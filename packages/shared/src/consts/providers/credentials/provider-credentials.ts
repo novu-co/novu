@@ -609,6 +609,22 @@ export const oneSignalConfig: IConfigCredentials[] = [
   ...pushConfigBase,
 ];
 
+export const oneSignalV2Config: IConfigCredentials[] = [
+  {
+    key: CredentialsKeyEnum.ApplicationId,
+    displayName: 'Application ID',
+    type: 'text',
+    required: true,
+  },
+  {
+    key: CredentialsKeyEnum.ApiKey,
+    displayName: 'API Key',
+    type: 'text',
+    required: true,
+  },
+  ...pushConfigBase,
+];
+
 export const pushpadConfig: IConfigCredentials[] = [
   {
     key: CredentialsKeyEnum.ApiKey,

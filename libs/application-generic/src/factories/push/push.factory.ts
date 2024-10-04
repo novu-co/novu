@@ -7,6 +7,7 @@ import {
   PusherBeamsHandler,
   PushpadHandler,
   PushWebhookHandler,
+  OneSignalV2Handler,
 } from './handlers';
 import { IPushFactory, IPushHandler } from './interfaces';
 
@@ -16,6 +17,7 @@ export class PushFactory implements IPushFactory {
     new ExpoHandler(),
     new APNSHandler(),
     new OneSignalHandler(),
+    new OneSignalV2Handler(),
     new PushpadHandler(),
     new PushWebhookHandler(),
     new PusherBeamsHandler(),
