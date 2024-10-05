@@ -41,6 +41,7 @@ export class OneSignalV2PushProvider
 
     const notification = this.transform(bridgeProviderData, {
       app_id: this.config.appId,
+      target_channel: 'push',
       include_aliases: {
         external_id: options.target,
       },
