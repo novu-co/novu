@@ -6,6 +6,7 @@ import {
   IPreferenceChannels,
   PreferencesTypeEnum,
   WorkflowPreferences,
+  WorkflowPreferencesPartial,
 } from '@novu/shared';
 import { deepMerge } from '../../utils';
 import { GetFeatureFlag, GetFeatureFlagCommand } from '../get-feature-flag';
@@ -113,10 +114,10 @@ export class GetPreferences {
 
   /** Transform WorkflowPreferences into IPreferenceChannels */
   public static mapWorkflowPreferencesToChannelPreferences(
-    workflowPreferences: WorkflowPreferences,
+    workflowPreferences: WorkflowPreferencesPartial,
   ): IPreferenceChannels {
     const mappedPreferences = Object.entries(
-      workflowPreferences.channels,
+      workflowPreferences.channels ?? {},
     ).reduce(
       (acc, [channel, preference]) => ({
         ...acc,
