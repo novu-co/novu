@@ -115,9 +115,9 @@ export class GetPreferences {
   public static mapWorkflowPreferencesToChannelPreferences(
     workflowPreferences: WorkflowPreferences,
   ): IPreferenceChannels {
-    const builtPreferences = buildWorkflowPreferences(workflowPreferences);
-
-    const mappedPreferences = Object.entries(builtPreferences.channels).reduce(
+    const mappedPreferences = Object.entries(
+      workflowPreferences.channels,
+    ).reduce(
       (acc, [channel, preference]) => ({
         ...acc,
         [channel]: preference.enabled,
