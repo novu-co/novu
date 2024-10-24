@@ -54,7 +54,7 @@ export class GetSubscriberTemplatePreference {
 
     const templateChannelPreference = command.template.preferenceSettings;
 
-    const subscriberWorkflowChannelPreferences =
+    const subscriberWorkflowPreference =
       await this.getSubscriberWorkflowPreference(command, subscriber._id);
     const workflowOverrideChannelPreference =
       workflowOverride?.preferenceSettings;
@@ -62,7 +62,7 @@ export class GetSubscriberTemplatePreference {
     const { channels, overrides } = overridePreferences(
       {
         template: templateChannelPreference,
-        subscriber: subscriberWorkflowChannelPreferences.channels,
+        subscriber: subscriberWorkflowPreference.channels,
         workflowOverride: workflowOverrideChannelPreference,
       },
       initialActiveChannels,
@@ -71,19 +71,19 @@ export class GetSubscriberTemplatePreference {
     const template = mapTemplateConfiguration({
       ...command.template,
       // Use the critical flag from the V2 Preference object if it exists
-      ...(subscriberWorkflowChannelPreferences.critical !== undefined && {
-        critical: subscriberWorkflowChannelPreferences.critical,
+      ...(subscriberWorkflowPreference.critical !== undefined && {
+        critical: subscriberWorkflowPreference.critical,
       }),
     });
 
     return {
       template,
       preference: {
-        enabled: subscriberWorkflowChannelPreferences.enabled,
+        enabled: subscriberWorkflowPreference.enabled,
         channels,
         overrides,
       },
-      type: subscriberWorkflowChannelPreferences.type,
+      type: subscriberWorkflowPreference.type,
     };
   }
 
