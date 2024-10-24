@@ -38,48 +38,53 @@ describe('Update global preferences - /inbox/preferences (PATCH)', function () {
       .set('Authorization', `Bearer ${session.subscriberToken}`);
 
     expect(response.status).to.equal(200);
-    expect(response.body.data.channels.email).to.equal(true);
-    expect(response.body.data.channels.in_app).to.equal(true);
-    expect(response.body.data.channels.sms).to.equal(false);
-    expect(response.body.data.channels.push).to.equal(false);
-    expect(response.body.data.channels.chat).to.equal(true);
+    expect(response.body.data.channels.email).to.equal(undefined);
+    expect(response.body.data.channels.in_app).to.equal(undefined);
+    expect(response.body.data.channels.sms).to.equal(undefined);
+    expect(response.body.data.channels.push).to.equal(undefined);
+    expect(response.body.data.channels.chat).to.equal(undefined);
     expect(response.body.data.level).to.equal(PreferenceLevelEnum.GLOBAL);
   });
 
-  it('should update the particular channel sent in the body and return all channels', async function () {
+  it('should update the particular channel sent in the body and return only active channels', async function () {
+    await session.createTemplate({
+      noFeedId: true,
+      steps: [
+        {
+          type: StepTypeEnum.IN_APP,
+          content: 'Test notification content',
+        },
+      ],
+    });
+
     const response = await session.testAgent
       .patch('/v1/inbox/preferences')
       .send({
-        email: true,
         in_app: true,
-        sms: false,
-        push: false,
-        chat: true,
       })
       .set('Authorization', `Bearer ${session.subscriberToken}`);
 
     expect(response.status).to.equal(200);
-    expect(response.body.data.channels.email).to.equal(true);
+    expect(response.body.data.channels.email).to.equal(undefined);
     expect(response.body.data.channels.in_app).to.equal(true);
-    expect(response.body.data.channels.sms).to.equal(false);
-    expect(response.body.data.channels.push).to.equal(false);
-    expect(response.body.data.channels.chat).to.equal(true);
+    expect(response.body.data.channels.sms).to.equal(undefined);
+    expect(response.body.data.channels.push).to.equal(undefined);
+    expect(response.body.data.channels.chat).to.equal(undefined);
     expect(response.body.data.level).to.equal(PreferenceLevelEnum.GLOBAL);
 
     const responseSecond = await session.testAgent
       .patch('/v1/inbox/preferences')
       .send({
-        email: false,
         in_app: true,
       })
       .set('Authorization', `Bearer ${session.subscriberToken}`);
 
     expect(responseSecond.status).to.equal(200);
-    expect(responseSecond.body.data.channels.email).to.equal(false);
+    expect(responseSecond.body.data.channels.email).to.equal(undefined);
     expect(responseSecond.body.data.channels.in_app).to.equal(true);
-    expect(responseSecond.body.data.channels.sms).to.equal(false);
-    expect(responseSecond.body.data.channels.push).to.equal(false);
-    expect(responseSecond.body.data.channels.chat).to.equal(true);
+    expect(responseSecond.body.data.channels.sms).to.equal(undefined);
+    expect(responseSecond.body.data.channels.push).to.equal(undefined);
+    expect(responseSecond.body.data.channels.chat).to.equal(undefined);
     expect(responseSecond.body.data.level).to.equal(PreferenceLevelEnum.GLOBAL);
   });
 });
