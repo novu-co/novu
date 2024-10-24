@@ -223,15 +223,15 @@ export class UpdatePreferences {
           preferences,
         })
       );
+    } else {
+      await this.upsertPreferences.upsertSubscriberGlobalPreferences(
+        UpsertSubscriberGlobalPreferencesCommand.create({
+          preferences,
+          environmentId: item.environmentId,
+          organizationId: item.organizationId,
+          _subscriberId: item._subscriberId,
+        })
+      );
     }
-
-    await this.upsertPreferences.upsertSubscriberGlobalPreferences(
-      UpsertSubscriberGlobalPreferencesCommand.create({
-        preferences,
-        environmentId: item.environmentId,
-        organizationId: item.organizationId,
-        _subscriberId: item._subscriberId,
-      })
-    );
   }
 }
