@@ -47,7 +47,7 @@ export class SyncToEnvironmentUseCase {
     const workflowToClone = await this.getWorkflowToClone(command);
     const preferencesToClone = await this.getWorkflowPreferences(workflowToClone._id, workflowToClone._environmentId);
     const externalId = workflowToClone.triggers[0].identifier;
-    const existingWorkflow = await this.findExistingWorkflow(command, externalId);
+    const existingWorkflow = await this.findWorkflowInTargetEnvironment(command, externalId);
 
     const workflowDto = existingWorkflow
       ? await this.mapWorkflowToUpdateWorkflowDto(workflowToClone, existingWorkflow, preferencesToClone)
@@ -73,7 +73,7 @@ export class SyncToEnvironmentUseCase {
     );
   }
 
-  private async findExistingWorkflow(
+  private async findWorkflowInTargetEnvironment(
     command: SyncToEnvironmentCommand,
     externalId: string
   ): Promise<NotificationTemplateEntity | undefined> {
