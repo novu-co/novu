@@ -2,14 +2,12 @@ import { createHmac } from 'node:crypto';
 
 import { Client } from './client';
 import {
-  FRAMEWORK_VERSION,
   GetActionEnum,
   HttpHeaderKeysEnum,
   HttpMethodEnum,
   HttpQueryKeysEnum,
   HttpStatusEnum,
   PostActionEnum,
-  SDK_VERSION,
   SIGNATURE_TIMESTAMP_TOLERANCE,
 } from './constants';
 import {
