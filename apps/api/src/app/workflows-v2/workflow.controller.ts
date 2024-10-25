@@ -38,7 +38,6 @@ import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.us
 import { ListWorkflowsCommand } from './usecases/list-workflows/list-workflows.command';
 import { DeleteWorkflowUseCase } from './usecases/delete-workflow/delete-workflow.usecase';
 import { DeleteWorkflowCommand } from './usecases/delete-workflow/delete-workflow.command';
-import { GetListQueryParams } from './params/get-list-query-params';
 import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
 import { SyncToEnvironmentCommand } from './usecases/sync-to-environment/sync-to-environment.command';
 import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
@@ -75,11 +74,10 @@ export class WorkflowController {
   }
 
   @Put(':workflowId/promote')
-  @ExternalApiAccessible()
   @UseGuards(UserAuthGuard)
   async promote(
     @UserSession() user: UserSessionData,
-    @Param('workflowId') workflowId: string,
+    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
     @Body() promoteWorkflowDto: PromoteWorkflowDto
   ): Promise<WorkflowResponseDto> {
     return this.syncToEnvironmentUseCase.execute(

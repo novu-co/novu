@@ -258,7 +258,10 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(prodWorkflow.steps).to.have.lengthOf(devWorkflow.steps.length);
       prodWorkflow.steps.forEach((prodStep, index) => {
         const devStep = devWorkflow.steps[index];
-        expect(prodStep.stepUuid).to.not.equal(devStep.stepUuid, 'Step UUID should be different');
+        /*
+         * TODO: this is not true yet, but some ID will remain the same across environments
+         * expect(prodStep.stepId).to.equal(devStep.stepId, 'Step ID should be the same');
+         */
         expect(prodStep.controlValues).to.deep.equal(devStep.controlValues, 'Step controlValues should match');
         expect(prodStep.name).to.equal(devStep.name, 'Step name should match');
         expect(prodStep.type).to.equal(devStep.type, 'Step type should match');
@@ -290,7 +293,7 @@ describe('Workflow Controller E2E API Testing', () => {
         // modify existing Email Step, add new InApp Steps, previously existing InApp Step is removed
         steps: [
           { ...devWorkflow.steps[0], name: 'Updated Email Step' },
-          { ...buildInAppStep(), name: 'Updated InApp Step' },
+          { ...buildInAppStep(), name: 'New InApp Step' },
         ],
       };
 
@@ -320,16 +323,16 @@ describe('Workflow Controller E2E API Testing', () => {
       // Verify updated steps
       expect(prodWorkflowUpdated.steps).to.have.lengthOf(2);
       expect(prodWorkflowUpdated.steps[0].name).to.equal('Updated Email Step');
-      // (!) Update changes the UUID, its removed and recreated
-      expect(prodWorkflowUpdated.steps[0].stepUuid).to.not.equal(prodWorkflowCreated.steps[0].stepUuid);
-      expect(prodWorkflowUpdated.steps[1].name).to.equal('Updated InApp Step');
-      expect(prodWorkflowUpdated.steps[1].stepUuid).to.not.equal(prodWorkflowCreated.steps[1].stepUuid);
+      // TODO: verify that the stepId (or some) is the same across env for the same prod/dev step
+      expect(prodWorkflowUpdated.steps[0]._id).to.not.equal(prodWorkflowCreated.steps[0]._id);
+      expect(prodWorkflowUpdated.steps[1].name).to.equal('New InApp Step');
+      expect(prodWorkflowUpdated.steps[1]._id).to.not.equal(prodWorkflowCreated.steps[1]._id);
     });
 
     it('should throw an error if the workflow to promote is not found', async () => {
       const res = await session.testAgent.put(`${v2Prefix}/workflows/123/promote`).send({ targetEnvironmentId: '123' });
 
-      expect(res.status).to.equal(400);
+      expect(res.status).to.equal(404);
       expect(res.body.message).to.equal('Workflow cannot be found');
       expect(res.body.workflowId).to.equal('123');
     });

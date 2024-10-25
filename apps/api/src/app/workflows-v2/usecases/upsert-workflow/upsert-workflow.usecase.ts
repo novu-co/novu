@@ -14,7 +14,6 @@ import {
   GetPreferencesCommand,
   GetPreferencesResponseDto,
   NotificationStep,
-  slugifyName,
   UpdateWorkflow,
   UpdateWorkflowCommand,
   UpsertControlValuesCommand,
@@ -224,7 +223,7 @@ export class UpsertWorkflowUseCase {
 
     return {
       id: existingWorkflow._id,
-      environmentId: user.environmentId,
+      environmentId: existingWorkflow._environmentId,
       organizationId: user.organizationId,
       userId: user._id,
       name: command.workflowDto.name,

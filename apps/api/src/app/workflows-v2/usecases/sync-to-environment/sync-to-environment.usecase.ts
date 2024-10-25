@@ -123,16 +123,19 @@ export class SyncToEnvironmentUseCase {
     existingWorkflowSteps?: NotificationStepEntity[]
   ): StepUpdateDto[] | StepCreateDto[] {
     return steps.map((step) => ({
-      // If we are updating an existing workflow, we need to map the updated steps to the existing steps
+      /*
+       * If we are updating an existing workflow, we need to map the updated steps to the existing steps
+       * (!) 'existingWorkflowSteps' are from a different environment than 'steps' - the only thing that doesn't change
+       *  in steps across environments is the stepId (TODO)
+       */
       ...(existingWorkflowSteps && {
-        stepUuid:
+        _id:
           existingWorkflowSteps.find((existingStep) => existingStep.stepId === step.stepId)?._templateId ??
           step._templateId,
       }),
       name: step.name ?? '',
       type: step.template?.type ?? StepTypeEnum.TRIGGER,
       controlValues: step.controlVariables ?? {},
-      controls: step.template?.controls ?? { schema: {} },
     }));
   }
 
