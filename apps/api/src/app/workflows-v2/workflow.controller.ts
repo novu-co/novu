@@ -22,6 +22,7 @@ import {
   UpdateWorkflowDto,
   UserSessionData,
   WorkflowResponseDto,
+  PromoteWorkflowDto,
 } from '@novu/shared';
 import { ExternalApiAccessible, UserAuthGuard, UserSession } from '@novu/application-generic';
 import { ApiCommonResponses } from '../shared/framework/response.decorator';
@@ -35,6 +36,8 @@ import { ListWorkflowsCommand } from './usecases/list-workflows/list-workflows.c
 import { DeleteWorkflowUseCase } from './usecases/delete-workflow/delete-workflow.usecase';
 import { DeleteWorkflowCommand } from './usecases/delete-workflow/delete-workflow.command';
 import { GetListQueryParams } from './params/get-list-query-params';
+import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
+import { SyncToEnvironmentCommand } from './usecases/sync-to-environment/sync-to-environment.command';
 
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
@@ -46,7 +49,8 @@ export class WorkflowController {
     private upsertWorkflowUseCase: UpsertWorkflowUseCase,
     private getWorkflowUseCase: GetWorkflowUseCase,
     private listWorkflowsUseCase: ListWorkflowsUseCase,
-    private deleteWorkflowUsecase: DeleteWorkflowUseCase
+    private deleteWorkflowUsecase: DeleteWorkflowUseCase,
+    private syncToEnvironmentUseCase: SyncToEnvironmentUseCase
   ) {}
 
   @Post('')
@@ -58,6 +62,23 @@ export class WorkflowController {
     return this.upsertWorkflowUseCase.execute(
       UpsertWorkflowCommand.create({
         workflowDto: createWorkflowDto,
+        user,
+      })
+    );
+  }
+
+  @Put(':workflowId/promote')
+  @ExternalApiAccessible()
+  @UseGuards(UserAuthGuard)
+  async promote(
+    @UserSession() user: UserSessionData,
+    @Param('workflowId') workflowId: string,
+    @Body() promoteWorkflowDto: PromoteWorkflowDto
+  ): Promise<WorkflowResponseDto> {
+    return this.syncToEnvironmentUseCase.execute(
+      SyncToEnvironmentCommand.create({
+        identifierOrInternalId: workflowId,
+        targetEnvironmentId: promoteWorkflowDto.targetEnvironmentId,
         user,
       })
     );

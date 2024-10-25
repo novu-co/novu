@@ -61,12 +61,12 @@ export class UpsertPreferences {
     });
   }
 
-  private async upsert(
+  public async upsert(
     command: UpsertPreferencesCommand,
   ): Promise<PreferencesEntity> {
     const foundId = await this.getPreferencesId(command);
 
-    if (command.preferences === null) {
+    if (command.preferences === null && foundId) {
       return this.deletePreferences(command, foundId);
     }
 

@@ -5,7 +5,6 @@ import {
   NotificationGroupRepository,
   NotificationStepEntity,
   NotificationTemplateEntity,
-  NotificationTemplateRepository,
   PreferencesEntity,
 } from '@novu/dal';
 import {
@@ -22,6 +21,7 @@ import {
   UpsertPreferences,
   UpsertUserWorkflowPreferencesCommand,
   slugifyName,
+  UpsertWorkflowPreferencesCommand,
 } from '@novu/application-generic';
 import {
   CreateWorkflowDto,
@@ -123,15 +123,13 @@ export class UpsertWorkflowUseCase {
     command: UpsertWorkflowCommand,
     workflow: NotificationTemplateEntity
   ): Promise<GetPreferencesResponseDto | undefined> {
-    if (!command.workflowDto.preferences?.user) {
-      return undefined;
-    }
-    await this.upsertPreferences(workflow, command);
+    await this.upsertUserWorkflowPreferences(workflow, command);
+    await this.upsertWorkflowPreferences(workflow, command);
 
     return await this.getPersistedPreferences(workflow);
   }
 
-  private async getPersistedPreferences(workflow) {
+  private async getPersistedPreferences(workflow: NotificationTemplateEntity) {
     return await this.getPreferencesUseCase.safeExecute(
       GetPreferencesCommand.create({
         environmentId: workflow._environmentId,
@@ -141,7 +139,10 @@ export class UpsertWorkflowUseCase {
     );
   }
 
-  private async upsertPreferences(workflow, command: UpsertWorkflowCommand): Promise<PreferencesEntity> {
+  private async upsertUserWorkflowPreferences(
+    workflow: NotificationTemplateEntity,
+    command: UpsertWorkflowCommand
+  ): Promise<PreferencesEntity> {
     return await this.upsertPreferencesUsecase.upsertUserWorkflowPreferences(
       UpsertUserWorkflowPreferencesCommand.create({
         environmentId: workflow._environmentId,
@@ -149,6 +150,20 @@ export class UpsertWorkflowUseCase {
         userId: command.user._id,
         templateId: workflow._id,
         preferences: command.workflowDto.preferences?.user,
+      })
+    );
+  }
+
+  private async upsertWorkflowPreferences(
+    workflow: NotificationTemplateEntity,
+    command: UpsertWorkflowCommand
+  ): Promise<PreferencesEntity> {
+    return await this.upsertPreferencesUsecase.upsertWorkflowPreferences(
+      UpsertWorkflowPreferencesCommand.create({
+        environmentId: workflow._environmentId,
+        organizationId: workflow._organizationId,
+        templateId: workflow._id,
+        preferences: command.workflowDto.preferences?.workflow,
       })
     );
   }

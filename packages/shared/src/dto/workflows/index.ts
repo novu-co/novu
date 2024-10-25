@@ -1,5 +1,6 @@
 export * from './create-workflow-dto';
 export * from './update-workflow-dto';
+export * from './promote-workflow-dto';
 export * from './create-workflow-deprecated.dto';
 export * from './update-workflow-deprecated.dto';
 export * from './workflow-commons-fields';
