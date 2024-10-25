@@ -1,8 +1,6 @@
 import { useLayoutEffect, useState } from 'react';
 import { RiLinkM, RiPencilFill } from 'react-icons/ri';
 import { useForm } from 'react-hook-form';
-// eslint-disable-next-line
-// @ts-ignore
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 
@@ -10,10 +8,12 @@ import { cn } from '@/utils/ui';
 import { Popover, PopoverContent, PopoverTrigger, PopoverPortal } from '../primitives/popover';
 import { Button } from '../primitives/button';
 import { Input, InputField } from '../primitives/input';
-import { useBridgeHealthCheck, useUpdateBridgeUrl, useValidateBridgeUrl } from '@/hooks';
 import { ConnectionStatus } from '@/utils/types';
 import { useEnvironment } from '@/context/environment/hooks';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form';
+import { useBridgeHealthCheck } from '@/hooks/use-bridge-health-check';
+import { useValidateBridgeUrl } from '@/hooks/use-validate-bridge-url';
+import { useUpdateBridgeUrl } from '@/hooks/use-update-bridge-url';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
 
 const formSchema = z.object({ bridgeUrl: z.string().url() });
 
@@ -86,7 +86,7 @@ export const EditBridgeUrlButton = () => {
                     <FormItem>
                       <FormLabel>Bridge Endpoint URL</FormLabel>
                       <FormControl>
-                        <InputField variant="xs" state={errors.bridgeUrl?.message ? 'error' : 'default'}>
+                        <InputField state={errors.bridgeUrl?.message ? 'error' : 'default'}>
                           <RiLinkM className="size-5 min-w-5" />
                           <Input id="bridgeUrl" {...field} />
                         </InputField>

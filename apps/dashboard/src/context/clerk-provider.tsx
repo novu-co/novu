@@ -37,6 +37,9 @@ export const ClerkProvider = (props: ClerkProviderProps) => {
       routerPush={(to) => navigate(to)}
       routerReplace={(to) => navigate(to, { replace: true })}
       publishableKey={CLERK_PUBLISHABLE_KEY}
+      localization={{
+        formFieldLabel__organizationSlug: 'URL friendly identifier',
+      }}
       appearance={{
         userButton: {
           elements: {

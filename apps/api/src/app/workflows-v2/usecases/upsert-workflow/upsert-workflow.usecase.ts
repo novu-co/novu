@@ -14,6 +14,7 @@ import {
   GetPreferencesCommand,
   GetPreferencesResponseDto,
   NotificationStep,
+  slugifyName,
   UpdateWorkflow,
   UpdateWorkflowCommand,
   UpsertControlValuesCommand,
@@ -38,6 +39,7 @@ import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/st
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { GetWorkflowByIdsCommand } from '../get-workflow-by-ids/get-workflow-by-ids.command';
+import { mapStepTypeToOutput } from '../../../step-schemas/shared';
 
 function buildUpsertControlValuesCommand(
   command: UpsertWorkflowCommand,
@@ -266,8 +268,8 @@ export class UpsertWorkflowUseCase {
     persistedWorkflow: NotificationTemplateEntity | undefined,
     step: StepDto | (StepDto & { stepUuid: string })
   ): NotificationStep {
-    const stepEntityToReturn = this.buildBaseStepEntity(step);
     const foundPersistedStep = this.getPersistedStepIfFound(persistedWorkflow, step);
+    const stepEntityToReturn = this.buildBaseStepEntity(step, foundPersistedStep);
     if (foundPersistedStep) {
       return {
         ...stepEntityToReturn,
@@ -280,12 +282,15 @@ export class UpsertWorkflowUseCase {
     return stepEntityToReturn;
   }
 
-  private buildBaseStepEntity(step: StepDto | (StepDto & { stepUuid: string })): NotificationStep {
+  private buildBaseStepEntity(
+    step: StepDto | StepUpdateDto,
+    foundPersistedStep?: NotificationStepEntity
+  ): NotificationStep {
     return {
       template: {
         type: step.type,
         name: step.name,
-        controls: step.controls,
+        controls: foundPersistedStep?.template?.controls || { schema: mapStepTypeToOutput[step.type] },
         content: '',
       },
       stepId: slugifyName(step.name),
@@ -302,14 +307,14 @@ export class UpsertWorkflowUseCase {
     }
 
     for (const persistedStep of persistedWorkflow.steps) {
-      if (this.isStepUpdateDto(stepUpdateRequest) && persistedStep._templateId === stepUpdateRequest.stepUuid) {
+      if (this.isStepUpdateDto(stepUpdateRequest) && persistedStep._templateId === stepUpdateRequest._id) {
         return persistedStep;
       }
     }
   }
 
-  private isStepUpdateDto(obj: StepDto): obj is StepUpdateDto {
-    return typeof obj === 'object' && obj !== null && 'stepUuid' in obj;
+  private isStepUpdateDto(obj: StepUpdateDto | StepCreateDto): obj is StepUpdateDto {
+    return typeof obj === 'object' && obj !== null && !!(obj as StepUpdateDto)._id;
   }
 
   private async getNotificationGroup(environmentId: string): Promise<string | undefined> {

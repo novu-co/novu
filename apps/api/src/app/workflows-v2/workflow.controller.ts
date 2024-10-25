@@ -1,30 +1,33 @@
+import { ApiTags } from '@nestjs/swagger';
 import {
   Body,
-  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
   HttpCode,
-  HttpStatus,
   Param,
   Post,
   Put,
   Query,
   UseGuards,
   UseInterceptors,
-} from '@nestjs/common';
-
-import { ApiTags } from '@nestjs/swagger';
+} from '@nestjs/common/decorators';
+import { ClassSerializerInterceptor, HttpStatus } from '@nestjs/common';
 import {
   CreateWorkflowDto,
   DirectionEnum,
+  GeneratePreviewRequestDto,
+  GeneratePreviewResponseDto,
+  GetListQueryParams,
+  IdentifierOrInternalId,
   ListWorkflowResponse,
   UpdateWorkflowDto,
   UserSessionData,
   WorkflowResponseDto,
   PromoteWorkflowDto,
 } from '@novu/shared';
-import { ExternalApiAccessible, UserAuthGuard, UserSession } from '@novu/application-generic';
+import { UserAuthGuard, UserSession } from '@novu/application-generic';
+
 import { ApiCommonResponses } from '../shared/framework/response.decorator';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
 import { GetWorkflowCommand } from './usecases/get-workflow/get-workflow.command';
@@ -38,6 +41,9 @@ import { DeleteWorkflowCommand } from './usecases/delete-workflow/delete-workflo
 import { GetListQueryParams } from './params/get-list-query-params';
 import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
 import { SyncToEnvironmentCommand } from './usecases/sync-to-environment/sync-to-environment.command';
+import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
+import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview-command';
+import { ParseSlugIdPipe } from './pipes/parse-slug-Id.pipe';
 
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
@@ -50,7 +56,8 @@ export class WorkflowController {
     private getWorkflowUseCase: GetWorkflowUseCase,
     private listWorkflowsUseCase: ListWorkflowsUseCase,
     private deleteWorkflowUsecase: DeleteWorkflowUseCase,
-    private syncToEnvironmentUseCase: SyncToEnvironmentUseCase
+    private syncToEnvironmentUseCase: SyncToEnvironmentUseCase,
+    private generatePreviewUseCase: GeneratePreviewUsecase
   ) {}
 
   @Post('')
@@ -88,7 +95,7 @@ export class WorkflowController {
   @UseGuards(UserAuthGuard)
   async update(
     @UserSession() user: UserSessionData,
-    @Param('workflowId') workflowId: string,
+    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
     @Body() updateWorkflowDto: UpdateWorkflowDto
   ): Promise<WorkflowResponseDto> {
     return await this.upsertWorkflowUseCase.execute(
@@ -104,15 +111,17 @@ export class WorkflowController {
   @UseGuards(UserAuthGuard)
   async getWorkflow(
     @UserSession() user: UserSessionData,
-    @Param('workflowId') workflowId: string
+    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId
   ): Promise<WorkflowResponseDto> {
     return this.getWorkflowUseCase.execute(GetWorkflowCommand.create({ identifierOrInternalId: workflowId, user }));
   }
 
   @Delete(':workflowId')
-  @ExternalApiAccessible()
   @HttpCode(HttpStatus.NO_CONTENT)
-  async removeWorkflow(@UserSession() user: UserSessionData, @Param('workflowId') workflowId: string) {
+  async removeWorkflow(
+    @UserSession() user: UserSessionData,
+    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId
+  ) {
     await this.deleteWorkflowUsecase.execute(
       DeleteWorkflowCommand.create({ identifierOrInternalId: workflowId, user })
     );
@@ -133,6 +142,19 @@ export class WorkflowController {
         searchQuery: query.query,
         user,
       })
+    );
+  }
+
+  @Post('/:workflowId/step/:stepUuid/preview')
+  @UseGuards(UserAuthGuard)
+  async generatePreview(
+    @UserSession() user: UserSessionData,
+    @Param('workflowId') workflowId: string,
+    @Param('stepUuid') stepUuid: string,
+    @Body() generatePreviewRequestDto: GeneratePreviewRequestDto
+  ): Promise<GeneratePreviewResponseDto> {
+    return await this.generatePreviewUseCase.execute(
+      GeneratePreviewCommand.create({ user, workflowId, stepUuid, generatePreviewRequestDto })
     );
   }
 }
