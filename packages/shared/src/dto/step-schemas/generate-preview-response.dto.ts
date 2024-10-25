@@ -1,5 +1,5 @@
 import { ChannelTypeEnum } from '../../types';
-import { ControlPreviewIssueTypeEnum } from './control-preview-issue-type.enum';
+import { WorkflowIssueTypeEnum } from './workflow-issue-type.enum';
 
 export class RenderOutput {}
 
@@ -54,14 +54,14 @@ export class InAppRenderOutput extends RenderOutput {
   };
 }
 
-export class ControlPreviewIssue {
-  issueType: ControlPreviewIssueTypeEnum;
+export class RuntimeIssue {
+  issueType: WorkflowIssueTypeEnum;
   variableName?: string;
   message: string;
 }
 
 export class GeneratePreviewResponseDto {
-  issues: Record<string, ControlPreviewIssue[]>;
+  issues: Record<string, RuntimeIssue[]>;
   result?:
     | {
         type: ChannelTypeEnum.EMAIL;

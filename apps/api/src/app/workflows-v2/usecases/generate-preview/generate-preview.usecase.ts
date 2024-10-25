@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import {
   ChannelTypeEnum,
-  ControlPreviewIssue,
-  ControlPreviewIssueTypeEnum,
   ControlsSchema,
   GeneratePreviewRequestDto,
   GeneratePreviewResponseDto,
   JSONSchemaDto,
+  RuntimeIssue,
   StepTypeEnum,
+  WorkflowIssueTypeEnum,
   WorkflowOriginEnum,
 } from '@novu/shared';
 import { merge } from 'lodash/fp';
@@ -69,13 +69,13 @@ export class GeneratePreviewUsecase {
     return this.buildControlPreviewIssues(missingRequiredControlValues);
   }
 
-  private buildControlPreviewIssues(keys: string[]): Record<string, ControlPreviewIssue[]> {
-    const record: Record<string, ControlPreviewIssue[]> = {};
+  private buildControlPreviewIssues(keys: string[]): Record<string, RuntimeIssue[]> {
+    const record: Record<string, RuntimeIssue[]> = {};
 
     keys.forEach((key) => {
       record[key] = [
         {
-          issueType: ControlPreviewIssueTypeEnum.MISSING_VALUE,
+          issueType: WorkflowIssueTypeEnum.MISSING_VALUE,
           message: `Value is missing on a required control`, // Custom message for the issue
         },
       ];
@@ -187,14 +187,14 @@ export class GeneratePreviewUsecase {
   private buildPayloadIssues(
     missingVariables: string[],
     variableToControlValueKeys: Record<string, string[]>
-  ): Record<string, ControlPreviewIssue[]> {
-    const record: Record<string, ControlPreviewIssue[]> = {};
+  ): Record<string, RuntimeIssue[]> {
+    const record: Record<string, RuntimeIssue[]> = {};
 
     missingVariables.forEach((missingVariable) => {
       variableToControlValueKeys[missingVariable].forEach((controlValueKey) => {
         record[controlValueKey] = [
           {
-            issueType: ControlPreviewIssueTypeEnum.MISSING_VARIABLE_IN_PAYLOAD, // Set issueType to MISSING_VALUE
+            issueType: WorkflowIssueTypeEnum.MISSING_VARIABLE_IN_PAYLOAD, // Set issueType to MISSING_VALUE
             message: `Variable payload.${missingVariable} is missing in payload`, // Custom message for the issue
             variableName: `payload.${missingVariable}`,
           },
@@ -207,8 +207,8 @@ export class GeneratePreviewUsecase {
 }
 
 function buildResponse(
-  missingValuesIssue: Record<string, ControlPreviewIssue[]>,
-  missingPayloadVariablesIssue: Record<string, ControlPreviewIssue[]>,
+  missingValuesIssue: Record<string, RuntimeIssue[]>,
+  missingPayloadVariablesIssue: Record<string, RuntimeIssue[]>,
   executionOutput,
   stepType: StepTypeEnum
 ): GeneratePreviewResponseDto {
