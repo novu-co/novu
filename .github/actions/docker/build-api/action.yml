@@ -39,23 +39,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: ⛏️ build api
-      shell: bash
-      run: pnpm build:api
-
-    # TODO Removed when migrated to action matrix for each build type
-    - uses: ./.github/actions/cache
-
-    - uses: crazy-max/ghaction-setup-docker@v2
-      with:
-        version: v24.0.6
-        daemon-config: |
-          {
-            "features": {
-              "containerd-snapshotter": true
-            }
-          }
-
     - name: Setup QEMU
       uses: docker/setup-qemu-action@v3
       with:
