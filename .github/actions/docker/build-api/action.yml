@@ -80,7 +80,7 @@ runs:
         IMAGE_TAG: ${{ github.sha }}
         DOCKER_BUILD_ARGUMENTS: >
           --platform=linux/amd64 --provenance=false
-          --output=type=image, name=$REGISTRY/$REPOSITORY,push-by-digest=true,name-canonical=true
+          --output=type=image,name=$REGISTRY/$REPOSITORY,push-by-digest=true,name-canonical=true
       run: |
         set -x
         cd apps/api && pnpm run docker:build
