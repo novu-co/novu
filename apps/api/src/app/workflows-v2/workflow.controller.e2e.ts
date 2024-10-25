@@ -329,6 +329,17 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(prodWorkflowUpdated.steps[1]._id).to.not.equal(prodWorkflowCreated.steps[1]._id);
     });
 
+    it('should throw an error if trying to promote to the same environment', async () => {
+      const devWorkflow = await createWorkflowAndValidate('-promote-workflow');
+
+      const res = await session.testAgent.put(`${v2Prefix}/workflows/${devWorkflow._id}/promote`).send({
+        targetEnvironmentId: session.environment._id,
+      });
+
+      expect(res.status).to.equal(400);
+      expect(res.body.message).to.equal('Cannot sync workflow to the same environment');
+    });
+
     it('should throw an error if the workflow to promote is not found', async () => {
       const res = await session.testAgent.put(`${v2Prefix}/workflows/123/promote`).send({ targetEnvironmentId: '123' });
 

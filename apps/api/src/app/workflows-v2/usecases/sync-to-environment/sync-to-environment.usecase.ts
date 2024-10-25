@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   CreateWorkflowDto,
   PreferencesTypeEnum,
@@ -40,6 +40,10 @@ export class SyncToEnvironmentUseCase {
   ) {}
 
   async execute(command: SyncToEnvironmentCommand): Promise<WorkflowResponseDto> {
+    if (command.user.environmentId === command.targetEnvironmentId) {
+      throw new BadRequestException('Cannot sync workflow to the same environment');
+    }
+
     const workflowToClone = await this.getWorkflowToClone(command);
     const preferencesToClone = await this.getWorkflowPreferences(workflowToClone._id, workflowToClone._environmentId);
     const externalId = workflowToClone.triggers[0].identifier;
