@@ -10,8 +10,11 @@ inputs:
     description: 'Push the image to the registry'
     required: false
     default: 'false'
-  github_token:
-    description: 'The token to use for logging into ghcr.io'
+  aws-access-key-id:
+    description: 'Access Key for AWS'
+    required: true
+  aws-secret-access-key:
+    description: 'Secret Access Key for AWS'
     required: true
   fork:
     description: 'Whether this is being triggered from a forked repo'
@@ -73,8 +76,8 @@ runs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
         aws-region: eu-west-2
       
     - name: Login to Amazon ECR

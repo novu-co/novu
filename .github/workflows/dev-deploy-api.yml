@@ -54,7 +54,8 @@ jobs:
         with:
           tag: dev
           push: 'true'
-          github_token: ${{ secrets.GH_PACKAGES }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           docker_name: 'novu/api-ee'
           bullmq_secret: ${{ secrets.BULL_MQ_PRO_NPM_TOKEN }}
           environment: dev
