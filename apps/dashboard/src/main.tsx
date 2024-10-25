@@ -7,6 +7,9 @@ import { WorkflowsPage, SignInPage, SignUpPage, OrganizationListPage } from '@/p
 import './index.css';
 import { ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
+import { initializeSentry } from './utils/sentry';
+
+initializeSentry();
 
 const router = createBrowserRouter([
   {

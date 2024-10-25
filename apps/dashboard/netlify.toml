@@ -21,6 +21,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
+    Document-Policy = "js-profiling"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "no-referrer-when-downgrade"
     X-Content-Type-Options = "nosniff"
