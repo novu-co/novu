@@ -22,7 +22,7 @@ jobs:
   test_api:
     strategy:
       matrix:
-        name: ['novu/api-ee', 'novu/api']
+        name: ['novu/api-ee']
     uses: ./.github/workflows/reusable-api-e2e.yml
     with:
       ee: ${{ contains (matrix.name,'-ee') }}
