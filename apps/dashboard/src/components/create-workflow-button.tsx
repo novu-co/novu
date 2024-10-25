@@ -18,6 +18,7 @@ import { Textarea } from '@/components/primitives/textarea';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useTagsQuery } from '@/hooks/use-tags-query';
 import { QueryKeys } from '@/utils/query-keys';
+import { slugify } from '@/utils/slugify';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type CreateWorkflowDto, WorkflowCreationSourceEnum } from '@novu/shared';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -30,7 +31,7 @@ import { z } from 'zod';
 
 const formSchema = z.object({
   name: z.string(),
-  identifier: z.string().regex(/^[a-z0-9-]+$/, 'Invalid identifier format. Must follow ^[a-z0-9-]+$'),
+  workflowId: z.string().regex(/^[a-z0-9-]+$/, 'Invalid identifier format. Must follow ^[a-z0-9-]+$'),
   tags: z
     .array(z.string().min(1))
     .max(8)
@@ -59,7 +60,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { description: '', identifier: '', name: '', tags: [] },
+    defaultValues: { description: '', workflowId: '', name: '', tags: [] },
   });
 
   return (
@@ -100,7 +101,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                   name: values.name,
                   steps: [],
                   __source: WorkflowCreationSourceEnum.DASHBOARD,
-                  workflowId: values.identifier,
+                  workflowId: values.workflowId,
                   description: values.description || undefined,
                   tags: values.tags,
                 });
@@ -115,7 +116,14 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     <FormLabel>Name</FormLabel>
                     <FormControl>
                       <InputField>
-                        <Input placeholder="Untitled" {...field} />
+                        <Input
+                          placeholder="Untitled"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            form.setValue('workflowId', slugify(e.target.value));
+                          }}
+                        />
                       </InputField>
                     </FormControl>
                     <FormMessage />
@@ -125,13 +133,19 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
 
               <FormField
                 control={form.control}
-                name="identifier"
+                name="workflowId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Identifier</FormLabel>
                     <FormControl>
                       <InputField>
-                        <Input placeholder="untitled" {...field} />
+                        <Input
+                          readOnly
+                          placeholder="untitled"
+                          className="pointer-events-none"
+                          tabIndex={-1}
+                          {...field}
+                        />
                       </InputField>
                     </FormControl>
                     <FormMessage>Must be unique and all lowercase ^[a-z0-9\-]+$</FormMessage>
