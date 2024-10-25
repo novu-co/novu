@@ -33,7 +33,7 @@ export class UpsertPreferences {
   public async upsertSubscriberGlobalPreferences(
     command: UpsertSubscriberGlobalPreferencesCommand,
   ) {
-    await this.deleteWorkflowSubscriberChannelPreferences(command);
+    await this.deleteSubscriberWorkflowChannelPreferences(command);
 
     return this.upsert({
       _subscriberId: command._subscriberId,
@@ -44,7 +44,7 @@ export class UpsertPreferences {
     });
   }
 
-  private async deleteWorkflowSubscriberChannelPreferences(
+  private async deleteSubscriberWorkflowChannelPreferences(
     command: UpsertSubscriberGlobalPreferencesCommand,
   ) {
     const channelTypes = Object.keys(command.preferences?.channels || {});
