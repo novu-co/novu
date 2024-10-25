@@ -44,7 +44,6 @@ runs:
       run: pnpm build:api
 
     # TODO Removed when migrated to action matrix for each build type
-    - uses: ./.github/actions/free-space
     - uses: ./.github/actions/cache
 
     - uses: crazy-max/ghaction-setup-docker@v2
@@ -60,7 +59,7 @@ runs:
     - name: Setup QEMU
       uses: docker/setup-qemu-action@v3
       with:
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64
 
     - name: Set Up Docker Buildx
       uses: docker/setup-buildx-action@v3
