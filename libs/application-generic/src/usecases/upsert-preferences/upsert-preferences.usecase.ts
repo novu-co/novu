@@ -144,14 +144,12 @@ export class UpsertPreferences {
         _id: foundPreference._id,
         _environmentId: command.environmentId,
       },
-      [
-        {
-          $set: {
-            preferences: mergedPreferences,
-            _userId: command.userId,
-          },
+      {
+        $set: {
+          preferences: mergedPreferences,
+          _userId: command.userId,
         },
-      ],
+      },
     );
 
     return await this.getPreference(command);
