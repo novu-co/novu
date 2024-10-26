@@ -1,6 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PreferencesEntity, PreferencesRepository } from '@novu/dal';
-import { buildWorkflowPreferences, PreferencesTypeEnum } from '@novu/shared';
+import {
+  buildWorkflowPreferences,
+  PreferencesTypeEnum,
+  WorkflowPreferencesPartial,
+} from '@novu/shared';
 import { UpsertPreferencesCommand } from './upsert-preferences.command';
 import { UpsertWorkflowPreferencesCommand } from './upsert-workflow-preferences.command';
 import { UpsertSubscriberGlobalPreferencesCommand } from './upsert-subscriber-global-preferences.command';
@@ -136,7 +140,7 @@ export class UpsertPreferences {
   ): Promise<PreferencesEntity> {
     const mergedPreferences = deepMerge([
       foundPreference.preferences,
-      command.preferences as Record<string, unknown>,
+      command.preferences as WorkflowPreferencesPartial,
     ]);
 
     await this.preferencesRepository.update(
