@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { ArgumentMetadata } from '@nestjs/common';
 
-import { ParseSlugIdPipe } from './parse-slug-Id.pipe';
+import { ParseSlugIdPipe } from './parse-slug-id.pipe';
 import { encodeBase62 } from '../../shared/helpers';
 
 describe('ParseSlugIdPipe', () => {
