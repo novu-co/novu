@@ -5,6 +5,7 @@ import {
   NotificationGroupRepository,
   NotificationStepEntity,
   NotificationTemplateEntity,
+  NotificationTemplateRepository,
   PreferencesEntity,
 } from '@novu/dal';
 import {
@@ -57,6 +58,7 @@ function buildUpsertControlValuesCommand(
 @Injectable()
 export class UpsertWorkflowUseCase {
   constructor(
+    private notificationTemplateRepository: NotificationTemplateRepository,
     private createWorkflowGenericUsecase: CreateWorkflowGeneric,
     private updateWorkflowUsecase: UpdateWorkflow,
     private notificationGroupRepository: NotificationGroupRepository,
@@ -66,19 +68,25 @@ export class UpsertWorkflowUseCase {
     private getPreferencesUseCase: GetPreferences
   ) {}
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
-    const workflowForUpdate: NotificationTemplateEntity | null = command.identifierOrInternalId
-      ? await this.getWorkflowByIdsUseCase.execute(
-          GetWorkflowByIdsCommand.create({
-            ...command,
-            identifierOrInternalId: command.identifierOrInternalId,
-          })
-        )
-      : null;
+    const workflowForUpdate = await this.queryWorkflow(command);
     const workflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
     const stepIdToControlValuesMap = await this.upsertControlValues(workflow, command);
     const preferences = await this.upsertPreference(command, workflow);
 
     return toResponseWorkflowDto(workflow, preferences, stepIdToControlValuesMap);
+  }
+
+  private async queryWorkflow(command: UpsertWorkflowCommand): Promise<NotificationTemplateEntity | null> {
+    if (!command.identifierOrInternalId) {
+      return null;
+    }
+
+    return await this.getWorkflowByIdsUseCase.execute(
+      GetWorkflowByIdsCommand.create({
+        ...command,
+        identifierOrInternalId: command.identifierOrInternalId,
+      })
+    );
   }
 
   private async upsertControlValues(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
@@ -154,9 +162,11 @@ export class UpsertWorkflowUseCase {
   }
 
   private async createOrUpdateWorkflow(
-    existingWorkflow: NotificationTemplateEntity | null | undefined,
+    existingWorkflow: NotificationTemplateEntity | null,
     command: UpsertWorkflowCommand
   ): Promise<NotificationTemplateEntity> {
+    await this.validateWorkflowUniqueness(existingWorkflow, command);
+
     if (existingWorkflow) {
       return await this.updateWorkflowUsecase.execute(
         UpdateWorkflowCommand.create(this.convertCreateToUpdateCommand(command, existingWorkflow))
@@ -166,6 +176,78 @@ export class UpsertWorkflowUseCase {
     return await this.createWorkflowGenericUsecase.execute(
       CreateWorkflowCommand.create(await this.buildCreateWorkflowGenericCommand(command))
     );
+  }
+
+  private async validateWorkflowUniqueness(
+    existingWorkflow: NotificationTemplateEntity | null,
+    command: UpsertWorkflowCommand
+  ): Promise<void> {
+    const { name } = command.workflowDto;
+    const { environmentId, organizationId } = command.user;
+
+    await this.validateWorkflowIdUniqueness(existingWorkflow, command, name);
+
+    await this.validateWorkflowNameUniqueness(name, environmentId, organizationId, existingWorkflow, command);
+  }
+
+  /**
+   * Creation path:
+   * If existingWorkflow is null, it indicates a new workflow creation.
+   * Therefore, we only need to check if any other workflow already exists with the same name.
+   *
+   * Update path:
+   * If existingWorkflow is not null, we can use a single query with { _id: { $ne: existingWorkflow._id } }
+   * to check for workflows with the same name that aren’t the current one.
+   */
+  private async validateWorkflowNameUniqueness(
+    name: string,
+    environmentId: string,
+    organizationId: string,
+    existingWorkflow: NotificationTemplateEntity | null,
+    command: UpsertWorkflowCommand
+  ) {
+    const existingWorkflowWithSameName = await this.notificationTemplateRepository.findOne({
+      name,
+      _environmentId: environmentId,
+      _organizationId: organizationId,
+      ...(existingWorkflow ? { _id: { $ne: existingWorkflow._id } } : {}),
+    });
+
+    if (existingWorkflowWithSameName) {
+      throw new BadRequestException({
+        message: `A workflow with the same workflow name already exists.`,
+        workflowName: name,
+      });
+    }
+  }
+
+  /**
+   * On Creation, validates the uniqueness of the workflow identifier
+   * @throws BadRequestException if a workflow with the same identifier already exists
+   */
+  private async validateWorkflowIdUniqueness(
+    existingWorkflow: NotificationTemplateEntity | null,
+    command: UpsertWorkflowCommand,
+    name: string
+  ): Promise<void> {
+    const { workflowDto, user } = command;
+    const { workflowId } = workflowDto;
+
+    const create = !existingWorkflow;
+
+    if (create && workflowId) {
+      const existingWorkflowByWorkflowId = await this.notificationTemplateRepository.findByTriggerIdentifier(
+        user.environmentId,
+        workflowId
+      );
+
+      if (existingWorkflowByWorkflowId) {
+        throw new BadRequestException({
+          message: `A workflow with the same workflow id already exists.`,
+          workflowId: command.workflowDto.workflowId,
+        });
+      }
+    }
   }
 
   private async buildCreateWorkflowGenericCommand(command: UpsertWorkflowCommand): Promise<CreateWorkflowCommand> {
@@ -194,7 +276,7 @@ export class UpsertWorkflowUseCase {
       description: workflowDto.description || '',
       tags: workflowDto.tags || [],
       critical: false,
-      triggerIdentifier: slugifyName(workflowDto.name),
+      triggerIdentifier: command.workflowDto.workflowId,
     };
   }
 
