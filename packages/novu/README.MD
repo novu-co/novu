@@ -31,8 +31,20 @@
 ```bash
 npx novu@latest dev
 ```
-  
+
+## 🔥 Flags
+
+| flag | long form usage example | description                                | default value               |
+| ---- | ----------------------- | ------------------------------------------ | --------------------------- |
+| -p   | --port <port>           | The local Bridge application endpoint port | 4000                        |
+| -r   | --route <route>         | The Bridge application endpoint route      | /api/novu                   |
+| -o   | --origin <origin>       | The Bridge application endpoint origin     | http://localhost            |
+| -d   | --dashboard-url <url>   | The Novu Cloud Dashboard URL               | https://dashboard.novu.co   |
+| -sp  | --studio-port <port>    | The Local Studio server port               | 2022                        |
+| -t   | --tunnel <url>          | Self hosted tunnel url                     | https://my-tunnel.ngrok.app |
+
 ## ⭐️ Why
+
 Building a notification system is hard, at first it seems like just sending an email but in reality it's just the beginning. In today's world users expect multichannel communication experience over email, sms, push, chat and more... An ever-growing list of providers are popping up each day, and notifications are spread around the code. Novu's goal is to simplify notifications and provide developers the tools to create meaningful communication between the system and its users.
 
 ## ✨ Features
@@ -76,7 +88,7 @@ await novu.trigger('<TRIGGER_NAME>', {
     name: 'Hello World',
     organization: {
       logo: 'https://happycorp.com/logo.png',
-    }
+    },
   },
 });
 ```
@@ -123,14 +135,14 @@ Novu provides a single API to manage providers across multiple channels with a s
 - [ ] Bandwidth
 - [ ] RingCentral
 
-#### 📱 Push 
+#### 📱 Push
 
 - [x] [FCM](https://github.com/novuhq/novu/tree/main/providers/fcm)
 - [x] [Expo](https://github.com/novuhq/novu/tree/main/providers/expo)
 - [ ] [SNS](https://github.com/novuhq/novu/tree/main/providers/sns)
 - [ ] Pushwoosh
 
-#### 👇 Chat 
+#### 👇 Chat
 
 - [x] [Slack](https://github.com/novuhq/novu/tree/main/providers/slack)
 - [x] [Discord](https://github.com/novuhq/novu/tree/main/providers/discord)
@@ -140,7 +152,6 @@ Novu provides a single API to manage providers across multiple channels with a s
 #### 📱 In-App
 
 - [x] [Novu](https://docs.novu.co/notification-center/introduction?utm_campaign=inapp-cli-readme)
-- [ ] MagicBell
 
 #### Other (Coming Soon...)
 
