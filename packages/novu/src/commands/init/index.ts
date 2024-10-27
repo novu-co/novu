@@ -121,7 +121,7 @@ export async function init(program: IInitCommandOptions, anonymousId?: string): 
     } catch (error) {
       console.error(
         // eslint-disable-next-line max-len
-        `Failed to verify your secret key against ${program.apiUrl}. For EU instances use --api-url https://eu.novu.co or provide the correct secret key`
+        `Failed to verify your secret key against ${program.apiUrl}. For EU instances use --api-url https://eu.api.novu.co or provide the correct secret key`
       );
 
       process.exit(1);
