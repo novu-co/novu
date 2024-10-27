@@ -59,7 +59,7 @@ const mapStepToNode = (
   if (step.type === StepTypeEnum.DELAY) {
     content = `Wait to send ~ 30 minutes`;
   }
-
+  console.log(step);
   return {
     id: crypto.randomUUID(),
     position: { x: previousPosition.x, y: previousPosition.y + Y_DISTANCE },
@@ -67,6 +67,7 @@ const mapStepToNode = (
       name: step.name,
       content,
       addStepIndex,
+      stepId: step._id,
     },
     type: step.type,
   };
@@ -87,7 +88,7 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
     });
 
     const addNode: Node<NodeData> = {
-      id: `${Number.MAX_SAFE_INTEGER}`,
+      id: crypto.randomUUID(),
       position: { ...previousPosition, y: previousPosition.y + Y_DISTANCE },
       data: {},
       type: 'add',

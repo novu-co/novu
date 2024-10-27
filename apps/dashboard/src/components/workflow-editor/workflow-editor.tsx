@@ -12,6 +12,7 @@ export const WorkflowEditor = () => {
     name: 'steps',
   });
 
+  console.log({ steps });
   return (
     <Tabs defaultValue="workflow" className="-mt-[1px] flex h-full flex-1 flex-col">
       <TabsList>

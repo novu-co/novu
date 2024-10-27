@@ -6,11 +6,13 @@ import { AddStepMenu } from './add-step-menu';
 import { Node, NodeBody, NodeHeader, NodeIcon, NodeName } from './base-node';
 import { StepTypeEnum } from '@/utils/enums';
 import { useWorkflowEditorContext } from './hooks';
+import { Link } from 'react-router-dom';
 
 export type NodeData = {
   name?: string;
   content?: string;
   addStepIndex?: number;
+  stepId?: string;
 };
 
 export type NodeType = FlowNode<NodeData>;
@@ -78,15 +80,17 @@ export const InAppNode = ({ data }: NodeProps<NodeType>) => {
 
   return (
     <Node>
-      <NodeHeader type={StepTypeEnum.IN_APP}>
-        <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.IN_APP]}>
-          <Icon />
-        </NodeIcon>
-        <NodeName>{data.name || 'In-App Step'}</NodeName>
-      </NodeHeader>
-      <NodeBody>Sends In-app notification to your subscribers</NodeBody>
-      <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
-      <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
+      <Link to={`step/${data.stepId}`}>
+        <NodeHeader type={StepTypeEnum.IN_APP}>
+          <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.IN_APP]}>
+            <Icon />
+          </NodeIcon>
+          <NodeName>{data.name || 'In-App Step'}</NodeName>
+        </NodeHeader>
+        <NodeBody>Sends In-app notification to your subscribers</NodeBody>
+        <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
+        <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
+      </Link>
     </Node>
   );
 };
