@@ -34,14 +34,20 @@ npx novu@latest dev
 
 ## 🔥 Flags
 
-| flag | long form usage example | description                                | default value               |
-| ---- | ----------------------- | ------------------------------------------ | --------------------------- |
-| -p   | --port <port>           | The local Bridge application endpoint port | 4000                        |
-| -r   | --route <route>         | The Bridge application endpoint route      | /api/novu                   |
-| -o   | --origin <origin>       | The Bridge application endpoint origin     | http://localhost            |
-| -d   | --dashboard-url <url>   | The Novu Cloud Dashboard URL               | https://dashboard.novu.co   |
-| -sp  | --studio-port <port>    | The Local Studio server port               | 2022                        |
-| -t   | --tunnel <url>          | Self hosted tunnel url                     | https://my-tunnel.ngrok.app |
+| flag | long form usage example | description                   | default value               |
+| ---- | ----------------------- | ----------------------------- | --------------------------- |
+| -p   | --port <port>           | local bridge application port | 4000                        |
+| -r   | --route <route>         | bridge application route      | /api/novu                   |
+| -o   | --origin <origin>       | bridge application origin     | http://localhost            |
+| -d   | --dashboard-url <url>   | Novu cloud dashboard URL      | https://dashboard.novu.co   |
+| -sp  | --studio-port <port>    | Local Studio server port      | 2022                        |
+| -t   | --tunnel <url>          | self hosted tunnel url        | https://my-tunnel.ngrok.app |
+
+Example: If bridge application is running on port `3002` and Novu account is in `EU` region.
+
+```bash
+npx novu@latest dev --port 3002 --dashboard-url https://eu.dashboard.novu.co
+```
 
 ## ⭐️ Why
 
@@ -49,7 +55,7 @@ Building a notification system is hard, at first it seems like just sending an e
 
 ## ✨ Features
 
-- 🌈 Single API for all messaging providers (Email, SMS, Push, Chat)
+- 🌈 Single API for all messaging provide`rs (Email, SMS, Push, Chat)
 - 💅 Easily manage notification over multiple channels
 - 🚀 Equipped with a CMS for advanced layouts and design management
 - 🛡 Built-in protection for missing variables (Coming Soon)
