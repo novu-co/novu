@@ -1,4 +1,4 @@
-import type { StepCreateDto, StepResponseDto } from '@novu/shared';
+import type { StepResponseDto } from '@novu/shared';
 
 export enum BaseEnvironmentEnum {
   DEVELOPMENT = 'Development',

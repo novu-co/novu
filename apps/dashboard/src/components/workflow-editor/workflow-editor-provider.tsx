@@ -32,6 +32,7 @@ const STEP_NAME_BY_TYPE: Record<StepTypeEnum, string> = {
 const createStep = (type: StepTypeEnum): Step => ({
   name: STEP_NAME_BY_TYPE[type],
   type,
+  _id: crypto.randomUUID(),
 });
 
 export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) => {
