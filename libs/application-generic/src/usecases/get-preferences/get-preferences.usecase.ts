@@ -143,7 +143,7 @@ export class GetPreferences {
       [workflowResourcePreferences, workflowUserPreferences]
         .filter((preference) => preference !== undefined)
         .map((item) => item.preferences),
-    );
+    ) as WorkflowPreferences;
 
     const subscriberGlobalPreferences =
       this.getSubscriberGlobalPreferences(items);
@@ -250,9 +250,10 @@ export class GetPreferences {
 
     // making sure we respond with correct readonly values.
     const mergedPreferences = deepMerge([
+      workflowPreferences,
       subscriberPreferences,
       readOnlyPreference,
-    ]);
+    ]) as WorkflowPreferences;
 
     return {
       preferences: mergedPreferences,
