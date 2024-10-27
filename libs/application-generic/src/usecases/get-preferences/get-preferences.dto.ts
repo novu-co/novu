@@ -9,5 +9,10 @@ export class GetPreferencesResponseDto {
 
   type: PreferencesTypeEnum;
 
-  source: Record<PreferencesTypeEnum, WorkflowPreferencesPartial | null>;
+  source: {
+    [PreferencesTypeEnum.WORKFLOW_RESOURCE]: WorkflowPreferences;
+    [PreferencesTypeEnum.USER_WORKFLOW]: WorkflowPreferences | null;
+    [PreferencesTypeEnum.SUBSCRIBER_GLOBAL]: WorkflowPreferencesPartial | null;
+    [PreferencesTypeEnum.SUBSCRIBER_WORKFLOW]: WorkflowPreferencesPartial | null;
+  };
 }

@@ -174,7 +174,7 @@ export class GetPreferences {
       (acc, type) => {
         const preference = items.find((item) => item.type === type);
         if (preference) {
-          acc[type] = preference.preferences;
+          acc[type] = preference.preferences as WorkflowPreferences;
         } else {
           acc[type] = null;
         }
