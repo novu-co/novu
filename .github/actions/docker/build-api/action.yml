@@ -39,11 +39,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Setup QEMU
-      uses: docker/setup-qemu-action@v3
-      with:
-        platforms: linux/amd64
-
     - name: Set Up Docker Buildx
       uses: docker/setup-buildx-action@v3
       with:
