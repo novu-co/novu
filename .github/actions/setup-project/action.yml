@@ -39,9 +39,9 @@ runs:
 
     - name: 📚 Start MongoDB
       if: ${{ inputs.slim == 'false' }}
-      uses: supercharge/mongodb-github-action@v1.9.0
+      uses: supercharge/mongodb-github-action@1.11.0
       with:
-        mongodb-version: 4.2.8
+        mongodb-version: 5.0.29
 
     - name: 🛟 Install dependencies
       shell: bash
