@@ -23,7 +23,11 @@ export const fetchWorkflowTestData = async ({
 };
 
 export async function triggerWorkflow({ name, payload, to }: { name: string; payload: unknown; to: unknown }) {
-  return post<{ data: { transactionId: string } }>(`/events/trigger`, { name, to, payload });
+  return post<{ data: { transactionId: string } }>(`/events/trigger`, {
+    name,
+    to,
+    payload: { ...(payload ?? {}), __source: 'dashboard' },
+  });
 }
 
 export async function createWorkflow(payload: CreateWorkflowDto) {
