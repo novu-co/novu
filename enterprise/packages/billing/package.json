@@ -24,7 +24,6 @@
     "mongoose": "^7.5.0",
     "rxjs": "7.8.1",
     "shortid": "^2.2.16",
-    "slugify": "^1.4.6",
     "stripe": "^11.18.0",
     "stripe-event-types": "^3.1.0"
   },

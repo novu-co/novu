@@ -1,3 +1,11 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ComponentProps, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { RiExternalLinkLine } from 'react-icons/ri';
+import { Link } from 'react-router-dom';
+import { z } from 'zod';
+import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify } from '@novu/shared';
 import { createWorkflow } from '@/api/workflows';
 import { Button } from '@/components/primitives/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
@@ -18,16 +26,6 @@ import { Textarea } from '@/components/primitives/textarea';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useTagsQuery } from '@/hooks/use-tags-query';
 import { QueryKeys } from '@/utils/query-keys';
-import { slugify } from '@/utils/slugify';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { type CreateWorkflowDto, WorkflowCreationSourceEnum } from '@novu/shared';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ComponentProps, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { RiExternalLinkLine } from 'react-icons/ri';
-
-import { Link } from 'react-router-dom';
-import { z } from 'zod';
 
 const formSchema = z.object({
   name: z.string(),
