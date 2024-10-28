@@ -1,8 +1,7 @@
-import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
 import { BaseRepository } from '@novu/dal';
 import { decodeBase62 } from '../../shared/helpers';
 
-type InternalId = string;
+export type InternalId = string;
 const INTERNAL_ID_LENGTH = 24;
 const ENCODED_ID_LENGTH = 16;
 
@@ -49,11 +48,4 @@ export function parseSlugId(value: string): InternalId {
   }
 
   return value;
-}
-
-@Injectable()
-export class ParseSlugIdPipe implements PipeTransform<string, InternalId> {
-  transform(value: string, metadata: ArgumentMetadata): InternalId {
-    return parseSlugId(value);
-  }
 }
