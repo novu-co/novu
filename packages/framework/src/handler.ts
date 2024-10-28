@@ -135,10 +135,7 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
     const action = url.searchParams.get(HttpQueryKeysEnum.ACTION) || GetActionEnum.HEALTH_CHECK;
     const workflowId = url.searchParams.get(HttpQueryKeysEnum.WORKFLOW_ID) || '';
     const stepId = url.searchParams.get(HttpQueryKeysEnum.STEP_ID) || '';
-    const signatureHeader =
-      (await actions.headers(HttpHeaderKeysEnum.NOVU_SIGNATURE)) ||
-      (await actions.headers(HttpHeaderKeysEnum.NOVU_SIGNATURE_DEPRECATED)) ||
-      '';
+    const signatureHeader = (await actions.headers(HttpHeaderKeysEnum.NOVU_SIGNATURE)) || '';
 
     let body: Record<string, unknown> = {};
     try {

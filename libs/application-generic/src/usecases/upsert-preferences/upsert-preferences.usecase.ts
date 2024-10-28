@@ -1,11 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PreferencesEntity, PreferencesRepository } from '@novu/dal';
-import { buildWorkflowPreferences, PreferencesTypeEnum } from '@novu/shared';
+import {
+  buildWorkflowPreferences,
+  PreferencesTypeEnum,
+  WorkflowPreferencesPartial,
+} from '@novu/shared';
 import { UpsertPreferencesCommand } from './upsert-preferences.command';
 import { UpsertWorkflowPreferencesCommand } from './upsert-workflow-preferences.command';
 import { UpsertSubscriberGlobalPreferencesCommand } from './upsert-subscriber-global-preferences.command';
 import { UpsertSubscriberWorkflowPreferencesCommand } from './upsert-subscriber-workflow-preferences.command';
 import { UpsertUserWorkflowPreferencesCommand } from './upsert-user-workflow-preferences.command';
+import { deepMerge } from '../../utils';
 
 @Injectable()
 export class UpsertPreferences {
@@ -14,11 +19,17 @@ export class UpsertPreferences {
   public async upsertWorkflowPreferences(
     command: UpsertWorkflowPreferencesCommand,
   ) {
+    /*
+     * Only Workflow Preferences need to be built with default values to ensure
+     * there is always a value to fall back to during preference merging.
+     */
+    const builtPreferences = buildWorkflowPreferences(command.preferences);
+
     return this.upsert({
       templateId: command.templateId,
       environmentId: command.environmentId,
       organizationId: command.organizationId,
-      preferences: command.preferences,
+      preferences: builtPreferences,
       type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
     });
   }
@@ -26,6 +37,8 @@ export class UpsertPreferences {
   public async upsertSubscriberGlobalPreferences(
     command: UpsertSubscriberGlobalPreferencesCommand,
   ) {
+    await this.deleteSubscriberWorkflowChannelPreferences(command);
+
     return this.upsert({
       _subscriberId: command._subscriberId,
       environmentId: command.environmentId,
@@ -33,6 +46,32 @@ export class UpsertPreferences {
       preferences: command.preferences,
       type: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
     });
+  }
+
+  private async deleteSubscriberWorkflowChannelPreferences(
+    command: UpsertSubscriberGlobalPreferencesCommand,
+  ) {
+    const channelTypes = Object.keys(command.preferences?.channels || {});
+
+    const preferenceUnsetPayload = channelTypes.reduce((acc, channelType) => {
+      acc[`preferences.channels.${channelType}`] = '';
+
+      return acc;
+    }, {});
+
+    await this.preferencesRepository.update(
+      {
+        _organizationId: command.organizationId,
+        _subscriberId: command._subscriberId,
+        type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+        $or: channelTypes.map((channelType) => ({
+          [`preferences.channels.${channelType}`]: { $exists: true },
+        })),
+      },
+      {
+        $unset: preferenceUnsetPayload,
+      },
+    );
   }
 
   public async upsertSubscriberWorkflowPreferences(
@@ -64,24 +103,21 @@ export class UpsertPreferences {
   private async upsert(
     command: UpsertPreferencesCommand,
   ): Promise<PreferencesEntity> {
-    const foundId = await this.getPreferencesId(command);
+    const foundPreference = await this.getPreference(command);
 
     if (command.preferences === null) {
-      return this.deletePreferences(command, foundId);
+      if (!foundPreference) {
+        throw new BadRequestException('Preference not found');
+      }
+
+      return this.deletePreferences(command, foundPreference?._id);
     }
 
-    const builtPreferences = buildWorkflowPreferences(command.preferences);
-
-    const builtCommand = {
-      ...command,
-      preferences: builtPreferences,
-    };
-
-    if (foundId) {
-      return this.updatePreferences(foundId, builtCommand);
+    if (foundPreference) {
+      return this.updatePreferences(foundPreference, command);
     }
 
-    return this.createPreferences(builtCommand);
+    return this.createPreferences(command);
   }
 
   private async createPreferences(
@@ -99,26 +135,28 @@ export class UpsertPreferences {
   }
 
   private async updatePreferences(
-    preferencesId: string,
+    foundPreference: PreferencesEntity,
     command: UpsertPreferencesCommand,
   ): Promise<PreferencesEntity> {
+    const mergedPreferences = deepMerge([
+      foundPreference.preferences,
+      command.preferences as WorkflowPreferencesPartial,
+    ]);
+
     await this.preferencesRepository.update(
       {
-        _id: preferencesId,
+        _id: foundPreference._id,
         _environmentId: command.environmentId,
       },
       {
         $set: {
-          preferences: command.preferences,
+          preferences: mergedPreferences,
           _userId: command.userId,
         },
       },
     );
 
-    return await this.preferencesRepository.findOne({
-      _id: preferencesId,
-      _environmentId: command.environmentId,
-    });
+    return await this.getPreference(command);
   }
 
   private async deletePreferences(
@@ -133,20 +171,15 @@ export class UpsertPreferences {
     });
   }
 
-  private async getPreferencesId(
+  private async getPreference(
     command: UpsertPreferencesCommand,
-  ): Promise<string | undefined> {
-    const found = await this.preferencesRepository.findOne(
-      {
-        _subscriberId: command._subscriberId,
-        _environmentId: command.environmentId,
-        _organizationId: command.organizationId,
-        _templateId: command.templateId,
-        type: command.type,
-      },
-      '_id',
-    );
-
-    return found?._id;
+  ): Promise<PreferencesEntity | undefined> {
+    return await this.preferencesRepository.findOne({
+      _subscriberId: command._subscriberId,
+      _environmentId: command.environmentId,
+      _organizationId: command.organizationId,
+      _templateId: command.templateId,
+      type: command.type,
+    });
   }
 }
