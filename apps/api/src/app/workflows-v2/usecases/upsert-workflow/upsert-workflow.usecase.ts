@@ -206,7 +206,7 @@ export class UpsertWorkflowUseCase {
       description: workflowDto.description || '',
       tags: workflowDto.tags || [],
       critical: false,
-      triggerIdentifier: slugifyName(workflowDto.name),
+      triggerIdentifier: slugifyName(workflowDto.workflowId),
     };
   }
 
@@ -229,7 +229,7 @@ export class UpsertWorkflowUseCase {
       description: workflowDto.description,
       tags: workflowDto.tags,
       active: workflowDto.active ?? true,
-      workflowId: workflowDto.workflowId,
+      workflowId: slugifyName(workflowDto.workflowId),
     };
   }
 

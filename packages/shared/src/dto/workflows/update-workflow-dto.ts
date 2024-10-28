@@ -1,9 +1,21 @@
-import { PreferencesRequestDto, StepCreateDto, StepUpdateDto, WorkflowCommonsFields } from './workflow-commons-fields';
+import { IsDefined, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
-export type UpdateWorkflowDto = WorkflowCommonsFields & {
+import {
+  PreferencesRequestDto,
+  StepCreateDto,
+  StepDto,
+  StepUpdateDto,
+  WorkflowCommonsFields,
+} from './workflow-commons-fields';
+
+export class UpdateWorkflowDto extends WorkflowCommonsFields {
   updatedAt: string;
 
+  @Type(() => StepDto)
+  @ValidateNested({ each: true })
   steps: (StepCreateDto | StepUpdateDto)[];
 
+  @IsDefined()
   preferences: PreferencesRequestDto;
-};
+}

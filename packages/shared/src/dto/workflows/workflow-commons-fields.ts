@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsDefined, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
 
 import { JSONSchema } from 'json-schema-to-ts';
 import { WorkflowResponseDto } from './workflow-response-dto';
@@ -10,6 +10,20 @@ export class ControlsSchema {
   schema: JSONSchema;
 }
 
+export class StepDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsEnum(StepTypeEnum)
+  @IsNotEmpty()
+  type: StepTypeEnum;
+
+  @IsObject()
+  @IsOptional()
+  controlValues?: Record<string, unknown>;
+}
+
 export type StepResponseDto = StepDto & {
   _id: string;
   slug: Slug;
@@ -17,11 +31,13 @@ export type StepResponseDto = StepDto & {
   controls: ControlsSchema;
 };
 
-export type StepUpdateDto = StepDto & {
+export class StepUpdateDto extends StepDto {
+  @IsString()
+  @IsNotEmpty()
   _id: string;
-};
+}
 
-export type StepCreateDto = StepDto;
+export class StepCreateDto extends StepDto {}
 
 export type ListWorkflowResponse = {
   workflows: WorkflowListResponseDto[];
@@ -35,19 +51,6 @@ export type WorkflowListResponseDto = Pick<
   stepTypeOverviews: StepTypeEnum[];
 };
 
-export class StepDto {
-  @IsString()
-  @IsDefined()
-  name: string;
-
-  @IsString()
-  @IsDefined()
-  type: StepTypeEnum;
-
-  @IsObject()
-  controlValues: Record<string, unknown>;
-}
-
 export class WorkflowCommonsFields {
   @IsOptional()
   @IsArray()
@@ -59,11 +62,11 @@ export class WorkflowCommonsFields {
   active?: boolean;
 
   @IsString()
-  @IsDefined()
+  @IsNotEmpty()
   name: string;
 
   @IsString()
-  @IsDefined()
+  @IsNotEmpty()
   workflowId: string;
 
   @IsString()
