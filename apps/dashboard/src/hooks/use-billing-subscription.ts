@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { differenceInDays, isSameDay } from 'date-fns';
-import { GetSubscriptionDto } from '@novu/shared';
-import { useAuth } from '@/context';
+import type { GetSubscriptionDto } from '@novu/shared';
 import { getBillingSubscription } from '@/api/billing';
 import { QueryKeys } from '@/utils/query-keys';
+import { useAuth } from '@/context/auth/hooks';
 
 const today = new Date();
 
@@ -13,13 +13,11 @@ export type UseSubscriptionType = GetSubscriptionDto & { daysLeft: number; isLoa
 export const useBillingSubscription = () => {
   const { currentOrganization } = useAuth();
 
-  const { data: subscription, isLoading: isLoadingSubscription } = useQuery<GetSubscriptionDto>(
-    [QueryKeys.billingSubscription, currentOrganization?._id],
-    getBillingSubscription,
-    {
-      enabled: !!currentOrganization,
-    }
-  );
+  const { data: subscription, isLoading: isLoadingSubscription } = useQuery<GetSubscriptionDto>({
+    queryKey: [QueryKeys.billingSubscription, currentOrganization?._id],
+    queryFn: getBillingSubscription,
+    enabled: !!currentOrganization,
+  });
 
   const daysLeft = useMemo(() => {
     if (!subscription?.trial.end) return 0;

@@ -6,14 +6,16 @@ import { RootRoute, AuthRoute, DashboardRoute, CatchAllRoute } from './routes';
 import { WorkflowsPage, SignInPage, SignUpPage, OrganizationListPage } from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
-import { Primitives } from '@/routes/primitives';
+import { EditWorkflowPage } from './pages/edit-workflow';
+import { initializeSentry } from './utils/sentry';
+
+initializeSentry();
 
 const router = createBrowserRouter([
   {
     element: <RootRoute />,
     errorElement: <ErrorPage />,
     children: [
-      { path: '/primitives', element: <Primitives /> },
       {
         element: <AuthRoute />,
         children: [
@@ -36,8 +38,21 @@ const router = createBrowserRouter([
         element: <DashboardRoute />,
         children: [
           {
-            path: ROUTES.WORKFLOWS,
-            element: <WorkflowsPage />,
+            path: ROUTES.ENV,
+            children: [
+              {
+                path: ROUTES.WORKFLOWS,
+                element: <WorkflowsPage />,
+              },
+              {
+                path: ROUTES.EDIT_WORKFLOW,
+                element: <EditWorkflowPage />,
+              },
+              {
+                path: '*',
+                element: <CatchAllRoute />,
+              },
+            ],
           },
           {
             path: '*',

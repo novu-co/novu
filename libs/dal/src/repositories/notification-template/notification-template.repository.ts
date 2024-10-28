@@ -42,6 +42,7 @@ export class NotificationTemplateRepository extends BaseRepository<
   async findById(id: string, environmentId: string) {
     return this.findByIdQuery({ id, environmentId });
   }
+
   async findByIdQuery(query: FindByIdQuery) {
     const item = await this.MongooseModel.findOne({
       _id: query.id,
@@ -265,6 +266,34 @@ export class NotificationTemplateRepository extends BaseRepository<
 
   public static getBlueprintOrganizationId(): string | undefined {
     return process.env.BLUEPRINT_CREATOR;
+  }
+
+  async estimatedDocumentCount(): Promise<any> {
+    return this.notificationTemplate.estimatedDocumentCount();
+  }
+
+  async getTotalSteps(): Promise<number> {
+    const res = await this.notificationTemplate.aggregate<{ totalSteps: number }>([
+      {
+        $group: {
+          _id: null,
+          totalSteps: {
+            $sum: {
+              $cond: {
+                if: { $isArray: '$steps' },
+                then: { $size: '$steps' },
+                else: 0,
+              },
+            },
+          },
+        },
+      },
+    ]);
+    if (res.length > 0) {
+      return res[0].totalSteps;
+    } else {
+      return 0;
+    }
   }
 }
 

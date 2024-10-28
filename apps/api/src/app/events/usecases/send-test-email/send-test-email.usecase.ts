@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { addBreadcrumb } from '@sentry/node';
-import { OrganizationRepository, IntegrationEntity } from '@novu/dal';
-import { ChannelTypeEnum, EmailProviderIdEnum, IEmailOptions } from '@novu/shared';
+import { IntegrationEntity, OrganizationRepository } from '@novu/dal';
+import { ChannelTypeEnum, EmailProviderIdEnum, IEmailOptions, WorkflowOriginEnum } from '@novu/shared';
 
 import {
   AnalyticsService,
@@ -97,12 +97,12 @@ export class SendTestEmail {
         PreviewStepCommand.create({
           workflowId: command.workflowId,
           stepId: command.stepId,
-          inputs: command.controls || command.inputs,
-          controls: command.controls || command.inputs,
-          data: command.payload,
+          controls: command.controls,
+          payload: command.payload,
           environmentId: command.environmentId,
           organizationId: command.organizationId,
           userId: command.userId,
+          workflowOrigin: WorkflowOriginEnum.EXTERNAL,
         })
       );
 
@@ -110,8 +110,8 @@ export class SendTestEmail {
         throw new ApiException('Could not retrieve content from edge');
       }
 
-      html = data.outputs.body;
-      subject = data.outputs.subject;
+      html = data.outputs.body as string;
+      subject = data.outputs.subject as string;
 
       if (data.providers && typeof data.providers === 'object') {
         bridgeProviderData = data.providers[integration.providerId] || {};
@@ -123,7 +123,7 @@ export class SendTestEmail {
         to: Array.isArray(email) ? email : [email],
         subject,
         html: html as string,
-        from: command.payload.$sender_email || integration?.credentials.from || 'no-reply@novu.co',
+        from: (command.payload.$sender_email as string) || integration?.credentials.from || 'no-reply@novu.co',
       };
 
       await this.sendMessage(integration, mailData, mailFactory, command, bridgeProviderData);

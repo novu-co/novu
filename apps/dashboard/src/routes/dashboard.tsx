@@ -1,13 +1,13 @@
 import { Outlet } from 'react-router-dom';
-import { DashboardLayout } from '@/components/dashboard-layout';
 import { ProtectedRoute } from './protected-route';
+import { useMonitoring } from '@/hooks/use-monitoring';
 
 export const DashboardRoute = () => {
+  useMonitoring();
+
   return (
     <ProtectedRoute>
-      <DashboardLayout>
-        <Outlet />
-      </DashboardLayout>
+      <Outlet />
     </ProtectedRoute>
   );
 };

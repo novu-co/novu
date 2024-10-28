@@ -1,10 +1,10 @@
-import { useBillingSubscription } from '@/hooks';
 import { LogoCircle } from '../icons';
 import { RiArrowRightDoubleLine, RiInformationFill } from 'react-icons/ri';
 import { Progress } from '../primitives/progress';
 import { Button } from '../primitives/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, TooltipArrow } from '../primitives/tooltip';
 import { LEGACY_ROUTES } from '@/utils/routes';
+import { useBillingSubscription } from '@/hooks/use-billing-subscription';
 
 const transition = 'transition-all duration-300 ease-out';
 
@@ -14,6 +14,7 @@ const pluralizeDaysLeft = (numberOfDays: number) => {
 
 export const FreeTrialCard = () => {
   const { subscription, daysLeft, isLoading } = useBillingSubscription();
+  const daysTotal = subscription && subscription.trial.daysTotal > 0 ? subscription.trial.daysTotal : 100;
 
   if (isLoading || !subscription || !subscription.trial.isActive || subscription?.hasPaymentMethod) {
     return null;
@@ -59,7 +60,7 @@ export const FreeTrialCard = () => {
         Experience novu without any limits for free for the next {pluralizedDays}.
       </span>
       <div className={`max-h-3 overflow-hidden opacity-100 ${transition} group-hover:max-h-0 group-hover:opacity-0`}>
-        <Progress value={daysLeft} max={subscription.trial.daysTotal > 0 ? subscription.trial.daysTotal : 100} />
+        <Progress value={daysTotal - daysLeft} max={daysTotal} />
       </div>
       <div
         className={`-mt-2 max-h-0 overflow-hidden opacity-0 ${transition} group-hover:max-h-8 group-hover:opacity-100`}

@@ -26,3 +26,14 @@ export type DeepPartial<T> = T extends object
       [P in keyof T]?: DeepPartial<T[P]>;
     }
   : T;
+
+export type Base62Id = string;
+
+export type WorkflowName = string;
+
+export enum ShortIsPrefixEnum {
+  WORKFLOW = 'wf_',
+  STEP = 'stp_',
+}
+
+export type Slug = `${WorkflowName}_${ShortIsPrefixEnum}${Base62Id}`;

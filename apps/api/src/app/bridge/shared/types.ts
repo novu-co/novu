@@ -1,6 +1,6 @@
 import { IMessageTemplate, INotificationTemplateStep, StepType } from '@novu/shared';
 import { IStepControl } from '@novu/application-generic';
-import { JsonSchema } from '@novu/framework';
+import { JsonSchema } from '@novu/framework/internal';
 
 export type Steps = INotificationTemplateStep & IMessageTemplate;
 
@@ -29,9 +29,4 @@ export interface IWorkflowDefineStep {
   options?: IStepDefineOptions;
 
   code: string;
-}
-
-export enum BridgeErrorCodeEnum {
-  BRIDGE_UNEXPECTED_RESPONSE = 'BRIDGE_UNEXPECTED_RESPONSE',
-  BRIDGE_ENDPOINT_NOT_FOUND = 'BRIDGE_ENDPOINT_NOT_FOUND',
 }

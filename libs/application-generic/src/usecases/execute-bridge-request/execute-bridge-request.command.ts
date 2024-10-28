@@ -1,29 +1,24 @@
-import { IsDefined, IsOptional, IsString } from 'class-validator';
+import { IsDefined, IsOptional } from 'class-validator';
 import { AfterResponseHook } from 'got';
 import {
   CodeResult,
   DiscoverOutput,
-  ExecuteOutput,
-  HealthCheck,
   Event,
+  ExecuteOutput,
   GetActionEnum,
-  PostActionEnum,
+  HealthCheck,
   HttpQueryKeysEnum,
-} from '@novu/framework';
-import { BaseCommand } from '../../commands';
+  PostActionEnum,
+} from '@novu/framework/internal';
+import { WorkflowOriginEnum } from '@novu/shared';
+import { EnvironmentLevelCommand } from '../../commands';
 
-export class ExecuteBridgeRequestCommand extends BaseCommand {
-  @IsString()
-  bridgeUrl: string;
-
+export class ExecuteBridgeRequestCommand extends EnvironmentLevelCommand {
   @IsOptional()
   event?: Omit<Event, `${HttpQueryKeysEnum}`>;
 
-  @IsString()
-  apiKey: string;
-
   @IsOptional()
-  searchParams?: Record<string, string>;
+  searchParams?: Partial<Record<HttpQueryKeysEnum, string>>;
 
   @IsOptional()
   afterResponse?: AfterResponseHook;
@@ -33,6 +28,12 @@ export class ExecuteBridgeRequestCommand extends BaseCommand {
 
   @IsOptional()
   retriesLimit?: number;
+
+  @IsDefined()
+  workflowOrigin: WorkflowOriginEnum;
+
+  @IsOptional()
+  statelessBridgeUrl?: string;
 }
 
 // will generate the output type based on the action

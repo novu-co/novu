@@ -1,45 +1,31 @@
-import { ClassSerializerInterceptor, Controller, Get, Param, UseInterceptors } from '@nestjs/common';
+import { ClassSerializerInterceptor, Controller, Get, Query, UseInterceptors } from '@nestjs/common';
+
+import { ExternalApiAccessible, UserSession } from '@novu/application-generic';
+import { type StepType } from '@novu/framework/internal';
 
 import { UserSessionData } from '@novu/shared';
-import { ExternalApiAccessible, UserSession } from '@novu/application-generic';
-import { StepType } from '@novu/framework';
-
-import { ApiOperation, ApiParam } from '@nestjs/swagger';
-import { GetStepSchemaCommand } from './usecases/get-step-schema/get-step-schema.command';
+import { createGetStepSchemaCommand } from './usecases/get-step-schema/get-step-schema.command';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
-import { GetStepSchema } from './usecases/get-step-schema/get-step-schema.usecase';
-import { SchemaTypeDto } from './dtos/schema-type.dto';
+import { GetStepSchemaUseCase } from './usecases/get-step-schema/get-step-schema.usecase';
+import { StepSchemaDto } from './dtos/step-schema.dto';
+import { ParseSlugIdPipe } from '../workflows-v2/pipes/parse-slug-id.pipe';
 
 @Controller('/step-schemas')
 @UserAuthentication()
 @UseInterceptors(ClassSerializerInterceptor)
 export class StepSchemasController {
-  constructor(private getStepDefaultSchemaUsecase: GetStepSchema) {}
+  constructor(private getStepDefaultSchemaUsecase: GetStepSchemaUseCase) {}
 
-  @Get('/:stepType')
-  @ApiOperation({
-    summary: 'Get step schema',
-    description: 'Get the schema for a step type',
-  })
-  @ApiParam({
-    name: 'stepType',
-    type: String,
-    description: 'The type of step to get the schema for.',
-  })
+  @Get()
   @ExternalApiAccessible()
-  async getStepSchema(
+  async getWorkflowStepSchema(
     @UserSession() user: UserSessionData,
-    @Param('stepType') stepType: StepType
-  ): Promise<SchemaTypeDto> {
-    const schema = await this.getStepDefaultSchemaUsecase.execute(
-      GetStepSchemaCommand.create({
-        organizationId: user.organizationId,
-        environmentId: user.environmentId,
-        userId: user._id,
-        stepType,
-      })
+    @Query('stepType') stepType?: StepType,
+    @Query('workflowId', ParseSlugIdPipe) workflowId?: string,
+    @Query('stepId', ParseSlugIdPipe) stepId?: string
+  ): Promise<StepSchemaDto> {
+    return await this.getStepDefaultSchemaUsecase.execute(
+      createGetStepSchemaCommand(user, stepType, workflowId, stepId)
     );
-
-    return { schema };
   }
 }

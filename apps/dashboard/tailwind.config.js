@@ -1,14 +1,17 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     boxShadow: {
-      xs: '0px 1px 2px 0px #0A0D1408',
+      xs: '0px 1px 2px 0px rgba(10, 13, 20, 0.03)',
       sm: '0px 1px 2px 0px #1018280F,0px 1px 3px 0px #1018281A',
+      md: '0px 16px 32px -12px rgba(14, 18, 27, 0.10)',
       DEFAULT: '0px 16px 32px -12px #0E121B1A',
     },
     colors: {
+      black: 'black',
+      transparent: 'transparent',
       background: 'hsl(var(--background))',
       foreground: {
         0: 'hsl(var(--foreground-0))',
@@ -25,35 +28,35 @@ export default {
         950: 'hsl(var(--foreground-950))',
       },
       neutral: {
-        DEFAULT: 'hsl(var(--secondary))',
-        0: 'hsl(var(--secondary-0))',
-        50: 'hsl(var(--secondary-50))',
-        100: 'hsl(var(--secondary-100))',
-        200: 'hsl(var(--secondary-200))',
-        300: 'hsl(var(--secondary-300))',
-        400: 'hsl(var(--secondary-400))',
-        500: 'hsl(var(--secondary-500))',
-        600: 'hsl(var(--secondary-600))',
-        700: 'hsl(var(--secondary-700))',
-        800: 'hsl(var(--secondary-800))',
-        900: 'hsl(var(--secondary-900))',
-        950: 'hsl(var(--secondary-950))',
-        1000: 'hsl(var(--secondary-1000))',
-        foreground: 'hsl(var(--secondary-foreground))',
+        DEFAULT: 'hsl(var(--neutral))',
+        0: 'hsl(var(--neutral-0))',
+        50: 'hsl(var(--neutral-50))',
+        100: 'hsl(var(--neutral-100))',
+        200: 'hsl(var(--neutral-200))',
+        300: 'hsl(var(--neutral-300))',
+        400: 'hsl(var(--neutral-400))',
+        500: 'hsl(var(--neutral-500))',
+        600: 'hsl(var(--neutral-600))',
+        700: 'hsl(var(--neutral-700))',
+        800: 'hsl(var(--neutral-800))',
+        900: 'hsl(var(--neutral-900))',
+        950: 'hsl(var(--neutral-950))',
+        1000: 'hsl(var(--neutral-1000))',
+        foreground: 'hsl(var(--neutral-foreground))',
       },
-      'secondary-alpha': {
-        50: 'hsl(var(--secondary-alpha-50))',
-        100: 'hsl(var(--secondary-alpha-100))',
-        200: 'hsl(var(--secondary-alpha-200))',
-        300: 'hsl(var(--secondary-alpha-300))',
-        400: 'hsl(var(--secondary-alpha-400))',
-        500: 'hsl(var(--secondary-alpha-500))',
-        600: 'hsl(var(--secondary-alpha-600))',
-        700: 'hsl(var(--secondary-alpha-700))',
-        800: 'hsl(var(--secondary-alpha-800))',
-        900: 'hsl(var(--secondary-alpha-900))',
-        950: 'hsl(var(--secondary-alpha-950))',
-        1000: 'hsl(var(--secondary-alpha-1000))',
+      'neutral-alpha': {
+        50: 'hsl(var(--neutral-alpha-50))',
+        100: 'hsl(var(--neutral-alpha-100))',
+        200: 'hsl(var(--neutral-alpha-200))',
+        300: 'hsl(var(--neutral-alpha-300))',
+        400: 'hsl(var(--neutral-alpha-400))',
+        500: 'hsl(var(--neutral-alpha-500))',
+        600: 'hsl(var(--neutral-alpha-600))',
+        700: 'hsl(var(--neutral-alpha-700))',
+        800: 'hsl(var(--neutral-alpha-800))',
+        900: 'hsl(var(--neutral-alpha-900))',
+        950: 'hsl(var(--neutral-alpha-950))',
+        1000: 'hsl(var(--neutral-alpha-1000))',
       },
       primary: {
         DEFAULT: 'hsl(var(--primary))',
@@ -84,14 +87,19 @@ export default {
       stable: {
         DEFAULT: 'hsl(var(--stable))',
       },
-      border: {
-        DEFAULT: 'hsl(var(--border))',
-        stroke: 'hsl(var(--stroke))',
+      verified: {
+        DEFAULT: 'hsl(var(--verified))',
+      },
+      alert: {
+        DEFAULT: 'hsl(var(--alert))',
       },
       input: 'hsl(var(--input))',
       ring: 'hsl(var(--ring))',
     },
     extend: {
+      fontFamily: {
+        code: ['Ubuntu', 'monospace'],
+      },
       opacity: {
         2.5: 0.025,
       },
@@ -99,6 +107,19 @@ export default {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      keyframes: {
+        'pulse-shadow': {
+          '0%': {
+            boxShadow: '0 0 0 0 hsl(var(--pulse-color))',
+          },
+          '70%': {
+            boxShadow: '0 0 0 6px rgba(255, 82, 82, 0)',
+          },
+          '100%': {
+            boxShadow: '0 0 0 0 rgba(255, 82, 82, 0)',
+          },
+        },
       },
     },
   },
