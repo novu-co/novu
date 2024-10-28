@@ -59,7 +59,7 @@ const mapStepToNode = (
   if (step.type === StepTypeEnum.DELAY) {
     content = `Wait to send ~ 30 minutes`;
   }
-  console.log(step);
+
   return {
     id: crypto.randomUUID(),
     position: { x: previousPosition.x, y: previousPosition.y + Y_DISTANCE },

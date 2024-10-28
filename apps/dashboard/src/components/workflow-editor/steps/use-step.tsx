@@ -5,20 +5,21 @@ import * as z from 'zod';
 import { formSchema } from '../schema';
 
 export const useStep = () => {
-  const { stepUuid = '' } = useParams<{
-    stepUuid: string;
+  const { stepId = '' } = useParams<{
+    stepId: string;
   }>();
 
-  const { watch } = useFormContext<z.infer<typeof formSchema>>();
+  const { watch, control } = useFormContext<z.infer<typeof formSchema>>();
   const steps = watch('steps');
 
-  const step = useMemo(() => steps.find((message) => message.uuid === stepUuid), [stepUuid, steps]);
+  const step = useMemo(() => steps?.find((message) => message._id === stepId), [stepId, steps]);
 
-  const stepIndex = useMemo(() => steps.findIndex((message) => message.uuid === stepUuid), [stepUuid, steps]);
+  const stepIndex = useMemo(() => steps?.findIndex((message) => message._id === stepId), [stepId, steps]);
 
   return {
     step,
     stepIndex,
+    control,
     channel: step?.type,
   };
 };

@@ -31,6 +31,7 @@ const STEP_NAME_BY_TYPE: Record<StepTypeEnum, string> = {
 
 const createStep = (type: StepTypeEnum): Step => ({
   name: STEP_NAME_BY_TYPE[type],
+  stepId: '',
   type,
   _id: crypto.randomUUID(),
 });

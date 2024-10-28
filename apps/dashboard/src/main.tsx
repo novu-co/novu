@@ -8,6 +8,7 @@ import './index.css';
 import { ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
 import { ConfigureWorkflow } from './components/workflow-editor/configure-workflow';
+import { ConfigureStep } from './components/workflow-editor/steps/configure-step';
 
 const router = createBrowserRouter([
   {
@@ -51,7 +52,7 @@ const router = createBrowserRouter([
                     index: true,
                   },
                   {
-                    element: <>hiiii</>,
+                    element: <ConfigureStep />,
                     path: 'step/:stepId',
                   },
                 ],

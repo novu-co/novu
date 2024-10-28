@@ -20,4 +20,4 @@ export enum ConnectionStatus {
 }
 
 // TODO: update this when the API types are updated
-export type Step = Pick<StepResponseDto, 'name' | 'type' | '_id'>;
+export type Step = Pick<StepResponseDto, 'name' | 'type' | '_id' | 'stepId'>;

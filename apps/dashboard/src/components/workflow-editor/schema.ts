@@ -27,6 +27,7 @@ export const formSchema = z.object({
         name: z.string(),
         type: z.nativeEnum(StepTypeEnum),
         _id: z.string(),
+        stepId: z.string(),
       })
       .passthrough()
   ),
