@@ -8,6 +8,9 @@ import './index.css';
 import { ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
 import { TestWorkflowPage } from './pages/test-workflow';
+import { initializeSentry } from './utils/sentry';
+
+initializeSentry();
 
 const router = createBrowserRouter([
   {
