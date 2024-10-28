@@ -16,13 +16,7 @@ export type ExecuteInput<T_Payload extends Record<string, unknown>, T_Controls e
   subscriber: Prettify<Subscriber>;
   /** The environment the workflow is running in. */
   environment: Record<string, unknown>;
-  /**
-   * The controls for the event. Provided via the UI.
-   *
-   * @deprecated Use `controls` instead
-   */
-  input: T_Controls;
-  /** The controls for the event. Provided via the UI. */
+  /** The controls for the event. Provided via the Dashboard. */
   controls: T_Controls;
 };
 
@@ -95,12 +89,6 @@ export type WorkflowPreferences = DeepPartial<{
 export type WorkflowOptions<T_PayloadSchema extends Schema, T_ControlSchema extends Schema> = {
   /** The schema for the payload. */
   payloadSchema?: T_PayloadSchema;
-  /**
-   * The schema for the controls.
-   *
-   * @deprecated Use `controlSchema` instead
-   */
-  inputSchema?: T_ControlSchema;
   /** The schema for the controls. */
   controlSchema?: T_ControlSchema;
   /**

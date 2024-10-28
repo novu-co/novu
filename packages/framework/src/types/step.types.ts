@@ -20,12 +20,6 @@ export type StepOptions<
   skip?: Skip<T_Controls>;
   /**
    * The schema for the controls of the step. Used to validate the user-provided controls from Novu Web.
-   *
-   * @deprecated Use `controlSchema` instead
-   */
-  inputSchema?: T_ControlSchema;
-  /**
-   * The schema for the controls of the step. Used to validate the user-provided controls from Novu Web.
    */
   controlSchema?: T_ControlSchema;
 };

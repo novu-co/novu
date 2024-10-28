@@ -1,10 +1,5 @@
 export type ClientOptions = {
   /**
-   * @deprecated use `secretKey` instead
-   */
-  apiKey?: string;
-
-  /**
    * Specify your Novu secret key, to secure the Bridge Endpoint, and Novu API communication.
    * Novu communicates securely with your endpoint using a signed HMAC header,
    * ensuring that only trusted requests from Novu are actioned by your Bridge API.

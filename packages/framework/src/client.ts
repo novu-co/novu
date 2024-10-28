@@ -405,8 +405,7 @@ export class Client {
     try {
       if (
         event.action === PostActionEnum.EXECUTE && // TODO: move this validation to the handler layer
-        !event.payload &&
-        !event.data
+        !event.payload
       ) {
         throw new ExecutionEventPayloadInvalidError(event.workflowId, {
           message: 'Event `payload` is required',
@@ -423,7 +422,6 @@ export class Client {
         workflow.execute({
           payload: executionData,
           environment: {},
-          input: {},
           controls: {},
           subscriber: event.subscriber,
           step: {
@@ -479,7 +477,7 @@ export class Client {
     event: Event,
     workflow: DiscoverWorkflowOutput
   ): Promise<Record<string, unknown>> {
-    let payload = event.payload || event.data;
+    let { payload } = event;
     if (event.action === PostActionEnum.PREVIEW) {
       const mockResult = this.mock(workflow.payload.schema);
 
@@ -681,10 +679,8 @@ export class Client {
       const templateString = this.templateEngine.parse(JSON.stringify(templateControls));
 
       const compiledString = await this.templateEngine.render(templateString, {
-        payload: event.payload || event.data,
+        payload: event.payload,
         subscriber: event.subscriber,
-        // Backwards compatibility, for allowing usage of variables without namespace (e.g. `{{name}}` instead of `{{payload.name}}`)
-        ...(event.payload || event.data),
       });
 
       return JSON.parse(compiledString);
@@ -701,10 +697,8 @@ export class Client {
    * @returns The controls for the step
    */
   private async createStepControls(step: DiscoverStepOutput, event: Event): Promise<Record<string, unknown>> {
-    const stepControls = event.controls || event.inputs;
-
     const validatedControls = await this.validate(
-      stepControls,
+      event.controls,
       step.controls.unknownSchema,
       'step',
       'controls',

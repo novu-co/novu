@@ -13,15 +13,11 @@ export function discoverChannelStepFactory(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): ChannelStep<ChannelStepEnum, any, any> {
   return async (stepId, resolve, options = {}) => {
-    const controlSchema = options?.controlSchema || options?.inputSchema || emptySchema;
+    const controlSchema = options?.controlSchema || emptySchema;
 
     const step: DiscoverStepOutput = {
       stepId,
       type,
-      inputs: {
-        schema: transformSchema(controlSchema),
-        unknownSchema: controlSchema,
-      },
       controls: {
         schema: transformSchema(controlSchema),
         unknownSchema: controlSchema,
