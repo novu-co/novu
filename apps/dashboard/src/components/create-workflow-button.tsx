@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ComponentProps, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiExternalLinkLine } from 'react-icons/ri';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify } from '@novu/shared';
 import { createWorkflow } from '@/api/workflows';
@@ -26,6 +26,7 @@ import { Textarea } from '@/components/primitives/textarea';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useTagsQuery } from '@/hooks/use-tags-query';
 import { QueryKeys } from '@/utils/query-keys';
+import { buildRoute, ROUTES } from '@/utils/routes';
 
 const formSchema = z.object({
   name: z.string(),
@@ -42,16 +43,23 @@ const formSchema = z.object({
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
 export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
   const [isOpen, setIsOpen] = useState(false);
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (data: CreateWorkflowDto) => createWorkflow(data),
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id] });
-      queryClient.invalidateQueries({
+    onSuccess: async (result) => {
+      await queryClient.invalidateQueries({ queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id] });
+      await queryClient.invalidateQueries({
         queryKey: [QueryKeys.fetchWorkflow, currentEnvironment?._id, result.data.workflowId],
       });
       setIsOpen(false);
+      navigate(
+        buildRoute(ROUTES.EDIT_WORKFLOW, {
+          environmentId: currentEnvironment?._id ?? '',
+          workflowId: result.data._id,
+        })
+      );
     },
   });
   const tagsQuery = useTagsQuery();
@@ -137,13 +145,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     <FormLabel>Identifier</FormLabel>
                     <FormControl>
                       <InputField>
-                        <Input
-                          readOnly
-                          placeholder="untitled"
-                          className="pointer-events-none"
-                          tabIndex={-1}
-                          {...field}
-                        />
+                        <Input placeholder="untitled" {...field} />
                       </InputField>
                     </FormControl>
                     <FormMessage>Must be unique and all lowercase ^[a-z0-9\-]+$</FormMessage>

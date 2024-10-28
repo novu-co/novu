@@ -194,7 +194,7 @@ export class UpsertWorkflowUseCase {
       description: workflowDto.description || '',
       tags: workflowDto.tags || [],
       critical: false,
-      triggerIdentifier: slugify(workflowDto.name),
+      triggerIdentifier: workflowDto.workflowId ?? slugify(workflowDto.name),
     };
   }
 
