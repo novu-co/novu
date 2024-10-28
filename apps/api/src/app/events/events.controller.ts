@@ -172,7 +172,7 @@ export class EventsController {
         workflowId: body.workflowId,
         stepId: body.stepId,
         bridge: body.bridge,
-        controls: body.controls || body.inputs,
+        controls: body.controls,
       })
     );
   }

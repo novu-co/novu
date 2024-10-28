@@ -57,7 +57,6 @@ class WorkflowDefineStep implements IWorkflowDefineStep {
   @IsString()
   type: StepType;
 
-  inputs: IStepControl;
   controls: IStepControl;
 
   outputs: IStepOutput;

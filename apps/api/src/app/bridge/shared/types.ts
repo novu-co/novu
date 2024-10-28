@@ -20,8 +20,6 @@ export interface IWorkflowDefineStep {
 
   type: StepType;
 
-  inputs: IStepControl;
-
   controls: IStepControl;
 
   outputs: IStepOutput;
