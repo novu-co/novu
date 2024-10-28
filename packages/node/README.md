@@ -135,7 +135,6 @@ Novu provides a single API to manage providers across multiple channels with a s
 #### 📱 In-App
 
 - [x] [Novu](https://docs.novu.co/notification-center/introduction?utm_campaign=node-sdk-readme)
-- [ ] MagicBell
 
 #### Other (Coming Soon...)
 
@@ -295,7 +294,7 @@ await novu.subscribers.setCredentials(
   {
     webhookUrl: ['webhookUrl'],
   },
-  'slack_identifier'
+  'slack_identifier',
 );
 ```
 
@@ -363,13 +362,13 @@ const novu = new Novu('<NOVU_SECRET_KEY>');
 // Get global level preference
 await novu.subscribers.getPreferenceByLevel(
   'subscriberId',
-  PreferenceLevelEnum.GLOBAL
+  PreferenceLevelEnum.GLOBAL,
 );
 
 // Get template level preference
 await novu.subscribers.getPreferenceByLevel(
   'subscriberId',
-  PreferenceLevelEnum.TEMPLATE
+  PreferenceLevelEnum.TEMPLATE,
 );
 ```
 
@@ -486,14 +485,14 @@ const novu = new Novu('<NOVU_SECRET_KEY>');
 await novu.subscribers.markAllMessagesAs(
   'subscriberId',
   MarkMessageAsEnum.SEEN,
-  'feedId'
+  'feedId',
 );
 
 // mark all messages as read
 await novu.subscribers.markAllMessagesAs(
   'subscriberId',
   MarkMessageAsEnum.READ,
-  'feedId'
+  'feedId',
 );
 ```
 
@@ -511,7 +510,7 @@ await novu.subscribers.markMessageActionSeen(
   ButtonTypeEnum.PRIMARY,
   {
     status: MessageActionStatusEnum.PENDING,
-  }
+  },
 );
 
 // mark a message's secondary action button as done
@@ -521,7 +520,7 @@ await novu.subscribers.markMessageActionSeen(
   ButtonTypeEnum.SECONDARY,
   {
     status: MessageActionStatusEnum.DONE,
-  }
+  },
 );
 ```
 
@@ -1382,7 +1381,7 @@ const novu = new Novu('<NOVU_SECRET_KEY>');
 
 await novu.workflowOverrides.getOneByTenantIdandWorkflowId(
   'workflowId_123',
-  'tenantId_123'
+  'tenantId_123',
 );
 ```
 
@@ -1398,7 +1397,7 @@ await novu.workflowOverrides.updateOneByTenantIdandWorkflowId(
   'tenantId_123',
   {
     active: false,
-  }
+  },
 );
 ```
 

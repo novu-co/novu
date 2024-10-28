@@ -6,6 +6,7 @@ export enum HttpRequestHeaderKeysEnum {
   USER_AGENT = 'User-Agent',
   CONTENT_TYPE = 'Content-Type',
   SENTRY_TRACE = 'Sentry-Trace',
+  BAGGAGE = 'Baggage',
   NOVU_ENVIRONMENT_ID = 'Novu-Environment-Id',
   NOVU_API_VERSION = 'Novu-API-Version',
   NOVU_USER_AGENT = 'Novu-User-Agent',

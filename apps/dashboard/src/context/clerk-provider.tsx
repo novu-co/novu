@@ -23,6 +23,7 @@ const CLERK_LOCALIZATION = {
     action__signOutAll: 'Log out from all accounts',
     action__manageAccount: 'Settings',
   },
+  formFieldLabel__organizationSlug: 'URL friendly identifier',
 };
 
 const ALLOWED_REDIRECT_ORIGINS = ['http://localhost:*', window.location.origin];
@@ -37,9 +38,6 @@ export const ClerkProvider = (props: ClerkProviderProps) => {
       routerPush={(to) => navigate(to)}
       routerReplace={(to) => navigate(to, { replace: true })}
       publishableKey={CLERK_PUBLISHABLE_KEY}
-      localization={{
-        formFieldLabel__organizationSlug: 'URL friendly identifier',
-      }}
       appearance={{
         userButton: {
           elements: {

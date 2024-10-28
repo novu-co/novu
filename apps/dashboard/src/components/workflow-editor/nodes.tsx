@@ -3,7 +3,7 @@ import { RiPlayCircleLine } from 'react-icons/ri';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { AddStepMenu } from './add-step-menu';
-import { Node, NodeBody, NodeHeader, NodeIcon, NodeName } from './base-node';
+import { Node, NodeBody, NodeError, NodeHeader, NodeIcon, NodeName } from './base-node';
 import { StepTypeEnum } from '@/utils/enums';
 import { useWorkflowEditorContext } from './hooks';
 
@@ -11,6 +11,7 @@ export type NodeData = {
   name?: string;
   content?: string;
   addStepIndex?: number;
+  error?: string;
 };
 
 export type NodeType = FlowNode<NodeData>;
@@ -49,6 +50,7 @@ export const EmailNode = ({ data }: NodeProps<NodeType>) => {
         <NodeName>{data.name || 'Email Step'}</NodeName>
       </NodeHeader>
       <NodeBody>Sends Email to your subscribers</NodeBody>
+      {data.error && <NodeError>{data.error}</NodeError>}
       <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
       <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
     </Node>
@@ -67,6 +69,7 @@ export const SmsNode = ({ data }: NodeProps<NodeType>) => {
         <NodeName>{data.name || 'SMS Step'}</NodeName>
       </NodeHeader>
       <NodeBody>Sends SMS notification to your subscribers</NodeBody>
+      {data.error && <NodeError>{data.error}</NodeError>}
       <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
       <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
     </Node>
@@ -85,6 +88,7 @@ export const InAppNode = ({ data }: NodeProps<NodeType>) => {
         <NodeName>{data.name || 'In-App Step'}</NodeName>
       </NodeHeader>
       <NodeBody>Sends In-app notification to your subscribers</NodeBody>
+      {data.error && <NodeError>{data.error}</NodeError>}
       <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
       <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
     </Node>
@@ -103,6 +107,7 @@ export const PushNode = ({ data }: NodeProps<NodeType>) => {
         <NodeName>{data.name || 'Push Step'}</NodeName>
       </NodeHeader>
       <NodeBody>Sends push notification to your subscribers</NodeBody>
+      {data.error && <NodeError>{data.error}</NodeError>}
       <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
       <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
     </Node>
@@ -121,6 +126,7 @@ export const ChatNode = ({ data }: NodeProps<NodeType>) => {
         <NodeName>{data.name || 'Chat Step'}</NodeName>
       </NodeHeader>
       <NodeBody>Sends chat notification to your subscribers</NodeBody>
+      {data.error && <NodeError>{data.error}</NodeError>}
       <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
       <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
     </Node>
