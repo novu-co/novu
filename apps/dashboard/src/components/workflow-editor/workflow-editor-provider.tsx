@@ -68,6 +68,7 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
       reset({ ...data, steps: data.steps.map((step) => ({ ...step })) });
 
       if (data.issues) {
+        // TODO: remove the as any cast when BE issues are typed
         handleValidationIssues({ fields: form.getValues(), issues: data.issues as any, setError });
       }
 

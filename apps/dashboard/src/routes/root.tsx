@@ -14,7 +14,7 @@ const RootRouteInternal = () => {
       fallback={({ error, eventId }) => (
         <>
           Sorry, but something went wrong. <br />
-          Our team has been notified and we are investigating.
+          Please contact our support team and provide the event id for the reference.
           <br />
           <code>
             <small style={{ color: 'lightGrey' }}>
