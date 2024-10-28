@@ -9,6 +9,9 @@ import { ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
 import { ConfigureWorkflow } from './components/workflow-editor/configure-workflow';
 import { ConfigureStep } from './components/workflow-editor/steps/configure-step';
+import { initializeSentry } from './utils/sentry';
+
+initializeSentry();
 
 const router = createBrowserRouter([
   {
