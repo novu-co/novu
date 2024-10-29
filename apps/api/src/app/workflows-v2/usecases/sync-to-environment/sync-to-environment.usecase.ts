@@ -156,21 +156,21 @@ export class SyncToEnvironmentUseCase {
     const findPreferences = (type: PreferencesTypeEnum) =>
       preferences.find((pref) => pref.type === type)?.preferences ?? null;
 
-    const userPrefs = findPreferences(PreferencesTypeEnum.USER_WORKFLOW);
-    const workflowPrefs = findPreferences(PreferencesTypeEnum.WORKFLOW_RESOURCE);
+    const userPreferences = findPreferences(PreferencesTypeEnum.USER_WORKFLOW);
+    const workflowPreferences = findPreferences(PreferencesTypeEnum.WORKFLOW_RESOURCE);
 
     const transformToFullPreferences = (
-      partialPrefs: WorkflowPreferencesPartial | null
+      partialPreferences: WorkflowPreferencesPartial | null
     ): WorkflowPreferences | null => {
-      if (!partialPrefs) return null;
+      if (!partialPreferences) return null;
 
       const getChannelEnabled = (channel: ChannelTypeEnum) =>
-        typeof partialPrefs.channels?.[channel] === 'boolean' ? partialPrefs.channels[channel] : true;
+        typeof partialPreferences.channels?.[channel] === 'boolean' ? partialPreferences.channels[channel] : true;
 
       return {
         all: {
-          enabled: typeof partialPrefs.all?.enabled === 'boolean' ? partialPrefs.all.enabled : true,
-          readOnly: typeof partialPrefs.all?.readOnly === 'boolean' ? partialPrefs.all.readOnly : false,
+          enabled: typeof partialPreferences.all?.enabled === 'boolean' ? partialPreferences.all.enabled : true,
+          readOnly: typeof partialPreferences.all?.readOnly === 'boolean' ? partialPreferences.all.readOnly : false,
         },
         channels: {
           [ChannelTypeEnum.EMAIL]: { enabled: getChannelEnabled(ChannelTypeEnum.EMAIL) },
@@ -183,8 +183,8 @@ export class SyncToEnvironmentUseCase {
     };
 
     return {
-      user: transformToFullPreferences(userPrefs),
-      workflow: transformToFullPreferences(workflowPrefs),
+      user: transformToFullPreferences(userPreferences),
+      workflow: transformToFullPreferences(workflowPreferences),
     };
   }
 

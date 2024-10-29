@@ -20,7 +20,6 @@ import {
   UpsertControlValuesUseCase,
   UpsertPreferences,
   UpsertUserWorkflowPreferencesCommand,
-  slugifyName,
   UpsertWorkflowPreferencesCommand,
 } from '@novu/application-generic';
 import {
