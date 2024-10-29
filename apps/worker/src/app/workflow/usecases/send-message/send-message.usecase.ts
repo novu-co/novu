@@ -348,10 +348,7 @@ export class SendMessage {
       return false;
     }
 
-    let subscriberPreference: {
-      enabled: boolean;
-      channels: IPreferenceChannels;
-    };
+    let subscriberPreference: { enabled: boolean; channels: IPreferenceChannels };
     let subscriberPreferenceType: PreferencesTypeEnum;
     if (command.statelessPreferences) {
       /*
