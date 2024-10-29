@@ -360,8 +360,7 @@ export class UpdateWorkflow {
         actor: message.template.actor,
         parentChangeId,
         code: message?.template.code,
-        inputs: message?.template.controls || message?.template.inputs,
-        controls: message?.template.controls || message?.template.inputs,
+        controls: message?.template.controls,
         output: message?.template.output,
         workflowType: command.type,
       };

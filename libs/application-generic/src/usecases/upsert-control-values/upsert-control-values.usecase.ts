@@ -32,7 +32,6 @@ export class UpsertControlValuesUseCase {
       _stepId: command.notificationStepEntity._templateId,
       level: ControlValuesLevelEnum.STEP_CONTROLS,
       priority: 0,
-      inputs: command.newControlValues,
       controls: command.newControlValues,
     });
   }
@@ -49,7 +48,6 @@ export class UpsertControlValuesUseCase {
       },
       {
         priority: 0,
-        inputs: controlValues,
         controls: controlValues,
       },
     );

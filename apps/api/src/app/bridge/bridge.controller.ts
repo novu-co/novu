@@ -71,7 +71,7 @@ export class BridgeController {
       PreviewStepCommand.create({
         workflowId,
         stepId,
-        controls: data.controls || data.inputs,
+        controls: data.controls,
         payload: data.payload,
         environmentId: user.environmentId,
         organizationId: user.organizationId,

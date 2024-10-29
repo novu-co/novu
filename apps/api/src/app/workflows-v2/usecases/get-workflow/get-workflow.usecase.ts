@@ -33,6 +33,7 @@ export class GetWorkflowUseCase {
       GetPreferencesCommand.create({
         environmentId: command.user.environmentId,
         organizationId: command.user.organizationId,
+        templateId: workflowEntity._id,
       })
     );
 

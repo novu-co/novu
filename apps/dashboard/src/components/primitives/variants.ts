@@ -69,6 +69,7 @@ export const buttonVariants = cva(
         destructive:
           'bg-gradient-to-b from-destructive/90 to-destructive text-destructive-foreground shadow-[inset_0_-4px_2px_-2px_hsl(var(--destructive)),inset_0_0_0_1px_rgba(255,255,255,0.16),0_0_0_1px_hsl(var(--destructive)),0px_1px_2px_0px_#0E121B3D] after:content-[""] after:absolute after:w-full after:h-full after:bg-gradient-to-b after:from-background/10 after:opacity-0 hover:after:opacity-100 after:rounded-lg after:transition-opacity after:duration-300',
         outline: 'border border-input bg-background shadow-xs hover:bg-accent hover:text-accent-foreground',
+        dashed: 'border border-dashed border-input bg-background hover:bg-accent text-foreground-600',
         ghost: 'hover:bg-accent',
         link: 'underline-offset-4 hover:underline',
         light:

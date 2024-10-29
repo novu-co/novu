@@ -167,8 +167,6 @@ export class ConstructFrameworkWorkflow {
 
   private constructCommonStepOptions(staticStep: NotificationStepEntity): Required<StepOptions> {
     return {
-      /** @deprecated */
-      inputSchema: staticStep.template!.controls!.schema,
       controlSchema: staticStep.template!.controls!.schema,
       /*
        * TODO: add conditions

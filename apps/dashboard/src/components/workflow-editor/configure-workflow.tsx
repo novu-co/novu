@@ -1,4 +1,5 @@
 import { useFormContext } from 'react-hook-form';
+import { motion } from 'framer-motion';
 import { RouteFill } from '../icons';
 import { Input, InputField } from '../primitives/input';
 import { RiArrowRightSLine, RiSettingsLine } from 'react-icons/ri';
@@ -18,7 +19,13 @@ export function ConfigureWorkflow() {
 
   const { control } = useFormContext<z.infer<typeof formSchema>>();
   return (
-    <aside className="text-foreground-950 flex h-full w-[300px] max-w-[350px] flex-col border-l pb-5 pt-3.5 [&_input]:text-xs [&_input]:text-neutral-600 [&_label]:text-xs [&_label]:font-medium [&_textarea]:text-xs [&_textarea]:text-neutral-600">
+    <motion.div
+      className="flex h-full w-full flex-col"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0.1 }}
+      transition={{ duration: 0.1 }}
+    >
       <div className="flex items-center gap-2.5 px-3 pb-3.5 text-sm font-medium">
         <RouteFill />
         <span>Configure workflow</span>
@@ -119,6 +126,6 @@ export function ConfigureWorkflow() {
         </Button>
       </div>
       <Separator />
-    </aside>
+    </motion.div>
   );
 }

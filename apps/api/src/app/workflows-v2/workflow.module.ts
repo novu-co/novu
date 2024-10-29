@@ -17,6 +17,7 @@ import { GetWorkflowUseCase } from './usecases/get-workflow/get-workflow.usecase
 import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.usecase';
 import { DeleteWorkflowUseCase } from './usecases/delete-workflow/delete-workflow.usecase';
 import { GetWorkflowByIdsUseCase } from './usecases/get-workflow-by-ids/get-workflow-by-ids.usecase';
+import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
 import { GetStepSchemaUseCase } from '../step-schemas/usecases/get-step-schema/get-step-schema.usecase';
 import { BridgeModule } from '../bridge';
 import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
@@ -39,6 +40,7 @@ import { TransformPlaceholderMapUseCase } from './usecases/placeholder-enrichmen
     UpsertControlValuesUseCase,
     GetPreferences,
     GetWorkflowByIdsUseCase,
+    SyncToEnvironmentUseCase,
     GetStepSchemaUseCase,
     GeneratePreviewUsecase,
     GetWorkflowUseCase,
