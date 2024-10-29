@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { UserSession } from '@novu/testing';
 import { randomBytes } from 'crypto';
-import { slugifyName } from '@novu/application-generic';
 import {
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
@@ -21,6 +20,7 @@ import {
   WorkflowListResponseDto,
   WorkflowResponseDto,
   ShortIsPrefixEnum,
+  slugify,
 } from '@novu/shared';
 import { createWorkflowClient } from './clients';
 
@@ -75,7 +75,7 @@ describe('Workflow Controller E2E API Testing', () => {
       const res = await session.testAgent.post(`${v2Prefix}/workflows`).send(createWorkflowDto);
       expect(res.status).to.be.equal(201);
       const workflowCreated: WorkflowResponseDto = res.body.data;
-      expect(workflowCreated.workflowId).to.include(`${slugifyName(nameSuffix)}-`);
+      expect(workflowCreated.workflowId).to.include(`${slugify(nameSuffix)}-`);
     });
 
     it('should throw error when creating workflow with duplicate step ids', async () => {
@@ -325,7 +325,7 @@ export function buildCreateWorkflowDto(
   return {
     __source: WorkflowCreationSourceEnum.EDITOR,
     name: TEST_WORKFLOW_NAME + nameSuffix,
-    workflowId: `${slugifyName(TEST_WORKFLOW_NAME + nameSuffix)}`,
+    workflowId: `${slugify(TEST_WORKFLOW_NAME + nameSuffix)}`,
     description: 'This is a test workflow',
     active: true,
     tags: TEST_TAGS,
@@ -384,9 +384,9 @@ function updateStepId(step: StepResponseDto): Partial<StepResponseDto> {
 
   return {
     ...rest,
-    ...(step._id && step.name ? { stepId: slugifyName(step.name) } : {}),
+    ...(step._id && step.name ? { stepId: slugify(step.name) } : {}),
     ...(step.name && step._id
-      ? { slug: `${slugifyName(step.name)}_${ShortIsPrefixEnum.STEP}${encodeBase62(step._id)}` }
+      ? { slug: `${slugify(step.name)}_${ShortIsPrefixEnum.STEP}${encodeBase62(step._id)}` }
       : {}),
   };
 }
@@ -436,7 +436,7 @@ async function updateWorkflowAndValidate(
   );
   const expectedUpdateRequest = {
     ...updateRequest,
-    slug: `${slugifyName(updateRequest.name)}_${ShortIsPrefixEnum.WORKFLOW}${encodeBase62(
+    slug: `${slugify(updateRequest.name)}_${ShortIsPrefixEnum.WORKFLOW}${encodeBase62(
       workflowInternalId || workflowRequestId
     )}`,
     steps: updateRequest.steps.map(updateStepId),
@@ -701,7 +701,7 @@ function buildUpdateRequest(workflowCreated: WorkflowResponseDto): UpdateWorkflo
   return {
     ...updateRequest,
     name: TEST_WORKFLOW_UPDATED_NAME,
-    workflowId: `${slugifyName(TEST_WORKFLOW_UPDATED_NAME)}`,
+    workflowId: `${slugify(TEST_WORKFLOW_UPDATED_NAME)}`,
     steps,
   };
 }

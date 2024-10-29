@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Sidebar, Title, errorMessage } from '@novu/design-system';
 import { Group } from '@mantine/core';
-import slugify from 'slugify';
 import { Control, FormProvider, useForm } from 'react-hook-form';
+import { slugify } from '@novu/shared';
 import { useEnvironment } from '../../../hooks';
 import { api } from '../../../api';
 import { useGetDefaultLocale } from '../hooks/useGetDefaultLocale';
@@ -80,10 +80,7 @@ export const CreateGroupSidebar = ({
   }, [defaultLocale, localesForm, setValue]);
 
   useEffect(() => {
-    const newIdentifier = slugify(name, {
-      lower: true,
-      strict: true,
-    });
+    const newIdentifier = slugify(name);
 
     if (newIdentifier === identifier) {
       return;

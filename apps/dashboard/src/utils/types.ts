@@ -1,4 +1,4 @@
-import type { StepCreateDto } from '@novu/shared';
+import type { StepResponseDto } from '@novu/shared';
 
 export enum BaseEnvironmentEnum {
   DEVELOPMENT = 'Development',
@@ -34,7 +34,7 @@ export type RuntimeIssue = {
 };
 
 // TODO: update this when the API types are updated
-export type Step = Pick<StepCreateDto, 'name' | 'type'> & {
+export type Step = Pick<StepResponseDto, 'name' | 'type' | '_id' | 'stepId'> & {
   issues?: {
     body: Record<string, RuntimeIssue[]>;
     control: Record<string, RuntimeIssue[]>;

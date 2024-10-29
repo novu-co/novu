@@ -1,13 +1,10 @@
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { ActionIcon, Center, Grid, Group, Modal, Title, useMantineTheme } from '@mantine/core';
-import slugify from 'slugify';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { parse } from '@handlebars/parser';
 import { useClipboard } from '@mantine/hooks';
-
-import { getTemplateVariables, ITemplateVariable, isReservedVariableName, LayoutId } from '@novu/shared';
-
+import { getTemplateVariables, ITemplateVariable, isReservedVariableName, LayoutId, slugify } from '@novu/shared';
 import {
   ArrowLeft,
   Check,
@@ -111,10 +108,7 @@ export function LayoutEditor({
       return;
     }
 
-    const newIdentifier = slugify(layoutName, {
-      lower: true,
-      strict: true,
-    });
+    const newIdentifier = slugify(layoutName);
     setValue('identifier', newIdentifier);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editMode, layoutName]);

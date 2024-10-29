@@ -540,9 +540,6 @@ importers:
       shortid:
         specifier: ^2.2.16
         version: 2.2.16
-      slugify:
-        specifier: ^1.4.6
-        version: 1.6.6
       swagger-ui-express:
         specifier: ^4.4.0
         version: 4.6.2(express@4.18.2)
@@ -1306,9 +1303,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      slugify:
-        specifier: ^1.4.6
-        version: 1.6.6
       storybook-dark-mode:
         specifier: ^3.0.1
         version: 3.0.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2291,9 +2285,6 @@ importers:
       shortid:
         specifier: ^2.2.16
         version: 2.2.16
-      slugify:
-        specifier: ^1.4.6
-        version: 1.6.6
       stripe:
         specifier: ^11.18.0
         version: 11.18.0
@@ -2444,9 +2435,6 @@ importers:
       shortid:
         specifier: ^2.2.16
         version: 2.2.16
-      slugify:
-        specifier: ^1.4.6
-        version: 1.6.6
     devDependencies:
       '@types/chai':
         specifier: ^4.2.11
@@ -2670,9 +2658,6 @@ importers:
       shortid:
         specifier: ^2.2.16
         version: 2.2.16
-      slugify:
-        specifier: ^1.4.6
-        version: 1.6.6
     optionalDependencies:
       '@novu/ee-shared-services':
         specifier: workspace:*
@@ -3310,9 +3295,6 @@ importers:
       shortid:
         specifier: ^2.2.16
         version: 2.2.16
-      slugify:
-        specifier: ^1.4.6
-        version: 1.6.6
       superagent-defaults:
         specifier: ^0.1.14
         version: 0.1.14(superagent@10.1.0)
@@ -3402,9 +3384,6 @@ importers:
       cross-fetch:
         specifier: ^4.0.0
         version: 4.0.0(encoding@0.1.13)
-      json-schema-faker:
-        specifier: ^0.5.6
-        version: 0.5.6
       json-schema-to-ts:
         specifier: ^3.0.0
         version: 3.1.0
@@ -22573,9 +22552,6 @@ packages:
     resolution: {integrity: sha512-ETEklSGi5t0QMZuiXoA/Q6vcnxcLQP5vdugSpuAyi6SVGi2clPPp+xgEhuMaHC+zGgn31Kd235W35f7Hykkaww==}
     engines: {node: '>= 6'}
 
-  format-util@1.0.5:
-    resolution: {integrity: sha512-varLbTj0e0yVyRpqQhuWV+8hlePAgaoFRhNFj50BNjEIrw1/DphHSObtqwskVCPWNgzwPoQrZAbfa/SBiicNeg==}
-
   format@0.2.2:
     resolution: {integrity: sha512-wzsgA6WOq+09wrU1tsJ09udeR/YZRaeArL9e1wPbFg3GG2yDnC2ldKpxs4xunpFF9DgqCqOIra3bc1HWrJ37Ww==}
     engines: {node: '>=0.4.x'}
@@ -24946,17 +24922,9 @@ packages:
   json-schema-compare@0.2.2:
     resolution: {integrity: sha512-c4WYmDKyJXhs7WWvAWm3uIYnfyWFoIp+JEoX34rctVvEkMYCPGhXtvmFFXiffBbxfZsvQ0RNnV5H7GvDF5HCqQ==}
 
-  json-schema-faker@0.5.6:
-    resolution: {integrity: sha512-u/cFC26/GDxh2vPiAC8B8xVvpXAW+QYtG2mijEbKrimCk8IHtiwQBjCE8TwvowdhALWq9IcdIWZ+/8ocXvdL3Q==}
-    hasBin: true
-
   json-schema-merge-allof@0.8.1:
     resolution: {integrity: sha512-CTUKmIlPJbsWfzRRnOXz+0MjIqvnleIXwFTzz+t9T86HnYX/Rozria6ZVGLktAU9e+NygNljveP+yxqtQp/Q4w==}
     engines: {node: '>=12.0.0'}
-
-  json-schema-ref-parser@6.1.0:
-    resolution: {integrity: sha512-pXe9H1m6IgIpXmE5JSb8epilNTGsmTb2iPohAXpOdhqGFbQjNeHHsZxU+C8w6T81GZxSPFLeUoqDJmzxx5IGuw==}
-    deprecated: Please switch to @apidevtools/json-schema-ref-parser
 
   json-schema-to-ts@1.6.4:
     resolution: {integrity: sha512-pR4yQ9DHz6itqswtHCm26mw45FSNfQ9rEQjosaZErhn5J3J2sIViQiz8rDaezjKAhFGpmsoczYVBgGHzFw/stA==}
@@ -25027,10 +24995,6 @@ packages:
 
   jsonpath-plus@7.1.0:
     resolution: {integrity: sha512-gTaNRsPWO/K2KY6MrqaUFClF9kmuM6MFH5Dhg1VYDODgFbByw1yb7xu3hrViE/sz+dGOeMWgCzwUwQtAnCTE9g==}
-    engines: {node: '>=12.0.0'}
-
-  jsonpath-plus@7.2.0:
-    resolution: {integrity: sha512-zBfiUPM5nD0YZSBT/o/fbCUlCcepMIdP0CJZxM1+KgA4f2T206f6VAg9e7mX35+KlMaIc5qXW34f3BnwJ3w+RA==}
     engines: {node: '>=12.0.0'}
 
   jsonpointer@5.0.1:
@@ -27420,9 +27384,6 @@ packages:
   onetime@6.0.0:
     resolution: {integrity: sha512-1FlR+gjXK7X+AsAHso35MnyN5KqGwJRi/31ft6x0M194ht7S+rWAvd7PHss9xSKMzE0asv1pyIHaJYq+BbacAQ==}
     engines: {node: '>=12'}
-
-  ono@4.0.11:
-    resolution: {integrity: sha512-jQ31cORBFE6td25deYeD80wxKBMj+zBmHTrVxnc6CKhx8gho6ipmWM5zj/oeoqioZ99yqBls9Z/9Nss7J26G2g==}
 
   open-cli@6.0.1:
     resolution: {integrity: sha512-A5h8MF3GrT1efn9TiO9LPajDnLtuEiGQT5G8TxWObBlgt1cZJF1YbQo/kNtsD1bJb7HxnT6SaSjzeLq0Rfhygw==}
@@ -31189,10 +31150,6 @@ packages:
 
   slick@1.12.2:
     resolution: {integrity: sha512-4qdtOGcBjral6YIBCWJ0ljFSKNLz9KkhbWtuGvUyRowl1kxfuE1x/Z/aJcaiilpb3do9bl5K7/1h9XC5wWpY/A==}
-
-  slugify@1.6.6:
-    resolution: {integrity: sha512-h+z7HKHYXj6wJU+AnS/+IH8Uh9fdcX1Lrhg1/VMdf9PwoBQXFcXiAdsy2tSK0P6gKwJLXp02r90ahUCqHk9rrw==}
-    engines: {node: '>=8.0.0'}
 
   smart-buffer@4.2.0:
     resolution: {integrity: sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==}
@@ -64281,8 +64238,6 @@ snapshots:
       combined-stream: 1.0.8
       mime-types: 2.1.35
 
-  format-util@1.0.5: {}
-
   format@0.2.2: {}
 
   formdata-polyfill@4.0.10:
@@ -68050,22 +68005,11 @@ snapshots:
     dependencies:
       lodash: 4.17.21
 
-  json-schema-faker@0.5.6:
-    dependencies:
-      json-schema-ref-parser: 6.1.0
-      jsonpath-plus: 7.2.0
-
   json-schema-merge-allof@0.8.1:
     dependencies:
       compute-lcm: 1.1.2
       json-schema-compare: 0.2.2
       lodash: 4.17.21
-
-  json-schema-ref-parser@6.1.0:
-    dependencies:
-      call-me-maybe: 1.0.2
-      js-yaml: 3.14.1
-      ono: 4.0.11
 
   json-schema-to-ts@1.6.4:
     dependencies:
@@ -68130,8 +68074,6 @@ snapshots:
     optional: true
 
   jsonpath-plus@7.1.0: {}
-
-  jsonpath-plus@7.2.0: {}
 
   jsonpointer@5.0.1: {}
 
@@ -71586,10 +71528,6 @@ snapshots:
   onetime@6.0.0:
     dependencies:
       mimic-fn: 4.0.0
-
-  ono@4.0.11:
-    dependencies:
-      format-util: 1.0.5
 
   open-cli@6.0.1:
     dependencies:
@@ -76393,8 +76331,6 @@ snapshots:
       is-fullwidth-code-point: 3.0.0
 
   slick@1.12.2: {}
-
-  slugify@1.6.6: {}
 
   smart-buffer@4.2.0: {}
 

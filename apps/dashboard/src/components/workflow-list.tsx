@@ -45,6 +45,7 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { WorkflowOriginEnum, WorkflowStatusEnum } from '@/utils/enums';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
+import { CreateWorkflowButton } from '@/components/create-workflow-button';
 
 export const WorkflowList = () => {
   const { currentEnvironment } = useEnvironment();
@@ -102,10 +103,12 @@ export const WorkflowList = () => {
             <RiBookMarkedLine className="size-4" />
             View docs
           </Link>
-          <Button variant="primary" className="gap-2">
-            <RiRouteFill className="size-5" />
-            Create workflow
-          </Button>
+          <CreateWorkflowButton asChild>
+            <Button variant="primary" className="gap-2">
+              <RiRouteFill className="size-5" />
+              Create workflow
+            </Button>
+          </CreateWorkflowButton>
         </div>
       </div>
     );
