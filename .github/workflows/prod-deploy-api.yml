@@ -38,7 +38,7 @@ jobs:
       - name: Prepare
         shell: bash
         run: |
-          service=novu/api-ee
+          service="novu/api-ee"
           echo "SERVICE_NAME=$(basename "${service//-/-}")" >> $GITHUB_ENV
 
       - name: Set Bull MQ Env variable for EE
