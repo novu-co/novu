@@ -1,53 +1,24 @@
 import { IsDefined, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
+import { JsonSchema } from '@novu/framework/internal';
 import { EnvironmentWithUserCommand, IStepControl } from '@novu/application-generic';
-import { IPreferenceChannels, NotificationTemplateCustomData, StepType } from '@novu/shared';
+import { StepType } from '@novu/shared';
 
-import { IStepOutput, IWorkflowDefineStep } from '../../shared';
-
-interface IWorkflowDefineOptions {
-  version?: `${number}.${number}.${number}`;
-
-  critical?: boolean;
-
-  active?: boolean;
-
-  tags?: string[];
-
-  description: string;
-
-  preferenceSettings?: IPreferenceChannels;
-
-  data?: NotificationTemplateCustomData;
-
-  payloadSchema?: Record<string, unknown>;
-
-  notificationGroupId?: string;
+interface IStepOutput {
+  schema: JsonSchema;
 }
 
-export class WorkflowDefineOptions implements IWorkflowDefineOptions {
-  @IsString()
-  version: `${number}.${number}.${number}`;
+interface IWorkflowDefineStep {
+  stepId: string;
 
-  critical?: boolean;
+  type: StepType;
 
-  active?: boolean;
+  controls: IStepControl;
 
-  tags?: string[];
+  outputs: IStepOutput;
 
-  description: string;
-
-  preferenceSettings?: IPreferenceChannels;
-
-  data?: NotificationTemplateCustomData;
-}
-
-interface IStepDefineOptions {
-  version: `${number}.${number}.${number}`;
-  failOnErrorEnabled: boolean;
-  skip: boolean;
-  active?: boolean;
+  code: string;
 }
 
 class WorkflowDefineStep implements IWorkflowDefineStep {
@@ -61,21 +32,16 @@ class WorkflowDefineStep implements IWorkflowDefineStep {
 
   outputs: IStepOutput;
 
-  options?: IStepDefineOptions;
-
   code: string;
 }
 
 export interface IWorkflowDefine {
   workflowId: string;
 
-  options?: IWorkflowDefineOptions;
-
   code: string;
 
   steps: IWorkflowDefineStep[];
 
-  inputs?: IStepControl;
   controls?: IStepControl;
 }
 
@@ -83,17 +49,12 @@ export class WorkflowDefine implements IWorkflowDefine {
   @IsString()
   workflowId: string;
 
-  @ValidateNested({ each: true })
-  @Type(() => WorkflowDefineOptions)
-  options?: IWorkflowDefineOptions;
-
   code: string;
 
   @ValidateNested({ each: true })
   @Type(() => WorkflowDefineStep)
   steps: IWorkflowDefineStep[];
 
-  inputs?: IStepControl;
   controls?: IStepControl;
 }
 
