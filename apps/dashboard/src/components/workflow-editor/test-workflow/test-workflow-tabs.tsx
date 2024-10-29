@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { RiPlayCircleLine } from 'react-icons/ri';
 import { useForm } from 'react-hook-form';

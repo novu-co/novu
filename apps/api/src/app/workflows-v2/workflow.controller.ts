@@ -43,7 +43,7 @@ import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to
 import { SyncToEnvironmentCommand } from './usecases/sync-to-environment/sync-to-environment.command';
 import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
 import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview-command';
-import { ParseSlugIdPipe } from './pipes/parse-slug-Id.pipe';
+import { ParseSlugIdPipe } from './pipes/parse-slug-id.pipe';
 import { ParseSlugEnvironmentIdPipe } from './pipes/parse-slug-env-id.pipe';
 import { WorkflowTestDataUseCase } from './usecases/test-data/test-data.usecase';
 import { WorkflowTestDataCommand } from './usecases/test-data/test-data.command';
