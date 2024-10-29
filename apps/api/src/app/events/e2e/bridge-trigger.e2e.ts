@@ -917,6 +917,7 @@ contexts.forEach((context: Context) => {
       expect(executionDetailsWorkflowFiltered.length).to.be.eq(1);
     });
 
+    // eslint-disable-next-line max-len
     it(`should deliver inApp message if subscriber disabled inApp channel for readOnly workflow with inApp enabled [${context.name}]`, async () => {
       const workflowId = `enabled-readonly-workflow-level-${`${context.name}-${uuidv4()}`}`;
       const newWorkflow = workflow(
@@ -969,6 +970,7 @@ contexts.forEach((context: Context) => {
       expect(sentMessages.length).to.be.eq(1);
     });
 
+    // eslint-disable-next-line max-len
     it(`should NOT deliver inApp message if subscriber enables inApp channel for readOnly workflow with inApp disabled [${context.name}]`, async () => {
       const workflowId = `disabled-readonly-workflow-level-${`${context.name}-${uuidv4()}`}`;
       const newWorkflow = workflow(
@@ -1032,6 +1034,7 @@ contexts.forEach((context: Context) => {
       expect(executionDetailsWorkflowFiltered.length).to.be.eq(1);
     });
 
+    // eslint-disable-next-line max-len
     it(`should deliver inApp message if subscriber disabled inApp channel globally for readOnly workflow with inApp enabled [${context.name}]`, async () => {
       const workflowId = `enabled-readonly-global-level-${`${context.name}-${uuidv4()}`}`;
       const newWorkflow = workflow(
@@ -1082,6 +1085,7 @@ contexts.forEach((context: Context) => {
       expect(sentMessages.length).to.be.eq(1);
     });
 
+    // eslint-disable-next-line max-len
     it(`should NOT deliver inApp message if subscriber enabled inApp channel globally for readOnly workflow with inApp disabled [${context.name}]`, async () => {
       const workflowId = `disabled-readonly-global-level-${`${context.name}-${uuidv4()}`}`;
       const newWorkflow = workflow(
@@ -1143,6 +1147,7 @@ contexts.forEach((context: Context) => {
       expect(executionDetailsWorkflowFiltered.length).to.be.eq(1);
     });
 
+    // eslint-disable-next-line max-len
     it(`should deliver inApp message if subscriber enabled inApp channel globally for workflow with inApp disabled [${context.name}]`, async () => {
       if (!context.isStateful) {
         /*
@@ -1197,6 +1202,7 @@ contexts.forEach((context: Context) => {
       }
     });
 
+    // eslint-disable-next-line max-len
     it(`should NOT deliver inApp message if subscriber disabled inApp channel globally for workflow with inApp enabled [${context.name}]`, async () => {
       if (!context.isStateful) {
         /*
@@ -1262,6 +1268,7 @@ contexts.forEach((context: Context) => {
       }
     });
 
+    // eslint-disable-next-line max-len
     it(`should deliver inApp message if subscriber disabled inApp channel globally but enabled inApp for workflow with inApp disabled [${context.name}]`, async () => {
       if (!context.isStateful) {
         /*
@@ -1325,6 +1332,7 @@ contexts.forEach((context: Context) => {
       }
     });
 
+    // eslint-disable-next-line max-len
     it(`should NOT deliver inApp message if subscriber enabled inApp channel globally but disabled inApp for workflow with inApp enabled [${context.name}]`, async () => {
       if (!context.isStateful) {
         /*
@@ -1534,7 +1542,7 @@ async function saveControlValues(
   session: UserSession,
   workflowIdentifier?: string,
   stepIdentifier?: string,
-  payloadBody?: any
+  payloadBody?: Record<string, unknown>
 ) {
   return await session.testAgent.put(`/v1/bridge/controls/${workflowIdentifier}/${stepIdentifier}`).send(payloadBody);
 }
