@@ -7,7 +7,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import slugify from 'slugify';
 import shortid from 'shortid';
 
 import {
@@ -26,8 +25,10 @@ import {
   TriggerTypeEnum,
   WorkflowOriginEnum,
   WorkflowTypeEnum,
+  slugify,
 } from '@novu/shared';
 
+import { PinoLogger } from 'nestjs-pino';
 import {
   CreateWorkflowCommand,
   NotificationStep,
@@ -53,32 +54,16 @@ export class CreateWorkflow {
     private createChange: CreateChange,
     @Inject(forwardRef(() => AnalyticsService))
     private analyticsService: AnalyticsService,
+    private logger: PinoLogger,
     protected moduleRef: ModuleRef,
   ) {}
 
   async execute(usecaseCommand: CreateWorkflowCommand) {
     const blueprintCommand = await this.processBlueprint(usecaseCommand);
     const command = blueprintCommand ?? usecaseCommand;
-
     this.validatePayload(command);
 
-    let triggerIdentifier: string;
-    if (command.type === WorkflowTypeEnum.BRIDGE)
-      /*
-       * Bridge workflows need to have the identifier preserved to ensure that
-       * the Framework-defined identifier is the source of truth.
-       */
-      triggerIdentifier = command.name;
-    else {
-      /**
-       * For non-bridge workflows, we use a slugified version of the workflow name
-       * as the trigger identifier to provide a better trigger DX.
-       */
-      triggerIdentifier = `${slugify(command.name, {
-        lower: true,
-        strict: true,
-      })}`;
-    }
+    const triggerIdentifier = this.generateTriggerIdentifier(command);
 
     const parentChangeId: string =
       NotificationTemplateRepository.createObjectId();
@@ -133,6 +118,32 @@ export class CreateWorkflow {
     }
 
     return storedWorkflow;
+  }
+
+  private generateTriggerIdentifier(command: CreateWorkflowCommand) {
+    if (command.triggerIdentifier) {
+      return command.triggerIdentifier;
+    }
+
+    let triggerIdentifier: string;
+    if (
+      command.type === WorkflowTypeEnum.BRIDGE &&
+      command.origin === WorkflowOriginEnum.EXTERNAL
+    )
+      /*
+       * Bridge workflows need to have the identifier preserved to ensure that
+       * the Framework-defined identifier is the source of truth.
+       */
+      triggerIdentifier = command.name;
+    else {
+      /**
+       * For non-bridge workflows, we use a slugified version of the workflow name
+       * as the trigger identifier to provide a better trigger DX.
+       */
+      triggerIdentifier = slugify(command.name);
+    }
+
+    return triggerIdentifier;
   }
 
   private validatePayload(command: CreateWorkflowCommand) {
@@ -244,6 +255,8 @@ export class CreateWorkflow {
     trigger: INotificationTrigger,
     triggerIdentifier: string,
   ) {
+    this.logger.info(`Creating workflow ${JSON.stringify(command)}`);
+
     const savedWorkflow = await this.notificationTemplateRepository.create({
       _organizationId: command.organizationId,
       _creatorId: command.userId,
@@ -310,8 +323,7 @@ export class CreateWorkflow {
             preheader: step.template.preheader,
             senderName: step.template.senderName,
             actor: step.template.actor,
-            inputs: step.template.controls || step.template.inputs,
-            controls: step.template.controls || step.template.inputs,
+            controls: step.template.controls,
             output: step.template.output,
             stepId: step.template.stepId,
             parentChangeId,

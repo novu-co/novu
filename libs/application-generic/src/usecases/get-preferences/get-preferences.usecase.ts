@@ -5,6 +5,7 @@ import {
   IPreferenceChannels,
   PreferencesTypeEnum,
   WorkflowPreferences,
+  WorkflowPreferencesPartial,
 } from '@novu/shared';
 import { deepMerge } from '../../utils';
 import { GetFeatureFlag } from '../get-feature-flag';
@@ -83,11 +84,13 @@ export class GetPreferences {
 
   /** Transform WorkflowPreferences into IPreferenceChannels */
   public static mapWorkflowPreferencesToChannelPreferences(
-    workflowPreferences: WorkflowPreferences,
+    workflowPreferences: WorkflowPreferencesPartial,
   ): IPreferenceChannels {
     const builtPreferences = buildWorkflowPreferences(workflowPreferences);
 
-    const mappedPreferences = Object.entries(builtPreferences.channels).reduce(
+    const mappedPreferences = Object.entries(
+      builtPreferences.channels ?? {},
+    ).reduce(
       (acc, [channel, preference]) => ({
         ...acc,
         [channel]: preference.enabled,
@@ -110,7 +113,7 @@ export class GetPreferences {
       [workflowResourcePreferences, workflowUserPreferences]
         .filter((preference) => preference !== undefined)
         .map((item) => item.preferences),
-    );
+    ) as WorkflowPreferences;
 
     const subscriberGlobalPreferences =
       this.getSubscriberGlobalPreferences(items);
@@ -141,7 +144,7 @@ export class GetPreferences {
       (acc, type) => {
         const preference = items.find((item) => item.type === type);
         if (preference) {
-          acc[type] = preference.preferences;
+          acc[type] = preference.preferences as WorkflowPreferences;
         } else {
           acc[type] = null;
         }
@@ -217,9 +220,10 @@ export class GetPreferences {
 
     // making sure we respond with correct readonly values.
     const mergedPreferences = deepMerge([
+      workflowPreferences,
       subscriberPreferences,
       readOnlyPreference,
-    ]);
+    ]) as WorkflowPreferences;
 
     return {
       preferences: mergedPreferences,

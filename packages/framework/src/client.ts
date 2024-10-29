@@ -1,11 +1,8 @@
-import { JSONSchemaFaker } from 'json-schema-faker';
 import { Liquid } from 'liquidjs';
 import ora from 'ora';
-import {} from './types';
 
-import { ChannelStepEnum, FRAMEWORK_VERSION, PostActionEnum, SDK_VERSION } from './constants';
+import { ChannelStepEnum, PostActionEnum } from './constants';
 import {
-  StepControlCompilationFailedError,
   ExecutionEventControlsInvalidError,
   ExecutionEventPayloadInvalidError,
   ExecutionProviderOutputInvalidError,
@@ -15,9 +12,12 @@ import {
   ExecutionStateResultInvalidError,
   ProviderExecutionFailedError,
   ProviderNotFoundError,
+  StepControlCompilationFailedError,
   StepNotFoundError,
   WorkflowAlreadyExistsError,
   WorkflowNotFoundError,
+  StepExecutionFailedError,
+  isFrameworkError,
 } from './errors';
 import type {
   ActionStep,
@@ -36,20 +36,10 @@ import type {
   Workflow,
 } from './types';
 import { WithPassthrough } from './types/provider.types';
-import { EMOJI, log, sanitizeHtmlInObject } from './utils';
-import { transformSchema, validateData } from './validators';
+import { EMOJI, log, sanitizeHtmlInObject, stringifyDataStructureWithSingleQuotes } from './utils';
+import { validateData } from './validators';
 
-/**
- * We want to respond with a consistent string value for preview
- */
-JSONSchemaFaker.random.shuffle = function shuffle() {
-  return ['[placeholder]'];
-};
-
-JSONSchemaFaker.option({
-  useDefaultValue: true,
-  alwaysFakeOptionals: true,
-});
+import { mockSchema } from './jsonSchemaFaker';
 
 function isRuntimeInDevelopment() {
   return ['development', undefined].includes(process.env.NODE_ENV);
@@ -58,7 +48,11 @@ function isRuntimeInDevelopment() {
 export class Client {
   private discoveredWorkflows: Array<DiscoverWorkflowOutput> = [];
 
-  private templateEngine = new Liquid();
+  private templateEngine = new Liquid({
+    outputEscape: (output) => {
+      return stringifyDataStructureWithSingleQuotes(output);
+    },
+  });
 
   public secretKey?: string;
 
@@ -70,6 +64,9 @@ export class Client {
     const builtOpts = this.buildOptions(options);
     this.secretKey = builtOpts.secretKey;
     this.strictAuthentication = builtOpts.strictAuthentication;
+    this.templateEngine.registerFilter('json', (value, spaces) =>
+      stringifyDataStructureWithSingleQuotes(value, spaces)
+    );
   }
 
   private buildOptions(providedOptions?: ClientOptions) {
@@ -156,8 +153,7 @@ export class Client {
    * @returns mocked data
    */
   private mock(schema: Schema): Record<string, unknown> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return JSONSchemaFaker.generate(transformSchema(schema) as any) as Record<string, unknown>;
+    return mockSchema(schema) as Record<string, unknown>;
   }
 
   private async validate<T extends Record<string, unknown>>(
@@ -266,7 +262,7 @@ export class Client {
     return async (stepId, stepResolve, options) => {
       const step = this.getStep(event.workflowId, stepId);
       const controls = await this.createStepControls(step, event);
-      const isPreview = event.action === 'preview';
+      const isPreview = event.action === PostActionEnum.PREVIEW;
 
       if (!isPreview && (await this.shouldSkip(options?.skip as typeof step.options.skip, controls))) {
         if (stepId === event.stepId) {
@@ -309,7 +305,12 @@ export class Client {
         resolve: stepResolve as typeof step.resolve,
       });
 
-      if (Object.values(ChannelStepEnum).includes(step.type as ChannelStepEnum)) {
+      if (
+        Object.values(ChannelStepEnum).includes(step.type as ChannelStepEnum) &&
+        // TODO: Update return type to include ChannelStep and fix typings
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (options as any)?.disableOutputSanitization !== true
+      ) {
         // Sanitize the outputs to avoid XSS attacks via Channel content.
         stepResult = {
           ...stepResult,
@@ -345,14 +346,10 @@ export class Client {
     const actionMessages = {
       [PostActionEnum.EXECUTE]: 'Executing',
       [PostActionEnum.PREVIEW]: 'Previewing',
-    };
+    } as const;
 
-    const actionMessage = (() => {
-      if (event.action === 'execute') return 'Executed';
-      if (event.action === 'preview') return 'Previewed';
+    const actionMessage = actionMessages[event.action];
 
-      return 'Invalid action';
-    })();
     const actionMessageFormatted = `${actionMessage} workflowId:`;
     // eslint-disable-next-line no-console
     console.log(`\n${log.bold(log.underline(actionMessageFormatted))} '${event.workflowId}'`);
@@ -390,9 +387,8 @@ export class Client {
     let executionError: Error | undefined;
     try {
       if (
-        event.action === 'execute' && // TODO: move this validation to the handler layer
-        !event.payload &&
-        !event.data
+        event.action === PostActionEnum.EXECUTE && // TODO: move this validation to the handler layer
+        !event.payload
       ) {
         throw new ExecutionEventPayloadInvalidError(event.workflowId, {
           message: 'Event `payload` is required',
@@ -409,7 +405,6 @@ export class Client {
         workflow.execute({
           payload: executionData,
           environment: {},
-          input: {},
           controls: {},
           subscriber: event.subscriber,
           step: {
@@ -434,9 +429,12 @@ export class Client {
     const elapsedTimeInMilliseconds = elapsedSeconds * 1_000 + elapsedNanoseconds / 1_000_000;
 
     const emoji = executionError ? EMOJI.ERROR : EMOJI.SUCCESS;
-    const resultMessage =
-      // eslint-disable-next-line no-nested-ternary
-      event.action === 'execute' ? 'Executed' : event.action === 'preview' ? 'Previewed' : 'Invalid action';
+    const resultMessages = {
+      [PostActionEnum.EXECUTE]: 'Executed',
+      [PostActionEnum.PREVIEW]: 'Previewed',
+    } as const;
+    const resultMessage = resultMessages[event.action];
+
     // eslint-disable-next-line no-console
     console.log(`${emoji} ${resultMessage} workflowId: \`${event.workflowId}\``);
 
@@ -462,8 +460,8 @@ export class Client {
     event: Event,
     workflow: DiscoverWorkflowOutput
   ): Promise<Record<string, unknown>> {
-    let payload = event.payload || event.data;
-    if (event.action === 'preview') {
+    let { payload } = event;
+    if (event.action === PostActionEnum.PREVIEW) {
       const mockResult = this.mock(workflow.payload.schema);
 
       payload = Object.assign(mockResult, payload);
@@ -482,9 +480,11 @@ export class Client {
 
   private prettyPrintExecute(event: Event, duration: number, error?: Error): void {
     const successPrefix = error ? EMOJI.ERROR : EMOJI.SUCCESS;
-    const actionMessage =
-      // eslint-disable-next-line no-nested-ternary
-      event.action === 'execute' ? 'Executed' : event.action === 'preview' ? 'Previewed' : 'Invalid action';
+    const actionMessages = {
+      [PostActionEnum.EXECUTE]: 'Executed',
+      [PostActionEnum.PREVIEW]: 'Previewed',
+    } as const;
+    const actionMessage = actionMessages[event.action];
     const message = error ? 'Failed to execute' : actionMessage;
     const executionLog = error ? log.error : log.success;
     const logMessage = `${successPrefix} ${message} workflowId: '${event.workflowId}`;
@@ -508,7 +508,7 @@ export class Client {
         const result = await acc;
         const previewProviderHandler = this.previewProvider.bind(this);
         const executeProviderHandler = this.executeProvider.bind(this);
-        const handler = event.action === 'preview' ? previewProviderHandler : executeProviderHandler;
+        const handler = event.action === PostActionEnum.PREVIEW ? previewProviderHandler : executeProviderHandler;
 
         const providerResult = await handler(event, step, provider, outputs);
 
@@ -578,9 +578,7 @@ export class Client {
         symbol: EMOJI.ERROR,
         text: `Failed to execute provider: \`${provider.type}\``,
       });
-      throw new ProviderExecutionFailedError(
-        `Failed to execute provider: '${provider.type}'.\n${(error as Error).message}`
-      );
+      throw new ProviderExecutionFailedError(provider.type, event.action, error);
     }
   }
 
@@ -617,7 +615,11 @@ export class Client {
           symbol: EMOJI.ERROR,
           text: `Failed to execute stepId: \`${step.stepId}\``,
         });
-        throw error;
+        if (isFrameworkError(error)) {
+          throw error;
+        } else {
+          throw new StepExecutionFailedError(step.stepId, event.action, error);
+        }
       }
     } else {
       const spinner = ora({ indent: 1 }).start(`Hydrating stepId: \`${step.stepId}\``);
@@ -660,10 +662,8 @@ export class Client {
       const templateString = this.templateEngine.parse(JSON.stringify(templateControls));
 
       const compiledString = await this.templateEngine.render(templateString, {
-        payload: event.payload || event.data,
+        payload: event.payload,
         subscriber: event.subscriber,
-        // Backwards compatibility, for allowing usage of variables without namespace (e.g. `{{name}}` instead of `{{payload.name}}`)
-        ...(event.payload || event.data),
       });
 
       return JSON.parse(compiledString);
@@ -680,10 +680,8 @@ export class Client {
    * @returns The controls for the step
    */
   private async createStepControls(step: DiscoverStepOutput, event: Event): Promise<Record<string, unknown>> {
-    const stepControls = event.controls || event.inputs;
-
     const validatedControls = await this.validate(
-      stepControls,
+      event.controls,
       step.controls.unknownSchema,
       'step',
       'controls',
@@ -741,7 +739,12 @@ export class Client {
         symbol: EMOJI.ERROR,
         text: `Failed to preview stepId: \`${step.stepId}\``,
       });
-      throw error;
+
+      if (isFrameworkError(error)) {
+        throw error;
+      } else {
+        throw new StepExecutionFailedError(step.stepId, event.action, error);
+      }
     }
   }
 

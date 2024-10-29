@@ -1,6 +1,5 @@
 import { BadRequestException, ConflictException, Inject, Injectable } from '@nestjs/common';
 import shortid from 'shortid';
-import slugify from 'slugify';
 import { IntegrationEntity, IntegrationRepository, DalException, IntegrationQuery } from '@novu/dal';
 import {
   ChannelTypeEnum,
@@ -9,6 +8,7 @@ import {
   SmsProviderIdEnum,
   InAppProviderIdEnum,
   CHANNELS_WITH_PRIMARY,
+  slugify,
 } from '@novu/shared';
 import {
   AnalyticsService,
@@ -148,7 +148,7 @@ export class CreateIntegration {
       const defaultName =
         providers.find((provider) => provider.id === command.providerId)?.displayName ?? providerIdCapitalized;
       const name = command.name ?? defaultName;
-      const identifier = command.identifier ?? `${slugify(name, { lower: true, strict: true })}-${shortid.generate()}`;
+      const identifier = command.identifier ?? `${slugify(name)}-${shortid.generate()}`;
 
       const query: IntegrationQuery = {
         name,

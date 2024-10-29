@@ -5,16 +5,12 @@ import { discoverStep } from './discover-step';
 
 export function discoverCustomStepFactory(targetWorkflow: DiscoverWorkflowOutput, type: StepType): CustomStep {
   return async (stepId, resolve, options = {}) => {
-    const controlSchema = options?.controlSchema || options?.inputSchema || emptySchema;
+    const controlSchema = options?.controlSchema || emptySchema;
     const outputSchema = options?.outputSchema || emptySchema;
 
     discoverStep(targetWorkflow, stepId, {
       stepId,
       type,
-      inputs: {
-        schema: transformSchema(controlSchema),
-        unknownSchema: controlSchema,
-      },
       controls: {
         schema: transformSchema(controlSchema),
         unknownSchema: controlSchema,

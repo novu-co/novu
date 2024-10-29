@@ -309,6 +309,7 @@
     "mailin",
     "Mailjet",
     "mailparser",
+    "Maily",
     "Maizzle",
     "mansagroup",
     "mantine",
@@ -651,6 +652,7 @@
     "unarchived",
     "Unarchived",
     "Unfetch",
+    "unplugin",
     "Unpromoted",
     "unpublish",
     "unsub",
@@ -684,7 +686,11 @@
     "xkeysib",
     "zulip",
     "zwnj",
-    "motionone"
+    "motionone",
+    "xyflow",
+    "Sonner",
+    "sonner",
+    "cmdk"
   ],
   "flagWords": [],
   "patterns": [
@@ -783,5 +789,6 @@
     "apps/web/src/pages/playground/web-container-configuration/sandbox-vite/*.ts",
     "apps/api/src/app/analytics/usecases/hubspot-identify-form/hubspot-identify-form.usecase.ts",
     "apps/dashboard/eslint.config.js",
+    "packages/framework/src/jsonSchemaFaker.js"
   ]
 }

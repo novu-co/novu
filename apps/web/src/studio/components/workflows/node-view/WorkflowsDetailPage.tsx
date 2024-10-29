@@ -5,6 +5,7 @@ import { IconCable, IconPlayArrow, IconSettings } from '@novu/novui/icons';
 import { HStack, Stack } from '@novu/novui/jsx';
 import { token } from '@novu/novui/tokens';
 import { useEffect, useState } from 'react';
+import type { DiscoverWorkflowOutput } from '@novu/framework/internal';
 import { useTelemetry } from '../../../../hooks/useNovuAPI';
 import { useWorkflow } from '../../../hooks/useBridgeAPI';
 import { useStudioWorkflowsNavigation } from '../../../hooks/useStudioWorkflowsNavigation';
@@ -38,7 +39,10 @@ const BaseWorkflowsDetailPage = () => {
     return <WorkflowsContentLoading />;
   }
 
-  const title = workflow?.workflowId;
+  // After loading has completed, we can safely cast the workflow to DiscoverWorkflowOutput
+  const fetchedWorkflow = workflow as DiscoverWorkflowOutput;
+
+  const title = fetchedWorkflow?.name || fetchedWorkflow.workflowId;
 
   return (
     <WorkflowsPageTemplate

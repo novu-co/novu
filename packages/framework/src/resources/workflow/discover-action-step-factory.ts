@@ -13,15 +13,11 @@ export function discoverActionStepFactory(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): ActionStep<any, any> {
   return async (stepId, resolve, options = {}) => {
-    const controlSchema = options?.controlSchema || options?.inputSchema || emptySchema;
+    const controlSchema = options?.controlSchema || emptySchema;
 
     discoverStep(targetWorkflow, stepId, {
       stepId,
       type,
-      inputs: {
-        schema: transformSchema(controlSchema),
-        unknownSchema: controlSchema,
-      },
       controls: {
         schema: transformSchema(controlSchema),
         unknownSchema: controlSchema,

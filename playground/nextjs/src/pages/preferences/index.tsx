@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <>
       <Title title="Preferences Component" />
-      <div className="w-96 h-96 overflow-y-auto">
+      <div className="w-96 h-[600px] overflow-y-auto">
         <Inbox {...novuConfig}>
           <Preferences />
         </Inbox>

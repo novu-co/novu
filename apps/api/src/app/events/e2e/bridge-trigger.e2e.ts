@@ -12,10 +12,13 @@ import {
 } from '@novu/dal';
 import {
   ChannelTypeEnum,
+  CreateWorkflowDto,
   ExecutionDetailsStatusEnum,
   JobStatusEnum,
   MessagesStatusEnum,
   StepTypeEnum,
+  WorkflowCreationSourceEnum,
+  WorkflowResponseDto,
 } from '@novu/shared';
 import { workflow } from '@novu/framework';
 
@@ -31,7 +34,7 @@ const contexts: Context[] = [
 ];
 
 contexts.forEach((context: Context) => {
-  describe('Bridge Trigger', async () => {
+  describe('Self-Hosted Bridge Trigger', async () => {
     let session: UserSession;
     let bridgeServer: BridgeServer;
     const messageRepository = new MessageRepository();
@@ -623,62 +626,6 @@ contexts.forEach((context: Context) => {
       expect(sentMessage[1].subject).to.include('prefix Hello default_name');
       expect(sentMessage[0].subject).to.include('prefix Hello payload_name');
     });
-    it(`should trigger the bridge workflow with control default and payload data [${context.name}] - with backwards compatability for payload variable`, async () => {
-      const workflowId = `default-payload-params-workflow-${`${context.name}-${uuidv4()}`}`;
-      const newWorkflow = workflow(
-        workflowId,
-        async ({ step, payload }) => {
-          await step.email(
-            'send-email',
-            async (controls) => {
-              return {
-                subject: `prefix ${controls.name}`,
-                body: 'Body result',
-              };
-            },
-            {
-              controlSchema: {
-                type: 'object',
-                properties: {
-                  name: { type: 'string', default: 'Hello {{name}}' },
-                },
-              } as const,
-            }
-          );
-        },
-        {
-          payloadSchema: {
-            type: 'object',
-            properties: {
-              name: { type: 'string', default: 'default_name' },
-            },
-            required: [],
-            additionalProperties: false,
-          } as const,
-        }
-      );
-
-      await bridgeServer.start({ workflows: [newWorkflow] });
-
-      if (context.isStateful) {
-        await discoverAndSyncBridge(session, workflowsRepository, workflowId, bridgeServer);
-      }
-
-      await triggerEvent(session, workflowId, subscriber.subscriberId, {}, bridge);
-      await session.awaitRunningJobs();
-      await triggerEvent(session, workflowId, subscriber.subscriberId, { name: 'payload_name' }, bridge);
-      await session.awaitRunningJobs();
-
-      const sentMessage = await messageRepository.find({
-        _environmentId: session.environment._id,
-        _subscriberId: subscriber._id,
-        channel: StepTypeEnum.EMAIL,
-      });
-
-      expect(sentMessage.length).to.be.eq(2);
-      expect(sentMessage[1].subject).to.include('prefix Hello default_name');
-      expect(sentMessage[0].subject).to.include('prefix Hello payload_name');
-    });
 
     it(`should trigger the bridge workflow with control variables [${context.name}]`, async () => {
       const workflowId = `control-variables-workflow-${`${context.name}-${uuidv4()}`}`;
@@ -721,7 +668,7 @@ contexts.forEach((context: Context) => {
 
       if (context.isStateful) {
         await discoverAndSyncBridge(session, workflowsRepository, workflowId, bridgeServer);
-        await saveControlVariables(session, workflowId, stepId, { variables: { name: 'stored_control_name' } });
+        await saveControlValues(session, workflowId, stepId, { variables: { name: 'stored_control_name' } });
       }
 
       const controls = { steps: { [stepId]: { name: 'stored_control_name' } } };
@@ -1454,6 +1401,62 @@ contexts.forEach((context: Context) => {
   });
 });
 
+describe('Novu-Hosted Bridge Trigger', () => {
+  let session: UserSession;
+  const messageRepository = new MessageRepository();
+  let subscriber: SubscriberEntity;
+  let subscriberService: SubscribersService;
+
+  beforeEach(async () => {
+    session = new UserSession();
+    await session.initialize();
+    subscriberService = new SubscribersService(session.organization._id, session.environment._id);
+    subscriber = await subscriberService.createSubscriber({ _id: session.subscriberId });
+  });
+
+  it('should execute a Novu-managed workflow', async () => {
+    const createWorkflowDto: CreateWorkflowDto = {
+      name: 'Test Workflow',
+      description: 'Test Workflow',
+      __source: WorkflowCreationSourceEnum.DASHBOARD,
+      workflowId: 'test-workflow',
+      steps: [
+        {
+          type: StepTypeEnum.IN_APP,
+          name: 'Test Step 1',
+          controlValues: {
+            body: 'Test Body',
+          },
+        },
+        {
+          type: StepTypeEnum.IN_APP,
+          name: 'Test Step 2',
+          controlValues: {
+            body: 'Test Body',
+          },
+        },
+      ],
+    };
+
+    const response = await session.testAgent.post(`/v2/workflows`).send(createWorkflowDto);
+    expect(response.status).to.be.eq(201);
+
+    const responseData = response.body.data as WorkflowResponseDto;
+
+    await triggerEvent(session, responseData.workflowId, subscriber._id, {});
+    await session.awaitRunningJobs();
+
+    const sentMessages = await messageRepository.find({
+      _environmentId: session.environment._id,
+      _subscriberId: session.subscriberProfile?._id,
+      templateIdentifier: responseData.workflowId,
+      channel: StepTypeEnum.IN_APP,
+    });
+
+    expect(sentMessages.length).to.be.eq(2);
+  });
+});
+
 async function syncWorkflow(
   session: UserSession,
   workflowsRepository: NotificationTemplateRepository,
@@ -1526,7 +1529,7 @@ async function discoverAndSyncBridge(
   return discoverResponse;
 }
 
-async function saveControlVariables(
+async function saveControlValues(
   session: UserSession,
   workflowIdentifier?: string,
   stepIdentifier?: string,

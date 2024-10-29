@@ -20,12 +20,6 @@ export type StepOptions<
   skip?: Skip<T_Controls>;
   /**
    * The schema for the controls of the step. Used to validate the user-provided controls from Novu Web.
-   *
-   * @deprecated Use `controlSchema` instead
-   */
-  inputSchema?: T_ControlSchema;
-  /**
-   * The schema for the controls of the step. Used to validate the user-provided controls from Novu Web.
    */
   controlSchema?: T_ControlSchema;
 };
@@ -179,6 +173,12 @@ export type ChannelStep<
      * The providers for the step. Used to override the behaviour of the providers for the step.
      */
     providers?: Prettify<Providers<T_StepType, T_Controls, T_Outputs>>;
+    /**
+     * A flag to disable output sanitization for the step.
+     *
+     * @default false
+     */
+    disableOutputSanitization?: boolean;
   }
 ) => StepOutput<T_Result>;
 
