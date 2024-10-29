@@ -4,6 +4,7 @@ import { JSONSchema } from 'json-schema-to-ts';
 import { type StepType } from '@novu/framework/internal';
 import { NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
 
+import { StepTypeEnum } from '@novu/shared';
 import {
   GetExistingStepSchemaCommand,
   GetStepSchemaCommand,
@@ -35,9 +36,16 @@ export class GetStepSchemaUseCase {
         throw new BadRequestException('No controls schema found');
       }
 
+      if (!isStepType(currentStep.template?.type)) {
+        throw new BadRequestException({
+          message: 'Invalid step type',
+          stepType: currentStep.template?.type,
+        });
+      }
+
       return {
         controls: buildControlsSchema({
-          stepType: currentStep.template?.type as StepType,
+          stepType: currentStep.template?.type,
           controlsSchema: currentStep.template?.controls?.schema,
         }),
         variables: buildVariablesSchema(previousSteps),
@@ -176,4 +184,8 @@ function buildPreviousStepsSchema(previousSteps: NotificationStepEntity[] | unde
     additionalProperties: false,
     description: 'Previous Steps Results',
   } as const satisfies JSONSchema;
+}
+
+function isStepType(value: string): value is StepType {
+  return Object.values(StepTypeEnum).includes(value as StepTypeEnum);
 }

@@ -58,10 +58,10 @@ type Properties =
 
 export type UiSchema = {
   type: `${StepType}`;
-  properties?: Properties;
+  properties: Properties;
 };
 
-export const mapStepTypeToUiSchema: Record<ChannelStepEnum | ActionStepEnum, UiSchema> = {
+export const mapStepTypeToUiSchema = {
   [ChannelStepEnum.SMS]: { type: 'sms', properties: smsProperties },
   [ChannelStepEnum.EMAIL]: { type: 'email', properties: emailProperties },
   [ChannelStepEnum.PUSH]: { type: 'push', properties: pushProperties },
@@ -70,7 +70,7 @@ export const mapStepTypeToUiSchema: Record<ChannelStepEnum | ActionStepEnum, UiS
   [ActionStepEnum.DELAY]: { type: 'delay', properties: delayProperties },
   [ActionStepEnum.DIGEST]: { type: 'digest', properties: digestProperties },
   [ActionStepEnum.CUSTOM]: { type: 'custom', properties: customProperties },
-};
+} as const satisfies Record<ChannelStepEnum | ActionStepEnum, UiSchema>;
 
 export class ControlsDto {
   schema: JSONSchema;
