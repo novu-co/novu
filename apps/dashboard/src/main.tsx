@@ -10,6 +10,7 @@ import { EditWorkflowPage } from './pages/edit-workflow';
 import { ConfigureWorkflow } from './components/workflow-editor/configure-workflow';
 import { ConfigureStep } from './components/workflow-editor/steps/configure-step';
 import { initializeSentry } from './utils/sentry';
+import { EditStepSidebar } from './components/workflow-editor/steps/edit-step-sidebar';
 
 initializeSentry();
 
@@ -56,7 +57,11 @@ const router = createBrowserRouter([
                   },
                   {
                     element: <ConfigureStep />,
-                    path: 'step/:stepId',
+                    path: ROUTES.CONFIGURE_STEP,
+                  },
+                  {
+                    element: <EditStepSidebar />,
+                    path: ROUTES.EDIT_STEP,
                   },
                 ],
               },

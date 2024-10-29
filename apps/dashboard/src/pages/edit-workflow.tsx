@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import { EditWorkflowLayout } from '@/components/edit-workflow-layout';
 import { ArrowRight, RouteFill } from '@/components/icons';
@@ -19,6 +19,10 @@ import { WorkflowEditorProvider } from '@/components/workflow-editor/workflow-ed
 import { useEnvironment } from '@/context/environment/hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { Toaster } from '@/components/primitives/sonner';
+import { AnimatedOutlet } from '@/components/animated-outlet';
+
+const asideClassName =
+  'text-foreground-950 flex h-full w-[300px] max-w-[350px] flex-col border-l pb-5 pt-3.5 [&_input]:text-xs [&_input]:text-neutral-600 [&_label]:text-xs [&_label]:font-medium [&_textarea]:text-xs [&_textarea]:text-neutral-600';
 
 export const EditWorkflowPage = () => {
   return (
@@ -26,7 +30,9 @@ export const EditWorkflowPage = () => {
       <EditWorkflowLayout headerStartItems={<StartItems />}>
         <div className="flex h-full flex-1 flex-nowrap">
           <WorkflowEditor />
-          <Outlet />
+          <aside className={asideClassName}>
+            <AnimatedOutlet />
+          </aside>
           <Toaster />
         </div>
       </EditWorkflowLayout>
