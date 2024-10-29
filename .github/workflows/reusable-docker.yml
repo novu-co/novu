@@ -64,7 +64,7 @@ jobs:
       id-token: write
     strategy:
       matrix:
-        name: [ '${{ inputs.package_name }}-ee', '${{ inputs.package_name }}' ]
+        name: [ '${{ inputs.package_name }}-ee']
     steps:
       - uses: actions/checkout@v4
         with:
