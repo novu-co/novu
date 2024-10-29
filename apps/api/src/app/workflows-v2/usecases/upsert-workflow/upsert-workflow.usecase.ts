@@ -229,7 +229,7 @@ export class UpsertWorkflowUseCase {
       description: workflowDto.description,
       tags: workflowDto.tags,
       active: workflowDto.active ?? true,
-      workflowId: slugifyName(workflowDto.workflowId),
+      workflowId: slugify(workflowDto.workflowId),
     };
   }
 
