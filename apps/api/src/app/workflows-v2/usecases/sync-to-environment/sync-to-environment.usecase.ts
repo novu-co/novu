@@ -8,9 +8,7 @@ import {
   UpdateWorkflowDto,
   WorkflowCreationSourceEnum,
   WorkflowPreferences,
-  WorkflowPreferencesPartial,
   WorkflowResponseDto,
-  ChannelTypeEnum,
 } from '@novu/shared';
 import {
   NotificationStepEntity,
@@ -145,46 +143,16 @@ export class SyncToEnvironmentUseCase {
     }));
   }
 
-  /**
-   * We need to map WorkflowPreferencesPartial retrieved from the database to WorkflowPreferences
-   * which is required to create/update a workflow
-   */
   private mapPreferences(preferences: PreferencesEntity[]): {
     user: WorkflowPreferences | null;
     workflow: WorkflowPreferences | null;
   } {
-    const findPreferences = (type: PreferencesTypeEnum) =>
-      preferences.find((pref) => pref.type === type)?.preferences ?? null;
-
-    const userPreferences = findPreferences(PreferencesTypeEnum.USER_WORKFLOW);
-    const workflowPreferences = findPreferences(PreferencesTypeEnum.WORKFLOW_RESOURCE);
-
-    const transformToFullPreferences = (
-      partialPreferences: WorkflowPreferencesPartial | null
-    ): WorkflowPreferences | null => {
-      if (!partialPreferences) return null;
-
-      const getChannelEnabled = (channel: ChannelTypeEnum) =>
-        typeof partialPreferences.channels?.[channel] === 'boolean' ? partialPreferences.channels[channel] : true;
-
-      return {
-        all: {
-          enabled: typeof partialPreferences.all?.enabled === 'boolean' ? partialPreferences.all.enabled : true,
-          readOnly: typeof partialPreferences.all?.readOnly === 'boolean' ? partialPreferences.all.readOnly : false,
-        },
-        channels: {
-          [ChannelTypeEnum.EMAIL]: { enabled: getChannelEnabled(ChannelTypeEnum.EMAIL) },
-          [ChannelTypeEnum.SMS]: { enabled: getChannelEnabled(ChannelTypeEnum.SMS) },
-          [ChannelTypeEnum.IN_APP]: { enabled: getChannelEnabled(ChannelTypeEnum.IN_APP) },
-          [ChannelTypeEnum.CHAT]: { enabled: getChannelEnabled(ChannelTypeEnum.CHAT) },
-          [ChannelTypeEnum.PUSH]: { enabled: getChannelEnabled(ChannelTypeEnum.PUSH) },
-        },
-      };
-    };
-
+    // we can typecast the preferences to WorkflowPreferences because user and workflow preferences are always full set
     return {
-      user: transformToFullPreferences(userPreferences),
-      workflow: transformToFullPreferences(workflowPreferences),
+      user: preferences.find((pref) => pref.type === PreferencesTypeEnum.USER_WORKFLOW)
+        ?.preferences as WorkflowPreferences | null,
+      workflow: preferences.find((pref) => pref.type === PreferencesTypeEnum.WORKFLOW_RESOURCE)
+        ?.preferences as WorkflowPreferences | null,
     };
   }
 
