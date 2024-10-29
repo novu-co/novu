@@ -25,6 +25,7 @@ import {
   TriggerTypeEnum,
   WorkflowOriginEnum,
   WorkflowTypeEnum,
+  slugify,
 } from '@novu/shared';
 
 import { PinoLogger } from 'nestjs-pino';
@@ -42,7 +43,6 @@ import {
   CreateMessageTemplateCommand,
 } from '../message-template';
 import { ApiException, PlatformException } from '../../utils/exceptions';
-import { slugifyName } from '../../utils';
 
 @Injectable()
 export class CreateWorkflow {
@@ -140,7 +140,7 @@ export class CreateWorkflow {
        * For non-bridge workflows, we use a slugified version of the workflow name
        * as the trigger identifier to provide a better trigger DX.
        */
-      triggerIdentifier = slugifyName(command.name);
+      triggerIdentifier = slugify(command.name);
     }
 
     return triggerIdentifier;
@@ -323,8 +323,7 @@ export class CreateWorkflow {
             preheader: step.template.preheader,
             senderName: step.template.senderName,
             actor: step.template.actor,
-            inputs: step.template.controls || step.template.inputs,
-            controls: step.template.controls || step.template.inputs,
+            controls: step.template.controls,
             output: step.template.output,
             stepId: step.template.stepId,
             parentChangeId,

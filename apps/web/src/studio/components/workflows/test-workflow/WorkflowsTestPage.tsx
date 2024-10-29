@@ -167,12 +167,7 @@ export const WorkflowsTestPage = () => {
         <When truthy={!isLoading}>
           <WorkflowTestControlsPanel
             onChange={onChange}
-            payloadSchema={
-              workflow?.payload?.schema ||
-              workflow?.data?.schema ||
-              (template as any)?.rawData?.payload?.schema ||
-              (template as any)?.rawData?.data?.schema
-            }
+            payloadSchema={workflow?.payload?.schema || template?.payloadSchema}
             to={{
               subscriberId: testUser?.id || '',
               email: testUser?.emailAddress || '',

@@ -46,6 +46,7 @@
     "clsx": "^2.1.1",
     "cmdk": "1.0.0",
     "date-fns": "^4.1.0",
+    "framer-motion": "^11.3.19",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.439.0",
     "mixpanel-browser": "^2.52.0",

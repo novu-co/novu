@@ -33,10 +33,7 @@ export class PreviewStep {
 
   private buildBridgeEventPayload(command: PreviewStepCommand): Event {
     return {
-      inputs: {}, // @deprecated - use controls instead
       controls: command.controls || {},
-
-      data: {}, // @deprecated - use payload instead
       payload: command.payload || {},
       state: [
         {

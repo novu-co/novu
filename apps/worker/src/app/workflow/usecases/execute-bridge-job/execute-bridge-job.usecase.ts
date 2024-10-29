@@ -95,10 +95,7 @@ export class ExecuteBridgeJob {
       : command.job.step.controlVariables;
 
     const bridgeEvent: Omit<Event, 'workflowId' | 'stepId' | 'action'> = {
-      /** @deprecated */
-      data: payload ?? {},
       payload: payload ?? {},
-      inputs: variablesStores ?? {},
       controls: variablesStores ?? {},
       state,
       subscriber: subscriber ?? {},
@@ -147,7 +144,7 @@ export class ExecuteBridgeJob {
       level: ControlValuesLevelEnum.STEP_CONTROLS,
     });
 
-    return controls?.controls || controls?.inputs;
+    return controls?.controls;
   }
 
   private normalizePayload(originalPayload) {

@@ -73,10 +73,6 @@ export class CreateMessageTemplateCommand extends EnvironmentWithUserCommand {
   _creatorId?: string;
 
   @IsOptional()
-  inputs?: {
-    schema: JsonSchema;
-  };
-  @IsOptional()
   controls?: {
     schema: JsonSchema;
   };

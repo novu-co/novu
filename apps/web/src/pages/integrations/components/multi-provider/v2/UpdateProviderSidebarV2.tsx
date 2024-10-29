@@ -11,10 +11,10 @@ import {
   ICredentialsDto,
   InAppProviderIdEnum,
   SmsProviderIdEnum,
+  slugify,
 } from '@novu/shared';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
-import slugify from 'slugify';
 import { useWebhookSupportStatus } from '../../../../../api/hooks';
 import { useUpdateIntegration } from '../../../../../api/hooks/useUpdateIntegration';
 import { Conditions, IConditions } from '../../../../../components/conditions';
@@ -126,10 +126,7 @@ export function UpdateProviderSidebar({
 
   useEffect(() => {
     if (selectedProvider && !selectedProvider?.identifier) {
-      const newIdentifier = slugify(selectedProvider?.displayName, {
-        lower: true,
-        strict: true,
-      });
+      const newIdentifier = slugify(selectedProvider?.displayName);
 
       setValue('identifier', newIdentifier);
     }

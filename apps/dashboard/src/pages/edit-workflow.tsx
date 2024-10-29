@@ -13,13 +13,16 @@ import {
   BreadcrumbSeparator,
 } from '@/components/primitives/breadcrumb';
 import { Button } from '@/components/primitives/button';
-import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workflow';
 import { formSchema } from '@/components/workflow-editor/schema';
 import { WorkflowEditor } from '@/components/workflow-editor/workflow-editor';
 import { WorkflowEditorProvider } from '@/components/workflow-editor/workflow-editor-provider';
 import { useEnvironment } from '@/context/environment/hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { Toaster } from '@/components/primitives/sonner';
+import { AnimatedOutlet } from '@/components/animated-outlet';
+
+const asideClassName =
+  'text-foreground-950 flex h-full w-[300px] max-w-[350px] flex-col border-l pb-5 pt-3.5 [&_input]:text-xs [&_input]:text-neutral-600 [&_label]:text-xs [&_label]:font-medium [&_textarea]:text-xs [&_textarea]:text-neutral-600';
 
 export const EditWorkflowPage = () => {
   return (
@@ -27,7 +30,9 @@ export const EditWorkflowPage = () => {
       <EditWorkflowLayout headerStartItems={<StartItems />}>
         <div className="flex h-full flex-1 flex-nowrap">
           <WorkflowEditor />
-          <ConfigureWorkflow />
+          <aside className={asideClassName}>
+            <AnimatedOutlet />
+          </aside>
           <Toaster />
         </div>
       </EditWorkflowLayout>

@@ -14,12 +14,6 @@ export type Providers<T_StepType extends keyof typeof providerSchemas, T_Control
   [K in keyof (typeof providerSchemas)[T_StepType]]?: (step: {
     /**
      * The controls for the step.
-     *
-     * @deprecated Use `controls` instead
-     */
-    inputs: T_Controls;
-    /**
-     * The controls for the step.
      */
     controls: T_Controls;
     /**

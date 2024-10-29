@@ -162,10 +162,6 @@ export class NotificationStepVariantCommand {
   metadata?: IWorkflowStepMetadata;
 
   @IsOptional()
-  inputs?: {
-    schema: JsonSchema;
-  };
-  @IsOptional()
   controls?: {
     schema: JsonSchema;
   };
