@@ -10,7 +10,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import {
-  GetFeatureFlag,
   GetPreferences,
   GetPreferencesCommand,
   UpsertPreferences,
@@ -28,8 +27,7 @@ import { UpsertPreferencesDto } from './dtos/upsert-preferences.dto';
 export class PreferencesController {
   constructor(
     private upsertPreferences: UpsertPreferences,
-    private getPreferences: GetPreferences,
-    private getFeatureFlag: GetFeatureFlag
+    private getPreferences: GetPreferences
   ) {}
 
   @Get('/')

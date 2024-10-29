@@ -20,7 +20,6 @@ import {
   DetailEnum,
   ExecutionLogRoute,
   ExecutionLogRouteCommand,
-  GetFeatureFlag,
   GetPreferences,
   GetSubscriberGlobalPreference,
   GetSubscriberGlobalPreferenceCommand,
@@ -77,8 +76,7 @@ export class SendMessage {
     private tenantRepository: TenantRepository,
     private analyticsService: AnalyticsService,
     private normalizeVariablesUsecase: NormalizeVariables,
-    private executeBridgeJob: ExecuteBridgeJob,
-    private getFeatureFlag: GetFeatureFlag
+    private executeBridgeJob: ExecuteBridgeJob
   ) {}
 
   @InstrumentUsecase()
