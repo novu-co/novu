@@ -11,7 +11,7 @@ import {
   GetStepTypeSchemaCommand,
 } from './get-step-schema.command';
 import { ControlsDto, StepSchemaDto } from '../../dtos/step-schema.dto';
-import { mapStepTypeToControlScema, mapStepTypeToResult } from '../../shared';
+import { mapStepTypeToControlSchema, mapStepTypeToResult } from '../../shared';
 
 @Injectable()
 export class GetStepSchemaUseCase {
@@ -107,7 +107,7 @@ export const buildControlsSchema = ({
   }
 
   if (stepType) {
-    schemaRes = mapStepTypeToControlScema[stepType].schema;
+    schemaRes = mapStepTypeToControlSchema[stepType].schema;
   }
 
   if (!schemaRes || typeof schemaRes !== 'object') {
@@ -122,7 +122,7 @@ export const buildControlsSchema = ({
       ...schemaRes,
       description: 'Output of the step, including any controls defined in the Bridge App',
     },
-    uiSchema: mapStepTypeToControlScema[stepType].uiSchema,
+    uiSchema: mapStepTypeToControlSchema[stepType].uiSchema,
   };
 };
 

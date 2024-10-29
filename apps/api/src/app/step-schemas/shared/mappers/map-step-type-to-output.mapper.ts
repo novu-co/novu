@@ -9,7 +9,7 @@ export const PERMISSIVE_EMPTY_SCHEMA = {
   additionalProperties: true,
 } as const;
 
-export const mapStepTypeToControlScema: Record<ChannelStepEnum | ActionStepEnum, ControlsDto> = {
+export const mapStepTypeToControlSchema: Record<ChannelStepEnum | ActionStepEnum, ControlsDto> = {
   [ChannelStepEnum.SMS]: {
     schema: channelStepSchemas[ChannelStepEnum.SMS].output,
     uiSchema: mapStepTypeToUiSchema[ChannelStepEnum.SMS],
