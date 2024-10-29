@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { JSONSchema } from 'json-schema-to-ts';
 
 import { type StepType } from '@novu/framework/internal';
@@ -10,7 +10,7 @@ import {
   GetStepSchemaCommand,
   GetStepTypeSchemaCommand,
 } from './get-step-schema.command';
-import { ControlsDto, mapStepTypeToUiSchema, StepSchemaDto } from '../../dtos/step-schema.dto';
+import { ControlsDto, StepSchemaDto } from '../../dtos/step-schema.dto';
 import { mapStepTypeToControlScema, mapStepTypeToResult } from '../../shared';
 
 @Injectable()
@@ -101,27 +101,29 @@ export const buildControlsSchema = ({
   stepType: StepType;
   controlsSchema?: JSONSchema;
 }): ControlsDto => {
+  let schemaRes: JSONSchema | null = null;
   if (controlsSchema && typeof controlsSchema === 'object') {
-    return {
-      schema: {
-        ...controlsSchema,
-        description: 'Output of the step, including any controls defined in the Bridge App',
-      },
-      uiSchema: mapStepTypeToUiSchema[stepType],
-    };
+    schemaRes = controlsSchema;
   }
 
   if (stepType) {
-    return {
-      schema: {
-        ...mapStepTypeToControlScema[stepType],
-        description: 'Output of the step, including any controls defined in the Bridge App',
-      },
-      uiSchema: mapStepTypeToUiSchema[stepType],
-    };
+    schemaRes = mapStepTypeToControlScema[stepType].schema;
   }
 
-  throw new Error('No controls schema found');
+  if (!schemaRes || typeof schemaRes !== 'object') {
+    throw new NotFoundException({
+      message: 'No controls schema found',
+      stepType,
+    });
+  }
+
+  return {
+    schema: {
+      ...schemaRes,
+      description: 'Output of the step, including any controls defined in the Bridge App',
+    },
+    uiSchema: mapStepTypeToControlScema[stepType].uiSchema,
+  };
 };
 
 const buildSubscriberSchema = () =>
