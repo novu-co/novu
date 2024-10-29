@@ -8,7 +8,9 @@ import {
   UpdateWorkflowDto,
   WorkflowCreationSourceEnum,
   WorkflowPreferences,
+  WorkflowPreferencesPartial,
   WorkflowResponseDto,
+  ChannelTypeEnum,
 } from '@novu/shared';
 import {
   NotificationStepEntity,
@@ -143,13 +145,46 @@ export class SyncToEnvironmentUseCase {
     }));
   }
 
+  /**
+   * We need to map WorkflowPreferencesPartial retrieved from the database to WorkflowPreferences
+   * which is required to create/update a workflow
+   */
   private mapPreferences(preferences: PreferencesEntity[]): {
     user: WorkflowPreferences | null;
     workflow: WorkflowPreferences | null;
   } {
+    const findPreferences = (type: PreferencesTypeEnum) =>
+      preferences.find((pref) => pref.type === type)?.preferences ?? null;
+
+    const userPrefs = findPreferences(PreferencesTypeEnum.USER_WORKFLOW);
+    const workflowPrefs = findPreferences(PreferencesTypeEnum.WORKFLOW_RESOURCE);
+
+    const transformToFullPreferences = (
+      partialPrefs: WorkflowPreferencesPartial | null
+    ): WorkflowPreferences | null => {
+      if (!partialPrefs) return null;
+
+      const getChannelEnabled = (channel: ChannelTypeEnum) =>
+        typeof partialPrefs.channels?.[channel] === 'boolean' ? partialPrefs.channels[channel] : true;
+
+      return {
+        all: {
+          enabled: typeof partialPrefs.all?.enabled === 'boolean' ? partialPrefs.all.enabled : true,
+          readOnly: typeof partialPrefs.all?.readOnly === 'boolean' ? partialPrefs.all.readOnly : false,
+        },
+        channels: {
+          [ChannelTypeEnum.EMAIL]: { enabled: getChannelEnabled(ChannelTypeEnum.EMAIL) },
+          [ChannelTypeEnum.SMS]: { enabled: getChannelEnabled(ChannelTypeEnum.SMS) },
+          [ChannelTypeEnum.IN_APP]: { enabled: getChannelEnabled(ChannelTypeEnum.IN_APP) },
+          [ChannelTypeEnum.CHAT]: { enabled: getChannelEnabled(ChannelTypeEnum.CHAT) },
+          [ChannelTypeEnum.PUSH]: { enabled: getChannelEnabled(ChannelTypeEnum.PUSH) },
+        },
+      };
+    };
+
     return {
-      user: preferences.find((pref) => pref.type === PreferencesTypeEnum.USER_WORKFLOW)?.preferences ?? null,
-      workflow: preferences.find((pref) => pref.type === PreferencesTypeEnum.WORKFLOW_RESOURCE)?.preferences ?? null,
+      user: transformToFullPreferences(userPrefs),
+      workflow: transformToFullPreferences(workflowPrefs),
     };
   }
 

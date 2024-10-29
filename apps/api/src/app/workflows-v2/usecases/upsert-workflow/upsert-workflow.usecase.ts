@@ -173,7 +173,7 @@ export class UpsertWorkflowUseCase {
         environmentId: workflow._environmentId,
         organizationId: workflow._organizationId,
         templateId: workflow._id,
-        preferences: command.workflowDto.preferences?.workflow,
+        preferences: command.workflowDto.preferences?.workflow || null,
       })
     );
   }
