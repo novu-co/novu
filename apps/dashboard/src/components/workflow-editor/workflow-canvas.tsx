@@ -60,6 +60,9 @@ const mapStepToNode = (
     content = `Wait to send ~ 30 minutes`;
   }
 
+  const fieldIssues = Object.values({ ...step.issues?.body, ...step.issues?.control })[0];
+  const error = fieldIssues?.[0]?.message;
+
   return {
     id: crypto.randomUUID(),
     position: { x: previousPosition.x, y: previousPosition.y + Y_DISTANCE },
@@ -67,6 +70,7 @@ const mapStepToNode = (
       name: step.name,
       content,
       addStepIndex,
+      error,
     },
     type: step.type,
   };

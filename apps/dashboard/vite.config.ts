@@ -2,6 +2,7 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import { sentryVitePlugin } from '@sentry/vite-plugin';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { legacyHandler } from './legacy-handler';
@@ -25,10 +26,23 @@ export default defineConfig({
         });
       },
     },
+    // Put the Sentry vite plugin after all other plugins
+    sentryVitePlugin({
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      // Auth tokens can be obtained from https://sentry.io/orgredirect/organizations/:orgslug/settings/auth-tokens/
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      reactComponentAnnotation: { enabled: true },
+    }),
   ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+    },
+  },
+  server: {
+    headers: {
+      'Document-Policy': 'js-profiling',
     },
   },
 });

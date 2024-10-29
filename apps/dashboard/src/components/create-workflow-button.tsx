@@ -52,6 +52,9 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.fetchWorkflow, currentEnvironment?._id, result.data.workflowId],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.fetchTags, currentEnvironment?._id],
+      });
       setIsOpen(false);
     },
   });

@@ -44,6 +44,8 @@ export class Preferences extends BaseModule {
               new Preference(el, {
                 emitterInstance: this._emitter,
                 inboxServiceInstance: this._inboxService,
+                cache: this.cache,
+                useCache: this.#useCache,
               })
           );
 
@@ -61,11 +63,5 @@ export class Preferences extends BaseModule {
         throw error;
       }
     });
-  }
-
-  async update(args: UpdatePreferencesArgs): Result<Preference> {
-    return this.callWithSession(async () =>
-      updatePreference({ emitter: this._emitter, apiService: this._inboxService, args })
-    );
   }
 }

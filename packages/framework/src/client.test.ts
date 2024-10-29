@@ -11,7 +11,7 @@ import {
 } from './errors';
 import { workflow } from './resources';
 import { Event, Step } from './types';
-import { FRAMEWORK_VERSION, SDK_VERSION, PostActionEnum } from './constants';
+import { PostActionEnum } from './constants';
 
 describe('Novu Client', () => {
   let client: Client;
