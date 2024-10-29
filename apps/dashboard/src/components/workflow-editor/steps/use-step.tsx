@@ -12,9 +12,19 @@ export const useStep = () => {
   const { watch, control } = useFormContext<z.infer<typeof workflowSchema>>();
   const steps = watch('steps');
 
-  const step = useMemo(() => steps?.find((message) => message._id === stepId), [stepId, steps]);
+  const step = useMemo(() => {
+    if (Array.isArray(steps)) {
+      return steps.find((message) => message._id === stepId);
+    }
+    return undefined;
+  }, [stepId, steps]);
 
-  const stepIndex = useMemo(() => steps?.findIndex((message) => message._id === stepId), [stepId, steps]);
+  const stepIndex = useMemo(() => {
+    if (Array.isArray(steps)) {
+      return steps.findIndex((message) => message._id === stepId);
+    }
+    return -1;
+  }, [stepId, steps]);
 
   return {
     step,
