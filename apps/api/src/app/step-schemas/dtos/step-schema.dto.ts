@@ -46,20 +46,39 @@ const digestProperties = {
 
 const customProperties = {};
 
-type Properties =
-  | typeof chatProperties
-  | typeof emailProperties
-  | typeof inAppProperties
-  | typeof pushProperties
-  | typeof smsProperties
-  | typeof delayProperties
-  | typeof digestProperties
-  | typeof customProperties;
-
-export type UiSchema = {
-  type: `${StepType}`;
-  properties: Properties;
-};
+export type UiSchema =
+  | {
+      type: 'email';
+      properties: typeof emailProperties;
+    }
+  | {
+      type: 'sms';
+      properties: typeof smsProperties;
+    }
+  | {
+      type: 'push';
+      properties: typeof pushProperties;
+    }
+  | {
+      type: 'chat';
+      properties: typeof chatProperties;
+    }
+  | {
+      type: 'in_app';
+      properties: typeof inAppProperties;
+    }
+  | {
+      type: 'delay';
+      properties: typeof delayProperties;
+    }
+  | {
+      type: 'digest';
+      properties: typeof digestProperties;
+    }
+  | {
+      type: 'custom';
+      properties: typeof customProperties;
+    };
 
 export const mapStepTypeToUiSchema = {
   [ChannelStepEnum.SMS]: { type: 'sms', properties: smsProperties },
