@@ -200,7 +200,7 @@ contexts.forEach((context: Context) => {
         await syncWorkflow(session, workflowsRepository, workflowIdSkipByStatic, bridgeServer);
       }
 
-      await triggerEvent(session, workflowIdSkipByStatic, subscriber.subscriberId, null, bridge);
+      await triggerEvent(session, workflowIdSkipByStatic, subscriber.subscriberId, {}, bridge);
       await session.awaitRunningJobs();
 
       const executedMessageByStatic = await messageRepository.find({
@@ -264,7 +264,7 @@ contexts.forEach((context: Context) => {
         await syncWorkflow(session, workflowsRepository, workflowIdSkipByVariable, bridgeServer);
       }
 
-      await triggerEvent(session, workflowIdSkipByVariable, subscriber.subscriberId, null, bridge);
+      await triggerEvent(session, workflowIdSkipByVariable, subscriber.subscriberId, {}, bridge);
       await session.awaitRunningJobs();
 
       const executedMessage = await messageRepository.find({
@@ -556,7 +556,7 @@ contexts.forEach((context: Context) => {
         await discoverAndSyncBridge(session, workflowsRepository, workflowId, bridgeServer);
       }
 
-      await triggerEvent(session, workflowId, subscriber.subscriberId, null, bridge);
+      await triggerEvent(session, workflowId, subscriber.subscriberId, {}, bridge);
 
       await session.awaitRunningJobs();
 
@@ -724,6 +724,7 @@ contexts.forEach((context: Context) => {
        * Delete `preferences` from the Workflow Definition to simulate an old
        * Workflow Definition (i.e. from old Framework version) that doesn't have the `preferences` property.
        */
+      // @ts-ignore - The operand of a 'delete' operator must be optional.
       delete newWorkflow.definition.preferences;
 
       await bridgeServer.start({ workflows: [newWorkflow] });
