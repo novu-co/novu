@@ -9,7 +9,7 @@ import {
   GetStepSchemaCommand,
   GetStepTypeSchemaCommand,
 } from './get-step-schema.command';
-import { StepSchemaDto } from '../../dtos/step-schema.dto';
+import { ControlsDto, mapStepTypeToUiSchema, StepSchemaDto } from '../../dtos/step-schema.dto';
 import { mapStepTypeToControlScema, mapStepTypeToResult } from '../../shared';
 
 @Injectable()
@@ -18,13 +18,28 @@ export class GetStepSchemaUseCase {
 
   async execute(command: GetStepSchemaCommand): Promise<StepSchemaDto> {
     if (isGetByStepType(command)) {
-      return { variables: buildVariablesSchema() };
+      return {
+        controls: buildControlsSchema({ stepType: command.stepType }),
+        variables: buildVariablesSchema(),
+      };
     }
 
     if (isGetByStepId(command)) {
-      const { previousSteps } = await this.findSteps(command);
+      const { currentStep, previousSteps } = await this.findSteps(command);
+
+      if (!currentStep.template?.type) {
+        throw new BadRequestException('No step type found');
+      }
+
+      if (!currentStep.template?.controls?.schema) {
+        throw new BadRequestException('No controls schema found');
+      }
 
       return {
+        controls: buildControlsSchema({
+          stepType: currentStep.template?.type as StepType,
+          controlsSchema: currentStep.template?.controls?.schema,
+        }),
         variables: buildVariablesSchema(previousSteps),
       };
     }
@@ -75,20 +90,26 @@ export const buildControlsSchema = ({
   stepType,
   controlsSchema,
 }: {
-  stepType?: StepType;
+  stepType: StepType;
   controlsSchema?: JSONSchema;
-}): JSONSchema => {
+}): ControlsDto => {
   if (controlsSchema && typeof controlsSchema === 'object') {
     return {
-      ...controlsSchema,
-      description: 'Output of the step, including any controls defined in the Bridge App',
+      schema: {
+        ...controlsSchema,
+        description: 'Output of the step, including any controls defined in the Bridge App',
+      },
+      uiSchema: mapStepTypeToUiSchema[stepType],
     };
   }
 
   if (stepType) {
     return {
-      ...mapStepTypeToControlScema[stepType],
-      description: 'Output of the step, including any controls defined in the Bridge App',
+      schema: {
+        ...mapStepTypeToControlScema[stepType],
+        description: 'Output of the step, including any controls defined in the Bridge App',
+      },
+      uiSchema: mapStepTypeToUiSchema[stepType],
     };
   }
 
