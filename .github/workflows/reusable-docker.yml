@@ -99,7 +99,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag, and push image to ghcr.io
+      - name: Build, tag, and push image to ECR
         id: build-image
         if: ${{ inputs.env_tag == 'dev' || inputs.env_tag == 'stg' }}
         env:
@@ -120,7 +120,7 @@ jobs:
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           docker push $REGISTRY/$REPOSITORY:$ENV_TAG
 
-      - name: Production build, tag, and push image to ghcr.io
+      - name: Production build, tag, and push image to ECR
         id: build-prod-image
         if: ${{ inputs.env_tag == 'prod' }}
         env:
@@ -146,7 +146,8 @@ jobs:
       - name: Save image to output
         id: save-image-to-output
         env:
-          REGISTRY_OWNER: novuhq
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ inputs.package_name }}
           DOCKER_NAME: ${{ matrix.name }}
           IMAGE_TAG: ${{ github.sha }}
           OUTPUT_NAME: ${{ contains(matrix.name,'-ee') && 'IMAGE_EE' || 'IMAGE' }}
