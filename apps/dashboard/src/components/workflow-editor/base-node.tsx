@@ -1,8 +1,10 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { cva, VariantProps } from 'class-variance-authority';
 import { Badge, BadgeContent, BadgeContentProps, BadgeProps } from '../primitives/badge';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { StepTypeEnum } from '@/utils/enums';
+import { RiErrorWarningFill } from 'react-icons/ri';
+import { Popover, PopoverArrow, PopoverContent, PopoverPortal, PopoverTrigger } from '../primitives/popover';
 
 const nodeIconVariants = cva('w-5 h-5 border rounded-full opacity-40 flex items-center justify-center p-1', {
   variants: {
@@ -63,11 +65,34 @@ export const NodeBody = ({ children }: { children: ReactNode }) => {
   );
 };
 
+export const NodeError = ({ children }: { children: ReactNode }) => {
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  return (
+    <Popover open={isPopoverOpen}>
+      <PopoverTrigger asChild>
+        <span
+          className="absolute right-0 top-0 size-4 -translate-y-[6px] translate-x-[2px]"
+          onMouseEnter={() => setIsPopoverOpen(true)}
+          onMouseLeave={() => setIsPopoverOpen(false)}
+        >
+          <RiErrorWarningFill className="border-destructive fill-destructive rounded-full border p-[1px]" />
+        </span>
+      </PopoverTrigger>
+      <PopoverPortal>
+        <PopoverContent className="flex w-max max-w-[200px] rounded-xl p-2" side="right">
+          <PopoverArrow />
+          <span className="text-destructive text-xs font-normal">{children}</span>
+        </PopoverContent>
+      </PopoverPortal>
+    </Popover>
+  );
+};
+
 export const NODE_WIDTH = 300;
 export const NODE_HEIGHT = 86;
 
 const nodeVariants = cva(
-  `border-neutral-alpha-200 bg-foreground-0 flex w-[300px] flex-col gap-1 border p-1 shadow-xs`,
+  `relative border-neutral-alpha-200 bg-foreground-0 flex w-[300px] flex-col gap-1 border p-1 shadow-xs`,
   {
     variants: {
       variant: {

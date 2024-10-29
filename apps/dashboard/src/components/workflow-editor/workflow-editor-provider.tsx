@@ -16,6 +16,7 @@ import { formSchema } from './schema';
 import { useFetchWorkflow, useUpdateWorkflow, useFormAutoSave } from '@/hooks';
 import { Step } from '@/utils/types';
 import { smallToast } from '../primitives/sonner-helpers';
+import { handleValidationIssues } from '@/utils/handleValidationIssues';
 
 const STEP_NAME_BY_TYPE: Record<StepTypeEnum, string> = {
   email: 'Email Step',
@@ -40,7 +41,7 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
   const { workflowId } = useParams<{ workflowId?: string }>();
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({ mode: 'onSubmit', resolver: zodResolver(formSchema) });
-  const { reset } = form;
+  const { reset, setError } = form;
   const steps = useFieldArray({
     control: form.control,
     name: 'steps',
@@ -65,6 +66,12 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
   const { updateWorkflow } = useUpdateWorkflow({
     onSuccess: (data) => {
       reset({ ...data, steps: data.steps.map((step) => ({ ...step })) });
+
+      if (data.issues) {
+        // TODO: remove the as any cast when BE issues are typed
+        handleValidationIssues({ fields: form.getValues(), issues: data.issues as any, setError });
+      }
+
       if (changesSavedToastIdRef.current) {
         return;
       }
