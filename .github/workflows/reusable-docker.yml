@@ -115,7 +115,7 @@ jobs:
             --output=type=image,name=$REGISTRY/$REPOSITORY,push-by-digest=true,name-canonical=true
         run: |
           cd $PROJECT_PATH && npm run docker:build
-          docker tag $LOCAL_TAG $REGISTRY/$REPOSITORYE:$IMAGE_TAG
+          docker tag $LOCAL_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG
           docker tag $LOCAL_TAG $REGISTRY/$REPOSITORY:$ENV_TAG
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           docker push $REGISTRY/$REPOSITORY:$ENV_TAG
