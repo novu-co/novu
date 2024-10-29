@@ -164,13 +164,9 @@ describe('validation', () => {
         await client.executeWorkflow({
           action: PostActionEnum.EXECUTE,
           workflowId: 'zod-validation',
-          inputs: {
-            foo: '341',
-          },
           controls: {
             foo: '341',
           },
-          data: {},
           payload: {},
           stepId: 'test-email',
           state: [],
@@ -347,13 +343,9 @@ describe('validation', () => {
         await client.executeWorkflow({
           action: PostActionEnum.EXECUTE,
           workflowId: 'json-schema-validation',
-          inputs: {
-            foo: '341',
-          },
           controls: {
             foo: '341',
           },
-          data: {},
           payload: {},
           stepId: 'test-email',
           state: [],

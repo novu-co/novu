@@ -1,12 +1,13 @@
 import { Handle, Node as FlowNode, NodeProps, Position } from '@xyflow/react';
 import { RiPlayCircleLine } from 'react-icons/ri';
+import { Link } from 'react-router-dom';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { AddStepMenu } from './add-step-menu';
 import { Node, NodeBody, NodeError, NodeHeader, NodeIcon, NodeName } from './base-node';
 import { StepTypeEnum } from '@/utils/enums';
 import { useWorkflowEditorContext } from './hooks';
-import { Link } from 'react-router-dom';
+import { buildRoute, ROUTES } from '@/utils/routes';
 
 export type NodeData = {
   name?: string;
@@ -86,7 +87,7 @@ export const InAppNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.IN_APP];
 
   return (
-    <Link to={`step/${data.stepId}`}>
+    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepId: data.stepId ?? '' })}>
       <Node>
         <NodeHeader type={StepTypeEnum.IN_APP}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.IN_APP]}>

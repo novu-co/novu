@@ -1,10 +1,11 @@
+import { Link, useParams } from 'react-router-dom';
+import { RiArrowLeftSLine, RiCloseFill } from 'react-icons/ri';
+import { motion } from 'framer-motion';
 import { StepTypeEnum } from '@/utils/enums';
 import { useStep } from './use-step';
 import { InApp } from './in-app';
 import { Separator } from '@/components/primitives/separator';
-import { RiArrowLeftSLine, RiCloseFill } from 'react-icons/ri';
 import { Button } from '@/components/primitives/button';
-import { Link, useParams } from 'react-router-dom';
 import { useEnvironment } from '@/context/environment/hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import Chat from './chat';
@@ -16,7 +17,13 @@ export function ConfigureStep() {
   }>();
 
   return (
-    <aside className="text-foreground-950 flex h-full w-[300px] max-w-[350px] flex-col border-l pb-5 pt-3.5 [&_input]:text-xs [&_input]:text-neutral-600 [&_label]:text-xs [&_label]:font-medium [&_textarea]:text-xs [&_textarea]:text-neutral-600">
+    <motion.div
+      className="flex h-full w-full flex-col"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0.1 }}
+      transition={{ duration: 0.1 }}
+    >
       <div className="flex items-center gap-2.5 px-3 pb-3.5 text-sm font-medium">
         <Link
           to={buildRoute(ROUTES.EDIT_WORKFLOW, {
@@ -44,7 +51,7 @@ export function ConfigureStep() {
       </div>
       <Separator />
       <Step />
-    </aside>
+    </motion.div>
   );
 }
 
