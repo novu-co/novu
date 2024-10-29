@@ -540,9 +540,6 @@ importers:
       shortid:
         specifier: ^2.2.16
         version: 2.2.16
-      slugify:
-        specifier: ^1.4.6
-        version: 1.6.6
       swagger-ui-express:
         specifier: ^4.4.0
         version: 4.6.2(express@4.18.2)
@@ -1297,9 +1294,6 @@ importers:
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
-      slugify:
-        specifier: ^1.4.6
-        version: 1.6.6
       storybook-dark-mode:
         specifier: ^3.0.1
         version: 3.0.1(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2282,9 +2276,6 @@ importers:
       shortid:
         specifier: ^2.2.16
         version: 2.2.16
-      slugify:
-        specifier: ^1.4.6
-        version: 1.6.6
       stripe:
         specifier: ^11.18.0
         version: 11.18.0
@@ -2435,9 +2426,6 @@ importers:
       shortid:
         specifier: ^2.2.16
         version: 2.2.16
-      slugify:
-        specifier: ^1.4.6
-        version: 1.6.6
     devDependencies:
       '@types/chai':
         specifier: ^4.2.11
@@ -2661,9 +2649,6 @@ importers:
       shortid:
         specifier: ^2.2.16
         version: 2.2.16
-      slugify:
-        specifier: ^1.4.6
-        version: 1.6.6
     optionalDependencies:
       '@novu/ee-shared-services':
         specifier: workspace:*
@@ -3304,9 +3289,6 @@ importers:
       shortid:
         specifier: ^2.2.16
         version: 2.2.16
-      slugify:
-        specifier: ^1.4.6
-        version: 1.6.6
       superagent-defaults:
         specifier: ^0.1.14
         version: 0.1.14(superagent@10.1.0)
@@ -31220,10 +31202,6 @@ packages:
 
   slick@1.12.2:
     resolution: {integrity: sha512-4qdtOGcBjral6YIBCWJ0ljFSKNLz9KkhbWtuGvUyRowl1kxfuE1x/Z/aJcaiilpb3do9bl5K7/1h9XC5wWpY/A==}
-
-  slugify@1.6.6:
-    resolution: {integrity: sha512-h+z7HKHYXj6wJU+AnS/+IH8Uh9fdcX1Lrhg1/VMdf9PwoBQXFcXiAdsy2tSK0P6gKwJLXp02r90ahUCqHk9rrw==}
-    engines: {node: '>=8.0.0'}
 
   smart-buffer@4.2.0:
     resolution: {integrity: sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==}
@@ -77330,8 +77308,6 @@ snapshots:
       is-fullwidth-code-point: 3.0.0
 
   slick@1.12.2: {}
-
-  slugify@1.6.6: {}
 
   smart-buffer@4.2.0: {}
 

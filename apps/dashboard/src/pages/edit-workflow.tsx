@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import { EditWorkflowLayout } from '@/components/edit-workflow-layout';
 import { ArrowRight, RouteFill } from '@/components/icons';
@@ -13,7 +13,6 @@ import {
   BreadcrumbSeparator,
 } from '@/components/primitives/breadcrumb';
 import { Button } from '@/components/primitives/button';
-import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workflow';
 import { formSchema } from '@/components/workflow-editor/schema';
 import { WorkflowEditor } from '@/components/workflow-editor/workflow-editor';
 import { WorkflowEditorProvider } from '@/components/workflow-editor/workflow-editor-provider';
@@ -27,7 +26,7 @@ export const EditWorkflowPage = () => {
       <EditWorkflowLayout headerStartItems={<StartItems />}>
         <div className="flex h-full flex-1 flex-nowrap">
           <WorkflowEditor />
-          <ConfigureWorkflow />
+          <Outlet />
           <Toaster />
         </div>
       </EditWorkflowLayout>

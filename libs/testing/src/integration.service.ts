@@ -1,5 +1,4 @@
 import shortid from 'shortid';
-import slugify from 'slugify';
 import { EnvironmentRepository, IntegrationRepository } from '@novu/dal';
 import {
   ChannelTypeEnum,
@@ -9,6 +8,7 @@ import {
   ProvidersIdEnum,
   PushProviderIdEnum,
   SmsProviderIdEnum,
+  slugify,
 } from '@novu/shared';
 
 export class IntegrationService {
@@ -62,7 +62,7 @@ export class IntegrationService {
       channel,
       credentials: {},
       active,
-      identifier: `${slugify(name, { lower: true, strict: true })}-${shortid.generate()}`,
+      identifier: `${slugify(name)}-${shortid.generate()}`,
     };
 
     return await this.integrationRepository.create(payload);

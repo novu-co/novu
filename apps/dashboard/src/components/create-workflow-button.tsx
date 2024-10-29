@@ -1,3 +1,11 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ComponentProps, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { RiExternalLinkLine } from 'react-icons/ri';
+import { Link, useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify } from '@novu/shared';
 import { createWorkflow } from '@/api/workflows';
 import { Button } from '@/components/primitives/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
@@ -18,19 +26,11 @@ import { Textarea } from '@/components/primitives/textarea';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useTagsQuery } from '@/hooks/use-tags-query';
 import { QueryKeys } from '@/utils/query-keys';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { type CreateWorkflowDto, WorkflowCreationSourceEnum } from '@novu/shared';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ComponentProps, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { RiExternalLinkLine } from 'react-icons/ri';
-
-import { Link } from 'react-router-dom';
-import { z } from 'zod';
+import { buildRoute, ROUTES } from '@/utils/routes';
 
 const formSchema = z.object({
   name: z.string(),
-  identifier: z.string().regex(/^[a-z0-9-]+$/, 'Invalid identifier format. Must follow ^[a-z0-9-]+$'),
+  workflowId: z.string().regex(/^[a-z0-9-]+$/, 'Invalid identifier format. Must follow ^[a-z0-9-]+$'),
   tags: z
     .array(z.string().min(1))
     .max(8)
@@ -43,26 +43,33 @@ const formSchema = z.object({
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
 export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
   const [isOpen, setIsOpen] = useState(false);
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (data: CreateWorkflowDto) => createWorkflow(data),
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id] });
-      queryClient.invalidateQueries({
+    onSuccess: async (result) => {
+      await queryClient.invalidateQueries({ queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id] });
+      await queryClient.invalidateQueries({
         queryKey: [QueryKeys.fetchWorkflow, currentEnvironment?._id, result.data.workflowId],
       });
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.fetchTags, currentEnvironment?._id],
       });
       setIsOpen(false);
+      navigate(
+        buildRoute(ROUTES.EDIT_WORKFLOW, {
+          environmentId: currentEnvironment?._id ?? '',
+          workflowId: result.data._id,
+        })
+      );
     },
   });
   const tagsQuery = useTagsQuery();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { description: '', identifier: '', name: '', tags: [] },
+    defaultValues: { description: '', workflowId: '', name: '', tags: [] },
   });
 
   return (
@@ -103,7 +110,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                   name: values.name,
                   steps: [],
                   __source: WorkflowCreationSourceEnum.DASHBOARD,
-                  workflowId: values.identifier,
+                  workflowId: values.workflowId,
                   description: values.description || undefined,
                   tags: values.tags,
                 });
@@ -118,7 +125,14 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     <FormLabel>Name</FormLabel>
                     <FormControl>
                       <InputField>
-                        <Input placeholder="Untitled" {...field} />
+                        <Input
+                          placeholder="Untitled"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            form.setValue('workflowId', slugify(e.target.value));
+                          }}
+                        />
                       </InputField>
                     </FormControl>
                     <FormMessage />
@@ -128,7 +142,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
 
               <FormField
                 control={form.control}
-                name="identifier"
+                name="workflowId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Identifier</FormLabel>

@@ -8,6 +8,7 @@ import {
   SmsProviderIdEnum,
   InAppProviderIdEnum,
   CHANNELS_WITH_PRIMARY,
+  slugify,
 } from '@novu/shared';
 import {
   AnalyticsService,
@@ -16,7 +17,6 @@ import {
   InvalidateCacheService,
   areNovuSmsCredentialsSet,
   areNovuEmailCredentialsSet,
-  slugifyName,
 } from '@novu/application-generic';
 
 import { CreateIntegrationCommand } from './create-integration.command';
@@ -148,7 +148,7 @@ export class CreateIntegration {
       const defaultName =
         providers.find((provider) => provider.id === command.providerId)?.displayName ?? providerIdCapitalized;
       const name = command.name ?? defaultName;
-      const identifier = command.identifier ?? `${slugifyName(name)}-${shortid.generate()}`;
+      const identifier = command.identifier ?? `${slugify(name)}-${shortid.generate()}`;
 
       const query: IntegrationQuery = {
         name,

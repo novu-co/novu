@@ -34,6 +34,7 @@ import {
   WorkflowPreferences,
   WorkflowResponseDto,
   WorkflowTypeEnum,
+  slugify,
 } from '@novu/shared';
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/step-upsert-mechanism-failed-missing-id.exception';
@@ -219,7 +220,7 @@ export class UpsertWorkflowUseCase {
       description: workflowDto.description || '',
       tags: workflowDto.tags || [],
       critical: false,
-      triggerIdentifier: slugifyName(workflowDto.name),
+      triggerIdentifier: workflowDto.workflowId ?? slugify(workflowDto.name),
     };
   }
 
@@ -301,7 +302,7 @@ export class UpsertWorkflowUseCase {
         controls: foundPersistedStep?.template?.controls || { schema: mapStepTypeToOutput[step.type] },
         content: '',
       },
-      stepId: slugifyName(step.name),
+      stepId: slugify(step.name),
       name: step.name,
     };
   }
