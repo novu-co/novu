@@ -100,7 +100,7 @@ export class UpsertPreferences {
     });
   }
 
-  public async upsert(
+  private async upsert(
     command: UpsertPreferencesCommand,
   ): Promise<PreferencesEntity> {
     const foundPreference = await this.getPreference(command);
