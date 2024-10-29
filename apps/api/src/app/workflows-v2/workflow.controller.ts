@@ -25,6 +25,7 @@ import {
   UserSessionData,
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
+  PromoteWorkflowDto,
 } from '@novu/shared';
 import { UserAuthGuard, UserSession } from '@novu/application-generic';
 
@@ -38,6 +39,8 @@ import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.us
 import { ListWorkflowsCommand } from './usecases/list-workflows/list-workflows.command';
 import { DeleteWorkflowUseCase } from './usecases/delete-workflow/delete-workflow.usecase';
 import { DeleteWorkflowCommand } from './usecases/delete-workflow/delete-workflow.command';
+import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
+import { SyncToEnvironmentCommand } from './usecases/sync-to-environment/sync-to-environment.command';
 import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
 import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview-command';
 import { ParseSlugIdPipe } from './pipes/parse-slug-Id.pipe';
@@ -56,6 +59,7 @@ export class WorkflowController {
     private getWorkflowUseCase: GetWorkflowUseCase,
     private listWorkflowsUseCase: ListWorkflowsUseCase,
     private deleteWorkflowUsecase: DeleteWorkflowUseCase,
+    private syncToEnvironmentUseCase: SyncToEnvironmentUseCase,
     private generatePreviewUseCase: GeneratePreviewUsecase,
     private workflowTestDataUseCase: WorkflowTestDataUseCase
   ) {}
@@ -69,6 +73,22 @@ export class WorkflowController {
     return this.upsertWorkflowUseCase.execute(
       UpsertWorkflowCommand.create({
         workflowDto: createWorkflowDto,
+        user,
+      })
+    );
+  }
+
+  @Put(':workflowId/promote')
+  @UseGuards(UserAuthGuard)
+  async promote(
+    @UserSession() user: UserSessionData,
+    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
+    @Body() promoteWorkflowDto: PromoteWorkflowDto
+  ): Promise<WorkflowResponseDto> {
+    return this.syncToEnvironmentUseCase.execute(
+      SyncToEnvironmentCommand.create({
+        identifierOrInternalId: workflowId,
+        targetEnvironmentId: promoteWorkflowDto.targetEnvironmentId,
         user,
       })
     );
