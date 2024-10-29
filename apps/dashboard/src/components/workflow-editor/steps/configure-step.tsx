@@ -3,7 +3,7 @@ import { RiArrowLeftSLine, RiCloseFill } from 'react-icons/ri';
 import { motion } from 'framer-motion';
 import { StepTypeEnum } from '@/utils/enums';
 import { useStep } from './use-step';
-import { InApp } from './in-app';
+import { InApp } from './in-app/in-app';
 import { Separator } from '@/components/primitives/separator';
 import { Button } from '@/components/primitives/button';
 import { useEnvironment } from '@/context/environment/hooks';

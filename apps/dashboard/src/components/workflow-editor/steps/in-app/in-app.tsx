@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { RiArrowRightSLine, RiPencilRuler2Fill } from 'react-icons/ri';
-import { Button } from '../../primitives/button';
-import { Separator } from '../../primitives/separator';
-import { CommonFields } from './common-fields';
-import { DeleteStepButton } from './delete-step-button';
+import { Button } from '../../../primitives/button';
+import { Separator } from '../../../primitives/separator';
+import { CommonFields } from '../common-fields';
+import { DeleteStepButton } from '../delete-step-button';
 
 export function InApp() {
   return (
