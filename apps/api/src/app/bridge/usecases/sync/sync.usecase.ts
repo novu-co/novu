@@ -11,7 +11,6 @@ import {
   CreateWorkflow,
   CreateWorkflowCommand,
   ExecuteBridgeRequest,
-  GetFeatureFlag,
   NotificationStep,
   UpdateWorkflow,
   UpdateWorkflowCommand,
@@ -41,8 +40,7 @@ export class Sync {
     private environmentRepository: EnvironmentRepository,
     private executeBridgeRequest: ExecuteBridgeRequest,
     private analyticsService: AnalyticsService,
-    private upsertPreferences: UpsertPreferences,
-    private getFeatureFlag: GetFeatureFlag
+    private upsertPreferences: UpsertPreferences
   ) {}
   async execute(command: SyncCommand): Promise<CreateBridgeResponseDto> {
     const environment = await this.environmentRepository.findOne({ _id: command.environmentId });
