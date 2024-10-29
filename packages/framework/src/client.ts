@@ -1,7 +1,7 @@
 import { Liquid } from 'liquidjs';
 import ora from 'ora';
 
-import { ChannelStepEnum, FRAMEWORK_VERSION, PostActionEnum, SDK_VERSION } from './constants';
+import { ChannelStepEnum, PostActionEnum } from './constants';
 import {
   ExecutionEventControlsInvalidError,
   ExecutionEventPayloadInvalidError,
@@ -37,25 +37,9 @@ import type {
 } from './types';
 import { WithPassthrough } from './types/provider.types';
 import { EMOJI, log, sanitizeHtmlInObject, stringifyDataStructureWithSingleQuotes } from './utils';
-import { transformSchema, validateData } from './validators';
+import { validateData } from './validators';
 
-/*
- * JSONSchemaFaker needs to be imported as CJS to avoid HMR and Webpack issues when importing @novu/framework
- * in Next.js. See https://github.com/json-schema-faker/json-schema-faker/issues/796#issuecomment-2433335751
- */
-const { JSONSchemaFaker } = require('json-schema-faker');
-
-/**
- * We want to respond with a consistent string value for preview
- */
-JSONSchemaFaker.random.shuffle = function shuffle() {
-  return ['[placeholder]'];
-};
-
-JSONSchemaFaker.option({
-  useDefaultValue: true,
-  alwaysFakeOptionals: true,
-});
+import { mockSchema } from './jsonSchemaFaker';
 
 function isRuntimeInDevelopment() {
   return ['development', undefined].includes(process.env.NODE_ENV);
@@ -169,8 +153,7 @@ export class Client {
    * @returns mocked data
    */
   private mock(schema: Schema): Record<string, unknown> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return JSONSchemaFaker.generate(transformSchema(schema) as any) as Record<string, unknown>;
+    return mockSchema(schema) as Record<string, unknown>;
   }
 
   private async validate<T extends Record<string, unknown>>(

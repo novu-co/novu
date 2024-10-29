@@ -1,4 +1,4 @@
-import type { WorkflowPreferences } from '@novu/shared';
+import type { WorkflowPreferencesPartial } from '@novu/shared';
 import { PreferencesTypeEnum } from '@novu/shared';
 import type { OrganizationId } from '../organization';
 import type { EnvironmentId } from '../environment';
@@ -26,5 +26,5 @@ export class PreferencesEntity {
 
   type: PreferencesTypeEnum;
 
-  preferences: WorkflowPreferences;
+  preferences: WorkflowPreferencesPartial;
 }

@@ -27,6 +27,7 @@ const CLERK_LOCALIZATION = {
     action__signOutAll: 'Log out from all accounts',
     action__manageAccount: 'Settings',
   },
+  formFieldLabel__organizationSlug: 'URL friendly identifier',
 };
 
 const CLERK_MODAL_ELEMENT = {
