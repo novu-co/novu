@@ -753,6 +753,7 @@
     "projectIds"
   ],
   "ignorePaths": [
+    "apps/api/src/app/workflows-v2/maily-test-data.ts",
     "apps/api/src/.env.test",
     "apps/ws/src/.env.test",
     "apps/ws/src/.example.env",
