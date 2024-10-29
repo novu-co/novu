@@ -23,10 +23,6 @@ inputs:
   docker_name:
     description: 'Name for docker image'
     required: true
-  environment:
-    required: false
-    type: string
-
   bullmq_secret:
     description: 'Bullmq secret api token'
     required: true
