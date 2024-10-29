@@ -23,9 +23,6 @@ inputs:
   docker_name:
     description: 'Name for docker image'
     required: true
-  environment:
-    required: false
-    type: string
 
   bullmq_secret:
     description: 'Bullmq secret api token'
@@ -39,12 +36,6 @@ outputs:
 runs:
   using: composite
   steps:
-
-    - name: Setup QEMU
-      uses: docker/setup-qemu-action@v3
-      with:
-        platforms: linux/amd64
-
     - name: Set Up Docker Buildx
       uses: docker/setup-buildx-action@v3
       with:
