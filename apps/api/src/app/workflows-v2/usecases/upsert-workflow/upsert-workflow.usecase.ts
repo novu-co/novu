@@ -20,6 +20,7 @@ import {
   UpsertControlValuesUseCase,
   UpsertPreferences,
   UpsertUserWorkflowPreferencesCommand,
+  UpsertWorkflowPreferencesCommand,
 } from '@novu/application-generic';
 import {
   CreateWorkflowDto,
@@ -125,10 +126,8 @@ export class UpsertWorkflowUseCase {
     command: UpsertWorkflowCommand,
     workflow: NotificationTemplateEntity
   ): Promise<GetPreferencesResponseDto | undefined> {
-    if (!command.workflowDto.preferences?.user) {
-      return undefined;
-    }
-    await this.upsertPreferences(workflow, command);
+    await this.upsertUserWorkflowPreferences(workflow, command);
+    await this.upsertWorkflowPreferences(workflow, command);
 
     return await this.getPersistedPreferences(workflow);
   }
@@ -143,7 +142,7 @@ export class UpsertWorkflowUseCase {
     );
   }
 
-  private async upsertPreferences(
+  private async upsertUserWorkflowPreferences(
     workflow: NotificationTemplateEntity,
     command: UpsertWorkflowCommand
   ): Promise<PreferencesEntity> {
@@ -161,6 +160,20 @@ export class UpsertWorkflowUseCase {
         userId: command.user._id,
         templateId: workflow._id,
         preferences,
+      })
+    );
+  }
+
+  private async upsertWorkflowPreferences(
+    workflow: NotificationTemplateEntity,
+    command: UpsertWorkflowCommand
+  ): Promise<PreferencesEntity> {
+    return await this.upsertPreferencesUsecase.upsertWorkflowPreferences(
+      UpsertWorkflowPreferencesCommand.create({
+        environmentId: workflow._environmentId,
+        organizationId: workflow._organizationId,
+        templateId: workflow._id,
+        preferences: command.workflowDto.preferences?.workflow || null,
       })
     );
   }
@@ -219,7 +232,7 @@ export class UpsertWorkflowUseCase {
 
     return {
       id: existingWorkflow._id,
-      environmentId: user.environmentId,
+      environmentId: existingWorkflow._environmentId,
       organizationId: user.organizationId,
       userId: user._id,
       name: command.workflowDto.name,
