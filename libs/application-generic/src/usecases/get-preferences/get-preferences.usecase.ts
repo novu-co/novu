@@ -8,7 +8,6 @@ import {
   WorkflowPreferencesPartial,
 } from '@novu/shared';
 import { deepMerge } from '../../utils';
-import { GetFeatureFlag } from '../get-feature-flag';
 import { GetPreferencesCommand } from './get-preferences.command';
 import { GetPreferencesResponseDto } from './get-preferences.dto';
 
@@ -20,10 +19,7 @@ class PreferencesNotFoundException extends BadRequestException {
 
 @Injectable()
 export class GetPreferences {
-  constructor(
-    private preferencesRepository: PreferencesRepository,
-    private getFeatureFlag: GetFeatureFlag,
-  ) {}
+  constructor(private preferencesRepository: PreferencesRepository) {}
 
   async execute(
     command: GetPreferencesCommand,
