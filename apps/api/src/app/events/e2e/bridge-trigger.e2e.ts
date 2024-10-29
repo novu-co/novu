@@ -672,7 +672,7 @@ contexts.forEach((context: Context) => {
       }
 
       const controls = { steps: { [stepId]: { name: 'stored_control_name' } } };
-      await triggerEvent(session, workflowId, subscriber.subscriberId, undefined, bridge, controls);
+      await triggerEvent(session, workflowId, subscriber.subscriberId, {}, bridge, controls);
       await session.awaitRunningJobs();
 
       const sentMessage = await messageRepository.find({
