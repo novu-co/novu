@@ -314,11 +314,8 @@ export class SendMessage {
     if (!subscriber) throw new PlatformException(`Subscriber not found with id ${job._subscriberId}`);
 
     /*
-     * TODO: Remove this after we deprecate V1 preferences, global subscriber
+     * TODO: Remove this after we remove V1 preferences, global subscriber
      * preferences are handled in `GetPreferences` for V2 preferences.
-     *
-     * This is actually a bug because it can allow for Global Preferences to disable
-     * delivery of Workflows with read-only preferences.
      */
     const { preference: globalPreference } = await this.getSubscriberGlobalPreferenceUsecase.execute(
       GetSubscriberGlobalPreferenceCommand.create({
