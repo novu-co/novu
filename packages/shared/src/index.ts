@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 export * from './config';
 export * from './consts';
 export * from './dto';

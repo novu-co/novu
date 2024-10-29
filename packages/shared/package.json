@@ -39,7 +39,6 @@
   },
   "dependencies": {
     "@nestjs/swagger": "7.4.0",
-    "class-transformer": "0.5.1",
     "class-validator": "0.14.1"
   },
   "devDependencies": {
@@ -49,6 +48,10 @@
     "rimraf": "^3.0.2",
     "typescript": "5.6.2",
     "vitest": "^2.0.5"
+  },
+  "peerDependencies": {
+    "class-transformer": "0.5.1",
+    "reflect-metadata": "0.2.2"
   },
   "nx": {
     "tags": ["package:public"]
