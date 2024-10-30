@@ -4,6 +4,7 @@ export * from './discover.types';
 export * from './event.types';
 export * from './execution.types';
 export * from './health-check.types';
+export * from './infer.types';
 export * from './schema.types';
 export * from './server.types';
 export * from './skip.types';

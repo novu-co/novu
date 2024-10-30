@@ -46,8 +46,8 @@ export type DiscoverStepOutput = {
   options: StepOptions;
 };
 
-export type DiscoverWorkflowOutput = {
-  workflowId: string;
+export type DiscoverWorkflowOutput<T_WorkflowId extends string = string> = {
+  workflowId: T_WorkflowId;
   execute: Execute<Record<string, unknown>, Record<string, unknown>>;
   code: string;
   steps: Array<DiscoverStepOutput>;
@@ -66,11 +66,11 @@ export type DiscoverWorkflowOutput = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Workflow<T_Payload = any> = {
+export type Workflow<T_WorkflowId extends string = string, T_Payload = any> = {
   trigger: (
     event: Prettify<Omit<EventTriggerParams<T_Payload>, 'workflowId' | 'bridgeUrl' | 'controls'>>
   ) => Promise<EventTriggerResult>;
-  definition: DiscoverWorkflowOutput;
+  definition: DiscoverWorkflowOutput<T_WorkflowId>;
 };
 
 export type DiscoverOutput = {

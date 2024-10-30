@@ -29,16 +29,17 @@ export function workflow<
   T_PayloadValidated extends Record<string, unknown> = FromSchema<T_PayloadSchema>,
   T_PayloadUnvalidated extends Record<string, unknown> = FromSchemaUnvalidated<T_PayloadSchema>,
   T_Controls extends Record<string, unknown> = FromSchema<T_ControlSchema>,
+  T_WorkflowId extends string = string,
 >(
-  workflowId: string,
+  workflowId: T_WorkflowId,
   execute: Execute<T_PayloadValidated, T_Controls>,
   workflowOptions?: WorkflowOptions<T_PayloadSchema, T_ControlSchema>
-): Workflow<T_PayloadUnvalidated> {
+): Workflow<T_WorkflowId, T_PayloadUnvalidated> {
   const options = workflowOptions || {};
 
   const apiClient = initApiClient(process.env.NOVU_SECRET_KEY as string);
 
-  const trigger: Workflow<T_PayloadUnvalidated>['trigger'] = async (event) => {
+  const trigger: Workflow<T_WorkflowId, T_PayloadUnvalidated>['trigger'] = async (event) => {
     if (!process.env.NOVU_SECRET_KEY) {
       throw new MissingSecretKeyError();
     }
@@ -81,7 +82,7 @@ export function workflow<
     };
   };
 
-  const newWorkflow: DiscoverWorkflowOutput = {
+  const newWorkflow: DiscoverWorkflowOutput<T_WorkflowId> = {
     workflowId,
     steps: [],
     code: execute.toString(),
