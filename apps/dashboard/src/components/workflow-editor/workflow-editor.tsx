@@ -8,7 +8,7 @@ import { workflowSchema } from './schema';
 import { buildRoute, ROUTES } from '@/utils/routes';
 
 export const WorkflowEditor = () => {
-  const { environmentId = '', workflowId = '' } = useParams<{ environmentId: string; workflowId: string }>();
+  const { environmentId = '', workflowSlug = '' } = useParams<{ environmentId: string; workflowSlug: string }>();
   const form = useFormContext<z.infer<typeof workflowSchema>>();
   const steps = useWatch({
     control: form.control,
@@ -23,7 +23,7 @@ export const WorkflowEditor = () => {
             <Link
               to={buildRoute(ROUTES.EDIT_WORKFLOW, {
                 environmentId,
-                workflowId,
+                workflowSlug,
               })}
             >
               Workflow
@@ -33,7 +33,7 @@ export const WorkflowEditor = () => {
             <Link
               to={buildRoute(ROUTES.TEST_WORKFLOW, {
                 environmentId,
-                workflowId,
+                workflowSlug,
               })}
             >
               Trigger
