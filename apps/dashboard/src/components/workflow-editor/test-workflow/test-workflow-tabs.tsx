@@ -19,9 +19,9 @@ import { buildDynamicFormSchema, makeObjectFromSchema, TestWorkflowFormType } fr
 import { TestWorkflowForm } from './test-workflow-form';
 
 export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataResponseDto }) => {
-  const { environmentId = '', workflowId = '' } = useParams<{ environmentId: string; workflowId: string }>();
+  const { environmentId = '', workflowSlug = '' } = useParams<{ environmentId: string; workflowSlug: string }>();
   const { workflow } = useFetchWorkflow({
-    workflowId,
+    workflowSlug,
   });
   const to = useMemo(
     () => (typeof testData.to === 'object' ? makeObjectFromSchema({ properties: testData.to.properties ?? {} }) : {}),
@@ -54,7 +54,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
             <ToastIcon variant="success" />
             <div className="flex flex-col gap-2">
               <span className="font-medium">Test workflow triggered successfully</span>
-              <span className="text-foreground-600">{`Test workflow ${workflowId} was triggered successfully`}</span>
+              <span className="text-foreground-600">{`Test workflow ${workflowSlug} was triggered successfully`}</span>
               <Link
                 to={`${LEGACY_ROUTES.ACTIVITY_FEED}?transactionId=${transactionId}`}
                 reloadDocument
@@ -85,7 +85,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
                 <Link
                   to={buildRoute(ROUTES.EDIT_WORKFLOW, {
                     environmentId,
-                    workflowId,
+                    workflowSlug,
                   })}
                 >
                   Workflow
@@ -95,7 +95,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
                 <Link
                   to={buildRoute(ROUTES.TEST_WORKFLOW, {
                     environmentId,
-                    workflowId,
+                    workflowSlug,
                   })}
                 >
                   Trigger
