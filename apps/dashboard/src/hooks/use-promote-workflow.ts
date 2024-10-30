@@ -2,8 +2,6 @@ import { getV2, NovuApiError } from '@/api/api.client';
 import { promoteWorkflow } from '@/api/workflows';
 import { promoteToast } from '@/components/primitives/sonner-helpers';
 import { useEnvironment } from '@/context/environment/hooks';
-import { ROUTES } from '@/utils/routes';
-import { buildRoute } from '@/utils/routes';
 import { WorkflowListResponseDto, WorkflowOriginEnum, WorkflowResponseDto, WorkflowStatusEnum } from '@novu/shared';
 import { useMutation } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
@@ -12,7 +10,7 @@ import { toast } from 'sonner';
 const PRODUCTION_ENVIRONMENT = 'Production' as const;
 
 export function usePromoteWorkflow(workflow: WorkflowListResponseDto) {
-  const { environments } = useEnvironment();
+  const { environments, switchEnvironment } = useEnvironment();
   const [isLoading, setIsLoading] = useState(false);
   let loadingToast: string | number | undefined = undefined;
 
@@ -78,11 +76,7 @@ export function usePromoteWorkflow(workflow: WorkflowListResponseDto) {
       description: `Workflow '${workflow.name}' has been successfully promoted to production.`,
       action: {
         label: 'Switch to production',
-        onClick: () => {
-          window.location.href = buildRoute(ROUTES.WORKFLOWS, {
-            environmentId: getProductionEnvironmentId(),
-          });
-        },
+        onClick: () => switchEnvironment(getProductionEnvironmentId()),
       },
     });
   };
