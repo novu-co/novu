@@ -25,12 +25,13 @@ jobs:
     uses: ./.github/workflows/reusable-docker.yml
     with:
       environment: Development
-      package_name: novu/webhook
+      package_name: novu-dev/webhook
       project_path: apps/webhook
       test_port: 1341
       health_check: true
       local_tag: novu-webhook
       env_tag: dev
+      aws-region: eu-west-2
     secrets: inherit
 
   deploy_dev_webhook:
