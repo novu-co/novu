@@ -12,6 +12,7 @@ import { Separator } from '@/components/primitives/separator';
 import { URLInput } from '@/components/primitives/url-input';
 import { buttonVariants } from '@/components/primitives/variants';
 import { cn } from '@/utils/ui';
+import { urlTargetTypes } from '@/utils/url';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RedirectTargetEnum } from '@novu/shared';
 import { ComponentProps } from 'react';
@@ -152,14 +153,6 @@ const formSchema = z.object({
   }),
 });
 
-const urlTypes = [
-  RedirectTargetEnum.SELF,
-  RedirectTargetEnum.BLANK,
-  RedirectTargetEnum.PARENT,
-  RedirectTargetEnum.TOP,
-  RedirectTargetEnum.UNFENCED_TOP,
-];
-
 const ConfigureActionPopover = (
   props: ComponentProps<typeof PopoverTrigger> & { action: Action; setAction: (action: Action) => void }
 ) => {
@@ -222,7 +215,7 @@ const ConfigureActionPopover = (
                     <FormControl>
                       <URLInput
                         {...field}
-                        options={urlTypes}
+                        options={urlTargetTypes}
                         value={field.value}
                         onChange={(val) => field.onChange(val)}
                       />

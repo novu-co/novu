@@ -52,11 +52,11 @@ const TabsTrigger = React.forwardRef<React.ElementRef<typeof TabsPrimitive.Trigg
 );
 TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 
-const tabsContentVariants = cva('mt-2 focus-visible:outline-none', {
+const tabsContentVariants = cva('focus-visible:outline-none', {
   variants: {
     variant: {
       default: 'ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-      regular: '',
+      regular: 'mt-2',
     },
   },
   defaultVariants: {

@@ -6,7 +6,6 @@ import * as z from 'zod';
 
 import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
-import { SheetClose } from '@/components/primitives/sheet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Notification5Fill } from '@/components/icons';
 import { AvatarPicker } from '@/components/primitives/form/avatar-picker';
@@ -18,7 +17,7 @@ import { URLInput } from '@/components/primitives/url-input';
 import { urlTargetTypes } from '@/utils/url';
 import { RedirectTargetEnum } from '@novu/shared';
 
-const tabsContentClassName = '!mt-0 h-full w-full px-3 py-3.5';
+const tabsContentClassName = 'h-full w-full px-3 py-3.5';
 
 export const InAppEditor = () => {
   const navigate = useNavigate();
@@ -42,15 +41,17 @@ export const InAppEditor = () => {
           </TabsTrigger>
         </TabsList>
 
-        <SheetClose
-          className="ring-offset-background focus:ring-ring rounded-sm opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none"
+        <Button
+          variant="ghost"
+          size="xs"
+          className="size-6"
           onClick={() => {
             navigate('../', { relative: 'path' });
           }}
         >
           <Cross2Icon className="h-4 w-4" />
           <span className="sr-only">Close</span>
-        </SheetClose>
+        </Button>
       </header>
       <Separator />
       <TabsContent value="editor" className={tabsContentClassName}>
