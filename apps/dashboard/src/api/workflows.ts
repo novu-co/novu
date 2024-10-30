@@ -45,3 +45,16 @@ export const updateWorkflow = async ({
 
   return data;
 };
+
+export const previewStep = async ({
+  workflowId: id,
+  payload,
+}: {
+  workflowId: string;
+  stepUuid: string;
+  payload?: any;
+}): Promise<any> => {
+  const { data } = await postV2<{ data: any }>(`/workflows/${id}/preview`, payload);
+
+  return data;
+};

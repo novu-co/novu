@@ -4,6 +4,7 @@ import { Button } from '../../../primitives/button';
 import { Separator } from '../../../primitives/separator';
 import { CommonFields } from '../common-fields';
 import { DeleteStepButton } from '../delete-step-button';
+import { InAppPreview } from './in-app-preview';
 
 export function InApp() {
   return (
@@ -12,14 +13,16 @@ export function InApp() {
         <CommonFields />
       </div>
       <Separator />
-      <div className="px-3 py-4">
+      <div className="flex flex-col gap-2 px-3 py-4">
         <Link to={'./edit'} relative="path">
           <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
             <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
             Configure in-app template <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
           </Button>
         </Link>
+        <InAppPreview />
       </div>
+      <Separator />
       <DeleteStepButton />
     </div>
   );
