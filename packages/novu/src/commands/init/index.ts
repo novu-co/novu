@@ -93,6 +93,7 @@ export async function init(program: IInitCommandOptions, anonymousId?: string): 
     process.exit(1);
   }
 
+  let applicationId: string;
   let userId: string;
   // if no secret key is supplied set to empty string
   if (!program.secretKey) {
@@ -113,6 +114,15 @@ export async function init(program: IInitCommandOptions, anonymousId?: string): 
       const user = await response.json();
 
       userId = user.data?._id;
+
+      const integrationsResponse = await fetch(`${program.apiUrl}/v1/environments/me`, {
+        headers: {
+          Authorization: `ApiKey ${program.secretKey}`,
+        },
+      });
+
+      const environment = await integrationsResponse.json();
+      applicationId = environment.data.identifier;
 
       analytics.alias({
         previousId: anonymousId,
@@ -172,6 +182,8 @@ export async function init(program: IInitCommandOptions, anonymousId?: string): 
     srcDir: defaults.srcDir as boolean,
     importAlias: defaults.importAlias as string,
     secretKey: program.secretKey,
+    applicationId,
+    userId,
   });
 
   if (userId || anonymousId) {

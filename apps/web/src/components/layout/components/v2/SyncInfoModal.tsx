@@ -92,7 +92,7 @@ export const SyncInfoModal: FC<SyncInfoModalProps> = ({ isOpen, toggleOpen, refe
               href="https://docs.novu.co/deployment/syncing"
               target={'_blank'}
               className={css({
-                textDecoration: 'underline !important',
+                textDecoration: '!important underline',
               })}
             >
               our docs.
