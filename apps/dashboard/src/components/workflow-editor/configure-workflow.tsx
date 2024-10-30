@@ -7,7 +7,7 @@ import * as z from 'zod';
 import { Separator } from '../primitives/separator';
 import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
-import { formSchema } from './schema';
+import { workflowSchema } from './schema';
 import { useTagsQuery } from '@/hooks/use-tags-query';
 import { Button } from '../primitives/button';
 import { CopyButton } from '../primitives/copy-button';
@@ -17,7 +17,7 @@ import { Switch } from '../primitives/switch';
 export function ConfigureWorkflow() {
   const tagsQuery = useTagsQuery();
 
-  const { control } = useFormContext<z.infer<typeof formSchema>>();
+  const { control } = useFormContext<z.infer<typeof workflowSchema>>();
   return (
     <motion.div
       className="flex h-full w-full flex-col"
