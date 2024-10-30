@@ -1287,7 +1287,7 @@ describe('Novu Client', () => {
       expect(mockFn).toHaveBeenCalledTimes(0);
     });
 
-    it.only('should NOT log anything after executing the provided stepId', async () => {
+    it('should NOT log anything after executing the provided stepId', async () => {
       const mockFn = vi.fn();
       const spyConsoleLog = vi.spyOn(console, 'log');
       const newWorkflow = workflow('test-workflow', async ({ step }) => {
