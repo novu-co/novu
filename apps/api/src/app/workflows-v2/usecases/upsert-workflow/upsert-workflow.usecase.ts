@@ -22,6 +22,7 @@ import {
   UpsertPreferences,
   UpsertUserWorkflowPreferencesCommand,
   UpsertWorkflowPreferencesCommand,
+  shortId,
 } from '@novu/application-generic';
 import {
   CreateWorkflowDto,
@@ -254,31 +255,48 @@ export class UpsertWorkflowUseCase {
       active: workflowDto.active ?? true,
     };
   }
-
   private mapSteps(
     commandWorkflowSteps: Array<StepCreateDto | StepUpdateDto>,
     persistedWorkflow?: NotificationTemplateEntity | undefined
   ): NotificationStep[] {
-    const steps: NotificationStep[] = commandWorkflowSteps.map((step) => {
-      return this.mapSingleStep(persistedWorkflow, step);
-    });
+    const steps: NotificationStep[] = [];
 
-    const seenStepIds = new Set();
-    const duplicateStepIds = new Set();
+    for (const step of commandWorkflowSteps) {
+      const mappedStep = this.mapSingleStep(persistedWorkflow, step);
+      const baseStepId = mappedStep.stepId;
 
-    steps.forEach((step) => {
-      if (seenStepIds.has(step.stepId)) {
-        duplicateStepIds.add(step.stepId);
-      } else {
-        seenStepIds.add(step.stepId);
+      if (baseStepId) {
+        const previousStepIds = steps.map((stepX) => stepX.stepId).filter((id) => id != null);
+        mappedStep.stepId = this.generateUniqueStepId(baseStepId, previousStepIds);
       }
-    });
 
-    if (duplicateStepIds.size > 0) {
-      throw new BadRequestException(`Duplicate stepIds are not allowed: ${Array.from(duplicateStepIds).join(', ')}`);
+      steps.push(mappedStep);
     }
 
     return steps;
+  }
+
+  private generateUniqueStepId(baseStepId: string, previousStepIds: string[]): string {
+    let currentStepId = baseStepId;
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    while (attempts < maxAttempts) {
+      if (isUniqueStepId(currentStepId, previousStepIds)) {
+        break;
+      }
+      currentStepId = `${baseStepId}-${shortId()}`;
+      attempts += 1;
+    }
+
+    if (attempts === maxAttempts && !isUniqueStepId(currentStepId, previousStepIds)) {
+      throw new BadRequestException({
+        message: 'Failed to generate unique stepId',
+        stepId: baseStepId,
+      });
+    }
+
+    return currentStepId;
   }
 
   private mapSingleStep(
@@ -310,7 +328,7 @@ export class UpsertWorkflowUseCase {
         controls: foundPersistedStep?.template?.controls || mapStepTypeToControlSchema[step.type],
         content: '',
       },
-      stepId: slugify(step.name),
+      stepId: foundPersistedStep?.stepId || slugify(step.name),
       name: step.name,
     };
   }
@@ -353,3 +371,7 @@ function isWorkflowUpdateDto(
 ): workflowDto is UpdateWorkflowDto {
   return !!id;
 }
+
+const isUniqueStepId = (stepIdToValidate: string, otherStepsIds: string[]) => {
+  return !otherStepsIds.some((stepId) => stepId === stepIdToValidate);
+};
