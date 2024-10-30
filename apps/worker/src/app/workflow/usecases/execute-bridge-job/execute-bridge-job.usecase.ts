@@ -17,7 +17,7 @@ import {
   WorkflowOriginEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
-import { Event, State, PostActionEnum, ExecuteOutput } from '@novu/framework';
+import { Event, State, PostActionEnum, ExecuteOutput } from '@novu/framework/internal';
 
 import {
   CreateExecutionDetails,
@@ -95,10 +95,7 @@ export class ExecuteBridgeJob {
       : command.job.step.controlVariables;
 
     const bridgeEvent: Omit<Event, 'workflowId' | 'stepId' | 'action'> = {
-      /** @deprecated */
-      data: payload ?? {},
       payload: payload ?? {},
-      inputs: variablesStores ?? {},
       controls: variablesStores ?? {},
       state,
       subscriber: subscriber ?? {},
@@ -147,7 +144,7 @@ export class ExecuteBridgeJob {
       level: ControlValuesLevelEnum.STEP_CONTROLS,
     });
 
-    return controls?.controls || controls?.inputs;
+    return controls?.controls;
   }
 
   private normalizePayload(originalPayload) {
@@ -216,9 +213,18 @@ export class ExecuteBridgeJob {
         action: PostActionEnum.EXECUTE,
         searchParams,
         afterResponse: async (response) => {
-          const body = response?.body as string | undefined;
+          const body = response?.body as string;
 
           if (response.statusCode >= 400) {
+            let rawMessage: Record<string, unknown>;
+            try {
+              rawMessage = JSON.parse(body);
+            } catch {
+              Logger.error(`Unexpected body received from Bridge: ${body}`, LOG_CONTEXT);
+              rawMessage = {
+                error: `Unexpected body received from Bridge: ${body}`,
+              };
+            }
             const createExecutionDetailsCommand: CreateExecutionDetailsCommand = {
               ...CreateExecutionDetailsCommand.getDetailsFromJob(job),
               detail: DetailEnum.FAILED_BRIDGE_RETRY,
@@ -231,7 +237,7 @@ export class ExecuteBridgeJob {
                 statusCode: response.statusCode,
                 retryCount: response.retryCount,
                 message: response.statusMessage,
-                ...(body && body?.length > 0 ? { raw: JSON.parse(body) } : {}),
+                ...(body && body?.length > 0 ? { raw: rawMessage } : {}),
               }),
             };
 

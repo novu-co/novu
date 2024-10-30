@@ -20,7 +20,6 @@ export const ControlVariablesForm = ({ schema, payloadSchema, formData, onChange
 
   useEffect(() => {
     onChange({
-      inputs: value,
       controls: value,
       payload: payloadSchemaData,
     });
@@ -58,7 +57,7 @@ export const ControlVariablesForm = ({ schema, payloadSchema, formData, onChange
               onChange={(data) => {
                 setValue(data);
               }}
-              defaults={controlVariables?.controls || controlVariables?.inputs || {}}
+              defaults={controlVariables?.controls}
             />
             <Button
               loading={isSavingControls}

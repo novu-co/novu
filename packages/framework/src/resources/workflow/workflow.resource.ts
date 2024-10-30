@@ -83,35 +83,15 @@ export function workflow<
 
   const newWorkflow: DiscoverWorkflowOutput = {
     workflowId,
-    options: {
-      ...options,
-      /*
-       * TODO: Transformation added for backwards compatibility, remove this additional transform after we
-       * start using `data.schema` and `control.schema` in UI.
-       */
-      inputSchema: transformSchema(options.controlSchema || options.inputSchema || emptySchema),
-      controlSchema: transformSchema(options.controlSchema || options.inputSchema || emptySchema),
-      payloadSchema: transformSchema(options.payloadSchema || emptySchema),
-    },
     steps: [],
     code: execute.toString(),
-    /** @deprecated */
-    data: {
-      schema: transformSchema(options.payloadSchema || emptySchema),
-      unknownSchema: options.payloadSchema || emptySchema,
-    },
     payload: {
       schema: transformSchema(options.payloadSchema || emptySchema),
       unknownSchema: options.payloadSchema || emptySchema,
     },
-    /** @deprecated */
-    inputs: {
-      schema: transformSchema(options.controlSchema || options.inputSchema || emptySchema),
-      unknownSchema: options.controlSchema || options.inputSchema || emptySchema,
-    },
     controls: {
-      schema: transformSchema(options.controlSchema || options.inputSchema || emptySchema),
-      unknownSchema: options.controlSchema || options.inputSchema || emptySchema,
+      schema: transformSchema(options.controlSchema || emptySchema),
+      unknownSchema: options.controlSchema || emptySchema,
     },
     tags: options.tags || [],
     preferences: mapPreferences(options.preferences),
@@ -125,7 +105,6 @@ export function workflow<
     subscriber: {},
     environment: {},
     controls: {} as T_Controls,
-    input: {} as T_Controls,
     step: {
       push: discoverChannelStepFactory(
         newWorkflow,

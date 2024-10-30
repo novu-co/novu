@@ -69,6 +69,7 @@ export const buttonVariants = cva(
         destructive:
           'bg-gradient-to-b from-destructive/90 to-destructive text-destructive-foreground shadow-[inset_0_-4px_2px_-2px_hsl(var(--destructive)),inset_0_0_0_1px_rgba(255,255,255,0.16),0_0_0_1px_hsl(var(--destructive)),0px_1px_2px_0px_#0E121B3D] after:content-[""] after:absolute after:w-full after:h-full after:bg-gradient-to-b after:from-background/10 after:opacity-0 hover:after:opacity-100 after:rounded-lg after:transition-opacity after:duration-300',
         outline: 'border border-input bg-background shadow-xs hover:bg-accent hover:text-accent-foreground',
+        dashed: 'border border-dashed border-input bg-background hover:bg-accent text-foreground-600',
         ghost: 'hover:bg-accent',
         link: 'underline-offset-4 hover:underline',
         light:
@@ -77,7 +78,7 @@ export const buttonVariants = cva(
       size: {
         default: 'h-9 p-2.5',
         xs: 'h-6 px-1.5 rounded-md text-xs',
-        sm: 'h-8 px-3 rounded-md text-xs',
+        sm: 'h-8 px-1.5 rounded-md text-sm',
         lg: 'h-10 rounded-md px-8',
         icon: 'size-8',
       },
@@ -114,4 +115,8 @@ export const stepVariants = cva(
       size: 'default',
     },
   }
+);
+
+export const inputVariants = cva(
+  'file:text-foreground placeholder:text-foreground-400 flex h-full w-full bg-transparent text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none disabled:cursor-not-allowed'
 );

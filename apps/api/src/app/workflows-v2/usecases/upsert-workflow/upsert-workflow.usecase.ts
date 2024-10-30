@@ -5,7 +5,6 @@ import {
   NotificationGroupRepository,
   NotificationStepEntity,
   NotificationTemplateEntity,
-  NotificationTemplateRepository,
   PreferencesEntity,
 } from '@novu/dal';
 import {
@@ -21,23 +20,27 @@ import {
   UpsertControlValuesUseCase,
   UpsertPreferences,
   UpsertUserWorkflowPreferencesCommand,
-  slugifyName,
+  UpsertWorkflowPreferencesCommand,
 } from '@novu/application-generic';
 import {
   CreateWorkflowDto,
+  DEFAULT_WORKFLOW_PREFERENCES,
   StepCreateDto,
   StepDto,
   StepUpdateDto,
   WorkflowCreationSourceEnum,
   WorkflowOriginEnum,
+  WorkflowPreferences,
   WorkflowResponseDto,
   WorkflowTypeEnum,
+  slugify,
 } from '@novu/shared';
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/step-upsert-mechanism-failed-missing-id.exception';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { GetWorkflowByIdsCommand } from '../get-workflow-by-ids/get-workflow-by-ids.command';
+import { mapStepTypeToControlSchema } from '../../../step-schemas/shared';
 
 function buildUpsertControlValuesCommand(
   command: UpsertWorkflowCommand,
@@ -123,15 +126,13 @@ export class UpsertWorkflowUseCase {
     command: UpsertWorkflowCommand,
     workflow: NotificationTemplateEntity
   ): Promise<GetPreferencesResponseDto | undefined> {
-    if (!command.workflowDto.preferences?.user) {
-      return undefined;
-    }
-    await this.upsertPreferences(workflow, command);
+    await this.upsertUserWorkflowPreferences(workflow, command);
+    await this.upsertWorkflowPreferences(workflow, command);
 
     return await this.getPersistedPreferences(workflow);
   }
 
-  private async getPersistedPreferences(workflow) {
+  private async getPersistedPreferences(workflow: NotificationTemplateEntity) {
     return await this.getPreferencesUseCase.safeExecute(
       GetPreferencesCommand.create({
         environmentId: workflow._environmentId,
@@ -141,14 +142,38 @@ export class UpsertWorkflowUseCase {
     );
   }
 
-  private async upsertPreferences(workflow, command: UpsertWorkflowCommand): Promise<PreferencesEntity> {
+  private async upsertUserWorkflowPreferences(
+    workflow: NotificationTemplateEntity,
+    command: UpsertWorkflowCommand
+  ): Promise<PreferencesEntity> {
+    let preferences: WorkflowPreferences | null;
+    if (command.workflowDto.preferences?.user !== undefined) {
+      preferences = command.workflowDto.preferences.user;
+    } else {
+      preferences = DEFAULT_WORKFLOW_PREFERENCES;
+    }
+
     return await this.upsertPreferencesUsecase.upsertUserWorkflowPreferences(
       UpsertUserWorkflowPreferencesCommand.create({
         environmentId: workflow._environmentId,
         organizationId: workflow._organizationId,
         userId: command.user._id,
         templateId: workflow._id,
-        preferences: command.workflowDto.preferences?.user,
+        preferences,
+      })
+    );
+  }
+
+  private async upsertWorkflowPreferences(
+    workflow: NotificationTemplateEntity,
+    command: UpsertWorkflowCommand
+  ): Promise<PreferencesEntity> {
+    return await this.upsertPreferencesUsecase.upsertWorkflowPreferences(
+      UpsertWorkflowPreferencesCommand.create({
+        environmentId: workflow._environmentId,
+        organizationId: workflow._organizationId,
+        templateId: workflow._id,
+        preferences: command.workflowDto.preferences?.workflow || null,
       })
     );
   }
@@ -194,7 +219,7 @@ export class UpsertWorkflowUseCase {
       description: workflowDto.description || '',
       tags: workflowDto.tags || [],
       critical: false,
-      triggerIdentifier: slugifyName(workflowDto.name),
+      triggerIdentifier: workflowDto.workflowId ?? slugify(workflowDto.name),
     };
   }
 
@@ -207,7 +232,7 @@ export class UpsertWorkflowUseCase {
 
     return {
       id: existingWorkflow._id,
-      environmentId: user.environmentId,
+      environmentId: existingWorkflow._environmentId,
       organizationId: user.organizationId,
       userId: user._id,
       name: command.workflowDto.name,
@@ -251,8 +276,8 @@ export class UpsertWorkflowUseCase {
     persistedWorkflow: NotificationTemplateEntity | undefined,
     step: StepDto | (StepDto & { stepUuid: string })
   ): NotificationStep {
-    const stepEntityToReturn = this.buildBaseStepEntity(step);
     const foundPersistedStep = this.getPersistedStepIfFound(persistedWorkflow, step);
+    const stepEntityToReturn = this.buildBaseStepEntity(step, foundPersistedStep);
     if (foundPersistedStep) {
       return {
         ...stepEntityToReturn,
@@ -265,15 +290,18 @@ export class UpsertWorkflowUseCase {
     return stepEntityToReturn;
   }
 
-  private buildBaseStepEntity(step: StepDto | (StepDto & { stepUuid: string })): NotificationStep {
+  private buildBaseStepEntity(
+    step: StepDto | StepUpdateDto,
+    foundPersistedStep?: NotificationStepEntity
+  ): NotificationStep {
     return {
       template: {
         type: step.type,
         name: step.name,
-        controls: step.controls,
+        controls: foundPersistedStep?.template?.controls || mapStepTypeToControlSchema[step.type],
         content: '',
       },
-      stepId: slugifyName(step.name),
+      stepId: slugify(step.name),
       name: step.name,
     };
   }
@@ -287,14 +315,14 @@ export class UpsertWorkflowUseCase {
     }
 
     for (const persistedStep of persistedWorkflow.steps) {
-      if (this.isStepUpdateDto(stepUpdateRequest) && persistedStep._templateId === stepUpdateRequest.stepUuid) {
+      if (this.isStepUpdateDto(stepUpdateRequest) && persistedStep._templateId === stepUpdateRequest._id) {
         return persistedStep;
       }
     }
   }
 
-  private isStepUpdateDto(obj: StepDto): obj is StepUpdateDto {
-    return typeof obj === 'object' && obj !== null && 'stepUuid' in obj;
+  private isStepUpdateDto(obj: StepUpdateDto | StepCreateDto): obj is StepUpdateDto {
+    return typeof obj === 'object' && obj !== null && !!(obj as StepUpdateDto)._id;
   }
 
   private async getNotificationGroup(environmentId: string): Promise<string | undefined> {

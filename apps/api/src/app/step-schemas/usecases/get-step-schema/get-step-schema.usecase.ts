@@ -1,31 +1,53 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { JSONSchema } from 'json-schema-to-ts';
 
-import { StepType } from '@novu/framework';
+import { type StepType } from '@novu/framework/internal';
 import { NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
 
+import { StepTypeEnum } from '@novu/shared';
 import {
   GetExistingStepSchemaCommand,
   GetStepSchemaCommand,
   GetStepTypeSchemaCommand,
 } from './get-step-schema.command';
-import { StepSchemaDto } from '../../dtos/step-schema.dto';
-import { mapStepTypeToOutput, mapStepTypeToResult } from '../../shared';
+import { ControlsDto, StepSchemaDto } from '../../dtos/step-schema.dto';
+import { mapStepTypeToControlSchema, mapStepTypeToResult } from '../../shared';
 
 @Injectable()
-export class GetStepSchema {
+export class GetStepSchemaUseCase {
   constructor(private readonly notificationTemplateRepository: NotificationTemplateRepository) {}
 
   async execute(command: GetStepSchemaCommand): Promise<StepSchemaDto> {
     if (isGetByStepType(command)) {
-      return { controls: buildControlsSchema({ stepType: command.stepType }), variables: buildVariablesSchema() };
+      return {
+        controls: buildControlsSchema({ stepType: command.stepType }),
+        variables: buildVariablesSchema(),
+      };
     }
 
     if (isGetByStepId(command)) {
       const { currentStep, previousSteps } = await this.findSteps(command);
 
+      if (!currentStep.template?.type) {
+        throw new BadRequestException('No step type found');
+      }
+
+      if (!currentStep.template?.controls?.schema) {
+        throw new BadRequestException('No controls schema found');
+      }
+
+      if (!isStepType(currentStep.template?.type)) {
+        throw new BadRequestException({
+          message: 'Invalid step type',
+          stepType: currentStep.template?.type,
+        });
+      }
+
       return {
-        controls: buildControlsSchema({ controlsSchema: currentStep.template?.controls?.schema }),
+        controls: buildControlsSchema({
+          stepType: currentStep.template?.type,
+          controlsSchema: currentStep.template?.controls?.schema,
+        }),
         variables: buildVariablesSchema(previousSteps),
       };
     }
@@ -76,24 +98,32 @@ export const buildControlsSchema = ({
   stepType,
   controlsSchema,
 }: {
-  stepType?: StepType;
+  stepType: StepType;
   controlsSchema?: JSONSchema;
-}): JSONSchema => {
+}): ControlsDto => {
+  let schemaRes: JSONSchema | null = null;
   if (controlsSchema && typeof controlsSchema === 'object') {
-    return {
-      ...controlsSchema,
-      description: 'Output of the step, including any controls defined in the Bridge App',
-    };
+    schemaRes = controlsSchema;
   }
 
   if (stepType) {
-    return {
-      ...mapStepTypeToOutput[stepType],
-      description: 'Output of the step, including any controls defined in the Bridge App',
-    };
+    schemaRes = mapStepTypeToControlSchema[stepType].schema;
   }
 
-  throw new Error('No controls schema found');
+  if (!schemaRes || typeof schemaRes !== 'object') {
+    throw new NotFoundException({
+      message: 'No controls schema found',
+      stepType,
+    });
+  }
+
+  return {
+    schema: {
+      ...schemaRes,
+      description: 'Output of the step, including any controls defined in the Bridge App',
+    },
+    uiSchema: mapStepTypeToControlSchema[stepType].uiSchema,
+  };
 };
 
 const buildSubscriberSchema = () =>
@@ -140,8 +170,8 @@ function buildPreviousStepsSchema(previousSteps: NotificationStepEntity[] | unde
 
   previousStepsProperties = (previousSteps || []).reduce(
     (acc, step) => {
-      if (step.template?._id) {
-        acc[step.template._id] = mapStepTypeToResult[step.template.type as StepType];
+      if (step.stepId && step.template?.type) {
+        acc[step.stepId] = mapStepTypeToResult[step.template.type as StepType];
       }
 
       return acc;
@@ -156,4 +186,8 @@ function buildPreviousStepsSchema(previousSteps: NotificationStepEntity[] | unde
     additionalProperties: false,
     description: 'Previous Steps Results',
   } as const satisfies JSONSchema;
+}
+
+function isStepType(value: string): value is StepType {
+  return Object.values(StepTypeEnum).includes(value as StepTypeEnum);
 }

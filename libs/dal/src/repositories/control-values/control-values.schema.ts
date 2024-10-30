@@ -31,7 +31,6 @@ const controlValuesSchema = new Schema<ControlValuesModel>(
     } as any,
     level: Schema.Types.String,
     priority: Schema.Types.Number,
-    inputs: Schema.Types.Mixed,
     controls: Schema.Types.Mixed,
   },
   schemaOptions
@@ -41,5 +40,4 @@ controlValuesSchema.plugin(mongooseDelete, { deletedAt: true, deletedBy: true, o
 
 export const ControlValues =
   (mongoose.models.ControlValues as mongoose.Model<ControlValuesModel>) ||
-  mongoose.model<ControlValuesModel>('controls', controlValuesSchema) ||
-  mongoose.model<ControlValuesModel>('inputs', controlValuesSchema);
+  mongoose.model<ControlValuesModel>('controls', controlValuesSchema);

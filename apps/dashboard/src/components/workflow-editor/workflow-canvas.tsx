@@ -9,7 +9,6 @@ import {
   useReactFlow,
   ViewportHelperFunctionOptions,
 } from '@xyflow/react';
-import type { StepDto } from '@novu/shared';
 import '@xyflow/react/dist/style.css';
 import {
   AddNode,
@@ -24,9 +23,10 @@ import {
   SmsNode,
   TriggerNode,
 } from './nodes';
-import { AddNodeEdgeType, AddNodeEdge } from './edges';
+import { AddNodeEdge, AddNodeEdgeType } from './edges';
 import { NODE_HEIGHT, NODE_WIDTH } from './base-node';
 import { StepTypeEnum } from '@/utils/enums';
+import { Step } from '@/utils/types';
 
 const nodeTypes = {
   trigger: TriggerNode,
@@ -51,7 +51,7 @@ const panOnDrag = [1, 2];
 const Y_DISTANCE = NODE_HEIGHT + 50;
 
 const mapStepToNode = (
-  step: StepDto,
+  step: Step,
   previousPosition: { x: number; y: number },
   addStepIndex: number
 ): Node<NodeData, keyof typeof nodeTypes> => {
@@ -60,6 +60,9 @@ const mapStepToNode = (
     content = `Wait to send ~ 30 minutes`;
   }
 
+  const fieldIssues = Object.values({ ...step.issues?.body, ...step.issues?.control })[0];
+  const error = fieldIssues?.[0]?.message;
+
   return {
     id: crypto.randomUUID(),
     position: { x: previousPosition.x, y: previousPosition.y + Y_DISTANCE },
@@ -67,12 +70,14 @@ const mapStepToNode = (
       name: step.name,
       content,
       addStepIndex,
+      stepId: step._id,
+      error,
     },
     type: step.type,
   };
 };
 
-const WorkflowCanvasChild = ({ steps }: { steps: StepDto[] }) => {
+const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useReactFlow();
 
@@ -87,7 +92,7 @@ const WorkflowCanvasChild = ({ steps }: { steps: StepDto[] }) => {
     });
 
     const addNode: Node<NodeData> = {
-      id: `${Number.MAX_SAFE_INTEGER}`,
+      id: crypto.randomUUID(),
       position: { ...previousPosition, y: previousPosition.y + Y_DISTANCE },
       data: {},
       type: 'add',
@@ -168,7 +173,7 @@ const WorkflowCanvasChild = ({ steps }: { steps: StepDto[] }) => {
   );
 };
 
-export const WorkflowCanvas = ({ steps }: { steps: StepDto[] }) => {
+export const WorkflowCanvas = ({ steps }: { steps: Step[] }) => {
   return (
     <ReactFlowProvider>
       <WorkflowCanvasChild steps={steps} />
