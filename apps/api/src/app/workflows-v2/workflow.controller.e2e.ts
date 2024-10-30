@@ -821,7 +821,6 @@ function buildUpdateRequest(workflowCreated: WorkflowResponseDto): UpdateWorkflo
   return {
     ...updateRequest,
     name: TEST_WORKFLOW_UPDATED_NAME,
-    workflowId: `${slugify(TEST_WORKFLOW_UPDATED_NAME)}`,
     steps,
   };
 }
