@@ -1,10 +1,35 @@
 "use client";
 
-import { NovuInbox } from "./components/NovuInbox";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import { NovuInbox } from "./components/NovuInbox";
 import styles from "./page.module.css";
 
 export default function Home() {
+  const [isNovuConnected, setIsNovuConnected] = useState(false);
+
+  useEffect(() => {
+    const checkNovuConnection = async () => {
+      try {
+        const response = await fetch("/api/dev-studio-status");
+        const data = await response.json();
+        setIsNovuConnected(data.connected);
+
+        if (!data.connected) {
+          console.log("Novu connection failed:", data.error);
+        }
+      } catch (error) {
+        console.error("Novu connection error:", error);
+        setIsNovuConnected(false);
+      }
+    };
+
+    checkNovuConnection();
+    const interval = setInterval(checkNovuConnection, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const triggerNotification = async () => {
     try {
       const response = await fetch("/api/trigger", {
@@ -92,7 +117,7 @@ export default function Home() {
                   </div>
 
                   <a
-                    href="https://docs.novu.co/workflows/introduction"
+                    href="https://docs.novu.co/workflows/introduction/?utm_campaign=nextjs-starter&utm_source=nextjs-starter&utm_medium=nextjs"
                     className={styles.link}
                   >
                     Learn more about workflows
@@ -124,7 +149,7 @@ export default function Home() {
                     <code>{`<Inbox />`}</code>
                   </pre>
                   <a
-                    href="https://docs.novu.co/inbox/introduction"
+                    href="https://docs.novu.co/inbox/introduction/?utm_campaign=nextjs-starter&utm_source=nextjs-starter&utm_medium=nextjs"
                     className={styles.link}
                   >
                     Learn more about Inbox
@@ -160,7 +185,7 @@ export default function Home() {
                     </p>
                   </div>
                   <a
-                    href="https://docs.novu.co/workflows/digest"
+                    href="https://docs.novu.co/workflows/digest/?utm_campaign=nextjs-starter&utm_source=nextjs-starter&utm_medium=nextjs"
                     className={styles.link}
                   >
                     Learn more about Digest
@@ -210,7 +235,7 @@ export default function Home() {
                   </ul>
 
                   <a
-                    href="https://docs.novu.co/workflow/delay"
+                    href="https://docs.novu.co/workflow/delay/?utm_campaign=nextjs-starter&utm_source=nextjs-starter&utm_medium=nextjs"
                     className={styles.link}
                   >
                     Learn more about Delay
@@ -232,9 +257,23 @@ export default function Home() {
             <div className={styles.divider} />
 
             <div className={styles.buttonSection}>
-              <button className={styles.button} onClick={triggerNotification}>
-                Trigger a notification
-              </button>
+              {isNovuConnected ? (
+                <button className={styles.button} onClick={triggerNotification}>
+                  Trigger a notification
+                </button>
+              ) : (
+                <div className={styles.connectionMessage}>
+                  <div className={styles.connectionContent}></div>
+                  <div className={styles.connectionText}>
+                    <h4>Connection Required</h4>
+                    <br />
+                    <p>Run the following command to start:</p>
+                    <code className={styles.commandCode}>
+                      npx novu@latest dev --port 4000
+                    </code>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -251,16 +290,28 @@ export default function Home() {
             <h3>Resources</h3>
             <ul>
               <li>
-                <a href="#">Documentation</a>
+                <a
+                  href="https://docs.novu.co/getting-started/introduction/?utm_campaign=nextjs-starter&utm_source=nextjs-starter&utm_medium=nextjs"
+                  target="_blank"
+                >
+                  Documentation
+                </a>
               </li>
               <li>
-                <a href="#">API Reference</a>
+                <a
+                  href="https://docs.novu.co/api-reference/overview/?utm_campaign=nextjs-starter&utm_source=nextjs-starter&utm_medium=nextjs"
+                  target="_blank"
+                >
+                  API Reference
+                </a>
               </li>
               <li>
-                <a href="#">Tutorials</a>
-              </li>
-              <li>
-                <a href="#">Blog</a>
+                <a
+                  href="https://novu.co/blog/?utm_campaign=nextjs-starter&utm_source=nextjs-starter&utm_medium=nextjs"
+                  target="_blank"
+                >
+                  Blog
+                </a>
               </li>
             </ul>
           </div>
@@ -269,16 +320,19 @@ export default function Home() {
             <h3>Community</h3>
             <ul>
               <li>
-                <a href="#">GitHub</a>
+                <a href="https://github.com/novuhq/novu" target="_blank">
+                  GitHub
+                </a>
               </li>
               <li>
-                <a href="#">Discord</a>
+                <a href="https://discord.novu.co" target="_blank">
+                  Discord
+                </a>
               </li>
               <li>
-                <a href="#">Twitter</a>
-              </li>
-              <li>
-                <a href="#">Stack Overflow</a>
+                <a href="https://twitter.com/novuhq" target="_blank">
+                  Twitter
+                </a>
               </li>
             </ul>
           </div>
@@ -287,16 +341,12 @@ export default function Home() {
             <h3>Company</h3>
             <ul>
               <li>
-                <a href="#">About Us</a>
-              </li>
-              <li>
-                <a href="#">Careers</a>
-              </li>
-              <li>
-                <a href="#">Contact</a>
-              </li>
-              <li>
-                <a href="#">Partners</a>
+                <a
+                  href="https://novu.co/contact-us/?utm_campaign=nextjs-starter&utm_source=nextjs-starter&utm_medium=nextjs"
+                  target="_blank"
+                >
+                  Contact
+                </a>
               </li>
             </ul>
           </div>
