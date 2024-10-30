@@ -124,6 +124,7 @@ export const WorkflowList = () => {
             <TableHead>Steps</TableHead>
             <TableHead>Tags</TableHead>
             <TableHead>Last updated</TableHead>
+            <TableHead>Advanced Data</TableHead>
             <TableHead />
           </TableRow>
         </TableHeader>
@@ -147,6 +148,9 @@ export const WorkflowList = () => {
                   </TableCell>
                   <TableCell className="text-foreground-600 text-sm font-medium">
                     <Skeleton className="h-5 w-[14ch] rounded-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-5 w-[10ch] rounded-full" />
                   </TableCell>
                   <TableCell className="text-foreground-600 text-sm font-medium">
                     <RiMore2Fill className="size-4 opacity-50" />
@@ -202,6 +206,9 @@ export const WorkflowList = () => {
                         day: 'numeric',
                       })}
                     </TableCell>
+                    <TableCell className="text-foreground-600 text-sm font-medium">
+                      {workflow.advancedData || 'N/A'}
+                    </TableCell>
                     <TableCell className="w-1">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -247,7 +254,7 @@ export const WorkflowList = () => {
         {workflowsQuery.data && limit < workflowsQuery.data.totalCount && (
           <TableFooter>
             <TableRow>
-              <TableCell colSpan={5}>
+              <TableCell colSpan={6}>
                 <div className="flex items-center justify-between">
                   {workflowsQuery.data ? (
                     <span className="text-foreground-600 block text-sm font-normal">

@@ -37,6 +37,23 @@ const createStep = (type: StepTypeEnum): Step => ({
   _id: crypto.randomUUID(),
 });
 
+const For = ({ items, renderItem }: { items: any[]; renderItem: (item: any) => ReactNode }) => {
+  return <>{items.map(renderItem)}</>;
+};
+
+const Liquid = ({ template, data }: { template: string; data: any }) => {
+  const compiledTemplate = compileTemplate(template);
+  return <>{compiledTemplate(data)}</>;
+};
+
+const compileTemplate = (template: string) => {
+  // Implement the logic to compile the Liquid template
+  return (data: any) => {
+    // Implement the logic to render the compiled template with data
+    return template;
+  };
+};
+
 export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) => {
   const changesSavedToastIdRef = useRef<string | number>();
   const { currentEnvironment } = useEnvironment();
@@ -125,6 +142,8 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
   const value = useMemo(
     () => ({
       addStep,
+      For,
+      Liquid,
     }),
     [addStep]
   );

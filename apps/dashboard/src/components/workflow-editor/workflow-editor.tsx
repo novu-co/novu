@@ -39,9 +39,33 @@ export const WorkflowEditor = () => {
               Trigger
             </Link>
           </TabsTrigger>
+          <TabsTrigger value="advanced" asChild>
+            <Link
+              to={buildRoute(ROUTES.ADVANCED_WORKFLOW, {
+                environmentId,
+                workflowId,
+              })}
+            >
+              Advanced
+            </Link>
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="workflow" className="mt-0 h-full w-full">
           {steps && <WorkflowCanvas steps={steps} />}
+        </TabsContent>
+        <TabsContent value="advanced" className="mt-0 h-full w-full">
+          <div className="p-4">
+            <h2 className="text-lg font-semibold">Advanced Data Manipulation</h2>
+            <p className="mt-2 text-sm text-gray-600">Use the helper components to manipulate data:</p>
+            <ul className="mt-4 list-disc list-inside">
+              <li>
+                <strong>For:</strong> Loop through items and render them.
+              </li>
+              <li>
+                <strong>Liquid:</strong> Use Liquid templates to render dynamic content.
+              </li>
+            </ul>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
