@@ -80,8 +80,8 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="roun flex h-full flex-1 flex-nowrap">
           <Tabs defaultValue="workflow" className="-mt-[1px] flex h-full flex-1 flex-col" value="trigger">
-            <TabsList>
-              <TabsTrigger value="workflow" asChild>
+            <TabsList variant="regular">
+              <TabsTrigger value="workflow" asChild variant="regular">
                 <Link
                   to={buildRoute(ROUTES.EDIT_WORKFLOW, {
                     environmentId,
@@ -91,7 +91,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
                   Workflow
                 </Link>
               </TabsTrigger>
-              <TabsTrigger value="trigger" asChild>
+              <TabsTrigger value="trigger" asChild variant="regular">
                 <Link
                   to={buildRoute(ROUTES.TEST_WORKFLOW, {
                     environmentId,
@@ -108,7 +108,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
                 </Button>
               </div>
             </TabsList>
-            <TabsContent value="trigger" className="mt-0 h-full w-full">
+            <TabsContent value="trigger" className="mt-0 h-full w-full" variant="regular">
               <TestWorkflowForm workflow={workflow} />
             </TabsContent>
           </Tabs>

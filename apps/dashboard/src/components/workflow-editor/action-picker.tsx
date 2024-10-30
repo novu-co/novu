@@ -33,17 +33,18 @@ type Actions = {
 };
 
 type ActionPickerProps = {
+  className?: string;
   value: Actions | undefined;
   onChange: (value: Actions) => void;
 };
 
 export const ActionPicker = (props: ActionPickerProps) => {
-  const { value, onChange } = props;
+  const { className, value, onChange } = props;
   const primaryAction = value?.primaryAction;
   const secondaryAction = value?.secondaryAction;
 
   return (
-    <div className="flex items-center gap-1">
+    <div className={cn('flex items-center gap-1', className)}>
       <div className="border-neutral-alpha-200 flex min-h-10 w-full flex-wrap justify-end gap-1 rounded-md border p-1 shadow-sm">
         {!primaryAction && !secondaryAction && (
           <div className={buttonVariants({ variant: 'dashed', size: 'sm' })}>
