@@ -1,5 +1,6 @@
 import type {
   CreateWorkflowDto,
+  GeneratePreviewResponseDto,
   UpdateWorkflowDto,
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
@@ -47,14 +48,18 @@ export const updateWorkflow = async ({
 };
 
 export const previewStep = async ({
-  workflowId: id,
+  workflowId,
   payload,
+  stepUuid,
 }: {
   workflowId: string;
   stepUuid: string;
-  payload?: any;
-}): Promise<any> => {
-  const { data } = await postV2<{ data: any }>(`/workflows/${id}/preview`, payload);
+  payload?: Record<string, unknown>;
+}): Promise<GeneratePreviewResponseDto> => {
+  const { data } = await postV2<{ data: GeneratePreviewResponseDto }>(
+    `/workflows/${workflowId}/step/${stepUuid}/preview`,
+    payload
+  );
 
   return data;
 };
