@@ -25,8 +25,6 @@ describe('Generate Preview', () => {
     session = new UserSession();
     await session.initialize();
     workflowsClient = createWorkflowClient(session.serverUrl, getHeaders());
-    // @ts-ignore
-    process.env[FeatureFlagsKeysEnum.IS_WORKFLOW_PREFERENCES_ENABLED] = 'true';
   });
   after(async () => {
     await sleep(1000);

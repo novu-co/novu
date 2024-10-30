@@ -78,4 +78,5 @@ export type PreferencesResponseDto = {
 
 export type PreferencesRequestDto = {
   user: WorkflowPreferences | null;
+  workflow?: WorkflowPreferences | null;
 };

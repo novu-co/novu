@@ -17,6 +17,7 @@ import { GetWorkflowUseCase } from './usecases/get-workflow/get-workflow.usecase
 import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.usecase';
 import { DeleteWorkflowUseCase } from './usecases/delete-workflow/delete-workflow.usecase';
 import { GetWorkflowByIdsUseCase } from './usecases/get-workflow-by-ids/get-workflow-by-ids.usecase';
+import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
 import { GetStepSchemaUseCase } from '../step-schemas/usecases/get-step-schema/get-step-schema.usecase';
 import { BridgeModule } from '../bridge';
 import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
@@ -24,6 +25,7 @@ import { CreateMockPayloadUseCase } from './usecases/placeholder-enrichment/payl
 import { ExtractDefaultsUsecase } from './usecases/get-default-values-from-schema/extract-defaults.usecase';
 import { CollectPlaceholdersFromTipTapSchemaUsecase } from './usecases/placeholder-enrichment/collect-placeholders-from-tip-tap-schema.usecase';
 import { TransformPlaceholderMapUseCase } from './usecases/placeholder-enrichment/transform-placeholder.usecase';
+import { WorkflowTestDataUseCase } from './usecases/test-data/test-data.usecase';
 
 @Module({
   imports: [SharedModule, MessageTemplateModule, ChangeModule, AuthModule, BridgeModule, IntegrationModule],
@@ -39,6 +41,7 @@ import { TransformPlaceholderMapUseCase } from './usecases/placeholder-enrichmen
     UpsertControlValuesUseCase,
     GetPreferences,
     GetWorkflowByIdsUseCase,
+    SyncToEnvironmentUseCase,
     GetStepSchemaUseCase,
     GeneratePreviewUsecase,
     GetWorkflowUseCase,
@@ -47,6 +50,7 @@ import { TransformPlaceholderMapUseCase } from './usecases/placeholder-enrichmen
     ExtractDefaultsUsecase,
     CollectPlaceholdersFromTipTapSchemaUsecase,
     TransformPlaceholderMapUseCase,
+    WorkflowTestDataUseCase,
   ],
 })
 export class WorkflowModule implements NestModule {

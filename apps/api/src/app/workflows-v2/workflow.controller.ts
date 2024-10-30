@@ -24,6 +24,8 @@ import {
   UpdateWorkflowDto,
   UserSessionData,
   WorkflowResponseDto,
+  WorkflowTestDataResponseDto,
+  PromoteWorkflowDto,
 } from '@novu/shared';
 import { UserAuthGuard, UserSession } from '@novu/application-generic';
 
@@ -37,10 +39,14 @@ import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.us
 import { ListWorkflowsCommand } from './usecases/list-workflows/list-workflows.command';
 import { DeleteWorkflowUseCase } from './usecases/delete-workflow/delete-workflow.usecase';
 import { DeleteWorkflowCommand } from './usecases/delete-workflow/delete-workflow.command';
+import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
+import { SyncToEnvironmentCommand } from './usecases/sync-to-environment/sync-to-environment.command';
 import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
 import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview-command';
 import { ParseSlugIdPipe } from './pipes/parse-slug-id.pipe';
 import { ParseSlugEnvironmentIdPipe } from './pipes/parse-slug-env-id.pipe';
+import { WorkflowTestDataUseCase } from './usecases/test-data/test-data.usecase';
+import { WorkflowTestDataCommand } from './usecases/test-data/test-data.command';
 
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
@@ -53,7 +59,9 @@ export class WorkflowController {
     private getWorkflowUseCase: GetWorkflowUseCase,
     private listWorkflowsUseCase: ListWorkflowsUseCase,
     private deleteWorkflowUsecase: DeleteWorkflowUseCase,
-    private generatePreviewUseCase: GeneratePreviewUsecase
+    private syncToEnvironmentUseCase: SyncToEnvironmentUseCase,
+    private generatePreviewUseCase: GeneratePreviewUsecase,
+    private workflowTestDataUseCase: WorkflowTestDataUseCase
   ) {}
 
   @Post('')
@@ -65,6 +73,22 @@ export class WorkflowController {
     return this.upsertWorkflowUseCase.execute(
       UpsertWorkflowCommand.create({
         workflowDto: createWorkflowDto,
+        user,
+      })
+    );
+  }
+
+  @Put(':workflowId/promote')
+  @UseGuards(UserAuthGuard)
+  async promote(
+    @UserSession() user: UserSessionData,
+    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
+    @Body() promoteWorkflowDto: PromoteWorkflowDto
+  ): Promise<WorkflowResponseDto> {
+    return this.syncToEnvironmentUseCase.execute(
+      SyncToEnvironmentCommand.create({
+        identifierOrInternalId: workflowId,
+        targetEnvironmentId: promoteWorkflowDto.targetEnvironmentId,
         user,
       })
     );
@@ -134,6 +158,17 @@ export class WorkflowController {
   ): Promise<GeneratePreviewResponseDto> {
     return await this.generatePreviewUseCase.execute(
       GeneratePreviewCommand.create({ user, workflowId, stepUuid, generatePreviewRequestDto })
+    );
+  }
+
+  @Get('/:workflowId/test-data')
+  @UseGuards(UserAuthGuard)
+  async getWorkflowTestData(
+    @UserSession() user: UserSessionData,
+    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId
+  ): Promise<WorkflowTestDataResponseDto> {
+    return this.workflowTestDataUseCase.execute(
+      WorkflowTestDataCommand.create({ identifierOrInternalId: workflowId, user })
     );
   }
 }

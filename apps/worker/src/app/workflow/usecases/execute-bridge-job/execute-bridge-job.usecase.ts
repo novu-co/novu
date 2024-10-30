@@ -13,6 +13,7 @@ import {
   ControlValuesLevelEnum,
   ExecutionDetailsSourceEnum,
   ExecutionDetailsStatusEnum,
+  ITriggerPayload,
   JobStatusEnum,
   WorkflowOriginEnum,
   WorkflowTypeEnum,
@@ -147,7 +148,7 @@ export class ExecuteBridgeJob {
     return controls?.controls;
   }
 
-  private normalizePayload(originalPayload) {
+  private normalizePayload(originalPayload: ITriggerPayload = {}) {
     // Remove internal params
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { __source, ...payload } = originalPayload;
@@ -163,7 +164,6 @@ export class ExecuteBridgeJob {
     })) as JobEntity;
 
     if (theJob) {
-      this.normalizeFirstJob(theJob, previousJobs, payload);
       const jobState = await this.mapState(theJob, payload);
       previousJobs.push(jobState);
     }
@@ -181,19 +181,6 @@ export class ExecuteBridgeJob {
     }
 
     return previousJobs;
-  }
-
-  /*
-   * Backward compatibility, If the first job is not a trigger, we need to add a trigger job to the state
-   */
-  private normalizeFirstJob(firstJob: JobEntity, previousJobs: State[], payload?: Record<string, unknown>) {
-    if (firstJob.type !== 'trigger') {
-      previousJobs.push({
-        stepId: 'trigger',
-        outputs: payload ?? {},
-        state: { status: JobStatusEnum.COMPLETED },
-      });
-    }
   }
 
   private async sendBridgeRequest({
@@ -303,16 +290,8 @@ export class ExecuteBridgeJob {
 
   private async mapState(job: JobEntity, payload: Record<string, unknown>) {
     let output = {};
-    let state: State['state'] | null = null;
-    let stepId: string | null = null;
 
     switch (job.type) {
-      case 'trigger': {
-        stepId = 'trigger';
-        output = payload ?? {};
-        state = { status: JobStatusEnum.COMPLETED };
-        break;
-      }
       case 'delay': {
         output = {
           duration: Date.now() - new Date(job.createdAt).getTime(),
@@ -370,9 +349,9 @@ export class ExecuteBridgeJob {
     }
 
     return {
-      stepId: stepId || job?.step.stepId || job?.step.uuid || '',
+      stepId: job?.step.stepId || job?.step.uuid || '',
       outputs: output ?? {},
-      state: state || {
+      state: {
         status: job?.status,
         error: job?.error,
       },
