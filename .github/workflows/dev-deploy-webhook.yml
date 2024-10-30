@@ -35,7 +35,7 @@ jobs:
     secrets: inherit
 
   deploy_dev_webhook:
-    if: '!contains(github.event.head_commit.message, "ci skip")'
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
     needs: publish_docker_image_webhook
     uses: ./.github/workflows/reusable-app-service-deploy.yml
     secrets: inherit
