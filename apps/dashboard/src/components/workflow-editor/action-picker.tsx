@@ -46,7 +46,7 @@ export const ActionPicker = (props: ActionPickerProps) => {
 
   return (
     <div className={cn('flex items-center gap-1', className)}>
-      <div className="border-neutral-alpha-200 flex min-h-10 w-full flex-wrap justify-end gap-1 rounded-md border p-1 shadow-sm">
+      <div className="border-neutral-alpha-200 flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
         {!primaryAction && !secondaryAction && (
           <div className={buttonVariants({ variant: 'dashed', size: 'sm' })}>
             <RiForbid2Line className="size-4" />
@@ -61,7 +61,7 @@ export const ActionPicker = (props: ActionPickerProps) => {
               onChange({ primaryAction, secondaryAction });
             }}
           >
-            <Button variant="primary" size="sm">
+            <Button variant="primary" size="xs">
               {primaryAction.label}
             </Button>
           </ConfigureActionPopover>
@@ -74,7 +74,7 @@ export const ActionPicker = (props: ActionPickerProps) => {
               onChange({ primaryAction, secondaryAction });
             }}
           >
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="xs">
               {secondaryAction.label}
             </Button>
           </ConfigureActionPopover>
@@ -92,7 +92,7 @@ export const ActionPicker = (props: ActionPickerProps) => {
               onChange({});
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'dashed', size: 'sm' }), 'pointer-events-none gap-2')}>
+            <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'pointer-events-none gap-2')}>
               <RiForbid2Line className="size-4" />
               No action
             </div>
@@ -108,7 +108,7 @@ export const ActionPicker = (props: ActionPickerProps) => {
               });
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'primary', size: 'sm' }), 'pointer-events-none')}>
+            <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
               Primary action
             </div>
           </DropdownMenuItem>
@@ -126,10 +126,10 @@ export const ActionPicker = (props: ActionPickerProps) => {
               });
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'primary', size: 'sm' }), 'pointer-events-none')}>
+            <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
               Primary action
             </div>
-            <div className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'pointer-events-none')}>
+            <div className={cn(buttonVariants({ variant: 'outline', size: 'xs' }), 'pointer-events-none')}>
               Secondary action
             </div>
           </DropdownMenuItem>
