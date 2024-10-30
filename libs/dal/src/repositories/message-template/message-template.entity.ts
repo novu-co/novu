@@ -56,10 +56,6 @@ export class MessageTemplateEntity implements IMessageTemplate {
 
   deleted?: boolean;
 
-  inputs?: {
-    schema: JSONSchema;
-  };
-
   controls?: {
     schema: JSONSchema;
   };

@@ -60,6 +60,9 @@ const mapStepToNode = (
     content = `Wait to send ~ 30 minutes`;
   }
 
+  const fieldIssues = Object.values({ ...step.issues?.body, ...step.issues?.control })[0];
+  const error = fieldIssues?.[0]?.message;
+
   return {
     id: crypto.randomUUID(),
     position: { x: previousPosition.x, y: previousPosition.y + Y_DISTANCE },
@@ -67,6 +70,8 @@ const mapStepToNode = (
       name: step.name,
       content,
       addStepIndex,
+      stepId: step._id,
+      error,
     },
     type: step.type,
   };
@@ -87,7 +92,7 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
     });
 
     const addNode: Node<NodeData> = {
-      id: `${Number.MAX_SAFE_INTEGER}`,
+      id: crypto.randomUUID(),
       position: { ...previousPosition, y: previousPosition.y + Y_DISTANCE },
       data: {},
       type: 'add',

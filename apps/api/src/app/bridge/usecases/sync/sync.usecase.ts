@@ -19,7 +19,13 @@ import {
   UpsertPreferences,
   UpsertWorkflowPreferencesCommand,
 } from '@novu/application-generic';
-import { FeatureFlagsKeysEnum, WorkflowCreationSourceEnum, WorkflowOriginEnum, WorkflowTypeEnum } from '@novu/shared';
+import {
+  FeatureFlagsKeysEnum,
+  WorkflowCreationSourceEnum,
+  WorkflowOriginEnum,
+  WorkflowTypeEnum,
+  WorkflowPreferencesPartial,
+} from '@novu/shared';
 import { DiscoverOutput, DiscoverStepOutput, DiscoverWorkflowOutput, GetActionEnum } from '@novu/framework/internal';
 
 import { SyncCommand } from './sync.command';
@@ -159,14 +165,14 @@ export class Sync {
           savedWorkflow = await this.updateWorkflow(workflowExist, command, workflow);
         } else {
           const notificationGroupId = await this.getNotificationGroup(
-            this.castToAnyNotSupportedParam(workflow.options)?.notificationGroupId,
+            this.castToAnyNotSupportedParam(workflow)?.notificationGroupId,
             command.environmentId
           );
 
           if (!notificationGroupId) {
             throw new BadRequestException('Notification group not found');
           }
-          const isWorkflowActive = this.castToAnyNotSupportedParam(workflow.options)?.active ?? true;
+          const isWorkflowActive = this.castToAnyNotSupportedParam(workflow)?.active ?? true;
 
           savedWorkflow = await this.createWorkflow(notificationGroupId, isWorkflowActive, command, workflow);
         }
@@ -186,7 +192,7 @@ export class Sync {
               environmentId: savedWorkflow._environmentId,
               organizationId: savedWorkflow._organizationId,
               templateId: savedWorkflow._id,
-              preferences: workflow.preferences,
+              preferences: this.getWorkflowPreferences(workflow),
             })
           );
         }
@@ -215,24 +221,17 @@ export class Sync {
         triggerIdentifier: workflow.workflowId,
         __source: WorkflowCreationSourceEnum.BRIDGE,
         steps: this.mapSteps(workflow.steps),
-        /** @deprecated */
-        inputs: {
-          schema: workflow.controls?.schema || workflow.inputs.schema,
-        },
         controls: {
-          schema: workflow.controls?.schema || workflow.inputs.schema,
+          schema: workflow.controls?.schema,
         },
         rawData: workflow as unknown as Record<string, unknown>,
-        payloadSchema:
-          (workflow.payload?.schema as Record<string, unknown>) ||
-          /** @deprecated */
-          (workflow.options?.payloadSchema as Record<string, unknown>),
+        payloadSchema: workflow.payload?.schema,
         active: isWorkflowActive,
         description: this.getWorkflowDescription(workflow),
-        data: this.castToAnyNotSupportedParam(workflow).options?.data,
+        data: this.castToAnyNotSupportedParam(workflow)?.data,
         tags: this.getWorkflowTags(workflow),
-        critical: this.castToAnyNotSupportedParam(workflow.options)?.critical ?? false,
-        preferenceSettings: this.castToAnyNotSupportedParam(workflow.options)?.preferenceSettings,
+        critical: this.castToAnyNotSupportedParam(workflow)?.critical ?? false,
+        preferenceSettings: this.castToAnyNotSupportedParam(workflow)?.preferenceSettings,
       })
     );
   }
@@ -251,23 +250,18 @@ export class Sync {
         name: this.getWorkflowName(workflow),
         workflowId: workflow.workflowId,
         steps: this.mapSteps(workflow.steps, workflowExist),
-        inputs: {
-          schema: workflow.controls?.schema || workflow.inputs.schema,
-        },
         controls: {
-          schema: workflow.controls?.schema || workflow.inputs.schema,
+          schema: workflow.controls?.schema,
         },
         rawData: workflow,
-        payloadSchema:
-          (workflow.payload?.schema as Record<string, unknown>) ||
-          (workflow.options?.payloadSchema as Record<string, unknown>),
+        payloadSchema: workflow.payload?.schema,
         type: WorkflowTypeEnum.BRIDGE,
         description: this.getWorkflowDescription(workflow),
-        data: this.castToAnyNotSupportedParam(workflow.options)?.data,
+        data: this.castToAnyNotSupportedParam(workflow)?.data,
         tags: this.getWorkflowTags(workflow),
-        active: this.castToAnyNotSupportedParam(workflow.options)?.active ?? true,
-        critical: this.castToAnyNotSupportedParam(workflow.options)?.critical ?? false,
-        preferenceSettings: this.castToAnyNotSupportedParam(workflow.options)?.preferenceSettings,
+        active: this.castToAnyNotSupportedParam(workflow)?.active ?? true,
+        critical: this.castToAnyNotSupportedParam(workflow)?.critical ?? false,
+        preferenceSettings: this.castToAnyNotSupportedParam(workflow)?.preferenceSettings,
       })
     );
   }
@@ -283,8 +277,7 @@ export class Sync {
         _id: foundStep?._id,
         type: step.type,
         name: step.stepId,
-        inputs: step.controls || step.inputs,
-        controls: step.controls || step.inputs,
+        controls: step.controls,
         output: step.outputs,
         options: step.options,
         code: step.code,
@@ -323,6 +316,10 @@ export class Sync {
     return notificationGroupId;
   }
 
+  private getWorkflowPreferences(workflow: DiscoverWorkflowOutput): WorkflowPreferencesPartial {
+    return workflow.preferences || {};
+  }
+
   private getWorkflowName(workflow: DiscoverWorkflowOutput): string {
     return workflow.name || workflow.workflowId;
   }
@@ -335,7 +332,9 @@ export class Sync {
     return workflow.tags || [];
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private castToAnyNotSupportedParam(param: any): any {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return param as any;
   }
 }

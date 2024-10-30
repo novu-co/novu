@@ -24,6 +24,8 @@ import {
   UpdateWorkflowDto,
   UserSessionData,
   WorkflowResponseDto,
+  WorkflowTestDataResponseDto,
+  PromoteWorkflowDto,
 } from '@novu/shared';
 import { UserAuthGuard, UserSession } from '@novu/application-generic';
 
@@ -37,9 +39,14 @@ import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.us
 import { ListWorkflowsCommand } from './usecases/list-workflows/list-workflows.command';
 import { DeleteWorkflowUseCase } from './usecases/delete-workflow/delete-workflow.usecase';
 import { DeleteWorkflowCommand } from './usecases/delete-workflow/delete-workflow.command';
+import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
+import { SyncToEnvironmentCommand } from './usecases/sync-to-environment/sync-to-environment.command';
 import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
 import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview-command';
-import { ParseSlugIdPipe } from './pipes/parse-slug-Id.pipe';
+import { ParseSlugIdPipe } from './pipes/parse-slug-id.pipe';
+import { ParseSlugEnvironmentIdPipe } from './pipes/parse-slug-env-id.pipe';
+import { WorkflowTestDataUseCase } from './usecases/test-data/test-data.usecase';
+import { WorkflowTestDataCommand } from './usecases/test-data/test-data.command';
 
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
@@ -52,13 +59,15 @@ export class WorkflowController {
     private getWorkflowUseCase: GetWorkflowUseCase,
     private listWorkflowsUseCase: ListWorkflowsUseCase,
     private deleteWorkflowUsecase: DeleteWorkflowUseCase,
-    private generatePreviewUseCase: GeneratePreviewUsecase
+    private syncToEnvironmentUseCase: SyncToEnvironmentUseCase,
+    private generatePreviewUseCase: GeneratePreviewUsecase,
+    private workflowTestDataUseCase: WorkflowTestDataUseCase
   ) {}
 
   @Post('')
   @UseGuards(UserAuthGuard)
   async create(
-    @UserSession() user: UserSessionData,
+    @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
     @Body() createWorkflowDto: CreateWorkflowDto
   ): Promise<WorkflowResponseDto> {
     return this.upsertWorkflowUseCase.execute(
@@ -69,10 +78,26 @@ export class WorkflowController {
     );
   }
 
+  @Put(':workflowId/promote')
+  @UseGuards(UserAuthGuard)
+  async promote(
+    @UserSession() user: UserSessionData,
+    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
+    @Body() promoteWorkflowDto: PromoteWorkflowDto
+  ): Promise<WorkflowResponseDto> {
+    return this.syncToEnvironmentUseCase.execute(
+      SyncToEnvironmentCommand.create({
+        identifierOrInternalId: workflowId,
+        targetEnvironmentId: promoteWorkflowDto.targetEnvironmentId,
+        user,
+      })
+    );
+  }
+
   @Put(':workflowId')
   @UseGuards(UserAuthGuard)
   async update(
-    @UserSession() user: UserSessionData,
+    @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
     @Body() updateWorkflowDto: UpdateWorkflowDto
   ): Promise<WorkflowResponseDto> {
@@ -88,7 +113,7 @@ export class WorkflowController {
   @Get(':workflowId')
   @UseGuards(UserAuthGuard)
   async getWorkflow(
-    @UserSession() user: UserSessionData,
+    @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId
   ): Promise<WorkflowResponseDto> {
     return this.getWorkflowUseCase.execute(GetWorkflowCommand.create({ identifierOrInternalId: workflowId, user }));
@@ -97,7 +122,7 @@ export class WorkflowController {
   @Delete(':workflowId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeWorkflow(
-    @UserSession() user: UserSessionData,
+    @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId
   ) {
     await this.deleteWorkflowUsecase.execute(
@@ -108,7 +133,7 @@ export class WorkflowController {
   @Get('')
   @UseGuards(UserAuthGuard)
   async searchWorkflows(
-    @UserSession() user: UserSessionData,
+    @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
     @Query() query: GetListQueryParams
   ): Promise<ListWorkflowResponse> {
     return this.listWorkflowsUseCase.execute(
@@ -126,13 +151,24 @@ export class WorkflowController {
   @Post('/:workflowId/step/:stepUuid/preview')
   @UseGuards(UserAuthGuard)
   async generatePreview(
-    @UserSession() user: UserSessionData,
+    @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
     @Param('workflowId') workflowId: string,
     @Param('stepUuid') stepUuid: string,
     @Body() generatePreviewRequestDto: GeneratePreviewRequestDto
   ): Promise<GeneratePreviewResponseDto> {
     return await this.generatePreviewUseCase.execute(
       GeneratePreviewCommand.create({ user, workflowId, stepUuid, generatePreviewRequestDto })
+    );
+  }
+
+  @Get('/:workflowId/test-data')
+  @UseGuards(UserAuthGuard)
+  async getWorkflowTestData(
+    @UserSession() user: UserSessionData,
+    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId
+  ): Promise<WorkflowTestDataResponseDto> {
+    return this.workflowTestDataUseCase.execute(
+      WorkflowTestDataCommand.create({ identifierOrInternalId: workflowId, user })
     );
   }
 }

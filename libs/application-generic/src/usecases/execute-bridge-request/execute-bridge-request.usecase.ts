@@ -173,7 +173,6 @@ export class ExecuteBridgeRequest {
     return {
       [HttpRequestHeaderKeysEnum.BYPASS_TUNNEL_REMINDER]: 'true',
       [HttpRequestHeaderKeysEnum.CONTENT_TYPE]: 'application/json',
-      [HttpHeaderKeysEnum.NOVU_SIGNATURE_DEPRECATED]: novuSignatureHeader,
       [HttpHeaderKeysEnum.NOVU_SIGNATURE]: novuSignatureHeader,
     };
   }

@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { UserSession } from '@novu/testing';
 import { randomBytes } from 'crypto';
-import { slugifyName } from '@novu/application-generic';
 import {
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
@@ -21,6 +20,7 @@ import {
   WorkflowListResponseDto,
   WorkflowResponseDto,
   ShortIsPrefixEnum,
+  slugify,
 } from '@novu/shared';
 import { createWorkflowClient } from './clients';
 
@@ -75,7 +75,7 @@ describe('Workflow Controller E2E API Testing', () => {
       const res = await session.testAgent.post(`${v2Prefix}/workflows`).send(createWorkflowDto);
       expect(res.status).to.be.equal(201);
       const workflowCreated: WorkflowResponseDto = res.body.data;
-      expect(workflowCreated.workflowId).to.include(`${slugifyName(nameSuffix)}-`);
+      expect(workflowCreated.workflowId).to.include(`${slugify(nameSuffix)}-`);
     });
 
     it('should throw error when creating workflow with duplicate step ids', async () => {
@@ -225,6 +225,130 @@ describe('Workflow Controller E2E API Testing', () => {
     });
   });
 
+  describe('Promote Workflow Permutations', () => {
+    it('should promote by creating a new workflow in production environment with the same properties', async () => {
+      // Create a workflow in the development environment
+      const devWorkflow = await createWorkflowAndValidate('-promote-workflow');
+
+      // Switch to production environment and get its ID
+      await session.switchToProdEnvironment();
+      const prodEnvironmentId = session.environment._id;
+      await session.switchToDevEnvironment();
+
+      // Promote the workflow to production
+      const res = await session.testAgent.put(`${v2Prefix}/workflows/${devWorkflow._id}/promote`).send({
+        targetEnvironmentId: prodEnvironmentId,
+      });
+
+      expect(res.status).to.equal(200);
+
+      const prodWorkflow = res.body.data;
+
+      // Verify that the promoted workflow has a new ID but the same workflowId
+      expect(prodWorkflow._id).to.not.equal(devWorkflow._id);
+      expect(prodWorkflow.workflowId).to.equal(devWorkflow.workflowId);
+
+      // Check that all non-environment-specific properties are identical
+      const propertiesToCompare = ['name', 'description', 'tags', 'preferences', 'status', 'type', 'origin'];
+      propertiesToCompare.forEach((prop) => {
+        expect(prodWorkflow[prop]).to.deep.equal(devWorkflow[prop], `Property ${prop} should match`);
+      });
+
+      // Verify that steps are correctly promoted
+      expect(prodWorkflow.steps).to.have.lengthOf(devWorkflow.steps.length);
+      prodWorkflow.steps.forEach((prodStep, index) => {
+        const devStep = devWorkflow.steps[index];
+        /*
+         * TODO: this is not true yet, but some ID will remain the same across environments
+         * expect(prodStep.stepId).to.equal(devStep.stepId, 'Step ID should be the same');
+         */
+        expect(prodStep.controlValues).to.deep.equal(devStep.controlValues, 'Step controlValues should match');
+        expect(prodStep.name).to.equal(devStep.name, 'Step name should match');
+        expect(prodStep.type).to.equal(devStep.type, 'Step type should match');
+      });
+    });
+
+    it('should promote by updating an existing workflow in production environment', async () => {
+      // Switch to production environment and get its ID
+      await session.switchToProdEnvironment();
+      const prodEnvironmentId = session.environment._id;
+      await session.switchToDevEnvironment();
+
+      // Create a workflow in the development environment
+      const devWorkflow = await createWorkflowAndValidate('-promote-workflow');
+
+      // Promote the workflow to production
+      const resPromoteCreate = await session.testAgent.put(`${v2Prefix}/workflows/${devWorkflow._id}/promote`).send({
+        targetEnvironmentId: prodEnvironmentId,
+      });
+
+      expect(resPromoteCreate.status).to.equal(200);
+      const prodWorkflowCreated = resPromoteCreate.body.data;
+
+      // Update the workflow in the development environment
+      const updateDto = {
+        ...convertResponseToUpdateDto(devWorkflow),
+        name: 'Updated Name',
+        description: 'Updated Description',
+        // modify existing Email Step, add new InApp Steps, previously existing InApp Step is removed
+        steps: [
+          { ...devWorkflow.steps[0], name: 'Updated Email Step' },
+          { ...buildInAppStep(), name: 'New InApp Step' },
+        ],
+      };
+
+      await updateWorkflowAndValidate(devWorkflow._id, devWorkflow.updatedAt, updateDto);
+
+      // Promote the updated workflow to production
+      const resPromoteUpdate = await session.testAgent.put(`${v2Prefix}/workflows/${devWorkflow._id}/promote`).send({
+        targetEnvironmentId: prodEnvironmentId,
+      });
+
+      expect(resPromoteUpdate.status).to.equal(200);
+      const prodWorkflowUpdated = resPromoteUpdate.body.data;
+
+      // Verify that IDs remain unchanged
+      expect(prodWorkflowUpdated._id).to.equal(prodWorkflowCreated._id);
+      expect(prodWorkflowUpdated.workflowId).to.equal(prodWorkflowCreated.workflowId);
+
+      // Verify updated properties
+      expect(prodWorkflowUpdated.name).to.equal('Updated Name');
+      expect(prodWorkflowUpdated.description).to.equal('Updated Description');
+
+      // Verify unchanged properties
+      ['status', 'type', 'origin'].forEach((prop) => {
+        expect(prodWorkflowUpdated[prop]).to.deep.equal(prodWorkflowCreated[prop], `Property ${prop} should match`);
+      });
+
+      // Verify updated steps
+      expect(prodWorkflowUpdated.steps).to.have.lengthOf(2);
+      expect(prodWorkflowUpdated.steps[0].name).to.equal('Updated Email Step');
+      // TODO: verify that the stepId (or some) is the same across env for the same prod/dev step
+      expect(prodWorkflowUpdated.steps[0]._id).to.not.equal(prodWorkflowCreated.steps[0]._id);
+      expect(prodWorkflowUpdated.steps[1].name).to.equal('New InApp Step');
+      expect(prodWorkflowUpdated.steps[1]._id).to.not.equal(prodWorkflowCreated.steps[1]._id);
+    });
+
+    it('should throw an error if trying to promote to the same environment', async () => {
+      const devWorkflow = await createWorkflowAndValidate('-promote-workflow');
+
+      const res = await session.testAgent.put(`${v2Prefix}/workflows/${devWorkflow._id}/promote`).send({
+        targetEnvironmentId: session.environment._id,
+      });
+
+      expect(res.status).to.equal(400);
+      expect(res.body.message).to.equal('Cannot sync workflow to the same environment');
+    });
+
+    it('should throw an error if the workflow to promote is not found', async () => {
+      const res = await session.testAgent.put(`${v2Prefix}/workflows/123/promote`).send({ targetEnvironmentId: '123' });
+
+      expect(res.status).to.equal(404);
+      expect(res.body.message).to.equal('Workflow cannot be found');
+      expect(res.body.workflowId).to.equal('123');
+    });
+  });
+
   describe('Get Workflow Permutations', () => {
     it('should get by slugify ids', async () => {
       const workflowCreated = await createWorkflowAndValidate('XYZ');
@@ -325,7 +449,7 @@ export function buildCreateWorkflowDto(
   return {
     __source: WorkflowCreationSourceEnum.EDITOR,
     name: TEST_WORKFLOW_NAME + nameSuffix,
-    workflowId: `${slugifyName(TEST_WORKFLOW_NAME + nameSuffix)}`,
+    workflowId: `${slugify(TEST_WORKFLOW_NAME + nameSuffix)}`,
     description: 'This is a test workflow',
     active: true,
     tags: TEST_TAGS,
@@ -384,9 +508,9 @@ function updateStepId(step: StepResponseDto): Partial<StepResponseDto> {
 
   return {
     ...rest,
-    ...(step._id && step.name ? { stepId: slugifyName(step.name) } : {}),
+    ...(step._id && step.name ? { stepId: slugify(step.name) } : {}),
     ...(step.name && step._id
-      ? { slug: `${slugifyName(step.name)}_${ShortIsPrefixEnum.STEP}${encodeBase62(step._id)}` }
+      ? { slug: `${slugify(step.name)}_${ShortIsPrefixEnum.STEP}${encodeBase62(step._id)}` }
       : {}),
   };
 }
@@ -436,7 +560,7 @@ async function updateWorkflowAndValidate(
   );
   const expectedUpdateRequest = {
     ...updateRequest,
-    slug: `${slugifyName(updateRequest.name)}_${ShortIsPrefixEnum.WORKFLOW}${encodeBase62(
+    slug: `${slugify(updateRequest.name)}_${ShortIsPrefixEnum.WORKFLOW}${encodeBase62(
       workflowInternalId || workflowRequestId
     )}`,
     steps: updateRequest.steps.map(updateStepId),
@@ -701,7 +825,7 @@ function buildUpdateRequest(workflowCreated: WorkflowResponseDto): UpdateWorkflo
   return {
     ...updateRequest,
     name: TEST_WORKFLOW_UPDATED_NAME,
-    workflowId: `${slugifyName(TEST_WORKFLOW_UPDATED_NAME)}`,
+    workflowId: `${slugify(TEST_WORKFLOW_UPDATED_NAME)}`,
     steps,
   };
 }

@@ -6,11 +6,10 @@ import {
   ChannelTypeEnum,
   EnvironmentEntity,
 } from '@novu/dal';
-import { EmailProviderIdEnum, SmsProviderIdEnum } from '@novu/shared';
+import { EmailProviderIdEnum, SmsProviderIdEnum, slugify } from '@novu/shared';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../../src/app.module';
-import { slugifyName } from '@novu/application-generic';
 import shortid from 'shortid';
+import { AppModule } from '../../src/app.module';
 
 const organizationRepository = new OrganizationRepository();
 const environmentRepository = new EnvironmentRepository();
@@ -47,7 +46,7 @@ const createNovuIntegration = async (
     providerId,
     channel,
     name,
-    identifier: `${slugifyName(name)}-${shortid.generate()}`,
+    identifier: `${slugify(name)}-${shortid.generate()}`,
     active: countChannelIntegrations === 0,
   });
 

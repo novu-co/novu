@@ -8,9 +8,9 @@ import { createGetStepSchemaCommand } from './usecases/get-step-schema/get-step-
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
 import { GetStepSchemaUseCase } from './usecases/get-step-schema/get-step-schema.usecase';
 import { StepSchemaDto } from './dtos/step-schema.dto';
-import { ParseSlugIdPipe } from '../workflows-v2/pipes/parse-slug-Id.pipe';
+import { ParseSlugIdPipe } from '../workflows-v2/pipes/parse-slug-id.pipe';
 
-@Controller('/step-schemas')
+@Controller('/steps')
 @UserAuthentication()
 @UseInterceptors(ClassSerializerInterceptor)
 export class StepSchemasController {

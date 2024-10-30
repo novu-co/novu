@@ -1,8 +1,7 @@
 import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
 
 import { isStepCreateBody, isStepUpdateBody, UpsertStepBody, UpsertWorkflowBody, UpdateStepBody } from '@novu/shared';
-
-import { parseSlugId } from './parse-slug-Id.pipe';
+import { parseSlugId } from './parse-slug-id';
 
 /**
  * @deprecated This pipe is currently not needed and will be refactored

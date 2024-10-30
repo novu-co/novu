@@ -26,7 +26,7 @@
 </h1>
 
 <div align="center">
-  Novu is the easy button for developer teams that need to quickly integrate notifications into their application, and enable product teams to own notifications content and messaging.
+  Novu is the easy button for developer teams that need to quickly integrate notifications into their application, and enables product teams to own notifications content and messaging.
 </div>
 
 <p align="center">
@@ -35,7 +35,7 @@
   <br />
   or
   <br />
-  <a href="https://dashboard.novu.co?utm_campaign=github-readme" rel="dofollow"><strong>Create a free account »</strong></a>
+  <a href="https://dashboard.novu.co?utm_campaign=github-readme" rel="dofollow"><strong>create a free account »</strong></a>
   <br />
 
 <br/>
