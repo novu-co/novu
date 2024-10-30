@@ -7,7 +7,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import shortid from 'shortid';
 
 import {
   FeedRepository,
@@ -43,6 +42,7 @@ import {
   CreateMessageTemplateCommand,
 } from '../message-template';
 import { ApiException, PlatformException } from '../../utils/exceptions';
+import { shortId } from '../../utils/generate-id';
 
 @Injectable()
 export class CreateWorkflow {
@@ -169,18 +169,14 @@ export class CreateWorkflow {
       contentService.extractMessageVariables(command.steps);
     const subscriberVariables =
       contentService.extractSubscriberMessageVariables(command.steps);
-
-    const templateCheckIdentifier =
-      await this.notificationTemplateRepository.findByTriggerIdentifier(
-        command.environmentId,
-        triggerIdentifier,
-      );
+    const identifier = await this.generateUniqueIdentifier(
+      command,
+      triggerIdentifier,
+    );
 
     const trigger: INotificationTrigger = {
       type: TriggerTypeEnum.EVENT,
-      identifier: `${triggerIdentifier}${
-        !templateCheckIdentifier ? '' : `-${shortid.generate()}`
-      }`,
+      identifier,
       variables: variables.map((i) => {
         return {
           name: i.name,
@@ -206,6 +202,38 @@ export class CreateWorkflow {
     };
 
     return trigger;
+  }
+
+  private async generateUniqueIdentifier(
+    command: CreateWorkflowCommand,
+    triggerIdentifier: string,
+  ) {
+    const maxAttempts = 3;
+    let identifier = '';
+
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      const candidateIdentifier =
+        attempt === 0 ? triggerIdentifier : `${triggerIdentifier}-${shortId()}`;
+
+      const isIdentifierExist =
+        await this.notificationTemplateRepository.findByTriggerIdentifier(
+          command.environmentId,
+          candidateIdentifier,
+        );
+
+      if (!isIdentifierExist) {
+        identifier = candidateIdentifier;
+        break;
+      }
+    }
+
+    if (!identifier) {
+      throw new ApiException(
+        `Unable to generate a unique identifier. Please provide a different workflow name.${command.name}`,
+      );
+    }
+
+    return identifier;
   }
 
   private sendTemplateCreationEvent(

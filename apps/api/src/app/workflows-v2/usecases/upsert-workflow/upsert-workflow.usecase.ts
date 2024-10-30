@@ -26,9 +26,12 @@ import {
 import {
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
+  IdentifierOrInternalId,
   StepCreateDto,
   StepDto,
   StepUpdateDto,
+  UpdateWorkflowDto,
+  UserSessionData,
   WorkflowCreationSourceEnum,
   WorkflowOriginEnum,
   WorkflowPreferences,
@@ -61,7 +64,6 @@ function buildUpsertControlValuesCommand(
 @Injectable()
 export class UpsertWorkflowUseCase {
   constructor(
-    private notificationTemplateRepository: NotificationTemplateRepository,
     private createWorkflowGenericUsecase: CreateWorkflowGeneric,
     private updateWorkflowUsecase: UpdateWorkflow,
     private notificationGroupRepository: NotificationGroupRepository,
@@ -190,89 +192,17 @@ export class UpsertWorkflowUseCase {
     existingWorkflow: NotificationTemplateEntity | null,
     command: UpsertWorkflowCommand
   ): Promise<NotificationTemplateEntity> {
-    await this.validateWorkflowUniqueness(existingWorkflow, command);
-
-    if (existingWorkflow) {
+    if (existingWorkflow && isWorkflowUpdateDto(command.workflowDto, command.identifierOrInternalId)) {
       return await this.updateWorkflowUsecase.execute(
-        UpdateWorkflowCommand.create(this.convertCreateToUpdateCommand(command, existingWorkflow))
+        UpdateWorkflowCommand.create(
+          this.convertCreateToUpdateCommand(command.workflowDto, command.user, existingWorkflow)
+        )
       );
     }
 
     return await this.createWorkflowGenericUsecase.execute(
       CreateWorkflowCommand.create(await this.buildCreateWorkflowGenericCommand(command))
     );
-  }
-
-  private async validateWorkflowUniqueness(
-    existingWorkflow: NotificationTemplateEntity | null,
-    command: UpsertWorkflowCommand
-  ): Promise<void> {
-    const { name } = command.workflowDto;
-    const { environmentId, organizationId } = command.user;
-
-    await this.validateWorkflowIdUniqueness(existingWorkflow, command, name);
-
-    await this.validateWorkflowNameUniqueness(name, environmentId, organizationId, existingWorkflow, command);
-  }
-
-  /**
-   * Creation path:
-   * If existingWorkflow is null, it indicates a new workflow creation.
-   * Therefore, we only need to check if any other workflow already exists with the same name.
-   *
-   * Update path:
-   * If existingWorkflow is not null, we can use a single query with { _id: { $ne: existingWorkflow._id } }
-   * to check for workflows with the same name that aren’t the current one.
-   */
-  private async validateWorkflowNameUniqueness(
-    name: string,
-    environmentId: string,
-    organizationId: string,
-    existingWorkflow: NotificationTemplateEntity | null,
-    command: UpsertWorkflowCommand
-  ) {
-    const existingWorkflowWithSameName = await this.notificationTemplateRepository.findOne({
-      name,
-      _environmentId: environmentId,
-      _organizationId: organizationId,
-      ...(existingWorkflow ? { _id: { $ne: existingWorkflow._id } } : {}),
-    });
-
-    if (existingWorkflowWithSameName) {
-      throw new BadRequestException({
-        message: `A workflow with the same workflow name already exists.`,
-        workflowName: name,
-      });
-    }
-  }
-
-  /**
-   * On Creation, validates the uniqueness of the workflow identifier
-   * @throws BadRequestException if a workflow with the same identifier already exists
-   */
-  private async validateWorkflowIdUniqueness(
-    existingWorkflow: NotificationTemplateEntity | null,
-    command: UpsertWorkflowCommand,
-    name: string
-  ): Promise<void> {
-    const { workflowDto, user } = command;
-    const { workflowId } = workflowDto;
-
-    const create = !existingWorkflow;
-
-    if (create && workflowId) {
-      const existingWorkflowByWorkflowId = await this.notificationTemplateRepository.findByTriggerIdentifier(
-        user.environmentId,
-        workflowId
-      );
-
-      if (existingWorkflowByWorkflowId) {
-        throw new BadRequestException({
-          message: `A workflow with the same workflow id already exists.`,
-          workflowId: command.workflowDto.workflowId,
-        });
-      }
-    }
   }
 
   private async buildCreateWorkflowGenericCommand(command: UpsertWorkflowCommand): Promise<CreateWorkflowCommand> {
@@ -301,30 +231,27 @@ export class UpsertWorkflowUseCase {
       description: workflowDto.description || '',
       tags: workflowDto.tags || [],
       critical: false,
-      triggerIdentifier: slugifyName(workflowDto.name),
+      triggerIdentifier: slugify(workflowDto.name),
     };
   }
 
   private convertCreateToUpdateCommand(
-    command: UpsertWorkflowCommand,
+    workflowDto: UpdateWorkflowDto,
+    user: UserSessionData,
     existingWorkflow: NotificationTemplateEntity
   ): UpdateWorkflowCommand {
-    const { workflowDto } = command;
-    const { user } = command;
-
     return {
       id: existingWorkflow._id,
       environmentId: existingWorkflow._environmentId,
       organizationId: user.organizationId,
       userId: user._id,
-      name: command.workflowDto.name,
+      name: workflowDto.name,
       steps: this.mapSteps(workflowDto.steps, existingWorkflow),
       rawData: workflowDto,
       type: WorkflowTypeEnum.BRIDGE,
       description: workflowDto.description,
       tags: workflowDto.tags,
       active: workflowDto.active ?? true,
-      workflowId: workflowDto.workflowId,
     };
   }
 
@@ -418,4 +345,11 @@ export class UpsertWorkflowUseCase {
       )
     )?._id;
   }
+}
+
+function isWorkflowUpdateDto(
+  workflowDto: CreateWorkflowDto | UpdateWorkflowDto,
+  id?: IdentifierOrInternalId
+): workflowDto is UpdateWorkflowDto {
+  return !!id;
 }
