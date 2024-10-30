@@ -1,4 +1,4 @@
-import { WorkflowListResponseDto, WorkflowResponseDto } from '@novu/shared';
+import { IEnvironment, WorkflowListResponseDto, WorkflowResponseDto } from '@novu/shared';
 import { RiAlertFill, RiDeleteBin2Line, RiGitPullRequestFill, RiPauseCircleLine, RiPulseFill } from 'react-icons/ri';
 import { Button } from '@/components/primitives/button';
 import {
@@ -120,30 +120,12 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
                 <RiPlayCircleLine />
                 Trigger workflow
               </DropdownMenuItem>
-
-              {isPromotable ? (
-                <>
-                  <DropdownMenuItem onClick={handlePromote}>
-                    <RiGitPullRequestFill />
-                    Promote to Production
-                  </DropdownMenuItem>
-                </>
-              ) : (
-                <TooltipProvider delayDuration={100}>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <DropdownMenuItem disabled>
-                        <RiGitPullRequestFill />
-                        Promote to Production
-                      </DropdownMenuItem>
-                    </TooltipTrigger>
-                    <TooltipPortal>
-                      <TooltipContent>{tooltipContent}</TooltipContent>
-                    </TooltipPortal>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-
+              <PromoteWorkflowMenuItem
+                currentEnvironment={currentEnvironment}
+                isPromotable={isPromotable}
+                tooltipContent={tooltipContent}
+                onPromote={handlePromote}
+              />
               <DropdownMenuItem>
                 <RiPulseFill />
                 View activity
@@ -167,6 +149,47 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
   );
 };
 
+const PromoteWorkflowMenuItem = ({
+  currentEnvironment,
+  isPromotable,
+  tooltipContent,
+  onPromote,
+}: {
+  currentEnvironment: IEnvironment | undefined;
+  isPromotable: boolean;
+  tooltipContent: string | undefined;
+  onPromote: () => void;
+}) => {
+  if (!currentEnvironment || currentEnvironment.name === 'Production') {
+    return null;
+  }
+
+  if (isPromotable) {
+    return (
+      <DropdownMenuItem onClick={onPromote}>
+        <RiGitPullRequestFill />
+        Promote to Production
+      </DropdownMenuItem>
+    );
+  }
+
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        <TooltipTrigger>
+          <DropdownMenuItem disabled>
+            <RiGitPullRequestFill />
+            Promote to Production
+          </DropdownMenuItem>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>{tooltipContent}</TooltipContent>
+        </TooltipPortal>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
 const PromoteWorkflowConfirmModal = ({
   open,
   setOpen,
@@ -174,7 +197,7 @@ const PromoteWorkflowConfirmModal = ({
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
-  promoteWorkflow: UseMutateAsyncFunction<{ data: WorkflowResponseDto }, Error, void, unknown>;
+  promoteWorkflow: UseMutateAsyncFunction<WorkflowResponseDto, unknown, void, void>;
 }) => {
   async function onConfirm() {
     setOpen(false);

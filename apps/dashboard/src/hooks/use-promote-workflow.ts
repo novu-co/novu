@@ -10,13 +10,16 @@ import { toast } from 'sonner';
 const PRODUCTION_ENVIRONMENT = 'Production' as const;
 
 export function usePromoteWorkflow(workflow: WorkflowListResponseDto) {
-  const { environments, switchEnvironment } = useEnvironment();
+  const { environments, switchEnvironment, currentEnvironment } = useEnvironment();
   const [isLoading, setIsLoading] = useState(false);
   let loadingToast: string | number | undefined = undefined;
 
   const isPromotable = useMemo(
-    () => workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && workflow.status !== WorkflowStatusEnum.ERROR,
-    [workflow.origin, workflow.status]
+    () =>
+      workflow.origin === WorkflowOriginEnum.NOVU_CLOUD &&
+      workflow.status !== WorkflowStatusEnum.ERROR &&
+      currentEnvironment?.name !== PRODUCTION_ENVIRONMENT,
+    [workflow.origin, workflow.status, currentEnvironment?.name]
   );
 
   const getProductionEnvironmentId = useCallback(() => {

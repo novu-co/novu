@@ -94,7 +94,7 @@ const PromoteToast = ({
   action: { label: string; onClick: () => void };
 }) => {
   return (
-    <div className="flex gap-3 rounded-lg border p-3.5 shadow-md">
+    <Toast variant="lg" className="gap-3">
       <ToastIcon variant="default" />
       <div className="flex flex-[1_0_0] flex-col items-start gap-2.5">
         <div className="flex flex-col items-start justify-center gap-1 self-stretch">
@@ -108,10 +108,8 @@ const PromoteToast = ({
           </Button>
         </div>
       </div>
-      <Button variant="link" size="icon" className="size-4" type="button" onClick={() => toast.dismiss(t)}>
-        <RiCloseLine size={20} opacity={0.4} />
-      </Button>
-    </div>
+      <ToastClose onClick={() => toast.dismiss(t)} />
+    </Toast>
   );
 };
 
