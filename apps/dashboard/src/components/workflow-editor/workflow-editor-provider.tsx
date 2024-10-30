@@ -40,7 +40,7 @@ const createStep = (type: StepTypeEnum): Step => ({
 export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) => {
   const changesSavedToastIdRef = useRef<string | number>();
   const { currentEnvironment } = useEnvironment();
-  const { workflowId } = useParams<{ workflowId?: string }>();
+  const { workflowSlug } = useParams<{ workflowSlug?: string }>();
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof workflowSchema>>({ mode: 'onSubmit', resolver: zodResolver(workflowSchema) });
   const { reset, setError } = form;
@@ -50,7 +50,7 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
   });
 
   const { workflow, error } = useFetchWorkflow({
-    workflowId,
+    workflowSlug,
   });
 
   useLayoutEffect(() => {

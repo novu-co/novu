@@ -4,7 +4,6 @@ import {
   DigestTypeEnum,
   ExecutionDetailsSourceEnum,
   ExecutionDetailsStatusEnum,
-  FeatureFlagsKeysEnum,
   IDigestRegularMetadata,
   IPreferenceChannels,
   PreferencesTypeEnum,
@@ -21,9 +20,8 @@ import {
   DetailEnum,
   ExecutionLogRoute,
   ExecutionLogRouteCommand,
-  GetFeatureFlag,
-  GetFeatureFlagCommand,
   GetPreferences,
+  GetPreferencesCommand,
   GetSubscriberGlobalPreference,
   GetSubscriberGlobalPreferenceCommand,
   GetSubscriberTemplatePreference,
@@ -80,7 +78,7 @@ export class SendMessage {
     private analyticsService: AnalyticsService,
     private normalizeVariablesUsecase: NormalizeVariables,
     private executeBridgeJob: ExecuteBridgeJob,
-    private getFeatureFlag: GetFeatureFlag
+    private getPreferencesUseCase: GetPreferences
   ) {}
 
   @InstrumentUsecase()
@@ -128,7 +126,12 @@ export class SendMessage {
           isRetry: false,
           raw: JSON.stringify({
             ...(stepCondition
-              ? { filter: { conditions: stepCondition?.conditions, passed: stepCondition?.passed } }
+              ? {
+                  filter: {
+                    conditions: stepCondition?.conditions,
+                    passed: stepCondition?.passed,
+                  },
+                }
               : {}),
             ...(channelPreference ? { preferences: { passed: channelPreference } } : {}),
             ...(isBridgeSkipped ? { skip: isBridgeSkipped } : {}),
@@ -203,9 +206,15 @@ export class SendMessage {
     bridgeSkip: boolean | undefined,
     command: SendMessageCommand,
     variables: IFilterVariables
-  ): Promise<{ stepCondition: IConditionsFilterResponse | null; channelPreference: boolean | null }> {
+  ): Promise<{
+    stepCondition: IConditionsFilterResponse | null;
+    channelPreference: boolean | null;
+  }> {
     if (bridgeSkip === true) {
-      return { stepCondition: { passed: true, conditions: [], variables: {} }, channelPreference: true };
+      return {
+        stepCondition: { passed: true, conditions: [], variables: {} },
+        channelPreference: true,
+      };
     }
 
     const [stepCondition, channelPreference] = await Promise.all([
@@ -244,6 +253,7 @@ export class SendMessage {
     });
 
     const { digest } = command.job;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let timedInfo: any = {};
 
     if (digest && digest.type === DigestTypeEnum.TIMED && digest.timed) {
@@ -287,18 +297,14 @@ export class SendMessage {
   private async evaluateChannelPreference(command: SendMessageCommand): Promise<boolean> {
     const { job } = command;
 
+    if (this.isActionStep(job)) {
+      return true;
+    }
+
     const workflow = await this.getWorkflow({
       _id: job._templateId,
       environmentId: job._environmentId,
     });
-
-    /*
-     * The `critical` flag check is needed here for backward-compatibility of V1 Workflow Preferences only.
-     * V2 Workflow Preferences are stored on the Preference entity instead.
-     */
-    if (workflow?.critical || this.isActionStep(job)) {
-      return true;
-    }
 
     const subscriber = await this.getSubscriberBySubscriberId({
       _environmentId: job._environmentId,
@@ -306,23 +312,34 @@ export class SendMessage {
     });
     if (!subscriber) throw new PlatformException(`Subscriber not found with id ${job._subscriberId}`);
 
-    const isWorkflowPreferencesEnabled = await this.getFeatureFlag.execute(
-      GetFeatureFlagCommand.create({
-        userId: 'system',
-        environmentId: command.environmentId,
-        organizationId: command.organizationId,
-        key: FeatureFlagsKeysEnum.IS_WORKFLOW_PREFERENCES_ENABLED,
+    /*
+     * START: V1 PREFERENCES
+     *
+     * The `critical` flag and Subscriber Preferences check is needed here for backward-compatibility
+     * of V1 Workflow Preferences only.
+     *
+     * V2 Preferences are stored on the Preference entity instead, and resolved in `GetPreferences`.
+     *
+     * TODO: remove the following code block after we remove v1 preferences
+     */
+    const workflowPreferencesV2 = await this.getPreferencesUseCase.safeExecute(
+      GetPreferencesCommand.create({
+        environmentId: job._environmentId,
+        organizationId: job._organizationId,
+        templateId: job._templateId,
       })
     );
+    const isWorkflowWithV2Preferences =
+      workflowPreferencesV2?.preferences !== undefined || command.statelessPreferences !== undefined;
+    if (!isWorkflowWithV2Preferences) {
+      if (workflow?.critical) {
+        return true;
+      }
 
-    /*
-     * TODO: Remove this after we deprecate V1 preferences, global subscriber
-     * preferences are handled in `GetPreferences` for V2 preferences.
-     *
-     * This is actually a bug because it can allow for Global Preferences to disable
-     * delivery of Workflows with read-only preferences.
-     */
-    if (!isWorkflowPreferencesEnabled) {
+      /*
+       * TODO: Remove this check after we remove V1 preferences, global subscriber
+       * preferences are handled in `GetPreferences` for V2 preferences.
+       */
       const { preference: globalPreference } = await this.getSubscriberGlobalPreferenceUsecase.execute(
         GetSubscriberGlobalPreferenceCommand.create({
           organizationId: job._organizationId,
@@ -349,6 +366,7 @@ export class SendMessage {
         return false;
       }
     }
+    /** END: V1 PREFERENCES */
 
     let subscriberPreference: { enabled: boolean; channels: IPreferenceChannels };
     let subscriberPreferenceType: PreferencesTypeEnum;

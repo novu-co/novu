@@ -5,8 +5,8 @@ export const ROUTES = {
   ROOT: '/',
   ENV: '/env',
   WORKFLOWS: '/env/:environmentId/workflows',
-  EDIT_WORKFLOW: '/env/:environmentId/workflows/:workflowId',
-  TEST_WORKFLOW: '/env/:environmentId/workflows/:workflowId/test',
+  EDIT_WORKFLOW: '/env/:environmentId/workflows/:workflowSlug',
+  TEST_WORKFLOW: '/env/:environmentId/workflows/:workflowSlug/test',
   CONFIGURE_STEP: 'steps/:stepId',
   EDIT_STEP: 'steps/:stepId/edit',
 };

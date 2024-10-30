@@ -12,8 +12,8 @@ import Chat from './chat';
 
 export function ConfigureStep() {
   const { currentEnvironment } = useEnvironment();
-  const { workflowId = '' } = useParams<{
-    workflowId: string;
+  const { workflowSlug = '' } = useParams<{
+    workflowSlug: string;
   }>();
 
   return (
@@ -28,7 +28,7 @@ export function ConfigureStep() {
         <Link
           to={buildRoute(ROUTES.EDIT_WORKFLOW, {
             environmentId: currentEnvironment?._id ?? '',
-            workflowId,
+            workflowSlug,
           })}
           className="flex items-center"
         >
@@ -40,7 +40,7 @@ export function ConfigureStep() {
         <Link
           to={buildRoute(ROUTES.EDIT_WORKFLOW, {
             environmentId: currentEnvironment?._id ?? '',
-            workflowId,
+            workflowSlug,
           })}
           className="ml-auto flex items-center"
         >
