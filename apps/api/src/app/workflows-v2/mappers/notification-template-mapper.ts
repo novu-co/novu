@@ -67,6 +67,7 @@ function toMinifiedWorkflowDto(template: NotificationTemplateEntity): WorkflowLi
 
   return {
     _id: template._id,
+    workflowId: template.triggers[0].identifier,
     slug: buildSlug(workflowName, ShortIsPrefixEnum.WORKFLOW, template._id),
     name: workflowName,
     origin: computeOrigin(template),

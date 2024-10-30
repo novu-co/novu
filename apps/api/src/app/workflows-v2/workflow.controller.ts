@@ -110,9 +110,18 @@ export class WorkflowController {
   @UseGuards(UserAuthGuard)
   async getWorkflow(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
-    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId
+    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
+    @Query('environmentId') environmentId?: string
   ): Promise<WorkflowResponseDto> {
-    return this.getWorkflowUseCase.execute(GetWorkflowCommand.create({ identifierOrInternalId: workflowId, user }));
+    return this.getWorkflowUseCase.execute(
+      GetWorkflowCommand.create({
+        identifierOrInternalId: workflowId,
+        user: {
+          ...user,
+          environmentId: environmentId || user.environmentId,
+        },
+      })
+    );
   }
 
   @Delete(':workflowId')

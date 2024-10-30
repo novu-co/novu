@@ -18,7 +18,6 @@ import { WorkflowEditor } from '@/components/workflow-editor/workflow-editor';
 import { WorkflowEditorProvider } from '@/components/workflow-editor/workflow-editor-provider';
 import { useEnvironment } from '@/context/environment/hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
-import { Toaster } from '@/components/primitives/sonner';
 import { AnimatedOutlet } from '@/components/animated-outlet';
 
 const asideClassName =
@@ -33,7 +32,6 @@ export const EditWorkflowPage = () => {
           <aside className={asideClassName}>
             <AnimatedOutlet />
           </aside>
-          <Toaster />
         </div>
       </EditWorkflowLayout>
     </WorkflowEditorProvider>

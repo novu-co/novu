@@ -1,4 +1,4 @@
-import type { CreateWorkflowDto, UpdateWorkflowDto, WorkflowResponseDto } from '@novu/shared';
+import type { CreateWorkflowDto, PromoteWorkflowDto, UpdateWorkflowDto, WorkflowResponseDto } from '@novu/shared';
 import { getV2, postV2, putV2 } from './api.client';
 
 export const fetchWorkflow = async ({ workflowId }: { workflowId?: string }): Promise<WorkflowResponseDto> => {
@@ -9,6 +9,10 @@ export const fetchWorkflow = async ({ workflowId }: { workflowId?: string }): Pr
 
 export async function createWorkflow(payload: CreateWorkflowDto) {
   return postV2<{ data: WorkflowResponseDto }>(`/workflows`, payload);
+}
+
+export async function promoteWorkflow(workflowId: string, payload: PromoteWorkflowDto) {
+  return putV2<{ data: WorkflowResponseDto }>(`/workflows/${workflowId}/promote`, payload);
 }
 
 export const updateWorkflow = async ({
