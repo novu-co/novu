@@ -7,7 +7,11 @@ import { WorkflowsPage, SignInPage, SignUpPage, OrganizationListPage } from '@/p
 import './index.css';
 import { ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
+import { TestWorkflowPage } from './pages/test-workflow';
+import { ConfigureWorkflow } from './components/workflow-editor/configure-workflow';
+import { ConfigureStep } from './components/workflow-editor/steps/configure-step';
 import { initializeSentry } from './utils/sentry';
+import { EditStepSidebar } from './components/workflow-editor/steps/edit-step-sidebar';
 
 initializeSentry();
 
@@ -47,6 +51,24 @@ const router = createBrowserRouter([
               {
                 path: ROUTES.EDIT_WORKFLOW,
                 element: <EditWorkflowPage />,
+                children: [
+                  {
+                    element: <ConfigureWorkflow />,
+                    index: true,
+                  },
+                  {
+                    element: <ConfigureStep />,
+                    path: ROUTES.CONFIGURE_STEP,
+                  },
+                  {
+                    element: <EditStepSidebar />,
+                    path: ROUTES.EDIT_STEP,
+                  },
+                ],
+              },
+              {
+                path: ROUTES.TEST_WORKFLOW,
+                element: <TestWorkflowPage />,
               },
               {
                 path: '*',

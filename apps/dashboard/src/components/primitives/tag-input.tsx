@@ -93,41 +93,45 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
             )}
           </div>
         </div>
-        <PopoverContent
-          className="p-1"
-          portal={false}
-          onOpenAutoFocus={(e) => {
-            e.preventDefault();
-          }}
-        >
-          <CommandList>
-            <CommandGroup>
-              {inputValue !== '' && (
-                <CommandItem
-                  // We can't have duplicate keys in our list so adding a prefix
-                  // here to differentiate this from a possible suggestion value
-                  value={`input-${inputValue}`}
-                  onSelect={() => {
-                    addTag(inputValue);
-                  }}
-                >
-                  {inputValue}
-                </CommandItem>
-              )}
-              {suggestions.map((tag) => (
-                <CommandItem
-                  key={tag}
-                  value={tag}
-                  onSelect={() => {
-                    addTag(tag);
-                  }}
-                >
-                  {tag}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </PopoverContent>
+        <CommandList>
+          {(suggestions.length > 0 || inputValue !== '') && (
+            <PopoverContent
+              className="p-1"
+              portal={false}
+              onOpenAutoFocus={(e) => {
+                e.preventDefault();
+              }}
+              onFocusOutside={(e) => e.preventDefault()}
+              onInteractOutside={(e) => e.preventDefault()}
+            >
+              <CommandGroup>
+                {inputValue !== '' && (
+                  <CommandItem
+                    // We can't have duplicate keys in our list so adding a prefix
+                    // here to differentiate this from a possible suggestion value
+                    value={`input-${inputValue}`}
+                    onSelect={() => {
+                      addTag(inputValue);
+                    }}
+                  >
+                    {inputValue}
+                  </CommandItem>
+                )}
+                {suggestions.map((tag) => (
+                  <CommandItem
+                    key={tag}
+                    value={tag}
+                    onSelect={() => {
+                      addTag(tag);
+                    }}
+                  >
+                    {tag}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </PopoverContent>
+          )}
+        </CommandList>
       </Command>
     </Popover>
   );

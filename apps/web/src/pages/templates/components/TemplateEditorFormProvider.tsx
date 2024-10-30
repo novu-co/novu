@@ -1,5 +1,4 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import slugify from 'slugify';
 import { FieldErrors, FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useParams } from 'react-router-dom';
@@ -16,6 +15,7 @@ import {
   isBridgeWorkflow,
   StepTypeEnum,
   TextAlignEnum,
+  slugify,
 } from '@novu/shared';
 import { captureException } from '@sentry/react';
 
@@ -192,10 +192,7 @@ const TemplateEditorFormProvider = ({ children }) => {
     if (!template?.triggers[0].identifier.includes('untitled')) {
       return;
     }
-    const newIdentifier = slugify(name, {
-      lower: true,
-      strict: true,
-    });
+    const newIdentifier = slugify(name);
 
     if (newIdentifier === identifier) {
       return;

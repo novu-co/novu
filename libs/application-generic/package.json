@@ -92,8 +92,7 @@
     "rrule": "^2.7.2",
     "rxjs": "7.8.1",
     "sanitize-html": "^2.4.0",
-    "shortid": "^2.2.16",
-    "slugify": "^1.4.6"
+    "shortid": "^2.2.16"
   },
   "optionalDependencies": {
     "@novu/ee-shared-services": "workspace:*",

@@ -33,18 +33,9 @@ export class PreviewStep {
 
   private buildBridgeEventPayload(command: PreviewStepCommand): Event {
     return {
-      inputs: {}, // @deprecated - use controls instead
       controls: command.controls || {},
-
-      data: {}, // @deprecated - use payload instead
       payload: command.payload || {},
-      state: [
-        {
-          stepId: 'trigger',
-          outputs: {},
-          state: { status: JobStatusEnum.COMPLETED },
-        },
-      ],
+      state: [],
       subscriber: command.subscriber || {},
       stepId: command.stepId,
       workflowId: command.workflowId,

@@ -55,7 +55,7 @@ export const WorkflowsStepEditorPageV2 = () => {
   useEffect(() => {
     if (!currentWorkflow) return;
     if (!isInitialLoading) {
-      setControls(controlVariables?.controls || controlVariables?.inputs);
+      setControls(controlVariables?.controls);
     }
   }, [currentWorkflow, isInitialLoading, controlVariables, setControls]);
 
@@ -94,7 +94,7 @@ export const WorkflowsStepEditorPageV2 = () => {
         loadingPreview={loadingPreview}
         isSavingControls={isSavingControls}
         error={error}
-        defaultControls={controlVariables?.controls || controlVariables?.inputs || {}}
+        defaultControls={controlVariables?.controls || {}}
         onControlsChange={onControlsChange}
         onControlsSave={onControlsSave}
       />

@@ -3,13 +3,9 @@ import { WithPassthrough } from './provider.types';
 import type { Subscriber } from './subscriber.types';
 
 export type Event = {
-  /** @deprecated */
-  data: Record<string, unknown>;
   payload: Record<string, unknown>;
   workflowId: string;
   stepId: string;
-  /** @deprecated */
-  inputs: Record<string, unknown>;
   controls: Record<string, unknown>;
   state: State[];
   action: Exclude<PostActionEnum, PostActionEnum.TRIGGER>;

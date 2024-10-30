@@ -1,16 +1,19 @@
 import { Handle, Node as FlowNode, NodeProps, Position } from '@xyflow/react';
 import { RiPlayCircleLine } from 'react-icons/ri';
+import { Link } from 'react-router-dom';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { AddStepMenu } from './add-step-menu';
 import { Node, NodeBody, NodeError, NodeHeader, NodeIcon, NodeName } from './base-node';
 import { StepTypeEnum } from '@/utils/enums';
 import { useWorkflowEditorContext } from './hooks';
+import { buildRoute, ROUTES } from '@/utils/routes';
 
 export type NodeData = {
   name?: string;
   content?: string;
   addStepIndex?: number;
+  stepId?: string;
   error?: string;
 };
 
@@ -42,18 +45,20 @@ export const EmailNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.EMAIL];
 
   return (
-    <Node>
-      <NodeHeader type={StepTypeEnum.EMAIL}>
-        <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.EMAIL]}>
-          <Icon />
-        </NodeIcon>
-        <NodeName>{data.name || 'Email Step'}</NodeName>
-      </NodeHeader>
-      <NodeBody>Sends Email to your subscribers</NodeBody>
-      {data.error && <NodeError>{data.error}</NodeError>}
-      <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
-      <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-    </Node>
+    <Link to={`step/${data.stepId}`}>
+      <Node>
+        <NodeHeader type={StepTypeEnum.EMAIL}>
+          <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.EMAIL]}>
+            <Icon />
+          </NodeIcon>
+          <NodeName>{data.name || 'Email Step'}</NodeName>
+        </NodeHeader>
+        <NodeBody>Sends Email to your subscribers</NodeBody>
+        {data.error && <NodeError>{data.error}</NodeError>}
+        <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
+        <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
+      </Node>
+    </Link>
   );
 };
 
@@ -61,18 +66,20 @@ export const SmsNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.SMS];
 
   return (
-    <Node>
-      <NodeHeader type={StepTypeEnum.SMS}>
-        <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.SMS]}>
-          <Icon />
-        </NodeIcon>
-        <NodeName>{data.name || 'SMS Step'}</NodeName>
-      </NodeHeader>
-      <NodeBody>Sends SMS notification to your subscribers</NodeBody>
-      {data.error && <NodeError>{data.error}</NodeError>}
-      <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
-      <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-    </Node>
+    <Link to={`step/${data.stepId}`}>
+      <Node>
+        <NodeHeader type={StepTypeEnum.SMS}>
+          <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.SMS]}>
+            <Icon />
+          </NodeIcon>
+          <NodeName>{data.name || 'SMS Step'}</NodeName>
+        </NodeHeader>
+        <NodeBody>Sends SMS notification to your subscribers</NodeBody>
+        {data.error && <NodeError>{data.error}</NodeError>}
+        <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
+        <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
+      </Node>
+    </Link>
   );
 };
 
@@ -80,18 +87,20 @@ export const InAppNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.IN_APP];
 
   return (
-    <Node>
-      <NodeHeader type={StepTypeEnum.IN_APP}>
-        <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.IN_APP]}>
-          <Icon />
-        </NodeIcon>
-        <NodeName>{data.name || 'In-App Step'}</NodeName>
-      </NodeHeader>
-      <NodeBody>Sends In-app notification to your subscribers</NodeBody>
-      {data.error && <NodeError>{data.error}</NodeError>}
-      <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
-      <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-    </Node>
+    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepId: data.stepId ?? '' })}>
+      <Node>
+        <NodeHeader type={StepTypeEnum.IN_APP}>
+          <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.IN_APP]}>
+            <Icon />
+          </NodeIcon>
+          <NodeName>{data.name || 'In-App Step'}</NodeName>
+        </NodeHeader>
+        <NodeBody>Sends In-app notification to your subscribers</NodeBody>
+        {data.error && <NodeError>{data.error}</NodeError>}
+        <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
+        <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
+      </Node>
+    </Link>
   );
 };
 
@@ -99,18 +108,20 @@ export const PushNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.PUSH];
 
   return (
-    <Node>
-      <NodeHeader type={StepTypeEnum.PUSH}>
-        <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.PUSH]}>
-          <Icon />
-        </NodeIcon>
-        <NodeName>{data.name || 'Push Step'}</NodeName>
-      </NodeHeader>
-      <NodeBody>Sends push notification to your subscribers</NodeBody>
-      {data.error && <NodeError>{data.error}</NodeError>}
-      <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
-      <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-    </Node>
+    <Link to={`step/${data.stepId}`}>
+      <Node>
+        <NodeHeader type={StepTypeEnum.PUSH}>
+          <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.PUSH]}>
+            <Icon />
+          </NodeIcon>
+          <NodeName>{data.name || 'Push Step'}</NodeName>
+        </NodeHeader>
+        <NodeBody>Sends push notification to your subscribers</NodeBody>
+        {data.error && <NodeError>{data.error}</NodeError>}
+        <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
+        <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
+      </Node>
+    </Link>
   );
 };
 
@@ -118,18 +129,20 @@ export const ChatNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.CHAT];
 
   return (
-    <Node>
-      <NodeHeader type={StepTypeEnum.CHAT}>
-        <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.CHAT]}>
-          <Icon />
-        </NodeIcon>
-        <NodeName>{data.name || 'Chat Step'}</NodeName>
-      </NodeHeader>
-      <NodeBody>Sends chat notification to your subscribers</NodeBody>
-      {data.error && <NodeError>{data.error}</NodeError>}
-      <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
-      <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-    </Node>
+    <Link to={`step/${data.stepId}`}>
+      <Node>
+        <NodeHeader type={StepTypeEnum.CHAT}>
+          <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.CHAT]}>
+            <Icon />
+          </NodeIcon>
+          <NodeName>{data.name || 'Chat Step'}</NodeName>
+        </NodeHeader>
+        <NodeBody>Sends chat notification to your subscribers</NodeBody>
+        {data.error && <NodeError>{data.error}</NodeError>}
+        <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
+        <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
+      </Node>
+    </Link>
   );
 };
 
