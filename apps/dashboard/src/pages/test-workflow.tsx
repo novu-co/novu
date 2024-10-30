@@ -6,8 +6,8 @@ import { TestWorkflowTabs } from '@/components/workflow-editor/test-workflow/tes
 import { useFetchWorkflowTestData } from '@/hooks/use-fetch-workflow-test-data';
 
 export const TestWorkflowPage = () => {
-  const { workflowId = '' } = useParams<{ environmentId: string; workflowId: string }>();
-  const { testData } = useFetchWorkflowTestData({ workflowId });
+  const { workflowSlug = '' } = useParams<{ environmentId: string; workflowSlug: string }>();
+  const { testData } = useFetchWorkflowTestData({ workflowSlug });
 
   return (
     <EditWorkflowLayout headerStartItems={<EditorBreadcrumbs />}>

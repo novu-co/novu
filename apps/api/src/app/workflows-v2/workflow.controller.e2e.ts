@@ -38,8 +38,6 @@ describe('Workflow Controller E2E API Testing', () => {
   let workflowsClient: ReturnType<typeof createWorkflowClient>;
 
   beforeEach(async () => {
-    // @ts-ignore
-    process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
     session = new UserSession();
     await session.initialize();
     workflowsClient = createWorkflowClient(session.serverUrl, getHeaders());
@@ -52,8 +50,6 @@ describe('Workflow Controller E2E API Testing', () => {
   }
 
   it('Smoke Testing', async () => {
-    // @ts-ignore
-    process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
     const workflowCreated = await createWorkflowAndValidate();
     await getWorkflowAndValidate(workflowCreated);
     const updateRequest = buildUpdateRequest(workflowCreated);
