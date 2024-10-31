@@ -15,12 +15,12 @@ import { buildRoute, ROUTES } from '@/utils/routes';
 import { useFetchWorkflow } from '@/hooks';
 
 export const EditorBreadcrumbs = () => {
-  const { workflowId = '' } = useParams<{ workflowId: string }>();
+  const { workflowSlug = '' } = useParams<{ workflowSlug: string }>();
   const { currentEnvironment } = useEnvironment();
   const navigate = useNavigate();
   const workflowsRoute = buildRoute(ROUTES.WORKFLOWS, { environmentId: currentEnvironment?._id ?? '' });
   const { workflow } = useFetchWorkflow({
-    workflowId,
+    workflowSlug,
   });
 
   const breadcrumbs = [

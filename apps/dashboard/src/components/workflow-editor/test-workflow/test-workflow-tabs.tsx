@@ -19,9 +19,9 @@ import { buildDynamicFormSchema, makeObjectFromSchema, TestWorkflowFormType } fr
 import { TestWorkflowForm } from './test-workflow-form';
 
 export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataResponseDto }) => {
-  const { environmentId = '', workflowId = '' } = useParams<{ environmentId: string; workflowId: string }>();
+  const { environmentId = '', workflowSlug = '' } = useParams<{ environmentId: string; workflowSlug: string }>();
   const { workflow } = useFetchWorkflow({
-    workflowId,
+    workflowSlug,
   });
   const to = useMemo(
     () => (typeof testData.to === 'object' ? makeObjectFromSchema({ properties: testData.to.properties ?? {} }) : {}),
@@ -54,7 +54,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
             <ToastIcon variant="success" />
             <div className="flex flex-col gap-2">
               <span className="font-medium">Test workflow triggered successfully</span>
-              <span className="text-foreground-600">{`Test workflow ${workflowId} was triggered successfully`}</span>
+              <span className="text-foreground-600">{`Test workflow ${workflowSlug} was triggered successfully`}</span>
               <Link
                 to={`${LEGACY_ROUTES.ACTIVITY_FEED}?transactionId=${transactionId}`}
                 reloadDocument
@@ -80,22 +80,22 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="roun flex h-full flex-1 flex-nowrap">
           <Tabs defaultValue="workflow" className="-mt-[1px] flex h-full flex-1 flex-col" value="trigger">
-            <TabsList>
-              <TabsTrigger value="workflow" asChild>
+            <TabsList variant="regular">
+              <TabsTrigger value="workflow" asChild variant="regular">
                 <Link
                   to={buildRoute(ROUTES.EDIT_WORKFLOW, {
                     environmentId,
-                    workflowId,
+                    workflowSlug,
                   })}
                 >
                   Workflow
                 </Link>
               </TabsTrigger>
-              <TabsTrigger value="trigger" asChild>
+              <TabsTrigger value="trigger" asChild variant="regular">
                 <Link
                   to={buildRoute(ROUTES.TEST_WORKFLOW, {
                     environmentId,
-                    workflowId,
+                    workflowSlug,
                   })}
                 >
                   Trigger
@@ -108,7 +108,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
                 </Button>
               </div>
             </TabsList>
-            <TabsContent value="trigger" className="mt-0 h-full w-full">
+            <TabsContent value="trigger" className="mt-0 h-full w-full" variant="regular">
               <TestWorkflowForm workflow={workflow} />
             </TabsContent>
           </Tabs>
