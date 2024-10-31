@@ -1,5 +1,4 @@
 import { Liquid } from 'liquidjs';
-import ora from 'ora';
 
 import { ChannelStepEnum, PostActionEnum } from './constants';
 import {
@@ -257,9 +256,18 @@ export class Client {
 
   private executeStepFactory<T_Outputs extends Record<string, unknown>, T_Result extends Record<string, unknown>>(
     event: Event,
-    setResult: (result: Pick<ExecuteOutput, 'outputs' | 'providers' | 'options'>) => void
+    setResult: (result: Pick<ExecuteOutput, 'outputs' | 'providers' | 'options'>) => void,
+    hasResult: () => boolean
   ): ActionStep<T_Outputs, T_Result> {
     return async (stepId, stepResolve, options) => {
+      if (hasResult()) {
+        /*
+         * Exit the execution early if the result has already been set.
+         * This is to ensure that we don't evaluate code in steps after the provided stepId.
+         */
+        return;
+      }
+
       const step = this.getStep(event.workflowId, stepId);
       const controls = await this.createStepControls(step, event);
       const isPreview = event.action === PostActionEnum.PREVIEW;
@@ -364,6 +372,7 @@ export class Client {
     };
 
     let concludeExecution: (value?: unknown) => void;
+    let hasConcludedExecution = false;
     const concludeExecutionPromise = new Promise((resolve) => {
       concludeExecution = resolve;
     });
@@ -375,14 +384,19 @@ export class Client {
      * `workflow.execute` method. By resolving the `concludeExecutionPromise` when setting the result,
      * we can ensure that the `workflow.execute` method is not evaluated after the `stepId` is reached.
      *
-     * This function should only be called once per workflow execution.
-     *
      * @param stepResult The result of the workflow execution.
      */
     const setResult = (stepResult: Omit<ExecuteOutput, 'metadata'>): void => {
+      if (hasConcludedExecution) {
+        throw new Error('setResult can only be called once per workflow execution');
+      }
       concludeExecution();
+      hasConcludedExecution = true;
+
       result = stepResult;
     };
+
+    const hasResult = (): boolean => hasConcludedExecution;
 
     let executionError: Error | undefined;
     try {
@@ -408,14 +422,14 @@ export class Client {
           controls: {},
           subscriber: event.subscriber,
           step: {
-            email: this.executeStepFactory(validatedEvent, setResult),
-            sms: this.executeStepFactory(validatedEvent, setResult),
-            inApp: this.executeStepFactory(validatedEvent, setResult),
-            digest: this.executeStepFactory(validatedEvent, setResult),
-            delay: this.executeStepFactory(validatedEvent, setResult),
-            push: this.executeStepFactory(validatedEvent, setResult),
-            chat: this.executeStepFactory(validatedEvent, setResult),
-            custom: this.executeStepFactory(validatedEvent, setResult),
+            email: this.executeStepFactory(validatedEvent, setResult, hasResult),
+            sms: this.executeStepFactory(validatedEvent, setResult, hasResult),
+            inApp: this.executeStepFactory(validatedEvent, setResult, hasResult),
+            digest: this.executeStepFactory(validatedEvent, setResult, hasResult),
+            delay: this.executeStepFactory(validatedEvent, setResult, hasResult),
+            push: this.executeStepFactory(validatedEvent, setResult, hasResult),
+            chat: this.executeStepFactory(validatedEvent, setResult, hasResult),
+            custom: this.executeStepFactory(validatedEvent, setResult, hasResult),
           },
         }),
       ]);
@@ -541,7 +555,6 @@ export class Client {
     provider: DiscoverProviderOutput,
     outputs: Record<string, unknown>
   ): Promise<WithPassthrough<Record<string, unknown>>> {
-    const spinner = ora({ indent: 2 }).start(`Executing provider: \`${provider.type}\``);
     try {
       if (event.stepId === step.stepId) {
         const controls = await this.createStepControls(step, event);
@@ -558,7 +571,7 @@ export class Client {
           step.stepId,
           provider.type
         );
-        spinner.succeed(`Executed provider: \`${provider.type}\``);
+        console.log(`  ${EMOJI.SUCCESS} Executed provider: \`${provider.type}\``);
 
         return {
           ...validatedOutput,
@@ -566,18 +579,13 @@ export class Client {
         };
       } else {
         // No-op. We don't execute providers for hydrated steps
-        spinner.stopAndPersist({
-          symbol: EMOJI.HYDRATED,
-          text: `Hydrated provider: \`${provider.type}\``,
-        });
+        console.log(`  ${EMOJI.HYDRATED} Hydrated provider: \`${provider.type}\``);
 
         return {};
       }
     } catch (error) {
-      spinner.stopAndPersist({
-        symbol: EMOJI.ERROR,
-        text: `Failed to execute provider: \`${provider.type}\``,
-      });
+      console.log(`  ${EMOJI.ERROR} Failed to execute provider: \`${provider.type}\``);
+
       throw new ProviderExecutionFailedError(provider.type, event.action, error);
     }
   }
@@ -587,7 +595,6 @@ export class Client {
     step: DiscoverStepOutput
   ): Promise<Pick<ExecuteOutput, 'outputs' | 'providers'>> {
     if (event.stepId === step.stepId) {
-      const spinner = ora({ indent: 1 }).start(`Executing stepId: \`${step.stepId}\``);
       try {
         const templateControls = await this.createStepControls(step, event);
         const controls = await this.compileControls(templateControls, event);
@@ -603,18 +610,14 @@ export class Client {
 
         const providers = await this.executeProviders(event, step, validatedOutput);
 
-        spinner.succeed(`Executed stepId: \`${step.stepId}\``);
+        console.log(`  ${EMOJI.SUCCESS} Executed stepId: \`${step.stepId}\``);
 
         return {
           outputs: validatedOutput,
           providers,
         };
       } catch (error) {
-        spinner.stopAndPersist({
-          prefixText: '',
-          symbol: EMOJI.ERROR,
-          text: `Failed to execute stepId: \`${step.stepId}\``,
-        });
+        console.log(`  ${EMOJI.ERROR} Failed to execute stepId: \`${step.stepId}\``);
         if (isFrameworkError(error)) {
           throw error;
         } else {
@@ -622,7 +625,6 @@ export class Client {
         }
       }
     } else {
-      const spinner = ora({ indent: 1 }).start(`Hydrating stepId: \`${step.stepId}\``);
       try {
         const result = event.state.find((state) => state.stepId === step.stepId);
 
@@ -635,10 +637,7 @@ export class Client {
             event.workflowId,
             step.stepId
           );
-          spinner.stopAndPersist({
-            symbol: EMOJI.HYDRATED,
-            text: `Hydrated stepId: \`${step.stepId}\``,
-          });
+          console.log(`  ${EMOJI.HYDRATED} Hydrated stepId: \`${step.stepId}\``);
 
           return {
             outputs: validatedOutput,
@@ -648,10 +647,8 @@ export class Client {
           throw new ExecutionStateCorruptError(event.workflowId, step.stepId);
         }
       } catch (error) {
-        spinner.stopAndPersist({
-          symbol: EMOJI.ERROR,
-          text: `Failed to hydrate stepId: \`${step.stepId}\``,
-        });
+        console.log(`  ${EMOJI.ERROR} Failed to hydrate stepId: \`${step.stepId}\``);
+
         throw error;
       }
     }
@@ -696,7 +693,6 @@ export class Client {
     event: Event,
     step: DiscoverStepOutput
   ): Promise<Pick<ExecuteOutput, 'outputs' | 'providers'>> {
-    const spinner = ora({ indent: 1 }).start(`Previewing stepId: \`${step.stepId}\``);
     try {
       if (event.stepId === step.stepId) {
         const templateControls = await this.createStepControls(step, event);
@@ -712,10 +708,7 @@ export class Client {
           step.stepId
         );
 
-        spinner.stopAndPersist({
-          symbol: EMOJI.MOCK,
-          text: `Mocked stepId: \`${step.stepId}\``,
-        });
+        console.log(`  ${EMOJI.MOCK} Mocked stepId: \`${step.stepId}\``);
 
         return {
           outputs: validatedOutput,
@@ -724,10 +717,7 @@ export class Client {
       } else {
         const mockResult = this.mock(step.results.schema);
 
-        spinner.stopAndPersist({
-          symbol: EMOJI.MOCK,
-          text: `Mocked stepId: \`${step.stepId}\``,
-        });
+        console.log(`  ${EMOJI.MOCK} Mocked stepId: \`${step.stepId}\``);
 
         return {
           outputs: mockResult,
@@ -735,10 +725,7 @@ export class Client {
         };
       }
     } catch (error) {
-      spinner.stopAndPersist({
-        symbol: EMOJI.ERROR,
-        text: `Failed to preview stepId: \`${step.stepId}\``,
-      });
+      console.log(`  ${EMOJI.ERROR} Failed to preview stepId: \`${step.stepId}\``);
 
       if (isFrameworkError(error)) {
         throw error;
