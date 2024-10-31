@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
 import { HubspotIdentifyFormCommand } from './hubspot-identify-form.command';
+import { Injectable, Logger } from '@nestjs/common';
+import { AxiosError } from 'axios';
+
+const LOG_CONTEXT = 'HubspotIdentifyFormUsecase';
 
 @Injectable()
 export class HubspotIdentifyFormUsecase {
@@ -10,28 +12,38 @@ export class HubspotIdentifyFormUsecase {
 
   constructor(private httpService: HttpService) {}
 
-  async execute(command: HubspotIdentifyFormCommand): Promise<{ success: boolean; hubspotResponse?: any }> {
-    const hubspotSubmitUrl = `https://api.hsforms.com/submissions/v3/integration/submit/${this.hubspotPortalId}/${this.hubspotFormId}`;
+  async execute(command: HubspotIdentifyFormCommand) {
+    try {
+      const hubspotSubmitUrl = `https://api.hsforms.com/submissions/v3/integration/submit/${this.hubspotPortalId}/${this.hubspotFormId}`;
 
-    const hubspotData = {
-      fields: [
-        { name: 'email', value: command.email },
-        { name: 'lastname', value: command.lastName || 'Unknown' },
-        { name: 'firstname', value: command.firstName || 'Unknown' },
-        { name: 'app_organizationid', value: command.organizationId },
-      ],
-      context: {
-        hutk: command.hubspotContext,
-        pageUri: command.pageUri,
-        pageName: command.pageName,
-      },
-    };
+      const hubspotData = {
+        fields: [
+          { name: 'email', value: command.email },
+          { name: 'lastname', value: command.lastName || 'Unknown' },
+          { name: 'firstname', value: command.firstName || 'Unknown' },
+          { name: 'app_organizationid', value: command.organizationId },
+        ],
+        context: {
+          hutk: command.hubspotContext,
+          pageUri: command.pageUri,
+          pageName: command.pageName,
+        },
+      };
 
-    const response = await firstValueFrom(this.httpService.post(hubspotSubmitUrl, hubspotData));
-
-    return {
-      success: true,
-      hubspotResponse: response.data,
-    };
+      await this.httpService.post(hubspotSubmitUrl, hubspotData);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        Logger.error(
+          `Failed to submit to Hubspot message=${error.message}, status=${error.status}`,
+          {
+            organizationId: command.organizationId,
+            response: error.response?.data,
+          },
+          LOG_CONTEXT
+        );
+      } else {
+        throw error;
+      }
+    }
   }
 }
