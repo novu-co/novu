@@ -1,28 +1,59 @@
-import { useNavigate } from 'react-router-dom';
-import { RiEdit2Line } from 'react-icons/ri';
+import { useLayoutEffect, useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/primitives/button';
-import { Separator } from '@/components/primitives/separator';
-import {
-  Sheet,
-  SheetClose,
-  SheetFooter,
-  SheetHeader,
-  SheetMain,
-  SheetOverlay,
-  SheetPortal,
-  SheetTitle,
-} from '@/components/primitives/sheet';
-import { Cross2Icon } from '@radix-ui/react-icons';
+import { workflowSchema } from '../schema';
+import { useFetchWorkflow, useUpdateWorkflow } from '@/hooks';
+import { Form } from '@/components/primitives/form/form';
+import { handleValidationIssues } from '@/utils/handleValidationIssues';
+import { Sheet, SheetOverlay, SheetPortal } from '@/components/primitives/sheet';
+import { StepEditor } from './step-editor';
 
 const transitionSetting = { ease: [0.29, 0.83, 0.57, 0.99], duration: 0.4 };
 
-const StepEditor = () => {
-  return <div>Step Editor</div>;
-};
-
 export const EditStepSidebar = () => {
+  const { workflowId = '', stepId = '' } = useParams<{ workflowId: string; stepId: string }>();
   const navigate = useNavigate();
+  const form = useForm<z.infer<typeof workflowSchema>>({ mode: 'onSubmit', resolver: zodResolver(workflowSchema) });
+  const { reset, setError } = form;
+
+  const { workflow, error } = useFetchWorkflow({
+    workflowId,
+  });
+
+  const step = useMemo(() => workflow?.steps.find((el) => el._id === stepId), [stepId, workflow]);
+
+  useLayoutEffect(() => {
+    if (!workflow) {
+      return;
+    }
+
+    reset({ ...workflow, steps: workflow.steps.map((step) => ({ ...step })) });
+  }, [workflow, error, navigate, reset]);
+
+  const { updateWorkflow } = useUpdateWorkflow({
+    onSuccess: (data) => {
+      reset({ ...data, steps: data.steps.map((step) => ({ ...step })) });
+
+      if (data.issues) {
+        // TODO: remove the as any cast when BE issues are typed
+        handleValidationIssues({ fields: form.getValues(), issues: data.issues as any, setError });
+      }
+
+      // TODO: show the toast
+      navigate(`../`, { relative: 'path' });
+    },
+  });
+
+  const onSubmit = (data: z.infer<typeof workflowSchema>) => {
+    if (!workflow) {
+      return;
+    }
+
+    updateWorkflow({ id: workflow._id, workflow: { ...workflow, ...data } as any });
+  };
 
   return (
     <Sheet open>
@@ -56,33 +87,18 @@ export const EditStepSidebar = () => {
             'bg-background fixed inset-y-0 right-0 z-50 flex h-full w-3/4 flex-col border-l shadow-lg sm:max-w-[600px]'
           }
         >
-          <SheetClose
-            className="ring-offset-background focus:ring-ring data-[state=open]:bg-neutral-alpha-100 absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none"
-            onClick={() => {
-              navigate('../', { relative: 'path' });
-            }}
-          >
-            <Cross2Icon className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </SheetClose>
-          <SheetHeader className="px-3 py-3.5">
-            <SheetTitle>
-              <div className="flex items-center gap-2.5 text-sm font-medium">
-                <RiEdit2Line className="size-4" />
-                <span>Configure Template</span>
-              </div>
-            </SheetTitle>
-          </SheetHeader>
-          <Separator />
-          <SheetMain>
-            <StepEditor />
-          </SheetMain>
-          <Separator />
-          <SheetFooter>
-            <Button variant="default" type="submit" form="create-workflow">
-              Save step
-            </Button>
-          </SheetFooter>
+          <Form {...form}>
+            <form
+              className="flex h-full flex-col"
+              onSubmit={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                form.handleSubmit(onSubmit)(event);
+              }}
+            >
+              {step && <StepEditor stepType={step?.type} />}
+            </form>
+          </Form>
         </motion.div>
       </SheetPortal>
     </Sheet>
