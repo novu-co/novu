@@ -56,7 +56,7 @@ export function ConfigureStep() {
 }
 
 const Step = () => {
-  const { channel } = useStep();
+  const { stepType: channel } = useStep();
   switch (channel) {
     case StepTypeEnum.IN_APP:
       return <InApp />;

@@ -1,6 +1,6 @@
 'use client';
 
-import { Input, InputField, InputProps } from '@/components/primitives/input';
+import { Input, InputField, InputFieldProps, InputProps } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { RedirectTargetEnum } from '@novu/shared';
 import { forwardRef } from 'react';
@@ -10,19 +10,19 @@ type URLValue = {
   url: string;
 };
 
-type URLInputProps = Omit<InputProps, 'value' | 'onChange'> & {
+type URLInputProps = Omit<InputProps, 'value' | 'onChange' | 'size'> & {
   options: string[];
   value: URLValue;
   onChange: (value: URLValue) => void;
-};
+} & Pick<InputFieldProps, 'size'>;
 
 export const URLInput = forwardRef<HTMLInputElement, URLInputProps>((props, ref) => {
-  const { options, value, onChange, ...rest } = props;
+  const { options, value, onChange, size, ...rest } = props;
 
   return (
     <div className="flex items-center justify-between space-x-2">
       <div className="relative flex-grow">
-        <InputField className="pr-0">
+        <InputField className="pr-0" size={size}>
           <Input
             ref={ref}
             type="text"
@@ -32,7 +32,7 @@ export const URLInput = forwardRef<HTMLInputElement, URLInputProps>((props, ref)
             {...rest}
           />
           <Select value={value.type} onValueChange={(val: RedirectTargetEnum) => onChange({ ...value, type: val })}>
-            <SelectTrigger className="h-full rounded-l-none border-0 border-l">
+            <SelectTrigger className="h-full max-w-24 rounded-l-none border-0 border-l">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
