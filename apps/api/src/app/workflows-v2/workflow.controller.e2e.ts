@@ -267,12 +267,11 @@ describe('Workflow Controller E2E API Testing', () => {
       const resPromoteCreate = await session.testAgent.put(`${v2Prefix}/workflows/${devWorkflow._id}/promote`).send({
         targetEnvironmentId: prodEnvironmentId,
       });
-
       expect(resPromoteCreate.status).to.equal(200);
       const prodWorkflowCreated = resPromoteCreate.body.data;
 
-      const stepToUpdate = removeFields(devWorkflow.steps[0], 'stepId');
       // Update the workflow in the development environment
+      const stepToUpdate = removeFields(devWorkflow.steps[0], 'stepId');
       const updateDto = {
         ...convertResponseToUpdateDto(devWorkflow),
         name: 'Updated Name',
@@ -283,7 +282,6 @@ describe('Workflow Controller E2E API Testing', () => {
           { ...buildInAppStep(), name: 'New InApp Step' },
         ],
       };
-
       await updateWorkflowAndValidate(devWorkflow._id, devWorkflow.updatedAt, updateDto);
 
       // Promote the updated workflow to production
@@ -310,9 +308,13 @@ describe('Workflow Controller E2E API Testing', () => {
       // Verify updated steps
       expect(prodWorkflowUpdated.steps).to.have.lengthOf(2);
       expect(prodWorkflowUpdated.steps[0].name).to.equal('Updated Email Step');
+      expect(prodWorkflowUpdated.steps[0]._id).to.equal(prodWorkflowCreated.steps[0]._id);
       expect(prodWorkflowUpdated.steps[0].stepId).to.equal(prodWorkflowCreated.steps[0].stepId);
       expect(prodWorkflowUpdated.steps[1].name).to.equal('New InApp Step');
+
+      // Verify new created step
       expect(prodWorkflowUpdated.steps[1]._id).to.not.equal(prodWorkflowCreated.steps[1]._id);
+      expect(prodWorkflowUpdated.steps[1].stepId).to.equal('new-inapp-step');
     });
 
     it('should throw an error if trying to promote to the same environment', async () => {
