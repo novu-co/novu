@@ -1,6 +1,6 @@
 import Title from '@/components/Title';
 import { novuConfig } from '@/utils/config';
-import { Inbox } from '@novu/react';
+import { Inbox } from '@novu/nextjs';
 import styles from './novu-theme.module.css';
 
 export default function NovuTheme() {

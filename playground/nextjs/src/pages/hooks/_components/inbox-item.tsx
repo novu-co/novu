@@ -3,7 +3,7 @@
 'use-client';
 
 import { useState } from 'react';
-import type { Notification } from '@novu/react';
+import type { Notification } from '@novu/nextjs';
 import { PiNotificationFill } from 'react-icons/pi';
 import { FaRegCheckSquare } from 'react-icons/fa';
 import { FiArchive, FiCornerUpLeft } from 'react-icons/fi';

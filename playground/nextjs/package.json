@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@novu/react": "workspace:*",
     "@novu/nextjs": "workspace:*",
     "@radix-ui/colors": "^3.0.0",
     "@radix-ui/react-dropdown-menu": "^2.1.1",
