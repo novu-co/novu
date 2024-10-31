@@ -12,6 +12,7 @@ import { Separator } from '@/components/primitives/separator';
 import { URLInput } from '@/components/primitives/url-input';
 import { buttonVariants } from '@/components/primitives/variants';
 import { cn } from '@/utils/ui';
+import { urlTargetTypes } from '@/utils/url';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RedirectTargetEnum } from '@novu/shared';
 import { ComponentProps } from 'react';
@@ -33,18 +34,19 @@ type Actions = {
 };
 
 type ActionPickerProps = {
+  className?: string;
   value: Actions | undefined;
   onChange: (value: Actions) => void;
 };
 
 export const ActionPicker = (props: ActionPickerProps) => {
-  const { value, onChange } = props;
+  const { className, value, onChange } = props;
   const primaryAction = value?.primaryAction;
   const secondaryAction = value?.secondaryAction;
 
   return (
-    <div className="flex items-center gap-1">
-      <div className="border-neutral-alpha-200 flex min-h-10 w-full flex-wrap justify-end gap-1 rounded-md border p-1 shadow-sm">
+    <div className={cn('flex items-center gap-1', className)}>
+      <div className="border-neutral-alpha-200 flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
         {!primaryAction && !secondaryAction && (
           <div className={buttonVariants({ variant: 'dashed', size: 'sm' })}>
             <RiForbid2Line className="size-4" />
@@ -59,7 +61,7 @@ export const ActionPicker = (props: ActionPickerProps) => {
               onChange({ primaryAction, secondaryAction });
             }}
           >
-            <Button variant="primary" size="sm">
+            <Button variant="primary" size="xs">
               {primaryAction.label}
             </Button>
           </ConfigureActionPopover>
@@ -72,7 +74,7 @@ export const ActionPicker = (props: ActionPickerProps) => {
               onChange({ primaryAction, secondaryAction });
             }}
           >
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="xs">
               {secondaryAction.label}
             </Button>
           </ConfigureActionPopover>
@@ -90,7 +92,7 @@ export const ActionPicker = (props: ActionPickerProps) => {
               onChange({});
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'dashed', size: 'sm' }), 'pointer-events-none gap-2')}>
+            <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'pointer-events-none gap-2')}>
               <RiForbid2Line className="size-4" />
               No action
             </div>
@@ -106,7 +108,7 @@ export const ActionPicker = (props: ActionPickerProps) => {
               });
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'primary', size: 'sm' }), 'pointer-events-none')}>
+            <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
               Primary action
             </div>
           </DropdownMenuItem>
@@ -124,10 +126,10 @@ export const ActionPicker = (props: ActionPickerProps) => {
               });
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'primary', size: 'sm' }), 'pointer-events-none')}>
+            <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
               Primary action
             </div>
-            <div className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'pointer-events-none')}>
+            <div className={cn(buttonVariants({ variant: 'outline', size: 'xs' }), 'pointer-events-none')}>
               Secondary action
             </div>
           </DropdownMenuItem>
@@ -150,14 +152,6 @@ const formSchema = z.object({
     ]),
   }),
 });
-
-const urlTypes = [
-  RedirectTargetEnum.SELF,
-  RedirectTargetEnum.BLANK,
-  RedirectTargetEnum.PARENT,
-  RedirectTargetEnum.TOP,
-  RedirectTargetEnum.UNFENCED_TOP,
-];
 
 const ConfigureActionPopover = (
   props: ComponentProps<typeof PopoverTrigger> & { action: Action; setAction: (action: Action) => void }
@@ -221,7 +215,7 @@ const ConfigureActionPopover = (
                     <FormControl>
                       <URLInput
                         {...field}
-                        options={urlTypes}
+                        options={urlTargetTypes}
                         value={field.value}
                         onChange={(val) => field.onChange(val)}
                       />

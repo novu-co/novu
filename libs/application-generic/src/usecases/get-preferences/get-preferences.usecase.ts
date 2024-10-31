@@ -2,25 +2,14 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PreferencesEntity, PreferencesRepository } from '@novu/dal';
 import {
   buildWorkflowPreferences,
-  FeatureFlagsKeysEnum,
   IPreferenceChannels,
   PreferencesTypeEnum,
   WorkflowPreferences,
   WorkflowPreferencesPartial,
 } from '@novu/shared';
 import { deepMerge } from '../../utils';
-import { GetFeatureFlag, GetFeatureFlagCommand } from '../get-feature-flag';
 import { GetPreferencesCommand } from './get-preferences.command';
 import { GetPreferencesResponseDto } from './get-preferences.dto';
-
-class PreferencesNotEnabledException extends BadRequestException {
-  constructor(featureFlagCommand: object) {
-    super({
-      message: 'Preferences Feature Flag are not enabled',
-      ...featureFlagCommand,
-    });
-  }
-}
 
 class PreferencesNotFoundException extends BadRequestException {
   constructor(featureFlagCommand: GetPreferencesCommand) {
@@ -30,16 +19,11 @@ class PreferencesNotFoundException extends BadRequestException {
 
 @Injectable()
 export class GetPreferences {
-  constructor(
-    private preferencesRepository: PreferencesRepository,
-    private getFeatureFlag: GetFeatureFlag,
-  ) {}
+  constructor(private preferencesRepository: PreferencesRepository) {}
 
   async execute(
     command: GetPreferencesCommand,
   ): Promise<GetPreferencesResponseDto> {
-    await this.validateFeatureFlag(command);
-
     const items = await this.getPreferencesFromDb(command);
 
     if (items.length === 0) {
@@ -53,24 +37,6 @@ export class GetPreferences {
     }
 
     return mergedPreferences;
-  }
-
-  private async validateFeatureFlag(command: GetPreferencesCommand) {
-    const featureFlagCommand = {
-      userId: 'system',
-      environmentId: command.environmentId,
-      organizationId: command.organizationId,
-      key: FeatureFlagsKeysEnum.IS_WORKFLOW_PREFERENCES_ENABLED,
-    };
-    const isEnabled = await this.getFeatureFlag.execute(
-      GetFeatureFlagCommand.create(featureFlagCommand),
-    );
-
-    if (!isEnabled) {
-      throw new PreferencesNotEnabledException(featureFlagCommand);
-    }
-
-    return featureFlagCommand;
   }
 
   /** Get only simple, channel-level enablement flags */

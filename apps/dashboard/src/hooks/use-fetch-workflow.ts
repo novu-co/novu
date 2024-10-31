@@ -4,12 +4,12 @@ import { QueryKeys } from '@/utils/query-keys';
 import { fetchWorkflow } from '@/api/workflows';
 import { useEnvironment } from '@/context/environment/hooks';
 
-export const useFetchWorkflow = ({ workflowId }: { workflowId?: string }) => {
+export const useFetchWorkflow = ({ workflowSlug }: { workflowSlug?: string }) => {
   const { currentEnvironment } = useEnvironment();
   const { data, isPending, error } = useQuery<WorkflowResponseDto>({
-    queryKey: [QueryKeys.fetchWorkflow, currentEnvironment?._id, workflowId],
-    queryFn: () => fetchWorkflow({ workflowId }),
-    enabled: !!currentEnvironment?._id && !!workflowId,
+    queryKey: [QueryKeys.fetchWorkflow, currentEnvironment?._id, workflowSlug],
+    queryFn: () => fetchWorkflow({ workflowSlug }),
+    enabled: !!currentEnvironment?._id && !!workflowSlug,
   });
 
   return {

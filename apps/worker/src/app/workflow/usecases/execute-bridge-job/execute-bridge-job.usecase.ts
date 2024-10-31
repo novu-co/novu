@@ -13,6 +13,7 @@ import {
   ControlValuesLevelEnum,
   ExecutionDetailsSourceEnum,
   ExecutionDetailsStatusEnum,
+  ITriggerPayload,
   JobStatusEnum,
   WorkflowOriginEnum,
   WorkflowTypeEnum,
@@ -147,7 +148,7 @@ export class ExecuteBridgeJob {
     return controls?.controls;
   }
 
-  private normalizePayload(originalPayload) {
+  private normalizePayload(originalPayload: ITriggerPayload = {}) {
     // Remove internal params
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { __source, ...payload } = originalPayload;
