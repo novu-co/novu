@@ -12,7 +12,15 @@ import { buildSubscriberKey, CachedEntity } from '../../services/cache';
 import { ApiException } from '../../utils/exceptions';
 import { InstrumentUsecase } from '../../instrumentation';
 
-/** @deprecated - use `GetPreferences` instead */
+/**
+ * @deprecated - use `GetPreferences` with `PreferenceTypeEnum.SUBSCRIBER_GLOBAL` instead.
+ *
+ * This use-case will be removed after migrating all V1 Preferences to the `Preferences`
+ * collection. These include:
+ * - NotificationTemplateEntity.preferenceSettings
+ * - SubscriberPreferenceEntity (with `PreferenceLevelEnum.GLOBAL`)
+ * - SubscriberPreferenceEntity (with `PreferenceLevelEnum.TEMPLATE`)
+ */
 @Injectable()
 export class GetSubscriberGlobalPreferenceV1 {
   constructor(
