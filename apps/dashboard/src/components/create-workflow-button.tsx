@@ -126,7 +126,6 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     <FormControl>
                       <InputField>
                         <Input
-                          placeholder="Untitled"
                           {...field}
                           onChange={(e) => {
                             field.onChange(e);
@@ -148,7 +147,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     <FormLabel>Identifier</FormLabel>
                     <FormControl>
                       <InputField>
-                        <Input placeholder="untitled" {...field} readOnly />
+                        <Input {...field} readOnly />
                       </InputField>
                     </FormControl>
                     <FormMessage />
