@@ -30,6 +30,7 @@ import { buildRoute, ROUTES } from '@/utils/routes';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
+  workflowId: z.string(),
   tags: z
     .array(z.string().min(1))
     .max(8)
@@ -68,7 +69,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { description: '', name: '', tags: [] },
+    defaultValues: { description: '', workflowId: '', name: '', tags: [] },
   });
 
   return (
@@ -135,6 +136,22 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       </InputField>
                     </FormControl>
                     <FormMessage>Name is required</FormMessage>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="workflowId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Identifier</FormLabel>
+                    <FormControl>
+                      <InputField>
+                        <Input placeholder="untitled" {...field} readOnly />
+                      </InputField>
+                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
