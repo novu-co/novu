@@ -1,5 +1,5 @@
 import { getV2, NovuApiError } from '@/api/api.client';
-import { promoteWorkflow } from '@/api/workflows';
+import { syncWorkflow } from '@/api/workflows';
 import { Button } from '@/components/primitives/button';
 import {
   Dialog,
@@ -23,14 +23,14 @@ import { toast } from 'sonner';
 
 const PRODUCTION_ENVIRONMENT = 'Production' as const;
 
-export function usePromoteWorkflow(workflow: WorkflowListResponseDto) {
+export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
   const { environments, switchEnvironment, currentEnvironment } = useEnvironment();
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   let loadingToast: string | number | undefined = undefined;
 
-  const isPromotable = useMemo(
+  const isSyncable = useMemo(
     () =>
       workflow.origin === WorkflowOriginEnum.NOVU_CLOUD &&
       workflow.status !== WorkflowStatusEnum.ERROR &&
@@ -44,19 +44,19 @@ export function usePromoteWorkflow(workflow: WorkflowListResponseDto) {
 
   const getTooltipContent = () => {
     if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
-      return 'External workflows cannot be promoted to Production using dashboard.';
+      return 'External workflows cannot be synced to Production using dashboard.';
     }
 
     if (workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1) {
-      return 'V1 workflows cannot be promoted to Production using dashboard. Please visit the legacy portal.';
+      return 'V1 workflows cannot be syncedto Production using dashboard. Please visit the legacy portal.';
     }
 
     if (workflow.status === WorkflowStatusEnum.ERROR) {
-      return 'This workflow has errors and cannot be promoted to Production. Please fix the errors first.';
+      return 'This workflow has errors and cannot be synced to Production. Please fix the errors first.';
     }
   };
 
-  const safePromote = async () => {
+  const safeSync = async () => {
     try {
       if (await isWorkflowInProduction()) {
         setShowConfirmModal(true);
@@ -65,13 +65,13 @@ export function usePromoteWorkflow(workflow: WorkflowListResponseDto) {
       }
     } catch (error) {
       if (error instanceof NovuApiError && error.status === 404) {
-        await promoteWorkflowMutation();
+        await syncWorkflowMutation();
 
         return;
       }
 
-      toast.error('Failed to promote workflow', {
-        description: error instanceof Error ? error.message : 'There was an error promoting the workflow.',
+      toast.error('Failed to sync workflow', {
+        description: error instanceof Error ? error.message : 'There was an error syncing the workflow.',
       });
     }
   };
@@ -84,7 +84,7 @@ export function usePromoteWorkflow(workflow: WorkflowListResponseDto) {
     return !!workflowInProd;
   };
 
-  const onPromoteSuccess = () => {
+  const onSyncSuccess = () => {
     toast.dismiss(loadingToast);
     setIsLoading(false);
 
@@ -96,9 +96,9 @@ export function usePromoteWorkflow(workflow: WorkflowListResponseDto) {
           <ToastIcon variant="default" />
           <div className="flex flex-1 flex-col items-start gap-2.5">
             <div className="flex flex-col items-start justify-center gap-1 self-stretch">
-              <div className="text-foreground-950 text-sm font-medium">Workflow promoted to Production</div>
+              <div className="text-foreground-950 text-sm font-medium">Workflow synced to Production</div>
               <div className="text-foreground-600 text-sm">
-                Workflow '{workflow.name}' has been successfully promoted to production.
+                Workflow '{workflow.name}' has been successfully synced to production.
               </div>
             </div>
             <div className="flex items-center justify-end gap-2 self-stretch">
@@ -122,30 +122,30 @@ export function usePromoteWorkflow(workflow: WorkflowListResponseDto) {
     });
   };
 
-  const onPromoteError = (error: unknown) => {
+  const onSyncError = (error: unknown) => {
     toast.dismiss(loadingToast);
     setIsLoading(false);
 
-    toast.error('Failed to promote workflow', {
-      description: error instanceof Error ? error.message : 'There was an error promoting the workflow.',
+    toast.error('Failed to sync workflow', {
+      description: error instanceof Error ? error.message : 'There was an error syncing the workflow.',
     });
   };
 
-  const { mutateAsync: promoteWorkflowMutation } = useMutation({
+  const { mutateAsync: syncWorkflowMutation } = useMutation({
     mutationFn: async () =>
-      promoteWorkflow(workflow._id, { targetEnvironmentId: getProductionEnvironmentId() }).then((res) => res.data),
+      syncWorkflow(workflow._id, { targetEnvironmentId: getProductionEnvironmentId() }).then((res) => res.data),
     onMutate: () => {
       setIsLoading(true);
-      loadingToast = toast.loading('Promoting workflow...');
+      loadingToast = toast.loading('Syncing workflow...');
     },
-    onSuccess: onPromoteSuccess,
-    onError: onPromoteError,
+    onSuccess: onSyncSuccess,
+    onError: onSyncError,
   });
 
   const ConfirmationModal = () => {
     async function onConfirm() {
       setShowConfirmModal(false);
-      await promoteWorkflowMutation();
+      await syncWorkflowMutation();
     }
 
     return (
@@ -158,7 +158,7 @@ export function usePromoteWorkflow(workflow: WorkflowListResponseDto) {
                 <RiAlertFill className="text-warning size-6" />
               </div>
               <div className="flex flex-1 flex-col items-start gap-1">
-                <DialogTitle className="text-md font-medium">Promote workflow to Production</DialogTitle>
+                <DialogTitle className="text-md font-medium">Sync workflow to Production</DialogTitle>
                 <DialogDescription className="text-foreground-600">
                   Workflow already exists in Production. Proceeding will overwrite the existing workflow.
                 </DialogDescription>
@@ -183,9 +183,9 @@ export function usePromoteWorkflow(workflow: WorkflowListResponseDto) {
   };
 
   return {
-    safePromote,
-    promote: promoteWorkflowMutation,
-    isPromotable,
+    safeSync,
+    sync: syncWorkflowMutation,
+    isSyncable,
     isLoading,
     tooltipContent: getTooltipContent(),
     ConfirmationModal,

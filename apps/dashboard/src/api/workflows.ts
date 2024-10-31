@@ -1,6 +1,6 @@
 import type {
   CreateWorkflowDto,
-  PromoteWorkflowDto,
+  SyncWorkflowDto,
   UpdateWorkflowDto,
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
@@ -35,8 +35,8 @@ export async function createWorkflow(payload: CreateWorkflowDto) {
   return postV2<{ data: WorkflowResponseDto }>(`/workflows`, payload);
 }
 
-export async function promoteWorkflow(workflowId: string, payload: PromoteWorkflowDto) {
-  return putV2<{ data: WorkflowResponseDto }>(`/workflows/${workflowId}/promote`, payload);
+export async function syncWorkflow(workflowId: string, payload: SyncWorkflowDto) {
+  return putV2<{ data: WorkflowResponseDto }>(`/workflows/${workflowId}/sync`, payload);
 }
 
 export const updateWorkflow = async ({

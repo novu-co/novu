@@ -1,5 +1,5 @@
-import { IEnvironment, WorkflowListResponseDto, WorkflowResponseDto } from '@novu/shared';
-import { RiAlertFill, RiDeleteBin2Line, RiGitPullRequestFill, RiPauseCircleLine, RiPulseFill } from 'react-icons/ri';
+import { IEnvironment, WorkflowListResponseDto } from '@novu/shared';
+import { RiDeleteBin2Line, RiGitPullRequestFill, RiPauseCircleLine, RiPulseFill } from 'react-icons/ri';
 import { Button } from '@/components/primitives/button';
 import {
   DropdownMenu,
@@ -29,7 +29,7 @@ import {
   TooltipTrigger,
 } from '@/components/primitives/tooltip';
 import { RiMore2Fill, RiPlayCircleLine } from 'react-icons/ri';
-import { usePromoteWorkflow } from '@/hooks/use-promote-workflow2';
+import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -37,7 +37,7 @@ type WorkflowRowProps = {
 
 export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
   const { currentEnvironment } = useEnvironment();
-  const { safePromote, isPromotable, tooltipContent, ConfirmationModal } = usePromoteWorkflow(workflow);
+  const { safeSync, isSyncable, tooltipContent, ConfirmationModal } = useSyncWorkflow(workflow);
 
   const isV1Workflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1;
   const workflowLink = isV1Workflow
@@ -97,11 +97,11 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
                 <RiPlayCircleLine />
                 Trigger workflow
               </DropdownMenuItem>
-              <PromoteWorkflowMenuItem
+              <SyncWorkflowMenuItem
                 currentEnvironment={currentEnvironment}
-                isPromotable={isPromotable}
+                isSyncable={isSyncable}
                 tooltipContent={tooltipContent}
-                onPromote={safePromote}
+                onSync={safeSync}
               />
               <DropdownMenuItem>
                 <RiPulseFill />
@@ -126,26 +126,26 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
   );
 };
 
-const PromoteWorkflowMenuItem = ({
+const SyncWorkflowMenuItem = ({
   currentEnvironment,
-  isPromotable,
+  isSyncable,
   tooltipContent,
-  onPromote,
+  onSync,
 }: {
   currentEnvironment: IEnvironment | undefined;
-  isPromotable: boolean;
+  isSyncable: boolean;
   tooltipContent: string | undefined;
-  onPromote: () => void;
+  onSync: () => void;
 }) => {
   if (!currentEnvironment || currentEnvironment.name === 'Production') {
     return null;
   }
 
-  if (isPromotable) {
+  if (isSyncable) {
     return (
-      <DropdownMenuItem onClick={onPromote}>
+      <DropdownMenuItem onClick={onSync}>
         <RiGitPullRequestFill />
-        Promote to Production
+        Sync to Production
       </DropdownMenuItem>
     );
   }
@@ -156,7 +156,7 @@ const PromoteWorkflowMenuItem = ({
         <TooltipTrigger>
           <DropdownMenuItem disabled>
             <RiGitPullRequestFill />
-            Promote to Production
+            Sync to Production
           </DropdownMenuItem>
         </TooltipTrigger>
         <TooltipPortal>
