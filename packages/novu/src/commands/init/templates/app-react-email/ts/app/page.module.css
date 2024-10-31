@@ -187,6 +187,10 @@
   margin-bottom: 1rem;
 }
 
+.description a {
+  color: #0081f1;
+}
+
 .divider {
   width: 1px;
   background: #e2e8f0;
@@ -415,4 +419,19 @@
   color: #4f46e5;
   border: 1px solid rgba(224, 231, 255, 0.6);
   font-weight: 500;
+}
+
+.successMessage {
+  color: #16a34a;
+  margin-top: 8px;
+  margin-left: 5rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.complianceBadges {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 0.5rem;
 }
