@@ -36,6 +36,6 @@
     "react": ">=17"
   },
   "dependencies": {
-    "@novu/react": "^2.3.1"
+    "@novu/react": "workspace:*"
   }
 }

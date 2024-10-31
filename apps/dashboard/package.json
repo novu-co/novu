@@ -23,7 +23,7 @@
     "@clerk/clerk-react": "^5.2.5",
     "@hookform/resolvers": "^3.9.0",
     "@monaco-editor/react": "^4.6.0",
-    "@novu/react": "^2.3.0",
+    "@novu/react": "workspace:*",
     "@novu/shared": "workspace:*",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-accordion": "^1.2.1",
