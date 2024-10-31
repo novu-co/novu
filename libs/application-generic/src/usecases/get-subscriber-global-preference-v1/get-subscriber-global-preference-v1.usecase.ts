@@ -10,9 +10,7 @@ import { IPreferenceChannels, ChannelTypeEnum } from '@novu/shared';
 import { GetSubscriberGlobalPreferenceCommandV1 } from './get-subscriber-global-preference-v1.command';
 import { buildSubscriberKey, CachedEntity } from '../../services/cache';
 import { ApiException } from '../../utils/exceptions';
-import { GetPreferences } from '../get-preferences';
-import { GetSubscriberPreference } from '../get-subscriber-preference/get-subscriber-preference.usecase';
-import { filteredPreference } from '../get-subscriber-template-preference/get-subscriber-template-preference.usecase';
+import { InstrumentUsecase } from '../../instrumentation';
 
 /** @deprecated - use `GetPreferences` instead */
 @Injectable()
@@ -22,6 +20,7 @@ export class GetSubscriberGlobalPreferenceV1 {
     private subscriberRepository: SubscriberRepository,
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: GetSubscriberGlobalPreferenceCommandV1) {
     const subscriber = await this.getSubscriber(command);
 
