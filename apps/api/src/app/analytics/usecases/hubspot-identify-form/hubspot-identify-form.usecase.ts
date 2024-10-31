@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
-import { HubspotIdentifyFormCommand } from './hubspot-identify-form.command';
 import { Injectable, Logger } from '@nestjs/common';
 import { AxiosError } from 'axios';
+import { HubspotIdentifyFormCommand } from './hubspot-identify-form.command';
 
 const LOG_CONTEXT = 'HubspotIdentifyFormUsecase';
 
