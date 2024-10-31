@@ -15,17 +15,11 @@ import { InstrumentUsecase } from '../../instrumentation';
 /**
  * @deprecated - use `GetPreferences` with `PreferenceTypeEnum.SUBSCRIBER_GLOBAL` instead.
  *
- * This use-case is temporary to support resolution of existing Global Subscriber Preferences
+ * This use-case is temporary to support resolution of existing V1 Global Subscriber Preferences
  * that are still stored in the `SubscriberPreference` collection.
  *
- * This use-case will be removed after migrating all V1 Preferences to the `Preferences`
- * collection. These include:
- * - NotificationTemplateEntity.preferenceSettings migrates to:
- *   -> `Preference` collection with: `PreferenceTypeEnum.WORKFLOW_RESOURCE` & `PreferenceLevelEnum.USER_WORKFLOW`
- * - SubscriberPreferenceEntity (with `PreferenceLevelEnum.GLOBAL`) migrates to:
- *   -> `Preference` collection with `PreferenceTypeEnum.SUBSCRIBER_GLOBAL`
- * - SubscriberPreferenceEntity (with `PreferenceLevelEnum.TEMPLATE`) migrates to:
- *   -> `Preference` collection with `PreferenceTypeEnum.SUBSCRIBER_TEMPLATE`
+ * V2 Global Subscriber Preferences are stored in the `Preference` collection
+ * with `PreferenceTypeEnum.SUBSCRIBER_GLOBAL`
  */
 @Injectable()
 export class GetSubscriberGlobalPreferenceV1 {
