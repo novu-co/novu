@@ -1,14 +1,14 @@
 import { checkIsResponseError } from '@novu/shared';
 import { BridgeError, MissingSecretKeyError, PlatformError } from '../errors';
 
-export const initApiClient = (apiKey: string, apiUrl?: string) => {
-  if (!apiKey) {
+export const initApiClient = (secretKey: string, apiUrl: string) => {
+  if (!secretKey) {
     throw new MissingSecretKeyError();
   }
 
   return {
     post: async <T = unknown>(route: string, data: Record<string, unknown>): Promise<T> => {
-      const response = await fetch(`${apiUrl || 'https://api.novu.co'}/v1${route}`, {
+      const response = await fetch(`${apiUrl}/v1${route}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
