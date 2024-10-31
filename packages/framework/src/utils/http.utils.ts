@@ -1,16 +1,18 @@
 import { checkIsResponseError } from '@novu/shared';
-import { BridgeError, PlatformError } from '../errors';
+import { BridgeError, MissingSecretKeyError, PlatformError } from '../errors';
 
-export const initApiClient = (apiKey: string, baseURL = 'https://api.novu.co') => {
-  const apiUrl = process.env.NOVU_API_URL || baseURL;
+export const initApiClient = (apiKey: string, apiUrl?: string) => {
+  if (!apiKey) {
+    throw new MissingSecretKeyError();
+  }
 
   return {
     post: async <T = unknown>(route: string, data: Record<string, unknown>): Promise<T> => {
-      const response = await fetch(`${apiUrl}/v1${route}`, {
+      const response = await fetch(`${apiUrl || 'https://api.novu.co'}/v1${route}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `ApiKey ${apiKey}`,
+          Authorization: `ApiKey ${secretKey}`,
         },
         body: JSON.stringify(data),
       });
@@ -31,7 +33,7 @@ export const initApiClient = (apiKey: string, baseURL = 'https://api.novu.co') =
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `ApiKey ${apiKey}`,
+            Authorization: `ApiKey ${secretKey}`,
           },
         })
       ).json() as T;
