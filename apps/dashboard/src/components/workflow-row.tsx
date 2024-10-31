@@ -137,15 +137,13 @@ const SyncWorkflowMenuItem = ({
   tooltipContent: string | undefined;
   onSync: () => void;
 }) => {
-  if (!currentEnvironment || currentEnvironment.name === 'Production') {
-    return null;
-  }
+  const syncToLabel = `Sync to ${currentEnvironment?.name === 'Production' ? 'Development' : 'Production'}`;
 
   if (isSyncable) {
     return (
       <DropdownMenuItem onClick={onSync}>
         <RiGitPullRequestFill />
-        Sync to Production
+        {syncToLabel}
       </DropdownMenuItem>
     );
   }
@@ -156,7 +154,7 @@ const SyncWorkflowMenuItem = ({
         <TooltipTrigger>
           <DropdownMenuItem disabled>
             <RiGitPullRequestFill />
-            Sync to Production
+            {syncToLabel}
           </DropdownMenuItem>
         </TooltipTrigger>
         <TooltipPortal>

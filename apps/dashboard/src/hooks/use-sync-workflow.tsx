@@ -15,13 +15,20 @@ import { ToastClose } from '@/components/primitives/sonner';
 import { ToastIcon } from '@/components/primitives/sonner';
 import { showToast } from '@/components/primitives/sonner-helpers';
 import { useEnvironment } from '@/context/environment/hooks';
-import { WorkflowListResponseDto, WorkflowOriginEnum, WorkflowResponseDto, WorkflowStatusEnum } from '@novu/shared';
+import {
+  WorkflowListResponseDto,
+  WorkflowOriginEnum,
+  WorkflowResponseDto,
+  WorkflowStatusEnum,
+  IEnvironment,
+} from '@novu/shared';
 import { useMutation } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { RiAlertFill, RiArrowRightSLine } from 'react-icons/ri';
 import { toast } from 'sonner';
 
 const PRODUCTION_ENVIRONMENT = 'Production' as const;
+const DEVELOPMENT_ENVIRONMENT = 'Development' as const;
 
 export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
   const { environments, switchEnvironment, currentEnvironment } = useEnvironment();
@@ -31,16 +38,19 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
   let loadingToast: string | number | undefined = undefined;
 
   const isSyncable = useMemo(
-    () =>
-      workflow.origin === WorkflowOriginEnum.NOVU_CLOUD &&
-      workflow.status !== WorkflowStatusEnum.ERROR &&
-      currentEnvironment?.name !== PRODUCTION_ENVIRONMENT,
-    [workflow.origin, workflow.status, currentEnvironment?.name]
+    () => workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && workflow.status !== WorkflowStatusEnum.ERROR,
+    [workflow.origin, workflow.status]
   );
 
-  const getProductionEnvironmentId = useCallback(() => {
-    return environments?.find((environment) => environment.name === PRODUCTION_ENVIRONMENT)?._id || '';
-  }, [environments]);
+  const getTargetEnvironment = useCallback(
+    (sourceEnvironment: IEnvironment): IEnvironment | null => {
+      const targetEnvironmentName =
+        sourceEnvironment.name === PRODUCTION_ENVIRONMENT ? DEVELOPMENT_ENVIRONMENT : PRODUCTION_ENVIRONMENT;
+
+      return environments?.find((env) => env.name === targetEnvironmentName) || null;
+    },
+    [environments]
+  );
 
   const getTooltipContent = () => {
     if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
@@ -57,8 +67,10 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
   };
 
   const safeSync = async () => {
+    const targetEnvironment = getTargetEnvironment(currentEnvironment);
+
     try {
-      if (await isWorkflowInProduction()) {
+      if (await isWorkflowInTargetEnvironment(targetEnvironment?._id || '')) {
         setShowConfirmModal(true);
 
         return;
@@ -76,12 +88,12 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
     }
   };
 
-  const isWorkflowInProduction = async () => {
-    const { data: workflowInProd } = await getV2<{ data: WorkflowResponseDto }>(
-      `/workflows/${workflow.workflowId}?environmentId=${getProductionEnvironmentId()}`
+  const isWorkflowInTargetEnvironment = async (environmentId: string) => {
+    const { data: workflowInTargetEnvironment } = await getV2<{ data: WorkflowResponseDto }>(
+      `/workflows/${workflow.workflowId}?environmentId=${environmentId}`
     );
 
-    return !!workflowInProd;
+    return !!workflowInTargetEnvironment;
   };
 
   const onSyncSuccess = () => {
@@ -96,9 +108,12 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
           <ToastIcon variant="default" />
           <div className="flex flex-1 flex-col items-start gap-2.5">
             <div className="flex flex-col items-start justify-center gap-1 self-stretch">
-              <div className="text-foreground-950 text-sm font-medium">Workflow synced to Production</div>
+              <div className="text-foreground-950 text-sm font-medium">
+                Workflow synced to {getTargetEnvironment(currentEnvironment)?.name}
+              </div>
               <div className="text-foreground-600 text-sm">
-                Workflow '{workflow.name}' has been successfully synced to production.
+                Workflow '{workflow.name}' has been successfully synced to{' '}
+                {getTargetEnvironment(currentEnvironment)?.name}.
               </div>
             </div>
             <div className="flex items-center justify-end gap-2 self-stretch">
@@ -106,7 +121,7 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
                 variant="ghost"
                 size="sm"
                 className="text-destructive gap-1"
-                onClick={() => switchEnvironment(getProductionEnvironmentId())}
+                onClick={() => switchEnvironment(getTargetEnvironment(currentEnvironment)?._id)}
               >
                 Switch to production
                 <RiArrowRightSLine />
@@ -133,7 +148,9 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
 
   const { mutateAsync: syncWorkflowMutation } = useMutation({
     mutationFn: async () =>
-      syncWorkflow(workflow._id, { targetEnvironmentId: getProductionEnvironmentId() }).then((res) => res.data),
+      syncWorkflow(workflow._id, { targetEnvironmentId: getTargetEnvironment(currentEnvironment)?._id || '' }).then(
+        (res) => res.data
+      ),
     onMutate: () => {
       setIsLoading(true);
       loadingToast = toast.loading('Syncing workflow...');
@@ -158,9 +175,12 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
                 <RiAlertFill className="text-warning size-6" />
               </div>
               <div className="flex flex-1 flex-col items-start gap-1">
-                <DialogTitle className="text-md font-medium">Sync workflow to Production</DialogTitle>
+                <DialogTitle className="text-md font-medium">
+                  Sync workflow to {getTargetEnvironment(currentEnvironment)?.name}
+                </DialogTitle>
                 <DialogDescription className="text-foreground-600">
-                  Workflow already exists in Production. Proceeding will overwrite the existing workflow.
+                  Workflow already exists in {getTargetEnvironment(currentEnvironment)?.name}. Proceeding will overwrite
+                  the existing workflow.
                 </DialogDescription>
               </div>
             </div>
