@@ -29,8 +29,7 @@ import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
 
 const formSchema = z.object({
-  name: z.string(),
-  workflowId: z.string().regex(/^[a-z0-9-]+$/, 'Invalid identifier format. Must follow ^[a-z0-9-]+$'),
+  name: z.string().min(1, { message: 'Name is required' }),
   tags: z
     .array(z.string().min(1))
     .max(8)
@@ -69,7 +68,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { description: '', workflowId: '', name: '', tags: [] },
+    defaultValues: { description: '', name: '', tags: [] },
   });
 
   return (
@@ -135,23 +134,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                         />
                       </InputField>
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="workflowId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Identifier</FormLabel>
-                    <FormControl>
-                      <InputField>
-                        <Input placeholder="untitled" {...field} />
-                      </InputField>
-                    </FormControl>
-                    <FormMessage>Must be unique and all lowercase ^[a-z0-9\-]+$</FormMessage>
+                    <FormMessage>Name is required</FormMessage>
                   </FormItem>
                 )}
               />
