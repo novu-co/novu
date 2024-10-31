@@ -1,6 +1,6 @@
 import { cn } from '@/utils/ui';
 import { useTheme } from 'next-themes';
-import { Toaster as Sonner, toast } from 'sonner';
+import { Toaster as Sonner } from 'sonner';
 import { cva, VariantProps } from 'class-variance-authority';
 import React from 'react';
 import { IconBaseProps } from 'react-icons/lib';
@@ -11,7 +11,6 @@ import {
   RiErrorWarningFill,
   RiInformationFill,
   RiProgress1Line,
-  RiArrowRightSLine,
 } from 'react-icons/ri';
 import { Button } from './button';
 
@@ -82,37 +81,6 @@ const ToastClose = ({ className, ...props }: React.HTMLAttributes<HTMLButtonElem
   );
 };
 
-const PromoteToast = ({
-  t,
-  title,
-  description,
-  action,
-}: {
-  t: number | string;
-  title: string;
-  description: string;
-  action: { label: string; onClick: () => void };
-}) => {
-  return (
-    <Toast variant="lg" className="gap-3">
-      <ToastIcon variant="default" />
-      <div className="flex flex-[1_0_0] flex-col items-start gap-2.5">
-        <div className="flex flex-col items-start justify-center gap-1 self-stretch">
-          <div className="text-foreground-950 text-sm font-medium">{title}</div>
-          <div className="text-foreground-600 text-sm">{description}</div>
-        </div>
-        <div className="flex items-center justify-end gap-2 self-stretch">
-          <Button variant="ghost" size="sm" className="text-destructive gap-1" onClick={action.onClick}>
-            {action.label}
-            <RiArrowRightSLine />
-          </Button>
-        </div>
-      </div>
-      <ToastClose onClick={() => toast.dismiss(t)} />
-    </Toast>
-  );
-};
-
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = 'system' } = useTheme();
 
@@ -137,4 +105,4 @@ const Toaster = ({ ...props }: ToasterProps) => {
   );
 };
 
-export { Toaster, Toast, ToastIcon, ToastClose, PromoteToast };
+export { Toaster, Toast, ToastIcon, ToastClose };

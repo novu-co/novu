@@ -14,8 +14,6 @@ import { TableCell, TableRow } from '@/components/primitives/table';
 import { useEnvironment } from '@/context/environment/hooks';
 import { WorkflowOriginEnum } from '@/utils/enums';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
-import { usePromoteWorkflow } from '@/hooks/use-promote-workflow';
-import { useState } from 'react';
 import { Badge } from '@/components/primitives/badge';
 import { BadgeContent } from '@/components/primitives/badge';
 import { WorkflowStatus } from '@/components/workflow-status';
@@ -31,17 +29,7 @@ import {
   TooltipTrigger,
 } from '@/components/primitives/tooltip';
 import { RiMore2Fill, RiPlayCircleLine } from 'react-icons/ri';
-import { UseMutateAsyncFunction } from '@tanstack/react-query';
-import {
-  Dialog,
-  DialogClose,
-  DialogFooter,
-  DialogDescription,
-  DialogTitle,
-  DialogContent,
-  DialogOverlay,
-  DialogPortal,
-} from '@/components/primitives/dialog';
+import { usePromoteWorkflow } from '@/hooks/use-promote-workflow2';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -49,18 +37,7 @@ type WorkflowRowProps = {
 
 export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
   const { currentEnvironment } = useEnvironment();
-  const { safePromote, promote, isPromotable, tooltipContent } = usePromoteWorkflow(workflow);
-  const [showPromoteModal, setShowPromoteModal] = useState(false);
-
-  const handlePromote = async () => {
-    const { needsConfirmation } = await safePromote();
-
-    if (needsConfirmation) {
-      setShowPromoteModal(true);
-    } else {
-      await promote();
-    }
-  };
+  const { safePromote, isPromotable, tooltipContent, ConfirmationModal } = usePromoteWorkflow(workflow);
 
   const isV1Workflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1;
   const workflowLink = isV1Workflow
@@ -72,7 +49,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
 
   return (
     <TableRow key={workflow._id} className="relative">
-      <PromoteWorkflowConfirmModal open={showPromoteModal} setOpen={setShowPromoteModal} promoteWorkflow={promote} />
+      <ConfirmationModal />
       <TableCell className="font-medium">
         <div className="flex items-center gap-1">
           {workflow.origin === WorkflowOriginEnum.EXTERNAL && (
@@ -124,7 +101,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
                 currentEnvironment={currentEnvironment}
                 isPromotable={isPromotable}
                 tooltipContent={tooltipContent}
-                onPromote={handlePromote}
+                onPromote={safePromote}
               />
               <DropdownMenuItem>
                 <RiPulseFill />
@@ -187,53 +164,5 @@ const PromoteWorkflowMenuItem = ({
         </TooltipPortal>
       </Tooltip>
     </TooltipProvider>
-  );
-};
-
-const PromoteWorkflowConfirmModal = ({
-  open,
-  setOpen,
-  promoteWorkflow,
-}: {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  promoteWorkflow: UseMutateAsyncFunction<WorkflowResponseDto, unknown, void, void>;
-}) => {
-  async function onConfirm() {
-    setOpen(false);
-    await promoteWorkflow();
-  }
-
-  return (
-    <Dialog modal open={open}>
-      <DialogPortal>
-        <DialogOverlay />
-        <DialogContent className="sm:max-w-[440px]">
-          <div className="flex items-start gap-4 self-stretch">
-            <div className="flex items-center justify-center gap-2 rounded-[10px] bg-[#FF84471A] p-2">
-              <RiAlertFill className="text-warning size-6" />
-            </div>
-            <div className="flex flex-[1_0_0] flex-col items-start gap-1">
-              <DialogTitle className="text-md font-medium">Promote workflow to Production</DialogTitle>
-              <DialogDescription className="text-foreground-600">
-                Workflow already exists in Production. Proceeding will overwrite the existing workflow.
-              </DialogDescription>
-            </div>
-          </div>
-          <DialogFooter className="[&~button]:hidden">
-            <DialogClose asChild aria-label="Close">
-              <Button type="button" size="sm" variant="outline" onClick={() => setOpen(false)}>
-                Cancel
-              </Button>
-            </DialogClose>
-            <DialogClose asChild aria-label="Close">
-              <Button type="button" size="sm" variant="primary" onClick={onConfirm}>
-                Proceed
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </DialogPortal>
-    </Dialog>
   );
 };
