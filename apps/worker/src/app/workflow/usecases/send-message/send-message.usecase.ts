@@ -22,8 +22,8 @@ import {
   ExecutionLogRouteCommand,
   GetPreferences,
   GetPreferencesCommand,
-  GetSubscriberGlobalPreference,
-  GetSubscriberGlobalPreferenceCommand,
+  GetSubscriberGlobalPreferenceCommandV1,
+  GetSubscriberGlobalPreferenceV1,
   GetSubscriberTemplatePreference,
   GetSubscriberTemplatePreferenceCommand,
   IConditionsFilterResponse,
@@ -67,7 +67,7 @@ export class SendMessage {
     private digest: Digest,
     private executionLogRoute: ExecutionLogRoute,
     private getSubscriberTemplatePreferenceUsecase: GetSubscriberTemplatePreference,
-    private getSubscriberGlobalPreferenceUsecase: GetSubscriberGlobalPreference,
+    private getSubscriberGlobalPreferenceV1Usecase: GetSubscriberGlobalPreferenceV1,
     private notificationTemplateRepository: NotificationTemplateRepository,
     private jobRepository: JobRepository,
     private sendMessageDelay: SendMessageDelay,
@@ -340,8 +340,8 @@ export class SendMessage {
        * TODO: Remove this check after we remove V1 preferences, global subscriber
        * preferences are handled in `GetPreferences` for V2 preferences.
        */
-      const { preference: globalPreference } = await this.getSubscriberGlobalPreferenceUsecase.execute(
-        GetSubscriberGlobalPreferenceCommand.create({
+      const { preference: globalPreference } = await this.getSubscriberGlobalPreferenceV1Usecase.execute(
+        GetSubscriberGlobalPreferenceCommandV1.create({
           organizationId: job._organizationId,
           environmentId: job._environmentId,
           subscriberId: job.subscriberId,

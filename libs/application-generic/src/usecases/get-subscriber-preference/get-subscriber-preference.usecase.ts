@@ -50,6 +50,7 @@ export class GetSubscriberPreference {
       },
     );
 
+    // TODO: replace this runtime mapping with a single query to the database
     const subscriberWorkflowPreferences = await Promise.all(
       templateList.map(async (template) =>
         this.getSubscriberTemplatePreferenceUsecase.execute(
