@@ -20,7 +20,7 @@ export const EditStepSidebar = () => {
   const { reset, setError } = form;
 
   const { workflow, error } = useFetchWorkflow({
-    workflowId,
+    workflowSlug: workflowId,
   });
 
   const step = useMemo(() => workflow?.steps.find((el) => el._id === stepId), [stepId, workflow]);

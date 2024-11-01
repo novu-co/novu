@@ -1,5 +1,5 @@
 import { ActionStepEnum, ChannelStepEnum } from '../../constants';
-import { MissingSecretKeyError, WorkflowPayloadInvalidError } from '../../errors';
+import { WorkflowPayloadInvalidError } from '../../errors';
 import { channelStepSchemas, delayActionSchemas, digestActionSchemas, emptySchema } from '../../schemas';
 import type {
   CancelEventTriggerResponse,
@@ -12,7 +12,7 @@ import type {
   WorkflowOptions,
   FromSchemaUnvalidated,
 } from '../../types';
-import { getBridgeUrl, initApiClient } from '../../utils';
+import { getBridgeUrl, initApiClient, resolveApiUrl, resolveSecretKey } from '../../utils';
 import { transformSchema, validateData } from '../../validators';
 import { discoverActionStepFactory } from './discover-action-step-factory';
 import { discoverChannelStepFactory } from './discover-channel-step-factory';
@@ -36,12 +36,8 @@ export function workflow<
 ): Workflow<T_PayloadUnvalidated> {
   const options = workflowOptions || {};
 
-  const apiClient = initApiClient(process.env.NOVU_SECRET_KEY as string);
-
   const trigger: Workflow<T_PayloadUnvalidated>['trigger'] = async (event) => {
-    if (!process.env.NOVU_SECRET_KEY) {
-      throw new MissingSecretKeyError();
-    }
+    const apiClient = initApiClient(resolveSecretKey(event.secretKey), resolveApiUrl(event.apiUrl));
 
     const unvalidatedData = (event.payload || {}) as T_PayloadUnvalidated;
     let validatedData: T_PayloadValidated;

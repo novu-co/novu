@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useRef } from 'react';
-import { useCounts, useNotifications } from '@novu/react';
+import { useCounts, useNotifications } from '@novu/nextjs';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { FiChevronDown, FiHome, FiInbox, FiSearch, FiSettings } from 'react-icons/fi';
 import { BsFillFileTextFill, BsTrash } from 'react-icons/bs';

@@ -9,7 +9,7 @@ jobs:
   test_inbound_mail:
     strategy:
       matrix:
-        name: [ 'novu/inbound-mail-ee', 'novu/inbound-mail' ]
+        name: ['novu/inbound-mail-ee', 'novu/inbound-mail']
     uses: ./.github/workflows/reusable-inbound-mail-e2e.yml
     with:
       ee: ${{ contains (matrix.name,'-ee') }}
@@ -28,7 +28,7 @@ jobs:
       id-token: write
     strategy:
       matrix:
-        name: [ 'novu/inbound-mail-ee', 'novu/inbound-mail' ]
+        name: ['novu/inbound-mail-ee', 'novu/inbound-mail']
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-project
@@ -89,7 +89,7 @@ jobs:
           docker tag novu-inbound-mail ghcr.io/$REGISTRY_OWNER/$DOCKER_NAME:$IMAGE_TAG
 
           docker run --network=host --name inbound-mail -dit --env NODE_ENV=test ghcr.io/$REGISTRY_OWNER/$DOCKER_NAME:$IMAGE_TAG
-          
+
           docker push ghcr.io/$REGISTRY_OWNER/$DOCKER_NAME:prod
           docker push ghcr.io/$REGISTRY_OWNER/$DOCKER_NAME:latest
           docker push ghcr.io/$REGISTRY_OWNER/$DOCKER_NAME:$IMAGE_TAG
@@ -108,7 +108,6 @@ jobs:
 
   deploy_prod_inbound_mail_us:
     needs:
-      - deploy_prod_inbound_mail_eu
       - build_prod_image
     uses: ./.github/workflows/reusable-app-service-deploy.yml
     secrets: inherit

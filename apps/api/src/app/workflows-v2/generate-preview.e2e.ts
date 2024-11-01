@@ -6,7 +6,6 @@ import { sleep } from '@nestjs/terminus/dist/utils';
 import {
   ChannelTypeEnum,
   EmailStepControlSchemaDto,
-  FeatureFlagsKeysEnum,
   GeneratePreviewRequestDto,
   GeneratePreviewResponseDto,
   RedirectTargetEnum,
