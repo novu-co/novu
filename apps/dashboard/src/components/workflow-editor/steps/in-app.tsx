@@ -4,8 +4,11 @@ import { Button } from '../../primitives/button';
 import { Separator } from '../../primitives/separator';
 import { CommonFields } from './common-fields';
 import { DeleteStepButton } from './delete-step-button';
+import { useWorkflowEditorContext } from '@/components/workflow-editor/hooks';
 
 export function InApp() {
+  const { isReadOnly } = useWorkflowEditorContext();
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex flex-col gap-4 p-3">
@@ -20,7 +23,7 @@ export function InApp() {
           </Button>
         </Link>
       </div>
-      <DeleteStepButton />
+      {!isReadOnly && <DeleteStepButton />}
     </div>
   );
 }

@@ -13,14 +13,17 @@ import { Button } from '../primitives/button';
 import { CopyButton } from '../primitives/copy-button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
 import { Switch } from '../primitives/switch';
+import { useWorkflowEditorContext } from '@/components/workflow-editor/hooks';
+import { cn } from '@/utils/ui';
 
 export function ConfigureWorkflow() {
   const tagsQuery = useTagsQuery();
+  const { isReadOnly } = useWorkflowEditorContext();
 
   const { control } = useFormContext<z.infer<typeof workflowSchema>>();
   return (
     <motion.div
-      className="flex h-full w-full flex-col"
+      className={cn('relative flex h-full w-full flex-col')}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0.1 }}
@@ -44,7 +47,7 @@ export function ConfigureWorkflow() {
               <FormLabel>Active Workflow</FormLabel>
             </div>
             <FormControl>
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
+              <Switch checked={field.value} onCheckedChange={field.onChange} disabled={isReadOnly} />
             </FormControl>
           </FormItem>
         )}
@@ -59,7 +62,7 @@ export function ConfigureWorkflow() {
               <FormLabel>Workflow Name</FormLabel>
               <FormControl>
                 <InputField>
-                  <Input placeholder="Untitled" {...field} />
+                  <Input placeholder="Untitled" {...field} disabled={isReadOnly} />
                 </InputField>
               </FormControl>
               <FormMessage />
@@ -74,7 +77,7 @@ export function ConfigureWorkflow() {
               <FormLabel>Workflow Identifier</FormLabel>
               <FormControl>
                 <InputField className="flex overflow-hidden pr-0">
-                  <Input placeholder="Untitled" {...field} readOnly />
+                  <Input placeholder="Untitled" {...field} disabled={isReadOnly} />
                   <CopyButton
                     content={field.value}
                     className="rounded-md rounded-s-none border-b-0 border-r-0 border-t-0 text-neutral-400"
@@ -92,7 +95,7 @@ export function ConfigureWorkflow() {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="Description of what this workflow does" {...field} />
+                <Textarea placeholder="Description of what this workflow does" {...field} disabled={isReadOnly} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -109,9 +112,10 @@ export function ConfigureWorkflow() {
               <FormControl className="text-xs text-neutral-600">
                 <TagInput
                   {...field}
+                  disabled={isReadOnly}
                   value={field.value ?? []}
                   suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []}
-                  showAddButton
+                  showAddButton={!isReadOnly}
                 />
               </FormControl>
             </FormItem>

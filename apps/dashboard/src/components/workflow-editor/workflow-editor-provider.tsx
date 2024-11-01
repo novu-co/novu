@@ -17,6 +17,7 @@ import { Step } from '@/utils/types';
 import { showToast } from '../primitives/sonner-helpers';
 import { ToastIcon } from '../primitives/sonner';
 import { handleValidationIssues } from '@/utils/handleValidationIssues';
+import { WorkflowOriginEnum } from '@novu/shared';
 
 const STEP_NAME_BY_TYPE: Record<StepTypeEnum, string> = {
   email: 'Email Step',
@@ -52,6 +53,7 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
   const { workflow, error } = useFetchWorkflow({
     workflowSlug,
   });
+  const isReadOnly = workflow?.origin === WorkflowOriginEnum.EXTERNAL;
 
   useLayoutEffect(() => {
     if (error) {
@@ -108,6 +110,7 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
 
       updateWorkflow({ id: workflow._id, workflow: { ...workflow, ...data } as any });
     },
+    enabled: !isReadOnly,
   });
 
   const addStep = useCallback(
@@ -124,9 +127,10 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
 
   const value = useMemo(
     () => ({
+      isReadOnly,
       addStep,
     }),
-    [addStep]
+    [addStep, isReadOnly]
   );
 
   return (
