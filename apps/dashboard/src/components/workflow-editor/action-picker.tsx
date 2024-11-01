@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/button';
+import { Button, buttonVariants } from '@/components/primitives/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +10,6 @@ import { Input, InputField } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import { URLInput } from '@/components/primitives/url-input';
-import { buttonVariants } from '@/components/primitives/variants';
 import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
 import { zodResolver } from '@hookform/resolvers/zod';

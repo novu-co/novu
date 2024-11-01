@@ -15,6 +15,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../pri
 import { Switch } from '../primitives/switch';
 import { useWorkflowEditorContext } from '@/components/workflow-editor/hooks';
 import { cn } from '@/utils/ui';
+import { SidebarContent, SidebarHeader } from '@/components/side-navigation/Sidebar';
 
 export function ConfigureWorkflow() {
   const tagsQuery = useTagsQuery();
@@ -29,31 +30,35 @@ export function ConfigureWorkflow() {
       exit={{ opacity: 0.1 }}
       transition={{ duration: 0.1 }}
     >
-      <div className="flex items-center gap-2.5 px-3 pb-3.5 text-sm font-medium">
-        <RouteFill />
-        <span>Configure workflow</span>
-      </div>
+      <SidebarHeader className="items-center text-sm font-medium">
+        <div className="flex items-center gap-1">
+          <RouteFill />
+          <span>Configure workflow</span>
+        </div>
+      </SidebarHeader>
       <Separator />
-      <FormField
-        control={control}
-        name="active"
-        render={({ field }) => (
-          <FormItem className="flex items-center justify-between gap-2.5 space-y-0 px-3 py-2">
-            <div className="flex items-center gap-4">
-              <div
-                className="bg-success/60 data-[active=false]:shadow-neutral-alpha-100 ml-2 h-1.5 w-1.5 rounded-full [--pulse-color:var(--success)] data-[active=true]:animate-[pulse-shadow_1s_ease-in-out_infinite] data-[active=false]:bg-neutral-300 data-[active=false]:shadow-[0_0px_0px_5px_var(--neutral-alpha-200),0_0px_0px_9px_var(--neutral-alpha-100)]"
-                data-active={field.value}
-              />
-              <FormLabel>Active Workflow</FormLabel>
-            </div>
-            <FormControl>
-              <Switch checked={field.value} onCheckedChange={field.onChange} disabled={isReadOnly} />
-            </FormControl>
-          </FormItem>
-        )}
-      />
+      <SidebarContent size="md">
+        <FormField
+          control={control}
+          name="active"
+          render={({ field }) => (
+            <FormItem className="flex w-full items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div
+                  className="bg-success/60 data-[active=false]:shadow-neutral-alpha-100 ml-2 h-1.5 w-1.5 rounded-full [--pulse-color:var(--success)] data-[active=true]:animate-[pulse-shadow_1s_ease-in-out_infinite] data-[active=false]:bg-neutral-300 data-[active=false]:shadow-[0_0px_0px_5px_var(--neutral-alpha-200),0_0px_0px_9px_var(--neutral-alpha-100)]"
+                  data-active={field.value}
+                />
+                <FormLabel>Active Workflow</FormLabel>
+              </div>
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} disabled={isReadOnly} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+      </SidebarContent>
       <Separator />
-      <div className="flex flex-col gap-4 p-3">
+      <SidebarContent>
         <FormField
           control={control}
           name="name"
@@ -121,14 +126,14 @@ export function ConfigureWorkflow() {
             </FormItem>
           )}
         />
-      </div>
+      </SidebarContent>
       <Separator />
-      <div className="px-3 py-4">
+      <SidebarContent size="lg">
         <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
           <RiSettingsLine className="h-4 w-4 text-neutral-600" />
           Configure channel preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
         </Button>
-      </div>
+      </SidebarContent>
       <Separator />
     </motion.div>
   );
