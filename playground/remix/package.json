@@ -1,0 +1,34 @@
+{
+  "name": "remix",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "build": "remix vite:build",
+    "dev": "remix vite:dev --port 5173",
+    "start": "remix-serve ./build/server/index.js",
+    "typecheck": "tsc",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@novu/framework": "workspace:*",
+    "@remix-run/node": "^2.13.1",
+    "@remix-run/react": "^2.13.1",
+    "@remix-run/serve": "^2.13.1",
+    "isbot": "^4.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@remix-run/dev": "^2.13.1",
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.2.7",
+    "typescript": "^5.1.6",
+    "vite": "^5.1.0",
+    "vite-tsconfig-paths": "^4.2.1",
+    "vitest": "^2.0.4"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

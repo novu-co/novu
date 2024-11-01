@@ -1,0 +1,17 @@
+{
+  "name": "h3",
+  "private": true,
+  "scripts": {
+    "start": "listhen ./app.ts",
+    "dev": "listhen -w ./app.ts --port 5173",
+		"test": "vitest"
+  },
+  "dependencies": {
+    "@novu/framework": "workspace:*",
+    "h3": "latest",
+    "listhen": "latest"
+  },
+  "devDependencies": {
+    "vitest": "^2.0.4"
+  }
+}
