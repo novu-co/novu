@@ -4,7 +4,6 @@ import {
   PreferencesResponseDto,
   PreferencesTypeEnum,
   ShortIsPrefixEnum,
-  Slug,
   StepResponseDto,
   StepTypeEnum,
   WorkflowListResponseDto,
@@ -12,13 +11,10 @@ import {
   WorkflowResponseDto,
   WorkflowStatusEnum,
   WorkflowTypeEnum,
-  slugify,
 } from '@novu/shared';
 import { ControlValuesEntity, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { GetPreferencesResponseDto } from '@novu/application-generic';
-import { encodeBase62 } from '../../shared/helpers';
-
-const SLUG_DELIMITER = '_';
+import { buildSlug } from '../../shared/helpers/build-slug';
 
 export function toResponseWorkflowDto(
   template: NotificationTemplateEntity,
@@ -94,14 +90,6 @@ function toStepResponseDto(step: NotificationStepEntity): StepResponseDto {
     controls: convertControls(step),
     controlValues: step.controlVariables || {},
   } satisfies StepResponseDto;
-}
-
-/**
- * Builds a slug for a step based on the step name, the short prefix and the internal ID.
- * @returns The slug for the entity, example:  slug: "workflow-name_wf_AbC1Xyz9KlmNOpQr"
- */
-function buildSlug(entityName: string, shortIsPrefix: ShortIsPrefixEnum, internalId: string): Slug {
-  return `${slugify(entityName)}${SLUG_DELIMITER}${shortIsPrefix}${encodeBase62(internalId)}`;
 }
 
 function convertControls(step: NotificationStepEntity): ControlsSchema {

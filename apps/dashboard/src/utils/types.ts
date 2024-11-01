@@ -1,10 +1,5 @@
 import type { StepResponseDto } from '@novu/shared';
 
-export enum BaseEnvironmentEnum {
-  DEVELOPMENT = 'Development',
-  PRODUCTION = 'Production',
-}
-
 export type BridgeStatus = {
   status: 'ok';
   bridgeUrl?: string;

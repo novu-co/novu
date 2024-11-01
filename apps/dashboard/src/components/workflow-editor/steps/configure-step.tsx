@@ -30,7 +30,7 @@ export function ConfigureStep() {
       <SidebarHeader className="flex items-center gap-2.5 text-sm font-medium">
         <Link
           to={buildRoute(ROUTES.EDIT_WORKFLOW, {
-            environmentId: currentEnvironment?._id ?? '',
+            environmentSlug: currentEnvironment?.slug ?? '',
             workflowSlug,
           })}
           className="flex items-center"
@@ -42,7 +42,7 @@ export function ConfigureStep() {
         <span>Configure Step</span>
         <Link
           to={buildRoute(ROUTES.EDIT_WORKFLOW, {
-            environmentId: currentEnvironment?._id ?? '',
+            environmentSlug: currentEnvironment?.slug ?? '',
             workflowSlug,
           })}
           className="ml-auto flex items-center"

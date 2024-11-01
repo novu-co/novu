@@ -57,6 +57,7 @@ export const WorkflowList = () => {
       offset: offset.toString(),
     })}`;
   };
+
   const setLimit = (limit: number) => {
     setSearchParams((searchParams) => {
       searchParams.set('limit', limit.toString());
@@ -162,7 +163,7 @@ export const WorkflowList = () => {
                       workflowSlug: workflow.slug,
                     })
                   : buildRoute(ROUTES.EDIT_WORKFLOW, {
-                      environmentId: currentEnvironment?._id ?? '',
+                      environmentSlug: currentEnvironment?.slug ?? '',
                       workflowSlug: workflow.slug,
                     });
                 return (

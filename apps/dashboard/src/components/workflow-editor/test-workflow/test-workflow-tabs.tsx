@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form';
 // @ts-ignore
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { WorkflowTestDataResponseDto } from '@novu/shared';
-// import { TestWorkflowLogsSidebar } from './test-workflow-logs-sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitives/tabs';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { useFetchWorkflow } from '@/hooks';
@@ -19,7 +18,7 @@ import { buildDynamicFormSchema, makeObjectFromSchema, TestWorkflowFormType } fr
 import { TestWorkflowForm } from './test-workflow-form';
 
 export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataResponseDto }) => {
-  const { environmentId = '', workflowSlug = '' } = useParams<{ environmentId: string; workflowSlug: string }>();
+  const { environmentSlug = '', workflowSlug = '' } = useParams<{ environmentSlug: string; workflowSlug: string }>();
   const { workflow } = useFetchWorkflow({
     workflowSlug,
   });
@@ -84,7 +83,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
               <TabsTrigger value="workflow" asChild variant="regular">
                 <Link
                   to={buildRoute(ROUTES.EDIT_WORKFLOW, {
-                    environmentId,
+                    environmentSlug,
                     workflowSlug,
                   })}
                 >
@@ -94,7 +93,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
               <TabsTrigger value="trigger" asChild variant="regular">
                 <Link
                   to={buildRoute(ROUTES.TEST_WORKFLOW, {
-                    environmentId,
+                    environmentSlug,
                     workflowSlug,
                   })}
                 >
