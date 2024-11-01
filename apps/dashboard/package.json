@@ -21,7 +21,9 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.2.5",
+    "@codemirror/lang-liquid": "^6.2.1",
     "@hookform/resolvers": "^3.9.0",
+    "@lezer/highlight": "^1.2.1",
     "@monaco-editor/react": "^4.6.0",
     "@novu/react": "workspace:*",
     "@novu/shared": "workspace:*",
@@ -50,7 +52,6 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "1.0.0",
-    "codemirror-lang-liquid": "^1.0.0",
     "date-fns": "^4.1.0",
     "framer-motion": "^11.3.19",
     "lodash.debounce": "^4.0.8",

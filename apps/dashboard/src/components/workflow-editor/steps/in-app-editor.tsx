@@ -71,7 +71,7 @@ export const InAppEditor = () => {
                 <Editor placeholder="Subject" size="md" value={subject} onChange={setSubject} height="38px" />
               </InputField>
             </div>
-            <InputField size="md" className="h-24 px-1">
+            <InputField size="md" className="h-32 px-1">
               <Editor placeholder="Body" size="md" value={body} onChange={setBody} />
             </InputField>
             <div className="mt-1 flex items-center gap-1">

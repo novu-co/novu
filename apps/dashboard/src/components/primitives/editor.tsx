@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
+import { tags as t } from '@lezer/highlight';
 import { useCodeMirror, EditorView } from '@uiw/react-codemirror';
-import { LiquidHTML } from 'codemirror-lang-liquid';
+import { liquid } from '@codemirror/lang-liquid';
 import { cva, VariantProps } from 'class-variance-authority';
 import createTheme from '@uiw/codemirror-themes';
+import { autocompleteFooter, autocompleteHeader, functionIcon } from './constants';
 
 const editorVariants = cva('-mx-1 -mt-[2px] h-full w-full flex-1 [&_.cm-focused]:outline-none', {
   variants: {
@@ -16,9 +18,91 @@ const editorVariants = cva('-mx-1 -mt-[2px] h-full w-full flex-1 [&_.cm-focused]
   },
 });
 
+const baseTheme = EditorView.baseTheme({
+  '&light': {
+    backgroundColor: 'transparent',
+  },
+  '.cm-tooltip-autocomplete .cm-completionIcon-variable': {
+    '&:after': {
+      content: "''",
+      height: '16px',
+      width: '16px',
+      display: 'block',
+      backgroundRepeat: 'no-repeat',
+      backgroundImage: `url('${functionIcon}')`,
+    },
+  },
+  '.cm-tooltip-autocomplete.cm-tooltip': {
+    position: 'relative',
+    overflow: 'hidden',
+    borderRadius: 'var(--radius)',
+    border: '1px solid var(--neutral-100)',
+    backgroundColor: 'hsl(var(--background))',
+    boxShadow: '0px 1px 3px 0px rgba(16, 24, 40, 0.10), 0px 1px 2px 0px rgba(16, 24, 40, 0.06)',
+    '&:before': {
+      content: "''",
+      top: '0',
+      left: '0',
+      right: '0',
+      height: '30px',
+      display: 'block',
+      backgroundRepeat: 'no-repeat',
+      backgroundImage: `url('${autocompleteHeader}')`,
+    },
+    '&:after': {
+      content: "''",
+      bottom: '30px',
+      left: '0',
+      right: '0',
+      height: '30px',
+      display: 'block',
+      backgroundRepeat: 'no-repeat',
+      backgroundImage: `url('${autocompleteFooter}')`,
+    },
+  },
+  '.cm-tooltip-autocomplete.cm-tooltip > ul[role="listbox"]': {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px',
+    maxHeight: '12rem',
+    margin: '4px 0',
+    padding: '4px',
+  },
+  '.cm-tooltip-autocomplete.cm-tooltip > ul > li[role="option"]': {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '4px',
+    fontSize: '12px',
+    fontWeight: '500',
+    lineHeight: '16px',
+    minHeight: '24px',
+    color: 'var(--foreground-950)',
+    borderRadius: 'calc(var(--radius) - 2px)',
+  },
+  '.cm-tooltip-autocomplete.cm-tooltip > ul > li[aria-selected="true"]': {
+    backgroundColor: 'hsl(var(--neutral-100))',
+  },
+  '.cm-tooltip-autocomplete.cm-tooltip .cm-completionIcon': {
+    padding: '0',
+    width: '16px',
+    height: '16px',
+  },
+  '.cm-line span.cm-matchingBracket': {
+    backgroundColor: 'hsl(var(--highlighted) / 0.1)',
+  },
+});
+
 const theme = createTheme({
   theme: 'light',
-  styles: [],
+  styles: [
+    { tag: t.keyword, color: 'hsl(var(--feature))' },
+    { tag: t.string, color: 'hsl(var(--highlighted))' },
+    { tag: t.operatorKeyword, color: 'hsl(var(--highlighted))' },
+    { tag: t.function(t.variableName), color: 'hsl(var(--information))' },
+    { tag: t.brace, color: 'hsl(var(--foreground-400))' },
+    { tag: t.variableName, color: 'hsl(var(--foreground-950))' },
+  ],
   settings: {
     background: 'transparent',
     lineHighlight: 'transparent',
@@ -36,7 +120,13 @@ type EditorProps = {
 export const Editor = ({ value, placeholder, className, height, size, onChange }: EditorProps) => {
   const editor = useRef<HTMLDivElement>(null);
   const { setContainer } = useCodeMirror({
-    extensions: [LiquidHTML({}), EditorView.lineWrapping],
+    extensions: [
+      liquid({
+        variables: [{ type: 'variable', label: 'asdf' }],
+      }),
+      EditorView.lineWrapping,
+      baseTheme,
+    ],
     height,
     placeholder,
     basicSetup: {
@@ -52,6 +142,7 @@ export const Editor = ({ value, placeholder, className, height, size, onChange }
     value,
     onChange,
     theme,
+    lang: 'liquid',
   });
 
   useEffect(() => {
@@ -59,6 +150,8 @@ export const Editor = ({ value, placeholder, className, height, size, onChange }
       setContainer(editor.current);
     }
   }, [setContainer]);
+
+  // TODO remove default HTML editor tags
 
   return <div ref={editor} className={editorVariants({ size, className })} />;
 };
