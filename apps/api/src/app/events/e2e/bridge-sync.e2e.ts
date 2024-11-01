@@ -609,6 +609,9 @@ describe('Bridge Sync - /bridge/sync (POST)', async () => {
     expect(firstControlValueResponse.length).to.equal(1);
     expect(firstControlValueResponse[0].controls.subject).to.equal('Hello World again');
 
+    const firstStepResponse = await session.testAgent.get(`/v1/bridge/controls/${workflowId}/send-email`);
+    expect(firstStepResponse.body.data.controls.subject).to.equal('Hello World again');
+
     const secondSyncResponse = await session.testAgent.post(`/v1/bridge/sync`).send({
       bridgeUrl: bridgeServer.serverPath,
     });
@@ -643,5 +646,8 @@ describe('Bridge Sync - /bridge/sync (POST)', async () => {
 
     expect(secondControlValueResponse.length).to.equal(1);
     expect(secondControlValueResponse[0].controls.subject).to.equal('Hello World again');
+
+    const secondStepResponse = await session.testAgent.get(`/v1/bridge/controls/${workflowId}/send-email`);
+    expect(secondStepResponse.body.data.controls.subject).to.equal('Hello World again');
   });
 });
