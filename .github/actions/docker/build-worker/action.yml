@@ -10,8 +10,11 @@ inputs:
     description: 'Push the image to the registry'
     required: false
     default: 'false'
-  github_token:
-    description: 'The token to use for logging into ghcr.io'
+  aws-access-key-id:
+    description: 'Access Key for AWS'
+    required: true
+  aws-secret-access-key:
+    description: 'Secret Access Key for AWS'
     required: true
   fork:
     description: 'Whether this is being triggered from a forked repo'
@@ -20,10 +23,6 @@ inputs:
   docker_name:
     description: 'Name for docker image'
     required: true
-  environment:
-    required: false
-    type: string
-
   bullmq_secret:
     description: 'Bullmq secret api token'
     required: true
@@ -36,29 +35,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: ⛏️ build worker
-      shell: bash
-      run: pnpm build:worker
-
-    # TODO Removed when migrated to action matrix for each build type
-    - uses: ./.github/actions/free-space
-    - uses: ./.github/actions/cache
-
-    - uses: crazy-max/ghaction-setup-docker@v2
-      with:
-        version: v24.0.6
-        daemon-config: |
-          {
-            "features": {
-              "containerd-snapshotter": true
-            }
-          }
-
-    - name: Setup QEMU
-      uses: docker/setup-qemu-action@v3
-      with:
-        platforms: linux/amd64,linux/arm64
-
     - name: Set Up Docker Buildx
       uses: docker/setup-buildx-action@v3
       with:
@@ -70,13 +46,16 @@ runs:
         service=${{ matrix.name }}
         echo "SERVICE_NAME=$(basename "${service//-/-}")" >> $GITHUB_ENV
 
-    - name: Login To Registry
-      shell: bash
-      env:
-        GH_ACTOR: ${{ github.actor }}
-        GH_PASSWORD: ${{ inputs.github_token }}
-      run: |
-        echo $GH_PASSWORD | docker login ghcr.io -u $GH_ACTOR --password-stdin
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: eu-west-2
+      
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
 
     - name: Set Bull MQ Env variable for EE
       shell: bash
@@ -87,16 +66,12 @@ runs:
     - name: Build with Buildx, tag, and test
       shell: bash
       env:
-        REGISTRY_OWNER: novuhq
-        DOCKER_NAME: ${{ inputs.docker_name }}
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: novu-dev/worker    
         IMAGE_TAG: ${{ github.sha }}
-        GH_ACTOR: ${{ github.actor }}
-        GH_PASSWORD: ${{ inputs.github_token }}
         DOCKER_BUILD_ARGUMENTS: >
-          --cache-from type=registry,ref=ghcr.io/novuhq/cache:build-cache-${{ env.SERVICE_NAME }}-${{ inputs.environment }}
-          --cache-to type=registry,ref=ghcr.io/novuhq/cache:build-cache-${{ env.SERVICE_NAME }}-${{ inputs.environment }},mode=max
           --platform=linux/amd64 --provenance=false
-          --output=type=image,name=ghcr.io/novuhq/${{ inputs.docker_name }},push-by-digest=true,name-canonical=true
+          --output=type=image,name=$REGISTRY/$REPOSITORY,push-by-digest=true,name-canonical=true
       run: |
         set -x
         cd apps/worker && pnpm run docker:build
@@ -105,47 +80,43 @@ runs:
       id: build-image
       shell: bash
       env:
-        REGISTRY_OWNER: novuhq
-        DOCKER_NAME: ${{ inputs.docker_name }}
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: novu-dev/worker           
         IMAGE_TAG: ${{ github.sha }}
-        GH_ACTOR: ${{ github.actor }}
-        GH_PASSWORD: ${{ inputs.github_token }}
       run: |
-        echo "Tag image"
-        docker images --all
-        docker tag novu-worker ghcr.io/$REGISTRY_OWNER/$DOCKER_NAME:$IMAGE_TAG
+        echo "Built image"
+        docker tag novu-worker $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
-        echo "Run image"
-        docker run --network=host --name worker -dit --env NODE_ENV=test ghcr.io/$REGISTRY_OWNER/$DOCKER_NAME:$IMAGE_TAG
+        docker run --network=host --name worker -dit --env NODE_ENV=test $REGISTRY/$REPOSITORY:$IMAGE_TAG
         docker run --network=host appropriate/curl --retry 10 --retry-delay 5 --retry-connrefused http://127.0.0.1:1342/v1/health-check | grep 'ok'
 
-        echo "IMAGE=ghcr.io/$REGISTRY_OWNER/$DOCKER_NAME:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        echo "IMAGE=$REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
     - name: Optionally tag docker image
       if: ${{ inputs.tag }}
       shell: bash
       env:
-        REGISTRY_OWNER: novuhq
-        DOCKER_NAME: ${{ inputs.docker_name }}
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: novu-dev/worker 
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker tag ghcr.io/$REGISTRY_OWNER/$DOCKER_NAME:$IMAGE_TAG ghcr.io/$REGISTRY_OWNER/$DOCKER_NAME:${{ inputs.tag }}
+        docker tag $REGISTRY/$REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:${{ inputs.tag }}
 
     - name: Push PR tag image
       if: ${{ inputs.push == 'true' }}
       shell: bash
       env:
-        REGISTRY_OWNER: novuhq
-        DOCKER_NAME: ${{ inputs.docker_name }}
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: novu-dev/worker 
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker push ghcr.io/$REGISTRY_OWNER/$DOCKER_NAME:$IMAGE_TAG
+        docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
     - name: Push custom tag image
       if: ${{ inputs.push == 'true' && inputs.tag }}
       shell: bash
       env:
-        REGISTRY_OWNER: novuhq
-        DOCKER_NAME: ${{ inputs.docker_name }}
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: novu-dev/worker 
       run: |
-        docker push ghcr.io/$REGISTRY_OWNER/$DOCKER_NAME:${{ inputs.tag }}
+        docker push $REGISTRY/$REPOSITORY:${{ inputs.tag }}

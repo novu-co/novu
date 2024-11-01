@@ -19,6 +19,7 @@ import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { SubscribersStayTunedModal } from './subscribers-stay-tuned-modal';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { useTelemetry } from '@/hooks/use-telemetry';
+import { SidebarContent } from '@/components/side-navigation/Sidebar';
 
 const linkVariants = cva(
   `flex items-center gap-2 text-sm py-1.5 px-2 rounded-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer`,
@@ -91,54 +92,56 @@ export const SideNavigation = () => {
   };
 
   return (
-    <aside className="bg-neutral-alpha-50 relative flex w-[275px] flex-shrink-0 flex-col gap-3 px-2 pb-3 pt-1.5">
-      <FreeTrialCard />
-      <OrganizationDropdown />
-      <EnvironmentDropdown value={currentEnvironment?.name} data={environmentNames} onChange={onEnvironmentChange} />
-      <nav className="flex flex-1 flex-col gap-4">
-        <NavigationGroup>
-          <NavigationLink to={buildRoute(ROUTES.WORKFLOWS, { environmentId: currentEnvironment?._id ?? '' })}>
-            <RiRouteFill className="size-4" />
-            <span>Workflows</span>
-          </NavigationLink>
-          <SubscribersStayTunedModal>
-            <span onClick={() => track(TelemetryEvent.SUBSCRIBERS_LINK_CLICKED)}>
-              <NavigationLink>
-                <RiGroup2Line className="size-4" />
-                <span>Subscribers</span>
-              </NavigationLink>
-            </span>
-          </SubscribersStayTunedModal>
-        </NavigationGroup>
-        <NavigationGroup label="Monitor">
-          <NavigationLink to={LEGACY_ROUTES.ACTIVITY_FEED} isExternal>
-            <RiBarChartBoxLine className="size-4" />
-            <span>Activity Feed</span>
-          </NavigationLink>
-        </NavigationGroup>
-        <NavigationGroup label="Developer">
-          <NavigationLink to={LEGACY_ROUTES.INTEGRATIONS} isExternal>
-            <RiStore3Line className="size-4" />
-            <span>Integration Store</span>
-          </NavigationLink>
-          <NavigationLink to={LEGACY_ROUTES.API_KEYS} isExternal>
-            <RiKey2Line className="size-4" />
-            <span>API Keys</span>
-          </NavigationLink>
-        </NavigationGroup>
-        <NavigationGroup label="Application">
-          <NavigationLink to={LEGACY_ROUTES.SETTINGS} isExternal>
-            <RiSettings4Line className="size-4" />
-            <span>Settings</span>
-          </NavigationLink>
-        </NavigationGroup>
-        <NavigationGroup>
-          <NavigationLink to={LEGACY_ROUTES.INVITE_TEAM_MEMBERS} isExternal>
-            <RiUserAddLine className="size-4" />
-            <span>Invite teammates</span>
-          </NavigationLink>
-        </NavigationGroup>
-      </nav>
+    <aside className="bg-neutral-alpha-50 relative flex w-[275px] flex-shrink-0 flex-col">
+      <SidebarContent>
+        <FreeTrialCard />
+        <OrganizationDropdown />
+        <EnvironmentDropdown value={currentEnvironment?.name} data={environmentNames} onChange={onEnvironmentChange} />
+        <nav className="flex flex-1 flex-col gap-4">
+          <NavigationGroup>
+            <NavigationLink to={buildRoute(ROUTES.WORKFLOWS, { environmentId: currentEnvironment?._id ?? '' })}>
+              <RiRouteFill className="size-4" />
+              <span>Workflows</span>
+            </NavigationLink>
+            <SubscribersStayTunedModal>
+              <span onClick={() => track(TelemetryEvent.SUBSCRIBERS_LINK_CLICKED)}>
+                <NavigationLink>
+                  <RiGroup2Line className="size-4" />
+                  <span>Subscribers</span>
+                </NavigationLink>
+              </span>
+            </SubscribersStayTunedModal>
+          </NavigationGroup>
+          <NavigationGroup label="Monitor">
+            <NavigationLink to={LEGACY_ROUTES.ACTIVITY_FEED} isExternal>
+              <RiBarChartBoxLine className="size-4" />
+              <span>Activity Feed</span>
+            </NavigationLink>
+          </NavigationGroup>
+          <NavigationGroup label="Developer">
+            <NavigationLink to={LEGACY_ROUTES.INTEGRATIONS} isExternal>
+              <RiStore3Line className="size-4" />
+              <span>Integration Store</span>
+            </NavigationLink>
+            <NavigationLink to={LEGACY_ROUTES.API_KEYS} isExternal>
+              <RiKey2Line className="size-4" />
+              <span>API Keys</span>
+            </NavigationLink>
+          </NavigationGroup>
+          <NavigationGroup label="Application">
+            <NavigationLink to={LEGACY_ROUTES.SETTINGS} isExternal>
+              <RiSettings4Line className="size-4" />
+              <span>Settings</span>
+            </NavigationLink>
+          </NavigationGroup>
+          <NavigationGroup>
+            <NavigationLink to={LEGACY_ROUTES.INVITE_TEAM_MEMBERS} isExternal>
+              <RiUserAddLine className="size-4" />
+              <span>Invite teammates</span>
+            </NavigationLink>
+          </NavigationGroup>
+        </nav>
+      </SidebarContent>
     </aside>
   );
 };

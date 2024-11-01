@@ -38,8 +38,6 @@ describe('Workflow Controller E2E API Testing', () => {
   let workflowsClient: ReturnType<typeof createWorkflowClient>;
 
   beforeEach(async () => {
-    // @ts-ignore
-    process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
     session = new UserSession();
     await session.initialize();
     workflowsClient = createWorkflowClient(session.serverUrl, getHeaders());
@@ -52,8 +50,6 @@ describe('Workflow Controller E2E API Testing', () => {
   }
 
   it('Smoke Testing', async () => {
-    // @ts-ignore
-    process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
     const workflowCreated = await createWorkflowAndValidate();
     await getWorkflowAndValidate(workflowCreated);
     const updateRequest = buildUpdateRequest(workflowCreated);
@@ -76,16 +72,6 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(res.status).to.be.equal(201);
       const workflowCreated: WorkflowResponseDto = res.body.data;
       expect(workflowCreated.workflowId).to.include(`${slugify(nameSuffix)}-`);
-    });
-
-    it('should throw error when creating workflow with duplicate step ids', async () => {
-      const nameSuffix = `Test Workflow${new Date().toString()}`;
-      const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto(nameSuffix, {
-        steps: [buildEmailStep(), buildEmailStep(), buildInAppStep(), buildInAppStep()],
-      });
-      const res = await session.testAgent.post(`${v2Prefix}/workflows`).send(createWorkflowDto);
-      expect(res.status).to.be.equal(400);
-      expect(res.body.message).to.be.equal('Duplicate stepIds are not allowed: email-test-step, in-app-test-step');
     });
   });
 
@@ -281,22 +267,21 @@ describe('Workflow Controller E2E API Testing', () => {
       const resPromoteCreate = await session.testAgent.put(`${v2Prefix}/workflows/${devWorkflow._id}/promote`).send({
         targetEnvironmentId: prodEnvironmentId,
       });
-
       expect(resPromoteCreate.status).to.equal(200);
       const prodWorkflowCreated = resPromoteCreate.body.data;
 
       // Update the workflow in the development environment
+      const stepToUpdate = removeFields(devWorkflow.steps[0], 'stepId');
       const updateDto = {
         ...convertResponseToUpdateDto(devWorkflow),
         name: 'Updated Name',
         description: 'Updated Description',
         // modify existing Email Step, add new InApp Steps, previously existing InApp Step is removed
         steps: [
-          { ...devWorkflow.steps[0], name: 'Updated Email Step' },
+          { ...stepToUpdate, name: 'Updated Email Step' },
           { ...buildInAppStep(), name: 'New InApp Step' },
         ],
       };
-
       await updateWorkflowAndValidate(devWorkflow._id, devWorkflow.updatedAt, updateDto);
 
       // Promote the updated workflow to production
@@ -323,10 +308,13 @@ describe('Workflow Controller E2E API Testing', () => {
       // Verify updated steps
       expect(prodWorkflowUpdated.steps).to.have.lengthOf(2);
       expect(prodWorkflowUpdated.steps[0].name).to.equal('Updated Email Step');
-      // TODO: verify that the stepId (or some) is the same across env for the same prod/dev step
-      expect(prodWorkflowUpdated.steps[0]._id).to.not.equal(prodWorkflowCreated.steps[0]._id);
+      expect(prodWorkflowUpdated.steps[0]._id).to.equal(prodWorkflowCreated.steps[0]._id);
+      expect(prodWorkflowUpdated.steps[0].stepId).to.equal(prodWorkflowCreated.steps[0].stepId);
       expect(prodWorkflowUpdated.steps[1].name).to.equal('New InApp Step');
+
+      // Verify new created step
       expect(prodWorkflowUpdated.steps[1]._id).to.not.equal(prodWorkflowCreated.steps[1]._id);
+      expect(prodWorkflowUpdated.steps[1].stepId).to.equal('new-inapp-step');
     });
 
     it('should throw an error if trying to promote to the same environment', async () => {
@@ -508,7 +496,6 @@ function updateStepId(step: StepResponseDto): Partial<StepResponseDto> {
 
   return {
     ...rest,
-    ...(step._id && step.name ? { stepId: slugify(step.name) } : {}),
     ...(step.name && step._id
       ? { slug: `${slugify(step.name)}_${ShortIsPrefixEnum.STEP}${encodeBase62(step._id)}` }
       : {}),
@@ -528,7 +515,7 @@ function validateUpdatedWorkflowAndRemoveResponseFields(
   );
   const augmentedSteps: UpsertStepBody[] = [];
   for (const stepInResponse of workflowResponse.steps) {
-    const responseStep = removeFields(stepInResponse, 'controls');
+    const responseStep = removeFields(stepInResponse, 'controls', 'stepId');
     expect(stepInResponse._id).to.be.ok;
 
     const { _id } = responseStep;
@@ -825,7 +812,6 @@ function buildUpdateRequest(workflowCreated: WorkflowResponseDto): UpdateWorkflo
   return {
     ...updateRequest,
     name: TEST_WORKFLOW_UPDATED_NAME,
-    workflowId: `${slugify(TEST_WORKFLOW_UPDATED_NAME)}`,
     steps,
   };
 }

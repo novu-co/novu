@@ -8,6 +8,7 @@ import {
   UpsertPreferences,
   UpsertSubscriberWorkflowPreferencesCommand,
   UpsertSubscriberGlobalPreferencesCommand,
+  InstrumentUsecase,
 } from '@novu/application-generic';
 import {
   NotificationTemplateEntity,
@@ -36,6 +37,7 @@ export class UpdatePreferences {
     private upsertPreferences: UpsertPreferences
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: UpdatePreferencesCommand): Promise<InboxPreference> {
     const subscriber = await this.subscriberRepository.findBySubscriberId(command.environmentId, command.subscriberId);
     if (!subscriber) throw new NotFoundException(`Subscriber with id: ${command.subscriberId} is not found`);

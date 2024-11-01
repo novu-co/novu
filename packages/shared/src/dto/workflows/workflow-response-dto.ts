@@ -40,4 +40,8 @@ export class WorkflowResponseDto extends WorkflowCommonsFields {
   @IsObject()
   @IsOptional()
   issues?: Record<string, unknown>;
+
+  @IsString()
+  @IsDefined()
+  workflowId: string;
 }

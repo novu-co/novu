@@ -8,7 +8,7 @@ import { workflowSchema } from './schema';
 import { buildRoute, ROUTES } from '@/utils/routes';
 
 export const WorkflowEditor = () => {
-  const { environmentId = '', workflowId = '' } = useParams<{ environmentId: string; workflowId: string }>();
+  const { environmentId = '', workflowSlug = '' } = useParams<{ environmentId: string; workflowSlug: string }>();
   const form = useFormContext<z.infer<typeof workflowSchema>>();
   const steps = useWatch({
     control: form.control,
@@ -18,29 +18,29 @@ export const WorkflowEditor = () => {
   return (
     <div className="flex h-full flex-1 flex-nowrap">
       <Tabs defaultValue="workflow" className="-mt-[1px] flex h-full flex-1 flex-col" value="workflow">
-        <TabsList>
-          <TabsTrigger value="workflow" asChild>
+        <TabsList variant="regular">
+          <TabsTrigger value="workflow" asChild variant="regular">
             <Link
               to={buildRoute(ROUTES.EDIT_WORKFLOW, {
                 environmentId,
-                workflowId,
+                workflowSlug,
               })}
             >
               Workflow
             </Link>
           </TabsTrigger>
-          <TabsTrigger value="trigger" asChild>
+          <TabsTrigger value="trigger" asChild variant="regular">
             <Link
               to={buildRoute(ROUTES.TEST_WORKFLOW, {
                 environmentId,
-                workflowId,
+                workflowSlug,
               })}
             >
               Trigger
             </Link>
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="workflow" className="mt-0 h-full w-full">
+        <TabsContent value="workflow" className="mt-0 h-full w-full" variant="regular">
           {steps && <WorkflowCanvas steps={steps} />}
         </TabsContent>
       </Tabs>

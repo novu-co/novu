@@ -35,13 +35,7 @@ export class PreviewStep {
     return {
       controls: command.controls || {},
       payload: command.payload || {},
-      state: [
-        {
-          stepId: 'trigger',
-          outputs: {},
-          state: { status: JobStatusEnum.COMPLETED },
-        },
-      ],
+      state: [],
       subscriber: command.subscriber || {},
       stepId: command.stepId,
       workflowId: command.workflowId,

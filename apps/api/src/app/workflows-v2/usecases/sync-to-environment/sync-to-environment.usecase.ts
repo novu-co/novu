@@ -111,7 +111,6 @@ export class SyncToEnvironmentUseCase {
     preferences: PreferencesEntity[]
   ): Promise<UpdateWorkflowDto> {
     return {
-      updatedAt: new Date().toISOString(),
       workflowId: workflow.triggers[0].identifier,
       name: workflow.name,
       active: workflow.active,

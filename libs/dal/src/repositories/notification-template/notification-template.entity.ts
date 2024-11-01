@@ -37,8 +37,10 @@ export class NotificationTemplateEntity implements INotificationTemplate {
 
   draft: boolean;
 
+  /** @deprecated - use `Preferences` entity instead */
   preferenceSettings: IPreferenceChannels;
 
+  /** @deprecated - use `Preferences` entity instead */
   critical: boolean;
 
   tags: string[];

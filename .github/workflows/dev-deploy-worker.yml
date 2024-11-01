@@ -23,12 +23,9 @@ env:
 
 jobs:
   test_worker:
-    strategy:
-      matrix:
-        name: ['novu/worker', 'novu/worker-ee']
     uses: ./.github/workflows/reusable-worker-e2e.yml
     with:
-      ee: ${{ contains (matrix.name,'-ee') }}
+      ee: true
     secrets: inherit
 
   build_dev_worker:
@@ -37,30 +34,30 @@ jobs:
     needs: test_worker
     timeout-minutes: 80
     environment: Development
+    outputs:
+      docker_image: ${{ steps.docker_build.outputs.IMAGE }}
     permissions:
       contents: read
       packages: write
       deployments: write
       id-token: write
-    strategy:
-      matrix:
-        name: ['novu/worker-ee', 'novu/worker']
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: ${{ contains (matrix.name,'-ee') }}
+          submodules: true
           token: ${{ secrets.SUBMODULES_TOKEN }}
       - uses: ./.github/actions/setup-project
         with:
-          submodules: ${{ contains (matrix.name,'-ee') }}
+          submodules: true
 
       - uses: ./.github/actions/docker/build-worker
         id: docker_build
         with:
           tag: dev
           push: 'true'
-          github_token: ${{ secrets.GH_PACKAGES }}
-          docker_name: ${{ matrix.name }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          docker_name: 'novu/worker-ee'
           bullmq_secret: ${{ secrets.BULL_MQ_PRO_NPM_TOKEN }}
           environment: dev
 
@@ -71,8 +68,7 @@ jobs:
     with:
       environment: Development
       terraform_workspace: novu-dev
-      # This is a workaround to an issue with matrix outputs
-      docker_image: ghcr.io/novuhq/novu/worker-ee:${{ github.sha }}
+      docker_image: ${{ needs.build_dev_worker.outputs.docker_image }}
 
   newrelic:
     runs-on: ubuntu-latest
