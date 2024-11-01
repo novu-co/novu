@@ -35,7 +35,14 @@ import type {
   Workflow,
 } from './types';
 import { WithPassthrough } from './types/provider.types';
-import { EMOJI, log, sanitizeHtmlInObject, stringifyDataStructureWithSingleQuotes } from './utils';
+import {
+  EMOJI,
+  log,
+  resolveApiUrl,
+  resolveSecretKey,
+  sanitizeHtmlInObject,
+  stringifyDataStructureWithSingleQuotes,
+} from './utils';
 import { validateData } from './validators';
 
 import { mockSchema } from './jsonSchemaFaker';
@@ -53,7 +60,9 @@ export class Client {
     },
   });
 
-  public secretKey?: string;
+  public secretKey: string;
+
+  public apiUrl: string;
 
   public version: string = SDK_VERSION;
 
@@ -61,6 +70,7 @@ export class Client {
 
   constructor(options?: ClientOptions) {
     const builtOpts = this.buildOptions(options);
+    this.apiUrl = builtOpts.apiUrl;
     this.secretKey = builtOpts.secretKey;
     this.strictAuthentication = builtOpts.strictAuthentication;
     this.templateEngine.registerFilter('json', (value, spaces) =>
@@ -69,13 +79,11 @@ export class Client {
   }
 
   private buildOptions(providedOptions?: ClientOptions) {
-    const builtConfiguration: { secretKey?: string; strictAuthentication: boolean } = {
-      secretKey: undefined,
+    const builtConfiguration: Required<ClientOptions> = {
+      apiUrl: resolveApiUrl(providedOptions?.apiUrl),
+      secretKey: resolveSecretKey(providedOptions?.secretKey),
       strictAuthentication: !isRuntimeInDevelopment(),
     };
-
-    builtConfiguration.secretKey =
-      providedOptions?.secretKey || process.env.NOVU_SECRET_KEY || process.env.NOVU_API_KEY;
 
     if (providedOptions?.strictAuthentication !== undefined) {
       builtConfiguration.strictAuthentication = providedOptions.strictAuthentication;

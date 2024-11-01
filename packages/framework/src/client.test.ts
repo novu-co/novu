@@ -44,6 +44,12 @@ describe('Novu Client', () => {
       expect(newClient.secretKey).toBe(testSecretKey);
     });
 
+    it('should set apiUrl to provided apiUrl', () => {
+      const testApiUrl = 'https://test.host';
+      const newClient = new Client({ apiUrl: testApiUrl });
+      expect(newClient.apiUrl).toBe(testApiUrl);
+    });
+
     it('should set strictAuthentication to false when NODE_ENV is development', () => {
       const originalEnv = process.env.NODE_ENV;
       process.env = { ...process.env, NODE_ENV: 'development' };
