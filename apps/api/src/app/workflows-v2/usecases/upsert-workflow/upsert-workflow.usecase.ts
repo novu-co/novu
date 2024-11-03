@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import Handlebars from 'handlebars';
 
 import {
   ControlValuesEntity,
@@ -285,37 +284,21 @@ export class UpsertWorkflowUseCase {
 
     return steps;
   }
-  extractPayloadVariables(step: StepDto) {
-    const { variables: payloadVariables } = extractMessageVariables(step);
 
-    function mapTypeToSchemaType(type: TemplateVariableTypeEnum): JSONSchemaType {
-      switch (type) {
-        case TemplateVariableTypeEnum.STRING:
-          return 'string';
-        case TemplateVariableTypeEnum.ARRAY:
-          return 'array';
-        case TemplateVariableTypeEnum.BOOLEAN:
-          return 'boolean';
-        default:
-          throw new Error(`Unsupported type: ${type}`);
-      }
-    }
+  private extractPayloadVariables(step: StepDto): JSONSchema {
+    const payloadVariables = extractPlaceholders(Object.values(step.controlValues).join(''));
 
-    function templateToSchema(variables: IMustacheVariable[]): JSONSchema {
-      const properties: Record<string, JSONSchema> = {};
-      variables?.forEach((variable) => {
-        properties[variable.name] = {
-          type: mapTypeToSchemaType(variable.type),
-        };
-      });
-
-      return {
-        type: 'object',
-        properties,
+    const properties: Record<string, JSONSchema> = {};
+    payloadVariables?.forEach((variable) => {
+      properties[variable] = {
+        type: 'string',
       };
-    }
+    });
 
-    return templateToSchema(payloadVariables);
+    return {
+      type: 'object',
+      properties,
+    };
   }
 
   private generateUniqueStepId(baseStepId: string, previousStepIds: string[]): string {
@@ -418,37 +401,18 @@ const isUniqueStepId = (stepIdToValidate: string, otherStepsIds: string[]) => {
   return !otherStepsIds.some((stepId) => stepId === stepIdToValidate);
 };
 
-function extractMessageVariables(step: StepDto): {
-  variables: IMustacheVariable[];
-} {
-  const variables: IMustacheVariable[] = [];
+function extractPlaceholders(text: string): string[] {
+  const regex = /\{\{\{(.*?)\}\}\}|\{\{(.*?)\}\}|\{#(.*?)#\}/g;
+  const matches: string[] = [];
+  let match: RegExpExecArray | null;
 
-  for (const controlValue of messagesTextIterator(step)) {
-    const extractedVariables = extractVariables(controlValue);
-
-    variables.push(...extractedVariables);
+  // eslint-disable-next-line no-cond-assign
+  while ((match = regex.exec(text)) !== null) {
+    const placeholder = match[1] || match[2] || match[3];
+    if (placeholder) {
+      matches.push(placeholder.trim());
+    }
   }
 
-  return {
-    variables: [...new Map(variables.map((item) => [item.name, item])).values()],
-  };
-}
-
-function* messagesTextIterator(steps: StepDto): Generator<string> {
-  for (const step of Object.values(steps.controlValues)) {
-    // TODO: remove cast
-    yield step as string;
-  }
-}
-
-function extractVariables(controlValue: string): IMustacheVariable[] {
-  if (!controlValue) return [];
-
-  try {
-    const ast: hbs.AST.Program = Handlebars.parseWithoutProcessing(controlValue);
-
-    return getTemplateVariables(ast.body);
-  } catch (e) {
-    throw new ApiException('Failed to extract variables');
-  }
+  return matches;
 }
