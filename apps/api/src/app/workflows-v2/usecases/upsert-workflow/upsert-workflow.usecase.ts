@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import Handlebars from 'handlebars';
 
 import {
   ControlValuesEntity,
   NotificationGroupRepository,
   NotificationStepEntity,
   NotificationTemplateEntity,
-  NotificationTemplateRepository,
   PreferencesEntity,
 } from '@novu/dal';
 import {
@@ -23,14 +23,17 @@ import {
   UpsertUserWorkflowPreferencesCommand,
   UpsertWorkflowPreferencesCommand,
   shortId,
+  ApiException,
 } from '@novu/application-generic';
 import {
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
+  IMustacheVariable,
   IdentifierOrInternalId,
   StepCreateDto,
   StepDto,
   StepUpdateDto,
+  TemplateVariableTypeEnum,
   UpdateWorkflowDto,
   UserSessionData,
   WorkflowCreationSourceEnum,
@@ -38,8 +41,11 @@ import {
   WorkflowPreferences,
   WorkflowResponseDto,
   WorkflowTypeEnum,
+  getTemplateVariables,
   slugify,
 } from '@novu/shared';
+import { JSONSchema } from 'json-schema-to-ts';
+import { JSONSchemaType } from 'json-schema-to-ts/lib/types/definitions';
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/step-upsert-mechanism-failed-missing-id.exception';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
@@ -255,6 +261,7 @@ export class UpsertWorkflowUseCase {
       active: workflowDto.active ?? true,
     };
   }
+
   private mapSteps(
     commandWorkflowSteps: Array<StepCreateDto | StepUpdateDto>,
     persistedWorkflow?: NotificationTemplateEntity | undefined
@@ -268,12 +275,47 @@ export class UpsertWorkflowUseCase {
       if (baseStepId) {
         const previousStepIds = steps.map((stepX) => stepX.stepId).filter((id) => id != null);
         mappedStep.stepId = this.generateUniqueStepId(baseStepId, previousStepIds);
+        mappedStep.variablesSchemas = {
+          payloadSchema: this.extractPayloadVariables(step),
+        };
       }
 
       steps.push(mappedStep);
     }
 
     return steps;
+  }
+  extractPayloadVariables(step: StepDto) {
+    const { variables: payloadVariables } = extractMessageVariables(step);
+
+    function mapTypeToSchemaType(type: TemplateVariableTypeEnum): JSONSchemaType {
+      switch (type) {
+        case TemplateVariableTypeEnum.STRING:
+          return 'string';
+        case TemplateVariableTypeEnum.ARRAY:
+          return 'array';
+        case TemplateVariableTypeEnum.BOOLEAN:
+          return 'boolean';
+        default:
+          throw new Error(`Unsupported type: ${type}`);
+      }
+    }
+
+    function templateToSchema(variables: IMustacheVariable[]): JSONSchema {
+      const properties: Record<string, JSONSchema> = {};
+      variables?.forEach((variable) => {
+        properties[variable.name] = {
+          type: mapTypeToSchemaType(variable.type),
+        };
+      });
+
+      return {
+        type: 'object',
+        properties,
+      };
+    }
+
+    return templateToSchema(payloadVariables);
   }
 
   private generateUniqueStepId(baseStepId: string, previousStepIds: string[]): string {
@@ -375,3 +417,38 @@ function isWorkflowUpdateDto(
 const isUniqueStepId = (stepIdToValidate: string, otherStepsIds: string[]) => {
   return !otherStepsIds.some((stepId) => stepId === stepIdToValidate);
 };
+
+function extractMessageVariables(step: StepDto): {
+  variables: IMustacheVariable[];
+} {
+  const variables: IMustacheVariable[] = [];
+
+  for (const controlValue of messagesTextIterator(step)) {
+    const extractedVariables = extractVariables(controlValue);
+
+    variables.push(...extractedVariables);
+  }
+
+  return {
+    variables: [...new Map(variables.map((item) => [item.name, item])).values()],
+  };
+}
+
+function* messagesTextIterator(steps: StepDto): Generator<string> {
+  for (const step of Object.values(steps.controlValues)) {
+    // TODO: remove cast
+    yield step as string;
+  }
+}
+
+function extractVariables(controlValue: string): IMustacheVariable[] {
+  if (!controlValue) return [];
+
+  try {
+    const ast: hbs.AST.Program = Handlebars.parseWithoutProcessing(controlValue);
+
+    return getTemplateVariables(ast.body);
+  } catch (e) {
+    throw new ApiException('Failed to extract variables');
+  }
+}

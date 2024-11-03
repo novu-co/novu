@@ -381,6 +381,7 @@ export class CreateWorkflow {
         name: step.name,
         metadata: step.metadata,
         stepId: step.stepId,
+        variablesSchemas: step.variablesSchemas,
       };
 
       if (storedVariants.length) {

@@ -499,6 +499,10 @@ export class UpdateWorkflow {
       partialNotificationStep.variants = updatedVariants;
     }
 
+    if (message.variablesSchemas) {
+      partialNotificationStep.variablesSchemas = message.variablesSchemas;
+    }
+
     return partialNotificationStep;
   }
 

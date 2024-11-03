@@ -54,6 +54,9 @@ const variantSchemePart = {
   _parentId: {
     type: Schema.Types.ObjectId,
   },
+  variablesSchemas: {
+    payloadSchema: Schema.Types.Mixed,
+  },
   metadata: {
     amount: {
       type: Schema.Types.Number,

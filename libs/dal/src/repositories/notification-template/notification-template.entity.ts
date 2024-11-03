@@ -143,6 +143,8 @@ export class StepVariantEntity implements IStepVariant {
   controls?: {
     schema: JSONSchema;
   };
+
+  variablesSchemas?: { payloadSchema?: JSONSchema };
 }
 
 export class NotificationStepEntity extends StepVariantEntity implements INotificationTemplateStep {

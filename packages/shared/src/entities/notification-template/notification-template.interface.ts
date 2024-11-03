@@ -111,6 +111,9 @@ export interface IStepVariant {
    */
   controlVariables?: ControlsDto;
   bridgeUrl?: string;
+  variablesSchemas?: {
+    payloadSchema?: any;
+  };
 }
 
 export interface INotificationTemplateStep extends IStepVariant {

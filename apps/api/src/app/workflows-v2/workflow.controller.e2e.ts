@@ -63,7 +63,6 @@ describe('Workflow Controller E2E API Testing', () => {
   });
 
   describe('Create Workflow Permutations', () => {
-    // todo: remove skip and fix if needed once pr 6657 is merged
     it('should allow creating two workflows for the same user with the same name', async () => {
       const nameSuffix = `Test Workflow${new Date().toString()}`;
       await createWorkflowAndValidate(nameSuffix);

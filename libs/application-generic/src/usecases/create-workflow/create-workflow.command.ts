@@ -172,6 +172,11 @@ export class NotificationStepVariantCommand {
   };
 
   @IsOptional()
+  variablesSchemas?: {
+    payloadSchema?: JsonSchema;
+  };
+
+  @IsOptional()
   stepId?: string;
 }
 
