@@ -22,8 +22,8 @@ export class GetStepDataUsecase {
 
     return {
       controls: {
-        dataSchema: currentStep.controls?.schema,
-        uiSchema: currentStep.controls?.uiSchema,
+        dataSchema: currentStep.template?.controls?.schema,
+        uiSchema: currentStep.template?.controls?.uiSchema,
         values: await this.getValues(command, currentStep),
       },
       variables: buildVariablesSchema(previousSteps),
