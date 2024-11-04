@@ -5,6 +5,7 @@ import {
   GetSubscriberPreferenceCommand,
   GetSubscriberGlobalPreference,
   GetSubscriberGlobalPreferenceCommand,
+  InstrumentUsecase,
 } from '@novu/application-generic';
 import { PreferenceLevelEnum } from '@novu/shared';
 import { AnalyticsEventsEnum } from '../../utils';
@@ -19,6 +20,7 @@ export class GetInboxPreferences {
     private getSubscriberPreference: GetSubscriberPreference
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: GetInboxPreferencesCommand): Promise<InboxPreference[]> {
     const globalPreference = await this.getSubscriberGlobalPreference.execute(
       GetSubscriberGlobalPreferenceCommand.create({

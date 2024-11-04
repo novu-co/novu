@@ -29,8 +29,8 @@ import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
 
 const formSchema = z.object({
-  name: z.string(),
-  workflowId: z.string().regex(/^[a-z0-9-]+$/, 'Invalid identifier format. Must follow ^[a-z0-9-]+$'),
+  name: z.string().min(1, { message: 'Name is required' }),
+  workflowId: z.string(),
   tags: z
     .array(z.string().min(1))
     .max(8)
@@ -126,7 +126,6 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     <FormControl>
                       <InputField>
                         <Input
-                          placeholder="Untitled"
                           {...field}
                           onChange={(e) => {
                             field.onChange(e);
@@ -135,7 +134,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                         />
                       </InputField>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage>Name is required</FormMessage>
                   </FormItem>
                 )}
               />
@@ -148,10 +147,10 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     <FormLabel>Identifier</FormLabel>
                     <FormControl>
                       <InputField>
-                        <Input placeholder="untitled" {...field} />
+                        <Input {...field} readOnly />
                       </InputField>
                     </FormControl>
-                    <FormMessage>Must be unique and all lowercase ^[a-z0-9\-]+$</FormMessage>
+                    <FormMessage />
                   </FormItem>
                 )}
               />

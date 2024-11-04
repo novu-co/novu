@@ -4,7 +4,7 @@ import { RiBookMarkedLine, RiMore2Fill, RiRouteFill } from 'react-icons/ri';
 import { createSearchParams, Link, useLocation, useSearchParams } from 'react-router-dom';
 import { getV2 } from '@/api/api.client';
 import { DefaultPagination } from '@/components/default-pagination';
-import { Button } from '@/components/primitives/button';
+import { Button, buttonVariants } from '@/components/primitives/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { Skeleton } from '@/components/primitives/skeleton';
 import {
@@ -16,7 +16,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/primitives/table';
-import { buttonVariants } from '@/components/primitives/variants';
 import { WorkflowCloud } from '@/components/workflow-cloud';
 import { useEnvironment } from '@/context/environment/hooks';
 import { QueryKeys } from '@/utils/query-keys';
