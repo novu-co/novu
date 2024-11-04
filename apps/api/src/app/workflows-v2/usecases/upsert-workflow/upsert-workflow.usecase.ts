@@ -14,6 +14,7 @@ import {
   GetPreferencesCommand,
   GetPreferencesResponseDto,
   NotificationStep,
+  shortId,
   UpdateWorkflow,
   UpdateWorkflowCommand,
   UpsertControlValuesCommand,
@@ -21,18 +22,15 @@ import {
   UpsertPreferences,
   UpsertUserWorkflowPreferencesCommand,
   UpsertWorkflowPreferencesCommand,
-  shortId,
-  ApiException,
 } from '@novu/application-generic';
 import {
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
-  IMustacheVariable,
   IdentifierOrInternalId,
+  slugify,
   StepCreateDto,
   StepDto,
   StepUpdateDto,
-  TemplateVariableTypeEnum,
   UpdateWorkflowDto,
   UserSessionData,
   WorkflowCreationSourceEnum,
@@ -40,23 +38,20 @@ import {
   WorkflowPreferences,
   WorkflowResponseDto,
   WorkflowTypeEnum,
-  getTemplateVariables,
-  slugify,
 } from '@novu/shared';
 import { JSONSchema } from 'json-schema-to-ts';
-import { JSONSchemaType } from 'json-schema-to-ts/lib/types/definitions';
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/step-upsert-mechanism-failed-missing-id.exception';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { GetWorkflowByIdsCommand } from '../get-workflow-by-ids/get-workflow-by-ids.command';
-import { mapStepTypeToControlSchema } from '../../../step-schemas/shared';
+import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
 
 function buildUpsertControlValuesCommand(
   command: UpsertWorkflowCommand,
   persistedStep: NotificationStepEntity,
   persistedWorkflow: NotificationTemplateEntity,
-  stepInDto: StepDto
+  stepInDto: StepUpdateDto | StepCreateDto
 ): UpsertControlValuesCommand {
   return UpsertControlValuesCommand.create({
     organizationId: command.user.organizationId,
@@ -81,10 +76,10 @@ export class UpsertWorkflowUseCase {
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
     const workflowForUpdate = await this.queryWorkflow(command);
     const workflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
-    const stepIdToControlValuesMap = await this.upsertControlValues(workflow, command);
+    await this.upsertControlValues(workflow, command);
     const preferences = await this.upsertPreference(command, workflow);
 
-    return toResponseWorkflowDto(workflow, preferences, stepIdToControlValuesMap);
+    return toResponseWorkflowDto(workflow, preferences);
   }
 
   private async queryWorkflow(command: UpsertWorkflowCommand): Promise<NotificationTemplateEntity | null> {
@@ -326,7 +321,7 @@ export class UpsertWorkflowUseCase {
 
   private mapSingleStep(
     persistedWorkflow: NotificationTemplateEntity | undefined,
-    step: StepDto | (StepDto & { stepUuid: string })
+    step: StepUpdateDto | StepCreateDto
   ): NotificationStep {
     const foundPersistedStep = this.getPersistedStepIfFound(persistedWorkflow, step);
     const stepEntityToReturn = this.buildBaseStepEntity(step, foundPersistedStep);
@@ -350,7 +345,7 @@ export class UpsertWorkflowUseCase {
       template: {
         type: step.type,
         name: step.name,
-        controls: foundPersistedStep?.template?.controls || mapStepTypeToControlSchema[step.type],
+        controls: foundPersistedStep?.template?.controls || stepTypeToDefaultDashboardControlSchema[step.type],
         content: '',
       },
       stepId: foundPersistedStep?.stepId || slugify(step.name),

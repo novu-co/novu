@@ -21,14 +21,14 @@ import {
   GetListQueryParams,
   IdentifierOrInternalId,
   ListWorkflowResponse,
+  StepDataDto,
   UpdateWorkflowDto,
   UserSessionData,
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
-  PromoteWorkflowDto,
+  SyncWorkflowDto,
 } from '@novu/shared';
-import { UserAuthGuard, UserSession } from '@novu/application-generic';
-
+import { ExternalApiAccessible, UserAuthGuard, UserSession } from '@novu/application-generic';
 import { ApiCommonResponses } from '../shared/framework/response.decorator';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
 import { GetWorkflowCommand } from './usecases/get-workflow/get-workflow.command';
@@ -47,6 +47,8 @@ import { ParseSlugIdPipe } from './pipes/parse-slug-id.pipe';
 import { ParseSlugEnvironmentIdPipe } from './pipes/parse-slug-env-id.pipe';
 import { WorkflowTestDataUseCase } from './usecases/test-data/test-data.usecase';
 import { WorkflowTestDataCommand } from './usecases/test-data/test-data.command';
+import { GetStepDataCommand } from './usecases/get-step-schema/get-step-data.command';
+import { GetStepDataUsecase } from './usecases/get-step-schema/get-step-data.usecase';
 
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
@@ -61,7 +63,8 @@ export class WorkflowController {
     private deleteWorkflowUsecase: DeleteWorkflowUseCase,
     private syncToEnvironmentUseCase: SyncToEnvironmentUseCase,
     private generatePreviewUseCase: GeneratePreviewUsecase,
-    private workflowTestDataUseCase: WorkflowTestDataUseCase
+    private workflowTestDataUseCase: WorkflowTestDataUseCase,
+    private getStepData: GetStepDataUsecase
   ) {}
 
   @Post('')
@@ -78,17 +81,17 @@ export class WorkflowController {
     );
   }
 
-  @Put(':workflowId/promote')
+  @Put(':workflowId/sync')
   @UseGuards(UserAuthGuard)
-  async promote(
+  async sync(
     @UserSession() user: UserSessionData,
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
-    @Body() promoteWorkflowDto: PromoteWorkflowDto
+    @Body() syncWorkflowDto: SyncWorkflowDto
   ): Promise<WorkflowResponseDto> {
     return this.syncToEnvironmentUseCase.execute(
       SyncToEnvironmentCommand.create({
         identifierOrInternalId: workflowId,
-        targetEnvironmentId: promoteWorkflowDto.targetEnvironmentId,
+        targetEnvironmentId: syncWorkflowDto.targetEnvironmentId,
         user,
       })
     );
@@ -114,9 +117,18 @@ export class WorkflowController {
   @UseGuards(UserAuthGuard)
   async getWorkflow(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
-    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId
+    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
+    @Query('environmentId') environmentId?: string
   ): Promise<WorkflowResponseDto> {
-    return this.getWorkflowUseCase.execute(GetWorkflowCommand.create({ identifierOrInternalId: workflowId, user }));
+    return this.getWorkflowUseCase.execute(
+      GetWorkflowCommand.create({
+        identifierOrInternalId: workflowId,
+        user: {
+          ...user,
+          environmentId: environmentId || user.environmentId,
+        },
+      })
+    );
   }
 
   @Delete(':workflowId')
@@ -148,19 +160,28 @@ export class WorkflowController {
     );
   }
 
-  @Post('/:workflowId/step/:stepUuid/preview')
+  @Post('/:workflowId/step/:stepId/preview')
   @UseGuards(UserAuthGuard)
   async generatePreview(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
-    @Param('workflowId') workflowId: string,
-    @Param('stepUuid') stepUuid: string,
+    @Param('workflowId', ParseSlugIdPipe) workflowId: string,
+    @Param('stepId') stepId: string,
     @Body() generatePreviewRequestDto: GeneratePreviewRequestDto
   ): Promise<GeneratePreviewResponseDto> {
     return await this.generatePreviewUseCase.execute(
-      GeneratePreviewCommand.create({ user, workflowId, stepUuid, generatePreviewRequestDto })
+      GeneratePreviewCommand.create({ user, workflowId, stepDatabaseId: stepId, generatePreviewRequestDto })
     );
   }
 
+  @Get('/:workflowId/steps/:stepId')
+  @ExternalApiAccessible()
+  async getWorkflowStepData(
+    @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
+    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
+    @Param('stepId', ParseSlugIdPipe) stepId: IdentifierOrInternalId
+  ): Promise<StepDataDto> {
+    return await this.getStepData.execute(GetStepDataCommand.create({ user, workflowId, stepId }));
+  }
   @Get('/:workflowId/test-data')
   @UseGuards(UserAuthGuard)
   async getWorkflowTestData(

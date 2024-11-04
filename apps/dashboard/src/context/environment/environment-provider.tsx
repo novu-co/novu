@@ -8,6 +8,9 @@ import { useAuth } from '@/context/auth/hooks';
 import { useFetchEnvironments } from '@/context/environment/hooks';
 import { EnvironmentContext } from '@/context/environment/environment-context';
 
+const PRODUCTION_ENVIRONMENT = 'Production';
+const DEVELOPMENT_ENVIRONMENT = 'Development';
+
 function selectEnvironment(environments: IEnvironment[], selectedEnvironmentId?: string | null) {
   let environment: IEnvironment | undefined;
 
@@ -89,16 +92,35 @@ export function EnvironmentProvider({ children }: { children: React.ReactNode })
     [currentEnvironment]
   );
 
+  const oppositeEnvironment = useMemo((): IEnvironment | null => {
+    if (!currentEnvironment || !environments) {
+      return null;
+    }
+
+    const oppositeEnvironmentName =
+      currentEnvironment.name === PRODUCTION_ENVIRONMENT ? DEVELOPMENT_ENVIRONMENT : PRODUCTION_ENVIRONMENT;
+
+    return environments?.find((env) => env.name === oppositeEnvironmentName) || null;
+  }, [currentEnvironment, environments]);
+
   const value = useMemo(
     () => ({
       currentEnvironment,
       environments,
       areEnvironmentsInitialLoading,
       readOnly: currentEnvironment?._parentId !== undefined,
+      oppositeEnvironment,
       switchEnvironment,
       setBridgeUrl,
     }),
-    [currentEnvironment, environments, areEnvironmentsInitialLoading, switchEnvironment, setBridgeUrl]
+    [
+      currentEnvironment,
+      environments,
+      areEnvironmentsInitialLoading,
+      oppositeEnvironment,
+      switchEnvironment,
+      setBridgeUrl,
+    ]
   );
 
   return <EnvironmentContext.Provider value={value}>{children}</EnvironmentContext.Provider>;

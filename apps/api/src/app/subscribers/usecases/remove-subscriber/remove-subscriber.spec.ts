@@ -54,7 +54,7 @@ describe('Remove Subscriber', function () {
       throw new Error('Should not reach here');
     } catch (e) {
       expect(e).to.be.instanceOf(NotFoundException);
-      expect(e.message).to.eql('Subscriber not found for id invalid-subscriber-id');
+      expect(e.message).to.eql("Subscriber 'invalid-subscriber-id' was not found");
     }
   });
 });
