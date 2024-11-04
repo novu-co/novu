@@ -50,10 +50,7 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - uses: ./.github/actions/free-space
-        name: Extend space in Action Container
-     
+             
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
         with:
@@ -75,6 +72,8 @@ jobs:
         shell: bash
         env:
           DOCKER_BUILD_ARGUMENTS: >
+            --cache-from type=registry,ref=ghcr.io/${{ env.REGISTRY_OWNER }}/cache:build-cache-${{ env.SERVICE_NAME }}-community
+            --cache-to type=registry,ref=ghcr.io/${{ env.REGISTRY_OWNER }}/cache:build-cache-${{ env.SERVICE_NAME }}-community,mode=max
             --platform=linux/amd64,linux/arm64 --provenance=false
             --output=type=image,name=ghcr.io/${{ env.REGISTRY_OWNER }}/${{ env.SERVICE_NAME }},push-by-digest=true,name-canonical=true
         run: |
