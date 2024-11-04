@@ -1,6 +1,6 @@
 import Title from '@/components/Title';
 import { novuConfig } from '@/utils/config';
-import { Inbox, Preferences } from '@novu/react';
+import { Inbox, Preferences } from '@novu/nextjs';
 
 export default function Home() {
   return (

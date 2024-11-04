@@ -10,6 +10,7 @@ import {
 import { deepMerge } from '../../utils';
 import { GetPreferencesCommand } from './get-preferences.command';
 import { GetPreferencesResponseDto } from './get-preferences.dto';
+import { InstrumentUsecase } from '../../instrumentation';
 
 class PreferencesNotFoundException extends BadRequestException {
   constructor(featureFlagCommand: GetPreferencesCommand) {
@@ -21,6 +22,7 @@ class PreferencesNotFoundException extends BadRequestException {
 export class GetPreferences {
   constructor(private preferencesRepository: PreferencesRepository) {}
 
+  @InstrumentUsecase()
   async execute(
     command: GetPreferencesCommand,
   ): Promise<GetPreferencesResponseDto> {

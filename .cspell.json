@@ -690,7 +690,9 @@
     "xyflow",
     "Sonner",
     "sonner",
-    "cmdk"
+    "cmdk",
+    "Keymap",
+    "lezer"
   ],
   "flagWords": [],
   "patterns": [
