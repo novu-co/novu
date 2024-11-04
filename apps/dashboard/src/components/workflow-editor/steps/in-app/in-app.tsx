@@ -4,15 +4,16 @@ import { Button } from '../../../primitives/button';
 import { Separator } from '../../../primitives/separator';
 import { CommonFields } from '../common-fields';
 import { InAppPreview } from './in-app-preview';
+import { SidebarContent } from '@/components/side-navigation/Sidebar';
 
 export function InApp() {
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="flex flex-col gap-4 p-3">
+    <>
+      <SidebarContent>
         <CommonFields />
-      </div>
+      </SidebarContent>
       <Separator />
-      <div className="flex flex-col gap-2 px-3 py-4">
+      <SidebarContent>
         <Link to={'./edit'} relative="path">
           <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
             <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
@@ -20,8 +21,7 @@ export function InApp() {
           </Button>
         </Link>
         <InAppPreview />
-      </div>
-      <Separator />
-    </div>
+      </SidebarContent>
+    </>
   );
 }
