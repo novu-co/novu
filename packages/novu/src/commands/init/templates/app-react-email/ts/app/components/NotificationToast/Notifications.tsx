@@ -2,8 +2,8 @@
 
 import { Novu } from "@novu/js";
 import { useEffect, useState } from "react";
-import styles from "./Notifications.module.css"; // You'll need to create this
 import { Inbox } from "@novu/nextjs";
+import styles from "./Notifications.module.css"; // You'll need to create this
 
 const NotificationToast = () => {
   const novu = new Novu({
