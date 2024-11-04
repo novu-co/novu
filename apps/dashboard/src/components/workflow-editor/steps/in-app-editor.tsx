@@ -1,27 +1,31 @@
+import { useState } from 'react';
 import { RiEdit2Line, RiInformationFill, RiPencilRuler2Line } from 'react-icons/ri';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useNavigate } from 'react-router-dom';
 import { useFormContext } from 'react-hook-form';
 import * as z from 'zod';
+import { RedirectTargetEnum } from '@novu/shared';
 
 import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Notification5Fill } from '@/components/icons';
 import { AvatarPicker } from '@/components/primitives/form/avatar-picker';
-import { Input, InputField } from '@/components/primitives/input';
-import { Textarea } from '@/components/primitives/textarea';
+import { InputField } from '@/components/primitives/input';
 import { workflowSchema } from '../schema';
 import { ActionPicker } from '../action-picker';
 import { URLInput } from '@/components/primitives/url-input';
 import { urlTargetTypes } from '@/utils/url';
-import { RedirectTargetEnum } from '@novu/shared';
+import { Editor } from '@/components/primitives/editor';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5';
 
 export const InAppEditor = () => {
   const navigate = useNavigate();
   const { formState } = useFormContext<z.infer<typeof workflowSchema>>();
+
+  const [subject, setSubject] = useState('');
+  const [body, setBody] = useState('');
 
   return (
     <Tabs defaultValue="editor" className="flex h-full flex-1 flex-col">
@@ -63,11 +67,13 @@ export const InAppEditor = () => {
           <div className="flex flex-col gap-1 rounded-xl border border-neutral-100 p-1">
             <div className="flex gap-1">
               <AvatarPicker />
-              <InputField size="md">
-                <Input type="text" name="subject" placeholder="Subject" />
+              <InputField size="md" className="px-1">
+                <Editor placeholder="Subject" size="md" value={subject} onChange={setSubject} height="38px" />
               </InputField>
             </div>
-            <Textarea placeholder="Body" className="h-24" />
+            <InputField size="md" className="h-24 px-1">
+              <Editor placeholder="Body" size="md" value={body} onChange={setBody} />
+            </InputField>
             <div className="mt-1 flex items-center gap-1">
               <RiInformationFill className="text-foreground-400 size-4 p-0.5" />
               <span className="text-foreground-600 text-xs font-normal">
@@ -89,7 +95,9 @@ export const InAppEditor = () => {
               options={urlTargetTypes}
               value={{ type: RedirectTargetEnum.BLANK, url: '' }}
               onChange={(val) => console.log(val)}
+              placeholder="Redirect URL"
               size="md"
+              asEditor
             />
           </div>
         </div>

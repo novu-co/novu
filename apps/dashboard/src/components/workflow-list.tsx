@@ -15,7 +15,7 @@ import { createSearchParams, Link, useLocation, useSearchParams } from 'react-ro
 import { getV2 } from '@/api/api.client';
 import { DefaultPagination } from '@/components/default-pagination';
 import { Badge, BadgeContent } from '@/components/primitives/badge';
-import { Button } from '@/components/primitives/button';
+import { Button, buttonVariants } from '@/components/primitives/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +35,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/primitives/table';
-import { buttonVariants } from '@/components/primitives/variants';
 import TruncatedText from '@/components/truncated-text';
 import { WorkflowCloud } from '@/components/workflow-cloud';
 import { WorkflowStatus } from '@/components/workflow-status';
