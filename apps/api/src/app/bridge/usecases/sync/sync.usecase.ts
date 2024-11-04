@@ -255,7 +255,7 @@ export class Sync {
     commandWorkflowSteps: DiscoverStepOutput[],
     workflow?: NotificationTemplateEntity | undefined
   ): NotificationStep[] {
-    const steps: NotificationStep[] = commandWorkflowSteps.map((step) => {
+    return commandWorkflowSteps.map((step) => {
       const foundStep = workflow?.steps?.find((workflowStep) => workflowStep.stepId === step.stepId);
 
       const template = {
@@ -273,11 +273,10 @@ export class Sync {
         name: step.stepId,
         stepId: step.stepId,
         uuid: step.stepId,
+        _templateId: foundStep?._templateId,
         shouldStopOnFail: this.castToAnyNotSupportedParam(step.options)?.failOnErrorEnabled ?? false,
       };
     });
-
-    return steps;
   }
 
   private async getNotificationGroup(

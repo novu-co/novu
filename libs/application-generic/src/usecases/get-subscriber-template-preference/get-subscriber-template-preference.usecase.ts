@@ -25,6 +25,7 @@ import { GetSubscriberTemplatePreferenceCommand } from './get-subscriber-templat
 import { ApiException } from '../../utils/exceptions';
 import { buildSubscriberKey, CachedEntity } from '../../services/cache';
 import { GetPreferences } from '../get-preferences';
+import { InstrumentUsecase } from '../../instrumentation';
 
 const PRIORITY_ORDER = [
   PreferenceOverrideSourceEnum.TEMPLATE,
@@ -43,6 +44,7 @@ export class GetSubscriberTemplatePreference {
     private getPreferences: GetPreferences,
   ) {}
 
+  @InstrumentUsecase()
   async execute(
     command: GetSubscriberTemplatePreferenceCommand,
   ): Promise<ISubscriberPreferenceResponse> {

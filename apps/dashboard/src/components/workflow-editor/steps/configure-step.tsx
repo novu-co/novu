@@ -1,20 +1,23 @@
-import { Link, useParams } from 'react-router-dom';
-import { RiArrowLeftSLine, RiCloseFill } from 'react-icons/ri';
-import { motion } from 'framer-motion';
-import { StepTypeEnum } from '@/utils/enums';
-import { useStep } from './use-step';
-import { InApp } from './in-app';
-import { Separator } from '@/components/primitives/separator';
 import { Button } from '@/components/primitives/button';
+import { Separator } from '@/components/primitives/separator';
+import { SidebarFooter, SidebarHeader } from '@/components/side-navigation/Sidebar';
+import { useWorkflowEditorContext } from '@/components/workflow-editor/hooks';
 import { useEnvironment } from '@/context/environment/hooks';
+import { StepTypeEnum } from '@/utils/enums';
 import { buildRoute, ROUTES } from '@/utils/routes';
+import { motion } from 'framer-motion';
+import { RiArrowLeftSLine, RiCloseFill, RiDeleteBin2Line } from 'react-icons/ri';
+import { Link, useParams } from 'react-router-dom';
 import Chat from './chat';
+import { InApp } from './in-app';
+import { useStep } from './use-step';
 
 export function ConfigureStep() {
   const { currentEnvironment } = useEnvironment();
   const { workflowSlug = '' } = useParams<{
     workflowSlug: string;
   }>();
+  const { isReadOnly } = useWorkflowEditorContext();
 
   return (
     <motion.div
@@ -24,7 +27,7 @@ export function ConfigureStep() {
       exit={{ opacity: 0.1 }}
       transition={{ duration: 0.1 }}
     >
-      <div className="flex items-center gap-2.5 px-3 pb-3.5 text-sm font-medium">
+      <SidebarHeader className="flex items-center gap-2.5 text-sm font-medium">
         <Link
           to={buildRoute(ROUTES.EDIT_WORKFLOW, {
             environmentId: currentEnvironment?._id ?? '',
@@ -48,9 +51,25 @@ export function ConfigureStep() {
             <RiCloseFill />
           </Button>
         </Link>
-      </div>
+      </SidebarHeader>
+
       <Separator />
+
       <Step />
+
+      <Separator />
+
+      {!isReadOnly && (
+        <>
+          <SidebarFooter>
+            <Separator />
+            <Button variant="ghostDestructive" type="button">
+              <RiDeleteBin2Line className="size-4" />
+              Delete step
+            </Button>
+          </SidebarFooter>
+        </>
+      )}
     </motion.div>
   );
 }

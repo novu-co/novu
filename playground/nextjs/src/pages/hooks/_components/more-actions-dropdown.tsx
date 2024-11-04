@@ -1,6 +1,6 @@
 'use-client';
 
-import { useNovu } from '@novu/react';
+import { useNovu } from '@novu/nextjs';
 import { Archive, ArchiveRead, Dots, ReadAll } from './icons';
 import { StatusItem } from './status-dropdown';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
