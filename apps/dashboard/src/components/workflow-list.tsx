@@ -15,7 +15,7 @@ import { createSearchParams, Link, useLocation, useSearchParams } from 'react-ro
 import { getV2 } from '@/api/api.client';
 import { DefaultPagination } from '@/components/default-pagination';
 import { Badge, BadgeContent } from '@/components/primitives/badge';
-import { Button } from '@/components/primitives/button';
+import { Button, buttonVariants } from '@/components/primitives/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +35,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/primitives/table';
-import { buttonVariants } from '@/components/primitives/variants';
 import TruncatedText from '@/components/truncated-text';
 import { WorkflowCloud } from '@/components/workflow-cloud';
 import { WorkflowStatus } from '@/components/workflow-status';
@@ -160,11 +159,11 @@ export const WorkflowList = () => {
                 const isV1Workflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1;
                 const workflowLink = isV1Workflow
                   ? buildRoute(LEGACY_ROUTES.EDIT_WORKFLOW, {
-                      workflowId: workflow._id,
+                      workflowSlug: workflow.slug,
                     })
                   : buildRoute(ROUTES.EDIT_WORKFLOW, {
                       environmentId: currentEnvironment?._id ?? '',
-                      workflowId: workflow._id,
+                      workflowSlug: workflow.slug,
                     });
                 return (
                   <TableRow key={workflow._id} className="relative">

@@ -5,11 +5,12 @@ import { cva, VariantProps } from 'class-variance-authority';
 import { inputVariants } from '@/components/primitives/variants';
 
 const inputFieldVariants = cva(
-  'text-foreground-950 flex w-full flex-nowrap items-center gap-1.5 rounded-md border bg-transparent shadow-sm transition-colors focus-within:outline-none focus-visible:outline-none hover:bg-neutral-50 has-[input:disabled]:cursor-not-allowed has-[input:disabled]:opacity-50 has-[input[value=""]]:text-foreground-400 has-[input:disabled]:bg-neutral-alpha-100 has-[input:disabled]:text-foreground-300',
+  'text-foreground-950 flex w-full flex-nowrap items-center gap-1.5 rounded-md border bg-transparent transition-colors focus-within:outline-none focus-visible:outline-none hover:bg-neutral-50 has-[input:disabled]:cursor-not-allowed has-[input:disabled]:opacity-50 has-[input[value=""]]:text-foreground-400 has-[input:disabled]:bg-neutral-alpha-100 has-[input:disabled]:text-foreground-300',
   {
     variants: {
       size: {
         default: 'h-8 px-2 [&>input]:py-1.5',
+        md: 'h-10 px-3 [&>input]:py-2.5',
       },
       state: {
         default:

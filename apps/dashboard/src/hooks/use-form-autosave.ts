@@ -6,9 +6,11 @@ import { useDataRef } from './use-data-ref';
 export const useFormAutoSave = <T extends FieldValues>({
   onSubmit,
   form,
+  enabled = true,
 }: {
   onSubmit: SubmitHandler<T>;
   form: UseFormReturn<T>;
+  enabled?: boolean;
 }) => {
   const onSubmitRef = useDataRef(onSubmit);
   const { formState, control, handleSubmit } = form;
@@ -18,7 +20,9 @@ export const useFormAutoSave = <T extends FieldValues>({
   });
 
   const debouncedSave = useDebounce(() => {
-    handleSubmit(onSubmitRef.current)();
+    if (enabled) {
+      handleSubmit(onSubmitRef.current)();
+    }
   }, 500);
 
   useDeepCompareEffect(() => {
