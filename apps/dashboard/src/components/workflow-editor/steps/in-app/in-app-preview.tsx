@@ -7,16 +7,16 @@ import { InAppRenderOutput } from '@novu/shared';
 
 export function InAppPreview() {
   const { previewStep, data } = usePreviewStep();
-  const { workflowId, stepId } = useParams<{
-    workflowId: string;
+  const { workflowSlug, stepId } = useParams<{
+    workflowSlug: string;
     stepId: string;
   }>();
 
   useEffect(() => {
-    if (workflowId && stepId) {
-      previewStep({ workflowId, stepUuid: stepId });
+    if (workflowSlug && stepId) {
+      previewStep({ workflowSlug, stepId });
     }
-  }, [workflowId, stepId, previewStep]);
+  }, [workflowSlug, stepId, previewStep]);
 
   return (
     <div className="border-foreground-200 to-background/90 pointer-events-none relative left-0 top-0 flex h-full w-full flex-col gap-2 rounded-xl border border-dashed px-2">

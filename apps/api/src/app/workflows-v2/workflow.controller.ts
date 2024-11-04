@@ -152,7 +152,7 @@ export class WorkflowController {
   @UseGuards(UserAuthGuard)
   async generatePreview(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
-    @Param('workflowId') workflowId: string,
+    @Param('workflowId', ParseSlugIdPipe) workflowId: string,
     @Param('stepUuid') stepUuid: string,
     @Body() generatePreviewRequestDto: GeneratePreviewRequestDto
   ): Promise<GeneratePreviewResponseDto> {

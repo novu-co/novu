@@ -48,16 +48,16 @@ export const updateWorkflow = async ({
 };
 
 export const previewStep = async ({
-  workflowId,
+  workflowSlug,
   payload,
-  stepUuid,
+  stepId,
 }: {
-  workflowId: string;
-  stepUuid: string;
+  workflowSlug: string;
+  stepId: string;
   payload?: Record<string, unknown>;
 }): Promise<GeneratePreviewResponseDto> => {
   const { data } = await postV2<{ data: GeneratePreviewResponseDto }>(
-    `/workflows/${workflowId}/step/${stepUuid}/preview`,
+    `/workflows/${workflowSlug}/step/${stepId}/preview`,
     payload
   );
 

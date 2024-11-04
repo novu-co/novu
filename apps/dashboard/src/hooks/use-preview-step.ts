@@ -5,14 +5,14 @@ import { previewStep } from '@/api/workflows';
 export const usePreviewStep = ({ onSuccess }: { onSuccess?: (data: GeneratePreviewResponseDto) => void } = {}) => {
   const { mutateAsync, isPending, error, data } = useMutation({
     mutationFn: async ({
-      stepUuid,
-      workflowId,
+      stepId,
+      workflowSlug,
       payload,
     }: {
-      stepUuid: string;
-      workflowId: string;
+      stepId: string;
+      workflowSlug: string;
       payload?: Record<string, unknown>;
-    }) => previewStep({ stepUuid, workflowId, payload }),
+    }) => previewStep({ stepId, workflowSlug, payload }),
     onSuccess,
   });
 
