@@ -15,9 +15,6 @@ export default function Home() {
             '6697c185607852e9104daf33': 'My workflow in other language', // key is workflow id
           },
         }}
-        appearance={{
-          baseTheme: dark,
-        }}
       />
     </>
   );

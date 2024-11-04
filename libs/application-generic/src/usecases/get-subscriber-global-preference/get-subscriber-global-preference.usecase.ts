@@ -13,6 +13,7 @@ import { ApiException } from '../../utils/exceptions';
 import { GetPreferences } from '../get-preferences';
 import { GetSubscriberPreference } from '../get-subscriber-preference/get-subscriber-preference.usecase';
 import { filteredPreference } from '../get-subscriber-template-preference/get-subscriber-template-preference.usecase';
+import { InstrumentUsecase } from '../../instrumentation';
 
 @Injectable()
 export class GetSubscriberGlobalPreference {
@@ -23,6 +24,7 @@ export class GetSubscriberGlobalPreference {
     private getSubscriberPreference: GetSubscriberPreference,
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: GetSubscriberGlobalPreferenceCommand) {
     const subscriber = await this.getSubscriber(command);
 

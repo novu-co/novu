@@ -1,6 +1,6 @@
 import Title from '@/components/Title';
 import { novuConfig } from '@/utils/config';
-import { Inbox } from '@novu/react';
+import { Inbox } from '@novu/nextjs';
 
 const CustomBell = ({ unreadCount }: { unreadCount: number }) => {
   return (

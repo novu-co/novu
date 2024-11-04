@@ -15,7 +15,7 @@ export function AddNodeEdge({
   data = { isLast: false, addStepIndex: 0 },
   markerEnd,
 }: EdgeProps<AddNodeEdgeType>) {
-  const { addStep } = useWorkflowEditorContext();
+  const { addStep, isReadOnly } = useWorkflowEditorContext();
 
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -42,11 +42,13 @@ export function AddNodeEdge({
             }}
             className="nodrag nopan"
           >
-            <AddStepMenu
-              onMenuItemClick={(stepType) => {
-                addStep(stepType, data.addStepIndex);
-              }}
-            />
+            {!isReadOnly && (
+              <AddStepMenu
+                onMenuItemClick={(stepType) => {
+                  addStep(stepType, data.addStepIndex);
+                }}
+              />
+            )}
           </div>
         </EdgeLabelRenderer>
       )}

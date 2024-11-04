@@ -3,16 +3,16 @@ import { JSONSchema } from 'json-schema-to-ts';
 import type {
   BuilderFieldType,
   BuilderGroupValues,
-  TemplateVariableTypeEnum,
   FilterParts,
-  WorkflowTypeEnum,
   NotificationTemplateCustomData,
+  TemplateVariableTypeEnum,
+  WorkflowTypeEnum,
 } from '../../types';
-import { IMessageTemplate } from '../message-template';
+import { ControlSchemas, IMessageTemplate } from '../message-template';
 import { IPreferenceChannels } from '../subscriber-preference';
 import { IWorkflowStepMetadata } from '../step';
 import { INotificationGroup } from '../notification-group';
-import { ControlsDto } from '../../dto';
+import { ControlsDto } from '../../index';
 
 export interface INotificationTemplate {
   _id?: string;
@@ -102,9 +102,11 @@ export interface IStepVariant {
   inputs?: {
     schema: JSONSchema;
   };
-  controls?: {
-    schema: JSONSchema;
-  };
+  /**
+   * @deprecated This property is deprecated and will be removed in future versions.
+   * Use IMessageTemplate.controls
+   */
+  controls?: ControlSchemas;
   /*
    * controlVariables exists
    * only on none production environment in order to provide stateless control variables on fly
