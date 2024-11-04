@@ -33,7 +33,7 @@ jobs:
           LATEST_VERSION=$(jq -r '.version' lerna.json)
           SERVICE_NAME=$(basename "${service//-/-}")
           SERVICE_COMMON_NAME=$(echo "$SERVICE_NAME" | sed 's/-ee$//')
-          echo "LASTEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
+          echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
           echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_ENV
           echo "SERVICE_COMMON_NAME=$SERVICE_COMMON_NAME" >> $GITHUB_ENV
           echo "REGISTRY_OWNER=novuhq" >> $GITHUB_ENV
