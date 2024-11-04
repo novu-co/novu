@@ -66,7 +66,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             <TruncatedText className="cursor-pointer" text={workflow.name} />
           </Link>
         </div>
-        <TruncatedText className="text-foreground-400 font-code block text-xs" text={workflow._id} />
+        <TruncatedText className="text-foreground-400 font-code block text-xs" text={workflow.workflowId} />
       </TableCell>
       <TableCell>
         <WorkflowStatus status={workflow.status} />
