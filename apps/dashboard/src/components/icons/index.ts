@@ -4,3 +4,7 @@ export * from './mail-3-fill';
 export * from './sms';
 export * from './route-fill';
 export * from './arrow-right';
+export * from './inbox-bell';
+export * from './inbox-arrow-down';
+export * from './inbox-ellipsis';
+export * from './inbox-settings';

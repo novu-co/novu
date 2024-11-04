@@ -1,6 +1,6 @@
-import { IsArray, IsDefined, IsEnum, isObject, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsDefined, IsEnum, IsObject, IsOptional, IsString } from 'class-validator';
 import { PreferencesResponseDto, StepResponseDto, WorkflowCommonsFields } from './workflow-commons-fields';
-import { Base62Id, Slug, WorkflowOriginEnum, WorkflowTypeEnum } from '../../types';
+import { Slug, WorkflowOriginEnum } from '../../types';
 import { WorkflowStatusEnum } from './workflow-status-enum';
 
 export class WorkflowResponseDto extends WorkflowCommonsFields {
