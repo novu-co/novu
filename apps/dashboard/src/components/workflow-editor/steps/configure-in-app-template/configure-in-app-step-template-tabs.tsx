@@ -8,21 +8,22 @@ import { liquid } from '@codemirror/lang-liquid';
 import { EditorView } from '@uiw/react-codemirror';
 import { RedirectTargetEnum } from '@novu/shared';
 
-import { Button } from '@/components/primitives/button';
-import { Separator } from '@/components/primitives/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Notification5Fill } from '@/components/icons';
+import { Button } from '@/components/primitives/button';
+import { Editor } from '@/components/primitives/editor';
 import { AvatarPicker } from '@/components/primitives/form/avatar-picker';
 import { InputField } from '@/components/primitives/input';
-import { workflowSchema } from '../schema';
-import { ActionPicker } from '../action-picker';
+import { Separator } from '@/components/primitives/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { URLInput } from '@/components/primitives/url-input';
 import { urlTargetTypes } from '@/utils/url';
-import { Editor } from '@/components/primitives/editor';
+import { ActionPicker } from '../../action-picker';
+import { workflowSchema } from '../../schema';
+import { ConfigureInAppStepTemplatePreview } from '@/components/workflow-editor/steps/configure-in-app-template/configure-in-app-step-template-preview';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5';
 
-export const InAppEditor = () => {
+export const ConfigureInAppStepTemplateTabs = () => {
   const navigate = useNavigate();
   const { formState } = useFormContext<z.infer<typeof workflowSchema>>();
 
@@ -127,7 +128,7 @@ export const InAppEditor = () => {
         </div>
       </TabsContent>
       <TabsContent value="preview" className={tabsContentClassName}>
-        <div>Preview</div>
+        <ConfigureInAppStepTemplatePreview />
       </TabsContent>
       <Separator />
       <footer className="flex justify-end px-3 py-3.5">

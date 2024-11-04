@@ -1,25 +1,26 @@
-import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { InboxArrowDown, InboxBell, InboxEllipsis, InboxSettings } from '@/components/icons';
+import { InboxArrowDown } from '@/components/icons/inbox-arrow-down';
+import { InboxBell } from '@/components/icons/inbox-bell';
+import { InboxEllipsis } from '@/components/icons/inbox-ellipsis';
+import { InboxSettings } from '@/components/icons/inbox-settings';
 import { Button } from '@/components/primitives/button';
-import { usePreviewStep } from '@/hooks';
-import { InAppRenderOutput } from '@novu/shared';
+import { cn } from '@/utils/ui';
+import { GeneratePreviewResponseDto, InAppRenderOutput } from '@novu/shared';
+import { HTMLAttributes } from 'react';
 
-export function InAppPreview() {
-  const { previewStep, data } = usePreviewStep();
-  const { workflowSlug, stepId } = useParams<{
-    workflowSlug: string;
-    stepId: string;
-  }>();
-
-  useEffect(() => {
-    if (workflowSlug && stepId) {
-      previewStep({ workflowSlug, stepId });
-    }
-  }, [workflowSlug, stepId, previewStep]);
+type InAppPreviewProps = HTMLAttributes<HTMLDivElement> & {
+  data: GeneratePreviewResponseDto;
+};
+export const InAppPreview = (props: InAppPreviewProps) => {
+  const { className, data, ...rest } = props;
 
   return (
-    <div className="border-foreground-200 to-background/90 pointer-events-none relative left-0 top-0 flex h-full w-full flex-col gap-2 rounded-xl border border-dashed px-2">
+    <div
+      className={cn(
+        'border-foreground-200 to-background/90 pointer-events-none relative left-0 top-0 flex h-full w-full flex-col gap-2 rounded-xl border border-dashed px-2',
+        className
+      )}
+      {...rest}
+    >
       <div className="absolute -left-0.5 bottom-0 z-10 -mb-2 h-2/3 w-[calc(100%+4px)] bg-gradient-to-t from-[rgb(255,255,255)] from-5% to-95%" />
       <div className="z-20 flex h-6 items-center justify-end text-neutral-300">
         <span className="relative">
@@ -69,7 +70,7 @@ export function InAppPreview() {
       </div>
     </div>
   );
-}
+};
 
 const Body = ({ text }: { text: string }) => {
   return (

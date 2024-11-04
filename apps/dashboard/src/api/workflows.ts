@@ -5,6 +5,7 @@ import type {
   UpdateWorkflowDto,
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
+  GeneratePreviewRequestDto,
 } from '@novu/shared';
 import { getV2, post, postV2, putV2 } from './api.client';
 
@@ -59,7 +60,7 @@ export const previewStep = async ({
 }: {
   workflowSlug: string;
   stepId: string;
-  payload?: Record<string, unknown>;
+  payload?: GeneratePreviewRequestDto;
 }): Promise<GeneratePreviewResponseDto> => {
   const { data } = await postV2<{ data: GeneratePreviewResponseDto }>(
     `/workflows/${workflowSlug}/step/${stepId}/preview`,
