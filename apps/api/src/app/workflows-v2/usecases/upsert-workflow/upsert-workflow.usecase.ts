@@ -280,8 +280,8 @@ export class UpsertWorkflowUseCase {
     return steps;
   }
 
-  private extractPayloadVariables(step: StepDto): JSONSchema {
-    const payloadVariables = extractPlaceholders(Object.values(step.controlValues).join(''));
+  private extractPayloadVariables(step: StepCreateDto): JSONSchema {
+    const payloadVariables = extractPlaceholders(Object.values(step.controlValues || {}).join(''));
 
     const properties: Record<string, JSONSchema> = {};
     payloadVariables?.forEach((variable) => {
