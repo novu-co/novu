@@ -188,3 +188,18 @@ export const buildServiceConfigApiRateLimitMaximumKey = (): string =>
   buildServiceConfigKey(
     ServiceConfigIdentifierEnum.API_RATE_LIMIT_SERVICE_MAXIMUM,
   );
+
+export const buildSubscriberTopicsKey = ({
+  subscriberId,
+  _environmentId,
+}: {
+  subscriberId: string;
+  _environmentId: string;
+}): string =>
+  buildEnvironmentScopedKeyById({
+    type: CacheKeyTypeEnum.ENTITY,
+    keyEntity: CacheKeyPrefixEnum.SUBSCRIBER_TOPICS,
+    environmentId: _environmentId,
+    identifierPrefix: IdentifierPrefixEnum.SUBSCRIBER_ID,
+    identifier: subscriberId,
+  });

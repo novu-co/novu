@@ -3,6 +3,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
 import { z } from 'zod';
+import { liquid } from '@codemirror/lang-liquid';
+import { EditorView } from '@uiw/react-codemirror';
 import { RedirectTargetEnum } from '@novu/shared';
 import { Button, buttonVariants } from '@/components/primitives/button';
 import {
@@ -196,7 +198,18 @@ const ConfigureActionPopover = (
                     </div>
                     <FormControl>
                       <InputField>
-                        <Editor placeholder="Button text" value={field.value} onChange={field.onChange} height="30px" />
+                        <Editor
+                          placeholder="Button text"
+                          value={field.value}
+                          onChange={field.onChange}
+                          height="30px"
+                          extensions={[
+                            liquid({
+                              variables: [{ type: 'variable', label: 'asdf' }],
+                            }),
+                            EditorView.lineWrapping,
+                          ]}
+                        />
                       </InputField>
                     </FormControl>
                     <FormMessage />
