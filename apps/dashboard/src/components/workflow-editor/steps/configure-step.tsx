@@ -1,3 +1,5 @@
+import { Link, useParams } from 'react-router-dom';
+import { RiArrowLeftSLine, RiCloseFill, RiDeleteBin2Line } from 'react-icons/ri';
 import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarFooter, SidebarHeader } from '@/components/side-navigation/Sidebar';
@@ -6,11 +8,9 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { StepTypeEnum } from '@/utils/enums';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { motion } from 'framer-motion';
-import { RiArrowLeftSLine, RiCloseFill, RiDeleteBin2Line } from 'react-icons/ri';
-import { Link, useParams } from 'react-router-dom';
-import Chat from './chat';
-import { InApp } from './in-app';
+import { InApp } from './in-app/in-app';
 import { useStep } from './use-step';
+import Chat from './chat';
 
 export function ConfigureStep() {
   const { currentEnvironment } = useEnvironment();

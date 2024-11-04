@@ -8,6 +8,7 @@ export type EnvironmentContextValue = {
   readOnly: boolean;
   switchEnvironment: (newEnvironmentSlug?: string) => void;
   setBridgeUrl: (url: string) => void;
+  oppositeEnvironment: IEnvironment | null;
 };
 
 export const EnvironmentContext = React.createContext<EnvironmentContextValue>({} as EnvironmentContextValue);

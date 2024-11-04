@@ -11,3 +11,4 @@ export * from './workflow-response-dto';
 export * from './workflow-status-enum';
 export * from './get-list-query-params';
 export * from './workflow-test-data-response-dto';
+export * from './step-data.dto';

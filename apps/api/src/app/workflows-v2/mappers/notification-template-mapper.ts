@@ -1,9 +1,9 @@
 import {
-  ControlsSchema,
   DEFAULT_WORKFLOW_PREFERENCES,
   PreferencesResponseDto,
   PreferencesTypeEnum,
   ShortIsPrefixEnum,
+  ControlsSchema,
   StepResponseDto,
   StepTypeEnum,
   WorkflowListResponseDto,
@@ -12,14 +12,13 @@ import {
   WorkflowStatusEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
-import { ControlValuesEntity, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
+import { NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { GetPreferencesResponseDto } from '@novu/application-generic';
 import { buildSlug } from '../../shared/helpers/build-slug';
 
 export function toResponseWorkflowDto(
   template: NotificationTemplateEntity,
-  preferences: GetPreferencesResponseDto | undefined,
-  stepIdToControlValuesMap: { [p: string]: ControlValuesEntity }
+  preferences: GetPreferencesResponseDto | undefined
 ): WorkflowResponseDto {
   const preferencesDto: PreferencesResponseDto = {
     user: preferences?.source[PreferencesTypeEnum.USER_WORKFLOW] || null,
@@ -35,7 +34,7 @@ export function toResponseWorkflowDto(
     tags: template.tags,
     active: template.active,
     preferences: preferencesDto,
-    steps: getSteps(template, stepIdToControlValuesMap),
+    steps: getSteps(template),
     description: template.description,
     origin: computeOrigin(template),
     updatedAt: template.updatedAt || 'Missing Updated At',
@@ -44,14 +43,10 @@ export function toResponseWorkflowDto(
   };
 }
 
-function getSteps(template: NotificationTemplateEntity, controlValuesMap: { [p: string]: ControlValuesEntity }) {
+function getSteps(template: NotificationTemplateEntity) {
   const steps: StepResponseDto[] = [];
   for (const step of template.steps) {
     const stepResponseDto = toStepResponseDto(step);
-    const controlValues = controlValuesMap[step._templateId];
-    if (controlValues?.controls && Object.entries(controlValues?.controls).length) {
-      stepResponseDto.controlValues = controlValues.controls;
-    }
     steps.push(stepResponseDto);
   }
 
@@ -63,6 +58,7 @@ function toMinifiedWorkflowDto(template: NotificationTemplateEntity): WorkflowLi
 
   return {
     _id: template._id,
+    workflowId: template.triggers[0].identifier,
     slug: buildSlug(workflowName, ShortIsPrefixEnum.WORKFLOW, template._id),
     name: workflowName,
     origin: computeOrigin(template),
@@ -87,8 +83,6 @@ function toStepResponseDto(step: NotificationStepEntity): StepResponseDto {
     name: stepName,
     stepId: step.stepId || 'Missing Step Id',
     type: step.template?.type || StepTypeEnum.EMAIL,
-    controls: convertControls(step),
-    controlValues: step.controlVariables || {},
   } satisfies StepResponseDto;
 }
 

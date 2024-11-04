@@ -3,7 +3,7 @@ import {
   ChannelTypeEnum,
   ControlPreviewIssue,
   ControlPreviewIssueTypeEnum,
-  ControlsSchema,
+  ControlSchemas,
   GeneratePreviewRequestDto,
   GeneratePreviewResponseDto,
   JSONSchemaDto,
@@ -14,16 +14,17 @@ import { merge } from 'lodash/fp';
 import { difference, isArray, isObject, reduce } from 'lodash';
 import { GeneratePreviewCommand } from './generate-preview-command';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
-import { GetWorkflowUseCase } from '../get-workflow/get-workflow.usecase';
 import { CreateMockPayloadUseCase } from '../placeholder-enrichment/payload-preview-value-generator.usecase';
-import { StepNotFoundException } from '../../exceptions/step-not-found-exception';
+import { StepMissingControlsException, StepNotFoundException } from '../../exceptions/step-not-found-exception';
 import { ExtractDefaultsUsecase } from '../get-default-values-from-schema/extract-defaults.usecase';
+import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
+import { OriginMissingException, StepIdMissingException } from './step-id-missing.exception';
 
 @Injectable()
 export class GeneratePreviewUsecase {
   constructor(
     private legacyPreviewStepUseCase: PreviewStep,
-    private getWorkflowUseCase: GetWorkflowUseCase,
+    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private createMockPayloadUseCase: CreateMockPayloadUseCase,
     private extractDefaultsUseCase: ExtractDefaultsUsecase
   ) {}
@@ -49,7 +50,7 @@ export class GeneratePreviewUsecase {
     );
   }
 
-  private addMissingValuesToControlValues(command: GeneratePreviewCommand, stepControlSchema: ControlsSchema) {
+  private addMissingValuesToControlValues(command: GeneratePreviewCommand, stepControlSchema: ControlSchemas) {
     const defaultValues = this.extractDefaultsUseCase.execute({
       jsonSchemaDto: stepControlSchema.schema as JSONSchemaDto,
     });
@@ -108,12 +109,19 @@ export class GeneratePreviewUsecase {
   }
   private async executePreviewUsecase(
     workflowId: string,
-    stepId: string,
-    origin: WorkflowOriginEnum,
+    stepId: string | undefined,
+    origin: WorkflowOriginEnum | undefined,
     hydratedPayload: Record<string, unknown>,
     updatedControlValues: Record<string, unknown>,
     command: GeneratePreviewCommand
   ) {
+    if (!stepId) {
+      throw new StepIdMissingException(workflowId);
+    }
+    if (!origin) {
+      throw new OriginMissingException(stepId);
+    }
+
     return await this.legacyPreviewStepUseCase.execute(
       PreviewStepCommand.create({
         payload: hydratedPayload,
@@ -129,22 +137,25 @@ export class GeneratePreviewUsecase {
   }
 
   private async getWorkflowUserIdentifierFromWorkflowObject(command: GeneratePreviewCommand) {
-    const workflowResponseDto = await this.getWorkflowUseCase.execute({
+    const persistedWorkflow = await this.getWorkflowByIdsUseCase.execute({
       identifierOrInternalId: command.workflowId,
       user: command.user,
     });
-    const { workflowId, steps } = workflowResponseDto;
-    const step = steps.find((stepDto) => stepDto._id === command.stepUuid);
+    const { steps } = persistedWorkflow;
+    const step = steps.find((stepDto) => stepDto._id === command.stepDatabaseId);
     if (!step) {
-      throw new StepNotFoundException(command.stepUuid);
+      throw new StepNotFoundException(command.stepDatabaseId);
+    }
+    if (!step.template || !step.template.controls) {
+      throw new StepMissingControlsException(command.stepDatabaseId, step);
     }
 
     return {
-      workflowId,
+      workflowId: persistedWorkflow.triggers[0].identifier,
       stepId: step.stepId,
-      stepType: step.type,
-      stepControlSchema: step.controls,
-      origin: workflowResponseDto.origin,
+      stepType: step.template.type,
+      stepControlSchema: step.template.controls,
+      origin: persistedWorkflow.origin,
     };
   }
 

@@ -1,3 +1,11 @@
+import { ComponentProps } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
+import { z } from 'zod';
+import { liquid } from '@codemirror/lang-liquid';
+import { EditorView } from '@uiw/react-codemirror';
+import { RedirectTargetEnum } from '@novu/shared';
 import { Button, buttonVariants } from '@/components/primitives/button';
 import {
   DropdownMenu,
@@ -6,18 +14,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/primitives/dropdown-menu';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { Input, InputField } from '@/components/primitives/input';
+import { InputField } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import { URLInput } from '@/components/primitives/url-input';
 import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { RedirectTargetEnum } from '@novu/shared';
-import { ComponentProps } from 'react';
-import { useForm } from 'react-hook-form';
-import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
-import { z } from 'zod';
+import { Editor } from '../primitives/editor';
 
 type Action = {
   label: string;
@@ -177,7 +180,7 @@ const ConfigureActionPopover = (
       }}
     >
       <PopoverTrigger {...rest} />
-      <PopoverContent>
+      <PopoverContent className="max-w-72">
         <Form {...form}>
           <form className="space-y-4">
             <div className="space-y-2">
@@ -195,7 +198,18 @@ const ConfigureActionPopover = (
                     </div>
                     <FormControl>
                       <InputField>
-                        <Input {...field} />
+                        <Editor
+                          placeholder="Button text"
+                          value={field.value}
+                          onChange={field.onChange}
+                          height="30px"
+                          extensions={[
+                            liquid({
+                              variables: [{ type: 'variable', label: 'asdf' }],
+                            }),
+                            EditorView.lineWrapping,
+                          ]}
+                        />
                       </InputField>
                     </FormControl>
                     <FormMessage />
@@ -217,6 +231,7 @@ const ConfigureActionPopover = (
                         options={urlTargetTypes}
                         value={field.value}
                         onChange={(val) => field.onChange(val)}
+                        asEditor
                       />
                     </FormControl>
                     <FormMessage />

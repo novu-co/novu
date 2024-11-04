@@ -164,13 +164,15 @@ export class SubscribersController {
   })
   async getSubscriber(
     @UserSession() user: UserSessionData,
-    @Param('subscriberId') subscriberId: string
+    @Param('subscriberId') subscriberId: string,
+    @Query('includeTopics') includeTopics: string
   ): Promise<SubscriberResponseDto> {
-    return await this.getSubscriberUseCase.execute(
+    return this.getSubscriberUseCase.execute(
       GetSubscriberCommand.create({
         environmentId: user.environmentId,
         organizationId: user.organizationId,
         subscriberId,
+        includeTopics: includeTopics === 'true',
       })
     );
   }
