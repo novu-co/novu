@@ -307,9 +307,7 @@ describe('Workflow Controller E2E API Testing', () => {
          * TODO: this is not true yet, but some ID will remain the same across environments
          * expect(prodStep.stepId).to.equal(devStep.stepId, 'Step ID should be the same');
          */
-        console.log('prodStep', prodStep);
         const prodValues = await getWorkflowStepData(prodWorkflow, prodStep, prodEnvironmentId);
-        console.log('devStep', devStep);
 
         const devValues = await getWorkflowStepData(devWorkflow, devStep, devEnvironmentId);
         expect(prodValues).to.deep.equal(devValues, 'Step controlValues should match');
@@ -328,7 +326,7 @@ describe('Workflow Controller E2E API Testing', () => {
       const devWorkflow = await createWorkflowAndValidate('-promote-workflow');
 
       // Promote the workflow to production
-      const resPromoteCreate = await session.testAgent.put(`${v2Prefix}/workflows/${devWorkflow._id}/promote`).send({
+      const resPromoteCreate = await session.testAgent.put(`${v2Prefix}/workflows/${devWorkflow._id}/sync`).send({
         targetEnvironmentId: prodEnvironmentId,
       });
       expect(resPromoteCreate.status).to.equal(200);
@@ -349,7 +347,7 @@ describe('Workflow Controller E2E API Testing', () => {
       await updateWorkflowAndValidate(devWorkflow._id, devWorkflow.updatedAt, updateDto);
 
       // Promote the updated workflow to production
-      const resPromoteUpdate = await session.testAgent.put(`${v2Prefix}/workflows/${devWorkflow._id}/promote`).send({
+      const resPromoteUpdate = await session.testAgent.put(`${v2Prefix}/workflows/${devWorkflow._id}/sync`).send({
         targetEnvironmentId: prodEnvironmentId,
       });
 
@@ -384,7 +382,7 @@ describe('Workflow Controller E2E API Testing', () => {
     it('should throw an error if trying to promote to the same environment', async () => {
       const devWorkflow = await createWorkflowAndValidate('-promote-workflow');
 
-      const res = await session.testAgent.put(`${v2Prefix}/workflows/${devWorkflow._id}/promote`).send({
+      const res = await session.testAgent.put(`${v2Prefix}/workflows/${devWorkflow._id}/sync`).send({
         targetEnvironmentId: session.environment._id,
       });
 
@@ -393,7 +391,7 @@ describe('Workflow Controller E2E API Testing', () => {
     });
 
     it('should throw an error if the workflow to promote is not found', async () => {
-      const res = await session.testAgent.put(`${v2Prefix}/workflows/123/promote`).send({ targetEnvironmentId: '123' });
+      const res = await session.testAgent.put(`${v2Prefix}/workflows/123/sync`).send({ targetEnvironmentId: '123' });
 
       expect(res.status).to.equal(404);
       expect(res.body.message).to.equal('Workflow cannot be found');
