@@ -70,6 +70,8 @@ runs:
         REPOSITORY: novu-dev/api    
         IMAGE_TAG: ${{ github.sha }}
         DOCKER_BUILD_ARGUMENTS: >
+          --cache-from type=registry,ref=${{ steps.login-ecr.outputs.registry }}/novu-dev/cache:build-cache-${{ env.SERVICE_NAME }}
+          --cache-to type=registry,ref=${{ steps.login-ecr.outputs.registry }}/novu-dev/cache:build-cache-${{ env.SERVICE_NAME }},mode=max
           --platform=linux/amd64 --provenance=false
           --output=type=image,name=$REGISTRY/$REPOSITORY,push-by-digest=true,name-canonical=true
       run: |
