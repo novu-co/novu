@@ -30,6 +30,6 @@ export const useStep = () => {
     step,
     stepIndex,
     control,
-    channel: step?.type,
+    stepType: step?.type,
   };
 };

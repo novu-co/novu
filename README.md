@@ -16,9 +16,6 @@
   <a href="https://www.npmjs.com/package/@novu/node">
     <img src="https://img.shields.io/npm/dm/@novu/node" alt="npm downloads">
   </a>
-  <a href="https://github.com/novuhq/novu/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/novuhq/novu" alt="MIT">
-  </a>
 </p>
 
 <h1 align="center">
@@ -217,7 +214,12 @@ We are more than happy to help you. If you are getting any errors or facing prob
 
 ## 🛡️ License
 
-Novu is licensed under the MIT License - see the [LICENSE](https://github.com/novuhq/novu/blob/main/LICENSE) file for details.
+Novu is a commercial open source company, which means some parts of this open source repository require a commercial license. The concept is called "Open Core," where the core technology is fully open source, licensed under MIT license, and the enterprise code is covered under a commercial license ("/enterprise" Enterprise Edition). Enterprise features are built by the core engineering team of Novu which is hired in full-time.
+
+The following modules and folders are licensed under the enterprise license:
+- `enterprise` folder at the root of the project and all of their subfolders and modules
+- `apps/web/src/ee` folder and all of their subfolders and modules
+- `apps/dashboard/src/ee` folder and all of their subfolders and modules
 
 ## 💪 Thanks to all of our contributors
 

@@ -11,6 +11,7 @@ import {
   GetSubscriberTemplatePreference,
   GetSubscriberTemplatePreferenceCommand,
 } from '../get-subscriber-template-preference';
+import { InstrumentUsecase } from '../../instrumentation';
 
 @Injectable()
 export class GetSubscriberPreference {
@@ -21,6 +22,7 @@ export class GetSubscriberPreference {
     private analyticsService: AnalyticsService,
   ) {}
 
+  @InstrumentUsecase()
   async execute(
     command: GetSubscriberPreferenceCommand,
   ): Promise<ISubscriberPreferenceResponse[]> {
@@ -50,6 +52,7 @@ export class GetSubscriberPreference {
       },
     );
 
+    // TODO: replace this runtime mapping with a single query to the database
     const subscriberWorkflowPreferences = await Promise.all(
       templateList.map(async (template) =>
         this.getSubscriberTemplatePreferenceUsecase.execute(

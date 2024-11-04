@@ -1,7 +1,12 @@
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
-import { EnvironmentRepository, NotificationTemplateRepository, MessageTemplateRepository } from '@novu/dal';
-import { FeatureFlagsKeysEnum, WorkflowTypeEnum } from '@novu/shared';
+import {
+  EnvironmentRepository,
+  NotificationTemplateRepository,
+  MessageTemplateRepository,
+  ControlValuesRepository,
+} from '@novu/dal';
+import { WorkflowTypeEnum } from '@novu/shared';
 import { workflow } from '@novu/framework';
 import { BridgeServer } from '../../../../e2e/bridge.server';
 
@@ -10,6 +15,7 @@ describe('Bridge Sync - /bridge/sync (POST)', async () => {
   const environmentRepository = new EnvironmentRepository();
   const workflowsRepository = new NotificationTemplateRepository();
   const messageTemplateRepository = new MessageTemplateRepository();
+  const controlValuesRepository = new ControlValuesRepository();
 
   const inputPostPayload = {
     schema: {
@@ -552,5 +558,96 @@ describe('Bridge Sync - /bridge/sync (POST)', async () => {
 
     const workflowDataWithName = workflowsWithDescription[0];
     expect(workflowDataWithName.description).to.equal('');
+  });
+
+  it('should preserve control values across workflow syncs', async () => {
+    const workflowId = 'My Workflow';
+    const spaceSeparatedIdWorkflow = workflow(workflowId, async ({ step }) => {
+      await step.email('send-email', () => ({
+        subject: 'Welcome!',
+        body: 'Hello there',
+      }));
+    });
+    await bridgeServer.start({ workflows: [spaceSeparatedIdWorkflow] });
+
+    const firstSyncResponse = await session.testAgent.post(`/v1/bridge/sync`).send({
+      bridgeUrl: bridgeServer.serverPath,
+    });
+    expect(firstSyncResponse.body.data?.length).to.equal(1);
+
+    const firstWorkflowCountResponse = await workflowsRepository.count({ _environmentId: session.environment._id });
+    expect(firstWorkflowCountResponse).to.equal(1);
+
+    const firstWorkflowResponse = await workflowsRepository.findById(
+      firstSyncResponse.body.data[0]._id,
+      session.environment._id
+    );
+
+    expect(firstWorkflowResponse).to.be.ok;
+    if (!firstWorkflowResponse) {
+      throw new Error('Workflow not found');
+    }
+
+    expect(firstWorkflowResponse.name).to.equal(workflowId);
+    expect(firstWorkflowResponse.type).to.equal(WorkflowTypeEnum.BRIDGE);
+    expect(firstWorkflowResponse.rawData.workflowId).to.equal(workflowId);
+    expect(firstWorkflowResponse.triggers[0].identifier).to.equal(workflowId);
+
+    expect(firstWorkflowResponse.steps.length).to.equal(1);
+    expect(firstWorkflowResponse.steps[0].stepId).to.equal('send-email');
+    expect(firstWorkflowResponse.steps[0]._templateId).to.exist;
+
+    await session.testAgent.put(`/v1/bridge/controls/${workflowId}/send-email`).send({
+      variables: { subject: 'Hello World again' },
+    });
+
+    const firstControlValueResponse = await controlValuesRepository.find({
+      _environmentId: session.environment._id,
+      _workflowId: firstWorkflowResponse._id,
+    });
+
+    expect(firstControlValueResponse.length).to.equal(1);
+    expect(firstControlValueResponse[0].controls.subject).to.equal('Hello World again');
+
+    const firstStepResponse = await session.testAgent.get(`/v1/bridge/controls/${workflowId}/send-email`);
+    expect(firstStepResponse.body.data.controls.subject).to.equal('Hello World again');
+
+    const secondSyncResponse = await session.testAgent.post(`/v1/bridge/sync`).send({
+      bridgeUrl: bridgeServer.serverPath,
+    });
+    expect(secondSyncResponse.body.data?.length).to.equal(1);
+
+    const secondWorkflowCountResponse = await workflowsRepository.count({ _environmentId: session.environment._id });
+    expect(secondWorkflowCountResponse).to.equal(1);
+
+    const secondWorkflowResponse = await workflowsRepository.findById(
+      firstSyncResponse.body.data[0]._id,
+      session.environment._id
+    );
+
+    expect(secondWorkflowResponse).to.be.ok;
+    if (!secondWorkflowResponse) {
+      throw new Error('Workflow not found');
+    }
+
+    expect(secondWorkflowResponse.name).to.equal(workflowId);
+    expect(secondWorkflowResponse.type).to.equal(WorkflowTypeEnum.BRIDGE);
+    expect(secondWorkflowResponse.rawData.workflowId).to.equal(workflowId);
+    expect(secondWorkflowResponse.triggers[0].identifier).to.equal(workflowId);
+
+    expect(secondWorkflowResponse.steps.length).to.equal(1);
+    expect(secondWorkflowResponse.steps[0].stepId).to.equal('send-email');
+    expect(secondWorkflowResponse.steps[0]._templateId).to.exist;
+
+    const secondControlValueResponse = await controlValuesRepository.find({
+      _environmentId: session.environment._id,
+      _workflowId: secondWorkflowResponse._id,
+    });
+
+    expect(secondControlValueResponse.length).to.equal(1);
+    expect(secondControlValueResponse[0].controls.subject).to.equal('Hello World again');
+
+    const secondStepResponse = await session.testAgent.get(`/v1/bridge/controls/${workflowId}/send-email`);
+    expect(secondStepResponse.body.data.controls.subject).to.equal('Hello World again');
   });
 });

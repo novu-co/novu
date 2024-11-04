@@ -203,7 +203,11 @@ export const CustomNode = ({ data }: NodeProps<NodeType>) => {
 };
 
 export const AddNode = (_props: NodeProps<NodeType>) => {
-  const { addStep } = useWorkflowEditorContext();
+  const { addStep, isReadOnly } = useWorkflowEditorContext();
+
+  if (isReadOnly) {
+    return null;
+  }
 
   return (
     <div className="flex w-[300px] justify-center">
