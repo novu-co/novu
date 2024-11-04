@@ -3,7 +3,6 @@ import {
   PreferencesResponseDto,
   PreferencesTypeEnum,
   ShortIsPrefixEnum,
-  ControlsSchema,
   StepResponseDto,
   StepTypeEnum,
   WorkflowListResponseDto,
@@ -84,14 +83,6 @@ function toStepResponseDto(step: NotificationStepEntity): StepResponseDto {
     stepId: step.stepId || 'Missing Step Id',
     type: step.template?.type || StepTypeEnum.EMAIL,
   } satisfies StepResponseDto;
-}
-
-function convertControls(step: NotificationStepEntity): ControlsSchema {
-  if (step.template?.controls) {
-    return { schema: step.template.controls.schema };
-  }
-
-  return { schema: {} }; // This is not a usecase, it's only here to be backwards compatible with V1 Notification Entities
 }
 
 function buildStepTypeOverview(step: NotificationStepEntity): StepTypeEnum | undefined {
