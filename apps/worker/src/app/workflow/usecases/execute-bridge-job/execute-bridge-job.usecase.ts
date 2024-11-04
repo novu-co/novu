@@ -2,12 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import {
   ControlValuesRepository,
-  NotificationTemplateEntity,
   EnvironmentRepository,
-  JobRepository,
-  NotificationTemplateRepository,
-  MessageRepository,
   JobEntity,
+  JobRepository,
+  MessageRepository,
+  NotificationTemplateEntity,
+  NotificationTemplateRepository,
 } from '@novu/dal';
 import {
   ControlValuesLevelEnum,
@@ -18,7 +18,7 @@ import {
   WorkflowOriginEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
-import { Event, State, PostActionEnum, ExecuteOutput } from '@novu/framework/internal';
+import { Event, ExecuteOutput, PostActionEnum, State } from '@novu/framework/internal';
 
 import {
   CreateExecutionDetails,

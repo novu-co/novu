@@ -1,4 +1,5 @@
-/* eslint-disable global-require */ import { DynamicModule, Logger, Module, Provider } from '@nestjs/common';
+/* eslint-disable global-require */
+import { DynamicModule, Logger, Module, Provider } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { Type } from '@nestjs/common/interfaces/type.interface';
 import { ForwardReference } from '@nestjs/common/interfaces/modules/forward-reference.interface';
@@ -40,7 +41,6 @@ import { AnalyticsModule } from './app/analytics/analytics.module';
 import { InboxModule } from './app/inbox/inbox.module';
 import { BridgeModule } from './app/bridge/bridge.module';
 import { PreferencesModule } from './app/preferences';
-import { StepSchemasModule } from './app/step-schemas/step-schemas.module';
 import { WorkflowModule } from './app/workflows-v2/workflow.module';
 import { WorkflowModuleV1 } from './app/workflows-v1/workflow-v1.module';
 import { EnvironmentsModuleV1 } from './app/environments-v1/environments-v1.module';
@@ -72,7 +72,6 @@ const enterpriseQuotaThrottlerInterceptor =
     : [];
 
 const baseModules: Array<Type | DynamicModule | Promise<DynamicModule> | ForwardReference> = [
-  StepSchemasModule,
   AuthModule,
   InboundParseModule,
   SharedModule,

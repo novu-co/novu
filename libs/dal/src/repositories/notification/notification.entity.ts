@@ -1,5 +1,4 @@
 import { ControlsDto, ISubscribersDefine, StepTypeEnum } from '@novu/shared';
-
 import { NotificationTemplateEntity } from '../notification-template';
 import type { OrganizationId } from '../organization';
 import type { EnvironmentId } from '../environment';

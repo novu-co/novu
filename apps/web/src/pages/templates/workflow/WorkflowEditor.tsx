@@ -6,6 +6,7 @@ import { Node, NodeProps } from 'react-flow-renderer';
 import { useDidUpdate, useTimeout } from '@mantine/hooks';
 import { FilterPartTypeEnum, StepTypeEnum } from '@novu/shared';
 import { Bolt, Button, Settings } from '@novu/design-system';
+import { Bolt } from '@novu/design-system/dist/cjs';
 import { useAuth, useEnvironment } from '../../../hooks';
 import { useSegment } from '../../../components/providers/SegmentProvider';
 
@@ -25,7 +26,7 @@ import { AddNodeEdge } from './workflow/edge-types/AddNodeEdge';
 import AddNode from './workflow/node-types/AddNode';
 import ChannelNode from './workflow/node-types/ChannelNode';
 import TriggerNode from './workflow/node-types/TriggerNode';
-import { NodeType, NodeData } from '../../../components/workflow/types';
+import { NodeData, NodeType } from '../../../components/workflow/types';
 import { useStepInfoPath } from '../hooks/useStepInfoPath';
 import { useNavigateToVariantPreview } from '../hooks/useNavigateToVariantPreview';
 import { useOnboardingExperiment } from '../../../hooks/useOnboardingExperiment';
@@ -80,7 +81,7 @@ const WorkflowEditor = () => {
       if (isVariant) {
         navigateToVariantPreview({
           channel: channelType,
-          stepUuid: step.uuid,
+          stepId: step.uuid,
           variantUuid: step.uuid,
         });
       } else if (node.type === NodeType.CHANNEL) {
