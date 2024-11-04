@@ -4,6 +4,8 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import { useNavigate } from 'react-router-dom';
 import { useFormContext } from 'react-hook-form';
 import * as z from 'zod';
+import { liquid } from '@codemirror/lang-liquid';
+import { EditorView } from '@uiw/react-codemirror';
 import { RedirectTargetEnum } from '@novu/shared';
 
 import { Button } from '@/components/primitives/button';
@@ -68,11 +70,33 @@ export const InAppEditor = () => {
             <div className="flex gap-1">
               <AvatarPicker />
               <InputField size="md" className="px-1">
-                <Editor placeholder="Subject" size="md" value={subject} onChange={setSubject} height="38px" />
+                <Editor
+                  placeholder="Subject"
+                  size="md"
+                  value={subject}
+                  onChange={setSubject}
+                  extensions={[
+                    liquid({
+                      variables: [{ type: 'variable', label: 'asdf' }],
+                    }),
+                    EditorView.lineWrapping,
+                  ]}
+                />
               </InputField>
             </div>
             <InputField size="md" className="h-32 px-1">
-              <Editor placeholder="Body" size="md" value={body} onChange={setBody} />
+              <Editor
+                placeholder="Body"
+                size="md"
+                value={body}
+                onChange={setBody}
+                extensions={[
+                  liquid({
+                    variables: [{ type: 'variable', label: 'asdf' }],
+                  }),
+                  EditorView.lineWrapping,
+                ]}
+              />
             </InputField>
             <div className="mt-1 flex items-center gap-1">
               <RiInformationFill className="text-foreground-400 size-4 p-0.5" />

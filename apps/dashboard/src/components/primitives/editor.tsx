@@ -1,12 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { tags as t } from '@lezer/highlight';
-import { useCodeMirror, EditorView } from '@uiw/react-codemirror';
-import { liquid } from '@codemirror/lang-liquid';
+import { useCodeMirror, EditorView, ReactCodeMirrorProps } from '@uiw/react-codemirror';
 import { cva, VariantProps } from 'class-variance-authority';
 import createTheme from '@uiw/codemirror-themes';
 import { autocompleteFooter, autocompleteHeader, functionIcon } from './constants';
 
-const editorVariants = cva('-mx-1 -mt-[2px] h-full w-full flex-1 [&_.cm-focused]:outline-none', {
+const editorVariants = cva('-mx-1 mt-[2px] h-full w-full flex-1 [&_.cm-focused]:outline-none', {
   variants: {
     size: {
       default: 'text-xs [&_.cm-editor]:py-1',
@@ -91,6 +90,14 @@ const baseTheme = EditorView.baseTheme({
   '.cm-line span.cm-matchingBracket': {
     backgroundColor: 'hsl(var(--highlighted) / 0.1)',
   },
+  'div.cm-content': {
+    padding: 0,
+  },
+  'div.cm-gutters': {
+    backgroundColor: 'transparent',
+    borderRight: 'none',
+    color: 'hsl(var(--foreground-400))',
+  },
 });
 
 const theme = createTheme({
@@ -114,19 +121,24 @@ type EditorProps = {
   placeholder?: string;
   className?: string;
   height?: string;
-  onChange: (val: string) => void;
-} & VariantProps<typeof editorVariants>;
+  onChange?: (val: string) => void;
+} & ReactCodeMirrorProps &
+  VariantProps<typeof editorVariants>;
 
-export const Editor = ({ value, placeholder, className, height, size, onChange }: EditorProps) => {
+export const Editor = ({
+  value,
+  placeholder,
+  className,
+  height,
+  size,
+  onChange,
+  extensions,
+  basicSetup,
+  ...restCodeMirrorProps
+}: EditorProps) => {
   const editor = useRef<HTMLDivElement>(null);
   const { setContainer } = useCodeMirror({
-    extensions: [
-      liquid({
-        variables: [{ type: 'variable', label: 'asdf' }],
-      }),
-      EditorView.lineWrapping,
-      baseTheme,
-    ],
+    extensions: [...(extensions ?? []), baseTheme],
     height,
     placeholder,
     basicSetup: {
@@ -137,12 +149,14 @@ export const Editor = ({ value, placeholder, className, height, size, onChange }
       highlightActiveLineGutter: false,
       indentOnInput: false,
       searchKeymap: false,
+      ...(typeof basicSetup === 'object' ? basicSetup : {}),
     },
     container: editor.current,
     value,
     onChange,
     theme,
     lang: 'liquid',
+    ...restCodeMirrorProps,
   });
 
   useEffect(() => {
@@ -150,8 +164,6 @@ export const Editor = ({ value, placeholder, className, height, size, onChange }
       setContainer(editor.current);
     }
   }, [setContainer]);
-
-  // TODO remove default HTML editor tags
 
   return <div ref={editor} className={editorVariants({ size, className })} />;
 };
