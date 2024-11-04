@@ -37,7 +37,7 @@ type WorkflowRowProps = {
 
 export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
   const { currentEnvironment } = useEnvironment();
-  const { safeSync, isSyncable, tooltipContent, ConfirmationModal } = useSyncWorkflow(workflow);
+  const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
 
   const isV1Workflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1;
   const workflowLink = isV1Workflow
@@ -49,7 +49,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
 
   return (
     <TableRow key={workflow._id} className="relative">
-      <ConfirmationModal />
+      <PromoteConfirmModal />
       <TableCell className="font-medium">
         <div className="flex items-center gap-1">
           {workflow.origin === WorkflowOriginEnum.EXTERNAL && (
