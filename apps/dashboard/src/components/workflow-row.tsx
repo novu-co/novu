@@ -44,7 +44,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
     ? buildRoute(LEGACY_ROUTES.EDIT_WORKFLOW, { workflowId: workflow._id })
     : buildRoute(ROUTES.EDIT_WORKFLOW, {
         environmentId: currentEnvironment?._id ?? '',
-        workflowId: workflow._id,
+        workflowSlug: workflow.slug,
       });
 
   return (
