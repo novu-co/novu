@@ -1,6 +1,6 @@
 {
   "name": "novu",
-  "version": "2.1.0",
+  "version": "2.2.0-rc.2",
   "description": "Novu CLI. Run Novu Studio and sync workflows with Novu Cloud",
   "main": "src/index.js",
   "publishConfig": {
@@ -68,7 +68,7 @@
   },
   "dependencies": {
     "@novu/ntfr-client": "^0.0.4",
-    "@novu/shared": "workspace:*",
+    "@novu/shared": "2.1.1",
     "@segment/analytics-node": "^1.1.4",
     "axios": "^1.6.8",
     "chalk": "4.1.2",

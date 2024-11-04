@@ -5,6 +5,7 @@ export async function POST(request: Request) {
     const response = await fetch("https://api.novu.co/v1/telemetry/measure", {
       headers: {
         Accept: "application/json",
+        "Content-Type": "application/json",
         Authorization: `ApiKey ${process.env.NOVU_SECRET_KEY}`,
       },
       method: "POST",
