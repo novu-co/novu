@@ -249,8 +249,8 @@ describe('Workflow Controller E2E API Testing', () => {
     });
   });
 
-  async function promoteWorkflow(devWorkflow: WorkflowResponseDto, prodEnvironmentId: string) {
-    const res = await workflowsClient.promoteWorkflow(devWorkflow._id, {
+  async function syncWorkflow(devWorkflow: WorkflowResponseDto, prodEnvironmentId: string) {
+    const res = await workflowsClient.syncWorkflow(devWorkflow._id, {
       targetEnvironmentId: prodEnvironmentId,
     });
     if (res.isSuccessResult()) {
@@ -286,7 +286,7 @@ describe('Workflow Controller E2E API Testing', () => {
       await session.switchToDevEnvironment();
 
       // Promote the workflow to production
-      const prodWorkflow = await promoteWorkflow(devWorkflow, prodEnvironmentId);
+      const prodWorkflow = await syncWorkflow(devWorkflow, prodEnvironmentId);
 
       // Verify that the promoted workflow has a new ID but the same workflowId
       expect(prodWorkflow._id).to.not.equal(devWorkflow._id);

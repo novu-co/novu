@@ -4,7 +4,7 @@ import {
   GeneratePreviewResponseDto,
   GetListQueryParams,
   ListWorkflowResponse,
-  PromoteWorkflowDto,
+  SyncWorkflowDto,
   StepDataDto,
   UpdateWorkflowDto,
   WorkflowResponseDto,
@@ -29,11 +29,11 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     return await baseClient.safePut<WorkflowResponseDto>(`/v2/workflows/${workflowId}`, updateWorkflowDto);
   };
 
-  const promoteWorkflow = async (
+  const syncWorkflow = async (
     workflowId: string,
-    promoteWorkflowDto: PromoteWorkflowDto
+    syncWorkflowDto: SyncWorkflowDto
   ): Promise<NovuRestResult<WorkflowResponseDto, HttpError>> => {
-    return await baseClient.safePut<WorkflowResponseDto>(`/v2/workflows/${workflowId}/promote`, promoteWorkflowDto);
+    return await baseClient.safePut<WorkflowResponseDto>(`/v2/workflows/${workflowId}/sync`, syncWorkflowDto);
   };
 
   const getWorkflow = async (workflowId: string): Promise<NovuRestResult<WorkflowResponseDto, HttpError>> => {
@@ -90,7 +90,7 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     generatePreview,
     createWorkflow,
     updateWorkflow,
-    promoteWorkflow,
+    syncWorkflow,
     getWorkflow,
     deleteWorkflow,
     searchWorkflows,
