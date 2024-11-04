@@ -23,15 +23,15 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
 
   const getTooltipContent = () => {
     if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
-      return 'External workflows cannot be synced to Production using dashboard.';
+      return `External workflows cannot be synced to ${oppositeEnvironment?.name} using dashboard.`;
     }
 
     if (workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1) {
-      return 'V1 workflows cannot be syncedto Production using dashboard. Please visit the legacy portal.';
+      return `V1 workflows cannot be synced to ${oppositeEnvironment?.name} using dashboard. Please visit the legacy portal.`;
     }
 
     if (workflow.status === WorkflowStatusEnum.ERROR) {
-      return 'This workflow has errors and cannot be synced to Production. Please fix the errors first.';
+      return `This workflow has errors and cannot be synced to ${oppositeEnvironment?.name}. Please fix the errors first.`;
     }
   };
 
