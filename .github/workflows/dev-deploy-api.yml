@@ -41,9 +41,11 @@ jobs:
         with:
           submodules: true
           token: ${{ secrets.SUBMODULES_TOKEN }}
+      
       - uses: ./.github/actions/setup-project
         with:
           submodules: true
+          slim: true
 
       - uses: ./.github/actions/docker/build-api
         id: docker_build
