@@ -34,9 +34,9 @@ describe('Generate Preview', () => {
 
       channelTypes.forEach(({ type, description }) => {
         it(`${type}:should match the body in the preview response`, async () => {
-          const { stepUuid, workflowId } = await createWorkflowAndReturnId(type);
+          const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(type);
           const requestDto = buildDtoWithPayload(type);
-          const previewResponseDto = await generatePreview(workflowId, stepUuid, requestDto, description);
+          const previewResponseDto = await generatePreview(workflowId, stepDatabaseId, requestDto, description);
           expect(previewResponseDto.result!.preview).to.exist;
           const expectedRenderedResult = buildInAppControlValues();
           expectedRenderedResult.subject = buildInAppControlValues().subject!.replace(
@@ -57,9 +57,9 @@ describe('Generate Preview', () => {
 
       channelTypes.forEach(({ type, description }) => {
         it(`${type}:should match the body in the preview response`, async () => {
-          const { stepUuid, workflowId } = await createWorkflowAndReturnId(type);
+          const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(type);
           const requestDto = buildDtoNoPayload(type);
-          const previewResponseDto = await generatePreview(workflowId, stepUuid, requestDto, description);
+          const previewResponseDto = await generatePreview(workflowId, stepDatabaseId, requestDto, description);
           expect(previewResponseDto.result!.preview).to.exist;
           expect(previewResponseDto.issues).to.exist;
 
@@ -76,9 +76,9 @@ describe('Generate Preview', () => {
 
       channelTypes.forEach(({ type, description }) => {
         it(`${type}: should assign default values to missing elements`, async () => {
-          const { stepUuid, workflowId } = await createWorkflowAndReturnId(type);
+          const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(type);
           const requestDto = buildDtoWithMissingControlValues(type);
-          const previewResponseDto = await generatePreview(workflowId, stepUuid, requestDto, description);
+          const previewResponseDto = await generatePreview(workflowId, stepDatabaseId, requestDto, description);
           expect(previewResponseDto.result!.preview.body).to.exist;
           expect(previewResponseDto.result!.preview.body).to.equal('PREVIEW_ISSUE:REQUIRED_CONTROL_VALUE_IS_MISSING');
           const { issues } = previewResponseDto;
@@ -98,11 +98,11 @@ describe('Generate Preview', () => {
 
   async function generatePreview(
     workflowId: string,
-    stepUuid: string,
+    stepDatabaseId: string,
     dto: GeneratePreviewRequestDto,
     description: string
   ): Promise<GeneratePreviewResponseDto> {
-    const novuRestResult = await workflowsClient.generatePreview(workflowId, stepUuid, dto);
+    const novuRestResult = await workflowsClient.generatePreview(workflowId, stepDatabaseId, dto);
     if (novuRestResult.isSuccessResult()) {
       return novuRestResult.value;
     }
@@ -117,7 +117,7 @@ describe('Generate Preview', () => {
       throw new Error(`Failed to create workflow ${JSON.stringify(workflowResult.error)}`);
     }
 
-    return { workflowId: workflowResult.value._id, stepUuid: workflowResult.value.steps[0]._id };
+    return { workflowId: workflowResult.value._id, stepDatabaseId: workflowResult.value.steps[0]._id };
   }
 });
 
@@ -207,7 +207,7 @@ function mailyJsonExample(): TipTapNode {
 function buildEmailControlValuesPayload(): EmailStepControlSchemaDto {
   return {
     subject: `Hello, World! ${SUBJECT_TEST_PAYLOAD}`,
-    emailEditor: mailyJsonExample(),
+    emailEditor: JSON.stringify(mailyJsonExample()),
   };
 }
 function buildInAppControlValues(): InAppOutput {

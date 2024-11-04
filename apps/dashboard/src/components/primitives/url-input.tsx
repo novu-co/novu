@@ -1,4 +1,6 @@
 import { forwardRef } from 'react';
+import { liquid } from '@codemirror/lang-liquid';
+import { EditorView } from '@uiw/react-codemirror';
 import { RedirectTargetEnum } from '@novu/shared';
 import { Input, InputField, InputFieldProps, InputProps } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
@@ -30,6 +32,12 @@ export const URLInput = forwardRef<HTMLInputElement, URLInputProps>((props, ref)
               value={value.url}
               onChange={(val) => onChange({ ...value, url: val })}
               height={size === 'md' ? '38px' : '30px'}
+              extensions={[
+                liquid({
+                  variables: [{ type: 'variable', label: 'asdf' }],
+                }),
+                EditorView.lineWrapping,
+              ]}
             />
           ) : (
             <Input

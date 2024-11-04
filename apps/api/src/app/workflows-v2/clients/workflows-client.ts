@@ -4,8 +4,11 @@ import {
   GeneratePreviewResponseDto,
   GetListQueryParams,
   ListWorkflowResponse,
+  SyncWorkflowDto,
+  StepDataDto,
   UpdateWorkflowDto,
   WorkflowResponseDto,
+  WorkflowTestDataResponseDto,
 } from '@novu/shared';
 import { createNovuBaseClient, HttpError, NovuRestResult } from './novu-base-client';
 
@@ -26,10 +29,22 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     return await baseClient.safePut<WorkflowResponseDto>(`/v2/workflows/${workflowId}`, updateWorkflowDto);
   };
 
+  const syncWorkflow = async (
+    workflowId: string,
+    syncWorkflowDto: SyncWorkflowDto
+  ): Promise<NovuRestResult<WorkflowResponseDto, HttpError>> => {
+    return await baseClient.safePut<WorkflowResponseDto>(`/v2/workflows/${workflowId}/sync`, syncWorkflowDto);
+  };
+
   const getWorkflow = async (workflowId: string): Promise<NovuRestResult<WorkflowResponseDto, HttpError>> => {
     return await baseClient.safeGet<WorkflowResponseDto>(`/v2/workflows/${workflowId}`);
   };
-
+  const getWorkflowStepData = async (
+    workflowId: string,
+    stepId: string
+  ): Promise<NovuRestResult<StepDataDto, HttpError>> => {
+    return await baseClient.safeGet<StepDataDto>(`/v2/workflows/${workflowId}/steps/${stepId}`);
+  };
   const deleteWorkflow = async (workflowId: string): Promise<NovuRestResult<void, HttpError>> => {
     return await baseClient.safeDelete(`/v2/workflows/${workflowId}`);
   };
@@ -55,13 +70,19 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
 
   const generatePreview = async (
     workflowId: string,
-    stepUuid: string,
+    stepDatabaseId: string,
     generatePreviewDto: GeneratePreviewRequestDto
   ): Promise<NovuRestResult<GeneratePreviewResponseDto, HttpError>> => {
     return await baseClient.safePost<GeneratePreviewResponseDto>(
-      `/v2/workflows/${workflowId}/step/${stepUuid}/preview`,
+      `/v2/workflows/${workflowId}/step/${stepDatabaseId}/preview`,
       generatePreviewDto
     );
+  };
+
+  const getWorkflowTestData = async (
+    workflowId: string
+  ): Promise<NovuRestResult<WorkflowTestDataResponseDto, HttpError>> => {
+    return await baseClient.safeGet<WorkflowTestDataResponseDto>(`/v2/workflows/${workflowId}/test-data`);
   };
 
   // Return the methods as an object
@@ -69,8 +90,11 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     generatePreview,
     createWorkflow,
     updateWorkflow,
+    syncWorkflow,
     getWorkflow,
     deleteWorkflow,
     searchWorkflows,
+    getWorkflowTestData,
+    getWorkflowStepMetadata: getWorkflowStepData,
   };
 };

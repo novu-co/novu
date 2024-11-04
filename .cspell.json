@@ -691,7 +691,9 @@
     "Sonner",
     "sonner",
     "cmdk",
-    "Keymap"
+    "Keymap",
+    "Syncable",
+    "lezer"
   ],
   "flagWords": [],
   "patterns": [

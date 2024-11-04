@@ -12,6 +12,6 @@ export * from './tenant';
 export * from './workflow-override';
 export * from './widget';
 export * from './session';
-export * from './controls';
 export * from './subscription';
 export * from './step-schemas';
+export * from './controls';

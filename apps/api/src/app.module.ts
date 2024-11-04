@@ -1,4 +1,5 @@
-/* eslint-disable global-require */ import { DynamicModule, Logger, Module, Provider } from '@nestjs/common';
+/* eslint-disable global-require */
+import { DynamicModule, Logger, Module, Provider } from '@nestjs/common';
 import { ForwardReference } from '@nestjs/common/interfaces/modules/forward-reference.interface';
 import { Type } from '@nestjs/common/interfaces/type.interface';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -34,7 +35,6 @@ import { RateLimitingModule } from './app/rate-limiting/rate-limiting.module';
 import { IdempotencyInterceptor } from './app/shared/framework/idempotency.interceptor';
 import { ProductFeatureInterceptor } from './app/shared/interceptors/product-feature.interceptor';
 import { SharedModule } from './app/shared/shared.module';
-import { StepSchemasModule } from './app/step-schemas/step-schemas.module';
 import { StorageModule } from './app/storage/storage.module';
 import { SubscribersModule } from './app/subscribers/subscribers.module';
 import { TenantModule } from './app/tenant/tenant.module';
@@ -72,7 +72,6 @@ const enterpriseQuotaThrottlerInterceptor =
     : [];
 
 const baseModules: Array<Type | DynamicModule | Promise<DynamicModule> | ForwardReference> = [
-  StepSchemasModule,
   AuthModule,
   InboundParseModule,
   SharedModule,
