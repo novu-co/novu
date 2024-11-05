@@ -1,7 +1,7 @@
 import { getV2, NovuApiError } from '@/api/api.client';
 import { syncWorkflow } from '@/api/workflows';
+import { ConfirmationModal } from '@/components/confirmation-modal';
 import { showToast } from '@/components/primitives/sonner-helpers';
-import { PromoteConfirmModal } from '@/components/promote-workflow/promote-confirm-modal';
 import { PromoteSuccessToast } from '@/components/promote-workflow/promote-success-toast';
 import { useEnvironment } from '@/context/environment/hooks';
 import { WorkflowListResponseDto, WorkflowOriginEnum, WorkflowResponseDto, WorkflowStatusEnum } from '@novu/shared';
@@ -107,10 +107,13 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
     isLoading,
     tooltipContent: getTooltipContent(),
     PromoteConfirmModal: () => (
-      <PromoteConfirmModal
+      <ConfirmationModal
         open={showConfirmModal}
         onOpenChange={setShowConfirmModal}
         onConfirm={syncWorkflowMutation}
+        title={`Sync workflow to ${oppositeEnvironment?.name}`}
+        description={`Workflow already exists in ${oppositeEnvironment?.name}. Proceeding will overwrite the existing workflow.`}
+        confirmButtonText="Proceed"
       />
     ),
   };

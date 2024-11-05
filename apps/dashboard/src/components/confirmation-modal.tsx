@@ -12,14 +12,23 @@ import {
 } from '@/components/primitives/dialog';
 import { RiAlertFill } from 'react-icons/ri';
 
-type DeleteStepModalProps = {
+type ConfirmationModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
-  stepName: string;
+  title: string;
+  description: string;
+  confirmButtonText: string;
 };
 
-export const DeleteStepModal = ({ open, onOpenChange, onConfirm, stepName }: DeleteStepModalProps) => {
+export const ConfirmationModal = ({
+  open,
+  onOpenChange,
+  onConfirm,
+  title,
+  description,
+  confirmButtonText,
+}: ConfirmationModalProps) => {
   return (
     <Dialog modal open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
@@ -30,10 +39,8 @@ export const DeleteStepModal = ({ open, onOpenChange, onConfirm, stepName }: Del
               <RiAlertFill className="text-warning size-6" />
             </div>
             <div className="flex flex-1 flex-col items-start gap-1">
-              <DialogTitle className="text-md font-medium">Are you sure?</DialogTitle>
-              <DialogDescription className="text-foreground-600">
-                You're about to delete the {stepName}, this action cannot be undone.
-              </DialogDescription>
+              <DialogTitle className="text-md font-medium">{title}</DialogTitle>
+              <DialogDescription className="text-foreground-600">{description}</DialogDescription>
             </div>
           </div>
           <DialogFooter>
@@ -44,7 +51,7 @@ export const DeleteStepModal = ({ open, onOpenChange, onConfirm, stepName }: Del
             </DialogClose>
             <DialogClose asChild aria-label="Close">
               <Button type="button" size="sm" variant="primary" onClick={onConfirm}>
-                Delete
+                {confirmButtonText}
               </Button>
             </DialogClose>
           </DialogFooter>

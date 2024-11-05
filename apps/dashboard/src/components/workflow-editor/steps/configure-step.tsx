@@ -12,7 +12,7 @@ import { InApp } from './in-app/in-app';
 import { useStep } from './use-step';
 import Chat from './chat';
 import { useState } from 'react';
-import { DeleteStepModal } from '@/components/workflow-editor/steps/delete-step-modal';
+import { ConfirmationModal } from '@/components/confirmation-modal';
 
 export function ConfigureStep() {
   const { step } = useStep();
@@ -75,11 +75,13 @@ export function ConfigureStep() {
         <>
           <SidebarFooter>
             <Separator />
-            <DeleteStepModal
+            <ConfirmationModal
               open={isDeleteModalOpen}
               onOpenChange={setIsDeleteModalOpen}
               onConfirm={onDeleteStep}
-              stepName={step?.name ?? ''}
+              title="Are you sure?"
+              description={`You're about to delete the ${step?.name}, this action cannot be undone.`}
+              confirmButtonText="Delete"
             />
             <Button
               variant="ghostDestructive"
