@@ -97,6 +97,7 @@ export async function bootstrap(expressApp?): Promise<INestApplication> {
   app.use(bodyParser.urlencoded({ extended: true, verify: rawBodyBuffer }));
 
   app.use(compression());
+  app.enableShutdownHooks();
 
   await setupSwagger(app);
 

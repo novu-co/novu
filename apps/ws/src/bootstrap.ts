@@ -40,6 +40,8 @@ export async function bootstrap() {
 
   app.useWebSocketAdapter(inMemoryAdapter);
 
+  app.enableShutdownHooks();
+
   await app.init();
 
   try {

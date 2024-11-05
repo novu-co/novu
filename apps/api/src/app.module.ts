@@ -3,7 +3,7 @@ import { DynamicModule, Logger, Module, Provider } from '@nestjs/common';
 import { ForwardReference } from '@nestjs/common/interfaces/modules/forward-reference.interface';
 import { Type } from '@nestjs/common/interfaces/type.interface';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { GracefulShutdownConfigModule, ProfilingModule, TracingModule } from '@novu/application-generic';
+import { ProfilingModule, TracingModule } from '@novu/application-generic';
 import { isClerkEnabled } from '@novu/shared';
 import { SentryModule } from '@sentry/nestjs/setup';
 import packageJson from '../package.json';
@@ -106,7 +106,6 @@ const baseModules: Array<Type | DynamicModule | Promise<DynamicModule> | Forward
   BridgeModule,
   PreferencesModule,
   WorkflowModule,
-  GracefulShutdownConfigModule.forRootAsync(),
   EnvironmentsModule,
 ];
 

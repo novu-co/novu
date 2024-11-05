@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 
 import {
   createNestLoggingModuleOptions,
-  GracefulShutdownConfigModule,
   LoggerModule,
   ProfilingModule,
   TracingModule,
@@ -27,7 +26,6 @@ const modules = [
       version: packageJson.version,
     })
   ),
-  GracefulShutdownConfigModule.forRootAsync(),
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
