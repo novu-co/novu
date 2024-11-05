@@ -28,7 +28,7 @@ import {
   WorkflowTestDataResponseDto,
   SyncWorkflowDto,
 } from '@novu/shared';
-import { ExternalApiAccessible, UserAuthGuard, UserSession } from '@novu/application-generic';
+import { UserAuthGuard, UserSession } from '@novu/application-generic';
 import { ApiCommonResponses } from '../shared/framework/response.decorator';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
 import { GetWorkflowCommand } from './usecases/get-workflow/get-workflow.command';
@@ -174,7 +174,7 @@ export class WorkflowController {
   }
 
   @Get('/:workflowId/steps/:stepId')
-  @ExternalApiAccessible()
+  @UseGuards(UserAuthGuard)
   async getWorkflowStepData(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
@@ -182,6 +182,7 @@ export class WorkflowController {
   ): Promise<StepDataDto> {
     return await this.getStepData.execute(GetStepDataCommand.create({ user, workflowId, stepId }));
   }
+
   @Get('/:workflowId/test-data')
   @UseGuards(UserAuthGuard)
   async getWorkflowTestData(

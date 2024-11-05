@@ -57,7 +57,8 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
 
   useLayoutEffect(() => {
     if (error) {
-      navigate(buildRoute(ROUTES.WORKFLOWS, { environmentId: currentEnvironment?._id ?? '' }));
+      // TODO: check if this is the correct ROUTES
+      navigate(buildRoute(ROUTES.WORKFLOWS, { environmentSlug: currentEnvironment?.slug ?? '' }));
     }
 
     if (!workflow) {
