@@ -51,11 +51,11 @@ export class GetStepDataUsecase {
     return workflow;
   }
 
-  private async getValues(command: GetStepDataCommand, currentStep: NotificationStepEntity, workflowId: string) {
+  private async getValues(command: GetStepDataCommand, currentStep: NotificationStepEntity, _workflowId: string) {
     const controlValuesEntity = await this.controlValuesRepository.findOne({
       _environmentId: command.user.environmentId,
       _organizationId: command.user.organizationId,
-      _workflowId: workflowId,
+      _workflowId,
       _stepId: currentStep._templateId,
       level: ControlValuesLevelEnum.STEP_CONTROLS,
     });
