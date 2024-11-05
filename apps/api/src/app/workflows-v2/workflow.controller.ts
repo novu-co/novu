@@ -165,7 +165,7 @@ export class WorkflowController {
   async generatePreview(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
     @Param('workflowId', ParseSlugIdPipe) workflowId: string,
-    @Param('stepId') stepId: string,
+    @Param('stepId', ParseSlugIdPipe) stepId: string,
     @Body() generatePreviewRequestDto: GeneratePreviewRequestDto
   ): Promise<GeneratePreviewResponseDto> {
     return await this.generatePreviewUseCase.execute(
