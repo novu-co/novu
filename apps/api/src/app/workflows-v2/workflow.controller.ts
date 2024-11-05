@@ -180,7 +180,9 @@ export class WorkflowController {
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
     @Param('stepId', ParseSlugIdPipe) stepId: IdentifierOrInternalId
   ): Promise<StepDataDto> {
-    return await this.getStepData.execute(GetStepDataCommand.create({ user, workflowId, stepId }));
+    return await this.getStepData.execute(
+      GetStepDataCommand.create({ user, identifierOrInternalId: workflowId, stepId })
+    );
   }
 
   @Get('/:workflowId/test-data')
