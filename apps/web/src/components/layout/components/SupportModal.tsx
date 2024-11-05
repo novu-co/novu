@@ -56,13 +56,6 @@ export const SupportModal: FC<SupportModalProps> = ({ isOpen, toggleOpen }) => {
                 minRows={8}
                 onChange={onChange}
                 value={value}
-                /*
-                 * onChange={onBridgeUrlChange}
-                 * value={url}
-                 * disabled={isLoading}
-                 * variant="preventLayoutShift"
-                 * error={urlError}
-                 */
                 className={css({ marginBottom: '20px' })}
               />
             )}
