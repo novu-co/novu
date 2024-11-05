@@ -31,11 +31,11 @@ export const useFormAutoSave = <T extends FieldValues>({
 
   const checkStepsDeleted = useCallback(() => {
     const currentStepsLength = watchedData.steps?.length ?? 0;
-    const wasDeleted = previousStepsLength.current !== null && currentStepsLength < previousStepsLength.current;
+    const wasStepDeleted = previousStepsLength.current !== null && currentStepsLength < previousStepsLength.current;
 
     previousStepsLength.current = currentStepsLength;
 
-    return wasDeleted;
+    return wasStepDeleted;
   }, [watchedData]);
 
   useDeepCompareEffect(() => {
@@ -46,9 +46,9 @@ export const useFormAutoSave = <T extends FieldValues>({
       return;
     }
 
-    const wasDeleted = checkStepsDeleted();
+    const wasStepsDeleted = checkStepsDeleted();
 
-    if (wasDeleted) {
+    if (wasStepsDeleted) {
       save();
     } else {
       debouncedSave();
