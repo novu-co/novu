@@ -1,4 +1,12 @@
-import { Button } from '@/components/primitives/button';
+import { ComponentProps } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
+import { z } from 'zod';
+import { liquid } from '@codemirror/lang-liquid';
+import { EditorView } from '@uiw/react-codemirror';
+import { RedirectTargetEnum } from '@novu/shared';
+import { Button, buttonVariants } from '@/components/primitives/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,18 +14,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/primitives/dropdown-menu';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { Input, InputField } from '@/components/primitives/input';
+import { InputField } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import { URLInput } from '@/components/primitives/url-input';
-import { buttonVariants } from '@/components/primitives/variants';
 import { cn } from '@/utils/ui';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { RedirectTargetEnum } from '@novu/shared';
-import { ComponentProps } from 'react';
-import { useForm } from 'react-hook-form';
-import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
-import { z } from 'zod';
+import { urlTargetTypes } from '@/utils/url';
+import { Editor } from '../primitives/editor';
 
 type Action = {
   label: string;
@@ -33,18 +36,19 @@ type Actions = {
 };
 
 type ActionPickerProps = {
+  className?: string;
   value: Actions | undefined;
   onChange: (value: Actions) => void;
 };
 
 export const ActionPicker = (props: ActionPickerProps) => {
-  const { value, onChange } = props;
+  const { className, value, onChange } = props;
   const primaryAction = value?.primaryAction;
   const secondaryAction = value?.secondaryAction;
 
   return (
-    <div className="flex items-center gap-1">
-      <div className="border-neutral-alpha-200 flex min-h-10 w-full flex-wrap justify-end gap-1 rounded-md border p-1 shadow-sm">
+    <div className={cn('flex items-center gap-1', className)}>
+      <div className="border-neutral-alpha-200 flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
         {!primaryAction && !secondaryAction && (
           <div className={buttonVariants({ variant: 'dashed', size: 'sm' })}>
             <RiForbid2Line className="size-4" />
@@ -59,7 +63,7 @@ export const ActionPicker = (props: ActionPickerProps) => {
               onChange({ primaryAction, secondaryAction });
             }}
           >
-            <Button variant="primary" size="sm">
+            <Button variant="primary" size="xs">
               {primaryAction.label}
             </Button>
           </ConfigureActionPopover>
@@ -72,7 +76,7 @@ export const ActionPicker = (props: ActionPickerProps) => {
               onChange({ primaryAction, secondaryAction });
             }}
           >
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="xs">
               {secondaryAction.label}
             </Button>
           </ConfigureActionPopover>
@@ -90,7 +94,7 @@ export const ActionPicker = (props: ActionPickerProps) => {
               onChange({});
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'dashed', size: 'sm' }), 'pointer-events-none gap-2')}>
+            <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'pointer-events-none gap-2')}>
               <RiForbid2Line className="size-4" />
               No action
             </div>
@@ -106,7 +110,7 @@ export const ActionPicker = (props: ActionPickerProps) => {
               });
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'primary', size: 'sm' }), 'pointer-events-none')}>
+            <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
               Primary action
             </div>
           </DropdownMenuItem>
@@ -124,10 +128,10 @@ export const ActionPicker = (props: ActionPickerProps) => {
               });
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'primary', size: 'sm' }), 'pointer-events-none')}>
+            <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
               Primary action
             </div>
-            <div className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'pointer-events-none')}>
+            <div className={cn(buttonVariants({ variant: 'outline', size: 'xs' }), 'pointer-events-none')}>
               Secondary action
             </div>
           </DropdownMenuItem>
@@ -150,14 +154,6 @@ const formSchema = z.object({
     ]),
   }),
 });
-
-const urlTypes = [
-  RedirectTargetEnum.SELF,
-  RedirectTargetEnum.BLANK,
-  RedirectTargetEnum.PARENT,
-  RedirectTargetEnum.TOP,
-  RedirectTargetEnum.UNFENCED_TOP,
-];
 
 const ConfigureActionPopover = (
   props: ComponentProps<typeof PopoverTrigger> & { action: Action; setAction: (action: Action) => void }
@@ -184,7 +180,7 @@ const ConfigureActionPopover = (
       }}
     >
       <PopoverTrigger {...rest} />
-      <PopoverContent>
+      <PopoverContent className="max-w-72">
         <Form {...form}>
           <form className="space-y-4">
             <div className="space-y-2">
@@ -202,7 +198,18 @@ const ConfigureActionPopover = (
                     </div>
                     <FormControl>
                       <InputField>
-                        <Input {...field} />
+                        <Editor
+                          placeholder="Button text"
+                          value={field.value}
+                          onChange={field.onChange}
+                          height="30px"
+                          extensions={[
+                            liquid({
+                              variables: [{ type: 'variable', label: 'asdf' }],
+                            }),
+                            EditorView.lineWrapping,
+                          ]}
+                        />
                       </InputField>
                     </FormControl>
                     <FormMessage />
@@ -221,9 +228,10 @@ const ConfigureActionPopover = (
                     <FormControl>
                       <URLInput
                         {...field}
-                        options={urlTypes}
+                        options={urlTargetTypes}
                         value={field.value}
                         onChange={(val) => field.onChange(val)}
+                        asEditor
                       />
                     </FormControl>
                     <FormMessage />

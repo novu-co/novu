@@ -44,6 +44,12 @@ describe('Novu Client', () => {
       expect(newClient.secretKey).toBe(testSecretKey);
     });
 
+    it('should set apiUrl to provided apiUrl', () => {
+      const testApiUrl = 'https://test.host';
+      const newClient = new Client({ apiUrl: testApiUrl });
+      expect(newClient.apiUrl).toBe(testApiUrl);
+    });
+
     it('should set strictAuthentication to false when NODE_ENV is development', () => {
       const originalEnv = process.env.NODE_ENV;
       process.env = { ...process.env, NODE_ENV: 'development' };
@@ -1285,6 +1291,43 @@ describe('Novu Client', () => {
       await client.executeWorkflow(event);
 
       expect(mockFn).toHaveBeenCalledTimes(0);
+    });
+
+    it('should NOT log anything after executing the provided stepId', async () => {
+      const mockFn = vi.fn();
+      const spyConsoleLog = vi.spyOn(console, 'log');
+      const newWorkflow = workflow('test-workflow', async ({ step }) => {
+        await step.email('active-step-id', async () => ({ body: 'Test Body', subject: 'Subject' }));
+        await step.email('inactive-step-id', async () => {
+          mockFn();
+
+          return { body: 'Test Body', subject: 'Subject' };
+        });
+      });
+
+      client.addWorkflows([newWorkflow]);
+
+      const event: Event = {
+        action: PostActionEnum.EXECUTE,
+        workflowId: 'test-workflow',
+        stepId: 'active-step-id',
+        subscriber: {},
+        state: [],
+        payload: {},
+        controls: {},
+      };
+
+      await client.executeWorkflow(event);
+
+      // Wait for the conclusion promise to resolve.
+      await new Promise((resolve) => {
+        setTimeout(resolve);
+      });
+      /*
+       * Not the most robust test, but ensures that the last log call contains the duration,
+       * which is the last expected log call.
+       */
+      expect(spyConsoleLog.mock.lastCall).toEqual([expect.stringContaining('duration:')]);
     });
 
     it('should evaluate code in steps after a skipped step', async () => {

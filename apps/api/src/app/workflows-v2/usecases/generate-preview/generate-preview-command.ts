@@ -3,6 +3,6 @@ import { EnvironmentWithUserObjectCommand } from '@novu/application-generic';
 
 export class GeneratePreviewCommand extends EnvironmentWithUserObjectCommand {
   workflowId: string;
-  stepUuid: string;
+  stepDatabaseId: string;
   generatePreviewRequestDto: GeneratePreviewRequestDto;
 }

@@ -2,7 +2,7 @@ import { getToken } from '@/utils/auth';
 import { API_HOSTNAME } from '../config';
 import { getEnvironmentId } from '@/utils/environment';
 
-class NovuApiError extends Error {
+export class NovuApiError extends Error {
   constructor(
     message: string,
     public error: unknown,

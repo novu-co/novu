@@ -1,23 +1,25 @@
 import type {
   CreateWorkflowDto,
+  SyncWorkflowDto,
+  GeneratePreviewResponseDto,
   UpdateWorkflowDto,
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
 } from '@novu/shared';
 import { getV2, post, postV2, putV2 } from './api.client';
 
-export const fetchWorkflow = async ({ workflowId }: { workflowId?: string }): Promise<WorkflowResponseDto> => {
-  const { data } = await getV2<{ data: WorkflowResponseDto }>(`/workflows/${workflowId}`);
+export const fetchWorkflow = async ({ workflowSlug }: { workflowSlug?: string }): Promise<WorkflowResponseDto> => {
+  const { data } = await getV2<{ data: WorkflowResponseDto }>(`/workflows/${workflowSlug}`);
 
   return data;
 };
 
 export const fetchWorkflowTestData = async ({
-  workflowId,
+  workflowSlug,
 }: {
-  workflowId?: string;
+  workflowSlug?: string;
 }): Promise<WorkflowTestDataResponseDto> => {
-  const { data } = await getV2<{ data: WorkflowTestDataResponseDto }>(`/workflows/${workflowId}/test-data`);
+  const { data } = await getV2<{ data: WorkflowTestDataResponseDto }>(`/workflows/${workflowSlug}/test-data`);
 
   return data;
 };
@@ -34,6 +36,10 @@ export async function createWorkflow(payload: CreateWorkflowDto) {
   return postV2<{ data: WorkflowResponseDto }>(`/workflows`, payload);
 }
 
+export async function syncWorkflow(workflowId: string, payload: SyncWorkflowDto) {
+  return putV2<{ data: WorkflowResponseDto }>(`/workflows/${workflowId}/sync`, payload);
+}
+
 export const updateWorkflow = async ({
   id,
   workflow,
@@ -42,6 +48,23 @@ export const updateWorkflow = async ({
   workflow: UpdateWorkflowDto;
 }): Promise<WorkflowResponseDto> => {
   const { data } = await putV2<{ data: WorkflowResponseDto }>(`/workflows/${id}`, workflow);
+
+  return data;
+};
+
+export const previewStep = async ({
+  workflowSlug,
+  payload,
+  stepId,
+}: {
+  workflowSlug: string;
+  stepId: string;
+  payload?: Record<string, unknown>;
+}): Promise<GeneratePreviewResponseDto> => {
+  const { data } = await postV2<{ data: GeneratePreviewResponseDto }>(
+    `/workflows/${workflowSlug}/step/${stepId}/preview`,
+    payload
+  );
 
   return data;
 };

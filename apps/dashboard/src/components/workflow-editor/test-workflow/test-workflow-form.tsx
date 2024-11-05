@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { RiSendPlaneFill } from 'react-icons/ri';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { Editor } from '@monaco-editor/react';
+import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import type { WorkflowResponseDto } from '@novu/shared';
 import { Code2 } from '../../icons/code-2';
 import { Panel, PanelContent, PanelHeader } from '../../primitives/panel';
@@ -22,6 +22,7 @@ import { CopyButton } from '../../primitives/copy-button';
 import { TestWorkflowFormType } from '../schema';
 import { SnippetLanguage } from './types';
 import { SnippetEditor } from './snippet-editor';
+import { Editor } from '@/components/primitives/editor';
 
 const tabsTriggerClassName = 'pt-1';
 const codePanelClassName = 'bg-background h-full w-full rounded-lg border border-neutral-200 p-3';
@@ -94,21 +95,10 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
                     </PanelHeader>
                     <PanelContent>
                       <Editor
-                        defaultLanguage="json"
-                        language="json"
+                        lang="json"
                         className="h-full"
-                        options={{
-                          minimap: {
-                            enabled: false,
-                          },
-                          // workaround from: https://github.com/microsoft/monaco-editor/issues/2093
-                          accessibilitySupport: 'off',
-                          renderLineHighlight: 'none',
-                          scrollBeyondLastLine: false,
-                          fontSize: 14,
-                          lineHeight: 20,
-                          readOnly: false,
-                        }}
+                        basicSetup={{ lineNumbers: true }}
+                        extensions={[loadLanguage('json')?.extension ?? []]}
                         {...restField}
                       />
                     </PanelContent>
@@ -127,23 +117,23 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
             value={activeSnippetTab}
             onValueChange={(value) => setActiveSnippetTab(value as SnippetLanguage)}
           >
-            <TabsList className="border-t-0">
-              <TabsTrigger className={tabsTriggerClassName} value="framework">
+            <TabsList className="border-t-0" variant="regular">
+              <TabsTrigger className={tabsTriggerClassName} value="framework" variant="regular">
                 Framework
               </TabsTrigger>
-              <TabsTrigger className={tabsTriggerClassName} value="shell">
+              <TabsTrigger className={tabsTriggerClassName} value="shell" variant="regular">
                 cURL
               </TabsTrigger>
-              <TabsTrigger className={tabsTriggerClassName} value="typescript">
+              <TabsTrigger className={tabsTriggerClassName} value="typescript" variant="regular">
                 NodeJS
               </TabsTrigger>
-              <TabsTrigger className={tabsTriggerClassName} value="php">
+              <TabsTrigger className={tabsTriggerClassName} value="php" variant="regular">
                 PHP
               </TabsTrigger>
-              <TabsTrigger className={tabsTriggerClassName} value="go">
+              <TabsTrigger className={tabsTriggerClassName} value="go" variant="regular">
                 Golang
               </TabsTrigger>
-              <TabsTrigger className={tabsTriggerClassName} value="python">
+              <TabsTrigger className={tabsTriggerClassName} value="python" variant="regular">
                 Python
               </TabsTrigger>
               <CopyButton
@@ -154,22 +144,22 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
                 value="Copy code"
               />
             </TabsList>
-            <TabsContent value="framework" className={codePanelClassName}>
+            <TabsContent value="framework" className={codePanelClassName} variant="regular">
               <SnippetEditor language="framework" value={snippetValue} />
             </TabsContent>
-            <TabsContent value="shell" className={codePanelClassName}>
+            <TabsContent value="shell" className={codePanelClassName} variant="regular">
               <SnippetEditor language="shell" value={snippetValue} />
             </TabsContent>
-            <TabsContent value="typescript" className={codePanelClassName}>
+            <TabsContent value="typescript" className={codePanelClassName} variant="regular">
               <SnippetEditor language="typescript" value={snippetValue} />
             </TabsContent>
-            <TabsContent value="php" className={codePanelClassName}>
+            <TabsContent value="php" className={codePanelClassName} variant="regular">
               <SnippetEditor language="php" value={snippetValue} />
             </TabsContent>
-            <TabsContent value="go" className={codePanelClassName}>
+            <TabsContent value="go" className={codePanelClassName} variant="regular">
               <SnippetEditor language="go" value={snippetValue} />
             </TabsContent>
-            <TabsContent value="python" className={codePanelClassName}>
+            <TabsContent value="python" className={codePanelClassName} variant="regular">
               <SnippetEditor language="python" value={snippetValue} />
             </TabsContent>
           </Tabs>

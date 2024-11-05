@@ -14,6 +14,7 @@ import {
   GetPreferencesCommand,
   GetPreferencesResponseDto,
   NotificationStep,
+  shortId,
   UpdateWorkflow,
   UpdateWorkflowCommand,
   UpsertControlValuesCommand,
@@ -25,28 +26,31 @@ import {
 import {
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
+  IdentifierOrInternalId,
+  slugify,
   StepCreateDto,
   StepDto,
   StepUpdateDto,
+  UpdateWorkflowDto,
+  UserSessionData,
   WorkflowCreationSourceEnum,
   WorkflowOriginEnum,
   WorkflowPreferences,
   WorkflowResponseDto,
   WorkflowTypeEnum,
-  slugify,
 } from '@novu/shared';
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/step-upsert-mechanism-failed-missing-id.exception';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { GetWorkflowByIdsCommand } from '../get-workflow-by-ids/get-workflow-by-ids.command';
-import { mapStepTypeToControlSchema } from '../../../step-schemas/shared';
+import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
 
 function buildUpsertControlValuesCommand(
   command: UpsertWorkflowCommand,
   persistedStep: NotificationStepEntity,
   persistedWorkflow: NotificationTemplateEntity,
-  stepInDto: StepDto
+  stepInDto: StepUpdateDto | StepCreateDto
 ): UpsertControlValuesCommand {
   return UpsertControlValuesCommand.create({
     organizationId: command.user.organizationId,
@@ -69,19 +73,25 @@ export class UpsertWorkflowUseCase {
     private getPreferencesUseCase: GetPreferences
   ) {}
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
-    const workflowForUpdate: NotificationTemplateEntity | null = command.identifierOrInternalId
-      ? await this.getWorkflowByIdsUseCase.execute(
-          GetWorkflowByIdsCommand.create({
-            ...command,
-            identifierOrInternalId: command.identifierOrInternalId,
-          })
-        )
-      : null;
+    const workflowForUpdate = await this.queryWorkflow(command);
     const workflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
-    const stepIdToControlValuesMap = await this.upsertControlValues(workflow, command);
+    await this.upsertControlValues(workflow, command);
     const preferences = await this.upsertPreference(command, workflow);
 
-    return toResponseWorkflowDto(workflow, preferences, stepIdToControlValuesMap);
+    return toResponseWorkflowDto(workflow, preferences);
+  }
+
+  private async queryWorkflow(command: UpsertWorkflowCommand): Promise<NotificationTemplateEntity | null> {
+    if (!command.identifierOrInternalId) {
+      return null;
+    }
+
+    return await this.getWorkflowByIdsUseCase.execute(
+      GetWorkflowByIdsCommand.create({
+        ...command,
+        identifierOrInternalId: command.identifierOrInternalId,
+      })
+    );
   }
 
   private async upsertControlValues(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
@@ -179,12 +189,14 @@ export class UpsertWorkflowUseCase {
   }
 
   private async createOrUpdateWorkflow(
-    existingWorkflow: NotificationTemplateEntity | null | undefined,
+    existingWorkflow: NotificationTemplateEntity | null,
     command: UpsertWorkflowCommand
   ): Promise<NotificationTemplateEntity> {
-    if (existingWorkflow) {
+    if (existingWorkflow && isWorkflowUpdateDto(command.workflowDto, command.identifierOrInternalId)) {
       return await this.updateWorkflowUsecase.execute(
-        UpdateWorkflowCommand.create(this.convertCreateToUpdateCommand(command, existingWorkflow))
+        UpdateWorkflowCommand.create(
+          this.convertCreateToUpdateCommand(command.workflowDto, command.user, existingWorkflow)
+        )
       );
     }
 
@@ -219,62 +231,76 @@ export class UpsertWorkflowUseCase {
       description: workflowDto.description || '',
       tags: workflowDto.tags || [],
       critical: false,
-      triggerIdentifier: workflowDto.workflowId ?? slugify(workflowDto.name),
+      triggerIdentifier: slugify(workflowDto.name),
     };
   }
 
   private convertCreateToUpdateCommand(
-    command: UpsertWorkflowCommand,
+    workflowDto: UpdateWorkflowDto,
+    user: UserSessionData,
     existingWorkflow: NotificationTemplateEntity
   ): UpdateWorkflowCommand {
-    const { workflowDto } = command;
-    const { user } = command;
-
     return {
       id: existingWorkflow._id,
       environmentId: existingWorkflow._environmentId,
       organizationId: user.organizationId,
       userId: user._id,
-      name: command.workflowDto.name,
+      name: workflowDto.name,
       steps: this.mapSteps(workflowDto.steps, existingWorkflow),
       rawData: workflowDto,
       type: WorkflowTypeEnum.BRIDGE,
       description: workflowDto.description,
       tags: workflowDto.tags,
       active: workflowDto.active ?? true,
-      workflowId: workflowDto.workflowId,
     };
   }
-
   private mapSteps(
     commandWorkflowSteps: Array<StepCreateDto | StepUpdateDto>,
     persistedWorkflow?: NotificationTemplateEntity | undefined
   ): NotificationStep[] {
-    const steps: NotificationStep[] = commandWorkflowSteps.map((step) => {
-      return this.mapSingleStep(persistedWorkflow, step);
-    });
+    const steps: NotificationStep[] = [];
 
-    const seenStepIds = new Set();
-    const duplicateStepIds = new Set();
+    for (const step of commandWorkflowSteps) {
+      const mappedStep = this.mapSingleStep(persistedWorkflow, step);
+      const baseStepId = mappedStep.stepId;
 
-    steps.forEach((step) => {
-      if (seenStepIds.has(step.stepId)) {
-        duplicateStepIds.add(step.stepId);
-      } else {
-        seenStepIds.add(step.stepId);
+      if (baseStepId) {
+        const previousStepIds = steps.map((stepX) => stepX.stepId).filter((id) => id != null);
+        mappedStep.stepId = this.generateUniqueStepId(baseStepId, previousStepIds);
       }
-    });
 
-    if (duplicateStepIds.size > 0) {
-      throw new BadRequestException(`Duplicate stepIds are not allowed: ${Array.from(duplicateStepIds).join(', ')}`);
+      steps.push(mappedStep);
     }
 
     return steps;
   }
 
+  private generateUniqueStepId(baseStepId: string, previousStepIds: string[]): string {
+    let currentStepId = baseStepId;
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    while (attempts < maxAttempts) {
+      if (isUniqueStepId(currentStepId, previousStepIds)) {
+        break;
+      }
+      currentStepId = `${baseStepId}-${shortId()}`;
+      attempts += 1;
+    }
+
+    if (attempts === maxAttempts && !isUniqueStepId(currentStepId, previousStepIds)) {
+      throw new BadRequestException({
+        message: 'Failed to generate unique stepId',
+        stepId: baseStepId,
+      });
+    }
+
+    return currentStepId;
+  }
+
   private mapSingleStep(
     persistedWorkflow: NotificationTemplateEntity | undefined,
-    step: StepDto | (StepDto & { stepUuid: string })
+    step: StepUpdateDto | StepCreateDto
   ): NotificationStep {
     const foundPersistedStep = this.getPersistedStepIfFound(persistedWorkflow, step);
     const stepEntityToReturn = this.buildBaseStepEntity(step, foundPersistedStep);
@@ -298,10 +324,10 @@ export class UpsertWorkflowUseCase {
       template: {
         type: step.type,
         name: step.name,
-        controls: foundPersistedStep?.template?.controls || mapStepTypeToControlSchema[step.type],
+        controls: foundPersistedStep?.template?.controls || stepTypeToDefaultDashboardControlSchema[step.type],
         content: '',
       },
-      stepId: slugify(step.name),
+      stepId: foundPersistedStep?.stepId || slugify(step.name),
       name: step.name,
     };
   }
@@ -337,3 +363,14 @@ export class UpsertWorkflowUseCase {
     )?._id;
   }
 }
+
+function isWorkflowUpdateDto(
+  workflowDto: CreateWorkflowDto | UpdateWorkflowDto,
+  id?: IdentifierOrInternalId
+): workflowDto is UpdateWorkflowDto {
+  return !!id;
+}
+
+const isUniqueStepId = (stepIdToValidate: string, otherStepsIds: string[]) => {
+  return !otherStepsIds.some((stepId) => stepId === stepIdToValidate);
+};

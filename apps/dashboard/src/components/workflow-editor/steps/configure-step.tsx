@@ -1,20 +1,23 @@
 import { Link, useParams } from 'react-router-dom';
-import { RiArrowLeftSLine, RiCloseFill } from 'react-icons/ri';
-import { motion } from 'framer-motion';
-import { StepTypeEnum } from '@/utils/enums';
-import { useStep } from './use-step';
-import { InApp } from './in-app';
-import { Separator } from '@/components/primitives/separator';
+import { RiArrowLeftSLine, RiCloseFill, RiDeleteBin2Line } from 'react-icons/ri';
 import { Button } from '@/components/primitives/button';
+import { Separator } from '@/components/primitives/separator';
+import { SidebarFooter, SidebarHeader } from '@/components/side-navigation/Sidebar';
+import { useWorkflowEditorContext } from '@/components/workflow-editor/hooks';
 import { useEnvironment } from '@/context/environment/hooks';
+import { StepTypeEnum } from '@/utils/enums';
 import { buildRoute, ROUTES } from '@/utils/routes';
+import { motion } from 'framer-motion';
+import { InApp } from './in-app/in-app';
+import { useStep } from './use-step';
 import Chat from './chat';
 
 export function ConfigureStep() {
   const { currentEnvironment } = useEnvironment();
-  const { workflowId = '' } = useParams<{
-    workflowId: string;
+  const { workflowSlug = '' } = useParams<{
+    workflowSlug: string;
   }>();
+  const { isReadOnly } = useWorkflowEditorContext();
 
   return (
     <motion.div
@@ -24,11 +27,11 @@ export function ConfigureStep() {
       exit={{ opacity: 0.1 }}
       transition={{ duration: 0.1 }}
     >
-      <div className="flex items-center gap-2.5 px-3 pb-3.5 text-sm font-medium">
+      <SidebarHeader className="flex items-center gap-2.5 text-sm font-medium">
         <Link
           to={buildRoute(ROUTES.EDIT_WORKFLOW, {
             environmentId: currentEnvironment?._id ?? '',
-            workflowId,
+            workflowSlug,
           })}
           className="flex items-center"
         >
@@ -40,7 +43,7 @@ export function ConfigureStep() {
         <Link
           to={buildRoute(ROUTES.EDIT_WORKFLOW, {
             environmentId: currentEnvironment?._id ?? '',
-            workflowId,
+            workflowSlug,
           })}
           className="ml-auto flex items-center"
         >
@@ -48,15 +51,31 @@ export function ConfigureStep() {
             <RiCloseFill />
           </Button>
         </Link>
-      </div>
+      </SidebarHeader>
+
       <Separator />
+
       <Step />
+
+      <Separator />
+
+      {!isReadOnly && (
+        <>
+          <SidebarFooter>
+            <Separator />
+            <Button variant="ghostDestructive" type="button">
+              <RiDeleteBin2Line className="size-4" />
+              Delete step
+            </Button>
+          </SidebarFooter>
+        </>
+      )}
     </motion.div>
   );
 }
 
 const Step = () => {
-  const { channel } = useStep();
+  const { stepType: channel } = useStep();
   switch (channel) {
     case StepTypeEnum.IN_APP:
       return <InApp />;

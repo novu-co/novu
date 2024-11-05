@@ -11,6 +11,7 @@ import {
 } from '../../types';
 import { TriggerContextTypeEnum } from '../notification-template';
 import { IActor } from '../messages';
+import { UiSchema } from '../../dto';
 
 export type MessageTemplateContentType = 'editor' | 'customHtml';
 
@@ -42,9 +43,7 @@ export interface IMessageTemplate {
   preheader?: string;
   senderName?: string;
   actor?: IActor;
-  controls?: {
-    schema: JSONSchema;
-  };
+  controls?: ControlSchemas;
   output?: {
     schema: JSONSchema;
   };
@@ -52,7 +51,10 @@ export interface IMessageTemplate {
   createdAt?: string;
   updatedAt?: string;
 }
-
+export class ControlSchemas {
+  schema: JSONSchema;
+  uiSchema?: UiSchema;
+}
 export const TemplateSystemVariables = ['subscriber', 'step', 'branding', 'tenant', 'preheader', 'actor'];
 
 export const SystemVariablesWithTypes = {

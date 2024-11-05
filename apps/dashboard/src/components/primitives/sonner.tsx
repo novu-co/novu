@@ -1,5 +1,7 @@
-import { cva, VariantProps } from 'class-variance-authority';
+import { cn } from '@/utils/ui';
 import { useTheme } from 'next-themes';
+import { Toaster as Sonner } from 'sonner';
+import { cva, VariantProps } from 'class-variance-authority';
 import React from 'react';
 import { IconBaseProps } from 'react-icons/lib';
 import {
@@ -10,9 +12,7 @@ import {
   RiInformationFill,
   RiProgress1Line,
 } from 'react-icons/ri';
-import { Toaster as Sonner } from 'sonner';
 import { Button } from './button';
-import { cn } from '@/utils/ui';
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
@@ -91,8 +91,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast:
-            'group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg',
-          description: 'group-[.toast]:text-muted-foreground',
+            'group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg text-foreground-950',
+          description: 'group-[.toast]:text-foreground-600',
           actionButton: 'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
           cancelButton: 'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground',
         },

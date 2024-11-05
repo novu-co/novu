@@ -13,22 +13,23 @@ export const QUERY_PREFIX = '#query#';
  * Add an entry to this enum when you have a new entity that needs to be cached.
  */
 export enum CacheKeyPrefixEnum {
-  MESSAGE_COUNT = 'message_count',
-  FEED = 'feed',
-  SUBSCRIBER = 'subscriber',
-  NOTIFICATION_TEMPLATE = 'notification_template',
-  WORKFLOW_VARIABLES = 'workflow_variables',
-  USER = 'user',
-  INTEGRATION = 'integration',
-  ENVIRONMENT_BY_API_KEY = 'environment_by_api_key',
-  GROUPED_BLUEPRINTS = 'grouped-blueprints',
   AUTH_SERVICE = 'auth_service',
-  MAXIMUM_API_RATE_LIMIT = 'maximum_api_rate_limit',
+  ENVIRONMENT_BY_API_KEY = 'environment_by_api_key',
   EVALUATE_API_RATE_LIMIT = 'evaluate_api_rate_limit',
+  FEED = 'feed',
+  GROUPED_BLUEPRINTS = 'grouped-blueprints',
+  HAS_NOTIFICATION = 'has_notification',
+  INTEGRATION = 'integration',
+  MAXIMUM_API_RATE_LIMIT = 'maximum_api_rate_limit',
+  MESSAGE_COUNT = 'message_count',
+  NOTIFICATION_TEMPLATE = 'notification_template',
   SERVICE_CONFIG = 'service_config',
+  SUBSCRIBER = 'subscriber',
+  SUBSCRIBER_TOPICS = 'subscriber_topics',
   SUBSCRIPTION = 'subscription',
   USAGE = 'usage',
-  HAS_NOTIFICATION = 'has_notification',
+  USER = 'user',
+  WORKFLOW_VARIABLES = 'workflow_variables',
 }
 
 /**

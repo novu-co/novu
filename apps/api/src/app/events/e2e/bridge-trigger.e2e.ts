@@ -200,7 +200,7 @@ contexts.forEach((context: Context) => {
         await syncWorkflow(session, workflowsRepository, workflowIdSkipByStatic, bridgeServer);
       }
 
-      await triggerEvent(session, workflowIdSkipByStatic, subscriber.subscriberId, null, bridge);
+      await triggerEvent(session, workflowIdSkipByStatic, subscriber.subscriberId, {}, bridge);
       await session.awaitRunningJobs();
 
       const executedMessageByStatic = await messageRepository.find({
@@ -264,7 +264,7 @@ contexts.forEach((context: Context) => {
         await syncWorkflow(session, workflowsRepository, workflowIdSkipByVariable, bridgeServer);
       }
 
-      await triggerEvent(session, workflowIdSkipByVariable, subscriber.subscriberId, null, bridge);
+      await triggerEvent(session, workflowIdSkipByVariable, subscriber.subscriberId, {}, bridge);
       await session.awaitRunningJobs();
 
       const executedMessage = await messageRepository.find({
@@ -556,7 +556,7 @@ contexts.forEach((context: Context) => {
         await discoverAndSyncBridge(session, workflowsRepository, workflowId, bridgeServer);
       }
 
-      await triggerEvent(session, workflowId, subscriber.subscriberId, null, bridge);
+      await triggerEvent(session, workflowId, subscriber.subscriberId, {}, bridge);
 
       await session.awaitRunningJobs();
 
@@ -672,7 +672,7 @@ contexts.forEach((context: Context) => {
       }
 
       const controls = { steps: { [stepId]: { name: 'stored_control_name' } } };
-      await triggerEvent(session, workflowId, subscriber.subscriberId, undefined, bridge, controls);
+      await triggerEvent(session, workflowId, subscriber.subscriberId, {}, bridge, controls);
       await session.awaitRunningJobs();
 
       const sentMessage = await messageRepository.find({
@@ -715,7 +715,6 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should deliver message if the Workflow Definition doesn't contain preferences [${context.name}]`, async () => {
-      process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
       const workflowId = `without-preferences-workflow-${`${context.name}-${uuidv4()}`}`;
       const newWorkflow = workflow(workflowId, async ({ step }) => {
         await step.inApp('send-in-app', () => ({ body: 'Hello there 1' }));
@@ -725,6 +724,7 @@ contexts.forEach((context: Context) => {
        * Delete `preferences` from the Workflow Definition to simulate an old
        * Workflow Definition (i.e. from old Framework version) that doesn't have the `preferences` property.
        */
+      // @ts-ignore - The operand of a 'delete' operator must be optional.
       delete newWorkflow.definition.preferences;
 
       await bridgeServer.start({ workflows: [newWorkflow] });
@@ -747,7 +747,6 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should deliver message if inApp is enabled via workflow preferences [${context.name}]`, async () => {
-      process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
       const workflowId = `enabled-inapp-workflow-${`${context.name}-${uuidv4()}`}`;
       const newWorkflow = workflow(
         workflowId,
@@ -785,7 +784,6 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should NOT deliver message if inApp is disabled via workflow preferences [${context.name}]`, async () => {
-      process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
       const workflowId = `disabled-inapp-workflow-${`${context.name}-${uuidv4()}`}`;
       const newWorkflow = workflow(
         workflowId,
@@ -834,7 +832,6 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should deliver inApp message if workflow is disabled via workflow preferences and inApp is enabled [${context.name}]`, async () => {
-      process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
       const workflowId = `disabled-workflow-${`${context.name}-${uuidv4()}`}`;
       const newWorkflow = workflow(
         workflowId,
@@ -875,7 +872,6 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should NOT deliver inApp message if workflow is disabled via workflow preferences [${context.name}]`, async () => {
-      process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
       const workflowId = `disabled-workflow-${`${context.name}-${uuidv4()}`}`;
       const newWorkflow = workflow(
         workflowId,
@@ -921,8 +917,8 @@ contexts.forEach((context: Context) => {
       expect(executionDetailsWorkflowFiltered.length).to.be.eq(1);
     });
 
+    // eslint-disable-next-line max-len
     it(`should deliver inApp message if subscriber disabled inApp channel for readOnly workflow with inApp enabled [${context.name}]`, async () => {
-      process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
       const workflowId = `enabled-readonly-workflow-level-${`${context.name}-${uuidv4()}`}`;
       const newWorkflow = workflow(
         workflowId,
@@ -974,8 +970,8 @@ contexts.forEach((context: Context) => {
       expect(sentMessages.length).to.be.eq(1);
     });
 
+    // eslint-disable-next-line max-len
     it(`should NOT deliver inApp message if subscriber enables inApp channel for readOnly workflow with inApp disabled [${context.name}]`, async () => {
-      process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
       const workflowId = `disabled-readonly-workflow-level-${`${context.name}-${uuidv4()}`}`;
       const newWorkflow = workflow(
         workflowId,
@@ -1038,8 +1034,8 @@ contexts.forEach((context: Context) => {
       expect(executionDetailsWorkflowFiltered.length).to.be.eq(1);
     });
 
+    // eslint-disable-next-line max-len
     it(`should deliver inApp message if subscriber disabled inApp channel globally for readOnly workflow with inApp enabled [${context.name}]`, async () => {
-      process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
       const workflowId = `enabled-readonly-global-level-${`${context.name}-${uuidv4()}`}`;
       const newWorkflow = workflow(
         workflowId,
@@ -1089,8 +1085,8 @@ contexts.forEach((context: Context) => {
       expect(sentMessages.length).to.be.eq(1);
     });
 
+    // eslint-disable-next-line max-len
     it(`should NOT deliver inApp message if subscriber enabled inApp channel globally for readOnly workflow with inApp disabled [${context.name}]`, async () => {
-      process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
       const workflowId = `disabled-readonly-global-level-${`${context.name}-${uuidv4()}`}`;
       const newWorkflow = workflow(
         workflowId,
@@ -1151,6 +1147,7 @@ contexts.forEach((context: Context) => {
       expect(executionDetailsWorkflowFiltered.length).to.be.eq(1);
     });
 
+    // eslint-disable-next-line max-len
     it(`should deliver inApp message if subscriber enabled inApp channel globally for workflow with inApp disabled [${context.name}]`, async () => {
       if (!context.isStateful) {
         /*
@@ -1159,7 +1156,6 @@ contexts.forEach((context: Context) => {
          */
         expect(true).to.equal(true);
       } else {
-        process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
         const workflowId = `disabled-editable-global-level-${`${context.name}-${uuidv4()}`}`;
         const newWorkflow = workflow(
           workflowId,
@@ -1206,6 +1202,7 @@ contexts.forEach((context: Context) => {
       }
     });
 
+    // eslint-disable-next-line max-len
     it(`should NOT deliver inApp message if subscriber disabled inApp channel globally for workflow with inApp enabled [${context.name}]`, async () => {
       if (!context.isStateful) {
         /*
@@ -1214,7 +1211,6 @@ contexts.forEach((context: Context) => {
          */
         expect(true).to.equal(true);
       } else {
-        process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
         const workflowId = `enabled-editable-global-level-${`${context.name}-${uuidv4()}`}`;
         const newWorkflow = workflow(
           workflowId,
@@ -1272,6 +1268,7 @@ contexts.forEach((context: Context) => {
       }
     });
 
+    // eslint-disable-next-line max-len
     it(`should deliver inApp message if subscriber disabled inApp channel globally but enabled inApp for workflow with inApp disabled [${context.name}]`, async () => {
       if (!context.isStateful) {
         /*
@@ -1280,7 +1277,6 @@ contexts.forEach((context: Context) => {
          */
         expect(true).to.equal(true);
       } else {
-        process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
         const workflowId = `disabled-editable-global-workflow-level-${`${context.name}-${uuidv4()}`}`;
         const newWorkflow = workflow(
           workflowId,
@@ -1336,6 +1332,7 @@ contexts.forEach((context: Context) => {
       }
     });
 
+    // eslint-disable-next-line max-len
     it(`should NOT deliver inApp message if subscriber enabled inApp channel globally but disabled inApp for workflow with inApp enabled [${context.name}]`, async () => {
       if (!context.isStateful) {
         /*
@@ -1344,7 +1341,6 @@ contexts.forEach((context: Context) => {
          */
         expect(true).to.equal(true);
       } else {
-        process.env.IS_WORKFLOW_PREFERENCES_ENABLED = 'true';
         const workflowId = `enabled-editable-global-workflow-level-${`${context.name}-${uuidv4()}`}`;
         const newWorkflow = workflow(
           workflowId,
@@ -1546,7 +1542,7 @@ async function saveControlValues(
   session: UserSession,
   workflowIdentifier?: string,
   stepIdentifier?: string,
-  payloadBody?: any
+  payloadBody?: Record<string, unknown>
 ) {
   return await session.testAgent.put(`/v1/bridge/controls/${workflowIdentifier}/${stepIdentifier}`).send(payloadBody);
 }
