@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 import { TableCell, TableRow } from '@/components/primitives/table';
 import { useEnvironment } from '@/context/environment/hooks';
 import { WorkflowOriginEnum } from '@/utils/enums';
-import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
+import { buildRoute, buildRoute2, LEGACY_ROUTES, ROUTES_TEMPLATE } from '@/utils/routes';
 import { Badge } from '@/components/primitives/badge';
 import { BadgeContent } from '@/components/primitives/badge';
 import { WorkflowStatus } from '@/components/workflow-status';
@@ -44,10 +44,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
     ? buildRoute(LEGACY_ROUTES.EDIT_WORKFLOW, {
         workflowSlug: workflow.slug,
       })
-    : buildRoute(ROUTES.EDIT_WORKFLOW, {
-        environmentSlug: currentEnvironment?.slug ?? '',
-        workflowSlug: workflow.slug,
-      });
+    : buildRoute2(ROUTES_TEMPLATE.EDIT_WORKFLOW, currentEnvironment?.slug ?? '', workflow.slug);
 
   return (
     <TableRow key={workflow._id} className="relative">
