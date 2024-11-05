@@ -47,8 +47,6 @@ export async function bootstrap(): Promise<INestApplication> {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 
-  app.enableShutdownHooks();
-
   Logger.log('BOOTSTRAPPED SUCCESSFULLY');
 
   await app.init();

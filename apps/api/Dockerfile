@@ -6,12 +6,16 @@ ARG PACKAGE_PATH
 COPY --chown=1000:1000 ./meta ./deps ./pkg ./
 
 # Install dependencies and build the project
-RUN --mount=type=secret,id=BULL_MQ_PRO_NPM_TOKEN,uid=1000 \
-    BULL_MQ_PRO_NPM_TOKEN=$(cat /run/secrets/BULL_MQ_PRO_NPM_TOKEN) && \
-    [ -n "$BULL_MQ_PRO_NPM_TOKEN" ] && echo 'Building with Enterprise Edition of Novu' && \
-    rm -f .npmrc && cp .npmrc-cloud .npmrc || true && \
-    pnpm install --filter "novuhq" --filter "{${PACKAGE_PATH}}..." --frozen-lockfile --unsafe-perm && \
-    NODE_ENV=production NX_DAEMON=false pnpm build:api
+RUN --mount=type=secret,id=BULL_MQ_PRO_NPM_TOKEN,uid=1000 export BULL_MQ_PRO_NPM_TOKEN=$(cat /run/secrets/BULL_MQ_PRO_NPM_TOKEN) && \
+if [ -n "${BULL_MQ_PRO_NPM_TOKEN}" ] ; then echo 'Building with Enterprise Edition of Novu'; rm -f .npmrc ; cp .npmrc-cloud .npmrc ; fi
+
+RUN --mount=type=cache,id=pnpm-store-api,target=/root/.pnpm-store\
+--mount=type=secret,id=BULL_MQ_PRO_NPM_TOKEN,uid=1000 export BULL_MQ_PRO_NPM_TOKEN=$(cat /run/secrets/BULL_MQ_PRO_NPM_TOKEN) && \
+pnpm install --filter "novuhq" --filter "{${PACKAGE_PATH}}..."\
+--frozen-lockfile\
+--unsafe-perm
+
+RUN --mount=type=secret,id=BULL_MQ_PRO_NPM_TOKEN,uid=1000 export BULL_MQ_PRO_NPM_TOKEN=$(cat /run/secrets/BULL_MQ_PRO_NPM_TOKEN) && NODE_ENV=production NX_DAEMON=false pnpm build:api
 
 # Set the working directory to the API app and copy example environment file
 WORKDIR /usr/src/app/apps/api
@@ -45,9 +49,10 @@ COPY --chown=1000:1000 ./meta ./
 COPY --chown=1000:1000 --from=assets /usr/src/app .
 
 # Install production dependencies
-RUN --mount=type=cache,id=pnpm-store-api,target=/root/.pnpm-store \
-    --mount=type=secret,id=BULL_MQ_PRO_NPM_TOKEN,uid=1000 \
-    pnpm install --filter "{${PACKAGE_PATH}}..." --frozen-lockfile --unsafe-perm --prod
+RUN --mount=type=cache,id=pnpm-store-api,target=/root/.pnpm-store\
+    --mount=type=secret,id=BULL_MQ_PRO_NPM_TOKEN,uid=1000 export BULL_MQ_PRO_NPM_TOKEN=$(cat /run/secrets/BULL_MQ_PRO_NPM_TOKEN) && \
+ pnpm install --filter "{${PACKAGE_PATH}}..." \
+ --frozen-lockfile --unsafe-perm --prod
 
 # Set the working directory to the API app and start the application using pm2-runtime
 WORKDIR /usr/src/app/apps/api
