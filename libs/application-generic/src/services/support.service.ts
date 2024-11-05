@@ -21,7 +21,7 @@ export class SupportService {
   }
 
   async upsertCustomer({ emailAddress, fullName }) {
-    return await this.plainClient.upsertCustomer({
+    const res = await this.plainClient.upsertCustomer({
       identifier: {
         emailAddress,
       },
@@ -43,11 +43,20 @@ export class SupportService {
         },
       },
     });
+    if (res.error) {
+      Logger.error(
+        { emailAddress, fullName, error: res.error },
+        res.error.message,
+        LOG_CONTEXT,
+      );
+      throw new Error(res.error.message);
+    } else {
+      return res;
+    }
   }
 
-  async createThread({ plainCustomerId, threadTitle, threadText }) {
-    return await this.plainClient.createThread({
-      title: threadTitle,
+  async createThread({ plainCustomerId, threadText }) {
+    const res = await this.plainClient.createThread({
       customerIdentifier: {
         customerId: plainCustomerId,
       },
@@ -59,5 +68,16 @@ export class SupportService {
         },
       ],
     });
+
+    if (res.error) {
+      Logger.error(
+        { plainCustomerId, threadText, error: res.error },
+        res.error.message,
+        LOG_CONTEXT,
+      );
+      throw new Error(res.error.message);
+    } else {
+      return res;
+    }
   }
 }

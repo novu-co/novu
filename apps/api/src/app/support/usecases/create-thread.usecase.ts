@@ -15,15 +15,15 @@ export class CreateSupportThreadUsecase {
       fullName: `${firstName} ${lastName}`,
     });
 
-    await this.supportService.createThread({
-      plainCustomerId: plainCustomer.data?.customer.id,
-      threadTitle: command.title,
+    const thread = await this.supportService.createThread({
+      plainCustomerId: plainCustomer.data?.customer?.id,
       threadText: command.text,
     });
 
     return {
       success: true,
       message: 'Thread created successfully',
+      threadId: thread.data?.id,
     };
   }
 }

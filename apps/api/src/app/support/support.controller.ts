@@ -137,7 +137,6 @@ export class SupportController {
   async createThread(@Body() body: CreateSupportThreadDto, @UserSession() user: UserSessionData) {
     return this.createSupportThreadUsecase.execute(
       CreateSupportThreadCommand.create({
-        title: body.title,
         text: body.text,
         email: user.email as string,
         firstName: user.firstName as string,
