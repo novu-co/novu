@@ -9,9 +9,11 @@ import {
   TracingModule,
   getNovuNotificationsModule,
 } from '@novu/application-generic';
+import { NovuModule, workflow } from '@novu/framework/nest';
 
 import { isClerkEnabled } from '@novu/shared';
 import { SentryModule } from '@sentry/nestjs/setup';
+import { ApiExcludeController } from '@nestjs/swagger';
 import packageJson from '../package.json';
 import { AnalyticsModule } from './app/analytics/analytics.module';
 import { AuthModule } from './app/auth/auth.module';
@@ -52,7 +54,6 @@ import { WorkflowOverridesModule } from './app/workflow-overrides/workflow-overr
 import { WorkflowModuleV1 } from './app/workflows-v1/workflow-v1.module';
 import { WorkflowModule } from './app/workflows-v2/workflow.module';
 import { NovuController } from './app/novu/novu.controller';
-import { NovuModule } from './app/novu/novu.module';
 
 const enterpriseImports = (): Array<Type | DynamicModule | Promise<DynamicModule> | ForwardReference> => {
   const modules: Array<Type | DynamicModule | Promise<DynamicModule> | ForwardReference> = [];
@@ -156,7 +157,22 @@ if (process.env.NODE_ENV === 'test') {
   modules.push(TestingModule);
 }
 
-modules.push(getNovuNotificationsModule());
+modules.push(
+  NovuModule.register({
+    apiPath: '/api/novu',
+    controllerDecorators: [ApiExcludeController()],
+    workflows: [
+      workflow('test', async ({ step }) => {
+        await step.email('asdsa', () => {
+          return {
+            subject: 'test',
+            body: 'test',
+          };
+        });
+      }),
+    ],
+  })
+);
 
 @Module({
   imports: modules,
