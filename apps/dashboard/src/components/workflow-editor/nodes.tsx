@@ -13,7 +13,7 @@ export type NodeData = {
   name?: string;
   content?: string;
   addStepIndex?: number;
-  stepId?: string;
+  stepSlug?: string;
   error?: string;
 };
 
@@ -45,7 +45,7 @@ export const EmailNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.EMAIL];
 
   return (
-    <Link to={`step/${data.stepId}`}>
+    <Link to={`step/${data.stepSlug}`}>
       <Node>
         <NodeHeader type={StepTypeEnum.EMAIL}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.EMAIL]}>
@@ -66,7 +66,7 @@ export const SmsNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.SMS];
 
   return (
-    <Link to={`step/${data.stepId}`}>
+    <Link to={`step/${data.stepSlug}`}>
       <Node>
         <NodeHeader type={StepTypeEnum.SMS}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.SMS]}>
@@ -87,7 +87,7 @@ export const InAppNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.IN_APP];
 
   return (
-    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepId: data.stepId ?? '' })}>
+    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
       <Node>
         <NodeHeader type={StepTypeEnum.IN_APP}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.IN_APP]}>
@@ -108,7 +108,7 @@ export const PushNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.PUSH];
 
   return (
-    <Link to={`step/${data.stepId}`}>
+    <Link to={`step/${data.stepSlug}`}>
       <Node>
         <NodeHeader type={StepTypeEnum.PUSH}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.PUSH]}>
@@ -129,7 +129,7 @@ export const ChatNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.CHAT];
 
   return (
-    <Link to={`step/${data.stepId}`}>
+    <Link to={`step/${data.stepSlug}`}>
       <Node>
         <NodeHeader type={StepTypeEnum.CHAT}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.CHAT]}>

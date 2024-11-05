@@ -14,7 +14,7 @@ import { StepEditor } from './step-editor';
 const transitionSetting = { ease: [0.29, 0.83, 0.57, 0.99], duration: 0.4 };
 
 export const EditStepSidebar = () => {
-  const { workflowSlug = '', stepId = '' } = useParams<{ workflowSlug: string; stepId: string }>();
+  const { workflowSlug = '', stepSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof workflowSchema>>({ mode: 'onSubmit', resolver: zodResolver(workflowSchema) });
   const { reset, setError } = form;
@@ -23,7 +23,7 @@ export const EditStepSidebar = () => {
     workflowSlug,
   });
 
-  const step = useMemo(() => workflow?.steps.find((el) => el._id === stepId), [stepId, workflow]);
+  const step = useMemo(() => workflow?.steps.find((el) => el.slug === stepSlug), [stepSlug, workflow]);
 
   useLayoutEffect(() => {
     if (!workflow) {

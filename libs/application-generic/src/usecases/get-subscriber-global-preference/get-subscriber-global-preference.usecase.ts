@@ -58,13 +58,6 @@ export class GetSubscriberGlobalPreference {
   }> {
     let subscriberGlobalChannels: IPreferenceChannels;
     let enabled: boolean;
-    /** @deprecated */
-    const subscriberGlobalPreferenceV1 =
-      await this.subscriberPreferenceRepository.findOne({
-        _environmentId: command.environmentId,
-        _subscriberId: subscriberId,
-        level: PreferenceLevelEnum.GLOBAL,
-      });
 
     const subscriberGlobalPreferenceV2 =
       await this.getPreferences.getPreferenceChannels({
@@ -78,6 +71,15 @@ export class GetSubscriberGlobalPreference {
       subscriberGlobalChannels = subscriberGlobalPreferenceV2;
       enabled = true;
     } else {
+      // Lookup V1 preferences only if V2 is not available
+      /** @deprecated */
+      const subscriberGlobalPreferenceV1 =
+        await this.subscriberPreferenceRepository.findOne({
+          _environmentId: command.environmentId,
+          _subscriberId: subscriberId,
+          level: PreferenceLevelEnum.GLOBAL,
+        });
+
       subscriberGlobalChannels = subscriberGlobalPreferenceV1?.channels ?? {};
       enabled = subscriberGlobalPreferenceV1?.enabled ?? true;
     }

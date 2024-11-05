@@ -34,6 +34,7 @@ const STEP_NAME_BY_TYPE: Record<StepTypeEnum, string> = {
 const createStep = (type: StepTypeEnum): Step => ({
   name: STEP_NAME_BY_TYPE[type],
   stepId: '',
+  slug: '_stp_',
   type,
   _id: crypto.randomUUID(),
 });
@@ -57,7 +58,8 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
 
   useLayoutEffect(() => {
     if (error) {
-      navigate(buildRoute(ROUTES.WORKFLOWS, { environmentId: currentEnvironment?._id ?? '' }));
+      // TODO: check if this is the correct ROUTES
+      navigate(buildRoute(ROUTES.WORKFLOWS, { environmentSlug: currentEnvironment?.slug ?? '' }));
     }
 
     if (!workflow) {

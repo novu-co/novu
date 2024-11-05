@@ -113,7 +113,13 @@ export class FeatureFlagsService {
    *  - Default value with the value provided by Novu's environment variable if set
    *  - Default value with the value provided by the hardcoded fallback
    */
-  @Instrument()
+  @Instrument({
+    buildTransactionIdSuffix: (
+      key: FeatureFlagsKeysEnum,
+      defaultValue: unknown,
+      context: IFeatureFlagContext,
+    ) => key,
+  })
   public async get<T>(
     key: FeatureFlagsKeysEnum,
     defaultValue: T,

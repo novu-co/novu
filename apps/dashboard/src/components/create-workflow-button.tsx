@@ -59,8 +59,8 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
       setIsOpen(false);
       navigate(
         buildRoute(ROUTES.EDIT_WORKFLOW, {
-          environmentId: currentEnvironment?._id ?? '',
-          workflowId: result.data._id,
+          environmentSlug: currentEnvironment?.slug ?? '',
+          workflowSlug: result.data.slug ?? '',
         })
       );
     },

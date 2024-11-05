@@ -3,8 +3,8 @@ import { RiArrowRightSLine, RiPencilRuler2Fill } from 'react-icons/ri';
 import { Button } from '../../../primitives/button';
 import { Separator } from '../../../primitives/separator';
 import { CommonFields } from '../common-fields';
-import { InAppPreview } from './in-app-preview';
 import { SidebarContent } from '@/components/side-navigation/Sidebar';
+import { EditStepInAppPreview } from '@/components/workflow-editor/steps/in-app/edit-step-in-app-preview';
 
 export function InApp() {
   return (
@@ -20,7 +20,8 @@ export function InApp() {
             Configure in-app template <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
           </Button>
         </Link>
-        <InAppPreview />
+
+        <EditStepInAppPreview />
       </SidebarContent>
     </>
   );

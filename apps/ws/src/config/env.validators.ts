@@ -18,5 +18,4 @@ export const envValidators = {
   WORKER_DEFAULT_CONCURRENCY: num({ default: undefined }),
   WORKER_DEFAULT_LOCK_DURATION: num({ default: undefined }),
   SENTRY_DSN: str({ default: undefined }),
-  GRACEFUL_SHUTDOWN_TIMEOUT: num({ default: 5000 }),
 } satisfies Record<string, ValidatorSpec<unknown>>;

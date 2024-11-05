@@ -98,18 +98,6 @@ export class GetSubscriberTemplatePreference {
     type: PreferencesTypeEnum;
     enabled: boolean;
   }> {
-    /** @deprecated */
-    const subscriberWorkflowPreferenceV1 =
-      await this.subscriberPreferenceRepository.findOne(
-        {
-          _environmentId: command.environmentId,
-          _subscriberId: subscriberId,
-          _templateId: command.template._id,
-        },
-        'enabled channels',
-        { readPreference: 'secondaryPreferred' },
-      );
-
     const subscriberWorkflowPreferenceV2 =
       await this.getPreferences.safeExecute({
         environmentId: command.environmentId,
@@ -132,6 +120,19 @@ export class GetSubscriberTemplatePreference {
       critical = subscriberWorkflowPreferenceV2.preferences?.all?.readOnly;
       enabled = true;
     } else {
+      // Lookup V1 preferences only if V2 is not available
+      /** @deprecated */
+      const subscriberWorkflowPreferenceV1 =
+        await this.subscriberPreferenceRepository.findOne(
+          {
+            _environmentId: command.environmentId,
+            _subscriberId: subscriberId,
+            _templateId: command.template._id,
+          },
+          'enabled channels',
+          { readPreference: 'secondaryPreferred' },
+        );
+
       subscriberWorkflowChannels =
         subscriberWorkflowPreferenceV1?.channels ?? {};
       subscriberPreferenceType = PreferencesTypeEnum.SUBSCRIBER_WORKFLOW;
