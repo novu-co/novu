@@ -8,7 +8,7 @@
     "builder": {
       "type": "swc",
       "options": {
-        "stripLeadingPaths": true
+        "extensions": [".js", ".ts", ".jsx", ".tsx"]
       }
     },
     "assets": [

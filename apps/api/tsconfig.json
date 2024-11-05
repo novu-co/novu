@@ -9,7 +9,8 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strictNullChecks": true,
-    "target": "es6"
+    "target": "es6",
+    "jsx": "react"
   },
   "exclude": ["node_modules"]
 }

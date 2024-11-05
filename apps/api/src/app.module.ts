@@ -53,7 +53,7 @@ import { WidgetsModule } from './app/widgets/widgets.module';
 import { WorkflowOverridesModule } from './app/workflow-overrides/workflow-overrides.module';
 import { WorkflowModuleV1 } from './app/workflows-v1/workflow-v1.module';
 import { WorkflowModule } from './app/workflows-v2/workflow.module';
-import { NovuController } from './app/novu/novu.controller';
+import { testWorkflow } from './app/novu/workflows/usage-limits.workflow';
 
 const enterpriseImports = (): Array<Type | DynamicModule | Promise<DynamicModule> | ForwardReference> => {
   const modules: Array<Type | DynamicModule | Promise<DynamicModule> | ForwardReference> = [];
@@ -161,16 +161,7 @@ modules.push(
   NovuModule.register({
     apiPath: '/api/novu',
     controllerDecorators: [ApiExcludeController()],
-    workflows: [
-      workflow('test', async ({ step }) => {
-        await step.email('asdsa', () => {
-          return {
-            subject: 'test',
-            body: 'test',
-          };
-        });
-      }),
-    ],
+    workflows: [testWorkflow],
   })
 );
 
