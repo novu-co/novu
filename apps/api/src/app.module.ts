@@ -3,7 +3,13 @@ import { DynamicModule, Logger, Module, Provider } from '@nestjs/common';
 import { ForwardReference } from '@nestjs/common/interfaces/modules/forward-reference.interface';
 import { Type } from '@nestjs/common/interfaces/type.interface';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { GracefulShutdownConfigModule, ProfilingModule, TracingModule } from '@novu/application-generic';
+import {
+  GracefulShutdownConfigModule,
+  ProfilingModule,
+  TracingModule,
+  getNovuNotificationsModule,
+} from '@novu/application-generic';
+
 import { isClerkEnabled } from '@novu/shared';
 import { SentryModule } from '@sentry/nestjs/setup';
 import packageJson from '../package.json';
@@ -45,6 +51,8 @@ import { WidgetsModule } from './app/widgets/widgets.module';
 import { WorkflowOverridesModule } from './app/workflow-overrides/workflow-overrides.module';
 import { WorkflowModuleV1 } from './app/workflows-v1/workflow-v1.module';
 import { WorkflowModule } from './app/workflows-v2/workflow.module';
+import { NovuController } from './app/novu/novu.controller';
+import { NovuModule } from './app/novu/novu.module';
 
 const enterpriseImports = (): Array<Type | DynamicModule | Promise<DynamicModule> | ForwardReference> => {
   const modules: Array<Type | DynamicModule | Promise<DynamicModule> | ForwardReference> = [];
@@ -108,6 +116,7 @@ const baseModules: Array<Type | DynamicModule | Promise<DynamicModule> | Forward
   WorkflowModule,
   GracefulShutdownConfigModule.forRootAsync(),
   EnvironmentsModule,
+  NovuModule,
 ];
 
 const enterpriseModules = enterpriseImports();
@@ -146,6 +155,8 @@ if (process.env.SEGMENT_TOKEN) {
 if (process.env.NODE_ENV === 'test') {
   modules.push(TestingModule);
 }
+
+modules.push(getNovuNotificationsModule());
 
 @Module({
   imports: modules,
