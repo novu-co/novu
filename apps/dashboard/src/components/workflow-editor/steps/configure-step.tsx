@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RiArrowLeftSLine, RiCloseFill, RiDeleteBin2Line } from 'react-icons/ri';
 import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
@@ -11,13 +11,25 @@ import { motion } from 'framer-motion';
 import { InApp } from './in-app/in-app';
 import { useStep } from './use-step';
 import Chat from './chat';
+import { useState } from 'react';
+import { DeleteStepModal } from '@/components/workflow-editor/steps/delete-step-modal';
 
 export function ConfigureStep() {
+  const { step } = useStep();
+  const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
-  const { workflowSlug = '' } = useParams<{
+  const { workflowSlug = '', stepSlug = '' } = useParams<{
     workflowSlug: string;
+    stepSlug: string;
   }>();
-  const { isReadOnly } = useWorkflowEditorContext();
+  const { isReadOnly, deleteStep } = useWorkflowEditorContext();
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const onDeleteStep = () => {
+    deleteStep(stepSlug);
+    navigate(buildRoute(ROUTES.EDIT_WORKFLOW, { environmentSlug: currentEnvironment?.slug ?? '', workflowSlug }));
+  };
 
   return (
     <motion.div
@@ -55,7 +67,7 @@ export function ConfigureStep() {
 
       <Separator />
 
-      <Step />
+      <Step stepType={step?.type} />
 
       <Separator />
 
@@ -63,7 +75,18 @@ export function ConfigureStep() {
         <>
           <SidebarFooter>
             <Separator />
-            <Button variant="ghostDestructive" type="button">
+            <DeleteStepModal
+              open={isDeleteModalOpen}
+              onOpenChange={setIsDeleteModalOpen}
+              onConfirm={onDeleteStep}
+              stepName={step?.name ?? ''}
+            />
+            <Button
+              variant="ghostDestructive"
+              className="gap-1.5 text-xs"
+              type="button"
+              onClick={() => setIsDeleteModalOpen(true)}
+            >
               <RiDeleteBin2Line className="size-4" />
               Delete step
             </Button>
@@ -74,9 +97,8 @@ export function ConfigureStep() {
   );
 }
 
-const Step = () => {
-  const { stepType: channel } = useStep();
-  switch (channel) {
+const Step = ({ stepType }: { stepType?: StepTypeEnum }) => {
+  switch (stepType) {
     case StepTypeEnum.IN_APP:
       return <InApp />;
 
