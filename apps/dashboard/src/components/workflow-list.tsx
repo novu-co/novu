@@ -33,6 +33,7 @@ export const WorkflowList = () => {
       offset: offset.toString(),
     })}`;
   };
+
   const setLimit = (limit: number) => {
     setSearchParams((searchParams) => {
       searchParams.set('limit', limit.toString());

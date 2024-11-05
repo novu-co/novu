@@ -23,7 +23,7 @@ import {
   UpdateSubscriberChannelCommand,
   UpdateSubscriberCommand,
 } from '@novu/application-generic';
-import { ApiExcludeEndpoint, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiOperation, ApiParam, ApiTags, ApiQuery } from '@nestjs/swagger';
 import {
   ApiRateLimitCategoryEnum,
   ApiRateLimitCostEnum,
@@ -161,6 +161,12 @@ export class SubscribersController {
   @ApiOperation({
     summary: 'Get subscriber',
     description: 'Get subscriber by your internal id used to identify the subscriber',
+  })
+  @ApiQuery({
+    name: 'includeTopics',
+    type: String,
+    description: 'Includes the topics associated with the subscriber',
+    required: false,
   })
   async getSubscriber(
     @UserSession() user: UserSessionData,
