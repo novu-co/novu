@@ -20,7 +20,7 @@ export class SupportService {
     }
   }
 
-  async upsertCustomer({ emailAddress, fullName }) {
+  async upsertCustomer({ emailAddress, fullName, novuUserId }) {
     const res = await this.plainClient.upsertCustomer({
       identifier: {
         emailAddress,
@@ -30,14 +30,15 @@ export class SupportService {
           email: emailAddress,
           isVerified: true,
         },
+        externalId: novuUserId,
         fullName,
       },
       onUpdate: {
+        externalId: novuUserId,
         email: {
           email: emailAddress,
           isVerified: true,
         },
-
         fullName: {
           value: fullName,
         },

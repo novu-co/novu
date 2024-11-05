@@ -141,6 +141,7 @@ export class SupportController {
         email: user.email as string,
         firstName: user.firstName as string,
         lastName: user.lastName as string,
+        userId: user._id as string,
       })
     );
   }

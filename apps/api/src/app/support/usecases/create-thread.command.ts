@@ -1,5 +1,5 @@
 import { BaseCommand } from '@novu/application-generic';
-import { IsDefined, IsString } from 'class-validator';
+import { IsDefined, IsOptional, IsString } from 'class-validator';
 
 export class CreateSupportThreadCommand extends BaseCommand {
   @IsDefined()
@@ -14,7 +14,11 @@ export class CreateSupportThreadCommand extends BaseCommand {
   @IsString()
   firstName: string;
 
+  @IsOptional()
+  @IsString()
+  lastName?: string;
+
   @IsDefined()
   @IsString()
-  lastName: string;
+  userId: string;
 }

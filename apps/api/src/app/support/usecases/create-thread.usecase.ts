@@ -13,6 +13,7 @@ export class CreateSupportThreadUsecase {
     const plainCustomer = await this.supportService.upsertCustomer({
       emailAddress: command.email,
       fullName: `${firstName} ${lastName}`,
+      novuUserId: command.userId,
     });
 
     const thread = await this.supportService.createThread({

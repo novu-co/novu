@@ -59,7 +59,7 @@ export function HeaderNav() {
 
           {/* Ugly fallback to satisfy the restrictive typings of the NotificationCenterWidget */}
 
-          {IS_NOVU_PROD_STAGING ? (
+          {IS_NOVU_PROD_STAGING || true ? (
             <Dropdown
               control={
                 <ActionIcon variant="transparent">
