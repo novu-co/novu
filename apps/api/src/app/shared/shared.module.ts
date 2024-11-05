@@ -46,6 +46,7 @@ import {
   LoggerModule,
   QueuesModule,
   storageService,
+  supportService,
 } from '@novu/application-generic';
 
 import { isClerkEnabled, JobTopicNameEnum } from '@novu/shared';
@@ -116,6 +117,7 @@ const PROVIDERS = [
   ExecuteBridgeRequest,
   getFeatureFlag,
   GetDecryptedSecretKey,
+  supportService,
 ];
 
 const IMPORTS = [

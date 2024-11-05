@@ -1,11 +1,16 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { UserRepository, OrganizationRepository } from '@novu/dal';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { UserAuthGuard, UserSession } from '@novu/application-generic';
+import { UserRepository } from '@novu/dal';
+import { UserSessionData } from '@novu/shared';
+import { CreateSupportThreadDto } from './dto/create-thread.dto';
+import { CreateSupportThreadUsecase } from './usecases/create-thread.usecase';
+import { CreateSupportThreadCommand } from './usecases/create-thread.command';
 
 @Controller('/support')
 export class SupportController {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly organizationRepository: OrganizationRepository
+    private createSupportThreadUsecase: CreateSupportThreadUsecase
   ) {}
 
   @Post('plain/cards')
@@ -125,5 +130,19 @@ export class SupportController {
         },
       ],
     };
+  }
+
+  @UseGuards(UserAuthGuard)
+  @Post('create-thread')
+  async createThread(@Body() body: CreateSupportThreadDto, @UserSession() user: UserSessionData) {
+    return this.createSupportThreadUsecase.execute(
+      CreateSupportThreadCommand.create({
+        title: body.title,
+        text: body.text,
+        email: user.email as string,
+        firstName: user.firstName as string,
+        lastName: user.lastName as string,
+      })
+    );
   }
 }

@@ -2586,6 +2586,9 @@ importers:
       '@sentry/node':
         specifier: ^8.33.1
         version: 8.33.1
+      '@team-plain/typescript-sdk':
+        specifier: 5.4.3
+        version: 5.4.3
       axios:
         specifier: ^1.6.8
         version: 1.6.8
@@ -15999,6 +16002,9 @@ packages:
   '@taskforcesh/bullmq-pro@5.1.14':
     resolution: {integrity: sha512-J/83Q1GTFWbUWn1bpsiX+CcQXktp7ADg/d1oID+wQ8ZwSB2W5l/1FV4yR1BEi3sO+UFEo+rK3qfXQuDml7aBYA==, tarball: https://npm.taskforce.sh/@taskforcesh/bullmq-pro/-/@taskforcesh/bullmq-pro-5.1.14.tgz}
 
+  '@team-plain/typescript-sdk@5.4.3':
+    resolution: {integrity: sha512-660VeutTdaspdzsgpLHKhYsBxX0BOH/O4r0FTi1HD67QyHnKeaMRbxBAen7Yi+vpcpBc3gJGq4HtgHWPZ5WEoA==}
+
   '@testing-library/dom@10.4.0':
     resolution: {integrity: sha512-pemlzrSESWbdAloYml3bAJMEfNh1Z7EduzqPKprCH5S341frlpYnUEW0H72dLxa6IsYr+mPno20GiSm+h9dEdQ==}
     engines: {node: '>=18'}
@@ -22740,7 +22746,7 @@ packages:
     resolution: {integrity: sha512-oWb1Z6mkHIskLzEJ/XWX0srkpkTQ7vaopMQkyaEIoq0fmtFVxOthb8cCxeT+p3ynTdkk/RZwbgG4brR5BeWECw==}
     engines: {node: '>= 4.0'}
     os: [darwin]
-    deprecated: Upgrade to fsevents v2 to mitigate potential security issues
+    deprecated: The v1 package contains DANGEROUS / INSECURE binaries. Upgrade to safe fsevents v2
 
   fsevents@2.3.2:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
@@ -26654,8 +26660,8 @@ packages:
     engines: {node: '>= 14.0.0'}
     hasBin: true
 
-  mocha@10.7.3:
-    resolution: {integrity: sha512-uQWxAu44wwiACGqjbPYmjo7Lg8sFrS3dQe7PP2FQI+woptP4vZXSMcfMyFL/e1yFEeEpV4RtyTpZROOKmxis+A==}
+  mocha@10.8.1:
+    resolution: {integrity: sha512-WxSpEWgF03HfgNKBuysfK40DUaOSVX5zxgLDoieMGO+zyE69iq2eQ1vBypvIJ5mOPKpuVAqWiTbt4Orj7L6wVw==}
     engines: {node: '>= 14.0.0'}
     hasBin: true
 
@@ -43865,7 +43871,6 @@ snapshots:
   '@graphql-typed-document-node/core@3.2.0(graphql@16.9.0)':
     dependencies:
       graphql: 16.9.0
-    optional: true
 
   '@grpc/grpc-js@1.11.1':
     dependencies:
@@ -55533,6 +55538,15 @@ snapshots:
       - supports-color
     optional: true
 
+  '@team-plain/typescript-sdk@5.4.3':
+    dependencies:
+      '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
+      ajv: 8.13.0
+      ajv-formats: 2.1.1(ajv@8.13.0)
+      graphql: 16.9.0
+      lodash.get: 4.4.2
+      zod: 3.22.4
+
   '@testing-library/dom@10.4.0':
     dependencies:
       '@babel/code-frame': 7.24.7
@@ -62105,7 +62119,7 @@ snapshots:
 
   cypress-intellij-reporter@0.0.7:
     dependencies:
-      mocha: 10.7.3
+      mocha: 10.8.1
 
   cypress-network-idle@1.14.2: {}
 
@@ -71266,7 +71280,7 @@ snapshots:
       yargs-parser: 20.2.4
       yargs-unparser: 2.0.0
 
-  mocha@10.7.3:
+  mocha@10.8.1:
     dependencies:
       ansi-colors: 4.1.3
       browser-stdout: 1.3.1
