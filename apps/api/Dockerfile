@@ -1,54 +1,72 @@
-# Use the base image for development
-FROM ghcr.io/novuhq/novu/base:1.0.0 AS dev
+FROM node:20-alpine3.19 AS dev_base
+RUN apk add g++ make py3-pip
+
+ENV NX_DAEMON=false
+
+RUN npm i pm2 -g
+RUN npm --no-update-notifier --no-fund --global install pnpm@9.11.0
+RUN pnpm --version
+
+USER 1000
+WORKDIR /usr/src/app
+
+# ------- DEV BUILD ----------
+FROM dev_base AS dev
 ARG PACKAGE_PATH
 
-# Copy necessary directories to the image
-COPY --chown=1000:1000 ./meta ./deps ./pkg ./
+COPY --chown=1000:1000 ./meta .
+COPY --chown=1000:1000 ./deps .
+COPY --chown=1000:1000 ./pkg .
 
-# Install dependencies and build the project
-RUN --mount=type=secret,id=BULL_MQ_PRO_NPM_TOKEN,uid=1000 \
-    BULL_MQ_PRO_NPM_TOKEN=$(cat /run/secrets/BULL_MQ_PRO_NPM_TOKEN) && \
-    [ -n "$BULL_MQ_PRO_NPM_TOKEN" ] && echo 'Building with Enterprise Edition of Novu' && \
-    rm -f .npmrc && cp .npmrc-cloud .npmrc || true && \
-    pnpm install --filter "novuhq" --filter "{${PACKAGE_PATH}}..." --frozen-lockfile --unsafe-perm && \
-    NODE_ENV=production NX_DAEMON=false pnpm build:api
+RUN --mount=type=secret,id=BULL_MQ_PRO_NPM_TOKEN,uid=1000 export BULL_MQ_PRO_NPM_TOKEN=$(cat /run/secrets/BULL_MQ_PRO_NPM_TOKEN) && \
+    if [ -n "${BULL_MQ_PRO_NPM_TOKEN}" ] ; then echo 'Building with Enterprise Edition of Novu'; rm -f .npmrc ; cp .npmrc-cloud .npmrc ; fi
 
-# Set the working directory to the API app and copy example environment file
+RUN --mount=type=cache,id=pnpm-store-api,target=/root/.pnpm-store\
+    --mount=type=secret,id=BULL_MQ_PRO_NPM_TOKEN,uid=1000 export BULL_MQ_PRO_NPM_TOKEN=$(cat /run/secrets/BULL_MQ_PRO_NPM_TOKEN) && \
+ pnpm install --filter "novuhq" --filter "{${PACKAGE_PATH}}..."\
+ --frozen-lockfile\
+ --unsafe-perm
+
+RUN --mount=type=secret,id=BULL_MQ_PRO_NPM_TOKEN,uid=1000 export BULL_MQ_PRO_NPM_TOKEN=$(cat /run/secrets/BULL_MQ_PRO_NPM_TOKEN) && NODE_ENV=production NX_DAEMON=false pnpm build:api
+
 WORKDIR /usr/src/app/apps/api
-RUN cp src/.example.env dist/.env
 
-# Set the working directory to the root of the app
+RUN cp src/.example.env dist/.env
+RUN cp src/.env.test dist/.env.test
+RUN cp src/.env.development dist/.env.development
+RUN cp src/.env.production dist/.env.production
+
 WORKDIR /usr/src/app
 
 # ------- ASSETS BUILD ----------
-# Create a new stage for building assets
 FROM dev AS assets
 
-# Remove node_modules and source directories
+WORKDIR /usr/src/app
+
+# Remove all dependencies so later we can only install prod dependencies without devDependencies
 RUN rm -rf node_modules && pnpm recursive exec -- rm -rf ./src ./node_modules
 
 # ------- PRODUCTION BUILD ----------
-# Use the base image for production
-FROM ghcr.io/novuhq/novu/base:1.0.0 AS prod
+FROM dev_base AS prod
 
 ARG PACKAGE_PATH
 
-# Set environment variables for production
 ENV CI=true
-ENV NEW_RELIC_NO_CONFIG_FILE=true
 
-# Set the working directory to the root of the app
 WORKDIR /usr/src/app
 
-# Copy necessary directories from the build stage
-COPY --chown=1000:1000 ./meta ./
+COPY --chown=1000:1000 ./meta .
+
+# Get the build artifacts that only include dist folders
 COPY --chown=1000:1000 --from=assets /usr/src/app .
 
-# Install production dependencies
-RUN --mount=type=cache,id=pnpm-store-api,target=/root/.pnpm-store \
-    --mount=type=secret,id=BULL_MQ_PRO_NPM_TOKEN,uid=1000 \
-    pnpm install --filter "{${PACKAGE_PATH}}..." --frozen-lockfile --unsafe-perm --prod
+RUN --mount=type=cache,id=pnpm-store-api,target=/root/.pnpm-store\
+    --mount=type=secret,id=BULL_MQ_PRO_NPM_TOKEN,uid=1000 export BULL_MQ_PRO_NPM_TOKEN=$(cat /run/secrets/BULL_MQ_PRO_NPM_TOKEN) && \
+ pnpm install --filter "{${PACKAGE_PATH}}..." \
+ --frozen-lockfile \
+ --unsafe-perm
 
-# Set the working directory to the API app and start the application using pm2-runtime
+ENV NEW_RELIC_NO_CONFIG_FILE=true
+
 WORKDIR /usr/src/app/apps/api
-CMD [ "pm2-runtime", "start", "dist/main.js" ]
+CMD [ "pm2-runtime","start", "dist/main.js" ]
