@@ -1,19 +1,18 @@
+import { join } from 'path';
 import { Module } from '@nestjs/common';
+import { SentryModule } from '@sentry/nestjs/setup';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import {
   createNestLoggingModuleOptions,
-  GracefulShutdownConfigModule,
   LoggerModule,
   ProfilingModule,
   TracingModule,
 } from '@novu/application-generic';
-import { SentryModule } from '@sentry/nestjs/setup';
-import { join } from 'path';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { HealthModule } from './health/health.module';
 import { SharedModule } from './shared/shared.module';
+import { HealthModule } from './health/health.module';
 import { SocketModule } from './socket/socket.module';
 
 import packageJson from '../package.json';
@@ -30,7 +29,6 @@ const modules = [
       version: packageJson.version,
     })
   ),
-  GracefulShutdownConfigModule.forRootAsync(),
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
