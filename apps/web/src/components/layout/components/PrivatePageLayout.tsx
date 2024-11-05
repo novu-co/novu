@@ -3,7 +3,10 @@ import { ErrorBoundary } from '@sentry/react';
 import { Outlet, useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { IntercomProvider } from 'react-use-intercom';
+
 import { css } from '@novu/novui/css';
+import { EnvironmentEnum } from '@novu/shared';
+
 import { BRIDGE_SYNC_SAMPLE_ENDPOINT, BRIDGE_ENDPOINTS_LEGACY_VERSIONS, INTERCOM_APP_ID } from '../../../config';
 import { SpotLight } from '../../utils/Spotlight';
 import { SpotLightProvider } from '../../providers/SpotlightProvider';
@@ -12,7 +15,6 @@ import { useEnvironment, useRedirectURL, useRouteScopes } from '../../../hooks';
 import { Sidebar } from '../../nav/Sidebar';
 import { HeaderNav } from './v2/HeaderNav';
 import { FreeTrialBanner } from './FreeTrialBanner';
-import { EnvironmentEnum } from '../../../studio/constants/EnvironmentEnum';
 import { SampleModeBanner } from './v2/SampleWorkflowsBanner';
 
 const AppShell = styled.div`

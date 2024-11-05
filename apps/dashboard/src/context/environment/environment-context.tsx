@@ -6,7 +6,7 @@ export type EnvironmentContextValue = {
   environments?: IEnvironment[];
   areEnvironmentsInitialLoading: boolean;
   readOnly: boolean;
-  switchEnvironment: (newEnvironment?: string) => void;
+  switchEnvironment: (newEnvironmentSlug?: string) => void;
   setBridgeUrl: (url: string) => void;
   oppositeEnvironment: IEnvironment | null;
 };

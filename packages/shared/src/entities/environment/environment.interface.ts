@@ -6,6 +6,7 @@ export interface IEnvironment {
   _organizationId: string;
   _parentId?: string;
   identifier: string;
+  slug?: string;
   widget: IWidgetSettings;
   dns?: IDnsSettings;
   apiRateLimits?: IApiRateLimitMaximum;

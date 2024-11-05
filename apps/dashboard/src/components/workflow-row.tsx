@@ -41,9 +41,11 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
 
   const isV1Workflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1;
   const workflowLink = isV1Workflow
-    ? buildRoute(LEGACY_ROUTES.EDIT_WORKFLOW, { workflowId: workflow._id })
+    ? buildRoute(LEGACY_ROUTES.EDIT_WORKFLOW, {
+        workflowSlug: workflow.slug,
+      })
     : buildRoute(ROUTES.EDIT_WORKFLOW, {
-        environmentId: currentEnvironment?._id ?? '',
+        environmentSlug: currentEnvironment?.slug ?? '',
         workflowSlug: workflow.slug,
       });
 

@@ -4,9 +4,9 @@ export const ROUTES = {
   SIGNUP_ORGANIZATION_LIST: '/sign-up/organization-list',
   ROOT: '/',
   ENV: '/env',
-  WORKFLOWS: '/env/:environmentId/workflows',
-  EDIT_WORKFLOW: '/env/:environmentId/workflows/:workflowSlug',
-  TEST_WORKFLOW: '/env/:environmentId/workflows/:workflowSlug/test',
+  WORKFLOWS: '/env/:environmentSlug/workflows',
+  EDIT_WORKFLOW: '/env/:environmentSlug/workflows/:workflowSlug',
+  TEST_WORKFLOW: '/env/:environmentSlug/workflows/:workflowSlug/test',
   CONFIGURE_STEP: 'steps/:stepId',
   EDIT_STEP: 'steps/:stepId/edit',
 };
