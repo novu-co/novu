@@ -15,9 +15,9 @@ export const ConfigureInAppStepTemplatePreview = () => {
   const [editorValue, setEditorValue] = useState('{}');
   const [isEditorOpen, setIsEditorOpen] = useState(true);
   const { previewStep, data } = usePreviewStep();
-  const { workflowSlug, stepId } = useParams<{
+  const { workflowSlug = '', stepSlug = '' } = useParams<{
     workflowSlug: string;
-    stepId: string;
+    stepSlug: string;
   }>();
   const [payloadError, setPayloadError] = useState('');
 
@@ -63,7 +63,7 @@ export const ConfigureInAppStepTemplatePreview = () => {
             className="self-end"
             onClick={() => {
               try {
-                previewStep({ workflowSlug: workflowSlug!, stepId: stepId!, payload: JSON.parse(editorValue) });
+                previewStep({ workflowSlug, stepSlug, payload: JSON.parse(editorValue) });
               } catch (e) {
                 setPayloadError(String(e));
               }

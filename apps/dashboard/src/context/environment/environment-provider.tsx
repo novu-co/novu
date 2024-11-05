@@ -1,7 +1,6 @@
 import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-
-import { EnvironmentEnum, type IEnvironment } from '@novu/shared';
+import { type IEnvironment } from '@novu/shared';
 
 import { getEnvironmentId, saveEnvironmentId } from '@/utils/environment';
 import { buildRoute, ROUTES } from '@/utils/routes';
@@ -22,7 +21,7 @@ function selectEnvironment(environments: IEnvironment[], selectedEnvironmentSlug
 
   // Or pick the development environment
   if (!environment) {
-    environment = environments.find((env) => env.name === EnvironmentEnum.DEVELOPMENT);
+    environment = environments.find((env) => env.name === DEVELOPMENT_ENVIRONMENT);
   }
 
   if (!environment) {

@@ -5,16 +5,16 @@ import { InAppPreview } from '@/components/workflow-editor/in-app-preview';
 
 export function EditStepInAppPreview() {
   const { previewStep, data } = usePreviewStep();
-  const { workflowSlug, stepId } = useParams<{
+  const { workflowSlug, stepSlug } = useParams<{
     workflowSlug: string;
-    stepId: string;
+    stepSlug: string;
   }>();
 
   useEffect(() => {
-    if (workflowSlug && stepId) {
-      previewStep({ workflowSlug, stepId });
+    if (workflowSlug && stepSlug) {
+      previewStep({ workflowSlug, stepSlug });
     }
-  }, [workflowSlug, stepId, previewStep]);
+  }, [workflowSlug, stepSlug, previewStep]);
 
   if (!data) {
     return null;
