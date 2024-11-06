@@ -34,6 +34,7 @@ const STEP_NAME_BY_TYPE: Record<StepTypeEnum, string> = {
 const createStep = (type: StepTypeEnum): Step => ({
   name: STEP_NAME_BY_TYPE[type],
   stepId: '',
+  slug: '_stp_',
   type,
   _id: crypto.randomUUID(),
 });
@@ -126,12 +127,24 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
     [steps]
   );
 
+  const deleteStep = useCallback(
+    (stepSlug: string) => {
+      const stepIndex = steps.fields.findIndex((step) => step.slug === stepSlug);
+
+      if (stepIndex !== -1) {
+        steps.remove(stepIndex);
+      }
+    },
+    [steps]
+  );
+
   const value = useMemo(
     () => ({
       isReadOnly,
       addStep,
+      deleteStep,
     }),
-    [addStep, isReadOnly]
+    [addStep, isReadOnly, deleteStep]
   );
 
   return (

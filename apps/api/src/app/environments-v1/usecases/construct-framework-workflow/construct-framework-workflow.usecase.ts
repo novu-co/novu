@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { workflow } from '@novu/framework/express';
 import {
   ActionStep,
@@ -15,9 +15,10 @@ import { StepTypeEnum } from '@novu/shared';
 import { ConstructFrameworkWorkflowCommand } from './construct-framework-workflow.command';
 import {
   ChatOutputRendererUsecase,
-  EmailOutputRendererUsecase,
+  FullPayloadForRender,
   InAppOutputRendererUsecase,
   PushOutputRendererUsecase,
+  RenderEmailOutputUsecase,
   SmsOutputRendererUsecase,
 } from '../output-renderers';
 
@@ -26,7 +27,7 @@ export class ConstructFrameworkWorkflow {
   constructor(
     private workflowsRepository: NotificationTemplateRepository,
     private inAppOutputRendererUseCase: InAppOutputRendererUsecase,
-    private emailOutputRendererUseCase: EmailOutputRendererUsecase,
+    private emailOutputRendererUseCase: RenderEmailOutputUsecase,
     private smsOutputRendererUseCase: SmsOutputRendererUsecase,
     private chatOutputRendererUseCase: ChatOutputRendererUsecase,
     private pushOutputRendererUseCase: PushOutputRendererUsecase
@@ -40,15 +41,21 @@ export class ConstructFrameworkWorkflow {
       }
     }
 
-    return this.constructFrameworkWorkflow(dbWorkflow);
+    return this.constructFrameworkWorkflow(dbWorkflow, command.action);
   }
 
-  private constructFrameworkWorkflow(newWorkflow: NotificationTemplateEntity): Workflow {
+  private constructFrameworkWorkflow(newWorkflow, action) {
     return workflow(
       newWorkflow.triggers[0].identifier,
-      async ({ step }) => {
+      async ({ step, payload, subscriber }) => {
+        const fullPayloadForRender: FullPayloadForRender = { payload, subscriber, steps: {} };
         for await (const staticStep of newWorkflow.steps) {
-          await this.constructStep(step, staticStep);
+          try {
+            const stepOutputs = await this.constructStep(step, staticStep, fullPayloadForRender);
+            fullPayloadForRender.steps[staticStep.stepId || staticStep._templateId] = stepOutputs;
+          } catch (e) {
+            Logger.log(`Cannot Construct Step ${staticStep.stepId || staticStep._templateId}`, e);
+          }
         }
       },
       {
@@ -66,7 +73,11 @@ export class ConstructFrameworkWorkflow {
     );
   }
 
-  private constructStep(step: Step, staticStep: NotificationStepEntity): StepOutput<Record<string, unknown>> {
+  private constructStep(
+    step: Step,
+    staticStep: NotificationStepEntity,
+    fullPayloadForRender: FullPayloadForRender
+  ): StepOutput<Record<string, unknown>> {
     const stepTemplate = staticStep.template;
 
     if (!stepTemplate) {
@@ -91,7 +102,7 @@ export class ConstructFrameworkWorkflow {
           stepId,
           // The step callback function. Takes controls and returns the step outputs
           async (controlValues) => {
-            return this.inAppOutputRendererUseCase.execute({ controlValues });
+            return this.inAppOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           // Step options
           this.constructChannelStepOptions(staticStep)
@@ -100,7 +111,7 @@ export class ConstructFrameworkWorkflow {
         return step.email(
           stepId,
           async (controlValues) => {
-            return this.emailOutputRendererUseCase.execute({ controlValues });
+            return this.emailOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructChannelStepOptions(staticStep)
         );
@@ -108,7 +119,7 @@ export class ConstructFrameworkWorkflow {
         return step.inApp(
           stepId,
           async (controlValues) => {
-            return this.smsOutputRendererUseCase.execute({ controlValues });
+            return this.smsOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructChannelStepOptions(staticStep)
         );
@@ -116,7 +127,7 @@ export class ConstructFrameworkWorkflow {
         return step.inApp(
           stepId,
           async (controlValues) => {
-            return this.chatOutputRendererUseCase.execute({ controlValues });
+            return this.chatOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructChannelStepOptions(staticStep)
         );
@@ -124,7 +135,7 @@ export class ConstructFrameworkWorkflow {
         return step.inApp(
           stepId,
           async (controlValues) => {
-            return this.pushOutputRendererUseCase.execute({ controlValues });
+            return this.pushOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructChannelStepOptions(staticStep)
         );

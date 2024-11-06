@@ -20,12 +20,13 @@ import { GetWorkflowByIdsUseCase } from './usecases/get-workflow-by-ids/get-work
 import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
 import { BridgeModule } from '../bridge';
 import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
-import { CreateMockPayloadUseCase } from './usecases/placeholder-enrichment/payload-preview-value-generator.usecase';
+import { CreateMockPayloadForSingleControlValueUseCase } from './usecases/placeholder-enrichment/payload-preview-value-generator.usecase';
 import { ExtractDefaultsUsecase } from './usecases/get-default-values-from-schema/extract-defaults.usecase';
-import { CollectPlaceholdersFromTipTapSchemaUsecase } from './usecases/placeholder-enrichment/collect-placeholders-from-tip-tap-schema.usecase';
-import { TransformPlaceholderMapUseCase } from './usecases/placeholder-enrichment/transform-placeholder.usecase';
+import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-renderers';
 import { WorkflowTestDataUseCase } from './usecases/test-data/test-data.usecase';
 import { GetStepDataUsecase } from './usecases/get-step-schema/get-step-data.usecase';
+import { BuildPayloadNestedStructureUsecase } from './usecases/placeholder-enrichment/buildPayloadNestedStructureUsecase';
+import { BuildDefaultPayloadUseCase } from './usecases/build-payload-from-placeholder/build-default-payload-use-case.service';
 
 @Module({
   imports: [SharedModule, MessageTemplateModule, ChangeModule, AuthModule, BridgeModule, IntegrationModule],
@@ -44,12 +45,12 @@ import { GetStepDataUsecase } from './usecases/get-step-schema/get-step-data.use
     SyncToEnvironmentUseCase,
     GetStepDataUsecase,
     GeneratePreviewUsecase,
-    GetWorkflowUseCase,
-    CreateMockPayloadUseCase,
+    CreateMockPayloadForSingleControlValueUseCase,
     ExtractDefaultsUsecase,
-    CollectPlaceholdersFromTipTapSchemaUsecase,
-    TransformPlaceholderMapUseCase,
+    BuildPayloadNestedStructureUsecase,
     WorkflowTestDataUseCase,
+    BuildDefaultPayloadUseCase,
+    HydrateEmailSchemaUseCase,
   ],
 })
 export class WorkflowModule implements NestModule {

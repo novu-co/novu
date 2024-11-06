@@ -1,5 +1,5 @@
 import { ArgumentsHost, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
-import type { Response, Request } from 'express';
+import { Response } from 'express';
 import { CommandValidationException, PinoLogger } from '@novu/application-generic';
 import { randomUUID } from 'node:crypto';
 import { captureException } from '@sentry/node';
@@ -76,6 +76,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (exception instanceof ZodError) {
       return handleZod(exception);
     }
+    if (exception instanceof ZodError) {
+      return handleZod(exception);
+    }
     if (exception instanceof CommandValidationException) {
       return handleCommandValidation(exception);
     }
@@ -122,7 +125,7 @@ export class ErrorDto {
   message: string | object;
 }
 
-function handleZod(exception: ZodError<any>) {
+function handleZod(exception: ZodError) {
   const status = HttpStatus.BAD_REQUEST; // Set appropriate status for ZodError
   const message = {
     errors: exception.errors.map((err) => ({
@@ -139,4 +142,17 @@ function handleCommandValidation(exception: CommandValidationException) {
   const { message } = exception;
 
   return { message: { message, cause: mappedErrors }, status: HttpStatus.BAD_REQUEST };
+}
+class MongoServerError {
+  code: number;
+  errmsg: string;
+  ok: number;
+  writeErrors?: {
+    index: number;
+    code: number;
+    errmsg: string;
+    op: any;
+  }[];
+  operationTime?: string;
+  clusterTime?: string;
 }

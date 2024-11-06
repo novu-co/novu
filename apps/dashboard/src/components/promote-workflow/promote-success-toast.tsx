@@ -14,7 +14,7 @@ export function PromoteSuccessToast({ workflow, onClose }: PromoteSuccessToastPr
 
   function onSwitchEnvironmentClick() {
     onClose();
-    switchEnvironment(oppositeEnvironment?._id || '');
+    switchEnvironment(oppositeEnvironment?.slug || '');
   }
 
   return (
