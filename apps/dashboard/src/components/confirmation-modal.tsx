@@ -1,33 +1,34 @@
 import { Button } from '@/components/primitives/button';
+
 import {
   Dialog,
   DialogClose,
-  DialogContent,
   DialogDescription,
-  DialogFooter,
+  DialogContent,
   DialogOverlay,
   DialogPortal,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { useEnvironment } from '@/context/environment/hooks';
-import { WorkflowResponseDto } from '@novu/shared';
-import { UseMutateAsyncFunction } from '@tanstack/react-query';
+  DialogFooter,
+} from '@/components/primitives/dialog';
 import { RiAlertFill } from 'react-icons/ri';
 
-interface PromoteConfirmModalProps {
+type ConfirmationModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: UseMutateAsyncFunction<WorkflowResponseDto, unknown, void, void>;
-}
+  onConfirm: () => void;
+  title: string;
+  description: string;
+  confirmButtonText: string;
+};
 
-export function PromoteConfirmModal({ open, onOpenChange, onConfirm }: PromoteConfirmModalProps) {
-  const { oppositeEnvironment } = useEnvironment();
-
-  async function onConfirmClick() {
-    onOpenChange(false);
-    await onConfirm();
-  }
-
+export const ConfirmationModal = ({
+  open,
+  onOpenChange,
+  onConfirm,
+  title,
+  description,
+  confirmButtonText,
+}: ConfirmationModalProps) => {
   return (
     <Dialog modal open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
@@ -38,10 +39,8 @@ export function PromoteConfirmModal({ open, onOpenChange, onConfirm }: PromoteCo
               <RiAlertFill className="text-warning size-6" />
             </div>
             <div className="flex flex-1 flex-col items-start gap-1">
-              <DialogTitle className="text-md font-medium">Sync workflow to {oppositeEnvironment?.name}</DialogTitle>
-              <DialogDescription className="text-foreground-600">
-                Workflow already exists in {oppositeEnvironment?.name}. Proceeding will overwrite the existing workflow.
-              </DialogDescription>
+              <DialogTitle className="text-md font-medium">{title}</DialogTitle>
+              <DialogDescription className="text-foreground-600">{description}</DialogDescription>
             </div>
           </div>
           <DialogFooter>
@@ -51,8 +50,8 @@ export function PromoteConfirmModal({ open, onOpenChange, onConfirm }: PromoteCo
               </Button>
             </DialogClose>
             <DialogClose asChild aria-label="Close">
-              <Button type="button" size="sm" variant="primary" onClick={onConfirmClick}>
-                Proceed
+              <Button type="button" size="sm" variant="primary" onClick={onConfirm}>
+                {confirmButtonText}
               </Button>
             </DialogClose>
           </DialogFooter>
@@ -60,4 +59,4 @@ export function PromoteConfirmModal({ open, onOpenChange, onConfirm }: PromoteCo
       </DialogPortal>
     </Dialog>
   );
-}
+};

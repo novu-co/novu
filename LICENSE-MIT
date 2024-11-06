@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2019 Noti-fire apps ltd.
+Copyright (c) 2019 Noti-fire Apps Ltd.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-This license applies to the entire repo except for subfolders that have their own license file.
-In such cases, the license file in the subfolder takes precedence.

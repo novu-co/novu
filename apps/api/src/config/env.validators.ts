@@ -52,6 +52,7 @@ export const envValidators = {
   NOVU_INVITE_TEAM_MEMBER_NUDGE_TRIGGER_IDENTIFIER: str({ default: undefined }),
   HUBSPOT_INVITE_NUDGE_EMAIL_USER_LIST_ID: str({ default: undefined }),
   HUBSPOT_PRIVATE_APP_ACCESS_TOKEN: str({ default: undefined }),
+  PLAIN_SUPPORT_KEY: str(),
   // Feature Flags
   ...Object.keys(FeatureFlagsKeysEnum).reduce(
     (acc, key) => {
