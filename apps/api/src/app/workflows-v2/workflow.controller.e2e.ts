@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { UserSession } from '@novu/testing';
 import { randomBytes } from 'crypto';
 import {
+  createWorkflowClient,
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
   isStepUpdateBody,
@@ -22,7 +23,6 @@ import {
   WorkflowListResponseDto,
   WorkflowResponseDto,
 } from '@novu/shared';
-import { createWorkflowClient } from './clients';
 
 import { encodeBase62 } from '../shared/helpers';
 import { stepTypeToDefaultDashboardControlSchema } from './shared';
@@ -73,21 +73,7 @@ describe('Workflow Controller E2E API Testing', () => {
       if (res.isSuccessResult()) {
         const workflowCreated: WorkflowResponseDto = res.value;
         expect(workflowCreated.workflowId).to.include(`${slugify(nameSuffix)}-`);
-        for (const step of workflowCreated.steps) {
-          const stepDataDto = await getStepData(workflowCreated._id, step._id);
-          expect(stepDataDto).to.be.ok;
-          expect(stepDataDto.controls).to.be.ok;
-          if (stepDataDto.controls) {
-            expect(stepDataDto.controls.values).to.be.ok;
-            expect(stepDataDto.controls.dataSchema).to.be.ok;
-            expect(stepDataDto.controls.dataSchema).to.deep.equal(
-              stepTypeToDefaultDashboardControlSchema[step.type].schema
-            );
-            expect(stepDataDto.controls.uiSchema).to.deep.equal(
-              stepTypeToDefaultDashboardControlSchema[step.type].uiSchema
-            );
-          }
-        }
+        await assertValuesInSteps(workflowCreated);
       }
     });
   });
@@ -528,6 +514,23 @@ describe('Workflow Controller E2E API Testing', () => {
       }
     }
     expect(convertToDate(updatedWorkflow.updatedAt)).to.be.greaterThan(convertToDate(expectedPastUpdatedAt));
+  }
+  async function assertValuesInSteps(workflowCreated: WorkflowResponseDto) {
+    for (const step of workflowCreated.steps) {
+      const stepDataDto = await getStepData(workflowCreated._id, step._id);
+      expect(stepDataDto).to.be.ok;
+      expect(stepDataDto.controls).to.be.ok;
+      if (stepDataDto.controls) {
+        expect(stepDataDto.controls.values).to.be.ok;
+        expect(stepDataDto.controls.dataSchema).to.be.ok;
+        expect(stepDataDto.controls.dataSchema).to.deep.equal(
+          stepTypeToDefaultDashboardControlSchema[step.type].schema
+        );
+        expect(stepDataDto.controls.uiSchema).to.deep.equal(
+          stepTypeToDefaultDashboardControlSchema[step.type].uiSchema
+        );
+      }
+    }
   }
 });
 
