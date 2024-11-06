@@ -31,7 +31,6 @@ import type {
   HealthCheck,
   Schema,
   Skip,
-  State,
   ValidationError,
   Workflow,
 } from './types';
