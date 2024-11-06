@@ -8,12 +8,16 @@ export class SupportService {
   private readonly plainKey: string;
   constructor() {
     this.plainKey = process.env.PLAIN_SUPPORT_KEY;
-    this.plainClient = new PlainClient({ apiKey: this.plainKey });
-    Logger.log(`Initialized PlainClient`, LOG_CONTEXT);
+    if (this.plainKey) {
+      this.plainClient = new PlainClient({ apiKey: this.plainKey });
+      Logger.log(`Initialized PlainClient`, LOG_CONTEXT);
+    } else {
+      Logger.log('Skipping PlainClient initialization', LOG_CONTEXT);
+    }
   }
 
   async upsertCustomer({ emailAddress, fullName, novuUserId }) {
-    const res = await this.plainClient.upsertCustomer({
+    const res = await this.plainClient?.upsertCustomer({
       identifier: {
         emailAddress,
       },
@@ -49,7 +53,7 @@ export class SupportService {
   }
 
   async createThread({ plainCustomerId, threadText }) {
-    const res = await this.plainClient.createThread({
+    const res = await this.plainClient?.createThread({
       customerIdentifier: {
         customerId: plainCustomerId,
       },

@@ -5,7 +5,6 @@ import {
   CacheService,
   DistributedLockService,
   FeatureFlagsService,
-  SupportService,
 } from '../services';
 import { GetFeatureFlag } from '../usecases';
 
@@ -22,7 +21,7 @@ export const featureFlagsService = {
 export const getFeatureFlag = {
   provide: GetFeatureFlag,
   useFactory: async (
-    featureFlagsServiceItem: FeatureFlagsService,
+    featureFlagsServiceItem: FeatureFlagsService
   ): Promise<GetFeatureFlag> => {
     const useCase = new GetFeatureFlag(featureFlagsServiceItem);
 
@@ -79,19 +78,10 @@ export const distributedLockService = {
       cacheInMemoryProviderService.useFactory();
 
     const service = new DistributedLockService(
-      factoryCacheInMemoryProviderService,
+      factoryCacheInMemoryProviderService
     );
 
     await service.initialize();
-
-    return service;
-  },
-};
-
-export const supportService = {
-  provide: SupportService,
-  useFactory: async () => {
-    const service = new SupportService();
 
     return service;
   },
