@@ -15,9 +15,8 @@ export const usageLimitsWorkflow = workflow(
   {
     name: 'Usage Limits Alert',
     payloadSchema: z.object({
-      name: z.string().optional(),
-      email: z.string(),
-      upgradeUrl: z.string().optional(),
+      percentage: z.number(),
+      organizationName: z.string(),
     }),
   }
 );
