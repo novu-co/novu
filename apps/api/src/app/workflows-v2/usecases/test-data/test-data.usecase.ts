@@ -7,7 +7,7 @@ import { WorkflowTestDataCommand } from './test-data.command';
 import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { GetWorkflowByIdsCommand } from '../get-workflow-by-ids/get-workflow-by-ids.command';
 import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
-import { buildStringSchema } from '../../shared/build-string-schema';
+import { buildJSONSchema } from '../../shared/build-string-schema';
 
 @Injectable()
 export class WorkflowTestDataUseCase {
@@ -52,7 +52,7 @@ export class WorkflowTestDataUseCase {
       payloadVariables = { ...payloadVariables, ...currPayloadVariables };
     }
 
-    return buildStringSchema(payloadVariables || {});
+    return buildJSONSchema(payloadVariables || {});
   }
 
   private async getValues(user: UserSessionData, _stepId: string, _workflowId: string) {
