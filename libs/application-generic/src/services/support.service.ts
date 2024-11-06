@@ -5,16 +5,19 @@ const LOG_CONTEXT = 'SupportService';
 
 export class SupportService {
   private plainClient: PlainClient;
-  constructor(private plainKey?: string | null) {
+  private readonly plainKey: string;
+  constructor() {
+    this.plainKey = process.env.PLAIN_SUPPORT_KEY;
     if (this.plainKey) {
-      this.plainClient = new PlainClient({
-        apiKey: this.plainKey,
-      });
+      this.plainClient = new PlainClient({ apiKey: this.plainKey });
+      Logger.log(`Initialized PlainClient`, LOG_CONTEXT);
+    } else {
+      Logger.log('Skipping PlainClient initialization', LOG_CONTEXT);
     }
   }
 
   async upsertCustomer({ emailAddress, fullName, novuUserId }) {
-    const res = await this.plainClient.upsertCustomer({
+    const res = await this.plainClient?.upsertCustomer({
       identifier: {
         emailAddress,
       },
@@ -27,7 +30,7 @@ export class SupportService {
         fullName,
       },
       onUpdate: {
-        externalId: novuUserId,
+        externalId: { value: novuUserId },
         email: {
           email: emailAddress,
           isVerified: true,
@@ -50,7 +53,7 @@ export class SupportService {
   }
 
   async createThread({ plainCustomerId, threadText }) {
-    const res = await this.plainClient.createThread({
+    const res = await this.plainClient?.createThread({
       customerIdentifier: {
         customerId: plainCustomerId,
       },

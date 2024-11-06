@@ -53,7 +53,7 @@ export const IS_SELF_HOSTED =
   window._env_.REACT_APP_IS_SELF_HOSTED === 'true' || process.env.REACT_APP_IS_SELF_HOSTED === 'true';
 
 // To test feature in prod and staging. Excluding self host and local
-export const IS_NOVU_PROD_STAGING = !IS_SELF_HOSTED && (ENV === 'production' || ENV === 'prod' || ENV === 'dev');
+export const IS_NOVU_PROD_STAGING = !IS_SELF_HOSTED && !API_ROOT.includes('localhost');
 
 export const REACT_APP_VERSION = process.env.NOVU_VERSION;
 

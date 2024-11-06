@@ -14,15 +14,7 @@ export class SupportController {
   ) {}
 
   @Post('plain/cards')
-  async getPlainCards(@Body() body: any) {
-    const userId = body.customer?.externalId;
-    const { email } = body.customer || {};
-
-    console.log('userId', userId);
-    console.log('email', email);
-    console.log('body', body);
-    const userRepo = this.userRepository;
-
+  async getPlainCards() {
     return {
       data: {},
 
