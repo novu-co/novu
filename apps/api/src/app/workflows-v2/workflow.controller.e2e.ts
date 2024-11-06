@@ -422,6 +422,44 @@ describe('Workflow Controller E2E API Testing', () => {
       const stepRetrievedByStepIdentifier = await getStepData(internalWorkflowId, stepIdentifier);
       expect(stepRetrievedByStepIdentifier._id).to.equal(stepId);
     });
+
+    it('should get step payload variables', async () => {
+      const steps = [
+        {
+          ...buildEmailStep(),
+          controlValues: {
+            body: 'Welcome to our newsletter {{bodyText}}{{bodyText2}}{{payload.prefixBodyText}}',
+            subject: 'Welcome to our newsletter {{subjectText}} {{payload.prefixSubjectText}}',
+          },
+        },
+        { ...buildInAppStep(), controlValues: { subject: 'Welcome to our newsletter {{inAppSubjectText}}' } },
+      ];
+      const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('', { steps });
+      const res = await session.testAgent.post(`${v2Prefix}/workflows`).send(createWorkflowDto);
+      expect(res.status).to.be.equal(201);
+      const workflowCreated: WorkflowResponseDto = res.body.data;
+      const stepData = await getStepData(workflowCreated._id, workflowCreated.steps[0]._id);
+      const { variables } = stepData;
+
+      if (typeof variables === 'boolean') throw new Error('Variables is not an object');
+      const { properties } = variables;
+      expect(properties).to.be.ok;
+      if (!properties) throw new Error('Payload schema is not valid');
+
+      expect(properties.payload).to.deep.equal({
+        type: 'object',
+        properties: {
+          prefixSubjectText: {
+            type: 'string',
+            default: '{{payload.prefixSubjectText}}',
+          },
+          prefixBodyText: {
+            type: 'string',
+            default: '{{payload.prefixBodyText}}',
+          },
+        },
+      });
+    });
   });
 
   async function updateWorkflowRest(id: string, workflow: UpdateWorkflowDto): Promise<WorkflowResponseDto> {

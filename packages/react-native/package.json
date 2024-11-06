@@ -17,11 +17,23 @@
   "publishConfig": {
     "access": "public"
   },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/client/index.d.mts",
+        "default": "./dist/client/index.mjs"
+      },
+      "require": {
+        "types": "./dist/client/index.d.ts",
+        "default": "./dist/client/index.js"
+      }
+    }
+  },
   "scripts": {
     "build:watch": "tsup --watch",
-    "build": "tsup && pnpm run check-exports",
+    "build": "tsup && pnpm run check:exports",
     "lint": "eslint src",
-    "check-exports": "attw --pack .",
+    "check:exports": "attw --pack .",
     "release:preview": "pnpx pkg-pr-new publish"
   },
   "devDependencies": {
