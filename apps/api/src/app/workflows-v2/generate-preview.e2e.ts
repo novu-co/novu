@@ -6,6 +6,7 @@ import { sleep } from '@nestjs/terminus/dist/utils';
 import {
   ChannelTypeEnum,
   createWorkflowClient,
+  CreateWorkflowDto,
   EmailStepControlSchemaDto,
   GeneratePreviewRequestDto,
   GeneratePreviewResponseDto,
@@ -13,6 +14,7 @@ import {
   NovuRestResult,
   RedirectTargetEnum,
   StepTypeEnum,
+  WorkflowCreationSourceEnum,
 } from '@novu/shared';
 import { InAppOutput } from '@novu/framework/internal';
 import { buildCreateWorkflowDto } from './workflow.controller.e2e';
@@ -49,6 +51,15 @@ describe('Generate Preview', () => {
             PLACEHOLDER_SUBJECT_INAPP_PAYLOAD_VALUE
           );
           expect(previewResponseDto.result!.preview).to.deep.equal(expectedRenderedResult);
+        });
+        it(`${type} should hydrate previous step`, async () => {
+          const { workflowId, emailStepDatabaseId, digestStepId } = await createWorkflowWithDigest(type);
+          const requestDto = buildDtoWithPayload(type, digestStepId);
+          const previewResponseDto = await generatePreview(workflowId, emailStepDatabaseId, requestDto, description);
+          expect(previewResponseDto.result!.preview).to.exist;
+          expect(previewResponseDto.previewPayloadExample).to.exist;
+          expect(previewResponseDto.previewPayloadExample?.steps?.digestStepId).to.be.ok;
+          console.log(previewResponseDto.previewPayloadExample);
         });
       });
     });
@@ -227,6 +238,36 @@ describe('Generate Preview', () => {
       workflowId: workflowResult.value._id,
       stepDatabaseId: workflowResult.value.steps[0]._id,
       stepId: workflowResult.value.steps[0].stepId,
+    };
+  }
+  async function createWorkflowWithDigest(type: StepTypeEnum) {
+    const createWorkflowDto: CreateWorkflowDto = {
+      __source: WorkflowCreationSourceEnum.EDITOR,
+      name: 'somename',
+      workflowId: `somename`,
+      description: 'This is a test workflow',
+      active: true,
+      steps: [
+        {
+          name: 'DigestStep',
+          type: StepTypeEnum.DIGEST,
+        },
+        {
+          name: 'Email Test Step',
+          type: StepTypeEnum.IN_APP,
+        },
+      ],
+    };
+    const workflowResult = await workflowsClient.createWorkflow(createWorkflowDto);
+    if (!workflowResult.isSuccessResult()) {
+      throw new Error(`Failed to create workflow ${JSON.stringify(workflowResult.error)}`);
+    }
+    console.log(workflowResult.value);
+
+    return {
+      workflowId: workflowResult.value._id,
+      emailStepDatabaseId: workflowResult.value.steps[1]._id,
+      digestStepId: workflowResult.value.steps[0].stepId,
     };
   }
 });
