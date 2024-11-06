@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { RiEdit2Line, RiInformationFill, RiPencilRuler2Line } from 'react-icons/ri';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useNavigate } from 'react-router-dom';
-import { useFormContext } from 'react-hook-form';
-import * as z from 'zod';
 import { liquid } from '@codemirror/lang-liquid';
 import { EditorView } from '@uiw/react-codemirror';
 import { RedirectTargetEnum } from '@novu/shared';
@@ -18,17 +16,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitive
 import { URLInput } from '@/components/primitives/url-input';
 import { urlTargetTypes } from '@/utils/url';
 import { ActionPicker } from '../../action-picker';
-import { workflowSchema } from '../../schema';
 import { ConfigureInAppStepTemplatePreview } from '@/components/workflow-editor/steps/configure-in-app-template/configure-in-app-step-template-preview';
+import { useStep } from '../use-step';
+import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5';
 
 export const ConfigureInAppStepTemplateTabs = () => {
   const navigate = useNavigate();
-  const { formState } = useFormContext<z.infer<typeof workflowSchema>>();
-
+  const { stepIndex, control } = useStep();
   const [subject, setSubject] = useState('');
-  const [body, setBody] = useState('');
 
   return (
     <Tabs defaultValue="editor" className="flex h-full flex-1 flex-col">
@@ -85,20 +82,34 @@ export const ConfigureInAppStepTemplateTabs = () => {
                 />
               </InputField>
             </div>
-            <InputField size="md" className="h-32 px-1">
-              <Editor
-                placeholder="Body"
-                size="md"
-                value={body}
-                onChange={setBody}
-                extensions={[
-                  liquid({
-                    variables: [{ type: 'variable', label: 'asdf' }],
-                  }),
-                  EditorView.lineWrapping,
-                ]}
-              />
-            </InputField>
+
+            <FormField
+              control={control}
+              name={`steps.${stepIndex}.name`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <InputField size="md" className="h-32 px-1">
+                      <Editor
+                        placeholder="Body"
+                        size="md"
+                        value={field.value}
+                        onChange={field.onChange}
+                        extensions={[
+                          liquid({
+                            variables: [{ type: 'variable', label: 'asdf' }],
+                          }),
+                          EditorView.lineWrapping,
+                        ]}
+                        height="100%"
+                      />
+                    </InputField>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <div className="mt-1 flex items-center gap-1">
               <RiInformationFill className="text-foreground-400 size-4 p-0.5" />
               <span className="text-foreground-600 text-xs font-normal">
@@ -130,18 +141,6 @@ export const ConfigureInAppStepTemplateTabs = () => {
       <TabsContent value="preview" className={tabsContentClassName}>
         <ConfigureInAppStepTemplatePreview />
       </TabsContent>
-      <Separator />
-      <footer className="flex justify-end px-3 py-3.5">
-        <Button
-          className="ml-auto"
-          variant="default"
-          type="submit"
-          form="create-workflow"
-          disabled={!formState.isDirty}
-        >
-          Save step
-        </Button>
-      </footer>
     </Tabs>
   );
 };

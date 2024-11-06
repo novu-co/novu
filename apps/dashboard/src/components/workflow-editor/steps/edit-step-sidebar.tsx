@@ -117,7 +117,6 @@ export const EditStepSidebar = () => {
                 event.stopPropagation();
                 form.handleSubmit(onSubmit)(event);
               }}
-              id="edit-step"
             >
               {step && <StepEditor stepType={step?.type} />}
               <Separator />
@@ -127,7 +126,6 @@ export const EditStepSidebar = () => {
                   variant="default"
                   type="submit"
                   disabled={!form.formState.isDirty || form.formState.isSubmitting}
-                  form="edit-step"
                 >
                   Save step
                 </Button>
