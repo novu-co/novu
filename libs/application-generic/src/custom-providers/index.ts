@@ -5,6 +5,7 @@ import {
   CacheService,
   DistributedLockService,
   FeatureFlagsService,
+  SupportService,
 } from '../services';
 import { GetFeatureFlag } from '../usecases';
 
@@ -82,6 +83,15 @@ export const distributedLockService = {
     );
 
     await service.initialize();
+
+    return service;
+  },
+};
+
+export const supportService = {
+  provide: SupportService,
+  useFactory: async () => {
+    const service = new SupportService(process.env.PLAIN_SUPPORT_KEY);
 
     return service;
   },

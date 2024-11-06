@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
-import { useSubscription, UseSubscriptionType } from '../hooks/useSubscription';
 import { ApiServiceLevelEnum } from '@novu/shared';
+import { useSubscription, UseSubscriptionType } from '../hooks/useSubscription';
+
+export type { UseSubscriptionType } from '../hooks/useSubscription';
 
 const SubscriptionContext = React.createContext<UseSubscriptionType>({
   isLoading: false,

@@ -76,9 +76,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (exception instanceof ZodError) {
       return handleZod(exception);
     }
-    if (this.isMongoError(exception)) {
-      return handleMongo(exception);
-    }
     if (exception instanceof ZodError) {
       return handleZod(exception);
     }
@@ -99,14 +96,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     };
   }
 
-  private isMongoError(exception: unknown): exception is MongoServerError {
-    return (
-      typeof exception === 'object' &&
-      exception !== null &&
-      'type' in exception &&
-      (exception as { type: string }).type === 'MongoServerError'
-    );
-  }
   private getUuid(exception: unknown) {
     if (process.env.SENTRY_DSN) {
       try {
@@ -146,17 +135,6 @@ function handleZod(exception: ZodError) {
   };
 
   return { status, message };
-}
-function handleMongo(exception: MongoServerError) {
-  const status = HttpStatus.INTERNAL_SERVER_ERROR; // Set appropriate status for ZodError
-
-  let msg = `MongoDB Error: Code: ${exception.code}, Message: ${exception.errmsg}`;
-  if (exception.writeErrors) {
-    msg += `, Write Errors: ${exception.writeErrors.map((err) => `Index: ${err.index}, Message: ${err.errmsg}`).join('; ')}`;
-  }
-  msg += `, Operation Time: ${exception.operationTime || 'N/A'}, Cluster Time: ${exception.clusterTime || 'N/A'}`;
-
-  return { status, message: msg };
 }
 
 function handleCommandValidation(exception: CommandValidationException) {

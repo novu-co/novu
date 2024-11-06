@@ -2598,6 +2598,9 @@ importers:
       '@sentry/node':
         specifier: ^8.33.1
         version: 8.33.1
+      '@team-plain/typescript-sdk':
+        specifier: 5.4.3
+        version: 5.4.3
       axios:
         specifier: ^1.6.8
         version: 1.6.8
@@ -16177,6 +16180,9 @@ packages:
   '@taskforcesh/bullmq-pro@5.1.14':
     resolution: {integrity: sha512-J/83Q1GTFWbUWn1bpsiX+CcQXktp7ADg/d1oID+wQ8ZwSB2W5l/1FV4yR1BEi3sO+UFEo+rK3qfXQuDml7aBYA==, tarball: https://npm.taskforce.sh/@taskforcesh/bullmq-pro/-/@taskforcesh/bullmq-pro-5.1.14.tgz}
 
+  '@team-plain/typescript-sdk@5.4.3':
+    resolution: {integrity: sha512-660VeutTdaspdzsgpLHKhYsBxX0BOH/O4r0FTi1HD67QyHnKeaMRbxBAen7Yi+vpcpBc3gJGq4HtgHWPZ5WEoA==}
+
   '@testing-library/dom@10.4.0':
     resolution: {integrity: sha512-pemlzrSESWbdAloYml3bAJMEfNh1Z7EduzqPKprCH5S341frlpYnUEW0H72dLxa6IsYr+mPno20GiSm+h9dEdQ==}
     engines: {node: '>=18'}
@@ -29629,7 +29635,6 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
-
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qrcode.react@3.1.0:
@@ -44348,7 +44353,6 @@ snapshots:
   '@graphql-typed-document-node/core@3.2.0(graphql@16.9.0)':
     dependencies:
       graphql: 16.9.0
-    optional: true
 
   '@grpc/grpc-js@1.11.1':
     dependencies:
@@ -56069,6 +56073,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
     optional: true
+
+  '@team-plain/typescript-sdk@5.4.3':
+    dependencies:
+      '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
+      ajv: 8.13.0
+      ajv-formats: 2.1.1(ajv@8.13.0)
+      graphql: 16.9.0
+      lodash.get: 4.4.2
+      zod: 3.22.4
 
   '@testing-library/dom@10.4.0':
     dependencies:
