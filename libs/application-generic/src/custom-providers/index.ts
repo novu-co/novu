@@ -78,7 +78,7 @@ export const distributedLockService = {
       cacheInMemoryProviderService.useFactory();
 
     const service = new DistributedLockService(
-      factoryCacheInMemoryProviderService
+      factoryCacheInMemoryProviderService,
     );
 
     await service.initialize();
