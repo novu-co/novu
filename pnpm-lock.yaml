@@ -2295,6 +2295,9 @@ importers:
       '@novu/ee-dal':
         specifier: workspace:*
         version: link:../dal
+      '@novu/notifications':
+        specifier: workspace:*
+        version: link:../../../libs/notifications
       '@novu/shared':
         specifier: workspace:*
         version: link:../../../packages/shared
