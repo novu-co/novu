@@ -463,7 +463,7 @@ describe('Workflow Controller E2E API Testing', () => {
   });
 
   describe('Get Test Data Permutations', () => {
-    it('should get step payload variables', async () => {
+    it('should get test data', async () => {
       const steps = [
         {
           ...buildEmailStep(),
