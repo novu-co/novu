@@ -6,11 +6,13 @@ import { GetStepDataCommand } from './get-step-data.command';
 import { mapStepTypeToResult } from '../../shared';
 import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { InvalidStepException } from '../../exceptions/invalid-step.exception';
+import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
 
 @Injectable()
 export class GetStepDataUsecase {
   constructor(
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
+    private buildDefaultPayloadUseCase: BuildDefaultPayloadUseCase,
     private controlValuesRepository: ControlValuesRepository
   ) {}
 
@@ -21,18 +23,28 @@ export class GetStepDataUsecase {
     if (!currentStep.name || !currentStep._templateId || !currentStep.stepId) {
       throw new InvalidStepException(currentStep);
     }
+    const controlValues = await this.getValues(command, currentStep, workflow._id);
+    const payloadSchema = this.buildPayloadSchema(controlValues);
 
     return {
       controls: {
         dataSchema: currentStep.template?.controls?.schema,
         uiSchema: currentStep.template?.controls?.uiSchema,
-        values: await this.getValues(command, currentStep, workflow._id),
+        values: controlValues,
       },
-      variables: buildVariablesSchema(previousSteps),
+      variables: buildVariablesSchema(previousSteps, payloadSchema),
       name: currentStep.name,
       _id: currentStep._templateId,
       stepId: currentStep.stepId,
     };
+  }
+
+  private buildPayloadSchema(controlValues: Record<string, any>) {
+    const payloadVariables = this.buildDefaultPayloadUseCase.execute({
+      controlValues,
+    }).previewPayload.payload;
+
+    return buildStringSchema(payloadVariables || {});
   }
 
   private async fetchWorkflow(command: GetStepDataCommand) {
@@ -108,12 +120,16 @@ const buildSubscriberSchema = () =>
     additionalProperties: false,
   }) as const satisfies JSONSchema;
 
-function buildVariablesSchema(previousSteps?: NotificationStepEntity[]): JSONSchema {
+function buildVariablesSchema(
+  previousSteps: NotificationStepEntity[] | undefined,
+  payloadSchema: JSONSchema
+): JSONSchema {
   return {
     type: 'object',
     properties: {
       subscriber: buildSubscriberSchema(),
       steps: buildPreviousStepsSchema(previousSteps),
+      payload: payloadSchema,
     },
     additionalProperties: false,
   } as const satisfies JSONSchema;
@@ -141,4 +157,23 @@ function buildPreviousStepsSchema(previousSteps: NotificationStepEntity[] | unde
     additionalProperties: false,
     description: 'Previous Steps Results',
   } as const satisfies JSONSchema;
+}
+
+/**
+ * Builds a JSON schema object where each variable becomes a string property.
+ */
+function buildStringSchema(variables: Record<string, unknown>): JSONSchema {
+  const properties: Record<string, JSONSchema> = {};
+
+  for (const [variableKey, variableValue] of Object.entries(variables)) {
+    properties[variableKey] = {
+      type: 'string',
+      default: variableValue,
+    };
+  }
+
+  return {
+    type: 'object',
+    properties,
+  };
 }

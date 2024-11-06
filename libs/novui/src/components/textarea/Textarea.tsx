@@ -11,7 +11,7 @@ import { DEFAULT_TEXT_INPUT_TYPE, TextInputType } from '../input';
 export interface TextareaProps
   extends JsxStyleProps,
     CoreProps,
-    Pick<ExternalTextareaProps, 'leftSection'>,
+    Pick<ExternalTextareaProps, 'leftSection' | 'minRows' | 'maxRows'>,
     Partial<InputVariant> {
   label?: LocalizedMessage;
   description?: LocalizedMessage;

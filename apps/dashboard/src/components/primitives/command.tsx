@@ -3,7 +3,7 @@ import { type DialogProps } from '@radix-ui/react-dialog';
 import { Command as CommandPrimitive } from 'cmdk';
 
 import { cn } from '@/utils/ui';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/primitives/dialog';
 import { inputVariants } from '@/components/primitives/variants';
 import { InputField } from '@/components/primitives/input';
 
