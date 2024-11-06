@@ -5,18 +5,11 @@ const LOG_CONTEXT = 'SupportService';
 
 export class SupportService {
   private plainClient: PlainClient;
-  constructor(private plainKey?: string | null) {}
-
-  async initialize() {
+  constructor(private plainKey?: string | null) {
     if (this.plainKey) {
       this.plainClient = new PlainClient({
         apiKey: this.plainKey,
       });
-    } else {
-      Logger.error(
-        'Missing Plain API key: Unable to perform support operations. Please ensure the API key is set in the environment variables.',
-        LOG_CONTEXT,
-      );
     }
   }
 
