@@ -1,21 +1,23 @@
 import { workflow } from '@novu/framework';
 import { z } from 'zod';
-import { renderEmail } from './email';
+import { renderUsageLimitsEmail } from './email';
 
-export const testWorkflow = workflow(
+export const usageLimitsWorkflow = workflow(
   'usage-limits',
   async ({ step }) => {
     await step.email('email', async (controls) => {
       return {
         subject: 'You have reached your usage limits',
-        body: await renderEmail(controls),
+        body: await renderUsageLimitsEmail(controls),
       };
     });
   },
   {
     name: 'Usage Limits Alert',
     payloadSchema: z.object({
+      name: z.string().optional(),
       email: z.string(),
+      upgradeUrl: z.string().optional(),
     }),
   }
 );

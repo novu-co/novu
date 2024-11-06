@@ -3,17 +3,13 @@ import { DynamicModule, Logger, Module, Provider } from '@nestjs/common';
 import { ForwardReference } from '@nestjs/common/interfaces/modules/forward-reference.interface';
 import { Type } from '@nestjs/common/interfaces/type.interface';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import {
-  GracefulShutdownConfigModule,
-  ProfilingModule,
-  TracingModule,
-  getNovuNotificationsModule,
-} from '@novu/application-generic';
+import { GracefulShutdownConfigModule, ProfilingModule, TracingModule } from '@novu/application-generic';
 import { NovuModule, workflow } from '@novu/framework/nest';
 
 import { isClerkEnabled } from '@novu/shared';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { ApiExcludeController } from '@nestjs/swagger';
+import { usageLimitsWorkflow } from '@novu/notifications';
 import packageJson from '../package.json';
 import { AnalyticsModule } from './app/analytics/analytics.module';
 import { AuthModule } from './app/auth/auth.module';
@@ -53,7 +49,6 @@ import { WidgetsModule } from './app/widgets/widgets.module';
 import { WorkflowOverridesModule } from './app/workflow-overrides/workflow-overrides.module';
 import { WorkflowModuleV1 } from './app/workflows-v1/workflow-v1.module';
 import { WorkflowModule } from './app/workflows-v2/workflow.module';
-import { testWorkflow } from './app/novu/workflows/usage-limits.workflow';
 
 const enterpriseImports = (): Array<Type | DynamicModule | Promise<DynamicModule> | ForwardReference> => {
   const modules: Array<Type | DynamicModule | Promise<DynamicModule> | ForwardReference> = [];
@@ -161,7 +156,7 @@ modules.push(
   NovuModule.register({
     apiPath: '/api/novu',
     controllerDecorators: [ApiExcludeController()],
-    workflows: [testWorkflow],
+    workflows: [usageLimitsWorkflow],
   })
 );
 
