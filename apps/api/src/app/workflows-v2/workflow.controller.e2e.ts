@@ -424,6 +424,61 @@ describe('Workflow Controller E2E API Testing', () => {
     });
   });
 
+  describe('Get Test Data Permutations', () => {
+    it('should get step payload variables', async () => {
+      const steps = [
+        {
+          ...buildEmailStep(),
+          controlValues: {
+            body: 'Welcome to our newsletter {{bodyText}}{{bodyText2}}{{payload.emailPrefixBodyText}}',
+            subject: 'Welcome to our newsletter {{subjectText}} {{payload.prefixSubjectText}}',
+          },
+        },
+        { ...buildInAppStep(), controlValues: { subject: 'Welcome to our newsletter {{payload.inAppSubjectText}}' } },
+      ];
+      const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('', { steps });
+      const res = await session.testAgent.post(`${v2Prefix}/workflows`).send(createWorkflowDto);
+      expect(res.status).to.be.equal(201);
+      const workflowCreated: WorkflowResponseDto = res.body.data;
+      const workflowTestData = await getWorkflowTestData(workflowCreated._id);
+
+      expect(workflowTestData).to.be.ok;
+      expect(workflowTestData.payload).to.deep.equal({
+        type: 'object',
+        properties: {
+          emailPrefixBodyText: {
+            type: 'string',
+            default: '{{payload.emailPrefixBodyText}}',
+          },
+          prefixSubjectText: {
+            type: 'string',
+            default: '{{payload.prefixSubjectText}}',
+          },
+          inAppSubjectText: {
+            type: 'string',
+            default: '{{payload.inAppSubjectText}}',
+          },
+        },
+      });
+      expect(workflowTestData.to).to.deep.equal({
+        type: 'object',
+        properties: {
+          subscriberId: {
+            type: 'string',
+            default: `${session.user._id}`,
+          },
+          email: {
+            type: 'string',
+            default: `${session.user.email}`,
+            format: 'email',
+          },
+        },
+        required: ['subscriberId', 'email'],
+        additionalProperties: false,
+      });
+    });
+  });
+
   async function updateWorkflowRest(id: string, workflow: UpdateWorkflowDto): Promise<WorkflowResponseDto> {
     const novuRestResult = await workflowsClient.updateWorkflow(id, workflow);
     if (novuRestResult.isSuccessResult()) {
@@ -475,6 +530,18 @@ describe('Workflow Controller E2E API Testing', () => {
     const novuRestResult = await createWorkflowClient(session.serverUrl, getHeaders(envId)).getWorkflowStepData(
       workflowId,
       stepId
+    );
+    if (!novuRestResult.isSuccessResult()) {
+      throw new Error(novuRestResult.error!.responseText);
+    }
+    const { value } = novuRestResult;
+
+    return value;
+  }
+
+  async function getWorkflowTestData(workflowId: string, envId?: string) {
+    const novuRestResult = await createWorkflowClient(session.serverUrl, getHeaders(envId)).getWorkflowTestData(
+      workflowId
     );
     if (!novuRestResult.isSuccessResult()) {
       throw new Error(novuRestResult.error!.responseText);
