@@ -1441,7 +1441,7 @@ describe('Novu Client', () => {
       expect(metadata.duration).toEqual(expect.any(Number));
     });
 
-    it('should preview workflow successfully when action is preview and a non-first step is targeted', async () => {
+    it('should preview a non-first step in a workflow successfully when action is preview', async () => {
       const newWorkflow = workflow('test-workflow', async ({ step }) => {
         await step.delay(
           'delay-step',
@@ -1465,7 +1465,7 @@ describe('Novu Client', () => {
           }
         );
 
-        await step.inApp('send-email', async () => ({ body: 'Test Body', subject: 'Subject' }));
+        await step.inApp('send-in-app', async () => ({ body: 'Test Body', subject: 'Subject' }));
       });
 
       client.addWorkflows([newWorkflow]);
@@ -1473,7 +1473,7 @@ describe('Novu Client', () => {
       const event: Event = {
         action: PostActionEnum.PREVIEW,
         workflowId: 'test-workflow',
-        stepId: 'send-email',
+        stepId: 'send-in-app',
         subscriber: {},
         state: [],
         payload: {},
