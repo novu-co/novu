@@ -728,7 +728,14 @@ export class Client {
         const suppliedResult = this.getStepState(event, step.stepId);
 
         if (suppliedResult) {
-          mockResult = suppliedResult.outputs;
+          mockResult = await this.validate(
+            suppliedResult.outputs,
+            step.results.unknownSchema,
+            'step',
+            'result',
+            event.workflowId,
+            step.stepId
+          );
         } else {
           mockResult = this.mock(step.results.schema);
         }
