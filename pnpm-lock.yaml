@@ -43722,6 +43722,19 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.3
 
+  '@emotion/styled@11.10.6(@emotion/react@11.11.1(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)':
+    dependencies:
+      '@babel/runtime': 7.23.2
+      '@emotion/babel-plugin': 11.10.6
+      '@emotion/is-prop-valid': 1.2.0
+      '@emotion/react': 11.11.1(@types/react@18.3.3)(react@18.3.1)
+      '@emotion/serialize': 1.1.1
+      '@emotion/use-insertion-effect-with-fallbacks': 1.0.0(react@18.3.1)
+      '@emotion/utils': 1.2.0
+      react: 18.3.1
+    optionalDependencies:
+      '@types/react': 18.3.3
+
   '@emotion/unitless@0.7.5': {}
 
   '@emotion/unitless@0.8.0': {}
@@ -44514,8 +44527,8 @@ snapshots:
 
   '@hookform/devtools@4.3.1(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@emotion/react': 11.10.6(@types/react@18.3.3)(react@18.3.1)
-      '@emotion/styled': 11.10.6(@emotion/react@11.10.6(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
+      '@emotion/react': 11.11.1(@types/react@18.3.3)(react@18.3.1)
+      '@emotion/styled': 11.10.6(@emotion/react@11.11.1(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
       '@types/lodash': 4.14.192
       little-state-machine: 4.8.0(react@18.3.1)
       lodash: 4.17.21
