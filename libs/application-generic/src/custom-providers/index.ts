@@ -92,7 +92,6 @@ export const supportService = {
   provide: SupportService,
   useFactory: async () => {
     const service = new SupportService(process.env.PLAIN_SUPPORT_KEY);
-    await service.initialize();
 
     return service;
   },
