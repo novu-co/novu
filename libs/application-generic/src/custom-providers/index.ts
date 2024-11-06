@@ -91,7 +91,7 @@ export const distributedLockService = {
 export const supportService = {
   provide: SupportService,
   useFactory: async () => {
-    const service = new SupportService(process.env.PLAIN_SUPPORT_KEY);
+    const service = new SupportService();
 
     return service;
   },

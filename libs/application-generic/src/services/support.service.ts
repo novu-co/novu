@@ -5,12 +5,11 @@ const LOG_CONTEXT = 'SupportService';
 
 export class SupportService {
   private plainClient: PlainClient;
-  constructor(private plainKey?: string | null) {
-    if (this.plainKey) {
-      this.plainClient = new PlainClient({
-        apiKey: this.plainKey,
-      });
-    }
+  private readonly plainKey: string;
+  constructor() {
+    this.plainKey = process.env.PLAIN_SUPPORT_KEY;
+    this.plainClient = new PlainClient({ apiKey: this.plainKey });
+    Logger.log(`Initialized PlainClient`, LOG_CONTEXT);
   }
 
   async upsertCustomer({ emailAddress, fullName, novuUserId }) {
@@ -27,7 +26,7 @@ export class SupportService {
         fullName,
       },
       onUpdate: {
-        externalId: novuUserId,
+        externalId: { value: novuUserId },
         email: {
           email: emailAddress,
           isVerified: true,
@@ -41,7 +40,7 @@ export class SupportService {
       Logger.error(
         { emailAddress, fullName, error: res.error },
         res.error.message,
-        LOG_CONTEXT,
+        LOG_CONTEXT
       );
       throw new Error(res.error.message);
     } else {
@@ -67,7 +66,7 @@ export class SupportService {
       Logger.error(
         { plainCustomerId, threadText, error: res.error },
         res.error.message,
-        LOG_CONTEXT,
+        LOG_CONTEXT
       );
       throw new Error(res.error.message);
     } else {
