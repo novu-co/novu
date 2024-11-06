@@ -157,7 +157,7 @@ export class UpsertWorkflowUseCase {
     command: UpsertWorkflowCommand
   ): Promise<PreferencesEntity> {
     let preferences: WorkflowPreferences | null;
-    if (command.workflowDto.preferences?.user !== undefined) {
+    if (command.workflowDto.preferences?.user) {
       preferences = command.workflowDto.preferences.user;
     } else {
       preferences = DEFAULT_WORKFLOW_PREFERENCES;

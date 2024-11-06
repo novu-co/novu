@@ -2,19 +2,17 @@ import { useState } from 'react';
 import { RiEdit2Line, RiInformationFill, RiPencilRuler2Line } from 'react-icons/ri';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useNavigate } from 'react-router-dom';
-import { useFormContext } from 'react-hook-form';
-import * as z from 'zod';
+
 import { liquid } from '@codemirror/lang-liquid';
 import { EditorView } from '@uiw/react-codemirror';
 import { RedirectTargetEnum } from '@novu/shared';
-
 import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Notification5Fill } from '@/components/icons';
 import { AvatarPicker } from '@/components/primitives/form/avatar-picker';
 import { InputField } from '@/components/primitives/input';
-import { workflowSchema } from '../schema';
+
 import { ActionPicker } from '../action-picker';
 import { URLInput } from '@/components/primitives/url-input';
 import { urlTargetTypes } from '@/utils/url';
@@ -24,7 +22,6 @@ const tabsContentClassName = 'h-full w-full px-3 py-3.5';
 
 export const InAppEditor = () => {
   const navigate = useNavigate();
-  const { formState } = useFormContext<z.infer<typeof workflowSchema>>();
 
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
@@ -129,18 +126,6 @@ export const InAppEditor = () => {
       <TabsContent value="preview" className={tabsContentClassName}>
         <div>Preview</div>
       </TabsContent>
-      <Separator />
-      <footer className="flex justify-end px-3 py-3.5">
-        <Button
-          className="ml-auto"
-          variant="default"
-          type="submit"
-          form="create-workflow"
-          disabled={!formState.isDirty}
-        >
-          Save step
-        </Button>
-      </footer>
     </Tabs>
   );
 };
