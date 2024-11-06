@@ -14,7 +14,6 @@ export enum DetailEnum {
   MESSAGE_CONTENT_SYNTAX_ERROR = 'Message content could not be generated due to syntax error in email editor',
   MESSAGE_CREATED = 'Message created',
   SUCCESSFUL_BRIDGE_RESPONSE_RECEIVED = 'Successful Bridge response received',
-  FAILED_BRIDGE_RETRY = 'Failed to get response from Bridge, will be retried',
   FAILED_BRIDGE_EXECUTION = 'Bridge execution failed',
   SUBSCRIBER_NO_ACTIVE_INTEGRATION = 'Subscriber does not have an active integration',
   LAYOUT_NOT_FOUND = 'Layout not found ',

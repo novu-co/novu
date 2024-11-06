@@ -121,11 +121,16 @@ export class ExecuteBridgeRequest {
       timeout: DEFAULT_TIMEOUT,
       json: command.event,
       retry: {
-        calculateDelay: ({
-          attemptCount,
-        }: {
-          attemptCount: number;
-        }): number => {
+        calculateDelay: ({ attemptCount, computedValue }) => {
+          if (computedValue === 0) {
+            /*
+             * If the computed value is 0, the retry conditions were not met and we don't want to retry.
+             *
+             * @see https://github.com/sindresorhus/got/blob/3034c2fdcebdff94907a6e015a8b154e851fc343/documentation/7-retry.md?plain=1#L130
+             */
+            return 0;
+          }
+
           if (attemptCount === retriesLimit) {
             return 0;
           }
