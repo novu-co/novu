@@ -24,7 +24,7 @@ export class GetStepDataUsecase {
       throw new InvalidStepException(currentStep);
     }
     const controlValues = await this.getValues(command, currentStep, workflow._id);
-    const payloadSchema = this.buildPayloadScehma(controlValues);
+    const payloadSchema = this.buildPayloadSchema(controlValues);
 
     return {
       controls: {
@@ -39,7 +39,7 @@ export class GetStepDataUsecase {
     };
   }
 
-  private buildPayloadScehma(controlValues: Record<string, any>) {
+  private buildPayloadSchema(controlValues: Record<string, any>) {
     const payloadVariables = this.buildDefaultPayloadUseCase.execute({
       controlValues,
     }).previewPayload.payload;
