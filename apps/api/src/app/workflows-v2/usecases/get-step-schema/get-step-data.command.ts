@@ -5,7 +5,7 @@ import { IdentifierOrInternalId } from '@novu/shared';
 export class GetStepDataCommand extends EnvironmentWithUserObjectCommand {
   @IsString()
   @IsNotEmpty()
-  workflowId: IdentifierOrInternalId;
+  identifierOrInternalId: IdentifierOrInternalId;
 
   @IsString()
   @IsNotEmpty()

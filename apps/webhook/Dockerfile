@@ -1,50 +1,66 @@
-# Use the base image for development
-FROM ghcr.io/novuhq/novu/base:1.0.0 AS dev
+FROM node:20-alpine3.19 AS dev_base
+RUN apk add g++ make py3-pip
+ENV NX_DAEMON=false
+
+RUN npm i pm2 -g
+RUN npm --no-update-notifier --no-fund --global install pnpm@9.11.0
+RUN pnpm --version
+
+USER 1000
+WORKDIR /usr/src/app
+
+# ------- DEV BUILD ----------
+FROM dev_base AS dev
 ARG PACKAGE_PATH
 
-# Copy necessary directories to the image with appropriate ownership
-COPY --chown=1000:1000 ./meta ./deps ./pkg ./
 
-# Install dependencies and build the webhook service
-RUN --mount=type=cache,id=pnpm-store-webhook,target=/root/.pnpm-store \
-    pnpm install --reporter=silent --filter "novuhq" --filter "{${PACKAGE_PATH}}..." \
-    --frozen-lockfile --unsafe-perm --reporter=silent && \
-    NODE_ENV=production pnpm build:webhook
+COPY --chown=1000:1000 ./meta .
+COPY --chown=1000:1000 ./deps .
+COPY --chown=1000:1000 ./pkg .
 
-# Set the working directory to the webhook app and copy example environment file
+RUN --mount=type=cache,id=pnpm-store-webhook,target=/root/.pnpm-store\
+ pnpm install --reporter=silent --filter "novuhq" --filter "{${PACKAGE_PATH}}..."\
+ --frozen-lockfile\
+ --unsafe-perm\
+ --reporter=silent
+
+RUN NODE_ENV=production pnpm build:webhook
+
 WORKDIR /usr/src/app/apps/webhook
-RUN cp src/.example.env dist/.env
 
-# Set the working directory to the root of the app
+RUN cp src/.example.env dist/.env
+RUN cp src/.env.test dist/.env.test
+RUN cp src/.env.development dist/.env.development
+RUN cp src/.env.production dist/.env.production
+
 WORKDIR /usr/src/app
 
 # ------- ASSETS BUILD ----------
-# Create a new stage for building assets
 FROM dev AS assets
 
-# Remove node_modules and source directories
+WORKDIR /usr/src/app
+
+# Remove all dependencies so later we can only install prod dependencies without devDependencies
 RUN rm -rf node_modules && pnpm recursive exec -- rm -rf ./src ./node_modules
 
 # ------- PRODUCTION BUILD ----------
-# Use the base image for production
-FROM ghcr.io/novuhq/novu/base:1.0.0 AS prod
+FROM dev_base AS prod
 ARG PACKAGE_PATH
 
-# Set environment variables for production
 ENV CI=true
 
-# Set the working directory to the root of the app
 WORKDIR /usr/src/app
 
-# Copy necessary directories from the build stage
-COPY --chown=1000:1000 ./meta ./
+COPY --chown=1000:1000 ./meta .
+
+# Get the build artifacts that only include dist folders
 COPY --chown=1000:1000 --from=assets /usr/src/app .
 
-# Install production dependencies
-RUN --mount=type=cache,id=pnpm-store-webhook,target=/root/.pnpm-store \
-    pnpm install --reporter=silent --filter "{${PACKAGE_PATH}}..." \
-    --frozen-lockfile --unsafe-perm --prod --reporter=silent
+RUN --mount=type=cache,id=pnpm-store-webhook,target=/root/.pnpm-store\
+ pnpm install --reporter=silent --filter "{${PACKAGE_PATH}}..."\
+ --frozen-lockfile\
+ --unsafe-perm\
+ --reporter=silent
 
-# Set the working directory to the webhook app and start the application using pm2-runtime
 WORKDIR /usr/src/app/apps/webhook
-CMD [ "pm2-runtime", "start", "dist/main.js" ]
+CMD [ "pm2-runtime", "dist/main.js" ]

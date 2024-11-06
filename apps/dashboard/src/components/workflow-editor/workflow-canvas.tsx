@@ -70,7 +70,7 @@ const mapStepToNode = (
       name: step.name,
       content,
       addStepIndex,
-      stepId: step._id,
+      stepSlug: step.slug,
       error,
     },
     type: step.type,

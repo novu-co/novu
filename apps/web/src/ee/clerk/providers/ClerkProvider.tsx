@@ -197,9 +197,6 @@ const CLERK_MODAL_ELEMENT = {
   pageScrollBox: {
     padding: '0',
   },
-  profileSectionItemList__organizationDomains: {
-    display: 'none',
-  },
   userButtonPopoverMain: {
     backgroundColor: 'var(--nv-colors-surface-panel-subsection)',
     boxShadow: 'unset !important',
