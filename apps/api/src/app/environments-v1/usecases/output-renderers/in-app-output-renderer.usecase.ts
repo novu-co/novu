@@ -2,10 +2,12 @@
 import { InAppRenderOutput, RedirectTargetEnum } from '@novu/shared';
 import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
+import { InstrumentUsecase } from '@novu/application-generic';
 import { RenderCommand } from './render-command';
 
 @Injectable()
 export class InAppOutputRendererUsecase {
+  @InstrumentUsecase()
   execute(renderCommand: RenderCommand): InAppRenderOutput {
     const inApp = InAppRenderOutputSchema.parse(renderCommand.controlValues);
 

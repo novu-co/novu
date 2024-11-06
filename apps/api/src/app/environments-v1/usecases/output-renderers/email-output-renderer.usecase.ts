@@ -2,6 +2,7 @@ import { EmailRenderOutput, TipTapNode } from '@novu/shared';
 import { render } from '@maily-to/render';
 import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
+import { InstrumentUsecase } from '@novu/application-generic';
 import { RenderCommand } from './render-command';
 import { ExpandEmailEditorSchemaUsecase } from './email-schema-expander.usecase';
 
@@ -9,6 +10,7 @@ import { ExpandEmailEditorSchemaUsecase } from './email-schema-expander.usecase'
 export class EmailOutputRendererUsecase {
   constructor(private expendEmailEditorSchemaUseCase: ExpandEmailEditorSchemaUsecase) {}
 
+  @InstrumentUsecase()
   async execute(renderCommand: RenderCommand): Promise<EmailRenderOutput> {
     const parse = EmailStepControlSchema.parse(renderCommand.controlValues);
     const schema = parse.emailEditor as TipTapNode;

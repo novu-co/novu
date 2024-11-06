@@ -101,6 +101,7 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
       [HttpHeaderKeysEnum.NOVU_FRAMEWORK_VERSION]: FRAMEWORK_VERSION,
       [HttpHeaderKeysEnum.NOVU_FRAMEWORK_SDK]: SDK_VERSION,
       [HttpHeaderKeysEnum.NOVU_FRAMEWORK_SERVER]: this.frameworkName,
+      [HttpHeaderKeysEnum.NOVU_FRAMEWORK_LANGUAGE]: 'typescript',
       [HttpHeaderKeysEnum.USER_AGENT]: sdkVersion,
     };
   }

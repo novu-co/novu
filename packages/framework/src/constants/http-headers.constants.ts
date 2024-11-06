@@ -4,6 +4,7 @@ export enum HttpHeaderKeysEnum {
   NOVU_FRAMEWORK_SDK = 'novu-framework-sdk',
   NOVU_FRAMEWORK_SERVER = 'novu-framework-server',
   NOVU_FRAMEWORK_VERSION = 'novu-framework-version',
+  NOVU_FRAMEWORK_LANGUAGE = 'novu-framework-language',
   USER_AGENT = 'user-agent',
   CONTENT_TYPE = 'content-type',
   ACCESS_CONTROL_ALLOW_ORIGIN = 'access-control-allow-origin',

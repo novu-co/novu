@@ -27,7 +27,7 @@ import {
   GetActionEnum,
   isFrameworkError,
 } from '@novu/framework/internal';
-import { EnvironmentRepository } from '@novu/dal';
+import { EnvironmentEntity, EnvironmentRepository } from '@novu/dal';
 import { HttpRequestHeaderKeysEnum, WorkflowOriginEnum } from '@novu/shared';
 import {
   ExecuteBridgeRequestCommand,
@@ -38,6 +38,10 @@ import {
   GetDecryptedSecretKeyCommand,
 } from '../get-decrypted-secret-key';
 import { BRIDGE_EXECUTION_ERROR } from '../../utils';
+import { Instrument, InstrumentUsecase } from '../../instrumentation';
+
+// eslint-disable-next-line global-require
+const nr = require('newrelic') as typeof import('newrelic');
 
 export const DEFAULT_TIMEOUT = 5_000; // 5 seconds
 export const DEFAULT_RETRIES_LIMIT = 3;
@@ -84,18 +88,14 @@ export class ExecuteBridgeRequest {
     private getDecryptedSecretKey: GetDecryptedSecretKey,
   ) {}
 
+  @InstrumentUsecase({
+    buildTransactionIdSuffix: (command: ExecuteBridgeRequestCommand) =>
+      `${command.action}`,
+  })
   async execute<T extends PostActionEnum | GetActionEnum>(
     command: ExecuteBridgeRequestCommand,
   ): Promise<ExecuteBridgeRequestDto<T>> {
-    const environment = await this.environmentRepository.findOne({
-      _id: command.environmentId,
-    });
-
-    if (!environment) {
-      throw new NotFoundException(
-        `Environment ${command.environmentId} not found`,
-      );
-    }
+    const environment = await this.getEnvironment(command.environmentId);
 
     const bridgeUrl = this.getBridgeUrl(
       environment.bridge?.url || environment.echo?.url,
@@ -134,6 +134,7 @@ export class ExecuteBridgeRequest {
         },
         statusCodes: RETRYABLE_HTTP_CODES,
         errorCodes: RETRYABLE_ERROR_CODES,
+        limit: retriesLimit - 1,
       },
       hooks: {
         afterResponse:
@@ -158,15 +159,45 @@ export class ExecuteBridgeRequest {
 
     Logger.log(`Making bridge request to \`${url}\``, LOG_CONTEXT);
     try {
-      return await request(url, {
+      const response = await request(url, {
         ...options,
         headers,
-      }).json();
+      });
+
+      const body = JSON.parse(response.body) as ExecuteBridgeRequestDto<T>;
+
+      this.recordBridgeAttributes({
+        url: bridgeUrl,
+        action: command.action,
+        statusCode: response.statusCode,
+        responseHeaders: response.headers as Record<string, string>,
+        requestDuration: response.timings?.phases?.total,
+      });
+
+      Logger.log(`Bridge request to \`${url}\` completed`, LOG_CONTEXT);
+
+      return body;
     } catch (error) {
-      this.handleResponseError(error, url);
+      this.handleResponseError(error, bridgeUrl, command.action);
     }
   }
 
+  @Instrument()
+  private async getEnvironment(
+    environmentId: string,
+  ): Promise<EnvironmentEntity> {
+    const environment = await this.environmentRepository.findOne({
+      _id: environmentId,
+    });
+
+    if (!environment) {
+      throw new NotFoundException(`Environment ${environmentId} not found`);
+    }
+
+    return environment;
+  }
+
+  @Instrument()
   private async buildRequestHeaders(command: ExecuteBridgeRequestCommand) {
     const novuSignatureHeader = await this.buildRequestSignature(command);
 
@@ -177,6 +208,7 @@ export class ExecuteBridgeRequest {
     };
   }
 
+  @Instrument()
   private async buildRequestSignature(command: ExecuteBridgeRequestCommand) {
     const secretKey = await this.getDecryptedSecretKey.execute(
       GetDecryptedSecretKeyCommand.create({
@@ -257,8 +289,56 @@ export class ExecuteBridgeRequest {
     return apiUrl;
   }
 
-  private handleResponseError(error: unknown, url: string) {
+  private recordBridgeAttributes(data: {
+    url: string;
+    action: PostActionEnum | GetActionEnum;
+    statusCode: number;
+    responseHeaders: Record<string, string>;
+    requestDuration: number;
+  }) {
+    const metricObject = {
+      version: data.responseHeaders[HttpHeaderKeysEnum.NOVU_FRAMEWORK_VERSION],
+      server: data.responseHeaders[HttpHeaderKeysEnum.NOVU_FRAMEWORK_SERVER],
+      sdk: data.responseHeaders[HttpHeaderKeysEnum.NOVU_FRAMEWORK_SDK],
+      /*
+       * TODO: remove the `typescript` fallback after January 1 2025.
+       * This gives enough time for all users to upgrade to the new `@novu/framework` version.
+       */
+      language:
+        data.responseHeaders[HttpHeaderKeysEnum.NOVU_FRAMEWORK_LANGUAGE] ||
+        'typescript',
+      statusCode: data.statusCode,
+      url: data.url,
+
+      /*
+       * Timings in milliseconds
+       * TODO: add a timings header to the Bridge response and use it here
+       */
+      timingTotal: data.requestDuration,
+    };
+
+    Logger.verbose(
+      `Recording bridge attributes: ${JSON.stringify(metricObject)}`,
+      LOG_CONTEXT,
+    );
+
+    nr.addCustomAttributes(metricObject);
+  }
+
+  private handleResponseError(
+    error: unknown,
+    url: string,
+    action: PostActionEnum | GetActionEnum,
+  ) {
     if (error instanceof RequestError) {
+      this.recordBridgeAttributes({
+        url,
+        action,
+        statusCode: error.response?.statusCode || 500,
+        responseHeaders:
+          (error.response?.headers as Record<string, string>) || {},
+        requestDuration: error.response?.timings?.phases?.total,
+      });
       let body: Record<string, unknown>;
       try {
         body = JSON.parse(error.response.body as string);
@@ -273,7 +353,10 @@ export class ExecuteBridgeRequest {
       }
 
       if (error instanceof TimeoutError) {
-        Logger.error(`Bridge request timeout for \`${url}\``, LOG_CONTEXT);
+        Logger.error(
+          `Bridge request timeout for \`${url}\` and action \`${action}\``,
+          LOG_CONTEXT,
+        );
         throw new RequestTimeoutException({
           message: BRIDGE_EXECUTION_ERROR.BRIDGE_REQUEST_TIMEOUT.message(url),
           code: BRIDGE_EXECUTION_ERROR.BRIDGE_REQUEST_TIMEOUT.code,
@@ -281,7 +364,10 @@ export class ExecuteBridgeRequest {
       }
 
       if (error instanceof UnsupportedProtocolError) {
-        Logger.error(`Unsupported protocol for \`${url}\``, LOG_CONTEXT);
+        Logger.error(
+          `Unsupported protocol for \`${url}\` and action \`${action}\``,
+          LOG_CONTEXT,
+        );
         throw new BadRequestException({
           message: BRIDGE_EXECUTION_ERROR.UNSUPPORTED_PROTOCOL.message(url),
           code: BRIDGE_EXECUTION_ERROR.UNSUPPORTED_PROTOCOL.code,
@@ -290,7 +376,7 @@ export class ExecuteBridgeRequest {
 
       if (error instanceof ReadError) {
         Logger.error(
-          `Response body could not be read for \`${url}\``,
+          `Response body could not be read for \`${url}\` and action \`${action}\``,
           LOG_CONTEXT,
         );
         throw new BadRequestException({
@@ -301,7 +387,7 @@ export class ExecuteBridgeRequest {
 
       if (error instanceof UploadError) {
         Logger.error(
-          `Error uploading request body for \`${url}\``,
+          `Error uploading request body for \`${url}\` and action \`${action}\``,
           LOG_CONTEXT,
         );
         throw new BadRequestException({
@@ -311,7 +397,10 @@ export class ExecuteBridgeRequest {
       }
 
       if (error instanceof CacheError) {
-        Logger.error(`Error caching request for \`${url}\``, LOG_CONTEXT);
+        Logger.error(
+          `Error caching request for \`${url}\` and action \`${action}\``,
+          LOG_CONTEXT,
+        );
         throw new BadRequestException({
           message: BRIDGE_EXECUTION_ERROR.REQUEST_CACHE_ERROR.message(url),
           code: BRIDGE_EXECUTION_ERROR.REQUEST_CACHE_ERROR.code,
@@ -319,7 +408,10 @@ export class ExecuteBridgeRequest {
       }
 
       if (error instanceof MaxRedirectsError) {
-        Logger.error(`Maximum redirects exceeded for \`${url}\``, LOG_CONTEXT);
+        Logger.error(
+          `Maximum redirects exceeded for \`${url}\` and action \`${action}\``,
+          LOG_CONTEXT,
+        );
         throw new BadRequestException({
           message:
             BRIDGE_EXECUTION_ERROR.MAXIMUM_REDIRECTS_EXCEEDED.message(url),
@@ -329,7 +421,7 @@ export class ExecuteBridgeRequest {
 
       if (error instanceof ParseError) {
         Logger.error(
-          `Bridge URL response code is 2xx, but parsing body fails. \`${url}\``,
+          `Bridge URL response code is 2xx, but parsing body fails. \`${url}\` and action \`${action}\``,
           LOG_CONTEXT,
         );
         throw new BadRequestException({
@@ -343,7 +435,7 @@ export class ExecuteBridgeRequest {
         // Handle known tunnel errors
         const tunnelBody = body as TunnelResponseError;
         Logger.error(
-          `Could not establish tunnel connection for \`${url}\`. Error: \`${tunnelBody.message}\``,
+          `Could not establish tunnel connection for \`${url}\` and action \`${action}\`. Error: \`${tunnelBody.message}\``,
           LOG_CONTEXT,
         );
         throw new NotFoundException({
@@ -354,7 +446,7 @@ export class ExecuteBridgeRequest {
 
       if (error.code === 'DEPTH_ZERO_SELF_SIGNED_CERT') {
         Logger.error(
-          `Bridge URL is uing a self-signed certificate that is not allowed for production environments. \`${url}\``,
+          `Bridge URL is uing a self-signed certificate that is not allowed for production environments. \`${url}\` and action \`${action}\``,
           LOG_CONTEXT,
         );
         throw new BadRequestException({
@@ -369,7 +461,7 @@ export class ExecuteBridgeRequest {
          * 502 is thrown by the tunnel service when the Bridge endpoint is not reachable.
          */
         Logger.error(
-          `Local Bridge endpoint not found for \`${url}\``,
+          `Local Bridge endpoint not found for \`${url}\` and action \`${action}\``,
           LOG_CONTEXT,
         );
         throw new BadRequestException({
@@ -383,7 +475,10 @@ export class ExecuteBridgeRequest {
         error.response?.statusCode === 404 ||
         RETRYABLE_ERROR_CODES.includes(error.code)
       ) {
-        Logger.error(`Bridge endpoint unavailable for \`${url}\``, LOG_CONTEXT);
+        Logger.error(
+          `Bridge endpoint unavailable for \`${url}\` and action \`${action}\``,
+          LOG_CONTEXT,
+        );
 
         let codeToThrow: string;
         if (RETRYABLE_ERROR_CODES.includes(error.code)) {
@@ -400,7 +495,7 @@ export class ExecuteBridgeRequest {
 
       if (error.response?.statusCode === 405) {
         Logger.error(
-          `Bridge endpoint method not configured for \`${url}\``,
+          `Bridge endpoint method not configured for \`${url}\` and action \`${action}\``,
           LOG_CONTEXT,
         );
         throw new BadRequestException({
@@ -411,7 +506,7 @@ export class ExecuteBridgeRequest {
       }
 
       Logger.error(
-        `Unknown bridge request error calling \`${url}\`: \`${JSON.stringify(
+        `Unknown bridge request error calling \`${url}\` and action \`${action}\`: \`${JSON.stringify(
           body,
         )}\``,
         error,
@@ -420,7 +515,7 @@ export class ExecuteBridgeRequest {
       throw error;
     } else {
       Logger.error(
-        `Unknown bridge non-request error calling \`${url}\``,
+        `Unknown bridge non-request error calling \`${url}\` and action \`${action}\``,
         error,
         LOG_CONTEXT,
       );

@@ -2,7 +2,7 @@ import { Inject, Injectable, Scope } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { PostActionEnum, type Workflow } from '@novu/framework/internal';
 import { Client, NovuRequestHandler, NovuHandler } from '@novu/framework/nest';
-import { GetDecryptedSecretKey, GetDecryptedSecretKeyCommand } from '@novu/application-generic';
+import { GetDecryptedSecretKey, GetDecryptedSecretKeyCommand, InstrumentUsecase } from '@novu/application-generic';
 import { ConstructFrameworkWorkflow, ConstructFrameworkWorkflowCommand } from './usecases/construct-framework-workflow';
 
 /*
@@ -25,6 +25,7 @@ export class NovuBridgeClient {
     private getDecryptedSecretKey: GetDecryptedSecretKey
   ) {}
 
+  @InstrumentUsecase()
   public async handleRequest(req: Request, res: Response) {
     const secretKey = await this.getDecryptedSecretKey.execute(
       GetDecryptedSecretKeyCommand.create({

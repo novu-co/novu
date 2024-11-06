@@ -26,6 +26,8 @@ import {
   DetailEnum,
   ExecuteBridgeRequest,
   ExecuteBridgeRequestCommand,
+  Instrument,
+  InstrumentUsecase,
 } from '@novu/application-generic';
 import { ExecuteBridgeJobCommand } from './execute-bridge-job.command';
 
@@ -43,6 +45,7 @@ export class ExecuteBridgeJob {
     private executeBridgeRequest: ExecuteBridgeRequest
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: ExecuteBridgeJobCommand): Promise<ExecuteOutput | null> {
     const stepId = command.job.step.stepId || command.job.step.uuid;
 
@@ -68,22 +71,6 @@ export class ExecuteBridgeJob {
 
     if (!stepId) {
       throw new Error('Step id is not set');
-    }
-
-    const environment = await this.environmentRepository.findOne(
-      {
-        _id: command.environmentId,
-        _organizationId: command.organizationId,
-      },
-      'echo apiKeys _id'
-    );
-
-    if (!environment) {
-      throw new Error(`Environment id ${command.environmentId} is not found`);
-    }
-
-    if (!environment?.echo?.url && isStateful && workflow?.origin === WorkflowOriginEnum.EXTERNAL) {
-      throw new Error(`Bridge URL is not set for environment id: ${environment._id}`);
     }
 
     const { subscriber, payload: originalPayload } = command.variables || {};
@@ -137,6 +124,7 @@ export class ExecuteBridgeJob {
     return bridgeResponse;
   }
 
+  @Instrument()
   private async findControlValues(command: ExecuteBridgeJobCommand, workflow: NotificationTemplateEntity) {
     const controls = await this.controlValuesRepository.findOne({
       _organizationId: command.organizationId,
@@ -156,6 +144,7 @@ export class ExecuteBridgeJob {
     return payload;
   }
 
+  @Instrument()
   private async generateState(payload, command: ExecuteBridgeJobCommand): Promise<State[]> {
     const previousJobs: State[] = [];
     let theJob = (await this.jobRepository.findOne({
@@ -183,6 +172,7 @@ export class ExecuteBridgeJob {
     return previousJobs;
   }
 
+  @Instrument()
   private async sendBridgeRequest({
     statelessBridgeUrl,
     event,
@@ -288,6 +278,7 @@ export class ExecuteBridgeJob {
     }
   }
 
+  @Instrument()
   private async mapState(job: JobEntity, payload: Record<string, unknown>) {
     let output = {};
 

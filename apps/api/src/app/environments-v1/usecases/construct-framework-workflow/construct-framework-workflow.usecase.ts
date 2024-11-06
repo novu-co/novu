@@ -12,6 +12,7 @@ import {
 } from '@novu/framework/internal';
 import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import { StepTypeEnum } from '@novu/shared';
+import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { ConstructFrameworkWorkflowCommand } from './construct-framework-workflow.command';
 import {
   ChatOutputRendererUsecase,
@@ -32,6 +33,7 @@ export class ConstructFrameworkWorkflow {
     private pushOutputRendererUseCase: PushOutputRendererUsecase
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: ConstructFrameworkWorkflowCommand): Promise<Workflow> {
     const dbWorkflow = await this.getDbWorkflow(command.environmentId, command.workflowId);
     if (command.controlValues) {
@@ -43,6 +45,7 @@ export class ConstructFrameworkWorkflow {
     return this.constructFrameworkWorkflow(dbWorkflow);
   }
 
+  @Instrument()
   private constructFrameworkWorkflow(newWorkflow: NotificationTemplateEntity): Workflow {
     return workflow(
       newWorkflow.triggers[0].identifier,
@@ -175,6 +178,8 @@ export class ConstructFrameworkWorkflow {
       skip: (controlValues) => false,
     };
   }
+
+  @Instrument()
   private async getDbWorkflow(environmentId: string, workflowId: string): Promise<NotificationTemplateEntity> {
     const foundWorkflow = await this.workflowsRepository.findByTriggerIdentifier(environmentId, workflowId);
 
