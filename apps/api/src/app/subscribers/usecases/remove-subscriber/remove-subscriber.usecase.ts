@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { SubscriberRepository, DalException, TopicSubscribersRepository } from '@novu/dal';
-import { buildSubscriberKey, InvalidateCacheService } from '@novu/application-generic';
+import {
+  buildSubscriberKey,
+  buildFeedKey,
+  buildMessageCountKey,
+  InvalidateCacheService,
+} from '@novu/application-generic';
 
 import { RemoveSubscriberCommand } from './remove-subscriber.command';
 import { GetSubscriber } from '../get-subscriber';
@@ -24,12 +29,26 @@ export class RemoveSubscriber {
         subscriberId,
       });
 
-      await this.invalidateCache.invalidateByKey({
-        key: buildSubscriberKey({
-          subscriberId: command.subscriberId,
-          _environmentId: command.environmentId,
+      await Promise.all([
+        this.invalidateCache.invalidateByKey({
+          key: buildSubscriberKey({
+            subscriberId: command.subscriberId,
+            _environmentId: command.environmentId,
+          }),
         }),
-      });
+        this.invalidateCache.invalidateQuery({
+          key: buildFeedKey().invalidate({
+            subscriberId,
+            _environmentId: command.environmentId,
+          }),
+        }),
+        this.invalidateCache.invalidateQuery({
+          key: buildMessageCountKey().invalidate({
+            subscriberId,
+            _environmentId: command.environmentId,
+          }),
+        }),
+      ]);
 
       await this.subscriberRepository.delete({
         _environmentId: subscriber._environmentId,
