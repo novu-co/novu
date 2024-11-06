@@ -520,19 +520,19 @@ describe('validators', () => {
         testCases
           .filter((testCase) => testCase.schemas[schema] !== null)
           .forEach((testCase) => {
-            it(testCase.title, () => {
-              const result = transformSchema(testCase.schemas[schema] as Schema);
+            it(testCase.title, async () => {
+              const result = await transformSchema(testCase.schemas[schema] as Schema);
               expect(result).deep.contain(testCase.result);
             });
           });
       });
     });
 
-    it('should throw an error for invalid schema', () => {
+    it('should throw an error for invalid schema', async () => {
       const schema = { invalidKey: 'test' } as const;
 
       // @ts-expect-error - we are testing the type guard
-      expect(() => transformSchema(schema)).toThrow('Invalid schema');
+      await expect(transformSchema(schema)).rejects.toThrow('Invalid schema');
     });
   });
 });

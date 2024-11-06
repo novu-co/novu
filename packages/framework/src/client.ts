@@ -94,12 +94,13 @@ export class Client {
     return builtConfiguration;
   }
 
-  public addWorkflows(workflows: Array<Workflow>) {
+  public async addWorkflows(workflows: Array<Workflow>) {
     for (const workflow of workflows) {
-      if (this.discoveredWorkflows.some((existing) => existing.workflowId === workflow.definition.workflowId)) {
-        throw new WorkflowAlreadyExistsError(workflow.definition.workflowId);
+      const definition = await workflow.discover();
+      if (this.discoveredWorkflows.some((existing) => existing.workflowId === definition.workflowId)) {
+        throw new WorkflowAlreadyExistsError(definition.workflowId);
       } else {
-        this.discoveredWorkflows.push(workflow.definition);
+        this.discoveredWorkflows.push(definition);
       }
     }
   }

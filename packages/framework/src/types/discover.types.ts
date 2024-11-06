@@ -70,7 +70,7 @@ export type Workflow<T_Payload = any> = {
   trigger: (
     event: Prettify<Omit<EventTriggerParams<T_Payload>, 'workflowId' | 'bridgeUrl' | 'controls'>>
   ) => Promise<EventTriggerResult>;
-  definition: DiscoverWorkflowOutput;
+  discover: () => Promise<DiscoverWorkflowOutput>;
 };
 
 export type DiscoverOutput = {

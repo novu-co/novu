@@ -68,7 +68,7 @@ export class JsonSchemaValidator implements Validator<JsonSchema> {
     }
   }
 
-  transformToJsonSchema(schema: JsonSchema): JsonSchema {
+  async transformToJsonSchema(schema: JsonSchema): Promise<JsonSchema> {
     return schema;
   }
 }
