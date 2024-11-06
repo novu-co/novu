@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { usePreviewStep } from '@/hooks';
 import { InAppPreview } from '@/components/workflow-editor/in-app-preview';
 
-export function EditStepInAppPreview() {
+export function ConfigureInAppPreview() {
   const { previewStep, data } = usePreviewStep();
   const { workflowSlug, stepSlug } = useParams<{
     workflowSlug: string;

@@ -8,7 +8,7 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { StepTypeEnum } from '@/utils/enums';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { motion } from 'framer-motion';
-import { InApp } from './in-app/in-app';
+import { ConfigureInApp } from './in-app/configure-in-app';
 import { useStep } from './use-step';
 import Chat from './chat';
 
@@ -78,7 +78,7 @@ const Step = () => {
   const { stepType: channel } = useStep();
   switch (channel) {
     case StepTypeEnum.IN_APP:
-      return <InApp />;
+      return <ConfigureInApp />;
 
     /**
      * TODO: Add other step types here
