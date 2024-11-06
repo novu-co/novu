@@ -64,7 +64,6 @@ jobs:
           echo "ecs_cluster=$(terraform output -json worker_ecs_cluster | jq -r .)" >> $GITHUB_OUTPUT
           echo "aws_region=$(terraform output -json aws_region | jq -r .)" >> $GITHUB_OUTPUT
 
-
   deploy_worker_queue:
     needs: infrastructure_data
     runs-on: ubuntu-latest

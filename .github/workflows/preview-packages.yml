@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install
@@ -31,7 +31,7 @@ jobs:
 
       - name: Build
         run: pnpm run preview:pkg:build
-          
+
       - name: Release package previews to pkg.pr.new
         run: pnpm run preview:pkg:publish
         if: ${{ success() }}

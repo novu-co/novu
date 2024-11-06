@@ -83,7 +83,6 @@ jobs:
       - uses: ./.github/actions/start-localstack
         name: Start localstack
 
-
       - uses: ./.github/actions/run-worker
         name: Run worker
         with:

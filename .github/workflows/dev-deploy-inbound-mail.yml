@@ -79,7 +79,7 @@ jobs:
         shell: bash
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: novu-dev/inbound-mail    
+          REPOSITORY: novu-dev/inbound-mail
           IMAGE_TAG: ${{ github.sha }}
           DOCKER_BUILD_ARGUMENTS: >
             --platform=linux/amd64 --provenance=false
@@ -93,7 +93,7 @@ jobs:
         shell: bash
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: novu-dev/inbound-mail           
+          REPOSITORY: novu-dev/inbound-mail
           IMAGE_TAG: ${{ github.sha }}
         run: |
           echo "Built image"
@@ -106,7 +106,7 @@ jobs:
         shell: bash
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: novu-dev/inbound-mail 
+          REPOSITORY: novu-dev/inbound-mail
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
@@ -117,7 +117,6 @@ jobs:
           repository: novuhq/cloud-infra
           token: ${{ secrets.GH_PACKAGES }}
           path: cloud-infra
-
 
       - name: Terraform setup
         uses: hashicorp/setup-terraform@v3
@@ -179,4 +178,4 @@ jobs:
           sourcemaps: apps/inbound-mail/dist
           ignore_empty: true
           ignore_missing: true
-          url_prefix: "~"
+          url_prefix: '~'

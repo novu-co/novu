@@ -4,9 +4,9 @@ import { Inbox } from '@novu/nextjs';
 
 const CustomBell = ({ unreadCount }: { unreadCount: number }) => {
   return (
-    <button className="p-1 w-full">
+    <button className="w-full p-1">
       <div className="relative">
-        <span className="absolute top-0 left-full text-cyan-600 rounded-full p-1 transform -translate-x-1/2 -translate-y-1/2">
+        <span className="absolute left-full top-0 -translate-x-1/2 -translate-y-1/2 transform rounded-full p-1 text-cyan-600">
           {unreadCount}
         </span>
         <svg

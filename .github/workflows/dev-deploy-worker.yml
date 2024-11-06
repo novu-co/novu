@@ -85,6 +85,6 @@ jobs:
         with:
           region: EU
           apiKey: ${{ secrets.NEW_RELIC_API_KEY }}
-          guid: "MzgxMjQwOHxBUE18QVBQTElDQVRJT058NDk3NjQzODIy"
-          version: "${{ env.RELEASE_VERSION }}"
-          user: "${{ github.actor }}"
+          guid: 'MzgxMjQwOHxBUE18QVBQTElDQVRJT058NDk3NjQzODIy'
+          version: '${{ env.RELEASE_VERSION }}'
+          user: '${{ github.actor }}'
