@@ -275,7 +275,7 @@ function buildDtoNoPayload(stepTypeEnum: StepTypeEnum, stepId: string): Generate
 
 function buildDtoWithPayload(stepTypeEnum: StepTypeEnum, stepId: string): GeneratePreviewRequestDto {
   return {
-    controlValues: getControlValues(stepId)[StepTypeEnum.EMAIL],
+    controlValues: getControlValues(stepId)[stepTypeEnum],
     previewPayload: { payload: { subject: PLACEHOLDER_SUBJECT_INAPP_PAYLOAD_VALUE } },
   };
 }
