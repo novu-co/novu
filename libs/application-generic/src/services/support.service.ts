@@ -44,7 +44,7 @@ export class SupportService {
       Logger.error(
         { emailAddress, fullName, error: res.error },
         res.error.message,
-        LOG_CONTEXT
+        LOG_CONTEXT,
       );
       throw new Error(res.error.message);
     } else {
