@@ -21,7 +21,7 @@ export const featureFlagsService = {
 export const getFeatureFlag = {
   provide: GetFeatureFlag,
   useFactory: async (
-    featureFlagsServiceItem: FeatureFlagsService
+    featureFlagsServiceItem: FeatureFlagsService,
   ): Promise<GetFeatureFlag> => {
     const useCase = new GetFeatureFlag(featureFlagsServiceItem);
 
