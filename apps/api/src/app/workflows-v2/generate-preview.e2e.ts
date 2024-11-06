@@ -16,7 +16,6 @@ import {
   StepTypeEnum,
   WorkflowCreationSourceEnum,
 } from '@novu/shared';
-import { InAppOutput } from '@novu/framework/internal';
 import { buildCreateWorkflowDto } from './workflow.controller.e2e';
 import { forSnippet, fullCodeSnippet } from './maily-test-data';
 
@@ -37,6 +36,16 @@ describe('Generate Preview', () => {
   });
   describe('Generate Preview', () => {
     describe('Hydration testing', () => {
+      it(` should hydrate previous step`, async () => {
+        const { workflowId, emailStepDatabaseId, digestStepId } = await createWorkflowWithDigest();
+        const requestDto = buildDtoWithPayload(StepTypeEnum.EMAIL, digestStepId);
+        const previewResponseDto = await generatePreview(workflowId, emailStepDatabaseId, requestDto, 'testing steps');
+        expect(previewResponseDto.result!.preview).to.exist;
+        expect(previewResponseDto.previewPayloadExample).to.exist;
+        console.log(previewResponseDto.previewPayloadExample);
+        expect(previewResponseDto.previewPayloadExample?.steps?.digeststep).to.be.ok;
+      });
+
       const channelTypes = [{ type: StepTypeEnum.IN_APP, description: 'InApp' }];
 
       channelTypes.forEach(({ type, description }) => {
@@ -45,21 +54,12 @@ describe('Generate Preview', () => {
           const requestDto = buildDtoWithPayload(type, stepId);
           const previewResponseDto = await generatePreview(workflowId, stepDatabaseId, requestDto, description);
           expect(previewResponseDto.result!.preview).to.exist;
-          const expectedRenderedResult = buildInAppControlValues();
-          expectedRenderedResult.subject = buildInAppControlValues().subject!.replace(
+          const expectedRenderedResult = buildInAppControlValues(stepId);
+          expectedRenderedResult.subject = buildInAppControlValues(stepId).subject!.replace(
             PLACEHOLDER_SUBJECT_INAPP,
             PLACEHOLDER_SUBJECT_INAPP_PAYLOAD_VALUE
           );
           expect(previewResponseDto.result!.preview).to.deep.equal(expectedRenderedResult);
-        });
-        it(`${type} should hydrate previous step`, async () => {
-          const { workflowId, emailStepDatabaseId, digestStepId } = await createWorkflowWithDigest(type);
-          const requestDto = buildDtoWithPayload(type, digestStepId);
-          const previewResponseDto = await generatePreview(workflowId, emailStepDatabaseId, requestDto, description);
-          expect(previewResponseDto.result!.preview).to.exist;
-          expect(previewResponseDto.previewPayloadExample).to.exist;
-          expect(previewResponseDto.previewPayloadExample?.steps?.digestStepId).to.be.ok;
-          console.log(previewResponseDto.previewPayloadExample);
         });
       });
     });
@@ -215,11 +215,6 @@ describe('Generate Preview', () => {
   ): Promise<GeneratePreviewResponseDto> {
     const novuRestResult = await workflowsClient.generatePreview(workflowId, stepDatabaseId, dto);
     if (novuRestResult.isSuccessResult()) {
-      console.log(
-        'previewResponseDto.exampleMasterPayload',
-        JSON.stringify(novuRestResult.value.previewPayloadExample, null, 2)
-      );
-
       return novuRestResult.value;
     }
 
@@ -240,11 +235,11 @@ describe('Generate Preview', () => {
       stepId: workflowResult.value.steps[0].stepId,
     };
   }
-  async function createWorkflowWithDigest(type: StepTypeEnum) {
+  async function createWorkflowWithDigest() {
     const createWorkflowDto: CreateWorkflowDto = {
       __source: WorkflowCreationSourceEnum.EDITOR,
-      name: 'somename',
-      workflowId: `somename`,
+      name: 'John',
+      workflowId: `john:${randomUUID()}`,
       description: 'This is a test workflow',
       active: true,
       steps: [
@@ -254,7 +249,7 @@ describe('Generate Preview', () => {
         },
         {
           name: 'Email Test Step',
-          type: StepTypeEnum.IN_APP,
+          type: StepTypeEnum.EMAIL,
         },
       ],
     };
@@ -311,7 +306,7 @@ function buildSimpleForEmail(): EmailStepControlSchemaDto {
     emailEditor: JSON.stringify(forSnippet),
   };
 }
-function buildInAppControlValues(): InAppOutput {
+function buildInAppControlValues(stepId: string) {
   return {
     subject: `{{subscriber.firstName}} Hello, World! ${PLACEHOLDER_SUBJECT_INAPP}`,
     body: 'Hello, World! {{payload.placeholder.body}}',
@@ -364,7 +359,7 @@ const getControlValues = (stepId: string) => ({
   [StepTypeEnum.EMAIL]: buildEmailControlValuesPayload(stepId) as unknown as Record<string, unknown>,
   [StepTypeEnum.PUSH]: buildPushControlValuesPayload(),
   [StepTypeEnum.CHAT]: buildChatControlValuesPayload(),
-  [StepTypeEnum.IN_APP]: buildInAppControlValues(),
+  [StepTypeEnum.IN_APP]: buildInAppControlValues(stepId),
 });
 
 async function assertHttpError(
