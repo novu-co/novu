@@ -20,8 +20,14 @@ export class BuildDefaultPayloadUseCase {
   } {
     let aggregatedDefaultValues = {};
     const aggregatedDefaultValuesForControl: Record<string, Record<string, unknown>> = {};
-    const flattenedValues = flattenJson(command.controlValues);
+    if (this.hasNoValues(command)) {
+      return {
+        previewPayload: command.payloadValues || {},
+        issues: {},
+      };
+    }
 
+    const flattenedValues = flattenJson(command.controlValues);
     for (const controlValueKey in flattenedValues) {
       if (flattenedValues.hasOwnProperty(controlValueKey)) {
         const defaultPayloadForASingleControlValue = this.payloadForSingleControlValueUseCase.execute({
@@ -36,13 +42,20 @@ export class BuildDefaultPayloadUseCase {
     }
 
     return {
-      previewPayload: _.merge(aggregatedDefaultValues, { payload: command.payloadValues }),
+      previewPayload: _.merge(aggregatedDefaultValues, command.payloadValues),
       issues: this.buildVariableMissingIssueRecord(
         aggregatedDefaultValuesForControl,
         aggregatedDefaultValues,
         command.payloadValues
       ),
     };
+  }
+
+  private hasNoValues(command: BuildDefaultPayloadCommand) {
+    return (
+      !command.controlValues ||
+      (Object.keys(command.controlValues).length === 0 && command.controlValues.constructor === Object)
+    );
   }
 
   private buildVariableMissingIssueRecord(
@@ -85,7 +98,6 @@ export class BuildDefaultPayloadUseCase {
     variableToControlValueKeys: Record<string, string[]>
   ): Record<string, ControlPreviewIssue[]> {
     const record: Record<string, ControlPreviewIssue[]> = {};
-
     missingVariables.forEach((missingVariable) => {
       variableToControlValueKeys[missingVariable].forEach((controlValueKey) => {
         record[controlValueKey] = [

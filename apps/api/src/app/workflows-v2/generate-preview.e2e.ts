@@ -39,8 +39,8 @@ describe('Generate Preview', () => {
 
       channelTypes.forEach(({ type, description }) => {
         it(`${type}:should match the body in the preview response`, async () => {
-          const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(type);
-          const requestDto = buildDtoWithPayload(type);
+          const { stepDatabaseId, workflowId, stepId } = await createWorkflowAndReturnId(type);
+          const requestDto = buildDtoWithPayload(type, stepId);
           const previewResponseDto = await generatePreview(workflowId, stepDatabaseId, requestDto, description);
           expect(previewResponseDto.result!.preview).to.exist;
           const expectedRenderedResult = buildInAppControlValues();
@@ -176,8 +176,8 @@ describe('Generate Preview', () => {
 
       channelTypes.forEach(({ type, description }) => {
         it(`${type}: should assign default values to missing elements`, async () => {
-          const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(type);
-          const requestDto = buildDtoWithMissingControlValues(type);
+          const { stepDatabaseId, workflowId, stepId } = await createWorkflowAndReturnId(type);
+          const requestDto = buildDtoWithMissingControlValues(type, stepId);
           const previewResponseDto = await generatePreview(workflowId, stepDatabaseId, requestDto, description);
           expect(previewResponseDto.result!.preview.body).to.exist;
           expect(previewResponseDto.result!.preview.body).to.equal('PREVIEW_ISSUE:REQUIRED_CONTROL_VALUE_IS_MISSING');
@@ -206,13 +206,13 @@ describe('Generate Preview', () => {
     if (novuRestResult.isSuccessResult()) {
       console.log(
         'previewResponseDto.exampleMasterPayload',
-        JSON.stringify(novuRestResult.value.previewPayloadExample)
+        JSON.stringify(novuRestResult.value.previewPayloadExample, null, 2)
       );
 
       return novuRestResult.value;
     }
 
-    throw await assertHttpError(description, novuRestResult);
+    throw await assertHttpError(description, novuRestResult, dto);
   }
 
   async function createWorkflowAndReturnId(type: StepTypeEnum) {
@@ -237,15 +237,15 @@ function buildDtoNoPayload(stepTypeEnum: StepTypeEnum, stepId: string): Generate
   };
 }
 
-function buildDtoWithPayload(stepTypeEnum: StepTypeEnum): GeneratePreviewRequestDto {
+function buildDtoWithPayload(stepTypeEnum: StepTypeEnum, stepId: string): GeneratePreviewRequestDto {
   return {
-    controlValues: getControlValues[stepTypeEnum],
+    controlValues: getControlValues(stepId)[stepTypeEnum],
     previewPayload: { payload: { subject: PLACEHOLDER_SUBJECT_INAPP_PAYLOAD_VALUE } },
   };
 }
 
-function buildDtoWithMissingControlValues(stepTypeEnum: StepTypeEnum): GeneratePreviewRequestDto {
-  const stepTypeToElement = getControlValues[stepTypeEnum];
+function buildDtoWithMissingControlValues(stepTypeEnum: StepTypeEnum, stepId: string): GeneratePreviewRequestDto {
+  const stepTypeToElement = getControlValues(stepId)[stepTypeEnum];
   if (stepTypeEnum === StepTypeEnum.EMAIL) {
     delete stepTypeToElement.subject;
   } else {
@@ -328,10 +328,13 @@ const getControlValues = (stepId: string) => ({
 
 async function assertHttpError(
   description: string,
-  novuRestResult: NovuRestResult<GeneratePreviewResponseDto, HttpError>
+  novuRestResult: NovuRestResult<GeneratePreviewResponseDto, HttpError>,
+  dto: GeneratePreviewRequestDto
 ) {
   if (novuRestResult.error) {
-    return new Error(`${description}: Failed to generate preview: ${novuRestResult.error.message}`);
+    return new Error(
+      `${description}: Failed to generate preview: ${novuRestResult.error.message}payload: ${JSON.stringify(dto, null, 2)} `
+    );
   }
 
   return new Error(`${description}: Failed to generate preview, bug in response error mapping `);
