@@ -1472,6 +1472,87 @@ describe('Novu Client', () => {
       expect(metadata.duration).toEqual(expect.any(Number));
     });
 
+    it('should use the provided state to mock non previewed step outputs', async () => {
+      const newWorkflow = workflow(
+        'test-workflow',
+        async ({ step }) => {
+          const digestOutput = await step.digest('digest-output', async () => ({
+            type: 'regular',
+            amount: 1,
+            unit: 'seconds',
+          }));
+
+          await step.inApp(
+            'send-email',
+            async () => ({
+              body: digestOutput.events.map((event) => event.payload.comment).join(','),
+            }),
+            {
+              skip: () => true,
+            }
+          );
+        },
+        {
+          payloadSchema: {
+            type: 'object',
+            properties: {
+              comment: { type: 'string' },
+            },
+            required: ['comment'],
+          } as const,
+        }
+      );
+
+      client.addWorkflows([newWorkflow]);
+
+      const event: Event = {
+        action: PostActionEnum.PREVIEW,
+        workflowId: 'test-workflow',
+        stepId: 'send-email',
+        subscriber: {},
+        state: [
+          {
+            stepId: 'digest-output',
+            state: {
+              status: 'success',
+            },
+            outputs: {
+              events: [
+                {
+                  payload: {
+                    comment: 'Hello',
+                  },
+                },
+                {
+                  payload: {
+                    comment: 'World',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+        payload: {},
+        controls: {},
+      };
+
+      const executionResult = await client.executeWorkflow(event);
+
+      expect(executionResult).toBeDefined();
+      expect(executionResult.outputs).toBeDefined();
+      if (!executionResult.outputs) throw new Error('executionResult.outputs is undefined');
+
+      const { body } = executionResult.outputs;
+      expect(body).toBe('Hello,World');
+
+      expect(executionResult.providers).toEqual({});
+
+      const { metadata } = executionResult;
+      expect(metadata.status).toBe('success');
+      expect(metadata.error).toBe(false);
+      expect(metadata.duration).toEqual(expect.any(Number));
+    });
+
     it('should throw an error when workflow ID is invalid', async () => {
       // non-existing workflow ID
       const event: Event = {
