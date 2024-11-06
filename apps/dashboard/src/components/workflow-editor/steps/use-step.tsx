@@ -5,16 +5,26 @@ import * as z from 'zod';
 import { workflowSchema } from '../schema';
 
 export const useStep = () => {
-  const { stepId = '' } = useParams<{
-    stepId: string;
+  const { stepSlug = '' } = useParams<{
+    stepSlug: string;
   }>();
 
   const { watch, control } = useFormContext<z.infer<typeof workflowSchema>>();
   const steps = watch('steps');
 
-  const step = useMemo(() => steps?.find((message) => message._id === stepId), [stepId, steps]);
+  const step = useMemo(() => {
+    if (Array.isArray(steps)) {
+      return steps.find((el) => el.slug === stepSlug);
+    }
+    return undefined;
+  }, [stepSlug, steps]);
 
-  const stepIndex = useMemo(() => steps?.findIndex((message) => message._id === stepId), [stepId, steps]);
+  const stepIndex = useMemo(() => {
+    if (Array.isArray(steps)) {
+      return steps.findIndex((el) => el.slug === stepSlug);
+    }
+    return -1;
+  }, [stepSlug, steps]);
 
   return {
     step,

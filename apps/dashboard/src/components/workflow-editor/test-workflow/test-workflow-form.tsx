@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { RiSendPlaneFill } from 'react-icons/ri';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { Editor } from '@monaco-editor/react';
+import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import type { WorkflowResponseDto } from '@novu/shared';
 import { Code2 } from '../../icons/code-2';
 import { Panel, PanelContent, PanelHeader } from '../../primitives/panel';
@@ -22,6 +22,7 @@ import { CopyButton } from '../../primitives/copy-button';
 import { TestWorkflowFormType } from '../schema';
 import { SnippetLanguage } from './types';
 import { SnippetEditor } from './snippet-editor';
+import { Editor } from '@/components/primitives/editor';
 
 const tabsTriggerClassName = 'pt-1';
 const codePanelClassName = 'bg-background h-full w-full rounded-lg border border-neutral-200 p-3';
@@ -94,21 +95,10 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
                     </PanelHeader>
                     <PanelContent>
                       <Editor
-                        defaultLanguage="json"
-                        language="json"
+                        lang="json"
                         className="h-full"
-                        options={{
-                          minimap: {
-                            enabled: false,
-                          },
-                          // workaround from: https://github.com/microsoft/monaco-editor/issues/2093
-                          accessibilitySupport: 'off',
-                          renderLineHighlight: 'none',
-                          scrollBeyondLastLine: false,
-                          fontSize: 14,
-                          lineHeight: 20,
-                          readOnly: false,
-                        }}
+                        basicSetup={{ lineNumbers: true }}
+                        extensions={[loadLanguage('json')?.extension ?? []]}
                         {...restField}
                       />
                     </PanelContent>

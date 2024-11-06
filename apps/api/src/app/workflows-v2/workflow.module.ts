@@ -18,7 +18,6 @@ import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.us
 import { DeleteWorkflowUseCase } from './usecases/delete-workflow/delete-workflow.usecase';
 import { GetWorkflowByIdsUseCase } from './usecases/get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
-import { GetStepSchemaUseCase } from '../step-schemas/usecases/get-step-schema/get-step-schema.usecase';
 import { BridgeModule } from '../bridge';
 import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
 import { CreateMockPayloadUseCase } from './usecases/placeholder-enrichment/payload-preview-value-generator.usecase';
@@ -26,6 +25,7 @@ import { ExtractDefaultsUsecase } from './usecases/get-default-values-from-schem
 import { CollectPlaceholdersFromTipTapSchemaUsecase } from './usecases/placeholder-enrichment/collect-placeholders-from-tip-tap-schema.usecase';
 import { TransformPlaceholderMapUseCase } from './usecases/placeholder-enrichment/transform-placeholder.usecase';
 import { WorkflowTestDataUseCase } from './usecases/test-data/test-data.usecase';
+import { GetStepDataUsecase } from './usecases/get-step-schema/get-step-data.usecase';
 
 @Module({
   imports: [SharedModule, MessageTemplateModule, ChangeModule, AuthModule, BridgeModule, IntegrationModule],
@@ -42,10 +42,9 @@ import { WorkflowTestDataUseCase } from './usecases/test-data/test-data.usecase'
     GetPreferences,
     GetWorkflowByIdsUseCase,
     SyncToEnvironmentUseCase,
-    GetStepSchemaUseCase,
+    GetStepDataUsecase,
     GeneratePreviewUsecase,
     GetWorkflowUseCase,
-    GetPreferences,
     CreateMockPayloadUseCase,
     ExtractDefaultsUsecase,
     CollectPlaceholdersFromTipTapSchemaUsecase,

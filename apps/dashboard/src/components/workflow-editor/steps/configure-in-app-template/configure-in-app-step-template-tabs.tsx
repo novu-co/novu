@@ -4,23 +4,26 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import { useNavigate } from 'react-router-dom';
 import { useFormContext } from 'react-hook-form';
 import * as z from 'zod';
+import { liquid } from '@codemirror/lang-liquid';
+import { EditorView } from '@uiw/react-codemirror';
 import { RedirectTargetEnum } from '@novu/shared';
 
-import { Button } from '@/components/primitives/button';
-import { Separator } from '@/components/primitives/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Notification5Fill } from '@/components/icons';
+import { Button } from '@/components/primitives/button';
+import { Editor } from '@/components/primitives/editor';
 import { AvatarPicker } from '@/components/primitives/form/avatar-picker';
 import { InputField } from '@/components/primitives/input';
-import { workflowSchema } from '../schema';
-import { ActionPicker } from '../action-picker';
+import { Separator } from '@/components/primitives/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { URLInput } from '@/components/primitives/url-input';
 import { urlTargetTypes } from '@/utils/url';
-import { Editor } from '@/components/primitives/editor';
+import { ActionPicker } from '../../action-picker';
+import { workflowSchema } from '../../schema';
+import { ConfigureInAppStepTemplatePreview } from '@/components/workflow-editor/steps/configure-in-app-template/configure-in-app-step-template-preview';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5';
 
-export const InAppEditor = () => {
+export const ConfigureInAppStepTemplateTabs = () => {
   const navigate = useNavigate();
   const { formState } = useFormContext<z.infer<typeof workflowSchema>>();
 
@@ -68,11 +71,33 @@ export const InAppEditor = () => {
             <div className="flex gap-1">
               <AvatarPicker />
               <InputField size="md" className="px-1">
-                <Editor placeholder="Subject" size="md" value={subject} onChange={setSubject} height="38px" />
+                <Editor
+                  placeholder="Subject"
+                  size="md"
+                  value={subject}
+                  onChange={setSubject}
+                  extensions={[
+                    liquid({
+                      variables: [{ type: 'variable', label: 'asdf' }],
+                    }),
+                    EditorView.lineWrapping,
+                  ]}
+                />
               </InputField>
             </div>
-            <InputField size="md" className="h-24 px-1">
-              <Editor placeholder="Body" size="md" value={body} onChange={setBody} />
+            <InputField size="md" className="h-32 px-1">
+              <Editor
+                placeholder="Body"
+                size="md"
+                value={body}
+                onChange={setBody}
+                extensions={[
+                  liquid({
+                    variables: [{ type: 'variable', label: 'asdf' }],
+                  }),
+                  EditorView.lineWrapping,
+                ]}
+              />
             </InputField>
             <div className="mt-1 flex items-center gap-1">
               <RiInformationFill className="text-foreground-400 size-4 p-0.5" />
@@ -103,7 +128,7 @@ export const InAppEditor = () => {
         </div>
       </TabsContent>
       <TabsContent value="preview" className={tabsContentClassName}>
-        <div>Preview</div>
+        <ConfigureInAppStepTemplatePreview />
       </TabsContent>
       <Separator />
       <footer className="flex justify-end px-3 py-3.5">

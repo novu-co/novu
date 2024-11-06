@@ -11,7 +11,7 @@ interface GeneratePreviewRequestDto {
   controlValues?: Record<string, unknown>; // Optional control values
   payloadValues?: Record<string, unknown>; // Optional payload values
   variablesSchema?: JSONSchemaDto; // Optional variables schema
-  validationStrategies: ValidationStrategyEnum[]; // Array of validation strategies
+  validationStrategies?: ValidationStrategyEnum[]; // Array of validation strategies
 }
 
 // Export the GeneratePreviewRequestDto type
