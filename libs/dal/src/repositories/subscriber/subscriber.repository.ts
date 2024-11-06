@@ -157,55 +157,19 @@ export class SubscriberRepository extends BaseRepository<SubscriberDBModel, Subs
     );
   }
 
-  async delete(query: SubscriberDeleteQuery) {
-    const requestQuery: SubscriberDeleteQuery = {
-      _environmentId: query._environmentId,
-      subscriberId: query.subscriberId,
-    };
-
-    const foundSubscriber = await this.findOne(requestQuery);
-
-    if (!foundSubscriber) {
-      throw new DalException(`Could not find subscriber ${query.subscriberId} to delete`);
-    }
-
-    return await this.subscriber.delete(requestQuery);
-  }
-
-  async deleteMany(query: SubscriberDeleteManyQuery) {
-    const requestQuery: SubscriberDeleteManyQuery = {
-      _environmentId: query._environmentId,
-      subscriberId: query.subscriberId,
-    };
-
-    if (query._id) {
-      requestQuery._id = query._id;
-    }
-
-    return await this.subscriber.delete(requestQuery);
-  }
-
-  async findDeleted(query: SubscriberQuery) {
-    const requestQuery: SubscriberQuery = {
-      _environmentId: query._environmentId,
-      subscriberId: query.subscriberId,
-    };
-
-    const res = await this.subscriber.findDeleted(requestQuery);
-
-    return this.mapEntity(res);
-  }
-
   async estimatedDocumentCount(): Promise<number> {
     return this.subscriber.estimatedDocumentCount();
   }
 }
+
 function mapToSubscriberObject(subscriberId: string) {
   return { subscriberId };
 }
+
 function regExpEscape(literalString: string): string {
   return literalString.replace(/[-[\]{}()*+!<=:?./\\^$|#\s,]/g, '\\$&');
 }
+
 function isErrorWithWriteErrors(e: unknown): e is { writeErrors?: any; message?: string; result?: any } {
   return typeof e === 'object' && e !== null && 'writeErrors' in e;
 }
