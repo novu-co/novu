@@ -3,41 +3,41 @@ import { css } from '@novu/novui/css';
 import { Text, Title, Button, IconButton } from '@novu/novui';
 import { IconOutlineClose } from '@novu/novui/icons';
 import { useUser } from '@clerk/clerk-react';
-import { FeatureFlagsKeysEnum, V3DashboardOptInStatusEnum } from '@novu/shared';
+import { FeatureFlagsKeysEnum, NewDashboardOptInStatusEnum } from '@novu/shared';
 import { IS_SELF_HOSTED } from '../../../../config';
 import { useFeatureFlag } from '../../../../hooks';
 
-export function V3DashboardOptInWidget() {
+export function NewDashboardOptInWidget() {
   const { user } = useUser();
-  const isV3DashboardEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V3_DASHBOARD_ENABLED);
+  const isNewDashboardEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ENABLED);
 
-  const isDismissed = user?.unsafeMetadata?.v3DashboardOptInStatus === V3DashboardOptInStatusEnum.DISMISSED;
+  const isDismissed = user?.unsafeMetadata?.newDashboardOptInStatus === NewDashboardOptInStatusEnum.DISMISSED;
 
-  if (IS_SELF_HOSTED || isDismissed || !isV3DashboardEnabled) {
+  if (IS_SELF_HOSTED || isDismissed || !isNewDashboardEnabled) {
     return null;
   }
 
-  const updateUserOptInStatus = (status: V3DashboardOptInStatusEnum) => {
+  const updateUserOptInStatus = (status: NewDashboardOptInStatusEnum) => {
     if (!user) return;
 
     user.update({
       unsafeMetadata: {
         ...user.unsafeMetadata,
-        v3DashboardOptInStatus: status,
+        newDashboardOptInStatus: status,
       },
     });
   };
 
   function handleOptIn() {
-    const v3DashboardUrl = process.env.V3_DASHBOARD_URL;
-    if (!v3DashboardUrl || !user) return;
+    const newDashboardUrl = process.env.NEW_DASHBOARD_URL;
+    if (!newDashboardUrl || !user) return;
 
-    updateUserOptInStatus(V3DashboardOptInStatusEnum.OPTED_IN);
-    window.location.href = v3DashboardUrl;
+    updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_IN);
+    window.location.href = newDashboardUrl;
   }
 
   function handleDismiss() {
-    updateUserOptInStatus(V3DashboardOptInStatusEnum.DISMISSED);
+    updateUserOptInStatus(NewDashboardOptInStatusEnum.DISMISSED);
   }
 
   return (

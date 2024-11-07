@@ -24,10 +24,10 @@ export type UserPublicMetadata = {
  * Unsafe metadata can be updated from the frontend directly
  */
 export type UserUnsafeMetadata = {
-  v3DashboardOptInStatus?: V3DashboardOptInStatusEnum;
+  newDashboardOptInStatus?: NewDashboardOptInStatusEnum;
 };
 
-export enum V3DashboardOptInStatusEnum {
+export enum NewDashboardOptInStatusEnum {
   OPTED_IN = 'opted_in', // user switched to the new dashboard
   DISMISSED = 'dismissed', // user dismissed the opt-in widget
   OPTED_OUT = 'opted_out', // user switched back to the old dashboard
