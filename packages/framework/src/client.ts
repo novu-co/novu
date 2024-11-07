@@ -31,6 +31,7 @@ import type {
   HealthCheck,
   Schema,
   Skip,
+  State,
   ValidationError,
   Workflow,
 } from './types';
@@ -634,7 +635,7 @@ export class Client {
       }
     } else {
       try {
-        const result = event.state.find((state) => state.stepId === step.stepId);
+        const result = this.getStepState(event, step.stepId);
 
         if (result) {
           const validatedOutput = await this.validate(
@@ -723,7 +724,21 @@ export class Client {
           providers: await this.executeProviders(event, step, validatedOutput),
         };
       } else {
-        const mockResult = this.mock(step.results.schema);
+        let mockResult: Record<string, unknown>;
+        const suppliedResult = this.getStepState(event, step.stepId);
+
+        if (suppliedResult) {
+          mockResult = await this.validate(
+            suppliedResult.outputs,
+            step.results.unknownSchema,
+            'step',
+            'result',
+            event.workflowId,
+            step.stepId
+          );
+        } else {
+          mockResult = this.mock(step.results.schema);
+        }
 
         console.log(`  ${EMOJI.MOCK} Mocked stepId: \`${step.stepId}\``);
 
@@ -741,6 +756,10 @@ export class Client {
         throw new StepExecutionFailedError(step.stepId, event.action, error);
       }
     }
+  }
+
+  private getStepState(event: Event, stepId: string): State | undefined {
+    return event.state.find((state) => state.stepId === stepId);
   }
 
   private getStepCode(workflowId: string, stepId: string): CodeResult {
