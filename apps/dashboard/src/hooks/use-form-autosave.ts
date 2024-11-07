@@ -1,21 +1,25 @@
-import { FieldValues, SubmitHandler, UseFormReturn, useWatch } from 'react-hook-form';
+import { DeepPartialSkipArrayKey, FieldValues, SubmitHandler, UseFormReturn, useWatch } from 'react-hook-form';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 import { useDebounce } from './use-debounce';
 import { useDataRef } from './use-data-ref';
-import { useCallback, useRef } from 'react';
+import { useRef } from 'react';
 
 export const useFormAutoSave = <T extends FieldValues>({
   onSubmit,
   form,
   enabled = true,
+  shouldSaveImmediately,
 }: {
   onSubmit: SubmitHandler<T>;
   form: UseFormReturn<T>;
   enabled?: boolean;
+  shouldSaveImmediately?: (
+    watchedData: DeepPartialSkipArrayKey<T>,
+    previousWatchedData: DeepPartialSkipArrayKey<T> | null
+  ) => boolean;
 }) => {
   const onSubmitRef = useDataRef(onSubmit);
   const { formState, control, handleSubmit } = form;
-  const previousStepsLength = useRef<number | null>(null);
 
   const watchedData = useWatch<T>({
     control,
@@ -29,29 +33,22 @@ export const useFormAutoSave = <T extends FieldValues>({
 
   const debouncedSave = useDebounce(save, 500);
 
-  const checkStepsDeleted = useCallback(() => {
-    const currentStepsLength = watchedData.steps?.length ?? 0;
-    const wasStepDeleted = previousStepsLength.current !== null && currentStepsLength < previousStepsLength.current;
-
-    previousStepsLength.current = currentStepsLength;
-
-    return wasStepDeleted;
-  }, [watchedData]);
+  const previousWatchedData = useRef<DeepPartialSkipArrayKey<T> | null>(null);
 
   useDeepCompareEffect(() => {
     if (!formState.isDirty) {
-      // set the previous steps length to the current steps length upon mount
-      previousStepsLength.current = watchedData.steps?.length ?? 0;
-
+      previousWatchedData.current = watchedData;
       return;
     }
 
-    const wasStepsDeleted = checkStepsDeleted();
+    const immediateSave = shouldSaveImmediately?.(watchedData, previousWatchedData.current) || false;
 
-    if (wasStepsDeleted) {
+    if (immediateSave) {
       save();
     } else {
       debouncedSave();
     }
+
+    previousWatchedData.current = watchedData;
   }, [watchedData]);
 };
