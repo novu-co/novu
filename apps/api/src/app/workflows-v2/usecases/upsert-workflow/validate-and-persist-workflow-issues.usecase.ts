@@ -36,8 +36,8 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
   }
 
   private async persistWorkflow(command: ValidateWorkflowCommand, workflowWithIssues: NotificationTemplateEntity) {
-    const isGoodWorkflow = this.isWorkflowCompleteAndValid(workflowWithIssues);
-    const status = this.calculateStatus(isGoodWorkflow, workflowWithIssues);
+    const isWorkflowCompleteAndValid = this.isWorkflowCompleteAndValid(workflowWithIssues);
+    const status = this.calculateStatus(isWorkflowCompleteAndValid, workflowWithIssues);
     await this.notificationTemplateRepository.update(
       {
         _id: command.workflow._id,
