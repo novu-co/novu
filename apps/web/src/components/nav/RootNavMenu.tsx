@@ -39,6 +39,7 @@ import { SidebarFooter } from '../layout/components/LocalStudioSidebar/SidebarFo
 import { useNavigateToLocalStudio } from '../../studio/hooks/useNavigateToLocalStudio';
 import { OpenLocalStudioModal } from '../../studio/components/OpenLocalStudioModal';
 import { OutlineButton } from '../../studio/components/OutlineButton';
+import { NewDashboardOptInWidget } from '../layout/components/v2/NewDashboardOptInWidget';
 
 const getEnvPageRoute = (route: ROUTES, env: BaseEnvironmentEnum) => parseUrl(route, { env });
 
@@ -161,6 +162,7 @@ export const RootNavMenu: React.FC = () => {
       {isV2Enabled ? (
         <>
           <SidebarFooter>
+            <NewDashboardOptInWidget />
             <FreeTrialSidebarWidget />
             <OutlineButton fullWidth onClick={navigateToLocalStudio} Icon={IconLaptop}>
               Open Local Studio

@@ -1,4 +1,3 @@
-import { IsDefined, IsNotEmpty, IsString } from 'class-validator';
 import { PreferencesRequestDto, StepCreateDto, WorkflowCommonsFields } from './workflow-commons-fields';
 import { WorkflowCreationSourceEnum } from '../../types';
 
