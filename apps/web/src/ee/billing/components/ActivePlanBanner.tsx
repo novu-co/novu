@@ -2,35 +2,38 @@ import { Text, Title } from '@novu/novui';
 import { MantineTheme } from '@mantine/core';
 import { css } from '@novu/novui/css';
 import { UsageProgress } from './UsageProgress';
-import { useSubscriptionContext } from './SubscriptionProvider';
+import { useSubscriptionContext, type UseSubscriptionType } from './SubscriptionProvider';
 import { capitalizeFirstLetter } from '../../../utils/string';
 import { Badge } from './Badge';
 import { PlanActionButton } from './PlanActionButton';
 
-export const ActivePlanBanner = ({ selectedBillingInterval }: { selectedBillingInterval: 'month' | 'year' }) => {
-  const { apiServiceLevel, status, events, trial } = useSubscriptionContext();
+type BillingInterval = 'month' | 'year';
+
+export const ActivePlanBanner = ({ selectedBillingInterval }: { selectedBillingInterval: BillingInterval }) => {
+  const subscription = useSubscriptionContext();
 
   return (
     <div className={styles.activePlanWrapper}>
       <Title variant="section">Active Plan</Title>
       <div className={styles.banner}>
         <div className={styles.content}>
-          <PlanHeader apiServiceLevel={apiServiceLevel} isFreeTrialActive={trial.isActive} daysLeft={trial.daysLeft} />
-          <PlanInfo apiServiceLevel={apiServiceLevel} currentEvents={events.current} maxEvents={events.included} />
+          <PlanHeader {...subscription} />
+          <PlanInfo {...subscription} />
         </div>
-        <PlanActions trialEnd={trial.end} status={status} selectedBillingInterval={selectedBillingInterval} />
+        <PlanActions {...subscription} selectedBillingInterval={selectedBillingInterval} />
       </div>
     </div>
   );
 };
 
-const PlanHeader = ({ apiServiceLevel, isFreeTrialActive, daysLeft }) => {
+function PlanHeader({ apiServiceLevel, trial }: UseSubscriptionType) {
+  const { daysLeft, isActive } = trial;
   const color = getColorByDaysLeft(daysLeft);
 
   return (
     <div className={styles.header}>
       <Title variant="section">{capitalizeFirstLetter(apiServiceLevel)}</Title>
-      {isFreeTrialActive && (
+      {isActive && (
         <>
           <Badge label="Trial" />
           <div className={styles.daysLeft}>
@@ -45,21 +48,23 @@ const PlanHeader = ({ apiServiceLevel, isFreeTrialActive, daysLeft }) => {
       )}
     </div>
   );
-};
+}
 
-const PlanInfo = ({ apiServiceLevel, currentEvents, maxEvents }) => {
+function PlanInfo({ apiServiceLevel, events, currentPeriodStart, currentPeriodEnd }: UseSubscriptionType) {
+  const { current: currentEvents, included: maxEvents } = events;
   const color = getColorByEventsUsed(currentEvents, maxEvents);
 
   return (
     <div className={styles.info}>
       <div className={styles.eventsUsage}>
         <div className={styles.eventsCount}>
-          <Text className={styles.eventsNumber} style={{ color }}>
-            {currentEvents?.toLocaleString()}
+          <Text className={styles.eventsLabel}>
+            <Text as="span" color="typography.text.primary" className={styles.eventsNumber} style={{ color }}>
+              {currentEvents?.toLocaleString()}
+            </Text>{' '}
+            events used between {formatDate(currentPeriodStart || '2024')} and {formatDate(currentPeriodEnd || '2024')}.
           </Text>
-          <Text className={styles.eventsLabel}>events</Text>
         </div>
-        <Text className={styles.usageText}>used this month</Text>
       </div>
       <UsageProgress apiServiceLevel={apiServiceLevel} currentEvents={currentEvents} maxEvents={maxEvents} />
       <Text variant="secondary" fontSize="12px" color="typography.text.secondary">
@@ -67,25 +72,31 @@ const PlanInfo = ({ apiServiceLevel, currentEvents, maxEvents }) => {
       </Text>
     </div>
   );
-};
+}
 
-const PlanActions = ({ trialEnd, status, selectedBillingInterval }) => {
+function PlanActions({
+  trial,
+  status,
+  selectedBillingInterval,
+}: UseSubscriptionType & { selectedBillingInterval: BillingInterval }) {
   return (
     <div className={styles.actions}>
       <PlanActionButton selectedBillingInterval={selectedBillingInterval} />
-      {status === 'trialing' ? (
+      {status === 'trialing' && trial.end && (
         <Text variant="secondary" fontSize="12px" color="typography.text.secondary">
-          Trial ends on {formatDate(trialEnd)}
+          Trial ends on {formatDate(trial.end)}
         </Text>
-      ) : null}
+      )}
     </div>
   );
-};
+}
 
-const getColorByEventsUsed = (eventsUsed: number, maxEvents: number) => {
+const getColorByEventsUsed = (eventsUsed: number, maxEvents?: number | null) => {
+  if (!eventsUsed || !maxEvents) return undefined;
+
   const percentage = (eventsUsed / maxEvents) * 100;
   if (percentage >= 100) return '#F2555A';
-  if (percentage >= 90) return '#FFB224';
+  if (percentage >= 80) return '#FFB224';
 
   return undefined;
 };
@@ -99,7 +110,7 @@ const getColorByDaysLeft = (daysLeft: number) => {
 
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString('en-US', {
-    month: 'long',
+    month: 'short',
     day: 'numeric',
     year: 'numeric',
   });
@@ -161,7 +172,7 @@ const styles = {
   }),
   info: css({
     display: 'flex',
-    width: '240px',
+    width: '340px',
     flexDirection: 'column',
     alignItems: 'flex-start',
     gap: '8px',
@@ -170,6 +181,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
+    lineHeight: '24px',
   }),
   eventsCount: css({
     display: 'flex',
@@ -179,20 +191,11 @@ const styles = {
   eventsNumber: css({
     fontSize: '16px',
     fontWeight: '600',
-    lineHeight: '24px',
-    color: 'typography.text.primary',
   }),
   eventsLabel: css({
     color: 'typography.text.secondary',
     fontSize: '14px',
     fontWeight: '400',
-    lineHeight: '20px',
-  }),
-  usageText: css({
-    color: 'typography.text.secondary',
-    fontSize: '14px',
-    fontWeight: '400',
-    lineHeight: '20px',
   }),
   usageFootnote: css({
     color: 'typography.text.secondary',

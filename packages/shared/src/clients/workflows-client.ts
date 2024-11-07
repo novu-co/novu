@@ -1,16 +1,16 @@
+import { createNovuBaseClient, HttpError, NovuRestResult } from './novu-base-client';
 import {
   CreateWorkflowDto,
-  GeneratePreviewRequestDto,
   GeneratePreviewResponseDto,
   GetListQueryParams,
   ListWorkflowResponse,
-  SyncWorkflowDto,
   StepDataDto,
+  SyncWorkflowDto,
   UpdateWorkflowDto,
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
-} from '@novu/shared';
-import { createNovuBaseClient, HttpError, NovuRestResult } from './novu-base-client';
+} from '../dto';
+import { GeneratePreviewRequestDto } from '../dto/workflows/generate-preview-request.dto';
 
 // Define the WorkflowClient as a function that utilizes the base client
 export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {}) => {

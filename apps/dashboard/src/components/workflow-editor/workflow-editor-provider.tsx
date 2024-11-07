@@ -1,5 +1,5 @@
 import { ReactNode, useMemo, useCallback, useRef, useLayoutEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useBlocker, useNavigate, useParams } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 // eslint-disable-next-line
 // @ts-ignore
@@ -18,6 +18,19 @@ import { showToast } from '../primitives/sonner-helpers';
 import { ToastIcon } from '../primitives/sonner';
 import { handleValidationIssues } from '@/utils/handleValidationIssues';
 import { WorkflowOriginEnum } from '@novu/shared';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/primitives/alert-dialog';
+import { Button, buttonVariants } from '@/components/primitives/button';
+import { RiAlertFill } from 'react-icons/ri';
+import { Separator } from '@/components/primitives/separator';
 
 const STEP_NAME_BY_TYPE: Record<StepTypeEnum, string> = {
   email: 'Email Step',
@@ -69,7 +82,7 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
     reset({ ...workflow, steps: workflow.steps.map((step) => ({ ...step })) });
   }, [workflow, error, navigate, reset, currentEnvironment]);
 
-  const { updateWorkflow } = useUpdateWorkflow({
+  const { updateWorkflow, isPending } = useUpdateWorkflow({
     onSuccess: (data) => {
       reset({ ...data, steps: data.steps.map((step) => ({ ...step })) });
 
@@ -102,6 +115,8 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
       changesSavedToastIdRef.current = id;
     },
   });
+
+  const blocker = useBlocker(form.formState.isDirty || isPending);
 
   useFormAutoSave({
     form,
@@ -149,6 +164,33 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
 
   return (
     <WorkflowEditorContext.Provider value={value}>
+      <AlertDialog open={blocker.state === 'blocked'}>
+        <AlertDialogContent>
+          <AlertDialogHeader className="flex flex-row items-start gap-4">
+            <div className="bg-warning/10 rounded-lg p-3">
+              <RiAlertFill className="text-warning size-6" />
+            </div>
+            <div className="space-y-1">
+              <AlertDialogTitle>You might lose your progress</AlertDialogTitle>
+              <AlertDialogDescription>
+                This workflow has some unsaved changes. Save progress before you leave.
+              </AlertDialogDescription>
+            </div>
+          </AlertDialogHeader>
+
+          <Separator />
+
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => blocker.reset?.()}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => blocker.proceed?.()}
+              className={buttonVariants({ variant: 'destructive' })}
+            >
+              Proceed anyway
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <Form {...form}>
         <form className="h-full">{children}</form>
       </Form>

@@ -1,5 +1,5 @@
 import { ChannelTypeEnum } from '../../types';
-import { ControlPreviewIssueTypeEnum } from '../step-schemas';
+import { SubscriberDto } from '../subscriber';
 
 export class RenderOutput {}
 
@@ -53,14 +53,25 @@ export class InAppRenderOutput extends RenderOutput {
     target?: RedirectTargetEnum;
   };
 }
+export enum ControlPreviewIssueTypeEnum {
+  MISSING_VARIABLE_IN_PAYLOAD = 'MISSING_VARIABLE_IN_PAYLOAD',
+  VARIABLE_TYPE_MISMATCH = 'VARIABLE_TYPE_MISMATCH',
+  MISSING_VALUE = 'MISSING_VALUE',
+}
 
 export class ControlPreviewIssue {
   issueType: ControlPreviewIssueTypeEnum;
   variableName?: string;
   message: string;
 }
+export class PreviewPayload {
+  subscriber?: Partial<SubscriberDto>;
+  payload?: Record<string, unknown>;
+  steps?: Record<string, unknown>; // step.stepId.unknown
+}
 
 export class GeneratePreviewResponseDto {
+  previewPayloadExample: PreviewPayload;
   issues: Record<string, ControlPreviewIssue[]>;
   result?:
     | {
