@@ -19,6 +19,7 @@ const variantSchemePart = {
     type: Schema.Types.Boolean,
     default: false,
   },
+  issues: Schema.Types.Mixed,
   uuid: Schema.Types.String,
   stepId: Schema.Types.String,
   name: Schema.Types.String,
@@ -219,6 +220,7 @@ const notificationTemplateSchema = new Schema<NotificationTemplateDBModel>(
     data: Schema.Types.Mixed,
     rawData: Schema.Types.Mixed,
     payloadSchema: Schema.Types.Mixed,
+    issues: Schema.Types.Mixed,
   },
   { ...schemaOptions, minimize: false }
 );
