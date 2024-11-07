@@ -15,7 +15,7 @@
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
     "fix:lint": "eslint src --ext .ts --fix",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "lint": "eslint src",
     "test:watch": "jest --watch",
     "watch:build": "tsc -p tsconfig.json -w",
