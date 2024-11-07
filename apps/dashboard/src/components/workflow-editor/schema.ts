@@ -30,7 +30,7 @@ export const workflowSchema = z.object({
         type: z.nativeEnum(StepTypeEnum),
         _id: z.string(),
         stepId: z.string(),
-        slug: z.literal<StepResponseDto['slug']>('_stp_'),
+        slug: z.literal<StepResponseDto['slug']>('_st_'),
       })
       .passthrough()
   ),
