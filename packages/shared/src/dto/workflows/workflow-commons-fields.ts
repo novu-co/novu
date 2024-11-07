@@ -60,7 +60,7 @@ export type StepDto = {
 
 export type WorkflowCommonsFields = {
   tags: string[];
-  active: boolean;
+  active?: boolean;
   name: string;
   description?: string;
 };
