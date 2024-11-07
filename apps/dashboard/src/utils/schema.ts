@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { WorkflowTestDataResponseDto } from '@novu/shared';
+import { UiSchema, WorkflowTestDataResponseDto } from '@novu/shared';
 import { capitalize } from './string';
 
 type JSONSchema = WorkflowTestDataResponseDto['to'];
@@ -140,24 +140,24 @@ export const buildDynamicZodSchema = (obj: JSONSchema): z.AnyZodObject => {
 };
 
 /**
- * Build default values based on the JSONSchema object.
+ * Build default values based on the UI Schema object.
  */
-export const buildDefaultValues = (obj: JSONSchema): object => {
-  const properties = typeof obj === 'object' ? (obj.properties ?? {}) : {};
+export const buildDefaultValues = (uiSchema: UiSchema): object => {
+  const properties = typeof uiSchema === 'object' ? (uiSchema.properties ?? {}) : {};
 
   const keys: Record<string, unknown> = Object.keys(properties).reduce((acc, key) => {
-    const jsonSchemaProp = properties[key];
-    if (typeof jsonSchemaProp !== 'object') {
+    const property = properties[key];
+    if (typeof property !== 'object') {
       return acc;
     }
 
-    const { type, default: defaultValue } = jsonSchemaProp;
-    if (type === 'object' && defaultValue === null) {
+    const { placeholder: defaultValue } = property;
+    if (defaultValue === null || typeof defaultValue === 'undefined') {
       return acc;
     }
 
-    if (type === 'object' && defaultValue === 'undefined') {
-      return { ...acc, [key]: buildDefaultValues(jsonSchemaProp) };
+    if (typeof defaultValue === 'object') {
+      return { ...acc, [key]: buildDefaultValues({ properties: { ...defaultValue } }) };
     }
 
     return { ...acc, [key]: defaultValue };

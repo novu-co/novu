@@ -25,6 +25,7 @@ export enum UiComponentEnum {
 }
 
 export class UiSchemaProperty {
+  placeholder?: unknown;
   component: UiComponentEnum;
 }
 

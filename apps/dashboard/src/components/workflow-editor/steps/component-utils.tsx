@@ -6,7 +6,7 @@ import { InAppBody } from '@/components/workflow-editor/steps/in-app/in-app-body
 import { InAppAvatar } from '@/components/workflow-editor/steps/in-app/in-app-avatar';
 import { InAppRedirect } from '@/components/workflow-editor/steps/in-app/in-app-redirect';
 
-export const getComponentByType = ({ component }: { component: UiComponentEnum }) => {
+export const getComponentByType = ({ component }: { component?: UiComponentEnum }) => {
   switch (component) {
     case UiComponentEnum.IN_APP_AVATAR: {
       return <InAppAvatar />;

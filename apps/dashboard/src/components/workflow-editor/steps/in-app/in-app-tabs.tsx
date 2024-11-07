@@ -28,7 +28,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
     mode: 'onSubmit',
     resolver: zodResolver(schema),
     resetOptions: { keepDirtyValues: true },
-    defaultValues: buildDefaultValues(dataSchema ?? {}),
+    defaultValues: buildDefaultValues(uiSchema ?? {}),
     values: step.controls.values,
   });
   const { reset, formState } = form;
