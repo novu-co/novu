@@ -125,7 +125,8 @@ export class ExecuteBridgeRequest {
           if (computedValue === 0) {
             /*
              * If the computed value is 0, the retry conditions were not met and we don't want to retry.
-             *
+             * The retry condition is only met when the response has a `statusCodes` or `errorCodes`
+             * that matches the supplied retry configuration values.
              * @see https://github.com/sindresorhus/got/blob/3034c2fdcebdff94907a6e015a8b154e851fc343/documentation/7-retry.md?plain=1#L130
              */
             return 0;
