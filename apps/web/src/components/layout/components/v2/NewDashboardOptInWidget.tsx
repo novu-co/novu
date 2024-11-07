@@ -2,42 +2,20 @@ import { Card } from '@mantine/core';
 import { css } from '@novu/novui/css';
 import { Text, Title, Button, IconButton } from '@novu/novui';
 import { IconOutlineClose } from '@novu/novui/icons';
-import { useUser } from '@clerk/clerk-react';
 import { FeatureFlagsKeysEnum, NewDashboardOptInStatusEnum } from '@novu/shared';
 import { IS_SELF_HOSTED } from '../../../../config';
 import { useFeatureFlag } from '../../../../hooks';
+import { useNewDashboardOptIn } from '../../../../hooks/useNewDashboardOptIn';
 
 export function NewDashboardOptInWidget() {
-  const { user } = useUser();
+  const { dismiss, optIn, status } = useNewDashboardOptIn();
+
   const isNewDashboardEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ENABLED);
 
-  const isDismissed = user?.unsafeMetadata?.newDashboardOptInStatus === NewDashboardOptInStatusEnum.DISMISSED;
+  const isDismissed = status === NewDashboardOptInStatusEnum.DISMISSED;
 
   if (IS_SELF_HOSTED || isDismissed || !isNewDashboardEnabled) {
     return null;
-  }
-
-  const updateUserOptInStatus = (status: NewDashboardOptInStatusEnum) => {
-    if (!user) return;
-
-    user.update({
-      unsafeMetadata: {
-        ...user.unsafeMetadata,
-        newDashboardOptInStatus: status,
-      },
-    });
-  };
-
-  function handleOptIn() {
-    const newDashboardUrl = process.env.NEW_DASHBOARD_URL;
-    if (!newDashboardUrl || !user) return;
-
-    updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_IN);
-    window.location.href = newDashboardUrl;
-  }
-
-  function handleDismiss() {
-    updateUserOptInStatus(NewDashboardOptInStatusEnum.DISMISSED);
   }
 
   return (
@@ -47,14 +25,14 @@ export function NewDashboardOptInWidget() {
           <Title className={styles.title}>
             <span style={{ marginRight: '4px' }}>🎉</span> You're invited!
           </Title>
-          <IconButton onClick={handleDismiss} Icon={IconOutlineClose} size="xs" />
+          <IconButton onClick={dismiss} Icon={IconOutlineClose} size="xs" />
         </div>
         <Text className={styles.text}>
           We’d love to extend you the access for the new workflows dashboard that we’re building.
         </Text>
       </div>
       <div className={styles.buttonContainer}>
-        <Button size="sm" variant="transparent" onClick={handleOptIn}>
+        <Button size="sm" variant="transparent" onClick={optIn}>
           Take me there
         </Button>
       </div>
