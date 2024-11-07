@@ -729,7 +729,7 @@ function parseAndReturnJson(res: ApiResponse, url: string) {
     expect.fail(
       '',
       '',
-      `'Expected response to be JSON' text: ${res.text}, url: ${url}, method: ${res.req.method}, status: ${res.status}`
+      `'Expected response to be JSON' text: ${res.text}, url: ${url}, method: ${res.req.method}, status: ${res.status}, error: ${e.message}`
     );
   }
   expect(parse).to.be.ok;
