@@ -1,5 +1,5 @@
 import { expect, it, describe } from 'vitest';
-import { isFrameworkError, isPlatformError } from './guard.errors';
+import { isFrameworkError, isNativeError, isPlatformError } from './guard.errors';
 import { PlatformError } from './platform.errors';
 import { ErrorCodeEnum, HttpStatusEnum } from '../constants';
 import { FrameworkError } from './base.errors';
@@ -11,6 +11,24 @@ class TestFrameworkError extends FrameworkError {
 }
 
 describe('error utils', () => {
+  describe('isNativeError', () => {
+    it('should return true for native errors', () => {
+      expect(isNativeError(new Error('Test error'))).toBe(true);
+    });
+
+    it('should return true for framework errors', () => {
+      expect(isNativeError(new TestFrameworkError('Unable to find the workflow'))).toBe(true);
+    });
+
+    const falseCases = [{}, null, undefined, 'Test error', 123, true, [], () => {}, Symbol('test')];
+
+    falseCases.forEach((value) => {
+      it(`should return false for ${typeof value}`, () => {
+        expect(isNativeError(value)).toBe(false);
+      });
+    });
+  });
+
   describe('isFrameworkError', () => {
     it('should return true for framework errors', () => {
       expect(isFrameworkError(new TestFrameworkError('Unable to find the workflow'))).toBe(true);

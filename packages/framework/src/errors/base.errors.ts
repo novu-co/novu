@@ -1,7 +1,6 @@
-import { isNativeError } from 'node:util/types';
-
 import { HttpStatusEnum } from '../constants';
 import { ErrorCodeEnum } from '../constants/error.constants';
+import { isNativeError } from './guard.errors';
 
 /**
  * Base error class.
