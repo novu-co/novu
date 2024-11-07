@@ -2,6 +2,9 @@ name: Run Backend
 
 description: Starts and waits for the API and Worker instance
 
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
 inputs:
   launch_darkly_sdk_key:
     description: 'The Launch Darkly SDK key to use'

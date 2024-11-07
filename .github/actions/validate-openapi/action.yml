@@ -2,6 +2,9 @@ name: Validate OpenAPI
 
 description: Validates the OpenAPI from the API
 
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
 runs:
   using: composite
 

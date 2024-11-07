@@ -17,6 +17,7 @@ on:
       - 'libs/application-generic/**'
 env:
   TF_WORKSPACE: novu-dev
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
 jobs:
   test_api:

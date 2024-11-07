@@ -1,5 +1,8 @@
 name: 'Prepare Cloud Release'
 
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
 on:
   workflow_dispatch:
   # Triggers the workflow every work day at 8:00 UTC
