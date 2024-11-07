@@ -2,9 +2,6 @@ name: Run Worker
 
 description: Sets up a Redis Cluster instance needed to run the tests
 
-env:
-  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-
 inputs:
   launch_darkly_sdk_key:
     description: 'The Launch Darkly SDK key to use'

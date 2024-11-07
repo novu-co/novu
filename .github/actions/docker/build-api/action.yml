@@ -1,8 +1,5 @@
 name: Build API Docker Image
 
-env:
-  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-
 description: 'Builds a docker image for the API'
 
 inputs:

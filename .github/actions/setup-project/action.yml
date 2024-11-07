@@ -2,9 +2,6 @@ name: Setup Novu Monorepo
 
 description: Sets up the whole monorepo and install dependencies
 
-env:
-  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-
 inputs:
   slim:
     description: 'Should only install dependencies and checkout code'
