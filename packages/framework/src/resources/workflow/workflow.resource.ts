@@ -18,7 +18,6 @@ import { discoverActionStepFactory } from './discover-action-step-factory';
 import { discoverChannelStepFactory } from './discover-channel-step-factory';
 import { discoverCustomStepFactory } from './discover-custom-step-factory';
 import { mapPreferences } from './map-preferences';
-import { prettyPrintDiscovery } from './pretty-print-discovery';
 
 /**
  * Define a new notification workflow.
@@ -149,12 +148,11 @@ export function workflow<
       } as never,
     });
 
-    prettyPrintDiscovery(newWorkflow);
-
     return newWorkflow;
   };
 
   return {
+    id: workflowId,
     trigger,
     discover,
   };

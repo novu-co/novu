@@ -13,7 +13,6 @@ import {
   ProviderNotFoundError,
   StepControlCompilationFailedError,
   StepNotFoundError,
-  WorkflowAlreadyExistsError,
   WorkflowNotFoundError,
   StepExecutionFailedError,
   isFrameworkError,
@@ -46,6 +45,7 @@ import {
 import { validateData } from './validators';
 
 import { mockSchema } from './jsonSchemaFaker';
+import { prettyPrintDiscovery } from './resources/workflow/pretty-print-discovery';
 
 function isRuntimeInDevelopment() {
   return ['development', undefined].includes(process.env.NODE_ENV);
@@ -94,12 +94,13 @@ export class Client {
     return builtConfiguration;
   }
 
-  public async addWorkflows(workflows: Array<Workflow>) {
+  public async addWorkflows(workflows: Array<Workflow>): Promise<void> {
     for (const workflow of workflows) {
-      const definition = await workflow.discover();
-      if (this.discoveredWorkflows.some((existing) => existing.workflowId === definition.workflowId)) {
-        throw new WorkflowAlreadyExistsError(definition.workflowId);
+      if (this.discoveredWorkflows.some((existing) => existing.workflowId === workflow.id)) {
+        return;
       } else {
+        const definition = await workflow.discover();
+        prettyPrintDiscovery(definition);
         this.discoveredWorkflows.push(definition);
       }
     }
