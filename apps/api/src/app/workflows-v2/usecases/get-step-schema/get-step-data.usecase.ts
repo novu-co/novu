@@ -1,43 +1,73 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ControlValuesLevelEnum, StepDataDto } from '@novu/shared';
 import { JSONSchema } from 'json-schema-to-ts';
-import { ControlValuesRepository, NotificationStepEntity } from '@novu/dal';
+import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { GetStepDataCommand } from './get-step-data.command';
 import { mapStepTypeToResult } from '../../shared';
 import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { InvalidStepException } from '../../exceptions/invalid-step.exception';
+import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
 
 @Injectable()
 export class GetStepDataUsecase {
   constructor(
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
+    private buildDefaultPayloadUseCase: BuildDefaultPayloadUseCase,
     private controlValuesRepository: ControlValuesRepository
   ) {}
 
   async execute(command: GetStepDataCommand): Promise<StepDataDto> {
-    const { currentStep, previousSteps } = await this.findSteps(command);
+    const workflow = await this.fetchWorkflow(command);
+
+    const { currentStep, previousSteps } = await this.findSteps(command, workflow);
     if (!currentStep.name || !currentStep._templateId || !currentStep.stepId) {
       throw new InvalidStepException(currentStep);
     }
+    const controlValues = await this.getValues(command, currentStep, workflow._id);
+    const payloadSchema = this.buildPayloadSchema(controlValues);
 
     return {
       controls: {
         dataSchema: currentStep.template?.controls?.schema,
         uiSchema: currentStep.template?.controls?.uiSchema,
-        values: await this.getValues(command, currentStep),
+        values: controlValues,
       },
-      variables: buildVariablesSchema(previousSteps),
+      variables: buildVariablesSchema(previousSteps, payloadSchema),
       name: currentStep.name,
       _id: currentStep._templateId,
       stepId: currentStep.stepId,
     };
   }
 
-  private async getValues(command: GetStepDataCommand, currentStep: NotificationStepEntity) {
+  private buildPayloadSchema(controlValues: Record<string, any>) {
+    const payloadVariables = this.buildDefaultPayloadUseCase.execute({
+      controlValues,
+    }).previewPayload.payload;
+
+    return buildStringSchema(payloadVariables || {});
+  }
+
+  private async fetchWorkflow(command: GetStepDataCommand) {
+    const workflow = await this.getWorkflowByIdsUseCase.execute({
+      identifierOrInternalId: command.identifierOrInternalId,
+      user: command.user,
+    });
+
+    if (!workflow) {
+      throw new BadRequestException({
+        message: 'No workflow found',
+        workflowId: command.identifierOrInternalId,
+      });
+    }
+
+    return workflow;
+  }
+
+  private async getValues(command: GetStepDataCommand, currentStep: NotificationStepEntity, _workflowId: string) {
     const controlValuesEntity = await this.controlValuesRepository.findOne({
       _environmentId: command.user.environmentId,
       _organizationId: command.user.organizationId,
-      _workflowId: command.workflowId,
+      _workflowId,
       _stepId: currentStep._templateId,
       level: ControlValuesLevelEnum.STEP_CONTROLS,
     });
@@ -45,26 +75,16 @@ export class GetStepDataUsecase {
     return controlValuesEntity?.controls || {};
   }
 
-  private async findSteps(command: GetStepDataCommand) {
-    const workflow = await this.getWorkflowByIdsUseCase.execute({
-      identifierOrInternalId: command.workflowId,
-      user: command.user,
-    });
-
-    if (!workflow) {
-      throw new BadRequestException({
-        message: 'No workflow found',
-        workflowId: command.workflowId,
-      });
-    }
-
-    const currentStep = workflow.steps.find((stepItem) => stepItem._id === command.stepId);
+  private async findSteps(command: GetStepDataCommand, workflow: NotificationTemplateEntity) {
+    const currentStep = workflow.steps.find(
+      (stepItem) => stepItem._id === command.stepId || stepItem.stepId === command.stepId
+    );
 
     if (!currentStep) {
       throw new BadRequestException({
         message: 'No step found',
         stepId: command.stepId,
-        workflowId: command.workflowId,
+        workflowId: command.identifierOrInternalId,
       });
     }
 
@@ -100,12 +120,16 @@ const buildSubscriberSchema = () =>
     additionalProperties: false,
   }) as const satisfies JSONSchema;
 
-function buildVariablesSchema(previousSteps?: NotificationStepEntity[]): JSONSchema {
+function buildVariablesSchema(
+  previousSteps: NotificationStepEntity[] | undefined,
+  payloadSchema: JSONSchema
+): JSONSchema {
   return {
     type: 'object',
     properties: {
       subscriber: buildSubscriberSchema(),
       steps: buildPreviousStepsSchema(previousSteps),
+      payload: payloadSchema,
     },
     additionalProperties: false,
   } as const satisfies JSONSchema;
@@ -133,4 +157,23 @@ function buildPreviousStepsSchema(previousSteps: NotificationStepEntity[] | unde
     additionalProperties: false,
     description: 'Previous Steps Results',
   } as const satisfies JSONSchema;
+}
+
+/**
+ * Builds a JSON schema object where each variable becomes a string property.
+ */
+function buildStringSchema(variables: Record<string, unknown>): JSONSchema {
+  const properties: Record<string, JSONSchema> = {};
+
+  for (const [variableKey, variableValue] of Object.entries(variables)) {
+    properties[variableKey] = {
+      type: 'string',
+      default: variableValue,
+    };
+  }
+
+  return {
+    type: 'object',
+    properties,
+  };
 }

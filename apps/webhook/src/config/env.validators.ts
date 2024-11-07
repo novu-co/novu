@@ -1,4 +1,4 @@
-import { CleanedEnv, cleanEnv, num, port, str, ValidatorSpec } from 'envalid';
+import { CleanedEnv, cleanEnv, port, str, ValidatorSpec } from 'envalid';
 import { StringifyEnv } from '@novu/shared';
 
 export function validateEnv() {
@@ -12,5 +12,4 @@ export const envValidators = {
   NODE_ENV: str({ choices: ['dev', 'test', 'production', 'ci', 'local'], default: 'local' }),
   PORT: port(),
   SENTRY_DSN: str({ default: undefined }),
-  GRACEFUL_SHUTDOWN_TIMEOUT: num({ default: 5000 }),
 } satisfies Record<string, ValidatorSpec<unknown>>;

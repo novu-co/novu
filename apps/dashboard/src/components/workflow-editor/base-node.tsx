@@ -92,7 +92,7 @@ export const NODE_WIDTH = 300;
 export const NODE_HEIGHT = 86;
 
 const nodeVariants = cva(
-  `relative border-neutral-alpha-200 bg-foreground-0 flex w-[300px] flex-col gap-1 border p-1 shadow-xs`,
+  `relative border-neutral-alpha-200 transition-colors aria-selected:border-primary bg-foreground-0 flex w-[300px] flex-col gap-1 border p-1 shadow-xs`,
   {
     variants: {
       variant: {
@@ -108,6 +108,11 @@ const nodeVariants = cva(
 
 export interface BaseNodeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof nodeVariants> {}
 
-export const Node = ({ children, variant, className }: BaseNodeProps) => {
-  return <div className={nodeVariants({ variant, className })}>{children}</div>;
+export const Node = (props: BaseNodeProps) => {
+  const { children, variant, className, ...rest } = props;
+  return (
+    <div className={nodeVariants({ variant, className })} {...rest}>
+      {children}
+    </div>
+  );
 };

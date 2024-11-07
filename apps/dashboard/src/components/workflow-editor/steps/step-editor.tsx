@@ -1,10 +1,10 @@
+import { ConfigureInAppStepTemplateTabs } from '@/components/workflow-editor/steps/configure-in-app-template/configure-in-app-step-template-tabs';
 import { StepTypeEnum } from '@novu/shared';
-import { InAppEditor } from './in-app-editor';
 
 const STEP_TYPE_TO_EDITOR: Record<StepTypeEnum, () => React.JSX.Element> = {
   [StepTypeEnum.EMAIL]: () => <div>EMAIL Editor</div>,
   [StepTypeEnum.CHAT]: () => <div>CHAT Editor</div>,
-  [StepTypeEnum.IN_APP]: InAppEditor,
+  [StepTypeEnum.IN_APP]: ConfigureInAppStepTemplateTabs,
   [StepTypeEnum.SMS]: () => <div>SMS Editor</div>,
   [StepTypeEnum.PUSH]: () => <div>PUSH Editor</div>,
   [StepTypeEnum.DIGEST]: () => <div>DIGEST Editor</div>,

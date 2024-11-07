@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Event, ExecuteOutput, HttpQueryKeysEnum, JobStatusEnum, PostActionEnum } from '@novu/framework/internal';
+import { Event, ExecuteOutput, HttpQueryKeysEnum, PostActionEnum } from '@novu/framework/internal';
 import { ExecuteBridgeRequest, ExecuteBridgeRequestCommand } from '@novu/application-generic';
 
 import { PreviewStepCommand } from './preview-step.command';
@@ -35,7 +35,7 @@ export class PreviewStep {
     return {
       controls: command.controls || {},
       payload: command.payload || {},
-      state: [],
+      state: command.state || [],
       subscriber: command.subscriber || {},
       stepId: command.stepId,
       workflowId: command.workflowId,

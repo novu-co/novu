@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { UserSession } from '@novu/testing';
 import { randomBytes } from 'crypto';
 import {
+  createWorkflowClient,
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
   isStepUpdateBody,
@@ -22,7 +23,6 @@ import {
   WorkflowListResponseDto,
   WorkflowResponseDto,
 } from '@novu/shared';
-import { createWorkflowClient } from './clients';
 
 import { encodeBase62 } from '../shared/helpers';
 import { stepTypeToDefaultDashboardControlSchema } from './shared';
@@ -73,21 +73,7 @@ describe('Workflow Controller E2E API Testing', () => {
       if (res.isSuccessResult()) {
         const workflowCreated: WorkflowResponseDto = res.value;
         expect(workflowCreated.workflowId).to.include(`${slugify(nameSuffix)}-`);
-        for (const step of workflowCreated.steps) {
-          const stepDataDto = await getStepData(workflowCreated, step);
-          expect(stepDataDto).to.be.ok;
-          expect(stepDataDto.controls).to.be.ok;
-          if (stepDataDto.controls) {
-            expect(stepDataDto.controls.values).to.be.ok;
-            expect(stepDataDto.controls.dataSchema).to.be.ok;
-            expect(stepDataDto.controls.dataSchema).to.deep.equal(
-              stepTypeToDefaultDashboardControlSchema[step.type].schema
-            );
-            expect(stepDataDto.controls.uiSchema).to.deep.equal(
-              stepTypeToDefaultDashboardControlSchema[step.type].uiSchema
-            );
-          }
-        }
+        await assertValuesInSteps(workflowCreated);
       }
     });
   });
@@ -393,6 +379,89 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(JSON.parse(novuRestResult.error!.responseText).workflowId).to.contain(notExistingId);
     });
   });
+
+  describe('Get Steps Permutations', () => {
+    it('should get by worflow slugify ids', async () => {
+      const workflowCreated = await createWorkflowAndValidate('XYZ');
+      const internalWorkflowId = workflowCreated._id;
+      const stepId = workflowCreated.steps[0]._id;
+
+      const stepRetrievedByWorkflowInternalId = await getStepData(internalWorkflowId, stepId);
+      expect(stepRetrievedByWorkflowInternalId._id).to.equal(stepId);
+
+      const base62WorkflowIdInternalId = encodeBase62(internalWorkflowId);
+      const slugPrefixAndEncodedWorkflowInternalId = `my-workflow-${ShortIsPrefixEnum.WORKFLOW}${base62WorkflowIdInternalId}`;
+      const stepRetrievedBySlugPrefixAndEncodedWorkflowInternalId = await getStepData(
+        slugPrefixAndEncodedWorkflowInternalId,
+        stepId
+      );
+      expect(stepRetrievedBySlugPrefixAndEncodedWorkflowInternalId._id).to.equal(stepId);
+
+      const workflowIdentifier = workflowCreated.workflowId;
+      const stepRetrievedByWorkflowIdentifier = await getStepData(workflowIdentifier, stepId);
+      expect(stepRetrievedByWorkflowIdentifier._id).to.equal(stepId);
+    });
+
+    it('should get by step slugify ids', async () => {
+      const workflowCreated = await createWorkflowAndValidate('XYZ');
+      const internalWorkflowId = workflowCreated._id;
+      const stepId = workflowCreated.steps[0]._id;
+
+      const stepRetrievedByStepInternalId = await getStepData(internalWorkflowId, stepId);
+      expect(stepRetrievedByStepInternalId._id).to.equal(stepId);
+
+      const base62StepIdInternalId = encodeBase62(stepId);
+      const slugPrefixAndEncodedStepId = `my-step-${ShortIsPrefixEnum.STEP}${base62StepIdInternalId}`;
+      const stepRetrievedBySlugPrefixAndEncodedStepId = await getStepData(
+        internalWorkflowId,
+        slugPrefixAndEncodedStepId
+      );
+      expect(stepRetrievedBySlugPrefixAndEncodedStepId._id).to.equal(stepId);
+
+      const stepIdentifier = workflowCreated.steps[0].stepId;
+      const stepRetrievedByStepIdentifier = await getStepData(internalWorkflowId, stepIdentifier);
+      expect(stepRetrievedByStepIdentifier._id).to.equal(stepId);
+    });
+
+    it('should get step payload variables', async () => {
+      const steps = [
+        {
+          ...buildEmailStep(),
+          controlValues: {
+            body: 'Welcome to our newsletter {{bodyText}}{{bodyText2}}{{payload.prefixBodyText}}',
+            subject: 'Welcome to our newsletter {{subjectText}} {{payload.prefixSubjectText}}',
+          },
+        },
+        { ...buildInAppStep(), controlValues: { subject: 'Welcome to our newsletter {{inAppSubjectText}}' } },
+      ];
+      const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('', { steps });
+      const res = await session.testAgent.post(`${v2Prefix}/workflows`).send(createWorkflowDto);
+      expect(res.status).to.be.equal(201);
+      const workflowCreated: WorkflowResponseDto = res.body.data;
+      const stepData = await getStepData(workflowCreated._id, workflowCreated.steps[0]._id);
+      const { variables } = stepData;
+
+      if (typeof variables === 'boolean') throw new Error('Variables is not an object');
+      const { properties } = variables;
+      expect(properties).to.be.ok;
+      if (!properties) throw new Error('Payload schema is not valid');
+
+      expect(properties.payload).to.deep.equal({
+        type: 'object',
+        properties: {
+          prefixSubjectText: {
+            type: 'string',
+            default: '{{payload.prefixSubjectText}}',
+          },
+          prefixBodyText: {
+            type: 'string',
+            default: '{{payload.prefixBodyText}}',
+          },
+        },
+      });
+    });
+  });
+
   async function updateWorkflowRest(id: string, workflow: UpdateWorkflowDto): Promise<WorkflowResponseDto> {
     const novuRestResult = await workflowsClient.updateWorkflow(id, workflow);
     if (novuRestResult.isSuccessResult()) {
@@ -405,7 +474,7 @@ describe('Workflow Controller E2E API Testing', () => {
     return `${slugify(stepInRequest.name)}_${ShortIsPrefixEnum.STEP}${encodeBase62((stepInRequest as StepUpdateDto)._id)}`;
   }
   async function getControlValuesForStep(workflowId: string, stepId: string) {
-    const workflowStepMetadataRestResult = await workflowsClient.getWorkflowStepMetadata(workflowId, stepId);
+    const workflowStepMetadataRestResult = await workflowsClient.getWorkflowStepData(workflowId, stepId);
     if (!workflowStepMetadataRestResult.isSuccessResult()) {
       throw new Error(workflowStepMetadataRestResult.error!.responseText);
     }
@@ -440,10 +509,10 @@ describe('Workflow Controller E2E API Testing', () => {
     throw new Error(res.error!.responseText);
   }
 
-  async function getStepData(workflow: WorkflowResponseDto, step: StepResponseDto, envId?: string) {
-    const novuRestResult = await createWorkflowClient(session.serverUrl, getHeaders(envId)).getWorkflowStepMetadata(
-      workflow._id,
-      step._id
+  async function getStepData(workflowId: string, stepId: string, envId?: string) {
+    const novuRestResult = await createWorkflowClient(session.serverUrl, getHeaders(envId)).getWorkflowStepData(
+      workflowId,
+      stepId
     );
     if (!novuRestResult.isSuccessResult()) {
       throw new Error(novuRestResult.error!.responseText);
@@ -458,7 +527,7 @@ describe('Workflow Controller E2E API Testing', () => {
     step: StepDto & { _id: string; slug: Slug; stepId: string },
     envId: string
   ) {
-    const value = await getStepData(workflow, step, envId);
+    const value = await getStepData(workflow._id, step._id, envId);
 
     return value.controls.values;
   }
@@ -483,6 +552,23 @@ describe('Workflow Controller E2E API Testing', () => {
       }
     }
     expect(convertToDate(updatedWorkflow.updatedAt)).to.be.greaterThan(convertToDate(expectedPastUpdatedAt));
+  }
+  async function assertValuesInSteps(workflowCreated: WorkflowResponseDto) {
+    for (const step of workflowCreated.steps) {
+      const stepDataDto = await getStepData(workflowCreated._id, step._id);
+      expect(stepDataDto).to.be.ok;
+      expect(stepDataDto.controls).to.be.ok;
+      if (stepDataDto.controls) {
+        expect(stepDataDto.controls.values).to.be.ok;
+        expect(stepDataDto.controls.dataSchema).to.be.ok;
+        expect(stepDataDto.controls.dataSchema).to.deep.equal(
+          stepTypeToDefaultDashboardControlSchema[step.type].schema
+        );
+        expect(stepDataDto.controls.uiSchema).to.deep.equal(
+          stepTypeToDefaultDashboardControlSchema[step.type].uiSchema
+        );
+      }
+    }
   }
 });
 

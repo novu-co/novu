@@ -1,6 +1,6 @@
 import { Handle, Node as FlowNode, NodeProps, Position } from '@xyflow/react';
 import { RiPlayCircleLine } from 'react-icons/ri';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { AddStepMenu } from './add-step-menu';
@@ -8,12 +8,14 @@ import { Node, NodeBody, NodeError, NodeHeader, NodeIcon, NodeName } from './bas
 import { StepTypeEnum } from '@/utils/enums';
 import { useWorkflowEditorContext } from './hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
+import { ComponentProps } from 'react';
+import { cn } from '@/utils/ui';
 
 export type NodeData = {
   name?: string;
   content?: string;
   addStepIndex?: number;
-  stepId?: string;
+  stepSlug?: string;
   error?: string;
 };
 
@@ -41,12 +43,22 @@ export const TriggerNode = (_props: NodeProps) => {
   );
 };
 
+type StepNodeProps = ComponentProps<typeof Node> & { data: NodeData };
+const StepNode = (props: StepNodeProps) => {
+  const { className, data, ...rest } = props;
+  const { stepSlug } = useParams<{
+    stepSlug: string;
+  }>();
+
+  return <Node aria-selected={stepSlug === data.stepSlug} className={cn('group', className)} {...rest} />;
+};
+
 export const EmailNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.EMAIL];
 
   return (
-    <Link to={`step/${data.stepId}`}>
-      <Node>
+    <Link to={`step/${data.stepSlug}`}>
+      <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.EMAIL}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.EMAIL]}>
             <Icon />
@@ -57,17 +69,18 @@ export const EmailNode = ({ data }: NodeProps<NodeType>) => {
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-      </Node>
+      </StepNode>
     </Link>
   );
 };
 
-export const SmsNode = ({ data }: NodeProps<NodeType>) => {
+export const SmsNode = (props: NodeProps<NodeType>) => {
+  const { data } = props;
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.SMS];
 
   return (
-    <Link to={`step/${data.stepId}`}>
-      <Node>
+    <Link to={`step/${data.stepSlug}`}>
+      <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.SMS}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.SMS]}>
             <Icon />
@@ -78,17 +91,18 @@ export const SmsNode = ({ data }: NodeProps<NodeType>) => {
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-      </Node>
+      </StepNode>
     </Link>
   );
 };
 
-export const InAppNode = ({ data }: NodeProps<NodeType>) => {
+export const InAppNode = (props: NodeProps<NodeType>) => {
+  const { data } = props;
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.IN_APP];
 
   return (
-    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepId: data.stepId ?? '' })}>
-      <Node>
+    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
+      <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.IN_APP}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.IN_APP]}>
             <Icon />
@@ -99,17 +113,18 @@ export const InAppNode = ({ data }: NodeProps<NodeType>) => {
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-      </Node>
+      </StepNode>
     </Link>
   );
 };
 
-export const PushNode = ({ data }: NodeProps<NodeType>) => {
+export const PushNode = (props: NodeProps<NodeType>) => {
+  const { data } = props;
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.PUSH];
 
   return (
-    <Link to={`step/${data.stepId}`}>
-      <Node>
+    <Link to={`step/${data.stepSlug}`}>
+      <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.PUSH}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.PUSH]}>
             <Icon />
@@ -120,17 +135,18 @@ export const PushNode = ({ data }: NodeProps<NodeType>) => {
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-      </Node>
+      </StepNode>
     </Link>
   );
 };
 
-export const ChatNode = ({ data }: NodeProps<NodeType>) => {
+export const ChatNode = (props: NodeProps<NodeType>) => {
+  const { data } = props;
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.CHAT];
 
   return (
-    <Link to={`step/${data.stepId}`}>
-      <Node>
+    <Link to={`step/${data.stepSlug}`}>
+      <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.CHAT}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.CHAT]}>
             <Icon />
@@ -141,16 +157,17 @@ export const ChatNode = ({ data }: NodeProps<NodeType>) => {
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-      </Node>
+      </StepNode>
     </Link>
   );
 };
 
-export const DelayNode = ({ data }: NodeProps<NodeType>) => {
+export const DelayNode = (props: NodeProps<NodeType>) => {
+  const { data } = props;
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.DELAY];
 
   return (
-    <Node>
+    <StepNode data={data}>
       <NodeHeader type={StepTypeEnum.DELAY}>
         <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.DELAY]}>
           <Icon />
@@ -160,15 +177,16 @@ export const DelayNode = ({ data }: NodeProps<NodeType>) => {
       <NodeBody>{data.content || 'You have been invited to the Novu party on "commentSnippet"'}</NodeBody>
       <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
       <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-    </Node>
+    </StepNode>
   );
 };
 
-export const DigestNode = ({ data }: NodeProps<NodeType>) => {
+export const DigestNode = (props: NodeProps<NodeType>) => {
+  const { data } = props;
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.DIGEST];
 
   return (
-    <Node>
+    <StepNode data={data}>
       <NodeHeader type={StepTypeEnum.DIGEST}>
         <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.DIGEST]}>
           <Icon />
@@ -180,15 +198,16 @@ export const DigestNode = ({ data }: NodeProps<NodeType>) => {
       </NodeBody>
       <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
       <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-    </Node>
+    </StepNode>
   );
 };
 
-export const CustomNode = ({ data }: NodeProps<NodeType>) => {
+export const CustomNode = (props: NodeProps<NodeType>) => {
+  const { data } = props;
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.CUSTOM];
 
   return (
-    <Node>
+    <StepNode data={data}>
       <NodeHeader type={StepTypeEnum.CUSTOM}>
         <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.CUSTOM]}>
           <Icon />
@@ -198,7 +217,7 @@ export const CustomNode = ({ data }: NodeProps<NodeType>) => {
       <NodeBody>Executes the business logic in your bridge application</NodeBody>
       <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
       <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-    </Node>
+    </StepNode>
   );
 };
 
