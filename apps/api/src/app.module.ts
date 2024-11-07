@@ -2,7 +2,7 @@
 import { DynamicModule, Logger, Module, Provider } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ProfilingModule, TracingModule } from '@novu/application-generic';
-import { NovuModule } from '@novu/framework/nest';
+import { Client, NovuModule } from '@novu/framework/nest';
 
 import { Type } from '@nestjs/common/interfaces/type.interface';
 import { ForwardReference } from '@nestjs/common/interfaces/modules/forward-reference.interface';
@@ -157,6 +157,11 @@ if (process.env.NODE_ENV === 'test') {
 modules.push(
   NovuModule.register({
     apiPath: '/api/novu',
+    client: new Client({
+      secretKey: process.env.NOVU_INTERNAL_SECRET_KEY,
+      strictAuthentication:
+        process.env.NODE_ENV === 'production' || process.env.NOVU_STRICT_AUTHENTICATION_ENABLED === 'true',
+    }),
     controllerDecorators: [ApiExcludeController()],
     workflows: [usageLimitsWorkflow],
   })
