@@ -6,6 +6,7 @@ import {
   StepIssuesDto,
   WorkflowIssueTypeEnum,
   WorkflowResponseDto,
+  WorkflowStatusEnum,
 } from '@novu/shared';
 import {
   ControlValuesEntity,
@@ -34,7 +35,8 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
     return await this.getWorkflow(command);
   }
 
-  private async persistWorkflow(command: ValidateWorkflowCommand, workflowWithIssues) {
+  private async persistWorkflow(command: ValidateWorkflowCommand, workflowWithIssues: NotificationTemplateEntity) {
+    const isGoodWorkflow = this.isTriggerableWorkflow(workflowWithIssues);
     await this.notificationTemplateRepository.update(
       {
         _id: command.workflow._id,
@@ -42,9 +44,32 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
       },
       {
         ...workflowWithIssues,
+        status: this.calculateStatus(isGoodWorkflow, workflowWithIssues),
       }
     );
   }
+
+  private calculateStatus(isGoodWorkflow: boolean, workflowWithIssues) {
+    if (workflowWithIssues.status === WorkflowStatusEnum.INACTIVE) {
+      return WorkflowStatusEnum.INACTIVE;
+    }
+
+    return isGoodWorkflow ? WorkflowStatusEnum.ERROR : WorkflowStatusEnum.ACTIVE;
+  }
+
+  private isTriggerableWorkflow(workflowWithIssues) {
+    const workflowIssues = workflowWithIssues.issues && Object.keys(workflowWithIssues.issues).length;
+    const hasStepIssues =
+      workflowWithIssues.steps
+        .map((step) => step.issues)
+        .filter((issue) => issue != null)
+        .filter((issue) => issue.body && Object.keys(issue.body).length > 0)
+        .filter((issue) => issue.controls && Object.keys(issue.controls).length > 0).length > 0;
+    const active = !hasStepIssues && !workflowIssues;
+
+    return active;
+  }
+
   private async getWorkflow(command: ValidateWorkflowCommand) {
     const entity = await this.notificationTemplateRepository.findById(command.workflow._id, command.user.environmentId);
     if (entity == null) {
@@ -91,7 +116,7 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
   ): Promise<Record<keyof WorkflowResponseDto, RuntimeIssue[]>> {
     // @ts-ignore
     const issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]> = {};
-    await this.addTriggerIdentifierNotUnuiqeIfApplicable(command, issues);
+    await this.addTriggerIdentifierNotUniqueIfApplicable(command, issues);
     this.addNameMissingIfApplicable(command, issues);
     this.addDescriptionTooLongIfApplicable(command, issues);
 
@@ -118,25 +143,9 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
       ];
     }
   }
-  private async addTriggerIdentifierNotUnuiqeIfApplicable(
+  private async addTriggerIdentifierNotUniqueIfApplicable(
     command: ValidateWorkflowCommand,
-    issues: Record<
-      | '_id'
-      | 'slug'
-      | 'updatedAt'
-      | 'createdAt'
-      | 'steps'
-      | 'origin'
-      | 'preferences'
-      | 'status'
-      | 'issues'
-      | 'workflowId'
-      | 'tags'
-      | 'active'
-      | 'name'
-      | 'description',
-      RuntimeIssue[]
-    >
+    issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
   ) {
     const findAllByTriggerIdentifier = await this.notificationTemplateRepository.findAllByTriggerIdentifier(
       command.user.environmentId,
