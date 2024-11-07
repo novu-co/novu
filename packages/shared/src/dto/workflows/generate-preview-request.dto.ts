@@ -1,4 +1,4 @@
-import { JSONSchemaDto } from './json-schema-dto';
+import { PreviewPayload } from './preview-step-response.dto';
 
 export enum ValidationStrategyEnum {
   VALIDATE_MISSING_PAYLOAD_VALUES_FOR_HYDRATION = 'VALIDATE_MISSING_PAYLOAD_VALUES_FOR_HYDRATION',
@@ -9,9 +9,7 @@ export enum ValidationStrategyEnum {
 // eslint-disable-next-line @typescript-eslint/naming-convention
 interface GeneratePreviewRequestDto {
   controlValues?: Record<string, unknown>; // Optional control values
-  payloadValues?: Record<string, unknown>; // Optional payload values
-  variablesSchema?: JSONSchemaDto; // Optional variables schema
-  validationStrategies?: ValidationStrategyEnum[]; // Array of validation strategies
+  previewPayload?: PreviewPayload; // Optional payload values
 }
 
 // Export the GeneratePreviewRequestDto type

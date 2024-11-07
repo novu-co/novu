@@ -50,13 +50,11 @@ export class BridgeController {
   @Get('/status')
   @UseGuards(UserAuthGuard)
   async health(@UserSession() user: UserSessionData) {
-    const result = await this.getBridgeStatus.execute(
+    return this.getBridgeStatus.execute(
       GetBridgeStatusCommand.create({
         environmentId: user.environmentId,
       })
     );
-
-    return result;
   }
 
   @Post('/preview/:workflowId/:stepId')
