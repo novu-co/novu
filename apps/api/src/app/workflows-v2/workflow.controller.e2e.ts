@@ -111,7 +111,7 @@ describe('Workflow Controller E2E API Testing', () => {
           { steps: [{ ...buildEmailStep(), controlValues: {} }] },
           0
         );
-        expect(status).to.equal(WorkflowStatusEnum.ERROR);
+        expect(status, JSON.stringify(issues)).to.equal(WorkflowStatusEnum.ERROR);
         expect(issues).to.be.ok;
         if (issues.controls) {
           expect(issues.controls?.emailEditor).to.be.ok;
@@ -728,7 +728,6 @@ describe('Workflow Controller E2E API Testing', () => {
     expect(workflowResponseDto.createdAt, workflowAsString(workflowResponseDto)).to.be.ok;
     expect(workflowResponseDto.preferences, workflowAsString(workflowResponseDto)).to.be.ok;
     expect(workflowResponseDto.status, workflowAsString(workflowResponseDto)).to.be.ok;
-    expect(workflowResponseDto.status, workflowAsString(workflowResponseDto)).to.equal(WorkflowStatusEnum.ACTIVE);
     expect(workflowResponseDto.origin, workflowAsString(workflowResponseDto)).to.be.eq(WorkflowOriginEnum.NOVU_CLOUD);
     expect(Object.keys(workflowResponseDto.issues || {}).length, workflowAsString(workflowResponseDto)).to.be.equal(0);
   }

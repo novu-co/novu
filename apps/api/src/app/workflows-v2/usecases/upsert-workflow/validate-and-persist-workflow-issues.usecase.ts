@@ -37,6 +37,7 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
 
   private async persistWorkflow(command: ValidateWorkflowCommand, workflowWithIssues: NotificationTemplateEntity) {
     const isGoodWorkflow = this.isWorkflowCompleteAndValid(workflowWithIssues);
+    const status = this.calculateStatus(isGoodWorkflow, workflowWithIssues);
     await this.notificationTemplateRepository.update(
       {
         _id: command.workflow._id,
@@ -44,7 +45,7 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
       },
       {
         ...workflowWithIssues,
-        status: this.calculateStatus(isGoodWorkflow, workflowWithIssues),
+        status,
       }
     );
   }
@@ -62,15 +63,22 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
   }
 
   private isWorkflowCompleteAndValid(workflowWithIssues: NotificationTemplateEntity) {
-    const workflowIssues = workflowWithIssues.issues && Object.keys(workflowWithIssues.issues).length;
-    const hasStepIssues =
+    const workflowIssues = workflowWithIssues.issues && Object.keys(workflowWithIssues.issues).length > 0;
+    const hasInnerIssues =
       workflowWithIssues.steps
         .map((step) => step.issues)
         .filter((issue) => issue != null)
-        .filter((issue) => issue.body && Object.keys(issue.body).length > 0)
-        .filter((issue) => issue.controls && Object.keys(issue.controls).length > 0).length > 0;
+        .filter((issue) => this.hasBodyIssues(issue) || this.hasControlIssues(issue)).length > 0;
 
-    return !hasStepIssues && !workflowIssues;
+    return !hasInnerIssues && !workflowIssues;
+  }
+
+  private hasControlIssues(issue: StepIssues) {
+    return issue.controls && Object.keys(issue.controls).length > 0;
+  }
+
+  private hasBodyIssues(issue: StepIssues) {
+    return issue.body && Object.keys(issue.body).length > 0;
   }
 
   private async getWorkflow(command: ValidateWorkflowCommand) {
