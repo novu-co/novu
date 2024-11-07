@@ -462,6 +462,70 @@ describe('Workflow Controller E2E API Testing', () => {
     });
   });
 
+  describe('Get Test Data Permutations', () => {
+    it('should get test data', async () => {
+      const steps = [
+        {
+          ...buildEmailStep(),
+          controlValues: {
+            body: 'Welcome to our newsletter {{bodyText}}{{bodyText2}}{{payload.emailPrefixBodyText}}',
+            subject: 'Welcome to our newsletter {{subjectText}} {{payload.prefixSubjectText}}',
+          },
+        },
+        { ...buildInAppStep(), controlValues: { subject: 'Welcome to our newsletter {{payload.inAppSubjectText}}' } },
+      ];
+      const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('', { steps });
+      const res = await session.testAgent.post(`${v2Prefix}/workflows`).send(createWorkflowDto);
+      expect(res.status).to.be.equal(201);
+      const workflowCreated: WorkflowResponseDto = res.body.data;
+      const workflowTestData = await getWorkflowTestData(workflowCreated._id);
+
+      expect(workflowTestData).to.be.ok;
+      expect(workflowTestData.payload).to.deep.equal({
+        type: 'object',
+        properties: {
+          emailPrefixBodyText: {
+            type: 'string',
+            default: '{{payload.emailPrefixBodyText}}',
+          },
+          prefixSubjectText: {
+            type: 'string',
+            default: '{{payload.prefixSubjectText}}',
+          },
+          inAppSubjectText: {
+            type: 'string',
+            default: '{{payload.inAppSubjectText}}',
+          },
+        },
+      });
+
+      /*
+       * Validate the 'to' schema
+       * Note: Can't use deep comparison since emails differ between local and CI environments due to user sessions
+       */
+      const toSchema = workflowTestData.to;
+      if (
+        typeof toSchema === 'boolean' ||
+        typeof toSchema.properties?.subscriberId === 'boolean' ||
+        typeof toSchema.properties?.email === 'boolean'
+      ) {
+        expect((toSchema as any).type).to.be.a('boolean');
+        expect(((toSchema as any).properties?.subscriberId as any).type).to.be.a('boolean');
+        expect(((toSchema as any).properties?.email as any).type).to.be.a('boolean');
+        throw new Error('To schema is not a boolean');
+      }
+      expect(toSchema.type).to.equal('object');
+      expect(toSchema.properties?.subscriberId.type).to.equal('string');
+      expect(toSchema.properties?.subscriberId.default).to.equal(session.user._id);
+      expect(toSchema.properties?.email.type).to.equal('string');
+      expect(toSchema.properties?.email.format).to.equal('email');
+      expect(toSchema.properties?.email.default).to.be.a('string');
+      expect(toSchema.properties?.email.default).to.not.equal('');
+      expect(toSchema.required).to.deep.equal(['subscriberId', 'email']);
+      expect(toSchema.additionalProperties).to.be.false;
+    });
+  });
+
   async function updateWorkflowRest(id: string, workflow: UpdateWorkflowDto): Promise<WorkflowResponseDto> {
     const novuRestResult = await workflowsClient.updateWorkflow(id, workflow);
     if (novuRestResult.isSuccessResult()) {
@@ -513,6 +577,18 @@ describe('Workflow Controller E2E API Testing', () => {
     const novuRestResult = await createWorkflowClient(session.serverUrl, getHeaders(envId)).getWorkflowStepData(
       workflowId,
       stepId
+    );
+    if (!novuRestResult.isSuccessResult()) {
+      throw new Error(novuRestResult.error!.responseText);
+    }
+    const { value } = novuRestResult;
+
+    return value;
+  }
+
+  async function getWorkflowTestData(workflowId: string, envId?: string) {
+    const novuRestResult = await createWorkflowClient(session.serverUrl, getHeaders(envId)).getWorkflowTestData(
+      workflowId
     );
     if (!novuRestResult.isSuccessResult()) {
       throw new Error(novuRestResult.error!.responseText);

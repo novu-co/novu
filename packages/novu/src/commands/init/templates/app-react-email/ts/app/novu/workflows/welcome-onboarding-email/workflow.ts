@@ -17,6 +17,14 @@ export const welcomeOnboardingEmail = workflow(
         controlSchema: emailControlSchema,
       },
     );
+
+    await step.inApp("In-App Step", async () => {
+      return {
+        subject: payload.inAppSubject,
+        body: payload.inAppBody,
+        avatar: payload.inAppAvatar,
+      };
+    });
   },
   {
     payloadSchema,
