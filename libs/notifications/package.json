@@ -16,6 +16,7 @@
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
     "fix:lint": "eslint src --ext .ts --fix",
     "test": "jest",
+    "lint": "eslint src",
     "test:watch": "jest --watch",
     "watch:build": "tsc -p tsconfig.json -w",
     "reset-hard": "git clean -dfx && git reset --hard && pnpm install",
