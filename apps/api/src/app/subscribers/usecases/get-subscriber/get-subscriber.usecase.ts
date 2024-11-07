@@ -48,13 +48,6 @@ export class GetSubscriber {
     return await this.subscriberRepository.findBySubscriberId(_environmentId, subscriberId);
   }
 
-  @CachedEntity({
-    builder: (command: { subscriberId: string; _environmentId: string }) =>
-      buildSubscriberTopicsKey({
-        _environmentId: command._environmentId,
-        subscriberId: command.subscriberId,
-      }),
-  })
   private async fetchSubscriberTopics({
     subscriberId,
     _environmentId,
