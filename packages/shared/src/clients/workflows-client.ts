@@ -46,6 +46,7 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
   ): Promise<NovuRestResult<StepDataDto, HttpError>> => {
     return await baseClient.safeGet<StepDataDto>(`/v2/workflows/${workflowId}/steps/${stepId}`);
   };
+
   const deleteWorkflow = async (workflowId: string): Promise<NovuRestResult<void, HttpError>> => {
     return await baseClient.safeDelete(`/v2/workflows/${workflowId}`);
   };
