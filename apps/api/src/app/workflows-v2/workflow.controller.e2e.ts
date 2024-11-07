@@ -26,10 +26,12 @@ import {
   WorkflowListResponseDto,
   WorkflowOriginEnum,
   WorkflowResponseDto,
+  WorkflowStatusEnum,
 } from '@novu/shared';
 
 import { encodeBase62 } from '../shared/helpers';
 import { stepTypeToDefaultDashboardControlSchema } from './shared';
+import { getTestControlValues } from './generate-preview.e2e';
 
 const v2Prefix = '/v2';
 const PARTIAL_UPDATED_NAME = 'Updated';
@@ -71,6 +73,12 @@ describe('Workflow Controller E2E API Testing', () => {
   });
 
   describe('Error Handling', () => {
+    describe('Should show status ok when no problems', () => {
+      it('should show status ok when no problems', async () => {
+        const workflowCreated = await createWorkflowAndValidate();
+        await getWorkflowAndValidate(workflowCreated);
+      });
+    });
     describe('Workflow Body Issues', () => {
       it('should show description issue when too long', async () => {
         const issues = await createWorkflowAndReturnIssues({ description: LONG_DESCRIPTION });
@@ -84,29 +92,31 @@ describe('Workflow Controller E2E API Testing', () => {
     });
     describe('Workflow Step Body Issues', () => {
       it('should show name issue when missing', async () => {
-        const issues = await createWorkflowAndReturnStepIssues({ steps: [{ ...buildEmailStep(), name: '' }] }, 0);
-
-        expect(issues?.body).to.be.ok;
-        if (issues?.body) {
-          expect(issues?.body).to.be.ok;
-          expect(issues?.body.name).to.be.ok;
-          expect(issues?.body.name?.issueType, JSON.stringify(issues?.body.name)).to.be.equal(
-            StepIssueEnum.MISSING_REQUIRED_VALUE
-          );
+        const { issues, status } = await createWorkflowAndReturnStepIssues(
+          { steps: [{ ...buildEmailStep(), name: '' }] },
+          0
+        );
+        expect(status).to.be.equal(WorkflowStatusEnum.ERROR);
+        expect(issues).to.be.ok;
+        if (issues.body) {
+          expect(issues.body).to.be.ok;
+          expect(issues.body.name).to.be.ok;
+          expect(issues.body.name?.issueType, JSON.stringify(issues)).to.be.equal(StepIssueEnum.MISSING_REQUIRED_VALUE);
         }
       });
     });
     describe('Workflow Step content Issues', () => {
       it('should show control value required when missing', async () => {
-        const issues = await createWorkflowAndReturnStepIssues(
+        const { issues, status } = await createWorkflowAndReturnStepIssues(
           { steps: [{ ...buildEmailStep(), controlValues: {} }] },
           0
         );
-        expect(issues?.controls).to.be.ok;
-        if (issues?.controls) {
-          expect(issues?.controls.emailEditor).to.be.ok;
-          if (issues.controls.emailEditor) {
-            expect(issues.controls.emailEditor[0].issueType).to.be.equal(StepContentIssueEnum.MISSING_VALUE);
+        expect(status).to.equal(WorkflowStatusEnum.ERROR);
+        expect(issues).to.be.ok;
+        if (issues.controls) {
+          expect(issues.controls?.emailEditor).to.be.ok;
+          if (issues.controls?.emailEditor) {
+            expect(issues.controls?.emailEditor[0].issueType).to.be.equal(StepContentIssueEnum.MISSING_VALUE);
           }
         }
       });
@@ -718,6 +728,7 @@ describe('Workflow Controller E2E API Testing', () => {
     expect(workflowResponseDto.createdAt, workflowAsString(workflowResponseDto)).to.be.ok;
     expect(workflowResponseDto.preferences, workflowAsString(workflowResponseDto)).to.be.ok;
     expect(workflowResponseDto.status, workflowAsString(workflowResponseDto)).to.be.ok;
+    expect(workflowResponseDto.status, workflowAsString(workflowResponseDto)).to.equal(WorkflowStatusEnum.ACTIVE);
     expect(workflowResponseDto.origin, workflowAsString(workflowResponseDto)).to.be.eq(WorkflowOriginEnum.NOVU_CLOUD);
     expect(Object.keys(workflowResponseDto.issues || {}).length, workflowAsString(workflowResponseDto)).to.be.equal(0);
   }
@@ -771,7 +782,7 @@ describe('Workflow Controller E2E API Testing', () => {
     const { issues } = step;
     expect(issues, JSON.stringify(step)).to.be.ok;
     if (issues) {
-      return issues;
+      return { issues, status: workflowCreated.status };
     }
     throw new Error('Issues not found');
   }
@@ -788,6 +799,7 @@ function buildEmailStep(): StepCreateDto {
   return {
     name: 'Email Test Step',
     type: StepTypeEnum.EMAIL,
+    controlValues: getTestControlValues()[StepTypeEnum.EMAIL],
   };
 }
 
@@ -795,6 +807,7 @@ function buildInAppStep(): StepCreateDto {
   return {
     name: 'In-App Test Step',
     type: StepTypeEnum.IN_APP,
+    controlValues: getTestControlValues()[StepTypeEnum.IN_APP],
   };
 }
 

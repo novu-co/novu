@@ -36,7 +36,7 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
   }
 
   private async persistWorkflow(command: ValidateWorkflowCommand, workflowWithIssues: NotificationTemplateEntity) {
-    const isGoodWorkflow = this.isTriggerableWorkflow(workflowWithIssues);
+    const isGoodWorkflow = this.isWorkflowCompleteAndValid(workflowWithIssues);
     await this.notificationTemplateRepository.update(
       {
         _id: command.workflow._id,
@@ -49,15 +49,19 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
     );
   }
 
-  private calculateStatus(isGoodWorkflow: boolean, workflowWithIssues) {
-    if (workflowWithIssues.status === WorkflowStatusEnum.INACTIVE) {
+  private calculateStatus(isGoodWorkflow: boolean, workflowWithIssues: NotificationTemplateEntity) {
+    if (workflowWithIssues.active === false) {
       return WorkflowStatusEnum.INACTIVE;
     }
 
-    return isGoodWorkflow ? WorkflowStatusEnum.ERROR : WorkflowStatusEnum.ACTIVE;
+    if (isGoodWorkflow) {
+      return WorkflowStatusEnum.ACTIVE;
+    }
+
+    return WorkflowStatusEnum.ERROR;
   }
 
-  private isTriggerableWorkflow(workflowWithIssues) {
+  private isWorkflowCompleteAndValid(workflowWithIssues: NotificationTemplateEntity) {
     const workflowIssues = workflowWithIssues.issues && Object.keys(workflowWithIssues.issues).length;
     const hasStepIssues =
       workflowWithIssues.steps
@@ -65,9 +69,8 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
         .filter((issue) => issue != null)
         .filter((issue) => issue.body && Object.keys(issue.body).length > 0)
         .filter((issue) => issue.controls && Object.keys(issue.controls).length > 0).length > 0;
-    const active = !hasStepIssues && !workflowIssues;
 
-    return active;
+    return !hasStepIssues && !workflowIssues;
   }
 
   private async getWorkflow(command: ValidateWorkflowCommand) {

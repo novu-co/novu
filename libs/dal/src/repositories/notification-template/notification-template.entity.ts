@@ -20,6 +20,7 @@ import {
   StepIssues,
   TriggerTypeEnum,
   WorkflowOriginEnum,
+  WorkflowStatusEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
 import { NotificationGroupEntity } from '../notification-group';
@@ -87,6 +88,8 @@ export class NotificationTemplateEntity implements INotificationTemplate {
   payloadSchema?: any;
 
   issues: Record<string, ContentIssue[]>;
+
+  status?: WorkflowStatusEnum;
 }
 
 export type NotificationTemplateDBModel = ChangePropsValueType<

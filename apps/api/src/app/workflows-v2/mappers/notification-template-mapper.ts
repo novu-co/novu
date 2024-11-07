@@ -40,7 +40,7 @@ export function toResponseWorkflowDto(
     origin: computeOrigin(template),
     updatedAt: template.updatedAt || 'Missing Updated At',
     createdAt: template.createdAt || 'Missing Create At',
-    status: WorkflowStatusEnum.ACTIVE,
+    status: template.status || WorkflowStatusEnum.ACTIVE,
     issues: template.issues as unknown as Record<WorkflowCreateAndUpdateKeys, RuntimeIssue>,
   };
 }
