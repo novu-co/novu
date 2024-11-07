@@ -18,7 +18,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "watch:build": "tsc -p tsconfig.json -w",
-    "reset-hard": "git clean -dfx && git reset --hard && pnpm install"
+    "reset-hard": "git clean -dfx && git reset --hard && pnpm install",
+    "start:studio": "npx novu@latest dev --port 3000 --route /v1/api/novu"
   },
   "dependencies": {
     "@react-email/components": "^0.0.15",

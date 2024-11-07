@@ -4,18 +4,27 @@ import { renderUsageLimitsEmail } from './email';
 
 export const usageLimitsWorkflow = workflow(
   'usage-limits',
-  async ({ step }) => {
-    await step.email('email', async (controls) => {
-      return {
-        subject: 'You have reached your usage limits',
-        body: await renderUsageLimitsEmail(controls),
-      };
-    });
+  async ({ step, payload }) => {
+    await step.email(
+      'email',
+      async (controls) => {
+        return {
+          subject: controls.subject,
+          body: await renderUsageLimitsEmail(payload, controls),
+        };
+      },
+      {
+        controlSchema: z.object({
+          subject: z.string().default('You are approaching your usage limits'),
+          previewText: z.string().default('You have used {{payload.percentage}}% of your monthly events'),
+        }),
+      }
+    );
   },
   {
     name: 'Usage Limits Alert',
     payloadSchema: z.object({
-      percentage: z.number(),
+      percentage: z.number().min(0).max(100),
       organizationName: z.string(),
     }),
   }
