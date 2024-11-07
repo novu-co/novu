@@ -1,8 +1,5 @@
 name: Deploy DEV Worker
 
-env:
-  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
@@ -21,8 +18,10 @@ on:
       - 'libs/application-generic/**'
       - 'packages/stateless/**'
       - 'packages/node/**'
+
 env:
   TF_WORKSPACE: novu-dev
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
 jobs:
   test_worker:
