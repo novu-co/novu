@@ -67,9 +67,20 @@ export type DiscoverWorkflowOutput = {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Workflow<T_Payload = any> = {
+  /**
+   * Trigger an event for this workflow with a strongly typed and validated `payload`, derived from the `payloadSchema`.
+   *
+   * @param event - The event to trigger
+   * @returns `EventTriggerResult` - The result of the event trigger
+   */
   trigger: (
     event: Prettify<Omit<EventTriggerParams<T_Payload>, 'workflowId' | 'bridgeUrl' | 'controls'>>
   ) => Promise<EventTriggerResult>;
+  /**
+   * Discover the workflow definition.
+   *
+   * @returns `DiscoverWorkflowOutput` - The workflow definition
+   */
   discover: () => Promise<DiscoverWorkflowOutput>;
 };
 
