@@ -1469,7 +1469,7 @@ describe('Novu Client', () => {
         await step.inApp('send-in-app', async () => ({ body: 'Test Body', subject: 'Subject' }));
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.PREVIEW,
@@ -1571,7 +1571,7 @@ describe('Novu Client', () => {
         }
       );
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.PREVIEW,
@@ -1656,7 +1656,7 @@ describe('Novu Client', () => {
         }
       );
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.PREVIEW,
