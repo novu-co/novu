@@ -85,8 +85,6 @@ export class Sync {
       });
     }
 
-    await this.invalidateStaleWorkflows(command, discover);
-
     const persistedWorkflowsInBridge = await this.createWorkflows(command, discover.workflows);
 
     await this.disposeOldWorkflows(command, persistedWorkflowsInBridge);
@@ -94,47 +92,6 @@ export class Sync {
     await this.updateBridgeUrl(command);
 
     return persistedWorkflowsInBridge;
-  }
-
-  private async invalidateStaleWorkflows(command: SyncCommand, discover: DiscoverOutput) {
-    const existingWorkflows = await this.notificationTemplateRepository.find(
-      {
-        _environmentId: command.environmentId,
-        type: {
-          $in: [WorkflowTypeEnum.ECHO, WorkflowTypeEnum.BRIDGE],
-        },
-      },
-      {
-        projection: {
-          'triggers.0.identifier': 1,
-          _id: 1,
-        },
-      }
-    );
-    const discoverWorkflowIdentifiers = discover.workflows.map((workflow) => workflow.workflowId);
-    const staleWorkflows = existingWorkflows.filter(
-      (_worklfow) => !discoverWorkflowIdentifiers.includes(_worklfow.triggers[0].identifier)
-    );
-    const staleWorkflowIdentifiers = staleWorkflows.map((workflow) => workflow.triggers[0].identifier);
-    const staleWorkflowIds = staleWorkflows.map((workflow) => workflow._id);
-
-    for (const identifier of staleWorkflowIdentifiers) {
-      await this.invalidateCacheService.invalidateByKey({
-        key: buildNotificationTemplateIdentifierKey({
-          templateIdentifier: identifier,
-          _environmentId: command.environmentId,
-        }),
-      });
-    }
-
-    for (const _id of staleWorkflowIds) {
-      await this.invalidateCacheService.invalidateByKey({
-        key: buildNotificationTemplateKey({
-          _id,
-          _environmentId: command.environmentId,
-        }),
-      });
-    }
   }
 
   private async updateBridgeUrl(command: SyncCommand): Promise<void> {
@@ -158,21 +115,40 @@ export class Sync {
     createdWorkflows: NotificationTemplateEntity[]
   ): Promise<void> {
     const persistedWorkflowIdsInBridge = createdWorkflows.map((i) => i._id);
-
     const workflowsToDelete = await this.findAllWorkflowsWithOtherIds(command, persistedWorkflowIdsInBridge);
 
-    await Promise.all(
-      workflowsToDelete?.map((workflow) => {
-        return this.deleteWorkflow.execute(
-          DeleteWorkflowCommand.create({
-            environmentId: command.environmentId,
-            organizationId: command.organizationId,
-            userId: command.userId,
-            workflowId: workflow._id,
-          })
-        );
+    const deleteWorkflowFromStoragePromises = workflowsToDelete.map((workflow) =>
+      this.deleteWorkflow.execute(
+        DeleteWorkflowCommand.create({
+          environmentId: command.environmentId,
+          organizationId: command.organizationId,
+          userId: command.userId,
+          workflowId: workflow._id,
+        })
+      )
+    );
+    const invalidateCachesByIdentifiersPromises = workflowsToDelete.map((workflow) =>
+      this.invalidateCacheService.invalidateByKey({
+        key: buildNotificationTemplateIdentifierKey({
+          templateIdentifier: workflow.triggers[0].identifier,
+          _environmentId: command.environmentId,
+        }),
       })
     );
+    const invalidateCachesByIdsPromises = workflowsToDelete.map((workflow) =>
+      this.invalidateCacheService.invalidateByKey({
+        key: buildNotificationTemplateKey({
+          _id: workflow._id,
+          _environmentId: command.environmentId,
+        }),
+      })
+    );
+
+    await Promise.all([
+      ...deleteWorkflowFromStoragePromises,
+      ...invalidateCachesByIdentifiersPromises,
+      ...invalidateCachesByIdsPromises,
+    ]);
   }
 
   private async findAllWorkflowsWithOtherIds(
