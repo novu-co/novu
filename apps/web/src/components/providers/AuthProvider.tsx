@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import { IOrganizationEntity, IUserEntity } from '@novu/shared';
+import { type BrowserClerk } from '@clerk/clerk-react';
 import { IS_EE_AUTH_ENABLED } from '../../config/index';
 import {
   CommunityAuthContext,
@@ -57,6 +58,12 @@ export const useAuth = () => {
 
   return value;
 };
+
+declare global {
+  interface Window {
+    Clerk: BrowserClerk;
+  }
+}
 
 export async function getToken() {
   if (IS_EE_AUTH_ENABLED) {
