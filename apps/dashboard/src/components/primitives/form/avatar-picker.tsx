@@ -42,7 +42,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ i
         <PopoverTrigger asChild>
           <Button variant="outline" size="icon" className="text-foreground-600 relative size-10">
             {props.value ? (
-              <Avatar className="p-[1px]">
+              <Avatar className="p-px">
                 <AvatarImage src={props.value as string} />
               </Avatar>
             ) : (

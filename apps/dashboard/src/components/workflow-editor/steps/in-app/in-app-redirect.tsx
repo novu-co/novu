@@ -8,11 +8,13 @@ export const InAppRedirect = () => {
       <FormLabel hint="">Redirect URL</FormLabel>
       <URLInput
         options={urlTargetTypes}
-        placeholder="/tasks/{{taskid}}"
+        placeholder="/tasks/{{taskId}}"
         size="md"
         asEditor
-        urlKey="redirect.url"
-        targetKey="redirect.target"
+        fields={{
+          urlKey: 'redirect.url',
+          targetKey: 'redirect.target',
+        }}
       />
     </div>
   );

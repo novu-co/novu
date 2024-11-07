@@ -28,7 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/primitives/alert-dialog';
-import { Button, buttonVariants } from '@/components/primitives/button';
+import { buttonVariants } from '@/components/primitives/button';
 import { RiAlertFill } from 'react-icons/ri';
 import { Separator } from '@/components/primitives/separator';
 

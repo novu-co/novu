@@ -11,9 +11,11 @@ import { cn } from '@/utils/ui';
 type URLInputProps = Omit<InputProps, 'value' | 'onChange' | 'size'> & {
   options: string[];
   asEditor?: boolean;
-  urlKey: string;
-  targetKey: string;
   withHint?: boolean;
+  fields: {
+    urlKey: string;
+    targetKey: string;
+  };
 } & Pick<InputFieldProps, 'size'>;
 
 export const URLInput = ({
@@ -21,8 +23,7 @@ export const URLInput = ({
   size = 'default',
   asEditor = false,
   placeholder,
-  urlKey,
-  targetKey,
+  fields: { urlKey, targetKey },
   withHint = true,
 }: URLInputProps) => {
   const { control, getFieldState } = useFormContext();
@@ -95,7 +96,7 @@ export const URLInput = ({
         </div>
       </div>
       <FormMessagePure error={error ? String(error.message) : undefined}>
-        {withHint && 'This support variables and relative URLs i.e /tasks/{{taskid}}'}
+        {withHint && 'This support variables and relative URLs i.e /tasks/{{taskId}}'}
       </FormMessagePure>
     </div>
   );

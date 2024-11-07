@@ -55,14 +55,14 @@ export const InAppAction = () => {
             </div>
           )}
           {primaryAction && (
-            <ConfigureActionPopover asChild actionKey={primaryActionKey}>
+            <ConfigureActionPopover asChild fields={{ actionKey: primaryActionKey }}>
               <Button variant="primary" size="xs">
                 {primaryAction.label}
               </Button>
             </ConfigureActionPopover>
           )}
           {secondaryAction && (
-            <ConfigureActionPopover asChild actionKey={secondaryActionKey}>
+            <ConfigureActionPopover asChild fields={{ actionKey: secondaryActionKey }}>
               <Button variant="outline" size="xs">
                 {secondaryAction.label}
               </Button>
@@ -139,8 +139,11 @@ export const InAppAction = () => {
   );
 };
 
-const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & { actionKey: string }) => {
-  const { actionKey, ...rest } = props;
+const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & { fields: { actionKey: string } }) => {
+  const {
+    fields: { actionKey },
+    ...rest
+  } = props;
   const { control } = useFormContext();
 
   return (
@@ -186,8 +189,10 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
             <URLInput
               options={urlTargetTypes}
               asEditor
-              urlKey={`${actionKey}.redirect.url`}
-              targetKey={`${actionKey}.redirect.target`}
+              fields={{
+                urlKey: `${actionKey}.redirect.url`,
+                targetKey: `${actionKey}.redirect.target`,
+              }}
               withHint={false}
             />
           </div>

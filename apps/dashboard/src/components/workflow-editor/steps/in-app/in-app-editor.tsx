@@ -31,10 +31,12 @@ export const InAppEditor = ({ uiSchema }: { uiSchema?: UiSchema }) => {
         <span>In-app Template</span>
       </div>
       <div className="flex flex-col gap-1 rounded-xl border border-neutral-100 p-1">
-        <div className="flex gap-1">
-          {avatar && getComponentByType({ component: avatar.component })}
-          {subject && getComponentByType({ component: subject.component })}
-        </div>
+        {(avatar || subject) && (
+          <div className="flex gap-1">
+            {avatar && getComponentByType({ component: avatar.component })}
+            {subject && getComponentByType({ component: subject.component })}
+          </div>
+        )}
         {body && getComponentByType({ component: body.component })}
         {(primaryAction || secondaryAction) &&
           getComponentByType({
