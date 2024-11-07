@@ -28,7 +28,7 @@ jobs:
     secrets: inherit
 
   deploy_dev_api:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     needs: test_api
     timeout-minutes: 80
     environment: Development
@@ -134,7 +134,7 @@ jobs:
           url_prefix: '~'
 
   newrelic:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     name: New Relic Deploy
     needs: deploy_dev_api
     environment: Development

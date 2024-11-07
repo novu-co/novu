@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   build_docker:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     timeout-minutes: 90
     strategy:
       fail-fast: false
@@ -44,7 +44,7 @@ jobs:
         uses: pnpm/action-setup@v3
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: useblacksmith/setup-node@v5
         with:
           node-version: 20.8.1
           cache: 'pnpm'

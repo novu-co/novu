@@ -27,7 +27,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   infrastructure_data:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     timeout-minutes: 80
     environment: ${{ inputs.environment }}
     env:
@@ -69,7 +69,7 @@ jobs:
 
   deploy_worker_queue:
     needs: infrastructure_data
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     timeout-minutes: 80
     environment: ${{ inputs.environment }}
     env:

@@ -11,7 +11,7 @@ on:
 jobs:
   build_prod_image:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     timeout-minutes: 80
     environment: Production
     outputs:
@@ -108,7 +108,7 @@ jobs:
 
   deploy_docs:
     needs: deploy_prod_api_us
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     environment: Production
     steps:
       - name: Deploy API Documentation
@@ -118,7 +118,7 @@ jobs:
           method: 'POST'
 
   newrelic:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2204
     name: New Relic Deploy
     needs: deploy_prod_api_us
     environment: Production
