@@ -28,7 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/primitives/alert-dialog';
-import { Button, buttonVariants } from '@/components/primitives/button';
+import { buttonVariants } from '@/components/primitives/button';
 import { RiAlertFill } from 'react-icons/ri';
 import { Separator } from '@/components/primitives/separator';
 
@@ -128,6 +128,12 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
       updateWorkflow({ id: workflow._id, workflow: { ...workflow, ...data } as any });
     },
     enabled: !isReadOnly,
+    shouldSaveImmediately: (previousData, data) => {
+      const currentStepsLength = data?.steps?.length ?? 0;
+      const wasStepsLengthAltered = previousData.steps != null && currentStepsLength !== previousData.steps?.length;
+
+      return wasStepsLengthAltered;
+    },
   });
 
   const addStep = useCallback(
