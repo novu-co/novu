@@ -278,25 +278,27 @@ export class Client {
       }
 
       const step = this.getStep(event.workflowId, stepId);
-      const controls = await this.createStepControls(step, event);
       const isPreview = event.action === PostActionEnum.PREVIEW;
 
-      if (!isPreview && (await this.shouldSkip(options?.skip as typeof step.options.skip, controls))) {
-        if (stepId === event.stepId) {
-          // Only set the result when the step is the current step.
+      // Only evaluate a skip condition when the step is the current step and not in preview mode.
+      if (!isPreview && stepId === event.stepId) {
+        const controls = await this.createStepControls(step, event);
+        const shouldSkip = await this.shouldSkip(options?.skip as typeof step.options.skip, controls);
+
+        if (shouldSkip) {
           setResult({
             options: { skip: true },
             outputs: {},
             providers: {},
           });
-        }
 
-        /*
-         * Return an empty object for results when a step is skipped.
-         * TODO: fix typings when `skip` is specified to return `Partial<T_Result>`
-         */
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return {} as any;
+          /*
+           * Return an empty object for results when a step is skipped.
+           * TODO: fix typings when `skip` is specified to return `Partial<T_Result>`
+           */
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return {} as any;
+        }
       }
 
       const previewStepHandler = this.previewStep.bind(this);

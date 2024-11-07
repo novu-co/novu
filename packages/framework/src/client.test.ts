@@ -1351,7 +1351,15 @@ describe('Novu Client', () => {
         workflowId: 'test-workflow',
         stepId: 'active-step-id',
         subscriber: {},
-        state: [],
+        state: [
+          {
+            stepId: 'skipped-step-id',
+            outputs: {},
+            state: {
+              status: 'success',
+            },
+          },
+        ],
         payload: {},
         controls: {},
       };
@@ -1408,6 +1416,65 @@ describe('Novu Client', () => {
         action: PostActionEnum.PREVIEW,
         workflowId: 'test-workflow',
         stepId: 'send-email',
+        subscriber: {},
+        state: [],
+        payload: {},
+        controls: {},
+      };
+
+      const executionResult = await client.executeWorkflow(event);
+
+      expect(executionResult).toBeDefined();
+      expect(executionResult.outputs).toBeDefined();
+      if (!executionResult.outputs) throw new Error('executionResult.outputs is undefined');
+
+      const { body } = executionResult.outputs;
+      expect(body).toBe('Test Body');
+
+      const { subject } = executionResult.outputs;
+      expect(subject).toBe('Subject');
+
+      expect(executionResult.providers).toEqual({});
+
+      const { metadata } = executionResult;
+      expect(metadata.status).toBe('success');
+      expect(metadata.error).toBe(false);
+      expect(metadata.duration).toEqual(expect.any(Number));
+    });
+
+    it('should preview a non-first step in a workflow successfully when action is preview', async () => {
+      const newWorkflow = workflow('test-workflow', async ({ step }) => {
+        await step.delay(
+          'delay-step',
+          async (controls) => ({
+            amount: controls.amount,
+            unit: controls.unit,
+          }),
+          {
+            controlSchema: {
+              type: 'object',
+              properties: {
+                amount: { type: 'number' },
+                unit: {
+                  type: 'string',
+                  enum: ['seconds', 'minutes', 'hours', 'days', 'weeks', 'months'],
+                },
+              },
+              required: ['amount', 'unit'],
+              additionalProperties: false,
+            } as const,
+          }
+        );
+
+        await step.inApp('send-in-app', async () => ({ body: 'Test Body', subject: 'Subject' }));
+      });
+
+      client.addWorkflows([newWorkflow]);
+
+      const event: Event = {
+        action: PostActionEnum.PREVIEW,
+        workflowId: 'test-workflow',
+        stepId: 'send-in-app',
         subscriber: {},
         state: [],
         payload: {},
