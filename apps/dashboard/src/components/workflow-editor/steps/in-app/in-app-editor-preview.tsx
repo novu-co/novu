@@ -6,19 +6,25 @@ import { Code2 } from '@/components/icons/code-2';
 import { Button } from '@/components/primitives/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/primitives/collapsible';
 import { Editor } from '@/components/primitives/editor';
-import { usePreviewStep } from '@/hooks/use-preview-step';
-import { useParams } from 'react-router-dom';
 import { InAppPreview } from '@/components/workflow-editor/in-app-preview';
+import { usePreviewStep } from '@/hooks/use-preview-step';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
+import { useFormContext } from 'react-hook-form';
+import { useParams } from 'react-router-dom';
 
-export const InAppEditorPreview = () => {
-  const [editorValue, setEditorValue] = useState('{}');
+type InAppEditorPreviewProps = {
+  value: string;
+  onChange: (value: string) => void;
+};
+export const InAppEditorPreview = (props: InAppEditorPreviewProps) => {
+  const { value, onChange } = props;
   const [isEditorOpen, setIsEditorOpen] = useState(true);
   const { previewStep, data } = usePreviewStep();
   const { workflowSlug = '', stepSlug = '' } = useParams<{
     workflowSlug: string;
     stepSlug: string;
   }>();
+  const form = useFormContext();
   const [payloadError, setPayloadError] = useState('');
 
   return (
@@ -48,10 +54,9 @@ export const InAppEditorPreview = () => {
 
         <CollapsibleContent className="flex flex-col gap-2 rounded-lg p-1">
           <Editor
-            value={editorValue}
-            onChange={setEditorValue}
+            value={value}
+            onChange={onChange}
             lang="json"
-            basicSetup={{ lineNumbers: true, defaultKeymap: true }}
             extensions={[loadLanguage('json')?.extension ?? []]}
             className="border-neutral-alpha-200 bg-background text-foreground-600 rounded-lg border border-dashed p-3"
           />
@@ -63,7 +68,11 @@ export const InAppEditorPreview = () => {
             className="self-end"
             onClick={() => {
               try {
-                previewStep({ workflowSlug, stepSlug, payload: JSON.parse(editorValue) });
+                previewStep({
+                  workflowSlug,
+                  stepSlug,
+                  data: { controlValues: form.getValues(), previewPayload: JSON.parse(value) },
+                });
               } catch (e) {
                 setPayloadError(String(e));
               }
