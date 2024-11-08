@@ -14,7 +14,7 @@ export function UserProfileButton() {
       {isNewDashboardEnabled && (
         <UserButton.MenuItems>
           <UserButton.Action
-            label="Try out the new dashboard (beta)"
+            label="Try our new Dashboard (beta)"
             labelIcon={<IconBolt size="16" color="var(--nv-colors-typography-text-main)" />}
             onClick={optIn}
           />
