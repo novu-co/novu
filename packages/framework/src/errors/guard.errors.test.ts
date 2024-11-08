@@ -1,8 +1,8 @@
 import { expect, it, describe } from 'vitest';
-import { isFrameworkError, isNativeError, isPlatformError } from './guard.errors';
+import { isFrameworkError, isPlatformError } from './guard.errors';
+import { isNativeError, FrameworkError } from './base.errors';
 import { PlatformError } from './platform.errors';
 import { ErrorCodeEnum, HttpStatusEnum } from '../constants';
-import { FrameworkError } from './base.errors';
 import { BridgeError } from './bridge.errors';
 
 class TestFrameworkError extends FrameworkError {
