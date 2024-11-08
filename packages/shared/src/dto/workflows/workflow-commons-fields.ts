@@ -1,5 +1,4 @@
-import { IsArray, IsBoolean, IsDefined, IsOptional, IsString } from 'class-validator';
-import { JSONSchema } from 'json-schema-to-ts';
+import type { JSONSchema } from 'json-schema-to-ts';
 import { WorkflowResponseDto } from './workflow-response-dto';
 import { Slug, StepTypeEnum, WorkflowPreferences } from '../../types';
 import { StepContentIssueEnum, StepIssueEnum } from './step-content-issue.enum';
@@ -54,32 +53,17 @@ export type WorkflowListResponseDto = Pick<
   stepTypeOverviews: StepTypeEnum[];
 };
 
-export class StepDto {
-  @IsString()
-  @IsDefined()
+export type StepDto = {
   name: string;
-
-  @IsString()
-  @IsDefined()
   type: StepTypeEnum;
-}
+};
 
-export class WorkflowCommonsFields {
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  tags?: string[];
-
-  @IsOptional()
-  @IsBoolean()
+export type WorkflowCommonsFields = {
+  tags: string[];
   active?: boolean;
-
   name: string;
-
-  @IsString()
-  @IsOptional()
   description?: string;
-}
+};
 
 export type PreferencesResponseDto = {
   user: WorkflowPreferences | null;

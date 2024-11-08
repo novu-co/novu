@@ -1,6 +1,11 @@
 /* cSpell:enableCompoundWords */
 import { expect, describe, it } from 'vitest';
-import { WithRequired, ConvertToConstantCase, testHttpHeaderEnumValidity, ValidateHttpHeaderCase } from './utils.types';
+import {
+  WithRequired,
+  ConvertToConstantCase,
+  testHttpHeaderEnumValidity,
+  ValidateHttpHeaderCase,
+} from './utils.types';
 
 describe('HTTP headers', () => {
   /**
@@ -34,40 +39,56 @@ export const invalidTestType: WithRequired<TestWithRequired, 'optional'> = {
  * ConvertToConstantCase tests
  */
 // Valid
-export const validConstantSingleString: ConvertToConstantCase<'Single'> = 'SINGLE';
-export const validConstantSingleSingleString: ConvertToConstantCase<'Double-String'> = 'DOUBLE_STRING';
-export const validConstantDoubleSingleString: ConvertToConstantCase<'DoubleWord-String'> = 'DOUBLEWORD_STRING';
+export const validConstantSingleString: ConvertToConstantCase<'Single'> =
+  'SINGLE';
+export const validConstantSingleSingleString: ConvertToConstantCase<'Double-String'> =
+  'DOUBLE_STRING';
+export const validConstantDoubleSingleString: ConvertToConstantCase<'DoubleWord-String'> =
+  'DOUBLEWORD_STRING';
 
 // @ts-expect-error - Incorrect case - should be 'SINGLE'
-export const invalidConstantSingleString: ConvertToConstantCase<'Single'> = 'single';
+export const invalidConstantSingleString: ConvertToConstantCase<'Single'> =
+  'single';
 
 /**
  * ValidateHttpHeaderCase tests
  */
 // Valid
-export const validHttpHeaderSingleString: ValidateHttpHeaderCase<'Single'> = 'Single';
-export const validHttpHeaderSingleSingleString: ValidateHttpHeaderCase<'Double-String'> = 'Double-String';
-export const validHttpHeaderDoubleSingleString: ValidateHttpHeaderCase<'DoubleWord-String'> = 'DoubleWord-String';
-export const validHttpHeaderUnion1String: ValidateHttpHeaderCase<'First-String' | 'Second-String'> = 'First-String';
-export const validHttpHeaderUnion2String: ValidateHttpHeaderCase<'First-String' | 'Second-String'> = 'Second-String';
+export const validHttpHeaderSingleString: ValidateHttpHeaderCase<'Single'> =
+  'Single';
+export const validHttpHeaderSingleSingleString: ValidateHttpHeaderCase<'Double-String'> =
+  'Double-String';
+export const validHttpHeaderDoubleSingleString: ValidateHttpHeaderCase<'DoubleWord-String'> =
+  'DoubleWord-String';
+export const validHttpHeaderUnion1String: ValidateHttpHeaderCase<
+  'First-String' | 'Second-String'
+> = 'First-String';
+export const validHttpHeaderUnion2String: ValidateHttpHeaderCase<
+  'First-String' | 'Second-String'
+> = 'Second-String';
 enum TestCapitalHeaderEnum {
   SINGLE = 'Single',
   INVALID = 'invalid-string',
   DOUBLE_STRING = 'Double-String',
   DOUBLEWORD_STRING = 'DoubleWord-String',
 }
-export const validHttpHeaderSingleEnum: ValidateHttpHeaderCase<TestCapitalHeaderEnum.SINGLE> = 'Single';
+export const validHttpHeaderSingleEnum: ValidateHttpHeaderCase<TestCapitalHeaderEnum.SINGLE> =
+  'Single';
 export const validHttpHeaderSingleSingleEnum: ValidateHttpHeaderCase<TestCapitalHeaderEnum.DOUBLE_STRING> =
   'Double-String';
 export const validHttpHeaderDoubleSingleEnum: ValidateHttpHeaderCase<TestCapitalHeaderEnum.DOUBLEWORD_STRING> =
   'DoubleWord-String';
 
 // @ts-expect-error - Incorrect case - 'invalid-string' literal type is not Capital-Case
-export const invalidHttpHeaderSingleString: ValidateHttpHeaderCase<'invalid-string'> = 'Invalid';
+export const invalidHttpHeaderSingleString: ValidateHttpHeaderCase<'invalid-string'> =
+  'Invalid';
 // @ts-expect-error - Incorrect case - 'invalid-string' union type is not Capital-Case
-export const invalidHttpHeaderUnionString: ValidateHttpHeaderCase<'First-String' | 'invalid-string'> = 'invalid-string';
+export const invalidHttpHeaderUnionString: ValidateHttpHeaderCase<
+  'First-String' | 'invalid-string'
+> = 'invalid-string';
 // @ts-expect-error - Incorrect case - 'invalid-string' enum is not Capital-Case
-export const invalidHttpHeaderEnumString: ValidateHttpHeaderCase<TestCapitalHeaderEnum.INVALID> = 'invalid';
+export const invalidHttpHeaderEnumString: ValidateHttpHeaderCase<TestCapitalHeaderEnum.INVALID> =
+  'invalid';
 
 /**
  * testHeaderEnumValidity Tests

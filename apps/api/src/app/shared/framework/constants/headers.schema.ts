@@ -1,4 +1,4 @@
-import { HeaderObject, HttpResponseHeaderKeysEnum } from '@novu/shared';
+import { HeaderObject, HttpResponseHeaderKeysEnum } from '@novu/application-generic';
 
 export const COMMON_RESPONSE_HEADERS: Array<HttpResponseHeaderKeysEnum> = [
   HttpResponseHeaderKeysEnum.CONTENT_TYPE,
