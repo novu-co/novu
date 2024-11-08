@@ -128,13 +128,13 @@ export function ConfigureWorkflow() {
         />
       </SidebarContent>
       <Separator />
-      <SidebarContent size="lg">
+      {/* <SidebarContent size="lg">
         <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
           <RiSettingsLine className="h-4 w-4 text-neutral-600" />
           Configure channel preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
         </Button>
       </SidebarContent>
-      <Separator />
+      <Separator /> */}
     </motion.div>
   );
 }

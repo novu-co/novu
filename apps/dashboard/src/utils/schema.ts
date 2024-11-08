@@ -11,7 +11,8 @@ type ZodValue =
   | z.ZodEffects<z.ZodTypeAny>
   | z.ZodDefault<z.ZodTypeAny>
   | z.ZodEnum<[string, ...string[]]>
-  | z.ZodOptional<z.ZodTypeAny>;
+  | z.ZodOptional<z.ZodTypeAny>
+  | z.ZodBoolean;
 
 const handleStringFormat = ({ value, key, format }: { value: z.ZodString; key: string; format: string }) => {
   if (format === 'email') {
@@ -122,6 +123,8 @@ export const buildDynamicZodSchema = (obj: JSONSchema): z.AnyZodObject => {
       });
     } else if (type === 'string') {
       zodValue = handleStringType({ key, requiredFields, format, pattern, enumValues, defaultValue });
+    } else if (type === 'boolean') {
+      zodValue = z.boolean(isRequired ? { message: `${capitalize(key)} is required` } : undefined);
     } else {
       zodValue = z.number(isRequired ? { message: `${capitalize(key)} is required` } : undefined);
       if (defaultValue) {
