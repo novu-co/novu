@@ -42,6 +42,11 @@ const baseModuleConfig: Options = {
     'themes/index': './src/ui/themes/index.ts',
     'internal/index': './src/ui/internal/index.ts',
   },
+  define: {
+    NOVU_API_VERSION: `"2024-06-26"`,
+    PACKAGE_NAME: `"${name}"`,
+    PACKAGE_VERSION: `"${version}"`,
+  },
 };
 
 export default defineConfig((config: Options) => {
