@@ -1,6 +1,6 @@
 name: Setup Novu Redis Cluster
 
-description: Sets up a Redis Cluster instance needed to run the tests 
+description: Sets up a Redis Cluster instance needed to run the tests
 
 runs:
   using: composite

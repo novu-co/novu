@@ -5,6 +5,9 @@ name: Deploy PROD WS
 on:
   workflow_dispatch:
 
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
 jobs:
   # This workflow contains a single job called "build"
   build_prod_image:

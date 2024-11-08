@@ -101,28 +101,35 @@ const formMessageVariants = cva('flex items-center gap-1', {
   },
 });
 
-const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
-  ({ className, children, ...props }, ref) => {
-    const { error, formMessageId } = useFormField();
-    const body = error ? String(error?.message) : children;
+const FormMessagePure = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement> & { error?: string }
+>(({ className, children, error, id, ...props }, ref) => {
+  const body = error ? error : children;
 
-    if (!body) {
-      return null;
-    }
-
-    return (
-      <p
-        ref={ref}
-        id={formMessageId}
-        className={formMessageVariants({ variant: error ? 'error' : 'default', className })}
-        {...props}
-      >
-        {error ? <RiErrorWarningFill className="size-4" /> : <RiInformationFill className="size-4" />}
-        <span className="mt-[1px] text-xs leading-3">{body}</span>
-      </p>
-    );
+  if (!body) {
+    return null;
   }
-);
+
+  return (
+    <p
+      ref={ref}
+      id={id}
+      className={formMessageVariants({ variant: error ? 'error' : 'default', className })}
+      {...props}
+    >
+      {error ? <RiErrorWarningFill className="size-4" /> : <RiInformationFill className="size-4" />}
+      <span className="mt-[1px] text-xs leading-3">{body}</span>
+    </p>
+  );
+});
+FormMessagePure.displayName = 'FormMessagePure';
+
+const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>((props, ref) => {
+  const { error, formMessageId } = useFormField();
+
+  return <FormMessagePure ref={ref} id={formMessageId} error={error ? String(error?.message) : undefined} {...props} />;
+});
 FormMessage.displayName = 'FormMessage';
 
-export { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormField };
+export { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormMessagePure, FormField };

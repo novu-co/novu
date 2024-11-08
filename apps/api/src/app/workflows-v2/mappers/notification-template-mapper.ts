@@ -2,9 +2,11 @@ import {
   DEFAULT_WORKFLOW_PREFERENCES,
   PreferencesResponseDto,
   PreferencesTypeEnum,
+  RuntimeIssue,
   ShortIsPrefixEnum,
   StepResponseDto,
   StepTypeEnum,
+  WorkflowCreateAndUpdateKeys,
   WorkflowListResponseDto,
   WorkflowOriginEnum,
   WorkflowResponseDto,
@@ -38,7 +40,8 @@ export function toResponseWorkflowDto(
     origin: computeOrigin(template),
     updatedAt: template.updatedAt || 'Missing Updated At',
     createdAt: template.createdAt || 'Missing Create At',
-    status: WorkflowStatusEnum.ACTIVE,
+    status: template.status || WorkflowStatusEnum.ACTIVE,
+    issues: template.issues as unknown as Record<WorkflowCreateAndUpdateKeys, RuntimeIssue>,
   };
 }
 
@@ -73,15 +76,16 @@ export function toWorkflowsMinifiedDtos(templates: NotificationTemplateEntity[])
   return templates.map(toMinifiedWorkflowDto);
 }
 
-function toStepResponseDto(step: NotificationStepEntity): StepResponseDto {
-  const stepName = step.name || 'Missing Name';
+function toStepResponseDto(persistedStep: NotificationStepEntity): StepResponseDto {
+  const stepName = persistedStep.name || 'Missing Name';
 
   return {
-    _id: step._templateId,
-    slug: buildSlug(stepName, ShortIsPrefixEnum.STEP, step._templateId),
+    _id: persistedStep._templateId,
+    slug: buildSlug(stepName, ShortIsPrefixEnum.STEP, persistedStep._templateId),
     name: stepName,
-    stepId: step.stepId || 'Missing Step Id',
-    type: step.template?.type || StepTypeEnum.EMAIL,
+    stepId: persistedStep.stepId || 'Missing Step Id',
+    type: persistedStep.template?.type || StepTypeEnum.EMAIL,
+    issues: persistedStep.issues,
   } satisfies StepResponseDto;
 }
 

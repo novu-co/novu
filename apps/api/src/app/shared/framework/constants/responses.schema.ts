@@ -1,5 +1,5 @@
 import { ApiResponseOptions } from '@nestjs/swagger';
-import { ApiResponseDecoratorName, HttpResponseHeaderKeysEnum } from '@novu/shared';
+import { ApiResponseDecoratorName, HttpResponseHeaderKeysEnum } from '@novu/application-generic';
 import { THROTTLED_EXCEPTION_MESSAGE } from '../../../rate-limiting/guards';
 import { createReusableHeaders } from '../swagger';
 

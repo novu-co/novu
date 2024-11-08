@@ -5,10 +5,10 @@ const themeBase: ThemeVarsPartial = {
   base: 'light',
   brandTitle: 'Novu Design System',
   brandTarget: '_self',
-}
+};
 /**
  * Novu Design System theme for Storybook
- * 
+ *
  * @see https://storybook.js.org/docs/configure/theming
  */
 export const lightTheme = create({
