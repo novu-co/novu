@@ -8,6 +8,10 @@ import { JsonForm } from './json-form';
 export function CustomStepControls({ dataSchema }: { dataSchema: ControlsMetadata['dataSchema'] }) {
   const [isEditorOpen, setIsEditorOpen] = useState(true);
 
+  if (!dataSchema) {
+    return null;
+  }
+
   return (
     <Collapsible
       open={isEditorOpen}
