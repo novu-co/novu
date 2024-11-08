@@ -113,7 +113,7 @@ export class UpsertPreferences {
       await this.deletePreferences(command, foundPreference?._id);
 
       /*
-       * Ideally we need to return the foundPreference with a deleted: true flag
+       * TODO: Ideally we need to return the foundPreference with a deleted: true flag
        * but the repository does not support this yet. For now we will make a compromise
        * to avoid refactoring all the usages of this usecase.
        */
