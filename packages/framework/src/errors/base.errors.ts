@@ -5,7 +5,7 @@ import { ErrorCodeEnum } from '../constants/error.constants';
  * Check if the object is a native error.
  *
  * This method relies on `Object.prototype.toString()` behavior. It is possible to obtain
- * an incorrect result when the object argument manipulates the `@@toStringTag` property.
+ * an incorrect result when the object argument has a non `Error`-suffixed `name` property.
  *
  * @param object - The object to check.
  * @returns `true` if the object is a native error, `false` otherwise.
