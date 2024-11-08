@@ -32,7 +32,7 @@ export function CustomStepControls({ dataSchema }: { dataSchema: ControlsMetadat
       </CollapsibleTrigger>
 
       <CollapsibleContent>
-        <div className="bg-background rounded-md border border-dashed p-3">
+        <div className="bg-background rounded-md border border-dashed px-3 py-0">
           <JsonForm schema={(dataSchema as RJSFSchema) || {}} variables={[]} />
         </div>
       </CollapsibleContent>
