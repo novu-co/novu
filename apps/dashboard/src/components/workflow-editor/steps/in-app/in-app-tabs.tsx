@@ -97,6 +97,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
     });
     setEditorValue(JSON.stringify(res.previewPayloadExample, null, 2));
   };
+
   const formValues = useWatch(form);
   useDebouncedEffect(
     () => {
