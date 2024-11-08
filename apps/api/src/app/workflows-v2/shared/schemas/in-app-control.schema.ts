@@ -9,36 +9,33 @@ const redirectSchema = {
     url: {
       type: 'string',
       pattern: ABSOLUTE_AND_RELATIVE_URL_REGEX,
-      default: '',
     },
     target: {
       type: 'string',
       enum: ['_self', '_blank', '_parent', '_top', '_unfencedTop'],
-      default: '_self', // Default value for target
+      default: '_blank', // Default value for target
     },
   },
   required: ['url'], // url remains required
   additionalProperties: false, // No additional properties allowed
-  default: { url: '', target: '_self' },
 } as const satisfies JSONSchema;
 
 const actionSchema = {
   type: 'object',
   properties: {
-    label: { type: 'string', default: '' },
+    label: { type: 'string' },
     redirect: redirectSchema,
   },
   required: ['label'],
   additionalProperties: false,
-  default: null,
 } as const satisfies JSONSchema;
 
 export const inAppControlSchema = {
   type: 'object',
   properties: {
-    subject: { type: 'string', default: '' },
-    body: { type: 'string', default: '' },
-    avatar: { type: 'string', format: 'uri', default: '' },
+    subject: { type: 'string' },
+    body: { type: 'string' },
+    avatar: { type: 'string', format: 'uri' },
     primaryAction: actionSchema, // Nested primaryAction
     secondaryAction: actionSchema, // Nested secondaryAction
     data: { type: 'object', additionalProperties: true },
