@@ -9,13 +9,13 @@ export default function Home() {
   return (
     <>
       <Title title="Notifications Component" />
-      <div className="w-96 h-96 overflow-y-auto">
+      <div className="h-96 w-96 overflow-y-auto">
         <Inbox {...novuConfig}>
           <Notifications
             renderNotification={(notification) => {
               return (
                 <div
-                  className="relative cursor-pointer flex gap-2 flex-nowrap items-start self-stretch my-1 p-2 hover:bg-slate-200"
+                  className="relative my-1 flex cursor-pointer flex-nowrap items-start gap-2 self-stretch p-2 hover:bg-slate-200"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -27,12 +27,12 @@ export default function Home() {
                     }
                   }}
                 >
-                  <div className="rounded-full min-w-8 w-8 h-8 overflow-hidden border border-cyan-200">Avatar</div>
+                  <div className="h-8 w-8 min-w-8 overflow-hidden rounded-full border border-cyan-200">Avatar</div>
                   <div>
                     <div className="text-xl font-bold">{notification.subject || 'Subject'}</div>
                     <div>{notification.body}</div>
                     {!notification.isRead && (
-                      <div className="absolute right-2 top-2 bg-blue-500 rounded-full border border-background size-2" />
+                      <div className="border-background absolute right-2 top-2 size-2 rounded-full border bg-blue-500" />
                     )}
                   </div>
                   <div>{count}</div>
@@ -43,7 +43,7 @@ export default function Home() {
         </Inbox>
       </div>
       <button
-        className="max-w-40 self-center bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
+        className="max-w-40 self-center rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700"
         onClick={() => setCount((prev) => prev + 1)}
       >
         Increment {count}

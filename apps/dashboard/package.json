@@ -76,6 +76,7 @@
   "devDependencies": {
     "@clerk/types": "^4.6.1",
     "@eslint/js": "^9.9.0",
+    "@hookform/devtools": "^4.3.0",
     "@playwright/test": "^1.44.0",
     "@sentry/vite-plugin": "^2.22.6",
     "@types/lodash.debounce": "^4.0.9",

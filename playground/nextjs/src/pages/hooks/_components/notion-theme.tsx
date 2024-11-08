@@ -17,7 +17,7 @@ import { useStatus } from './status-context';
 
 const EmptyNotificationList = () => {
   return (
-    <div className={'absolute inset-0 flex flex-col items-center m-auto h-fit w-full text-[#E8E8E9]'}>
+    <div className={'absolute inset-0 m-auto flex h-fit w-full flex-col items-center text-[#E8E8E9]'}>
       <EmptyIcon />
       <p data-localization="notifications.emptyNotice">No notifications</p>
     </div>
@@ -27,7 +27,7 @@ const EmptyNotificationList = () => {
 type SkeletonTextProps = { className?: string };
 
 const SkeletonText = (props: SkeletonTextProps) => {
-  return <div className={`w-full h-3 rounded bg-[#E8E8E9] ${props.className}`} />;
+  return <div className={`h-3 w-full rounded bg-[#E8E8E9] ${props.className}`} />;
 };
 
 type SkeletonAvatarProps = { className?: string };
@@ -38,9 +38,9 @@ const SkeletonAvatar = (props: SkeletonAvatarProps) => {
 const NotificationSkeleton = () => {
   return (
     <>
-      <div className="flex gap-2 p-4 w-full">
+      <div className="flex w-full gap-2 p-4">
         <SkeletonAvatar />
-        <div className={'flex flex-col self-stretch gap-3 flex-1'}>
+        <div className={'flex flex-1 flex-col gap-3 self-stretch'}>
           <SkeletonText className="w-1/4" />
           <div className="flex gap-1">
             <SkeletonText />
@@ -87,11 +87,11 @@ export const NotionTheme = () => {
   const { notifications, isLoading, isFetching, hasMore, fetchMore, error } = useNotifications(filter);
 
   return (
-    <div className="flex w-full max-w-[1200px] min-h-[600px] rounded-lg bg-white">
-      <div className="flex-shrink-0 w-[240px] bg-[#f7f7f5] shadow-lg p-4 flex flex-col border-gray-200">
-        <div className="flex items-center mb-4">
-          <div className="flex items-center mr-4">
-            <NotionIcon className="w-4 h-4 mr-2" />
+    <div className="flex min-h-[600px] w-full max-w-[1200px] rounded-lg bg-white">
+      <div className="flex w-[240px] flex-shrink-0 flex-col border-gray-200 bg-[#f7f7f5] p-4 shadow-lg">
+        <div className="mb-4 flex items-center">
+          <div className="mr-4 flex items-center">
+            <NotionIcon className="mr-2 h-4 w-4" />
             <span className="text-sm font-bold text-gray-800">Notion Workspace</span>
           </div>
           <button className="IconButton">
@@ -99,12 +99,12 @@ export const NotionTheme = () => {
           </button>
         </div>
 
-        <nav className="space-y-0 mb-6">
+        <nav className="mb-6 space-y-0">
           <SidebarItem icon={FiSearch} label="Search" />
           <SidebarItem icon={FiHome} label="Home" isActive />
           <SidebarItem icon={FiInbox} label="Inbox">
             {counts && counts[0].count > 0 && (
-              <span className="flex items-center justify-center text-[10px] rounded h-4 min-w-4 bg-[#eb5757] text-white px-1 font-semibold !ml-auto">
+              <span className="!ml-auto flex h-4 min-w-4 items-center justify-center rounded bg-[#eb5757] px-1 text-[10px] font-semibold text-white">
                 {counts[0].count}
               </span>
             )}
@@ -112,22 +112,22 @@ export const NotionTheme = () => {
           <SidebarItem icon={FiSettings} label="Settings & members" />
         </nav>
 
-        <h3 className="text-xs text-left font-bold text-gray-500 mb-2">Favorites</h3>
-        <nav className="space-y-2 mb-6">
+        <h3 className="mb-2 text-left text-xs font-bold text-gray-500">Favorites</h3>
+        <nav className="mb-6 space-y-2">
           <SidebarItem icon={FiHome} label="Teamspaces" />
           <SidebarItem icon={BsFillFileTextFill} label="Shared" />
         </nav>
 
-        <h3 className="text-xs text-left font-bold text-gray-500 mb-2">Private</h3>
-        <nav className="space-y-2 mb-6">
+        <h3 className="mb-2 text-left text-xs font-bold text-gray-500">Private</h3>
+        <nav className="mb-6 space-y-2">
           <SidebarItem icon={AiOutlineCalendar} label="Calendar" />
           <SidebarItem icon={FaUserFriends} label="Templates" />
           <SidebarItem icon={BsTrash} label="Trash" />
         </nav>
       </div>
 
-      <div className="relative flex-1 bg-white w-[400px] flex flex-col justify-center">
-        <div className="flex shrink-0 justify-between items-center w-full py-5 px-6">
+      <div className="relative flex w-[400px] flex-1 flex-col justify-center bg-white">
+        <div className="flex w-full shrink-0 items-center justify-between px-6 py-5">
           <StatusDropdown />
           <MoreActionsDropdown />
         </div>

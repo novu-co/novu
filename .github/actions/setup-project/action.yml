@@ -51,7 +51,7 @@ runs:
       shell: bash
       if: ${{ inputs.submodules == 'true' }}
       run: pnpm symlink:submodules
-  
+
     - name: Install wait-on plugin
       shell: bash
       run: pnpm i -g wait-on

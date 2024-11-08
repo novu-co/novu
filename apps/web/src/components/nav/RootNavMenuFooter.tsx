@@ -9,7 +9,7 @@ export const RootNavMenuFooter: React.FC = () => {
       className={cx(
         hstack(),
         css({
-          display: 'flex !important',
+          display: '!important flex',
           justifyContent: 'space-between',
           pt: '100',
         })

@@ -84,7 +84,7 @@ describe('Generate Preview', () => {
             .exist;
 
           if (type !== StepTypeEnum.EMAIL) {
-            expect(previewResponseDto.result!.preview).to.deep.equal(getControlValues(stepId)[type]);
+            expect(previewResponseDto.result!.preview).to.deep.equal(getTestControlValues(stepId)[type]);
           } else {
             assertEmail(previewResponseDto);
           }
@@ -99,7 +99,7 @@ describe('Generate Preview', () => {
             workflowId,
             stepDatabaseId,
             {
-              controlValues: getControlValues(stepId)[StepTypeEnum.EMAIL],
+              controlValues: getTestControlValues(stepId)[StepTypeEnum.EMAIL],
               previewPayload: { payload: { params: { isPayedUser: 'false' } } },
             },
             'email'
@@ -115,7 +115,7 @@ describe('Generate Preview', () => {
             workflowId,
             stepDatabaseId,
             {
-              controlValues: getControlValues(stepId)[StepTypeEnum.EMAIL],
+              controlValues: getTestControlValues(stepId)[StepTypeEnum.EMAIL],
               previewPayload: { payload: { params: { isPayedUser: 'true' } } },
             },
             'email'
@@ -131,7 +131,7 @@ describe('Generate Preview', () => {
             workflowId,
             stepDatabaseId,
             {
-              controlValues: getControlValues(stepId)[StepTypeEnum.EMAIL],
+              controlValues: getTestControlValues(stepId)[StepTypeEnum.EMAIL],
               previewPayload: { payload: { params: { isPayedUser: true } } },
             },
             'email'
@@ -147,7 +147,7 @@ describe('Generate Preview', () => {
             workflowId,
             stepDatabaseId,
             {
-              controlValues: getControlValues(stepId)[StepTypeEnum.EMAIL],
+              controlValues: getTestControlValues(stepId)[StepTypeEnum.EMAIL],
               previewPayload: { payload: { params: { isPayedUser: 'true' } } },
             },
             'email'
@@ -269,19 +269,19 @@ describe('Generate Preview', () => {
 
 function buildDtoNoPayload(stepTypeEnum: StepTypeEnum, stepId: string): GeneratePreviewRequestDto {
   return {
-    controlValues: getControlValues(stepId)[stepTypeEnum],
+    controlValues: getTestControlValues(stepId)[stepTypeEnum],
   };
 }
 
 function buildDtoWithPayload(stepTypeEnum: StepTypeEnum, stepId: string): GeneratePreviewRequestDto {
   return {
-    controlValues: getControlValues(stepId)[stepTypeEnum],
+    controlValues: getTestControlValues(stepId)[stepTypeEnum],
     previewPayload: { payload: { subject: PLACEHOLDER_SUBJECT_INAPP_PAYLOAD_VALUE } },
   };
 }
 
 function buildDtoWithMissingControlValues(stepTypeEnum: StepTypeEnum, stepId: string): GeneratePreviewRequestDto {
-  const stepTypeToElement = getControlValues(stepId)[stepTypeEnum];
+  const stepTypeToElement = getTestControlValues(stepId)[stepTypeEnum];
   if (stepTypeEnum === StepTypeEnum.EMAIL) {
     delete stepTypeToElement.subject;
   } else {
@@ -294,7 +294,7 @@ function buildDtoWithMissingControlValues(stepTypeEnum: StepTypeEnum, stepId: st
   };
 }
 
-function buildEmailControlValuesPayload(stepId: string): EmailStepControlSchemaDto {
+function buildEmailControlValuesPayload(stepId?: string): EmailStepControlSchemaDto {
   return {
     subject: `Hello, World! ${SUBJECT_TEST_PAYLOAD}`,
     emailEditor: JSON.stringify(fullCodeSnippet(stepId)),
@@ -306,10 +306,10 @@ function buildSimpleForEmail(): EmailStepControlSchemaDto {
     emailEditor: JSON.stringify(forSnippet),
   };
 }
-function buildInAppControlValues(stepId: string) {
+function buildInAppControlValues(stepId?: string) {
   return {
     subject: `{{subscriber.firstName}} Hello, World! ${PLACEHOLDER_SUBJECT_INAPP}`,
-    body: 'Hello, World! {{payload.placeholder.body}}',
+    body: `${stepId ? `steps.${stepId}.origins` : '{{payload.origins}}'} Hello, World! {{payload.placeholder.body}}`,
     avatar: 'https://www.example.com/avatar.png',
     primaryAction: {
       label: '{{payload.secondaryUrl}}',
@@ -354,7 +354,7 @@ function buildChatControlValuesPayload() {
   };
 }
 
-const getControlValues = (stepId: string) => ({
+export const getTestControlValues = (stepId?: string) => ({
   [StepTypeEnum.SMS]: buildSmsControlValuesPayload(),
   [StepTypeEnum.EMAIL]: buildEmailControlValuesPayload(stepId) as unknown as Record<string, unknown>,
   [StepTypeEnum.PUSH]: buildPushControlValuesPayload(),
