@@ -9,6 +9,7 @@ import {
   UpsertSubscriberWorkflowPreferencesCommand,
   UpsertSubscriberGlobalPreferencesCommand,
   InstrumentUsecase,
+  Instrument,
 } from '@novu/application-generic';
 import {
   NotificationTemplateEntity,
@@ -55,10 +56,8 @@ export class UpdatePreferences {
       }
     }
 
-    const userPreference: SubscriberPreferenceEntity | null = await this.subscriberPreferenceRepository.findOne(
-      this.commonQuery(command, subscriber)
-    );
-    if (!userPreference) {
+    const subscriberPreference = await this.findPreference(command, subscriber);
+    if (!subscriberPreference) {
       await this.createUserPreference(command, subscriber);
     } else {
       await this.updateUserPreference(command, subscriber);
@@ -67,6 +66,7 @@ export class UpdatePreferences {
     return await this.findPreference(command, subscriber);
   }
 
+  @Instrument()
   private async createUserPreference(command: UpdatePreferencesCommand, subscriber: SubscriberEntity): Promise<void> {
     const channelPreferences: IPreferenceChannels = this.buildPreferenceChannels(command);
 
@@ -94,6 +94,7 @@ export class UpdatePreferences {
     });
   }
 
+  @Instrument()
   private async updateUserPreference(command: UpdatePreferencesCommand, subscriber: SubscriberEntity): Promise<void> {
     const channelPreferences: IPreferenceChannels = this.buildPreferenceChannels(command);
 
@@ -136,6 +137,7 @@ export class UpdatePreferences {
     };
   }
 
+  @Instrument()
   private async findPreference(
     command: UpdatePreferencesCommand,
     subscriber: SubscriberEntity
@@ -198,6 +200,7 @@ export class UpdatePreferences {
   /**
    * Strangler pattern to migrate to V2 preferences.
    */
+  @Instrument()
   private async storePreferencesV2(item: {
     channels: IPreferenceChannels;
     organizationId: string;
