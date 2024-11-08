@@ -52,7 +52,7 @@ runs:
         aws-access-key-id: ${{ inputs.aws-access-key-id }}
         aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
         aws-region: eu-west-2
-      
+
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
@@ -67,7 +67,7 @@ runs:
       shell: bash
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: novu-dev/api    
+        REPOSITORY: novu-dev/api
         IMAGE_TAG: ${{ github.sha }}
         DOCKER_BUILD_ARGUMENTS: >
           --platform=linux/amd64 --provenance=false
@@ -81,7 +81,7 @@ runs:
       shell: bash
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: novu-dev/api           
+        REPOSITORY: novu-dev/api
         IMAGE_TAG: ${{ github.sha }}
       run: |
         echo "Built image"
@@ -97,7 +97,7 @@ runs:
       shell: bash
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: novu-dev/api 
+        REPOSITORY: novu-dev/api
         IMAGE_TAG: ${{ github.sha }}
       run: |
         docker tag $REGISTRY/$REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:${{ inputs.tag }}
@@ -107,7 +107,7 @@ runs:
       shell: bash
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: novu-dev/api 
+        REPOSITORY: novu-dev/api
         IMAGE_TAG: ${{ github.sha }}
       run: |
         docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
@@ -117,6 +117,6 @@ runs:
       shell: bash
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: novu-dev/api 
+        REPOSITORY: novu-dev/api
       run: |
         docker push $REGISTRY/$REPOSITORY:${{ inputs.tag }}

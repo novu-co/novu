@@ -1,6 +1,7 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Test WEB
+
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 on:
@@ -57,7 +58,7 @@ jobs:
         with:
           submodules: true
           token: ${{ secrets.SUBMODULES_TOKEN }}
-          
+
       - id: checkout-community-code
         name: Checkout community code
         uses: actions/checkout@v4
@@ -126,30 +127,30 @@ jobs:
     needs: [e2e_web]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 20.8.1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.8.1
 
-    - name: Download blob reports from GitHub Actions Artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: all-blob-reports
-        pattern: blob-report-*
-        merge-multiple: true
+      - name: Download blob reports from GitHub Actions Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
 
-    - name: Merge into HTML Report
-      run: npx playwright merge-reports --reporter html ./all-blob-reports
+      - name: Merge into HTML Report
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
 
-    - name: Upload HTML report
-      uses: actions/upload-artifact@v4
-      with:
-        name: html-report--attempt-${{ github.run_attempt }}
-        path: playwright-report
-        retention-days: 14
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report--attempt-${{ github.run_attempt }}
+          path: playwright-report
+          retention-days: 14
 
-    - name: Send Slack notifications
-      uses: ./.github/actions/slack-notify-on-failure
-      if: failure()
-      with:
-        slackWebhookURL: ${{ secrets.SLACK_WEBHOOK_URL_ENG_FEED_GITHUB }}
+      - name: Send Slack notifications
+        uses: ./.github/actions/slack-notify-on-failure
+        if: failure()
+        with:
+          slackWebhookURL: ${{ secrets.SLACK_WEBHOOK_URL_ENG_FEED_GITHUB }}

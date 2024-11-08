@@ -55,17 +55,17 @@ export const updateWorkflow = async ({
 
 export const previewStep = async ({
   workflowSlug,
-  payload,
+  data,
   stepSlug,
 }: {
   workflowSlug: string;
   stepSlug: string;
-  payload?: GeneratePreviewRequestDto;
+  data?: GeneratePreviewRequestDto;
 }): Promise<GeneratePreviewResponseDto> => {
-  const { data } = await postV2<{ data: GeneratePreviewResponseDto }>(
+  const res = await postV2<{ data: GeneratePreviewResponseDto }>(
     `/workflows/${workflowSlug}/step/${stepSlug}/preview`,
-    payload
+    data
   );
 
-  return data;
+  return res.data;
 };

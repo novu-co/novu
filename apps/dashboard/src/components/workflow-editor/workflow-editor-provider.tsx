@@ -28,7 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/primitives/alert-dialog';
-import { Button, buttonVariants } from '@/components/primitives/button';
+import { buttonVariants } from '@/components/primitives/button';
 import { RiAlertFill } from 'react-icons/ri';
 import { Separator } from '@/components/primitives/separator';
 
@@ -47,7 +47,7 @@ const STEP_NAME_BY_TYPE: Record<StepTypeEnum, string> = {
 const createStep = (type: StepTypeEnum): Step => ({
   name: STEP_NAME_BY_TYPE[type],
   stepId: '',
-  slug: '_stp_',
+  slug: '_st_',
   type,
   _id: crypto.randomUUID(),
 });
@@ -128,6 +128,12 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
       updateWorkflow({ id: workflow._id, workflow: { ...workflow, ...data } as any });
     },
     enabled: !isReadOnly,
+    shouldSaveImmediately: (previousData, data) => {
+      const currentStepsLength = data?.steps?.length ?? 0;
+      const wasStepsLengthAltered = previousData.steps != null && currentStepsLength !== previousData.steps?.length;
+
+      return wasStepsLengthAltered;
+    },
   });
 
   const addStep = useCallback(

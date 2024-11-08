@@ -22,15 +22,15 @@ export const InboxItem = ({
 
   return (
     <div
-      className="p-2 bg-white relative"
+      className="relative bg-white p-2"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex flex-start relative">
+      <div className="flex-start relative flex">
         {/* Hover actions (desktop only) */}
-        <div className="absolute top-0 right-0 hidden md:flex">
+        <div className="absolute right-0 top-0 hidden md:flex">
           {isHovered && (
-            <div className="bg-white flex gap-2" style={{ color: '#37352fa6' }}>
+            <div className="flex gap-2 bg-white" style={{ color: '#37352fa6' }}>
               <Show when={status !== 'archived'}>
                 {notification.isRead ? (
                   <button className="IconButton" aria-label="Mark as unread" onClick={() => notification.unread()}>
@@ -56,17 +56,17 @@ export const InboxItem = ({
         </div>
 
         {/* Avatar (with unread indicator) */}
-        <div className="relative flex items-center mr-4 h-8">
+        <div className="relative mr-4 flex h-8 items-center">
           {!notification.isRead && (
-            <div className="absolute top-1 left-0">
-              <div className="w-2 h-2 bg-blue-500 rounded-full" />
+            <div className="absolute left-0 top-1">
+              <div className="h-2 w-2 rounded-full bg-blue-500" />
             </div>
           )}
           {notification.avatar !== undefined && (
-            <div className="ml-4 w-6 h-6">
-              <div className="w-6 h-6 rounded-full overflow-hidden mr-2">
+            <div className="ml-4 h-6 w-6">
+              <div className="mr-2 h-6 w-6 overflow-hidden rounded-full">
                 <img
-                  className="w-full h-full object-cover"
+                  className="h-full w-full object-cover"
                   src={notification.avatar}
                   alt={`Avatar of ${notification.to.firstName}`}
                 />
@@ -76,8 +76,8 @@ export const InboxItem = ({
         </div>
 
         {/* Main content with conditional margin based on avatar */}
-        <div className="flex-grow flex flex-col ml-auto mt-1 gap-2">
-          <div className="flex justify-between w-full">
+        <div className="ml-auto mt-1 flex flex-grow flex-col gap-2">
+          <div className="flex w-full justify-between">
             <span className="text-left text-sm text-gray-800">{notification.subject}</span>
             <span className="text-sm text-gray-400">{formatTime(notification.createdAt)}</span>
           </div>
@@ -89,33 +89,33 @@ export const InboxItem = ({
             </span>
           )}
           {(notificationType === 'Mention' || notificationType === 'Comment') && (
-            <button className="Button variant-ghost size-sm flex items-center px-2 py-1 h-8 rounded-md hover:bg-gray-100">
-              <GrDocumentText className="h-5 w-5 mr-2" />
-              <span className="text-left text-sm text-gray-800 underline decoration-solid decoration-gray-400">
+            <button className="Button variant-ghost size-sm flex h-8 items-center rounded-md px-2 py-1 hover:bg-gray-100">
+              <GrDocumentText className="mr-2 h-5 w-5" />
+              <span className="text-left text-sm text-gray-800 underline decoration-gray-400 decoration-solid">
                 {notification.body}
               </span>
             </button>
           )}
           {notificationType === 'Invite' && (
-            <button className="Button variant-outline size-md flex items-center justify-between w-full px-4 py-2 rounded-md hover:bg-gray-100 text-left text-gray-800 border border-gray-300">
+            <button className="Button variant-outline size-md flex w-full items-center justify-between rounded-md border border-gray-300 px-4 py-2 text-left text-gray-800 hover:bg-gray-100">
               {notification.body}
             </button>
           )}
           {notificationType === 'Comment' && (
             <div>
-              <span className="text-sm text-gray-500 font-light">{notification.to.firstName}</span>
+              <span className="text-sm font-light text-gray-500">{notification.to.firstName}</span>
               <span className="text-base text-gray-800">{`This is a notification Comment made by ${notification.to.firstName} and posted on the page Top Secret Project`}</span>
             </div>
           )}
 
           <div className="flex space-x-3">
             {notification.primaryAction && (
-              <button className="button text-sm variant-outline size-md colorScheme-gray rounded-md border border-gray-300 hover:bg-gray-100 px-2 py-1 h-8">
+              <button className="button variant-outline size-md colorScheme-gray h-8 rounded-md border border-gray-300 px-2 py-1 text-sm hover:bg-gray-100">
                 {notification.primaryAction.label}
               </button>
             )}
             {notification.secondaryAction && (
-              <button className="button text-sm variant-ghost size-md colorScheme-gray rounded-md border border-gray-300 hover:bg-gray-100 px-2 py-1 h-8">
+              <button className="button variant-ghost size-md colorScheme-gray h-8 rounded-md border border-gray-300 px-2 py-1 text-sm hover:bg-gray-100">
                 {notification.secondaryAction.label}
               </button>
             )}

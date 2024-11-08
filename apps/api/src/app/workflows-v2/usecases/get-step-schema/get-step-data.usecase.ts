@@ -7,6 +7,7 @@ import { mapStepTypeToResult } from '../../shared';
 import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { InvalidStepException } from '../../exceptions/invalid-step.exception';
 import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
+import { buildJSONSchema } from '../../shared/build-string-schema';
 
 @Injectable()
 export class GetStepDataUsecase {
@@ -39,12 +40,12 @@ export class GetStepDataUsecase {
     };
   }
 
-  private buildPayloadSchema(controlValues: Record<string, any>) {
+  private buildPayloadSchema(controlValues: Record<string, unknown>) {
     const payloadVariables = this.buildDefaultPayloadUseCase.execute({
       controlValues,
     }).previewPayload.payload;
 
-    return buildStringSchema(payloadVariables || {});
+    return buildJSONSchema(payloadVariables || {});
   }
 
   private async fetchWorkflow(command: GetStepDataCommand) {
@@ -157,23 +158,4 @@ function buildPreviousStepsSchema(previousSteps: NotificationStepEntity[] | unde
     additionalProperties: false,
     description: 'Previous Steps Results',
   } as const satisfies JSONSchema;
-}
-
-/**
- * Builds a JSON schema object where each variable becomes a string property.
- */
-function buildStringSchema(variables: Record<string, unknown>): JSONSchema {
-  const properties: Record<string, JSONSchema> = {};
-
-  for (const [variableKey, variableValue] of Object.entries(variables)) {
-    properties[variableKey] = {
-      type: 'string',
-      default: variableValue,
-    };
-  }
-
-  return {
-    type: 'object',
-    properties,
-  };
 }

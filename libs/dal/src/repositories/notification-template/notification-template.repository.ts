@@ -38,6 +38,16 @@ export class NotificationTemplateRepository extends BaseRepository<
 
     return this.mapEntity(item);
   }
+  async findAllByTriggerIdentifier(environmentId: string, identifier: string): Promise<NotificationTemplateEntity[]> {
+    const requestQuery: NotificationTemplateQuery = {
+      _environmentId: environmentId,
+      'triggers.identifier': identifier,
+    };
+
+    const query = await this._model.find(requestQuery, { _id: 1, 'triggers.identifier': 1 });
+
+    return this.mapEntities(query);
+  }
 
   async findById(id: string, environmentId: string) {
     return this.findByIdQuery({ id, environmentId });

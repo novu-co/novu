@@ -4,6 +4,6 @@ module.exports = {
     tailwindcss: {},
     cssnano: {
       preset: 'default',
-    }
+    },
   },
 };

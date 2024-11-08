@@ -1,7 +1,7 @@
 import { createNovuBaseClient, HttpError, NovuRestResult } from './novu-base-client';
 import {
   CreateWorkflowDto,
-  GeneratePreviewResponseDto,
+  GeneratePreviewRequestDto,
   GetListQueryParams,
   ListWorkflowResponse,
   StepDataDto,
@@ -10,7 +10,7 @@ import {
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
 } from '../dto';
-import { GeneratePreviewRequestDto } from '../dto/workflows/generate-preview-request.dto';
+import { GeneratePreviewResponseDto } from '../dto/workflows/preview-step-response.dto';
 
 // Define the WorkflowClient as a function that utilizes the base client
 export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {}) => {
@@ -46,6 +46,7 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
   ): Promise<NovuRestResult<StepDataDto, HttpError>> => {
     return await baseClient.safeGet<StepDataDto>(`/v2/workflows/${workflowId}/steps/${stepId}`);
   };
+
   const deleteWorkflow = async (workflowId: string): Promise<NovuRestResult<void, HttpError>> => {
     return await baseClient.safeDelete(`/v2/workflows/${workflowId}`);
   };

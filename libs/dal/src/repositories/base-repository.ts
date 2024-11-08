@@ -6,7 +6,16 @@ import {
   DEFAULT_MESSAGE_IN_APP_RETENTION_DAYS,
   DEFAULT_NOTIFICATION_RETENTION_DAYS,
 } from '@novu/shared';
-import { FilterQuery, Model, ProjectionType, QueryOptions, QueryWithHelpers, Types, UpdateQuery } from 'mongoose';
+import {
+  ClientSession,
+  FilterQuery,
+  Model,
+  ProjectionType,
+  QueryOptions,
+  QueryWithHelpers,
+  Types,
+  UpdateQuery,
+} from 'mongoose';
 import { DalException } from '../shared';
 
 export class BaseRepository<T_DBModel, T_MappedEntity, T_Enforcement> {
@@ -337,6 +346,10 @@ export class BaseRepository<T_DBModel, T_MappedEntity, T_Enforcement> {
 
   protected mapEntities(data: any): T_MappedEntity[] {
     return plainToInstance<T_MappedEntity, T_MappedEntity[]>(this.entity, JSON.parse(JSON.stringify(data)));
+  }
+
+  async withTransaction(fn: Parameters<ClientSession['withTransaction']>[0]) {
+    return (await this._model.db.startSession()).withTransaction(fn);
   }
 }
 
