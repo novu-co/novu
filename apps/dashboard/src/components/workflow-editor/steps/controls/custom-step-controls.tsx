@@ -1,19 +1,37 @@
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
-import { RiInputField } from 'react-icons/ri';
+import { useState } from 'react';
+import { RJSFSchema } from '@rjsf/utils';
+import { RiArrowDownSLine, RiArrowUpSLine, RiInputField } from 'react-icons/ri';
+import { type ControlsMetadata } from '@novu/shared';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/primitives/collapsible';
+import { JsonForm } from './json-form';
 
-export function CustomStepControls() {
+export function CustomStepControls({ dataSchema }: { dataSchema: ControlsMetadata['dataSchema'] }) {
+  const [isEditorOpen, setIsEditorOpen] = useState(true);
+
   return (
-    <Accordion type="single" collapsible>
-      <AccordionItem value="item-1">
-        <AccordionTrigger>
-          <div className="flex items-center gap-1">
-            <RiInputField /> Custom step controls
-          </div>
-        </AccordionTrigger>
-        <AccordionContent className="rounded-md border border-dashed p-3">
-          <div>Yes. It adheres to the WAI-ARIA design pattern.</div>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+    <Collapsible
+      open={isEditorOpen}
+      onOpenChange={setIsEditorOpen}
+      className="bg-neutral-alpha-50 border-neutral-alpha-200 flex w-full flex-col gap-2 rounded-lg border p-2"
+    >
+      <CollapsibleTrigger className="flex w-full items-center justify-between text-sm">
+        <div className="flex items-center gap-1">
+          <RiInputField className="text-feature size-5" />
+          <span className="text-sm font-medium">Custom steps controls</span>
+        </div>
+
+        {isEditorOpen ? (
+          <RiArrowUpSLine className="text-neutral-alpha-400 size-5" />
+        ) : (
+          <RiArrowDownSLine className="text-neutral-alpha-400 size-5" />
+        )}
+      </CollapsibleTrigger>
+
+      <CollapsibleContent>
+        <div className="bg-background rounded-md border border-dashed p-3">
+          <JsonForm schema={(dataSchema as RJSFSchema) || {}} variables={[]} />
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
