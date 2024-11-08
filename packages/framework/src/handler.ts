@@ -68,11 +68,12 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
   public readonly client: Client;
   private readonly hmacEnabled: boolean;
   private readonly http;
+  private readonly workflows: Array<Workflow>;
 
   constructor(options: INovuRequestHandlerOptions<Input, Output>) {
     this.handler = options.handler;
     this.client = options.client ? options.client : new Client();
-    this.client.addWorkflows(options.workflows);
+    this.workflows = options.workflows;
     this.http = initApiClient(this.client.secretKey, this.client.apiUrl);
     this.frameworkName = options.frameworkName;
     this.hmacEnabled = this.client.strictAuthentication;
@@ -80,6 +81,7 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
 
   public createHandler(): (...args: Input) => Promise<Output> {
     return async (...args: Input) => {
+      await this.client.addWorkflows(this.workflows);
       const actions = await this.handler(...args);
       const actionResponse = await this.handleAction({
         actions,

@@ -1,5 +1,8 @@
 name: Build, tag and push docker image to ghcr.io
 
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
 # Controls when the action will run. Triggers the workflow on push or pull request
 on:
   workflow_call:
@@ -64,7 +67,7 @@ jobs:
       id-token: write
     strategy:
       matrix:
-        name: [ '${{ inputs.package_name }}-ee']
+        name: ['${{ inputs.package_name }}-ee']
     steps:
       - uses: actions/checkout@v4
         with:
@@ -87,14 +90,13 @@ jobs:
         with:
           driver-opts: 'image=moby/buildkit:v0.13.1'
 
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ inputs.aws-region }}
-        
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2

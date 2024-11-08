@@ -1,6 +1,5 @@
 import { UserSession } from '@novu/testing';
-import { HttpResponseHeaderKeysEnum } from '@novu/shared';
-import { CacheService } from '@novu/application-generic';
+import { CacheService, HttpResponseHeaderKeysEnum } from '@novu/application-generic';
 import { expect } from 'chai';
 import { DOCS_LINK } from './idempotency.interceptor';
 

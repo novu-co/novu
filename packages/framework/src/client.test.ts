@@ -26,7 +26,7 @@ describe('Novu Client', () => {
     });
 
     client = new Client({ secretKey: 'some-secret-key' });
-    client.addWorkflows([newWorkflow]);
+    await client.addWorkflows([newWorkflow]);
   });
 
   describe('client constructor', () => {
@@ -185,7 +185,7 @@ describe('Novu Client', () => {
         }));
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       // wait for discovery to finish
       await new Promise((resolve) => {
@@ -301,7 +301,7 @@ describe('Novu Client', () => {
         );
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const discovery = client.discover();
       expect(discovery.workflows).toHaveLength(2);
@@ -355,7 +355,7 @@ describe('Novu Client', () => {
         }
       );
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const emailEvent: Event = {
         action: PostActionEnum.PREVIEW,
@@ -381,7 +381,7 @@ describe('Novu Client', () => {
     it('should sanitize the step result of all delivery channel step types', async () => {
       const script = `<script>alert('Hello there')</script>`;
 
-      client.addWorkflows([
+      await client.addWorkflows([
         workflow('test-workflow', async ({ step }) => {
           await step.email('send-email', async () => ({
             body: `Start of body. ${script}`,
@@ -409,7 +409,7 @@ describe('Novu Client', () => {
     it('should not sanitize the step result of custom step type', async () => {
       const script = `<script>alert('Hello there')</script>`;
 
-      client.addWorkflows([
+      await client.addWorkflows([
         workflow('test-workflow', async ({ step }) => {
           await step.custom(
             'send-email',
@@ -468,7 +468,7 @@ describe('Novu Client', () => {
         controls: {},
       };
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const emailExecutionResult = await client.executeWorkflow(emailEvent);
 
@@ -564,7 +564,7 @@ describe('Novu Client', () => {
         }
       );
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const emailEvent: Event = {
         action: PostActionEnum.EXECUTE,
@@ -633,7 +633,7 @@ describe('Novu Client', () => {
         }
       );
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -699,7 +699,7 @@ describe('Novu Client', () => {
         }
       );
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -762,7 +762,7 @@ describe('Novu Client', () => {
         }
       );
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -825,7 +825,7 @@ describe('Novu Client', () => {
         }
       );
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -888,7 +888,7 @@ describe('Novu Client', () => {
         }
       );
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -935,7 +935,7 @@ describe('Novu Client', () => {
         );
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -981,7 +981,7 @@ describe('Novu Client', () => {
         );
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const emailEvent: Event = {
         action: PostActionEnum.EXECUTE,
@@ -1030,7 +1030,7 @@ describe('Novu Client', () => {
         );
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const emailEvent: Event = {
         action: PostActionEnum.EXECUTE,
@@ -1061,7 +1061,7 @@ describe('Novu Client', () => {
         await step.email('send-email', async () => ({ body: 'Test Body', subject: 'Subject' }));
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -1100,7 +1100,7 @@ describe('Novu Client', () => {
         });
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -1153,7 +1153,7 @@ describe('Novu Client', () => {
         });
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -1207,7 +1207,7 @@ describe('Novu Client', () => {
         });
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -1249,7 +1249,7 @@ describe('Novu Client', () => {
         await step.email('inactive-step-id', async () => ({ body: 'Test Body', subject: 'Subject' }));
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -1277,7 +1277,7 @@ describe('Novu Client', () => {
         });
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -1306,7 +1306,7 @@ describe('Novu Client', () => {
         });
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -1344,7 +1344,7 @@ describe('Novu Client', () => {
         });
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -1386,7 +1386,7 @@ describe('Novu Client', () => {
         }
       );
 
-      client.addWorkflows([workflowMock]);
+      await client.addWorkflows([workflowMock]);
 
       const event: Event = {
         action: PostActionEnum.PREVIEW,
@@ -1410,7 +1410,7 @@ describe('Novu Client', () => {
         await step.email('send-email', async () => ({ body: 'Test Body', subject: 'Subject' }));
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.PREVIEW,
@@ -1469,7 +1469,7 @@ describe('Novu Client', () => {
         await step.inApp('send-in-app', async () => ({ body: 'Test Body', subject: 'Subject' }));
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.PREVIEW,
@@ -1508,7 +1508,7 @@ describe('Novu Client', () => {
         });
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.PREVIEW,
@@ -1571,7 +1571,7 @@ describe('Novu Client', () => {
         }
       );
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.PREVIEW,
@@ -1656,7 +1656,7 @@ describe('Novu Client', () => {
         }
       );
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.PREVIEW,
@@ -1713,7 +1713,7 @@ describe('Novu Client', () => {
         await step.email('send-email', async () => ({ body: 'Test Body', subject: 'Subject' }));
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       // @ts-expect-error - no workflow id
       const event2: Event = {
@@ -1730,7 +1730,7 @@ describe('Novu Client', () => {
         await step.email('send-email', async () => ({ body: 'Test Body', subject: 'Subject' }));
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -1750,7 +1750,7 @@ describe('Novu Client', () => {
         await step.email('send-email', async () => ({ body: 'Test Body', subject: 'Subject' }));
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       // @ts-expect-error - no action
       const event: Event = {
@@ -1771,7 +1771,7 @@ describe('Novu Client', () => {
         });
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -1808,7 +1808,7 @@ describe('Novu Client', () => {
         );
       });
 
-      client.addWorkflows([newWorkflow]);
+      await client.addWorkflows([newWorkflow]);
 
       const event: Event = {
         action: PostActionEnum.EXECUTE,
@@ -1828,7 +1828,7 @@ describe('Novu Client', () => {
     it('should sanitize the step output of all channel step types by default', async () => {
       const script = `<script>alert('Hello there')</script>`;
 
-      client.addWorkflows([
+      await client.addWorkflows([
         workflow('test-workflow', async ({ step }) => {
           await step.email('send-email', async () => ({
             body: `Start of body. ${script}`,
@@ -1856,7 +1856,7 @@ describe('Novu Client', () => {
     it('should sanitize the step output of channel step types when `disableOutputSanitization: false`', async () => {
       const script = `<script>alert('Hello there')</script>`;
 
-      client.addWorkflows([
+      await client.addWorkflows([
         workflow('test-workflow', async ({ step }) => {
           await step.email(
             'send-email',
@@ -1891,7 +1891,7 @@ describe('Novu Client', () => {
       const link =
         '/pipeline/Oee4d54-ca52-4d70-86b3-cd10a67b6810/requirements?requirementId=dc25a578-ecf1-4835-9310-2236f8244bd&commentId=e259b16b-68f9-43af-b252-fce68bc7cb2f';
 
-      client.addWorkflows([
+      await client.addWorkflows([
         workflow('test-workflow', async ({ step }) => {
           await step.inApp(
             'send-inapp',
@@ -1927,7 +1927,7 @@ describe('Novu Client', () => {
     it('should not sanitize the step result of custom step type', async () => {
       const script = `<script>alert('Hello there')</a>`;
 
-      client.addWorkflows([
+      await client.addWorkflows([
         workflow('test-workflow', async ({ step }) => {
           await step.custom(
             'send-email',
@@ -1981,7 +1981,7 @@ describe('Novu Client', () => {
 
       const newWorkflow = workflow('setup-workflow', workflowExecuteFunc);
 
-      getCodeClientInstance.addWorkflows([newWorkflow]);
+      await getCodeClientInstance.addWorkflows([newWorkflow]);
     });
 
     it('should throw an error when workflow ID is not found', () => {
@@ -1991,7 +1991,7 @@ describe('Novu Client', () => {
     it('should throw an error when step ID is provided but not found in the workflow', async () => {
       const newWorkflow = workflow('test-workflow', workflowExecuteFunc);
 
-      getCodeClientInstance.addWorkflows([newWorkflow]);
+      await getCodeClientInstance.addWorkflows([newWorkflow]);
 
       expect(() => getCodeClientInstance.getCode('test-workflow', 'non-existent-step')).toThrow(StepNotFoundError);
     });

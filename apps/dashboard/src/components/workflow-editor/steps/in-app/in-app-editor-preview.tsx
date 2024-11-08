@@ -11,7 +11,7 @@ import { useParams } from 'react-router-dom';
 import { InAppPreview } from '@/components/workflow-editor/in-app-preview';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 
-export const ConfigureInAppStepTemplatePreview = () => {
+export const InAppEditorPreview = () => {
   const [editorValue, setEditorValue] = useState('{}');
   const [isEditorOpen, setIsEditorOpen] = useState(true);
   const { previewStep, data } = usePreviewStep();

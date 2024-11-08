@@ -1,4 +1,4 @@
-import { JSONSchema } from 'json-schema-to-ts';
+import type { JSONSchema } from 'json-schema-to-ts';
 
 export type StepDataDto = {
   controls: ControlsMetadata;
@@ -25,6 +25,7 @@ export enum UiComponentEnum {
 }
 
 export class UiSchemaProperty {
+  placeholder?: unknown;
   component: UiComponentEnum;
 }
 

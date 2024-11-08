@@ -84,7 +84,9 @@ await novu.trigger('workflowIdentifier', {
 ```ts
 import { Novu } from '@novu/node';
 
-const novu = new Novu('<NOVU_SECRET_KEY>', { backendUrl : '<SELF_HOST_API_URL>' });
+const novu = new Novu('<NOVU_SECRET_KEY>', {
+  backendUrl: '<SELF_HOST_API_URL>',
+});
 ```
 
 ## Providers

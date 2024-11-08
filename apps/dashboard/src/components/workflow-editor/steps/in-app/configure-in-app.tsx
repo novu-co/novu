@@ -4,9 +4,9 @@ import { Button } from '../../../primitives/button';
 import { Separator } from '../../../primitives/separator';
 import { CommonFields } from '../common-fields';
 import { SidebarContent } from '@/components/side-navigation/Sidebar';
-import { EditStepInAppPreview } from '@/components/workflow-editor/steps/in-app/edit-step-in-app-preview';
+import { ConfigureInAppPreview } from './configure-in-app-preview';
 
-export function InApp() {
+export function ConfigureInApp() {
   return (
     <>
       <SidebarContent>
@@ -21,7 +21,7 @@ export function InApp() {
           </Button>
         </Link>
 
-        <EditStepInAppPreview />
+        <ConfigureInAppPreview />
       </SidebarContent>
     </>
   );

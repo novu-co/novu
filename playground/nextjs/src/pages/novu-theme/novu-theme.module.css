@@ -1,4 +1,3 @@
-
 .flex {
   display: flex;
 }
@@ -44,15 +43,15 @@
   color: #828299;
 }
 
-.action-button[data-variant="icon"]:hover {
-  background-color: #3D3D4D;
+.action-button[data-variant='icon']:hover {
+  background-color: #3d3d4d;
 }
 
 .dropdown-item:hover {
   background-color: #292933;
 }
 
-.tabs-trigger[data-state="active"]::after {
+.tabs-trigger[data-state='active']::after {
   background-color: #dd2476;
 }
 

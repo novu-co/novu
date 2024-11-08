@@ -4,19 +4,22 @@ import {
   ThrottlerException,
   ThrottlerGuard,
   ThrottlerModuleOptions,
-  ThrottlerOptions,
   ThrottlerRequest,
   ThrottlerStorage,
 } from '@nestjs/throttler';
 import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { GetFeatureFlag, GetFeatureFlagCommand, Instrument } from '@novu/application-generic';
+import {
+  GetFeatureFlag,
+  GetFeatureFlagCommand,
+  Instrument,
+  HttpRequestHeaderKeysEnum,
+  HttpResponseHeaderKeysEnum,
+} from '@novu/application-generic';
 import {
   ApiAuthSchemeEnum,
   ApiRateLimitCategoryEnum,
   ApiRateLimitCostEnum,
-  HttpRequestHeaderKeysEnum,
-  HttpResponseHeaderKeysEnum,
   FeatureFlagsKeysEnum,
   UserSessionData,
 } from '@novu/shared';
