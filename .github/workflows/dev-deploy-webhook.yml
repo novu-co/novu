@@ -22,6 +22,7 @@ env:
 jobs:
   test_webhook:
     uses: ./.github/workflows/reusable-webhook-e2e.yml
+    secrets: inherit
 
   publish_docker_image_webhook:
     if: "!contains(github.event.head_commit.message, 'ci skip')"
