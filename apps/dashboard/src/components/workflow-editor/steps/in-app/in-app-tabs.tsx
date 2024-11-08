@@ -19,6 +19,7 @@ import { ToastIcon } from '@/components/primitives/sonner';
 import { useState } from 'react';
 import { usePreviewStep } from '@/hooks/use-preview-step';
 import useDebouncedEffect from '@/hooks/use-debounced-effect';
+import { CustomStepControls } from '../controls/custom-step-controls';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5';
 
@@ -154,6 +155,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
           <Separator />
           <TabsContent value="editor" className={tabsContentClassName}>
             <InAppEditor uiSchema={uiSchema} />
+            <CustomStepControls />
           </TabsContent>
           <TabsContent value="preview" className={tabsContentClassName}>
             <InAppEditorPreview value={editorValue} onChange={setEditorValue} />
