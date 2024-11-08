@@ -16,7 +16,6 @@ import {
   NotificationTemplateRepository,
   PreferenceLevelEnum,
   SubscriberEntity,
-  SubscriberPreferenceEntity,
   SubscriberPreferenceRepository,
   SubscriberRepository,
 } from '@novu/dal';
@@ -56,46 +55,16 @@ export class UpdatePreferences {
       }
     }
 
-    const subscriberPreference = await this.findPreference(command, subscriber);
-    if (!subscriberPreference) {
-      await this.createUserPreference(command, subscriber);
-    } else {
-      await this.updateUserPreference(command, subscriber);
-    }
+    await this.updateSubscriberPreference(command, subscriber);
 
     return await this.findPreference(command, subscriber);
   }
 
   @Instrument()
-  private async createUserPreference(command: UpdatePreferencesCommand, subscriber: SubscriberEntity): Promise<void> {
-    const channelPreferences: IPreferenceChannels = this.buildPreferenceChannels(command);
-
-    await this.storePreferencesV2({
-      channels: channelPreferences,
-      organizationId: command.organizationId,
-      environmentId: command.environmentId,
-      _subscriberId: subscriber._id,
-      templateId: command.workflowId,
-    });
-
-    this.analyticsService.mixpanelTrack(AnalyticsEventsEnum.CREATE_PREFERENCES, '', {
-      _organization: command.organizationId,
-      _subscriber: subscriber._id,
-      _workflowId: command.workflowId,
-      level: command.level,
-      channels: channelPreferences,
-    });
-
-    const query = this.commonQuery(command, subscriber);
-    await this.subscriberPreferenceRepository.create({
-      ...query,
-      enabled: true,
-      channels: channelPreferences,
-    });
-  }
-
-  @Instrument()
-  private async updateUserPreference(command: UpdatePreferencesCommand, subscriber: SubscriberEntity): Promise<void> {
+  private async updateSubscriberPreference(
+    command: UpdatePreferencesCommand,
+    subscriber: SubscriberEntity
+  ): Promise<void> {
     const channelPreferences: IPreferenceChannels = this.buildPreferenceChannels(command);
 
     await this.storePreferencesV2({
