@@ -36,7 +36,7 @@ on:
 jobs:
   check_submodule_token:
     name: Check if the secret exists or not.
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     outputs:
       has_token: ${{ steps.secret-check.outputs.has_token }}
     steps:

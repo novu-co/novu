@@ -11,7 +11,7 @@ env:
 jobs:
   build_prod_image:
     # The type of runner that the job will run on
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     timeout-minutes: 80
     environment: Production
     outputs:
@@ -104,7 +104,7 @@ jobs:
       sentry_project: worker
 
   newrelic:
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     name: New Relic Deploy
     needs: deploy_prod_workers_us
     environment: Production

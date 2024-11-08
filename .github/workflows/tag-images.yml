@@ -12,7 +12,7 @@ on:
 
 jobs:
   tag_images:
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     timeout-minutes: 80
     environment: Production
     permissions:
@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Setup kernel for react native, increase watchers
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-      - uses: useblacksmith/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
           node-version: '20.8.1'
 

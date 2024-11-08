@@ -42,7 +42,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   reusable_widget_deploy:
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     timeout-minutes: 80
     environment: ${{ inputs.environment }}
     permissions:

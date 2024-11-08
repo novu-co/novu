@@ -19,7 +19,7 @@ jobs:
     secrets: inherit
 
   build_prod_image:
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     timeout-minutes: 80
     environment: Production
     outputs:

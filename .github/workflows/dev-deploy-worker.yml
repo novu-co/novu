@@ -32,7 +32,7 @@ jobs:
 
   build_dev_worker:
     # The type of runner that the job will run on
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     needs: test_worker
     timeout-minutes: 80
     environment: Development
@@ -73,7 +73,7 @@ jobs:
       docker_image: ${{ needs.build_dev_worker.outputs.docker_image }}
 
   newrelic:
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     name: New Relic Deploy
     needs: deploy_dev_workers
     environment: Development

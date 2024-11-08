@@ -32,7 +32,7 @@ jobs:
         total: [4]
 
     # The type of runner that the job will run on
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     timeout-minutes: 80
 
     permissions:
@@ -125,10 +125,10 @@ jobs:
     # Merge reports after playwright-tests, even if some shards have failed
     if: ${{ !cancelled() }}
     needs: [e2e_web]
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: useblacksmith/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
           node-version: 20.8.1
 

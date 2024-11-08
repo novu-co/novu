@@ -41,7 +41,7 @@ on:
 jobs:
   ecs:
     if: contains(fromJson('["api", "inbound_mail", "webhook", "worker", "ws"]'), github.event.inputs.service)
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         region: ${{ fromJSON(github.event.inputs.region) }}
@@ -195,7 +195,7 @@ jobs:
 
   netlify:
     if: contains(fromJson('["web", "widget"]'), github.event.inputs.service)
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         region: ${{ fromJSON(github.event.inputs.region) }}

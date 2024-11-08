@@ -12,7 +12,7 @@ on:
 
 jobs:
   prepare-cloud-release:
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write

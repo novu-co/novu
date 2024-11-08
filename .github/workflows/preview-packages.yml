@@ -12,7 +12,7 @@ on:
 
 jobs:
   publish_preview_packages:
-    runs-on: blacksmith-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - run: corepack enable
-      - uses: useblacksmith/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
