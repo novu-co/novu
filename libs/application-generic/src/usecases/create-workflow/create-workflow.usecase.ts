@@ -60,6 +60,7 @@ export class CreateWorkflow {
     @Inject(forwardRef(() => AnalyticsService))
     private analyticsService: AnalyticsService,
     private logger: PinoLogger,
+    @Inject(forwardRef(() => InvalidateCacheService))
     private invalidateCache: InvalidateCacheService,
     protected moduleRef: ModuleRef,
   ) {}
