@@ -106,17 +106,11 @@ jobs:
       deploy_sentry_release: true
       sentry_project: api
 
-  deploy_docs:
+  sync_novu_state:
     needs: deploy_prod_api_us
     runs-on: ubuntu-latest
     environment: Production
     steps:
-      - name: Deploy API Documentation
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: ${{ secrets.API_DOCS_BUILD_WEBHOOK }}
-          method: 'POST'
-
       - name: Sync State to Novu
         uses: novuhq/actions-novu-sync@v2
         with:
@@ -128,7 +122,18 @@ jobs:
           # The publicly available endpoint hosting the bridge application
           # where notification entities (eg. workflows, topics) are defined.
           # Required.
-          bridge-url: https://api.novu.co/v1/api/novu
+          bridge-url: https://api.novu.co/v1/bridge/novu
+
+  deploy_docs:
+    needs: deploy_prod_api_us
+    runs-on: ubuntu-latest
+    environment: Production
+    steps:
+      - name: Deploy API Documentation
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.API_DOCS_BUILD_WEBHOOK }}
+          method: 'POST'
 
   newrelic:
     runs-on: ubuntu-latest

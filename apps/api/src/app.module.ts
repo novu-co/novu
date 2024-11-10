@@ -156,7 +156,7 @@ if (process.env.NODE_ENV === 'test') {
 
 modules.push(
   NovuModule.register({
-    apiPath: '/api/novu',
+    apiPath: '/bridge/novu',
     client: new Client({
       secretKey: process.env.NOVU_INTERNAL_SECRET_KEY,
       strictAuthentication:
