@@ -28,7 +28,8 @@ export function CompassGradient(props: React.ComponentPropsWithoutRef<'svg'>) {
           y1="20.7999"
           x2="15.2502"
           y2="10.2"
-          gradientUnits="userSpaceOnUse">
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor="#FF512F" />
           <stop offset="1" stopColor="#DD2476" />
         </linearGradient>

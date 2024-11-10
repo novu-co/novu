@@ -1,5 +1,6 @@
 import { ChannelTypeEnum } from '../../types';
 import { SubscriberDto } from '../subscriber';
+import { ContentIssue } from './workflow-commons-fields';
 
 export class RenderOutput {}
 
@@ -53,17 +54,7 @@ export class InAppRenderOutput extends RenderOutput {
     target?: RedirectTargetEnum;
   };
 }
-export enum ControlPreviewIssueTypeEnum {
-  MISSING_VARIABLE_IN_PAYLOAD = 'MISSING_VARIABLE_IN_PAYLOAD',
-  VARIABLE_TYPE_MISMATCH = 'VARIABLE_TYPE_MISMATCH',
-  MISSING_VALUE = 'MISSING_VALUE',
-}
 
-export class ControlPreviewIssue {
-  issueType: ControlPreviewIssueTypeEnum;
-  variableName?: string;
-  message: string;
-}
 export class PreviewPayload {
   subscriber?: Partial<SubscriberDto>;
   payload?: Record<string, unknown>;
@@ -72,7 +63,7 @@ export class PreviewPayload {
 
 export class GeneratePreviewResponseDto {
   previewPayloadExample: PreviewPayload;
-  issues: Record<string, ControlPreviewIssue[]>;
+  issues: Record<string, ContentIssue[]>;
   result?:
     | {
         type: ChannelTypeEnum.EMAIL;

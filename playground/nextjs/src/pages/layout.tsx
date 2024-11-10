@@ -4,8 +4,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <main>
       <Header />
-      <div className="flex justify-center p-5 h-screen">
-        <div className="text-center flex flex-col gap-4">{children}</div>
+      <div className="flex h-screen justify-center p-5">
+        <div className="flex flex-col gap-4 text-center">{children}</div>
       </div>
     </main>
   );

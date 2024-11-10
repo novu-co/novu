@@ -12,6 +12,7 @@ on:
       - 'apps/ws/**'
 env:
   TF_WORKSPACE: novu-dev
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
 jobs:
   test_ws:
@@ -92,17 +93,16 @@ jobs:
           aws ecs describe-task-definition --task-definition ${{ env.ws_task_name }} \
           --query taskDefinition > task-definition.json
 
-
       - name: Set Bull MQ Env variable for EE
         shell: bash
         run: |
           echo "BULL_MQ_PRO_NPM_TOKEN=${{ secrets.BULL_MQ_PRO_NPM_TOKEN }}" >> $GITHUB_ENV
-        
+
       - name: Build with Buildx, tag, and test
         shell: bash
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: novu-dev/ws    
+          REPOSITORY: novu-dev/ws
           IMAGE_TAG: ${{ github.sha }}
           DOCKER_BUILD_ARGUMENTS: >
             --platform=linux/amd64 --provenance=false
@@ -116,7 +116,7 @@ jobs:
         shell: bash
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: novu-dev/ws           
+          REPOSITORY: novu-dev/ws
           IMAGE_TAG: ${{ github.sha }}
         run: |
           echo "Built image"
@@ -130,7 +130,7 @@ jobs:
         shell: bash
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: novu-dev/ws 
+          REPOSITORY: novu-dev/ws
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG

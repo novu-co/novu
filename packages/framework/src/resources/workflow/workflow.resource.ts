@@ -18,7 +18,6 @@ import { discoverActionStepFactory } from './discover-action-step-factory';
 import { discoverChannelStepFactory } from './discover-channel-step-factory';
 import { discoverCustomStepFactory } from './discover-custom-step-factory';
 import { mapPreferences } from './map-preferences';
-import { prettyPrintDiscovery } from './pretty-print-discovery';
 
 /**
  * Define a new notification workflow.
@@ -77,81 +76,84 @@ export function workflow<
     };
   };
 
-  const newWorkflow: DiscoverWorkflowOutput = {
-    workflowId,
-    steps: [],
-    code: execute.toString(),
-    payload: {
-      schema: transformSchema(options.payloadSchema || emptySchema),
-      unknownSchema: options.payloadSchema || emptySchema,
-    },
-    controls: {
-      schema: transformSchema(options.controlSchema || emptySchema),
-      unknownSchema: options.controlSchema || emptySchema,
-    },
-    tags: options.tags || [],
-    preferences: mapPreferences(options.preferences),
-    name: options.name,
-    description: options.description,
-    execute: execute as Execute<Record<string, unknown>, Record<string, unknown>>,
+  const discover = async (): Promise<DiscoverWorkflowOutput> => {
+    const newWorkflow: DiscoverWorkflowOutput = {
+      workflowId,
+      steps: [],
+      code: execute.toString(),
+      payload: {
+        schema: await transformSchema(options.payloadSchema || emptySchema),
+        unknownSchema: options.payloadSchema || emptySchema,
+      },
+      controls: {
+        schema: await transformSchema(options.controlSchema || emptySchema),
+        unknownSchema: options.controlSchema || emptySchema,
+      },
+      tags: options.tags || [],
+      preferences: mapPreferences(options.preferences),
+      name: options.name,
+      description: options.description,
+      execute: execute as Execute<Record<string, unknown>, Record<string, unknown>>,
+    };
+
+    await execute({
+      payload: {} as T_PayloadValidated,
+      subscriber: {},
+      environment: {},
+      controls: {} as T_Controls,
+      step: {
+        push: await discoverChannelStepFactory(
+          newWorkflow,
+          ChannelStepEnum.PUSH,
+          channelStepSchemas.push.output,
+          channelStepSchemas.push.result
+        ),
+        chat: await discoverChannelStepFactory(
+          newWorkflow,
+          ChannelStepEnum.CHAT,
+          channelStepSchemas.chat.output,
+          channelStepSchemas.chat.result
+        ),
+        email: await discoverChannelStepFactory(
+          newWorkflow,
+          ChannelStepEnum.EMAIL,
+          channelStepSchemas.email.output,
+          channelStepSchemas.email.result
+        ),
+        sms: await discoverChannelStepFactory(
+          newWorkflow,
+          ChannelStepEnum.SMS,
+          channelStepSchemas.sms.output,
+          channelStepSchemas.sms.result
+        ),
+        inApp: await discoverChannelStepFactory(
+          newWorkflow,
+          ChannelStepEnum.IN_APP,
+          channelStepSchemas.in_app.output,
+          channelStepSchemas.in_app.result
+        ),
+        digest: await discoverActionStepFactory(
+          newWorkflow,
+          ActionStepEnum.DIGEST,
+          digestActionSchemas.output,
+          digestActionSchemas.result
+        ),
+        delay: await discoverActionStepFactory(
+          newWorkflow,
+          ActionStepEnum.DELAY,
+          delayActionSchemas.output,
+          delayActionSchemas.result
+        ),
+        custom: await discoverCustomStepFactory(newWorkflow, ActionStepEnum.CUSTOM),
+      } as never,
+    });
+
+    return newWorkflow;
   };
 
-  execute({
-    payload: {} as T_PayloadValidated,
-    subscriber: {},
-    environment: {},
-    controls: {} as T_Controls,
-    step: {
-      push: discoverChannelStepFactory(
-        newWorkflow,
-        ChannelStepEnum.PUSH,
-        channelStepSchemas.push.output,
-        channelStepSchemas.push.result
-      ),
-      chat: discoverChannelStepFactory(
-        newWorkflow,
-        ChannelStepEnum.CHAT,
-        channelStepSchemas.chat.output,
-        channelStepSchemas.chat.result
-      ),
-      email: discoverChannelStepFactory(
-        newWorkflow,
-        ChannelStepEnum.EMAIL,
-        channelStepSchemas.email.output,
-        channelStepSchemas.email.result
-      ),
-      sms: discoverChannelStepFactory(
-        newWorkflow,
-        ChannelStepEnum.SMS,
-        channelStepSchemas.sms.output,
-        channelStepSchemas.sms.result
-      ),
-      inApp: discoverChannelStepFactory(
-        newWorkflow,
-        ChannelStepEnum.IN_APP,
-        channelStepSchemas.in_app.output,
-        channelStepSchemas.in_app.result
-      ),
-      digest: discoverActionStepFactory(
-        newWorkflow,
-        ActionStepEnum.DIGEST,
-        digestActionSchemas.output,
-        digestActionSchemas.result
-      ),
-      delay: discoverActionStepFactory(
-        newWorkflow,
-        ActionStepEnum.DELAY,
-        delayActionSchemas.output,
-        delayActionSchemas.result
-      ),
-      custom: discoverCustomStepFactory(newWorkflow, ActionStepEnum.CUSTOM),
-    } as never,
-  }).then(() => {
-    prettyPrintDiscovery(newWorkflow);
-  });
-
   return {
+    id: workflowId,
     trigger,
-    definition: newWorkflow,
+    discover,
   };
 }

@@ -3,6 +3,9 @@ name: Deploy PROD Notification Center Web Component
 on:
   workflow_dispatch:
 
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
 jobs:
   build:
     uses: ./.github/workflows/reusable-notification-center.yml

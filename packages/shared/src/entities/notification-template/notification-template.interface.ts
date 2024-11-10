@@ -1,4 +1,4 @@
-import { JSONSchema } from 'json-schema-to-ts';
+import type { JSONSchema } from 'json-schema-to-ts';
 
 import type {
   BuilderFieldType,
@@ -12,7 +12,7 @@ import { ControlSchemas, IMessageTemplate } from '../message-template';
 import { IPreferenceChannels } from '../subscriber-preference';
 import { IWorkflowStepMetadata } from '../step';
 import { INotificationGroup } from '../notification-group';
-import { ControlsDto } from '../../index';
+import { ContentIssue, ControlsDto, StepIssue } from '../../index';
 
 export interface INotificationTemplate {
   _id?: string;
@@ -82,11 +82,15 @@ export interface INotificationTriggerVariable {
   value?: any;
   type?: TemplateVariableTypeEnum;
 }
-
+export class StepIssues {
+  body?: Record<string, StepIssue>;
+  controls?: Record<string, ContentIssue[]>;
+}
 export interface IStepVariant {
   _id?: string;
   uuid?: string;
   stepId?: string;
+  issues?: StepIssues;
   name?: string;
   filters?: IMessageFilter[];
   _templateId?: string;

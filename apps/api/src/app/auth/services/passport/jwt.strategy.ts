@@ -2,8 +2,8 @@ import type http from 'http';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ApiAuthSchemeEnum, HttpRequestHeaderKeysEnum, UserSessionData } from '@novu/shared';
-import { AuthService, Instrument } from '@novu/application-generic';
+import { AuthService, Instrument, HttpRequestHeaderKeysEnum } from '@novu/application-generic';
+import { ApiAuthSchemeEnum, UserSessionData } from '@novu/shared';
 import { EnvironmentRepository } from '@novu/dal';
 
 @Injectable()

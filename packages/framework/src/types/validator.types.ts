@@ -29,5 +29,5 @@ export interface Validator<T_Schema extends Schema = Schema> {
     schema: T_Schema
   ) => Promise<ValidateResult<T_Validated>>;
   canHandle: (schema: Schema) => schema is T_Schema;
-  transformToJsonSchema: (schema: T_Schema) => JsonSchema;
+  transformToJsonSchema: (schema: T_Schema) => Promise<JsonSchema>;
 }
