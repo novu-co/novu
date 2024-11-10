@@ -8,10 +8,10 @@ import {
 } from '@novu/dal';
 import {
   AnalyticsService,
-  buildNotificationTemplateIdentifierKey,
-  buildNotificationTemplateKey,
   CreateWorkflow,
   CreateWorkflowCommand,
+  DeleteWorkflowCommand,
+  DeleteWorkflowUseCase,
   ExecuteBridgeRequest,
   InvalidateCacheService,
   NotificationStep,
@@ -29,7 +29,6 @@ import {
 import { DiscoverOutput, DiscoverStepOutput, DiscoverWorkflowOutput, GetActionEnum } from '@novu/framework/internal';
 
 import { SyncCommand } from './sync.command';
-import { DeleteWorkflow, DeleteWorkflowCommand } from '../delete-workflow';
 import { CreateBridgeResponseDto } from '../../dtos/create-bridge-response.dto';
 
 @Injectable()
@@ -37,7 +36,7 @@ export class Sync {
   constructor(
     private createWorkflowUsecase: CreateWorkflow,
     private updateWorkflowUsecase: UpdateWorkflow,
-    private deleteWorkflow: DeleteWorkflow,
+    private deleteWorkflowUseCase: DeleteWorkflowUseCase,
     private notificationTemplateRepository: NotificationTemplateRepository,
     private notificationGroupRepository: NotificationGroupRepository,
     private environmentRepository: EnvironmentRepository,
@@ -116,39 +115,18 @@ export class Sync {
   ): Promise<void> {
     const persistedWorkflowIdsInBridge = createdWorkflows.map((i) => i._id);
     const workflowsToDelete = await this.findAllWorkflowsWithOtherIds(command, persistedWorkflowIdsInBridge);
-
     const deleteWorkflowFromStoragePromises = workflowsToDelete.map((workflow) =>
-      this.deleteWorkflow.execute(
+      this.deleteWorkflowUseCase.execute(
         DeleteWorkflowCommand.create({
           environmentId: command.environmentId,
           organizationId: command.organizationId,
           userId: command.userId,
-          workflowId: workflow._id,
+          identifierOrInternalId: workflow._id,
         })
       )
     );
-    const invalidateCachesByIdentifiersPromises = workflowsToDelete.map((workflow) =>
-      this.invalidateCacheService.invalidateByKey({
-        key: buildNotificationTemplateIdentifierKey({
-          templateIdentifier: workflow.triggers[0].identifier,
-          _environmentId: command.environmentId,
-        }),
-      })
-    );
-    const invalidateCachesByIdsPromises = workflowsToDelete.map((workflow) =>
-      this.invalidateCacheService.invalidateByKey({
-        key: buildNotificationTemplateKey({
-          _id: workflow._id,
-          _environmentId: command.environmentId,
-        }),
-      })
-    );
 
-    await Promise.all([
-      ...deleteWorkflowFromStoragePromises,
-      ...invalidateCachesByIdentifiersPromises,
-      ...invalidateCachesByIdsPromises,
-    ]);
+    await Promise.all([...deleteWorkflowFromStoragePromises]);
   }
 
   private async findAllWorkflowsWithOtherIds(

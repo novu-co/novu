@@ -3,9 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { ControlValuesLevelEnum, StepTypeEnum, UserSessionData, WorkflowTestDataResponseDto } from '@novu/shared';
 
+import { GetWorkflowByIdsCommand, GetWorkflowByIdsUseCase } from '@novu/application-generic';
 import { WorkflowTestDataCommand } from './test-data.command';
-import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
-import { GetWorkflowByIdsCommand } from '../get-workflow-by-ids/get-workflow-by-ids.command';
 import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
 import { buildJSONSchema } from '../../shared/build-string-schema';
 
@@ -31,7 +30,9 @@ export class WorkflowTestDataUseCase {
   private async fetchWorkflow(command: WorkflowTestDataCommand): Promise<NotificationTemplateEntity> {
     return await this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({
-        ...command,
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
+        userId: command.user._id,
         identifierOrInternalId: command.identifierOrInternalId,
       })
     );
