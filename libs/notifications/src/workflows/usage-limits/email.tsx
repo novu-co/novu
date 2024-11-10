@@ -36,8 +36,8 @@ export function UsageLimitsEmail({ percentage, organizationName, previewText }: 
       </Section>
 
       <Text className="text-[12px] leading-[20px] text-gray-500">
-        Note: Once you consume 100% of your monthly limit, notifications will be blocked until you upgrade or the next billing cycle begins.
-        begins.
+        Note: Once you consume 100% of your monthly limit, notifications will be blocked until you upgrade or the next
+        billing cycle begins. begins.
       </Text>
     </EmailLayout>
   );
