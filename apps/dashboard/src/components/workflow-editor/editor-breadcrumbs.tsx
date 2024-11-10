@@ -18,7 +18,7 @@ export const EditorBreadcrumbs = () => {
   const { workflowSlug = '' } = useParams<{ workflowSlug: string }>();
   const { currentEnvironment } = useEnvironment();
   const navigate = useNavigate();
-  const workflowsRoute = buildRoute(ROUTES.WORKFLOWS, { environmentId: currentEnvironment?._id ?? '' });
+  const workflowsRoute = buildRoute(ROUTES.WORKFLOWS, { environmentSlug: currentEnvironment?.slug ?? '' });
   const { workflow } = useFetchWorkflow({
     workflowSlug,
   });

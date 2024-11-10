@@ -1,6 +1,6 @@
+import { Button } from '@/components/primitives/button';
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from '@/components/primitives/dialog';
 import { ReactNode } from 'react';
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from '../primitives/dialog';
-import { Button } from '../primitives/button';
 import { RiBookMarkedLine } from 'react-icons/ri';
 
 export const SubscribersStayTunedModal = ({ children }: { children: ReactNode }) => {

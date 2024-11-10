@@ -1,8 +1,8 @@
-import { GeneratePreviewRequestDto } from '@novu/shared';
 import { EnvironmentWithUserObjectCommand } from '@novu/application-generic';
+import { GeneratePreviewRequestDto } from '@novu/shared';
 
 export class GeneratePreviewCommand extends EnvironmentWithUserObjectCommand {
   workflowId: string;
-  stepUuid: string;
+  stepDatabaseId: string;
   generatePreviewRequestDto: GeneratePreviewRequestDto;
 }

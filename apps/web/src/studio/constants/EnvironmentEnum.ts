@@ -1,4 +1,1 @@
-export enum EnvironmentEnum {
-  DEVELOPMENT = 'Development',
-  PRODUCTION = 'Production',
-}
+import { EnvironmentEnum } from '@novu/shared';

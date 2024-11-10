@@ -1,122 +1,119 @@
 import { Injectable } from '@nestjs/common';
 import {
   ChannelTypeEnum,
-  ControlPreviewIssue,
-  ControlPreviewIssueTypeEnum,
-  ControlsSchema,
-  GeneratePreviewRequestDto,
+  ContentIssue,
+  ControlSchemas,
   GeneratePreviewResponseDto,
-  JSONSchemaDto,
+  JobStatusEnum,
+  PreviewPayload,
+  StepContentIssueEnum,
   StepTypeEnum,
   WorkflowOriginEnum,
 } from '@novu/shared';
 import { merge } from 'lodash/fp';
-import { difference, isArray, isObject, reduce } from 'lodash';
+import _ = require('lodash');
 import { GeneratePreviewCommand } from './generate-preview-command';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
-import { GetWorkflowUseCase } from '../get-workflow/get-workflow.usecase';
-import { CreateMockPayloadUseCase } from '../placeholder-enrichment/payload-preview-value-generator.usecase';
-import { StepNotFoundException } from '../../exceptions/step-not-found-exception';
-import { ExtractDefaultsUsecase } from '../get-default-values-from-schema/extract-defaults.usecase';
+import { StepMissingControlsException, StepNotFoundException } from '../../exceptions/step-not-found-exception';
+import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
+import { OriginMissingException, StepIdMissingException } from './step-id-missing.exception';
+import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
+import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
+import { ValidateControlValuesAndConstructPassableStructureUsecase } from '../validate-control-values/build-default-control-values-usecase.service';
 
 @Injectable()
 export class GeneratePreviewUsecase {
   constructor(
     private legacyPreviewStepUseCase: PreviewStep,
-    private getWorkflowUseCase: GetWorkflowUseCase,
-    private createMockPayloadUseCase: CreateMockPayloadUseCase,
-    private extractDefaultsUseCase: ExtractDefaultsUsecase
+    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
+    private constructPayloadUseCase: BuildDefaultPayloadUseCase,
+    private controlValuesUsecase: ValidateControlValuesAndConstructPassableStructureUsecase
   ) {}
 
   async execute(command: GeneratePreviewCommand): Promise<GeneratePreviewResponseDto> {
-    const payloadHydrationInfo = this.payloadHydrationLogic(command);
+    const payloadInfo = this.buildPayloadWithDefaults(command);
     const workflowInfo = await this.getWorkflowUserIdentifierFromWorkflowObject(command);
     const controlValuesResult = this.addMissingValuesToControlValues(command, workflowInfo.stepControlSchema);
     const executeOutput = await this.executePreviewUsecase(
       workflowInfo.workflowId,
       workflowInfo.stepId,
       workflowInfo.origin,
-      payloadHydrationInfo.augmentedPayload,
+      payloadInfo.previewPayload,
       controlValuesResult.augmentedControlValues,
       command
     );
 
     return buildResponse(
       controlValuesResult.issuesMissingValues,
-      payloadHydrationInfo.issues,
+      payloadInfo.issues,
       executeOutput,
-      workflowInfo.stepType
+      workflowInfo.stepType,
+      payloadInfo.previewPayload
     );
   }
 
-  private addMissingValuesToControlValues(command: GeneratePreviewCommand, stepControlSchema: ControlsSchema) {
-    const defaultValues = this.extractDefaultsUseCase.execute({
-      jsonSchemaDto: stepControlSchema.schema as JSONSchemaDto,
+  private buildPayloadWithDefaults(command: GeneratePreviewCommand) {
+    const dto = command.generatePreviewRequestDto;
+    const { previewPayload, issues } = this.constructPayloadUseCase.execute({
+      controlValues: dto.controlValues,
+      payloadValues: dto.previewPayload,
     });
 
-    return {
-      augmentedControlValues: merge(defaultValues, command.generatePreviewRequestDto.controlValues),
-      issuesMissingValues: this.buildMissingControlValuesIssuesList(defaultValues, command),
-    };
+    return { previewPayload, issues };
+  }
+
+  private addMissingValuesToControlValues(command: GeneratePreviewCommand, stepControlSchema: ControlSchemas) {
+    return this.controlValuesUsecase.execute({
+      controlSchema: stepControlSchema,
+      controlValues: command.generatePreviewRequestDto.controlValues || {},
+    });
   }
 
   private buildMissingControlValuesIssuesList(defaultValues: Record<string, any>, command: GeneratePreviewCommand) {
-    const missingRequiredControlValues = this.findMissingKeys(
+    const missingRequiredControlValues = findMissingKeys(
       defaultValues,
       command.generatePreviewRequestDto.controlValues || {}
     );
 
-    return this.buildControlPreviewIssues(missingRequiredControlValues);
+    return this.buildContentIssues(missingRequiredControlValues);
   }
 
-  private buildControlPreviewIssues(keys: string[]): Record<string, ControlPreviewIssue[]> {
-    const record: Record<string, ControlPreviewIssue[]> = {};
+  private buildContentIssues(keys: string[]): Record<string, ContentIssue[]> {
+    const record: Record<string, ContentIssue[]> = {};
 
     keys.forEach((key) => {
       record[key] = [
         {
-          issueType: ControlPreviewIssueTypeEnum.MISSING_VALUE,
-          message: `Value is missing on a required control`, // Custom message for the issue
+          issueType: StepContentIssueEnum.MISSING_VALUE,
+          message: `Value is missing on a required control`,
         },
       ];
     });
 
     return record;
   }
-  private findMissingKeys(requiredRecord: Record<string, unknown>, actualRecord: Record<string, unknown>) {
-    const requiredKeys = this.collectKeys(requiredRecord);
-    const actualKeys = this.collectKeys(actualRecord);
 
-    return difference(requiredKeys, actualKeys);
-  }
-  private collectKeys(obj, prefix = '') {
-    return reduce(
-      obj,
-      (result, value, key) => {
-        const newKey = prefix ? `${prefix}.${key}` : key;
-        if (isObject(value) && !isArray(value)) {
-          result.push(...this.collectKeys(value, newKey));
-        } else {
-          // Otherwise, just add the key
-          result.push(newKey);
-        }
-
-        return result;
-      },
-      []
-    );
-  }
   private async executePreviewUsecase(
     workflowId: string,
-    stepId: string,
-    origin: WorkflowOriginEnum,
-    hydratedPayload: Record<string, unknown>,
+    stepId: string | undefined,
+    origin: WorkflowOriginEnum | undefined,
+    hydratedPayload: PreviewPayload,
     updatedControlValues: Record<string, unknown>,
     command: GeneratePreviewCommand
   ) {
+    if (!stepId) {
+      throw new StepIdMissingException(workflowId);
+    }
+    if (!origin) {
+      throw new OriginMissingException(stepId);
+    }
+
+    const state = buildState(hydratedPayload.steps);
+
     return await this.legacyPreviewStepUseCase.execute(
       PreviewStepCommand.create({
-        payload: hydratedPayload,
+        payload: hydratedPayload.payload || {},
+        subscriber: hydratedPayload.subscriber,
         controls: updatedControlValues || {},
         environmentId: command.user.environmentId,
         organizationId: command.user.organizationId,
@@ -124,164 +121,88 @@ export class GeneratePreviewUsecase {
         userId: command.user._id,
         workflowId,
         workflowOrigin: origin,
+        state,
       })
     );
   }
 
   private async getWorkflowUserIdentifierFromWorkflowObject(command: GeneratePreviewCommand) {
-    const workflowResponseDto = await this.getWorkflowUseCase.execute({
+    const persistedWorkflow = await this.getWorkflowByIdsUseCase.execute({
       identifierOrInternalId: command.workflowId,
       user: command.user,
     });
-    const { workflowId, steps } = workflowResponseDto;
-    const step = steps.find((stepDto) => stepDto._id === command.stepUuid);
+    const { steps } = persistedWorkflow;
+    const step = steps.find((stepDto) => stepDto._id === command.stepDatabaseId);
     if (!step) {
-      throw new StepNotFoundException(command.stepUuid);
+      throw new StepNotFoundException(command.stepDatabaseId);
+    }
+    if (!step.template || !step.template.controls) {
+      throw new StepMissingControlsException(command.stepDatabaseId, step);
     }
 
     return {
-      workflowId,
+      workflowId: persistedWorkflow.triggers[0].identifier,
       stepId: step.stepId,
-      stepType: step.type,
-      stepControlSchema: step.controls,
-      origin: workflowResponseDto.origin,
+      stepType: step.template.type,
+      stepControlSchema: step.template.controls,
+      origin: persistedWorkflow.origin,
     };
-  }
-
-  private payloadHydrationLogic(command: GeneratePreviewCommand) {
-    const dto = command.generatePreviewRequestDto;
-
-    let aggregatedDefaultValues = {};
-    const aggregatedDefaultValuesForControl: Record<string, Record<string, unknown>> = {};
-    const flattenedValues = flattenJson(dto.controlValues);
-    for (const controlValueKey in flattenedValues) {
-      if (flattenedValues.hasOwnProperty(controlValueKey)) {
-        const defaultValuesForSingleControlValue = this.createMockPayloadUseCase.execute({
-          controlValues: flattenedValues,
-          controlValueKey,
-        });
-
-        if (defaultValuesForSingleControlValue) {
-          aggregatedDefaultValuesForControl[controlValueKey] = defaultValuesForSingleControlValue;
-        }
-        aggregatedDefaultValues = merge(defaultValuesForSingleControlValue, aggregatedDefaultValues);
-      }
-    }
-
-    return {
-      augmentedPayload: merge(aggregatedDefaultValues, dto.payloadValues),
-      issues: this.buildVariableMissingIssueRecord(aggregatedDefaultValuesForControl, aggregatedDefaultValues, dto),
-    };
-  }
-
-  private buildVariableMissingIssueRecord(
-    valueKeyToDefaultsMap: Record<string, Record<string, unknown>>,
-    aggregatedDefaultValues: Record<string, unknown>,
-    dto: GeneratePreviewRequestDto
-  ) {
-    const defaultVariableToValueKeyMap = flattenJsonWithArrayValues(valueKeyToDefaultsMap);
-    const missingRequiredPayloadIssues = this.findMissingKeys(aggregatedDefaultValues, dto.payloadValues || {});
-
-    return this.buildPayloadIssues(missingRequiredPayloadIssues, defaultVariableToValueKeyMap);
-  }
-  private buildPayloadIssues(
-    missingVariables: string[],
-    variableToControlValueKeys: Record<string, string[]>
-  ): Record<string, ControlPreviewIssue[]> {
-    const record: Record<string, ControlPreviewIssue[]> = {};
-
-    missingVariables.forEach((missingVariable) => {
-      variableToControlValueKeys[missingVariable].forEach((controlValueKey) => {
-        record[controlValueKey] = [
-          {
-            issueType: ControlPreviewIssueTypeEnum.MISSING_VARIABLE_IN_PAYLOAD, // Set issueType to MISSING_VALUE
-            message: `Variable payload.${missingVariable} is missing in payload`, // Custom message for the issue
-            variableName: `payload.${missingVariable}`,
-          },
-        ];
-      });
-    });
-
-    return record;
   }
 }
 
 function buildResponse(
-  missingValuesIssue: Record<string, ControlPreviewIssue[]>,
-  missingPayloadVariablesIssue: Record<string, ControlPreviewIssue[]>,
+  missingValuesIssue: Record<string, ContentIssue[]>,
+  missingPayloadVariablesIssue: Record<string, ContentIssue[]>,
   executionOutput,
-  stepType: StepTypeEnum
+  stepType: StepTypeEnum,
+  augmentedPayload: PreviewPayload
 ): GeneratePreviewResponseDto {
   return {
     issues: merge(missingValuesIssue, missingPayloadVariablesIssue),
     result: {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       preview: executionOutput.outputs as any,
       type: stepType as unknown as ChannelTypeEnum,
     },
+    previewPayloadExample: augmentedPayload,
   };
 }
-function flattenJsonWithArrayValues(valueKeyToDefaultsMap: Record<string, Record<string, unknown>>) {
-  const flattened = {};
-  Object.keys(valueKeyToDefaultsMap).forEach((controlValue) => {
-    const defaultPayloads = valueKeyToDefaultsMap[controlValue];
-    const defaultPlaceholders = getDotNotationKeys(defaultPayloads);
-    defaultPlaceholders.forEach((defaultPlaceholder) => {
-      if (!flattened[defaultPlaceholder]) {
-        flattened[defaultPlaceholder] = [];
-      }
-      flattened[defaultPlaceholder].push(controlValue);
-    });
-  });
 
-  return flattened;
+function findMissingKeys(requiredRecord: Record<string, unknown>, actualRecord: Record<string, unknown>): string[] {
+  const requiredKeys = collectKeys(requiredRecord);
+  const actualKeys = collectKeys(actualRecord);
+
+  return _.difference(requiredKeys, actualKeys);
 }
-type NestedRecord = Record<string, unknown>;
 
-function getDotNotationKeys(input: NestedRecord, parentKey: string = '', keys: string[] = []): string[] {
-  for (const key in input) {
-    if (input.hasOwnProperty(key)) {
-      const newKey = parentKey ? `${parentKey}.${key}` : key; // Construct dot notation key
-
-      if (typeof input[key] === 'object' && input[key] !== null && !Array.isArray(input[key])) {
-        // Recursively flatten the object and collect keys
-        getDotNotationKeys(input[key] as NestedRecord, newKey, keys);
+function collectKeys(obj: Record<string, unknown>, prefix = ''): string[] {
+  // Initialize result as an empty array of strings
+  return _.reduce(
+    obj,
+    (result: string[], value, key) => {
+      const newKey = prefix ? `${prefix}.${key}` : key;
+      if (_.isObject(value) && !_.isArray(value)) {
+        // Call collectKeys recursively and concatenate the results
+        result.push(...collectKeys(value, newKey));
       } else {
-        // Push the dot notation key to the keys array
-        keys.push(newKey);
+        result.push(newKey);
       }
-    }
-  }
 
-  return keys;
+      return result;
+    },
+    [] // Pass an empty array as the initial value
+  );
 }
-function flattenJson(obj, parentKey = '', result = {}) {
-  // eslint-disable-next-line guard-for-in
-  for (const key in obj) {
-    // Construct the new key using dot notation
-    const newKey = parentKey ? `${parentKey}.${key}` : key;
-
-    // Check if the value is an object (and not null or an array)
-    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-      // Recursively flatten the object
-      flattenJson(obj[key], newKey, result);
-    } else if (Array.isArray(obj[key])) {
-      // Handle arrays by flattening each item
-      obj[key].forEach((item, index) => {
-        const arrayKey = `${newKey}[${index}]`;
-        if (typeof item === 'object' && item !== null) {
-          flattenJson(item, arrayKey, result);
-        } else {
-          // eslint-disable-next-line no-param-reassign
-          result[arrayKey] = item;
-        }
-      });
-    } else {
-      // Assign the value to the result with the new key
-      // eslint-disable-next-line no-param-reassign
-      result[newKey] = obj[key];
-    }
+function buildState(steps: Record<string, unknown> | undefined): FrameworkPreviousStepsOutputState[] {
+  const outputArray: FrameworkPreviousStepsOutputState[] = [];
+  for (const [stepId, value] of Object.entries(steps || {})) {
+    outputArray.push({
+      stepId,
+      outputs: value as Record<string, unknown>,
+      state: {
+        status: JobStatusEnum.COMPLETED,
+      },
+    });
   }
 
-  return result;
+  return outputArray;
 }

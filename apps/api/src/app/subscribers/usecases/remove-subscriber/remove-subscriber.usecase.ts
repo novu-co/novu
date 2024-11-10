@@ -1,53 +1,88 @@
-import { Injectable } from '@nestjs/common';
-import { SubscriberRepository, DalException, TopicSubscribersRepository } from '@novu/dal';
-import { buildSubscriberKey, InvalidateCacheService } from '@novu/application-generic';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  SubscriberRepository,
+  TopicSubscribersRepository,
+  SubscriberPreferenceRepository,
+  PreferencesRepository,
+} from '@novu/dal';
+import {
+  buildSubscriberKey,
+  buildFeedKey,
+  buildMessageCountKey,
+  InvalidateCacheService,
+} from '@novu/application-generic';
 
 import { RemoveSubscriberCommand } from './remove-subscriber.command';
-import { GetSubscriber } from '../get-subscriber';
-import { ApiException } from '../../../shared/exceptions/api.exception';
 
 @Injectable()
 export class RemoveSubscriber {
   constructor(
     private invalidateCache: InvalidateCacheService,
     private subscriberRepository: SubscriberRepository,
-    private getSubscriber: GetSubscriber,
-    private topicSubscribersRepository: TopicSubscribersRepository
+    private topicSubscribersRepository: TopicSubscribersRepository,
+    private subscriberPreferenceRepository: SubscriberPreferenceRepository,
+    private preferenceRepository: PreferencesRepository
   ) {}
 
-  async execute(command: RemoveSubscriberCommand) {
-    try {
-      const { environmentId: _environmentId, organizationId, subscriberId } = command;
-      const subscriber = await this.getSubscriber.execute({
-        environmentId: _environmentId,
-        organizationId,
-        subscriberId,
-      });
-
-      await this.invalidateCache.invalidateByKey({
+  async execute({ environmentId: _environmentId, subscriberId }: RemoveSubscriberCommand) {
+    await Promise.all([
+      this.invalidateCache.invalidateByKey({
         key: buildSubscriberKey({
-          subscriberId: command.subscriberId,
-          _environmentId: command.environmentId,
+          subscriberId,
+          _environmentId,
         }),
-      });
+      }),
+      this.invalidateCache.invalidateQuery({
+        key: buildFeedKey().invalidate({
+          subscriberId,
+          _environmentId,
+        }),
+      }),
+      this.invalidateCache.invalidateQuery({
+        key: buildMessageCountKey().invalidate({
+          subscriberId,
+          _environmentId,
+        }),
+      }),
+    ]);
 
+    const subscriberInternalIds = await this.subscriberRepository._model.distinct('_id', {
+      subscriberId,
+      _environmentId,
+    });
+
+    if (subscriberInternalIds.length === 0) {
+      throw new NotFoundException({ message: 'Subscriber was not found', externalSubscriberId: subscriberId });
+    }
+
+    await this.subscriberRepository.withTransaction(async () => {
+      /*
+       * Note about parallelism in transactions
+       *
+       * Running operations in parallel is not supported during a transaction.
+       * The use of Promise.all, Promise.allSettled, Promise.race, etc. to parallelize operations
+       * inside a transaction is undefined behaviour and should be avoided.
+       *
+       * Refer to https://mongoosejs.com/docs/transactions.html#note-about-parallelism-in-transactions
+       */
       await this.subscriberRepository.delete({
-        _environmentId: subscriber._environmentId,
-        _organizationId: subscriber._organizationId,
-        subscriberId: subscriber.subscriberId,
+        subscriberId,
+        _environmentId,
       });
 
       await this.topicSubscribersRepository.delete({
-        _environmentId: subscriber._environmentId,
-        _organizationId: subscriber._organizationId,
-        externalSubscriberId: subscriber.subscriberId,
+        _environmentId,
+        externalSubscriberId: subscriberId,
       });
-    } catch (e) {
-      if (e instanceof DalException) {
-        throw new ApiException(e.message);
-      }
-      throw e;
-    }
+      await this.subscriberPreferenceRepository.delete({
+        _environmentId,
+        _subscriberId: { $in: subscriberInternalIds },
+      });
+      await this.preferenceRepository.delete({
+        _environmentId,
+        _subscriberId: { $in: subscriberInternalIds },
+      });
+    });
 
     return {
       acknowledged: true,

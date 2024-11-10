@@ -1,3 +1,5 @@
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { RiArrowLeftSLine, RiCloseFill, RiDeleteBin2Line } from 'react-icons/ri';
 import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarFooter, SidebarHeader } from '@/components/side-navigation/Sidebar';
@@ -6,18 +8,28 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { StepTypeEnum } from '@/utils/enums';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { motion } from 'framer-motion';
-import { RiArrowLeftSLine, RiCloseFill, RiDeleteBin2Line } from 'react-icons/ri';
-import { Link, useParams } from 'react-router-dom';
-import Chat from './chat';
-import { InApp } from './in-app';
+import { ConfigureInApp } from './in-app/configure-in-app';
 import { useStep } from './use-step';
+import Chat from './chat';
+import { useState } from 'react';
+import { ConfirmationModal } from '@/components/confirmation-modal';
 
 export function ConfigureStep() {
+  const { step } = useStep();
+  const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
-  const { workflowSlug = '' } = useParams<{
+  const { workflowSlug = '', stepSlug = '' } = useParams<{
     workflowSlug: string;
+    stepSlug: string;
   }>();
-  const { isReadOnly } = useWorkflowEditorContext();
+  const { isReadOnly, deleteStep } = useWorkflowEditorContext();
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const onDeleteStep = () => {
+    deleteStep(stepSlug);
+    navigate(buildRoute(ROUTES.EDIT_WORKFLOW, { environmentSlug: currentEnvironment?.slug ?? '', workflowSlug }));
+  };
 
   return (
     <motion.div
@@ -30,7 +42,7 @@ export function ConfigureStep() {
       <SidebarHeader className="flex items-center gap-2.5 text-sm font-medium">
         <Link
           to={buildRoute(ROUTES.EDIT_WORKFLOW, {
-            environmentId: currentEnvironment?._id ?? '',
+            environmentSlug: currentEnvironment?.slug ?? '',
             workflowSlug,
           })}
           className="flex items-center"
@@ -42,7 +54,7 @@ export function ConfigureStep() {
         <span>Configure Step</span>
         <Link
           to={buildRoute(ROUTES.EDIT_WORKFLOW, {
-            environmentId: currentEnvironment?._id ?? '',
+            environmentSlug: currentEnvironment?.slug ?? '',
             workflowSlug,
           })}
           className="ml-auto flex items-center"
@@ -55,7 +67,7 @@ export function ConfigureStep() {
 
       <Separator />
 
-      <Step />
+      <Step stepType={step?.type} />
 
       <Separator />
 
@@ -63,7 +75,20 @@ export function ConfigureStep() {
         <>
           <SidebarFooter>
             <Separator />
-            <Button variant="ghostDestructive" type="button">
+            <ConfirmationModal
+              open={isDeleteModalOpen}
+              onOpenChange={setIsDeleteModalOpen}
+              onConfirm={onDeleteStep}
+              title="Are you sure?"
+              description={`You're about to delete the ${step?.name}, this action cannot be undone.`}
+              confirmButtonText="Delete"
+            />
+            <Button
+              variant="ghostDestructive"
+              className="gap-1.5 text-xs"
+              type="button"
+              onClick={() => setIsDeleteModalOpen(true)}
+            >
               <RiDeleteBin2Line className="size-4" />
               Delete step
             </Button>
@@ -74,11 +99,10 @@ export function ConfigureStep() {
   );
 }
 
-const Step = () => {
-  const { stepType: channel } = useStep();
-  switch (channel) {
+const Step = ({ stepType }: { stepType?: StepTypeEnum }) => {
+  switch (stepType) {
     case StepTypeEnum.IN_APP:
-      return <InApp />;
+      return <ConfigureInApp />;
 
     /**
      * TODO: Add other step types here

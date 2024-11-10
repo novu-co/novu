@@ -9,6 +9,7 @@ export class WorkflowsPage {
 
     return new WorkflowEditorPage(this.page);
   }
+
   private templateStoreModal: TemplateStoreModal;
 
   constructor(private page: Page) {

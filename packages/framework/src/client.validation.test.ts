@@ -111,7 +111,7 @@ describe('validation', () => {
     });
 
     it('should transform a zod schema to a json schema during discovery', async () => {
-      client.addWorkflows([
+      await client.addWorkflows([
         workflow('zod-validation', async ({ step }) => {
           await step.email(
             'zod-validation',
@@ -145,7 +145,7 @@ describe('validation', () => {
     });
 
     it('should throw an error if a property is missing', async () => {
-      client.addWorkflows([
+      await client.addWorkflows([
         workflow('zod-validation', async ({ step }) => {
           await step.email(
             'test-email',
@@ -290,7 +290,7 @@ describe('validation', () => {
     });
 
     it('should transform a JSON schema to a valid schema during discovery', async () => {
-      client.addWorkflows([
+      await client.addWorkflows([
         workflow('json-schema-validation', async ({ step }) => {
           await step.email(
             'json-schema-validation',
@@ -324,7 +324,7 @@ describe('validation', () => {
     });
 
     it('should throw an error if a property is missing', async () => {
-      client.addWorkflows([
+      await client.addWorkflows([
         workflow('json-schema-validation', async ({ step }) => {
           await step.email(
             'test-email',

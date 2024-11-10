@@ -21,7 +21,7 @@
           "endsPattern": "Started application in NODE_ENV"
         }
       }
-    },   
+    },
     {
       "type": "npm",
       "script": "start",
@@ -41,14 +41,7 @@
         "id": "server",
         "color": "terminal.ansiGreen"
       },
-      "dependsOn": [
-        "SHARED",
-        "API",
-        "APPLICATION GENERIC",
-        "DAL",
-        "EE - TRANSLATION",
-        "EE - BILLING"
-      ]
+      "dependsOn": ["SHARED", "API", "APPLICATION GENERIC", "DAL", "EE - TRANSLATION", "EE - BILLING"]
     },
     {
       "type": "npm",
@@ -69,7 +62,8 @@
           "endsPattern": "webpack compiled successfully"
         }
       }
-    },    {
+    },
+    {
       "type": "npm",
       "script": "start",
       "isBackground": true,
@@ -88,12 +82,7 @@
           "endsPattern": "webpack compiled successfully"
         }
       },
-      "dependsOn": [
-        "SHARED",
-        "API",
-        "DESIGN SYSTEM",
-        "NOVUI"
-      ]
+      "dependsOn": ["SHARED", "API", "DESIGN SYSTEM", "NOVUI"]
     },
     {
       "type": "npm",
@@ -110,11 +99,7 @@
       "label": "APPLICATION GENERIC",
       "path": "/libs/application-generic",
       "problemMatcher": "$tsc-watch",
-      "dependsOn": [
-        "SHARED",
-        "TESTING",
-        "PROVIDERS"
-      ]
+      "dependsOn": ["SHARED", "TESTING", "PROVIDERS"]
     },
     {
       "type": "npm",
@@ -123,9 +108,7 @@
       "label": "DAL",
       "path": "/libs/dal",
       "problemMatcher": "$tsc-watch",
-      "dependsOn": [
-        "SHARED"
-      ]
+      "dependsOn": ["SHARED"]
     },
     {
       "type": "npm",
@@ -142,9 +125,7 @@
       "label": "PROVIDERS",
       "path": "/packages/providers",
       "problemMatcher": "$tsc-watch",
-      "dependsOn": [
-        "SHARED"
-      ]
+      "dependsOn": ["SHARED"]
     },
     {
       "type": "npm",
@@ -161,9 +142,7 @@
       "label": "TESTING",
       "path": "/libs/testing",
       "problemMatcher": "$tsc-watch",
-      "dependsOn": [
-        "SHARED"
-      ]
+      "dependsOn": ["SHARED"]
     },
     {
       "type": "npm",
@@ -221,10 +200,7 @@
       "label": "NOTIFICATION CENTER",
       "path": "/packages/notification-center",
       "problemMatcher": "$tsc",
-      "dependsOn": [
-        "NC CLIENT",
-        "SHARED"
-      ]
+      "dependsOn": ["NC CLIENT", "SHARED"]
     },
     {
       "type": "npm",
@@ -232,9 +208,7 @@
       "label": "NC CLIENT",
       "path": "/packages/client",
       "problemMatcher": "$tsc",
-      "dependsOn": [
-        "SHARED"
-      ]
+      "dependsOn": ["SHARED"]
     }
   ]
 }

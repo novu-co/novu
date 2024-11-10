@@ -69,6 +69,7 @@
     "@pyroscope/nodejs": "^0.2.9",
     "@segment/analytics-node": "^1.1.4",
     "@sentry/node": "^8.33.1",
+    "@team-plain/typescript-sdk": "5.4.3",
     "axios": "^1.6.8",
     "bullmq": "^3.10.2",
     "class-transformer": "0.5.1",
@@ -120,7 +121,8 @@
     "sinon": "^9.2.4",
     "ts-jest": "^27.0.5",
     "ts-node": "~10.9.1",
-    "typescript": "5.6.2"
+    "typescript": "5.6.2",
+    "vitest": "^2.0.5"
   },
   "files": [
     "build/main",

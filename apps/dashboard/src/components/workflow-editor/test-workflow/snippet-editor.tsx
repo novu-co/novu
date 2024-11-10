@@ -1,27 +1,28 @@
-import { Editor } from '@monaco-editor/react';
+import { useMemo } from 'react';
+import { EditorView } from '@uiw/react-codemirror';
+import { loadLanguage, LanguageName } from '@uiw/codemirror-extensions-langs';
+import { Editor } from '@/components/primitives/editor';
 import type { SnippetLanguage } from './types';
 
 export const SnippetEditor = ({ language, value }: { language: SnippetLanguage; value: string }) => {
-  const editorLanguage = language === 'framework' ? 'typescript' : language;
+  const editorLanguage: LanguageName = language === 'framework' ? 'typescript' : language;
+
+  const extensions = useMemo(() => {
+    const res = [EditorView.lineWrapping];
+    const langExtension = loadLanguage(editorLanguage)?.extension;
+    if (langExtension) {
+      res.push(langExtension);
+    }
+    return res;
+  }, [editorLanguage]);
 
   return (
     <Editor
-      defaultLanguage={editorLanguage}
-      language={editorLanguage}
+      lang={editorLanguage}
       className="h-full"
-      options={{
-        minimap: {
-          enabled: false,
-        },
-        // workaround from: https://github.com/microsoft/monaco-editor/issues/2093
-        accessibilitySupport: 'off',
-        renderLineHighlight: 'none',
-        scrollBeyondLastLine: false,
-        fontSize: 14,
-        lineHeight: 20,
-        readOnly: true,
-      }}
       value={value}
+      extensions={extensions}
+      basicSetup={{ lineNumbers: true }}
     />
   );
 };

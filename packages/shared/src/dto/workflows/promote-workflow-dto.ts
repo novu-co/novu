@@ -1,3 +1,3 @@
-export type PromoteWorkflowDto = {
+export type SyncWorkflowDto = {
   targetEnvironmentId: string;
 };

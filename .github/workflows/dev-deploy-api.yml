@@ -17,6 +17,7 @@ on:
       - 'libs/application-generic/**'
 env:
   TF_WORKSPACE: novu-dev
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
 jobs:
   test_api:
@@ -130,7 +131,7 @@ jobs:
           sourcemaps: apps/api/dist
           ignore_empty: true
           ignore_missing: true
-          url_prefix: "~"
+          url_prefix: '~'
 
   newrelic:
     runs-on: ubuntu-latest
@@ -147,6 +148,6 @@ jobs:
         with:
           region: EU
           apiKey: ${{ secrets.NEW_RELIC_API_KEY }}
-          guid: "MzgxMjQwOHxBUE18QVBQTElDQVRJT058NDk3NjQzODIy"
-          version: "${{ env.RELEASE_VERSION }}"
-          user: "${{ github.actor }}"
+          guid: 'MzgxMjQwOHxBUE18QVBQTElDQVRJT058NDk3NjQzODIy'
+          version: '${{ env.RELEASE_VERSION }}'
+          user: '${{ github.actor }}'

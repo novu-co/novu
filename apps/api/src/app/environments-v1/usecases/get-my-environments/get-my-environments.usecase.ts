@@ -2,9 +2,11 @@ import { Injectable, Logger, NotFoundException, Scope } from '@nestjs/common';
 
 import { EnvironmentEntity, EnvironmentRepository } from '@novu/dal';
 import { decryptApiKey } from '@novu/application-generic';
+import { ShortIsPrefixEnum, EnvironmentEnum } from '@novu/shared';
 
 import { GetMyEnvironmentsCommand } from './get-my-environments.command';
 import { EnvironmentResponseDto } from '../../dtos/environment-response.dto';
+import { buildSlug } from '../../../shared/helpers/build-slug';
 
 @Injectable({
   scope: Scope.REQUEST,
@@ -42,6 +44,19 @@ export class GetMyEnvironments {
       };
     });
 
-    return decryptedApiKeysEnvironment;
+    const shortEnvName = shortenEnvironmentName(decryptedApiKeysEnvironment.name);
+
+    return {
+      ...decryptedApiKeysEnvironment,
+      slug: buildSlug(shortEnvName, ShortIsPrefixEnum.ENVIRONMENT, decryptedApiKeysEnvironment._id),
+    };
   }
+}
+function shortenEnvironmentName(name: string): string {
+  const mapToShotEnvName: Record<EnvironmentEnum, string> = {
+    [EnvironmentEnum.PRODUCTION]: 'prod',
+    [EnvironmentEnum.DEVELOPMENT]: 'dev',
+  };
+
+  return mapToShotEnvName[name] || name;
 }

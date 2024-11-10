@@ -2,6 +2,8 @@ import { Types } from 'mongoose';
 import {
   BuilderFieldType,
   BuilderGroupValues,
+  ContentIssue,
+  ControlSchemas,
   ControlsDto,
   FilterParts,
   IMessageFilter,
@@ -15,12 +17,12 @@ import {
   ITriggerReservedVariable,
   IWorkflowStepMetadata,
   NotificationTemplateCustomData,
+  StepIssues,
   TriggerTypeEnum,
   WorkflowOriginEnum,
+  WorkflowStatusEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
-
-import { JSONSchema } from 'json-schema-to-ts';
 import { NotificationGroupEntity } from '../notification-group';
 import type { OrganizationId } from '../organization';
 import type { EnvironmentId } from '../environment';
@@ -84,6 +86,10 @@ export class NotificationTemplateEntity implements INotificationTemplate {
   rawData?: any;
 
   payloadSchema?: any;
+
+  issues: Record<string, ContentIssue[]>;
+
+  status?: WorkflowStatusEnum;
 }
 
 export type NotificationTemplateDBModel = ChangePropsValueType<
@@ -112,6 +118,8 @@ export class StepVariantEntity implements IStepVariant {
 
   stepId?: string;
 
+  issues?: StepIssues;
+
   name?: string;
 
   _templateId: string;
@@ -135,16 +143,16 @@ export class StepVariantEntity implements IStepVariant {
 
   bridgeUrl?: string;
   /**
-   * Control variables for the step
-   * Same as ControlValues
+   * @deprecated This property is deprecated and will be removed in future versions.
+   * Use `fullName` instead.
    */
   controlVariables?: ControlsDto;
-
-  controls?: {
-    schema: JSONSchema;
-  };
+  /**
+   * @deprecated This property is deprecated and will be removed in future versions.
+   * Use IMessageTemplate.controls
+   */
+  controls?: ControlSchemas;
 }
-
 export class NotificationStepEntity extends StepVariantEntity implements INotificationTemplateStep {
   variants?: StepVariantEntity[];
 }

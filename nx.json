@@ -15,15 +15,16 @@
       "inputs": ["default", "{workspaceRoot}/tools/eslint-rules/**/*"]
     }
   },
-  "extends": "@nrwl/workspace/presets/npm.json",
+  "extends": "@nx/workspace/presets/npm.json",
   "tasksRunnerOptions": {
     "default": {
       "options": {
-        "canTrackAnalytics": false
-      }
+        "canTrackAnalytics": false,
+        "nxCloudId": "61d98cffc3343830d132e541"
+      },
+      "runner": "nx-cloud"
     }
   },
-  "nxCloudAccessToken": "ZTQ3Yzc3MjEtM2M2ZS00MzRlLWI0OWItZjhmOWVhNWQ1MTM0fHJlYWQ=",
   "useInferencePlugins": false,
   "defaultBase": "main"
 }

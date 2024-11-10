@@ -18,6 +18,9 @@ export class EnvironmentResponseDto {
 
   @ApiProperty()
   _parentId: string;
+
+  @ApiPropertyOptional()
+  slug?: string;
 }
 
 export interface IApiKeyDto {

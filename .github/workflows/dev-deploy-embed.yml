@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Deploy DEV EMBED
 
 # Controls when the action will run. Triggers the workflow on push or pull request
@@ -12,6 +10,9 @@ on:
       - main
     paths:
       - 'libs/embed/**'
+
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:

@@ -3,7 +3,7 @@
 import { Badge } from '@/components/primitives/badge';
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/primitives/popover';
 import { inputVariants } from '@/components/primitives/variants';
-import { CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/primitives/command';
 import { cn } from '@/utils/ui';
 import { Command } from 'cmdk';
 import { forwardRef, useEffect, useState } from 'react';

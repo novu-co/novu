@@ -9,14 +9,13 @@ import {
   ExecutionStateCorruptError,
   ExecutionStateOutputInvalidError,
   ExecutionStateResultInvalidError,
+  isFrameworkError,
   ProviderExecutionFailedError,
   ProviderNotFoundError,
   StepControlCompilationFailedError,
-  StepNotFoundError,
-  WorkflowAlreadyExistsError,
-  WorkflowNotFoundError,
   StepExecutionFailedError,
-  isFrameworkError,
+  StepNotFoundError,
+  WorkflowNotFoundError,
 } from './errors';
 import type {
   ActionStep,
@@ -31,6 +30,7 @@ import type {
   HealthCheck,
   Schema,
   Skip,
+  State,
   ValidationError,
   Workflow,
 } from './types';
@@ -46,6 +46,7 @@ import {
 import { validateData } from './validators';
 
 import { mockSchema } from './jsonSchemaFaker';
+import { prettyPrintDiscovery } from './resources/workflow/pretty-print-discovery';
 
 function isRuntimeInDevelopment() {
   return ['development', undefined].includes(process.env.NODE_ENV);
@@ -94,12 +95,14 @@ export class Client {
     return builtConfiguration;
   }
 
-  public addWorkflows(workflows: Array<Workflow>) {
+  public async addWorkflows(workflows: Array<Workflow>): Promise<void> {
     for (const workflow of workflows) {
-      if (this.discoveredWorkflows.some((existing) => existing.workflowId === workflow.definition.workflowId)) {
-        throw new WorkflowAlreadyExistsError(workflow.definition.workflowId);
+      if (this.discoveredWorkflows.some((existing) => existing.workflowId === workflow.id)) {
+        return;
       } else {
-        this.discoveredWorkflows.push(workflow.definition);
+        const definition = await workflow.discover();
+        prettyPrintDiscovery(definition);
+        this.discoveredWorkflows.push(definition);
       }
     }
   }
@@ -277,25 +280,27 @@ export class Client {
       }
 
       const step = this.getStep(event.workflowId, stepId);
-      const controls = await this.createStepControls(step, event);
       const isPreview = event.action === PostActionEnum.PREVIEW;
 
-      if (!isPreview && (await this.shouldSkip(options?.skip as typeof step.options.skip, controls))) {
-        if (stepId === event.stepId) {
-          // Only set the result when the step is the current step.
+      // Only evaluate a skip condition when the step is the current step and not in preview mode.
+      if (!isPreview && stepId === event.stepId) {
+        const controls = await this.createStepControls(step, event);
+        const shouldSkip = await this.shouldSkip(options?.skip as typeof step.options.skip, controls);
+
+        if (shouldSkip) {
           setResult({
             options: { skip: true },
             outputs: {},
             providers: {},
           });
-        }
 
-        /*
-         * Return an empty object for results when a step is skipped.
-         * TODO: fix typings when `skip` is specified to return `Partial<T_Result>`
-         */
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return {} as any;
+          /*
+           * Return an empty object for results when a step is skipped.
+           * TODO: fix typings when `skip` is specified to return `Partial<T_Result>`
+           */
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return {} as any;
+        }
       }
 
       const previewStepHandler = this.previewStep.bind(this);
@@ -634,7 +639,7 @@ export class Client {
       }
     } else {
       try {
-        const result = event.state.find((state) => state.stepId === step.stepId);
+        const result = this.getStepState(event, step.stepId);
 
         if (result) {
           const validatedOutput = await this.validate(
@@ -723,7 +728,21 @@ export class Client {
           providers: await this.executeProviders(event, step, validatedOutput),
         };
       } else {
-        const mockResult = this.mock(step.results.schema);
+        let mockResult: Record<string, unknown>;
+        const suppliedResult = this.getStepState(event, step.stepId);
+
+        if (suppliedResult) {
+          mockResult = await this.validate(
+            suppliedResult.outputs,
+            step.results.unknownSchema,
+            'step',
+            'result',
+            event.workflowId,
+            step.stepId
+          );
+        } else {
+          mockResult = this.mock(step.results.schema);
+        }
 
         console.log(`  ${EMOJI.MOCK} Mocked stepId: \`${step.stepId}\``);
 
@@ -741,6 +760,10 @@ export class Client {
         throw new StepExecutionFailedError(step.stepId, event.action, error);
       }
     }
+  }
+
+  private getStepState(event: Event, stepId: string): State | undefined {
+    return event.state.find((state) => state.stepId === stepId);
   }
 
   private getStepCode(workflowId: string, stepId: string): CodeResult {

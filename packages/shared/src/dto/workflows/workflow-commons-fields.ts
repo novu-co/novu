@@ -1,27 +1,45 @@
-import { IsArray, IsBoolean, IsDefined, IsObject, IsOptional, IsString } from 'class-validator';
-
-import { JSONSchema } from 'json-schema-to-ts';
+import type { JSONSchema } from 'json-schema-to-ts';
 import { WorkflowResponseDto } from './workflow-response-dto';
 import { Slug, StepTypeEnum, WorkflowPreferences } from '../../types';
-
-export type IdentifierOrInternalId = string;
+import { StepContentIssueEnum, StepIssueEnum } from './step-content-issue.enum';
 
 export class ControlsSchema {
   schema: JSONSchema;
 }
+export type StepCreateAndUpdateKeys = keyof StepCreateDto | keyof StepUpdateDto;
+
+export class StepIssuesDto {
+  body?: Record<StepCreateAndUpdateKeys, StepIssue>;
+  controls?: Record<string, ContentIssue[]>;
+}
+// eslint-disable-next-line @typescript-eslint/naming-convention
+interface Issue<T> {
+  issueType: T;
+  variableName?: string;
+  message: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export interface ContentIssue extends Issue<StepContentIssueEnum> {}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export interface StepIssue extends Issue<StepIssueEnum> {}
+export type IdentifierOrInternalId = string;
 
 export type StepResponseDto = StepDto & {
   _id: string;
   slug: Slug;
   stepId: string;
-  controls: ControlsSchema;
+  issues?: StepIssuesDto;
 };
 
-export type StepUpdateDto = StepDto & {
+export type StepUpdateDto = StepCreateDto & {
   _id: string;
 };
 
-export type StepCreateDto = StepDto;
+export type StepCreateDto = StepDto & {
+  controlValues?: Record<string, unknown>;
+};
 
 export type ListWorkflowResponse = {
   workflows: WorkflowListResponseDto[];
@@ -30,42 +48,22 @@ export type ListWorkflowResponse = {
 
 export type WorkflowListResponseDto = Pick<
   WorkflowResponseDto,
-  'name' | 'tags' | 'updatedAt' | 'createdAt' | '_id' | 'slug' | 'status' | 'origin'
+  'name' | 'tags' | 'updatedAt' | 'createdAt' | '_id' | 'workflowId' | 'slug' | 'status' | 'origin'
 > & {
   stepTypeOverviews: StepTypeEnum[];
 };
 
-export class StepDto {
-  @IsString()
-  @IsDefined()
+export type StepDto = {
   name: string;
-
-  @IsString()
-  @IsDefined()
   type: StepTypeEnum;
+};
 
-  @IsObject()
-  controlValues: Record<string, unknown>;
-}
-
-export class WorkflowCommonsFields {
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  tags?: string[];
-
-  @IsOptional()
-  @IsBoolean()
-  active?: boolean;
-
-  @IsString()
-  @IsDefined()
+export type WorkflowCommonsFields = {
   name: string;
-
-  @IsString()
-  @IsOptional()
   description?: string;
-}
+  tags?: string[];
+  active?: boolean;
+};
 
 export type PreferencesResponseDto = {
   user: WorkflowPreferences | null;

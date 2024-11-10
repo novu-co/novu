@@ -88,7 +88,7 @@ export const SideNavigation = () => {
   const environmentNames = useMemo(() => environments?.map((env) => env.name), [environments]);
   const onEnvironmentChange = (value: string) => {
     const environment = environments?.find((env) => env.name === value);
-    switchEnvironment(environment?._id);
+    switchEnvironment(environment?.slug);
   };
 
   return (
@@ -99,7 +99,7 @@ export const SideNavigation = () => {
         <EnvironmentDropdown value={currentEnvironment?.name} data={environmentNames} onChange={onEnvironmentChange} />
         <nav className="flex flex-1 flex-col gap-4">
           <NavigationGroup>
-            <NavigationLink to={buildRoute(ROUTES.WORKFLOWS, { environmentId: currentEnvironment?._id ?? '' })}>
+            <NavigationLink to={buildRoute(ROUTES.WORKFLOWS, { environmentSlug: currentEnvironment?.slug ?? '' })}>
               <RiRouteFill className="size-4" />
               <span>Workflows</span>
             </NavigationLink>

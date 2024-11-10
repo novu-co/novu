@@ -1,11 +1,12 @@
 import {
-  StepTypeEnum,
-  IMessageCTA,
-  IActor,
-  IMessageTemplate,
+  ControlSchemas,
   EnvironmentId,
-  OrganizationId,
+  IActor,
+  IMessageCTA,
+  IMessageTemplate,
   MessageTemplateContentType,
+  OrganizationId,
+  StepTypeEnum,
 } from '@novu/shared';
 import { JSONSchema } from 'json-schema-to-ts';
 
@@ -56,9 +57,7 @@ export class MessageTemplateEntity implements IMessageTemplate {
 
   deleted?: boolean;
 
-  controls?: {
-    schema: JSONSchema;
-  };
+  controls?: ControlSchemas;
 
   output?: {
     schema: JSONSchema;

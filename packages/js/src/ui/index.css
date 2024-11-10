@@ -177,11 +177,10 @@
   }
 
   :where(input)::placeholder,
-  :where(textarea)::placeholder  {
+  :where(textarea)::placeholder {
     opacity: 1; /* 1 */
     color: #9ca3af; /* 2 */
   }
-
 
   :where(button, [role='button']) {
     cursor: pointer;
@@ -329,14 +328,13 @@
   ::-webkit-scrollbar-thumb {
     background-color: var(--nv-color-secondary-foreground-alpha-300);
     border-radius: 0.25rem;
-    background-clip: 'padding-box',
+    background-clip: 'padding-box';
   }
 
   ::-webkit-scrollbar-track,
   ::-webkit-scrollbar-corner {
     background-color: transparent;
   }
-
 }
 
 @tailwind base;

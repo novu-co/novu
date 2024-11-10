@@ -70,7 +70,7 @@ const mapStepToNode = (
       name: step.name,
       content,
       addStepIndex,
-      stepId: step._id,
+      stepSlug: step.slug,
       error,
     },
     type: step.type,
@@ -85,7 +85,7 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
     const triggerNode = { id: '0', position: { x: 0, y: 0 }, data: {}, type: 'trigger' };
     let previousPosition = triggerNode.position;
 
-    const createdNodes = steps.map((el, index) => {
+    const createdNodes = steps?.map((el, index) => {
       const node = mapStepToNode(el, previousPosition, index);
       previousPosition = node.position;
       return node;
@@ -176,7 +176,7 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
 export const WorkflowCanvas = ({ steps }: { steps: Step[] }) => {
   return (
     <ReactFlowProvider>
-      <WorkflowCanvasChild steps={steps} />
+      <WorkflowCanvasChild steps={steps || []} />
     </ReactFlowProvider>
   );
 };
