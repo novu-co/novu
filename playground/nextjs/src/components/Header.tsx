@@ -25,7 +25,7 @@ const NavLink = ({ href, label }: LinkType) => {
 
   const isActive = pathname === href;
   return (
-    <li className={`p-2 rounded hover:bg-slate-200 ${isActive ? 'underline text-cyan-800' : ''}`}>
+    <li className={`rounded p-2 hover:bg-slate-200 ${isActive ? 'text-cyan-800 underline' : ''}`}>
       <Link href={href}>{label}</Link>
     </li>
   );
@@ -34,7 +34,7 @@ const NavLink = ({ href, label }: LinkType) => {
 export default function Header() {
   return (
     <div className="flex items-center justify-center p-6">
-      <ul className="flex space-x-5 list-none">
+      <ul className="flex list-none space-x-5">
         {LINKS.map((link) => (
           <NavLink key={link.href} {...link} />
         ))}

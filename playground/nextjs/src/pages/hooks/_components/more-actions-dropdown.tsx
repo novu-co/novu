@@ -13,7 +13,7 @@ export const MoreActionsDropdown = () => {
       <DropdownMenuTrigger className={'gap-2'}>
         <Dots />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-[#f5f5f4] text-[#726F77] min-w-content">
+      <DropdownMenuContent className="min-w-content bg-[#f5f5f4] text-[#726F77]">
         <StatusItem onClick={() => novu.notifications.readAll()} icon={<ReadAll />} label={'Mark all as read'} />
         <StatusItem onClick={() => novu.notifications.archiveAll()} icon={<Archive />} label={'Archive all'} />
         <StatusItem onClick={() => novu.notifications.archiveAllRead()} icon={<ArchiveRead />} label={'Archive read'} />

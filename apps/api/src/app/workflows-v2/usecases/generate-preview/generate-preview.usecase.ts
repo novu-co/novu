@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import {
   ChannelTypeEnum,
-  ControlPreviewIssue,
-  ControlPreviewIssueTypeEnum,
+  ContentIssue,
   ControlSchemas,
   GeneratePreviewResponseDto,
   JobStatusEnum,
-  JSONSchemaDto,
   PreviewPayload,
+  StepContentIssueEnum,
   StepTypeEnum,
   WorkflowOriginEnum,
 } from '@novu/shared';
@@ -16,19 +15,19 @@ import _ = require('lodash');
 import { GeneratePreviewCommand } from './generate-preview-command';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { StepMissingControlsException, StepNotFoundException } from '../../exceptions/step-not-found-exception';
-import { ExtractDefaultsUsecase } from '../get-default-values-from-schema/extract-defaults.usecase';
 import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { OriginMissingException, StepIdMissingException } from './step-id-missing.exception';
 import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
+import { ValidateControlValuesAndConstructPassableStructureUsecase } from '../validate-control-values/build-default-control-values-usecase.service';
 
 @Injectable()
 export class GeneratePreviewUsecase {
   constructor(
     private legacyPreviewStepUseCase: PreviewStep,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private extractDefaultsUseCase: ExtractDefaultsUsecase,
-    private constructPayloadUseCase: BuildDefaultPayloadUseCase
+    private constructPayloadUseCase: BuildDefaultPayloadUseCase,
+    private controlValuesUsecase: ValidateControlValuesAndConstructPassableStructureUsecase
   ) {}
 
   async execute(command: GeneratePreviewCommand): Promise<GeneratePreviewResponseDto> {
@@ -63,16 +62,11 @@ export class GeneratePreviewUsecase {
     return { previewPayload, issues };
   }
 
-  3;
   private addMissingValuesToControlValues(command: GeneratePreviewCommand, stepControlSchema: ControlSchemas) {
-    const defaultValues = this.extractDefaultsUseCase.execute({
-      jsonSchemaDto: stepControlSchema.schema as JSONSchemaDto,
+    return this.controlValuesUsecase.execute({
+      controlSchema: stepControlSchema,
+      controlValues: command.generatePreviewRequestDto.controlValues || {},
     });
-
-    return {
-      augmentedControlValues: merge(defaultValues, command.generatePreviewRequestDto.controlValues),
-      issuesMissingValues: this.buildMissingControlValuesIssuesList(defaultValues, command),
-    };
   }
 
   private buildMissingControlValuesIssuesList(defaultValues: Record<string, any>, command: GeneratePreviewCommand) {
@@ -81,16 +75,16 @@ export class GeneratePreviewUsecase {
       command.generatePreviewRequestDto.controlValues || {}
     );
 
-    return this.buildControlPreviewIssues(missingRequiredControlValues);
+    return this.buildContentIssues(missingRequiredControlValues);
   }
 
-  private buildControlPreviewIssues(keys: string[]): Record<string, ControlPreviewIssue[]> {
-    const record: Record<string, ControlPreviewIssue[]> = {};
+  private buildContentIssues(keys: string[]): Record<string, ContentIssue[]> {
+    const record: Record<string, ContentIssue[]> = {};
 
     keys.forEach((key) => {
       record[key] = [
         {
-          issueType: ControlPreviewIssueTypeEnum.MISSING_VALUE,
+          issueType: StepContentIssueEnum.MISSING_VALUE,
           message: `Value is missing on a required control`,
         },
       ];
@@ -115,7 +109,6 @@ export class GeneratePreviewUsecase {
     }
 
     const state = buildState(hydratedPayload.steps);
-    console.log('state', JSON.stringify(state, null, 2));
 
     return await this.legacyPreviewStepUseCase.execute(
       PreviewStepCommand.create({
@@ -158,8 +151,8 @@ export class GeneratePreviewUsecase {
 }
 
 function buildResponse(
-  missingValuesIssue: Record<string, ControlPreviewIssue[]>,
-  missingPayloadVariablesIssue: Record<string, ControlPreviewIssue[]>,
+  missingValuesIssue: Record<string, ContentIssue[]>,
+  missingPayloadVariablesIssue: Record<string, ContentIssue[]>,
   executionOutput,
   stepType: StepTypeEnum,
   augmentedPayload: PreviewPayload

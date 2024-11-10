@@ -13,7 +13,6 @@ import { AuthModule } from '../auth/auth.module';
 import { IntegrationModule } from '../integrations/integrations.module';
 import { WorkflowController } from './workflow.controller';
 import { UpsertWorkflowUseCase } from './usecases/upsert-workflow/upsert-workflow.usecase';
-import { GetWorkflowUseCase } from './usecases/get-workflow/get-workflow.usecase';
 import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.usecase';
 import { DeleteWorkflowUseCase } from './usecases/delete-workflow/delete-workflow.usecase';
 import { GetWorkflowByIdsUseCase } from './usecases/get-workflow-by-ids/get-workflow-by-ids.usecase';
@@ -25,8 +24,11 @@ import { ExtractDefaultsUsecase } from './usecases/get-default-values-from-schem
 import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-renderers';
 import { WorkflowTestDataUseCase } from './usecases/test-data/test-data.usecase';
 import { GetStepDataUsecase } from './usecases/get-step-schema/get-step-data.usecase';
+import { ValidateAndPersistWorkflowIssuesUsecase } from './usecases/upsert-workflow/validate-and-persist-workflow-issues.usecase';
 import { BuildPayloadNestedStructureUsecase } from './usecases/placeholder-enrichment/buildPayloadNestedStructureUsecase';
-import { BuildDefaultPayloadUseCase } from './usecases/build-payload-from-placeholder/build-default-payload-use-case.service';
+import { GetWorkflowUseCase } from './usecases/get-workflow/get-workflow.usecase';
+import { BuildDefaultPayloadUseCase } from './usecases/build-payload-from-placeholder';
+import { ValidateControlValuesAndConstructPassableStructureUsecase } from './usecases/validate-control-values/build-default-control-values-usecase.service';
 
 @Module({
   imports: [SharedModule, MessageTemplateModule, ChangeModule, AuthModule, BridgeModule, IntegrationModule],
@@ -35,7 +37,6 @@ import { BuildDefaultPayloadUseCase } from './usecases/build-payload-from-placeh
     CreateWorkflow,
     UpdateWorkflow,
     UpsertWorkflowUseCase,
-    GetWorkflowUseCase,
     ListWorkflowsUseCase,
     DeleteWorkflowUseCase,
     UpsertPreferences,
@@ -49,8 +50,11 @@ import { BuildDefaultPayloadUseCase } from './usecases/build-payload-from-placeh
     ExtractDefaultsUsecase,
     BuildPayloadNestedStructureUsecase,
     WorkflowTestDataUseCase,
-    BuildDefaultPayloadUseCase,
+    GetWorkflowUseCase,
     HydrateEmailSchemaUseCase,
+    ValidateAndPersistWorkflowIssuesUsecase,
+    BuildDefaultPayloadUseCase,
+    ValidateControlValuesAndConstructPassableStructureUsecase,
   ],
 })
 export class WorkflowModule implements NestModule {
