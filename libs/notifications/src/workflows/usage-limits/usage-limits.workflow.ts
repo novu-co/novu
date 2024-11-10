@@ -20,6 +20,22 @@ export const usageLimitsWorkflow = workflow(
         }),
       }
     );
+
+    await step.inApp(
+      'in-app',
+      async (controls) => {
+        return {
+          title: controls.title,
+          body: controls.body,
+        };
+      },
+      {
+        controlSchema: z.object({
+          title: z.string().default('You are approaching your usage limits'),
+          body: z.string().default('You have used {{payload.percentage}}% of your monthly events'),
+        }),
+      }
+    );
   },
   {
     name: 'Usage Limits Alert',
