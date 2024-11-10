@@ -6,6 +6,7 @@ import { createSearchParams, useNavigate } from 'react-router-dom';
 import { VStack } from '@novu/novui/jsx';
 import { Text, Title } from '@novu/novui';
 import { isAxiosError } from 'axios';
+import { ExecuteOutput } from '@novu/framework/internal';
 // TODO: This indicates that all onboarding pages for studio should move under the "Studio" folder
 import { useWorkflowTrigger, useDiscover, useWorkflowPreview } from '../../studio/hooks/useBridgeAPI';
 import { Footer } from './components/Footer';
@@ -154,7 +155,7 @@ export const StudioOnboardingPreview = () => {
                 source="studio"
                 error={null}
                 step={step}
-                preview={preview}
+                preview={preview as ExecuteOutput}
                 isLoadingPreview={previewLoading || isLoadingList}
               />
               <WorkflowStepEditorControlsPanel
