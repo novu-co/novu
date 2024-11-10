@@ -3,9 +3,16 @@ import { Prism } from '@mantine/prism';
 import { Tabs } from '@novu/novui';
 import { IconOutlineCode, IconVisibility } from '@novu/novui/icons';
 import { VStack } from '@novu/novui/jsx';
-import { ButtonTypeEnum, inAppMessageFromBridgeOutputs, StepTypeEnum } from '@novu/shared';
+import { inAppMessageFromBridgeOutputs, StepTypeEnum } from '@novu/shared';
 import { css } from '@novu/novui/css';
-import { ChatOutput, EmailOutput, ExecuteOutput, InAppOutput, PushOutput, SmsOutput } from '@novu/framework/internal';
+import type {
+  ChatOutput,
+  EmailOutput,
+  ExecuteOutput,
+  InAppOutput,
+  PushOutput,
+  SmsOutput,
+} from '@novu/framework/internal';
 import { PreviewWeb } from '../../../../components/workflow/preview/email/PreviewWeb';
 import { useActiveIntegrations } from '../../../../hooks';
 import {

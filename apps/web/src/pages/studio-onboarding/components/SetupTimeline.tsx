@@ -4,7 +4,7 @@ import { IconCheck } from '@novu/novui/icons';
 import { Text } from '@novu/novui';
 import { css } from '@novu/novui/css';
 import { useColorScheme } from '@novu/design-system';
-import { HealthCheck } from '@novu/framework/internal';
+import type { HealthCheck } from '@novu/framework/internal';
 import { CodeSnippet } from '../../get-started/legacy-onboarding/components/CodeSnippet';
 import { useStudioState } from '../../../studio/StudioStateProvider';
 import { timelineRecipe } from './SetupTimeline.recipe';

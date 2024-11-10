@@ -2,7 +2,7 @@ import { Badge, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { Popover } from '@novu/design-system';
 import { useDisclosure } from '@mantine/hooks';
-import { HealthCheck } from '@novu/framework/internal';
+import type { HealthCheck } from '@novu/framework/internal';
 import { api } from '../../../api/api.client';
 import { useEnvironment } from '../../../hooks';
 import { IS_SELF_HOSTED } from '../../../config';
