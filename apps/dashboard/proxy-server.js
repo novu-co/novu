@@ -27,6 +27,8 @@ app.use(
   })
 );
 
+app.use('/images', express.static('images'));
+
 app.get('/legacy/*', (req, res, next) => {
   legacyHandler(__dirname, req, res, next);
 });

@@ -57,7 +57,7 @@ export const FreeTrialCard = () => {
         </TooltipProvider>
       </div>
       <span className="text-foreground-600 text-xs">
-        Experience novu without any limits for free for the next {pluralizedDays}.
+        Experience Novu without any limits for free for the next {pluralizedDays}.
       </span>
       <div className={`max-h-3 overflow-hidden opacity-100 ${transition} group-hover:max-h-0 group-hover:opacity-0`}>
         <Progress value={daysTotal - daysLeft} max={daysTotal} />

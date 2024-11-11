@@ -8,11 +8,12 @@ import { useFeatureFlag } from '../../../../hooks';
 import { useNewDashboardOptIn } from '../../../../hooks/useNewDashboardOptIn';
 
 export function NewDashboardOptInWidget() {
-  const { dismiss, optIn, status } = useNewDashboardOptIn();
+  const { dismiss, redirectToNewDashboard, status } = useNewDashboardOptIn();
 
   const isNewDashboardEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ENABLED);
 
-  const isDismissed = status === NewDashboardOptInStatusEnum.DISMISSED;
+  const isDismissed =
+    status === NewDashboardOptInStatusEnum.DISMISSED || status === NewDashboardOptInStatusEnum.OPTED_OUT;
 
   if (IS_SELF_HOSTED || isDismissed || !isNewDashboardEnabled) {
     return null;
@@ -32,7 +33,7 @@ export function NewDashboardOptInWidget() {
         </Text>
       </div>
       <div className={styles.buttonContainer}>
-        <Button size="sm" variant="transparent" onClick={optIn}>
+        <Button size="sm" variant="transparent" onClick={redirectToNewDashboard}>
           Take me there
         </Button>
       </div>

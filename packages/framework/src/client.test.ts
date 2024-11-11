@@ -316,6 +316,14 @@ describe('Novu Client', () => {
       expect(stepChat.providers[0].code).toContain(`type: "plain_text"`);
       expect(stepChat.providers[0].code).toContain(`text: "Pretty Header"`);
     });
+
+    it('should not add duplicate workflows when adding the same workflow in parallel', async () => {
+      const newWorkflow = workflow('test-workflow', async () => {});
+      await Promise.all([client.addWorkflows([newWorkflow]), client.addWorkflows([newWorkflow])]);
+
+      const discovery = client.discover();
+      expect(discovery.workflows).toHaveLength(2);
+    });
   });
 
   describe('previewWorkflow method', () => {

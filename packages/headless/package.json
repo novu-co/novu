@@ -1,6 +1,6 @@
 {
   "name": "@novu/headless",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "repository": "https://github.com/novuhq/novu",
   "description": "Headless client package that is a thin abstraction layer over the API client + state and socket management",
   "keywords": [],
@@ -48,6 +48,8 @@
     "singleQuote": true
   },
   "nx": {
-    "tags": ["package:public"]
+    "tags": [
+      "package:public"
+    ]
   }
 }
