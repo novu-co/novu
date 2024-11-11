@@ -1,5 +1,5 @@
 import { ChannelStepEnum } from '../../constants';
-import { Schema } from '../../types/schema.types';
+import type { JsonSchema } from '../../types/schema.types';
 import { chatProviderSchemas } from './chat';
 import { emailProviderSchemas } from './email';
 import { inAppProviderSchemas } from './inApp';
@@ -12,4 +12,4 @@ export const providerSchemas = {
   email: emailProviderSchemas,
   push: pushProviderSchemas,
   in_app: inAppProviderSchemas,
-} as const satisfies Record<ChannelStepEnum, Record<string, { output: Schema }>>;
+} as const satisfies Record<ChannelStepEnum, Record<string, { output: JsonSchema }>>;

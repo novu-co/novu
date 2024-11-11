@@ -1,4 +1,4 @@
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 
 const address = {
   type: 'object',
@@ -7,7 +7,7 @@ const address = {
     name: { type: 'string' },
   },
   additionalProperties: true,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 const attachmentLike = {
   type: 'object',
@@ -16,7 +16,7 @@ const attachmentLike = {
     path: { type: 'string' },
   },
   additionalProperties: true,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 /**
  * Nodemailer `sendMail` schema
@@ -107,7 +107,7 @@ const nodemailerOutputSchema = {
   },
   required: [],
   additionalProperties: true,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 export const nodemailerProviderSchemas = {
   output: nodemailerOutputSchema,

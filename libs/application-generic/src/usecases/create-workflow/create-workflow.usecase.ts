@@ -34,7 +34,12 @@ import {
   NotificationStepVariantCommand,
 } from './create-workflow.command';
 import { CreateChange, CreateChangeCommand } from '../create-change';
-import { AnalyticsService } from '../../services';
+import {
+  AnalyticsService,
+  buildNotificationTemplateIdentifierKey,
+  buildNotificationTemplateKey,
+  InvalidateCacheService,
+} from '../../services';
 import { ContentService } from '../../services/content.service';
 import { isVariantEmpty } from '../../utils/variants';
 import {
@@ -55,6 +60,8 @@ export class CreateWorkflow {
     @Inject(forwardRef(() => AnalyticsService))
     private analyticsService: AnalyticsService,
     private logger: PinoLogger,
+    @Inject(forwardRef(() => InvalidateCacheService))
+    private invalidateCache: InvalidateCacheService,
     protected moduleRef: ModuleRef,
   ) {}
 
@@ -307,6 +314,19 @@ export class CreateWorkflow {
         ? { payloadSchema: command.payloadSchema }
         : {}),
       ...(command.data ? { data: command.data } : {}),
+    });
+
+    await this.invalidateCache.invalidateByKey({
+      key: buildNotificationTemplateIdentifierKey({
+        templateIdentifier: savedWorkflow.triggers[0].identifier,
+        _environmentId: command.environmentId,
+      }),
+    });
+    await this.invalidateCache.invalidateByKey({
+      key: buildNotificationTemplateKey({
+        _id: savedWorkflow._id,
+        _environmentId: command.environmentId,
+      }),
     });
 
     const item = await this.notificationTemplateRepository.findById(

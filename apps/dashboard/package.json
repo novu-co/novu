@@ -79,7 +79,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-     "@clerk/types": "^4.30.0",
+    "@clerk/types": "^4.30.0",
     "@eslint/js": "^9.9.0",
     "@hookform/devtools": "^4.3.0",
     "@playwright/test": "^1.44.0",

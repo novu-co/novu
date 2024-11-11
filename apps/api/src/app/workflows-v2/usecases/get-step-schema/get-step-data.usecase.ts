@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ControlValuesLevelEnum, StepDataDto } from '@novu/shared';
-import { JSONSchema } from 'json-schema-to-ts';
+import { ControlValuesLevelEnum, JSONSchemaDto, StepDataDto } from '@novu/shared';
 import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
+import { GetWorkflowByIdsUseCase } from '@novu/application-generic';
+
 import { GetStepDataCommand } from './get-step-data.command';
 import { mapStepTypeToResult } from '../../shared';
-import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { InvalidStepException } from '../../exceptions/invalid-step.exception';
 import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
 import { buildJSONSchema } from '../../shared/build-string-schema';
@@ -51,7 +51,9 @@ export class GetStepDataUsecase {
   private async fetchWorkflow(command: GetStepDataCommand) {
     const workflow = await this.getWorkflowByIdsUseCase.execute({
       identifierOrInternalId: command.identifierOrInternalId,
-      user: command.user,
+      environmentId: command.user.environmentId,
+      organizationId: command.user.organizationId,
+      userId: command.user._id,
     });
 
     if (!workflow) {
@@ -119,12 +121,12 @@ const buildSubscriberSchema = () =>
     },
     required: ['firstName', 'lastName', 'email', 'subscriberId'],
     additionalProperties: false,
-  }) as const satisfies JSONSchema;
+  }) as const satisfies JSONSchemaDto;
 
 function buildVariablesSchema(
   previousSteps: NotificationStepEntity[] | undefined,
-  payloadSchema: JSONSchema
-): JSONSchema {
+  payloadSchema: JSONSchemaDto
+): JSONSchemaDto {
   return {
     type: 'object',
     properties: {
@@ -133,12 +135,12 @@ function buildVariablesSchema(
       payload: payloadSchema,
     },
     additionalProperties: false,
-  } as const satisfies JSONSchema;
+  } as const satisfies JSONSchemaDto;
 }
 
 function buildPreviousStepsSchema(previousSteps: NotificationStepEntity[] | undefined) {
   type StepExternalId = string;
-  let previousStepsProperties: Record<StepExternalId, JSONSchema> = {};
+  let previousStepsProperties: Record<StepExternalId, JSONSchemaDto> = {};
 
   previousStepsProperties = (previousSteps || []).reduce(
     (acc, step) => {
@@ -148,7 +150,7 @@ function buildPreviousStepsSchema(previousSteps: NotificationStepEntity[] | unde
 
       return acc;
     },
-    {} as Record<StepExternalId, JSONSchema>
+    {} as Record<StepExternalId, JSONSchemaDto>
   );
 
   return {
@@ -157,5 +159,5 @@ function buildPreviousStepsSchema(previousSteps: NotificationStepEntity[] | unde
     required: [],
     additionalProperties: false,
     description: 'Previous Steps Results',
-  } as const satisfies JSONSchema;
+  } as const satisfies JSONSchemaDto;
 }

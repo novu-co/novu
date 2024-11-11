@@ -1,5 +1,5 @@
 import { SmsProviderIdEnum } from '@novu/shared';
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 import { genericProviderSchemas } from '../generic.schema';
 import { novuSmsProviderSchemas } from './novu-sms.schema';
 import { twilioProviderSchemas } from './twilio.schema';
@@ -36,4 +36,4 @@ export const smsProviderSchemas = {
   telnyx: genericProviderSchemas,
   termii: genericProviderSchemas,
   twilio: twilioProviderSchemas,
-} as const satisfies Record<SmsProviderIdEnum, { output: Schema }>;
+} as const satisfies Record<SmsProviderIdEnum, { output: JsonSchema }>;

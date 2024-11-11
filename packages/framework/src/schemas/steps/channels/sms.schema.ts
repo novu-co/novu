@@ -1,4 +1,4 @@
-import { Schema } from '../../../types/schema.types';
+import { JsonSchema } from '../../../types/schema.types';
 
 const smsOutputSchema = {
   type: 'object',
@@ -7,14 +7,14 @@ const smsOutputSchema = {
   },
   required: ['body'],
   additionalProperties: false,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 const smsResultSchema = {
   type: 'object',
   properties: {},
   required: [],
   additionalProperties: false,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 export const smsChannelSchemas = {
   output: smsOutputSchema,

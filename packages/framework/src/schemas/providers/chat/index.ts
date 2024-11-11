@@ -1,5 +1,5 @@
 import { ChatProviderIdEnum } from '@novu/shared';
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 import { genericProviderSchemas } from '../generic.schema';
 import { slackProviderSchemas } from './slack.schema';
 
@@ -14,4 +14,4 @@ export const chatProviderSchemas = {
   slack: slackProviderSchemas,
   'whatsapp-business': genericProviderSchemas,
   zulip: genericProviderSchemas,
-} as const satisfies Record<ChatProviderIdEnum, { output: Schema }>;
+} as const satisfies Record<ChatProviderIdEnum, { output: JsonSchema }>;
