@@ -1,3 +1,4 @@
+import { LEGACY_DASHBOARD_URL } from '@/config';
 import { useUser } from '@clerk/clerk-react';
 import { NewDashboardOptInStatusEnum } from '@novu/shared';
 
@@ -21,11 +22,9 @@ export function useNewDashboardOptIn() {
     return user.unsafeMetadata?.newDashboardOptInStatus || null;
   };
 
-  const redirectToNewDashboard = () => {
-    const newDashboardUrl = process.env.NEW_DASHBOARD_URL;
-    if (!newDashboardUrl) return;
-
-    window.location.href = newDashboardUrl;
+  const redirectToLegacyDashboard = () => {
+    optOut();
+    window.location.href = LEGACY_DASHBOARD_URL || window.location.origin + '/legacy';
   };
 
   const optIn = () => {
@@ -45,6 +44,6 @@ export function useNewDashboardOptIn() {
     optOut,
     dismiss,
     status: getCurrentOptInStatus(),
-    redirectToNewDashboard,
+    redirectToLegacyDashboard,
   };
 }
