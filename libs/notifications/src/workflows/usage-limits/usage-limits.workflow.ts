@@ -25,13 +25,13 @@ export const usageLimitsWorkflow = workflow(
       'in-app',
       async (controls) => {
         return {
-          title: controls.title,
+          subject: controls.subject,
           body: controls.body,
         };
       },
       {
         controlSchema: z.object({
-          title: z.string().default('You are approaching your usage limits'),
+          subject: z.string().default('You are approaching your usage limits'),
           body: z.string().default('You have used {{payload.percentage}}% of your monthly events'),
         }),
       }
