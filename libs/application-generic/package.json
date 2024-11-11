@@ -84,7 +84,6 @@
     "lodash": "^4.17.15",
     "mixpanel": "^0.17.0",
     "nanoid": "^3.1.20",
-    "nestjs-graceful-shutdown": "^1.0.3",
     "nestjs-otel": "6.1.1",
     "nestjs-pino": "4.1.0",
     "node-fetch": "^3.2.10",
