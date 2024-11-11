@@ -27,10 +27,16 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
   }, [value]);
 
   const addTag = (tag: string) => {
+    const newTag = tag.trim();
+    if (newTag === '') {
+      return;
+    }
+
     const newTags = [...tags, tag];
     if (new Set(newTags).size !== newTags.length) {
       return;
     }
+
     onChange(newTags);
     setInputValue('');
     setIsOpen(false);
