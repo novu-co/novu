@@ -16,12 +16,16 @@ type InferSchema<T extends Schema, Options extends { validated: boolean }> =
   | InferJsonSchema<T, Options>
   | InferZodSchema<T, Options>
   | never extends infer U
-  ? // If all inferred types are `never`, return an unknown record
+  ? // Check if all inferred types are `never`
     [U] extends [never]
-    ? Record<string, unknown>
-    : U extends Record<string, unknown>
-      ? U
-      : Record<string, unknown>
+    ? // If all inferred types are `never`, return an unknown record
+      Record<string, unknown>
+    : // At this point type `U` is still unknown, so we narrow it down to an unknown record
+      U extends Record<string, unknown>
+      ? // If `U` has a record type, return it
+        U
+      : // If `U` is not a record type, fallback to an unknown record
+        Record<string, unknown>
   : Record<string, unknown>;
 
 /**
