@@ -113,9 +113,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
               <CommandGroup>
                 {inputValue !== '' && (
                   <CommandItem
-                    // We can't have duplicate keys in our list so adding a prefix
-                    // here to differentiate this from a possible suggestion value
-                    value={`input-${inputValue}`}
+                    value={inputValue}
                     onSelect={() => {
                       addTag(inputValue);
                     }}
@@ -126,7 +124,9 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
                 {suggestions.map((tag) => (
                   <CommandItem
                     key={tag}
-                    value={tag}
+                    // We can't have duplicate keys in our list so adding a suffix
+                    // here to differentiate this from the value typed
+                    value={`${tag}-suggestion`}
                     onSelect={() => {
                       addTag(tag);
                     }}
