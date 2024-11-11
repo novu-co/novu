@@ -97,7 +97,7 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
                       <Editor
                         lang="json"
                         className="h-full"
-                        basicSetup={{ lineNumbers: true }}
+                        basicSetup={{ lineNumbers: true, defaultKeymap: true }}
                         extensions={[loadLanguage('json')?.extension ?? []]}
                         {...restField}
                       />
