@@ -42,10 +42,10 @@ export class ConstructFrameworkWorkflow {
       }
     }
 
-    return this.constructFrameworkWorkflow(dbWorkflow, command.action);
+    return this.constructFrameworkWorkflow(dbWorkflow);
   }
 
-  private constructFrameworkWorkflow(newWorkflow, action) {
+  private constructFrameworkWorkflow(newWorkflow: NotificationTemplateEntity) {
     return workflow(
       newWorkflow.triggers[0].identifier,
       async ({ step, payload, subscriber }) => {
