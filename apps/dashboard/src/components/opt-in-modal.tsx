@@ -54,7 +54,7 @@ export const OptInModal = () => {
 
 const Image = () => (
   <div className="relative">
-    <img src="/public/images/opt-in.png" alt="New Dashboard Preview" />
+    <img src="/images/opt-in.png" alt="New Dashboard Preview" />
     <div
       className="absolute inset-0 rounded-lg"
       style={{ background: 'linear-gradient(163deg, rgba(255, 255, 255, 0.00) 7.65%, #FFF 92.93%)' }}

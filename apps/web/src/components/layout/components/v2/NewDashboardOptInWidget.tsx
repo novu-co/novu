@@ -12,7 +12,8 @@ export function NewDashboardOptInWidget() {
 
   const isNewDashboardEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ENABLED);
 
-  const isDismissed = status === NewDashboardOptInStatusEnum.DISMISSED;
+  const isDismissed =
+    status === NewDashboardOptInStatusEnum.DISMISSED || status === NewDashboardOptInStatusEnum.OPTED_OUT;
 
   if (IS_SELF_HOSTED || isDismissed || !isNewDashboardEnabled) {
     return null;
