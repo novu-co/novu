@@ -73,8 +73,8 @@ const makeStep = (channelType: StepTypeEnum, id: string): IFormStep => {
         digestKey: '',
         type: DigestTypeEnum.REGULAR,
         regular: {
-          unit: DigestUnitEnum.MINUTES,
-          amount: '5',
+          unit: DigestUnitEnum.SECONDS,
+          amount: '30',
           backoff: false,
         },
       },
