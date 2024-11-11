@@ -1,7 +1,7 @@
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useForm, useWatch } from 'react-hook-form';
+import { FieldValues, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type WorkflowResponseDto, type StepDataDto, type StepUpdateDto } from '@novu/shared';
 
@@ -38,7 +38,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
   const [editorValue, setEditorValue] = useState('{}');
   const { reset, formState } = form;
 
-  const { previewStep } = usePreviewStep();
+  const { previewStep, data: previewData } = usePreviewStep();
   const { updateWorkflow } = useUpdateWorkflow({
     onSuccess: () => {
       showToast({
@@ -159,7 +159,18 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
             <CustomStepControls dataSchema={dataSchema} />
           </TabsContent>
           <TabsContent value="preview" className={tabsContentClassName}>
-            <InAppEditorPreview value={editorValue} onChange={setEditorValue} />
+            <InAppEditorPreview
+              value={editorValue}
+              onChange={setEditorValue}
+              previewData={previewData}
+              applyPreview={() => {
+                previewStep({
+                  stepSlug,
+                  workflowSlug,
+                  data: { controlValues: form.getValues() as FieldValues, previewPayload: JSON.parse(editorValue) },
+                });
+              }}
+            />
           </TabsContent>
           <Separator />
           <footer className="flex justify-end px-3 py-3.5">

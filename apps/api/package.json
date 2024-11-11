@@ -1,6 +1,6 @@
 {
   "name": "@novu/api",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "description",
   "author": "",
   "private": "true",
@@ -31,6 +31,7 @@
   "dependencies": {
     "@godaddy/terminus": "^4.12.1",
     "@google-cloud/storage": "^6.2.3",
+    "@maily-to/render": "^0.0.12",
     "@nestjs/axios": "3.0.3",
     "@nestjs/common": "10.4.1",
     "@nestjs/core": "10.4.1",
@@ -56,8 +57,6 @@
     "@sentry/tracing": "^7.40.0",
     "@types/newrelic": "^9.14.0",
     "@upstash/ratelimit": "^0.4.4",
-    "zod-to-json-schema": "^3.23.3",
-    "@maily-to/render": "^0.0.12",
     "axios": "^1.6.8",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.20.0",
@@ -73,6 +72,7 @@
     "helmet": "^6.0.1",
     "i18next": "^23.7.6",
     "ioredis": "5.3.2",
+    "json-schema-to-ts": "^3.0.0",
     "jsonwebtoken": "9.0.0",
     "lodash": "^4.17.15",
     "nanoid": "^3.1.20",
@@ -92,9 +92,10 @@
     "sanitize-html": "^2.4.0",
     "shortid": "^2.2.16",
     "swagger-ui-express": "^4.4.0",
-    "twilio": "^4.14.1","zod": "^3.23.8",
-    "json-schema-to-ts": "^3.0.0",
-    "uuid": "^8.3.2"
+    "twilio": "^4.14.1",
+    "uuid": "^8.3.2",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.23.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^6.0.0",
