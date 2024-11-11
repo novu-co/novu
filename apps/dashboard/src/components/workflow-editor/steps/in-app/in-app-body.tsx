@@ -42,6 +42,7 @@ export const InAppBody = () => {
                 ]}
                 value={field.value}
                 onChange={(val) => field.onChange(val)}
+                height="100%"
               />
             </InputField>
           </FormControl>
