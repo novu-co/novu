@@ -1,6 +1,9 @@
 import type zod from 'zod';
 
-export type ZodSchema = zod.ZodType;
+/**
+ * A ZodSchema used to validate a JSON object.
+ */
+export type ZodSchema = zod.ZodType<Record<string, unknown>, zod.ZodTypeDef, Record<string, unknown>>;
 
 /**
  * A minimal ZodSchema type.

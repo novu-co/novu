@@ -7,17 +7,21 @@ export type ImportRequirement = {
    *
    * @example
    * ```typescript
-   * 'my-dependency'
+   * 'module-name'
    * ```
    */
   name: string;
   /**
-   * The import of the dependency. An explicit `import()` call is necessary to ensure
-   * that the bundler will make the dependency available for usage during tree-shaking.
+   * The import of the dependency. An explicit `import('module-name')` call with a static module string
+   * is necessary to ensure that the bundler will make the dependency available for usage during tree-shaking.
+   * Without a static string, tree-shaking may aggressively remove the import, making it unavailable.
+   *
+   * This syntax is required during synchronous declaration (e.g. on a class property),
+   * but should only be awaited when you can handle a runtime import error.
    *
    * @example
    * ```typescript
-   * import('my-dependency')
+   * import('module-name')
    * ```
    */
   import: Promise<{ default: unknown } & Record<string, unknown>>;
