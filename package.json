@@ -78,6 +78,9 @@
     "packages:set-workspace-protocol": "node scripts/set-package-dependencies.mjs workspace:*",
     "packages:set-latest": "node scripts/set-package-dependencies.mjs latest"
   },
+  "resolutions": {
+    "minimist": "1.2.6"
+  },
   "devDependencies": {
     "@auto-it/npm": "^10.36.5",
     "@auto-it/released": "^10.36.5",

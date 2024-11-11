@@ -30,6 +30,7 @@ import { BuildPayloadNestedStructureUsecase } from './usecases/placeholder-enric
 import { GetWorkflowUseCase } from './usecases/get-workflow/get-workflow.usecase';
 import { BuildDefaultPayloadUseCase } from './usecases/build-payload-from-placeholder';
 import { ValidateControlValuesAndConstructPassableStructureUsecase } from './usecases/validate-control-values/build-default-control-values-usecase.service';
+import { BuildAvailableVariableSchemaUsecase } from './usecases/get-step-schema/build-available-variable-schema-usecase.service';
 
 @Module({
   imports: [SharedModule, MessageTemplateModule, ChangeModule, AuthModule, BridgeModule, IntegrationModule],
@@ -56,6 +57,7 @@ import { ValidateControlValuesAndConstructPassableStructureUsecase } from './use
     ValidateAndPersistWorkflowIssuesUsecase,
     BuildDefaultPayloadUseCase,
     ValidateControlValuesAndConstructPassableStructureUsecase,
+    BuildAvailableVariableSchemaUsecase,
   ],
 })
 export class WorkflowModule implements NestModule {

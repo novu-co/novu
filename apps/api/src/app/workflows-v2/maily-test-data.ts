@@ -308,7 +308,7 @@ export function fullCodeSnippet(stepId?: string) {
               {
                 type: 'for',
                 attrs: {
-                  each: stepId ? `steps.${stepId}.origins` : 'payload.origins',
+                  each: stepId ? `steps.${stepId}.events` : 'payload.origins',
                   isUpdatingKey: false,
                 },
                 content: [
@@ -337,7 +337,21 @@ export function fullCodeSnippet(stepId?: string) {
                               {
                                 type: 'payloadValue',
                                 attrs: {
-                                  id: 'origin.country',
+                                  id: stepId ? 'payload.country' : 'origin.country',
+                                  label: null,
+                                },
+                              },
+                              {
+                                type: 'payloadValue',
+                                attrs: {
+                                  id: 'id',
+                                  label: null,
+                                },
+                              },
+                              {
+                                type: 'payloadValue',
+                                attrs: {
+                                  id: 'time',
                                   label: null,
                                 },
                               },

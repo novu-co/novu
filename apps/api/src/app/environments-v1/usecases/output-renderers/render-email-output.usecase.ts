@@ -13,7 +13,7 @@ export class RenderEmailOutputUsecase {
 
   async execute(renderCommand: RenderEmailOutputCommand): Promise<EmailRenderOutput> {
     const { emailEditor, subject } = EmailStepControlSchema.parse(renderCommand.controlValues);
-    console.log('renderCommand.fullPayloadForRender', renderCommand.fullPayloadForRender);
+    console.log('payload', JSON.stringify(renderCommand.fullPayloadForRender));
     const expandedSchema = this.transformForAndShowLogic(emailEditor, renderCommand.fullPayloadForRender);
     const htmlRendered = await render(expandedSchema);
 
