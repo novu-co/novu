@@ -4,8 +4,9 @@ import { InboxEllipsis } from '@/components/icons/inbox-ellipsis';
 import { InboxSettings } from '@/components/icons/inbox-settings';
 import { Button } from '@/components/primitives/button';
 import { cn } from '@/utils/ui';
-import { GeneratePreviewResponseDto, InAppRenderOutput } from '@novu/shared';
-import { HTMLAttributes } from 'react';
+import { ChannelTypeEnum, GeneratePreviewResponseDto, InAppRenderOutput } from '@novu/shared';
+import { HTMLAttributes, useMemo } from 'react';
+import { parseMarkdownIntoTokens } from '@novu/js/internal';
 
 type InAppPreviewProps = HTMLAttributes<HTMLDivElement> & {
   data: GeneratePreviewResponseDto;
@@ -38,44 +39,62 @@ export const InAppPreview = (props: InAppPreviewProps) => {
           <InboxSettings />
         </div>
       </div>
-      <div className="z-20 mb-2 p-2">
-        <div className="mb-2 flex items-center gap-2">
-          {data?.result?.preview && 'avatar' in data.result.preview && (
-            <img src={data.result.preview.avatar as string} alt="avatar" className="h-5 w-5 rounded-full" />
-          )}
-          {data?.result?.preview && 'subject' in data.result.preview ? (
-            <span className="text-xs font-medium text-neutral-600">
-              {(data.result.preview as InAppRenderOutput).subject}
-            </span>
-          ) : (
-            data?.result?.preview && 'body' in data.result.preview && <Body text={data.result.preview.body} />
-          )}
-        </div>
-        {data?.result?.preview && 'body' in data.result.preview && 'subject' in data.result.preview && (
-          <Body text={data.result.preview.body} />
-        )}
+      {data.result?.type === ChannelTypeEnum.IN_APP && (
+        <div className="z-20 mb-2 p-2">
+          <div className="mb-2 flex items-center gap-2">
+            {data.result.preview.avatar && (
+              <img src={data.result.preview.avatar as string} alt="avatar" className="h-5 w-5 rounded-full" />
+            )}
+            {data.result.preview.subject ? (
+              <Subject text={data.result.preview.subject as string} />
+            ) : (
+              <Body text={data.result.preview.body} />
+            )}
+          </div>
 
-        <div className="mt-3 flex items-center justify-end gap-1">
-          {data?.result?.preview && 'primaryAction' in data.result.preview && (
-            <Button className="text-xs font-medium shadow-none" type="button" variant="primary">
-              {(data.result.preview as InAppRenderOutput).primaryAction?.label}
-            </Button>
-          )}
-          {data?.result?.preview && 'secondaryAction' in data.result.preview && (
-            <Button variant="outline" className="text-xs font-medium" type="button">
-              {(data.result.preview as InAppRenderOutput).secondaryAction?.label}
-            </Button>
-          )}
+          {data.result.preview.subject && <Body text={data.result.preview.body} />}
+
+          <div className="mt-3 flex items-center justify-end gap-1">
+            {data.result.preview.primaryAction && (
+              <Button className="text-xs font-medium shadow-none" type="button" variant="primary">
+                {(data.result.preview as InAppRenderOutput).primaryAction?.label}
+              </Button>
+            )}
+            {data.result.preview.secondaryAction && (
+              <Button variant="outline" className="text-xs font-medium" type="button">
+                {(data.result.preview as InAppRenderOutput).secondaryAction?.label}
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
 
-const Body = ({ text }: { text: string }) => {
+type MarkdownProps = Omit<HTMLAttributes<HTMLParagraphElement>, 'children'> & { children: string };
+const Markdown = (props: MarkdownProps) => {
+  const { children, ...rest } = props;
+
+  const tokens = useMemo(() => parseMarkdownIntoTokens(children), [children]);
+
   return (
-    <div className="truncate text-xs text-neutral-400">
-      <span>{text}</span>
-    </div>
+    <p {...rest}>
+      {tokens.map((token) => {
+        if (token.type === 'bold') {
+          return <strong>{token.content}</strong>;
+        } else {
+          return <span>{token.content}</span>;
+        }
+      })}
+    </p>
   );
+};
+
+const Subject = ({ text }: { text: string }) => {
+  return <Markdown className="text-xs font-medium text-neutral-600">{text}</Markdown>;
+};
+
+const Body = ({ text }: { text: string }) => {
+  return <Markdown className="truncate text-xs text-neutral-400">{text}</Markdown>;
 };
