@@ -1,4 +1,5 @@
 import {
+  ArrayMaxSize,
   IsArray,
   IsBoolean,
   IsDefined,
@@ -36,6 +37,7 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
 
   @IsOptional()
   @IsArray()
+  @ArrayMaxSize(8)
   tags?: string[];
 
   @IsDefined()
