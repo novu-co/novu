@@ -53,7 +53,9 @@ function isRuntimeInDevelopment() {
 }
 
 export class Client {
-  private discoveredWorkflows: Array<DiscoverWorkflowOutput> = [];
+  private discoveredWorkflows = new Map<string, DiscoverWorkflowOutput>();
+  private addingWorkflows = new Set<string>();
+  private workflowPromises = new Map<string, Promise<void>>();
 
   private templateEngine = new Liquid({
     outputEscape: (output) => {
@@ -95,21 +97,49 @@ export class Client {
     return builtConfiguration;
   }
 
+  /**
+   * Adds workflows to the client.
+   *
+   * A locking mechanism is used to ensure that duplicate workflows are not added.
+   *
+   * @param workflows - The workflows to add.
+   */
   public async addWorkflows(workflows: Array<Workflow>): Promise<void> {
     for (const workflow of workflows) {
-      if (this.discoveredWorkflows.some((existing) => existing.workflowId === workflow.id)) {
-        return;
-      } else {
-        const definition = await workflow.discover();
-        prettyPrintDiscovery(definition);
-        this.discoveredWorkflows.push(definition);
+      if (this.discoveredWorkflows.has(workflow.id)) {
+        continue;
       }
+
+      if (this.addingWorkflows.has(workflow.id)) {
+        // Wait for the existing promise to resolve if the workflow is already being added
+        await this.workflowPromises.get(workflow.id);
+        continue;
+      }
+
+      this.addingWorkflows.add(workflow.id);
+
+      const workflowPromise = this.addWorkflow(workflow);
+      this.workflowPromises.set(workflow.id, workflowPromise);
+
+      await workflowPromise;
+    }
+  }
+
+  private async addWorkflow(workflow: Workflow): Promise<void> {
+    try {
+      const definition = await workflow.discover();
+      prettyPrintDiscovery(definition);
+      this.discoveredWorkflows.set(workflow.id, definition);
+    } finally {
+      this.addingWorkflows.delete(workflow.id);
+      this.workflowPromises.delete(workflow.id);
     }
   }
 
   public healthCheck(): HealthCheck {
-    const workflowCount = this.discoveredWorkflows.length;
-    const stepCount = this.discoveredWorkflows.reduce((acc, workflow) => acc + workflow.steps.length, 0);
+    const discoveredWorkflows = this.getRegisteredWorkflows();
+    const workflowCount = discoveredWorkflows.length;
+    const stepCount = discoveredWorkflows.reduce((acc, workflow) => acc + workflow.steps.length, 0);
 
     return {
       status: 'ok',
@@ -123,7 +153,7 @@ export class Client {
   }
 
   private getWorkflow(workflowId: string): DiscoverWorkflowOutput {
-    const foundWorkflow = this.discoveredWorkflows.find((workflow) => workflow.workflowId === workflowId);
+    const foundWorkflow = this.discoveredWorkflows.get(workflowId);
 
     if (foundWorkflow) {
       return foundWorkflow;
@@ -145,7 +175,7 @@ export class Client {
   }
 
   private getRegisteredWorkflows(): Array<DiscoverWorkflowOutput> {
-    return this.discoveredWorkflows;
+    return Array.from(this.discoveredWorkflows.values());
   }
 
   public discover(): DiscoverOutput {
