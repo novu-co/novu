@@ -18,7 +18,7 @@ export const DashboardLayout = ({
       <div className="relative flex h-full w-full">
         <SideNavigation />
         <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
-          <HeaderNavigation startItems={headerStartItems} className="pt-4" />
+          <HeaderNavigation startItems={headerStartItems} className="px-6 pt-4" />
 
           <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">{children}</div>
         </div>

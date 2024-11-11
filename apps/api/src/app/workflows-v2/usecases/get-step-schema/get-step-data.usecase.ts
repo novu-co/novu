@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ControlValuesLevelEnum, StepDataDto } from '@novu/shared';
-import { JSONSchema } from 'json-schema-to-ts';
+import { ControlValuesLevelEnum, JSONSchemaDto, StepDataDto } from '@novu/shared';
 import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { GetStepDataCommand } from './get-step-data.command';
 import { mapStepTypeToResult } from '../../shared';
@@ -119,12 +118,12 @@ const buildSubscriberSchema = () =>
     },
     required: ['firstName', 'lastName', 'email', 'subscriberId'],
     additionalProperties: false,
-  }) as const satisfies JSONSchema;
+  }) as const satisfies JSONSchemaDto;
 
 function buildVariablesSchema(
   previousSteps: NotificationStepEntity[] | undefined,
-  payloadSchema: JSONSchema
-): JSONSchema {
+  payloadSchema: JSONSchemaDto
+): JSONSchemaDto {
   return {
     type: 'object',
     properties: {
@@ -133,12 +132,12 @@ function buildVariablesSchema(
       payload: payloadSchema,
     },
     additionalProperties: false,
-  } as const satisfies JSONSchema;
+  } as const satisfies JSONSchemaDto;
 }
 
 function buildPreviousStepsSchema(previousSteps: NotificationStepEntity[] | undefined) {
   type StepExternalId = string;
-  let previousStepsProperties: Record<StepExternalId, JSONSchema> = {};
+  let previousStepsProperties: Record<StepExternalId, JSONSchemaDto> = {};
 
   previousStepsProperties = (previousSteps || []).reduce(
     (acc, step) => {
@@ -148,7 +147,7 @@ function buildPreviousStepsSchema(previousSteps: NotificationStepEntity[] | unde
 
       return acc;
     },
-    {} as Record<StepExternalId, JSONSchema>
+    {} as Record<StepExternalId, JSONSchemaDto>
   );
 
   return {
@@ -157,5 +156,5 @@ function buildPreviousStepsSchema(previousSteps: NotificationStepEntity[] | unde
     required: [],
     additionalProperties: false,
     description: 'Previous Steps Results',
-  } as const satisfies JSONSchema;
+  } as const satisfies JSONSchemaDto;
 }

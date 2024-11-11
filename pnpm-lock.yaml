@@ -483,9 +483,6 @@ importers:
       ioredis:
         specifier: 5.3.2
         version: 5.3.2
-      json-schema-to-ts:
-        specifier: ^3.0.0
-        version: 3.1.0
       jsonwebtoken:
         specifier: 9.0.0
         version: 9.0.0
@@ -648,8 +645,8 @@ importers:
   apps/dashboard:
     dependencies:
       '@clerk/clerk-react':
-        specifier: ^5.2.5
-        version: 5.2.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^5.15.1
+        version: 5.15.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@codemirror/lang-liquid':
         specifier: ^6.2.1
         version: 6.2.1
@@ -659,6 +656,12 @@ importers:
       '@lezer/highlight':
         specifier: ^1.2.1
         version: 1.2.1
+      '@novu/framework':
+        specifier: workspace:*
+        version: link:../../packages/framework
+      '@novu/js':
+        specifier: workspace:*
+        version: link:../../packages/js
       '@novu/react':
         specifier: workspace:*
         version: link:../../packages/react
@@ -817,8 +820,8 @@ importers:
         version: 3.23.8
     devDependencies:
       '@clerk/types':
-        specifier: ^4.6.1
-        version: 4.13.0
+        specifier: ^4.30.0
+        version: 4.30.0
       '@eslint/js':
         specifier: ^9.9.0
         version: 9.9.1
@@ -2890,9 +2893,6 @@ importers:
       apollo-boost:
         specifier: 0.4.9
         version: 0.4.9(graphql@16.9.0)
-      json-schema-to-ts:
-        specifier: ^3.0.0
-        version: 3.1.0
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
@@ -4413,15 +4413,6 @@ importers:
 
   packages/shared:
     devDependencies:
-      '@types/bluebird':
-        specifier: ^3.5.24
-        version: 3.5.38
-      '@types/jest':
-        specifier: 29.5.2
-        version: 29.5.2
-      json-schema-to-ts:
-        specifier: ^3.0.0
-        version: 3.1.0
       rimraf:
         specifier: ^3.0.2
         version: 3.0.2
@@ -7051,31 +7042,12 @@ packages:
       react: ^18 || ^19.0.0-0
       react-dom: ^18 || ^19.0.0-0
 
-  '@clerk/clerk-react@5.2.7':
-    resolution: {integrity: sha512-8gPS/N0D1ooGg92lrSsAN9nKZEVE1b/nfZGtgEZX9epQ47nD+geThAC1G+mc3hABNkIODvIyecKTLbsk0K+LfA==}
-    engines: {node: '>=18.17.0'}
-    peerDependencies:
-      react: '>=18 || >=19.0.0-beta'
-      react-dom: '>=18 || >=19.0.0-beta'
-
   '@clerk/clerk-sdk-node@5.0.19':
     resolution: {integrity: sha512-LnjXgqRGJpBIhkaBQCLixfuGFZNDDpTUv9uuSj3tp5X6DQbmRSPKX0Vm8WwXJmIr67JYoAE+6N3j/P2StVTZ7w==}
     engines: {node: '>=18.17.0'}
 
   '@clerk/shared@2.11.5':
     resolution: {integrity: sha512-GQiqKgIBhqnXfLmohNbDvTz8GNK/nYRSWciGArdezaB+w2q+QpQyo2v1Y7Bh6j608iKZCnc4jG4yxcAI/pRQDA==}
-    engines: {node: '>=18.17.0'}
-    peerDependencies:
-      react: '>=18 || >=19.0.0-beta'
-      react-dom: '>=18 || >=19.0.0-beta'
-    peerDependenciesMeta:
-      react:
-        optional: true
-      react-dom:
-        optional: true
-
-  '@clerk/shared@2.3.2':
-    resolution: {integrity: sha512-uOTYqSmxe41Ye8TnyPtthwLp5rrYK5Ze04bvl1SQzlIibr4qeLU2DXZOYibMnSWvIMwr45pXUHsJh8NfKKIZ2w==}
     engines: {node: '>=18.17.0'}
     peerDependencies:
       react: '>=18 || >=19.0.0-beta'
@@ -7124,10 +7096,6 @@ packages:
 
   '@clerk/types@4.6.1':
     resolution: {integrity: sha512-QFeNKPYDmTJ88l5QYG0SPwbABk42wRMalW3M/wAtr+wnQxBCXyX2XRZe9h4g2rH1VF+wG4Xe56abeeD+xE4iEw==}
-    engines: {node: '>=18.17.0'}
-
-  '@clerk/types@4.7.0':
-    resolution: {integrity: sha512-Gg4zEZLE7wgByMhgHMU69tkIEwfiFKNSbtRwdtAwrW+Pg0blpVpw7XuN0wHNAYFM2COrrKEUaGt8KWZmmdTFbg==}
     engines: {node: '>=18.17.0'}
 
   '@clerk/types@4.9.0':
@@ -16906,9 +16874,6 @@ packages:
 
   '@types/bcryptjs@2.4.6':
     resolution: {integrity: sha512-9xlo6R2qDs5uixm0bcIqCeMCE6HiQsIyel9KQySStiyqNl2tnj2mP3DX1Nf56MD6KMenNNlBBsy3LJ7gUEQPXQ==}
-
-  '@types/bluebird@3.5.38':
-    resolution: {integrity: sha512-yR/Kxc0dd4FfwtEoLZMoqJbM/VE/W7hXn/MIjb+axcwag0iFmSPK7OBUZq1YWLynJUoWQkfUrI7T0HDqGApNSg==}
 
   '@types/body-parser@1.19.2':
     resolution: {integrity: sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==}
@@ -42922,14 +42887,6 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       tslib: 2.4.1
 
-  '@clerk/clerk-react@5.2.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@clerk/shared': 2.3.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@clerk/types': 4.7.0
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      tslib: 2.4.1
-
   '@clerk/clerk-sdk-node@5.0.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@clerk/backend': 1.4.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -42943,17 +42900,6 @@ snapshots:
   '@clerk/shared@2.11.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@clerk/types': 4.30.0
-      glob-to-regexp: 0.4.1
-      js-cookie: 3.0.5
-      std-env: 3.7.0
-      swr: 2.2.5(react@18.3.1)
-    optionalDependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-
-  '@clerk/shared@2.3.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@clerk/types': 4.7.0
       glob-to-regexp: 0.4.1
       js-cookie: 3.0.5
       std-env: 3.7.0
@@ -42998,10 +42944,6 @@ snapshots:
       csstype: 3.1.1
 
   '@clerk/types@4.6.1':
-    dependencies:
-      csstype: 3.1.1
-
-  '@clerk/types@4.7.0':
     dependencies:
       csstype: 3.1.1
 
@@ -57237,8 +57179,6 @@ snapshots:
   '@types/bcrypt@3.0.1': {}
 
   '@types/bcryptjs@2.4.6': {}
-
-  '@types/bluebird@3.5.38': {}
 
   '@types/body-parser@1.19.2':
     dependencies:

@@ -57,15 +57,23 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
   const { currentEnvironment } = useEnvironment();
   const { workflowSlug } = useParams<{ workflowSlug?: string }>();
   const navigate = useNavigate();
-  const form = useForm<z.infer<typeof workflowSchema>>({ mode: 'onSubmit', resolver: zodResolver(workflowSchema) });
+
+  const { workflow, error } = useFetchWorkflow({
+    workflowSlug,
+  });
+  const defaultFormValues = useMemo(
+    () => ({ ...workflow, steps: workflow?.steps.map((step) => ({ ...step })) }),
+    [workflow]
+  );
+  const form = useForm<z.infer<typeof workflowSchema>>({
+    mode: 'onSubmit',
+    resolver: zodResolver(workflowSchema),
+    defaultValues: defaultFormValues,
+  });
   const { reset, setError } = form;
   const steps = useFieldArray({
     control: form.control,
     name: 'steps',
-  });
-
-  const { workflow, error } = useFetchWorkflow({
-    workflowSlug,
   });
   const isReadOnly = workflow?.origin === WorkflowOriginEnum.EXTERNAL;
 
@@ -79,8 +87,8 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
       return;
     }
 
-    reset({ ...workflow, steps: workflow.steps.map((step) => ({ ...step })) });
-  }, [workflow, error, navigate, reset, currentEnvironment]);
+    reset(defaultFormValues);
+  }, [workflow, defaultFormValues, error, navigate, reset, currentEnvironment]);
 
   const { updateWorkflow, isPending } = useUpdateWorkflow({
     onSuccess: (data) => {

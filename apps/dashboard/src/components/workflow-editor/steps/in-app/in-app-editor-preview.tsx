@@ -7,24 +7,18 @@ import { Button } from '@/components/primitives/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/primitives/collapsible';
 import { Editor } from '@/components/primitives/editor';
 import { InAppPreview } from '@/components/workflow-editor/in-app-preview';
-import { usePreviewStep } from '@/hooks/use-preview-step';
+import { GeneratePreviewResponseDto } from '@novu/shared';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
-import { useFormContext } from 'react-hook-form';
-import { useParams } from 'react-router-dom';
 
 type InAppEditorPreviewProps = {
   value: string;
   onChange: (value: string) => void;
+  previewData?: GeneratePreviewResponseDto;
+  applyPreview: () => void;
 };
 export const InAppEditorPreview = (props: InAppEditorPreviewProps) => {
-  const { value, onChange } = props;
+  const { value, onChange, previewData, applyPreview } = props;
   const [isEditorOpen, setIsEditorOpen] = useState(true);
-  const { previewStep, data } = usePreviewStep();
-  const { workflowSlug = '', stepSlug = '' } = useParams<{
-    workflowSlug: string;
-    stepSlug: string;
-  }>();
-  const form = useFormContext();
   const [payloadError, setPayloadError] = useState('');
 
   return (
@@ -68,11 +62,7 @@ export const InAppEditorPreview = (props: InAppEditorPreviewProps) => {
             className="self-end"
             onClick={() => {
               try {
-                previewStep({
-                  workflowSlug,
-                  stepSlug,
-                  data: { controlValues: form.getValues(), previewPayload: JSON.parse(value) },
-                });
+                applyPreview();
               } catch (e) {
                 setPayloadError(String(e));
               }
@@ -83,7 +73,7 @@ export const InAppEditorPreview = (props: InAppEditorPreviewProps) => {
         </CollapsibleContent>
       </Collapsible>
 
-      {data && <InAppPreview data={data} />}
+      {previewData && <InAppPreview data={previewData} />}
     </div>
   );
 };

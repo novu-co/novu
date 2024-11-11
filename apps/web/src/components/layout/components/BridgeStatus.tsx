@@ -2,6 +2,7 @@ import { Badge, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { Popover } from '@novu/design-system';
 import { useDisclosure } from '@mantine/hooks';
+import type { HealthCheck } from '@novu/framework/internal';
 import { api } from '../../../api/api.client';
 import { useEnvironment } from '../../../hooks';
 import { IS_SELF_HOSTED } from '../../../config';
@@ -11,11 +12,7 @@ export function BridgeStatus() {
 
   const { environment } = useEnvironment();
   const isBridgeEnabled = !!environment?.echo?.url && !IS_SELF_HOSTED;
-  const { data, error, isInitialLoading } = useQuery<{
-    status: 'ok' | 'down';
-    version: string;
-    discovered: { workflows: number };
-  }>(
+  const { data, error, isInitialLoading } = useQuery<HealthCheck>(
     ['/v1/bridge/status'],
     () => {
       return api.get('/v1/bridge/status');

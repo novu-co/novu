@@ -1,8 +1,6 @@
 import * as z from 'zod';
-import { UiSchema, WorkflowTestDataResponseDto } from '@novu/shared';
+import { JSONSchemaDto, UiSchema } from '@novu/shared';
 import { capitalize } from './string';
-
-type JSONSchema = WorkflowTestDataResponseDto['to'];
 
 type ZodValue =
   | z.AnyZodObject
@@ -97,7 +95,7 @@ const handleStringType = ({
  * The function will recursively build the schema based on the JSONSchema object.
  * It removes empty strings and objects with empty required fields during the transformation phase after parsing.
  */
-export const buildDynamicZodSchema = (obj: JSONSchema): z.AnyZodObject => {
+export const buildDynamicZodSchema = (obj: JSONSchemaDto): z.AnyZodObject => {
   const properties = typeof obj === 'object' ? (obj.properties ?? {}) : {};
   const requiredFields = typeof obj === 'object' ? (obj.required ?? []) : [];
 
@@ -114,7 +112,7 @@ export const buildDynamicZodSchema = (obj: JSONSchema): z.AnyZodObject => {
     if (type === 'object') {
       zodValue = buildDynamicZodSchema(jsonSchemaProp);
       if (defaultValue) {
-        zodValue = zodValue.default(defaultValue);
+        zodValue = zodValue.default(defaultValue as object);
       }
       zodValue = zodValue.transform((val) => {
         const hasAnyRequiredEmpty = required?.some((field) => val[field] === '' || val[field] === undefined);

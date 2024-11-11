@@ -1,7 +1,12 @@
-import { JSONSchema } from 'json-schema-to-ts';
 import { Injectable } from '@nestjs/common';
 import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
-import { ControlValuesLevelEnum, StepTypeEnum, UserSessionData, WorkflowTestDataResponseDto } from '@novu/shared';
+import {
+  ControlValuesLevelEnum,
+  JSONSchemaDto,
+  StepTypeEnum,
+  UserSessionData,
+  WorkflowTestDataResponseDto,
+} from '@novu/shared';
 
 import { WorkflowTestDataCommand } from './test-data.command';
 import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
@@ -81,7 +86,7 @@ const buildToFieldSchema = ({ user, steps }: { user: UserSessionData; steps: Not
     },
     required: ['subscriberId', ...(isEmailExist ? ['email'] : []), ...(isSmsExist ? ['phone'] : [])],
     additionalProperties: false,
-  } as const satisfies JSONSchema;
+  } as const satisfies JSONSchemaDto;
 };
 
 function isContainsStepType(steps: NotificationStepEntity[], type: StepTypeEnum) {

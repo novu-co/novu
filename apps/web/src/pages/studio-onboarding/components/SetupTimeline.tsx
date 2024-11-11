@@ -4,7 +4,7 @@ import { IconCheck } from '@novu/novui/icons';
 import { Text } from '@novu/novui';
 import { css } from '@novu/novui/css';
 import { useColorScheme } from '@novu/design-system';
-import { BridgeStatus } from '../../../bridgeApi/bridgeApi.client';
+import type { HealthCheck } from '@novu/framework/internal';
 import { CodeSnippet } from '../../get-started/legacy-onboarding/components/CodeSnippet';
 import { useStudioState } from '../../../studio/StudioStateProvider';
 import { timelineRecipe } from './SetupTimeline.recipe';
@@ -20,7 +20,7 @@ const Icon = () => (
   />
 );
 
-export const SetupTimeline = ({ testResponse }: { testResponse: { isLoading: boolean; data: BridgeStatus } }) => {
+export const SetupTimeline = ({ testResponse }: { testResponse: { isLoading: boolean; data: HealthCheck } }) => {
   const { devSecretKey } = useStudioState();
   const [active, setActive] = useState(0);
   const { colorScheme } = useColorScheme();

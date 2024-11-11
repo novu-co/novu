@@ -1,12 +1,11 @@
 import { IsDefined, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
-import { JsonSchema } from '@novu/framework/internal';
 import { EnvironmentWithUserCommand, IStepControl } from '@novu/application-generic';
-import { StepType } from '@novu/shared';
+import type { JSONSchemaDto, StepType } from '@novu/shared';
 
 interface IStepOutput {
-  schema: JsonSchema;
+  schema: JSONSchemaDto;
 }
 
 interface IWorkflowDefineStep {
