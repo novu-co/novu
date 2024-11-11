@@ -6,7 +6,7 @@ import { useNewDashboardOptIn } from '../../../hooks/useNewDashboardOptIn';
 import { useFeatureFlag } from '../../../hooks';
 
 export function UserProfileButton() {
-  const { optIn } = useNewDashboardOptIn();
+  const { redirectToNewDashboard } = useNewDashboardOptIn();
   const isNewDashboardEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ENABLED);
 
   return (
@@ -16,7 +16,7 @@ export function UserProfileButton() {
           <UserButton.Action
             label="Try out the new dashboard (beta)"
             labelIcon={<IconBolt size="16" color="var(--nv-colors-typography-text-main)" />}
-            onClick={optIn}
+            onClick={redirectToNewDashboard}
           />
         </UserButton.MenuItems>
       )}
