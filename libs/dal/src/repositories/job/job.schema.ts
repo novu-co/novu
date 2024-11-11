@@ -128,14 +128,11 @@ const jobSchema = new Schema<JobDBModel>(
     actorId: {
       type: Schema.Types.String,
     },
-    expireAt: Schema.Types.Date,
     stepOutput: Schema.Types.Mixed,
     preferences: Schema.Types.Mixed,
   },
   schemaOptions
 );
-
-jobSchema.index({ expireAt: 1 }, getTTLOptions());
 
 jobSchema.virtual('executionDetails', {
   ref: 'ExecutionDetails',
