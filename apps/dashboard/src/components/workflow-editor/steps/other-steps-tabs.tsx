@@ -22,7 +22,7 @@ import { CustomStepControls } from './controls/custom-step-controls';
 const tabsContentClassName = 'h-full w-full px-3 py-3.5';
 
 export const OtherStepTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; step: StepDataDto }) => {
-  const { stepSlug = '', workflowSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
+  const { stepSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
   const { dataSchema, uiSchema } = step.controls;
   const navigate = useNavigate();
   const schema = buildDynamicZodSchema(dataSchema ?? {});
