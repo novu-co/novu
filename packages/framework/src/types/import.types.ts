@@ -12,9 +12,10 @@ export type ImportRequirement = {
    */
   name: string;
   /**
-   * The import of the dependency. An explicit `import('module-name')` call with a static module string
-   * is necessary to ensure that the bundler will make the dependency available for usage during tree-shaking.
-   * Without a static string, tree-shaking may aggressively remove the import, making it unavailable.
+   * The import statement for the required dependency. An explicit `import('module-name')`
+   * call with a static module string is necessary to ensure that the bundler will make
+   * the dependency available for usage after tree-shaking. Without a static string,
+   * tree-shaking may aggressively remove the import, making it unavailable.
    *
    * This syntax is required during synchronous declaration (e.g. on a class property),
    * but should only be awaited when you can handle a runtime import error.
