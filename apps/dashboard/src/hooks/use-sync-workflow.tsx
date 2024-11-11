@@ -2,7 +2,7 @@ import { getV2, NovuApiError } from '@/api/api.client';
 import { syncWorkflow } from '@/api/workflows';
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { showToast } from '@/components/primitives/sonner-helpers';
-import { SuccessToast } from '@/components/sucess-toast';
+import { SuccessButtonToast } from '@/components/sucess-button-toast';
 import { useEnvironment } from '@/context/environment/hooks';
 import type { IEnvironment, WorkflowListResponseDto, WorkflowResponseDto } from '@novu/shared';
 import { WorkflowOriginEnum, WorkflowStatusEnum } from '@novu/shared';
@@ -64,7 +64,7 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
       variant: 'lg',
       className: 'gap-3',
       children: ({ close }) => (
-        <SuccessToast
+        <SuccessButtonToast
           title={`Workflow synced to ${environment?.name}`}
           description={`Workflow '${workflow.name}' has been successfully synced to ${environment?.name}.`}
           actionLabel={`Switch to ${environment?.name}`}

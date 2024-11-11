@@ -6,11 +6,11 @@ interface SuccessToastProps {
   title: string;
   description: string;
   actionLabel: string;
-  onAction?: () => void;
+  onAction: () => void;
   onClose: () => void;
 }
 
-export function SuccessToast({ title, description, actionLabel, onAction, onClose }: SuccessToastProps) {
+export function SuccessButtonToast({ title, description, actionLabel, onAction, onClose }: SuccessToastProps) {
   return (
     <>
       <ToastIcon variant="default" />
