@@ -1,7 +1,7 @@
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type WorkflowResponseDto, type StepDataDto, type StepUpdateDto } from '@novu/shared';
 
@@ -16,11 +16,15 @@ import { buildDynamicZodSchema, buildDefaultValues } from '@/utils/schema';
 import { InAppEditor } from '@/components/workflow-editor/steps/in-app/in-app-editor';
 import { showToast } from '@/components/primitives/sonner-helpers';
 import { ToastIcon } from '@/components/primitives/sonner';
+import { useState } from 'react';
+import { usePreviewStep } from '@/hooks/use-preview-step';
+import useDebouncedEffect from '@/hooks/use-debounced-effect';
+import { CustomStepControls } from '../controls/custom-step-controls';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5';
 
 export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; step: StepDataDto }) => {
-  const { stepSlug = '' } = useParams<{ stepSlug: string }>();
+  const { stepSlug = '', workflowSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
   const { dataSchema, uiSchema } = step.controls;
   const navigate = useNavigate();
   const schema = buildDynamicZodSchema(dataSchema ?? {});
@@ -31,8 +35,10 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
     defaultValues: buildDefaultValues(uiSchema ?? {}),
     values: step.controls.values,
   });
+  const [editorValue, setEditorValue] = useState('{}');
   const { reset, formState } = form;
 
+  const { previewStep } = usePreviewStep();
   const { updateWorkflow } = useUpdateWorkflow({
     onSuccess: () => {
       showToast({
@@ -81,6 +87,30 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
     reset({ ...data });
   };
 
+  const preview = async (props: {
+    controlValues: Record<string, unknown>;
+    previewPayload: Record<string, unknown>;
+  }) => {
+    const res = await previewStep({
+      workflowSlug,
+      stepSlug,
+      data: { controlValues: props.controlValues, previewPayload: props.previewPayload },
+    });
+    setEditorValue(JSON.stringify(res.previewPayloadExample, null, 2));
+  };
+
+  const formValues = useWatch(form);
+  useDebouncedEffect(
+    () => {
+      preview({
+        controlValues: form.getValues() as Record<string, unknown>,
+        previewPayload: JSON.parse(editorValue),
+      });
+    },
+    2000,
+    [formValues]
+  );
+
   return (
     <Form {...form}>
       <form
@@ -126,9 +156,10 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
           <Separator />
           <TabsContent value="editor" className={tabsContentClassName}>
             <InAppEditor uiSchema={uiSchema} />
+            <CustomStepControls dataSchema={dataSchema} />
           </TabsContent>
           <TabsContent value="preview" className={tabsContentClassName}>
-            <InAppEditorPreview />
+            <InAppEditorPreview value={editorValue} onChange={setEditorValue} />
           </TabsContent>
           <Separator />
           <footer className="flex justify-end px-3 py-3.5">

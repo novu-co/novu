@@ -1,6 +1,4 @@
-import { SoftDeleteModel } from 'mongoose-delete';
 import { FilterQuery } from 'mongoose';
-
 import { EnvironmentId, ISubscribersDefine, OrganizationId } from '@novu/shared';
 import { SubscriberDBModel, SubscriberEntity } from './subscriber.entity';
 import { Subscriber } from './subscriber.schema';
@@ -10,14 +8,10 @@ import { DalException } from '../../shared';
 import type { EnforceEnvOrOrgIds } from '../../types';
 
 type SubscriberQuery = FilterQuery<SubscriberDBModel> & EnforceEnvOrOrgIds;
-type SubscriberDeleteQuery = Pick<SubscriberQuery, 'subscriberId' | '_environmentId'> & EnforceEnvOrOrgIds;
-type SubscriberDeleteManyQuery = Pick<SubscriberQuery, 'subscriberId' | '_id' | '_environmentId'> & EnforceEnvOrOrgIds;
 
 export class SubscriberRepository extends BaseRepository<SubscriberDBModel, SubscriberEntity, EnforceEnvOrOrgIds> {
-  private subscriber: SoftDeleteModel;
   constructor() {
     super(Subscriber, SubscriberEntity);
-    this.subscriber = Subscriber;
   }
 
   async findBySubscriberId(
@@ -158,7 +152,7 @@ export class SubscriberRepository extends BaseRepository<SubscriberDBModel, Subs
   }
 
   async estimatedDocumentCount(): Promise<number> {
-    return this.subscriber.estimatedDocumentCount();
+    return this._model.estimatedDocumentCount();
   }
 }
 

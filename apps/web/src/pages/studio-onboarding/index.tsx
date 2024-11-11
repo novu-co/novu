@@ -3,13 +3,13 @@ import { useEffect } from 'react';
 import { Title, Text } from '@novu/novui';
 import { VStack } from '@novu/novui/jsx';
 import { useNavigate } from 'react-router-dom';
+import { HealthCheck } from '@novu/framework/internal';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { SetupTimeline } from './components/SetupTimeline';
 import { Wrapper } from './components/Wrapper';
 import { ROUTES } from '../../constants/routes';
 import { useHealthCheck } from '../../studio/hooks/useBridgeAPI';
-import { BridgeStatus } from '../../bridgeApi/bridgeApi.client';
 import { useStudioState } from '../../studio/StudioStateProvider';
 import { capitalizeFirstLetter } from '../../utils/string';
 import { setNovuOnboardingStepCookie } from '../../utils';
@@ -62,7 +62,7 @@ export const StudioOnboarding = () => {
             Send your first email notification, by connecting to your Novu Bridge Endpoint. This setup will create a
             sample Next.js project with a pre-configured <code>@novu/framework</code>.
           </Text>
-          <SetupTimeline testResponse={{ data: data as BridgeStatus, isLoading }} />
+          <SetupTimeline testResponse={{ data: data as HealthCheck, isLoading }} />
         </div>
       </VStack>
       <Footer

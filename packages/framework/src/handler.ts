@@ -1,5 +1,3 @@
-import { createHmac } from 'node:crypto';
-
 import { Client } from './client';
 import {
   GetActionEnum,
@@ -23,7 +21,7 @@ import {
   SigningKeyNotFoundError,
 } from './errors';
 import type { Awaitable, EventTriggerParams, Workflow } from './types';
-import { initApiClient } from './utils';
+import { initApiClient, createHmacSubtle } from './utils';
 import { isPlatformError } from './errors/guard.errors';
 
 export type ServeHandlerOptions = {
@@ -148,7 +146,7 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
 
     try {
       if (action !== GetActionEnum.HEALTH_CHECK) {
-        this.validateHmac(body, signatureHeader);
+        await this.validateHmac(body, signatureHeader);
       }
 
       const postActionMap = this.getPostActionMap(body, workflowId, stepId, action);
@@ -293,7 +291,7 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
     }
   }
 
-  private validateHmac(payload: unknown, hmacHeader: string | null): void {
+  private async validateHmac(payload: unknown, hmacHeader: string | null): Promise<void> {
     if (!this.hmacEnabled) return;
     if (!hmacHeader) {
       throw new SignatureNotFoundError();
@@ -316,16 +314,12 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
       throw new SignatureExpiredError();
     }
 
-    const localHash = this.hashHmac(this.client.secretKey as string, `${timestampPayload}.${JSON.stringify(payload)}`);
+    const localHash = await createHmacSubtle(this.client.secretKey, `${timestampPayload}.${JSON.stringify(payload)}`);
 
     const isMatching = localHash === signaturePayload;
 
     if (!isMatching) {
       throw new SignatureMismatchError();
     }
-  }
-
-  private hashHmac(secretKey: string, data: string): string {
-    return createHmac('sha256', secretKey).update(data).digest('hex');
   }
 }
