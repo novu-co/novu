@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RiPlayCircleLine } from 'react-icons/ri';
 import { useForm } from 'react-hook-form';
 // eslint-disable-next-line
@@ -13,11 +13,12 @@ import { Form } from '../../primitives/form/form';
 import { Button } from '../../primitives/button';
 import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
 import { showToast } from '../../primitives/sonner-helpers';
-import { ToastClose, ToastIcon } from '../../primitives/sonner';
 import { buildDynamicFormSchema, makeObjectFromSchema, TestWorkflowFormType } from '../schema';
 import { TestWorkflowForm } from './test-workflow-form';
+import { SuccessToast } from '@/components/sucess-toast';
 
 export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataResponseDto }) => {
+  const navigate = useNavigate();
   const { environmentSlug = '', workflowSlug = '' } = useParams<{ environmentSlug: string; workflowSlug: string }>();
   const { workflow } = useFetchWorkflow({
     workflowSlug,
@@ -49,21 +50,16 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
       showToast({
         variant: 'lg',
         children: ({ close }) => (
-          <>
-            <ToastIcon variant="success" />
-            <div className="flex flex-col gap-2">
-              <span className="font-medium">Test workflow triggered successfully</span>
-              <span className="text-foreground-600">{`Test workflow ${workflowSlug} was triggered successfully`}</span>
-              <Link
-                to={`${LEGACY_ROUTES.ACTIVITY_FEED}?transactionId=${transactionId}`}
-                reloadDocument
-                className="text-foreground-950 flex items-center gap-1 text-sm font-medium"
-              >
-                View activity feed
-              </Link>
-            </div>
-            <ToastClose onClick={close} />
-          </>
+          <SuccessToast
+            title="Test workflow triggered successfully"
+            description={`Test workflow ${workflowSlug} was triggered successfully`}
+            actionLabel="View activity feed"
+            onAction={() => {
+              close();
+              navigate(buildRoute(LEGACY_ROUTES.ACTIVITY_FEED, { transactionId }));
+            }}
+            onClose={close}
+          />
         ),
         options: {
           position: 'bottom-right',

@@ -2,7 +2,7 @@ import { getV2, NovuApiError } from '@/api/api.client';
 import { syncWorkflow } from '@/api/workflows';
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { showToast } from '@/components/primitives/sonner-helpers';
-import { PromoteSuccessToast } from '@/components/promote-workflow/promote-success-toast';
+import { SuccessToast } from '@/components/sucess-toast';
 import { useEnvironment } from '@/context/environment/hooks';
 import {
   IEnvironment,
@@ -16,7 +16,7 @@ import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
-  const { oppositeEnvironment } = useEnvironment();
+  const { oppositeEnvironment, switchEnvironment } = useEnvironment();
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -68,7 +68,18 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
     return showToast({
       variant: 'lg',
       className: 'gap-3',
-      children: ({ close }) => <PromoteSuccessToast workflow={workflow} environment={environment} onClose={close} />,
+      children: ({ close }) => (
+        <SuccessToast
+          title={`Workflow synced to ${environment?.name}`}
+          description={`Workflow '${workflow.name}' has been successfully synced to ${environment?.name}.`}
+          actionLabel={`Switch to ${environment?.name}`}
+          onAction={() => {
+            close();
+            switchEnvironment(environment?.slug || '');
+          }}
+          onClose={close}
+        />
+      ),
       options: {
         position: 'bottom-right',
       },
