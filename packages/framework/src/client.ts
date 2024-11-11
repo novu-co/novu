@@ -54,8 +54,7 @@ function isRuntimeInDevelopment() {
 
 export class Client {
   private discoveredWorkflows = new Map<string, DiscoverWorkflowOutput>();
-  private addingWorkflows = new Set<string>();
-  private workflowPromises = new Map<string, Promise<void>>();
+  private discoverWorkflowPromises = new Map<string, Promise<void>>();
 
   private templateEngine = new Liquid({
     outputEscape: (output) => {
@@ -110,16 +109,15 @@ export class Client {
         continue;
       }
 
-      if (this.addingWorkflows.has(workflow.id)) {
+      const existingPromise = this.discoverWorkflowPromises.get(workflow.id);
+      if (existingPromise) {
         // Wait for the existing promise to resolve if the workflow is already being added
-        await this.workflowPromises.get(workflow.id);
+        await existingPromise;
         continue;
       }
 
-      this.addingWorkflows.add(workflow.id);
-
       const workflowPromise = this.addWorkflow(workflow);
-      this.workflowPromises.set(workflow.id, workflowPromise);
+      this.discoverWorkflowPromises.set(workflow.id, workflowPromise);
 
       await workflowPromise;
     }
@@ -131,8 +129,7 @@ export class Client {
       prettyPrintDiscovery(definition);
       this.discoveredWorkflows.set(workflow.id, definition);
     } finally {
-      this.addingWorkflows.delete(workflow.id);
-      this.workflowPromises.delete(workflow.id);
+      this.discoverWorkflowPromises.delete(workflow.id);
     }
   }
 
