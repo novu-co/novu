@@ -5,6 +5,7 @@ import {
   ChannelStep,
   DelayOutput,
   DigestOutput,
+  JsonSchema,
   Step,
   StepOptions,
   StepOutput,
@@ -178,7 +179,8 @@ export class ConstructFrameworkWorkflow {
 
   private constructCommonStepOptions(staticStep: NotificationStepEntity): Required<StepOptions> {
     return {
-      controlSchema: staticStep.template!.controls!.schema,
+      // TODO: fix the `JSONSchemaDto` type to enforce a non-primitive schema type.
+      controlSchema: staticStep.template!.controls!.schema as JsonSchema,
       /*
        * TODO: add conditions
        * Used to construct conditions defined with https://react-querybuilder.js.org/ or similar
