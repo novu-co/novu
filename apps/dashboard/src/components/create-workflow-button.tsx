@@ -93,7 +93,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
             </SheetDescription>
             <Link
               target="_blank"
-              to="https://docs.novu.co/api-reference/workflows/create-workflow"
+              to="https://docs.novu.co/concepts/workflows"
               className="text-foreground-400 flex items-center text-sm underline"
             >
               Learn more <RiExternalLinkLine className="inline size-4" />
