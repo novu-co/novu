@@ -1,5 +1,5 @@
 import { EmailProviderIdEnum } from '@novu/shared';
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 import { genericProviderSchemas } from '../generic.schema';
 import { mailgunProviderSchemas } from './mailgun.schema';
 import { mailjetProviderSchemas } from './mailjet.schema';
@@ -29,4 +29,4 @@ export const emailProviderSchemas = {
   sendinblue: genericProviderSchemas,
   ses: genericProviderSchemas,
   sparkpost: genericProviderSchemas,
-} as const satisfies Record<EmailProviderIdEnum, { output: Schema }>;
+} as const satisfies Record<EmailProviderIdEnum, { output: JsonSchema }>;

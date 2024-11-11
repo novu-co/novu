@@ -1,4 +1,4 @@
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 
 /**
  * OneSignal `POST /notifications` schema
@@ -1383,7 +1383,7 @@ const oneSignalOutputSchema = {
   ],
   required: [],
   additionalProperties: true,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 export const oneSignalProviderSchema = {
   output: oneSignalOutputSchema,

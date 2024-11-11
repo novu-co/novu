@@ -1,5 +1,5 @@
 import { PushProviderIdEnum } from '@novu/shared';
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 import { genericProviderSchemas } from '../generic.schema';
 import { apnsProviderSchemas } from './apns.schema';
 import { expoProviderSchemas } from './expo.schema';
@@ -14,4 +14,4 @@ export const pushProviderSchemas = {
   'pusher-beams': genericProviderSchemas,
   pushpad: genericProviderSchemas,
   'push-webhook': genericProviderSchemas,
-} as const satisfies Record<PushProviderIdEnum, { output: Schema }>;
+} as const satisfies Record<PushProviderIdEnum, { output: JsonSchema }>;

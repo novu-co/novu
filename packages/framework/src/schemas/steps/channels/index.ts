@@ -1,5 +1,5 @@
 import { ChannelStepEnum } from '../../../constants';
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 import { chatChannelSchemas } from './chat.schema';
 import { emailChannelSchemas } from './email.schema';
 import { inAppChannelSchemas } from './in-app.schema';
@@ -12,4 +12,4 @@ export const channelStepSchemas = {
   push: pushChannelSchemas,
   email: emailChannelSchemas,
   in_app: inAppChannelSchemas,
-} as const satisfies Record<ChannelStepEnum, { output: Schema; result: Schema }>;
+} as const satisfies Record<ChannelStepEnum, { output: JsonSchema; result: JsonSchema }>;
