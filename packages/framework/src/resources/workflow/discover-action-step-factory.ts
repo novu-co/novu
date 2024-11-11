@@ -32,7 +32,7 @@ export async function discoverActionStepFactory(
       },
       resolve: resolve as (controls: Record<string, unknown>) => Awaitable<Record<string, unknown>>,
       code: resolve.toString(),
-      options: options as StepOptions<FromSchema<Schema>, FromSchema<Schema>>,
+      options: options as StepOptions<Schema, FromSchema<Schema>>,
       providers: [],
     });
 

@@ -6,7 +6,6 @@ import type {
   StepType,
   StepOutput,
   StepOptions,
-  FromSchema,
   Schema,
 } from '../../types';
 import { transformSchema } from '../../validators';
@@ -37,7 +36,7 @@ export async function discoverCustomStepFactory(
       },
       resolve: resolve as (controls: Record<string, unknown>) => Awaitable<Record<string, unknown>>,
       code: resolve.toString(),
-      options: options as StepOptions<FromSchema<Schema>, FromSchema<Schema>>,
+      options: options as StepOptions<Schema, Record<string, unknown>>,
       providers: [],
     });
 
