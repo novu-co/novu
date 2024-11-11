@@ -1,5 +1,6 @@
 import { useUser } from '@clerk/clerk-react';
 import { NewDashboardOptInStatusEnum } from '@novu/shared';
+import { NEW_DASHBOARD_URL } from '../config';
 
 export function useNewDashboardOptIn() {
   const { user } = useUser();
@@ -22,10 +23,7 @@ export function useNewDashboardOptIn() {
   };
 
   const redirectToNewDashboard = () => {
-    const newDashboardUrl = process.env.NEW_DASHBOARD_URL;
-    if (!newDashboardUrl) return;
-
-    window.location.href = newDashboardUrl;
+    window.location.href = NEW_DASHBOARD_URL || window.location.origin;
   };
 
   const optIn = () => {
