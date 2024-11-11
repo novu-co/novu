@@ -1,9 +1,17 @@
 import type { JSONSchema, FromSchema as JsonSchemaInfer } from 'json-schema-to-ts';
 
 /**
- * A JSON schema.
+ * A minimal JSON schema type.
+ *
+ * This type is used to narrow the type of a JSON schema to a minimal type
+ * that is compatible with the `json-schema-to-ts` library.
  */
-export type JsonSchema = Exclude<JSONSchema, boolean>;
+export type JsonSchemaMinimal = { type: 'object' } | { anyOf: unknown[] } | { allOf: unknown[] } | { oneOf: unknown[] };
+
+/**
+ * A JSON schema
+ */
+export type JsonSchema = Exclude<JSONSchema, boolean> & JsonSchemaMinimal;
 
 /**
  * Infer the data type of a JsonSchema.
@@ -29,8 +37,13 @@ export type JsonSchema = Exclude<JSONSchema, boolean>;
  * type MySchema = InferJsonSchema<typeof mySchema, { validated: true }>;
  * ```
  */
-export type InferJsonSchema<T, Options extends { validated: boolean }> = T extends JsonSchema
-  ? Options['validated'] extends true
-    ? JsonSchemaInfer<T>
-    : JsonSchemaInfer<T, { keepDefaultedPropertiesOptional: true }>
-  : never;
+export type InferJsonSchema<T, Options extends { validated: boolean }> =
+  // Firstly, narrow to the minimal schema type without using the `json-schema-to-ts` import
+  T extends JsonSchemaMinimal
+    ? // Secondly, narrow to the JSON schema type to provide type-safety to `json-schema-to-ts`
+      T extends JSONSchema
+      ? Options['validated'] extends true
+        ? JsonSchemaInfer<T>
+        : JsonSchemaInfer<T, { keepDefaultedPropertiesOptional: true }>
+      : never
+    : never;

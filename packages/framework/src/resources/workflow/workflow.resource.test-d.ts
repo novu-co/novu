@@ -109,6 +109,27 @@ describe('workflow function types', () => {
       additionalProperties: false,
     } as const;
 
+    it('should infer an unknown record type when the provided schema is for a primitive type', () => {
+      const primitiveSchema = { type: 'string' } as const;
+      workflow('without-schema', async ({ step }) => {
+        await step.email(
+          'without-schema',
+          async (controls) => {
+            expectTypeOf(controls).toEqualTypeOf<Record<string, unknown>>();
+
+            return {
+              subject: 'Test subject',
+              body: 'Test body',
+            };
+          },
+          {
+            // @ts-expect-error - schema is for a primitive type
+            controlSchema: primitiveSchema,
+          }
+        );
+      });
+    });
+
     it('should infer correct types in the step controls', async () => {
       workflow('json-schema', async ({ step }) => {
         await step.email(

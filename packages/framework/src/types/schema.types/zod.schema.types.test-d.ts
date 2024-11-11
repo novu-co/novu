@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, it } from 'vitest';
 import { z } from 'zod';
-import { InferZodSchema } from './zod.schema.types';
+import { InferZodSchema, ZodSchemaMinimal } from './zod.schema.types';
 
 describe('ZodSchema', () => {
   const testSchema = z.object({
@@ -16,8 +16,18 @@ describe('ZodSchema', () => {
       }>();
     });
 
-    it('should not compile when the schema is not a ClassSchema', () => {
+    it('should not compile when the schema is not a ZodSchema', () => {
       expectTypeOf<InferZodSchema<string, { validated: true }>>().toEqualTypeOf<never>();
+    });
+
+    it('should not compile when the schema is generic', () => {
+      expectTypeOf<InferZodSchema<ZodSchemaMinimal, { validated: true }>>().toEqualTypeOf<never>();
+    });
+
+    it('should not compile when the schema is a primitive ZodSchema', () => {
+      const testPrimitiveSchema = z.string();
+
+      expectTypeOf<InferZodSchema<typeof testPrimitiveSchema, { validated: true }>>().toEqualTypeOf<never>();
     });
 
     it('should not compile when a property does not match the expected type', () => {

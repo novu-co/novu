@@ -19,8 +19,18 @@ describe('JsonSchema types', () => {
       }>();
     });
 
-    it('should not compile when the schema is not a ClassSchema', () => {
+    it('should not compile when the schema is not a JsonSchema', () => {
       expectTypeOf<InferJsonSchema<string, { validated: true }>>().toEqualTypeOf<never>();
+    });
+
+    it('should not compile when the schema is generic', () => {
+      expectTypeOf<InferJsonSchema<{}, { validated: true }>>().toEqualTypeOf<never>();
+    });
+
+    it('should not compile when the schema is a primitive JsonSchema', () => {
+      const testPrimitiveSchema = { type: 'string' } as const;
+
+      expectTypeOf<InferJsonSchema<typeof testPrimitiveSchema, { validated: true }>>().toEqualTypeOf<never>();
     });
 
     it('should not compile when a property does not match the expected type', () => {

@@ -1,10 +1,10 @@
-import type { JsonSchema, InferJsonSchema } from './json.schema.types';
-import type { ZodSchemaMinimal, InferZodSchema } from './zod.schema.types';
+import type { InferJsonSchema, JsonSchemaMinimal } from './json.schema.types';
+import type { InferZodSchema, ZodSchemaMinimal } from './zod.schema.types';
 
 /**
  * A schema used to validate a JSON object.
  */
-export type Schema = JsonSchema | ZodSchemaMinimal;
+export type Schema = JsonSchemaMinimal | ZodSchemaMinimal;
 
 /**
  * Main utility type for schema inference
@@ -14,19 +14,7 @@ export type Schema = JsonSchema | ZodSchemaMinimal;
  */
 type InferSchema<T extends Schema, Options extends { validated: boolean }> =
   | InferJsonSchema<T, Options>
-  | InferZodSchema<T, Options>
-  | never extends infer U
-  ? // Check if all inferred types are `never`
-    [U] extends [never]
-    ? // If all inferred types are `never`, return an unknown record
-      Record<string, unknown>
-    : // At this point type `U` is still unknown, so we narrow it down to an unknown record
-      U extends Record<string, unknown>
-      ? // If `U` has a record type, return it
-        U
-      : // If `U` is not a record type, fallback to an unknown record
-        Record<string, unknown>
-  : Record<string, unknown>;
+  | InferZodSchema<T, Options>;
 
 /**
  * Infer the type of a Schema for unvalidated data.
@@ -54,4 +42,4 @@ export type FromSchemaUnvalidated<T extends Schema> = InferSchema<T, { validated
  * type MySchema = FromSchema<typeof mySchema>;
  * ```
  */
-export type FromSchema<T extends Schema = Record<string, unknown>> = InferSchema<T, { validated: true }>;
+export type FromSchema<T extends Schema> = InferSchema<T, { validated: true }>;

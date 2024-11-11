@@ -1,10 +1,19 @@
 import { describe, expectTypeOf, it } from 'vitest';
 import { z } from 'zod';
-import { FromSchema, FromSchemaUnvalidated } from './base.schema.types';
+import { FromSchema, FromSchemaUnvalidated, Schema } from './base.schema.types';
 
 describe('FromSchema', () => {
-  it('should infer an unknown record type when no schema is provided', () => {
-    expectTypeOf<FromSchema<{}>>().toEqualTypeOf<Record<string, unknown>>();
+  it('should infer an unknown record type when a generic schema is provided', () => {
+    expectTypeOf<FromSchema<Schema>>().toEqualTypeOf<Record<string, unknown>>();
+  });
+
+  it('should not compile when the schema is primitive', () => {
+    const primitiveSchema = { type: 'string' } as const;
+
+    // @ts-expect-error - Type '{ type: string; }' is not assignable to type '{ type: "object"; }'.
+    type Test = FromSchema<typeof primitiveSchema>;
+
+    expectTypeOf<Test>().toEqualTypeOf<never>();
   });
 
   it('should infer a Json Schema type', () => {
@@ -31,8 +40,17 @@ describe('FromSchema', () => {
 });
 
 describe('FromSchemaUnvalidated', () => {
-  it('should infer an unknown record type when no schema is provided', () => {
-    expectTypeOf<FromSchemaUnvalidated<{}>>().toEqualTypeOf<Record<string, unknown>>();
+  it('should infer an unknown record type when a generic schema is provided', () => {
+    expectTypeOf<FromSchemaUnvalidated<Schema>>().toEqualTypeOf<Record<string, unknown>>();
+  });
+
+  it('should not compile when the schema is primitive', () => {
+    const primitiveSchema = { type: 'string' } as const;
+
+    // @ts-expect-error - Type '{ type: string; }' is not assignable to type '{ type: "object"; }'.
+    type Test = FromSchemaUnvalidated<typeof primitiveSchema>;
+
+    expectTypeOf<Test>().toEqualTypeOf<never>();
   });
 
   it('should infer a Json Schema type', () => {
