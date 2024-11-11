@@ -59,10 +59,10 @@ export type StepDto = {
 };
 
 export type WorkflowCommonsFields = {
-  tags: string[];
-  active?: boolean;
   name: string;
   description?: string;
+  tags?: string[];
+  active?: boolean;
 };
 
 export type PreferencesResponseDto = {

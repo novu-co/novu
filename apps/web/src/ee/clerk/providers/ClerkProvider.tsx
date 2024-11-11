@@ -68,6 +68,13 @@ const CLERK_MODAL_ELEMENT = {
     borderStyle: 'none',
     borderWidth: '0 !important',
   },
+  userButtonPopoverCustomItemButton: {
+    fontWeight: 'var(--nv-font-weights-strong)',
+    lineHeight: 'var(--nv-line-heights-125)',
+    color: 'var(--nv-colors-typography-text-main)',
+    borderStyle: 'none',
+    borderWidth: '0 !important',
+  },
   /*
    * PLAT-146 this should be uncommented when the linked task is done
    * button__manageAccount: {

@@ -1427,6 +1427,8 @@ describe('Novu-Hosted Bridge Trigger', () => {
 
   it('should execute a Novu-managed workflow', async () => {
     const createWorkflowDto: CreateWorkflowDto = {
+      tags: [],
+      active: true,
       name: 'Test Workflow',
       description: 'Test Workflow',
       __source: WorkflowCreationSourceEnum.DASHBOARD,

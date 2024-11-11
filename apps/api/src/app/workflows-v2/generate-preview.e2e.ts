@@ -237,6 +237,7 @@ describe('Generate Preview', () => {
   }
   async function createWorkflowWithDigest() {
     const createWorkflowDto: CreateWorkflowDto = {
+      tags: [],
       __source: WorkflowCreationSourceEnum.EDITOR,
       name: 'John',
       workflowId: `john:${randomUUID()}`,
