@@ -348,6 +348,15 @@ export class BaseRepository<T_DBModel, T_MappedEntity, T_Enforcement> {
     return plainToInstance<T_MappedEntity, T_MappedEntity[]>(this.entity, JSON.parse(JSON.stringify(data)));
   }
 
+  /*
+   * Note about parallelism in transactions
+   *
+   * Running operations in parallel is not supported during a transaction.
+   * The use of Promise.all, Promise.allSettled, Promise.race, etc. to parallelize operations
+   * inside a transaction is undefined behaviour and should be avoided.
+   *
+   * Refer to https://mongoosejs.com/docs/transactions.html#note-about-parallelism-in-transactions
+   */
   async withTransaction(fn: Parameters<ClientSession['withTransaction']>[0]) {
     return (await this._model.db.startSession()).withTransaction(fn);
   }

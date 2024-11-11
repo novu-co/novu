@@ -37,6 +37,8 @@ export class DeleteWorkflowUseCase {
       }),
     );
 
+    await this.invalidateCacheForWorkflow(workflowEntity, command);
+
     await this.deleteRelatedEntities(command, workflowEntity);
   }
 
@@ -44,32 +46,43 @@ export class DeleteWorkflowUseCase {
     command: DeleteWorkflowCommand,
     workflow: NotificationTemplateEntity,
   ) {
-    await this.deleteControlValues(command, workflow);
-    await this.deleteMessageTemplates(workflow, command);
-    await this.deletePreferences(command, workflow);
-    await this.invalidateCacheForWorkflow(workflow, command);
-    await this.deleteWorkflow(command, workflow);
-  }
+    await this.notificationTemplateRepository.withTransaction(async () => {
+      await this.controlValuesRepository.deleteMany({
+        _environmentId: command.environmentId,
+        _organizationId: command.organizationId,
+        _workflowId: workflow._id,
+      });
 
-  private async deleteWorkflow(
-    command: DeleteWorkflowCommand,
-    workflow: NotificationTemplateEntity,
-  ) {
-    await this.notificationTemplateRepository.delete({
-      _id: workflow._id,
-      _organizationId: command.organizationId,
-      _environmentId: command.environmentId,
-    });
-  }
+      if (workflow.steps.length > 0) {
+        for (const step of workflow.steps) {
+          await this.messageTemplateRepository.deleteById({
+            _id: step._templateId,
+            _environmentId: command.environmentId,
+          });
+        }
+      }
 
-  private async deleteControlValues(
-    command: DeleteWorkflowCommand,
-    workflow: NotificationTemplateEntity,
-  ) {
-    await this.controlValuesRepository.deleteMany({
-      _environmentId: command.environmentId,
-      _organizationId: command.organizationId,
-      _workflowId: workflow._id,
+      if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
+        return await this.preferencesRepository.delete({
+          _environmentId: command.environmentId,
+          _organizationId: command.organizationId,
+          _templateId: workflow._id,
+          type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
+        });
+      } else if (this.isNovuCloud(workflow)) {
+        return await this.preferencesRepository.delete({
+          _environmentId: command.environmentId,
+          _organizationId: command.organizationId,
+          _templateId: workflow._id,
+          type: PreferencesTypeEnum.USER_WORKFLOW,
+        });
+      }
+
+      await this.notificationTemplateRepository.delete({
+        _id: workflow._id,
+        _organizationId: command.organizationId,
+        _environmentId: command.environmentId,
+      });
     });
   }
 
@@ -92,45 +105,10 @@ export class DeleteWorkflowUseCase {
     });
   }
 
-  private async deletePreferences(
-    command: DeleteWorkflowCommand,
-    workflow: NotificationTemplateEntity,
-  ) {
-    if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
-      return await this.preferencesRepository.delete({
-        _environmentId: command.environmentId,
-        _organizationId: command.organizationId,
-        _templateId: workflow._id,
-        type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
-      });
-    } else if (this.isNovuCloud(workflow)) {
-      return await this.preferencesRepository.delete({
-        _environmentId: command.environmentId,
-        _organizationId: command.organizationId,
-        _templateId: workflow._id,
-        type: PreferencesTypeEnum.USER_WORKFLOW,
-      });
-    }
-  }
-
   private isNovuCloud(workflow: NotificationTemplateEntity) {
     return (
       workflow.origin === WorkflowOriginEnum.NOVU_CLOUD ||
       workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1
     );
-  }
-
-  private async deleteMessageTemplates(
-    workflow: NotificationTemplateEntity,
-    command: DeleteWorkflowCommand,
-  ) {
-    if (workflow.steps.length > 0) {
-      for (const step of workflow.steps) {
-        await this.messageTemplateRepository.deleteById({
-          _id: step._templateId,
-          _environmentId: command.environmentId,
-        });
-      }
-    }
   }
 }
