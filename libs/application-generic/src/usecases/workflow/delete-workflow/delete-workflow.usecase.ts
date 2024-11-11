@@ -63,14 +63,14 @@ export class DeleteWorkflowUseCase {
       }
 
       if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
-        return await this.preferencesRepository.delete({
+        await this.preferencesRepository.delete({
           _environmentId: command.environmentId,
           _organizationId: command.organizationId,
           _templateId: workflow._id,
           type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
         });
       } else if (this.isNovuCloud(workflow)) {
-        return await this.preferencesRepository.delete({
+        await this.preferencesRepository.delete({
           _environmentId: command.environmentId,
           _organizationId: command.organizationId,
           _templateId: workflow._id,
