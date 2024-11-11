@@ -211,17 +211,19 @@ export const CustomNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.CUSTOM];
 
   return (
-    <StepNode data={data}>
-      <NodeHeader type={StepTypeEnum.CUSTOM}>
-        <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.CUSTOM]}>
-          <Icon />
-        </NodeIcon>
-        <NodeName>{data.name || 'Custom Step'}</NodeName>
-      </NodeHeader>
-      <NodeBody>Executes the business logic in your bridge application</NodeBody>
-      <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
-      <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-    </StepNode>
+    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
+      <StepNode data={data}>
+        <NodeHeader type={StepTypeEnum.CUSTOM}>
+          <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.CUSTOM]}>
+            <Icon />
+          </NodeIcon>
+          <NodeName>{data.name || 'Custom Step'}</NodeName>
+        </NodeHeader>
+        <NodeBody>Executes the business logic in your bridge application</NodeBody>
+        <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
+        <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
+      </StepNode>
+    </Link>
   );
 };
 
