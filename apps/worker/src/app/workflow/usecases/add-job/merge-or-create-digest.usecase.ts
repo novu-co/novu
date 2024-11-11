@@ -121,7 +121,6 @@ export class MergeOrCreateDigest {
         {
           $set: {
             _digestedNotificationId: activeNotificationId,
-            expireAt: job.expireAt,
           },
         }
       ),
