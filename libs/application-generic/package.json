@@ -1,6 +1,6 @@
 {
   "name": "@novu/application-generic",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Generic backend code used inside of Novu's different services",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -45,11 +45,11 @@
     "@google-cloud/storage": "^6.2.3",
     "@hokify/agenda": "^6.3.0",
     "@novu/dal": "workspace:*",
+    "@novu/framework": "workspace:*",
     "@novu/providers": "workspace:*",
     "@novu/shared": "workspace:*",
     "@novu/stateless": "workspace:*",
     "@novu/testing": "workspace:*",
-    "@novu/framework": "workspace:*",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/auto-instrumentations-node": "^0.40.2",
     "@opentelemetry/context-async-hooks": "~1.19.0",
@@ -83,6 +83,7 @@
     "launchdarkly-node-server-sdk": "^7.0.1",
     "lodash": "^4.17.15",
     "mixpanel": "^0.17.0",
+    "nanoid": "^3.1.20",
     "nestjs-otel": "6.1.1",
     "nestjs-pino": "4.1.0",
     "node-fetch": "^3.2.10",
@@ -93,7 +94,6 @@
     "rrule": "^2.7.2",
     "rxjs": "7.8.1",
     "sanitize-html": "^2.4.0",
-    "nanoid": "^3.1.20",
     "shortid": "^2.2.16"
   },
   "optionalDependencies": {

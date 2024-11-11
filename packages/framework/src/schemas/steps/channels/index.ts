@@ -7,9 +7,9 @@ import { pushChannelSchemas } from './push.schema';
 import { smsChannelSchemas } from './sms.schema';
 
 export const channelStepSchemas = {
-  [ChannelStepEnum.CHAT]: chatChannelSchemas,
-  [ChannelStepEnum.SMS]: smsChannelSchemas,
-  [ChannelStepEnum.PUSH]: pushChannelSchemas,
-  [ChannelStepEnum.EMAIL]: emailChannelSchemas,
-  [ChannelStepEnum.IN_APP]: inAppChannelSchemas,
-} satisfies Record<ChannelStepEnum, { output: Schema; result: Schema }>;
+  chat: chatChannelSchemas,
+  sms: smsChannelSchemas,
+  push: pushChannelSchemas,
+  email: emailChannelSchemas,
+  in_app: inAppChannelSchemas,
+} as const satisfies Record<ChannelStepEnum, { output: Schema; result: Schema }>;
