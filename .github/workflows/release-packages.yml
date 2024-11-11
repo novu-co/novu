@@ -1,0 +1,20 @@
+name: Release Please for Framework
+
+on:
+  push:
+    branches:
+      - main
+      - 'add-framework-release-workflow'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          release-type: node
+          path: packages/framework
