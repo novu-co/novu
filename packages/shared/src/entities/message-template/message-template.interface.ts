@@ -1,5 +1,3 @@
-import type { JSONSchema } from 'json-schema-to-ts';
-
 import {
   ChannelCTATypeEnum,
   EnvironmentId,
@@ -11,7 +9,7 @@ import {
 } from '../../types';
 import { TriggerContextTypeEnum } from '../notification-template';
 import { IActor } from '../messages';
-import { UiSchema } from '../../dto';
+import type { JSONSchemaDto, UiSchema } from '../../dto';
 
 export type MessageTemplateContentType = 'editor' | 'customHtml';
 
@@ -45,14 +43,14 @@ export interface IMessageTemplate {
   actor?: IActor;
   controls?: ControlSchemas;
   output?: {
-    schema: JSONSchema;
+    schema: JSONSchemaDto;
   };
   code?: string;
   createdAt?: string;
   updatedAt?: string;
 }
 export class ControlSchemas {
-  schema: JSONSchema;
+  schema: JSONSchemaDto;
   uiSchema?: UiSchema;
 }
 export const TemplateSystemVariables = ['subscriber', 'step', 'branding', 'tenant', 'preheader', 'actor'];

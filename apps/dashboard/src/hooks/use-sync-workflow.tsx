@@ -4,13 +4,8 @@ import { ConfirmationModal } from '@/components/confirmation-modal';
 import { showToast } from '@/components/primitives/sonner-helpers';
 import { SuccessToast } from '@/components/sucess-toast';
 import { useEnvironment } from '@/context/environment/hooks';
-import {
-  IEnvironment,
-  WorkflowListResponseDto,
-  WorkflowOriginEnum,
-  WorkflowResponseDto,
-  WorkflowStatusEnum,
-} from '@novu/shared';
+import type { IEnvironment, WorkflowListResponseDto, WorkflowResponseDto } from '@novu/shared';
+import { WorkflowOriginEnum, WorkflowStatusEnum } from '@novu/shared';
 import { useMutation } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';

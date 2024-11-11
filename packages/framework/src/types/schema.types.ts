@@ -1,7 +1,7 @@
 import type { JSONSchema, FromSchema as JsonSchemaInfer } from 'json-schema-to-ts';
 import zod from 'zod';
 
-export type JsonSchema = JSONSchema;
+export type JsonSchema = Exclude<JSONSchema, boolean>;
 
 /**
  * A schema used to validate a JSON object.
