@@ -198,7 +198,7 @@ describe('workflow function types', () => {
         );
       });
 
-      it('should infer an unknown record type in the custom step results', async () => {
+      it('should infer the correct types in the custom step results', async () => {
         workflow('without-schema', async ({ step }) => {
           const result = await step.custom(
             'without-schema',
