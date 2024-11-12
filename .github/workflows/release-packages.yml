@@ -1,4 +1,4 @@
-name: Release Please for Framework
+name: Publish Packages
 
 on:
   push:
@@ -16,5 +16,5 @@ jobs:
     steps:
       - uses: googleapis/release-please-action@v4
         with:
-          release-type: node
-          path: packages/framework
+          config-file: .release-please-config.json
+          manifest-file: .release-please-manifest.json
