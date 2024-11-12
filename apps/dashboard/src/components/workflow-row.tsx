@@ -82,13 +82,24 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
       <TableCell>
         <WorkflowTags tags={workflow.tags || []} />
       </TableCell>
-      <TableCell className="text-foreground-600 text-sm font-medium">
-        {new Date(workflow.updatedAt).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-        })}
-      </TableCell>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <TableCell className="text-foreground-600 text-sm font-medium">
+              {new Date(workflow.updatedAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })}
+            </TableCell>
+          </TooltipTrigger>
+          <TooltipPortal>
+            <TooltipContent>{new Date(workflow.updatedAt).toUTCString()}</TooltipContent>
+          </TooltipPortal>
+        </Tooltip>
+      </TooltipProvider>
+
       <TableCell className="w-1">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

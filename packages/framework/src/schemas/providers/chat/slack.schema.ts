@@ -1,4 +1,4 @@
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 
 /**
  * Slack message payload schema
@@ -41,7 +41,7 @@ const slackOutputSchema = {
     },
   },
   additionalProperties: true,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 export const slackProviderSchemas = {
   output: slackOutputSchema,

@@ -20,12 +20,13 @@ export async function discoverProviders(
 ): Promise<void> {
   const channelSchemas = providerSchemas[channelType];
 
-  Object.entries(providers).forEach(async ([type, resolve]) => {
+  const providerPromises = Object.entries(providers).map(async ([type, resolve]) => {
     // eslint-disable-next-line multiline-comment-style
     // TODO: fix the typing for `type` to use the keyof providerSchema[channelType]
     // @ts-expect-error - Element implicitly has an 'any' type because expression of type 'string' can't be used to index type
     const schemas = channelSchemas[type];
-    step.providers.push({
+
+    return {
       type,
       code: resolve.toString(),
       resolve,
@@ -33,6 +34,8 @@ export async function discoverProviders(
         schema: await transformSchema(schemas.output),
         unknownSchema: schemas.output,
       },
-    });
+    };
   });
+
+  step.providers.push(...(await Promise.all(providerPromises)));
 }

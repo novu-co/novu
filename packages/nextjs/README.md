@@ -1,6 +1,6 @@
-# Novu's NextJS SDK for <Inbox />.
+# Novu's NextJS SDK for `<Inbox />`.
 
-Novu provides the `@novu/nextjs` library that helps to add a fully functioning <Inbox /> to your web application in minutes.
+Novu provides the `@novu/nextjs` library that helps to add a fully functioning `<Inbox />` to your web application in minutes.
 See full documentation [here](https://docs.novu.co/inbox/react/get-started).
 
 ## Installation

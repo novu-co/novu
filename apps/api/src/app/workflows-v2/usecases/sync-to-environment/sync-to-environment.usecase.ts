@@ -13,11 +13,11 @@ import {
 } from '@novu/shared';
 import { PreferencesEntity, PreferencesRepository } from '@novu/dal';
 import { SyncToEnvironmentCommand } from './sync-to-environment.command';
-import { GetWorkflowByIdsCommand } from '../get-workflow-by-ids/get-workflow-by-ids.command';
 import { UpsertWorkflowUseCase } from '../upsert-workflow/upsert-workflow.usecase';
 import { UpsertWorkflowCommand } from '../upsert-workflow/upsert-workflow.command';
 import { GetWorkflowUseCase } from '../get-workflow/get-workflow.usecase';
 import { GetStepDataUsecase } from '../get-step-schema/get-step-data.usecase';
+import { GetWorkflowCommand } from '../get-workflow/get-workflow.command';
 
 /**
  * This usecase is used to sync a workflow from one environment to another.
@@ -72,7 +72,7 @@ export class SyncToEnvironmentUseCase {
 
   private async getWorkflowToClone(command: SyncToEnvironmentCommand): Promise<WorkflowResponseDto> {
     return this.getWorkflowUseCase.execute(
-      GetWorkflowByIdsCommand.create({
+      GetWorkflowCommand.create({
         user: command.user,
         identifierOrInternalId: command.identifierOrInternalId,
       })
@@ -85,7 +85,7 @@ export class SyncToEnvironmentUseCase {
   ): Promise<WorkflowResponseDto | undefined> {
     try {
       return await this.getWorkflowUseCase.execute(
-        GetWorkflowByIdsCommand.create({
+        GetWorkflowCommand.create({
           user: { ...command.user, environmentId: command.targetEnvironmentId },
           identifierOrInternalId: externalId,
         })

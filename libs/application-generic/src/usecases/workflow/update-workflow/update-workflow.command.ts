@@ -12,11 +12,11 @@ import {
 
 import {
   IPreferenceChannels,
+  JSONSchemaDto,
   NotificationTemplateCustomData,
   WorkflowTypeEnum,
 } from '@novu/shared';
 
-import { JsonSchema } from '@novu/framework/internal';
 import { EnvironmentWithUserCommand } from '../../../commands';
 import { NotificationStep } from '../..';
 
@@ -84,7 +84,7 @@ export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   rawData?: any;
 
   @IsOptional()
-  payloadSchema?: JsonSchema;
+  payloadSchema?: JSONSchemaDto;
 
   @IsEnum(WorkflowTypeEnum)
   @IsDefined()
@@ -92,5 +92,5 @@ export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
 }
 
 export interface IStepControl {
-  schema: JsonSchema;
+  schema: JSONSchemaDto;
 }

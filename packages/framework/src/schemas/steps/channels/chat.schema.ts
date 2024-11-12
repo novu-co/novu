@@ -1,4 +1,4 @@
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 
 const chatOutputSchema = {
   type: 'object',
@@ -7,14 +7,14 @@ const chatOutputSchema = {
   },
   required: ['body'],
   additionalProperties: false,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 const chatResultSchema = {
   type: 'object',
   properties: {},
   required: [],
   additionalProperties: false,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 export const chatChannelSchemas = {
   output: chatOutputSchema,

@@ -10,7 +10,10 @@ import {
   AnalyticsService,
   CreateWorkflow,
   CreateWorkflowCommand,
+  DeleteWorkflowCommand,
+  DeleteWorkflowUseCase,
   ExecuteBridgeRequest,
+  InvalidateCacheService,
   NotificationStep,
   UpdateWorkflow,
   UpdateWorkflowCommand,
@@ -26,7 +29,6 @@ import {
 import { DiscoverOutput, DiscoverStepOutput, DiscoverWorkflowOutput, GetActionEnum } from '@novu/framework/internal';
 
 import { SyncCommand } from './sync.command';
-import { DeleteWorkflow, DeleteWorkflowCommand } from '../delete-workflow';
 import { CreateBridgeResponseDto } from '../../dtos/create-bridge-response.dto';
 
 @Injectable()
@@ -34,12 +36,13 @@ export class Sync {
   constructor(
     private createWorkflowUsecase: CreateWorkflow,
     private updateWorkflowUsecase: UpdateWorkflow,
-    private deleteWorkflow: DeleteWorkflow,
+    private deleteWorkflowUseCase: DeleteWorkflowUseCase,
     private notificationTemplateRepository: NotificationTemplateRepository,
     private notificationGroupRepository: NotificationGroupRepository,
     private environmentRepository: EnvironmentRepository,
     private executeBridgeRequest: ExecuteBridgeRequest,
     private analyticsService: AnalyticsService,
+    private invalidateCacheService: InvalidateCacheService,
     private upsertPreferences: UpsertPreferences
   ) {}
   async execute(command: SyncCommand): Promise<CreateBridgeResponseDto> {
@@ -111,21 +114,19 @@ export class Sync {
     createdWorkflows: NotificationTemplateEntity[]
   ): Promise<void> {
     const persistedWorkflowIdsInBridge = createdWorkflows.map((i) => i._id);
-
     const workflowsToDelete = await this.findAllWorkflowsWithOtherIds(command, persistedWorkflowIdsInBridge);
-
-    await Promise.all(
-      workflowsToDelete?.map((workflow) => {
-        return this.deleteWorkflow.execute(
-          DeleteWorkflowCommand.create({
-            environmentId: command.environmentId,
-            organizationId: command.organizationId,
-            userId: command.userId,
-            workflowId: workflow._id,
-          })
-        );
-      })
+    const deleteWorkflowFromStoragePromises = workflowsToDelete.map((workflow) =>
+      this.deleteWorkflowUseCase.execute(
+        DeleteWorkflowCommand.create({
+          environmentId: command.environmentId,
+          organizationId: command.organizationId,
+          userId: command.userId,
+          identifierOrInternalId: workflow._id,
+        })
+      )
     );
+
+    await Promise.all([...deleteWorkflowFromStoragePromises]);
   }
 
   private async findAllWorkflowsWithOtherIds(

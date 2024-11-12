@@ -1,5 +1,5 @@
 import { EmailProviderIdEnum } from '@novu/shared';
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 import { genericProviderSchemas } from '../generic.schema';
 import { mailgunProviderSchemas } from './mailgun.schema';
 import { mailjetProviderSchemas } from './mailjet.schema';
@@ -8,25 +8,25 @@ import { novuEmailProviderSchemas } from './novu-email.schema';
 import { sendgridProviderSchemas } from './sendgrid.schema';
 
 export const emailProviderSchemas = {
-  [EmailProviderIdEnum.Braze]: genericProviderSchemas,
-  [EmailProviderIdEnum.Clickatell]: genericProviderSchemas,
-  [EmailProviderIdEnum.CustomSMTP]: nodemailerProviderSchemas,
-  [EmailProviderIdEnum.EmailJS]: genericProviderSchemas,
-  [EmailProviderIdEnum.EmailWebhook]: genericProviderSchemas,
-  [EmailProviderIdEnum.Infobip]: genericProviderSchemas,
-  [EmailProviderIdEnum.MailerSend]: genericProviderSchemas,
-  [EmailProviderIdEnum.Mailgun]: mailgunProviderSchemas,
-  [EmailProviderIdEnum.Mailjet]: mailjetProviderSchemas,
-  [EmailProviderIdEnum.Mailtrap]: genericProviderSchemas,
-  [EmailProviderIdEnum.Mandrill]: genericProviderSchemas,
-  [EmailProviderIdEnum.NetCore]: genericProviderSchemas,
-  [EmailProviderIdEnum.Novu]: novuEmailProviderSchemas,
-  [EmailProviderIdEnum.Outlook365]: genericProviderSchemas,
-  [EmailProviderIdEnum.Plunk]: genericProviderSchemas,
-  [EmailProviderIdEnum.Postmark]: genericProviderSchemas,
-  [EmailProviderIdEnum.Resend]: genericProviderSchemas,
-  [EmailProviderIdEnum.SendGrid]: sendgridProviderSchemas,
-  [EmailProviderIdEnum.Sendinblue]: genericProviderSchemas,
-  [EmailProviderIdEnum.SES]: genericProviderSchemas,
-  [EmailProviderIdEnum.SparkPost]: genericProviderSchemas,
-} satisfies Record<EmailProviderIdEnum, { output: Schema }>;
+  braze: genericProviderSchemas,
+  clickatell: genericProviderSchemas,
+  nodemailer: nodemailerProviderSchemas,
+  emailjs: genericProviderSchemas,
+  'email-webhook': genericProviderSchemas,
+  'infobip-email': genericProviderSchemas,
+  mailersend: genericProviderSchemas,
+  mailgun: mailgunProviderSchemas,
+  mailjet: mailjetProviderSchemas,
+  mailtrap: genericProviderSchemas,
+  mandrill: genericProviderSchemas,
+  netcore: genericProviderSchemas,
+  'novu-email': novuEmailProviderSchemas,
+  outlook365: genericProviderSchemas,
+  plunk: genericProviderSchemas,
+  postmark: genericProviderSchemas,
+  resend: genericProviderSchemas,
+  sendgrid: sendgridProviderSchemas,
+  sendinblue: genericProviderSchemas,
+  ses: genericProviderSchemas,
+  sparkpost: genericProviderSchemas,
+} as const satisfies Record<EmailProviderIdEnum, { output: JsonSchema }>;

@@ -1,4 +1,4 @@
-import { StepDataDto } from '@novu/shared';
+import type { JSONSchemaDefinition } from '@novu/shared';
 
 interface LiquidVariable {
   type: 'variable';
@@ -6,17 +6,15 @@ interface LiquidVariable {
   detail: string;
 }
 
-type JSONSchema = StepDataDto['variables'];
-
 /**
  * Parse JSON Schema and extract variables for Liquid autocompletion.
  * @param schema - The JSON Schema to parse.
  * @returns An array of variable objects suitable for the Liquid language.
  */
-export function parseStepVariablesToLiquidVariables(schema: JSONSchema): LiquidVariable[] {
+export function parseStepVariablesToLiquidVariables(schema: JSONSchemaDefinition): LiquidVariable[] {
   const variables: LiquidVariable[] = [];
 
-  function extractProperties(obj: JSONSchema, path = ''): void {
+  function extractProperties(obj: JSONSchemaDefinition, path = ''): void {
     if (typeof obj === 'boolean') return; // Handle boolean schema
 
     if (obj.type === 'object' && obj.properties) {
@@ -44,7 +42,7 @@ export function parseStepVariablesToLiquidVariables(schema: JSONSchema): LiquidV
     // Handle combinators (allOf, anyOf, oneOf)
     ['allOf', 'anyOf', 'oneOf'].forEach((combiner) => {
       if (Array.isArray(obj[combiner as keyof typeof obj])) {
-        for (const subSchema of obj[combiner as keyof typeof obj] as JSONSchema[]) {
+        for (const subSchema of obj[combiner as keyof typeof obj] as JSONSchemaDefinition[]) {
           extractProperties(subSchema, path);
         }
       }

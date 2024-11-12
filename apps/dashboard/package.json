@@ -20,11 +20,12 @@
     "test:e2e:merge-report": "playwright merge-reports --reporter html"
   },
   "dependencies": {
-    "@clerk/clerk-react": "^5.2.5",
+    "@clerk/clerk-react": "^5.15.1",
     "@codemirror/lang-liquid": "^6.2.1",
     "@hookform/resolvers": "^3.9.0",
     "@lezer/highlight": "^1.2.1",
     "@novu/framework": "workspace:*",
+    "@novu/js": "workspace:*",
     "@novu/react": "workspace:*",
     "@novu/shared": "workspace:*",
     "@radix-ui/react-accordion": "^1.2.1",
@@ -78,7 +79,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@clerk/types": "^4.6.1",
+    "@clerk/types": "^4.30.0",
     "@eslint/js": "^9.9.0",
     "@hookform/devtools": "^4.3.0",
     "@playwright/test": "^1.44.0",
