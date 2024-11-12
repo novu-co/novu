@@ -157,9 +157,13 @@ export class ProcessWorkflowIssuesUsecase {
 
     const tagsIssues: RuntimeIssue[] = [];
 
-    const hasDuplications = tags.length !== new Set(tags).size;
+    const duplicatedTags = tags.filter((tag, index) => tags.indexOf(tag) !== index);
+    const hasDuplications = duplicatedTags.length > 0;
     if (hasDuplications) {
-      tagsIssues.push({ issueType: WorkflowIssueTypeEnum.DUPLICATED_VALUE, message: 'Duplicated tags' });
+      tagsIssues.push({
+        issueType: WorkflowIssueTypeEnum.DUPLICATED_VALUE,
+        message: `Duplicated tags: ${duplicatedTags.join(', ')}`,
+      });
     }
 
     const hasEmptyTags = tags?.some((tag) => !tag || tag === '');
