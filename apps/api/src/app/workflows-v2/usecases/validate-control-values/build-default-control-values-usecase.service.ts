@@ -4,6 +4,7 @@ import _ = require('lodash');
 import { ExtractDefaultsUsecase } from '../get-default-values-from-schema/extract-defaults.usecase';
 import { BuildDefaultControlValuesCommand } from './build-default-control-values.command';
 import { findMissingKeys } from '../../util/utils';
+import { capitalize } from '../../../shared/services/helper/helper.service';
 
 @Injectable()
 export class ValidateControlValuesAndConstructPassableStructureUsecase {
@@ -36,7 +37,7 @@ export class ValidateControlValuesAndConstructPassableStructureUsecase {
       record[key] = [
         {
           issueType: StepContentIssueEnum.MISSING_VALUE,
-          message: `Value is missing on a required control`, // Custom message for the issue
+          message: `${capitalize(key)} is missing`, // Custom message for the issue
         },
       ];
     });

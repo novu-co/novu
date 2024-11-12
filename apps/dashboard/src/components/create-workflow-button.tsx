@@ -27,6 +27,7 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { useTagsQuery } from '@/hooks/use-tags-query';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
+import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
@@ -104,6 +105,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
           <Form {...form}>
             <form
               id="create-workflow"
+              autoComplete="off"
               onSubmit={form.handleSubmit((values) => {
                 mutateAsync({
                   name: values.name,
@@ -126,6 +128,8 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <InputField>
                         <Input
                           {...field}
+                          autoFocus
+                          {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
                           onChange={(e) => {
                             field.onChange(e);
                             form.setValue('workflowId', slugify(e.target.value));
