@@ -25,7 +25,7 @@ import { SnippetEditor } from './snippet-editor';
 import { Editor } from '@/components/primitives/editor';
 
 const tabsTriggerClassName = 'pt-1';
-const codePanelClassName = 'bg-background h-full w-full rounded-lg border border-neutral-200 p-3';
+const codePanelClassName = 'bg-background flex-1 w-full rounded-lg border border-neutral-200 p-3 overflow-y-auto';
 
 const LANGUAGE_TO_SNIPPET_UTIL: Record<SnippetLanguage, (props: CodeSnippet) => string> = {
   shell: createCurlSnippet,
@@ -51,7 +51,7 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
   }, [activeSnippetTab, identifier, to, payload]);
 
   return (
-    <div className="flex h-full w-full flex-1 flex-col gap-3 p-3">
+    <div className="flex h-full max-h-screen w-full flex-1 flex-col gap-3 overflow-hidden p-3">
       <div className="flex flex-1 flex-col gap-3 xl:flex-row">
         <div className="flex-1">
           <Panel className="h-full">
@@ -110,10 +110,10 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
           />
         </div>
       </div>
-      <div className="flex-1">
-        <Panel className="h-full">
+      <div className="flex h-1/3 flex-1 flex-col">
+        <Panel className="flex flex-1 flex-col overflow-hidden">
           <Tabs
-            className="flex h-full flex-1 flex-col border-none"
+            className="flex max-h-full flex-1 flex-col border-none"
             value={activeSnippetTab}
             onValueChange={(value) => setActiveSnippetTab(value as SnippetLanguage)}
           >
