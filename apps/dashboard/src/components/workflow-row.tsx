@@ -43,9 +43,16 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
   const isV1Workflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1;
   const workflowLink = isV1Workflow
     ? buildRoute(LEGACY_ROUTES.EDIT_WORKFLOW, {
-        workflowSlug: workflow.slug,
+        workflowId: workflow._id,
       })
     : buildRoute(ROUTES.EDIT_WORKFLOW, {
+        environmentSlug: currentEnvironment?.slug ?? '',
+        workflowSlug: workflow.slug,
+      });
+
+  const triggerWorkflowLink = isV1Workflow
+    ? buildRoute(LEGACY_ROUTES.TEST_WORKFLOW, { workflowId: workflow._id })
+    : buildRoute(ROUTES.TEST_WORKFLOW, {
         environmentSlug: currentEnvironment?.slug ?? '',
         workflowSlug: workflow.slug,
       });
@@ -109,23 +116,27 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <RiPlayCircleLine />
-                Trigger workflow
-              </DropdownMenuItem>
+              <Link to={triggerWorkflowLink} reloadDocument={isV1Workflow}>
+                <DropdownMenuItem className="cursor-pointer">
+                  <RiPlayCircleLine />
+                  Trigger workflow
+                </DropdownMenuItem>
+              </Link>
               <SyncWorkflowMenuItem
                 currentEnvironment={currentEnvironment}
                 isSyncable={isSyncable}
                 tooltipContent={tooltipContent}
                 onSync={safeSync}
               />
-              <DropdownMenuItem>
-                <RiPulseFill />
-                View activity
-              </DropdownMenuItem>
+              <Link to={LEGACY_ROUTES.ACTIVITY_FEED} reloadDocument>
+                <DropdownMenuItem className="cursor-pointer">
+                  <RiPulseFill />
+                  View activity
+                </DropdownMenuItem>
+              </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
+            <DropdownMenuGroup className="*:cursor-pointer">
               <DropdownMenuItem>
                 <RiPauseCircleLine />
                 Pause workflow
