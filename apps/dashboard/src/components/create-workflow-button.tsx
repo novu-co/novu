@@ -27,6 +27,7 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { useTagsQuery } from '@/hooks/use-tags-query';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
+import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
@@ -129,7 +130,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                         <Input
                           {...field}
                           autoFocus
-                          data-1p-ignore
+                          {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
                           onChange={(e) => {
                             field.onChange(e);
                             form.setValue('workflowId', slugify(e.target.value));
