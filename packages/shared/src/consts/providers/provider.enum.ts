@@ -124,6 +124,7 @@ export enum PushProviderIdEnum {
   APNS = 'apns',
   EXPO = 'expo',
   OneSignal = 'one-signal',
+  OneSignalV2 = 'one-signal-v2',
   Pushpad = 'pushpad',
   PushWebhook = 'push-webhook',
   PusherBeams = 'pusher-beams',

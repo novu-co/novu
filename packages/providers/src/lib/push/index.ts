@@ -5,3 +5,4 @@ export * from './one-signal/one-signal.provider';
 export * from './push-webhook/push-webhook.provider';
 export * from './pusher-beams/pusher-beams.provider';
 export * from './pushpad/pushpad.provider';
+export * from './one-signal-v2/one-signal-v2.provider';

@@ -3,6 +3,7 @@ import {
   expoConfig,
   fcmConfig,
   oneSignalConfig,
+  oneSignalV2Config,
   pusherBeamsConfig,
   pushpadConfig,
   pushWebhookConfig,
@@ -22,6 +23,14 @@ export const pushProviders: IProviderConfig[] = [
     credentials: oneSignalConfig,
     docReference: `https://docs.novu.co/channels-and-providers/push/onesignal${UTM_CAMPAIGN_QUERY_PARAM}`,
     logoFileName: { light: 'one-signal.svg', dark: 'one-signal.svg' },
+  },
+  {
+    id: PushProviderIdEnum.OneSignalV2,
+    displayName: 'OneSignalV2',
+    channel: ChannelTypeEnum.PUSH,
+    credentials: oneSignalV2Config,
+    docReference: `https://documentation.onesignal.com/reference/push-notification`,
+    logoFileName: { light: 'one-signal-v2.svg', dark: 'one-signal-v2.svg' },
   },
   {
     id: PushProviderIdEnum.Pushpad,
