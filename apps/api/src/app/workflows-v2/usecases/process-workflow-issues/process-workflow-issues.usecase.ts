@@ -15,18 +15,18 @@ import {
   NotificationTemplateRepository,
 } from '@novu/dal';
 import { Injectable } from '@nestjs/common';
-import { ValidateWorkflowCommand } from './validate-workflow.command';
-import { WorkflowNotFoundException } from '../../exceptions/workflow-not-found-exception';
+import { ProcessWorkflowIssuesCommand } from './process-workflow-issues.command';
 import { ValidateControlValuesAndConstructPassableStructureUsecase } from '../validate-control-values/build-default-control-values-usecase.service';
+import { WorkflowNotFoundException } from '../../exceptions/workflow-not-found-exception';
 
 @Injectable()
-export class ValidateAndPersistWorkflowIssuesUsecase {
+export class ProcessWorkflowIssuesUsecase {
   constructor(
     private notificationTemplateRepository: NotificationTemplateRepository,
     private buildDefaultControlValuesUsecase: ValidateControlValuesAndConstructPassableStructureUsecase
   ) {}
 
-  async execute(command: ValidateWorkflowCommand): Promise<NotificationTemplateEntity> {
+  async execute(command: ProcessWorkflowIssuesCommand): Promise<NotificationTemplateEntity> {
     const workflowIssues = await this.validateWorkflow(command);
     const stepIssues = this.validateSteps(command.workflow.steps, command.stepIdToControlValuesMap);
     const workflowWithIssues = this.updateIssuesOnWorkflow(command.workflow, workflowIssues, stepIssues);
@@ -35,7 +35,7 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
     return await this.getWorkflow(command);
   }
 
-  private async persistWorkflow(command: ValidateWorkflowCommand, workflowWithIssues: NotificationTemplateEntity) {
+  private async persistWorkflow(command: ProcessWorkflowIssuesCommand, workflowWithIssues: NotificationTemplateEntity) {
     const isWorkflowCompleteAndValid = this.isWorkflowCompleteAndValid(workflowWithIssues);
     const status = this.calculateStatus(isWorkflowCompleteAndValid, workflowWithIssues);
     await this.notificationTemplateRepository.update(
@@ -81,7 +81,7 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
     return issue.body && Object.keys(issue.body).length > 0;
   }
 
-  private async getWorkflow(command: ValidateWorkflowCommand) {
+  private async getWorkflow(command: ProcessWorkflowIssuesCommand) {
     const entity = await this.notificationTemplateRepository.findById(command.workflow._id, command.user.environmentId);
     if (entity == null) {
       throw new WorkflowNotFoundException(command.workflow._id);
@@ -123,19 +123,20 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
     }
   }
   private async validateWorkflow(
-    command: ValidateWorkflowCommand
+    command: ProcessWorkflowIssuesCommand
   ): Promise<Record<keyof WorkflowResponseDto, RuntimeIssue[]>> {
     // @ts-ignore
     const issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]> = {};
     await this.addTriggerIdentifierNotUniqueIfApplicable(command, issues);
     this.addNameMissingIfApplicable(command, issues);
     this.addDescriptionTooLongIfApplicable(command, issues);
+    this.processTags(command, issues);
 
     return issues;
   }
 
   private addNameMissingIfApplicable(
-    command: ValidateWorkflowCommand,
+    command: ProcessWorkflowIssuesCommand,
     issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
   ) {
     if (!command.workflow.name || command.workflow.name.trim() === '') {
@@ -143,8 +144,45 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
       issues.name = [{ issueType: WorkflowIssueTypeEnum.MISSING_VALUE, message: 'Name is missing' }];
     }
   }
+
+  private processTags(
+    command: ProcessWorkflowIssuesCommand,
+    issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
+  ) {
+    const tags = command.workflow.tags?.map((tag) => tag.trim());
+
+    if (!tags.length) {
+      return;
+    }
+
+    const tagsIssues: RuntimeIssue[] = [];
+
+    const hasDuplications = tags.length !== new Set(tags).size;
+    if (hasDuplications) {
+      tagsIssues.push({ issueType: WorkflowIssueTypeEnum.DUPLICATED_VALUE, message: 'Duplicated tags' });
+    }
+
+    const hasEmptyTags = tags?.some((tag) => !tag || tag === '');
+    if (hasEmptyTags) {
+      tagsIssues.push({ issueType: WorkflowIssueTypeEnum.MISSING_VALUE, message: 'Empty tag value' });
+    }
+
+    const exceedsMaxLength = tags?.some((tag) => tag.length > 8);
+    if (exceedsMaxLength) {
+      tagsIssues.push({
+        issueType: WorkflowIssueTypeEnum.LIMIT_REACHED,
+        message: 'Exceeded the 8 tag limit',
+      });
+    }
+
+    if (tagsIssues.length > 0) {
+      // eslint-disable-next-line no-param-reassign
+      issues.tags = tagsIssues;
+    }
+  }
+
   private addDescriptionTooLongIfApplicable(
-    command: ValidateWorkflowCommand,
+    command: ProcessWorkflowIssuesCommand,
     issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
   ) {
     if (command.workflow.description && command.workflow.description.length > 160) {
@@ -154,8 +192,9 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
       ];
     }
   }
+
   private async addTriggerIdentifierNotUniqueIfApplicable(
-    command: ValidateWorkflowCommand,
+    command: ProcessWorkflowIssuesCommand,
     issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
   ) {
     const findAllByTriggerIdentifier = await this.notificationTemplateRepository.findAllByTriggerIdentifier(

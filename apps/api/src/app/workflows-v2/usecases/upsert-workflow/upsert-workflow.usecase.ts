@@ -5,7 +5,6 @@ import {
   NotificationGroupRepository,
   NotificationStepEntity,
   NotificationTemplateEntity,
-  PreferencesEntity,
 } from '@novu/dal';
 import {
   CreateWorkflow as CreateWorkflowGeneric,
@@ -45,7 +44,7 @@ import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/step-upsert-mechanism-failed-missing-id.exception';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
-import { ValidateAndPersistWorkflowIssuesUsecase } from './validate-and-persist-workflow-issues.usecase';
+import { ProcessWorkflowIssuesUsecase } from '../process-workflow-issues/process-workflow-issues.usecase';
 
 function buildUpsertControlValuesCommand(
   command: UpsertWorkflowCommand,
@@ -70,7 +69,7 @@ export class UpsertWorkflowUseCase {
     private notificationGroupRepository: NotificationGroupRepository,
     private upsertPreferencesUsecase: UpsertPreferences,
     private upsertControlValuesUseCase: UpsertControlValuesUseCase,
-    private validateWorkflowUsecase: ValidateAndPersistWorkflowIssuesUsecase,
+    private processWorkflowIssuesUsecase: ProcessWorkflowIssuesUsecase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private getPreferencesUseCase: GetPreferences
   ) {}
@@ -80,14 +79,14 @@ export class UpsertWorkflowUseCase {
     const workflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
     const stepIdToControlValuesMap = await this.upsertControlValues(workflow, command);
     const preferences = await this.upsertPreference(command, workflow);
-    const validatedWorkflowWithIssues = await this.validateWorkflowUsecase.execute({
+    const workflowIssues = await this.processWorkflowIssuesUsecase.execute({
       user: command.user,
       workflow,
       preferences,
       stepIdToControlValuesMap,
     });
 
-    return toResponseWorkflowDto(validatedWorkflowWithIssues, preferences);
+    return toResponseWorkflowDto(workflowIssues, preferences);
   }
 
   private async queryWorkflow(command: UpsertWorkflowCommand): Promise<NotificationTemplateEntity | null> {
