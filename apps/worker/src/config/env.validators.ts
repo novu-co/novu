@@ -52,8 +52,8 @@ export const envValidators = {
   REDIS_CACHE_FAMILY: str({ default: undefined }),
   REDIS_CACHE_KEY_PREFIX: str({ default: undefined }),
   /** @deprecated - use `MONGO_AUTO_CREATE_INDEXES` instead */
-  AUTO_CREATE_INDEXES: bool({ default: true }),
-  MONGO_AUTO_CREATE_INDEXES: bool({ default: true }),
+  AUTO_CREATE_INDEXES: bool({ default: false }),
+  MONGO_AUTO_CREATE_INDEXES: bool({ default: false }),
   MONGO_MAX_IDLE_TIME_IN_MS: num({ default: 1000 * 30 }),
   MONGO_MAX_POOL_SIZE: num({ default: 50 }),
   MONGO_MIN_POOL_SIZE: num({ default: 10 }),
