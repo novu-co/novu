@@ -134,7 +134,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                         />
                       </InputField>
                     </FormControl>
-                    <FormMessage>Name is required</FormMessage>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
