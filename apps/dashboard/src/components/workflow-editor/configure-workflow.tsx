@@ -120,7 +120,6 @@ export function ConfigureWorkflow() {
                   disabled={isReadOnly}
                   value={field.value ?? []}
                   suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []}
-                  showAddButton={!isReadOnly}
                 />
               </FormControl>
             </FormItem>
