@@ -15,6 +15,7 @@ import { StepEditor } from '@/components/workflow-editor/steps/step-editor';
 import { useFetchStep } from '@/hooks/use-fetch-step';
 import { VisuallyHidden } from '@/components/primitives/visually-hidden';
 import { PageMeta } from '@/components/page-meta';
+import { getStepBase62Id } from '@/utils/step';
 
 const transitionSetting = { ease: [0.29, 0.83, 0.57, 0.99], duration: 0.4 };
 
@@ -27,7 +28,10 @@ export const EditStepSidebar = () => {
   });
 
   const { step } = useFetchStep({ workflowSlug, stepSlug });
-  const stepType = useMemo(() => workflow?.steps.find((el) => el.slug === stepSlug)?.type, [stepSlug, workflow]);
+  const stepType = useMemo(
+    () => workflow?.steps.find((el) => getStepBase62Id(el.slug) === getStepBase62Id(stepSlug))?.type,
+    [stepSlug, workflow]
+  );
 
   const handleCloseSidebar = () => {
     navigate('../', { relative: 'path' });

@@ -102,7 +102,7 @@ export const WorkflowList = () => {
           ) : (
             <>
               {workflowsQuery.data.workflows.map((workflow) => (
-                <WorkflowRow workflow={workflow} />
+                <WorkflowRow key={workflow._id} workflow={workflow} />
               ))}
             </>
           )}
