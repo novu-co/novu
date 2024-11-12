@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - 'add-framework-release-workflow'
+      - add-framework-release-workflow
 
 permissions:
   contents: write
@@ -15,6 +15,45 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: googleapis/release-please-action@v4
+        id: release
         with:
           config-file: .release-please-config.json
           manifest-file: .release-please-manifest.json
+          target-branch: add-framework-release-workflow
+
+      # The logic below handles the npm publication:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        if: ${{ steps.release.outputs.releases_created }}
+        with:
+          fetch-depth: 0
+
+      - run: corepack enable
+        if: ${{ steps.release.outputs.releases_created }}
+
+      - uses: actions/setup-node@v4
+        if: ${{ steps.release.outputs.releases_created }}
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        if: ${{ steps.release.outputs.releases_created }}
+        run: pnpm install
+
+      - name: Teach Novu preview packages to work with latest dependencies
+        if: ${{ steps.release.outputs.releases_created }}
+        run: pnpm run packages:set-latest
+
+      - name: Build
+        if: ${{ steps.release.outputs.releases_created }}
+        run: pnpm run preview:pkg:build
+
+      # Release Please has already incremented versions and published tags, so we just
+      # need to publish all unpublished versions to NPM here
+      # See: https://github.com/lerna/lerna/tree/main/commands/publish#bump-from-package
+      - name: Publish to NPM
+        if: ${{ steps.release.outputs.releases_created }}
+        env:
+          NODE_AUTH_TOKEN: 'garbage-token'
+        run: nx release version --dry-run
