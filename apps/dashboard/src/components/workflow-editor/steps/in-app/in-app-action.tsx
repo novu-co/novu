@@ -47,35 +47,36 @@ export const InAppAction = () => {
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <div className={cn('mt-3 flex items-center gap-1')}>
-            <div className="border-neutral-alpha-200 flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
-              {!primaryAction && !secondaryAction && (
-                <div className={buttonVariants({ variant: 'dashed', size: 'xs' })}>
-                  <RiForbid2Line className="size-4" />
-                  <span className="cursor-default">No action</span>
-                </div>
-              )}
-              {primaryAction && (
-                <ConfigureActionPopover asChild fields={{ actionKey: primaryActionKey }}>
-                  <Button variant="primary" size="xs">
-                    {primaryAction.label}
-                  </Button>
-                </ConfigureActionPopover>
-              )}
-              {secondaryAction && (
-                <ConfigureActionPopover asChild fields={{ actionKey: secondaryActionKey }}>
-                  <Button variant="outline" size="xs">
-                    {secondaryAction.label}
-                  </Button>
-                </ConfigureActionPopover>
-              )}
-            </div>
+        <div className={cn('mt-3 flex items-center gap-1')}>
+          <div className="border-neutral-alpha-200 relative flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
+            {!primaryAction && !secondaryAction && (
+              <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'z-10')}>
+                <RiForbid2Line className="size-4" />
+                <span className="cursor-default">No action</span>
+              </div>
+            )}
+            {primaryAction && (
+              <ConfigureActionPopover asChild fields={{ actionKey: primaryActionKey }}>
+                <Button variant="primary" size="xs" className="z-10">
+                  {primaryAction.label}
+                </Button>
+              </ConfigureActionPopover>
+            )}
+            {secondaryAction && (
+              <ConfigureActionPopover asChild fields={{ actionKey: secondaryActionKey }}>
+                <Button variant="outline" size="xs" className="z-10">
+                  {secondaryAction.label}
+                </Button>
+              </ConfigureActionPopover>
+            )}
+            <DropdownMenuTrigger className="absolute size-full" />
+          </div>
+          <DropdownMenuTrigger asChild>
             <Button size={'icon'} variant={'ghost'}>
               <RiExpandUpDownLine className="size-4" />
             </Button>
-          </div>
-        </DropdownMenuTrigger>
+          </DropdownMenuTrigger>
+        </div>
         <DropdownMenuContent className="p-1" align="end">
           <DropdownMenuItem
             onClick={() => {
