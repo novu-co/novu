@@ -2,7 +2,7 @@
  * This component is used as a placeholder for the other step configuration until the actual configuration is implemented.
  */
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type StepDataDto, type StepUpdateDto, type WorkflowResponseDto } from '@novu/shared';
+import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useForm } from 'react-hook-form';
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
@@ -76,9 +76,7 @@ export const OtherStepTabs = ({ workflow, step }: { workflow: WorkflowResponseDt
       id: workflow._id,
       workflow: {
         ...workflow,
-        steps: workflow.steps.map((step) =>
-          step.slug === stepSlug ? ({ ...step, controlValues: { ...data } } as StepUpdateDto) : step
-        ),
+        steps: workflow.steps.map((step) => (step.slug === stepSlug ? { ...step, controlValues: { ...data } } : step)),
       },
     });
     reset({ ...data });
