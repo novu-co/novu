@@ -6,7 +6,7 @@ import { inputVariants } from '@/components/primitives/variants';
 import { CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/primitives/command';
 import { cn } from '@/utils/ui';
 import { Command } from 'cmdk';
-import { forwardRef, useEffect, useState } from 'react';
+import { forwardRef, useEffect, useMemo, useState } from 'react';
 import { RiCloseFill } from 'react-icons/ri';
 
 type TagInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
@@ -20,6 +20,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
   const [tags, setTags] = useState<string[]>(value);
   const [inputValue, setInputValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const validSuggestions = useMemo(() => suggestions.filter((suggestion) => !tags.includes(suggestion)), [tags]);
 
   useEffect(() => {
     setTags(value);
@@ -84,7 +85,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
           </div>
         </div>
         <CommandList>
-          {(suggestions.length > 0 || inputValue !== '') && (
+          {(validSuggestions.length > 0 || inputValue !== '') && (
             <PopoverContent
               className="p-1"
               portal={false}
@@ -95,7 +96,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
               onInteractOutside={(e) => e.preventDefault()}
             >
               <CommandGroup>
-                {inputValue !== '' && (
+                {inputValue !== '' && !tags.includes(inputValue) && (
                   <CommandItem
                     value={inputValue}
                     onSelect={() => {
@@ -105,7 +106,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
                     {inputValue}
                   </CommandItem>
                 )}
-                {suggestions.map((tag) => (
+                {validSuggestions.map((tag) => (
                   <CommandItem
                     key={tag}
                     // We can't have duplicate keys in our list so adding a suffix
