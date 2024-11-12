@@ -127,6 +127,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <InputField>
                         <Input
                           {...field}
+                          autoFocus
                           onChange={(e) => {
                             field.onChange(e);
                             form.setValue('workflowId', slugify(e.target.value));
