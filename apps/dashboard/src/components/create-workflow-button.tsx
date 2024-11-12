@@ -105,6 +105,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
           <Form {...form}>
             <form
               id="create-workflow"
+              autoComplete="off"
               onSubmit={form.handleSubmit((values) => {
                 mutateAsync({
                   name: values.name,
@@ -128,6 +129,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                         <Input
                           {...field}
                           autoFocus
+                          data-1p-ignore
                           onChange={(e) => {
                             field.onChange(e);
                             form.setValue('workflowId', slugify(e.target.value));
