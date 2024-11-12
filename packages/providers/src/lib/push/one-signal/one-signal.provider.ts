@@ -17,18 +17,24 @@ export class OneSignalPushProvider
   id = PushProviderIdEnum.OneSignal;
   channelType = ChannelTypeEnum.PUSH as ChannelTypeEnum.PUSH;
   private axiosInstance: AxiosInstance;
+  private apiVersion: string | null = null;
   protected casing: CasingEnum = CasingEnum.SNAKE_CASE;
-  public readonly BASE_URL = 'https://onesignal.com/api/v1';
+  public readonly BASE_URL_PLAYER_MODEL = 'https://onesignal.com/api/v1';
+  public readonly BASE_URL_USER_MODEL = 'https://api.onesignal.com';
 
   constructor(
     private config: {
       appId: string;
       apiKey: string;
+      domain?: string | null;
     },
   ) {
     super();
+    this.apiVersion = config.domain;
     this.axiosInstance = axios.create({
-      baseURL: this.BASE_URL,
+      baseURL: this.apiVersion
+        ? this.BASE_URL_USER_MODEL
+        : this.BASE_URL_PLAYER_MODEL,
     });
   }
 
@@ -38,8 +44,16 @@ export class OneSignalPushProvider
   ): Promise<ISendMessageSuccessResponse> {
     const { sound, badge, ...overrides } = options.overrides ?? {};
 
+    const targetSegment = this.apiVersion
+      ? {
+          include_aliases: {
+            external_id: options.target,
+          },
+        }
+      : { include_player_ids: options.target };
+
     const notification = this.transform(bridgeProviderData, {
-      include_player_ids: options.target,
+      ...targetSegment,
       app_id: this.config.appId,
       headings: { en: options.title },
       contents: { en: options.content },
