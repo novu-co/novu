@@ -1,3 +1,4 @@
+import { useState, useEffect, useMemo } from 'react';
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -16,15 +17,19 @@ import { buildDynamicZodSchema, buildDefaultValues } from '@/utils/schema';
 import { InAppEditor } from '@/components/workflow-editor/steps/in-app/in-app-editor';
 import { showToast } from '@/components/primitives/sonner-helpers';
 import { ToastIcon } from '@/components/primitives/sonner';
-import { useState } from 'react';
 import { usePreviewStep } from '@/hooks/use-preview-step';
 import useDebouncedEffect from '@/hooks/use-debounced-effect';
 import { CustomStepControls } from '../controls/custom-step-controls';
+import { useStep } from '../use-step';
+import { flattenIssues } from '../../step-utils';
+import { useWorkflowEditorContext } from '../../hooks';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5';
 
 export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; step: StepDataDto }) => {
   const { stepSlug = '', workflowSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
+  const { resetWorkflowForm } = useWorkflowEditorContext();
+  const { step: workflowStep } = useStep();
   const { dataSchema, uiSchema } = step.controls;
   const navigate = useNavigate();
   const schema = buildDynamicZodSchema(dataSchema ?? {});
@@ -34,13 +39,25 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
     resetOptions: { keepDirtyValues: true },
     defaultValues: buildDefaultValues(uiSchema ?? {}),
     values: step.controls.values,
+    shouldFocusError: true,
   });
   const [editorValue, setEditorValue] = useState('{}');
-  const { reset, formState } = form;
+  const { reset, formState, setError } = form;
+
+  const controlErrors = useMemo(() => flattenIssues(workflowStep?.issues?.controls), [workflowStep]);
+
+  useEffect(() => {
+    if (Object.keys(controlErrors).length) {
+      Object.entries(controlErrors).forEach(([key, value]) => {
+        setError(key as any, { message: value }, { shouldFocus: true });
+      });
+    }
+  }, [controlErrors, setError]);
 
   const { previewStep, data: previewData } = usePreviewStep();
   const { updateWorkflow } = useUpdateWorkflow({
-    onSuccess: () => {
+    onSuccess: (data) => {
+      resetWorkflowForm(data);
       showToast({
         children: () => (
           <>
@@ -80,7 +97,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
       workflow: {
         ...workflow,
         steps: workflow.steps.map((step) =>
-          step.slug === stepSlug ? ({ ...step, controlValues: { ...data } } as StepUpdateDto) : step
+          step.slug === stepSlug ? ({ ...step, controlValues: { ...data }, issues: undefined } as StepUpdateDto) : step
         ),
       },
     });

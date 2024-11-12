@@ -79,7 +79,7 @@ export const NodeError = ({ children }: { children: ReactNode }) => {
         </span>
       </PopoverTrigger>
       <PopoverPortal>
-        <PopoverContent className="flex w-max max-w-[200px] rounded-xl p-2" side="right">
+        <PopoverContent className="flex min-w-min max-w-[200px] rounded-xl p-2" side="right">
           <PopoverArrow />
           <span className="text-destructive text-xs font-normal">{children}</span>
         </PopoverContent>

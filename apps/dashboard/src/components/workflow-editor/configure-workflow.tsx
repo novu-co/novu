@@ -87,7 +87,7 @@ export function ConfigureWorkflow() {
                 <FormLabel>Workflow Identifier</FormLabel>
                 <FormControl>
                   <InputField className="flex overflow-hidden pr-0">
-                    <Input placeholder="Untitled" {...field} disabled={isReadOnly} />
+                    <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
                     <CopyButton
                       content={field.value}
                       className="rounded-md rounded-s-none border-b-0 border-r-0 border-t-0 text-neutral-400"

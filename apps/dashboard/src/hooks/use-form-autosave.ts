@@ -19,19 +19,18 @@ export const useFormAutoSave = <T extends FieldValues>({
   ) => boolean;
 }) => {
   const onSubmitRef = useDataRef(onSubmit);
+  const saveRef = useDataRef(() => {
+    if (enabled) {
+      handleSubmit(onSubmitRef.current)();
+    }
+  });
   const { formState, control, handleSubmit } = form;
 
   const watchedData = useWatch<T>({
     control,
   });
 
-  const save = () => {
-    if (enabled) {
-      handleSubmit(onSubmitRef.current)();
-    }
-  };
-
-  const debouncedSave = useDebounce(save, 500);
+  const debouncedSave = useDebounce(saveRef.current, 800);
 
   const previousWatchedData = useRef<DeepPartialSkipArrayKey<T> | null>(null);
 
@@ -44,7 +43,7 @@ export const useFormAutoSave = <T extends FieldValues>({
     const immediateSave = shouldSaveImmediately?.(watchedData, previousWatchedData.current) || false;
 
     if (immediateSave) {
-      save();
+      saveRef.current();
     } else {
       debouncedSave();
     }

@@ -69,30 +69,6 @@ export class GeneratePreviewUsecase {
     });
   }
 
-  private buildMissingControlValuesIssuesList(defaultValues: Record<string, any>, command: GeneratePreviewCommand) {
-    const missingRequiredControlValues = findMissingKeys(
-      defaultValues,
-      command.generatePreviewRequestDto.controlValues || {}
-    );
-
-    return this.buildContentIssues(missingRequiredControlValues);
-  }
-
-  private buildContentIssues(keys: string[]): Record<string, ContentIssue[]> {
-    const record: Record<string, ContentIssue[]> = {};
-
-    keys.forEach((key) => {
-      record[key] = [
-        {
-          issueType: StepContentIssueEnum.MISSING_VALUE,
-          message: `Value is missing on a required control`,
-        },
-      ];
-    });
-
-    return record;
-  }
-
   private async executePreviewUsecase(
     workflowId: string,
     stepId: string | undefined,
