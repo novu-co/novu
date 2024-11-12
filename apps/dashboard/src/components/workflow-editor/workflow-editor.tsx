@@ -17,7 +17,7 @@ export const WorkflowEditor = () => {
 
   return (
     <div className="flex h-full flex-1 flex-nowrap">
-      <Tabs defaultValue="workflow" className="-mt-[1px] flex h-full flex-1 flex-col" value="workflow">
+      <Tabs defaultValue="workflow" className="-mt-px flex h-full flex-1 flex-col" value="workflow">
         <TabsList variant="regular">
           <TabsTrigger value="workflow" asChild variant="regular">
             <Link

@@ -57,7 +57,7 @@ export const EmailNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.EMAIL];
 
   return (
-    <Link to={`step/${data.stepSlug}`}>
+    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.EMAIL}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.EMAIL]}>
@@ -79,7 +79,7 @@ export const SmsNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.SMS];
 
   return (
-    <Link to={`step/${data.stepSlug}`}>
+    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.SMS}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.SMS]}>
@@ -123,7 +123,7 @@ export const PushNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.PUSH];
 
   return (
-    <Link to={`step/${data.stepSlug}`}>
+    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.PUSH}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.PUSH]}>
@@ -145,7 +145,7 @@ export const ChatNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.CHAT];
 
   return (
-    <Link to={`step/${data.stepSlug}`}>
+    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.CHAT}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.CHAT]}>
@@ -167,17 +167,19 @@ export const DelayNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.DELAY];
 
   return (
-    <StepNode data={data}>
-      <NodeHeader type={StepTypeEnum.DELAY}>
-        <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.DELAY]}>
-          <Icon />
-        </NodeIcon>
-        <NodeName>{data.name || 'Delay Step'}</NodeName>
-      </NodeHeader>
-      <NodeBody>{data.content || 'You have been invited to the Novu party on "commentSnippet"'}</NodeBody>
-      <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
-      <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-    </StepNode>
+    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
+      <StepNode data={data}>
+        <NodeHeader type={StepTypeEnum.DELAY}>
+          <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.DELAY]}>
+            <Icon />
+          </NodeIcon>
+          <NodeName>{data.name || 'Delay Step'}</NodeName>
+        </NodeHeader>
+        <NodeBody>{data.content || 'You have been invited to the Novu party on "commentSnippet"'}</NodeBody>
+        <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
+        <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
+      </StepNode>
+    </Link>
   );
 };
 
@@ -186,19 +188,21 @@ export const DigestNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.DIGEST];
 
   return (
-    <StepNode data={data}>
-      <NodeHeader type={StepTypeEnum.DIGEST}>
-        <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.DIGEST]}>
-          <Icon />
-        </NodeIcon>
-        <NodeName>{data.name || 'Digest Step'}</NodeName>
-      </NodeHeader>
-      <NodeBody>
-        {data.content || 'Batches events into one coherent message before delivery to the subscriber.'}
-      </NodeBody>
-      <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
-      <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-    </StepNode>
+    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
+      <StepNode data={data}>
+        <NodeHeader type={StepTypeEnum.DIGEST}>
+          <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.DIGEST]}>
+            <Icon />
+          </NodeIcon>
+          <NodeName>{data.name || 'Digest Step'}</NodeName>
+        </NodeHeader>
+        <NodeBody>
+          {data.content || 'Batches events into one coherent message before delivery to the subscriber.'}
+        </NodeBody>
+        <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
+        <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
+      </StepNode>
+    </Link>
   );
 };
 
@@ -207,17 +211,19 @@ export const CustomNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.CUSTOM];
 
   return (
-    <StepNode data={data}>
-      <NodeHeader type={StepTypeEnum.CUSTOM}>
-        <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.CUSTOM]}>
-          <Icon />
-        </NodeIcon>
-        <NodeName>{data.name || 'Custom Step'}</NodeName>
-      </NodeHeader>
-      <NodeBody>Executes the business logic in your bridge application</NodeBody>
-      <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
-      <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
-    </StepNode>
+    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
+      <StepNode data={data}>
+        <NodeHeader type={StepTypeEnum.CUSTOM}>
+          <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.CUSTOM]}>
+            <Icon />
+          </NodeIcon>
+          <NodeName>{data.name || 'Custom Step'}</NodeName>
+        </NodeHeader>
+        <NodeBody>Executes the business logic in your bridge application</NodeBody>
+        <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
+        <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
+      </StepNode>
+    </Link>
   );
 };
 

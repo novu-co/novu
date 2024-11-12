@@ -1,7 +1,10 @@
 name: Check pull request
 concurrency:
-  group: "${{ github.workflow }}-${{ github.ref }}"
+  group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
+
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
 on:
   pull_request:
@@ -245,7 +248,7 @@ jobs:
       test-e2e-ee-affected: ${{ contains(fromJson(needs.get-affected.outputs.test-e2e-ee), '@novu/api') || contains(fromJson(needs.get-affected.outputs.test-e2e-ee), '@novu/worker') }}
       job-name: ${{ matrix.name }}
       test-unit: false
-    secrets: inherit    
+    secrets: inherit
 
   test_e2e_web:
     name: E2E test Web app

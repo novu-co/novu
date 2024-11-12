@@ -19,7 +19,6 @@ import got, {
   UploadError,
 } from 'got';
 import { createHmac } from 'node:crypto';
-
 import {
   PostActionEnum,
   HttpHeaderKeysEnum,
@@ -28,7 +27,7 @@ import {
   isFrameworkError,
 } from '@novu/framework/internal';
 import { EnvironmentRepository } from '@novu/dal';
-import { HttpRequestHeaderKeysEnum, WorkflowOriginEnum } from '@novu/shared';
+import { WorkflowOriginEnum } from '@novu/shared';
 import {
   ExecuteBridgeRequestCommand,
   ExecuteBridgeRequestDto,
@@ -38,6 +37,7 @@ import {
   GetDecryptedSecretKeyCommand,
 } from '../get-decrypted-secret-key';
 import { BRIDGE_EXECUTION_ERROR } from '../../utils';
+import { HttpRequestHeaderKeysEnum } from '../../http';
 
 export const DEFAULT_TIMEOUT = 5_000; // 5 seconds
 export const DEFAULT_RETRIES_LIMIT = 3;

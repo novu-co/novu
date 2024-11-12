@@ -1,4 +1,5 @@
 import {
+  ArrayMaxSize,
   IsArray,
   IsBoolean,
   IsDefined,
@@ -18,12 +19,12 @@ import {
   INotificationGroup,
   IPreferenceChannels,
   IWorkflowStepMetadata,
+  JSONSchemaDto,
   NotificationTemplateCustomData,
   WorkflowOriginEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
 
-import { JsonSchema } from '@novu/framework/internal';
 import { EnvironmentWithUserCommand } from '../../commands';
 
 export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
@@ -36,6 +37,7 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
 
   @IsOptional()
   @IsArray()
+  @ArrayMaxSize(8)
   tags?: string[];
 
   @IsDefined()
@@ -76,18 +78,18 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
 
   @IsOptional()
   inputs?: {
-    schema: JsonSchema;
+    schema: JSONSchemaDto;
   };
   @IsOptional()
   controls?: {
-    schema: JsonSchema;
+    schema: JSONSchemaDto;
   };
 
   @IsOptional()
   rawData?: Record<string, unknown>;
 
   @IsOptional()
-  payloadSchema?: JsonSchema;
+  payloadSchema?: JSONSchemaDto;
 
   @IsEnum(WorkflowTypeEnum)
   @IsDefined()
@@ -163,12 +165,12 @@ export class NotificationStepVariantCommand {
 
   @IsOptional()
   controls?: {
-    schema: JsonSchema;
+    schema: JSONSchemaDto;
   };
 
   @IsOptional()
   output?: {
-    schema: JsonSchema;
+    schema: JSONSchemaDto;
   };
 
   @IsOptional()

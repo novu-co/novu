@@ -83,7 +83,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
       }}
     >
       <SheetTrigger {...props} />
-      <SheetContent>
+      <SheetContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <SheetHeader>
           <SheetTitle>Create workflow</SheetTitle>
           <div>
@@ -93,7 +93,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
             </SheetDescription>
             <Link
               target="_blank"
-              to="https://docs.novu.co/api-reference/workflows/create-workflow"
+              to="https://docs.novu.co/concepts/workflows"
               className="text-foreground-400 flex items-center text-sm underline"
             >
               Learn more <RiExternalLinkLine className="inline size-4" />
@@ -127,6 +127,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <InputField>
                         <Input
                           {...field}
+                          autoFocus
                           onChange={(e) => {
                             field.onChange(e);
                             form.setValue('workflowId', slugify(e.target.value));
@@ -134,7 +135,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                         />
                       </InputField>
                     </FormControl>
-                    <FormMessage>Name is required</FormMessage>
+                    <FormMessage />
                   </FormItem>
                 )}
               />

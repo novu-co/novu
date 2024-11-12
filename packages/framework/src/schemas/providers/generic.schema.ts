@@ -1,4 +1,4 @@
-import { Schema } from '../../types/schema.types';
+import type { JsonSchema } from '../../types/schema.types';
 
 /**
  * A permissive schema for untyped providers to use.
@@ -15,4 +15,4 @@ export const genericProviderSchemas = {
     required: [],
     additionalProperties: true,
   } as const,
-} satisfies { output: Schema };
+} satisfies { output: JsonSchema };

@@ -32,13 +32,14 @@ import { VisibilityButton } from './VisibilityButton';
 import { FreeTrialSidebarWidget } from '../layout/components/FreeTrialSidebarWidget';
 import { parseUrl } from '../../utils/routeUtils';
 import { OrganizationSwitcher } from '../../ee/clerk';
-import { IS_EE_AUTH_ENABLED } from '../../config/index';
+import { IS_SELF_HOSTED, IS_EE_AUTH_ENABLED } from '../../config/index';
 import { useFeatureFlag } from '../../hooks/useFeatureFlag';
 import { When } from '../utils/When';
 import { SidebarFooter } from '../layout/components/LocalStudioSidebar/SidebarFooter';
 import { useNavigateToLocalStudio } from '../../studio/hooks/useNavigateToLocalStudio';
 import { OpenLocalStudioModal } from '../../studio/components/OpenLocalStudioModal';
 import { OutlineButton } from '../../studio/components/OutlineButton';
+import { NewDashboardOptInWidget } from '../layout/components/v2/NewDashboardOptInWidget';
 
 const getEnvPageRoute = (route: ROUTES, env: BaseEnvironmentEnum) => parseUrl(route, { env });
 
@@ -161,6 +162,7 @@ export const RootNavMenu: React.FC = () => {
       {isV2Enabled ? (
         <>
           <SidebarFooter>
+            {!IS_SELF_HOSTED && IS_EE_AUTH_ENABLED && <NewDashboardOptInWidget />}
             <FreeTrialSidebarWidget />
             <OutlineButton fullWidth onClick={navigateToLocalStudio} Icon={IconLaptop}>
               Open Local Studio

@@ -1,4 +1,4 @@
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 
 /**
  * Twilio `POST /2010-04-01/Accounts/{AccountSid}/Messages.json` schema
@@ -145,7 +145,7 @@ const twilioOutputSchema = {
   },
   required: [],
   additionalProperties: true,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 export const twilioProviderSchemas = {
   output: twilioOutputSchema,

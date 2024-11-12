@@ -5,6 +5,9 @@ name: Deploy PROD WEBHOOK
 on:
   workflow_dispatch:
 
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
 jobs:
   publish_docker_image_webhook:
     uses: ./.github/workflows/reusable-docker.yml

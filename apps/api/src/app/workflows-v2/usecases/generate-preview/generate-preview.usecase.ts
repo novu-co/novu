@@ -1,34 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import {
   ChannelTypeEnum,
-  ControlPreviewIssue,
-  ControlPreviewIssueTypeEnum,
+  ContentIssue,
   ControlSchemas,
   GeneratePreviewResponseDto,
   JobStatusEnum,
-  JSONSchemaDto,
   PreviewPayload,
+  StepContentIssueEnum,
   StepTypeEnum,
   WorkflowOriginEnum,
+  WorkflowTypeEnum,
 } from '@novu/shared';
 import { merge } from 'lodash/fp';
 import _ = require('lodash');
+import { GetWorkflowByIdsUseCase } from '@novu/application-generic';
+import { NotificationTemplateEntity } from '@novu/dal';
 import { GeneratePreviewCommand } from './generate-preview-command';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { StepMissingControlsException, StepNotFoundException } from '../../exceptions/step-not-found-exception';
-import { ExtractDefaultsUsecase } from '../get-default-values-from-schema/extract-defaults.usecase';
-import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { OriginMissingException, StepIdMissingException } from './step-id-missing.exception';
 import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
+import { ValidateControlValuesAndConstructPassableStructureUsecase } from '../validate-control-values/build-default-control-values-usecase.service';
 
 @Injectable()
 export class GeneratePreviewUsecase {
   constructor(
     private legacyPreviewStepUseCase: PreviewStep,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private extractDefaultsUseCase: ExtractDefaultsUsecase,
-    private constructPayloadUseCase: BuildDefaultPayloadUseCase
+    private constructPayloadUseCase: BuildDefaultPayloadUseCase,
+    private controlValuesUsecase: ValidateControlValuesAndConstructPassableStructureUsecase
   ) {}
 
   async execute(command: GeneratePreviewCommand): Promise<GeneratePreviewResponseDto> {
@@ -63,40 +64,11 @@ export class GeneratePreviewUsecase {
     return { previewPayload, issues };
   }
 
-  3;
   private addMissingValuesToControlValues(command: GeneratePreviewCommand, stepControlSchema: ControlSchemas) {
-    const defaultValues = this.extractDefaultsUseCase.execute({
-      jsonSchemaDto: stepControlSchema.schema as JSONSchemaDto,
+    return this.controlValuesUsecase.execute({
+      controlSchema: stepControlSchema,
+      controlValues: command.generatePreviewRequestDto.controlValues || {},
     });
-
-    return {
-      augmentedControlValues: merge(defaultValues, command.generatePreviewRequestDto.controlValues),
-      issuesMissingValues: this.buildMissingControlValuesIssuesList(defaultValues, command),
-    };
-  }
-
-  private buildMissingControlValuesIssuesList(defaultValues: Record<string, any>, command: GeneratePreviewCommand) {
-    const missingRequiredControlValues = findMissingKeys(
-      defaultValues,
-      command.generatePreviewRequestDto.controlValues || {}
-    );
-
-    return this.buildControlPreviewIssues(missingRequiredControlValues);
-  }
-
-  private buildControlPreviewIssues(keys: string[]): Record<string, ControlPreviewIssue[]> {
-    const record: Record<string, ControlPreviewIssue[]> = {};
-
-    keys.forEach((key) => {
-      record[key] = [
-        {
-          issueType: ControlPreviewIssueTypeEnum.MISSING_VALUE,
-          message: `Value is missing on a required control`,
-        },
-      ];
-    });
-
-    return record;
   }
 
   private async executePreviewUsecase(
@@ -115,7 +87,6 @@ export class GeneratePreviewUsecase {
     }
 
     const state = buildState(hydratedPayload.steps);
-    console.log('state', JSON.stringify(state, null, 2));
 
     return await this.legacyPreviewStepUseCase.execute(
       PreviewStepCommand.create({
@@ -136,7 +107,9 @@ export class GeneratePreviewUsecase {
   private async getWorkflowUserIdentifierFromWorkflowObject(command: GeneratePreviewCommand) {
     const persistedWorkflow = await this.getWorkflowByIdsUseCase.execute({
       identifierOrInternalId: command.workflowId,
-      user: command.user,
+      environmentId: command.user.environmentId,
+      organizationId: command.user.organizationId,
+      userId: command.user._id,
     });
     const { steps } = persistedWorkflow;
     const step = steps.find((stepDto) => stepDto._id === command.stepDatabaseId);
@@ -146,20 +119,42 @@ export class GeneratePreviewUsecase {
     if (!step.template || !step.template.controls) {
       throw new StepMissingControlsException(command.stepDatabaseId, step);
     }
+    const origin = this.buildOrigin(persistedWorkflow);
 
     return {
       workflowId: persistedWorkflow.triggers[0].identifier,
       stepId: step.stepId,
       stepType: step.template.type,
       stepControlSchema: step.template.controls,
-      origin: persistedWorkflow.origin,
+      origin,
     };
+  }
+
+  /**
+   * Builds the origin of the workflow based on the workflow type.
+   * If the origin is not set, it will be built based on the workflow type.
+   * We need to do so for backward compatibility reasons.
+   */
+  private buildOrigin(persistedWorkflow: NotificationTemplateEntity): WorkflowOriginEnum {
+    if (persistedWorkflow.origin) {
+      return persistedWorkflow.origin;
+    }
+
+    if (persistedWorkflow.type === WorkflowTypeEnum.ECHO || persistedWorkflow.type === WorkflowTypeEnum.BRIDGE) {
+      return WorkflowOriginEnum.EXTERNAL;
+    }
+
+    if (persistedWorkflow.type === WorkflowTypeEnum.REGULAR) {
+      return WorkflowOriginEnum.NOVU_CLOUD_V1;
+    }
+
+    return WorkflowOriginEnum.NOVU_CLOUD;
   }
 }
 
 function buildResponse(
-  missingValuesIssue: Record<string, ControlPreviewIssue[]>,
-  missingPayloadVariablesIssue: Record<string, ControlPreviewIssue[]>,
+  missingValuesIssue: Record<string, ContentIssue[]>,
+  missingPayloadVariablesIssue: Record<string, ContentIssue[]>,
   executionOutput,
   stepType: StepTypeEnum,
   augmentedPayload: PreviewPayload

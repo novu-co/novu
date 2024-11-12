@@ -1,11 +1,11 @@
-import { Prism } from '@mantine/prism';
-import { errorMessage, Tabs } from '@novu/design-system';
+import { errorMessage } from '@novu/design-system';
 import { css } from '@novu/novui/css';
 import { useEffect, useMemo, useState } from 'react';
 import { createSearchParams, useNavigate } from 'react-router-dom';
 import { VStack } from '@novu/novui/jsx';
 import { Text, Title } from '@novu/novui';
 import { isAxiosError } from 'axios';
+import type { ExecuteOutput } from '@novu/framework/internal';
 // TODO: This indicates that all onboarding pages for studio should move under the "Studio" folder
 import { useWorkflowTrigger, useDiscover, useWorkflowPreview } from '../../studio/hooks/useBridgeAPI';
 import { Footer } from './components/Footer';
@@ -23,7 +23,6 @@ export const StudioOnboardingPreview = () => {
   const [controls, setStepControls] = useState({});
   const [payload, setPayload] = useState({});
   const { testUser } = useStudioState();
-  const [tab, setTab] = useState<string>('Preview');
   const track = useTelemetry();
   const navigate = useNavigate();
   const { data: bridgeResponse, isLoading: isLoadingList } = useDiscover();
@@ -154,7 +153,7 @@ export const StudioOnboardingPreview = () => {
                 source="studio"
                 error={null}
                 step={step}
-                preview={preview}
+                preview={preview as ExecuteOutput}
                 isLoadingPreview={previewLoading || isLoadingList}
               />
               <WorkflowStepEditorControlsPanel

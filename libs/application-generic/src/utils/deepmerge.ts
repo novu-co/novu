@@ -24,7 +24,7 @@ function emptyTarget(val: unknown) {
 
 function cloneUnlessOtherwiseSpecified(
   value: Record<string, unknown>,
-  options: IOptions
+  options: IOptions,
 ): Record<string, unknown> | Record<string, unknown>[] {
   return options.clone !== false && options.isMergeableObject(value)
     ? deepMergeObjects(emptyTarget(value), value, options)
@@ -34,13 +34,13 @@ function cloneUnlessOtherwiseSpecified(
 function defaultArrayMerge(
   target: Record<string, unknown>[],
   source: Record<string, unknown>[],
-  options: IOptions
+  options: IOptions,
 ): Record<string, unknown>[] {
   return target.concat(source).map(function (element) {
-    return cloneUnlessOtherwiseSpecified(
-      element,
-      options
-    ) as Record<string, unknown>;
+    return cloneUnlessOtherwiseSpecified(element, options) as Record<
+      string,
+      unknown
+    >;
   });
 }
 
@@ -79,7 +79,7 @@ function propertyIsUnsafe(target: Record<string, unknown>, key: string) {
 function mergeObject(
   target: Record<string, unknown>,
   source: Record<string, unknown>,
-  options: IOptions
+  options: IOptions,
 ): Record<string, unknown> {
   const destination = {};
   if (options.isMergeableObject(target)) {
@@ -88,7 +88,7 @@ function mergeObject(
     getKeys(target).forEach((key: string) => {
       destination[key] = cloneUnlessOtherwiseSpecified(
         target[key] as Record<string, unknown>,
-        options
+        options,
       );
     });
   }
@@ -106,12 +106,12 @@ function mergeObject(
       destination[key] = getMergeFunction(key as string, options)(
         target[key] as Record<string, unknown>,
         source[key] as Record<string, unknown>,
-        options
+        options,
       );
     } else {
       destination[key] = cloneUnlessOtherwiseSpecified(
         source[key] as Record<string, unknown>,
-        options
+        options,
       );
     }
   });
@@ -121,42 +121,42 @@ function mergeObject(
 
 interface IOptions {
   customMerge: (
-    key: string
+    key: string,
   ) => (
     target: Record<string, unknown>,
     source: Record<string, unknown>,
-    options: IOptions
+    options: IOptions,
   ) => Record<string, unknown>;
   arrayMerge: (
     target: Record<string, unknown>[],
     source: Record<string, unknown>[],
-    options: IOptions
+    options: IOptions,
   ) => Record<string, unknown>[];
   isMergeableObject: (value: unknown) => boolean;
   cloneUnlessOtherwiseSpecified: (
     value: Record<string, unknown>,
-    options: IOptions
+    options: IOptions,
   ) => Record<string, unknown> | Record<string, unknown>[];
   clone?: boolean;
 }
 
 interface IDeepMergeOptions {
   customMerge?: (
-    key: string
+    key: string,
   ) => (
     target: Record<string, unknown>,
     source: Record<string, unknown>,
-    options: IOptions
+    options: IOptions,
   ) => Record<string, unknown>;
   arrayMerge?: (
     target: Record<string, unknown>[],
     source: Record<string, unknown>[],
-    options: IOptions
+    options: IOptions,
   ) => Record<string, unknown>[];
   isMergeableObject?: (value: unknown) => boolean;
   cloneUnlessOtherwiseSpecified?: (
     value: Record<string, unknown>,
-    options: IOptions
+    options: IOptions,
   ) => Record<string, unknown> | Record<string, unknown>[];
   clone?: boolean;
 }
@@ -170,11 +170,11 @@ interface IDeepMergeOptions {
  * @returns The merged object or array of objects.
  */
 function deepMergeObjects<
-  T extends Record<string, unknown> | Record<string, unknown>[]
+  T extends Record<string, unknown> | Record<string, unknown>[],
 >(
   target: Record<string, unknown> | Record<string, unknown>[],
   source: Record<string, unknown> | Record<string, unknown>[],
-  options?: IDeepMergeOptions
+  options?: IDeepMergeOptions,
 ): T {
   options = options || {};
   options.arrayMerge = options.arrayMerge || defaultArrayMerge;
@@ -192,21 +192,21 @@ function deepMergeObjects<
   if (!sourceAndTargetTypesMatch) {
     return cloneUnlessOtherwiseSpecified(
       source as Record<string, unknown>,
-      options as IOptions
+      options as IOptions,
     ) as T;
   }
   if (sourceIsArray) {
     return options.arrayMerge(
       target as Record<string, unknown>[],
       source as Record<string, unknown>[],
-      options as IOptions
+      options as IOptions,
     ) as T;
   }
 
   return mergeObject(
     target as Record<string, unknown>,
     source,
-    options as IOptions
+    options as IOptions,
   ) as T;
 }
 
@@ -220,7 +220,7 @@ function deepMergeObjects<
  */
 export function deepMerge<T extends Record<string, unknown>>(
   array: T[],
-  options?: IDeepMergeOptions
+  options?: IDeepMergeOptions,
 ): T {
   if (!Array.isArray(array)) {
     throw new Error('first argument should be an array');

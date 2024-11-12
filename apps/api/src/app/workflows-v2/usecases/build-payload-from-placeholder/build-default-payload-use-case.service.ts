@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { Injectable } from '@nestjs/common';
-import { ControlPreviewIssue, ControlPreviewIssueTypeEnum, PreviewPayload } from '@novu/shared';
+import { ContentIssue, PreviewPayload, StepContentIssueEnum } from '@novu/shared';
 import { BaseCommand } from '@novu/application-generic';
 import _ = require('lodash');
 import { CreateMockPayloadForSingleControlValueUseCase } from '../placeholder-enrichment/payload-preview-value-generator.usecase';
@@ -16,7 +16,7 @@ export class BuildDefaultPayloadUseCase {
 
   execute(command: BuildDefaultPayloadCommand): {
     previewPayload: PreviewPayload;
-    issues: Record<string, ControlPreviewIssue[]>;
+    issues: Record<string, ContentIssue[]>;
   } {
     let aggregatedDefaultValues = {};
     const aggregatedDefaultValuesForControl: Record<string, Record<string, unknown>> = {};
@@ -96,13 +96,13 @@ export class BuildDefaultPayloadUseCase {
   private buildPayloadIssues(
     missingVariables: string[],
     variableToControlValueKeys: Record<string, string[]>
-  ): Record<string, ControlPreviewIssue[]> {
-    const record: Record<string, ControlPreviewIssue[]> = {};
+  ): Record<string, ContentIssue[]> {
+    const record: Record<string, ContentIssue[]> = {};
     missingVariables.forEach((missingVariable) => {
       variableToControlValueKeys[missingVariable].forEach((controlValueKey) => {
         record[controlValueKey] = [
           {
-            issueType: ControlPreviewIssueTypeEnum.MISSING_VARIABLE_IN_PAYLOAD,
+            issueType: StepContentIssueEnum.MISSING_VARIABLE_IN_PAYLOAD,
             message: `Variable payload.${missingVariable} is missing in payload`,
             variableName: `payload.${missingVariable}`,
           },

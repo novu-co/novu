@@ -17,7 +17,8 @@ export function BellGradient(props: React.ComponentPropsWithoutRef<'svg'>) {
           y1="26.4965"
           x2="15"
           y2="4.5"
-          gradientUnits="userSpaceOnUse">
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor="#FF512F" />
           <stop offset="1" stopColor="#DD2476" />
         </linearGradient>

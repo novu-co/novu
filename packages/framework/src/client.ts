@@ -9,14 +9,13 @@ import {
   ExecutionStateCorruptError,
   ExecutionStateOutputInvalidError,
   ExecutionStateResultInvalidError,
+  isFrameworkError,
   ProviderExecutionFailedError,
   ProviderNotFoundError,
   StepControlCompilationFailedError,
-  StepNotFoundError,
-  WorkflowAlreadyExistsError,
-  WorkflowNotFoundError,
   StepExecutionFailedError,
-  isFrameworkError,
+  StepNotFoundError,
+  WorkflowNotFoundError,
 } from './errors';
 import type {
   ActionStep,
@@ -31,6 +30,7 @@ import type {
   HealthCheck,
   Schema,
   Skip,
+  State,
   ValidationError,
   Workflow,
 } from './types';
@@ -46,13 +46,16 @@ import {
 import { validateData } from './validators';
 
 import { mockSchema } from './jsonSchemaFaker';
+import { prettyPrintDiscovery } from './resources/workflow/pretty-print-discovery';
+import { deepMerge } from './utils/object.utils';
 
 function isRuntimeInDevelopment() {
   return ['development', undefined].includes(process.env.NODE_ENV);
 }
 
 export class Client {
-  private discoveredWorkflows: Array<DiscoverWorkflowOutput> = [];
+  private discoveredWorkflows = new Map<string, DiscoverWorkflowOutput>();
+  private discoverWorkflowPromises = new Map<string, Promise<void>>();
 
   private templateEngine = new Liquid({
     outputEscape: (output) => {
@@ -94,19 +97,47 @@ export class Client {
     return builtConfiguration;
   }
 
-  public addWorkflows(workflows: Array<Workflow>) {
+  /**
+   * Adds workflows to the client.
+   *
+   * A locking mechanism is used to ensure that duplicate workflows are not added.
+   *
+   * @param workflows - The workflows to add.
+   */
+  public async addWorkflows(workflows: Array<Workflow>): Promise<void> {
     for (const workflow of workflows) {
-      if (this.discoveredWorkflows.some((existing) => existing.workflowId === workflow.definition.workflowId)) {
-        throw new WorkflowAlreadyExistsError(workflow.definition.workflowId);
-      } else {
-        this.discoveredWorkflows.push(workflow.definition);
+      if (this.discoveredWorkflows.has(workflow.id)) {
+        continue;
       }
+
+      const existingPromise = this.discoverWorkflowPromises.get(workflow.id);
+      if (existingPromise) {
+        // Wait for the existing promise to resolve if the workflow is already being added
+        await existingPromise;
+        continue;
+      }
+
+      const workflowPromise = this.addWorkflow(workflow);
+      this.discoverWorkflowPromises.set(workflow.id, workflowPromise);
+
+      await workflowPromise;
+    }
+  }
+
+  private async addWorkflow(workflow: Workflow): Promise<void> {
+    try {
+      const definition = await workflow.discover();
+      prettyPrintDiscovery(definition);
+      this.discoveredWorkflows.set(workflow.id, definition);
+    } finally {
+      this.discoverWorkflowPromises.delete(workflow.id);
     }
   }
 
   public healthCheck(): HealthCheck {
-    const workflowCount = this.discoveredWorkflows.length;
-    const stepCount = this.discoveredWorkflows.reduce((acc, workflow) => acc + workflow.steps.length, 0);
+    const discoveredWorkflows = this.getRegisteredWorkflows();
+    const workflowCount = discoveredWorkflows.length;
+    const stepCount = discoveredWorkflows.reduce((acc, workflow) => acc + workflow.steps.length, 0);
 
     return {
       status: 'ok',
@@ -120,7 +151,7 @@ export class Client {
   }
 
   private getWorkflow(workflowId: string): DiscoverWorkflowOutput {
-    const foundWorkflow = this.discoveredWorkflows.find((workflow) => workflow.workflowId === workflowId);
+    const foundWorkflow = this.discoveredWorkflows.get(workflowId);
 
     if (foundWorkflow) {
       return foundWorkflow;
@@ -142,7 +173,7 @@ export class Client {
   }
 
   private getRegisteredWorkflows(): Array<DiscoverWorkflowOutput> {
-    return this.discoveredWorkflows;
+    return Array.from(this.discoveredWorkflows.values());
   }
 
   public discover(): DiscoverOutput {
@@ -192,7 +223,7 @@ export class Client {
           throw new Error(`Invalid component: '${component}'`);
       }
     } else {
-      return result.data;
+      return result.data as T;
     }
   }
 
@@ -277,25 +308,27 @@ export class Client {
       }
 
       const step = this.getStep(event.workflowId, stepId);
-      const controls = await this.createStepControls(step, event);
       const isPreview = event.action === PostActionEnum.PREVIEW;
 
-      if (!isPreview && (await this.shouldSkip(options?.skip as typeof step.options.skip, controls))) {
-        if (stepId === event.stepId) {
-          // Only set the result when the step is the current step.
+      // Only evaluate a skip condition when the step is the current step and not in preview mode.
+      if (!isPreview && stepId === event.stepId) {
+        const controls = await this.createStepControls(step, event);
+        const shouldSkip = await this.shouldSkip(options?.skip as typeof step.options.skip, controls);
+
+        if (shouldSkip) {
           setResult({
             options: { skip: true },
             outputs: {},
             providers: {},
           });
-        }
 
-        /*
-         * Return an empty object for results when a step is skipped.
-         * TODO: fix typings when `skip` is specified to return `Partial<T_Result>`
-         */
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return {} as any;
+          /*
+           * Return an empty object for results when a step is skipped.
+           * TODO: fix typings when `skip` is specified to return `Partial<T_Result>`
+           */
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return {} as any;
+        }
       }
 
       const previewStepHandler = this.previewStep.bind(this);
@@ -634,7 +667,7 @@ export class Client {
       }
     } else {
       try {
-        const result = event.state.find((state) => state.stepId === step.stepId);
+        const result = this.getStepState(event, step.stepId);
 
         if (result) {
           const validatedOutput = await this.validate(
@@ -669,6 +702,7 @@ export class Client {
       const compiledString = await this.templateEngine.render(templateString, {
         payload: event.payload,
         subscriber: event.subscriber,
+        steps: buildSteps(event.state),
       });
 
       return JSON.parse(compiledString);
@@ -702,36 +736,7 @@ export class Client {
     step: DiscoverStepOutput
   ): Promise<Pick<ExecuteOutput, 'outputs' | 'providers'>> {
     try {
-      if (event.stepId === step.stepId) {
-        const templateControls = await this.createStepControls(step, event);
-        const controls = await this.compileControls(templateControls, event);
-
-        const previewOutput = await step.resolve(controls);
-        const validatedOutput = await this.validate(
-          previewOutput,
-          step.outputs.unknownSchema,
-          'step',
-          'output',
-          event.workflowId,
-          step.stepId
-        );
-
-        console.log(`  ${EMOJI.MOCK} Mocked stepId: \`${step.stepId}\``);
-
-        return {
-          outputs: validatedOutput,
-          providers: await this.executeProviders(event, step, validatedOutput),
-        };
-      } else {
-        const mockResult = this.mock(step.results.schema);
-
-        console.log(`  ${EMOJI.MOCK} Mocked stepId: \`${step.stepId}\``);
-
-        return {
-          outputs: mockResult,
-          providers: await this.executeProviders(event, step, mockResult),
-        };
-      }
+      return await this.constructStepForPreview(event, step);
     } catch (error) {
       console.log(`  ${EMOJI.ERROR} Failed to preview stepId: \`${step.stepId}\``);
 
@@ -741,6 +746,53 @@ export class Client {
         throw new StepExecutionFailedError(step.stepId, event.action, error);
       }
     }
+  }
+
+  private async constructStepForPreview(event: Event, step: DiscoverStepOutput) {
+    if (event.stepId === step.stepId) {
+      return await this.previewRequiredStep(step, event);
+    } else {
+      return await this.extractMockDataForPreviousSteps(event, step);
+    }
+  }
+
+  private async extractMockDataForPreviousSteps(event: Event, step: DiscoverStepOutput) {
+    const outputs: Record<string, unknown> = {};
+    const suppliedResult = this.getStepState(event, step.stepId);
+    const mockedOutputs = this.mock(step.results.schema);
+
+    const mergedOutput = deepMerge(mockedOutputs, suppliedResult?.outputs || {});
+
+    return {
+      outputs: mergedOutput,
+      providers: await this.executeProviders(event, step, outputs),
+    };
+  }
+
+  private async previewRequiredStep(step: DiscoverStepOutput, event: Event) {
+    const templateControls = await this.createStepControls(step, event);
+    const controls = await this.compileControls(templateControls, event);
+
+    const previewOutput = await step.resolve(controls);
+    const validatedOutput = await this.validate(
+      previewOutput,
+      step.outputs.unknownSchema,
+      'step',
+      'output',
+      event.workflowId,
+      step.stepId
+    );
+
+    console.log(`  ${EMOJI.MOCK} Mocked stepId: \`${step.stepId}\``);
+
+    return {
+      outputs: validatedOutput,
+      providers: await this.executeProviders(event, step, validatedOutput),
+    };
+  }
+
+  private getStepState(event: Event, stepId: string): State | undefined {
+    return event.state.find((state) => state.stepId === stepId);
   }
 
   private getStepCode(workflowId: string, stepId: string): CodeResult {
@@ -772,4 +824,13 @@ export class Client {
 
     return getCodeResult;
   }
+}
+function buildSteps(stateArray: State[]) {
+  const result: Record<string, Record<string, unknown>> = {};
+
+  for (const state of stateArray) {
+    result[state.stepId] = state.outputs; // Map stepId to outputs
+  }
+
+  return result;
 }

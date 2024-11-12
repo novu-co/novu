@@ -1,4 +1,4 @@
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 
 const pushOutputSchema = {
   type: 'object',
@@ -8,14 +8,14 @@ const pushOutputSchema = {
   },
   required: ['subject', 'body'],
   additionalProperties: false,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 const pushResultSchema = {
   type: 'object',
   properties: {},
   required: [],
   additionalProperties: false,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 export const pushChannelSchemas = {
   output: pushOutputSchema,

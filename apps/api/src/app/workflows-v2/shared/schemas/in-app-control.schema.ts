@@ -1,5 +1,4 @@
-import { JSONSchema } from 'json-schema-to-ts';
-import { UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
+import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum, UiSchemaProperty } from '@novu/shared';
 
 const ABSOLUTE_AND_RELATIVE_URL_REGEX = '^(?!mailto:)(?:(https?):\\/\\/[^\\s/$.?#].[^\\s]*)|^(\\/[^\\s]*)$';
 
@@ -18,7 +17,7 @@ const redirectSchema = {
   },
   required: ['url'], // url remains required
   additionalProperties: false, // No additional properties allowed
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchemaDto;
 
 const actionSchema = {
   type: 'object',
@@ -28,7 +27,7 @@ const actionSchema = {
   },
   required: ['label'],
   additionalProperties: false,
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchemaDto;
 
 export const inAppControlSchema = {
   type: 'object',
@@ -43,27 +42,43 @@ export const inAppControlSchema = {
   },
   required: ['body'],
   additionalProperties: false,
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchemaDto;
+
+const redirectPlaceholder = {
+  url: {
+    placeholder: '',
+  },
+  target: {
+    placeholder: '_self',
+  },
+};
+
 export const InAppUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.IN_APP,
   properties: {
     body: {
       component: UiComponentEnum.IN_APP_BODY,
+      placeholder: '',
     },
     avatar: {
       component: UiComponentEnum.IN_APP_AVATAR,
+      placeholder: '',
     },
     subject: {
       component: UiComponentEnum.IN_APP_SUBJECT,
+      placeholder: '',
     },
     primaryAction: {
       component: UiComponentEnum.IN_APP_BUTTON_DROPDOWN,
+      placeholder: null,
     },
     secondaryAction: {
       component: UiComponentEnum.IN_APP_BUTTON_DROPDOWN,
+      placeholder: null,
     },
     redirect: {
       component: UiComponentEnum.URL_TEXT_BOX,
+      placeholder: redirectPlaceholder,
     },
   },
 };

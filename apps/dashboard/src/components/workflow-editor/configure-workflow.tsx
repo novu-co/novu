@@ -2,14 +2,14 @@ import { useFormContext } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { RouteFill } from '../icons';
 import { Input, InputField } from '../primitives/input';
-import { RiArrowRightSLine, RiSettingsLine } from 'react-icons/ri';
+// import { RiArrowRightSLine, RiSettingsLine } from 'react-icons/ri';
 import * as z from 'zod';
 import { Separator } from '../primitives/separator';
 import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
 import { workflowSchema } from './schema';
 import { useTagsQuery } from '@/hooks/use-tags-query';
-import { Button } from '../primitives/button';
+// import { Button } from '../primitives/button';
 import { CopyButton } from '../primitives/copy-button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
 import { Switch } from '../primitives/switch';
@@ -82,7 +82,7 @@ export function ConfigureWorkflow() {
               <FormLabel>Workflow Identifier</FormLabel>
               <FormControl>
                 <InputField className="flex overflow-hidden pr-0">
-                  <Input placeholder="Untitled" {...field} disabled={isReadOnly} />
+                  <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
                   <CopyButton
                     content={field.value}
                     className="rounded-md rounded-s-none border-b-0 border-r-0 border-t-0 text-neutral-400"
@@ -120,7 +120,6 @@ export function ConfigureWorkflow() {
                   disabled={isReadOnly}
                   value={field.value ?? []}
                   suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []}
-                  showAddButton={!isReadOnly}
                 />
               </FormControl>
             </FormItem>
@@ -128,13 +127,13 @@ export function ConfigureWorkflow() {
         />
       </SidebarContent>
       <Separator />
-      <SidebarContent size="lg">
+      {/* <SidebarContent size="lg">
         <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
           <RiSettingsLine className="h-4 w-4 text-neutral-600" />
           Configure channel preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
         </Button>
       </SidebarContent>
-      <Separator />
+      <Separator /> */}
     </motion.div>
   );
 }
