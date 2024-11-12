@@ -24,7 +24,7 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
 
   const getTooltipContent = () => {
     if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
-      return `External workflows cannot be synced to ${oppositeEnvironment?.name} using dashboard.`;
+      return `Code-first workflows cannot be synced to ${oppositeEnvironment?.name} using dashboard.`;
     }
 
     if (workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1) {
