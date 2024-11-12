@@ -23,6 +23,7 @@ import { TestWorkflowFormType } from '../schema';
 import { SnippetLanguage } from './types';
 import { SnippetEditor } from './snippet-editor';
 import { Editor } from '@/components/primitives/editor';
+import { WorkflowOriginEnum } from '@/utils/enums';
 
 const tabsTriggerClassName = 'pt-1';
 const codePanelClassName = 'bg-background flex-1 w-full rounded-lg border border-neutral-200 p-3 overflow-y-auto';
@@ -41,7 +42,9 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
     control,
     formState: { errors },
   } = useFormContext<TestWorkflowFormType>();
-  const [activeSnippetTab, setActiveSnippetTab] = useState<SnippetLanguage>('framework');
+  const [activeSnippetTab, setActiveSnippetTab] = useState<SnippetLanguage>(() =>
+    workflow?.origin === WorkflowOriginEnum.EXTERNAL ? 'framework' : 'typescript'
+  );
   const to = useWatch({ name: 'to', control });
   const payload = useWatch({ name: 'payload', control });
   const identifier = workflow?.workflowId ?? '';
@@ -118,14 +121,16 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
             onValueChange={(value) => setActiveSnippetTab(value as SnippetLanguage)}
           >
             <TabsList className="border-t-0" variant="regular">
-              <TabsTrigger className={tabsTriggerClassName} value="framework" variant="regular">
-                Framework
+              {workflow?.origin === WorkflowOriginEnum.EXTERNAL && (
+                <TabsTrigger className={tabsTriggerClassName} value="framework" variant="regular">
+                  Framework
+                </TabsTrigger>
+              )}
+              <TabsTrigger className={tabsTriggerClassName} value="typescript" variant="regular">
+                NodeJS
               </TabsTrigger>
               <TabsTrigger className={tabsTriggerClassName} value="shell" variant="regular">
                 cURL
-              </TabsTrigger>
-              <TabsTrigger className={tabsTriggerClassName} value="typescript" variant="regular">
-                NodeJS
               </TabsTrigger>
               <TabsTrigger className={tabsTriggerClassName} value="php" variant="regular">
                 PHP
@@ -144,9 +149,11 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
                 value="Copy code"
               />
             </TabsList>
-            <TabsContent value="framework" className={codePanelClassName} variant="regular">
-              <SnippetEditor language="framework" value={snippetValue} />
-            </TabsContent>
+            {workflow?.origin === WorkflowOriginEnum.EXTERNAL && (
+              <TabsContent value="framework" className={codePanelClassName} variant="regular">
+                <SnippetEditor language="framework" value={snippetValue} />
+              </TabsContent>
+            )}
             <TabsContent value="shell" className={codePanelClassName} variant="regular">
               <SnippetEditor language="shell" value={snippetValue} />
             </TabsContent>
