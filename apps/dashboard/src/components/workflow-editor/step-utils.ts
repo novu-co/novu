@@ -20,7 +20,7 @@ export const getFirstControlsErrorMessage = (issues?: StepIssuesDto) => {
   }
 };
 
-export const convertIssuesToFlat = (controlIssues?: Record<string, ContentIssue[]>): Record<string, string> => {
+export const flattenIssues = (controlIssues?: Record<string, ContentIssue[]>): Record<string, string> => {
   const controlIssuesFlat: Record<string, ContentIssue[]> = flatten({ ...controlIssues }, { safe: true });
 
   return Object.entries(controlIssuesFlat).reduce((acc, [key, value]) => {
