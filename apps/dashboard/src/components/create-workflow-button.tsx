@@ -83,7 +83,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
       }}
     >
       <SheetTrigger {...props} />
-      <SheetContent>
+      <SheetContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <SheetHeader>
           <SheetTitle>Create workflow</SheetTitle>
           <div>
