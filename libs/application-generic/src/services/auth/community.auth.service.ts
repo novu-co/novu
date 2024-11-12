@@ -350,12 +350,6 @@ export class CommunityAuthService implements IAuthService {
     );
   }
 
-  @CachedEntity({
-    builder: ({ apiKey }: { apiKey: string }) =>
-      buildAuthServiceKey({
-        apiKey,
-      }),
-  })
   private async getApiKeyUser({ apiKey }: { apiKey: string }): Promise<{
     environment?: EnvironmentEntity;
     user?: UserEntity;
