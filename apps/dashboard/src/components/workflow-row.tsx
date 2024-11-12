@@ -130,7 +130,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
                 <RiPauseCircleLine />
                 Pause workflow
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem className="text-destructive" disabled={workflow.origin === WorkflowOriginEnum.EXTERNAL}>
                 <RiDeleteBin2Line />
                 Delete workflow
               </DropdownMenuItem>
