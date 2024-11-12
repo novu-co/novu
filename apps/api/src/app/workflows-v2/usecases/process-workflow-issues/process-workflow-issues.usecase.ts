@@ -130,7 +130,7 @@ export class ProcessWorkflowIssuesUsecase {
     await this.addTriggerIdentifierNotUniqueIfApplicable(command, issues);
     this.addNameMissingIfApplicable(command, issues);
     this.addDescriptionTooLongIfApplicable(command, issues);
-    this.processTags(command, issues);
+    this.addTagsIssues(command, issues);
 
     return issues;
   }
@@ -145,7 +145,7 @@ export class ProcessWorkflowIssuesUsecase {
     }
   }
 
-  private processTags(
+  private addTagsIssues(
     command: ProcessWorkflowIssuesCommand,
     issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
   ) {
