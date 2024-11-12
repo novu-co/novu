@@ -2,7 +2,7 @@ import { getV2, NovuApiError } from '@/api/api.client';
 import { syncWorkflow } from '@/api/workflows';
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { showToast } from '@/components/primitives/sonner-helpers';
-import { SuccessButtonToast } from '@/components/sucess-button-toast';
+import { SuccessButtonToast } from '@/components/success-button-toast';
 import { useEnvironment } from '@/context/environment/hooks';
 import type { IEnvironment, WorkflowListResponseDto, WorkflowResponseDto } from '@novu/shared';
 import { WorkflowOriginEnum, WorkflowStatusEnum } from '@novu/shared';

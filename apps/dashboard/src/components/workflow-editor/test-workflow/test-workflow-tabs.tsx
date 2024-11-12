@@ -15,7 +15,7 @@ import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
 import { showToast } from '../../primitives/sonner-helpers';
 import { buildDynamicFormSchema, makeObjectFromSchema, TestWorkflowFormType } from '../schema';
 import { TestWorkflowForm } from './test-workflow-form';
-import { SuccessButtonToast } from '@/components/sucess-button-toast';
+import { SuccessButtonToast } from '@/components/success-button-toast';
 
 export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataResponseDto }) => {
   const navigate = useNavigate();
