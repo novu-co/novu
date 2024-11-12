@@ -165,7 +165,7 @@ export class UpsertWorkflowUseCase {
 
   private async upsertUserWorkflowPreferences(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
     let preferences: WorkflowPreferences | null;
-    if (command.workflowDto.preferences?.user !== undefined && command.workflowDto.preferences?.user !== null) {
+    if (command.workflowDto.preferences?.user !== undefined) {
       preferences = command.workflowDto.preferences.user;
     } else {
       preferences = DEFAULT_WORKFLOW_PREFERENCES;
