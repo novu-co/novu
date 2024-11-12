@@ -166,11 +166,13 @@ export class GeneratePreviewUsecase {
 
     if (persistedWorkflow.type === WorkflowTypeEnum.ECHO || persistedWorkflow.type === WorkflowTypeEnum.BRIDGE) {
       return WorkflowOriginEnum.EXTERNAL;
-    } else if (persistedWorkflow.type === WorkflowTypeEnum.REGULAR) {
-      return WorkflowOriginEnum.NOVU_CLOUD_V1;
-    } else {
-      return WorkflowOriginEnum.NOVU_CLOUD;
     }
+
+    if (persistedWorkflow.type === WorkflowTypeEnum.REGULAR) {
+      return WorkflowOriginEnum.NOVU_CLOUD_V1;
+    }
+
+    return WorkflowOriginEnum.NOVU_CLOUD;
   }
 }
 
