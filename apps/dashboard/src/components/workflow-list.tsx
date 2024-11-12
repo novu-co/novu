@@ -91,7 +91,7 @@ export const WorkflowList = () => {
   }
 
   return (
-    <div className="flex h-full flex-col px-6 py-2">
+    <div className="flex h-full flex-col px-2.5 py-2">
       <Table>
         <TableHeader>
           <TableRow>
