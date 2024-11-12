@@ -21,7 +21,7 @@ import { usePreviewStep } from '@/hooks/use-preview-step';
 import useDebouncedEffect from '@/hooks/use-debounced-effect';
 import { CustomStepControls } from '../controls/custom-step-controls';
 import { useStep } from '../use-step';
-import { convertIssuesToFlat } from '../../step-utils';
+import { flattenIssues } from '../../step-utils';
 import { useWorkflowEditorContext } from '../../hooks';
 import {
   AlertDialog,
@@ -54,7 +54,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
   const [editorValue, setEditorValue] = useState('{}');
   const { reset, formState, setError } = form;
 
-  const controlErrors = useMemo(() => convertIssuesToFlat(workflowStep?.issues?.controls), [workflowStep]);
+  const controlErrors = useMemo(() => flattenIssues(workflowStep?.issues?.controls), [workflowStep]);
 
   useEffect(() => {
     if (Object.keys(controlErrors).length) {

@@ -47,6 +47,7 @@ import { validateData } from './validators';
 
 import { mockSchema } from './jsonSchemaFaker';
 import { prettyPrintDiscovery } from './resources/workflow/pretty-print-discovery';
+import { deepMerge } from './utils/object.utils';
 
 function isRuntimeInDevelopment() {
   return ['development', undefined].includes(process.env.NODE_ENV);
@@ -701,6 +702,7 @@ export class Client {
       const compiledString = await this.templateEngine.render(templateString, {
         payload: event.payload,
         subscriber: event.subscriber,
+        steps: buildSteps(event.state),
       });
 
       return JSON.parse(compiledString);
@@ -734,50 +736,7 @@ export class Client {
     step: DiscoverStepOutput
   ): Promise<Pick<ExecuteOutput, 'outputs' | 'providers'>> {
     try {
-      if (event.stepId === step.stepId) {
-        const templateControls = await this.createStepControls(step, event);
-        const controls = await this.compileControls(templateControls, event);
-
-        const previewOutput = await step.resolve(controls);
-        const validatedOutput = await this.validate(
-          previewOutput,
-          step.outputs.unknownSchema,
-          'step',
-          'output',
-          event.workflowId,
-          step.stepId
-        );
-
-        console.log(`  ${EMOJI.MOCK} Mocked stepId: \`${step.stepId}\``);
-
-        return {
-          outputs: validatedOutput,
-          providers: await this.executeProviders(event, step, validatedOutput),
-        };
-      } else {
-        let mockResult: Record<string, unknown>;
-        const suppliedResult = this.getStepState(event, step.stepId);
-
-        if (suppliedResult) {
-          mockResult = await this.validate(
-            suppliedResult.outputs,
-            step.results.unknownSchema,
-            'step',
-            'result',
-            event.workflowId,
-            step.stepId
-          );
-        } else {
-          mockResult = this.mock(step.results.schema);
-        }
-
-        console.log(`  ${EMOJI.MOCK} Mocked stepId: \`${step.stepId}\``);
-
-        return {
-          outputs: mockResult,
-          providers: await this.executeProviders(event, step, mockResult),
-        };
-      }
+      return await this.constructStepForPreview(event, step);
     } catch (error) {
       console.log(`  ${EMOJI.ERROR} Failed to preview stepId: \`${step.stepId}\``);
 
@@ -787,6 +746,49 @@ export class Client {
         throw new StepExecutionFailedError(step.stepId, event.action, error);
       }
     }
+  }
+
+  private async constructStepForPreview(event: Event, step: DiscoverStepOutput) {
+    if (event.stepId === step.stepId) {
+      return await this.previewRequiredStep(step, event);
+    } else {
+      return await this.extractMockDataForPreviousSteps(event, step);
+    }
+  }
+
+  private async extractMockDataForPreviousSteps(event: Event, step: DiscoverStepOutput) {
+    const outputs: Record<string, unknown> = {};
+    const suppliedResult = this.getStepState(event, step.stepId);
+    const mockedOutputs = this.mock(step.results.schema);
+
+    const mergedOutput = deepMerge(mockedOutputs, suppliedResult?.outputs || {});
+
+    return {
+      outputs: mergedOutput,
+      providers: await this.executeProviders(event, step, outputs),
+    };
+  }
+
+  private async previewRequiredStep(step: DiscoverStepOutput, event: Event) {
+    const templateControls = await this.createStepControls(step, event);
+    const controls = await this.compileControls(templateControls, event);
+
+    const previewOutput = await step.resolve(controls);
+    const validatedOutput = await this.validate(
+      previewOutput,
+      step.outputs.unknownSchema,
+      'step',
+      'output',
+      event.workflowId,
+      step.stepId
+    );
+
+    console.log(`  ${EMOJI.MOCK} Mocked stepId: \`${step.stepId}\``);
+
+    return {
+      outputs: validatedOutput,
+      providers: await this.executeProviders(event, step, validatedOutput),
+    };
   }
 
   private getStepState(event: Event, stepId: string): State | undefined {
@@ -822,4 +824,13 @@ export class Client {
 
     return getCodeResult;
   }
+}
+function buildSteps(stateArray: State[]) {
+  const result: Record<string, Record<string, unknown>> = {};
+
+  for (const state of stateArray) {
+    result[state.stepId] = state.outputs; // Map stepId to outputs
+  }
+
+  return result;
 }

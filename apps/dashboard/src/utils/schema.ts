@@ -122,7 +122,7 @@ export const buildDynamicZodSchema = (obj: JSONSchemaDto): z.AnyZodObject => {
     } else if (type === 'string') {
       zodValue = handleStringType({ key, requiredFields, format, pattern, enumValues, defaultValue });
     } else if (type === 'boolean') {
-      zodValue = z.boolean(isRequired ? { message: `${capitalize(key)} is required` } : undefined);
+      zodValue = z.boolean(isRequired ? { message: `${capitalize(key)} is missing` } : undefined);
     } else {
       zodValue = z.number(isRequired ? { message: `${capitalize(key)} is missing` } : undefined);
       if (defaultValue) {

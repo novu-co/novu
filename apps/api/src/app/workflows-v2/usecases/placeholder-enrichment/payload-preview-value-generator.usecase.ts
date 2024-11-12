@@ -7,7 +7,7 @@ import {
 } from './buildPayloadNestedStructureUsecase';
 import { PayloadDefaultsEngineFailureException } from './payload-defaults-engine-failure.exception';
 
-const unsupportedPrefixes: string[] = ['actor', 'steps'];
+const unsupportedPrefixes: string[] = ['actor'];
 @Injectable()
 export class CreateMockPayloadForSingleControlValueUseCase {
   constructor(
@@ -77,6 +77,7 @@ export function extractPlaceholders(potentialText: unknown): string[] {
   // eslint-disable-next-line no-cond-assign
   while ((match = regex.exec(potentialText)) !== null) {
     const placeholder = match[1] || match[2] || match[3];
+
     if (placeholder) {
       matches.push(placeholder.trim());
     }
