@@ -43,16 +43,6 @@ import {
 
 const LOG_CONTEXT = 'TriggerEventUseCase';
 
-export interface IExecuteBridgeRequestCommand {
-  bridgeUrl: string;
-  payload?: Record<string, unknown>;
-  apiKey: string;
-  searchParams?: Record<string, string>;
-  afterResponse?: any;
-  action: GetActionEnum | PostActionEnum;
-  retriesLimit?: number;
-}
-
 @Injectable()
 export class TriggerEvent {
   constructor(
