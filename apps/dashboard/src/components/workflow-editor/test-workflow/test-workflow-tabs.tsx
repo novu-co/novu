@@ -74,7 +74,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
     <div className="h-full w-full">
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="roun flex h-full flex-1 flex-nowrap">
-          <Tabs defaultValue="workflow" className="-mt-[1px] flex h-full flex-1 flex-col" value="trigger">
+          <Tabs defaultValue="workflow" className="-mt-[1px] flex flex-1 flex-col" value="trigger">
             <TabsList variant="regular">
               <TabsTrigger value="workflow" asChild variant="regular">
                 <Link
@@ -103,7 +103,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
                 </Button>
               </div>
             </TabsList>
-            <TabsContent value="trigger" className="mt-0 h-full w-full" variant="regular">
+            <TabsContent value="trigger" className="mt-0 flex w-full flex-1 flex-col overflow-hidden" variant="regular">
               <TestWorkflowForm workflow={workflow} />
             </TabsContent>
           </Tabs>

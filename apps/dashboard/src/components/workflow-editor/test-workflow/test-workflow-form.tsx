@@ -54,7 +54,7 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
   }, [activeSnippetTab, identifier, to, payload]);
 
   return (
-    <div className="flex h-full max-h-screen w-full flex-1 flex-col gap-3 overflow-hidden p-3">
+    <div className="flex w-full flex-1 flex-col gap-3 overflow-hidden p-3">
       <div className="flex flex-1 flex-col gap-3 xl:flex-row">
         <div className="flex-1">
           <Panel className="h-full">
