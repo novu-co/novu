@@ -165,7 +165,7 @@ export class UpsertWorkflowUseCase {
 
   private async upsertUserWorkflowPreferences(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
     let preferences: WorkflowPreferences | null;
-    if (command.workflowDto.preferences?.user !== undefined) {
+    if (command.workflowDto.preferences?.user !== undefined && command.workflowDto.preferences?.user !== null) {
       preferences = command.workflowDto.preferences.user;
     } else {
       preferences = DEFAULT_WORKFLOW_PREFERENCES;
@@ -183,12 +183,16 @@ export class UpsertWorkflowUseCase {
   }
 
   private async upsertWorkflowPreferences(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
+    if (!command.workflowDto.preferences?.workflow) {
+      return;
+    }
+
     await this.upsertPreferencesUsecase.upsertWorkflowPreferences(
       UpsertWorkflowPreferencesCommand.create({
         environmentId: workflow._environmentId,
         organizationId: workflow._organizationId,
         templateId: workflow._id,
-        preferences: command.workflowDto.preferences?.workflow || null,
+        preferences: command.workflowDto.preferences.workflow,
       })
     );
   }
