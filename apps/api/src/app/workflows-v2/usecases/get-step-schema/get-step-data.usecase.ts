@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ControlValuesLevelEnum, JSONSchemaDto, StepDataDto } from '@novu/shared';
 import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
+import { GetWorkflowByIdsUseCase } from '@novu/application-generic';
+
 import { GetStepDataCommand } from './get-step-data.command';
 import { mapStepTypeToResult } from '../../shared';
-import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { InvalidStepException } from '../../exceptions/invalid-step.exception';
 import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
 import { buildJSONSchema } from '../../shared/build-string-schema';
@@ -50,7 +51,9 @@ export class GetStepDataUsecase {
   private async fetchWorkflow(command: GetStepDataCommand) {
     const workflow = await this.getWorkflowByIdsUseCase.execute({
       identifierOrInternalId: command.identifierOrInternalId,
-      user: command.user,
+      environmentId: command.user.environmentId,
+      organizationId: command.user.organizationId,
+      userId: command.user._id,
     });
 
     if (!workflow) {

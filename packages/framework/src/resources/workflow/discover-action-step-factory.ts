@@ -1,6 +1,6 @@
 import { ActionStepEnum } from '../../constants';
 import { emptySchema } from '../../schemas';
-import type { Awaitable, DiscoverWorkflowOutput, Schema, ActionStep } from '../../types';
+import type { Awaitable, DiscoverWorkflowOutput, Schema, ActionStep, StepOptions, FromSchema } from '../../types';
 import { transformSchema } from '../../validators';
 import { discoverStep } from './discover-step';
 
@@ -32,7 +32,7 @@ export async function discoverActionStepFactory(
       },
       resolve: resolve as (controls: Record<string, unknown>) => Awaitable<Record<string, unknown>>,
       code: resolve.toString(),
-      options,
+      options: options as StepOptions<Schema, FromSchema<Schema>>,
       providers: [],
     });
 

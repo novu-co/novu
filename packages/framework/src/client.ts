@@ -222,7 +222,7 @@ export class Client {
           throw new Error(`Invalid component: '${component}'`);
       }
     } else {
-      return result.data;
+      return result.data as T;
     }
   }
 

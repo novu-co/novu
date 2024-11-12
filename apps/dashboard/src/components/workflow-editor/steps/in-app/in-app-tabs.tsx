@@ -156,7 +156,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
           <Separator />
           <TabsContent value="editor" className={tabsContentClassName}>
             <InAppEditor uiSchema={uiSchema} />
-            <CustomStepControls dataSchema={dataSchema} />
+            <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
           </TabsContent>
           <TabsContent value="preview" className={tabsContentClassName}>
             <InAppEditorPreview

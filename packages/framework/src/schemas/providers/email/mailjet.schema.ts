@@ -1,4 +1,4 @@
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 
 const address = {
   type: 'object',
@@ -9,7 +9,7 @@ const address = {
   description: `JSON object, containing 2 properties: Name and Email address of a previously validated and active sender. Including the Name property in the JSON is optional. This property is not mandatory in case you use TemplateID and you specified a From address for the template. Format : { "Email":"value", "Name":"value" }.`,
   required: ['Email'],
   additionalProperties: true,
-} satisfies Schema;
+} satisfies JsonSchema;
 
 const attachment = {
   type: 'object',
@@ -20,7 +20,7 @@ const attachment = {
   },
   required: ['ContentType', 'Filename', 'Base64Content'],
   additionalProperties: true,
-} satisfies Schema;
+} satisfies JsonSchema;
 
 const inlineAttatchment = {
   type: 'object',
@@ -32,7 +32,7 @@ const inlineAttatchment = {
   },
   required: ['ContentType', 'Filename', 'Base64Content'],
   additionalProperties: true,
-} satisfies Schema;
+} satisfies JsonSchema;
 
 /**
  * Mailjet `POST /send` schema
@@ -100,7 +100,7 @@ const mailjetOutputSchema = {
   },
   required: [],
   additionalProperties: true,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 export const mailjetProviderSchemas = {
   output: mailjetOutputSchema,

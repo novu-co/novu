@@ -67,7 +67,7 @@ export abstract class ServerError extends FrameworkError {
         stack: cause.stack ?? message,
       };
     } else {
-      super(`${message}: ${JSON.stringify(cause, null, 2)}`);
+      super(`${message}${cause ? `: ${JSON.stringify(cause, null, 2)}` : ''}`);
       this.data = {
         stack: message,
       };
