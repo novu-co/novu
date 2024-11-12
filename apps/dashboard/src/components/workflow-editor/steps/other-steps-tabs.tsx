@@ -1,5 +1,5 @@
 /**
- * This file is used as a placeholder for the other step configuration until the actual configuration is implemented.
+ * This component is used as a placeholder for the other step configuration until the actual configuration is implemented.
  */
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type StepDataDto, type StepUpdateDto, type WorkflowResponseDto } from '@novu/shared';
