@@ -8,7 +8,7 @@ on:
       - edited
 jobs:
   check-branches:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2204
     steps:
       - name: Check branches
         env:
