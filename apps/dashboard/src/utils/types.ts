@@ -20,10 +20,6 @@ export type RuntimeIssue = {
   message: string;
 };
 
-// TODO: update this when the API types are updated
-export type Step = Pick<StepResponseDto, 'name' | 'type' | '_id' | 'stepId' | 'slug'> & {
-  issues?: {
-    body: Record<string, RuntimeIssue[]>;
-    control: Record<string, RuntimeIssue[]>;
-  };
+export type Step = Pick<StepResponseDto, 'name' | 'type' | '_id' | 'stepId' | 'issues'> & {
+  slug: string;
 };

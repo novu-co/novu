@@ -9,13 +9,13 @@ import {
   UpsertSubscriberWorkflowPreferencesCommand,
   UpsertSubscriberGlobalPreferencesCommand,
   InstrumentUsecase,
+  Instrument,
 } from '@novu/application-generic';
 import {
   NotificationTemplateEntity,
   NotificationTemplateRepository,
   PreferenceLevelEnum,
   SubscriberEntity,
-  SubscriberPreferenceEntity,
   SubscriberPreferenceRepository,
   SubscriberRepository,
 } from '@novu/dal';
@@ -55,46 +55,16 @@ export class UpdatePreferences {
       }
     }
 
-    const userPreference: SubscriberPreferenceEntity | null = await this.subscriberPreferenceRepository.findOne(
-      this.commonQuery(command, subscriber)
-    );
-    if (!userPreference) {
-      await this.createUserPreference(command, subscriber);
-    } else {
-      await this.updateUserPreference(command, subscriber);
-    }
+    await this.updateSubscriberPreference(command, subscriber);
 
     return await this.findPreference(command, subscriber);
   }
 
-  private async createUserPreference(command: UpdatePreferencesCommand, subscriber: SubscriberEntity): Promise<void> {
-    const channelPreferences: IPreferenceChannels = this.buildPreferenceChannels(command);
-
-    await this.storePreferencesV2({
-      channels: channelPreferences,
-      organizationId: command.organizationId,
-      environmentId: command.environmentId,
-      _subscriberId: subscriber._id,
-      templateId: command.workflowId,
-    });
-
-    this.analyticsService.mixpanelTrack(AnalyticsEventsEnum.CREATE_PREFERENCES, '', {
-      _organization: command.organizationId,
-      _subscriber: subscriber._id,
-      _workflowId: command.workflowId,
-      level: command.level,
-      channels: channelPreferences,
-    });
-
-    const query = this.commonQuery(command, subscriber);
-    await this.subscriberPreferenceRepository.create({
-      ...query,
-      enabled: true,
-      channels: channelPreferences,
-    });
-  }
-
-  private async updateUserPreference(command: UpdatePreferencesCommand, subscriber: SubscriberEntity): Promise<void> {
+  @Instrument()
+  private async updateSubscriberPreference(
+    command: UpdatePreferencesCommand,
+    subscriber: SubscriberEntity
+  ): Promise<void> {
     const channelPreferences: IPreferenceChannels = this.buildPreferenceChannels(command);
 
     await this.storePreferencesV2({
@@ -136,6 +106,7 @@ export class UpdatePreferences {
     };
   }
 
+  @Instrument()
   private async findPreference(
     command: UpdatePreferencesCommand,
     subscriber: SubscriberEntity
@@ -198,6 +169,7 @@ export class UpdatePreferences {
   /**
    * Strangler pattern to migrate to V2 preferences.
    */
+  @Instrument()
   private async storePreferencesV2(item: {
     channels: IPreferenceChannels;
     organizationId: string;

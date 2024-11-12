@@ -183,12 +183,16 @@ export class UpsertWorkflowUseCase {
   }
 
   private async upsertWorkflowPreferences(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
+    if (!command.workflowDto.preferences?.workflow) {
+      return;
+    }
+
     await this.upsertPreferencesUsecase.upsertWorkflowPreferences(
       UpsertWorkflowPreferencesCommand.create({
         environmentId: workflow._environmentId,
         organizationId: workflow._organizationId,
         templateId: workflow._id,
-        preferences: command.workflowDto.preferences?.workflow || null,
+        preferences: command.workflowDto.preferences.workflow,
       })
     );
   }
