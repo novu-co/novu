@@ -9,10 +9,12 @@ import {
   StepContentIssueEnum,
   StepTypeEnum,
   WorkflowOriginEnum,
+  WorkflowTypeEnum,
 } from '@novu/shared';
 import { merge } from 'lodash/fp';
 import _ = require('lodash');
 import { GetWorkflowByIdsUseCase } from '@novu/application-generic';
+import { NotificationTemplateEntity } from '@novu/dal';
 import { GeneratePreviewCommand } from './generate-preview-command';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { StepMissingControlsException, StepNotFoundException } from '../../exceptions/step-not-found-exception';
@@ -117,14 +119,36 @@ export class GeneratePreviewUsecase {
     if (!step.template || !step.template.controls) {
       throw new StepMissingControlsException(command.stepDatabaseId, step);
     }
+    const origin = this.buildOrigin(persistedWorkflow);
 
     return {
       workflowId: persistedWorkflow.triggers[0].identifier,
       stepId: step.stepId,
       stepType: step.template.type,
       stepControlSchema: step.template.controls,
-      origin: persistedWorkflow.origin,
+      origin,
     };
+  }
+
+  /**
+   * Builds the origin of the workflow based on the workflow type.
+   * If the origin is not set, it will be built based on the workflow type.
+   * We need to do so for backward compatibility reasons.
+   */
+  private buildOrigin(persistedWorkflow: NotificationTemplateEntity): WorkflowOriginEnum {
+    if (persistedWorkflow.origin) {
+      return persistedWorkflow.origin;
+    }
+
+    if (persistedWorkflow.type === WorkflowTypeEnum.ECHO || persistedWorkflow.type === WorkflowTypeEnum.BRIDGE) {
+      return WorkflowOriginEnum.EXTERNAL;
+    }
+
+    if (persistedWorkflow.type === WorkflowTypeEnum.REGULAR) {
+      return WorkflowOriginEnum.NOVU_CLOUD_V1;
+    }
+
+    return WorkflowOriginEnum.NOVU_CLOUD;
   }
 }
 
