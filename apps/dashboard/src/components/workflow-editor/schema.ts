@@ -17,7 +17,7 @@ const channelsSchema = z.object({
 });
 
 export const workflowSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1, 'Workflow name is required'),
   workflowId: z.string(),
   description: z.string().optional(),
   tags: z.array(z.string()).optional(),
