@@ -1,18 +1,16 @@
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { RiArrowLeftSLine, RiCloseFill, RiDeleteBin2Line } from 'react-icons/ri';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarFooter, SidebarHeader } from '@/components/side-navigation/Sidebar';
 import { useWorkflowEditorContext } from '@/components/workflow-editor/hooks';
 import { useEnvironment } from '@/context/environment/hooks';
-import { StepTypeEnum } from '@/utils/enums';
 import { buildRoute, ROUTES } from '@/utils/routes';
-import { motion } from 'framer-motion';
-import { ConfigureInApp } from './in-app/configure-in-app';
 import { useStep } from './use-step';
-import ConfigureOtherSteps from './configure-other-steps';
-import { useState } from 'react';
 import { ConfirmationModal } from '@/components/confirmation-modal';
+import { ConfigureStepContent } from './configure-step-content';
 
 export function ConfigureStep() {
   const { step } = useStep();
@@ -67,7 +65,7 @@ export function ConfigureStep() {
 
       <Separator />
 
-      <Step stepType={step?.type} />
+      {step && <ConfigureStepContent />}
 
       <Separator />
 
@@ -98,29 +96,3 @@ export function ConfigureStep() {
     </motion.div>
   );
 }
-
-const Step = ({ stepType }: { stepType?: StepTypeEnum }) => {
-  switch (stepType) {
-    case StepTypeEnum.IN_APP:
-      return <ConfigureInApp />;
-
-    case StepTypeEnum.EMAIL:
-      return <ConfigureOtherSteps channelName="email" />;
-
-    case StepTypeEnum.SMS:
-      return <ConfigureOtherSteps channelName="sms" />;
-
-    case StepTypeEnum.PUSH:
-      return <ConfigureOtherSteps channelName="push" />;
-
-    case StepTypeEnum.CHAT:
-      return <ConfigureOtherSteps channelName="chat" />;
-
-    /**
-     * TODO: Add other step types here
-     * For now, it is just a placeholder with the use sdk banner
-     */
-    default:
-      return <ConfigureOtherSteps />;
-  }
-};

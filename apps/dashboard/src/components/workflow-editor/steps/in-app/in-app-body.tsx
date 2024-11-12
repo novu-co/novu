@@ -40,6 +40,7 @@ export const InAppBody = () => {
                   }),
                   EditorView.lineWrapping,
                 ]}
+                ref={field.ref}
                 value={field.value}
                 onChange={(val) => field.onChange(val)}
                 height="100%"

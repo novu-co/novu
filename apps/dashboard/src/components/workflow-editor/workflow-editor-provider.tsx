@@ -5,6 +5,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 // @ts-ignore
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { WorkflowOriginEnum, WorkflowResponseDto } from '@novu/shared';
 
 import { WorkflowEditorContext } from './workflow-editor-context';
 import { StepTypeEnum } from '@/utils/enums';
@@ -17,7 +18,6 @@ import { Step } from '@/utils/types';
 import { showToast } from '../primitives/sonner-helpers';
 import { ToastIcon } from '../primitives/sonner';
 import { handleValidationIssues } from '@/utils/handleValidationIssues';
-import { WorkflowOriginEnum } from '@novu/shared';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,9 +55,8 @@ const createStep = (type: StepTypeEnum): Step => ({
 export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) => {
   const changesSavedToastIdRef = useRef<string | number>();
   const { currentEnvironment } = useEnvironment();
-  const { workflowSlug } = useParams<{ workflowSlug?: string }>();
+  const { workflowSlug = '' } = useParams<{ workflowSlug?: string; stepSlug?: string }>();
   const navigate = useNavigate();
-
   const { workflow, error } = useFetchWorkflow({
     workflowSlug,
   });
@@ -70,16 +69,27 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
     resolver: zodResolver(workflowSchema),
     defaultValues: defaultFormValues,
   });
-  const { reset, setError } = form;
+  const {
+    reset,
+    getValues,
+    setError,
+    formState: { isDirty },
+  } = form;
   const steps = useFieldArray({
     control: form.control,
     name: 'steps',
   });
   const isReadOnly = workflow?.origin === WorkflowOriginEnum.EXTERNAL;
 
+  const resetWorkflowForm = useCallback(
+    (workflow: WorkflowResponseDto) => {
+      reset({ ...workflow, steps: workflow.steps.map((step) => ({ ...step })) });
+    },
+    [reset]
+  );
+
   useLayoutEffect(() => {
     if (error) {
-      // TODO: check if this is the correct ROUTES
       navigate(buildRoute(ROUTES.WORKFLOWS, { environmentSlug: currentEnvironment?.slug ?? '' }));
     }
 
@@ -87,16 +97,16 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
       return;
     }
 
-    reset(defaultFormValues);
-  }, [workflow, defaultFormValues, error, navigate, reset, currentEnvironment]);
+    resetWorkflowForm(workflow);
+  }, [workflow, error, navigate, resetWorkflowForm, currentEnvironment]);
 
   const { updateWorkflow, isPending } = useUpdateWorkflow({
     onSuccess: (data) => {
-      reset({ ...data, steps: data.steps.map((step) => ({ ...step })) });
+      resetWorkflowForm(data);
 
       if (data.issues) {
         // TODO: remove the as any cast when BE issues are typed
-        handleValidationIssues({ fields: form.getValues(), issues: data.issues as any, setError });
+        handleValidationIssues({ fields: getValues(), issues: data.issues as any, setError });
       }
 
       if (changesSavedToastIdRef.current) {
@@ -124,7 +134,7 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
     },
   });
 
-  const blocker = useBlocker(form.formState.isDirty || isPending);
+  const blocker = useBlocker(isDirty || isPending);
 
   useFormAutoSave({
     form,
@@ -172,8 +182,9 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
       isReadOnly,
       addStep,
       deleteStep,
+      resetWorkflowForm,
     }),
-    [addStep, isReadOnly, deleteStep]
+    [addStep, isReadOnly, deleteStep, resetWorkflowForm]
   );
 
   return (
