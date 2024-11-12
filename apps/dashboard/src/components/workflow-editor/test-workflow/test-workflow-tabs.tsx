@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { RiPlayCircleLine } from 'react-icons/ri';
+import { RiPlayCircleLine, RiProgress1Fill } from 'react-icons/ri';
 import { useForm } from 'react-hook-form';
 // eslint-disable-next-line
 // @ts-ignore
@@ -16,6 +16,7 @@ import { showToast } from '../../primitives/sonner-helpers';
 import { buildDynamicFormSchema, makeObjectFromSchema, TestWorkflowFormType } from '../schema';
 import { TestWorkflowForm } from './test-workflow-form';
 import { SuccessButtonToast } from '@/components/success-button-toast';
+import { toast } from 'sonner';
 
 export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataResponseDto }) => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
     defaultValues: { to, payload: JSON.stringify(payload, null, 2) },
   });
   const { handleSubmit } = form;
-  const { triggerWorkflow } = useTriggerWorkflow();
+  const { triggerWorkflow, isPending } = useTriggerWorkflow();
 
   const onSubmit = async (data: TestWorkflowFormType) => {
     try {
@@ -66,7 +67,9 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
         },
       });
     } catch (e) {
-      console.error(e);
+      toast.error('Failed to trigger workflow', {
+        description: e instanceof Error ? e.message : 'There was an error triggering the workflow.',
+      });
     }
   };
 
@@ -97,8 +100,8 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
                 </Link>
               </TabsTrigger>
               <div className="ml-auto">
-                <Button type="submit" variant="primary" size="sm" className="flex gap-1">
-                  <RiPlayCircleLine className="size-5" />
+                <Button type="submit" variant="primary" size="sm" className="flex gap-1" disabled={isPending}>
+                  {isPending ? <RiProgress1Fill className="size-5" /> : <RiPlayCircleLine className="size-5" />}
                   <span>Test workflow</span>
                 </Button>
               </div>
