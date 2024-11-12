@@ -38,12 +38,10 @@ const WorkflowListEmptyProd = ({ switchToDev }: { switchToDev: () => void }) => 
         <RiBookMarkedLine className="size-4" />
         View docs
       </Link>
-      <CreateWorkflowButton asChild>
-        <Button variant="primary" className="gap-2" onClick={switchToDev}>
-          <RiRouteFill className="size-5" />
-          Switch to dev
-        </Button>
-      </CreateWorkflowButton>
+      <Button variant="primary" className="gap-2" onClick={switchToDev}>
+        <RiRouteFill className="size-5" />
+        Switch to dev
+      </Button>
     </div>
   </div>
 );
