@@ -1,4 +1,4 @@
-import { LEGACY_DASHBOARD_URL } from '@/config';
+import { LEGACY_DASHBOARD_URL, NEW_DASHBOARD_FEEDBACK_FORM_URL } from '@/config';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { useUser } from '@clerk/clerk-react';
@@ -27,6 +27,11 @@ export function useNewDashboardOptIn() {
 
   const redirectToLegacyDashboard = () => {
     optOut();
+
+    if (NEW_DASHBOARD_FEEDBACK_FORM_URL) {
+      window.open(NEW_DASHBOARD_FEEDBACK_FORM_URL, '_blank');
+    }
+
     window.location.href = LEGACY_DASHBOARD_URL || window.location.origin + '/legacy';
   };
 
