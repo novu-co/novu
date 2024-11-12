@@ -103,6 +103,7 @@
     "codesee",
     "codestream",
     "coep",
+    "combinators",
     "commitlint",
     "compatbility",
     "cond",
@@ -292,7 +293,7 @@
     "lastindex",
     "Lato",
     "Lentczner",
-    "lezer"
+    "lezer",
     "libarary",
     "libauth",
     "libspf",

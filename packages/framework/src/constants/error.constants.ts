@@ -11,6 +11,7 @@ export enum ErrorCodeEnum {
   EXECUTION_STATE_RESULT_INVALID_ERROR = 'ExecutionStateResultInvalidError',
   INVALID_ACTION_ERROR = 'InvalidActionError',
   METHOD_NOT_ALLOWED_ERROR = 'MethodNotAllowedError',
+  MISSING_DEPENDENCY_ERROR = 'MissingDependencyError',
   MISSING_SECRET_KEY_ERROR = 'MissingSecretKeyError',
   PROVIDER_EXECUTION_FAILED_ERROR = 'ProviderExecutionFailedError',
   PROVIDER_NOT_FOUND_ERROR = 'ProviderNotFoundError',

@@ -1,8 +1,6 @@
 import * as z from 'zod';
-import { UiSchema, WorkflowTestDataResponseDto } from '@novu/shared';
+import { JSONSchemaDto, UiSchema } from '@novu/shared';
 import { capitalize } from './string';
-
-type JSONSchema = WorkflowTestDataResponseDto['to'];
 
 type ZodValue =
   | z.AnyZodObject
@@ -11,7 +9,8 @@ type ZodValue =
   | z.ZodEffects<z.ZodTypeAny>
   | z.ZodDefault<z.ZodTypeAny>
   | z.ZodEnum<[string, ...string[]]>
-  | z.ZodOptional<z.ZodTypeAny>;
+  | z.ZodOptional<z.ZodTypeAny>
+  | z.ZodBoolean;
 
 const handleStringFormat = ({ value, key, format }: { value: z.ZodString; key: string; format: string }) => {
   if (format === 'email') {
@@ -96,7 +95,7 @@ const handleStringType = ({
  * The function will recursively build the schema based on the JSONSchema object.
  * It removes empty strings and objects with empty required fields during the transformation phase after parsing.
  */
-export const buildDynamicZodSchema = (obj: JSONSchema): z.AnyZodObject => {
+export const buildDynamicZodSchema = (obj: JSONSchemaDto): z.AnyZodObject => {
   const properties = typeof obj === 'object' ? (obj.properties ?? {}) : {};
   const requiredFields = typeof obj === 'object' ? (obj.required ?? []) : [];
 
@@ -113,7 +112,7 @@ export const buildDynamicZodSchema = (obj: JSONSchema): z.AnyZodObject => {
     if (type === 'object') {
       zodValue = buildDynamicZodSchema(jsonSchemaProp);
       if (defaultValue) {
-        zodValue = zodValue.default(defaultValue);
+        zodValue = zodValue.default(defaultValue as object);
       }
       zodValue = zodValue.transform((val) => {
         const hasAnyRequiredEmpty = required?.some((field) => val[field] === '' || val[field] === undefined);
@@ -122,6 +121,8 @@ export const buildDynamicZodSchema = (obj: JSONSchema): z.AnyZodObject => {
       });
     } else if (type === 'string') {
       zodValue = handleStringType({ key, requiredFields, format, pattern, enumValues, defaultValue });
+    } else if (type === 'boolean') {
+      zodValue = z.boolean(isRequired ? { message: `${capitalize(key)} is required` } : undefined);
     } else {
       zodValue = z.number(isRequired ? { message: `${capitalize(key)} is required` } : undefined);
       if (defaultValue) {

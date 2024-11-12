@@ -4,6 +4,8 @@ import {
   CreateMessageTemplate,
   CreateWorkflow,
   DeleteMessageTemplate,
+  DeleteWorkflowUseCase,
+  GetWorkflowByIdsUseCase,
   UpdateChange,
   UpdateMessageTemplate,
   UpdateWorkflow,
@@ -18,6 +20,9 @@ import { USECASES } from './usecases';
 const PROVIDERS = [
   CreateWorkflow,
   UpdateWorkflow,
+  GetWorkflowByIdsUseCase,
+  DeleteWorkflowUseCase,
+  UpsertControlValuesUseCase,
   CreateMessageTemplate,
   UpdateMessageTemplate,
   DeleteMessageTemplate,

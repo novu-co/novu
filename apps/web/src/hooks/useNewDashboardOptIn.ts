@@ -1,5 +1,6 @@
 import { useUser } from '@clerk/clerk-react';
 import { NewDashboardOptInStatusEnum } from '@novu/shared';
+import { NEW_DASHBOARD_URL } from '../config';
 
 export function useNewDashboardOptIn() {
   const { user } = useUser();
@@ -21,12 +22,12 @@ export function useNewDashboardOptIn() {
     return user.unsafeMetadata?.newDashboardOptInStatus || null;
   };
 
-  const optIn = () => {
-    const newDashboardUrl = process.env.NEW_DASHBOARD_URL;
-    if (!newDashboardUrl) return;
+  const redirectToNewDashboard = () => {
+    window.location.href = NEW_DASHBOARD_URL || window.location.origin;
+  };
 
+  const optIn = () => {
     updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_IN);
-    window.location.href = newDashboardUrl;
   };
 
   const optOut = () => {
@@ -37,5 +38,11 @@ export function useNewDashboardOptIn() {
     updateUserOptInStatus(NewDashboardOptInStatusEnum.DISMISSED);
   };
 
-  return { optIn, optOut, dismiss, status: getCurrentOptInStatus() };
+  return {
+    optIn,
+    optOut,
+    dismiss,
+    status: getCurrentOptInStatus(),
+    redirectToNewDashboard,
+  };
 }

@@ -1,14 +1,14 @@
-import {
+import type {
   ControlSchemas,
   EnvironmentId,
   IActor,
   IMessageCTA,
   IMessageTemplate,
+  JSONSchemaDto,
   MessageTemplateContentType,
   OrganizationId,
   StepTypeEnum,
 } from '@novu/shared';
-import { JSONSchema } from 'json-schema-to-ts';
 
 import { IEmailBlock, ITemplateVariable } from './types';
 import type { ChangePropsValueType } from '../../types/helpers';
@@ -60,7 +60,7 @@ export class MessageTemplateEntity implements IMessageTemplate {
   controls?: ControlSchemas;
 
   output?: {
-    schema: JSONSchema;
+    schema: JSONSchemaDto;
   };
 
   code?: string;

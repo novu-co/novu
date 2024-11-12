@@ -80,6 +80,8 @@
     "singleQuote": true
   },
   "nx": {
-    "tags": ["package:public"]
+    "tags": [
+      "package:public"
+    ]
   }
 }

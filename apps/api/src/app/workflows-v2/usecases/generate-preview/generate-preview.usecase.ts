@@ -12,10 +12,10 @@ import {
 } from '@novu/shared';
 import { merge } from 'lodash/fp';
 import _ = require('lodash');
+import { GetWorkflowByIdsUseCase } from '@novu/application-generic';
 import { GeneratePreviewCommand } from './generate-preview-command';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { StepMissingControlsException, StepNotFoundException } from '../../exceptions/step-not-found-exception';
-import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { OriginMissingException, StepIdMissingException } from './step-id-missing.exception';
 import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
@@ -129,7 +129,9 @@ export class GeneratePreviewUsecase {
   private async getWorkflowUserIdentifierFromWorkflowObject(command: GeneratePreviewCommand) {
     const persistedWorkflow = await this.getWorkflowByIdsUseCase.execute({
       identifierOrInternalId: command.workflowId,
-      user: command.user,
+      environmentId: command.user.environmentId,
+      organizationId: command.user.organizationId,
+      userId: command.user._id,
     });
     const { steps } = persistedWorkflow;
     const step = steps.find((stepDto) => stepDto._id === command.stepDatabaseId);
