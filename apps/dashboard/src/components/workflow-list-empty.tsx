@@ -32,6 +32,7 @@ const WorkflowListEmptyProd = ({ switchToDev }: { switchToDev: () => void }) => 
     <div className="flex items-center justify-center gap-6">
       <Link
         to={'https://docs.novu.co/concepts/workflows'}
+        target="_blank"
         className={buttonVariants({ variant: 'link', className: 'text-foreground-600 gap-1' })}
       >
         <RiBookMarkedLine className="size-4" />
@@ -63,6 +64,7 @@ const WorkflowListEmptyDev = () => (
     <div className="flex items-center justify-center gap-6">
       <Link
         to={'https://docs.novu.co/concepts/workflows'}
+        target="_blank"
         className={buttonVariants({ variant: 'link', className: 'text-foreground-600 gap-1' })}
       >
         <RiBookMarkedLine className="size-4" />
