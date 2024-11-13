@@ -190,7 +190,7 @@ export class ExecuteBridgeJob {
     searchParams,
     workflowOrigin,
     environmentId,
-  }: Omit<ExecuteBridgeRequestCommand, 'afterResponse' | 'action' | 'retriesLimit'> & {
+  }: Omit<ExecuteBridgeRequestCommand, 'processError' | 'action' | 'retriesLimit'> & {
     job: JobEntity;
   }): Promise<ExecuteOutput> {
     return this.executeBridgeRequest.execute({
@@ -198,39 +198,24 @@ export class ExecuteBridgeJob {
       event,
       action: PostActionEnum.EXECUTE,
       searchParams,
-      afterResponse: async (response) => {
-        const body = response?.body as string;
+      processError: async (response) => {
+        const createExecutionDetailsCommand: CreateExecutionDetailsCommand = {
+          ...CreateExecutionDetailsCommand.getDetailsFromJob(job),
+          detail: DetailEnum.FAILED_BRIDGE_EXECUTION,
+          source: ExecutionDetailsSourceEnum.INTERNAL,
+          status: ExecutionDetailsStatusEnum.FAILED,
+          isTest: false,
+          isRetry: false,
+          raw: JSON.stringify({
+            url: response.url,
+            statusCode: response.statusCode,
+            message: response.message,
+            code: response.code,
+            data: response.data,
+          }),
+        };
 
-        if (response.statusCode >= 400) {
-          let rawMessage: Record<string, unknown>;
-          try {
-            rawMessage = JSON.parse(body);
-          } catch {
-            Logger.error(`Unexpected body received from Bridge: ${body}`, LOG_CONTEXT);
-            rawMessage = {
-              error: `Unexpected body received from Bridge: ${body}`,
-            };
-          }
-          const createExecutionDetailsCommand: CreateExecutionDetailsCommand = {
-            ...CreateExecutionDetailsCommand.getDetailsFromJob(job),
-            detail: DetailEnum.FAILED_BRIDGE_EXECUTION,
-            source: ExecutionDetailsSourceEnum.INTERNAL,
-            status: ExecutionDetailsStatusEnum.FAILED,
-            isTest: false,
-            isRetry: false,
-            raw: JSON.stringify({
-              url: statelessBridgeUrl,
-              statusCode: response.statusCode,
-              retryCount: response.retryCount,
-              message: response.statusMessage,
-              ...(body && body?.length > 0 ? { raw: rawMessage } : {}),
-            }),
-          };
-
-          await this.createExecutionDetails.execute(createExecutionDetailsCommand);
-        }
-
-        return response;
+        await this.createExecutionDetails.execute(createExecutionDetailsCommand);
       },
       workflowOrigin,
       environmentId,
