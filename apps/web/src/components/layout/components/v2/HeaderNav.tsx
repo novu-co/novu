@@ -29,6 +29,8 @@ export function HeaderNav() {
   const [isSupportModalOpened, setIsSupportModalOpened] = useState(false);
   const isV2Enabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_ENABLED);
 
+  // variable to check if it's the first render for. Needed for Plain live chat initialization
+  const [isFirstRender, setIsFirstRender] = useState(true);
   const isLiveChatVisible =
     process.env.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID &&
     IS_NOVU_PROD_STAGING &&
@@ -42,7 +44,7 @@ export function HeaderNav() {
   };
 
   useEffect(() => {
-    if (isLiveChatVisible) {
+    if (isLiveChatVisible && isFirstRender) {
       // @ts-ignore
       window.Plain.init({
         appId: process.env.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID,
@@ -63,16 +65,14 @@ export function HeaderNav() {
           emailHash: currentUser?.servicesHashes?.plain,
         },
       });
-
-      // @ts-ignore
-      window.Plain.show();
     }
+    setIsFirstRender(false);
   }, [isLiveChatVisible, currentUser]);
 
   const showLiveChat = () => {
     if (currentUser?.servicesHashes?.plain && process.env.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID) {
       // @ts-ignore
-      window.Plain.show();
+      window.Plain.open();
     }
   };
 
