@@ -2,9 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <title>Novu Cloud Dashboard</title>
+    <meta name="description" content="Novu Cloud Dashboard" />
+    <meta name="theme-color" content="#fff" />
+    <link rel="icon" href="/favicon-gradient.svg" />
+    <link rel="apple-touch-icon" href="/favicon-gradient.svg" />
+    <link rel="manifest" href="/manifest.json" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -15,8 +19,40 @@
       href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
       rel="stylesheet"
     />
+    <% if (env.VITE_GTM) { %>
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', '<%= env.VITE_GTM %>');
+    </script>
+    <% } %>
   </head>
   <body>
+    <% if (env.VITE_GTM) { %>
+    <noscript>
+      <iframe
+        src="https://www.googletagmanager.com/ns.html?id=<%= env.VITE_GTM %>"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe>
+    </noscript>
+    <% } %> <% if (env.VITE_SELF_HOSTED === 'false' ) { %>
+    <script
+      src="https://uptime.betterstack.com/widgets/announcement.js"
+      data-id="144175"
+      async="async"
+      type="text/javascript"
+    ></script>
+    <% } %>
+
     <div id="root" class="h-full"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

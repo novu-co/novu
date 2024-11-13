@@ -1,22 +1,17 @@
-import { useMutation } from '@tanstack/react-query';
-import type { UpdateWorkflowDto, WorkflowResponseDto } from '@novu/shared';
 import { updateWorkflow } from '@/api/workflows';
+import type { WorkflowResponseDto } from '@novu/shared';
+import { useMutation, UseMutationOptions } from '@tanstack/react-query';
 
-export const useUpdateWorkflow = ({
-  onSuccess,
-  onError,
-}: { onSuccess?: (data: WorkflowResponseDto) => void; onError?: (error: unknown) => void } = {}) => {
-  const { mutateAsync, isPending, error, data } = useMutation({
-    mutationFn: async ({ id, workflow }: { id: string; workflow: UpdateWorkflowDto }) =>
-      updateWorkflow({ id, workflow }),
-    onSuccess,
-    onError,
+export const useUpdateWorkflow = (
+  options?: UseMutationOptions<WorkflowResponseDto, unknown, Parameters<typeof updateWorkflow>[0]>
+) => {
+  const mutation = useMutation({
+    mutationFn: updateWorkflow,
+    ...options,
   });
 
   return {
-    updateWorkflow: mutateAsync,
-    isPending,
-    error,
-    data,
+    ...mutation,
+    updateWorkflow: mutation.mutateAsync,
   };
 };

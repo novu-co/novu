@@ -3,8 +3,8 @@ import {
   Logger,
   NotFoundException,
   BadRequestException,
+  HttpStatus,
   HttpException,
-  RequestTimeoutException,
 } from '@nestjs/common';
 import got, {
   CacheError,
@@ -29,6 +29,7 @@ import {
 import { EnvironmentRepository } from '@novu/dal';
 import { WorkflowOriginEnum } from '@novu/shared';
 import {
+  BridgeError,
   ExecuteBridgeRequestCommand,
   ExecuteBridgeRequestDto,
 } from './execute-bridge-request.command';
@@ -77,6 +78,25 @@ type TunnelResponseError = {
   message: string;
 };
 
+/**
+ * A wrapper around the BridgeError that is thrown by the ExecuteBridgeRequest usecase.
+ */
+class BridgeRequestError extends HttpException {
+  constructor(bridgeError: BridgeError) {
+    super(
+      {
+        message: bridgeError.message,
+        code: bridgeError.code,
+        data: bridgeError.data,
+      },
+      bridgeError.statusCode,
+      {
+        cause: bridgeError.cause,
+      },
+    );
+  }
+}
+
 @Injectable()
 export class ExecuteBridgeRequest {
   constructor(
@@ -121,11 +141,17 @@ export class ExecuteBridgeRequest {
       timeout: DEFAULT_TIMEOUT,
       json: command.event,
       retry: {
-        calculateDelay: ({
-          attemptCount,
-        }: {
-          attemptCount: number;
-        }): number => {
+        calculateDelay: ({ attemptCount, computedValue }) => {
+          if (computedValue === 0) {
+            /*
+             * If the computed value is 0, the retry conditions were not met and we don't want to retry.
+             * The retry condition is only met when the response has a `statusCodes` or `errorCodes`
+             * that matches the supplied retry configuration values.
+             * @see https://github.com/sindresorhus/got/blob/3034c2fdcebdff94907a6e015a8b154e851fc343/documentation/7-retry.md?plain=1#L130
+             */
+            return 0;
+          }
+
           if (attemptCount === retriesLimit) {
             return 0;
           }
@@ -134,10 +160,6 @@ export class ExecuteBridgeRequest {
         },
         statusCodes: RETRYABLE_HTTP_CODES,
         errorCodes: RETRYABLE_ERROR_CODES,
-      },
-      hooks: {
-        afterResponse:
-          command.afterResponse !== undefined ? [command.afterResponse] : [],
       },
       https: {
         /*
@@ -163,7 +185,7 @@ export class ExecuteBridgeRequest {
         headers,
       }).json();
     } catch (error) {
-      this.handleResponseError(error, url);
+      await this.handleResponseError(error, bridgeUrl, command.processError);
     }
   }
 
@@ -257,7 +279,15 @@ export class ExecuteBridgeRequest {
     return apiUrl;
   }
 
-  private handleResponseError(error: unknown, url: string) {
+  private async handleResponseError(
+    error: unknown,
+    url: string,
+    processError: ExecuteBridgeRequestCommand['processError'],
+  ) {
+    let bridgeErrorData: Pick<
+      BridgeError,
+      'data' | 'code' | 'statusCode' | 'message' | 'cause'
+    >;
     if (error instanceof RequestError) {
       let body: Record<string, unknown>;
       try {
@@ -269,101 +299,95 @@ export class ExecuteBridgeRequest {
 
       if (error instanceof HTTPError && isFrameworkError(body)) {
         // Handle known Framework errors. Propagate the error code and message.
-        throw new HttpException(body, error.response.statusCode);
-      }
-
-      if (error instanceof TimeoutError) {
+        bridgeErrorData = {
+          data: body.data,
+          code: body.code,
+          message: body.message,
+          statusCode: error.response.statusCode,
+        };
+      } else if (error instanceof TimeoutError) {
         Logger.error(`Bridge request timeout for \`${url}\``, LOG_CONTEXT);
-        throw new RequestTimeoutException({
-          message: BRIDGE_EXECUTION_ERROR.BRIDGE_REQUEST_TIMEOUT.message(url),
+        bridgeErrorData = {
           code: BRIDGE_EXECUTION_ERROR.BRIDGE_REQUEST_TIMEOUT.code,
-        });
-      }
-
-      if (error instanceof UnsupportedProtocolError) {
+          message: BRIDGE_EXECUTION_ERROR.BRIDGE_REQUEST_TIMEOUT.message(url),
+          statusCode: HttpStatus.REQUEST_TIMEOUT,
+        };
+      } else if (error instanceof UnsupportedProtocolError) {
         Logger.error(`Unsupported protocol for \`${url}\``, LOG_CONTEXT);
-        throw new BadRequestException({
-          message: BRIDGE_EXECUTION_ERROR.UNSUPPORTED_PROTOCOL.message(url),
+        bridgeErrorData = {
           code: BRIDGE_EXECUTION_ERROR.UNSUPPORTED_PROTOCOL.code,
-        });
-      }
-
-      if (error instanceof ReadError) {
+          message: BRIDGE_EXECUTION_ERROR.UNSUPPORTED_PROTOCOL.message(url),
+          statusCode: HttpStatus.BAD_REQUEST,
+        };
+      } else if (error instanceof ReadError) {
         Logger.error(
           `Response body could not be read for \`${url}\``,
           LOG_CONTEXT,
         );
-        throw new BadRequestException({
-          message: BRIDGE_EXECUTION_ERROR.RESPONSE_READ_ERROR.message(url),
+        bridgeErrorData = {
           code: BRIDGE_EXECUTION_ERROR.RESPONSE_READ_ERROR.code,
-        });
-      }
-
-      if (error instanceof UploadError) {
+          message: BRIDGE_EXECUTION_ERROR.RESPONSE_READ_ERROR.message(url),
+          statusCode: HttpStatus.BAD_REQUEST,
+        };
+      } else if (error instanceof UploadError) {
         Logger.error(
           `Error uploading request body for \`${url}\``,
           LOG_CONTEXT,
         );
-        throw new BadRequestException({
-          message: BRIDGE_EXECUTION_ERROR.REQUEST_UPLOAD_ERROR.message(url),
+        bridgeErrorData = {
           code: BRIDGE_EXECUTION_ERROR.REQUEST_UPLOAD_ERROR.code,
-        });
-      }
-
-      if (error instanceof CacheError) {
+          message: BRIDGE_EXECUTION_ERROR.REQUEST_UPLOAD_ERROR.message(url),
+          statusCode: HttpStatus.BAD_REQUEST,
+        };
+      } else if (error instanceof CacheError) {
         Logger.error(`Error caching request for \`${url}\``, LOG_CONTEXT);
-        throw new BadRequestException({
-          message: BRIDGE_EXECUTION_ERROR.REQUEST_CACHE_ERROR.message(url),
+        bridgeErrorData = {
           code: BRIDGE_EXECUTION_ERROR.REQUEST_CACHE_ERROR.code,
-        });
-      }
-
-      if (error instanceof MaxRedirectsError) {
+          message: BRIDGE_EXECUTION_ERROR.REQUEST_CACHE_ERROR.message(url),
+          statusCode: HttpStatus.BAD_REQUEST,
+        };
+      } else if (error instanceof MaxRedirectsError) {
         Logger.error(`Maximum redirects exceeded for \`${url}\``, LOG_CONTEXT);
-        throw new BadRequestException({
+        bridgeErrorData = {
           message:
             BRIDGE_EXECUTION_ERROR.MAXIMUM_REDIRECTS_EXCEEDED.message(url),
           code: BRIDGE_EXECUTION_ERROR.MAXIMUM_REDIRECTS_EXCEEDED.code,
-        });
-      }
-
-      if (error instanceof ParseError) {
+          statusCode: HttpStatus.BAD_REQUEST,
+        };
+      } else if (error instanceof ParseError) {
         Logger.error(
           `Bridge URL response code is 2xx, but parsing body fails. \`${url}\``,
           LOG_CONTEXT,
         );
-        throw new BadRequestException({
+        bridgeErrorData = {
           message:
             BRIDGE_EXECUTION_ERROR.MAXIMUM_REDIRECTS_EXCEEDED.message(url),
           code: BRIDGE_EXECUTION_ERROR.MAXIMUM_REDIRECTS_EXCEEDED.code,
-        });
-      }
-
-      if (body.code === TUNNEL_ERROR_CODE) {
+          statusCode: HttpStatus.BAD_REQUEST,
+        };
+      } else if (body.code === TUNNEL_ERROR_CODE) {
         // Handle known tunnel errors
         const tunnelBody = body as TunnelResponseError;
         Logger.error(
           `Could not establish tunnel connection for \`${url}\`. Error: \`${tunnelBody.message}\``,
           LOG_CONTEXT,
         );
-        throw new NotFoundException({
+        bridgeErrorData = {
           message: BRIDGE_EXECUTION_ERROR.TUNNEL_NOT_FOUND.message(url),
           code: BRIDGE_EXECUTION_ERROR.TUNNEL_NOT_FOUND.code,
-        });
-      }
-
-      if (error.code === 'DEPTH_ZERO_SELF_SIGNED_CERT') {
+          statusCode: HttpStatus.NOT_FOUND,
+        };
+      } else if (error.code === 'DEPTH_ZERO_SELF_SIGNED_CERT') {
         Logger.error(
           `Bridge URL is uing a self-signed certificate that is not allowed for production environments. \`${url}\``,
           LOG_CONTEXT,
         );
-        throw new BadRequestException({
+        bridgeErrorData = {
           message: BRIDGE_EXECUTION_ERROR.SELF_SIGNED_CERTIFICATE.message(url),
           code: BRIDGE_EXECUTION_ERROR.SELF_SIGNED_CERTIFICATE.code,
-        });
-      }
-
-      if (error.response?.statusCode === 502) {
+          statusCode: HttpStatus.BAD_REQUEST,
+        };
+      } else if (error.response?.statusCode === 502) {
         /*
          * Tunnel was live, but the Bridge endpoint was down.
          * 502 is thrown by the tunnel service when the Bridge endpoint is not reachable.
@@ -372,14 +396,13 @@ export class ExecuteBridgeRequest {
           `Local Bridge endpoint not found for \`${url}\``,
           LOG_CONTEXT,
         );
-        throw new BadRequestException({
+        bridgeErrorData = {
           message:
             BRIDGE_EXECUTION_ERROR.BRIDGE_ENDPOINT_NOT_FOUND.message(url),
           code: BRIDGE_EXECUTION_ERROR.BRIDGE_ENDPOINT_NOT_FOUND.code,
-        });
-      }
-
-      if (
+          statusCode: HttpStatus.NOT_FOUND,
+        };
+      } else if (
         error.response?.statusCode === 404 ||
         RETRYABLE_ERROR_CODES.includes(error.code)
       ) {
@@ -391,40 +414,63 @@ export class ExecuteBridgeRequest {
         } else {
           codeToThrow = BRIDGE_EXECUTION_ERROR.BRIDGE_ENDPOINT_UNAVAILABLE.code;
         }
-        throw new NotFoundException({
+        bridgeErrorData = {
           message:
             BRIDGE_EXECUTION_ERROR.BRIDGE_ENDPOINT_UNAVAILABLE.message(url),
           code: codeToThrow,
-        });
-      }
-
-      if (error.response?.statusCode === 405) {
+          statusCode: HttpStatus.BAD_REQUEST,
+        };
+      } else if (error.response?.statusCode === 405) {
         Logger.error(
           `Bridge endpoint method not configured for \`${url}\``,
           LOG_CONTEXT,
         );
-        throw new BadRequestException({
+        bridgeErrorData = {
           message:
             BRIDGE_EXECUTION_ERROR.BRIDGE_METHOD_NOT_CONFIGURED.message(url),
           code: BRIDGE_EXECUTION_ERROR.BRIDGE_METHOD_NOT_CONFIGURED.code,
-        });
+          statusCode: HttpStatus.BAD_REQUEST,
+        };
+      } else {
+        Logger.error(
+          `Unknown bridge request error calling \`${url}\`: \`${JSON.stringify(
+            body,
+          )}\``,
+          error,
+          LOG_CONTEXT,
+        );
+        bridgeErrorData = {
+          message:
+            BRIDGE_EXECUTION_ERROR.UNKNOWN_BRIDGE_REQUEST_ERROR.message(url),
+          code: BRIDGE_EXECUTION_ERROR.UNKNOWN_BRIDGE_REQUEST_ERROR.code,
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          cause: error,
+        };
       }
-
-      Logger.error(
-        `Unknown bridge request error calling \`${url}\`: \`${JSON.stringify(
-          body,
-        )}\``,
-        error,
-        LOG_CONTEXT,
-      );
-      throw error;
     } else {
       Logger.error(
         `Unknown bridge non-request error calling \`${url}\``,
         error,
         LOG_CONTEXT,
       );
-      throw error;
+      bridgeErrorData = {
+        message:
+          BRIDGE_EXECUTION_ERROR.UNKNOWN_BRIDGE_NON_REQUEST_ERROR.message(url),
+        code: BRIDGE_EXECUTION_ERROR.UNKNOWN_BRIDGE_NON_REQUEST_ERROR.code,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        cause: error,
+      };
     }
+
+    const fullBridgeError: BridgeError = {
+      ...bridgeErrorData,
+      url,
+    };
+
+    if (processError) {
+      await processError(fullBridgeError);
+    }
+
+    throw new BridgeRequestError(fullBridgeError);
   }
 }

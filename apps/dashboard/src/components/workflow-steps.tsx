@@ -22,8 +22,8 @@ export const WorkflowSteps = (props: WorkflowStepsProps) => {
   return (
     <div className="flex items-center">
       <>
-        {firstSteps.map((step) => (
-          <WorkflowStep key={step} step={step} className="-ml-2 first-of-type:ml-0" />
+        {firstSteps.map((step, idx) => (
+          <WorkflowStep key={`${step}_${idx}`} step={step} className="-ml-2 first-of-type:ml-0" />
         ))}
         {restSteps.length > 1 && <Step className="-ml-2">+{restSteps.length}</Step>}
       </>

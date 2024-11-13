@@ -40,6 +40,7 @@ export class GetSubscriberPreference {
       {
         organizationId: command.organizationId,
         environmentId: command.environmentId,
+        tags: command.tags,
       },
     );
 

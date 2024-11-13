@@ -1,4 +1,4 @@
-import { ReactNode, useMemo, useCallback, useRef, useLayoutEffect } from 'react';
+import { ReactNode, useMemo, useCallback, useLayoutEffect, useState } from 'react';
 import { useBlocker, useNavigate, useParams } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 // eslint-disable-next-line
@@ -53,10 +53,11 @@ const createStep = (type: StepTypeEnum): Step => ({
 });
 
 export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) => {
-  const changesSavedToastIdRef = useRef<string | number>();
   const { currentEnvironment } = useEnvironment();
   const { workflowSlug = '' } = useParams<{ workflowSlug?: string; stepSlug?: string }>();
   const navigate = useNavigate();
+  const [toastId, setToastId] = useState<string | number>('');
+
   const { workflow, error } = useFetchWorkflow({
     workflowSlug,
   });
@@ -101,6 +102,24 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
   }, [workflow, error, navigate, resetWorkflowForm, currentEnvironment]);
 
   const { updateWorkflow, isPending } = useUpdateWorkflow({
+    onMutate: () => {
+      setToastId(
+        showToast({
+          children: () => (
+            <>
+              <ToastIcon variant={'default'} />
+              <span className="text-sm">Saving</span>
+            </>
+          ),
+          options: {
+            position: 'bottom-left',
+            classNames: {
+              toast: 'ml-10',
+            },
+          },
+        })
+      );
+    },
     onSuccess: (data) => {
       resetWorkflowForm(data);
 
@@ -109,28 +128,23 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
         handleValidationIssues({ fields: getValues(), issues: data.issues as any, setError });
       }
 
-      if (changesSavedToastIdRef.current) {
-        return;
-      }
-
-      const id = showToast({
-        children: () => (
-          <>
-            <ToastIcon />
-            <span className="text-sm">Saved</span>
-          </>
-        ),
-        options: {
-          position: 'bottom-left',
-          classNames: {
-            toast: 'ml-10',
+      setTimeout(() => {
+        showToast({
+          children: () => (
+            <>
+              <ToastIcon variant="success" />
+              <span className="text-sm">Saved</span>
+            </>
+          ),
+          options: {
+            position: 'bottom-left',
+            classNames: {
+              toast: 'ml-10',
+            },
+            id: toastId,
           },
-          onAutoClose: () => {
-            changesSavedToastIdRef.current = undefined;
-          },
-        },
-      });
-      changesSavedToastIdRef.current = id;
+        });
+      }, 1000);
     },
   });
 
