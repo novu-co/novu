@@ -12,7 +12,6 @@ import {
   FeedRepository,
   NotificationGroupEntity,
   NotificationGroupRepository,
-  NotificationStepEntity,
   NotificationTemplateEntity,
   NotificationTemplateRepository,
 } from '@novu/dal';
@@ -27,7 +26,6 @@ import {
   WorkflowTypeEnum,
   slugify,
   buildWorkflowPreferences,
-  WorkflowPreferences,
   buildWorkflowPreferencesFromPreferenceChannels,
 } from '@novu/shared';
 
@@ -65,7 +63,6 @@ export class CreateWorkflow {
     private notificationTemplateRepository: NotificationTemplateRepository,
     private createMessageTemplate: CreateMessageTemplate,
     private notificationGroupRepository: NotificationGroupRepository,
-    private feedRepository: FeedRepository,
     private createChange: CreateChange,
     @Inject(forwardRef(() => AnalyticsService))
     private analyticsService: AnalyticsService,
@@ -73,6 +70,7 @@ export class CreateWorkflow {
     @Inject(forwardRef(() => InvalidateCacheService))
     private invalidateCache: InvalidateCacheService,
     protected moduleRef: ModuleRef,
+    @Inject(forwardRef(() => UpsertPreferences))
     private upsertPreferences: UpsertPreferences,
   ) {}
 

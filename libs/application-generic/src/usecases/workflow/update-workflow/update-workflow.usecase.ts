@@ -72,6 +72,7 @@ export class UpdateWorkflow {
     @Inject(forwardRef(() => AnalyticsService))
     private analyticsService: AnalyticsService,
     protected moduleRef: ModuleRef,
+    @Inject(forwardRef(() => UpsertPreferences))
     private upsertPreferences: UpsertPreferences,
   ) {}
 
