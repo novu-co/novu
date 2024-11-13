@@ -28,6 +28,7 @@ import {
   slugify,
   buildWorkflowPreferences,
   WorkflowPreferences,
+  buildWorkflowPreferencesFromPreferenceChannels,
 } from '@novu/shared';
 
 import { PinoLogger } from 'nestjs-pino';
@@ -346,16 +347,10 @@ export class CreateWorkflow {
       this.upsertPreferences.upsertUserWorkflowPreferences(
         UpsertUserWorkflowPreferencesCommand.create({
           templateId: savedWorkflow._id,
-          preferences: {
-            all: { enabled: true, readOnly: command.critical },
-            channels: Object.entries(command.preferenceSettings || {}).reduce(
-              (acc, [channel, value]) => ({
-                ...acc,
-                [channel]: value,
-              }),
-              {} as WorkflowPreferences['channels'],
-            ),
-          },
+          preferences: buildWorkflowPreferencesFromPreferenceChannels(
+            command.critical,
+            command.preferenceSettings || {},
+          ),
           environmentId: command.environmentId,
           organizationId: command.organizationId,
           userId: command.userId,

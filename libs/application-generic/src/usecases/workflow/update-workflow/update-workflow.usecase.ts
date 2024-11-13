@@ -19,7 +19,12 @@ import {
   NotificationTemplateRepository,
   StepVariantEntity,
 } from '@novu/dal';
-import { ChangeEntityTypeEnum, isBridgeWorkflow } from '@novu/shared';
+import {
+  buildWorkflowPreferencesFromPreferenceChannels,
+  ChangeEntityTypeEnum,
+  isBridgeWorkflow,
+  IPreferenceChannels,
+} from '@novu/shared';
 
 import {
   AnalyticsService,
@@ -38,6 +43,9 @@ import {
   CreateMessageTemplateCommand,
   NotificationStep,
   NotificationStepVariantCommand,
+  UpsertPreferences,
+  UpsertUserWorkflowPreferencesCommand,
+  GetPreferences,
 } from '../..';
 import {
   DeleteMessageTemplate,
@@ -64,6 +72,7 @@ export class UpdateWorkflow {
     @Inject(forwardRef(() => AnalyticsService))
     private analyticsService: AnalyticsService,
     protected moduleRef: ModuleRef,
+    private upsertPreferences: UpsertPreferences,
   ) {}
 
   async execute(
@@ -215,6 +224,27 @@ export class UpdateWorkflow {
       }),
     });
 
+    let preferenceSettings: IPreferenceChannels | null = null;
+    if (updatePayload.preferenceSettings) {
+      const userWorkflowPreferencesResponse =
+        await this.upsertPreferences.upsertUserWorkflowPreferences(
+          UpsertUserWorkflowPreferencesCommand.create({
+            templateId: command.id,
+            preferences: buildWorkflowPreferencesFromPreferenceChannels(
+              command.critical,
+              updatePayload.preferenceSettings,
+            ),
+            environmentId: command.environmentId,
+            organizationId: command.organizationId,
+            userId: command.userId,
+          }),
+        );
+      preferenceSettings =
+        GetPreferences.mapWorkflowPreferencesToChannelPreferences(
+          userWorkflowPreferencesResponse.preferences,
+        );
+    }
+
     await this.notificationTemplateRepository.update(
       {
         _id: command.id,
@@ -299,7 +329,10 @@ export class UpdateWorkflow {
       );
     }
 
-    return notificationTemplateWithStepTemplate;
+    return {
+      ...notificationTemplateWithStepTemplate,
+      preferenceSettings,
+    };
   }
 
   private validatePayload(command: UpdateWorkflowCommand) {

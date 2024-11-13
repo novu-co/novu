@@ -17,6 +17,11 @@ import {
   buildNotificationTemplateIdentifierKey,
   buildNotificationTemplateKey,
 } from '../../../services/cache/key-builders';
+import {
+  UpsertPreferences,
+  UpsertUserWorkflowPreferencesCommand,
+  UpsertWorkflowPreferencesCommand,
+} from '../../upsert-preferences';
 
 @Injectable()
 export class DeleteWorkflowUseCase {
@@ -27,6 +32,7 @@ export class DeleteWorkflowUseCase {
     private preferencesRepository: PreferencesRepository,
     private invalidateCache: InvalidateCacheService,
     private controlValuesRepository: ControlValuesRepository,
+    private upsertPreferences: UpsertPreferences,
   ) {}
 
   async execute(command: DeleteWorkflowCommand): Promise<void> {
@@ -77,6 +83,31 @@ export class DeleteWorkflowUseCase {
           type: PreferencesTypeEnum.USER_WORKFLOW,
         });
       }
+
+      const upsertUserWorkflowPreferencesPromise =
+        this.upsertPreferences.upsertUserWorkflowPreferences(
+          UpsertUserWorkflowPreferencesCommand.create({
+            templateId: workflow._id,
+            preferences: null,
+            environmentId: command.environmentId,
+            organizationId: command.organizationId,
+            userId: command.userId,
+          }),
+        );
+      const upsertWorkflowResourcePreferencesPromise =
+        this.upsertPreferences.upsertWorkflowPreferences(
+          UpsertWorkflowPreferencesCommand.create({
+            templateId: workflow._id,
+            preferences: null,
+            environmentId: command.environmentId,
+            organizationId: command.organizationId,
+          }),
+        );
+
+      await Promise.all([
+        upsertUserWorkflowPreferencesPromise,
+        upsertWorkflowResourcePreferencesPromise,
+      ]);
 
       await this.notificationTemplateRepository.delete({
         _id: workflow._id,
