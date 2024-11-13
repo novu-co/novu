@@ -13,6 +13,7 @@ import {
   NotificationGroupEntity,
   NotificationGroupRepository,
   NotificationStepEntity,
+  NotificationTemplateEntity,
   NotificationTemplateRepository,
 } from '@novu/dal';
 import {
@@ -25,6 +26,8 @@ import {
   WorkflowOriginEnum,
   WorkflowTypeEnum,
   slugify,
+  buildWorkflowPreferences,
+  WorkflowPreferences,
 } from '@novu/shared';
 
 import { PinoLogger } from 'nestjs-pino';
@@ -48,6 +51,12 @@ import {
 } from '../message-template';
 import { ApiException, PlatformException } from '../../utils/exceptions';
 import { shortId } from '../../utils/generate-id';
+import {
+  UpsertPreferences,
+  UpsertUserWorkflowPreferencesCommand,
+  UpsertWorkflowPreferencesCommand,
+} from '../upsert-preferences';
+import { GetPreferences } from '../get-preferences';
 
 @Injectable()
 export class CreateWorkflow {
@@ -63,6 +72,7 @@ export class CreateWorkflow {
     @Inject(forwardRef(() => InvalidateCacheService))
     private invalidateCache: InvalidateCacheService,
     protected moduleRef: ModuleRef,
+    private upsertPreferences: UpsertPreferences,
   ) {}
 
   async execute(usecaseCommand: CreateWorkflowCommand) {
@@ -289,7 +299,7 @@ export class CreateWorkflow {
     templateSteps: INotificationTemplateStep[],
     trigger: INotificationTrigger,
     triggerIdentifier: string,
-  ) {
+  ): Promise<NotificationTemplateEntity> {
     this.logger.info(`Creating workflow ${JSON.stringify(command)}`);
 
     const savedWorkflow = await this.notificationTemplateRepository.create({
@@ -316,6 +326,50 @@ export class CreateWorkflow {
       ...(command.data ? { data: command.data } : {}),
     });
 
+    /*
+     * Create workflow resource preferences - these have a default preference set
+     * prepared for mapping to Framework code.
+     */
+    const workflowResourcePreferencesPromise =
+      this.upsertPreferences.upsertWorkflowPreferences(
+        UpsertWorkflowPreferencesCommand.create({
+          templateId: savedWorkflow._id,
+          preferences: buildWorkflowPreferences({}),
+          environmentId: command.environmentId,
+          organizationId: command.organizationId,
+        }),
+      );
+    /**
+     * Create user workflow preferences - these are created by the user.
+     */
+    const userWorkflowPreferencesPromise =
+      this.upsertPreferences.upsertUserWorkflowPreferences(
+        UpsertUserWorkflowPreferencesCommand.create({
+          templateId: savedWorkflow._id,
+          preferences: {
+            all: { enabled: true, readOnly: command.critical },
+            channels: Object.entries(command.preferenceSettings || {}).reduce(
+              (acc, [channel, value]) => ({
+                ...acc,
+                [channel]: value,
+              }),
+              {} as WorkflowPreferences['channels'],
+            ),
+          },
+          environmentId: command.environmentId,
+          organizationId: command.organizationId,
+          userId: command.userId,
+        }),
+      );
+    const [userWorkflowPreferences] = await Promise.all([
+      workflowResourcePreferencesPromise,
+      userWorkflowPreferencesPromise,
+    ]);
+    const preferenceSettings =
+      GetPreferences.mapWorkflowPreferencesToChannelPreferences(
+        userWorkflowPreferences.preferences,
+      );
+
     await this.invalidateCache.invalidateByKey({
       key: buildNotificationTemplateIdentifierKey({
         templateIdentifier: savedWorkflow.triggers[0].identifier,
@@ -338,7 +392,10 @@ export class CreateWorkflow {
 
     this.sendTemplateCreationEvent(command, triggerIdentifier);
 
-    return item;
+    return {
+      ...item,
+      preferenceSettings,
+    };
   }
 
   private async storeTemplateSteps(
@@ -529,64 +586,6 @@ export class CreateWorkflow {
         ...(template ? { template } : {}),
       };
     });
-  }
-
-  private async handleFeeds(
-    steps: NotificationStepEntity[],
-    command: CreateWorkflowCommand,
-  ): Promise<NotificationStepEntity[]> {
-    for (let i = 0; i < steps.length; i += 1) {
-      const step = steps[i];
-
-      if (!step.template?._feedId) {
-        continue;
-      }
-
-      const blueprintFeed = await this.feedRepository.findOne({
-        _organizationId: this.getBlueprintOrganizationId,
-        _id: step.template._feedId,
-      });
-
-      if (!blueprintFeed) {
-        step.template._feedId = undefined;
-        // eslint-disable-next-line no-param-reassign
-        steps[i] = step;
-        continue;
-      }
-
-      let feedItem = await this.feedRepository.findOne({
-        _organizationId: command.organizationId,
-        identifier: blueprintFeed.identifier,
-      });
-
-      if (!feedItem) {
-        feedItem = await this.feedRepository.create({
-          name: blueprintFeed.name,
-          identifier: blueprintFeed.identifier,
-          _environmentId: command.environmentId,
-          _organizationId: command.organizationId,
-        });
-
-        if (!isBridgeWorkflow(command.type)) {
-          await this.createChange.execute(
-            CreateChangeCommand.create({
-              item: feedItem,
-              type: ChangeEntityTypeEnum.FEED,
-              environmentId: command.environmentId,
-              organizationId: command.organizationId,
-              userId: command.userId,
-              changeId: FeedRepository.createObjectId(),
-            }),
-          );
-        }
-      }
-
-      step.template._feedId = feedItem._id;
-      // eslint-disable-next-line no-param-reassign
-      steps[i] = step;
-    }
-
-    return steps;
   }
 
   private async handleGroup(
