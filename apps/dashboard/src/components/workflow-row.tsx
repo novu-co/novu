@@ -12,7 +12,7 @@ import {
 import { Link } from 'react-router-dom';
 import { TableCell, TableRow } from '@/components/primitives/table';
 import { useEnvironment } from '@/context/environment/hooks';
-import { WorkflowOriginEnum } from '@/utils/enums';
+import { WorkflowOriginEnum, WorkflowStatusEnum } from '@/utils/enums';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { Badge } from '@/components/primitives/badge';
 import { BadgeContent } from '@/components/primitives/badge';
@@ -31,6 +31,9 @@ import {
 import { RiMore2Fill, RiPlayCircleLine } from 'react-icons/ri';
 import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
 import { HoverToCopy } from '@/components/primitives/hover-to-copy';
+import { useUpdateWorkflow } from '@/hooks';
+import { showToast } from './primitives/sonner-helpers';
+import { ToastIcon } from './primitives/sonner';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -56,6 +59,45 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         environmentSlug: currentEnvironment?.slug ?? '',
         workflowSlug: workflow.slug,
       });
+
+  const { updateWorkflow } = useUpdateWorkflow({
+    onSuccess: () => {
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="success" />
+            <span className="text-sm">Saved</span>
+          </>
+        ),
+        options: {
+          position: 'bottom-right',
+          classNames: {
+            toast: 'ml-10 mb-4',
+          },
+        },
+      });
+    },
+    onError: () => {
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="error" />
+            <span className="text-sm">Failed to save</span>
+          </>
+        ),
+        options: {
+          position: 'bottom-right',
+          classNames: {
+            toast: 'ml-10 mb-4',
+          },
+        },
+      });
+    },
+  });
+
+  const handlePauseWorkflow = () => {
+    const activeStatus = workflow.status === WorkflowStatusEnum.ACTIVE;
+  };
 
   return (
     <TableRow key={workflow._id} className="relative">
