@@ -73,6 +73,7 @@ export interface IPushOptions {
       };
     };
     fcmOptions?: { analyticsLabel?: string };
+    oneSignalOptions?: { useExternalUserIds?: boolean }
   };
   subscriber: object;
   step: {

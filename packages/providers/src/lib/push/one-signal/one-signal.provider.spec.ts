@@ -126,4 +126,100 @@ describe('test onesignal notification api', () => {
     });
     expect(res.id).toEqual(response.data.id);
   });
+
+  test('should use include_external_user_ids when useExternalUserIds is true', async () => {
+    const provider = new OneSignalPushProvider({
+      appId: 'test-app-id',
+      apiKey: 'test-key',
+    });
+
+    const response = {
+      data: {
+        id: 'result',
+      },
+    };
+
+    mockedAxios.request.mockResolvedValue(response);
+
+    const notificationWithExternalIds = {
+      ...mockNotificationOptions,
+      overrides: {
+        oneSignalOptions: {
+          useExternalUserIds: true
+        }
+      }
+    };
+
+    await provider.sendMessage(notificationWithExternalIds);
+    
+    expect(mockedAxios.request).toHaveBeenCalled();
+    const data = JSON.parse(
+      (mockedAxios.request.mock.calls[0][0].data as string) || '{}'
+    );
+
+    // Verify that include_external_user_ids is used instead of include_player_ids
+    expect(data).toHaveProperty('include_external_user_ids', ['tester']);
+    expect(data).not.toHaveProperty('include_player_ids');
+  });
+
+  test('should use include_player_ids when useExternalUserIds is false', async () => {
+    const provider = new OneSignalPushProvider({
+      appId: 'test-app-id',
+      apiKey: 'test-key',
+    });
+
+    const response = {
+      data: {
+        id: 'result',
+      },
+    };
+
+    mockedAxios.request.mockResolvedValue(response);
+
+    const notificationWithPlayerIds = {
+      ...mockNotificationOptions,
+      overrides: {
+        oneSignalOptions: {
+          useExternalUserIds: false
+        }
+      }
+    };
+
+    await provider.sendMessage(notificationWithPlayerIds);
+    
+    expect(mockedAxios.request).toHaveBeenCalled();
+    const data = JSON.parse(
+      (mockedAxios.request.mock.calls[0][0].data as string) || '{}'
+    );
+
+    // Verify that include_player_ids is used
+    expect(data).toHaveProperty('include_player_ids', ['tester']);
+    expect(data).not.toHaveProperty('include_external_user_ids');
+  });
+
+  test('should default to include_player_ids when oneSignalOptions is not provided', async () => {
+    const provider = new OneSignalPushProvider({
+      appId: 'test-app-id',
+      apiKey: 'test-key',
+    });
+
+    const response = {
+      data: {
+        id: 'result',
+      },
+    };
+
+    mockedAxios.request.mockResolvedValue(response);
+
+    await provider.sendMessage(mockNotificationOptions);
+    
+    expect(mockedAxios.request).toHaveBeenCalled();
+    const data = JSON.parse(
+      (mockedAxios.request.mock.calls[0][0].data as string) || '{}'
+    );
+
+    // Verify that include_player_ids is used by default
+    expect(data).toHaveProperty('include_player_ids', ['tester']);
+    expect(data).not.toHaveProperty('include_external_user_ids');
+  });
 });

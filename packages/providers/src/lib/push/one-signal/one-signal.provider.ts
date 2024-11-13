@@ -36,10 +36,14 @@ export class OneSignalPushProvider
     options: IPushOptions,
     bridgeProviderData: WithPassthrough<Record<string, unknown>> = {},
   ): Promise<ISendMessageSuccessResponse> {
-    const { sound, badge, ...overrides } = options.overrides ?? {};
+    const { sound, badge, oneSignalOptions, ...overrides } = options.overrides ?? {};
+    
+    const targetingParam = oneSignalOptions?.useExternalUserIds
+      ? { include_external_user_ids: options.target }
+      : { include_player_ids: options.target };
 
     const notification = this.transform(bridgeProviderData, {
-      include_player_ids: options.target,
+      ...targetingParam,
       app_id: this.config.appId,
       headings: { en: options.title },
       contents: { en: options.content },
