@@ -118,7 +118,6 @@ export class ValidateAndPersistWorkflowIssuesUsecase {
         controlSchema: step.template?.controls,
         controlValues: stepIdToControlValuesMap[step._templateId].controls,
       });
-      console.log('issuesMissingValues:', JSON.stringify(issuesMissingValues));
       // eslint-disable-next-line no-param-reassign
       stepIssues.controls = issuesMissingValues;
     }
