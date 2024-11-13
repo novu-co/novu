@@ -72,7 +72,7 @@ export type DiscoverWorkflowOutput = {
  * @property `trigger` - The function to trigger the workflow.
  * @property `discover` - The function to discover the workflow definition.
  */
-export type Workflow<T_Payload = Record<string, unknown>> = {
+export type Workflow<T_Payload = never> = {
   /**
    * The unique identifier for the workflow.
    */

@@ -104,7 +104,7 @@ export class Client {
    *
    * @param workflows - The workflows to add.
    */
-  public async addWorkflows(workflows: Array<Workflow<never>>): Promise<void> {
+  public async addWorkflows(workflows: Array<Workflow>): Promise<void> {
     for (const workflow of workflows) {
       if (this.discoveredWorkflows.has(workflow.id)) {
         continue;
@@ -124,7 +124,7 @@ export class Client {
     }
   }
 
-  private async addWorkflow(workflow: Workflow<never>): Promise<void> {
+  private async addWorkflow(workflow: Workflow): Promise<void> {
     try {
       const definition = await workflow.discover();
       prettyPrintDiscovery(definition);
