@@ -21,10 +21,11 @@ import {
   UpsertWorkflowPreferencesCommand,
 } from '@novu/application-generic';
 import {
+  JSONSchemaDto,
   WorkflowCreationSourceEnum,
   WorkflowOriginEnum,
-  WorkflowTypeEnum,
   WorkflowPreferencesPartial,
+  WorkflowTypeEnum,
 } from '@novu/shared';
 import { DiscoverOutput, DiscoverStepOutput, DiscoverWorkflowOutput, GetActionEnum } from '@novu/framework/internal';
 
@@ -208,10 +209,10 @@ export class Sync {
         __source: WorkflowCreationSourceEnum.BRIDGE,
         steps: this.mapSteps(workflow.steps),
         controls: {
-          schema: workflow.controls?.schema,
+          schema: workflow.controls?.schema as JSONSchemaDto,
         },
         rawData: workflow as unknown as Record<string, unknown>,
-        payloadSchema: workflow.payload?.schema,
+        payloadSchema: workflow.payload?.schema as JSONSchemaDto,
         active: isWorkflowActive,
         description: this.getWorkflowDescription(workflow),
         data: this.castToAnyNotSupportedParam(workflow)?.data,
@@ -237,10 +238,10 @@ export class Sync {
         workflowId: workflow.workflowId,
         steps: this.mapSteps(workflow.steps, workflowExist),
         controls: {
-          schema: workflow.controls?.schema,
+          schema: workflow.controls?.schema as JSONSchemaDto,
         },
         rawData: workflow,
-        payloadSchema: workflow.payload?.schema,
+        payloadSchema: workflow.payload?.schema as unknown as JSONSchemaDto,
         type: WorkflowTypeEnum.BRIDGE,
         description: this.getWorkflowDescription(workflow),
         data: this.castToAnyNotSupportedParam(workflow)?.data,

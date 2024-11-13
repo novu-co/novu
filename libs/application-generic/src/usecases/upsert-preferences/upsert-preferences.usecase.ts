@@ -53,6 +53,11 @@ export class UpsertPreferences {
   ) {
     const channelTypes = Object.keys(command.preferences?.channels || {});
 
+    if (channelTypes.length === 0) {
+      // If there are no channels to update, we don't need to run the update query
+      return;
+    }
+
     const preferenceUnsetPayload = channelTypes.reduce((acc, channelType) => {
       acc[`preferences.channels.${channelType}`] = '';
 

@@ -79,7 +79,7 @@ const handleStringType = ({
       enumValues: enumValues as [string, ...string[]],
     });
   } else if (isRequired) {
-    stringValue = stringValue.min(1, `${capitalize(key)} is required`);
+    stringValue = stringValue.min(1, `${capitalize(key)} is missing`);
   }
 
   if (defaultValue) {
@@ -122,9 +122,9 @@ export const buildDynamicZodSchema = (obj: JSONSchemaDto): z.AnyZodObject => {
     } else if (type === 'string') {
       zodValue = handleStringType({ key, requiredFields, format, pattern, enumValues, defaultValue });
     } else if (type === 'boolean') {
-      zodValue = z.boolean(isRequired ? { message: `${capitalize(key)} is required` } : undefined);
+      zodValue = z.boolean(isRequired ? { message: `${capitalize(key)} is missing` } : undefined);
     } else {
-      zodValue = z.number(isRequired ? { message: `${capitalize(key)} is required` } : undefined);
+      zodValue = z.number(isRequired ? { message: `${capitalize(key)} is missing` } : undefined);
       if (defaultValue) {
         zodValue = zodValue.default(defaultValue as number);
       }

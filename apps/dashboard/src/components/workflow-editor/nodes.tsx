@@ -235,7 +235,7 @@ export const AddNode = (_props: NodeProps<NodeType>) => {
   }
 
   return (
-    <div className="flex w-[300px] justify-center">
+    <div className="flex w-[300px] cursor-pointer justify-center">
       <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
       <AddStepMenu
         visible

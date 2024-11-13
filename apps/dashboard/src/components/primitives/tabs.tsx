@@ -55,7 +55,7 @@ TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
 const tabsContentVariants = cva('focus-visible:outline-none', {
   variants: {
     variant: {
-      default: 'ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+      default: '',
       regular: 'mt-2',
     },
   },

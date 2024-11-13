@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import type { JSONSchemaDefinition, StepResponseDto } from '@novu/shared';
+import type { JSONSchemaDefinition } from '@novu/shared';
 import { StepTypeEnum } from '@/utils/enums';
 import { capitalize } from '@/utils/string';
 
@@ -17,7 +17,7 @@ const channelsSchema = z.object({
 });
 
 export const workflowSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1, 'Workflow name is required'),
   workflowId: z.string(),
   description: z.string().optional(),
   tags: z.array(z.string()).optional(),
@@ -30,7 +30,13 @@ export const workflowSchema = z.object({
         type: z.nativeEnum(StepTypeEnum),
         _id: z.string(),
         stepId: z.string(),
-        slug: z.literal<StepResponseDto['slug']>('_st_'),
+        slug: z.string(),
+        issues: z
+          .object({
+            body: z.any().optional(),
+            controls: z.any().optional(),
+          })
+          .optional(),
       })
       .passthrough()
   ),

@@ -5,6 +5,13 @@ import { renderUsageLimitsEmail } from './email';
 export const usageLimitsWorkflow = workflow(
   'usage-limits',
   async ({ step, payload }) => {
+    await step.digest('digest', async () => {
+      return {
+        amount: 5,
+        unit: 'minutes',
+      };
+    });
+
     await step.email(
       'email',
       async (controls) => {
@@ -40,7 +47,7 @@ export const usageLimitsWorkflow = workflow(
   {
     name: 'Usage Limits Alert',
     payloadSchema: z.object({
-      percentage: z.number().min(0).max(100),
+      percentage: z.number().min(0),
       organizationName: z.string(),
     }),
   }

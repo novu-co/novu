@@ -1,14 +1,19 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useLocation, useOutlet } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 
 export const AnimatedOutlet = (): React.JSX.Element => {
-  const { pathname } = useLocation();
+  const { pathname, state } = useLocation();
+  const keyRef = useRef(pathname);
   const element = useOutlet();
+
+  if (!state?.skipAnimation) {
+    keyRef.current = pathname;
+  }
 
   return (
     <AnimatePresence mode="wait" initial>
-      {element && React.cloneElement(element, { key: pathname })}
+      {element && React.cloneElement(element, { key: keyRef.current })}
     </AnimatePresence>
   );
 };

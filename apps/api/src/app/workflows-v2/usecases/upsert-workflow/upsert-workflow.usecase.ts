@@ -12,6 +12,8 @@ import {
   GetPreferences,
   GetPreferencesCommand,
   GetPreferencesResponseDto,
+  GetWorkflowByIdsCommand,
+  GetWorkflowByIdsUseCase,
   NotificationStep,
   shortId,
   UpdateWorkflow,
@@ -21,8 +23,6 @@ import {
   UpsertPreferences,
   UpsertUserWorkflowPreferencesCommand,
   UpsertWorkflowPreferencesCommand,
-  GetWorkflowByIdsUseCase,
-  GetWorkflowByIdsCommand,
 } from '@novu/application-generic';
 import {
   CreateWorkflowDto,
@@ -45,6 +45,7 @@ import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/st
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
 import { ProcessWorkflowIssuesUsecase } from '../process-workflow-issues/process-workflow-issues.usecase';
+import { ValidateWorkflowCommand } from './validate-workflow.command';
 
 function buildUpsertControlValuesCommand(
   command: UpsertWorkflowCommand,
@@ -79,12 +80,14 @@ export class UpsertWorkflowUseCase {
     const workflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
     const stepIdToControlValuesMap = await this.upsertControlValues(workflow, command);
     const preferences = await this.upsertPreference(command, workflow);
-    const workflowIssues = await this.processWorkflowIssuesUsecase.execute({
-      user: command.user,
-      workflow,
-      preferences,
-      stepIdToControlValuesMap,
-    });
+    const workflowIssues = await this.processWorkflowIssuesUsecase.execute(
+      ValidateWorkflowCommand.create({
+        user: command.user,
+        workflow,
+        preferences,
+        stepIdToControlValuesMap,
+      })
+    );
 
     return toResponseWorkflowDto(workflowIssues, preferences);
   }
@@ -182,12 +185,16 @@ export class UpsertWorkflowUseCase {
   }
 
   private async upsertWorkflowPreferences(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
+    if (!command.workflowDto.preferences?.workflow) {
+      return;
+    }
+
     await this.upsertPreferencesUsecase.upsertWorkflowPreferences(
       UpsertWorkflowPreferencesCommand.create({
         environmentId: workflow._environmentId,
         organizationId: workflow._organizationId,
         templateId: workflow._id,
-        preferences: command.workflowDto.preferences?.workflow || null,
+        preferences: command.workflowDto.preferences.workflow,
       })
     );
   }

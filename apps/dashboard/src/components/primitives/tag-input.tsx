@@ -6,21 +6,21 @@ import { inputVariants } from '@/components/primitives/variants';
 import { CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/primitives/command';
 import { cn } from '@/utils/ui';
 import { Command } from 'cmdk';
-import { forwardRef, useEffect, useState } from 'react';
-import { RiAddFill, RiCloseFill } from 'react-icons/ri';
+import { forwardRef, useEffect, useMemo, useState } from 'react';
+import { RiCloseFill } from 'react-icons/ri';
 
 type TagInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   value: string[];
   suggestions: string[];
   onChange: (tags: string[]) => void;
-  showAddButton?: boolean;
 };
 
 const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
-  const { className, suggestions, value, onChange, showAddButton, ...rest } = props;
+  const { className, suggestions, value, onChange, ...rest } = props;
   const [tags, setTags] = useState<string[]>(value);
   const [inputValue, setInputValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const validSuggestions = useMemo(() => suggestions.filter((suggestion) => !tags.includes(suggestion)), [tags]);
 
   useEffect(() => {
     setTags(value);
@@ -57,22 +57,20 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
       <Command>
         <div className="flex flex-col gap-2">
           <PopoverAnchor asChild>
-            <div className={cn({ 'hidden group-focus-within:block': showAddButton })}>
-              <CommandInput
-                ref={ref}
-                autoComplete="off"
-                value={inputValue}
-                className={cn(inputVariants(), 'flex-grow', className)}
-                placeholder="Type a tag and press Enter"
-                onValueChange={(value) => {
-                  setInputValue(value);
-                  setIsOpen(true);
-                }}
-                onFocusCapture={() => setIsOpen(true)}
-                onBlurCapture={() => setIsOpen(false)}
-                {...rest}
-              />
-            </div>
+            <CommandInput
+              ref={ref}
+              autoComplete="off"
+              value={inputValue}
+              className={cn(inputVariants(), 'flex-grow', className)}
+              placeholder="Type a tag and press Enter"
+              onValueChange={(value) => {
+                setInputValue(value);
+                setIsOpen(true);
+              }}
+              onFocusCapture={() => setIsOpen(true)}
+              onBlurCapture={() => setIsOpen(false)}
+              {...rest}
+            />
           </PopoverAnchor>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, index) => (
@@ -84,23 +82,10 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
                 </button>
               </Badge>
             ))}
-
-            {showAddButton && (
-              <Badge
-                variant="outline"
-                kind="tag"
-                className="flex px-1.5 py-3 focus:hidden active:hidden group-focus-within:hidden"
-              >
-                <button type="button">
-                  <RiAddFill />
-                  <span className="sr-only">Add tag</span>
-                </button>
-              </Badge>
-            )}
           </div>
         </div>
         <CommandList>
-          {(suggestions.length > 0 || inputValue !== '') && (
+          {(validSuggestions.length > 0 || inputValue !== '') && (
             <PopoverContent
               className="p-1"
               portal={false}
@@ -111,7 +96,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
               onInteractOutside={(e) => e.preventDefault()}
             >
               <CommandGroup>
-                {inputValue !== '' && (
+                {inputValue !== '' && !tags.includes(inputValue) && (
                   <CommandItem
                     value={inputValue}
                     onSelect={() => {
@@ -121,7 +106,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
                     {inputValue}
                   </CommandItem>
                 )}
-                {suggestions.map((tag) => (
+                {validSuggestions.map((tag) => (
                   <CommandItem
                     key={tag}
                     // We can't have duplicate keys in our list so adding a suffix

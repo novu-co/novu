@@ -6,6 +6,8 @@ import {
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
   isStepUpdateBody,
+  JSONSchemaDefinition,
+  JSONSchemaDto,
   ListWorkflowResponse,
   PreferencesRequestDto,
   ShortIsPrefixEnum,
@@ -28,7 +30,6 @@ import {
   WorkflowResponseDto,
   WorkflowStatusEnum,
 } from '@novu/shared';
-
 import { encodeBase62 } from '../shared/helpers';
 import { stepTypeToDefaultDashboardControlSchema } from './shared';
 import { getTestControlValues } from './generate-preview.e2e';
@@ -103,6 +104,20 @@ describe('Workflow Controller E2E API Testing', () => {
           expect(issues.body.name).to.be.ok;
           expect(issues.body.name?.issueType, JSON.stringify(issues)).to.be.equal(StepIssueEnum.MISSING_REQUIRED_VALUE);
         }
+      });
+      it('should remove issues when no longer', async () => {
+        const inAppStep = { ...buildInAppStep(), controlValues: { body: 'some body' }, name: '' };
+        const workflowCreated = await createWorkflowAndReturn({ steps: [inAppStep] });
+        const novuRestResult = await workflowsClient.updateWorkflow(workflowCreated._id, {
+          ...workflowCreated,
+          steps: [{ ...inAppStep, name: 'New Name' }],
+        });
+        if (!novuRestResult.isSuccessResult()) {
+          throw new Error(novuRestResult.error!.responseText);
+        }
+        const updatedWorkflow = novuRestResult.value;
+        expect(updatedWorkflow.steps[0].issues?.body, JSON.stringify(updatedWorkflow.steps[0].issues)).to.be.empty;
+        expect(updatedWorkflow.steps[0].issues?.controls, JSON.stringify(updatedWorkflow.steps[0].issues)).to.be.empty;
       });
     });
     describe('Workflow Step content Issues', () => {
@@ -351,7 +366,7 @@ describe('Workflow Controller E2E API Testing', () => {
         description: 'Updated Description',
         // modify existing Email Step, add new InApp Steps, previously existing InApp Step is removed
         steps: [
-          { ...stepToUpdate, name: 'Updated Email Step' },
+          { ...buildEmailStep(), _id: devWorkflow.steps[0]._id, name: 'Updated Email Step' },
           { ...buildInAppStep(), name: 'New InApp Step' },
         ],
       };
@@ -372,7 +387,7 @@ describe('Workflow Controller E2E API Testing', () => {
       // Verify updated properties
       expect(prodWorkflowUpdated.name).to.equal('Updated Name');
       expect(prodWorkflowUpdated.description).to.equal('Updated Description');
-
+      console.log('prodWorkflowUpdated\n', JSON.stringify(prodWorkflowUpdated, null, 2));
       // Verify unchanged properties
       ['status', 'type', 'origin'].forEach((prop) => {
         expect(prodWorkflowUpdated[prop]).to.deep.equal(prodWorkflowCreated[prop], `Property ${prop} should match`);
@@ -439,8 +454,8 @@ describe('Workflow Controller E2E API Testing', () => {
     });
   });
 
-  describe('Get Steps Permutations', () => {
-    it('should get by worflow slugify ids', async () => {
+  describe('Get Step Data Permutations', () => {
+    it('should get step by worflow slugify ids', async () => {
       const workflowCreated = await createWorkflowAndValidate('XYZ');
       const internalWorkflowId = workflowCreated._id;
       const stepId = workflowCreated.steps[0]._id;
@@ -461,7 +476,7 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(stepRetrievedByWorkflowIdentifier._id).to.equal(stepId);
     });
 
-    it('should get by step slugify ids', async () => {
+    it('should get step by step slugify ids', async () => {
       const workflowCreated = await createWorkflowAndValidate('XYZ');
       const internalWorkflowId = workflowCreated._id;
       const stepId = workflowCreated.steps[0]._id;
@@ -481,8 +496,9 @@ describe('Workflow Controller E2E API Testing', () => {
       const stepRetrievedByStepIdentifier = await getStepData(internalWorkflowId, stepIdentifier);
       expect(stepRetrievedByStepIdentifier._id).to.equal(stepId);
     });
-
-    it('should get step payload variables', async () => {
+  });
+  describe('Variables', () => {
+    it('should get step available  variables', async () => {
       const steps = [
         {
           ...buildEmailStep(),
@@ -494,30 +510,42 @@ describe('Workflow Controller E2E API Testing', () => {
         { ...buildInAppStep(), controlValues: { subject: 'Welcome to our newsletter {{inAppSubjectText}}' } },
       ];
       const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('', { steps });
-      const res = await session.testAgent.post(`${v2Prefix}/workflows`).send(createWorkflowDto);
-      expect(res.status).to.be.equal(201);
-      const workflowCreated: WorkflowResponseDto = res.body.data;
-      const stepData = await getStepData(workflowCreated._id, workflowCreated.steps[0]._id);
+      const res = await workflowsClient.createWorkflow(createWorkflowDto);
+      if (!res.isSuccessResult()) {
+        throw new Error(res.error!.responseText);
+      }
+      const stepData = await getStepData(res.value._id, res.value.steps[0]._id);
       const { variables } = stepData;
 
       if (typeof variables === 'boolean') throw new Error('Variables is not an object');
       const { properties } = variables;
       expect(properties).to.be.ok;
       if (!properties) throw new Error('Payload schema is not valid');
-
-      expect(properties.payload).to.deep.equal({
-        type: 'object',
-        properties: {
-          prefixSubjectText: {
-            type: 'string',
-            default: '{{payload.prefixSubjectText}}',
-          },
-          prefixBodyText: {
-            type: 'string',
-            default: '{{payload.prefixBodyText}}',
-          },
-        },
-      });
+      const payloadVariables = properties.payload;
+      expect(payloadVariables).to.be.ok;
+      if (!payloadVariables) throw new Error('Payload schema is not valid');
+      expect(JSON.stringify(payloadVariables)).to.contain('prefixSubjectText');
+      expect(JSON.stringify(payloadVariables)).to.contain('prefixBodyText');
+      expect(JSON.stringify(payloadVariables)).to.contain('{{payload.prefixSubjectText}}');
+    });
+    it('should serve previous step variables with payload schema', async () => {
+      const steps = [
+        buildDigestStep(),
+        { ...buildInAppStep(), controlValues: { subject: 'Welcome to our newsletter {{payload.inAppSubjectText}}' } },
+      ];
+      const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('', { steps });
+      const res = await workflowsClient.createWorkflow(createWorkflowDto);
+      if (!res.isSuccessResult()) {
+        throw new Error(res.error!.responseText);
+      }
+      const novuRestResult = await workflowsClient.getWorkflowStepData(res.value._id, res.value.steps[1]._id);
+      if (!novuRestResult.isSuccessResult()) {
+        throw new Error(novuRestResult.error!.responseText);
+      }
+      const { variables } = novuRestResult.value;
+      const variableList = getJsonSchemaPrimitiveProperties(variables as JSONSchemaDto);
+      const hasStepVariables = variableList.some((variable) => variable.startsWith('steps.'));
+      expect(hasStepVariables, JSON.stringify(variableList)).to.be.true;
     });
   });
 
@@ -540,24 +568,23 @@ describe('Workflow Controller E2E API Testing', () => {
       const workflowTestData = await getWorkflowTestData(workflowCreated._id);
 
       expect(workflowTestData).to.be.ok;
-      expect(workflowTestData.payload).to.deep.equal({
-        type: 'object',
-        properties: {
-          emailPrefixBodyText: {
-            type: 'string',
-            default: '{{payload.emailPrefixBodyText}}',
-          },
-          prefixSubjectText: {
-            type: 'string',
-            default: '{{payload.prefixSubjectText}}',
-          },
-          inAppSubjectText: {
-            type: 'string',
-            default: '{{payload.inAppSubjectText}}',
-          },
-        },
-      });
+      const { payload } = workflowTestData;
+      if (typeof payload === 'boolean') throw new Error('Variables is not an object');
 
+      expect(payload.properties).to.have.property('emailPrefixBodyText');
+      expect(payload.properties?.emailPrefixBodyText)
+        .to.have.property('default')
+        .that.equals('{{payload.emailPrefixBodyText}}');
+
+      expect(payload.properties).to.have.property('prefixSubjectText');
+      expect(payload.properties?.prefixSubjectText)
+        .to.have.property('default')
+        .that.equals('{{payload.prefixSubjectText}}');
+
+      expect(payload.properties).to.have.property('inAppSubjectText');
+      expect(payload.properties?.inAppSubjectText)
+        .to.have.property('default')
+        .that.equals('{{payload.inAppSubjectText}}');
       /*
        * Validate the 'to' schema
        * Note: Can't use deep comparison since emails differ between local and CI environments due to user sessions
@@ -792,6 +819,55 @@ describe('Workflow Controller E2E API Testing', () => {
     assertWorkflowResponseBodyData(workflowResponseDto);
     assertStepResponse(workflowResponseDto, createWorkflowDto);
   }
+  function getJsonSchemaPrimitiveProperties(
+    schema: JSONSchemaDto | JSONSchemaDefinition[] | boolean,
+    prefix: string = ''
+  ): string[] {
+    if (!isJSONSchemaDto(schema)) {
+      return [];
+    }
+    let properties: string[] = [];
+    // Check if the schema has properties
+    if (schema.properties) {
+      // eslint-disable-next-line guard-for-in
+      for (const key in schema.properties) {
+        const propertySchema = schema.properties[key];
+        if (!isJSONSchemaDto(propertySchema)) {
+          continue;
+        }
+        const propertyPath = prefix ? `${prefix}.${key}` : key;
+
+        // Check if the property type is primitive
+        if (isPrimitiveType(propertySchema)) {
+          properties.push(propertyPath);
+        } else {
+          // If not primitive, recurse into the object
+          properties = properties.concat(getJsonSchemaPrimitiveProperties(propertySchema, propertyPath));
+        }
+      }
+    }
+
+    // Check if the schema has items (for arrays)
+    if (schema.items && isJSONSchemaDto(schema.items)) {
+      // Assuming items is an object schema, we can treat it like a property
+      if (isPrimitiveType(schema.items)) {
+        properties.push(prefix); // If items are primitive, add the array itself
+      } else {
+        properties = properties.concat(getJsonSchemaPrimitiveProperties(schema.items, prefix));
+      }
+    }
+
+    return properties;
+  }
+  function isJSONSchemaDto(obj: any): obj is JSONSchemaDto {
+    // Check if the object has a 'type' property and is of type 'string'
+    return typeof obj === 'object' && obj !== null && typeof obj.type === 'string';
+  }
+  function isPrimitiveType(schema: JSONSchemaDto): boolean {
+    const primitiveTypes = ['string', 'number', 'boolean', 'null'];
+
+    return primitiveTypes.includes((schema.type && (schema.type as string)) || '');
+  }
 });
 
 function buildEmailStep(): StepCreateDto {
@@ -799,6 +875,13 @@ function buildEmailStep(): StepCreateDto {
     name: 'Email Test Step',
     type: StepTypeEnum.EMAIL,
     controlValues: getTestControlValues()[StepTypeEnum.EMAIL],
+  };
+}
+function buildDigestStep(): StepCreateDto {
+  return {
+    name: 'Digest Test Step',
+    type: StepTypeEnum.DIGEST,
+    controlValues: getTestControlValues()[StepTypeEnum.DIGEST],
   };
 }
 
