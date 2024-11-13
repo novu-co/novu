@@ -1,4 +1,4 @@
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 
 /**
  * FCM `send` schema
@@ -147,7 +147,7 @@ const fcmOutputSchema = {
   },
   required: [],
   additionalProperties: true,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 export const fcmProviderSchemas = {
   output: fcmOutputSchema,

@@ -9,13 +9,15 @@ import {
   StepContentIssueEnum,
   StepTypeEnum,
   WorkflowOriginEnum,
+  WorkflowTypeEnum,
 } from '@novu/shared';
 import { merge } from 'lodash/fp';
 import _ = require('lodash');
+import { GetWorkflowByIdsUseCase } from '@novu/application-generic';
+import { NotificationTemplateEntity } from '@novu/dal';
 import { GeneratePreviewCommand } from './generate-preview-command';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { StepMissingControlsException, StepNotFoundException } from '../../exceptions/step-not-found-exception';
-import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { OriginMissingException, StepIdMissingException } from './step-id-missing.exception';
 import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
@@ -69,30 +71,6 @@ export class GeneratePreviewUsecase {
     });
   }
 
-  private buildMissingControlValuesIssuesList(defaultValues: Record<string, any>, command: GeneratePreviewCommand) {
-    const missingRequiredControlValues = findMissingKeys(
-      defaultValues,
-      command.generatePreviewRequestDto.controlValues || {}
-    );
-
-    return this.buildContentIssues(missingRequiredControlValues);
-  }
-
-  private buildContentIssues(keys: string[]): Record<string, ContentIssue[]> {
-    const record: Record<string, ContentIssue[]> = {};
-
-    keys.forEach((key) => {
-      record[key] = [
-        {
-          issueType: StepContentIssueEnum.MISSING_VALUE,
-          message: `Value is missing on a required control`,
-        },
-      ];
-    });
-
-    return record;
-  }
-
   private async executePreviewUsecase(
     workflowId: string,
     stepId: string | undefined,
@@ -129,7 +107,9 @@ export class GeneratePreviewUsecase {
   private async getWorkflowUserIdentifierFromWorkflowObject(command: GeneratePreviewCommand) {
     const persistedWorkflow = await this.getWorkflowByIdsUseCase.execute({
       identifierOrInternalId: command.workflowId,
-      user: command.user,
+      environmentId: command.user.environmentId,
+      organizationId: command.user.organizationId,
+      userId: command.user._id,
     });
     const { steps } = persistedWorkflow;
     const step = steps.find((stepDto) => stepDto._id === command.stepDatabaseId);
@@ -139,14 +119,36 @@ export class GeneratePreviewUsecase {
     if (!step.template || !step.template.controls) {
       throw new StepMissingControlsException(command.stepDatabaseId, step);
     }
+    const origin = this.buildOrigin(persistedWorkflow);
 
     return {
       workflowId: persistedWorkflow.triggers[0].identifier,
       stepId: step.stepId,
       stepType: step.template.type,
       stepControlSchema: step.template.controls,
-      origin: persistedWorkflow.origin,
+      origin,
     };
+  }
+
+  /**
+   * Builds the origin of the workflow based on the workflow type.
+   * If the origin is not set, it will be built based on the workflow type.
+   * We need to do so for backward compatibility reasons.
+   */
+  private buildOrigin(persistedWorkflow: NotificationTemplateEntity): WorkflowOriginEnum {
+    if (persistedWorkflow.origin) {
+      return persistedWorkflow.origin;
+    }
+
+    if (persistedWorkflow.type === WorkflowTypeEnum.ECHO || persistedWorkflow.type === WorkflowTypeEnum.BRIDGE) {
+      return WorkflowOriginEnum.EXTERNAL;
+    }
+
+    if (persistedWorkflow.type === WorkflowTypeEnum.REGULAR) {
+      return WorkflowOriginEnum.NOVU_CLOUD_V1;
+    }
+
+    return WorkflowOriginEnum.NOVU_CLOUD;
   }
 }
 

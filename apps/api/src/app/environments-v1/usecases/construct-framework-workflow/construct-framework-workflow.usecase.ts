@@ -1,10 +1,11 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { workflow } from '@novu/framework/express';
 import {
   ActionStep,
   ChannelStep,
   DelayOutput,
   DigestOutput,
+  JsonSchema,
   Step,
   StepOptions,
   StepOutput,
@@ -41,21 +42,20 @@ export class ConstructFrameworkWorkflow {
       }
     }
 
-    return this.constructFrameworkWorkflow(dbWorkflow, command.action);
+    return this.constructFrameworkWorkflow(dbWorkflow);
   }
 
-  private constructFrameworkWorkflow(newWorkflow, action) {
+  private constructFrameworkWorkflow(newWorkflow: NotificationTemplateEntity): Workflow {
     return workflow(
       newWorkflow.triggers[0].identifier,
       async ({ step, payload, subscriber }) => {
         const fullPayloadForRender: FullPayloadForRender = { payload, subscriber, steps: {} };
         for await (const staticStep of newWorkflow.steps) {
-          try {
-            const stepOutputs = await this.constructStep(step, staticStep, fullPayloadForRender);
-            fullPayloadForRender.steps[staticStep.stepId || staticStep._templateId] = stepOutputs;
-          } catch (e) {
-            Logger.log(`Cannot Construct Step ${staticStep.stepId || staticStep._templateId}`, e);
-          }
+          fullPayloadForRender.steps[staticStep.stepId || staticStep._templateId] = await this.constructStep(
+            step,
+            staticStep,
+            fullPayloadForRender
+          );
         }
       },
       {
@@ -178,7 +178,8 @@ export class ConstructFrameworkWorkflow {
 
   private constructCommonStepOptions(staticStep: NotificationStepEntity): Required<StepOptions> {
     return {
-      controlSchema: staticStep.template!.controls!.schema,
+      // TODO: fix the `JSONSchemaDto` type to enforce a non-primitive schema type.
+      controlSchema: staticStep.template!.controls!.schema as JsonSchema,
       /*
        * TODO: add conditions
        * Used to construct conditions defined with https://react-querybuilder.js.org/ or similar

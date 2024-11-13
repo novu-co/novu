@@ -7,7 +7,10 @@ export class StepIdMissingException extends InternalServerErrorException {
 }
 
 export class OriginMissingException extends InternalServerErrorException {
-  constructor(stepId: string) {
-    super({ message: `Origin is missing for the stepId: ${stepId}`, stepId });
+  constructor(workflowId: string) {
+    super({
+      message: 'Origin is missing on the workflow',
+      workflowId,
+    });
   }
 }

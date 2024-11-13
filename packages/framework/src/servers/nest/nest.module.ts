@@ -4,6 +4,7 @@ import { NovuController } from './nest.controller';
 import { registerApiPath } from './nest.register-api-path';
 import { ASYNC_OPTIONS_TYPE, NovuBaseModule, OPTIONS_TYPE } from './nest.module-definition';
 import { NovuHandler } from './nest.handler';
+import { applyDecorators } from './nest.utils';
 
 /**
  * In NestJS, serve and register any declared workflows with Novu, making
@@ -43,7 +44,7 @@ export class NovuModule extends NovuBaseModule {
   static register(options: typeof OPTIONS_TYPE, customProviders?: Provider[]) {
     const superModule = super.register(options);
 
-    superModule.controllers = [NovuController];
+    superModule.controllers = [applyDecorators(NovuController, options.controllerDecorators || [])];
     superModule.providers?.push(registerApiPath, NovuClient, NovuHandler, ...(customProviders || []));
     superModule.exports = [NovuClient, NovuHandler];
 

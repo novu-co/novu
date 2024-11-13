@@ -22,6 +22,8 @@ import {
   UpsertPreferences,
   UpsertUserWorkflowPreferencesCommand,
   UpsertWorkflowPreferencesCommand,
+  GetWorkflowByIdsUseCase,
+  GetWorkflowByIdsCommand,
 } from '@novu/application-generic';
 import {
   CreateWorkflowDto,
@@ -42,8 +44,6 @@ import {
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/step-upsert-mechanism-failed-missing-id.exception';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
-import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
-import { GetWorkflowByIdsCommand } from '../get-workflow-by-ids/get-workflow-by-ids.command';
 import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
 import { ValidateAndPersistWorkflowIssuesUsecase } from './validate-and-persist-workflow-issues.usecase';
 
@@ -97,7 +97,9 @@ export class UpsertWorkflowUseCase {
 
     return await this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({
-        ...command,
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
+        userId: command.user._id,
         identifierOrInternalId: command.identifierOrInternalId,
       })
     );
@@ -181,12 +183,16 @@ export class UpsertWorkflowUseCase {
   }
 
   private async upsertWorkflowPreferences(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
+    if (!command.workflowDto.preferences?.workflow) {
+      return;
+    }
+
     await this.upsertPreferencesUsecase.upsertWorkflowPreferences(
       UpsertWorkflowPreferencesCommand.create({
         environmentId: workflow._environmentId,
         organizationId: workflow._organizationId,
         templateId: workflow._id,
-        preferences: command.workflowDto.preferences?.workflow || null,
+        preferences: command.workflowDto.preferences.workflow,
       })
     );
   }

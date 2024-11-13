@@ -1,11 +1,10 @@
 import { Skeleton } from '@mantine/core';
-import { IconButton } from '@novu/novui';
+import { IconButton, Text } from '@novu/novui';
 import { css } from '@novu/novui/css';
 import { IconCable, IconPlayArrow, IconSettings } from '@novu/novui/icons';
 import { HStack, Stack } from '@novu/novui/jsx';
 import { token } from '@novu/novui/tokens';
 import { useEffect, useState } from 'react';
-import type { DiscoverWorkflowOutput } from '@novu/framework/internal';
 import { useTelemetry } from '../../../../hooks/useNovuAPI';
 import { useWorkflow } from '../../../hooks/useBridgeAPI';
 import { useStudioWorkflowsNavigation } from '../../../hooks/useStudioWorkflowsNavigation';
@@ -18,6 +17,7 @@ import { WorkflowDetailFormContextProvider } from '../preferences/WorkflowDetail
 import { WorkflowBackgroundWrapper } from './WorkflowBackgroundWrapper';
 import { WorkflowFloatingMenu } from './WorkflowFloatingMenu';
 import { WorkflowNodes } from './WorkflowNodes';
+import { WorkflowNotFound } from '../WorkflowNotFound';
 
 const BaseWorkflowsDetailPage = () => {
   const { currentWorkflowId, goToStep, goToTest } = useStudioWorkflowsNavigation();
@@ -39,10 +39,11 @@ const BaseWorkflowsDetailPage = () => {
     return <WorkflowsContentLoading />;
   }
 
-  // After loading has completed, we can safely cast the workflow to DiscoverWorkflowOutput
-  const fetchedWorkflow = workflow as DiscoverWorkflowOutput;
+  if (!workflow) {
+    return <WorkflowNotFound />;
+  }
 
-  const title = fetchedWorkflow?.name || fetchedWorkflow.workflowId;
+  const title = workflow?.name || workflow.workflowId;
 
   return (
     <WorkflowsPageTemplate

@@ -94,6 +94,8 @@ export const CLERK_PUBLISHABLE_KEY =
 export const IS_UNDER_DASHBOARD =
   window._env_.REACT_IS_UNDER_DASHBOARD || process.env.REACT_IS_UNDER_DASHBOARD || 'false';
 
+export const NEW_DASHBOARD_URL = window._env_.REACT_APP_NEW_DASHBOARD_URL || process.env.REACT_APP_NEW_DASHBOARD_URL;
+
 if (IS_EE_AUTH_ENABLED && !CLERK_PUBLISHABLE_KEY) {
   throw new Error('Missing Clerk Publishable Key');
 }

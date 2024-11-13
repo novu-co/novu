@@ -1,10 +1,9 @@
 import type { ListWorkflowResponse } from '@novu/shared';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { RiBookMarkedLine, RiMore2Fill, RiRouteFill } from 'react-icons/ri';
-import { createSearchParams, Link, useLocation, useSearchParams } from 'react-router-dom';
+import { RiMore2Fill } from 'react-icons/ri';
+import { createSearchParams, useLocation, useSearchParams } from 'react-router-dom';
 import { getV2 } from '@/api/api.client';
 import { DefaultPagination } from '@/components/default-pagination';
-import { Button, buttonVariants } from '@/components/primitives/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { Skeleton } from '@/components/primitives/skeleton';
 import {
@@ -16,11 +15,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/primitives/table';
-import { WorkflowCloud } from '@/components/workflow-cloud';
 import { useEnvironment } from '@/context/environment/hooks';
 import { QueryKeys } from '@/utils/query-keys';
-import { CreateWorkflowButton } from '@/components/create-workflow-button';
 import { WorkflowRow } from '@/components/workflow-row';
+import { WorkflowListEmpty } from '@/components/workflow-list-empty';
 
 export const WorkflowList = () => {
   const { currentEnvironment } = useEnvironment();
@@ -58,40 +56,11 @@ export const WorkflowList = () => {
   }
 
   if (!workflowsQuery.isPending && workflowsQuery.data.totalCount === 0) {
-    return (
-      <div className="flex h-full w-full flex-col items-center justify-center gap-6">
-        <div className="flex flex-col items-center gap-2 text-center">
-          <WorkflowCloud className="drop-shadow" />
-          <span className="text-foreground-900 block font-medium">
-            No workflows exist, create workflows to orchestrate notifications
-          </span>
-          <p className="text-foreground-600 max-w-[55ch] text-sm">
-            Workflows in Novu handle event-driven notifications across multiple channels in a single, version-controlled
-            flow, with the ability to manage preference for each subscriber.
-          </p>
-        </div>
-
-        <div className="flex items-center justify-center gap-6">
-          <Link
-            to={'https://docs.novu.co/concepts/workflows'}
-            className={buttonVariants({ variant: 'link', className: 'text-foreground-600 gap-1' })}
-          >
-            <RiBookMarkedLine className="size-4" />
-            View docs
-          </Link>
-          <CreateWorkflowButton asChild>
-            <Button variant="primary" className="gap-2">
-              <RiRouteFill className="size-5" />
-              Create workflow
-            </Button>
-          </CreateWorkflowButton>
-        </div>
-      </div>
-    );
+    return <WorkflowListEmpty />;
   }
 
   return (
-    <div className="flex h-full flex-col px-6 py-2">
+    <div className="flex h-full flex-col px-2.5 py-2">
       <Table>
         <TableHeader>
           <TableRow>

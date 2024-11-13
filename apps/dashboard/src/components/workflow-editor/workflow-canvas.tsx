@@ -10,6 +10,7 @@ import {
   ViewportHelperFunctionOptions,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+
 import {
   AddNode,
   ChatNode,
@@ -27,6 +28,7 @@ import { AddNodeEdge, AddNodeEdgeType } from './edges';
 import { NODE_HEIGHT, NODE_WIDTH } from './base-node';
 import { StepTypeEnum } from '@/utils/enums';
 import { Step } from '@/utils/types';
+import { getFirstControlsErrorMessage, getFirstBodyErrorMessage } from './step-utils';
 
 const nodeTypes = {
   trigger: TriggerNode,
@@ -60,8 +62,7 @@ const mapStepToNode = (
     content = `Wait to send ~ 30 minutes`;
   }
 
-  const fieldIssues = Object.values({ ...step.issues?.body, ...step.issues?.control })[0];
-  const error = fieldIssues?.[0]?.message;
+  const error = getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues);
 
   return {
     id: crypto.randomUUID(),

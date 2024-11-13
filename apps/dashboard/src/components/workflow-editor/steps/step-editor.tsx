@@ -1,15 +1,16 @@
 import { type StepDataDto, StepTypeEnum, type WorkflowResponseDto } from '@novu/shared';
 import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
+import { OtherStepTabs } from './other-steps-tabs';
 
 const STEP_TYPE_TO_EDITOR: Record<
   StepTypeEnum,
   (args: { workflow: WorkflowResponseDto; step: StepDataDto }) => React.JSX.Element
 > = {
-  [StepTypeEnum.EMAIL]: () => <div>EMAIL Editor</div>,
-  [StepTypeEnum.CHAT]: () => <div>CHAT Editor</div>,
+  [StepTypeEnum.EMAIL]: OtherStepTabs,
+  [StepTypeEnum.CHAT]: OtherStepTabs,
   [StepTypeEnum.IN_APP]: InAppTabs,
-  [StepTypeEnum.SMS]: () => <div>SMS Editor</div>,
-  [StepTypeEnum.PUSH]: () => <div>PUSH Editor</div>,
+  [StepTypeEnum.SMS]: OtherStepTabs,
+  [StepTypeEnum.PUSH]: OtherStepTabs,
   [StepTypeEnum.DIGEST]: () => <div>DIGEST Editor</div>,
   [StepTypeEnum.DELAY]: () => <div>DELAY Editor</div>,
   [StepTypeEnum.TRIGGER]: () => <div>TRIGGER Editor</div>,

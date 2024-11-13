@@ -1,10 +1,10 @@
-import type { JSONSchema } from 'json-schema-to-ts';
+import type { JSONSchemaDto } from './json-schema-dto';
 import { WorkflowResponseDto } from './workflow-response-dto';
 import { Slug, StepTypeEnum, WorkflowPreferences } from '../../types';
 import { StepContentIssueEnum, StepIssueEnum } from './step-content-issue.enum';
 
 export class ControlsSchema {
-  schema: JSONSchema;
+  schema: JSONSchemaDto;
 }
 export type StepCreateAndUpdateKeys = keyof StepCreateDto | keyof StepUpdateDto;
 

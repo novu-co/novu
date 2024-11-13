@@ -5,7 +5,10 @@ import {
   UpdateWorkflow,
   UpsertControlValuesUseCase,
   UpsertPreferences,
+  DeleteWorkflowUseCase,
+  GetWorkflowByIdsUseCase,
 } from '@novu/application-generic';
+
 import { SharedModule } from '../shared/shared.module';
 import { MessageTemplateModule } from '../message-template/message-template.module';
 import { ChangeModule } from '../change/change.module';
@@ -14,8 +17,6 @@ import { IntegrationModule } from '../integrations/integrations.module';
 import { WorkflowController } from './workflow.controller';
 import { UpsertWorkflowUseCase } from './usecases/upsert-workflow/upsert-workflow.usecase';
 import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.usecase';
-import { DeleteWorkflowUseCase } from './usecases/delete-workflow/delete-workflow.usecase';
-import { GetWorkflowByIdsUseCase } from './usecases/get-workflow-by-ids/get-workflow-by-ids.usecase';
 import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
 import { BridgeModule } from '../bridge';
 import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
@@ -29,6 +30,7 @@ import { BuildPayloadNestedStructureUsecase } from './usecases/placeholder-enric
 import { GetWorkflowUseCase } from './usecases/get-workflow/get-workflow.usecase';
 import { BuildDefaultPayloadUseCase } from './usecases/build-payload-from-placeholder';
 import { ValidateControlValuesAndConstructPassableStructureUsecase } from './usecases/validate-control-values/build-default-control-values-usecase.service';
+import { BuildAvailableVariableSchemaUsecase } from './usecases/get-step-schema/build-available-variable-schema-usecase.service';
 
 @Module({
   imports: [SharedModule, MessageTemplateModule, ChangeModule, AuthModule, BridgeModule, IntegrationModule],
@@ -55,6 +57,7 @@ import { ValidateControlValuesAndConstructPassableStructureUsecase } from './use
     ValidateAndPersistWorkflowIssuesUsecase,
     BuildDefaultPayloadUseCase,
     ValidateControlValuesAndConstructPassableStructureUsecase,
+    BuildAvailableVariableSchemaUsecase,
   ],
 })
 export class WorkflowModule implements NestModule {

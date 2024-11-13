@@ -31,7 +31,6 @@ export class GenerateUniqueApiKey {
     const hashedApiKey = createHash('sha256').update(apiKey).digest('hex');
 
     const environment = await this.environmentRepository.findByApiKey({
-      key: apiKey,
       hash: hashedApiKey,
     });
 
