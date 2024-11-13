@@ -89,16 +89,15 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
           <SheetTitle>Create workflow</SheetTitle>
           <div>
             <SheetDescription>
-              Workflows manage event-driven notifications across multiple channels in a version-controlled flow, with
-              the ability to manage preference for each subscriber.
+              Workflows manage event-driven notifications across channels.{' '}
+              <Link
+                target="_blank"
+                to="https://docs.novu.co/concepts/workflows"
+                className="text-foreground-400 inline-flex items-center text-sm underline"
+              >
+                Learn more <RiExternalLinkLine className="inline size-4" />
+              </Link>
             </SheetDescription>
-            <Link
-              target="_blank"
-              to="https://docs.novu.co/concepts/workflows"
-              className="text-foreground-400 flex items-center text-sm underline"
-            >
-              Learn more <RiExternalLinkLine className="inline size-4" />
-            </Link>
           </div>
         </SheetHeader>
         <Separator />

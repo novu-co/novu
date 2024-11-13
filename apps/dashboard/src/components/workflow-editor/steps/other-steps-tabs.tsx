@@ -19,7 +19,7 @@ import { useUpdateWorkflow } from '@/hooks/use-update-workflow';
 import { buildDefaultValues, buildDynamicZodSchema } from '@/utils/schema';
 import { CustomStepControls } from './controls/custom-step-controls';
 
-const tabsContentClassName = 'h-full w-full px-3 py-3.5';
+const tabsContentClassName = 'h-full w-full px-3 py-3.5 overflow-y-auto';
 
 export const OtherStepTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; step: StepDataDto }) => {
   const { stepSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();

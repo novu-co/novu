@@ -25,7 +25,7 @@ import { ExtractDefaultsUsecase } from './usecases/get-default-values-from-schem
 import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-renderers';
 import { WorkflowTestDataUseCase } from './usecases/test-data/test-data.usecase';
 import { GetStepDataUsecase } from './usecases/get-step-schema/get-step-data.usecase';
-import { ValidateAndPersistWorkflowIssuesUsecase } from './usecases/upsert-workflow/validate-and-persist-workflow-issues.usecase';
+import { ProcessWorkflowIssuesUsecase } from './usecases/process-workflow-issues/process-workflow-issues.usecase';
 import { BuildPayloadNestedStructureUsecase } from './usecases/placeholder-enrichment/buildPayloadNestedStructureUsecase';
 import { GetWorkflowUseCase } from './usecases/get-workflow/get-workflow.usecase';
 import { BuildDefaultPayloadUseCase } from './usecases/build-payload-from-placeholder';
@@ -54,7 +54,7 @@ import { BuildAvailableVariableSchemaUsecase } from './usecases/get-step-schema/
     WorkflowTestDataUseCase,
     GetWorkflowUseCase,
     HydrateEmailSchemaUseCase,
-    ValidateAndPersistWorkflowIssuesUsecase,
+    ProcessWorkflowIssuesUsecase,
     BuildDefaultPayloadUseCase,
     ValidateControlValuesAndConstructPassableStructureUsecase,
     BuildAvailableVariableSchemaUsecase,
