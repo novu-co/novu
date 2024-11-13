@@ -12,7 +12,7 @@ import { css } from '@novu/novui/css';
 import { HStack } from '@novu/novui/jsx';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { IS_EE_AUTH_ENABLED, IS_NOVU_PROD_STAGING } from '../../../../config';
-import { useFeatureFlag } from '../../../../hooks';
+import { useBootIntercom, useFeatureFlag } from '../../../../hooks';
 import useThemeChange from '../../../../hooks/useThemeChange';
 import { discordInviteUrl } from '../../../../pages/quick-start/consts';
 import { useAuth } from '../../../../hooks/useAuth';
@@ -29,6 +29,7 @@ export function HeaderNav() {
   const [isSupportModalOpened, setIsSupportModalOpened] = useState(false);
   const isV2Enabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_ENABLED);
 
+  useBootIntercom();
   // variable to check if it's the first render for. Needed for Plain live chat initialization
   const [isFirstRender, setIsFirstRender] = useState(true);
   const isLiveChatVisible =
@@ -53,7 +54,7 @@ export function HeaderNav() {
         links: [
           {
             icon: 'call',
-            text: 'Schedule a call with us',
+            text: 'Contact Sales',
             url: 'https://notify.novu.co/meetings/novuhq/novu-discovery-session-rr?utm_campaign=in_app_live_chat',
           },
         ],
