@@ -182,6 +182,7 @@ export class PostProcessWorkflowUpdate {
     command: PostProcessWorkflowUpdateCommand,
     issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
   ) {
+    const MAX_TAGS_LENGTH = 16;
     const tags = command.workflow.tags?.map((tag) => tag.trim());
 
     if (!tags.length) {

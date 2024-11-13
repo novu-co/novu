@@ -27,7 +27,6 @@ export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
 
   @IsArray()
   @IsOptional()
-  @ArrayMaxSize(8)
   tags?: string[];
 
   @IsString()
