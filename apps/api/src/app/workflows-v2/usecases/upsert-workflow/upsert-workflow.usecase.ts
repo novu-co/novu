@@ -5,7 +5,6 @@ import {
   NotificationGroupRepository,
   NotificationStepEntity,
   NotificationTemplateEntity,
-  PreferencesEntity,
 } from '@novu/dal';
 import {
   CreateWorkflow as CreateWorkflowGeneric,
@@ -13,6 +12,8 @@ import {
   GetPreferences,
   GetPreferencesCommand,
   GetPreferencesResponseDto,
+  GetWorkflowByIdsCommand,
+  GetWorkflowByIdsUseCase,
   NotificationStep,
   shortId,
   UpdateWorkflow,
@@ -22,8 +23,6 @@ import {
   UpsertPreferences,
   UpsertUserWorkflowPreferencesCommand,
   UpsertWorkflowPreferencesCommand,
-  GetWorkflowByIdsUseCase,
-  GetWorkflowByIdsCommand,
 } from '@novu/application-generic';
 import {
   CreateWorkflowDto,
@@ -46,6 +45,7 @@ import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/st
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
 import { ValidateAndPersistWorkflowIssuesUsecase } from './validate-and-persist-workflow-issues.usecase';
+import { ValidateWorkflowCommand } from './validate-workflow.command';
 
 function buildUpsertControlValuesCommand(
   command: UpsertWorkflowCommand,
@@ -80,12 +80,14 @@ export class UpsertWorkflowUseCase {
     const workflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
     const stepIdToControlValuesMap = await this.upsertControlValues(workflow, command);
     const preferences = await this.upsertPreference(command, workflow);
-    const validatedWorkflowWithIssues = await this.validateWorkflowUsecase.execute({
-      user: command.user,
-      workflow,
-      preferences,
-      stepIdToControlValuesMap,
-    });
+    const validatedWorkflowWithIssues = await this.validateWorkflowUsecase.execute(
+      ValidateWorkflowCommand.create({
+        user: command.user,
+        workflow,
+        preferences,
+        stepIdToControlValuesMap,
+      })
+    );
 
     return toResponseWorkflowDto(validatedWorkflowWithIssues, preferences);
   }

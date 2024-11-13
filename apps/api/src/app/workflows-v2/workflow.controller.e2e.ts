@@ -105,6 +105,20 @@ describe('Workflow Controller E2E API Testing', () => {
           expect(issues.body.name?.issueType, JSON.stringify(issues)).to.be.equal(StepIssueEnum.MISSING_REQUIRED_VALUE);
         }
       });
+      it('should remove issues when no longer', async () => {
+        const inAppStep = { ...buildInAppStep(), controlValues: { body: 'some body' }, name: '' };
+        const workflowCreated = await createWorkflowAndReturn({ steps: [inAppStep] });
+        const novuRestResult = await workflowsClient.updateWorkflow(workflowCreated._id, {
+          ...workflowCreated,
+          steps: [{ ...inAppStep, name: 'New Name' }],
+        });
+        if (!novuRestResult.isSuccessResult()) {
+          throw new Error(novuRestResult.error!.responseText);
+        }
+        const updatedWorkflow = novuRestResult.value;
+        expect(updatedWorkflow.steps[0].issues?.body, JSON.stringify(updatedWorkflow.steps[0].issues)).to.be.empty;
+        expect(updatedWorkflow.steps[0].issues?.controls, JSON.stringify(updatedWorkflow.steps[0].issues)).to.be.empty;
+      });
     });
     describe('Workflow Step content Issues', () => {
       it('should show control value required when missing', async () => {
