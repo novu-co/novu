@@ -45,7 +45,7 @@ import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/st
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
 import { ProcessWorkflowIssuesUsecase } from '../process-workflow-issues/process-workflow-issues.usecase';
-import { ValidateWorkflowCommand } from './validate-workflow.command';
+import { ProcessWorkflowIssuesCommand } from '../process-workflow-issues/process-workflow-issues.command';
 
 function buildUpsertControlValuesCommand(
   command: UpsertWorkflowCommand,
@@ -81,7 +81,7 @@ export class UpsertWorkflowUseCase {
     const stepIdToControlValuesMap = await this.upsertControlValues(workflow, command);
     const preferences = await this.upsertPreference(command, workflow);
     const workflowIssues = await this.processWorkflowIssuesUsecase.execute(
-      ValidateWorkflowCommand.create({
+      ProcessWorkflowIssuesCommand.create({
         user: command.user,
         workflow,
         preferences,
