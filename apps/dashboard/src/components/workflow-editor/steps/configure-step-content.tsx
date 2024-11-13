@@ -11,6 +11,7 @@ import { ConfigureInAppPreview } from './configure-in-app-preview';
 import { SdkBanner } from './sdk-banner';
 import { useStep } from './use-step';
 import { getFirstControlsErrorMessage, getFirstBodyErrorMessage } from '../step-utils';
+import { EXCLUDED_EDITOR_TYPES } from '@/utils/constants';
 
 export const ConfigureStepContent = () => {
   const { step } = useStep();
@@ -65,15 +66,19 @@ export const ConfigureStepContent = () => {
         <CommonFields />
       </SidebarContent>
       <Separator />
-      <SidebarContent>
-        <Link to={'./edit'} relative="path">
-          <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
-            <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
-            Configure {step?.type} template <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
-          </Button>
-        </Link>
-      </SidebarContent>
-      <Separator />
+      {!EXCLUDED_EDITOR_TYPES.includes(step?.type ?? '') && (
+        <>
+          <SidebarContent>
+            <Link to={'./edit'} relative="path">
+              <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
+                <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
+                Configure {step?.type} template <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
+              </Button>
+            </Link>
+          </SidebarContent>
+          <Separator />
+        </>
+      )}
       <SidebarContent>
         <SdkBanner />
       </SidebarContent>

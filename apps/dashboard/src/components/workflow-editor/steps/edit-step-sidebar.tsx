@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -16,6 +16,7 @@ import { useFetchStep } from '@/hooks/use-fetch-step';
 import { VisuallyHidden } from '@/components/primitives/visually-hidden';
 import { PageMeta } from '@/components/page-meta';
 import { getStepBase62Id } from '@/utils/step';
+import { EXCLUDED_EDITOR_TYPES } from '@/utils/constants';
 
 const transitionSetting = { ease: [0.29, 0.83, 0.57, 0.99], duration: 0.4 };
 
@@ -34,8 +35,20 @@ export const EditStepSidebar = () => {
   );
 
   const handleCloseSidebar = () => {
-    navigate('../', { relative: 'path' });
+    navigate('..', { relative: 'path' });
   };
+
+  const isNotSupportedEditorType = EXCLUDED_EDITOR_TYPES.includes(stepType ?? '');
+
+  useEffect(() => {
+    if (isNotSupportedEditorType) {
+      navigate('..', { relative: 'path' });
+    }
+  }, [isNotSupportedEditorType, navigate]);
+
+  if (isNotSupportedEditorType) {
+    return null;
+  }
 
   return (
     <>
