@@ -1,5 +1,5 @@
 import { ReactNode, useCallback, useEffect, useMemo } from 'react';
-import { useAuth, useOrganization, useOrganizationList, useUser } from '@clerk/clerk-react';
+import { useAuth, useOrganization, useUser } from '@clerk/clerk-react';
 import type { UserResource } from '@clerk/types';
 import { ROUTES } from '@/utils/routes';
 import type { AuthContextValue } from './types';
@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { orgId } = useAuth();
   const { user: clerkUser, isLoaded: isUserLoaded } = useUser();
   const { organization: clerkOrganization, isLoaded: isOrganizationLoaded } = useOrganization();
-  const { setActive, isLoaded: isOrgListLoaded } = useOrganizationList({ userMemberships: { infinite: true } });
 
   const redirectTo = useCallback(
     ({
@@ -44,23 +43,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     []
   );
 
-  // check if user has active organization
   useEffect(() => {
-    if (orgId) {
-      return;
-    }
+    if (!clerkUser || orgId) return;
 
-    if (isOrgListLoaded && clerkUser) {
-      const hasOrgs = clerkUser.organizationMemberships.length > 0;
-
-      if (hasOrgs) {
-        const firstOrg = clerkUser.organizationMemberships[0].organization;
-        setActive({ organization: firstOrg });
-      } else if (!window.location.href.includes(ROUTES.SIGNUP_ORGANIZATION_LIST)) {
-        redirectTo({ url: ROUTES.SIGNUP_ORGANIZATION_LIST });
-      }
+    const hasOrganizations = clerkUser.organizationMemberships.length > 0;
+    if (!hasOrganizations && window.location.pathname !== ROUTES.SIGNUP_ORGANIZATION_LIST) {
+      return redirectTo({ url: ROUTES.SIGNUP_ORGANIZATION_LIST });
     }
-  }, [setActive, isOrgListLoaded, clerkUser, orgId, redirectTo]);
+  }, [clerkUser, orgId, redirectTo]);
 
   const currentUser = useMemo(() => (clerkUser ? toUserEntity(clerkUser as UserResource) : undefined), [clerkUser]);
   const currentOrganization = useMemo(
