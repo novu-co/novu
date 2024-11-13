@@ -1,23 +1,12 @@
-import { ReactNode, useMemo, useCallback, useLayoutEffect, useState } from 'react';
+import { ReactNode, useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { useBlocker, useNavigate, useParams } from 'react-router-dom';
-import { useForm, useFieldArray } from 'react-hook-form';
 // eslint-disable-next-line
 // @ts-ignore
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { WorkflowOriginEnum, WorkflowResponseDto } from '@novu/shared';
+import * as z from 'zod';
 
-import { WorkflowEditorContext } from './workflow-editor-context';
-import { StepTypeEnum } from '@/utils/enums';
-import { Form } from '../primitives/form/form';
-import { buildRoute, ROUTES } from '@/utils/routes';
-import { useEnvironment } from '@/context/environment/hooks';
-import { workflowSchema } from './schema';
-import { useFetchWorkflow, useUpdateWorkflow, useFormAutoSave } from '@/hooks';
-import { Step } from '@/utils/types';
-import { showToast } from '../primitives/sonner-helpers';
-import { ToastIcon } from '../primitives/sonner';
-import { handleValidationIssues } from '@/utils/handleValidationIssues';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,8 +18,20 @@ import {
   AlertDialogTitle,
 } from '@/components/primitives/alert-dialog';
 import { buttonVariants } from '@/components/primitives/button';
-import { RiAlertFill } from 'react-icons/ri';
 import { Separator } from '@/components/primitives/separator';
+import { useEnvironment } from '@/context/environment/hooks';
+import { useFetchWorkflow, useFormAutoSave, useUpdateWorkflow } from '@/hooks';
+import { StepTypeEnum } from '@/utils/enums';
+import { handleValidationIssues } from '@/utils/handleValidationIssues';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { Step } from '@/utils/types';
+import debounce from 'lodash.debounce';
+import { RiAlertFill } from 'react-icons/ri';
+import { Form } from '../primitives/form/form';
+import { ToastIcon } from '../primitives/sonner';
+import { showToast } from '../primitives/sonner-helpers';
+import { workflowSchema } from './schema';
+import { WorkflowEditorContext } from './workflow-editor-context';
 
 const STEP_NAME_BY_TYPE: Record<StepTypeEnum, string> = {
   email: 'Email Step',
@@ -150,17 +151,27 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
 
   const blocker = useBlocker(isDirty || isPending);
 
-  useFormAutoSave({
-    form,
-    onSubmit: async (data: z.infer<typeof workflowSchema>) => {
-      if (!workflow) {
+  const onSubmit = useCallback(
+    async (data: z.infer<typeof workflowSchema>) => {
+      if (!workflow || !form.formState.isDirty || isReadOnly) {
         return;
       }
 
       updateWorkflow({ id: workflow._id, workflow: { ...workflow, ...data } as any });
     },
-    enabled: !isReadOnly,
-    shouldSaveImmediately: (previousData, data) => {
+    [workflow, form.formState.isDirty, isReadOnly, updateWorkflow]
+  );
+
+  const debouncedSave = useCallback(debounce(form.handleSubmit(onSubmit), 800), [
+    form.handleSubmit,
+    onSubmit,
+    debounce,
+  ]);
+
+  useFormAutoSave({
+    form,
+    debouncedSave,
+    shouldFlush: (previousData, data) => {
       const currentStepsLength = data?.steps?.length ?? 0;
       const wasStepsLengthAltered = previousData.steps != null && currentStepsLength !== previousData.steps?.length;
 
@@ -231,7 +242,9 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
         </AlertDialogContent>
       </AlertDialog>
       <Form {...form}>
-        <form className="h-full">{children}</form>
+        <form className="h-full" onBlur={debouncedSave.flush}>
+          {children}
+        </form>
       </Form>
     </WorkflowEditorContext.Provider>
   );
