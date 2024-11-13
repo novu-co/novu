@@ -1,5 +1,6 @@
 import {
   ContentIssue,
+  ControlValuesLevelEnum,
   RuntimeIssue,
   StepIssueEnum,
   StepIssues,
@@ -13,6 +14,7 @@ import {
   NotificationStepEntity,
   NotificationTemplateEntity,
   NotificationTemplateRepository,
+  ControlValuesRepository,
 } from '@novu/dal';
 import { Injectable } from '@nestjs/common';
 import { ProcessWorkflowIssuesCommand } from './process-workflow-issues.command';
@@ -23,16 +25,33 @@ import { WorkflowNotFoundException } from '../../exceptions/workflow-not-found-e
 export class ProcessWorkflowIssuesUsecase {
   constructor(
     private notificationTemplateRepository: NotificationTemplateRepository,
-    private buildDefaultControlValuesUsecase: ValidateControlValuesAndConstructPassableStructureUsecase
+    private buildDefaultControlValuesUsecase: ValidateControlValuesAndConstructPassableStructureUsecase,
+    private controlValuesRepository: ControlValuesRepository
   ) {}
 
   async execute(command: ProcessWorkflowIssuesCommand): Promise<NotificationTemplateEntity> {
     const workflowIssues = await this.validateWorkflow(command);
-    const stepIssues = this.validateSteps(command.workflow.steps, command.stepIdToControlValuesMap);
+    const stepIdToControlValuesMap: { [p: string]: ControlValuesEntity } = await this.fetchStepsControlValue(command);
+    const stepIssues = this.validateSteps(command.workflow.steps, stepIdToControlValuesMap);
     const workflowWithIssues = this.updateIssuesOnWorkflow(command.workflow, workflowIssues, stepIssues);
     await this.persistWorkflow(command, workflowWithIssues);
 
     return await this.getWorkflow(command);
+  }
+
+  private async fetchStepsControlValue(command: ProcessWorkflowIssuesCommand) {
+    const stepsControlValues = await this.controlValuesRepository.find({
+      _environmentId: command.user.environmentId,
+      _organizationId: command.user.organizationId,
+      _workflowId: command.workflow._id,
+      level: ControlValuesLevelEnum.STEP_CONTROLS,
+    });
+    const stepIdToControlValuesMap: { [p: string]: ControlValuesEntity } = {};
+    for (const stepsControlValue of stepsControlValues) {
+      stepIdToControlValuesMap[stepsControlValue._stepId] = stepsControlValue;
+    }
+
+    return stepIdToControlValuesMap;
   }
 
   private async persistWorkflow(command: ProcessWorkflowIssuesCommand, workflowWithIssues: NotificationTemplateEntity) {

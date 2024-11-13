@@ -78,14 +78,13 @@ export class UpsertWorkflowUseCase {
     const workflowForUpdate = await this.queryWorkflow(command);
 
     const workflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
-    const stepIdToControlValuesMap = await this.upsertControlValues(workflow, command);
+    await this.upsertControlValues(workflow, command);
     const preferences = await this.upsertPreference(command, workflow);
     const workflowIssues = await this.processWorkflowIssuesUsecase.execute(
       ProcessWorkflowIssuesCommand.create({
         user: command.user,
         workflow,
         preferences,
-        stepIdToControlValuesMap,
       })
     );
 
@@ -108,41 +107,25 @@ export class UpsertWorkflowUseCase {
   }
 
   private async upsertControlValues(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
-    const stepIdToControlValuesMap: { [p: string]: ControlValuesEntity } = {};
     for (const persistedStep of workflow.steps) {
-      const controlValuesEntity = await this.upsertControlValuesForSingleStep(persistedStep, command, workflow);
-      if (controlValuesEntity) {
-        stepIdToControlValuesMap[persistedStep._templateId] = controlValuesEntity;
+      const stepDatabaseId = persistedStep._templateId;
+      const stepExternalId = persistedStep.name;
+      if (!stepDatabaseId && !stepExternalId) {
+        throw new StepUpsertMechanismFailedMissingIdException(stepDatabaseId, stepExternalId, persistedStep);
       }
+      const stepInDto = command.workflowDto?.steps.find(
+        (commandStepItem) => commandStepItem.name === persistedStep.name
+      );
+
+      if (!stepInDto || Object.keys(stepInDto.controlValues || {}).length === 0) {
+        // TODO: should delete the values from the database?  or just ignore?
+        continue;
+      }
+
+      await this.upsertControlValuesUseCase.execute(
+        buildUpsertControlValuesCommand(command, persistedStep, workflow, stepInDto)
+      );
     }
-
-    return stepIdToControlValuesMap;
-  }
-
-  private async upsertControlValuesForSingleStep(
-    persistedStep: NotificationStepEntity,
-    command: UpsertWorkflowCommand,
-    persistedWorkflow: NotificationTemplateEntity
-  ): Promise<ControlValuesEntity | undefined> {
-    const stepDatabaseId = persistedStep._templateId;
-    const stepExternalId = persistedStep.name;
-    if (!stepDatabaseId && !stepExternalId) {
-      throw new StepUpsertMechanismFailedMissingIdException(stepDatabaseId, stepExternalId, persistedStep);
-    }
-    const stepInDto = command.workflowDto?.steps.find((commandStepItem) => commandStepItem.name === persistedStep.name);
-    if (!stepInDto) {
-      // TODO: should delete the values from the database?  or just ignore?
-      return;
-    }
-
-    const upsertControlValuesCommand = buildUpsertControlValuesCommand(
-      command,
-      persistedStep,
-      persistedWorkflow,
-      stepInDto
-    );
-
-    return await this.upsertControlValuesUseCase.execute(upsertControlValuesCommand);
   }
 
   private async upsertPreference(
