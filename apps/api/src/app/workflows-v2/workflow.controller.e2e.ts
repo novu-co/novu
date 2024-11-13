@@ -366,7 +366,7 @@ describe('Workflow Controller E2E API Testing', () => {
         description: 'Updated Description',
         // modify existing Email Step, add new InApp Steps, previously existing InApp Step is removed
         steps: [
-          { ...stepToUpdate, name: 'Updated Email Step' },
+          { ...buildEmailStep(), _id: devWorkflow.steps[0]._id, name: 'Updated Email Step' },
           { ...buildInAppStep(), name: 'New InApp Step' },
         ],
       };
@@ -387,7 +387,7 @@ describe('Workflow Controller E2E API Testing', () => {
       // Verify updated properties
       expect(prodWorkflowUpdated.name).to.equal('Updated Name');
       expect(prodWorkflowUpdated.description).to.equal('Updated Description');
-
+      console.log('prodWorkflowUpdated\n', JSON.stringify(prodWorkflowUpdated, null, 2));
       // Verify unchanged properties
       ['status', 'type', 'origin'].forEach((prop) => {
         expect(prodWorkflowUpdated[prop]).to.deep.equal(prodWorkflowCreated[prop], `Property ${prop} should match`);
