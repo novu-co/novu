@@ -29,12 +29,13 @@ import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 
+const MAX_TAGS_LENGTH = 16;
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
   workflowId: z.string(),
   tags: z
     .array(z.string().min(1))
-    .max(16)
+    .max(MAX_TAGS_LENGTH)
     .refine((tags) => new Set(tags).size === tags.length, {
       message: 'Duplicate tags are not allowed.',
     }),
@@ -166,7 +167,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-1">
-                      <FormLabel hint="(max. 16)">Add tags</FormLabel>
+                      <FormLabel hint={`(max. ${MAX_TAGS_LENGTH})`}>Add tags</FormLabel>
                     </div>
                     <FormControl>
                       <TagInput suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []} {...field} />
