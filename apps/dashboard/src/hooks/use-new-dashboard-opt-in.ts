@@ -5,16 +5,27 @@ import { useUser } from '@clerk/clerk-react';
 import { NewDashboardOptInStatusEnum } from '@novu/shared';
 
 export function useNewDashboardOptIn() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const track = useTelemetry();
 
-  const updateUserOptInStatus = (status: NewDashboardOptInStatusEnum) => {
+  const updateUserOptInStatus = async (status: NewDashboardOptInStatusEnum) => {
+    if (!user) return;
+
+    await user.update({
+      unsafeMetadata: {
+        ...user.unsafeMetadata,
+        newDashboardOptInStatus: status,
+      },
+    });
+  };
+
+  const updateNewDashboardFirstVisit = (firstVisit: boolean) => {
     if (!user) return;
 
     user.update({
       unsafeMetadata: {
         ...user.unsafeMetadata,
-        newDashboardOptInStatus: status,
+        newDashboardFirstVisit: firstVisit,
       },
     });
   };
@@ -25,30 +36,31 @@ export function useNewDashboardOptIn() {
     return user.unsafeMetadata?.newDashboardOptInStatus || null;
   };
 
-  const redirectToLegacyDashboard = () => {
-    optOut();
+  const getNewDashboardFirstVisit = () => {
+    if (!user) return false;
 
+    return user.unsafeMetadata?.newDashboardFirstVisit || false;
+  };
+
+  const redirectToLegacyDashboard = () => {
     if (NEW_DASHBOARD_FEEDBACK_FORM_URL) {
       window.open(NEW_DASHBOARD_FEEDBACK_FORM_URL, '_blank');
     }
 
-    window.location.href = LEGACY_DASHBOARD_URL || window.location.origin + '/legacy';
+    window.location.href = LEGACY_DASHBOARD_URL || window.location.origin + '/legacy/workflows';
   };
 
-  const optIn = () => {
-    track(TelemetryEvent.NEW_DASHBOARD_OPT_IN);
-    updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_IN);
-  };
-
-  const optOut = () => {
+  const optOut = async () => {
     track(TelemetryEvent.NEW_DASHBOARD_OPT_OUT);
-    updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_OUT);
+    await updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_OUT);
+    redirectToLegacyDashboard();
   };
 
   return {
-    optIn,
+    isLoaded,
     optOut,
     status: getCurrentOptInStatus(),
-    redirectToLegacyDashboard,
+    isFirstVisit: getNewDashboardFirstVisit(),
+    updateNewDashboardFirstVisit,
   };
 }
