@@ -1,8 +1,7 @@
-import { EnvironmentWithUserObjectCommand, GetPreferencesResponseDto } from '@novu/application-generic';
-import { ControlValuesEntity, NotificationTemplateEntity } from '@novu/dal';
+import { EnvironmentWithUserObjectCommand, GetWorkflowByIdsResponseDto } from '@novu/application-generic';
+import { ControlValuesEntity } from '@novu/dal';
 
 export class ProcessWorkflowIssuesCommand extends EnvironmentWithUserObjectCommand {
-  workflow: NotificationTemplateEntity;
-  preferences?: GetPreferencesResponseDto;
+  workflow: GetWorkflowByIdsResponseDto;
   stepIdToControlValuesMap: { [p: string]: ControlValuesEntity };
 }

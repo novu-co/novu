@@ -9,10 +9,8 @@ import {
 import { ModuleRef } from '@nestjs/core';
 
 import {
-  FeedRepository,
   NotificationGroupEntity,
   NotificationGroupRepository,
-  NotificationTemplateEntity,
   NotificationTemplateRepository,
 } from '@novu/dal';
 import {
@@ -25,8 +23,6 @@ import {
   WorkflowOriginEnum,
   WorkflowTypeEnum,
   slugify,
-  buildWorkflowPreferences,
-  buildWorkflowPreferencesFromPreferenceChannels,
 } from '@novu/shared';
 
 import { PinoLogger } from 'nestjs-pino';
@@ -56,6 +52,11 @@ import {
   UpsertWorkflowPreferencesCommand,
 } from '../upsert-preferences';
 import { GetPreferences } from '../get-preferences';
+import {
+  GetWorkflowByIdsCommand,
+  GetWorkflowByIdsResponseDto,
+  GetWorkflowByIdsUseCase,
+} from '../workflow';
 
 /**
  * @deprecated - use `UpsertWorkflow` instead
@@ -75,9 +76,12 @@ export class CreateWorkflow {
     protected moduleRef: ModuleRef,
     @Inject(forwardRef(() => UpsertPreferences))
     private upsertPreferences: UpsertPreferences,
+    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
   ) {}
 
-  async execute(usecaseCommand: CreateWorkflowCommand) {
+  async execute(
+    usecaseCommand: CreateWorkflowCommand,
+  ): Promise<GetWorkflowByIdsResponseDto> {
     const blueprintCommand = await this.processBlueprint(usecaseCommand);
     const command = blueprintCommand ?? usecaseCommand;
     this.validatePayload(command);
@@ -301,7 +305,7 @@ export class CreateWorkflow {
     templateSteps: INotificationTemplateStep[],
     trigger: INotificationTrigger,
     triggerIdentifier: string,
-  ): Promise<NotificationTemplateEntity> {
+  ): Promise<GetWorkflowByIdsResponseDto> {
     this.logger.info(`Creating workflow ${JSON.stringify(command)}`);
 
     const savedWorkflow = await this.notificationTemplateRepository.create({
@@ -311,8 +315,11 @@ export class CreateWorkflow {
       name: command.name,
       active: command.active,
       draft: command.draft,
-      critical: command.critical,
-      preferenceSettings: command.preferenceSettings,
+      critical: command.userPreferences?.all?.readOnly ?? false,
+      preferenceSettings:
+        GetPreferences.mapWorkflowPreferencesToChannelPreferences(
+          command.userPreferences,
+        ),
       tags: command.tags,
       description: command.description,
       steps: templateSteps,
@@ -328,43 +335,28 @@ export class CreateWorkflow {
       ...(command.data ? { data: command.data } : {}),
     });
 
-    /*
-     * Create workflow resource preferences - these have a default preference set
-     * prepared for mapping to Framework code.
-     */
-    const workflowResourcePreferencesPromise =
-      this.upsertPreferences.upsertWorkflowPreferences(
-        UpsertWorkflowPreferencesCommand.create({
-          templateId: savedWorkflow._id,
-          preferences: buildWorkflowPreferences({}),
-          environmentId: command.environmentId,
-          organizationId: command.organizationId,
-        }),
-      );
-    /**
-     * Create user workflow preferences - these are created by the user.
-     */
-    const userWorkflowPreferencesPromise =
-      this.upsertPreferences.upsertUserWorkflowPreferences(
+    // defaultPreferences is required, so we always call the upsert
+    await this.upsertPreferences.upsertWorkflowPreferences(
+      UpsertWorkflowPreferencesCommand.create({
+        templateId: savedWorkflow._id,
+        preferences: command.defaultPreferences,
+        environmentId: command.environmentId,
+        organizationId: command.organizationId,
+      }),
+    );
+
+    if (command.userPreferences !== undefined) {
+      // userPreferences is optional, so we need to check if it's defined before calling the upsert
+      await this.upsertPreferences.upsertUserWorkflowPreferences(
         UpsertUserWorkflowPreferencesCommand.create({
           templateId: savedWorkflow._id,
-          preferences: buildWorkflowPreferencesFromPreferenceChannels(
-            command.critical,
-            command.preferenceSettings || {},
-          ),
+          preferences: command.userPreferences,
           environmentId: command.environmentId,
           organizationId: command.organizationId,
           userId: command.userId,
         }),
       );
-    const [userWorkflowPreferences] = await Promise.all([
-      userWorkflowPreferencesPromise,
-      workflowResourcePreferencesPromise,
-    ]);
-    const preferenceSettings =
-      GetPreferences.mapWorkflowPreferencesToChannelPreferences(
-        userWorkflowPreferences.preferences,
-      );
+    }
 
     await this.invalidateCache.invalidateByKey({
       key: buildNotificationTemplateIdentifierKey({
@@ -388,10 +380,14 @@ export class CreateWorkflow {
 
     this.sendTemplateCreationEvent(command, triggerIdentifier);
 
-    return {
-      ...item,
-      preferenceSettings,
-    };
+    return this.getWorkflowByIdsUseCase.execute(
+      GetWorkflowByIdsCommand.create({
+        userId: command.userId,
+        environmentId: command.environmentId,
+        organizationId: command.organizationId,
+        identifierOrInternalId: savedWorkflow._id,
+      }),
+    );
   }
 
   private async storeTemplateSteps(
@@ -557,8 +553,8 @@ export class CreateWorkflow {
       notificationGroupId: group._id,
       active: command.active ?? false,
       draft: command.draft ?? true,
-      critical: command.critical ?? false,
-      preferenceSettings: command.preferenceSettings,
+      userPreferences: command.userPreferences,
+      defaultPreferences: command.defaultPreferences,
       blueprintId: command.blueprintId,
       __source: command.__source,
       type: WorkflowTypeEnum.REGULAR,

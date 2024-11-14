@@ -50,8 +50,8 @@ export const buildWorkflowPreferences = (
  * @deprecated use `buildWorkflowPreferences` instead
  */
 export const buildWorkflowPreferencesFromPreferenceChannels = (
-  critical: boolean,
-  preferenceChannels: IPreferenceChannels
+  critical: boolean = false,
+  preferenceChannels: IPreferenceChannels = {}
 ): WorkflowPreferences => {
   return buildWorkflowPreferences({
     all: { enabled: true, readOnly: critical },

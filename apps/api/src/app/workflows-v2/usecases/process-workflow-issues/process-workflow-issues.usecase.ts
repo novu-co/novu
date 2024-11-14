@@ -8,13 +8,13 @@ import {
   WorkflowResponseDto,
   WorkflowStatusEnum,
 } from '@novu/shared';
-import {
-  ControlValuesEntity,
-  NotificationStepEntity,
-  NotificationTemplateEntity,
-  NotificationTemplateRepository,
-} from '@novu/dal';
+import { ControlValuesEntity, NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
 import { Injectable } from '@nestjs/common';
+import {
+  GetWorkflowByIdsCommand,
+  GetWorkflowByIdsResponseDto,
+  GetWorkflowByIdsUseCase,
+} from '@novu/application-generic';
 import { ProcessWorkflowIssuesCommand } from './process-workflow-issues.command';
 import { ValidateControlValuesAndConstructPassableStructureUsecase } from '../validate-control-values/build-default-control-values-usecase.service';
 import { WorkflowNotFoundException } from '../../exceptions/workflow-not-found-exception';
@@ -23,10 +23,11 @@ import { WorkflowNotFoundException } from '../../exceptions/workflow-not-found-e
 export class ProcessWorkflowIssuesUsecase {
   constructor(
     private notificationTemplateRepository: NotificationTemplateRepository,
-    private buildDefaultControlValuesUsecase: ValidateControlValuesAndConstructPassableStructureUsecase
+    private buildDefaultControlValuesUsecase: ValidateControlValuesAndConstructPassableStructureUsecase,
+    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase
   ) {}
 
-  async execute(command: ProcessWorkflowIssuesCommand): Promise<NotificationTemplateEntity> {
+  async execute(command: ProcessWorkflowIssuesCommand): Promise<GetWorkflowByIdsResponseDto> {
     const workflowIssues = await this.validateWorkflow(command);
     const stepIssues = this.validateSteps(command.workflow.steps, command.stepIdToControlValuesMap);
     const workflowWithIssues = this.updateIssuesOnWorkflow(command.workflow, workflowIssues, stepIssues);
@@ -35,7 +36,10 @@ export class ProcessWorkflowIssuesUsecase {
     return await this.getWorkflow(command);
   }
 
-  private async persistWorkflow(command: ProcessWorkflowIssuesCommand, workflowWithIssues: NotificationTemplateEntity) {
+  private async persistWorkflow(
+    command: ProcessWorkflowIssuesCommand,
+    workflowWithIssues: GetWorkflowByIdsResponseDto
+  ) {
     const isWorkflowCompleteAndValid = this.isWorkflowCompleteAndValid(workflowWithIssues);
     const status = this.calculateStatus(isWorkflowCompleteAndValid, workflowWithIssues);
     await this.notificationTemplateRepository.update(
@@ -50,7 +54,7 @@ export class ProcessWorkflowIssuesUsecase {
     );
   }
 
-  private calculateStatus(isGoodWorkflow: boolean, workflowWithIssues: NotificationTemplateEntity) {
+  private calculateStatus(isGoodWorkflow: boolean, workflowWithIssues: GetWorkflowByIdsResponseDto) {
     if (workflowWithIssues.active === false) {
       return WorkflowStatusEnum.INACTIVE;
     }
@@ -62,7 +66,7 @@ export class ProcessWorkflowIssuesUsecase {
     return WorkflowStatusEnum.ERROR;
   }
 
-  private isWorkflowCompleteAndValid(workflowWithIssues: NotificationTemplateEntity) {
+  private isWorkflowCompleteAndValid(workflowWithIssues: GetWorkflowByIdsResponseDto) {
     const workflowIssues = workflowWithIssues.issues && Object.keys(workflowWithIssues.issues).length > 0;
     const hasInnerIssues =
       workflowWithIssues.steps
@@ -82,12 +86,19 @@ export class ProcessWorkflowIssuesUsecase {
   }
 
   private async getWorkflow(command: ProcessWorkflowIssuesCommand) {
-    const entity = await this.notificationTemplateRepository.findById(command.workflow._id, command.user.environmentId);
-    if (entity == null) {
+    const workflow = await this.getWorkflowByIdsUseCase.execute(
+      GetWorkflowByIdsCommand.create({
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
+        userId: command.user._id,
+        identifierOrInternalId: command.workflow._id,
+      })
+    );
+    if (workflow == null) {
       throw new WorkflowNotFoundException(command.workflow._id);
     }
 
-    return entity;
+    return workflow;
   }
 
   private validateSteps(
@@ -229,10 +240,10 @@ export class ProcessWorkflowIssuesUsecase {
   }
 
   private updateIssuesOnWorkflow(
-    workflow: NotificationTemplateEntity,
+    workflow: GetWorkflowByIdsResponseDto,
     workflowIssues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>,
     stepIssuesMap: Record<string, StepIssues>
-  ): NotificationTemplateEntity {
+  ): GetWorkflowByIdsResponseDto {
     const issues = workflowIssues as unknown as Record<string, ContentIssue[]>;
     for (const step of workflow.steps) {
       if (stepIssuesMap[step._templateId]) {

@@ -5,8 +5,10 @@ import {
   IsDefined,
   IsEnum,
   IsMongoId,
+  IsObject,
   IsOptional,
   IsString,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 
@@ -17,7 +19,6 @@ import {
   FilterParts,
   IMessageAction,
   INotificationGroup,
-  IPreferenceChannels,
   IWorkflowStepMetadata,
   JSONSchemaDto,
   NotificationTemplateCustomData,
@@ -25,7 +26,9 @@ import {
   WorkflowTypeEnum,
 } from '@novu/shared';
 
+import { Type } from 'class-transformer';
 import { EnvironmentWithUserCommand } from '../../commands';
+import { PreferencesRequired } from '../upsert-preferences';
 
 export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsMongoId()
@@ -60,11 +63,18 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsOptional()
   draft?: boolean;
 
-  @IsBoolean()
-  critical: boolean;
-
+  @IsObject()
+  @ValidateNested()
+  @Type(() => PreferencesRequired)
+  @ValidateIf((object, value) => value !== null)
   @IsOptional()
-  preferenceSettings?: IPreferenceChannels;
+  userPreferences?: PreferencesRequired | null;
+
+  @IsObject()
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PreferencesRequired)
+  defaultPreferences: PreferencesRequired;
 
   @IsOptional()
   blueprintId?: string;

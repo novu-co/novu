@@ -5,6 +5,7 @@ import {
   CreateWorkflow,
   DeleteMessageTemplate,
   DeleteWorkflowUseCase,
+  GetPreferences,
   GetWorkflowByIdsUseCase,
   UpdateChange,
   UpdateMessageTemplate,
@@ -29,6 +30,7 @@ const PROVIDERS = [
   CreateChange,
   UpdateChange,
   PreferencesRepository,
+  GetPreferences,
   UpsertPreferences,
   UpsertControlValuesUseCase,
 ];

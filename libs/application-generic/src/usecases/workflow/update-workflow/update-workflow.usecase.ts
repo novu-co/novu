@@ -19,12 +19,7 @@ import {
   NotificationTemplateRepository,
   StepVariantEntity,
 } from '@novu/dal';
-import {
-  buildWorkflowPreferencesFromPreferenceChannels,
-  ChangeEntityTypeEnum,
-  isBridgeWorkflow,
-  IPreferenceChannels,
-} from '@novu/shared';
+import { ChangeEntityTypeEnum, isBridgeWorkflow } from '@novu/shared';
 
 import {
   AnalyticsService,
@@ -46,6 +41,10 @@ import {
   UpsertPreferences,
   UpsertUserWorkflowPreferencesCommand,
   GetPreferences,
+  GetWorkflowByIdsResponseDto,
+  UpsertWorkflowPreferencesCommand,
+  GetWorkflowByIdsCommand,
+  GetWorkflowByIdsUseCase,
 } from '../..';
 import {
   DeleteMessageTemplate,
@@ -77,11 +76,13 @@ export class UpdateWorkflow {
     protected moduleRef: ModuleRef,
     @Inject(forwardRef(() => UpsertPreferences))
     private upsertPreferences: UpsertPreferences,
+    @Inject(forwardRef(() => GetWorkflowByIdsUseCase))
+    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
   ) {}
 
   async execute(
     command: UpdateWorkflowCommand,
-  ): Promise<NotificationTemplateEntity> {
+  ): Promise<GetWorkflowByIdsResponseDto> {
     this.validatePayload(command);
 
     const existingTemplate = await this.notificationTemplateRepository.findById(
@@ -93,7 +94,7 @@ export class UpdateWorkflow {
         `Notification template with id ${command.id} not found`,
       );
 
-    let updatePayload: Partial<NotificationTemplateEntity> = {};
+    let updatePayload: Partial<GetWorkflowByIdsResponseDto> = {};
     if (command.name) {
       updatePayload.name = command.name;
     }
@@ -134,42 +135,6 @@ export class UpdateWorkflow {
         );
 
       updatePayload._notificationGroupId = command.notificationGroupId;
-    }
-
-    if (command.critical != null) {
-      updatePayload.critical = command.critical;
-
-      if (command.critical !== existingTemplate.critical) {
-        this.analyticsService.track(
-          'Update Critical Template - [Platform]',
-          command.userId,
-          {
-            _organization: command.organizationId,
-            critical: command.critical,
-          },
-        );
-      }
-    }
-
-    if (command.preferenceSettings) {
-      if (existingTemplate.preferenceSettings) {
-        if (
-          JSON.stringify(existingTemplate.preferenceSettings) !==
-          JSON.stringify(command.preferenceSettings)
-        ) {
-          this.analyticsService.track(
-            'Update Preference Defaults - [Platform]',
-            command.userId,
-            {
-              _organization: command.organizationId,
-              critical: command.critical,
-              ...command.preferenceSettings,
-            },
-          );
-        }
-      }
-
-      updatePayload.preferenceSettings = command.preferenceSettings;
     }
 
     const parentChangeId: string = await this.changeRepository.getChangeId(
@@ -214,6 +179,72 @@ export class UpdateWorkflow {
       throw new BadRequestException('No properties found for update');
     }
 
+    // defaultPreferences is required, so we always call the upsert
+    await this.upsertPreferences.upsertWorkflowPreferences(
+      UpsertWorkflowPreferencesCommand.create({
+        templateId: command.id,
+        preferences: command.defaultPreferences,
+        environmentId: command.environmentId,
+        organizationId: command.organizationId,
+      }),
+    );
+
+    if (command.userPreferences !== undefined) {
+      // userPreferences is optional, so we need to check if it's defined before calling the upsert
+      await this.upsertPreferences.upsertUserWorkflowPreferences(
+        UpsertUserWorkflowPreferencesCommand.create({
+          templateId: command.id,
+          preferences: command.userPreferences,
+          environmentId: command.environmentId,
+          organizationId: command.organizationId,
+          userId: command.userId,
+        }),
+      );
+
+      if (
+        command.userPreferences?.all?.readOnly !== existingTemplate.critical
+      ) {
+        this.analyticsService.track(
+          'Update Critical Template - [Platform]',
+          command.userId,
+          {
+            _organization: command.organizationId,
+            critical: command.userPreferences?.all?.readOnly,
+          },
+        );
+      }
+
+      const preferenceSettings =
+        GetPreferences.mapWorkflowPreferencesToChannelPreferences(
+          command.userPreferences,
+        );
+      if (
+        JSON.stringify(preferenceSettings) !==
+        JSON.stringify(command.userPreferences)
+      ) {
+        this.analyticsService.track(
+          'Update Preference Defaults - [Platform]',
+          command.userId,
+          {
+            _organization: command.organizationId,
+            critical: command.userPreferences?.all?.readOnly,
+            ...preferenceSettings,
+          },
+        );
+      }
+    }
+
+    await this.notificationTemplateRepository.update(
+      {
+        _id: command.id,
+        _environmentId: command.environmentId,
+      },
+      {
+        $set: updatePayload,
+      },
+    );
+
+    // Invalidate cache after update
     await this.invalidateCache.invalidateByKey({
       key: buildNotificationTemplateKey({
         _id: existingTemplate._id,
@@ -227,37 +258,6 @@ export class UpdateWorkflow {
         _environmentId: command.environmentId,
       }),
     });
-
-    let preferenceSettings: IPreferenceChannels | null = null;
-    if (updatePayload.preferenceSettings) {
-      const userWorkflowPreferencesResponse =
-        await this.upsertPreferences.upsertUserWorkflowPreferences(
-          UpsertUserWorkflowPreferencesCommand.create({
-            templateId: command.id,
-            preferences: buildWorkflowPreferencesFromPreferenceChannels(
-              command.critical,
-              updatePayload.preferenceSettings,
-            ),
-            environmentId: command.environmentId,
-            organizationId: command.organizationId,
-            userId: command.userId,
-          }),
-        );
-      preferenceSettings =
-        GetPreferences.mapWorkflowPreferencesToChannelPreferences(
-          userWorkflowPreferencesResponse.preferences,
-        );
-    }
-
-    await this.notificationTemplateRepository.update(
-      {
-        _id: command.id,
-        _environmentId: command.environmentId,
-      },
-      {
-        $set: updatePayload,
-      },
-    );
 
     const notificationTemplateWithStepTemplate =
       await this.notificationTemplateRepository.findById(
@@ -294,7 +294,7 @@ export class UpdateWorkflow {
         _organization: command.organizationId,
         steps: command.steps?.length,
         channels: command.steps?.map((i) => i.template?.type),
-        critical: command.critical,
+        critical: command.userPreferences?.all?.readOnly,
       },
     );
 
@@ -333,10 +333,14 @@ export class UpdateWorkflow {
       );
     }
 
-    return {
-      ...notificationTemplateWithStepTemplate,
-      preferenceSettings,
-    };
+    return this.getWorkflowByIdsUseCase.execute(
+      GetWorkflowByIdsCommand.create({
+        userId: command.userId,
+        environmentId: command.environmentId,
+        organizationId: command.organizationId,
+        identifierOrInternalId: command.id,
+      }),
+    );
   }
 
   private validatePayload(command: UpdateWorkflowCommand) {
@@ -443,10 +447,10 @@ export class UpdateWorkflow {
   }
 
   private updateTriggers(
-    updatePayload: Partial<NotificationTemplateEntity>,
+    updatePayload: Partial<GetWorkflowByIdsResponseDto>,
     steps: NotificationStep[],
-  ): Partial<NotificationTemplateEntity> {
-    const updatePayloadResult: Partial<NotificationTemplateEntity> = {
+  ): Partial<GetWorkflowByIdsResponseDto> {
+    const updatePayloadResult: Partial<GetWorkflowByIdsResponseDto> = {
       ...updatePayload,
     };
 
