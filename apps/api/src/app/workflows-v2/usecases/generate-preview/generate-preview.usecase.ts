@@ -7,12 +7,12 @@ import {
   PreviewPayload,
   StepDataDto,
 } from '@novu/shared';
-import { GeneratePreviewCommand } from './generate-preview-command';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
 import { StepMissingControlsException } from '../../exceptions/step-not-found-exception';
 import { PrepareAndValidateContentUsecase, ValidatedContentResponse } from '../validate-content';
 import { BuildStepDataUsecase } from '../build-step-data';
+import { GeneratePreviewCommand } from './generate-preview.command';
 
 @Injectable()
 export class GeneratePreviewUsecase {

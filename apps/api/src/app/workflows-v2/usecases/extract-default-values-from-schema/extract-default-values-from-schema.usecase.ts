@@ -1,6 +1,6 @@
 import { JSONSchemaDto } from '@novu/shared';
 import { Injectable } from '@nestjs/common';
-import { ExtractDefaultValuesFromSchemaCommand } from './extract-default-values-from-schema-command';
+import { ExtractDefaultValuesFromSchemaCommand } from './extract-default-values-from-schema.command';
 
 @Injectable()
 export class ExtractDefaultValuesFromSchemaUsecase {
