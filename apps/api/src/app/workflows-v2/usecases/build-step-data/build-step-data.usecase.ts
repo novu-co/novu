@@ -1,32 +1,27 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ControlValuesLevelEnum, StepDataDto, WorkflowOriginEnum } from '@novu/shared';
 import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { GetWorkflowByIdsUseCase } from '@novu/application-generic';
-
-import { ControlValuesLevelEnum, StepDataDto } from '@novu/shared';
-import { GetStepDataCommand } from './get-step-data.command';
+import { BuildStepDataCommand } from './build-step-data.command';
 import { InvalidStepException } from '../../exceptions/invalid-step.exception';
-import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
-import { BuildAvailableVariableSchemaUsecase } from './build-available-variable-schema-usecase.service';
-import { convertJsonToSchemaWithDefaults } from '../../util/jsonToSchema';
+import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
 
 @Injectable()
-export class GetStepDataUsecase {
+export class BuildStepDataUsecase {
   constructor(
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private buildDefaultPayloadUseCase: BuildDefaultPayloadUseCase,
     private controlValuesRepository: ControlValuesRepository,
     private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase // Dependency injection for new use case
   ) {}
 
-  async execute(command: GetStepDataCommand): Promise<StepDataDto> {
+  async execute(command: BuildStepDataCommand): Promise<StepDataDto> {
     const workflow = await this.fetchWorkflow(command);
 
-    const { currentStep, previousSteps } = await this.loadStepsFromDb(command, workflow);
-    if (!currentStep.name || !currentStep._templateId || !currentStep.stepId) {
+    const { currentStep } = await this.loadStepsFromDb(command, workflow);
+    if (!currentStep.name || !currentStep._templateId || !currentStep.stepId || !currentStep.template?.type) {
       throw new InvalidStepException(currentStep);
     }
     const controlValues = await this.getValues(command, currentStep, workflow._id);
-    const payloadSchema = this.buildPayloadSchema(controlValues);
 
     return {
       controls: {
@@ -35,24 +30,20 @@ export class GetStepDataUsecase {
         values: controlValues,
       },
       variables: this.buildAvailableVariableSchemaUsecase.execute({
-        previousSteps,
-        payloadSchema,
+        stepDatabaseId: currentStep._templateId,
+        workflow,
       }), // Use the new use case to build variables schema
       name: currentStep.name,
       _id: currentStep._templateId,
       stepId: currentStep.stepId,
+      type: currentStep.template?.type,
+      origin: workflow.origin || WorkflowOriginEnum.EXTERNAL,
+      workflowId: workflow.triggers[0].identifier,
+      workflowDatabaseId: workflow._id,
     };
   }
 
-  private buildPayloadSchema(controlValues: Record<string, unknown>) {
-    const payloadVariables = this.buildDefaultPayloadUseCase.execute({
-      controlValues,
-    }).previewPayload.payload;
-
-    return convertJsonToSchemaWithDefaults(payloadVariables);
-  }
-
-  private async fetchWorkflow(command: GetStepDataCommand) {
+  private async fetchWorkflow(command: BuildStepDataCommand) {
     const workflow = await this.getWorkflowByIdsUseCase.execute({
       identifierOrInternalId: command.identifierOrInternalId,
       environmentId: command.user.environmentId,
@@ -70,7 +61,7 @@ export class GetStepDataUsecase {
     return workflow;
   }
 
-  private async getValues(command: GetStepDataCommand, currentStep: NotificationStepEntity, _workflowId: string) {
+  private async getValues(command: BuildStepDataCommand, currentStep: NotificationStepEntity, _workflowId: string) {
     const controlValuesEntity = await this.controlValuesRepository.findOne({
       _environmentId: command.user.environmentId,
       _organizationId: command.user.organizationId,
@@ -82,7 +73,7 @@ export class GetStepDataUsecase {
     return controlValuesEntity?.controls || {};
   }
 
-  private async loadStepsFromDb(command: GetStepDataCommand, workflow: NotificationTemplateEntity) {
+  private async loadStepsFromDb(command: BuildStepDataCommand, workflow: NotificationTemplateEntity) {
     const currentStep = workflow.steps.find(
       (stepItem) => stepItem._id === command.stepId || stepItem.stepId === command.stepId
     );
@@ -95,11 +86,6 @@ export class GetStepDataUsecase {
       });
     }
 
-    const previousSteps = workflow.steps.slice(
-      0,
-      workflow.steps.findIndex((stepItem) => stepItem._id === command.stepId)
-    );
-
-    return { currentStep, previousSteps };
+    return { currentStep };
   }
 }

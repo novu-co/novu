@@ -13,11 +13,9 @@ import {
 } from '@novu/shared';
 import { PreferencesEntity, PreferencesRepository } from '@novu/dal';
 import { SyncToEnvironmentCommand } from './sync-to-environment.command';
-import { UpsertWorkflowUseCase } from '../upsert-workflow/upsert-workflow.usecase';
-import { UpsertWorkflowCommand } from '../upsert-workflow/upsert-workflow.command';
-import { GetWorkflowUseCase } from '../get-workflow/get-workflow.usecase';
-import { GetStepDataUsecase } from '../get-step-schema/get-step-data.usecase';
-import { GetWorkflowCommand } from '../get-workflow/get-workflow.command';
+import { GetWorkflowCommand, GetWorkflowUseCase } from '../get-workflow';
+import { UpsertWorkflowCommand, UpsertWorkflowUseCase } from '../upsert-workflow';
+import { BuildStepDataUsecase } from '../build-step-data';
 
 /**
  * This usecase is used to sync a workflow from one environment to another.
@@ -34,7 +32,7 @@ export class SyncToEnvironmentUseCase {
     private getWorkflowUseCase: GetWorkflowUseCase,
     private preferencesRepository: PreferencesRepository,
     private upsertWorkflowUseCase: UpsertWorkflowUseCase,
-    private getStepData: GetStepDataUsecase
+    private buildStepDataUsecase: BuildStepDataUsecase
   ) {}
 
   async execute(command: SyncToEnvironmentCommand): Promise<WorkflowResponseDto> {
@@ -137,7 +135,7 @@ export class SyncToEnvironmentUseCase {
     const augmentedSteps: (StepUpdateDto | StepCreateDto)[] = [];
     for (const step of steps) {
       const idAsOptionalObject = this.prodDbIdAsOptionalObject(existingWorkflowSteps, step);
-      const stepDataDto = await this.getStepData.execute({
+      const stepDataDto = await this.buildStepDataUsecase.execute({
         identifierOrInternalId: command.identifierOrInternalId,
         stepId: step.stepId,
         user: command.user,
@@ -199,14 +197,12 @@ export class SyncToEnvironmentUseCase {
   }
 
   private async getWorkflowPreferences(workflowId: string, environmentId: string): Promise<PreferencesEntity[]> {
-    const workflowPreferences = await this.preferencesRepository.find({
+    return await this.preferencesRepository.find({
       _templateId: workflowId,
       _environmentId: environmentId,
       type: {
         $in: [PreferencesTypeEnum.WORKFLOW_RESOURCE, PreferencesTypeEnum.USER_WORKFLOW],
       },
     });
-
-    return workflowPreferences;
   }
 }

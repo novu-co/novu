@@ -789,6 +789,7 @@
     "packages/shared/src/types/timezones/timezones.types.ts",
     "*.riv",
     "websockets",
+    "apps/api/src/app/workflows-v2/usecases/validate-content/validate-placeholders/validate-placeholder.usecase.ts",
     ".env",
     ".env.development",
     ".env.local",
