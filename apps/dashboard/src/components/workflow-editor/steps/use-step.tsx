@@ -1,30 +1,32 @@
 import { useMemo } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import * as z from 'zod';
 import { workflowSchema } from '../schema';
+import { getStepBase62Id } from '@/utils/step';
 
 export const useStep = () => {
   const { stepSlug = '' } = useParams<{
     stepSlug: string;
   }>();
 
-  const { watch, control } = useFormContext<z.infer<typeof workflowSchema>>();
-  const steps = watch('steps');
+  const { control } = useFormContext<z.infer<typeof workflowSchema>>();
+  const steps = useWatch({ name: 'steps', control });
+  const base62Id = getStepBase62Id(stepSlug);
 
   const step = useMemo(() => {
     if (Array.isArray(steps)) {
-      return steps.find((el) => el.slug === stepSlug);
+      return steps.find((el) => getStepBase62Id(el.slug) === base62Id);
     }
     return undefined;
-  }, [stepSlug, steps]);
+  }, [base62Id, steps]);
 
   const stepIndex = useMemo(() => {
     if (Array.isArray(steps)) {
-      return steps.findIndex((el) => el.slug === stepSlug);
+      return steps.findIndex((el) => getStepBase62Id(el.slug) === base62Id);
     }
     return -1;
-  }, [stepSlug, steps]);
+  }, [base62Id, steps]);
 
   return {
     step,

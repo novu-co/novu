@@ -49,6 +49,7 @@
     "@novu/shared": "workspace:*",
     "@novu/stateless": "workspace:*",
     "@novu/testing": "workspace:*",
+    "@novu/notifications": "workspace:*",
     "@sendgrid/mail": "^8.1.0",
     "@sentry/browser": "^8.33.1",
     "@sentry/hub": "^7.114.0",
@@ -73,6 +74,7 @@
     "helmet": "^6.0.1",
     "i18next": "^23.7.6",
     "ioredis": "5.3.2",
+    "json-schema-to-ts": "^3.0.0",
     "jsonwebtoken": "9.0.0",
     "lodash": "^4.17.15",
     "nanoid": "^3.1.20",
@@ -84,6 +86,8 @@
     "passport-headerapikey": "^1.2.2",
     "passport-jwt": "^4.0.1",
     "passport-oauth2": "^1.8.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "recursive-diff": "^1.0.8",
     "redlock": "5.0.0-beta.2",
     "reflect-metadata": "0.2.2",
@@ -95,7 +99,8 @@
     "twilio": "^4.14.1",
     "uuid": "^8.3.2",
     "zod": "^3.23.8",
-    "zod-to-json-schema": "^3.23.3"
+    "zod-to-json-schema": "^3.23.3",
+    "json-schema-to-ts": "^3.0.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^6.0.0",
@@ -122,6 +127,7 @@
     "tsconfig-paths": "~4.1.0",
     "typescript": "5.6.2"
   },
+
   "optionalDependencies": {
     "@novu/ee-auth": "workspace:*",
     "@novu/ee-billing": "workspace:*",

@@ -1,11 +1,15 @@
 /* eslint-disable global-require */
 import { DynamicModule, Logger, Module, Provider } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ProfilingModule, TracingModule } from '@novu/application-generic';
+import { Client, NovuModule } from '@novu/framework/nest';
+
 import { Type } from '@nestjs/common/interfaces/type.interface';
 import { ForwardReference } from '@nestjs/common/interfaces/modules/forward-reference.interface';
-import { ProfilingModule, TracingModule } from '@novu/application-generic';
 import { isClerkEnabled } from '@novu/shared';
 import { SentryModule } from '@sentry/nestjs/setup';
+import { ApiExcludeController } from '@nestjs/swagger';
+import { usageLimitsWorkflow } from '@novu/notifications';
 import packageJson from '../package.json';
 import { SharedModule } from './app/shared/shared.module';
 import { UserModule } from './app/user/user.module';
@@ -110,6 +114,7 @@ const baseModules: Array<Type | DynamicModule | Promise<DynamicModule> | Forward
   PreferencesModule,
   WorkflowModule,
   EnvironmentsModule,
+  NovuModule,
 ];
 
 const enterpriseModules = enterpriseImports();
@@ -148,6 +153,19 @@ if (process.env.SEGMENT_TOKEN) {
 if (process.env.NODE_ENV === 'test') {
   modules.push(TestingModule);
 }
+
+modules.push(
+  NovuModule.register({
+    apiPath: '/bridge/novu',
+    client: new Client({
+      secretKey: process.env.NOVU_INTERNAL_SECRET_KEY,
+      strictAuthentication:
+        process.env.NODE_ENV === 'production' || process.env.NOVU_STRICT_AUTHENTICATION_ENABLED === 'true',
+    }),
+    controllerDecorators: [ApiExcludeController()],
+    workflows: [usageLimitsWorkflow],
+  })
+);
 
 @Module({
   imports: modules,

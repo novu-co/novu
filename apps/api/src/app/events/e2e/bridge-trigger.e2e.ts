@@ -329,11 +329,11 @@ contexts.forEach((context: Context) => {
       expect(messagesAfter.length).to.be.eq(0);
       const executionDetailsRequired = await executionDetailsRepository.find({
         _environmentId: session.environment._id,
-        status: ExecutionDetailsStatusEnum.WARNING,
+        status: ExecutionDetailsStatusEnum.FAILED,
       });
 
       let raw = JSON.parse(executionDetailsRequired[0]?.raw ?? '');
-      let error = raw.raw.data[0].message;
+      let error = raw.data[0].message;
 
       expect(error).to.include("must have required property 'name'");
 
@@ -344,10 +344,10 @@ contexts.forEach((context: Context) => {
 
       const executionDetailsInvalidType = await executionDetailsRepository.find({
         _environmentId: session.environment._id,
-        status: ExecutionDetailsStatusEnum.WARNING,
+        status: ExecutionDetailsStatusEnum.FAILED,
       });
       raw = JSON.parse(executionDetailsInvalidType[0]?.raw ?? '');
-      error = raw.raw.data[0].message;
+      error = raw.data[0].message;
 
       expect(error).to.include('must be string');
     });

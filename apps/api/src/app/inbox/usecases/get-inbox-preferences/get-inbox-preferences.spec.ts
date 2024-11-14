@@ -129,6 +129,7 @@ describe('GetInboxPreferences', () => {
         environmentId: command.environmentId,
         subscriberId: command.subscriberId,
         organizationId: command.organizationId,
+        tags: undefined,
       })
     );
 
@@ -216,6 +217,7 @@ describe('GetInboxPreferences', () => {
         environmentId: command.environmentId,
         subscriberId: command.subscriberId,
         organizationId: command.organizationId,
+        tags: command.tags,
       })
     );
 

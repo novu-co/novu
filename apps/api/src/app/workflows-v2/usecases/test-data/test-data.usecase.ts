@@ -11,7 +11,7 @@ import {
 import { GetWorkflowByIdsCommand, GetWorkflowByIdsUseCase } from '@novu/application-generic';
 import { WorkflowTestDataCommand } from './test-data.command';
 import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
-import { buildJSONSchema } from '../../shared/build-string-schema';
+import { convertJsonToSchemaWithDefaults } from '../../util/jsonToSchema';
 
 @Injectable()
 export class WorkflowTestDataUseCase {
@@ -24,7 +24,7 @@ export class WorkflowTestDataUseCase {
   async execute(command: WorkflowTestDataCommand): Promise<WorkflowTestDataResponseDto> {
     const _workflowEntity: NotificationTemplateEntity = await this.fetchWorkflow(command);
     const toSchema = buildToFieldSchema({ user: command.user, steps: _workflowEntity.steps });
-    const payloadSchema = await this.buildPayloadSchema(command, _workflowEntity);
+    const payloadSchema = await this.buildAggregateWorkflowPayloadSchema(command, _workflowEntity);
 
     return {
       to: toSchema,
@@ -43,22 +43,20 @@ export class WorkflowTestDataUseCase {
     );
   }
 
-  private async buildPayloadSchema(command: WorkflowTestDataCommand, _workflowEntity: NotificationTemplateEntity) {
-    let payloadVariables: Record<string, unknown> = {};
+  private async buildAggregateWorkflowPayloadSchema(
+    command: WorkflowTestDataCommand,
+    _workflowEntity: NotificationTemplateEntity
+  ): Promise<JSONSchemaDto> {
+    let payloadExampleForWorkflow: Record<string, unknown> = {};
     for (const step of _workflowEntity.steps) {
-      const newValues = await this.getValues(command.user, step._templateId, _workflowEntity._id);
-
-      /*
-       *  we need to build the payload defaults for each step,
-       *  because of possible duplicated values (like subject, body, etc...)
-       */
-      const currPayloadVariables = this.buildDefaultPayloadUseCase.execute({
-        controlValues: newValues,
+      const controlValuesForStep = await this.getValues(command.user, step._templateId, _workflowEntity._id);
+      const payloadExampleForStep = this.buildDefaultPayloadUseCase.execute({
+        controlValues: controlValuesForStep,
       }).previewPayload.payload;
-      payloadVariables = { ...payloadVariables, ...currPayloadVariables };
+      payloadExampleForWorkflow = { ...payloadExampleForWorkflow, ...payloadExampleForStep };
     }
 
-    return buildJSONSchema(payloadVariables || {});
+    return convertJsonToSchemaWithDefaults(payloadExampleForWorkflow);
   }
 
   private async getValues(user: UserSessionData, _stepId: string, _workflowId: string) {

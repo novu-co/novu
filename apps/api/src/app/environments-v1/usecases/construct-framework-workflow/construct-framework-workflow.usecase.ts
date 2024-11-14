@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { workflow } from '@novu/framework/express';
 import {
   ActionStep,
@@ -45,18 +45,17 @@ export class ConstructFrameworkWorkflow {
     return this.constructFrameworkWorkflow(dbWorkflow);
   }
 
-  private constructFrameworkWorkflow(newWorkflow: NotificationTemplateEntity) {
+  private constructFrameworkWorkflow(newWorkflow: NotificationTemplateEntity): Workflow {
     return workflow(
       newWorkflow.triggers[0].identifier,
       async ({ step, payload, subscriber }) => {
         const fullPayloadForRender: FullPayloadForRender = { payload, subscriber, steps: {} };
         for await (const staticStep of newWorkflow.steps) {
-          try {
-            const stepOutputs = await this.constructStep(step, staticStep, fullPayloadForRender);
-            fullPayloadForRender.steps[staticStep.stepId || staticStep._templateId] = stepOutputs;
-          } catch (e) {
-            Logger.log(`Cannot Construct Step ${staticStep.stepId || staticStep._templateId}`, e);
-          }
+          fullPayloadForRender.steps[staticStep.stepId || staticStep._templateId] = await this.constructStep(
+            step,
+            staticStep,
+            fullPayloadForRender
+          );
         }
       },
       {

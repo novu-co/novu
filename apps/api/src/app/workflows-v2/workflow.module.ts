@@ -25,11 +25,12 @@ import { ExtractDefaultsUsecase } from './usecases/get-default-values-from-schem
 import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-renderers';
 import { WorkflowTestDataUseCase } from './usecases/test-data/test-data.usecase';
 import { GetStepDataUsecase } from './usecases/get-step-schema/get-step-data.usecase';
-import { ValidateAndPersistWorkflowIssuesUsecase } from './usecases/upsert-workflow/validate-and-persist-workflow-issues.usecase';
+import { ProcessWorkflowIssuesUsecase } from './usecases/process-workflow-issues/process-workflow-issues.usecase';
 import { BuildPayloadNestedStructureUsecase } from './usecases/placeholder-enrichment/buildPayloadNestedStructureUsecase';
 import { GetWorkflowUseCase } from './usecases/get-workflow/get-workflow.usecase';
 import { BuildDefaultPayloadUseCase } from './usecases/build-payload-from-placeholder';
 import { ValidateControlValuesAndConstructPassableStructureUsecase } from './usecases/validate-control-values/build-default-control-values-usecase.service';
+import { BuildAvailableVariableSchemaUsecase } from './usecases/get-step-schema/build-available-variable-schema-usecase.service';
 
 @Module({
   imports: [SharedModule, MessageTemplateModule, ChangeModule, AuthModule, BridgeModule, IntegrationModule],
@@ -53,9 +54,10 @@ import { ValidateControlValuesAndConstructPassableStructureUsecase } from './use
     WorkflowTestDataUseCase,
     GetWorkflowUseCase,
     HydrateEmailSchemaUseCase,
-    ValidateAndPersistWorkflowIssuesUsecase,
+    ProcessWorkflowIssuesUsecase,
     BuildDefaultPayloadUseCase,
     ValidateControlValuesAndConstructPassableStructureUsecase,
+    BuildAvailableVariableSchemaUsecase,
   ],
 })
 export class WorkflowModule implements NestModule {
