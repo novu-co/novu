@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { liquid } from '@codemirror/lang-liquid';
 import { EditorView } from '@uiw/react-codemirror';
 import { useFormContext } from 'react-hook-form';
@@ -5,10 +6,9 @@ import { useFormContext } from 'react-hook-form';
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
 import { InputField } from '@/components/primitives/input';
-import { useFetchStep } from '@/hooks/use-fetch-step';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
-import { useParams } from 'react-router-dom';
+import { useStepEditorContext } from '../hooks';
 
 const bodyKey = 'body';
 
@@ -17,10 +17,8 @@ export const InAppBody = () => {
     control,
     formState: { errors },
   } = useFormContext();
-
-  const { workflowSlug = '', stepSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
-
-  const { step } = useFetchStep({ workflowSlug, stepSlug });
+  const { step } = useStepEditorContext();
+  const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
 
   return (
     <FormField
@@ -36,7 +34,7 @@ export const InAppBody = () => {
                 id={field.name}
                 extensions={[
                   liquid({
-                    variables: step ? parseStepVariablesToLiquidVariables(step.variables) : [],
+                    variables,
                   }),
                   EditorView.lineWrapping,
                 ]}

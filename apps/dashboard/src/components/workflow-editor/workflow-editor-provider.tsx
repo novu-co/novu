@@ -58,7 +58,11 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
   const navigate = useNavigate();
   const [toastId, setToastId] = useState<string | number>('');
 
-  const { workflow, error } = useFetchWorkflow({
+  const {
+    workflow,
+    isPending: isPendingWorkflow,
+    error,
+  } = useFetchWorkflow({
     workflowSlug,
   });
   const defaultFormValues = useMemo(
@@ -193,12 +197,14 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
 
   const value = useMemo(
     () => ({
+      isPendingWorkflow,
+      workflow,
       isReadOnly,
       addStep,
       deleteStep,
       resetWorkflowForm,
     }),
-    [addStep, isReadOnly, deleteStep, resetWorkflowForm]
+    [isPendingWorkflow, workflow, isReadOnly, addStep, deleteStep, resetWorkflowForm]
   );
 
   return (
