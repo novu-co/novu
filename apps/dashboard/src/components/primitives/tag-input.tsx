@@ -77,7 +77,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
               <Badge key={index} variant="outline" kind="tag" className="gap-1">
                 <span>{tag}</span>
                 <button type="button" onClick={() => removeTag(tag)}>
-                  <RiCloseFill className="size-3" />
+                  <RiCloseFill className="-mr-0.5 size-3" />
                   <span className="sr-only">Remove tag</span>
                 </button>
               </Badge>
