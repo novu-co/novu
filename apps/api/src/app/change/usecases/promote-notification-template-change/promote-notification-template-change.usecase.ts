@@ -9,17 +9,34 @@ import {
   StepVariantEntity,
   EnvironmentRepository,
 } from '@novu/dal';
-import { ChangeEntityTypeEnum } from '@novu/shared';
+import {
+  buildWorkflowPreferencesFromPreferenceChannels,
+  ChangeEntityTypeEnum,
+  DEFAULT_WORKFLOW_PREFERENCES,
+  IPreferenceChannels,
+} from '@novu/shared';
 import {
   buildGroupedBlueprintsKey,
   buildNotificationTemplateIdentifierKey,
   buildNotificationTemplateKey,
   InvalidateCacheService,
+  UpsertPreferences,
+  UpsertUserWorkflowPreferencesCommand,
+  UpsertWorkflowPreferencesCommand,
 } from '@novu/application-generic';
 
 import { ApplyChange, ApplyChangeCommand } from '../apply-change';
 import { PromoteTypeChangeCommand } from '../promote-type-change.command';
 
+/**
+ * Promote a notification template change to a workflow
+ *
+ * TODO: update this use-case to use the following use-cases which fully handle
+ * the workflow creation, update and deletion:
+ * - CreateWorkflow
+ * - UpdateWorkflow
+ * - DeleteWorkflow
+ */
 @Injectable()
 export class PromoteNotificationTemplateChange {
   constructor(
@@ -29,7 +46,8 @@ export class PromoteNotificationTemplateChange {
     private messageTemplateRepository: MessageTemplateRepository,
     private notificationGroupRepository: NotificationGroupRepository,
     @Inject(forwardRef(() => ApplyChange)) private applyChange: ApplyChange,
-    private changeRepository: ChangeRepository
+    private changeRepository: ChangeRepository,
+    private upsertPreferences: UpsertPreferences
   ) {}
 
   async execute(command: PromoteTypeChangeCommand) {
@@ -170,7 +188,12 @@ export class PromoteNotificationTemplateChange {
         ...(newItem.data ? { data: newItem.data } : {}),
       };
 
-      return this.notificationTemplateRepository.create(newNotificationTemplate as NotificationTemplateEntity);
+      const createdTemplate = await this.notificationTemplateRepository.create(
+        newNotificationTemplate as NotificationTemplateEntity
+      );
+      await this.upsertWorkflowPreferences(createdTemplate._id, command, newItem.critical, newItem.preferenceSettings);
+
+      return createdTemplate;
     }
 
     const count = await this.notificationTemplateRepository.count({
@@ -181,12 +204,12 @@ export class PromoteNotificationTemplateChange {
     if (count === 0) {
       await this.notificationTemplateRepository.delete({ _environmentId: command.environmentId, _id: item._id });
 
+      await this.upsertWorkflowPreferences(item._id, command, newItem.critical, newItem.preferenceSettings);
+
       return;
     }
 
-    await this.invalidateNotificationTemplate(item, command.organizationId);
-
-    return await this.notificationTemplateRepository.update(
+    const updatedTemplate = await this.notificationTemplateRepository.update(
       {
         _environmentId: command.environmentId,
         _id: item._id,
@@ -206,6 +229,49 @@ export class PromoteNotificationTemplateChange {
         ...(newItem.data ? { data: newItem.data } : {}),
       }
     );
+    await this.upsertWorkflowPreferences(item._id, command, newItem.critical, newItem.preferenceSettings);
+
+    // Invalidate after mutations
+    await this.invalidateNotificationTemplate(item, command.organizationId);
+
+    return updatedTemplate;
+  }
+
+  private async upsertWorkflowPreferences(
+    workflowId: string,
+    command: PromoteTypeChangeCommand,
+    critical: boolean,
+    preferenceSettings: IPreferenceChannels | null
+  ) {
+    const upsertUserWorkflowPreferencesPromise = this.upsertPreferences.upsertUserWorkflowPreferences(
+      UpsertUserWorkflowPreferencesCommand.create({
+        templateId: workflowId,
+        preferences:
+          preferenceSettings === null
+            ? null
+            : buildWorkflowPreferencesFromPreferenceChannels(critical, preferenceSettings),
+        environmentId: command.environmentId,
+        organizationId: command.organizationId,
+        userId: command.userId,
+      })
+    );
+
+    /*
+     * Always upsert workflow resource preferences.
+     * If preferenceSettings is null, indicating a deletion,
+     * we also set it to null.
+     */
+    const workflowResourcePreferences = preferenceSettings === null ? null : DEFAULT_WORKFLOW_PREFERENCES;
+    const upsertWorkflowResourcePreferencesPromise = this.upsertPreferences.upsertWorkflowPreferences(
+      UpsertWorkflowPreferencesCommand.create({
+        templateId: workflowId,
+        preferences: workflowResourcePreferences,
+        environmentId: command.environmentId,
+        organizationId: command.organizationId,
+      })
+    );
+
+    await Promise.all([upsertUserWorkflowPreferencesPromise, upsertWorkflowResourcePreferencesPromise]);
   }
 
   private async getProductionEnvironmentId(organizationId: string) {

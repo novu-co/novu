@@ -218,6 +218,7 @@ export class UpdateWorkflow {
         GetPreferences.mapWorkflowPreferencesToChannelPreferences(
           command.userPreferences,
         );
+      updatePayload.preferenceSettings = preferenceSettings;
       if (
         JSON.stringify(preferenceSettings) !==
         JSON.stringify(command.userPreferences)
