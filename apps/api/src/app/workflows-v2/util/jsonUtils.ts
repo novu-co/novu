@@ -30,12 +30,6 @@ export function flattenJson(obj?: Object, parentKey = '', result = {}) {
 
   return result;
 }
-function customizer(objValue, srcValue) {
-  if (Array.isArray(objValue)) {
-    return objValue.concat(srcValue); // Accumulate arrays
-  }
-}
-
 // Merging the JSON objects, arrays are concatenated
 export function mergeObjects(json1: Record<string, unknown>, json2?: Record<string, unknown>) {
   if (!json2) {
@@ -45,5 +39,9 @@ export function mergeObjects(json1: Record<string, unknown>, json2?: Record<stri
     return json2;
   }
 
-  return _.mergeWith(json1, json2, customizer);
+  return _.mergeWith(json1, json2, (objValue, srcValue) => {
+    if (Array.isArray(objValue)) {
+      return objValue.concat(srcValue); // Accumulate arrays
+    }
+  });
 }
