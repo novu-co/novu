@@ -4,16 +4,17 @@ import { NEW_DASHBOARD_URL } from '../config';
 import { useSegment } from '../components/providers/SegmentProvider';
 
 export function useNewDashboardOptIn() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const segment = useSegment();
 
-  const updateUserOptInStatus = (status: NewDashboardOptInStatusEnum) => {
+  const updateUserOptInStatus = async (status: NewDashboardOptInStatusEnum) => {
     if (!user) return;
 
-    user.update({
+    await user.update({
       unsafeMetadata: {
         ...user.unsafeMetadata,
         newDashboardOptInStatus: status,
+        newDashboardFirstVisit: true,
       },
     });
   };
@@ -28,9 +29,11 @@ export function useNewDashboardOptIn() {
     window.location.href = NEW_DASHBOARD_URL || window.location.origin;
   };
 
-  const optIn = () => {
+  const optIn = async () => {
     segment.track('New dashboard opt-in');
-    updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_IN);
+    await updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_IN);
+    localStorage.setItem('mantine-theme', 'light');
+    redirectToNewDashboard();
   };
 
   const dismiss = () => {
@@ -39,9 +42,9 @@ export function useNewDashboardOptIn() {
   };
 
   return {
+    isLoaded,
     optIn,
     dismiss,
     status: getCurrentOptInStatus(),
-    redirectToNewDashboard,
   };
 }

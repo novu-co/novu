@@ -1,14 +1,19 @@
 import { JSONSchemaDto } from '@novu/shared';
-import { ExtractDefaultsCommand } from './extract-defaults-command';
+import { Injectable } from '@nestjs/common';
+import { ExtractDefaultValuesFromSchemaCommand } from './extract-default-values-from-schema.command';
 
-export class ExtractDefaultsUsecase {
+@Injectable()
+export class ExtractDefaultValuesFromSchemaUsecase {
   /**
    * Executes the use case to extract default values from the JSON Schema.
    * @param command - The command containing the JSON Schema DTO.
    * @returns A nested JSON structure with field paths and their default values.
    */
-  execute(command: ExtractDefaultsCommand): Record<string, any> {
+  execute(command: ExtractDefaultValuesFromSchemaCommand): Record<string, unknown> {
     const { jsonSchemaDto } = command;
+    if (!jsonSchemaDto) {
+      return {};
+    }
 
     return this.extractDefaults(jsonSchemaDto);
   }

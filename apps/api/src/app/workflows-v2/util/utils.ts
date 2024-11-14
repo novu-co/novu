@@ -1,6 +1,6 @@
 import _ = require('lodash');
 
-export function findMissingKeys(requiredRecord: Record<string, unknown>, actualRecord: Record<string, unknown>) {
+export function findMissingKeys(requiredRecord: object, actualRecord: object) {
   const requiredKeys = collectKeys(requiredRecord);
   const actualKeys = collectKeys(actualRecord);
 
