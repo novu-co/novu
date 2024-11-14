@@ -1,4 +1,8 @@
 import { ControlValuesEntity } from '@novu/dal';
+import { ValidatedContentResponse } from '../usecases/validate-content';
 
-type StepInternalId = string;
-export type ControlValuesMap = { [p: StepInternalId]: ControlValuesEntity };
+export type InternalStepId = string;
+
+export type ControlValuesMap = { [p: InternalStepId]: ControlValuesEntity };
+
+export type ValidatedContentMap = Record<InternalStepId, ValidatedContentResponse>;

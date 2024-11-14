@@ -7,9 +7,9 @@ import { flattenJson } from '../../../util/jsonUtils';
 @Injectable()
 export class CollectPlaceholderWithDefaultsUsecase {
   constructor(private hydrateEmailSchemaUseCase: HydrateEmailSchemaUseCase) {}
-  execute(command: CollectPlaceholderWithDefaultsCommand): Record<string, PlaceholderAggregation> {
+  execute(command: CollectPlaceholderWithDefaultsCommand): Record<string, PlaceholderAggregation> | null {
     if (!command.controlValues) {
-      return {};
+      return null;
     }
     const placeholders: Record<string, PlaceholderAggregation> = {};
     const flattenedControlValues = flattenJson(command.controlValues);

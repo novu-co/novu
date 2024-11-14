@@ -4,8 +4,10 @@ import {
   NotificationStepEntity,
   NotificationTemplateEntity,
   NotificationTemplateRepository,
+  ControlValuesRepository,
 } from '@novu/dal';
 import {
+  ControlValuesLevelEnum,
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
   IdentifierOrInternalId,
@@ -45,12 +47,14 @@ import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { PrepareAndValidateContentUsecase, ValidatedContentResponse } from '../validate-content';
 import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
+import { ProcessWorkflowIssuesCommand } from '../process-workflow-issues/process-workflow-issues.command';
 import { convertJsonToSchemaWithDefaults } from '../../util/jsonToSchema';
 import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/step-upsert-mechanism-failed-missing-id.exception';
 import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
 import { StepMissingControlsException } from '../../exceptions/step-not-found-exception';
 import { ProcessWorkflowIssuesUsecase } from '../process-workflow-issues';
 import { WorkflowNotFoundException } from '../../exceptions/workflow-not-found-exception';
+import { ControlValuesMap, InternalStepId, ValidatedContentMap } from '../../shared/control-value.map';
 
 function buildUpsertControlValuesCommand(
   command: UpsertWorkflowCommand,
@@ -73,6 +77,7 @@ export class UpsertWorkflowUseCase {
     private createWorkflowGenericUsecase: CreateWorkflowGeneric,
     private updateWorkflowUsecase: UpdateWorkflow,
     private notificationGroupRepository: NotificationGroupRepository,
+    private controlValuesRepository: ControlValuesRepository,
     private upsertPreferencesUsecase: UpsertPreferences,
     private upsertControlValuesUseCase: UpsertControlValuesUseCase,
     private processWorkflowIssuesUsecase: ProcessWorkflowIssuesUsecase,
@@ -85,15 +90,14 @@ export class UpsertWorkflowUseCase {
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
     const workflowForUpdate = await this.queryWorkflow(command);
     const workflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
-    const stepIdToControlValuesMap = await this.upsertControlValues(workflow, command);
+    await this.upsertControlValues(workflow, command);
     const preferences = await this.upsertPreference(command, workflow);
-    const validatedContentsArray = await this.validateStepContent(workflow, stepIdToControlValuesMap);
+    const validatedContentsArray = await this.validateStepContent(workflow, command.user);
     await this.overloadPayloadSchemaOnWorkflow(workflow, validatedContentsArray);
     const validatedWorkflowWithIssues = await this.processWorkflowIssuesUsecase.execute({
       user: command.user,
       workflow,
       preferences,
-      stepIdToControlValuesMap,
       validatedContentsArray,
     });
     await this.persistWorkflow(validatedWorkflowWithIssues, command);
@@ -124,10 +128,10 @@ export class UpsertWorkflowUseCase {
 
   async overloadPayloadSchemaOnWorkflow(
     workflow: NotificationTemplateEntity,
-    stepIdToControlValuesMap: { [p: string]: ValidatedContentResponse }
+    validatedContentsArray: { [p: InternalStepId]: ValidatedContentResponse }
   ) {
     let finalPayload = {};
-    for (const value of Object.values(stepIdToControlValuesMap)) {
+    for (const value of Object.values(validatedContentsArray)) {
       finalPayload = _.merge(finalPayload, value.finalPayload.payload);
     }
     // eslint-disable-next-line no-param-reassign
@@ -150,41 +154,24 @@ export class UpsertWorkflowUseCase {
   }
 
   private async upsertControlValues(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
-    const stepIdToControlValuesMap: { [p: string]: ControlValuesEntity } = {};
     for (const persistedStep of workflow.steps) {
-      const controlValuesEntity = await this.upsertControlValuesForSingleStep(persistedStep, command, workflow);
-      if (controlValuesEntity) {
-        stepIdToControlValuesMap[persistedStep._templateId] = controlValuesEntity;
+      const stepDatabaseId = persistedStep._templateId;
+      const stepExternalId = persistedStep.name;
+      if (!stepDatabaseId && !stepExternalId) {
+        throw new StepUpsertMechanismFailedMissingIdException(stepDatabaseId, stepExternalId, persistedStep);
       }
+      const stepInDto = command.workflowDto?.steps.find(
+        (commandStepItem) => commandStepItem.name === persistedStep.name
+      );
+      if (!stepInDto) {
+        // TODO: should delete the values from the database?  or just ignore?
+        continue;
+      }
+
+      const upsertControlValuesCommand = buildUpsertControlValuesCommand(command, persistedStep, workflow, stepInDto);
+
+      await this.upsertControlValuesUseCase.execute(upsertControlValuesCommand);
     }
-
-    return stepIdToControlValuesMap;
-  }
-
-  private async upsertControlValuesForSingleStep(
-    persistedStep: NotificationStepEntity,
-    command: UpsertWorkflowCommand,
-    persistedWorkflow: NotificationTemplateEntity
-  ): Promise<ControlValuesEntity | undefined> {
-    const stepDatabaseId = persistedStep._templateId;
-    const stepExternalId = persistedStep.name;
-    if (!stepDatabaseId && !stepExternalId) {
-      throw new StepUpsertMechanismFailedMissingIdException(stepDatabaseId, stepExternalId, persistedStep);
-    }
-    const stepInDto = command.workflowDto?.steps.find((commandStepItem) => commandStepItem.name === persistedStep.name);
-    if (!stepInDto) {
-      // TODO: should delete the values from the database?  or just ignore?
-      return;
-    }
-
-    const upsertControlValuesCommand = buildUpsertControlValuesCommand(
-      command,
-      persistedStep,
-      persistedWorkflow,
-      stepInDto
-    );
-
-    return await this.upsertControlValuesUseCase.execute(upsertControlValuesCommand);
   }
 
   private async upsertPreference(
@@ -418,28 +405,47 @@ export class UpsertWorkflowUseCase {
 
   private async validateStepContent(
     workflow: NotificationTemplateEntity,
-    stepIdToControlValuesMap: Record<string, ControlValuesEntity>
-  ) {
-    const validatedStepContent: Record<string, ValidatedContentResponse> = {};
-
+    user: UserSessionData
+  ): Promise<ValidatedContentMap> {
+    const validatedStepContent: ValidatedContentMap = {};
+    const stepIdToControlValuesMap = await this.fetchStepsControlValue(user, workflow._id);
     for (const step of workflow.steps) {
       const controls = step.template?.controls;
       if (!controls) {
         throw new StepMissingControlsException(step._templateId, step);
       }
-      const controlValues = stepIdToControlValuesMap[step._templateId];
+      const controlValues = stepIdToControlValuesMap?.[step._templateId]?.controls;
       const jsonSchemaDto = this.buildAvailableVariableSchemaUsecase.execute({
         workflow,
         stepDatabaseId: step._templateId,
       });
       validatedStepContent[step._templateId] = await this.prepareAndValidateContentUsecase.execute({
         controlDataSchema: controls.schema,
-        controlValues: controlValues?.controls || {},
+        controlValues,
         variableSchema: jsonSchemaDto,
       });
     }
 
     return validatedStepContent;
+  }
+
+  private async fetchStepsControlValue(user: UserSessionData, _workflowId: string): Promise<ControlValuesMap | null> {
+    const stepsControlValues = await this.controlValuesRepository.find({
+      _environmentId: user.environmentId,
+      _organizationId: user.organizationId,
+      _workflowId,
+      level: ControlValuesLevelEnum.STEP_CONTROLS,
+    });
+    const stepIdToControlValuesMap: ControlValuesMap = {};
+    for (const stepsControlValue of stepsControlValues) {
+      stepIdToControlValuesMap[stepsControlValue._stepId] = stepsControlValue;
+    }
+
+    if (Object.keys(stepIdToControlValuesMap).length === 0) {
+      return null;
+    }
+
+    return stepIdToControlValuesMap;
   }
 }
 

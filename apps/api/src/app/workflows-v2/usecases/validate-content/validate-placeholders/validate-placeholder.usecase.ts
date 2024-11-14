@@ -6,10 +6,18 @@ import { PlaceholderAggregation } from '../collect-placeholders';
 
 @Injectable()
 export class ValidatePlaceholderUsecase {
-  execute(command: ValidatePlaceholderCommand): Record<string, ValidatedPlaceholderAggregation> {
+  execute(command: ValidatePlaceholderCommand): Record<string, ValidatedPlaceholderAggregation> | null {
+    if (!command.controlValueToPlaceholders) {
+      return null;
+    }
+
     const validatedPlaceholders: Record<string, ValidatedPlaceholderAggregation> = {};
     const variablesFromSchema = extractPropertiesFromJsonSchema(command.variableSchema);
-    for (const controlValueKey of Object.keys(command.controlValueToPlaceholders)) {
+    for (const controlValueKey of Object.keys(command.controlValueToPlaceholders || {})) {
+      if (!command.controlValueToPlaceholders) {
+        continue;
+      }
+
       const controlValue = command.controlValueToPlaceholders[controlValueKey];
       validatedPlaceholders[controlValueKey] = this.validatePlaceholders(controlValue, variablesFromSchema);
     }

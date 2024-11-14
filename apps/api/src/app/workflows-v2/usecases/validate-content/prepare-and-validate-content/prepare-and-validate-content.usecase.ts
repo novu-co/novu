@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ContentIssue, JSONSchemaDto, PreviewPayload, StepContentIssueEnum } from '@novu/shared';
 import { merge } from 'lodash';
+import { ControlsKeyValue } from '@novu/dal';
 import { PrepareAndValidateContentCommand } from './prepare-and-validate-content.command';
 import { mergeObjects } from '../../../util/jsonUtils';
 import { findMissingKeys } from '../../../util/utils';
@@ -21,23 +22,29 @@ export class PrepareAndValidateContentUsecase {
 
   async execute(command: PrepareAndValidateContentCommand): Promise<ValidatedContentResponse> {
     const controlValueToPlaceholders = this.collectPlaceholders(command.controlValues);
-    const controlValueToValidPlaceholders = this.validatePlaceholders(
-      controlValueToPlaceholders,
-      command.variableSchema
-    );
-    const finalPayload = this.buildAndMergePayload(controlValueToValidPlaceholders, command.previewPayloadFromDto);
-    const { defaultControlValues, finalControlValues } = this.mergeAndSanitizeControlValues(
-      command.controlDataSchema,
-      command.controlValues,
-      controlValueToValidPlaceholders
-    );
+    const controlValueToValidPlaceholders = controlValueToPlaceholders
+      ? this.validatePlaceholders(controlValueToPlaceholders, command.variableSchema)
+      : null;
+
+    const finalPayload = controlValueToValidPlaceholders
+      ? this.buildAndMergePayload(controlValueToValidPlaceholders, command.previewPayloadFromDto)
+      : {};
+
+    const { defaultControlValues, finalControlValues } =
+      command.controlValues && controlValueToValidPlaceholders
+        ? this.mergeAndSanitizeControlValues(
+            command.controlDataSchema,
+            command.controlValues,
+            controlValueToValidPlaceholders
+          )
+        : { defaultControlValues: null, finalControlValues: null };
 
     const issues = this.buildIssues(
       finalPayload,
       command.previewPayloadFromDto || finalPayload, // if no payload provided no point creating issues.
-      defaultControlValues,
-      command.controlValues,
-      controlValueToValidPlaceholders
+      defaultControlValues || {},
+      command.controlValues || {},
+      controlValueToValidPlaceholders || {}
     );
 
     return {
@@ -47,7 +54,7 @@ export class PrepareAndValidateContentUsecase {
     };
   }
 
-  private collectPlaceholders(controlValues: Record<string, unknown>) {
+  private collectPlaceholders(controlValues?: ControlsKeyValue): Record<string, PlaceholderAggregation> | null {
     return this.collectPlaceholderWithDefaultsUsecase.execute({
       controlValues,
     });

@@ -3,6 +3,6 @@ import { PlaceholderAggregation } from '../collect-placeholders/placeholder.aggr
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface ValidatePlaceholderCommand {
-  controlValueToPlaceholders: Record<string, PlaceholderAggregation>;
+  controlValueToPlaceholders: Record<string, PlaceholderAggregation> | null;
   variableSchema: JSONSchemaDto;
 }
