@@ -64,7 +64,12 @@ export class GetSubscriberTemplatePreference {
     const { channels, overrides } = overridePreferences(
       {
         template: templateChannelPreference,
-        subscriber: subscriberWorkflowPreference.channels,
+        subscriber: [
+          PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+          PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
+        ].includes(subscriberWorkflowPreference.type)
+          ? subscriberWorkflowPreference.channels
+          : {},
         workflowOverride: workflowOverrideChannelPreference,
       },
       initialActiveChannels,
