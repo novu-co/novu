@@ -43,16 +43,17 @@ export function useNewDashboardOptIn() {
   };
 
   const redirectToLegacyDashboard = () => {
-    if (NEW_DASHBOARD_FEEDBACK_FORM_URL) {
-      window.open(NEW_DASHBOARD_FEEDBACK_FORM_URL, '_blank');
-    }
-
     window.location.href = LEGACY_DASHBOARD_URL || window.location.origin + '/legacy/workflows';
   };
 
   const optOut = async () => {
     track(TelemetryEvent.NEW_DASHBOARD_OPT_OUT);
     await updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_OUT);
+
+    if (NEW_DASHBOARD_FEEDBACK_FORM_URL) {
+      window.open(NEW_DASHBOARD_FEEDBACK_FORM_URL, '_blank');
+    }
+
     redirectToLegacyDashboard();
   };
 
@@ -62,5 +63,6 @@ export function useNewDashboardOptIn() {
     status: getCurrentOptInStatus(),
     isFirstVisit: getNewDashboardFirstVisit(),
     updateNewDashboardFirstVisit,
+    redirectToLegacyDashboard,
   };
 }
