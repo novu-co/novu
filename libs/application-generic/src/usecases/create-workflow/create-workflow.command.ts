@@ -70,6 +70,10 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsOptional()
   userPreferences?: PreferencesRequired | null;
 
+  @IsBoolean()
+  @IsOptional()
+  critical?: boolean;
+
   @IsObject()
   @IsOptional()
   @ValidateNested()

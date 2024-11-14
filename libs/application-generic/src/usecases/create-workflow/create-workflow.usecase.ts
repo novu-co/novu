@@ -315,7 +315,7 @@ export class CreateWorkflow {
       name: command.name,
       active: command.active,
       draft: command.draft,
-      critical: command.userPreferences?.all?.readOnly ?? false,
+      critical: command.critical ?? false,
       preferenceSettings:
         GetPreferences.mapWorkflowPreferencesToChannelPreferences(
           command.userPreferences,

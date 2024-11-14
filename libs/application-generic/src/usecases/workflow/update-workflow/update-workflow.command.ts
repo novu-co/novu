@@ -62,6 +62,10 @@ export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   @Type(() => PreferencesRequired)
   defaultPreferences: PreferencesRequired;
 
+  @IsBoolean()
+  @IsOptional()
+  critical?: boolean;
+
   @IsOptional()
   @IsMongoId({
     message: 'Bad group id name',

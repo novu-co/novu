@@ -19,7 +19,11 @@ import {
   NotificationTemplateRepository,
   StepVariantEntity,
 } from '@novu/dal';
-import { ChangeEntityTypeEnum, isBridgeWorkflow } from '@novu/shared';
+import {
+  buildWorkflowPreferencesFromPreferenceChannels,
+  ChangeEntityTypeEnum,
+  isBridgeWorkflow,
+} from '@novu/shared';
 
 import {
   AnalyticsService,
@@ -175,10 +179,6 @@ export class UpdateWorkflow {
       updatePayload.payloadSchema = command.payloadSchema;
     }
 
-    if (!Object.keys(updatePayload).length) {
-      throw new BadRequestException('No properties found for update');
-    }
-
     // defaultPreferences is required, so we always call the upsert
     await this.upsertPreferences.upsertWorkflowPreferences(
       UpsertWorkflowPreferencesCommand.create({
@@ -189,50 +189,62 @@ export class UpdateWorkflow {
       }),
     );
 
-    if (command.userPreferences !== undefined) {
-      // userPreferences is optional, so we need to check if it's defined before calling the upsert
+    if (
+      command.userPreferences !== undefined ||
+      command.critical !== undefined
+    ) {
+      /*
+       * userPreferences is optional, so we need to check if it's defined before calling the upsert.
+       * we also need to check if the legacy `critical` property is defined, because if provided,
+       * it's used to set the `userPreferences.all.readOnly` property
+       */
+
+      updatePayload.critical = command.critical;
+      this.analyticsService.track(
+        'Update Critical Template - [Platform]',
+        command.userId,
+        {
+          _organization: command.organizationId,
+          critical: command.userPreferences?.all?.readOnly,
+        },
+      );
+
+      // if userPreferences is not defined, we use the existing preference settings
+      const userPreferences =
+        command.userPreferences ??
+        buildWorkflowPreferencesFromPreferenceChannels(
+          command.critical ?? existingTemplate.critical,
+          existingTemplate.preferenceSettings,
+        );
       await this.upsertPreferences.upsertUserWorkflowPreferences(
         UpsertUserWorkflowPreferencesCommand.create({
           templateId: command.id,
-          preferences: command.userPreferences,
+          preferences: userPreferences,
           environmentId: command.environmentId,
           organizationId: command.organizationId,
           userId: command.userId,
         }),
       );
 
-      if (
-        command.userPreferences?.all?.readOnly !== existingTemplate.critical
-      ) {
-        this.analyticsService.track(
-          'Update Critical Template - [Platform]',
-          command.userId,
-          {
-            _organization: command.organizationId,
-            critical: command.userPreferences?.all?.readOnly,
-          },
-        );
-      }
-
       const preferenceSettings =
         GetPreferences.mapWorkflowPreferencesToChannelPreferences(
-          command.userPreferences,
+          userPreferences,
         );
       updatePayload.preferenceSettings = preferenceSettings;
-      if (
-        JSON.stringify(preferenceSettings) !==
-        JSON.stringify(command.userPreferences)
-      ) {
-        this.analyticsService.track(
-          'Update Preference Defaults - [Platform]',
-          command.userId,
-          {
-            _organization: command.organizationId,
-            critical: command.userPreferences?.all?.readOnly,
-            ...preferenceSettings,
-          },
-        );
-      }
+
+      this.analyticsService.track(
+        'Update Preference Defaults - [Platform]',
+        command.userId,
+        {
+          _organization: command.organizationId,
+          critical: userPreferences.all.readOnly,
+          ...preferenceSettings,
+        },
+      );
+    }
+
+    if (!Object.keys(updatePayload).length) {
+      throw new BadRequestException('No properties found for update');
     }
 
     await this.notificationTemplateRepository.update(

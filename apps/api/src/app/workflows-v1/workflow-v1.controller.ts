@@ -118,10 +118,11 @@ export class WorkflowControllerV1 {
         tags: body.tags,
         description: body.description,
         workflowId: body.identifier,
+        critical: body.critical,
         defaultPreferences: DEFAULT_WORKFLOW_PREFERENCES,
         userPreferences:
           body.preferenceSettings &&
-          buildWorkflowPreferencesFromPreferenceChannels(body.critical ?? false, body.preferenceSettings),
+          buildWorkflowPreferencesFromPreferenceChannels(body.critical, body.preferenceSettings),
         steps: body.steps,
         notificationGroupId: body.notificationGroupId,
         data: body.data,
@@ -217,6 +218,7 @@ export class WorkflowControllerV1 {
         notificationGroup: body.notificationGroup,
         active: body.active ?? false,
         draft: !body.active,
+        critical: body.critical ?? false,
         defaultPreferences: DEFAULT_WORKFLOW_PREFERENCES,
         userPreferences:
           body.preferenceSettings &&
