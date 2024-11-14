@@ -218,7 +218,6 @@ export class WorkflowControllerV1 {
         active: body.active ?? false,
         draft: !body.active,
         defaultPreferences: DEFAULT_WORKFLOW_PREFERENCES,
-
         userPreferences:
           body.preferenceSettings &&
           buildWorkflowPreferencesFromPreferenceChannels(body.critical ?? false, body.preferenceSettings),
