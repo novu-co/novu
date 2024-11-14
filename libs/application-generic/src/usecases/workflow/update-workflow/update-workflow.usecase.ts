@@ -20,8 +20,10 @@ import {
   StepVariantEntity,
 } from '@novu/dal';
 import {
+  buildWorkflowPreferences,
   buildWorkflowPreferencesFromPreferenceChannels,
   ChangeEntityTypeEnum,
+  DEFAULT_WORKFLOW_PREFERENCES,
   isBridgeWorkflow,
 } from '@novu/shared';
 
@@ -89,9 +91,13 @@ export class UpdateWorkflow {
   ): Promise<GetWorkflowByIdsResponseDto> {
     this.validatePayload(command);
 
-    const existingTemplate = await this.notificationTemplateRepository.findById(
-      command.id,
-      command.environmentId,
+    const existingTemplate = await this.getWorkflowByIdsUseCase.execute(
+      GetWorkflowByIdsCommand.create({
+        identifierOrInternalId: command.id,
+        environmentId: command.environmentId,
+        organizationId: command.organizationId,
+        userId: command.userId,
+      }),
     );
     if (!existingTemplate)
       throw new NotFoundException(
@@ -209,13 +215,33 @@ export class UpdateWorkflow {
         },
       );
 
-      // if userPreferences is not defined, we use the existing preference settings
+      /*
+       * This builder pattern is only needed for the `critical` property,
+       * ensuring it's set in the `userPreferences.all.readOnly` property
+       * when supplied.
+       *
+       * TODO: remove this once we deprecate the `critical` property
+       * and use only the `userPreferences` object
+       */
+      const defaultUserPreferences =
+        command.userPreferences ?? existingTemplate.userPreferences;
+      const defaultCritical =
+        command.userPreferences?.all?.readOnly ??
+        command.critical ??
+        existingTemplate.userPreferences?.all?.readOnly ??
+        existingTemplate.critical;
+
       const userPreferences =
-        command.userPreferences ??
-        buildWorkflowPreferencesFromPreferenceChannels(
-          command.critical ?? existingTemplate.critical,
-          existingTemplate.preferenceSettings,
-        );
+        command.userPreferences === null
+          ? null
+          : buildWorkflowPreferences(
+              {
+                all: {
+                  readOnly: defaultCritical,
+                },
+              },
+              defaultUserPreferences,
+            );
       await this.upsertPreferences.upsertUserWorkflowPreferences(
         UpsertUserWorkflowPreferencesCommand.create({
           templateId: command.id,
@@ -226,9 +252,10 @@ export class UpdateWorkflow {
         }),
       );
 
+      /** @deprecated - use `userPreferences` instead */
       const preferenceSettings =
         GetPreferences.mapWorkflowPreferencesToChannelPreferences(
-          userPreferences,
+          userPreferences ?? DEFAULT_WORKFLOW_PREFERENCES,
         );
       updatePayload.preferenceSettings = preferenceSettings;
 
@@ -237,7 +264,7 @@ export class UpdateWorkflow {
         command.userId,
         {
           _organization: command.organizationId,
-          critical: userPreferences.all.readOnly,
+          critical: userPreferences?.all?.readOnly ?? false,
           ...preferenceSettings,
         },
       );

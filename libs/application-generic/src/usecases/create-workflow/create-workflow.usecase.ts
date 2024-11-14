@@ -23,6 +23,7 @@ import {
   WorkflowOriginEnum,
   WorkflowTypeEnum,
   slugify,
+  DEFAULT_WORKFLOW_PREFERENCES,
 } from '@novu/shared';
 
 import { PinoLogger } from 'nestjs-pino';
@@ -316,9 +317,10 @@ export class CreateWorkflow {
       active: command.active,
       draft: command.draft,
       critical: command.critical ?? false,
+      /** @deprecated - use `userPreferences` instead */
       preferenceSettings:
         GetPreferences.mapWorkflowPreferencesToChannelPreferences(
-          command.userPreferences,
+          command.userPreferences ?? DEFAULT_WORKFLOW_PREFERENCES,
         ),
       tags: command.tags,
       description: command.description,
