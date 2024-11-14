@@ -31,7 +31,7 @@ describe('test onesignal notification user api', () => {
     const provider = new OneSignalPushProvider({
       appId: 'test-app-id',
       apiKey: 'test-key',
-      domain: 'externalId',
+      apiVersion: 'externalId',
     });
 
     const response = {
