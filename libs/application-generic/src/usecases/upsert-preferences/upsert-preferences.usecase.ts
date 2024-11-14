@@ -124,8 +124,10 @@ export class UpsertPreferences {
 
     if (command.preferences === null) {
       if (!foundPreference) {
-        // Gracefully return if the preference is not found,
-        // ensuring the operation is idempotent.
+        /*
+         * Gracefully return if the preference is not found,
+         * ensuring the operation is idempotent.
+         */
         return;
       }
 
