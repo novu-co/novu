@@ -134,6 +134,9 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           description={`You're about to delete the ${workflow.name}, this action cannot be undone.`}
           confirmButtonText="Delete"
         />
+        {/**
+         * Needs modal={false} to prevent the click freeze after the modal is closed
+         */}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
