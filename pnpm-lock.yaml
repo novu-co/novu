@@ -37861,7 +37861,7 @@ snapshots:
       form-data: 3.0.1
       node-fetch: 2.7.0(encoding@0.1.13)
       process: 0.11.10
-      tough-cookie: 4.1.3
+      tough-cookie: 4.1.4
       tslib: 2.7.0
       tunnel: 0.0.6
       uuid: 8.3.2
@@ -77900,7 +77900,7 @@ snapshots:
       performance-now: 2.1.0
       qs: 6.5.3
       safe-buffer: 5.2.1
-      tough-cookie: 4.1.3
+      tough-cookie: 4.1.4
       tunnel-agent: 0.6.0
       uuid: 3.4.0
 

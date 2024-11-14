@@ -1,24 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-
 import {
   ControlValuesEntity,
   NotificationGroupRepository,
   NotificationStepEntity,
   NotificationTemplateEntity,
+  NotificationTemplateRepository,
 } from '@novu/dal';
-import {
-  CreateWorkflow as CreateWorkflowGeneric,
-  CreateWorkflowCommand,
-  GetWorkflowByIdsCommand,
-  GetWorkflowByIdsUseCase,
-  GetWorkflowByIdsResponseDto,
-  NotificationStep,
-  shortId,
-  UpdateWorkflow,
-  UpdateWorkflowCommand,
-  UpsertControlValuesCommand,
-  UpsertControlValuesUseCase,
-} from '@novu/application-generic';
 import {
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
@@ -34,12 +20,30 @@ import {
   WorkflowResponseDto,
   WorkflowTypeEnum,
 } from '@novu/shared';
+import {
+  CreateWorkflow as CreateWorkflowGeneric,
+  CreateWorkflowCommand,
+  GetWorkflowByIdsCommand,
+  GetWorkflowByIdsUseCase,
+  GetWorkflowByIdsResponseDto,
+  NotificationStep,
+  shortId,
+  UpdateWorkflow,
+  UpdateWorkflowCommand,
+  UpsertControlValuesCommand,
+  UpsertControlValuesUseCase,
+} from '@novu/application-generic';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import _ = require('lodash');
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
-import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/step-upsert-mechanism-failed-missing-id.exception';
+import { PrepareAndValidateContentUsecase, ValidatedContentResponse } from '../validate-content';
+import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
+import { convertJsonToSchemaWithDefaults } from '../../util/jsonToSchema';
+import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/step-upsert-mechanism-failed-missing-id.exception';
 import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
-import { ProcessWorkflowIssuesUsecase } from '../process-workflow-issues/process-workflow-issues.usecase';
-import { ProcessWorkflowIssuesCommand } from '../process-workflow-issues/process-workflow-issues.command';
+import { StepMissingControlsException } from '../../exceptions/step-not-found-exception';
+import { ProcessWorkflowIssuesUsecase } from '../process-workflow-issues';
 
 function buildUpsertControlValuesCommand(
   command: UpsertWorkflowCommand,
@@ -64,22 +68,61 @@ export class UpsertWorkflowUseCase {
     private notificationGroupRepository: NotificationGroupRepository,
     private upsertControlValuesUseCase: UpsertControlValuesUseCase,
     private processWorkflowIssuesUsecase: ProcessWorkflowIssuesUsecase,
-    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase
+    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
+    private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase,
+    private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase,
+    private notificationTemplateRepository: NotificationTemplateRepository
   ) {}
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
     const workflowForUpdate = await this.queryWorkflow(command);
-
     const workflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
     const stepIdToControlValuesMap = await this.upsertControlValues(workflow, command);
-    const workflowWithIssues = await this.processWorkflowIssuesUsecase.execute(
-      ProcessWorkflowIssuesCommand.create({
-        user: command.user,
-        workflow,
-        stepIdToControlValuesMap,
+    const validatedContentsArray = await this.validateStepContent(workflow, stepIdToControlValuesMap);
+    await this.overloadPayloadSchemaOnWorkflow(workflow, validatedContentsArray);
+    const validatedWorkflowWithIssues = await this.processWorkflowIssuesUsecase.execute({
+      user: command.user,
+      workflow,
+      stepIdToControlValuesMap,
+      validatedContentsArray,
+    });
+    await this.persistWorkflow(validatedWorkflowWithIssues, command);
+    const persistedWorkflow = await this.getWorkflow(command, validatedWorkflowWithIssues._id);
+
+    return toResponseWorkflowDto(persistedWorkflow);
+  }
+  private async getWorkflow(command: UpsertWorkflowCommand, workflowId: string) {
+    return await this.getWorkflowByIdsUseCase.execute(
+      GetWorkflowByIdsCommand.create({
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
+        userId: command.user._id,
+        identifierOrInternalId: workflowId,
       })
     );
+  }
 
-    return toResponseWorkflowDto(workflowWithIssues);
+  private async persistWorkflow(workflowWithIssues: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
+    await this.notificationTemplateRepository.update(
+      {
+        _id: workflowWithIssues._id,
+        _environmentId: command.user.environmentId,
+      },
+      {
+        ...workflowWithIssues,
+      }
+    );
+  }
+
+  async overloadPayloadSchemaOnWorkflow(
+    workflow: NotificationTemplateEntity,
+    stepIdToControlValuesMap: { [p: string]: ValidatedContentResponse }
+  ) {
+    let finalPayload = {};
+    for (const value of Object.values(stepIdToControlValuesMap)) {
+      finalPayload = _.merge(finalPayload, value.finalPayload.payload);
+    }
+    // eslint-disable-next-line no-param-reassign
+    workflow.payloadSchema = JSON.stringify(convertJsonToSchemaWithDefaults(finalPayload));
   }
 
   private async queryWorkflow(command: UpsertWorkflowCommand): Promise<GetWorkflowByIdsResponseDto | null> {
@@ -311,6 +354,32 @@ export class UpsertWorkflowUseCase {
         '_id'
       )
     )?._id;
+  }
+
+  private async validateStepContent(
+    workflow: NotificationTemplateEntity,
+    stepIdToControlValuesMap: Record<string, ControlValuesEntity>
+  ) {
+    const validatedStepContent: Record<string, ValidatedContentResponse> = {};
+
+    for (const step of workflow.steps) {
+      const controls = step.template?.controls;
+      if (!controls) {
+        throw new StepMissingControlsException(step._templateId, step);
+      }
+      const controlValues = stepIdToControlValuesMap[step._templateId];
+      const jsonSchemaDto = this.buildAvailableVariableSchemaUsecase.execute({
+        workflow,
+        stepDatabaseId: step._templateId,
+      });
+      validatedStepContent[step._templateId] = await this.prepareAndValidateContentUsecase.execute({
+        controlDataSchema: controls.schema,
+        controlValues: controlValues?.controls || {},
+        variableSchema: jsonSchemaDto,
+      });
+    }
+
+    return validatedStepContent;
   }
 }
 

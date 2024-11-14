@@ -3,31 +3,43 @@ import { Injectable } from '@nestjs/common';
 import { PreviewPayload, TipTapNode } from '@novu/shared';
 import { z } from 'zod';
 import { HydrateEmailSchemaCommand } from './hydrate-email-schema.command';
+import { PlaceholderAggregation } from '../../../workflows-v2/usecases';
 
 @Injectable()
 export class HydrateEmailSchemaUseCase {
   execute(command: HydrateEmailSchemaCommand): {
     hydratedEmailSchema: TipTapNode;
-    nestedPayload: Record<string, unknown>;
+    placeholderAggregation: PlaceholderAggregation;
   } {
-    const defaultPayload: Record<string, unknown> = {};
+    const placeholderAggregation: PlaceholderAggregation = {
+      nestedForPlaceholders: {},
+      regularPlaceholdersToDefaultValue: {},
+    };
     const emailEditorSchema: TipTapNode = TipTapSchema.parse(JSON.parse(command.emailEditor));
     if (emailEditorSchema.content) {
-      this.transformContentInPlace(emailEditorSchema.content, defaultPayload, command.fullPayloadForRender);
+      this.transformContentInPlace(emailEditorSchema.content, command.fullPayloadForRender, placeholderAggregation);
     }
 
-    return { hydratedEmailSchema: emailEditorSchema, nestedPayload: this.flattenToNested(defaultPayload) };
+    return {
+      hydratedEmailSchema: emailEditorSchema,
+      placeholderAggregation,
+    };
   }
 
   private variableLogic(
     masterPayload: PreviewPayload,
-    node: TipTapNode & { attrs: { id: string } },
-    defaultPayload: Record<string, unknown>,
+    node: TipTapNode & {
+      attrs: { id: string };
+    },
     content: TipTapNode[],
-    index: number
+    index: number,
+    placeholderAggregation: PlaceholderAggregation
   ) {
-    const resolvedValueRegularPlaceholder = this.getResolvedValueRegularPlaceholder(masterPayload, node);
-    defaultPayload[node.attrs.id] = resolvedValueRegularPlaceholder;
+    const resolvedValueRegularPlaceholder = this.getResolvedValueRegularPlaceholder(
+      masterPayload,
+      node,
+      placeholderAggregation
+    );
     content[index] = {
       type: 'text',
       text: resolvedValueRegularPlaceholder,
@@ -35,19 +47,21 @@ export class HydrateEmailSchemaUseCase {
   }
 
   private forNodeLogic(
-    node: TipTapNode & { attrs: { each: string } },
+    node: TipTapNode & {
+      attrs: { each: string };
+    },
     masterPayload: PreviewPayload,
-    defaultPayload: Record<string, unknown>,
     content: TipTapNode[],
-    index: number
+    index: number,
+    placeholderAggregation: PlaceholderAggregation
   ) {
     const itemPointerToDefaultRecord = this.collectAllItemPlaceholders(node);
     const resolvedValueForPlaceholder = this.getResolvedValueForPlaceholder(
       masterPayload,
       node,
-      itemPointerToDefaultRecord
+      itemPointerToDefaultRecord,
+      placeholderAggregation
     );
-    defaultPayload[node.attrs.each] = resolvedValueForPlaceholder;
     content[index] = {
       type: 'for',
       attrs: { each: resolvedValueForPlaceholder },
@@ -57,31 +71,31 @@ export class HydrateEmailSchemaUseCase {
 
   private showLogic(
     masterPayload: PreviewPayload,
-    node: TipTapNode & { attrs: { show: string } },
-    defaultPayload: Record<string, unknown>
+    node: TipTapNode & {
+      attrs: { show: string };
+    },
+    placeholderAggregation: PlaceholderAggregation
   ) {
-    const resolvedValueShowPlaceholder = this.getResolvedValueShowPlaceholder(masterPayload, node);
-    defaultPayload[node.attrs.show] = resolvedValueShowPlaceholder;
-    node.attrs.show = resolvedValueShowPlaceholder;
+    node.attrs.show = this.getResolvedValueShowPlaceholder(masterPayload, node, placeholderAggregation);
   }
 
   private transformContentInPlace(
     content: TipTapNode[],
-    defaultPayload: Record<string, unknown>,
-    masterPayload: PreviewPayload
+    masterPayload: PreviewPayload,
+    placeholderAggregation: PlaceholderAggregation
   ) {
     content.forEach((node, index) => {
       if (this.isVariableNode(node)) {
-        this.variableLogic(masterPayload, node, defaultPayload, content, index);
+        this.variableLogic(masterPayload, node, content, index, placeholderAggregation);
       }
       if (this.isForNode(node)) {
-        this.forNodeLogic(node, masterPayload, defaultPayload, content, index);
+        this.forNodeLogic(node, masterPayload, content, index, placeholderAggregation);
       }
       if (this.isShowNode(node)) {
-        this.showLogic(masterPayload, node, defaultPayload);
+        this.showLogic(masterPayload, node, placeholderAggregation);
       }
       if (node.content) {
-        this.transformContentInPlace(node.content, defaultPayload, masterPayload);
+        this.transformContentInPlace(node.content, masterPayload, placeholderAggregation);
       }
     });
   }
@@ -98,53 +112,65 @@ export class HydrateEmailSchemaUseCase {
     return !!(node.type === 'variable' && node.attrs && 'id' in node.attrs && typeof node.attrs.id === 'string');
   }
 
-  private getResolvedValueRegularPlaceholder(masterPayload: PreviewPayload, node) {
+  private getResolvedValueRegularPlaceholder(
+    masterPayload: PreviewPayload,
+    node,
+    placeholderAggregation: PlaceholderAggregation
+  ) {
     const resolvedValue = this.getValueByPath(masterPayload, node.attrs.id);
     const { fallback } = node.attrs;
 
-    return resolvedValue || fallback || `{{${node.attrs.id}}}`;
+    const finalValue = resolvedValue || fallback || `{{${node.attrs.id}}}`;
+    placeholderAggregation.regularPlaceholdersToDefaultValue[`{{${node.attrs.id}}}`] = finalValue;
+
+    return finalValue;
   }
 
-  private getResolvedValueShowPlaceholder(masterPayload: PreviewPayload, node) {
+  private getResolvedValueShowPlaceholder(
+    masterPayload: PreviewPayload,
+    node,
+    placeholderAggregation: PlaceholderAggregation
+  ) {
     const resolvedValue = this.getValueByPath(masterPayload, node.attrs.show);
     const { fallback } = node.attrs;
 
-    return resolvedValue || fallback || `true`;
-  }
+    const finalValue = resolvedValue || fallback || `true`;
+    placeholderAggregation.regularPlaceholdersToDefaultValue[`{{${node.attrs.show}}}`] = finalValue;
 
-  private flattenToNested(flatJson: Record<string, any>): Record<string, any> {
-    const nestedJson: Record<string, any> = {};
-    // eslint-disable-next-line guard-for-in
-    for (const key in flatJson) {
-      const keys = key.split('.');
-      keys.reduce((acc, part, index) => {
-        if (index === keys.length - 1) {
-          acc[part] = flatJson[key];
-        } else if (!acc[part]) {
-          acc[part] = {};
-        }
-
-        return acc[part];
-      }, nestedJson);
-    }
-
-    return nestedJson;
+    return finalValue;
   }
 
   private getResolvedValueForPlaceholder(
     masterPayload: PreviewPayload,
-    node: TipTapNode & { attrs: { each: string } },
-    itemPointerToDefaultRecord: Record<string, string>
+    node: TipTapNode & {
+      attrs: { each: string };
+    },
+    itemPointerToDefaultRecord: Record<string, string>,
+    placeholderAggregation: PlaceholderAggregation
   ) {
-    const resolvedValue = this.getValueByPath(masterPayload, node.attrs.each);
+    let resolvedValueIfFound = this.getValueByPath(masterPayload, node.attrs.each);
 
-    if (!resolvedValue) {
-      return [this.buildElement(itemPointerToDefaultRecord, '1'), this.buildElement(itemPointerToDefaultRecord, '2')];
+    if (!resolvedValueIfFound) {
+      resolvedValueIfFound = [
+        this.buildElement(itemPointerToDefaultRecord, '1'),
+        this.buildElement(itemPointerToDefaultRecord, '2'),
+      ];
     }
+    placeholderAggregation.nestedForPlaceholders[`{{${node.attrs.each}}}`] =
+      this.buildNestedVariableRecord(itemPointerToDefaultRecord);
 
-    return resolvedValue;
+    return resolvedValueIfFound;
   }
 
+  private buildNestedVariableRecord(itemPointerToDefaultRecord: Record<string, string>) {
+    const transformedObj: Record<string, string> = {};
+
+    Object.entries(itemPointerToDefaultRecord).forEach(([key, value]) => {
+      transformedObj[value] = value;
+    });
+
+    return transformedObj;
+  }
   private collectAllItemPlaceholders(nodeExt: TipTapNode) {
     const payloadValues = {};
     const traverse = (node: TipTapNode) => {
@@ -153,7 +179,7 @@ export class HydrateEmailSchemaUseCase {
       }
       if (this.isPayloadValue(node)) {
         const { id } = node.attrs;
-        payloadValues[node.attrs.id] = node.attrs.fallback || `{{item.${id}}}`;
+        payloadValues[`${node.attrs.id}`] = node.attrs.fallback || `{{item.${id}}}`;
       }
       if (node.content && Array.isArray(node.content)) {
         node.content.forEach(traverse);
@@ -164,18 +190,16 @@ export class HydrateEmailSchemaUseCase {
     return payloadValues;
   }
 
-  private getValueByPath(obj: Record<string, any>, path: string): any {
-    const keys = path.split('.');
+  private getValueByPath(masterPayload: Record<string, any>, placeholderRef: string): any {
+    const keys = placeholderRef.split('.');
 
     return keys.reduce((currentObj, key) => {
       if (currentObj && typeof currentObj === 'object' && key in currentObj) {
-        const nextObj = currentObj[key];
-
-        return nextObj;
+        return currentObj[key];
       }
 
       return undefined;
-    }, obj);
+    }, masterPayload);
   }
 
   private buildElement(itemPointerToDefaultRecord: Record<string, string>, suffix: string) {

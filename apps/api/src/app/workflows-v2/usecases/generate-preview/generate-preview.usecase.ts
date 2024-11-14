@@ -1,91 +1,76 @@
 import { Injectable } from '@nestjs/common';
 import {
   ChannelTypeEnum,
-  ContentIssue,
-  ControlSchemas,
+  GeneratePreviewRequestDto,
   GeneratePreviewResponseDto,
   JobStatusEnum,
   PreviewPayload,
-  StepContentIssueEnum,
-  StepTypeEnum,
-  WorkflowOriginEnum,
-  WorkflowTypeEnum,
+  StepDataDto,
 } from '@novu/shared';
-import { merge } from 'lodash/fp';
-import _ = require('lodash');
-import { GetWorkflowByIdsUseCase } from '@novu/application-generic';
-import { NotificationTemplateEntity } from '@novu/dal';
-import { GeneratePreviewCommand } from './generate-preview-command';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
-import { StepMissingControlsException, StepNotFoundException } from '../../exceptions/step-not-found-exception';
-import { OriginMissingException, StepIdMissingException } from './step-id-missing.exception';
-import { BuildDefaultPayloadUseCase } from '../build-payload-from-placeholder';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
-import { ValidateControlValuesAndConstructPassableStructureUsecase } from '../validate-control-values/build-default-control-values-usecase.service';
+import { StepMissingControlsException } from '../../exceptions/step-not-found-exception';
+import { PrepareAndValidateContentUsecase, ValidatedContentResponse } from '../validate-content';
+import { BuildStepDataUsecase } from '../build-step-data';
+import { GeneratePreviewCommand } from './generate-preview.command';
 
 @Injectable()
 export class GeneratePreviewUsecase {
   constructor(
     private legacyPreviewStepUseCase: PreviewStep,
-    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private constructPayloadUseCase: BuildDefaultPayloadUseCase,
-    private controlValuesUsecase: ValidateControlValuesAndConstructPassableStructureUsecase
+    private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase,
+    private buildStepDataUsecase: BuildStepDataUsecase
   ) {}
 
   async execute(command: GeneratePreviewCommand): Promise<GeneratePreviewResponseDto> {
-    const payloadInfo = this.buildPayloadWithDefaults(command);
-    const workflowInfo = await this.getWorkflowUserIdentifierFromWorkflowObject(command);
-    const controlValuesResult = this.addMissingValuesToControlValues(command, workflowInfo.stepControlSchema);
-    const executeOutput = await this.executePreviewUsecase(
-      workflowInfo.workflowId,
-      workflowInfo.stepId,
-      workflowInfo.origin,
-      payloadInfo.previewPayload,
-      controlValuesResult.augmentedControlValues,
-      command
-    );
-
-    return buildResponse(
-      controlValuesResult.issuesMissingValues,
-      payloadInfo.issues,
-      executeOutput,
-      workflowInfo.stepType,
-      payloadInfo.previewPayload
-    );
-  }
-
-  private buildPayloadWithDefaults(command: GeneratePreviewCommand) {
     const dto = command.generatePreviewRequestDto;
-    const { previewPayload, issues } = this.constructPayloadUseCase.execute({
-      controlValues: dto.controlValues,
-      payloadValues: dto.previewPayload,
-    });
+    const stepData = await this.getStepData(command);
 
-    return { previewPayload, issues };
+    const validatedContent: ValidatedContentResponse = await this.getValidatedContent(dto, stepData);
+    const executeOutput = await this.executePreviewUsecase(
+      command,
+      stepData,
+      validatedContent.finalPayload,
+      validatedContent.finalControlValues
+    );
+
+    return {
+      issues: validatedContent.issues, // Use the issues from validatedContent
+      result: {
+        preview: executeOutput.outputs as any,
+        type: stepData.type as unknown as ChannelTypeEnum,
+      },
+      previewPayloadExample: validatedContent.finalPayload,
+    };
   }
 
-  private addMissingValuesToControlValues(command: GeneratePreviewCommand, stepControlSchema: ControlSchemas) {
-    return this.controlValuesUsecase.execute({
-      controlSchema: stepControlSchema,
-      controlValues: command.generatePreviewRequestDto.controlValues || {},
+  private async getValidatedContent(dto: GeneratePreviewRequestDto, stepData: StepDataDto) {
+    if (!stepData.controls?.dataSchema) {
+      throw new StepMissingControlsException(stepData.stepId, stepData);
+    }
+
+    return await this.prepareAndValidateContentUsecase.execute({
+      controlValues: dto.controlValues || {},
+      controlDataSchema: stepData.controls.dataSchema,
+      variableSchema: stepData.variables,
+      previewPayloadFromDto: dto.previewPayload,
+    });
+  }
+
+  private async getStepData(command: GeneratePreviewCommand) {
+    return await this.buildStepDataUsecase.execute({
+      identifierOrInternalId: command.workflowId,
+      stepId: command.stepDatabaseId,
+      user: command.user,
     });
   }
 
   private async executePreviewUsecase(
-    workflowId: string,
-    stepId: string | undefined,
-    origin: WorkflowOriginEnum | undefined,
+    command: GeneratePreviewCommand,
+    stepData: StepDataDto,
     hydratedPayload: PreviewPayload,
-    updatedControlValues: Record<string, unknown>,
-    command: GeneratePreviewCommand
+    updatedControlValues: Record<string, unknown>
   ) {
-    if (!stepId) {
-      throw new StepIdMissingException(workflowId);
-    }
-    if (!origin) {
-      throw new OriginMissingException(stepId);
-    }
-
     const state = buildState(hydratedPayload.steps);
 
     return await this.legacyPreviewStepUseCase.execute(
@@ -95,105 +80,16 @@ export class GeneratePreviewUsecase {
         controls: updatedControlValues || {},
         environmentId: command.user.environmentId,
         organizationId: command.user.organizationId,
-        stepId,
+        stepId: stepData.stepId,
         userId: command.user._id,
-        workflowId,
-        workflowOrigin: origin,
+        workflowId: stepData.workflowId,
+        workflowOrigin: stepData.origin,
         state,
       })
     );
   }
-
-  private async getWorkflowUserIdentifierFromWorkflowObject(command: GeneratePreviewCommand) {
-    const persistedWorkflow = await this.getWorkflowByIdsUseCase.execute({
-      identifierOrInternalId: command.workflowId,
-      environmentId: command.user.environmentId,
-      organizationId: command.user.organizationId,
-      userId: command.user._id,
-    });
-    const { steps } = persistedWorkflow;
-    const step = steps.find((stepDto) => stepDto._id === command.stepDatabaseId);
-    if (!step) {
-      throw new StepNotFoundException(command.stepDatabaseId);
-    }
-    if (!step.template || !step.template.controls) {
-      throw new StepMissingControlsException(command.stepDatabaseId, step);
-    }
-    const origin = this.buildOrigin(persistedWorkflow);
-
-    return {
-      workflowId: persistedWorkflow.triggers[0].identifier,
-      stepId: step.stepId,
-      stepType: step.template.type,
-      stepControlSchema: step.template.controls,
-      origin,
-    };
-  }
-
-  /**
-   * Builds the origin of the workflow based on the workflow type.
-   * If the origin is not set, it will be built based on the workflow type.
-   * We need to do so for backward compatibility reasons.
-   */
-  private buildOrigin(persistedWorkflow: NotificationTemplateEntity): WorkflowOriginEnum {
-    if (persistedWorkflow.origin) {
-      return persistedWorkflow.origin;
-    }
-
-    if (persistedWorkflow.type === WorkflowTypeEnum.ECHO || persistedWorkflow.type === WorkflowTypeEnum.BRIDGE) {
-      return WorkflowOriginEnum.EXTERNAL;
-    }
-
-    if (persistedWorkflow.type === WorkflowTypeEnum.REGULAR) {
-      return WorkflowOriginEnum.NOVU_CLOUD_V1;
-    }
-
-    return WorkflowOriginEnum.NOVU_CLOUD;
-  }
 }
 
-function buildResponse(
-  missingValuesIssue: Record<string, ContentIssue[]>,
-  missingPayloadVariablesIssue: Record<string, ContentIssue[]>,
-  executionOutput,
-  stepType: StepTypeEnum,
-  augmentedPayload: PreviewPayload
-): GeneratePreviewResponseDto {
-  return {
-    issues: merge(missingValuesIssue, missingPayloadVariablesIssue),
-    result: {
-      preview: executionOutput.outputs as any,
-      type: stepType as unknown as ChannelTypeEnum,
-    },
-    previewPayloadExample: augmentedPayload,
-  };
-}
-
-function findMissingKeys(requiredRecord: Record<string, unknown>, actualRecord: Record<string, unknown>): string[] {
-  const requiredKeys = collectKeys(requiredRecord);
-  const actualKeys = collectKeys(actualRecord);
-
-  return _.difference(requiredKeys, actualKeys);
-}
-
-function collectKeys(obj: Record<string, unknown>, prefix = ''): string[] {
-  // Initialize result as an empty array of strings
-  return _.reduce(
-    obj,
-    (result: string[], value, key) => {
-      const newKey = prefix ? `${prefix}.${key}` : key;
-      if (_.isObject(value) && !_.isArray(value)) {
-        // Call collectKeys recursively and concatenate the results
-        result.push(...collectKeys(value, newKey));
-      } else {
-        result.push(newKey);
-      }
-
-      return result;
-    },
-    [] // Pass an empty array as the initial value
-  );
-}
 function buildState(steps: Record<string, unknown> | undefined): FrameworkPreviousStepsOutputState[] {
   const outputArray: FrameworkPreviousStepsOutputState[] = [];
   for (const [stepId, value] of Object.entries(steps || {})) {
