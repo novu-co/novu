@@ -67,6 +67,7 @@ export type WorkflowListResponseDto = Pick<
 export type StepDto = {
   name: string;
   type: StepTypeEnum;
+  stepId: string;
 };
 
 export type WorkflowCommonsFields = {

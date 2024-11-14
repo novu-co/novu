@@ -160,6 +160,7 @@ export class SyncToEnvironmentUseCase {
       ...idAsOptionalObject,
       name: step.name ?? '',
       type: step.type,
+      stepId: step.stepId,
       controlValues: stepDataDto.controls.values ?? {},
     };
   }
