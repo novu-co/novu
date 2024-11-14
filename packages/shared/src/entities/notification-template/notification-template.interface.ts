@@ -1,5 +1,3 @@
-import { JSONSchema } from 'json-schema-to-ts';
-
 import type {
   BuilderFieldType,
   BuilderGroupValues,
@@ -12,7 +10,7 @@ import { ControlSchemas, IMessageTemplate } from '../message-template';
 import { IPreferenceChannels } from '../subscriber-preference';
 import { IWorkflowStepMetadata } from '../step';
 import { INotificationGroup } from '../notification-group';
-import { ControlsDto } from '../../index';
+import type { ContentIssue, ControlsDto, JSONSchemaDto, StepIssue } from '../../index';
 
 export interface INotificationTemplate {
   _id?: string;
@@ -82,11 +80,15 @@ export interface INotificationTriggerVariable {
   value?: any;
   type?: TemplateVariableTypeEnum;
 }
-
+export class StepIssues {
+  body?: Record<string, StepIssue>;
+  controls?: Record<string, ContentIssue[]>;
+}
 export interface IStepVariant {
   _id?: string;
   uuid?: string;
   stepId?: string;
+  issues?: StepIssues;
   name?: string;
   filters?: IMessageFilter[];
   _templateId?: string;
@@ -100,7 +102,7 @@ export interface IStepVariant {
   };
   metadata?: IWorkflowStepMetadata;
   inputs?: {
-    schema: JSONSchema;
+    schema: JSONSchemaDto;
   };
   /**
    * @deprecated This property is deprecated and will be removed in future versions.

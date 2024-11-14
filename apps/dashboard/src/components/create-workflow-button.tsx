@@ -27,6 +27,7 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { useTagsQuery } from '@/hooks/use-tags-query';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
+import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
@@ -83,21 +84,20 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
       }}
     >
       <SheetTrigger {...props} />
-      <SheetContent>
+      <SheetContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <SheetHeader>
           <SheetTitle>Create workflow</SheetTitle>
           <div>
             <SheetDescription>
-              Workflows manage event-driven notifications across multiple channels in a version-controlled flow, with
-              the ability to manage preference for each subscriber.
+              Workflows manage event-driven notifications across channels.{' '}
+              <Link
+                target="_blank"
+                to="https://docs.novu.co/concepts/workflows"
+                className="text-foreground-400 inline-flex items-center text-sm underline"
+              >
+                Learn more <RiExternalLinkLine className="inline size-4" />
+              </Link>
             </SheetDescription>
-            <Link
-              target="_blank"
-              to="https://docs.novu.co/api-reference/workflows/create-workflow"
-              className="text-foreground-400 flex items-center text-sm underline"
-            >
-              Learn more <RiExternalLinkLine className="inline size-4" />
-            </Link>
           </div>
         </SheetHeader>
         <Separator />
@@ -105,6 +105,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
           <Form {...form}>
             <form
               id="create-workflow"
+              autoComplete="off"
               onSubmit={form.handleSubmit((values) => {
                 mutateAsync({
                   name: values.name,
@@ -127,6 +128,8 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <InputField>
                         <Input
                           {...field}
+                          autoFocus
+                          {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
                           onChange={(e) => {
                             field.onChange(e);
                             form.setValue('workflowId', slugify(e.target.value));
@@ -134,7 +137,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                         />
                       </InputField>
                     </FormControl>
-                    <FormMessage>Name is required</FormMessage>
+                    <FormMessage />
                   </FormItem>
                 )}
               />

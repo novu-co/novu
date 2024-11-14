@@ -1,12 +1,6 @@
-import { IsDefined, IsObject } from 'class-validator';
-import { JSONSchema } from 'json-schema-to-ts';
+import type { JSONSchemaDto } from './json-schema-dto';
 
-export class WorkflowTestDataResponseDto {
-  @IsObject()
-  @IsDefined()
-  to: JSONSchema;
-
-  @IsObject()
-  @IsDefined()
-  payload: JSONSchema;
-}
+export type WorkflowTestDataResponseDto = {
+  to: JSONSchemaDto;
+  payload: JSONSchemaDto;
+};

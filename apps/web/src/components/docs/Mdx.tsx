@@ -302,7 +302,7 @@ export const Mdx = ({ code = '', mappings = {}, isChildDocs, children, isLoading
                   listStyleType: 'decimal',
                   listStylePosition: 'inside',
                   '& p': {
-                    display: 'inline !important',
+                    display: '!important inline',
                   },
                 })}
                 {...props}
@@ -317,7 +317,7 @@ export const Mdx = ({ code = '', mappings = {}, isChildDocs, children, isLoading
                   listStyleType: 'disc',
                   listStylePosition: 'inside',
                   '& p': {
-                    display: 'inline !important',
+                    display: '!important inline',
                   },
                 })}
                 {...props}

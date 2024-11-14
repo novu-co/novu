@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useImperativeHandle, useLayoutEffect, useRef } from 'react';
 import { tags as t } from '@lezer/highlight';
 import { useCodeMirror, EditorView, ReactCodeMirrorProps } from '@uiw/react-codemirror';
 import { cva, VariantProps } from 'class-variance-authority';
@@ -125,45 +125,55 @@ type EditorProps = {
 } & ReactCodeMirrorProps &
   VariantProps<typeof editorVariants>;
 
-export const Editor = ({
-  value,
-  placeholder,
-  className,
-  height,
-  size,
-  onChange,
-  extensions,
-  basicSetup,
-  ...restCodeMirrorProps
-}: EditorProps) => {
-  const editor = useRef<HTMLDivElement>(null);
-  const { setContainer } = useCodeMirror({
-    extensions: [...(extensions ?? []), baseTheme],
-    height,
-    placeholder,
-    basicSetup: {
-      lineNumbers: false,
-      foldGutter: false,
-      defaultKeymap: false,
-      highlightActiveLine: false,
-      highlightActiveLineGutter: false,
-      indentOnInput: false,
-      searchKeymap: false,
-      ...(typeof basicSetup === 'object' ? basicSetup : {}),
-    },
-    container: editor.current,
-    value,
-    onChange,
-    theme,
-    lang: 'liquid',
-    ...restCodeMirrorProps,
-  });
+export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, EditorProps>(
+  ({ value, placeholder, className, height, size, onChange, extensions, basicSetup, ...restCodeMirrorProps }, ref) => {
+    const editor = useRef<HTMLDivElement>(null);
+    const [shouldFocus, setShouldFocus] = React.useState(false);
 
-  useEffect(() => {
-    if (editor.current) {
-      setContainer(editor.current);
-    }
-  }, [setContainer]);
+    const { setContainer, view } = useCodeMirror({
+      extensions: [...(extensions ?? []), baseTheme],
+      height,
+      placeholder,
+      basicSetup: {
+        lineNumbers: false,
+        foldGutter: false,
+        defaultKeymap: false,
+        highlightActiveLine: false,
+        highlightActiveLineGutter: false,
+        indentOnInput: false,
+        searchKeymap: false,
+        ...(typeof basicSetup === 'object' ? basicSetup : {}),
+      },
+      container: editor.current,
+      value,
+      onChange,
+      theme,
+      lang: 'liquid',
+      ...restCodeMirrorProps,
+    });
 
-  return <div ref={editor} className={editorVariants({ size, className })} />;
-};
+    useImperativeHandle(
+      ref,
+      () => ({
+        focus: () => setShouldFocus(true),
+        blur: () => setShouldFocus(false),
+      }),
+      []
+    );
+
+    useEffect(() => {
+      if (editor.current) {
+        setContainer(editor.current);
+      }
+    }, [setContainer]);
+
+    useLayoutEffect(() => {
+      if (view && shouldFocus) {
+        view.focus();
+        setShouldFocus(false);
+      }
+    }, [shouldFocus, view]);
+
+    return <div ref={editor} className={editorVariants({ size, className })} />;
+  }
+);

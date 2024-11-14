@@ -141,7 +141,7 @@ describe('Bulk create subscribers - /v1/subscribers/bulk (POST)', function () {
     }
   });
 
-  it('should allow recreate deleted subscribers', async function () {
+  it('should recreate deleted subscribers', async function () {
     const existingSubscriber = { subscriberId: subscriber.subscriberId, firstName: 'existingSubscriber' };
     const newSubscriber1 = {
       subscriberId: 'test1',
@@ -153,7 +153,7 @@ describe('Bulk create subscribers - /v1/subscribers/bulk (POST)', function () {
       firstName: 'sub2',
       email: 'sub2@test.co',
     };
-    const { data: body } = await axiosInstance.post(
+    const { data: firstResponseData } = await axiosInstance.post(
       `${session.serverUrl}${BULK_API_ENDPOINT}`,
       {
         subscribers: [existingSubscriber, newSubscriber1, newSubscriber2],
@@ -164,19 +164,13 @@ describe('Bulk create subscribers - /v1/subscribers/bulk (POST)', function () {
         },
       }
     );
-    expect(body.data).to.be.ok;
 
-    const {
-      data: { updated, created },
-    } = body;
+    expect(firstResponseData.data.created?.length).to.equal(2);
+    expect(firstResponseData.data.updated?.length).to.equal(1);
+    expect(firstResponseData.data.created[0].subscriberId).to.equal(newSubscriber1.subscriberId);
+    expect(firstResponseData.data.created[1].subscriberId).to.equal(newSubscriber2.subscriberId);
+    expect(firstResponseData.data.updated[0].subscriberId).to.equal(existingSubscriber.subscriberId);
 
-    expect(updated?.length).to.equal(1);
-    expect(created?.length).to.equal(2);
-    expect(updated[0].subscriberId).to.equal(existingSubscriber.subscriberId);
-    expect(created[0].subscriberId).to.equal(newSubscriber1.subscriberId);
-    expect(created[1].subscriberId).to.equal(newSubscriber2.subscriberId);
-
-    // delete the two created subscribers
     await axiosInstance.delete(`${session.serverUrl}/v1/subscribers/${newSubscriber1.subscriberId}`, {
       headers: {
         authorization: `ApiKey ${session.apiKey}`,
@@ -188,8 +182,7 @@ describe('Bulk create subscribers - /v1/subscribers/bulk (POST)', function () {
       },
     });
 
-    // recreate the deleted subscribers
-    const { data: recreateBody } = await axiosInstance.post(
+    const { data: secondResponseData } = await axiosInstance.post(
       `${session.serverUrl}${BULK_API_ENDPOINT}`,
       {
         subscribers: [existingSubscriber, newSubscriber1, newSubscriber2],
@@ -201,26 +194,10 @@ describe('Bulk create subscribers - /v1/subscribers/bulk (POST)', function () {
       }
     );
 
-    expect(recreateBody.data).to.be.ok;
-    const {
-      data: { updated: updatedAgain },
-    } = recreateBody;
-
-    expect(updatedAgain?.length).to.equal(3);
-    expect(updatedAgain[0].subscriberId).to.equal(existingSubscriber.subscriberId);
-    expect(updatedAgain[1].subscriberId).to.equal(newSubscriber1.subscriberId);
-    expect(updatedAgain[2].subscriberId).to.equal(newSubscriber2.subscriberId);
-
-    // check that they are not marked as deleted
-    const recreatedSubscriber1 = await subscriberRepository.findBySubscriberId(
-      session.environment._id,
-      newSubscriber1.subscriberId
-    );
-    const recreatedSubscriber2 = await subscriberRepository.findBySubscriberId(
-      session.environment._id,
-      newSubscriber2.subscriberId
-    );
-    expect(recreatedSubscriber1.deleted).to.be.false;
-    expect(recreatedSubscriber2.deleted).to.be.false;
+    expect(secondResponseData.data.created?.length).to.equal(2);
+    expect(secondResponseData.data.updated?.length).to.equal(1);
+    expect(secondResponseData.data.created[0].subscriberId).to.equal(newSubscriber1.subscriberId);
+    expect(secondResponseData.data.created[1].subscriberId).to.equal(newSubscriber2.subscriberId);
+    expect(secondResponseData.data.updated[0].subscriberId).to.equal(existingSubscriber.subscriberId);
   });
 });

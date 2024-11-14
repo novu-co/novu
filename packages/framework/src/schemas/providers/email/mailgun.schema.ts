@@ -1,4 +1,4 @@
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 
 /**
  * Mailgun `POST /messages` schema
@@ -73,7 +73,7 @@ const mailgunOutputSchema = {
   },
   required: [],
   additionalProperties: true,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 export const mailgunProviderSchemas = {
   output: mailgunOutputSchema,

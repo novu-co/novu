@@ -15,6 +15,6 @@
     "skipLibCheck": true,
     "strictNullChecks": false,
     "strictPropertyInitialization": false,
-    "target": "es5",
+    "target": "es5"
   }
 }

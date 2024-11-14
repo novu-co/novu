@@ -5,6 +5,9 @@ name: Deploy PROD Worker
 on:
   workflow_dispatch:
 
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
 jobs:
   build_prod_image:
     # The type of runner that the job will run on
@@ -52,7 +55,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID}}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-        
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -115,6 +118,6 @@ jobs:
         with:
           region: EU
           apiKey: ${{ secrets.NEW_RELIC_API_KEY }}
-          guid: "MzgxMjQwOHxBUE18QVBQTElDQVRJT058NDk3NzA2ODk2"
-          version: "${{ env.RELEASE_VERSION }}"
-          user: "${{ github.actor }}"
+          guid: 'MzgxMjQwOHxBUE18QVBQTElDQVRJT058NDk3NzA2ODk2'
+          version: '${{ env.RELEASE_VERSION }}'
+          user: '${{ github.actor }}'

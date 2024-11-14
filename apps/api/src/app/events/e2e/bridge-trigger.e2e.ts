@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { expect } from 'chai';
 import { v4 as uuidv4 } from 'uuid';
+import sinon from 'sinon';
 
 import { SubscribersService, UserSession } from '@novu/testing';
 import {
@@ -328,11 +329,11 @@ contexts.forEach((context: Context) => {
       expect(messagesAfter.length).to.be.eq(0);
       const executionDetailsRequired = await executionDetailsRepository.find({
         _environmentId: session.environment._id,
-        status: ExecutionDetailsStatusEnum.WARNING,
+        status: ExecutionDetailsStatusEnum.FAILED,
       });
 
       let raw = JSON.parse(executionDetailsRequired[0]?.raw ?? '');
-      let error = raw.raw.data[0].message;
+      let error = raw.data[0].message;
 
       expect(error).to.include("must have required property 'name'");
 
@@ -343,10 +344,10 @@ contexts.forEach((context: Context) => {
 
       const executionDetailsInvalidType = await executionDetailsRepository.find({
         _environmentId: session.environment._id,
-        status: ExecutionDetailsStatusEnum.WARNING,
+        status: ExecutionDetailsStatusEnum.FAILED,
       });
       raw = JSON.parse(executionDetailsInvalidType[0]?.raw ?? '');
-      error = raw.raw.data[0].message;
+      error = raw.data[0].message;
 
       expect(error).to.include('must be string');
     });
@@ -724,8 +725,9 @@ contexts.forEach((context: Context) => {
        * Delete `preferences` from the Workflow Definition to simulate an old
        * Workflow Definition (i.e. from old Framework version) that doesn't have the `preferences` property.
        */
-      // @ts-ignore - The operand of a 'delete' operator must be optional.
-      delete newWorkflow.definition.preferences;
+      const { preferences, ...rest } = await newWorkflow.discover();
+      // @ts-expect-error - preferences is not part of the resolved object
+      sinon.stub(newWorkflow, 'discover').resolves(rest);
 
       await bridgeServer.start({ workflows: [newWorkflow] });
 
@@ -1425,6 +1427,8 @@ describe('Novu-Hosted Bridge Trigger', () => {
 
   it('should execute a Novu-managed workflow', async () => {
     const createWorkflowDto: CreateWorkflowDto = {
+      tags: [],
+      active: true,
       name: 'Test Workflow',
       description: 'Test Workflow',
       __source: WorkflowCreationSourceEnum.DASHBOARD,

@@ -78,6 +78,9 @@
     "packages:set-workspace-protocol": "node scripts/set-package-dependencies.mjs workspace:*",
     "packages:set-latest": "node scripts/set-package-dependencies.mjs latest"
   },
+  "resolutions": {
+    "minimist": "1.2.6"
+  },
   "devDependencies": {
     "@auto-it/npm": "^10.36.5",
     "@auto-it/released": "^10.36.5",
@@ -85,13 +88,12 @@
     "@eslint/compat": "^1.1.1",
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.9.1",
-    "@nrwl/cli": "^15.9.3",
-    "@nrwl/eslint-plugin-nx": "19.8.2",
-    "@nrwl/jest": "19.8.2",
-    "@nrwl/linter": "19.8.2",
-    "@nrwl/tao": "19.8.2",
-    "@nrwl/workspace": "19.8.2",
-    "@nx/plugin": "19.8.2",
+    "nx": "20.0.5",
+    "@nx/eslint-plugin": "20.0.5",
+    "@nx/jest": "20.0.5",
+    "@nx/linter": "19.8.4",
+    "@nx/workspace": "20.0.5",
+    "@nx/plugin": "20.0.5",
     "@octokit/core": "^4.0.0",
     "@pandacss/eslint-plugin": "^0.1.9",
     "@pnpm/filter-workspace-packages": "^7.0.6",
@@ -184,7 +186,8 @@
     "ts-node": "~10.9.1",
     "typescript": "5.6.2",
     "typescript-eslint": "^8.3.0",
-    "wait-port": "^0.3.0"
+    "wait-port": "^0.3.0",
+    "nx-cloud": "latest"
   },
   "workspaces": {
     "packages": [

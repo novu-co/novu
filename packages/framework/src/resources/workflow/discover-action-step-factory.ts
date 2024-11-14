@@ -1,38 +1,38 @@
 import { ActionStepEnum } from '../../constants';
 import { emptySchema } from '../../schemas';
-import type { Awaitable, DiscoverWorkflowOutput, Schema, ActionStep } from '../../types';
+import type { Awaitable, DiscoverWorkflowOutput, Schema, ActionStep, StepOptions, FromSchema } from '../../types';
 import { transformSchema } from '../../validators';
 import { discoverStep } from './discover-step';
 
-export function discoverActionStepFactory(
+export async function discoverActionStepFactory(
   targetWorkflow: DiscoverWorkflowOutput,
   type: ActionStepEnum,
   outputSchema: Schema,
   resultSchema: Schema
   // TODO: fix typing for `resolve` to use generic typings
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): ActionStep<any, any> {
+): Promise<ActionStep<any, any>> {
   return async (stepId, resolve, options = {}) => {
     const controlSchema = options?.controlSchema || emptySchema;
 
-    discoverStep(targetWorkflow, stepId, {
+    await discoverStep(targetWorkflow, stepId, {
       stepId,
       type,
       controls: {
-        schema: transformSchema(controlSchema),
+        schema: await transformSchema(controlSchema),
         unknownSchema: controlSchema,
       },
       outputs: {
-        schema: transformSchema(outputSchema),
+        schema: await transformSchema(outputSchema),
         unknownSchema: outputSchema,
       },
       results: {
-        schema: transformSchema(resultSchema),
+        schema: await transformSchema(resultSchema),
         unknownSchema: resultSchema,
       },
       resolve: resolve as (controls: Record<string, unknown>) => Awaitable<Record<string, unknown>>,
       code: resolve.toString(),
-      options,
+      options: options as StepOptions<Schema, FromSchema<Schema>>,
       providers: [],
     });
 

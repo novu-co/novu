@@ -19,7 +19,21 @@ export class Messages extends WithHttp implements IMessages {
     });
   }
 
+  /**
+   * Deletes a single message notification by messageId.
+   *
+   * @param {string} messageId - The MongoDB ID of the message to delete.
+   */
   async deleteById(messageId: string) {
     return await this.http.delete(`${BASE_PATH}/${messageId}`);
+  }
+
+  /**
+   * Deletes multiple message notifications by transactionId.
+   *
+   * @param {string} transactionId - The unique identifier of the event whose notifications will be deleted.
+   */
+  async deleteByTransactionId(transactionId: string) {
+    return await this.http.delete(`${BASE_PATH}/transaction/${transactionId}`);
   }
 }

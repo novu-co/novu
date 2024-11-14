@@ -53,6 +53,11 @@ export class UpsertPreferences {
   ) {
     const channelTypes = Object.keys(command.preferences?.channels || {});
 
+    if (channelTypes.length === 0) {
+      // If there are no channels to update, we don't need to run the update query
+      return;
+    }
+
     const preferenceUnsetPayload = channelTypes.reduce((acc, channelType) => {
       acc[`preferences.channels.${channelType}`] = '';
 
@@ -110,7 +115,14 @@ export class UpsertPreferences {
         throw new BadRequestException('Preference not found');
       }
 
-      return this.deletePreferences(command, foundPreference?._id);
+      await this.deletePreferences(command, foundPreference?._id);
+
+      /*
+       * TODO: Ideally we need to return the foundPreference with a deleted: true flag
+       * but the repository does not support this yet. For now we will make a compromise
+       * to avoid refactoring all the usages of this usecase.
+       */
+      return foundPreference;
     }
 
     if (foundPreference) {
@@ -162,7 +174,7 @@ export class UpsertPreferences {
   private async deletePreferences(
     command: UpsertPreferencesCommand,
     preferencesId: string,
-  ): Promise<PreferencesEntity> {
+  ) {
     return await this.preferencesRepository.delete({
       _id: preferencesId,
       _environmentId: command.environmentId,

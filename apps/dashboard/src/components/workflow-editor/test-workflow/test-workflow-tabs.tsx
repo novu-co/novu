@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { RiPlayCircleLine } from 'react-icons/ri';
+import { RiPlayCircleLine, RiProgress1Fill } from 'react-icons/ri';
 import { useForm } from 'react-hook-form';
 // eslint-disable-next-line
 // @ts-ignore
@@ -13,9 +13,10 @@ import { Form } from '../../primitives/form/form';
 import { Button } from '../../primitives/button';
 import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
 import { showToast } from '../../primitives/sonner-helpers';
-import { ToastClose, ToastIcon } from '../../primitives/sonner';
 import { buildDynamicFormSchema, makeObjectFromSchema, TestWorkflowFormType } from '../schema';
 import { TestWorkflowForm } from './test-workflow-form';
+import { toast } from 'sonner';
+import { ToastClose, ToastIcon } from '@/components/primitives/sonner';
 
 export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataResponseDto }) => {
   const { environmentSlug = '', workflowSlug = '' } = useParams<{ environmentSlug: string; workflowSlug: string }>();
@@ -39,7 +40,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
     defaultValues: { to, payload: JSON.stringify(payload, null, 2) },
   });
   const { handleSubmit } = form;
-  const { triggerWorkflow } = useTriggerWorkflow();
+  const { triggerWorkflow, isPending } = useTriggerWorkflow();
 
   const onSubmit = async (data: TestWorkflowFormType) => {
     try {
@@ -50,7 +51,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
         variant: 'lg',
         children: ({ close }) => (
           <>
-            <ToastIcon variant="success" />
+            <ToastIcon variant="default" />
             <div className="flex flex-col gap-2">
               <span className="font-medium">Test workflow triggered successfully</span>
               <span className="text-foreground-600">{`Test workflow ${workflowSlug} was triggered successfully`}</span>
@@ -70,7 +71,9 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
         },
       });
     } catch (e) {
-      console.error(e);
+      toast.error('Failed to trigger workflow', {
+        description: e instanceof Error ? e.message : 'There was an error triggering the workflow.',
+      });
     }
   };
 
@@ -78,7 +81,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
     <div className="h-full w-full">
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="roun flex h-full flex-1 flex-nowrap">
-          <Tabs defaultValue="workflow" className="-mt-[1px] flex h-full flex-1 flex-col" value="trigger">
+          <Tabs defaultValue="workflow" className="-mt-[1px] flex flex-1 flex-col" value="trigger">
             <TabsList variant="regular">
               <TabsTrigger value="workflow" asChild variant="regular">
                 <Link
@@ -101,13 +104,13 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
                 </Link>
               </TabsTrigger>
               <div className="ml-auto">
-                <Button type="submit" variant="primary" size="sm" className="flex gap-1">
-                  <RiPlayCircleLine className="size-5" />
+                <Button type="submit" variant="primary" size="sm" className="flex gap-1" disabled={isPending}>
+                  {isPending ? <RiProgress1Fill className="size-5" /> : <RiPlayCircleLine className="size-5" />}
                   <span>Test workflow</span>
                 </Button>
               </div>
             </TabsList>
-            <TabsContent value="trigger" className="mt-0 h-full w-full" variant="regular">
+            <TabsContent value="trigger" className="mt-0 flex w-full flex-1 flex-col overflow-hidden" variant="regular">
               <TestWorkflowForm workflow={workflow} />
             </TabsContent>
           </Tabs>

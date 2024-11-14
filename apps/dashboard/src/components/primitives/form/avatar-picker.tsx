@@ -1,15 +1,14 @@
-'use client';
-
 import { Avatar, AvatarImage } from '@/components/primitives/avatar';
 import { Button } from '@/components/primitives/button';
-import { FormControl, FormMessage } from '@/components/primitives/form/form';
+import { FormMessage } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';
 import { Label } from '@/components/primitives/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import TextSeparator from '@/components/primitives/text-separator';
 import { useState, forwardRef } from 'react';
-import { RiEdit2Line, RiImageEditFill } from 'react-icons/ri';
+import { RiEdit2Line, RiErrorWarningFill, RiImageEditFill } from 'react-icons/ri';
+import { useFormField } from './form-context';
 
 const predefinedAvatars = [
   `${window.location.origin}/images/avatar.svg`,
@@ -30,6 +29,7 @@ type AvatarPickerProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ id, ...props }, ref) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { error } = useFormField();
 
   const handlePredefinedAvatarClick = (url: string) => {
     props.onChange?.({ target: { value: url } } as React.ChangeEvent<HTMLInputElement>);
@@ -40,13 +40,16 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ i
     <div className="space-y-2">
       <Popover modal={true} open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="icon" className="text-foreground-600 size-10">
+          <Button variant="outline" size="icon" className="text-foreground-600 relative size-10">
             {props.value ? (
-              <Avatar>
+              <Avatar className="p-px">
                 <AvatarImage src={props.value as string} />
               </Avatar>
             ) : (
               <RiImageEditFill className="size-5" />
+            )}
+            {error && (
+              <RiErrorWarningFill className="text-destructive outline-destructive absolute right-0 top-0 size-3 -translate-y-1/2 translate-x-1/2 rounded-full outline outline-1 outline-offset-1" />
             )}
           </Button>
         </PopoverTrigger>
@@ -59,11 +62,9 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ i
               <Separator />
               <div className="space-y-1">
                 <Label>Avatar URL</Label>
-                <FormControl>
-                  <InputField>
-                    <Input type="url" id={id} placeholder="Enter avatar URL" ref={ref} {...props} />
-                  </InputField>
-                </FormControl>
+                <InputField>
+                  <Input type="url" id={id} placeholder="Enter avatar URL" ref={ref} {...props} />
+                </InputField>
                 <FormMessage />
               </div>
             </div>
@@ -80,7 +81,6 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ i
           </div>
         </PopoverContent>
       </Popover>
-      <FormMessage />
     </div>
   );
 });

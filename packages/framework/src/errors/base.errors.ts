@@ -1,7 +1,24 @@
-import { isNativeError } from 'node:util/types';
-
 import { HttpStatusEnum } from '../constants';
 import { ErrorCodeEnum } from '../constants/error.constants';
+
+/**
+ * Check if the object is a native error.
+ *
+ * This method relies on `Object.prototype.toString()` behavior. It is possible to obtain
+ * an incorrect result when the object argument has a non `Error`-suffixed `name` property.
+ *
+ * @param object - The object to check.
+ * @returns `true` if the object is a native error, `false` otherwise.
+ */
+export const isNativeError = (object: unknown): object is Error => {
+  if (typeof object !== 'object' || object === null) {
+    return false;
+  }
+
+  const proto = Object.getPrototypeOf(object);
+
+  return proto?.constructor?.name.endsWith('Error') ?? false;
+};
 
 /**
  * Base error class.
@@ -50,7 +67,7 @@ export abstract class ServerError extends FrameworkError {
         stack: cause.stack ?? message,
       };
     } else {
-      super(`${message}: ${JSON.stringify(cause, null, 2)}`);
+      super(`${message}${cause ? `: ${JSON.stringify(cause, null, 2)}` : ''}`);
       this.data = {
         stack: message,
       };

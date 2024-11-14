@@ -77,7 +77,14 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
     expect(response.data.data.preference.channels).to.eql({});
   });
 
-  it('should update user global preference and disable the flag for the future channels update', async function () {
+  it('should unset all preferences when the preferences object is empty', async function () {
+    const response = await updateGlobalPreferences({}, session);
+
+    expect(response.data.data.preference.channels).to.eql({});
+  });
+
+  // `enabled` flag is not used anymore. The presence of a preference object means that the subscriber has enabled notifications.
+  it.skip('should update user global preference and disable the flag for the future channels update', async function () {
     const disablePreferenceData = {
       enabled: false,
     };

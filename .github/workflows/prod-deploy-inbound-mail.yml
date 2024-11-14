@@ -5,6 +5,9 @@ name: Deploy PROD Inbound Mail
 on:
   workflow_dispatch:
 
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
 jobs:
   test_inbound_mail:
     strategy:

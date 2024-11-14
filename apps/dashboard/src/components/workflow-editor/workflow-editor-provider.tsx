@@ -1,23 +1,12 @@
-import { ReactNode, useMemo, useCallback, useRef, useLayoutEffect } from 'react';
+import { ReactNode, useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { useBlocker, useNavigate, useParams } from 'react-router-dom';
-import { useForm, useFieldArray } from 'react-hook-form';
 // eslint-disable-next-line
 // @ts-ignore
 import { zodResolver } from '@hookform/resolvers/zod';
+import { WorkflowOriginEnum, WorkflowResponseDto } from '@novu/shared';
 import * as z from 'zod';
 
-import { WorkflowEditorContext } from './workflow-editor-context';
-import { StepTypeEnum } from '@/utils/enums';
-import { Form } from '../primitives/form/form';
-import { buildRoute, ROUTES } from '@/utils/routes';
-import { useEnvironment } from '@/context/environment/hooks';
-import { workflowSchema } from './schema';
-import { useFetchWorkflow, useUpdateWorkflow, useFormAutoSave } from '@/hooks';
-import { Step } from '@/utils/types';
-import { showToast } from '../primitives/sonner-helpers';
-import { ToastIcon } from '../primitives/sonner';
-import { handleValidationIssues } from '@/utils/handleValidationIssues';
-import { WorkflowOriginEnum } from '@novu/shared';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,8 +18,20 @@ import {
   AlertDialogTitle,
 } from '@/components/primitives/alert-dialog';
 import { buttonVariants } from '@/components/primitives/button';
-import { RiAlertFill } from 'react-icons/ri';
 import { Separator } from '@/components/primitives/separator';
+import { useEnvironment } from '@/context/environment/hooks';
+import { useFetchWorkflow, useFormAutoSave, useUpdateWorkflow } from '@/hooks';
+import { StepTypeEnum } from '@/utils/enums';
+import { handleValidationIssues } from '@/utils/handleValidationIssues';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { Step } from '@/utils/types';
+import debounce from 'lodash.debounce';
+import { RiAlertFill } from 'react-icons/ri';
+import { Form } from '../primitives/form/form';
+import { ToastIcon } from '../primitives/sonner';
+import { showToast } from '../primitives/sonner-helpers';
+import { workflowSchema } from './schema';
+import { WorkflowEditorContext } from './workflow-editor-context';
 
 const STEP_NAME_BY_TYPE: Record<StepTypeEnum, string> = {
   email: 'Email Step',
@@ -47,31 +48,50 @@ const STEP_NAME_BY_TYPE: Record<StepTypeEnum, string> = {
 const createStep = (type: StepTypeEnum): Step => ({
   name: STEP_NAME_BY_TYPE[type],
   stepId: '',
-  slug: '_stp_',
+  slug: '_st_',
   type,
   _id: crypto.randomUUID(),
 });
 
 export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) => {
-  const changesSavedToastIdRef = useRef<string | number>();
   const { currentEnvironment } = useEnvironment();
-  const { workflowSlug } = useParams<{ workflowSlug?: string }>();
+  const { workflowSlug = '' } = useParams<{ workflowSlug?: string; stepSlug?: string }>();
   const navigate = useNavigate();
-  const form = useForm<z.infer<typeof workflowSchema>>({ mode: 'onSubmit', resolver: zodResolver(workflowSchema) });
-  const { reset, setError } = form;
-  const steps = useFieldArray({
-    control: form.control,
-    name: 'steps',
-  });
+  const [toastId, setToastId] = useState<string | number>('');
 
   const { workflow, error } = useFetchWorkflow({
     workflowSlug,
   });
+  const defaultFormValues = useMemo(
+    () => ({ ...workflow, steps: workflow?.steps.map((step) => ({ ...step })) }),
+    [workflow]
+  );
+  const form = useForm<z.infer<typeof workflowSchema>>({
+    mode: 'onSubmit',
+    resolver: zodResolver(workflowSchema),
+    defaultValues: defaultFormValues,
+  });
+  const {
+    reset,
+    getValues,
+    setError,
+    formState: { isDirty },
+  } = form;
+  const steps = useFieldArray({
+    control: form.control,
+    name: 'steps',
+  });
   const isReadOnly = workflow?.origin === WorkflowOriginEnum.EXTERNAL;
+
+  const resetWorkflowForm = useCallback(
+    (workflow: WorkflowResponseDto) => {
+      reset({ ...workflow, steps: workflow.steps.map((step) => ({ ...step })) });
+    },
+    [reset]
+  );
 
   useLayoutEffect(() => {
     if (error) {
-      // TODO: check if this is the correct ROUTES
       navigate(buildRoute(ROUTES.WORKFLOWS, { environmentSlug: currentEnvironment?.slug ?? '' }));
     }
 
@@ -79,60 +99,92 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
       return;
     }
 
-    reset({ ...workflow, steps: workflow.steps.map((step) => ({ ...step })) });
-  }, [workflow, error, navigate, reset, currentEnvironment]);
+    resetWorkflowForm(workflow);
+  }, [workflow, error, navigate, resetWorkflowForm, currentEnvironment]);
 
   const { updateWorkflow, isPending } = useUpdateWorkflow({
+    onMutate: () => {
+      setToastId(
+        showToast({
+          children: () => (
+            <>
+              <ToastIcon variant={'default'} />
+              <span className="text-sm">Saving</span>
+            </>
+          ),
+          options: {
+            position: 'bottom-left',
+            classNames: {
+              toast: 'ml-10',
+            },
+          },
+        })
+      );
+    },
     onSuccess: (data) => {
-      reset({ ...data, steps: data.steps.map((step) => ({ ...step })) });
+      resetWorkflowForm(data);
 
       if (data.issues) {
         // TODO: remove the as any cast when BE issues are typed
-        handleValidationIssues({ fields: form.getValues(), issues: data.issues as any, setError });
+        handleValidationIssues({ fields: getValues(), issues: data.issues as any, setError });
       }
 
-      if (changesSavedToastIdRef.current) {
-        return;
-      }
-
-      const id = showToast({
-        children: () => (
-          <>
-            <ToastIcon />
-            <span className="text-sm">Saved</span>
-          </>
-        ),
-        options: {
-          position: 'bottom-left',
-          classNames: {
-            toast: 'ml-10',
+      setTimeout(() => {
+        showToast({
+          children: () => (
+            <>
+              <ToastIcon variant="success" />
+              <span className="text-sm">Saved</span>
+            </>
+          ),
+          options: {
+            position: 'bottom-left',
+            classNames: {
+              toast: 'ml-10',
+            },
+            id: toastId,
           },
-          onAutoClose: () => {
-            changesSavedToastIdRef.current = undefined;
-          },
-        },
-      });
-      changesSavedToastIdRef.current = id;
+        });
+      }, 1000);
     },
   });
 
-  const blocker = useBlocker(form.formState.isDirty || isPending);
+  const blocker = useBlocker(isDirty || isPending);
 
-  useFormAutoSave({
-    form,
-    onSubmit: async (data: z.infer<typeof workflowSchema>) => {
-      if (!workflow) {
+  const onSubmit = useCallback(
+    async (data: z.infer<typeof workflowSchema>) => {
+      if (!workflow || !form.formState.isDirty || isReadOnly) {
         return;
       }
 
       updateWorkflow({ id: workflow._id, workflow: { ...workflow, ...data } as any });
     },
-    enabled: !isReadOnly,
-    shouldSaveImmediately: (previousData, data) => {
+    [workflow, form.formState.isDirty, isReadOnly, updateWorkflow]
+  );
+
+  const debouncedSave = useCallback(debounce(form.handleSubmit(onSubmit), 800), [
+    form.handleSubmit,
+    onSubmit,
+    debounce,
+  ]);
+
+  useFormAutoSave({
+    form,
+    debouncedSave,
+    shouldFlush: (previousData, data) => {
       const currentStepsLength = data?.steps?.length ?? 0;
       const wasStepsLengthAltered = previousData.steps != null && currentStepsLength !== previousData.steps?.length;
+      if (wasStepsLengthAltered) {
+        return true;
+      }
 
-      return wasStepsLengthAltered;
+      const currentTagsLength = data?.tags?.length ?? 0;
+      const wasTagsLengthAltered = previousData.tags != null && currentTagsLength !== previousData.tags?.length;
+      if (wasTagsLengthAltered) {
+        return true;
+      }
+
+      return false;
     },
   });
 
@@ -164,8 +216,9 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
       isReadOnly,
       addStep,
       deleteStep,
+      resetWorkflowForm,
     }),
-    [addStep, isReadOnly, deleteStep]
+    [addStep, isReadOnly, deleteStep, resetWorkflowForm]
   );
 
   return (
@@ -198,7 +251,9 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
         </AlertDialogContent>
       </AlertDialog>
       <Form {...form}>
-        <form className="h-full">{children}</form>
+        <form className="h-full" onBlur={debouncedSave.flush}>
+          {children}
+        </form>
       </Form>
     </WorkflowEditorContext.Provider>
   );

@@ -65,12 +65,33 @@ export type DiscoverWorkflowOutput = {
   description?: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Workflow<T_Payload = any> = {
+/**
+ * A workflow resource.
+ *
+ * @property `id` - The unique identifier for the workflow.
+ * @property `trigger` - The function to trigger the workflow.
+ * @property `discover` - The function to discover the workflow definition.
+ */
+export type Workflow<T_Payload = never> = {
+  /**
+   * The unique identifier for the workflow.
+   */
+  id: string;
+  /**
+   * Trigger an event for this workflow with a strongly typed and validated `payload`, derived from the `payloadSchema`.
+   *
+   * @param event - The event to trigger
+   * @returns `EventTriggerResult` - The result of the event trigger
+   */
   trigger: (
     event: Prettify<Omit<EventTriggerParams<T_Payload>, 'workflowId' | 'bridgeUrl' | 'controls'>>
   ) => Promise<EventTriggerResult>;
-  definition: DiscoverWorkflowOutput;
+  /**
+   * Discover the workflow definition.
+   *
+   * @returns `DiscoverWorkflowOutput` - The workflow definition
+   */
+  discover: () => Promise<DiscoverWorkflowOutput>;
 };
 
 export type DiscoverOutput = {

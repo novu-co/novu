@@ -1,11 +1,16 @@
-import { JSONSchema } from 'json-schema-to-ts';
+import type { JSONSchemaDto } from './json-schema-dto';
+import { StepTypeEnum, WorkflowOriginEnum } from '../../types';
 
 export type StepDataDto = {
   controls: ControlsMetadata;
-  variables: JSONSchema;
+  variables: JSONSchemaDto;
   stepId: string;
   _id: string;
   name: string;
+  type: StepTypeEnum;
+  origin: WorkflowOriginEnum;
+  workflowId: string;
+  workflowDatabaseId: string;
 };
 
 export enum UiSchemaGroupEnum {
@@ -25,6 +30,7 @@ export enum UiComponentEnum {
 }
 
 export class UiSchemaProperty {
+  placeholder?: unknown;
   component: UiComponentEnum;
 }
 
@@ -34,7 +40,7 @@ export class UiSchema {
 }
 
 export class ControlsMetadata {
-  dataSchema?: JSONSchema;
+  dataSchema?: JSONSchemaDto;
   uiSchema?: UiSchema;
   values: Record<string, unknown>;
 }

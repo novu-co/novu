@@ -22,13 +22,13 @@ import {
   IdentifierOrInternalId,
   ListWorkflowResponse,
   StepDataDto,
+  SyncWorkflowDto,
   UpdateWorkflowDto,
   UserSessionData,
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
-  SyncWorkflowDto,
 } from '@novu/shared';
-import { UserAuthGuard, UserSession } from '@novu/application-generic';
+import { DeleteWorkflowCommand, DeleteWorkflowUseCase, UserAuthGuard, UserSession } from '@novu/application-generic';
 import { ApiCommonResponses } from '../shared/framework/response.decorator';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
 import { GetWorkflowCommand } from './usecases/get-workflow/get-workflow.command';
@@ -37,18 +37,18 @@ import { UpsertWorkflowCommand } from './usecases/upsert-workflow/upsert-workflo
 import { GetWorkflowUseCase } from './usecases/get-workflow/get-workflow.usecase';
 import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.usecase';
 import { ListWorkflowsCommand } from './usecases/list-workflows/list-workflows.command';
-import { DeleteWorkflowUseCase } from './usecases/delete-workflow/delete-workflow.usecase';
-import { DeleteWorkflowCommand } from './usecases/delete-workflow/delete-workflow.command';
 import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
 import { SyncToEnvironmentCommand } from './usecases/sync-to-environment/sync-to-environment.command';
 import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
-import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview-command';
 import { ParseSlugIdPipe } from './pipes/parse-slug-id.pipe';
 import { ParseSlugEnvironmentIdPipe } from './pipes/parse-slug-env-id.pipe';
-import { WorkflowTestDataUseCase } from './usecases/test-data/test-data.usecase';
-import { WorkflowTestDataCommand } from './usecases/test-data/test-data.command';
-import { GetStepDataCommand } from './usecases/get-step-schema/get-step-data.command';
-import { GetStepDataUsecase } from './usecases/get-step-schema/get-step-data.usecase';
+import {
+  BuildStepDataCommand,
+  BuildStepDataUsecase,
+  BuildWorkflowTestDataUseCase,
+  WorkflowTestDataCommand,
+} from './usecases';
+import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview.command';
 
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
@@ -63,8 +63,8 @@ export class WorkflowController {
     private deleteWorkflowUsecase: DeleteWorkflowUseCase,
     private syncToEnvironmentUseCase: SyncToEnvironmentUseCase,
     private generatePreviewUseCase: GeneratePreviewUsecase,
-    private workflowTestDataUseCase: WorkflowTestDataUseCase,
-    private getStepData: GetStepDataUsecase
+    private buildWorkflowTestDataUseCase: BuildWorkflowTestDataUseCase,
+    private buildStepDataUsecase: BuildStepDataUsecase
   ) {}
 
   @Post('')
@@ -138,7 +138,12 @@ export class WorkflowController {
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId
   ) {
     await this.deleteWorkflowUsecase.execute(
-      DeleteWorkflowCommand.create({ identifierOrInternalId: workflowId, user })
+      DeleteWorkflowCommand.create({
+        identifierOrInternalId: workflowId,
+        environmentId: user.environmentId,
+        organizationId: user.organizationId,
+        userId: user._id,
+      })
     );
   }
 
@@ -180,8 +185,8 @@ export class WorkflowController {
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
     @Param('stepId', ParseSlugIdPipe) stepId: IdentifierOrInternalId
   ): Promise<StepDataDto> {
-    return await this.getStepData.execute(
-      GetStepDataCommand.create({ user, identifierOrInternalId: workflowId, stepId })
+    return await this.buildStepDataUsecase.execute(
+      BuildStepDataCommand.create({ user, identifierOrInternalId: workflowId, stepId })
     );
   }
 
@@ -191,7 +196,7 @@ export class WorkflowController {
     @UserSession() user: UserSessionData,
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId
   ): Promise<WorkflowTestDataResponseDto> {
-    return this.workflowTestDataUseCase.execute(
+    return this.buildWorkflowTestDataUseCase.execute(
       WorkflowTestDataCommand.create({ identifierOrInternalId: workflowId, user })
     );
   }

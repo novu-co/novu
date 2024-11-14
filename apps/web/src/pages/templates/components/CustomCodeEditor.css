@@ -41,10 +41,7 @@
   color: #fff !important;
 }
 
-
-.custom-code-editor
-  .monaco-editor
-  .overflow-guard {
+.custom-code-editor .monaco-editor .overflow-guard {
   border-radius: 10px !important;
 }
 

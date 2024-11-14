@@ -34,10 +34,10 @@ export const StatusItem = (props: {
 }) => {
   return (
     <DropdownMenuItem
-      className={cn(dropdownItemVariants(), 'flex gap-8 justify-between hover:bg-[#E9E9E8]')}
+      className={cn(dropdownItemVariants(), 'flex justify-between gap-8 hover:bg-[#E9E9E8]')}
       onClick={props.onClick}
     >
-      <span className={'flex gap-2 items-center flex-nowrap'}>
+      <span className={'flex flex-nowrap items-center gap-2'}>
         <span>{props.icon}</span>
         <span>{props.label}</span>
       </span>
@@ -55,13 +55,13 @@ export const StatusDropdown = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className={'gap-2 flex'}>
+      <DropdownMenuTrigger className={'flex gap-2'}>
         <span className={'text-md font-semibold'}>{STATUS_TEXT[status]}</span>
         <span className={'text-foreground-alpha-600'}>
           <ArrowDropDown />
         </span>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-[#f5f5f4] text-[#726F77] min-w-content">
+      <DropdownMenuContent className="min-w-content bg-[#f5f5f4] text-[#726F77]">
         <StatusItem
           onClick={() => setStatus('all')}
           icon={<InboxIcon />}
