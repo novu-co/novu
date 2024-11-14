@@ -9,8 +9,17 @@ import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
 import { Tabs, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Notification5Fill } from '@/components/icons';
+import { WorkflowOriginEnum } from '@/utils/enums';
 
-const STEP_TYPE_TO_SKELETON_CONTENT: Record<StepTypeEnum, () => React.JSX.Element | null> = {
+const SingleLineSkeleton = () => {
+  return (
+    <div className="flex h-full flex-col gap-1">
+      <Skeleton className="h-10 w-full" />
+    </div>
+  );
+};
+
+const STEP_TYPE_TO_SKELETON_CONTENT: Record<StepTypeEnum | string, () => React.JSX.Element | null> = {
   [StepTypeEnum.EMAIL]: () => {
     return (
       <div className="flex h-full flex-col gap-1">
@@ -19,14 +28,7 @@ const STEP_TYPE_TO_SKELETON_CONTENT: Record<StepTypeEnum, () => React.JSX.Elemen
       </div>
     );
   },
-  [StepTypeEnum.CHAT]: () => {
-    return (
-      <div className="flex h-full flex-col gap-1">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-full w-full" />
-      </div>
-    );
-  },
+  [StepTypeEnum.CHAT]: SingleLineSkeleton,
   [StepTypeEnum.IN_APP]: () => {
     return (
       <>
@@ -44,64 +46,24 @@ const STEP_TYPE_TO_SKELETON_CONTENT: Record<StepTypeEnum, () => React.JSX.Elemen
       </>
     );
   },
-  [StepTypeEnum.SMS]: () => {
-    return (
-      <div className="flex h-full flex-col gap-1">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-full w-full" />
-      </div>
-    );
-  },
-  [StepTypeEnum.PUSH]: () => {
-    return (
-      <div className="flex h-full flex-col gap-1">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-full w-full" />
-      </div>
-    );
-  },
-  [StepTypeEnum.DIGEST]: () => {
-    return (
-      <div className="flex h-full flex-col gap-1">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-full w-full" />
-      </div>
-    );
-  },
-  [StepTypeEnum.DELAY]: () => {
-    return (
-      <div className="flex h-full flex-col gap-1">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-full w-full" />
-      </div>
-    );
-  },
-  [StepTypeEnum.TRIGGER]: () => {
-    return (
-      <div className="flex h-full flex-col gap-1">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-full w-full" />
-      </div>
-    );
-  },
-  [StepTypeEnum.CUSTOM]: () => {
-    return (
-      <div className="flex h-full flex-col gap-1">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-full w-full" />
-      </div>
-    );
-  },
+  [StepTypeEnum.SMS]: SingleLineSkeleton,
+  [StepTypeEnum.PUSH]: SingleLineSkeleton,
+  [StepTypeEnum.DIGEST]: () => null,
+  [StepTypeEnum.DELAY]: () => null,
+  [StepTypeEnum.TRIGGER]: () => null,
+  [StepTypeEnum.CUSTOM]: () => null,
 };
 
-export const StepSkeleton = ({ stepType }: { stepType?: StepTypeEnum }) => {
+export const StepSkeleton = ({
+  stepType,
+  workflowOrigin,
+}: {
+  stepType?: StepTypeEnum;
+  workflowOrigin?: WorkflowOriginEnum;
+}) => {
   const navigate = useNavigate();
 
-  if (!stepType) {
-    return null;
-  }
-
-  const SkeletonContent = STEP_TYPE_TO_SKELETON_CONTENT[stepType];
+  const SkeletonContent = STEP_TYPE_TO_SKELETON_CONTENT[stepType ?? ''];
 
   return (
     <div className="flex h-full flex-1 flex-col">
@@ -139,7 +101,11 @@ export const StepSkeleton = ({ stepType }: { stepType?: StepTypeEnum }) => {
       </header>
       <Separator />
       <div className="flex h-full w-full flex-col gap-3 px-3 py-3.5">
-        <SkeletonContent />
+        {workflowOrigin && workflowOrigin !== WorkflowOriginEnum.EXTERNAL ? (
+          <SkeletonContent />
+        ) : (
+          <SingleLineSkeleton />
+        )}
       </div>
       <Separator />
       <footer className="flex justify-end px-3 py-3.5">

@@ -69,7 +69,7 @@ const EditStepSidebarInternal = () => {
                 <SheetDescription />
               </VisuallyHidden>
               {isPending ? (
-                <StepSkeleton stepType={stepType} />
+                <StepSkeleton stepType={stepType} workflowOrigin={workflow?.origin} />
               ) : (
                 <>
                   {workflow && step && stepType && <StepEditor workflow={workflow} step={step} stepType={stepType} />}
