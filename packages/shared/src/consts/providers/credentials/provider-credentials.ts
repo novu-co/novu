@@ -607,14 +607,14 @@ export const oneSignalConfig: IConfigCredentials[] = [
     required: true,
   },
   {
-    key: CredentialsKeyEnum.Region,
+    key: CredentialsKeyEnum.ApiVersion,
     displayName: 'One Signal API',
     description: 'Select the One Signal API to use',
     type: 'dropdown',
     required: false,
     value: null,
     dropdown: [
-      { name: 'Default (Player Model)', value: null },
+      { name: 'Default (Player Model)', value: 'playerModel' },
       { name: 'External ID', value: 'externalId' },
     ],
   },

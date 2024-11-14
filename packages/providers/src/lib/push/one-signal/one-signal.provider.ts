@@ -26,15 +26,17 @@ export class OneSignalPushProvider
     private config: {
       appId: string;
       apiKey: string;
-      domain?: string | null;
+      apiVersion?: 'externalId' | 'playerModel' | null;
     },
   ) {
     super();
-    this.apiVersion = config.domain;
+    this.apiVersion = config.apiVersion;
+
     this.axiosInstance = axios.create({
-      baseURL: this.apiVersion
-        ? this.BASE_URL_USER_MODEL
-        : this.BASE_URL_PLAYER_MODEL,
+      baseURL:
+        config.apiVersion === 'externalId'
+          ? this.BASE_URL_USER_MODEL
+          : this.BASE_URL_PLAYER_MODEL,
     });
   }
 
@@ -44,13 +46,14 @@ export class OneSignalPushProvider
   ): Promise<ISendMessageSuccessResponse> {
     const { sound, badge, ...overrides } = options.overrides ?? {};
 
-    const targetSegment = this.apiVersion
-      ? {
-          include_aliases: {
-            external_id: options.target,
-          },
-        }
-      : { include_player_ids: options.target };
+    const targetSegment =
+      this.apiVersion === 'externalId'
+        ? {
+            include_aliases: {
+              external_id: options.target,
+            },
+          }
+        : { include_player_ids: options.target };
 
     const notification = this.transform(bridgeProviderData, {
       ...targetSegment,
