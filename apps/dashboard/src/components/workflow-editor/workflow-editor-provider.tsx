@@ -174,8 +174,17 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
     shouldFlush: (previousData, data) => {
       const currentStepsLength = data?.steps?.length ?? 0;
       const wasStepsLengthAltered = previousData.steps != null && currentStepsLength !== previousData.steps?.length;
+      if (wasStepsLengthAltered) {
+        return true;
+      }
 
-      return wasStepsLengthAltered;
+      const currentTagsLength = data?.tags?.length ?? 0;
+      const wasTagsLengthAltered = previousData.tags != null && currentTagsLength !== previousData.tags?.length;
+      if (wasTagsLengthAltered) {
+        return true;
+      }
+
+      return false;
     },
   });
 

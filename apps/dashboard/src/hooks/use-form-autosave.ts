@@ -32,6 +32,7 @@ export const useFormAutoSave = <T extends FieldValues>({
     const immediateSave = shouldFlush?.(watchedData, previousWatchedData.current) || false;
 
     if (immediateSave) {
+      debouncedSave();
       debouncedSave.flush();
     } else {
       debouncedSave();
