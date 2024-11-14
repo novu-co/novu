@@ -119,7 +119,6 @@ export class WorkflowControllerV1 {
         description: body.description,
         workflowId: body.identifier,
         defaultPreferences: DEFAULT_WORKFLOW_PREFERENCES,
-
         userPreferences:
           body.preferenceSettings &&
           buildWorkflowPreferencesFromPreferenceChannels(body.critical ?? false, body.preferenceSettings),
