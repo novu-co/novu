@@ -95,7 +95,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             </TableCell>
           </TooltipTrigger>
           <TooltipPortal>
-            <TooltipContent>{new Date(workflow.updatedAt).toUTCString()}</TooltipContent>
+            <TooltipContent align="start">{new Date(workflow.updatedAt).toUTCString()}</TooltipContent>
           </TooltipPortal>
         </Tooltip>
       </TooltipProvider>

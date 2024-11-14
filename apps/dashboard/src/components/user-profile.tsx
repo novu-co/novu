@@ -4,7 +4,7 @@ import { useNewDashboardOptIn } from '@/hooks/use-new-dashboard-opt-in';
 import { RiSignpostFill } from 'react-icons/ri';
 
 export function UserProfile() {
-  const { redirectToLegacyDashboard } = useNewDashboardOptIn();
+  const { optOut } = useNewDashboardOptIn();
 
   return (
     <UserButton afterSignOutUrl={ROUTES.SIGN_IN}>
@@ -12,7 +12,7 @@ export function UserProfile() {
         <UserButton.Action
           label="Go back to the legacy dashboard"
           labelIcon={<RiSignpostFill size="16" color="var(--nv-colors-typography-text-main)" />}
-          onClick={redirectToLegacyDashboard}
+          onClick={optOut}
         />
       </UserButton.MenuItems>
     </UserButton>

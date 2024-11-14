@@ -67,6 +67,7 @@ export function ConfigureWorkflow() {
           <FormField
             control={control}
             name="name"
+            defaultValue=""
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Workflow Name</FormLabel>
@@ -82,6 +83,7 @@ export function ConfigureWorkflow() {
           <FormField
             control={control}
             name="workflowId"
+            defaultValue=""
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Workflow Identifier</FormLabel>

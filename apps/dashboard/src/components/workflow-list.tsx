@@ -4,7 +4,6 @@ import { RiMore2Fill } from 'react-icons/ri';
 import { createSearchParams, useLocation, useSearchParams } from 'react-router-dom';
 import { getV2 } from '@/api/api.client';
 import { DefaultPagination } from '@/components/default-pagination';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { Skeleton } from '@/components/primitives/skeleton';
 import {
   Table,
@@ -22,7 +21,7 @@ import { WorkflowListEmpty } from '@/components/workflow-list-empty';
 
 export const WorkflowList = () => {
   const { currentEnvironment } = useEnvironment();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const location = useLocation();
 
   const hrefFromOffset = (offset: number) => {
@@ -30,13 +29,6 @@ export const WorkflowList = () => {
       ...searchParams,
       offset: offset.toString(),
     })}`;
-  };
-
-  const setLimit = (limit: number) => {
-    setSearchParams((searchParams) => {
-      searchParams.set('limit', limit.toString());
-      return searchParams;
-    });
   };
 
   const offset = parseInt(searchParams.get('offset') || '0');
@@ -102,7 +94,7 @@ export const WorkflowList = () => {
           ) : (
             <>
               {workflowsQuery.data.workflows.map((workflow) => (
-                <WorkflowRow workflow={workflow} />
+                <WorkflowRow key={workflow._id} workflow={workflow} />
               ))}
             </>
           )}
@@ -129,16 +121,9 @@ export const WorkflowList = () => {
                   ) : (
                     <Skeleton className="h-5 w-32" />
                   )}
-                  <Select onValueChange={(v) => setLimit(parseInt(v))} defaultValue={limit.toString()}>
-                    <SelectTrigger className="w-fit">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="12">12 / page</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
               </TableCell>
+              <TableCell colSpan={2} />
             </TableRow>
           </TableFooter>
         )}

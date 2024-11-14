@@ -6,7 +6,7 @@ import { StepTypeEnum } from '@/utils/enums';
 import { RiErrorWarningFill } from 'react-icons/ri';
 import { Popover, PopoverArrow, PopoverContent, PopoverPortal, PopoverTrigger } from '../primitives/popover';
 
-const nodeIconVariants = cva('w-5 h-5 border rounded-full opacity-40 flex items-center justify-center p-1', {
+const nodeIconVariants = cva('min-w-5 h-5 border rounded-full opacity-40 flex items-center justify-center p-1', {
   variants: {
     variant: {
       neutral: 'border-neutral-500 text-neutral-500',
@@ -34,17 +34,21 @@ export const NodeIcon = ({ children, variant }: NodeIconProps) => {
 };
 
 export const NodeName = ({ children }: { children: ReactNode }) => {
-  return <span className="text-foreground-950 text-sm font-medium">{children}</span>;
+  return (
+    <span className="text-foreground-950 overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium">
+      {children}
+    </span>
+  );
 };
 
 export const NodeHeader = ({ children, type }: { children: ReactNode; type: StepTypeEnum }) => {
   return (
-    <div className="flex items-center justify-between px-1 py-2">
-      <div className="flex items-center gap-1.5">{children}</div>
+    <div className="flex w-full items-center gap-1.5 px-1 py-2">
+      {children}
       <Badge
         variant={STEP_TYPE_TO_COLOR[type] as BadgeProps['variant']}
         kind="pill-stroke"
-        className="uppercase opacity-40"
+        className="ml-auto min-w-max uppercase opacity-40"
       >
         <BadgeContent variant={STEP_TYPE_TO_COLOR[type] as BadgeContentProps['variant']}>
           {type.replace('_', '-')}

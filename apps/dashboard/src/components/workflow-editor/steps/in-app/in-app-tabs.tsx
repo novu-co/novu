@@ -34,7 +34,7 @@ import {
   AlertDialogTitle,
 } from '@/components/primitives/alert-dialog';
 
-const tabsContentClassName = 'h-full w-full px-3 py-3.5';
+const tabsContentClassName = 'h-full w-full px-3 py-3.5 overflow-y-auto';
 
 export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; step: StepDataDto }) => {
   const { stepSlug = '', workflowSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
