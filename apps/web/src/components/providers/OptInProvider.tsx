@@ -25,7 +25,9 @@ export const _OptInProvider = (props: PropsWithChildren) => {
   const { status, isLoaded } = useNewDashboardOptIn();
 
   useEffect(() => {
-    if (isLoaded && status === NewDashboardOptInStatusEnum.OPTED_IN) {
+    const dashboardV2HostName = window.location.hostname.includes('dashboard-v2');
+
+    if (isLoaded && status === NewDashboardOptInStatusEnum.OPTED_IN && dashboardV2HostName) {
       const currentRoute = window.location.pathname.replace('/legacy', '');
 
       /**
