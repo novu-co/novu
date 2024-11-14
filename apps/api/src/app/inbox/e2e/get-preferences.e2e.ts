@@ -60,6 +60,7 @@ describe('Get all preferences - /inbox/preferences (GET)', function () {
   it('should allow filtering preferences by tags', async function () {
     const newsletterTag = 'newsletter';
     const securityTag = 'security';
+    const marketingTag = 'marketing';
     await session.createTemplate({
       noFeedId: true,
       tags: [newsletterTag],
@@ -67,6 +68,14 @@ describe('Get all preferences - /inbox/preferences (GET)', function () {
     await session.createTemplate({
       noFeedId: true,
       tags: [securityTag],
+    });
+    await session.createTemplate({
+      noFeedId: true,
+      tags: [marketingTag],
+    });
+    await session.createTemplate({
+      noFeedId: true,
+      tags: [],
     });
 
     const response = await session.testAgent

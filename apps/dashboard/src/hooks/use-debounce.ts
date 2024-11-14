@@ -1,5 +1,5 @@
-import { useCallback, useEffect } from 'react';
 import debounce from 'lodash.debounce';
+import { useCallback, useEffect } from 'react';
 import { useDataRef } from './use-data-ref';
 
 export const useDebounce = <Arguments extends any[]>(callback: (...args: Arguments) => void, ms = 0) => {

@@ -65,10 +65,16 @@ export type DiscoverWorkflowOutput = {
   description?: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Workflow<T_Payload = any> = {
+/**
+ * A workflow resource.
+ *
+ * @property `id` - The unique identifier for the workflow.
+ * @property `trigger` - The function to trigger the workflow.
+ * @property `discover` - The function to discover the workflow definition.
+ */
+export type Workflow<T_Payload = never> = {
   /**
-   * The unique identifier of the workflow.
+   * The unique identifier for the workflow.
    */
   id: string;
   /**
