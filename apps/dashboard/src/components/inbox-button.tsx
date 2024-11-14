@@ -17,7 +17,11 @@ export const InboxButton = () => {
           <Bell />
         </PopoverTrigger>
         <PopoverPortal>
-          <PopoverContent className="h-[500px] w-[350px] overflow-y-auto p-0 [&>div:first-child]:[&>div:first-child]:h-full [&>div:first-child]:h-full">
+          <PopoverContent
+            side="bottom"
+            align="end"
+            className="h-[500px] w-[350px] overflow-y-auto p-0 [&>div:first-child]:[&>div:first-child]:h-full [&>div:first-child]:h-full"
+          >
             <InboxContent />
           </PopoverContent>
         </PopoverPortal>
