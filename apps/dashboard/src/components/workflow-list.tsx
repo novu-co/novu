@@ -4,7 +4,6 @@ import { RiMore2Fill } from 'react-icons/ri';
 import { createSearchParams, useLocation, useSearchParams } from 'react-router-dom';
 import { getV2 } from '@/api/api.client';
 import { DefaultPagination } from '@/components/default-pagination';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { Skeleton } from '@/components/primitives/skeleton';
 import {
   Table,
