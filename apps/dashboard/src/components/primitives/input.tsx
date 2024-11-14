@@ -2,10 +2,13 @@ import * as React from 'react';
 
 import { cn } from '@/utils/ui';
 import { cva, VariantProps } from 'class-variance-authority';
-import { inputVariants } from '@/components/primitives/variants';
+
+export const inputVariants = cva(
+  'file:text-foreground placeholder:text-foreground-400 flex h-full w-full bg-transparent text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none disabled:cursor-not-allowed'
+);
 
 const inputFieldVariants = cva(
-  [
+  cn(
     // Base styles
     'text-foreground-950',
     'flex w-full flex-nowrap',
@@ -17,6 +20,7 @@ const inputFieldVariants = cva(
     // Focus states
     'focus-within:outline-none',
     'focus-visible:outline-none',
+    'focus-visible:ring-2',
 
     // Hover state
     'hover:bg-neutral-50',
@@ -34,8 +38,8 @@ const inputFieldVariants = cva(
     'has-[input:read-only]:text-foreground-700',
     'has-[input:read-only]:bg-neutral-alpha-100',
     'has-[input:read-only]:opacity-70',
-    'has-[input:read-only]:border-neutral-alpha-200',
-  ].join(' '),
+    'has-[input:read-only]:border-neutral-alpha-200'
+  ),
   {
     variants: {
       size: {
@@ -44,7 +48,7 @@ const inputFieldVariants = cva(
       },
       state: {
         default:
-          'border-neutral-alpha-200 focus-within:border-neutral-alpha-950 focus-visible:border-neutral-alpha-950',
+          'border-neutral-alpha-200 focus-within:border-neutral-alpha-400 focus-visible:border-neutral-alpha-400',
         error: 'border-destructive',
       },
     },

@@ -2,12 +2,12 @@
 
 import { Badge } from '@/components/primitives/badge';
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/primitives/popover';
-import { inputVariants } from '@/components/primitives/variants';
 import { CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/primitives/command';
 import { cn } from '@/utils/ui';
 import { Command } from 'cmdk';
 import { forwardRef, useEffect, useMemo, useState } from 'react';
 import { RiCloseFill } from 'react-icons/ri';
+import { inputVariants } from '@/components/primitives/input';
 
 type TagInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   value: string[];
