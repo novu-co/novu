@@ -126,7 +126,6 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
         title={`Sync workflow to ${oppositeEnvironment?.name}`}
         description={`Workflow already exists in ${oppositeEnvironment?.name}. Proceeding will overwrite the existing workflow.`}
         confirmButtonText="Proceed"
-        isLoading={isPending}
       />
     ),
   };
