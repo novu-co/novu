@@ -40,6 +40,8 @@ import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
 import { WorkflowOriginEnum } from '@/utils/enums';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { ConfirmationModal } from './confirmation-modal';
+import { showToast } from './primitives/sonner-helpers';
+import { ToastIcon } from './primitives/sonner';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -67,7 +69,40 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         workflowSlug: workflow.slug,
       });
 
-  const { deleteWorkflow } = useDeleteWorkflow();
+  const { deleteWorkflow, isPending } = useDeleteWorkflow({
+    onSuccess: () => {
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="success" />
+            <span className="text-sm">Deleted</span>
+          </>
+        ),
+        options: {
+          position: 'bottom-right',
+          classNames: {
+            toast: 'mb-4 ml-auto justify-end',
+          },
+        },
+      });
+    },
+    onError: () => {
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="error" />
+            <span className="text-sm">Failed to delete</span>
+          </>
+        ),
+        options: {
+          position: 'bottom-right',
+          classNames: {
+            toast: 'mb-4',
+          },
+        },
+      });
+    },
+  });
 
   const onDeleteStep = async () => {
     await deleteWorkflow({
@@ -133,6 +168,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           title="Are you sure?"
           description={`You're about to delete the ${workflow.name}, this action cannot be undone.`}
           confirmButtonText="Delete"
+          isLoading={isPending}
         />
         {/**
          * Needs modal={false} to prevent the click freeze after the modal is closed

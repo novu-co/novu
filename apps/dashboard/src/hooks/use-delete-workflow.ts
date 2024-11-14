@@ -10,8 +10,8 @@ export const useDeleteWorkflow = (
   const { mutateAsync, ...rest } = useMutation({
     mutationFn: deleteWorkflow,
     ...options,
-    onSuccess: (data, variables, ctx) => {
-      queryClient.invalidateQueries({
+    onSuccess: async (data, variables, ctx) => {
+      await queryClient.invalidateQueries({
         queryKey: [QueryKeys.fetchWorkflows],
       });
 
