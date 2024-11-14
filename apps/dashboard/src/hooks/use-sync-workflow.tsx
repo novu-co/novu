@@ -122,10 +122,14 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
       <ConfirmationModal
         open={showConfirmModal}
         onOpenChange={setShowConfirmModal}
-        onConfirm={syncWorkflowMutation}
+        onConfirm={() => {
+          syncWorkflowMutation();
+          setShowConfirmModal(false);
+        }}
         title={`Sync workflow to ${oppositeEnvironment?.name}`}
         description={`Workflow already exists in ${oppositeEnvironment?.name}. Proceeding will overwrite the existing workflow.`}
         confirmButtonText="Proceed"
+        isLoading={isPending}
       />
     ),
   };
