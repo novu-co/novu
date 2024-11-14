@@ -57,6 +57,9 @@ import {
 } from '../upsert-preferences';
 import { GetPreferences } from '../get-preferences';
 
+/**
+ * @deprecated - use `UpsertWorkflow` instead
+ */
 @Injectable()
 export class CreateWorkflow {
   constructor(
@@ -355,8 +358,8 @@ export class CreateWorkflow {
         }),
       );
     const [userWorkflowPreferences] = await Promise.all([
-      workflowResourcePreferencesPromise,
       userWorkflowPreferencesPromise,
+      workflowResourcePreferencesPromise,
     ]);
     const preferenceSettings =
       GetPreferences.mapWorkflowPreferencesToChannelPreferences(

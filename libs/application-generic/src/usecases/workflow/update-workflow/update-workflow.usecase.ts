@@ -54,6 +54,9 @@ import {
   UpdateMessageTemplateCommand,
 } from '../../message-template';
 
+/**
+ * @deprecated - use `UpsertWorkflow` instead
+ */
 @Injectable()
 export class UpdateWorkflow {
   constructor(
