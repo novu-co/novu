@@ -20,6 +20,7 @@ import { Injectable } from '@nestjs/common';
 import { ProcessWorkflowIssuesCommand } from './process-workflow-issues.command';
 import { ValidateControlValuesAndConstructPassableStructureUsecase } from '../validate-control-values/build-default-control-values-usecase.service';
 import { WorkflowNotFoundException } from '../../exceptions/workflow-not-found-exception';
+import { ControlValuesMap } from '../../shared/control-value.map';
 
 @Injectable()
 export class ProcessWorkflowIssuesUsecase {
@@ -31,7 +32,7 @@ export class ProcessWorkflowIssuesUsecase {
 
   async execute(command: ProcessWorkflowIssuesCommand): Promise<NotificationTemplateEntity> {
     const workflowIssues = await this.validateWorkflow(command);
-    const stepIdToControlValuesMap: { [p: string]: ControlValuesEntity } = await this.fetchStepsControlValue(command);
+    const stepIdToControlValuesMap = await this.fetchStepsControlValue(command);
     const stepIssues = this.validateSteps(command.workflow.steps, stepIdToControlValuesMap);
     const workflowWithIssues = this.updateIssuesOnWorkflow(command.workflow, workflowIssues, stepIssues);
     await this.persistWorkflow(command, workflowWithIssues);
@@ -39,16 +40,20 @@ export class ProcessWorkflowIssuesUsecase {
     return await this.getWorkflow(command);
   }
 
-  private async fetchStepsControlValue(command: ProcessWorkflowIssuesCommand) {
+  private async fetchStepsControlValue(command: ProcessWorkflowIssuesCommand): Promise<ControlValuesMap | null> {
     const stepsControlValues = await this.controlValuesRepository.find({
       _environmentId: command.user.environmentId,
       _organizationId: command.user.organizationId,
       _workflowId: command.workflow._id,
       level: ControlValuesLevelEnum.STEP_CONTROLS,
     });
-    const stepIdToControlValuesMap: { [p: string]: ControlValuesEntity } = {};
+    const stepIdToControlValuesMap: ControlValuesMap = {};
     for (const stepsControlValue of stepsControlValues) {
       stepIdToControlValuesMap[stepsControlValue._stepId] = stepsControlValue;
+    }
+
+    if (Object.keys(stepIdToControlValuesMap).length === 0) {
+      return null;
     }
 
     return stepIdToControlValuesMap;
@@ -111,7 +116,7 @@ export class ProcessWorkflowIssuesUsecase {
 
   private validateSteps(
     steps: NotificationStepEntity[],
-    stepIdToControlValuesMap: { [p: string]: ControlValuesEntity }
+    stepIdToControlValuesMap: ControlValuesMap | null
   ): Record<string, StepIssuesDto> {
     const stepIdToIssues: Record<string, StepIssuesDto> = {};
     for (const step of steps) {
@@ -127,15 +132,13 @@ export class ProcessWorkflowIssuesUsecase {
 
   private addControlIssues(
     step: NotificationStepEntity,
-    stepIdToControlValuesMap: {
-      [p: string]: ControlValuesEntity;
-    },
+    stepIdToControlValuesMap: ControlValuesMap | null,
     stepIssues: StepIssuesDto
   ) {
     if (step.template?.controls) {
       const { issuesMissingValues } = this.buildDefaultControlValuesUsecase.execute({
         controlSchema: step.template?.controls,
-        controlValues: stepIdToControlValuesMap[step._templateId].controls,
+        controlValues: stepIdToControlValuesMap?.[step._templateId]?.controls,
       });
       // eslint-disable-next-line no-param-reassign
       stepIssues.controls = issuesMissingValues;

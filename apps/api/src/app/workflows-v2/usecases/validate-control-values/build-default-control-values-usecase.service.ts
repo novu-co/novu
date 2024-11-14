@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ContentIssue, JSONSchemaDto, StepContentIssueEnum } from '@novu/shared';
 import _ = require('lodash');
+import { ControlsKeyValue, ControlValues } from '@novu/dal';
 import { ExtractDefaultsUsecase } from '../get-default-values-from-schema/extract-defaults.usecase';
 import { BuildDefaultControlValuesCommand } from './build-default-control-values.command';
 import { findMissingKeys } from '../../util/utils';
@@ -11,7 +12,7 @@ export class ValidateControlValuesAndConstructPassableStructureUsecase {
   constructor(private extractDefaultsUseCase: ExtractDefaultsUsecase) {}
 
   execute(command: BuildDefaultControlValuesCommand): {
-    augmentedControlValues: Record<string, unknown>;
+    augmentedControlValues: ControlsKeyValue;
     issuesMissingValues: Record<string, ContentIssue[]>;
   } {
     const defaultValues = this.extractDefaultsUseCase.execute({
@@ -24,8 +25,8 @@ export class ValidateControlValuesAndConstructPassableStructureUsecase {
     };
   }
 
-  private buildMissingControlValuesIssuesList(defaultValues: Record<string, any>, controlValues: Record<string, any>) {
-    const missingRequiredControlValues = findMissingKeys(defaultValues, controlValues);
+  private buildMissingControlValuesIssuesList(defaultValues: Record<string, any>, controlValues?: ControlsKeyValue) {
+    const missingRequiredControlValues = findMissingKeys(defaultValues, controlValues || {});
 
     return this.buildContentIssues(missingRequiredControlValues);
   }

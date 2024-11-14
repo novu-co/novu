@@ -117,7 +117,7 @@ export class UpsertWorkflowUseCase {
         (commandStepItem) => commandStepItem.name === persistedStep.name
       );
 
-      if (!stepInDto || Object.keys(stepInDto.controlValues || {}).length === 0) {
+      if (!stepInDto || stepInDto.controlValues === undefined) {
         // TODO: should delete the values from the database?  or just ignore?
         continue;
       }
