@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ChangeRepository, DalException } from '@novu/dal';
+import { ChangeRepository, DalException, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import { ChangeEntityTypeEnum } from '@novu/shared';
 import {
   AnalyticsService,
@@ -26,7 +26,8 @@ export class DeleteNotificationTemplate {
     private changeRepository: ChangeRepository,
     private analyticsService: AnalyticsService,
     private deleteWorkflowUseCase: DeleteWorkflowUseCase,
-    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase
+    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
+    private notificationTemplateRepository: NotificationTemplateRepository
   ) {}
 
   async execute(command: DeleteNotificationTemplateCommand) {
@@ -55,12 +56,19 @@ export class DeleteNotificationTemplate {
         })
       );
 
+      const item: NotificationTemplateEntity = (
+        await this.notificationTemplateRepository.findDeleted({
+          _environmentId: command.environmentId,
+          _id: command.templateId,
+        })
+      )?.[0];
+
       await this.createChange.execute(
         CreateChangeCommand.create({
           organizationId: command.organizationId,
           environmentId: command.environmentId,
           userId: command.userId,
-          item: workflowEntity,
+          item,
           type: ChangeEntityTypeEnum.NOTIFICATION_TEMPLATE,
           changeId: parentChangeId,
         })
@@ -71,8 +79,8 @@ export class DeleteNotificationTemplate {
         _environment: command.environmentId,
         _templateId: command.templateId,
         data: {
-          draft: workflowEntity.draft,
-          critical: workflowEntity.critical,
+          draft: item.draft,
+          critical: item.critical,
         },
       });
     } catch (e) {
