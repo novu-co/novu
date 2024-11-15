@@ -7,7 +7,7 @@ import {
   UpsertControlValuesCommand,
   UpsertControlValuesUseCase,
 } from '@novu/application-generic';
-import { PatchStepDataCommand } from './patch-step-data.command';
+import { PatchStepCommand } from './patch-step.command';
 import { BuildStepDataUsecase } from '../build-step-data';
 import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
 
@@ -16,7 +16,7 @@ type ValidNotificationWorkflow = {
   workflow: NotificationTemplateEntity;
 };
 @Injectable()
-export class PatchStepDataUsecase {
+export class PatchStepUsecase {
   constructor(
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private buildStepDataUsecase: BuildStepDataUsecase,
@@ -25,7 +25,7 @@ export class PatchStepDataUsecase {
     private postProcessWorkflowUpdate: PostProcessWorkflowUpdate
   ) {}
 
-  async execute(command: PatchStepDataCommand): Promise<StepDataDto> {
+  async execute(command: PatchStepCommand): Promise<StepDataDto> {
     const persistedItems = await this.loadPersistedItems(command);
     await this.patchFieldsOnPersistedItems(command, persistedItems);
     const updatedWorkflow = await this.postProcessWorkflowUpdate.execute({
@@ -37,7 +37,7 @@ export class PatchStepDataUsecase {
     return await this.buildStepDataUsecase.execute({ ...command });
   }
 
-  private async patchFieldsOnPersistedItems(command: PatchStepDataCommand, persistedItems: ValidNotificationWorkflow) {
+  private async patchFieldsOnPersistedItems(command: PatchStepCommand, persistedItems: ValidNotificationWorkflow) {
     if (command.name !== undefined) {
       await this.updateName(persistedItems, command);
     }
@@ -47,7 +47,7 @@ export class PatchStepDataUsecase {
     }
   }
 
-  private async loadPersistedItems(command: PatchStepDataCommand) {
+  private async loadPersistedItems(command: PatchStepCommand) {
     const workflow = await this.fetchWorkflow(command);
 
     const { currentStep } = await this.findStepWithSameMemoryPointer(command, workflow);
@@ -55,7 +55,7 @@ export class PatchStepDataUsecase {
     return { workflow, currentStep };
   }
 
-  private async updateName(persistedItems: ValidNotificationWorkflow, command: PatchStepDataCommand) {
+  private async updateName(persistedItems: ValidNotificationWorkflow, command: PatchStepCommand) {
     persistedItems.currentStep.name = command.name;
   }
   private async persistWorkflow(
@@ -73,7 +73,7 @@ export class PatchStepDataUsecase {
     );
   }
 
-  private async fetchWorkflow(command: PatchStepDataCommand) {
+  private async fetchWorkflow(command: PatchStepCommand) {
     return await this.getWorkflowByIdsUseCase.execute({
       identifierOrInternalId: command.identifierOrInternalId,
       environmentId: command.user.environmentId,
@@ -82,7 +82,7 @@ export class PatchStepDataUsecase {
     });
   }
 
-  private async findStepWithSameMemoryPointer(command: PatchStepDataCommand, workflow: NotificationTemplateEntity) {
+  private async findStepWithSameMemoryPointer(command: PatchStepCommand, workflow: NotificationTemplateEntity) {
     const currentStep = workflow.steps.find(
       (stepItem) => stepItem._id === command.stepId || stepItem.stepId === command.stepId
     );
@@ -97,7 +97,7 @@ export class PatchStepDataUsecase {
 
     return { currentStep };
   }
-  private async updateControlValues(persistedItems: ValidNotificationWorkflow, command: PatchStepDataCommand) {
+  private async updateControlValues(persistedItems: ValidNotificationWorkflow, command: PatchStepCommand) {
     return await this.upsertControlValuesUseCase.execute(
       UpsertControlValuesCommand.create({
         organizationId: command.user.organizationId,

@@ -40,7 +40,7 @@ import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
 import { WorkflowNotFoundException } from '../../exceptions/workflow-not-found-exception';
-import { PatchStepDataUsecase } from '../patch-step-data';
+import { PatchStepUsecase } from '../patch-step-data';
 import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
 
 @Injectable()
@@ -54,7 +54,7 @@ export class UpsertWorkflowUseCase {
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private getPreferencesUseCase: GetPreferences,
     private notificationTemplateRepository: NotificationTemplateRepository,
-    private patchStepDataUsecase: PatchStepDataUsecase
+    private patchStepDataUsecase: PatchStepUsecase
   ) {}
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
     const workflowForUpdate = await this.queryWorkflow(command);

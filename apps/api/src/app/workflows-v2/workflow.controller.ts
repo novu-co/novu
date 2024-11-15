@@ -51,8 +51,8 @@ import {
   WorkflowTestDataCommand,
 } from './usecases';
 import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview.command';
-import { PatchStepDataUsecase } from './usecases/patch-step-data/patch-step-data.usecase';
-import { PatchStepDataCommand } from './usecases/patch-step-data';
+import { PatchStepUsecase } from './usecases/patch-step-data/patch-step-usecase.service';
+import { PatchStepCommand } from './usecases/patch-step-data';
 import { PatchWorkflowCommand, PatchWorkflowUsecase } from './usecases/patch-workflow';
 
 @ApiCommonResponses()
@@ -70,7 +70,7 @@ export class WorkflowController {
     private generatePreviewUseCase: GeneratePreviewUsecase,
     private buildWorkflowTestDataUseCase: BuildWorkflowTestDataUseCase,
     private buildStepDataUsecase: BuildStepDataUsecase,
-    private patchStepDataUsecase: PatchStepDataUsecase,
+    private patchStepDataUsecase: PatchStepUsecase,
     private patchWorkflowUsecase: PatchWorkflowUsecase
   ) {}
 
@@ -204,7 +204,7 @@ export class WorkflowController {
     @Param('stepId', ParseSlugIdPipe) stepId: IdentifierOrInternalId,
     @Body() patchStepDataDto: PatchStepDataDto
   ): Promise<StepDataDto> {
-    const command = PatchStepDataCommand.create({ user, identifierOrInternalId, stepId, ...patchStepDataDto });
+    const command = PatchStepCommand.create({ user, identifierOrInternalId, stepId, ...patchStepDataDto });
 
     return await this.patchStepDataUsecase.execute(command);
   }

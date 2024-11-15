@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserSessionData, WorkflowResponseDto } from '@novu/shared';
 import { NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import { GetWorkflowByIdsUseCase } from '@novu/application-generic';
@@ -57,20 +57,11 @@ export class PatchWorkflowUsecase {
   }
 
   private async fetchWorkflow(command: PatchWorkflowCommand) {
-    const workflow = await this.getWorkflowByIdsUseCase.execute({
+    return await this.getWorkflowByIdsUseCase.execute({
       identifierOrInternalId: command.identifierOrInternalId,
       environmentId: command.user.environmentId,
       organizationId: command.user.organizationId,
       userId: command.user._id,
     });
-
-    if (!workflow) {
-      throw new BadRequestException({
-        message: 'No workflow found',
-        workflowId: command.identifierOrInternalId,
-      });
-    }
-
-    return workflow;
   }
 }

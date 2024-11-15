@@ -2,7 +2,7 @@ import { EnvironmentWithUserObjectCommand } from '@novu/application-generic';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { IdentifierOrInternalId } from '@novu/shared';
 
-export class PatchStepDataCommand extends EnvironmentWithUserObjectCommand {
+export class PatchStepCommand extends EnvironmentWithUserObjectCommand {
   @IsString()
   @IsNotEmpty()
   identifierOrInternalId: IdentifierOrInternalId;
