@@ -8,7 +8,7 @@ export type DevCommandOptions = {
   dashboardUrl: string;
   route: string;
   tunnel: string;
-  open: boolean; // commander.js negates flags prefixed with `--no`, so `--no-open` is `open: false`
+  headless: boolean;
 };
 
 export type LocalTunnelResponse = {
