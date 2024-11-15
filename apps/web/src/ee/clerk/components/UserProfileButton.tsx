@@ -4,6 +4,7 @@ import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { ROUTES } from '../../../constants/routes';
 import { useNewDashboardOptIn } from '../../../hooks/useNewDashboardOptIn';
 import { useFeatureFlag } from '../../../hooks';
+import { WEB_APP_URL } from '../../../config';
 
 export function UserProfileButton() {
   const { optIn } = useNewDashboardOptIn();
@@ -11,7 +12,7 @@ export function UserProfileButton() {
 
   return (
     <UserButton
-      afterSignOutUrl={`${window.location.origin}${ROUTES.AUTH_LOGIN}`}
+      afterSignOutUrl={`${WEB_APP_URL}${ROUTES.AUTH_LOGIN}`}
       userProfileUrl={ROUTES.MANAGE_ACCOUNT_USER_PROFILE}
     >
       {isNewDashboardEnabled && (
