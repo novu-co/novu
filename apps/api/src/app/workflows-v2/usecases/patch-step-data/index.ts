@@ -1,2 +1,2 @@
 export * from './patch-step.command';
-export * from './patch-step-usecase.service';
+export * from './patch-step.usecase';

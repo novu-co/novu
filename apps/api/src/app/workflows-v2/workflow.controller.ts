@@ -51,9 +51,9 @@ import {
   WorkflowTestDataCommand,
 } from './usecases';
 import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview.command';
-import { PatchStepUsecase } from './usecases/patch-step-data/patch-step-usecase.service';
 import { PatchStepCommand } from './usecases/patch-step-data';
 import { PatchWorkflowCommand, PatchWorkflowUsecase } from './usecases/patch-workflow';
+import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
 
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
