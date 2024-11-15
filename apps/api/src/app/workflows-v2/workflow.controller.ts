@@ -22,6 +22,7 @@ import {
   IdentifierOrInternalId,
   ListWorkflowResponse,
   PatchStepDataDto,
+  PatchWorkflowDto,
   StepDataDto,
   SyncWorkflowDto,
   UpdateWorkflowDto,
@@ -50,8 +51,9 @@ import {
   WorkflowTestDataCommand,
 } from './usecases';
 import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview.command';
-import { PatchStepDataUsecase } from './usecases/patch-step-data/patch-step-data.usecase';
-import { PatchStepDataCommand } from './usecases/patch-step-data';
+import { PatchStepCommand } from './usecases/patch-step-data';
+import { PatchWorkflowCommand, PatchWorkflowUsecase } from './usecases/patch-workflow';
+import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
 
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
@@ -68,7 +70,8 @@ export class WorkflowController {
     private generatePreviewUseCase: GeneratePreviewUsecase,
     private buildWorkflowTestDataUseCase: BuildWorkflowTestDataUseCase,
     private buildStepDataUsecase: BuildStepDataUsecase,
-    private patchStepDataUsecase: PatchStepDataUsecase
+    private patchStepDataUsecase: PatchStepUsecase,
+    private patchWorkflowUsecase: PatchWorkflowUsecase
   ) {}
 
   @Post('')
@@ -201,9 +204,20 @@ export class WorkflowController {
     @Param('stepId', ParseSlugIdPipe) stepId: IdentifierOrInternalId,
     @Body() patchStepDataDto: PatchStepDataDto
   ): Promise<StepDataDto> {
-    const command = PatchStepDataCommand.create({ user, identifierOrInternalId, stepId, ...patchStepDataDto });
+    const command = PatchStepCommand.create({ user, identifierOrInternalId, stepId, ...patchStepDataDto });
 
     return await this.patchStepDataUsecase.execute(command);
+  }
+  @Patch('/:workflowId')
+  @UseGuards(UserAuthGuard)
+  async patchWorkflow(
+    @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
+    @Param('workflowId', ParseSlugIdPipe) identifierOrInternalId: IdentifierOrInternalId,
+    @Body() patchWorkflowDto: PatchWorkflowDto
+  ): Promise<WorkflowResponseDto> {
+    const command = PatchWorkflowCommand.create({ user, identifierOrInternalId, ...patchWorkflowDto });
+
+    return await this.patchWorkflowUsecase.execute(command);
   }
   @Get('/:workflowId/test-data')
   @UseGuards(UserAuthGuard)
