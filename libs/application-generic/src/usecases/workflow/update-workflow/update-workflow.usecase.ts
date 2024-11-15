@@ -299,21 +299,20 @@ export class UpdateWorkflow {
     });
 
     const notificationTemplateWithStepTemplate =
-      await this.notificationTemplateRepository.findById(
-        command.id,
-        command.environmentId,
+      await this.getWorkflowByIdsUseCase.execute(
+        GetWorkflowByIdsCommand.create({
+          userId: command.userId,
+          environmentId: command.environmentId,
+          organizationId: command.organizationId,
+          identifierOrInternalId: command.id,
+        }),
       );
-    if (!notificationTemplateWithStepTemplate) {
-      throw new NotFoundException(
-        `Notification template ${command.id} is not found`,
-      );
-    }
-
-    const notificationTemplate = this.cleanNotificationTemplate(
-      notificationTemplateWithStepTemplate,
-    );
 
     if (!isBridgeWorkflow(command.type)) {
+      const notificationTemplate = this.cleanNotificationTemplate(
+        notificationTemplateWithStepTemplate,
+      );
+
       await this.createChange.execute(
         CreateChangeCommand.create({
           organizationId: command.organizationId,
@@ -372,14 +371,7 @@ export class UpdateWorkflow {
       );
     }
 
-    return this.getWorkflowByIdsUseCase.execute(
-      GetWorkflowByIdsCommand.create({
-        userId: command.userId,
-        environmentId: command.environmentId,
-        organizationId: command.organizationId,
-        identifierOrInternalId: command.id,
-      }),
-    );
+    return notificationTemplateWithStepTemplate;
   }
 
   private validatePayload(command: UpdateWorkflowCommand) {
