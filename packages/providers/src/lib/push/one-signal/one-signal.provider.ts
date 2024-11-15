@@ -52,6 +52,7 @@ export class OneSignalPushProvider
             include_aliases: {
               external_id: options.target,
             },
+            target_channel: 'push',
           }
         : { include_player_ids: options.target };
 
