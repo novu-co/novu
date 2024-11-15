@@ -113,7 +113,7 @@ export class UpdateWorkflow {
       updatePayload.name = command.name;
     }
 
-    if (command.active) {
+    if (command.active !== undefined) {
       updatePayload.active = command.active;
     }
 

@@ -1,8 +1,8 @@
 import { EnvironmentWithUserObjectCommand } from '@novu/application-generic';
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { IdentifierOrInternalId, PatchStepFieldEnum } from '@novu/shared';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IdentifierOrInternalId } from '@novu/shared';
 
-export class PatchStepDataCommand extends EnvironmentWithUserObjectCommand {
+export class PatchStepCommand extends EnvironmentWithUserObjectCommand {
   @IsString()
   @IsNotEmpty()
   identifierOrInternalId: IdentifierOrInternalId;
@@ -10,8 +10,6 @@ export class PatchStepDataCommand extends EnvironmentWithUserObjectCommand {
   @IsString()
   @IsNotEmpty()
   stepId: IdentifierOrInternalId;
-  @IsArray()
-  fieldsToUpdate: PatchStepFieldEnum[];
 
   @IsString()
   @IsOptional()

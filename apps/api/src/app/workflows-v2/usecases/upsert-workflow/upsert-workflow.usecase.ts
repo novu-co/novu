@@ -1,14 +1,8 @@
-import {
-  NotificationGroupRepository,
-  NotificationStepEntity,
-  NotificationTemplateEntity,
-  NotificationTemplateRepository,
-} from '@novu/dal';
+import { NotificationGroupRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import {
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
   IdentifierOrInternalId,
-  PatchStepFieldEnum,
   slugify,
   StepCreateDto,
   StepDto,
@@ -31,12 +25,11 @@ import {
   UpdateWorkflow,
   UpdateWorkflowCommand,
 } from '@novu/application-generic';
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
-import { WorkflowNotFoundException } from '../../exceptions/workflow-not-found-exception';
-import { PatchStepDataUsecase } from '../patch-step-data';
+import { PatchStepUsecase } from '../patch-step-data';
 import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
 
 @Injectable()
@@ -47,8 +40,7 @@ export class UpsertWorkflowUseCase {
     private notificationGroupRepository: NotificationGroupRepository,
     private workflowUpdatePostProcess: PostProcessWorkflowUpdate,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private notificationTemplateRepository: NotificationTemplateRepository,
-    private patchStepDataUsecase: PatchStepDataUsecase
+    private patchStepDataUsecase: PatchStepUsecase
   ) {}
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
     const workflowForUpdate = await this.queryWorkflow(command);
@@ -74,16 +66,8 @@ export class UpsertWorkflowUseCase {
     );
   }
 
-  private async persistWorkflow(workflowWithIssues: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
-    await this.notificationTemplateRepository.update(
-      {
-        _id: workflowWithIssues._id,
-        _environmentId: command.user.environmentId,
-      },
-      {
-        ...workflowWithIssues,
-      }
-    );
+  private async persistWorkflow(workflowWithIssues: WorkflowInternalResponseDto) {
+    await this.updateWorkflowUsecase.execute(UpdateWorkflowCommand.create(workflowWithIssues));
   }
 
   private async queryWorkflow(command: UpsertWorkflowCommand): Promise<WorkflowInternalResponseDto | null> {
@@ -286,29 +270,34 @@ export class UpsertWorkflowUseCase {
     workflow: NotificationTemplateEntity,
     command: UpsertWorkflowCommand
   ): Promise<WorkflowInternalResponseDto> {
-    for (const stepRequest of command.workflowDto.steps) {
-      const persistedStepDbId = workflow.steps.find((step) => step.name === stepRequest.name)?._templateId;
-      if (!persistedStepDbId) {
-        throw new InternalServerErrorException({
-          message: 'Step not found in persistence, this should not happen',
-          stepName: stepRequest.name,
-        });
-      }
-      if (!stepRequest.controlValues) {
+    for (const step of workflow.steps) {
+      const controlValues = this.findControlValueInRequest(step, command.workflowDto.steps);
+      if (!controlValues) {
         continue;
       }
-
       await this.patchStepDataUsecase.execute({
-        controlValues: stepRequest.controlValues,
-        fieldsToUpdate: [PatchStepFieldEnum.CONTROL_VALUES],
+        controlValues,
         identifierOrInternalId: workflow._id,
-        name: stepRequest.name,
-        stepId: persistedStepDbId,
+        name: step.name,
+        stepId: step._templateId,
         user: command.user,
       });
     }
 
     return await this.getWorkflow(workflow._id, command);
+  }
+
+  private findControlValueInRequest(
+    step: NotificationStepEntity,
+    steps: (StepCreateDto | StepUpdateDto)[] | StepCreateDto[]
+  ): Record<string, unknown> | undefined {
+    return steps.find((stepRequest) => {
+      if (this.isStepUpdateDto(stepRequest)) {
+        return stepRequest._id === step._templateId;
+      }
+
+      return stepRequest.name === step.name;
+    })?.controlValues;
   }
 }
 

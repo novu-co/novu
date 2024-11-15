@@ -1,2 +1,2 @@
-export * from './patch-step-data.command';
-export * from './patch-step-data.usecase';
+export * from './patch-step.command';
+export * from './patch-step.usecase';

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FaCode } from 'react-icons/fa6';
 import {
   RiDeleteBin2Line,
+  RiFileCopyLine,
   RiGitPullRequestFill,
   RiMore2Fill,
   RiPauseCircleLine,
@@ -10,7 +11,6 @@ import {
 } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { IEnvironment, WorkflowListResponseDto } from '@novu/shared';
-
 import { Badge, BadgeContent } from '@/components/primitives/badge';
 import { Button } from '@/components/primitives/button';
 import {
@@ -125,12 +125,15 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           {/**
            * reloadDocument is needed for v1 workflows to reload the document when the user navigates to the workflow editor
            */}
-          <Link to={workflowLink} reloadDocument={isV1Workflow}>
-            <TruncatedText className="cursor-pointer" text={workflow.name} />
-          </Link>
+          <TruncatedText className="max-w-[32ch]" asChild>
+            <Link to={workflowLink} reloadDocument={isV1Workflow}>
+              {workflow.name}
+            </Link>
+          </TruncatedText>
         </div>
-        <HoverToCopy valueToCopy={workflow.workflowId}>
-          <TruncatedText className="text-foreground-400 font-code block text-xs" text={workflow.workflowId} />
+        <HoverToCopy className="group flex items-center gap-1" valueToCopy={workflow.workflowId}>
+          <TruncatedText className="text-foreground-400 font-code block text-xs">{workflow.workflowId}</TruncatedText>
+          <RiFileCopyLine className="text-foreground-400 invisible size-3 group-hover:visible" />
         </HoverToCopy>
       </TableCell>
       <TableCell>
