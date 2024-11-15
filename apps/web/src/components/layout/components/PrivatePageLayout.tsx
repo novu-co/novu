@@ -16,6 +16,7 @@ import { Sidebar } from '../../nav/Sidebar';
 import { HeaderNav } from './v2/HeaderNav';
 import { FreeTrialBanner } from './FreeTrialBanner';
 import { SampleModeBanner } from './v2/SampleWorkflowsBanner';
+import { useOptInRedirect } from '../../../hooks/useOptInRedirect';
 
 const AppShell = styled.div`
   display: flex;
@@ -61,6 +62,8 @@ export function PrivatePageLayout() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useOptInRedirect();
 
   return (
     <SpotLightProvider>

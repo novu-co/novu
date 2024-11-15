@@ -1,30 +1,24 @@
+import { useLayoutEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { FeatureFlagsKeysEnum, NewDashboardOptInStatusEnum } from '@novu/shared';
-import { PropsWithChildren, useEffect } from 'react';
-import { useNewDashboardOptIn } from '../../hooks/useNewDashboardOptIn';
 
-import { ROUTES } from '../../constants/routes';
-import { IS_EE_AUTH_ENABLED } from '../../config';
-import { useFeatureFlag } from '../../hooks';
+import { useNewDashboardOptIn } from './useNewDashboardOptIn';
+import { ROUTES } from '../constants/routes';
+import { useFeatureFlag } from './useFeatureFlag';
+import { IS_EE_AUTH_ENABLED } from '../config';
 
 const ROUTES_THAT_REDIRECT_TO_DASHBOARD = [ROUTES.WORKFLOWS];
 
-export const OptInProvider = ({ children }: { children: React.ReactNode }) => {
+export const useOptInRedirect = () => {
+  const { pathname } = useLocation();
   const isNewDashboardEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ENABLED);
-
-  if (IS_EE_AUTH_ENABLED && isNewDashboardEnabled) {
-    return <_OptInProvider>{children}</_OptInProvider>;
-  }
-
-  return <>{children}</>;
-};
-
-export const _OptInProvider = (props: PropsWithChildren) => {
-  const { children } = props;
   const { status, isLoaded, redirectToNewDashboard } = useNewDashboardOptIn();
+  const isUserOptedIn = isLoaded && status && status === NewDashboardOptInStatusEnum.OPTED_IN;
+  const shouldHandleOptInRedirect = IS_EE_AUTH_ENABLED && isNewDashboardEnabled && isUserOptedIn;
 
-  useEffect(() => {
-    if (isLoaded && status === NewDashboardOptInStatusEnum.OPTED_IN) {
-      const currentRoute = window.location.pathname.replace('/legacy', '');
+  useLayoutEffect(() => {
+    if (shouldHandleOptInRedirect) {
+      const currentRoute = pathname.replace('/legacy', '');
 
       /**
        * if equivalent of current route (incl. subroutes) exits in new dashboard, redirect to it
@@ -41,7 +35,5 @@ export const _OptInProvider = (props: PropsWithChildren) => {
         redirectToNewDashboard();
       }
     }
-  }, [status, redirectToNewDashboard, isLoaded]);
-
-  return <>{children}</>;
+  }, [shouldHandleOptInRedirect, pathname, redirectToNewDashboard]);
 };
