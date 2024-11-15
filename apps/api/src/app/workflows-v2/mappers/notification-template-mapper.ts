@@ -12,10 +12,10 @@ import {
   WorkflowTypeEnum,
 } from '@novu/shared';
 import { NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
-import { GetWorkflowByIdsResponseDto } from '@novu/application-generic';
+import { GetWorkflowResponseDto } from '@novu/application-generic';
 import { buildSlug } from '../../shared/helpers/build-slug';
 
-export function toResponseWorkflowDto(workflow: GetWorkflowByIdsResponseDto): WorkflowResponseDto {
+export function toResponseWorkflowDto(workflow: GetWorkflowResponseDto): WorkflowResponseDto {
   const preferencesDto: PreferencesResponseDto = {
     user: workflow.userPreferences,
     default: workflow.defaultPreferences,

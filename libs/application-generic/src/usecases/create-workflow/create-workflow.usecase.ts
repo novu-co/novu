@@ -55,7 +55,7 @@ import {
 import { GetPreferences } from '../get-preferences';
 import {
   GetWorkflowByIdsCommand,
-  GetWorkflowByIdsResponseDto,
+  GetWorkflowResponseDto,
   GetWorkflowByIdsUseCase,
 } from '../workflow';
 
@@ -82,7 +82,7 @@ export class CreateWorkflow {
 
   async execute(
     usecaseCommand: CreateWorkflowCommand,
-  ): Promise<GetWorkflowByIdsResponseDto> {
+  ): Promise<GetWorkflowResponseDto> {
     const blueprintCommand = await this.processBlueprint(usecaseCommand);
     const command = blueprintCommand ?? usecaseCommand;
     this.validatePayload(command);
@@ -306,7 +306,7 @@ export class CreateWorkflow {
     templateSteps: INotificationTemplateStep[],
     trigger: INotificationTrigger,
     triggerIdentifier: string,
-  ): Promise<GetWorkflowByIdsResponseDto> {
+  ): Promise<GetWorkflowResponseDto> {
     this.logger.info(`Creating workflow ${JSON.stringify(command)}`);
 
     const savedWorkflow = await this.notificationTemplateRepository.create({

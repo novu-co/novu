@@ -12,7 +12,7 @@ import {
 } from '@novu/shared';
 import { NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
 import { Injectable } from '@nestjs/common';
-import { GetWorkflowByIdsResponseDto } from '@novu/application-generic';
+import { GetWorkflowResponseDto } from '@novu/application-generic';
 import { ProcessWorkflowIssuesCommand } from './process-workflow-issues.command';
 import { ValidatedContentResponse } from '../validate-content';
 
@@ -20,7 +20,7 @@ import { ValidatedContentResponse } from '../validate-content';
 export class ProcessWorkflowIssuesUsecase {
   constructor(private notificationTemplateRepository: NotificationTemplateRepository) {}
 
-  async execute(command: ProcessWorkflowIssuesCommand): Promise<GetWorkflowByIdsResponseDto> {
+  async execute(command: ProcessWorkflowIssuesCommand): Promise<GetWorkflowResponseDto> {
     const workflowIssues = await this.validateWorkflow(command);
     const stepIssues = this.validateSteps(command.workflow.steps, command.validatedContentsArray);
     const workflowWithIssues = this.updateIssuesOnWorkflow(command.workflow, workflowIssues, stepIssues);
@@ -28,7 +28,7 @@ export class ProcessWorkflowIssuesUsecase {
     return this.updateStatusOnWorkflow(workflowWithIssues);
   }
 
-  private updateStatusOnWorkflow(workflowWithIssues: GetWorkflowByIdsResponseDto) {
+  private updateStatusOnWorkflow(workflowWithIssues: GetWorkflowResponseDto) {
     // eslint-disable-next-line no-param-reassign
     workflowWithIssues.status = this.computeStatus(workflowWithIssues);
 
@@ -42,7 +42,7 @@ export class ProcessWorkflowIssuesUsecase {
     return status;
   }
 
-  private calculateStatus(isGoodWorkflow: boolean, workflowWithIssues: GetWorkflowByIdsResponseDto) {
+  private calculateStatus(isGoodWorkflow: boolean, workflowWithIssues: GetWorkflowResponseDto) {
     if (workflowWithIssues.active === false) {
       return WorkflowStatusEnum.INACTIVE;
     }
@@ -54,7 +54,7 @@ export class ProcessWorkflowIssuesUsecase {
     return WorkflowStatusEnum.ERROR;
   }
 
-  private isWorkflowCompleteAndValid(workflowWithIssues: GetWorkflowByIdsResponseDto) {
+  private isWorkflowCompleteAndValid(workflowWithIssues: GetWorkflowResponseDto) {
     const workflowIssues = workflowWithIssues.issues && Object.keys(workflowWithIssues.issues).length > 0;
     const hasInnerIssues =
       workflowWithIssues.steps
@@ -156,10 +156,10 @@ export class ProcessWorkflowIssuesUsecase {
   }
 
   private updateIssuesOnWorkflow(
-    workflow: GetWorkflowByIdsResponseDto,
+    workflow: GetWorkflowResponseDto,
     workflowIssues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>,
     stepIssuesMap: Record<string, StepIssues>
-  ): GetWorkflowByIdsResponseDto {
+  ): GetWorkflowResponseDto {
     const issues = workflowIssues as unknown as Record<string, ContentIssue[]>;
     for (const step of workflow.steps) {
       if (stepIssuesMap[step._templateId]) {

@@ -25,7 +25,7 @@ import {
   CreateWorkflowCommand,
   GetWorkflowByIdsCommand,
   GetWorkflowByIdsUseCase,
-  GetWorkflowByIdsResponseDto,
+  GetWorkflowResponseDto,
   NotificationStep,
   shortId,
   UpdateWorkflow,
@@ -125,7 +125,7 @@ export class UpsertWorkflowUseCase {
     workflow.payloadSchema = JSON.stringify(convertJsonToSchemaWithDefaults(finalPayload));
   }
 
-  private async queryWorkflow(command: UpsertWorkflowCommand): Promise<GetWorkflowByIdsResponseDto | null> {
+  private async queryWorkflow(command: UpsertWorkflowCommand): Promise<GetWorkflowResponseDto | null> {
     if (!command.identifierOrInternalId) {
       return null;
     }
@@ -181,7 +181,7 @@ export class UpsertWorkflowUseCase {
   private async createOrUpdateWorkflow(
     existingWorkflow: NotificationTemplateEntity | null,
     command: UpsertWorkflowCommand
-  ): Promise<GetWorkflowByIdsResponseDto> {
+  ): Promise<GetWorkflowResponseDto> {
     if (existingWorkflow && isWorkflowUpdateDto(command.workflowDto, command.identifierOrInternalId)) {
       return await this.updateWorkflowUsecase.execute(
         UpdateWorkflowCommand.create(

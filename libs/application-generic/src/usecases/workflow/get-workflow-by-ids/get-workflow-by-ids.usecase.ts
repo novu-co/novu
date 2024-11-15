@@ -12,7 +12,7 @@ import {
 import { GetPreferences, GetPreferencesCommand } from '../../get-preferences';
 
 import { GetWorkflowByIdsCommand } from './get-workflow-by-ids.command';
-import { GetWorkflowByIdsResponseDto } from './get-workflow-by-ids.dto';
+import { GetWorkflowResponseDto } from './get-workflow-by-ids.dto';
 
 @Injectable()
 export class GetWorkflowByIdsUseCase {
@@ -23,7 +23,7 @@ export class GetWorkflowByIdsUseCase {
   ) {}
   async execute(
     command: GetWorkflowByIdsCommand,
-  ): Promise<GetWorkflowByIdsResponseDto> {
+  ): Promise<GetWorkflowResponseDto> {
     const isInternalId = NotificationTemplateRepository.isInternalId(
       command.identifierOrInternalId,
     );
