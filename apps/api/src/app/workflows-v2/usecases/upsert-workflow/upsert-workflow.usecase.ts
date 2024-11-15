@@ -36,7 +36,7 @@ import {
   UpsertUserWorkflowPreferencesCommand,
   UpsertWorkflowPreferencesCommand,
 } from '@novu/application-generic';
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
@@ -350,29 +350,35 @@ export class UpsertWorkflowUseCase {
     workflow: NotificationTemplateEntity,
     command: UpsertWorkflowCommand
   ): Promise<NotificationTemplateEntity> {
-    for (const stepRequest of command.workflowDto.steps) {
-      const persistedStepDbId = workflow.steps.find((step) => step.name === stepRequest.name)?._templateId;
-      if (!persistedStepDbId) {
-        throw new InternalServerErrorException({
-          message: 'Step not found in persistence, this should not happen',
-          stepName: stepRequest.name,
-        });
-      }
-      if (!stepRequest.controlValues) {
+    for (const step of workflow.steps) {
+      const controlValues = this.findControlValueInRequest(step, command.workflowDto.steps);
+      if (!controlValues) {
         continue;
       }
-
       await this.patchStepDataUsecase.execute({
-        controlValues: stepRequest.controlValues,
+        controlValues,
         fieldsToUpdate: [PatchStepFieldEnum.CONTROL_VALUES],
         identifierOrInternalId: workflow._id,
-        name: stepRequest.name,
-        stepId: persistedStepDbId,
+        name: step.name,
+        stepId: step._templateId,
         user: command.user,
       });
     }
 
     return await this.getWorkflow(workflow._id, command.user.environmentId);
+  }
+
+  private findControlValueInRequest(
+    step: NotificationStepEntity,
+    steps: (StepCreateDto | StepUpdateDto)[] | StepCreateDto[]
+  ): Record<string, unknown> | undefined {
+    return steps.find((stepRequest) => {
+      if (this.isStepUpdateDto(stepRequest)) {
+        return stepRequest._id === step._templateId;
+      }
+
+      return stepRequest.name === step.name;
+    })?.controlValues;
   }
 }
 
