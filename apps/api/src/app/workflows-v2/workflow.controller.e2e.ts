@@ -174,18 +174,18 @@ describe('Workflow Controller E2E API Testing', () => {
       );
       const workflowId = updatedWorkflow._id;
       const stepId = updatedWorkflow.steps[0]._id;
-      const stepContolValuesAfterUpdate: string[] = [];
+      const stepControlValuesAfterUpdate: string[] = [];
       for (const step of workflowCreated.steps) {
         const test = `test-${generateUUID()}`;
-        stepContolValuesAfterUpdate.push(test);
+        stepControlValuesAfterUpdate.push(test);
         await workflowsClient.patchWorkflowStepData(workflowId, step._id, {
           fieldsToUpdate: [PatchStepFieldEnum.CONTROL_VALUES],
           controlValues: { test },
         });
       }
-      expect(stepContolValuesAfterUpdate[0]).to.be.equal((await getControlValuesForStep(workflowId, stepId))?.test);
+      expect(stepControlValuesAfterUpdate[0]).to.be.equal((await getControlValuesForStep(workflowId, stepId))?.test);
       const stepId1 = updatedWorkflow.steps[1]._id;
-      expect(stepContolValuesAfterUpdate[1]).to.be.equal((await getControlValuesForStep(workflowId, stepId1))?.test);
+      expect(stepControlValuesAfterUpdate[1]).to.be.equal((await getControlValuesForStep(workflowId, stepId1))?.test);
     });
 
     it('should keep the step id on updated ', async () => {
