@@ -168,16 +168,6 @@ const removeMootSeparators = (string: string, separator: string) => {
  * - multilanguage support
  * - emojis support
  *
- * @param string - The string to slugify.
- * @param options - The options to use for slugifying the string.
- * @param options.separator - The separator to use for slugifying the string.
- * @param options.lowercase - Whether to lowercase the string.
- * @param options.decamelize - Whether to decamelize the string.
- * @param options.customReplacements - The custom replacements to use for slugifying the string.
- * @param options.preserveLeadingUnderscore - Whether to preserve leading underscores.
- * @param options.preserveTrailingDash - Whether to preserve trailing dashes.
- * @returns The slugified string.
- *
  * @example
  * ```
  * import { slugify } from '@novu/shared';
@@ -293,32 +283,3 @@ export const slugify = (string: string, options?: Options) => {
 
   return string;
 };
-
-export function slugifyWithCounter() {
-  const occurrences = new Map();
-
-  const countable = (string: string, options?: Options) => {
-    string = slugify(string, options);
-
-    if (!string) {
-      return '';
-    }
-
-    const stringLower = string.toLowerCase();
-    const numberless = occurrences.get(stringLower.replace(/(?:-\d+?)+?$/, '')) || 0;
-    const counter = occurrences.get(stringLower);
-    occurrences.set(stringLower, typeof counter === 'number' ? counter + 1 : 1);
-    const newCounter = occurrences.get(stringLower) || 2;
-    if (newCounter >= 2 || numberless > 2) {
-      string = `${string}-${newCounter}`;
-    }
-
-    return string;
-  };
-
-  countable.reset = () => {
-    occurrences.clear();
-  };
-
-  return countable;
-}
