@@ -351,7 +351,9 @@ export class UpsertWorkflowUseCase {
     command: UpsertWorkflowCommand
   ): Promise<NotificationTemplateEntity> {
     for (const stepRequest of command.workflowDto.steps) {
-      const persistedStepDbId = workflow.steps.find((step) => step.name === stepRequest.name)?._templateId;
+      const persistedStepDbId = workflow.steps.find(
+        (step) => step._id === (stepRequest as StepUpdateDto)._id
+      )?._templateId;
       if (!persistedStepDbId) {
         throw new InternalServerErrorException({
           message: 'Step not found in persistence, this should not happen',
