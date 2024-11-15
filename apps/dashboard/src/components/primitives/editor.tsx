@@ -113,6 +113,7 @@ const theme = createTheme({
   settings: {
     background: 'transparent',
     lineHighlight: 'transparent',
+    fontFamily: 'inherit',
   },
 });
 
