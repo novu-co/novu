@@ -72,6 +72,7 @@ program
   .option('-d, --dashboard-url <url>', 'The Novu Cloud Dashboard URL', 'https://dashboard.novu.co')
   .option('-sp, --studio-port <port>', 'The Local Studio server port', '2022')
   .option('-t, --tunnel <url>', 'Self hosted tunnel. e.g. https://my-tunnel.ngrok.app')
+  .option('--no-open', 'Do not open the browser automatically')
   .action(async (options: DevCommandOptions) => {
     analytics.track({
       identity: {
