@@ -75,7 +75,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, index) => (
               <Badge key={index} variant="outline" kind="tag" className="gap-1">
-                <span>{tag}</span>
+                <span style={{ wordBreak: 'break-all' }}>{tag}</span>
                 <button type="button" onClick={() => removeTag(tag)}>
                   <RiCloseFill className="-mr-0.5 size-3" />
                   <span className="sr-only">Remove tag</span>
@@ -87,7 +87,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
         <CommandList>
           {(validSuggestions.length > 0 || inputValue !== '') && (
             <PopoverContent
-              className="p-1"
+              className="w-32 p-1"
               portal={false}
               onOpenAutoFocus={(e) => {
                 e.preventDefault();
@@ -96,16 +96,18 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
               onInteractOutside={(e) => e.preventDefault()}
             >
               <CommandGroup>
-                {inputValue !== '' && !tags.includes(inputValue) && (
+                {inputValue !== '' && (
                   <CommandItem
                     value={inputValue}
                     onSelect={() => {
                       addTag(inputValue);
                     }}
+                    disabled={inputValue === '' || tags.includes(inputValue)}
                   >
                     {inputValue}
                   </CommandItem>
                 )}
+
                 {validSuggestions.map((tag) => (
                   <CommandItem
                     key={tag}
