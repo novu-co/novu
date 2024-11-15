@@ -10,7 +10,10 @@ export function UserProfileButton() {
   const isNewDashboardEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ENABLED);
 
   return (
-    <UserButton afterSignOutUrl={ROUTES.AUTH_LOGIN} userProfileUrl={ROUTES.MANAGE_ACCOUNT_USER_PROFILE}>
+    <UserButton
+      afterSignOutUrl={`${window.location.origin}${ROUTES.AUTH_LOGIN}`}
+      userProfileUrl={ROUTES.MANAGE_ACCOUNT_USER_PROFILE}
+    >
       {isNewDashboardEnabled && (
         <UserButton.MenuItems>
           <UserButton.Action
