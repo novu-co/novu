@@ -70,21 +70,12 @@ export class PatchStepDataUsecase {
   }
 
   private async fetchWorkflow(command: PatchStepDataCommand) {
-    const workflow = await this.getWorkflowByIdsUseCase.execute({
+    return await this.getWorkflowByIdsUseCase.execute({
       identifierOrInternalId: command.identifierOrInternalId,
       environmentId: command.user.environmentId,
       organizationId: command.user.organizationId,
       userId: command.user._id,
     });
-
-    if (!workflow) {
-      throw new BadRequestException({
-        message: 'No workflow found',
-        workflowId: command.identifierOrInternalId,
-      });
-    }
-
-    return workflow;
   }
 
   private async findStepWithSameMemoryPointer(command: PatchStepDataCommand, workflow: NotificationTemplateEntity) {

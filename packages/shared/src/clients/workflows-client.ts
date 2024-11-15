@@ -107,6 +107,6 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     searchWorkflows,
     getWorkflowTestData,
     getWorkflowStepData,
-    patchWorkflowStepData, // Include the new method in the returned object
+    patchWorkflowStepData,
   };
 };
