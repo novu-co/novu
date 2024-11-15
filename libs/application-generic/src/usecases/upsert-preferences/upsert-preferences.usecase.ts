@@ -122,25 +122,6 @@ export class UpsertPreferences {
   ): Promise<PreferencesEntity> {
     const foundPreference = await this.getPreference(command);
 
-    if (command.preferences === null) {
-      if (!foundPreference) {
-        /*
-         * Gracefully return if the preference is not found,
-         * ensuring the operation is idempotent.
-         */
-        return;
-      }
-
-      await this.deletePreferences(command, foundPreference?._id);
-
-      /*
-       * TODO: Ideally we need to return the foundPreference with a deleted: true flag
-       * but the repository does not support this yet. For now we will make a compromise
-       * to avoid refactoring all the usages of this usecase.
-       */
-      return foundPreference;
-    }
-
     if (foundPreference) {
       return this.updatePreferences(foundPreference, command);
     }

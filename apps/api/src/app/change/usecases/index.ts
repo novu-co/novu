@@ -1,4 +1,10 @@
-import { CreateChange, GetPreferences, UpdateChange, UpsertPreferences } from '@novu/application-generic';
+import {
+  CreateChange,
+  DeletePreferencesUseCase,
+  GetPreferences,
+  UpdateChange,
+  UpsertPreferences,
+} from '@novu/application-generic';
 
 import { PromoteMessageTemplateChange } from './promote-message-template-change/promote-message-template-change';
 import { PromoteNotificationTemplateChange } from './promote-notification-template-change/promote-notification-template-change.usecase';
@@ -34,4 +40,5 @@ export const USE_CASES = [
   PromoteTranslationGroupChange,
   GetPreferences,
   UpsertPreferences,
+  DeletePreferencesUseCase,
 ];

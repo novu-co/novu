@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import {
   CreateWorkflow,
+  DeletePreferencesUseCase,
   DeleteWorkflowUseCase,
   GetPreferences,
   GetWorkflowByIdsUseCase,
@@ -44,6 +45,7 @@ import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-re
     ListWorkflowsUseCase,
     DeleteWorkflowUseCase,
     UpsertPreferences,
+    DeletePreferencesUseCase,
     UpsertControlValuesUseCase,
     GetPreferences,
     GetWorkflowByIdsUseCase,

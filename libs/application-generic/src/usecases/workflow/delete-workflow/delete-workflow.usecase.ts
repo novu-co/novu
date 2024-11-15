@@ -18,10 +18,9 @@ import {
   buildNotificationTemplateKey,
 } from '../../../services/cache/key-builders';
 import {
-  UpsertPreferences,
-  UpsertUserWorkflowPreferencesCommand,
-  UpsertWorkflowPreferencesCommand,
-} from '../../upsert-preferences';
+  DeletePreferencesUseCase,
+  DeletePreferencesCommand,
+} from '../../delete-preferences';
 
 @Injectable()
 export class DeleteWorkflowUseCase {
@@ -32,7 +31,7 @@ export class DeleteWorkflowUseCase {
     private preferencesRepository: PreferencesRepository,
     private invalidateCache: InvalidateCacheService,
     private controlValuesRepository: ControlValuesRepository,
-    private upsertPreferences: UpsertPreferences,
+    private deletePreferencesUsecase: DeletePreferencesUseCase,
   ) {}
 
   async execute(command: DeleteWorkflowCommand): Promise<void> {
@@ -68,46 +67,24 @@ export class DeleteWorkflowUseCase {
         }
       }
 
-      if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
-        await this.preferencesRepository.delete({
-          _environmentId: command.environmentId,
-          _organizationId: command.organizationId,
-          _templateId: workflow._id,
-          type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
-        });
-      } else if (this.isNovuCloud(workflow)) {
-        await this.preferencesRepository.delete({
-          _environmentId: command.environmentId,
-          _organizationId: command.organizationId,
-          _templateId: workflow._id,
+      await this.deletePreferencesUsecase.execute(
+        DeletePreferencesCommand.create({
+          templateId: workflow._id,
+          environmentId: command.environmentId,
+          organizationId: command.organizationId,
+          userId: command.userId,
           type: PreferencesTypeEnum.USER_WORKFLOW,
-        });
-      }
-
-      const upsertUserWorkflowPreferencesPromise =
-        this.upsertPreferences.upsertUserWorkflowPreferences(
-          UpsertUserWorkflowPreferencesCommand.create({
-            templateId: workflow._id,
-            preferences: null,
-            environmentId: command.environmentId,
-            organizationId: command.organizationId,
-            userId: command.userId,
-          }),
-        );
-      const upsertWorkflowResourcePreferencesPromise =
-        this.upsertPreferences.upsertWorkflowPreferences(
-          UpsertWorkflowPreferencesCommand.create({
-            templateId: workflow._id,
-            preferences: null,
-            environmentId: command.environmentId,
-            organizationId: command.organizationId,
-          }),
-        );
-
-      await Promise.all([
-        upsertUserWorkflowPreferencesPromise,
-        upsertWorkflowResourcePreferencesPromise,
-      ]);
+        }),
+      );
+      await this.deletePreferencesUsecase.execute(
+        DeletePreferencesCommand.create({
+          templateId: workflow._id,
+          environmentId: command.environmentId,
+          organizationId: command.organizationId,
+          userId: command.userId,
+          type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
+        }),
+      );
 
       await this.notificationTemplateRepository.delete({
         _id: workflow._id,

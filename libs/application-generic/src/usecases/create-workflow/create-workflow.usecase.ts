@@ -86,25 +86,31 @@ export class CreateWorkflow {
     const blueprintCommand = await this.processBlueprint(usecaseCommand);
     const command = blueprintCommand ?? usecaseCommand;
     this.validatePayload(command);
+    let storedWorkflow: WorkflowInternalResponseDto;
+    await this.notificationTemplateRepository.withTransaction(async () => {
+      const triggerIdentifier = this.generateTriggerIdentifier(command);
 
-    const triggerIdentifier = this.generateTriggerIdentifier(command);
+      const parentChangeId: string =
+        NotificationTemplateRepository.createObjectId();
 
-    const parentChangeId: string =
-      NotificationTemplateRepository.createObjectId();
+      const templateSteps = await this.storeTemplateSteps(
+        command,
+        parentChangeId,
+      );
+      const trigger = await this.createNotificationTrigger(
+        command,
+        triggerIdentifier,
+      );
 
-    const [templateSteps, trigger] = await Promise.all([
-      this.storeTemplateSteps(command, parentChangeId),
-      this.createNotificationTrigger(command, triggerIdentifier),
-    ]);
+      storedWorkflow = await this.storeWorkflow(
+        command,
+        templateSteps,
+        trigger,
+        triggerIdentifier,
+      );
 
-    const storedWorkflow = await this.storeWorkflow(
-      command,
-      templateSteps,
-      trigger,
-      triggerIdentifier,
-    );
-
-    await this.createWorkflowChange(command, storedWorkflow, parentChangeId);
+      await this.createWorkflowChange(command, storedWorkflow, parentChangeId);
+    });
 
     try {
       if (
@@ -403,41 +409,40 @@ export class CreateWorkflow {
       if (!step.template)
         throw new ApiException(`Unexpected error: message template is missing`);
 
-      const [createdMessageTemplate, storedVariants] = await Promise.all([
-        await this.createMessageTemplate.execute(
-          CreateMessageTemplateCommand.create({
-            organizationId: command.organizationId,
-            environmentId: command.environmentId,
-            userId: command.userId,
-            type: step.template.type,
-            name: step.template.name,
-            content: step.template.content,
-            variables: step.template.variables,
-            contentType: step.template.contentType,
-            cta: step.template.cta,
-            subject: step.template.subject,
-            title: step.template.title,
-            feedId: step.template.feedId,
-            layoutId: step.template.layoutId,
-            preheader: step.template.preheader,
-            senderName: step.template.senderName,
-            actor: step.template.actor,
-            controls: step.template.controls,
-            output: step.template.output,
-            stepId: step.template.stepId,
-            parentChangeId,
-            workflowType: command.type,
-          }),
-        ),
-        await this.storeVariantSteps({
-          variants: step.variants,
-          parentChangeId,
+      const createdMessageTemplate = await this.createMessageTemplate.execute(
+        CreateMessageTemplateCommand.create({
           organizationId: command.organizationId,
           environmentId: command.environmentId,
           userId: command.userId,
+          type: step.template.type,
+          name: step.template.name,
+          content: step.template.content,
+          variables: step.template.variables,
+          contentType: step.template.contentType,
+          cta: step.template.cta,
+          subject: step.template.subject,
+          title: step.template.title,
+          feedId: step.template.feedId,
+          layoutId: step.template.layoutId,
+          preheader: step.template.preheader,
+          senderName: step.template.senderName,
+          actor: step.template.actor,
+          controls: step.template.controls,
+          output: step.template.output,
+          stepId: step.template.stepId,
+          parentChangeId,
           workflowType: command.type,
         }),
-      ]);
+      );
+
+      const storedVariants = await this.storeVariantSteps({
+        variants: step.variants,
+        parentChangeId,
+        organizationId: command.organizationId,
+        environmentId: command.environmentId,
+        userId: command.userId,
+        workflowType: command.type,
+      });
 
       const stepId = createdMessageTemplate._id;
       const templateStep: Partial<INotificationTemplateStep> = {

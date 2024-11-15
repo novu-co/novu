@@ -24,6 +24,7 @@ import {
   ChangeEntityTypeEnum,
   DEFAULT_WORKFLOW_PREFERENCES,
   isBridgeWorkflow,
+  PreferencesTypeEnum,
 } from '@novu/shared';
 
 import {
@@ -50,6 +51,8 @@ import {
   UpsertWorkflowPreferencesCommand,
   GetWorkflowByIdsCommand,
   GetWorkflowByIdsUseCase,
+  DeletePreferencesCommand,
+  DeletePreferencesUseCase,
 } from '../..';
 import {
   DeleteMessageTemplate,
@@ -81,6 +84,8 @@ export class UpdateWorkflow {
     protected moduleRef: ModuleRef,
     @Inject(forwardRef(() => UpsertPreferences))
     private upsertPreferences: UpsertPreferences,
+    @Inject(forwardRef(() => DeletePreferencesUseCase))
+    private deletePreferencesUsecase: DeletePreferencesUseCase,
     @Inject(forwardRef(() => GetWorkflowByIdsUseCase))
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
   ) {}
@@ -152,178 +157,190 @@ export class UpdateWorkflow {
       existingTemplate._id,
     );
 
-    if (command.steps) {
-      updatePayload = this.updateTriggers(updatePayload, command.steps);
+    let notificationTemplateWithStepTemplate: WorkflowInternalResponseDto;
+    await this.notificationTemplateRepository.withTransaction(async () => {
+      if (command.steps) {
+        updatePayload = this.updateTriggers(updatePayload, command.steps);
 
-      updatePayload.steps = await this.updateMessageTemplates(
-        command.steps,
-        command,
-        parentChangeId,
-      );
-
-      await this.deleteRemovedSteps(
-        existingTemplate.steps,
-        command,
-        parentChangeId,
-      );
-    }
-
-    if (command.tags) {
-      updatePayload.tags = command.tags;
-    }
-
-    if (command.data) {
-      updatePayload.data = command.data;
-    }
-
-    if (command.rawData) {
-      updatePayload.rawData = command.rawData;
-    }
-
-    if (command.payloadSchema) {
-      updatePayload.payloadSchema = command.payloadSchema;
-    }
-
-    // defaultPreferences is required, so we always call the upsert
-    await this.upsertPreferences.upsertWorkflowPreferences(
-      UpsertWorkflowPreferencesCommand.create({
-        templateId: command.id,
-        preferences: command.defaultPreferences,
-        environmentId: command.environmentId,
-        organizationId: command.organizationId,
-      }),
-    );
-
-    if (
-      command.userPreferences !== undefined ||
-      command.critical !== undefined
-    ) {
-      /*
-       * userPreferences is optional, so we need to check if it's defined before calling the upsert.
-       * we also need to check if the legacy `critical` property is defined, because if provided,
-       * it's used to set the `userPreferences.all.readOnly` property
-       */
-
-      updatePayload.critical = command.critical;
-      this.analyticsService.track(
-        'Update Critical Template - [Platform]',
-        command.userId,
-        {
-          _organization: command.organizationId,
-          critical: command.userPreferences?.all?.readOnly,
-        },
-      );
-
-      /*
-       * This builder pattern is only needed for the `critical` property,
-       * ensuring it's set in the `userPreferences.all.readOnly` property
-       * when supplied.
-       *
-       * TODO: remove this once we deprecate the `critical` property
-       * and use only the `userPreferences` object
-       */
-      const defaultUserPreferences =
-        command.userPreferences ?? existingTemplate.userPreferences;
-      const defaultCritical =
-        command.userPreferences?.all?.readOnly ??
-        command.critical ??
-        existingTemplate.userPreferences?.all?.readOnly ??
-        existingTemplate.critical;
-
-      const userPreferences =
-        command.userPreferences === null
-          ? null
-          : buildWorkflowPreferences(
-              {
-                all: {
-                  readOnly: defaultCritical,
-                },
-              },
-              defaultUserPreferences,
-            );
-      await this.upsertPreferences.upsertUserWorkflowPreferences(
-        UpsertUserWorkflowPreferencesCommand.create({
-          templateId: command.id,
-          preferences: userPreferences,
-          environmentId: command.environmentId,
-          organizationId: command.organizationId,
-          userId: command.userId,
-        }),
-      );
-
-      /** @deprecated - use `userPreferences` instead */
-      const preferenceSettings =
-        GetPreferences.mapWorkflowPreferencesToChannelPreferences(
-          userPreferences ?? DEFAULT_WORKFLOW_PREFERENCES,
+        updatePayload.steps = await this.updateMessageTemplates(
+          command.steps,
+          command,
+          parentChangeId,
         );
-      updatePayload.preferenceSettings = preferenceSettings;
 
-      this.analyticsService.track(
-        'Update Preference Defaults - [Platform]',
-        command.userId,
+        await this.deleteRemovedSteps(
+          existingTemplate.steps,
+          command,
+          parentChangeId,
+        );
+      }
+
+      if (command.tags) {
+        updatePayload.tags = command.tags;
+      }
+
+      if (command.data) {
+        updatePayload.data = command.data;
+      }
+
+      if (command.rawData) {
+        updatePayload.rawData = command.rawData;
+      }
+
+      if (command.payloadSchema) {
+        updatePayload.payloadSchema = command.payloadSchema;
+      }
+
+      // defaultPreferences is required, so we always call the upsert
+      await this.upsertPreferences.upsertWorkflowPreferences(
+        UpsertWorkflowPreferencesCommand.create({
+          templateId: command.id,
+          preferences: command.defaultPreferences,
+          environmentId: command.environmentId,
+          organizationId: command.organizationId,
+        }),
+      );
+
+      if (
+        command.userPreferences !== undefined ||
+        command.critical !== undefined
+      ) {
+        /*
+         * userPreferences is optional, so we need to check if it's defined before calling the upsert.
+         * we also need to check if the legacy `critical` property is defined, because if provided,
+         * it's used to set the `userPreferences.all.readOnly` property
+         */
+
+        updatePayload.critical = command.critical;
+        this.analyticsService.track(
+          'Update Critical Template - [Platform]',
+          command.userId,
+          {
+            _organization: command.organizationId,
+            critical: command.userPreferences?.all?.readOnly,
+          },
+        );
+
+        /*
+         * This builder pattern is only needed for the `critical` property,
+         * ensuring it's set in the `userPreferences.all.readOnly` property
+         * when supplied.
+         *
+         * TODO: remove this once we deprecate the `critical` property
+         * and use only the `userPreferences` object
+         */
+        const defaultUserPreferences =
+          command.userPreferences ?? existingTemplate.userPreferences;
+        const defaultCritical =
+          command.userPreferences?.all?.readOnly ??
+          command.critical ??
+          existingTemplate.userPreferences?.all?.readOnly ??
+          existingTemplate.critical;
+
+        if (command.userPreferences === null) {
+          await this.deletePreferencesUsecase.execute(
+            DeletePreferencesCommand.create({
+              templateId: command.id,
+              environmentId: command.environmentId,
+              organizationId: command.organizationId,
+              userId: command.userId,
+              type: PreferencesTypeEnum.USER_WORKFLOW,
+            }),
+          );
+        } else {
+          const userPreferences = buildWorkflowPreferences(
+            {
+              all: {
+                readOnly: defaultCritical,
+              },
+            },
+            defaultUserPreferences,
+          );
+          await this.upsertPreferences.upsertUserWorkflowPreferences(
+            UpsertUserWorkflowPreferencesCommand.create({
+              templateId: command.id,
+              preferences: userPreferences,
+              environmentId: command.environmentId,
+              organizationId: command.organizationId,
+              userId: command.userId,
+            }),
+          );
+
+          /** @deprecated - use `userPreferences` instead */
+          const preferenceSettings =
+            GetPreferences.mapWorkflowPreferencesToChannelPreferences(
+              userPreferences,
+            );
+          updatePayload.preferenceSettings = preferenceSettings;
+
+          this.analyticsService.track(
+            'Update Preference Defaults - [Platform]',
+            command.userId,
+            {
+              _organization: command.organizationId,
+              critical: userPreferences?.all?.readOnly ?? false,
+              ...preferenceSettings,
+            },
+          );
+        }
+      }
+
+      if (!Object.keys(updatePayload).length) {
+        throw new BadRequestException('No properties found for update');
+      }
+
+      await this.notificationTemplateRepository.update(
         {
-          _organization: command.organizationId,
-          critical: userPreferences?.all?.readOnly ?? false,
-          ...preferenceSettings,
+          _id: command.id,
+          _environmentId: command.environmentId,
+        },
+        {
+          $set: updatePayload,
         },
       );
-    }
 
-    if (!Object.keys(updatePayload).length) {
-      throw new BadRequestException('No properties found for update');
-    }
-
-    await this.notificationTemplateRepository.update(
-      {
-        _id: command.id,
-        _environmentId: command.environmentId,
-      },
-      {
-        $set: updatePayload,
-      },
-    );
-
-    // Invalidate cache after update
-    await this.invalidateCache.invalidateByKey({
-      key: buildNotificationTemplateKey({
-        _id: existingTemplate._id,
-        _environmentId: command.environmentId,
-      }),
-    });
-
-    await this.invalidateCache.invalidateByKey({
-      key: buildNotificationTemplateIdentifierKey({
-        templateIdentifier: existingTemplate.triggers[0].identifier,
-        _environmentId: command.environmentId,
-      }),
-    });
-
-    const notificationTemplateWithStepTemplate =
-      await this.getWorkflowByIdsUseCase.execute(
-        GetWorkflowByIdsCommand.create({
-          userId: command.userId,
-          environmentId: command.environmentId,
-          organizationId: command.organizationId,
-          identifierOrInternalId: command.id,
+      // Invalidate cache after update
+      await this.invalidateCache.invalidateByKey({
+        key: buildNotificationTemplateKey({
+          _id: existingTemplate._id,
+          _environmentId: command.environmentId,
         }),
-      );
+      });
 
-    if (!isBridgeWorkflow(command.type)) {
-      const notificationTemplate = this.cleanNotificationTemplate(
-        notificationTemplateWithStepTemplate,
-      );
-
-      await this.createChange.execute(
-        CreateChangeCommand.create({
-          organizationId: command.organizationId,
-          environmentId: command.environmentId,
-          userId: command.userId,
-          type: ChangeEntityTypeEnum.NOTIFICATION_TEMPLATE,
-          item: notificationTemplate,
-          changeId: parentChangeId,
+      await this.invalidateCache.invalidateByKey({
+        key: buildNotificationTemplateIdentifierKey({
+          templateIdentifier: existingTemplate.triggers[0].identifier,
+          _environmentId: command.environmentId,
         }),
-      );
-    }
+      });
+
+      notificationTemplateWithStepTemplate =
+        await this.getWorkflowByIdsUseCase.execute(
+          GetWorkflowByIdsCommand.create({
+            userId: command.userId,
+            environmentId: command.environmentId,
+            organizationId: command.organizationId,
+            identifierOrInternalId: command.id,
+          }),
+        );
+
+      if (!isBridgeWorkflow(command.type)) {
+        const notificationTemplate = this.cleanNotificationTemplate(
+          notificationTemplateWithStepTemplate,
+        );
+
+        await this.createChange.execute(
+          CreateChangeCommand.create({
+            organizationId: command.organizationId,
+            environmentId: command.environmentId,
+            userId: command.userId,
+            type: ChangeEntityTypeEnum.NOTIFICATION_TEMPLATE,
+            item: notificationTemplate,
+            changeId: parentChangeId,
+          }),
+        );
+      }
+    });
 
     this.analyticsService.track(
       'Update Notification Template - [Platform]',

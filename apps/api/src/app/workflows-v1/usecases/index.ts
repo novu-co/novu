@@ -1,4 +1,9 @@
-import { CreateWorkflow, GetWorkflowByIdsUseCase, UpdateWorkflow } from '@novu/application-generic';
+import {
+  CreateWorkflow,
+  DeleteWorkflowUseCase,
+  GetWorkflowByIdsUseCase,
+  UpdateWorkflow,
+} from '@novu/application-generic';
 
 import { GetActiveIntegrationsStatus } from './get-active-integrations-status/get-active-integrations-status.usecase';
 import { ChangeTemplateActiveStatus } from './change-template-active-status/change-template-active-status.usecase';
@@ -13,6 +18,7 @@ export const USE_CASES = [
   GetWorkflowByIdsUseCase,
   CreateWorkflow,
   UpdateWorkflow,
+  DeleteWorkflowUseCase,
   GetNotificationTemplates,
   GetNotificationTemplate,
   DeleteNotificationTemplate,

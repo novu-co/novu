@@ -12,6 +12,7 @@ import {
   UpdateWorkflow,
   UpsertControlValuesUseCase,
   UpsertPreferences,
+  DeletePreferencesUseCase,
 } from '@novu/application-generic';
 import { PreferencesRepository } from '@novu/dal';
 import { SharedModule } from '../shared/shared.module';
@@ -32,6 +33,7 @@ const PROVIDERS = [
   PreferencesRepository,
   GetPreferences,
   UpsertPreferences,
+  DeletePreferencesUseCase,
   UpsertControlValuesUseCase,
 ];
 
