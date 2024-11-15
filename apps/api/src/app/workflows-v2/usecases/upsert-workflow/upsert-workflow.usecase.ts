@@ -184,11 +184,6 @@ export class UpsertWorkflowUseCase {
     );
   }
 
-  /**
-   * Upsert workflow preferences. While this operation is not typically needed
-   * in a standard workflow update, it's maintained here to support environment
-   * sync scenarios and to enable code reusability.
-   */
   private async upsertWorkflowPreferences(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
     if (!command.workflowDto.preferences?.workflow) {
       return;
