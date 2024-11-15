@@ -1,14 +1,20 @@
+import { useState, forwardRef, useMemo } from 'react';
+import { liquid } from '@codemirror/lang-liquid';
+import { EditorView } from '@uiw/react-codemirror';
+import { RiEdit2Line, RiErrorWarningFill, RiImageEditFill } from 'react-icons/ri';
+
 import { Avatar, AvatarImage } from '@/components/primitives/avatar';
 import { Button } from '@/components/primitives/button';
 import { FormMessage } from '@/components/primitives/form/form';
-import { Input, InputField } from '@/components/primitives/input';
+import { InputField } from '@/components/primitives/input';
 import { Label } from '@/components/primitives/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import TextSeparator from '@/components/primitives/text-separator';
-import { useState, forwardRef } from 'react';
-import { RiEdit2Line, RiErrorWarningFill, RiImageEditFill } from 'react-icons/ri';
 import { useFormField } from './form-context';
+import { Editor } from '../editor';
+import { useStepEditorContext } from '@/components/workflow-editor/steps/hooks';
+import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 
 const predefinedAvatars = [
   `${window.location.origin}/images/avatar.svg`,
@@ -25,25 +31,31 @@ const predefinedAvatars = [
   `${window.location.origin}/images/error-warning.svg`,
 ];
 
-type AvatarPickerProps = React.InputHTMLAttributes<HTMLInputElement>;
+type AvatarPickerProps = {
+  name: string;
+  value: string;
+  onChange?: (value: string) => void;
+};
 
-export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ id, ...props }, ref) => {
+export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ name, value, onChange }, ref) => {
+  const { step } = useStepEditorContext();
+  const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
   const [isOpen, setIsOpen] = useState(false);
   const { error } = useFormField();
 
   const handlePredefinedAvatarClick = (url: string) => {
-    props.onChange?.({ target: { value: url } } as React.ChangeEvent<HTMLInputElement>);
+    onChange?.(url);
     setIsOpen(false);
   };
 
   return (
-    <div className="space-y-2">
+    <div className="size-10 space-y-2">
       <Popover modal={true} open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" size="icon" className="text-foreground-600 relative size-10">
-            {props.value ? (
+            {value ? (
               <Avatar className="p-px">
-                <AvatarImage src={props.value as string} />
+                <AvatarImage src={value as string} />
               </Avatar>
             ) : (
               <RiImageEditFill className="size-5" />
@@ -62,8 +74,20 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ i
               <Separator />
               <div className="space-y-1">
                 <Label>Avatar URL</Label>
-                <InputField>
-                  <Input type="url" id={id} placeholder="Enter avatar URL" ref={ref} {...props} />
+                <InputField className="px-1" state={error ? 'error' : 'default'}>
+                  <Editor
+                    ref={ref}
+                    placeholder="Enter avatar URL"
+                    id={name}
+                    extensions={[
+                      liquid({
+                        variables,
+                      }),
+                      EditorView.lineWrapping,
+                    ]}
+                    value={`${value}`}
+                    onChange={(newValue) => onChange?.(newValue)}
+                  />
                 </InputField>
                 <FormMessage />
               </div>

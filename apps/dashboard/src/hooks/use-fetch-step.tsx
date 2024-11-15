@@ -6,7 +6,7 @@ import { fetchStep } from '@/api/steps';
 
 export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string; stepSlug: string }) => {
   const { currentEnvironment } = useEnvironment();
-  const { data, isPending, error } = useQuery<StepDataDto>({
+  const { data, isPending, isRefetching, error } = useQuery<StepDataDto>({
     queryKey: [QueryKeys.fetchWorkflow, currentEnvironment?._id, workflowSlug, stepSlug],
     queryFn: () => fetchStep({ workflowSlug, stepSlug }),
     enabled: !!currentEnvironment?._id && !!stepSlug,
@@ -15,6 +15,7 @@ export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string;
   return {
     step: data,
     isPending,
+    isRefetching,
     error,
   };
 };

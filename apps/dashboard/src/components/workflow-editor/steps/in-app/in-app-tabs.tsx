@@ -131,7 +131,11 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
     () => {
       preview({
         controlValues: form.getValues() as Record<string, unknown>,
-        previewPayload: JSON.parse(editorValue),
+        /**
+         * Reset the preview payload to an empty object on form change
+         * to prevent showing the previous payload
+         */
+        previewPayload: {},
       });
     },
     2000,

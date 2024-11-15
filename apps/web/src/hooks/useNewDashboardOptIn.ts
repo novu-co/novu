@@ -45,6 +45,7 @@ export function useNewDashboardOptIn() {
     isLoaded,
     optIn,
     dismiss,
+    redirectToNewDashboard,
     status: getCurrentOptInStatus(),
   };
 }

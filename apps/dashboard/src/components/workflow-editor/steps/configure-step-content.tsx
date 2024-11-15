@@ -29,7 +29,7 @@ export const ConfigureStepContent = () => {
         </SidebarContent>
         <Separator />
         <SidebarContent>
-          <Link to={'./edit'} relative="path">
+          <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
             <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
               <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
               Configure in-app template <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
@@ -47,7 +47,7 @@ export const ConfigureStepContent = () => {
                 <span>Help?</span>
               </Link>
             </div>
-            <Link to={'./edit'} relative="path">
+            <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
               <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
                 <span className="bg-destructive h-4 min-w-1 rounded-full" />
                 <span className="overflow-hidden text-ellipsis">{firstError}</span>
@@ -69,7 +69,7 @@ export const ConfigureStepContent = () => {
       {!EXCLUDED_EDITOR_TYPES.includes(step?.type ?? '') && (
         <>
           <SidebarContent>
-            <Link to={'./edit'} relative="path">
+            <Link to={'./edit'} relative="path" state={{ stepType: step?.type }}>
               <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
                 <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
                 Configure {step?.type} template <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />

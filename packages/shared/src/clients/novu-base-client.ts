@@ -151,6 +151,15 @@ export const createNovuBaseClient = (baseUrl: string, headers: HeadersInit = {})
       })
     );
   };
+  const safePatch = async <T>(endpoint: string, data: object): Promise<NovuRestResult<T, HttpError>> => {
+    return await safeFetch(endpoint, () =>
+      fetch(buildUrl(endpoint), {
+        method: 'PATCH',
+        headers: defaultHeaders,
+        body: JSON.stringify(data),
+      })
+    );
+  };
 
   const safeDelete = async (endpoint: string): Promise<NovuRestResult<void, HttpError>> => {
     return await safeFetch(endpoint, () =>
@@ -166,5 +175,6 @@ export const createNovuBaseClient = (baseUrl: string, headers: HeadersInit = {})
     safePut,
     safePost,
     safeDelete,
+    safePatch,
   };
 };

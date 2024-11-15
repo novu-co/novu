@@ -8,4 +8,4 @@ export * from './list-workflows';
 export * from './sync-to-environment';
 export * from './upsert-workflow';
 export * from './validate-content';
-export * from './process-workflow-issues';
+export * from './post-process-workflow-update';

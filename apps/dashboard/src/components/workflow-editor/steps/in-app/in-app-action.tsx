@@ -1,4 +1,4 @@
-import { ComponentProps } from 'react';
+import { ComponentProps, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
 import { liquid } from '@codemirror/lang-liquid';
@@ -26,6 +26,8 @@ import { URLInput } from '@/components/workflow-editor/url-input';
 import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
 import { Editor } from '@/components/primitives/editor';
+import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
+import { useStepEditorContext } from '../hooks';
 
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
@@ -146,6 +148,8 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
     ...rest
   } = props;
   const { control } = useFormContext();
+  const { step } = useStepEditorContext();
+  const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
 
   return (
     <Popover modal={true}>
@@ -174,7 +178,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                       height="30px"
                       extensions={[
                         liquid({
-                          variables: [{ type: 'variable', label: 'asdf' }],
+                          variables,
                         }),
                         EditorView.lineWrapping,
                       ]}
@@ -195,6 +199,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                 targetKey: `${actionKey}.redirect.target`,
               }}
               withHint={false}
+              variables={variables}
             />
           </div>
         </div>

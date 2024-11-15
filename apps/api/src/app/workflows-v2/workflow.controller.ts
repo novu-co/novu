@@ -12,7 +12,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common/decorators';
-import { ClassSerializerInterceptor, HttpStatus } from '@nestjs/common';
+import { ClassSerializerInterceptor, HttpStatus, Patch } from '@nestjs/common';
 import {
   CreateWorkflowDto,
   DirectionEnum,
@@ -21,6 +21,7 @@ import {
   GetListQueryParams,
   IdentifierOrInternalId,
   ListWorkflowResponse,
+  PatchStepDataDto,
   StepDataDto,
   SyncWorkflowDto,
   UpdateWorkflowDto,
@@ -49,6 +50,8 @@ import {
   WorkflowTestDataCommand,
 } from './usecases';
 import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview.command';
+import { PatchStepDataUsecase } from './usecases/patch-step-data/patch-step-data.usecase';
+import { PatchStepDataCommand } from './usecases/patch-step-data';
 
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
@@ -64,7 +67,8 @@ export class WorkflowController {
     private syncToEnvironmentUseCase: SyncToEnvironmentUseCase,
     private generatePreviewUseCase: GeneratePreviewUsecase,
     private buildWorkflowTestDataUseCase: BuildWorkflowTestDataUseCase,
-    private buildStepDataUsecase: BuildStepDataUsecase
+    private buildStepDataUsecase: BuildStepDataUsecase,
+    private patchStepDataUsecase: PatchStepDataUsecase
   ) {}
 
   @Post('')
@@ -189,7 +193,18 @@ export class WorkflowController {
       BuildStepDataCommand.create({ user, identifierOrInternalId: workflowId, stepId })
     );
   }
+  @Patch('/:workflowId/steps/:stepId')
+  @UseGuards(UserAuthGuard)
+  async patchWorkflowStepData(
+    @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
+    @Param('workflowId', ParseSlugIdPipe) identifierOrInternalId: IdentifierOrInternalId,
+    @Param('stepId', ParseSlugIdPipe) stepId: IdentifierOrInternalId,
+    @Body() patchStepDataDto: PatchStepDataDto
+  ): Promise<StepDataDto> {
+    const command = PatchStepDataCommand.create({ user, identifierOrInternalId, stepId, ...patchStepDataDto });
 
+    return await this.patchStepDataUsecase.execute(command);
+  }
   @Get('/:workflowId/test-data')
   @UseGuards(UserAuthGuard)
   async getWorkflowTestData(
