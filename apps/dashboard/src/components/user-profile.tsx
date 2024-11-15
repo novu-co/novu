@@ -10,7 +10,7 @@ export function UserProfile() {
     <UserButton afterSignOutUrl={`${LEGACY_DASHBOARD_URL}/auth/login`}>
       <UserButton.MenuItems>
         <UserButton.Action
-          label="Go back to the legacy dashboard"
+          label="Go back to the legacy Dashboard"
           labelIcon={<RiSignpostFill size="16" color="var(--nv-colors-typography-text-main)" />}
           onClick={optOut}
         />

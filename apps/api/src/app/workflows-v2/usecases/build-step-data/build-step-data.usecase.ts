@@ -18,7 +18,12 @@ export class BuildStepDataUsecase {
     const workflow = await this.fetchWorkflow(command);
 
     const { currentStep } = await this.loadStepsFromDb(command, workflow);
-    if (!currentStep.name || !currentStep._templateId || !currentStep.stepId || !currentStep.template?.type) {
+    if (
+      currentStep.name === undefined ||
+      !currentStep._templateId ||
+      currentStep.stepId === undefined ||
+      !currentStep.template?.type
+    ) {
       throw new InvalidStepException(currentStep);
     }
     const controlValues = await this.getValues(command, currentStep, workflow._id);

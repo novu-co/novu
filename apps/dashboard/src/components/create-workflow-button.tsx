@@ -34,7 +34,7 @@ const formSchema = z.object({
   workflowId: z.string(),
   tags: z
     .array(z.string().min(1))
-    .max(8)
+    .max(16)
     .refine((tags) => new Set(tags).size === tags.length, {
       message: 'Duplicate tags are not allowed.',
     }),
@@ -166,7 +166,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-1">
-                      <FormLabel hint="(max. 8)">Add tags</FormLabel>
+                      <FormLabel hint="(max. 16)">Add tags</FormLabel>
                     </div>
                     <FormControl>
                       <TagInput suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []} {...field} />

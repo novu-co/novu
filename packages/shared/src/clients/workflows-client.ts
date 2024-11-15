@@ -4,6 +4,7 @@ import {
   GeneratePreviewRequestDto,
   GetListQueryParams,
   ListWorkflowResponse,
+  PatchStepDataDto,
   StepDataDto,
   SyncWorkflowDto,
   UpdateWorkflowDto,
@@ -45,6 +46,14 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     stepId: string
   ): Promise<NovuRestResult<StepDataDto, HttpError>> => {
     return await baseClient.safeGet<StepDataDto>(`/v2/workflows/${workflowId}/steps/${stepId}`);
+  };
+
+  const patchWorkflowStepData = async (
+    workflowId: string,
+    stepId: string,
+    patchStepDataDto: PatchStepDataDto
+  ): Promise<NovuRestResult<StepDataDto, HttpError>> => {
+    return await baseClient.safePatch<StepDataDto>(`/v2/workflows/${workflowId}/steps/${stepId}`, patchStepDataDto);
   };
 
   const deleteWorkflow = async (workflowId: string): Promise<NovuRestResult<void, HttpError>> => {
@@ -98,5 +107,6 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     searchWorkflows,
     getWorkflowTestData,
     getWorkflowStepData,
+    patchWorkflowStepData,
   };
 };

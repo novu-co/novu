@@ -80,11 +80,11 @@ const Markdown = (props: MarkdownProps) => {
 
   return (
     <p {...rest}>
-      {tokens.map((token) => {
+      {tokens.map((token, index) => {
         if (token.type === 'bold') {
-          return <strong>{token.content}</strong>;
+          return <strong key={index}>{token.content}</strong>;
         } else {
-          return <span>{token.content}</span>;
+          return <span key={index}>{token.content}</span>;
         }
       })}
     </p>
