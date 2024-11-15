@@ -4,7 +4,7 @@ import { usePreviewStep } from '@/hooks';
 import { InAppPreview } from '@/components/workflow-editor/in-app-preview';
 
 export function ConfigureInAppPreview() {
-  const { previewStep, data } = usePreviewStep();
+  const { previewStep, data, isPending: isPreviewPending } = usePreviewStep();
   const { workflowSlug, stepSlug } = useParams<{
     workflowSlug: string;
     stepSlug: string;
@@ -16,9 +16,5 @@ export function ConfigureInAppPreview() {
     }
   }, [workflowSlug, stepSlug, previewStep]);
 
-  if (!data) {
-    return null;
-  }
-
-  return <InAppPreview data={data} />;
+  return <InAppPreview data={data} truncateBody isLoading={isPreviewPending} />;
 }

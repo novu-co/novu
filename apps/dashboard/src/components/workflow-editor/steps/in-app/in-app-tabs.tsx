@@ -64,7 +64,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
     }
   }, [controlErrors, setError]);
 
-  const { previewStep, data: previewData } = usePreviewStep();
+  const { previewStep, data: previewData, isPending: isPreviewPending } = usePreviewStep();
   const { isPending, updateWorkflow } = useUpdateWorkflow({
     onSuccess: (data) => {
       resetWorkflowForm(data);
@@ -197,6 +197,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
                 value={editorValue}
                 onChange={setEditorValue}
                 previewData={previewData}
+                isPreviewLoading={isPreviewPending}
                 applyPreview={() => {
                   previewStep({
                     stepSlug,
