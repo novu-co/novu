@@ -46,7 +46,7 @@ import {
   UpsertPreferences,
   UpsertUserWorkflowPreferencesCommand,
   GetPreferences,
-  GetWorkflowResponseDto,
+  WorkflowInternalResponseDto,
   UpsertWorkflowPreferencesCommand,
   GetWorkflowByIdsCommand,
   GetWorkflowByIdsUseCase,
@@ -87,7 +87,7 @@ export class UpdateWorkflow {
 
   async execute(
     command: UpdateWorkflowCommand,
-  ): Promise<GetWorkflowResponseDto> {
+  ): Promise<WorkflowInternalResponseDto> {
     this.validatePayload(command);
 
     const existingTemplate = await this.getWorkflowByIdsUseCase.execute(
@@ -103,7 +103,7 @@ export class UpdateWorkflow {
         `Notification template with id ${command.id} not found`,
       );
 
-    let updatePayload: Partial<GetWorkflowResponseDto> = {};
+    let updatePayload: Partial<WorkflowInternalResponseDto> = {};
     if (command.name) {
       updatePayload.name = command.name;
     }
@@ -486,10 +486,10 @@ export class UpdateWorkflow {
   }
 
   private updateTriggers(
-    updatePayload: Partial<GetWorkflowResponseDto>,
+    updatePayload: Partial<WorkflowInternalResponseDto>,
     steps: NotificationStep[],
-  ): Partial<GetWorkflowResponseDto> {
-    const updatePayloadResult: Partial<GetWorkflowResponseDto> = {
+  ): Partial<WorkflowInternalResponseDto> {
+    const updatePayloadResult: Partial<WorkflowInternalResponseDto> = {
       ...updatePayload,
     };
 
