@@ -17,11 +17,7 @@ export class PatchWorkflowUsecase {
 
   async execute(command: PatchWorkflowCommand): Promise<WorkflowResponseDto> {
     const persistedWorkflow = await this.fetchWorkflow(command);
-    let transientWorkflow = { ...persistedWorkflow };
-    if (command.active !== undefined) {
-      // @ts-ignore
-      transientWorkflow.active = command.active;
-    }
+    let transientWorkflow = this.patchWorkflowFields(persistedWorkflow, command);
 
     transientWorkflow = await this.postProcessWorkflowUpdate.execute({
       workflow: transientWorkflow,
@@ -33,6 +29,16 @@ export class PatchWorkflowUsecase {
       identifierOrInternalId: command.identifierOrInternalId,
       user: command.user,
     });
+  }
+
+  private patchWorkflowFields(persistedWorkflow, command: PatchWorkflowCommand) {
+    const transientWorkflow = { ...persistedWorkflow };
+    if (command.active !== undefined) {
+      // @ts-ignore
+      transientWorkflow.active = command.active;
+    }
+
+    return transientWorkflow;
   }
 
   private async persistWorkflow(
