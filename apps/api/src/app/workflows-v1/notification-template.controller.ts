@@ -202,7 +202,7 @@ export class NotificationTemplateController {
         defaultPreferences: DEFAULT_WORKFLOW_PREFERENCES,
         userPreferences:
           body.preferenceSettings &&
-          buildWorkflowPreferencesFromPreferenceChannels(body.critical ?? false, body.preferenceSettings),
+          buildWorkflowPreferencesFromPreferenceChannels(body.critical, body.preferenceSettings),
         blueprintId: body.blueprintId,
         data: body.data,
         __source: query?.__source,
