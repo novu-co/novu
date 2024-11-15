@@ -117,7 +117,7 @@ export class GetSubscriberTemplatePreference {
           subscriberWorkflowPreferenceV2.preferences,
         );
       subscriberPreferenceType = subscriberWorkflowPreferenceV2.type;
-      critical = subscriberWorkflowPreferenceV2.preferences.all.readOnly;
+      critical = subscriberWorkflowPreferenceV2.preferences?.all?.readOnly;
       enabled = true;
     } else {
       // Lookup V1 preferences only if V2 is not available
