@@ -1,3 +1,4 @@
+/* cspell:disable */
 /* eslint-disable guard-for-in */
 import { it, describe, expect } from 'vitest';
 import { slugify } from './slugify';
