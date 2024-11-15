@@ -1,13 +1,10 @@
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 
-const ABSOLUTE_AND_RELATIVE_URL_REGEX = '^(?!mailto:)(?:(https?):\\/\\/[^\\s/$.?#].[^\\s]*)|^(\\/[^\\s]*)$';
-
 const redirectSchema = {
   type: 'object',
   properties: {
     url: {
       type: 'string',
-      pattern: ABSOLUTE_AND_RELATIVE_URL_REGEX,
     },
     target: {
       type: 'string',
