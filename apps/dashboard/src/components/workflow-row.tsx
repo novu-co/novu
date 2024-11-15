@@ -104,7 +104,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
     },
   });
 
-  const onDeleteStep = async () => {
+  const onDeleteWorkflow = async () => {
     await deleteWorkflow({
       workflowId: workflow._id,
     });
@@ -164,7 +164,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         <ConfirmationModal
           open={isDeleteModalOpen}
           onOpenChange={setIsDeleteModalOpen}
-          onConfirm={onDeleteStep}
+          onConfirm={onDeleteWorkflow}
           title="Are you sure?"
           description={`You're about to delete the ${workflow.name}, this action cannot be undone.`}
           confirmButtonText="Delete"
