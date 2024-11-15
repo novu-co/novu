@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PatchWorkflowFieldEnum, UserSessionData, WorkflowResponseDto } from '@novu/shared';
+import { UserSessionData, WorkflowResponseDto } from '@novu/shared';
 import { NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import { GetWorkflowByIdsUseCase } from '@novu/application-generic';
 import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
@@ -18,7 +18,7 @@ export class PatchWorkflowUsecase {
   async execute(command: PatchWorkflowCommand): Promise<WorkflowResponseDto> {
     const persistedWorkflow = await this.fetchWorkflow(command);
     let transientWorkflow = { ...persistedWorkflow };
-    if (command.fieldsToUpdate.includes(PatchWorkflowFieldEnum.ACTIVE)) {
+    if (command.active !== undefined) {
       // @ts-ignore
       transientWorkflow.active = command.active;
     }

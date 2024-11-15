@@ -1,4 +1,4 @@
-import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum, UiSchemaProperty } from '@novu/shared';
+import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 
 const ABSOLUTE_AND_RELATIVE_URL_REGEX = '^(?!mailto:)(?:(https?):\\/\\/[^\\s/$.?#].[^\\s]*)|^(\\/[^\\s]*)$';
 
@@ -34,7 +34,7 @@ export const inAppControlSchema = {
   properties: {
     subject: { type: 'string' },
     body: { type: 'string' },
-    avatar: { type: 'string', format: 'uri' },
+    avatar: { type: 'string' },
     primaryAction: actionSchema, // Nested primaryAction
     secondaryAction: actionSchema, // Nested secondaryAction
     data: { type: 'object', additionalProperties: true },

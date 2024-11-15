@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PatchStepFieldEnum, StepDataDto, UserSessionData } from '@novu/shared';
+import { StepDataDto, UserSessionData } from '@novu/shared';
 import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import {
   GetWorkflowByIdsUseCase,
@@ -27,13 +27,7 @@ export class PatchStepDataUsecase {
 
   async execute(command: PatchStepDataCommand): Promise<StepDataDto> {
     const persistedItems = await this.loadPersistedItems(command);
-    if (command.fieldsToUpdate.includes(PatchStepFieldEnum.NAME)) {
-      await this.updateName(persistedItems, command);
-    }
-
-    if (command.fieldsToUpdate.includes(PatchStepFieldEnum.CONTROL_VALUES)) {
-      await this.updateControlValues(persistedItems, command);
-    }
+    await this.patchFieldsOnPersistedItems(command, persistedItems);
     const updatedWorkflow = await this.postProcessWorkflowUpdate.execute({
       workflow: persistedItems.workflow,
       user: command.user,
@@ -41,6 +35,16 @@ export class PatchStepDataUsecase {
     await this.persistWorkflow(updatedWorkflow, command.user);
 
     return await this.buildStepDataUsecase.execute({ ...command });
+  }
+
+  private async patchFieldsOnPersistedItems(command: PatchStepDataCommand, persistedItems: ValidNotificationWorkflow) {
+    if (command.name !== undefined) {
+      await this.updateName(persistedItems, command);
+    }
+
+    if (command.controlValues !== undefined) {
+      await this.updateControlValues(persistedItems, command);
+    }
   }
 
   private async loadPersistedItems(command: PatchStepDataCommand) {

@@ -8,7 +8,6 @@ import {
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
   IdentifierOrInternalId,
-  PatchStepFieldEnum,
   slugify,
   StepCreateDto,
   StepDto,
@@ -357,7 +356,6 @@ export class UpsertWorkflowUseCase {
       }
       await this.patchStepDataUsecase.execute({
         controlValues,
-        fieldsToUpdate: [PatchStepFieldEnum.CONTROL_VALUES],
         identifierOrInternalId: workflow._id,
         name: step.name,
         stepId: step._templateId,
