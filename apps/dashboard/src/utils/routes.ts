@@ -25,4 +25,5 @@ export const LEGACY_ROUTES = {
   INVITE_TEAM_MEMBERS: '/legacy/manage-account/team-members',
   SETTINGS: '/legacy/manage-account/user-profile',
   EDIT_WORKFLOW: '/legacy/workflows/edit/:workflowId',
+  TEST_WORKFLOW: '/legacy/workflows/edit/:workflowId/test-workflow',
 };
