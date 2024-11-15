@@ -21,7 +21,6 @@ import {
 } from '@novu/dal';
 import {
   buildWorkflowPreferences,
-  buildWorkflowPreferencesFromPreferenceChannels,
   ChangeEntityTypeEnum,
   DEFAULT_WORKFLOW_PREFERENCES,
   isBridgeWorkflow,
