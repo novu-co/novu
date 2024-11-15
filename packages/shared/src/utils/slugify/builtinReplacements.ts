@@ -1,3 +1,5 @@
+/* cspell:disable */
+
 export const builtinReplacements = [
   // German umlauts
   ['ß', 'ss'],
