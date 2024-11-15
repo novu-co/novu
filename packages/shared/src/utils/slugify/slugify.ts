@@ -7,11 +7,6 @@
  *
  * Original code: https://github.com/simov/slugify
  * Enhanced code with custom replacements: https://gist.github.com/glorat/5070ebd2fa275e2012a51300329a7a55
- *
- * All changes:
- * - `locales` are omitted as they are not needed for our use case.
- * - `decamelize` - added to convert camelcase to separate words.
- *
  */
 
 import { transliterate } from './transliterate';
