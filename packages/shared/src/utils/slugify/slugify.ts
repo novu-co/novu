@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-param-reassign */
-/**
- * Slugify a string
- *
+/*
  * 15/11/2024
+ *
+ * Slugify a string.
  *
  * Original code: https://github.com/simov/slugify
  * Enhanced code with custom replacements: https://gist.github.com/glorat/5070ebd2fa275e2012a51300329a7a55
@@ -161,6 +161,84 @@ const removeMootSeparators = (string: string, separator: string) => {
     .replace(new RegExp(`^${escapedSeparator}|${escapedSeparator}$`, 'g'), '');
 };
 
+/**
+ * Slugify a string.
+ *
+ * Default behavior:
+ * - decamelize
+ * - lowercase
+ * - remove duplicates of the separator character
+ * - remove trailing spaces
+ * - remove special characters
+ * - multilanguage support
+ * - emojis support
+ *
+ * @param string - The string to slugify.
+ * @param options - The options to use for slugifying the string.
+ * @param options.separator - The separator to use for slugifying the string.
+ * @param options.lowercase - Whether to lowercase the string.
+ * @param options.decamelize - Whether to decamelize the string.
+ * @param options.customReplacements - The custom replacements to use for slugifying the string.
+ * @param options.preserveLeadingUnderscore - Whether to preserve leading underscores.
+ * @param options.preserveTrailingDash - Whether to preserve trailing dashes.
+ * @returns The slugified string.
+ *
+ * @example
+ * ```
+ * import { slugify } from '@novu/shared';
+ * slugify('Hello World');
+ * //=> 'hello-world'
+ * ```
+ *
+ * @example
+ * ```
+ * import { slugify } from '@novu/shared';
+ * slugify('Hello World', { separator: '_' });
+ * //=> 'hello_world'
+ * ```
+ *
+ * @example
+ * ```
+ * import { slugify } from '@novu/shared';
+ * slugify('αβγ');
+ * //=> 'avg'
+ * ```
+ *
+ * @example
+ * ```
+ * import { slugify } from '@novu/shared';
+ * slugify('💯-1️⃣-2️⃣-3️⃣');
+ * //=> '100-1-2-3'
+ * ```
+ *
+ * @example
+ * ```
+ * import { slugify } from '@novu/shared';
+ * slugify('camelCase', { decamelize: true });
+ * //=> 'camel-case'
+ * ```
+ *
+ * @example
+ * ```
+ * import { slugify } from '@novu/shared';
+ * slugify('Hello World', { lowercase: false });
+ * //=> 'Hello-World'
+ * ```
+ *
+ * @example
+ * ```
+ * import { slugify } from '@novu/shared';
+ * slugify('foo@unicorn', { preserveLeadingUnderscore: true });
+ * //=> '_foo-at-unicorn'
+ * ```
+ *
+ * @example
+ * ```
+ * import { slugify } from '@novu/shared';
+ * slugify('foo-bar-', { preserveTrailingDash: true });
+ * //=> 'foo-bar-'
+ * ```
+ */
 export const slugify = (string: string, options?: Options) => {
   if (typeof string !== 'string') {
     throw new TypeError(`Expected a string, got \`${typeof string}\``);
