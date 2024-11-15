@@ -407,7 +407,7 @@ describe('Workflow Controller E2E API Testing', () => {
 
       // Verify new created step
       expect(prodWorkflowUpdated.steps[1]._id).to.not.equal(prodWorkflowCreated.steps[1]._id);
-      expect(prodWorkflowUpdated.steps[1].stepId).to.equal('new-in-app-step');
+      expect(prodWorkflowUpdated.steps[1].stepId).to.equal('new-inapp-step');
     });
 
     it('should throw an error if trying to promote to the same environment', async () => {
