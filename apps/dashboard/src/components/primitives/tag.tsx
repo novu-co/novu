@@ -4,7 +4,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/utils/ui';
 
 const tagVariants = cva(
-  'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  'inline-flex items-center max-w-[16ch] rounded-full px-2 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
   {
     variants: {
       variant: {
@@ -21,8 +21,12 @@ const tagVariants = cva(
 
 export interface TagProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof tagVariants> {}
 
-function Tag({ className, variant, ...props }: TagProps) {
-  return <div className={cn(tagVariants({ variant }), className)} {...props} />;
+function Tag({ className, variant, children, ...rest }: TagProps) {
+  return (
+    <div className={cn(tagVariants({ variant }), className)} {...rest}>
+      <span className="truncate">{children}</span>
+    </div>
+  );
 }
 
 export { Tag };
