@@ -81,7 +81,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         options: {
           position: 'bottom-right',
           classNames: {
-            toast: 'mb-4 ml-auto justify-end',
+            toast: 'mb-4 right-0',
           },
         },
       });
@@ -97,7 +97,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         options: {
           position: 'bottom-right',
           classNames: {
-            toast: 'mb-4',
+            toast: 'mb-4 right-0',
           },
         },
       });
