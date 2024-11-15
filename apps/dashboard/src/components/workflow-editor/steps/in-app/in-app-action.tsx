@@ -148,7 +148,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
   const { control } = useFormContext();
 
   return (
-    <Popover modal={false}>
+    <Popover modal={true}>
       <PopoverTrigger {...rest} />
       <PopoverContent className="max-w-72">
         <div className="flex flex-col gap-3">

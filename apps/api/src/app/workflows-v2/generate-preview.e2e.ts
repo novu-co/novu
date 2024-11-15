@@ -192,7 +192,59 @@ describe('Generate Preview', () => {
         });
       });
     });
+    describe('payload sanitation', () => {
+      it('Should produce a correct payload when pipe is used etc {{payload.variable | upper}}', async () => {
+        const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(StepTypeEnum.SMS);
+        const requestDto = {
+          controlValues: {
+            body: 'This is a legal placeholder with a pipe [{{payload.variableName | upper}}the pipe should show in the preview]',
+          },
+        };
+        const previewResponseDto = await generatePreview(workflowId, stepDatabaseId, requestDto, 'email');
+        expect(previewResponseDto.result!.preview).to.exist;
+        if (previewResponseDto.result!.type !== 'sms') {
+          throw new Error('Expected sms');
+        }
+        expect(previewResponseDto.result!.preview.body).to.contain('{{payload.variableName | upper}}');
+        expect(previewResponseDto.previewPayloadExample).to.exist;
+        expect(previewResponseDto?.previewPayloadExample?.payload?.variableName).to.equal(
+          '{{payload.variableName | upper}}'
+        );
+      });
+    });
 
+    describe('Error Handling', () => {
+      it('Should not fail on illegal placeholder {{}} ', async () => {
+        const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(StepTypeEnum.SMS);
+        const requestDto = {
+          controlValues: { body: 'some text that illegal placeholder[{{}}this text should be alone in brackets]' },
+        };
+        const previewResponseDto = await generatePreview(workflowId, stepDatabaseId, requestDto, 'sms');
+        expect(previewResponseDto.result!.preview).to.exist;
+        if (previewResponseDto.result!.type === 'sms') {
+          expect(previewResponseDto.result!.preview.body).to.contain('[this text should be alone in brackets]');
+        }
+        const issue = previewResponseDto.issues.body;
+        expect(issue).to.exist;
+        expect(issue[0].variableName).to.equal('{{}}');
+        expect(issue[0].issueType).to.equal('ILLEGAL_VARIABLE_IN_CONTROL_VALUE');
+      });
+      it('Should return a clear error on illegal placeholder {{name}} ', async () => {
+        const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(StepTypeEnum.SMS);
+        const requestDto = {
+          controlValues: { body: 'some text that illegal placeholder[{{name}}this text should be alone in brackets]' },
+        };
+        const previewResponseDto = await generatePreview(workflowId, stepDatabaseId, requestDto, 'sms');
+        expect(previewResponseDto.result!.preview).to.exist;
+        if (previewResponseDto.result!.type === 'sms') {
+          expect(previewResponseDto.result!.preview.body).to.contain('[this text should be alone in brackets]');
+        }
+        const issue = previewResponseDto.issues.body;
+        expect(issue).to.exist;
+        expect(issue[0].variableName).to.equal('{{name}}');
+        expect(issue[0].issueType).to.equal('ILLEGAL_VARIABLE_IN_CONTROL_VALUE');
+      });
+    });
     describe('Missing Required ControlValues', () => {
       const channelTypes = [{ type: StepTypeEnum.IN_APP, description: 'InApp' }];
 
@@ -427,14 +479,14 @@ function assertEmail(dto: GeneratePreviewResponseDto) {
   if (dto.result!.type === ChannelTypeEnum.EMAIL) {
     const preview = dto.result!.preview.body;
     expect(preview).to.exist;
-    expect(preview).to.contain('{{item.header}}1');
-    expect(preview).to.contain('{{item.header}}2');
-    expect(preview).to.contain('{{item.name}}1');
-    expect(preview).to.contain('{{item.name}}2');
-    expect(preview).to.contain('{{item.id}}1');
-    expect(preview).to.contain('{{item.id}}2');
-    expect(preview).to.contain('{{item.origin.country}}1');
-    expect(preview).to.contain('{{item.origin.country}}2');
+    expect(preview).to.contain('{{item.header}}-1');
+    expect(preview).to.contain('{{item.header}}-2');
+    expect(preview).to.contain('{{item.name}}-1');
+    expect(preview).to.contain('{{item.name}}-2');
+    expect(preview).to.contain('{{item.id}}-1');
+    expect(preview).to.contain('{{item.id}}-2');
+    expect(preview).to.contain('{{item.origin.country}}-1');
+    expect(preview).to.contain('{{item.origin.country}}-2');
     expect(preview).to.contain('{{payload.body}}');
     expect(preview).to.contain('should be the fallback value');
   }

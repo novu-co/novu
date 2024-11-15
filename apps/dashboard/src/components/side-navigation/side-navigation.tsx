@@ -27,7 +27,7 @@ const linkVariants = cva(
     variants: {
       variant: {
         default: 'text-foreground-600/95 transition ease-out duration-300 hover:bg-accent',
-        selected: 'text-foreground-950 transition ease-out duration-300 hover:bg-accent',
+        selected: 'text-foreground-950 bg-neutral-alpha-100 transition ease-out duration-300 hover:bg-accent',
         disabled: 'text-foreground-300 cursor-help',
       },
     },

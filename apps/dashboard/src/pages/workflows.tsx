@@ -14,7 +14,7 @@ export const WorkflowsPage = () => {
       <DashboardLayout headerStartItems={<h1 className="text-foreground-950">Workflows</h1>}>
         <OptInModal />
         <div className="mt-3 flex justify-between px-2.5 py-2">
-          <div className="flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2">
+          <div className="invisible flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2">
             <RiSearch2Line className="text-foreground-400 size-5" />
             <Input placeholder="Search workflows" />
           </div>

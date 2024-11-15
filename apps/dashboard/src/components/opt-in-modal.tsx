@@ -13,19 +13,16 @@ import {
 } from '@/components/primitives/dialog';
 import { RiCustomerService2Line } from 'react-icons/ri';
 import { useNewDashboardOptIn } from '@/hooks/use-new-dashboard-opt-in';
-import { NewDashboardOptInStatusEnum } from '@novu/shared';
 
 export const OptInModal = () => {
-  const { status, optIn } = useNewDashboardOptIn();
+  const { isFirstVisit, updateNewDashboardFirstVisit } = useNewDashboardOptIn();
 
-  const isOptedIn = status === NewDashboardOptInStatusEnum.OPTED_IN;
-
-  if (isOptedIn) {
+  if (!isFirstVisit) {
     return null;
   }
 
   return (
-    <Dialog modal open={!isOptedIn} onOpenChange={optIn}>
+    <Dialog modal open={!!isFirstVisit} onOpenChange={updateNewDashboardFirstVisit}>
       <DialogPortal>
         <DialogOverlay />
         <DialogContent className="p-0">
