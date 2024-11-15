@@ -22,6 +22,7 @@ import {
   IdentifierOrInternalId,
   ListWorkflowResponse,
   PatchStepDataDto,
+  PatchWorkflowDto,
   StepDataDto,
   SyncWorkflowDto,
   UpdateWorkflowDto,
@@ -52,6 +53,7 @@ import {
 import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview.command';
 import { PatchStepDataUsecase } from './usecases/patch-step-data/patch-step-data.usecase';
 import { PatchStepDataCommand } from './usecases/patch-step-data';
+import { PatchWorkflowCommand, PatchWorkflowUsecase } from './usecases/patch-workflow';
 
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
@@ -68,7 +70,8 @@ export class WorkflowController {
     private generatePreviewUseCase: GeneratePreviewUsecase,
     private buildWorkflowTestDataUseCase: BuildWorkflowTestDataUseCase,
     private buildStepDataUsecase: BuildStepDataUsecase,
-    private patchStepDataUsecase: PatchStepDataUsecase
+    private patchStepDataUsecase: PatchStepDataUsecase,
+    private patchWorkflowUsecase: PatchWorkflowUsecase
   ) {}
 
   @Post('')
@@ -204,6 +207,17 @@ export class WorkflowController {
     const command = PatchStepDataCommand.create({ user, identifierOrInternalId, stepId, ...patchStepDataDto });
 
     return await this.patchStepDataUsecase.execute(command);
+  }
+  @Patch('/:workflowId')
+  @UseGuards(UserAuthGuard)
+  async patchWorkflow(
+    @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
+    @Param('workflowId', ParseSlugIdPipe) identifierOrInternalId: IdentifierOrInternalId,
+    @Body() patchWorkflowDto: PatchWorkflowDto
+  ): Promise<WorkflowResponseDto> {
+    const command = PatchWorkflowCommand.create({ user, identifierOrInternalId, ...patchWorkflowDto });
+
+    return await this.patchWorkflowUsecase.execute(command);
   }
   @Get('/:workflowId/test-data')
   @UseGuards(UserAuthGuard)

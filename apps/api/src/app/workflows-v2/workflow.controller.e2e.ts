@@ -10,6 +10,7 @@ import {
   JSONSchemaDto,
   ListWorkflowResponse,
   PatchStepFieldEnum,
+  PatchWorkflowFieldEnum,
   PreferencesRequestDto,
   ShortIsPrefixEnum,
   slugify,
@@ -368,7 +369,6 @@ describe('Workflow Controller E2E API Testing', () => {
       const prodWorkflowCreated = resPromoteCreate.body.data;
 
       // Update the workflow in the development environment
-      const stepToUpdate = removeFields(devWorkflow.steps[0], 'stepId');
       const updateDto = {
         ...convertResponseToUpdateDto(devWorkflow),
         name: 'Updated Name',
@@ -638,6 +638,48 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(toSchema.additionalProperties).to.be.false;
     });
   });
+  describe('Patch Workflow Step Data Permutations', () => {
+    it('when patch one control values the second step stays untouched', async () => {
+      const response = await createWorkflowRest(buildCreateWorkflowDto('', {}));
+      const workflowDatabaseId = response._id;
+      const stepId1 = response.steps[0]._id;
+      const stepId2 = response.steps[1]._id;
+      const controlValues1 = { body: 'body1', subject: 'subject1' };
+      await patchStepRest(workflowDatabaseId, stepId1, controlValues1);
+      const newVar = await getStepData(workflowDatabaseId, stepId1);
+      expect(newVar.controls.values).to.deep.equal(controlValues1);
+      const stepData2 = await getStepData(workflowDatabaseId, stepId2);
+      expect(stepData2.controls.values).to.not.deep.equal(controlValues1);
+      const controlValues2 = { body: 'body2', subject: 'subject2' };
+      await patchStepRest(workflowDatabaseId, stepId2, controlValues2);
+      const stepData2Updated = await getStepData(workflowDatabaseId, stepId2);
+      expect(stepData2Updated.controls.values).to.deep.equal(controlValues2);
+    });
+  });
+  describe('Patch Workflow Permutations', () => {
+    it('Patch should work and allow us to turn workflow active on / off and have the status change accordingly', async () => {
+      const workflowDto = await createWorkflowRest(buildCreateWorkflowDto('', { steps: [buildInAppStep()] }));
+      await patchStepRest(workflowDto._id, workflowDto.steps[0]._id, { body: 'body1', subject: 'subject1' });
+      const novuRestResult = await workflowsClient.patchWorkflow(workflowDto._id, {
+        fieldsToUpdate: [PatchWorkflowFieldEnum.ACTIVE],
+        active: false,
+      });
+      if (!novuRestResult.isSuccessResult()) {
+        throw new Error(novuRestResult.error!.responseText);
+      }
+      const updatedWorkflow = novuRestResult.value;
+      expect(updatedWorkflow.status).to.equal(WorkflowStatusEnum.INACTIVE);
+      const novuRestResult2 = await workflowsClient.patchWorkflow(updatedWorkflow._id, {
+        fieldsToUpdate: [PatchWorkflowFieldEnum.ACTIVE],
+        active: true,
+      });
+      if (!novuRestResult2.isSuccessResult()) {
+        throw new Error(novuRestResult2.error!.responseText);
+      }
+      const updatedWorkflow2 = novuRestResult2.value;
+      expect(updatedWorkflow2.status).to.equal(WorkflowStatusEnum.ACTIVE);
+    });
+  });
 
   async function createWorkflowRest(newVar: CreateWorkflowDto): Promise<WorkflowResponseDto> {
     const novuRestResult = await workflowsClient.createWorkflow(newVar);
@@ -666,25 +708,6 @@ describe('Workflow Controller E2E API Testing', () => {
 
     return novuRestResult.value;
   }
-
-  describe('Patch Workflow Step Data Permutations', () => {
-    it('when patch one control values the second step stays untouched', async () => {
-      const response = await createWorkflowRest(buildCreateWorkflowDto('', {}));
-      const workflowDatabaseId = response._id;
-      const stepId1 = response.steps[0]._id;
-      const stepId2 = response.steps[1]._id;
-      const controlValues1 = { body: 'body1', subject: 'subject1' };
-      await patchStepRest(workflowDatabaseId, stepId1, controlValues1);
-      const newVar = await getStepData(workflowDatabaseId, stepId1);
-      expect(newVar.controls.values).to.deep.equal(controlValues1);
-      const stepData2 = await getStepData(workflowDatabaseId, stepId2);
-      expect(stepData2.controls.values).to.not.deep.equal(controlValues1);
-      const controlValues2 = { body: 'body2', subject: 'subject2' };
-      await patchStepRest(workflowDatabaseId, stepId2, controlValues2);
-      const stepData2Updated = await getStepData(workflowDatabaseId, stepId2);
-      expect(stepData2Updated.controls.values).to.deep.equal(controlValues2);
-    });
-  });
   async function validatePayloadSchemaInStepDataVariables(workflowResponse: WorkflowResponseDto) {
     const stepData = await getStepData(workflowResponse._id, workflowResponse.steps[0]._id);
     if (!stepData) throw new Error('Step data is not valid');
@@ -789,7 +812,7 @@ describe('Workflow Controller E2E API Testing', () => {
       const stepInRequest = updateRequest.steps[i];
       expect(stepInRequest.name).to.equal(updatedWorkflow.steps[i].name);
       expect(stepInRequest.type).to.equal(updatedWorkflow.steps[i].type);
-      const persistedValues = await getControlValuesForStep(updatedWorkflow._id, updatedWorkflow.steps[i]._id);
+
       if ('_id' in stepInRequest) {
         expect(constructSlugForStepRequest(stepInRequest)).to.equal(updatedWorkflow.steps[i].slug);
       }

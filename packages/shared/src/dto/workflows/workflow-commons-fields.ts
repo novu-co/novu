@@ -34,6 +34,13 @@ export type PatchStepDataDto = {
   controlValues?: Record<string, unknown>;
   fieldsToUpdate: PatchStepFieldEnum[];
 };
+export type PatchWorkflowDto = {
+  active?: boolean;
+  fieldsToUpdate: PatchWorkflowFieldEnum[];
+};
+export enum PatchWorkflowFieldEnum {
+  ACTIVE = 'active',
+}
 export type StepResponseDto = StepDto & {
   _id: string;
   slug: Slug;
