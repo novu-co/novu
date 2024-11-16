@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ControlValuesLevelEnum, UserSessionData } from '@novu/shared';
-import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
+import { ControlValuesRepository, NotificationStepEntity } from '@novu/dal';
 import _ from 'lodash';
 import { WorkflowInternalResponseDto } from '@novu/application-generic';
 import { PrepareAndValidateContentUsecase, ValidatedContentResponse } from '../validate-content';
