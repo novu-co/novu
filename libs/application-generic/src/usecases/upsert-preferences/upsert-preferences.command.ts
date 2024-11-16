@@ -87,8 +87,7 @@ export class UpsertPreferencesPartialBaseCommand extends EnvironmentCommand {
   @IsObject()
   @ValidateNested()
   @Type(() => PreferencesPartial)
-  @ValidateIf((object, value) => value !== null)
-  readonly preferences: PreferencesPartial | null;
+  readonly preferences: PreferencesPartial;
 }
 
 // FULL PREFERENCES
@@ -150,6 +149,5 @@ export class UpsertPreferencesRequiredBaseCommand extends EnvironmentCommand {
   @IsObject()
   @ValidateNested()
   @Type(() => PreferencesRequired)
-  @ValidateIf((object, value) => value !== null)
-  readonly preferences: PreferencesRequired | null;
+  readonly preferences: PreferencesRequired;
 }
