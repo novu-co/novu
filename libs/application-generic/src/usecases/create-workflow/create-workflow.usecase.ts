@@ -353,7 +353,10 @@ export class CreateWorkflow {
       }),
     );
 
-    if (command.userPreferences !== undefined) {
+    if (
+      command.userPreferences !== undefined &&
+      command.userPreferences !== null
+    ) {
       // userPreferences is optional, so we need to check if it's defined before calling the upsert
       await this.upsertPreferences.upsertUserWorkflowPreferences(
         UpsertUserWorkflowPreferencesCommand.create({
