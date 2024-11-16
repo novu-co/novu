@@ -127,6 +127,10 @@ export class NotificationStepVariantCommand {
   @IsOptional()
   _templateId?: string;
 
+  @IsString()
+  @IsOptional()
+  shortId?: string;
+
   @ValidateNested()
   @IsOptional()
   template?: any;

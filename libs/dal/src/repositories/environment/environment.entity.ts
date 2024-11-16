@@ -28,6 +28,8 @@ export interface IDnsSettings {
 export class EnvironmentEntity {
   _id: string;
 
+  shortId?: string;
+
   name: string;
 
   _organizationId: OrganizationId;

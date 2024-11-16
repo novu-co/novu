@@ -12,7 +12,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common/decorators';
-import { ClassSerializerInterceptor, HttpStatus, Patch } from '@nestjs/common';
+import { ClassSerializerInterceptor, HttpStatus, NotFoundException, Patch } from '@nestjs/common';
 import {
   CreateWorkflowDto,
   DirectionEnum,
@@ -30,7 +30,14 @@ import {
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
 } from '@novu/shared';
-import { DeleteWorkflowCommand, DeleteWorkflowUseCase, UserAuthGuard, UserSession } from '@novu/application-generic';
+import {
+  DeleteWorkflowCommand,
+  DeleteWorkflowUseCase,
+  isValidShortId,
+  UserAuthGuard,
+  UserSession,
+} from '@novu/application-generic';
+import { EnvironmentRepository } from '@novu/dal';
 import { ApiCommonResponses } from '../shared/framework/response.decorator';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
 import { GetWorkflowCommand } from './usecases/get-workflow/get-workflow.command';
@@ -71,7 +78,8 @@ export class WorkflowController {
     private buildWorkflowTestDataUseCase: BuildWorkflowTestDataUseCase,
     private buildStepDataUsecase: BuildStepDataUsecase,
     private patchStepDataUsecase: PatchStepUsecase,
-    private patchWorkflowUsecase: PatchWorkflowUsecase
+    private patchWorkflowUsecase: PatchWorkflowUsecase,
+    private environmentRepository: EnvironmentRepository
   ) {}
 
   @Post('')
@@ -80,10 +88,12 @@ export class WorkflowController {
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
     @Body() createWorkflowDto: CreateWorkflowDto
   ): Promise<WorkflowResponseDto> {
+    const userSession = await this.normalizeUserSession(user);
+
     return this.upsertWorkflowUseCase.execute(
       UpsertWorkflowCommand.create({
         workflowDto: createWorkflowDto,
-        user,
+        user: userSession,
       })
     );
   }
@@ -95,11 +105,13 @@ export class WorkflowController {
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
     @Body() syncWorkflowDto: SyncWorkflowDto
   ): Promise<WorkflowResponseDto> {
+    const userSession = await this.normalizeUserSession(user);
+
     return this.syncToEnvironmentUseCase.execute(
       SyncToEnvironmentCommand.create({
         identifierOrInternalId: workflowId,
         targetEnvironmentId: syncWorkflowDto.targetEnvironmentId,
-        user,
+        user: userSession,
       })
     );
   }
@@ -111,10 +123,12 @@ export class WorkflowController {
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
     @Body() updateWorkflowDto: UpdateWorkflowDto
   ): Promise<WorkflowResponseDto> {
+    const userSession = await this.normalizeUserSession(user);
+
     return await this.upsertWorkflowUseCase.execute(
       UpsertWorkflowCommand.create({
         workflowDto: updateWorkflowDto,
-        user,
+        user: userSession,
         identifierOrInternalId: workflowId,
       })
     );
@@ -127,12 +141,14 @@ export class WorkflowController {
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
     @Query('environmentId') environmentId?: string
   ): Promise<WorkflowResponseDto> {
+    const userSession = await this.normalizeUserSession(user);
+
     return this.getWorkflowUseCase.execute(
       GetWorkflowCommand.create({
         identifierOrInternalId: workflowId,
         user: {
-          ...user,
-          environmentId: environmentId || user.environmentId,
+          ...userSession,
+          environmentId: environmentId || userSession.environmentId,
         },
       })
     );
@@ -144,12 +160,14 @@ export class WorkflowController {
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId
   ) {
+    const userSession = await this.normalizeUserSession(user);
+
     await this.deleteWorkflowUsecase.execute(
       DeleteWorkflowCommand.create({
         identifierOrInternalId: workflowId,
-        environmentId: user.environmentId,
-        organizationId: user.organizationId,
-        userId: user._id,
+        environmentId: userSession.environmentId,
+        organizationId: userSession.organizationId,
+        userId: userSession._id,
       })
     );
   }
@@ -160,6 +178,8 @@ export class WorkflowController {
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
     @Query() query: GetListQueryParams
   ): Promise<ListWorkflowResponse> {
+    const userSession = await this.normalizeUserSession(user);
+
     return this.listWorkflowsUseCase.execute(
       ListWorkflowsCommand.create({
         offset: Number(query.offset || '0'),
@@ -167,7 +187,7 @@ export class WorkflowController {
         orderDirection: query.orderDirection ?? DirectionEnum.DESC,
         orderByField: query.orderByField ?? 'createdAt',
         searchQuery: query.query,
-        user,
+        user: userSession,
       })
     );
   }
@@ -180,8 +200,15 @@ export class WorkflowController {
     @Param('stepId', ParseSlugIdPipe) stepId: string,
     @Body() generatePreviewRequestDto: GeneratePreviewRequestDto
   ): Promise<GeneratePreviewResponseDto> {
+    const userSession = await this.normalizeUserSession(user);
+
     return await this.generatePreviewUseCase.execute(
-      GeneratePreviewCommand.create({ user, workflowId, stepDatabaseId: stepId, generatePreviewRequestDto })
+      GeneratePreviewCommand.create({
+        user: userSession,
+        workflowId,
+        stepDatabaseId: stepId,
+        generatePreviewRequestDto,
+      })
     );
   }
 
@@ -192,8 +219,10 @@ export class WorkflowController {
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
     @Param('stepId', ParseSlugIdPipe) stepId: IdentifierOrInternalId
   ): Promise<StepDataDto> {
+    const userSession = await this.normalizeUserSession(user);
+
     return await this.buildStepDataUsecase.execute(
-      BuildStepDataCommand.create({ user, identifierOrInternalId: workflowId, stepId })
+      BuildStepDataCommand.create({ user: userSession, identifierOrInternalId: workflowId, stepId })
     );
   }
   @Patch('/:workflowId/steps/:stepId')
@@ -204,7 +233,14 @@ export class WorkflowController {
     @Param('stepId', ParseSlugIdPipe) stepId: IdentifierOrInternalId,
     @Body() patchStepDataDto: PatchStepDataDto
   ): Promise<StepDataDto> {
-    const command = PatchStepCommand.create({ user, identifierOrInternalId, stepId, ...patchStepDataDto });
+    const userSession = await this.normalizeUserSession(user);
+
+    const command = PatchStepCommand.create({
+      user: userSession,
+      identifierOrInternalId,
+      stepId,
+      ...patchStepDataDto,
+    });
 
     return await this.patchStepDataUsecase.execute(command);
   }
@@ -215,7 +251,13 @@ export class WorkflowController {
     @Param('workflowId', ParseSlugIdPipe) identifierOrInternalId: IdentifierOrInternalId,
     @Body() patchWorkflowDto: PatchWorkflowDto
   ): Promise<WorkflowResponseDto> {
-    const command = PatchWorkflowCommand.create({ user, identifierOrInternalId, ...patchWorkflowDto });
+    const userSession = await this.normalizeUserSession(user);
+
+    const command = PatchWorkflowCommand.create({
+      user: userSession,
+      identifierOrInternalId,
+      ...patchWorkflowDto,
+    });
 
     return await this.patchWorkflowUsecase.execute(command);
   }
@@ -228,5 +270,27 @@ export class WorkflowController {
     return this.buildWorkflowTestDataUseCase.execute(
       WorkflowTestDataCommand.create({ identifierOrInternalId: workflowId, user })
     );
+  }
+
+  private async normalizeUserSession(user: UserSessionData): Promise<UserSessionData> {
+    if (!isValidShortId(user.environmentId, 6)) {
+      return user;
+    }
+
+    const environment = await this.environmentRepository.findOne({
+      shortId: user.environmentId,
+    });
+
+    if (!environment) {
+      throw new NotFoundException({
+        message: 'Environment not found',
+        environmentId: user.environmentId,
+      });
+    }
+
+    return {
+      ...user,
+      environmentId: environment._id,
+    };
   }
 }

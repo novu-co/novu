@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { createHash } from 'crypto';
 
 import { EnvironmentRepository, NotificationGroupRepository } from '@novu/dal';
-import { encryptApiKey } from '@novu/application-generic';
+import { encryptApiKey, generateUniqueId } from '@novu/application-generic';
 
 import { CreateEnvironmentCommand } from './create-environment.command';
 import { GenerateUniqueApiKey } from '../generate-unique-api-key/generate-unique-api-key.usecase';
@@ -22,10 +22,19 @@ export class CreateEnvironment {
     const key = await this.generateUniqueApiKey.execute();
     const encryptedApiKey = encryptApiKey(key);
     const hashedApiKey = createHash('sha256').update(key).digest('hex');
+    const shortId = await generateUniqueId(
+      nanoid(6),
+      async (candidateId) => {
+        return (await this.environmentRepository.findOne({ shortId: candidateId })) !== null;
+      },
+      () => nanoid(6),
+      'ENVIRONMENT_SHORT_ID_GENERATION'
+    );
 
     const environment = await this.environmentRepository.create({
       _organizationId: command.organizationId,
       name: command.name,
+      shortId,
       identifier: nanoid(12),
       _parentId: command.parentEnvironmentId,
       apiKeys: [

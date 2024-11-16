@@ -7,6 +7,7 @@ import { EnvironmentDBModel } from './environment.entity';
 const environmentSchema = new Schema<EnvironmentDBModel>(
   {
     name: Schema.Types.String,
+    shortId: Schema.Types.String,
     identifier: {
       type: Schema.Types.String,
       unique: true,
@@ -79,6 +80,10 @@ environmentSchema.index({
 
 environmentSchema.index({
   'apiKeys.hash': 1,
+});
+
+environmentSchema.index({
+  shortId: 1,
 });
 
 export const Environment =

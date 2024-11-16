@@ -7,6 +7,7 @@ import { ShortIsPrefixEnum, EnvironmentEnum } from '@novu/shared';
 import { GetMyEnvironmentsCommand } from './get-my-environments.command';
 import { EnvironmentResponseDto } from '../../dtos/environment-response.dto';
 import { buildSlug } from '../../../shared/helpers/build-slug';
+import { encodeBase62 } from '../../../shared/helpers/base62';
 
 @Injectable({
   scope: Scope.REQUEST,
@@ -45,10 +46,11 @@ export class GetMyEnvironments {
     });
 
     const shortEnvName = shortenEnvironmentName(decryptedApiKeysEnvironment.name);
+    const shortId = decryptedApiKeysEnvironment.shortId || encodeBase62(decryptedApiKeysEnvironment._id);
 
     return {
       ...decryptedApiKeysEnvironment,
-      slug: buildSlug(shortEnvName, ShortIsPrefixEnum.ENVIRONMENT, decryptedApiKeysEnvironment._id),
+      slug: buildSlug(shortEnvName, ShortIsPrefixEnum.ENVIRONMENT, shortId),
     };
   }
 }
