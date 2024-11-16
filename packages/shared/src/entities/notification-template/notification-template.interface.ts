@@ -86,6 +86,7 @@ export class StepIssues {
 }
 export interface IStepVariant {
   _id?: string;
+  shortId?: string;
   uuid?: string;
   stepId?: string;
   issues?: StepIssues;

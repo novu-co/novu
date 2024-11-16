@@ -45,6 +45,7 @@ import {
   UpdateMessageTemplate,
   UpdateMessageTemplateCommand,
 } from '../../message-template';
+import { generateUniqueStepShortId } from '../../../utils/generate-unique-step-short-id';
 
 @Injectable()
 export class UpdateWorkflow {
@@ -377,7 +378,7 @@ export class UpdateWorkflow {
         messageTemplateExist = stepMessageTemplate?._id;
       }
 
-      const updatedTemplate = messageTemplateExist
+      const upsertedTemplate = messageTemplateExist
         ? await this.updateMessageTemplate.execute(
             UpdateMessageTemplateCommand.create({
               templateId: message._templateId!,
@@ -388,13 +389,17 @@ export class UpdateWorkflow {
             CreateMessageTemplateCommand.create(messageTemplatePayload),
           );
 
-      messageTemplateId = updatedTemplate._id;
+      messageTemplateId = upsertedTemplate._id;
+
+      const shortId =
+        message.shortId || (await generateUniqueStepShortId(message, steps));
 
       const partialNotificationStep = this.getPartialTemplateStep(
         messageTemplateId,
         parentStepId,
         message,
         updatedVariants,
+        shortId,
       );
 
       templateMessages.push(partialNotificationStep as NotificationStepEntity);
@@ -456,6 +461,7 @@ export class UpdateWorkflow {
     parentStepId: string | null,
     message: NotificationStep,
     updatedVariants: StepVariantEntity[],
+    shortId: string,
   ) {
     const partialNotificationStep: Partial<NotificationStepEntity> = {
       _id: stepId,
@@ -497,6 +503,10 @@ export class UpdateWorkflow {
 
     if (updatedVariants.length) {
       partialNotificationStep.variants = updatedVariants;
+    }
+
+    if (shortId) {
+      partialNotificationStep.shortId = shortId;
     }
 
     return partialNotificationStep;

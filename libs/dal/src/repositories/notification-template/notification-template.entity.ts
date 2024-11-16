@@ -31,6 +31,8 @@ import type { ChangePropsValueType } from '../../types';
 export class NotificationTemplateEntity implements INotificationTemplate {
   _id: string;
 
+  shortId: string;
+
   name: string;
 
   description: string;
@@ -113,6 +115,8 @@ export class NotificationTriggerEntity implements INotificationTrigger {
 
 export class StepVariantEntity implements IStepVariant {
   _id?: string;
+
+  shortId?: string;
 
   uuid?: string;
 

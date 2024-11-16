@@ -16,6 +16,7 @@ import {
 import { NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { GetPreferencesResponseDto } from '@novu/application-generic';
 import { buildSlug } from '../../shared/helpers/build-slug';
+import { encodeBase62 } from '../../shared/helpers/base62';
 
 export function toResponseWorkflowDto(
   template: NotificationTemplateEntity,
@@ -29,7 +30,7 @@ export function toResponseWorkflowDto(
 
   return {
     _id: template._id,
-    slug: buildSlug(workflowName, ShortIsPrefixEnum.WORKFLOW, template._id),
+    slug: buildSlug(workflowName, ShortIsPrefixEnum.WORKFLOW, buildShortId(template.shortId, template._id)),
     workflowId: template.triggers[0].identifier,
     name: workflowName,
     tags: template.tags,
@@ -61,7 +62,7 @@ function toMinifiedWorkflowDto(template: NotificationTemplateEntity): WorkflowLi
   return {
     _id: template._id,
     workflowId: template.triggers[0].identifier,
-    slug: buildSlug(workflowName, ShortIsPrefixEnum.WORKFLOW, template._id),
+    slug: buildSlug(workflowName, ShortIsPrefixEnum.WORKFLOW, buildShortId(template.shortId, template._id)),
     name: workflowName,
     origin: computeOrigin(template),
     tags: template.tags,
@@ -81,12 +82,16 @@ function toStepResponseDto(persistedStep: NotificationStepEntity): StepResponseD
 
   return {
     _id: persistedStep._templateId,
-    slug: buildSlug(stepName, ShortIsPrefixEnum.STEP, persistedStep._templateId),
+    slug: buildSlug(stepName, ShortIsPrefixEnum.STEP, buildShortId(persistedStep.shortId, persistedStep._templateId)),
     name: stepName,
     stepId: persistedStep.stepId || 'Missing Step Id',
     type: persistedStep.template?.type || StepTypeEnum.EMAIL,
     issues: persistedStep.issues,
   } satisfies StepResponseDto;
+}
+
+function buildShortId(shortId: string | undefined, internalId: string) {
+  return shortId || encodeBase62(internalId);
 }
 
 function buildStepTypeOverview(step: NotificationStepEntity): StepTypeEnum | undefined {

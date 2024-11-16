@@ -1,4 +1,6 @@
 import { BaseRepository } from '@novu/dal';
+import { ShortIsPrefixEnum } from '@novu/shared';
+import { isValidShortId } from '@novu/application-generic';
 import { decodeBase62 } from '../../shared/helpers';
 
 export type InternalId = string;
@@ -18,10 +20,6 @@ function lookoutForId(value: string): string | null {
     return value;
   }
 
-  if (isWorkflowId(value)) {
-    return value;
-  }
-
   return null;
 }
 
@@ -31,14 +29,26 @@ export function parseSlugId(value: string): InternalId {
   }
 
   const validId = lookoutForId(value);
+  // if contains only a internal id or a workflow id
   if (validId) {
     return validId;
   }
 
-  const encodedValue = value.slice(-ENCODED_ID_LENGTH);
+  // result is emhJxofizJJEcIN3 / h2khu3
+  const prefixedId = extractPrefixedId(value);
+
+  // only case is that this is a workflow id
+  if (!prefixedId) {
+    return value;
+  }
+
+  if (isValidShortId(prefixedId, 6)) {
+    return prefixedId;
+  }
+
   let decodedValue: string;
   try {
-    decodedValue = decodeBase62(encodedValue);
+    decodedValue = decodeBase62(prefixedId);
   } catch (error) {
     return value;
   }
@@ -48,4 +58,18 @@ export function parseSlugId(value: string): InternalId {
   }
 
   return value;
+}
+
+function extractPrefixedId(value: string): string | null {
+  const prefixes = Object.values(ShortIsPrefixEnum);
+  let id: string | null = null;
+  for (const prefix of prefixes) {
+    const parts = value.split(`_${prefix}`);
+    if (parts.length > 1) {
+      id = parts[parts.length - 1];
+      break;
+    }
+  }
+
+  return id;
 }

@@ -48,6 +48,8 @@ import {
 } from '../message-template';
 import { ApiException, PlatformException } from '../../utils/exceptions';
 import { shortId } from '../../utils/generate-id';
+import { generateUniqueId } from '../../utils/generate-unique-short-id';
+import { generateUniqueStepShortId } from '../../utils/generate-unique-step-short-id';
 
 @Injectable()
 export class CreateWorkflow {
@@ -74,6 +76,9 @@ export class CreateWorkflow {
 
     const parentChangeId: string =
       NotificationTemplateRepository.createObjectId();
+    const uniqueWorkflowShortId = await this.generateUniqueWorkflowShortId(
+      command.environmentId,
+    );
 
     const [templateSteps, trigger] = await Promise.all([
       this.storeTemplateSteps(command, parentChangeId),
@@ -85,6 +90,7 @@ export class CreateWorkflow {
       templateSteps,
       trigger,
       triggerIdentifier,
+      uniqueWorkflowShortId,
     );
 
     await this.createWorkflowChange(command, storedWorkflow, parentChangeId);
@@ -176,7 +182,7 @@ export class CreateWorkflow {
       contentService.extractMessageVariables(command.steps);
     const subscriberVariables =
       contentService.extractSubscriberMessageVariables(command.steps);
-    const identifier = await this.generateUniqueIdentifier(
+    const identifier = await this.generateUniqueTriggerIdentifier(
       command,
       triggerIdentifier,
     );
@@ -211,36 +217,33 @@ export class CreateWorkflow {
     return trigger;
   }
 
-  private async generateUniqueIdentifier(
+  private async generateUniqueTriggerIdentifier(
     command: CreateWorkflowCommand,
     triggerIdentifier: string,
   ) {
-    const maxAttempts = 3;
-    let identifier = '';
-
-    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-      const candidateIdentifier =
-        attempt === 0 ? triggerIdentifier : `${triggerIdentifier}-${shortId()}`;
-
-      const isIdentifierExist =
-        await this.notificationTemplateRepository.findByTriggerIdentifier(
+    return generateUniqueId(
+      triggerIdentifier,
+      async (candidateIdentifier) =>
+        (await this.notificationTemplateRepository.findByTriggerIdentifier(
           command.environmentId,
           candidateIdentifier,
-        );
+        )) !== null,
+      () => `${triggerIdentifier}-${shortId()}`,
+      'WORKFLOW_ID_GENERATION',
+    );
+  }
 
-      if (!isIdentifierExist) {
-        identifier = candidateIdentifier;
-        break;
-      }
-    }
-
-    if (!identifier) {
-      throw new ApiException(
-        `Unable to generate a unique identifier. Please provide a different workflow name.${command.name}`,
-      );
-    }
-
-    return identifier;
+  private async generateUniqueWorkflowShortId(environmentId: string) {
+    return generateUniqueId(
+      shortId(6),
+      async (candidateShortId) =>
+        (await this.notificationTemplateRepository.findByTriggerIdentifier(
+          environmentId,
+          candidateShortId,
+        )) !== null,
+      () => shortId(6),
+      'WORKFLOW_SHORT_ID_GENERATION',
+    );
   }
 
   private sendTemplateCreationEvent(
@@ -289,10 +292,12 @@ export class CreateWorkflow {
     templateSteps: INotificationTemplateStep[],
     trigger: INotificationTrigger,
     triggerIdentifier: string,
+    uniqueShortId: string,
   ) {
     this.logger.info(`Creating workflow ${JSON.stringify(command)}`);
 
     const savedWorkflow = await this.notificationTemplateRepository.create({
+      shortId: uniqueShortId,
       _organizationId: command.organizationId,
       _creatorId: command.userId,
       _environmentId: command.environmentId,
@@ -389,8 +394,12 @@ export class CreateWorkflow {
       ]);
 
       const stepId = createdMessageTemplate._id;
+
+      const stepShortId = await generateUniqueStepShortId(step, templateSteps);
+
       const templateStep: Partial<INotificationTemplateStep> = {
         _id: stepId,
+        shortId: stepShortId,
         _templateId: createdMessageTemplate._id,
         filters: step.filters,
         _parentId: parentStepId,

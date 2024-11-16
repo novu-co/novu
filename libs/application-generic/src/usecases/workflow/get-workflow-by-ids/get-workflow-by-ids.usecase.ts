@@ -6,6 +6,7 @@ import {
 } from '@novu/dal';
 
 import { GetWorkflowByIdsCommand } from './get-workflow-by-ids.command';
+import { isValidShortId } from '../../../utils';
 
 @Injectable()
 export class GetWorkflowByIdsUseCase {
@@ -26,21 +27,36 @@ export class GetWorkflowByIdsUseCase {
         command.identifierOrInternalId,
         command.environmentId,
       );
-    } else {
-      workflowEntity =
-        await this.notificationTemplateRepository.findByTriggerIdentifier(
-          command.environmentId,
-          command.identifierOrInternalId,
-        );
     }
 
-    if (!workflowEntity) {
-      throw new NotFoundException({
-        message: 'Workflow cannot be found',
-        workflowId: command.identifierOrInternalId,
+    if (workflowEntity) {
+      return workflowEntity;
+    }
+
+    if (isValidShortId(command.identifierOrInternalId, 6)) {
+      workflowEntity = await this.notificationTemplateRepository.findOne({
+        shortId: command.identifierOrInternalId,
+        _environmentId: command.environmentId,
       });
     }
 
-    return workflowEntity;
+    if (workflowEntity) {
+      return workflowEntity;
+    }
+
+    workflowEntity =
+      await this.notificationTemplateRepository.findByTriggerIdentifier(
+        command.environmentId,
+        command.identifierOrInternalId,
+      );
+
+    if (workflowEntity) {
+      return workflowEntity;
+    }
+
+    throw new NotFoundException({
+      message: 'Workflow cannot be found',
+      workflowId: command.identifierOrInternalId,
+    });
   }
 }
