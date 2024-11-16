@@ -9,7 +9,6 @@ import {
   JSONSchemaDefinition,
   JSONSchemaDto,
   ListWorkflowResponse,
-  PatchStepFieldEnum,
   PreferencesRequestDto,
   ShortIsPrefixEnum,
   slugify,
@@ -179,7 +178,6 @@ describe('Workflow Controller E2E API Testing', () => {
         const test = `test-${generateUUID()}`;
         stepControlValuesAfterUpdate.push(test);
         await workflowsClient.patchWorkflowStepData(workflowId, step._id, {
-          fieldsToUpdate: [PatchStepFieldEnum.CONTROL_VALUES],
           controlValues: { test },
         });
       }
@@ -368,7 +366,6 @@ describe('Workflow Controller E2E API Testing', () => {
       const prodWorkflowCreated = resPromoteCreate.body.data;
 
       // Update the workflow in the development environment
-      const stepToUpdate = removeFields(devWorkflow.steps[0], 'stepId');
       const updateDto = {
         ...convertResponseToUpdateDto(devWorkflow),
         name: 'Updated Name',
@@ -519,7 +516,6 @@ describe('Workflow Controller E2E API Testing', () => {
         const workflowResponse = res.value;
         const controlValues = { subject: 'Welcome to our newsletter {{payload.legalVariable}},{{IllegalVariable}}' };
         await workflowsClient.patchWorkflowStepData(workflowResponse?._id, workflowResponse?.steps[0]._id, {
-          fieldsToUpdate: [PatchStepFieldEnum.CONTROL_VALUES],
           controlValues,
         });
 
@@ -638,35 +634,6 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(toSchema.additionalProperties).to.be.false;
     });
   });
-
-  async function createWorkflowRest(newVar: CreateWorkflowDto): Promise<WorkflowResponseDto> {
-    const novuRestResult = await workflowsClient.createWorkflow(newVar);
-    if (!novuRestResult.isSuccessResult()) {
-      throw new Error(novuRestResult.error!.responseText);
-    }
-
-    return novuRestResult.value;
-  }
-
-  async function patchStepRest(
-    workflowDatabaseId: string,
-    stepId1: string,
-    controlValues1: {
-      subject: string;
-      body: string;
-    }
-  ) {
-    const novuRestResult = await workflowsClient.patchWorkflowStepData(workflowDatabaseId, stepId1, {
-      fieldsToUpdate: [PatchStepFieldEnum.CONTROL_VALUES],
-      controlValues: controlValues1,
-    });
-    if (!novuRestResult.isSuccessResult()) {
-      throw new Error(novuRestResult.error!.responseText);
-    }
-
-    return novuRestResult.value;
-  }
-
   describe('Patch Workflow Step Data Permutations', () => {
     it('when patch one control values the second step stays untouched', async () => {
       const response = await createWorkflowRest(buildCreateWorkflowDto('', {}));
@@ -685,6 +652,54 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(stepData2Updated.controls.values).to.deep.equal(controlValues2);
     });
   });
+
+  async function patchWorkflowAndReturnResponse(workflowId: string, active: boolean) {
+    const novuRestResult = await workflowsClient.patchWorkflow(workflowId, {
+      active,
+    });
+    if (!novuRestResult.isSuccessResult()) {
+      throw new Error(novuRestResult.error!.responseText);
+    }
+    const updatedWorkflow = novuRestResult.value;
+
+    return updatedWorkflow;
+  }
+
+  describe('Patch Workflow Permutations', () => {
+    it('Patch should work and allow us to turn workflow active on / off and have the status change accordingly', async () => {
+      const workflowDto = await createWorkflowRest(buildCreateWorkflowDto('', { steps: [buildInAppStep()] }));
+      await patchStepRest(workflowDto._id, workflowDto.steps[0]._id, { body: 'body1', subject: 'subject1' });
+      let updatedWorkflow = await patchWorkflowAndReturnResponse(workflowDto._id, false);
+      expect(updatedWorkflow.status).to.equal(WorkflowStatusEnum.INACTIVE);
+      updatedWorkflow = await patchWorkflowAndReturnResponse(workflowDto._id, true);
+      expect(updatedWorkflow.status).to.equal(WorkflowStatusEnum.ACTIVE);
+      await patchStepRest(workflowDto._id, workflowDto.steps[0]._id, {});
+      updatedWorkflow = await patchWorkflowAndReturnResponse(workflowDto._id, false);
+      expect(updatedWorkflow.status).to.equal(WorkflowStatusEnum.INACTIVE);
+      updatedWorkflow = await patchWorkflowAndReturnResponse(workflowDto._id, true);
+      expect(updatedWorkflow.status).to.equal(WorkflowStatusEnum.ERROR);
+    });
+  });
+
+  async function createWorkflowRest(newVar: CreateWorkflowDto): Promise<WorkflowResponseDto> {
+    const novuRestResult = await workflowsClient.createWorkflow(newVar);
+    if (!novuRestResult.isSuccessResult()) {
+      throw new Error(novuRestResult.error!.responseText);
+    }
+
+    return novuRestResult.value;
+  }
+
+  async function patchStepRest(workflowDatabaseId: string, stepId1: string, controlValues1: Record<string, unknown>) {
+    const novuRestResult = await workflowsClient.patchWorkflowStepData(workflowDatabaseId, stepId1, {
+      controlValues: controlValues1,
+    });
+    if (!novuRestResult.isSuccessResult()) {
+      throw new Error(novuRestResult.error!.responseText);
+    }
+
+    return novuRestResult.value;
+  }
   async function validatePayloadSchemaInStepDataVariables(workflowResponse: WorkflowResponseDto) {
     const stepData = await getStepData(workflowResponse._id, workflowResponse.steps[0]._id);
     if (!stepData) throw new Error('Step data is not valid');
@@ -789,7 +804,7 @@ describe('Workflow Controller E2E API Testing', () => {
       const stepInRequest = updateRequest.steps[i];
       expect(stepInRequest.name).to.equal(updatedWorkflow.steps[i].name);
       expect(stepInRequest.type).to.equal(updatedWorkflow.steps[i].type);
-      const persistedValues = await getControlValuesForStep(updatedWorkflow._id, updatedWorkflow.steps[i]._id);
+
       if ('_id' in stepInRequest) {
         expect(constructSlugForStepRequest(stepInRequest)).to.equal(updatedWorkflow.steps[i].slug);
       }
@@ -959,7 +974,6 @@ describe('Workflow Controller E2E API Testing', () => {
     if (isStepUpdateBody(stepToUpdate)) {
       stepToUpdate.name = `Updated Step Name- ${generateUUID()}`;
       await workflowsClient.patchWorkflowStepData(workflowDatabaseId, stepToUpdate._id, {
-        fieldsToUpdate: [PatchStepFieldEnum.CONTROL_VALUES],
         controlValues: { test: `test-${generateUUID()}` },
       });
 

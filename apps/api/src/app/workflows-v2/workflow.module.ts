@@ -33,8 +33,9 @@ import {
 } from './usecases';
 import { BridgeModule } from '../bridge';
 import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-renderers';
-import { PatchStepDataUsecase } from './usecases/patch-step-data';
 import { OverloadContentDataOnWorkflowUseCase } from './usecases/overload-content-data';
+import { PatchWorkflowUsecase } from './usecases/patch-workflow';
+import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
 
 @Module({
   imports: [SharedModule, MessageTemplateModule, ChangeModule, AuthModule, BridgeModule, IntegrationModule],
@@ -62,9 +63,10 @@ import { OverloadContentDataOnWorkflowUseCase } from './usecases/overload-conten
     PrepareAndValidateContentUsecase,
     ValidatePlaceholderUsecase,
     ExtractDefaultValuesFromSchemaUsecase,
-    PatchStepDataUsecase,
+    PatchStepUsecase,
     PostProcessWorkflowUpdate,
     OverloadContentDataOnWorkflowUseCase,
+    PatchWorkflowUsecase,
   ],
 })
 export class WorkflowModule implements NestModule {
