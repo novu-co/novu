@@ -1,14 +1,11 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/primitives/tooltip';
 import { cn } from '@/utils/ui';
+import { Slot, SlotProps } from '@radix-ui/react-slot';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-interface TruncatedTextProps {
-  text: string;
-  className?: string;
-  onClick?: React.MouseEventHandler<HTMLSpanElement>;
-}
-
-export default function TruncatedText({ text, className = '', onClick }: TruncatedTextProps) {
+type TruncatedTextProps = SlotProps & { asChild?: boolean };
+export default function TruncatedText(props: TruncatedTextProps) {
+  const { className, children, asChild, ...rest } = props;
   const [isTruncated, setIsTruncated] = useState(false);
   const textRef = useRef<HTMLDivElement>(null);
 
@@ -29,15 +26,17 @@ export default function TruncatedText({ text, className = '', onClick }: Truncat
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span ref={textRef} className={cn('block truncate', className)} onClick={onClick}>
-            {text}
-          </span>
+          {asChild ? (
+            <Slot ref={textRef} className={cn('block truncate', className)} {...rest}>
+              {children}
+            </Slot>
+          ) : (
+            <span ref={textRef} className={cn('block truncate', className)} {...rest}>
+              {children}
+            </span>
+          )}
         </TooltipTrigger>
-        {isTruncated && (
-          <TooltipContent>
-            <p>{text}</p>
-          </TooltipContent>
-        )}
+        {isTruncated && <TooltipContent style={{ wordBreak: 'break-all' }}>{children}</TooltipContent>}
       </Tooltip>
     </TooltipProvider>
   );

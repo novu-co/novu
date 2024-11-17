@@ -43,7 +43,7 @@ describe('Generate Preview', () => {
         const previewResponseDto = await generatePreview(workflowId, emailStepDatabaseId, requestDto, 'testing steps');
         expect(previewResponseDto.result!.preview).to.exist;
         expect(previewResponseDto.previewPayloadExample).to.exist;
-        expect(previewResponseDto.previewPayloadExample?.steps?.digeststep).to.be.ok;
+        expect(previewResponseDto.previewPayloadExample?.steps?.[digestStepId]).to.be.ok;
         expect(previewResponseDto.result!.preview.body).to.contain('{{item.payload.country}}');
       });
       it(` should hydrate previous step in iterator sms looking at inApp`, async () => {
@@ -54,7 +54,7 @@ describe('Generate Preview', () => {
         expect(previewResponseDto.previewPayloadExample).to.exist;
         expect(previewResponseDto.previewPayloadExample?.steps).to.be.ok;
         if (previewResponseDto.result?.type === 'sms' && previewResponseDto.result?.preview.body) {
-          expect(previewResponseDto.result!.preview.body).to.contain('[[{{steps.inappstep.seen}}]]');
+          expect(previewResponseDto.result!.preview.body).to.contain(`[[{{steps.${inAppStepId}.seen}}]]`);
         }
       });
       const channelTypes = [{ type: StepTypeEnum.IN_APP, description: 'InApp' }];

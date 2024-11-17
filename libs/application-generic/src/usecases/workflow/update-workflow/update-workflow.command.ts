@@ -5,20 +5,24 @@ import {
   IsDefined,
   IsEnum,
   IsMongoId,
+  IsObject,
   IsOptional,
   IsString,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 
 import {
-  IPreferenceChannels,
   JSONSchemaDto,
   NotificationTemplateCustomData,
+  WorkflowStatusEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
 
+import { Type } from 'class-transformer';
 import { EnvironmentWithUserCommand } from '../../../commands';
-import { NotificationStep } from '../..';
+import { PreferencesRequired } from '../../upsert-preferences';
+import { ContentIssue, NotificationStep } from '../..';
 
 export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsDefined()
@@ -45,12 +49,22 @@ export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsOptional()
   workflowId?: string;
 
+  @IsObject()
+  @ValidateNested()
+  @Type(() => PreferencesRequired)
+  @ValidateIf((object, value) => value !== null)
+  @IsOptional()
+  userPreferences?: PreferencesRequired | null;
+
+  @IsObject()
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PreferencesRequired)
+  defaultPreferences: PreferencesRequired;
+
   @IsBoolean()
   @IsOptional()
   critical?: boolean;
-
-  @IsOptional()
-  preferenceSettings?: IPreferenceChannels;
 
   @IsOptional()
   @IsMongoId({
@@ -88,6 +102,15 @@ export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsEnum(WorkflowTypeEnum)
   @IsDefined()
   type: WorkflowTypeEnum;
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => ContentIssue)
+  issues?: Record<string, ContentIssue[]>;
+
+  @IsEnum(WorkflowStatusEnum)
+  @IsOptional()
+  status?: WorkflowStatusEnum;
 }
 
 export interface IStepControl {

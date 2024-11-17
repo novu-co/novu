@@ -2,6 +2,7 @@ import { JobTitleEnum } from '../../types';
 
 export interface IServicesHashes {
   intercom?: string;
+  plain?: string;
 }
 export interface IUserEntity {
   _id: string;

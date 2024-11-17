@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { RiSendPlaneFill } from 'react-icons/ri';
+import { RiFileCopyLine, RiSendPlaneFill } from 'react-icons/ri';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import type { WorkflowResponseDto } from '@novu/shared';
@@ -141,13 +141,9 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
               <TabsTrigger className={tabsTriggerClassName} value="python" variant="regular">
                 Python
               </TabsTrigger>
-              <CopyButton
-                variant="ghost"
-                size="sm"
-                className="text-foreground-400 ml-auto font-normal"
-                content={snippetValue}
-                value="Copy code"
-              />
+              <CopyButton variant="ghost" className="text-foreground-400 ml-auto" size="sm" valueToCopy="Copy code">
+                <RiFileCopyLine className="size-4" /> Copy code
+              </CopyButton>
             </TabsList>
             {workflow?.origin === WorkflowOriginEnum.EXTERNAL && (
               <TabsContent value="framework" className={codePanelClassName} variant="regular">

@@ -148,7 +148,7 @@ describe('Delete workflow by id - /workflows/:workflowId (DELETE)', async () => 
     const dummyId = '5f6651112efc19f33b34fc39';
     const response = await session.testAgent.delete(`/v1/workflows/${dummyId}`).send();
 
-    expect(response.body.message).to.contains('Could not find workflow with id');
+    expect(response.body.message).to.contains('Workflow cannot be found');
   });
 
   it('should delete the workflow along with the message templates', async function () {

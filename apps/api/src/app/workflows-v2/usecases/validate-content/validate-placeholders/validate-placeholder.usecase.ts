@@ -142,7 +142,7 @@ export class ValidatePlaceholderUsecase {
     return { errorMsg: `Error: Placeholder "${nestedPlaceholder}" is not defined in the schema.` };
   }
 }
-const VALID_VARIABLE_REGEX: RegExp = /^[a-zA-Z_][\w.]*$/;
+const VALID_VARIABLE_REGEX: RegExp = /^[a-zA-Z_][\w.-]*$/;
 const NESTED_PLACEHOLDER_REGEX: RegExp = /\{\{.*\{\{.*\}\}.*\}\}/;
 const FILTER_REGEX: RegExp = /\|/;
 const RESERVED_WORDS: string[] = [
@@ -298,7 +298,8 @@ const ERROR_MESSAGES = {
   empty: 'Error: Placeholder cannot be empty. Please provide a valid variable name.',
   nestedPlaceholders: 'Error: Nested placeholders are not allowed. Please remove any nested {{ }}.',
   invalidCharacters:
-    'Error: Placeholder contains invalid characters. A valid placeholder can only include letters, numbers, underscores, and dots.',
+    // eslint-disable-next-line max-len
+    'Error: Placeholder contains invalid characters. A valid placeholder can only include letters, numbers, underscores, dots, and hyphens.',
   invalidDotUsage: 'Error: Placeholder cannot start or end with a dot. Please adjust the variable name.',
   consecutiveDots: 'Error: Placeholder cannot contain consecutive dots. Please correct the variable name.',
   invalidFilter: (part: string) =>

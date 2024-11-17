@@ -10,8 +10,10 @@ import {
   WorkflowResponseDto,
   WorkflowStatusEnum,
 } from '@novu/shared';
-import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
+import { NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
 import { Injectable } from '@nestjs/common';
+import { WorkflowInternalResponseDto } from '@novu/application-generic';
+import { ValidatedContentResponse } from '../validate-content';
 
 import { PostProcessWorkflowUpdateCommand } from './post-process-workflow-update.command';
 import { OverloadContentDataOnWorkflowUseCase } from '../overload-content-data';
@@ -25,7 +27,7 @@ export class PostProcessWorkflowUpdate {
     private overloadContentDataOnWorkflowUseCase: OverloadContentDataOnWorkflowUseCase
   ) {}
 
-  async execute(command: PostProcessWorkflowUpdateCommand): Promise<NotificationTemplateEntity> {
+  async execute(command: PostProcessWorkflowUpdateCommand): Promise<WorkflowInternalResponseDto> {
     const workflowIssues = await this.validateWorkflow(command);
     const stepIssues = this.validateSteps(command.workflow.steps);
     let transientWorkflow = this.updateIssuesOnWorkflow(command.workflow, workflowIssues, stepIssues);
@@ -39,20 +41,20 @@ export class PostProcessWorkflowUpdate {
     return transientWorkflow;
   }
 
-  private overloadStatusOnWorkflow(workflowWithIssues: NotificationTemplateEntity) {
+  private overloadStatusOnWorkflow(workflowWithIssues: WorkflowInternalResponseDto) {
     // eslint-disable-next-line no-param-reassign
     workflowWithIssues.status = this.computeStatus(workflowWithIssues);
 
     return workflowWithIssues;
   }
 
-  private computeStatus(workflowWithIssues: NotificationTemplateEntity) {
+  private computeStatus(workflowWithIssues: WorkflowInternalResponseDto) {
     const isWorkflowCompleteAndValid = this.isWorkflowCompleteAndValid(workflowWithIssues);
 
     return this.calculateStatus(isWorkflowCompleteAndValid, workflowWithIssues);
   }
 
-  private calculateStatus(isGoodWorkflow: boolean, workflowWithIssues: NotificationTemplateEntity) {
+  private calculateStatus(isGoodWorkflow: boolean, workflowWithIssues: WorkflowInternalResponseDto) {
     if (workflowWithIssues.active === false) {
       return WorkflowStatusEnum.INACTIVE;
     }
@@ -64,7 +66,7 @@ export class PostProcessWorkflowUpdate {
     return WorkflowStatusEnum.ERROR;
   }
 
-  private isWorkflowCompleteAndValid(workflowWithIssues: NotificationTemplateEntity) {
+  private isWorkflowCompleteAndValid(workflowWithIssues: WorkflowInternalResponseDto) {
     const workflowIssues = workflowWithIssues.issues && Object.keys(workflowWithIssues.issues).length > 0;
     const hasInnerIssues =
       workflowWithIssues.steps
@@ -163,10 +165,10 @@ export class PostProcessWorkflowUpdate {
   }
 
   private updateIssuesOnWorkflow(
-    workflow: NotificationTemplateEntity,
+    workflow: WorkflowInternalResponseDto,
     workflowIssues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>,
     stepIssuesMap: Record<string, StepIssues>
-  ): NotificationTemplateEntity {
+  ): WorkflowInternalResponseDto {
     const issues = workflowIssues as unknown as Record<string, ContentIssue[]>;
     for (const step of workflow.steps) {
       if (stepIssuesMap[step._templateId]) {
