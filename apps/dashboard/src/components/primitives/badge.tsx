@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/utils/ui';
 
 const badgeVariants = cva(
-  'inline-flex items-center h-fit border px-2  transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  'inline-flex items-center gap-1 h-fit border p-1 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
   {
     variants: {
       variant: {
@@ -13,15 +13,12 @@ const badgeVariants = cva(
         highlighted: 'border-highlighted bg-highlighted',
         stable: 'border-stable bg-stable',
         verified: 'border-verified bg-verified',
-        destructive: 'border-destructive bg-destructive',
-        'destructive-light': 'border-transparent bg-destructive/10',
-        success: 'border-success bg-success',
-        'success-light': 'border-transparent bg-success/10',
-        warning: 'border-warning bg-warning',
-        'warning-light': 'border-transparent bg-warning/10',
+        destructive: 'border-transparent bg-destructive/10 text-destructive',
+        success: 'border-transparent bg-success/10 text-success',
+        warning: 'border-transparent bg-warning/10 text-warning',
         alert: 'border-alert bg-alert',
         soft: 'border-neutral-alpha-200 bg-neutral-alpha-200',
-        outline: 'border-neutral-alpha-200 bg-transparent font-normal text-foreground-600 text-sm shadow-sm',
+        outline: 'border-neutral-alpha-200 bg-transparent font-normal text-foreground-600 shadow-sm',
       },
       kind: {
         default: 'rounded-md',
@@ -43,34 +40,4 @@ function Badge({ className, variant, kind, ...props }: BadgeProps) {
   return <div className={cn(badgeVariants({ variant, kind }), className)} {...props} />;
 }
 
-const badgeContentVariants = cva('text-xs font-medium', {
-  variants: {
-    variant: {
-      foreground: 'text-foreground',
-      'neutral-foreground': 'text-neutral-foreground',
-      neutral: 'text-neutral-500',
-      feature: 'text-feature',
-      information: 'text-information',
-      highlighted: 'text-highlighted',
-      stable: 'text-stable',
-      verified: 'text-verified',
-      destructive: 'text-destructive',
-      success: 'text-success',
-      warning: 'text-warning',
-      alert: 'text-alert',
-    },
-  },
-  defaultVariants: {
-    variant: 'foreground',
-  },
-});
-
-export interface BadgeContentProps
-  extends React.HTMLAttributes<HTMLSpanElement>,
-    VariantProps<typeof badgeContentVariants> {}
-
-function BadgeContent({ className, variant, ...props }: BadgeContentProps) {
-  return <span className={cn(badgeContentVariants({ variant }), className)} {...props} />;
-}
-
-export { Badge, BadgeContent };
+export { Badge };

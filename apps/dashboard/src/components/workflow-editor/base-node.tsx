@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { cva, VariantProps } from 'class-variance-authority';
-import { Badge, BadgeContent, BadgeContentProps, BadgeProps } from '../primitives/badge';
+import { Badge, BadgeProps } from '../primitives/badge';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { StepTypeEnum } from '@/utils/enums';
 import { RiErrorWarningFill } from 'react-icons/ri';
@@ -50,9 +50,7 @@ export const NodeHeader = ({ children, type }: { children: ReactNode; type: Step
         kind="pill-stroke"
         className="ml-auto min-w-max uppercase opacity-40"
       >
-        <BadgeContent variant={STEP_TYPE_TO_COLOR[type] as BadgeContentProps['variant']}>
-          {type.replace('_', '-')}
-        </BadgeContent>
+        {type.replace('_', '-')}
       </Badge>
     </div>
   );
