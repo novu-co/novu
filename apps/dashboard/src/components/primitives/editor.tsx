@@ -1,4 +1,4 @@
-import React, { useEffect, useImperativeHandle, useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef } from 'react';
 import { tags as t } from '@lezer/highlight';
 import { useCodeMirror, EditorView, ReactCodeMirrorProps } from '@uiw/react-codemirror';
 import { cva, VariantProps } from 'class-variance-authority';
@@ -100,36 +100,53 @@ const baseTheme = EditorView.baseTheme({
   },
 });
 
-const theme = createTheme({
-  theme: 'light',
-  styles: [
-    { tag: t.keyword, color: 'hsl(var(--feature))' },
-    { tag: t.string, color: 'hsl(var(--highlighted))' },
-    { tag: t.operatorKeyword, color: 'hsl(var(--highlighted))' },
-    { tag: t.function(t.variableName), color: 'hsl(var(--information))' },
-    { tag: t.brace, color: 'hsl(var(--foreground-400))' },
-    { tag: t.variableName, color: 'hsl(var(--foreground-950))' },
-  ],
-  settings: {
-    background: 'transparent',
-    lineHighlight: 'transparent',
-    fontFamily: 'inherit',
-  },
-});
-
 type EditorProps = {
   value: string;
   placeholder?: string;
   className?: string;
   height?: string;
   onChange?: (val: string) => void;
+  fontFamily?: 'inherit';
 } & ReactCodeMirrorProps &
   VariantProps<typeof editorVariants>;
 
 export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, EditorProps>(
-  ({ value, placeholder, className, height, size, onChange, extensions, basicSetup, ...restCodeMirrorProps }, ref) => {
+  (
+    {
+      value,
+      placeholder,
+      className,
+      height,
+      size,
+      fontFamily,
+      onChange,
+      extensions,
+      basicSetup,
+      ...restCodeMirrorProps
+    },
+    ref
+  ) => {
     const editor = useRef<HTMLDivElement>(null);
     const [shouldFocus, setShouldFocus] = React.useState(false);
+
+    const theme = useMemo(() => {
+      return createTheme({
+        theme: 'light',
+        styles: [
+          { tag: t.keyword, color: 'hsl(var(--feature))' },
+          { tag: t.string, color: 'hsl(var(--highlighted))' },
+          { tag: t.operatorKeyword, color: 'hsl(var(--highlighted))' },
+          { tag: t.function(t.variableName), color: 'hsl(var(--information))' },
+          { tag: t.brace, color: 'hsl(var(--foreground-400))' },
+          { tag: t.variableName, color: 'hsl(var(--foreground-950))' },
+        ],
+        settings: {
+          background: 'transparent',
+          lineHighlight: 'transparent',
+          fontFamily: fontFamily === 'inherit' ? 'inherit' : undefined,
+        },
+      });
+    }, [fontFamily]);
 
     const { setContainer, view } = useCodeMirror({
       extensions: [...(extensions ?? []), baseTheme],

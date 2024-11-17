@@ -25,6 +25,7 @@ export function TextWidget(props: WidgetProps) {
           <FormControl>
             <InputField size="md" className="px-1" state={errors[name] ? 'error' : 'default'}>
               <Editor
+                fontFamily="inherit"
                 placeholder={capitalize(label)}
                 size="md"
                 id={label}

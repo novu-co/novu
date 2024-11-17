@@ -47,6 +47,7 @@ export const URLInput = ({
                   <FormControl>
                     {asEditor ? (
                       <Editor
+                        fontFamily="inherit"
                         size={size}
                         placeholder={placeholder}
                         height={size === 'md' ? '38px' : '30px'}

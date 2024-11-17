@@ -29,6 +29,7 @@ export const InAppSubject = () => {
           <FormControl>
             <InputField size="md" className="px-1" state={errors[subjectKey] ? 'error' : 'default'}>
               <Editor
+                fontFamily="inherit"
                 placeholder={capitalize(field.name)}
                 size="md"
                 id={field.name}

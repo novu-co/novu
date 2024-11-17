@@ -172,6 +172,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                 <FormControl>
                   <InputField>
                     <Editor
+                      fontFamily="inherit"
                       placeholder="Button text"
                       value={field.value}
                       onChange={field.onChange}
