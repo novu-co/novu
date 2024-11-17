@@ -196,6 +196,7 @@ export class WorkflowController {
       BuildStepDataCommand.create({ user, identifierOrInternalId: workflowId, stepId })
     );
   }
+
   @Patch('/:workflowId/steps/:stepId')
   @UseGuards(UserAuthGuard)
   async patchWorkflowStepData(
@@ -204,10 +205,11 @@ export class WorkflowController {
     @Param('stepId', ParseSlugIdPipe) stepId: IdentifierOrInternalId,
     @Body() patchStepDataDto: PatchStepDataDto
   ): Promise<StepDataDto> {
-    const command = PatchStepCommand.create({ user, identifierOrInternalId, stepId, ...patchStepDataDto });
-
-    return await this.patchStepDataUsecase.execute(command);
+    return await this.patchStepDataUsecase.execute(
+      PatchStepCommand.create({ user, identifierOrInternalId, stepId, ...patchStepDataDto })
+    );
   }
+
   @Patch('/:workflowId')
   @UseGuards(UserAuthGuard)
   async patchWorkflow(
@@ -215,10 +217,11 @@ export class WorkflowController {
     @Param('workflowId', ParseSlugIdPipe) identifierOrInternalId: IdentifierOrInternalId,
     @Body() patchWorkflowDto: PatchWorkflowDto
   ): Promise<WorkflowResponseDto> {
-    const command = PatchWorkflowCommand.create({ user, identifierOrInternalId, ...patchWorkflowDto });
-
-    return await this.patchWorkflowUsecase.execute(command);
+    return await this.patchWorkflowUsecase.execute(
+      PatchWorkflowCommand.create({ user, identifierOrInternalId, ...patchWorkflowDto })
+    );
   }
+
   @Get('/:workflowId/test-data')
   @UseGuards(UserAuthGuard)
   async getWorkflowTestData(

@@ -56,6 +56,7 @@ export class UpsertWorkflowUseCase {
     private notificationTemplateRepository: NotificationTemplateRepository,
     private patchStepDataUsecase: PatchStepUsecase
   ) {}
+
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
     const workflowForUpdate = await this.queryWorkflow(command);
     let persistedWorkflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
@@ -70,6 +71,7 @@ export class UpsertWorkflowUseCase {
 
     return toResponseWorkflowDto(persistedWorkflow, preferences);
   }
+
   private async getWorkflow(workflowId: string, environmentId: string): Promise<NotificationTemplateEntity> {
     const entity = await this.notificationTemplateRepository.findById(workflowId, environmentId);
     if (!entity) {
@@ -152,6 +154,11 @@ export class UpsertWorkflowUseCase {
     return command.workflowDto.preferences.user;
   }
 
+  /**
+   * Upsert workflow preferences. While this operation is not typically needed
+   * in a standard workflow update, it's maintained here to support environment
+   * sync scenarios and to enable code reusability.
+   */
   private async upsertWorkflowPreferences(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
     if (!command.workflowDto.preferences?.workflow) {
       return;
@@ -341,6 +348,7 @@ export class UpsertWorkflowUseCase {
       )
     )?._id;
   }
+
   /**
    * @deprecated This method will be removed in future versions.
    * Please use `the patch step data instead, do not add here anything` instead.

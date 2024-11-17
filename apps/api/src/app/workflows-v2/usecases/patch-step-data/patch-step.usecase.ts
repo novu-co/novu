@@ -38,11 +38,11 @@ export class PatchStepUsecase {
   }
 
   private async patchFieldsOnPersistedItems(command: PatchStepCommand, persistedItems: ValidNotificationWorkflow) {
-    if (command.name !== undefined) {
+    if (command.name !== undefined && command.name !== null) {
       await this.updateName(persistedItems, command);
     }
 
-    if (command.controlValues !== undefined) {
+    if (command.controlValues !== undefined && command.controlValues !== null) {
       await this.updateControlValues(persistedItems, command);
     }
   }
@@ -50,7 +50,7 @@ export class PatchStepUsecase {
   private async loadPersistedItems(command: PatchStepCommand) {
     const workflow = await this.fetchWorkflow(command);
 
-    const { currentStep } = await this.findStepWithSameMemoryPointer(command, workflow);
+    const { currentStep } = await this.findStepByStepId(command, workflow);
 
     return { workflow, currentStep };
   }
@@ -58,6 +58,7 @@ export class PatchStepUsecase {
   private async updateName(persistedItems: ValidNotificationWorkflow, command: PatchStepCommand) {
     persistedItems.currentStep.name = command.name;
   }
+
   private async persistWorkflow(
     workflowWithIssues: Partial<NotificationTemplateEntity>,
     userSessionData: UserSessionData
@@ -82,7 +83,7 @@ export class PatchStepUsecase {
     });
   }
 
-  private async findStepWithSameMemoryPointer(command: PatchStepCommand, workflow: NotificationTemplateEntity) {
+  private async findStepByStepId(command: PatchStepCommand, workflow: NotificationTemplateEntity) {
     const currentStep = workflow.steps.find(
       (stepItem) => stepItem._id === command.stepId || stepItem.stepId === command.stepId
     );
@@ -97,6 +98,7 @@ export class PatchStepUsecase {
 
     return { currentStep };
   }
+
   private async updateControlValues(persistedItems: ValidNotificationWorkflow, command: PatchStepCommand) {
     return await this.upsertControlValuesUseCase.execute(
       UpsertControlValuesCommand.create({

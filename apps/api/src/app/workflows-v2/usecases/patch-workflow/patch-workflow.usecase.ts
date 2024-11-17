@@ -31,9 +31,9 @@ export class PatchWorkflowUsecase {
     });
   }
 
-  private patchWorkflowFields(persistedWorkflow, command: PatchWorkflowCommand) {
-    const transientWorkflow = { ...persistedWorkflow };
-    if (command.active !== undefined) {
+  private patchWorkflowFields(persistedWorkflow, command: PatchWorkflowCommand): NotificationTemplateEntity {
+    const transientWorkflow: NotificationTemplateEntity = { ...persistedWorkflow };
+    if (command.active !== undefined && command.active !== null) {
       // @ts-ignore
       transientWorkflow.active = command.active;
     }
@@ -41,10 +41,7 @@ export class PatchWorkflowUsecase {
     return transientWorkflow;
   }
 
-  private async persistWorkflow(
-    workflowWithIssues: Partial<NotificationTemplateEntity>,
-    userSessionData: UserSessionData
-  ) {
+  private async persistWorkflow(workflowWithIssues: NotificationTemplateEntity, userSessionData: UserSessionData) {
     await this.notificationTemplateRepository.update(
       {
         _id: workflowWithIssues._id,

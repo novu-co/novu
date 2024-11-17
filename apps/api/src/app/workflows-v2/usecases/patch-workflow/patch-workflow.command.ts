@@ -6,6 +6,7 @@ export class PatchWorkflowCommand extends EnvironmentWithUserObjectCommand {
   @IsString()
   @IsNotEmpty()
   identifierOrInternalId: IdentifierOrInternalId;
+
   @IsBoolean()
   @IsOptional()
   active?: boolean;
