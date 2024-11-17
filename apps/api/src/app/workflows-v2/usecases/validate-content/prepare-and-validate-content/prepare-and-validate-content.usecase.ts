@@ -179,7 +179,7 @@ export class PrepareAndValidateContentUsecase {
           result[controlValueKey].push({
             issueType: StepContentIssueEnum.MISSING_VARIABLE_IN_PAYLOAD,
             variableName: item,
-            message: `${toSentenceCase(item)} is missing in payload.`,
+            message: `${toSentenceCase(item)} is missing in payload`,
           });
         }
       }
@@ -199,7 +199,7 @@ export class PrepareAndValidateContentUsecase {
       result[item] = [
         {
           issueType: StepContentIssueEnum.MISSING_VALUE,
-          message: `${toSentenceCase(item)} is missing.`,
+          message: `${toSentenceCase(item)} is missing`,
         },
       ];
     }
