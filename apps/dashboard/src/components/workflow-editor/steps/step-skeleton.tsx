@@ -32,9 +32,9 @@ const STEP_TYPE_TO_SKELETON_CONTENT: Record<StepTypeEnum | string, () => React.J
   [StepTypeEnum.IN_APP]: () => {
     return (
       <>
-        <div className="flex items-center gap-2.5">
-          <RiPencilRuler2Line className="text-foreground-950 size-5 p-0.5 text-sm font-medium" />
-          <span>In-app Template</span>
+        <div className="flex items-center gap-2.5 text-sm font-medium">
+          <Notification5Fill className="size-3" />
+          <span>In-app template editor</span>
         </div>
         <div className="flex flex-col gap-1 rounded-xl border border-neutral-100 p-1">
           <div className="flex gap-1">

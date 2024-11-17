@@ -117,7 +117,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                   tags: values.tags,
                 });
               })}
-              className="flex flex-col gap-6"
+              className="flex flex-col gap-4"
             >
               <FormField
                 control={form.control}

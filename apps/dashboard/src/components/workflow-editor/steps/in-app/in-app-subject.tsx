@@ -27,11 +27,10 @@ export const InAppSubject = () => {
       render={({ field }) => (
         <FormItem className="w-full">
           <FormControl>
-            <InputField size="md" className="px-1" state={errors[subjectKey] ? 'error' : 'default'}>
+            <InputField className="px-1" state={errors[subjectKey] ? 'error' : 'default'}>
               <Editor
                 fontFamily="inherit"
                 placeholder={capitalize(field.name)}
-                size="md"
                 id={field.name}
                 extensions={[
                   liquid({

@@ -49,10 +49,10 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ n
   };
 
   return (
-    <div className="size-10 space-y-2">
+    <div className="size-9 space-y-2">
       <Popover modal={true} open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="icon" className="text-foreground-600 relative size-10">
+          <Button variant="outline" size="icon" className="text-foreground-600 relative h-9 w-10">
             {value ? (
               <Avatar className="p-px">
                 <AvatarImage src={value as string} />
@@ -72,7 +72,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ n
                 <RiEdit2Line className="size-4" /> Customize avatar
               </div>
               <Separator />
-              <div className="space-y-1">
+              <div className="flex flex-col gap-1">
                 <Label>Avatar URL</Label>
                 <InputField className="px-1" state={error ? 'error' : 'default'}>
                   <Editor

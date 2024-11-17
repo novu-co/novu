@@ -23,9 +23,9 @@ export const InAppEditorPreview = (props: InAppEditorPreviewProps) => {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-2 text-sm">
+      <div className="flex items-center gap-2.5 text-sm font-medium">
         <Notification5Fill className="size-3" />
-        In-app template
+        In-app template editor
       </div>
 
       <Collapsible

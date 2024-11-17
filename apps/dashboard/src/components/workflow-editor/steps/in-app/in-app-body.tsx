@@ -4,7 +4,7 @@ import { EditorView } from '@uiw/react-codemirror';
 import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
-import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
+import { FormControl, FormField, FormItem, FormMessage, FormMessagePure } from '@/components/primitives/form/form';
 import { InputField } from '@/components/primitives/input';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
@@ -27,11 +27,10 @@ export const InAppBody = () => {
       render={({ field }) => (
         <FormItem className="w-full">
           <FormControl>
-            <InputField size="md" className="h-32 px-1" state={errors[bodyKey] ? 'error' : 'default'}>
+            <InputField className="h-36 px-1" state={errors[bodyKey] ? 'error' : 'default'}>
               <Editor
                 fontFamily="inherit"
                 placeholder={capitalize(field.name)}
-                size="md"
                 id={field.name}
                 extensions={[
                   liquid({
@@ -46,7 +45,7 @@ export const InAppBody = () => {
               />
             </InputField>
           </FormControl>
-          <FormMessage />
+          <FormMessage>{`This supports markdown and variables, type {{ for more.`}</FormMessage>
         </FormItem>
       )}
     />
