@@ -72,7 +72,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ n
                 <RiEdit2Line className="size-4" /> Customize avatar
               </div>
               <Separator />
-              <div className="flex flex-col gap-1">
+              <div className="space-y-1">
                 <Label>Avatar URL</Label>
                 <InputField className="px-1" state={error ? 'error' : 'default'}>
                   <Editor

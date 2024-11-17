@@ -1,7 +1,6 @@
 import { Handle, Node as FlowNode, NodeProps, Position } from '@xyflow/react';
 import { RiPlayCircleLine } from 'react-icons/ri';
 import { Link, useParams } from 'react-router-dom';
-import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { AddStepMenu } from './add-step-menu';
 import { Node, NodeBody, NodeError, NodeHeader, NodeIcon, NodeName } from './base-node';
@@ -10,6 +9,7 @@ import { useWorkflowEditorContext } from './hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { ComponentProps } from 'react';
 import { cn } from '@/utils/ui';
+import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 
 export type NodeData = {
   name?: string;
