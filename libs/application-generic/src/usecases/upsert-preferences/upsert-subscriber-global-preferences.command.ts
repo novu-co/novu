@@ -1,7 +1,7 @@
 import { IsMongoId, IsNotEmpty } from 'class-validator';
-import { UpsertPreferencesBaseCommand } from './upsert-preferences.command';
+import { UpsertPreferencesPartialBaseCommand } from './upsert-preferences.command';
 
-export class UpsertSubscriberGlobalPreferencesCommand extends UpsertPreferencesBaseCommand {
+export class UpsertSubscriberGlobalPreferencesCommand extends UpsertPreferencesPartialBaseCommand {
   @IsNotEmpty()
   @IsMongoId()
   readonly _subscriberId: string;

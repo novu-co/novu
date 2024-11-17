@@ -25,15 +25,15 @@ export interface ContentIssue extends Issue<StepContentIssueEnum> {}
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface StepIssue extends Issue<StepIssueEnum> {}
 export type IdentifierOrInternalId = string;
-export enum PatchStepFieldEnum {
-  CONTROL_VALUES = 'controlValues',
-  NAME = 'name',
-}
+
 export type PatchStepDataDto = {
   name?: string;
   controlValues?: Record<string, unknown>;
-  fieldsToUpdate: PatchStepFieldEnum[];
 };
+export type PatchWorkflowDto = {
+  active?: boolean;
+};
+
 export type StepResponseDto = StepDto & {
   _id: string;
   slug: Slug;

@@ -13,18 +13,16 @@ import {
   DeleteWorkflowCommand,
   DeleteWorkflowUseCase,
   ExecuteBridgeRequest,
-  InvalidateCacheService,
   NotificationStep,
   UpdateWorkflow,
   UpdateWorkflowCommand,
-  UpsertPreferences,
-  UpsertWorkflowPreferencesCommand,
 } from '@novu/application-generic';
 import {
+  buildWorkflowPreferences,
   JSONSchemaDto,
   WorkflowCreationSourceEnum,
   WorkflowOriginEnum,
-  WorkflowPreferencesPartial,
+  WorkflowPreferences,
   WorkflowTypeEnum,
 } from '@novu/shared';
 import { DiscoverOutput, DiscoverStepOutput, DiscoverWorkflowOutput, GetActionEnum } from '@novu/framework/internal';
@@ -42,9 +40,7 @@ export class Sync {
     private notificationGroupRepository: NotificationGroupRepository,
     private environmentRepository: EnvironmentRepository,
     private executeBridgeRequest: ExecuteBridgeRequest,
-    private analyticsService: AnalyticsService,
-    private invalidateCacheService: InvalidateCacheService,
-    private upsertPreferences: UpsertPreferences
+    private analyticsService: AnalyticsService
   ) {}
   async execute(command: SyncCommand): Promise<CreateBridgeResponseDto> {
     const environment = await this.environmentRepository.findOne({ _id: command.environmentId });
@@ -175,15 +171,6 @@ export class Sync {
           savedWorkflow = await this.createWorkflow(notificationGroupId, isWorkflowActive, command, workflow);
         }
 
-        await this.upsertPreferences.upsertWorkflowPreferences(
-          UpsertWorkflowPreferencesCommand.create({
-            environmentId: savedWorkflow._environmentId,
-            organizationId: savedWorkflow._organizationId,
-            templateId: savedWorkflow._id,
-            preferences: this.getWorkflowPreferences(workflow),
-          })
-        );
-
         return savedWorkflow;
       })
     );
@@ -217,8 +204,7 @@ export class Sync {
         description: this.getWorkflowDescription(workflow),
         data: this.castToAnyNotSupportedParam(workflow)?.data,
         tags: this.getWorkflowTags(workflow),
-        critical: this.castToAnyNotSupportedParam(workflow)?.critical ?? false,
-        preferenceSettings: this.castToAnyNotSupportedParam(workflow)?.preferenceSettings,
+        defaultPreferences: this.getWorkflowPreferences(workflow),
       })
     );
   }
@@ -247,8 +233,7 @@ export class Sync {
         data: this.castToAnyNotSupportedParam(workflow)?.data,
         tags: this.getWorkflowTags(workflow),
         active: this.castToAnyNotSupportedParam(workflow)?.active ?? true,
-        critical: this.castToAnyNotSupportedParam(workflow)?.critical ?? false,
-        preferenceSettings: this.castToAnyNotSupportedParam(workflow)?.preferenceSettings,
+        defaultPreferences: this.getWorkflowPreferences(workflow),
       })
     );
   }
@@ -302,8 +287,8 @@ export class Sync {
     return notificationGroupId;
   }
 
-  private getWorkflowPreferences(workflow: DiscoverWorkflowOutput): WorkflowPreferencesPartial {
-    return workflow.preferences || {};
+  private getWorkflowPreferences(workflow: DiscoverWorkflowOutput): WorkflowPreferences {
+    return buildWorkflowPreferences(workflow.preferences || {});
   }
 
   private getWorkflowName(workflow: DiscoverWorkflowOutput): string {

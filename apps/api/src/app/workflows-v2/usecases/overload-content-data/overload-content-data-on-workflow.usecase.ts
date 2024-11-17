@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ControlValuesLevelEnum, UserSessionData } from '@novu/shared';
-import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
+import { ControlValuesRepository, NotificationStepEntity } from '@novu/dal';
 import _ from 'lodash';
+import { WorkflowInternalResponseDto } from '@novu/application-generic';
 import { PrepareAndValidateContentUsecase, ValidatedContentResponse } from '../validate-content';
 import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
 import { OverloadContentDataOnWorkflowCommand } from './overload-content-data-on-workflow.command';
@@ -16,7 +17,7 @@ export class OverloadContentDataOnWorkflowUseCase {
     private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase
   ) {}
 
-  async execute(command: OverloadContentDataOnWorkflowCommand): Promise<NotificationTemplateEntity> {
+  async execute(command: OverloadContentDataOnWorkflowCommand): Promise<WorkflowInternalResponseDto> {
     const validatedContentResponses = await this.validateStepContent(command.workflow, command.user);
     await this.overloadPayloadSchema(command.workflow, validatedContentResponses);
     for (const step of command.workflow.steps) {
@@ -32,7 +33,7 @@ export class OverloadContentDataOnWorkflowUseCase {
     return command.workflow;
   }
 
-  private async validateStepContent(workflow: NotificationTemplateEntity, user: UserSessionData) {
+  private async validateStepContent(workflow: WorkflowInternalResponseDto, user: UserSessionData) {
     const stepIdToControlValuesMap = await this.buildValuesMap(workflow, user);
     const validatedStepContent: Record<string, ValidatedContentResponse> = {};
 
@@ -58,7 +59,7 @@ export class OverloadContentDataOnWorkflowUseCase {
   }
 
   private async buildValuesMap(
-    workflow: NotificationTemplateEntity,
+    workflow: WorkflowInternalResponseDto,
     user: UserSessionData
   ): Promise<Record<string, Record<string, unknown>>> {
     const stepIdToControlValuesMap: Record<string, Record<string, unknown>> = {};
@@ -82,7 +83,7 @@ export class OverloadContentDataOnWorkflowUseCase {
   }
 
   private async overloadPayloadSchema(
-    workflow: NotificationTemplateEntity,
+    workflow: WorkflowInternalResponseDto,
     stepIdToControlValuesMap: { [p: string]: ValidatedContentResponse }
   ) {
     let finalPayload = {};
