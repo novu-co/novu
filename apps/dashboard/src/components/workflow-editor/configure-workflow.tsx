@@ -90,7 +90,7 @@ export function ConfigureWorkflow() {
                 <FormControl>
                   <InputField className="flex overflow-hidden pr-0">
                     <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
-                    <CopyButton variant="outline" size="input-right" valueToCopy={field.value} />
+                    <CopyButton size="input-right" valueToCopy={field.value} />
                   </InputField>
                 </FormControl>
                 <FormMessage />
