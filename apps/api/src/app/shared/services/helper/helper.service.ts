@@ -17,7 +17,7 @@ export function capitalize(text: string) {
  *
  * @example
  * ```typescript
- * formatSentenceCase('camelCaseText') // 'Camel case text'
+ * toSentenceCase('camelCaseText') // 'Camel case text'
  * ```
  */
 export function toSentenceCase(text: string) {
