@@ -64,7 +64,7 @@ export type InputFieldProps = { children: React.ReactNode; className?: string } 
 
 const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(({ children, className, size, state }, ref) => {
   return (
-    <div ref={ref} className={inputFieldVariants({ size, state, className })}>
+    <div ref={ref} className={cn(inputFieldVariants({ size, state }), className)}>
       {children}
     </div>
   );
