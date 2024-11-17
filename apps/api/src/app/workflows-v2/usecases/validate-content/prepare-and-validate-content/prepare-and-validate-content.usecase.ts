@@ -9,7 +9,7 @@ import { ValidatedPlaceholderAggregation, ValidatePlaceholderUsecase } from '../
 import { CollectPlaceholderWithDefaultsUsecase, PlaceholderAggregation } from '../collect-placeholders';
 import { ExtractDefaultValuesFromSchemaUsecase } from '../../extract-default-values-from-schema';
 import { ValidatedContentResponse } from './validated-content.response';
-import { capitalize } from '../../../../shared/services/helper/helper.service';
+import { toSentenceCase } from '../../../../shared/services/helper/helper.service';
 
 @Injectable()
 export class PrepareAndValidateContentUsecase {
@@ -179,7 +179,7 @@ export class PrepareAndValidateContentUsecase {
           result[controlValueKey].push({
             issueType: StepContentIssueEnum.MISSING_VARIABLE_IN_PAYLOAD,
             variableName: item,
-            message: `${capitalize(item)} is missing in payload.`,
+            message: `${toSentenceCase(item)} is missing in payload.`,
           });
         }
       }
@@ -199,7 +199,7 @@ export class PrepareAndValidateContentUsecase {
       result[item] = [
         {
           issueType: StepContentIssueEnum.MISSING_VALUE,
-          message: `${capitalize(item)} is missing.`,
+          message: `${toSentenceCase(item)} is missing.`,
         },
       ];
     }
