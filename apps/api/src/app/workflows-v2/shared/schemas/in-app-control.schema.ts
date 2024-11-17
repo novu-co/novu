@@ -1,14 +1,10 @@
-import { JSONSchema } from 'json-schema-to-ts';
-import { UiComponentEnum, UiSchema, UiSchemaGroupEnum, UiSchemaProperty } from '@novu/shared';
-
-const ABSOLUTE_AND_RELATIVE_URL_REGEX = '^(?!mailto:)(?:(https?):\\/\\/[^\\s/$.?#].[^\\s]*)|^(\\/[^\\s]*)$';
+import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 
 const redirectSchema = {
   type: 'object',
   properties: {
     url: {
       type: 'string',
-      pattern: ABSOLUTE_AND_RELATIVE_URL_REGEX,
     },
     target: {
       type: 'string',
@@ -18,7 +14,7 @@ const redirectSchema = {
   },
   required: ['url'], // url remains required
   additionalProperties: false, // No additional properties allowed
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchemaDto;
 
 const actionSchema = {
   type: 'object',
@@ -28,14 +24,14 @@ const actionSchema = {
   },
   required: ['label'],
   additionalProperties: false,
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchemaDto;
 
 export const inAppControlSchema = {
   type: 'object',
   properties: {
     subject: { type: 'string' },
     body: { type: 'string' },
-    avatar: { type: 'string', format: 'uri' },
+    avatar: { type: 'string' },
     primaryAction: actionSchema, // Nested primaryAction
     secondaryAction: actionSchema, // Nested secondaryAction
     data: { type: 'object', additionalProperties: true },
@@ -43,7 +39,7 @@ export const inAppControlSchema = {
   },
   required: ['body'],
   additionalProperties: false,
-} as const satisfies JSONSchema;
+} as const satisfies JSONSchemaDto;
 
 const redirectPlaceholder = {
   url: {

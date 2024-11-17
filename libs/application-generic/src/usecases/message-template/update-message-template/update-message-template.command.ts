@@ -14,8 +14,8 @@ import {
   IActor,
   MessageTemplateContentType,
   WorkflowTypeEnum,
+  JSONSchemaDto,
 } from '@novu/shared';
-import { JsonSchema } from '@novu/framework/internal';
 import { EnvironmentWithUserCommand } from '../../../commands';
 
 export class UpdateMessageTemplateCommand extends EnvironmentWithUserCommand {
@@ -75,16 +75,16 @@ export class UpdateMessageTemplateCommand extends EnvironmentWithUserCommand {
 
   @IsOptional()
   inputs?: {
-    schema: JsonSchema;
+    schema: JSONSchemaDto;
   };
   @IsOptional()
   controls?: {
-    schema: JsonSchema;
+    schema: JSONSchemaDto;
   };
 
   @IsOptional()
   output?: {
-    schema: JsonSchema;
+    schema: JSONSchemaDto;
   };
 
   @IsOptional()

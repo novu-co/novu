@@ -7,17 +7,17 @@ on:
       - '!prod'
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.ref }}"
+  group: '${{ github.workflow }}-${{ github.ref }}'
   cancel-in-progress: true
 
 jobs:
   check:
     name: Verify
-    runs-on: ubuntu-20.04
+    runs-on: blacksmith-2vcpu-ubuntu-2204
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - uses: useblacksmith/setup-node@v5
         with:
           node-version: 20.8.1
       - name: Install Octokit

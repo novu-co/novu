@@ -17,7 +17,13 @@ import {
   UpdateWorkflow,
   UpdateWorkflowCommand,
 } from '@novu/application-generic';
-import { UserSessionData, WorkflowOriginEnum, WorkflowTypeEnum } from '@novu/shared';
+import {
+  buildWorkflowPreferencesFromPreferenceChannels,
+  DEFAULT_WORKFLOW_PREFERENCES,
+  UserSessionData,
+  WorkflowOriginEnum,
+  WorkflowTypeEnum,
+} from '@novu/shared';
 
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserSession } from '../shared/framework/user.decorator';
@@ -113,7 +119,10 @@ export class WorkflowControllerV1 {
         description: body.description,
         workflowId: body.identifier,
         critical: body.critical,
-        preferenceSettings: body.preferenceSettings,
+        defaultPreferences: DEFAULT_WORKFLOW_PREFERENCES,
+        userPreferences:
+          body.preferenceSettings &&
+          buildWorkflowPreferencesFromPreferenceChannels(body.critical, body.preferenceSettings),
         steps: body.steps,
         notificationGroupId: body.notificationGroupId,
         data: body.data,
@@ -210,7 +219,10 @@ export class WorkflowControllerV1 {
         active: body.active ?? false,
         draft: !body.active,
         critical: body.critical ?? false,
-        preferenceSettings: body.preferenceSettings,
+        defaultPreferences: DEFAULT_WORKFLOW_PREFERENCES,
+        userPreferences:
+          body.preferenceSettings &&
+          buildWorkflowPreferencesFromPreferenceChannels(body.critical, body.preferenceSettings),
         blueprintId: body.blueprintId,
         data: body.data,
         __source: query?.__source,

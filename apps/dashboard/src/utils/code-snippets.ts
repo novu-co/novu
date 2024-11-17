@@ -93,9 +93,10 @@ const transformJsonToPhpArray = (data: Record<string, unknown>, indentLevel = 4)
   const obj = entries
     .map(([key, value]) => {
       return `
-${indent}'${key}' => '${JSON.stringify(value)}',`;
+${indent}'${key}' => ${JSON.stringify(value)},`;
     })
-    .join('');
+    .join('')
+    .replace(/"/g, "'");
 
   return `${obj}${Object.keys(data).length > 0 ? `\n${new Array(indentLevel - 4).fill(' ').join('')}` : ''}`;
 };

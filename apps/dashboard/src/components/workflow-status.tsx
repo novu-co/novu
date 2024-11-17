@@ -1,6 +1,6 @@
 import { Badge, BadgeContent } from '@/components/primitives/badge';
-import { badgeContentVariants, badgeVariants } from '@/components/primitives/variants';
 import { WorkflowStatusEnum } from '@/utils/enums';
+import { ComponentProps } from 'react';
 
 type WorkflowStatusProps = {
   status: WorkflowStatusEnum;
@@ -9,8 +9,8 @@ type WorkflowStatusProps = {
 const statusRenderData: Record<
   WorkflowStatusEnum,
   {
-    badgeVariant: NonNullable<Parameters<typeof badgeVariants>[0]>['variant'];
-    badgeContentVariant: NonNullable<Parameters<typeof badgeContentVariants>[0]>['variant'];
+    badgeVariant: ComponentProps<typeof Badge>['variant'];
+    badgeContentVariant: ComponentProps<typeof BadgeContent>['variant'];
     text: string;
   }
 > = {

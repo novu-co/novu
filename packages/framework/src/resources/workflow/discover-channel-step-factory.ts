@@ -1,17 +1,25 @@
 import { ChannelStepEnum } from '../../constants';
 import { emptySchema } from '../../schemas';
-import type { Awaitable, DiscoverStepOutput, DiscoverWorkflowOutput, Schema, ChannelStep } from '../../types';
+import type {
+  Awaitable,
+  DiscoverStepOutput,
+  DiscoverWorkflowOutput,
+  Schema,
+  ChannelStep,
+  StepOptions,
+  FromSchema,
+} from '../../types';
 import { transformSchema } from '../../validators';
 import { discoverProviders } from './discover-providers';
 import { discoverStep } from './discover-step';
 
-export function discoverChannelStepFactory(
+export async function discoverChannelStepFactory(
   targetWorkflow: DiscoverWorkflowOutput,
   type: ChannelStepEnum,
   outputSchema: Schema,
   resultSchema: Schema
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): ChannelStep<ChannelStepEnum, any, any> {
+): Promise<ChannelStep<ChannelStepEnum, any, any>> {
   return async (stepId, resolve, options = {}) => {
     const controlSchema = options?.controlSchema || emptySchema;
 
@@ -19,27 +27,27 @@ export function discoverChannelStepFactory(
       stepId,
       type,
       controls: {
-        schema: transformSchema(controlSchema),
+        schema: await transformSchema(controlSchema),
         unknownSchema: controlSchema,
       },
       outputs: {
-        schema: transformSchema(outputSchema),
+        schema: await transformSchema(outputSchema),
         unknownSchema: outputSchema,
       },
       results: {
-        schema: transformSchema(resultSchema),
+        schema: await transformSchema(resultSchema),
         unknownSchema: resultSchema,
       },
       resolve: resolve as (controls: Record<string, unknown>) => Awaitable<Record<string, unknown>>,
       code: resolve.toString(),
-      options,
+      options: options as StepOptions<Schema, FromSchema<Schema>>,
       providers: [],
     };
 
-    discoverStep(targetWorkflow, stepId, step);
+    await discoverStep(targetWorkflow, stepId, step);
 
     if (Object.keys(options.providers || {}).length > 0) {
-      discoverProviders(step, type as ChannelStepEnum, options.providers || {});
+      await discoverProviders(step, type as ChannelStepEnum, options.providers || {});
     }
 
     return {

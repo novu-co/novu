@@ -1,5 +1,4 @@
 import { IsDefined, IsOptional } from 'class-validator';
-import { AfterResponseHook } from 'got';
 import {
   CodeResult,
   DiscoverOutput,
@@ -13,6 +12,17 @@ import {
 import { WorkflowOriginEnum } from '@novu/shared';
 import { EnvironmentLevelCommand } from '../../commands';
 
+export type BridgeError = {
+  url: string;
+  code: string;
+  message: string;
+  statusCode: number;
+  data?: unknown;
+  cause?: unknown;
+};
+
+export type ProcessError = (response: BridgeError) => Promise<void>;
+
 export class ExecuteBridgeRequestCommand extends EnvironmentLevelCommand {
   @IsOptional()
   event?: Omit<Event, `${HttpQueryKeysEnum}`>;
@@ -21,7 +31,7 @@ export class ExecuteBridgeRequestCommand extends EnvironmentLevelCommand {
   searchParams?: Partial<Record<HttpQueryKeysEnum, string>>;
 
   @IsOptional()
-  afterResponse?: AfterResponseHook;
+  processError?: ProcessError;
 
   @IsDefined()
   action: PostActionEnum | GetActionEnum;

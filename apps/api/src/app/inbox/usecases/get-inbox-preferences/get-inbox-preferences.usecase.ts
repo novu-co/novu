@@ -40,6 +40,7 @@ export class GetInboxPreferences {
         environmentId: command.environmentId,
         subscriberId: command.subscriberId,
         organizationId: command.organizationId,
+        tags: command.tags,
       })
     );
     const workflowPreferences = subscriberWorkflowPreferences.map((subscriberWorkflowPreference) => {

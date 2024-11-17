@@ -1,5 +1,8 @@
 name: Deploy Web to Netlify
 
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
 # Controls when the action will run. Triggers the workflow on push or pull request
 on:
   workflow_call:

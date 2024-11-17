@@ -12,9 +12,9 @@ export const INBOX_TOKENS = {
   'semantic/color/neutral/80': '#3D3D4D',
   'semantic/color/neutral/90': '#292933',
   'semantic/margins/buttons/S/S': '1rem',
-  'Inbox/whiteLable/buttons/accent/normal': '#369EFF',
-  'Inbox/whiteLable/secondaryButton': '#2E2E32',
-  'Inbox/whiteLable/devider': '#2E2E32',
+  'Inbox/whiteLabel/buttons/accent/normal': '#369EFF',
+  'Inbox/whiteLabel/secondaryButton': '#2E2E32',
+  'Inbox/whiteLabel/divider': '#2E2E32',
   'Inbox/paddings/header/vertical': '1.25rem',
   'Inbox/paddings/header/horizontal': '1.5rem',
   'Inbox/paddings/message/horizontal': '1.5rem',
@@ -91,7 +91,7 @@ export function InboxPreviewContent({
       <HStack
         gap={28}
         className={css({
-          borderColor: INBOX_TOKENS['Inbox/whiteLable/devider'],
+          borderColor: INBOX_TOKENS['Inbox/whiteLabel/divider'],
           borderBottom: 'solid',
           borderBottomWidth: '1',
           alignSelf: 'stretch',
@@ -249,10 +249,10 @@ const actionButtonRecipe = cva({
   variants: {
     type: {
       primary: {
-        bgColor: INBOX_TOKENS['Inbox/whiteLable/buttons/accent/normal'],
+        bgColor: INBOX_TOKENS['Inbox/whiteLabel/buttons/accent/normal'],
       },
       secondary: {
-        bgColor: INBOX_TOKENS['Inbox/whiteLable/secondaryButton'],
+        bgColor: INBOX_TOKENS['Inbox/whiteLabel/secondaryButton'],
       },
     },
   },

@@ -1,13 +1,5 @@
 import type { StepResponseDto } from '@novu/shared';
 
-export type BridgeStatus = {
-  status: 'ok';
-  bridgeUrl?: string;
-  discovered: {
-    workflows: number;
-  };
-};
-
 export enum ConnectionStatus {
   CONNECTED = 'connected',
   DISCONNECTED = 'disconnected',
@@ -28,10 +20,6 @@ export type RuntimeIssue = {
   message: string;
 };
 
-// TODO: update this when the API types are updated
-export type Step = Pick<StepResponseDto, 'name' | 'type' | '_id' | 'stepId' | 'slug'> & {
-  issues?: {
-    body: Record<string, RuntimeIssue[]>;
-    control: Record<string, RuntimeIssue[]>;
-  };
+export type Step = Pick<StepResponseDto, 'name' | 'type' | '_id' | 'stepId' | 'issues'> & {
+  slug: string;
 };

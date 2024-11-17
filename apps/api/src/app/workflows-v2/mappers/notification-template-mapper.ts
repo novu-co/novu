@@ -1,10 +1,10 @@
 import {
-  DEFAULT_WORKFLOW_PREFERENCES,
   PreferencesResponseDto,
-  PreferencesTypeEnum,
+  RuntimeIssue,
   ShortIsPrefixEnum,
   StepResponseDto,
   StepTypeEnum,
+  WorkflowCreateAndUpdateKeys,
   WorkflowListResponseDto,
   WorkflowOriginEnum,
   WorkflowResponseDto,
@@ -12,33 +12,31 @@ import {
   WorkflowTypeEnum,
 } from '@novu/shared';
 import { NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
-import { GetPreferencesResponseDto } from '@novu/application-generic';
+import { WorkflowInternalResponseDto } from '@novu/application-generic';
 import { buildSlug } from '../../shared/helpers/build-slug';
 
-export function toResponseWorkflowDto(
-  template: NotificationTemplateEntity,
-  preferences: GetPreferencesResponseDto | undefined
-): WorkflowResponseDto {
+export function toResponseWorkflowDto(workflow: WorkflowInternalResponseDto): WorkflowResponseDto {
   const preferencesDto: PreferencesResponseDto = {
-    user: preferences?.source[PreferencesTypeEnum.USER_WORKFLOW] || null,
-    default: preferences?.source[PreferencesTypeEnum.WORKFLOW_RESOURCE] || DEFAULT_WORKFLOW_PREFERENCES,
+    user: workflow.userPreferences,
+    default: workflow.defaultPreferences,
   };
-  const workflowName = template.name || 'Missing Name';
+  const workflowName = workflow.name || 'Missing Name';
 
   return {
-    _id: template._id,
-    slug: buildSlug(workflowName, ShortIsPrefixEnum.WORKFLOW, template._id),
-    workflowId: template.triggers[0].identifier,
+    _id: workflow._id,
+    slug: buildSlug(workflowName, ShortIsPrefixEnum.WORKFLOW, workflow._id),
+    workflowId: workflow.triggers[0].identifier,
     name: workflowName,
-    tags: template.tags,
-    active: template.active,
+    tags: workflow.tags,
+    active: workflow.active,
     preferences: preferencesDto,
-    steps: getSteps(template),
-    description: template.description,
-    origin: computeOrigin(template),
-    updatedAt: template.updatedAt || 'Missing Updated At',
-    createdAt: template.createdAt || 'Missing Create At',
-    status: WorkflowStatusEnum.ACTIVE,
+    steps: getSteps(workflow),
+    description: workflow.description,
+    origin: computeOrigin(workflow),
+    updatedAt: workflow.updatedAt || 'Missing Updated At',
+    createdAt: workflow.createdAt || 'Missing Create At',
+    status: workflow.status || WorkflowStatusEnum.ACTIVE,
+    issues: workflow.issues as unknown as Record<WorkflowCreateAndUpdateKeys, RuntimeIssue>,
   };
 }
 
@@ -73,15 +71,16 @@ export function toWorkflowsMinifiedDtos(templates: NotificationTemplateEntity[])
   return templates.map(toMinifiedWorkflowDto);
 }
 
-function toStepResponseDto(step: NotificationStepEntity): StepResponseDto {
-  const stepName = step.name || 'Missing Name';
+function toStepResponseDto(persistedStep: NotificationStepEntity): StepResponseDto {
+  const stepName = persistedStep.name || 'Missing Name';
 
   return {
-    _id: step._templateId,
-    slug: buildSlug(stepName, ShortIsPrefixEnum.STEP, step._templateId),
+    _id: persistedStep._templateId,
+    slug: buildSlug(stepName, ShortIsPrefixEnum.STEP, persistedStep._templateId),
     name: stepName,
-    stepId: step.stepId || 'Missing Step Id',
-    type: step.template?.type || StepTypeEnum.EMAIL,
+    stepId: persistedStep.stepId || 'Missing Step Id',
+    type: persistedStep.template?.type || StepTypeEnum.EMAIL,
+    issues: persistedStep.issues,
   } satisfies StepResponseDto;
 }
 

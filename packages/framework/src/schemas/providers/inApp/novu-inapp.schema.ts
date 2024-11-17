@@ -1,4 +1,4 @@
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 
 /**
  * Novu in-app schema
@@ -8,7 +8,7 @@ const novuInAppOutputSchema = {
   properties: {},
   required: [],
   additionalProperties: false,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 export const novuInAppProviderSchemas = {
   output: novuInAppOutputSchema,

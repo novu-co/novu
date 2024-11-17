@@ -10,23 +10,24 @@ import {
   AnalyticsService,
   CreateWorkflow,
   CreateWorkflowCommand,
+  DeleteWorkflowCommand,
+  DeleteWorkflowUseCase,
   ExecuteBridgeRequest,
   NotificationStep,
   UpdateWorkflow,
   UpdateWorkflowCommand,
-  UpsertPreferences,
-  UpsertWorkflowPreferencesCommand,
 } from '@novu/application-generic';
 import {
+  buildWorkflowPreferences,
+  JSONSchemaDto,
   WorkflowCreationSourceEnum,
   WorkflowOriginEnum,
+  WorkflowPreferences,
   WorkflowTypeEnum,
-  WorkflowPreferencesPartial,
 } from '@novu/shared';
 import { DiscoverOutput, DiscoverStepOutput, DiscoverWorkflowOutput, GetActionEnum } from '@novu/framework/internal';
 
 import { SyncCommand } from './sync.command';
-import { DeleteWorkflow, DeleteWorkflowCommand } from '../delete-workflow';
 import { CreateBridgeResponseDto } from '../../dtos/create-bridge-response.dto';
 
 @Injectable()
@@ -34,13 +35,12 @@ export class Sync {
   constructor(
     private createWorkflowUsecase: CreateWorkflow,
     private updateWorkflowUsecase: UpdateWorkflow,
-    private deleteWorkflow: DeleteWorkflow,
+    private deleteWorkflowUseCase: DeleteWorkflowUseCase,
     private notificationTemplateRepository: NotificationTemplateRepository,
     private notificationGroupRepository: NotificationGroupRepository,
     private environmentRepository: EnvironmentRepository,
     private executeBridgeRequest: ExecuteBridgeRequest,
-    private analyticsService: AnalyticsService,
-    private upsertPreferences: UpsertPreferences
+    private analyticsService: AnalyticsService
   ) {}
   async execute(command: SyncCommand): Promise<CreateBridgeResponseDto> {
     const environment = await this.environmentRepository.findOne({ _id: command.environmentId });
@@ -111,21 +111,19 @@ export class Sync {
     createdWorkflows: NotificationTemplateEntity[]
   ): Promise<void> {
     const persistedWorkflowIdsInBridge = createdWorkflows.map((i) => i._id);
-
     const workflowsToDelete = await this.findAllWorkflowsWithOtherIds(command, persistedWorkflowIdsInBridge);
-
-    await Promise.all(
-      workflowsToDelete?.map((workflow) => {
-        return this.deleteWorkflow.execute(
-          DeleteWorkflowCommand.create({
-            environmentId: command.environmentId,
-            organizationId: command.organizationId,
-            userId: command.userId,
-            workflowId: workflow._id,
-          })
-        );
-      })
+    const deleteWorkflowFromStoragePromises = workflowsToDelete.map((workflow) =>
+      this.deleteWorkflowUseCase.execute(
+        DeleteWorkflowCommand.create({
+          environmentId: command.environmentId,
+          organizationId: command.organizationId,
+          userId: command.userId,
+          identifierOrInternalId: workflow._id,
+        })
+      )
     );
+
+    await Promise.all([...deleteWorkflowFromStoragePromises]);
   }
 
   private async findAllWorkflowsWithOtherIds(
@@ -173,15 +171,6 @@ export class Sync {
           savedWorkflow = await this.createWorkflow(notificationGroupId, isWorkflowActive, command, workflow);
         }
 
-        await this.upsertPreferences.upsertWorkflowPreferences(
-          UpsertWorkflowPreferencesCommand.create({
-            environmentId: savedWorkflow._environmentId,
-            organizationId: savedWorkflow._organizationId,
-            templateId: savedWorkflow._id,
-            preferences: this.getWorkflowPreferences(workflow),
-          })
-        );
-
         return savedWorkflow;
       })
     );
@@ -207,16 +196,15 @@ export class Sync {
         __source: WorkflowCreationSourceEnum.BRIDGE,
         steps: this.mapSteps(workflow.steps),
         controls: {
-          schema: workflow.controls?.schema,
+          schema: workflow.controls?.schema as JSONSchemaDto,
         },
         rawData: workflow as unknown as Record<string, unknown>,
-        payloadSchema: workflow.payload?.schema,
+        payloadSchema: workflow.payload?.schema as JSONSchemaDto,
         active: isWorkflowActive,
         description: this.getWorkflowDescription(workflow),
         data: this.castToAnyNotSupportedParam(workflow)?.data,
         tags: this.getWorkflowTags(workflow),
-        critical: this.castToAnyNotSupportedParam(workflow)?.critical ?? false,
-        preferenceSettings: this.castToAnyNotSupportedParam(workflow)?.preferenceSettings,
+        defaultPreferences: this.getWorkflowPreferences(workflow),
       })
     );
   }
@@ -236,17 +224,16 @@ export class Sync {
         workflowId: workflow.workflowId,
         steps: this.mapSteps(workflow.steps, workflowExist),
         controls: {
-          schema: workflow.controls?.schema,
+          schema: workflow.controls?.schema as JSONSchemaDto,
         },
         rawData: workflow,
-        payloadSchema: workflow.payload?.schema,
+        payloadSchema: workflow.payload?.schema as unknown as JSONSchemaDto,
         type: WorkflowTypeEnum.BRIDGE,
         description: this.getWorkflowDescription(workflow),
         data: this.castToAnyNotSupportedParam(workflow)?.data,
         tags: this.getWorkflowTags(workflow),
         active: this.castToAnyNotSupportedParam(workflow)?.active ?? true,
-        critical: this.castToAnyNotSupportedParam(workflow)?.critical ?? false,
-        preferenceSettings: this.castToAnyNotSupportedParam(workflow)?.preferenceSettings,
+        defaultPreferences: this.getWorkflowPreferences(workflow),
       })
     );
   }
@@ -300,8 +287,8 @@ export class Sync {
     return notificationGroupId;
   }
 
-  private getWorkflowPreferences(workflow: DiscoverWorkflowOutput): WorkflowPreferencesPartial {
-    return workflow.preferences || {};
+  private getWorkflowPreferences(workflow: DiscoverWorkflowOutput): WorkflowPreferences {
+    return buildWorkflowPreferences(workflow.preferences || {});
   }
 
   private getWorkflowName(workflow: DiscoverWorkflowOutput): string {

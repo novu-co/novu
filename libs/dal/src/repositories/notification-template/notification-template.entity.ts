@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import {
   BuilderFieldType,
   BuilderGroupValues,
+  ContentIssue,
   ControlSchemas,
   ControlsDto,
   FilterParts,
@@ -16,8 +17,10 @@ import {
   ITriggerReservedVariable,
   IWorkflowStepMetadata,
   NotificationTemplateCustomData,
+  StepIssues,
   TriggerTypeEnum,
   WorkflowOriginEnum,
+  WorkflowStatusEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
 import { NotificationGroupEntity } from '../notification-group';
@@ -36,10 +39,10 @@ export class NotificationTemplateEntity implements INotificationTemplate {
 
   draft: boolean;
 
-  /** @deprecated - use `Preferences` entity instead */
+  /** @deprecated - use `userPreferences` instead */
   preferenceSettings: IPreferenceChannels;
 
-  /** @deprecated - use `Preferences` entity instead */
+  /** @deprecated - use `userPreferences` instead */
   critical: boolean;
 
   tags: string[];
@@ -83,6 +86,10 @@ export class NotificationTemplateEntity implements INotificationTemplate {
   rawData?: any;
 
   payloadSchema?: any;
+
+  issues: Record<string, ContentIssue[]>;
+
+  status?: WorkflowStatusEnum;
 }
 
 export type NotificationTemplateDBModel = ChangePropsValueType<
@@ -110,6 +117,8 @@ export class StepVariantEntity implements IStepVariant {
   uuid?: string;
 
   stepId?: string;
+
+  issues?: StepIssues;
 
   name?: string;
 

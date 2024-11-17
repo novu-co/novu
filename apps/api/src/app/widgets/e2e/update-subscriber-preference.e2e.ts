@@ -21,7 +21,8 @@ describe('PATCH /widgets/preferences/:templateId', function () {
     });
   });
 
-  it('should create user preference', async function () {
+  // `enabled` flag is not used anymore. The presence of a preference object means that the subscriber has enabled notifications.
+  it.skip('should create user preference', async function () {
     const updateData = {
       enabled: false,
     };

@@ -1,7 +1,6 @@
-import { JSONSchema } from 'json-schema-to-ts';
-import { UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
+import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 
-export const EmailStepControlSchema: JSONSchema = {
+export const EmailStepControlSchema: JSONSchemaDto = {
   type: 'object',
   properties: {
     emailEditor: {

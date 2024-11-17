@@ -1,4 +1,4 @@
-name: "Pull Request Labeler"
+name: 'Pull Request Labeler'
 
 on:
   - pull_request_target
@@ -9,7 +9,7 @@ jobs:
       contents: read
       pull-requests: write
       statuses: write
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-2vcpu-ubuntu-2204
     steps:
       - uses: actions/checkout@v4
 

@@ -16,7 +16,7 @@ export class ExpandEmailEditorSchemaUsecase {
   }
   private hydrate(command: ExpandEmailEditorSchemaCommand) {
     const { hydratedEmailSchema } = this.hydrateEmailSchemaUseCase.execute({
-      emailEditor: command.body,
+      emailEditor: command.emailEditorJson,
       fullPayloadForRender: command.fullPayloadForRender,
     });
 

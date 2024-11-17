@@ -36,7 +36,7 @@ const DefaultButton = ({ onClick }: { onClick: () => void }) => (
   <ActionButton
     className={css({
       height: '150 !important',
-      minHeight: '150  !important',
+      minHeight: '150 !important',
     })}
     Icon={() => <IconOutlineMenuBook />}
     onClick={onClick}

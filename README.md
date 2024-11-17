@@ -75,6 +75,7 @@ There are two ways to get started:
 ```bash
 npx novu@latest dev
 ```
+
 2. [Create a free cloud account](https://dashboard.novu.co?utm_campaign=github-readme)
 
 ## 📚 Table of contents
@@ -135,6 +136,7 @@ Using the Novu API and admin panel, you can easily add a real-time notification 
 <img width="762" alt="notification-center-912bb96e009fb3a69bafec23bcde00b0" src="https://novu.co/static/6e670ba56ed7a65c7f5ccff5d58c56fb/a9e85/inbox.webp" alt-text="GIF of Novu's Embeddable Notification Center">
 
 Read more about how to add a [notification center Inbox](https://docs.novu.co/inbox/react/get-started?utm_campaign=github-readme) to your app.
+
 </div>
 
 ## Providers
@@ -217,6 +219,7 @@ We are more than happy to help you. If you are getting any errors or facing prob
 Novu is a commercial open source company, which means some parts of this open source repository require a commercial license. The concept is called "Open Core," where the core technology is fully open source, licensed under MIT license, and the enterprise code is covered under a commercial license ("/enterprise" Enterprise Edition). Enterprise features are built by the core engineering team of Novu which is hired in full-time.
 
 The following modules and folders are licensed under the enterprise license:
+
 - `enterprise` folder at the root of the project and all of their subfolders and modules
 - `apps/web/src/ee` folder and all of their subfolders and modules
 - `apps/dashboard/src/ee` folder and all of their subfolders and modules

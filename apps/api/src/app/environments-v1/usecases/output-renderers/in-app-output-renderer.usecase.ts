@@ -7,36 +7,48 @@ import { RenderCommand } from './render-command';
 @Injectable()
 export class InAppOutputRendererUsecase {
   execute(renderCommand: RenderCommand): InAppRenderOutput {
-    const inApp = InAppRenderOutputSchema.parse(renderCommand.controlValues);
+    const inApp = InAppRenderOutputSchema.optional().parse(renderCommand.controlValues);
+    if (!inApp) {
+      throw new Error('Invalid in-app control value data');
+    }
 
     return {
       subject: inApp.subject,
       body: inApp.body,
       avatar: inApp.avatar,
-      primaryAction: inApp.primaryAction
-        ? {
-            label: inApp.primaryAction.label,
-            redirect: {
-              url: inApp.primaryAction.redirect.url,
-              target: inApp.primaryAction.redirect.target as RedirectTargetEnum,
-            },
-          }
-        : undefined,
-      secondaryAction: inApp.secondaryAction
-        ? {
-            label: inApp.secondaryAction?.label,
-            redirect: {
-              url: inApp.secondaryAction?.redirect.url,
-              target: inApp.secondaryAction?.redirect.target as RedirectTargetEnum,
-            },
-          }
-        : undefined,
-      redirect: inApp.redirect
-        ? {
-            url: inApp.redirect.url,
-            target: inApp.redirect.target as RedirectTargetEnum,
-          }
-        : undefined,
+      primaryAction:
+        inApp.primaryAction &&
+        inApp.primaryAction.label &&
+        inApp.primaryAction.redirect &&
+        inApp.primaryAction.redirect.url
+          ? {
+              label: inApp.primaryAction.label,
+              redirect: {
+                url: inApp.primaryAction.redirect.url,
+                target: inApp.primaryAction.redirect.target as RedirectTargetEnum,
+              },
+            }
+          : undefined,
+      secondaryAction:
+        inApp.secondaryAction &&
+        inApp.secondaryAction.label &&
+        inApp.secondaryAction.redirect &&
+        inApp.secondaryAction.redirect.url
+          ? {
+              label: inApp.secondaryAction?.label,
+              redirect: {
+                url: inApp.secondaryAction?.redirect.url,
+                target: inApp.secondaryAction?.redirect.target as RedirectTargetEnum,
+              },
+            }
+          : undefined,
+      redirect:
+        inApp.redirect && inApp.redirect.url
+          ? {
+              url: inApp.redirect.url,
+              target: inApp.redirect.target as RedirectTargetEnum,
+            }
+          : undefined,
       data: inApp.data as Record<string, unknown>,
     };
   }

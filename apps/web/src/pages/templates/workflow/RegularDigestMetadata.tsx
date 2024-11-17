@@ -9,7 +9,7 @@ import { useStepFormPath } from '../hooks/useStepFormPath';
 import { useEnvironment } from '../../../hooks';
 import { useTemplateEditorForm } from '../components/TemplateEditorFormProvider';
 
-const amountDefaultValue = '5';
+const amountDefaultValue = '30';
 
 export const RegularDigestMetadata = () => {
   const { template } = useTemplateEditorForm();

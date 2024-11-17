@@ -64,7 +64,8 @@ export const SupportModal: FC<SupportModalProps> = ({ isOpen, toggleOpen }) => {
           <HStack justify={'space-between'}>
             <div>
               <HStack gap="50" className={css({ color: 'typography.text.secondary' })}>
-                You can also email us as at<a href="mailto:support@novu.co">support@novu.co</a>
+                You can also email us at
+                <a href="mailto:support@novu.co">support@novu.co</a>
               </HStack>
             </div>
             <Button size={'md'} disabled={!isValid} onClick={handleSubmit(onSubmit)}>

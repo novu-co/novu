@@ -25,9 +25,13 @@ export const envValidators = {
   REDIS_TLS: json({ default: undefined }),
   JWT_SECRET: str(),
   SENDGRID_API_KEY: str({ default: '' }),
-  MONGO_URL: str(),
+  /** @deprecated - use `MONGO_AUTO_CREATE_INDEXES` instead */
+  AUTO_CREATE_INDEXES: bool({ default: false }),
+  MONGO_AUTO_CREATE_INDEXES: bool({ default: false }),
+  MONGO_MAX_IDLE_TIME_IN_MS: num({ default: 1000 * 30 }),
+  MONGO_MAX_POOL_SIZE: num({ default: 50 }),
   MONGO_MIN_POOL_SIZE: num({ default: 10 }),
-  MONGO_MAX_POOL_SIZE: num({ default: 500 }),
+  MONGO_URL: str(),
   NOVU_API_KEY: str({ default: '' }),
   STORE_ENCRYPTION_KEY: str(),
   NEW_RELIC_APP_NAME: str({ default: '' }),
@@ -52,7 +56,9 @@ export const envValidators = {
   NOVU_INVITE_TEAM_MEMBER_NUDGE_TRIGGER_IDENTIFIER: str({ default: undefined }),
   HUBSPOT_INVITE_NUDGE_EMAIL_USER_LIST_ID: str({ default: undefined }),
   HUBSPOT_PRIVATE_APP_ACCESS_TOKEN: str({ default: undefined }),
-  PLAIN_SUPPORT_KEY: str(),
+  ...(processEnv.NOVU_ENTERPRISE === 'true' && {
+    PLAIN_SUPPORT_KEY: str(),
+  }),
   // Feature Flags
   ...Object.keys(FeatureFlagsKeysEnum).reduce(
     (acc, key) => {

@@ -13,6 +13,8 @@ const SheetClose = SheetPrimitive.Close;
 
 const SheetPortal = SheetPrimitive.Portal;
 
+const SheetContentBase = SheetPrimitive.Content;
+
 const SheetOverlay = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>
@@ -104,6 +106,7 @@ export {
   SheetOverlay,
   SheetTrigger,
   SheetClose,
+  SheetContentBase,
   SheetContent,
   SheetHeader,
   SheetFooter,

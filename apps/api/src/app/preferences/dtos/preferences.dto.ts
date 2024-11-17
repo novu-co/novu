@@ -40,7 +40,7 @@ export class Channels {
 export class PreferencesDto {
   @ValidateNested({ each: true })
   @Type(() => WorkflowPreference)
-  workflow: WorkflowPreference;
+  all: WorkflowPreference;
 
   @ValidateNested({ each: true })
   @Type(() => Channels)

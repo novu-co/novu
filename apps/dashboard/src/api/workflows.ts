@@ -7,7 +7,7 @@ import type {
   WorkflowTestDataResponseDto,
   GeneratePreviewRequestDto,
 } from '@novu/shared';
-import { getV2, post, postV2, putV2 } from './api.client';
+import { delV2, getV2, post, postV2, putV2 } from './api.client';
 
 export const fetchWorkflow = async ({ workflowSlug }: { workflowSlug?: string }): Promise<WorkflowResponseDto> => {
   const { data } = await getV2<{ data: WorkflowResponseDto }>(`/workflows/${workflowSlug}`);
@@ -55,17 +55,21 @@ export const updateWorkflow = async ({
 
 export const previewStep = async ({
   workflowSlug,
-  payload,
+  data,
   stepSlug,
 }: {
   workflowSlug: string;
   stepSlug: string;
-  payload?: GeneratePreviewRequestDto;
+  data?: GeneratePreviewRequestDto;
 }): Promise<GeneratePreviewResponseDto> => {
-  const { data } = await postV2<{ data: GeneratePreviewResponseDto }>(
+  const res = await postV2<{ data: GeneratePreviewResponseDto }>(
     `/workflows/${workflowSlug}/step/${stepSlug}/preview`,
-    payload
+    data
   );
 
-  return data;
+  return res.data;
+};
+
+export const deleteWorkflow = async ({ workflowId }: { workflowId: string }): Promise<void> => {
+  return delV2(`/workflows/${workflowId}`);
 };

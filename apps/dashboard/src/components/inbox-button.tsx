@@ -11,13 +11,17 @@ export const InboxButton = () => {
   }
 
   return (
-    <Inbox subscriberId={user.id} applicationIdentifier={APP_ID}>
+    <Inbox subscriberId={user.externalId ?? ''} applicationIdentifier={APP_ID}>
       <Popover>
         <PopoverTrigger>
           <Bell />
         </PopoverTrigger>
         <PopoverPortal>
-          <PopoverContent className="h-[500px] w-[350px] p-0">
+          <PopoverContent
+            side="bottom"
+            align="end"
+            className="h-[500px] w-[350px] overflow-y-auto p-0 [&>div:first-child]:[&>div:first-child]:h-full [&>div:first-child]:h-full"
+          >
             <InboxContent />
           </PopoverContent>
         </PopoverPortal>

@@ -16,6 +16,7 @@ type URLInputProps = Omit<InputProps, 'value' | 'onChange' | 'size'> & {
     urlKey: string;
     targetKey: string;
   };
+  variables: Array<{ type: string; label: string }>;
 } & Pick<InputFieldProps, 'size'>;
 
 export const URLInput = ({
@@ -25,6 +26,7 @@ export const URLInput = ({
   placeholder,
   fields: { urlKey, targetKey },
   withHint = true,
+  variables = [],
 }: URLInputProps) => {
   const { control, getFieldState } = useFormContext();
   const url = getFieldState(`${urlKey}`);
@@ -50,7 +52,7 @@ export const URLInput = ({
                         height={size === 'md' ? '38px' : '30px'}
                         extensions={[
                           liquid({
-                            variables: [{ type: 'variable', label: 'asdf' }],
+                            variables,
                           }),
                           EditorView.lineWrapping,
                         ]}

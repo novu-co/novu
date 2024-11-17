@@ -35,7 +35,8 @@ export function GlobeGradient(props: React.ComponentPropsWithoutRef<'svg'>) {
           y1="16.5"
           x2="15.75"
           y2="15.5"
-          gradientUnits="userSpaceOnUse">
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor="#FF512F" />
           <stop offset="1" stopColor="#DD2476" />
         </linearGradient>
