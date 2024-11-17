@@ -55,6 +55,7 @@ export class UpsertWorkflowUseCase {
 
     return toResponseWorkflowDto(persistedWorkflow);
   }
+
   private async getWorkflow(workflowId: string, command: UpsertWorkflowCommand): Promise<WorkflowInternalResponseDto> {
     return await this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({
@@ -67,16 +68,16 @@ export class UpsertWorkflowUseCase {
   }
 
   private async persistWorkflow(workflowWithIssues: WorkflowInternalResponseDto) {
-    await this.updateWorkflowUsecase.execute(
-      UpdateWorkflowCommand.create({
-        id: workflowWithIssues._id,
-        environmentId: workflowWithIssues._environmentId,
-        organizationId: workflowWithIssues._organizationId,
-        userId: workflowWithIssues._creatorId,
-        type: workflowWithIssues.type!,
-        ...workflowWithIssues,
-      })
-    );
+    const command = UpdateWorkflowCommand.create({
+      id: workflowWithIssues._id,
+      environmentId: workflowWithIssues._environmentId,
+      organizationId: workflowWithIssues._organizationId,
+      userId: workflowWithIssues._creatorId,
+      type: workflowWithIssues.type!,
+      ...workflowWithIssues,
+    });
+
+    await this.updateWorkflowUsecase.execute(command);
   }
 
   private async queryWorkflow(command: UpsertWorkflowCommand): Promise<WorkflowInternalResponseDto | null> {

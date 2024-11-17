@@ -22,7 +22,6 @@ import {
 import {
   buildWorkflowPreferences,
   ChangeEntityTypeEnum,
-  DEFAULT_WORKFLOW_PREFERENCES,
   isBridgeWorkflow,
   PreferencesTypeEnum,
 } from '@novu/shared';
@@ -189,6 +188,14 @@ export class UpdateWorkflow {
 
       if (command.payloadSchema) {
         updatePayload.payloadSchema = command.payloadSchema;
+      }
+
+      if (command.status) {
+        updatePayload.status = command.status;
+      }
+
+      if (command.issues) {
+        updatePayload.issues = command.issues;
       }
 
       // defaultPreferences is required, so we always call the upsert
@@ -586,6 +593,10 @@ export class UpdateWorkflow {
 
     if (updatedVariants.length) {
       partialNotificationStep.variants = updatedVariants;
+    }
+
+    if (message.issues) {
+      partialNotificationStep.issues = message.issues;
     }
 
     return partialNotificationStep;

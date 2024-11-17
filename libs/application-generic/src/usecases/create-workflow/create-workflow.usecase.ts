@@ -336,6 +336,8 @@ export class CreateWorkflow {
       blueprintId: command.blueprintId,
       type: command.type,
       origin: command.origin,
+      status: command.status,
+      issues: command.issues,
       ...(command.rawData ? { rawData: command.rawData } : {}),
       ...(command.payloadSchema
         ? { payloadSchema: command.payloadSchema }
@@ -460,6 +462,7 @@ export class CreateWorkflow {
         name: step.name,
         metadata: step.metadata,
         stepId: step.stepId,
+        issues: step.issues,
       };
 
       if (storedVariants.length) {

@@ -19,11 +19,19 @@ import {
   FilterParts,
   IMessageAction,
   INotificationGroup,
+  IStepVariant,
+  StepIssuesDto,
+  StepIssue as StepIssueDto,
+  ContentIssue as ContentIssueDto,
   IWorkflowStepMetadata,
   JSONSchemaDto,
   NotificationTemplateCustomData,
   WorkflowOriginEnum,
   WorkflowTypeEnum,
+  StepIssueEnum,
+  StepContentIssueEnum,
+  StepCreateAndUpdateKeys,
+  WorkflowStatusEnum,
 } from '@novu/shared';
 
 import { Type } from 'class-transformer';
@@ -119,6 +127,15 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsOptional()
   @IsString()
   triggerIdentifier?: string;
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => ContentIssue)
+  issues?: Record<string, ContentIssue[]>;
+
+  @IsEnum(WorkflowStatusEnum)
+  @IsOptional()
+  status?: WorkflowStatusEnum;
 }
 
 export class ChannelCTACommand {
@@ -136,7 +153,45 @@ export class ChannelCTACommand {
   action?: IMessageAction[];
 }
 
-export class NotificationStepVariantCommand {
+export class ContentIssue implements ContentIssueDto {
+  @IsOptional()
+  @IsString()
+  variableName?: string;
+
+  @IsString()
+  message: string;
+
+  @IsEnum(StepContentIssueEnum)
+  issueType: StepContentIssueEnum;
+}
+
+export class StepIssue implements StepIssueDto {
+  @IsEnum(StepIssueEnum)
+  issueType: StepIssueEnum;
+
+  @IsOptional()
+  @IsString()
+  variableName?: string;
+
+  @IsString()
+  message: string;
+}
+
+export class StepIssues implements StepIssuesDto {
+  @IsOptional()
+  @IsObject()
+  @ValidateNested({ each: true })
+  @Type(() => StepIssue)
+  body?: Record<StepCreateAndUpdateKeys, StepIssue>;
+
+  @IsOptional()
+  @IsObject()
+  @ValidateNested({ each: true })
+  @Type(() => ContentIssue)
+  controls?: Record<string, ContentIssue[]>;
+}
+
+export class NotificationStepVariantCommand implements IStepVariant {
   @IsString()
   @IsOptional()
   _templateId?: string;
@@ -188,6 +243,11 @@ export class NotificationStepVariantCommand {
 
   @IsOptional()
   stepId?: string;
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => StepIssues)
+  issues?: StepIssues;
 }
 
 export class NotificationStep extends NotificationStepVariantCommand {

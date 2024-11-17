@@ -15,13 +15,14 @@ import {
 import {
   JSONSchemaDto,
   NotificationTemplateCustomData,
+  WorkflowStatusEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
 
 import { Type } from 'class-transformer';
 import { EnvironmentWithUserCommand } from '../../../commands';
 import { PreferencesRequired } from '../../upsert-preferences';
-import { NotificationStep } from '../..';
+import { ContentIssue, NotificationStep } from '../..';
 
 export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsDefined()
@@ -101,6 +102,15 @@ export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsEnum(WorkflowTypeEnum)
   @IsDefined()
   type: WorkflowTypeEnum;
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => ContentIssue)
+  issues?: Record<string, ContentIssue[]>;
+
+  @IsEnum(WorkflowStatusEnum)
+  @IsOptional()
+  status?: WorkflowStatusEnum;
 }
 
 export interface IStepControl {
