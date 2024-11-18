@@ -25,7 +25,7 @@ export const InAppSubject = () => {
       control={control}
       name={subjectKey}
       render={({ field }) => (
-        <InputField state={errors[subjectKey] ? 'error' : 'default'}>
+        <InputField state={errors[subjectKey] ? 'error' : 'default'} size="fit">
           <FormItem className="w-full">
             <FormControl>
               <Editor
