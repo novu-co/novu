@@ -42,7 +42,7 @@ export const inAppControlSchema = {
 
 const redirectPlaceholder = {
   url: {
-    placeholder: '',
+    placeholder: undefined,
   },
   target: {
     placeholder: '_self',
@@ -58,23 +58,23 @@ export const InAppUiSchema: UiSchema = {
     },
     avatar: {
       component: UiComponentEnum.IN_APP_AVATAR,
-      placeholder: '',
+      placeholder: undefined,
     },
     subject: {
       component: UiComponentEnum.IN_APP_SUBJECT,
-      placeholder: '',
+      placeholder: undefined,
     },
     primaryAction: {
       component: UiComponentEnum.IN_APP_BUTTON_DROPDOWN,
-      placeholder: null,
+      placeholder: undefined,
     },
     secondaryAction: {
       component: UiComponentEnum.IN_APP_BUTTON_DROPDOWN,
-      placeholder: null,
+      placeholder: undefined,
     },
     redirect: {
       component: UiComponentEnum.URL_TEXT_BOX,
-      placeholder: redirectPlaceholder,
+      placeholder: undefined,
     },
   },
 };
