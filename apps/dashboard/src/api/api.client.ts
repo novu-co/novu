@@ -12,7 +12,7 @@ export class NovuApiError extends Error {
   }
 }
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 const request = async <T>(
   endpoint: string,
@@ -69,6 +69,7 @@ export const get = <T>(endpoint: string) => request<T>(endpoint, { method: 'GET'
 export const post = <T>(endpoint: string, data: unknown) => request<T>(endpoint, { method: 'POST', data });
 export const put = <T>(endpoint: string, data: unknown) => request<T>(endpoint, { method: 'PUT', data });
 export const del = <T>(endpoint: string) => request<T>(endpoint, { method: 'DELETE' });
+export const patch = <T>(endpoint: string, data: unknown) => request<T>(endpoint, { method: 'PATCH', data });
 
 export const getV2 = <T>(endpoint: string) => request<T>(endpoint, { version: 'v2', method: 'GET' });
 export const postV2 = <T>(endpoint: string, data: unknown) =>
@@ -76,3 +77,5 @@ export const postV2 = <T>(endpoint: string, data: unknown) =>
 export const putV2 = <T>(endpoint: string, data: unknown) =>
   request<T>(endpoint, { version: 'v2', method: 'PUT', data });
 export const delV2 = <T>(endpoint: string) => request<T>(endpoint, { version: 'v2', method: 'DELETE' });
+export const patchV2 = <T>(endpoint: string, data: unknown) =>
+  request<T>(endpoint, { version: 'v2', method: 'PATCH', data });
