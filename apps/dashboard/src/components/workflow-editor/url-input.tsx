@@ -1,5 +1,4 @@
 import { liquid } from '@codemirror/lang-liquid';
-import { EditorView } from '@uiw/react-codemirror';
 import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
@@ -34,14 +33,14 @@ export const URLInput = ({
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between space-x-2">
-        <div className="relative flex-grow">
+        <div className="relative w-full">
           <InputField className="pr-0">
             <FormField
               control={control}
               name={urlKey}
               defaultValue=""
               render={({ field }) => (
-                <FormItem className="w-full">
+                <FormItem className="w-full overflow-hidden">
                   <FormControl>
                     {asEditor ? (
                       <Editor
@@ -51,7 +50,6 @@ export const URLInput = ({
                           liquid({
                             variables,
                           }),
-                          EditorView.lineWrapping,
                         ]}
                         value={field.value}
                         onChange={field.onChange}
@@ -71,7 +69,7 @@ export const URLInput = ({
                 <FormItem>
                   <FormControl>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="max-w-24 rounded-l-none border-0 border-l">
+                      <SelectTrigger className="h-full max-w-24 rounded-l-none border-0 border-l">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -90,7 +88,7 @@ export const URLInput = ({
         </div>
       </div>
       <FormMessagePure error={error ? String(error.message) : undefined}>
-        {withHint && 'This supports variables and relative URLs i.e /tasks/{{taskId}}'}
+        {withHint && 'Type {{ for variables'}
       </FormMessagePure>
     </div>
   );

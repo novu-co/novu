@@ -32,7 +32,7 @@ export const InAppEditor = ({ uiSchema }: { uiSchema?: UiSchema }) => {
       </div>
       <div className="flex flex-col gap-1 rounded-xl border border-neutral-100 p-1">
         {(avatar || subject) && (
-          <div className="flex items-center gap-1">
+          <div className="flex gap-1">
             {avatar && getComponentByType({ component: avatar.component })}
             {subject && getComponentByType({ component: subject.component })}
           </div>
