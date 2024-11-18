@@ -1,7 +1,7 @@
 import { UiSchemaGroupEnum, type UiSchema } from '@novu/shared';
 
-import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
 import { Notification5Fill } from '@/components/icons';
+import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
 
 const avatarKey = 'avatar';
 const subjectKey = 'subject';
@@ -32,7 +32,7 @@ export const InAppEditor = ({ uiSchema }: { uiSchema?: UiSchema }) => {
       </div>
       <div className="flex flex-col gap-1 rounded-xl border border-neutral-100 p-1">
         {(avatar || subject) && (
-          <div className="flex gap-1">
+          <div className="flex items-center gap-1">
             {avatar && getComponentByType({ component: avatar.component })}
             {subject && getComponentByType({ component: subject.component })}
           </div>

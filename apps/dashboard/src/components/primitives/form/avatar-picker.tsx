@@ -1,6 +1,6 @@
-import { useState, forwardRef, useMemo } from 'react';
 import { liquid } from '@codemirror/lang-liquid';
 import { EditorView } from '@uiw/react-codemirror';
+import { forwardRef, useMemo, useState } from 'react';
 import { RiEdit2Line, RiErrorWarningFill, RiImageEditFill } from 'react-icons/ri';
 
 import { Avatar, AvatarImage } from '@/components/primitives/avatar';
@@ -11,10 +11,10 @@ import { Label } from '@/components/primitives/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import TextSeparator from '@/components/primitives/text-separator';
-import { useFormField } from './form-context';
-import { Editor } from '../editor';
 import { useStepEditorContext } from '@/components/workflow-editor/steps/hooks';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
+import { Editor } from '../editor';
+import { useFormField } from './form-context';
 
 const predefinedAvatars = [
   `${window.location.origin}/images/avatar.svg`,
@@ -52,7 +52,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ n
     <div className="size-9 space-y-2">
       <Popover modal={true} open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="icon" className="text-foreground-600 relative h-9 w-10">
+          <Button variant="outline" size="icon" className="text-foreground-600 relative size-full">
             {value ? (
               <Avatar className="p-px">
                 <AvatarImage src={value as string} />

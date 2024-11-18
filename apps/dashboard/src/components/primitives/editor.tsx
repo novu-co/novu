@@ -1,11 +1,11 @@
-import React, { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef } from 'react';
 import { tags as t } from '@lezer/highlight';
-import { useCodeMirror, EditorView, ReactCodeMirrorProps } from '@uiw/react-codemirror';
-import { cva, VariantProps } from 'class-variance-authority';
 import createTheme from '@uiw/codemirror-themes';
+import { EditorView, ReactCodeMirrorProps, useCodeMirror } from '@uiw/react-codemirror';
+import { cva, VariantProps } from 'class-variance-authority';
+import React, { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef } from 'react';
 import { autocompleteFooter, autocompleteHeader, functionIcon } from './constants';
 
-const editorVariants = cva('h-full mt-2 w-full flex-1 [&_.cm-focused]:outline-none', {
+const editorVariants = cva('h-full w-full flex-1 [&_.cm-focused]:outline-none', {
   variants: {
     size: {
       default: 'text-xs [&_.cm-editor]:py-1',

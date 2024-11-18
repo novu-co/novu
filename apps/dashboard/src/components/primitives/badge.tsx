@@ -1,9 +1,9 @@
-import * as React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/utils/ui';
+import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
 
 const badgeVariants = cva(
-  'inline-flex items-center gap-1 px-1 h-fit border text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  'inline-flex items-center gap-1 h-fit border text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
   {
     variants: {
       variant: {
@@ -15,7 +15,7 @@ const badgeVariants = cva(
         outline: 'border-neutral-alpha-200 bg-transparent font-normal text-foreground-600 shadow-sm',
       },
       size: {
-        default: 'rounded-md p-1',
+        default: 'rounded-md px-2 py-1',
         pill: 'rounded-full px-2',
         'pill-stroke': 'rounded-full px-2',
         tag: 'rounded-md py-0.5 px-2',
