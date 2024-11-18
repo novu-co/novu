@@ -35,7 +35,7 @@ export function toResponseWorkflowDto(workflow: WorkflowInternalResponseDto): Wo
     origin: computeOrigin(workflow),
     updatedAt: workflow.updatedAt || 'Missing Updated At',
     createdAt: workflow.createdAt || 'Missing Create At',
-    status: getWorkflowStatus(workflow),
+    status: workflow.status || WorkflowStatusEnum.ACTIVE,
     issues: workflow.issues as unknown as Record<WorkflowCreateAndUpdateKeys, RuntimeIssue>,
   };
 }
@@ -63,20 +63,8 @@ function toMinifiedWorkflowDto(template: NotificationTemplateEntity): WorkflowLi
     updatedAt: template.updatedAt || 'Missing Updated At',
     stepTypeOverviews: template.steps.map(buildStepTypeOverview).filter((stepTypeEnum) => !!stepTypeEnum),
     createdAt: template.createdAt || 'Missing Create At',
-    status: getWorkflowStatus(template),
+    status: template.status || WorkflowStatusEnum.ACTIVE,
   };
-}
-
-function getWorkflowStatus(template: NotificationTemplateEntity): WorkflowStatusEnum {
-  if (template.issues && Object.keys(template.issues).length > 0) {
-    return WorkflowStatusEnum.ERROR;
-  }
-
-  if (!template.active) {
-    return WorkflowStatusEnum.INACTIVE;
-  }
-
-  return WorkflowStatusEnum.ACTIVE;
 }
 
 export function toWorkflowsMinifiedDtos(templates: NotificationTemplateEntity[]): WorkflowListResponseDto[] {
