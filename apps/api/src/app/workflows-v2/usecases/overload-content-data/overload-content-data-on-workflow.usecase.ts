@@ -7,6 +7,7 @@ import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
 import { OverloadContentDataOnWorkflowCommand } from './overload-content-data-on-workflow.command';
 import { StepMissingControlsException } from '../../exceptions/step-not-found-exception';
 import { convertJsonToSchemaWithDefaults } from '../../util/jsonToSchema';
+import { mergeObjects } from '../../util/jsonUtils';
 
 @Injectable()
 export class OverloadContentDataOnWorkflowUseCase {
@@ -26,7 +27,9 @@ export class OverloadContentDataOnWorkflowUseCase {
       if (!step.issues?.controls) {
         step.issues.controls = {};
       }
-      step.issues.controls = validatedContentResponses[step._templateId].issues;
+      const validatedIssues = validatedContentResponses[step._templateId].issues;
+      const stepControlIssues = step.issues.controls;
+      step.issues.controls = stepControlIssues ? mergeObjects(stepControlIssues, validatedIssues) : validatedIssues;
     }
 
     return command.workflow;

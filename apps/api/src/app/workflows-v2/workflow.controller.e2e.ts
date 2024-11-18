@@ -85,6 +85,7 @@ describe('Workflow Controller E2E API Testing', () => {
         await getWorkflowAndValidate(workflowCreated);
       });
     });
+
     describe('Workflow Body Issues', () => {
       it('should show description issue when too long', async () => {
         const issues = await createWorkflowAndReturnIssues({ description: LONG_DESCRIPTION });
@@ -96,6 +97,7 @@ describe('Workflow Controller E2E API Testing', () => {
         }
       });
     });
+
     describe('Workflow Step Body Issues', () => {
       it('should show name issue when missing', async () => {
         const { issues, status } = await createWorkflowAndReturnStepIssues(
@@ -110,6 +112,7 @@ describe('Workflow Controller E2E API Testing', () => {
           expect(issues.body.name?.issueType, JSON.stringify(issues)).to.be.equal(StepIssueEnum.MISSING_REQUIRED_VALUE);
         }
       });
+
       it('should remove issues when no longer', async () => {
         const inAppStep = { ...buildInAppStep(), controlValues: { body: 'some body here' }, name: '' };
         const workflowCreated = await createWorkflowAndReturn({ steps: [inAppStep] });
@@ -126,6 +129,7 @@ describe('Workflow Controller E2E API Testing', () => {
         expect(firstStep.issues?.controls, JSON.stringify(firstStep.issues)).to.be.empty;
       });
     });
+
     describe('Workflow Step content Issues', () => {
       it('should show control value required when missing', async () => {
         const { issues, status } = await createWorkflowAndReturnStepIssues({ steps: [{ ...buildEmailStep() }] }, 0);
@@ -138,8 +142,14 @@ describe('Workflow Controller E2E API Testing', () => {
           }
         }
       });
+
+      it('should show digest control value issues when illegal value provided', async () => {
+        const steps = [{ ...buildDigestStep({ controlValues: { amount: '30', unit: 'seconds' } }) }];
+        const { issues, status } = await createWorkflowAndReturnStepIssues({ steps }, 0);
+      });
     });
   });
+
   describe('Create Workflow Permutations', () => {
     it('should allow creating two workflows for the same user with the same name', async () => {
       const nameSuffix = `Test Workflow${new Date().toString()}`;
@@ -834,6 +844,7 @@ describe('Workflow Controller E2E API Testing', () => {
       await createWorkflowAndValidate(`${prefix}-ABC${i}`);
     }
   }
+
   async function createWorkflowAndValidate(nameSuffix: string = ''): Promise<WorkflowResponseDto> {
     const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto(nameSuffix);
     const res = await workflowsClient.createWorkflow(createWorkflowDto);
@@ -871,6 +882,7 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(Object.keys(step.issues?.body || {}).length, stringify(step)).to.be.eq(0);
     }
   }
+
   async function createWorkflowAndReturnIssues(overrideDto: Partial<CreateWorkflowDto>) {
     const workflowCreated = await createWorkflowAndReturn(overrideDto);
     const { issues } = workflowCreated;
@@ -878,6 +890,7 @@ describe('Workflow Controller E2E API Testing', () => {
 
     return issues;
   }
+
   async function createWorkflowAndReturn(
     overrideDto: Partial<
       WorkflowCommonsFields & {
@@ -1001,10 +1014,11 @@ function buildEmailStep(): StepCreateDto {
     type: StepTypeEnum.EMAIL,
   };
 }
-function buildDigestStep(): StepCreateDto {
+function buildDigestStep(overrides: Partial<StepCreateDto> = {}): StepCreateDto {
   return {
     name: 'Digest Test Step',
     type: StepTypeEnum.DIGEST,
+    ...overrides,
   };
 }
 
