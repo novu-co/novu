@@ -4,7 +4,7 @@ import { cn } from '@/utils/ui';
 import { cva, VariantProps } from 'class-variance-authority';
 
 export const inputVariants = cva(
-  'file:text-foreground placeholder:text-foreground-400 flex h-full w-full bg-transparent text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none disabled:cursor-not-allowed'
+  'file:text-foreground placeholder:text-foreground-400 flex h-full w-full bg-transparent text-xs file:border-0 file:bg-transparent file:font-medium focus-visible:outline-none disabled:cursor-not-allowed'
 );
 
 const inputFieldVariants = cva(
@@ -43,8 +43,7 @@ const inputFieldVariants = cva(
   {
     variants: {
       size: {
-        default: 'min-h-8 px-2 [&>input]:py-1.5',
-        md: 'min-h-10 px-3 [&>input]:py-2.5',
+        default: 'h-9 px-2 [&>input]:py-1.5',
       },
       state: {
         default:
@@ -65,7 +64,7 @@ export type InputFieldProps = { children: React.ReactNode; className?: string } 
 
 const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(({ children, className, size, state }, ref) => {
   return (
-    <div ref={ref} className={inputFieldVariants({ size, state, className })}>
+    <div ref={ref} className={cn(inputFieldVariants({ size, state }), className)}>
       {children}
     </div>
   );

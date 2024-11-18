@@ -9,10 +9,8 @@ import {
 import { ModuleRef } from '@nestjs/core';
 
 import {
-  FeedRepository,
   NotificationGroupEntity,
   NotificationGroupRepository,
-  NotificationStepEntity,
   NotificationTemplateRepository,
 } from '@novu/dal';
 import {
@@ -25,6 +23,7 @@ import {
   WorkflowOriginEnum,
   WorkflowTypeEnum,
   slugify,
+  DEFAULT_WORKFLOW_PREFERENCES,
 } from '@novu/shared';
 
 import { PinoLogger } from 'nestjs-pino';
@@ -48,14 +47,27 @@ import {
 } from '../message-template';
 import { ApiException, PlatformException } from '../../utils/exceptions';
 import { shortId } from '../../utils/generate-id';
+import {
+  UpsertPreferences,
+  UpsertUserWorkflowPreferencesCommand,
+  UpsertWorkflowPreferencesCommand,
+} from '../upsert-preferences';
+import { GetPreferences } from '../get-preferences';
+import {
+  GetWorkflowByIdsCommand,
+  WorkflowInternalResponseDto,
+  GetWorkflowByIdsUseCase,
+} from '../workflow';
 
+/**
+ * @deprecated - use `UpsertWorkflow` instead
+ */
 @Injectable()
 export class CreateWorkflow {
   constructor(
     private notificationTemplateRepository: NotificationTemplateRepository,
     private createMessageTemplate: CreateMessageTemplate,
     private notificationGroupRepository: NotificationGroupRepository,
-    private feedRepository: FeedRepository,
     private createChange: CreateChange,
     @Inject(forwardRef(() => AnalyticsService))
     private analyticsService: AnalyticsService,
@@ -63,31 +75,42 @@ export class CreateWorkflow {
     @Inject(forwardRef(() => InvalidateCacheService))
     private invalidateCache: InvalidateCacheService,
     protected moduleRef: ModuleRef,
+    @Inject(forwardRef(() => UpsertPreferences))
+    private upsertPreferences: UpsertPreferences,
+    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
   ) {}
 
-  async execute(usecaseCommand: CreateWorkflowCommand) {
+  async execute(
+    usecaseCommand: CreateWorkflowCommand,
+  ): Promise<WorkflowInternalResponseDto> {
     const blueprintCommand = await this.processBlueprint(usecaseCommand);
     const command = blueprintCommand ?? usecaseCommand;
     this.validatePayload(command);
+    let storedWorkflow: WorkflowInternalResponseDto;
+    await this.notificationTemplateRepository.withTransaction(async () => {
+      const triggerIdentifier = this.generateTriggerIdentifier(command);
 
-    const triggerIdentifier = this.generateTriggerIdentifier(command);
+      const parentChangeId: string =
+        NotificationTemplateRepository.createObjectId();
 
-    const parentChangeId: string =
-      NotificationTemplateRepository.createObjectId();
+      const templateSteps = await this.storeTemplateSteps(
+        command,
+        parentChangeId,
+      );
+      const trigger = await this.createNotificationTrigger(
+        command,
+        triggerIdentifier,
+      );
 
-    const [templateSteps, trigger] = await Promise.all([
-      this.storeTemplateSteps(command, parentChangeId),
-      this.createNotificationTrigger(command, triggerIdentifier),
-    ]);
+      storedWorkflow = await this.storeWorkflow(
+        command,
+        templateSteps,
+        trigger,
+        triggerIdentifier,
+      );
 
-    const storedWorkflow = await this.storeWorkflow(
-      command,
-      templateSteps,
-      trigger,
-      triggerIdentifier,
-    );
-
-    await this.createWorkflowChange(command, storedWorkflow, parentChangeId);
+      await this.createWorkflowChange(command, storedWorkflow, parentChangeId);
+    });
 
     try {
       if (
@@ -289,7 +312,7 @@ export class CreateWorkflow {
     templateSteps: INotificationTemplateStep[],
     trigger: INotificationTrigger,
     triggerIdentifier: string,
-  ) {
+  ): Promise<WorkflowInternalResponseDto> {
     this.logger.info(`Creating workflow ${JSON.stringify(command)}`);
 
     const savedWorkflow = await this.notificationTemplateRepository.create({
@@ -299,8 +322,12 @@ export class CreateWorkflow {
       name: command.name,
       active: command.active,
       draft: command.draft,
-      critical: command.critical,
-      preferenceSettings: command.preferenceSettings,
+      critical: command.critical ?? false,
+      /** @deprecated - use `userPreferences` instead */
+      preferenceSettings:
+        GetPreferences.mapWorkflowPreferencesToChannelPreferences(
+          command.userPreferences ?? DEFAULT_WORKFLOW_PREFERENCES,
+        ),
       tags: command.tags,
       description: command.description,
       steps: templateSteps,
@@ -309,12 +336,40 @@ export class CreateWorkflow {
       blueprintId: command.blueprintId,
       type: command.type,
       origin: command.origin,
+      status: command.status,
+      issues: command.issues,
       ...(command.rawData ? { rawData: command.rawData } : {}),
       ...(command.payloadSchema
         ? { payloadSchema: command.payloadSchema }
         : {}),
       ...(command.data ? { data: command.data } : {}),
     });
+
+    // defaultPreferences is required, so we always call the upsert
+    await this.upsertPreferences.upsertWorkflowPreferences(
+      UpsertWorkflowPreferencesCommand.create({
+        templateId: savedWorkflow._id,
+        preferences: command.defaultPreferences,
+        environmentId: command.environmentId,
+        organizationId: command.organizationId,
+      }),
+    );
+
+    if (
+      command.userPreferences !== undefined &&
+      command.userPreferences !== null
+    ) {
+      // userPreferences is optional, so we need to check if it's defined before calling the upsert
+      await this.upsertPreferences.upsertUserWorkflowPreferences(
+        UpsertUserWorkflowPreferencesCommand.create({
+          templateId: savedWorkflow._id,
+          preferences: command.userPreferences,
+          environmentId: command.environmentId,
+          organizationId: command.organizationId,
+          userId: command.userId,
+        }),
+      );
+    }
 
     await this.invalidateCache.invalidateByKey({
       key: buildNotificationTemplateIdentifierKey({
@@ -338,7 +393,14 @@ export class CreateWorkflow {
 
     this.sendTemplateCreationEvent(command, triggerIdentifier);
 
-    return item;
+    return this.getWorkflowByIdsUseCase.execute(
+      GetWorkflowByIdsCommand.create({
+        userId: command.userId,
+        environmentId: command.environmentId,
+        organizationId: command.organizationId,
+        identifierOrInternalId: savedWorkflow._id,
+      }),
+    );
   }
 
   private async storeTemplateSteps(
@@ -352,41 +414,40 @@ export class CreateWorkflow {
       if (!step.template)
         throw new ApiException(`Unexpected error: message template is missing`);
 
-      const [createdMessageTemplate, storedVariants] = await Promise.all([
-        await this.createMessageTemplate.execute(
-          CreateMessageTemplateCommand.create({
-            organizationId: command.organizationId,
-            environmentId: command.environmentId,
-            userId: command.userId,
-            type: step.template.type,
-            name: step.template.name,
-            content: step.template.content,
-            variables: step.template.variables,
-            contentType: step.template.contentType,
-            cta: step.template.cta,
-            subject: step.template.subject,
-            title: step.template.title,
-            feedId: step.template.feedId,
-            layoutId: step.template.layoutId,
-            preheader: step.template.preheader,
-            senderName: step.template.senderName,
-            actor: step.template.actor,
-            controls: step.template.controls,
-            output: step.template.output,
-            stepId: step.template.stepId,
-            parentChangeId,
-            workflowType: command.type,
-          }),
-        ),
-        await this.storeVariantSteps({
-          variants: step.variants,
-          parentChangeId,
+      const createdMessageTemplate = await this.createMessageTemplate.execute(
+        CreateMessageTemplateCommand.create({
           organizationId: command.organizationId,
           environmentId: command.environmentId,
           userId: command.userId,
+          type: step.template.type,
+          name: step.template.name,
+          content: step.template.content,
+          variables: step.template.variables,
+          contentType: step.template.contentType,
+          cta: step.template.cta,
+          subject: step.template.subject,
+          title: step.template.title,
+          feedId: step.template.feedId,
+          layoutId: step.template.layoutId,
+          preheader: step.template.preheader,
+          senderName: step.template.senderName,
+          actor: step.template.actor,
+          controls: step.template.controls,
+          output: step.template.output,
+          stepId: step.template.stepId,
+          parentChangeId,
           workflowType: command.type,
         }),
-      ]);
+      );
+
+      const storedVariants = await this.storeVariantSteps({
+        variants: step.variants,
+        parentChangeId,
+        organizationId: command.organizationId,
+        environmentId: command.environmentId,
+        userId: command.userId,
+        workflowType: command.type,
+      });
 
       const stepId = createdMessageTemplate._id;
       const templateStep: Partial<INotificationTemplateStep> = {
@@ -401,6 +462,7 @@ export class CreateWorkflow {
         name: step.name,
         metadata: step.metadata,
         stepId: step.stepId,
+        issues: step.issues,
       };
 
       if (storedVariants.length) {
@@ -504,8 +566,8 @@ export class CreateWorkflow {
       notificationGroupId: group._id,
       active: command.active ?? false,
       draft: command.draft ?? true,
-      critical: command.critical ?? false,
-      preferenceSettings: command.preferenceSettings,
+      userPreferences: command.userPreferences,
+      defaultPreferences: command.defaultPreferences,
       blueprintId: command.blueprintId,
       __source: command.__source,
       type: WorkflowTypeEnum.REGULAR,
@@ -529,64 +591,6 @@ export class CreateWorkflow {
         ...(template ? { template } : {}),
       };
     });
-  }
-
-  private async handleFeeds(
-    steps: NotificationStepEntity[],
-    command: CreateWorkflowCommand,
-  ): Promise<NotificationStepEntity[]> {
-    for (let i = 0; i < steps.length; i += 1) {
-      const step = steps[i];
-
-      if (!step.template?._feedId) {
-        continue;
-      }
-
-      const blueprintFeed = await this.feedRepository.findOne({
-        _organizationId: this.getBlueprintOrganizationId,
-        _id: step.template._feedId,
-      });
-
-      if (!blueprintFeed) {
-        step.template._feedId = undefined;
-        // eslint-disable-next-line no-param-reassign
-        steps[i] = step;
-        continue;
-      }
-
-      let feedItem = await this.feedRepository.findOne({
-        _organizationId: command.organizationId,
-        identifier: blueprintFeed.identifier,
-      });
-
-      if (!feedItem) {
-        feedItem = await this.feedRepository.create({
-          name: blueprintFeed.name,
-          identifier: blueprintFeed.identifier,
-          _environmentId: command.environmentId,
-          _organizationId: command.organizationId,
-        });
-
-        if (!isBridgeWorkflow(command.type)) {
-          await this.createChange.execute(
-            CreateChangeCommand.create({
-              item: feedItem,
-              type: ChangeEntityTypeEnum.FEED,
-              environmentId: command.environmentId,
-              organizationId: command.organizationId,
-              userId: command.userId,
-              changeId: FeedRepository.createObjectId(),
-            }),
-          );
-        }
-      }
-
-      step.template._feedId = feedItem._id;
-      // eslint-disable-next-line no-param-reassign
-      steps[i] = step;
-    }
-
-    return steps;
   }
 
   private async handleGroup(

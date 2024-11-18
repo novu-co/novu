@@ -11,7 +11,7 @@ const OrganizationSwitcherAppearance: OrganizationSwitcherTheme = {
     organizationSwitcherPopoverActionButton__manageOrganization: {
       display: 'none',
     },
-    organizationPreviewMainIdentifier: 'text-foreground text-base',
+    organizationPreviewMainIdentifier: 'text-foreground-950 text-base',
     organizationPreviewAvatarContainer: 'size-6 rounded-full',
     organizationPreviewAvatarBox: 'rounded-full size-6',
     organizationPreview: 'py-1.5 px-4 gap-2',

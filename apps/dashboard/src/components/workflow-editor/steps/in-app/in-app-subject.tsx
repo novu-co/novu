@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { liquid } from '@codemirror/lang-liquid';
 import { EditorView } from '@uiw/react-codemirror';
@@ -6,9 +7,8 @@ import { FormControl, FormField, FormItem, FormMessage } from '@/components/prim
 import { InputField } from '@/components/primitives/input';
 import { Editor } from '@/components/primitives/editor';
 import { capitalize } from '@/utils/string';
-import { useParams } from 'react-router-dom';
-import { useFetchStep } from '@/hooks/use-fetch-step';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
+import { useStepEditorContext } from '../hooks';
 
 const subjectKey = 'subject';
 
@@ -17,9 +17,8 @@ export const InAppSubject = () => {
     control,
     formState: { errors },
   } = useFormContext();
-  const { workflowSlug = '', stepSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
-
-  const { step } = useFetchStep({ workflowSlug, stepSlug });
+  const { step } = useStepEditorContext();
+  const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
 
   return (
     <FormField
@@ -28,14 +27,14 @@ export const InAppSubject = () => {
       render={({ field }) => (
         <FormItem className="w-full">
           <FormControl>
-            <InputField size="md" className="px-1" state={errors[subjectKey] ? 'error' : 'default'}>
+            <InputField className="px-1" state={errors[subjectKey] ? 'error' : 'default'}>
               <Editor
+                fontFamily="inherit"
                 placeholder={capitalize(field.name)}
-                size="md"
                 id={field.name}
                 extensions={[
                   liquid({
-                    variables: step ? parseStepVariablesToLiquidVariables(step.variables) : [],
+                    variables,
                   }),
                   EditorView.lineWrapping,
                 ]}

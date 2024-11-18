@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import {
   CreateWorkflow,
+  DeletePreferencesUseCase,
   DeleteWorkflowUseCase,
   GetPreferences,
   GetWorkflowByIdsUseCase,
@@ -25,14 +26,17 @@ import {
   GeneratePreviewUsecase,
   GetWorkflowUseCase,
   ListWorkflowsUseCase,
+  PostProcessWorkflowUpdate,
   PrepareAndValidateContentUsecase,
-  ProcessWorkflowIssuesUsecase,
   SyncToEnvironmentUseCase,
   UpsertWorkflowUseCase,
   ValidatePlaceholderUsecase,
 } from './usecases';
 import { BridgeModule } from '../bridge';
 import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-renderers';
+import { OverloadContentDataOnWorkflowUseCase } from './usecases/overload-content-data';
+import { PatchWorkflowUsecase } from './usecases/patch-workflow';
+import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
 
 @Module({
   imports: [SharedModule, MessageTemplateModule, ChangeModule, AuthModule, BridgeModule, IntegrationModule],
@@ -44,6 +48,7 @@ import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-re
     ListWorkflowsUseCase,
     DeleteWorkflowUseCase,
     UpsertPreferences,
+    DeletePreferencesUseCase,
     UpsertControlValuesUseCase,
     GetPreferences,
     GetWorkflowByIdsUseCase,
@@ -53,13 +58,17 @@ import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-re
     BuildWorkflowTestDataUseCase,
     GetWorkflowUseCase,
     HydrateEmailSchemaUseCase,
-    ProcessWorkflowIssuesUsecase,
+    PostProcessWorkflowUpdate,
     BuildDefaultPayloadUsecase,
     BuildAvailableVariableSchemaUsecase,
     CollectPlaceholderWithDefaultsUsecase,
     PrepareAndValidateContentUsecase,
     ValidatePlaceholderUsecase,
     ExtractDefaultValuesFromSchemaUsecase,
+    PatchStepUsecase,
+    PostProcessWorkflowUpdate,
+    OverloadContentDataOnWorkflowUseCase,
+    PatchWorkflowUsecase,
   ],
 })
 export class WorkflowModule implements NestModule {

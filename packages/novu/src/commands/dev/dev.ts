@@ -50,7 +50,7 @@ export async function devCommand(options: DevCommandOptions, anonymousId?: strin
 
   dashboardSpinner.succeed(`🖥️  Dashboard → ${parsedOptions.dashboardUrl}`);
   studioSpinner.succeed(`🎨 Studio    → ${httpServer.getStudioAddress()}`);
-  if (process.env.NODE_ENV !== 'dev') {
+  if (process.env.NODE_ENV !== 'dev' && parsedOptions.headless === false) {
     await open(httpServer.getStudioAddress());
   }
 

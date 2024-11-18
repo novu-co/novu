@@ -23,10 +23,10 @@ export function TextWidget(props: WidgetProps) {
         <FormItem className="my-2 w-full py-1">
           <FormLabel>{capitalize(label)}</FormLabel>
           <FormControl>
-            <InputField size="md" className="px-1" state={errors[name] ? 'error' : 'default'}>
+            <InputField className="px-1" state={errors[name] ? 'error' : 'default'}>
               <Editor
+                fontFamily="inherit"
                 placeholder={capitalize(label)}
-                size="md"
                 id={label}
                 extensions={[
                   liquid({

@@ -59,18 +59,24 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
   const navigate = useNavigate();
   const [toastId, setToastId] = useState<string | number>('');
 
-  const { workflow, error } = useFetchWorkflow({
+  const {
+    workflow,
+    isPending: isPendingWorkflow,
+    error,
+  } = useFetchWorkflow({
     workflowSlug,
   });
   const defaultFormValues = useMemo(
     () => ({ ...workflow, steps: workflow?.steps.map((step) => ({ ...step })) }),
     [workflow]
   );
+
   const form = useForm<z.infer<typeof workflowSchema>>({
     mode: 'onSubmit',
     resolver: zodResolver(workflowSchema),
     defaultValues: defaultFormValues,
   });
+
   const {
     reset,
     getValues,
@@ -129,23 +135,21 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
         handleValidationIssues({ fields: getValues(), issues: data.issues as any, setError });
       }
 
-      setTimeout(() => {
-        showToast({
-          children: () => (
-            <>
-              <ToastIcon variant="success" />
-              <span className="text-sm">Saved</span>
-            </>
-          ),
-          options: {
-            position: 'bottom-left',
-            classNames: {
-              toast: 'ml-10',
-            },
-            id: toastId,
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="success" />
+            <span className="text-sm">Saved</span>
+          </>
+        ),
+        options: {
+          position: 'bottom-left',
+          classNames: {
+            toast: 'ml-10',
           },
-        });
-      }, 1000);
+          id: toastId,
+        },
+      });
     },
   });
 
@@ -202,23 +206,23 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
 
   const deleteStep = useCallback(
     (stepSlug: string) => {
-      const stepIndex = steps.fields.findIndex((step) => step.slug === stepSlug);
+      const newSteps = steps.fields.filter((step) => step.slug !== stepSlug);
 
-      if (stepIndex !== -1) {
-        steps.remove(stepIndex);
-      }
+      steps.replace(newSteps);
     },
     [steps]
   );
 
   const value = useMemo(
     () => ({
+      isPendingWorkflow,
+      workflow,
       isReadOnly,
       addStep,
       deleteStep,
       resetWorkflowForm,
     }),
-    [addStep, isReadOnly, deleteStep, resetWorkflowForm]
+    [isPendingWorkflow, workflow, isReadOnly, addStep, deleteStep, resetWorkflowForm]
   );
 
   return (

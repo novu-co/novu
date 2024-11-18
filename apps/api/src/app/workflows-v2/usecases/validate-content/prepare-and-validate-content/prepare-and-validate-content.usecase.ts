@@ -9,6 +9,7 @@ import { ValidatedPlaceholderAggregation, ValidatePlaceholderUsecase } from '../
 import { CollectPlaceholderWithDefaultsUsecase, PlaceholderAggregation } from '../collect-placeholders';
 import { ExtractDefaultValuesFromSchemaUsecase } from '../../extract-default-values-from-schema';
 import { ValidatedContentResponse } from './validated-content.response';
+import { toSentenceCase } from '../../../../shared/services/helper/helper.service';
 
 @Injectable()
 export class PrepareAndValidateContentUsecase {
@@ -178,7 +179,7 @@ export class PrepareAndValidateContentUsecase {
           result[controlValueKey].push({
             issueType: StepContentIssueEnum.MISSING_VARIABLE_IN_PAYLOAD,
             variableName: item,
-            message: `[${item}] Missing Reference in payload`,
+            message: `${toSentenceCase(item)} is missing in payload`,
           });
         }
       }
@@ -198,7 +199,7 @@ export class PrepareAndValidateContentUsecase {
       result[item] = [
         {
           issueType: StepContentIssueEnum.MISSING_VALUE,
-          message: `[${item}] No Value was submitted to a required control.`,
+          message: `${toSentenceCase(item)} is missing`,
         },
       ];
     }

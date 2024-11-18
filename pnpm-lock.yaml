@@ -114,7 +114,7 @@ importers:
         version: 7.0.3
       cross-spawn:
         specifier: ^7.0.3
-        version: 7.0.3
+        version: 7.0.5
       cspell:
         specifier: ^6.19.2
         version: 6.19.2(encoding@0.1.13)
@@ -656,7 +656,7 @@ importers:
         version: 6.2.1
       '@hookform/resolvers':
         specifier: ^3.9.0
-        version: 3.9.0(react-hook-form@7.43.9(react@18.3.1))
+        version: 3.9.0(react-hook-form@7.53.2(react@18.3.1))
       '@lezer/highlight':
         specifier: ^1.2.1
         version: 1.2.1
@@ -802,8 +802,8 @@ importers:
         specifier: ^1.3.0
         version: 1.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-hook-form:
-        specifier: 7.43.9
-        version: 7.43.9(react@18.3.1)
+        specifier: 7.53.2
+        version: 7.53.2(react@18.3.1)
       react-icons:
         specifier: ^5.3.0
         version: 5.3.0(react@18.3.1)
@@ -814,8 +814,8 @@ importers:
         specifier: ^2.0.0
         version: 2.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       sonner:
-        specifier: ^1.5.0
-        version: 1.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^1.7.0
+        version: 1.7.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tailwind-merge:
         specifier: ^2.4.0
         version: 2.4.0
@@ -4090,8 +4090,8 @@ importers:
         specifier: ^5.0.0
         version: 5.0.1
       cross-spawn:
-        specifier: 7.0.3
-        version: 7.0.3
+        specifier: 7.0.5
+        version: 7.0.5
       dotenv:
         specifier: ^16.4.5
         version: 16.4.5
@@ -20737,6 +20737,10 @@ packages:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
     engines: {node: '>= 8'}
 
+  cross-spawn@7.0.5:
+    resolution: {integrity: sha512-ZVJrKKYunU38/76t0RMOulHOnUcbU9GbpWKAOZ0mhjr7CX6FVrH+4FrAapSOekrgFQ3f/8gwMEuIft0aKq6Hug==}
+    engines: {node: '>= 8'}
+
   crosspath@2.0.0:
     resolution: {integrity: sha512-ju88BYCQ2uvjO2bR+SsgLSTwTSctU+6Vp2ePbKPgSCZyy4MWZxYsT738DlKVRE5utUjobjPRm1MkTYKJxCmpTA==}
     engines: {node: '>=14.9.0'}
@@ -30566,6 +30570,12 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18
 
+  react-hook-form@7.53.2:
+    resolution: {integrity: sha512-YVel6fW5sOeedd1524pltpHX+jgU2u3DSDtXEaBORNdqiNrsX/nUI/iGXONegttg0mJVnfrIkiV0cmTU6Oo2xw==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18 || ^19
+
   react-icons@5.0.1:
     resolution: {integrity: sha512-WqLZJ4bLzlhmsvme6iFdgO8gfZP17rfjYEJ2m9RsZjZ+cc4k1hTzknEz63YS1MeT50kVzoa1Nz36f4BEx+Wigw==}
     peerDependencies:
@@ -32017,11 +32027,11 @@ packages:
   sonic-boom@3.8.1:
     resolution: {integrity: sha512-y4Z8LCDBuum+PBP3lSV7RHrXscqksve/bi0as7mhwVnBW+/wUqKT/2Kb7um8yqcFy0duYbbPxzt89Zy2nOCaxg==}
 
-  sonner@1.5.0:
-    resolution: {integrity: sha512-FBjhG/gnnbN6FY0jaNnqZOMmB73R+5IiyYAw8yBj7L54ER7HB3fOSE5OFiQiE2iXWxeXKvg6fIP4LtVppHEdJA==}
+  sonner@1.7.0:
+    resolution: {integrity: sha512-W6dH7m5MujEPyug3lpI2l3TC3Pp1+LTgK0Efg+IHDrBbtEjyCmCHHo6yfNBOsf1tFZ6zf+jceWwB38baC8yO9g==}
     peerDependencies:
-      react: ^18.0.0
-      react-dom: ^18.0.0
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
   sort-keys-length@1.0.1:
     resolution: {integrity: sha512-GRbEOUqCxemTAk/b32F2xa8wDTs+Z1QHOkbhJDQTvv/6G3ZkbJ+frYWsTcc7cBB3Fu4wy4XlLCuNtJuMn7Gsvw==}
@@ -44971,9 +44981,9 @@ snapshots:
     dependencies:
       react-hook-form: 7.43.9(react@18.3.1)
 
-  '@hookform/resolvers@3.9.0(react-hook-form@7.43.9(react@18.3.1))':
+  '@hookform/resolvers@3.9.0(react-hook-form@7.53.2(react@18.3.1))':
     dependencies:
-      react-hook-form: 7.43.9(react@18.3.1)
+      react-hook-form: 7.53.2(react@18.3.1)
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -45687,7 +45697,7 @@ snapshots:
   '@jsdevtools/ez-spawn@3.0.4':
     dependencies:
       call-me-maybe: 1.0.2
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       string-argv: 0.3.2
       type-detect: 4.0.8
 
@@ -49869,7 +49879,7 @@ snapshots:
 
   '@pkgr/utils@2.3.1':
     dependencies:
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       is-glob: 4.0.3
       open: 8.4.2
       picocolors: 1.1.1
@@ -55308,7 +55318,7 @@ snapshots:
       '@yarnpkg/libzip': 2.3.0
       chalk: 4.1.2
       commander: 6.2.1
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       detect-indent: 6.1.0
       envinfo: 7.8.1
       execa: 5.1.1
@@ -55356,7 +55366,7 @@ snapshots:
       '@yarnpkg/libzip': 2.3.0
       chalk: 4.1.2
       commander: 6.2.1
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       detect-indent: 6.1.0
       envinfo: 7.13.0
       execa: 5.1.1
@@ -55421,7 +55431,7 @@ snapshots:
       '@storybook/node-logger': 7.4.2
       '@storybook/types': 7.4.2
       '@types/cross-spawn': 6.0.3
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       globby: 11.1.0
       jscodeshift: 0.14.0(@babel/preset-env@7.23.2(@babel/core@7.22.11))
       lodash: 4.17.21
@@ -55440,7 +55450,7 @@ snapshots:
       '@storybook/node-logger': 8.1.1
       '@storybook/types': 8.1.1
       '@types/cross-spawn': 6.0.3
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       globby: 14.0.1
       jscodeshift: 0.15.2(@babel/preset-env@7.25.4(@babel/core@7.25.2))
       lodash: 4.17.21
@@ -55547,7 +55557,7 @@ snapshots:
       '@yarnpkg/fslib': 2.10.3
       '@yarnpkg/libzip': 2.3.0
       chalk: 4.1.2
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       esbuild: 0.20.2
       esbuild-register: 3.5.0(esbuild@0.20.2)
       execa: 5.1.1
@@ -62940,7 +62950,7 @@ snapshots:
 
   cross-env@7.0.3:
     dependencies:
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
 
   cross-fetch@3.1.5(encoding@0.1.13):
     dependencies:
@@ -62969,6 +62979,12 @@ snapshots:
       which: 1.3.1
 
   cross-spawn@7.0.3:
+    dependencies:
+      path-key: 3.1.1
+      shebang-command: 2.0.0
+      which: 2.0.2
+
+  cross-spawn@7.0.5:
     dependencies:
       path-key: 3.1.1
       shebang-command: 2.0.0
@@ -65467,7 +65483,7 @@ snapshots:
       '@ungap/structured-clone': 1.2.0
       ajv: 6.12.6
       chalk: 4.1.2
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       debug: 4.3.6(supports-color@8.1.1)
       doctrine: 3.0.0
       escape-string-regexp: 4.0.0
@@ -65679,7 +65695,7 @@ snapshots:
 
   execa@4.1.0:
     dependencies:
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       get-stream: 5.2.0
       human-signals: 1.1.1
       is-stream: 2.0.1
@@ -65691,7 +65707,7 @@ snapshots:
 
   execa@5.1.1:
     dependencies:
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       get-stream: 6.0.1
       human-signals: 2.1.0
       is-stream: 2.0.1
@@ -65703,7 +65719,7 @@ snapshots:
 
   execa@8.0.1:
     dependencies:
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       get-stream: 8.0.1
       human-signals: 5.0.0
       is-stream: 3.0.0
@@ -65716,7 +65732,7 @@ snapshots:
   execa@9.3.1:
     dependencies:
       '@sindresorhus/merge-streams': 4.0.0
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       figures: 6.1.0
       get-stream: 9.0.1
       human-signals: 8.0.0
@@ -66425,12 +66441,12 @@ snapshots:
 
   foreground-child@2.0.0:
     dependencies:
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       signal-exit: 3.0.7
 
   foreground-child@3.3.0:
     dependencies:
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       signal-exit: 4.1.0
 
   forever-agent@0.6.1: {}
@@ -68709,7 +68725,7 @@ snapshots:
   istanbul-lib-processinfo@2.0.3:
     dependencies:
       archy: 1.0.0
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       istanbul-lib-coverage: 3.2.0
       p-map: 3.0.0
       rimraf: 3.0.2
@@ -76797,7 +76813,7 @@ snapshots:
       address: 1.2.2
       browserslist: 4.23.3
       chalk: 4.1.2
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       detect-port-alt: 1.1.6
       escape-string-regexp: 4.0.0
       filesize: 8.0.7
@@ -76831,7 +76847,7 @@ snapshots:
       address: 1.2.2
       browserslist: 4.23.3
       chalk: 4.1.2
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       detect-port-alt: 1.1.6
       escape-string-regexp: 4.0.0
       filesize: 8.0.7
@@ -77009,6 +77025,10 @@ snapshots:
       shallowequal: 1.1.0
 
   react-hook-form@7.43.9(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+
+  react-hook-form@7.53.2(react@18.3.1):
     dependencies:
       react: 18.3.1
 
@@ -78956,7 +78976,7 @@ snapshots:
     dependencies:
       atomic-sleep: 1.0.0
 
-  sonner@1.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  sonner@1.7.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)

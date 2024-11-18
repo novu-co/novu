@@ -84,7 +84,7 @@
     font-family: 'Inter', system-ui, sans-serif;
   }
   body {
-    @apply bg-background text-foreground-950;
+    @apply bg-background text-foreground-950 text-base;
   }
 
   body,
