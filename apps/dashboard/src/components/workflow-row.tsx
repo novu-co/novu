@@ -59,6 +59,7 @@ const toastOptions: ExternalToast = {
 
 export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
   const { currentEnvironment } = useEnvironment();
   const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
 
@@ -79,7 +80,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         workflowSlug: workflow.slug,
       });
 
-  const { deleteWorkflow, isPending } = useDeleteWorkflow({
+  const { deleteWorkflow, isPending: isDeleteWorkflowPending } = useDeleteWorkflow({
     onSuccess: () => {
       showToast({
         children: () => (
@@ -110,7 +111,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
     });
   };
 
-  const { patchWorkflow } = usePatchWorkflow({
+  const { patchWorkflow, isPending: isPauseWorkflowPending } = usePatchWorkflow({
     onSuccess: (data) => {
       showToast({
         children: () => (
@@ -203,7 +204,19 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           title="Are you sure?"
           description={`You're about to delete the ${workflow.name}, this action cannot be undone.`}
           confirmButtonText="Delete"
-          isLoading={isPending}
+          isLoading={isDeleteWorkflowPending}
+        />
+        <ConfirmationModal
+          open={isPauseModalOpen}
+          onOpenChange={setIsPauseModalOpen}
+          onConfirm={async () => {
+            await onPauseWorkflow();
+            setIsPauseModalOpen(false);
+          }}
+          title="Proceeding will pause the workflow"
+          description="This workflow cannot be triggered if paused, please confirm to proceed."
+          confirmButtonText="Proceed"
+          isLoading={isPauseWorkflowPending}
         />
         {/**
          * Needs modal={false} to prevent the click freeze after the modal is closed
@@ -237,7 +250,16 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup className="*:cursor-pointer">
-              <DropdownMenuItem onClick={onPauseWorkflow} disabled={workflow.status === WorkflowStatusEnum.ERROR}>
+              <DropdownMenuItem
+                onClick={() => {
+                  if (workflow.status === WorkflowStatusEnum.ACTIVE) {
+                    setIsPauseModalOpen(true);
+                    return;
+                  }
+                  onPauseWorkflow();
+                }}
+                disabled={workflow.status === WorkflowStatusEnum.ERROR}
+              >
                 {workflow.status === WorkflowStatusEnum.ACTIVE ? (
                   <>
                     <RiPauseCircleLine />
