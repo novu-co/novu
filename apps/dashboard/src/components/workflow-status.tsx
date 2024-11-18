@@ -2,7 +2,7 @@ import { Badge } from '@/components/primitives/badge';
 import { WorkflowStatusEnum } from '@/utils/enums';
 import { ComponentProps } from 'react';
 import { IconType } from 'react-icons/lib';
-import { RiAlertFill, RiCheckboxCircleFill, RiCheckFill, RiErrorWarningFill } from 'react-icons/ri';
+import { RiAlertFill, RiCheckboxCircleFill, RiErrorWarningFill } from 'react-icons/ri';
 
 type WorkflowStatusProps = {
   status: WorkflowStatusEnum;
