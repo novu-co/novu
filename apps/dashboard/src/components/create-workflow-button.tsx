@@ -30,16 +30,21 @@ import { buildRoute, ROUTES } from '@/utils/routes';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 
 const MAX_TAGS_LENGTH = 16;
+const MAX_DESCRIPTION_LENGTH = 200;
+
 const formSchema = z.object({
-  name: z.string().min(1, { message: 'Name is required' }),
+  name: z.string().min(1, { message: 'Is required' }),
   workflowId: z.string(),
   tags: z
     .array(z.string().min(1))
-    .max(MAX_TAGS_LENGTH)
+    .max(MAX_TAGS_LENGTH, { message: `Must contain at most ${MAX_TAGS_LENGTH} elements` })
     .refine((tags) => new Set(tags).size === tags.length, {
-      message: 'Duplicate tags are not allowed.',
+      message: 'Duplicate tags are not allowed',
     }),
-  description: z.string().max(200).optional(),
+  description: z
+    .string()
+    .max(MAX_DESCRIPTION_LENGTH, { message: `Must contain at most ${MAX_DESCRIPTION_LENGTH} characters` })
+    .optional(),
 });
 
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
@@ -73,6 +78,9 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
     resolver: zodResolver(formSchema),
     defaultValues: { description: '', workflowId: '', name: '', tags: [] },
   });
+  const {
+    formState: { errors },
+  } = form;
 
   return (
     <Sheet
@@ -126,7 +134,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <InputField>
+                      <InputField state={errors['name']?.message ? 'error' : 'default'}>
                         <Input
                           {...field}
                           autoFocus
@@ -170,7 +178,11 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <FormLabel hint={`(max. ${MAX_TAGS_LENGTH})`}>Add tags</FormLabel>
                     </div>
                     <FormControl>
-                      <TagInput suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []} {...field} />
+                      <TagInput
+                        suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []}
+                        error={errors['tags']?.message}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -186,7 +198,11 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <FormLabel optional>Description</FormLabel>
                     </div>
                     <FormControl>
-                      <Textarea placeholder="Description of what this workflow does" {...field} />
+                      <Textarea
+                        placeholder="Description of what this workflow does"
+                        state={errors['description']?.message ? 'error' : 'default'}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

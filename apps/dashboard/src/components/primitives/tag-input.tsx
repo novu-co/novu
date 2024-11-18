@@ -12,15 +12,19 @@ import { inputVariants } from '@/components/primitives/input';
 type TagInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   value: string[];
   suggestions: string[];
+  error?: string;
   onChange: (tags: string[]) => void;
 };
 
 const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
-  const { className, suggestions, value, onChange, ...rest } = props;
+  const { className, suggestions, value, error, onChange, ...rest } = props;
   const [tags, setTags] = useState<string[]>(value);
   const [inputValue, setInputValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const validSuggestions = useMemo(() => suggestions.filter((suggestion) => !tags.includes(suggestion)), [tags]);
+  const validSuggestions = useMemo(
+    () => suggestions.filter((suggestion) => !tags.includes(suggestion)),
+    [tags, suggestions]
+  );
 
   useEffect(() => {
     setTags(value);
@@ -55,12 +59,13 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
   return (
     <Popover open={isOpen}>
       <Command>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 pb-0.5">
           <PopoverAnchor asChild>
             <CommandInput
               ref={ref}
               autoComplete="off"
               value={inputValue}
+              hasError={!!error}
               className={cn(inputVariants(), 'flex-grow', className)}
               placeholder="Type a tag and press Enter"
               onValueChange={(value) => {

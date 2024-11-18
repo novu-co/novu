@@ -37,9 +37,9 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
 
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => (
-  <InputField>
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & { hasError?: boolean }
+>(({ className, hasError, ...props }, ref) => (
+  <InputField state={hasError ? 'error' : 'default'}>
     <CommandPrimitive.Input ref={ref} className={cn(inputVariants(), className)} {...props} />
   </InputField>
 ));
