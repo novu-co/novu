@@ -1,9 +1,9 @@
+import { useState } from 'react';
+import * as z from 'zod';
 import { useFormContext } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { RouteFill } from '../icons';
 import { Input, InputField } from '../primitives/input';
-// import { RiArrowRightSLine, RiSettingsLine } from 'react-icons/ri';
-import * as z from 'zod';
 import { Separator } from '../primitives/separator';
 import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
@@ -17,16 +17,33 @@ import { useWorkflowEditorContext } from '@/components/workflow-editor/hooks';
 import { cn } from '@/utils/ui';
 import { SidebarContent, SidebarHeader } from '@/components/side-navigation/Sidebar';
 import { PageMeta } from '../page-meta';
+import { ConfirmationModal } from '../confirmation-modal';
 
 export function ConfigureWorkflow() {
+  const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
   const tagsQuery = useTagsQuery();
   const { isReadOnly } = useWorkflowEditorContext();
 
-  const { control, watch } = useFormContext<z.infer<typeof workflowSchema>>();
+  const { control, watch, setValue } = useFormContext<z.infer<typeof workflowSchema>>();
   const workflowName = watch('name');
+
+  const onPauseWorkflow = () => {
+    setValue('active', false, { shouldValidate: true, shouldDirty: true });
+  };
 
   return (
     <>
+      <ConfirmationModal
+        open={isPauseModalOpen}
+        onOpenChange={setIsPauseModalOpen}
+        onConfirm={async () => {
+          onPauseWorkflow();
+          setIsPauseModalOpen(false);
+        }}
+        title="Proceeding will pause the workflow"
+        description="This workflow cannot be triggered if paused, please confirm to proceed."
+        confirmButtonText="Proceed"
+      />
       <PageMeta title={workflowName} />
       <motion.div
         className={cn('relative flex h-full w-full flex-col')}
@@ -56,7 +73,17 @@ export function ConfigureWorkflow() {
                   <FormLabel>Active Workflow</FormLabel>
                 </div>
                 <FormControl>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} disabled={isReadOnly} />
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={(checked) => {
+                      if (!checked) {
+                        setIsPauseModalOpen(true);
+                        return;
+                      }
+                      field.onChange(checked);
+                    }}
+                    disabled={isReadOnly}
+                  />
                 </FormControl>
               </FormItem>
             )}
