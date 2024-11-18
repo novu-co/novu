@@ -24,22 +24,26 @@ import { useWorkflowEditorContext } from '../../hooks';
 import { flattenIssues } from '../../step-utils';
 import { CustomStepControls } from '../controls/custom-step-controls';
 import { useStep } from '../use-step';
+import { useStepEditorContext } from '@/components/workflow-editor/steps/hooks';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5 overflow-y-auto';
 
 export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; step: StepDataDto }) => {
+  const navigate = useNavigate();
   const { stepSlug = '', workflowSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
   const { resetWorkflowForm } = useWorkflowEditorContext();
+  const { refetch: refetchStep } = useStepEditorContext();
   const { step: workflowStep } = useStep();
-  const { dataSchema, uiSchema } = step.controls;
-  const navigate = useNavigate();
+
+  const { dataSchema, uiSchema, values } = step.controls;
   const schema = buildDynamicZodSchema(dataSchema ?? {});
+
   const form = useForm({
     mode: 'onSubmit',
     resolver: zodResolver(schema),
     resetOptions: { keepDirtyValues: true },
     defaultValues: buildDefaultValues(uiSchema ?? {}),
-    values: step.controls.values,
+    values,
     shouldFocusError: true,
   });
   const [editorValue, setEditorValue] = useState('{}');
@@ -59,6 +63,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
   const { isPending, updateWorkflow } = useUpdateWorkflow({
     onSuccess: (data) => {
       resetWorkflowForm(data);
+      refetchStep();
       showToast({
         children: () => (
           <>

@@ -13,7 +13,15 @@ export const StepEditorProvider = ({ children }: { children: ReactNode }) => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const { workflow } = useWorkflowEditorContext();
-  const { step, isPending: isPendingStep, isRefetching: isRefetchingStep } = useFetchStep({ workflowSlug, stepSlug });
+  const {
+    step,
+    isPending: isPendingStep,
+    isRefetching: isRefetchingStep,
+    refetch,
+  } = useFetchStep({
+    workflowSlug,
+    stepSlug,
+  });
 
   const navigationStepType = state?.stepType as StepTypeEnum | undefined;
   const stepType = useMemo(
@@ -23,8 +31,8 @@ export const StepEditorProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const value = useMemo(
-    () => ({ isPendingStep, isRefetchingStep, step, stepType }),
-    [isPendingStep, isRefetchingStep, step, stepType]
+    () => ({ isPendingStep, isRefetchingStep, step, stepType, refetch }),
+    [isPendingStep, isRefetchingStep, step, stepType, refetch]
   );
 
   const isNotSupportedEditorType = EXCLUDED_EDITOR_TYPES.includes(stepType ?? '');
