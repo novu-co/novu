@@ -1,4 +1,4 @@
-import { useFormContext } from 'react-hook-form';
+import { ControllerRenderProps, useFormContext } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { RouteFill } from '../icons';
 import { Input, InputField } from '../primitives/input';
@@ -7,7 +7,7 @@ import * as z from 'zod';
 import { Separator } from '../primitives/separator';
 import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
-import { workflowSchema } from './schema';
+import { MAX_DESCRIPTION_LENGTH, workflowSchema } from './schema';
 import { useTagsQuery } from '@/hooks/use-tags-query';
 // import { Button } from '../primitives/button';
 import { CopyButton } from '../primitives/copy-button';
@@ -104,7 +104,12 @@ export function ConfigureWorkflow() {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Description of what this workflow does" {...field} disabled={isReadOnly} />
+                  <Textarea
+                    placeholder="Description of what this workflow does"
+                    {...field}
+                    maxLength={MAX_DESCRIPTION_LENGTH}
+                    disabled={isReadOnly}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -126,6 +131,7 @@ export function ConfigureWorkflow() {
                     suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />

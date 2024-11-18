@@ -28,19 +28,7 @@ import { useTagsQuery } from '@/hooks/use-tags-query';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
-
-const MAX_TAGS_LENGTH = 16;
-const formSchema = z.object({
-  name: z.string().min(1, { message: 'Name is required' }),
-  workflowId: z.string(),
-  tags: z
-    .array(z.string().min(1))
-    .max(MAX_TAGS_LENGTH)
-    .refine((tags) => new Set(tags).size === tags.length, {
-      message: 'Duplicate tags are not allowed.',
-    }),
-  description: z.string().max(200).optional(),
-});
+import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowMinimalSchema } from './workflow-editor/schema';
 
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
 export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
@@ -69,8 +57,8 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   });
   const tagsQuery = useTagsQuery();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof workflowMinimalSchema>>({
+    resolver: zodResolver(workflowMinimalSchema),
     defaultValues: { description: '', workflowId: '', name: '', tags: [] },
   });
 
@@ -107,6 +95,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
             <form
               id="create-workflow"
               autoComplete="off"
+              noValidate
               onSubmit={form.handleSubmit((values) => {
                 mutateAsync({
                   name: values.name,
@@ -167,7 +156,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-1">
-                      <FormLabel hint={`(max. ${MAX_TAGS_LENGTH})`}>Add tags</FormLabel>
+                      <FormLabel hint={`(max. ${MAX_TAG_ELEMENTS})`}>Add tags</FormLabel>
                     </div>
                     <FormControl>
                       <TagInput suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []} {...field} />
@@ -186,7 +175,11 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <FormLabel optional>Description</FormLabel>
                     </div>
                     <FormControl>
-                      <Textarea placeholder="Description of what this workflow does" {...field} />
+                      <Textarea
+                        placeholder="Description of what this workflow does"
+                        {...field}
+                        maxLength={MAX_DESCRIPTION_LENGTH}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
