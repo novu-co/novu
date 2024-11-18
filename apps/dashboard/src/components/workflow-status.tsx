@@ -1,8 +1,8 @@
 import { Badge } from '@/components/primitives/badge';
 import { WorkflowStatusEnum } from '@/utils/enums';
 import { ComponentProps } from 'react';
-import { IconType } from 'react-icons/lib';
-import { RiAlertFill, RiCheckboxCircleFill, RiErrorWarningFill } from 'react-icons/ri';
+import { type IconType } from 'react-icons/lib';
+import { RiCheckboxCircleFill, RiErrorWarningFill, RiForbidFill } from 'react-icons/ri';
 
 type WorkflowStatusProps = {
   status: WorkflowStatusEnum;
@@ -16,8 +16,16 @@ const statusRenderData: Record<
     icon: IconType;
   }
 > = {
-  [WorkflowStatusEnum.ACTIVE]: { badgeVariant: 'success', text: 'Active', icon: RiCheckboxCircleFill },
-  [WorkflowStatusEnum.INACTIVE]: { badgeVariant: 'warning', text: 'Inactive', icon: RiAlertFill },
+  [WorkflowStatusEnum.ACTIVE]: {
+    badgeVariant: 'success',
+    text: 'Active',
+    icon: RiCheckboxCircleFill,
+  },
+  [WorkflowStatusEnum.INACTIVE]: {
+    badgeVariant: 'soft',
+    text: 'Inactive',
+    icon: RiForbidFill,
+  },
   [WorkflowStatusEnum.ERROR]: {
     badgeVariant: 'destructive',
     text: 'Action required',

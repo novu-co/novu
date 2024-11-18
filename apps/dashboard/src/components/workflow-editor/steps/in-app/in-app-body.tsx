@@ -38,6 +38,9 @@ export const InAppBody = () => {
                   }),
                   EditorView.lineWrapping,
                 ]}
+                basicSetup={{
+                  defaultKeymap: true,
+                }}
                 ref={field.ref}
                 value={field.value}
                 onChange={(val) => field.onChange(val)}

@@ -2,10 +2,10 @@ import { liquid } from '@codemirror/lang-liquid';
 import { EditorView } from '@uiw/react-codemirror';
 import { useFormContext } from 'react-hook-form';
 
-import { Input, InputField, InputFieldProps, InputProps } from '@/components/primitives/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessagePure } from '@/components/primitives/form/form';
+import { Input, InputField, InputFieldProps, InputProps } from '@/components/primitives/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 
 type URLInputProps = Omit<InputProps, 'value' | 'onChange' | 'size'> & {
   options: string[];

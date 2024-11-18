@@ -11,7 +11,6 @@ import { EnvironmentProvider } from './components/providers/EnvironmentProvider'
 import { SegmentProvider } from './components/providers/SegmentProvider';
 import { StudioStateProvider } from './studio/StudioStateProvider';
 import { ContainerProvider } from './hooks/useContainer';
-import { OptInProvider } from './components/providers/OptInProvider';
 
 const defaultQueryFn = async ({ queryKey }: { queryKey: string }) => {
   const response = await api.get(`${queryKey[0]}`);
@@ -37,15 +36,13 @@ const Providers: React.FC<PropsWithChildren<{}>> = ({ children }) => {
           <SegmentProvider>
             <QueryClientProvider client={queryClient}>
               <AuthProvider>
-                <OptInProvider>
-                  <EnvironmentProvider>
-                    <HelmetProvider>
-                      <StudioStateProvider>
-                        <ContainerProvider>{children}</ContainerProvider>
-                      </StudioStateProvider>
-                    </HelmetProvider>
-                  </EnvironmentProvider>
-                </OptInProvider>
+                <EnvironmentProvider>
+                  <HelmetProvider>
+                    <StudioStateProvider>
+                      <ContainerProvider>{children}</ContainerProvider>
+                    </StudioStateProvider>
+                  </HelmetProvider>
+                </EnvironmentProvider>
               </AuthProvider>
             </QueryClientProvider>
           </SegmentProvider>

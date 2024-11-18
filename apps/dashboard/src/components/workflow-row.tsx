@@ -3,6 +3,7 @@ import { FaCode } from 'react-icons/fa6';
 import {
   RiDeleteBin2Line,
   RiFileCopyLine,
+  RiFlashlightLine,
   RiGitPullRequestFill,
   RiMore2Fill,
   RiPauseCircleLine,
@@ -10,6 +11,7 @@ import {
   RiPulseFill,
 } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
+import { type ExternalToast } from 'sonner';
 import { IEnvironment, WorkflowListResponseDto } from '@novu/shared';
 import { Badge } from '@/components/primitives/badge';
 import { Button } from '@/components/primitives/button';
@@ -37,14 +39,22 @@ import { WorkflowTags } from '@/components/workflow-tags';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
 import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
-import { WorkflowOriginEnum } from '@/utils/enums';
+import { WorkflowOriginEnum, WorkflowStatusEnum } from '@/utils/enums';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { ConfirmationModal } from './confirmation-modal';
 import { showToast } from './primitives/sonner-helpers';
 import { ToastIcon } from './primitives/sonner';
+import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
+};
+
+const toastOptions: ExternalToast = {
+  position: 'bottom-right',
+  classNames: {
+    toast: 'mb-4 right-0',
+  },
 };
 
 export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
@@ -78,12 +88,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             <span className="text-sm">Deleted</span>
           </>
         ),
-        options: {
-          position: 'bottom-right',
-          classNames: {
-            toast: 'mb-4 right-0',
-          },
-        },
+        options: toastOptions,
       });
     },
     onError: () => {
@@ -94,12 +99,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             <span className="text-sm">Failed to delete</span>
           </>
         ),
-        options: {
-          position: 'bottom-right',
-          classNames: {
-            toast: 'mb-4 right-0',
-          },
-        },
+        options: toastOptions,
       });
     },
   });
@@ -107,6 +107,40 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
   const onDeleteWorkflow = async () => {
     await deleteWorkflow({
       workflowId: workflow._id,
+    });
+  };
+
+  const { patchWorkflow } = usePatchWorkflow({
+    onSuccess: (data) => {
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="success" />
+            <span className="text-sm">{data.active ? 'Enabled' : 'Paused'} workflow</span>
+          </>
+        ),
+        options: toastOptions,
+      });
+    },
+    onError: (_, { workflow }) => {
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="error" />
+            <span className="text-sm">Failed to {workflow.active ? 'enable' : 'pause'} workflow</span>
+          </>
+        ),
+        options: toastOptions,
+      });
+    },
+  });
+
+  const onPauseWorkflow = async () => {
+    await patchWorkflow({
+      workflowId: workflow._id,
+      workflow: {
+        active: workflow.status === WorkflowStatusEnum.ACTIVE ? false : true,
+      },
     });
   };
 
@@ -203,9 +237,18 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup className="*:cursor-pointer">
-              <DropdownMenuItem>
-                <RiPauseCircleLine />
-                Pause workflow
+              <DropdownMenuItem onClick={onPauseWorkflow} disabled={workflow.status === WorkflowStatusEnum.ERROR}>
+                {workflow.status === WorkflowStatusEnum.ACTIVE ? (
+                  <>
+                    <RiPauseCircleLine />
+                    Pause workflow
+                  </>
+                ) : (
+                  <>
+                    <RiFlashlightLine />
+                    Enable workflow
+                  </>
+                )}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive"
