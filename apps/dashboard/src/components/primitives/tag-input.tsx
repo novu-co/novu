@@ -1,13 +1,13 @@
 'use client';
 
 import { Badge } from '@/components/primitives/badge';
-import { Popover, PopoverAnchor, PopoverContent } from '@/components/primitives/popover';
 import { CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/primitives/command';
+import { inputVariants } from '@/components/primitives/input';
+import { Popover, PopoverAnchor, PopoverContent } from '@/components/primitives/popover';
 import { cn } from '@/utils/ui';
 import { Command } from 'cmdk';
 import { forwardRef, useEffect, useMemo, useState } from 'react';
 import { RiCloseFill } from 'react-icons/ri';
-import { inputVariants } from '@/components/primitives/input';
 
 type TagInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   value: string[];
@@ -54,7 +54,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
 
   return (
     <Popover open={isOpen}>
-      <Command>
+      <Command loop>
         <div className="flex flex-col gap-2">
           <PopoverAnchor asChild>
             <CommandInput
@@ -87,7 +87,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
         <CommandList>
           {(validSuggestions.length > 0 || inputValue !== '') && (
             <PopoverContent
-              className="w-32 p-1"
+              className="max-h-64 w-32 p-1"
               portal={false}
               onOpenAutoFocus={(e) => {
                 e.preventDefault();
@@ -96,12 +96,13 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
               onInteractOutside={(e) => e.preventDefault()}
             >
               <CommandGroup>
-                {inputValue !== '' && (
+                {inputValue !== '' && !validSuggestions.includes(inputValue) && (
                   <CommandItem
                     value={inputValue}
                     onSelect={() => {
                       addTag(inputValue);
                     }}
+                    className="gap-1"
                     disabled={inputValue === '' || tags.includes(inputValue)}
                   >
                     {inputValue}
