@@ -385,6 +385,97 @@ describe('Novu Client', () => {
       expect(subject).toBe('body static prefix John');
     });
 
+    it('should render step results in preview', async () => {
+      const inAppStepId = 'in-app';
+      const customStepId = 'fetch-user';
+      const newWorkflow = workflow('test-workflow', async ({ step }) => {
+        await step.inApp(inAppStepId, async () => ({
+          body: 'In App Body',
+        }));
+
+        await step.custom(
+          customStepId,
+          async () => ({
+            username: `my-db-user`,
+          }),
+          {
+            outputSchema: {
+              type: 'object',
+              properties: {
+                username: { type: 'string' },
+              },
+              required: ['username'],
+              additionalProperties: false,
+            } as const,
+          }
+        );
+
+        await step.email(
+          'send-email',
+          async (controls) => {
+            return {
+              subject: 'Test Subject',
+              body: controls.body,
+            };
+          },
+          {
+            controlSchema: {
+              type: 'object',
+              properties: {
+                body: {
+                  type: 'string',
+                  default: `In app message was {{steps.${inAppStepId}.seen}}. Username is {{steps.${customStepId}.username}}.`,
+                },
+              },
+              required: ['body'],
+              additionalProperties: false,
+            } as const,
+          }
+        );
+      });
+
+      await client.addWorkflows([newWorkflow]);
+
+      const emailEvent: Event = {
+        action: PostActionEnum.PREVIEW,
+        payload: {},
+        workflowId: 'test-workflow',
+        stepId: 'send-email',
+        subscriber: {},
+        state: [
+          {
+            stepId: inAppStepId,
+            outputs: {
+              seen: true,
+              read: true,
+              lastSeenDate: new Date().toISOString(),
+              lastReadDate: new Date().toISOString(),
+            },
+            state: {
+              status: 'completed',
+            },
+          },
+          {
+            stepId: customStepId,
+            outputs: {
+              username: 'my-db-user',
+            },
+            state: {
+              status: 'completed',
+            },
+          },
+        ],
+        controls: {},
+      };
+
+      const emailExecutionResult = await client.executeWorkflow(emailEvent);
+
+      expect(emailExecutionResult).toBeDefined();
+      expect(emailExecutionResult.outputs).toBeDefined();
+      if (!emailExecutionResult.outputs) throw new Error('executionResult.outputs is undefined');
+      expect(emailExecutionResult.outputs.body).toBe('In app message was true. Username is my-db-user.');
+    });
+
     it('should sanitize the step result of all delivery channel step types', async () => {
       const script = `<script>alert('Hello there')</script>`;
 

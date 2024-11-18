@@ -1,6 +1,5 @@
-import { useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import {
   Sheet,
@@ -10,45 +9,25 @@ import {
   SheetPortal,
   SheetTitle,
 } from '@/components/primitives/sheet';
-import { useFetchWorkflow } from '@/hooks/use-fetch-workflow';
 import { StepEditor } from '@/components/workflow-editor/steps/step-editor';
-import { useFetchStep } from '@/hooks/use-fetch-step';
 import { VisuallyHidden } from '@/components/primitives/visually-hidden';
 import { PageMeta } from '@/components/page-meta';
-import { getStepBase62Id } from '@/utils/step';
-import { EXCLUDED_EDITOR_TYPES } from '@/utils/constants';
+import { StepSkeleton } from './step-skeleton';
+import { StepEditorProvider } from './step-editor-provider';
+import { useStepEditorContext } from './hooks';
+import { useWorkflowEditorContext } from '../hooks';
 
 const transitionSetting = { ease: [0.29, 0.83, 0.57, 0.99], duration: 0.4 };
 
-export const EditStepSidebar = () => {
-  const { workflowSlug = '', stepSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
+const EditStepSidebarInternal = () => {
   const navigate = useNavigate();
-
-  const { workflow } = useFetchWorkflow({
-    workflowSlug,
-  });
-
-  const { step } = useFetchStep({ workflowSlug, stepSlug });
-  const stepType = useMemo(
-    () => workflow?.steps.find((el) => getStepBase62Id(el.slug) === getStepBase62Id(stepSlug))?.type,
-    [stepSlug, workflow]
-  );
-
+  const { workflow, isPendingWorkflow } = useWorkflowEditorContext();
+  const { step, stepType, isPendingStep, isRefetchingStep } = useStepEditorContext();
   const handleCloseSidebar = () => {
     navigate('..', { relative: 'path' });
   };
 
-  const isNotSupportedEditorType = EXCLUDED_EDITOR_TYPES.includes(stepType ?? '');
-
-  useEffect(() => {
-    if (isNotSupportedEditorType) {
-      navigate('..', { relative: 'path' });
-    }
-  }, [isNotSupportedEditorType, navigate]);
-
-  if (isNotSupportedEditorType) {
-    return null;
-  }
+  const isPending = isPendingWorkflow || isPendingStep || isRefetchingStep;
 
   return (
     <>
@@ -89,12 +68,25 @@ export const EditStepSidebar = () => {
                 <SheetTitle />
                 <SheetDescription />
               </VisuallyHidden>
-              {/* TODO: show loading indicator */}
-              {workflow && step && stepType && <StepEditor workflow={workflow} step={step} stepType={stepType} />}
+              {isPending ? (
+                <StepSkeleton stepType={stepType} workflowOrigin={workflow?.origin} />
+              ) : (
+                <>
+                  {workflow && step && stepType && <StepEditor workflow={workflow} step={step} stepType={stepType} />}
+                </>
+              )}
             </motion.div>
           </SheetContentBase>
         </SheetPortal>
       </Sheet>
     </>
+  );
+};
+
+export const EditStepSidebar = () => {
+  return (
+    <StepEditorProvider>
+      <EditStepSidebarInternal />
+    </StepEditorProvider>
   );
 };

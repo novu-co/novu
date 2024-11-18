@@ -5,7 +5,6 @@ import { withProfiler, ErrorBoundary } from '@sentry/react';
 import { SegmentProvider } from '@/context/segment';
 import { AuthProvider } from '@/context/auth/auth-provider';
 import { ClerkProvider } from '@/context/clerk-provider';
-import { OptInProvider } from '@/context/opt-in-provider';
 
 const queryClient = new QueryClient();
 
@@ -31,11 +30,9 @@ const RootRouteInternal = () => {
         <ClerkProvider>
           <SegmentProvider>
             <AuthProvider>
-              <OptInProvider>
-                <HelmetProvider>
-                  <Outlet />
-                </HelmetProvider>
-              </OptInProvider>
+              <HelmetProvider>
+                <Outlet />
+              </HelmetProvider>
             </AuthProvider>
           </SegmentProvider>
         </ClerkProvider>

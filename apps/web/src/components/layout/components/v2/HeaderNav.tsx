@@ -1,6 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActionIcon, Header } from '@mantine/core';
-import { IconHelpOutline, IconOutlineChat, IconOutlineLibraryBooks, IconOutlineGroup } from '@novu/novui/icons';
+import {
+  IconHelpOutline,
+  IconOutlineChat,
+  IconOutlineLibraryBooks,
+  IconOutlineGroup,
+  IconOutlineMail,
+} from '@novu/novui/icons';
 import { Tooltip, Dropdown } from '@novu/design-system';
 import { css } from '@novu/novui/css';
 import { HStack } from '@novu/novui/jsx';
@@ -19,16 +25,56 @@ import { WorkflowHeaderBackButton } from './WorkflowHeaderBackButton';
 import { SupportModal } from '../SupportModal';
 
 export function HeaderNav() {
-  const { currentUser } = useAuth();
+  const { currentUser, currentOrganization } = useAuth();
   const [isSupportModalOpened, setIsSupportModalOpened] = useState(false);
   const isV2Enabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_ENABLED);
 
   useBootIntercom();
+  // variable to check if it's the first render for. Needed for Plain live chat initialization
+  const [isFirstRender, setIsFirstRender] = useState(true);
+  const isLiveChatVisible =
+    process.env.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID &&
+    IS_NOVU_PROD_STAGING &&
+    currentOrganization?.apiServiceLevel !== 'free' &&
+    currentUser?.servicesHashes?.plain;
 
   const { Icon, themeLabel, toggleColorScheme } = useThemeChange();
 
   const toggleSupportModalShow = () => {
     setIsSupportModalOpened((previous) => !previous);
+  };
+
+  useEffect(() => {
+    if (isLiveChatVisible && isFirstRender) {
+      // @ts-ignore
+      window.Plain.init({
+        appId: process.env.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID,
+        hideLauncher: true,
+        title: 'Chat with us',
+        links: [
+          {
+            icon: 'call',
+            text: 'Contact Sales',
+            url: 'https://notify.novu.co/meetings/novuhq/novu-discovery-session-rr?utm_campaign=in_app_live_chat',
+          },
+        ],
+        entryPoint: 'default',
+        theme: 'light',
+
+        customerDetails: {
+          email: currentUser?.email,
+          emailHash: currentUser?.servicesHashes?.plain,
+        },
+      });
+    }
+    setIsFirstRender(false);
+  }, [isLiveChatVisible, currentUser]);
+
+  const showLiveChat = () => {
+    if (currentUser?.servicesHashes?.plain && process.env.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID) {
+      // @ts-ignore
+      window.Plain.open();
+    }
   };
 
   return (
@@ -81,16 +127,26 @@ export function HeaderNav() {
                   </HStack>
                 </a>
               </Dropdown.Item>
-
               <Dropdown.Item
                 onClick={() => {
                   toggleSupportModalShow();
                 }}
               >
                 <HStack>
-                  <IconOutlineChat /> Contact Us
+                  <IconOutlineMail /> Contact Us
                 </HStack>
               </Dropdown.Item>
+              {isLiveChatVisible && (
+                <Dropdown.Item
+                  onClick={() => {
+                    showLiveChat();
+                  }}
+                >
+                  <HStack>
+                    <IconOutlineChat /> Live Chat
+                  </HStack>
+                </Dropdown.Item>
+              )}
             </Dropdown>
           ) : (
             <a href={discordInviteUrl} target="_blank" rel="noopener noreferrer">

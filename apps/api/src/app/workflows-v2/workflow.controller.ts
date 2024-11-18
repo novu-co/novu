@@ -12,7 +12,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common/decorators';
-import { ClassSerializerInterceptor, HttpStatus } from '@nestjs/common';
+import { ClassSerializerInterceptor, HttpStatus, Patch } from '@nestjs/common';
 import {
   CreateWorkflowDto,
   DirectionEnum,
@@ -21,6 +21,8 @@ import {
   GetListQueryParams,
   IdentifierOrInternalId,
   ListWorkflowResponse,
+  PatchStepDataDto,
+  PatchWorkflowDto,
   StepDataDto,
   SyncWorkflowDto,
   UpdateWorkflowDto,
@@ -49,6 +51,9 @@ import {
   WorkflowTestDataCommand,
 } from './usecases';
 import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview.command';
+import { PatchStepCommand } from './usecases/patch-step-data';
+import { PatchWorkflowCommand, PatchWorkflowUsecase } from './usecases/patch-workflow';
+import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
 
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
@@ -64,7 +69,9 @@ export class WorkflowController {
     private syncToEnvironmentUseCase: SyncToEnvironmentUseCase,
     private generatePreviewUseCase: GeneratePreviewUsecase,
     private buildWorkflowTestDataUseCase: BuildWorkflowTestDataUseCase,
-    private buildStepDataUsecase: BuildStepDataUsecase
+    private buildStepDataUsecase: BuildStepDataUsecase,
+    private patchStepDataUsecase: PatchStepUsecase,
+    private patchWorkflowUsecase: PatchWorkflowUsecase
   ) {}
 
   @Post('')
@@ -189,7 +196,29 @@ export class WorkflowController {
       BuildStepDataCommand.create({ user, identifierOrInternalId: workflowId, stepId })
     );
   }
+  @Patch('/:workflowId/steps/:stepId')
+  @UseGuards(UserAuthGuard)
+  async patchWorkflowStepData(
+    @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
+    @Param('workflowId', ParseSlugIdPipe) identifierOrInternalId: IdentifierOrInternalId,
+    @Param('stepId', ParseSlugIdPipe) stepId: IdentifierOrInternalId,
+    @Body() patchStepDataDto: PatchStepDataDto
+  ): Promise<StepDataDto> {
+    const command = PatchStepCommand.create({ user, identifierOrInternalId, stepId, ...patchStepDataDto });
 
+    return await this.patchStepDataUsecase.execute(command);
+  }
+  @Patch('/:workflowId')
+  @UseGuards(UserAuthGuard)
+  async patchWorkflow(
+    @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
+    @Param('workflowId', ParseSlugIdPipe) identifierOrInternalId: IdentifierOrInternalId,
+    @Body() patchWorkflowDto: PatchWorkflowDto
+  ): Promise<WorkflowResponseDto> {
+    const command = PatchWorkflowCommand.create({ user, identifierOrInternalId, ...patchWorkflowDto });
+
+    return await this.patchWorkflowUsecase.execute(command);
+  }
   @Get('/:workflowId/test-data')
   @UseGuards(UserAuthGuard)
   async getWorkflowTestData(

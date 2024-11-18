@@ -124,7 +124,7 @@ export class ExecuteBridgeRequest {
       command.statelessBridgeUrl,
     );
 
-    Logger.log(
+    Logger.debug(
       `Resolved bridge URL: ${bridgeUrl} for environment ${command.environmentId} and origin ${command.workflowOrigin}`,
       LOG_CONTEXT,
     );
@@ -178,7 +178,7 @@ export class ExecuteBridgeRequest {
 
     const headers = await this.buildRequestHeaders(command);
 
-    Logger.log(`Making bridge request to \`${url}\``, LOG_CONTEXT);
+    Logger.debug(`Making bridge request to \`${url}\``, LOG_CONTEXT);
     try {
       return await request(url, {
         ...options,
@@ -306,21 +306,21 @@ export class ExecuteBridgeRequest {
           statusCode: error.response.statusCode,
         };
       } else if (error instanceof TimeoutError) {
-        Logger.error(`Bridge request timeout for \`${url}\``, LOG_CONTEXT);
+        Logger.debug(`Bridge request timeout for \`${url}\``, LOG_CONTEXT);
         bridgeErrorData = {
           code: BRIDGE_EXECUTION_ERROR.BRIDGE_REQUEST_TIMEOUT.code,
           message: BRIDGE_EXECUTION_ERROR.BRIDGE_REQUEST_TIMEOUT.message(url),
           statusCode: HttpStatus.REQUEST_TIMEOUT,
         };
       } else if (error instanceof UnsupportedProtocolError) {
-        Logger.error(`Unsupported protocol for \`${url}\``, LOG_CONTEXT);
+        Logger.debug(`Unsupported protocol for \`${url}\``, LOG_CONTEXT);
         bridgeErrorData = {
           code: BRIDGE_EXECUTION_ERROR.UNSUPPORTED_PROTOCOL.code,
           message: BRIDGE_EXECUTION_ERROR.UNSUPPORTED_PROTOCOL.message(url),
           statusCode: HttpStatus.BAD_REQUEST,
         };
       } else if (error instanceof ReadError) {
-        Logger.error(
+        Logger.debug(
           `Response body could not be read for \`${url}\``,
           LOG_CONTEXT,
         );
@@ -330,7 +330,7 @@ export class ExecuteBridgeRequest {
           statusCode: HttpStatus.BAD_REQUEST,
         };
       } else if (error instanceof UploadError) {
-        Logger.error(
+        Logger.debug(
           `Error uploading request body for \`${url}\``,
           LOG_CONTEXT,
         );
@@ -340,14 +340,14 @@ export class ExecuteBridgeRequest {
           statusCode: HttpStatus.BAD_REQUEST,
         };
       } else if (error instanceof CacheError) {
-        Logger.error(`Error caching request for \`${url}\``, LOG_CONTEXT);
+        Logger.debug(`Error caching request for \`${url}\``, LOG_CONTEXT);
         bridgeErrorData = {
           code: BRIDGE_EXECUTION_ERROR.REQUEST_CACHE_ERROR.code,
           message: BRIDGE_EXECUTION_ERROR.REQUEST_CACHE_ERROR.message(url),
           statusCode: HttpStatus.BAD_REQUEST,
         };
       } else if (error instanceof MaxRedirectsError) {
-        Logger.error(`Maximum redirects exceeded for \`${url}\``, LOG_CONTEXT);
+        Logger.debug(`Maximum redirects exceeded for \`${url}\``, LOG_CONTEXT);
         bridgeErrorData = {
           message:
             BRIDGE_EXECUTION_ERROR.MAXIMUM_REDIRECTS_EXCEEDED.message(url),
@@ -355,7 +355,7 @@ export class ExecuteBridgeRequest {
           statusCode: HttpStatus.BAD_REQUEST,
         };
       } else if (error instanceof ParseError) {
-        Logger.error(
+        Logger.debug(
           `Bridge URL response code is 2xx, but parsing body fails. \`${url}\``,
           LOG_CONTEXT,
         );
@@ -368,7 +368,7 @@ export class ExecuteBridgeRequest {
       } else if (body.code === TUNNEL_ERROR_CODE) {
         // Handle known tunnel errors
         const tunnelBody = body as TunnelResponseError;
-        Logger.error(
+        Logger.debug(
           `Could not establish tunnel connection for \`${url}\`. Error: \`${tunnelBody.message}\``,
           LOG_CONTEXT,
         );
@@ -378,7 +378,7 @@ export class ExecuteBridgeRequest {
           statusCode: HttpStatus.NOT_FOUND,
         };
       } else if (error.code === 'DEPTH_ZERO_SELF_SIGNED_CERT') {
-        Logger.error(
+        Logger.debug(
           `Bridge URL is uing a self-signed certificate that is not allowed for production environments. \`${url}\``,
           LOG_CONTEXT,
         );
@@ -392,7 +392,7 @@ export class ExecuteBridgeRequest {
          * Tunnel was live, but the Bridge endpoint was down.
          * 502 is thrown by the tunnel service when the Bridge endpoint is not reachable.
          */
-        Logger.error(
+        Logger.debug(
           `Local Bridge endpoint not found for \`${url}\``,
           LOG_CONTEXT,
         );
@@ -406,7 +406,7 @@ export class ExecuteBridgeRequest {
         error.response?.statusCode === 404 ||
         RETRYABLE_ERROR_CODES.includes(error.code)
       ) {
-        Logger.error(`Bridge endpoint unavailable for \`${url}\``, LOG_CONTEXT);
+        Logger.debug(`Bridge endpoint unavailable for \`${url}\``, LOG_CONTEXT);
 
         let codeToThrow: string;
         if (RETRYABLE_ERROR_CODES.includes(error.code)) {
@@ -421,7 +421,7 @@ export class ExecuteBridgeRequest {
           statusCode: HttpStatus.BAD_REQUEST,
         };
       } else if (error.response?.statusCode === 405) {
-        Logger.error(
+        Logger.debug(
           `Bridge endpoint method not configured for \`${url}\``,
           LOG_CONTEXT,
         );
@@ -432,7 +432,7 @@ export class ExecuteBridgeRequest {
           statusCode: HttpStatus.BAD_REQUEST,
         };
       } else {
-        Logger.error(
+        Logger.debug(
           `Unknown bridge request error calling \`${url}\`: \`${JSON.stringify(
             body,
           )}\``,
@@ -448,7 +448,7 @@ export class ExecuteBridgeRequest {
         };
       }
     } else {
-      Logger.error(
+      Logger.debug(
         `Unknown bridge non-request error calling \`${url}\``,
         error,
         LOG_CONTEXT,

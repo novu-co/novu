@@ -26,6 +26,14 @@ export interface ContentIssue extends Issue<StepContentIssueEnum> {}
 export interface StepIssue extends Issue<StepIssueEnum> {}
 export type IdentifierOrInternalId = string;
 
+export type PatchStepDataDto = {
+  name?: string;
+  controlValues?: Record<string, unknown>;
+};
+export type PatchWorkflowDto = {
+  active?: boolean;
+};
+
 export type StepResponseDto = StepDto & {
   _id: string;
   slug: Slug;
@@ -38,6 +46,9 @@ export type StepUpdateDto = StepCreateDto & {
 };
 
 export type StepCreateDto = StepDto & {
+  /**
+   * @deprecated This field is deprecated and will be removed in future versions, use the patch step data.
+   */
   controlValues?: Record<string, unknown>;
 };
 

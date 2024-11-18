@@ -28,6 +28,7 @@ export const buttonVariants = cva(
         xs: 'h-6 px-1.5 rounded-md text-xs',
         sm: 'h-8 px-1.5 rounded-md text-xs',
         lg: 'h-10 rounded-md px-8',
+        'input-right': 'rounded-none border-b-0 h-full text-xs border-r-0 border-t-0 px-2 py-0',
         icon: 'size-8',
       },
     },

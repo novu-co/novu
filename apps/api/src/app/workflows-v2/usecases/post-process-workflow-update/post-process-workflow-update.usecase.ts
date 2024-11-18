@@ -10,38 +10,51 @@ import {
   WorkflowResponseDto,
   WorkflowStatusEnum,
 } from '@novu/shared';
-import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
+import { NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
 import { Injectable } from '@nestjs/common';
-import { ProcessWorkflowIssuesCommand } from './process-workflow-issues.command';
+import { WorkflowInternalResponseDto } from '@novu/application-generic';
 import { ValidatedContentResponse } from '../validate-content';
 
+import { PostProcessWorkflowUpdateCommand } from './post-process-workflow-update.command';
+import { OverloadContentDataOnWorkflowUseCase } from '../overload-content-data';
+
+const MAX_NUMBER_OF_TAGS = 16;
+
 @Injectable()
-export class ProcessWorkflowIssuesUsecase {
-  constructor(private notificationTemplateRepository: NotificationTemplateRepository) {}
+export class PostProcessWorkflowUpdate {
+  constructor(
+    private notificationTemplateRepository: NotificationTemplateRepository,
+    private overloadContentDataOnWorkflowUseCase: OverloadContentDataOnWorkflowUseCase
+  ) {}
 
-  async execute(command: ProcessWorkflowIssuesCommand): Promise<NotificationTemplateEntity> {
+  async execute(command: PostProcessWorkflowUpdateCommand): Promise<WorkflowInternalResponseDto> {
     const workflowIssues = await this.validateWorkflow(command);
-    const stepIssues = this.validateSteps(command.workflow.steps, command.validatedContentsArray);
-    const workflowWithIssues = this.updateIssuesOnWorkflow(command.workflow, workflowIssues, stepIssues);
+    const stepIssues = this.validateSteps(command.workflow.steps);
+    let transientWorkflow = this.updateIssuesOnWorkflow(command.workflow, workflowIssues, stepIssues);
 
-    return this.updateStatusOnWorkflow(workflowWithIssues);
+    transientWorkflow = await this.overloadContentDataOnWorkflowUseCase.execute({
+      user: command.user,
+      workflow: transientWorkflow,
+    });
+    transientWorkflow = this.overloadStatusOnWorkflow(transientWorkflow);
+
+    return transientWorkflow;
   }
 
-  private updateStatusOnWorkflow(workflowWithIssues: NotificationTemplateEntity) {
+  private overloadStatusOnWorkflow(workflowWithIssues: WorkflowInternalResponseDto) {
     // eslint-disable-next-line no-param-reassign
     workflowWithIssues.status = this.computeStatus(workflowWithIssues);
 
     return workflowWithIssues;
   }
 
-  private computeStatus(workflowWithIssues) {
+  private computeStatus(workflowWithIssues: WorkflowInternalResponseDto) {
     const isWorkflowCompleteAndValid = this.isWorkflowCompleteAndValid(workflowWithIssues);
-    const status = this.calculateStatus(isWorkflowCompleteAndValid, workflowWithIssues);
 
-    return status;
+    return this.calculateStatus(isWorkflowCompleteAndValid, workflowWithIssues);
   }
 
-  private calculateStatus(isGoodWorkflow: boolean, workflowWithIssues: NotificationTemplateEntity) {
+  private calculateStatus(isGoodWorkflow: boolean, workflowWithIssues: WorkflowInternalResponseDto) {
     if (workflowWithIssues.active === false) {
       return WorkflowStatusEnum.INACTIVE;
     }
@@ -53,7 +66,7 @@ export class ProcessWorkflowIssuesUsecase {
     return WorkflowStatusEnum.ERROR;
   }
 
-  private isWorkflowCompleteAndValid(workflowWithIssues: NotificationTemplateEntity) {
+  private isWorkflowCompleteAndValid(workflowWithIssues: WorkflowInternalResponseDto) {
     const workflowIssues = workflowWithIssues.issues && Object.keys(workflowWithIssues.issues).length > 0;
     const hasInnerIssues =
       workflowWithIssues.steps
@@ -71,15 +84,12 @@ export class ProcessWorkflowIssuesUsecase {
   private hasBodyIssues(issue: StepIssues) {
     return issue.body && Object.keys(issue.body).length > 0;
   }
-  private validateSteps(
-    steps: NotificationStepEntity[],
-    validatedContentsArray: Record<string, ValidatedContentResponse>
-  ): Record<string, StepIssuesDto> {
+  private validateSteps(steps: NotificationStepEntity[]): Record<string, StepIssuesDto> {
     const stepIdToIssues: Record<string, StepIssuesDto> = {};
     for (const step of steps) {
       stepIdToIssues[step._templateId] = {
         body: this.addStepBodyIssues(step),
-        controls: validatedContentsArray[step._templateId]?.issues || {},
+        controls: step.issues?.controls,
       };
     }
 
@@ -87,7 +97,7 @@ export class ProcessWorkflowIssuesUsecase {
   }
 
   private async validateWorkflow(
-    command: ProcessWorkflowIssuesCommand
+    command: PostProcessWorkflowUpdateCommand
   ): Promise<Record<keyof WorkflowResponseDto, RuntimeIssue[]>> {
     // @ts-ignore
     const issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]> = {};
@@ -100,7 +110,7 @@ export class ProcessWorkflowIssuesUsecase {
   }
 
   private addNameMissingIfApplicable(
-    command: ProcessWorkflowIssuesCommand,
+    command: PostProcessWorkflowUpdateCommand,
     issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
   ) {
     if (!command.workflow.name || command.workflow.name.trim() === '') {
@@ -109,7 +119,7 @@ export class ProcessWorkflowIssuesUsecase {
     }
   }
   private addDescriptionTooLongIfApplicable(
-    command: ProcessWorkflowIssuesCommand,
+    command: PostProcessWorkflowUpdateCommand,
     issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
   ) {
     if (command.workflow.description && command.workflow.description.length > 160) {
@@ -121,7 +131,7 @@ export class ProcessWorkflowIssuesUsecase {
   }
 
   private async addTriggerIdentifierNotUniqueIfApplicable(
-    command: ProcessWorkflowIssuesCommand,
+    command: PostProcessWorkflowUpdateCommand,
     issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
   ) {
     const findAllByTriggerIdentifier = await this.notificationTemplateRepository.findAllByTriggerIdentifier(
@@ -155,10 +165,10 @@ export class ProcessWorkflowIssuesUsecase {
   }
 
   private updateIssuesOnWorkflow(
-    workflow: NotificationTemplateEntity,
+    workflow: WorkflowInternalResponseDto,
     workflowIssues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>,
     stepIssuesMap: Record<string, StepIssues>
-  ): NotificationTemplateEntity {
+  ): WorkflowInternalResponseDto {
     const issues = workflowIssues as unknown as Record<string, ContentIssue[]>;
     for (const step of workflow.steps) {
       if (stepIssuesMap[step._templateId]) {
@@ -171,9 +181,10 @@ export class ProcessWorkflowIssuesUsecase {
     return { ...workflow, issues };
   }
   private addTagsIssues(
-    command: ProcessWorkflowIssuesCommand,
+    command: PostProcessWorkflowUpdateCommand,
     issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
   ) {
+    const MAX_TAGS_LENGTH = 16;
     const tags = command.workflow.tags?.map((tag) => tag.trim());
 
     if (!tags.length) {
@@ -196,11 +207,11 @@ export class ProcessWorkflowIssuesUsecase {
       tagsIssues.push({ issueType: WorkflowIssueTypeEnum.MISSING_VALUE, message: 'Empty tag value' });
     }
 
-    const exceedsMaxLength = tags?.some((tag) => tag.length > 8);
+    const exceedsMaxLength = tags?.some((tag) => tag.length > MAX_NUMBER_OF_TAGS);
     if (exceedsMaxLength) {
       tagsIssues.push({
         issueType: WorkflowIssueTypeEnum.LIMIT_REACHED,
-        message: 'Exceeded the 8 tag limit',
+        message: `Exceeded the ${MAX_NUMBER_OF_TAGS} tag limit`,
       });
     }
 

@@ -18,7 +18,12 @@ export class BuildStepDataUsecase {
     const workflow = await this.fetchWorkflow(command);
 
     const { currentStep } = await this.loadStepsFromDb(command, workflow);
-    if (!currentStep.name || !currentStep._templateId || !currentStep.stepId || !currentStep.template?.type) {
+    if (
+      currentStep.name === undefined ||
+      !currentStep._templateId ||
+      currentStep.stepId === undefined ||
+      !currentStep.template?.type
+    ) {
       throw new InvalidStepException(currentStep);
     }
     const controlValues = await this.getValues(command, currentStep, workflow._id);
@@ -44,21 +49,12 @@ export class BuildStepDataUsecase {
   }
 
   private async fetchWorkflow(command: BuildStepDataCommand) {
-    const workflow = await this.getWorkflowByIdsUseCase.execute({
+    return await this.getWorkflowByIdsUseCase.execute({
       identifierOrInternalId: command.identifierOrInternalId,
       environmentId: command.user.environmentId,
       organizationId: command.user.organizationId,
       userId: command.user._id,
     });
-
-    if (!workflow) {
-      throw new BadRequestException({
-        message: 'No workflow found',
-        workflowId: command.identifierOrInternalId,
-      });
-    }
-
-    return workflow;
   }
 
   private async getValues(command: BuildStepDataCommand, currentStep: NotificationStepEntity, _workflowId: string) {

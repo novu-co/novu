@@ -2,17 +2,18 @@ import { createNovuBaseClient, HttpError, NovuRestResult } from './novu-base-cli
 import {
   CreateWorkflowDto,
   GeneratePreviewRequestDto,
+  GeneratePreviewResponseDto,
   GetListQueryParams,
   ListWorkflowResponse,
+  PatchStepDataDto,
+  PatchWorkflowDto,
   StepDataDto,
   SyncWorkflowDto,
   UpdateWorkflowDto,
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
 } from '../dto';
-import { GeneratePreviewResponseDto } from '../dto/workflows/preview-step-response.dto';
 
-// Define the WorkflowClient as a function that utilizes the base client
 export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {}) => {
   const baseClient = createNovuBaseClient(baseUrl, headers);
 
@@ -45,6 +46,21 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     stepId: string
   ): Promise<NovuRestResult<StepDataDto, HttpError>> => {
     return await baseClient.safeGet<StepDataDto>(`/v2/workflows/${workflowId}/steps/${stepId}`);
+  };
+
+  const patchWorkflowStepData = async (
+    workflowId: string,
+    stepId: string,
+    patchStepDataDto: PatchStepDataDto
+  ): Promise<NovuRestResult<StepDataDto, HttpError>> => {
+    return await baseClient.safePatch<StepDataDto>(`/v2/workflows/${workflowId}/steps/${stepId}`, patchStepDataDto);
+  };
+
+  const patchWorkflow = async (
+    workflowId: string,
+    patchWorkflowDto: PatchWorkflowDto
+  ): Promise<NovuRestResult<WorkflowResponseDto, HttpError>> => {
+    return await baseClient.safePatch<WorkflowResponseDto>(`/v2/workflows/${workflowId}`, patchWorkflowDto);
   };
 
   const deleteWorkflow = async (workflowId: string): Promise<NovuRestResult<void, HttpError>> => {
@@ -87,7 +103,6 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     return await baseClient.safeGet<WorkflowTestDataResponseDto>(`/v2/workflows/${workflowId}/test-data`);
   };
 
-  // Return the methods as an object
   return {
     generatePreview,
     createWorkflow,
@@ -98,5 +113,7 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     searchWorkflows,
     getWorkflowTestData,
     getWorkflowStepData,
+    patchWorkflowStepData,
+    patchWorkflow,
   };
 };

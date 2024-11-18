@@ -96,6 +96,21 @@ export default {
       input: 'hsl(var(--input))',
       ring: 'hsl(var(--ring))',
     },
+    fontSize: {
+      xs: ['0.75rem', '1rem'], // 12px font size, 16px line height
+      sm: ['0.875rem', '1.25rem'], // 14px font size, 20px line height
+      base: ['1rem', '1.5rem'], // 16px font size, 24px line height (default)
+      lg: ['1.125rem', '1.75rem'], // 18px font size, 28px line height
+      xl: ['1.25rem', '1.75rem'], // 20px font size, 28px line height
+      '2xl': ['1.5rem', '2rem'], // 24px font size, 32px line height
+      '3xl': ['1.875rem', '2.25rem'], // 30px font size, 36px line height
+      '4xl': ['2.25rem', '2.5rem'], // 36px font size, 40px line height
+      '5xl': ['3rem', '1'], // 48px font size, 1 line height
+      '6xl': ['3.75rem', '1'], // 60px font size, 1 line height
+      '7xl': ['4.5rem', '1'], // 72px font size, 1 line height
+      '8xl': ['6rem', '1'], // 96px font size, 1 line height
+      '9xl': ['8rem', '1'], // 128px font size, 1 line height
+    },
     extend: {
       fontFamily: {
         code: ['Ubuntu', 'monospace'],
