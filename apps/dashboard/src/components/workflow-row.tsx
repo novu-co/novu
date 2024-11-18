@@ -45,6 +45,7 @@ import { ConfirmationModal } from './confirmation-modal';
 import { showToast } from './primitives/sonner-helpers';
 import { ToastIcon } from './primitives/sonner';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
+import { PAUSE_MODAL_DESCRIPTION, PAUSE_MODAL_TITLE } from '@/utils/constants';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -213,8 +214,8 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             await onPauseWorkflow();
             setIsPauseModalOpen(false);
           }}
-          title="Proceeding will pause the workflow"
-          description="This workflow cannot be triggered if paused, please confirm to proceed."
+          title={PAUSE_MODAL_TITLE}
+          description={PAUSE_MODAL_DESCRIPTION}
           confirmButtonText="Proceed"
           isLoading={isPauseWorkflowPending}
         />

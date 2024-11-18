@@ -12,3 +12,6 @@ export const EXCLUDED_EDITOR_TYPES: string[] = [
   StepTypeEnum.TRIGGER,
   StepTypeEnum.CUSTOM,
 ];
+
+export const PAUSE_MODAL_TITLE = 'Proceeding will pause the workflow';
+export const PAUSE_MODAL_DESCRIPTION = 'This workflow cannot be triggered if paused, please confirm to proceed.';

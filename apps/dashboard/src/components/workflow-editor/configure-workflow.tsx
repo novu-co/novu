@@ -9,7 +9,6 @@ import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
 import { MAX_DESCRIPTION_LENGTH, workflowSchema } from './schema';
 import { useTagsQuery } from '@/hooks/use-tags-query';
-// import { Button } from '../primitives/button';
 import { CopyButton } from '../primitives/copy-button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
 import { Switch } from '../primitives/switch';
@@ -18,6 +17,7 @@ import { cn } from '@/utils/ui';
 import { SidebarContent, SidebarHeader } from '@/components/side-navigation/Sidebar';
 import { PageMeta } from '../page-meta';
 import { ConfirmationModal } from '../confirmation-modal';
+import { PAUSE_MODAL_DESCRIPTION, PAUSE_MODAL_TITLE } from '@/utils/constants';
 
 export function ConfigureWorkflow() {
   const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
@@ -40,8 +40,8 @@ export function ConfigureWorkflow() {
           onPauseWorkflow();
           setIsPauseModalOpen(false);
         }}
-        title="Proceeding will pause the workflow"
-        description="This workflow cannot be triggered if paused, please confirm to proceed."
+        title={PAUSE_MODAL_TITLE}
+        description={PAUSE_MODAL_DESCRIPTION}
         confirmButtonText="Proceed"
       />
       <PageMeta title={workflowName} />
