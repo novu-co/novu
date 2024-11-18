@@ -40,7 +40,7 @@ export const WorkflowStatus = (props: WorkflowStatusProps) => {
   const text = statusRenderData[status].text;
 
   return (
-    <Badge variant={badgeVariant} className="border-none py-1">
+    <Badge variant={badgeVariant} className="border-none">
       <Icon className="size-4" /> {text}
     </Badge>
   );

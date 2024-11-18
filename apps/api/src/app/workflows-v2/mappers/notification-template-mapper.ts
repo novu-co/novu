@@ -35,7 +35,7 @@ export function toResponseWorkflowDto(workflow: WorkflowInternalResponseDto): Wo
     origin: computeOrigin(workflow),
     updatedAt: workflow.updatedAt || 'Missing Updated At',
     createdAt: workflow.createdAt || 'Missing Create At',
-    status: workflow.status || WorkflowStatusEnum.ACTIVE,
+    status: getWorkflowStatus(workflow),
     issues: workflow.issues as unknown as Record<WorkflowCreateAndUpdateKeys, RuntimeIssue>,
   };
 }
@@ -72,11 +72,11 @@ function getWorkflowStatus(template: NotificationTemplateEntity): WorkflowStatus
     return WorkflowStatusEnum.ERROR;
   }
 
-  if (template.active) {
-    return WorkflowStatusEnum.ACTIVE;
+  if (!template.active) {
+    return WorkflowStatusEnum.INACTIVE;
   }
 
-  return WorkflowStatusEnum.INACTIVE;
+  return WorkflowStatusEnum.ACTIVE;
 }
 
 export function toWorkflowsMinifiedDtos(templates: NotificationTemplateEntity[]): WorkflowListResponseDto[] {
