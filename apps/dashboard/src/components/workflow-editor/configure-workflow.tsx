@@ -36,7 +36,7 @@ export function ConfigureWorkflow() {
       <ConfirmationModal
         open={isPauseModalOpen}
         onOpenChange={setIsPauseModalOpen}
-        onConfirm={async () => {
+        onConfirm={() => {
           onPauseWorkflow();
           setIsPauseModalOpen(false);
         }}
