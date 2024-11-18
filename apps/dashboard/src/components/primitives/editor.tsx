@@ -21,6 +21,9 @@ const baseTheme = EditorView.baseTheme({
     backgroundColor: 'transparent',
   },
   '.cm-tooltip-autocomplete .cm-completionIcon-variable': {
+    '&:before': {
+      content: 'Suggestions',
+    },
     '&:after': {
       content: "''",
       height: '16px',
@@ -154,7 +157,6 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
       basicSetup: {
         lineNumbers: false,
         foldGutter: false,
-        defaultKeymap: false,
         highlightActiveLine: false,
         highlightActiveLineGutter: false,
         indentOnInput: false,
