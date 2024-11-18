@@ -1,5 +1,5 @@
 import { EnvironmentWithUserObjectCommand } from '@novu/application-generic';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
 import { IdentifierOrInternalId } from '@novu/shared';
 
 export class PatchStepCommand extends EnvironmentWithUserObjectCommand {
@@ -16,5 +16,6 @@ export class PatchStepCommand extends EnvironmentWithUserObjectCommand {
   name?: string;
 
   @IsOptional()
+  @IsObject()
   controlValues?: Record<string, unknown>;
 }

@@ -13,7 +13,6 @@ import {
 import { NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
 import { Injectable } from '@nestjs/common';
 import { WorkflowInternalResponseDto } from '@novu/application-generic';
-import { ValidatedContentResponse } from '../validate-content';
 
 import { PostProcessWorkflowUpdateCommand } from './post-process-workflow-update.command';
 import { OverloadContentDataOnWorkflowUseCase } from '../overload-content-data';
