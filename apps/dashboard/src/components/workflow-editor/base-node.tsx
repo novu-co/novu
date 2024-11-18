@@ -77,11 +77,11 @@ export const NodeError = ({ children }: { children: ReactNode }) => {
     <Popover open={isPopoverOpen}>
       <PopoverTrigger asChild>
         <span
-          className="absolute right-0 top-0 size-4 -translate-y-[6px] translate-x-[2px]"
+          className="absolute right-0 top-0 size-4 -translate-y-[5px] translate-x-[5px]"
           onMouseEnter={() => setIsPopoverOpen(true)}
           onMouseLeave={() => setIsPopoverOpen(false)}
         >
-          <RiErrorWarningFill className="border-destructive fill-destructive rounded-full border p-[1px]" />
+          <RiErrorWarningFill className="border-destructive fill-destructive bg-foreground-0 rounded-full border p-[1px]" />
         </span>
       </PopoverTrigger>
       <PopoverPortal>
