@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../primitives/select';
 import { EuFlag } from '../icons/flags/eu';
 import { USFlag } from '../icons/flags/us';
+import { BsFillInfoCircleFill } from 'react-icons/bs';
+import { Tooltip, TooltipTrigger } from '../primitives/tooltip';
+import { TooltipProvider } from '../primitives/tooltip';
+import { TooltipContent } from '../primitives/tooltip';
 
 const REGION_MAP = {
   US: 'US',
@@ -32,7 +36,20 @@ export function RegionPicker() {
 
   return (
     <div className="inline-flex w-full items-center justify-center gap-[6px]">
-      <div className="text-xs font-medium leading-none text-[#99a0ad]">Data Residency</div>
+      <div className="text-xs font-medium leading-none text-[#99a0ad]">
+        Data Residency
+        <TooltipProvider delayDuration={100}>
+          <Tooltip>
+            <TooltipTrigger className="ml-1">
+              <BsFillInfoCircleFill className="text-foreground-300 -mt-0.5 inline size-3" />
+            </TooltipTrigger>
+            <TooltipContent>
+              Novu offers data residency in Europe (Germany) and United States. Account residency couldn't be modified
+              after sign-up.
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
       <Select value={selectedRegion} onValueChange={handleRegionChange}>
         <SelectTrigger className="h-[22px] w-[64px] p-[4px] pl-[6px] text-[10px] leading-[14px]">
           <SelectValue placeholder="Select a country" />
