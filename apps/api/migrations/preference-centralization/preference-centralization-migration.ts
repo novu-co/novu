@@ -104,6 +104,15 @@ async function migrateWorkflowPreferences(
   for await (const workflowPreference of workflowPreferenceCursor) {
     await sleep(10);
     try {
+      const workflowPreferenceToUpsert = UpsertWorkflowPreferencesCommand.create({
+        templateId: workflowPreference._id.toString(),
+        environmentId: workflowPreference._environmentId.toString(),
+        organizationId: workflowPreference._organizationId.toString(),
+        preferences: DEFAULT_WORKFLOW_PREFERENCES,
+      });
+
+      await upsertPreferences.upsertWorkflowPreferences(workflowPreferenceToUpsert);
+
       const userWorkflowPreferenceToUpsert = UpsertUserWorkflowPreferencesCommand.create({
         userId: workflowPreference._creatorId.toString(),
         templateId: workflowPreference._id.toString(),
@@ -117,19 +126,13 @@ async function migrateWorkflowPreferences(
 
       await upsertPreferences.upsertUserWorkflowPreferences(userWorkflowPreferenceToUpsert);
 
-      const workflowPreferenceToUpsert = UpsertWorkflowPreferencesCommand.create({
-        templateId: workflowPreference._id.toString(),
-        environmentId: workflowPreference._environmentId.toString(),
-        organizationId: workflowPreference._organizationId.toString(),
-        preferences: DEFAULT_WORKFLOW_PREFERENCES,
-      });
-
-      await upsertPreferences.upsertWorkflowPreferences(workflowPreferenceToUpsert);
-
       counter.workflow.success += 1;
       lastProcessedWorkflowId = workflowPreference._id.toString();
     } catch (error) {
       console.error(error);
+      console.error({
+        failedWorkflowId: workflowPreference._id,
+      });
       counter.workflow.error += 1;
     }
   }
@@ -187,6 +190,10 @@ async function migrateSubscriberPreferences(
       lastProcessedSubscriberId = subscriberPreference._id.toString();
     } catch (error) {
       console.error(error);
+      console.error({
+        failedSubscriberPreferenceId: subscriberPreference._id,
+        failedSubscriberId: subscriberPreference._subscriberId,
+      });
       if (subscriberPreference.level === PreferenceLevelEnum.GLOBAL) {
         counter.subscriberGlobal.error += 1;
       } else if (subscriberPreference.level === PreferenceLevelEnum.TEMPLATE) {
