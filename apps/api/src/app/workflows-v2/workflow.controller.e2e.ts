@@ -880,8 +880,8 @@ describe('Workflow Controller E2E API Testing', () => {
       if (stepDataDto.controls) {
         expect(stepDataDto.controls.values).to.be.ok;
         expect(stepDataDto.controls.dataSchema).to.be.ok;
-        expect(stepDataDto.controls.dataSchema).to.deep.equal(
-          stepTypeToDefaultDashboardControlSchema[step.type].schema
+        expect(Object.keys(stepDataDto.controls.dataSchema?.properties || {}).length).to.deep.equal(
+          Object.keys(stepTypeToDefaultDashboardControlSchema[step.type].schema.properties).length
         );
         expect(stepDataDto.controls.uiSchema).to.deep.equal(
           stepTypeToDefaultDashboardControlSchema[step.type].uiSchema

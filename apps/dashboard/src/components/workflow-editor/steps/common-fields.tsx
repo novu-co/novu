@@ -6,13 +6,16 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../../
 import { Input, InputField } from '../../primitives/input';
 import { useStep } from './use-step';
 import { buildRoute, ROUTES } from '@/utils/routes';
+import { EXCLUDED_EDITOR_TYPES } from '@/utils/constants';
 
 export function CommonFields() {
   const { stepIndex, control, step } = useStep();
   const navigate = useNavigate();
   const { stepSlug } = useParams<{ stepSlug: string }>();
-  const { isReadOnly } = useWorkflowEditorContext();
+  const { isReadOnly: isWorkflowReadOnly } = useWorkflowEditorContext();
   const [isBlurred, setIsBlurred] = useState(false);
+
+  const isReadOnly = isWorkflowReadOnly || EXCLUDED_EDITOR_TYPES.includes(step?.type ?? '');
 
   const isStepSlugChanged = step && step?.slug && stepSlug !== step.slug;
   const shouldUpdateStepSlug = isBlurred && isStepSlugChanged;

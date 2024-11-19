@@ -45,6 +45,7 @@ export class BuildStepDataUsecase {
       origin: workflow.origin || WorkflowOriginEnum.EXTERNAL,
       workflowId: workflow.triggers[0].identifier,
       workflowDatabaseId: workflow._id,
+      issues: currentStep.issues,
     };
   }
 

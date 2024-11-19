@@ -1,44 +1,40 @@
+import { z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 
-const redirectSchema = {
-  type: 'object',
-  properties: {
-    url: {
-      type: 'string',
-    },
-    target: {
-      type: 'string',
-      enum: ['_self', '_blank', '_parent', '_top', '_unfencedTop'],
-      default: '_blank',
-    },
-  },
-  additionalProperties: false,
-} as const satisfies JSONSchemaDto;
+const redirectZodSchema = z
+  .object({
+    url: z.string().optional(),
+    target: z.enum(['_self', '_blank', '_parent', '_top', '_unfencedTop']).default('_blank'),
+  })
+  .strict();
 
-const actionSchema = {
-  type: 'object',
-  properties: {
-    label: { type: 'string' },
-    redirect: redirectSchema,
-  },
-  required: ['label'],
-  additionalProperties: false,
-} as const satisfies JSONSchemaDto;
+const actionZodSchema = z
+  .object({
+    label: z.string().optional(),
+    redirect: redirectZodSchema.optional(),
+  })
+  .strict();
 
-export const inAppControlSchema = {
-  type: 'object',
-  properties: {
-    subject: { type: 'string' },
-    body: { type: 'string' },
-    avatar: { type: 'string' },
-    primaryAction: actionSchema,
-    secondaryAction: actionSchema,
-    data: { type: 'object', additionalProperties: true },
-    redirect: redirectSchema,
-  },
-  required: ['body'],
-  additionalProperties: false,
-} as const satisfies JSONSchemaDto;
+export const InAppControlZodSchema = z
+  .object({
+    subject: z.string().optional(),
+    body: z.string(),
+    avatar: z.string().optional(),
+    primaryAction: actionZodSchema.optional(),
+    secondaryAction: actionZodSchema.optional(),
+    data: z.object({}).catchall(z.unknown()).optional(),
+    redirect: redirectZodSchema.optional(),
+  })
+  .strict();
+
+export type InAppRedirectType = z.infer<typeof redirectZodSchema>;
+export type InAppActionType = z.infer<typeof actionZodSchema>;
+export type InAppControlType = z.infer<typeof InAppControlZodSchema>;
+
+export const InAppRedirectSchema = zodToJsonSchema(redirectZodSchema) as JSONSchemaDto;
+export const InAppActionSchema = zodToJsonSchema(actionZodSchema) as JSONSchemaDto;
+export const inAppControlSchema = zodToJsonSchema(InAppControlZodSchema) as JSONSchemaDto;
 
 const redirectPlaceholder = {
   url: {
