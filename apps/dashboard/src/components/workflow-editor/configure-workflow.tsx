@@ -24,7 +24,12 @@ export function ConfigureWorkflow() {
   const tagsQuery = useTagsQuery();
   const { isReadOnly } = useWorkflowEditorContext();
 
-  const { control, watch, setValue } = useFormContext<z.infer<typeof workflowSchema>>();
+  const {
+    control,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext<z.infer<typeof workflowSchema>>();
   const workflowName = watch('name');
 
   const onPauseWorkflow = () => {

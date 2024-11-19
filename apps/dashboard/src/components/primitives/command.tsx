@@ -4,7 +4,7 @@ import { Command as CommandPrimitive } from 'cmdk';
 
 import { cn } from '@/utils/ui';
 import { Dialog, DialogContent } from '@/components/primitives/dialog';
-import { InputField, InputFieldPure, inputVariants } from '@/components/primitives/input';
+import { InputField, inputVariants } from '@/components/primitives/input';
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -37,11 +37,11 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
 
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & { hasError?: boolean }
->(({ className, hasError, ...props }, ref) => (
-  <InputFieldPure state={hasError ? 'error' : 'default'}>
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
+>(({ className, ...props }, ref) => (
+  <InputField>
     <CommandPrimitive.Input ref={ref} className={cn(inputVariants(), className)} {...props} />
-  </InputFieldPure>
+  </InputField>
 ));
 
 CommandInput.displayName = CommandPrimitive.Input.displayName;

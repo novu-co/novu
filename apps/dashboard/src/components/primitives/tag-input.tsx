@@ -12,12 +12,11 @@ import { RiCloseFill } from 'react-icons/ri';
 type TagInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   value: string[];
   suggestions: string[];
-  error?: string;
   onChange: (tags: string[]) => void;
 };
 
 const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
-  const { className, suggestions, value, error, onChange, ...rest } = props;
+  const { className, suggestions, value, onChange, ...rest } = props;
   const [tags, setTags] = useState<string[]>(value);
   const [inputValue, setInputValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -65,7 +64,6 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
               ref={ref}
               autoComplete="off"
               value={inputValue}
-              hasError={!!error}
               className={cn(inputVariants(), 'flex-grow', className)}
               placeholder="Type a tag and press Enter"
               onValueChange={(value) => {
