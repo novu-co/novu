@@ -173,7 +173,6 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     <FormControl>
                       <Textarea
                         placeholder="Description of what this workflow does"
-                        state={errors['description']?.message ? 'error' : 'default'}
                         {...field}
                         maxLength={MAX_DESCRIPTION_LENGTH}
                       />

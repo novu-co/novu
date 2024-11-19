@@ -113,7 +113,7 @@ export const buildDynamicFormSchema = ({
       try {
         return JSON.parse(str);
       } catch (e) {
-        ctx.addIssue({ code: 'custom', message: 'Payload needs to be a valid JSON' });
+        ctx.addIssue({ code: 'custom', message: 'Payload must be valid JSON' });
         return z.NEVER;
       }
     }),
