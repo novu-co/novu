@@ -143,7 +143,7 @@ describe('Workflow Controller E2E API Testing', () => {
   });
   describe('Create Workflow Permutations', () => {
     it('should allow creating two workflows for the same user with the same name', async () => {
-      const nameSuffix = `Test Workflow${new Date().toString()}`;
+      const nameSuffix = `Test Workflow${new Date().toISOString()}`;
       await createWorkflowAndValidate(nameSuffix);
       const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto(nameSuffix);
       const res = await workflowsClient.createWorkflow(createWorkflowDto);
@@ -158,7 +158,7 @@ describe('Workflow Controller E2E API Testing', () => {
 
   describe('Update Workflow Permutations', () => {
     it('should update control values', async () => {
-      const nameSuffix = `Test Workflow${new Date().toString()}`;
+      const nameSuffix = `Test Workflow${new Date().toISOString()}`;
       const workflowCreated: WorkflowResponseDto = await createWorkflowAndValidate(nameSuffix);
       const updateRequest: UpdateWorkflowDto = {
         name: workflowCreated.name,
@@ -188,7 +188,7 @@ describe('Workflow Controller E2E API Testing', () => {
     });
 
     it('should keep the step id on updated ', async () => {
-      const nameSuffix = `Test Workflow${new Date().toString()}`;
+      const nameSuffix = `Test Workflow${new Date().toISOString()}`;
       const workflowCreated: WorkflowResponseDto = await createWorkflowAndValidate(nameSuffix);
       const updateDto = convertResponseToUpdateDto(workflowCreated);
       const updatedWorkflow = await updateWorkflowRest(workflowCreated._id, updateDto);
@@ -199,7 +199,7 @@ describe('Workflow Controller E2E API Testing', () => {
     });
 
     it('adding user preferences', async () => {
-      const nameSuffix = `Test Workflow${new Date().toString()}`;
+      const nameSuffix = `Test Workflow${new Date().toISOString()}`;
       const workflowCreated: WorkflowResponseDto = await createWorkflowAndValidate(nameSuffix);
       const updateDto = convertResponseToUpdateDto(workflowCreated);
       const updatedWorkflow = await updateWorkflowRest(workflowCreated._id, {
@@ -222,7 +222,7 @@ describe('Workflow Controller E2E API Testing', () => {
     });
 
     it('should update by slugify ids', async () => {
-      const nameSuffix = `Test Workflow${new Date().toString()}`;
+      const nameSuffix = `Test Workflow${new Date().toISOString()}`;
       const workflowCreated: WorkflowResponseDto = await createWorkflowAndValidate(nameSuffix);
       const updateDtoWithValues = await buildUpdateDto(workflowCreated);
 
