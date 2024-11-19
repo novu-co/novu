@@ -49,7 +49,7 @@ const redirectPlaceholder = {
   },
 };
 
-export const InAppUiSchema: UiSchema = {
+export const inAppUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.IN_APP,
   properties: {
     body: {

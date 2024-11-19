@@ -30,6 +30,7 @@ export type PatchStepDataDto = {
   name?: string;
   controlValues?: Record<string, unknown>;
 };
+
 export type PatchWorkflowDto = {
   active?: boolean;
   name?: string;

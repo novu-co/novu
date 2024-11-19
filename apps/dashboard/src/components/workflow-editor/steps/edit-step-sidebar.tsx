@@ -22,12 +22,12 @@ const transitionSetting = { ease: [0.29, 0.83, 0.57, 0.99], duration: 0.4 };
 const EditStepSidebarInternal = () => {
   const navigate = useNavigate();
   const { workflow, isPendingWorkflow } = useWorkflowEditorContext();
-  const { step, stepType, isPendingStep, isRefetchingStep } = useStepEditorContext();
+  const { step, stepType, isPendingStep } = useStepEditorContext();
   const handleCloseSidebar = () => {
     navigate('..', { relative: 'path' });
   };
 
-  const isPending = isPendingWorkflow || isPendingStep || isRefetchingStep;
+  const isPending = isPendingWorkflow || isPendingStep;
 
   return (
     <>

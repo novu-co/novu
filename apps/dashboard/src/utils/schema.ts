@@ -6,6 +6,7 @@ type ZodValue =
   | z.AnyZodObject
   | z.ZodString
   | z.ZodNumber
+  | z.ZodNullable<z.ZodTypeAny>
   | z.ZodEffects<z.ZodTypeAny>
   | z.ZodDefault<z.ZodTypeAny>
   | z.ZodEnum<[string, ...string[]]>
@@ -86,8 +87,7 @@ const handleStringType = ({
     stringValue = stringValue.default(defaultValue as string);
   }
 
-  // remove empty strings
-  return stringValue.transform((val) => (val === '' ? undefined : val));
+  return stringValue;
 };
 
 /**
@@ -119,6 +119,7 @@ export const buildDynamicZodSchema = (obj: JSONSchemaDto): z.AnyZodObject => {
         // remove object if any required field is empty or undefined
         return hasAnyRequiredEmpty ? undefined : val;
       });
+      zodValue = zodValue.nullable();
     } else if (type === 'string') {
       zodValue = handleStringType({ key, requiredFields, format, pattern, enumValues, defaultValue });
     } else if (type === 'boolean') {
@@ -153,8 +154,12 @@ export const buildDefaultValues = (uiSchema: UiSchema): object => {
     }
 
     const { placeholder: defaultValue } = property;
-    if (defaultValue === null || typeof defaultValue === 'undefined') {
+    if (typeof defaultValue === 'undefined') {
       return acc;
+    }
+
+    if (defaultValue === null) {
+      return { ...acc, [key]: defaultValue };
     }
 
     if (typeof defaultValue === 'object') {

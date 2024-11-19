@@ -1,6 +1,6 @@
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 
-export const EmailStepControlSchema: JSONSchemaDto = {
+export const emailStepControlSchema: JSONSchemaDto = {
   type: 'object',
   properties: {
     emailEditor: {
@@ -13,7 +13,8 @@ export const EmailStepControlSchema: JSONSchemaDto = {
   required: ['emailEditor', 'subject'],
   additionalProperties: false,
 };
-export const EmailStepUiSchema: UiSchema = {
+
+export const emailStepUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.EMAIL,
   properties: {
     emailEditor: {

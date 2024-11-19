@@ -10,7 +10,7 @@ export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string;
   const { currentEnvironment } = useEnvironment();
   const stepId = useMemo(() => getEncodedId({ slug: stepSlug, divider: STEP_DIVIDER }), [stepSlug]);
 
-  const { data, isPending, isRefetching, error } = useQuery<StepDataDto>({
+  const { data, isPending, isRefetching, error, refetch } = useQuery<StepDataDto>({
     queryKey: [QueryKeys.fetchWorkflow, currentEnvironment?._id, workflowSlug, stepId],
     queryFn: () => fetchStep({ workflowSlug, stepSlug }),
     enabled: !!currentEnvironment?._id && !!stepSlug,
@@ -21,5 +21,6 @@ export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string;
     isPending,
     isRefetching,
     error,
+    refetch,
   };
 };

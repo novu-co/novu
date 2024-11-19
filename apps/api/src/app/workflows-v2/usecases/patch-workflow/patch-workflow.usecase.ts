@@ -55,10 +55,7 @@ export class PatchWorkflowUsecase {
     return transientWorkflow;
   }
 
-  private async persistWorkflow(
-    workflowWithIssues: Partial<NotificationTemplateEntity>,
-    userSessionData: UserSessionData
-  ) {
+  private async persistWorkflow(workflowWithIssues: NotificationTemplateEntity, userSessionData: UserSessionData) {
     await this.notificationTemplateRepository.update(
       {
         _id: workflowWithIssues._id,
