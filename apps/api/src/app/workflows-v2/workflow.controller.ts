@@ -217,9 +217,9 @@ export class WorkflowController {
     @Param('workflowId', ParseSlugIdPipe) identifierOrInternalId: IdentifierOrInternalId,
     @Body() patchWorkflowDto: PatchWorkflowDto
   ): Promise<WorkflowResponseDto> {
-    const command = PatchWorkflowCommand.create({ user, identifierOrInternalId, ...patchWorkflowDto });
-
-    return await this.patchWorkflowUsecase.execute(command);
+    return await this.patchWorkflowUsecase.execute(
+      PatchWorkflowCommand.create({ user, identifierOrInternalId, ...patchWorkflowDto })
+    );
   }
 
   @Get('/:workflowId/test-data')

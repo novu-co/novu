@@ -15,6 +15,8 @@ import {
   RenderEmailOutputUsecase,
   SmsOutputRendererUsecase,
 } from './usecases/output-renderers';
+import { DelayOutputRendererUsecase } from './usecases/output-renderers/delay-output-renderer.usecase';
+import { DigestOutputRendererUsecase } from './usecases/output-renderers/digest-output-renderer.usecase';
 
 @Module({
   controllers: [NovuBridgeController],
@@ -36,6 +38,8 @@ import {
     RenderEmailOutputUsecase,
     ExpandEmailEditorSchemaUsecase,
     HydrateEmailSchemaUseCase,
+    DelayOutputRendererUsecase,
+    DigestOutputRendererUsecase,
   ],
 })
 export class NovuBridgeModule {}

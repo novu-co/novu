@@ -1,19 +1,23 @@
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 
-export const EmailStepControlSchema: JSONSchemaDto = {
-  type: 'object',
-  properties: {
-    emailEditor: {
-      type: 'string',
-    },
-    subject: {
-      type: 'string',
-    },
-  },
-  required: ['emailEditor', 'subject'],
-  additionalProperties: false,
-};
-export const EmailStepUiSchema: UiSchema = {
+import { z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
+
+export const EmailStepControlZodSchema = z
+  .object({
+    emailEditor: z.string(),
+    subject: z.string(),
+  })
+  .strict()
+  .required({
+    emailEditor: true,
+    subject: true,
+  });
+
+export const emailStepControlSchema = zodToJsonSchema(EmailStepControlZodSchema) as JSONSchemaDto;
+
+export type EmailStepControlType = z.infer<typeof EmailStepControlZodSchema>;
+export const emailStepUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.EMAIL,
   properties: {
     emailEditor: {
