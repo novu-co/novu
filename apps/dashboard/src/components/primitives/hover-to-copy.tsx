@@ -1,5 +1,5 @@
 import { ComponentProps, useState } from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip';
 
 type HoverToCopyProps = ComponentProps<typeof TooltipTrigger> & {
   valueToCopy: string;
@@ -21,17 +21,15 @@ export const HoverToCopy = (props: HoverToCopyProps) => {
   };
 
   return (
-    <TooltipProvider delayDuration={100}>
-      <Tooltip>
-        <TooltipTrigger aria-label="Copy to clipboard" onClick={copyToClipboard} {...rest} />
-        <TooltipContent
-          onPointerDownOutside={(e) => {
-            e.preventDefault();
-          }}
-        >
-          {isCopied ? 'Copied!' : 'Click to copy'}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger aria-label="Copy to clipboard" onClick={copyToClipboard} {...rest} />
+      <TooltipContent
+        onPointerDownOutside={(e) => {
+          e.preventDefault();
+        }}
+      >
+        {isCopied ? 'Copied!' : 'Click to copy'}
+      </TooltipContent>
+    </Tooltip>
   );
 };

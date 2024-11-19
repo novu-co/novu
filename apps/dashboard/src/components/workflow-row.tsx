@@ -25,13 +25,7 @@ import {
 } from '@/components/primitives/dropdown-menu';
 import { HoverToCopy } from '@/components/primitives/hover-to-copy';
 import { TableCell, TableRow } from '@/components/primitives/table';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipPortal,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/primitives/tooltip';
+import { Tooltip, TooltipContent, TooltipPortal, TooltipTrigger } from '@/components/primitives/tooltip';
 import TruncatedText from '@/components/truncated-text';
 import { WorkflowStatus } from '@/components/workflow-status';
 import { WorkflowSteps } from '@/components/workflow-steps';
@@ -188,22 +182,20 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         <WorkflowTags tags={workflow.tags || []} />
       </TableCell>
 
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <TableCell className="text-foreground-600 text-sm font-medium">
-              {new Date(workflow.updatedAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}
-            </TableCell>
-          </TooltipTrigger>
-          <TooltipPortal>
-            <TooltipContent align="start">{new Date(workflow.updatedAt).toUTCString()}</TooltipContent>
-          </TooltipPortal>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <TableCell className="text-foreground-600 text-sm font-medium">
+            {new Date(workflow.updatedAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </TableCell>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent align="start">{new Date(workflow.updatedAt).toUTCString()}</TooltipContent>
+        </TooltipPortal>
+      </Tooltip>
 
       <TableCell className="w-1">
         <ConfirmationModal
@@ -313,18 +305,16 @@ const SyncWorkflowMenuItem = ({
   }
 
   return (
-    <TooltipProvider delayDuration={100}>
-      <Tooltip>
-        <TooltipTrigger>
-          <DropdownMenuItem disabled>
-            <RiGitPullRequestFill />
-            {syncToLabel}
-          </DropdownMenuItem>
-        </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent>{tooltipContent}</TooltipContent>
-        </TooltipPortal>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger>
+        <DropdownMenuItem disabled>
+          <RiGitPullRequestFill />
+          {syncToLabel}
+        </DropdownMenuItem>
+      </TooltipTrigger>
+      <TooltipPortal>
+        <TooltipContent>{tooltipContent}</TooltipContent>
+      </TooltipPortal>
+    </Tooltip>
   );
 };
