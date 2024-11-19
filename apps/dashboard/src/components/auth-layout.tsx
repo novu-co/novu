@@ -1,21 +1,108 @@
 import { ReactNode } from 'react';
+import { CircleCheck } from './icons/circle-check';
+import { ShieldZap } from './icons/shield-zap';
+import { Plug } from './icons/plug';
+import { Sparkling } from './icons/sparkling';
+import { AuthFeatureRow } from './auth/auth-feature-row';
 
 export const AuthLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="flex h-screen gap-8">
-      <div className="relative hidden min-w-[600px] flex-1 grow items-center bg-[url('/images/signin_bg.webp')] bg-no-repeat [background-size:70%_100%] lg:flex">
-        <img src={`/images/logo-light.webp`} alt="logo" className="ml-1 mt-1 max-w-[150px] self-start" />
-        <div className="translate-y-1/12 absolute right-1/2 flex translate-x-1/3 transform flex-col">
-          <img src={`/images/notifications/notification_01.webp`} alt="logo" className="max-w-[400px]" />
-          <img
-            src={`/images/notifications/notification_02.webp`}
-            alt="logo"
-            className="-mt-[15px] ml-[30px] max-w-[400px]"
-          />
-          <img src={`/images/notifications/notification_03.webp`} alt="logo" className="-mt-[15px] max-w-[400px]" />
+    <div className="flex h-screen items-center justify-center gap-8 bg-[url('/images/auth/background.svg')]">
+      <div className="flex max-w-[1100px] flex-1 flex-row">
+        <div className="inline-flex w-full max-w-[476px] flex-col items-center justify-center gap-[50px] p-5">
+          <div className="flex flex-col items-start justify-start gap-4">
+            <div className="inline-flex items-center justify-start gap-3">
+              <img src="/images/novu-logo-dark.svg" className="w-[96px]" alt="logo" />
+            </div>
+            <div className="flex flex-col items-start justify-start gap-4">
+              <div className="flex flex-col items-start justify-start gap-1.5 self-stretch">
+                <div className="text-2xl font-medium leading-[32px] text-[#0d111b]">
+                  Send your first notification in minutes.
+                </div>
+                <div className="inline-flex justify-start gap-1">
+                  <CircleCheck className="h-3 w-3" color="#99a0ad" />
+                  <div className="text-xs font-medium leading-none text-[#99a0ad]">
+                    No credit card required, 30k events for free every month.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col items-start justify-start gap-8 self-stretch">
+            <AuthFeatureRow
+              icon={<Plug className="h-[26px] w-[26px]" />}
+              title="Integrates easily, delivers powerful notifications"
+              description="Unlimited workflows, unlimited providers, unlimited subscribers with 99.9% uptime SLA"
+            />
+            <AuthFeatureRow
+              icon={<Sparkling className="h-[28px] w-[28px]" />}
+              title="As flexible as in-house built"
+              description="Novu API-first approach, means that you can use just what you need, when you need it."
+            />
+            <AuthFeatureRow
+              icon={<ShieldZap className="h-[26px] w-[26px]" />}
+              title="Built-in security, Observable and Scalable"
+              description="Novu handles any volume, any channel, and any team for mission-critical notifications."
+            />
+          </div>
+
+          <div className="inline-flex h-[87px] w-[365px] flex-col items-center justify-center gap-[19px]">
+            <div className="inline-flex h-[18px] items-center justify-center self-stretch">
+              <div className="h-px shrink grow basis-0 bg-black/5" />
+              <div className="inline-flex flex-col items-start justify-start px-4">
+                <div className="flex flex-col items-center justify-start">
+                  <div className="text-center font-['Inter'] text-[10px] font-normal leading-[18px] tracking-wider text-[#99a0ad]">
+                    TRUSTED BY
+                  </div>
+                </div>
+              </div>
+              <div className="h-px shrink grow basis-0 bg-black/5" />
+            </div>
+            <div className="flex flex-col items-center justify-center gap-4">
+              <div className="inline-flex items-center justify-center gap-5">
+                <div className="inline-flex flex-col items-start justify-start px-5">
+                  <div className="flex flex-col items-start justify-start">
+                    <div className="relative h-[20px]">
+                      <img src="/images/auth/capgemini-customer.svg" alt="capgemini" />
+                    </div>
+                  </div>
+                </div>
+                <div className="inline-flex flex-col items-start justify-start px-5">
+                  <div className="flex flex-col items-start justify-start">
+                    <div className="relative h-[20px]">
+                      <img src="/images/auth/hemnet-customer.svg" alt="hemnet" />
+                    </div>
+                  </div>
+                </div>
+                <div className="inline-flex flex-col items-start justify-start px-5">
+                  <div className="flex flex-col items-start justify-start">
+                    <div className="relative h-[20px]">
+                      <img src="/images/auth/mongodb-customer.svg" alt="mongodb" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="inline-flex items-center justify-center gap-5">
+                <div className="inline-flex flex-col items-start justify-start px-5">
+                  <div className="flex flex-col items-start justify-start">
+                    <div className="relative h-[20px]">
+                      <img src="/images/auth/siemens-customer.svg" alt="siemens" />
+                    </div>
+                  </div>
+                </div>
+                <div className="inline-flex flex-col items-start justify-start px-5">
+                  <div className="flex flex-col items-start justify-start">
+                    <div className="relative h-[20px]">
+                      <img src="/images/auth/unity-customer.svg" alt="unity" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+        <div className="flex flex-1 items-center justify-end">{children}</div>
       </div>
-      <div className="flex flex-1 items-center justify-center">{children}</div>
     </div>
   );
 };
