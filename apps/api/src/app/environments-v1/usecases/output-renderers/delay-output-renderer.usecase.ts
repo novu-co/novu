@@ -4,7 +4,7 @@ import { RenderCommand } from './render-command';
 import {
   DelayTimeControlType,
   DelayTimeControlZodSchema,
-} from '../../../workflows-v2/shared/schemas/delay-control-schema';
+} from '../../../workflows-v2/shared/schemas/delay-control.schema';
 
 @Injectable()
 export class DelayOutputRendererUsecase {

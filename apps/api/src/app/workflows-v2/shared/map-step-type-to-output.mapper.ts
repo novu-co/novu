@@ -1,10 +1,8 @@
 import { ActionStepEnum, ChannelStepEnum, channelStepSchemas } from '@novu/framework/internal';
 import { ControlSchemas, JSONSchemaDto } from '@novu/shared';
 import { emailStepControlSchema, emailStepUiSchema, inAppControlSchema, inAppUiSchema } from './schemas';
-import { digestControlSchema } from './schemas/digest-control.schema';
-import { delayControlSchema } from './schemas/delay-control.schema';
-import { DelayTimeControlSchema } from './schemas/delay-control-schema';
-import { DigestOutputJsonSchema } from './schemas/digest-control-schema';
+import { DelayTimeControlSchema, delayUiSchema } from './schemas/delay-control.schema';
+import { DigestOutputJsonSchema, digestUiSchema } from './schemas/digest-control.schema';
 
 export const PERMISSIVE_EMPTY_SCHEMA = {
   type: 'object',
@@ -33,11 +31,11 @@ export const stepTypeToDefaultDashboardControlSchema: Record<ChannelStepEnum | A
   },
   [ActionStepEnum.DELAY]: {
     schema: DelayTimeControlSchema,
-    uiSchema: delayControlSchema.uiSchema,
+    uiSchema: delayUiSchema,
   },
   [ActionStepEnum.DIGEST]: {
     schema: DigestOutputJsonSchema,
-    uiSchema: digestControlSchema.uiSchema,
+    uiSchema: digestUiSchema,
   },
   [ActionStepEnum.CUSTOM]: {
     schema: PERMISSIVE_EMPTY_SCHEMA,

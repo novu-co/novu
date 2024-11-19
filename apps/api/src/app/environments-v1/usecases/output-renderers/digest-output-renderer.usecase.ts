@@ -6,7 +6,7 @@ import {
   DigestControlZodSchema,
   isDigestRegularControl,
   isDigestTimedControl,
-} from '../../../workflows-v2/shared/schemas/digest-control-schema';
+} from '../../../workflows-v2/shared/schemas/digest-control.schema';
 
 @Injectable()
 export class DigestOutputRendererUsecase {
