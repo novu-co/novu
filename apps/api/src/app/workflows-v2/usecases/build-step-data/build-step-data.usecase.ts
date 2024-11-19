@@ -45,25 +45,17 @@ export class BuildStepDataUsecase {
       origin: workflow.origin || WorkflowOriginEnum.EXTERNAL,
       workflowId: workflow.triggers[0].identifier,
       workflowDatabaseId: workflow._id,
+      issues: currentStep.issues,
     };
   }
 
   private async fetchWorkflow(command: BuildStepDataCommand) {
-    const workflow = await this.getWorkflowByIdsUseCase.execute({
+    return await this.getWorkflowByIdsUseCase.execute({
       identifierOrInternalId: command.identifierOrInternalId,
       environmentId: command.user.environmentId,
       organizationId: command.user.organizationId,
       userId: command.user._id,
     });
-
-    if (!workflow) {
-      throw new BadRequestException({
-        message: 'No workflow found',
-        workflowId: command.identifierOrInternalId,
-      });
-    }
-
-    return workflow;
   }
 
   private async getValues(command: BuildStepDataCommand, currentStep: NotificationStepEntity, _workflowId: string) {

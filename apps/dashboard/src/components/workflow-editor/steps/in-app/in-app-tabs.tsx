@@ -1,73 +1,69 @@
-import { useState, useEffect, useMemo } from 'react';
-import { RiAlertFill, RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
-import { Cross2Icon } from '@radix-ui/react-icons';
-import { useBlocker, useNavigate, useParams } from 'react-router-dom';
-import { FieldValues, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type WorkflowResponseDto, type StepDataDto, type StepUpdateDto } from '@novu/shared';
+import { type StepDataDto, type StepUpdateDto, type WorkflowResponseDto } from '@novu/shared';
+import { Cross2Icon } from '@radix-ui/react-icons';
+import { useEffect, useMemo, useState } from 'react';
+import { FieldValues, useForm, useWatch } from 'react-hook-form';
+import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
+import { useBlocker, useNavigate, useParams } from 'react-router-dom';
+import merge from 'lodash.merge';
 
-import { Form } from '@/components/primitives/form/form';
 import { Notification5Fill } from '@/components/icons';
-import { Button, buttonVariants } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button';
+import { Form } from '@/components/primitives/form/form';
 import { Separator } from '@/components/primitives/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
-import { InAppEditorPreview } from '@/components/workflow-editor/steps/in-app/in-app-editor-preview';
-import { useUpdateWorkflow } from '@/hooks/use-update-workflow';
-import { buildDynamicZodSchema, buildDefaultValues } from '@/utils/schema';
-import { InAppEditor } from '@/components/workflow-editor/steps/in-app/in-app-editor';
-import { showToast } from '@/components/primitives/sonner-helpers';
 import { ToastIcon } from '@/components/primitives/sonner';
-import { usePreviewStep } from '@/hooks/use-preview-step';
+import { showToast } from '@/components/primitives/sonner-helpers';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
+import { UnsavedChangesAlertDialog } from '@/components/unsaved-changes-alert-dialog';
+import { InAppEditor } from '@/components/workflow-editor/steps/in-app/in-app-editor';
+import { InAppEditorPreview } from '@/components/workflow-editor/steps/in-app/in-app-editor-preview';
 import useDebouncedEffect from '@/hooks/use-debounced-effect';
+import { usePreviewStep } from '@/hooks/use-preview-step';
+import { useUpdateWorkflow } from '@/hooks/use-update-workflow';
+import { buildDefaultValues, buildDynamicZodSchema } from '@/utils/schema';
+import { useWorkflowEditorContext } from '../../hooks';
+import { flattenIssues } from '../../step-utils';
 import { CustomStepControls } from '../controls/custom-step-controls';
 import { useStep } from '../use-step';
-import { flattenIssues } from '../../step-utils';
-import { useWorkflowEditorContext } from '../../hooks';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/primitives/alert-dialog';
+import { useStepEditorContext } from '@/components/workflow-editor/steps/hooks';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5 overflow-y-auto';
 
 export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; step: StepDataDto }) => {
+  const navigate = useNavigate();
   const { stepSlug = '', workflowSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
   const { resetWorkflowForm } = useWorkflowEditorContext();
+  const { refetch: refetchStep } = useStepEditorContext();
   const { step: workflowStep } = useStep();
-  const { dataSchema, uiSchema } = step.controls;
-  const navigate = useNavigate();
-  const schema = buildDynamicZodSchema(dataSchema ?? {});
+
+  const { dataSchema, uiSchema, values } = step.controls;
+  const schema = useMemo(() => buildDynamicZodSchema(dataSchema ?? {}), [dataSchema]);
+  const newFormValues = useMemo(() => merge(buildDefaultValues(uiSchema ?? {}), values), [uiSchema, values]);
+
   const form = useForm({
     mode: 'onSubmit',
     resolver: zodResolver(schema),
-    resetOptions: { keepDirtyValues: true },
-    defaultValues: buildDefaultValues(uiSchema ?? {}),
-    values: step.controls.values,
+    values: newFormValues,
     shouldFocusError: true,
   });
   const [editorValue, setEditorValue] = useState('{}');
-  const { reset, formState, setError } = form;
+  const { formState, setError } = form;
 
   const controlErrors = useMemo(() => flattenIssues(workflowStep?.issues?.controls), [workflowStep]);
 
   useEffect(() => {
     if (Object.keys(controlErrors).length) {
       Object.entries(controlErrors).forEach(([key, value]) => {
-        setError(key as any, { message: value }, { shouldFocus: true });
+        setError(key as string, { message: value }, { shouldFocus: true });
       });
     }
   }, [controlErrors, setError]);
 
-  const { previewStep, data: previewData } = usePreviewStep();
+  const { previewStep, data: previewData, isPending: isPreviewPending } = usePreviewStep();
   const { isPending, updateWorkflow } = useUpdateWorkflow({
     onSuccess: (data) => {
       resetWorkflowForm(data);
+      refetchStep();
       showToast({
         children: () => (
           <>
@@ -102,16 +98,29 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
   });
 
   const onSubmit = async (data: any) => {
+    const updatedValues = Object.keys(formState.dirtyFields).reduce(
+      (acc, key) => {
+        acc[key] = data[key];
+        return acc;
+      },
+      {} as Record<string, unknown>
+    );
+
     await updateWorkflow({
       id: workflow._id,
       workflow: {
         ...workflow,
         steps: workflow.steps.map((step) =>
-          step.slug === stepSlug ? ({ ...step, controlValues: { ...data }, issues: undefined } as StepUpdateDto) : step
+          step.slug === stepSlug
+            ? ({
+                ...step,
+                controlValues: { ...values, ...updatedValues },
+                issues: undefined,
+              } as StepUpdateDto)
+            : step
         ),
       },
     });
-    reset({ ...data });
   };
 
   const preview = async (props: {
@@ -197,6 +206,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
                 value={editorValue}
                 onChange={setEditorValue}
                 previewData={previewData}
+                isPreviewLoading={isPreviewPending}
                 applyPreview={() => {
                   previewStep({
                     stepSlug,
@@ -221,33 +231,11 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
           </Tabs>
         </form>
       </Form>
-      <AlertDialog open={blocker.state === 'blocked'}>
-        <AlertDialogContent>
-          <AlertDialogHeader className="flex flex-row items-start gap-4">
-            <div className="bg-warning/10 rounded-lg p-3">
-              <RiAlertFill className="text-warning size-6" />
-            </div>
-            <div className="space-y-1">
-              <AlertDialogTitle>You might lose your progress</AlertDialogTitle>
-              <AlertDialogDescription>
-                This editor form has some unsaved changes. Save progress before you leave.
-              </AlertDialogDescription>
-            </div>
-          </AlertDialogHeader>
 
-          <Separator />
-
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => blocker.reset?.()}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => blocker.proceed?.()}
-              className={buttonVariants({ variant: 'destructive' })}
-            >
-              Proceed anyway
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <UnsavedChangesAlertDialog
+        blocker={blocker}
+        description="This editor form has some unsaved changes. Save progress before you leave."
+      />
     </>
   );
 };

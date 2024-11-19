@@ -28,7 +28,7 @@ export function CustomStepControls({
       <CollapsibleTrigger className="flex w-full items-center justify-between text-sm">
         <div className="flex items-center gap-1">
           <RiInputField className="text-feature size-5" />
-          <span className="text-sm font-medium">Custom steps controls</span>
+          <span className="text-sm font-medium">Custom step controls</span>
         </div>
 
         {isEditorOpen ? (

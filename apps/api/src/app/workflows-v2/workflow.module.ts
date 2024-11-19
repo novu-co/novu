@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import {
   CreateWorkflow,
+  DeletePreferencesUseCase,
   DeleteWorkflowUseCase,
   GetPreferences,
   GetWorkflowByIdsUseCase,
@@ -48,6 +49,7 @@ import { ValidateControlByTierUsecase } from './usecases/validate-content/valida
     ListWorkflowsUseCase,
     DeleteWorkflowUseCase,
     UpsertPreferences,
+    DeletePreferencesUseCase,
     UpsertControlValuesUseCase,
     GetPreferences,
     GetWorkflowByIdsUseCase,

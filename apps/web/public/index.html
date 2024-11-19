@@ -208,5 +208,15 @@
       type="text/javascript"
     ></script>
     <% } %>
+    <% if ( process.env.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID ) { %>
+    <script>
+      (function(d, script) {
+        script = d.createElement('script');
+        script.async = false;
+        script.src = 'https://chat.cdn-plain.com/index.js';
+        d.getElementsByTagName('head')[0].appendChild(script);
+      }(document));
+    </script>
+    <% } %>
   </body>
 </html>

@@ -1,7 +1,27 @@
-import { ActionStepEnum, actionStepSchemas } from '@novu/framework/internal';
-import { DigestUnitEnum, JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
+import { z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
+import {
+  DigestUnitEnum,
+  JSONSchemaDto,
+  TimeUnitEnum,
+  UiComponentEnum,
+  UiSchema,
+  UiSchemaGroupEnum,
+} from '@novu/shared';
 
-const delayUiSchema: UiSchema = {
+export const DelayTimeControlZodSchema = z
+  .object({
+    type: z.enum(['regular']).default('regular'),
+    amount: z.number(),
+    unit: z.nativeEnum(TimeUnitEnum),
+  })
+  .strict();
+
+export const DelayTimeControlSchema = zodToJsonSchema(DelayTimeControlZodSchema) as JSONSchemaDto;
+
+export type DelayTimeControlType = z.infer<typeof DelayTimeControlZodSchema>;
+
+export const delayUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.DELAY,
   properties: {
     amount: {
@@ -17,9 +37,4 @@ const delayUiSchema: UiSchema = {
       placeholder: null,
     },
   },
-};
-
-export const delayControlSchema = {
-  schema: actionStepSchemas[ActionStepEnum.DELAY].output as unknown as JSONSchemaDto,
-  uiSchema: delayUiSchema,
 };

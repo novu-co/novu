@@ -10,6 +10,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import {
+  DeletePreferencesCommand,
+  DeletePreferencesUseCase,
   GetPreferences,
   GetPreferencesCommand,
   UpsertPreferences,
@@ -17,17 +19,21 @@ import {
   UserAuthGuard,
   UserSession,
 } from '@novu/application-generic';
-import { UserSessionData } from '@novu/shared';
+import { PreferencesTypeEnum, UserSessionData } from '@novu/shared';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { UpsertPreferencesDto } from './dtos/upsert-preferences.dto';
 
+/**
+ * @deprecated - set workflow preferences using the `/workflows` endpoint instead
+ */
 @Controller('/preferences')
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiExcludeController()
 export class PreferencesController {
   constructor(
     private upsertPreferences: UpsertPreferences,
-    private getPreferences: GetPreferences
+    private getPreferences: GetPreferences,
+    private deletePreferences: DeletePreferencesUseCase
   ) {}
 
   @Get('/')
@@ -59,13 +65,13 @@ export class PreferencesController {
   @Delete('/')
   @UseGuards(UserAuthGuard)
   async delete(@UserSession() user: UserSessionData, @Query('workflowId') workflowId: string) {
-    return this.upsertPreferences.upsertUserWorkflowPreferences(
-      UpsertUserWorkflowPreferencesCommand.create({
+    return this.deletePreferences.execute(
+      DeletePreferencesCommand.create({
+        templateId: workflowId,
         environmentId: user.environmentId,
         organizationId: user.organizationId,
         userId: user._id,
-        templateId: workflowId,
-        preferences: null,
+        type: PreferencesTypeEnum.USER_WORKFLOW,
       })
     );
   }

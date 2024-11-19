@@ -1,7 +1,7 @@
 import { IsMongoId, IsNotEmpty } from 'class-validator';
-import { UpsertPreferencesBaseCommand } from './upsert-preferences.command';
+import { UpsertPreferencesRequiredBaseCommand } from './upsert-preferences.command';
 
-export class UpsertWorkflowPreferencesCommand extends UpsertPreferencesBaseCommand {
+export class UpsertWorkflowPreferencesCommand extends UpsertPreferencesRequiredBaseCommand {
   @IsNotEmpty()
   @IsMongoId()
   readonly templateId: string;

@@ -12,8 +12,10 @@ import { ConfigureWorkflow } from './components/workflow-editor/configure-workfl
 import { ConfigureStep } from './components/workflow-editor/steps/configure-step';
 import { initializeSentry } from './utils/sentry';
 import { EditStepSidebar } from './components/workflow-editor/steps/edit-step-sidebar';
+import { overrideZodErrorMap } from './utils/validation';
 
 initializeSentry();
+overrideZodErrorMap();
 
 const router = createBrowserRouter([
   {

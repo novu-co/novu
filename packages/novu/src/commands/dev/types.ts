@@ -8,6 +8,7 @@ export type DevCommandOptions = {
   dashboardUrl: string;
   route: string;
   tunnel: string;
+  headless: boolean;
 };
 
 export type LocalTunnelResponse = {

@@ -16,6 +16,7 @@ import { ValidatedPlaceholderAggregation, ValidatePlaceholderUsecase } from '../
 import { CollectPlaceholderWithDefaultsUsecase, PlaceholderAggregation } from '../collect-placeholders';
 import { ExtractDefaultValuesFromSchemaUsecase } from '../../extract-default-values-from-schema';
 import { ValidatedContentResponse } from './validated-content.response';
+import { toSentenceCase } from '../../../../shared/services/helper/helper.service';
 import { ValidateControlByTierUsecase } from '../validate-control-by-tier/validate-control-by-tier.usecase';
 
 /**
@@ -47,7 +48,6 @@ export class PrepareAndValidateContentUsecase {
       command.controlValues,
       controlValueToValidPlaceholders
     );
-
     const issues = await this.buildIssues(
       finalPayload,
       command.previewPayloadFromDto || finalPayload, // if no payload provided no point creating issues.
@@ -100,7 +100,7 @@ export class PrepareAndValidateContentUsecase {
     const defaultControlValues = this.extractDefaultsFromSchemaUseCase.execute({
       jsonSchemaDto: jsonSchema,
     });
-    const mergedControlValues = merge(defaultControlValues, controlValues);
+    const mergedControlValues = merge(defaultControlValues, this.removeEmptyValuesFromMap(controlValues));
     Object.keys(mergedControlValues).forEach((controlValueKey) => {
       const controlValue = mergedControlValues[controlValueKey];
 
@@ -118,11 +118,26 @@ export class PrepareAndValidateContentUsecase {
       for (const problematicPlaceholder of Object.keys(placeholders.problematicPlaceholders)) {
         cleanedControlValue = this.removePlaceholdersFromText(problematicPlaceholder, cleanedControlValue);
       }
-
       mergedControlValues[controlValueKey] = cleanedControlValue; // Update mergedControlValues with cleanedControlValue
     });
 
     return { defaultControlValues, finalControlValues: mergedControlValues };
+  }
+
+  private removeEmptyValuesFromMap(controlValues: Record<string, unknown>) {
+    const filteredValues: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(controlValues)) {
+      if (typeof value !== 'string') {
+        filteredValues[key] = value;
+        continue;
+      }
+      if (value.toLowerCase().trim() !== '') {
+        filteredValues[key] = value;
+      }
+    }
+
+    return filteredValues;
   }
 
   private removePlaceholdersFromText(text: string, targetText: string) {
@@ -204,7 +219,7 @@ export class PrepareAndValidateContentUsecase {
           result[controlValueKey].push({
             issueType: StepContentIssueEnum.MISSING_VARIABLE_IN_PAYLOAD,
             variableName: item,
-            message: `[${item}] Missing Reference in payload`,
+            message: `${toSentenceCase(item)} is missing in payload`,
           });
         }
       }
@@ -224,7 +239,7 @@ export class PrepareAndValidateContentUsecase {
       result[item] = [
         {
           issueType: StepContentIssueEnum.MISSING_VALUE,
-          message: `[${item}] No Value was submitted to a required control.`,
+          message: `${toSentenceCase(item)} is missing`,
         },
       ];
     }

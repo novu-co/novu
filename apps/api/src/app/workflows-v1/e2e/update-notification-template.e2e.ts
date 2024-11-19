@@ -384,9 +384,9 @@ describe('Update workflow by id - /workflows/:workflowId (PUT)', async () => {
     const template: INotificationTemplate = body.data;
 
     const updateData: UpdateWorkflowRequestDto = {
-      name: '',
-      tags: [''],
-      description: '',
+      name: 'test email template',
+      tags: ['test-tag'],
+      description: 'This is a test description',
       steps: [
         {
           template: {

@@ -52,7 +52,7 @@ export class GeneratePreviewUsecase {
 
     return await this.prepareAndValidateContentUsecase.execute({
       stepType: stepData.type,
-      controlValues: dto.controlValues || {},
+      controlValues: dto.controlValues || stepData.controls.values,
       controlDataSchema: stepData.controls.dataSchema,
       variableSchema: stepData.variables,
       previewPayloadFromDto: dto.previewPayload,
