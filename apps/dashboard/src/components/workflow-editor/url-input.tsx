@@ -38,7 +38,6 @@ export const URLInput = ({
             <FormField
               control={control}
               name={urlKey}
-              defaultValue=""
               render={({ field }) => (
                 <FormItem className="w-full overflow-hidden">
                   <FormControl>
@@ -64,7 +63,6 @@ export const URLInput = ({
             <FormField
               control={control}
               name={targetKey}
-              defaultValue="_self"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>

@@ -783,6 +783,9 @@ importers:
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
+      lodash.merge:
+        specifier: ^4.6.2
+        version: 4.6.2
       lucide-react:
         specifier: ^0.439.0
         version: 0.439.0(react@18.3.1)
@@ -56788,7 +56791,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       superjson: 1.12.2
-      use-sync-external-store: 1.2.0(react@18.3.1)
+      use-sync-external-store: 1.2.2(react@18.3.1)
 
   '@tanstack/react-query@4.29.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:

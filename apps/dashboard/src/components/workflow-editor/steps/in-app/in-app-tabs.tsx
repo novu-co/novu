@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { FieldValues, useForm, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
 import { useBlocker, useNavigate, useParams } from 'react-router-dom';
+import merge from 'lodash.merge';
 
 import { Notification5Fill } from '@/components/icons';
 import { Button } from '@/components/primitives/button';
@@ -36,25 +37,24 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
   const { step: workflowStep } = useStep();
 
   const { dataSchema, uiSchema, values } = step.controls;
-  const schema = buildDynamicZodSchema(dataSchema ?? {});
+  const schema = useMemo(() => buildDynamicZodSchema(dataSchema ?? {}), [dataSchema]);
+  const newFormValues = useMemo(() => merge(buildDefaultValues(uiSchema ?? {}), values), [uiSchema, values]);
 
   const form = useForm({
     mode: 'onSubmit',
     resolver: zodResolver(schema),
-    resetOptions: { keepDirtyValues: true },
-    defaultValues: buildDefaultValues(uiSchema ?? {}),
-    values,
+    values: newFormValues,
     shouldFocusError: true,
   });
   const [editorValue, setEditorValue] = useState('{}');
-  const { reset, formState, setError } = form;
+  const { formState, setError } = form;
 
   const controlErrors = useMemo(() => flattenIssues(workflowStep?.issues?.controls), [workflowStep]);
 
   useEffect(() => {
     if (Object.keys(controlErrors).length) {
       Object.entries(controlErrors).forEach(([key, value]) => {
-        setError(key as any, { message: value }, { shouldFocus: true });
+        setError(key as string, { message: value }, { shouldFocus: true });
       });
     }
   }, [controlErrors, setError]);
@@ -98,16 +98,29 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
   });
 
   const onSubmit = async (data: any) => {
+    const updatedValues = Object.keys(formState.dirtyFields).reduce(
+      (acc, key) => {
+        acc[key] = data[key];
+        return acc;
+      },
+      {} as Record<string, unknown>
+    );
+
     await updateWorkflow({
       id: workflow._id,
       workflow: {
         ...workflow,
         steps: workflow.steps.map((step) =>
-          step.slug === stepSlug ? ({ ...step, controlValues: { ...data }, issues: undefined } as StepUpdateDto) : step
+          step.slug === stepSlug
+            ? ({
+                ...step,
+                controlValues: { ...values, ...updatedValues },
+                issues: undefined,
+              } as StepUpdateDto)
+            : step
         ),
       },
     });
-    reset({ ...data });
   };
 
   const preview = async (props: {
