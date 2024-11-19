@@ -64,12 +64,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   });
 
   return (
-    <Sheet
-      open={isOpen}
-      onOpenChange={(open) => {
-        setIsOpen(open);
-      }}
-    >
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger {...props} />
       <SheetContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <SheetHeader>
