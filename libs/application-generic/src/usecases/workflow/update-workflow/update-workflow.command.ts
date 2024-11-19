@@ -38,7 +38,7 @@ export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsMongoId()
   id: string;
 
-  @IsDefined()
+  @IsOptional()
   @IsString()
   @Length(1, MAX_NAME_LENGTH)
   name: string;
