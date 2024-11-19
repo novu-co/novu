@@ -3,7 +3,7 @@ import type { WorkflowResponseDto } from '@novu/shared';
 import { updateWorkflow } from '@/api/workflows';
 import { useEnvironment } from '@/context/environment/hooks';
 import { QueryKeys } from '@/utils/query-keys';
-import { getBase62Id, WORKFLOW_DIVIDER } from '@/utils/step';
+import { getEncodedId, WORKFLOW_DIVIDER } from '@/utils/step';
 
 export const useUpdateWorkflow = (
   options?: UseMutationOptions<WorkflowResponseDto, unknown, Parameters<typeof updateWorkflow>[0]>
@@ -16,7 +16,11 @@ export const useUpdateWorkflow = (
     ...options,
     onSuccess: async (data, variables, context) => {
       await queryClient.setQueryData(
-        [QueryKeys.fetchWorkflow, currentEnvironment?._id, getBase62Id({ slug: data.slug, divider: WORKFLOW_DIVIDER })],
+        [
+          QueryKeys.fetchWorkflow,
+          currentEnvironment?._id,
+          getEncodedId({ slug: data.slug, divider: WORKFLOW_DIVIDER }),
+        ],
         data
       );
       options?.onSuccess?.(data, variables, context);

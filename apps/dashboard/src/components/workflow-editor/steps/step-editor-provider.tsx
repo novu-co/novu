@@ -5,7 +5,7 @@ import { StepTypeEnum } from '@novu/shared';
 import { StepEditorContext } from './step-editor-context';
 import { useFetchStep } from '@/hooks/use-fetch-step';
 import { useWorkflowEditorContext } from '../hooks';
-import { getBase62Id, STEP_DIVIDER } from '@/utils/step';
+import { getEncodedId, STEP_DIVIDER } from '@/utils/step';
 import { EXCLUDED_EDITOR_TYPES } from '@/utils/constants';
 
 export const StepEditorProvider = ({ children }: { children: ReactNode }) => {
@@ -21,8 +21,8 @@ export const StepEditorProvider = ({ children }: { children: ReactNode }) => {
       navigationStepType ??
       workflow?.steps.find(
         (el) =>
-          getBase62Id({ slug: el.slug, divider: STEP_DIVIDER }) ===
-          getBase62Id({ slug: stepSlug, divider: STEP_DIVIDER })
+          getEncodedId({ slug: el.slug, divider: STEP_DIVIDER }) ===
+          getEncodedId({ slug: stepSlug, divider: STEP_DIVIDER })
       )?.type,
     [navigationStepType, stepSlug, workflow]
   );

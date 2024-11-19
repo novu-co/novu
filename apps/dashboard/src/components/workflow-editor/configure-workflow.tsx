@@ -130,7 +130,7 @@ export function ConfigureWorkflow() {
                 <FormControl>
                   <InputField>
                     <Input
-                      placeholder="Untitled"
+                      placeholder="New workflow"
                       {...field}
                       disabled={isReadOnly}
                       onFocus={() => setIsBlurred(false)}

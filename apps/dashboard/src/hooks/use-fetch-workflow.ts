@@ -4,12 +4,12 @@ import type { WorkflowResponseDto } from '@novu/shared';
 import { QueryKeys } from '@/utils/query-keys';
 import { fetchWorkflow } from '@/api/workflows';
 import { useEnvironment } from '@/context/environment/hooks';
-import { getBase62Id, WORKFLOW_DIVIDER } from '@/utils/step';
+import { getEncodedId, WORKFLOW_DIVIDER } from '@/utils/step';
 
 export const useFetchWorkflow = ({ workflowSlug }: { workflowSlug?: string }) => {
   const { currentEnvironment } = useEnvironment();
   const workflowId = useMemo(
-    () => getBase62Id({ slug: workflowSlug ?? '', divider: WORKFLOW_DIVIDER }),
+    () => getEncodedId({ slug: workflowSlug ?? '', divider: WORKFLOW_DIVIDER }),
     [workflowSlug]
   );
 
