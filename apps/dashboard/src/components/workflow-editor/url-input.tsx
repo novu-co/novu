@@ -1,10 +1,12 @@
-import { liquid } from '@codemirror/lang-liquid';
 import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessagePure } from '@/components/primitives/form/form';
 import { Input, InputField, InputFieldProps, InputProps } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
+import { completions } from '@/utils/liquid-autocomplete';
+import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
+import { autocompletion } from '@codemirror/autocomplete';
 
 type URLInputProps = Omit<InputProps, 'value' | 'onChange' | 'size'> & {
   options: string[];
@@ -14,7 +16,7 @@ type URLInputProps = Omit<InputProps, 'value' | 'onChange' | 'size'> & {
     urlKey: string;
     targetKey: string;
   };
-  variables: Array<{ type: string; label: string }>;
+  variables: LiquidVariable[];
 } & Pick<InputFieldProps, 'size'>;
 
 export const URLInput = ({
@@ -46,11 +48,7 @@ export const URLInput = ({
                       <Editor
                         fontFamily="inherit"
                         placeholder={placeholder}
-                        extensions={[
-                          liquid({
-                            variables,
-                          }),
-                        ]}
+                        extensions={[autocompletion({ override: [completions(variables)] })]}
                         value={field.value}
                         onChange={field.onChange}
                       />

@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.15.1",
-    "@codemirror/lang-liquid": "^6.2.1",
+    "@codemirror/autocomplete": "^6.18.3",
     "@hookform/resolvers": "^3.9.0",
     "@lezer/highlight": "^1.2.1",
     "@novu/framework": "workspace:*",
