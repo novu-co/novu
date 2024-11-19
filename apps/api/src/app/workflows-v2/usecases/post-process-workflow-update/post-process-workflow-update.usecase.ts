@@ -1,29 +1,16 @@
 import {
-  ApiServiceLevelEnum,
   ContentIssue,
-  ControlValuesLevelEnum,
-  DigestUnitEnum,
   RuntimeIssue,
-  StepContentIssueEnum,
   StepCreateAndUpdateKeys,
   StepIssue,
   StepIssueEnum,
   StepIssues,
   StepIssuesDto,
-  StepTypeEnum,
-  UserSessionData,
   WorkflowIssueTypeEnum,
   WorkflowResponseDto,
   WorkflowStatusEnum,
 } from '@novu/shared';
-import {
-  ControlValuesRepository,
-  NotificationStepEntity,
-
-  NotificationTemplateRepository,
-  OrganizationEntity,
-  OrganizationRepository,
-} from '@novu/dal';
+import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
 import { Injectable } from '@nestjs/common';
 import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, WorkflowInternalResponseDto } from '@novu/application-generic';
 
@@ -120,27 +107,6 @@ export class PostProcessWorkflowUpdate {
     }
 
     return stepIdToIssues;
-  }
-
-  private async getValues(
-    _stepId: string,
-    _workflowId: string,
-    _environmentId: string,
-    _organizationId: string
-  ): Promise<Record<string, unknown> | null> {
-    const controlValuesEntity = await this.controlValuesRepository.findOne({
-      _environmentId,
-      _organizationId,
-      _workflowId,
-      _stepId,
-      level: ControlValuesLevelEnum.STEP_CONTROLS,
-    });
-
-    if (!Object.keys(controlValuesEntity?.controls || {}).length) {
-      return null;
-    }
-
-    return controlValuesEntity?.controls ?? null;
   }
 
   private async validateWorkflow(
