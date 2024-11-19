@@ -8,7 +8,7 @@ export const SignUpPage = () => {
   return (
     <>
       <PageMeta title="Sign up" />
-      <div className="flex flex-col items-start justify-start gap-4">
+      <div className="flex flex-col items-start justify-start gap-[18px]">
         <SignUpForm
           path={ROUTES.SIGN_UP}
           signInUrl={ROUTES.SIGN_IN}

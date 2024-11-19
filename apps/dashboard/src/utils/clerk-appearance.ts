@@ -1,5 +1,15 @@
 export const clerkAppearance = {
   elements: {
+    headerTitle: {
+      fontWeight: '500',
+    },
+    headerSubtitle: {
+      fontSize: '12px',
+    },
+    formFieldLabel: {
+      fontSize: '12px !important',
+      fontWeight: '500',
+    },
     footer: {
       background: 'linear-gradient(0deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.02) 100%), #FFF',
     },
