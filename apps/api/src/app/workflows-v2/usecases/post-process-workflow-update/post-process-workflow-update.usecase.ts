@@ -17,8 +17,6 @@ import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, WorkflowInternalResponseDto }
 import { PostProcessWorkflowUpdateCommand } from './post-process-workflow-update.command';
 import { OverloadContentDataOnWorkflowUseCase } from '../overload-content-data';
 
-const MAX_NUMBER_OF_TAGS = 16;
-
 /**
  * Post-processes workflow updates by validating and updating workflow status.
  *
