@@ -61,18 +61,18 @@ const InAppRenderOutputSchema = z.object({
   avatar: z.string().optional(),
   primaryAction: z
     .object({
-      label: z.string(),
+      label: z.string().optional(),
       redirect: z.object({
-        url: z.string(),
+        url: z.string().optional(),
         target: RedirectTargetEnumSchema.optional(), // Optional target
       }),
     })
     .optional(),
   secondaryAction: z
     .object({
-      label: z.string(),
+      label: z.string().optional(),
       redirect: z.object({
-        url: z.string(),
+        url: z.string().optional(),
         target: RedirectTargetEnumSchema.optional(), // Optional target
       }),
     })
@@ -80,7 +80,7 @@ const InAppRenderOutputSchema = z.object({
   data: z.record(z.unknown()).optional(), // Optional data
   redirect: z
     .object({
-      url: z.string(),
+      url: z.string().optional(),
       target: RedirectTargetEnumSchema.optional(), // Optional target
     })
     .optional(),

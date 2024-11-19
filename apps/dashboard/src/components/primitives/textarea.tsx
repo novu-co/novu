@@ -26,9 +26,25 @@ const textareaVariants = cva(
 
 export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & VariantProps<typeof textareaVariants>;
 
-const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, state, size, ...props }, ref) => {
-  return <textarea className={cn(textareaVariants({ state, size }), className)} ref={ref} {...props} />;
-});
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ className, state, size, maxLength, ...props }, ref) => {
+    return (
+      <>
+        <textarea
+          className={cn(textareaVariants({ state, size }), className)}
+          ref={ref}
+          maxLength={maxLength}
+          {...props}
+        />
+        {maxLength !== undefined && (
+          <div className="text-foreground-400 mt-1 text-right text-xs">
+            {String(props.value).length}/{maxLength}
+          </div>
+        )}
+      </>
+    );
+  }
+);
 Textarea.displayName = 'Textarea';
 
 export { Textarea };
