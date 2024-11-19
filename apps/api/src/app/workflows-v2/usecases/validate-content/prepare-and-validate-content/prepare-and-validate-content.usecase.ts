@@ -16,7 +16,7 @@ import { ValidatedPlaceholderAggregation, ValidatePlaceholderUsecase } from '../
 import { CollectPlaceholderWithDefaultsUsecase, PlaceholderAggregation } from '../collect-placeholders';
 import { ExtractDefaultValuesFromSchemaUsecase } from '../../extract-default-values-from-schema';
 import { ValidatedContentResponse } from './validated-content.response';
-import { ValidateControlByTierUsecase } from '../validateControlByTier/validate-control-by-tier.usecase';
+import { ValidateControlByTierUsecase } from '../validate-control-by-tier/validate-control-by-tier.usecase';
 
 /**
  * Validates and prepares workflow step content by collecting placeholders,
