@@ -36,11 +36,9 @@ export class DigestOutputRendererUsecase {
         digestKey: parse.digestKey,
       };
     }
-    throw new DigestRenderProblem(renderCommand.controlValues);
-  }
-}
-class DigestRenderProblem extends InternalServerErrorException {
-  constructor(controlValues: Record<string, unknown>) {
-    super({ message: `Invalid digest control value data sent for rendering`, controlValues });
+    throw new InternalServerErrorException({
+      message: `Invalid digest control value data sent for rendering`,
+      controlValues: renderCommand.controlValues,
+    });
   }
 }
