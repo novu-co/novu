@@ -1,5 +1,6 @@
 import {
   ArrayUnique,
+  ArrayMaxSize,
   IsArray,
   IsBoolean,
   IsDefined,
@@ -59,6 +60,7 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsArray()
   @ArrayUnique()
   @Length(1, MAX_TAG_LENGTH, { each: true })
+  @ArrayMaxSize(MAX_TAG_ELEMENTS)
   tags?: string[];
 
   @IsBoolean()
