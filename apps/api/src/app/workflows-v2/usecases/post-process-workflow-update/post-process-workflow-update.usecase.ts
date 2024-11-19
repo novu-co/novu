@@ -12,7 +12,7 @@ import {
 } from '@novu/shared';
 import { NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
 import { Injectable } from '@nestjs/common';
-import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, WorkflowInternalResponseDto } from '@novu/application-generic';
+import { WorkflowInternalResponseDto } from '@novu/application-generic';
 
 import { PostProcessWorkflowUpdateCommand } from './post-process-workflow-update.command';
 import { OverloadContentDataOnWorkflowUseCase } from '../overload-content-data';
@@ -99,32 +99,8 @@ export class PostProcessWorkflowUpdate {
     // @ts-ignore
     const issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]> = {};
     await this.addTriggerIdentifierNotUniqueIfApplicable(command, issues);
-    this.addNameMissingIfApplicable(command, issues);
-    this.addDescriptionTooLongIfApplicable(command, issues);
-    this.addTagsIssues(command, issues);
 
     return issues;
-  }
-
-  private addNameMissingIfApplicable(
-    command: PostProcessWorkflowUpdateCommand,
-    issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
-  ) {
-    if (!command.workflow.name || command.workflow.name.trim() === '') {
-      // eslint-disable-next-line no-param-reassign
-      issues.name = [{ issueType: WorkflowIssueTypeEnum.MISSING_VALUE, message: 'Name is missing' }];
-    }
-  }
-  private addDescriptionTooLongIfApplicable(
-    command: PostProcessWorkflowUpdateCommand,
-    issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
-  ) {
-    if (command.workflow.description && command.workflow.description.length > MAX_DESCRIPTION_LENGTH) {
-      // eslint-disable-next-line no-param-reassign
-      issues.description = [
-        { issueType: WorkflowIssueTypeEnum.MAX_LENGTH_ACCESSED, message: 'Description is too long' },
-      ];
-    }
   }
 
   private async addTriggerIdentifierNotUniqueIfApplicable(
@@ -176,44 +152,5 @@ export class PostProcessWorkflowUpdate {
     }
 
     return { ...workflow, issues };
-  }
-  private addTagsIssues(
-    command: PostProcessWorkflowUpdateCommand,
-    issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
-  ) {
-    const tags = command.workflow.tags?.map((tag) => tag.trim());
-
-    if (!tags.length) {
-      return;
-    }
-
-    const tagsIssues: RuntimeIssue[] = [];
-
-    const duplicatedTags = tags.filter((tag, index) => tags.indexOf(tag) !== index);
-    const hasDuplications = duplicatedTags.length > 0;
-    if (hasDuplications) {
-      tagsIssues.push({
-        issueType: WorkflowIssueTypeEnum.DUPLICATED_VALUE,
-        message: `Duplicated tags: ${duplicatedTags.join(', ')}`,
-      });
-    }
-
-    const hasEmptyTags = tags?.some((tag) => !tag || tag === '');
-    if (hasEmptyTags) {
-      tagsIssues.push({ issueType: WorkflowIssueTypeEnum.MISSING_VALUE, message: 'Empty tag value' });
-    }
-
-    const exceedsMaxLength = tags?.some((tag) => tag.length > MAX_TAG_ELEMENTS);
-    if (exceedsMaxLength) {
-      tagsIssues.push({
-        issueType: WorkflowIssueTypeEnum.LIMIT_REACHED,
-        message: `Exceeded the ${MAX_TAG_ELEMENTS} tag limit`,
-      });
-    }
-
-    if (tagsIssues.length > 0) {
-      // eslint-disable-next-line no-param-reassign
-      issues.tags = tagsIssues;
-    }
   }
 }
