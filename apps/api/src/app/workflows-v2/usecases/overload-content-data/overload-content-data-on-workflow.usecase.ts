@@ -27,9 +27,7 @@ export class OverloadContentDataOnWorkflowUseCase {
       if (!step.issues?.controls) {
         step.issues.controls = {};
       }
-      const validatedIssues = validatedContentResponses[step._templateId].issues;
-      const stepControlIssues = step.issues.controls;
-      step.issues.controls = stepControlIssues ? mergeObjects(stepControlIssues, validatedIssues) : validatedIssues;
+      step.issues.controls = validatedContentResponses[step._templateId].issues;
     }
 
     return command.workflow;
@@ -51,9 +49,13 @@ export class OverloadContentDataOnWorkflowUseCase {
         stepDatabaseId: step._templateId,
       });
       validatedStepContent[step._templateId] = await this.prepareAndValidateContentUsecase.execute({
+        stepType: step?.template?.type,
         controlDataSchema: controls.schema,
         controlValues,
         variableSchema: jsonSchemaDto,
+        environmentId: user.environmentId,
+        organizationId: user.organizationId,
+        userId: user._id,
       });
     }
 

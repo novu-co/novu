@@ -144,8 +144,16 @@ describe('Workflow Controller E2E API Testing', () => {
       });
 
       it('should show digest control value issues when illegal value provided', async () => {
-        const steps = [{ ...buildDigestStep({ controlValues: { amount: '30', unit: 'seconds' } }) }];
+        const steps = [{ ...buildDigestStep({ controlValues: { amount: '555', unit: 'days' } }) }];
         const { issues, status } = await createWorkflowAndReturnStepIssues({ steps }, 0);
+        expect(status).to.equal(WorkflowStatusEnum.ERROR);
+        expect(issues.controls?.tier).to.deep.equal([
+          {
+            issueType: 'TIER_LIMIT_EXCEEDED',
+            message:
+              'The maximum delay allowed is 90 days.Please contact our support team to discuss extending this limit for your use case.',
+          },
+        ]);
       });
     });
   });

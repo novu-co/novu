@@ -30,8 +30,6 @@ import { PostProcessWorkflowUpdateCommand } from './post-process-workflow-update
 import { OverloadContentDataOnWorkflowUseCase } from '../overload-content-data';
 
 const MAX_NUMBER_OF_TAGS = 16;
-const MAX_DELAY_DAYS_FREE_TIER = 30;
-const MAX_DELAY_DAYS_BUSINESS_TIER = 90;
 
 /**
  * Post-processes workflow updates by validating and updating workflow status.
@@ -55,7 +53,7 @@ export class PostProcessWorkflowUpdate {
 
   async execute(command: PostProcessWorkflowUpdateCommand): Promise<NotificationTemplateEntity> {
     const workflowIssues = await this.validateWorkflow(command);
-    const stepIssues = await this.validateSteps(command.workflow.steps, command.workflow._id, command.user);
+    const stepIssues = this.validateSteps(command.workflow.steps, command.workflow._id);
     let transientWorkflow = this.updateIssuesOnWorkflow(command.workflow, workflowIssues, stepIssues);
 
     transientWorkflow = await this.overloadContentDataOnWorkflowUseCase.execute({
@@ -111,161 +109,17 @@ export class PostProcessWorkflowUpdate {
     return issue.body && Object.keys(issue.body).length > 0;
   }
 
-  private async validateSteps(
-    steps: NotificationStepEntity[],
-    _workflowId: string,
-    user: UserSessionData
-  ): Promise<Record<string, StepIssuesDto>> {
+  private validateSteps(steps: NotificationStepEntity[], _workflowId: string): Record<string, StepIssuesDto> {
     const stepIdToIssues: Record<string, StepIssuesDto> = {};
 
-    await Promise.all(
-      steps.map(async (step) => {
-        stepIdToIssues[step._templateId] = {
-          body: this.addStepBodyIssues(step),
-          controls: await this.buildControlIssues(step, _workflowId, user),
-        };
-      })
-    );
+    for (const step of steps) {
+      stepIdToIssues[step._templateId] = {
+        body: this.addStepBodyIssues(step),
+        controls: step.issues?.controls,
+      };
+    }
 
     return stepIdToIssues;
-  }
-
-  private async buildControlIssues(step: NotificationStepEntity, _workflowId: string, user: UserSessionData) {
-    const issues: Record<string, ContentIssue[]> = { ...(step.issues?.controls || {}) };
-
-    const controlValueNeedAdditionValidation =
-      step.template?.type !== StepTypeEnum.DIGEST && step.template?.type !== StepTypeEnum.DELAY;
-
-    if (controlValueNeedAdditionValidation || !step.template?._id) {
-      return issues;
-    }
-
-    const controlValues = await this.getValues(step._templateId, _workflowId, user.environmentId, user.organizationId);
-
-    if (!controlValues) {
-      return issues;
-    }
-
-    if (controlValues.unit && !controlValues.amount) {
-      issues.amount = [
-        ...(issues.amount || []),
-        {
-          issueType: StepContentIssueEnum.MISSING_VALUE,
-          message: 'Amount is missing',
-        },
-      ];
-    }
-
-    if (!controlValues.unit && controlValues.amount) {
-      issues.unit = [
-        ...(issues.unit || []),
-        {
-          issueType: StepContentIssueEnum.MISSING_VALUE,
-          message: 'Unit is missing',
-        },
-      ];
-    }
-
-    if (controlValues.amount && !this.isNumber(controlValues.amount)) {
-      issues.amount = [
-        ...(issues.amount || []),
-        {
-          issueType: StepContentIssueEnum.ILLEGAL_VARIABLE_IN_CONTROL_VALUE,
-          message: 'Amount must be a number',
-        },
-      ];
-    }
-
-    if (controlValues.unit && !this.isValidDigestUnit(controlValues.unit)) {
-      issues.unit = [
-        ...(issues.unit || []),
-        {
-          issueType: StepContentIssueEnum.ILLEGAL_VARIABLE_IN_CONTROL_VALUE,
-          message: 'Unit is not valid',
-        },
-      ];
-    }
-
-    let organization: OrganizationEntity | null = null;
-    if (
-      controlValues.unit &&
-      controlValues.amount &&
-      this.isNumber(controlValues.amount) &&
-      this.isValidDigestUnit(controlValues.unit)
-    ) {
-      organization = await this.getOrganization(organization, user.organizationId);
-
-      const delayInDays = this.calculateDaysFromUnit(controlValues.amount, controlValues.unit);
-
-      const tier = organization?.apiServiceLevel;
-      if (tier === undefined || tier === ApiServiceLevelEnum.BUSINESS || tier === ApiServiceLevelEnum.ENTERPRISE) {
-        if (delayInDays > MAX_DELAY_DAYS_BUSINESS_TIER) {
-          issues.tier = [
-            ...(issues.tier || []),
-            {
-              issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
-              message:
-                `The maximum delay allowed is ${MAX_DELAY_DAYS_BUSINESS_TIER} days.` +
-                'Please contact our support team to discuss extending this limit for your use case.',
-            },
-          ];
-        }
-      }
-
-      if (tier === ApiServiceLevelEnum.FREE) {
-        if (delayInDays > MAX_DELAY_DAYS_FREE_TIER) {
-          issues.tier = [
-            ...(issues.tier || []),
-            {
-              issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
-              message:
-                `The maximum delay allowed is ${MAX_DELAY_DAYS_FREE_TIER} days.` +
-                'Please contact our support team to discuss extending this limit for your use case.',
-            },
-          ];
-        }
-      }
-    }
-
-    return issues;
-  }
-
-  private isValidDigestUnit(unit: unknown): unit is DigestUnitEnum {
-    return Object.values(DigestUnitEnum).includes(unit as DigestUnitEnum);
-  }
-
-  private isNumber(value: unknown): value is number {
-    return !Number.isNaN(Number(value));
-  }
-
-  private calculateDaysFromUnit(amount: number, unit: DigestUnitEnum): number {
-    switch (unit) {
-      case DigestUnitEnum.SECONDS:
-        return amount / (24 * 60 * 60);
-      case DigestUnitEnum.MINUTES:
-        return amount / (24 * 60);
-      case DigestUnitEnum.HOURS:
-        return amount / 24;
-      case DigestUnitEnum.DAYS:
-        return amount;
-      case DigestUnitEnum.WEEKS:
-        return amount * 7;
-      case DigestUnitEnum.MONTHS:
-        return amount * 30; // Using 30 days as an approximation for a month
-      default:
-        return 0;
-    }
-  }
-
-  private async getOrganization(
-    organization: OrganizationEntity | null,
-    organizationId: string
-  ): Promise<OrganizationEntity | null> {
-    if (organization === null) {
-      return await this.organizationRepository.findById(organizationId);
-    }
-
-    return organization;
   }
 
   private async getValues(
