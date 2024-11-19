@@ -1,7 +1,10 @@
-import { useState } from 'react';
-import * as z from 'zod';
 import { useFormContext } from 'react-hook-form';
 import { motion } from 'framer-motion';
+import { useLayoutEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import * as z from 'zod';
+// import { RiArrowRightSLine, RiSettingsLine } from 'react-icons/ri';
+
 import { RouteFill } from '../icons';
 import { Input, InputField } from '../primitives/input';
 import { Separator } from '../primitives/separator';
@@ -18,14 +21,40 @@ import { SidebarContent, SidebarHeader } from '@/components/side-navigation/Side
 import { PageMeta } from '../page-meta';
 import { ConfirmationModal } from '../confirmation-modal';
 import { PAUSE_MODAL_DESCRIPTION, PAUSE_MODAL_TITLE } from '@/utils/constants';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { useEnvironment } from '@/context/environment/hooks';
 
 export function ConfigureWorkflow() {
   const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
   const tagsQuery = useTagsQuery();
-  const { isReadOnly } = useWorkflowEditorContext();
+  const { isReadOnly, workflow } = useWorkflowEditorContext();
+  const { currentEnvironment } = useEnvironment();
+  const { workflowSlug } = useParams<{ workflowSlug: string }>();
+  const navigate = useNavigate();
+  const [isBlurred, setIsBlurred] = useState(false);
 
   const { control, watch, setValue } = useFormContext<z.infer<typeof workflowSchema>>();
   const workflowName = watch('name');
+  const isWorkflowSlugChanged = workflow && workflow?.slug && workflowSlug !== workflow?.slug;
+  const shouldUpdateWorkflowSlug = isBlurred && isWorkflowSlugChanged;
+
+  useLayoutEffect(() => {
+    if (shouldUpdateWorkflowSlug) {
+      setTimeout(() => {
+        navigate(
+          buildRoute(ROUTES.EDIT_WORKFLOW, {
+            environmentSlug: currentEnvironment?.slug ?? '',
+            workflowSlug: workflow?.slug ?? '',
+          }),
+          {
+            replace: true,
+            state: { skipAnimation: true },
+          }
+        );
+      }, 0);
+      setIsBlurred(false);
+    }
+  }, [shouldUpdateWorkflowSlug, workflow?.slug, currentEnvironment?.slug, navigate]);
 
   const onPauseWorkflow = () => {
     setValue('active', false, { shouldValidate: true, shouldDirty: true });
@@ -100,7 +129,13 @@ export function ConfigureWorkflow() {
                 <FormLabel>Workflow Name</FormLabel>
                 <FormControl>
                   <InputField>
-                    <Input placeholder="Untitled" {...field} disabled={isReadOnly} />
+                    <Input
+                      placeholder="New workflow"
+                      {...field}
+                      disabled={isReadOnly}
+                      onFocus={() => setIsBlurred(false)}
+                      onBlur={() => setIsBlurred(true)}
+                    />
                   </InputField>
                 </FormControl>
                 <FormMessage />

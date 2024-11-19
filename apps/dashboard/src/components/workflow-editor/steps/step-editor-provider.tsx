@@ -5,7 +5,7 @@ import { StepTypeEnum } from '@novu/shared';
 import { StepEditorContext } from './step-editor-context';
 import { useFetchStep } from '@/hooks/use-fetch-step';
 import { useWorkflowEditorContext } from '../hooks';
-import { getStepBase62Id } from '@/utils/step';
+import { getEncodedId, STEP_DIVIDER } from '@/utils/step';
 
 export const StepEditorProvider = ({ children }: { children: ReactNode }) => {
   const { workflowSlug = '', stepSlug = '' } = useParams<{
@@ -27,7 +27,12 @@ export const StepEditorProvider = ({ children }: { children: ReactNode }) => {
   const navigationStepType = state?.stepType as StepTypeEnum | undefined;
   const stepType = useMemo(
     () =>
-      navigationStepType ?? workflow?.steps.find((el) => getStepBase62Id(el.slug) === getStepBase62Id(stepSlug))?.type,
+      navigationStepType ??
+      workflow?.steps.find(
+        (el) =>
+          getEncodedId({ slug: el.slug, divider: STEP_DIVIDER }) ===
+          getEncodedId({ slug: stepSlug, divider: STEP_DIVIDER })
+      )?.type,
     [navigationStepType, stepSlug, workflow]
   );
 
