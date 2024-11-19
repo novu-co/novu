@@ -38,10 +38,7 @@ const LANGUAGE_TO_SNIPPET_UTIL: Record<SnippetLanguage, (props: CodeSnippet) => 
 };
 
 export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto }) => {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext<TestWorkflowFormType>();
+  const { control } = useFormContext<TestWorkflowFormType>();
   const [activeSnippetTab, setActiveSnippetTab] = useState<SnippetLanguage>(() =>
     workflow?.origin === WorkflowOriginEnum.EXTERNAL ? 'framework' : 'typescript'
   );
@@ -72,7 +69,7 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
                     <FormItem>
                       <FormLabel htmlFor={key}>{capitalize(key)}</FormLabel>
                       <FormControl>
-                        <InputField state={errors.to?.[key] ? 'error' : 'default'}>
+                        <InputField>
                           <Input id={key} {...(field as any)} />
                         </InputField>
                       </FormControl>

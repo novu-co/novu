@@ -14,10 +14,7 @@ import { useStepEditorContext } from '../hooks';
 const subjectKey = 'subject';
 
 export const InAppSubject = () => {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext();
+  const { control } = useFormContext();
   const { step } = useStepEditorContext();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
 
@@ -26,7 +23,7 @@ export const InAppSubject = () => {
       control={control}
       name={subjectKey}
       render={({ field }) => (
-        <InputField state={errors[subjectKey] ? 'error' : 'default'} size="fit">
+        <InputField size="fit">
           <FormItem className="w-full">
             <FormControl>
               <Editor

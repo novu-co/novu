@@ -9,11 +9,7 @@ import { useFormContext } from 'react-hook-form';
 
 export function TextWidget(props: WidgetProps) {
   const { label, readonly, name } = props;
-
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext();
+  const { control } = useFormContext();
 
   return (
     <FormField
@@ -23,7 +19,7 @@ export function TextWidget(props: WidgetProps) {
         <FormItem className="my-2 w-full py-1">
           <FormLabel>{capitalize(label)}</FormLabel>
           <FormControl>
-            <InputField className="px-1" state={errors[name] ? 'error' : 'default'}>
+            <InputField className="px-1">
               <Editor
                 fontFamily="inherit"
                 placeholder={capitalize(label)}

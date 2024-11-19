@@ -111,7 +111,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <InputField state={errors['name']?.message ? 'error' : 'default'}>
+                      <InputField>
                         <Input
                           {...field}
                           autoFocus
