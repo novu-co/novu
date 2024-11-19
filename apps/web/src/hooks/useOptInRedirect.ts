@@ -16,8 +16,7 @@ export const useOptInRedirect = () => {
   const isUserOptedIn = isLoaded && status && status === NewDashboardOptInStatusEnum.OPTED_IN;
   const dashboardV2HostName = window.location.hostname.includes('dashboard-v2');
 
-  const shouldHandleOptInRedirect =
-    IS_EE_AUTH_ENABLED && isNewDashboardEnabled && isUserOptedIn && !dashboardV2HostName;
+  const shouldHandleOptInRedirect = IS_EE_AUTH_ENABLED && isNewDashboardEnabled && isUserOptedIn && dashboardV2HostName;
 
   useLayoutEffect(() => {
     if (shouldHandleOptInRedirect) {
