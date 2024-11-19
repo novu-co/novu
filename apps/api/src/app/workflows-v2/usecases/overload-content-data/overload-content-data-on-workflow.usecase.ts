@@ -53,9 +53,7 @@ export class OverloadContentDataOnWorkflowUseCase {
         controlDataSchema: controls.schema,
         controlValues,
         variableSchema: jsonSchemaDto,
-        environmentId: user.environmentId,
-        organizationId: user.organizationId,
-        userId: user._id,
+        user,
       });
     }
 

@@ -56,9 +56,7 @@ export class GeneratePreviewUsecase {
       controlDataSchema: stepData.controls.dataSchema,
       variableSchema: stepData.variables,
       previewPayloadFromDto: dto.previewPayload,
-      environmentId: user.environmentId,
-      organizationId: user.organizationId,
-      userId: user._id,
+      user,
     });
   }
 

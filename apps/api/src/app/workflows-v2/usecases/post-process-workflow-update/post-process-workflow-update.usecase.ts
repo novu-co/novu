@@ -47,7 +47,6 @@ export class PostProcessWorkflowUpdate {
   constructor(
     private notificationTemplateRepository: NotificationTemplateRepository,
     private controlValuesRepository: ControlValuesRepository,
-    private organizationRepository: OrganizationRepository,
     private overloadContentDataOnWorkflowUseCase: OverloadContentDataOnWorkflowUseCase
   ) {}
 
