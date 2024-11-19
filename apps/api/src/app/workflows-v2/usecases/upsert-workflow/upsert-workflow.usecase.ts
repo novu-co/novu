@@ -57,12 +57,6 @@ export class UpsertWorkflowUseCase {
     return toResponseWorkflowDto(persistedWorkflow);
   }
 
-  private async getWorkflow(workflowId: string, environmentId: string): Promise<NotificationTemplateEntity> {
-    const entity = await this.notificationTemplateRepository.findById(workflowId, environmentId);
-    if (!entity) {
-      throw new WorkflowNotFoundException(workflowId);
-    }
-
   private async getWorkflow(workflowId: string, command: UpsertWorkflowCommand): Promise<WorkflowInternalResponseDto> {
     return await this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({
