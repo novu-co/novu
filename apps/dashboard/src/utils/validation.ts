@@ -13,7 +13,6 @@ const pluralize = (count: number | bigint) => (count === 1 ? '' : 's');
  */
 const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
   const issueField = getIssueField(issue);
-  console.log({ issueField, issue });
 
   if (issue.code === z.ZodIssueCode.too_big) {
     if (issue.type === 'array') {

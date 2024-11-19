@@ -1,7 +1,6 @@
 import * as z from 'zod';
 import type { JSONSchemaDefinition } from '@novu/shared';
 import { StepTypeEnum } from '@/utils/enums';
-import { capitalize } from '@/utils/string';
 
 const enabledSchema = z.object({
   enabled: z.boolean(),
