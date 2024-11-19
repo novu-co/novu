@@ -9,11 +9,10 @@ const redirectSchema = {
     target: {
       type: 'string',
       enum: ['_self', '_blank', '_parent', '_top', '_unfencedTop'],
-      default: '_blank', // Default value for target
+      default: '_blank',
     },
   },
-  required: ['url'], // url remains required
-  additionalProperties: false, // No additional properties allowed
+  additionalProperties: false,
 } as const satisfies JSONSchemaDto;
 
 const actionSchema = {
@@ -32,8 +31,8 @@ export const inAppControlSchema = {
     subject: { type: 'string' },
     body: { type: 'string' },
     avatar: { type: 'string' },
-    primaryAction: actionSchema, // Nested primaryAction
-    secondaryAction: actionSchema, // Nested secondaryAction
+    primaryAction: actionSchema,
+    secondaryAction: actionSchema,
     data: { type: 'object', additionalProperties: true },
     redirect: redirectSchema,
   },

@@ -1,4 +1,3 @@
-import { liquid } from '@codemirror/lang-liquid';
 import { EditorView } from '@uiw/react-codemirror';
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -8,6 +7,7 @@ import { FormControl, FormField, FormItem, FormMessage } from '@/components/prim
 import { InputField } from '@/components/primitives/input';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
+import { liquid } from '@codemirror/lang-liquid';
 import { useStepEditorContext } from '../hooks';
 
 const bodyKey = 'body';
@@ -38,6 +38,9 @@ export const InAppBody = () => {
                   }),
                   EditorView.lineWrapping,
                 ]}
+                basicSetup={{
+                  defaultKeymap: true,
+                }}
                 ref={field.ref}
                 value={field.value}
                 onChange={(val) => field.onChange(val)}
@@ -45,7 +48,7 @@ export const InAppBody = () => {
               />
             </InputField>
           </FormControl>
-          <FormMessage>{`This supports markdown and variables, type {{ for more.`}</FormMessage>
+          <FormMessage>{`Type {{ for variables, or wrap text in ** for bold.`}</FormMessage>
         </FormItem>
       )}
     />

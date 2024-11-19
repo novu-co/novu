@@ -3,6 +3,7 @@ import { FaCode } from 'react-icons/fa6';
 import {
   RiDeleteBin2Line,
   RiFileCopyLine,
+  RiFlashlightLine,
   RiGitPullRequestFill,
   RiMore2Fill,
   RiPauseCircleLine,
@@ -10,6 +11,7 @@ import {
   RiPulseFill,
 } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
+import { type ExternalToast } from 'sonner';
 import { IEnvironment, WorkflowListResponseDto } from '@novu/shared';
 import { Badge } from '@/components/primitives/badge';
 import { Button } from '@/components/primitives/button';
@@ -37,18 +39,28 @@ import { WorkflowTags } from '@/components/workflow-tags';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
 import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
-import { WorkflowOriginEnum } from '@/utils/enums';
+import { WorkflowOriginEnum, WorkflowStatusEnum } from '@/utils/enums';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { ConfirmationModal } from './confirmation-modal';
 import { showToast } from './primitives/sonner-helpers';
 import { ToastIcon } from './primitives/sonner';
+import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
+import { PAUSE_MODAL_DESCRIPTION, PAUSE_MODAL_TITLE } from '@/utils/constants';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
 };
 
+const toastOptions: ExternalToast = {
+  position: 'bottom-right',
+  classNames: {
+    toast: 'mb-4 right-0',
+  },
+};
+
 export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
   const { currentEnvironment } = useEnvironment();
   const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
 
@@ -69,7 +81,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         workflowSlug: workflow.slug,
       });
 
-  const { deleteWorkflow, isPending } = useDeleteWorkflow({
+  const { deleteWorkflow, isPending: isDeleteWorkflowPending } = useDeleteWorkflow({
     onSuccess: () => {
       showToast({
         children: () => (
@@ -78,12 +90,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             <span className="text-sm">Deleted</span>
           </>
         ),
-        options: {
-          position: 'bottom-right',
-          classNames: {
-            toast: 'mb-4 right-0',
-          },
-        },
+        options: toastOptions,
       });
     },
     onError: () => {
@@ -94,12 +101,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             <span className="text-sm">Failed to delete</span>
           </>
         ),
-        options: {
-          position: 'bottom-right',
-          classNames: {
-            toast: 'mb-4 right-0',
-          },
-        },
+        options: toastOptions,
       });
     },
   });
@@ -108,6 +110,48 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
     await deleteWorkflow({
       workflowId: workflow._id,
     });
+  };
+
+  const { patchWorkflow, isPending: isPauseWorkflowPending } = usePatchWorkflow({
+    onSuccess: (data) => {
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="success" />
+            <span className="text-sm">{data.active ? 'Enabled' : 'Paused'} workflow</span>
+          </>
+        ),
+        options: toastOptions,
+      });
+    },
+    onError: (_, { workflow }) => {
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="error" />
+            <span className="text-sm">Failed to {workflow.active ? 'enable' : 'pause'} workflow</span>
+          </>
+        ),
+        options: toastOptions,
+      });
+    },
+  });
+
+  const onPauseWorkflow = async () => {
+    await patchWorkflow({
+      workflowId: workflow._id,
+      workflow: {
+        active: workflow.status === WorkflowStatusEnum.ACTIVE ? false : true,
+      },
+    });
+  };
+
+  const handlePauseWorkflow = () => {
+    if (workflow.status === WorkflowStatusEnum.ACTIVE) {
+      setIsPauseModalOpen(true);
+      return;
+    }
+    onPauseWorkflow();
   };
 
   return (
@@ -169,7 +213,19 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           title="Are you sure?"
           description={`You're about to delete the ${workflow.name}, this action cannot be undone.`}
           confirmButtonText="Delete"
-          isLoading={isPending}
+          isLoading={isDeleteWorkflowPending}
+        />
+        <ConfirmationModal
+          open={isPauseModalOpen}
+          onOpenChange={setIsPauseModalOpen}
+          onConfirm={async () => {
+            await onPauseWorkflow();
+            setIsPauseModalOpen(false);
+          }}
+          title={PAUSE_MODAL_TITLE}
+          description={PAUSE_MODAL_DESCRIPTION(workflow.name)}
+          confirmButtonText="Proceed"
+          isLoading={isPauseWorkflowPending}
         />
         {/**
          * Needs modal={false} to prevent the click freeze after the modal is closed
@@ -203,9 +259,18 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup className="*:cursor-pointer">
-              <DropdownMenuItem>
-                <RiPauseCircleLine />
-                Pause workflow
+              <DropdownMenuItem onClick={handlePauseWorkflow} disabled={workflow.status === WorkflowStatusEnum.ERROR}>
+                {workflow.status === WorkflowStatusEnum.ACTIVE ? (
+                  <>
+                    <RiPauseCircleLine />
+                    Pause workflow
+                  </>
+                ) : (
+                  <>
+                    <RiFlashlightLine />
+                    Enable workflow
+                  </>
+                )}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive"

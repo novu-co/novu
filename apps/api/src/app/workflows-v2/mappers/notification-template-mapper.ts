@@ -63,7 +63,7 @@ function toMinifiedWorkflowDto(template: NotificationTemplateEntity): WorkflowLi
     updatedAt: template.updatedAt || 'Missing Updated At',
     stepTypeOverviews: template.steps.map(buildStepTypeOverview).filter((stepTypeEnum) => !!stepTypeEnum),
     createdAt: template.createdAt || 'Missing Create At',
-    status: WorkflowStatusEnum.ACTIVE,
+    status: template.status || WorkflowStatusEnum.ACTIVE,
   };
 }
 

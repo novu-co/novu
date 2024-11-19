@@ -1,7 +1,7 @@
 import { UiSchemaGroupEnum, type UiSchema } from '@novu/shared';
 
-import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
 import { Notification5Fill } from '@/components/icons';
+import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
 
 const avatarKey = 'avatar';
 const subjectKey = 'subject';

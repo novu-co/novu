@@ -12,13 +12,10 @@ import {
 } from '@novu/shared';
 import { NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
 import { Injectable } from '@nestjs/common';
-import { WorkflowInternalResponseDto } from '@novu/application-generic';
-import { ValidatedContentResponse } from '../validate-content';
+import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, WorkflowInternalResponseDto } from '@novu/application-generic';
 
 import { PostProcessWorkflowUpdateCommand } from './post-process-workflow-update.command';
 import { OverloadContentDataOnWorkflowUseCase } from '../overload-content-data';
-
-const MAX_NUMBER_OF_TAGS = 16;
 
 @Injectable()
 export class PostProcessWorkflowUpdate {
@@ -122,7 +119,7 @@ export class PostProcessWorkflowUpdate {
     command: PostProcessWorkflowUpdateCommand,
     issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
   ) {
-    if (command.workflow.description && command.workflow.description.length > 160) {
+    if (command.workflow.description && command.workflow.description.length > MAX_DESCRIPTION_LENGTH) {
       // eslint-disable-next-line no-param-reassign
       issues.description = [
         { issueType: WorkflowIssueTypeEnum.MAX_LENGTH_ACCESSED, message: 'Description is too long' },
@@ -184,7 +181,6 @@ export class PostProcessWorkflowUpdate {
     command: PostProcessWorkflowUpdateCommand,
     issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
   ) {
-    const MAX_TAGS_LENGTH = 16;
     const tags = command.workflow.tags?.map((tag) => tag.trim());
 
     if (!tags.length) {
@@ -207,11 +203,11 @@ export class PostProcessWorkflowUpdate {
       tagsIssues.push({ issueType: WorkflowIssueTypeEnum.MISSING_VALUE, message: 'Empty tag value' });
     }
 
-    const exceedsMaxLength = tags?.some((tag) => tag.length > MAX_NUMBER_OF_TAGS);
+    const exceedsMaxLength = tags?.some((tag) => tag.length > MAX_TAG_ELEMENTS);
     if (exceedsMaxLength) {
       tagsIssues.push({
         issueType: WorkflowIssueTypeEnum.LIMIT_REACHED,
-        message: `Exceeded the ${MAX_NUMBER_OF_TAGS} tag limit`,
+        message: `Exceeded the ${MAX_TAG_ELEMENTS} tag limit`,
       });
     }
 
