@@ -146,6 +146,14 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
     });
   };
 
+  const handlePauseWorkflow = () => {
+    if (workflow.status === WorkflowStatusEnum.ACTIVE) {
+      setIsPauseModalOpen(true);
+      return;
+    }
+    onPauseWorkflow();
+  };
+
   return (
     <TableRow key={workflow._id} className="relative">
       <PromoteConfirmModal />
@@ -251,16 +259,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup className="*:cursor-pointer">
-              <DropdownMenuItem
-                onClick={() => {
-                  if (workflow.status === WorkflowStatusEnum.ACTIVE) {
-                    setIsPauseModalOpen(true);
-                    return;
-                  }
-                  onPauseWorkflow();
-                }}
-                disabled={workflow.status === WorkflowStatusEnum.ERROR}
-              >
+              <DropdownMenuItem onClick={handlePauseWorkflow} disabled={workflow.status === WorkflowStatusEnum.ERROR}>
                 {workflow.status === WorkflowStatusEnum.ACTIVE ? (
                   <>
                     <RiPauseCircleLine />
