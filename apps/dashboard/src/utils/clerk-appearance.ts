@@ -1,4 +1,6 @@
-export const clerkAppearance = {
+import { SignUpTheme, SignInTheme } from '@clerk/types';
+
+export const clerkAppearance: SignUpTheme | SignInTheme = {
   elements: {
     headerTitle: {
       fontWeight: '500',
