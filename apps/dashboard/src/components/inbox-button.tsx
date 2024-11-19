@@ -13,11 +13,11 @@ const InboxInner = () => {
 
   const novu = useNovu();
   useEffect(() => {
-    const cleanup = novu.on('notifications.notification_received', (data) => {
-      console.log('notification_received');
-      console.log({ data });
+    const cleanup = novu.on('notifications.notification_received', () => {
       setJingle(true);
-      setTimeout(() => setJingle(false), 3000);
+      const timeout = setTimeout(() => setJingle(false), 3000);
+
+      return () => clearTimeout(timeout);
     });
     return () => cleanup();
   }, [novu]);
