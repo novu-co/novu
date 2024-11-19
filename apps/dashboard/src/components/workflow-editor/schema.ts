@@ -90,12 +90,12 @@ export const buildDynamicFormSchema = ({
     const isRequired = requiredFields.includes(key);
     let zodValue: z.ZodString | z.ZodNumber | z.ZodOptional<z.ZodString | z.ZodNumber>;
     if (value.type === 'string') {
-      zodValue = z.string().min(1, `${capitalize(key)} is required`);
+      zodValue = z.string().min(1);
       if (value.format === 'email') {
-        zodValue = zodValue.email(`${capitalize(key)} must be a valid email`);
+        zodValue = zodValue.email();
       }
     } else {
-      zodValue = z.number().min(1, `${capitalize(key)} is required`);
+      zodValue = z.number().min(1);
     }
     if (!isRequired) {
       zodValue = zodValue.optional();
@@ -114,7 +114,7 @@ export const buildDynamicFormSchema = ({
       try {
         return JSON.parse(str);
       } catch (e) {
-        ctx.addIssue({ code: 'custom', message: 'Invalid payload. Payload needs to be a valid JSON.' });
+        ctx.addIssue({ code: 'custom', message: 'Payload needs to be a valid JSON' });
         return z.NEVER;
       }
     }),
