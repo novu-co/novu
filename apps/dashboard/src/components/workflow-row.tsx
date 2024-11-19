@@ -223,7 +223,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             setIsPauseModalOpen(false);
           }}
           title={PAUSE_MODAL_TITLE}
-          description={PAUSE_MODAL_DESCRIPTION}
+          description={PAUSE_MODAL_DESCRIPTION(workflow.name)}
           confirmButtonText="Proceed"
           isLoading={isPauseWorkflowPending}
         />

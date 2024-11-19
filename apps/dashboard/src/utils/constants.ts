@@ -14,4 +14,6 @@ export const EXCLUDED_EDITOR_TYPES: string[] = [
 ];
 
 export const PAUSE_MODAL_TITLE = 'Proceeding will pause the workflow';
-export const PAUSE_MODAL_DESCRIPTION = 'This workflow cannot be triggered if paused, please confirm to proceed.';
+// convert it to accept dynamic workflow name
+export const PAUSE_MODAL_DESCRIPTION = (workflowName: string) =>
+  `The ${workflowName} cannot be triggered if paused, please confirm to proceed.`;

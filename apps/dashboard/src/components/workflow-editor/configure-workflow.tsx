@@ -41,7 +41,7 @@ export function ConfigureWorkflow() {
           setIsPauseModalOpen(false);
         }}
         title={PAUSE_MODAL_TITLE}
-        description={PAUSE_MODAL_DESCRIPTION}
+        description={PAUSE_MODAL_DESCRIPTION(workflowName)}
         confirmButtonText="Proceed"
       />
       <PageMeta title={workflowName} />
