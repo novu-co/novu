@@ -38,11 +38,11 @@ export class PatchStepUsecase {
   }
 
   private async patchFieldsOnPersistedItems(command: PatchStepCommand, persistedItems: ValidNotificationWorkflow) {
-    if (command.name !== undefined && command.name !== null) {
+    if (command.name !== undefined) {
       await this.updateName(persistedItems, command);
     }
 
-    if (command.controlValues !== undefined && command.controlValues !== null) {
+    if (command.controlValues !== undefined) {
       await this.updateControlValues(persistedItems, command);
     }
   }
