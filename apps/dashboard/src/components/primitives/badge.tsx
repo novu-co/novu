@@ -1,76 +1,37 @@
-import * as React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/utils/ui';
+import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
 
 const badgeVariants = cva(
-  'inline-flex items-center h-fit border px-2  transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  'inline-flex items-center gap-1 h-fit border text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
   {
     variants: {
       variant: {
         neutral: 'border-neutral-500 bg-neutral-500',
-        feature: 'border-feature bg-feature',
-        information: 'border-information bg-information',
-        highlighted: 'border-highlighted bg-highlighted',
-        stable: 'border-stable bg-stable',
-        verified: 'border-verified bg-verified',
-        destructive: 'border-destructive bg-destructive',
-        'destructive-light': 'border-transparent bg-destructive/10',
-        success: 'border-success bg-success',
-        'success-light': 'border-transparent bg-success/10',
-        warning: 'border-warning bg-warning',
-        'warning-light': 'border-transparent bg-warning/10',
-        alert: 'border-alert bg-alert',
-        soft: 'border-neutral-alpha-200 bg-neutral-alpha-200',
-        outline: 'border-neutral-alpha-200 bg-transparent font-normal text-foreground-600 text-sm shadow-sm',
+        destructive: 'border-transparent bg-destructive/10 text-destructive',
+        success: 'border-transparent bg-success/10 text-success',
+        warning: 'border-transparent bg-warning/10 text-warning',
+        soft: 'bg-neutral-alpha-200 text-foreground-500 border-transparent',
+        outline: 'border-neutral-alpha-200 bg-transparent font-normal text-foreground-600 shadow-sm',
       },
-      kind: {
-        default: 'rounded-md',
-        pill: 'rounded-full',
-        'pill-stroke': 'rounded-full bg-transparent',
+      size: {
+        default: 'rounded-md px-2 py-1',
+        pill: 'rounded-full px-2',
+        'pill-stroke': 'rounded-full px-2',
         tag: 'rounded-md py-0.5 px-2',
       },
     },
     defaultVariants: {
       variant: 'neutral',
-      kind: 'default',
+      size: 'default',
     },
   }
 );
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
 
-function Badge({ className, variant, kind, ...props }: BadgeProps) {
-  return <div className={cn(badgeVariants({ variant, kind }), className)} {...props} />;
+function Badge({ className, variant, size, ...props }: BadgeProps) {
+  return <div className={cn(badgeVariants({ variant, size }), className)} {...props} />;
 }
 
-const badgeContentVariants = cva('text-xs font-medium', {
-  variants: {
-    variant: {
-      foreground: 'text-foreground',
-      'neutral-foreground': 'text-neutral-foreground',
-      neutral: 'text-neutral-500',
-      feature: 'text-feature',
-      information: 'text-information',
-      highlighted: 'text-highlighted',
-      stable: 'text-stable',
-      verified: 'text-verified',
-      destructive: 'text-destructive',
-      success: 'text-success',
-      warning: 'text-warning',
-      alert: 'text-alert',
-    },
-  },
-  defaultVariants: {
-    variant: 'foreground',
-  },
-});
-
-export interface BadgeContentProps
-  extends React.HTMLAttributes<HTMLSpanElement>,
-    VariantProps<typeof badgeContentVariants> {}
-
-function BadgeContent({ className, variant, ...props }: BadgeContentProps) {
-  return <span className={cn(badgeContentVariants({ variant }), className)} {...props} />;
-}
-
-export { Badge, BadgeContent };
+export { Badge };

@@ -24,12 +24,12 @@ import {
   UpsertWorkflowBody,
   WorkflowCommonsFields,
   WorkflowCreationSourceEnum,
-  WorkflowIssueTypeEnum,
   WorkflowListResponseDto,
   WorkflowOriginEnum,
   WorkflowResponseDto,
   WorkflowStatusEnum,
 } from '@novu/shared';
+import { PreferencesRepository } from '@novu/dal';
 import { after } from 'mocha';
 import { sleep } from '@nestjs/terminus/dist/utils';
 import { encodeBase62 } from '../shared/helpers';
@@ -42,10 +42,6 @@ const TEST_WORKFLOW_NAME = 'Test Workflow Name';
 
 const TEST_TAGS = ['test'];
 let session: UserSession;
-
-const LONG_DESCRIPTION = `XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX`;
 
 describe('Workflow Controller E2E API Testing', () => {
   let workflowsClient: ReturnType<typeof createWorkflowClient>;
@@ -86,14 +82,79 @@ describe('Workflow Controller E2E API Testing', () => {
       });
     });
     describe('Workflow Body Issues', () => {
-      it('should show description issue when too long', async () => {
-        const issues = await createWorkflowAndReturnIssues({ description: LONG_DESCRIPTION });
-        expect(issues?.description).to.be.ok;
-        if (issues?.description) {
-          expect(issues?.description[0]?.issueType, JSON.stringify(issues)).to.be.equal(
-            WorkflowIssueTypeEnum.MAX_LENGTH_ACCESSED
-          );
-        }
+      it('should respond with 400 when name is empty', async () => {
+        const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('nameSuffix', {
+          name: '',
+        });
+
+        const res = await workflowsClient.createWorkflow(createWorkflowDto);
+        expect(res.isSuccessResult()).to.be.false;
+        expect(res.error?.responseText).to.include('name must be longer than or equal to 1 characters');
+      });
+
+      it('should respond with 400 when name is too long', async () => {
+        const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('nameSuffix', {
+          name: Array.from({ length: 80 }).join('X'),
+        });
+
+        const res = await workflowsClient.createWorkflow(createWorkflowDto);
+        expect(res.isSuccessResult()).to.be.false;
+        expect(res.error?.responseText).to.include('name must be shorter than or equal to 64 characters');
+      });
+
+      it('should respond with 400 when description is too long', async () => {
+        const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('nameSuffix', {
+          description: Array.from({ length: 260 }).join('X'),
+        });
+
+        const res = await workflowsClient.createWorkflow(createWorkflowDto);
+        expect(res.isSuccessResult()).to.be.false;
+        expect(res.error?.responseText).to.include('description must be shorter than or equal to 256 characters');
+      });
+
+      it('should respond with 400 when a tag is too long', async () => {
+        const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('nameSuffix', {
+          tags: ['tag1', Array.from({ length: 50 }).join('X')],
+        });
+
+        const res = await workflowsClient.createWorkflow(createWorkflowDto);
+        expect(res.isSuccessResult()).to.be.false;
+        expect(res.error?.responseText).to.include(
+          'each value in tags must be longer than or equal to 1 and shorter than or equal to 32 characters'
+        );
+      });
+
+      it('should respond with 400 when a tag is empty', async () => {
+        const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('nameSuffix', {
+          tags: ['tag1', ''],
+        });
+
+        const res = await workflowsClient.createWorkflow(createWorkflowDto);
+        expect(res.isSuccessResult()).to.be.false;
+        expect(res.error?.responseText).to.include(
+          'each value in tags must be longer than or equal to 1 and shorter than or equal to 32 characters'
+        );
+      });
+
+      it('should respond with 400 when a duplicate tag is provided', async () => {
+        const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('nameSuffix', {
+          tags: ['tag1', 'tag1'],
+        });
+
+        const res = await workflowsClient.createWorkflow(createWorkflowDto);
+        expect(res.isSuccessResult()).to.be.false;
+        expect(res.error?.responseText).to.include("All tags's elements must be unique");
+      });
+
+      // TODO: fix use of `ArrayMaxSize` decorator in `{Create,Update}WorkflowCommand`
+      it.skip('should respond with 400 when more than 16 tags are provided', async () => {
+        const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('nameSuffix', {
+          tags: Array.from({ length: 17 }).map((_, index) => `tag${index}`),
+        });
+
+        const res = await workflowsClient.createWorkflow(createWorkflowDto);
+        expect(res.isSuccessResult()).to.be.false;
+        expect(res.error?.responseText).to.include('tags must contain no more than 16 elements');
       });
     });
     describe('Workflow Step Body Issues', () => {
@@ -142,7 +203,7 @@ describe('Workflow Controller E2E API Testing', () => {
   });
   describe('Create Workflow Permutations', () => {
     it('should allow creating two workflows for the same user with the same name', async () => {
-      const nameSuffix = `Test Workflow${new Date().toString()}`;
+      const nameSuffix = `Test Workflow${new Date().toISOString()}`;
       await createWorkflowAndValidate(nameSuffix);
       const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto(nameSuffix);
       const res = await workflowsClient.createWorkflow(createWorkflowDto);
@@ -157,7 +218,7 @@ describe('Workflow Controller E2E API Testing', () => {
 
   describe('Update Workflow Permutations', () => {
     it('should update control values', async () => {
-      const nameSuffix = `Test Workflow${new Date().toString()}`;
+      const nameSuffix = `Test Workflow${new Date().toISOString()}`;
       const workflowCreated: WorkflowResponseDto = await createWorkflowAndValidate(nameSuffix);
       const updateRequest: UpdateWorkflowDto = {
         name: workflowCreated.name,
@@ -187,7 +248,7 @@ describe('Workflow Controller E2E API Testing', () => {
     });
 
     it('should keep the step id on updated ', async () => {
-      const nameSuffix = `Test Workflow${new Date().toString()}`;
+      const nameSuffix = `Test Workflow${new Date().toISOString()}`;
       const workflowCreated: WorkflowResponseDto = await createWorkflowAndValidate(nameSuffix);
       const updateDto = convertResponseToUpdateDto(workflowCreated);
       const updatedWorkflow = await updateWorkflowRest(workflowCreated._id, updateDto);
@@ -198,7 +259,7 @@ describe('Workflow Controller E2E API Testing', () => {
     });
 
     it('adding user preferences', async () => {
-      const nameSuffix = `Test Workflow${new Date().toString()}`;
+      const nameSuffix = `Test Workflow${new Date().toISOString()}`;
       const workflowCreated: WorkflowResponseDto = await createWorkflowAndValidate(nameSuffix);
       const updateDto = convertResponseToUpdateDto(workflowCreated);
       const updatedWorkflow = await updateWorkflowRest(workflowCreated._id, {
@@ -221,7 +282,7 @@ describe('Workflow Controller E2E API Testing', () => {
     });
 
     it('should update by slugify ids', async () => {
-      const nameSuffix = `Test Workflow${new Date().toString()}`;
+      const nameSuffix = `Test Workflow${new Date().toISOString()}`;
       const workflowCreated: WorkflowResponseDto = await createWorkflowAndValidate(nameSuffix);
       const updateDtoWithValues = await buildUpdateDto(workflowCreated);
 
@@ -407,7 +468,7 @@ describe('Workflow Controller E2E API Testing', () => {
 
       // Verify new created step
       expect(prodWorkflowUpdated.steps[1]._id).to.not.equal(prodWorkflowCreated.steps[1]._id);
-      expect(prodWorkflowUpdated.steps[1].stepId).to.equal('new-inapp-step');
+      expect(prodWorkflowUpdated.steps[1].stepId).to.equal('new-in-app-step');
     });
 
     it('should throw an error if trying to promote to the same environment', async () => {
@@ -1081,6 +1142,16 @@ async function getWorkflowRest(workflowId: string): Promise<WorkflowResponseDto>
 
 async function validateWorkflowDeleted(workflowId: string): Promise<void> {
   await session.testAgent.get(`${v2Prefix}/workflows/${workflowId}`).expect(404);
+  await validatePreferencesDeleted(workflowId);
+}
+
+async function validatePreferencesDeleted(workflowId: string): Promise<void> {
+  const preferencesRepository = new PreferencesRepository();
+  const preferences = await preferencesRepository.find({
+    _templateId: workflowId,
+    _organizationId: session.organization._id,
+  });
+  expect(preferences.length).to.equal(0);
 }
 
 async function getWorkflowAndValidate(workflowCreated: WorkflowResponseDto) {

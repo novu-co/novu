@@ -12,7 +12,6 @@ const redirectSchema = {
       default: '_blank',
     },
   },
-  required: ['url'],
   additionalProperties: false,
 } as const satisfies JSONSchemaDto;
 

@@ -65,13 +65,14 @@ program
   Running with a custom tunnel:
   (e.g., npx novu@latest dev --tunnel https://my-tunnel.ngrok.app)`
   )
-  .usage('[-p <port>] [-r <route>] [-o <origin>] [-d <dashboard-url>] [-sp <studio-port>]')
+  .usage('[-p <port>] [-r <route>] [-o <origin>] [-d <dashboard-url>] [-sp <studio-port>] [-t <url>] [-H]')
   .option('-p, --port <port>', 'The local Bridge endpoint port', '4000')
   .option('-r, --route <route>', 'The Bridge endpoint route', '/api/novu')
   .option('-o, --origin <origin>', 'The Bridge endpoint origin')
   .option('-d, --dashboard-url <url>', 'The Novu Cloud Dashboard URL', 'https://dashboard.novu.co')
   .option('-sp, --studio-port <port>', 'The Local Studio server port', '2022')
   .option('-t, --tunnel <url>', 'Self hosted tunnel. e.g. https://my-tunnel.ngrok.app')
+  .option('-H, --headless', 'Run the Bridge in headless mode without opening the browser', false)
   .action(async (options: DevCommandOptions) => {
     analytics.track({
       identity: {

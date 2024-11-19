@@ -1,15 +1,14 @@
+import { useState } from 'react';
+import * as z from 'zod';
 import { useFormContext } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { RouteFill } from '../icons';
 import { Input, InputField } from '../primitives/input';
-// import { RiArrowRightSLine, RiSettingsLine } from 'react-icons/ri';
-import * as z from 'zod';
 import { Separator } from '../primitives/separator';
 import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
-import { workflowSchema } from './schema';
+import { MAX_DESCRIPTION_LENGTH, workflowSchema } from './schema';
 import { useTagsQuery } from '@/hooks/use-tags-query';
-// import { Button } from '../primitives/button';
 import { CopyButton } from '../primitives/copy-button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
 import { Switch } from '../primitives/switch';
@@ -17,16 +16,34 @@ import { useWorkflowEditorContext } from '@/components/workflow-editor/hooks';
 import { cn } from '@/utils/ui';
 import { SidebarContent, SidebarHeader } from '@/components/side-navigation/Sidebar';
 import { PageMeta } from '../page-meta';
+import { ConfirmationModal } from '../confirmation-modal';
+import { PAUSE_MODAL_DESCRIPTION, PAUSE_MODAL_TITLE } from '@/utils/constants';
 
 export function ConfigureWorkflow() {
+  const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
   const tagsQuery = useTagsQuery();
   const { isReadOnly } = useWorkflowEditorContext();
 
-  const { control, watch } = useFormContext<z.infer<typeof workflowSchema>>();
+  const { control, watch, setValue } = useFormContext<z.infer<typeof workflowSchema>>();
   const workflowName = watch('name');
+
+  const onPauseWorkflow = () => {
+    setValue('active', false, { shouldValidate: true, shouldDirty: true });
+  };
 
   return (
     <>
+      <ConfirmationModal
+        open={isPauseModalOpen}
+        onOpenChange={setIsPauseModalOpen}
+        onConfirm={() => {
+          onPauseWorkflow();
+          setIsPauseModalOpen(false);
+        }}
+        title={PAUSE_MODAL_TITLE}
+        description={PAUSE_MODAL_DESCRIPTION(workflowName)}
+        confirmButtonText="Proceed"
+      />
       <PageMeta title={workflowName} />
       <motion.div
         className={cn('relative flex h-full w-full flex-col')}
@@ -56,7 +73,17 @@ export function ConfigureWorkflow() {
                   <FormLabel>Active Workflow</FormLabel>
                 </div>
                 <FormControl>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} disabled={isReadOnly} />
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={(checked) => {
+                      if (!checked) {
+                        setIsPauseModalOpen(true);
+                        return;
+                      }
+                      field.onChange(checked);
+                    }}
+                    disabled={isReadOnly}
+                  />
                 </FormControl>
               </FormItem>
             )}
@@ -90,7 +117,7 @@ export function ConfigureWorkflow() {
                 <FormControl>
                   <InputField className="flex overflow-hidden pr-0">
                     <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
-                    <CopyButton variant="outline" size="input-right" valueToCopy={field.value} />
+                    <CopyButton size="input-right" valueToCopy={field.value} />
                   </InputField>
                 </FormControl>
                 <FormMessage />
@@ -104,7 +131,12 @@ export function ConfigureWorkflow() {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Description of what this workflow does" {...field} disabled={isReadOnly} />
+                  <Textarea
+                    placeholder="Description of what this workflow does"
+                    {...field}
+                    maxLength={MAX_DESCRIPTION_LENGTH}
+                    disabled={isReadOnly}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -126,6 +158,7 @@ export function ConfigureWorkflow() {
                     suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />

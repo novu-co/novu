@@ -10,13 +10,12 @@ import {
   WorkflowResponseDto,
   WorkflowStatusEnum,
 } from '@novu/shared';
-import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
+import { NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
 import { Injectable } from '@nestjs/common';
+import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, WorkflowInternalResponseDto } from '@novu/application-generic';
 
 import { PostProcessWorkflowUpdateCommand } from './post-process-workflow-update.command';
 import { OverloadContentDataOnWorkflowUseCase } from '../overload-content-data';
-
-const MAX_NUMBER_OF_TAGS = 16;
 
 @Injectable()
 export class PostProcessWorkflowUpdate {
@@ -25,7 +24,7 @@ export class PostProcessWorkflowUpdate {
     private overloadContentDataOnWorkflowUseCase: OverloadContentDataOnWorkflowUseCase
   ) {}
 
-  async execute(command: PostProcessWorkflowUpdateCommand): Promise<NotificationTemplateEntity> {
+  async execute(command: PostProcessWorkflowUpdateCommand): Promise<WorkflowInternalResponseDto> {
     const workflowIssues = await this.validateWorkflow(command);
     const stepIssues = this.validateSteps(command.workflow.steps);
     let transientWorkflow = this.updateIssuesOnWorkflow(command.workflow, workflowIssues, stepIssues);
@@ -39,20 +38,20 @@ export class PostProcessWorkflowUpdate {
     return transientWorkflow;
   }
 
-  private overloadStatusOnWorkflow(workflowWithIssues: NotificationTemplateEntity) {
+  private overloadStatusOnWorkflow(workflowWithIssues: WorkflowInternalResponseDto) {
     // eslint-disable-next-line no-param-reassign
     workflowWithIssues.status = this.computeStatus(workflowWithIssues);
 
     return workflowWithIssues;
   }
 
-  private computeStatus(workflowWithIssues: NotificationTemplateEntity) {
+  private computeStatus(workflowWithIssues: WorkflowInternalResponseDto) {
     const isWorkflowCompleteAndValid = this.isWorkflowCompleteAndValid(workflowWithIssues);
 
     return this.calculateStatus(isWorkflowCompleteAndValid, workflowWithIssues);
   }
 
-  private calculateStatus(isGoodWorkflow: boolean, workflowWithIssues: NotificationTemplateEntity) {
+  private calculateStatus(isGoodWorkflow: boolean, workflowWithIssues: WorkflowInternalResponseDto) {
     if (workflowWithIssues.active === false) {
       return WorkflowStatusEnum.INACTIVE;
     }
@@ -64,7 +63,7 @@ export class PostProcessWorkflowUpdate {
     return WorkflowStatusEnum.ERROR;
   }
 
-  private isWorkflowCompleteAndValid(workflowWithIssues: NotificationTemplateEntity) {
+  private isWorkflowCompleteAndValid(workflowWithIssues: WorkflowInternalResponseDto) {
     const workflowIssues = workflowWithIssues.issues && Object.keys(workflowWithIssues.issues).length > 0;
     const hasInnerIssues =
       workflowWithIssues.steps
@@ -120,7 +119,7 @@ export class PostProcessWorkflowUpdate {
     command: PostProcessWorkflowUpdateCommand,
     issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
   ) {
-    if (command.workflow.description && command.workflow.description.length > 160) {
+    if (command.workflow.description && command.workflow.description.length > MAX_DESCRIPTION_LENGTH) {
       // eslint-disable-next-line no-param-reassign
       issues.description = [
         { issueType: WorkflowIssueTypeEnum.MAX_LENGTH_ACCESSED, message: 'Description is too long' },
@@ -163,10 +162,10 @@ export class PostProcessWorkflowUpdate {
   }
 
   private updateIssuesOnWorkflow(
-    workflow: NotificationTemplateEntity,
+    workflow: WorkflowInternalResponseDto,
     workflowIssues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>,
     stepIssuesMap: Record<string, StepIssues>
-  ): NotificationTemplateEntity {
+  ): WorkflowInternalResponseDto {
     const issues = workflowIssues as unknown as Record<string, ContentIssue[]>;
     for (const step of workflow.steps) {
       if (stepIssuesMap[step._templateId]) {
@@ -182,7 +181,6 @@ export class PostProcessWorkflowUpdate {
     command: PostProcessWorkflowUpdateCommand,
     issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>
   ) {
-    const MAX_TAGS_LENGTH = 16;
     const tags = command.workflow.tags?.map((tag) => tag.trim());
 
     if (!tags.length) {
@@ -205,11 +203,11 @@ export class PostProcessWorkflowUpdate {
       tagsIssues.push({ issueType: WorkflowIssueTypeEnum.MISSING_VALUE, message: 'Empty tag value' });
     }
 
-    const exceedsMaxLength = tags?.some((tag) => tag.length > MAX_NUMBER_OF_TAGS);
+    const exceedsMaxLength = tags?.some((tag) => tag.length > MAX_TAG_ELEMENTS);
     if (exceedsMaxLength) {
       tagsIssues.push({
         issueType: WorkflowIssueTypeEnum.LIMIT_REACHED,
-        message: `Exceeded the ${MAX_NUMBER_OF_TAGS} tag limit`,
+        message: `Exceeded the ${MAX_TAG_ELEMENTS} tag limit`,
       });
     }
 

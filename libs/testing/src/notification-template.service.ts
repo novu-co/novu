@@ -1,5 +1,13 @@
 import { faker } from '@faker-js/faker';
-import { ChannelCTATypeEnum, EmailBlockTypeEnum, StepTypeEnum, TemplateVariableTypeEnum } from '@novu/shared';
+import {
+  buildWorkflowPreferencesFromPreferenceChannels,
+  ChannelCTATypeEnum,
+  DEFAULT_WORKFLOW_PREFERENCES,
+  EmailBlockTypeEnum,
+  PreferencesTypeEnum,
+  StepTypeEnum,
+  TemplateVariableTypeEnum,
+} from '@novu/shared';
 import {
   MessageTemplateRepository,
   NotificationGroupRepository,
@@ -8,6 +16,7 @@ import {
   NotificationTemplateRepository,
   FeedRepository,
   LayoutRepository,
+  PreferencesRepository,
 } from '@novu/dal';
 import { v4 as uuid } from 'uuid';
 
@@ -23,6 +32,7 @@ export class NotificationTemplateService {
   private notificationTemplateRepository = new NotificationTemplateRepository();
   private notificationGroupRepository = new NotificationGroupRepository();
   private messageTemplateRepository = new MessageTemplateRepository();
+  private preferenceRepository = new PreferencesRepository();
   private feedRepository = new FeedRepository();
   private layoutRepository = new LayoutRepository();
 
@@ -171,6 +181,27 @@ export class NotificationTemplateService {
     } as NotificationTemplateEntity;
 
     const notificationTemplate = await this.notificationTemplateRepository.create(data);
+
+    await this.preferenceRepository.create({
+      _templateId: notificationTemplate._id,
+      _environmentId: this.environmentId,
+      _organizationId: this.organizationId,
+      _userId: this.userId,
+      type: PreferencesTypeEnum.USER_WORKFLOW,
+      preferences: buildWorkflowPreferencesFromPreferenceChannels(
+        override.critical,
+        override.preferenceSettingsOverride
+      ),
+    });
+
+    await this.preferenceRepository.create({
+      _templateId: notificationTemplate._id,
+      _environmentId: this.environmentId,
+      _organizationId: this.organizationId,
+      _userId: this.userId,
+      type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
+      preferences: DEFAULT_WORKFLOW_PREFERENCES,
+    });
 
     return await this.notificationTemplateRepository.findById(
       notificationTemplate._id,

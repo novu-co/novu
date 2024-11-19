@@ -1,6 +1,5 @@
-import { EnvironmentWithUserObjectCommand } from '@novu/application-generic';
-import { NotificationTemplateEntity } from '@novu/dal';
+import { EnvironmentWithUserObjectCommand, WorkflowInternalResponseDto } from '@novu/application-generic';
 
 export class PostProcessWorkflowUpdateCommand extends EnvironmentWithUserObjectCommand {
-  workflow: NotificationTemplateEntity;
+  workflow: WorkflowInternalResponseDto;
 }

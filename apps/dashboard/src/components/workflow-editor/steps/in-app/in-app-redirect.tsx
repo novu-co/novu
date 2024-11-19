@@ -18,7 +18,6 @@ export const InAppRedirect = () => {
       <URLInput
         options={urlTargetTypes}
         placeholder="/tasks/{{taskId}}"
-        size="md"
         asEditor
         fields={{
           urlKey: 'redirect.url',

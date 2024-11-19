@@ -1,13 +1,14 @@
+import { EditorView } from '@uiw/react-codemirror';
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { liquid } from '@codemirror/lang-liquid';
-import { EditorView } from '@uiw/react-codemirror';
 
+import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
 import { InputField } from '@/components/primitives/input';
-import { Editor } from '@/components/primitives/editor';
-import { capitalize } from '@/utils/string';
+import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
+import { capitalize } from '@/utils/string';
+import { autocompletion } from '@codemirror/autocomplete';
 import { useStepEditorContext } from '../hooks';
 
 const subjectKey = 'subject';
@@ -25,26 +26,21 @@ export const InAppSubject = () => {
       control={control}
       name={subjectKey}
       render={({ field }) => (
-        <FormItem className="w-full">
-          <FormControl>
-            <InputField size="md" className="px-1" state={errors[subjectKey] ? 'error' : 'default'}>
+        <InputField state={errors[subjectKey] ? 'error' : 'default'} size="fit">
+          <FormItem className="w-full">
+            <FormControl>
               <Editor
+                fontFamily="inherit"
                 placeholder={capitalize(field.name)}
-                size="md"
                 id={field.name}
-                extensions={[
-                  liquid({
-                    variables,
-                  }),
-                  EditorView.lineWrapping,
-                ]}
+                extensions={[autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping]}
                 value={field.value}
                 onChange={(val) => field.onChange(val)}
               />
-            </InputField>
-          </FormControl>
-          <FormMessage />
-        </FormItem>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </InputField>
       )}
     />
   );

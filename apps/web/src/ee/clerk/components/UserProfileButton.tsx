@@ -9,13 +9,14 @@ import { WEB_APP_URL } from '../../../config';
 export function UserProfileButton() {
   const { optIn } = useNewDashboardOptIn();
   const isNewDashboardEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ENABLED);
+  const isV2Enabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_ENABLED);
 
   return (
     <UserButton
       afterSignOutUrl={`${WEB_APP_URL}${ROUTES.AUTH_LOGIN}`}
       userProfileUrl={ROUTES.MANAGE_ACCOUNT_USER_PROFILE}
     >
-      {isNewDashboardEnabled && (
+      {isNewDashboardEnabled && isV2Enabled && (
         <UserButton.MenuItems>
           <UserButton.Action
             label="Try out the new Dashboard (beta)"

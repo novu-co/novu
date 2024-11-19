@@ -99,7 +99,7 @@ FormDescription.displayName = 'FormDescription';
 const formMessageVariants = cva('flex items-center gap-1', {
   variants: {
     variant: {
-      default: '[&>svg]:text-foreground-300 text-foreground-400',
+      default: '[&>svg]:text-foreground-400 text-foreground-500',
       error: '[&>svg]:text-destructive [&>span]:text-destructive',
     },
   },

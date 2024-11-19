@@ -1,9 +1,4 @@
-import {
-  NotificationGroupRepository,
-  NotificationStepEntity,
-  NotificationTemplateEntity,
-  NotificationTemplateRepository,
-} from '@novu/dal';
+import { NotificationGroupRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import {
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
@@ -22,24 +17,18 @@ import {
 import {
   CreateWorkflow as CreateWorkflowGeneric,
   CreateWorkflowCommand,
-  GetPreferences,
-  GetPreferencesCommand,
-  GetPreferencesResponseDto,
   GetWorkflowByIdsCommand,
   GetWorkflowByIdsUseCase,
+  WorkflowInternalResponseDto,
   NotificationStep,
   shortId,
   UpdateWorkflow,
   UpdateWorkflowCommand,
-  UpsertPreferences,
-  UpsertUserWorkflowPreferencesCommand,
-  UpsertWorkflowPreferencesCommand,
 } from '@novu/application-generic';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
-import { WorkflowNotFoundException } from '../../exceptions/workflow-not-found-exception';
 import { PatchStepUsecase } from '../patch-step-data';
 import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
 
@@ -49,11 +38,8 @@ export class UpsertWorkflowUseCase {
     private createWorkflowGenericUsecase: CreateWorkflowGeneric,
     private updateWorkflowUsecase: UpdateWorkflow,
     private notificationGroupRepository: NotificationGroupRepository,
-    private upsertPreferencesUsecase: UpsertPreferences,
     private workflowUpdatePostProcess: PostProcessWorkflowUpdate,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private getPreferencesUseCase: GetPreferences,
-    private notificationTemplateRepository: NotificationTemplateRepository,
     private patchStepDataUsecase: PatchStepUsecase
   ) {}
 
@@ -61,39 +47,41 @@ export class UpsertWorkflowUseCase {
     const workflowForUpdate = await this.queryWorkflow(command);
     let persistedWorkflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
     persistedWorkflow = await this.upsertControlValues(persistedWorkflow, command);
-    const preferences = await this.upsertPreference(command, persistedWorkflow);
     const validatedWorkflowWithIssues = await this.workflowUpdatePostProcess.execute({
       user: command.user,
       workflow: persistedWorkflow,
     });
-    await this.persistWorkflow(validatedWorkflowWithIssues, command);
-    persistedWorkflow = await this.getWorkflow(validatedWorkflowWithIssues._id, command.user.environmentId);
+    await this.persistWorkflow(validatedWorkflowWithIssues);
+    persistedWorkflow = await this.getWorkflow(validatedWorkflowWithIssues._id, command);
 
-    return toResponseWorkflowDto(persistedWorkflow, preferences);
+    return toResponseWorkflowDto(persistedWorkflow);
   }
 
-  private async getWorkflow(workflowId: string, environmentId: string): Promise<NotificationTemplateEntity> {
-    const entity = await this.notificationTemplateRepository.findById(workflowId, environmentId);
-    if (!entity) {
-      throw new WorkflowNotFoundException(workflowId);
-    }
-
-    return entity;
-  }
-
-  private async persistWorkflow(workflowWithIssues: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
-    await this.notificationTemplateRepository.update(
-      {
-        _id: workflowWithIssues._id,
-        _environmentId: command.user.environmentId,
-      },
-      {
-        ...workflowWithIssues,
-      }
+  private async getWorkflow(workflowId: string, command: UpsertWorkflowCommand): Promise<WorkflowInternalResponseDto> {
+    return await this.getWorkflowByIdsUseCase.execute(
+      GetWorkflowByIdsCommand.create({
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
+        userId: command.user._id,
+        identifierOrInternalId: workflowId,
+      })
     );
   }
 
-  private async queryWorkflow(command: UpsertWorkflowCommand): Promise<NotificationTemplateEntity | null> {
+  private async persistWorkflow(workflowWithIssues: WorkflowInternalResponseDto) {
+    const command = UpdateWorkflowCommand.create({
+      id: workflowWithIssues._id,
+      environmentId: workflowWithIssues._environmentId,
+      organizationId: workflowWithIssues._organizationId,
+      userId: workflowWithIssues._creatorId,
+      type: workflowWithIssues.type!,
+      ...workflowWithIssues,
+    });
+
+    await this.updateWorkflowUsecase.execute(command);
+  }
+
+  private async queryWorkflow(command: UpsertWorkflowCommand): Promise<WorkflowInternalResponseDto | null> {
     if (!command.identifierOrInternalId) {
       return null;
     }
@@ -108,76 +96,10 @@ export class UpsertWorkflowUseCase {
     );
   }
 
-  private async upsertPreference(
-    command: UpsertWorkflowCommand,
-    workflow: NotificationTemplateEntity
-  ): Promise<GetPreferencesResponseDto | undefined> {
-    await this.upsertUserWorkflowPreferences(workflow, command);
-    await this.upsertWorkflowPreferences(workflow, command);
-
-    return await this.getPersistedPreferences(workflow);
-  }
-
-  private async getPersistedPreferences(workflow: NotificationTemplateEntity) {
-    return await this.getPreferencesUseCase.safeExecute(
-      GetPreferencesCommand.create({
-        environmentId: workflow._environmentId,
-        organizationId: workflow._organizationId,
-        templateId: workflow._id,
-      })
-    );
-  }
-
-  private async upsertUserWorkflowPreferences(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
-    const preferences = this.buildPreferenceObject(command);
-
-    await this.upsertPreferencesUsecase.upsertUserWorkflowPreferences(
-      UpsertUserWorkflowPreferencesCommand.create({
-        environmentId: workflow._environmentId,
-        organizationId: workflow._organizationId,
-        userId: command.user._id,
-        templateId: workflow._id,
-        preferences,
-      })
-    );
-  }
-
-  private buildPreferenceObject(command: UpsertWorkflowCommand) {
-    if (command.workflowDto.preferences?.user === undefined) {
-      return DEFAULT_WORKFLOW_PREFERENCES; // If missing put defaults
-    }
-    if (command.workflowDto.preferences?.user === null) {
-      // That's the way the FE signals that the user has decided no overrides.
-      return null;
-    }
-
-    return command.workflowDto.preferences.user;
-  }
-
-  /**
-   * Upsert workflow preferences. While this operation is not typically needed
-   * in a standard workflow update, it's maintained here to support environment
-   * sync scenarios and to enable code reusability.
-   */
-  private async upsertWorkflowPreferences(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
-    if (!command.workflowDto.preferences?.workflow) {
-      return;
-    }
-
-    await this.upsertPreferencesUsecase.upsertWorkflowPreferences(
-      UpsertWorkflowPreferencesCommand.create({
-        environmentId: workflow._environmentId,
-        organizationId: workflow._organizationId,
-        templateId: workflow._id,
-        preferences: command.workflowDto.preferences.workflow,
-      })
-    );
-  }
-
   private async createOrUpdateWorkflow(
     existingWorkflow: NotificationTemplateEntity | null,
     command: UpsertWorkflowCommand
-  ): Promise<NotificationTemplateEntity> {
+  ): Promise<WorkflowInternalResponseDto> {
     if (existingWorkflow && isWorkflowUpdateDto(command.workflowDto, command.identifierOrInternalId)) {
       return await this.updateWorkflowUsecase.execute(
         UpdateWorkflowCommand.create(
@@ -216,7 +138,8 @@ export class UpsertWorkflowUseCase {
       active: isWorkflowActive,
       description: workflowDto.description || '',
       tags: workflowDto.tags || [],
-      critical: false,
+      userPreferences: command.workflowDto.preferences?.user ?? null,
+      defaultPreferences: command.workflowDto.preferences?.workflow ?? DEFAULT_WORKFLOW_PREFERENCES,
       triggerIdentifier: slugify(workflowDto.name),
     };
   }
@@ -236,6 +159,8 @@ export class UpsertWorkflowUseCase {
       rawData: workflowDto,
       type: WorkflowTypeEnum.BRIDGE,
       description: workflowDto.description,
+      userPreferences: workflowDto.preferences?.user ?? null,
+      defaultPreferences: workflowDto.preferences?.workflow ?? DEFAULT_WORKFLOW_PREFERENCES,
       tags: workflowDto.tags,
       active: workflowDto.active ?? true,
     };
@@ -356,7 +281,7 @@ export class UpsertWorkflowUseCase {
   private async upsertControlValues(
     workflow: NotificationTemplateEntity,
     command: UpsertWorkflowCommand
-  ): Promise<NotificationTemplateEntity> {
+  ): Promise<WorkflowInternalResponseDto> {
     for (const step of workflow.steps) {
       const controlValues = this.findControlValueInRequest(step, command.workflowDto.steps);
       if (!controlValues) {
@@ -371,7 +296,7 @@ export class UpsertWorkflowUseCase {
       });
     }
 
-    return await this.getWorkflow(workflow._id, command.user.environmentId);
+    return await this.getWorkflow(workflow._id, command);
   }
 
   private findControlValueInRequest(

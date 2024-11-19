@@ -33,6 +33,9 @@ export type PatchStepDataDto = {
 
 export type PatchWorkflowDto = {
   active?: boolean;
+  name?: string;
+  description?: string;
+  tags?: string[];
 };
 
 export type StepResponseDto = StepDto & {

@@ -5,12 +5,14 @@ import {
   CreateWorkflow,
   DeleteMessageTemplate,
   DeleteWorkflowUseCase,
+  GetPreferences,
   GetWorkflowByIdsUseCase,
   UpdateChange,
   UpdateMessageTemplate,
   UpdateWorkflow,
   UpsertControlValuesUseCase,
   UpsertPreferences,
+  DeletePreferencesUseCase,
 } from '@novu/application-generic';
 import { PreferencesRepository } from '@novu/dal';
 import { SharedModule } from '../shared/shared.module';
@@ -29,7 +31,9 @@ const PROVIDERS = [
   CreateChange,
   UpdateChange,
   PreferencesRepository,
+  GetPreferences,
   UpsertPreferences,
+  DeletePreferencesUseCase,
   UpsertControlValuesUseCase,
 ];
 
