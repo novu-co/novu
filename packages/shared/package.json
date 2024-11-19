@@ -1,6 +1,6 @@
 {
   "name": "@novu/shared",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "",
   "scripts": {
     "start": "npm run start:dev",
@@ -43,6 +43,8 @@
     "vitest": "^2.0.5"
   },
   "nx": {
-    "tags": ["package:public"]
+    "tags": [
+      "package:public"
+    ]
   }
 }

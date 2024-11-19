@@ -1,13 +1,12 @@
 {
   "name": "@novu/framework",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "The Code-First Notifications Workflow SDK.",
   "main": "./dist/cjs/index.cjs",
   "types": "./dist/cjs/index.d.cts",
   "module": "./dist/esm/index.js",
   "type": "module",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org",
     "access": "public"
   },
   "private": false,
@@ -244,6 +243,8 @@
     "sanitize-html": "^2.13.0"
   },
   "nx": {
-    "tags": ["package:public"]
+    "tags": [
+      "package:public"
+    ]
   }
 }
