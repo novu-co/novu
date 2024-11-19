@@ -104,27 +104,29 @@ async function migrateWorkflowPreferences(
   for await (const workflowPreference of workflowPreferenceCursor) {
     await sleep(10);
     try {
-      const workflowPreferenceToUpsert = UpsertWorkflowPreferencesCommand.create({
-        templateId: workflowPreference._id.toString(),
-        environmentId: workflowPreference._environmentId.toString(),
-        organizationId: workflowPreference._organizationId.toString(),
-        preferences: DEFAULT_WORKFLOW_PREFERENCES,
+      await workflowPreferenceRepository.withTransaction(async (tx) => {
+        const workflowPreferenceToUpsert = UpsertWorkflowPreferencesCommand.create({
+          templateId: workflowPreference._id.toString(),
+          environmentId: workflowPreference._environmentId.toString(),
+          organizationId: workflowPreference._organizationId.toString(),
+          preferences: DEFAULT_WORKFLOW_PREFERENCES,
+        });
+
+        await upsertPreferences.upsertWorkflowPreferences(workflowPreferenceToUpsert);
+
+        const userWorkflowPreferenceToUpsert = UpsertUserWorkflowPreferencesCommand.create({
+          userId: workflowPreference._creatorId.toString(),
+          templateId: workflowPreference._id.toString(),
+          environmentId: workflowPreference._environmentId.toString(),
+          organizationId: workflowPreference._organizationId.toString(),
+          preferences: buildWorkflowPreferencesFromPreferenceChannels(
+            workflowPreference.critical,
+            workflowPreference.preferenceSettings
+          ),
+        });
+
+        await upsertPreferences.upsertUserWorkflowPreferences(userWorkflowPreferenceToUpsert);
       });
-
-      await upsertPreferences.upsertWorkflowPreferences(workflowPreferenceToUpsert);
-
-      const userWorkflowPreferenceToUpsert = UpsertUserWorkflowPreferencesCommand.create({
-        userId: workflowPreference._creatorId.toString(),
-        templateId: workflowPreference._id.toString(),
-        environmentId: workflowPreference._environmentId.toString(),
-        organizationId: workflowPreference._organizationId.toString(),
-        preferences: buildWorkflowPreferencesFromPreferenceChannels(
-          workflowPreference.critical,
-          workflowPreference.preferenceSettings
-        ),
-      });
-
-      await upsertPreferences.upsertUserWorkflowPreferences(userWorkflowPreferenceToUpsert);
 
       counter.workflow.success += 1;
       lastProcessedWorkflowId = workflowPreference._id.toString();
