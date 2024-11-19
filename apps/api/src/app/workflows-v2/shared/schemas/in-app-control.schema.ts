@@ -34,7 +34,7 @@ export type InAppControlType = z.infer<typeof InAppControlZodSchema>;
 
 export const InAppRedirectSchema = zodToJsonSchema(redirectZodSchema) as JSONSchemaDto;
 export const InAppActionSchema = zodToJsonSchema(actionZodSchema) as JSONSchemaDto;
-export const InAppControlSchema = zodToJsonSchema(InAppControlZodSchema) as JSONSchemaDto;
+export const inAppControlSchema = zodToJsonSchema(InAppControlZodSchema) as JSONSchemaDto;
 
 const redirectPlaceholder = {
   url: {

@@ -3,7 +3,6 @@ import { ControlSchemas, JSONSchemaDto } from '@novu/shared';
 import { emailStepControlSchema, emailStepUiSchema, inAppControlSchema, inAppUiSchema } from './schemas';
 import { digestControlSchema } from './schemas/digest-control.schema';
 import { delayControlSchema } from './schemas/delay-control.schema';
-import { EmailStepControlSchema, EmailStepUiSchema, InAppControlSchema, InAppUiSchema } from './schemas';
 import { DelayTimeControlSchema } from './schemas/delay-control-schema';
 import { DigestOutputJsonSchema } from './schemas/digest-control-schema';
 
