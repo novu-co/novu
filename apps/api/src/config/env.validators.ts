@@ -49,7 +49,6 @@ export const envValidators = {
   LEGACY_STAGING_DASHBOARD_URL: url({ default: undefined }),
   API_ROOT_URL: url(),
   NOVU_INVITE_TEAM_MEMBER_NUDGE_TRIGGER_IDENTIFIER: str({ default: undefined }),
-
   // Novu Cloud third party services
   ...(processEnv.IS_SELF_HOSTED !== 'true' &&
     processEnv.NOVU_ENTERPRISE === 'true' && {
@@ -62,6 +61,8 @@ export const envValidators = {
       STRIPE_API_KEY: str({ default: undefined }),
       STRIPE_CONNECT_SECRET: str({ default: undefined }),
     }),
+  HUBSPOT_INVITE_NUDGE_EMAIL_USER_LIST_ID: str({ default: undefined }),
+  HUBSPOT_PRIVATE_APP_ACCESS_TOKEN: str({ default: undefined }),
 
   // Feature Flags
   ...Object.keys(FeatureFlagsKeysEnum).reduce(
