@@ -43,7 +43,8 @@ const inputFieldVariants = cva(
   {
     variants: {
       size: {
-        default: 'min-h-9 px-2 [&>input]:py-1.5',
+        default: 'h-9 px-2 [&>input]:py-1.5',
+        fit: 'h-fit min-h-9 px-2',
       },
       state: {
         default:

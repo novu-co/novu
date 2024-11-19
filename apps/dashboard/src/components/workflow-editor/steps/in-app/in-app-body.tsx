@@ -1,4 +1,3 @@
-import { liquid } from '@codemirror/lang-liquid';
 import { EditorView } from '@uiw/react-codemirror';
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -6,8 +5,10 @@ import { useFormContext } from 'react-hook-form';
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
 import { InputField } from '@/components/primitives/input';
+import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
+import { autocompletion } from '@codemirror/autocomplete';
 import { useStepEditorContext } from '../hooks';
 
 const bodyKey = 'body';
@@ -32,12 +33,7 @@ export const InAppBody = () => {
                 fontFamily="inherit"
                 placeholder={capitalize(field.name)}
                 id={field.name}
-                extensions={[
-                  liquid({
-                    variables,
-                  }),
-                  EditorView.lineWrapping,
-                ]}
+                extensions={[autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping]}
                 basicSetup={{
                   defaultKeymap: true,
                 }}
@@ -48,7 +44,7 @@ export const InAppBody = () => {
               />
             </InputField>
           </FormControl>
-          <FormMessage>{`This supports markdown and variables, type {{ for more.`}</FormMessage>
+          <FormMessage>{`Type {{ for variables, or wrap text in ** for bold.`}</FormMessage>
         </FormItem>
       )}
     />

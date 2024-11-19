@@ -28,24 +28,7 @@ import { useTagsQuery } from '@/hooks/use-tags-query';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
-
-const MAX_TAGS_LENGTH = 16;
-const MAX_DESCRIPTION_LENGTH = 200;
-
-const formSchema = z.object({
-  name: z.string().min(1, { message: 'Is required' }),
-  workflowId: z.string(),
-  tags: z
-    .array(z.string().min(1))
-    .max(MAX_TAGS_LENGTH, { message: `Must contain at most ${MAX_TAGS_LENGTH} elements` })
-    .refine((tags) => new Set(tags).size === tags.length, {
-      message: 'Duplicate tags are not allowed',
-    }),
-  description: z
-    .string()
-    .max(MAX_DESCRIPTION_LENGTH, { message: `Must contain at most ${MAX_DESCRIPTION_LENGTH} characters` })
-    .optional(),
-});
+import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowMinimalSchema } from './workflow-editor/schema';
 
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
 export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
@@ -64,6 +47,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
         queryKey: [QueryKeys.fetchTags, currentEnvironment?._id],
       });
       setIsOpen(false);
+      form.reset();
       navigate(
         buildRoute(ROUTES.EDIT_WORKFLOW, {
           environmentSlug: currentEnvironment?.slug ?? '',
@@ -74,8 +58,8 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   });
   const tagsQuery = useTagsQuery();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof workflowMinimalSchema>>({
+    resolver: zodResolver(workflowMinimalSchema),
     defaultValues: { description: '', workflowId: '', name: '', tags: [] },
   });
   const {
@@ -83,15 +67,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   } = form;
 
   return (
-    <Sheet
-      open={isOpen}
-      onOpenChange={(open) => {
-        setIsOpen(open);
-        if (open) {
-          form.reset();
-        }
-      }}
-    >
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger {...props} />
       <SheetContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <SheetHeader>
@@ -115,6 +91,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
             <form
               id="create-workflow"
               autoComplete="off"
+              noValidate
               onSubmit={form.handleSubmit((values) => {
                 mutateAsync({
                   name: values.name,
@@ -175,7 +152,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-1">
-                      <FormLabel hint={`(max. ${MAX_TAGS_LENGTH})`}>Add tags</FormLabel>
+                      <FormLabel hint={`(max. ${MAX_TAG_ELEMENTS})`}>Add tags</FormLabel>
                     </div>
                     <FormControl>
                       <TagInput
@@ -202,6 +179,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                         placeholder="Description of what this workflow does"
                         state={errors['description']?.message ? 'error' : 'default'}
                         {...field}
+                        maxLength={MAX_DESCRIPTION_LENGTH}
                       />
                     </FormControl>
                     <FormMessage />

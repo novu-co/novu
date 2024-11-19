@@ -1,8 +1,7 @@
+import { EditorView } from '@uiw/react-codemirror';
 import { ComponentProps, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
-import { liquid } from '@codemirror/lang-liquid';
-import { EditorView } from '@uiw/react-codemirror';
 
 import { Button, buttonVariants } from '@/components/primitives/button';
 import {
@@ -11,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/primitives/dropdown-menu';
+import { Editor } from '@/components/primitives/editor';
 import {
   FormControl,
   FormField,
@@ -23,10 +23,11 @@ import { InputField } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import { URLInput } from '@/components/workflow-editor/url-input';
+import { completions } from '@/utils/liquid-autocomplete';
+import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
-import { Editor } from '@/components/primitives/editor';
-import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
+import { autocompletion } from '@codemirror/autocomplete';
 import { useStepEditorContext } from '../hooks';
 
 const primaryActionKey = 'primaryAction';
@@ -177,12 +178,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                       value={field.value}
                       onChange={field.onChange}
                       height="30px"
-                      extensions={[
-                        liquid({
-                          variables,
-                        }),
-                        EditorView.lineWrapping,
-                      ]}
+                      extensions={[autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping]}
                     />
                   </InputField>
                 </FormControl>

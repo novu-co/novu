@@ -9,6 +9,10 @@ import {
   NotificationTemplateEntity,
   NotificationTemplateRepository,
 } from '@novu/dal';
+import {
+  buildWorkflowPreferencesFromPreferenceChannels,
+  DEFAULT_WORKFLOW_PREFERENCES,
+} from '@novu/shared';
 import { GetPreferences, GetPreferencesCommand } from '../../get-preferences';
 
 import { GetWorkflowByIdsCommand } from './get-workflow-by-ids.command';
@@ -60,16 +64,26 @@ export class GetWorkflowByIdsUseCase {
     /**
      * @deprecated - use `userPreferences` and `defaultPreferences` instead
      */
-    const preferenceSettings =
-      GetPreferences.mapWorkflowPreferencesToChannelPreferences(
-        workflowPreferences.preferences,
-      );
+    const preferenceSettings = workflowPreferences
+      ? GetPreferences.mapWorkflowPreferencesToChannelPreferences(
+          workflowPreferences.preferences,
+        )
+      : workflowEntity.preferenceSettings;
+    const userPreferences = workflowPreferences
+      ? workflowPreferences.source.USER_WORKFLOW
+      : buildWorkflowPreferencesFromPreferenceChannels(
+          workflowEntity.critical,
+          workflowEntity.preferenceSettings,
+        );
+    const defaultPreferences = workflowPreferences
+      ? workflowPreferences.source.WORKFLOW_RESOURCE
+      : DEFAULT_WORKFLOW_PREFERENCES;
 
     return {
       ...workflowEntity,
       preferenceSettings,
-      userPreferences: workflowPreferences.source.USER_WORKFLOW,
-      defaultPreferences: workflowPreferences.source.WORKFLOW_RESOURCE,
+      userPreferences,
+      defaultPreferences,
     };
   }
 }

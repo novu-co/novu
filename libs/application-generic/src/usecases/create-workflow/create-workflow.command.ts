@@ -1,5 +1,5 @@
 import {
-  ArrayMaxSize,
+  ArrayUnique,
   IsArray,
   IsBoolean,
   IsDefined,
@@ -8,6 +8,7 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  Length,
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
@@ -38,25 +39,30 @@ import { Type } from 'class-transformer';
 import { EnvironmentWithUserCommand } from '../../commands';
 import { PreferencesRequired } from '../upsert-preferences';
 
+export const MAX_TAG_ELEMENTS = 16;
+export const MAX_TAG_LENGTH = 32;
+export const MAX_NAME_LENGTH = 64;
+export const MAX_DESCRIPTION_LENGTH = 256;
+
 export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
-  @IsMongoId()
-  @IsDefined()
-  notificationGroupId?: string;
-
-  @IsOptional()
-  notificationGroup?: INotificationGroup;
-
-  @IsOptional()
-  @IsArray()
-  tags?: string[];
-
   @IsDefined()
   @IsString()
+  @Length(1, MAX_NAME_LENGTH)
   name: string;
 
   @IsString()
   @IsOptional()
+  @Length(0, MAX_DESCRIPTION_LENGTH)
   description?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @Length(1, MAX_TAG_LENGTH, { each: true })
+  tags?: string[];
+
+  @IsBoolean()
+  active: boolean;
 
   @IsDefined()
   @IsArray()
@@ -64,11 +70,15 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
   steps: NotificationStep[];
 
   @IsBoolean()
-  active: boolean;
-
-  @IsBoolean()
   @IsOptional()
   draft?: boolean;
+
+  @IsMongoId()
+  @IsDefined()
+  notificationGroupId?: string;
+
+  @IsOptional()
+  notificationGroup?: INotificationGroup;
 
   @IsObject()
   @ValidateNested()
@@ -116,6 +126,8 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsDefined()
   type: WorkflowTypeEnum;
 
+  @IsEnum(WorkflowOriginEnum)
+  @IsDefined()
   origin: WorkflowOriginEnum;
 
   /**
@@ -232,14 +244,10 @@ export class NotificationStepVariantCommand implements IStepVariant {
   metadata?: IWorkflowStepMetadata;
 
   @IsOptional()
-  controls?: {
-    schema: JSONSchemaDto;
-  };
+  controls?: IStepControl;
 
   @IsOptional()
-  output?: {
-    schema: JSONSchemaDto;
-  };
+  output?: IStepControl;
 
   @IsOptional()
   stepId?: string;
@@ -268,4 +276,8 @@ export class MessageFilter {
 
   @IsArray()
   children: FilterParts[];
+}
+
+export interface IStepControl {
+  schema: JSONSchemaDto;
 }

@@ -1,11 +1,12 @@
-import { liquid } from '@codemirror/lang-liquid';
-import { EditorView } from '@uiw/react-codemirror';
 import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessagePure } from '@/components/primitives/form/form';
 import { Input, InputField, InputFieldProps, InputProps } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
+import { completions } from '@/utils/liquid-autocomplete';
+import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
+import { autocompletion } from '@codemirror/autocomplete';
 
 type URLInputProps = Omit<InputProps, 'value' | 'onChange' | 'size'> & {
   options: string[];
@@ -15,7 +16,7 @@ type URLInputProps = Omit<InputProps, 'value' | 'onChange' | 'size'> & {
     urlKey: string;
     targetKey: string;
   };
-  variables: Array<{ type: string; label: string }>;
+  variables: LiquidVariable[];
 } & Pick<InputFieldProps, 'size'>;
 
 export const URLInput = ({
@@ -34,25 +35,20 @@ export const URLInput = ({
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between space-x-2">
-        <div className="relative flex-grow">
+        <div className="relative w-full">
           <InputField className="pr-0">
             <FormField
               control={control}
               name={urlKey}
               defaultValue=""
               render={({ field }) => (
-                <FormItem className="w-full">
+                <FormItem className="w-full overflow-hidden">
                   <FormControl>
                     {asEditor ? (
                       <Editor
                         fontFamily="inherit"
                         placeholder={placeholder}
-                        extensions={[
-                          liquid({
-                            variables,
-                          }),
-                          EditorView.lineWrapping,
-                        ]}
+                        extensions={[autocompletion({ override: [completions(variables)] })]}
                         value={field.value}
                         onChange={field.onChange}
                       />
@@ -71,7 +67,7 @@ export const URLInput = ({
                 <FormItem>
                   <FormControl>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="max-w-24 rounded-l-none border-0 border-l">
+                      <SelectTrigger className="h-full max-w-24 rounded-l-none border-0 border-l">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -90,7 +86,7 @@ export const URLInput = ({
         </div>
       </div>
       <FormMessagePure error={error ? String(error.message) : undefined}>
-        {withHint && 'This supports variables and relative URLs i.e /tasks/{{taskId}}'}
+        {withHint && 'Type {{ for variables'}
       </FormMessagePure>
     </div>
   );

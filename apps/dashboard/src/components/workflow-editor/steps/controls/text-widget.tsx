@@ -1,11 +1,11 @@
-import { type WidgetProps } from '@rjsf/utils';
-import { EditorView } from '@uiw/react-codemirror';
-import { liquid } from '@codemirror/lang-liquid';
-import { useFormContext } from 'react-hook-form';
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { InputField } from '@/components/primitives/input';
+import { completions } from '@/utils/liquid-autocomplete';
 import { capitalize } from '@/utils/string';
+import { autocompletion } from '@codemirror/autocomplete';
+import { type WidgetProps } from '@rjsf/utils';
+import { useFormContext } from 'react-hook-form';
 
 export function TextWidget(props: WidgetProps) {
   const { label, readonly, name } = props;
@@ -28,12 +28,7 @@ export function TextWidget(props: WidgetProps) {
                 fontFamily="inherit"
                 placeholder={capitalize(label)}
                 id={label}
-                extensions={[
-                  liquid({
-                    variables: [{ type: 'variable', label: 'asdf' }],
-                  }),
-                  EditorView.lineWrapping,
-                ]}
+                extensions={[autocompletion({ override: [completions([])] })]}
                 value={field.value}
                 onChange={(val) => field.onChange(val)}
                 readOnly={readonly}
