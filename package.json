@@ -88,12 +88,12 @@
     "@eslint/compat": "^1.1.1",
     "@eslint/eslintrc": "^3.1.0",
     "@eslint/js": "^9.9.1",
-    "nx": "20.0.5",
-    "@nx/eslint-plugin": "20.0.5",
-    "@nx/jest": "20.0.5",
-    "@nx/linter": "19.8.4",
-    "@nx/workspace": "20.0.5",
-    "@nx/plugin": "20.0.5",
+    "nx": "20.1.2",
+    "@nx/eslint-plugin": "20.1.2",
+    "@nx/jest": "20.1.2",
+    "@nx/eslint": "20.1.2",
+    "@nx/workspace": "20.1.2",
+    "@nx/plugin": "20.1.2",
     "@octokit/core": "^4.0.0",
     "@pandacss/eslint-plugin": "^0.1.9",
     "@pnpm/filter-workspace-packages": "^7.0.6",
@@ -187,7 +187,7 @@
     "typescript": "5.6.2",
     "typescript-eslint": "^8.3.0",
     "wait-port": "^0.3.0",
-    "nx-cloud": "latest"
+    "nx-cloud": "19.1.0"
   },
   "workspaces": {
     "packages": [
@@ -223,7 +223,7 @@
     "pnpm": "^9.11.0"
   },
   "dependencies": {
-    "nx": "19.8.2",
+    "nx": "20.1.2",
     "tslib": "^2.4.0"
   },
   "pnpm": {
