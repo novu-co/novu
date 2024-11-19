@@ -47,6 +47,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
         queryKey: [QueryKeys.fetchTags, currentEnvironment?._id],
       });
       setIsOpen(false);
+      form.reset();
       navigate(
         buildRoute(ROUTES.EDIT_WORKFLOW, {
           environmentSlug: currentEnvironment?.slug ?? '',
@@ -67,9 +68,6 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
       open={isOpen}
       onOpenChange={(open) => {
         setIsOpen(open);
-        if (open) {
-          form.reset();
-        }
       }}
     >
       <SheetTrigger {...props} />
