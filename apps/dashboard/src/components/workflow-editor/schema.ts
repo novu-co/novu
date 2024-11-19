@@ -1,7 +1,7 @@
-import * as z from 'zod';
-import type { JSONSchemaDefinition } from '@novu/shared';
 import { StepTypeEnum } from '@/utils/enums';
 import { capitalize } from '@/utils/string';
+import type { JSONSchemaDefinition } from '@novu/shared';
+import * as z from 'zod';
 
 const enabledSchema = z.object({
   enabled: z.boolean(),
@@ -61,13 +61,15 @@ export const workflowSchema = workflowMinimalSchema.extend({
      * TODO: Add user schema
      */
     user: z.any().nullable(),
-    default: z.object({
-      all: z.object({
-        enabled: z.boolean(),
-        readOnly: z.boolean(),
-      }),
-      channels: channelsSchema,
-    }),
+    default: z
+      .object({
+        all: z.object({
+          enabled: z.boolean(),
+          readOnly: z.boolean(),
+        }),
+        channels: channelsSchema,
+      })
+      .nullable(),
   }),
 });
 
