@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { slugify } from '@novu/shared';
 import { PlaceholderAggregation } from './placeholder.aggregation';
 import { HydrateEmailSchemaUseCase } from '../../../../environments-v1/usecases/output-renderers';
 import { CollectPlaceholderWithDefaultsCommand } from './collect-placeholder-with-defaults.command';
@@ -110,7 +111,7 @@ function extractLiquidJSPlaceholders(text: string) {
     } else {
       matches.push({
         placeholder: `{{${trimmedContent}}}`,
-        defaultValue,
+        defaultValue: slugify(defaultValue, { separator: '_' }),
       });
     }
   }
