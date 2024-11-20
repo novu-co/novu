@@ -1,11 +1,15 @@
 import {
+  ArrayUnique,
   IsArray,
   IsBoolean,
   IsDefined,
   IsEnum,
   IsMongoId,
+  IsObject,
   IsOptional,
   IsString,
+  Length,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 
@@ -16,35 +20,49 @@ import {
   FilterParts,
   IMessageAction,
   INotificationGroup,
-  IPreferenceChannels,
+  IStepVariant,
+  StepIssuesDto,
+  StepIssue as StepIssueDto,
+  ContentIssue as ContentIssueDto,
   IWorkflowStepMetadata,
+  JSONSchemaDto,
   NotificationTemplateCustomData,
   WorkflowOriginEnum,
   WorkflowTypeEnum,
+  StepIssueEnum,
+  StepContentIssueEnum,
+  StepCreateAndUpdateKeys,
+  WorkflowStatusEnum,
 } from '@novu/shared';
 
-import { JsonSchema } from '@novu/framework/internal';
+import { Type } from 'class-transformer';
 import { EnvironmentWithUserCommand } from '../../commands';
+import { PreferencesRequired } from '../upsert-preferences';
+
+export const MAX_TAG_ELEMENTS = 16;
+export const MAX_TAG_LENGTH = 32;
+export const MAX_NAME_LENGTH = 64;
+export const MAX_DESCRIPTION_LENGTH = 256;
 
 export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
-  @IsMongoId()
-  @IsDefined()
-  notificationGroupId?: string;
-
-  @IsOptional()
-  notificationGroup?: INotificationGroup;
-
-  @IsOptional()
-  @IsArray()
-  tags?: string[];
-
   @IsDefined()
   @IsString()
+  @Length(1, MAX_NAME_LENGTH)
   name: string;
 
   @IsString()
   @IsOptional()
+  @Length(0, MAX_DESCRIPTION_LENGTH)
   description?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @Length(1, MAX_TAG_LENGTH, { each: true })
+  tags?: string[];
+
+  @IsBoolean()
+  active: boolean;
 
   @IsDefined()
   @IsArray()
@@ -52,17 +70,32 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
   steps: NotificationStep[];
 
   @IsBoolean()
-  active: boolean;
-
-  @IsBoolean()
   @IsOptional()
   draft?: boolean;
 
-  @IsBoolean()
-  critical: boolean;
+  @IsMongoId()
+  @IsDefined()
+  notificationGroupId?: string;
 
   @IsOptional()
-  preferenceSettings?: IPreferenceChannels;
+  notificationGroup?: INotificationGroup;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => PreferencesRequired)
+  @ValidateIf((object, value) => value !== null)
+  @IsOptional()
+  userPreferences?: PreferencesRequired | null;
+
+  @IsBoolean()
+  @IsOptional()
+  critical?: boolean;
+
+  @IsObject()
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PreferencesRequired)
+  defaultPreferences: PreferencesRequired;
 
   @IsOptional()
   blueprintId?: string;
@@ -76,23 +109,25 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
 
   @IsOptional()
   inputs?: {
-    schema: JsonSchema;
+    schema: JSONSchemaDto;
   };
   @IsOptional()
   controls?: {
-    schema: JsonSchema;
+    schema: JSONSchemaDto;
   };
 
   @IsOptional()
   rawData?: Record<string, unknown>;
 
   @IsOptional()
-  payloadSchema?: JsonSchema;
+  payloadSchema?: JSONSchemaDto;
 
   @IsEnum(WorkflowTypeEnum)
   @IsDefined()
   type: WorkflowTypeEnum;
 
+  @IsEnum(WorkflowOriginEnum)
+  @IsDefined()
   origin: WorkflowOriginEnum;
 
   /**
@@ -104,6 +139,15 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsOptional()
   @IsString()
   triggerIdentifier?: string;
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => ContentIssue)
+  issues?: Record<string, ContentIssue[]>;
+
+  @IsEnum(WorkflowStatusEnum)
+  @IsOptional()
+  status?: WorkflowStatusEnum;
 }
 
 export class ChannelCTACommand {
@@ -121,7 +165,45 @@ export class ChannelCTACommand {
   action?: IMessageAction[];
 }
 
-export class NotificationStepVariantCommand {
+export class ContentIssue implements ContentIssueDto {
+  @IsOptional()
+  @IsString()
+  variableName?: string;
+
+  @IsString()
+  message: string;
+
+  @IsEnum(StepContentIssueEnum)
+  issueType: StepContentIssueEnum;
+}
+
+export class StepIssue implements StepIssueDto {
+  @IsEnum(StepIssueEnum)
+  issueType: StepIssueEnum;
+
+  @IsOptional()
+  @IsString()
+  variableName?: string;
+
+  @IsString()
+  message: string;
+}
+
+export class StepIssues implements StepIssuesDto {
+  @IsOptional()
+  @IsObject()
+  @ValidateNested({ each: true })
+  @Type(() => StepIssue)
+  body?: Record<StepCreateAndUpdateKeys, StepIssue>;
+
+  @IsOptional()
+  @IsObject()
+  @ValidateNested({ each: true })
+  @Type(() => ContentIssue)
+  controls?: Record<string, ContentIssue[]>;
+}
+
+export class NotificationStepVariantCommand implements IStepVariant {
   @IsString()
   @IsOptional()
   _templateId?: string;
@@ -162,17 +244,18 @@ export class NotificationStepVariantCommand {
   metadata?: IWorkflowStepMetadata;
 
   @IsOptional()
-  controls?: {
-    schema: JsonSchema;
-  };
+  controls?: IStepControl;
 
   @IsOptional()
-  output?: {
-    schema: JsonSchema;
-  };
+  output?: IStepControl;
 
   @IsOptional()
   stepId?: string;
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => StepIssues)
+  issues?: StepIssues;
 }
 
 export class NotificationStep extends NotificationStepVariantCommand {
@@ -193,4 +276,8 @@ export class MessageFilter {
 
   @IsArray()
   children: FilterParts[];
+}
+
+export interface IStepControl {
+  schema: JSONSchemaDto;
 }

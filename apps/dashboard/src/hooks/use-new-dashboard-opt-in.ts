@@ -1,16 +1,31 @@
+import { LEGACY_DASHBOARD_URL, NEW_DASHBOARD_FEEDBACK_FORM_URL } from '@/config';
+import { useTelemetry } from '@/hooks/use-telemetry';
+import { TelemetryEvent } from '@/utils/telemetry';
 import { useUser } from '@clerk/clerk-react';
 import { NewDashboardOptInStatusEnum } from '@novu/shared';
 
 export function useNewDashboardOptIn() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
+  const track = useTelemetry();
 
-  const updateUserOptInStatus = (status: NewDashboardOptInStatusEnum) => {
+  const updateUserOptInStatus = async (status: NewDashboardOptInStatusEnum) => {
+    if (!user) return;
+
+    await user.update({
+      unsafeMetadata: {
+        ...user.unsafeMetadata,
+        newDashboardOptInStatus: status,
+      },
+    });
+  };
+
+  const updateNewDashboardFirstVisit = (firstVisit: boolean) => {
     if (!user) return;
 
     user.update({
       unsafeMetadata: {
         ...user.unsafeMetadata,
-        newDashboardOptInStatus: status,
+        newDashboardFirstVisit: firstVisit,
       },
     });
   };
@@ -21,30 +36,33 @@ export function useNewDashboardOptIn() {
     return user.unsafeMetadata?.newDashboardOptInStatus || null;
   };
 
-  const redirectToNewDashboard = () => {
-    const newDashboardUrl = process.env.NEW_DASHBOARD_URL;
-    if (!newDashboardUrl) return;
+  const getNewDashboardFirstVisit = () => {
+    if (!user) return false;
 
-    window.location.href = newDashboardUrl;
+    return user.unsafeMetadata?.newDashboardFirstVisit || false;
   };
 
-  const optIn = () => {
-    updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_IN);
+  const redirectToLegacyDashboard = () => {
+    window.location.href = LEGACY_DASHBOARD_URL || window.location.origin + '/legacy/workflows';
   };
 
-  const optOut = () => {
-    updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_OUT);
-  };
+  const optOut = async () => {
+    track(TelemetryEvent.NEW_DASHBOARD_OPT_OUT);
+    await updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_OUT);
 
-  const dismiss = () => {
-    updateUserOptInStatus(NewDashboardOptInStatusEnum.DISMISSED);
+    if (NEW_DASHBOARD_FEEDBACK_FORM_URL) {
+      window.open(NEW_DASHBOARD_FEEDBACK_FORM_URL, '_blank');
+    }
+
+    redirectToLegacyDashboard();
   };
 
   return {
-    optIn,
+    isLoaded,
     optOut,
-    dismiss,
     status: getCurrentOptInStatus(),
-    redirectToNewDashboard,
+    isFirstVisit: getNewDashboardFirstVisit(),
+    updateNewDashboardFirstVisit,
+    redirectToLegacyDashboard,
   };
 }

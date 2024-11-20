@@ -1,16 +1,34 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PreferencesEntity, PreferencesRepository } from '@novu/dal';
 import {
-  buildWorkflowPreferences,
   PreferencesTypeEnum,
+  WorkflowPreferences,
   WorkflowPreferencesPartial,
 } from '@novu/shared';
-import { UpsertPreferencesCommand } from './upsert-preferences.command';
 import { UpsertWorkflowPreferencesCommand } from './upsert-workflow-preferences.command';
 import { UpsertSubscriberGlobalPreferencesCommand } from './upsert-subscriber-global-preferences.command';
 import { UpsertSubscriberWorkflowPreferencesCommand } from './upsert-subscriber-workflow-preferences.command';
 import { UpsertUserWorkflowPreferencesCommand } from './upsert-user-workflow-preferences.command';
 import { deepMerge } from '../../utils';
+
+export type WorkflowPreferencesFull = Omit<PreferencesEntity, 'preferences'> & {
+  preferences: WorkflowPreferences;
+};
+
+type UpsertPreferencesCommand = Omit<
+  Partial<
+    UpsertWorkflowPreferencesCommand &
+      UpsertSubscriberGlobalPreferencesCommand &
+      UpsertSubscriberWorkflowPreferencesCommand &
+      UpsertUserWorkflowPreferencesCommand
+  >,
+  'preferences'
+> & {
+  organizationId: string;
+  environmentId: string;
+  type: PreferencesTypeEnum;
+  preferences: WorkflowPreferencesPartial;
+};
 
 @Injectable()
 export class UpsertPreferences {
@@ -18,20 +36,14 @@ export class UpsertPreferences {
 
   public async upsertWorkflowPreferences(
     command: UpsertWorkflowPreferencesCommand,
-  ) {
-    /*
-     * Only Workflow Preferences need to be built with default values to ensure
-     * there is always a value to fall back to during preference merging.
-     */
-    const builtPreferences = buildWorkflowPreferences(command.preferences);
-
+  ): Promise<WorkflowPreferencesFull> {
     return this.upsert({
       templateId: command.templateId,
       environmentId: command.environmentId,
       organizationId: command.organizationId,
-      preferences: builtPreferences,
+      preferences: command.preferences,
       type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
-    });
+    }) as Promise<WorkflowPreferencesFull>;
   }
 
   public async upsertSubscriberGlobalPreferences(
@@ -52,6 +64,11 @@ export class UpsertPreferences {
     command: UpsertSubscriberGlobalPreferencesCommand,
   ) {
     const channelTypes = Object.keys(command.preferences?.channels || {});
+
+    if (channelTypes.length === 0) {
+      // If there are no channels to update, we don't need to run the update query
+      return;
+    }
 
     const preferenceUnsetPayload = channelTypes.reduce((acc, channelType) => {
       acc[`preferences.channels.${channelType}`] = '';
@@ -89,7 +106,7 @@ export class UpsertPreferences {
 
   public async upsertUserWorkflowPreferences(
     command: UpsertUserWorkflowPreferencesCommand,
-  ) {
+  ): Promise<WorkflowPreferencesFull> {
     return this.upsert({
       userId: command.userId,
       environmentId: command.environmentId,
@@ -97,28 +114,13 @@ export class UpsertPreferences {
       preferences: command.preferences,
       templateId: command.templateId,
       type: PreferencesTypeEnum.USER_WORKFLOW,
-    });
+    }) as Promise<WorkflowPreferencesFull>;
   }
 
   private async upsert(
     command: UpsertPreferencesCommand,
   ): Promise<PreferencesEntity> {
     const foundPreference = await this.getPreference(command);
-
-    if (command.preferences === null) {
-      if (!foundPreference) {
-        throw new BadRequestException('Preference not found');
-      }
-
-      await this.deletePreferences(command, foundPreference?._id);
-
-      /*
-       * TODO: Ideally we need to return the foundPreference with a deleted: true flag
-       * but the repository does not support this yet. For now we will make a compromise
-       * to avoid refactoring all the usages of this usecase.
-       */
-      return foundPreference;
-    }
 
     if (foundPreference) {
       return this.updatePreferences(foundPreference, command);

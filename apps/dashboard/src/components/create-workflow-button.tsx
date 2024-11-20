@@ -27,18 +27,8 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { useTagsQuery } from '@/hooks/use-tags-query';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
-
-const formSchema = z.object({
-  name: z.string().min(1, { message: 'Name is required' }),
-  workflowId: z.string(),
-  tags: z
-    .array(z.string().min(1))
-    .max(8)
-    .refine((tags) => new Set(tags).size === tags.length, {
-      message: 'Duplicate tags are not allowed.',
-    }),
-  description: z.string().max(200).optional(),
-});
+import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
+import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowMinimalSchema } from './workflow-editor/schema';
 
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
 export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
@@ -57,6 +47,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
         queryKey: [QueryKeys.fetchTags, currentEnvironment?._id],
       });
       setIsOpen(false);
+      form.reset();
       navigate(
         buildRoute(ROUTES.EDIT_WORKFLOW, {
           environmentSlug: currentEnvironment?.slug ?? '',
@@ -67,37 +58,28 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   });
   const tagsQuery = useTagsQuery();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof workflowMinimalSchema>>({
+    resolver: zodResolver(workflowMinimalSchema),
     defaultValues: { description: '', workflowId: '', name: '', tags: [] },
   });
 
   return (
-    <Sheet
-      open={isOpen}
-      onOpenChange={(open) => {
-        setIsOpen(open);
-        if (open) {
-          form.reset();
-        }
-      }}
-    >
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger {...props} />
-      <SheetContent>
+      <SheetContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <SheetHeader>
           <SheetTitle>Create workflow</SheetTitle>
           <div>
             <SheetDescription>
-              Workflows manage event-driven notifications across multiple channels in a version-controlled flow, with
-              the ability to manage preference for each subscriber.
+              Workflows manage event-driven notifications across channels.{' '}
+              <Link
+                target="_blank"
+                to="https://docs.novu.co/concepts/workflows"
+                className="text-foreground-400 inline-flex items-center text-sm underline"
+              >
+                Learn more <RiExternalLinkLine className="inline size-4" />
+              </Link>
             </SheetDescription>
-            <Link
-              target="_blank"
-              to="https://docs.novu.co/api-reference/workflows/create-workflow"
-              className="text-foreground-400 flex items-center text-sm underline"
-            >
-              Learn more <RiExternalLinkLine className="inline size-4" />
-            </Link>
           </div>
         </SheetHeader>
         <Separator />
@@ -105,6 +87,8 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
           <Form {...form}>
             <form
               id="create-workflow"
+              autoComplete="off"
+              noValidate
               onSubmit={form.handleSubmit((values) => {
                 mutateAsync({
                   name: values.name,
@@ -115,7 +99,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                   tags: values.tags,
                 });
               })}
-              className="flex flex-col gap-6"
+              className="flex flex-col gap-4"
             >
               <FormField
                 control={form.control}
@@ -127,6 +111,8 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <InputField>
                         <Input
                           {...field}
+                          autoFocus
+                          {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
                           onChange={(e) => {
                             field.onChange(e);
                             form.setValue('workflowId', slugify(e.target.value));
@@ -134,7 +120,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                         />
                       </InputField>
                     </FormControl>
-                    <FormMessage>Name is required</FormMessage>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -163,7 +149,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-1">
-                      <FormLabel hint="(max. 8)">Add tags</FormLabel>
+                      <FormLabel hint={`(max. ${MAX_TAG_ELEMENTS})`}>Add tags</FormLabel>
                     </div>
                     <FormControl>
                       <TagInput suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []} {...field} />
@@ -182,7 +168,11 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <FormLabel optional>Description</FormLabel>
                     </div>
                     <FormControl>
-                      <Textarea placeholder="Description of what this workflow does" {...field} />
+                      <Textarea
+                        placeholder="Description of what this workflow does"
+                        {...field}
+                        maxLength={MAX_DESCRIPTION_LENGTH}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

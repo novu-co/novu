@@ -1,5 +1,13 @@
 import { emptySchema } from '../../schemas';
-import type { Awaitable, CustomStep, DiscoverWorkflowOutput, StepType, StepOutput } from '../../types';
+import type {
+  Awaitable,
+  CustomStep,
+  DiscoverWorkflowOutput,
+  StepType,
+  StepOutput,
+  StepOptions,
+  Schema,
+} from '../../types';
 import { transformSchema } from '../../validators';
 import { discoverStep } from './discover-step';
 
@@ -28,7 +36,7 @@ export async function discoverCustomStepFactory(
       },
       resolve: resolve as (controls: Record<string, unknown>) => Awaitable<Record<string, unknown>>,
       code: resolve.toString(),
-      options,
+      options: options as StepOptions<Schema, Record<string, unknown>>,
       providers: [],
     });
 

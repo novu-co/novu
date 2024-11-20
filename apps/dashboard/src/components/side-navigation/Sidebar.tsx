@@ -8,7 +8,7 @@ export const SidebarHeader = (props: SidebarHeaderProps) => {
   return <div className={cn('flex gap-2.5 px-2 py-3.5', className)} {...rest} />;
 };
 
-export const sidebarContentVariants = cva(`flex flex-col`, {
+const sidebarContentVariants = cva(`flex flex-col`, {
   variants: {
     size: {
       sm: 'gap-2 px-3 py-2',

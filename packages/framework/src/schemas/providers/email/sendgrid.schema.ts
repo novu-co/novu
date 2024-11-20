@@ -1,4 +1,4 @@
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 
 /**
  * Sendgrid `POST /v3/mail/send` schema
@@ -490,7 +490,7 @@ const sendgridOutputSchema = {
   },
   required: [],
   additionalProperties: false,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 export const sendgridProviderSchemas = {
   output: sendgridOutputSchema,

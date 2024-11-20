@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import type { StepResponseDto, WorkflowTestDataResponseDto } from '@novu/shared';
+import type { JSONSchemaDefinition } from '@novu/shared';
 import { StepTypeEnum } from '@/utils/enums';
 import { capitalize } from '@/utils/string';
 
@@ -16,11 +16,27 @@ const channelsSchema = z.object({
   chat: enabledSchema,
 });
 
-export const workflowSchema = z.object({
-  name: z.string(),
+export const MAX_TAG_ELEMENTS = 16;
+export const MAX_TAG_LENGTH = 32;
+export const MAX_NAME_LENGTH = 64;
+export const MAX_DESCRIPTION_LENGTH = 256;
+
+export const workflowMinimalSchema = z.object({
+  name: z.string().min(1).max(MAX_NAME_LENGTH),
   workflowId: z.string(),
-  description: z.string().optional(),
-  tags: z.array(z.string()).optional(),
+  tags: z
+    .array(z.string().min(0).max(MAX_TAG_LENGTH))
+    .max(MAX_TAG_ELEMENTS)
+    .refine((tags) => tags.every((tag) => tag.length <= MAX_TAG_LENGTH), {
+      message: `Tags must be less than ${MAX_TAG_LENGTH} characters`,
+    })
+    .refine((tags) => new Set(tags).size === tags.length, {
+      message: 'Duplicate tags are not allowed',
+    }),
+  description: z.string().max(MAX_DESCRIPTION_LENGTH).optional(),
+});
+
+export const workflowSchema = workflowMinimalSchema.extend({
   active: z.boolean().optional(),
   critical: z.boolean().optional(),
   steps: z.array(
@@ -30,7 +46,13 @@ export const workflowSchema = z.object({
         type: z.nativeEnum(StepTypeEnum),
         _id: z.string(),
         stepId: z.string(),
-        slug: z.literal<StepResponseDto['slug']>('_st_'),
+        slug: z.string(),
+        issues: z
+          .object({
+            body: z.any().optional(),
+            controls: z.any().optional(),
+          })
+          .optional(),
       })
       .passthrough()
   ),
@@ -49,12 +71,10 @@ export const workflowSchema = z.object({
   }),
 });
 
-export type JSONSchema = WorkflowTestDataResponseDto['to'];
-
 export const buildDynamicFormSchema = ({
   to,
 }: {
-  to: JSONSchema;
+  to: JSONSchemaDefinition;
 }): z.ZodObject<{
   to: z.ZodObject<Record<string, z.ZodTypeAny>>;
   payload: z.ZodEffects<z.ZodString, any, string>;
@@ -103,7 +123,11 @@ export const buildDynamicFormSchema = ({
 
 export type TestWorkflowFormType = z.infer<ReturnType<typeof buildDynamicFormSchema>>;
 
-export const makeObjectFromSchema = ({ properties }: { properties: Readonly<Record<string, JSONSchema>> }) => {
+export const makeObjectFromSchema = ({
+  properties,
+}: {
+  properties: Readonly<Record<string, JSONSchemaDefinition>>;
+}) => {
   return Object.keys(properties).reduce((acc, key) => {
     const value = properties[key];
     if (typeof value !== 'object') {

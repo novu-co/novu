@@ -1,10 +1,9 @@
-import { expect, it, describe, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Client } from './client';
 import {
   ExecutionEventPayloadInvalidError,
   ExecutionStateCorruptError,
-  ExecutionStateResultInvalidError,
   ProviderExecutionFailedError,
   StepExecutionFailedError,
   StepNotFoundError,
@@ -384,6 +383,97 @@ describe('Novu Client', () => {
       if (!emailExecutionResult.outputs) throw new Error('executionResult.outputs is undefined');
       const { subject } = emailExecutionResult.outputs;
       expect(subject).toBe('body static prefix John');
+    });
+
+    it('should render step results in preview', async () => {
+      const inAppStepId = 'in-app';
+      const customStepId = 'fetch-user';
+      const newWorkflow = workflow('test-workflow', async ({ step }) => {
+        await step.inApp(inAppStepId, async () => ({
+          body: 'In App Body',
+        }));
+
+        await step.custom(
+          customStepId,
+          async () => ({
+            username: `my-db-user`,
+          }),
+          {
+            outputSchema: {
+              type: 'object',
+              properties: {
+                username: { type: 'string' },
+              },
+              required: ['username'],
+              additionalProperties: false,
+            } as const,
+          }
+        );
+
+        await step.email(
+          'send-email',
+          async (controls) => {
+            return {
+              subject: 'Test Subject',
+              body: controls.body,
+            };
+          },
+          {
+            controlSchema: {
+              type: 'object',
+              properties: {
+                body: {
+                  type: 'string',
+                  default: `In app message was {{steps.${inAppStepId}.seen}}. Username is {{steps.${customStepId}.username}}.`,
+                },
+              },
+              required: ['body'],
+              additionalProperties: false,
+            } as const,
+          }
+        );
+      });
+
+      await client.addWorkflows([newWorkflow]);
+
+      const emailEvent: Event = {
+        action: PostActionEnum.PREVIEW,
+        payload: {},
+        workflowId: 'test-workflow',
+        stepId: 'send-email',
+        subscriber: {},
+        state: [
+          {
+            stepId: inAppStepId,
+            outputs: {
+              seen: true,
+              read: true,
+              lastSeenDate: new Date().toISOString(),
+              lastReadDate: new Date().toISOString(),
+            },
+            state: {
+              status: 'completed',
+            },
+          },
+          {
+            stepId: customStepId,
+            outputs: {
+              username: 'my-db-user',
+            },
+            state: {
+              status: 'completed',
+            },
+          },
+        ],
+        controls: {},
+      };
+
+      const emailExecutionResult = await client.executeWorkflow(emailEvent);
+
+      expect(emailExecutionResult).toBeDefined();
+      expect(emailExecutionResult.outputs).toBeDefined();
+      if (!emailExecutionResult.outputs) throw new Error('executionResult.outputs is undefined');
+      expect(emailExecutionResult.outputs.body).toBe('In app message was true. Username is my-db-user.');
     });
 
     it('should sanitize the step result of all delivery channel step types', async () => {
@@ -1631,76 +1721,6 @@ describe('Novu Client', () => {
       expect(metadata.status).toBe('success');
       expect(metadata.error).toBe(false);
       expect(metadata.duration).toEqual(expect.any(Number));
-    });
-
-    it('should throw an error when the provided preview state is invalid', async () => {
-      const newWorkflow = workflow(
-        'test-workflow',
-        async ({ step }) => {
-          const digestOutput = await step.digest('digest-output', async () => ({
-            type: 'regular',
-            amount: 1,
-            unit: 'seconds',
-          }));
-
-          await step.inApp(
-            'send-email',
-            async () => ({
-              body: digestOutput.events.map((event) => event.payload.comment).join(','),
-            }),
-            {
-              skip: () => true,
-            }
-          );
-        },
-        {
-          payloadSchema: {
-            type: 'object',
-            properties: {
-              comment: { type: 'string' },
-            },
-            required: ['comment'],
-          } as const,
-        }
-      );
-
-      await client.addWorkflows([newWorkflow]);
-
-      const event: Event = {
-        action: PostActionEnum.PREVIEW,
-        workflowId: 'test-workflow',
-        stepId: 'send-email',
-        subscriber: {},
-        state: [
-          {
-            stepId: 'digest-output',
-            state: {
-              status: 'success',
-            },
-            outputs: {
-              events: [
-                {
-                  time: '2024-01-01T00:00:00.000Z',
-                  payload: {
-                    comment: 'Hello',
-                  },
-                },
-                {
-                  id: '2',
-                  time: '2024-01-01T00:00:00.000Z',
-                  payload: {
-                    comment: 'World',
-                  },
-                },
-              ],
-            },
-          },
-        ],
-        payload: {},
-        controls: {},
-      };
-
-      await expect(client.executeWorkflow(event)).rejects.toThrow(ExecutionStateResultInvalidError);
     });
 
     it('should throw an error when workflow ID is invalid', async () => {

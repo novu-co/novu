@@ -4,12 +4,17 @@ import react from '@vitejs/plugin-react';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import tailwindcss from 'tailwindcss';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
+import { ViteEjsPlugin } from 'vite-plugin-ejs';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { legacyHandler } from './legacy-handler';
 
 export default defineConfig({
   plugins: [
+    ViteEjsPlugin((viteConfig) => ({
+      // viteConfig is the current Vite resolved config
+      env: viteConfig.env,
+    })),
     react(),
     viteStaticCopy({
       targets: [
@@ -47,6 +52,7 @@ export default defineConfig({
     },
   },
   server: {
+    port: 4201,
     headers: {
       'Document-Policy': 'js-profiling',
     },

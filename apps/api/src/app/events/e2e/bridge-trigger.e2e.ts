@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { expect } from 'chai';
-import { v4 as uuidv4 } from 'uuid';
 import sinon from 'sinon';
 
 import { SubscribersService, UserSession } from '@novu/testing';
@@ -60,7 +59,7 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should trigger the bridge workflow with sync [${context.name}]`, async () => {
-      const workflowId = `hello-world-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `hello-world-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowId,
         async ({ step, payload }) => {
@@ -160,7 +159,7 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should skip by static value [${context.name}]`, async () => {
-      const workflowIdSkipByStatic = `skip-by-static-value-workflow-${`${context.name}-${uuidv4()}`}`;
+      const workflowIdSkipByStatic = `skip-by-static-value-workflow-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowIdSkipByStatic,
         async ({ step, payload }) => {
@@ -223,7 +222,7 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should skip by variable default value [${context.name}]`, async () => {
-      const workflowIdSkipByVariable = `skip-by-variable-default-value-${`${context.name}-${uuidv4()}`}`;
+      const workflowIdSkipByVariable = `skip-by-variable-default-value-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowIdSkipByVariable,
         async ({ step, payload }) => {
@@ -287,7 +286,7 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should have execution detail errors for invalid trigger payload [${context.name}]`, async () => {
-      const workflowId = `missing-payload-name-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `missing-payload-name-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowId,
         async ({ step, payload }) => {
@@ -329,11 +328,11 @@ contexts.forEach((context: Context) => {
       expect(messagesAfter.length).to.be.eq(0);
       const executionDetailsRequired = await executionDetailsRepository.find({
         _environmentId: session.environment._id,
-        status: ExecutionDetailsStatusEnum.WARNING,
+        status: ExecutionDetailsStatusEnum.FAILED,
       });
 
       let raw = JSON.parse(executionDetailsRequired[0]?.raw ?? '');
-      let error = raw.raw.data[0].message;
+      let error = raw.data[0].message;
 
       expect(error).to.include("must have required property 'name'");
 
@@ -344,16 +343,16 @@ contexts.forEach((context: Context) => {
 
       const executionDetailsInvalidType = await executionDetailsRepository.find({
         _environmentId: session.environment._id,
-        status: ExecutionDetailsStatusEnum.WARNING,
+        status: ExecutionDetailsStatusEnum.FAILED,
       });
       raw = JSON.parse(executionDetailsInvalidType[0]?.raw ?? '');
-      error = raw.raw.data[0].message;
+      error = raw.data[0].message;
 
       expect(error).to.include('must be string');
     });
 
     it(`should use custom step [${context.name}]`, async () => {
-      const workflowId = `with-custom-step-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `with-custom-step-${`${context.name}`}`;
       const newWorkflow = workflow(workflowId, async ({ step }) => {
         const resInApp = await step.inApp('send-in-app', async () => {
           return {
@@ -419,7 +418,7 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should trigger the bridge workflow with digest [${context.name}]`, async () => {
-      const workflowId = `digest-workflow-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `digest-workflow-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowId,
         async ({ step }) => {
@@ -491,7 +490,7 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should trigger the bridge workflow with delay [${context.name}]`, async () => {
-      const workflowId = `delay-workflow-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `delay-workflow-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowId,
         async ({ step }) => {
@@ -572,7 +571,7 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should trigger the bridge workflow with control default and payload data [${context.name}]`, async () => {
-      const workflowId = `default-payload-params-workflow-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `default-payload-params-workflow-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowId,
         async ({ step, payload }) => {
@@ -624,12 +623,16 @@ contexts.forEach((context: Context) => {
       });
 
       expect(sentMessage.length).to.be.eq(2);
-      expect(sentMessage[1].subject).to.include('prefix Hello default_name');
-      expect(sentMessage[0].subject).to.include('prefix Hello payload_name');
+      const expectedSubjects = ['prefix Hello default_name', 'prefix Hello payload_name'];
+
+      expectedSubjects.forEach((expectedSubject) => {
+        const found = sentMessage.some((message) => message.subject.includes(expectedSubject));
+        expect(found).to.be.true;
+      });
     });
 
     it(`should trigger the bridge workflow with control variables [${context.name}]`, async () => {
-      const workflowId = `control-variables-workflow-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `control-variables-workflow-${`${context.name}`}`;
       const stepId = 'send-email';
       const newWorkflow = workflow(
         workflowId,
@@ -687,7 +690,7 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should store 2 in-app messages for a single notification event [${context.name}]`, async () => {
-      const workflowId = `double-in-app-workflow-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `double-in-app-workflow-${`${context.name}`}`;
       const newWorkflow = workflow(workflowId, async ({ step }) => {
         await step.inApp('send-in-app1', () => ({ body: 'Hello there 1' }));
         await step.inApp('send-in-app2', () => ({ body: 'Hello there 2' }));
@@ -716,7 +719,7 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should deliver message if the Workflow Definition doesn't contain preferences [${context.name}]`, async () => {
-      const workflowId = `without-preferences-workflow-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `without-preferences-workflow-${`${context.name}`}`;
       const newWorkflow = workflow(workflowId, async ({ step }) => {
         await step.inApp('send-in-app', () => ({ body: 'Hello there 1' }));
       });
@@ -749,7 +752,7 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should deliver message if inApp is enabled via workflow preferences [${context.name}]`, async () => {
-      const workflowId = `enabled-inapp-workflow-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `enabled-inapp-workflow-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowId,
         async ({ step }) => {
@@ -786,7 +789,7 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should NOT deliver message if inApp is disabled via workflow preferences [${context.name}]`, async () => {
-      const workflowId = `disabled-inapp-workflow-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `disabled-inapp-workflow-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowId,
         async ({ step }) => {
@@ -834,7 +837,7 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should deliver inApp message if workflow is disabled via workflow preferences and inApp is enabled [${context.name}]`, async () => {
-      const workflowId = `disabled-workflow-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `disabled-workflow-inapp-enabled-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowId,
         async ({ step }) => {
@@ -874,7 +877,7 @@ contexts.forEach((context: Context) => {
     });
 
     it(`should NOT deliver inApp message if workflow is disabled via workflow preferences [${context.name}]`, async () => {
-      const workflowId = `disabled-workflow-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `disabled-workflow-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowId,
         async ({ step }) => {
@@ -921,7 +924,7 @@ contexts.forEach((context: Context) => {
 
     // eslint-disable-next-line max-len
     it(`should deliver inApp message if subscriber disabled inApp channel for readOnly workflow with inApp enabled [${context.name}]`, async () => {
-      const workflowId = `enabled-readonly-workflow-level-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `enabled-readonly-workflow-level-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowId,
         async ({ step }) => {
@@ -974,7 +977,7 @@ contexts.forEach((context: Context) => {
 
     // eslint-disable-next-line max-len
     it(`should NOT deliver inApp message if subscriber enables inApp channel for readOnly workflow with inApp disabled [${context.name}]`, async () => {
-      const workflowId = `disabled-readonly-workflow-level-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `disabled-readonly-workflow-level-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowId,
         async ({ step }) => {
@@ -1038,7 +1041,7 @@ contexts.forEach((context: Context) => {
 
     // eslint-disable-next-line max-len
     it(`should deliver inApp message if subscriber disabled inApp channel globally for readOnly workflow with inApp enabled [${context.name}]`, async () => {
-      const workflowId = `enabled-readonly-global-level-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `enabled-readonly-global-level-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowId,
         async ({ step }) => {
@@ -1089,7 +1092,7 @@ contexts.forEach((context: Context) => {
 
     // eslint-disable-next-line max-len
     it(`should NOT deliver inApp message if subscriber enabled inApp channel globally for readOnly workflow with inApp disabled [${context.name}]`, async () => {
-      const workflowId = `disabled-readonly-global-level-${`${context.name}-${uuidv4()}`}`;
+      const workflowId = `disabled-readonly-global-level-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowId,
         async ({ step }) => {
@@ -1158,7 +1161,7 @@ contexts.forEach((context: Context) => {
          */
         expect(true).to.equal(true);
       } else {
-        const workflowId = `disabled-editable-global-level-${`${context.name}-${uuidv4()}`}`;
+        const workflowId = `disabled-editable-global-level-${`${context.name}`}`;
         const newWorkflow = workflow(
           workflowId,
           async ({ step }) => {
@@ -1213,7 +1216,7 @@ contexts.forEach((context: Context) => {
          */
         expect(true).to.equal(true);
       } else {
-        const workflowId = `enabled-editable-global-level-${`${context.name}-${uuidv4()}`}`;
+        const workflowId = `enabled-editable-global-level-${`${context.name}`}`;
         const newWorkflow = workflow(
           workflowId,
           async ({ step }) => {
@@ -1279,7 +1282,7 @@ contexts.forEach((context: Context) => {
          */
         expect(true).to.equal(true);
       } else {
-        const workflowId = `disabled-editable-global-workflow-level-${`${context.name}-${uuidv4()}`}`;
+        const workflowId = `disabled-editable-global-workflow-level-${`${context.name}`}`;
         const newWorkflow = workflow(
           workflowId,
           async ({ step }) => {
@@ -1343,7 +1346,7 @@ contexts.forEach((context: Context) => {
          */
         expect(true).to.equal(true);
       } else {
-        const workflowId = `enabled-editable-global-workflow-level-${`${context.name}-${uuidv4()}`}`;
+        const workflowId = `enabled-editable-global-workflow-level-${`${context.name}`}`;
         const newWorkflow = workflow(
           workflowId,
           async ({ step }) => {

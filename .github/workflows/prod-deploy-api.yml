@@ -106,6 +106,24 @@ jobs:
       deploy_sentry_release: true
       sentry_project: api
 
+  sync_novu_state:
+    needs: deploy_prod_api_us
+    runs-on: ubuntu-latest
+    environment: Production
+    steps:
+      - name: Sync State to Novu
+        uses: novuhq/actions-novu-sync@v2
+        with:
+          # The secret key used to authenticate with Novu Cloud
+          # To get the secret key, go to https://web.novu.co/api-keys.
+          # Required.
+          secret-key: ${{ secrets.NOVU_INTERNAL_SECRET_KEY }}
+
+          # The publicly available endpoint hosting the bridge application
+          # where notification entities (eg. workflows, topics) are defined.
+          # Required.
+          bridge-url: https://api.novu.co/v1/bridge/novu
+
   deploy_docs:
     needs: deploy_prod_api_us
     runs-on: ubuntu-latest

@@ -1,8 +1,8 @@
-import { ComponentProps } from 'react';
+import { EditorView } from '@uiw/react-codemirror';
+import { ComponentProps, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
-import { liquid } from '@codemirror/lang-liquid';
-import { EditorView } from '@uiw/react-codemirror';
+import merge from 'lodash.merge';
 
 import { Button, buttonVariants } from '@/components/primitives/button';
 import {
@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/primitives/dropdown-menu';
+import { Editor } from '@/components/primitives/editor';
 import {
   FormControl,
   FormField,
@@ -23,9 +24,12 @@ import { InputField } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import { URLInput } from '@/components/workflow-editor/url-input';
+import { completions } from '@/utils/liquid-autocomplete';
+import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
-import { Editor } from '@/components/primitives/editor';
+import { autocompletion } from '@codemirror/autocomplete';
+import { useStepEditorContext } from '../hooks';
 
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
@@ -46,94 +50,95 @@ export const InAppAction = () => {
 
   return (
     <>
-      <div className={cn('mt-3 flex items-center gap-1')}>
-        <div className="border-neutral-alpha-200 flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
-          {!primaryAction && !secondaryAction && (
-            <div className={buttonVariants({ variant: 'dashed', size: 'xs' })}>
-              <RiForbid2Line className="size-4" />
-              <span className="cursor-default">No action</span>
-            </div>
-          )}
-          {primaryAction && (
-            <ConfigureActionPopover asChild fields={{ actionKey: primaryActionKey }}>
-              <Button variant="primary" size="xs">
-                {primaryAction.label}
-              </Button>
-            </ConfigureActionPopover>
-          )}
-          {secondaryAction && (
-            <ConfigureActionPopover asChild fields={{ actionKey: secondaryActionKey }}>
-              <Button variant="outline" size="xs">
-                {secondaryAction.label}
-              </Button>
-            </ConfigureActionPopover>
-          )}
-        </div>
-        <DropdownMenu>
+      <DropdownMenu>
+        <div className={cn('mt-3 flex items-center gap-1')}>
+          <div className="border-neutral-alpha-200 relative flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
+            {!primaryAction && !secondaryAction && (
+              <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'z-10')}>
+                <RiForbid2Line className="size-4" />
+                <span className="cursor-default">No action</span>
+              </div>
+            )}
+            {primaryAction && (
+              <ConfigureActionPopover asChild fields={{ actionKey: primaryActionKey }}>
+                <Button variant="primary" size="xs" className="z-10">
+                  {primaryAction.label}
+                </Button>
+              </ConfigureActionPopover>
+            )}
+            {secondaryAction && (
+              <ConfigureActionPopover asChild fields={{ actionKey: secondaryActionKey }}>
+                <Button variant="outline" size="xs" className="z-10">
+                  {secondaryAction.label}
+                </Button>
+              </ConfigureActionPopover>
+            )}
+            <DropdownMenuTrigger className="absolute size-full" />
+          </div>
           <DropdownMenuTrigger asChild>
             <Button size={'icon'} variant={'ghost'}>
               <RiExpandUpDownLine className="size-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="p-1">
-            <DropdownMenuItem
-              onClick={() => {
-                setValue(primaryActionKey, undefined, { shouldDirty: true, shouldValidate: false });
-                setValue(secondaryActionKey, undefined, { shouldDirty: true, shouldValidate: false });
-              }}
-            >
-              <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'pointer-events-none gap-2')}>
-                <RiForbid2Line className="size-4" />
-                <span className="cursor-default">No action</span>
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                setValue(
-                  primaryActionKey,
-                  {
-                    label: 'Primary action',
-                    redirect: { target: '_self', url: '' },
-                  },
-                  { shouldDirty: true, shouldValidate: false }
-                );
-                setValue(secondaryActionKey, undefined, { shouldDirty: true, shouldValidate: false });
-              }}
-            >
-              <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
-                Primary action
-              </div>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                setValue(
-                  primaryActionKey,
-                  {
-                    label: 'Primary action',
-                    redirect: { target: '_self', url: '' },
-                  },
-                  { shouldDirty: true, shouldValidate: false }
-                );
-                setValue(
-                  secondaryActionKey,
-                  {
-                    label: 'Secondary action',
-                    redirect: { target: '_self', url: '' },
-                  },
-                  { shouldDirty: true, shouldValidate: false }
-                );
-              }}
-            >
-              <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
-                Primary action
-              </div>
-              <div className={cn(buttonVariants({ variant: 'outline', size: 'xs' }), 'pointer-events-none')}>
-                Secondary action
-              </div>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+        </div>
+        <DropdownMenuContent className="p-1" align="end">
+          <DropdownMenuItem
+            onClick={() => {
+              setValue(primaryActionKey, null, { shouldDirty: true, shouldValidate: false });
+              setValue(secondaryActionKey, null, { shouldDirty: true, shouldValidate: false });
+            }}
+          >
+            <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'pointer-events-none gap-2')}>
+              <RiForbid2Line className="size-4" />
+              <span className="cursor-default">No action</span>
+            </div>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              const primaryActionValue = merge(
+                {
+                  label: 'Primary action',
+                  redirect: { target: '_self', url: '' },
+                },
+                primaryAction
+              );
+              setValue(primaryActionKey, primaryActionValue, { shouldDirty: true, shouldValidate: false });
+              setValue(secondaryActionKey, null, { shouldDirty: true, shouldValidate: false });
+            }}
+          >
+            <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
+              Primary action
+            </div>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              const primaryActionValue = merge(
+                {
+                  label: 'Primary action',
+                  redirect: { target: '_self', url: '' },
+                },
+                primaryAction
+              );
+              setValue(primaryActionKey, primaryActionValue, { shouldDirty: true, shouldValidate: false });
+              setValue(
+                secondaryActionKey,
+                {
+                  label: 'Secondary action',
+                  redirect: { target: '_self', url: '' },
+                },
+                { shouldDirty: true, shouldValidate: false }
+              );
+            }}
+          >
+            <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
+              Primary action
+            </div>
+            <div className={cn(buttonVariants({ variant: 'outline', size: 'xs' }), 'pointer-events-none')}>
+              Secondary action
+            </div>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <FormMessagePure error={error ? String(error.message) : undefined} />
     </>
   );
@@ -145,11 +150,13 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
     ...rest
   } = props;
   const { control } = useFormContext();
+  const { step } = useStepEditorContext();
+  const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
 
   return (
-    <Popover modal={false}>
+    <Popover modal={true}>
       <PopoverTrigger {...rest} />
-      <PopoverContent className="max-w-72">
+      <PopoverContent className="max-w-72" side="bottom" align="end">
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 text-sm font-medium leading-none">
             <RiEdit2Line className="size-4" /> Customize button
@@ -167,16 +174,12 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                 <FormControl>
                   <InputField>
                     <Editor
+                      fontFamily="inherit"
                       placeholder="Button text"
                       value={field.value}
                       onChange={field.onChange}
                       height="30px"
-                      extensions={[
-                        liquid({
-                          variables: [{ type: 'variable', label: 'asdf' }],
-                        }),
-                        EditorView.lineWrapping,
-                      ]}
+                      extensions={[autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping]}
                     />
                   </InputField>
                 </FormControl>
@@ -194,6 +197,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                 targetKey: `${actionKey}.redirect.target`,
               }}
               withHint={false}
+              variables={variables}
             />
           </div>
         </div>

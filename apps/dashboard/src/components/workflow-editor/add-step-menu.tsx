@@ -4,10 +4,10 @@ import { PopoverPortal } from '@radix-ui/react-popover';
 import { Node } from './base-node';
 import { Popover, PopoverContent, PopoverTrigger } from '../primitives/popover';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
-import { STEP_TYPE_TO_COLOR } from '@/utils/color';
-import { Badge, BadgeContent } from '../primitives/badge';
+import { Badge } from '../primitives/badge';
 import { cn } from '@/utils/ui';
 import { StepTypeEnum } from '@/utils/enums';
+import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 
 const MenuGroup = ({ children }: { children: ReactNode }) => {
   return <div className="flex flex-col">{children}</div>;
@@ -49,11 +49,16 @@ const MenuItem = ({
         }
       )}
     >
-      <Icon className={`text-${color} bg-neutral-alpha-50 h-6 w-6 rounded-md p-1 opacity-40`} />
+      <Icon
+        className={`bg-neutral-alpha-50 h-6 w-6 rounded-md p-1 opacity-40`}
+        style={{
+          color: `hsl(var(--${color}))`,
+        }}
+      />
       <span className="text-xs">{children}</span>
       {disabled && (
-        <Badge kind="pill" variant="soft" className="ml-auto opacity-40">
-          <BadgeContent variant="neutral">soon</BadgeContent>
+        <Badge size="pill" variant="soft" className="ml-auto opacity-40">
+          coming soon
         </Badge>
       )}
     </span>

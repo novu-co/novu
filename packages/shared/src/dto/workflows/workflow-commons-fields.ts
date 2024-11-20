@@ -1,10 +1,10 @@
-import type { JSONSchema } from 'json-schema-to-ts';
+import type { JSONSchemaDto } from './json-schema-dto';
 import { WorkflowResponseDto } from './workflow-response-dto';
 import { Slug, StepTypeEnum, WorkflowPreferences } from '../../types';
 import { StepContentIssueEnum, StepIssueEnum } from './step-content-issue.enum';
 
 export class ControlsSchema {
-  schema: JSONSchema;
+  schema: JSONSchemaDto;
 }
 export type StepCreateAndUpdateKeys = keyof StepCreateDto | keyof StepUpdateDto;
 
@@ -26,6 +26,18 @@ export interface ContentIssue extends Issue<StepContentIssueEnum> {}
 export interface StepIssue extends Issue<StepIssueEnum> {}
 export type IdentifierOrInternalId = string;
 
+export type PatchStepDataDto = {
+  name?: string;
+  controlValues?: Record<string, unknown>;
+};
+
+export type PatchWorkflowDto = {
+  active?: boolean;
+  name?: string;
+  description?: string;
+  tags?: string[];
+};
+
 export type StepResponseDto = StepDto & {
   _id: string;
   slug: Slug;
@@ -38,6 +50,9 @@ export type StepUpdateDto = StepCreateDto & {
 };
 
 export type StepCreateDto = StepDto & {
+  /**
+   * @deprecated This field is deprecated and will be removed in future versions, use the patch step data.
+   */
   controlValues?: Record<string, unknown>;
 };
 

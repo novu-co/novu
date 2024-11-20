@@ -10,6 +10,7 @@ import {
   ViewportHelperFunctionOptions,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+
 import {
   AddNode,
   ChatNode,
@@ -27,6 +28,7 @@ import { AddNodeEdge, AddNodeEdgeType } from './edges';
 import { NODE_HEIGHT, NODE_WIDTH } from './base-node';
 import { StepTypeEnum } from '@/utils/enums';
 import { Step } from '@/utils/types';
+import { getFirstControlsErrorMessage, getFirstBodyErrorMessage } from './step-utils';
 
 const nodeTypes = {
   trigger: TriggerNode,
@@ -60,8 +62,7 @@ const mapStepToNode = (
     content = `Wait to send ~ 30 minutes`;
   }
 
-  const fieldIssues = Object.values({ ...step.issues?.body, ...step.issues?.control })[0];
-  const error = fieldIssues?.[0]?.message;
+  const error = getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues);
 
   return {
     id: crypto.randomUUID(),
@@ -81,7 +82,7 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useReactFlow();
 
-  const nodes = useMemo(() => {
+  const [nodes, edges] = useMemo(() => {
     const triggerNode = { id: '0', position: { x: 0, y: 0 }, data: {}, type: 'trigger' };
     let previousPosition = triggerNode.position;
 
@@ -98,35 +99,32 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
       type: 'add',
     };
 
-    return [triggerNode, ...createdNodes, addNode];
-  }, [steps]);
-
-  const edges = useMemo(
-    () =>
-      nodes.reduce<AddNodeEdgeType[]>((acc, node, index) => {
-        if (index === 0) {
-          return acc;
-        }
-
-        const parent = nodes[index - 1];
-        acc.push({
-          id: `edge-${parent.id}-${node.id}`,
-          source: parent.id,
-          sourceHandle: 'b',
-          targetHandle: 'a',
-          target: node.id,
-          type: 'addNode',
-          style: { stroke: 'hsl(var(--neutral-alpha-200))', strokeWidth: 2, strokeDasharray: 5 },
-          data: {
-            isLast: index === nodes.length - 1,
-            addStepIndex: index - 1,
-          },
-        });
-
+    const nodes = [triggerNode, ...createdNodes, addNode];
+    const edges = nodes.reduce<AddNodeEdgeType[]>((acc, node, index) => {
+      if (index === 0) {
         return acc;
-      }, []),
-    [nodes]
-  );
+      }
+
+      const parent = nodes[index - 1];
+      acc.push({
+        id: `edge-${parent.id}-${node.id}`,
+        source: parent.id,
+        sourceHandle: 'b',
+        targetHandle: 'a',
+        target: node.id,
+        type: 'addNode',
+        style: { stroke: 'hsl(var(--neutral-alpha-200))', strokeWidth: 2, strokeDasharray: 5 },
+        data: {
+          isLast: index === nodes.length - 1,
+          addStepIndex: index - 1,
+        },
+      });
+
+      return acc;
+    }, []);
+
+    return [nodes, edges];
+  }, [steps]);
 
   const positionCanvas = useCallback(
     (options?: ViewportHelperFunctionOptions) => {

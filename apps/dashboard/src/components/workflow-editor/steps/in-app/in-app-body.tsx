@@ -1,14 +1,15 @@
-import { liquid } from '@codemirror/lang-liquid';
 import { EditorView } from '@uiw/react-codemirror';
+import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
 import { InputField } from '@/components/primitives/input';
-import { useFetchStep } from '@/hooks/use-fetch-step';
+import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
-import { useParams } from 'react-router-dom';
+import { autocompletion } from '@codemirror/autocomplete';
+import { useStepEditorContext } from '../hooks';
 
 const bodyKey = 'body';
 
@@ -17,10 +18,8 @@ export const InAppBody = () => {
     control,
     formState: { errors },
   } = useFormContext();
-
-  const { workflowSlug = '', stepSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
-
-  const { step } = useFetchStep({ workflowSlug, stepSlug });
+  const { step } = useStepEditorContext();
+  const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
 
   return (
     <FormField
@@ -29,23 +28,23 @@ export const InAppBody = () => {
       render={({ field }) => (
         <FormItem className="w-full">
           <FormControl>
-            <InputField size="md" className="h-32 px-1" state={errors[bodyKey] ? 'error' : 'default'}>
+            <InputField className="h-36 px-1" state={errors[bodyKey] ? 'error' : 'default'}>
               <Editor
+                fontFamily="inherit"
                 placeholder={capitalize(field.name)}
-                size="md"
                 id={field.name}
-                extensions={[
-                  liquid({
-                    variables: step ? parseStepVariablesToLiquidVariables(step.variables) : [],
-                  }),
-                  EditorView.lineWrapping,
-                ]}
+                extensions={[autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping]}
+                basicSetup={{
+                  defaultKeymap: true,
+                }}
+                ref={field.ref}
                 value={field.value}
                 onChange={(val) => field.onChange(val)}
+                height="100%"
               />
             </InputField>
           </FormControl>
-          <FormMessage />
+          <FormMessage>{`Type {{ for variables, or wrap text in ** for bold.`}</FormMessage>
         </FormItem>
       )}
     />

@@ -723,6 +723,36 @@ describe('Promote changes', () => {
       });
       expect(prodFeeds.length).to.equal(0);
     });
+
+    it('should update workflow preferences on promote', async () => {
+      const testTemplate: Partial<CreateWorkflowRequestDto> = {
+        name: 'test email template',
+        description: 'This is a test description',
+        tags: ['test-tag'],
+        notificationGroupId: session.notificationGroups[0]._id,
+        steps: [],
+        preferenceSettings: {
+          email: true,
+          in_app: false,
+          sms: true,
+          chat: false,
+          push: false,
+        },
+      };
+
+      const { body } = await session.testAgent.post(`/v1/workflows`).send(testTemplate);
+      const notificationTemplateId = body.data._id;
+
+      await session.testAgent.put(`/v1/workflows/${notificationTemplateId}/status`).send({ active: true });
+
+      await session.applyChanges({
+        enabled: false,
+      });
+
+      const { body: prodVersion } = await session.testAgent.get(`/v1/workflows/${notificationTemplateId}`);
+
+      expect(prodVersion?.data?.preferenceSettings).to.deep.equal(testTemplate.preferenceSettings);
+    });
   });
 
   async function getProductionEnvironment(): Promise<EnvironmentEntity> {

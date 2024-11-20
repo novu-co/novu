@@ -1,6 +1,14 @@
 import { ChannelStepEnum } from '../../constants';
 import { emptySchema } from '../../schemas';
-import type { Awaitable, DiscoverStepOutput, DiscoverWorkflowOutput, Schema, ChannelStep } from '../../types';
+import type {
+  Awaitable,
+  DiscoverStepOutput,
+  DiscoverWorkflowOutput,
+  Schema,
+  ChannelStep,
+  StepOptions,
+  FromSchema,
+} from '../../types';
 import { transformSchema } from '../../validators';
 import { discoverProviders } from './discover-providers';
 import { discoverStep } from './discover-step';
@@ -32,14 +40,14 @@ export async function discoverChannelStepFactory(
       },
       resolve: resolve as (controls: Record<string, unknown>) => Awaitable<Record<string, unknown>>,
       code: resolve.toString(),
-      options,
+      options: options as StepOptions<Schema, FromSchema<Schema>>,
       providers: [],
     };
 
     await discoverStep(targetWorkflow, stepId, step);
 
     if (Object.keys(options.providers || {}).length > 0) {
-      discoverProviders(step, type as ChannelStepEnum, options.providers || {});
+      await discoverProviders(step, type as ChannelStepEnum, options.providers || {});
     }
 
     return {

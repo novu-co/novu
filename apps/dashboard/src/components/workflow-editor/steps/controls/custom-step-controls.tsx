@@ -4,11 +4,18 @@ import { RiArrowDownSLine, RiArrowUpSLine, RiInputField } from 'react-icons/ri';
 import { type ControlsMetadata } from '@novu/shared';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/primitives/collapsible';
 import { JsonForm } from './json-form';
+import { WorkflowOriginEnum } from '@/utils/enums';
 
-export function CustomStepControls({ dataSchema }: { dataSchema: ControlsMetadata['dataSchema'] }) {
+export function CustomStepControls({
+  dataSchema,
+  origin,
+}: {
+  dataSchema: ControlsMetadata['dataSchema'];
+  origin: WorkflowOriginEnum;
+}) {
   const [isEditorOpen, setIsEditorOpen] = useState(true);
 
-  if (!dataSchema) {
+  if (!dataSchema || origin !== WorkflowOriginEnum.EXTERNAL) {
     return null;
   }
 
@@ -21,7 +28,7 @@ export function CustomStepControls({ dataSchema }: { dataSchema: ControlsMetadat
       <CollapsibleTrigger className="flex w-full items-center justify-between text-sm">
         <div className="flex items-center gap-1">
           <RiInputField className="text-feature size-5" />
-          <span className="text-sm font-medium">Custom steps controls</span>
+          <span className="text-sm font-medium">Custom step controls</span>
         </div>
 
         {isEditorOpen ? (

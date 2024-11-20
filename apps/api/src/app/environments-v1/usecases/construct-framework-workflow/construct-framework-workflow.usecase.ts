@@ -1,15 +1,6 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { workflow } from '@novu/framework/express';
-import {
-  ActionStep,
-  ChannelStep,
-  DelayOutput,
-  DigestOutput,
-  Step,
-  StepOptions,
-  StepOutput,
-  Workflow,
-} from '@novu/framework/internal';
+import { ActionStep, ChannelStep, JsonSchema, Step, StepOptions, StepOutput, Workflow } from '@novu/framework/internal';
 import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import { StepTypeEnum } from '@novu/shared';
 import { ConstructFrameworkWorkflowCommand } from './construct-framework-workflow.command';
@@ -21,6 +12,8 @@ import {
   RenderEmailOutputUsecase,
   SmsOutputRendererUsecase,
 } from '../output-renderers';
+import { DelayOutputRendererUsecase } from '../output-renderers/delay-output-renderer.usecase';
+import { DigestOutputRendererUsecase } from '../output-renderers/digest-output-renderer.usecase';
 
 @Injectable()
 export class ConstructFrameworkWorkflow {
@@ -30,7 +23,9 @@ export class ConstructFrameworkWorkflow {
     private emailOutputRendererUseCase: RenderEmailOutputUsecase,
     private smsOutputRendererUseCase: SmsOutputRendererUsecase,
     private chatOutputRendererUseCase: ChatOutputRendererUsecase,
-    private pushOutputRendererUseCase: PushOutputRendererUsecase
+    private pushOutputRendererUseCase: PushOutputRendererUsecase,
+    private delayOutputRendererUseCase: DelayOutputRendererUsecase,
+    private digestOutputRendererUseCase: DigestOutputRendererUsecase
   ) {}
 
   async execute(command: ConstructFrameworkWorkflowCommand): Promise<Workflow> {
@@ -41,21 +36,20 @@ export class ConstructFrameworkWorkflow {
       }
     }
 
-    return this.constructFrameworkWorkflow(dbWorkflow, command.action);
+    return this.constructFrameworkWorkflow(dbWorkflow);
   }
 
-  private constructFrameworkWorkflow(newWorkflow, action) {
+  private constructFrameworkWorkflow(newWorkflow: NotificationTemplateEntity): Workflow {
     return workflow(
       newWorkflow.triggers[0].identifier,
       async ({ step, payload, subscriber }) => {
         const fullPayloadForRender: FullPayloadForRender = { payload, subscriber, steps: {} };
         for await (const staticStep of newWorkflow.steps) {
-          try {
-            const stepOutputs = await this.constructStep(step, staticStep, fullPayloadForRender);
-            fullPayloadForRender.steps[staticStep.stepId || staticStep._templateId] = stepOutputs;
-          } catch (e) {
-            Logger.log(`Cannot Construct Step ${staticStep.stepId || staticStep._templateId}`, e);
-          }
+          fullPayloadForRender.steps[staticStep.stepId || staticStep._templateId] = await this.constructStep(
+            step,
+            staticStep,
+            fullPayloadForRender
+          );
         }
       },
       {
@@ -143,7 +137,7 @@ export class ConstructFrameworkWorkflow {
         return step.digest(
           stepId,
           async (controlValues) => {
-            return controlValues as DigestOutput;
+            return this.digestOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructActionStepOptions(staticStep)
         );
@@ -151,7 +145,7 @@ export class ConstructFrameworkWorkflow {
         return step.delay(
           stepId,
           async (controlValues) => {
-            return controlValues as DelayOutput;
+            return this.delayOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructActionStepOptions(staticStep)
         );
@@ -178,7 +172,8 @@ export class ConstructFrameworkWorkflow {
 
   private constructCommonStepOptions(staticStep: NotificationStepEntity): Required<StepOptions> {
     return {
-      controlSchema: staticStep.template!.controls!.schema,
+      // TODO: fix the `JSONSchemaDto` type to enforce a non-primitive schema type.
+      controlSchema: staticStep.template!.controls!.schema as JsonSchema,
       /*
        * TODO: add conditions
        * Used to construct conditions defined with https://react-querybuilder.js.org/ or similar
