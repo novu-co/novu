@@ -1,4 +1,4 @@
-import { JobTitleEnum } from '../../types';
+import { JobTitleEnum, OrganizationTypeEnum } from '../../types';
 
 export type UpdateExternalOrganizationDto = {
   jobTitle?: JobTitleEnum;
@@ -6,4 +6,5 @@ export type UpdateExternalOrganizationDto = {
   language?: string[];
   frontendStack?: string[];
   companySize?: string;
+  organizationType?: OrganizationTypeEnum;
 };

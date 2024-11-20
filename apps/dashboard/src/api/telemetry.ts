@@ -6,3 +6,11 @@ export const sendTelemetry = async (event: string, data?: Record<string, unknown
     data,
   });
 };
+
+export const identifyUser = async (userData: any) => {
+  try {
+    await post('/v1/telemetry/identify', userData);
+  } catch (error) {
+    console.error('Error identifying user:', error);
+  }
+};

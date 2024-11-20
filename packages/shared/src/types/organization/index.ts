@@ -29,6 +29,14 @@ export enum JobTitleEnum {
   OTHER = 'other',
 }
 
+export enum OrganizationTypeEnum {
+  COMPANY = 'Company',
+  AGENCY = 'Agency',
+  EDUCATIONAL = 'Educational',
+  SOLOPRENEUR = 'Solopreneur',
+  OTHER = 'Other',
+}
+
 export const jobTitleToLabelMapper = {
   [JobTitleEnum.ENGINEER]: 'Engineer',
   [JobTitleEnum.ARCHITECT]: 'Architect',
