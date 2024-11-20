@@ -11,7 +11,8 @@ type ZodValue =
   | z.ZodDefault<z.ZodTypeAny>
   | z.ZodEnum<[string, ...string[]]>
   | z.ZodOptional<z.ZodTypeAny>
-  | z.ZodBoolean;
+  | z.ZodBoolean
+  | z.ZodAny;
 
 const handleStringFormat = ({ value, key, format }: { value: z.ZodString; key: string; format: string }) => {
   if (format === 'email') {
@@ -117,11 +118,13 @@ export const buildDynamicZodSchema = (obj: JSONSchemaDto): z.AnyZodObject => {
       zodValue = handleStringType({ key, requiredFields, format, pattern, enumValues, defaultValue });
     } else if (type === 'boolean') {
       zodValue = z.boolean();
-    } else {
+    } else if (type === 'number') {
       zodValue = z.number();
       if (defaultValue) {
         zodValue = zodValue.default(defaultValue as number);
       }
+    } else {
+      zodValue = z.any();
     }
 
     if (!isRequired) {

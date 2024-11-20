@@ -27,8 +27,6 @@ export interface IExecutionLogJobDataDto {
 
   providerId?: string;
 
-  expireAt?: string;
-
   transactionId: string;
 
   channel?: StepTypeEnum;

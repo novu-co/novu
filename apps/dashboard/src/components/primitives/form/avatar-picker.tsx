@@ -1,4 +1,3 @@
-import { EditorView } from '@uiw/react-codemirror';
 import { forwardRef, useMemo, useState } from 'react';
 import { RiEdit2Line, RiErrorWarningFill, RiImageEditFill } from 'react-icons/ri';
 
@@ -75,13 +74,13 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ n
               <Separator />
               <div className="space-y-1">
                 <Label>Avatar URL</Label>
-                <InputField className="px-1">
+                <InputField size="fit">
                   <Editor
                     fontFamily="inherit"
                     ref={ref}
                     placeholder="Enter avatar URL"
                     id={name}
-                    extensions={[autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping]}
+                    extensions={[autocompletion({ override: [completions(variables)] })]}
                     value={`${value}`}
                     onChange={(newValue) => onChange?.(newValue)}
                   />

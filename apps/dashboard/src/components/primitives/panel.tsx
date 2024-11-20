@@ -6,7 +6,10 @@ const Panel = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEleme
     return (
       <div
         ref={ref}
-        className={cn('bg-neutral-alpha-50 flex flex-col gap-2 rounded-lg border border-neutral-200 p-2', className)}
+        className={cn(
+          'bg-neutral-alpha-50 flex flex-col gap-2 overflow-auto rounded-lg border border-neutral-200 p-2',
+          className
+        )}
         {...restDivProps}
       >
         {children}

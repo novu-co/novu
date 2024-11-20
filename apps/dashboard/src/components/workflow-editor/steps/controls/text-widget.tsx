@@ -16,10 +16,10 @@ export function TextWidget(props: WidgetProps) {
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className="my-2 w-full py-1">
+        <FormItem className="my-2 py-1">
           <FormLabel>{capitalize(label)}</FormLabel>
           <FormControl>
-            <InputField className="px-1">
+            <InputField size="fit">
               <Editor
                 fontFamily="inherit"
                 placeholder={capitalize(label)}
