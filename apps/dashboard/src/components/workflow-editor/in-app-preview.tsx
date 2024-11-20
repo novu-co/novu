@@ -59,44 +59,45 @@ export const InAppPreview = (props: InAppPreviewProps) => {
       )}
       {data && data.result?.type === ChannelTypeEnum.IN_APP && (
         <div className="bg-neutral-alpha-50 z-20 mt-2 rounded-lg px-2 py-2">
-          <div className="mb-2 flex items-center gap-2">
+          <div className="mb-2 flex gap-2">
             {data.result.preview.avatar && (
               <img src={data.result.preview.avatar} alt="avatar" className="bg-background h-5 min-w-5 rounded-full" />
             )}
-            {data.result.preview.subject ? (
-              <Subject text={data.result.preview.subject} className={truncate ? 'truncate' : ''} />
-            ) : (
-              <Body text={data.result.preview.body} className={truncate ? 'truncate' : ''} />
-            )}
-          </div>
-
-          {data.result.preview.subject && (
-            <Body text={data.result.preview.body} className={truncate ? 'truncate' : ''} />
-          )}
-
-          {(data.result.preview.primaryAction || data.result.preview.secondaryAction) && (
-            <div className="mt-3 flex items-center justify-start gap-1 overflow-hidden">
-              {data.result.preview.primaryAction && (
-                <Button
-                  className="overflow-hidden text-xs font-medium shadow-none"
-                  type="button"
-                  variant="primary"
-                  size="xs"
-                >
-                  <span className="overflow-hidden text-ellipsis">
-                    {(data.result.preview as InAppRenderOutput).primaryAction?.label}
-                  </span>
-                </Button>
+            <div className="space-y-2">
+              {data.result.preview.subject ? (
+                <Subject text={data.result.preview.subject} className={truncate ? 'truncate' : ''} />
+              ) : (
+                <Body text={data.result.preview.body} className={truncate ? 'truncate' : ''} />
               )}
-              {data.result.preview.secondaryAction && (
-                <Button variant="outline" className="overflow-hidden text-xs font-medium" type="button" size="xs">
-                  <span className="overflow-hidden text-ellipsis">
-                    {(data.result.preview as InAppRenderOutput).secondaryAction?.label}
-                  </span>
-                </Button>
+
+              {data.result.preview.subject && (
+                <Body text={data.result.preview.body} className={truncate ? 'truncate' : ''} />
+              )}
+              {(data.result.preview.primaryAction || data.result.preview.secondaryAction) && (
+                <div className="mt-3 flex items-center justify-start gap-1 overflow-hidden">
+                  {data.result.preview.primaryAction && (
+                    <Button
+                      className="overflow-hidden text-xs font-medium shadow-none"
+                      type="button"
+                      variant="primary"
+                      size="xs"
+                    >
+                      <span className="overflow-hidden text-ellipsis">
+                        {(data.result.preview as InAppRenderOutput).primaryAction?.label}
+                      </span>
+                    </Button>
+                  )}
+                  {data.result.preview.secondaryAction && (
+                    <Button variant="outline" className="overflow-hidden text-xs font-medium" type="button" size="xs">
+                      <span className="overflow-hidden text-ellipsis">
+                        {(data.result.preview as InAppRenderOutput).secondaryAction?.label}
+                      </span>
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
-          )}
+          </div>
         </div>
       )}
     </div>
