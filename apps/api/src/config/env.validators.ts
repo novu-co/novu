@@ -63,6 +63,9 @@ export const envValidators = {
       STRIPE_CONNECT_SECRET: str({ default: undefined }),
     }),
 
+  ...(processEnv.NOVU_ENTERPRISE === 'true' && {
+    PLAIN_SUPPORT_KEY: str({ default: undefined }),
+  }),
   // Feature Flags
   ...Object.keys(FeatureFlagsKeysEnum).reduce(
     (acc, key) => {
