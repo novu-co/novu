@@ -1,4 +1,3 @@
-import { EditorView } from '@uiw/react-codemirror';
 import { forwardRef, useMemo, useState } from 'react';
 import { RiEdit2Line, RiErrorWarningFill, RiImageEditFill } from 'react-icons/ri';
 
