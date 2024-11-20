@@ -172,7 +172,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           <RiFileCopyLine className="text-foreground-400 invisible size-3 group-hover:visible" />
         </HoverToCopy>
       </TableCell>
-      <TableCell>
+      <TableCell className="min-w-[200px]">
         <WorkflowStatus status={workflow.status} />
       </TableCell>
       <TableCell>
@@ -184,7 +184,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
 
       <Tooltip>
         <TooltipTrigger asChild>
-          <TableCell className="text-foreground-600 text-sm font-medium">
+          <TableCell className="text-foreground-600 min-w-[180px] text-sm font-medium">
             {new Date(workflow.updatedAt).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
