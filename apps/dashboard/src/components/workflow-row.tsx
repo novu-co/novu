@@ -39,7 +39,7 @@ import { ConfirmationModal } from './confirmation-modal';
 import { showToast } from './primitives/sonner-helpers';
 import { ToastIcon } from './primitives/sonner';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
-import { PAUSE_MODAL_DESCRIPTION, PAUSE_MODAL_TITLE } from '@/utils/constants';
+import { PauseModalDescription, PAUSE_MODAL_TITLE } from '@/components/pause-workflow-dialog';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -215,7 +215,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             setIsPauseModalOpen(false);
           }}
           title={PAUSE_MODAL_TITLE}
-          description={PAUSE_MODAL_DESCRIPTION(workflow.name)}
+          description={<PauseModalDescription workflowName={workflow.name} />}
           confirmButtonText="Proceed"
           isLoading={isPauseWorkflowPending}
         />
