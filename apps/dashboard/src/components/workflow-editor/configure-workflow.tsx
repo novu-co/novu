@@ -20,7 +20,7 @@ import { cn } from '@/utils/ui';
 import { SidebarContent, SidebarHeader } from '@/components/side-navigation/Sidebar';
 import { PageMeta } from '../page-meta';
 import { ConfirmationModal } from '../confirmation-modal';
-import { PauseModalDescription, PAUSE_MODAL_TITLE } from '../pause-workflow-dialog';
+import { PauseModalDescription, PAUSE_MODAL_TITLE } from '@/components/pause-workflow-dialog';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { useEnvironment } from '@/context/environment/hooks';
 

@@ -84,8 +84,12 @@ const ConfigureStepInternal = () => {
                 open={isDeleteModalOpen}
                 onOpenChange={setIsDeleteModalOpen}
                 onConfirm={onDeleteStep}
-                title="Are you sure?"
-                description={`You're about to delete the ${step?.name}, this action cannot be undone.`}
+                title="Proceeding will delete the step"
+                description={
+                  <>
+                    You're about to delete the <strong>{step?.name}</strong> step, this action is permanent.
+                  </>
+                }
                 confirmButtonText="Delete"
               />
               <Button
