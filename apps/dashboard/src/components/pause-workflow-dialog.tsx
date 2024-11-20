@@ -1,7 +1,6 @@
 export const PauseModalDescription = ({ workflowName }: { workflowName: string }) => (
   <>
-    Pausing the <strong>{workflowName}</strong> workflow will immediately prevent your integration from being able to
-    trigger it.
+    Pausing the <strong>{workflowName}</strong> workflow will immediately prevent you frombeing able to trigger it.
   </>
 );
 
