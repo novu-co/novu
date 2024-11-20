@@ -1,22 +1,24 @@
-import { ActionStepEnum, actionStepSchemas, ChannelStepEnum, channelStepSchemas } from '@novu/framework/internal';
+import { ActionStepEnum, ChannelStepEnum, channelStepSchemas } from '@novu/framework/internal';
 import { ControlSchemas, JSONSchemaDto } from '@novu/shared';
-import { EmailStepControlSchema, EmailStepUiSchema, inAppControlSchema, InAppUiSchema } from './schemas';
+import { emailStepControlSchema, emailStepUiSchema, inAppControlSchema, inAppUiSchema } from './schemas';
+import { DelayTimeControlSchema, delayUiSchema } from './schemas/delay-control.schema';
+import { DigestOutputJsonSchema, digestUiSchema } from './schemas/digest-control.schema';
 
 export const PERMISSIVE_EMPTY_SCHEMA = {
   type: 'object',
   properties: {},
   required: [],
   additionalProperties: true,
-} as const;
+} as JSONSchemaDto;
 
 export const stepTypeToDefaultDashboardControlSchema: Record<ChannelStepEnum | ActionStepEnum, ControlSchemas> = {
   [ChannelStepEnum.IN_APP]: {
     schema: inAppControlSchema,
-    uiSchema: InAppUiSchema,
+    uiSchema: inAppUiSchema,
   },
   [ChannelStepEnum.EMAIL]: {
-    schema: EmailStepControlSchema,
-    uiSchema: EmailStepUiSchema,
+    schema: emailStepControlSchema,
+    uiSchema: emailStepUiSchema,
   },
   [ChannelStepEnum.SMS]: {
     schema: channelStepSchemas[ChannelStepEnum.SMS].output as unknown as JSONSchemaDto,
@@ -27,14 +29,15 @@ export const stepTypeToDefaultDashboardControlSchema: Record<ChannelStepEnum | A
   [ChannelStepEnum.CHAT]: {
     schema: channelStepSchemas[ChannelStepEnum.CHAT].output as unknown as JSONSchemaDto,
   },
-
   [ActionStepEnum.DELAY]: {
-    schema: actionStepSchemas[ActionStepEnum.DELAY].output as unknown as JSONSchemaDto,
+    schema: DelayTimeControlSchema,
+    uiSchema: delayUiSchema,
   },
   [ActionStepEnum.DIGEST]: {
-    schema: actionStepSchemas[ActionStepEnum.DIGEST].output as unknown as JSONSchemaDto,
+    schema: DigestOutputJsonSchema,
+    uiSchema: digestUiSchema,
   },
   [ActionStepEnum.CUSTOM]: {
-    schema: PERMISSIVE_EMPTY_SCHEMA as unknown as JSONSchemaDto,
+    schema: PERMISSIVE_EMPTY_SCHEMA,
   },
 };

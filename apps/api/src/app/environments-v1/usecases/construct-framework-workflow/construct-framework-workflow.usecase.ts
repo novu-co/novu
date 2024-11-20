@@ -1,16 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { workflow } from '@novu/framework/express';
-import {
-  ActionStep,
-  ChannelStep,
-  DelayOutput,
-  DigestOutput,
-  JsonSchema,
-  Step,
-  StepOptions,
-  StepOutput,
-  Workflow,
-} from '@novu/framework/internal';
+import { ActionStep, ChannelStep, JsonSchema, Step, StepOptions, StepOutput, Workflow } from '@novu/framework/internal';
 import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import { StepTypeEnum } from '@novu/shared';
 import { ConstructFrameworkWorkflowCommand } from './construct-framework-workflow.command';
@@ -22,6 +12,8 @@ import {
   RenderEmailOutputUsecase,
   SmsOutputRendererUsecase,
 } from '../output-renderers';
+import { DelayOutputRendererUsecase } from '../output-renderers/delay-output-renderer.usecase';
+import { DigestOutputRendererUsecase } from '../output-renderers/digest-output-renderer.usecase';
 
 @Injectable()
 export class ConstructFrameworkWorkflow {
@@ -31,7 +23,9 @@ export class ConstructFrameworkWorkflow {
     private emailOutputRendererUseCase: RenderEmailOutputUsecase,
     private smsOutputRendererUseCase: SmsOutputRendererUsecase,
     private chatOutputRendererUseCase: ChatOutputRendererUsecase,
-    private pushOutputRendererUseCase: PushOutputRendererUsecase
+    private pushOutputRendererUseCase: PushOutputRendererUsecase,
+    private delayOutputRendererUseCase: DelayOutputRendererUsecase,
+    private digestOutputRendererUseCase: DigestOutputRendererUsecase
   ) {}
 
   async execute(command: ConstructFrameworkWorkflowCommand): Promise<Workflow> {
@@ -143,7 +137,7 @@ export class ConstructFrameworkWorkflow {
         return step.digest(
           stepId,
           async (controlValues) => {
-            return controlValues as DigestOutput;
+            return this.digestOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructActionStepOptions(staticStep)
         );
@@ -151,7 +145,7 @@ export class ConstructFrameworkWorkflow {
         return step.delay(
           stepId,
           async (controlValues) => {
-            return controlValues as DelayOutput;
+            return this.delayOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructActionStepOptions(staticStep)
         );

@@ -68,7 +68,7 @@ const Header = () => (
     <div className="flex flex-1 flex-col items-start gap-1">
       <DialogTitle className="text-lg font-medium">Thanks for opting-in! 🎉</DialogTitle>
       <DialogDescription className="text-foreground-400 text-xs font-normal">
-        Get an early look at our enhanced dashboard.
+        Get an early look at our new Dashboard.
       </DialogDescription>
     </div>
   </div>

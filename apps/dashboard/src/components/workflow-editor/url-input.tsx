@@ -2,7 +2,7 @@ import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessagePure } from '@/components/primitives/form/form';
-import { Input, InputField, InputFieldProps, InputProps } from '@/components/primitives/input';
+import { Input, InputFieldProps, InputFieldPure, InputProps } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { completions } from '@/utils/liquid-autocomplete';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
@@ -36,11 +36,10 @@ export const URLInput = ({
     <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between space-x-2">
         <div className="relative w-full">
-          <InputField className="pr-0">
+          <InputFieldPure className="pr-0">
             <FormField
               control={control}
               name={urlKey}
-              defaultValue=""
               render={({ field }) => (
                 <FormItem className="w-full overflow-hidden">
                   <FormControl>
@@ -62,7 +61,6 @@ export const URLInput = ({
             <FormField
               control={control}
               name={targetKey}
-              defaultValue="_self"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -82,7 +80,7 @@ export const URLInput = ({
                 </FormItem>
               )}
             />
-          </InputField>
+          </InputFieldPure>
         </div>
       </div>
       <FormMessagePure error={error ? String(error.message) : undefined}>

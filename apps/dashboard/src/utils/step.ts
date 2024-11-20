@@ -1,8 +1,9 @@
-import { ShortIsPrefixEnum, StepResponseDto } from '@novu/shared';
+import { ShortIsPrefixEnum } from '@novu/shared';
 
-const divider = `_${ShortIsPrefixEnum.STEP}`;
+export const WORKFLOW_DIVIDER = `_${ShortIsPrefixEnum.WORKFLOW}`;
+export const STEP_DIVIDER = `_${ShortIsPrefixEnum.STEP}`;
 
-export const getStepBase62Id = (slug: StepResponseDto['slug'] | string = divider) => {
+export const getEncodedId = ({ slug, divider }: { slug: string; divider: string }) => {
   const parts = slug.split(divider);
   return parts[parts.length - 1];
 };
