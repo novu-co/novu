@@ -26,6 +26,7 @@ import {
   TriggerBroadcast,
   TriggerEvent,
   TriggerMulticast,
+  ValidateControlByTierUsecase,
   WorkflowInMemoryProviderService,
 } from '@novu/application-generic';
 import { CommunityOrganizationRepository, JobRepository, PreferencesRepository } from '@novu/dal';
@@ -90,6 +91,7 @@ const USE_CASES = [
   AddDelayJob,
   MergeOrCreateDigest,
   AddJob,
+  ValidateControlByTierUsecase,
   CalculateLimitNovuIntegration,
   CompileEmailTemplate,
   CompileTemplate,
