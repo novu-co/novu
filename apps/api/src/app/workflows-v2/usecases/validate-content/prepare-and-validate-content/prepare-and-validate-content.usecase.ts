@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   ContentIssue,
+  DigestUnitEnum,
   JSONSchemaDto,
   PreviewPayload,
   StepContentIssueEnum,
@@ -8,6 +9,7 @@ import {
   UserSessionData,
 } from '@novu/shared';
 import { merge } from 'lodash';
+import { ValidateControlByTierUsecase } from '@novu/application-generic/src/usecases/validate-control-by-tier/validate-control-by-tier.usecase';
 import { PrepareAndValidateContentCommand } from './prepare-and-validate-content.command';
 import { mergeObjects } from '../../../util/jsonUtils';
 import { findMissingKeys } from '../../../util/utils';
@@ -17,7 +19,6 @@ import { CollectPlaceholderWithDefaultsUsecase, PlaceholderAggregation } from '.
 import { ExtractDefaultValuesFromSchemaUsecase } from '../../extract-default-values-from-schema';
 import { ValidatedContentResponse } from './validated-content.response';
 import { toSentenceCase } from '../../../../shared/services/helper/helper.service';
-import { ValidateControlByTierUsecase } from '../validate-control-by-tier/validate-control-by-tier.usecase';
 
 /**
  * Validates and prepares workflow step content by collecting placeholders,
@@ -168,12 +169,7 @@ export class PrepareAndValidateContentUsecase {
     finalIssues = mergeObjects(finalIssues, this.computeIllegalVariablesIssues(valueToPlaceholders));
     finalIssues = mergeObjects(finalIssues, this.getMissingInPayload(providedPayload, valueToPlaceholders, payload));
     finalIssues = mergeObjects(finalIssues, this.computeMissingControlValue(defaultControlValues, userProvidedValues));
-    const tierIssues = await this.validateControlByTierUsecase.execute({
-      controlValues: defaultControlValues,
-      user,
-      stepType,
-    });
-    finalIssues = mergeObjects(finalIssues, tierIssues);
+    finalIssues = mergeObjects(finalIssues, await this.computeTierIssues(defaultControlValues, user, stepType));
 
     return finalIssues;
   }
@@ -246,4 +242,48 @@ export class PrepareAndValidateContentUsecase {
 
     return result;
   }
+
+  private async computeTierIssues(
+    defaultControlValues: Record<string, unknown>,
+    user: UserSessionData,
+    stepType?: StepTypeEnum
+  ) {
+    const deferDuration =
+      isValidDigestUnit(defaultControlValues.unit) && isNumber(defaultControlValues.amount)
+        ? calculateMilliseconds(defaultControlValues.amount, defaultControlValues.unit)
+        : 0;
+
+    return await this.validateControlByTierUsecase.execute({
+      deferDuration,
+      organizationId: user.organizationId,
+      stepType,
+    });
+  }
+}
+
+function calculateMilliseconds(amount: number, unit: DigestUnitEnum): number {
+  switch (unit) {
+    case DigestUnitEnum.SECONDS:
+      return amount * 1000;
+    case DigestUnitEnum.MINUTES:
+      return amount * 1000 * 60;
+    case DigestUnitEnum.HOURS:
+      return amount * 1000 * 60 * 60;
+    case DigestUnitEnum.DAYS:
+      return amount * 1000 * 60 * 60 * 24;
+    case DigestUnitEnum.WEEKS:
+      return amount * 1000 * 60 * 60 * 24 * 7;
+    case DigestUnitEnum.MONTHS:
+      return amount * 1000 * 60 * 60 * 24 * 30; // Using 30 days as an approximation for a month
+    default:
+      return 0;
+  }
+}
+
+function isValidDigestUnit(unit: unknown): unit is DigestUnitEnum {
+  return Object.values(DigestUnitEnum).includes(unit as DigestUnitEnum);
+}
+
+function isNumber(value: unknown): value is number {
+  return !Number.isNaN(Number(value));
 }

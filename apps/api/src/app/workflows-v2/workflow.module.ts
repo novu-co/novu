@@ -8,6 +8,7 @@ import {
   UpdateWorkflow,
   UpsertControlValuesUseCase,
   UpsertPreferences,
+  ValidateControlByTierUsecase,
 } from '@novu/application-generic';
 
 import { SharedModule } from '../shared/shared.module';
@@ -37,7 +38,6 @@ import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-re
 import { OverloadContentDataOnWorkflowUseCase } from './usecases/overload-content-data';
 import { PatchWorkflowUsecase } from './usecases/patch-workflow';
 import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
-import { ValidateControlByTierUsecase } from './usecases/validate-content/validate-control-by-tier/validate-control-by-tier.usecase';
 
 @Module({
   imports: [SharedModule, MessageTemplateModule, ChangeModule, AuthModule, BridgeModule, IntegrationModule],

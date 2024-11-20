@@ -5,6 +5,7 @@ import { differenceInMilliseconds } from 'date-fns';
 import { JobEntity, JobRepository, JobStatusEnum } from '@novu/dal';
 import {
   castUnitToDigestUnitEnum,
+  ContentIssue,
   DigestCreationResultEnum,
   DigestTypeEnum,
   ExecutionDetailsSourceEnum,
@@ -33,6 +34,8 @@ import {
   isTimedDigestOutput,
   isLookBackDigestOutput,
   isRegularDigestOutput,
+  ValidateControlByTierUsecase,
+  ValidateControlByTierCommand,
 } from '@novu/application-generic';
 
 import { AddDelayJob } from './add-delay-job.usecase';
@@ -63,6 +66,7 @@ export class AddJob {
     @Inject(forwardRef(() => ConditionsFilter))
     private conditionsFilter: ConditionsFilter,
     private normalizeVariablesUsecase: NormalizeVariables,
+    private validateControlByTierUsecase: ValidateControlByTierUsecase,
     private executeBridgeJob: ExecuteBridgeJob
   ) {}
 
@@ -157,7 +161,39 @@ export class AddJob {
 
     const delay = this.getExecutionDelayAmount(filtered, digestAmount, delayAmount);
 
+    await this.validateDeferDuration(delay, job, command);
+
     await this.queueJob(job, delay);
+  }
+
+  private async validateDeferDuration(delay: number, job: JobEntity, command: AddJobCommand) {
+    const issues = await this.validateControlByTierUsecase.execute(
+      ValidateControlByTierCommand.create({
+        deferDuration: delay,
+        stepType: job.type,
+        organizationId: command.organizationId,
+      })
+    );
+
+    if (Object.keys(issues).length > 0) {
+      const tierIssues = (issues as Record<string, ContentIssue[]>).tier;
+      if (tierIssues) {
+        Logger.warn({ issues: tierIssues, jobId: job._id }, 'Defer duration limit exceeded for job', LOG_CONTEXT);
+
+        await this.executionLogRoute.execute(
+          ExecutionLogRouteCommand.create({
+            ...ExecutionLogRouteCommand.getDetailsFromJob(job),
+            detail: DetailEnum.DEFER_DURATION_LIMIT_EXCEEDED,
+            source: ExecutionDetailsSourceEnum.INTERNAL,
+            status: ExecutionDetailsStatusEnum.FAILED,
+            isTest: false,
+            isRetry: false,
+          })
+        );
+
+        throw new Error(DetailEnum.DEFER_DURATION_LIMIT_EXCEEDED);
+      }
+    }
   }
 
   private async executeNoneDeferredJob(command: AddJobCommand): Promise<void> {
