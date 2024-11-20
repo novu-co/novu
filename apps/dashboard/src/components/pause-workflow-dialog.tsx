@@ -1,6 +1,12 @@
+import TruncatedText from './truncated-text';
+
 export const PauseModalDescription = ({ workflowName }: { workflowName: string }) => (
   <>
-    Pausing the <strong>{workflowName}</strong> workflow will immediately prevent you frombeing able to trigger it.
+    Pausing the{' '}
+    <strong>
+      <TruncatedText className="max-w-[32ch]">{workflowName}</TruncatedText>
+    </strong>{' '}
+    workflow will immediately prevent you from being able to trigger it.
   </>
 );
 
