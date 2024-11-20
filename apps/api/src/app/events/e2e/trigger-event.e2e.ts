@@ -21,8 +21,6 @@ import {
   ActorTypeEnum,
   ChannelTypeEnum,
   ChatProviderIdEnum,
-  DEFAULT_MESSAGE_GENERIC_RETENTION_DAYS,
-  DEFAULT_MESSAGE_IN_APP_RETENTION_DAYS,
   DelayTypeEnum,
   DigestUnitEnum,
   EmailBlockTypeEnum,
