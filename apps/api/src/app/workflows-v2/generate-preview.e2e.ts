@@ -242,6 +242,30 @@ describe('Generate Preview', () => {
     });
 
     describe('Error Handling', () => {
+      it('Should show issue about bad URLs without failing ', async () => {
+        const steps = [{ name: 'IN_APP_STEP_SHOULD_NOT_FAIL', type: StepTypeEnum.IN_APP }];
+        const createDto = buildCreateWorkflowDto('', { steps });
+        const novuRestResult = await workflowsClient.createWorkflow(createDto);
+        if (!novuRestResult.isSuccessResult()) {
+          throw new Error('should create workflow');
+        }
+        const controlValues = buildInAppControlValuesWithIllegalUrlsAndData();
+        const workflowSlug = novuRestResult.value?.slug;
+        const stepSlug = novuRestResult.value?.steps[0].slug;
+        await patchStepWithControlValues(workflowSlug, stepSlug, controlValues);
+        const generatePreviewResponseDto = await generatePreview(
+          workflowSlug,
+          stepSlug,
+          { controlValues: buildInAppControlValuesMissingUrlsAndData() },
+          ''
+        );
+        if (generatePreviewResponseDto.result?.type === ChannelTypeEnum.IN_APP) {
+          console.log(
+            'generatePreviewResponseDto.result.preview',
+            JSON.stringify(generatePreviewResponseDto.result.preview)
+          );
+        }
+      });
       it('Should not fail on illegal placeholder {{}} ', async () => {
         const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(StepTypeEnum.SMS);
         const requestDto = {
@@ -553,6 +577,32 @@ function buildInAppControlValuesMissingUrlsAndData() {
     },
   };
 }
+function buildInAppControlValuesWithIllegalUrlsAndData(): InAppControlType {
+  return {
+    subject: `{{subscriber.firstName}} Hello, World! ${PLACEHOLDER_SUBJECT_INAPP}`,
+    body: `Hello, World! {{payload.placeholder.body}}`,
+    avatar: 'https://www.example.com/avatar.png',
+    primaryAction: {
+      label: '{{payload.secondaryUrl}}',
+      redirect: {
+        url: 'notAurl.com',
+        target: RedirectTargetEnum.BLANK,
+      },
+    },
+    secondaryAction: {
+      label: 'somelabel',
+      redirect: {
+        url: 'ftp://notAurl.com',
+        target: RedirectTargetEnum.BLANK,
+      },
+    },
+    redirect: {
+      target: RedirectTargetEnum.BLANK,
+      url: 'blablal',
+    },
+  };
+}
+
 function buildInAppControlValueWithAPlaceholderInTheUrl() {
   return {
     subject: `{{subscriber.firstName}} Hello, World! ${PLACEHOLDER_SUBJECT_INAPP}`,
