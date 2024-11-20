@@ -1,4 +1,3 @@
-import { liquid } from '@codemirror/lang-liquid';
 import { EditorView } from '@uiw/react-codemirror';
 import { forwardRef, useMemo, useState } from 'react';
 import { RiEdit2Line, RiErrorWarningFill, RiImageEditFill } from 'react-icons/ri';
@@ -12,7 +11,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives
 import { Separator } from '@/components/primitives/separator';
 import TextSeparator from '@/components/primitives/text-separator';
 import { useStepEditorContext } from '@/components/workflow-editor/steps/hooks';
+import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
+import { autocompletion } from '@codemirror/autocomplete';
 import { Editor } from '../editor';
 import { useFormField } from './form-context';
 
@@ -80,12 +81,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ n
                     ref={ref}
                     placeholder="Enter avatar URL"
                     id={name}
-                    extensions={[
-                      liquid({
-                        variables,
-                      }),
-                      EditorView.lineWrapping,
-                    ]}
+                    extensions={[autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping]}
                     value={`${value}`}
                     onChange={(newValue) => onChange?.(newValue)}
                   />

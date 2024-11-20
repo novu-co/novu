@@ -32,7 +32,6 @@ export class PrepareAndValidateContentUsecase {
       command.controlValues,
       controlValueToValidPlaceholders
     );
-
     const issues = this.buildIssues(
       finalPayload,
       command.previewPayloadFromDto || finalPayload, // if no payload provided no point creating issues.
@@ -83,7 +82,7 @@ export class PrepareAndValidateContentUsecase {
     const defaultControlValues = this.extractDefaultsFromSchemaUseCase.execute({
       jsonSchemaDto: jsonSchema,
     });
-    const mergedControlValues = merge(defaultControlValues, controlValues);
+    const mergedControlValues = merge(defaultControlValues, this.removeEmptyValuesFromMap(controlValues));
     Object.keys(mergedControlValues).forEach((controlValueKey) => {
       const controlValue = mergedControlValues[controlValueKey];
 
@@ -101,11 +100,26 @@ export class PrepareAndValidateContentUsecase {
       for (const problematicPlaceholder of Object.keys(placeholders.problematicPlaceholders)) {
         cleanedControlValue = this.removePlaceholdersFromText(problematicPlaceholder, cleanedControlValue);
       }
-
       mergedControlValues[controlValueKey] = cleanedControlValue; // Update mergedControlValues with cleanedControlValue
     });
 
     return { defaultControlValues, finalControlValues: mergedControlValues };
+  }
+
+  private removeEmptyValuesFromMap(controlValues: Record<string, unknown>) {
+    const filteredValues: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(controlValues)) {
+      if (typeof value !== 'string') {
+        filteredValues[key] = value;
+        continue;
+      }
+      if (value.toLowerCase().trim() !== '') {
+        filteredValues[key] = value;
+      }
+    }
+
+    return filteredValues;
   }
 
   private removePlaceholdersFromText(text: string, targetText: string) {

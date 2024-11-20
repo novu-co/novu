@@ -4,6 +4,8 @@ import { ValidatePlaceholderCommand } from './validate-placeholder.command';
 import { ValidatedPlaceholderAggregation } from './validated-placeholder-aggregation';
 import { PlaceholderAggregation } from '../collect-placeholders';
 
+const PLACHOLDER_URL = 'https://www.example.com/search?query=placeholder';
+
 @Injectable()
 export class ValidatePlaceholderUsecase {
   execute(command: ValidatePlaceholderCommand): Record<string, ValidatedPlaceholderAggregation> {
@@ -11,7 +13,16 @@ export class ValidatePlaceholderUsecase {
     const variablesFromSchema = extractPropertiesFromJsonSchema(command.variableSchema);
     for (const controlValueKey of Object.keys(command.controlValueToPlaceholders)) {
       const controlValue = command.controlValueToPlaceholders[controlValueKey];
-      validatedPlaceholders[controlValueKey] = this.validatePlaceholders(controlValue, variablesFromSchema);
+      const validatedPlaceholderAggregation = this.validatePlaceholders(controlValue, variablesFromSchema);
+      if (
+        controlValueKey.trim().toLowerCase().includes('url') &&
+        Object.keys(validatedPlaceholderAggregation.validRegularPlaceholdersToDefaultValue).length === 1
+      ) {
+        const keys = Object.keys(validatedPlaceholderAggregation.validRegularPlaceholdersToDefaultValue);
+        const urlKey = keys[0];
+        validatedPlaceholderAggregation.validRegularPlaceholdersToDefaultValue[urlKey] = PLACHOLDER_URL;
+      }
+      validatedPlaceholders[controlValueKey] = validatedPlaceholderAggregation;
     }
 
     return validatedPlaceholders;

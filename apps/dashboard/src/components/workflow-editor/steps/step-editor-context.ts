@@ -6,6 +6,7 @@ export type StepEditorContextType = {
   isRefetchingStep: boolean;
   step?: StepDataDto;
   stepType?: StepTypeEnum;
+  refetch: () => void;
 };
 
 export const StepEditorContext = createContext<StepEditorContextType>({} as StepEditorContextType);
