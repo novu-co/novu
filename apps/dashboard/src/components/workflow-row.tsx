@@ -39,7 +39,7 @@ import { ConfirmationModal } from './confirmation-modal';
 import { showToast } from './primitives/sonner-helpers';
 import { ToastIcon } from './primitives/sonner';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
-import { PAUSE_MODAL_DESCRIPTION, PAUSE_MODAL_TITLE } from '@/utils/constants';
+import { PauseModalDescription, PAUSE_MODAL_TITLE } from '@/components/pause-workflow-dialog';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -172,7 +172,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           <RiFileCopyLine className="text-foreground-400 invisible size-3 group-hover:visible" />
         </HoverToCopy>
       </TableCell>
-      <TableCell>
+      <TableCell className="min-w-[200px]">
         <WorkflowStatus status={workflow.status} />
       </TableCell>
       <TableCell>
@@ -184,7 +184,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
 
       <Tooltip>
         <TooltipTrigger asChild>
-          <TableCell className="text-foreground-600 text-sm font-medium">
+          <TableCell className="text-foreground-600 min-w-[180px] text-sm font-medium">
             {new Date(workflow.updatedAt).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
@@ -215,7 +215,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             setIsPauseModalOpen(false);
           }}
           title={PAUSE_MODAL_TITLE}
-          description={PAUSE_MODAL_DESCRIPTION(workflow.name)}
+          description={<PauseModalDescription workflowName={workflow.name} />}
           confirmButtonText="Proceed"
           isLoading={isPauseWorkflowPending}
         />

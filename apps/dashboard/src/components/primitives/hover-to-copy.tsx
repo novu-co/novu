@@ -24,6 +24,7 @@ export const HoverToCopy = (props: HoverToCopyProps) => {
     <Tooltip>
       <TooltipTrigger aria-label="Copy to clipboard" onClick={copyToClipboard} {...rest} />
       <TooltipContent
+        side="right"
         onPointerDownOutside={(e) => {
           e.preventDefault();
         }}
