@@ -5,7 +5,7 @@ import { cva, VariantProps } from 'class-variance-authority';
 import { useFormField } from './form/form-context';
 
 const textareaVariants = cva(
-  'text-foreground-950 flex text-sm w-full flex-nowrap items-center min-h-[60px] gap-1.5 rounded-md border bg-transparent transition-colors focus-within:outline-none focus-visible:outline-none hover:bg-neutral-alpha-50 disabled:cursor-not-allowed disabled:opacity-50 has-[value=""]:text-foreground-400 disabled:bg-neutral-alpha-100 disabled:text-foreground-300',
+  'text-foreground-950 flex text-xs w-full flex-nowrap items-center min-h-[60px] gap-1.5 rounded-md border bg-transparent transition-colors focus-within:outline-none focus-visible:outline-none hover:bg-neutral-alpha-50 disabled:cursor-not-allowed disabled:opacity-50 has-[value=""]:text-foreground-400 disabled:bg-neutral-alpha-100 disabled:text-foreground-300',
   {
     variants: {
       size: {
