@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ContentIssue, JSONSchemaDto, PreviewPayload, StepContentIssueEnum } from '@novu/shared';
 import { merge } from 'lodash';
-import { isURL } from 'class-validator';
 import { PrepareAndValidateContentCommand } from './prepare-and-validate-content.command';
-import { mergeObjects } from '../../../util/jsonUtils';
+import { flattenJson, flattenToNested, mergeObjects } from '../../../util/jsonUtils';
 import { findMissingKeys } from '../../../util/utils';
 import { BuildDefaultPayloadUsecase } from '../build-payload-from-placeholder';
 import { ValidatedPlaceholderAggregation, ValidatePlaceholderUsecase } from '../validate-placeholders';
@@ -80,30 +79,33 @@ export class PrepareAndValidateContentUsecase {
     controlValueToValidPlaceholders: Record<string, ValidatedPlaceholderAggregation>
   ) {
     const defaultControlValues = this.extractDefaultsFromSchemaUseCase.execute({ jsonSchemaDto });
-    let sanitizedIncomingControlValues: Record<string, unknown> = controlValues;
+
+    let flatSanitizedControlValues: Record<string, unknown> = flattenJson(controlValues);
     const controlValueToContentIssues: Record<string, ContentIssue[]> = {};
+
     this.overloadMissingRequiredValuesIssues(
       defaultControlValues,
-      sanitizedIncomingControlValues,
-      controlValueToContentIssues
-    );
-    sanitizedIncomingControlValues = this.removeEmptyValuesFromMap(sanitizedIncomingControlValues);
-
-    sanitizedIncomingControlValues = this.removeIllegalValuesAndOverloadIssues(
-      sanitizedIncomingControlValues,
-      controlValueToValidPlaceholders,
+      flatSanitizedControlValues,
       controlValueToContentIssues
     );
 
-    sanitizedIncomingControlValues = this.removeIllegalPlaceholdersFromValues(
-      sanitizedIncomingControlValues,
+    flatSanitizedControlValues = this.removeEmptyValuesFromMap(flatSanitizedControlValues);
+    flatSanitizedControlValues = this.removeIllegalValuesAndOverloadIssues(
+      flatSanitizedControlValues,
       controlValueToValidPlaceholders,
       controlValueToContentIssues
     );
+    flatSanitizedControlValues = this.removeIllegalPlaceholdersFromValues(
+      flatSanitizedControlValues,
+      controlValueToValidPlaceholders,
+      controlValueToContentIssues
+    );
+    const finalControlValues = merge(defaultControlValues, flatSanitizedControlValues);
+    const nestedJson = flattenToNested(finalControlValues);
 
     return {
       defaultControlValues,
-      finalControlValues: merge(defaultControlValues, sanitizedIncomingControlValues),
+      finalControlValues: nestedJson,
       controlValueIssues: controlValueToContentIssues,
     };
   }
@@ -267,6 +269,15 @@ export class PrepareAndValidateContentUsecase {
       );
     }
   }
+  private isValidURL(urlString: string): boolean {
+    try {
+      const url = new URL(urlString);
+
+      return url.protocol === 'http:' || url.protocol === 'https:'; // Ensure it's HTTP or HTTPS
+    } catch (error) {
+      return false; // The URL is invalid
+    }
+  }
 
   private removeIllegalValuesAndOverloadIssues(
     sanitizedIncomingControlValues: Record<string, unknown>,
@@ -276,7 +287,7 @@ export class PrepareAndValidateContentUsecase {
     const finalSanitizedControlValues = { ...sanitizedIncomingControlValues };
     Object.keys(sanitizedIncomingControlValues).forEach((controlValueKey) => {
       const controlValue = sanitizedIncomingControlValues[controlValueKey];
-      if (controlValueKey.includes('url') && typeof controlValue === 'string' && !isURL(controlValue)) {
+      if (controlValueKey.includes('url') && typeof controlValue === 'string' && !this.isValidURL(controlValue)) {
         const hasNoPlaceholders = this.getHasNoPlaceholders(controlValueToValidPlaceholders, controlValueKey);
         if (hasNoPlaceholders) {
           delete finalSanitizedControlValues[controlValueKey];

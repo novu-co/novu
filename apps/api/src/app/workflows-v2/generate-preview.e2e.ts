@@ -242,30 +242,6 @@ describe('Generate Preview', () => {
     });
 
     describe('Error Handling', () => {
-      it('Should show issue about bad URLs without failing ', async () => {
-        const steps = [{ name: 'IN_APP_STEP_SHOULD_NOT_FAIL', type: StepTypeEnum.IN_APP }];
-        const createDto = buildCreateWorkflowDto('', { steps });
-        const novuRestResult = await workflowsClient.createWorkflow(createDto);
-        if (!novuRestResult.isSuccessResult()) {
-          throw new Error('should create workflow');
-        }
-        const controlValues = buildInAppControlValuesWithIllegalUrlsAndData();
-        const workflowSlug = novuRestResult.value?.slug;
-        const stepSlug = novuRestResult.value?.steps[0].slug;
-        await patchStepWithControlValues(workflowSlug, stepSlug, controlValues);
-        const generatePreviewResponseDto = await generatePreview(
-          workflowSlug,
-          stepSlug,
-          { controlValues: buildInAppControlValuesMissingUrlsAndData() },
-          ''
-        );
-        if (generatePreviewResponseDto.result?.type === ChannelTypeEnum.IN_APP) {
-          console.log(
-            'generatePreviewResponseDto.result.preview',
-            JSON.stringify(generatePreviewResponseDto.result.preview)
-          );
-        }
-      });
       it('Should not fail on illegal placeholder {{}} ', async () => {
         const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(StepTypeEnum.SMS);
         const requestDto = {
@@ -297,27 +273,56 @@ describe('Generate Preview', () => {
         expect(issue[0].issueType).to.equal('ILLEGAL_VARIABLE_IN_CONTROL_VALUE');
       });
       describe('In App Partial control values', () => {
-        it('Should not fail if inApp is providing partial URL in redirect', async () => {
+        it('Should show issue about bad URLs without failing ', async () => {
           const steps = [{ name: 'IN_APP_STEP_SHOULD_NOT_FAIL', type: StepTypeEnum.IN_APP }];
           const createDto = buildCreateWorkflowDto('', { steps });
           const novuRestResult = await workflowsClient.createWorkflow(createDto);
           if (!novuRestResult.isSuccessResult()) {
             throw new Error('should create workflow');
           }
-          const controlValues = buildInAppControlValuesMissingUrlsAndData();
+          const controlValues = {
+            subject: `{{subscriber.firstName}} Hello, World! ${PLACEHOLDER_SUBJECT_INAPP}`,
+            body: `Hello, World! {{payload.placeholder.body}}`,
+            avatar: 'https://www.example.com/avatar.png',
+            primaryAction: {
+              label: '{{payload.secondaryUrl}}',
+              redirect: {
+                url: 'notAurl.com',
+                target: RedirectTargetEnum.BLANK,
+              },
+            },
+            secondaryAction: {
+              label: 'somelabel',
+              redirect: {
+                url: 'ftp://notAurl.com',
+                target: RedirectTargetEnum.BLANK,
+              },
+            },
+            redirect: {
+              target: RedirectTargetEnum.BLANK,
+              url: 'blablal',
+            },
+          };
           const workflowSlug = novuRestResult.value?.slug;
           const stepSlug = novuRestResult.value?.steps[0].slug;
-          const stepDataDto = await patchStepWithControlValues(workflowSlug, stepSlug, controlValues);
+          await patchStepWithControlValues(workflowSlug, stepSlug, controlValues);
           const generatePreviewResponseDto = await generatePreview(
             workflowSlug,
             stepSlug,
-            { controlValues: buildInAppControlValuesMissingUrlsAndData() },
+            {
+              controlValues,
+            },
             ''
           );
+          expect(generatePreviewResponseDto.issues['redirect.url'][0].issueType).to.equal('INVALID_URL');
+          expect(generatePreviewResponseDto.issues['secondaryAction.redirect.url'][0].issueType).to.equal(
+            'INVALID_URL'
+          );
+          expect(generatePreviewResponseDto.issues['primaryAction.redirect.url'][0].issueType).to.equal('INVALID_URL');
           if (generatePreviewResponseDto.result?.type === ChannelTypeEnum.IN_APP) {
-            expect(generatePreviewResponseDto.result.preview.body).to.equal(
-              buildInAppControlValuesMissingUrlsAndData().body
-            );
+            expect(generatePreviewResponseDto.result.preview.primaryAction).to.be.undefined;
+            expect(generatePreviewResponseDto.result.preview.secondaryAction).to.be.undefined;
+            expect(generatePreviewResponseDto.result.preview.redirect).to.be.undefined;
           }
         });
 
@@ -328,19 +333,44 @@ describe('Generate Preview', () => {
           if (!novuRestResult.isSuccessResult()) {
             throw new Error('should create workflow');
           }
-          const controlValues = buildInAppControlValuesMissingUrlsAndData();
+          const controlValues = {
+            subject: `{{subscriber.firstName}} Hello, World! ${PLACEHOLDER_SUBJECT_INAPP}`,
+            body: `Hello, World! {{payload.placeholder.body}}`,
+            avatar: 'https://www.example.com/avatar.png',
+            primaryAction: {
+              label: '{{payload.secondaryUrl}}',
+              redirect: {
+                target: RedirectTargetEnum.BLANK,
+              },
+            },
+            secondaryAction: null,
+            redirect: {
+              target: RedirectTargetEnum.BLANK,
+              url: '   ',
+            },
+          };
           const workflowSlug = novuRestResult.value?.slug;
           const stepSlug = novuRestResult.value?.steps[0].slug;
           const stepDataDto = await patchStepWithControlValues(workflowSlug, stepSlug, controlValues);
-          const generatePreviewResponseDto = await generatePreview(
-            workflowSlug,
-            stepSlug,
-            { controlValues: buildInAppControlValuesMissingUrlsAndData() },
-            ''
-          );
+          const generatePreviewResponseDto = await generatePreview(workflowSlug, stepSlug, { controlValues }, '');
           if (generatePreviewResponseDto.result?.type === ChannelTypeEnum.IN_APP) {
             expect(generatePreviewResponseDto.result.preview.body).to.equal(
-              buildInAppControlValuesMissingUrlsAndData().body
+              {
+                subject: `{{subscriber.firstName}} Hello, World! ${PLACEHOLDER_SUBJECT_INAPP}`,
+                body: `Hello, World! {{payload.placeholder.body}}`,
+                avatar: 'https://www.example.com/avatar.png',
+                primaryAction: {
+                  label: '{{payload.secondaryUrl}}',
+                  redirect: {
+                    target: RedirectTargetEnum.BLANK,
+                  },
+                },
+                secondaryAction: null,
+                redirect: {
+                  target: RedirectTargetEnum.BLANK,
+                  url: '   ',
+                },
+              }.body
             );
           }
         });
@@ -366,7 +396,22 @@ describe('Generate Preview', () => {
           );
           if (generatePreviewResponseDto.result?.type === ChannelTypeEnum.IN_APP) {
             expect(generatePreviewResponseDto.result.preview.body).to.equal(
-              buildInAppControlValuesMissingUrlsAndData().body
+              {
+                subject: `{{subscriber.firstName}} Hello, World! ${PLACEHOLDER_SUBJECT_INAPP}`,
+                body: `Hello, World! {{payload.placeholder.body}}`,
+                avatar: 'https://www.example.com/avatar.png',
+                primaryAction: {
+                  label: '{{payload.secondaryUrl}}',
+                  redirect: {
+                    target: RedirectTargetEnum.BLANK,
+                  },
+                },
+                secondaryAction: null,
+                redirect: {
+                  target: RedirectTargetEnum.BLANK,
+                  url: '   ',
+                },
+              }.body
             );
             expect(generatePreviewResponseDto.result.preview.primaryAction?.redirect.url).to.be.ok;
             expect(generatePreviewResponseDto.result.preview.primaryAction?.redirect.url).to.contain('https');
@@ -556,49 +601,6 @@ function buildInAppControlValues() {
     redirect: {
       target: RedirectTargetEnum.BLANK,
       url: 'https://www.example.com/redirect',
-    },
-  };
-}
-function buildInAppControlValuesMissingUrlsAndData() {
-  return {
-    subject: `{{subscriber.firstName}} Hello, World! ${PLACEHOLDER_SUBJECT_INAPP}`,
-    body: `Hello, World! {{payload.placeholder.body}}`,
-    avatar: 'https://www.example.com/avatar.png',
-    primaryAction: {
-      label: '{{payload.secondaryUrl}}',
-      redirect: {
-        target: RedirectTargetEnum.BLANK,
-      },
-    },
-    secondaryAction: null,
-    redirect: {
-      target: RedirectTargetEnum.BLANK,
-      url: '   ',
-    },
-  };
-}
-function buildInAppControlValuesWithIllegalUrlsAndData(): InAppControlType {
-  return {
-    subject: `{{subscriber.firstName}} Hello, World! ${PLACEHOLDER_SUBJECT_INAPP}`,
-    body: `Hello, World! {{payload.placeholder.body}}`,
-    avatar: 'https://www.example.com/avatar.png',
-    primaryAction: {
-      label: '{{payload.secondaryUrl}}',
-      redirect: {
-        url: 'notAurl.com',
-        target: RedirectTargetEnum.BLANK,
-      },
-    },
-    secondaryAction: {
-      label: 'somelabel',
-      redirect: {
-        url: 'ftp://notAurl.com',
-        target: RedirectTargetEnum.BLANK,
-      },
-    },
-    redirect: {
-      target: RedirectTargetEnum.BLANK,
-      url: 'blablal',
     },
   };
 }

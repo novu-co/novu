@@ -45,3 +45,26 @@ export function mergeObjects(json1: Record<string, unknown>, json2?: Record<stri
     }
   });
 }
+type FlatJson = Record<string, unknown>;
+type NestedJson = Record<string, unknown>;
+
+export function flattenToNested(flatJson: FlatJson, delimiter: string = '.'): NestedJson {
+  const nestedJson: NestedJson = {};
+
+  for (const flatKey of Object.keys(flatJson)) {
+    const keys = flatKey.split(delimiter);
+    keys.reduce((accumulator, currentKey, index) => {
+      if (index === keys.length - 1) {
+        // eslint-disable-next-line no-param-reassign
+        accumulator[currentKey] = flatJson[flatKey];
+      } else if (!accumulator[currentKey]) {
+        // eslint-disable-next-line no-param-reassign
+        accumulator[currentKey] = {};
+      }
+
+      return accumulator[currentKey] as NestedJson;
+    }, nestedJson);
+  }
+
+  return nestedJson;
+}

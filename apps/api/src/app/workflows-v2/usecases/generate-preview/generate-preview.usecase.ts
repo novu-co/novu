@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import {
   ChannelTypeEnum,
   GeneratePreviewRequestDto,
@@ -64,6 +64,19 @@ export class GeneratePreviewUsecase {
       user: command.user,
     });
   }
+  private isFrameworkError(error: unknown): error is FrameworkError {
+    if (typeof error !== 'object' || error === null) {
+      return false;
+    }
+
+    return (
+      'statusCode' in error &&
+      'code' in error &&
+      typeof error.statusCode === 'number' &&
+      typeof error.code === 'string' &&
+      (!('data' in error) || typeof error.data === 'object' || error.data === undefined)
+    );
+  }
 
   private async executePreviewUsecase(
     command: GeneratePreviewCommand,
@@ -72,21 +85,28 @@ export class GeneratePreviewUsecase {
     updatedControlValues: Record<string, unknown>
   ) {
     const state = buildState(hydratedPayload.steps);
-
-    return await this.legacyPreviewStepUseCase.execute(
-      PreviewStepCommand.create({
-        payload: hydratedPayload.payload || {},
-        subscriber: hydratedPayload.subscriber,
-        controls: updatedControlValues || {},
-        environmentId: command.user.environmentId,
-        organizationId: command.user.organizationId,
-        stepId: stepData.stepId,
-        userId: command.user._id,
-        workflowId: stepData.workflowId,
-        workflowOrigin: stepData.origin,
-        state,
-      })
-    );
+    try {
+      return await this.legacyPreviewStepUseCase.execute(
+        PreviewStepCommand.create({
+          payload: hydratedPayload.payload || {},
+          subscriber: hydratedPayload.subscriber,
+          controls: updatedControlValues || {},
+          environmentId: command.user.environmentId,
+          organizationId: command.user.organizationId,
+          stepId: stepData.stepId,
+          userId: command.user._id,
+          workflowId: stepData.workflowId,
+          workflowOrigin: stepData.origin,
+          state,
+        })
+      );
+    } catch (error) {
+      if (this.isFrameworkError(error)) {
+        throw new GeneratePreviewError(error);
+      } else {
+        throw error;
+      }
+    }
   }
 }
 
@@ -103,4 +123,14 @@ function buildState(steps: Record<string, unknown> | undefined): FrameworkPrevio
   }
 
   return outputArray;
+}
+export class GeneratePreviewError extends InternalServerErrorException {
+  constructor(error: FrameworkError) {
+    super({ message: `GeneratePreviewError: Original Message:${error.message}`, code: error.code, data: error.data });
+  }
+}
+export class FrameworkError extends Error {
+  public statusCode: number;
+  public data?: unknown;
+  public code: string;
 }
