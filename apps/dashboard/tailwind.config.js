@@ -151,7 +151,7 @@ export default {
             height: '0',
           },
         },
-        bellswing: {
+        swing: {
           '0%, 9.9%, 100%': { transform: 'rotate(0deg)' },
           '10%': { transform: 'rotate(2deg)' },
           '20%': { transform: 'rotate(-2deg)' },
@@ -179,7 +179,7 @@ export default {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        bellswing: 'bellswing 3s ease-in-out',
+        swing: 'swing 3s ease-in-out',
         jingle: 'jingle 3s ease-in-out',
       },
     },

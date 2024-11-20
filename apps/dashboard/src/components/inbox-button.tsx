@@ -30,7 +30,7 @@ const InboxInner = () => {
               <div className="relative flex items-center justify-center">
                 <InboxBellFilled
                   className={`text-foreground-600 size-4 cursor-pointer stroke-[0.5px]`}
-                  bellClassName={`origin-top ${jingle ? 'animate-bellswing' : ''}`}
+                  bellClassName={`origin-top ${jingle ? 'animate-swing' : ''}`}
                   ringerClassName={`origin-top ${jingle ? 'animate-jingle' : ''}`}
                 />
                 {unreadCount > 0 && (
