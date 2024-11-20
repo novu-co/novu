@@ -546,13 +546,7 @@ function buildInAppControlValuesMissingUrlsAndData() {
         target: RedirectTargetEnum.BLANK,
       },
     },
-    secondaryAction: {
-      label: 'Secondary Action',
-      redirect: {
-        target: RedirectTargetEnum.BLANK,
-        url: '',
-      },
-    },
+    secondaryAction: null,
     redirect: {
       target: RedirectTargetEnum.BLANK,
       url: '   ',

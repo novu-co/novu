@@ -21,10 +21,10 @@ export const InAppControlZodSchema = z
     subject: z.string().optional(),
     body: z.string(),
     avatar: z.string().optional(),
-    primaryAction: actionZodSchema.optional(),
-    secondaryAction: actionZodSchema.optional(),
+    primaryAction: actionZodSchema.optional().nullable(),
+    secondaryAction: actionZodSchema.optional().nullable(),
     data: z.object({}).catchall(z.unknown()).optional(),
-    redirect: redirectZodSchema.optional(),
+    redirect: redirectZodSchema.optional().nullable(),
   })
   .strict();
 
