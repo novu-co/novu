@@ -64,20 +64,22 @@ export class GeneratePreviewUsecase {
       user: command.user,
     });
   }
-  private isFrameworkError(error: unknown): error is FrameworkError {
-    if (typeof error !== 'object' || error === null) {
-      return false;
-    }
-
+  private isFrameworkError(obj: any): obj is FrameworkError {
     return (
-      'statusCode' in error &&
-      'code' in error &&
-      typeof error.statusCode === 'number' &&
-      typeof error.code === 'string' &&
-      (!('data' in error) || typeof error.data === 'object' || error.data === undefined)
+      typeof obj === 'object' &&
+      obj !== null &&
+      typeof obj.response === 'object' &&
+      obj.response !== null &&
+      typeof obj.response.message === 'string' &&
+      typeof obj.response.code === 'string' &&
+      'data' in obj.response && // Assuming data can be any type
+      typeof obj.status === 'number' &&
+      typeof obj.options === 'object' &&
+      obj.options !== null &&
+      typeof obj.message === 'string' &&
+      typeof obj.name === 'string'
     );
   }
-
   private async executePreviewUsecase(
     command: GeneratePreviewCommand,
     stepData: StepDataDto,
@@ -126,11 +128,23 @@ function buildState(steps: Record<string, unknown> | undefined): FrameworkPrevio
 }
 export class GeneratePreviewError extends InternalServerErrorException {
   constructor(error: FrameworkError) {
-    super({ message: `GeneratePreviewError: Original Message:${error.message}`, code: error.code, data: error.data });
+    super({
+      message: `GeneratePreviewError: Original Message:${error.response.message}`,
+      code: error.response.code,
+      data: error.response.data,
+    });
   }
 }
-export class FrameworkError extends Error {
-  public statusCode: number;
-  public data?: unknown;
-  public code: string;
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+interface FrameworkError {
+  response: {
+    message: string;
+    code: string;
+    data: unknown;
+  };
+  status: number;
+  options: Record<string, unknown>;
+  message: string;
+  name: string;
 }

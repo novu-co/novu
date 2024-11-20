@@ -669,6 +669,8 @@ async function assertHttpError(
   dto: GeneratePreviewRequestDto
 ) {
   if (novuRestResult.error) {
+    console.log(JSON.stringify(JSON.parse(novuRestResult.error.responseText), null, 2));
+
     return new Error(
       `${description}: Failed to generate preview: ${novuRestResult.error.message}payload: ${JSON.stringify(dto, null, 2)} `
     );
