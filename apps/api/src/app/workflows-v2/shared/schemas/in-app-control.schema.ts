@@ -7,24 +7,28 @@ const redirectZodSchema = z
     url: z.string().optional(),
     target: z.enum(['_self', '_blank', '_parent', '_top', '_unfencedTop']).default('_blank'),
   })
-  .strict();
+  .strict()
+  .optional()
+  .nullable();
 
 const actionZodSchema = z
   .object({
     label: z.string().optional(),
     redirect: redirectZodSchema.optional(),
   })
-  .strict();
+  .strict()
+  .optional()
+  .nullable();
 
 export const InAppControlZodSchema = z
   .object({
     subject: z.string().optional(),
     body: z.string(),
     avatar: z.string().optional(),
-    primaryAction: actionZodSchema.optional().nullable(),
-    secondaryAction: actionZodSchema.optional().nullable(),
+    primaryAction: actionZodSchema,
+    secondaryAction: actionZodSchema,
     data: z.object({}).catchall(z.unknown()).optional(),
-    redirect: redirectZodSchema.optional().nullable(),
+    redirect: redirectZodSchema,
   })
   .strict();
 
