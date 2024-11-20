@@ -62,9 +62,6 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
     resolver: zodResolver(workflowMinimalSchema),
     defaultValues: { description: '', workflowId: '', name: '', tags: [] },
   });
-  const {
-    formState: { errors },
-  } = form;
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
