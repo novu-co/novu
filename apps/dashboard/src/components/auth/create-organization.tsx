@@ -1,7 +1,6 @@
 import { OrganizationList as OrganizationListForm } from '@clerk/clerk-react';
 import { ROUTES } from '../../utils/routes';
 import { clerkAppearance } from '../../utils/clerk-appearance';
-import { OrganizationNamePreview } from './organization-name-preview';
 import { AuthCard } from './auth-card';
 import { RiArrowLeftSLine } from 'react-icons/ri';
 
@@ -30,6 +29,7 @@ export default function OrganizationCreate() {
 
         <div className="w-full max-w-[564px] flex-1">
           <OrganizationNamePreview />
+          <img src="/images/auth/ui-org.svg" alt="create-org-illustration" />
         </div>
       </AuthCard>
     </div>
