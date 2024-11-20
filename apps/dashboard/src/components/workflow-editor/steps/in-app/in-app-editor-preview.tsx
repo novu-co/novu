@@ -9,14 +9,6 @@ import { InAppPreview } from '@/components/workflow-editor/in-app-preview';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
 
-const getInitialAccordionValue = (value: string) => {
-  try {
-    return Object.keys(JSON.parse(value)).length > 0 ? 'payload' : undefined;
-  } catch (e) {
-    return undefined;
-  }
-};
-
 type InAppEditorPreviewProps = {
   value: string;
   onChange: (value: string) => void;
@@ -26,24 +18,19 @@ type InAppEditorPreviewProps = {
 };
 export const InAppEditorPreview = (props: InAppEditorPreviewProps) => {
   const { value, onChange, previewData, applyPreview, isPreviewLoading } = props;
-  const [accordionValue, setAccordionValue] = useState<string | undefined>(getInitialAccordionValue(value));
+  const [accordionValue, setAccordionValue] = useState<string | undefined>('payload');
   const [payloadError, setPayloadError] = useState('');
   const [height, setHeight] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setAccordionValue(getInitialAccordionValue(value));
-  }, [value]);
-
-  console.log({ value });
-
-  useEffect(() => {
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       if (contentRef.current) {
         const rect = contentRef.current.getBoundingClientRect();
         setHeight(rect.height);
       }
     }, 0);
+    return () => clearTimeout(timeout);
   }, [value]);
 
   return (
