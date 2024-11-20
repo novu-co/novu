@@ -5,7 +5,6 @@ import { Bell, Inbox, InboxContent, useNovu } from '@novu/react';
 import { InboxBellFilled } from './icons/inbox-bell-filled';
 import { HeaderButton } from './header-navigation/header-button';
 import { useState, useEffect } from 'react';
-import './inbox-button.css';
 
 const InboxInner = () => {
   const [open, setOpen] = useState(false);
@@ -30,7 +29,9 @@ const InboxInner = () => {
             <HeaderButton label={unreadCount ? `Inbox (${unreadCount})` : 'Inbox'} disableTooltip={open}>
               <div className="relative flex items-center justify-center">
                 <InboxBellFilled
-                  className={`text-foreground-600 size-4 cursor-pointer stroke-[0.5px] ${jingle ? 'jingle' : ''}`}
+                  className={`text-foreground-600 size-4 cursor-pointer stroke-[0.5px]`}
+                  bellClassName={`origin-top ${jingle ? 'animate-bellswing' : ''}`}
+                  ringerClassName={`origin-top ${jingle ? 'animate-jingle' : ''}`}
                 />
                 {unreadCount > 0 && (
                   <div className="absolute right-[-4px] top-[-6px] flex h-3 w-3 items-center justify-center rounded-full border-[3px] border-[white] bg-white">
