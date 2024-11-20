@@ -110,6 +110,9 @@ export class PrepareAndValidateContentUsecase {
     const filteredValues: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(controlValues)) {
+      if (value === null) {
+        continue;
+      }
       if (typeof value !== 'string') {
         filteredValues[key] = value;
         continue;
