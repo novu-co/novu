@@ -17,10 +17,16 @@ export const HeaderNavigation = (props: HeaderNavigationProps) => {
       {...rest}
     >
       {startItems}
-      <div className="text-foreground-600 ml-auto flex items-center gap-3">
-        {!hideBridgeUrl ? <EditBridgeUrlButton /> : null}
+      <div className="text-foreground-600 ml-auto flex items-center gap-2">
+        {!hideBridgeUrl ? (
+          <div className="pr-1">
+            <EditBridgeUrlButton />
+          </div>
+        ) : null}
         <CustomerSupportButton />
-        <InboxButton />
+        <div className="flex pr-0.5">
+          <InboxButton />
+        </div>
         <UserProfile />
       </div>
     </div>

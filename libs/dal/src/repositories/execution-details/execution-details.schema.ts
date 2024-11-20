@@ -66,7 +66,6 @@ const executionDetailsSchema = new Schema<ExecutionDetailsDBModel>(
     webhookStatus: {
       type: Schema.Types.String,
     },
-    expireAt: Schema.Types.Date,
   },
   schemaOptions
 );
@@ -111,8 +110,6 @@ executionDetailsSchema.index({
 executionDetailsSchema.index({
   _environmentId: 1,
 });
-
-executionDetailsSchema.index({ expireAt: 1 }, getTTLOptions());
 
 export const ExecutionDetails =
   (mongoose.models.ExecutionDetails as mongoose.Model<ExecutionDetailsDBModel>) ||

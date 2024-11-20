@@ -75,7 +75,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
               <Link
                 target="_blank"
                 to="https://docs.novu.co/concepts/workflows"
-                className="text-foreground-400 inline-flex items-center text-sm underline"
+                className="text-foreground-400 inline-flex items-center text-xs underline"
               >
                 Learn more <RiExternalLinkLine className="inline size-4" />
               </Link>

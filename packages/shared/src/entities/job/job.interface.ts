@@ -27,7 +27,6 @@ export interface IJob {
   error?: any;
   createdAt: string;
   updatedAt: string;
-  expireAt?: string;
   _templateId: string;
   digest?: IWorkflowStepMetadata & {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

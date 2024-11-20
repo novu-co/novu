@@ -24,8 +24,8 @@ const WorkflowListEmptyProd = ({ switchToDev }: { switchToDev: () => void }) => 
     <div className="flex flex-col items-center gap-2 text-center">
       <span className="text-foreground-900 block font-medium">No workflows in production</span>
       <p className="text-foreground-400 max-w-[60ch] text-sm">
-        To sync workflows to production, switch to dev, select 'Sync to Production,' or sync using the production secret
-        key for code-first workflows.
+        To sync workflows to production, switch to Development environment, select a workflow and click on 'Sync to
+        Production,' or sync via novu CLI for code-first workflows.
       </p>
     </div>
 
@@ -40,7 +40,7 @@ const WorkflowListEmptyProd = ({ switchToDev }: { switchToDev: () => void }) => 
       </Link>
       <Button variant="primary" className="gap-2" onClick={switchToDev}>
         <RiRouteFill className="size-5" />
-        Switch to dev
+        Switch to Development
       </Button>
     </div>
   </div>

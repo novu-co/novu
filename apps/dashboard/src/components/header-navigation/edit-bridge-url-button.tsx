@@ -25,7 +25,7 @@ export const EditBridgeUrlButton = () => {
     handleSubmit,
     reset,
     setError,
-    formState: { isDirty, errors },
+    formState: { isDirty },
   } = form;
   const { currentEnvironment, setBridgeUrl } = useEnvironment();
   const { status, bridgeURL: envBridgeUrl } = useBridgeHealthCheck();
@@ -86,7 +86,7 @@ export const EditBridgeUrlButton = () => {
                     <FormItem>
                       <FormLabel>Bridge Endpoint URL</FormLabel>
                       <FormControl>
-                        <InputField state={errors.bridgeUrl?.message ? 'error' : 'default'}>
+                        <InputField>
                           <RiLinkM className="size-5 min-w-5" />
                           <Input id="bridgeUrl" {...field} />
                         </InputField>

@@ -35,8 +35,6 @@ export class MessageEntity {
 
   createdAt: string;
 
-  expireAt: string;
-
   updatedAt: string;
 
   archivedAt?: string;

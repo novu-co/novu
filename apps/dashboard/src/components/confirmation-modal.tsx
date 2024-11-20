@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/primitives/dialog';
+import { ReactNode } from 'react';
 import { RiAlertFill } from 'react-icons/ri';
 
 type ConfirmationModalProps = {
@@ -17,7 +18,7 @@ type ConfirmationModalProps = {
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   title: string;
-  description: string;
+  description: ReactNode;
   confirmButtonText: string;
   isLoading?: boolean;
 };
