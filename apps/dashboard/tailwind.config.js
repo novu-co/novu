@@ -129,7 +129,7 @@ export default {
             boxShadow: '0 0 0 0 hsl(var(--pulse-color))',
           },
           '70%': {
-            boxShadow: '0 0 0 6px rgba(255, 82, 82, 0)',
+            boxShadow: '0 0 0 var(--pulse-size, 6px) rgba(255, 82, 82, 0)',
           },
           '100%': {
             boxShadow: '0 0 0 0 rgba(255, 82, 82, 0)',
