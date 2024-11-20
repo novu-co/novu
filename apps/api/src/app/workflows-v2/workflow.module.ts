@@ -11,6 +11,7 @@ import {
   ValidateControlByTierUsecase,
 } from '@novu/application-generic';
 
+import { CommunityOrganizationRepository } from '@novu/dal';
 import { SharedModule } from '../shared/shared.module';
 import { MessageTemplateModule } from '../message-template/message-template.module';
 import { ChangeModule } from '../change/change.module';
@@ -39,10 +40,13 @@ import { OverloadContentDataOnWorkflowUseCase } from './usecases/overload-conten
 import { PatchWorkflowUsecase } from './usecases/patch-workflow';
 import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
 
+const DAL_REPOSITORIES = [CommunityOrganizationRepository];
+
 @Module({
   imports: [SharedModule, MessageTemplateModule, ChangeModule, AuthModule, BridgeModule, IntegrationModule],
   controllers: [WorkflowController],
   providers: [
+    ...DAL_REPOSITORIES,
     CreateWorkflow,
     UpdateWorkflow,
     UpsertWorkflowUseCase,

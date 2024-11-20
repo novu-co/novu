@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { merge } from 'lodash';
 import {
   ContentIssue,
   DigestUnitEnum,
@@ -8,8 +9,8 @@ import {
   StepTypeEnum,
   UserSessionData,
 } from '@novu/shared';
-import { merge } from 'lodash';
-import { ValidateControlByTierUsecase } from '@novu/application-generic/src/usecases/validate-control-by-tier/validate-control-by-tier.usecase';
+import { ValidateControlByTierUsecase } from '@novu/application-generic';
+
 import { PrepareAndValidateContentCommand } from './prepare-and-validate-content.command';
 import { mergeObjects } from '../../../util/jsonUtils';
 import { findMissingKeys } from '../../../util/utils';

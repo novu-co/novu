@@ -1,6 +1,6 @@
-import { StepTypeEnum } from '@novu/shared/';
 import { IsEnum, IsNumber, IsOptional } from 'class-validator';
 
+import { StepTypeEnum } from '@novu/shared';
 import { OrganizationLevelCommand } from '../../commands';
 
 export type Milliseconds = number;

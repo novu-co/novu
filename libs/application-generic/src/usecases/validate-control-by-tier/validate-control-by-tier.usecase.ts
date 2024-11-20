@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { OrganizationEntity, OrganizationRepository } from '@novu/dal';
+
 import {
   ApiServiceLevelEnum,
   ContentIssue,
   StepContentIssueEnum,
   StepTypeEnum,
 } from '@novu/shared';
+import { CommunityOrganizationRepository } from '@novu/dal';
+
 import {
   Milliseconds,
   ValidateControlByTierCommand,
@@ -26,81 +28,68 @@ type ValidateControlByTierUsecaseResponse =
 @Injectable()
 export class ValidateControlByTierUsecase {
   constructor(
-    private readonly organizationRepository: OrganizationRepository,
+    private organizationRepository: CommunityOrganizationRepository,
   ) {}
 
   async execute(
     command: ValidateControlByTierCommand,
   ): Promise<ValidateControlByTierUsecaseResponse> {
     return this.validateControlValuesByTierLimits(
-      command.deferDuration,
       command.organizationId,
+      command.deferDuration,
       command.stepType,
     );
   }
 
   private async validateControlValuesByTierLimits(
-    deferDuration: Milliseconds,
     organizationId: string,
+    deferDuration?: Milliseconds,
     stepType?: StepTypeEnum,
   ): Promise<ValidateControlByTierUsecaseResponse> {
     const controlValueNeedTierValidation =
       stepType === StepTypeEnum.DIGEST || stepType === StepTypeEnum.DELAY;
 
-    if (!controlValueNeedTierValidation) {
+    if (!controlValueNeedTierValidation || !deferDuration) {
       return {};
     }
 
     const issues: Record<string, ContentIssue[]> = {};
-    let organization: OrganizationEntity | null = null;
-    if (deferDuration) {
-      organization = await this.getOrganization(organization, organizationId);
+    const organization =
+      await this.organizationRepository.findById(organizationId);
+    const tier = organization?.apiServiceLevel;
 
-      const tier = organization?.apiServiceLevel;
-      if (
-        tier === undefined ||
-        tier === ApiServiceLevelEnum.BUSINESS ||
-        tier === ApiServiceLevelEnum.ENTERPRISE
-      ) {
-        if (deferDuration > MAX_DELAY_BUSINESS_TIER) {
-          issues.tier = [
-            ...(issues.tier || []),
-            {
-              issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
-              message:
-                `The maximum delay allowed is ${BUSINESS_TIER_MAX_DELAY_DAYS} days.` +
-                'Please contact our support team to discuss extending this limit for your use case.',
-            },
-          ];
-        }
+    if (
+      tier === undefined ||
+      tier === ApiServiceLevelEnum.BUSINESS ||
+      tier === ApiServiceLevelEnum.ENTERPRISE
+    ) {
+      if (deferDuration > MAX_DELAY_BUSINESS_TIER) {
+        issues.tier = [
+          ...(issues.tier || []),
+          {
+            issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
+            message:
+              `The maximum delay allowed is ${BUSINESS_TIER_MAX_DELAY_DAYS} days.` +
+              'Please contact our support team to discuss extending this limit for your use case.',
+          },
+        ];
       }
+    }
 
-      if (tier === ApiServiceLevelEnum.FREE) {
-        if (deferDuration > MAX_DELAY_FREE_TIER) {
-          issues.tier = [
-            ...(issues.tier || []),
-            {
-              issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
-              message:
-                `The maximum delay allowed is ${FREE_TIER_MAX_DELAY_DAYS} days.` +
-                'Please contact our support team to discuss extending this limit for your use case.',
-            },
-          ];
-        }
+    if (tier === ApiServiceLevelEnum.FREE) {
+      if (deferDuration > MAX_DELAY_FREE_TIER) {
+        issues.tier = [
+          ...(issues.tier || []),
+          {
+            issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
+            message:
+              `The maximum delay allowed is ${FREE_TIER_MAX_DELAY_DAYS} days.` +
+              'Please contact our support team to discuss extending this limit for your use case.',
+          },
+        ];
       }
     }
 
     return issues;
-  }
-
-  private async getOrganization(
-    organization: OrganizationEntity | null,
-    organizationId: string,
-  ): Promise<OrganizationEntity | null> {
-    if (organization === null) {
-      return await this.organizationRepository.findById(organizationId);
-    }
-
-    return organization;
   }
 }
