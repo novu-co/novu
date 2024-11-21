@@ -19,7 +19,7 @@ export class GetNotificationTemplates {
   ) {}
 
   async execute(command: GetNotificationTemplatesCommand): Promise<WorkflowsResponseDto> {
-    const { data: list, totalCount } = await this.notificationTemplateRepository.getList(
+    const { data: list, totalCount } = await this.notificationTemplateRepository.getListExcludeNew(
       command.organizationId,
       command.environmentId,
       command.page * command.limit,
