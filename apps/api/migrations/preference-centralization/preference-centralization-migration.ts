@@ -165,14 +165,13 @@ async function migrateWorkflowPreferences(
   }
   const workflowPreferenceCursor = await workflowPreferenceRepository._model
     .find(query)
+    .projection({ _id: 1, _environmentId: 1, _organizationId: 1, _creatorId: 1, critical: 1, preferenceSettings: 1 })
     .sort({ _id: 1 })
-    .batchSize(BATCH_SIZE)
     .read('secondaryPreferred')
-    .cursor();
+    .cursor({ batchSize: BATCH_SIZE });
 
-  let batch: NotificationTemplateEntity[] = []; // Replace 'any' with the appropriate type if available
-  let document;
-
+  let batch: NotificationTemplateEntity[] = [];
+  let document: NotificationTemplateEntity | null;
   while ((document = await workflowPreferenceCursor.next())) {
     batch.push(document);
 
@@ -261,13 +260,13 @@ async function migrateSubscriberPreferences(
   }
   const subscriberPreferenceCursor = await subscriberPreferenceRepository._model
     .find(query)
+    .projection({ _id: 1, _environmentId: 1, _organizationId: 1, _subscriberId: 1, level: 1, channels: 1 })
     .sort({ _id: 1 })
-    .batchSize(BATCH_SIZE)
     .read('secondaryPreferred')
-    .cursor();
+    .cursor({ batchSize: BATCH_SIZE });
 
-  let batch: SubscriberPreferenceEntity[] = []; // Replace 'any' with the appropriate type if available
-  let document;
+  let batch: SubscriberPreferenceEntity[] = [];
+  let document: SubscriberPreferenceEntity | null;
   while ((document = await subscriberPreferenceCursor.next())) {
     batch.push(document);
 
