@@ -118,7 +118,6 @@
     "@types/sinon": "^9.0.0",
     "@types/supertest": "^2.0.8",
     "chai": "^4.2.0",
-    "express": "^4.17.1",
     "mocha": "^10.2.0",
     "sinon": "^9.2.4",
     "ts-loader": "~9.4.0",
