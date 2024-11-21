@@ -56,6 +56,7 @@ export class PrepareAndValidateContentUsecase {
       command.previewPayloadFromDto || finalPayload, // if no payload provided no point creating issues.
       controlValueToValidPlaceholders,
       controlValueIssues,
+      finalControlValues,
       command.user,
       command.stepType
     );
@@ -238,13 +239,14 @@ export class PrepareAndValidateContentUsecase {
     providedPayload: PreviewPayload,
     valueToPlaceholders: Record<string, ValidatedPlaceholderAggregation>,
     urlControlValueIssues: Record<string, ContentIssue[]>,
+    finalControlValues: Record<string, unknown>,
     user: UserSessionData,
     stepType?: StepTypeEnum
-  ): Record<string, ContentIssue[]> {
+  ): Promise<Record<string, ContentIssue[]>> {
     let finalIssues: Record<string, ContentIssue[]> = {};
     finalIssues = mergeObjects(finalIssues, this.getMissingInPayload(providedPayload, valueToPlaceholders, payload));
     finalIssues = mergeObjects(finalIssues, urlControlValueIssues);
-    finalIssues = mergeObjects(finalIssues, await this.computeTierIssues(defaultControlValues, user, stepType));
+    finalIssues = mergeObjects(finalIssues, await this.computeTierIssues(finalControlValues, user, stepType));
 
     return finalIssues;
   }
