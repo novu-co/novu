@@ -11,8 +11,8 @@ export function AuthFeatureRow({ icon, title, description }: AuthFeatureRowProps
     <div className="inline-flex items-start justify-start gap-3.5">
       <div className="flex items-center justify-center p-1">{icon}</div>
       <div className="inline-flex shrink grow basis-0 flex-col items-start justify-start gap-2">
-        <div className="text-sm font-medium text-[#0d111b]">{title}</div>
-        <div className="text-xs font-medium text-[#99a0ad]">{description}</div>
+        <div className="text-sm font-medium text-neutral-950">{title}</div>
+        <div className="text-muted text-xs font-medium text-neutral-400">{description}</div>
       </div>
     </div>
   );
