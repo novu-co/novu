@@ -462,8 +462,8 @@ describe('Generate Preview', () => {
                 },
               }.body
             );
-            expect(generatePreviewResponseDto.result.preview.primaryAction?.redirect.url).to.be.ok;
-            expect(generatePreviewResponseDto.result.preview.primaryAction?.redirect.url).to.contain('https');
+            expect(generatePreviewResponseDto.result.preview.primaryAction?.redirect?.url).to.be.ok;
+            expect(generatePreviewResponseDto.result.preview.primaryAction?.redirect?.url).to.contain('https');
           }
         });
       });
