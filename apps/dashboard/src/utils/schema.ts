@@ -6,15 +6,17 @@ type ZodValue =
   | z.AnyZodObject
   | z.ZodString
   | z.ZodNumber
+  | z.ZodNullable<z.ZodTypeAny>
   | z.ZodEffects<z.ZodTypeAny>
   | z.ZodDefault<z.ZodTypeAny>
   | z.ZodEnum<[string, ...string[]]>
   | z.ZodOptional<z.ZodTypeAny>
-  | z.ZodBoolean;
+  | z.ZodBoolean
+  | z.ZodAny;
 
 const handleStringFormat = ({ value, key, format }: { value: z.ZodString; key: string; format: string }) => {
   if (format === 'email') {
-    return value.email(`${capitalize(key)} must be a valid email`);
+    return value.email();
   } else if (format === 'uri') {
     return value
       .transform((val) => (val === '' ? undefined : val))
@@ -32,10 +34,6 @@ const handleStringPattern = ({ value, key, pattern }: { value: z.ZodString; key:
     .refine((val) => !val || z.string().regex(new RegExp(pattern)).safeParse(val).success, {
       message: `${capitalize(key)} must be a valid value`,
     });
-};
-
-const handleStringEnum = ({ key, enumValues }: { key: string; enumValues: [string, ...string[]] }) => {
-  return z.enum(enumValues, { message: `${capitalize(key)} must be one of ${enumValues.join(', ')}` });
 };
 
 const handleStringType = ({
@@ -74,20 +72,16 @@ const handleStringType = ({
       pattern,
     });
   } else if (enumValues) {
-    stringValue = handleStringEnum({
-      key,
-      enumValues: enumValues as [string, ...string[]],
-    });
+    stringValue = z.enum(enumValues as [string, ...string[]]);
   } else if (isRequired) {
-    stringValue = stringValue.min(1, `${capitalize(key)} is missing`);
+    stringValue = stringValue.min(1);
   }
 
   if (defaultValue) {
     stringValue = stringValue.default(defaultValue as string);
   }
 
-  // remove empty strings
-  return stringValue.transform((val) => (val === '' ? undefined : val));
+  return stringValue;
 };
 
 /**
@@ -119,15 +113,18 @@ export const buildDynamicZodSchema = (obj: JSONSchemaDto): z.AnyZodObject => {
         // remove object if any required field is empty or undefined
         return hasAnyRequiredEmpty ? undefined : val;
       });
+      zodValue = zodValue.nullable();
     } else if (type === 'string') {
       zodValue = handleStringType({ key, requiredFields, format, pattern, enumValues, defaultValue });
     } else if (type === 'boolean') {
-      zodValue = z.boolean(isRequired ? { message: `${capitalize(key)} is missing` } : undefined);
-    } else {
-      zodValue = z.number(isRequired ? { message: `${capitalize(key)} is missing` } : undefined);
+      zodValue = z.boolean();
+    } else if (type === 'number') {
+      zodValue = z.number();
       if (defaultValue) {
         zodValue = zodValue.default(defaultValue as number);
       }
+    } else {
+      zodValue = z.any();
     }
 
     if (!isRequired) {
@@ -153,8 +150,12 @@ export const buildDefaultValues = (uiSchema: UiSchema): object => {
     }
 
     const { placeholder: defaultValue } = property;
-    if (defaultValue === null || typeof defaultValue === 'undefined') {
+    if (typeof defaultValue === 'undefined') {
       return acc;
+    }
+
+    if (defaultValue === null) {
+      return { ...acc, [key]: defaultValue };
     }
 
     if (typeof defaultValue === 'object') {

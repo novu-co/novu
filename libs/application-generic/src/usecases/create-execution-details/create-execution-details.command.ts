@@ -26,9 +26,6 @@ export class CreateExecutionDetailsCommand extends EnvironmentWithSubscriber {
   @IsOptional()
   providerId?: string;
 
-  @IsOptional()
-  expireAt?: string;
-
   @IsNotEmpty()
   transactionId: string;
 
@@ -69,7 +66,7 @@ export class CreateExecutionDetailsCommand extends EnvironmentWithSubscriber {
   webhookStatus?: EmailEventStatusEnum | SmsEventStatusEnum;
 
   static getDetailsFromJob(
-    job: IJob,
+    job: IJob
   ): Pick<
     CreateExecutionDetailsCommand,
     | 'environmentId'
@@ -82,7 +79,6 @@ export class CreateExecutionDetailsCommand extends EnvironmentWithSubscriber {
     | 'providerId'
     | 'transactionId'
     | 'channel'
-    | 'expireAt'
   > {
     return {
       environmentId: job._environmentId,
@@ -96,7 +92,6 @@ export class CreateExecutionDetailsCommand extends EnvironmentWithSubscriber {
       providerId: job.providerId,
       transactionId: job.transactionId,
       channel: job.type,
-      expireAt: job.expireAt,
     };
   }
 

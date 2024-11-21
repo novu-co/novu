@@ -2,6 +2,7 @@ import { EditorView } from '@uiw/react-codemirror';
 import { ComponentProps, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
+import merge from 'lodash.merge';
 
 import { Button, buttonVariants } from '@/components/primitives/button';
 import {
@@ -83,8 +84,8 @@ export const InAppAction = () => {
         <DropdownMenuContent className="p-1" align="end">
           <DropdownMenuItem
             onClick={() => {
-              setValue(primaryActionKey, undefined, { shouldDirty: true, shouldValidate: false });
-              setValue(secondaryActionKey, undefined, { shouldDirty: true, shouldValidate: false });
+              setValue(primaryActionKey, null, { shouldDirty: true, shouldValidate: false });
+              setValue(secondaryActionKey, null, { shouldDirty: true, shouldValidate: false });
             }}
           >
             <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'pointer-events-none gap-2')}>
@@ -94,15 +95,15 @@ export const InAppAction = () => {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
-              setValue(
-                primaryActionKey,
+              const primaryActionValue = merge(
                 {
                   label: 'Primary action',
                   redirect: { target: '_self', url: '' },
                 },
-                { shouldDirty: true, shouldValidate: false }
+                primaryAction
               );
-              setValue(secondaryActionKey, undefined, { shouldDirty: true, shouldValidate: false });
+              setValue(primaryActionKey, primaryActionValue, { shouldDirty: true, shouldValidate: false });
+              setValue(secondaryActionKey, null, { shouldDirty: true, shouldValidate: false });
             }}
           >
             <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
@@ -111,14 +112,14 @@ export const InAppAction = () => {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
-              setValue(
-                primaryActionKey,
+              const primaryActionValue = merge(
                 {
                   label: 'Primary action',
                   redirect: { target: '_self', url: '' },
                 },
-                { shouldDirty: true, shouldValidate: false }
+                primaryAction
               );
+              setValue(primaryActionKey, primaryActionValue, { shouldDirty: true, shouldValidate: false });
               setValue(
                 secondaryActionKey,
                 {
@@ -155,7 +156,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
   return (
     <Popover modal={true}>
       <PopoverTrigger {...rest} />
-      <PopoverContent className="max-w-72">
+      <PopoverContent className="max-w-72" side="bottom" align="end">
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 text-sm font-medium leading-none">
             <RiEdit2Line className="size-4" /> Customize button

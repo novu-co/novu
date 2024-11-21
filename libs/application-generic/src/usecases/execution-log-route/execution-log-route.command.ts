@@ -11,7 +11,7 @@ export class ExecutionLogRouteCommand extends CreateExecutionDetailsCommand {
   readonly userId: string;
 
   static getDetailsFromJob(
-    job: IJob,
+    job: IJob
   ): Pick<
     ExecutionLogRouteCommand,
     | 'environmentId'
@@ -24,7 +24,6 @@ export class ExecutionLogRouteCommand extends CreateExecutionDetailsCommand {
     | 'providerId'
     | 'transactionId'
     | 'channel'
-    | 'expireAt'
     | 'userId'
   > {
     return {
@@ -40,7 +39,6 @@ export class ExecutionLogRouteCommand extends CreateExecutionDetailsCommand {
       transactionId: job.transactionId,
       userId: job._userId,
       channel: job.type,
-      expireAt: job.expireAt,
     };
   }
 }

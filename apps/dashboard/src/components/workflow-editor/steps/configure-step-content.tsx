@@ -48,6 +48,8 @@ export const ConfigureStepContent = () => {
                   to="https://docs.novu.co/sdks/framework/typescript/steps/inApp"
                   reloadDocument
                   className="text-xs"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   <span>Help?</span>
                 </Link>

@@ -9,7 +9,7 @@ import { cva } from 'class-variance-authority';
 import { FormFieldContext, FormItemContext, useFormField } from './form-context';
 import { RiErrorWarningFill, RiInformationFill } from 'react-icons/ri';
 import { BsFillInfoCircleFill } from 'react-icons/bs';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/primitives/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 
 const Form = FormProvider;
 
@@ -50,14 +50,12 @@ const FormLabel = React.forwardRef<
       {children}
 
       {tooltip && (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger className="ml-1">
-              <BsFillInfoCircleFill className="text-foreground-300 -mt-0.5 inline size-3" />
-            </TooltipTrigger>
-            <TooltipContent>{tooltip}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger className="ml-1">
+            <BsFillInfoCircleFill className="text-foreground-300 -mt-0.5 inline size-3" />
+          </TooltipTrigger>
+          <TooltipContent>{tooltip}</TooltipContent>
+        </Tooltip>
       )}
 
       {hint && <span className="text-foreground-400 ml-0.5 inline-flex items-center gap-1">{hint}</span>}

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { FieldValues, useForm, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
 import { useBlocker, useNavigate, useParams } from 'react-router-dom';
+import merge from 'lodash.merge';
 
 import { Notification5Fill } from '@/components/icons';
 import { Button } from '@/components/primitives/button';
@@ -24,33 +25,37 @@ import { useWorkflowEditorContext } from '../../hooks';
 import { flattenIssues } from '../../step-utils';
 import { CustomStepControls } from '../controls/custom-step-controls';
 import { useStep } from '../use-step';
+import { useStepEditorContext } from '@/components/workflow-editor/steps/hooks';
+import { NovuApiError } from '@/api/api.client';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5 overflow-y-auto';
 
 export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; step: StepDataDto }) => {
+  const navigate = useNavigate();
   const { stepSlug = '', workflowSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
   const { resetWorkflowForm } = useWorkflowEditorContext();
+  const { refetch: refetchStep } = useStepEditorContext();
   const { step: workflowStep } = useStep();
-  const { dataSchema, uiSchema } = step.controls;
-  const navigate = useNavigate();
-  const schema = buildDynamicZodSchema(dataSchema ?? {});
+
+  const { dataSchema, uiSchema, values } = step.controls;
+  const schema = useMemo(() => buildDynamicZodSchema(dataSchema ?? {}), [dataSchema]);
+  const newFormValues = useMemo(() => merge(buildDefaultValues(uiSchema ?? {}), values), [uiSchema, values]);
+
   const form = useForm({
     mode: 'onSubmit',
     resolver: zodResolver(schema),
-    resetOptions: { keepDirtyValues: true },
-    defaultValues: buildDefaultValues(uiSchema ?? {}),
-    values: step.controls.values,
+    values: newFormValues,
     shouldFocusError: true,
   });
   const [editorValue, setEditorValue] = useState('{}');
-  const { reset, formState, setError } = form;
+  const { formState, setError } = form;
 
   const controlErrors = useMemo(() => flattenIssues(workflowStep?.issues?.controls), [workflowStep]);
 
   useEffect(() => {
     if (Object.keys(controlErrors).length) {
       Object.entries(controlErrors).forEach(([key, value]) => {
-        setError(key as any, { message: value }, { shouldFocus: true });
+        setError(key as string, { message: value }, { shouldFocus: true });
       });
     }
   }, [controlErrors, setError]);
@@ -59,6 +64,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
   const { isPending, updateWorkflow } = useUpdateWorkflow({
     onSuccess: (data) => {
       resetWorkflowForm(data);
+      refetchStep();
       showToast({
         children: () => (
           <>
@@ -93,28 +99,60 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
   });
 
   const onSubmit = async (data: any) => {
+    const updatedValues = Object.keys(formState.dirtyFields).reduce(
+      (acc, key) => {
+        acc[key] = data[key];
+        return acc;
+      },
+      {} as Record<string, unknown>
+    );
+
     await updateWorkflow({
       id: workflow._id,
       workflow: {
         ...workflow,
         steps: workflow.steps.map((step) =>
-          step.slug === stepSlug ? ({ ...step, controlValues: { ...data }, issues: undefined } as StepUpdateDto) : step
+          step.slug === stepSlug
+            ? ({
+                ...step,
+                controlValues: { ...values, ...updatedValues },
+                issues: undefined,
+              } as StepUpdateDto)
+            : step
         ),
       },
     });
-    reset({ ...data });
   };
 
   const preview = async (props: {
     controlValues: Record<string, unknown>;
     previewPayload: Record<string, unknown>;
   }) => {
-    const res = await previewStep({
-      workflowSlug,
-      stepSlug,
-      data: { controlValues: props.controlValues, previewPayload: props.previewPayload },
-    });
-    setEditorValue(JSON.stringify(res.previewPayloadExample, null, 2));
+    try {
+      const res = await previewStep({
+        workflowSlug,
+        stepSlug,
+        data: { controlValues: props.controlValues, previewPayload: props.previewPayload },
+      });
+      setEditorValue(JSON.stringify(res.previewPayloadExample, null, 2));
+    } catch (err) {
+      if (err instanceof NovuApiError) {
+        showToast({
+          children: () => (
+            <>
+              <ToastIcon variant="error" />
+              <span className="text-sm">Failed to preview, Error: ${err.message}</span>
+            </>
+          ),
+          options: {
+            position: 'bottom-right',
+            classNames: {
+              toast: 'ml-10 mb-4',
+            },
+          },
+        });
+      }
+    }
   };
 
   const formValues = useWatch(form);

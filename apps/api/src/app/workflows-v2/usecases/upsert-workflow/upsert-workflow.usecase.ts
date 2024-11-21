@@ -42,6 +42,7 @@ export class UpsertWorkflowUseCase {
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private patchStepDataUsecase: PatchStepUsecase
   ) {}
+
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
     const workflowForUpdate = await this.queryWorkflow(command);
     let persistedWorkflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
@@ -272,6 +273,7 @@ export class UpsertWorkflowUseCase {
       )
     )?._id;
   }
+
   /**
    * @deprecated This method will be removed in future versions.
    * Please use `the patch step data instead, do not add here anything` instead.
