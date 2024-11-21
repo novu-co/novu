@@ -206,15 +206,21 @@ export class NotificationTemplateRepository extends BaseRepository<
     limit: number = 10,
     query?: string
   ): Promise<{ totalCount: number; data: NotificationTemplateEntity[] }> {
-    let searchQuery: FilterQuery<NotificationTemplateDBModel> = {};
+    let searchQuery: FilterQuery<NotificationTemplateDBModel> = {
+      $or: [{ origin: { $ne: 'novu-cloud' } }, { type: { $ne: 'BRIDGE' } }],
+    };
     if (query) {
       searchQuery = {
-        $or: [
-          { name: { $regex: regExpEscape(query), $options: 'i' } },
-          { 'triggers.identifier': { $regex: regExpEscape(query), $options: 'i' } },
-        ],
-        $nor: [
-          { origin: 'novu-cloud' }, // Exclude items with origin 'novu-cloud'
+        $and: [
+          {
+            $or: [
+              { name: { $regex: regExpEscape(query), $options: 'i' } },
+              { 'triggers.identifier': { $regex: regExpEscape(query), $options: 'i' } },
+            ],
+          },
+          {
+            $nor: [{ origin: 'novu-cloud', type: 'BRIDGE' }],
+          },
         ],
       };
     }
