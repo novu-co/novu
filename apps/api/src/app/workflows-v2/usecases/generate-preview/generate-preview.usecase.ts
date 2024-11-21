@@ -65,20 +65,7 @@ export class GeneratePreviewUsecase {
     });
   }
   private isFrameworkError(obj: any): obj is FrameworkError {
-    return (
-      typeof obj === 'object' &&
-      obj !== null &&
-      typeof obj.response === 'object' &&
-      obj.response !== null &&
-      typeof obj.response.message === 'string' &&
-      typeof obj.response.code === 'string' &&
-      'data' in obj.response && // Assuming data can be any type
-      typeof obj.status === 'number' &&
-      typeof obj.options === 'object' &&
-      obj.options !== null &&
-      typeof obj.message === 'string' &&
-      typeof obj.name === 'string'
-    );
+    return typeof obj === 'object' && obj.status === '400' && obj.name === 'BridgeRequestError';
   }
   private async executePreviewUsecase(
     command: GeneratePreviewCommand,

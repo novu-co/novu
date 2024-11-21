@@ -32,7 +32,7 @@ export class InAppOutputRendererUsecase {
   }
 
   private buildRedirect(redirect?: InAppRedirectType) {
-    if (!(redirect && redirect.url && isValidUrlForActionButton(redirect.url))) {
+    if (!(redirect && redirect.url && this.isValidTarget(redirect) && isValidUrlForActionButton(redirect.url))) {
       return undefined;
     }
 
@@ -42,30 +42,22 @@ export class InAppOutputRendererUsecase {
     };
   }
 
+  private isValidTarget(redirect: InAppRedirectType) {
+    if (!redirect || !redirect.target) {
+      return false;
+    }
+
+    return Object.values(RedirectTargetEnum).includes(redirect.target as RedirectTargetEnum);
+  }
+
   private buildActionIfAllPartsAvailable(action?: InAppActionType) {
     if (!(action && action.label)) {
       return undefined;
     }
-    if (!action.redirect) {
-      return {
-        label: action.label,
-      };
-    }
-    if (!action.redirect.url) {
-      return {
-        label: action.label,
-      };
-    }
-    if (isValidUrlForActionButton(action.redirect.url)) {
-      return {
-        label: action.label,
-        redirect: {
-          url: action.redirect.url.toLowerCase().trim(),
-          target: action.redirect.target as RedirectTargetEnum,
-        },
-      };
-    }
 
-    return undefined;
+    return {
+      label: action.label,
+      redirect: this.buildRedirect(action.redirect),
+    };
   }
 }
