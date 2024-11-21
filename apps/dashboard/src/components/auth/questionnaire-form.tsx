@@ -10,8 +10,8 @@ import { hubspotCookie } from '../../utils/cookies';
 import { identifyUser } from '../../api/telemetry';
 import { useTelemetry } from '../../hooks';
 import { TelemetryEvent } from '../../utils/telemetry';
-import { ToastIcon } from '../primitives/sonner';
-import { showToast } from '../primitives/sonner-helpers';
+import { useNavigate } from 'react-router-dom';
+import { buildRoute, ROUTES } from '../../utils/routes';
 
 enum CompanySize {
   LESS_THAN_10 = '<10',
@@ -29,6 +29,8 @@ interface QuestionnaireFormData {
 export function QuestionnaireForm() {
   const { control, watch, handleSubmit } = useForm<QuestionnaireFormData>();
   const track = useTelemetry();
+  const navigate = useNavigate();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedJobTitle = watch('jobTitle');
@@ -73,6 +75,8 @@ export function QuestionnaireForm() {
         jobTitle: data.jobTitle,
         companySize: data.companySize,
       });
+
+      navigate(ROUTES.USECASE_SELECT);
     } finally {
       setIsSubmitting(false);
     }
