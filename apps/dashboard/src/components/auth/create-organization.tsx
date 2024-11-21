@@ -29,7 +29,7 @@ export default function OrganizationCreate() {
         </div>
 
         <div className="w-full max-w-[564px] flex-1">
-          <img src="/images/auth/ui-org.svg" alt="" className="opacity-70" />
+          <img src="/images/auth/ui-org.svg" alt="Novu dashboard overview" className="opacity-70" />
         </div>
       </AuthCard>
     </div>
