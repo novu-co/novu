@@ -1,4 +1,10 @@
-import { IsArray, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsDefined,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { EnvironmentWithSubscriber } from '../../commands/project.command';
 
 export class GetSubscriberPreferenceCommand extends EnvironmentWithSubscriber {
@@ -6,4 +12,8 @@ export class GetSubscriberPreferenceCommand extends EnvironmentWithSubscriber {
   @IsArray()
   @IsString({ each: true })
   tags?: string[];
+
+  @IsBoolean()
+  @IsDefined()
+  includeInactiveChannels: boolean;
 }

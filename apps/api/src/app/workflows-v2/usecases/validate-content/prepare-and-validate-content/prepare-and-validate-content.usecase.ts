@@ -12,7 +12,7 @@ import {
 import { TierRestrictionsValidateUsecase } from '@novu/application-generic';
 
 import { PrepareAndValidateContentCommand } from './prepare-and-validate-content.command';
-import { mergeObjects } from '../../../util/jsonUtils';
+import { flattenJson, flattenToNested, mergeObjects } from '../../../util/jsonUtils';
 import { findMissingKeys } from '../../../util/utils';
 import { BuildDefaultPayloadUsecase } from '../build-payload-from-placeholder';
 import { ValidatedPlaceholderAggregation, ValidatePlaceholderUsecase } from '../validate-placeholders';
@@ -20,6 +20,7 @@ import { CollectPlaceholderWithDefaultsUsecase, PlaceholderAggregation } from '.
 import { ExtractDefaultValuesFromSchemaUsecase } from '../../extract-default-values-from-schema';
 import { ValidatedContentResponse } from './validated-content.response';
 import { toSentenceCase } from '../../../../shared/services/helper/helper.service';
+import { isValidUrlForActionButton } from '../../../util/url-utils';
 
 /**
  * Validates and prepares workflow step content by collecting placeholders,
@@ -45,7 +46,7 @@ export class PrepareAndValidateContentUsecase {
       command.variableSchema
     );
     const finalPayload = this.buildAndMergePayload(controlValueToValidPlaceholders, command.previewPayloadFromDto);
-    const { defaultControlValues, finalControlValues } = this.mergeAndSanitizeControlValues(
+    const { finalControlValues, controlValueIssues } = this.mergeAndSanitizeControlValues(
       command.controlDataSchema,
       command.controlValues,
       controlValueToValidPlaceholders
@@ -53,9 +54,8 @@ export class PrepareAndValidateContentUsecase {
     const issues = await this.buildIssues(
       finalPayload,
       command.previewPayloadFromDto || finalPayload, // if no payload provided no point creating issues.
-      defaultControlValues,
-      command.controlValues,
       controlValueToValidPlaceholders,
+      controlValueIssues,
       command.user,
       command.stepType
     );
@@ -95,16 +95,50 @@ export class PrepareAndValidateContentUsecase {
   }
 
   private mergeAndSanitizeControlValues(
-    jsonSchema: JSONSchemaDto, // Now using JsonSchemaDto
+    jsonSchemaDto: JSONSchemaDto, // Now using JsonSchemaDto
     controlValues: Record<string, unknown>,
     controlValueToValidPlaceholders: Record<string, ValidatedPlaceholderAggregation>
   ) {
-    const defaultControlValues = this.extractDefaultsFromSchemaUseCase.execute({
-      jsonSchemaDto: jsonSchema,
-    });
-    const mergedControlValues = merge(defaultControlValues, this.removeEmptyValuesFromMap(controlValues));
-    Object.keys(mergedControlValues).forEach((controlValueKey) => {
-      const controlValue = mergedControlValues[controlValueKey];
+    const defaultControlValues = this.extractDefaultsFromSchemaUseCase.execute({ jsonSchemaDto });
+
+    let flatSanitizedControlValues: Record<string, unknown> = flattenJson(controlValues);
+    const controlValueToContentIssues: Record<string, ContentIssue[]> = {};
+
+    this.overloadMissingRequiredValuesIssues(
+      defaultControlValues,
+      flatSanitizedControlValues,
+      controlValueToContentIssues
+    );
+
+    flatSanitizedControlValues = this.removeEmptyValuesFromMap(flatSanitizedControlValues);
+    flatSanitizedControlValues = this.removeIllegalValuesAndOverloadIssues(
+      flatSanitizedControlValues,
+      controlValueToValidPlaceholders,
+      controlValueToContentIssues
+    );
+    flatSanitizedControlValues = this.removeIllegalPlaceholdersFromValues(
+      flatSanitizedControlValues,
+      controlValueToValidPlaceholders,
+      controlValueToContentIssues
+    );
+    const finalControlValues = merge(defaultControlValues, flatSanitizedControlValues);
+    const nestedJson = flattenToNested(finalControlValues);
+
+    return {
+      defaultControlValues,
+      finalControlValues: nestedJson,
+      controlValueIssues: controlValueToContentIssues,
+    };
+  }
+
+  private removeIllegalPlaceholdersFromValues(
+    sanitizedIncomingControlValues: Record<string, unknown>,
+    controlValueToValidPlaceholders: Record<string, ValidatedPlaceholderAggregation>,
+    controlValueToContentIssues: Record<string, ContentIssue[]>
+  ) {
+    const finalControlValuesSanitized: Record<string, unknown> = { ...sanitizedIncomingControlValues };
+    Object.keys(sanitizedIncomingControlValues).forEach((controlValueKey) => {
+      const controlValue = sanitizedIncomingControlValues[controlValueKey];
 
       if (typeof controlValue !== 'string') {
         return;
@@ -114,22 +148,64 @@ export class PrepareAndValidateContentUsecase {
       if (!placeholders) {
         return;
       }
-
-      let cleanedControlValue = controlValue; // Initialize cleanedControlValue with the original controlValue
-
-      for (const problematicPlaceholder of Object.keys(placeholders.problematicPlaceholders)) {
-        cleanedControlValue = this.removePlaceholdersFromText(problematicPlaceholder, cleanedControlValue);
-      }
-      mergedControlValues[controlValueKey] = cleanedControlValue; // Update mergedControlValues with cleanedControlValue
+      finalControlValuesSanitized[controlValueKey] = this.cleanFromBadPlaceholders(
+        controlValue,
+        placeholders,
+        controlValueToContentIssues,
+        controlValueKey
+      );
     });
 
-    return { defaultControlValues, finalControlValues: mergedControlValues };
+    return finalControlValuesSanitized;
+  }
+
+  private cleanFromBadPlaceholders(
+    controlValue: string,
+    placeholders: ValidatedPlaceholderAggregation,
+    controlValueToContentIssues: Record<string, ContentIssue[]>,
+    controlValueKey: string
+  ) {
+    let cleanedControlValue = controlValue; // Initialize cleanedControlValue with the original controlValue
+
+    for (const problematicPlaceholder of Object.keys(placeholders.problematicPlaceholders)) {
+      this.addToIssues(
+        controlValueToContentIssues,
+        controlValueKey,
+        StepContentIssueEnum.ILLEGAL_VARIABLE_IN_CONTROL_VALUE,
+        `Illegal variable in control value: ${problematicPlaceholder}`,
+        problematicPlaceholder
+      );
+      cleanedControlValue = this.removePlaceholdersFromText(problematicPlaceholder, cleanedControlValue);
+    }
+
+    return cleanedControlValue;
+  }
+
+  private addToIssues(
+    controlValueToContentIssues: Record<string, ContentIssue[]>,
+    controlValueKey: string,
+    issueEnum: StepContentIssueEnum,
+    msg: string,
+    variable: string | undefined
+  ) {
+    if (!controlValueToContentIssues[controlValueKey]) {
+      // eslint-disable-next-line no-param-reassign
+      controlValueToContentIssues[controlValueKey] = [];
+    }
+    controlValueToContentIssues[controlValueKey].push({
+      issueType: issueEnum,
+      variableName: variable,
+      message: msg,
+    });
   }
 
   private removeEmptyValuesFromMap(controlValues: Record<string, unknown>) {
     const filteredValues: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(controlValues)) {
+      if (value === null) {
+        continue;
+      }
       if (typeof value !== 'string') {
         filteredValues[key] = value;
         continue;
@@ -160,41 +236,17 @@ export class PrepareAndValidateContentUsecase {
   private async buildIssues(
     payload: PreviewPayload,
     providedPayload: PreviewPayload,
-    defaultControlValues: Record<string, unknown>,
-    userProvidedValues: Record<string, unknown>,
     valueToPlaceholders: Record<string, ValidatedPlaceholderAggregation>,
+    urlControlValueIssues: Record<string, ContentIssue[]>,
     user: UserSessionData,
     stepType?: StepTypeEnum
-  ): Promise<Record<string, ContentIssue[]>> {
+  ): Record<string, ContentIssue[]> {
     let finalIssues: Record<string, ContentIssue[]> = {};
-    finalIssues = mergeObjects(finalIssues, this.computeIllegalVariablesIssues(valueToPlaceholders));
     finalIssues = mergeObjects(finalIssues, this.getMissingInPayload(providedPayload, valueToPlaceholders, payload));
-    finalIssues = mergeObjects(finalIssues, this.computeMissingControlValue(defaultControlValues, userProvidedValues));
+    finalIssues = mergeObjects(finalIssues, urlControlValueIssues);
     finalIssues = mergeObjects(finalIssues, await this.computeTierIssues(defaultControlValues, user, stepType));
 
     return finalIssues;
-  }
-
-  private computeIllegalVariablesIssues(
-    controlValueToValidPlaceholders: Record<string, ValidatedPlaceholderAggregation>
-  ) {
-    const result: Record<string, ContentIssue[]> = {};
-
-    for (const [controlValue, placeholderAggregation] of Object.entries(controlValueToValidPlaceholders)) {
-      const illegalVariables = placeholderAggregation.problematicPlaceholders;
-      for (const [placeholder, errorMsg] of Object.entries(illegalVariables)) {
-        if (!result[controlValue]) {
-          result[controlValue] = [];
-        }
-        result[controlValue].push({
-          issueType: StepContentIssueEnum.ILLEGAL_VARIABLE_IN_CONTROL_VALUE,
-          variableName: placeholder,
-          message: errorMsg,
-        });
-      }
-    }
-
-    return result;
   }
 
   private getMissingInPayload(
@@ -225,23 +277,63 @@ export class PrepareAndValidateContentUsecase {
     return result;
   }
 
-  private computeMissingControlValue(
+  private overloadMissingRequiredValuesIssues(
     defaultControlValues: Record<string, unknown>,
-    userProvidedValues: Record<string, unknown>
+    userProvidedValues: Record<string, unknown>,
+    controlValueToContentIssues: Record<string, ContentIssue[]>
   ) {
     const missingControlKeys = findMissingKeys(defaultControlValues, userProvidedValues);
-    const result: Record<string, ContentIssue[]> = {};
-
     for (const item of missingControlKeys) {
-      result[item] = [
-        {
-          issueType: StepContentIssueEnum.MISSING_VALUE,
-          message: `${toSentenceCase(item)} is missing`,
-        },
-      ];
+      this.addToIssues(
+        controlValueToContentIssues,
+        item,
+        StepContentIssueEnum.MISSING_VALUE,
+        `${toSentenceCase(item)} is missing`,
+        item
+      );
     }
+  }
 
-    return result;
+  private removeIllegalValuesAndOverloadIssues(
+    sanitizedIncomingControlValues: Record<string, unknown>,
+    controlValueToValidPlaceholders: Record<string, ValidatedPlaceholderAggregation>,
+    controlValueToContentIssues: Record<string, ContentIssue[]>
+  ) {
+    const finalSanitizedControlValues = { ...sanitizedIncomingControlValues };
+    Object.keys(sanitizedIncomingControlValues).forEach((controlValueKey) => {
+      const controlValue = sanitizedIncomingControlValues[controlValueKey];
+      if (
+        controlValueKey.includes('url') &&
+        typeof controlValue === 'string' &&
+        !isValidUrlForActionButton(controlValue)
+      ) {
+        const hasNoPlaceholders = this.getHasNoPlaceholders(controlValueToValidPlaceholders, controlValueKey);
+        if (hasNoPlaceholders) {
+          finalSanitizedControlValues[controlValueKey] =
+            'https://www.not-good-url-please-replace.com/redirect?from=problematic-url&to=updated-url';
+
+          // eslint-disable-next-line no-param-reassign
+          controlValueToContentIssues[controlValueKey] = [
+            {
+              issueType: StepContentIssueEnum.INVALID_URL,
+              variableName: controlValue,
+              message: `Invalid URL: [[${controlValue}]]`,
+            },
+          ];
+        }
+      }
+    });
+
+    return finalSanitizedControlValues;
+  }
+
+  private getHasNoPlaceholders(
+    controlValueToValidPlaceholders: Record<string, ValidatedPlaceholderAggregation>,
+    controlValueKey: string
+  ) {
+    return (
+      Object.keys(controlValueToValidPlaceholders[controlValueKey].validRegularPlaceholdersToDefaultValue).length === 0
+    );
   }
 
   private async computeTierIssues(

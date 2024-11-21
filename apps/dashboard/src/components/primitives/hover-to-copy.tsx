@@ -1,5 +1,5 @@
 import { ComponentProps, useState } from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip';
 
 type HoverToCopyProps = ComponentProps<typeof TooltipTrigger> & {
   valueToCopy: string;
@@ -14,24 +14,24 @@ export const HoverToCopy = (props: HoverToCopyProps) => {
     try {
       await navigator.clipboard.writeText(valueToCopy);
       setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 1500);
+      const timeout = setTimeout(() => setIsCopied(false), 1500);
+      return () => clearTimeout(timeout);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
   };
 
   return (
-    <TooltipProvider delayDuration={100}>
-      <Tooltip>
-        <TooltipTrigger aria-label="Copy to clipboard" onClick={copyToClipboard} {...rest} />
-        <TooltipContent
-          onPointerDownOutside={(e) => {
-            e.preventDefault();
-          }}
-        >
-          {isCopied ? 'Copied!' : 'Click to copy'}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger aria-label="Copy to clipboard" onClick={copyToClipboard} {...rest} />
+      <TooltipContent
+        side="right"
+        onPointerDownOutside={(e) => {
+          e.preventDefault();
+        }}
+      >
+        {isCopied ? 'Copied!' : 'Click to copy'}
+      </TooltipContent>
+    </Tooltip>
   );
 };

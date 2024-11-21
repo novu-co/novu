@@ -20,7 +20,7 @@ import { cn } from '@/utils/ui';
 import { SidebarContent, SidebarHeader } from '@/components/side-navigation/Sidebar';
 import { PageMeta } from '../page-meta';
 import { ConfirmationModal } from '../confirmation-modal';
-import { PAUSE_MODAL_DESCRIPTION, PAUSE_MODAL_TITLE } from '@/utils/constants';
+import { PauseModalDescription, PAUSE_MODAL_TITLE } from '@/components/pause-workflow-dialog';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { useEnvironment } from '@/context/environment/hooks';
 
@@ -40,7 +40,7 @@ export function ConfigureWorkflow() {
 
   useLayoutEffect(() => {
     if (shouldUpdateWorkflowSlug) {
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         navigate(
           buildRoute(ROUTES.EDIT_WORKFLOW, {
             environmentSlug: currentEnvironment?.slug ?? '',
@@ -53,6 +53,8 @@ export function ConfigureWorkflow() {
         );
       }, 0);
       setIsBlurred(false);
+
+      return () => clearTimeout(timeoutId);
     }
   }, [shouldUpdateWorkflowSlug, workflow?.slug, currentEnvironment?.slug, navigate]);
 
@@ -70,7 +72,7 @@ export function ConfigureWorkflow() {
           setIsPauseModalOpen(false);
         }}
         title={PAUSE_MODAL_TITLE}
-        description={PAUSE_MODAL_DESCRIPTION(workflowName)}
+        description={<PauseModalDescription workflowName={workflowName} />}
         confirmButtonText="Proceed"
       />
       <PageMeta title={workflowName} />
@@ -126,7 +128,7 @@ export function ConfigureWorkflow() {
             defaultValue=""
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Workflow Name</FormLabel>
+                <FormLabel>Name</FormLabel>
                 <FormControl>
                   <InputField>
                     <Input
@@ -148,7 +150,7 @@ export function ConfigureWorkflow() {
             defaultValue=""
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Workflow Identifier</FormLabel>
+                <FormLabel>Identifier</FormLabel>
                 <FormControl>
                   <InputField className="flex overflow-hidden pr-0">
                     <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />

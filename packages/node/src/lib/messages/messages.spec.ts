@@ -70,7 +70,6 @@ describe('Novu Node.js package - Messages class', () => {
             status: 'sent',
             transactionId: '4560c0e0-7512-492d-8966-c708546aeb7e',
             payload: [Object],
-            expireAt: '2023-07-19T15:13:51.961Z',
             deleted: false,
             createdAt: '2023-06-19T15:13:51.961Z',
             updatedAt: '2023-06-19T15:13:51.966Z',

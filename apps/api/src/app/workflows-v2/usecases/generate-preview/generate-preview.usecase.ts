@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import {
   ChannelTypeEnum,
   GeneratePreviewRequestDto,
@@ -67,7 +67,9 @@ export class GeneratePreviewUsecase {
       user: command.user,
     });
   }
-
+  private isFrameworkError(obj: any): obj is FrameworkError {
+    return typeof obj === 'object' && obj.status === '400' && obj.name === 'BridgeRequestError';
+  }
   private async executePreviewUsecase(
     command: GeneratePreviewCommand,
     stepData: StepDataDto,
@@ -75,21 +77,28 @@ export class GeneratePreviewUsecase {
     updatedControlValues: Record<string, unknown>
   ) {
     const state = buildState(hydratedPayload.steps);
-
-    return await this.legacyPreviewStepUseCase.execute(
-      PreviewStepCommand.create({
-        payload: hydratedPayload.payload || {},
-        subscriber: hydratedPayload.subscriber,
-        controls: updatedControlValues || {},
-        environmentId: command.user.environmentId,
-        organizationId: command.user.organizationId,
-        stepId: stepData.stepId,
-        userId: command.user._id,
-        workflowId: stepData.workflowId,
-        workflowOrigin: stepData.origin,
-        state,
-      })
-    );
+    try {
+      return await this.legacyPreviewStepUseCase.execute(
+        PreviewStepCommand.create({
+          payload: hydratedPayload.payload || {},
+          subscriber: hydratedPayload.subscriber,
+          controls: updatedControlValues || {},
+          environmentId: command.user.environmentId,
+          organizationId: command.user.organizationId,
+          stepId: stepData.stepId,
+          userId: command.user._id,
+          workflowId: stepData.workflowId,
+          workflowOrigin: stepData.origin,
+          state,
+        })
+      );
+    } catch (error) {
+      if (this.isFrameworkError(error)) {
+        throw new GeneratePreviewError(error);
+      } else {
+        throw error;
+      }
+    }
   }
 }
 
@@ -106,4 +115,26 @@ function buildState(steps: Record<string, unknown> | undefined): FrameworkPrevio
   }
 
   return outputArray;
+}
+export class GeneratePreviewError extends InternalServerErrorException {
+  constructor(error: FrameworkError) {
+    super({
+      message: `GeneratePreviewError: Original Message:`,
+      frameworkMessage: error.response.message,
+      code: error.response.code,
+      data: error.response.data,
+    });
+  }
+}
+
+class FrameworkError {
+  response: {
+    message: string;
+    code: string;
+    data: unknown;
+  };
+  status: number;
+  options: Record<string, unknown>;
+  message: string;
+  name: string;
 }

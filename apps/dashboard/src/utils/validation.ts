@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { capitalize } from './string';
 
-const getIssueField = (issue: z.ZodIssueBase) => capitalize(issue.path.join(' '));
+const getIssueField = (issue: z.ZodIssueBase) => capitalize(`${issue.path[issue.path.length - 1]}`);
 const pluralize = (count: number | bigint) => (count === 1 ? '' : 's');
 
 /**
@@ -13,6 +13,7 @@ const pluralize = (count: number | bigint) => (count === 1 ? '' : 's');
  */
 const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
   const issueField = getIssueField(issue);
+
   if (issue.code === z.ZodIssueCode.too_big) {
     if (issue.type === 'array') {
       return {
@@ -21,7 +22,6 @@ const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
     }
 
     if (issue.type === 'string') {
-      console.log({ issue });
       return {
         message: `${issueField} must be at most ${issue.maximum} character${pluralize(issue.maximum)}`,
       };
@@ -39,6 +39,7 @@ const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
       };
     }
   }
+
   if (issue.code === z.ZodIssueCode.too_small) {
     if (issue.type === 'array') {
       return {
@@ -69,6 +70,18 @@ const customErrorMap: z.ZodErrorMap = (issue, ctx) => {
         message: `${issueField} must be at least ${new Date(Number(issue.minimum)).toLocaleString()}`,
       };
     }
+  }
+
+  if (issue.code === z.ZodIssueCode.invalid_string && issue.validation === 'email') {
+    return {
+      message: `${issueField} must be a valid email`,
+    };
+  }
+
+  if (issue.code === z.ZodIssueCode.invalid_enum_value) {
+    return {
+      message: `${issueField} must be one of ${issue.options.join(', ')}`,
+    };
   }
   return { message: ctx.defaultError };
 };

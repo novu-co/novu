@@ -21,15 +21,16 @@ export function CommonFields() {
   const shouldUpdateStepSlug = isBlurred && isStepSlugChanged;
 
   useLayoutEffect(() => {
-    if (shouldUpdateStepSlug) {
-      setTimeout(() => {
+    const timeout = setTimeout(() => {
+      if (shouldUpdateStepSlug) {
         navigate(buildRoute(`../${ROUTES.CONFIGURE_STEP}`, { stepSlug: step?.slug ?? '' }), {
           replace: true,
           state: { skipAnimation: true },
         });
-      }, 0);
+      }
       setIsBlurred(false);
-    }
+    }, 0);
+    return () => clearTimeout(timeout);
   }, [shouldUpdateStepSlug, step, navigate]);
 
   return (
@@ -39,7 +40,7 @@ export function CommonFields() {
         name={`steps.${stepIndex}.name`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Step Name</FormLabel>
+            <FormLabel>Name</FormLabel>
             <FormControl>
               <InputField>
                 <Input
@@ -60,7 +61,7 @@ export function CommonFields() {
         name={`steps.${stepIndex}.stepId`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Step Identifier</FormLabel>
+            <FormLabel>Identifier</FormLabel>
             <FormControl>
               <InputField className="flex overflow-hidden pr-0">
                 <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />

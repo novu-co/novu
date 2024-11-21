@@ -2,7 +2,6 @@ import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
 import { NotificationDBModel } from './notification.entity';
-import { getTTLOptions } from '../../shared';
 
 const notificationSchema = new Schema<NotificationDBModel>(
   {
@@ -39,7 +38,6 @@ const notificationSchema = new Schema<NotificationDBModel>(
     payload: {
       type: Schema.Types.Mixed,
     },
-    expireAt: Schema.Types.Date,
     controls: {
       type: Schema.Types.Mixed,
     },
@@ -49,8 +47,6 @@ const notificationSchema = new Schema<NotificationDBModel>(
   },
   schemaOptions
 );
-
-notificationSchema.index({ expireAt: 1 }, getTTLOptions());
 
 notificationSchema.virtual('environment', {
   ref: 'Environment',
@@ -157,6 +153,11 @@ notificationSchema.index({
   _environmentId: 1,
   createdAt: -1,
 });
+
+/*
+ * This index was created to push entries to Online Archive
+ */
+notificationSchema.index({ createdAt: 1 });
 
 export const Notification =
   (mongoose.models.Notification as mongoose.Model<NotificationDBModel>) ||

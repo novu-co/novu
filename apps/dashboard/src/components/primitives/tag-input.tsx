@@ -20,7 +20,10 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
   const [tags, setTags] = useState<string[]>(value);
   const [inputValue, setInputValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const validSuggestions = useMemo(() => suggestions.filter((suggestion) => !tags.includes(suggestion)), [tags]);
+  const validSuggestions = useMemo(
+    () => suggestions.filter((suggestion) => !tags.includes(suggestion)),
+    [tags, suggestions]
+  );
 
   useEffect(() => {
     setTags(value);
@@ -55,7 +58,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
   return (
     <Popover open={isOpen}>
       <Command loop>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 pb-0.5">
           <PopoverAnchor asChild>
             <CommandInput
               ref={ref}

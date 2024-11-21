@@ -26,6 +26,7 @@ import { flattenIssues } from '../../step-utils';
 import { CustomStepControls } from '../controls/custom-step-controls';
 import { useStep } from '../use-step';
 import { useStepEditorContext } from '@/components/workflow-editor/steps/hooks';
+import { NovuApiError } from '@/api/api.client';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5 overflow-y-auto';
 
@@ -127,12 +128,31 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
     controlValues: Record<string, unknown>;
     previewPayload: Record<string, unknown>;
   }) => {
-    const res = await previewStep({
-      workflowSlug,
-      stepSlug,
-      data: { controlValues: props.controlValues, previewPayload: props.previewPayload },
-    });
-    setEditorValue(JSON.stringify(res.previewPayloadExample, null, 2));
+    try {
+      const res = await previewStep({
+        workflowSlug,
+        stepSlug,
+        data: { controlValues: props.controlValues, previewPayload: props.previewPayload },
+      });
+      setEditorValue(JSON.stringify(res.previewPayloadExample, null, 2));
+    } catch (err) {
+      if (err instanceof NovuApiError) {
+        showToast({
+          children: () => (
+            <>
+              <ToastIcon variant="error" />
+              <span className="text-sm">Failed to preview, Error: ${err.message}</span>
+            </>
+          ),
+          options: {
+            position: 'bottom-right',
+            classNames: {
+              toast: 'ml-10 mb-4',
+            },
+          },
+        });
+      }
+    }
   };
 
   const formValues = useWatch(form);

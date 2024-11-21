@@ -10,6 +10,9 @@ export const OptInProvider = (props: PropsWithChildren) => {
     if (isLoaded && status !== NewDashboardOptInStatusEnum.OPTED_IN) {
       redirectToLegacyDashboard();
     }
+
+    // set light theme on the new domain for both legacy and new dashboard
+    localStorage.setItem('mantine-theme', 'light');
   }, [status, redirectToLegacyDashboard, isLoaded]);
 
   return <>{children}</>;

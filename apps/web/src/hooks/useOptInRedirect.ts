@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import { useCallback, useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { FeatureFlagsKeysEnum, NewDashboardOptInStatusEnum } from '@novu/shared';
 
@@ -13,29 +13,26 @@ export const useOptInRedirect = () => {
   const { pathname } = useLocation();
   const isNewDashboardEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ENABLED);
   const { status, isLoaded, redirectToNewDashboard } = useNewDashboardOptIn();
-  const isUserOptedIn = isLoaded && status && status === NewDashboardOptInStatusEnum.OPTED_IN;
-  const dashboardV2HostName = window.location.hostname.includes('dashboard-v2');
 
-  const shouldHandleOptInRedirect = IS_EE_AUTH_ENABLED && isNewDashboardEnabled && isUserOptedIn && dashboardV2HostName;
+  const checkAndRedirect = useCallback(() => {
+    if (!IS_EE_AUTH_ENABLED || !isNewDashboardEnabled) return false;
+    if (!isLoaded || !status || status !== NewDashboardOptInStatusEnum.OPTED_IN) return false;
 
+    const currentRoute = pathname.replace('/legacy', '');
+    const isRedirectableRoute = ROUTES_THAT_REDIRECT_TO_DASHBOARD.some((route) => currentRoute.includes(route));
+
+    if (!isRedirectableRoute) return false;
+
+    redirectToNewDashboard();
+
+    return true;
+  }, [isNewDashboardEnabled, isLoaded, status, pathname, redirectToNewDashboard]);
+
+  // handling of updates to deps
   useLayoutEffect(() => {
-    if (shouldHandleOptInRedirect) {
-      const currentRoute = pathname.replace('/legacy', '');
+    checkAndRedirect();
+  }, [checkAndRedirect]);
 
-      /**
-       * if equivalent of current route (incl. subroutes) exits in new dashboard, redirect to it
-       * - /legacy/workflows -> /workflows
-       * - /legacy/workflows/edit/123 -> /workflows
-       */
-      if (ROUTES_THAT_REDIRECT_TO_DASHBOARD.some((route) => currentRoute.includes(route))) {
-        /**
-         * TODO: in order to redirect to the same route, we need to translate the
-         * "dev_env_<id>" or wf/step slugs to legacy environment id and vice-versa
-         *
-         * note: /legacy is part of public URL, so we can't navigate() outside of that
-         */
-        redirectToNewDashboard();
-      }
-    }
-  }, [shouldHandleOptInRedirect, pathname, redirectToNewDashboard]);
+  // immediate redirect check for initial render
+  return checkAndRedirect();
 };
