@@ -40,7 +40,7 @@ export function ConfigureWorkflow() {
 
   useLayoutEffect(() => {
     if (shouldUpdateWorkflowSlug) {
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         navigate(
           buildRoute(ROUTES.EDIT_WORKFLOW, {
             environmentSlug: currentEnvironment?.slug ?? '',
@@ -53,6 +53,8 @@ export function ConfigureWorkflow() {
         );
       }, 0);
       setIsBlurred(false);
+
+      return () => clearTimeout(timeoutId);
     }
   }, [shouldUpdateWorkflowSlug, workflow?.slug, currentEnvironment?.slug, navigate]);
 
