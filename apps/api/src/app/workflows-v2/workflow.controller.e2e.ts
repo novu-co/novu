@@ -754,7 +754,7 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(updatedWorkflow.status).to.equal(WorkflowStatusEnum.INACTIVE);
       updatedWorkflow = await patchWorkflowAndReturnResponse(workflowDto._id, true);
       expect(updatedWorkflow.status).to.equal(WorkflowStatusEnum.ACTIVE);
-      await patchStepRest(workflowDto._id, workflowDto.steps[0]._id, {});
+      await patchStepRest(workflowDto._id, workflowDto.steps[0]._id, { controlValues: {} });
       updatedWorkflow = await patchWorkflowAndReturnResponse(workflowDto._id, false);
       expect(updatedWorkflow.status).to.equal(WorkflowStatusEnum.INACTIVE);
       updatedWorkflow = await patchWorkflowAndReturnResponse(workflowDto._id, true);
