@@ -9,7 +9,7 @@ import {
   StepTypeEnum,
   UserSessionData,
 } from '@novu/shared';
-import { TierRestrictionsValidatorUsecase } from '@novu/application-generic';
+import { TierRestrictionsValidateUsecase } from '@novu/application-generic';
 
 import { PrepareAndValidateContentCommand } from './prepare-and-validate-content.command';
 import { mergeObjects } from '../../../util/jsonUtils';
@@ -35,7 +35,7 @@ export class PrepareAndValidateContentUsecase {
     private validatePlaceholdersUseCase: ValidatePlaceholderUsecase,
     private collectPlaceholderWithDefaultsUsecase: CollectPlaceholderWithDefaultsUsecase,
     private extractDefaultsFromSchemaUseCase: ExtractDefaultValuesFromSchemaUsecase,
-    private tierRestrictionsValidatorUsecase: TierRestrictionsValidatorUsecase
+    private tierRestrictionsValidateUsecase: TierRestrictionsValidateUsecase
   ) {}
 
   async execute(command: PrepareAndValidateContentCommand): Promise<ValidatedContentResponse> {
@@ -254,7 +254,7 @@ export class PrepareAndValidateContentUsecase {
         ? calculateMilliseconds(defaultControlValues.amount, defaultControlValues.unit)
         : 0;
 
-    const restrictionsErrors = await this.tierRestrictionsValidatorUsecase.execute({
+    const restrictionsErrors = await this.tierRestrictionsValidateUsecase.execute({
       deferDurationMs: deferDuration,
       organizationId: user.organizationId,
       stepType,

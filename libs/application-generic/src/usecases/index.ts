@@ -48,4 +48,4 @@ export * from './upsert-control-values';
 export * from './get-preferences';
 export * from './delete-preferences';
 export * from './get-decrypted-secret-key';
-export * from './tier-restrictions-validator';
+export * from './tier-restrictions-validate';

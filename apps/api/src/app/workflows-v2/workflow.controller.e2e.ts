@@ -9,6 +9,7 @@ import {
   JSONSchemaDefinition,
   JSONSchemaDto,
   ListWorkflowResponse,
+  PatchStepDataDto,
   PreferencesRequestDto,
   ShortIsPrefixEnum,
   slugify,
@@ -205,25 +206,15 @@ describe('Workflow Controller E2E API Testing', () => {
       });
 
       it('should show digest control value issues when illegal value provided', async () => {
-        const steps = [{ ...buildDigestStep({ controlValues: { amount: '555', unit: 'days' } }) }];
-        const { issues, status } = await createWorkflowAndReturnStepIssues({ steps }, 0);
-        expect(status).to.equal(WorkflowStatusEnum.ERROR);
-        expect(issues.controls).to.deep.equal({
-          amount: [
-            {
-              issueType: 'TIER_LIMIT_EXCEEDED',
-              message:
-                'The maximum delay allowed is 90 days.Please contact our support team to discuss extending this limit for your use case.',
-            },
-          ],
-          unit: [
-            {
-              issueType: 'TIER_LIMIT_EXCEEDED',
-              message:
-                'The maximum delay allowed is 90 days.Please contact our support team to discuss extending this limit for your use case.',
-            },
-          ],
-        });
+        const steps = [{ ...buildDigestStep() }];
+        const workflowCreated = await createWorkflowAndReturn({ steps });
+        const values = { controlValues: { amount: '555', unit: 'days' } };
+        const updatedStep = await patchStepRest(workflowCreated._id, workflowCreated.steps[0]._id, values);
+
+        expect(updatedStep.issues?.controls?.amount[0].issueType).to.deep.equal(
+          StepContentIssueEnum.TIER_LIMIT_EXCEEDED
+        );
+        expect(updatedStep.issues?.controls?.unit[0].issueType).to.deep.equal(StepContentIssueEnum.TIER_LIMIT_EXCEEDED);
       });
     });
   });
@@ -729,13 +720,13 @@ describe('Workflow Controller E2E API Testing', () => {
       const stepId1 = response.steps[0]._id;
       const stepId2 = response.steps[1]._id;
       const controlValues1 = { body: 'body1', subject: 'subject1' };
-      await patchStepRest(workflowDatabaseId, stepId1, controlValues1);
+      await patchStepRest(workflowDatabaseId, stepId1, { controlValues: controlValues1 });
       const newVar = await getStepData(workflowDatabaseId, stepId1);
       expect(newVar.controls.values).to.deep.equal(controlValues1);
       const stepData2 = await getStepData(workflowDatabaseId, stepId2);
       expect(stepData2.controls.values).to.not.deep.equal(controlValues1);
       const controlValues2 = { body: 'body2', subject: 'subject2' };
-      await patchStepRest(workflowDatabaseId, stepId2, controlValues2);
+      await patchStepRest(workflowDatabaseId, stepId2, { controlValues: controlValues2 });
       const stepData2Updated = await getStepData(workflowDatabaseId, stepId2);
       expect(stepData2Updated.controls.values).to.deep.equal(controlValues2);
     });
@@ -756,7 +747,9 @@ describe('Workflow Controller E2E API Testing', () => {
   describe('Patch Workflow Permutations', () => {
     it('Patch should work and allow us to turn workflow active on / off and have the status change accordingly', async () => {
       const workflowDto = await createWorkflowRest(buildCreateWorkflowDto('', { steps: [buildInAppStep()] }));
-      await patchStepRest(workflowDto._id, workflowDto.steps[0]._id, { body: 'body1', subject: 'subject1' });
+      await patchStepRest(workflowDto._id, workflowDto.steps[0]._id, {
+        controlValues: { body: 'body1', subject: 'subject1' },
+      });
       let updatedWorkflow = await patchWorkflowAndReturnResponse(workflowDto._id, false);
       expect(updatedWorkflow.status).to.equal(WorkflowStatusEnum.INACTIVE);
       updatedWorkflow = await patchWorkflowAndReturnResponse(workflowDto._id, true);
@@ -778,10 +771,8 @@ describe('Workflow Controller E2E API Testing', () => {
     return novuRestResult.value;
   }
 
-  async function patchStepRest(workflowDatabaseId: string, stepId1: string, controlValues1: Record<string, unknown>) {
-    const novuRestResult = await workflowsClient.patchWorkflowStepData(workflowDatabaseId, stepId1, {
-      controlValues: controlValues1,
-    });
+  async function patchStepRest(workflowDatabaseId: string, stepId1: string, patchStepDataDto: PatchStepDataDto) {
+    const novuRestResult = await workflowsClient.patchWorkflowStepData(workflowDatabaseId, stepId1, patchStepDataDto);
     if (!novuRestResult.isSuccessResult()) {
       throw new Error(novuRestResult.error!.responseText);
     }

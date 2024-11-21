@@ -3,27 +3,27 @@ import { Injectable } from '@nestjs/common';
 import { ApiServiceLevelEnum, StepTypeEnum } from '@novu/shared';
 import { CommunityOrganizationRepository } from '@novu/dal';
 
-import { TierRestrictionsValidatorCommand } from './tier-restrictions-validator.command';
+import { TierRestrictionsValidateCommand } from './tier-restrictions-validate.command';
 import {
   ErrorEnum,
-  TierRestrictionsValidatorResponse,
-} from './tier-restrictions-validator.response';
+  TierRestrictionsValidateResponse,
+} from './tier-restrictions-validate.response';
 import {
   FREE_TIER_MAX_DELAY_DAYS,
   BUSINESS_TIER_MAX_DELAY_DAYS,
   MAX_DELAY_FREE_TIER,
   MAX_DELAY_BUSINESS_TIER,
-} from './tier-restrictions-validator.consts';
+} from './tier-restrictions-validate.consts';
 
 @Injectable()
-export class TierRestrictionsValidatorUsecase {
+export class TierRestrictionsValidateUsecase {
   constructor(
     private organizationRepository: CommunityOrganizationRepository,
   ) {}
 
   async execute(
-    command: TierRestrictionsValidatorCommand,
-  ): Promise<TierRestrictionsValidatorResponse> {
+    command: TierRestrictionsValidateCommand,
+  ): Promise<TierRestrictionsValidateResponse> {
     return this.validateControlValuesByTierLimits(
       command.organizationId,
       command.deferDurationMs,
@@ -35,7 +35,7 @@ export class TierRestrictionsValidatorUsecase {
     organizationId: string,
     deferDurationMs?: number,
     stepType?: StepTypeEnum,
-  ): Promise<TierRestrictionsValidatorResponse> {
+  ): Promise<TierRestrictionsValidateResponse> {
     const controlValueNeedTierValidation =
       stepType === StepTypeEnum.DIGEST || stepType === StepTypeEnum.DELAY;
 
@@ -43,16 +43,17 @@ export class TierRestrictionsValidatorUsecase {
       return null;
     }
 
-    const issues: TierRestrictionsValidatorResponse = [];
+    const issues: TierRestrictionsValidateResponse = [];
     const organization =
       await this.organizationRepository.findById(organizationId);
     const tier = organization?.apiServiceLevel;
-
-    if (
+    const isPaidTier = [
       tier === undefined ||
-      tier === ApiServiceLevelEnum.BUSINESS ||
-      tier === ApiServiceLevelEnum.ENTERPRISE
-    ) {
+        tier === ApiServiceLevelEnum.BUSINESS ||
+        tier === ApiServiceLevelEnum.ENTERPRISE,
+    ];
+
+    if (isPaidTier) {
       if (deferDurationMs > MAX_DELAY_BUSINESS_TIER) {
         issues.push({
           error: ErrorEnum.TIER_LIMIT_EXCEEDED,

@@ -7,4 +7,4 @@ type TierValidationError = {
   message: string;
 };
 
-export type TierRestrictionsValidatorResponse = TierValidationError[] | null;
+export type TierRestrictionsValidateResponse = TierValidationError[] | null;

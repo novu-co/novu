@@ -3,7 +3,7 @@ import { IsEnum, IsNumber, IsOptional } from 'class-validator';
 import { StepTypeEnum } from '@novu/shared';
 import { OrganizationLevelCommand } from '../../commands';
 
-export class TierRestrictionsValidatorCommand extends OrganizationLevelCommand {
+export class TierRestrictionsValidateCommand extends OrganizationLevelCommand {
   @IsNumber()
   @IsOptional()
   deferDurationMs?: number;

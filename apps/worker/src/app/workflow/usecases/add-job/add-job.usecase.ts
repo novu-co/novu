@@ -33,11 +33,10 @@ import {
   isTimedDigestOutput,
   isLookBackDigestOutput,
   isRegularDigestOutput,
-  TierRestrictionsValidatorUsecase,
-  TierRestrictionsValidatorCommand,
+  TierRestrictionsValidateUsecase,
+  TierRestrictionsValidateCommand,
 } from '@novu/application-generic';
 
-import { ErrorEnum } from '@novu/application-generic/build/main/usecases/tier-restrictions-validator/tier-restrictions-validator.response';
 import { AddDelayJob } from './add-delay-job.usecase';
 import { MergeOrCreateDigestCommand } from './merge-or-create-digest.command';
 import { MergeOrCreateDigest } from './merge-or-create-digest.usecase';
@@ -66,7 +65,7 @@ export class AddJob {
     @Inject(forwardRef(() => ConditionsFilter))
     private conditionsFilter: ConditionsFilter,
     private normalizeVariablesUsecase: NormalizeVariables,
-    private tierRestrictionsValidatorUsecase: TierRestrictionsValidatorUsecase,
+    private tierRestrictionsValidateUsecase: TierRestrictionsValidateUsecase,
     private executeBridgeJob: ExecuteBridgeJob
   ) {}
 
@@ -167,8 +166,8 @@ export class AddJob {
   }
 
   private async validateDeferDuration(delay: number, job: JobEntity, command: AddJobCommand) {
-    const errors = await this.tierRestrictionsValidatorUsecase.execute(
-      TierRestrictionsValidatorCommand.create({
+    const errors = await this.tierRestrictionsValidateUsecase.execute(
+      TierRestrictionsValidateCommand.create({
         deferDurationMs: delay,
         stepType: job.type,
         organizationId: command.organizationId,
