@@ -1,11 +1,23 @@
 import { CSSProperties, useEffect, useRef, useState } from 'react';
-import { GeneratePreviewResponseDto } from '@novu/shared';
+import { InAppRenderOutput } from '@novu/shared';
 
 import { Notification5Fill } from '@/components/icons';
 import { Code2 } from '@/components/icons/code-2';
 import { Button } from '@/components/primitives/button';
 import { Editor } from '@/components/primitives/editor';
-import { InAppPreview } from '@/components/workflow-editor/in-app-preview';
+import {
+  InAppPreview,
+  InAppPreviewActions,
+  InAppPreviewAvatar,
+  InAppPreviewBell,
+  InAppPreviewBody,
+  InAppPreviewHeader,
+  InAppPreviewNotification,
+  InAppPreviewNotificationContent,
+  InAppPreviewPrimaryAction,
+  InAppPreviewSecondaryAction,
+  InAppPreviewSubject,
+} from '@/components/workflow-editor/in-app-preview';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
 
@@ -20,12 +32,12 @@ const getInitialAccordionValue = (value: string) => {
 type InAppEditorPreviewProps = {
   value: string;
   onChange: (value: string) => void;
-  previewData?: GeneratePreviewResponseDto;
+  preview?: InAppRenderOutput;
   applyPreview: () => void;
-  isPreviewLoading?: boolean;
+  isPreviewPending?: boolean;
 };
 export const InAppEditorPreview = (props: InAppEditorPreviewProps) => {
-  const { value, onChange, previewData, applyPreview, isPreviewLoading } = props;
+  const { value, onChange, preview, applyPreview, isPreviewPending } = props;
   const [accordionValue, setAccordionValue] = useState<string | undefined>(getInitialAccordionValue(value));
   const [payloadError, setPayloadError] = useState('');
   const [height, setHeight] = useState(0);
@@ -47,13 +59,43 @@ export const InAppEditorPreview = (props: InAppEditorPreviewProps) => {
   }, [value]);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="relative flex flex-col gap-3">
       <div className="flex items-center gap-2.5 text-sm font-medium">
         <Notification5Fill className="size-3" />
         In-app template editor
       </div>
 
-      <InAppPreview data={previewData} isLoading={isPreviewLoading} />
+      <div className="relative my-2">
+        <div className="relative mx-auto max-w-sm">
+          <InAppPreviewBell />
+
+          <InAppPreview className="min-h-64">
+            <InAppPreviewHeader />
+
+            <InAppPreviewNotification>
+              <InAppPreviewAvatar src={preview?.avatar} isPending={isPreviewPending} />
+
+              <InAppPreviewNotificationContent>
+                <InAppPreviewSubject isPending={isPreviewPending}>{preview?.subject}</InAppPreviewSubject>
+                <InAppPreviewBody isPending={isPreviewPending} className="line-clamp-6">
+                  {preview?.body}
+                </InAppPreviewBody>
+
+                <InAppPreviewActions>
+                  <InAppPreviewPrimaryAction isPending={isPreviewPending}>
+                    {preview?.primaryAction?.label}
+                  </InAppPreviewPrimaryAction>
+
+                  <InAppPreviewSecondaryAction isPending={isPreviewPending}>
+                    {preview?.secondaryAction?.label}
+                  </InAppPreviewSecondaryAction>
+                </InAppPreviewActions>
+              </InAppPreviewNotificationContent>
+            </InAppPreviewNotification>
+          </InAppPreview>
+        </div>
+        <div className="to-background absolute -bottom-3 h-16 w-full bg-gradient-to-b from-transparent to-80%" />
+      </div>
 
       <Accordion type="single" collapsible value={accordionValue} onValueChange={setAccordionValue}>
         <AccordionItem value="payload">
