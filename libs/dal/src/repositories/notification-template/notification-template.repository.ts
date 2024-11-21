@@ -187,42 +187,26 @@ export class NotificationTemplateRepository extends BaseRepository<
 
     return { totalCount: totalItemsCount, data: this.mapEntities(items) };
   }
-  /**
-   * @deprecated This method is deprecated and will be removed in future versions.
-   * Use `getList` instead to retrieve notification templates without excluding new ones.
-   *
-   * @param {string} organizationId - The ID of the organization.
-   * @param {string} environmentId - The ID of the environment.
-   * @param {number} [skip=0] - The number of items to skip.
-   * @param {number} [limit=10] - The maximum number of items to return.
-   * @param {string} [query] - Optional query string to filter results.
-   * @returns {Promise<{ totalCount: number; data: NotificationTemplate[] }>} - A promise
-   * that resolves to an object containing the total count of items and the list of notification templates.
-   */
-  async getListExcludeNewDashboardWorkflows(
+
+  async getList(
     organizationId: string,
     environmentId: string,
     skip: number = 0,
     limit: number = 10,
-    query?: string
+    query?: string,
+    excludeNewDashboardWorkflows: boolean = false
   ): Promise<{ totalCount: number; data: NotificationTemplateEntity[] }> {
-    let searchQuery: FilterQuery<NotificationTemplateDBModel> = {
-      $or: [{ origin: { $ne: 'novu-cloud' } }, { type: { $ne: 'BRIDGE' } }],
-    };
+    const searchQuery: FilterQuery<NotificationTemplateDBModel> = {};
+
     if (query) {
-      searchQuery = {
-        $and: [
-          {
-            $or: [
-              { name: { $regex: regExpEscape(query), $options: 'i' } },
-              { 'triggers.identifier': { $regex: regExpEscape(query), $options: 'i' } },
-            ],
-          },
-          {
-            $nor: [{ origin: 'novu-cloud', type: 'BRIDGE' }],
-          },
-        ],
-      };
+      searchQuery.$or = [
+        { name: { $regex: regExpEscape(query), $options: 'i' } },
+        { 'triggers.identifier': { $regex: regExpEscape(query), $options: 'i' } },
+      ];
+    }
+
+    if (excludeNewDashboardWorkflows) {
+      searchQuery.$nor = [{ origin: 'novu-cloud', type: 'BRIDGE' }];
     }
 
     const totalItemsCount = await this.count({
@@ -230,13 +214,9 @@ export class NotificationTemplateRepository extends BaseRepository<
       ...searchQuery,
     });
 
-    const requestQuery: NotificationTemplateQuery = {
+    const items = await this.MongooseModel.find({
       _environmentId: environmentId,
       _organizationId: organizationId,
-    };
-
-    const items = await this.MongooseModel.find({
-      ...requestQuery,
       ...searchQuery,
     })
       .sort({ createdAt: -1 })
@@ -244,43 +224,7 @@ export class NotificationTemplateRepository extends BaseRepository<
       .limit(limit)
       .populate({ path: 'notificationGroup' })
       .populate('steps.template', { type: 1 })
-      .select('-steps.variants') // Excludes Variants from the list
-      .lean();
-
-    return { totalCount: totalItemsCount, data: this.mapEntities(items) };
-  }
-
-  async getList(organizationId: string, environmentId: string, skip = 0, limit = 10, query?: string) {
-    let searchQuery: FilterQuery<NotificationTemplateDBModel> = {};
-    if (query) {
-      searchQuery = {
-        $or: [
-          { name: { $regex: regExpEscape(query), $options: 'i' } },
-          { 'triggers.identifier': { $regex: regExpEscape(query), $options: 'i' } },
-        ],
-      };
-    }
-
-    const totalItemsCount = await this.count({
-      _environmentId: environmentId,
-      ...searchQuery,
-    });
-
-    const requestQuery: NotificationTemplateQuery = {
-      _environmentId: environmentId,
-      _organizationId: organizationId,
-    };
-
-    const items = await this.MongooseModel.find({
-      ...requestQuery,
-      ...searchQuery,
-    })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .populate({ path: 'notificationGroup' })
-      .populate('steps.template', { type: 1 })
-      .select('-steps.variants') // Excludes Variants from the list
+      .select('-steps.variants')
       .lean();
 
     return { totalCount: totalItemsCount, data: this.mapEntities(items) };

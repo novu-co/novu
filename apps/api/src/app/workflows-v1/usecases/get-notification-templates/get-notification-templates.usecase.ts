@@ -19,12 +19,13 @@ export class GetNotificationTemplates {
   ) {}
 
   async execute(command: GetNotificationTemplatesCommand): Promise<WorkflowsResponseDto> {
-    const { data: list, totalCount } = await this.notificationTemplateRepository.getListExcludeNewDashboardWorkflows(
+    const { data: list, totalCount } = await this.notificationTemplateRepository.getList(
       command.organizationId,
       command.environmentId,
       command.page * command.limit,
       command.limit,
-      command.query
+      command.query,
+      true
     );
 
     const workflows = await this.updateHasActiveIntegrationFlag(list, command);
