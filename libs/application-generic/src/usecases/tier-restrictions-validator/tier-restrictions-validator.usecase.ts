@@ -3,10 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ApiServiceLevelEnum, StepTypeEnum } from '@novu/shared';
 import { CommunityOrganizationRepository } from '@novu/dal';
 
-import {
-  Milliseconds,
-  TierRestrictionsValidatorCommand,
-} from './tier-restrictions-validator.command';
+import { TierRestrictionsValidatorCommand } from './tier-restrictions-validator.command';
 import {
   ErrorEnum,
   TierRestrictionsValidatorResponse,
