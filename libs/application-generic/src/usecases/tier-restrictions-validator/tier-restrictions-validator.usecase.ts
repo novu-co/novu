@@ -29,20 +29,20 @@ export class TierRestrictionsValidatorUsecase {
   ): Promise<TierRestrictionsValidatorResponse> {
     return this.validateControlValuesByTierLimits(
       command.organizationId,
-      command.deferDuration,
+      command.deferDurationMs,
       command.stepType,
     );
   }
 
   private async validateControlValuesByTierLimits(
     organizationId: string,
-    deferDuration?: Milliseconds,
+    deferDurationMs?: number,
     stepType?: StepTypeEnum,
   ): Promise<TierRestrictionsValidatorResponse> {
     const controlValueNeedTierValidation =
       stepType === StepTypeEnum.DIGEST || stepType === StepTypeEnum.DELAY;
 
-    if (!controlValueNeedTierValidation || !deferDuration) {
+    if (!controlValueNeedTierValidation || !deferDurationMs) {
       return null;
     }
 
@@ -56,7 +56,7 @@ export class TierRestrictionsValidatorUsecase {
       tier === ApiServiceLevelEnum.BUSINESS ||
       tier === ApiServiceLevelEnum.ENTERPRISE
     ) {
-      if (deferDuration > MAX_DELAY_BUSINESS_TIER) {
+      if (deferDurationMs > MAX_DELAY_BUSINESS_TIER) {
         issues.push({
           error: ErrorEnum.TIER_LIMIT_EXCEEDED,
           message:
@@ -67,7 +67,7 @@ export class TierRestrictionsValidatorUsecase {
     }
 
     if (tier === ApiServiceLevelEnum.FREE) {
-      if (deferDuration > MAX_DELAY_FREE_TIER) {
+      if (deferDurationMs > MAX_DELAY_FREE_TIER) {
         issues.push({
           error: ErrorEnum.TIER_LIMIT_EXCEEDED,
           message:

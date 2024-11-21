@@ -169,7 +169,7 @@ export class AddJob {
   private async validateDeferDuration(delay: number, job: JobEntity, command: AddJobCommand) {
     const errors = await this.tierRestrictionsValidatorUsecase.execute(
       TierRestrictionsValidatorCommand.create({
-        deferDuration: delay,
+        deferDurationMs: delay,
         stepType: job.type,
         organizationId: command.organizationId,
       })

@@ -255,7 +255,7 @@ export class PrepareAndValidateContentUsecase {
         : 0;
 
     const restrictionsErrors = await this.tierRestrictionsValidatorUsecase.execute({
-      deferDuration,
+      deferDurationMs: deferDuration,
       organizationId: user.organizationId,
       stepType,
     });
