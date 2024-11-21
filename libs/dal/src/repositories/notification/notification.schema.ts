@@ -157,7 +157,6 @@ notificationSchema.index({
 /*
  * This index was created to push entries to Online Archive
  */
-
 notificationSchema.index({ createdAt: 1 });
 
 export const Notification =

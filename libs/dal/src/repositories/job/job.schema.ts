@@ -399,7 +399,6 @@ jobSchema.index(
 /*
  * This index was created to push entries to Online Archive
  */
-
 jobSchema.index({ createdAt: 1 });
 
 export const Job = (mongoose.models.Job as mongoose.Model<JobDBModel>) || mongoose.model<JobDBModel>('Job', jobSchema);

@@ -290,7 +290,6 @@ messageSchema.index({
 /*
  * This index was created to push entries to Online Archive
  */
-
 messageSchema.index({ createdAt: 1 });
 
 export const Message =
