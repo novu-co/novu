@@ -4,6 +4,7 @@ import { CommandValidationException, PinoLogger } from '@novu/application-generi
 import { randomUUID } from 'node:crypto';
 import { captureException } from '@sentry/node';
 import { ZodError } from 'zod';
+import { InternalServerErrorException } from '@nestjs/common/exceptions/internal-server-error.exception';
 
 export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly logger: PinoLogger) {}
@@ -83,7 +84,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       return handleCommandValidation(exception);
     }
 
-    if (exception instanceof HttpException) {
+    if (exception instanceof HttpException && !(exception instanceof InternalServerErrorException)) {
       status = exception.getStatus();
       message = exception.getResponse();
 

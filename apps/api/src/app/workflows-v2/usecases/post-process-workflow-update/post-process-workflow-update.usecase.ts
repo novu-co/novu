@@ -10,23 +10,35 @@ import {
   WorkflowResponseDto,
   WorkflowStatusEnum,
 } from '@novu/shared';
-import { NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
+import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
 import { Injectable } from '@nestjs/common';
 import { WorkflowInternalResponseDto } from '@novu/application-generic';
 
 import { PostProcessWorkflowUpdateCommand } from './post-process-workflow-update.command';
 import { OverloadContentDataOnWorkflowUseCase } from '../overload-content-data';
 
+/**
+ * Post-processes workflow updates by validating and updating workflow status.
+ *
+ * Key responsibilities:
+ * - Validates workflow metadata issues (name, triggers, tags)
+ * - Validates step metadata issues (body, controls)
+ * - Updates workflow status based on validation results
+ *
+ * Works with {@link OverloadContentDataOnWorkflowUseCase} for control-value issues validation
+ * and payload schema storage.
+ */
 @Injectable()
 export class PostProcessWorkflowUpdate {
   constructor(
     private notificationTemplateRepository: NotificationTemplateRepository,
+    private controlValuesRepository: ControlValuesRepository,
     private overloadContentDataOnWorkflowUseCase: OverloadContentDataOnWorkflowUseCase
   ) {}
 
   async execute(command: PostProcessWorkflowUpdateCommand): Promise<WorkflowInternalResponseDto> {
     const workflowIssues = await this.validateWorkflow(command);
-    const stepIssues = this.validateSteps(command.workflow.steps);
+    const stepIssues = this.validateSteps(command.workflow.steps, command.workflow._id);
     let transientWorkflow = this.updateIssuesOnWorkflow(command.workflow, workflowIssues, stepIssues);
 
     transientWorkflow = await this.overloadContentDataOnWorkflowUseCase.execute({
@@ -81,8 +93,10 @@ export class PostProcessWorkflowUpdate {
   private hasBodyIssues(issue: StepIssues) {
     return issue.body && Object.keys(issue.body).length > 0;
   }
-  private validateSteps(steps: NotificationStepEntity[]): Record<string, StepIssuesDto> {
+
+  private validateSteps(steps: NotificationStepEntity[], _workflowId: string): Record<string, StepIssuesDto> {
     const stepIdToIssues: Record<string, StepIssuesDto> = {};
+
     for (const step of steps) {
       stepIdToIssues[step._templateId] = {
         body: this.addStepBodyIssues(step),

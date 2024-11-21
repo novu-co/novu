@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import {
   ChannelTypeEnum,
   GeneratePreviewRequestDto,
@@ -6,6 +6,7 @@ import {
   JobStatusEnum,
   PreviewPayload,
   StepDataDto,
+  UserSessionData,
 } from '@novu/shared';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
@@ -26,7 +27,7 @@ export class GeneratePreviewUsecase {
     const dto = command.generatePreviewRequestDto;
     const stepData = await this.getStepData(command);
 
-    const validatedContent: ValidatedContentResponse = await this.getValidatedContent(dto, stepData);
+    const validatedContent: ValidatedContentResponse = await this.getValidatedContent(dto, stepData, command.user);
     const executeOutput = await this.executePreviewUsecase(
       command,
       stepData,
@@ -35,7 +36,7 @@ export class GeneratePreviewUsecase {
     );
 
     return {
-      issues: validatedContent.issues, // Use the issues from validatedContent
+      issues: validatedContent.issues,
       result: {
         preview: executeOutput.outputs as any,
         type: stepData.type as unknown as ChannelTypeEnum,
@@ -44,16 +45,18 @@ export class GeneratePreviewUsecase {
     };
   }
 
-  private async getValidatedContent(dto: GeneratePreviewRequestDto, stepData: StepDataDto) {
+  private async getValidatedContent(dto: GeneratePreviewRequestDto, stepData: StepDataDto, user: UserSessionData) {
     if (!stepData.controls?.dataSchema) {
       throw new StepMissingControlsException(stepData.stepId, stepData);
     }
 
     return await this.prepareAndValidateContentUsecase.execute({
+      stepType: stepData.type,
       controlValues: dto.controlValues || stepData.controls.values,
       controlDataSchema: stepData.controls.dataSchema,
       variableSchema: stepData.variables,
       previewPayloadFromDto: dto.previewPayload,
+      user,
     });
   }
 
@@ -64,7 +67,9 @@ export class GeneratePreviewUsecase {
       user: command.user,
     });
   }
-
+  private isFrameworkError(obj: any): obj is FrameworkError {
+    return typeof obj === 'object' && obj.status === '400' && obj.name === 'BridgeRequestError';
+  }
   private async executePreviewUsecase(
     command: GeneratePreviewCommand,
     stepData: StepDataDto,
@@ -72,21 +77,28 @@ export class GeneratePreviewUsecase {
     updatedControlValues: Record<string, unknown>
   ) {
     const state = buildState(hydratedPayload.steps);
-
-    return await this.legacyPreviewStepUseCase.execute(
-      PreviewStepCommand.create({
-        payload: hydratedPayload.payload || {},
-        subscriber: hydratedPayload.subscriber,
-        controls: updatedControlValues || {},
-        environmentId: command.user.environmentId,
-        organizationId: command.user.organizationId,
-        stepId: stepData.stepId,
-        userId: command.user._id,
-        workflowId: stepData.workflowId,
-        workflowOrigin: stepData.origin,
-        state,
-      })
-    );
+    try {
+      return await this.legacyPreviewStepUseCase.execute(
+        PreviewStepCommand.create({
+          payload: hydratedPayload.payload || {},
+          subscriber: hydratedPayload.subscriber,
+          controls: updatedControlValues || {},
+          environmentId: command.user.environmentId,
+          organizationId: command.user.organizationId,
+          stepId: stepData.stepId,
+          userId: command.user._id,
+          workflowId: stepData.workflowId,
+          workflowOrigin: stepData.origin,
+          state,
+        })
+      );
+    } catch (error) {
+      if (this.isFrameworkError(error)) {
+        throw new GeneratePreviewError(error);
+      } else {
+        throw error;
+      }
+    }
   }
 }
 
@@ -103,4 +115,26 @@ function buildState(steps: Record<string, unknown> | undefined): FrameworkPrevio
   }
 
   return outputArray;
+}
+export class GeneratePreviewError extends InternalServerErrorException {
+  constructor(error: FrameworkError) {
+    super({
+      message: `GeneratePreviewError: Original Message:`,
+      frameworkMessage: error.response.message,
+      code: error.response.code,
+      data: error.response.data,
+    });
+  }
+}
+
+class FrameworkError {
+  response: {
+    message: string;
+    code: string;
+    data: unknown;
+  };
+  status: number;
+  options: Record<string, unknown>;
+  message: string;
+  name: string;
 }

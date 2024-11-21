@@ -70,7 +70,12 @@ export function PrivatePageLayout() {
 
   if (IS_EE_AUTH_ENABLED) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    useOptInRedirect();
+    const shouldRedirect = useOptInRedirect();
+
+    if (shouldRedirect) {
+      // prevent flickering of the legacy layout until the redirect is done
+      return null;
+    }
   }
 
   return (

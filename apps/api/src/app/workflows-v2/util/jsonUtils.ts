@@ -45,3 +45,42 @@ export function mergeObjects(json1: Record<string, unknown>, json2?: Record<stri
     }
   });
 }
+type FlatJson = Record<string, unknown>;
+type NestedJson = Record<string, unknown>;
+/**
+ * Converts a flat JSON object into a nested JSON object using a specified delimiter.
+ *
+ * @param {FlatJson} flatJson - The flat JSON object.
+ * @param {string} [delimiter='.'] - The delimiter for nested keys (default is '.').
+ * @returns {NestedJson} The resulting nested JSON object.
+ *
+ * @example
+ * const flatJson = { 'user.name': 'John', 'user.age': 30 };
+ * const nestedJson = flattenToNested(flatJson);
+ * // Output: { user: { name: 'John', age: 30 } }
+ *
+ * @example
+ * const flatJson2 = { 'user|name': 'Jane', 'user|age': 25 };
+ * const nestedJson2 = flattenToNested(flatJson2, '|');
+ * // Output: { user: { name: 'Jane', age: 25 } }
+ */
+export function flattenToNested(flatJson: FlatJson, delimiter: string = '.'): NestedJson {
+  const nestedJson: NestedJson = {};
+
+  for (const flatKey of Object.keys(flatJson)) {
+    const keys = flatKey.split(delimiter);
+    keys.reduce((accumulator, currentKey, index) => {
+      if (index === keys.length - 1) {
+        // eslint-disable-next-line no-param-reassign
+        accumulator[currentKey] = flatJson[flatKey];
+      } else if (!accumulator[currentKey]) {
+        // eslint-disable-next-line no-param-reassign
+        accumulator[currentKey] = {};
+      }
+
+      return accumulator[currentKey] as NestedJson;
+    }, nestedJson);
+  }
+
+  return nestedJson;
+}

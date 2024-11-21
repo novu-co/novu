@@ -9,6 +9,7 @@ import {
   JSONSchemaDefinition,
   JSONSchemaDto,
   ListWorkflowResponse,
+  PatchStepDataDto,
   PreferencesRequestDto,
   ShortIsPrefixEnum,
   slugify,
@@ -81,6 +82,7 @@ describe('Workflow Controller E2E API Testing', () => {
         await getWorkflowAndValidate(workflowCreated);
       });
     });
+
     describe('Workflow Body Issues', () => {
       it('should respond with 400 when name is empty', async () => {
         const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('nameSuffix', {
@@ -157,6 +159,7 @@ describe('Workflow Controller E2E API Testing', () => {
         expect(res.error?.responseText).to.include('tags must contain no more than 16 elements');
       });
     });
+
     describe('Workflow Step Body Issues', () => {
       it('should show name issue when missing', async () => {
         const { issues, status } = await createWorkflowAndReturnStepIssues(
@@ -171,6 +174,7 @@ describe('Workflow Controller E2E API Testing', () => {
           expect(issues.body.name?.issueType, JSON.stringify(issues)).to.be.equal(StepIssueEnum.MISSING_REQUIRED_VALUE);
         }
       });
+
       it('should remove issues when no longer', async () => {
         const inAppStep = { ...buildInAppStep(), controlValues: { body: 'some body here' }, name: '' };
         const workflowCreated = await createWorkflowAndReturn({ steps: [inAppStep] });
@@ -187,6 +191,7 @@ describe('Workflow Controller E2E API Testing', () => {
         expect(firstStep.issues?.controls, JSON.stringify(firstStep.issues)).to.be.empty;
       });
     });
+
     describe('Workflow Step content Issues', () => {
       it('should show control value required when missing', async () => {
         const { issues, status } = await createWorkflowAndReturnStepIssues({ steps: [{ ...buildEmailStep() }] }, 0);
@@ -199,8 +204,21 @@ describe('Workflow Controller E2E API Testing', () => {
           }
         }
       });
+
+      it('should show digest control value issues when illegal value provided', async () => {
+        const steps = [{ ...buildDigestStep() }];
+        const workflowCreated = await createWorkflowAndReturn({ steps });
+        const values = { controlValues: { amount: '555', unit: 'days' } };
+        const updatedStep = await patchStepRest(workflowCreated._id, workflowCreated.steps[0]._id, values);
+
+        expect(updatedStep.issues?.controls?.amount[0].issueType).to.deep.equal(
+          StepContentIssueEnum.TIER_LIMIT_EXCEEDED
+        );
+        expect(updatedStep.issues?.controls?.unit[0].issueType).to.deep.equal(StepContentIssueEnum.TIER_LIMIT_EXCEEDED);
+      });
     });
   });
+
   describe('Create Workflow Permutations', () => {
     it('should allow creating two workflows for the same user with the same name', async () => {
       const nameSuffix = `Test Workflow${new Date().toISOString()}`;
@@ -702,13 +720,13 @@ describe('Workflow Controller E2E API Testing', () => {
       const stepId1 = response.steps[0]._id;
       const stepId2 = response.steps[1]._id;
       const controlValues1 = { body: 'body1', subject: 'subject1' };
-      await patchStepRest(workflowDatabaseId, stepId1, controlValues1);
+      await patchStepRest(workflowDatabaseId, stepId1, { controlValues: controlValues1 });
       const newVar = await getStepData(workflowDatabaseId, stepId1);
       expect(newVar.controls.values).to.deep.equal(controlValues1);
       const stepData2 = await getStepData(workflowDatabaseId, stepId2);
       expect(stepData2.controls.values).to.not.deep.equal(controlValues1);
       const controlValues2 = { body: 'body2', subject: 'subject2' };
-      await patchStepRest(workflowDatabaseId, stepId2, controlValues2);
+      await patchStepRest(workflowDatabaseId, stepId2, { controlValues: controlValues2 });
       const stepData2Updated = await getStepData(workflowDatabaseId, stepId2);
       expect(stepData2Updated.controls.values).to.deep.equal(controlValues2);
     });
@@ -729,12 +747,14 @@ describe('Workflow Controller E2E API Testing', () => {
   describe('Patch Workflow Permutations', () => {
     it('Patch should work and allow us to turn workflow active on / off and have the status change accordingly', async () => {
       const workflowDto = await createWorkflowRest(buildCreateWorkflowDto('', { steps: [buildInAppStep()] }));
-      await patchStepRest(workflowDto._id, workflowDto.steps[0]._id, { body: 'body1', subject: 'subject1' });
+      await patchStepRest(workflowDto._id, workflowDto.steps[0]._id, {
+        controlValues: { body: 'body1', subject: 'subject1' },
+      });
       let updatedWorkflow = await patchWorkflowAndReturnResponse(workflowDto._id, false);
       expect(updatedWorkflow.status).to.equal(WorkflowStatusEnum.INACTIVE);
       updatedWorkflow = await patchWorkflowAndReturnResponse(workflowDto._id, true);
       expect(updatedWorkflow.status).to.equal(WorkflowStatusEnum.ACTIVE);
-      await patchStepRest(workflowDto._id, workflowDto.steps[0]._id, {});
+      await patchStepRest(workflowDto._id, workflowDto.steps[0]._id, { controlValues: {} });
       updatedWorkflow = await patchWorkflowAndReturnResponse(workflowDto._id, false);
       expect(updatedWorkflow.status).to.equal(WorkflowStatusEnum.INACTIVE);
       updatedWorkflow = await patchWorkflowAndReturnResponse(workflowDto._id, true);
@@ -751,10 +771,8 @@ describe('Workflow Controller E2E API Testing', () => {
     return novuRestResult.value;
   }
 
-  async function patchStepRest(workflowDatabaseId: string, stepId1: string, controlValues1: Record<string, unknown>) {
-    const novuRestResult = await workflowsClient.patchWorkflowStepData(workflowDatabaseId, stepId1, {
-      controlValues: controlValues1,
-    });
+  async function patchStepRest(workflowDatabaseId: string, stepId1: string, patchStepDataDto: PatchStepDataDto) {
+    const novuRestResult = await workflowsClient.patchWorkflowStepData(workflowDatabaseId, stepId1, patchStepDataDto);
     if (!novuRestResult.isSuccessResult()) {
       throw new Error(novuRestResult.error!.responseText);
     }
@@ -895,6 +913,7 @@ describe('Workflow Controller E2E API Testing', () => {
       await createWorkflowAndValidate(`${prefix}-ABC${i}`);
     }
   }
+
   async function createWorkflowAndValidate(nameSuffix: string = ''): Promise<WorkflowResponseDto> {
     const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto(nameSuffix);
     const res = await workflowsClient.createWorkflow(createWorkflowDto);
@@ -932,6 +951,7 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(Object.keys(step.issues?.body || {}).length, stringify(step)).to.be.eq(0);
     }
   }
+
   async function createWorkflowAndReturnIssues(overrideDto: Partial<CreateWorkflowDto>) {
     const workflowCreated = await createWorkflowAndReturn(overrideDto);
     const { issues } = workflowCreated;
@@ -939,6 +959,7 @@ describe('Workflow Controller E2E API Testing', () => {
 
     return issues;
   }
+
   async function createWorkflowAndReturn(
     overrideDto: Partial<
       WorkflowCommonsFields & {
@@ -1062,10 +1083,11 @@ function buildEmailStep(): StepCreateDto {
     type: StepTypeEnum.EMAIL,
   };
 }
-function buildDigestStep(): StepCreateDto {
+function buildDigestStep(overrides: Partial<StepCreateDto> = {}): StepCreateDto {
   return {
     name: 'Digest Test Step',
     type: StepTypeEnum.DIGEST,
+    ...overrides,
   };
 }
 
