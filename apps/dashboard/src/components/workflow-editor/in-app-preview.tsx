@@ -19,87 +19,99 @@ export const InAppPreview = (props: InAppPreviewProps) => {
   const { className, truncateBody: truncate = false, data, isLoading, ...rest } = props;
 
   return (
-    <div
-      className={cn(
-        'border-foreground-200 to-background/90 pointer-events-none relative flex h-full w-full flex-col rounded-xl rounded-b-none border border-b-0 border-dashed p-1',
-        className
-      )}
-      {...rest}
-    >
-      <div className="absolute -left-0.5 bottom-0 top-0 z-10 h-full w-[calc(100%+4px)] bg-gradient-to-t from-[rgb(255,255,255)] from-5% to-95%" />
+    <div className="mx-auto flex w-full max-w-sm flex-col gap-2 py-6">
       <div className="z-20 flex h-6 items-center justify-end px-2 text-neutral-300">
         <span className="relative p-1">
           <InboxBell className="relative size-4" />
           <div className="bg-primary border-background absolute right-1 top-1 h-2 w-2 translate-y-[1px] rounded-full border border-solid" />
         </span>
       </div>
-      <div className="my-0.5 w-full border-b border-b-neutral-100" />
-      <div className="z-20 flex items-center justify-between px-2 text-neutral-300">
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-medium">Inbox</span>
-          <InboxArrowDown />
+
+      <div
+        className={cn(
+          'border-foreground-200 to-background/90 pointer-events-none relative mx-auto flex h-full min-h-64 w-full flex-col rounded-xl p-1 py-3 shadow-sm',
+          className
+        )}
+        {...rest}
+      >
+        <div className="absolute -left-0.5 bottom-0 top-0 z-10 h-full w-[calc(100%+4px)] bg-gradient-to-t from-[rgb(255,255,255)] from-5% to-95%" />
+
+        <div className="z-20 flex items-center justify-between px-2 text-neutral-300">
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-medium">Inbox</span>
+            <InboxArrowDown />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="p-0.5">
+              <InboxEllipsis />
+            </span>
+            <span className="p-0.5">
+              <InboxSettings />
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="p-0.5">
-            <InboxEllipsis />
-          </span>
-          <span className="p-0.5">
-            <InboxSettings />
-          </span>
-        </div>
-      </div>
-      {isLoading && !data && (
-        <div className="bg-neutral-alpha-50 z-20 mt-2 rounded-lg px-2 py-2">
-          <div className="mb-2 flex items-center gap-2">
-            <Skeleton className="h-5 min-w-5 rounded-full" />
+        {isLoading && !data && (
+          <div className="bg-neutral-alpha-50 z-20 mt-2 rounded-lg px-2 py-2">
+            <div className="mb-2 flex items-center gap-2">
+              <Skeleton className="h-5 min-w-5 rounded-full" />
+              <Skeleton className="h-5 w-full" />
+            </div>
             <Skeleton className="h-5 w-full" />
           </div>
-          <Skeleton className="h-5 w-full" />
-        </div>
-      )}
-      {data && data.result?.type === ChannelTypeEnum.IN_APP && (
-        <div className="bg-neutral-alpha-50 z-20 mt-2 rounded-lg px-2 py-2">
-          <div className="mb-2 flex gap-2">
-            {data.result.preview.avatar && (
-              <img src={data.result.preview.avatar} alt="avatar" className="bg-background h-5 min-w-5 rounded-full" />
-            )}
-            <div className="space-y-2">
-              {data.result.preview.subject ? (
-                <Subject text={data.result.preview.subject} className={truncate ? 'truncate' : ''} />
-              ) : (
-                <Body text={data.result.preview.body} className={truncate ? 'truncate' : ''} />
+        )}
+        {data && data.result?.type === ChannelTypeEnum.IN_APP && (
+          <div className="z-20 mt-2 rounded-lg px-2 py-2">
+            <div className="mb-2 flex gap-2">
+              {data.result.preview.avatar && (
+                <img src={data.result.preview.avatar} alt="avatar" className="bg-background size-7 rounded-full" />
               )}
-
-              {data.result.preview.subject && (
-                <Body text={data.result.preview.body} className={truncate ? 'truncate' : ''} />
-              )}
-              {(data.result.preview.primaryAction || data.result.preview.secondaryAction) && (
-                <div className="mt-3 flex items-center justify-start gap-1 overflow-hidden">
-                  {data.result.preview.primaryAction && (
-                    <Button
-                      className="overflow-hidden text-xs font-medium shadow-none"
-                      type="button"
-                      variant="primary"
-                      size="xs"
-                    >
-                      <span className="overflow-hidden text-ellipsis">
-                        {(data.result.preview as InAppRenderOutput).primaryAction?.label}
-                      </span>
-                    </Button>
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  {data.result.preview.subject ? (
+                    <Subject text={data.result.preview.subject} className={truncate ? 'truncate' : ''} />
+                  ) : (
+                    <Body text={data.result.preview.body} className={truncate ? 'truncate' : ''} />
                   )}
-                  {data.result.preview.secondaryAction && (
-                    <Button variant="outline" className="overflow-hidden text-xs font-medium" type="button" size="xs">
-                      <span className="overflow-hidden text-ellipsis">
-                        {(data.result.preview as InAppRenderOutput).secondaryAction?.label}
-                      </span>
-                    </Button>
+
+                  {data.result.preview.subject && (
+                    <Body text={data.result.preview.body} className={truncate ? 'truncate' : ''} />
                   )}
                 </div>
-              )}
+
+                {(data.result.preview.primaryAction || data.result.preview.secondaryAction) && (
+                  <div className="mt-3 flex flex-wrap items-center gap-1 overflow-hidden">
+                    {data.result.preview.primaryAction && (
+                      <Button
+                        className="overflow-hidden px-3 text-xs font-medium shadow-none"
+                        type="button"
+                        variant="primary"
+                        size="xs"
+                      >
+                        <span className="overflow-hidden text-ellipsis">
+                          {(data.result.preview as InAppRenderOutput).primaryAction?.label}
+                        </span>
+                      </Button>
+                    )}
+                    {data.result.preview.secondaryAction && (
+                      <Button
+                        variant="outline"
+                        className="overflow-hidden px-3 text-xs font-medium"
+                        type="button"
+                        size="xs"
+                      >
+                        <span className="overflow-hidden text-ellipsis">
+                          {(data.result.preview as InAppRenderOutput).secondaryAction?.label}
+                        </span>
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+      <div className="bg-background relative -mt-2 h-2 w-full" />
     </div>
   );
 };
