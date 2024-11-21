@@ -35,8 +35,8 @@ export function RegionPicker() {
   }
 
   return (
-    <div className="inline-flex w-full items-center justify-center gap-[6px]">
-      <div className="text-xs font-medium leading-none text-[#99a0ad]">
+    <div className="inline-flex w-full items-center justify-center gap-1.5">
+      <div className="text-xs font-medium leading-none text-neutral-400">
         Data Residency
         <TooltipProvider delayDuration={100}>
           <Tooltip>
@@ -56,15 +56,9 @@ export function RegionPicker() {
         </SelectTrigger>
         <SelectContent>
           {Object.values(REGION_MAP).map((option) => (
-            <SelectItem key={option} value={option} className="w-[100px] w-full">
+            <SelectItem key={option} value={option} className="w-full">
               <div className="flex items-center gap-[6px]">
-                {' '}
-                {option === REGION_MAP.US ? (
-                  <USFlag className="h-[10px] w-[10px]" />
-                ) : (
-                  <EuFlag className="h-[10px] w-[10px]" />
-                )}{' '}
-                {option}
+                {option === REGION_MAP.US ? <USFlag className="h-3 w-3" /> : <EuFlag className="h-3 w-3" />} {option}
               </div>
             </SelectItem>
           ))}
