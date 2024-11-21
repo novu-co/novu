@@ -3,7 +3,7 @@ import { PageMeta } from '@/components/page-meta';
 import { ROUTES } from '@/utils/routes';
 import { RegionPicker } from '@/components/auth/region-picker';
 import { AuthSideBanner } from '@/components/auth/auth-side-banner';
-import { clerkAppearance } from '@/utils/clerk-appearance';
+import { clerkSignupAppearance } from '@/utils/clerk-appearance';
 
 export const SignUpPage = () => {
   return (
@@ -15,7 +15,7 @@ export const SignUpPage = () => {
           <SignUpForm
             path={ROUTES.SIGN_UP}
             signInUrl={ROUTES.SIGN_IN}
-            appearance={clerkAppearance}
+            appearance={clerkSignupAppearance}
             forceRedirectUrl={ROUTES.SIGNUP_ORGANIZATION_LIST}
           />
           <RegionPicker />

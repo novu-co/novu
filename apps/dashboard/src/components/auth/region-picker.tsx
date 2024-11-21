@@ -44,14 +44,14 @@ export function RegionPicker() {
               <BsFillInfoCircleFill className="text-foreground-300 -mt-0.5 inline size-3" />
             </TooltipTrigger>
             <TooltipContent>
-              Novu offers data residency in Europe (Germany) and United States. Account residency couldn't be modified
+              Novu offers data residency in Europe (Germany) and the United States. Data residency cannot be modified
               after sign-up.
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </div>
       <Select value={selectedRegion} onValueChange={handleRegionChange}>
-        <SelectTrigger className="h-[22px] w-[64px] p-[4px] pl-[6px] text-[10px] leading-[14px]">
+        <SelectTrigger className="h-[22px] w-16 p-1 pl-1.5 text-[10px] leading-[14px]">
           <SelectValue placeholder="Select a country" />
         </SelectTrigger>
         <SelectContent>
