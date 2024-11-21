@@ -287,20 +287,20 @@ describe('Generate Preview', () => {
             primaryAction: {
               label: '{{payload.secondaryUrl}}',
               redirect: {
-                url: 'notAurl.com',
+                url: 'notAUrl.com',
                 target: RedirectTargetEnum.BLANK,
               },
             },
             secondaryAction: {
-              label: 'somelabel',
+              label: 'some label',
               redirect: {
-                url: 'ftp://notAurl.com',
+                url: 'ftp://notAUrl.com',
                 target: RedirectTargetEnum.BLANK,
               },
             },
             redirect: {
               target: RedirectTargetEnum.BLANK,
-              url: 'blablal',
+              url: 'not a url',
             },
           };
           const workflowSlug = novuRestResult.value?.slug;
@@ -582,17 +582,16 @@ function buildInAppControlValues() {
     body: `Hello, World! {{payload.placeholder.body}}`,
     avatar: 'https://www.example.com/avatar.png',
     primaryAction: {
-      label: '{{payload.secondaryUrl}}',
+      label: '{{payload.primaryUrlLabel}}',
       redirect: {
         target: RedirectTargetEnum.BLANK,
-        url: 'https://www.example.com/primary-action',
       },
     },
     secondaryAction: {
       label: 'Secondary Action',
       redirect: {
         target: RedirectTargetEnum.BLANK,
-        url: 'https://www.example.com/secondary-action',
+        url: '/home/secondary-action',
       },
     },
     data: {

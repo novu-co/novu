@@ -10,6 +10,7 @@ import { CollectPlaceholderWithDefaultsUsecase, PlaceholderAggregation } from '.
 import { ExtractDefaultValuesFromSchemaUsecase } from '../../extract-default-values-from-schema';
 import { ValidatedContentResponse } from './validated-content.response';
 import { toSentenceCase } from '../../../../shared/services/helper/helper.service';
+import { isValidUrlForActionButton } from '../../../util/url-utils';
 
 @Injectable()
 export class PrepareAndValidateContentUsecase {
@@ -269,15 +270,6 @@ export class PrepareAndValidateContentUsecase {
       );
     }
   }
-  private isValidURL(urlString: string): boolean {
-    try {
-      const url = new URL(urlString);
-
-      return url.protocol === 'http:' || url.protocol === 'https:'; // Ensure it's HTTP or HTTPS
-    } catch (error) {
-      return false; // The URL is invalid
-    }
-  }
 
   private removeIllegalValuesAndOverloadIssues(
     sanitizedIncomingControlValues: Record<string, unknown>,
@@ -287,10 +279,15 @@ export class PrepareAndValidateContentUsecase {
     const finalSanitizedControlValues = { ...sanitizedIncomingControlValues };
     Object.keys(sanitizedIncomingControlValues).forEach((controlValueKey) => {
       const controlValue = sanitizedIncomingControlValues[controlValueKey];
-      if (controlValueKey.includes('url') && typeof controlValue === 'string' && !this.isValidURL(controlValue)) {
+      if (
+        controlValueKey.includes('url') &&
+        typeof controlValue === 'string' &&
+        !isValidUrlForActionButton(controlValue)
+      ) {
         const hasNoPlaceholders = this.getHasNoPlaceholders(controlValueToValidPlaceholders, controlValueKey);
         if (hasNoPlaceholders) {
-          delete finalSanitizedControlValues[controlValueKey];
+          finalSanitizedControlValues[controlValueKey] =
+            'https://www.not-good-url-please-replace.com/redirect?from=problematic-url&to=updated-url';
 
           // eslint-disable-next-line no-param-reassign
           controlValueToContentIssues[controlValueKey] = [
