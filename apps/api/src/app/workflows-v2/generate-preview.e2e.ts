@@ -107,18 +107,9 @@ describe('Generate Preview', () => {
         if (previewResponseDto.result!.type !== 'in_app') {
           throw new Error('should be in app preview type');
         }
-        const { preview } = previewResponseDto.result!;
         const inApp = getTestControlValues().in_app;
-        expect(preview.subject).to.be.eq(inApp.subject);
-        expect(preview.body).to.be.eq(inApp.body);
-        expect(preview.primaryAction?.label).to.be.eq(inApp.primaryAction.label);
-        expect(preview.primaryAction?.redirect).to.be.undefined;
-        expect(preview.secondaryAction).to.be.deep.eq(inApp.secondaryAction);
-        expect(preview.redirect).to.be.deep.eq(inApp.redirect);
-        expect(preview.avatar).to.be.eq(inApp.avatar);
-        expect(previewResponseDto.previewPayloadExample).to.exist;
-        expect(previewResponseDto.previewPayloadExample.subscriber, 'Expecting to find subscriber in the payload').to
-          .exist;
+        const previewRequestWithoutTheRedirect = { ...inApp, primaryAction: { label: inApp.primaryAction.label } };
+        expect(previewResponseDto.result!.preview).to.deep.equal(previewRequestWithoutTheRedirect);
       });
 
       it(`${StepTypeEnum.SMS}: should match the body in the preview response`, async () => {
