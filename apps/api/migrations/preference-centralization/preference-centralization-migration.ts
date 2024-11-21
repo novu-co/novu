@@ -22,7 +22,7 @@ import { buildWorkflowPreferencesFromPreferenceChannels, DEFAULT_WORKFLOW_PREFER
 
 import { AppModule } from '../../src/app.module';
 
-const BATCH_SIZE = 100;
+const BATCH_SIZE = 500;
 
 /**
  * Sleep for a random amount of time between 80% and 120% of the provided duration.
@@ -167,6 +167,7 @@ async function migrateWorkflowPreferences(
     .find(query)
     .sort({ _id: 1 })
     .batchSize(BATCH_SIZE)
+    .read('secondaryPreferred')
     .cursor();
 
   let batch: NotificationTemplateEntity[] = []; // Replace 'any' with the appropriate type if available
@@ -262,6 +263,7 @@ async function migrateSubscriberPreferences(
     .find(query)
     .sort({ _id: 1 })
     .batchSize(BATCH_SIZE)
+    .read('secondaryPreferred')
     .cursor();
 
   let batch: SubscriberPreferenceEntity[] = []; // Replace 'any' with the appropriate type if available
