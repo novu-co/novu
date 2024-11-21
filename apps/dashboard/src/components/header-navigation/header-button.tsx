@@ -15,7 +15,7 @@ export const HeaderButton = ({
       <TooltipTrigger asChild>
         <div
           tabIndex={0}
-          className="hover:bg-foreground-100 flex h-6 w-6 cursor-pointer items-center justify-center rounded-2xl transition-[background-color,box-shadow] duration-200 ease-in-out focus:outline-none focus:ring-4 focus:ring-neutral-200"
+          className="hover:bg-foreground-100 focus-visible:ring-ring flex h-6 w-6 cursor-pointer items-center justify-center rounded-2xl transition-[background-color,box-shadow] duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2"
         >
           {children}
         </div>
