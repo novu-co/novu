@@ -95,6 +95,7 @@ describe('UpdatePreferences', () => {
       subscriberId: 'not-found',
       level: PreferenceLevelEnum.GLOBAL,
       chat: true,
+      includeInactiveChannels: false,
     };
 
     subscriberRepositoryMock.findBySubscriberId.resolves(undefined);
@@ -115,6 +116,7 @@ describe('UpdatePreferences', () => {
       level: PreferenceLevelEnum.TEMPLATE,
       chat: true,
       workflowId: 'not-found',
+      includeInactiveChannels: false,
     };
 
     subscriberRepositoryMock.findBySubscriberId.resolves(mockedSubscriber);
@@ -135,6 +137,7 @@ describe('UpdatePreferences', () => {
       subscriberId: 'test-mockSubscriber',
       level: PreferenceLevelEnum.GLOBAL,
       chat: true,
+      includeInactiveChannels: false,
     };
 
     subscriberRepositoryMock.findBySubscriberId.resolves(mockedSubscriber);
@@ -149,6 +152,7 @@ describe('UpdatePreferences', () => {
         environmentId: command.environmentId,
         organizationId: command.organizationId,
         subscriberId: mockedSubscriber.subscriberId,
+        includeInactiveChannels: false,
       }),
     ]);
 
@@ -181,6 +185,7 @@ describe('UpdatePreferences', () => {
       workflowId: '6447aff3d89122e250412c28',
       chat: true,
       email: false,
+      includeInactiveChannels: false,
     };
 
     subscriberRepositoryMock.findBySubscriberId.resolves(mockedSubscriber);

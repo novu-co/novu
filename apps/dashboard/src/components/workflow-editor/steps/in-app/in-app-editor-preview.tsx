@@ -35,15 +35,15 @@ export const InAppEditorPreview = (props: InAppEditorPreviewProps) => {
     setAccordionValue(getInitialAccordionValue(value));
   }, [value]);
 
-  console.log({ value });
-
   useEffect(() => {
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       if (contentRef.current) {
         const rect = contentRef.current.getBoundingClientRect();
         setHeight(rect.height);
       }
     }, 0);
+
+    return () => clearTimeout(timeout);
   }, [value]);
 
   return (
