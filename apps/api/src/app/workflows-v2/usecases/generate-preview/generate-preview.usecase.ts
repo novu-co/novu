@@ -116,15 +116,15 @@ function buildState(steps: Record<string, unknown> | undefined): FrameworkPrevio
 export class GeneratePreviewError extends InternalServerErrorException {
   constructor(error: FrameworkError) {
     super({
-      message: `GeneratePreviewError: Original Message:${error.response.message}`,
+      message: `GeneratePreviewError: Original Message:`,
+      frameworkMessage: error.response.message,
       code: error.response.code,
       data: error.response.data,
     });
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-interface FrameworkError {
+class FrameworkError {
   response: {
     message: string;
     code: string;

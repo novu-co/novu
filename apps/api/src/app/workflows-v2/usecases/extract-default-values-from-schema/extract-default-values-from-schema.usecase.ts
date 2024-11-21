@@ -32,7 +32,7 @@ export class ExtractDefaultValuesFromSchemaUsecase {
         }
 
         if (value.default === undefined) {
-          if (key.toLowerCase().trim() === 'url') {
+          if (key.toLowerCase().trim().includes('url')) {
             result[key] = 'https://www.example.com/search?query=placeholder';
           }
           result[key] = 'PREVIEW_ISSUE:REQUIRED_CONTROL_VALUE_IS_MISSING';
