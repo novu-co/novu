@@ -5,7 +5,6 @@ import { differenceInMilliseconds } from 'date-fns';
 import { JobEntity, JobRepository, JobStatusEnum } from '@novu/dal';
 import {
   castUnitToDigestUnitEnum,
-  ContentIssue,
   DigestCreationResultEnum,
   DigestTypeEnum,
   ExecutionDetailsSourceEnum,
@@ -34,10 +33,11 @@ import {
   isTimedDigestOutput,
   isLookBackDigestOutput,
   isRegularDigestOutput,
-  ValidateControlByTierUsecase,
-  ValidateControlByTierCommand,
+  TierRestrictionsValidatorUsecase,
+  TierRestrictionsValidatorCommand,
 } from '@novu/application-generic';
 
+import { ErrorEnum } from '@novu/application-generic/build/main/usecases/tier-restrictions-validator/tier-restrictions-validator.response';
 import { AddDelayJob } from './add-delay-job.usecase';
 import { MergeOrCreateDigestCommand } from './merge-or-create-digest.command';
 import { MergeOrCreateDigest } from './merge-or-create-digest.usecase';
@@ -66,7 +66,7 @@ export class AddJob {
     @Inject(forwardRef(() => ConditionsFilter))
     private conditionsFilter: ConditionsFilter,
     private normalizeVariablesUsecase: NormalizeVariables,
-    private validateControlByTierUsecase: ValidateControlByTierUsecase,
+    private tierRestrictionsValidatorUsecase: TierRestrictionsValidatorUsecase,
     private executeBridgeJob: ExecuteBridgeJob
   ) {}
 
@@ -167,32 +167,29 @@ export class AddJob {
   }
 
   private async validateDeferDuration(delay: number, job: JobEntity, command: AddJobCommand) {
-    const issues = await this.validateControlByTierUsecase.execute(
-      ValidateControlByTierCommand.create({
+    const errors = await this.tierRestrictionsValidatorUsecase.execute(
+      TierRestrictionsValidatorCommand.create({
         deferDuration: delay,
         stepType: job.type,
         organizationId: command.organizationId,
       })
     );
 
-    if (Object.keys(issues).length > 0) {
-      const tierIssues = (issues as Record<string, ContentIssue[]>).tier;
-      if (tierIssues) {
-        Logger.warn({ issues: tierIssues, jobId: job._id }, 'Defer duration limit exceeded for job', LOG_CONTEXT);
+    if (errors) {
+      Logger.warn({ errors, jobId: job._id }, 'Defer duration limit exceeded for job', LOG_CONTEXT);
 
-        await this.executionLogRoute.execute(
-          ExecutionLogRouteCommand.create({
-            ...ExecutionLogRouteCommand.getDetailsFromJob(job),
-            detail: DetailEnum.DEFER_DURATION_LIMIT_EXCEEDED,
-            source: ExecutionDetailsSourceEnum.INTERNAL,
-            status: ExecutionDetailsStatusEnum.FAILED,
-            isTest: false,
-            isRetry: false,
-          })
-        );
+      await this.executionLogRoute.execute(
+        ExecutionLogRouteCommand.create({
+          ...ExecutionLogRouteCommand.getDetailsFromJob(job),
+          detail: DetailEnum.DEFER_DURATION_LIMIT_EXCEEDED,
+          source: ExecutionDetailsSourceEnum.INTERNAL,
+          status: ExecutionDetailsStatusEnum.FAILED,
+          isTest: false,
+          isRetry: false,
+        })
+      );
 
-        throw new Error(DetailEnum.DEFER_DURATION_LIMIT_EXCEEDED);
-      }
+      throw new Error(DetailEnum.DEFER_DURATION_LIMIT_EXCEEDED);
     }
   }
 

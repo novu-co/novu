@@ -5,7 +5,7 @@ import { OrganizationLevelCommand } from '../../commands';
 
 export type Milliseconds = number;
 
-export class ValidateControlByTierCommand extends OrganizationLevelCommand {
+export class TierRestrictionsValidatorCommand extends OrganizationLevelCommand {
   @IsNumber()
   @IsOptional()
   deferDuration?: Milliseconds;

@@ -9,7 +9,7 @@ import {
   StepTypeEnum,
   UserSessionData,
 } from '@novu/shared';
-import { ValidateControlByTierUsecase } from '@novu/application-generic';
+import { TierRestrictionsValidatorUsecase } from '@novu/application-generic';
 
 import { PrepareAndValidateContentCommand } from './prepare-and-validate-content.command';
 import { mergeObjects } from '../../../util/jsonUtils';
@@ -35,7 +35,7 @@ export class PrepareAndValidateContentUsecase {
     private validatePlaceholdersUseCase: ValidatePlaceholderUsecase,
     private collectPlaceholderWithDefaultsUsecase: CollectPlaceholderWithDefaultsUsecase,
     private extractDefaultsFromSchemaUseCase: ExtractDefaultValuesFromSchemaUsecase,
-    private validateControlByTierUsecase: ValidateControlByTierUsecase
+    private tierRestrictionsValidatorUsecase: TierRestrictionsValidatorUsecase
   ) {}
 
   async execute(command: PrepareAndValidateContentCommand): Promise<ValidatedContentResponse> {
@@ -248,17 +248,39 @@ export class PrepareAndValidateContentUsecase {
     defaultControlValues: Record<string, unknown>,
     user: UserSessionData,
     stepType?: StepTypeEnum
-  ) {
+  ): Promise<Record<string, ContentIssue[]>> {
     const deferDuration =
       isValidDigestUnit(defaultControlValues.unit) && isNumber(defaultControlValues.amount)
         ? calculateMilliseconds(defaultControlValues.amount, defaultControlValues.unit)
         : 0;
 
-    return await this.validateControlByTierUsecase.execute({
+    const restrictionsErrors = await this.tierRestrictionsValidatorUsecase.execute({
       deferDuration,
       organizationId: user.organizationId,
       stepType,
     });
+
+    if (!restrictionsErrors) {
+      return {};
+    }
+
+    const result: Record<string, ContentIssue[]> = {};
+    for (const restrictionsError of restrictionsErrors) {
+      result.amount = [
+        {
+          issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
+          message: restrictionsError.message,
+        },
+      ];
+      result.unit = [
+        {
+          issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
+          message: restrictionsError.message,
+        },
+      ];
+    }
+
+    return result;
   }
 }
 
