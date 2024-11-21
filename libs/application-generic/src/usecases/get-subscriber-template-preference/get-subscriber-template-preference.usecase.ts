@@ -50,7 +50,7 @@ export class GetSubscriberTemplatePreference {
   ): Promise<ISubscriberPreferenceResponse> {
     const subscriber = await this.getSubscriber(command);
 
-    const initialActiveChannels = await this.getActiveChannels(command);
+    const initialChannels = await this.getChannels(command);
 
     const workflowOverride = await this.getWorkflowOverride(command);
 
@@ -67,7 +67,7 @@ export class GetSubscriberTemplatePreference {
         subscriber: subscriberWorkflowPreference.channels,
         workflowOverride: workflowOverrideChannelPreference,
       },
-      initialActiveChannels,
+      initialChannels,
     );
 
     const template = mapTemplateConfiguration({
@@ -172,11 +172,17 @@ export class GetSubscriberTemplatePreference {
     });
   }
 
-  private async getActiveChannels(
+  private async getChannels(
     command: GetSubscriberTemplatePreferenceCommand,
   ): Promise<IPreferenceChannels> {
-    const activeChannels = await this.queryActiveChannels(command);
-    const initialActiveChannels = filteredPreference(
+    let includedChannels: ChannelTypeEnum[];
+    if (command.includeInactiveChannels === true) {
+      includedChannels = Object.values(ChannelTypeEnum);
+    } else {
+      includedChannels = await this.queryActiveChannels(command);
+    }
+
+    const initialChannels = filteredPreference(
       {
         email: true,
         sms: true,
@@ -184,10 +190,10 @@ export class GetSubscriberTemplatePreference {
         chat: true,
         push: true,
       },
-      activeChannels,
+      includedChannels,
     );
 
-    return initialActiveChannels;
+    return initialChannels;
   }
 
   private async queryActiveChannels(

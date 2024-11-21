@@ -414,6 +414,7 @@ export class WidgetsController {
       organizationId: subscriberSession._organizationId,
       subscriberId: subscriberSession.subscriberId,
       environmentId: subscriberSession._environmentId,
+      includeInactiveChannels: false,
     });
 
     return await this.getSubscriberPreferenceUsecase.execute(command);
@@ -429,6 +430,7 @@ export class WidgetsController {
       organizationId: subscriberSession._organizationId,
       subscriberId: subscriberSession.subscriberId,
       environmentId: subscriberSession._environmentId,
+      includeInactiveChannels: false,
       level,
     });
 
@@ -449,6 +451,7 @@ export class WidgetsController {
         subscriberId: subscriberSession.subscriberId,
         workflowId: templateId,
         level: PreferenceLevelEnum.TEMPLATE,
+        includeInactiveChannels: false,
         ...(body.channel && { [body.channel.type]: body.channel.enabled }),
       })
     );
@@ -493,6 +496,7 @@ export class WidgetsController {
         organizationId: subscriberSession._organizationId,
         subscriberId: subscriberSession.subscriberId,
         level: PreferenceLevelEnum.GLOBAL,
+        includeInactiveChannels: false,
         ...channels,
       })
     );

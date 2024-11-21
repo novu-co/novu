@@ -1,4 +1,4 @@
-import { IsDefined, IsEnum, IsString } from 'class-validator';
+import { IsBoolean, IsDefined, IsEnum, IsOptional, IsString } from 'class-validator';
 import { PreferenceLevelEnum } from '@novu/dal';
 import { EnvironmentCommand } from '../../../shared/commands/project.command';
 
@@ -10,4 +10,8 @@ export class GetPreferencesByLevelCommand extends EnvironmentCommand {
   @IsEnum(PreferenceLevelEnum)
   @IsDefined()
   level: PreferenceLevelEnum;
+
+  @IsBoolean()
+  @IsDefined()
+  includeInactiveChannels: boolean;
 }

@@ -131,6 +131,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(initialPreferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: true,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
     });
 
     const emptyPreferenceData = {
@@ -145,6 +148,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(preferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: true,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
     });
   });
 
@@ -155,6 +161,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(initialPreferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: true,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
     });
 
     const disablePreferenceData = {
@@ -168,6 +177,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(midwayPreferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: true,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
     });
 
     const updateEmailPreferenceData = {
@@ -184,6 +196,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(finalPreferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: false,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
     });
   });
 
@@ -194,6 +209,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(initialPreferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: true,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
     });
 
     const disablePreferenceData = {
@@ -207,6 +225,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(midwayPreferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: true,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
     });
 
     const enablePreferenceData = {
@@ -220,6 +241,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(finalPreferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: true,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
     });
   });
 
@@ -229,6 +253,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(initialPreferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: true,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
     });
 
     const disableEmailPreferenceData = {
@@ -245,6 +272,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(updatedPreferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: false,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
     });
 
     const enableEmailPreferenceData = {
@@ -261,6 +291,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(finalPreferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: true,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
     });
   });
 
@@ -270,6 +303,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(initialPreferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: true,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
     });
 
     const updateSmsPreferenceData = {
@@ -286,6 +322,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(finalPreferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: true,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: false,
     });
   });
 
@@ -317,6 +356,8 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
       [ChannelTypeEnum.EMAIL]: true,
       [ChannelTypeEnum.IN_APP]: true,
       [ChannelTypeEnum.SMS]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
     });
 
     const updateSmsPreferenceData = {
@@ -334,6 +375,8 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
       [ChannelTypeEnum.EMAIL]: true,
       [ChannelTypeEnum.IN_APP]: true,
       [ChannelTypeEnum.SMS]: false,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
     });
   });
 
@@ -370,6 +413,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(initialPreferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: true,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
     });
 
     const updateSmsPreferenceData = {
@@ -386,6 +432,9 @@ describe('Update Subscribers preferences - /subscribers/:subscriberId/preference
     expect(finalPreferences.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: false,
       [ChannelTypeEnum.IN_APP]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
     });
   });
 });
