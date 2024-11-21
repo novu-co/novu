@@ -1,6 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { ContentIssue, JSONSchemaDto, PreviewPayload, StepContentIssueEnum } from '@novu/shared';
 import { merge } from 'lodash';
+import {
+  ContentIssue,
+  DigestUnitEnum,
+  JSONSchemaDto,
+  PreviewPayload,
+  StepContentIssueEnum,
+  StepTypeEnum,
+  UserSessionData,
+} from '@novu/shared';
+import { TierRestrictionsValidateUsecase } from '@novu/application-generic';
+
 import { PrepareAndValidateContentCommand } from './prepare-and-validate-content.command';
 import { flattenJson, flattenToNested, mergeObjects } from '../../../util/jsonUtils';
 import { findMissingKeys } from '../../../util/utils';
@@ -12,13 +22,21 @@ import { ValidatedContentResponse } from './validated-content.response';
 import { toSentenceCase } from '../../../../shared/services/helper/helper.service';
 import { isValidUrlForActionButton } from '../../../util/url-utils';
 
+/**
+ * Validates and prepares workflow step content by collecting placeholders,
+ * validating against schemas, merging payloads and control values, and
+ * identifying any validation issues.
+ *
+ * @returns {ValidatedContentResponse} Contains final payload, control values and validation issues
+ */
 @Injectable()
 export class PrepareAndValidateContentUsecase {
   constructor(
     private constructPayloadUseCase: BuildDefaultPayloadUsecase,
     private validatePlaceholdersUseCase: ValidatePlaceholderUsecase,
     private collectPlaceholderWithDefaultsUsecase: CollectPlaceholderWithDefaultsUsecase,
-    private extractDefaultsFromSchemaUseCase: ExtractDefaultValuesFromSchemaUsecase
+    private extractDefaultsFromSchemaUseCase: ExtractDefaultValuesFromSchemaUsecase,
+    private tierRestrictionsValidateUsecase: TierRestrictionsValidateUsecase
   ) {}
 
   async execute(command: PrepareAndValidateContentCommand): Promise<ValidatedContentResponse> {
@@ -33,11 +51,14 @@ export class PrepareAndValidateContentUsecase {
       command.controlValues,
       controlValueToValidPlaceholders
     );
-    const issues = this.buildIssues(
+    const issues = await this.buildIssues(
       finalPayload,
       command.previewPayloadFromDto || finalPayload, // if no payload provided no point creating issues.
       controlValueToValidPlaceholders,
-      controlValueIssues
+      controlValueIssues,
+      finalControlValues,
+      command.user,
+      command.stepType
     );
 
     return {
@@ -213,15 +234,19 @@ export class PrepareAndValidateContentUsecase {
     return targetText.trim();
   }
 
-  private buildIssues(
+  private async buildIssues(
     payload: PreviewPayload,
     providedPayload: PreviewPayload,
     valueToPlaceholders: Record<string, ValidatedPlaceholderAggregation>,
-    urlControlValueIssues: Record<string, ContentIssue[]>
-  ): Record<string, ContentIssue[]> {
+    urlControlValueIssues: Record<string, ContentIssue[]>,
+    finalControlValues: Record<string, unknown>,
+    user: UserSessionData,
+    stepType?: StepTypeEnum
+  ): Promise<Record<string, ContentIssue[]>> {
     let finalIssues: Record<string, ContentIssue[]> = {};
     finalIssues = mergeObjects(finalIssues, this.getMissingInPayload(providedPayload, valueToPlaceholders, payload));
     finalIssues = mergeObjects(finalIssues, urlControlValueIssues);
+    finalIssues = mergeObjects(finalIssues, await this.computeTierIssues(finalControlValues, user, stepType));
 
     return finalIssues;
   }
@@ -312,4 +337,70 @@ export class PrepareAndValidateContentUsecase {
       Object.keys(controlValueToValidPlaceholders[controlValueKey].validRegularPlaceholdersToDefaultValue).length === 0
     );
   }
+
+  private async computeTierIssues(
+    defaultControlValues: Record<string, unknown>,
+    user: UserSessionData,
+    stepType?: StepTypeEnum
+  ): Promise<Record<string, ContentIssue[]>> {
+    const deferDuration =
+      isValidDigestUnit(defaultControlValues.unit) && isNumber(defaultControlValues.amount)
+        ? calculateMilliseconds(defaultControlValues.amount, defaultControlValues.unit)
+        : 0;
+
+    const restrictionsErrors = await this.tierRestrictionsValidateUsecase.execute({
+      deferDurationMs: deferDuration,
+      organizationId: user.organizationId,
+      stepType,
+    });
+
+    if (!restrictionsErrors) {
+      return {};
+    }
+
+    const result: Record<string, ContentIssue[]> = {};
+    for (const restrictionsError of restrictionsErrors) {
+      result.amount = [
+        {
+          issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
+          message: restrictionsError.message,
+        },
+      ];
+      result.unit = [
+        {
+          issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
+          message: restrictionsError.message,
+        },
+      ];
+    }
+
+    return result;
+  }
+}
+
+function calculateMilliseconds(amount: number, unit: DigestUnitEnum): number {
+  switch (unit) {
+    case DigestUnitEnum.SECONDS:
+      return amount * 1000;
+    case DigestUnitEnum.MINUTES:
+      return amount * 1000 * 60;
+    case DigestUnitEnum.HOURS:
+      return amount * 1000 * 60 * 60;
+    case DigestUnitEnum.DAYS:
+      return amount * 1000 * 60 * 60 * 24;
+    case DigestUnitEnum.WEEKS:
+      return amount * 1000 * 60 * 60 * 24 * 7;
+    case DigestUnitEnum.MONTHS:
+      return amount * 1000 * 60 * 60 * 24 * 30; // Using 30 days as an approximation for a month
+    default:
+      return 0;
+  }
+}
+
+function isValidDigestUnit(unit: unknown): unit is DigestUnitEnum {
+  return Object.values(DigestUnitEnum).includes(unit as DigestUnitEnum);
+}
+
+function isNumber(value: unknown): value is number {
+  return !Number.isNaN(Number(value));
 }

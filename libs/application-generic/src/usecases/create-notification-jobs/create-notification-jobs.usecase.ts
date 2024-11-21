@@ -195,7 +195,7 @@ export class CreateNotificationJobs {
   ): Promise<NotificationStepEntity[]> {
     // TODO: Review this for workflows with more than one digest as this will return the first element found
     const digestStep = steps.find(
-      (step) => step.template?.type === StepTypeEnum.DIGEST
+      (step) => step.template?.type === StepTypeEnum.DIGEST,
     );
 
     if (digestStep?.metadata?.type) {
@@ -215,7 +215,7 @@ export class CreateNotificationJobs {
             'backoff' in digestStep.metadata
               ? digestStep.metadata.backoff
               : undefined,
-        })
+        }),
       );
     }
 

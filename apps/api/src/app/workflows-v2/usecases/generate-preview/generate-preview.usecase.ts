@@ -6,6 +6,7 @@ import {
   JobStatusEnum,
   PreviewPayload,
   StepDataDto,
+  UserSessionData,
 } from '@novu/shared';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
@@ -26,7 +27,7 @@ export class GeneratePreviewUsecase {
     const dto = command.generatePreviewRequestDto;
     const stepData = await this.getStepData(command);
 
-    const validatedContent: ValidatedContentResponse = await this.getValidatedContent(dto, stepData);
+    const validatedContent: ValidatedContentResponse = await this.getValidatedContent(dto, stepData, command.user);
     const executeOutput = await this.executePreviewUsecase(
       command,
       stepData,
@@ -35,7 +36,7 @@ export class GeneratePreviewUsecase {
     );
 
     return {
-      issues: validatedContent.issues, // Use the issues from validatedContent
+      issues: validatedContent.issues,
       result: {
         preview: executeOutput.outputs as any,
         type: stepData.type as unknown as ChannelTypeEnum,
@@ -44,16 +45,18 @@ export class GeneratePreviewUsecase {
     };
   }
 
-  private async getValidatedContent(dto: GeneratePreviewRequestDto, stepData: StepDataDto) {
+  private async getValidatedContent(dto: GeneratePreviewRequestDto, stepData: StepDataDto, user: UserSessionData) {
     if (!stepData.controls?.dataSchema) {
       throw new StepMissingControlsException(stepData.stepId, stepData);
     }
 
     return await this.prepareAndValidateContentUsecase.execute({
+      stepType: stepData.type,
       controlValues: dto.controlValues || stepData.controls.values,
       controlDataSchema: stepData.controls.dataSchema,
       variableSchema: stepData.variables,
       previewPayloadFromDto: dto.previewPayload,
+      user,
     });
   }
 
