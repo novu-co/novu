@@ -94,7 +94,7 @@ export async function preferenceCentralization(startWorkflowId?: string, startSu
 
   await migrateWorkflowPreferences(workflowPreferenceRepository, upsertPreferences, startWorkflowId);
   console.log({ counter });
-  await migrateSubscriberPreferences(subscriberPreferenceRepository, upsertPreferences, startSubscriberId);
+  // await migrateSubscriberPreferences(subscriberPreferenceRepository, upsertPreferences, startSubscriberId);
 
   // Clear the logging interval once migration is complete
   clearInterval(logInterval);
@@ -165,13 +165,13 @@ async function migrateWorkflowPreferences(
   }
   const workflowPreferenceCursor = await workflowPreferenceRepository._model
     .find(query)
-    .projection({ _id: 1, _environmentId: 1, _organizationId: 1, _creatorId: 1, critical: 1, preferenceSettings: 1 })
+    .select({ _id: 1, _environmentId: 1, _organizationId: 1, _creatorId: 1, critical: 1, preferenceSettings: 1 })
     .sort({ _id: 1 })
     .read('secondaryPreferred')
     .cursor({ batchSize: BATCH_SIZE });
 
   let batch: NotificationTemplateEntity[] = [];
-  let document: NotificationTemplateEntity | null;
+  let document: any;
   while ((document = await workflowPreferenceCursor.next())) {
     batch.push(document);
 
@@ -260,13 +260,13 @@ async function migrateSubscriberPreferences(
   }
   const subscriberPreferenceCursor = await subscriberPreferenceRepository._model
     .find(query)
-    .projection({ _id: 1, _environmentId: 1, _organizationId: 1, _subscriberId: 1, level: 1, channels: 1 })
+    .select({ _id: 1, _environmentId: 1, _organizationId: 1, _subscriberId: 1, level: 1, channels: 1 })
     .sort({ _id: 1 })
     .read('secondaryPreferred')
     .cursor({ batchSize: BATCH_SIZE });
 
   let batch: SubscriberPreferenceEntity[] = [];
-  let document: SubscriberPreferenceEntity | null;
+  let document: any;
   while ((document = await subscriberPreferenceCursor.next())) {
     batch.push(document);
 
