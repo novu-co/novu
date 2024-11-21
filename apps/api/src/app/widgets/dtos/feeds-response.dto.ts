@@ -47,9 +47,6 @@ export class NotificationDto implements INotificationDto {
   @ApiPropertyOptional()
   updatedAt: string;
 
-  @ApiPropertyOptional()
-  expireAt: string;
-
   @ApiPropertyOptional({
     type: Actor,
   })

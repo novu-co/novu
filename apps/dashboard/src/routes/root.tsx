@@ -5,6 +5,7 @@ import { withProfiler, ErrorBoundary } from '@sentry/react';
 import { SegmentProvider } from '@/context/segment';
 import { AuthProvider } from '@/context/auth/auth-provider';
 import { ClerkProvider } from '@/context/clerk-provider';
+import { TooltipProvider } from '@/components/primitives/tooltip';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,7 +38,9 @@ const RootRouteInternal = () => {
           <SegmentProvider>
             <AuthProvider>
               <HelmetProvider>
-                <Outlet />
+                <TooltipProvider delayDuration={100}>
+                  <Outlet />
+                </TooltipProvider>
               </HelmetProvider>
             </AuthProvider>
           </SegmentProvider>

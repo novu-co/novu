@@ -35,8 +35,8 @@ export function RegionPicker() {
   }
 
   return (
-    <div className="inline-flex w-full items-center justify-center gap-[6px]">
-      <div className="text-xs font-medium leading-none text-[#99a0ad]">
+    <div className="inline-flex w-full items-center justify-center gap-1.5">
+      <div className="text-xs font-medium leading-none text-neutral-400">
         Data Residency
         <TooltipProvider delayDuration={100}>
           <Tooltip>
@@ -44,27 +44,21 @@ export function RegionPicker() {
               <BsFillInfoCircleFill className="text-foreground-300 -mt-0.5 inline size-3" />
             </TooltipTrigger>
             <TooltipContent>
-              Novu offers data residency in Europe (Germany) and United States. Account residency couldn't be modified
+              Novu offers data residency in Europe (Germany) and the United States. Data residency cannot be modified
               after sign-up.
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </div>
       <Select value={selectedRegion} onValueChange={handleRegionChange}>
-        <SelectTrigger className="h-[22px] w-[64px] p-[4px] pl-[6px] text-[10px] leading-[14px]">
+        <SelectTrigger className="h-[22px] w-16 p-1 pl-1.5 text-[10px] leading-[14px]">
           <SelectValue placeholder="Select a country" />
         </SelectTrigger>
         <SelectContent>
           {Object.values(REGION_MAP).map((option) => (
-            <SelectItem key={option} value={option} className="w-[100px] w-full">
+            <SelectItem key={option} value={option} className="w-full">
               <div className="flex items-center gap-[6px]">
-                {' '}
-                {option === REGION_MAP.US ? (
-                  <USFlag className="h-[10px] w-[10px]" />
-                ) : (
-                  <EuFlag className="h-[10px] w-[10px]" />
-                )}{' '}
-                {option}
+                {option === REGION_MAP.US ? <USFlag className="h-3 w-3" /> : <EuFlag className="h-3 w-3" />} {option}
               </div>
             </SelectItem>
           ))}

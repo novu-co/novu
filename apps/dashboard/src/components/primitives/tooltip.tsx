@@ -39,12 +39,14 @@ type TooltipContentProps = React.ComponentPropsWithoutRef<typeof TooltipPrimitiv
 
 const TooltipContent = React.forwardRef<React.ElementRef<typeof TooltipPrimitive.Content>, TooltipContentProps>(
   ({ className, sideOffset = 4, variant, size, ...props }, ref) => (
-    <TooltipPrimitive.Content
-      ref={ref}
-      sideOffset={sideOffset}
-      className={cn(tooltipContentVariants({ variant, size }), className)}
-      {...props}
-    />
+    <TooltipPortal>
+      <TooltipPrimitive.Content
+        ref={ref}
+        sideOffset={sideOffset}
+        className={cn(tooltipContentVariants({ variant, size }), className)}
+        {...props}
+      />
+    </TooltipPortal>
   )
 );
 

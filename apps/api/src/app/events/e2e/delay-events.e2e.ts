@@ -84,13 +84,7 @@ describe('Trigger event - Delay triggered events - /v1/events/trigger (POST)', f
 
     expect(delayedJob!.status).to.equal(JobStatusEnum.DELAYED);
 
-    const expireAt = new Date(delayedJob?.expireAt as string);
     const createdAt = new Date(delayedJob?.createdAt as string);
-
-    const subExpire30Days = subDays(expireAt, 30);
-    const diff = differenceInMilliseconds(subExpire30Days, createdAt);
-
-    expect(diff).to.approximately(200, 2000);
 
     const messages = await messageRepository.find({
       _environmentId: session.environment._id,

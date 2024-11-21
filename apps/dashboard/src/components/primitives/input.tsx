@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { cn } from '@/utils/ui';
 import { cva, VariantProps } from 'class-variance-authority';
+import { useFormField } from './form/form-context';
 
 export const inputVariants = cva(
   'file:text-foreground placeholder:text-foreground-400 flex h-full w-full bg-transparent text-xs file:border-0 file:bg-transparent file:font-medium focus-visible:outline-none disabled:cursor-not-allowed'
@@ -59,16 +60,28 @@ const inputFieldVariants = cva(
   }
 );
 
-export type InputFieldProps = { children: React.ReactNode; className?: string } & VariantProps<
+export type InputFieldPureProps = { children: React.ReactNode; className?: string } & VariantProps<
   typeof inputFieldVariants
 >;
 
-const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(({ children, className, size, state }, ref) => {
-  return (
-    <div ref={ref} className={cn(inputFieldVariants({ size, state }), className)}>
-      {children}
-    </div>
-  );
+const InputFieldPure = React.forwardRef<HTMLInputElement, InputFieldPureProps>(
+  ({ children, className, size, state }, ref) => {
+    return (
+      <div ref={ref} className={cn(inputFieldVariants({ size, state }), className)}>
+        {children}
+      </div>
+    );
+  }
+);
+
+InputFieldPure.displayName = 'InputFieldPure';
+
+export type InputFieldProps = Omit<InputFieldPureProps, 'state'>;
+
+const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(({ ...props }, ref) => {
+  const { error } = useFormField();
+
+  return <InputFieldPure ref={ref} {...props} state={error?.message ? 'error' : 'default'} />;
 });
 
 InputField.displayName = 'InputField';
@@ -80,4 +93,4 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type,
 });
 Input.displayName = 'Input';
 
-export { Input, InputField };
+export { Input, InputField, InputFieldPure };

@@ -13,6 +13,8 @@ import { ConfirmationModal } from '@/components/confirmation-modal';
 import { ConfigureStepContent } from './configure-step-content';
 import { PageMeta } from '@/components/page-meta';
 import { StepEditorProvider } from '@/components/workflow-editor/steps/step-editor-provider';
+import { EXCLUDED_EDITOR_TYPES } from '@/utils/constants';
+import TruncatedText from '@/components/truncated-text';
 
 const ConfigureStepInternal = () => {
   const { step } = useStep();
@@ -22,7 +24,9 @@ const ConfigureStepInternal = () => {
     workflowSlug: string;
     stepSlug: string;
   }>();
-  const { isReadOnly, deleteStep } = useWorkflowEditorContext();
+  const { isReadOnly: isWorkflowReadOnly, deleteStep } = useWorkflowEditorContext();
+
+  const isReadOnly = isWorkflowReadOnly || EXCLUDED_EDITOR_TYPES.includes(step?.type ?? '');
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -81,8 +85,16 @@ const ConfigureStepInternal = () => {
                 open={isDeleteModalOpen}
                 onOpenChange={setIsDeleteModalOpen}
                 onConfirm={onDeleteStep}
-                title="Are you sure?"
-                description={`You're about to delete the ${step?.name}, this action cannot be undone.`}
+                title="Proceeding will delete the step"
+                description={
+                  <>
+                    You're about to delete the{' '}
+                    <strong>
+                      <TruncatedText className="max-w-[32ch]">{step?.name}</TruncatedText>
+                    </strong>{' '}
+                    step, this action is permanent.
+                  </>
+                }
                 confirmButtonText="Delete"
               />
               <Button

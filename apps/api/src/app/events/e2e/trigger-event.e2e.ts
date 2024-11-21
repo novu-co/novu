@@ -21,8 +21,6 @@ import {
   ActorTypeEnum,
   ChannelTypeEnum,
   ChatProviderIdEnum,
-  DEFAULT_MESSAGE_GENERIC_RETENTION_DAYS,
-  DEFAULT_MESSAGE_IN_APP_RETENTION_DAYS,
   DelayTypeEnum,
   DigestUnitEnum,
   EmailBlockTypeEnum,
@@ -1444,13 +1442,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       expect(messages.length).to.equal(1);
       const message = messages[0];
 
-      let expireAt = new Date(message?.expireAt as string);
       let createdAt = new Date(message?.createdAt as string);
-
-      const subExpireYear = subDays(expireAt, DEFAULT_MESSAGE_IN_APP_RETENTION_DAYS);
-      let diff = differenceInMilliseconds(subExpireYear, createdAt);
-
-      expect(diff).to.approximately(0, 100);
 
       const emails = await messageRepository.findBySubscriberChannel(
         session.environment._id,
@@ -1461,13 +1453,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       expect(emails.length).to.equal(1);
       const email = emails[0];
 
-      expireAt = new Date(email?.expireAt as string);
       createdAt = new Date(email?.createdAt as string);
-
-      const subExpireMonth = subDays(expireAt, DEFAULT_MESSAGE_GENERIC_RETENTION_DAYS);
-      diff = differenceInMilliseconds(subExpireMonth, createdAt);
-
-      expect(diff).to.approximately(0, 100);
     });
 
     it('should trigger SMS notification', async function () {

@@ -14,10 +14,7 @@ import { useStepEditorContext } from '../hooks';
 const bodyKey = 'body';
 
 export const InAppBody = () => {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext();
+  const { control } = useFormContext();
   const { step } = useStepEditorContext();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
 
@@ -28,7 +25,7 @@ export const InAppBody = () => {
       render={({ field }) => (
         <FormItem className="w-full">
           <FormControl>
-            <InputField className="h-36 px-1" state={errors[bodyKey] ? 'error' : 'default'}>
+            <InputField className="h-36 px-1">
               <Editor
                 fontFamily="inherit"
                 placeholder={capitalize(field.name)}

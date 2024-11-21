@@ -16,6 +16,32 @@
     }
   },
   "extends": "@nx/workspace/presets/npm.json",
+  "release": {
+    "changelog": {
+      "workspaceChangelog": true,
+      "projectChangelogs": true
+    },
+    "projects": [
+      "novu",
+      "@novu/client",
+      "@novu/framework",
+      "@novu/headless",
+      "@novu/js",
+      "@novu/react",
+      "@novu/react-native",
+      "@novu/nextjs",
+      "@novu/node",
+      "@novu/providers",
+      "@novu/shared",
+      "@novu/stateless"
+    ],
+    "projectsRelationship": "independent",
+    "version": {
+      "generatorOptions": {
+        "preserveLocalDependencyProtocols": true
+      }
+    }
+  },
   "tasksRunnerOptions": {
     "default": {
       "options": {
@@ -26,5 +52,9 @@
     }
   },
   "useInferencePlugins": false,
-  "defaultBase": "main"
+  "defaultBase": "main",
+  "useLegacyCache": true,
+  "generatorOptions": {
+    "preserveLocalDependencyProtocols": true
+  }
 }

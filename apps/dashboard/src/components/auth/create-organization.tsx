@@ -1,6 +1,6 @@
 import { OrganizationList as OrganizationListForm } from '@clerk/clerk-react';
 import { ROUTES } from '../../utils/routes';
-import { clerkAppearance } from '../../utils/clerk-appearance';
+import { clerkSignupAppearance } from '../../utils/clerk-appearance';
 import { AuthCard } from './auth-card';
 import { StepIndicator } from './shared';
 
@@ -15,7 +15,7 @@ export default function OrganizationCreate() {
             <OrganizationListForm
               appearance={{
                 elements: {
-                  ...clerkAppearance.elements,
+                  ...clerkSignupAppearance.elements,
                   cardBox: { boxShadow: 'none' },
                   card: { paddingTop: 0, padding: 0 },
                 },
@@ -29,7 +29,7 @@ export default function OrganizationCreate() {
         </div>
 
         <div className="w-full max-w-[564px] flex-1">
-          <img src="/images/auth/ui-org.svg" alt="create-org-illustration" />
+          <img src="/images/auth/ui-org.svg" alt="" className="opacity-70" />
         </div>
       </AuthCard>
     </div>

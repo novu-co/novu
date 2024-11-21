@@ -36,7 +36,6 @@ export class NotificationEntity {
 
   createdAt?: string;
   updatedAt?: string;
-  expireAt?: string;
   tags?: string[];
   controls?: ControlsDto;
 }

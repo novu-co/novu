@@ -1,11 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ClassConstructor, plainToInstance } from 'class-transformer';
-import { addDays } from 'date-fns';
-import {
-  DEFAULT_MESSAGE_GENERIC_RETENTION_DAYS,
-  DEFAULT_MESSAGE_IN_APP_RETENTION_DAYS,
-  DEFAULT_NOTIFICATION_RETENTION_DAYS,
-} from '@novu/shared';
 import {
   ClientSession,
   FilterQuery,
@@ -222,41 +216,7 @@ export class BaseRepository<T_DBModel, T_MappedEntity, T_Enforcement> {
     };
   }
 
-  private calcExpireDate(modelName: string, data: FilterQuery<T_DBModel> & T_Enforcement) {
-    let startDate: Date = new Date();
-    if (data.expireAt) {
-      startDate = new Date(data.expireAt);
-    }
-
-    switch (modelName) {
-      case 'Message':
-        if (data.channel === 'in_app') {
-          return addDays(
-            startDate,
-            Number(process.env.MESSAGE_IN_APP_RETENTION_DAYS || DEFAULT_MESSAGE_IN_APP_RETENTION_DAYS)
-          );
-        } else {
-          return addDays(
-            startDate,
-            Number(process.env.MESSAGE_GENERIC_RETENTION_DAYS || DEFAULT_MESSAGE_GENERIC_RETENTION_DAYS)
-          );
-        }
-      case 'Notification':
-        return addDays(
-          startDate,
-          Number(process.env.NOTIFICATION_RETENTION_DAYS || DEFAULT_NOTIFICATION_RETENTION_DAYS)
-        );
-      default:
-        return null;
-    }
-  }
-
   async create(data: FilterQuery<T_DBModel> & T_Enforcement, options: IOptions = {}): Promise<T_MappedEntity> {
-    const expireAt = this.calcExpireDate(this.MongooseModel.modelName, data);
-    if (expireAt) {
-      // eslint-disable-next-line no-param-reassign
-      data = { ...data, expireAt };
-    }
     const newEntity = new this.MongooseModel(data);
 
     const saveOptions = options?.writeConcern ? { w: options?.writeConcern } : {};

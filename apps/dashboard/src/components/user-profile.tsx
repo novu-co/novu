@@ -7,7 +7,10 @@ export function UserProfile() {
   const { optOut } = useNewDashboardOptIn();
 
   return (
-    <UserButton afterSignOutUrl={`${LEGACY_DASHBOARD_URL}/auth/login`}>
+    <UserButton
+      afterSignOutUrl={`${LEGACY_DASHBOARD_URL}/auth/login`}
+      appearance={{ elements: { avatarBox: 'h-6 w-6 focus:outline-none focus:ring-4 focus:ring-neutral-200' } }}
+    >
       <UserButton.MenuItems>
         <UserButton.Action
           label="Go back to the legacy Dashboard"
