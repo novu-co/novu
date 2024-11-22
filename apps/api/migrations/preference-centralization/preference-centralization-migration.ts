@@ -22,21 +22,7 @@ import { buildWorkflowPreferencesFromPreferenceChannels, DEFAULT_WORKFLOW_PREFER
 
 import { AppModule } from '../../src/app.module';
 
-const BATCH_SIZE = 500;
-
-/**
- * Sleep for a random amount of time between 80% and 120% of the provided duration.
- * @param ms - The duration to sleep for in milliseconds.
- * @returns A promise that resolves after the randomized sleep duration.
- */
-const sleep = (ms: number) => {
-  const randomFactor = 1 + (Math.random() - 0.5) * 0.4; // Random factor between 0.8 and 1.2
-  const randomizedMs = ms * randomFactor;
-
-  return new Promise((resolve) => {
-    setTimeout(resolve, randomizedMs);
-  });
-};
+const BATCH_SIZE = 2500;
 
 const counter: Record<string, { success: number; error: number }> = {
   subscriberGlobal: { success: 0, error: 0 },
@@ -172,17 +158,32 @@ async function migrateWorkflowPreferences(
 
   let batch: NotificationTemplateEntity[] = [];
   let document: any;
+
+  /**
+   * Promise to handle the processing of the current batch.
+   *
+   * This promise is only awaited after the batch becomes full, enabling the batch
+   * refill to occur in the background while the previous batch is being processed.
+   */
+  let processingPromise: Promise<void> | null = null;
+
   while ((document = await workflowPreferenceCursor.next())) {
     batch.push(document);
 
     if (batch.length === BATCH_SIZE) {
-      await processWorkflowBatch(batch, upsertPreferences, workflowPreferenceRepository);
+      if (processingPromise) {
+        await processingPromise;
+      }
+      processingPromise = processWorkflowBatch(batch, upsertPreferences, workflowPreferenceRepository);
       batch = [];
     }
   }
 
   // Process any remaining documents in the batch
   if (batch.length > 0) {
+    if (processingPromise) {
+      await processingPromise;
+    }
     await processWorkflowBatch(batch, upsertPreferences, workflowPreferenceRepository);
   }
 
@@ -267,17 +268,32 @@ async function migrateSubscriberPreferences(
 
   let batch: SubscriberPreferenceEntity[] = [];
   let document: any;
+
+  /**
+   * Promise to handle the processing of the current batch.
+   *
+   * This promise is only awaited after the batch becomes full, enabling the batch
+   * refill to occur in the background while the previous batch is being processed.
+   */
+  let processingPromise: Promise<void> | null = null;
+
   while ((document = await subscriberPreferenceCursor.next())) {
     batch.push(document);
 
     if (batch.length === BATCH_SIZE) {
-      await processSubscriberBatch(batch, upsertPreferences);
+      if (processingPromise) {
+        await processingPromise;
+      }
+      processingPromise = processSubscriberBatch(batch, upsertPreferences);
       batch = [];
     }
   }
 
   // Process any remaining documents in the batch
   if (batch.length > 0) {
+    if (processingPromise) {
+      await processingPromise;
+    }
     await processSubscriberBatch(batch, upsertPreferences);
   }
 
