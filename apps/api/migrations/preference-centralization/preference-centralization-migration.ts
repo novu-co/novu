@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-/* eslint-disable no-cond-assign */
+
 /* eslint-disable no-console */
 import '../../src/config';
 
@@ -149,15 +149,9 @@ async function migrateWorkflowPreferences(
     console.log(`Starting from workflow preference ID: ${startWorkflowId}`);
     query = { _id: { $gt: startWorkflowId } };
   }
-  const workflowPreferenceCursor = await workflowPreferenceRepository._model
-    .find(query)
-    .select({ _id: 1, _environmentId: 1, _organizationId: 1, _creatorId: 1, critical: 1, preferenceSettings: 1 })
-    .sort({ _id: 1 })
-    .read('secondaryPreferred')
-    .cursor({ batchSize: BATCH_SIZE });
 
-  let batch: NotificationTemplateEntity[] = [];
-  let document: any;
+  let hasMore = true;
+  let skip = 0;
 
   /**
    * Promise to handle the processing of the current batch.
@@ -167,24 +161,33 @@ async function migrateWorkflowPreferences(
    */
   let processingPromise: Promise<void> | null = null;
 
-  while ((document = await workflowPreferenceCursor.next())) {
-    batch.push(document);
+  while (hasMore) {
+    const batch = await workflowPreferenceRepository._model
+      .find(query)
+      .select({ _id: 1, _environmentId: 1, _organizationId: 1, _creatorId: 1, critical: 1, preferenceSettings: 1 })
+      .sort({ _id: 1 })
+      .skip(skip)
+      .limit(BATCH_SIZE)
+      .read('secondaryPreferred');
 
-    if (batch.length === BATCH_SIZE) {
+    if (batch.length > 0) {
       if (processingPromise) {
         await processingPromise;
       }
-      processingPromise = processWorkflowBatch(batch, upsertPreferences, workflowPreferenceRepository);
-      batch = [];
+      processingPromise = processWorkflowBatch(
+        batch as unknown as NotificationTemplateEntity[],
+        upsertPreferences,
+        workflowPreferenceRepository
+      );
+      skip += BATCH_SIZE;
+    } else {
+      hasMore = false;
     }
   }
 
-  // Process any remaining documents in the batch
-  if (batch.length > 0) {
-    if (processingPromise) {
-      await processingPromise;
-    }
-    await processWorkflowBatch(batch, upsertPreferences, workflowPreferenceRepository);
+  // Ensure the last batch is processed
+  if (processingPromise) {
+    await processingPromise;
   }
 
   console.log('end workflow preference migration');
@@ -259,15 +262,9 @@ async function migrateSubscriberPreferences(
     console.log(`Starting from subscriber preference ID: ${startSubscriberId}`);
     query = { _id: { $gt: startSubscriberId } };
   }
-  const subscriberPreferenceCursor = await subscriberPreferenceRepository._model
-    .find(query)
-    .select({ _id: 1, _environmentId: 1, _organizationId: 1, _subscriberId: 1, _templateId: 1, level: 1, channels: 1 })
-    .sort({ _id: 1 })
-    .read('secondaryPreferred')
-    .cursor({ batchSize: BATCH_SIZE });
 
-  let batch: SubscriberPreferenceEntity[] = [];
-  let document: any;
+  let hasMore = true;
+  let skip = 0;
 
   /**
    * Promise to handle the processing of the current batch.
@@ -277,24 +274,37 @@ async function migrateSubscriberPreferences(
    */
   let processingPromise: Promise<void> | null = null;
 
-  while ((document = await subscriberPreferenceCursor.next())) {
-    batch.push(document);
+  while (hasMore) {
+    const batch = await subscriberPreferenceRepository._model
+      .find(query)
+      .select({
+        _id: 1,
+        _environmentId: 1,
+        _organizationId: 1,
+        _subscriberId: 1,
+        _templateId: 1,
+        level: 1,
+        channels: 1,
+      })
+      .sort({ _id: 1 })
+      .skip(skip)
+      .limit(BATCH_SIZE)
+      .read('secondaryPreferred');
 
-    if (batch.length === BATCH_SIZE) {
+    if (batch.length > 0) {
       if (processingPromise) {
         await processingPromise;
       }
-      processingPromise = processSubscriberBatch(batch, upsertPreferences);
-      batch = [];
+      processingPromise = processSubscriberBatch(batch as unknown as SubscriberPreferenceEntity[], upsertPreferences);
+      skip += BATCH_SIZE;
+    } else {
+      hasMore = false;
     }
   }
 
-  // Process any remaining documents in the batch
-  if (batch.length > 0) {
-    if (processingPromise) {
-      await processingPromise;
-    }
-    await processSubscriberBatch(batch, upsertPreferences);
+  // Ensure the last batch is processed
+  if (processingPromise) {
+    await processingPromise;
   }
 
   console.log('end subscriber preference migration');
