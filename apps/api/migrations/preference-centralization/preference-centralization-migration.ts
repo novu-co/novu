@@ -23,9 +23,10 @@ import async from 'async';
 
 import { AppModule } from '../../src/app.module';
 
-const BATCH_SIZE = 5000;
+const RETRIEVAL_BATCH_SIZE = 1000;
+const PROCESS_BATCH_SIZE = 2500;
 const MAX_QUEUE_DEPTH = 25000;
-const MAX_QUEUE_TIMEOUT = 1000;
+const MAX_QUEUE_TIMEOUT = 100;
 
 const counter: Record<string, { success: number; error: number }> = {
   subscriberGlobal: { success: 0, error: 0 },
@@ -72,7 +73,7 @@ export async function preferenceCentralization(startWorkflowId?: string, startSu
   // Set up a logging interval to log the counter and last processed IDs every 10 seconds
   const logInterval = setInterval(() => {
     console.log('Current migration status:');
-    console.log({ counter });
+    console.log({ timestamp: new Date().toISOString(), counter });
     if (lastProcessedWorkflowId) {
       console.log(`Last processed workflow preference ID: ${lastProcessedWorkflowId}`);
     }
@@ -111,11 +112,17 @@ async function migrateWorkflowPreferences(
   const recordQueue = async.queue<NotificationTemplateEntity>(async (record, callback) => {
     await processWorkflowRecord(record, upsertPreferences, workflowPreferenceRepository);
     callback();
-  }, BATCH_SIZE);
+  }, PROCESS_BATCH_SIZE);
 
   let hasMore = true;
   let skip = 0;
   while (hasMore) {
+    if (recordQueue.length() >= MAX_QUEUE_DEPTH) {
+      await new Promise((resolve) => {
+        setTimeout(resolve, MAX_QUEUE_TIMEOUT);
+      });
+      continue;
+    }
     const batch = await workflowPreferenceRepository._model
       .find(query)
       .select({
@@ -128,26 +135,19 @@ async function migrateWorkflowPreferences(
       })
       .sort({ _id: 1 })
       .skip(skip)
-      .limit(BATCH_SIZE)
+      .limit(RETRIEVAL_BATCH_SIZE)
       .read('secondaryPreferred');
 
-    if (recordQueue.length() >= MAX_QUEUE_DEPTH) {
-      await new Promise((resolve) => {
-        setTimeout(resolve, MAX_QUEUE_TIMEOUT);
-      });
-    } else if (batch.length > 0) {
+    if (batch.length > 0) {
       recordQueue.push(batch as unknown as NotificationTemplateEntity[]);
-      skip += BATCH_SIZE;
+      skip += RETRIEVAL_BATCH_SIZE;
     } else {
       hasMore = false;
     }
-    console.log('GOING');
   }
 
   // Wait for all records to be processed
-  console.log('DRAINING');
   await recordQueue.drain();
-  console.log('DONE');
 
   console.log('end workflow preference migration');
 }
@@ -208,11 +208,18 @@ async function migrateSubscriberPreferences(
   const recordQueue = async.queue<SubscriberPreferenceEntity>(async (record, callback) => {
     await processSubscriberRecord(record, upsertPreferences);
     callback();
-  }, BATCH_SIZE);
+  }, PROCESS_BATCH_SIZE);
 
   let hasMore = true;
   let skip = 0;
   while (hasMore) {
+    if (recordQueue.length() >= MAX_QUEUE_DEPTH) {
+      await new Promise((resolve) => {
+        setTimeout(resolve, MAX_QUEUE_TIMEOUT);
+      });
+      continue;
+    }
+
     const batch = await subscriberPreferenceRepository._model
       .find(query)
       .select({
@@ -226,16 +233,12 @@ async function migrateSubscriberPreferences(
       })
       .sort({ _id: 1 })
       .skip(skip)
-      .limit(BATCH_SIZE)
+      .limit(RETRIEVAL_BATCH_SIZE)
       .read('secondaryPreferred');
 
-    if (recordQueue.length() >= MAX_QUEUE_DEPTH) {
-      await new Promise((resolve) => {
-        setTimeout(resolve, MAX_QUEUE_TIMEOUT);
-      });
-    } else if (batch.length > 0) {
+    if (batch.length > 0) {
       recordQueue.push(batch as unknown as SubscriberPreferenceEntity[]);
-      skip += BATCH_SIZE;
+      skip += RETRIEVAL_BATCH_SIZE;
     } else {
       hasMore = false;
     }
