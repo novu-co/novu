@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
-import { Flex, Group, Overlay, OverlayProps, UnstyledButton, useMantineColorScheme } from '@mantine/core';
+import { Flex, Group, Overlay, type OverlayProps, UnstyledButton, useMantineColorScheme } from '@mantine/core';
 import { colors, PencilOutlined, Text } from '@novu/design-system';
-import { StepTypeEnum } from '@novu/shared';
-import { PropsWithChildren } from 'react';
+import { type StepTypeEnum } from '@novu/shared';
+import { type PropsWithChildren } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useBasePath } from '../../../../pages/templates/hooks/useBasePath';
 

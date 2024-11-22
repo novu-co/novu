@@ -1,14 +1,14 @@
 import {
   ChannelTypeEnum,
-  IPushOptions,
-  IPushProvider,
-  ISendMessageSuccessResponse,
+  type IPushOptions,
+  type IPushProvider,
+  type ISendMessageSuccessResponse,
 } from '@novu/stateless';
 import crypto from 'crypto';
 import axios from 'axios';
 import { PushProviderIdEnum } from '@novu/shared';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 export class PushWebhookPushProvider
   extends BaseProvider

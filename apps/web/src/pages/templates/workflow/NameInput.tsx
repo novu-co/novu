@@ -2,7 +2,7 @@ import { TextInput, useMantineColorScheme } from '@mantine/core';
 import { colors } from '@novu/notification-center';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useEnvironment } from '../../../hooks';
-import { IForm } from '../components/formTypes';
+import { type IForm } from '../components/formTypes';
 import { useTemplateEditorForm } from '../components/TemplateEditorFormProvider';
 
 export const NameInput = () => {

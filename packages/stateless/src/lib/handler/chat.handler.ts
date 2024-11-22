@@ -1,9 +1,12 @@
 import {
-  IContentEngine,
+  type IContentEngine,
   HandlebarsContentEngine,
 } from '../content/content.engine';
-import { IChatProvider } from '../provider/provider.interface';
-import { IMessage, ITriggerPayload } from '../template/template.interface';
+import { type IChatProvider } from '../provider/provider.interface';
+import {
+  type IMessage,
+  type ITriggerPayload,
+} from '../template/template.interface';
 
 export class ChatHandler {
   private readonly contentEngine: IContentEngine;

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { api } from '../../../api';
-import { ITranslation } from './useFetchTranslationGroup';
+import { type ITranslation } from './useFetchTranslationGroup';
 
 export const useFetchTranslation = (identifier?: string, locale?: string) => {
   const { data, ...rest } = useQuery<ITranslation>(

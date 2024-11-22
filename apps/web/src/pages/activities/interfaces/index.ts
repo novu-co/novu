@@ -1,5 +1,5 @@
-import { ScriptableContext } from 'chart.js';
-import { ChannelTypeEnum } from '@novu/shared';
+import { type ScriptableContext } from 'chart.js';
+import { type ChannelTypeEnum } from '@novu/shared';
 
 export interface IChartData {
   datasets: IDataSet[];

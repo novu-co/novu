@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Title, successMessage } from '@novu/design-system';
-import { ApiServiceLevelEnum } from '@novu/shared';
+import { type ApiServiceLevelEnum } from '@novu/shared';
 import { HubspotForm } from './HubspotForm';
 import { HUBSPOT_FORM_IDS } from '../utils/hubspot.constants';
 import { useAuth } from '../../../hooks/useAuth';

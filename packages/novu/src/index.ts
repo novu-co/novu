@@ -3,10 +3,10 @@
 import { Command } from 'commander';
 import { green } from 'picocolors';
 import { v4 as uuidv4 } from 'uuid';
-import { devCommand, DevCommandOptions } from './commands';
+import { devCommand, type DevCommandOptions } from './commands';
 import { sync } from './commands/sync';
 import { AnalyticService, ConfigService } from './services';
-import { IInitCommandOptions, init } from './commands/init';
+import { type IInitCommandOptions, init } from './commands/init';
 
 const analytics = new AnalyticService();
 export const config = new ConfigService();

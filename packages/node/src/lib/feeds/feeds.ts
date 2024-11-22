@@ -1,4 +1,4 @@
-import { IFeeds } from './feeds.interface';
+import { type IFeeds } from './feeds.interface';
 import { WithHttp } from '../novu.interface';
 
 export class Feeds extends WithHttp implements IFeeds {

@@ -1,10 +1,10 @@
-import { SoftDeleteModel } from 'mongoose-delete';
+import { type SoftDeleteModel } from 'mongoose-delete';
 
-import { IWorkflowOverride } from '@novu/shared';
+import { type IWorkflowOverride } from '@novu/shared';
 
 import { BaseRepository } from '../base-repository';
-import { EnforceEnvId } from '../../types';
-import { WorkflowOverrideDBModel, WorkflowOverrideEntity } from './workflow-override.entity';
+import { type EnforceEnvId } from '../../types';
+import { type WorkflowOverrideDBModel, WorkflowOverrideEntity } from './workflow-override.entity';
 import { WorkflowOverride } from './workflow-override.schema';
 
 export class WorkflowOverrideRepository extends BaseRepository<

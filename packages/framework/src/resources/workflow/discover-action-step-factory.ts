@@ -1,4 +1,4 @@
-import { ActionStepEnum } from '../../constants';
+import { type ActionStepEnum } from '../../constants';
 import { emptySchema } from '../../schemas';
 import type { Awaitable, DiscoverWorkflowOutput, Schema, ActionStep, StepOptions, FromSchema } from '../../types';
 import { transformSchema } from '../../validators';

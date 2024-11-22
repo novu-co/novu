@@ -1,4 +1,4 @@
-import { URLSearchParamsInit, useSearchParams } from 'react-router-dom';
+import { type URLSearchParamsInit, useSearchParams } from 'react-router-dom';
 
 import { useSegment } from '../../../../../components/providers/SegmentProvider';
 

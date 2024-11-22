@@ -2,7 +2,7 @@ import { type Sidebar } from '@novu/design-system';
 import { passwordConstraints } from '@novu/shared';
 import { type ComponentProps } from 'react';
 import { type RegisterOptions } from 'react-hook-form';
-import { UserProfileFlow } from './UserProfileFlow.const';
+import { type UserProfileFlow } from './UserProfileFlow.const';
 
 export interface IUserProfilePasswordEmailVerificationProps {
   email: string;

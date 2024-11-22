@@ -1,5 +1,5 @@
 import type { AppearanceKey } from '../../types';
-import { ClassName, cn, useStyle } from '../../helpers';
+import { type ClassName, cn, useStyle } from '../../helpers';
 
 type SkeletonTextProps = { appearanceKey: AppearanceKey; class?: ClassName };
 export const SkeletonText = (props: SkeletonTextProps) => {

@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
-import { UserDBModel } from './user.entity';
+import { type UserDBModel } from './user.entity';
 
 const userSchema = new Schema<UserDBModel>(
   {

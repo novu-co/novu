@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
-import { ColorScheme, useMantineTheme } from '@mantine/core';
-import { IFeedEntity } from '@novu/shared';
+import { type ColorScheme, useMantineTheme } from '@mantine/core';
+import { type IFeedEntity } from '@novu/shared';
 import type { UseFormSetValue } from 'react-hook-form';
 
 import { colors, shadows, DotsHorizontal } from '@novu/design-system';

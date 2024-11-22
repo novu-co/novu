@@ -1,7 +1,7 @@
-import { CoreProps } from '@novu/novui';
+import { type CoreProps } from '@novu/novui';
 import { css, cx } from '@novu/novui/css';
 import { Container } from '@novu/novui/jsx';
-import { FC, PropsWithChildren } from 'react';
+import { type FC, type PropsWithChildren } from 'react';
 
 export type IPageContainerProps = CoreProps;
 

@@ -6,10 +6,10 @@ import type {
   TemplateVariableTypeEnum,
   WorkflowTypeEnum,
 } from '../../types';
-import { ControlSchemas, IMessageTemplate } from '../message-template';
-import { IPreferenceChannels } from '../subscriber-preference';
-import { IWorkflowStepMetadata } from '../step';
-import { INotificationGroup } from '../notification-group';
+import { type ControlSchemas, type IMessageTemplate } from '../message-template';
+import { type IPreferenceChannels } from '../subscriber-preference';
+import { type IWorkflowStepMetadata } from '../step';
+import { type INotificationGroup } from '../notification-group';
 import type { ContentIssue, ControlsDto, JSONSchemaDto, StepIssue } from '../../index';
 
 export interface INotificationTemplate {

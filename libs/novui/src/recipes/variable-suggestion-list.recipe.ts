@@ -1,4 +1,4 @@
-import { ComboboxStylesNames } from '@mantine/core';
+import { type ComboboxStylesNames } from '@mantine/core';
 import { defineSlotRecipe } from '@pandacss/dev';
 import { SELECT_RECIPE } from './select.recipe';
 

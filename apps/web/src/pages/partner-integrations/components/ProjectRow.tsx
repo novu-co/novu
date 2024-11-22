@@ -1,13 +1,13 @@
 import { forwardRef, useRef, useEffect } from 'react';
 import { Box, Group, CloseButton } from '@mantine/core';
-import { useWatch, Control, Controller } from 'react-hook-form';
+import { useWatch, type Control, Controller } from 'react-hook-form';
 import { useIntersection } from '@mantine/hooks';
 import type { FetchNextPageOptions, InfiniteQueryObserverResult } from '@tanstack/react-query';
 import { IOrganizationEntity } from '@novu/shared';
 
 import { Text, Select, IconOutlineArrowLeft, IconOutlineArrowRight } from '@novu/design-system';
-import { OrganizationMembershipResource } from '@clerk/types';
-import { ProjectLinkFormValues } from './LinkProjectContainer';
+import { type OrganizationMembershipResource } from '@clerk/types';
+import { type ProjectLinkFormValues } from './LinkProjectContainer';
 
 type ProjectDataType = {
   id: string;

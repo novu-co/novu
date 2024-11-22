@@ -1,4 +1,4 @@
-import { EventHandler, Events, SocketEventNames } from '@novu/js';
+import { type EventHandler, type Events, type SocketEventNames } from '@novu/js';
 import { useEffect } from 'react';
 import { useNovu } from '../NovuProvider';
 import { requestLock } from '../../utils/requestLock';

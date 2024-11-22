@@ -1,6 +1,6 @@
-import { IElasticacheClusterProviderConfig } from './elasticache-cluster-provider';
-import { IRedisClusterProviderConfig } from './redis-cluster-provider';
-import { IMemoryDbClusterProviderConfig } from './memory-db-cluster-provider';
+import { type IElasticacheClusterProviderConfig } from './elasticache-cluster-provider';
+import { type IRedisClusterProviderConfig } from './redis-cluster-provider';
+import { type IMemoryDbClusterProviderConfig } from './memory-db-cluster-provider';
 
 import { getClientAndConfigForCluster } from './index';
 

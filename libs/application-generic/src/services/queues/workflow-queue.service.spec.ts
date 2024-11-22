@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { WorkflowQueueService } from './workflow-queue.service';
 import { BullMqService } from '../bull-mq';
 import { WorkflowInMemoryProviderService } from '../in-memory-provider';
-import { IWorkflowDataDto } from '../../dtos';
+import { type IWorkflowDataDto } from '../../dtos';
 
 let workflowQueueService: WorkflowQueueService;
 

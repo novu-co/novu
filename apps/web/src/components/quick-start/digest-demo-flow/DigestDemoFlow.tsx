@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Skeleton } from '@mantine/core';
 import { useResizeObserver } from '@mantine/hooks';
-import ReactFlow, { Edge, Node, useReactFlow } from 'react-flow-renderer';
+import ReactFlow, { type Edge, type Node, useReactFlow } from 'react-flow-renderer';
 
 import { TriggerNode } from './TriggerNode';
 import { DigestNode } from './DigestNode';

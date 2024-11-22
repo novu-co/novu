@@ -1,16 +1,16 @@
 import {
   ChannelTypeEnum,
-  IEmailOptions,
-  IEmailProvider,
-  ISendMessageSuccessResponse,
-  ICheckIntegrationResponse,
+  type IEmailOptions,
+  type IEmailProvider,
+  type ISendMessageSuccessResponse,
+  type ICheckIntegrationResponse,
   CheckIntegrationResponseEnum,
 } from '@novu/stateless';
 import type { Message, SMTPClient, MessageAttachment } from 'emailjs';
 import { EmailProviderIdEnum } from '@novu/shared';
-import { IEmailJsConfig } from './emailjs.config';
+import { type IEmailJsConfig } from './emailjs.config';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 export class EmailJsProvider extends BaseProvider implements IEmailProvider {
   protected casing: CasingEnum = CasingEnum.KEBAB_CASE;

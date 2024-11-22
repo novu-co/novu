@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import { UserSession, WorkflowOverrideService } from '@novu/testing';
-import { IUpdateWorkflowOverrideRequestDto } from '@novu/shared';
+import { type IUpdateWorkflowOverrideRequestDto } from '@novu/shared';
 
 describe('Update Workflow Override By ID - /workflow-overrides/:overrideId (PUT)', function () {
   let session: UserSession;

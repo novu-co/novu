@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 import { ChannelTypeEnum } from '@novu/shared';
 import { schemaOptions } from '../schema-default.options';
-import { PreferencesDBModel } from './preferences.entity';
+import { type PreferencesDBModel } from './preferences.entity';
 
 const mongooseDelete = require('mongoose-delete');
 

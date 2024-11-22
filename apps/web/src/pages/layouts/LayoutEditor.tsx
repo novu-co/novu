@@ -4,7 +4,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { parse } from '@handlebars/parser';
 import { useClipboard } from '@mantine/hooks';
-import { getTemplateVariables, ITemplateVariable, isReservedVariableName, LayoutId, slugify } from '@novu/shared';
+import {
+  getTemplateVariables,
+  type ITemplateVariable,
+  isReservedVariableName,
+  type LayoutId,
+  slugify,
+} from '@novu/shared';
 import {
   ArrowLeft,
   Check,

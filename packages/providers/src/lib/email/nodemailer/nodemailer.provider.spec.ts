@@ -1,7 +1,7 @@
 import { vi, describe, test, expect, afterEach } from 'vitest';
 
 import nodemailer from 'nodemailer';
-import { ConnectionOptions } from 'tls';
+import { type ConnectionOptions } from 'tls';
 import { fail } from 'assert';
 import { NodemailerProvider } from './nodemailer.provider';
 

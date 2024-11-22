@@ -1,4 +1,4 @@
-import { TabsStylesNames } from '@mantine/core';
+import { type TabsStylesNames } from '@mantine/core';
 import { defineSlotRecipe } from '@pandacss/dev';
 
 const SLOTS: TabsStylesNames[] = ['root', 'list', 'panel', 'tab', 'tabLabel', 'tabSection'];

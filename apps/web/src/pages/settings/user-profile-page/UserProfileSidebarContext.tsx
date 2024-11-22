@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren } from 'react';
+import { createContext, type PropsWithChildren } from 'react';
 import { useUserProfileSetPassword } from './useUserProfileSetPassword';
 
 export type IUserProfileSidebarContext = ReturnType<typeof useUserProfileSetPassword>;

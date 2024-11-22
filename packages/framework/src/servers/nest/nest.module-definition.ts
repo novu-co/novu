@@ -1,5 +1,5 @@
 import { ConfigurableModuleBuilder } from '@nestjs/common';
-import { NovuModuleOptions } from './nest.interface';
+import { type NovuModuleOptions } from './nest.interface';
 
 // use ConfigurableModuleBuilder, because building dynamic modules from scratch is painful
 export const {

@@ -1,4 +1,4 @@
-import { IUserEntity } from '@novu/shared';
+import { type IUserEntity } from '@novu/shared';
 import { ROUTES } from '../../../constants/routes';
 import { parseUrl } from '../../../utils/routeUtils';
 

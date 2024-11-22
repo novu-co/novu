@@ -1,6 +1,6 @@
-import { ChannelTypeEnum, WorkflowPreferencesPartial } from '@novu/shared';
+import { ChannelTypeEnum, type WorkflowPreferencesPartial } from '@novu/shared';
 import { WorkflowChannelEnum } from '../../constants';
-import { WorkflowPreferences } from '../../types';
+import { type WorkflowPreferences } from '../../types';
 
 /** Correlate user-friendly channels to system-friendly channels */
 const CHANNEL_TYPE_FROM_WORKFLOW_CHANNEL: Record<WorkflowChannelEnum, ChannelTypeEnum> = {

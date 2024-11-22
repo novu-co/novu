@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { type FC } from 'react';
 import { IS_SELF_HOSTED } from '../../../config';
 import { UpgradePlanBanner as Component } from '../../../ee/billing';
 

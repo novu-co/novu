@@ -12,7 +12,7 @@ import { ROUTES } from '../../../constants/routes';
 import { errorMessage } from '../../../utils/notifications';
 import { useNotificationGroup, useTemplates, useIntegrations } from '../../../hooks';
 import { FIRST_100_WORKFLOWS } from '../../../constants/workflowConstants';
-import { IntegrationEntity } from '../../../pages/integrations/types';
+import { type IntegrationEntity } from '../../../pages/integrations/types';
 import { setIntegrationAsPrimary } from '../../integration';
 
 export const useCreateOnboardingExperimentWorkflow = () => {

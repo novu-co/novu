@@ -1,9 +1,9 @@
 import { ChannelTypeEnum } from '@novu/shared';
 import { WithHttp } from '../novu.interface';
 import {
-  IIntegrations,
-  IIntegrationsPayload,
-  IIntegrationsUpdatePayload,
+  type IIntegrations,
+  type IIntegrationsPayload,
+  type IIntegrationsUpdatePayload,
 } from './integrations.interface';
 
 export class Integrations extends WithHttp implements IIntegrations {

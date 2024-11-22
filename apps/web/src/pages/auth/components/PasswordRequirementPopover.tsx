@@ -1,6 +1,6 @@
-import { useState, useMemo, PropsWithChildren } from 'react';
+import { useState, useMemo, type PropsWithChildren } from 'react';
 import { Text, Box, createStyles, Popover } from '@mantine/core';
-import { Control, useWatch } from 'react-hook-form';
+import { type Control, useWatch } from 'react-hook-form';
 import { Check, Close, colors } from '@novu/design-system';
 import { PasswordStrengthBar } from './PasswordStrengthBar';
 

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMantineTheme, Group, Container, Card } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { useFormContext, useFieldArray } from 'react-hook-form';
-import { EmailBlockTypeEnum, IEmailBlock, FeatureFlagsKeysEnum } from '@novu/shared';
+import { EmailBlockTypeEnum, type IEmailBlock, FeatureFlagsKeysEnum } from '@novu/shared';
 
 import { Upload, colors, Text } from '@novu/design-system';
 import { ContentRow } from './ContentRow';

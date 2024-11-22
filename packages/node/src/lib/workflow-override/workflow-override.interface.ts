@@ -1,4 +1,7 @@
-import { IPreferenceChannels, WorkflowOverrideId } from '@novu/shared';
+import {
+  type IPreferenceChannels,
+  type WorkflowOverrideId,
+} from '@novu/shared';
 
 export interface IWorkflowOverrides {
   create(data: IWorkflowOverridePayload);

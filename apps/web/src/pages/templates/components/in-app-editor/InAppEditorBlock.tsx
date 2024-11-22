@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
-import { IMessageAction, MessageActionStatusEnum } from '@novu/shared';
+import { type IMessageAction, MessageActionStatusEnum } from '@novu/shared';
 import { colors, errorMessage } from '@novu/design-system';
 import { useMutation } from '@tanstack/react-query';
 import { Center, Loader } from '@mantine/core';

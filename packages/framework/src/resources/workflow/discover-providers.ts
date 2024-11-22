@@ -1,7 +1,7 @@
-import { ChannelStepEnum } from '../../constants';
+import { type ChannelStepEnum } from '../../constants';
 import { providerSchemas } from '../../schemas';
 import type { Awaitable, DiscoverStepOutput } from '../../types';
-import { WithPassthrough } from '../../types/provider.types';
+import { type WithPassthrough } from '../../types/provider.types';
 import { transformSchema } from '../../validators';
 
 export async function discoverProviders(

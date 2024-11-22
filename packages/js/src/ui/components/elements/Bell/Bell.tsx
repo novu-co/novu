@@ -1,6 +1,6 @@
-import { Component, Show } from 'solid-js';
+import { type Component, Show } from 'solid-js';
 import { useTotalUnreadCount } from '../../../context';
-import { BellRenderer } from '../../../types';
+import { type BellRenderer } from '../../../types';
 import { ExternalElementRenderer } from '../../ExternalElementRenderer';
 import { BellContainer } from './DefaultBellContainer';
 

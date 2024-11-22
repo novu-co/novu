@@ -1,5 +1,5 @@
 import { MantineProvider } from '@mantine/core';
-import { FC, PropsWithChildren } from 'react';
+import { type FC, type PropsWithChildren } from 'react';
 import { IconProvider } from '../icons/IconProvider';
 import { MANTINE_THEME } from './mantine-theme.config';
 

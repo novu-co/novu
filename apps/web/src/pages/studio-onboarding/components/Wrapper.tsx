@@ -1,5 +1,5 @@
 import { css, cx } from '@novu/novui/css';
-import { ReactNode, useEffect } from 'react';
+import { type ReactNode, useEffect } from 'react';
 
 export const Wrapper = ({ children, className }: { children: ReactNode; className?: string }) => {
   useEffect(() => {

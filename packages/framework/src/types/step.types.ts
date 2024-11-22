@@ -1,7 +1,7 @@
-import { ChannelStepEnum } from '../constants';
-import { actionStepSchemas } from '../schemas/steps/actions';
-import { digestRegularOutputSchema, digestTimedOutputSchema } from '../schemas/steps/actions/digest.schema';
-import { channelStepSchemas } from '../schemas/steps/channels';
+import { type ChannelStepEnum } from '../constants';
+import { type actionStepSchemas } from '../schemas/steps/actions';
+import { type digestRegularOutputSchema, type digestTimedOutputSchema } from '../schemas/steps/actions/digest.schema';
+import { type channelStepSchemas } from '../schemas/steps/channels';
 import type { Providers } from './provider.types';
 import type { FromSchema, FromSchemaUnvalidated, Schema } from './schema.types';
 import type { Skip } from './skip.types';

@@ -3,14 +3,14 @@ import styled from '@emotion/styled';
 import { useFormContext } from 'react-hook-form';
 import { ScrollArea } from '@mantine/core';
 import { useParams } from 'react-router-dom';
-import { StepTypeEnum } from '@novu/shared';
+import { type StepTypeEnum } from '@novu/shared';
 import { When } from '@novu/design-system';
 import { useEnvironment } from '../../../hooks';
 
 import { FloatingButton } from './FloatingButton';
 import { VariantItemCard } from './VariantItemCard';
 import { ItemTypeEnum } from './useVariantListErrors';
-import { IForm } from './formTypes';
+import { type IForm } from './formTypes';
 import { VariantsListErrors } from './VariantsListErrors';
 import { useVariantListErrorsNavigation } from './useVariantListErrorsNavigation';
 

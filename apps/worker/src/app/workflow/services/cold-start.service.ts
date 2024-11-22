@@ -1,5 +1,5 @@
-import { INestApplication } from '@nestjs/common';
-import { INovuWorker, ReadinessService } from '@novu/application-generic';
+import { type INestApplication } from '@nestjs/common';
+import { type INovuWorker, ReadinessService } from '@novu/application-generic';
 
 const getWorkers = (app: INestApplication): INovuWorker[] => {
   const workers = app.get('ACTIVE_WORKERS');

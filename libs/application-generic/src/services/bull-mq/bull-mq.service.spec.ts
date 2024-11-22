@@ -2,7 +2,7 @@ import { JobTopicNameEnum } from '@novu/shared';
 
 import {
   BullMqService,
-  QueueBaseOptions,
+  type QueueBaseOptions,
   WorkerOptions,
 } from './bull-mq.service';
 import { WorkflowInMemoryProviderService } from '../in-memory-provider';

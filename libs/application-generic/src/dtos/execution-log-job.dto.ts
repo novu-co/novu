@@ -1,13 +1,16 @@
 import {
-  ExecutionDetailsSourceEnum,
-  ExecutionDetailsStatusEnum,
-  StepTypeEnum,
+  type ExecutionDetailsSourceEnum,
+  type ExecutionDetailsStatusEnum,
+  type StepTypeEnum,
 } from '@novu/shared';
-import { EmailEventStatusEnum, SmsEventStatusEnum } from '@novu/stateless';
+import {
+  type EmailEventStatusEnum,
+  type SmsEventStatusEnum,
+} from '@novu/stateless';
 
 import {
-  IBulkJobParams,
-  IJobParams,
+  type IBulkJobParams,
+  type IJobParams,
 } from '../services/queues/queue-base.service';
 
 export interface IExecutionLogJobDataDto {

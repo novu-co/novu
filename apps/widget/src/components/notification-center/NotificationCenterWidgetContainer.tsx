@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { IMessage, ButtonTypeEnum } from '@novu/shared';
+import { type IMessage, type ButtonTypeEnum } from '@novu/shared';
 import { NotificationCenterWidget } from './NotificationCenterWidget';
 
 export interface INotificationCenterWidgetContainerProps {

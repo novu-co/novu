@@ -1,6 +1,6 @@
-import { Types } from 'mongoose';
+import { type Types } from 'mongoose';
 
-import { EnvironmentId, OrganizationId, TopicId, TopicKey, TopicName } from './types';
+import { type EnvironmentId, type OrganizationId, type TopicId, type TopicKey, type TopicName } from './types';
 
 export class TopicEntity {
   _id: TopicId;

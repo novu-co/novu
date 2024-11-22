@@ -1,6 +1,11 @@
 import { expect, describe, it } from 'vitest';
 import { buildWorkflowPreferences } from './buildWorkflowPreferences';
-import { ChannelPreference, WorkflowPreferencesPartial, WorkflowPreferences, WorkflowPreference } from '../types';
+import {
+  type ChannelPreference,
+  type WorkflowPreferencesPartial,
+  type WorkflowPreferences,
+  type WorkflowPreference,
+} from '../types';
 
 const WORKFLOW_CHANNEL_PREFERENCE_DEFAULT_VALUE = true;
 const WORKFLOW_CHANNEL_PREFERENCE_DEFAULT_READ_ONLY = false;

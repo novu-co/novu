@@ -1,4 +1,4 @@
-import { ITheme } from './theme.interface';
+import { type ITheme } from './theme.interface';
 
 interface IThemeStorage {
   id: string;

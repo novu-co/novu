@@ -1,5 +1,5 @@
-import { IUserEntity } from '../user';
-import { MemberRoleEnum } from './member.enum';
+import { type IUserEntity } from '../user';
+import { type MemberRoleEnum } from './member.enum';
 
 export enum MemberStatusEnum {
   NEW = 'new',

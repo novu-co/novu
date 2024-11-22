@@ -1,4 +1,4 @@
-import { JsonSchemaFormSectionVariant } from '../../styled-system/recipes';
+import { type JsonSchemaFormSectionVariant } from '../../styled-system/recipes';
 import {
   AUTOCOMPLETE_CLOSE_TAG,
   AUTOCOMPLETE_OPEN_TAG,

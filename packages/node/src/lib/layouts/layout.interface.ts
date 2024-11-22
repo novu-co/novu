@@ -1,11 +1,11 @@
 import {
-  ITemplateVariable,
-  LayoutDescription,
+  type ITemplateVariable,
+  type LayoutDescription,
   LayoutDto,
   LayoutId,
-  LayoutName,
-  LayoutIdentifier,
-  OrderDirectionEnum,
+  type LayoutName,
+  type LayoutIdentifier,
+  type OrderDirectionEnum,
 } from '@novu/shared';
 
 export { LayoutDto, LayoutId };

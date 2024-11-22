@@ -1,9 +1,9 @@
 import { SubscribersService, UserSession } from '@novu/testing';
-import { SubscriberEntity, TopicSubscribersRepository } from '@novu/dal';
-import { ExternalSubscriberId, TopicKey } from '@novu/shared';
+import { type SubscriberEntity, TopicSubscribersRepository } from '@novu/dal';
+import { type ExternalSubscriberId, type TopicKey } from '@novu/shared';
 import { expect } from 'chai';
 
-import { CreateTopicResponseDto } from '../dtos';
+import { type CreateTopicResponseDto } from '../dtos';
 
 const BASE_PATH = '/v1/topics';
 

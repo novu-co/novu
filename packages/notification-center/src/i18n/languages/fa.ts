@@ -1,4 +1,4 @@
-import { ITranslationEntry } from '../lang';
+import { type ITranslationEntry } from '../lang';
 
 export const FA: ITranslationEntry = {
   translations: {

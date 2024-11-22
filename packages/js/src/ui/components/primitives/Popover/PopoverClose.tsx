@@ -1,4 +1,4 @@
-import { JSX, splitProps } from 'solid-js';
+import { type JSX, splitProps } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 import { usePopover } from '.';
 

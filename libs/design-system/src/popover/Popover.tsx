@@ -1,6 +1,6 @@
-import { MouseEventHandler, ReactNode } from 'react';
+import { type MouseEventHandler, type ReactNode } from 'react';
 import styled from '@emotion/styled';
-import { Popover as MantinePopover, PopoverProps as MantinePopoverProps, useMantineTheme } from '@mantine/core';
+import { Popover as MantinePopover, type PopoverProps as MantinePopoverProps, useMantineTheme } from '@mantine/core';
 
 import { colors, shadows } from '../config';
 import { Label } from '../typography/label';

@@ -1,5 +1,5 @@
-import { FC, useState } from 'react';
-import { QueryObserverResult } from '@tanstack/react-query';
+import { type FC, useState } from 'react';
+import { type QueryObserverResult } from '@tanstack/react-query';
 import { showNotification } from '@mantine/notifications';
 // TODO: replace with Novui Code Block when available
 import { Prism } from '@mantine/prism';

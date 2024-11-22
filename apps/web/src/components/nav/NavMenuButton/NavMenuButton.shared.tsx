@@ -1,10 +1,10 @@
-import { CoreProps, CorePropsWithChildren } from '@novu/novui';
+import { type CoreProps, type CorePropsWithChildren } from '@novu/novui';
 import { css, cx } from '@novu/novui/css';
-import { IIconProps } from '@novu/novui/icons';
+import { type IIconProps } from '@novu/novui/icons';
 import { HStack } from '@novu/novui/jsx';
-import { FC, ReactNode } from 'react';
+import { type FC, type ReactNode } from 'react';
 import { truncatedFlexTextCss } from '../../../studio/utils/shared.styles';
-import { LocalizedMessage } from '../../../types/LocalizedMessage';
+import { type LocalizedMessage } from '../../../types/LocalizedMessage';
 
 export type RightSideTrigger = 'hover';
 

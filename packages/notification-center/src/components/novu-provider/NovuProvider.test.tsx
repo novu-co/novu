@@ -5,15 +5,15 @@ import '@testing-library/jest-dom';
 import {
   ChannelCTATypeEnum,
   ChannelTypeEnum,
-  IMessage,
-  IOrganizationEntity,
+  type IMessage,
+  type IOrganizationEntity,
   ButtonTypeEnum,
   MessageActionStatusEnum,
-  IPaginatedResponse,
+  type IPaginatedResponse,
 } from '@novu/shared';
-import { IUserPreferenceSettings } from '@novu/client';
+import { type IUserPreferenceSettings } from '@novu/client';
 
-import { ISession } from '../../shared/interfaces';
+import { type ISession } from '../../shared/interfaces';
 import { NovuProvider } from '..';
 import { queryClient } from './NovuProvider';
 import { NotificationBell, PopoverNotificationCenter } from '../..';

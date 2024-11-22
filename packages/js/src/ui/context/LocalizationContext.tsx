@@ -1,4 +1,4 @@
-import { Accessor, createContext, createMemo, ParentProps, useContext } from 'solid-js';
+import { type Accessor, createContext, createMemo, type ParentProps, useContext } from 'solid-js';
 import { defaultLocalization, dynamicLocalization } from '../config/defaultLocalization';
 
 export type LocalizationKey = keyof typeof defaultLocalization;

@@ -1,7 +1,7 @@
 import {
   ChannelTypeEnum,
   EmailProviderIdEnum,
-  ICredentials,
+  type ICredentials,
 } from '@novu/shared';
 import { PlunkEmailProvider } from '@novu/providers';
 import { BaseHandler } from './base.handler';

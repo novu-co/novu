@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Container } from '@mantine/core';
-import { Row } from 'react-table';
-import { ITenantEntity } from '@novu/shared';
+import { type Row } from 'react-table';
+import { type ITenantEntity } from '@novu/shared';
 
 import { Table, When } from '@novu/design-system';
 import { columns } from './columns';

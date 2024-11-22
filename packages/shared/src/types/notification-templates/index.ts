@@ -1,5 +1,5 @@
-import { ChannelTypeEnum } from '../channel';
-import { CustomDataType } from '../shared';
+import { type ChannelTypeEnum } from '../channel';
+import { type CustomDataType } from '../shared';
 
 export type NotificationTemplateCustomData = CustomDataType;
 

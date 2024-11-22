@@ -1,4 +1,4 @@
-import { NotificationEvents, NovuEventEmitter } from '../event-emitter';
+import { type NotificationEvents, type NovuEventEmitter } from '../event-emitter';
 import type { ListNotificationsArgs, ListNotificationsResponse, Notification } from '../notifications';
 import type { NotificationFilter } from '../types';
 import { areTagsEqual, isSameFilter } from '../utils/notification-utils';

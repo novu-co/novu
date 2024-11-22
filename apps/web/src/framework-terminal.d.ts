@@ -1,4 +1,4 @@
-import { DOMAttributes } from 'react';
+import { type DOMAttributes } from 'react';
 
 type CustomElement<T> = Partial<T & DOMAttributes<T> & { children: any }>;
 

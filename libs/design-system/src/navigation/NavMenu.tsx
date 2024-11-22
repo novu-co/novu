@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { type ReactNode, useState } from 'react';
 import { NavLink as ReactNavLink } from 'react-router-dom';
 import { Group, Transition, Popover } from '@mantine/core';
 import useStyles from './NavMenu.styles';

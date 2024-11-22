@@ -11,8 +11,8 @@ import {
 import {
   MessageTemplateRepository,
   NotificationGroupRepository,
-  NotificationStepEntity,
-  NotificationTemplateEntity,
+  type NotificationStepEntity,
+  type NotificationTemplateEntity,
   NotificationTemplateRepository,
   FeedRepository,
   LayoutRepository,
@@ -20,7 +20,7 @@ import {
 } from '@novu/dal';
 import { v4 as uuid } from 'uuid';
 
-import { CreateTemplatePayload } from './create-notification-template.interface';
+import { type CreateTemplatePayload } from './create-notification-template.interface';
 
 export class NotificationTemplateService {
   constructor(

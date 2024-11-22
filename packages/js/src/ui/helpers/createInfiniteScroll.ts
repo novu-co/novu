@@ -1,4 +1,4 @@
-import { Accessor, batch, createComputed, createResource, createSignal, onCleanup, Setter } from 'solid-js';
+import { type Accessor, batch, createComputed, createResource, createSignal, onCleanup, type Setter } from 'solid-js';
 import { isServer } from 'solid-js/web';
 
 export function createInfiniteScroll<T>(fetcher: (page: number) => Promise<{ data: T[]; hasMore: boolean }>): [

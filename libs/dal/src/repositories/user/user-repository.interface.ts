@@ -1,5 +1,5 @@
-import { Types } from 'mongoose';
-import { IUserResetTokenCount, UserEntity } from './user.entity';
+import { type Types } from 'mongoose';
+import { type IUserResetTokenCount, type UserEntity } from './user.entity';
 
 export interface IUserRepository extends IUserRepositoryMongo {
   findByEmail(email: string): Promise<UserEntity | null>;

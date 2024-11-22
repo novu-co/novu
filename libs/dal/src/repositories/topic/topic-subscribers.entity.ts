@@ -1,12 +1,12 @@
 import type { ChangePropsValueType } from '../../types/helpers';
 import {
-  EnvironmentId,
-  ExternalSubscriberId,
-  OrganizationId,
-  SubscriberId,
-  TopicId,
-  TopicKey,
-  TopicSubscriberId,
+  type EnvironmentId,
+  type ExternalSubscriberId,
+  type OrganizationId,
+  type SubscriberId,
+  type TopicId,
+  type TopicKey,
+  type TopicSubscriberId,
 } from './types';
 
 export class TopicSubscribersEntity {

@@ -1,4 +1,4 @@
-import { ChannelTypeEnum, StepTypeEnum } from '@novu/shared';
+import { type ChannelTypeEnum, type StepTypeEnum } from '@novu/shared';
 import { Bell, Bolt, Chat, DigestGradient, Mail, Mobile, Sms, TimerGradient } from '@novu/design-system';
 
 export enum TemplateAnalyticsEnum {

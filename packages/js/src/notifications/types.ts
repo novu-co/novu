@@ -1,5 +1,5 @@
 import type { ActionTypeEnum, NotificationFilter } from '../types';
-import { Notification } from './notification';
+import { type Notification } from './notification';
 
 export type ListNotificationsArgs = {
   tags?: string[];

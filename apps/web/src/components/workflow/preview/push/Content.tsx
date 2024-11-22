@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useEnvironment } from '../../../../hooks/useEnvironment';
 import { api } from '../../../../api';
-import { IForm } from '../../../../pages/templates/components/formTypes';
+import { type IForm } from '../../../../pages/templates/components/formTypes';
 import { useTemplateEditorForm } from '../../../../pages/templates/components/TemplateEditorFormProvider';
 import { usePreviewPushTemplate } from '../../../../pages/templates/hooks/usePreviewPushTemplate';
 import { useStepFormPath } from '../../../../pages/templates/hooks/useStepFormPath';

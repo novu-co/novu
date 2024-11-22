@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@mantine/core';
 import { css, cx } from '@emotion/css';
-import { IButtonStyles, ButtonTypeEnum, IMessageAction } from '@novu/shared';
+import { type IButtonStyles, type ButtonTypeEnum, type IMessageAction } from '@novu/shared';
 
 import { useNovuTheme } from '../../../../hooks';
 

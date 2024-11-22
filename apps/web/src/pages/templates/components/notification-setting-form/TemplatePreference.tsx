@@ -1,9 +1,9 @@
-import { FunctionComponent } from 'react';
-import { Group, Input, InputWrapperProps, Text } from '@mantine/core';
+import { type FunctionComponent } from 'react';
+import { Group, Input, type InputWrapperProps, Text } from '@mantine/core';
 import { useFormContext, Controller } from 'react-hook-form';
 
 import { Checkbox, colors, Switch } from '@novu/design-system';
-import { ChannelTypeEnum } from '@novu/shared';
+import { type ChannelTypeEnum } from '@novu/shared';
 import { useEnvironment } from '../../../../hooks';
 import type { IForm } from '../formTypes';
 import { LabelWithTooltip } from '../../workflow/LabelWithTooltip';

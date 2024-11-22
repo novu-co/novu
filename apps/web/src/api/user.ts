@@ -1,4 +1,4 @@
-import { IUserEntity, IUpdateUserProfile } from '@novu/shared';
+import { type IUserEntity, type IUpdateUserProfile } from '@novu/shared';
 
 import { api } from './api.client';
 

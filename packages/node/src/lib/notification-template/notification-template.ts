@@ -1,6 +1,6 @@
 import {
-  INotificationTemplatePayload,
-  INotificationTemplates,
+  type INotificationTemplatePayload,
+  type INotificationTemplates,
 } from './notification-template.interface';
 import { WithHttp } from '../novu.interface';
 

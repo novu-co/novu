@@ -1,6 +1,6 @@
 import { SERVER_HOST } from '../../constants';
 import { CloudRegionEnum, DashboardUrlEnum } from './enums';
-import { DevCommandOptions } from './types';
+import { type DevCommandOptions } from './types';
 
 export function wait(ms: number) {
   return new Promise((resolve) => {

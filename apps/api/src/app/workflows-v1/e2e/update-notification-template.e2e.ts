@@ -2,17 +2,17 @@ import { expect } from 'chai';
 import { UserSession, NotificationTemplateService } from '@novu/testing';
 import {
   StepTypeEnum,
-  INotificationTemplate,
-  IUpdateNotificationTemplateDto,
+  type INotificationTemplate,
+  type IUpdateNotificationTemplateDto,
   FilterPartTypeEnum,
   FieldLogicalOperatorEnum,
   FieldOperatorEnum,
-  INotificationTemplateStep,
+  type INotificationTemplateStep,
   EmailBlockTypeEnum,
 } from '@novu/shared';
 import { ChangeRepository } from '@novu/dal';
-import { CreateWorkflowRequestDto, UpdateWorkflowRequestDto } from '../dto';
-import { WorkflowResponse } from '../dto/workflow-response.dto';
+import { type CreateWorkflowRequestDto, type UpdateWorkflowRequestDto } from '../dto';
+import { type WorkflowResponse } from '../dto/workflow-response.dto';
 
 describe('Update workflow by id - /workflows/:workflowId (PUT)', async () => {
   let session: UserSession;

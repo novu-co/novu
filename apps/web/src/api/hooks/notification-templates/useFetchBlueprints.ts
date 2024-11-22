@@ -1,11 +1,11 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 import localforage from 'localforage';
 import { addWeeks } from 'date-fns';
-import { IGroupedBlueprint } from '@novu/shared';
+import { type IGroupedBlueprint } from '@novu/shared';
 
 import { getBlueprintsGroupedByCategory } from '../../notification-templates';
 import { QueryKeys } from '../../query.keys';
-import { IBlueprintTemplate } from '../../types';
+import { type IBlueprintTemplate } from '../../types';
 import { getWorkflowBlueprintDetails } from '../../../utils';
 
 export interface IBlueprintsGrouped {

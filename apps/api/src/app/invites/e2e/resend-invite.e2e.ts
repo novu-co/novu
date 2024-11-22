@@ -1,4 +1,4 @@
-import { MemberEntity, CommunityMemberRepository } from '@novu/dal';
+import { type MemberEntity, CommunityMemberRepository } from '@novu/dal';
 import { UserSession } from '@novu/testing';
 import { MemberStatusEnum } from '@novu/shared';
 import { expect } from 'chai';

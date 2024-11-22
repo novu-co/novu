@@ -1,11 +1,11 @@
-import { CodeHighlightProps as ExternalCodeProps, CodeHighlight as ExternalCode } from '@mantine/code-highlight';
+import { type CodeHighlightProps as ExternalCodeProps, CodeHighlight as ExternalCode } from '@mantine/code-highlight';
 import React from 'react';
 import { css, cx } from '../../../styled-system/css';
 import { splitCssProps } from '../../../styled-system/jsx';
-import { codeBlock, CodeBlockVariantProps } from '../../../styled-system/recipes';
+import { codeBlock, type CodeBlockVariantProps } from '../../../styled-system/recipes';
 import type { JsxStyleProps } from '../../../styled-system/types';
-import { CoreProps } from '../../types';
-import { PolymorphicComponentPropWithRef, PolymorphicRef } from '../../types/props-helpers';
+import { type CoreProps } from '../../types';
+import { type PolymorphicComponentPropWithRef, type PolymorphicRef } from '../../types/props-helpers';
 
 // TODO: use @mantine/code-highlight/styles.layer.css instead
 import '@mantine/code-highlight/styles.css';

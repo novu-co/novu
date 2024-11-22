@@ -7,8 +7,8 @@ import { ChannelTypeEnum, InAppProviderIdEnum } from '@novu/shared';
 
 import { Session } from './session.usecase';
 import { ApiException } from '../../../shared/exceptions/api.exception';
-import { SessionCommand } from './session.command';
-import { SubscriberSessionResponseDto } from '../../dtos/subscriber-session-response.dto';
+import { type SessionCommand } from './session.command';
+import { type SubscriberSessionResponseDto } from '../../dtos/subscriber-session-response.dto';
 import { AnalyticsEventsEnum } from '../../utils';
 // eslint-disable-next-line import/no-namespace
 import * as encryption from '../../utils/encryption';

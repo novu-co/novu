@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { expect } from 'chai';
 import { UserSession, SubscribersService } from '@novu/testing';
-import { SubscriberEntity } from '@novu/dal';
+import { type SubscriberEntity } from '@novu/dal';
 import { workflow } from '@novu/framework';
 import { BridgeServer } from '../../../../e2e/bridge.server';
 

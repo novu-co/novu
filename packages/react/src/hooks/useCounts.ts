@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Notification, NotificationFilter, NovuError, areTagsEqual } from '@novu/js';
+import { type Notification, type NotificationFilter, type NovuError, areTagsEqual } from '@novu/js';
 import { useNovu } from './NovuProvider';
 import { useWebSocketEvent } from './internal/useWebsocketEvent';
 

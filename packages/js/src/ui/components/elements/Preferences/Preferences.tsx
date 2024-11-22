@@ -1,10 +1,10 @@
 import { createEffect, createMemo, createSignal, For, Show } from 'solid-js';
 import { Presence } from 'solid-motionone';
-import { Preference } from '../../../../preferences/preference';
-import { ChannelPreference, ChannelType, PreferenceLevel } from '../../../../types';
+import { type Preference } from '../../../../preferences/preference';
+import { type ChannelPreference, type ChannelType, PreferenceLevel } from '../../../../types';
 import { usePreferences } from '../../../api';
 import { setDynamicLocalization } from '../../../config';
-import { StringLocalizationKey, useInboxContext, useLocalization } from '../../../context';
+import { type StringLocalizationKey, useInboxContext, useLocalization } from '../../../context';
 import { useStyle } from '../../../helpers';
 import { ArrowDropDown } from '../../../icons';
 import { Motion } from '../../primitives';

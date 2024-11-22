@@ -1,6 +1,6 @@
-import { CoreProps } from '@novu/novui';
+import { type CoreProps } from '@novu/novui';
 import { css } from '@novu/novui/css';
-import { FC, PropsWithChildren, ReactNode } from 'react';
+import { type FC, type PropsWithChildren, type ReactNode } from 'react';
 import { PageContainer } from './PageContainer';
 import { PageHeader } from './PageHeader';
 import { PageMeta } from './PageMeta';

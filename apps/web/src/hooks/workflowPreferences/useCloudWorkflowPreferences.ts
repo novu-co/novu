@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { buildWorkflowPreferences, PreferencesTypeEnum, WorkflowPreferences } from '@novu/shared';
-import { AxiosError, HttpStatusCode } from 'axios';
+import { buildWorkflowPreferences, PreferencesTypeEnum, type WorkflowPreferences } from '@novu/shared';
+import { type AxiosError, HttpStatusCode } from 'axios';
 import { QueryKeys } from '../../api/query.keys';
 import { useNovuAPI } from '../useNovuAPI';
 

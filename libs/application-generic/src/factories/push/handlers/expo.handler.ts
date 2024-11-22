@@ -1,6 +1,6 @@
 import {
   ChannelTypeEnum,
-  ICredentials,
+  type ICredentials,
   PushProviderIdEnum,
 } from '@novu/shared';
 import { ExpoPushProvider } from '@novu/providers';

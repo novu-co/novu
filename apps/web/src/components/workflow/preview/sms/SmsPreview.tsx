@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { useLocation } from 'react-router-dom';
 import { useEnvironment } from '../../../../hooks/useEnvironment';
 import { api } from '../../../../api';
-import { IForm } from '../../../../pages/templates/components/formTypes';
+import { type IForm } from '../../../../pages/templates/components/formTypes';
 import { useTemplateEditorForm } from '../../../../pages/templates/components/TemplateEditorFormProvider';
 import { useNavigateToStepEditor } from '../../../../pages/templates/hooks/useNavigateToStepEditor';
 import { usePreviewSmsTemplate } from '../../../../pages/templates/hooks/usePreviewSmsTemplate';

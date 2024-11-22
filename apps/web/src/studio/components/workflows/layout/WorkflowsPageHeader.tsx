@@ -1,6 +1,6 @@
-import { CoreProps, type LocalizedString, Title, LocalizedMessage, Text } from '@novu/novui';
+import { type CoreProps, type LocalizedString, Title, type LocalizedMessage, Text } from '@novu/novui';
 import { Box, Flex, HStack } from '@novu/novui/jsx';
-import { FC, ReactNode } from 'react';
+import { type FC, type ReactNode } from 'react';
 
 export interface IWorkflowsPageHeaderProps extends CoreProps {
   title: LocalizedString;

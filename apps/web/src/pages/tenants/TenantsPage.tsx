@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { Row } from 'react-table';
-import { ITenantEntity } from '@novu/shared';
+import { type Row } from 'react-table';
+import { type ITenantEntity } from '@novu/shared';
 
 import PageContainer from '../../components/layout/components/PageContainer';
 import PageHeader from '../../components/layout/components/PageHeader';

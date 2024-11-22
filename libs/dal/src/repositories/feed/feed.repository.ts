@@ -1,8 +1,8 @@
-import { SoftDeleteModel } from 'mongoose-delete';
-import { FilterQuery } from 'mongoose';
+import { type SoftDeleteModel } from 'mongoose-delete';
+import { type FilterQuery } from 'mongoose';
 
 import { BaseRepository } from '../base-repository';
-import { FeedDBModel, FeedEntity } from './feed.entity';
+import { type FeedDBModel, FeedEntity } from './feed.entity';
 import { Feed } from './feed.schema';
 import { DalException } from '../../shared';
 import { MessageTemplateRepository } from '../message-template';

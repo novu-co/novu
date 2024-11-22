@@ -1,5 +1,5 @@
-import { Accessor, createEffect, onCleanup, onMount } from 'solid-js';
-import { ListNotificationsArgs, ListNotificationsResponse } from '../../../notifications';
+import { type Accessor, createEffect, onCleanup, onMount } from 'solid-js';
+import { type ListNotificationsArgs, type ListNotificationsResponse } from '../../../notifications';
 import type { NotificationFilter } from '../../../types';
 import { isSameFilter } from '../../../utils/notification-utils';
 import { useNovu } from '../../context';

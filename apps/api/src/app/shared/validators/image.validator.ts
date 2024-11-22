@@ -1,4 +1,4 @@
-import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
+import { registerDecorator, type ValidationOptions, type ValidationArguments } from 'class-validator';
 
 export function IsImageUrl(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {

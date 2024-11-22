@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { DefaultProps, DefaultInboxProps, WithChildrenProps } from '../utils/types';
+import { type DefaultProps, type DefaultInboxProps, type WithChildrenProps } from '../utils/types';
 import { Mounter } from './Mounter';
 import { useNovuUI } from '../context/NovuUIContext';
 import { useRenderer } from '../context/RendererContext';

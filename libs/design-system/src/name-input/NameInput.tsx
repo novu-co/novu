@@ -1,6 +1,6 @@
-import React, { ChangeEvent } from 'react';
+import React, { type ChangeEvent } from 'react';
 import { TextInput as MantineTextInput } from '@mantine/core';
-import { SpacingProps } from '../shared/spacing.props';
+import { type SpacingProps } from '../shared/spacing.props';
 import { nameInputStyles } from './nameInputStyles';
 
 interface INameInputProps extends SpacingProps {

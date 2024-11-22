@@ -1,4 +1,4 @@
-import { ISubscribersDefine, ITenantDefine, ITopic } from '../../types';
+import { type ISubscribersDefine, type ITenantDefine, type ITopic } from '../../types';
 
 export type TriggerRecipientSubscriber = string | ISubscribersDefine;
 

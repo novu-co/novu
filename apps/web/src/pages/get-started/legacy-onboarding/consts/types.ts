@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
-import { GetStartedTabsViewsEnum } from './GetStartedTabsViewsEnum';
-import { OnboardingUseCasesTabsEnum } from './OnboardingUseCasesTabsEnum';
+import { type GetStartedTabsViewsEnum } from './GetStartedTabsViewsEnum';
+import { type OnboardingUseCasesTabsEnum } from './OnboardingUseCasesTabsEnum';
 
 export type OnboardingUseCases = Record<OnboardingUseCasesTabsEnum, OnboardingUseCase>;
 

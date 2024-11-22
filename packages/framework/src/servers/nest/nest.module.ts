@@ -1,8 +1,8 @@
-import { Module, Provider } from '@nestjs/common';
+import { Module, type Provider } from '@nestjs/common';
 import { NovuClient } from './nest.client';
 import { NovuController } from './nest.controller';
 import { registerApiPath } from './nest.register-api-path';
-import { ASYNC_OPTIONS_TYPE, NovuBaseModule, OPTIONS_TYPE } from './nest.module-definition';
+import { type ASYNC_OPTIONS_TYPE, NovuBaseModule, type OPTIONS_TYPE } from './nest.module-definition';
 import { NovuHandler } from './nest.handler';
 import { applyDecorators } from './nest.utils';
 

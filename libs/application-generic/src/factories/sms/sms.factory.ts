@@ -1,5 +1,5 @@
-import { IntegrationEntity } from '@novu/dal';
-import { ISmsFactory, ISmsHandler } from './interfaces';
+import { type IntegrationEntity } from '@novu/dal';
+import { type ISmsFactory, type ISmsHandler } from './interfaces';
 import {
   SnsHandler,
   TelnyxHandler,

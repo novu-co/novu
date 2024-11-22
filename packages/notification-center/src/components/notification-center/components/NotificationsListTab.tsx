@@ -1,5 +1,5 @@
 import React from 'react';
-import { IMessage, ChannelCTATypeEnum } from '@novu/shared';
+import { type IMessage, ChannelCTATypeEnum } from '@novu/shared';
 
 import { useNotifications, useNotificationCenter, useNovuContext, useTranslations } from '../../../hooks';
 import { NotificationsList } from './NotificationsList';

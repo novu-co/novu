@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import cloneDeep from 'lodash.clonedeep';
 import {
   ChannelTypeEnum,
-  IConfigCredentials,
-  IProviderConfig,
+  type IConfigCredentials,
+  type IProviderConfig,
   NOVU_SMS_EMAIL_PROVIDERS,
   providers,
   PushProviderIdEnum,

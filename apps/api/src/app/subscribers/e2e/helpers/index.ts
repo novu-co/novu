@@ -1,10 +1,10 @@
-import { UserSession } from '@novu/testing';
-import { IUpdateNotificationTemplateDto, PreferenceLevelEnum } from '@novu/shared';
+import { type UserSession } from '@novu/testing';
+import { type IUpdateNotificationTemplateDto, type PreferenceLevelEnum } from '@novu/shared';
 import axios from 'axios';
 
-import { UpdateSubscriberOnlineFlagRequestDto } from '../../dtos/update-subscriber-online-flag-request.dto';
-import { UpdateSubscriberPreferenceRequestDto } from '../../../widgets/dtos/update-subscriber-preference-request.dto';
-import { UpdateSubscriberGlobalPreferencesRequestDto } from '../../dtos/update-subscriber-global-preferences-request.dto';
+import { type UpdateSubscriberOnlineFlagRequestDto } from '../../dtos/update-subscriber-online-flag-request.dto';
+import { type UpdateSubscriberPreferenceRequestDto } from '../../../widgets/dtos/update-subscriber-preference-request.dto';
+import { type UpdateSubscriberGlobalPreferencesRequestDto } from '../../dtos/update-subscriber-global-preferences-request.dto';
 
 const axiosInstance = axios.create();
 

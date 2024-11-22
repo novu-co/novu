@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import axios from 'axios';
 import { ChannelTypeEnum, MessagesStatusEnum } from '@novu/shared';
 import { UserSession } from '@novu/testing';
-import { NotificationTemplateEntity, MessageRepository, SubscriberRepository } from '@novu/dal';
+import { type NotificationTemplateEntity, MessageRepository, SubscriberRepository } from '@novu/dal';
 
 const axiosInstance = axios.create();
 

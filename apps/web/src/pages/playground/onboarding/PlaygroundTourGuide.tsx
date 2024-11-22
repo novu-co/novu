@@ -1,7 +1,14 @@
 import { Code, Accordion } from '@mantine/core';
 import { css } from '@novu/novui/css';
 import { useState, useEffect } from 'react';
-import Joyride, { ACTIONS, CallBackProps, LIFECYCLE, STATUS, Step, TooltipRenderProps } from 'react-joyride';
+import Joyride, {
+  ACTIONS,
+  type CallBackProps,
+  LIFECYCLE,
+  STATUS,
+  type Step,
+  type TooltipRenderProps,
+} from 'react-joyride';
 import { Button } from '@novu/novui';
 
 export function TourGuideComponent({

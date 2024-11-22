@@ -1,7 +1,7 @@
 import { css } from '@novu/novui/css';
 import { Title, Text } from '@novu/novui';
 import styled from '@emotion/styled';
-import { MantineTheme } from '@mantine/core';
+import { type MantineTheme } from '@mantine/core';
 import { Badge } from './Badge';
 import { PlanActionButton } from './PlanActionButton';
 import { ContactUsButton } from './ContactUsButton';

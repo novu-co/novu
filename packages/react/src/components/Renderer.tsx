@@ -1,6 +1,6 @@
-import { ComponentType, PropsWithChildren, useCallback, useState } from 'react';
-import { MountedElement, RendererProvider } from '../context/RendererContext';
+import { type ComponentType, type PropsWithChildren, useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { type MountedElement, RendererProvider } from '../context/RendererContext';
 
 type RendererProps = PropsWithChildren;
 export const Renderer = (props: RendererProps) => {

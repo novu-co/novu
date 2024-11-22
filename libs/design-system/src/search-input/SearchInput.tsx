@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Input, InputProps } from '@mantine/core';
+import { Input, type InputProps } from '@mantine/core';
 import styled from '@emotion/styled';
 
 import { IconClose, IconSearch } from '../iconsV2';

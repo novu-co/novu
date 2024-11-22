@@ -1,5 +1,5 @@
 import Nimma from 'nimma';
-import { OpenAPIObject } from '@nestjs/swagger';
+import { type OpenAPIObject } from '@nestjs/swagger';
 
 const jpath = '$.paths..responses["200","201"].content["application/json"]';
 

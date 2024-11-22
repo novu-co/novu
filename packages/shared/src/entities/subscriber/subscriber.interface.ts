@@ -1,5 +1,5 @@
-import { ChatProviderIdEnum, PushProviderIdEnum } from '../../consts';
-import { SubscriberCustomData } from '../../types';
+import { type ChatProviderIdEnum, type PushProviderIdEnum } from '../../consts';
+import { type SubscriberCustomData } from '../../types';
 
 export interface ISubscriber {
   _id?: string;

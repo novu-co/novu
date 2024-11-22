@@ -1,4 +1,4 @@
-import { IconButtonProps } from '@rjsf/utils';
+import { type IconButtonProps } from '@rjsf/utils';
 import { css, cx } from '../../../styled-system/css';
 import { Button, IconButton } from '../../components';
 import { IconAdd, IconArrowDownward, IconArrowUpward, IconOutlineDeleteOutline } from '../../icons/icon-registry';

@@ -8,7 +8,7 @@ import {
   withCellLoading,
   Edit,
   Trash,
-  IExtendedColumn,
+  type IExtendedColumn,
   Table,
 } from '@novu/design-system';
 import type { ILayoutEntity } from '@novu/shared';

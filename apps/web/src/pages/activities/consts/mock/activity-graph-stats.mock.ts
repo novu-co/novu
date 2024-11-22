@@ -1,4 +1,4 @@
-import { IActivityGraphStats } from '../../interfaces';
+import { type IActivityGraphStats } from '../../interfaces';
 
 export const activityGraphStatsMock: IActivityGraphStats[] = [
   {

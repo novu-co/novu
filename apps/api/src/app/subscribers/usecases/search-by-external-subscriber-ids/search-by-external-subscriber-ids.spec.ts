@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing';
 import { SubscribersService, UserSession } from '@novu/testing';
-import { SubscriberEntity } from '@novu/dal';
+import { type SubscriberEntity } from '@novu/dal';
 import { NotFoundException } from '@nestjs/common';
 import { expect } from 'chai';
 

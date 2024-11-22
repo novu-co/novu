@@ -1,7 +1,7 @@
-import { useState, Dispatch, SetStateAction } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 import { Box, Group, Divider, Popover, Stack, Avatar as MAvatar } from '@mantine/core';
 import { useController } from 'react-hook-form';
-import { SystemAvatarIconEnum, IActor, ActorTypeEnum } from '@novu/shared';
+import { SystemAvatarIconEnum, type IActor, ActorTypeEnum } from '@novu/shared';
 
 import {
   colors,

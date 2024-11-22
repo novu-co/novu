@@ -1,5 +1,5 @@
-import { Styles, DrawerStylesNames } from '@mantine/core';
-import { ReactNode } from 'react';
+import { type Styles, type DrawerStylesNames } from '@mantine/core';
+import { type ReactNode } from 'react';
 
 export interface ISidebarBaseProps {
   navigationWidth?: number;

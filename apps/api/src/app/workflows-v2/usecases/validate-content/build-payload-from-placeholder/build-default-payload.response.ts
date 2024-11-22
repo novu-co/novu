@@ -1,4 +1,4 @@
-import { PreviewPayload } from '@novu/shared';
+import { type PreviewPayload } from '@novu/shared';
 
 export class BuildDefaultPayloadResponse {
   previewPayload: PreviewPayload;

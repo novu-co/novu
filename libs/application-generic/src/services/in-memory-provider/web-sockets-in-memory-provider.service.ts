@@ -3,8 +3,8 @@ import { Logger } from '@nestjs/common';
 import { InMemoryProviderService } from './in-memory-provider.service';
 import {
   InMemoryProviderEnum,
-  InMemoryProviderClient,
-  ScanStream,
+  type InMemoryProviderClient,
+  type ScanStream,
 } from './types';
 
 import { GetIsInMemoryClusterModeEnabled } from '../../usecases';

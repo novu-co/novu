@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { type FC, useState } from 'react';
 import { Tooltip } from '@novu/design-system';
 import { Text, Button } from '@novu/novui';
 import { css } from '@novu/novui/css';

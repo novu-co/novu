@@ -1,5 +1,5 @@
 import { Queue } from 'bullmq';
-import { ConnectionOptions } from 'tls';
+import { type ConnectionOptions } from 'tls';
 
 export class TestingQueueService {
   public queue: Queue;

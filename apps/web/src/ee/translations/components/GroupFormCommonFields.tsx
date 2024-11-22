@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Text, colors, Input, Select, When } from '@novu/design-system';
-import { Group, CloseButton, Box, MultiSelectValueProps, useMantineTheme, Stack } from '@mantine/core';
-import { Control, Controller } from 'react-hook-form';
+import { Group, CloseButton, Box, type MultiSelectValueProps, useMantineTheme, Stack } from '@mantine/core';
+import { type Control, Controller } from 'react-hook-form';
 
-import { FlagIcon, ICreateGroup, SelectItem } from './shared';
+import { FlagIcon, type ICreateGroup, SelectItem } from './shared';
 import { useFetchLocales, useGetDefaultLocale } from '../hooks';
 import { DeleteLocaleModal } from './DeleteLocaleModal';
 

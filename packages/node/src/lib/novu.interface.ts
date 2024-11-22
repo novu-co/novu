@@ -1,4 +1,4 @@
-import { AxiosError, AxiosInstance } from 'axios';
+import { type AxiosError, type AxiosInstance } from 'axios';
 
 export interface IRetryConfig {
   initialDelay?: number;

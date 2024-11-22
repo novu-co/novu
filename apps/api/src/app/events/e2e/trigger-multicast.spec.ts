@@ -1,15 +1,15 @@
 import { expect } from 'chai';
 
 import {
-  ITopic,
+  type ITopic,
   SubscriberSourceEnum,
   TriggerRecipientsTypeEnum,
-  TriggerRecipientSubscriber,
-  ISubscribersDefine,
+  type TriggerRecipientSubscriber,
+  type ISubscribersDefine,
 } from '@novu/shared';
 import {
   buildSubscriberDefine,
-  IProcessSubscriberBulkJobDto,
+  type IProcessSubscriberBulkJobDto,
   mapSubscribersToJobs,
   splitByRecipientType,
   validateSubscriberDefine,

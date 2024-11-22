@@ -3,7 +3,7 @@ import { css } from '@novu/novui/css';
 import { IconOutlineMenuBook } from '@novu/novui/icons';
 import { HStack, styled, VStack } from '@novu/novui/jsx';
 import { text } from '@novu/novui/recipes';
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 
 const LinkText = styled('a', text);
 

@@ -1,6 +1,6 @@
-import { EnvironmentId } from '../environment';
-import { OrganizationId } from '../organization';
-import { UserId } from '../user';
+import { type EnvironmentId } from '../environment';
+import { type OrganizationId } from '../organization';
+import { type UserId } from '../user';
 
 export type JobId = string;
 

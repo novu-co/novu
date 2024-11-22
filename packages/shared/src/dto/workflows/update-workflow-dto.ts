@@ -1,4 +1,9 @@
-import { PreferencesRequestDto, StepCreateDto, StepUpdateDto, WorkflowCommonsFields } from './workflow-commons-fields';
+import {
+  type PreferencesRequestDto,
+  type StepCreateDto,
+  type StepUpdateDto,
+  type WorkflowCommonsFields,
+} from './workflow-commons-fields';
 
 export type UpdateWorkflowDto = WorkflowCommonsFields & {
   /**

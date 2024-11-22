@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form';
 
 import { usePreviewChat } from '../../../api/hooks';
 import { useProcessVariables } from '../../../hooks';
-import { IForm } from '../components/formTypes';
+import { type IForm } from '../components/formTypes';
 import { useStepFormCombinedErrors } from './useStepFormCombinedErrors';
 import { useStepFormPath } from './useStepFormPath';
 

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
-import { LocalStudioWellKnownMetadata } from '../types';
+import { type LocalStudioWellKnownMetadata } from '../types';
 
 const WELL_KNOWN_URL = 'http://localhost:2022/.well-known/novu';
 const DEFAULT_STUDIO_PROTOCOL = 'http:';

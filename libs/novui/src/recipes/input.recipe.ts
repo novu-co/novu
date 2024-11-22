@@ -1,4 +1,4 @@
-import { InputStylesNames, InputWrapperStylesNames } from '@mantine/core';
+import { type InputStylesNames, type InputWrapperStylesNames } from '@mantine/core';
 import { defineSlotRecipe } from '@pandacss/dev';
 
 // full enumeration of the component library's slots

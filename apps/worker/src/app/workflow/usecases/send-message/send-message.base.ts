@@ -1,34 +1,34 @@
 /* eslint-disable global-require */
 import i18next from 'i18next';
-import { ModuleRef } from '@nestjs/core';
+import { type ModuleRef } from '@nestjs/core';
 import { Logger } from '@nestjs/common';
 import { format } from 'date-fns';
-import { IntegrationEntity, JobEntity, MessageRepository, SubscriberRepository } from '@novu/dal';
+import { type IntegrationEntity, type JobEntity, type MessageRepository, type SubscriberRepository } from '@novu/dal';
 import {
   ChannelTypeEnum,
   EmailProviderIdEnum,
   ExecutionDetailsSourceEnum,
   ExecutionDetailsStatusEnum,
-  IMessageTemplate,
-  ITenantDefine,
-  ProvidersIdEnum,
+  type IMessageTemplate,
+  type ITenantDefine,
+  type ProvidersIdEnum,
   SmsProviderIdEnum,
 } from '@novu/shared';
 
 import {
   DetailEnum,
-  SelectIntegration,
+  type SelectIntegration,
   SelectIntegrationCommand,
-  GetNovuProviderCredentials,
+  type GetNovuProviderCredentials,
   SelectVariantCommand,
-  SelectVariant,
-  ExecutionLogRoute,
+  type SelectVariant,
+  type ExecutionLogRoute,
   ExecutionLogRouteCommand,
 } from '@novu/application-generic';
 import { SendMessageType } from './send-message-type.usecase';
-import { CreateLog } from '../../../shared/logs';
+import { type CreateLog } from '../../../shared/logs';
 import { PlatformException } from '../../../shared/utils';
-import { SendMessageCommand } from './send-message.command';
+import { type SendMessageCommand } from './send-message.command';
 
 export abstract class SendMessageBase extends SendMessageType {
   abstract readonly channelType: ChannelTypeEnum;

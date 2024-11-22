@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useImperativeHandle } from 'react';
 import { createPortal } from 'react-dom';
 import { VisuallyHidden, Combobox, useCombobox } from '@mantine/core';
-import { type SuggestionProps, SuggestionKeyDownProps } from '@tiptap/suggestion';
+import { type SuggestionProps, type SuggestionKeyDownProps } from '@tiptap/suggestion';
 import { variableSuggestionList } from '../../../styled-system/recipes';
 import { Text } from '../../components';
 import { AUTOCOMPLETE_CLOSE_TAG, AUTOCOMPLETE_OPEN_TAG, VariableErrorCode } from '../constants';

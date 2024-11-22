@@ -1,4 +1,4 @@
-import { expect, it, describe, afterEach, vi, MockedFunction } from 'vitest';
+import { expect, it, describe, afterEach, vi, type MockedFunction } from 'vitest';
 import axios from 'axios';
 
 import { sync, buildSignature } from './sync';

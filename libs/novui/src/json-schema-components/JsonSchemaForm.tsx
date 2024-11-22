@@ -1,12 +1,12 @@
-import Form, { FormProps } from '@rjsf/core';
-import { RegistryWidgetsType, UiSchema } from '@rjsf/utils';
+import Form, { type FormProps } from '@rjsf/core';
+import { type RegistryWidgetsType, type UiSchema } from '@rjsf/utils';
 import validator from '@rjsf/validator-ajv8';
 
 import { splitCssProps } from '../../styled-system/jsx';
-import { JsxStyleProps } from '../../styled-system/types';
+import { type JsxStyleProps } from '../../styled-system/types';
 import { css, cx } from '../../styled-system/css';
 
-import { CoreProps } from '../types';
+import { type CoreProps } from '../types';
 import { ArrayFieldItemTemplate, ArrayFieldTemplate, ArrayFieldTitleTemplate } from './templates/ArrayFieldTemplate';
 import { AddButton, MoveDownButton, MoveUpButton, RemoveButton } from './templates/IconButton';
 import { ObjectFieldTemplate } from './templates/ObjectFieldTemplate';

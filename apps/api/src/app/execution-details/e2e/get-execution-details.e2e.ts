@@ -1,4 +1,4 @@
-import { ExecutionDetailsRepository, SubscriberEntity } from '@novu/dal';
+import { ExecutionDetailsRepository, type SubscriberEntity } from '@novu/dal';
 import { ExecutionDetailsSourceEnum, ExecutionDetailsStatusEnum, StepTypeEnum } from '@novu/shared';
 import { UserSession, SubscribersService } from '@novu/testing';
 import axios from 'axios';

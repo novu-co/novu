@@ -14,7 +14,7 @@ import {
   sidebarDrawerContentClassName,
   useDrawerStyles,
 } from './Sidebar.styles';
-import { ISidebarBaseProps } from './Sidebar.types';
+import { type ISidebarBaseProps } from './Sidebar.types';
 
 /**
  * A Sidebar component without the form element that wraps content.

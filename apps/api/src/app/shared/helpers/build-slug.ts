@@ -1,4 +1,4 @@
-import { ShortIsPrefixEnum, Slug, slugify } from '@novu/shared';
+import { type ShortIsPrefixEnum, type Slug, slugify } from '@novu/shared';
 import { encodeBase62 } from './base62';
 
 const SLUG_DELIMITER = '_';

@@ -8,7 +8,7 @@ import { css } from '@novu/novui/css';
 import { Button } from '@novu/novui';
 
 import { hstack } from '@novu/novui/patterns';
-import { TerminalHandle } from '../../../hooks/useContainer';
+import { type TerminalHandle } from '../../../hooks/useContainer';
 
 interface TerminalComponentProps {
   onChange?: (data: string) => void;

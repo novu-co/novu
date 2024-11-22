@@ -1,6 +1,6 @@
 import { errorMessage } from '@novu/design-system';
-import { IEmailBlock } from '@novu/shared';
-import { useMutation, UseMutationOptions } from '@tanstack/react-query';
+import { type IEmailBlock } from '@novu/shared';
+import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { previewPush } from '../content-templates';
 

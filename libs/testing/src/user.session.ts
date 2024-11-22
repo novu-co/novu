@@ -1,43 +1,43 @@
 import 'cross-fetch/polyfill';
 import { faker } from '@faker-js/faker';
-import request, { SuperTest, Test } from 'supertest';
+import request, { type SuperTest, type Test } from 'supertest';
 import jwt from 'jsonwebtoken';
 import superAgentDefaults from 'superagent-defaults';
 import {
-  ApiServiceLevelEnum,
+  type ApiServiceLevelEnum,
   EmailBlockTypeEnum,
-  IApiRateLimitMaximum,
-  IEmailBlock,
-  JobTopicNameEnum,
+  type IApiRateLimitMaximum,
+  type IEmailBlock,
+  type JobTopicNameEnum,
   StepTypeEnum,
-  TriggerRecipientsPayload,
+  type TriggerRecipientsPayload,
   isClerkEnabled,
 } from '@novu/shared';
 import {
-  UserEntity,
-  EnvironmentEntity,
-  OrganizationEntity,
-  NotificationGroupEntity,
+  type UserEntity,
+  type EnvironmentEntity,
+  type OrganizationEntity,
+  type NotificationGroupEntity,
   NotificationGroupRepository,
   FeedRepository,
   ChangeRepository,
-  ChangeEntity,
+  type ChangeEntity,
   SubscriberRepository,
   LayoutRepository,
 } from '@novu/dal';
 
 import { NotificationTemplateService } from './notification-template.service';
-import { TestServer, testServer } from './test-server.service';
+import { type TestServer, testServer } from './test-server.service';
 import { OrganizationService } from './organization.service';
 import { EnvironmentService } from './environment.service';
-import { CreateTemplatePayload } from './create-notification-template.interface';
+import { type CreateTemplatePayload } from './create-notification-template.interface';
 import { IntegrationService } from './integration.service';
 import { UserService } from './user.service';
 import { JobsService } from './jobs.service';
 import { EEUserService } from './ee/ee.user.service';
 import { EEOrganizationService } from './ee/ee.organization.service';
 import { TEST_USER_PASSWORD } from './constants';
-import { ClerkJwtPayload } from './ee/types';
+import { type ClerkJwtPayload } from './ee/types';
 
 type UserSessionOptions = {
   noOrganization?: boolean;

@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
-import { Flex, FlexProps } from '@mantine/core';
+import { Flex, type FlexProps } from '@mantine/core';
 import { clamp } from '@mantine/hooks';
-import { Button, ChevronDown, ChevronUp, colors, CountdownTimer, IButtonProps, Text } from '@novu/design-system';
-import { Dispatch, SetStateAction } from 'react';
+import { Button, ChevronDown, ChevronUp, colors, CountdownTimer, type IButtonProps, Text } from '@novu/design-system';
+import { type Dispatch, type SetStateAction } from 'react';
 
 const DEFAULT_STEP = 1;
 const DEFAULT_MIN = 1;

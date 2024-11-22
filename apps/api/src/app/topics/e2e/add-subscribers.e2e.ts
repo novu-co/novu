@@ -1,4 +1,4 @@
-import { SubscriberEntity } from '@novu/dal';
+import { type SubscriberEntity } from '@novu/dal';
 import { SubscribersService, UserSession } from '@novu/testing';
 import { expect } from 'chai';
 

@@ -1,6 +1,6 @@
 import Handlebars from 'handlebars';
 import {
-  IAttachmentOptions,
+  type IAttachmentOptions,
   ITriggerPayload,
 } from '../template/template.interface';
 

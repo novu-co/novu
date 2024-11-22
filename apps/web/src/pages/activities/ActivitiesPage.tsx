@@ -15,7 +15,7 @@ import { ActivityStatistics } from './components/ActivityStatistics';
 import { ActivityGraph } from './components/ActivityGraph';
 import { ActivityList } from './components/ActivityList';
 import { ExecutionDetailsModal } from '../../components/execution-detail/ExecutionDetailsModal';
-import { IActivityGraphStats } from './interfaces';
+import { type IActivityGraphStats } from './interfaces';
 import { FIRST_100_WORKFLOWS } from '../../constants/workflowConstants';
 
 const FiltersContainer = styled.div`

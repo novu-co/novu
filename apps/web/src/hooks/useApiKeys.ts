@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { IApiKey } from '@novu/shared';
+import { type IApiKey } from '@novu/shared';
 import { QueryKeys } from '../api/query.keys';
 import { getApiKeys } from '../api/environment';
 import { useEnvironment } from '../components/providers/EnvironmentProvider';

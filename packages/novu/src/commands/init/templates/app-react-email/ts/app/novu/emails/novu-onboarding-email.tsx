@@ -17,7 +17,7 @@ import {
   Text,
 } from "@react-email/components";
 
-import { ControlSchema, PayloadSchema } from "../workflows";
+import { type ControlSchema, type PayloadSchema } from "../workflows";
 
 type NovuWelcomeEmailProps = ControlSchema & PayloadSchema;
 

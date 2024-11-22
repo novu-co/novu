@@ -1,5 +1,5 @@
 import { Stack } from '@mantine/core';
-import { ICondition } from '@novu/shared';
+import { type ICondition } from '@novu/shared';
 import { ExecutionDetailsConditionItem } from './ExecutionDetailsConditionItem';
 
 export function ExecutionDetailsConditions({ conditions }: { conditions: ICondition[] }) {

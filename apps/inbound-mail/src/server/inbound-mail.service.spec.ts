@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { IInboundParseDataDto } from '@novu/application-generic';
+import { type IInboundParseDataDto } from '@novu/application-generic';
 
 import { InboundMailService } from './inbound-mail.service';
 

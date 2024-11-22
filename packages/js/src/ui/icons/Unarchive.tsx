@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { JSX } from 'solid-js';
+import { type JSX } from 'solid-js';
 
 export const Unarchive = (props?: JSX.HTMLAttributes<SVGSVGElement>) => {
   return (

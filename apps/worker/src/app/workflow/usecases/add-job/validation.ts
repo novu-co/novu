@@ -1,16 +1,16 @@
 import {
   DigestTypeEnum,
   DigestUnitEnum,
-  IDigestRegularMetadata,
+  type IDigestRegularMetadata,
   StepTypeEnum,
   DaysEnum,
   MonthlyTypeEnum,
-  ITimedConfig,
+  type ITimedConfig,
   OrdinalEnum,
   OrdinalValueEnum,
-  IDigestBaseMetadata,
+  type IDigestBaseMetadata,
 } from '@novu/shared';
-import { JobEntity } from '@novu/dal';
+import { type JobEntity } from '@novu/dal';
 import { ApiException, isRegularDigest } from '@novu/application-generic';
 
 const validateAmountAndUnit = (digest: IDigestBaseMetadata) => {

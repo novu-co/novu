@@ -3,8 +3,8 @@ import { css, cx } from '../../../styled-system/css';
 import { splitCssProps } from '../../../styled-system/jsx';
 import { text, type TextVariantProps } from '../../../styled-system/recipes';
 import type { JsxStyleProps } from '../../../styled-system/types';
-import { CoreProps } from '../../types';
-import { PolymorphicComponentPropWithRef, PolymorphicRef } from '../../types/props-helpers';
+import { type CoreProps } from '../../types';
+import { type PolymorphicComponentPropWithRef, type PolymorphicRef } from '../../types/props-helpers';
 
 export type TextProps<C extends React.ElementType> = PolymorphicComponentPropWithRef<
   C,

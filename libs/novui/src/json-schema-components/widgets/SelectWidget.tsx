@@ -1,4 +1,4 @@
-import { WidgetProps } from '@rjsf/utils';
+import { type WidgetProps } from '@rjsf/utils';
 import { Select } from '../../components';
 
 export const SelectWidget = (props: WidgetProps) => {

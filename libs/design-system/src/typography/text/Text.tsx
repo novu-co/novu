@@ -1,8 +1,8 @@
-import React, { PropsWithChildren } from 'react';
-import { Text as MantineText, MantineColor, useMantineTheme, TextProps } from '@mantine/core';
+import React, { type PropsWithChildren } from 'react';
+import { Text as MantineText, type MantineColor, useMantineTheme, type TextProps } from '@mantine/core';
 
 import { colors } from '../../config';
-import { SpacingProps } from '../../shared/spacing.props';
+import { type SpacingProps } from '../../shared/spacing.props';
 
 interface ITextProps extends PropsWithChildren<{}>, SpacingProps {
   size?: TextProps['size'];

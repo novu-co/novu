@@ -1,4 +1,4 @@
-import { OnboardingUseCases } from './types';
+import { type OnboardingUseCases } from './types';
 import { InAppUseCaseConst } from './InAppUseCase.const';
 import { MultiChannelUseCaseConst } from './MultiChannelUseCase.const';
 import { DelayUseCaseConst } from './DelayUseCase.const';

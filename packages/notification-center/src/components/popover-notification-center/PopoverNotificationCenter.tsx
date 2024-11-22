@@ -1,15 +1,15 @@
 import React from 'react';
-import { PopoverProps } from '@mantine/core';
+import { type PopoverProps } from '@mantine/core';
 
-import { IMessage, IMessageAction, ButtonTypeEnum } from '@novu/shared';
-import { IUserPreferenceSettings } from '@novu/client';
+import { type IMessage, type IMessageAction, type ButtonTypeEnum } from '@novu/shared';
+import { type IUserPreferenceSettings } from '@novu/client';
 
 import { NotificationCenter } from '../notification-center';
-import { INotificationBellProps } from '../notification-bell';
+import { type INotificationBellProps } from '../notification-bell';
 import { Popover } from './components/Popover';
 import { useNotifications } from '../../hooks';
-import { ColorScheme, INovuThemePopoverProvider } from '../../index';
-import { ITab, ListItem } from '../../shared/interfaces';
+import { type ColorScheme, type INovuThemePopoverProvider } from '../../index';
+import { type ITab, type ListItem } from '../../shared/interfaces';
 import { getDefaultTheme } from '../../utils/defaultTheme';
 
 export interface IPopoverNotificationCenterProps {

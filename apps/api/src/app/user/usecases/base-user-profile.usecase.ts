@@ -1,5 +1,5 @@
 import type { UserEntity } from '@novu/dal';
-import { UserResponseDto } from '../dtos/user-response.dto';
+import { type UserResponseDto } from '../dtos/user-response.dto';
 
 export class BaseUserProfileUsecase {
   protected mapToDto(user: UserEntity): UserResponseDto {

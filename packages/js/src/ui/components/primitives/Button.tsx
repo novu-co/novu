@@ -1,6 +1,6 @@
-import { cva, VariantProps } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { splitProps } from 'solid-js';
-import { JSX } from 'solid-js/jsx-runtime';
+import { type JSX } from 'solid-js/jsx-runtime';
 import { cn, useStyle } from '../../helpers';
 import type { AppearanceKey } from '../../types';
 

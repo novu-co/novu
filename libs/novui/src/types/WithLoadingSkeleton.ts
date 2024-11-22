@@ -1,5 +1,5 @@
-import { FC } from 'react';
-import { CoreProps } from './CoreProps';
+import { type FC } from 'react';
+import { type CoreProps } from './CoreProps';
 
 // TODO: consider props that may be universal for loading skeletons
 export type LoadingDisplayComponent<TProps = CoreProps> = FC<TProps>;

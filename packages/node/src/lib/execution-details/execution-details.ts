@@ -1,6 +1,6 @@
 import {
-  IExecutionDetails,
-  IExecutionDetailsPayload,
+  type IExecutionDetails,
+  type IExecutionDetailsPayload,
 } from './execution-details.interface';
 import { WithHttp } from '../novu.interface';
 

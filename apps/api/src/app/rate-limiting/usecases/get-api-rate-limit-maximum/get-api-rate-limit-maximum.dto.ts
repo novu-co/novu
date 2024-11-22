@@ -1,4 +1,4 @@
-import { ApiServiceLevelEnum } from '@novu/shared';
+import { type ApiServiceLevelEnum } from '@novu/shared';
 
 export const CUSTOM_API_SERVICE_LEVEL = 'custom';
 

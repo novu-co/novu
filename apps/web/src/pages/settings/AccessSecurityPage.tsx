@@ -1,5 +1,5 @@
 import { IconAdminPanelSettings } from '@novu/design-system';
-import { FC } from 'react';
+import { type FC } from 'react';
 import { ProductLead } from '../../components/utils/ProductLead';
 import { SettingsPageContainer } from './SettingsPageContainer';
 

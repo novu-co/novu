@@ -1,5 +1,5 @@
-import { LoadingOverlayProps, LoadingOverlay as MantineLoadingOverlay, useMantineTheme } from '@mantine/core';
-import { PropsWithChildren } from 'react';
+import { type LoadingOverlayProps, LoadingOverlay as MantineLoadingOverlay, useMantineTheme } from '@mantine/core';
+import { type PropsWithChildren } from 'react';
 import { colors } from '../config';
 
 interface ILoadingOverlayProps {

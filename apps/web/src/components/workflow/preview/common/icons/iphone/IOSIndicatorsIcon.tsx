@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { ComponentProps } from 'react';
+import { type ComponentProps } from 'react';
 
 export const IOSIndicatorsIcon = (props: ComponentProps<'svg'>) => {
   return (

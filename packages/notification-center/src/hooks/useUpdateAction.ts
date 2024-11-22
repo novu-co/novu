@@ -1,5 +1,10 @@
-import { useMutation, useQueryClient, UseMutationOptions, InfiniteData } from '@tanstack/react-query';
-import { IMessage, ButtonTypeEnum, MessageActionStatusEnum, IPaginatedResponse } from '@novu/shared';
+import { useMutation, useQueryClient, type UseMutationOptions, type InfiniteData } from '@tanstack/react-query';
+import {
+  type IMessage,
+  type ButtonTypeEnum,
+  type MessageActionStatusEnum,
+  type IPaginatedResponse,
+} from '@novu/shared';
 
 import { useNovuContext } from './useNovuContext';
 import { useFetchNotificationsQueryKey } from './useFetchNotificationsQueryKey';

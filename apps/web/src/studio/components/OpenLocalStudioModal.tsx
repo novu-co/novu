@@ -1,5 +1,5 @@
 import { Modal } from '@novu/design-system';
-import { FC } from 'react';
+import { type FC } from 'react';
 import { Button, Text, Title } from '@novu/novui';
 import { css } from '@novu/novui/css';
 import { HStack, Stack } from '@novu/novui/jsx';

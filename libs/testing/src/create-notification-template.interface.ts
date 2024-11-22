@@ -1,14 +1,14 @@
 import {
-  IEmailBlock,
-  ITemplateVariable,
-  StepTypeEnum,
-  IPreferenceChannels,
-  DigestTypeEnum,
-  DigestUnitEnum,
-  DelayTypeEnum,
-  ActorTypeEnum,
+  type IEmailBlock,
+  type ITemplateVariable,
+  type StepTypeEnum,
+  type IPreferenceChannels,
+  type DigestTypeEnum,
+  type DigestUnitEnum,
+  type DelayTypeEnum,
+  type ActorTypeEnum,
 } from '@novu/shared';
-import { NotificationTemplateEntity, StepFilter } from '@novu/dal';
+import { type NotificationTemplateEntity, type StepFilter } from '@novu/dal';
 
 interface IVariant {
   cta?: any;

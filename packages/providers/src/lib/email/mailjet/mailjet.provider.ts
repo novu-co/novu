@@ -1,17 +1,17 @@
 import { EmailProviderIdEnum } from '@novu/shared';
 import {
   ChannelTypeEnum,
-  IEmailOptions,
-  IEmailProvider,
-  ISendMessageSuccessResponse,
-  ICheckIntegrationResponse,
+  type IEmailOptions,
+  type IEmailProvider,
+  type ISendMessageSuccessResponse,
+  type ICheckIntegrationResponse,
   CheckIntegrationResponseEnum,
-  IEmailEventBody,
+  type IEmailEventBody,
   EmailEventStatusEnum,
 } from '@novu/stateless';
 import { Client, type SendEmailV3_1 } from 'node-mailjet';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 const MAILJET_API_VERSION = 'v3.1';
 

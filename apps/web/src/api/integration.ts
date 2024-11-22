@@ -1,4 +1,4 @@
-import { ChannelTypeEnum, ICreateIntegrationBodyDto, IUpdateIntegrationBodyDto } from '@novu/shared';
+import { type ChannelTypeEnum, type ICreateIntegrationBodyDto, type IUpdateIntegrationBodyDto } from '@novu/shared';
 import { api } from './api.client';
 
 export function getIntegrations() {

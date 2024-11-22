@@ -1,6 +1,6 @@
-import React, { ChangeEventHandler } from 'react';
+import React, { type ChangeEventHandler } from 'react';
 import { IconPerson } from '@novu/design-system';
-import { ControllerRenderProps } from 'react-hook-form';
+import { type ControllerRenderProps } from 'react-hook-form';
 
 import { previewContainerStyles } from './ProfileImage.styles';
 import { UploadInput } from './UploadInput';

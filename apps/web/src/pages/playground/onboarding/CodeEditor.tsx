@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { css } from '@emotion/css';
 import { useMantineTheme, Tabs } from '@mantine/core';
-import { Editor, Monaco } from '@monaco-editor/react';
-import { editor as NEditor } from 'monaco-editor';
+import { Editor, type Monaco } from '@monaco-editor/react';
+import { type editor as NEditor } from 'monaco-editor';
 
 import { colors } from '@novu/design-system';
 import { BrowserScreenWrapper } from './TitleBarWrapper';

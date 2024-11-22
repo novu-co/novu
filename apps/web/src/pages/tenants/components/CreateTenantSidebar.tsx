@@ -10,7 +10,7 @@ import { createTenant } from '../../../api/tenants';
 import { errorMessage, successMessage } from '../../../utils/notifications';
 import { QueryKeys } from '../../../api/query.keys';
 import { TenantFormCommonFields } from './TenantFormCommonFields';
-import { defaultFormValues, ITenantForm } from './UpdateTenantSidebar';
+import { defaultFormValues, type ITenantForm } from './UpdateTenantSidebar';
 
 export function CreateTenantSidebar({
   isOpened,

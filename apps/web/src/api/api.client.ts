@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { CustomDataType, WorkflowPreferences } from '@novu/shared';
+import { type CustomDataType, type WorkflowPreferences } from '@novu/shared';
 import { API_ROOT } from '../config';
 import { getToken } from '../components/providers/AuthProvider';
 import { getEnvironmentId } from '../components/providers/EnvironmentProvider';

@@ -1,4 +1,4 @@
-import { MutationOptions, useMutation, useQueryClient } from '@tanstack/react-query';
+import { type MutationOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { errorMessage, successMessage } from '@novu/design-system';
 import { api } from '../../../api';

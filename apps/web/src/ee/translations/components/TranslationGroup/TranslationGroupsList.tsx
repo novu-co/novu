@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
 import { Group, Indicator } from '@mantine/core';
-import { colors, IExtendedColumn, Table, Text, Tooltip, withCellLoading, IRow } from '@novu/design-system';
+import { colors, type IExtendedColumn, Table, Text, Tooltip, withCellLoading, type IRow } from '@novu/design-system';
 import { format } from 'date-fns';
 import React from 'react';
-import { ITranslationGroup } from '../../hooks';
+import { type ITranslationGroup } from '../../hooks';
 import { TranslationFolderIconSmall } from '../../icons';
 import { FlagIcon } from '../shared';
 import { Warning } from '../../icons/Warning';

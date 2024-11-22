@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { subMinutes } from 'date-fns';
 import { expect } from 'chai';
 import { CommunityUserRepository } from '@novu/dal';
-import { UserSessionData } from '@novu/shared';
+import { type UserSessionData } from '@novu/shared';
 
 describe('User login - /auth/login (POST) @skip-in-ee', async () => {
   let session: UserSession;

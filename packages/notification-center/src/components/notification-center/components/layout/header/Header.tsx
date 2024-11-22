@@ -5,9 +5,9 @@ import { ActionIcon } from '@mantine/core';
 
 import { useNotifications, useNovuTheme, useTranslations } from '../../../../../hooks';
 import { Cogs } from '../../../../../shared/icons';
-import { INotificationCenterContext } from '../../../../../shared/interfaces';
+import { type INotificationCenterContext } from '../../../../../shared/interfaces';
 import { NotificationCenterContext } from '../../../../../store/notification-center.context';
-import { INovuTheme } from '../../../../../store/novu-theme.context';
+import { type INovuTheme } from '../../../../../store/novu-theme.context';
 import { useStyles } from '../../../../../store/styles';
 import { UnseenBadge } from '../../UnseenBadge';
 

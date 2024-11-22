@@ -1,9 +1,9 @@
-import React, { ChangeEvent } from 'react';
+import React, { type ChangeEvent } from 'react';
 import styled from '@emotion/styled';
-import { PasswordInputProps, PasswordInput as MantinePasswordInput } from '@mantine/core';
+import { type PasswordInputProps, PasswordInput as MantinePasswordInput } from '@mantine/core';
 import { colors } from '../config';
 import { inputStyles } from '../config/inputs.styles';
-import { SpacingProps } from '../shared/spacing.props';
+import { type SpacingProps } from '../shared/spacing.props';
 
 interface IPasswordInputProps extends SpacingProps {
   label?: React.ReactNode;

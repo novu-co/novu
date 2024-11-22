@@ -1,13 +1,13 @@
-import { LoaderProps as ExternalLoaderProps, LoadingOverlay as ExternalLoadingOverlay } from '@mantine/core';
+import { type LoaderProps as ExternalLoaderProps, LoadingOverlay as ExternalLoadingOverlay } from '@mantine/core';
 import React from 'react';
-import { PolymorphicComponentPropWithRef, PolymorphicRef } from '../../types/props-helpers';
-import { JsxStyleProps } from '../../../styled-system/types';
+import { type PolymorphicComponentPropWithRef, type PolymorphicRef } from '../../types/props-helpers';
+import { type JsxStyleProps } from '../../../styled-system/types';
 import { css, cx } from '../../../styled-system/css';
 import { loadingOverlay, type LoadingOverlayVariant } from '../../../styled-system/recipes';
-import { CoreProps } from '../../types';
+import { type CoreProps } from '../../types';
 import { splitCssProps } from '../../../styled-system/jsx';
-import { IconSize } from '../../icons';
-import { ZIndexToken, token } from '../../../styled-system/tokens';
+import { type IconSize } from '../../icons';
+import { type ZIndexToken, token } from '../../../styled-system/tokens';
 
 export type LoaderSize = IconSize | '64';
 

@@ -1,10 +1,10 @@
 import {
-  ChannelTypeEnum,
-  IChannelCredentials,
+  type ChannelTypeEnum,
+  type IChannelCredentials,
   ISubscriberPayload,
   ButtonTypeEnum,
   MessageActionStatusEnum,
-  ISubscribersDefine,
+  type ISubscribersDefine,
   PreferenceLevelEnum,
 } from '@novu/shared';
 

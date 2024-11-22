@@ -1,5 +1,5 @@
-import { PreferencesRequestDto, StepCreateDto, WorkflowCommonsFields } from './workflow-commons-fields';
-import { WorkflowCreationSourceEnum } from '../../types';
+import { type PreferencesRequestDto, type StepCreateDto, type WorkflowCommonsFields } from './workflow-commons-fields';
+import { type WorkflowCreationSourceEnum } from '../../types';
 
 export type CreateWorkflowDto = WorkflowCommonsFields & {
   workflowId: string;

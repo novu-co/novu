@@ -1,11 +1,11 @@
 import { Container, Group, UnstyledButton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { colors, PageContainer, Text, Title, When, IRow } from '@novu/design-system';
+import { colors, PageContainer, Text, Title, When, type IRow } from '@novu/design-system';
 import { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Flex } from '@novu/novui/jsx';
 import { useEnvironment } from '../../../hooks';
-import { useGetDefaultLocale, ITranslationGroup, useFetchLocales, useFetchTranslationGroups } from '../hooks';
+import { useGetDefaultLocale, type ITranslationGroup, useFetchLocales, useFetchTranslationGroups } from '../hooks';
 import { FlagIcon } from '../components/shared';
 
 import { DefaultLocaleModal } from '../components/DefaultLocaleModal';

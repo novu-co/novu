@@ -1,13 +1,13 @@
 import React from 'react';
 import {
   darkButtonStyle,
-  IMessageButton,
+  type IMessageButton,
   lightButtonStyle,
   ButtonTypeEnum,
-  IMessageAction,
+  type IMessageAction,
   MessageActionStatusEnum,
 } from '@novu/shared';
-import { ColorScheme, TextInput, useMantineColorScheme, useMantineTheme } from '@mantine/core';
+import { type ColorScheme, TextInput, useMantineColorScheme, useMantineTheme } from '@mantine/core';
 import { RemoveCircle, Button, colors } from '@novu/design-system';
 import styled from '@emotion/styled';
 import { When } from '../../../../../components/utils/When';

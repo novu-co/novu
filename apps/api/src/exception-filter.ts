@@ -1,6 +1,6 @@
-import { ArgumentsHost, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
-import { Response } from 'express';
-import { CommandValidationException, PinoLogger } from '@novu/application-generic';
+import { type ArgumentsHost, type ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
+import { type Response } from 'express';
+import { CommandValidationException, type PinoLogger } from '@novu/application-generic';
 import { randomUUID } from 'node:crypto';
 import { captureException } from '@sentry/node';
 import { ZodError } from 'zod';

@@ -1,4 +1,4 @@
-import { LoadingOverlayStylesNames } from '@mantine/core';
+import { type LoadingOverlayStylesNames } from '@mantine/core';
 import { defineSlotRecipe } from '@pandacss/dev';
 import { colorPaletteGradientHorizontal } from '../ingredients';
 

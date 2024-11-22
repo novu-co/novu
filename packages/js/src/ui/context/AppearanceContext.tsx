@@ -1,12 +1,12 @@
 import {
-  Accessor,
+  type Accessor,
   createContext,
   createEffect,
   createMemo,
   createSignal,
   onCleanup,
   onMount,
-  ParentProps,
+  type ParentProps,
   useContext,
 } from 'solid-js';
 import { createStore } from 'solid-js/store';

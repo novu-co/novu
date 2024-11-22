@@ -2,7 +2,7 @@ import { errorMessage, Modal, successMessage } from '@novu/design-system';
 import { css } from '@novu/novui/css';
 import { Button, Title, Textarea } from '@novu/novui';
 import { HStack, Box } from '@novu/novui/jsx';
-import { FC } from 'react';
+import { type FC } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { createThread } from '../../../api/support';
 

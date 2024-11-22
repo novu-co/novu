@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { StepTypeEnum } from '@novu/shared';
+import { type StepTypeEnum } from '@novu/shared';
 import { useParams } from 'react-router-dom';
 import { PreviewComponent } from './ChannelPreview';
 

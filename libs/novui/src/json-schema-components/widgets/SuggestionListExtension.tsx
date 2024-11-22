@@ -1,6 +1,6 @@
 import { Extension } from '@tiptap/react';
 
-import { VariableItem } from './VariableSuggestionList';
+import { type VariableItem } from './VariableSuggestionList';
 
 export type SuggestionListStorage = {
   suggestions: VariableItem[];

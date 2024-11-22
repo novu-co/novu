@@ -1,7 +1,7 @@
 import { expect, test, vi } from 'vitest';
 import {
   CheckIntegrationResponseEnum,
-  ICheckIntegrationResponse,
+  type ICheckIntegrationResponse,
 } from '@novu/stateless';
 import nodemailer from 'nodemailer';
 import { Outlook365Provider } from './outlook365.provider';

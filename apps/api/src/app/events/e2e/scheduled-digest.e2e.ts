@@ -2,8 +2,8 @@ import axios from 'axios';
 import { expect } from 'chai';
 import {
   MessageRepository,
-  NotificationTemplateEntity,
-  SubscriberEntity,
+  type NotificationTemplateEntity,
+  type SubscriberEntity,
   JobRepository,
   JobStatusEnum,
   JobEntity,

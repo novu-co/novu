@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styled from '@emotion/styled';
-import { useMantineTheme, ColorScheme } from '@mantine/core';
+import { useMantineTheme, type ColorScheme } from '@mantine/core';
 import { colors } from '@novu/design-system';
 import { HUBSPOT_PORTAL_ID } from '../utils/environment';
 

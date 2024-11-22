@@ -6,7 +6,10 @@ import {
   FilterPartTypeEnum,
 } from '@novu/shared';
 
-import { MessageFilter, NotificationStepVariantCommand } from '../../usecases';
+import {
+  type MessageFilter,
+  type NotificationStepVariantCommand,
+} from '../../usecases';
 import { isVariantEmpty } from './isVariantEmpty';
 
 const testFilter: MessageFilter = {

@@ -1,4 +1,4 @@
-import clsx, { ClassValue } from 'clsx';
+import clsx, { type ClassValue } from 'clsx';
 import { extendTailwindMerge, type ClassNameValue } from 'tailwind-merge';
 import type { CSSProperties, Elements, Tab, Variables } from '../types';
 

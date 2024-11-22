@@ -1,14 +1,14 @@
 import {
   HandlebarsContentEngine,
-  IContentEngine,
+  type IContentEngine,
 } from '../content/content.engine';
-import { IEmailProvider } from '../provider/provider.interface';
+import { type IEmailProvider } from '../provider/provider.interface';
 import {
   ChannelTypeEnum,
-  IMessage,
-  ITriggerPayload,
+  type IMessage,
+  type ITriggerPayload,
 } from '../template/template.interface';
-import { ITheme } from '../theme/theme.interface';
+import { type ITheme } from '../theme/theme.interface';
 
 export class EmailHandler {
   private readonly contentEngine: IContentEngine;

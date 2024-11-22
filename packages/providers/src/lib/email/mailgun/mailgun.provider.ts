@@ -1,18 +1,18 @@
 import { EmailProviderIdEnum } from '@novu/shared';
 import {
   ChannelTypeEnum,
-  IEmailOptions,
-  IEmailProvider,
-  ISendMessageSuccessResponse,
-  ICheckIntegrationResponse,
+  type IEmailOptions,
+  type IEmailProvider,
+  type ISendMessageSuccessResponse,
+  type ICheckIntegrationResponse,
   CheckIntegrationResponseEnum,
 } from '@novu/stateless';
 import formData from 'form-data';
 import Mailgun from 'mailgun.js';
-import { IMailgunClient } from 'mailgun.js/interfaces/IMailgunClient';
-import { MailgunMessageData } from 'mailgun.js/interfaces/Messages';
+import { type IMailgunClient } from 'mailgun.js/interfaces/IMailgunClient';
+import { type MailgunMessageData } from 'mailgun.js/interfaces/Messages';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 export class MailgunEmailProvider
   extends BaseProvider

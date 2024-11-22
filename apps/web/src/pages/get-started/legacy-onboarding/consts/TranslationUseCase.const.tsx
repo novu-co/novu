@@ -1,7 +1,7 @@
 import { ROUTES } from '../../../../constants/routes';
 
 import { GetStartedLink, StepDescription, StepText } from './shared';
-import { OnboardingUseCase } from './types';
+import { type OnboardingUseCase } from './types';
 import { OnboardingUseCasesTabsEnum } from './OnboardingUseCasesTabsEnum';
 import { GetStartedAnimation } from '../components/GetStartedAnimation';
 

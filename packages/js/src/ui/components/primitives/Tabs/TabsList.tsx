@@ -1,5 +1,5 @@
 /* eslint-disable local-rules/no-class-without-style */
-import { JSX, ParentProps, Ref, splitProps } from 'solid-js';
+import { type JSX, type ParentProps, type Ref, splitProps } from 'solid-js';
 import type { AppearanceKey } from '../../../types';
 import { useStyle } from '../../../helpers';
 

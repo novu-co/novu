@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import { MantineProvider, Global, ColorSchemeProvider, MantineTheme } from '@mantine/core';
+import { type ReactNode } from 'react';
+import { MantineProvider, Global, ColorSchemeProvider, type MantineTheme } from '@mantine/core';
 import { NotificationsProvider } from '@mantine/notifications';
 
 import { mantineConfig } from './config/theme.config';

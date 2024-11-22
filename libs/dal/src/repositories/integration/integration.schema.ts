@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
-import { IntegrationDBModel } from './integration.entity';
+import { type IntegrationDBModel } from './integration.entity';
 
 const mongooseDelete = require('mongoose-delete');
 

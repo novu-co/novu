@@ -1,9 +1,9 @@
 import React from 'react';
 import {
   SegmentedControl as MantineSegmentedControl,
-  SegmentedControlProps,
-  SegmentedControlItem,
-  Sx,
+  type SegmentedControlProps,
+  type SegmentedControlItem,
+  type Sx,
 } from '@mantine/core';
 import styled from '@emotion/styled';
 import useStyles from './TypeSegment.styles';

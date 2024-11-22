@@ -5,9 +5,9 @@ import { useMantineColorScheme } from '@mantine/core';
 
 import {
   FeatureFlagsKeysEnum,
-  ICreateOrganizationDto,
-  IResponseError,
-  ProductUseCases,
+  type ICreateOrganizationDto,
+  type IResponseError,
+  type ProductUseCases,
   JobTitleEnum,
 } from '@novu/shared';
 import { successMessage } from '@novu/design-system';

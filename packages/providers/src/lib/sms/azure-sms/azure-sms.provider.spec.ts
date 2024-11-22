@@ -1,5 +1,5 @@
 // azure-sms.provider.spec.ts
-import { expect, test, vi, MockedClass } from 'vitest';
+import { expect, test, vi, type MockedClass } from 'vitest';
 import { SmsClient } from '@azure/communication-sms';
 import { AzureSmsProvider } from './azure-sms.provider';
 

@@ -1,6 +1,6 @@
-import { NotificationStepDto } from './workflow.dto';
-import { IPreferenceChannels } from '../../entities/subscriber-preference';
-import { NotificationTemplateCustomData } from '../../types';
+import { type NotificationStepDto } from './workflow.dto';
+import { type IPreferenceChannels } from '../../entities/subscriber-preference';
+import { type NotificationTemplateCustomData } from '../../types';
 
 /**
  * @deprecated use CreateWorkflowDto instead

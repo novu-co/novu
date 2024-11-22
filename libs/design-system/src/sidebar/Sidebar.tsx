@@ -7,7 +7,7 @@ import { ArrowLeft } from '../icons';
 import { When } from '../when';
 import { Close } from './Close';
 import { BodyHolder, FooterHolder, HeaderHolder, Form, useDrawerStyles } from './Sidebar.styles';
-import { ISidebarBaseProps } from './Sidebar.types';
+import { type ISidebarBaseProps } from './Sidebar.types';
 
 export interface ISidebarProps extends ISidebarBaseProps {
   onSubmit?: React.FormEventHandler<HTMLFormElement>;

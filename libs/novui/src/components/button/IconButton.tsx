@@ -1,12 +1,12 @@
-import { ActionIcon, ButtonVariant as ExternalButtonVariant, ActionIconStylesNames } from '@mantine/core';
+import { ActionIcon, type ButtonVariant as ExternalButtonVariant, ActionIconStylesNames } from '@mantine/core';
 import React from 'react';
-import { PolymorphicComponentPropWithRef, PolymorphicRef } from '../../types/props-helpers';
-import { JsxStyleProps } from '../../../styled-system/types';
+import { type PolymorphicComponentPropWithRef, type PolymorphicRef } from '../../types/props-helpers';
+import { type JsxStyleProps } from '../../../styled-system/types';
 import { css, cx } from '../../../styled-system/css';
 import { button, type ButtonVariant } from '../../../styled-system/recipes';
 import { token } from '../../../styled-system/tokens';
-import { IconType } from '../../icons';
-import { CoreProps } from '../../types';
+import { type IconType } from '../../icons';
+import { type CoreProps } from '../../types';
 import { splitCssProps } from '../../../styled-system/jsx';
 import { BUTTON_SIZE_TO_ICON_SIZE, DEFAULT_SIZE } from './Button.const';
 

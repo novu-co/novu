@@ -1,12 +1,12 @@
 import {
   QueryClient,
-  QueryKey,
+  type QueryKey,
   QueryObserver,
-  QueryObserverOptions,
-  QueryObserverResult,
+  type QueryObserverOptions,
+  type QueryObserverResult,
   MutationObserver,
-  MutationObserverOptions,
-  MutationObserverResult,
+  type MutationObserverOptions,
+  type MutationObserverResult,
 } from '@tanstack/query-core';
 
 export class QueryService {

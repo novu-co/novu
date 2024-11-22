@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
-import { LogDBModel } from './log.entity';
+import { type LogDBModel } from './log.entity';
 
 const logSchema = new Schema<LogDBModel>(
   {

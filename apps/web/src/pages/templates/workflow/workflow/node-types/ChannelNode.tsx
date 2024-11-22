@@ -5,11 +5,11 @@ import { FilterPartTypeEnum } from '@novu/shared';
 import { useParams } from 'react-router-dom';
 import { useFormContext } from 'react-hook-form';
 import { WorkflowNode } from './WorkflowNode';
-import { INode } from '../../../../../components/workflow/types';
+import { type INode } from '../../../../../components/workflow/types';
 import { useStepSubtitle } from '../../../hooks/useStepSubtitle';
 import { Conditions } from '../../../../../components/conditions';
 import { useFilterPartsList } from '../../../hooks/useFilterPartsList';
-import { IForm } from '../../../components/formTypes';
+import { type IForm } from '../../../components/formTypes';
 
 export default memo((node: INode) => {
   const { data, id, dragging } = node;

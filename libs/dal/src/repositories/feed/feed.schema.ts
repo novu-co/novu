@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
-import { FeedDBModel } from './feed.entity';
+import { type FeedDBModel } from './feed.entity';
 
 const mongooseDelete = require('mongoose-delete');
 

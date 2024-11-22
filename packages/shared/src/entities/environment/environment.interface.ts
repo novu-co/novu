@@ -1,4 +1,4 @@
-import { IApiRateLimitMaximum } from '../../types';
+import { type IApiRateLimitMaximum } from '../../types';
 
 export interface IEnvironment {
   _id: string;

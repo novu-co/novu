@@ -1,6 +1,6 @@
 import { DEFAULT_WORKFLOW_PREFERENCES } from '../consts';
-import { IPreferenceChannels } from '../entities/subscriber-preference';
-import { ChannelTypeEnum, WorkflowPreferencesPartial, WorkflowPreferences } from '../types';
+import { type IPreferenceChannels } from '../entities/subscriber-preference';
+import { ChannelTypeEnum, type WorkflowPreferencesPartial, type WorkflowPreferences } from '../types';
 
 /**
  * Given any partial input of preferences, output a complete preferences object that:

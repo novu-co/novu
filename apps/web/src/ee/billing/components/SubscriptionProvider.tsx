@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { ApiServiceLevelEnum } from '@novu/shared';
-import { useSubscription, UseSubscriptionType } from '../hooks/useSubscription';
+import { useSubscription, type UseSubscriptionType } from '../hooks/useSubscription';
 
 export type { UseSubscriptionType } from '../hooks/useSubscription';
 

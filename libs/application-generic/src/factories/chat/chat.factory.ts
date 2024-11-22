@@ -1,5 +1,5 @@
-import { IntegrationEntity } from '@novu/dal';
-import { IChatFactory, IChatHandler } from './interfaces';
+import { type IntegrationEntity } from '@novu/dal';
+import { type IChatFactory, type IChatHandler } from './interfaces';
 import { SlackHandler } from './handlers/slack.handler';
 import { DiscordHandler } from './handlers/discord.handler';
 import { MSTeamsHandler } from './handlers/msteams.handler';

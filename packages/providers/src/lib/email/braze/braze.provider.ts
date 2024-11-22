@@ -1,20 +1,20 @@
 import { EmailProviderIdEnum } from '@novu/shared';
 import {
   ChannelTypeEnum,
-  ISendMessageSuccessResponse,
-  IEmailOptions,
-  IEmailProvider,
-  ICheckIntegrationResponse,
+  type ISendMessageSuccessResponse,
+  type IEmailOptions,
+  type IEmailProvider,
+  type ICheckIntegrationResponse,
   CheckIntegrationResponseEnum,
 } from '@novu/stateless';
 import {
   Braze,
-  MessagesSendObject,
-  UsersExportIdsObject,
-  UsersExportIdsResponse,
+  type MessagesSendObject,
+  type UsersExportIdsObject,
+  type UsersExportIdsResponse,
 } from 'braze-api';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 export class BrazeEmailProvider extends BaseProvider implements IEmailProvider {
   id = EmailProviderIdEnum.Braze;

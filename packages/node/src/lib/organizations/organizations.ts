@@ -1,10 +1,10 @@
 import { WithHttp } from '../novu.interface';
 import {
-  IOrganizations,
-  IOrganizationCreatePayload,
-  IOrganizationRenamePayload,
-  IOrganizationUpdateMemberRolePayload,
-  IOrganizationBrandingPayload,
+  type IOrganizations,
+  type IOrganizationCreatePayload,
+  type IOrganizationRenamePayload,
+  type IOrganizationUpdateMemberRolePayload,
+  type IOrganizationBrandingPayload,
 } from './organizations.interface';
 
 export class Organizations extends WithHttp implements IOrganizations {

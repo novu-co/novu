@@ -1,4 +1,4 @@
-import { TenantCustomData } from '../../types';
+import { type TenantCustomData } from '../../types';
 
 export interface IConstructTenantDto {
   data?: TenantCustomData;

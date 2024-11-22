@@ -1,9 +1,9 @@
 import {
-  LayoutId,
-  ILayoutPaginationPayload,
-  ILayoutPayload,
-  ILayoutUpdatePayload,
-  ILayouts,
+  type LayoutId,
+  type ILayoutPaginationPayload,
+  type ILayoutPayload,
+  type ILayoutUpdatePayload,
+  type ILayouts,
 } from './layout.interface';
 import { WithHttp } from '../novu.interface';
 

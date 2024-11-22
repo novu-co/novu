@@ -1,13 +1,13 @@
-import { PropsWithChildren, useMemo } from 'react';
+import { type PropsWithChildren, useMemo } from 'react';
 import styled from '@emotion/styled/macro';
-import { Title, Text, Grid, Stack, useMantineColorScheme, TextProps } from '@mantine/core';
+import { Title, Text, Grid, Stack, useMantineColorScheme, type TextProps } from '@mantine/core';
 import { useMutation } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import type { IResponseError, ICredentialsDto } from '@novu/shared';
 import { UTM_CAMPAIGN_QUERY_PARAM } from '@novu/shared';
 import { Switch, Button, colors, CircleArrowRight } from '@novu/design-system';
 
-import { IIntegratedProvider } from '../types';
+import { type IIntegratedProvider } from '../types';
 import { updateIntegration } from '../../../api/integration';
 import { When } from '../../../components/utils/When';
 import { errorMessage, successMessage } from '../../../utils/notifications';

@@ -1,6 +1,6 @@
 import { BaseRepository } from '../base-repository';
 import type { EnforceEnvOrOrgIds } from '../../types/enforce';
-import { SubscriberPreferenceEntity, SubscriberPreferenceDBModel } from './subscriber-preference.entity';
+import { SubscriberPreferenceEntity, type SubscriberPreferenceDBModel } from './subscriber-preference.entity';
 import { SubscriberPreference } from './subscriber-preference.schema';
 
 export class SubscriberPreferenceRepository extends BaseRepository<

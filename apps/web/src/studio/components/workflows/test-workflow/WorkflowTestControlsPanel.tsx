@@ -3,7 +3,7 @@ import { JsonSchemaForm, Title } from '@novu/novui';
 import { IconOutlineSend, IconOutlineTune } from '@novu/novui/icons';
 import { Box, HStack, Stack } from '@novu/novui/jsx';
 import { ChannelTypeEnum } from '@novu/shared';
-import { FC, useEffect } from 'react';
+import { type FC, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { When } from '../../../../components/utils/When';
 import { formContainerClassName } from '../step-editor/WorkflowStepEditorControlsPanel';

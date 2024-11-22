@@ -1,6 +1,6 @@
-import { InboxService } from './api';
-import { NovuEventEmitter } from './event-emitter';
-import { Result, Session } from './types';
+import { type InboxService } from './api';
+import { type NovuEventEmitter } from './event-emitter';
+import { type Result, type Session } from './types';
 import { NovuError } from './utils/errors';
 
 interface CallQueueItem {

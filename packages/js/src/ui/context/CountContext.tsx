@@ -1,5 +1,13 @@
-import { Accessor, createContext, createMemo, createSignal, onMount, ParentProps, useContext } from 'solid-js';
-import { NotificationFilter, Notification } from '../../types';
+import {
+  type Accessor,
+  createContext,
+  createMemo,
+  createSignal,
+  onMount,
+  type ParentProps,
+  useContext,
+} from 'solid-js';
+import { type NotificationFilter, type Notification } from '../../types';
 import { getTagsFromTab } from '../helpers';
 import { useNovuEvent } from '../helpers/useNovuEvent';
 import { useWebSocketEvent } from '../helpers/useWebSocketEvent';

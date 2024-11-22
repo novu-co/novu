@@ -1,6 +1,6 @@
 import { useClipboard } from '@mantine/hooks';
 import { successMessage, errorMessage } from '@novu/design-system';
-import { IResponseError, checkIsResponseError } from '@novu/shared';
+import { type IResponseError, checkIsResponseError } from '@novu/shared';
 import { useMutation } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -9,7 +9,7 @@ import { useEnvironment, useEffectOnce } from '../../../hooks';
 import { updateDnsSettings } from '../../../api';
 import { validateMxRecord } from '../../../api/inbound-parse';
 import { getWebhookClaimStatusFromEnvironment } from './getWebhookClaimStatusFromEnvironment';
-import { WebhookClaimStatus } from './WebhookPage.types';
+import { type WebhookClaimStatus } from './WebhookPage.types';
 
 export const useWebhookPage = () => {
   const mailServerDomain = `10 ${MAIL_SERVER_DOMAIN}`;

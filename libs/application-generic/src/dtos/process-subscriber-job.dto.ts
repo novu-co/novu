@@ -1,16 +1,16 @@
 import {
-  ControlsDto,
-  ISubscribersDefine,
-  ITenantDefine,
-  SubscriberSourceEnum,
-  TriggerRequestCategoryEnum,
+  type ControlsDto,
+  type ISubscribersDefine,
+  type ITenantDefine,
+  type SubscriberSourceEnum,
+  type TriggerRequestCategoryEnum,
 } from '@novu/shared';
-import { SubscriberEntity } from '@novu/dal';
-import { DiscoverWorkflowOutput } from '@novu/framework/internal';
+import { type SubscriberEntity } from '@novu/dal';
+import { type DiscoverWorkflowOutput } from '@novu/framework/internal';
 
 import {
-  IBulkJobParams,
-  IJobParams,
+  type IBulkJobParams,
+  type IJobParams,
 } from '../services/queues/queue-base.service';
 
 export interface IProcessSubscriberDataDto {

@@ -1,17 +1,20 @@
 import { EmailProviderIdEnum } from '@novu/shared';
 import {
   ChannelTypeEnum,
-  ISendMessageSuccessResponse,
-  IEmailOptions,
-  IEmailProvider,
-  ICheckIntegrationResponse,
+  type ISendMessageSuccessResponse,
+  type IEmailOptions,
+  type IEmailProvider,
+  type ICheckIntegrationResponse,
   CheckIntegrationResponseEnum,
 } from '@novu/stateless';
-import axios, { AxiosError } from 'axios';
+import axios, { type AxiosError } from 'axios';
 import { randomUUID } from 'crypto';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
-import { ISparkPostErrorResponse, SparkPostError } from './sparkpost.error';
+import { type WithPassthrough } from '../../../utils/types';
+import {
+  type ISparkPostErrorResponse,
+  SparkPostError,
+} from './sparkpost.error';
 
 interface ISparkPostResponse {
   results: {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Mounter } from './Mounter';
-import { BellRenderer } from '../utils/types';
+import { type BellRenderer } from '../utils/types';
 import { withRenderer } from './Renderer';
 import { useNovuUI } from '../context/NovuUIContext';
 import { useRenderer } from '../context/RendererContext';

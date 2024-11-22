@@ -7,12 +7,12 @@ import {
   FieldLogicalOperatorEnum,
   FieldOperatorEnum,
   FilterPartTypeEnum,
-  INotificationTemplateStep,
+  type INotificationTemplateStep,
   StepTypeEnum,
 } from '@novu/shared';
 
-import { GroupedBlueprintResponse } from '../dto/grouped-blueprint.response.dto';
-import { CreateWorkflowRequestDto } from '../../workflows-v1/dto';
+import { type GroupedBlueprintResponse } from '../dto/grouped-blueprint.response.dto';
+import { type CreateWorkflowRequestDto } from '../../workflows-v1/dto';
 
 describe('Get blueprints by id - /blueprints/:templateId (GET)', async () => {
   let session: UserSession;

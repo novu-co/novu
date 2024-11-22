@@ -1,4 +1,4 @@
-import { ITemplate, ITriggerPayload } from './template.interface';
+import { type ITemplate, type ITriggerPayload } from './template.interface';
 
 export class TemplateStore {
   private readonly templates: ITemplate[] = [];

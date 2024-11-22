@@ -1,4 +1,4 @@
-import { NotificationFilter, NotificationStatus } from '../types';
+import { type NotificationFilter, NotificationStatus } from '../types';
 import { arrayValuesEqual } from './arrays';
 
 export const SEEN_OR_UNSEEN = [NotificationStatus.SEEN, NotificationStatus.UNSEEN];

@@ -1,4 +1,4 @@
-import { Step } from 'react-joyride';
+import { type Step } from 'react-joyride';
 import { useParams } from 'react-router-dom';
 import { useAuth, useEffectOnce } from '../../../hooks';
 import { useTourStorage } from '../hooks/useTourStorage';

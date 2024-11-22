@@ -1,4 +1,4 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query';
+import { type UseQueryOptions, useQuery } from '@tanstack/react-query';
 
 import { getActiveIntegrations } from '../../api/integration';
 import { QueryKeys } from '../../api/query.keys';

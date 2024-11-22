@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container as MantineContainer, ContainerProps } from '@mantine/core';
+import { Container as MantineContainer, type ContainerProps } from '@mantine/core';
 import { colors, shadows } from '../config';
 
 /**

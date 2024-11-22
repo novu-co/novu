@@ -1,4 +1,4 @@
-import { EdgeProps, getBezierEdgeCenter, getBezierPath } from 'react-flow-renderer';
+import { type EdgeProps, getBezierEdgeCenter, getBezierPath } from 'react-flow-renderer';
 import styled from '@emotion/styled';
 import AddNode from '../node-types/AddNode';
 

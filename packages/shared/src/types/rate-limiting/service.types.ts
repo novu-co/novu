@@ -1,5 +1,5 @@
-import { ApiServiceLevelEnum } from '../organization';
-import { ApiRateLimitConfigEnum, ApiRateLimitEnvVarNamespace } from './config.types';
+import { type ApiServiceLevelEnum } from '../organization';
+import { type ApiRateLimitConfigEnum, type ApiRateLimitEnvVarNamespace } from './config.types';
 
 /**
  * The categories of rate limits.

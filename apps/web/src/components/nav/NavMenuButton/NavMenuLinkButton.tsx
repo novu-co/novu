@@ -1,8 +1,8 @@
-import { FC, PropsWithChildren, useState } from 'react';
+import { type FC, type PropsWithChildren, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { css, cx } from '@novu/novui/css';
 import { HStack } from '@novu/novui/jsx';
-import { INavMenuButtonProps, NavMenuButtonInner, rawButtonBaseStyles } from './NavMenuButton.shared';
+import { type INavMenuButtonProps, NavMenuButtonInner, rawButtonBaseStyles } from './NavMenuButton.shared';
 import { NavMenuRightSide } from './NavMenuButtonRightSide';
 
 const rawLinkButtonStyles = css.raw({

@@ -1,6 +1,6 @@
-import React, { Dispatch } from 'react';
+import React, { type Dispatch } from 'react';
 import { Stack } from '@mantine/core';
-import { NavigateFunction } from 'react-router-dom';
+import { type NavigateFunction } from 'react-router-dom';
 import { ChannelTypeEnum, UTM_CAMPAIGN_QUERY_PARAM } from '@novu/shared';
 import { Bell, Chat, Mail, Mobile, Sms } from '@novu/design-system';
 

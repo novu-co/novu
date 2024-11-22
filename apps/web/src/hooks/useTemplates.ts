@@ -1,5 +1,10 @@
-import { INotificationTemplate, isBridgeWorkflow, WorkflowIntegrationStatus, WorkflowTypeEnum } from '@novu/shared';
-import { IUsePaginationQueryParamsStateOptions } from '@novu/design-system';
+import {
+  type INotificationTemplate,
+  isBridgeWorkflow,
+  type WorkflowIntegrationStatus,
+  WorkflowTypeEnum,
+} from '@novu/shared';
+import { type IUsePaginationQueryParamsStateOptions } from '@novu/design-system';
 
 import { useEnvironment } from './useEnvironment';
 import { getNotificationsList } from '../api/notification-templates';

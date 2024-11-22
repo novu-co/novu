@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 import { Skeleton } from '@mantine/core';
 
-import { Renderer } from 'react-table';
-import { IExtendedCellProps } from './Table';
+import { type Renderer } from 'react-table';
+import { type IExtendedCellProps } from './Table';
 
 const SkeletonStyled = styled(Skeleton)`
   width: 100%;

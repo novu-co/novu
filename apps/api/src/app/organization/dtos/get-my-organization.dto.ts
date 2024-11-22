@@ -1,3 +1,3 @@
-import { OrganizationEntity } from '@novu/dal';
+import { type OrganizationEntity } from '@novu/dal';
 
 export type IGetMyOrganizationDto = OrganizationEntity;

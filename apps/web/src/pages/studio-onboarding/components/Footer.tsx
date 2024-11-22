@@ -9,7 +9,7 @@ import { When } from '../../../components/utils/When';
 import { DocsButton } from '../../../components/docs/DocsButton';
 import { useTelemetry } from '../../../hooks/useNovuAPI';
 import { PATHS } from '../../../components/docs/docs.const';
-import { DocsPaths, useDocsPath } from '../../../components/docs/useDocsPath';
+import { type DocsPaths, useDocsPath } from '../../../components/docs/useDocsPath';
 import { ROUTES } from '../../../constants/routes';
 
 const Text = styled('a', text);

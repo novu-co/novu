@@ -4,9 +4,9 @@ import { Outlet } from 'react-router-dom';
 import { OnboardingUseCasesTabsEnum } from '../../consts/OnboardingUseCasesTabsEnum';
 import { UseCasesConst } from '../../consts/UseCases.const';
 import { GetStartedTab } from '../../layout/GetStartedTab';
-import { GetStartedTabConfig, ICON_STYLE, TAB_CONFIGS } from './GetStartedTabs.const';
+import { type GetStartedTabConfig, ICON_STYLE, TAB_CONFIGS } from './GetStartedTabs.const';
 import useStyles from './GetStartedTabs.style';
-import { useGetStartedTabs } from './useGetStartedTabs';
+import { type useGetStartedTabs } from './useGetStartedTabs';
 import { useGetStartedTabView } from './useGetStartedTabView';
 import { FrameworkTab } from './FrameworkTab';
 

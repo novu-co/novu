@@ -1,10 +1,10 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Alignment, Fit, Layout, useRive, useStateMachineInput } from '@rive-app/react-canvas';
-import { FC, useEffect } from 'react';
-import { ColorScheme } from '@mantine/core';
+import { type FC, useEffect } from 'react';
+import { type ColorScheme } from '@mantine/core';
 
-import { OnboardingUseCasesTabsEnum } from '../consts/OnboardingUseCasesTabsEnum';
+import { type OnboardingUseCasesTabsEnum } from '../consts/OnboardingUseCasesTabsEnum';
 
 interface IGetStartedAnimationProps {
   useCase: OnboardingUseCasesTabsEnum;

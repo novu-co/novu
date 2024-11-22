@@ -1,14 +1,17 @@
 import { SmsProviderIdEnum } from '@novu/shared';
 import {
   ChannelTypeEnum,
-  ISendMessageSuccessResponse,
-  ISmsOptions,
-  ISmsProvider,
+  type ISendMessageSuccessResponse,
+  type ISmsOptions,
+  type ISmsProvider,
 } from '@novu/stateless';
 
-import Sms77Client, { SmsJsonResponse, SmsParams } from 'sms77-client';
+import Sms77Client, {
+  type SmsJsonResponse,
+  type SmsParams,
+} from 'sms77-client';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 export class Sms77SmsProvider extends BaseProvider implements ISmsProvider {
   id = SmsProviderIdEnum.Sms77;

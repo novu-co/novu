@@ -5,23 +5,23 @@ import axios from 'axios';
 
 import { SubscribersService, UserSession } from '@novu/testing';
 import {
-  ExternalSubscriberId,
-  ISubscribersDefine,
-  ITopic,
+  type ExternalSubscriberId,
+  type ISubscribersDefine,
+  type ITopic,
   SubscriberSourceEnum,
-  TopicId,
-  TopicKey,
-  TriggerRecipients,
+  type TopicId,
+  type TopicKey,
+  type TriggerRecipients,
   TriggerRecipientsTypeEnum,
 } from '@novu/shared';
 import {
-  IProcessSubscriberBulkJobDto,
+  type IProcessSubscriberBulkJobDto,
   mapSubscribersToJobs,
   SubscriberProcessQueueService,
   TriggerMulticast,
-  TriggerMulticastCommand,
+  type TriggerMulticastCommand,
 } from '@novu/application-generic';
-import { NotificationTemplateEntity, SubscriberEntity } from '@novu/dal';
+import { type NotificationTemplateEntity, type SubscriberEntity } from '@novu/dal';
 
 import { SharedModule } from '../../shared/shared.module';
 import { EventsModule } from '../events.module';

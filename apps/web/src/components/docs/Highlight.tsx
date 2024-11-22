@@ -1,5 +1,5 @@
 import hljs from 'highlight.js';
-import { ReactNode, useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import 'highlight.js/styles/default.css';
 import 'highlight.js/styles/atom-one-dark.css';
 

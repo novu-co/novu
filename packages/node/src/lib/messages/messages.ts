@@ -1,4 +1,4 @@
-import { IMessagesPayload, IMessages } from './messages.interface';
+import { type IMessagesPayload, type IMessages } from './messages.interface';
 import { WithHttp } from '../novu.interface';
 
 const BASE_PATH = '/messages';

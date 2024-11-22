@@ -1,4 +1,4 @@
-import { ChannelTypeEnum, ChannelPreference } from '@novu/shared';
+import { type ChannelTypeEnum, type ChannelPreference } from '@novu/shared';
 
 export type PreferenceChannelName = `${ChannelTypeEnum}` | 'all';
 export type SubscriptionPreferenceRow = {

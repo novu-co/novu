@@ -1,6 +1,6 @@
 import { For, Show } from 'solid-js';
-import { JSX } from 'solid-js/jsx-runtime';
-import { StringLocalizationKey, useLocalization } from '../../../context';
+import { type JSX } from 'solid-js/jsx-runtime';
+import { type StringLocalizationKey, useLocalization } from '../../../context';
 import { cn, useStyle } from '../../../helpers';
 import { Archive, Check, Inbox, Unread } from '../../../icons';
 import { NotificationStatus } from '../../../types';

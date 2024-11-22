@@ -1,4 +1,4 @@
-import { createContext, createMemo, JSX, useContext } from 'solid-js';
+import { createContext, createMemo, type JSX, useContext } from 'solid-js';
 import { Novu } from '../../novu';
 import type { NovuOptions } from '../../types';
 

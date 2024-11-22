@@ -1,9 +1,9 @@
-import { FilterQuery } from 'mongoose';
-import { SoftDeleteModel } from 'mongoose-delete';
+import { type FilterQuery } from 'mongoose';
+import { type SoftDeleteModel } from 'mongoose-delete';
 
 import { BaseRepository } from '../base-repository';
 import { NotificationTemplate } from './notification-template.schema';
-import { NotificationTemplateDBModel, NotificationTemplateEntity } from './notification-template.entity';
+import { type NotificationTemplateDBModel, NotificationTemplateEntity } from './notification-template.entity';
 import { DalException } from '../../shared';
 import type { EnforceEnvOrOrgIds } from '../../types/enforce';
 import { EnvironmentRepository } from '../environment';

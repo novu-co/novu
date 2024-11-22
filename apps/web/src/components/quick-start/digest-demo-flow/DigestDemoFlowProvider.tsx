@@ -1,10 +1,10 @@
-import React, { ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import {
-  INotificationTemplateStep,
-  IUpdateNotificationTemplateDto,
+  type INotificationTemplateStep,
+  type IUpdateNotificationTemplateDto,
   StepTypeEnum,
-  IDigestRegularMetadata,
+  type IDigestRegularMetadata,
 } from '@novu/shared';
 
 import { testTrigger } from '../../../api/notification-templates';

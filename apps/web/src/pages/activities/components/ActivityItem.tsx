@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react';
-import { createStyles, CSSObject, Grid, MantineTheme, Text, UnstyledButton, useMantineTheme } from '@mantine/core';
+import {
+  createStyles,
+  type CSSObject,
+  Grid,
+  type MantineTheme,
+  Text,
+  UnstyledButton,
+  useMantineTheme,
+} from '@mantine/core';
 import { JobStatusEnum } from '@novu/shared';
 import { format } from 'date-fns';
 import styled from '@emotion/styled';

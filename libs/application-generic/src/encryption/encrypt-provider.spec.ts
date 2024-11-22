@@ -1,4 +1,4 @@
-import { ICredentialsDto } from '@novu/shared';
+import { type ICredentialsDto } from '@novu/shared';
 import {
   decryptCredentials,
   decryptSecret,

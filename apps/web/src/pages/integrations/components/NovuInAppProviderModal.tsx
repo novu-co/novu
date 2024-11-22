@@ -3,7 +3,7 @@ import styled from '@emotion/styled/macro';
 import { Accordion, Box, Center, Loader, useMantineTheme } from '@mantine/core';
 
 import { colors, Close } from '@novu/design-system';
-import { IIntegratedProvider } from '../types';
+import { type IIntegratedProvider } from '../types';
 import { SetupTimeline } from '../../quick-start/components/SetupTimeline';
 import { NovuInAppForm } from './NovuInAppForm';
 import { When } from '../../../components/utils/When';

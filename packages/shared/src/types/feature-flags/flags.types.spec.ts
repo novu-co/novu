@@ -1,5 +1,5 @@
 import { expect, describe, it } from 'vitest';
-import { IFlagKey, testFlagEnumValidity } from './flags.types';
+import { type IFlagKey, testFlagEnumValidity } from './flags.types';
 import { FeatureFlagsKeysEnum } from './feature-flags';
 import { SystemCriticalFlagsEnum } from './system-critical-flags';
 

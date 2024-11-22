@@ -1,6 +1,6 @@
 import { useFormContext } from 'react-hook-form';
 
-import { IForm } from '../components/formTypes';
+import { type IForm } from '../components/formTypes';
 import { useStepIndex } from './useStepIndex';
 
 export const useStepVariantsCount = () => {

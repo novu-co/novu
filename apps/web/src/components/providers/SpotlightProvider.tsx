@@ -1,4 +1,4 @@
-import { SpotlightAction } from '@mantine/spotlight';
+import { type SpotlightAction } from '@mantine/spotlight';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 
 interface SpotlightItem extends SpotlightAction {

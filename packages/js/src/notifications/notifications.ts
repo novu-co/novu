@@ -1,7 +1,7 @@
-import { InboxService } from '../api';
-import { NovuEventEmitter } from '../event-emitter';
+import { type InboxService } from '../api';
+import { type NovuEventEmitter } from '../event-emitter';
 import { BaseModule } from '../base-module';
-import { ActionTypeEnum, NotificationFilter, Result } from '../types';
+import { ActionTypeEnum, type NotificationFilter, type Result } from '../types';
 import {
   archive,
   archiveAll,

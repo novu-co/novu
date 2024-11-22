@@ -3,10 +3,10 @@ import { IconButton, Input, Textarea } from '@novu/novui';
 import { IconCheck, IconCopyAll } from '@novu/novui/icons';
 import { Select } from '@novu/design-system';
 import { Stack, Box, styled } from '@novu/novui/jsx';
-import { FC } from 'react';
-import { Controller, FieldPath, useFormContext } from 'react-hook-form';
+import { type FC } from 'react';
+import { Controller, type FieldPath, useFormContext } from 'react-hook-form';
 import { token } from '@novu/novui/tokens';
-import { WorkflowDetailFormContext } from './WorkflowDetailFormContextProvider';
+import { type WorkflowDetailFormContext } from './WorkflowDetailFormContextProvider';
 
 export type WorkflowGeneralSettingsFieldName = Extract<
   FieldPath<WorkflowDetailFormContext>,

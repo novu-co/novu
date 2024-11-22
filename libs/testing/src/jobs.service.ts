@@ -1,4 +1,4 @@
-import { Queue } from 'bullmq';
+import { type Queue } from 'bullmq';
 import { JobRepository, JobStatusEnum } from '@novu/dal';
 import { JobTopicNameEnum, StepTypeEnum } from '@novu/shared';
 

@@ -10,7 +10,7 @@ import { Loader } from '../Loader';
 import { useNotificationCenter, useNovuContext, useNovuTheme } from '../../../../hooks';
 import { SubscriberPreference } from '../user-preference/SubscriberPreference';
 import { FeedsTabs } from '../FeedsTabs';
-import { INovuTheme } from '../../../../store/novu-theme.context';
+import { type INovuTheme } from '../../../../store/novu-theme.context';
 import { useStyles } from '../../../../store/styles';
 import { ScreensEnum } from '../../../../shared/interfaces';
 

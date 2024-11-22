@@ -1,8 +1,13 @@
-import { JobTopicNameEnum } from '@novu/shared';
+import { type JobTopicNameEnum } from '@novu/shared';
 import { Logger } from '@nestjs/common';
 
-import { BullMqService, Processor, Worker, WorkerOptions } from '../bull-mq';
-import { INovuWorker } from '../readiness';
+import {
+  type BullMqService,
+  type Processor,
+  type Worker,
+  WorkerOptions,
+} from '../bull-mq';
+import { type INovuWorker } from '../readiness';
 
 const LOG_CONTEXT = 'WorkerService';
 

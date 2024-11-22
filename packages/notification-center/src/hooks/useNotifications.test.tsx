@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { act, renderHook, RenderHookResult } from '@testing-library/react-hooks';
+import { act, renderHook, type RenderHookResult } from '@testing-library/react-hooks';
 import {
   ChannelCTATypeEnum,
   ChannelTypeEnum,
-  IMessage,
-  IOrganizationEntity,
+  type IMessage,
+  type IOrganizationEntity,
   ButtonTypeEnum,
   MessageActionStatusEnum,
-  IPaginatedResponse,
+  type IPaginatedResponse,
 } from '@novu/shared';
-import { IUserPreferenceSettings } from '@novu/client';
+import { type IUserPreferenceSettings } from '@novu/client';
 
-import { ISession, INotificationsContext } from '../shared/interfaces';
+import { type ISession, type INotificationsContext } from '../shared/interfaces';
 import { NovuProvider } from '../components';
 import { useNotifications } from './useNotifications';
 import { queryClient } from '../components/novu-provider/NovuProvider';

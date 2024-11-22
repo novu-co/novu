@@ -5,8 +5,8 @@ import {
   ApiRateLimitCategoryEnum,
   ApiRateLimitCostEnum,
   ApiServiceLevelEnum,
-  IApiRateLimitAlgorithm,
-  IApiRateLimitCost,
+  type IApiRateLimitAlgorithm,
+  type IApiRateLimitCost,
 } from '@novu/shared';
 import { expect } from 'chai';
 import sinon from 'sinon';

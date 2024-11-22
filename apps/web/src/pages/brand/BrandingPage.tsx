@@ -10,7 +10,7 @@ import {
   DEFAULT_BRANDING_COLOR,
   DEFAULT_FONT_COLOR,
   DEFAULT_FONT_FAMILY,
-  IBrandFormValues,
+  type IBrandFormValues,
 } from './BrandingPage.const';
 import { BrandInputs } from './BrandInputs';
 import { InAppInputs } from './InAppInputs';

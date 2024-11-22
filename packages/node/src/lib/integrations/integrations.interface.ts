@@ -1,9 +1,9 @@
 import {
-  BuilderFieldType,
-  BuilderGroupValues,
-  ChannelTypeEnum,
-  FilterParts,
-  ICredentialsDto,
+  type BuilderFieldType,
+  type BuilderGroupValues,
+  type ChannelTypeEnum,
+  type FilterParts,
+  type ICredentialsDto,
 } from '@novu/shared';
 
 export interface IConditions {

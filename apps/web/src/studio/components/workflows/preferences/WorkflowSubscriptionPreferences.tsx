@@ -3,10 +3,10 @@ import { Table, Text } from '@novu/novui';
 import { css } from '@novu/novui/css';
 import { HStack, VStack } from '@novu/novui/jsx';
 import { ColorToken } from '@novu/novui/tokens';
-import { ChannelTypeEnum, WorkflowPreferences } from '@novu/shared';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { type ChannelTypeEnum, type WorkflowPreferences } from '@novu/shared';
+import { type FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { IconInfoOutline, Tooltip, When } from '@novu/design-system';
-import { PreferenceChannelName, SubscriptionPreferenceRow } from './types';
+import { type PreferenceChannelName, type SubscriptionPreferenceRow } from './types';
 import { CHANNEL_LABELS_LOOKUP, CHANNEL_SETTINGS_LOGO_LOOKUP } from './WorkflowSubscriptionPreferences.const';
 import { tableClassName } from './WorkflowSubscriptionPreferences.styles';
 
@@ -17,12 +17,10 @@ const switchClassNames = {
       bg: { _dark: 'legacy.B40 !important', base: 'legacy.B80 !important' },
     },
     '& input:checked + label': {
-      // eslint-disable-next-line @pandacss/no-hardcoded-color
       bg: 'colorPalette.middle !important',
     },
   }),
   thumb: css({
-    // eslint-disable-next-line @pandacss/no-hardcoded-color
     bg: 'legacy.white !important',
     border: 'none !important',
   }),
@@ -174,7 +172,6 @@ function ChannelCell(props) {
   const colorToken = props.row.original.enabled ? 'typography.text.main' : 'typography.text.secondary';
 
   return (
-    // eslint-disable-next-line @pandacss/no-dynamic-styling, @pandacss/no-property-renaming
     <HStack color={colorToken} opacity={props.row.original.disabled ? 'disabled' : undefined}>
       {<Icon title="switch-channel-icon" color={'inherit'} />}
       <Text color={'inherit'}>{CHANNEL_LABELS_LOOKUP[props.getValue()]}</Text>

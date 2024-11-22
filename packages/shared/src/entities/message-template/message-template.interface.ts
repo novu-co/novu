@@ -1,14 +1,14 @@
 import {
-  ChannelCTATypeEnum,
-  EnvironmentId,
-  IEmailBlock,
-  ITemplateVariable,
-  OrganizationId,
-  StepTypeEnum,
+  type ChannelCTATypeEnum,
+  type EnvironmentId,
+  type IEmailBlock,
+  type ITemplateVariable,
+  type OrganizationId,
+  type StepTypeEnum,
   TemplateVariableTypeEnum,
 } from '../../types';
 import { TriggerContextTypeEnum } from '../notification-template';
-import { IActor } from '../messages';
+import { type IActor } from '../messages';
 import type { JSONSchemaDto, UiSchema } from '../../dto';
 
 export type MessageTemplateContentType = 'editor' | 'customHtml';

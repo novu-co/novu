@@ -4,7 +4,7 @@ import { ROUTES } from '../../../../constants/routes';
 import { useGetIntegrationsByChannel } from '../../../integrations/useGetIntegrationsByChannel';
 import { GetStartedAnimation } from '../components/GetStartedAnimation';
 import { GetStartedLink, StepDescription, StepText } from './shared';
-import { OnboardingWorkflowRouteEnum, OnboardingUseCase } from './types';
+import { OnboardingWorkflowRouteEnum, type OnboardingUseCase } from './types';
 import { OpenWorkflowButton } from '../components/OpenWorkflowButton';
 import { OnboardingUseCasesTabsEnum } from './OnboardingUseCasesTabsEnum';
 

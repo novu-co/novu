@@ -1,7 +1,7 @@
 import {
-  INotificationTemplateStep,
-  IPreferenceChannels,
-  NotificationTemplateCustomData,
+  type INotificationTemplateStep,
+  type IPreferenceChannels,
+  type NotificationTemplateCustomData,
 } from '@novu/shared';
 
 export interface INotificationTemplates {

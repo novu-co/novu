@@ -1,9 +1,15 @@
-import { BuilderFieldType, BuilderGroupValues, ChannelTypeEnum, FilterParts, ICredentials } from '@novu/shared';
+import {
+  BuilderFieldType,
+  BuilderGroupValues,
+  type ChannelTypeEnum,
+  FilterParts,
+  type ICredentials,
+} from '@novu/shared';
 
 import type { EnvironmentId } from '../environment';
 import type { OrganizationId } from '../organization';
-import { ChangePropsValueType } from '../../types/helpers';
-import { StepFilter } from '../notification-template';
+import { type ChangePropsValueType } from '../../types/helpers';
+import { type StepFilter } from '../notification-template';
 
 export class IntegrationEntity {
   _id: string;

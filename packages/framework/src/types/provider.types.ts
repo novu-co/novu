@@ -1,6 +1,6 @@
-import { providerSchemas } from '../schemas/providers';
+import { type providerSchemas } from '../schemas/providers';
 import type { FromSchemaUnvalidated } from './schema.types';
-import { Awaitable, Prettify } from './util.types';
+import { type Awaitable, type Prettify } from './util.types';
 
 export type Passthrough = {
   body?: Record<string, unknown>;

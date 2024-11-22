@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { INotificationCenterContext } from '../shared/interfaces';
+import { type INotificationCenterContext } from '../shared/interfaces';
 import { NotificationCenterContext } from '../store/notification-center.context';
 
 export function useNotificationCenter(): INotificationCenterContext {

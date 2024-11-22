@@ -1,7 +1,7 @@
 import React from 'react';
-import { IStyleButtons } from '@novu/shared';
-import { ColorScheme } from '../index';
-import { ICommonTheme } from './novu-theme-provider.context';
+import { type IStyleButtons } from '@novu/shared';
+import { type ColorScheme } from '../index';
+import { type ICommonTheme } from './novu-theme-provider.context';
 
 export interface IThemeContext {
   colorScheme: ColorScheme;

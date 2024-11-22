@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { TimerControl } from '../../../../components/TimerControl';
 import { OnboardingUseCasesTabsEnum } from './OnboardingUseCasesTabsEnum';
 import { StepButton, StepDescription, StepText, StyledLink } from './shared';
-import { OnboardingUseCase } from './types';
+import { type OnboardingUseCase } from './types';
 
 const StyledBolt = styled(Bolt)`
   color: ${colors.gradientMiddle};

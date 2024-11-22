@@ -1,15 +1,15 @@
 import {
   ChannelTypeEnum,
-  ISendMessageSuccessResponse,
-  ISmsOptions,
-  ISmsProvider,
+  type ISendMessageSuccessResponse,
+  type ISmsOptions,
+  type ISmsProvider,
 } from '@novu/stateless';
 
 import { Vonage } from '@vonage/server-sdk';
 import { Auth } from '@vonage/auth';
 import { SmsProviderIdEnum } from '@novu/shared';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 export class NexmoSmsProvider extends BaseProvider implements ISmsProvider {
   id = SmsProviderIdEnum.Nexmo;

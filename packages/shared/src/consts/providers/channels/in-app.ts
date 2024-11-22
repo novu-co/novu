@@ -1,7 +1,7 @@
 import { novuInAppConfig } from '../credentials';
 
 import { InAppProviderIdEnum } from '../provider.enum';
-import { IProviderConfig } from '../provider.interface';
+import { type IProviderConfig } from '../provider.interface';
 
 import { ChannelTypeEnum } from '../../../types';
 import { UTM_CAMPAIGN_QUERY_PARAM } from '../../../ui';

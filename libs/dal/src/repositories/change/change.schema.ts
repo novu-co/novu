@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
-import { ChangeDBModel } from './change.entity';
+import { type ChangeDBModel } from './change.entity';
 
 const changeSchema = new Schema<ChangeDBModel>(
   {

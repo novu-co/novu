@@ -3,12 +3,12 @@ import { expect } from 'chai';
 import { v4 as uuid } from 'uuid';
 
 import { SubscribersService, UserSession } from '@novu/testing';
-import { NotificationTemplateEntity, SubscriberRepository } from '@novu/dal';
-import { AddressingTypeEnum, TriggerRecipients, TriggerRequestCategoryEnum } from '@novu/shared';
+import { type NotificationTemplateEntity, SubscriberRepository } from '@novu/dal';
+import { AddressingTypeEnum, type TriggerRecipients, TriggerRequestCategoryEnum } from '@novu/shared';
 
 import { SharedModule } from '../../../shared/shared.module';
 import { EventsModule } from '../../events.module';
-import { ParseEventRequestCommand, ParseEventRequestMulticastCommand } from './parse-event-request.command';
+import { type ParseEventRequestCommand, ParseEventRequestMulticastCommand } from './parse-event-request.command';
 import { ParseEventRequest } from './parse-event-request.usecase';
 
 describe('ParseEventRequest Usecase', () => {

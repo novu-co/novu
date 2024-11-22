@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { buildWorkflowPreferences, WorkflowPreferences } from '@novu/shared';
+import { buildWorkflowPreferences, type WorkflowPreferences } from '@novu/shared';
 import { useDiscover } from '../../studio/hooks/useBridgeAPI';
 
 export const useStudioWorkflowPreferences = (

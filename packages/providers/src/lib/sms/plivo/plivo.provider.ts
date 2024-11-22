@@ -1,16 +1,16 @@
 import { SmsProviderIdEnum } from '@novu/shared';
 import {
   ChannelTypeEnum,
-  ISendMessageSuccessResponse,
-  ISMSEventBody,
-  ISmsOptions,
-  ISmsProvider,
+  type ISendMessageSuccessResponse,
+  type ISMSEventBody,
+  type ISmsOptions,
+  type ISmsProvider,
   SmsEventStatusEnum,
 } from '@novu/stateless';
 
 import { Client as PlivoClient } from 'plivo';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 export class PlivoSmsProvider extends BaseProvider implements ISmsProvider {
   id = SmsProviderIdEnum.Plivo;

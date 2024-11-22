@@ -1,5 +1,5 @@
 import { Tooltip } from '@novu/design-system';
-import { IconButton, LocalizedMessage, Text, type CoreProps, type IconButtonProps } from '@novu/novui';
+import { IconButton, type LocalizedMessage, Text, type CoreProps, type IconButtonProps } from '@novu/novui';
 import { css, cx } from '@novu/novui/css';
 import {
   IconOutlineAutoAwesomeMotion,
@@ -10,11 +10,11 @@ import {
   IconOutlineNotifications,
   IconOutlineSms,
   IconOutlineBolt,
-  IconType,
+  type IconType,
 } from '@novu/novui/icons';
 import { VStack } from '@novu/novui/jsx';
 import { vstack } from '@novu/novui/patterns';
-import { FC, PropsWithChildren } from 'react';
+import { type FC, type PropsWithChildren } from 'react';
 
 type IWorkflowFloatingMenuProps = CoreProps;
 

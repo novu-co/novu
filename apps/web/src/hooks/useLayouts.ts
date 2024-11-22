@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { ILayoutEntity } from '@novu/shared';
+import { type ILayoutEntity } from '@novu/shared';
 
 import { useEnvironment } from './useEnvironment';
 

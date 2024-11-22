@@ -1,4 +1,4 @@
-import { Action, ActionTypeEnum, NotificationFilter, Result } from '../types';
+import { Action, ActionTypeEnum, type NotificationFilter, type Result } from '../types';
 import type { InboxService } from '../api';
 import type { NovuEventEmitter } from '../event-emitter';
 import { Notification } from './notification';

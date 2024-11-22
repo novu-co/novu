@@ -1,5 +1,5 @@
-import { ApiServiceLevelEnum, MemberRoleEnum, MemberStatusEnum } from '@novu/shared';
-import { CommunityOrganizationRepository, MemberRepository, OrganizationRepository } from '@novu/dal';
+import { type ApiServiceLevelEnum, MemberRoleEnum, MemberStatusEnum } from '@novu/shared';
+import { CommunityOrganizationRepository, type MemberRepository, type OrganizationRepository } from '@novu/dal';
 import { getEERepository } from './ee.repository.factory';
 
 export class EEOrganizationService {

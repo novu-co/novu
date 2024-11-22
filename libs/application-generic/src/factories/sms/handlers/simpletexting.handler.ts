@@ -1,4 +1,8 @@
-import { ChannelTypeEnum, ICredentials, SmsProviderIdEnum } from '@novu/shared';
+import {
+  ChannelTypeEnum,
+  type ICredentials,
+  SmsProviderIdEnum,
+} from '@novu/shared';
 import { SimpletextingSmsProvider } from '@novu/providers';
 import { BaseSmsHandler } from './base.handler';
 

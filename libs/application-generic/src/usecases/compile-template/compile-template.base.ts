@@ -1,5 +1,8 @@
-import { CommunityOrganizationRepository, OrganizationEntity } from '@novu/dal';
-import { ModuleRef } from '@nestjs/core';
+import {
+  type CommunityOrganizationRepository,
+  type OrganizationEntity,
+} from '@novu/dal';
+import { type ModuleRef } from '@nestjs/core';
 import { NotFoundException } from '@nestjs/common';
 
 export abstract class CompileTemplateBase {

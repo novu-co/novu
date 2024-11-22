@@ -2,10 +2,10 @@ import { expect, test, vi } from 'vitest';
 
 import {
   CheckIntegrationResponseEnum,
-  IEmailOptions,
-  ISendMessageSuccessResponse,
+  type IEmailOptions,
+  type ISendMessageSuccessResponse,
 } from '@novu/stateless';
-import { IEmailJsConfig } from './emailjs.config';
+import { type IEmailJsConfig } from './emailjs.config';
 import { EmailJsProvider } from './emailjs.provider';
 
 const mockConfig = {

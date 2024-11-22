@@ -1,4 +1,4 @@
-import { LayoutDto } from '@novu/shared';
+import { type LayoutDto } from '@novu/shared';
 
 import { api } from './api.client';
 

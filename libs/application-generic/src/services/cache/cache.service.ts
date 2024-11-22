@@ -2,9 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { QUERY_PREFIX } from './key-builders';
 import {
-  CacheInMemoryProviderService,
-  InMemoryProviderClient,
-  Pipeline,
+  type CacheInMemoryProviderService,
+  type InMemoryProviderClient,
+  type Pipeline,
 } from '../in-memory-provider';
 import { addJitter } from '../../resilience';
 

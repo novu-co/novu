@@ -1,7 +1,7 @@
 import { Timeline as MantineTimeline } from '@mantine/core';
 
 import useStyles from './Timeline.styles';
-import { IOnboardingStep } from '../../consts/types';
+import { type IOnboardingStep } from '../../consts/types';
 
 export type ExpandStepsType = boolean | 'hover';
 interface ITimelineProps {

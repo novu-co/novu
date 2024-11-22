@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tabs as MantineTabs, TabsValue } from '@mantine/core';
+import { Tabs as MantineTabs, type TabsValue } from '@mantine/core';
 import { css, cx } from '@emotion/css';
 
 import useTabStyles from './Tabs.styles';

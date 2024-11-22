@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { StepTypeEnum } from '@novu/shared';
+import { type StepTypeEnum } from '@novu/shared';
 import { Sidebar } from '@novu/design-system';
 
 import { useStepIndex } from '../hooks/useStepIndex';

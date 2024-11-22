@@ -6,7 +6,7 @@ import { IconOpenInNew, IconClose } from '@novu/novui/icons';
 import { IconButton } from '@novu/novui';
 import { Docs } from './Docs';
 import { DOCS_URL } from './docs.const';
-import { Voting, VotingWidget } from './VotingWidget';
+import { type Voting, VotingWidget } from './VotingWidget';
 import { useLoadDocs } from './useLoadDocs';
 import { useTelemetry } from '../../hooks/useNovuAPI';
 

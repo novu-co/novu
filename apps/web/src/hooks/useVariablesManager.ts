@@ -4,7 +4,7 @@ import { parse } from '@handlebars/parser';
 import isEqual from 'lodash.isequal';
 import { getTemplateVariables } from '@novu/shared';
 
-import { IForm, ITemplates } from '../pages/templates/components/formTypes';
+import { type IForm, type ITemplates } from '../pages/templates/components/formTypes';
 import { useStepFormPath } from '../pages/templates/hooks/useStepFormPath';
 import { useStepIndex } from '../pages/templates/hooks/useStepIndex';
 

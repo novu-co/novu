@@ -1,4 +1,4 @@
-import { IEventBody } from '@novu/stateless';
+import { type IEventBody } from '@novu/stateless';
 
 export interface IWebhookResult {
   id: string;

@@ -1,10 +1,10 @@
 import { useMantineColorScheme } from '@mantine/core';
 import { NovuProvider, PopoverNotificationCenter, useUpdateAction } from '@novu/notification-center';
 import {
-  ButtonTypeEnum,
-  IMessage,
+  type ButtonTypeEnum,
+  type IMessage,
   INVITE_TEAM_MEMBER_NUDGE_PAYLOAD_KEY,
-  IUserEntity,
+  type IUserEntity,
   MessageActionStatusEnum,
 } from '@novu/shared';
 import { useNavigate } from 'react-router-dom';

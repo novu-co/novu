@@ -1,4 +1,4 @@
-import { UserEntity } from '@novu/dal';
+import { type UserEntity } from '@novu/dal';
 
 export class SeedDataBodyDto {}
 

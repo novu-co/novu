@@ -1,5 +1,5 @@
 import { SubscribersService, UserSession } from '@novu/testing';
-import { NotificationTemplateEntity, SubscriberEntity } from '@novu/dal';
+import { type NotificationTemplateEntity, type SubscriberEntity } from '@novu/dal';
 import axios from 'axios';
 import { expect } from 'chai';
 import { ChannelTypeEnum } from '@novu/shared';

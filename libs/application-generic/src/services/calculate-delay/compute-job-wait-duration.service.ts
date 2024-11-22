@@ -3,12 +3,12 @@ import { differenceInMilliseconds } from 'date-fns';
 import {
   DigestUnitEnum,
   DelayTypeEnum,
-  IDigestRegularMetadata,
-  IDigestTimedMetadata,
-  IWorkflowStepMetadata,
+  type IDigestRegularMetadata,
+  type IDigestTimedMetadata,
+  type IWorkflowStepMetadata,
   DigestTypeEnum,
-  IDelayScheduledMetadata,
-  IDelayRegularMetadata,
+  type IDelayScheduledMetadata,
+  type IDelayRegularMetadata,
 } from '@novu/shared';
 
 import { ApiException } from '../../utils/exceptions';

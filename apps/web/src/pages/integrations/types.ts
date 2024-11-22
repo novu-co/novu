@@ -6,7 +6,7 @@ import type {
   IProviderConfig,
   ProvidersIdEnum,
 } from '@novu/shared';
-import { IConditions } from '../../components/conditions';
+import { type IConditions } from '../../components/conditions';
 
 export interface ITableIntegration {
   name: string;

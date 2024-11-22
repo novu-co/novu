@@ -1,4 +1,4 @@
-import { INotificationTemplate, INotificationTemplateStep } from '@novu/shared';
+import { type INotificationTemplate, type INotificationTemplateStep } from '@novu/shared';
 
 import { OnboardingWorkflowRouteEnum } from '../consts/types';
 import { parseUrl } from '../../../../utils/routeUtils';

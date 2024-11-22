@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { GetStartedTabsViewsEnum } from '../../consts/GetStartedTabsViewsEnum';
+import { type GetStartedTabsViewsEnum } from '../../consts/GetStartedTabsViewsEnum';
 
 export const useGetStartedTabView = () => {
   // const [params, setParams] = useSearchParams(DEFAULT_PARAMS as unknown as URLSearchParamsInit);

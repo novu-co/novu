@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { StepTypeEnum } from '@novu/shared';
+import { type StepTypeEnum } from '@novu/shared';
 import { useFormContext } from 'react-hook-form';
 
-import { IForm } from '../components/formTypes';
+import { type IForm } from '../components/formTypes';
 
 export const useStepIndex = () => {
   const {

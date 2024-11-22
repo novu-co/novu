@@ -1,11 +1,11 @@
-import { QueryFunction, QueryKey, UseQueryOptions, useQuery } from '@tanstack/react-query';
+import { type QueryFunction, type QueryKey, type UseQueryOptions, useQuery } from '@tanstack/react-query';
 import {
-  IUsePaginationQueryParamsStateOptions,
+  type IUsePaginationQueryParamsStateOptions,
   usePaginationQueryParamsState,
-  IUseSearchQueryParamStateOptions,
+  type IUseSearchQueryParamStateOptions,
   useSearchQueryParamState,
 } from '@novu/design-system';
-import { IPaginationWithQueryParams } from '@novu/shared';
+import { type IPaginationWithQueryParams } from '@novu/shared';
 
 type IPaginatedQueryContext = Required<IPaginationWithQueryParams>;
 

@@ -1,6 +1,6 @@
 import { ActionIcon, Group, Title, useMantineTheme } from '@mantine/core';
 import { useLocalStorage } from '@mantine/hooks';
-import { CSSProperties, ReactNode, useEffect } from 'react';
+import { type CSSProperties, type ReactNode, useEffect } from 'react';
 import styled from '@emotion/styled';
 
 import { Button, colors, Text, Calendar, Close } from '@novu/design-system';

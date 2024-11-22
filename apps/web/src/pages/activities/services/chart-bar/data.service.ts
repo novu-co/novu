@@ -1,8 +1,8 @@
 import cloneDeep from 'lodash.clonedeep';
-import { ScriptableContext } from 'chart.js';
+import { type ScriptableContext } from 'chart.js';
 import { format, subDays } from 'date-fns';
 import { colors } from '@novu/design-system';
-import { IActivityGraphStats, IChartData } from '../../interfaces';
+import { type IActivityGraphStats, type IChartData } from '../../interfaces';
 import { activityGraphStatsMock } from '../../consts';
 
 export function getChartData(data: IActivityGraphStats[] | undefined, isDark: boolean): IChartData {

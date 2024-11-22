@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import axios from 'axios';
-import { SubscriberRepository, SubscriberEntity } from '@novu/dal';
+import { SubscriberRepository, type SubscriberEntity } from '@novu/dal';
 import { UserSession, SubscribersService } from '@novu/testing';
 
 const axiosInstance = axios.create();

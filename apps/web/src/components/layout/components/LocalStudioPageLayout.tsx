@@ -1,7 +1,7 @@
 import { ErrorBoundary } from '@sentry/react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { css } from '@novu/novui/css';
-import { WithLoadingSkeleton } from '@novu/novui';
+import { type WithLoadingSkeleton } from '@novu/novui';
 import { Box } from '@novu/novui/jsx';
 import { useEffect } from 'react';
 import { LocalStudioHeader } from './LocalStudioHeader/LocalStudioHeader';

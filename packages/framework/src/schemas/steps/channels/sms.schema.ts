@@ -1,4 +1,4 @@
-import { JsonSchema } from '../../../types/schema.types';
+import { type JsonSchema } from '../../../types/schema.types';
 
 const smsOutputSchema = {
   type: 'object',

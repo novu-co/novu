@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { usePreviewSms } from '../../../api/hooks';
-import { IForm } from '../components/formTypes';
+import { type IForm } from '../components/formTypes';
 import { useStepFormCombinedErrors } from './useStepFormCombinedErrors';
 import { useStepFormPath } from './useStepFormPath';
 import { useProcessVariables } from '../../../hooks';

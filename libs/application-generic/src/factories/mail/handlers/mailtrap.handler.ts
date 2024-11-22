@@ -1,6 +1,6 @@
 import {
   ChannelTypeEnum,
-  ICredentials,
+  type ICredentials,
   EmailProviderIdEnum,
 } from '@novu/shared';
 import { MailtrapEmailProvider } from '@novu/providers';

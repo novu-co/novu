@@ -1,10 +1,10 @@
-import { NestInterceptor, RequestMethod } from '@nestjs/common';
+import { type NestInterceptor, RequestMethod } from '@nestjs/common';
 import {
   getLoggerToken,
   Logger,
   LoggerErrorInterceptor,
   LoggerModule,
-  Params,
+  type Params,
   PinoLogger,
 } from 'nestjs-pino';
 import { storage, Store } from 'nestjs-pino/storage';

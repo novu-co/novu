@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { IUserEntity } from '@novu/shared';
+import { type IUserEntity } from '@novu/shared';
 
 import { updateUserOnBoarding } from '../user';
 import { useAuth } from '../../hooks/useAuth';

@@ -8,10 +8,10 @@ import {
   IconOutlineMobileFriendly,
   IconOutlineNotifications,
   IconOutlineSms,
-  IconSize,
-  IconType,
+  type IconSize,
+  type IconType,
 } from '@novu/novui/icons';
-import { ActionStepEnum, ChannelStepEnum, type DiscoverStepOutput } from '@novu/framework/internal';
+import { type ActionStepEnum, type ChannelStepEnum, type DiscoverStepOutput } from '@novu/framework/internal';
 import { StepNode } from './StepNode';
 import { WorkflowBackgroundWrapper } from './WorkflowBackgroundWrapper';
 

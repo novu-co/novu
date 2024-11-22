@@ -1,6 +1,6 @@
-import { Button, ButtonProps } from '@novu/novui';
+import { Button, type ButtonProps } from '@novu/novui';
 import { css, cx } from '@novu/novui/css';
-import { FC } from 'react';
+import { type FC } from 'react';
 
 type OutlineButtonProps = Omit<ButtonProps, 'variant'>;
 

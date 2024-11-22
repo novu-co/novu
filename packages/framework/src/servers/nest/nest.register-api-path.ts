@@ -1,8 +1,8 @@
-import { FactoryProvider } from '@nestjs/common';
+import { type FactoryProvider } from '@nestjs/common';
 import { PATH_METADATA } from '@nestjs/common/constants';
 import { NovuController } from './nest.controller';
 import { REGISTER_API_PATH, NOVU_OPTIONS } from './nest.constants';
-import { OPTIONS_TYPE } from './nest.module-definition';
+import { type OPTIONS_TYPE } from './nest.module-definition';
 
 /**
  * Workaround to dynamically set the path for the controller.

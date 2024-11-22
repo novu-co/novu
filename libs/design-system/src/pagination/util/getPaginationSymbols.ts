@@ -1,5 +1,5 @@
 import { FIRST_PAGE_NUMBER, MAX_PAGE_COUNT_WITHOUT_ELLIPSIS } from '../Pagination.const';
-import { IPaginationContext } from '../PaginationContext';
+import { type IPaginationContext } from '../PaginationContext';
 
 /** 'ELLIPSIS' is used to indicate that there are page numbers between the adjacent values that are not being shown. */
 export type PaginationSymbol = number | 'ELLIPSIS';

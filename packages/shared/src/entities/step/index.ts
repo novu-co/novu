@@ -1,4 +1,4 @@
-import { CronExpressionEnum } from '../../types';
+import { type CronExpressionEnum } from '../../types';
 
 export enum DigestUnitEnum {
   SECONDS = 'seconds',

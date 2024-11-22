@@ -1,4 +1,4 @@
-import { ObjectFieldTemplateProps } from '@rjsf/utils';
+import { type ObjectFieldTemplateProps } from '@rjsf/utils';
 import { Box } from '../../../styled-system/jsx';
 import { jsonSchemaFormSection } from '../../../styled-system/recipes';
 import { FormGroupTitle, SectionTitleToggle } from '../shared';

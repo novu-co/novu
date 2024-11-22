@@ -1,4 +1,4 @@
-import { IEmailBlock, IMessageButton, IMessageCTA, MessageTemplateContentType } from '@novu/shared';
+import { type IEmailBlock, IMessageButton, type IMessageCTA, type MessageTemplateContentType } from '@novu/shared';
 import { api } from './api.client';
 
 export async function previewEmail({

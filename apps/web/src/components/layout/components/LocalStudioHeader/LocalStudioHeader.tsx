@@ -4,7 +4,7 @@ import { Tooltip } from '@novu/design-system';
 import { css } from '@novu/novui/css';
 import { IconOutlineMenuBook } from '@novu/novui/icons';
 import { HStack } from '@novu/novui/jsx';
-import { FC } from 'react';
+import { type FC } from 'react';
 import useThemeChange from '../../../../hooks/useThemeChange';
 import { useStudioWorkflowsNavigation } from '../../../../studio/hooks';
 import { HEADER_NAV_HEIGHT } from '../../constants';

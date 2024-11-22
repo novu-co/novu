@@ -6,7 +6,7 @@ import {
   IconOutlinePublic,
   Translation,
 } from '@novu/design-system';
-import { CSSProperties } from 'react';
+import { type CSSProperties } from 'react';
 import { OnboardingUseCasesTabsEnum } from '../../consts/OnboardingUseCasesTabsEnum';
 
 export interface GetStartedTabConfig {

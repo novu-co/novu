@@ -1,5 +1,5 @@
-import { ColorScheme, useMantineColorScheme } from '@mantine/core';
-import { IconOutlineDarkMode, IconOutlineLightMode, IconOutlineTonality, IconType } from '@novu/novui/icons';
+import { type ColorScheme, useMantineColorScheme } from '@mantine/core';
+import { IconOutlineDarkMode, IconOutlineLightMode, IconOutlineTonality, type IconType } from '@novu/novui/icons';
 import { ColorSchemePreferenceEnum, THEME_TITLE_LOOKUP, useLocalThemePreference } from '@novu/design-system';
 import { useEffect, useMemo } from 'react';
 import { useSegment } from '../components/providers/SegmentProvider';

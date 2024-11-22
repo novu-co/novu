@@ -6,7 +6,7 @@ import {
   snakeCase,
 } from './utils/change-case';
 import { deepMerge } from './utils/deepmerge.utils';
-import { Passthrough, WithPassthrough } from './utils/types';
+import { type Passthrough, type WithPassthrough } from './utils/types';
 
 export enum CasingEnum {
   CAMEL_CASE = 'camelCase',

@@ -1,5 +1,5 @@
 import {
-  IconType,
+  type IconType,
   IconDynamicFeed,
   IconNotificationsNone,
   IconOutlineMailOutline,
@@ -9,7 +9,7 @@ import {
 } from '@novu/design-system';
 import { ChannelTypeEnum } from '@novu/shared';
 import { CHANNEL_TYPE_TO_STRING } from '../../../../utils/channels';
-import { PreferenceChannelName } from './types';
+import { type PreferenceChannelName } from './types';
 
 export const CHANNEL_SETTINGS_LOGO_LOOKUP: Record<PreferenceChannelName, IconType> = {
   all: IconDynamicFeed,

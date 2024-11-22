@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
-import { SubscriptionPreferenceDBModel } from './subscription-preference.entity';
+import { type SubscriptionPreferenceDBModel } from './subscription-preference.entity';
 
 const SubscriptionPreferenceSchema = new Schema<SubscriptionPreferenceDBModel>(
   {

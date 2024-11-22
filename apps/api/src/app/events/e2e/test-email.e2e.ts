@@ -3,7 +3,7 @@ import { UserSession } from '@novu/testing';
 import { MessageRepository, IntegrationRepository } from '@novu/dal';
 import { ChannelTypeEnum, EmailProviderIdEnum } from '@novu/shared';
 
-import { TestSendEmailRequestDto } from '../dtos';
+import { type TestSendEmailRequestDto } from '../dtos';
 
 describe('Events - Test email - /v1/events/test/email (POST)', function () {
   const requestDto: TestSendEmailRequestDto = {

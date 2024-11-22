@@ -4,7 +4,7 @@ import { HStack, styled } from '@novu/novui/jsx';
 import { title } from '@novu/novui/recipes';
 import { UserProfilePasswordEmailVerificationSection } from './UserProfilePasswordEmailVerificationSection';
 import { UserProfilePasswordForm } from './UserProfilePasswordForm';
-import { IUserProfilePasswordSidebarProps } from './UserProfilePasswordSidebar.shared';
+import { type IUserProfilePasswordSidebarProps } from './UserProfilePasswordSidebar.shared';
 import { UserProfileSidebarContext } from './UserProfileSidebarContext';
 import { UserProfileUpdatePasswordForm } from './UserProfileUpdatePasswordForm';
 import { useUserProfileSearchParams } from './useUserProfileSearchParams';

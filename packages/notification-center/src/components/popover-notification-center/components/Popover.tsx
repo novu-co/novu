@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Popover as MantinePopover, PopoverProps, createStyles, MantineTheme } from '@mantine/core';
+import { Popover as MantinePopover, type PopoverProps, createStyles, type MantineTheme } from '@mantine/core';
 import styled from '@emotion/styled';
 import { css } from '@emotion/css';
 
-import { INovuTheme } from '../../../store/novu-theme.context';
+import { type INovuTheme } from '../../../store/novu-theme.context';
 import { useStyles } from '../../../store/styles';
 import { useNotifications } from '../../../hooks';
 

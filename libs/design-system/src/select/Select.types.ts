@@ -1,7 +1,8 @@
-import React, { FC } from 'react';
-import { SelectProps, InputBaseProps, SelectItem } from '@mantine/core';
+import { type FC } from 'react';
+import type React from 'react';
+import { type SelectProps, type InputBaseProps, type SelectItem } from '@mantine/core';
 
-import { SpacingProps } from '../shared/spacing.props';
+import { type SpacingProps } from '../shared/spacing.props';
 
 export interface ISelectProps extends SpacingProps {
   data: (string | { value: string; label?: string } | SelectItem)[];

@@ -1,4 +1,4 @@
-import { ColorScheme } from './ColorScheme';
+import { type ColorScheme } from './ColorScheme';
 import { getColorSchemeHtmlElement } from './getColorSchemeHtmlElement';
 
 const DEFAULT_COLOR_SCHEME: ColorScheme = 'light';

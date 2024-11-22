@@ -1,5 +1,5 @@
-import { ExternalSubscriberId, TopicKey, TopicName } from '@novu/shared';
-import {
+import type { ExternalSubscriberId, TopicKey, TopicName } from '@novu/shared';
+import type {
   ITopicPayload,
   ITopicPaginationPayload,
   ITopics,

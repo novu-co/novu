@@ -5,7 +5,7 @@ import { ChannelTypeEnum } from '@novu/shared';
 import { buildMessageCountKey, CachedQuery } from '@novu/application-generic';
 
 import { NotificationsCount } from './notifications-count.usecase';
-import { NotificationsCountCommand } from './notifications-count.command';
+import { type NotificationsCountCommand } from './notifications-count.command';
 import { ApiException } from '../../../shared/exceptions/api.exception';
 
 sinon.stub(CachedQuery);

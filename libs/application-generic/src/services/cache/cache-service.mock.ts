@@ -1,5 +1,5 @@
-import { Redis } from 'ioredis';
-import { CachingConfig, ICacheService } from './cache.service';
+import { type Redis } from 'ioredis';
+import { type CachingConfig, type ICacheService } from './cache.service';
 
 export const MockCacheService = {
   createClient(mockClient?: Partial<Redis>): ICacheService {

@@ -1,5 +1,5 @@
 import { Group, useMantineColorScheme } from '@mantine/core';
-import { ChannelTypeEnum, providers, StepTypeEnum } from '@novu/shared';
+import { type ChannelTypeEnum, providers, type StepTypeEnum } from '@novu/shared';
 
 import { StepNameInput } from './StepNameInput';
 import { stepIcon, stepNames } from '../constants';

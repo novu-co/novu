@@ -1,6 +1,6 @@
 import React from 'react';
-import { INovuPopoverTheme, INovuTheme, ThemeContext } from './novu-theme.context';
-import { ColorScheme } from '../index';
+import { type INovuPopoverTheme, type INovuTheme, ThemeContext } from './novu-theme.context';
+import { type ColorScheme } from '../index';
 import { getDefaultTheme } from '../utils/defaultTheme';
 
 export interface INovuThemePopoverProvider {

@@ -1,4 +1,4 @@
-import { Motion as MotionPrimitive, MotionProxy, MotionProxyComponent } from 'solid-motionone';
+import { Motion as MotionPrimitive, type MotionProxy, type MotionProxyComponent } from 'solid-motionone';
 import { useAppearance } from '../../context';
 
 export const Motion = new Proxy(MotionPrimitive, {

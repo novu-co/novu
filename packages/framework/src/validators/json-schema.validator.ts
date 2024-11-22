@@ -5,7 +5,7 @@ import type { ValidateResult, Validator } from '../types/validator.types';
 import type { FromSchema, FromSchemaUnvalidated, Schema, JsonSchema } from '../types/schema.types';
 import { cloneData } from '../utils/clone.utils';
 import { checkDependencies } from '../utils/import.utils';
-import { ImportRequirement } from '../types/import.types';
+import { type ImportRequirement } from '../types/import.types';
 
 export class JsonSchemaValidator implements Validator<JsonSchema> {
   /**

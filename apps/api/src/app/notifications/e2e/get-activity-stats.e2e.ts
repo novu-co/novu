@@ -1,8 +1,8 @@
 import {
   JobRepository,
   MessageRepository,
-  NotificationEntity,
-  NotificationTemplateEntity,
+  type NotificationEntity,
+  type NotificationTemplateEntity,
   NotificationRepository,
   SubscriberRepository,
 } from '@novu/dal';

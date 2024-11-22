@@ -1,12 +1,12 @@
-import { IJobData, JobTopicNameEnum } from '@novu/shared';
+import { IJobData, type JobTopicNameEnum } from '@novu/shared';
 import { Logger } from '@nestjs/common';
 
 import {
-  BullMqService,
-  JobsOptions,
-  BulkJobOptions,
-  Queue,
-  QueueOptions,
+  type BullMqService,
+  type JobsOptions,
+  type BulkJobOptions,
+  type Queue,
+  type QueueOptions,
 } from '../bull-mq';
 
 const LOG_CONTEXT = 'QueueService';

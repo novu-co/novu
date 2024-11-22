@@ -1,5 +1,5 @@
 import Redis, { RedisOptions, ScanStream } from 'ioredis';
-import { ConnectionOptions } from 'tls';
+import { type ConnectionOptions } from 'tls';
 
 import { convertStringValues } from './variable-mappers';
 

@@ -1,4 +1,4 @@
-import { WidgetProps } from '@rjsf/utils';
+import { type WidgetProps } from '@rjsf/utils';
 import { Checkbox } from '../../components/checkbox/Checkbox';
 
 export const CheckboxWidget = (props: WidgetProps) => {

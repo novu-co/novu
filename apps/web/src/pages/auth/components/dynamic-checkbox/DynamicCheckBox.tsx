@@ -1,5 +1,5 @@
 import React, { SVGProps, useState } from 'react';
-import { CheckboxProps } from '@mantine/core';
+import { type CheckboxProps } from '@mantine/core';
 import styled from '@emotion/styled';
 
 import { colors, Checkbox, Tooltip } from '@novu/design-system';

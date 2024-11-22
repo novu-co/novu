@@ -7,7 +7,7 @@ import { useMutation } from '@tanstack/react-query';
 import { captureException } from '@sentry/react';
 import capitalize from 'lodash.capitalize';
 import { useDisclosure } from '@mantine/hooks';
-import { IUserEntity, INotificationTriggerVariable } from '@novu/shared';
+import { type IUserEntity, type INotificationTriggerVariable } from '@novu/shared';
 import { Button, colors, inputStyles } from '@novu/design-system';
 
 import { errorMessage, successMessage } from '../../../utils/notifications';

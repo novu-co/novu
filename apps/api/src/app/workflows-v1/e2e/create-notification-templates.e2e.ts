@@ -7,13 +7,13 @@ import {
   FieldLogicalOperatorEnum,
   FieldOperatorEnum,
   StepTypeEnum,
-  INotificationTemplate,
+  type INotificationTemplate,
   TriggerTypeEnum,
-  IFieldFilterPart,
+  type IFieldFilterPart,
   FilterPartTypeEnum,
   EmailProviderIdEnum,
   ChangeEntityTypeEnum,
-  INotificationTemplateStep,
+  type INotificationTemplateStep,
   isClerkEnabled,
   WorkflowTypeEnum,
 } from '@novu/shared';
@@ -22,14 +22,14 @@ import {
   NotificationTemplateRepository,
   MessageTemplateRepository,
   EnvironmentRepository,
-  SubscriberEntity,
+  type SubscriberEntity,
   OrganizationRepository,
-  NotificationTemplateEntity,
+  type NotificationTemplateEntity,
   CommunityOrganizationRepository,
 } from '@novu/dal';
 import { isSameDay } from 'date-fns';
 import axios from 'axios';
-import { CreateWorkflowRequestDto } from '../dto';
+import { type CreateWorkflowRequestDto } from '../dto';
 
 describe('Create Workflow - /workflows (POST)', async () => {
   let session: UserSession;

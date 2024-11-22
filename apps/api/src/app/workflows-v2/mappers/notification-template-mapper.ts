@@ -1,18 +1,18 @@
 import {
-  PreferencesResponseDto,
-  RuntimeIssue,
+  type PreferencesResponseDto,
+  type RuntimeIssue,
   ShortIsPrefixEnum,
-  StepResponseDto,
+  type StepResponseDto,
   StepTypeEnum,
-  WorkflowCreateAndUpdateKeys,
-  WorkflowListResponseDto,
+  type WorkflowCreateAndUpdateKeys,
+  type WorkflowListResponseDto,
   WorkflowOriginEnum,
-  WorkflowResponseDto,
+  type WorkflowResponseDto,
   WorkflowStatusEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
-import { NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
-import { WorkflowInternalResponseDto } from '@novu/application-generic';
+import { type NotificationStepEntity, type NotificationTemplateEntity } from '@novu/dal';
+import { type WorkflowInternalResponseDto } from '@novu/application-generic';
 import { buildSlug } from '../../shared/helpers/build-slug';
 
 export function toResponseWorkflowDto(workflow: WorkflowInternalResponseDto): WorkflowResponseDto {

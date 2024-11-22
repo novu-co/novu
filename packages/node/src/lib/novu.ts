@@ -1,9 +1,9 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 import { getEnvVariable } from '@novu/shared';
 import { EventEmitter } from 'events';
 import { Subscribers } from './subscribers/subscribers';
 import { Changes } from './changes/changes';
-import { INovuConfiguration } from './novu.interface';
+import { type INovuConfiguration } from './novu.interface';
 import { Events } from './events/events';
 import { Layouts } from './layouts/layouts';
 import { NotificationGroups } from './notification-groups/notification-groups';

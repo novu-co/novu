@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { CredentialsKeyEnum, IConfigCredentials, secureCredentials } from '@novu/shared';
+import { type CredentialsKeyEnum, type IConfigCredentials, secureCredentials } from '@novu/shared';
 import { Input, PasswordInput, Switch, Textarea, Tooltip, Select } from '@novu/design-system';
 import { IntegrationSecretTextarea } from './IntegrationSecretTextarea';
 

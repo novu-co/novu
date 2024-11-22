@@ -1,5 +1,5 @@
 import React from 'react';
-import { IMessageAction, ButtonTypeEnum, MessageActionStatusEnum } from '@novu/shared';
+import { type IMessageAction, ButtonTypeEnum, MessageActionStatusEnum } from '@novu/shared';
 import styled from '@emotion/styled';
 import { cx, css } from '@emotion/css';
 

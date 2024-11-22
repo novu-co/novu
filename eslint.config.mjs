@@ -154,6 +154,13 @@ export default tsEslint.config(
       'no-else-return': 'off',
       'import/export': 'off',
       'consistent-return': 'off',
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        {
+          prefer: 'type-imports',
+          fixStyle: 'inline-type-imports',
+        },
+      ], // Enforces use of 'import type' for type-only imports
       'no-param-reassign': [
         'error',
         {

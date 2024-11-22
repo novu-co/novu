@@ -1,5 +1,5 @@
 // TODO: remove when @types/mixpanel-browser can be updated to version 2.50.0 or later
-import { Config } from 'mixpanel-browser';
+import { type Config } from 'mixpanel-browser';
 
 export * from 'mixpanel-browser';
 

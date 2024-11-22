@@ -1,22 +1,22 @@
 'use client';
 
 import {
-  BaseProps,
+  type BaseProps,
   Bell,
-  BellProps,
-  BellRenderer,
-  DefaultInboxProps,
-  DefaultProps,
+  type BellProps,
+  type BellRenderer,
+  type DefaultInboxProps,
+  type DefaultProps,
   Inbox,
   InboxContent,
-  InboxContentProps,
-  InboxProps,
-  Notification,
-  NotificationProps,
+  type InboxContentProps,
+  type InboxProps,
+  type Notification,
+  type NotificationProps,
   Notifications,
-  NotificationsRenderer,
+  type NotificationsRenderer,
   Preferences,
-  WithChildrenProps,
+  type WithChildrenProps,
 } from '@novu/react';
 
 export * from './Inbox';

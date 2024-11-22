@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { UserProfileSidebarTypeEnum, USER_PROFILE_SIDEBAR_TYPE_SET } from './UserProfilePasswordSidebarEnum';
+import { type UserProfileSidebarTypeEnum, USER_PROFILE_SIDEBAR_TYPE_SET } from './UserProfilePasswordSidebarEnum';
 
 const TOKEN_PARAM = 'token';
 const SIDEBAR_PARAM = 'view';

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ISvgPropsInterface } from '../interfaces/svg-props.interface';
+import { type ISvgPropsInterface } from '../interfaces/svg-props.interface';
 
 export function DigestGradient({ width = '30', height = '31', ...props }: ISvgPropsInterface) {
   return (

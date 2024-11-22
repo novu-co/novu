@@ -1,5 +1,5 @@
 import { ExecutionDetailsStatusEnum, StepTypeEnum } from '@novu/shared';
-import { MantineTheme } from '@mantine/core';
+import { type MantineTheme } from '@mantine/core';
 import {
   colors,
   Chat,

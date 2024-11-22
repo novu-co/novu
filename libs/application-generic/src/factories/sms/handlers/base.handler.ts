@@ -1,6 +1,10 @@
-import { ISmsOptions, ISmsProvider } from '@novu/stateless';
-import { ChannelTypeEnum, ICredentials, SmsProviderIdEnum } from '@novu/shared';
-import { ISmsHandler } from '../interfaces';
+import { type ISmsOptions, type ISmsProvider } from '@novu/stateless';
+import {
+  type ChannelTypeEnum,
+  type ICredentials,
+  type SmsProviderIdEnum,
+} from '@novu/shared';
+import { type ISmsHandler } from '../interfaces';
 
 export abstract class BaseSmsHandler implements ISmsHandler {
   protected provider: ISmsProvider;

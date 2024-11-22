@@ -1,6 +1,6 @@
-import { createStyles, MantineTheme } from '@mantine/core';
+import { createStyles, type MantineTheme } from '@mantine/core';
 import { colors } from '@novu/design-system';
-import { ExpandStepsType } from './Timeline';
+import { type ExpandStepsType } from './Timeline';
 
 interface ITimelineParams {
   expandSteps: ExpandStepsType;

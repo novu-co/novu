@@ -1,4 +1,4 @@
-import { Component, createMemo, JSX, Show } from 'solid-js';
+import { type Component, createMemo, type JSX, Show } from 'solid-js';
 import { useLocalization } from '../../context';
 import { Button } from '../primitives';
 

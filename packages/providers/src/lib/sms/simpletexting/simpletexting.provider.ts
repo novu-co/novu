@@ -1,14 +1,14 @@
 import { SmsProviderIdEnum } from '@novu/shared';
 import {
   ChannelTypeEnum,
-  ISendMessageSuccessResponse,
-  ISmsOptions,
-  ISmsProvider,
+  type ISendMessageSuccessResponse,
+  type ISmsOptions,
+  type ISmsProvider,
 } from '@novu/stateless';
 
 import axios from 'axios';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 export class SimpletextingSmsProvider
   extends BaseProvider

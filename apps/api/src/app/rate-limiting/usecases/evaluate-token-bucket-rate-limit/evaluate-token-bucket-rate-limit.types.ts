@@ -1,4 +1,4 @@
-import { Ratelimit } from '@upstash/ratelimit';
+import { type Ratelimit } from '@upstash/ratelimit';
 
 export type UpstashRedisClient = ConstructorParameters<typeof Ratelimit>[0]['redis'];
 

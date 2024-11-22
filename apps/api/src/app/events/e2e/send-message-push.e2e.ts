@@ -4,7 +4,7 @@ import {
   ExecutionDetailsRepository,
   IntegrationRepository,
   MessageRepository,
-  NotificationTemplateEntity,
+  type NotificationTemplateEntity,
 } from '@novu/dal';
 import { DetailEnum } from '@novu/application-generic';
 import { ChannelTypeEnum, PushProviderIdEnum, StepTypeEnum } from '@novu/shared';

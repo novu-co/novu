@@ -1,8 +1,8 @@
 import {
-  ChannelTypeEnum,
-  IAttachmentOptions,
+  type ChannelTypeEnum,
+  type IAttachmentOptions,
 } from '../template/template.interface';
-import { CheckIntegrationResponseEnum } from './provider.enum';
+import { type CheckIntegrationResponseEnum } from './provider.enum';
 
 export interface IProvider {
   id: string;

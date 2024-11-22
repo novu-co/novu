@@ -1,4 +1,4 @@
-import { ComponentProps } from 'solid-js';
+import { type ComponentProps } from 'solid-js';
 import { Popover } from '../Popover';
 
 export const DropdownRoot = (props: ComponentProps<typeof Popover.Root>) => {

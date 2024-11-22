@@ -1,5 +1,5 @@
 import { Mention as ExternalMention } from '@tiptap/extension-mention';
-import { mergeAttributes, NodeViewProps, ReactNodeViewRenderer } from '@tiptap/react';
+import { mergeAttributes, type NodeViewProps, ReactNodeViewRenderer } from '@tiptap/react';
 import { AUTOCOMPLETE_CLOSE_TAG, AUTOCOMPLETE_OPEN_TAG, VARIABLE_HTML_TAG_NAME } from '../constants';
 import { checkIsValidVariableErrorCode } from '../utils';
 import { Variable } from './Variable';

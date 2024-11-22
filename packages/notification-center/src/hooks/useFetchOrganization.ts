@@ -1,5 +1,5 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { IOrganizationEntity } from '@novu/shared';
+import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
+import { type IOrganizationEntity } from '@novu/shared';
 
 import { useNovuContext } from './useNovuContext';
 import { ORGANIZATION_QUERY_KEY } from './queryKeys';

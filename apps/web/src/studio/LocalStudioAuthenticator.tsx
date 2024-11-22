@@ -4,7 +4,7 @@ import { useAuth, useEnvironment } from '../hooks';
 import { ROUTES } from '../constants/routes';
 import { assertProtocol } from '../utils/url';
 import { encodeBase64 } from './utils/base64';
-import { StudioState } from './types';
+import { type StudioState } from './types';
 import { novuOnboardedCookie } from '../utils/cookies';
 import { LocalStudioPageLayout } from '../components/layout/components/LocalStudioPageLayout';
 import { getToken } from '../components/providers/AuthProvider';

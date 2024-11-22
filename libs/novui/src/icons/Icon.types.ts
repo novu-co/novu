@@ -1,4 +1,4 @@
-import { CSSProperties, SVGAttributes } from 'react';
+import { type CSSProperties, type SVGAttributes } from 'react';
 
 /** Icon Size in pixels (to be replaced with values directly from Design System) */
 export type IconSize = '16' | '20' | '24' | '32' | '40';

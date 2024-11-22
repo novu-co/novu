@@ -1,7 +1,7 @@
 import {
-  IWorkflowOverridePayload,
-  IWorkflowOverrides,
-  IWorkflowOverrideUpdatePayload,
+  type IWorkflowOverridePayload,
+  type IWorkflowOverrides,
+  type IWorkflowOverrideUpdatePayload,
 } from './workflow-override.interface';
 import { WithHttp } from '../novu.interface';
 

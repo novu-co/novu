@@ -1,4 +1,4 @@
-import { ObjectWithRoot, CSSFunctionOrObject } from '../../components/types';
+import { type ObjectWithRoot, type CSSFunctionOrObject } from '../../components/types';
 
 export type StylesPaths =
   | 'bellButton.root'

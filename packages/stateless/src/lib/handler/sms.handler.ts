@@ -1,12 +1,12 @@
 import {
   HandlebarsContentEngine,
-  IContentEngine,
+  type IContentEngine,
 } from '../content/content.engine';
-import { ISmsProvider } from '../provider/provider.interface';
+import { type ISmsProvider } from '../provider/provider.interface';
 import {
   ChannelTypeEnum,
-  IMessage,
-  ITriggerPayload,
+  type IMessage,
+  type ITriggerPayload,
 } from '../template/template.interface';
 
 export class SmsHandler {

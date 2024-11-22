@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { colors } from '@novu/design-system';
-import { MouseEventHandler } from 'react';
+import { type MouseEventHandler } from 'react';
 import { LocaleSelect, MobileSimulator } from '../common';
 import { SmsBubble } from './SmsBubble';
 

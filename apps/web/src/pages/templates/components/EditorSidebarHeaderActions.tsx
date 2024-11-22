@@ -2,10 +2,10 @@ import { Group } from '@mantine/core';
 import { useEffect, useRef, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { FilterPartTypeEnum, DELAYED_STEPS, StepTypeEnum } from '@novu/shared';
+import { FilterPartTypeEnum, DELAYED_STEPS, type StepTypeEnum } from '@novu/shared';
 import { ActionButton, Condition, ConditionPlus, Trash, VariantPlus } from '@novu/design-system';
 
-import { Conditions, IConditions } from '../../../components/conditions';
+import { Conditions, type IConditions } from '../../../components/conditions';
 import { When } from '../../../components/utils/When';
 import { useEnvironment } from '../../../hooks';
 import { useBasePath } from '../hooks/useBasePath';
@@ -15,7 +15,7 @@ import { useStepIndex } from '../hooks/useStepIndex';
 import { useStepInfoPath } from '../hooks/useStepInfoPath';
 import { useStepVariantsCount } from '../hooks/useStepVariantsCount';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
-import { IForm } from './formTypes';
+import { type IForm } from './formTypes';
 import { makeVariantFromStep, useTemplateEditorForm } from './TemplateEditorFormProvider';
 import { WorkflowNodeActions } from '../workflow/workflow/node-types/WorkflowNodeActions';
 

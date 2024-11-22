@@ -2,7 +2,7 @@ import { ChannelTypeEnum, EmailProviderIdEnum } from '@novu/shared';
 import {
   EnvironmentRepository,
   ExecutionDetailsRepository,
-  IntegrationEntity,
+  type IntegrationEntity,
   IntegrationRepository,
   JobRepository,
   SubscriberRepository,

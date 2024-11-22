@@ -1,5 +1,5 @@
 import { ActionStepEnum, ChannelStepEnum, channelStepSchemas } from '@novu/framework/internal';
-import { ControlSchemas, JSONSchemaDto } from '@novu/shared';
+import { type ControlSchemas, type JSONSchemaDto } from '@novu/shared';
 import { emailStepControlSchema, emailStepUiSchema, inAppControlSchema, inAppUiSchema } from './schemas';
 import { DelayTimeControlSchema, delayUiSchema } from './schemas/delay-control.schema';
 import { DigestOutputJsonSchema, digestUiSchema } from './schemas/digest-control.schema';

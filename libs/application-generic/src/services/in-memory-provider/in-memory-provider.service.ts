@@ -4,16 +4,16 @@ import { setTimeout } from 'timers/promises';
 import {
   getClientAndConfig,
   getClientAndConfigForCluster,
-  InMemoryProviderConfig,
+  type InMemoryProviderConfig,
 } from './providers';
 import {
-  Cluster,
-  ClusterOptions,
-  InMemoryProviderClient,
-  InMemoryProviderEnum,
-  Redis,
-  RedisOptions,
-  ScanStream,
+  type Cluster,
+  type ClusterOptions,
+  type InMemoryProviderClient,
+  type InMemoryProviderEnum,
+  type Redis,
+  type RedisOptions,
+  type ScanStream,
 } from './types';
 
 const LOG_CONTEXT = 'InMemoryProviderService';

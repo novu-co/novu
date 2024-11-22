@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { CompileEmailTemplate } from '@novu/application-generic';
-import { IEmailOptions } from '@novu/stateless';
+import { type IEmailOptions } from '@novu/stateless';
 
 export const createMailData = (options: IEmailOptions, overrides: Record<string, any>): IEmailOptions => {
   const filterDuplicate = (prev: string[], current: string) => (prev.includes(current) ? prev : [...prev, current]);

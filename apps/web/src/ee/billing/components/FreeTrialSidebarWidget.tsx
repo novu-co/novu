@@ -1,4 +1,4 @@
-import { Box, MantineColor, Progress, Text } from '@mantine/core';
+import { Box, type MantineColor, Progress, Text } from '@mantine/core';
 import { colors, Button } from '@novu/design-system';
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';

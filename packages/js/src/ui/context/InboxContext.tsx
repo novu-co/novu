@@ -1,8 +1,16 @@
-import { Accessor, createContext, createEffect, createSignal, ParentProps, Setter, useContext } from 'solid-js';
-import { NotificationFilter, Redirect } from '../../types';
+import {
+  type Accessor,
+  createContext,
+  createEffect,
+  createSignal,
+  type ParentProps,
+  type Setter,
+  useContext,
+} from 'solid-js';
+import { type NotificationFilter, type Redirect } from '../../types';
 import { DEFAULT_REFERRER, DEFAULT_TARGET, getTagsFromTab } from '../helpers';
 import { useNovuEvent } from '../helpers/useNovuEvent';
-import { NotificationStatus, PreferencesFilter, RouterPush, Tab } from '../types';
+import { NotificationStatus, type PreferencesFilter, type RouterPush, type Tab } from '../types';
 
 type InboxContextType = {
   setStatus: (status: NotificationStatus) => void;

@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { expect } from 'chai';
-import { EnvironmentEntity } from '@novu/dal';
+import { type EnvironmentEntity } from '@novu/dal';
 import { UserSession } from '@novu/testing';
-import { UserSessionData } from '@novu/shared';
+import { type UserSessionData } from '@novu/shared';
 
 describe('Switch Environment - /auth/environments/:id/switch (POST) @skip-in-ee', async () => {
   let session: UserSession;

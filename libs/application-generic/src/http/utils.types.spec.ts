@@ -1,10 +1,10 @@
 /* cSpell:enableCompoundWords */
 import { expect, describe, it } from 'vitest';
 import {
-  WithRequired,
-  ConvertToConstantCase,
+  type WithRequired,
+  type ConvertToConstantCase,
   testHttpHeaderEnumValidity,
-  ValidateHttpHeaderCase,
+  type ValidateHttpHeaderCase,
 } from './utils.types';
 
 describe('HTTP headers', () => {

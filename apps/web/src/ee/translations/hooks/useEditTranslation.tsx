@@ -1,6 +1,6 @@
-import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query';
+import { type UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../../api';
-import { ITranslationGroup } from './useFetchTranslationGroups';
+import { type ITranslationGroup } from './useFetchTranslationGroups';
 
 export const useEditTranslation = (
   options: UseMutationOptions<

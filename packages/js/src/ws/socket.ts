@@ -1,22 +1,22 @@
-import io, { Socket as SocketIO } from 'socket.io-client';
-import { InboxService } from '../api';
+import io, { type Socket as SocketIO } from 'socket.io-client';
+import { type InboxService } from '../api';
 import { BaseModule } from '../base-module';
 
 import {
-  NotificationReceivedEvent,
-  NotificationUnseenEvent,
-  NotificationUnreadEvent,
-  NovuEventEmitter,
-  SocketEventNames,
+  type NotificationReceivedEvent,
+  type NotificationUnseenEvent,
+  type NotificationUnreadEvent,
+  type NovuEventEmitter,
+  type SocketEventNames,
 } from '../event-emitter';
 import { Notification } from '../notifications';
 import {
   ActionTypeEnum,
   NotificationActionStatus,
-  InboxNotification,
-  Session,
-  Subscriber,
-  TODO,
+  type InboxNotification,
+  type Session,
+  type Subscriber,
+  type TODO,
   WebSocketEvent,
 } from '../types';
 

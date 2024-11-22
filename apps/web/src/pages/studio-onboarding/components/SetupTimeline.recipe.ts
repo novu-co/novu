@@ -1,4 +1,4 @@
-import { TimelineItemStylesNames } from '@mantine/core';
+import { type TimelineItemStylesNames } from '@mantine/core';
 import { sva } from '@novu/novui/css';
 
 const SLOTS: TimelineItemStylesNames[] = ['itemBullet', 'item', 'itemContent', 'itemTitle', 'itemBody'];

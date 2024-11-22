@@ -1,4 +1,4 @@
-import { IConfigCredentials, IProviderConfig } from '../provider.interface';
+import { type IConfigCredentials, type IProviderConfig } from '../provider.interface';
 import {
   grafanaOnCallConfig,
   slackConfig,

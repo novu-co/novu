@@ -1,18 +1,18 @@
 import { SmsProviderIdEnum } from '@novu/shared';
 import {
   ChannelTypeEnum,
-  ISendMessageSuccessResponse,
-  ISmsOptions,
-  ISmsProvider,
+  type ISendMessageSuccessResponse,
+  type ISmsOptions,
+  type ISmsProvider,
   SmsEventStatusEnum,
-  ISMSEventBody,
+  type ISMSEventBody,
 } from '@novu/stateless';
 
 import Telnyx from 'telnyx';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
 
-import { ITelnyxCLient } from './telnyx.interface';
-import { WithPassthrough } from '../../../utils/types';
+import { type ITelnyxCLient } from './telnyx.interface';
+import { type WithPassthrough } from '../../../utils/types';
 
 export class TelnyxSmsProvider extends BaseProvider implements ISmsProvider {
   id = SmsProviderIdEnum.Telnyx;

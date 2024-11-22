@@ -1,4 +1,4 @@
-import { CloudRegionEnum } from './enums';
+import { type CloudRegionEnum } from './enums';
 
 export type DevCommandOptions = {
   port: string;

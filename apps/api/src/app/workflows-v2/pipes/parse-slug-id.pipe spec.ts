@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ArgumentMetadata } from '@nestjs/common';
+import { type ArgumentMetadata } from '@nestjs/common';
 
 import { ParseSlugIdPipe } from './parse-slug-id.pipe';
 import { encodeBase62 } from '../../shared/helpers';

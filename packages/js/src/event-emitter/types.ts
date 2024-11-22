@@ -11,10 +11,10 @@ import type {
   UnarchivedArgs,
   UnreadArgs,
 } from '../notifications';
-import { Preference } from '../preferences/preference';
-import { ListPreferencesArgs, UpdatePreferencesArgs } from '../preferences/types';
+import { type Preference } from '../preferences/preference';
+import { type ListPreferencesArgs, type UpdatePreferencesArgs } from '../preferences/types';
 import type { InitializeSessionArgs } from '../session';
-import { Session, WebSocketEvent } from '../types';
+import { type Session, type WebSocketEvent } from '../types';
 
 type NovuPendingEvent<A, D = undefined> = {
   args: A;

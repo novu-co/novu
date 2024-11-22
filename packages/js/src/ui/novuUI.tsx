@@ -1,7 +1,7 @@
-import { Accessor, Setter, ComponentProps, createSignal } from 'solid-js';
-import { MountableElement, render } from 'solid-js/web';
+import { type Accessor, type Setter, type ComponentProps, createSignal } from 'solid-js';
+import { type MountableElement, render } from 'solid-js/web';
 import type { NovuOptions } from '../types';
-import { NovuComponent, NovuComponentName, novuComponents, Renderer } from './components/Renderer';
+import { type NovuComponent, type NovuComponentName, type novuComponents, Renderer } from './components/Renderer';
 import { generateRandomString } from './helpers';
 import type {
   Appearance,

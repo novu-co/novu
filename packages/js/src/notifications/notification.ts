@@ -1,6 +1,6 @@
-import { InboxService } from '../api';
-import { EventHandler, EventNames, Events, NovuEventEmitter } from '../event-emitter';
-import { ActionTypeEnum, InboxNotification, Result } from '../types';
+import { type InboxService } from '../api';
+import { type EventHandler, type EventNames, type Events, type NovuEventEmitter } from '../event-emitter';
+import { ActionTypeEnum, type InboxNotification, type Result } from '../types';
 import { archive, completeAction, read, revertAction, unarchive, unread } from './helpers';
 
 export class Notification implements Pick<NovuEventEmitter, 'on'>, InboxNotification {

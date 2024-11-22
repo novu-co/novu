@@ -1,6 +1,6 @@
-import { Types } from 'mongoose';
+import { type Types } from 'mongoose';
 
-import { EncryptedSecret, IApiRateLimitMaximum } from '@novu/shared';
+import { type EncryptedSecret, type IApiRateLimitMaximum } from '@novu/shared';
 
 import type { OrganizationId } from '../organization';
 import type { ChangePropsValueType } from '../../types/helpers';

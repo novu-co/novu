@@ -1,18 +1,18 @@
 import { EmailProviderIdEnum } from '@novu/shared';
 import {
   ChannelTypeEnum,
-  IEmailOptions,
-  IEmailProvider,
-  ISendMessageSuccessResponse,
-  ICheckIntegrationResponse,
+  type IEmailOptions,
+  type IEmailProvider,
+  type ISendMessageSuccessResponse,
+  type ICheckIntegrationResponse,
   CheckIntegrationResponseEnum,
-  IEmailEventBody,
+  type IEmailEventBody,
   EmailEventStatusEnum,
 } from '@novu/stateless';
-import axios, { AxiosInstance } from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
-import { IEmailBody, IEmailResponse } from './netcore-types';
+import { type WithPassthrough } from '../../../utils/types';
+import { type IEmailBody, type IEmailResponse } from './netcore-types';
 
 export enum NetCoreStatusEnum {
   OPENED = 'open',

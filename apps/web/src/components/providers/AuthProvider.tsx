@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { IOrganizationEntity, IUserEntity } from '@novu/shared';
+import { type IOrganizationEntity, type IUserEntity } from '@novu/shared';
 import { type BrowserClerk } from '@clerk/clerk-react';
 import { IS_EE_AUTH_ENABLED } from '../../config/index';
 import {

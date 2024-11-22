@@ -1,4 +1,4 @@
-import { createEffect, JSX, onCleanup, splitProps } from 'solid-js';
+import { createEffect, type JSX, onCleanup, splitProps } from 'solid-js';
 
 type ExternalElementMounterProps = JSX.HTMLAttributes<HTMLDivElement> & {
   render: (el: HTMLDivElement) => () => void;

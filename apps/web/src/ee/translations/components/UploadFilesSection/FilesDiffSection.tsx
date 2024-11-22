@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Center, Grid, useMantineTheme } from '@mantine/core';
-import { DiffEditor, Monaco } from '@monaco-editor/react';
+import { DiffEditor, type Monaco } from '@monaco-editor/react';
 
 import { colors, Text } from '@novu/design-system';
 import React, { useEffect, useRef } from 'react';

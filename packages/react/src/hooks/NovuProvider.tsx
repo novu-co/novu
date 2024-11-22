@@ -1,5 +1,5 @@
-import { Novu, NovuOptions } from '@novu/js';
-import { ReactNode, createContext, useContext, useMemo } from 'react';
+import { Novu, type NovuOptions } from '@novu/js';
+import { type ReactNode, createContext, useContext, useMemo } from 'react';
 
 // @ts-ignore
 const version = PACKAGE_VERSION;

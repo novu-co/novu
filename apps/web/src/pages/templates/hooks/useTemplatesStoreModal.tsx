@@ -1,9 +1,9 @@
 import { useDisclosure } from '@mantine/hooks';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 
-import { IBlueprintsGrouped } from '../../../api/hooks';
+import { type IBlueprintsGrouped } from '../../../api/hooks';
 import { useInlineComponent, useFeatureFlag } from '../../../hooks';
-import { ITemplatesStoreModalProps, TemplatesStoreModal } from '../components/templates-store';
+import { type ITemplatesStoreModalProps, TemplatesStoreModal } from '../components/templates-store';
 
 const NULL_COMPONENT = () => null;
 

@@ -1,5 +1,5 @@
 import type { IUserGlobalPreferenceSettings } from '@novu/client';
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query';
+import { useMutation, type UseMutationOptions, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
 import { useFetchUserGlobalPreferencesQueryKey } from './useFetchUserGlobalPreferencesQueryKey';

@@ -1,12 +1,12 @@
-import { ExternalSubscriberId } from '@novu/shared';
+import { type ExternalSubscriberId } from '@novu/shared';
 
 import {
-  CreateTopicSubscribersEntity,
+  type CreateTopicSubscribersEntity,
   TopicSubscribersEntity,
-  TopicSubscribersDBModel,
+  type TopicSubscribersDBModel,
 } from './topic-subscribers.entity';
 import { TopicSubscribers } from './topic-subscribers.schema';
-import { EnvironmentId, OrganizationId, TopicId, TopicKey } from './types';
+import { type EnvironmentId, type OrganizationId, type TopicId, type TopicKey } from './types';
 import { BaseRepository } from '../base-repository';
 import type { EnforceEnvOrOrgIds } from '../../types/enforce';
 

@@ -2,7 +2,7 @@ import sinon from 'sinon';
 import {
   CacheService,
   CachingConfig,
-  ICacheService,
+  type ICacheService,
   splitKey,
 } from './cache.service';
 

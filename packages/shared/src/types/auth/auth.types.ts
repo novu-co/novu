@@ -1,4 +1,4 @@
-import { SignUpOriginEnum } from '../analytics';
+import { type SignUpOriginEnum } from '../analytics';
 
 export interface IJwtClaims {
   _id: string;

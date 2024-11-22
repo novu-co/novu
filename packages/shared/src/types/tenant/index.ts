@@ -1,4 +1,4 @@
-import { CustomDataType } from '../shared';
+import { type CustomDataType } from '../shared';
 
 export type TenantCustomData = CustomDataType;
 

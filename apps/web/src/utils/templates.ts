@@ -1,4 +1,4 @@
-import { IconName } from '@fortawesome/fontawesome-svg-core';
+import { type IconName } from '@fortawesome/fontawesome-svg-core';
 
 export const getWorkflowBlueprintDetails = (templateName: string): { name: string; iconName: IconName } => {
   const regexResult = /^:.{1,}:/.exec(templateName);

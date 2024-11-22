@@ -1,14 +1,14 @@
 import {
-  FocusEventHandler,
+  type FocusEventHandler,
   forwardRef,
-  KeyboardEventHandler,
+  type KeyboardEventHandler,
   useContext,
   useImperativeHandle,
   useRef,
   useState,
 } from 'react';
 import styled from '@emotion/styled';
-import { Input, NumberInput, NumberInputProps, useMantineTheme } from '@mantine/core';
+import { Input, NumberInput, type NumberInputProps, useMantineTheme } from '@mantine/core';
 import { PaginationContext } from './PaginationContext';
 import { Tooltip } from '../tooltip/Tooltip';
 import { FIRST_PAGE_NUMBER } from './Pagination.const';

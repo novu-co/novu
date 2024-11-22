@@ -1,6 +1,6 @@
 import { ActionStepEnum, actionStepSchemas, ChannelStepEnum, channelStepSchemas } from '@novu/framework/internal';
-import { JSONSchema } from 'json-schema-to-ts';
-import { StepTypeEnum } from '@novu/shared';
+import { type JSONSchema } from 'json-schema-to-ts';
+import { type StepTypeEnum } from '@novu/shared';
 
 export function computeResultSchema(stepType: StepTypeEnum, payloadSchema?: JSONSchema) {
   const mapStepTypeToResult: Record<ChannelStepEnum & ActionStepEnum, JSONSchema> = {

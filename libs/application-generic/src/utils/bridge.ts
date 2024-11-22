@@ -1,8 +1,8 @@
 import { DigestTypeEnum } from '@novu/shared';
 import {
-  DigestOutput,
-  DigestRegularOutput,
-  DigestTimedOutput,
+  type DigestOutput,
+  type DigestRegularOutput,
+  type DigestTimedOutput,
 } from '@novu/framework/internal';
 
 export function getDigestType(outputs: DigestOutput): DigestTypeEnum {

@@ -12,7 +12,7 @@ import { useTemplateEditorForm } from './TemplateEditorFormProvider';
 import { deleteTemplateById } from '../../../api/notification-templates';
 import { ROUTES } from '../../../constants/routes';
 import { WorkflowSettingsTabs } from './WorkflowSettingsTabs';
-import { IForm } from './formTypes';
+import { type IForm } from './formTypes';
 import { WorkflowSidebar } from './WorkflowSidebar';
 
 export const TemplateSettings = () => {

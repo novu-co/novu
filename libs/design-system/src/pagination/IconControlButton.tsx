@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { useMantineTheme } from '@mantine/core';
-import { ControlButton, IControlButtonProps } from './ControlButton';
+import { ControlButton, type IControlButtonProps } from './ControlButton';
 import { colors } from '../config';
 
 // TODO: Fix `theme` type once design system is ready and then use theme values

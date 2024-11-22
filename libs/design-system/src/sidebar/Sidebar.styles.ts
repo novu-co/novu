@@ -1,10 +1,10 @@
 import { css } from '@emotion/css';
 import styled from '@emotion/styled';
-import { createStyles, MantineTheme } from '@mantine/core';
+import { createStyles, type MantineTheme } from '@mantine/core';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { colors, shadows } from '../config';
 import { NAVIGATION_WIDTH, LEGACY_NAVIGATION_WIDTH, COLLAPSED_WIDTH } from './Sidebar.const';
-import { ISidebarBaseProps } from './Sidebar.types';
+import { type ISidebarBaseProps } from './Sidebar.types';
 
 export const HeaderHolder = styled.div`
   display: flex;

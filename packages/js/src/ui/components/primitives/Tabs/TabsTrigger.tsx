@@ -1,4 +1,4 @@
-import { JSX, ParentProps, Ref, splitProps } from 'solid-js';
+import { type JSX, type ParentProps, type Ref, splitProps } from 'solid-js';
 import { useStyle } from '../../../helpers';
 import type { AppearanceKey } from '../../../types';
 import { Button } from '../Button';

@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, JSX, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, type JSX, Show } from 'solid-js';
 
 import type { Notification } from '../../../notifications';
 import { ActionTypeEnum } from '../../../types';

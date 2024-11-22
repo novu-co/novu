@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { type FC } from 'react';
 import { BillingRoutes } from '../BillingPages';
 import { SettingsPageContainer } from './SettingsPageContainer';
 

@@ -1,5 +1,5 @@
 import { Text, Title } from '@novu/novui';
-import { MantineTheme } from '@mantine/core';
+import { type MantineTheme } from '@mantine/core';
 import { css } from '@novu/novui/css';
 import { UsageProgress } from './UsageProgress';
 import { useSubscriptionContext, type UseSubscriptionType } from './SubscriptionProvider';

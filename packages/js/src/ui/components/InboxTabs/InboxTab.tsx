@@ -1,7 +1,7 @@
-import { ComponentProps, createMemo, JSX, Show } from 'solid-js';
+import { type ComponentProps, createMemo, type JSX, Show } from 'solid-js';
 import { useInboxContext, useUnreadCount } from '../../context';
-import { ClassName, cn, getTagsFromTab, useStyle } from '../../helpers';
-import { NotificationStatus, Tab } from '../../types';
+import { type ClassName, cn, getTagsFromTab, useStyle } from '../../helpers';
+import { NotificationStatus, type Tab } from '../../types';
 import { Dropdown, dropdownItemVariants, Tabs } from '../primitives';
 import { tabsTriggerVariants } from '../primitives/Tabs/TabsTrigger';
 

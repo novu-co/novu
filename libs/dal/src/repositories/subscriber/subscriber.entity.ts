@@ -1,6 +1,6 @@
-import { SubscriberCustomData, ChatProviderIdEnum, PushProviderIdEnum } from '@novu/shared';
+import { type SubscriberCustomData, type ChatProviderIdEnum, type PushProviderIdEnum } from '@novu/shared';
 
-import { ExternalSubscriberId } from './types';
+import { type ExternalSubscriberId } from './types';
 import type { OrganizationId } from '../organization';
 import type { EnvironmentId } from '../environment';
 import type { ChangePropsValueType } from '../../types/helpers';

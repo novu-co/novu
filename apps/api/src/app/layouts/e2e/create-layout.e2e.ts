@@ -1,7 +1,7 @@
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
 
-import { LayoutId, TemplateVariableTypeEnum } from '../types';
+import { type LayoutId, TemplateVariableTypeEnum } from '../types';
 
 const BASE_PATH = '/v1/layouts';
 

@@ -1,4 +1,4 @@
-import { ChannelStepEnum } from '../../constants';
+import { type ChannelStepEnum } from '../../constants';
 import type { JsonSchema } from '../../types/schema.types';
 import { chatProviderSchemas } from './chat';
 import { emailProviderSchemas } from './email';

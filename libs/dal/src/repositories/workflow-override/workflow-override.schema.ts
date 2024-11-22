@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
-import { WorkflowOverrideDBModel } from './workflow-override.entity';
+import { type WorkflowOverrideDBModel } from './workflow-override.entity';
 
 const mongooseDelete = require('mongoose-delete');
 

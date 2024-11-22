@@ -3,7 +3,7 @@ import {
   ChatProviderIdEnum,
   EmailProviderIdEnum,
   InAppProviderIdEnum,
-  ProvidersIdEnum,
+  type ProvidersIdEnum,
   PushProviderIdEnum,
   SmsProviderIdEnum,
 } from '@novu/shared';

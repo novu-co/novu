@@ -1,12 +1,15 @@
-import axios, { AxiosResponse } from 'axios';
-import { Test, TestingModule } from '@nestjs/testing';
+import axios, { type AxiosResponse } from 'axios';
+import { Test, type TestingModule } from '@nestjs/testing';
 import { expect } from 'chai';
 import sinon from 'sinon';
 
 import { JobRepository, MessageRepository } from '@novu/dal';
 import { CompileTemplate } from '@novu/application-generic';
 
-import { InboundEmailParse, IUserWebhookPayload } from '../usecases/inbound-email-parse/inbound-email-parse.usecase';
+import {
+  InboundEmailParse,
+  type IUserWebhookPayload,
+} from '../usecases/inbound-email-parse/inbound-email-parse.usecase';
 import { InboundEmailParseCommand } from '../usecases/inbound-email-parse/inbound-email-parse.command';
 
 const axiosInstance = axios.create();

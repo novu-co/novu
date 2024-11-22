@@ -1,4 +1,4 @@
-import { IProviderConfig } from '../provider.interface';
+import { type IProviderConfig } from '../provider.interface';
 import {
   gupshupConfig,
   nexmoConfig,

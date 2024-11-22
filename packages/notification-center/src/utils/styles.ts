@@ -1,4 +1,4 @@
-import { CSSInterpolation } from '@emotion/css';
+import { type CSSInterpolation } from '@emotion/css';
 
 import type { ColorScheme, ICommonTheme } from '../index';
 import type { INovuTheme } from '../store/novu-theme.context';

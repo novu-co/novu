@@ -1,8 +1,8 @@
 import { expect } from 'chai';
-import { UserSession } from '@novu/testing';
+import { type UserSession } from '@novu/testing';
 
-import { GetTopicResponseDto } from '../../dtos';
-import { TopicId, TopicKey, TopicName } from '../../types';
+import { type GetTopicResponseDto } from '../../dtos';
+import { type TopicId, type TopicKey, type TopicName } from '../../types';
 
 const BASE_PATH = '/v1/topics';
 

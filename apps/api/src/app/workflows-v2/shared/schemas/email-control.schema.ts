@@ -1,4 +1,4 @@
-import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
+import { type JSONSchemaDto, UiComponentEnum, type UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';

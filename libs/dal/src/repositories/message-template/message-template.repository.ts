@@ -1,9 +1,9 @@
-import { FilterQuery } from 'mongoose';
-import { SoftDeleteModel } from 'mongoose-delete';
+import { type FilterQuery } from 'mongoose';
+import { type SoftDeleteModel } from 'mongoose-delete';
 import { DalException } from '../../shared';
 import type { EnforceEnvOrOrgIds } from '../../types/enforce';
 import { BaseRepository } from '../base-repository';
-import { MessageTemplateDBModel, MessageTemplateEntity } from './message-template.entity';
+import { type MessageTemplateDBModel, MessageTemplateEntity } from './message-template.entity';
 import { MessageTemplate } from './message-template.schema';
 
 type MessageTemplateQuery = FilterQuery<MessageTemplateDBModel>;

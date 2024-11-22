@@ -2,7 +2,7 @@ import { WorkflowTypeEnum } from '@novu/shared';
 import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
-import { NotificationTemplateDBModel } from './notification-template.entity';
+import { type NotificationTemplateDBModel } from './notification-template.entity';
 
 const mongooseDelete = require('mongoose-delete');
 

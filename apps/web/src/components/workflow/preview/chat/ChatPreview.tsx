@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 
 import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { IForm } from '../../../../pages/templates/components/formTypes';
+import { type IForm } from '../../../../pages/templates/components/formTypes';
 import { useStepFormPath } from '../../../../pages/templates/hooks/useStepFormPath';
 import { useTemplateLocales } from '../../../../pages/templates/hooks/useTemplateLocales';
 import { usePreviewChatTemplate } from '../../../../pages/templates/hooks/usePreviewChatTemplate';

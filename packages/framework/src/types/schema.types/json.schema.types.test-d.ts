@@ -1,5 +1,5 @@
 import { describe, expectTypeOf, it } from 'vitest';
-import { InferJsonSchema, JsonSchema } from './json.schema.types';
+import { type InferJsonSchema, type JsonSchema } from './json.schema.types';
 
 describe('JsonSchema types', () => {
   const testSchema = {

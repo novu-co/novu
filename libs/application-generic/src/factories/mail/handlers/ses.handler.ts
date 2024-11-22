@@ -1,9 +1,9 @@
 import {
   ChannelTypeEnum,
   EmailProviderIdEnum,
-  ICredentials,
+  type ICredentials,
 } from '@novu/shared';
-import { SESConfig, SESEmailProvider } from '@novu/providers';
+import { type SESConfig, SESEmailProvider } from '@novu/providers';
 import { BaseHandler } from './base.handler';
 
 export class SESHandler extends BaseHandler {

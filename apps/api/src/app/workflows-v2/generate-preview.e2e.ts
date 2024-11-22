@@ -6,20 +6,20 @@ import { sleep } from '@nestjs/terminus/dist/utils';
 import {
   ChannelTypeEnum,
   createWorkflowClient,
-  CreateWorkflowDto,
+  type CreateWorkflowDto,
   CronExpressionEnum,
-  EmailStepControlSchemaDto,
-  GeneratePreviewRequestDto,
-  GeneratePreviewResponseDto,
-  HttpError,
-  NovuRestResult,
+  type EmailStepControlSchemaDto,
+  type GeneratePreviewRequestDto,
+  type GeneratePreviewResponseDto,
+  type HttpError,
+  type NovuRestResult,
   RedirectTargetEnum,
   StepTypeEnum,
   WorkflowCreationSourceEnum,
 } from '@novu/shared';
 import { buildCreateWorkflowDto } from './workflow.controller.e2e';
 import { forSnippet, fullCodeSnippet } from './maily-test-data';
-import { InAppControlType } from './shared';
+import { type InAppControlType } from './shared';
 
 const SUBJECT_TEST_PAYLOAD = '{{payload.subject.test.payload}}';
 const PLACEHOLDER_SUBJECT_INAPP = '{{payload.subject}}';

@@ -1,5 +1,5 @@
 import { defineSlotRecipe } from '@pandacss/dev';
-import { RichTextEditorStylesNames } from '@mantine/tiptap';
+import { type RichTextEditorStylesNames } from '@mantine/tiptap';
 import { INPUT_RECIPE } from './input.recipe';
 
 // full enumeration of the component library's slots

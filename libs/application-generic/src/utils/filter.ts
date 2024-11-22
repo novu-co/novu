@@ -1,14 +1,14 @@
 import _ from 'lodash';
 import {
-  IBaseFieldFilterPart,
+  type IBaseFieldFilterPart,
   FieldOperatorEnum,
   FILTER_TO_LABEL,
-  ICondition,
+  type ICondition,
 } from '@novu/shared';
 
 import {
-  FilterProcessingDetails,
-  IFilterVariables,
+  type FilterProcessingDetails,
+  type IFilterVariables,
 } from './filter-processing-details';
 
 export abstract class Filter {

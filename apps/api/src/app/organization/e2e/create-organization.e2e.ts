@@ -12,7 +12,7 @@ import {
   ApiServiceLevelEnum,
   ChannelTypeEnum,
   EmailProviderIdEnum,
-  ICreateOrganizationDto,
+  type ICreateOrganizationDto,
   InAppProviderIdEnum,
   JobTitleEnum,
   MemberRoleEnum,

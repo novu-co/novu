@@ -1,6 +1,6 @@
-import { CustomDataType } from '../shared';
-import { ChatProviderIdEnum, PushProviderIdEnum } from '../../consts';
-import { IChannelCredentials } from '../../entities/subscriber';
+import { type CustomDataType } from '../shared';
+import { type ChatProviderIdEnum, type PushProviderIdEnum } from '../../consts';
+import { type IChannelCredentials } from '../../entities/subscriber';
 
 export type ExternalSubscriberId = string;
 export type SubscriberId = string;

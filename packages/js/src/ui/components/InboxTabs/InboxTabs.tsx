@@ -4,11 +4,11 @@ import { useInboxContext, useUnreadCounts } from '../../context';
 import { cn, getTagsFromTab, useStyle } from '../../helpers';
 import { Check, Dots } from '../../icons';
 import {
-  NotificationActionClickHandler,
-  NotificationClickHandler,
-  NotificationRenderer,
+  type NotificationActionClickHandler,
+  type NotificationClickHandler,
+  type NotificationRenderer,
   NotificationStatus,
-  Tab,
+  type Tab,
 } from '../../types';
 import { NotificationList } from '../Notification';
 import { Button, Dropdown, Tabs } from '../primitives';

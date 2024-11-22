@@ -1,7 +1,7 @@
-import { IEmailOptions, IEmailProvider } from '@novu/stateless';
-import { ChannelTypeEnum, EmailProviderIdEnum } from '@novu/shared';
+import { type IEmailOptions, type IEmailProvider } from '@novu/stateless';
+import { type ChannelTypeEnum, type EmailProviderIdEnum } from '@novu/shared';
 
-import { IMailHandler } from '../interfaces/send.handler.interface';
+import { type IMailHandler } from '../interfaces/send.handler.interface';
 import { PlatformException } from '../../../utils/exceptions';
 
 export abstract class BaseHandler implements IMailHandler {

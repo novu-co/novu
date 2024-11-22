@@ -2,7 +2,7 @@ import { BrazeEmailProvider } from '@novu/providers';
 import {
   ChannelTypeEnum,
   EmailProviderIdEnum,
-  ICredentials,
+  type ICredentials,
 } from '@novu/shared';
 import { BaseHandler } from './base.handler';
 

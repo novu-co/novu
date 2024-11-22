@@ -6,7 +6,7 @@ import {
   SubscriberProcessQueueService,
   WorkflowQueueService,
 } from '../queues';
-import { StandardWorkerService, WorkerBaseService } from '../workers';
+import { StandardWorkerService, type WorkerBaseService } from '../workers';
 import {
   StandardQueueServiceHealthIndicator,
   SubscriberProcessQueueHealthIndicator,

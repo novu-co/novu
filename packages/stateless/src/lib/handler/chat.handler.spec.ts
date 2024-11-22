@@ -1,4 +1,4 @@
-import { IChatProvider } from '../provider/provider.interface';
+import { type IChatProvider } from '../provider/provider.interface';
 import { ChannelTypeEnum } from '../template/template.interface';
 import { ChatHandler } from './chat.handler';
 

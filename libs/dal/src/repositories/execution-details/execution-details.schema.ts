@@ -1,7 +1,7 @@
 import { ExecutionDetailsSourceEnum, ExecutionDetailsStatusEnum } from '@novu/shared';
 import mongoose, { Schema } from 'mongoose';
 
-import { ExecutionDetailsDBModel } from './execution-details.entity';
+import { type ExecutionDetailsDBModel } from './execution-details.entity';
 
 import { schemaOptions } from '../schema-default.options';
 

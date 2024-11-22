@@ -1,5 +1,5 @@
 import { PageContainer, When } from '@novu/design-system';
-import { FC, PropsWithChildren, ReactNode } from 'react';
+import { type FC, type PropsWithChildren, type ReactNode } from 'react';
 import { css } from '@novu/novui/css';
 import PageHeader from '../../components/layout/components/PageHeader';
 

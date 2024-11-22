@@ -1,4 +1,4 @@
-import { ChannelStepEnum } from '../../constants';
+import { type ChannelStepEnum } from '../../constants';
 import { emptySchema } from '../../schemas';
 import type {
   Awaitable,

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { ISubscriber } from '@novu/shared';
+import { type ISubscriber } from '@novu/shared';
 
 import { useEnvironment } from './useEnvironment';
 

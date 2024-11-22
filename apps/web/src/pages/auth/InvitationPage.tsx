@@ -2,7 +2,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { Center, LoadingOverlay } from '@mantine/core';
-import { IGetInviteResponseDto } from '@novu/shared';
+import { type IGetInviteResponseDto } from '@novu/shared';
 
 import { colors, Text, Button, PageMeta } from '@novu/design-system';
 import { getInviteTokenData } from '../../api/invitation';

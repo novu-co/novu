@@ -1,5 +1,5 @@
-import { NovuEventEmitter } from '../event-emitter';
-import { InitializeSessionArgs } from './types';
+import { type NovuEventEmitter } from '../event-emitter';
+import { type InitializeSessionArgs } from './types';
 import type { InboxService } from '../api';
 
 export class Session {

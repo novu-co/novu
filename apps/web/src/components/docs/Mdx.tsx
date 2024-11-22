@@ -5,12 +5,12 @@ import { css } from '@novu/novui/css';
 import { Flex, Grid, GridItem, styled } from '@novu/novui/jsx';
 // eslint-disable-next-line import/no-namespace
 import * as mdxBundler from 'mdx-bundler/client';
-import { useMemo, ReactNode, PropsWithChildren, useEffect } from 'react';
+import { useMemo, type ReactNode, type PropsWithChildren, useEffect } from 'react';
 import { Title, Text } from '@novu/novui';
 import { text } from '@novu/novui/recipes';
 import { DOCS_URL, MINTLIFY_IMAGE_URL } from './docs.const';
 import { Highlight } from './Highlight';
-import { DocsQueryResults } from './useLoadDocs';
+import { type DocsQueryResults } from './useLoadDocs';
 import { DOCS_WRAPPER_ELEMENT_ID } from './Docs';
 import { createGlobals } from './globals';
 

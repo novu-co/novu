@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from '@emotion/styled';
 
-import { IThemeUserPreferences } from '../../../../store/novu-theme.context';
+import { type IThemeUserPreferences } from '../../../../store/novu-theme.context';
 
 export const accordionStyles = (baseTheme: IThemeUserPreferences, font: string) => {
   return {

@@ -1,4 +1,4 @@
-import { CSSProperties, SVGAttributes } from 'react';
+import { type CSSProperties, type SVGAttributes } from 'react';
 
 /**
  * @deprecated Use @novu/novui/icons instead.

@@ -1,5 +1,5 @@
 import { InternalServerErrorException } from '@nestjs/common';
-import { NotificationStepEntity } from '@novu/dal';
+import { type NotificationStepEntity } from '@novu/dal';
 
 export class StepUpsertMechanismFailedMissingIdException extends InternalServerErrorException {
   constructor(stepDatabaseId: string, stepExternalID: string | undefined, persistedStep: NotificationStepEntity) {

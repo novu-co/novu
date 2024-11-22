@@ -11,7 +11,7 @@ import { useWorkflow, useWorkflowTrigger } from '../../../hooks/useBridgeAPI';
 import { When } from '../../../../components/utils/When';
 import { ExecutionDetailsModalWrapper } from '../../../../pages/templates/components/ExecutionDetailsModalWrapper';
 import { WorkflowsPageTemplate, WorkflowsPanelLayout } from '../layout/index';
-import { ToSubscriber, WorkflowTestControlsPanel } from './WorkflowTestControlsPanel';
+import { type ToSubscriber, WorkflowTestControlsPanel } from './WorkflowTestControlsPanel';
 import { WorkflowTestTriggerPanel } from './WorkflowTestTriggerPanel';
 import { useTemplateFetcher } from '../../../../api/hooks/index';
 import { useSegment } from '../../../../components/providers/SegmentProvider';

@@ -10,7 +10,7 @@ import {
   WorkflowNotFoundError,
 } from './errors';
 import { workflow } from './resources';
-import { Event, Step } from './types';
+import { type Event, type Step } from './types';
 import { PostActionEnum } from './constants';
 
 describe('Novu Client', () => {

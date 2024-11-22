@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, it } from 'vitest';
 import { z } from 'zod';
-import { FromSchema, FromSchemaUnvalidated, Schema } from './base.schema.types';
+import { type FromSchema, type FromSchemaUnvalidated, type Schema } from './base.schema.types';
 
 describe('FromSchema', () => {
   it('should infer an unknown record type when a generic schema is provided', () => {

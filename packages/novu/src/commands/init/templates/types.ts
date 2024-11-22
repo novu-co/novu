@@ -1,4 +1,4 @@
-import { PackageManager } from "../helpers/get-pkg-manager";
+import { type PackageManager } from "../helpers/get-pkg-manager";
 
 export enum TemplateTypeEnum {
   DEFAULT = "default",

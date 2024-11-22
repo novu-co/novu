@@ -1,5 +1,5 @@
-import { IEnvironment } from '@novu/shared';
-import { WebhookClaimStatus } from './WebhookPage.types';
+import { type IEnvironment } from '@novu/shared';
+import { type WebhookClaimStatus } from './WebhookPage.types';
 
 const DEFAULT_STATUS: WebhookClaimStatus = 'unclaimed';
 

@@ -2,11 +2,11 @@ import { Dropzone } from '@mantine/dropzone';
 import { ActionButton, errorMessage, IconDelete, IconOutlineFileUpload } from '@novu/design-system';
 import { UploadTypesEnum } from '@novu/shared';
 import { useRef } from 'react';
-import { ControllerRenderProps, UseFormSetValue } from 'react-hook-form';
+import { type ControllerRenderProps, type UseFormSetValue } from 'react-hook-form';
 import { css, cx } from '@novu/novui/css';
 import { Stack } from '@novu/novui/jsx';
 import { useUploadToStorage } from '../../api/hooks/useUploadToStorage';
-import { ACCEPTABLE_ORG_IMAGE_TYPES, BRAND_LOGO_SIZE, IBrandFormValues } from './BrandingPage.const';
+import { ACCEPTABLE_ORG_IMAGE_TYPES, BRAND_LOGO_SIZE, type IBrandFormValues } from './BrandingPage.const';
 import {
   dropzoneOverlayStyles,
   dropzoneRootStyles,

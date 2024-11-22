@@ -1,6 +1,6 @@
-import { EncryptedSecret, IApiRateLimitMaximum } from '@novu/shared';
+import { type EncryptedSecret, type IApiRateLimitMaximum } from '@novu/shared';
 import { BaseRepository } from '../base-repository';
-import { IApiKey, EnvironmentEntity, EnvironmentDBModel } from './environment.entity';
+import { type IApiKey, EnvironmentEntity, type EnvironmentDBModel } from './environment.entity';
 import { Environment } from './environment.schema';
 
 export class EnvironmentRepository extends BaseRepository<EnvironmentDBModel, EnvironmentEntity, object> {

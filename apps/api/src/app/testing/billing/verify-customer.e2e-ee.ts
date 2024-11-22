@@ -1,7 +1,7 @@
 /* eslint-disable global-require */
 import { Logger } from '@nestjs/common';
 import sinon from 'sinon';
-import { OrganizationRepository } from '@novu/dal';
+import { type OrganizationRepository } from '@novu/dal';
 import { expect } from 'chai';
 import { ApiServiceLevelEnum } from '@novu/shared';
 import { VerifyCustomerCommand } from '@novu/ee-billing';

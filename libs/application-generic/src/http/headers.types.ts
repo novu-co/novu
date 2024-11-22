@@ -1,5 +1,5 @@
-import { ApiHeaderOptions } from '@nestjs/swagger';
-import { WithRequired, testHttpHeaderEnumValidity } from './utils.types';
+import { type ApiHeaderOptions } from '@nestjs/swagger';
+import { type WithRequired, testHttpHeaderEnumValidity } from './utils.types';
 
 export enum HttpRequestHeaderKeysEnum {
   AUTHORIZATION = 'Authorization',

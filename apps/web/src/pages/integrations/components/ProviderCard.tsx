@@ -1,4 +1,4 @@
-import { IConfigCredentials } from '@novu/shared';
+import { type IConfigCredentials } from '@novu/shared';
 import styled from '@emotion/styled';
 import { Group, useMantineColorScheme } from '@mantine/core';
 

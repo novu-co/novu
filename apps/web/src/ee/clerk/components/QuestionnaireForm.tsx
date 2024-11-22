@@ -7,7 +7,7 @@ import { captureException } from '@sentry/react';
 import {
   FeatureFlagsKeysEnum,
   IResponseError,
-  UpdateExternalOrganizationDto,
+  type UpdateExternalOrganizationDto,
   JobTitleEnum,
   jobTitleToLabelMapper,
 } from '@novu/shared';

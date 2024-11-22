@@ -1,4 +1,4 @@
-import { TemplateVariableTypeEnum } from '../channel';
+import { type TemplateVariableTypeEnum } from '../channel';
 
 export enum EmailBlockTypeEnum {
   BUTTON = 'button',

@@ -1,4 +1,4 @@
-import { CheckboxStylesNames } from '@mantine/core';
+import { type CheckboxStylesNames } from '@mantine/core';
 import { defineSlotRecipe } from '@pandacss/dev';
 import { colorPaletteGradientHorizontal } from '../ingredients';
 import { INPUT_RECIPE } from './input.recipe';

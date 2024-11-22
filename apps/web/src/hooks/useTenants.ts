@@ -1,6 +1,6 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query';
+import { type UseQueryOptions, useQuery } from '@tanstack/react-query';
 
-import { IPaginatedResponseDto, ITenantEntity } from '@novu/shared';
+import { type IPaginatedResponseDto, type ITenantEntity } from '@novu/shared';
 
 import { QueryKeys } from '../api/query.keys';
 import { getTenants } from '../api/tenants';

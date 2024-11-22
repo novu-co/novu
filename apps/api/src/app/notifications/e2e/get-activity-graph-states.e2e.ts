@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { format } from 'date-fns';
 import { UserSession } from '@novu/testing';
-import { NotificationTemplateEntity, SubscriberRepository } from '@novu/dal';
+import { type NotificationTemplateEntity, SubscriberRepository } from '@novu/dal';
 import { ChannelTypeEnum } from '@novu/shared';
 
 describe('Get activity feed graph stats - /notifications/graph/stats (GET)', async () => {

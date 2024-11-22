@@ -1,8 +1,12 @@
-import { PreferencesResponseDto, StepResponseDto, WorkflowCommonsFields } from './workflow-commons-fields';
-import { Slug, WorkflowOriginEnum } from '../../types';
-import { WorkflowStatusEnum } from './workflow-status-enum';
-import { CreateWorkflowDto } from './create-workflow-dto';
-import { UpdateWorkflowDto } from './update-workflow-dto';
+import {
+  type PreferencesResponseDto,
+  type StepResponseDto,
+  type WorkflowCommonsFields,
+} from './workflow-commons-fields';
+import { type Slug, type WorkflowOriginEnum } from '../../types';
+import { type WorkflowStatusEnum } from './workflow-status-enum';
+import { type CreateWorkflowDto } from './create-workflow-dto';
+import { type UpdateWorkflowDto } from './update-workflow-dto';
 
 export type WorkflowResponseDto = WorkflowCommonsFields & {
   _id: string;

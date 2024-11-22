@@ -1,4 +1,4 @@
-import { ChannelTypeEnum, IEmailBlock, ITemplateVariable } from '../../types';
+import { type ChannelTypeEnum, type IEmailBlock, type ITemplateVariable } from '../../types';
 
 export class LayoutDto {
   _id?: string;

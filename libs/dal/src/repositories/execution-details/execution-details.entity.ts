@@ -1,4 +1,4 @@
-import { ExecutionDetailsSourceEnum, ExecutionDetailsStatusEnum, StepTypeEnum } from '@novu/shared';
+import { type ExecutionDetailsSourceEnum, type ExecutionDetailsStatusEnum, type StepTypeEnum } from '@novu/shared';
 
 import type { EnvironmentId } from '../environment';
 import type { OrganizationId } from '../organization';

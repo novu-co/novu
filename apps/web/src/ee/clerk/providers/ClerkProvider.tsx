@@ -1,9 +1,9 @@
-import { PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClerkProvider as _ClerkProvider } from '@clerk/clerk-react';
 import { useColorScheme } from '@novu/design-system';
 import { dark } from '@clerk/themes';
-import { Variables } from '@clerk/types';
+import { type Variables } from '@clerk/types';
 import { CLERK_PUBLISHABLE_KEY, IS_EE_AUTH_ENABLED } from '../../../config/index';
 
 const CLERK_LOCALIZATION = {

@@ -1,14 +1,14 @@
 import styled from '@emotion/styled';
 import { Divider, Group, useMantineColorScheme } from '@mantine/core';
-import { ChannelTypeEnum, providers, StepTypeEnum } from '@novu/shared';
-import React, { MouseEventHandler, useEffect, useState } from 'react';
+import { type ChannelTypeEnum, providers, type StepTypeEnum } from '@novu/shared';
+import React, { type MouseEventHandler, useEffect, useState } from 'react';
 import { useViewport } from 'react-flow-renderer';
 import { useFormContext } from 'react-hook-form';
 
 import {
   Button,
   colors,
-  IDropdownProps,
+  type IDropdownProps,
   ProviderMissing,
   Text,
   useTemplateButtonStyles,

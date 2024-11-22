@@ -1,6 +1,6 @@
 import { errorMessage } from '@novu/design-system';
-import { IMessageButton, IMessageCTA } from '@novu/shared';
-import { useMutation, UseMutationOptions } from '@tanstack/react-query';
+import { type IMessageButton, type IMessageCTA } from '@novu/shared';
+import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { previewInApp } from '../content-templates';
 

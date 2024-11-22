@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, colors, shadows, Close } from '@novu/design-system';
 import { faFile } from '@fortawesome/free-regular-svg-icons';
 
-import { INotificationTemplateStep, WorkflowCreationSourceEnum } from '@novu/shared';
+import { type INotificationTemplateStep, WorkflowCreationSourceEnum } from '@novu/shared';
 
 import {
   CanvasHolder,
@@ -24,7 +24,7 @@ import {
   TemplateDescription,
   useStyles,
 } from './templateStoreStyles';
-import { IBlueprintsGrouped, useCreateTemplateFromBlueprint } from '../../../../api/hooks';
+import { type IBlueprintsGrouped, useCreateTemplateFromBlueprint } from '../../../../api/hooks';
 import { TriggerNode } from './TriggerNode';
 import { ChannelNode } from './ChannelNode';
 import { FlowEditor } from '../../../../components/workflow';
@@ -32,7 +32,7 @@ import { errorMessage } from '../../../../utils/notifications';
 import { parseUrl } from '../../../../utils/routeUtils';
 import { ROUTES } from '../../../../constants/routes';
 import { useSegment } from '../../../../components/providers/SegmentProvider';
-import { IBlueprintTemplate } from '../../../../api/types';
+import { type IBlueprintTemplate } from '../../../../api/types';
 import { TemplateAnalyticsEnum } from '../../constants';
 import { FrameworkProjectModalItem } from '../FrameworkProjectWaitList';
 

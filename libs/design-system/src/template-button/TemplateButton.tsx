@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { Popover, createStyles, UnstyledButton, UnstyledButtonProps, createPolymorphicComponent } from '@mantine/core';
+import {
+  Popover,
+  createStyles,
+  UnstyledButton,
+  type UnstyledButtonProps,
+  createPolymorphicComponent,
+} from '@mantine/core';
 import styled from '@emotion/styled';
 import { useFormContext } from 'react-hook-form';
 

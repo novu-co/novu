@@ -1,20 +1,20 @@
 import {
   ApiService,
-  IUserGlobalPreferenceSettings,
-  IUserPreferenceSettings,
+  type IUserGlobalPreferenceSettings,
+  type IUserPreferenceSettings,
 } from '@novu/client';
 import {
   WebSocketEventEnum,
   ChannelCTATypeEnum,
   ChannelTypeEnum,
-  IMessage,
-  IOrganizationEntity,
+  type IMessage,
+  type IOrganizationEntity,
   ButtonTypeEnum,
   MessageActionStatusEnum,
 } from '@novu/shared';
 import io from 'socket.io-client';
 
-import { ISession } from '../utils/types';
+import { type ISession } from '../utils/types';
 
 import {
   HeadlessService,

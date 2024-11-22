@@ -1,5 +1,5 @@
 import { Show, splitProps } from 'solid-js';
-import { JSX } from 'solid-js/jsx-runtime';
+import { type JSX } from 'solid-js/jsx-runtime';
 import { useAppearance, useInboxContext } from '../../context';
 import { cn, useStyle } from '../../helpers';
 

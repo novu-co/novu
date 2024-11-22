@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, MenuProps } from '@mantine/core';
+import { Menu, type MenuProps } from '@mantine/core';
 
 import useStyles from './Dropdown.styles';
 import { shadows } from '../config';

@@ -7,11 +7,11 @@ import {
   addWeeks,
   addMonths,
 } from 'date-fns';
-import { RRule, Frequency, Weekday } from 'rrule';
+import { RRule, Frequency, type Weekday } from 'rrule';
 import {
   DaysEnum,
   DigestUnitEnum,
-  ITimedConfig,
+  type ITimedConfig,
   MonthlyTypeEnum,
   OrdinalEnum,
   OrdinalValueEnum,

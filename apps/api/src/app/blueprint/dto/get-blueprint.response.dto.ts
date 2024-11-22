@@ -1,4 +1,9 @@
-import { INotificationGroup, INotificationTrigger, IPreferenceChannels, NotificationStepDto } from '@novu/shared';
+import {
+  type INotificationGroup,
+  type INotificationTrigger,
+  type IPreferenceChannels,
+  type NotificationStepDto,
+} from '@novu/shared';
 
 export class GetBlueprintResponse {
   _id: string;

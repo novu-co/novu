@@ -1,6 +1,6 @@
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
-import { NotificationTemplateEntity } from '@novu/dal';
+import { type NotificationTemplateEntity } from '@novu/dal';
 
 import { PreferenceLevelEnum } from '@novu/shared';
 import { getPreference, getPreferenceByLevel } from './helpers';

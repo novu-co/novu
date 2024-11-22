@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, it } from 'vitest';
 import { z } from 'zod';
-import { InferZodSchema, ZodSchemaMinimal } from './zod.schema.types';
+import { type InferZodSchema, type ZodSchemaMinimal } from './zod.schema.types';
 
 describe('ZodSchema', () => {
   const testSchema = z.object({

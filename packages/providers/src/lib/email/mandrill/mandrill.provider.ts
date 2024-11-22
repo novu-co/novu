@@ -1,19 +1,22 @@
 import {
   ChannelTypeEnum,
-  IEmailOptions,
-  IEmailProvider,
-  ISendMessageSuccessResponse,
-  ICheckIntegrationResponse,
+  type IEmailOptions,
+  type IEmailProvider,
+  type ISendMessageSuccessResponse,
+  type ICheckIntegrationResponse,
   CheckIntegrationResponseEnum,
-  IEmailEventBody,
+  type IEmailEventBody,
   EmailEventStatusEnum,
 } from '@novu/stateless';
 
 import mailchimp from '@mailchimp/mailchimp_transactional';
 import { EmailProviderIdEnum } from '@novu/shared';
-import { IMandrilInterface, IMandrillSendOptions } from './mandril.interface';
+import {
+  type IMandrilInterface,
+  type IMandrillSendOptions,
+} from './mandril.interface';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 export enum MandrillStatusEnum {
   OPENED = 'open',

@@ -1,14 +1,14 @@
-import { ProjectionType } from 'mongoose';
-import { DigestTypeEnum, IDigestRegularMetadata, StepTypeEnum, DigestCreationResultEnum } from '@novu/shared';
+import { type ProjectionType } from 'mongoose';
+import { DigestTypeEnum, type IDigestRegularMetadata, StepTypeEnum, DigestCreationResultEnum } from '@novu/shared';
 
 import { sub, isBefore } from 'date-fns';
 import { BaseRepository } from '../base-repository';
-import { JobEntity, JobDBModel, JobStatusEnum } from './job.entity';
+import { JobEntity, type JobDBModel, JobStatusEnum } from './job.entity';
 import { Job } from './job.schema';
-import { NotificationTemplateEntity } from '../notification-template';
-import { SubscriberEntity } from '../subscriber';
-import { NotificationEntity } from '../notification';
-import { EnvironmentEntity } from '../environment';
+import { type NotificationTemplateEntity } from '../notification-template';
+import { type SubscriberEntity } from '../subscriber';
+import { type NotificationEntity } from '../notification';
+import { type EnvironmentEntity } from '../environment';
 import type { EnforceEnvOrOrgIds, IUpdateResult } from '../../types';
 import { DalException } from '../../shared';
 

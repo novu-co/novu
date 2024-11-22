@@ -1,4 +1,4 @@
-import { TemplateVariableTypeEnum, IMustacheVariable, ITemplateVariable } from '@novu/shared';
+import { TemplateVariableTypeEnum, type IMustacheVariable, type ITemplateVariable } from '@novu/shared';
 import { useMemo } from 'react';
 import set from 'lodash.set';
 import get from 'lodash.get';

@@ -1,6 +1,6 @@
 import { ConflictException, Inject, Logger } from '@nestjs/common';
 import { DistributedLockService } from '../../distributed-lock';
-import { CacheService, CachingConfig } from '../cache.service';
+import { CacheService, type CachingConfig } from '../cache.service';
 
 type CacheLockOptions = {
   /**

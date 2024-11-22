@@ -1,7 +1,7 @@
-import { AxiosError, AxiosInstance } from 'axios';
+import { type AxiosError, type AxiosInstance } from 'axios';
 import axiosRetry, { isNetworkError } from 'axios-retry';
 import { v4 as uuid } from 'uuid';
-import { INovuConfiguration } from './novu.interface';
+import { type INovuConfiguration } from './novu.interface';
 
 export const RETRYABLE_HTTP_CODES = [408, 422, 429];
 const NON_IDEMPOTENT_METHODS = ['post', 'patch'];

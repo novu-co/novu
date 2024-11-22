@@ -1,4 +1,4 @@
-import { IChanges, IChangesPayload } from './changes.interface';
+import { type IChanges, type IChangesPayload } from './changes.interface';
 import { WithHttp } from '../novu.interface';
 
 export class Changes extends WithHttp implements IChanges {

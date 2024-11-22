@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { nanoid } from 'nanoid';
-import { IChatOptions } from '@novu/stateless';
+import { type IChatOptions } from '@novu/stateless';
 import { WhatsappBusinessChatProvider } from './whatsapp-business.provider';
 import { axiosSpy } from '../../../utils/test/spy-axios';
 

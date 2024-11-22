@@ -1,6 +1,6 @@
-import { expect, test, vi, describe, beforeEach, Mocked } from 'vitest';
+import { expect, test, vi, describe, beforeEach, type Mocked } from 'vitest';
 import axios from 'axios';
-import { IPushOptions } from '@novu/stateless';
+import { type IPushOptions } from '@novu/stateless';
 import { OneSignalPushProvider } from './one-signal.provider';
 
 vi.mock('axios');

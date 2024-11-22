@@ -1,17 +1,17 @@
 import { SmsProviderIdEnum } from '@novu/shared';
 import {
   ChannelTypeEnum,
-  ISendMessageSuccessResponse,
-  ISMSEventBody,
-  ISmsOptions,
-  ISmsProvider,
+  type ISendMessageSuccessResponse,
+  type ISMSEventBody,
+  type ISmsOptions,
+  type ISmsProvider,
   SmsEventStatusEnum,
 } from '@novu/stateless';
 
 import { Twilio } from 'twilio';
-import { MessageListInstanceCreateOptions } from 'twilio/lib/rest/api/v2010/account/message';
+import { type MessageListInstanceCreateOptions } from 'twilio/lib/rest/api/v2010/account/message';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 export class TwilioSmsProvider extends BaseProvider implements ISmsProvider {
   id = SmsProviderIdEnum.Twilio;

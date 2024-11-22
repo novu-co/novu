@@ -1,4 +1,4 @@
-import { ICreateTenantDto, IUpdateTenantDto } from '@novu/shared';
+import { type ICreateTenantDto, type IUpdateTenantDto } from '@novu/shared';
 import { api } from './api.client';
 
 export function getTenants({ page = 0, limit = 10 } = {}) {

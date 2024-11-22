@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query';
+import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { errorMessage } from '@novu/design-system';
 import type { IEmailBlock, IResponseError } from '@novu/shared';

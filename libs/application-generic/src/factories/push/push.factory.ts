@@ -1,4 +1,4 @@
-import { IntegrationEntity } from '@novu/dal';
+import { type IntegrationEntity } from '@novu/dal';
 import {
   APNSHandler,
   ExpoHandler,
@@ -8,7 +8,7 @@ import {
   PushpadHandler,
   PushWebhookHandler,
 } from './handlers';
-import { IPushFactory, IPushHandler } from './interfaces';
+import { type IPushFactory, type IPushHandler } from './interfaces';
 
 export class PushFactory implements IPushFactory {
   handlers: IPushHandler[] = [

@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
-import { JobDBModel, JobStatusEnum } from './job.entity';
+import { type JobDBModel, JobStatusEnum } from './job.entity';
 
 const jobSchema = new Schema<JobDBModel>(
   {

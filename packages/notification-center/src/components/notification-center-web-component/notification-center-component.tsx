@@ -1,5 +1,5 @@
-import React, { FunctionComponent } from 'react';
-import { IMessage, MessageActionStatusEnum, ButtonTypeEnum } from '@novu/shared';
+import React, { type FunctionComponent } from 'react';
+import { type IMessage, MessageActionStatusEnum, type ButtonTypeEnum } from '@novu/shared';
 
 import { NovuProvider } from '../novu-provider';
 import { PopoverNotificationCenter } from '../popover-notification-center';

@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 
-import { ComponentProps } from 'react';
+import { type ComponentProps } from 'react';
 
 export const AndroidIndicatorsIcon = (props: ComponentProps<'svg'>) => {
   return (

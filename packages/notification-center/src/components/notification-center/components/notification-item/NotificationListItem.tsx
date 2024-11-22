@@ -1,24 +1,24 @@
 import React from 'react';
-import { Avatar as MAvatar, ActionIcon, Menu, createStyles, MantineTheme } from '@mantine/core';
+import { Avatar as MAvatar, ActionIcon, Menu, createStyles, type MantineTheme } from '@mantine/core';
 import { useHover } from '@mantine/hooks';
 import { css, cx } from '@emotion/css';
 import styled from '@emotion/styled';
 import {
-  IMessage,
-  ButtonTypeEnum,
-  IMessageAction,
+  type IMessage,
+  type ButtonTypeEnum,
+  type IMessageAction,
   MessageActionStatusEnum,
   ActorTypeEnum,
   SystemAvatarIconEnum,
-  IActor,
+  type IActor,
 } from '@novu/shared';
 
 import { useNovuTheme, useNotificationCenter, useTranslations, useNotifications } from '../../../../hooks';
 import { getDefaultBellColors } from '../../../../utils/defaultTheme';
 import { ActionContainer } from './ActionContainer';
-import { INovuTheme } from '../../../../store/novu-theme.context';
+import { type INovuTheme } from '../../../../store/novu-theme.context';
 import { When } from '../../../../shared/utils/When';
-import { ColorScheme, colors } from '../../../../shared/config/colors';
+import { type ColorScheme, colors } from '../../../../shared/config/colors';
 import { shadows } from '../../../../shared/config/shadows';
 import {
   DotsHorizontal,

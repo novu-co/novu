@@ -2,10 +2,10 @@ import {
   NotificationGroupRepository,
   NotificationTemplateRepository,
   TenantRepository,
-  WorkflowOverrideEntity,
+  type WorkflowOverrideEntity,
   WorkflowOverrideRepository,
 } from '@novu/dal';
-import { ICreateWorkflowOverrideRequestDto } from '@novu/shared';
+import { type ICreateWorkflowOverrideRequestDto } from '@novu/shared';
 import { faker } from '@faker-js/faker';
 
 export class WorkflowOverrideService {

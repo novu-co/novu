@@ -1,4 +1,4 @@
-import { ChangeEventHandler, useMemo, useState } from 'react';
+import { type ChangeEventHandler, useMemo, useState } from 'react';
 import { ActionIcon, useMantineTheme, Group } from '@mantine/core';
 import { createSearchParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
@@ -8,7 +8,7 @@ import {
   Table,
   colors,
   Text,
-  IExtendedColumn,
+  type IExtendedColumn,
   withCellLoading,
   Container,
   Bolt,
@@ -27,7 +27,7 @@ import {
   useTemplates,
   useEnvironment,
   useNotificationGroup,
-  INotificationTemplateExtended,
+  type INotificationTemplateExtended,
   useDebouncedSearch,
   useFeatureFlag,
 } from '../../hooks';
@@ -39,7 +39,7 @@ import { TemplateAnalyticsEnum } from './constants';
 import { useTemplatesStoreModal } from './hooks/useTemplatesStoreModal';
 import { useFetchBlueprints, useCreateTemplateFromBlueprint } from '../../api/hooks';
 import { CreateWorkflowDropdown } from './components/CreateWorkflowDropdown';
-import { IBlueprintTemplate } from '../../api/types';
+import { type IBlueprintTemplate } from '../../api/types';
 import { errorMessage } from '../../utils/notifications';
 import { When } from '../../components/utils/When';
 import { ListPage } from '../../components/layout/components/ListPage';

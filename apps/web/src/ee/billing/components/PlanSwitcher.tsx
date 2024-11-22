@@ -1,4 +1,4 @@
-import { MantineTheme, Tabs, useMantineTheme } from '@mantine/core';
+import { type MantineTheme, Tabs, useMantineTheme } from '@mantine/core';
 import { Title } from '@novu/novui';
 import { css } from '@novu/novui/css';
 

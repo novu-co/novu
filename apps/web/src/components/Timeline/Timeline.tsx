@@ -1,5 +1,5 @@
 import { Timeline as MantineTimeline } from '@mantine/core';
-import { PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 
 import { TIMELINE_STYLES } from './Timeline.styles';
 

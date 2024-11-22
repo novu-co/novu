@@ -1,4 +1,4 @@
-import { Novu } from '@novu/js';
+import { type Novu } from '@novu/js';
 import type { NovuUIOptions } from '@novu/js/ui';
 import { NovuUI as NovuUIClass } from '@novu/js/ui';
 import React, { useEffect, useState } from 'react';

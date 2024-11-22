@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { INotificationTrigger, WorkflowCreationSourceEnum } from '@novu/shared';
-import { IForm } from '../components/formTypes';
+import { type INotificationTrigger, WorkflowCreationSourceEnum } from '@novu/shared';
+import { type IForm } from '../components/formTypes';
 import { mapFormToCreateNotificationTemplate } from '../components/templateToFormMappers';
 import { useTemplateController } from '../components/useTemplateController';
 

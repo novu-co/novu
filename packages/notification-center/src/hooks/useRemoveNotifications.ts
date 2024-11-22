@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient, UseMutationOptions } from '@tanstack/react-query';
+import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
 
 import { useNovuContext } from './useNovuContext';
 import { useFetchNotificationsQueryKey } from './useFetchNotificationsQueryKey';

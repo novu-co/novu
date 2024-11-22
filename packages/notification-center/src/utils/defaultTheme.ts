@@ -8,9 +8,9 @@ import {
   defaultNotificationBellDarkTheme,
   defaultNotificationBellLightTheme,
 } from '../shared/config/themeDefaultValues';
-import { ICommonTheme, INovuThemeProvider } from '../store/novu-theme-provider.context';
-import { INotificationBellColors, INovuTheme } from '../store/novu-theme.context';
-import { ColorScheme } from '../index';
+import { type ICommonTheme, type INovuThemeProvider } from '../store/novu-theme-provider.context';
+import { type INotificationBellColors, type INovuTheme } from '../store/novu-theme.context';
+import { type ColorScheme } from '../index';
 
 interface IDefaultThemeProps {
   colorScheme?: ColorScheme;

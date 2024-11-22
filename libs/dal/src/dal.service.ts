@@ -1,4 +1,4 @@
-import mongoose, { Connection, ConnectOptions } from 'mongoose';
+import mongoose, { type Connection, type ConnectOptions } from 'mongoose';
 
 export const baseConfig: ConnectOptions = {
   // AUTO_CREATE_INDEXES is deprecated, use MONGO_AUTO_CREATE_INDEXES

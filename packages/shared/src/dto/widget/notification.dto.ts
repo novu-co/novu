@@ -1,6 +1,6 @@
-import { ChannelTypeEnum } from '../../types';
-import { ISubscriberResponseDto } from '../subscriber';
-import { IActor, IMessageCTA } from '../../entities/messages';
+import { type ChannelTypeEnum } from '../../types';
+import { type ISubscriberResponseDto } from '../subscriber';
+import { type IActor, type IMessageCTA } from '../../entities/messages';
 
 export interface INotificationDto {
   _id: string;

@@ -1,7 +1,7 @@
 import { File } from '@google-cloud/storage';
 import { S3Client } from '@aws-sdk/client-s3';
 import { BlockBlobClient } from '@azure/storage-blob';
-import { IAttachmentOptionsExtended } from '@novu/stateless';
+import { type IAttachmentOptionsExtended } from '@novu/stateless';
 
 import { StorageHelperService } from './storage-helper.service';
 import {

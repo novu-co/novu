@@ -6,7 +6,7 @@ import { ChannelTypeEnum } from '@novu/shared';
 import {
   Button,
   colors,
-  IExtendedColumn,
+  type IExtendedColumn,
   Popover,
   shadows,
   Table,
@@ -18,7 +18,7 @@ import { IntegrationChannel } from '../IntegrationChannel';
 import { IntegrationEnvironmentPill } from '../IntegrationEnvironmentPill';
 import { CHANNEL_TYPE_TO_STRING } from '../../../../utils/channels';
 import { useEnvironment, useIntegrations } from '../../../../hooks';
-import { IntegrationEntity, ITableIntegration } from '../../types';
+import { type IntegrationEntity, type ITableIntegration } from '../../types';
 import { mapToTableIntegration } from '../../utils';
 import { IntegrationStatusCell } from '../IntegrationStatusCell';
 import { IntegrationNameCell } from '../IntegrationNameCell';

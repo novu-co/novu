@@ -1,6 +1,6 @@
-import React, { ChangeEvent } from 'react';
+import React, { type ChangeEvent } from 'react';
 import { Textarea as MantineTextarea } from '@mantine/core';
-import { SpacingProps } from '../shared/spacing.props';
+import { type SpacingProps } from '../shared/spacing.props';
 import { textareaStyles } from './textarea.styles';
 
 interface ITextareaProps extends SpacingProps {

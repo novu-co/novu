@@ -1,7 +1,13 @@
-import { StepTypeEnum, IWorkflowStepMetadata, JobStatusEnum, ITenantDefine, WorkflowPreferences } from '@novu/shared';
-import { Types } from 'mongoose';
+import {
+  type StepTypeEnum,
+  type IWorkflowStepMetadata,
+  JobStatusEnum,
+  type ITenantDefine,
+  type WorkflowPreferences,
+} from '@novu/shared';
+import { type Types } from 'mongoose';
 
-import { NotificationStepEntity } from '../notification-template';
+import { type NotificationStepEntity } from '../notification-template';
 import type { EnvironmentId } from '../environment';
 import type { OrganizationId } from '../organization';
 import type { ChangePropsValueType } from '../../types';

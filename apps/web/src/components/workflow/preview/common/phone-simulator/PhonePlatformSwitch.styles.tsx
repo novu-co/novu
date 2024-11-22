@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import { type CSSProperties } from 'react';
 import styled from '@emotion/styled';
 import { colors, shadows, AppleIcon, AndroidIcon } from '@novu/design-system';
 

@@ -4,10 +4,10 @@ import {
   Select as MantineSelect,
   MultiSelect as MantineMultiSelect,
   CloseButton,
-  InputBaseProps,
-  MultiSelectValueProps,
+  type InputBaseProps,
+  type MultiSelectValueProps,
   useMantineTheme,
-  SelectItem,
+  type SelectItem,
   Loader,
 } from '@mantine/core';
 import styled from '@emotion/styled';
@@ -16,7 +16,7 @@ import { inputStyles } from '../config/inputs.styles';
 import { ArrowDown } from '../icons';
 import { colors } from '../config';
 import { Text } from '../index';
-import { ISelectProps } from './Select.types';
+import { type ISelectProps } from './Select.types';
 
 /**
  * Select component

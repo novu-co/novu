@@ -1,4 +1,4 @@
-import { InAppProviderIdEnum } from '@novu/shared';
+import { type InAppProviderIdEnum } from '@novu/shared';
 import type { JsonSchema } from '../../../types/schema.types';
 import { novuInAppProviderSchemas } from './novu-inapp.schema';
 

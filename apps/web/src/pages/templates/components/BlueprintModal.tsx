@@ -3,7 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-import { IResponseError, IUserEntity, WorkflowCreationSourceEnum } from '@novu/shared';
+import { type IResponseError, type IUserEntity, WorkflowCreationSourceEnum } from '@novu/shared';
 import { colors, shadows, Title, Text, Button } from '@novu/design-system';
 
 import { updateUserOnBoarding } from '../../../api/user';

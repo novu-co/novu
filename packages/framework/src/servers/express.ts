@@ -1,9 +1,8 @@
 import { type VercelRequest, type VercelResponse } from '@vercel/node';
 import { type Request, type Response } from 'express';
 
-import { NovuRequestHandler, ServeHandlerOptions } from '../handler';
-import { Either } from '../types';
-import { type SupportedFrameworkName } from '../types';
+import { NovuRequestHandler, type ServeHandlerOptions } from '../handler';
+import { type Either, type SupportedFrameworkName } from '../types';
 
 /*
  * Re-export all top level exports from the main package.

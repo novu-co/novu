@@ -1,7 +1,7 @@
-import React, { MouseEventHandler, FunctionComponent, ReactNode } from 'react';
-import { ActionIcon, Center, Sx } from '@mantine/core';
+import React, { type MouseEventHandler, type FunctionComponent, type ReactNode } from 'react';
+import { ActionIcon, Center, type Sx } from '@mantine/core';
 
-import { Tooltip, ITooltipProps } from '../tooltip/Tooltip';
+import { Tooltip, type ITooltipProps } from '../tooltip/Tooltip';
 import { Text } from '../typography/text/Text';
 import { colors } from '../config';
 

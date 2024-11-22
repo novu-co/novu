@@ -1,8 +1,8 @@
 import {
-  CacheKeyPrefixEnum,
-  CacheKeyTypeEnum,
-  IdentifierPrefixEnum,
-  OrgScopePrefixEnum,
+  type CacheKeyPrefixEnum,
+  type CacheKeyTypeEnum,
+  type IdentifierPrefixEnum,
+  type OrgScopePrefixEnum,
 } from './identifiers';
 
 /**

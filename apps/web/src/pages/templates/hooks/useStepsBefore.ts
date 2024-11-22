@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { ChannelTypeEnum } from '@novu/shared';
 
-import { IForm } from '../components/formTypes';
+import { type IForm } from '../components/formTypes';
 
 export const useStepsBefore = ({ index = 0 }: { index?: number }) => {
   const { control } = useFormContext<IForm>();

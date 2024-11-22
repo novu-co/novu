@@ -1,4 +1,4 @@
-import { PushProviderIdEnum } from '@novu/shared';
+import { type PushProviderIdEnum } from '@novu/shared';
 import type { JsonSchema } from '../../../types/schema.types';
 import { genericProviderSchemas } from '../generic.schema';
 import { apnsProviderSchemas } from './apns.schema';

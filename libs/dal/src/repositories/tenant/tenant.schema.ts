@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
-import { TenantDBModel } from './tenant.entity';
+import { type TenantDBModel } from './tenant.entity';
 
 const tenantSchema = new Schema<TenantDBModel>(
   {

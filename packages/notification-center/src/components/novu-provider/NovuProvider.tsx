@@ -1,6 +1,6 @@
-import React, { ReactElement, useEffect, useState, useMemo, useCallback, PropsWithChildren } from 'react';
+import React, { type ReactElement, useEffect, useState, useMemo, useCallback, type PropsWithChildren } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { IOrganizationEntity } from '@novu/shared';
+import { type IOrganizationEntity } from '@novu/shared';
 import { ApiService } from '@novu/client';
 
 import type { I18NLanguage, ITranslationEntry } from '../../i18n/lang';
@@ -8,7 +8,7 @@ import { NotificationsProvider } from '../../store/notifications-provider.contex
 import { NovuContext } from '../../store/novu-provider.context';
 import { NovuI18NProvider } from '../../store/i18n.context';
 import type { IStore, ISession, IFetchingStrategy } from '../../shared/interfaces';
-import { INotificationCenterStyles, StylesProvider } from '../../store/styles';
+import { type INotificationCenterStyles, StylesProvider } from '../../store/styles';
 import { applyToken, removeToken } from '../../utils/token';
 import { useSession } from '../../hooks/useSession';
 import { useInitializeSocket } from '../../hooks/useInitializeSocket';

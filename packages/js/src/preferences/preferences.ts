@@ -1,10 +1,10 @@
-import { InboxService } from '../api';
-import { NovuEventEmitter } from '../event-emitter';
+import { type InboxService } from '../api';
+import { type NovuEventEmitter } from '../event-emitter';
 import { BaseModule } from '../base-module';
 import { updatePreference } from './helpers';
 import { Preference } from './preference';
 import type { ListPreferencesArgs, UpdatePreferencesArgs } from './types';
-import { Result } from '../types';
+import { type Result } from '../types';
 import { PreferencesCache } from '../cache/preferences-cache';
 
 export class Preferences extends BaseModule {

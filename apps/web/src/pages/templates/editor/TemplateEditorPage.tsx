@@ -3,7 +3,7 @@ import { useNavigate, useLocation, useParams, useSearchParams } from 'react-rout
 import { ReactFlowProvider } from 'react-flow-renderer';
 import { useFormContext } from 'react-hook-form';
 
-import { isBridgeWorkflow, WorkflowTypeEnum } from '@novu/shared';
+import { isBridgeWorkflow, type WorkflowTypeEnum } from '@novu/shared';
 import PageContainer from '../../../components/layout/components/PageContainer';
 import type { IForm } from '../components/formTypes';
 import WorkflowEditor from '../workflow/WorkflowEditor';

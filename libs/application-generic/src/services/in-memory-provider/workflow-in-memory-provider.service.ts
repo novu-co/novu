@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 
 import { InMemoryProviderService } from './in-memory-provider.service';
-import { InMemoryProviderEnum, InMemoryProviderClient } from './types';
+import { InMemoryProviderEnum, type InMemoryProviderClient } from './types';
 
 import { GetIsInMemoryClusterModeEnabled } from '../../usecases';
 

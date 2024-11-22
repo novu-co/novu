@@ -1,9 +1,9 @@
 import {
-  ICreateNotificationTemplateDto,
-  INotificationTemplate,
-  IGroupedBlueprint,
-  IPaginationWithQueryParams,
-  IBlueprint,
+  type ICreateNotificationTemplateDto,
+  type INotificationTemplate,
+  type IGroupedBlueprint,
+  type IPaginationWithQueryParams,
+  type IBlueprint,
 } from '@novu/shared';
 
 import { api } from './api.client';

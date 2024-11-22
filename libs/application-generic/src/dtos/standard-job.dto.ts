@@ -1,4 +1,4 @@
-import { IJobParams } from '../services/queues/queue-base.service';
+import { type IJobParams } from '../services/queues/queue-base.service';
 
 export class IStandardDataDto {
   _userId: string;

@@ -1,4 +1,4 @@
-import { WithLoadingSkeleton } from '@novu/novui';
+import { type WithLoadingSkeleton } from '@novu/novui';
 import { IconCloudQueue } from '@novu/novui/icons';
 import { css, cx } from '@novu/novui/css';
 import { HStack } from '@novu/novui/jsx';
@@ -7,7 +7,7 @@ import { useDiscover } from '../../../../studio/hooks/useBridgeAPI';
 import { Aside } from '../../../nav/Aside';
 import { LocalStudioSidebarContent } from './LocalStudioSidebarContent';
 import { SidebarFooter } from './SidebarFooter';
-import { FCBase } from '../../../../types';
+import { type FCBase } from '../../../../types';
 
 export const LocalStudioSidebar: WithLoadingSkeleton = () => {
   const { isLoading, data } = useDiscover();

@@ -1,4 +1,4 @@
-import { IInboundParse } from './inbound-parse.interface';
+import { type IInboundParse } from './inbound-parse.interface';
 import { WithHttp } from '../novu.interface';
 
 export class InboundParse extends WithHttp implements IInboundParse {

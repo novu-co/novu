@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { IntegrationRepository, SubscriberEntity, SubscriberRepository } from '@novu/dal';
+import { IntegrationRepository, type SubscriberEntity, SubscriberRepository } from '@novu/dal';
 import { ChatProviderIdEnum, PushProviderIdEnum } from '@novu/shared';
 
 export class SubscribersService {

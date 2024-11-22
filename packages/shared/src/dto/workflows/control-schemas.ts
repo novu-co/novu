@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { JSONSchemaDto } from './json-schema-dto';
+import { type JSONSchemaDto } from './json-schema-dto';
 
 export interface TipTapNode {
   type?: string;

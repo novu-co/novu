@@ -1,8 +1,8 @@
-import { FilterQuery } from 'mongoose';
-import { EnvironmentId, ISubscribersDefine, OrganizationId } from '@novu/shared';
-import { SubscriberDBModel, SubscriberEntity } from './subscriber.entity';
+import { type FilterQuery } from 'mongoose';
+import { type EnvironmentId, type ISubscribersDefine, type OrganizationId } from '@novu/shared';
+import { type SubscriberDBModel, SubscriberEntity } from './subscriber.entity';
 import { Subscriber } from './subscriber.schema';
-import { IExternalSubscribersEntity } from './types';
+import { type IExternalSubscribersEntity } from './types';
 import { BaseRepository } from '../base-repository';
 import { DalException } from '../../shared';
 import type { EnforceEnvOrOrgIds } from '../../types';

@@ -29,7 +29,7 @@ import { CHANNEL_TYPE_TO_STRING } from '../../../../utils/channels';
 import type { IntegrationEntity } from '../../types';
 import { useProviders } from '../../useProviders';
 import { When } from '../../../../components/utils/When';
-import { Conditions, IConditions } from '../../../../components/conditions';
+import { Conditions, type IConditions } from '../../../../components/conditions';
 import { ConditionIconButton } from '../ConditionIconButton';
 
 interface ICreateProviderInstanceForm {

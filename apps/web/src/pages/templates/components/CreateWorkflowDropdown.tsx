@@ -10,7 +10,7 @@ import { FeatureFlagsKeysEnum, WorkflowCreationSourceEnum } from '@novu/shared';
 import { Button } from '@novu/novui';
 import { IconOutlineAdd } from '@novu/novui/icons';
 
-import { IBlueprintTemplate } from '../../../api/types';
+import { type IBlueprintTemplate } from '../../../api/types';
 import { useSegment } from '../../../components/providers/SegmentProvider';
 import { useFeatureFlag, useHoverOverItem } from '../../../hooks';
 import { FrameworkProjectDropDownItem } from './FrameworkProjectWaitList';

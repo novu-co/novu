@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { type FC } from 'react';
 import { css } from '@novu/novui/css';
 import { styled } from '@novu/novui/jsx';
 import { title } from '@novu/novui/recipes';

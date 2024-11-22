@@ -1,5 +1,5 @@
 import { HttpStatusEnum } from '../constants';
-import { ErrorCodeEnum } from '../constants/error.constants';
+import { type ErrorCodeEnum } from '../constants/error.constants';
 
 /**
  * Check if the object is a native error.

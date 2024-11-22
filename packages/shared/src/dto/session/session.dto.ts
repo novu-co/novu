@@ -1,4 +1,4 @@
-import { ISubscriberJwt } from '../../entities/user';
+import { type ISubscriberJwt } from '../../entities/user';
 
 export interface ISessionDto {
   token: string;

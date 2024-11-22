@@ -1,15 +1,15 @@
 import { describe, it } from 'vitest';
 import {
-  ConditionalPartial,
-  Either,
-  Awaitable,
-  PickOptional,
-  PickRequired,
-  PickOptionalKeys,
-  PickRequiredKeys,
-  Prettify,
-  DeepPartial,
-  DeepRequired,
+  type ConditionalPartial,
+  type Either,
+  type Awaitable,
+  type PickOptional,
+  type PickRequired,
+  type PickOptionalKeys,
+  type PickRequiredKeys,
+  type Prettify,
+  type DeepPartial,
+  type DeepRequired,
 } from './util.types';
 
 describe('Either', () => {

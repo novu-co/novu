@@ -1,7 +1,7 @@
 import { SubscribersService, UserSession } from '@novu/testing';
 import { expect } from 'chai';
 import { sub } from 'date-fns';
-import { SubscriberEntity } from '@novu/dal';
+import { type SubscriberEntity } from '@novu/dal';
 
 import { updateSubscriberOnlineFlag } from './helpers';
 

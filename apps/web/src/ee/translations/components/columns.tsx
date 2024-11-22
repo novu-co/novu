@@ -3,8 +3,8 @@ import { FileButton, Group, Indicator, Skeleton, Stack, useMantineColorScheme } 
 import {
   ActionButton,
   colors,
-  IExtendedCellProps,
-  IExtendedColumn,
+  type IExtendedCellProps,
+  type IExtendedColumn,
   PencilOutlined,
   Text,
   Tooltip,
@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { FlagMap } from '../icons/flags';
 
 import { useEnvironment } from '../../../hooks';
-import { ITranslation, useFetchLocales } from '../hooks';
+import { type ITranslation, useFetchLocales } from '../hooks';
 import { useEditTranslationFileContext } from '../context/useEditTranslationFileContext';
 import { ReuploadIcon, Star, Warning } from '../icons';
 import { DeleteTranslationModal } from './TranslationGroup/DeleteTranslationModal';

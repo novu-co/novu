@@ -1,19 +1,19 @@
 import { EmailProviderIdEnum } from '@novu/shared';
 import {
   ChannelTypeEnum,
-  ISendMessageSuccessResponse,
-  IEmailOptions,
-  IEmailProvider,
-  ICheckIntegrationResponse,
+  type ISendMessageSuccessResponse,
+  type IEmailOptions,
+  type IEmailProvider,
+  type ICheckIntegrationResponse,
   IEmailEventBody,
   CheckIntegrationResponseEnum,
 } from '@novu/stateless';
 
 import Plunk from '@plunk/node';
-import { SendParams } from '@plunk/node/dist/types/emails';
+import { type SendParams } from '@plunk/node/dist/types/emails';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
-import { IPlunkResponse } from './plunk.interface';
+import { type WithPassthrough } from '../../../utils/types';
+import { type IPlunkResponse } from './plunk.interface';
 
 export class PlunkEmailProvider extends BaseProvider implements IEmailProvider {
   id = EmailProviderIdEnum.Plunk;

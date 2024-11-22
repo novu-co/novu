@@ -1,6 +1,6 @@
 /* eslint-disable vars-on-top */
 /* eslint-disable no-var */
-import { Novu } from './novu';
+import { type Novu } from './novu';
 
 declare global {
   var PACKAGE_NAME: string;

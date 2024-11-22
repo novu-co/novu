@@ -1,5 +1,5 @@
 import { cx } from '@emotion/css';
-import { Tooltip as MantineTooltip, TooltipProps } from '@mantine/core';
+import { Tooltip as MantineTooltip, type TooltipProps } from '@mantine/core';
 
 import useStyles from './Tooltip.styles';
 

@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { useFeatureFlag } from '../../../../hooks/useFeatureFlag';
-import { ParsedPreviewStateType } from '../../../../pages/templates/hooks/usePreviewInAppTemplate';
+import { type ParsedPreviewStateType } from '../../../../pages/templates/hooks/usePreviewInAppTemplate';
 import ContentOld from './Content';
 import { Header } from './Header';
 import { InboxPreviewContent } from './v2/InboxPreviewContent';

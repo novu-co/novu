@@ -2,7 +2,7 @@ import { ActorTypeEnum } from '@novu/shared';
 import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
-import { MessageDBModel } from './message.entity';
+import { type MessageDBModel } from './message.entity';
 
 const mongooseDelete = require('mongoose-delete');
 

@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient, UseMutationOptions } from '@tanstack/react-query';
+import { useMutation, useQueryClient, type UseMutationOptions } from '@tanstack/react-query';
 import type { IResponseError } from '@novu/shared';
 
 import { errorMessage, successMessage } from '../../utils/notifications';

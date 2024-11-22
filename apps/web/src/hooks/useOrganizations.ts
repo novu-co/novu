@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { IOrganizationEntity } from '@novu/shared';
+import { type IOrganizationEntity } from '@novu/shared';
 import { getOrganizations } from '../api/organization';
 
 export function useOrganizations() {

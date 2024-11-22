@@ -1,5 +1,5 @@
 import { Badge } from '@mantine/core';
-import { PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 import { colors } from '../config';
 
 interface ITagProps extends PropsWithChildren<{}> {

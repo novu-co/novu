@@ -10,7 +10,7 @@ import { differenceInDays, format, isSameDay, subDays } from 'date-fns';
 import { MessageContainer } from './MessageContainer';
 import { ActivityGraphGlobalStyles } from './ActivityGraphGlobalStyles';
 import { getActivityGraphStats } from '../../../api/activity';
-import { IActivityGraphStats } from '../interfaces';
+import { type IActivityGraphStats } from '../interfaces';
 import { getOptions, getChartData } from '../services';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);

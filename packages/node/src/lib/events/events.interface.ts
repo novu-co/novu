@@ -1,10 +1,10 @@
 import {
-  DigestUnitEnum,
-  ITriggerPayload,
-  TriggerRecipientSubscriber,
-  TriggerRecipientsPayload,
-  ITenantDefine,
-  SmsProviderIdEnum,
+  type DigestUnitEnum,
+  type ITriggerPayload,
+  type TriggerRecipientSubscriber,
+  type TriggerRecipientsPayload,
+  type ITenantDefine,
+  type SmsProviderIdEnum,
 } from '@novu/shared';
 
 export interface IEvents {

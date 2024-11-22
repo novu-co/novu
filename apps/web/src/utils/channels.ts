@@ -1,5 +1,5 @@
 import { ChannelTypeEnum, StepTypeEnum } from '@novu/shared';
-import React from 'react';
+import type React from 'react';
 import {
   ChatFilled,
   DelayAction,

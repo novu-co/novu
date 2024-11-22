@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-import { INotificationTemplate } from '@novu/shared';
+import { type INotificationTemplate } from '@novu/shared';
 
 import { getNotificationsList } from '../api/notification-templates';
 import { useDiscover } from '../studio/hooks';

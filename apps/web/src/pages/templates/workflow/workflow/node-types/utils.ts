@@ -1,6 +1,6 @@
 import { DelayTypeEnum, StepTypeEnum } from '@novu/shared';
 
-import { IFlowStep } from '../../../../../components/workflow/types';
+import { type IFlowStep } from '../../../../../components/workflow/types';
 
 export function delaySubtitle(channelType: StepTypeEnum, step: IFlowStep) {
   if (channelType === StepTypeEnum.DELAY && step.delayMetadata) {

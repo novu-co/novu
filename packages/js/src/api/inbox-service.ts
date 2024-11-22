@@ -1,4 +1,4 @@
-import { ApiOptions, HttpClient } from '@novu/client';
+import { type ApiOptions, HttpClient } from '@novu/client';
 import type {
   ActionTypeEnum,
   ChannelPreference,

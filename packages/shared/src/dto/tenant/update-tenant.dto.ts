@@ -1,4 +1,4 @@
-import { IConstructTenantDto } from './create-tenant.dto';
+import { type IConstructTenantDto } from './create-tenant.dto';
 
 export interface IUpdateTenantDto extends IConstructTenantDto {
   name?: string;

@@ -1,5 +1,5 @@
-import { json, port, str, num, ValidatorSpec, makeValidator, bool, CleanedEnv, cleanEnv, url } from 'envalid';
-import { DEFAULT_NOTIFICATION_RETENTION_DAYS, FeatureFlagsKeysEnum, StringifyEnv } from '@novu/shared';
+import { json, port, str, num, type ValidatorSpec, makeValidator, bool, type CleanedEnv, cleanEnv, url } from 'envalid';
+import { DEFAULT_NOTIFICATION_RETENTION_DAYS, FeatureFlagsKeysEnum, type StringifyEnv } from '@novu/shared';
 
 export function validateEnv() {
   return cleanEnv(process.env, envValidators);

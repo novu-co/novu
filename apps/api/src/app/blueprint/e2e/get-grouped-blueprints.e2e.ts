@@ -2,14 +2,14 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 
 import { UserSession } from '@novu/testing';
-import { NotificationTemplateRepository, EnvironmentRepository, EnvironmentEntity } from '@novu/dal';
+import { NotificationTemplateRepository, EnvironmentRepository, type EnvironmentEntity } from '@novu/dal';
 import {
   EmailBlockTypeEnum,
   FieldLogicalOperatorEnum,
   FieldOperatorEnum,
   FilterPartTypeEnum,
-  INotificationTemplate,
-  INotificationTemplateStep,
+  type INotificationTemplate,
+  type INotificationTemplateStep,
   StepTypeEnum,
 } from '@novu/shared';
 import {
@@ -19,11 +19,11 @@ import {
   InvalidateCacheService,
 } from '@novu/application-generic';
 
-import { GroupedBlueprintResponse } from '../dto/grouped-blueprint.response.dto';
+import { type GroupedBlueprintResponse } from '../dto/grouped-blueprint.response.dto';
 import { GetGroupedBlueprints, POPULAR_TEMPLATES_ID_LIST } from '../usecases/get-grouped-blueprints';
 // eslint-disable-next-line import/no-namespace
 import * as blueprintStaticModule from '../usecases/get-grouped-blueprints/consts';
-import { CreateWorkflowRequestDto } from '../../workflows-v1/dto';
+import { type CreateWorkflowRequestDto } from '../../workflows-v1/dto';
 
 describe('Get grouped notification template blueprints - /blueprints/group-by-category (GET)', async () => {
   let session: UserSession;

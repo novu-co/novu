@@ -8,7 +8,7 @@ import {
   guidePreview,
   guidePlayground,
   GuideTitleEnum,
-  IBeat,
+  type IBeat,
   HINT_MIDDLE_OPACITY,
   HINT_VISIBLE_OPACITY,
 } from './consts';

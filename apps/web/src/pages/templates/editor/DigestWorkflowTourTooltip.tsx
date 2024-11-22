@@ -1,13 +1,13 @@
 import { UnstyledButton } from '@mantine/core';
 import styled from '@emotion/styled';
-import { TooltipRenderProps } from 'react-joyride';
+import { type TooltipRenderProps } from 'react-joyride';
 import { useFormContext } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { StepTypeEnum } from '@novu/shared';
 
 import { Button, colors, DotsNavigation, Clock, LetterOpened, BellWithNotification } from '@novu/design-system';
 import { useTour } from './TourProvider';
-import { IForm } from '../components/formTypes';
+import { type IForm } from '../components/formTypes';
 import { useSegment } from '../../../components/providers/SegmentProvider';
 import { DigestWorkflowTourAnalyticsEnum, HINT_INDEX_TO_CLICK_ANALYTICS, ordinalNumbers } from '../constants';
 import { useBasePath } from '../hooks/useBasePath';

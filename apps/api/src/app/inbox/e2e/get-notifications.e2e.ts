@@ -1,6 +1,11 @@
 import { expect } from 'chai';
 import { UserSession } from '@novu/testing';
-import { MessageRepository, NotificationTemplateEntity, SubscriberEntity, SubscriberRepository } from '@novu/dal';
+import {
+  MessageRepository,
+  type NotificationTemplateEntity,
+  type SubscriberEntity,
+  SubscriberRepository,
+} from '@novu/dal';
 import {
   StepTypeEnum,
   ChannelCTATypeEnum,

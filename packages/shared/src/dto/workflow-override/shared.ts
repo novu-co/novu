@@ -1,4 +1,4 @@
-import { IPreferenceChannels } from '../../entities/subscriber-preference';
+import { type IPreferenceChannels } from '../../entities/subscriber-preference';
 
 export interface IWorkflowOverrideRequestDto {
   active?: boolean;

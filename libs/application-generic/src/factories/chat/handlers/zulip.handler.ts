@@ -1,4 +1,4 @@
-import { ICredentials, ChatProviderIdEnum } from '@novu/shared';
+import { type ICredentials, ChatProviderIdEnum } from '@novu/shared';
 import { ChannelTypeEnum } from '@novu/stateless';
 import { ZulipProvider } from '@novu/providers';
 import { BaseChatHandler } from './base.handler';

@@ -1,4 +1,4 @@
-import { TemplateSystemVariables, ITemplateVariable } from '@novu/shared';
+import { TemplateSystemVariables, type ITemplateVariable } from '@novu/shared';
 
 import { ApiException } from '../utils/exceptions';
 

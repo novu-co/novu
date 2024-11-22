@@ -1,4 +1,4 @@
-import { BadgeProps, Badge as MantineBadge, MantineTheme, useMantineTheme } from '@mantine/core';
+import { type BadgeProps, Badge as MantineBadge, type MantineTheme, useMantineTheme } from '@mantine/core';
 import { css } from '@novu/novui/css';
 
 export const Badge = ({ label, ...props }: BadgeProps & { label?: React.ReactNode }) => {

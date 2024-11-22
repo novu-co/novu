@@ -1,4 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test, type TestingModule } from '@nestjs/testing';
 import {
   MetricsService,
   NewRelicMetricsService,
@@ -7,7 +7,7 @@ import {
   AzureMetricsService,
 } from './metrics.service';
 import { metricsServiceList } from './index';
-import { IMetricsService } from './metrics.interface';
+import { type IMetricsService } from './metrics.interface';
 
 describe('MetricsService', () => {
   let service: MetricsService;

@@ -1,7 +1,7 @@
 import type { JSONSchemaDto } from './json-schema-dto';
-import { WorkflowResponseDto } from './workflow-response-dto';
-import { Slug, StepTypeEnum, WorkflowPreferences } from '../../types';
-import { StepContentIssueEnum, StepIssueEnum } from './step-content-issue.enum';
+import { type WorkflowResponseDto } from './workflow-response-dto';
+import { type Slug, type StepTypeEnum, type WorkflowPreferences } from '../../types';
+import { type StepContentIssueEnum, type StepIssueEnum } from './step-content-issue.enum';
 
 export class ControlsSchema {
   schema: JSONSchemaDto;

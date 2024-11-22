@@ -1,4 +1,4 @@
-import { IMessage, ButtonTypeEnum, WebSocketEventEnum } from '@novu/shared';
+import { type IMessage, type ButtonTypeEnum, WebSocketEventEnum } from '@novu/shared';
 
 export function sendUrlChange(url: string) {
   if (!window.parentIFrame) return;

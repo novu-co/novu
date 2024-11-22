@@ -1,4 +1,4 @@
-import { ButtonTypeEnum, IMessageButton, darkButtonStyle, lightButtonStyle } from '@novu/shared';
+import { ButtonTypeEnum, type IMessageButton, darkButtonStyle, lightButtonStyle } from '@novu/shared';
 import styled from '@emotion/styled';
 import { Divider, useMantineTheme } from '@mantine/core';
 import { Button } from '@novu/design-system';

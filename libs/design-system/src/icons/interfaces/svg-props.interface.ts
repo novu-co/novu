@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 export interface ISvgPropsInterface extends React.ComponentPropsWithoutRef<'svg'> {
   disabled?: boolean;

@@ -1,11 +1,11 @@
-import { ChangeEntityTypeEnum } from '@novu/shared';
+import { type ChangeEntityTypeEnum } from '@novu/shared';
 
-import { EnforceEnvOrOrgIds } from '../../types/enforce';
+import { type EnforceEnvOrOrgIds } from '../../types/enforce';
 import { BaseRepository } from '../base-repository';
-import { ChangeEntity, ChangeDBModel } from './change.entity';
+import { ChangeEntity, type ChangeDBModel } from './change.entity';
 import { Change } from './change.schema';
-import { UserEntity } from '../user';
-import { ChangeEntityPopulated } from './types';
+import { type UserEntity } from '../user';
+import { type ChangeEntityPopulated } from './types';
 
 export class ChangeRepository extends BaseRepository<ChangeDBModel, ChangeEntity, EnforceEnvOrOrgIds> {
   constructor() {

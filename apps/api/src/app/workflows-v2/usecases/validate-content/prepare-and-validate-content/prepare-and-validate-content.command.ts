@@ -1,5 +1,5 @@
-import { EnvironmentWithUserObjectCommand } from '@novu/application-generic';
-import { JSONSchemaDto, PreviewPayload, StepTypeEnum } from '@novu/shared';
+import { type EnvironmentWithUserObjectCommand } from '@novu/application-generic';
+import { type JSONSchemaDto, type PreviewPayload, type StepTypeEnum } from '@novu/shared';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface PrepareAndValidateContentCommand extends EnvironmentWithUserObjectCommand {

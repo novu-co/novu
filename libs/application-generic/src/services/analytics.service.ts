@@ -2,7 +2,7 @@ import { Analytics } from '@segment/analytics-node';
 import { Logger } from '@nestjs/common';
 import Mixpanel from 'mixpanel';
 
-import { IOrganizationEntity } from '@novu/shared';
+import { type IOrganizationEntity } from '@novu/shared';
 
 interface IUser {
   _id?: string | null;

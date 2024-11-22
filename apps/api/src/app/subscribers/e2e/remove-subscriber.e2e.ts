@@ -1,8 +1,8 @@
 import { SubscribersService, UserSession } from '@novu/testing';
-import { SubscriberEntity, SubscriberRepository, TopicSubscribersRepository } from '@novu/dal';
+import { type SubscriberEntity, SubscriberRepository, TopicSubscribersRepository } from '@novu/dal';
 import { expect } from 'chai';
 import axios from 'axios';
-import { ExternalSubscriberId, TopicId, TopicKey, TopicName } from '@novu/shared';
+import { type ExternalSubscriberId, type TopicId, type TopicKey, type TopicName } from '@novu/shared';
 
 const axiosInstance = axios.create();
 const TOPIC_PATH = '/v1/topics';

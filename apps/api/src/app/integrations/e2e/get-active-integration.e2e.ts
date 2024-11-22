@@ -1,7 +1,7 @@
 import { UserSession, IntegrationService } from '@novu/testing';
 import { expect } from 'chai';
 import { ChannelTypeEnum, EmailProviderIdEnum, SmsProviderIdEnum } from '@novu/shared';
-import { IntegrationEntity } from '@novu/dal';
+import { type IntegrationEntity } from '@novu/dal';
 
 describe('Get Active Integrations - Multi-Provider Configuration - /integrations/active (GET)', function () {
   let session: UserSession;

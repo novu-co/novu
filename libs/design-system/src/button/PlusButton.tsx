@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-import { Button, IButtonProps } from './Button';
+import { Button, type IButtonProps } from './Button';
 import { Text } from '../typography/text/Text';
 import { PlusFilled } from '../icons';
 

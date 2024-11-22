@@ -3,7 +3,7 @@ import { expect } from 'chai';
 
 import { createLayout } from './helpers';
 
-import { LayoutDto } from '../dtos';
+import { type LayoutDto } from '../dtos';
 import { ChannelTypeEnum, TemplateVariableTypeEnum } from '../types';
 
 const BASE_PATH = '/v1/layouts';

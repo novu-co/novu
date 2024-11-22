@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { UserSession, WorkflowOverrideService } from '@novu/testing';
-import { IWorkflowOverride } from '@novu/shared';
+import { type IWorkflowOverride } from '@novu/shared';
 import { TenantRepository } from '@novu/dal';
 
 describe('Get workflow override by ID - /workflow-overrides/:overrideId (GET)', async () => {

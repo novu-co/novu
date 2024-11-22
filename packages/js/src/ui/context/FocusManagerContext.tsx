@@ -1,4 +1,4 @@
-import { createContext, createMemo, createSignal, ParentProps, useContext } from 'solid-js';
+import { createContext, createMemo, createSignal, type ParentProps, useContext } from 'solid-js';
 import createFocusTrap from '../helpers/useFocusTrap';
 
 type FocusManagerContextType = {

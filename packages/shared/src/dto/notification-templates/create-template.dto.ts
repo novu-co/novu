@@ -1,7 +1,7 @@
-import { NotificationStepDto } from '../workflows';
-import { IPreferenceChannels } from '../../entities/subscriber-preference';
-import { NotificationTemplateCustomData } from '../../types';
-import { INotificationGroup } from '../../entities/notification-group';
+import { type NotificationStepDto } from '../workflows';
+import { type IPreferenceChannels } from '../../entities/subscriber-preference';
+import { type NotificationTemplateCustomData } from '../../types';
+import { type INotificationGroup } from '../../entities/notification-group';
 
 export interface ICreateNotificationTemplateDto {
   name: string;

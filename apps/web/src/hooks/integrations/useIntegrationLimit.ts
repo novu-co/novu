@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { ChannelTypeEnum } from '@novu/shared';
+import { type ChannelTypeEnum } from '@novu/shared';
 
 import { getIntegrationLimit } from '../../api/integration';
 import { IS_SELF_HOSTED } from '../../config/index';

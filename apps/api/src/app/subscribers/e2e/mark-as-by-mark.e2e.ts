@@ -3,10 +3,10 @@ import axios from 'axios';
 
 import { UserSession } from '@novu/testing';
 import {
-  MessageEntity,
+  type MessageEntity,
   MessageRepository,
-  NotificationTemplateEntity,
-  SubscriberEntity,
+  type NotificationTemplateEntity,
+  type SubscriberEntity,
   SubscriberRepository,
 } from '@novu/dal';
 import { ChannelTypeEnum, MessagesStatusEnum } from '@novu/shared';

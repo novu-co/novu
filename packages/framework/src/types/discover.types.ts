@@ -1,5 +1,5 @@
 import type { WorkflowPreferencesPartial } from '@novu/shared';
-import { ActionStepEnum, ChannelStepEnum } from '../constants';
+import { type ActionStepEnum, type ChannelStepEnum } from '../constants';
 import type { JsonSchema, Schema } from './schema.types';
 import type { StepOptions } from './step.types';
 import type { Execute } from './workflow.types';

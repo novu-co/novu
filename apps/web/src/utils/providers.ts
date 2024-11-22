@@ -1,4 +1,4 @@
-import { ColorScheme } from '@mantine/core';
+import { type ColorScheme } from '@mantine/core';
 import {
   ChannelTypeEnum,
   chatProviders,
@@ -11,7 +11,7 @@ import {
 } from '@novu/shared';
 
 import { CONTEXT_PATH, IS_SELF_HOSTED } from '../config';
-import { IIntegratedProvider } from '../pages/integrations/types';
+import { type IIntegratedProvider } from '../pages/integrations/types';
 
 const mapStructure = (listProv): IIntegratedProvider[] =>
   listProv.map((providerItem) => ({

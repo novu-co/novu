@@ -10,8 +10,8 @@ import type {
   MonthlyTypeEnum,
   OrdinalEnum,
   OrdinalValueEnum,
+  DigestTypeEnum,
 } from '@novu/shared';
-import { DigestTypeEnum } from '@novu/shared';
 
 export interface ITemplates extends IMessageTemplate {
   htmlContent?: string;

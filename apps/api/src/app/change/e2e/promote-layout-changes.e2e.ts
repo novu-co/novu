@@ -3,11 +3,11 @@ import { expect } from 'chai';
 import { ChangeRepository, EnvironmentRepository, LayoutRepository } from '@novu/dal';
 import {
   ChangeEntityTypeEnum,
-  ITemplateVariable,
-  LayoutDescription,
-  LayoutId,
-  LayoutIdentifier,
-  LayoutName,
+  type ITemplateVariable,
+  type LayoutDescription,
+  type LayoutId,
+  type LayoutIdentifier,
+  type LayoutName,
   TemplateVariableTypeEnum,
 } from '@novu/shared';
 import { UserSession } from '@novu/testing';

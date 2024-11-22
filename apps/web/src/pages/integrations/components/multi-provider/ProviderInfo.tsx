@@ -1,5 +1,5 @@
 import { Group } from '@mantine/core';
-import { ChannelTypeEnum, IEnvironment } from '@novu/shared';
+import { ChannelTypeEnum, type IEnvironment } from '@novu/shared';
 
 import { CHANNEL_TYPE_TO_STRING } from '../../../../utils/channels';
 import type { IIntegratedProvider } from '../../types';

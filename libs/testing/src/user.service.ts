@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { UserEntity, CommunityUserRepository } from '@novu/dal';
+import { type UserEntity, CommunityUserRepository } from '@novu/dal';
 import { normalizeEmail } from '@novu/shared';
 import { hash } from 'bcrypt';
 

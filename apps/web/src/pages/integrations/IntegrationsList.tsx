@@ -1,10 +1,10 @@
 import { Container } from '@mantine/core';
 import { Outlet } from 'react-router-dom';
 import { useMemo } from 'react';
-import { Row } from 'react-table';
-import { ChannelTypeEnum } from '@novu/shared';
+import { type Row } from 'react-table';
+import { type ChannelTypeEnum } from '@novu/shared';
 
-import { Table, Text, withCellLoading, IExtendedColumn } from '@novu/design-system';
+import { Table, Text, withCellLoading, type IExtendedColumn } from '@novu/design-system';
 import PageContainer from '../../components/layout/components/PageContainer';
 import PageHeader from '../../components/layout/components/PageHeader';
 import { useEnvironment, useIntegrations } from '../../hooks';

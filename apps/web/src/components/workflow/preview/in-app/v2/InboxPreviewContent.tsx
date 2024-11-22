@@ -3,7 +3,7 @@ import { css, cva } from '@novu/novui/css';
 import { IconArrowDropDown, IconMoreHoriz, IconSettings } from '@novu/novui/icons';
 import { Center, Flex, HStack, Stack } from '@novu/novui/jsx';
 import { parseMarkdownIntoTokens } from '@novu/js/internal';
-import { ParsedPreviewStateType } from '../../../../../pages/templates/hooks/usePreviewInAppTemplate';
+import { type ParsedPreviewStateType } from '../../../../../pages/templates/hooks/usePreviewInAppTemplate';
 import { SkeletonStyled } from '../Content.styles';
 import { InboxAvatar } from './InboxAvatar';
 

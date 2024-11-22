@@ -1,5 +1,5 @@
-import { Types } from 'mongoose';
-import { IPartnerConfiguration, OrganizationEntity } from './organization.entity';
+import { type Types } from 'mongoose';
+import { type IPartnerConfiguration, type OrganizationEntity } from './organization.entity';
 
 export interface IOrganizationRepository extends IOrganizationRepositoryMongo {
   findById(id: string, select?: string): Promise<OrganizationEntity | null>;

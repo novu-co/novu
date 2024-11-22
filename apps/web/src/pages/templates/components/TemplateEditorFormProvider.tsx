@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { FieldErrors, FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import { type FieldErrors, FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useParams } from 'react-router-dom';
 import cloneDeep from 'lodash.clonedeep';
@@ -9,9 +9,9 @@ import {
   DigestTypeEnum,
   DigestUnitEnum,
   EmailBlockTypeEnum,
-  IEmailBlock,
-  INotificationTemplate,
-  INotificationTrigger,
+  type IEmailBlock,
+  type INotificationTemplate,
+  type INotificationTrigger,
   isBridgeWorkflow,
   StepTypeEnum,
   TextAlignEnum,

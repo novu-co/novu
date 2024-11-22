@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { ActionIcon, Center, Input as MantineInput } from '@mantine/core';
-import { Control, Controller, useForm } from 'react-hook-form';
+import { type Control, Controller, useForm } from 'react-hook-form';
 import { useClipboard } from '@mantine/hooks';
 import styled from '@emotion/styled';
 import { showNotification } from '@mantine/notifications';

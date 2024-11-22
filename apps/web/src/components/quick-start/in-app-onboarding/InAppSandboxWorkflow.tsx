@@ -1,4 +1,4 @@
-import ReactFlow, { Background, BackgroundVariant, Edge, Node } from 'react-flow-renderer';
+import ReactFlow, { Background, BackgroundVariant, type Edge, type Node } from 'react-flow-renderer';
 
 import { useMantineColorScheme } from '@mantine/core';
 

@@ -1,4 +1,4 @@
-import { SelectStylesNames } from '@mantine/core';
+import { type SelectStylesNames } from '@mantine/core';
 import { defineSlotRecipe } from '@pandacss/dev';
 import { INPUT_RECIPE } from './input.recipe';
 

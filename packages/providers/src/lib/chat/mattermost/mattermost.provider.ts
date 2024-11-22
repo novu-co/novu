@@ -1,13 +1,13 @@
 import axios from 'axios';
 import {
   ChannelTypeEnum,
-  ISendMessageSuccessResponse,
-  IChatOptions,
-  IChatProvider,
+  type ISendMessageSuccessResponse,
+  type IChatOptions,
+  type IChatProvider,
 } from '@novu/stateless';
 import { ChatProviderIdEnum } from '@novu/shared';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 interface IMattermostPayload {
   channel?: string;

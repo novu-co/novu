@@ -1,13 +1,13 @@
 import {
-  ChannelTypeEnum,
-  EnvironmentId,
-  ITemplateVariable,
-  LayoutDescription,
-  LayoutId,
-  LayoutIdentifier,
-  LayoutName,
-  OrganizationId,
-  UserId,
+  type ChannelTypeEnum,
+  type EnvironmentId,
+  type ITemplateVariable,
+  type LayoutDescription,
+  type LayoutId,
+  type LayoutIdentifier,
+  type LayoutName,
+  type OrganizationId,
+  type UserId,
 } from '../../types';
 
 export interface ILayoutEntity {

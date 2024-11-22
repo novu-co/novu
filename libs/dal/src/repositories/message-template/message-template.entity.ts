@@ -10,7 +10,7 @@ import type {
   StepTypeEnum,
 } from '@novu/shared';
 
-import { IEmailBlock, ITemplateVariable } from './types';
+import { type IEmailBlock, type ITemplateVariable } from './types';
 import type { ChangePropsValueType } from '../../types/helpers';
 
 export class MessageTemplateEntity implements IMessageTemplate {

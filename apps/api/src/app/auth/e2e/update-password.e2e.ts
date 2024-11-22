@@ -1,4 +1,4 @@
-import { UserSessionData } from '@novu/shared';
+import { type UserSessionData } from '@novu/shared';
 import { TEST_USER_PASSWORD, UserSession } from '@novu/testing';
 import { expect } from 'chai';
 import jwt from 'jsonwebtoken';

@@ -1,5 +1,5 @@
-import { ButtonTypeEnum, IMessage, IMessageCTA } from '../entities/messages';
-import { ChannelCTATypeEnum, Redirect, WorkflowTypeEnum } from '../types';
+import { ButtonTypeEnum, type IMessage, type IMessageCTA } from '../entities/messages';
+import { ChannelCTATypeEnum, type Redirect, WorkflowTypeEnum } from '../types';
 
 export const isBridgeWorkflow = (workflowType?: WorkflowTypeEnum): boolean => {
   return workflowType === WorkflowTypeEnum.BRIDGE || workflowType === WorkflowTypeEnum.ECHO;

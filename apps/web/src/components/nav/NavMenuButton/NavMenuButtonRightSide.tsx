@@ -1,8 +1,8 @@
 import { Transition } from '@mantine/core';
 import { Tooltip } from '@novu/design-system';
-import { FC, PropsWithChildren, useState } from 'react';
+import { type FC, type PropsWithChildren, useState } from 'react';
 import { css } from '@novu/novui/css';
-import { INavMenuButtonRightSideConfig } from './NavMenuButton.shared';
+import { type INavMenuButtonRightSideConfig } from './NavMenuButton.shared';
 
 const tooltipStyle = css({
   backgroundColor: 'surface.popover',

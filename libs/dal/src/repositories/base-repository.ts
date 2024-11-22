@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ClassConstructor, plainToInstance } from 'class-transformer';
+import { type ClassConstructor, plainToInstance } from 'class-transformer';
 import {
-  ClientSession,
-  FilterQuery,
-  Model,
-  ProjectionType,
-  QueryOptions,
-  QueryWithHelpers,
+  type ClientSession,
+  type FilterQuery,
+  type Model,
+  type ProjectionType,
+  type QueryOptions,
+  type QueryWithHelpers,
   Types,
-  UpdateQuery,
+  type UpdateQuery,
 } from 'mongoose';
 import { DalException } from '../shared';
 

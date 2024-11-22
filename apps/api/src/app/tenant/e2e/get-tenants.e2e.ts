@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import axios, { AxiosResponse } from 'axios';
+import axios, { type AxiosResponse } from 'axios';
 
 import { UserSession } from '@novu/testing';
 import { TenantRepository } from '@novu/dal';

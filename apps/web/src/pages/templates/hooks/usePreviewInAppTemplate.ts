@@ -1,9 +1,9 @@
-import { IMessageButton } from '@novu/shared';
+import { type IMessageButton } from '@novu/shared';
 import { useCallback, useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { usePreviewInApp } from '../../../api/hooks';
 import { useProcessVariables } from '../../../hooks';
-import { IForm } from '../components/formTypes';
+import { type IForm } from '../components/formTypes';
 import { useStepFormCombinedErrors } from './useStepFormCombinedErrors';
 import { useStepFormPath } from './useStepFormPath';
 import { parsePayload } from '../../../utils';

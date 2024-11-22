@@ -4,8 +4,7 @@ import styled from '@emotion/styled';
 import { showNotification } from '@mantine/notifications';
 import { Container, Group } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
-import { MemberRoleEnum } from '@novu/shared';
-import type { IResponseError } from '@novu/shared';
+import { type MemberRoleEnum, type IResponseError } from '@novu/shared';
 
 import { Button, Input, Invite, UserAccess } from '@novu/design-system';
 import PageHeader from '../../components/layout/components/PageHeader';

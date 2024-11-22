@@ -1,18 +1,19 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import WebFont from 'webfontloader';
 import { css, Global } from '@emotion/react';
 import {
   NotificationCenter,
   NovuProvider,
-  ITranslationEntry,
-  ITab,
-  IStore,
+  type ITranslationEntry,
+  type ITab,
+  type IStore,
   useNovuContext,
-  ColorScheme,
-  IUserPreferenceSettings,
+  type ColorScheme,
+  type IUserPreferenceSettings,
+  type INovuThemeProvider,
+  type INotificationCenterStyles,
 } from '@novu/notification-center';
-import type { INovuThemeProvider, INotificationCenterStyles } from '@novu/notification-center';
-import { IMessage, IOrganizationEntity, ButtonTypeEnum, isBrowser } from '@novu/shared';
+import { type IMessage, type IOrganizationEntity, type ButtonTypeEnum, isBrowser } from '@novu/shared';
 
 import { API_URL, WS_URL } from '../../config';
 

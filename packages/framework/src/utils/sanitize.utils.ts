@@ -1,4 +1,4 @@
-import sanitizeTypes, { IOptions } from 'sanitize-html';
+import sanitizeTypes, { type IOptions } from 'sanitize-html';
 
 /**
  * Options for the sanitize-html library.

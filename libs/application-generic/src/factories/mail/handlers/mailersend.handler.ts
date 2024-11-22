@@ -1,7 +1,7 @@
 import {
   ChannelTypeEnum,
   EmailProviderIdEnum,
-  ICredentials,
+  type ICredentials,
 } from '@novu/shared';
 import { MailersendEmailProvider } from '@novu/providers';
 

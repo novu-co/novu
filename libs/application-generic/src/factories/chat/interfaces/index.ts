@@ -1,6 +1,9 @@
-import { IChatOptions, ISendMessageSuccessResponse } from '@novu/stateless';
-import { IntegrationEntity } from '@novu/dal';
-import { ChannelTypeEnum, ICredentials } from '@novu/shared';
+import {
+  type IChatOptions,
+  type ISendMessageSuccessResponse,
+} from '@novu/stateless';
+import { type IntegrationEntity } from '@novu/dal';
+import { type ChannelTypeEnum, type ICredentials } from '@novu/shared';
 
 export interface IChatHandler {
   canHandle(providerId: string, channelType: ChannelTypeEnum);

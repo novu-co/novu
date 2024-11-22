@@ -1,4 +1,4 @@
-import { UserProfileFlow } from './UserProfileFlow.const';
+import { type UserProfileFlow } from './UserProfileFlow.const';
 
 interface IUserProfilePageState {
   hasPassword: boolean;

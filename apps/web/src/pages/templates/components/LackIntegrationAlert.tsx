@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import styled from '@emotion/styled';
 
-import { ChannelTypeEnum } from '@novu/shared';
+import { type ChannelTypeEnum } from '@novu/shared';
 
 import { colors, Text, ErrorIcon, WarningIcon, CircleArrowRight } from '@novu/design-system';
 import { Group } from '@mantine/core';

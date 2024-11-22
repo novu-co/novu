@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
-import { NotificationDBModel } from './notification.entity';
+import { type NotificationDBModel } from './notification.entity';
 
 const notificationSchema = new Schema<NotificationDBModel>(
   {

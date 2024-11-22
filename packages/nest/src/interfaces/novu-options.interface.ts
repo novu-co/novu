@@ -1,10 +1,10 @@
-import { ModuleMetadata, Type } from '@nestjs/common';
+import { type ModuleMetadata, type Type } from '@nestjs/common';
 import {
-  IChatProvider,
-  IEmailProvider,
-  IPushProvider,
-  ISmsProvider,
-  ITemplate,
+  type IChatProvider,
+  type IEmailProvider,
+  type IPushProvider,
+  type ISmsProvider,
+  type ITemplate,
 } from '@novu/stateless';
 
 export interface INovuOptions {

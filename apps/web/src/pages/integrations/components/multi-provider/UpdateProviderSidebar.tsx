@@ -7,9 +7,9 @@ import {
   CHANNELS_WITH_PRIMARY,
   CredentialsKeyEnum,
   EmailProviderIdEnum,
-  IConfigCredentials,
-  IConstructIntegrationDto,
-  ICredentialsDto,
+  type IConfigCredentials,
+  type IConstructIntegrationDto,
+  type ICredentialsDto,
   InAppProviderIdEnum,
   SmsProviderIdEnum,
   slugify,
@@ -25,7 +25,7 @@ import { UpdateIntegrationSidebarHeader } from '../UpdateIntegrationSidebarHeade
 import { SetupWarning } from '../SetupWarning';
 import { UpdateIntegrationCommonFields } from '../UpdateIntegrationCommonFields';
 import { NovuInAppFrameworks } from '../NovuInAppFrameworks';
-import { FrameworkEnum } from '../../../quick-start/consts';
+import { type FrameworkEnum } from '../../../quick-start/consts';
 import { When } from '../../../../components/utils/When';
 import { SetupTimeline } from '../../../quick-start/components/SetupTimeline';
 import { Faq } from '../../../quick-start/components/QuickStartWrapper';
@@ -34,7 +34,7 @@ import { NovuInAppSetupWarning } from '../NovuInAppSetupWarning';
 import { NovuProviderSidebarContent } from './NovuProviderSidebarContent';
 import { useSelectPrimaryIntegrationModal } from './useSelectPrimaryIntegrationModal';
 import { ShareableUrl } from '../Modal/ConnectIntegrationForm';
-import { Conditions, IConditions } from '../../../../components/conditions';
+import { Conditions, type IConditions } from '../../../../components/conditions';
 import { useWebhookSupportStatus } from '../../../../api/hooks';
 import { defaultIntegrationConditionsProps } from '../../constants';
 import { NovuInAppRemoveBranding } from '../NovuInAppRemoveBranding';

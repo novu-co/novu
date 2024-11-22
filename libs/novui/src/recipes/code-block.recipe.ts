@@ -1,4 +1,4 @@
-import { CodeHighlightStylesNames } from '@mantine/code-highlight';
+import { type CodeHighlightStylesNames } from '@mantine/code-highlight';
 import { defineSlotRecipe } from '@pandacss/dev';
 import { BUTTON_RECIPE } from './button.recipe';
 

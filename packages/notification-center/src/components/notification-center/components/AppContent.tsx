@@ -1,5 +1,5 @@
 import React from 'react';
-import { MantineProvider, MantineThemeOverride } from '@mantine/core';
+import { MantineProvider, type MantineThemeOverride } from '@mantine/core';
 import { css } from '@emotion/css';
 
 import { Layout } from './layout/Layout';

@@ -1,4 +1,4 @@
-import { Accessor, createEffect, createMemo, createSignal, onCleanup, Setter } from 'solid-js';
+import { type Accessor, createEffect, createMemo, createSignal, onCleanup, type Setter } from 'solid-js';
 
 export function createDelayedLoading(initialValue: boolean, delayInMs: number): [Accessor<boolean>, Setter<boolean>] {
   const [debouncedValue, setDebouncedValue] = createSignal(initialValue);

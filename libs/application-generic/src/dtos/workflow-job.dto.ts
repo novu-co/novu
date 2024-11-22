@@ -1,15 +1,15 @@
 import {
-  AddressingTypeEnum,
-  ControlsDto,
-  TriggerRecipientsPayload,
-  TriggerRecipientSubscriber,
-  TriggerRequestCategoryEnum,
-  TriggerTenantContext,
+  type AddressingTypeEnum,
+  type ControlsDto,
+  type TriggerRecipientsPayload,
+  type TriggerRecipientSubscriber,
+  type TriggerRequestCategoryEnum,
+  type TriggerTenantContext,
 } from '@novu/shared';
-import { DiscoverWorkflowOutput } from '@novu/framework/internal';
+import { type DiscoverWorkflowOutput } from '@novu/framework/internal';
 import {
-  IBulkJobParams,
-  IJobParams,
+  type IBulkJobParams,
+  type IJobParams,
 } from '../services/queues/queue-base.service';
 
 export type AddressingBroadcast = {

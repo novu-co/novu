@@ -1,6 +1,6 @@
 import { Group } from '@mantine/core';
 import { Button, errorMessage, Invite, successMessage } from '@novu/design-system';
-import { IResponseError } from '@novu/shared';
+import { type IResponseError } from '@novu/shared';
 import { useMutation } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { IS_SELF_HOSTED } from '../../../config';

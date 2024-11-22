@@ -1,4 +1,4 @@
-import { MantineTheme } from '@mantine/core';
+import { type MantineTheme } from '@mantine/core';
 import { colors } from '../config';
 
 export const nameInputStyles = (theme: MantineTheme) => {

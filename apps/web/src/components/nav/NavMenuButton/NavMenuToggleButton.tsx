@@ -1,11 +1,11 @@
 import { css, cx } from '@novu/novui/css';
 import { IconKeyboardArrowDown, IconKeyboardArrowUp } from '@novu/novui/icons';
 import { HStack, Stack } from '@novu/novui/jsx';
-import { FC, PropsWithChildren, useEffect, useState } from 'react';
+import { type FC, type PropsWithChildren, useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useHover } from '../../../hooks/useHover';
 import { truncatedFlexTextCss } from '../../../studio/utils/shared.styles';
-import { INavMenuButtonProps, NavMenuButtonInner, rawButtonBaseStyles } from './NavMenuButton.shared';
+import { type INavMenuButtonProps, NavMenuButtonInner, rawButtonBaseStyles } from './NavMenuButton.shared';
 
 type INavMenuToggleButtonProps = { link: string } & Omit<INavMenuButtonProps, 'rightSide'>;
 

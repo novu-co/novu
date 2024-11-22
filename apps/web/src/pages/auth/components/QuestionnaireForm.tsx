@@ -7,12 +7,12 @@ import { captureException } from '@sentry/react';
 
 import {
   FeatureFlagsKeysEnum,
-  ICreateOrganizationDto,
-  IResponseError,
+  type ICreateOrganizationDto,
+  type IResponseError,
   JobTitleEnum,
   jobTitleToLabelMapper,
-  ProductUseCases,
-  ProductUseCasesEnum,
+  type ProductUseCases,
+  type ProductUseCasesEnum,
 } from '@novu/shared';
 import { Button, Input, inputStyles, Select } from '@novu/design-system';
 

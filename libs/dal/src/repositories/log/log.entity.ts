@@ -1,4 +1,4 @@
-import { LogCodeEnum, LogStatusEnum } from '@novu/shared';
+import { type LogCodeEnum, type LogStatusEnum } from '@novu/shared';
 
 import type { OrganizationId } from '../organization';
 import type { EnvironmentId } from '../environment';

@@ -2,10 +2,10 @@ import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import {
   DigestUnitEnum,
-  JSONSchemaDto,
+  type JSONSchemaDto,
   TimeUnitEnum,
   UiComponentEnum,
-  UiSchema,
+  type UiSchema,
   UiSchemaGroupEnum,
 } from '@novu/shared';
 

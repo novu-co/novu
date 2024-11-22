@@ -1,12 +1,12 @@
 import './CustomCodeEditor.css';
-import { Editor, Monaco } from '@monaco-editor/react';
+import { Editor, type Monaco } from '@monaco-editor/react';
 import { Card, Loader, useMantineColorScheme } from '@mantine/core';
 import { useCallback, useEffect, useRef } from 'react';
 import { colors } from '@novu/design-system';
-import { editor as NEditor } from 'monaco-editor';
+import { type editor as NEditor } from 'monaco-editor';
 
 import { createTranslationMarks } from './createTranslationMarks';
-import { IVariable, useWorkflowVariables } from '../../../api/hooks';
+import { type IVariable, useWorkflowVariables } from '../../../api/hooks';
 import { useEnvironment } from '../../../hooks';
 
 export const CustomCodeEditor = ({

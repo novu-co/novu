@@ -1,4 +1,4 @@
-import { TenantIdentifier, TenantCustomData } from '@novu/shared';
+import { type TenantIdentifier, type TenantCustomData } from '@novu/shared';
 
 export interface ITenants {
   create(tenantIdentifier: TenantIdentifier, data: ITenantPayload);

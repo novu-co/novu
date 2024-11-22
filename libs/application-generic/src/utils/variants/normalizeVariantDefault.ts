@@ -1,4 +1,4 @@
-import { ITemplateVariable } from '@novu/shared';
+import { type ITemplateVariable } from '@novu/shared';
 
 export const normalizeVariantDefault = (items: ITemplateVariable[]) => {
   return items.map((item) => {

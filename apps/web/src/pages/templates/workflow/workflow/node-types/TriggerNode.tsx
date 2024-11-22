@@ -7,9 +7,9 @@ import { useDidUpdate } from '@mantine/hooks';
 import { useFormContext } from 'react-hook-form';
 import { colors, Tooltip, BoltOutlinedGradient, Check } from '@novu/design-system';
 import { When } from '../../../../../components/utils/When';
-import { IForm } from '../../../components/formTypes';
+import { type IForm } from '../../../components/formTypes';
 import { WorkflowNode } from './WorkflowNode';
-import { INode } from '../../../../../components/workflow/types';
+import { type INode } from '../../../../../components/workflow/types';
 
 const useStyles = createStyles(
   (

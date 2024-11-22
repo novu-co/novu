@@ -1,6 +1,6 @@
 import { parseWithoutProcessing } from '@handlebars/parser';
-import { MustacheStatement, PathExpression, StringLiteral } from '@handlebars/parser/types/ast';
-import { editor as NEditor, Range } from 'monaco-editor';
+import { type MustacheStatement, type PathExpression, type StringLiteral } from '@handlebars/parser/types/ast';
+import { type editor as NEditor, Range } from 'monaco-editor';
 
 export const createTranslationMarks = (
   newValue: string | undefined,

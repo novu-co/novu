@@ -1,5 +1,5 @@
 import { Button, IconOutlineLockPerson } from '@novu/design-system';
-import { FC, MouseEventHandler, useContext, useMemo } from 'react';
+import { type FC, type MouseEventHandler, useContext, useMemo } from 'react';
 import { css } from '@novu/novui/css';
 import { UserProfileSidebarContext } from './UserProfileSidebarContext';
 import { UserProfilePasswordSidebar } from './UserProfilePasswordSidebar';

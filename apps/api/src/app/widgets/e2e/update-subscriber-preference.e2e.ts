@@ -1,9 +1,9 @@
-import { NotificationTemplateEntity, SubscriberRepository } from '@novu/dal';
+import { type NotificationTemplateEntity, SubscriberRepository } from '@novu/dal';
 import { UserSession } from '@novu/testing';
 import axios from 'axios';
 import { expect } from 'chai';
 import { ChannelTypeEnum } from '@novu/shared';
-import { UpdateSubscriberPreferenceRequestDto } from '../dtos/update-subscriber-preference-request.dto';
+import { type UpdateSubscriberPreferenceRequestDto } from '../dtos/update-subscriber-preference-request.dto';
 import { getSubscriberPreference } from './get-subscriber-preference.e2e';
 
 describe('PATCH /widgets/preferences/:templateId', function () {

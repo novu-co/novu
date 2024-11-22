@@ -8,7 +8,7 @@ import {
   EmailProviderIdEnum,
   FieldOperatorEnum,
   InAppProviderIdEnum,
-  ITenantFilterPart,
+  type ITenantFilterPart,
   PushProviderIdEnum,
 } from '@novu/shared';
 

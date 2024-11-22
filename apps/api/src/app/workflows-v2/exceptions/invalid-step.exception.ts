@@ -1,5 +1,5 @@
 import { InternalServerErrorException } from '@nestjs/common';
-import { NotificationStepEntity } from '@novu/dal';
+import { type NotificationStepEntity } from '@novu/dal';
 
 export class InvalidStepException extends InternalServerErrorException {
   constructor(currentStep: NotificationStepEntity) {

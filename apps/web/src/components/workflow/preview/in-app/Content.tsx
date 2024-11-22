@@ -7,7 +7,7 @@ import { ActionBlockContainer } from '../../../../pages/templates/components/in-
 import AvatarContainer, {
   RenderAvatar,
 } from '../../../../pages/templates/components/in-app-editor/preview/AvatarContainer';
-import { ParsedPreviewStateType } from '../../../../pages/templates/hooks/usePreviewInAppTemplate';
+import { type ParsedPreviewStateType } from '../../../../pages/templates/hooks/usePreviewInAppTemplate';
 import { PreviewEditOverlay } from '../common';
 import {
   ContentAndOverlayWrapperStyled,

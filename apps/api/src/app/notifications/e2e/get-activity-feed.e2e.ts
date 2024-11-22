@@ -1,7 +1,7 @@
-import { NotificationEntity, NotificationTemplateEntity, SubscriberRepository } from '@novu/dal';
+import { type NotificationEntity, type NotificationTemplateEntity, SubscriberRepository } from '@novu/dal';
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
-import { ChannelTypeEnum, StepTypeEnum, IMessage } from '@novu/shared';
+import { ChannelTypeEnum, StepTypeEnum, type IMessage } from '@novu/shared';
 
 describe('Get activity feed - /notifications (GET)', async () => {
   let session: UserSession;

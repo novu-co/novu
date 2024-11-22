@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ITerminalDimensions } from 'xterm-addon-fit';
+import { type ITerminalDimensions } from 'xterm-addon-fit';
 import { captureException } from '@sentry/react';
 
-import { FCWithChildren } from '../types';
+import { type FCWithChildren } from '../types';
 import { useStudioState } from '../studio/hooks';
 import { useEffectOnce } from './useEffectOnce';
 import { configureFiles } from '../pages/playground/web-container-configuration/files-configuration';

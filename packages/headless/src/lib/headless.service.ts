@@ -1,20 +1,20 @@
 import {
   QueryClient,
-  QueryObserverOptions,
-  QueryObserverResult,
-  MutationObserverResult,
+  type QueryObserverOptions,
+  type QueryObserverResult,
+  type MutationObserverResult,
 } from '@tanstack/query-core';
 import io from 'socket.io-client';
 import {
   ApiService,
-  IUserPreferenceSettings,
-  IStoreQuery,
-  IUserGlobalPreferenceSettings,
+  type IUserPreferenceSettings,
+  type IStoreQuery,
+  type IUserGlobalPreferenceSettings,
 } from '@novu/client';
 import {
-  IOrganizationEntity,
-  IMessage,
-  IPaginatedResponse,
+  type IOrganizationEntity,
+  type IMessage,
+  type IPaginatedResponse,
   WebSocketEventEnum,
 } from '@novu/shared';
 
@@ -30,14 +30,14 @@ import {
   USER_PREFERENCES_QUERY_KEY,
 } from '../utils';
 import {
-  FetchResult,
-  IFeedId,
-  IHeadlessServiceOptions,
-  IMessageId,
-  IUpdateActionVariables,
-  IUpdateUserPreferencesVariables,
-  IUpdateUserGlobalPreferencesVariables,
-  UpdateResult,
+  type FetchResult,
+  type IFeedId,
+  type IHeadlessServiceOptions,
+  type IMessageId,
+  type IUpdateActionVariables,
+  type IUpdateUserPreferencesVariables,
+  type IUpdateUserGlobalPreferencesVariables,
+  type UpdateResult,
 } from './types';
 
 export const NOTIFICATION_CENTER_TOKEN_KEY = 'nc_token';

@@ -1,21 +1,24 @@
 import merge from 'lodash.merge';
 import { EventEmitter } from 'events';
-import { INovuConfig } from './novu.interface';
+import { type INovuConfig } from './novu.interface';
 import {
-  IEmailProvider,
-  ISmsProvider,
-  IChatProvider,
-  IPushProvider,
+  type IEmailProvider,
+  type ISmsProvider,
+  type IChatProvider,
+  type IPushProvider,
 } from './provider/provider.interface';
 import { ProviderStore } from './provider/provider.store';
-import { ITemplate, ITriggerPayload } from './template/template.interface';
+import {
+  type ITemplate,
+  type ITriggerPayload,
+} from './template/template.interface';
 import { TemplateStore } from './template/template.store';
 import { TriggerEngine } from './trigger/trigger.engine';
 import { ThemeStore } from './theme/theme.store';
-import { ITheme } from './theme/theme.interface';
+import { type ITheme } from './theme/theme.interface';
 import {
   HandlebarsContentEngine,
-  IContentEngine,
+  type IContentEngine,
 } from './content/content.engine';
 
 export class NovuStateless extends EventEmitter {

@@ -7,7 +7,7 @@ import { useMemo } from 'react';
 import Card from '../../../../components/layout/components/Card';
 import { Timeline } from '../components/timeline/Timeline';
 import { AdditionInformationLink } from '../components/AdditionInformationLink';
-import { IOnboardingUseCaseViewContext, OnboardingUseCase } from '../consts/types';
+import { type IOnboardingUseCaseViewContext, type OnboardingUseCase } from '../consts/types';
 import { useSegment } from '../../../../components/providers/SegmentProvider';
 
 export interface IGetStartedTabProps extends OnboardingUseCase, IOnboardingUseCaseViewContext {}

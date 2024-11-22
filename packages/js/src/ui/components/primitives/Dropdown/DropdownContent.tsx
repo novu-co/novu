@@ -1,4 +1,4 @@
-import { ComponentProps, splitProps } from 'solid-js';
+import { type ComponentProps, splitProps } from 'solid-js';
 import { useStyle } from '../../../helpers';
 import type { AppearanceKey } from '../../../types';
 import { Popover } from '../Popover';

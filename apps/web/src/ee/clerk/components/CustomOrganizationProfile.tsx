@@ -1,5 +1,5 @@
 import { OrganizationProfile } from '@clerk/clerk-react';
-import { FC } from 'react';
+import { type FC } from 'react';
 
 // Hides OrganizationProfile sidebar + makes it fit the parent container
 const OrganizationProfileAppearance = {

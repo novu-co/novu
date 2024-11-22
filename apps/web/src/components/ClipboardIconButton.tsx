@@ -1,6 +1,6 @@
-import { IIconProps, IconCheck, IconContentCopy } from '@novu/design-system';
-import { FC } from 'react';
-import { LocalizedMessage } from '../types/LocalizedMessage';
+import { type IIconProps, IconCheck, IconContentCopy } from '@novu/design-system';
+import { type FC } from 'react';
+import { type LocalizedMessage } from '../types/LocalizedMessage';
 import { IconButton } from './IconButton';
 
 interface IClipboardIconButtonProps extends Partial<Pick<IIconProps, 'color' | 'size'>> {

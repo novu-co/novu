@@ -1,4 +1,4 @@
-import { IconSize } from './Icon.types';
+import { type IconSize } from './Icon.types';
 
 /**
  * Style Props

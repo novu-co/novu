@@ -1,5 +1,5 @@
 import { AnalyticsBrowser } from '@segment/analytics-next';
-import { IUserEntity } from '@novu/shared';
+import { type IUserEntity } from '@novu/shared';
 // eslint-disable-next-line import/no-namespace
 import * as mixpanel from 'mixpanel-browser';
 import { api } from '../api';
@@ -56,7 +56,7 @@ export class SegmentService {
 
     this._segment?.identify(user?._id, {
       email: user.email,
-      name: user.firstName + ' ' + user.lastName,
+      name: `${user.firstName} ${user.lastName}`,
       firstName: user.firstName,
       lastName: user.lastName,
       avatar: user.profilePicture,

@@ -10,13 +10,13 @@ import type {
 } from '@novu/shared';
 import { HttpClient } from '../http-client';
 import {
-  ITabCountQuery,
-  IStoreQuery,
-  IUserPreferenceSettings,
-  IUnseenCountQuery,
-  IUnreadCountQuery,
-  IUserGlobalPreferenceSettings,
-  ApiOptions,
+  type ITabCountQuery,
+  type IStoreQuery,
+  type IUserPreferenceSettings,
+  type IUnseenCountQuery,
+  type IUnreadCountQuery,
+  type IUserGlobalPreferenceSettings,
+  type ApiOptions,
 } from '../index';
 
 export class ApiService {

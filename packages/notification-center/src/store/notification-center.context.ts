@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { IMessage, ButtonTypeEnum } from '@novu/shared';
-import { IUserPreferenceSettings } from '@novu/client';
+import { type IMessage, type ButtonTypeEnum } from '@novu/shared';
+import { type IUserPreferenceSettings } from '@novu/client';
 
-import { INotificationCenterContext, ITab } from '../shared/interfaces';
+import { type INotificationCenterContext, type ITab } from '../shared/interfaces';
 
 export const NotificationCenterContext = React.createContext<INotificationCenterContext>({
   onUrlChange: (url: string) => {},

@@ -1,7 +1,7 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query';
+import { useInfiniteQuery, type UseInfiniteQueryOptions } from '@tanstack/react-query';
 import type { IStoreQuery } from '@novu/client';
 import type { IMessage, IPaginatedResponse } from '@novu/shared';
-import { INotificationsContext } from '../shared/interfaces';
+import { type INotificationsContext } from '../shared/interfaces';
 
 import { useNovuContext } from './useNovuContext';
 import { getNextPageParam } from '../utils/pagination';

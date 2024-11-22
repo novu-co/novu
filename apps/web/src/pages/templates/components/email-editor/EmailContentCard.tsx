@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { IOrganizationEntity } from '@novu/shared';
+import { type IOrganizationEntity } from '@novu/shared';
 import { Tabs } from '@novu/design-system';
 
 import { useStepFormPath } from '../../hooks/useStepFormPath';

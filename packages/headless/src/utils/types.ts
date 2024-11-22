@@ -1,4 +1,4 @@
-import { ISubscriberJwt } from '@novu/shared';
+import { type ISubscriberJwt } from '@novu/shared';
 
 export interface ISession {
   token: string;

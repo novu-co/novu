@@ -1,6 +1,6 @@
-import { LocalizedMessage, Text } from '@novu/novui';
+import { type LocalizedMessage, Text } from '@novu/novui';
 import { Flex, Stack } from '@novu/novui/jsx';
-import { FC } from 'react';
+import { type FC } from 'react';
 import { css } from '@novu/novui/css';
 import { Popover, useColorScheme } from '@novu/design-system';
 import { useDisclosure } from '@mantine/hooks';

@@ -3,7 +3,7 @@ import React from 'react';
 import { css, cx } from '@emotion/css';
 
 import { useNovuTheme, useTranslations } from '../../../../../hooks';
-import { INovuTheme } from '../../../../../store/novu-theme.context';
+import { type INovuTheme } from '../../../../../store/novu-theme.context';
 import { useStyles } from '../../../../../store/styles';
 
 export function Footer() {

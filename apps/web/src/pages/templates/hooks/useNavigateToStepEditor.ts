@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { StepTypeEnum } from '@novu/shared';
+import { type StepTypeEnum } from '@novu/shared';
 
 import { useBasePath } from './useBasePath';
 

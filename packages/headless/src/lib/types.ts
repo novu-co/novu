@@ -8,8 +8,8 @@ import {
   WebSocketEventEnum,
 } from '@novu/shared';
 import {
-  MutationObserverResult,
-  QueryObserverResult,
+  type MutationObserverResult,
+  type QueryObserverResult,
 } from '@tanstack/query-core';
 
 import {

@@ -1,6 +1,11 @@
 import { expect } from 'chai';
 import axios from 'axios';
-import { MessageRepository, NotificationRepository, NotificationTemplateEntity, SubscriberEntity } from '@novu/dal';
+import {
+  MessageRepository,
+  NotificationRepository,
+  type NotificationTemplateEntity,
+  type SubscriberEntity,
+} from '@novu/dal';
 import { UserSession, SubscribersService } from '@novu/testing';
 import { ChannelTypeEnum, StepTypeEnum } from '@novu/shared';
 

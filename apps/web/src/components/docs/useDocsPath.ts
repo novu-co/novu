@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { matchPath, useLocation } from 'react-router-dom';
-import { ROUTES } from '../../constants/routes';
-import { DocsPathsEnum } from './docs.const';
+import { type ROUTES } from '../../constants/routes';
+import { type DocsPathsEnum } from './docs.const';
 
 export type DocsPaths = { [key in ROUTES]?: DocsPathsEnum };
 

@@ -1,5 +1,5 @@
 import { createContext, useCallback, useEffect } from 'react';
-import { IOrganizationEntity, IUserEntity } from '@novu/shared';
+import { type IOrganizationEntity, type IUserEntity } from '@novu/shared';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { HttpStatusCode } from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';

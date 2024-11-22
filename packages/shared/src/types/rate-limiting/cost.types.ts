@@ -1,4 +1,4 @@
-import { ApiRateLimitConfigEnum, ApiRateLimitEnvVarNamespace } from './config.types';
+import { type ApiRateLimitConfigEnum, type ApiRateLimitEnvVarNamespace } from './config.types';
 
 export enum ApiRateLimitCostEnum {
   SINGLE = 'single',

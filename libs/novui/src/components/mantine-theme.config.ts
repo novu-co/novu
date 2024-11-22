@@ -1,6 +1,6 @@
-import { MantineColorsTuple, MantineThemeOverride } from '@mantine/core';
+import { type MantineColorsTuple, type MantineThemeOverride } from '@mantine/core';
 import { COLOR_PALETTE_TOKENS } from '../tokens/colors.tokens';
-import { token, Token } from '../../styled-system/tokens';
+import { token, type Token } from '../../styled-system/tokens';
 
 /**
  * Generates a Mantine color tuple for the given Panda color "family"

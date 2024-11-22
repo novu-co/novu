@@ -1,14 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 
-import { IMessage, IMessageAction, ButtonTypeEnum } from '@novu/shared';
-import { IUserPreferenceSettings } from '@novu/client';
+import { type IMessage, type IMessageAction, type ButtonTypeEnum } from '@novu/shared';
+import { type IUserPreferenceSettings } from '@novu/client';
 
 import { AppContent } from './components';
 import { useNotifications, useNovuContext } from '../../hooks';
 import { NotificationCenterContext } from '../../store/notification-center.context';
-import { ITab, ListItem, ScreensEnum } from '../../shared/interfaces';
-import { ColorScheme } from '../../shared/config/colors';
-import { INovuThemeProvider, NovuThemeProvider } from '../../store/novu-theme-provider.context';
+import { type ITab, type ListItem, type ScreensEnum } from '../../shared/interfaces';
+import { type ColorScheme } from '../../shared/config/colors';
+import { type INovuThemeProvider, NovuThemeProvider } from '../../store/novu-theme-provider.context';
 
 export interface INotificationCenterProps {
   onUrlChange?: (url: string) => void;

@@ -3,14 +3,17 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useClipboard } from '@mantine/hooks';
 import { ActionIcon, Alert, Center, Image, Stack, useMantineColorScheme } from '@mantine/core';
-import { ChannelTypeEnum, ChatProviderIdEnum, CredentialsKeyEnum, ProvidersIdEnum } from '@novu/shared';
-import type {
-  IResponseError,
-  IConfigCredentials,
-  ICreateIntegrationBodyDto,
-  ICredentialsDto,
-  IEnvironment,
-  IOrganizationEntity,
+import {
+  ChannelTypeEnum,
+  ChatProviderIdEnum,
+  CredentialsKeyEnum,
+  type ProvidersIdEnum,
+  type IResponseError,
+  type IConfigCredentials,
+  type ICreateIntegrationBodyDto,
+  type ICredentialsDto,
+  type IEnvironment,
+  type IOrganizationEntity,
 } from '@novu/shared';
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';

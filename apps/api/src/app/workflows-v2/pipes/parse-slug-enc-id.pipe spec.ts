@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import { ArgumentMetadata } from '@nestjs/common';
-import { UserSessionData, ApiAuthSchemeEnum } from '@novu/shared';
+import { type ArgumentMetadata } from '@nestjs/common';
+import { type UserSessionData, ApiAuthSchemeEnum } from '@novu/shared';
 
 import { encodeBase62 } from '../../shared/helpers';
 import { ParseSlugEnvironmentIdPipe } from './parse-slug-env-id.pipe';

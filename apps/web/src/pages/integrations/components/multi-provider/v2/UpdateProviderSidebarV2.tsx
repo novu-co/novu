@@ -6,9 +6,9 @@ import {
   CHANNELS_WITH_PRIMARY,
   CredentialsKeyEnum,
   EmailProviderIdEnum,
-  IConfigCredentials,
-  IConstructIntegrationDto,
-  ICredentialsDto,
+  type IConfigCredentials,
+  type IConstructIntegrationDto,
+  type ICredentialsDto,
   InAppProviderIdEnum,
   SmsProviderIdEnum,
   slugify,
@@ -17,13 +17,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useWebhookSupportStatus } from '../../../../../api/hooks';
 import { useUpdateIntegration } from '../../../../../api/hooks/useUpdateIntegration';
-import { Conditions, IConditions } from '../../../../../components/conditions';
+import { Conditions, type IConditions } from '../../../../../components/conditions';
 import { When } from '../../../../../components/utils/When';
 import { useEnvironment } from '../../../../../hooks';
 import { successMessage } from '../../../../../utils/notifications';
 import { Faq } from '../../../../quick-start/components/QuickStartWrapper';
 import { SetupTimeline } from '../../../../quick-start/components/SetupTimeline';
-import { FrameworkEnum } from '../../../../quick-start/consts';
+import { type FrameworkEnum } from '../../../../quick-start/consts';
 import { defaultIntegrationConditionsProps } from '../../../constants';
 import type { IIntegratedProvider } from '../../../types';
 import { useProviders } from '../../../useProviders';

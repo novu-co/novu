@@ -1,17 +1,17 @@
-import { createNovuBaseClient, HttpError, NovuRestResult } from './novu-base-client';
+import { createNovuBaseClient, type HttpError, type NovuRestResult } from './novu-base-client';
 import {
-  CreateWorkflowDto,
-  GeneratePreviewRequestDto,
-  GeneratePreviewResponseDto,
-  GetListQueryParams,
-  ListWorkflowResponse,
-  PatchStepDataDto,
-  PatchWorkflowDto,
-  StepDataDto,
-  SyncWorkflowDto,
-  UpdateWorkflowDto,
-  WorkflowResponseDto,
-  WorkflowTestDataResponseDto,
+  type CreateWorkflowDto,
+  type GeneratePreviewRequestDto,
+  type GeneratePreviewResponseDto,
+  type GetListQueryParams,
+  type ListWorkflowResponse,
+  type PatchStepDataDto,
+  type PatchWorkflowDto,
+  type StepDataDto,
+  type SyncWorkflowDto,
+  type UpdateWorkflowDto,
+  type WorkflowResponseDto,
+  type WorkflowTestDataResponseDto,
 } from '../dto';
 
 export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {}) => {

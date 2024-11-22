@@ -1,6 +1,6 @@
 import React from 'react';
 import { cx, css } from '@emotion/css';
-import { IMessage, ButtonTypeEnum } from '@novu/shared';
+import { type IMessage, type ButtonTypeEnum } from '@novu/shared';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 import { NotificationListItem } from './notification-item/NotificationListItem';

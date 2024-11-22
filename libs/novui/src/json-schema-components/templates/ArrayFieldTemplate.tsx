@@ -1,7 +1,7 @@
 import {
-  ArrayFieldTemplateItemType,
-  ArrayFieldTemplateProps,
-  ArrayFieldTitleProps,
+  type ArrayFieldTemplateItemType,
+  type ArrayFieldTemplateProps,
+  type ArrayFieldTitleProps,
   getTemplate,
   getUiOptions,
 } from '@rjsf/utils';

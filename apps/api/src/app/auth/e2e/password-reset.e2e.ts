@@ -2,7 +2,7 @@ import { CommunityUserRepository } from '@novu/dal';
 import { UserSession } from '@novu/testing';
 import { v4 as uuidv4 } from 'uuid';
 import { expect } from 'chai';
-import { stub, SinonStubbedMember } from 'sinon';
+import { stub, type SinonStubbedMember } from 'sinon';
 import { subDays, subMinutes } from 'date-fns';
 import { PasswordResetFlowEnum } from '@novu/shared';
 

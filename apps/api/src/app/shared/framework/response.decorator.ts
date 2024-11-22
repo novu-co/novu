@@ -1,5 +1,5 @@
-import { ApiExtraModels, getSchemaPath, ApiResponseOptions } from '@nestjs/swagger';
-import { applyDecorators, Type } from '@nestjs/common';
+import { ApiExtraModels, getSchemaPath, type ApiResponseOptions } from '@nestjs/swagger';
+import { applyDecorators, type Type } from '@nestjs/common';
 import { customResponseDecorators } from './swagger/responses.decorator';
 import { COMMON_RESPONSES } from './constants/responses.schema';
 import { DataWrapperDto } from '../dtos/data-wrapper-dto';

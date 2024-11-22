@@ -1,8 +1,8 @@
-import { ChangeEventHandler, FC } from 'react';
-import { SubmitHandler, useController, useForm, ValidationRule } from 'react-hook-form';
+import { type ChangeEventHandler, type FC } from 'react';
+import { type SubmitHandler, useController, useForm, type ValidationRule } from 'react-hook-form';
 import capitalize from 'lodash.capitalize';
 import { Button, errorMessage, Input, successMessage } from '@novu/design-system';
-import { IUserEntity, UploadTypesEnum } from '@novu/shared';
+import { type IUserEntity, UploadTypesEnum } from '@novu/shared';
 
 import { css } from '@novu/novui/css';
 import { ProfileImage } from '../../../components/shared';

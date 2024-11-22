@@ -1,15 +1,22 @@
-import { ComponentType, MouseEvent, MouseEvent as ReactMouseEvent, useCallback, useEffect, useRef } from 'react';
+import {
+  type ComponentType,
+  type MouseEvent,
+  type MouseEvent as ReactMouseEvent,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 import ReactFlow, {
   addEdge,
   Background,
   BackgroundVariant,
   Controls,
-  Edge,
-  EdgeProps,
+  type Edge,
+  type EdgeProps,
   getOutgoers,
-  Node,
-  NodeProps,
-  ReactFlowProps,
+  type Node,
+  type NodeProps,
+  type ReactFlowProps,
   useEdgesState,
   useNodesState,
   useReactFlow,
@@ -18,7 +25,7 @@ import { useMantineColorScheme } from '@mantine/core';
 import styled from '@emotion/styled';
 import { v4 as uuid4 } from 'uuid';
 import cloneDeep from 'lodash.clonedeep';
-import { StepTypeEnum } from '@novu/shared';
+import { type StepTypeEnum } from '@novu/shared';
 
 import { colors } from '@novu/design-system';
 import { getChannel } from '../../utils/channels';

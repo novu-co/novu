@@ -1,5 +1,5 @@
-import React, { FunctionComponent, createContext, useMemo, useContext, PropsWithChildren } from 'react';
-import { CSSInterpolation } from '@emotion/css';
+import React, { type FunctionComponent, createContext, useMemo, useContext, type PropsWithChildren } from 'react';
+import { type CSSInterpolation } from '@emotion/css';
 
 import type { INotificationCenterStyles, StylesPaths } from './styles-provider.types';
 import { useNovuTheme } from '../../hooks';

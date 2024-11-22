@@ -1,10 +1,10 @@
-import { ChannelTypeEnum } from '../template/template.interface';
+import { type ChannelTypeEnum } from '../template/template.interface';
 
 import {
-  IEmailProvider,
-  ISmsProvider,
-  IChatProvider,
-  IPushProvider,
+  type IEmailProvider,
+  type ISmsProvider,
+  type IChatProvider,
+  type IPushProvider,
 } from './provider.interface';
 
 export class ProviderStore {

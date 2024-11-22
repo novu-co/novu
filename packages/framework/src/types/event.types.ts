@@ -4,7 +4,7 @@ import type {
   TriggerRecipientsPayload,
   TriggerRecipientSubscriber,
 } from '@novu/shared';
-import { ConditionalPartial, PickRequiredKeys } from './util.types';
+import { type ConditionalPartial, type PickRequiredKeys } from './util.types';
 
 type EventPayload = ITriggerPayload & {};
 

@@ -1,11 +1,11 @@
-import { StepTypeEnum } from '@novu/shared';
+import { type StepTypeEnum } from '@novu/shared';
 import { useEffect, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 
 import { useNavigateToVariantPreview } from '../hooks/useNavigateToVariantPreview';
-import { NODE_ERROR_TYPES } from '../workflow/workflow/node-types/utils';
-import { IForm } from './formTypes';
+import { type NODE_ERROR_TYPES } from '../workflow/workflow/node-types/utils';
+import { type IForm } from './formTypes';
 import { ItemTypeEnum, useVariantListErrors } from './useVariantListErrors';
 
 export const useVariantListErrorsNavigation = () => {

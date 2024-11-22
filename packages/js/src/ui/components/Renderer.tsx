@@ -1,7 +1,7 @@
 import { For, onCleanup, onMount } from 'solid-js';
-import { MountableElement, Portal } from 'solid-js/web';
-import { NovuUI } from '..';
-import { Novu } from '../../novu';
+import { type MountableElement, Portal } from 'solid-js/web';
+import { type NovuUI } from '..';
+import { type Novu } from '../../novu';
 import type { NovuOptions } from '../../types';
 import {
   AppearanceProvider,
@@ -13,7 +13,7 @@ import {
 } from '../context';
 import type { Appearance, Localization, PreferencesFilter, RouterPush, Tab } from '../types';
 import { Bell, Root } from './elements';
-import { Inbox, InboxContent, InboxContentProps, InboxPage } from './Inbox';
+import { Inbox, InboxContent, type InboxContentProps, InboxPage } from './Inbox';
 
 export const novuComponents = {
   Inbox,

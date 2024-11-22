@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { UserSession } from '@novu/testing';
 import {
-  MessageEntity,
+  type MessageEntity,
   MessageRepository,
-  NotificationTemplateEntity,
-  SubscriberEntity,
+  type NotificationTemplateEntity,
+  type SubscriberEntity,
   SubscriberRepository,
 } from '@novu/dal';
 import {

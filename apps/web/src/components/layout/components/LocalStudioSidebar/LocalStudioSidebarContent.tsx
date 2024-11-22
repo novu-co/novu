@@ -1,10 +1,10 @@
 import { IconAdd } from '@novu/novui/icons';
 import { Flex, Stack } from '@novu/novui/jsx';
 import { Skeleton } from '@mantine/core';
-import { FC } from 'react';
+import { type FC } from 'react';
 import { token } from '@novu/novui/tokens';
 import { css, cx } from '@novu/novui/css';
-import { WithLoadingSkeleton } from '@novu/novui';
+import { type WithLoadingSkeleton } from '@novu/novui';
 import type { DiscoverWorkflowOutput } from '@novu/framework/internal';
 import { NavMenu } from '../../../nav/NavMenu';
 import { NavMenuSection } from '../../../nav/NavMenuSection';

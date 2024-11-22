@@ -8,17 +8,17 @@ import {
   JobRepository,
   MessageRepository,
   NotificationTemplateRepository,
-  SubscriberEntity,
+  type SubscriberEntity,
 } from '@novu/dal';
 import {
   ChannelTypeEnum,
-  CreateWorkflowDto,
+  type CreateWorkflowDto,
   ExecutionDetailsStatusEnum,
   JobStatusEnum,
   MessagesStatusEnum,
   StepTypeEnum,
   WorkflowCreationSourceEnum,
-  WorkflowResponseDto,
+  type WorkflowResponseDto,
 } from '@novu/shared';
 import { workflow } from '@novu/framework';
 

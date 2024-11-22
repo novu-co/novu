@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react';
+import React, { type ChangeEvent } from 'react';
 import { Switch as MantineSwitch } from '@mantine/core';
 import useStyles from './Switch.styles';
 

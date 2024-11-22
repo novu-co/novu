@@ -1,5 +1,5 @@
 import { expect, test, vi, describe } from 'vitest';
-import { ExpoPushTicket } from 'expo-server-sdk';
+import { type ExpoPushTicket } from 'expo-server-sdk';
 import { ExpoPushProvider } from './expo.provider';
 
 describe('Expo', () => {

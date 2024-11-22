@@ -1,6 +1,6 @@
 import { Group, Stack, UnstyledButton, useMantineColorScheme } from '@mantine/core';
 import { useMutation } from '@tanstack/react-query';
-import { TooltipRenderProps } from 'react-joyride';
+import { type TooltipRenderProps } from 'react-joyride';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { IResponseError, IUserEntity } from '@novu/shared';
 import {

@@ -1,4 +1,4 @@
-import { IEnvironment, providers } from '@novu/shared';
+import { type IEnvironment, providers } from '@novu/shared';
 
 import type { IntegrationEntity, ITableIntegration } from './types';
 import { CONTEXT_PATH } from '../../config';

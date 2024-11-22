@@ -2,10 +2,11 @@ import { Handle, Position } from 'react-flow-renderer';
 import { BoltOutlinedGradient, Button, colors, Playground, shadows, Text, Title } from '@novu/design-system';
 import styled from '@emotion/styled';
 import { createStyles, Group, Popover, Stack, useMantineColorScheme } from '@mantine/core';
-import type { INotificationTemplate, IResponseError } from '@novu/shared';
 import {
+  type INotificationTemplate,
+  type IResponseError,
   ActorTypeEnum,
-  ICreateNotificationTemplateDto,
+  type ICreateNotificationTemplateDto,
   StepTypeEnum,
   SystemAvatarIconEnum,
   WorkflowCreationSourceEnum,

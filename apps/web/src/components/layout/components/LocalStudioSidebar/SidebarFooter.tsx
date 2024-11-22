@@ -1,7 +1,7 @@
-import { CorePropsWithChildren } from '@novu/novui';
+import { type CorePropsWithChildren } from '@novu/novui';
 import { css, cx } from '@novu/novui/css';
 import { Box, Stack } from '@novu/novui/jsx';
-import { FC } from 'react';
+import { type FC } from 'react';
 import { NavMenuFooter } from '../../../nav/NavMenuFooter';
 
 export type SidebarFooterProps = CorePropsWithChildren;

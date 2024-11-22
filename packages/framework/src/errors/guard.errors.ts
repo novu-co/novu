@@ -1,6 +1,6 @@
 import { ErrorCodeEnum } from '../constants';
-import { FrameworkError } from './base.errors';
-import { PlatformError } from './platform.errors';
+import { type FrameworkError } from './base.errors';
+import { type PlatformError } from './platform.errors';
 
 /**
  * Check if the error is a `FrameworkError`.

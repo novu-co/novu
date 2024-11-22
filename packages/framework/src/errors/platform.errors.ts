@@ -1,4 +1,4 @@
-import { ErrorCodeEnum, HttpStatusEnum } from '../constants';
+import { type ErrorCodeEnum, type HttpStatusEnum } from '../constants';
 
 export class PlatformError extends Error {
   /**

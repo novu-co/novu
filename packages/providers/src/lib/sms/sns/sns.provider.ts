@@ -1,19 +1,19 @@
 import {
   ChannelTypeEnum,
-  ISendMessageSuccessResponse,
-  ISmsOptions,
-  ISmsProvider,
+  type ISendMessageSuccessResponse,
+  type ISmsOptions,
+  type ISmsProvider,
 } from '@novu/stateless';
 import {
   PublishCommand,
-  PublishCommandInput,
+  type PublishCommandInput,
   SNSClient,
 } from '@aws-sdk/client-sns';
 
 import { SmsProviderIdEnum } from '@novu/shared';
-import { SNSConfig } from './sns.config';
+import { type SNSConfig } from './sns.config';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 export class SNSSmsProvider extends BaseProvider implements ISmsProvider {
   id = SmsProviderIdEnum.SNS;

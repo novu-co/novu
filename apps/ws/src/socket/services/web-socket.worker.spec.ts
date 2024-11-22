@@ -2,7 +2,11 @@ import { Test } from '@nestjs/testing';
 import { expect } from 'chai';
 import { setTimeout } from 'timers/promises';
 
-import { IWebSocketDataDto, WebSocketsQueueService, WorkflowInMemoryProviderService } from '@novu/application-generic';
+import {
+  type IWebSocketDataDto,
+  WebSocketsQueueService,
+  WorkflowInMemoryProviderService,
+} from '@novu/application-generic';
 import { WebSocketEventEnum } from '@novu/shared';
 
 import { WebSocketWorker } from './web-socket.worker';

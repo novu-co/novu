@@ -1,5 +1,9 @@
-import { SubscriberEntity, TenantEntity } from '@novu/dal';
-import { ICondition, IMessageFilter, ITriggerPayload } from '@novu/shared';
+import { type SubscriberEntity, type TenantEntity } from '@novu/dal';
+import {
+  type ICondition,
+  type IMessageFilter,
+  type ITriggerPayload,
+} from '@novu/shared';
 
 export interface IFilterVariables {
   payload?: ITriggerPayload;

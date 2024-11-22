@@ -1,4 +1,4 @@
-import { JobTitleEnum, ProductUseCasesEnum } from '../../types';
+import { type JobTitleEnum, type ProductUseCasesEnum } from '../../types';
 
 export type ProductUseCases = Partial<Record<ProductUseCasesEnum, boolean>>;
 

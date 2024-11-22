@@ -1,7 +1,7 @@
-import React, { ChangeEvent, FocusEvent } from 'react';
-import { TextInputProps, TextInput as MantineTextInput, Styles, InputProps } from '@mantine/core';
+import React, { type ChangeEvent, type FocusEvent } from 'react';
+import { type TextInputProps, TextInput as MantineTextInput, type Styles, type InputProps } from '@mantine/core';
 import { inputStyles } from '../config/inputs.styles';
-import { SpacingProps } from '../shared/spacing.props';
+import { type SpacingProps } from '../shared/spacing.props';
 
 export interface IInputProps extends SpacingProps, Pick<InputProps, 'classNames'> {
   label?: React.ReactNode;

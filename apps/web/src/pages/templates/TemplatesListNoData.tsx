@@ -8,7 +8,7 @@ import { CardTile, colors, Popover } from '@novu/design-system';
 import { WorkflowCreationSourceEnum } from '@novu/shared';
 
 import { useSegment } from '../../components/providers/SegmentProvider';
-import { IBlueprintTemplate } from '../../api/types';
+import { type IBlueprintTemplate } from '../../api/types';
 import { useHoverOverItem } from '../../hooks';
 import { FrameworkProjectCardTile } from './components/FrameworkProjectWaitList';
 

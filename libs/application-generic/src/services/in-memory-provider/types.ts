@@ -1,5 +1,5 @@
 import {
-  ChainableCommander,
+  type ChainableCommander,
   Cluster,
   ClusterOptions,
   Redis,

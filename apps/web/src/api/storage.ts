@@ -1,4 +1,4 @@
-import { UploadTypesEnum } from '@novu/shared';
+import { type UploadTypesEnum } from '@novu/shared';
 import { api } from './api.client';
 
 export interface IGetSignedUrlParams {

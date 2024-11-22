@@ -3,15 +3,15 @@ import { Prism } from '@mantine/prism';
 import { IconOutlineBolt } from '@novu/novui/icons';
 import { Tabs, Title } from '@novu/novui';
 import { HStack } from '@novu/novui/jsx';
-import { FC } from 'react';
-import { Language } from 'prism-react-renderer';
+import { type FC } from 'react';
+import { type Language } from 'prism-react-renderer';
 import {
   createNodeSnippet,
   createCurlSnippet,
   createPhpSnippet,
   createGoSnippet,
   createPythonSnippet,
-  CodeSnippetProps,
+  type CodeSnippetProps,
 } from '../../../../utils/codeSnippets';
 
 type Snippet = {

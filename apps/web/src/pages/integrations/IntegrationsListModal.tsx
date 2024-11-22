@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useReducer, useState } from 'react';
-import { Group, Modal, ActionIcon, createStyles, MantineTheme } from '@mantine/core';
-import { ChannelTypeEnum, FeatureFlagsKeysEnum } from '@novu/shared';
+import { Group, Modal, ActionIcon, createStyles, type MantineTheme } from '@mantine/core';
+import { type ChannelTypeEnum, FeatureFlagsKeysEnum } from '@novu/shared';
 
 import { colors, Close } from '@novu/design-system';
-import { Row } from 'react-table';
+import { type Row } from 'react-table';
 import { useFeatureFlag, useKeyDown } from '../../hooks';
 import { useSegment } from '../../components/providers/SegmentProvider';
 import { IntegrationsStoreModalAnalytics } from './constants';

@@ -1,6 +1,6 @@
 import { createEffect, createResource, createSignal, onCleanup, onMount } from 'solid-js';
-import { Preference } from '../../../preferences/preference';
-import { FetchPreferencesArgs } from '../../../preferences/types';
+import { type Preference } from '../../../preferences/preference';
+import { type FetchPreferencesArgs } from '../../../preferences/types';
 import { useNovu } from '../../context';
 
 export const usePreferences = (options?: FetchPreferencesArgs) => {

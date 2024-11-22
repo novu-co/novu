@@ -1,8 +1,8 @@
-import { expect, test, vi, describe, Mocked, beforeEach } from 'vitest';
+import { expect, test, vi, describe, type Mocked, beforeEach } from 'vitest';
 import axios from 'axios';
-import { IEmailOptions } from '@novu/stateless';
+import { type IEmailOptions } from '@novu/stateless';
 import { NetCoreProvider } from './netcore.provider';
-import { IEmailBody } from './netcore-types';
+import { type IEmailBody } from './netcore-types';
 
 vi.mock('axios');
 

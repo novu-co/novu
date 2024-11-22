@@ -1,4 +1,4 @@
-import { ErrorCodeEnum, PostActionEnum, ResourceEnum } from '../constants';
+import { ErrorCodeEnum, type PostActionEnum, ResourceEnum } from '../constants';
 import { ResourceExecutionFailed, ResourceNotFoundError } from './resource.errors';
 
 export class ProviderNotFoundError extends ResourceNotFoundError {

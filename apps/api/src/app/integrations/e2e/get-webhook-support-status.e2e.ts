@@ -8,7 +8,7 @@ import {
   PushProviderIdEnum,
   SmsProviderIdEnum,
 } from '@novu/shared';
-import { IntegrationEntity, IntegrationRepository } from '@novu/dal';
+import { type IntegrationEntity, IntegrationRepository } from '@novu/dal';
 
 describe('Get Webhook Support Status - /webhook/provider/:providerOrIntegrationId/status (GET)', function () {
   let session: UserSession;

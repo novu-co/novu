@@ -1,7 +1,7 @@
 import { Badge, Card, Container, Group, Space, useMantineTheme } from '@mantine/core';
 import { useState } from 'react';
 import { formatDistanceToNow, subMinutes } from 'date-fns';
-import { IMessageAction } from '@novu/shared';
+import { type IMessageAction } from '@novu/shared';
 
 import { colors, shadows, Text, Title } from '@novu/design-system';
 import { ActionBlockContainer } from './ActionBlockContainer';

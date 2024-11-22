@@ -1,6 +1,6 @@
 import { Button } from '@novu/design-system';
 import { useFormContext } from 'react-hook-form';
-import { IForm } from './formTypes';
+import { type IForm } from './formTypes';
 import { useEnvironment } from '../../../hooks';
 import { useTemplateEditorForm } from './TemplateEditorFormProvider';
 

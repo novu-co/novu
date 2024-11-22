@@ -1,4 +1,4 @@
-import { ChannelTypeEnum } from '@novu/shared';
+import { type ChannelTypeEnum } from '@novu/shared';
 import { useMemo } from 'react';
 import { useEnvironment, useIntegrations } from '../../hooks';
 

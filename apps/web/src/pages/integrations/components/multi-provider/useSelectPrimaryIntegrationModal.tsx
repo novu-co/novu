@@ -2,7 +2,10 @@ import { useState, useCallback } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 
 import { useInlineComponent } from '../../../../hooks';
-import { ISelectPrimaryIntegrationModalProps, SelectPrimaryIntegrationModal } from './SelectPrimaryIntegrationModal';
+import {
+  type ISelectPrimaryIntegrationModalProps,
+  SelectPrimaryIntegrationModal,
+} from './SelectPrimaryIntegrationModal';
 
 export const useSelectPrimaryIntegrationModal = () => {
   const [isOpened, { open, close }] = useDisclosure(false);

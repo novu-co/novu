@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import { type CSSProperties } from 'react';
 import { Translate } from '@novu/design-system';
 import { ProductLead, ProductLeadVariants } from '../../../components/utils/ProductLead';
 

@@ -2,7 +2,7 @@ import { Group } from '@mantine/core';
 import { Title, Container } from '@novu/design-system';
 import { Flex } from '@novu/novui/jsx';
 import { DocsButton } from '../../docs/DocsButton';
-import { DocsPaths, useDocsPath } from '../../docs/useDocsPath';
+import { type DocsPaths, useDocsPath } from '../../docs/useDocsPath';
 import { ROUTES } from '../../../constants/routes';
 import { PATHS } from '../../docs/docs.const';
 

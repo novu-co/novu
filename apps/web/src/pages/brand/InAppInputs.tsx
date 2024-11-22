@@ -1,6 +1,6 @@
 import { ColorInput, Select } from '@novu/design-system';
-import { Control, Controller } from 'react-hook-form';
-import { FONT_FAMILIES, IBrandFormValues } from './BrandingPage.const';
+import { type Control, Controller } from 'react-hook-form';
+import { FONT_FAMILIES, type IBrandFormValues } from './BrandingPage.const';
 import { inputWrapperStyles } from './BrandingPage.styles';
 
 type InAppInputsProps = {

@@ -1,5 +1,5 @@
 import type { IMessage, IPaginatedResponse } from '@novu/shared';
-import { InfiniteData, useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query';
+import { type InfiniteData, useMutation, type UseMutationOptions, useQueryClient } from '@tanstack/react-query';
 
 import { useNovuContext } from './useNovuContext';
 import { useFetchNotificationsQueryKey } from './useFetchNotificationsQueryKey';

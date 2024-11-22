@@ -1,11 +1,11 @@
-import { IPushOptions, IPushProvider } from '@novu/stateless';
+import { type IPushOptions, type IPushProvider } from '@novu/stateless';
 import {
-  ChannelTypeEnum,
-  ICredentials,
-  PushProviderIdEnum,
+  type ChannelTypeEnum,
+  type ICredentials,
+  type PushProviderIdEnum,
 } from '@novu/shared';
 import {} from '@novu/dal';
-import { IPushHandler } from '../interfaces';
+import { type IPushHandler } from '../interfaces';
 
 export abstract class BasePushHandler implements IPushHandler {
   protected provider: IPushProvider;

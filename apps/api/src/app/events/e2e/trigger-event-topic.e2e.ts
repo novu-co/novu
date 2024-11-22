@@ -2,21 +2,21 @@ import {
   LogRepository,
   MessageRepository,
   NotificationRepository,
-  NotificationTemplateEntity,
-  SubscriberEntity,
+  type NotificationTemplateEntity,
+  type SubscriberEntity,
 } from '@novu/dal';
 import {
   ChannelTypeEnum,
   StepTypeEnum,
-  IEmailBlock,
-  ISubscribersDefine,
-  ITopic,
-  TopicId,
-  TopicKey,
-  TopicName,
-  TriggerRecipients,
+  type IEmailBlock,
+  type ISubscribersDefine,
+  type ITopic,
+  type TopicId,
+  type TopicKey,
+  type TopicName,
+  type TriggerRecipients,
   TriggerRecipientsTypeEnum,
-  ExternalSubscriberId,
+  type ExternalSubscriberId,
   DigestUnitEnum,
   DigestTypeEnum,
 } from '@novu/shared';
@@ -24,7 +24,7 @@ import { SubscribersService, UserSession } from '@novu/testing';
 import axios from 'axios';
 import { expect } from 'chai';
 
-import { TriggerEventRequestDto } from '../dtos';
+import { type TriggerEventRequestDto } from '../dtos';
 
 const axiosInstance = axios.create();
 

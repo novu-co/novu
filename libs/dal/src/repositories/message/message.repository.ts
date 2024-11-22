@@ -1,19 +1,19 @@
-import { SoftDeleteModel } from 'mongoose-delete';
-import { FilterQuery, Types } from 'mongoose';
+import { type SoftDeleteModel } from 'mongoose-delete';
+import { type FilterQuery, Types } from 'mongoose';
 import {
   ActorTypeEnum,
   ButtonTypeEnum,
-  ChannelTypeEnum,
-  MessageActionStatusEnum,
+  type ChannelTypeEnum,
+  type MessageActionStatusEnum,
   MessagesStatusEnum,
 } from '@novu/shared';
 
 import { BaseRepository } from '../base-repository';
-import { MessageDBModel, MessageEntity } from './message.entity';
+import { type MessageDBModel, MessageEntity } from './message.entity';
 import { Message } from './message.schema';
 import { FeedRepository } from '../feed';
 import { DalException } from '../../shared';
-import { EnforceEnvId } from '../../types/enforce';
+import { type EnforceEnvId } from '../../types/enforce';
 
 type MessageQuery = FilterQuery<MessageDBModel>;
 

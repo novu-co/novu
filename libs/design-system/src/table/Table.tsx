@@ -1,19 +1,19 @@
 import React, { useEffect, useMemo } from 'react';
-import { Skeleton, TableProps, Table as MantineTable, Pagination, Button } from '@mantine/core';
+import { Skeleton, type TableProps, Table as MantineTable, Pagination, Button } from '@mantine/core';
 import styled from '@emotion/styled';
 import {
   useTable,
-  Column,
+  type Column,
   usePagination,
-  TableInstance,
-  UsePaginationInstanceProps,
-  UsePaginationState,
-  Row,
-  CellProps,
-  IdType,
+  type TableInstance,
+  type UsePaginationInstanceProps,
+  type UsePaginationState,
+  type Row,
+  type CellProps,
+  type IdType,
   useRowSelect,
-  UseRowSelectInstanceProps,
-  UseRowSelectState,
+  type UseRowSelectInstanceProps,
+  type UseRowSelectState,
 } from 'react-table';
 import { useDataRef } from '../hooks/useDataRef';
 

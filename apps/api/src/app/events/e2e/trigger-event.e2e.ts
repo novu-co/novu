@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import axios, { AxiosResponse } from 'axios';
+import axios, { type AxiosResponse } from 'axios';
 import { v4 as uuid } from 'uuid';
 import { differenceInMilliseconds, subDays } from 'date-fns';
 import {
@@ -10,9 +10,9 @@ import {
   JobStatusEnum,
   MessageRepository,
   NotificationRepository,
-  NotificationTemplateEntity,
+  type NotificationTemplateEntity,
   NotificationTemplateRepository,
-  SubscriberEntity,
+  type SubscriberEntity,
   SubscriberRepository,
   TenantRepository,
 } from '@novu/dal';
@@ -28,9 +28,9 @@ import {
   FieldLogicalOperatorEnum,
   FieldOperatorEnum,
   FilterPartTypeEnum,
-  IEmailBlock,
+  type IEmailBlock,
   InAppProviderIdEnum,
-  ISubscribersDefine,
+  type ISubscribersDefine,
   PreviousStepTypeEnum,
   SmsProviderIdEnum,
   StepTypeEnum,

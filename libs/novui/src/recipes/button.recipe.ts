@@ -1,4 +1,4 @@
-import { ButtonStylesNames } from '@mantine/core';
+import { type ButtonStylesNames } from '@mantine/core';
 import { defineSlotRecipe } from '@pandacss/dev';
 import { colorPaletteGradientHorizontal, colorPaletteGradientText } from '../ingredients';
 

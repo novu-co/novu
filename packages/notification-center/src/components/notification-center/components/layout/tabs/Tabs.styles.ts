@@ -1,6 +1,6 @@
-import { createStyles, MantineTheme } from '@mantine/core';
-import { INovuTheme } from '../../../../../store/novu-theme.context';
-import { ICommonTheme } from '../../../../../store/novu-theme-provider.context';
+import { createStyles, type MantineTheme } from '@mantine/core';
+import { type INovuTheme } from '../../../../../store/novu-theme.context';
+import { type ICommonTheme } from '../../../../../store/novu-theme-provider.context';
 import { colors } from '../../../../../shared/config/colors';
 
 export default createStyles(

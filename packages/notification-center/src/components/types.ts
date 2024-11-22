@@ -1,8 +1,8 @@
-import { CSSInterpolation } from '@emotion/css';
+import { type CSSInterpolation } from '@emotion/css';
 
-import { ColorScheme } from '../shared/config/colors';
-import { ICommonTheme } from '../store/novu-theme-provider.context';
-import { INovuTheme } from '../store/novu-theme.context';
+import { type ColorScheme } from '../shared/config/colors';
+import { type ICommonTheme } from '../store/novu-theme-provider.context';
+import { type INovuTheme } from '../store/novu-theme.context';
 
 export type CSSFunctionInterpolation = (args: {
   theme: INovuTheme;

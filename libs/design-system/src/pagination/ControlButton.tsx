@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
 import { useMantineTheme } from '@mantine/core';
-import { CSSProperties, forwardRef, useContext } from 'react';
-import { Button, IButtonProps } from '../button/Button';
+import { type CSSProperties, forwardRef, useContext } from 'react';
+import { Button, type IButtonProps } from '../button/Button';
 import { colors } from '../config';
-import { IPaginationContext, PaginationContext } from './PaginationContext';
+import { type IPaginationContext, PaginationContext } from './PaginationContext';
 
 export type TPageButtonClickHandler = (ctx: IPaginationContext) => void;
 

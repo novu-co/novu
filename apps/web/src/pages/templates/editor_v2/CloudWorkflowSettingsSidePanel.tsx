@@ -1,13 +1,13 @@
-import { FC, useEffect } from 'react';
+import { type FC, useEffect } from 'react';
 
 import { Sidebar } from '@novu/design-system';
 import { Title } from '@novu/novui';
 import { css } from '@novu/novui/css';
 import { useFormContext } from 'react-hook-form';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { WorkflowTypeEnum } from '@novu/shared';
+import { type WorkflowTypeEnum } from '@novu/shared';
 import { useCloudWorkflowPreferences } from '../../../hooks/workflowPreferences/useCloudWorkflowPreferences';
-import { WorkflowDetailFormContext } from '../../../studio/components/workflows/preferences/WorkflowDetailFormContextProvider';
+import { type WorkflowDetailFormContext } from '../../../studio/components/workflows/preferences/WorkflowDetailFormContextProvider';
 import { WorkflowSettingsSidePanelContent } from '../../../studio/components/workflows/preferences/WorkflowSettingsSidePanelContent';
 
 type CloudWorkflowSettingsSidePanelProps = { onClose: () => void };

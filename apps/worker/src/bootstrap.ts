@@ -3,7 +3,7 @@ import './instrument';
 import 'newrelic';
 
 import helmet from 'helmet';
-import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
+import { type INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import bodyParser from 'body-parser';
 import { BullMqService, getErrorInterceptor, Logger as PinoLogger } from '@novu/application-generic';

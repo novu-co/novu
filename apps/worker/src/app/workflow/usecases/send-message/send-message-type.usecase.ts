@@ -1,10 +1,10 @@
 import { captureException } from '@sentry/node';
-import { MessageEntity, MessageRepository } from '@novu/dal';
-import { LogCodeEnum } from '@novu/shared';
-import { ExecutionLogRoute } from '@novu/application-generic';
+import { type MessageEntity, type MessageRepository } from '@novu/dal';
+import { type LogCodeEnum } from '@novu/shared';
+import { type ExecutionLogRoute } from '@novu/application-generic';
 
-import { CreateLog } from '../../../shared/logs';
-import { SendMessageCommand } from './send-message.command';
+import { type CreateLog } from '../../../shared/logs';
+import { type SendMessageCommand } from './send-message.command';
 
 export abstract class SendMessageType {
   protected constructor(

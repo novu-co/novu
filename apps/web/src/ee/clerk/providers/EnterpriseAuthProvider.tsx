@@ -1,7 +1,7 @@
 import { createContext, useCallback, useEffect, useMemo } from 'react';
 import type { IOrganizationEntity, IUserEntity } from '@novu/shared';
 import { useAuth, useUser, useOrganization } from '@clerk/clerk-react';
-import { OrganizationResource, UserResource } from '@clerk/types';
+import { type OrganizationResource, type UserResource } from '@clerk/types';
 
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';

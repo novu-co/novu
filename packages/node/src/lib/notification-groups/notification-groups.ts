@@ -1,6 +1,6 @@
 import {
-  INotificationGroupUpdatePayload,
-  INotificationGroups,
+  type INotificationGroupUpdatePayload,
+  type INotificationGroups,
 } from './notification-groups.interface';
 import { WithHttp } from '../novu.interface';
 

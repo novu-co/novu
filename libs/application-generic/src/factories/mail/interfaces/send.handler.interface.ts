@@ -1,8 +1,12 @@
-import { IEmailOptions, ChannelTypeEnum, ICredentials } from '@novu/shared';
 import {
-  IEmailProvider,
-  ISendMessageSuccessResponse,
-  ICheckIntegrationResponse,
+  type IEmailOptions,
+  type ChannelTypeEnum,
+  type ICredentials,
+} from '@novu/shared';
+import {
+  type IEmailProvider,
+  type ISendMessageSuccessResponse,
+  type ICheckIntegrationResponse,
 } from '@novu/stateless';
 
 export interface IMailHandler {

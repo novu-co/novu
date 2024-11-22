@@ -7,8 +7,8 @@ import {
 } from '@novu/application-generic';
 import {
   ChannelTypeEnum,
-  ISubscriberPreferenceResponse,
-  ITemplateConfiguration,
+  type ISubscriberPreferenceResponse,
+  type ITemplateConfiguration,
   PreferenceLevelEnum,
   PreferenceOverrideSourceEnum,
   PreferencesTypeEnum,

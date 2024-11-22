@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Popover, useMantineTheme, Grid, ColorScheme, createStyles } from '@mantine/core';
+import { Popover, useMantineTheme, Grid, type ColorScheme, createStyles } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import styled from '@emotion/styled';
 import { captureException } from '@sentry/react';

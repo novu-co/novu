@@ -1,8 +1,8 @@
 import {
-  IBroadcastPayloadOptions,
-  IBulkEvents,
-  IEvents,
-  ITriggerPayloadOptions,
+  type IBroadcastPayloadOptions,
+  type IBulkEvents,
+  type IEvents,
+  type ITriggerPayloadOptions,
 } from './events.interface';
 import { WithHttp } from '../novu.interface';
 

@@ -1,9 +1,9 @@
-import { SoftDeleteModel } from 'mongoose-delete';
-import { ControlValuesLevelEnum } from '@novu/shared';
-import { ControlValuesModel, ControlValues } from './control-values.schema';
+import { type SoftDeleteModel } from 'mongoose-delete';
+import { type ControlValuesLevelEnum } from '@novu/shared';
+import { type ControlValuesModel, ControlValues } from './control-values.schema';
 import { ControlValuesEntity } from './control-values.entity';
 import { BaseRepository } from '../base-repository';
-import { EnforceEnvOrOrgIds } from '../../types';
+import { type EnforceEnvOrOrgIds } from '../../types';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface DeleteManyValuesQuery {

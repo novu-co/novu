@@ -3,13 +3,13 @@ import { expect } from 'chai';
 import { getTime, parseISO } from 'date-fns';
 import {
   MessageRepository,
-  NotificationTemplateEntity,
-  SubscriberEntity,
+  type NotificationTemplateEntity,
+  type SubscriberEntity,
   JobRepository,
   JobStatusEnum,
-  JobEntity,
+  type JobEntity,
 } from '@novu/dal';
-import { StepTypeEnum, DigestTypeEnum, DigestUnitEnum, IDigestRegularMetadata } from '@novu/shared';
+import { StepTypeEnum, DigestTypeEnum, DigestUnitEnum, type IDigestRegularMetadata } from '@novu/shared';
 import { UserSession, SubscribersService } from '@novu/testing';
 
 const axiosInstance = axios.create();

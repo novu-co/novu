@@ -1,4 +1,4 @@
-import { JobTitleEnum } from '../../types';
+import { type JobTitleEnum } from '../../types';
 
 export type UpdateExternalOrganizationDto = {
   jobTitle?: JobTitleEnum;

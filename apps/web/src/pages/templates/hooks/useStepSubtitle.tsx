@@ -1,7 +1,7 @@
 import { StepTypeEnum } from '@novu/shared';
 import { useMemo } from 'react';
 
-import { IFlowStep } from '../../../components/workflow/types';
+import { type IFlowStep } from '../../../components/workflow/types';
 import { WillBeSentHeader } from '../workflow/digest/WillBeSentHeader';
 import { delaySubtitle } from '../workflow/workflow/node-types/utils';
 

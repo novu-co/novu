@@ -3,8 +3,8 @@ import axios from 'axios';
 import { addSeconds, differenceInMilliseconds, subDays } from 'date-fns';
 import {
   MessageRepository,
-  NotificationTemplateEntity,
-  SubscriberEntity,
+  type NotificationTemplateEntity,
+  type SubscriberEntity,
   JobRepository,
   JobStatusEnum,
 } from '@novu/dal';

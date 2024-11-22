@@ -11,7 +11,7 @@ import {
 } from '@novu/novui/icons';
 import { HStack, styled, VStack } from '@novu/novui/jsx';
 import { text as textRecipe } from '@novu/novui/recipes';
-import { ReactNode, useEffect } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
 import { useTelemetry } from '../../../hooks/useNovuAPI';

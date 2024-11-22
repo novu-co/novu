@@ -5,7 +5,7 @@ import {
   StepTypeEnum,
 } from '@novu/shared';
 import {
-  MessageTemplateEntity,
+  type MessageTemplateEntity,
   TenantRepository,
   SubscriberRepository,
   MessageTemplateRepository,
@@ -13,7 +13,7 @@ import {
 
 import { ConditionsFilter } from '../conditions-filter';
 import { SelectVariant } from './select-variant.usecase';
-import { SelectVariantCommand } from './select-variant.command';
+import { type SelectVariantCommand } from './select-variant.command';
 import { NormalizeVariables } from '../normalize-variables';
 
 const findOneMessageTemplateMock = jest.fn(() => testVariant);

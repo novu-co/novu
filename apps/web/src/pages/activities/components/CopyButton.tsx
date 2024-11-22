@@ -1,5 +1,5 @@
-import { SVGProps, useState } from 'react';
-import { createStyles, Tooltip, UnstyledButton, UnstyledButtonProps } from '@mantine/core';
+import { type SVGProps, useState } from 'react';
+import { createStyles, Tooltip, UnstyledButton, type UnstyledButtonProps } from '@mantine/core';
 import { useTimeout } from '@mantine/hooks';
 
 export const CopyIcon = (props: SVGProps<SVGSVGElement>) => {

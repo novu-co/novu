@@ -1,4 +1,4 @@
-import { NotificationStepVariantCommand } from '../../usecases/create-workflow';
+import { type NotificationStepVariantCommand } from '../../usecases/create-workflow';
 
 /** determine if the variant has no filters / conditions */
 export const isVariantEmpty = (

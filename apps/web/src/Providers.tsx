@@ -2,7 +2,7 @@ import { ThemeProvider } from '@novu/design-system';
 import { HelmetProvider } from 'react-helmet-async';
 import { withProfiler } from '@sentry/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { PropsWithChildren } from 'react';
+import { type PropsWithChildren } from 'react';
 import { NovuiProvider } from '@novu/novui';
 import { api } from './api/api.client';
 import { AuthProvider } from './components/providers/AuthProvider';

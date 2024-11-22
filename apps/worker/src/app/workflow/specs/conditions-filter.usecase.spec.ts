@@ -1,19 +1,19 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
 import axios from 'axios';
-import { Duration, sub } from 'date-fns';
+import { type Duration, sub } from 'date-fns';
 import {
-  BuilderGroupValues,
+  type BuilderGroupValues,
   FieldLogicalOperatorEnum,
   FieldOperatorEnum,
-  FilterParts,
+  type FilterParts,
   FilterPartTypeEnum,
   FILTER_TO_LABEL,
   StepTypeEnum,
   TimeOperatorEnum,
 } from '@novu/shared';
-import { JobEntity, MessageTemplateEntity, NotificationStepEntity } from '@novu/dal';
-import { CompileTemplate, ConditionsFilter, ConditionsFilterCommand } from '@novu/application-generic';
+import { type JobEntity, type MessageTemplateEntity, type NotificationStepEntity } from '@novu/dal';
+import { CompileTemplate, ConditionsFilter, type ConditionsFilterCommand } from '@novu/application-generic';
 
 describe('Message filter matcher', function () {
   const executionLogQueueService = {

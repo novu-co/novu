@@ -5,7 +5,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { FilterPartTypeEnum } from '@novu/shared';
 import { ActionButton, Condition, ConditionPlus, Trash, VariantPlus } from '@novu/design-system';
 
-import { Conditions, IConditions } from '../../../components/conditions';
+import { Conditions, type IConditions } from '../../../components/conditions';
 import { When } from '../../../components/utils/When';
 import { useEnvironment } from '../../../hooks';
 import { useBasePath } from '../hooks/useBasePath';
@@ -13,7 +13,7 @@ import { useFilterPartsList } from '../hooks/useFilterPartsList';
 import { useStepIndex } from '../hooks/useStepIndex';
 import { useStepVariantsCount } from '../hooks/useStepVariantsCount';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
-import { IForm } from './formTypes';
+import { type IForm } from './formTypes';
 import { makeVariantFromStep, useTemplateEditorForm } from './TemplateEditorFormProvider';
 
 const variantsCreatePath = '/variants/create';

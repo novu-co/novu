@@ -1,5 +1,8 @@
-import { IPushOptions, ISendMessageSuccessResponse } from '@novu/stateless';
-import { ChannelTypeEnum, ICredentials } from '@novu/shared';
+import {
+  type IPushOptions,
+  type ISendMessageSuccessResponse,
+} from '@novu/stateless';
+import { type ChannelTypeEnum, type ICredentials } from '@novu/shared';
 
 export interface IPushHandler {
   canHandle(providerId: string, channelType: ChannelTypeEnum);

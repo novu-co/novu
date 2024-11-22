@@ -1,18 +1,18 @@
 import { EmailProviderIdEnum } from '@novu/shared';
 import {
   ChannelTypeEnum,
-  IEmailOptions,
-  IEmailProvider,
-  ISendMessageSuccessResponse,
-  ICheckIntegrationResponse,
+  type IEmailOptions,
+  type IEmailProvider,
+  type ISendMessageSuccessResponse,
+  type ICheckIntegrationResponse,
   CheckIntegrationResponseEnum,
 } from '@novu/stateless';
-import nodemailer, { SendMailOptions, Transporter } from 'nodemailer';
-import DKIM from 'nodemailer/lib/dkim';
-import SMTPTransport from 'nodemailer/lib/smtp-transport';
-import { ConnectionOptions } from 'tls';
+import nodemailer, { type SendMailOptions, type Transporter } from 'nodemailer';
+import type DKIM from 'nodemailer/lib/dkim';
+import type SMTPTransport from 'nodemailer/lib/smtp-transport';
+import { type ConnectionOptions } from 'tls';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 interface INodemailerConfig {
   from: string;

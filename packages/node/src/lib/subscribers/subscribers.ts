@@ -1,19 +1,19 @@
-import { AxiosResponse } from 'axios';
+import { type AxiosResponse } from 'axios';
 import {
-  ButtonTypeEnum,
-  IChannelCredentials,
-  ISubscribersDefine,
-  MessagesStatusEnum,
+  type ButtonTypeEnum,
+  type IChannelCredentials,
+  type ISubscribersDefine,
+  type MessagesStatusEnum,
   PreferenceLevelEnum,
 } from '@novu/shared';
 import {
-  IGetSubscriberNotificationFeedParams,
-  IMarkFields,
-  IMarkMessageActionFields,
-  ISubscriberPayload,
-  ISubscribers,
-  IUpdateSubscriberGlobalPreferencePayload,
-  IUpdateSubscriberPreferencePayload,
+  type IGetSubscriberNotificationFeedParams,
+  type IMarkFields,
+  type IMarkMessageActionFields,
+  type ISubscriberPayload,
+  type ISubscribers,
+  type IUpdateSubscriberGlobalPreferencePayload,
+  type IUpdateSubscriberPreferencePayload,
 } from './subscriber.interface';
 import { WithHttp } from '../novu.interface';
 

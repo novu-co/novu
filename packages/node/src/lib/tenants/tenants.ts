@@ -1,9 +1,9 @@
-import { TenantIdentifier } from '@novu/shared';
+import { type TenantIdentifier } from '@novu/shared';
 import {
-  ITenants,
-  ITenantPayload,
-  ITenantUpdatePayload,
-  ITenantPaginationPayload,
+  type ITenants,
+  type ITenantPayload,
+  type ITenantUpdatePayload,
+  type ITenantPaginationPayload,
 } from './tenant.interface';
 import { WithHttp } from '../novu.interface';
 

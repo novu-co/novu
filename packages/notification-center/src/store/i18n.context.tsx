@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { I18NLanguage, ITranslationEntry, TRANSLATIONS } from '../i18n/lang';
+import { type I18NLanguage, type ITranslationEntry, TRANSLATIONS } from '../i18n/lang';
 
 export const I18NContext = React.createContext<ITranslationEntry>({
   translations: {

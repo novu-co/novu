@@ -2,7 +2,7 @@ import { CommunityOrganizationRepository, EnvironmentRepository } from '@novu/da
 import { UserSession } from '@novu/testing';
 import jwt from 'jsonwebtoken';
 import { expect } from 'chai';
-import { MemberRoleEnum, UserSessionData } from '@novu/shared';
+import { MemberRoleEnum, type UserSessionData } from '@novu/shared';
 
 describe('User registration - /auth/register (POST) @skip-in-ee', async () => {
   let session: UserSession;

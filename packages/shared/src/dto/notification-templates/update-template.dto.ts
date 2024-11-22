@@ -1,5 +1,5 @@
-import { NotificationStepDto } from '../workflows';
-import { NotificationTemplateCustomData } from '../../types';
+import { type NotificationStepDto } from '../workflows';
+import { type NotificationTemplateCustomData } from '../../types';
 
 export interface IUpdateNotificationTemplateDto {
   name?: string;

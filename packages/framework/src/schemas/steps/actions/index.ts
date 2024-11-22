@@ -1,4 +1,4 @@
-import { ActionStepEnum } from '../../../constants';
+import { type ActionStepEnum } from '../../../constants';
 import type { JsonSchema } from '../../../types/schema.types';
 import { delayActionSchemas } from './delay.schema';
 import { digestActionSchemas } from './digest.schema';

@@ -2,7 +2,7 @@ import type { Step } from './step.types';
 import type { Subscriber } from './subscriber.types';
 import type { DeepPartial, Prettify } from './util.types';
 import type { Schema } from './schema.types';
-import { WorkflowChannelEnum } from '../constants';
+import { type WorkflowChannelEnum } from '../constants';
 
 /**
  * The parameters for the workflow function.

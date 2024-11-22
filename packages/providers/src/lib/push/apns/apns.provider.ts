@@ -1,13 +1,13 @@
 import { PushProviderIdEnum } from '@novu/shared';
 import {
   ChannelTypeEnum,
-  IPushOptions,
-  IPushProvider,
-  ISendMessageSuccessResponse,
+  type IPushOptions,
+  type IPushProvider,
+  type ISendMessageSuccessResponse,
 } from '@novu/stateless';
 import apn from '@parse/node-apn';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
+import { type WithPassthrough } from '../../../utils/types';
 
 export class APNSPushProvider extends BaseProvider implements IPushProvider {
   id = PushProviderIdEnum.APNS;

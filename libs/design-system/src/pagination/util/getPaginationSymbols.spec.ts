@@ -1,6 +1,6 @@
 import { expect, it, describe } from 'vitest';
 import { MAX_PAGE_COUNT_WITHOUT_ELLIPSIS } from '../Pagination.const';
-import { getPaginationSymbols, PaginationSymbol } from './getPaginationSymbols';
+import { getPaginationSymbols, type PaginationSymbol } from './getPaginationSymbols';
 
 describe(getPaginationSymbols.name, () => {
   it('should have a single page number for 1 page', () => {

@@ -1,7 +1,7 @@
-import { WorkflowPreferences } from '@novu/shared';
-import { FC, PropsWithChildren } from 'react';
+import { type WorkflowPreferences } from '@novu/shared';
+import { type FC, type PropsWithChildren } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { WorkflowGeneralSettings } from './types';
+import { type WorkflowGeneralSettings } from './types';
 
 interface IWorkflowDetailFormContextProviderProps {}
 

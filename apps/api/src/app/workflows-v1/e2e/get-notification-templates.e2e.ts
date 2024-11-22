@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { NotificationTemplateEntity } from '@novu/dal';
+import { type NotificationTemplateEntity } from '@novu/dal';
 import { UserSession, NotificationTemplateService } from '@novu/testing';
 import {
   ChannelCTATypeEnum,

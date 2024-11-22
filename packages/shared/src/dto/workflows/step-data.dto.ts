@@ -1,6 +1,6 @@
 import type { JSONSchemaDto } from './json-schema-dto';
-import { StepTypeEnum, WorkflowOriginEnum } from '../../types';
-import { StepIssuesDto } from './workflow-commons-fields';
+import { type StepTypeEnum, type WorkflowOriginEnum } from '../../types';
+import { type StepIssuesDto } from './workflow-commons-fields';
 
 export type StepDataDto = {
   controls: ControlsMetadata;

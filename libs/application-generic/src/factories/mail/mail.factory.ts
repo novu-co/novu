@@ -1,4 +1,4 @@
-import { IntegrationEntity } from '@novu/dal';
+import { type IntegrationEntity } from '@novu/dal';
 import {
   SendgridHandler,
   MailgunHandler,
@@ -21,7 +21,7 @@ import {
   PlunkHandler,
   BrazeEmailHandler,
 } from './handlers';
-import { IMailHandler } from './interfaces/send.handler.interface';
+import { type IMailHandler } from './interfaces/send.handler.interface';
 
 export class MailFactory {
   handlers: IMailHandler[] = [

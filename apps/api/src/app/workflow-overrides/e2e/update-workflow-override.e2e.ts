@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import { UserSession } from '@novu/testing';
-import { ICreateWorkflowOverrideRequestDto, IUpdateWorkflowOverrideRequestDto } from '@novu/shared';
+import { type ICreateWorkflowOverrideRequestDto, type IUpdateWorkflowOverrideRequestDto } from '@novu/shared';
 import { NotificationTemplateRepository, TenantRepository } from '@novu/dal';
 
 describe('Update Workflow Override - /workflow-overrides/workflows/:workflowId/tenants/:tenantIdentifier (PUT)', function () {

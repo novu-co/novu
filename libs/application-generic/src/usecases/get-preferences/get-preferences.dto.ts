@@ -1,7 +1,7 @@
 import {
-  PreferencesTypeEnum,
-  WorkflowPreferences,
-  WorkflowPreferencesPartial,
+  type PreferencesTypeEnum,
+  type WorkflowPreferences,
+  type WorkflowPreferencesPartial,
 } from '@novu/shared';
 
 export class GetPreferencesResponseDto {

@@ -1,8 +1,12 @@
-import { Agenda } from '@hokify/agenda';
-import { JobCronNameEnum } from '@novu/shared';
+import { type Agenda } from '@hokify/agenda';
+import { type JobCronNameEnum } from '@novu/shared';
 import { CronService } from './cron.service';
-import { CronJobProcessor, CronMetrics, CronOptions } from './cron.types';
-import { MetricsService } from '../metrics';
+import {
+  type CronJobProcessor,
+  type CronMetrics,
+  type CronOptions,
+} from './cron.types';
+import { type MetricsService } from '../metrics';
 
 export class AgendaCronService extends CronService {
   cronServiceName = 'AgendaCronService';

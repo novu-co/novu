@@ -1,4 +1,4 @@
-import { IPaginationContext } from '../PaginationContext';
+import { type IPaginationContext } from '../PaginationContext';
 
 export interface IAdjustedPageNumParams extends Pick<IPaginationContext, 'currentPageNumber' | 'totalItemCount'> {
   newPageSize: number;

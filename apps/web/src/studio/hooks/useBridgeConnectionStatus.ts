@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ConnectionStatus } from '../types';
+import { type ConnectionStatus } from '../types';
 import { useHealthCheck } from './useBridgeAPI';
 
 export const useBridgeConnectionStatus = () => {

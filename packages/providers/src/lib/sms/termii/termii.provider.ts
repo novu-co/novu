@@ -1,15 +1,15 @@
 import { SmsProviderIdEnum } from '@novu/shared';
 import {
   ChannelTypeEnum,
-  ISendMessageSuccessResponse,
-  ISmsOptions,
-  ISmsProvider,
+  type ISendMessageSuccessResponse,
+  type ISmsOptions,
+  type ISmsProvider,
   SmsEventStatusEnum,
-  ISMSEventBody,
+  type ISMSEventBody,
 } from '@novu/stateless';
 import { BaseProvider, CasingEnum } from '../../../base.provider';
-import { WithPassthrough } from '../../../utils/types';
-import { SmsParams, MessageChannel, SmsJsonResponse } from './sms';
+import { type WithPassthrough } from '../../../utils/types';
+import { type SmsParams, MessageChannel, type SmsJsonResponse } from './sms';
 
 export class TermiiSmsProvider extends BaseProvider implements ISmsProvider {
   public static readonly BASE_URL = 'https://api.ng.termii.com/api/sms/send';

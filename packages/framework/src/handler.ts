@@ -10,7 +10,7 @@ import {
 } from './constants';
 import {
   BridgeError,
-  FrameworkError,
+  type FrameworkError,
   InvalidActionError,
   isFrameworkError,
   MethodNotAllowedError,

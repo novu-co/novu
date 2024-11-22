@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { Title, Text } from '@novu/novui';
 import { VStack } from '@novu/novui/jsx';
 import { useNavigate } from 'react-router-dom';
-import { HealthCheck } from '@novu/framework/internal';
+import { type HealthCheck } from '@novu/framework/internal';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { SetupTimeline } from './components/SetupTimeline';

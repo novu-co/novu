@@ -1,10 +1,10 @@
 import React from 'react';
 import {
   SegmentedControl as MantineSegmentedControl,
-  SegmentedControlProps,
-  SegmentedControlItem,
+  type SegmentedControlProps,
+  type SegmentedControlItem,
   LoadingOverlay,
-  Sx,
+  type Sx,
 } from '@mantine/core';
 import styled from '@emotion/styled';
 import useStyles from './SegmentedControl.styles';

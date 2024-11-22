@@ -1,4 +1,4 @@
-import { createStyles, MantineTheme } from '@mantine/core';
+import { createStyles, type MantineTheme } from '@mantine/core';
 import { colors, shadows } from '../config';
 
 const getGradient = (color) => `linear-gradient(0deg, ${color} 0%, ${color} 100%)`;

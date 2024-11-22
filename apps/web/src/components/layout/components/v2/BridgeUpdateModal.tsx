@@ -4,7 +4,7 @@ import { text } from '@novu/novui/recipes';
 import { Button, Input, Title } from '@novu/novui';
 import { IconOutlineMenuBook } from '@novu/novui/icons';
 import { HStack, Box, styled } from '@novu/novui/jsx';
-import { FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
 import { validateBridgeUrl } from '../../../../api/bridge';
 import { updateBridgeUrl } from '../../../../api';
 import { useEnvironment } from '../../../../hooks';

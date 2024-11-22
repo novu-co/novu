@@ -1,6 +1,6 @@
-import { FC } from 'react';
+import { type FC } from 'react';
 
-import { CoreProps } from '@novu/novui';
+import { type CoreProps } from '@novu/novui';
 import { Grid, GridItem } from '@novu/novui/jsx';
 import { css, cx } from '@novu/novui/css';
 

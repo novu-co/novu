@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest';
-import { MailtrapClient, SendResponse } from 'mailtrap';
+import { MailtrapClient, type SendResponse } from 'mailtrap';
 import { CheckIntegrationResponseEnum } from '@novu/stateless';
 import { MailtrapEmailProvider } from './mailtrap.provider';
 

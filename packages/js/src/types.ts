@@ -1,4 +1,4 @@
-import { NovuError } from './utils/errors';
+import { type NovuError } from './utils/errors';
 
 export { type FiltersCountResponse, type ListNotificationsResponse } from './notifications';
 export type { Notification } from './notifications';

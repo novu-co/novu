@@ -1,7 +1,7 @@
 import { Grid, Group, ActionIcon, Center, useMantineTheme } from '@mantine/core';
 import styled from '@emotion/styled';
-import { Control, Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
-import { FilterPartTypeEnum, IFieldFilterPart, FieldLogicalOperatorEnum, FieldOperatorEnum } from '@novu/shared';
+import { type Control, Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { FilterPartTypeEnum, type IFieldFilterPart, FieldLogicalOperatorEnum, FieldOperatorEnum } from '@novu/shared';
 import {
   Button,
   colors,
@@ -21,7 +21,13 @@ import {
   When,
 } from '@novu/design-system';
 
-import { DataSelect, IConditions, IConditionsForm, IConditionsProps, IFilterTypeList } from './types';
+import {
+  type DataSelect,
+  type IConditions,
+  type IConditionsForm,
+  type IConditionsProps,
+  type IFilterTypeList,
+} from './types';
 import { OnlineConditionRow } from './OnlineConditionRow';
 import { DefaultGroupOperatorData, DefaultOperatorData } from './constants';
 import { PreviousStepsConditionRow } from './PreviousStepsConditionRow';

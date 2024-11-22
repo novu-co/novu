@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { EmailBlockTypeEnum, IEmailBlock } from '@novu/shared';
+import { EmailBlockTypeEnum, type IEmailBlock } from '@novu/shared';
 
 import { sanitizeHTML, sanitizeMessageContent } from './sanitizer.service';
 

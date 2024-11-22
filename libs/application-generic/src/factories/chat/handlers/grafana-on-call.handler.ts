@@ -1,4 +1,4 @@
-import { ChatProviderIdEnum, ICredentials } from '@novu/shared';
+import { ChatProviderIdEnum, type ICredentials } from '@novu/shared';
 import { ChannelTypeEnum } from '@novu/stateless';
 import { GrafanaOnCallChatProvider } from '@novu/providers';
 

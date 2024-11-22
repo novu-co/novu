@@ -7,7 +7,7 @@ import { NtfrTunnel } from '@novu/ntfr-client';
 import { DevServer } from '../../dev-server';
 import { showWelcomeScreen } from '../shared';
 import { config } from '../../index';
-import { DevCommandOptions, LocalTunnelResponse } from './types';
+import { type DevCommandOptions, type LocalTunnelResponse } from './types';
 import { parseOptions, wait } from './utils';
 import packageJson from '../../../package.json';
 

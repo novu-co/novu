@@ -1,6 +1,6 @@
 import { SubscribersService, UserSession } from '@novu/testing';
-import { SubscriberEntity } from '@novu/dal';
-import { ExternalSubscriberId, TopicId, TopicKey } from '@novu/shared';
+import { type SubscriberEntity } from '@novu/dal';
+import { type ExternalSubscriberId, TopicId, type TopicKey } from '@novu/shared';
 import { expect } from 'chai';
 
 const BASE_PATH = '/v1/topics';

@@ -2,10 +2,10 @@ import { createStyles, Group, Stack } from '@mantine/core';
 import { colors, Label, Popover, Text, Select } from '@novu/design-system';
 
 import React, { useState } from 'react';
-import { Control, Controller, useWatch } from 'react-hook-form';
+import { type Control, Controller, useWatch } from 'react-hook-form';
 import { useFetchLocales } from '../../hooks';
 import { TranslateIcon } from '../../icons';
-import { LocalesFormSchema } from '../EditTranslationsSidebar';
+import { type LocalesFormSchema } from '../EditTranslationsSidebar';
 import { FlagIcon, SelectItem } from '../shared';
 import { useEnvironment } from '../../../../hooks';
 

@@ -1,5 +1,5 @@
 import { Button, Input, inputStyles } from '@novu/design-system';
-import { FC } from 'react';
+import { type FC } from 'react';
 import { Controller } from 'react-hook-form';
 
 import { css, cx } from '@novu/novui/css';

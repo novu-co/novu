@@ -1,7 +1,7 @@
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
 import axios from 'axios';
-import { NotificationTemplateEntity, SubscriberRepository } from '@novu/dal';
+import { type NotificationTemplateEntity, SubscriberRepository } from '@novu/dal';
 
 describe('Get Unseen Count - /:subscriberId/notifications/unseen (GET)', function () {
   let session: UserSession;

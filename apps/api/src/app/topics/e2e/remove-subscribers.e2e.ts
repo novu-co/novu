@@ -1,5 +1,5 @@
-import { SubscriberEntity } from '@novu/dal';
-import { TopicId } from '@novu/shared';
+import { type SubscriberEntity } from '@novu/dal';
+import { type TopicId } from '@novu/shared';
 import { SubscribersService, UserSession } from '@novu/testing';
 import { expect } from 'chai';
 

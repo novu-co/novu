@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button, Sidebar, Title, errorMessage } from '@novu/design-system';
 import { Group } from '@mantine/core';
-import { Control, FormProvider, useForm } from 'react-hook-form';
+import { type Control, FormProvider, useForm } from 'react-hook-form';
 import { slugify } from '@novu/shared';
 import { useEnvironment } from '../../../hooks';
 import { api } from '../../../api';
@@ -11,7 +11,7 @@ import { useGetDefaultLocale } from '../hooks/useGetDefaultLocale';
 import { TranslationFolderIconSmall } from '../icons';
 
 import { GroupFormCommonFields } from './GroupFormCommonFields';
-import { ICreateGroup } from './shared';
+import { type ICreateGroup } from './shared';
 
 function defaultValues(defaultLocale = '') {
   return {

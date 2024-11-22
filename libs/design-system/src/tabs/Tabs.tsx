@@ -1,8 +1,8 @@
-import { LoadingOverlay, Tabs as MantineTabs, TabsValue, Group } from '@mantine/core';
-import React, { ReactNode } from 'react';
+import { LoadingOverlay, Tabs as MantineTabs, type TabsValue, Group } from '@mantine/core';
+import React, { type ReactNode } from 'react';
 import { useTabsStyles } from './Tabs.styles';
 import { colors } from '../config';
-import { SpacingProps } from '../shared/spacing.props';
+import { type SpacingProps } from '../shared/spacing.props';
 
 interface IMenuButtonProp {
   value: string;

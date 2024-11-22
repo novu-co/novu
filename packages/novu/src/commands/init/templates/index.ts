@@ -8,8 +8,8 @@ import { copy } from "../helpers/copy";
 import { install } from "../helpers/install";
 
 import {
-  GetTemplateFileArgs,
-  InstallTemplateArgs,
+  type GetTemplateFileArgs,
+  type InstallTemplateArgs,
   TemplateTypeEnum,
 } from "./types";
 /**

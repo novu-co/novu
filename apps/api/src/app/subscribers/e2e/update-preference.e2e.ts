@@ -1,11 +1,11 @@
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
-import { NotificationTemplateEntity } from '@novu/dal';
+import { type NotificationTemplateEntity } from '@novu/dal';
 import {
   ChannelTypeEnum,
   DigestTypeEnum,
   DigestUnitEnum,
-  IUpdateNotificationTemplateDto,
+  type IUpdateNotificationTemplateDto,
   StepTypeEnum,
 } from '@novu/shared';
 

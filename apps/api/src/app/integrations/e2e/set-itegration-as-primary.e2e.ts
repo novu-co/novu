@@ -1,4 +1,4 @@
-import { IntegrationEntity, IntegrationRepository } from '@novu/dal';
+import { type IntegrationEntity, IntegrationRepository } from '@novu/dal';
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
 import {

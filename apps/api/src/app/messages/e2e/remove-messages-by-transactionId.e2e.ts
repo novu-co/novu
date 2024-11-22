@@ -1,4 +1,4 @@
-import { MessageRepository, NotificationTemplateEntity, SubscriberEntity } from '@novu/dal';
+import { MessageRepository, type NotificationTemplateEntity, type SubscriberEntity } from '@novu/dal';
 import { ChannelTypeEnum } from '@novu/shared';
 import { SubscribersService, UserSession } from '@novu/testing';
 import axios from 'axios';

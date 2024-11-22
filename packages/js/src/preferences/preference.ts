@@ -1,9 +1,9 @@
-import { InboxService } from '../api';
+import { type InboxService } from '../api';
 
-import { NovuEventEmitter } from '../event-emitter';
-import { ChannelPreference, PreferenceLevel, Result, Workflow } from '../types';
+import { type NovuEventEmitter } from '../event-emitter';
+import { type ChannelPreference, type PreferenceLevel, type Result, type Workflow } from '../types';
 import { updatePreference } from './helpers';
-import { PreferencesCache } from '../cache/preferences-cache';
+import { type PreferencesCache } from '../cache/preferences-cache';
 
 type PreferenceLike = Pick<Preference, 'level' | 'enabled' | 'channels' | 'workflow'>;
 

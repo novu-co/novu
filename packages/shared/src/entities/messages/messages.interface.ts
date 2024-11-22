@@ -1,6 +1,12 @@
-import { ActorTypeEnum, ChannelCTATypeEnum, ChannelTypeEnum, IEmailBlock, UrlTarget } from '../../types';
-import { INotificationTemplate } from '../notification-template';
-import { ButtonTypeEnum } from './action.enum';
+import {
+  type ActorTypeEnum,
+  type ChannelCTATypeEnum,
+  type ChannelTypeEnum,
+  type IEmailBlock,
+  type UrlTarget,
+} from '../../types';
+import { type INotificationTemplate } from '../notification-template';
+import { type ButtonTypeEnum } from './action.enum';
 
 export interface IMessage {
   _id: string;

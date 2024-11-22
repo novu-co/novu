@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, ModuleMetadata, Provider, RequestMethod } from '@nestjs/common';
+import { type MiddlewareConsumer, type ModuleMetadata, type Provider, RequestMethod } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import passport from 'passport';

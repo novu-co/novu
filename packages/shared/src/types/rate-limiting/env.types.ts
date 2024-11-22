@@ -1,6 +1,6 @@
-import { ApiRateLimitServiceMaximumEnvVarFormat } from './service.types';
-import { ApiRateLimitAlgorithmEnvVarFormat } from './algorithm.types';
-import { ApiRateLimitCostEnvVarFormat } from './cost.types';
+import { type ApiRateLimitServiceMaximumEnvVarFormat } from './service.types';
+import { type ApiRateLimitAlgorithmEnvVarFormat } from './algorithm.types';
+import { type ApiRateLimitCostEnvVarFormat } from './cost.types';
 
 /**
  * The format of all environment variables used to configure rate limiting.

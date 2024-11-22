@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 import { BaseRepository } from '../base-repository';
-import { IUserRepository } from './user-repository.interface';
-import { IUserResetTokenCount, UserEntity, UserDBModel } from './user.entity';
+import { type IUserRepository } from './user-repository.interface';
+import { type IUserResetTokenCount, UserEntity, type UserDBModel } from './user.entity';
 import { User } from './user.schema';
 
 export class CommunityUserRepository

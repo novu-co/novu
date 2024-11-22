@@ -1,6 +1,6 @@
 import { Flex } from '@novu/novui/jsx';
 import { css, cx } from '@novu/novui/css';
-import { FCWithChildren } from '../../../../types';
+import { type FCWithChildren } from '../../../../types';
 
 export const WorkflowBackgroundWrapper: FCWithChildren = ({ className, children }) => {
   return (

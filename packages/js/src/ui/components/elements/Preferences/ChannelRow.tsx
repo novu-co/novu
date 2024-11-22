@@ -1,4 +1,4 @@
-import { JSX } from 'solid-js';
+import { type JSX } from 'solid-js';
 import { ChannelType } from '../../../../types';
 import { useStyle } from '../../../helpers';
 import { Chat, Email, InApp, Push, Sms } from '../../../icons';

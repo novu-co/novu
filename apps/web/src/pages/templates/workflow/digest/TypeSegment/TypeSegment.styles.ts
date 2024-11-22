@@ -1,4 +1,4 @@
-import { createStyles, MantineSize, MantineTheme } from '@mantine/core';
+import { createStyles, type MantineSize, type MantineTheme } from '@mantine/core';
 import { colors, shadows, getGradient } from '@novu/design-system';
 
 export default createStyles<string, { size: MantineSize }>((theme: MantineTheme, _params, getRef) => {

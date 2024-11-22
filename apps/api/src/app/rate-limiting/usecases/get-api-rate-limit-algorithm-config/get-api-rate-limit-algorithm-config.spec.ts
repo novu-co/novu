@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import {
   ApiRateLimitAlgorithmEnum,
-  ApiRateLimitAlgorithmEnvVarFormat,
+  type ApiRateLimitAlgorithmEnvVarFormat,
   DEFAULT_API_RATE_LIMIT_ALGORITHM_CONFIG,
 } from '@novu/shared';
 import { expect } from 'chai';

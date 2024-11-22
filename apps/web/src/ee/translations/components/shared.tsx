@@ -1,5 +1,5 @@
 import React, { forwardRef, useMemo } from 'react';
-import { Group, SelectItemProps } from '@mantine/core';
+import { Group, type SelectItemProps } from '@mantine/core';
 import { Text } from '@novu/design-system';
 import { FlagMap } from '../icons/flags';
 

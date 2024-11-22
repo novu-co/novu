@@ -1,6 +1,6 @@
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
-import { UpdateEnvironmentRequestDto } from '../../dtos/update-environment-request.dto';
+import { type UpdateEnvironmentRequestDto } from '../../dtos/update-environment-request.dto';
 
 describe('Update Environment - /environments (PUT)', async () => {
   let session: UserSession;

@@ -1,11 +1,11 @@
-import { ChannelTypeEnum } from '@novu/shared';
+import { type ChannelTypeEnum } from '@novu/shared';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Row } from 'react-table';
+import { type Row } from 'react-table';
 import { ROUTES } from '../../constants/routes';
 
 import { IntegrationsList } from './IntegrationsList';
-import { ITableIntegration } from './types';
+import { type ITableIntegration } from './types';
 
 export const IntegrationsListPage = () => {
   const navigate = useNavigate();

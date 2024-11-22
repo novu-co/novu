@@ -1,9 +1,9 @@
-import { LocalizedMessage, Text } from '@novu/novui';
+import { type LocalizedMessage, Text } from '@novu/novui';
 import { cva, cx, type RecipeVariant } from '@novu/novui/css';
 import { hstack } from '@novu/novui/patterns';
-import { SystemStyleObject } from '@novu/novui/types';
+import { type SystemStyleObject } from '@novu/novui/types';
 import { type ForwardedRef, forwardRef } from 'react';
-import { ConnectionStatus } from '../../../../studio/types';
+import { type ConnectionStatus } from '../../../../studio/types';
 
 const CONNECTION_STATUS_LABEL_LOOKUP: Record<ConnectionStatus, LocalizedMessage> = {
   connected: 'Connected',

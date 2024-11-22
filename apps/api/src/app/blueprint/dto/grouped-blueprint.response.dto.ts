@@ -1,4 +1,4 @@
-import { IGroupedBlueprint } from '@novu/shared';
+import { type IGroupedBlueprint } from '@novu/shared';
 
 export class GroupedBlueprintResponse {
   general: IGroupedBlueprint[];

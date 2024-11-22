@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getPageNumberForNewPageSize, IAdjustedPageNumParams } from './getPageNumberForNewPageSize';
+import { getPageNumberForNewPageSize, type IAdjustedPageNumParams } from './getPageNumberForNewPageSize';
 
 describe('getPageNumberForNewPageSize', () => {
   it('computes the new page size as 1 when the currentPageNumber * prevPageSize < newPageSize', () => {

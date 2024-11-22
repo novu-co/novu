@@ -1,5 +1,5 @@
-import { NotificationStepDto } from './workflow.dto';
-import { NotificationTemplateCustomData } from '../../types';
+import { type NotificationStepDto } from './workflow.dto';
+import { type NotificationTemplateCustomData } from '../../types';
 
 /**
  * @deprecated use UpdateWorkflowDto instead

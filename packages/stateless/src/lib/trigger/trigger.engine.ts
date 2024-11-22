@@ -1,20 +1,20 @@
 import _get from 'lodash.get';
-import { EventEmitter } from 'events';
+import { type EventEmitter } from 'events';
 
-import { IContentEngine } from '../content/content.engine';
+import { type IContentEngine } from '../content/content.engine';
 
 import { EmailHandler } from '../handler/email.handler';
 import { SmsHandler } from '../handler/sms.handler';
-import { INovuConfig } from '../novu.interface';
-import { ProviderStore } from '../provider/provider.store';
+import { type INovuConfig } from '../novu.interface';
+import { type ProviderStore } from '../provider/provider.store';
 import {
   ChannelTypeEnum,
-  IMessage,
-  ITemplate,
-  ITriggerPayload,
+  type IMessage,
+  type ITemplate,
+  type ITriggerPayload,
 } from '../template/template.interface';
-import { TemplateStore } from '../template/template.store';
-import { ThemeStore } from '../theme/theme.store';
+import { type TemplateStore } from '../template/template.store';
+import { type ThemeStore } from '../theme/theme.store';
 import { ChatHandler } from '../handler/chat.handler';
 
 export class TriggerEngine {

@@ -1,5 +1,5 @@
 import { Button, errorMessage, IconOutlineLockPerson, PasswordInput, successMessage } from '@novu/design-system';
-import { checkIsResponseError, IResponseError } from '@novu/shared';
+import { checkIsResponseError, type IResponseError } from '@novu/shared';
 import { captureException } from '@sentry/react';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';

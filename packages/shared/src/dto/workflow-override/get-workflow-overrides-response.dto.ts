@@ -1,4 +1,4 @@
-import { IGetWorkflowOverrideResponseDto } from './get-workflow-override-response.dto';
+import { type IGetWorkflowOverrideResponseDto } from './get-workflow-override-response.dto';
 
 export interface IGetWorkflowOverridesResponseDto {
   hasMore: boolean;

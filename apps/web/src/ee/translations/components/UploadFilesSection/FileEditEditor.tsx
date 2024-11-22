@@ -2,10 +2,10 @@
 import { css, cx } from '@emotion/css';
 import styled from '@emotion/styled';
 import { Group, useMantineTheme } from '@mantine/core';
-import { Editor, Monaco } from '@monaco-editor/react';
+import { Editor, type Monaco } from '@monaco-editor/react';
 import { colors, Text } from '@novu/design-system';
 import { format } from 'date-fns';
-import { editor as NEditor, Range } from 'monaco-editor';
+import { type editor as NEditor, Range } from 'monaco-editor';
 import React, { useEffect, useRef, useState } from 'react';
 import { useEditTranslationFileContext } from '../../context/useEditTranslationFileContext';
 

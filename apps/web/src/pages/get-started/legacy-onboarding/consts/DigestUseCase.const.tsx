@@ -2,7 +2,7 @@ import { StepTypeEnum } from '@novu/shared';
 import { ROUTES } from '../../../../constants/routes';
 import { GetStartedAnimation } from '../components/GetStartedAnimation';
 
-import { OnboardingWorkflowRouteEnum, OnboardingUseCase } from './types';
+import { OnboardingWorkflowRouteEnum, type OnboardingUseCase } from './types';
 import { GetStartedLink, StepDescription, StepText } from './shared';
 import { OpenWorkflowButton } from '../components/OpenWorkflowButton';
 import { OnboardingUseCasesTabsEnum } from './OnboardingUseCasesTabsEnum';

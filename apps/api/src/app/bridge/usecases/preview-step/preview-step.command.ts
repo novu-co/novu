@@ -1,6 +1,6 @@
 import { EnvironmentWithUserCommand } from '@novu/application-generic';
-import { Subscriber } from '@novu/framework/internal';
-import { JobStatusEnum, WorkflowOriginEnum } from '@novu/shared';
+import { type Subscriber } from '@novu/framework/internal';
+import { type JobStatusEnum, type WorkflowOriginEnum } from '@novu/shared';
 
 export class PreviewStepCommand extends EnvironmentWithUserCommand {
   workflowId: string;

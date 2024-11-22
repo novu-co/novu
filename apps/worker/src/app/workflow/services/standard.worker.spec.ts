@@ -6,17 +6,17 @@ import { faker } from '@faker-js/faker';
 import { setTimeout } from 'timers/promises';
 
 import {
-  EnvironmentEntity,
-  JobEntity,
+  type EnvironmentEntity,
+  type JobEntity,
   JobRepository,
   JobStatusEnum,
-  MessageTemplateEntity,
+  type MessageTemplateEntity,
   NotificationRepository,
-  NotificationTemplateEntity,
+  type NotificationTemplateEntity,
   NotificationTemplateRepository,
-  OrganizationEntity,
-  SubscriberEntity,
-  UserEntity,
+  type OrganizationEntity,
+  type SubscriberEntity,
+  type UserEntity,
 } from '@novu/dal';
 import { StepTypeEnum } from '@novu/shared';
 import {

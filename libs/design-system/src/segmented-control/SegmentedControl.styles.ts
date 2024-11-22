@@ -1,4 +1,4 @@
-import { createStyles, MantineSize, MantineTheme } from '@mantine/core';
+import { createStyles, type MantineSize, type MantineTheme } from '@mantine/core';
 import { colors, shadows } from '../config';
 import { getGradient } from '../config/helper';
 

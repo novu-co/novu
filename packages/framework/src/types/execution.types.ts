@@ -1,5 +1,5 @@
-import { PostActionEnum } from '../constants';
-import { WithPassthrough } from './provider.types';
+import { type PostActionEnum } from '../constants';
+import { type WithPassthrough } from './provider.types';
 import type { Subscriber } from './subscriber.types';
 
 export type Event = {

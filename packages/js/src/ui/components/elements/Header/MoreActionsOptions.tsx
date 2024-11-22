@@ -1,6 +1,6 @@
-import { JSX } from 'solid-js';
+import { type JSX } from 'solid-js';
 import { useArchiveAll, useArchiveAllRead, useReadAll } from '../../../api';
-import { StringLocalizationKey, useInboxContext, useLocalization } from '../../../context';
+import { type StringLocalizationKey, useInboxContext, useLocalization } from '../../../context';
 import { cn, useStyle } from '../../../helpers';
 import { Archive, ArchiveRead, ReadAll } from '../../../icons';
 import { Dropdown, dropdownItemVariants } from '../../primitives';

@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
-import { PreferenceLevelEnum, SubscriberPreferenceDBModel } from './subscriber-preference.entity';
+import { PreferenceLevelEnum, type SubscriberPreferenceDBModel } from './subscriber-preference.entity';
 
 const subscriberPreferenceSchema = new Schema<SubscriberPreferenceDBModel>(
   {

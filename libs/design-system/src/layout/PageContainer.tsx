@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import React, { CSSProperties } from 'react';
+import React, { type CSSProperties } from 'react';
 import { Container } from '../container/Container';
 import { PageMeta } from './PageMeta';
 

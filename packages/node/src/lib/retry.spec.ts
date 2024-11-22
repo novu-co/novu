@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import { type AxiosError } from 'axios';
 import nock from 'nock';
 import { Novu, defaultRetryCondition } from '../index';
 import { RETRYABLE_HTTP_CODES } from './retry';

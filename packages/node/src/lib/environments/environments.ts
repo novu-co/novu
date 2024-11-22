@@ -1,7 +1,7 @@
 import {
-  IEnvironmentCreatePayload,
-  IEnvironments,
-  IEnvironmentUpdatePayload,
+  type IEnvironmentCreatePayload,
+  type IEnvironments,
+  type IEnvironmentUpdatePayload,
 } from './environments.interface';
 import { WithHttp } from '../novu.interface';
 

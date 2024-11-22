@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
-import { SelectItemProps, Group } from '@mantine/core';
-import { Select, ISelectProps, Text } from '@novu/design-system';
+import { type SelectItemProps, Group } from '@mantine/core';
+import { Select, type ISelectProps, Text } from '@novu/design-system';
 import { forwardRef } from 'react';
 import { IS_SELF_HOSTED } from '../../../../config';
 import { FlagIcon } from '../../../../ee/translations';

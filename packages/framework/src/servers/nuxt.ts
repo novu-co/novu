@@ -1,4 +1,4 @@
-import { getHeader, getQuery, H3Event, readBody, send, setHeaders } from 'h3';
+import { getHeader, getQuery, type H3Event, readBody, send, setHeaders } from 'h3';
 
 import { NovuRequestHandler, type ServeHandlerOptions } from '../handler';
 import { type SupportedFrameworkName } from '../types';

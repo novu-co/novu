@@ -2,19 +2,19 @@ import Handlebars from 'handlebars';
 import {
   StepTypeEnum,
   getTemplateVariables,
-  IMustacheVariable,
+  type IMustacheVariable,
   TemplateSystemVariables,
   TemplateVariableTypeEnum,
   DelayTypeEnum,
-  IFieldFilterPart,
+  type IFieldFilterPart,
   FilterPartTypeEnum,
   TriggerReservedVariables,
   ReservedVariablesMap,
-  TriggerContextTypeEnum,
-  ITriggerReservedVariable,
-  FilterParts,
+  type TriggerContextTypeEnum,
+  type ITriggerReservedVariable,
+  type FilterParts,
 } from '@novu/shared';
-import { NotificationStep } from '../usecases/create-workflow';
+import { type NotificationStep } from '../usecases/create-workflow';
 import { ApiException } from '../utils/exceptions';
 
 export class ContentService {

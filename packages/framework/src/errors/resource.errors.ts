@@ -1,4 +1,4 @@
-import { HttpStatusEnum, PostActionEnum, ResourceEnum } from '../constants';
+import { HttpStatusEnum, type PostActionEnum, type ResourceEnum } from '../constants';
 import { toPascalCase } from '../utils/string.utils';
 import { ConflictError, NotFoundError, ServerError } from './base.errors';
 

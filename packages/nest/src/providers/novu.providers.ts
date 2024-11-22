@@ -1,10 +1,10 @@
-import { Provider } from '@nestjs/common';
+import { type Provider } from '@nestjs/common';
 import { NovuStateless } from '@novu/stateless';
 import { NOVU_OPTIONS } from '../helpers/constants';
 import {
-  INovuModuleAsyncOptions,
-  INovuOptions,
-  INovuOptionsFactory,
+  type INovuModuleAsyncOptions,
+  type INovuOptions,
+  type INovuOptionsFactory,
 } from '../interfaces';
 import { NovuService } from '../services';
 

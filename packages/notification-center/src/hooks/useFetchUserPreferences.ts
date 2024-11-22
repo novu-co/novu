@@ -1,4 +1,4 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { useQuery, type UseQueryOptions } from '@tanstack/react-query';
 import type { IUserPreferenceSettings } from '@novu/client';
 
 import { useNovuContext } from './useNovuContext';

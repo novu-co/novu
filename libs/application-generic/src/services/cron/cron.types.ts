@@ -1,4 +1,4 @@
-import { JobCronNameEnum, Timezone } from '@novu/shared';
+import { type JobCronNameEnum, type Timezone } from '@novu/shared';
 
 export type CronOptions = {
   /** Max number of locked jobs of this kind */

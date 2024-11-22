@@ -4,7 +4,7 @@ import {
   ConnectionOptions as RedisConnectionOptions,
   Job,
   JobsOptions,
-  Metrics,
+  type Metrics,
   MetricsTime,
   Processor,
   Queue,
@@ -14,9 +14,13 @@ import {
   WorkerOptions,
 } from 'bullmq';
 import { Injectable, Logger } from '@nestjs/common';
-import { IEventJobData, IJobData, JobTopicNameEnum } from '@novu/shared';
+import {
+  type IEventJobData,
+  type IJobData,
+  type JobTopicNameEnum,
+} from '@novu/shared';
 
-import { WorkflowInMemoryProviderService } from '../in-memory-provider';
+import { type WorkflowInMemoryProviderService } from '../in-memory-provider';
 
 interface IQueueMetrics {
   completed: Metrics;

@@ -1,4 +1,4 @@
-import { JSX, onCleanup, onMount, Show, splitProps } from 'solid-js';
+import { type JSX, onCleanup, onMount, Show, splitProps } from 'solid-js';
 import { Portal } from 'solid-js/web';
 import { useFocusManager } from '../../../context';
 import { useStyle } from '../../../helpers';

@@ -1,4 +1,10 @@
-import { IconOutlineVisibility, IconOutlineVisibilityOff, IconRefresh, IconSize, Input } from '@novu/design-system';
+import {
+  IconOutlineVisibility,
+  IconOutlineVisibilityOff,
+  IconRefresh,
+  type IconSize,
+  Input,
+} from '@novu/design-system';
 import { Flex } from '@novu/novui/jsx';
 import { IconButton, ClipboardIconButton } from '../../../components';
 import { SettingsPageContainer } from '../SettingsPageContainer';

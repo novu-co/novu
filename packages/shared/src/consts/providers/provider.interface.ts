@@ -1,6 +1,6 @@
-import { CredentialsKeyEnum, ProvidersIdEnum } from './provider.enum';
+import { type CredentialsKeyEnum, type ProvidersIdEnum } from './provider.enum';
 
-import { ChannelTypeEnum } from '../../types';
+import { type ChannelTypeEnum } from '../../types';
 
 export interface IProviderConfig {
   id: ProvidersIdEnum;

@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query';
+import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
 import { WorkflowCreationSourceEnum, type INotificationTemplate, slugify } from '@novu/shared';
 
 import { useCreateTemplateFromBlueprint } from '../api/hooks';

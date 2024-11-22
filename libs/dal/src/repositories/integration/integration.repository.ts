@@ -1,8 +1,8 @@
-import { FilterQuery } from 'mongoose';
-import { SoftDeleteModel } from 'mongoose-delete';
+import { type FilterQuery } from 'mongoose';
+import { type SoftDeleteModel } from 'mongoose-delete';
 import { ApiServiceLevelEnum, ChannelTypeEnum, NOVU_PROVIDERS } from '@novu/shared';
 
-import { IntegrationEntity, IntegrationDBModel, ProviderCount } from './integration.entity';
+import { IntegrationEntity, type IntegrationDBModel, type ProviderCount } from './integration.entity';
 import { Integration } from './integration.schema';
 
 import { BaseRepository } from '../base-repository';

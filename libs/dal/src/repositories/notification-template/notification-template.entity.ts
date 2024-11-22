@@ -1,29 +1,29 @@
-import { Types } from 'mongoose';
+import { type Types } from 'mongoose';
 import {
-  BuilderFieldType,
-  BuilderGroupValues,
-  ContentIssue,
-  ControlSchemas,
-  ControlsDto,
-  FilterParts,
-  IMessageFilter,
-  IMessageTemplate,
-  INotificationTemplate,
-  INotificationTemplateStep,
-  INotificationTrigger,
-  INotificationTriggerVariable,
-  IPreferenceChannels,
-  IStepVariant,
-  ITriggerReservedVariable,
-  IWorkflowStepMetadata,
-  NotificationTemplateCustomData,
-  StepIssues,
-  TriggerTypeEnum,
-  WorkflowOriginEnum,
-  WorkflowStatusEnum,
-  WorkflowTypeEnum,
+  type BuilderFieldType,
+  type BuilderGroupValues,
+  type ContentIssue,
+  type ControlSchemas,
+  type ControlsDto,
+  type FilterParts,
+  type IMessageFilter,
+  type IMessageTemplate,
+  type INotificationTemplate,
+  type INotificationTemplateStep,
+  type INotificationTrigger,
+  type INotificationTriggerVariable,
+  type IPreferenceChannels,
+  type IStepVariant,
+  type ITriggerReservedVariable,
+  type IWorkflowStepMetadata,
+  type NotificationTemplateCustomData,
+  type StepIssues,
+  type TriggerTypeEnum,
+  type WorkflowOriginEnum,
+  type WorkflowStatusEnum,
+  type WorkflowTypeEnum,
 } from '@novu/shared';
-import { NotificationGroupEntity } from '../notification-group';
+import { type NotificationGroupEntity } from '../notification-group';
 import type { OrganizationId } from '../organization';
 import type { EnvironmentId } from '../environment';
 import type { ChangePropsValueType } from '../../types';

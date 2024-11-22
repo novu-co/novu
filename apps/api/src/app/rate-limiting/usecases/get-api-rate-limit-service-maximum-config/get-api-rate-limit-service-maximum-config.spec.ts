@@ -1,7 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test, type TestingModule } from '@nestjs/testing';
 import {
   ApiRateLimitCategoryEnum,
-  ApiRateLimitServiceMaximumEnvVarFormat,
+  type ApiRateLimitServiceMaximumEnvVarFormat,
   ApiServiceLevelEnum,
   DEFAULT_API_RATE_LIMIT_SERVICE_MAXIMUM_CONFIG,
 } from '@novu/shared';
