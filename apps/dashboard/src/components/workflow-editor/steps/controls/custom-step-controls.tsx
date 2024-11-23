@@ -40,7 +40,13 @@ export function CustomStepControls({
 
       <CollapsibleContent>
         <div className="bg-background rounded-md border border-dashed px-3 py-0">
-          <JsonForm schema={(dataSchema as RJSFSchema) || {}} variables={[]} />
+          <JsonForm
+            schema={(dataSchema as RJSFSchema) || {}}
+            variables={[]}
+            onChange={(data, id) => {
+              console.log({ data, id });
+            }}
+          />
         </div>
       </CollapsibleContent>
     </Collapsible>

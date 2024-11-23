@@ -4,6 +4,9 @@ import validator from '@rjsf/validator-ajv8';
 import { TextWidget } from './text-widget';
 import { SwitchWidget } from './switch-widget';
 import { SelectWidget } from './select-widget';
+import { Button } from '@/components/primitives/button';
+import { RiAddLine } from 'react-icons/ri';
+import { ArrayFieldTemplate } from './array-field-template';
 
 export const JSON_SCHEMA_FORM_ID_DELIMITER = '~~~';
 
@@ -50,6 +53,30 @@ export function JsonForm(props: JsonFormProps) {
       /**
        * TODO: Add support for Arrays and Nested Objects
        */
+      templates={{
+        ButtonTemplates: {
+          AddButton,
+        },
+        ArrayFieldTemplate,
+        ArrayFieldItemTemplate,
+        ArrayFieldTitleTemplate,
+      }}
     />
   );
 }
+
+const AddButton = (props: any) => {
+  return (
+    <Button variant="ghost" className="size-4 rounded-sm p-0.5" type="button" {...props}>
+      <RiAddLine className="text-foreground-600 size-3" />
+    </Button>
+  );
+};
+
+const ArrayFieldItemTemplate = (props: any) => {
+  return <div className="flex items-center gap-2 *:flex-1">{props.children}</div>;
+};
+
+const ArrayFieldTitleTemplate = (props: any) => {
+  return <legend className="text-foreground-400 px-1">{props.title}</legend>;
+};

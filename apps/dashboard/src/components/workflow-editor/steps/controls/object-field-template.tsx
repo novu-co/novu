@@ -1,17 +1,10 @@
-import { Button } from '@/components/primitives/button';
 import { CollapsibleContent, CollapsibleTrigger } from '@/components/primitives/collapsible';
 import { Collapsible } from '@radix-ui/react-collapsible';
-import {
-  ArrayFieldTemplateItemType,
-  ArrayFieldTemplateProps,
-  ArrayFieldTitleProps,
-  getTemplate,
-  getUiOptions,
-} from '@rjsf/utils';
+import { ArrayFieldTemplateProps, getTemplate, getUiOptions } from '@rjsf/utils';
 import { useState } from 'react';
-import { RiAddLine, RiArrowDownSLine, RiArrowUpSLine, RiExpandUpDownLine, RiInputField } from 'react-icons/ri';
+import { RiExpandUpDownLine } from 'react-icons/ri';
 
-export function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
+export function ObjectFieldTemplate(props: ArrayFieldTemplateProps) {
   const { canAdd, disabled, idSchema, uiSchema, items, onAddClick, readonly, registry, required, title, schema } =
     props;
   const {
@@ -24,8 +17,6 @@ export function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
   const ArrayFieldItemTemplate = getTemplate('ArrayFieldItemTemplate', registry, uiOptions);
 
   const [isEditorOpen, setIsEditorOpen] = useState(true);
-
-  console.log({ props });
 
   return (
     <Collapsible
