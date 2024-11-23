@@ -45,6 +45,11 @@ export class SubscriberResponseDto {
   })
   channels?: ChannelSettings[];
 
+  @ApiPropertyOptional({
+    description: 'Topics that subscriber belongs to',
+  })
+  topics?: string[];
+
   @ApiProperty()
   isOnline?: boolean;
 

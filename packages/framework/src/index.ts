@@ -1,5 +1,5 @@
 export { Client } from './client';
-export * from './constants';
 export { NovuRequestHandler, type ServeHandlerOptions } from './handler';
-export * from './resources';
-export * from './types';
+export { workflow } from './resources';
+export type { Workflow } from './types';
+export { CronExpression } from './constants';

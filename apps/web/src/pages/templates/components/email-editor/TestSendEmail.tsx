@@ -85,7 +85,6 @@ export function TestSendEmail({
         subject: '',
         ...template,
         payload,
-        inputs: controls,
         controls,
         to: sendTo,
         bridge,

@@ -11,10 +11,10 @@ import {
   ICredentialsDto,
   InAppProviderIdEnum,
   SmsProviderIdEnum,
+  slugify,
 } from '@novu/shared';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
-import slugify from 'slugify';
 import { useWebhookSupportStatus } from '../../../../../api/hooks';
 import { useUpdateIntegration } from '../../../../../api/hooks/useUpdateIntegration';
 import { Conditions, IConditions } from '../../../../../components/conditions';
@@ -30,6 +30,7 @@ import { useProviders } from '../../../useProviders';
 import { IntegrationInput } from '../../IntegrationInput';
 import { ShareableUrl } from '../../Modal/ConnectIntegrationForm';
 import { NovuInAppFrameworkHeader } from '../../NovuInAppFrameworkHeader';
+import { NovuInAppRemoveBranding } from '../../NovuInAppRemoveBranding';
 import { SetupWarning } from '../../SetupWarning';
 import { UpdateIntegrationCommonFields } from '../../UpdateIntegrationCommonFields';
 import { UpdateIntegrationSidebarHeader } from '../../UpdateIntegrationSidebarHeader';
@@ -43,6 +44,7 @@ interface IProviderForm {
   active: boolean;
   identifier: string;
   conditions: IConditions[];
+  removeNovuBranding?: boolean;
 }
 
 enum SidebarStateEnum {
@@ -124,10 +126,7 @@ export function UpdateProviderSidebar({
 
   useEffect(() => {
     if (selectedProvider && !selectedProvider?.identifier) {
-      const newIdentifier = slugify(selectedProvider?.displayName, {
-        lower: true,
-        strict: true,
-      });
+      const newIdentifier = slugify(selectedProvider?.displayName);
 
       setValue('identifier', newIdentifier);
     }
@@ -153,6 +152,7 @@ export function UpdateProviderSidebar({
       }, {} as any),
       conditions: foundProvider.conditions,
       active: foundProvider.active,
+      removeNovuBranding: foundProvider.removeNovuBranding,
     });
   }, [reset, integrationId, providers]);
 
@@ -364,6 +364,7 @@ export function UpdateProviderSidebar({
               />
             </InputWrapper>
           ))}
+          {isNovuInAppProvider && <NovuInAppRemoveBranding control={control} />}
           {isWebhookEnabled && (
             <InputWrapper>
               <Input

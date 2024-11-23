@@ -60,9 +60,9 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
     });
     expect(response.data.data.preference.channels).to.eql({
       [ChannelTypeEnum.EMAIL]: true,
-      [ChannelTypeEnum.SMS]: true,
-      [ChannelTypeEnum.CHAT]: true,
       [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
       [ChannelTypeEnum.IN_APP]: true,
     });
   });
@@ -71,7 +71,7 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
     const payload = {
       enabled: true,
       preferences: [
-        { type: ChannelTypeEnum.PUSH, enabled: true },
+        { type: ChannelTypeEnum.PUSH, enabled: false },
         { type: ChannelTypeEnum.IN_APP, enabled: false },
         { type: ChannelTypeEnum.SMS, enabled: true },
       ],
@@ -81,15 +81,16 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
 
     expect(response.data.data.preference.enabled).to.eql(true);
     expect(response.data.data.preference.channels).to.eql({
-      [ChannelTypeEnum.PUSH]: true,
-      [ChannelTypeEnum.IN_APP]: false,
-      [ChannelTypeEnum.SMS]: true,
       [ChannelTypeEnum.EMAIL]: true,
+      [ChannelTypeEnum.PUSH]: false,
       [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
+      [ChannelTypeEnum.IN_APP]: false,
     });
   });
 
-  it('should update user global preference and disable the flag for the future channels update', async function () {
+  // `enabled` flag is not used anymore. The presence of a preference object means that the subscriber has enabled notifications.
+  it.skip('should update user global preference and disable the flag for the future channels update', async function () {
     const disablePreferenceData = {
       enabled: false,
     };
@@ -104,12 +105,6 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
 
     const res = await updateGlobalPreferences(preferenceChannel, session);
 
-    expect(res.data.data.preference.channels).to.eql({
-      [ChannelTypeEnum.EMAIL]: true,
-      [ChannelTypeEnum.SMS]: true,
-      [ChannelTypeEnum.CHAT]: true,
-      [ChannelTypeEnum.PUSH]: true,
-      [ChannelTypeEnum.IN_APP]: true,
-    });
+    expect(res.data.data.preference.channels).to.eql({});
   });
 });

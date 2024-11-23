@@ -5,7 +5,42 @@ import { NovuRequestHandler, type ServeHandlerOptions } from '../handler';
 import { type Either, type SupportedFrameworkName } from '../types';
 import { getResponse } from '../utils';
 
+/*
+ * Re-export all top level exports from the main package.
+ * This results in better DX reduces the chances of the dual package hazard for ESM + CJS packages.
+ *
+ * Example:
+ *
+ * import { serve, Client, type Workflow } from '@novu/framework/next';
+ *
+ * instead of
+ *
+ * import { serve } from '@novu/framework/next';
+ * import { Client, type Workflow } from '@novu/framework';
+ */
+export * from '../index';
 export const frameworkName: SupportedFrameworkName = 'next';
+
+/**
+ * Defines a request handler for Next.js 12+.
+ *
+ * The argument types are kept abstract due to varying type checks across
+ * Next.js versions. Next.js 15 uses `RouteContext` for the second argument,
+ * while versions 13 and 14 omit it, and version 12 uses `NextApiResponse`,
+ * which varies by environment (edge vs serverless).
+ */
+export type RequestHandler = (expectedReq: NextRequest, res: unknown) => Promise<Response>;
+
+// Helper function to check if the response is a Next.js 12 API response
+const isNext12ApiResponse = (val: unknown): val is NextApiResponse => {
+  return (
+    typeof val === 'object' &&
+    val !== null &&
+    typeof (val as NextApiResponse).setHeader === 'function' &&
+    typeof (val as NextApiResponse).status === 'function' &&
+    typeof (val as NextApiResponse).send === 'function'
+  );
+};
 
 /**
  * In Next.js, serve and register any declared workflows with Novu, making
@@ -31,10 +66,10 @@ export const frameworkName: SupportedFrameworkName = 'next';
  */
 export const serve = (
   options: ServeHandlerOptions
-): ((expectedReq: NextRequest, res: NextApiResponse) => Promise<Response>) & {
-  GET: (expectedReq: NextRequest, res: NextApiResponse) => Promise<Response>;
-  POST: (expectedReq: NextRequest, res: NextApiResponse) => Promise<Response>;
-  OPTIONS: (expectedReq: NextRequest, res: NextApiResponse) => Promise<Response>;
+): RequestHandler & {
+  GET: RequestHandler;
+  POST: RequestHandler;
+  OPTIONS: RequestHandler;
 } => {
   const novuHandler = new NovuRequestHandler({
     frameworkName,
@@ -42,7 +77,7 @@ export const serve = (
     handler: (
       requestMethod: 'GET' | 'POST' | 'OPTIONS' | undefined,
       incomingRequest: NextRequest,
-      response: NextApiResponse
+      response: unknown
     ) => {
       const request = incomingRequest as Either<NextApiRequest, NextRequest>;
 
@@ -124,13 +159,11 @@ export const serve = (
            * Carefully attempt to set headers and data on the response object
            * for Next.js 12 support.
            */
-          if (typeof response?.setHeader === 'function') {
+          if (isNext12ApiResponse(response)) {
             Object.entries(headers).forEach(([headerName, headerValue]) => {
               response.setHeader(headerName, headerValue);
             });
-          }
 
-          if (typeof response?.status === 'function' && typeof response?.send === 'function') {
             response.status(status).send(body);
 
             /**

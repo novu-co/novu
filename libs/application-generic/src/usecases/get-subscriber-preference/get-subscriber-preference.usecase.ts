@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   NotificationTemplateRepository,
   SubscriberRepository,
@@ -11,6 +11,7 @@ import {
   GetSubscriberTemplatePreference,
   GetSubscriberTemplatePreferenceCommand,
 } from '../get-subscriber-template-preference';
+import { InstrumentUsecase } from '../../instrumentation';
 
 @Injectable()
 export class GetSubscriberPreference {
@@ -21,6 +22,7 @@ export class GetSubscriberPreference {
     private analyticsService: AnalyticsService,
   ) {}
 
+  @InstrumentUsecase()
   async execute(
     command: GetSubscriberPreferenceCommand,
   ): Promise<ISubscriberPreferenceResponse[]> {
@@ -28,13 +30,19 @@ export class GetSubscriberPreference {
       command.environmentId,
       command.subscriberId,
     );
-
-    const templateList =
-      await this.notificationTemplateRepository.getActiveList(
-        command.organizationId,
-        command.environmentId,
-        true,
+    if (!subscriber) {
+      throw new NotFoundException(
+        `Subscriber with id: ${command.subscriberId} not found`,
       );
+    }
+
+    const templateList = await this.notificationTemplateRepository.filterActive(
+      {
+        organizationId: command.organizationId,
+        environmentId: command.environmentId,
+        tags: command.tags,
+      },
+    );
 
     this.analyticsService.mixpanelTrack(
       'Fetch User Preferences - [Notification Center]',
@@ -45,7 +53,8 @@ export class GetSubscriberPreference {
       },
     );
 
-    return await Promise.all(
+    // TODO: replace this runtime mapping with a single query to the database
+    const subscriberWorkflowPreferences = await Promise.all(
       templateList.map(async (template) =>
         this.getSubscriberTemplatePreferenceUsecase.execute(
           GetSubscriberTemplatePreferenceCommand.create({
@@ -54,9 +63,16 @@ export class GetSubscriberPreference {
             environmentId: command.environmentId,
             template,
             subscriber,
+            includeInactiveChannels: command.includeInactiveChannels,
           }),
         ),
       ),
     );
+
+    const nonCriticalWorkflowPreferences = subscriberWorkflowPreferences.filter(
+      (preference) => preference.template.critical === false,
+    );
+
+    return nonCriticalWorkflowPreferences;
   }
 }

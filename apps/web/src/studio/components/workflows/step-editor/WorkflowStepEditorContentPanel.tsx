@@ -3,8 +3,16 @@ import { Prism } from '@mantine/prism';
 import { Tabs } from '@novu/novui';
 import { IconOutlineCode, IconVisibility } from '@novu/novui/icons';
 import { VStack } from '@novu/novui/jsx';
-import { ButtonTypeEnum, inAppMessageFromBridgeOutputs, StepTypeEnum } from '@novu/shared';
+import { inAppMessageFromBridgeOutputs, StepTypeEnum } from '@novu/shared';
 import { css } from '@novu/novui/css';
+import type {
+  ChatOutput,
+  EmailOutput,
+  ExecuteOutput,
+  InAppOutput,
+  PushOutput,
+  SmsOutput,
+} from '@novu/framework/internal';
 import { PreviewWeb } from '../../../../components/workflow/preview/email/PreviewWeb';
 import { useActiveIntegrations } from '../../../../hooks';
 import {
@@ -17,7 +25,7 @@ import { MobileSimulator } from '../../../../components/workflow/preview/common'
 import { ErrorPrettyRender } from '../../../../components/workflow/preview/ErrorPrettyRender';
 
 interface IWorkflowStepEditorContentPanelProps {
-  preview: any;
+  preview: ExecuteOutput;
   isLoadingPreview: boolean;
   error?: any;
   step: any;
@@ -94,7 +102,7 @@ export const PreviewStep = ({
   source,
 }: {
   channel: StepTypeEnum;
-  preview: any;
+  preview: ExecuteOutput;
   loadingPreview: boolean;
   source?: 'studio' | 'playground' | 'dashboard';
 }) => {
@@ -106,13 +114,15 @@ export const PreviewStep = ({
   const props = { locales: [], loading: loadingPreview, onLocaleChange: () => {} };
 
   switch (channel) {
-    case StepTypeEnum.EMAIL:
+    case StepTypeEnum.EMAIL: {
+      const previewOutputs = preview?.outputs as EmailOutput;
+
       return (
         <PreviewWeb
           source={source}
           integration={integration}
-          content={preview?.outputs?.body}
-          subject={preview?.outputs?.subject}
+          content={previewOutputs?.body}
+          subject={previewOutputs?.subject}
           classNames={{
             browser: css({ display: 'flex', flexDirection: 'column', gap: '0', flex: '1' }),
             content: css({ display: 'flex' }),
@@ -128,12 +138,16 @@ export const PreviewStep = ({
           {...props}
         />
       );
+    }
 
-    case StepTypeEnum.SMS:
-      return <SmsBasePreview content={preview?.outputs?.body} {...props} />;
+    case StepTypeEnum.SMS: {
+      const previewOutputs = preview?.outputs as SmsOutput;
+
+      return <SmsBasePreview content={previewOutputs?.body} {...props} />;
+    }
 
     case StepTypeEnum.IN_APP: {
-      const inAppMessage = inAppMessageFromBridgeOutputs(preview?.outputs);
+      const inAppMessage = inAppMessageFromBridgeOutputs(preview?.outputs as InAppOutput);
 
       return (
         <InAppBasePreview
@@ -148,24 +162,31 @@ export const PreviewStep = ({
       );
     }
 
-    case StepTypeEnum.CHAT:
-      return <ChatBasePreview content={preview?.outputs?.body} {...props} />;
+    case StepTypeEnum.CHAT: {
+      const previewOutputs = preview?.outputs as ChatOutput;
 
-    case StepTypeEnum.PUSH:
+      return <ChatBasePreview content={previewOutputs?.body} {...props} />;
+    }
+
+    case StepTypeEnum.PUSH: {
+      const previewOutputs = preview?.outputs as PushOutput;
+
       return (
         <MobileSimulator withBackground>
-          <PushBasePreview title={preview?.outputs?.subject} content={preview?.outputs?.body} {...props} />
+          <PushBasePreview title={previewOutputs?.subject} content={previewOutputs?.body} {...props} />
         </MobileSimulator>
       );
+    }
 
     case StepTypeEnum.DIGEST:
     case StepTypeEnum.DELAY:
-    case StepTypeEnum.CUSTOM:
+    case StepTypeEnum.CUSTOM: {
       return (
         <Prism styles={prismStyles} withLineNumbers language="javascript">
           {`${JSON.stringify(preview?.outputs, null, 2)}`}
         </Prism>
       );
+    }
 
     default:
       return <>Unknown Step</>;

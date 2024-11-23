@@ -1,58 +1,60 @@
 {
-  "extends": "@nrwl/workspace/presets/npm.json",
-  "npmScope": "novuhq",
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"],
+      "cache": true
+    },
+    "test": {
+      "cache": true
+    },
+    "lint": {
+      "cache": true
+    },
+    "@nx/eslint:lint": {
+      "cache": true,
+      "inputs": ["default", "{workspaceRoot}/tools/eslint-rules/**/*"]
+    }
+  },
+  "extends": "@nx/workspace/presets/npm.json",
+  "release": {
+    "changelog": {
+      "workspaceChangelog": true,
+      "projectChangelogs": true
+    },
+    "projects": [
+      "novu",
+      "@novu/client",
+      "@novu/framework",
+      "@novu/headless",
+      "@novu/js",
+      "@novu/react",
+      "@novu/react-native",
+      "@novu/nextjs",
+      "@novu/node",
+      "@novu/providers",
+      "@novu/shared",
+      "@novu/stateless"
+    ],
+    "projectsRelationship": "independent",
+    "version": {
+      "generatorOptions": {
+        "preserveLocalDependencyProtocols": true
+      }
+    }
+  },
   "tasksRunnerOptions": {
     "default": {
-      "runner": "@nrwl/nx-cloud",
       "options": {
-        "cacheableOperations": [
-          "build",
-          "test",
-          "lint",
-          "package",
-          "prepare"
-        ],
         "canTrackAnalytics": false,
-        "accessToken": "ZTQ3Yzc3MjEtM2M2ZS00MzRlLWI0OWItZjhmOWVhNWQ1MTM0fHJlYWQ="
-      }
+        "nxCloudId": "61d98cffc3343830d132e541"
+      },
+      "runner": "nx-cloud"
     }
   },
-  "targetDependencies": {
-    "build": [
-      {
-        "target": "build",
-        "inputs": [
-          "!{projectRoot}/enterprise/**/*"
-        ],
-        "projects": "dependencies"
-      }
-    ],
-    "prepare": [
-      {
-        "target": "prepare",
-        "projects": "dependencies"
-      }
-    ],
-    "package": [
-      {
-        "target": "package",
-        "projects": "dependencies"
-      }
-    ]
-  },
-  "affected": {
-    "defaultBase": "main"
-  },
-  "targetDefaults": {
-    "build-ee": {
-      "dependsOn": [
-        "^build-ee"
-      ]
-    },
-    "build": {
-      "dependsOn": [
-        "^build"
-      ]
-    }
+  "useInferencePlugins": false,
+  "defaultBase": "main",
+  "useLegacyCache": true,
+  "generatorOptions": {
+    "preserveLocalDependencyProtocols": true
   }
 }

@@ -56,6 +56,14 @@ export type EventTriggerParams<T_Payload = EventPayload> = {
       [stepId: string]: Record<string, unknown>;
     };
   };
+  /**
+   * Use Novu Cloud US (https://api.novu.co) or EU deployment (https://eu.api.novu.co). Defaults to US.
+   */
+  apiUrl?: string;
+  /**
+   * Override secret key for the trigger
+   */
+  secretKey?: string;
 } & ConditionalPartial<
   {
     /**

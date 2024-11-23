@@ -5,6 +5,9 @@ name: Deploy PROD WEBHOOK
 on:
   workflow_dispatch:
 
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
 jobs:
   publish_docker_image_webhook:
     uses: ./.github/workflows/reusable-docker.yml
@@ -16,6 +19,8 @@ jobs:
       health_check: true
       local_tag: novu-webhook
       env_tag: prod
+      aws-region: us-east-1
+
     secrets: inherit
 
   deploy_prod_webhook_eu:
@@ -31,7 +36,6 @@ jobs:
 
   deploy_prod_webhook_us:
     needs:
-      - deploy_prod_webhook_eu
       - publish_docker_image_webhook
     uses: ./.github/workflows/reusable-app-service-deploy.yml
     secrets: inherit

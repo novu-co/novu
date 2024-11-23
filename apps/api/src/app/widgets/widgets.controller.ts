@@ -7,6 +7,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -17,13 +18,15 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiExcludeController, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { AnalyticsService, GetSubscriberPreference, GetSubscriberPreferenceCommand } from '@novu/application-generic';
 import { MessageEntity, PreferenceLevelEnum, SubscriberEntity } from '@novu/dal';
-import { MessagesStatusEnum, ButtonTypeEnum, MessageActionStatusEnum } from '@novu/shared';
+import {
+  MessagesStatusEnum,
+  ButtonTypeEnum,
+  MessageActionStatusEnum,
+  TriggerTypeEnum,
+  IPreferenceChannels,
+} from '@novu/shared';
 
 import { SubscriberSession } from '../shared/framework/user.decorator';
-import {
-  UpdateSubscriberPreference,
-  UpdateSubscriberPreferenceCommand,
-} from '../subscribers/usecases/update-subscriber-preference';
 import { LogUsageRequestDto } from './dtos/log-usage-request.dto';
 import { LogUsageResponseDto } from './dtos/log-usage-response.dto';
 import { OrganizationResponseDto } from './dtos/organization-response.dto';
@@ -54,10 +57,6 @@ import { LimitPipe } from './pipes/limit-pipe/limit-pipe';
 import { RemoveAllMessagesCommand } from './usecases/remove-messages/remove-all-messages.command';
 import { RemoveAllMessages } from './usecases/remove-messages/remove-all-messages.usecase';
 import { RemoveAllMessagesDto } from './dtos/remove-all-messages.dto';
-import {
-  UpdateSubscriberGlobalPreferences,
-  UpdateSubscriberGlobalPreferencesCommand,
-} from '../subscribers/usecases/update-subscriber-global-preferences';
 import { UpdateSubscriberGlobalPreferencesRequestDto } from '../subscribers/dtos/update-subscriber-global-preferences-request.dto';
 import { GetPreferencesByLevel } from '../subscribers/usecases/get-preferences-by-level/get-preferences-by-level.usecase';
 import { GetPreferencesByLevelCommand } from '../subscribers/usecases/get-preferences-by-level/get-preferences-by-level.command';
@@ -68,6 +67,8 @@ import { RemoveMessagesBulkRequestDto } from './dtos/remove-messages-bulk-reques
 import { MessageMarkAsRequestDto } from './dtos/mark-as-request.dto';
 import { MarkMessageAsByMark } from './usecases/mark-message-as-by-mark/mark-message-as-by-mark.usecase';
 import { MarkMessageAsByMarkCommand } from './usecases/mark-message-as-by-mark/mark-message-as-by-mark.command';
+import { UpdatePreferences } from '../inbox/usecases/update-preferences/update-preferences.usecase';
+import { UpdatePreferencesCommand } from '../inbox/usecases/update-preferences/update-preferences.command';
 
 @ApiCommonResponses()
 @Controller('/widgets')
@@ -86,8 +87,7 @@ export class WidgetsController {
     private getOrganizationUsecase: GetOrganizationData,
     private getSubscriberPreferenceUsecase: GetSubscriberPreference,
     private getSubscriberPreferenceByLevelUsecase: GetPreferencesByLevel,
-    private updateSubscriberPreferenceUsecase: UpdateSubscriberPreference,
-    private updateSubscriberGlobalPreferenceUsecase: UpdateSubscriberGlobalPreferences,
+    private updatePreferencesUsecase: UpdatePreferences,
     private markAllMessagesAsUsecase: MarkAllMessagesAs,
     private analyticsService: AnalyticsService
   ) {}
@@ -414,6 +414,7 @@ export class WidgetsController {
       organizationId: subscriberSession._organizationId,
       subscriberId: subscriberSession.subscriberId,
       environmentId: subscriberSession._environmentId,
+      includeInactiveChannels: false,
     });
 
     return await this.getSubscriberPreferenceUsecase.execute(command);
@@ -429,6 +430,7 @@ export class WidgetsController {
       organizationId: subscriberSession._organizationId,
       subscriberId: subscriberSession.subscriberId,
       environmentId: subscriberSession._environmentId,
+      includeInactiveChannels: false,
       level,
     });
 
@@ -442,16 +444,38 @@ export class WidgetsController {
     @Param('templateId') templateId: string,
     @Body() body: UpdateSubscriberPreferenceRequestDto
   ): Promise<UpdateSubscriberPreferenceResponseDto> {
-    const command = UpdateSubscriberPreferenceCommand.create({
-      organizationId: subscriberSession._organizationId,
-      subscriberId: subscriberSession.subscriberId,
-      environmentId: subscriberSession._environmentId,
-      templateId,
-      channel: body.channel,
-      enabled: body.enabled,
-    });
+    const result = await this.updatePreferencesUsecase.execute(
+      UpdatePreferencesCommand.create({
+        environmentId: subscriberSession._environmentId,
+        organizationId: subscriberSession._organizationId,
+        subscriberId: subscriberSession.subscriberId,
+        workflowId: templateId,
+        level: PreferenceLevelEnum.TEMPLATE,
+        includeInactiveChannels: false,
+        ...(body.channel && { [body.channel.type]: body.channel.enabled }),
+      })
+    );
 
-    return await this.updateSubscriberPreferenceUsecase.execute(command);
+    if (!result.workflow) throw new NotFoundException('Workflow not found');
+
+    return {
+      preference: {
+        channels: result.channels,
+        enabled: result.enabled,
+      },
+      template: {
+        _id: result.workflow.id,
+        name: result.workflow.name,
+        critical: result.workflow.critical,
+        triggers: [
+          {
+            identifier: result.workflow.identifier,
+            type: TriggerTypeEnum.EVENT,
+            variables: [],
+          },
+        ],
+      },
+    };
   }
 
   @UseGuards(AuthGuard('subscriberJwt'))
@@ -460,15 +484,29 @@ export class WidgetsController {
     @SubscriberSession() subscriberSession: SubscriberEntity,
     @Body() body: UpdateSubscriberGlobalPreferencesRequestDto
   ) {
-    const command = UpdateSubscriberGlobalPreferencesCommand.create({
-      organizationId: subscriberSession._organizationId,
-      subscriberId: subscriberSession.subscriberId,
-      environmentId: subscriberSession._environmentId,
-      preferences: body.preferences,
-      enabled: body.enabled,
-    });
+    const channels = body.preferences?.reduce((acc, curr) => {
+      acc[curr.type] = curr.enabled;
 
-    return await this.updateSubscriberGlobalPreferenceUsecase.execute(command);
+      return acc;
+    }, {} as IPreferenceChannels);
+
+    const result = await this.updatePreferencesUsecase.execute(
+      UpdatePreferencesCommand.create({
+        environmentId: subscriberSession._environmentId,
+        organizationId: subscriberSession._organizationId,
+        subscriberId: subscriberSession.subscriberId,
+        level: PreferenceLevelEnum.GLOBAL,
+        includeInactiveChannels: false,
+        ...channels,
+      })
+    );
+
+    return {
+      preference: {
+        channels: result.channels,
+        enabled: result.enabled,
+      },
+    };
   }
 
   @UseGuards(AuthGuard('subscriberJwt'))

@@ -1,7 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
-import { GetPreferences, UpsertPreferences } from '@novu/application-generic';
-import { PreferencesRepository } from '@novu/dal';
 import { AuthModule } from '../auth/auth.module';
 import { SharedModule } from '../shared/shared.module';
 import { WidgetsModule } from '../widgets/widgets.module';

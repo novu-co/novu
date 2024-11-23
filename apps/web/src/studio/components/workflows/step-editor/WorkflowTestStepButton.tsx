@@ -36,7 +36,6 @@ export const WorkflowTestStepButton = ({
         contentType: 'customHtml',
         subject: '',
         payload,
-        inputs: controls,
         controls,
         to: testUser?.emailAddress || '',
         bridge: true,

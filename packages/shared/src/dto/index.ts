@@ -12,4 +12,5 @@ export * from './tenant';
 export * from './workflow-override';
 export * from './widget';
 export * from './session';
+export * from './subscription';
 export * from './controls';

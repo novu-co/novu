@@ -93,6 +93,10 @@ export const WorkflowsTestPage = () => {
 
       let response;
       if (isLocalStudio) {
+        if (!workflowId) {
+          throw new Error('workflowId was not defined when running a test');
+        }
+
         const bridgeResponse = await trigger({
           workflowId,
           to,
@@ -154,7 +158,7 @@ export const WorkflowsTestPage = () => {
     >
       <WorkflowsPanelLayout>
         <WorkflowTestTriggerPanel
-          identifier={workflowId}
+          identifier={workflowId || ''}
           to={to}
           payload={payload}
           secretKey={devSecretKey}
@@ -163,12 +167,7 @@ export const WorkflowsTestPage = () => {
         <When truthy={!isLoading}>
           <WorkflowTestControlsPanel
             onChange={onChange}
-            payloadSchema={
-              workflow?.payload?.schema ||
-              workflow?.data?.schema ||
-              (template as any)?.rawData?.payload?.schema ||
-              (template as any)?.rawData?.data?.schema
-            }
+            payloadSchema={workflow?.payload?.schema || template?.payloadSchema}
             to={{
               subscriberId: testUser?.id || '',
               email: testUser?.emailAddress || '',

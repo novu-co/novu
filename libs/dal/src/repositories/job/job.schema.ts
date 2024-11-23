@@ -2,7 +2,6 @@ import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
 import { JobDBModel, JobStatusEnum } from './job.entity';
-import { getTTLOptions } from '../../shared';
 
 const jobSchema = new Schema<JobDBModel>(
   {
@@ -40,7 +39,7 @@ const jobSchema = new Schema<JobDBModel>(
       ref: 'Notification',
     },
     _mergedDigestId: {
-      type: Schema.Types.ObjectId,
+      type: String,
       ref: 'Job',
     },
     subscriberId: {
@@ -128,13 +127,11 @@ const jobSchema = new Schema<JobDBModel>(
     actorId: {
       type: Schema.Types.String,
     },
-    expireAt: Schema.Types.Date,
     stepOutput: Schema.Types.Mixed,
+    preferences: Schema.Types.Mixed,
   },
   schemaOptions
 );
-
-jobSchema.index({ expireAt: 1 }, getTTLOptions());
 
 jobSchema.virtual('executionDetails', {
   ref: 'ExecutionDetails',
@@ -398,5 +395,10 @@ jobSchema.index(
     sparse: true,
   }
 );
+
+/*
+ * This index was created to push entries to Online Archive
+ */
+jobSchema.index({ createdAt: 1 });
 
 export const Job = (mongoose.models.Job as mongoose.Model<JobDBModel>) || mongoose.model<JobDBModel>('Job', jobSchema);

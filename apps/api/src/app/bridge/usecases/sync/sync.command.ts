@@ -1,53 +1,23 @@
-import { IsString, ValidateNested } from 'class-validator';
+import { IsDefined, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 import { EnvironmentWithUserCommand, IStepControl } from '@novu/application-generic';
-import { NotificationTemplateCustomData, IPreferenceChannels, StepType } from '@novu/shared';
+import type { JSONSchemaDto, StepType } from '@novu/shared';
 
-import { IStepOutput, IWorkflowDefineStep } from '../../shared';
-
-interface IWorkflowDefineOptions {
-  version?: `${number}.${number}.${number}`;
-
-  critical?: boolean;
-
-  active?: boolean;
-
-  tags?: string[];
-
-  description: string;
-
-  preferenceSettings?: IPreferenceChannels;
-
-  data?: NotificationTemplateCustomData;
-
-  payloadSchema?: Record<string, unknown>;
-
-  notificationGroupId?: string;
+interface IStepOutput {
+  schema: JSONSchemaDto;
 }
 
-export class WorkflowDefineOptions implements IWorkflowDefineOptions {
-  @IsString()
-  version: `${number}.${number}.${number}`;
+interface IWorkflowDefineStep {
+  stepId: string;
 
-  critical?: boolean;
+  type: StepType;
 
-  active?: boolean;
+  controls: IStepControl;
 
-  tags?: string[];
+  outputs: IStepOutput;
 
-  description: string;
-
-  preferenceSettings?: IPreferenceChannels;
-
-  data?: NotificationTemplateCustomData;
-}
-
-interface IStepDefineOptions {
-  version: `${number}.${number}.${number}`;
-  failOnErrorEnabled: boolean;
-  skip: boolean;
-  active?: boolean;
+  code: string;
 }
 
 class WorkflowDefineStep implements IWorkflowDefineStep {
@@ -57,12 +27,9 @@ class WorkflowDefineStep implements IWorkflowDefineStep {
   @IsString()
   type: StepType;
 
-  inputs: IStepControl;
   controls: IStepControl;
 
   outputs: IStepOutput;
-
-  options?: IStepDefineOptions;
 
   code: string;
 }
@@ -70,13 +37,10 @@ class WorkflowDefineStep implements IWorkflowDefineStep {
 export interface IWorkflowDefine {
   workflowId: string;
 
-  options?: IWorkflowDefineOptions;
-
   code: string;
 
   steps: IWorkflowDefineStep[];
 
-  inputs?: IStepControl;
   controls?: IStepControl;
 }
 
@@ -84,17 +48,12 @@ export class WorkflowDefine implements IWorkflowDefine {
   @IsString()
   workflowId: string;
 
-  @ValidateNested({ each: true })
-  @Type(() => WorkflowDefineOptions)
-  options?: IWorkflowDefineOptions;
-
   code: string;
 
   @ValidateNested({ each: true })
   @Type(() => WorkflowDefineStep)
   steps: IWorkflowDefineStep[];
 
-  inputs?: IStepControl;
   controls?: IStepControl;
 }
 
@@ -103,8 +62,16 @@ export interface ICreateBridges {
 }
 
 export class SyncCommand extends EnvironmentWithUserCommand implements ICreateBridges {
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => WorkflowDefine)
   workflows?: WorkflowDefine[];
+
+  @IsString()
+  @IsDefined()
   bridgeUrl: string;
 
+  @IsOptional()
+  @IsString()
   source?: string;
 }

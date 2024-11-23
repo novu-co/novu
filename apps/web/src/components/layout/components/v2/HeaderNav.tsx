@@ -1,10 +1,17 @@
+import { useEffect, useState } from 'react';
 import { ActionIcon, Header } from '@mantine/core';
-import { IconHelpOutline } from '@novu/novui/icons';
-import { Tooltip } from '@novu/design-system';
+import {
+  IconHelpOutline,
+  IconOutlineChat,
+  IconOutlineLibraryBooks,
+  IconOutlineGroup,
+  IconOutlineMail,
+} from '@novu/novui/icons';
+import { Tooltip, Dropdown } from '@novu/design-system';
 import { css } from '@novu/novui/css';
 import { HStack } from '@novu/novui/jsx';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
-import { IS_EE_AUTH_ENABLED, IS_DOCKER_HOSTED } from '../../../../config';
+import { IS_EE_AUTH_ENABLED, IS_NOVU_PROD_STAGING } from '../../../../config';
 import { useBootIntercom, useFeatureFlag } from '../../../../hooks';
 import useThemeChange from '../../../../hooks/useThemeChange';
 import { discordInviteUrl } from '../../../../pages/quick-start/consts';
@@ -14,21 +21,61 @@ import { NotificationCenterWidget } from '../NotificationCenterWidget';
 import { HeaderMenuItems } from './HeaderMenuItems';
 import { UserProfileButton } from '../../../../ee/clerk';
 import { BridgeMenuItems } from './BridgeMenuItems';
-import { useStudioState } from '../../../../studio/StudioStateProvider';
 import { WorkflowHeaderBackButton } from './WorkflowHeaderBackButton';
+import { SupportModal } from '../SupportModal';
 
 export function HeaderNav() {
-  const { currentUser } = useAuth();
-  const { bridgeURL } = useStudioState();
-
-  const isSelfHosted = IS_DOCKER_HOSTED;
-  const isV2ExperienceEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_EXPERIENCE_ENABLED);
-
-  const shouldShowNewNovuExperience = isV2ExperienceEnabled && bridgeURL;
+  const { currentUser, currentOrganization } = useAuth();
+  const [isSupportModalOpened, setIsSupportModalOpened] = useState(false);
+  const isV2Enabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_ENABLED);
 
   useBootIntercom();
+  // variable to check if it's the first render for. Needed for Plain live chat initialization
+  const [isFirstRender, setIsFirstRender] = useState(true);
+  const isLiveChatVisible =
+    process.env.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID &&
+    IS_NOVU_PROD_STAGING &&
+    currentOrganization?.apiServiceLevel !== 'free' &&
+    currentUser?.servicesHashes?.plain;
 
   const { Icon, themeLabel, toggleColorScheme } = useThemeChange();
+
+  const toggleSupportModalShow = () => {
+    setIsSupportModalOpened((previous) => !previous);
+  };
+
+  useEffect(() => {
+    if (isLiveChatVisible && isFirstRender) {
+      // @ts-ignore
+      window.Plain.init({
+        appId: process.env.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID,
+        hideLauncher: true,
+        title: 'Chat with us',
+        links: [
+          {
+            icon: 'call',
+            text: 'Contact Sales',
+            url: 'https://notify.novu.co/meetings/novuhq/novu-discovery-session-rr?utm_campaign=in_app_live_chat',
+          },
+        ],
+        entryPoint: 'default',
+        theme: 'light',
+
+        customerDetails: {
+          email: currentUser?.email,
+          emailHash: currentUser?.servicesHashes?.plain,
+        },
+      });
+    }
+    setIsFirstRender(false);
+  }, [isLiveChatVisible, currentUser]);
+
+  const showLiveChat = () => {
+    if (currentUser?.servicesHashes?.plain && process.env.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID) {
+      // @ts-ignore
+      window.Plain.open();
+    }
+  };
 
   return (
     <Header
@@ -43,9 +90,11 @@ export function HeaderNav() {
     >
       {/* TODO: Change position: right to space-between for breadcrumbs */}
       <HStack justifyContent="space-between" width="full" display="flex">
-        <HStack gap="100">{shouldShowNewNovuExperience && <WorkflowHeaderBackButton />}</HStack>
+        <HStack gap="100">
+          <WorkflowHeaderBackButton />
+        </HStack>
         <HStack flexWrap={'nowrap'} justifyContent="flex-end" gap={'100'}>
-          {shouldShowNewNovuExperience && <BridgeMenuItems />}
+          {isV2Enabled && <BridgeMenuItems />}
           <ActionIcon variant="transparent" onClick={() => toggleColorScheme()}>
             <Tooltip label={themeLabel}>
               <div>
@@ -53,22 +102,64 @@ export function HeaderNav() {
               </div>
             </Tooltip>
           </ActionIcon>
+
           {/* Ugly fallback to satisfy the restrictive typings of the NotificationCenterWidget */}
-          <NotificationCenterWidget user={currentUser || undefined} />
-          {isSelfHosted ? (
+
+          {IS_NOVU_PROD_STAGING ? (
+            <Dropdown
+              control={
+                <ActionIcon variant="transparent">
+                  <IconHelpOutline />
+                </ActionIcon>
+              }
+            >
+              <Dropdown.Item>
+                <a href={discordInviteUrl} target="_blank" rel="noopener noreferrer">
+                  <HStack>
+                    <IconOutlineGroup /> Join us on Discord
+                  </HStack>
+                </a>
+              </Dropdown.Item>
+              <Dropdown.Item>
+                <a href={'https://docs.novu.co'} target="_blank" rel="noopener noreferrer">
+                  <HStack>
+                    <IconOutlineLibraryBooks /> Documentation
+                  </HStack>
+                </a>
+              </Dropdown.Item>
+              <Dropdown.Item
+                onClick={() => {
+                  toggleSupportModalShow();
+                }}
+              >
+                <HStack>
+                  <IconOutlineMail /> Contact Us
+                </HStack>
+              </Dropdown.Item>
+              {isLiveChatVisible && (
+                <Dropdown.Item
+                  onClick={() => {
+                    showLiveChat();
+                  }}
+                >
+                  <HStack>
+                    <IconOutlineChat /> Live Chat
+                  </HStack>
+                </Dropdown.Item>
+              )}
+            </Dropdown>
+          ) : (
             <a href={discordInviteUrl} target="_blank" rel="noopener noreferrer">
               <ActionIcon variant="transparent">
                 <IconHelpOutline />
               </ActionIcon>
             </a>
-          ) : (
-            <ActionIcon variant="transparent" id="intercom-launcher">
-              <IconHelpOutline />
-            </ActionIcon>
           )}
+          <NotificationCenterWidget user={currentUser || undefined} />
           {IS_EE_AUTH_ENABLED ? <UserProfileButton /> : <HeaderMenuItems />}
         </HStack>
       </HStack>
+      <SupportModal isOpen={isSupportModalOpened} toggleOpen={toggleSupportModalShow} />
     </Header>
   );
 }

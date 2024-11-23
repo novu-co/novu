@@ -1,4 +1,4 @@
-import { providerSchemas } from '../schemas';
+import { providerSchemas } from '../schemas/providers';
 import type { FromSchemaUnvalidated } from './schema.types';
 import { Awaitable, Prettify } from './util.types';
 
@@ -12,12 +12,6 @@ export type WithPassthrough<T> = Prettify<T & { _passthrough?: Passthrough }>;
 
 export type Providers<T_StepType extends keyof typeof providerSchemas, T_Controls, T_Output> = {
   [K in keyof (typeof providerSchemas)[T_StepType]]?: (step: {
-    /**
-     * The controls for the step.
-     *
-     * @deprecated Use `controls` instead
-     */
-    inputs: T_Controls;
     /**
      * The controls for the step.
      */

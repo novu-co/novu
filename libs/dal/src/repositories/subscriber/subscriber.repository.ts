@@ -1,8 +1,6 @@
-import { SoftDeleteModel } from 'mongoose-delete';
 import { FilterQuery } from 'mongoose';
-
 import { EnvironmentId, ISubscribersDefine, OrganizationId } from '@novu/shared';
-import { SubscriberEntity, SubscriberDBModel } from './subscriber.entity';
+import { SubscriberDBModel, SubscriberEntity } from './subscriber.entity';
 import { Subscriber } from './subscriber.schema';
 import { IExternalSubscribersEntity } from './types';
 import { BaseRepository } from '../base-repository';
@@ -10,14 +8,10 @@ import { DalException } from '../../shared';
 import type { EnforceEnvOrOrgIds } from '../../types';
 
 type SubscriberQuery = FilterQuery<SubscriberDBModel> & EnforceEnvOrOrgIds;
-type SubscriberDeleteQuery = Pick<SubscriberQuery, 'subscriberId' | '_environmentId'> & EnforceEnvOrOrgIds;
-type SubscriberDeleteManyQuery = Pick<SubscriberQuery, 'subscriberId' | '_id' | '_environmentId'> & EnforceEnvOrOrgIds;
 
 export class SubscriberRepository extends BaseRepository<SubscriberDBModel, SubscriberEntity, EnforceEnvOrOrgIds> {
-  private subscriber: SoftDeleteModel;
   constructor() {
     super(Subscriber, SubscriberEntity);
-    this.subscriber = Subscriber;
   }
 
   async findBySubscriberId(
@@ -55,11 +49,15 @@ export class SubscriberRepository extends BaseRepository<SubscriberDBModel, Subs
     let bulkResponse;
     try {
       bulkResponse = await this.bulkWrite(bulkWriteOps);
-    } catch (e) {
-      if (!e.writeErrors) {
-        throw new DalException(e.message);
+    } catch (e: unknown) {
+      if (isErrorWithWriteErrors(e)) {
+        if (!e.writeErrors) {
+          throw new DalException(e.message);
+        }
+        bulkResponse = e.result;
+      } else {
+        throw new DalException('An unknown error occurred');
       }
-      bulkResponse = e.result;
     }
     const created = bulkResponse.getUpsertedIds();
     const writeErrors = bulkResponse.getWriteErrors();
@@ -153,48 +151,19 @@ export class SubscriberRepository extends BaseRepository<SubscriberDBModel, Subs
     );
   }
 
-  async delete(query: SubscriberDeleteQuery) {
-    const requestQuery: SubscriberDeleteQuery = {
-      _environmentId: query._environmentId,
-      subscriberId: query.subscriberId,
-    };
-
-    const foundSubscriber = await this.findOne(requestQuery);
-
-    if (!foundSubscriber) {
-      throw new DalException(`Could not find subscriber ${query.subscriberId} to delete`);
-    }
-
-    return await this.subscriber.delete(requestQuery);
-  }
-
-  async deleteMany(query: SubscriberDeleteManyQuery) {
-    const requestQuery: SubscriberDeleteManyQuery = {
-      _environmentId: query._environmentId,
-      subscriberId: query.subscriberId,
-    };
-
-    if (query._id) {
-      requestQuery._id = query._id;
-    }
-
-    return await this.subscriber.delete(requestQuery);
-  }
-
-  async findDeleted(query: SubscriberQuery) {
-    const requestQuery: SubscriberQuery = {
-      _environmentId: query._environmentId,
-      subscriberId: query.subscriberId,
-    };
-
-    const res = await this.subscriber.findDeleted(requestQuery);
-
-    return this.mapEntity(res);
+  async estimatedDocumentCount(): Promise<number> {
+    return this._model.estimatedDocumentCount();
   }
 }
+
 function mapToSubscriberObject(subscriberId: string) {
   return { subscriberId };
 }
+
 function regExpEscape(literalString: string): string {
   return literalString.replace(/[-[\]{}()*+!<=:?./\\^$|#\s,]/g, '\\$&');
+}
+
+function isErrorWithWriteErrors(e: unknown): e is { writeErrors?: any; message?: string; result?: any } {
+  return typeof e === 'object' && e !== null && 'writeErrors' in e;
 }

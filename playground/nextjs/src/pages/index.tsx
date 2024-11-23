@@ -1,6 +1,7 @@
+import { Inbox } from '@novu/nextjs';
+import { dark } from '@novu/nextjs/themes';
 import Title from '@/components/Title';
 import { novuConfig } from '@/utils/config';
-import { Inbox } from '@novu/react';
 
 export default function Home() {
   return (

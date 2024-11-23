@@ -38,6 +38,7 @@ const userSchema = new Schema<UserDBModel>(
     },
     servicesHashes: {
       intercom: Schema.Types.String,
+      plain: Schema.Types.String,
     },
     jobTitle: Schema.Types.String,
     externalId: Schema.Types.String,

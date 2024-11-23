@@ -8,9 +8,10 @@ import {
   UpsertPreferences,
   UpsertSubscriberWorkflowPreferencesCommand,
   UpsertSubscriberGlobalPreferencesCommand,
+  InstrumentUsecase,
+  Instrument,
 } from '@novu/application-generic';
 import {
-  ChannelTypeEnum,
   NotificationTemplateEntity,
   NotificationTemplateRepository,
   PreferenceLevelEnum,
@@ -18,13 +19,11 @@ import {
   SubscriberPreferenceRepository,
   SubscriberRepository,
 } from '@novu/dal';
-import { IPreferenceChannels } from '@novu/shared';
+import { IPreferenceChannels, WorkflowPreferences, WorkflowPreferencesPartial } from '@novu/shared';
 import { ApiException } from '../../../shared/exceptions/api.exception';
 import { AnalyticsEventsEnum } from '../../utils';
 import { InboxPreference } from '../../utils/types';
 import { UpdatePreferencesCommand } from './update-preferences.command';
-
-const PREFERENCE_DEFAULT_VALUE = true;
 
 @Injectable()
 export class UpdatePreferences {
@@ -38,6 +37,7 @@ export class UpdatePreferences {
     private upsertPreferences: UpsertPreferences
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: UpdatePreferencesCommand): Promise<InboxPreference> {
     const subscriber = await this.subscriberRepository.findBySubscriberId(command.environmentId, command.subscriberId);
     if (!subscriber) throw new NotFoundException(`Subscriber with id: ${command.subscriberId} is not found`);
@@ -55,60 +55,36 @@ export class UpdatePreferences {
       }
     }
 
-    const userPreference = await this.subscriberPreferenceRepository.findOne(this.commonQuery(command, subscriber));
-    if (!userPreference) {
-      await this.createUserPreference(command, subscriber);
-    } else {
-      await this.updateUserPreference(command, subscriber);
-    }
+    await this.updateSubscriberPreference(command, subscriber);
 
     return await this.findPreference(command, subscriber);
   }
 
-  private async createUserPreference(command: UpdatePreferencesCommand, subscriber: SubscriberEntity): Promise<void> {
-    const channelObj = {
-      chat: command.chat,
-      email: command.email,
-      in_app: command.in_app,
-      push: command.push,
-      sms: command.sms,
-    } as Record<ChannelTypeEnum, boolean>;
+  @Instrument()
+  private async updateSubscriberPreference(
+    command: UpdatePreferencesCommand,
+    subscriber: SubscriberEntity
+  ): Promise<void> {
+    const channelPreferences: IPreferenceChannels = this.buildPreferenceChannels(command);
 
-    this.analyticsService.mixpanelTrack(AnalyticsEventsEnum.CREATE_PREFERENCES, '', {
-      _organization: command.organizationId,
-      _subscriber: subscriber._id,
-      _workflowId: command.workflowId,
-      level: command.level,
-      channels: channelObj,
+    await this.storePreferencesV2({
+      channels: channelPreferences,
+      organizationId: command.organizationId,
+      environmentId: command.environmentId,
+      _subscriberId: subscriber._id,
+      templateId: command.workflowId,
     });
-
-    const query = this.commonQuery(command, subscriber);
-    await this.subscriberPreferenceRepository.create({
-      ...query,
-      enabled: true,
-      channels: channelObj,
-    });
-  }
-
-  private async updateUserPreference(command: UpdatePreferencesCommand, subscriber: SubscriberEntity): Promise<void> {
-    const channelObj = {
-      chat: command.chat,
-      email: command.email,
-      in_app: command.in_app,
-      push: command.push,
-      sms: command.sms,
-    } as Record<ChannelTypeEnum, boolean>;
 
     this.analyticsService.mixpanelTrack(AnalyticsEventsEnum.UPDATE_PREFERENCES, '', {
       _organization: command.organizationId,
       _subscriber: subscriber._id,
       _workflowId: command.workflowId,
       level: command.level,
-      channels: channelObj,
+      channels: channelPreferences,
     });
 
     const updateFields = {};
-    for (const [key, value] of Object.entries(channelObj)) {
+    for (const [key, value] of Object.entries(channelPreferences)) {
       if (value !== undefined) {
         updateFields[`channels.${key}`] = value;
       }
@@ -120,6 +96,17 @@ export class UpdatePreferences {
     });
   }
 
+  private buildPreferenceChannels(command: UpdatePreferencesCommand): IPreferenceChannels {
+    return {
+      ...(command.chat !== undefined && { chat: command.chat }),
+      ...(command.email !== undefined && { email: command.email }),
+      ...(command.in_app !== undefined && { in_app: command.in_app }),
+      ...(command.push !== undefined && { push: command.push }),
+      ...(command.sms !== undefined && { sms: command.sms }),
+    };
+  }
+
+  @Instrument()
   private async findPreference(
     command: UpdatePreferencesCommand,
     subscriber: SubscriberEntity
@@ -137,17 +124,9 @@ export class UpdatePreferences {
           environmentId: command.environmentId,
           template: workflow,
           subscriber,
+          includeInactiveChannels: command.includeInactiveChannels,
         })
       );
-
-      await this.storePreferences({
-        enabled: preference.enabled,
-        channels: preference.channels,
-        organizationId: command.organizationId,
-        environmentId: command.environmentId,
-        subscriberId: command.subscriberId,
-        templateId: workflow._id,
-      });
 
       return {
         level: PreferenceLevelEnum.TEMPLATE,
@@ -168,16 +147,9 @@ export class UpdatePreferences {
         organizationId: command.organizationId,
         environmentId: command.environmentId,
         subscriberId: command.subscriberId,
+        includeInactiveChannels: command.includeInactiveChannels,
       })
     );
-
-    await this.storePreferences({
-      enabled: preference.enabled,
-      channels: preference.channels,
-      organizationId: command.organizationId,
-      environmentId: command.environmentId,
-      subscriberId: command.subscriberId,
-    });
 
     return {
       level: PreferenceLevelEnum.GLOBAL,
@@ -196,62 +168,46 @@ export class UpdatePreferences {
     };
   }
 
-  private async storePreferences(item: {
-    enabled: boolean;
+  /**
+   * Strangler pattern to migrate to V2 preferences.
+   */
+  @Instrument()
+  private async storePreferencesV2(item: {
     channels: IPreferenceChannels;
     organizationId: string;
-    subscriberId: string;
+    _subscriberId: string;
     environmentId: string;
     templateId?: string;
-  }) {
-    const preferences = {
-      workflow: {
-        defaultValue: item.enabled || PREFERENCE_DEFAULT_VALUE,
-        readOnly: false,
-      },
-      channels: {
-        in_app: {
-          defaultValue: item.channels.in_app || PREFERENCE_DEFAULT_VALUE,
-          readOnly: false,
-        },
-        sms: {
-          defaultValue: item.channels.sms || PREFERENCE_DEFAULT_VALUE,
-          readOnly: false,
-        },
-        email: {
-          defaultValue: item.channels.email || PREFERENCE_DEFAULT_VALUE,
-          readOnly: false,
-        },
-        push: {
-          defaultValue: item.channels.push || PREFERENCE_DEFAULT_VALUE,
-          readOnly: false,
-        },
-        chat: {
-          defaultValue: item.channels.chat || PREFERENCE_DEFAULT_VALUE,
-          readOnly: false,
-        },
-      },
+  }): Promise<void> {
+    const preferences: WorkflowPreferencesPartial = {
+      channels: Object.entries(item.channels).reduce(
+        (outputChannels, [channel, enabled]) => ({
+          ...outputChannels,
+          [channel]: { enabled },
+        }),
+        {} as WorkflowPreferences['channels']
+      ),
     };
 
     if (item.templateId) {
-      return await this.upsertPreferences.upsertSubscriberWorkflowPreferences(
+      await this.upsertPreferences.upsertSubscriberWorkflowPreferences(
         UpsertSubscriberWorkflowPreferencesCommand.create({
           environmentId: item.environmentId,
           organizationId: item.organizationId,
-          subscriberId: item.subscriberId,
+          _subscriberId: item._subscriberId,
           templateId: item.templateId,
           preferences,
         })
       );
+    } else {
+      await this.upsertPreferences.upsertSubscriberGlobalPreferences(
+        UpsertSubscriberGlobalPreferencesCommand.create({
+          preferences,
+          environmentId: item.environmentId,
+          organizationId: item.organizationId,
+          _subscriberId: item._subscriberId,
+        })
+      );
     }
-
-    return await this.upsertPreferences.upsertSubscriberGlobalPreferences(
-      UpsertSubscriberGlobalPreferencesCommand.create({
-        preferences,
-        environmentId: item.environmentId,
-        organizationId: item.organizationId,
-        subscriberId: item.subscriberId,
-      })
-    );
   }
 }

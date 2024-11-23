@@ -1,11 +1,8 @@
-import { DiscoverWorkflowOutputPreferences } from '@novu/framework';
-import { EnvironmentCommand } from '../../commands';
-import { IsDefined, IsNotEmpty } from 'class-validator';
+import { IsMongoId, IsNotEmpty } from 'class-validator';
+import { UpsertPreferencesRequiredBaseCommand } from './upsert-preferences.command';
 
-export class UpsertWorkflowPreferencesCommand extends EnvironmentCommand {
-  @IsDefined()
-  readonly preferences: DiscoverWorkflowOutputPreferences;
-
+export class UpsertWorkflowPreferencesCommand extends UpsertPreferencesRequiredBaseCommand {
   @IsNotEmpty()
-  templateId: string;
+  @IsMongoId()
+  readonly templateId: string;
 }

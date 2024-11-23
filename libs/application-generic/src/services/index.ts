@@ -6,6 +6,7 @@ export * from './queues';
 export * from './workers';
 export { INovuWorker, ReadinessService } from './readiness';
 export { AnalyticsService } from './analytics.service';
+export { SupportService } from './support.service';
 export { VerifyPayloadService } from './verify-payload.service';
 export { EventsDistributedLockService } from './events-distributed-lock.service';
 export * from './calculate-delay';
