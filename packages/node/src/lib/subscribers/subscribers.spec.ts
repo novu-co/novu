@@ -193,7 +193,7 @@ describe('test use of novus node package - Subscribers class', () => {
   test('should get subscriber preference', async () => {
     mockedAxios.get.mockResolvedValue({});
 
-    await novu.subscribers.getPreference('test-subscriber-preference');
+    await novu.subscribers.getPreference('test-subscriber-preference', true);
 
     expect(mockedAxios.get).toHaveBeenCalled();
     expect(mockedAxios.get).toHaveBeenCalledWith(
