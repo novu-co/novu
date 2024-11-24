@@ -79,13 +79,29 @@ export class GetSubscriberPreference {
             ],
           },
         },
+        {
+          _subscriberId: command.subscriberId,
+          type: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
+        },
       ],
     });
+
+    const subscriberGlobalPreference = allPreferences.find(
+      (preference) =>
+        preference._subscriberId === command.subscriberId &&
+        preference.type === PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
+    );
 
     const workflowPreferenceSets = allPreferences.reduce<
       Record<string, PreferencesEntity[]>
     >((acc, preference) => {
       const workflowId = preference._templateId;
+
+      // Skip if the preference is not for a workflow
+      if (workflowId === undefined) {
+        return acc;
+      }
+
       if (!acc[workflowId]) {
         acc[workflowId] = [];
       }
@@ -97,7 +113,10 @@ export class GetSubscriberPreference {
     const mergedPreferences: ISubscriberPreferenceResponse[] = Object.entries(
       workflowPreferenceSets,
     ).map(([workflowId, preferences]) => {
-      const merged = MergePreferences.merge(preferences);
+      const merged = MergePreferences.merge([
+        ...preferences,
+        subscriberGlobalPreference,
+      ]);
 
       const workflow = workflowList.find((wf) => wf._id === workflowId);
 

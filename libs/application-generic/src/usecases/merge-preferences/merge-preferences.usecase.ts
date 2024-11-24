@@ -19,10 +19,7 @@ import { GetPreferencesResponseDto } from '../get-preferences';
  * If the subscriber has no preferences, the workflow preferences are returned.
  */
 export class MergePreferences {
-  public static merge(
-    items: PreferencesEntity[],
-    workflowId?: string,
-  ): GetPreferencesResponseDto {
+  public static merge(items: PreferencesEntity[]): GetPreferencesResponseDto {
     const workflowResourcePreferences =
       this.getWorkflowResourcePreferences(items);
     const workflowUserPreferences = this.getWorkflowUserPreferences(items);
@@ -35,10 +32,8 @@ export class MergePreferences {
 
     const subscriberGlobalPreferences =
       this.getSubscriberGlobalPreferences(items);
-    const subscriberWorkflowPreferences = this.getSubscriberWorkflowPreferences(
-      items,
-      workflowId,
-    );
+    const subscriberWorkflowPreferences =
+      this.getSubscriberWorkflowPreferences(items);
 
     const subscriberPreferences = deepMerge(
       [subscriberGlobalPreferences, subscriberWorkflowPreferences]
@@ -152,12 +147,9 @@ export class MergePreferences {
 
   private static getSubscriberWorkflowPreferences(
     items: PreferencesEntity[],
-    templateId: string,
-  ) {
+  ): PreferencesEntity | undefined {
     return items.find(
-      (item) =>
-        item.type === PreferencesTypeEnum.SUBSCRIBER_WORKFLOW &&
-        item._templateId === templateId,
+      (item) => item.type === PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
     );
   }
 
