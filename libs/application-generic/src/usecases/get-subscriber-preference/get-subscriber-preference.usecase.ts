@@ -82,18 +82,21 @@ export class GetSubscriberPreference {
       ],
     });
 
-    const workflowPreferenceSets = allPreferences.reduce((acc, preference) => {
+    const workflowPreferenceSets = allPreferences.reduce<
+      Record<string, PreferencesEntity[]>
+    >((acc, preference) => {
       const workflowId = preference._templateId;
-      if (!acc.has(workflowId)) {
-        acc.set(workflowId, []);
+      if (!acc[workflowId]) {
+        acc[workflowId] = [];
       }
-      acc.get(workflowId).push(preference);
+      acc[workflowId].push(preference);
 
       return acc;
-    }, new Map<string, PreferencesEntity[]>());
+    }, {});
 
-    const mergedPreferences: ISubscriberPreferenceResponse[] = [];
-    workflowPreferenceSets.forEach((preferences, workflowId) => {
+    const mergedPreferences: ISubscriberPreferenceResponse[] = Object.entries(
+      workflowPreferenceSets,
+    ).map(([workflowId, preferences]) => {
       const merged = MergePreferences.merge(preferences);
 
       const workflow = workflowList.find((wf) => wf._id === workflowId);
@@ -127,7 +130,7 @@ export class GetSubscriberPreference {
         initialChannels,
       );
 
-      mergedPreferences.push({
+      return {
         preference: {
           channels,
           enabled: true,
@@ -138,7 +141,7 @@ export class GetSubscriberPreference {
           critical: merged.preferences.all.readOnly,
         },
         type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
-      });
+      };
     });
 
     const nonCriticalWorkflowPreferences = mergedPreferences.filter(
