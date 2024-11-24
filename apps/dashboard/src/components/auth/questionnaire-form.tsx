@@ -158,7 +158,7 @@ export function QuestionnaireForm() {
                       control={control}
                       render={({ field }) => (
                         <>
-                          {Object.values(CompanySize).map((size) => (
+                          {Object.values(CompanySizeEnum).map((size) => (
                             <Button
                               key={size}
                               variant="outline"
