@@ -2,24 +2,34 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   NotificationTemplateRepository,
   SubscriberRepository,
+  PreferencesRepository,
+  PreferencesEntity,
+  NotificationTemplateEntity,
 } from '@novu/dal';
-import { ISubscriberPreferenceResponse } from '@novu/shared';
+import {
+  ChannelTypeEnum,
+  ISubscriberPreferenceResponse,
+  PreferencesTypeEnum,
+  StepTypeEnum,
+} from '@novu/shared';
 
 import { AnalyticsService } from '../../services/analytics.service';
 import { GetSubscriberPreferenceCommand } from './get-subscriber-preference.command';
-import {
-  GetSubscriberTemplatePreference,
-  GetSubscriberTemplatePreferenceCommand,
-} from '../get-subscriber-template-preference';
 import { InstrumentUsecase } from '../../instrumentation';
+import { MergePreferences } from '../merge-preferences/merge-preferences.usecase';
+import { GetPreferences } from '../get-preferences';
+import {
+  filteredPreference,
+  overridePreferences,
+} from '../get-subscriber-template-preference';
 
 @Injectable()
 export class GetSubscriberPreference {
   constructor(
     private subscriberRepository: SubscriberRepository,
     private notificationTemplateRepository: NotificationTemplateRepository,
-    private getSubscriberTemplatePreferenceUsecase: GetSubscriberTemplatePreference,
     private analyticsService: AnalyticsService,
+    private preferencesRepository: PreferencesRepository,
   ) {}
 
   @InstrumentUsecase()
@@ -36,7 +46,7 @@ export class GetSubscriberPreference {
       );
     }
 
-    const templateList = await this.notificationTemplateRepository.filterActive(
+    const workflowList = await this.notificationTemplateRepository.filterActive(
       {
         organizationId: command.organizationId,
         environmentId: command.environmentId,
@@ -49,30 +59,116 @@ export class GetSubscriberPreference {
       '',
       {
         _organization: command.organizationId,
-        templatesSize: templateList.length,
+        templatesSize: workflowList.length,
       },
     );
 
-    // TODO: replace this runtime mapping with a single query to the database
-    const subscriberWorkflowPreferences = await Promise.all(
-      templateList.map(async (template) =>
-        this.getSubscriberTemplatePreferenceUsecase.execute(
-          GetSubscriberTemplatePreferenceCommand.create({
-            organizationId: command.organizationId,
-            subscriberId: command.subscriberId,
-            environmentId: command.environmentId,
-            template,
-            subscriber,
-            includeInactiveChannels: command.includeInactiveChannels,
-          }),
-        ),
-      ),
-    );
+    const allPreferences = await this.preferencesRepository.find({
+      _environmentId: command.environmentId,
+      $or: [
+        {
+          _subscriberId: command.subscriberId,
+          type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+        },
+        {
+          _templateId: { $in: workflowList.map((template) => template._id) },
+          type: {
+            $in: [
+              PreferencesTypeEnum.WORKFLOW_RESOURCE,
+              PreferencesTypeEnum.USER_WORKFLOW,
+            ],
+          },
+        },
+      ],
+    });
 
-    const nonCriticalWorkflowPreferences = subscriberWorkflowPreferences.filter(
-      (preference) => preference.template.critical === false,
+    const workflowPreferenceSets = allPreferences.reduce((acc, preference) => {
+      const workflowId = preference._templateId;
+      if (!acc.has(workflowId)) {
+        acc.set(workflowId, []);
+      }
+      acc.get(workflowId).push(preference);
+
+      return acc;
+    }, new Map<string, PreferencesEntity[]>());
+
+    const mergedPreferences: ISubscriberPreferenceResponse[] = [];
+    workflowPreferenceSets.forEach((preferences, workflowId) => {
+      const merged = MergePreferences.merge(preferences);
+
+      const workflow = workflowList.find((wf) => wf._id === workflowId);
+
+      const includedChannels = this.getChannels(
+        workflow,
+        command.includeInactiveChannels,
+      );
+
+      const initialChannels = filteredPreference(
+        {
+          email: true,
+          sms: true,
+          in_app: true,
+          chat: true,
+          push: true,
+        },
+        includedChannels,
+      );
+
+      const { channels, overrides } = overridePreferences(
+        {
+          template: GetPreferences.mapWorkflowPreferencesToChannelPreferences(
+            merged.source.WORKFLOW_RESOURCE,
+          ),
+          subscriber: GetPreferences.mapWorkflowPreferencesToChannelPreferences(
+            merged.preferences,
+          ),
+          workflowOverride: {},
+        },
+        initialChannels,
+      );
+
+      mergedPreferences.push({
+        preference: {
+          channels,
+          enabled: true,
+          overrides,
+        },
+        template: {
+          ...workflow,
+          critical: merged.preferences.all.readOnly,
+        },
+        type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+      });
+    });
+
+    const nonCriticalWorkflowPreferences = mergedPreferences.filter(
+      (preference) => !preference.template.critical,
     );
 
     return nonCriticalWorkflowPreferences;
+  }
+
+  private getChannels(
+    template: NotificationTemplateEntity,
+    includeInactiveChannels: boolean,
+  ): ChannelTypeEnum[] {
+    if (includeInactiveChannels) {
+      return Object.values(ChannelTypeEnum);
+    }
+
+    const activeSteps = template.steps.filter((step) => step.active === true);
+
+    const channels = activeSteps
+      .map((item) => item.template.type as StepTypeEnum)
+      .reduce<StepTypeEnum[]>((list, channel) => {
+        if (list.includes(channel)) {
+          return list;
+        }
+        list.push(channel);
+
+        return list;
+      }, []);
+
+    return channels as unknown as ChannelTypeEnum[];
   }
 }
