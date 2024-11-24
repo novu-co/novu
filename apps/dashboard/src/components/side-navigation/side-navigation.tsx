@@ -22,7 +22,7 @@ import { useTelemetry } from '@/hooks/use-telemetry';
 import { SidebarContent } from '@/components/side-navigation/Sidebar';
 
 const linkVariants = cva(
-  `flex items-center gap-2 text-sm py-1.5 px-2 rounded-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer`,
+  `flex items-center gap-2 text-sm py-1.5 px-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer`,
   {
     variants: {
       variant: {

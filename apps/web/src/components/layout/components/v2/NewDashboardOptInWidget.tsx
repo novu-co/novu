@@ -45,6 +45,8 @@ const styles = {
     padding: '9px 16px !important',
     marginBottom: '16px',
     backgroundColor: 'surface.popover !important',
+    borderTopLeftRadius: '100 !important',
+    borderBottomLeftRadius: '100 !important',
     _before: {
       content: '""',
       position: 'absolute',

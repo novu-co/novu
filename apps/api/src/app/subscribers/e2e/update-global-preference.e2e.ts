@@ -58,14 +58,20 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
     expect(response.data.data.preference.channels).to.not.eql({
       [ChannelTypeEnum.IN_APP]: true,
     });
-    expect(response.data.data.preference.channels).to.eql({});
+    expect(response.data.data.preference.channels).to.eql({
+      [ChannelTypeEnum.EMAIL]: true,
+      [ChannelTypeEnum.PUSH]: true,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
+      [ChannelTypeEnum.IN_APP]: true,
+    });
   });
 
   it('should update user global preferences for multiple channels', async function () {
     const payload = {
       enabled: true,
       preferences: [
-        { type: ChannelTypeEnum.PUSH, enabled: true },
+        { type: ChannelTypeEnum.PUSH, enabled: false },
         { type: ChannelTypeEnum.IN_APP, enabled: false },
         { type: ChannelTypeEnum.SMS, enabled: true },
       ],
@@ -74,13 +80,13 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
     const response = await updateGlobalPreferences(payload, session);
 
     expect(response.data.data.preference.enabled).to.eql(true);
-    expect(response.data.data.preference.channels).to.eql({});
-  });
-
-  it('should unset all preferences when the preferences object is empty', async function () {
-    const response = await updateGlobalPreferences({}, session);
-
-    expect(response.data.data.preference.channels).to.eql({});
+    expect(response.data.data.preference.channels).to.eql({
+      [ChannelTypeEnum.EMAIL]: true,
+      [ChannelTypeEnum.PUSH]: false,
+      [ChannelTypeEnum.CHAT]: true,
+      [ChannelTypeEnum.SMS]: true,
+      [ChannelTypeEnum.IN_APP]: false,
+    });
   });
 
   // `enabled` flag is not used anymore. The presence of a preference object means that the subscriber has enabled notifications.

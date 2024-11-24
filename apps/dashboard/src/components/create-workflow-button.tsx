@@ -169,6 +169,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     </div>
                     <FormControl>
                       <Textarea
+                        className="min-h-36"
                         placeholder="Description of what this workflow does"
                         {...field}
                         maxLength={MAX_DESCRIPTION_LENGTH}

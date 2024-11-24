@@ -1,5 +1,5 @@
 import { UserSession } from '@novu/testing';
-import { IUpdateNotificationTemplateDto } from '@novu/shared';
+import { IUpdateNotificationTemplateDto, PreferenceLevelEnum } from '@novu/shared';
 import axios from 'axios';
 
 import { UpdateSubscriberOnlineFlagRequestDto } from '../../dtos/update-subscriber-online-flag-request.dto';
@@ -28,15 +28,39 @@ export async function updateNotificationTemplate(
   });
 }
 
-export async function getPreference(session: UserSession, subscriberId?: string) {
-  return await axiosInstance.get(
-    `${session.serverUrl}/v1/subscribers/${subscriberId || session.subscriberId}/preferences`,
-    {
-      headers: {
-        authorization: `ApiKey ${session.apiKey}`,
-      },
-    }
-  );
+export async function getPreference(
+  session: UserSession,
+  subscriberId = session.subscriberId,
+  queryParams: { includeInactiveChannels?: boolean } = {}
+) {
+  const url = new URL(`${session.serverUrl}/v1/subscribers/${subscriberId}/preferences`);
+  Object.entries(queryParams).forEach(([key, value]) => {
+    url.searchParams.append(key, String(value));
+  });
+
+  return await axiosInstance.get(url.toString(), {
+    headers: {
+      authorization: `ApiKey ${session.apiKey}`,
+    },
+  });
+}
+
+export async function getPreferenceByLevel(
+  session: UserSession,
+  subscriberId = session.subscriberId,
+  level: PreferenceLevelEnum,
+  queryParams: { includeInactiveChannels?: boolean } = {}
+) {
+  const url = new URL(`${session.serverUrl}/v1/subscribers/${subscriberId}/preferences/${level}`);
+  Object.entries(queryParams).forEach(([key, value]) => {
+    url.searchParams.append(key, String(value));
+  });
+
+  return await axiosInstance.get(url.toString(), {
+    headers: {
+      authorization: `ApiKey ${session.apiKey}`,
+    },
+  });
 }
 
 export async function updateSubscriberOnlineFlag(

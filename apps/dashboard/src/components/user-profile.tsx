@@ -9,7 +9,12 @@ export function UserProfile() {
   return (
     <UserButton
       afterSignOutUrl={`${LEGACY_DASHBOARD_URL}/auth/login`}
-      appearance={{ elements: { avatarBox: 'h-6 w-6 focus:outline-none focus:ring-4 focus:ring-neutral-200' } }}
+      appearance={{
+        elements: {
+          avatarBox: 'h-6 w-6',
+          userButtonTrigger: 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        },
+      }}
     >
       <UserButton.MenuItems>
         <UserButton.Action
