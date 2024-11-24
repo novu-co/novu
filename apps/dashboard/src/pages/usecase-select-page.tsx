@@ -58,7 +58,7 @@ export function UsecaseSelectPage() {
       <PageMeta title="Customize you experience" />
 
       <AuthCard>
-        <div className="flex w-[564px] justify-center px-0">
+        <div className="flex w-[480px] justify-center px-0">
           <div className="flex max-w-[480px] flex-col items-center justify-center gap-8 p-[60px]">
             <UsecaseSelectOnboarding
               selectedUseCases={selectedUseCases}
@@ -78,7 +78,7 @@ export function UsecaseSelectPage() {
           </div>
         </div>
 
-        <div className="flex h-full w-full max-w-[564px] flex-1 justify-center border-l border-l-neutral-200">
+        <div className="flex h-full w-full max-w-[640px] flex-1 justify-center border-l border-l-neutral-200">
           <AnimatePresence mode="wait">
             {displayedUseCase && (
               <motion.img
