@@ -6,7 +6,6 @@ import { InboxBellFilled } from './icons/inbox-bell-filled';
 import { HeaderButton } from './header-navigation/header-button';
 import { useState, useEffect } from 'react';
 import { useEnvironment } from '../context/environment/hooks';
-import { useLocation } from 'react-router-dom';
 import { useTestPage } from '@/hooks/use-test-page';
 
 const InboxInner = () => {
@@ -15,13 +14,19 @@ const InboxInner = () => {
 
   const novu = useNovu();
   useEffect(() => {
+    // Store a timeout to debounce the jingle animation
+    let timeout: NodeJS.Timeout;
+
     const cleanup = novu.on('notifications.notification_received', () => {
       setJingle(true);
-      const timeout = setTimeout(() => setJingle(false), 3000);
-
-      return () => clearTimeout(timeout);
+      clearTimeout(timeout);
+      timeout = setTimeout(() => setJingle(false), 3000);
     });
-    return () => cleanup();
+
+    return () => {
+      clearTimeout(timeout);
+      cleanup();
+    };
   }, [novu]);
 
   return (
