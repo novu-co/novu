@@ -35,6 +35,12 @@ export function UsecaseSelectPage() {
     }
   }
 
+  function handleSelectUseCase(useCase: ChannelTypeEnum) {
+    setSelectedUseCases((prev) =>
+      prev.includes(useCase) ? prev.filter((useCase) => useCase !== useCase) : [...prev, useCase]
+    );
+  }
+
   return (
     <>
       <PageMeta title="Customize you experience" />
@@ -45,11 +51,7 @@ export function UsecaseSelectPage() {
             <UsecaseSelectOnboarding
               selectedUseCases={selectedUseCases}
               onHover={(id) => setHoveredUseCase(id)}
-              onClick={(id) =>
-                setSelectedUseCases((prev) =>
-                  prev.includes(id) ? prev.filter((useCase) => useCase !== id) : [...prev, id]
-                )
-              }
+              onClick={(id) => handleSelectUseCase(id)}
             />
 
             <div className="flex flex-col items-center justify-center p-[60px] pt-0">
@@ -96,40 +98,44 @@ export function UsecaseSelectPage() {
               />
             )}
 
-            {!displayedUseCase && (
-              <motion.div
-                className="relative w-full p-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{
-                  duration: 0.2,
-                  ease: 'easeInOut',
-                }}
-              >
-                <div className="absolute left-2 top-[175px]">
-                  <OnboardingArrowLeft className="text-success h-[25px] w-[65px]" />
-                </div>
-
-                {/* Instruction Text */}
-                <p className="text-success absolute left-10 top-[211px] text-xs italic">
-                  Hover on the cards to visualize, <br />
-                  select all that apply.
-                </p>
-
-                {/* Help Text */}
-                <p className="absolute bottom-4 left-3.5 w-[400px] text-xs italic text-neutral-400">
-                  This helps us understand your use-case better with the channels you'd use in your product to
-                  communicate with your users.
-                  <br />
-                  <br />
-                  don't worry, you can always change later as you build.
-                </p>
-              </motion.div>
-            )}
+            {!displayedUseCase && <EmptyStateView />}
           </AnimatePresence>
         </div>
       </AuthCard>
     </>
+  );
+}
+
+function EmptyStateView() {
+  return (
+    <motion.div
+      className="relative w-full p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{
+        duration: 0.2,
+        ease: 'easeInOut',
+      }}
+    >
+      <div className="absolute left-2 top-[175px]">
+        <OnboardingArrowLeft className="text-success h-[25px] w-[65px]" />
+      </div>
+
+      {/* Instruction Text */}
+      <p className="text-success absolute left-10 top-[211px] text-xs italic">
+        Hover on the cards to visualize, <br />
+        select all that apply.
+      </p>
+
+      {/* Help Text */}
+      <p className="absolute bottom-4 left-3.5 w-[400px] text-xs italic text-neutral-400">
+        This helps us understand your use-case better with the channels you'd use in your product to communicate with
+        your users.
+        <br />
+        <br />
+        don't worry, you can always change later as you build.
+      </p>
+    </motion.div>
   );
 }

@@ -1,3 +1,4 @@
+import { OrganizationTypeEnum, CompanySizeEnum, JobTitleEnum } from '@novu/shared';
 import { post } from './api.client';
 
 export const sendTelemetry = async (event: string, data?: Record<string, unknown>): Promise<void> => {
@@ -7,7 +8,16 @@ export const sendTelemetry = async (event: string, data?: Record<string, unknown
   });
 };
 
-export const identifyUser = async (userData: any) => {
+interface IdentifyUserProps {
+  hubspotContext: string;
+  pageUri: string;
+  pageName: string;
+  jobTitle: JobTitleEnum;
+  organizationType: OrganizationTypeEnum;
+  companySize?: CompanySizeEnum;
+}
+
+export const identifyUser = async (userData: IdentifyUserProps) => {
   try {
     await post('/telemetry/identify', userData);
   } catch (error) {

@@ -3,7 +3,7 @@ import { CardDescription, CardTitle } from '@/components/primitives/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import React, { useState } from 'react';
 import { StepIndicator } from './shared';
-import { JobTitleEnum, jobTitleToLabelMapper, OrganizationTypeEnum } from '@novu/shared';
+import { JobTitleEnum, jobTitleToLabelMapper, OrganizationTypeEnum, CompanySizeEnum } from '@novu/shared';
 import { useForm, Controller } from 'react-hook-form';
 import { updateClerkOrgMetadata } from '../../api/organization';
 import { hubspotCookie } from '../../utils/cookies';
@@ -13,17 +13,10 @@ import { TelemetryEvent } from '../../utils/telemetry';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../utils/routes';
 
-enum CompanySize {
-  LESS_THAN_10 = '<10',
-  BETWEEN_10_50 = '10-50',
-  BETWEEN_51_100 = '51-100',
-  MORE_THAN_100 = '100+',
-}
-
 interface QuestionnaireFormData {
   jobTitle: JobTitleEnum;
   organizationType: OrganizationTypeEnum;
-  companySize?: CompanySize;
+  companySize?: CompanySizeEnum;
 }
 
 export function QuestionnaireForm() {
@@ -61,7 +54,6 @@ export function QuestionnaireForm() {
       const hubspotContext = hubspotCookie.get();
 
       await identifyUser({
-        location: 'web',
         jobTitle: data.jobTitle,
         pageUri: window.location.href,
         pageName: 'Create Organization Form',
@@ -74,6 +66,7 @@ export function QuestionnaireForm() {
         location: 'web',
         jobTitle: data.jobTitle,
         companySize: data.companySize,
+        organizationType: data.organizationType,
       });
 
       navigate(ROUTES.USECASE_SELECT);
