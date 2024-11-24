@@ -1,4 +1,4 @@
-import { JobTitleEnum, OrganizationTypeEnum } from '../../types';
+import { ChannelTypeEnum, JobTitleEnum, OrganizationTypeEnum } from '../../types';
 
 export type UpdateExternalOrganizationDto = {
   jobTitle?: JobTitleEnum;
@@ -7,4 +7,5 @@ export type UpdateExternalOrganizationDto = {
   frontendStack?: string[];
   companySize?: string;
   organizationType?: OrganizationTypeEnum;
+  useCases?: ChannelTypeEnum[];
 };

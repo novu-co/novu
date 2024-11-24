@@ -11,7 +11,7 @@ import { identifyUser } from '../../api/telemetry';
 import { useTelemetry } from '../../hooks';
 import { TelemetryEvent } from '../../utils/telemetry';
 import { useNavigate } from 'react-router-dom';
-import { buildRoute, ROUTES } from '../../utils/routes';
+import { ROUTES } from '../../utils/routes';
 
 enum CompanySize {
   LESS_THAN_10 = '<10',
