@@ -14,7 +14,8 @@ const InboxInner = () => {
 
   const novu = useNovu();
   useEffect(() => {
-    // Store a timeout to debounce the jingle animation
+    // Store a timeout to debounce the jingle animation, preventing the bell from
+    // becoming jittery when multiple notifications are received in quick succession.
     let timeout: NodeJS.Timeout;
 
     const cleanup = novu.on('notifications.notification_received', () => {
