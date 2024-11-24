@@ -1,8 +1,17 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { usePreviewStep } from '@/hooks';
-import { InAppPreview } from '@/components/workflow-editor/in-app-preview';
+import {
+  InAppPreview,
+  InAppPreviewAvatar,
+  InAppPreviewBody,
+  InAppPreviewHeader,
+  InAppPreviewNotification,
+  InAppPreviewNotificationContent,
+  InAppPreviewSubject,
+} from '@/components/workflow-editor/in-app-preview';
 import { useStepEditorContext } from '@/components/workflow-editor/steps/hooks';
+import { InAppRenderOutput } from '@novu/shared';
 
 export function ConfigureInAppPreview() {
   const { previewStep, data, isPending: isPreviewPending } = usePreviewStep();
@@ -23,5 +32,26 @@ export function ConfigureInAppPreview() {
     });
   }, [workflowSlug, stepSlug, previewStep, step, isPendingStep]);
 
-  return <InAppPreview data={data} truncateBody isLoading={isPreviewPending} />;
+  if (!isPreviewPending && !data?.result) {
+    return null;
+  }
+
+  const preview = data?.result?.preview as InAppRenderOutput | undefined;
+
+  return (
+    <InAppPreview>
+      <InAppPreviewHeader />
+
+      <InAppPreviewNotification>
+        <InAppPreviewAvatar src={preview?.avatar} isPending={isPreviewPending} />
+
+        <InAppPreviewNotificationContent>
+          <InAppPreviewSubject isPending={isPreviewPending}>{preview?.subject}</InAppPreviewSubject>
+          <InAppPreviewBody isPending={isPreviewPending} className="line-clamp-2">
+            {preview?.body}
+          </InAppPreviewBody>
+        </InAppPreviewNotificationContent>
+      </InAppPreviewNotification>
+    </InAppPreview>
+  );
 }

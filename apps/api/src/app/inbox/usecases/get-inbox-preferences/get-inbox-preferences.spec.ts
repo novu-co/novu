@@ -120,6 +120,7 @@ describe('GetInboxPreferences', () => {
         organizationId: command.organizationId,
         environmentId: command.environmentId,
         subscriberId: command.subscriberId,
+        includeInactiveChannels: false,
       })
     );
 
@@ -130,6 +131,7 @@ describe('GetInboxPreferences', () => {
         subscriberId: command.subscriberId,
         organizationId: command.organizationId,
         tags: undefined,
+        includeInactiveChannels: false,
       })
     );
 
@@ -208,6 +210,7 @@ describe('GetInboxPreferences', () => {
         organizationId: command.organizationId,
         environmentId: command.environmentId,
         subscriberId: command.subscriberId,
+        includeInactiveChannels: false,
       })
     );
 
@@ -218,6 +221,7 @@ describe('GetInboxPreferences', () => {
         subscriberId: command.subscriberId,
         organizationId: command.organizationId,
         tags: command.tags,
+        includeInactiveChannels: false,
       })
     );
 

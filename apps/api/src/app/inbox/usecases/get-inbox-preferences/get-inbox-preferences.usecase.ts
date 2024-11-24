@@ -27,6 +27,7 @@ export class GetInboxPreferences {
         organizationId: command.organizationId,
         environmentId: command.environmentId,
         subscriberId: command.subscriberId,
+        includeInactiveChannels: false,
       })
     );
 
@@ -41,6 +42,7 @@ export class GetInboxPreferences {
         subscriberId: command.subscriberId,
         organizationId: command.organizationId,
         tags: command.tags,
+        includeInactiveChannels: false,
       })
     );
     const workflowPreferences = subscriberWorkflowPreferences.map((subscriberWorkflowPreference) => {

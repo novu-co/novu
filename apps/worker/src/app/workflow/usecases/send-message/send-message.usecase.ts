@@ -398,6 +398,7 @@ export class SendMessage {
           template: workflow,
           subscriber,
           tenant: job.tenant,
+          includeInactiveChannels: false,
         })
       );
       subscriberPreference = preference;
