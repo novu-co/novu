@@ -1,4 +1,4 @@
-import { ArrowLeft, Bell, Mail, MessageCircle, MessageSquare, Smartphone } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent } from '../primitives/card';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { ChannelTypeEnum, StepTypeEnum } from '@novu/shared';
