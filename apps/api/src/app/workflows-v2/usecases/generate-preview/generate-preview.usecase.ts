@@ -6,6 +6,7 @@ import {
   JobStatusEnum,
   PreviewPayload,
   StepDataDto,
+  WorkflowOriginEnum,
 } from '@novu/shared';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
@@ -17,7 +18,7 @@ import { GeneratePreviewCommand } from './generate-preview.command';
 @Injectable()
 export class GeneratePreviewUsecase {
   constructor(
-    private legacyPreviewStepUseCase: PreviewStep,
+    private previewStepUsecase: PreviewStep,
     private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase,
     private buildStepDataUsecase: BuildStepDataUsecase
   ) {}
@@ -54,6 +55,7 @@ export class GeneratePreviewUsecase {
       controlDataSchema: stepData.controls.dataSchema,
       variableSchema: stepData.variables,
       previewPayloadFromDto: dto.previewPayload,
+      origin: stepData.origin || WorkflowOriginEnum.NOVU_CLOUD_V1,
     });
   }
 
@@ -75,7 +77,7 @@ export class GeneratePreviewUsecase {
   ) {
     const state = buildState(hydratedPayload.steps);
     try {
-      return await this.legacyPreviewStepUseCase.execute(
+      return await this.previewStepUsecase.execute(
         PreviewStepCommand.create({
           payload: hydratedPayload.payload || {},
           subscriber: hydratedPayload.subscriber,
@@ -113,6 +115,7 @@ function buildState(steps: Record<string, unknown> | undefined): FrameworkPrevio
 
   return outputArray;
 }
+
 export class GeneratePreviewError extends InternalServerErrorException {
   constructor(error: FrameworkError) {
     super({

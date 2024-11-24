@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { WorkflowOriginEnum } from '@novu/shared';
 import { PlaceholderAggregation } from './placeholder.aggregation';
 import { HydrateEmailSchemaUseCase } from '../../../../environments-v1/usecases/output-renderers';
 import { CollectPlaceholderWithDefaultsCommand } from './collect-placeholder-with-defaults.command';
@@ -11,16 +12,45 @@ export class CollectPlaceholderWithDefaultsUsecase {
     if (!command.controlValues) {
       return {};
     }
-    const placeholders: Record<string, PlaceholderAggregation> = {};
+    let placeholders: Record<string, PlaceholderAggregation> = {};
     const flattenedControlValues = flattenJson(command.controlValues);
 
-    for (const controlValueKey of Object.keys(flattenedControlValues)) {
-      const flattenedControlValue = flattenedControlValues[controlValueKey];
+    for (const [controlValueKey, flattenedControlValue] of Object.entries(flattenedControlValues)) {
       placeholders[controlValueKey] = this.extractPlaceholdersLogic(flattenedControlValue);
+    }
+
+    if (command.origin === WorkflowOriginEnum.EXTERNAL) {
+      // for external workflows, the source of truth is the payload schema
+      for (const placeholderAggregation of Object.values(placeholders)) {
+        const regularPlaceholders = placeholderAggregation.regularPlaceholdersToDefaultValue;
+        const nestedPlaceholders = placeholderAggregation.nestedForPlaceholders;
+
+        placeholderAggregation.regularPlaceholdersToDefaultValue = Object.fromEntries(
+          Object.entries(regularPlaceholders).filter(([key]) => !key.includes('{{payload.'))
+        );
+        placeholderAggregation.nestedForPlaceholders = Object.fromEntries(
+          Object.entries(nestedPlaceholders).filter(([key]) => !key.includes('{{payload.'))
+        );
+      }
+
+      const payloadPlaceholders: Record<string, PlaceholderAggregation> = {
+        payloadPlaceholder: {
+          nestedForPlaceholders: {},
+          regularPlaceholdersToDefaultValue: {},
+        },
+      };
+
+      for (const [key, value] of Object.entries(command.payloadSchema?.properties || {})) {
+        payloadPlaceholders.payloadPlaceholder.regularPlaceholdersToDefaultValue[`{{payload.${key}}}`] =
+          typeof value === 'boolean' ? `{{payload.${key}}}` : (value.default as string);
+      }
+
+      placeholders = { ...placeholders, ...payloadPlaceholders };
     }
 
     return placeholders;
   }
+
   private extractPlaceholdersLogic(controlValue: unknown): PlaceholderAggregation {
     let placeholders: PlaceholderAggregation;
     const parseEmailSchemaResult = this.safeAttemptToParseEmailSchema(controlValue);
@@ -32,6 +62,7 @@ export class CollectPlaceholderWithDefaultsUsecase {
 
     return placeholders;
   }
+
   private safeAttemptToParseEmailSchema(controlValue: unknown) {
     if (typeof controlValue !== 'string') {
       return undefined;
@@ -81,6 +112,7 @@ function extractPlaceholders(potentialText: unknown): PlaceholderAggregation {
 
   return placeholders;
 }
+
 function extractLiquidJSPlaceholders(text: string) {
   const regex = /\{\{([^}]*?)\}\}/g;
   const matches: {

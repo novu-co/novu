@@ -38,17 +38,22 @@ export class BuildAvailableVariableSchemaUsecase {
           additionalProperties: false,
         },
         steps: buildPreviousStepsSchema(previousSteps, workflow.payloadSchema),
-        payload: safePayloadSchema(workflow) || { type: 'object', description: 'Payload for the current step' },
+        payload: safePayloadSchema(workflow),
       },
       additionalProperties: false,
     } as const satisfies JSONSchemaDto;
   }
 }
-function safePayloadSchema(workflow: NotificationTemplateEntity): JSONSchemaDto | undefined {
+function safePayloadSchema(workflow: NotificationTemplateEntity): JSONSchemaDto {
   try {
-    return JSON.parse(workflow.payloadSchema);
+    // TODO: fix the type, we need to make sure we have the same data structure in the code
+    if (typeof workflow.payloadSchema === 'string') {
+      return JSON.parse(workflow.payloadSchema);
+    } else {
+      return workflow.payloadSchema;
+    }
   } catch (e) {
-    return undefined;
+    return { type: 'object', description: 'Payload for the current step' };
   }
 }
 

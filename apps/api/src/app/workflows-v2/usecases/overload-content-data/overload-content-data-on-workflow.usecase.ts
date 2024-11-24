@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ControlValuesLevelEnum, UserSessionData } from '@novu/shared';
+import { ControlValuesLevelEnum, UserSessionData, WorkflowOriginEnum } from '@novu/shared';
 import { ControlValuesRepository, NotificationStepEntity } from '@novu/dal';
 import _ from 'lodash';
 import { WorkflowInternalResponseDto } from '@novu/application-generic';
@@ -44,14 +44,15 @@ export class OverloadContentDataOnWorkflowUseCase {
       }
       const controlValues = stepIdToControlValuesMap[step._templateId];
 
-      const jsonSchemaDto = this.buildAvailableVariableSchemaUsecase.execute({
+      const variableSchema = this.buildAvailableVariableSchemaUsecase.execute({
         workflow,
         stepDatabaseId: step._templateId,
       });
       validatedStepContent[step._templateId] = await this.prepareAndValidateContentUsecase.execute({
         controlDataSchema: controls.schema,
         controlValues,
-        variableSchema: jsonSchemaDto,
+        variableSchema,
+        origin: workflow.origin || WorkflowOriginEnum.NOVU_CLOUD_V1,
       });
     }
 

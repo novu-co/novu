@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ContentIssue, JSONSchemaDto, PreviewPayload, StepContentIssueEnum } from '@novu/shared';
+import { ContentIssue, JSONSchemaDto, PreviewPayload, StepContentIssueEnum, WorkflowOriginEnum } from '@novu/shared';
 import { merge } from 'lodash';
 import { PrepareAndValidateContentCommand } from './prepare-and-validate-content.command';
 import { flattenJson, flattenToNested, mergeObjects } from '../../../util/jsonUtils';
@@ -22,7 +22,12 @@ export class PrepareAndValidateContentUsecase {
   ) {}
 
   async execute(command: PrepareAndValidateContentCommand): Promise<ValidatedContentResponse> {
-    const controlValueToPlaceholders = this.collectPlaceholders(command.controlValues);
+    const controlValueToPlaceholders = this.collectPlaceholders(
+      command.controlValues,
+      command.variableSchema.properties?.payload as JSONSchemaDto,
+      command.origin
+    );
+
     const controlValueToValidPlaceholders = this.validatePlaceholders(
       controlValueToPlaceholders,
       command.variableSchema
@@ -47,9 +52,15 @@ export class PrepareAndValidateContentUsecase {
     };
   }
 
-  private collectPlaceholders(controlValues: Record<string, unknown>) {
+  private collectPlaceholders(
+    controlValues: Record<string, unknown>,
+    payloadSchema: JSONSchemaDto,
+    origin: WorkflowOriginEnum
+  ) {
     return this.collectPlaceholderWithDefaultsUsecase.execute({
       controlValues,
+      payloadSchema,
+      origin,
     });
   }
 
@@ -58,7 +69,7 @@ export class PrepareAndValidateContentUsecase {
     variableSchema: JSONSchemaDto // Now using JsonStepSchemaDto
   ) {
     return this.validatePlaceholdersUseCase.execute({
-      controlValueToPlaceholders,
+      controlValueToPlaceholdersAggregation: controlValueToPlaceholders,
       variableSchema,
     });
   }

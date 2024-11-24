@@ -1,6 +1,6 @@
 import type { JSONSchemaDto } from './json-schema-dto';
 import { WorkflowResponseDto } from './workflow-response-dto';
-import { Slug, StepTypeEnum, WorkflowPreferences } from '../../types';
+import { Slug, StepTypeEnum, WorkflowOriginEnum, WorkflowPreferences } from '../../types';
 import { StepContentIssueEnum, StepIssueEnum } from './step-content-issue.enum';
 
 export class ControlsSchema {
@@ -45,8 +45,16 @@ export type StepResponseDto = StepDto & {
   issues?: StepIssuesDto;
 };
 
-export type StepUpdateDto = StepCreateDto & {
+export type StepUpdateDto = StepDto & {
   _id: string;
+  /**
+   * @deprecated This field is deprecated and will be removed in future versions, use the patch step data.
+   */
+  controlValues?: Record<string, unknown>;
+  /**
+   * for code-first workflows we allow to store the control schema on create/update step
+   */
+  controlSchema?: { schema: JSONSchemaDto };
 };
 
 export type StepCreateDto = StepDto & {
@@ -54,6 +62,10 @@ export type StepCreateDto = StepDto & {
    * @deprecated This field is deprecated and will be removed in future versions, use the patch step data.
    */
   controlValues?: Record<string, unknown>;
+  /**
+   * for code-first workflows we allow to store the control schema on create/update step
+   */
+  controlSchema?: { schema: JSONSchemaDto };
 };
 
 export type ListWorkflowResponse = {
@@ -73,7 +85,18 @@ export type StepDto = {
   type: StepTypeEnum;
 };
 
-export type WorkflowCommonsFields = {
+/**
+ * Common fields used by framework workflows to store schemas and metadata
+ */
+export type FrameworkCommonsFields = {
+  workflowId?: string;
+  controlsSchema?: JSONSchemaDto;
+  payloadSchema?: JSONSchemaDto;
+  rawData?: Record<string, unknown>;
+  origin?: WorkflowOriginEnum;
+};
+
+export type WorkflowCommonsFields = FrameworkCommonsFields & {
   name: string;
   description?: string;
   tags?: string[];

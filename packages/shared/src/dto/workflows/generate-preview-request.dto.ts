@@ -5,12 +5,10 @@ export enum ValidationStrategyEnum {
   VALIDATE_MISSING_CONTROL_VALUES = 'VALIDATE_MISSING_CONTROL_VALUES',
 }
 
-// Interface for Generate Preview Request DTO
 // eslint-disable-next-line @typescript-eslint/naming-convention
 interface GeneratePreviewRequestDto {
-  controlValues?: Record<string, unknown>; // Optional control values
-  previewPayload?: PreviewPayload; // Optional payload values
+  controlValues?: Record<string, unknown>;
+  previewPayload?: PreviewPayload;
 }
 
-// Export the GeneratePreviewRequestDto type
 export type { GeneratePreviewRequestDto };

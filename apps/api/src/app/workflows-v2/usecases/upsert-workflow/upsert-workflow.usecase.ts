@@ -5,7 +5,6 @@ import {
   IdentifierOrInternalId,
   slugify,
   StepCreateDto,
-  StepDto,
   StepUpdateDto,
   UpdateWorkflowDto,
   UserSessionData,
@@ -132,15 +131,15 @@ export class UpsertWorkflowUseCase {
       name: workflowDto.name,
       __source: workflowDto.__source || WorkflowCreationSourceEnum.DASHBOARD,
       type: WorkflowTypeEnum.BRIDGE,
-      origin: WorkflowOriginEnum.NOVU_CLOUD,
+      origin: workflowDto.origin || WorkflowOriginEnum.NOVU_CLOUD,
       steps: this.mapSteps(workflowDto.steps),
-      payloadSchema: {},
       active: isWorkflowActive,
       description: workflowDto.description || '',
       tags: workflowDto.tags || [],
       userPreferences: command.workflowDto.preferences?.user ?? null,
       defaultPreferences: command.workflowDto.preferences?.workflow ?? DEFAULT_WORKFLOW_PREFERENCES,
-      triggerIdentifier: slugify(workflowDto.name),
+      triggerIdentifier: workflowDto.workflowId || slugify(workflowDto.name),
+      payloadSchema: workflowDto.payloadSchema,
     };
   }
 
@@ -163,8 +162,10 @@ export class UpsertWorkflowUseCase {
       defaultPreferences: workflowDto.preferences?.workflow ?? DEFAULT_WORKFLOW_PREFERENCES,
       tags: workflowDto.tags,
       active: workflowDto.active ?? true,
+      payloadSchema: workflowDto.payloadSchema,
     };
   }
+
   private mapSteps(
     commandWorkflowSteps: Array<StepCreateDto | StepUpdateDto>,
     persistedWorkflow?: NotificationTemplateEntity | undefined
@@ -228,14 +229,17 @@ export class UpsertWorkflowUseCase {
   }
 
   private buildBaseStepEntity(
-    step: StepDto | StepUpdateDto,
+    step: StepCreateDto | StepUpdateDto,
     foundPersistedStep?: NotificationStepEntity
   ): NotificationStep {
     return {
       template: {
         type: step.type,
         name: step.name,
-        controls: foundPersistedStep?.template?.controls || stepTypeToDefaultDashboardControlSchema[step.type],
+        controls:
+          step.controlSchema ||
+          foundPersistedStep?.template?.controls ||
+          stepTypeToDefaultDashboardControlSchema[step.type],
         content: '',
       },
       stepId: foundPersistedStep?.stepId || slugify(step.name),

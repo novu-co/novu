@@ -1,54 +1,80 @@
 import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 
 import {
+  EnvironmentEntity,
   EnvironmentRepository,
-  NotificationGroupRepository,
   NotificationTemplateEntity,
   NotificationTemplateRepository,
 } from '@novu/dal';
 import {
   AnalyticsService,
-  CreateWorkflow,
-  CreateWorkflowCommand,
   DeleteWorkflowCommand,
   DeleteWorkflowUseCase,
   ExecuteBridgeRequest,
-  NotificationStep,
-  UpdateWorkflow,
-  UpdateWorkflowCommand,
 } from '@novu/application-generic';
 import {
   buildWorkflowPreferences,
+  CreateWorkflowDto,
   JSONSchemaDto,
+  StepCreateDto,
+  StepTypeEnum,
+  StepUpdateDto,
+  UpdateWorkflowDto,
+  UserSessionData,
   WorkflowCreationSourceEnum,
   WorkflowOriginEnum,
   WorkflowPreferences,
+  WorkflowResponseDto,
   WorkflowTypeEnum,
 } from '@novu/shared';
-import { DiscoverOutput, DiscoverStepOutput, DiscoverWorkflowOutput, GetActionEnum } from '@novu/framework/internal';
+import {
+  DiscoverOutput,
+  DiscoverStepOutput,
+  DiscoverWorkflowOutput,
+  GetActionEnum,
+  StepType,
+} from '@novu/framework/internal';
 
 import { SyncCommand } from './sync.command';
 import { CreateBridgeResponseDto } from '../../dtos/create-bridge-response.dto';
+import { UpsertWorkflowCommand } from '../../../workflows-v2/usecases/upsert-workflow/upsert-workflow.command';
+import { UpsertWorkflowUseCase } from '../../../workflows-v2/usecases/upsert-workflow/upsert-workflow.usecase';
 
 @Injectable()
 export class Sync {
   constructor(
-    private createWorkflowUsecase: CreateWorkflow,
-    private updateWorkflowUsecase: UpdateWorkflow,
     private deleteWorkflowUseCase: DeleteWorkflowUseCase,
     private notificationTemplateRepository: NotificationTemplateRepository,
-    private notificationGroupRepository: NotificationGroupRepository,
     private environmentRepository: EnvironmentRepository,
     private executeBridgeRequest: ExecuteBridgeRequest,
+    private upsertWorkflowUseCase: UpsertWorkflowUseCase,
     private analyticsService: AnalyticsService
   ) {}
   async execute(command: SyncCommand): Promise<CreateBridgeResponseDto> {
+    const environment = await this.findEnvironment(command);
+    const discover = await this.executeDiscover(command);
+
+    this.sendSyncTrack(command, environment, discover);
+
+    const upsertedWorkflows = await this.upsertWorkflows(command, discover.workflows);
+
+    await this.disposeOldWorkflows(command, upsertedWorkflows);
+    await this.updateBridgeUrl(command);
+
+    return upsertedWorkflows;
+  }
+
+  private async findEnvironment(command: SyncCommand) {
     const environment = await this.environmentRepository.findOne({ _id: command.environmentId });
 
     if (!environment) {
       throw new BadRequestException('Environment not found');
     }
 
+    return environment;
+  }
+
+  private async executeDiscover(command: SyncCommand): Promise<DiscoverOutput> {
     let discover: DiscoverOutput | undefined;
     try {
       discover = (await this.executeBridgeRequest.execute({
@@ -70,6 +96,10 @@ export class Sync {
       throw new BadRequestException('Invalid Bridge URL Response');
     }
 
+    return discover;
+  }
+
+  private sendSyncTrack(command: SyncCommand, environment: EnvironmentEntity, discover: DiscoverOutput) {
     if (command.source !== 'sample-workspace') {
       this.analyticsService.track('Sync Request - [Bridge API]', command.userId, {
         _organization: command.organizationId,
@@ -80,14 +110,6 @@ export class Sync {
         source: command.source,
       });
     }
-
-    const persistedWorkflowsInBridge = await this.createWorkflows(command, discover.workflows);
-
-    await this.disposeOldWorkflows(command, persistedWorkflowsInBridge);
-
-    await this.updateBridgeUrl(command);
-
-    return persistedWorkflowsInBridge;
   }
 
   private async updateBridgeUrl(command: SyncCommand): Promise<void> {
@@ -106,10 +128,7 @@ export class Sync {
     );
   }
 
-  private async disposeOldWorkflows(
-    command: SyncCommand,
-    createdWorkflows: NotificationTemplateEntity[]
-  ): Promise<void> {
+  private async disposeOldWorkflows(command: SyncCommand, createdWorkflows: WorkflowResponseDto[]): Promise<void> {
     const persistedWorkflowIdsInBridge = createdWorkflows.map((i) => i._id);
     const workflowsToDelete = await this.findAllWorkflowsWithOtherIds(command, persistedWorkflowIdsInBridge);
     const deleteWorkflowFromStoragePromises = workflowsToDelete.map((workflow) =>
@@ -142,149 +161,123 @@ export class Sync {
     });
   }
 
-  private async createWorkflows(
+  private async upsertWorkflows(
     command: SyncCommand,
     workflowsFromBridge: DiscoverWorkflowOutput[]
-  ): Promise<NotificationTemplateEntity[]> {
+  ): Promise<WorkflowResponseDto[]> {
     return Promise.all(
       workflowsFromBridge.map(async (workflow) => {
-        const workflowExist = await this.notificationTemplateRepository.findByTriggerIdentifier(
+        const fetchedWorkflow = await this.notificationTemplateRepository.findByTriggerIdentifier(
           command.environmentId,
           workflow.workflowId
         );
 
-        let savedWorkflow: NotificationTemplateEntity | undefined;
+        const upsertWorkflowCommand = fetchedWorkflow
+          ? this.mapDiscoverWorkflowToUpdateWorkflowDto(fetchedWorkflow._id, command, workflow)
+          : this.mapDiscoverWorkflowToCreateWorkflowDto(command, workflow);
 
-        if (workflowExist) {
-          savedWorkflow = await this.updateWorkflow(workflowExist, command, workflow);
-        } else {
-          const notificationGroupId = await this.getNotificationGroup(
-            this.castToAnyNotSupportedParam(workflow)?.notificationGroupId,
-            command.environmentId
-          );
-
-          if (!notificationGroupId) {
-            throw new BadRequestException('Notification group not found');
-          }
-          const isWorkflowActive = this.castToAnyNotSupportedParam(workflow)?.active ?? true;
-
-          savedWorkflow = await this.createWorkflow(notificationGroupId, isWorkflowActive, command, workflow);
-        }
-
-        return savedWorkflow;
+        return await this.upsertWorkflowUseCase.execute(upsertWorkflowCommand);
       })
     );
   }
 
-  private async createWorkflow(
-    notificationGroupId: string,
-    isWorkflowActive: boolean,
+  private mapDiscoverWorkflowToCreateWorkflowDto(
     command: SyncCommand,
     workflow: DiscoverWorkflowOutput
-  ): Promise<NotificationTemplateEntity> {
-    return await this.createWorkflowUsecase.execute(
-      CreateWorkflowCommand.create({
-        origin: WorkflowOriginEnum.EXTERNAL,
-        type: WorkflowTypeEnum.BRIDGE,
-        notificationGroupId,
-        draft: !isWorkflowActive,
+  ): UpsertWorkflowCommand {
+    const workflowDto: CreateWorkflowDto = {
+      origin: WorkflowOriginEnum.EXTERNAL,
+      __source: WorkflowCreationSourceEnum.BRIDGE,
+      ...this.getPartialWorkflowDto(workflow),
+    };
+
+    return {
+      workflowDto,
+      user: {
         environmentId: command.environmentId,
         organizationId: command.organizationId,
-        userId: command.userId,
-        name: this.getWorkflowName(workflow),
-        triggerIdentifier: workflow.workflowId,
-        __source: WorkflowCreationSourceEnum.BRIDGE,
-        steps: this.mapSteps(workflow.steps),
-        controls: {
-          schema: workflow.controls?.schema as JSONSchemaDto,
-        },
-        rawData: workflow as unknown as Record<string, unknown>,
-        payloadSchema: workflow.payload?.schema as JSONSchemaDto,
-        active: isWorkflowActive,
-        description: this.getWorkflowDescription(workflow),
-        data: this.castToAnyNotSupportedParam(workflow)?.data,
-        tags: this.getWorkflowTags(workflow),
-        defaultPreferences: this.getWorkflowPreferences(workflow),
-      })
-    );
+        _id: command.userId,
+      } as UserSessionData,
+    };
   }
 
-  private async updateWorkflow(
-    workflowExist: NotificationTemplateEntity,
+  private getPartialWorkflowDto(workflow: DiscoverWorkflowOutput) {
+    return {
+      name: this.getWorkflowName(workflow),
+      workflowId: workflow.workflowId,
+      steps: this.mapSteps2(workflow.steps),
+      controlsSchema: workflow.controls?.schema as JSONSchemaDto,
+      rawData: workflow as unknown as Record<string, unknown>,
+      payloadSchema: workflow.payload?.schema as JSONSchemaDto,
+      active: true,
+      description: this.getWorkflowDescription(workflow),
+      tags: this.getWorkflowTags(workflow),
+      preferences: {
+        user: null,
+        workflow: this.getWorkflowPreferences(workflow),
+      },
+    };
+  }
+
+  private mapDiscoverWorkflowToUpdateWorkflowDto(
+    _workflowId: string,
     command: SyncCommand,
     workflow: DiscoverWorkflowOutput
-  ): Promise<NotificationTemplateEntity> {
-    return await this.updateWorkflowUsecase.execute(
-      UpdateWorkflowCommand.create({
-        id: workflowExist._id,
+  ): UpsertWorkflowCommand {
+    const workflowDto: UpdateWorkflowDto = {
+      ...this.getPartialWorkflowDto(workflow),
+    };
+
+    return {
+      identifierOrInternalId: _workflowId,
+      workflowDto,
+      user: {
         environmentId: command.environmentId,
         organizationId: command.organizationId,
-        userId: command.userId,
-        name: this.getWorkflowName(workflow),
-        workflowId: workflow.workflowId,
-        steps: this.mapSteps(workflow.steps, workflowExist),
-        controls: {
-          schema: workflow.controls?.schema as JSONSchemaDto,
-        },
-        rawData: workflow,
-        payloadSchema: workflow.payload?.schema as unknown as JSONSchemaDto,
-        type: WorkflowTypeEnum.BRIDGE,
-        description: this.getWorkflowDescription(workflow),
-        data: this.castToAnyNotSupportedParam(workflow)?.data,
-        tags: this.getWorkflowTags(workflow),
-        active: this.castToAnyNotSupportedParam(workflow)?.active ?? true,
-        defaultPreferences: this.getWorkflowPreferences(workflow),
-      })
-    );
+        _id: command.userId,
+      } as UserSessionData,
+    };
   }
 
-  private mapSteps(
+  private mapSteps2(
     commandWorkflowSteps: DiscoverStepOutput[],
     workflow?: NotificationTemplateEntity | undefined
-  ): NotificationStep[] {
+  ): (StepCreateDto | StepUpdateDto)[] {
     return commandWorkflowSteps.map((step) => {
       const foundStep = workflow?.steps?.find((workflowStep) => workflowStep.stepId === step.stepId);
 
-      const template = {
-        _id: foundStep?._id,
-        type: step.type,
-        name: step.stepId,
-        controls: step.controls,
-        output: step.outputs,
-        options: step.options,
-        code: step.code,
-      };
-
       return {
-        template,
+        /*
+         *   // TODO: store output schema
+         *   output: step.outputs,
+         */
+        _id: foundStep?._id,
+        controlSchema: { schema: step.controls.schema as JSONSchemaDto },
+        type: this.mapStepTypeToEnum(step.type),
         name: step.stepId,
-        stepId: step.stepId,
-        uuid: step.stepId,
-        _templateId: foundStep?._templateId,
-        shouldStopOnFail: this.castToAnyNotSupportedParam(step.options)?.failOnErrorEnabled ?? false,
       };
     });
   }
 
-  private async getNotificationGroup(
-    notificationGroupIdCommand: string | undefined,
-    environmentId: string
-  ): Promise<string | undefined> {
-    let notificationGroupId = notificationGroupIdCommand;
-
-    if (!notificationGroupId) {
-      notificationGroupId = (
-        await this.notificationGroupRepository.findOne(
-          {
-            name: 'General',
-            _environmentId: environmentId,
-          },
-          '_id'
-        )
-      )?._id;
+  private mapStepTypeToEnum(stepType: StepType): StepTypeEnum {
+    switch (stepType) {
+      case 'email':
+        return StepTypeEnum.EMAIL;
+      case 'in_app':
+        return StepTypeEnum.IN_APP;
+      case 'sms':
+        return StepTypeEnum.SMS;
+      case 'push':
+        return StepTypeEnum.PUSH;
+      case 'chat':
+        return StepTypeEnum.CHAT;
+      case 'digest':
+        return StepTypeEnum.DIGEST;
+      case 'delay':
+        return StepTypeEnum.DELAY;
+      default:
+        throw new BadRequestException('Invalid step type');
     }
-
-    return notificationGroupId;
   }
 
   private getWorkflowPreferences(workflow: DiscoverWorkflowOutput): WorkflowPreferences {
@@ -301,11 +294,5 @@ export class Sync {
 
   private getWorkflowTags(workflow: DiscoverWorkflowOutput): string[] {
     return workflow.tags || [];
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private castToAnyNotSupportedParam(param: any): any {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return param as any;
   }
 }

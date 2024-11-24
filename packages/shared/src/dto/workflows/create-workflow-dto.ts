@@ -2,8 +2,6 @@ import { PreferencesRequestDto, StepCreateDto, WorkflowCommonsFields } from './w
 import { WorkflowCreationSourceEnum } from '../../types';
 
 export type CreateWorkflowDto = WorkflowCommonsFields & {
-  workflowId: string;
-
   steps: StepCreateDto[];
 
   __source: WorkflowCreationSourceEnum;

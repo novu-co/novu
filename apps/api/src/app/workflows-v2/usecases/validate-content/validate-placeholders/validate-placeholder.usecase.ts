@@ -11,8 +11,7 @@ export class ValidatePlaceholderUsecase {
   execute(command: ValidatePlaceholderCommand): Record<string, ValidatedPlaceholderAggregation> {
     const validatedPlaceholders: Record<string, ValidatedPlaceholderAggregation> = {};
     const variablesFromSchema = extractPropertiesFromJsonSchema(command.variableSchema);
-    for (const controlValueKey of Object.keys(command.controlValueToPlaceholders)) {
-      const controlValue = command.controlValueToPlaceholders[controlValueKey];
+    for (const [controlValueKey, controlValue] of Object.entries(command.controlValueToPlaceholdersAggregation)) {
       const validatedPlaceholderAggregation = this.validatePlaceholders(controlValue, variablesFromSchema);
       if (
         controlValueKey.trim().toLowerCase().includes('url') &&

@@ -4,6 +4,7 @@ import { ExecuteBridgeRequest, ExecuteBridgeRequestCommand } from '@novu/applica
 
 import { PreviewStepCommand } from './preview-step.command';
 
+// TODO: Extract this to a shared workflow module usecase
 @Injectable()
 export class PreviewStep {
   constructor(private executeBridgeRequest: ExecuteBridgeRequest) {}
