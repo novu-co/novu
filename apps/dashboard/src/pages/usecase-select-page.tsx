@@ -46,36 +46,22 @@ export function UsecaseSelectPage() {
       <PageMeta title="Customize you experience" />
 
       <AuthCard>
-        <div className="w-[564px] px-0">
-          <div className="flex flex-col items-center gap-8">
+        <div className="flex w-[564px] justify-center px-0">
+          <div className="flex max-w-[480px] flex-col items-center justify-center gap-8 p-[60px]">
             <UsecaseSelectOnboarding
               selectedUseCases={selectedUseCases}
               onHover={(id) => setHoveredUseCase(id)}
               onClick={(id) => handleSelectUseCase(id)}
             />
 
-            <div className="flex flex-col items-center justify-center p-[60px] pt-0">
-              <div className="flex w-[360px] flex-col items-center gap-8">
-                <div className="flex w-full flex-col items-center gap-7">
-                  <div className="flex w-full flex-col items-center gap-3">
-                    <Button
-                      disabled={selectedUseCases.length === 0 || loading}
-                      className="w-full"
-                      onClick={handleContinue}
-                    >
-                      Continue
-                      {loading && <RiLoader2Line className="animate-spin" />}
-                    </Button>
-                    <Button
-                      variant="link"
-                      className="pt-0 text-xs text-[#717784]"
-                      onClick={() => navigate(ROUTES.WORKFLOWS)}
-                    >
-                      Skip to Homepage
-                    </Button>
-                  </div>
-                </div>
-              </div>
+            <div className="flex w-full flex-col items-center gap-3">
+              <Button disabled={selectedUseCases.length === 0 || loading} className="w-full" onClick={handleContinue}>
+                Continue
+                {loading && <RiLoader2Line className="animate-spin" />}
+              </Button>
+              <Button variant="link" className="pt-0 text-xs text-[#717784]" onClick={() => navigate(ROUTES.WORKFLOWS)}>
+                Skip to Homepage
+              </Button>
             </div>
           </div>
         </div>

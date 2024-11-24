@@ -50,8 +50,8 @@ interface UsecaseSelectOnboardingProps {
 
 export function UsecaseSelectOnboarding({ onHover, onClick, selectedUseCases }: UsecaseSelectOnboardingProps) {
   return (
-    <div className="flex flex-col items-center justify-center p-[60px] pb-0">
-      <div className="flex w-[360px] flex-col items-center gap-8">
+    <div className="flex w-full flex-col items-center justify-center">
+      <div className="flex w-full flex-col items-center gap-8">
         <div className="flex w-full flex-col items-start gap-1">
           <div className="flex w-full items-center gap-1.5">
             <div className="flex items-center gap-0.5">
