@@ -132,6 +132,10 @@ export const InAppPreviewPrimaryAction = (props: InAppPreviewPrimaryActionProps)
     return <Skeleton className="h-5 w-[12ch]" />;
   }
 
+  if (!children) {
+    return null;
+  }
+
   return (
     <Button
       className={cn('px-3 text-xs font-medium shadow-none', className)}
@@ -151,6 +155,10 @@ export const InAppPreviewSecondaryAction = (props: InAppPreviewSecondaryActionPr
 
   if (isPending) {
     return <Skeleton className="h-5 w-[12ch]" />;
+  }
+
+  if (!children) {
+    return null;
   }
 
   return (
