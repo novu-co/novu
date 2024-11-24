@@ -45,9 +45,10 @@ const channelOptions = [
 interface UsecaseSelectOnboardingProps {
   onHover: (id: string | null) => void;
   onClick: (id: string) => void;
+  selectedUseCases: string[];
 }
 
-export function UsecaseSelectOnboarding({ onHover, onClick }: UsecaseSelectOnboardingProps) {
+export function UsecaseSelectOnboarding({ onHover, onClick, selectedUseCases }: UsecaseSelectOnboardingProps) {
   return (
     <div className="flex flex-col items-center justify-center p-[60px]">
       <div className="flex w-[360px] flex-col items-center gap-8">
@@ -72,12 +73,14 @@ export function UsecaseSelectOnboarding({ onHover, onClick }: UsecaseSelectOnboa
           {channelOptions.map((option, index) => (
             <Card
               key={index}
-              className="border border-neutral-200 shadow-none transition-all duration-300 hover:cursor-pointer hover:border-[1px] hover:border-solid hover:border-[#FF884D]"
+              className={`border border-neutral-200 shadow-none transition-all duration-300`}
               onMouseEnter={() => onHover(option.id)}
               onMouseLeave={() => onHover(null)}
               onClick={() => onClick(option.id)}
             >
-              <CardContent className="flex items-start gap-3.5 p-4">
+              <CardContent
+                className={`flex items-start gap-3.5 rounded-xl border-[2px] border-transparent p-4 hover:cursor-pointer ${selectedUseCases.includes(option.id) ? 'border-[#FF884D]' : 'border-transparent'}`}
+              >
                 <div className="flex h-10 w-10 items-center justify-center">
                   <option.icon className={`h-8 w-8 text-${option.color}`} />
                 </div>
@@ -88,15 +91,6 @@ export function UsecaseSelectOnboarding({ onHover, onClick }: UsecaseSelectOnboa
               </CardContent>
             </Card>
           ))}
-        </div>
-
-        <div className="flex w-full flex-col items-center gap-7">
-          <div className="flex w-full flex-col items-center gap-3">
-            <Button className="w-full cursor-not-allowed bg-[#F4F5F6] text-[#CAD0D8] hover:bg-[#F4F5F6]" disabled>
-              Continue
-            </Button>
-            <button className="text-xs text-[#717784]">Skip to Homepage</button>
-          </div>
         </div>
       </div>
     </div>
