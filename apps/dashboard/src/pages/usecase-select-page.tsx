@@ -10,9 +10,12 @@ import { updateClerkOrgMetadata } from '../api/organization';
 import { ChannelTypeEnum } from '@novu/shared';
 import { RiLoader2Line } from 'react-icons/ri';
 import { PageMeta } from '../components/page-meta';
+import { useTelemetry } from '../hooks';
+import { TelemetryEvent } from '../utils/telemetry';
 
 export function UsecaseSelectPage() {
   const navigate = useNavigate();
+  const track = useTelemetry();
   const [loading, setIsLoading] = useState(false);
   const [selectedUseCases, setSelectedUseCases] = useState<ChannelTypeEnum[]>([]);
   const [hoveredUseCase, setHoveredUseCase] = useState<ChannelTypeEnum | null>(null);
@@ -27,12 +30,21 @@ export function UsecaseSelectPage() {
         useCases: selectedUseCases,
       });
 
+      track(TelemetryEvent.USE_CASE_SELECTED, {
+        useCases: selectedUseCases,
+      });
       navigate(ROUTES.WORKFLOWS);
     } catch (error) {
       console.error(error);
     } finally {
       setIsLoading(false);
     }
+  }
+
+  function handleSkip() {
+    track(TelemetryEvent.USE_CASE_SKIPPED);
+
+    navigate(ROUTES.WORKFLOWS);
   }
 
   function handleSelectUseCase(useCase: ChannelTypeEnum) {
@@ -59,7 +71,7 @@ export function UsecaseSelectPage() {
                 Continue
                 {loading && <RiLoader2Line className="animate-spin" />}
               </Button>
-              <Button variant="link" className="pt-0 text-xs text-[#717784]" onClick={() => navigate(ROUTES.WORKFLOWS)}>
+              <Button variant="link" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
                 Skip to Homepage
               </Button>
             </div>
