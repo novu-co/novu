@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
-
 /* eslint-disable no-console */
+
 import '../../src/config';
 
 import { NestFactory } from '@nestjs/core';
@@ -52,13 +52,24 @@ process.on('SIGINT', () => {
 
 /**
  * Migration to centralize workflow and subscriber preferences.
+ * Preferences are migrated in the following order:
+ *
+ * - workflow preferences
+ *   -> preferences with workflow-resource type
+ *   -> preferences with user-workflow type
  * - subscriber global preference
  *    -> preferences with subscriber global type
  * - subscriber workflow preferences
  *    -> preferences with subscriber workflow type
- * - workflow preferences
- *   -> preferences with workflow-resource type
- *   -> preferences with user-workflow type
+ *
+ * Subscriber workflow preferences must be migrated after global preferences because
+ * the upsert subscriber global preferences will delete the subscriber workflow preferences
+ * with a matching channel.
+ *
+ * Depending on the size of your dataset, the following additional indexes will help with of the
+ * Subscriber Preference Migration:
+ * - { level: 1 }
+ * - { level: 1, _id: 1 }
  */
 export async function preferenceCentralization(startWorkflowId?: string, startSubscriberId?: string) {
   const app = await NestFactory.create(AppModule, {
@@ -97,6 +108,12 @@ export async function preferenceCentralization(startWorkflowId?: string, startSu
   app.close();
 }
 
+/**
+ * Migrate workflow preferences.
+ * - workflow preferences
+ *   -> preferences with workflow-resource type
+ *   -> preferences with user-workflow type
+ */
 async function migrateWorkflowPreferences(
   workflowPreferenceRepository: NotificationTemplateRepository,
   upsertPreferences: UpsertPreferences,
@@ -193,16 +210,57 @@ async function processWorkflowRecord(
   }
 }
 
+/**
+ * Migrate subscriber preferences.
+ * - global subscriber preferences
+ *    -> preferences with subscriber global type
+ * - template subscriber preferences
+ *    -> preferences with subscriber template type
+ */
 async function migrateSubscriberPreferences(
   subscriberPreferenceRepository: SubscriberPreferenceRepository,
   upsertPreferences: UpsertPreferences,
   startSubscriberId?: string
 ) {
   console.log('start subscriber preference migration');
-  let query = {};
+
+  console.log('start processing global subscriber preferences');
+  // Process global level preferences first
+  await processSubscriberPreferencesByLevel(
+    subscriberPreferenceRepository,
+    upsertPreferences,
+    PreferenceLevelEnum.GLOBAL,
+    startSubscriberId
+  );
+  console.log('end processing global subscriber preferences');
+
+  console.log('start processing template subscriber preferences');
+  // Then process template level preferences
+  await processSubscriberPreferencesByLevel(
+    subscriberPreferenceRepository,
+    upsertPreferences,
+    PreferenceLevelEnum.TEMPLATE,
+    startSubscriberId
+  );
+  console.log('end processing template subscriber preferences');
+
+  console.log('end subscriber preference migration');
+}
+
+async function processSubscriberPreferencesByLevel(
+  subscriberPreferenceRepository: SubscriberPreferenceRepository,
+  upsertPreferences: UpsertPreferences,
+  level: PreferenceLevelEnum,
+  startSubscriberId?: string
+) {
+  console.log(`start processing subscriber preferences with level: ${level}`);
+  let query: { level: PreferenceLevelEnum; _id?: { $gt: string }; _templateId?: { $ne: string } } = {
+    level,
+    _templateId: { $ne: '655236dbd54bcd028b21a4af' },
+  };
   if (startSubscriberId) {
     console.log(`Starting from subscriber preference ID: ${startSubscriberId}`);
-    query = { _id: { $gt: startSubscriberId } };
+    query = { ...query, _id: { $gt: startSubscriberId } };
   }
 
   const recordQueue = async.queue<SubscriberPreferenceEntity>(async (record, callback) => {
@@ -247,7 +305,7 @@ async function migrateSubscriberPreferences(
   // Wait for all records to be processed
   await recordQueue.drain();
 
-  console.log('end subscriber preference migration');
+  console.log(`end processing subscriber preferences with level: ${level}`);
 }
 
 async function processSubscriberRecord(
