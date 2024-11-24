@@ -254,9 +254,8 @@ async function processSubscriberPreferencesByLevel(
   startSubscriberId?: string
 ) {
   console.log(`start processing subscriber preferences with level: ${level}`);
-  let query: { level: PreferenceLevelEnum; _id?: { $gt: string }; _templateId?: { $ne: string } } = {
+  let query: { level: PreferenceLevelEnum; _id?: { $gt: string } } = {
     level,
-    _templateId: { $ne: '655236dbd54bcd028b21a4af' },
   };
   if (startSubscriberId) {
     console.log(`Starting from subscriber preference ID: ${startSubscriberId}`);
