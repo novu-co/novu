@@ -32,4 +32,8 @@ export class UpdatePreferencesCommand extends EnvironmentWithSubscriber {
   @IsDefined()
   @IsEnum(PreferenceLevelEnum)
   readonly level: PreferenceLevelEnum;
+
+  @IsDefined()
+  @IsBoolean()
+  readonly includeInactiveChannels: boolean;
 }

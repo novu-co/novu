@@ -87,14 +87,14 @@ export class InAppRenderOutput extends RenderOutput {
   avatar?: string;
   primaryAction?: {
     label: string;
-    redirect: {
+    redirect?: {
       url: string;
       target?: RedirectTargetEnum;
     };
   };
   secondaryAction?: {
     label: string;
-    redirect: {
+    redirect?: {
       url: string;
       target?: RedirectTargetEnum;
     };
