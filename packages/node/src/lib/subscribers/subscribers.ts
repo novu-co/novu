@@ -91,8 +91,13 @@ export class Subscribers extends WithHttp implements ISubscribers {
     return await this.http.delete(`/subscribers/${subscriberId}`);
   }
 
-  async getPreference(subscriberId: string) {
-    return await this.http.get(`/subscribers/${subscriberId}/preferences`);
+  async getPreference(
+    subscriberId: string,
+    includeInactiveChannels: boolean = true,
+  ) {
+    return await this.http.get(
+      `/subscribers/${subscriberId}/preferences?includeInactiveChannels=${includeInactiveChannels}`,
+    );
   }
 
   async getGlobalPreference(subscriberId: string) {
