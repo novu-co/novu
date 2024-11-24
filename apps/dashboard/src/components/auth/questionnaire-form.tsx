@@ -91,7 +91,7 @@ export function QuestionnaireForm() {
               <div className="flex flex-1 flex-col gap-1">
                 <StepIndicator step={2} />
                 <CardTitle className="text-lg font-medium text-[#232529]">
-                  Help us personalise your experience
+                  Help us personalize your experience
                 </CardTitle>
               </div>
             </div>
