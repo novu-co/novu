@@ -21,7 +21,7 @@ export type DefaultInboxProps = {
   onPrimaryActionClick?: NotificationActionClickHandler;
   onSecondaryActionClick?: NotificationActionClickHandler;
   placement?: InboxProps['placement'];
-  offset?: InboxProps['offset'];
+  placementOffset?: InboxProps['placementOffset'];
 };
 
 export type BaseProps = {

@@ -15,7 +15,7 @@ export default function Home() {
           },
         }}
         placement="left-start"
-        offset={25}
+        placementOffset={25}
       />
     </>
   );

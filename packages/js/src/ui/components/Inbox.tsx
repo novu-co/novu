@@ -21,7 +21,7 @@ export type InboxProps = {
   onPrimaryActionClick?: NotificationActionClickHandler;
   onSecondaryActionClick?: NotificationActionClickHandler;
   placement?: Placement;
-  offset?: OffsetOptions;
+  placementOffset?: OffsetOptions;
 };
 
 export enum InboxPage {
@@ -96,7 +96,7 @@ export const Inbox = (props: InboxProps) => {
   const isOpen = () => props?.open ?? isOpened();
 
   return (
-    <Popover.Root open={isOpen()} onOpenChange={setIsOpened} placement={props.placement} offset={props.offset}>
+    <Popover.Root open={isOpen()} onOpenChange={setIsOpened} placement={props.placement} offset={props.placementOffset}>
       <Popover.Trigger
         asChild={(triggerProps) => (
           <Button class={style('inbox__popoverTrigger')} variant="ghost" size="icon" {...triggerProps}>

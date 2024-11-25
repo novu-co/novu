@@ -17,8 +17,8 @@ const _DefaultInbox = (props: DefaultInboxProps) => {
     onNotificationClick,
     onPrimaryActionClick,
     onSecondaryActionClick,
-    offset,
     placement,
+    placementOffset,
   } = props;
   const { novuUI } = useNovuUI();
   const { mountElement } = useRenderer();
@@ -36,7 +36,7 @@ const _DefaultInbox = (props: DefaultInboxProps) => {
           onNotificationClick,
           onPrimaryActionClick,
           onSecondaryActionClick,
-          offset,
+          placementOffset,
           placement,
         },
         element,
@@ -123,7 +123,7 @@ const InboxChild = React.memo((props: InboxProps) => {
     onNotificationClick,
     onPrimaryActionClick,
     onSecondaryActionClick,
-    offset,
+    placementOffset,
     placement,
   } = props;
 
@@ -137,7 +137,7 @@ const InboxChild = React.memo((props: InboxProps) => {
         onPrimaryActionClick={onPrimaryActionClick}
         onSecondaryActionClick={onSecondaryActionClick}
         placement={placement}
-        offset={offset}
+        placementOffset={placementOffset}
       />
     </NovuUI>
   );
