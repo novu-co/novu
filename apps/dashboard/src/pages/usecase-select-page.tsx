@@ -12,6 +12,7 @@ import { RiLoader2Line } from 'react-icons/ri';
 import { PageMeta } from '../components/page-meta';
 import { useTelemetry } from '../hooks';
 import { TelemetryEvent } from '../utils/telemetry';
+import { channelOptions } from '../components/auth/usecases-list.utils';
 
 export function UsecaseSelectPage() {
   const navigate = useNavigate();
@@ -61,6 +62,7 @@ export function UsecaseSelectPage() {
         <div className="flex w-[480px] justify-center px-0">
           <div className="flex max-w-[480px] flex-col items-center justify-center gap-8 p-[60px]">
             <UsecaseSelectOnboarding
+              channelOptions={channelOptions}
               selectedUseCases={selectedUseCases}
               onHover={(id) => setHoveredUseCase(id)}
               onClick={(id) => handleSelectUseCase(id)}
@@ -83,9 +85,9 @@ export function UsecaseSelectPage() {
             {displayedUseCase && (
               <motion.img
                 key={displayedUseCase}
-                src={`/images/auth/${displayedUseCase}-preview.svg`}
+                src={`/images/auth/${channelOptions.find((option) => option.id === displayedUseCase)?.image}`}
                 alt={`${displayedUseCase}-usecase-illustration`}
-                className="h-auto w-full"
+                className="h-auto w-full object-contain"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

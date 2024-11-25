@@ -32,7 +32,7 @@ export enum JobTitleEnum {
 export enum OrganizationTypeEnum {
   COMPANY = 'Company',
   AGENCY = 'Agency',
-  EDUCATIONAL = 'Educational',
+  EDUCATIONAL = 'Student',
   SOLOPRENEUR = 'Solopreneur',
   OTHER = 'Other',
 }
