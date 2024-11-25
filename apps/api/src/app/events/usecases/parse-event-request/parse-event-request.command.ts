@@ -16,9 +16,9 @@ import {
   TriggerRequestCategoryEnum,
   TriggerTenantContext,
 } from '@novu/shared';
+import { ApiHideProperty } from '@nestjs/swagger';
 
 import { EnvironmentWithUserCommand } from '../../../shared/commands/project.command';
-import { ApiHideProperty } from '@nestjs/swagger';
 
 export class ParseEventRequestBaseCommand extends EnvironmentWithUserCommand {
   @IsDefined()
