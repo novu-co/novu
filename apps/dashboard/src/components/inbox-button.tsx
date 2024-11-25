@@ -41,7 +41,7 @@ const InboxInner = () => {
                 <>
                   Inbox
                   {isTestPage && ' (Test)'}
-                  {unreadCount ? ` (${unreadCount})` : ''}
+                  {unreadCount > 0 && ` (${unreadCount})`}
                 </>
               }
               disableTooltip={open}
