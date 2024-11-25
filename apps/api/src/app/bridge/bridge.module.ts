@@ -34,10 +34,7 @@ import { BuildAvailableVariableSchemaUsecase } from '../workflows-v2/usecases/bu
 import { ExtractDefaultValuesFromSchemaUsecase } from '../workflows-v2/usecases/extract-default-values-from-schema';
 import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-renderers/hydrate-email-schema.usecase';
 
-const SHARED_USECASES = [
-  /**
-   * TODO: Extract this to a shared workflow module usecase
-   */
+const SHARED_USE_CASES = [
   UpsertWorkflowUseCase,
   PostProcessWorkflowUpdate,
   PatchStepUsecase,
@@ -70,7 +67,7 @@ const PROVIDERS = [
   DeletePreferencesUseCase,
   UpsertControlValuesUseCase,
   CommunityOrganizationRepository,
-  ...SHARED_USECASES,
+  ...SHARED_USE_CASES,
 ];
 
 @Module({
