@@ -21,7 +21,7 @@ const EmptyNotificationList = () => {
       )}
     >
       <EmptyIcon class={style('notificationListEmptyNoticeIcon')} />
-      <p class={style('notificationListEmptyNotice')} data-localization="notifications.emptyNotice">
+      <p class={(style('notificationListEmptyNotice'), 'nt-text-center')} data-localization="notifications.emptyNotice">
         {t('notifications.emptyNotice')}
       </p>
     </div>
