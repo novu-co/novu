@@ -182,6 +182,9 @@ export default {
         swing: 'swing 3s ease-in-out',
         jingle: 'jingle 3s ease-in-out',
       },
+      backgroundImage: {
+        'test-pattern': 'repeating-linear-gradient(135deg, hsl(var(--neutral-100)) 0, hsl(var(--neutral-100)) 2px, hsl(var(--neutral-200)) 2px, hsl(var(--neutral-200)) 4px)',
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],

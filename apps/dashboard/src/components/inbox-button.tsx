@@ -45,6 +45,7 @@ const InboxInner = () => {
                 </>
               }
               disableTooltip={open}
+              className={isTestPage ? 'bg-test-pattern' : ''}
             >
               <div className="relative flex items-center justify-center">
                 <InboxBellFilled
