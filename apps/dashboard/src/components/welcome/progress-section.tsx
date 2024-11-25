@@ -1,7 +1,7 @@
 import { ArrowRight, CheckCircle, Loader2 } from 'lucide-react';
 import React from 'react';
 import { Card, CardContent } from '../primitives/card';
-import { RiArrowRightDoubleFill } from 'react-icons/ri';
+import { RiArrowRightDoubleFill, RiCheckLine, RiLoader3Line, RiLoaderLine } from 'react-icons/ri';
 
 const steps = [
   {
@@ -50,9 +50,15 @@ export function ProgressSection() {
 
       <div className="flex flex-1 flex-col gap-3 p-6">
         {steps.map((step, index) => (
-          <div key={index} className="flex max-w-[370px] items-center gap-1">
-            <div className="flex h-6 w-6 items-center justify-center">
-              {step.status === 'completed' ? <CheckCircle className="h-4 w-4" /> : <Loader2 className="h-4 w-4" />}
+          <div key={index} className="flex max-w-[370px] items-center gap-1.5">
+            <div
+              className={`${step.status === 'completed' ? 'bg-success' : 'shadow-xs'} flex h-6 w-6 min-w-6 items-center justify-center rounded-full`}
+            >
+              {step.status === 'completed' ? (
+                <RiCheckLine className="h-4 w-4 text-[#ffffff]" />
+              ) : (
+                <RiLoader3Line className="h-4 w-4 text-neutral-400" />
+              )}
             </div>
 
             <Card className="shadow-xs w-full p-1 transition-all duration-200 hover:translate-x-[1px] hover:cursor-pointer hover:shadow-md">
