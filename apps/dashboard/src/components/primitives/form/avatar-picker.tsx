@@ -54,7 +54,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ n
         <PopoverTrigger asChild>
           <Button variant="outline" size="icon" className="text-foreground-600 relative size-full overflow-hidden">
             {value ? (
-              <Avatar className="p-px">
+              <Avatar className="bg-transparent p-px">
                 <AvatarImage src={value as string} />
               </Avatar>
             ) : (
@@ -91,7 +91,12 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ n
             <TextSeparator text="or" />
             <div className="grid grid-cols-6 gap-4">
               {predefinedAvatars.map((url, index) => (
-                <Button key={index} variant="ghost" className="p-0" onClick={() => handlePredefinedAvatarClick(url)}>
+                <Button
+                  key={index}
+                  variant="ghost"
+                  className="rounded-full p-0"
+                  onClick={() => handlePredefinedAvatarClick(url)}
+                >
                   <Avatar>
                     <AvatarImage src={url} />
                   </Avatar>

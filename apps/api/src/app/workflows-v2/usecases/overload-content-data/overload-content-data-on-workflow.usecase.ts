@@ -8,6 +8,7 @@ import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
 import { OverloadContentDataOnWorkflowCommand } from './overload-content-data-on-workflow.command';
 import { StepMissingControlsException } from '../../exceptions/step-not-found-exception';
 import { convertJsonToSchemaWithDefaults } from '../../util/jsonToSchema';
+import { mergeObjects } from '../../util/jsonUtils';
 
 @Injectable()
 export class OverloadContentDataOnWorkflowUseCase {
@@ -49,10 +50,12 @@ export class OverloadContentDataOnWorkflowUseCase {
         stepDatabaseId: step._templateId,
       });
       validatedStepContent[step._templateId] = await this.prepareAndValidateContentUsecase.execute({
+        stepType: step?.template?.type,
         controlDataSchema: controls.schema,
         controlValues,
         variableSchema,
         origin: workflow.origin || WorkflowOriginEnum.NOVU_CLOUD_V1,
+        user,
       });
     }
 
