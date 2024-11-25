@@ -246,16 +246,25 @@ export class Sync {
     return commandWorkflowSteps.map((step) => {
       const foundStep = workflow?.steps?.find((workflowStep) => workflowStep.stepId === step.stepId);
 
-      return {
-        /*
-         *   // TODO: store output schema
-         *   output: step.outputs,
-         */
-        _id: foundStep?._id,
-        controlSchema: { schema: step.controls.schema as JSONSchemaDto },
-        type: this.mapStepTypeToEnum(step.type),
-        name: step.stepId,
-      };
+      let stepDto: StepCreateDto | StepUpdateDto;
+      if (foundStep?._id) {
+        stepDto = {
+          _id: foundStep?._id,
+          outputSchema: step.outputs.schema as JSONSchemaDto,
+          controlSchema: step.controls.schema as JSONSchemaDto,
+          type: this.mapStepTypeToEnum(step.type),
+          name: step.stepId,
+        } satisfies StepUpdateDto;
+      } else {
+        stepDto = {
+          outputSchema: step.outputs.schema as JSONSchemaDto,
+          controlSchema: step.controls.schema as JSONSchemaDto,
+          type: this.mapStepTypeToEnum(step.type),
+          name: step.stepId,
+        } satisfies StepCreateDto;
+      }
+
+      return stepDto;
     });
   }
 

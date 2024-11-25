@@ -52,9 +52,10 @@ export type StepUpdateDto = StepDto & {
    */
   controlValues?: Record<string, unknown>;
   /**
-   * for code-first workflows we allow to store the control schema on create/update step
+   * for code-first workflows we allow to store the control/output schema on create/update step
    */
-  controlSchema?: { schema: JSONSchemaDto };
+  controlSchema?: JSONSchemaDto;
+  outputSchema?: JSONSchemaDto;
 };
 
 export type StepCreateDto = StepDto & {
@@ -65,7 +66,8 @@ export type StepCreateDto = StepDto & {
   /**
    * for code-first workflows we allow to store the control schema on create/update step
    */
-  controlSchema?: { schema: JSONSchemaDto };
+  controlSchema?: JSONSchemaDto;
+  outputSchema?: JSONSchemaDto;
 };
 
 export type ListWorkflowResponse = {

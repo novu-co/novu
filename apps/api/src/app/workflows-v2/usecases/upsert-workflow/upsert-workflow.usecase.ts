@@ -232,14 +232,17 @@ export class UpsertWorkflowUseCase {
     step: StepCreateDto | StepUpdateDto,
     foundPersistedStep?: NotificationStepEntity
   ): NotificationStep {
+    const controlDto = step.controlSchema ? { schema: step.controlSchema } : null;
+    const outputDto = step.outputSchema ? { schema: step.outputSchema } : null;
+    const outputFallback = { schema: stepTypeToDefaultDashboardControlSchema[step.type].schema };
+
     return {
       template: {
         type: step.type,
         name: step.name,
         controls:
-          step.controlSchema ||
-          foundPersistedStep?.template?.controls ||
-          stepTypeToDefaultDashboardControlSchema[step.type],
+          controlDto || foundPersistedStep?.template?.controls || stepTypeToDefaultDashboardControlSchema[step.type],
+        output: outputDto || foundPersistedStep?.template?.output || outputFallback,
         content: '',
       },
       stepId: foundPersistedStep?.stepId || slugify(step.name),
