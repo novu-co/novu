@@ -2,7 +2,6 @@ import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
 import { NotificationDBModel } from './notification.entity';
-import { getTTLOptions } from '../../shared';
 
 const notificationSchema = new Schema<NotificationDBModel>(
   {
@@ -154,6 +153,11 @@ notificationSchema.index({
   _environmentId: 1,
   createdAt: -1,
 });
+
+/*
+ * This index was created to push entries to Online Archive
+ */
+notificationSchema.index({ createdAt: 1 });
 
 export const Notification =
   (mongoose.models.Notification as mongoose.Model<NotificationDBModel>) ||

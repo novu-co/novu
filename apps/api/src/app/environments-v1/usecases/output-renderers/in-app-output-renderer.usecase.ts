@@ -8,6 +8,7 @@ import {
   InAppControlZodSchema,
   InAppRedirectType,
 } from '../../../workflows-v2/shared';
+import { isValidUrlForActionButton } from '../../../workflows-v2/util/url-utils';
 
 @Injectable()
 export class InAppOutputRendererUsecase {
@@ -31,7 +32,7 @@ export class InAppOutputRendererUsecase {
   }
 
   private buildRedirect(redirect?: InAppRedirectType) {
-    if (!(redirect && redirect.url && isValidURL(redirect.url))) {
+    if (!(redirect && redirect.url && this.isValidTarget(redirect) && isValidUrlForActionButton(redirect.url))) {
       return undefined;
     }
 
@@ -41,26 +42,22 @@ export class InAppOutputRendererUsecase {
     };
   }
 
+  private isValidTarget(redirect: InAppRedirectType) {
+    if (!redirect || !redirect.target) {
+      return false;
+    }
+
+    return Object.values(RedirectTargetEnum).includes(redirect.target as RedirectTargetEnum);
+  }
+
   private buildActionIfAllPartsAvailable(action?: InAppActionType) {
-    if (!(action && action.label && action.redirect && action.redirect.url && isValidURL(action.redirect.url))) {
+    if (!(action && action.label)) {
       return undefined;
     }
 
     return {
       label: action.label,
-      redirect: {
-        url: action.redirect.url.toLowerCase().trim(),
-        target: action.redirect.target as RedirectTargetEnum,
-      },
+      redirect: this.buildRedirect(action.redirect),
     };
-  }
-}
-function isValidURL(urlString: string): boolean {
-  try {
-    const url = new URL(urlString);
-
-    return url.protocol === 'http:' || url.protocol === 'https:'; // Ensure it's HTTP or HTTPS
-  } catch (error) {
-    return false; // The URL is invalid
   }
 }

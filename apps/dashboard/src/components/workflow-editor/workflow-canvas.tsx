@@ -164,7 +164,7 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
         selectionOnDrag
         panOnDrag={panOnDrag}
       >
-        <Controls showZoom={false} />
+        <Controls showZoom={false} showInteractive={false} />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>
     </div>

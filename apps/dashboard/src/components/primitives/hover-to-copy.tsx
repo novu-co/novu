@@ -14,7 +14,8 @@ export const HoverToCopy = (props: HoverToCopyProps) => {
     try {
       await navigator.clipboard.writeText(valueToCopy);
       setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 1500);
+      const timeout = setTimeout(() => setIsCopied(false), 1500);
+      return () => clearTimeout(timeout);
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }

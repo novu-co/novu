@@ -22,6 +22,7 @@ export class GetPreferencesByLevel {
         organizationId: command.organizationId,
         environmentId: command.environmentId,
         subscriberId: command.subscriberId,
+        includeInactiveChannels: command.includeInactiveChannels,
       });
       const globalPreferences = await this.getSubscriberGlobalPreference.execute(globalPreferenceCommand);
 
@@ -32,6 +33,7 @@ export class GetPreferencesByLevel {
       organizationId: command.organizationId,
       environmentId: command.environmentId,
       subscriberId: command.subscriberId,
+      includeInactiveChannels: command.includeInactiveChannels,
     });
 
     return await this.getSubscriberPreferenceUsecase.execute(preferenceCommand);

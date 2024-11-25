@@ -401,16 +401,25 @@ export class SubscribersController {
   @ApiOperation({
     summary: 'Get subscriber preferences',
   })
+  @ApiQuery({
+    name: 'includeInactiveChannels',
+    type: Boolean,
+    required: false,
+    description:
+      'A flag which specifies if the inactive workflow channels should be included in the retrieved preferences. Default is true',
+  })
   @SdkGroupName('Subscribers.Preferences')
   async listSubscriberPreferences(
     @UserSession() user: UserSessionData,
-    @Param('subscriberId') subscriberId: string
+    @Param('subscriberId') subscriberId: string,
+    @Query('includeInactiveChannels') includeInactiveChannels: boolean
   ): Promise<UpdateSubscriberPreferenceResponseDto[]> {
     const command = GetPreferencesByLevelCommand.create({
       organizationId: user.organizationId,
       subscriberId,
       environmentId: user.environmentId,
       level: PreferenceLevelEnum.TEMPLATE,
+      includeInactiveChannels: includeInactiveChannels ?? true,
     });
 
     return (await this.getPreferenceUsecase.execute(command)) as UpdateSubscriberPreferenceResponseDto[];
@@ -431,17 +440,26 @@ export class SubscribersController {
     required: true,
     description: 'the preferences level to be retrieved (template / global) ',
   })
+  @ApiQuery({
+    name: 'includeInactiveChannels',
+    type: Boolean,
+    required: false,
+    description:
+      'A flag which specifies if the inactive workflow channels should be included in the retrieved preferences. Default is true',
+  })
   @SdkGroupName('Subscribers.Preferences')
   @SdkMethodName('retrieveByLevel')
   async getSubscriberPreferenceByLevel(
     @UserSession() user: UserSessionData,
-    @Param() { parameter, subscriberId }: GetSubscriberPreferencesByLevelParams
+    @Param() { parameter, subscriberId }: GetSubscriberPreferencesByLevelParams,
+    @Query('includeInactiveChannels') includeInactiveChannels: boolean
   ): Promise<GetSubscriberPreferencesResponseDto[]> {
     const command = GetPreferencesByLevelCommand.create({
       organizationId: user.organizationId,
       subscriberId,
       environmentId: user.environmentId,
       level: parameter,
+      includeInactiveChannels: includeInactiveChannels ?? true,
     });
 
     return await this.getPreferenceUsecase.execute(command);
@@ -470,6 +488,7 @@ export class SubscribersController {
         subscriberId,
         workflowId: templateId,
         level: PreferenceLevelEnum.TEMPLATE,
+        includeInactiveChannels: true,
         ...(body.channel && { [body.channel.type]: body.channel.enabled }),
       })
     );
@@ -522,6 +541,7 @@ export class SubscribersController {
         organizationId: user.organizationId,
         subscriberId,
         level: PreferenceLevelEnum.GLOBAL,
+        includeInactiveChannels: true,
         ...channels,
       })
     );

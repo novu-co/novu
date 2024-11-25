@@ -124,6 +124,7 @@ export class UpdatePreferences {
           environmentId: command.environmentId,
           template: workflow,
           subscriber,
+          includeInactiveChannels: command.includeInactiveChannels,
         })
       );
 
@@ -146,6 +147,7 @@ export class UpdatePreferences {
         organizationId: command.organizationId,
         environmentId: command.environmentId,
         subscriberId: command.subscriberId,
+        includeInactiveChannels: command.includeInactiveChannels,
       })
     );
 
