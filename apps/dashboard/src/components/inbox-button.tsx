@@ -52,6 +52,7 @@ const InboxInner = () => {
                   className={`text-foreground-600 size-4 cursor-pointer stroke-[0.5px]`}
                   bellClassName={`origin-top ${jingle ? 'animate-swing' : ''}`}
                   ringerClassName={`origin-top ${jingle ? 'animate-jingle' : ''}`}
+                  codeClassName={isTestPage ? 'block' : 'hidden'}
                 />
                 {unreadCount > 0 && (
                   <div className="absolute right-[-4px] top-[-6px] flex h-3 w-3 items-center justify-center rounded-full border-[3px] border-[white] bg-white">
