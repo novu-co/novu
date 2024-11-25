@@ -3,6 +3,7 @@ import { NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { JSONSchemaDto } from '@novu/shared';
 import { computeResultSchema } from '../../shared';
 import { BuildAvailableVariableSchemaCommand } from './build-available-variable-schema.command';
+import { parsePayloadSchema } from '../../shared/parse-payload-schema';
 
 @Injectable()
 export class BuildAvailableVariableSchemaUsecase {
@@ -46,12 +47,7 @@ export class BuildAvailableVariableSchemaUsecase {
 }
 function safePayloadSchema(workflow: NotificationTemplateEntity): JSONSchemaDto {
   try {
-    // TODO: fix the type, we need to make sure we have the same data structure in the code
-    if (typeof workflow.payloadSchema === 'string') {
-      return JSON.parse(workflow.payloadSchema);
-    } else {
-      return workflow.payloadSchema;
-    }
+    return parsePayloadSchema(workflow.payloadSchema);
   } catch (e) {
     return { type: 'object', description: 'Payload for the current step' };
   }

@@ -16,6 +16,7 @@ import {
   IStepVariant,
   ITriggerReservedVariable,
   IWorkflowStepMetadata,
+  JSONSchemaDto,
   NotificationTemplateCustomData,
   StepIssues,
   TriggerTypeEnum,
@@ -85,7 +86,8 @@ export class NotificationTemplateEntity implements INotificationTemplate {
 
   rawData?: any;
 
-  payloadSchema?: any;
+  // TODO deprecate the string type after we are sure that all payload schemas are JSONSchemaDto
+  payloadSchema?: JSONSchemaDto | string;
 
   issues: Record<string, ContentIssue[]>;
 
