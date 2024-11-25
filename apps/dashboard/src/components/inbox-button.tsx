@@ -7,10 +7,12 @@ import { HeaderButton } from './header-navigation/header-button';
 import { useState, useEffect } from 'react';
 import { useEnvironment } from '../context/environment/hooks';
 import { useTestPage } from '@/hooks/use-test-page';
+import { Badge } from './primitives/badge';
 
 const InboxInner = () => {
   const [open, setOpen] = useState(false);
   const [jingle, setJingle] = useState(false);
+  const { isTestPage } = useTestPage();
 
   const novu = useNovu();
   useEffect(() => {
@@ -35,7 +37,16 @@ const InboxInner = () => {
       <PopoverTrigger tabIndex={-1}>
         <Bell
           renderBell={(unreadCount) => (
-            <HeaderButton label={unreadCount ? `Inbox (${unreadCount})` : 'Inbox'} disableTooltip={open}>
+            <HeaderButton
+              label={
+                <>
+                  Inbox
+                  {isTestPage && ' (Test)'}
+                  {unreadCount ? ` (${unreadCount})` : ''}
+                </>
+              }
+              disableTooltip={open}
+            >
               <div className="relative flex items-center justify-center">
                 <InboxBellFilled
                   className={`text-foreground-600 size-4 cursor-pointer stroke-[0.5px]`}
