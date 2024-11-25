@@ -1,6 +1,5 @@
-import { type Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
 import { StepTypeEnum } from '@novu/shared';
-import { expect } from '../utils/base-test';
 
 export class WorkflowEditorPage {
   constructor(private page: Page) {}

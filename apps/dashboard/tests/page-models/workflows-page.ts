@@ -1,5 +1,4 @@
-import { type Page } from '@playwright/test';
-import { expect } from '../utils/base-test';
+import { expect, type Page } from '@playwright/test';
 
 export class WorkflowsPage {
   constructor(private page: Page) {}
