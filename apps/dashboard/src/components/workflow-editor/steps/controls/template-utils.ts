@@ -4,6 +4,7 @@ import { SwitchWidget } from './switch-widget';
 import { TextWidget } from './text-widget';
 
 export const JSON_SCHEMA_FORM_ID_DELIMITER = '~~~';
+export const ROOT_DELIMITER = 'root';
 /**
  * The length of the root delimiter ( root + ".")
  */

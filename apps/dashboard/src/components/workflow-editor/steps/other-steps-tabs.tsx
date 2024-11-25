@@ -98,6 +98,7 @@ export const OtherStepTabs = ({ workflow, step }: { workflow: WorkflowResponseDt
           event.stopPropagation();
           form.handleSubmit(onSubmit)(event);
         }}
+        noValidate
       >
         <Tabs defaultValue="editor" className="flex h-full flex-1 flex-col">
           <header className="flex flex-row items-center gap-3 px-3 py-1.5">
