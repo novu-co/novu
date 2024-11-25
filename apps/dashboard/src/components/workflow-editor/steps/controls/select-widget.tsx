@@ -3,9 +3,10 @@ import { useFormContext } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { capitalize } from '@/utils/string';
+import { JSON_SCHEMA_FORM_ID_DELIMITER } from './json-form';
 
 export function SelectWidget(props: WidgetProps) {
-  const { label, required, readonly, options, name } = props;
+  const { label, required, readonly, options, disabled, id } = props;
 
   const data = options.enumOptions?.map((option) => {
     return {
@@ -16,15 +17,22 @@ export function SelectWidget(props: WidgetProps) {
 
   const { control } = useFormContext();
 
+  const extractedName = id.split(JSON_SCHEMA_FORM_ID_DELIMITER).join('.').slice(5);
+
   return (
     <FormField
       control={control}
-      name={name}
+      name={extractedName}
       render={({ field }) => (
-        <FormItem className="my-2 py-1">
+        <FormItem className="py-1">
           <FormLabel>{capitalize(label)}</FormLabel>
           <FormControl>
-            <Select value={field.value} onValueChange={field.onChange} disabled={readonly} required={required}>
+            <Select
+              value={field.value}
+              onValueChange={field.onChange}
+              disabled={disabled || readonly}
+              required={required}
+            >
               <SelectTrigger className="group p-1.5 shadow-sm last:[&>svg]:hidden">
                 <SelectValue asChild>
                   <div className="flex items-center gap-2">

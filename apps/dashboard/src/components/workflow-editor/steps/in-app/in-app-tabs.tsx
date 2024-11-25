@@ -122,6 +122,8 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
         ),
       },
     });
+
+    form.reset({ ...values, ...updatedValues });
   };
 
   const preview = async (props: {
@@ -219,7 +221,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
             <Separator />
             <TabsContent value="editor" className={tabsContentClassName}>
               <InAppEditor uiSchema={uiSchema} />
-              <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
+              <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} formData={values} />
             </TabsContent>
             <TabsContent value="preview" className={tabsContentClassName}>
               {previewData === undefined ||

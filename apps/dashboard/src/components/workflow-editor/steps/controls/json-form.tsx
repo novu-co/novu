@@ -1,12 +1,20 @@
 import Form, { FormProps } from '@rjsf/core';
-import { RegistryWidgetsType, UiSchema } from '@rjsf/utils';
+import {
+  ArrayFieldTemplateItemType,
+  ArrayFieldTitleProps,
+  IconButtonProps,
+  RegistryWidgetsType,
+  UiSchema,
+} from '@rjsf/utils';
 import validator from '@rjsf/validator-ajv8';
-import { TextWidget } from './text-widget';
-import { SwitchWidget } from './switch-widget';
-import { SelectWidget } from './select-widget';
+import { RiAddLine, RiSubtractFill } from 'react-icons/ri';
+import { cn } from '@/utils/ui';
 import { Button } from '@/components/primitives/button';
-import { RiAddLine } from 'react-icons/ri';
 import { ArrayFieldTemplate } from './array-field-template';
+import { ObjectFieldTemplate } from './object-field-template';
+import { SelectWidget } from './select-widget';
+import { SwitchWidget } from './switch-widget';
+import { TextWidget } from './text-widget';
 
 export const JSON_SCHEMA_FORM_ID_DELIMITER = '~~~';
 
@@ -39,7 +47,7 @@ export function JsonForm(props: JsonFormProps) {
   return (
     <Form
       tagName={'fieldset'}
-      className="[&_.control-label]:hidden [&_.field-decription]:hidden [&_.panel.panel-danger.errors]:hidden"
+      className="*:flex *:flex-col *:gap-3 [&_.control-label]:hidden [&_.field-decription]:hidden [&_.panel.panel-danger.errors]:hidden"
       uiSchema={UI_SCHEMA}
       widgets={WIDGETS}
       validator={validator}
@@ -50,33 +58,60 @@ export function JsonForm(props: JsonFormProps) {
       formContext={{ variables: [] }}
       idSeparator={JSON_SCHEMA_FORM_ID_DELIMITER}
       {...props}
-      /**
-       * TODO: Add support for Arrays and Nested Objects
-       */
       templates={{
         ButtonTemplates: {
           AddButton,
+          RemoveButton,
         },
         ArrayFieldTemplate,
         ArrayFieldItemTemplate,
         ArrayFieldTitleTemplate,
+        ObjectFieldTemplate,
       }}
     />
   );
 }
 
-const AddButton = (props: any) => {
+const AddButton = (props: IconButtonProps) => {
   return (
-    <Button variant="ghost" className="size-4 rounded-sm p-0.5" type="button" {...props}>
+    <Button variant="ghost" className="size-4 rounded-sm p-0.5" type="button" {...props} title="Add item">
       <RiAddLine className="text-foreground-600 size-3" />
     </Button>
   );
 };
 
-const ArrayFieldItemTemplate = (props: any) => {
-  return <div className="flex items-center gap-2 *:flex-1">{props.children}</div>;
+const RemoveButton = (props: IconButtonProps) => {
+  return (
+    <Button variant="ghost" className="size-4 rounded-sm p-0.5" type="button" {...props} title="Remove item">
+      <RiSubtractFill className="text-foreground-600 size-3" />
+    </Button>
+  );
 };
 
-const ArrayFieldTitleTemplate = (props: any) => {
-  return <legend className="text-foreground-400 px-1">{props.title}</legend>;
+const ArrayFieldItemTemplate = (props: ArrayFieldTemplateItemType) => {
+  const isChildObjectType = props.schema.type === 'object';
+
+  return (
+    <div className="relative flex items-center gap-2 *:flex-1">
+      {props.children}
+      <div
+        className={cn(
+          'bg-background absolute right-0 top-0 z-10 mt-2 flex w-5 -translate-y-1/2 items-center justify-end',
+          { 'right-4 justify-start': isChildObjectType }
+        )}
+      >
+        {
+          <RemoveButton
+            disabled={props.disabled || props.readonly}
+            onClick={props.onDropIndexClick(props.index)}
+            registry={props.registry}
+          />
+        }
+      </div>
+    </div>
+  );
+};
+
+const ArrayFieldTitleTemplate = (props: ArrayFieldTitleProps) => {
+  return <legend className="text-foreground-400 px-1 text-xs">{props.title}</legend>;
 };
