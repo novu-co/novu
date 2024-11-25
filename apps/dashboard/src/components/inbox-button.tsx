@@ -7,7 +7,6 @@ import { HeaderButton } from './header-navigation/header-button';
 import { useState, useEffect } from 'react';
 import { useEnvironment } from '../context/environment/hooks';
 import { useTestPage } from '@/hooks/use-test-page';
-import { Badge } from './primitives/badge';
 
 const InboxInner = () => {
   const [open, setOpen] = useState(false);
