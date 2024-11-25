@@ -102,6 +102,7 @@ jobs:
           echo REACT_APP_CLERK_PUBLISHABLE_KEY=${{ inputs.clerk_publishable_key }} >> .env
           echo REACT_APP_IS_EE_AUTH_ENABLED=${{ inputs.clerk_is_ee_auth_enabled }} >> .env
           echo REACT_APP_NEW_DASHBOARD_URL=${{ inputs.new_dashboard_url }} >> .env
+          echo REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID=${{secrets.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID}} >> .env
       - name: Envsetup
         working-directory: apps/web
         run: npm run envsetup
