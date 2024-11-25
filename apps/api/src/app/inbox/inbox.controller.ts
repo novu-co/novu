@@ -240,6 +240,7 @@ export class InboxController {
         in_app: body.in_app,
         push: body.push,
         sms: body.sms,
+        includeInactiveChannels: false,
       })
     );
   }
@@ -263,6 +264,7 @@ export class InboxController {
         push: body.push,
         sms: body.sms,
         workflowId,
+        includeInactiveChannels: false,
       })
     );
   }

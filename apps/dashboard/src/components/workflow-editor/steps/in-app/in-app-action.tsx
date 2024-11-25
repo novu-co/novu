@@ -172,13 +172,12 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                   <FormLabel>Button text</FormLabel>
                 </div>
                 <FormControl>
-                  <InputField>
+                  <InputField size="fit">
                     <Editor
                       fontFamily="inherit"
                       placeholder="Button text"
                       value={field.value}
                       onChange={field.onChange}
-                      height="30px"
                       extensions={[autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping]}
                     />
                   </InputField>

@@ -86,6 +86,40 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     return await baseClient.safeGet<ListWorkflowResponse>(`/v2/workflows?${query.toString()}`);
   };
 
+  /**
+   * @deprecated This function is deprecated and will be removed in future versions.
+   * Use `searchWorkflows` instead to retrieve workflows with updated parameters and functionality.
+   *
+   * @param {GetListQueryParams} queryParams - The parameters for querying workflows.
+   * @returns {Promise<NovuRestResult<ListWorkflowResponse, HttpError>>} - A promise that resolves to the result of the workflow retrieval.
+   */
+  const searchWorkflowsV1 = async (queryParams?: string): Promise<NovuRestResult<WorkflowResponseDto[], HttpError>> => {
+    const query = new URLSearchParams();
+    query.append('defaultLimit', '10');
+    query.append('maxLimit', '50');
+    if (queryParams) {
+      query.append('query', queryParams);
+    }
+
+    return await baseClient.safeGet<WorkflowResponseDto[]>(`/v1/workflows?${query.toString()}`);
+  };
+  /**
+   * @deprecated This function is deprecated and will be removed in future versions.
+   * Use `searchWorkflows` instead to retrieve workflows with updated parameters and functionality.
+   *
+   * @returns {Promise<NovuRestResult<ListWorkflowResponse, HttpError>>} - A promise that resolves to the result of the workflow retrieval.
+   * @param templateBody
+   */
+  const createWorkflowsV1 = async (templateBody: {
+    name: string;
+    description: string;
+    tags: string[];
+    notificationGroupId: string;
+    steps: any[];
+  }): Promise<NovuRestResult<WorkflowResponseDto, HttpError>> => {
+    return await baseClient.safePost<WorkflowResponseDto>(`/v1/workflows`, templateBody);
+  };
+
   const generatePreview = async (
     workflowId: string,
     stepDatabaseId: string,
@@ -115,5 +149,7 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     getWorkflowStepData,
     patchWorkflowStepData,
     patchWorkflow,
+    searchWorkflowsV1,
+    createWorkflowsV1,
   };
 };

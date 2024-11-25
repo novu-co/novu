@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type StepDataDto, type StepUpdateDto, type WorkflowResponseDto } from '@novu/shared';
+import { ChannelTypeEnum, type StepDataDto, type StepUpdateDto, type WorkflowResponseDto } from '@novu/shared';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useEffect, useMemo, useState } from 'react';
 import { FieldValues, useForm, useWatch } from 'react-hook-form';
@@ -222,19 +222,25 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
               <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
             </TabsContent>
             <TabsContent value="preview" className={tabsContentClassName}>
-              <InAppEditorPreview
-                value={editorValue}
-                onChange={setEditorValue}
-                previewData={previewData}
-                isPreviewLoading={isPreviewPending}
-                applyPreview={() => {
-                  previewStep({
-                    stepSlug,
-                    workflowSlug,
-                    data: { controlValues: form.getValues() as FieldValues, previewPayload: JSON.parse(editorValue) },
-                  });
-                }}
-              />
+              {previewData === undefined ||
+                (previewData.result?.type === ChannelTypeEnum.IN_APP && (
+                  <InAppEditorPreview
+                    value={editorValue}
+                    onChange={setEditorValue}
+                    preview={previewData?.result.preview}
+                    isPreviewPending={isPreviewPending}
+                    applyPreview={() => {
+                      previewStep({
+                        stepSlug,
+                        workflowSlug,
+                        data: {
+                          controlValues: form.getValues() as FieldValues,
+                          previewPayload: JSON.parse(editorValue),
+                        },
+                      });
+                    }}
+                  />
+                ))}
             </TabsContent>
             <Separator />
             <footer className="flex justify-end px-3 py-3.5">

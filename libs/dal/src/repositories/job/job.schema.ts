@@ -2,7 +2,6 @@ import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
 import { JobDBModel, JobStatusEnum } from './job.entity';
-import { getTTLOptions } from '../../shared';
 
 const jobSchema = new Schema<JobDBModel>(
   {
@@ -396,5 +395,10 @@ jobSchema.index(
     sparse: true,
   }
 );
+
+/*
+ * This index was created to push entries to Online Archive
+ */
+jobSchema.index({ createdAt: 1 });
 
 export const Job = (mongoose.models.Job as mongoose.Model<JobDBModel>) || mongoose.model<JobDBModel>('Job', jobSchema);

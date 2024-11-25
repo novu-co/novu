@@ -228,8 +228,8 @@
     "tsx": "4.16.2",
     "typescript": "5.6.2",
     "vitest": "^1.2.1",
-    "zod": "^3.23.0",
-    "zod-to-json-schema": "^3.23.0"
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.23.3"
   },
   "dependencies": {
     "@novu/shared": "workspace:*",

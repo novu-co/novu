@@ -188,15 +188,25 @@ export class NotificationTemplateRepository extends BaseRepository<
     return { totalCount: totalItemsCount, data: this.mapEntities(items) };
   }
 
-  async getList(organizationId: string, environmentId: string, skip = 0, limit = 10, query?: string) {
-    let searchQuery: FilterQuery<NotificationTemplateDBModel> = {};
+  async getList(
+    organizationId: string,
+    environmentId: string,
+    skip: number = 0,
+    limit: number = 10,
+    query?: string,
+    excludeNewDashboardWorkflows: boolean = false
+  ): Promise<{ totalCount: number; data: NotificationTemplateEntity[] }> {
+    const searchQuery: FilterQuery<NotificationTemplateDBModel> = {};
+
     if (query) {
-      searchQuery = {
-        $or: [
-          { name: { $regex: regExpEscape(query), $options: 'i' } },
-          { 'triggers.identifier': { $regex: regExpEscape(query), $options: 'i' } },
-        ],
-      };
+      searchQuery.$or = [
+        { name: { $regex: regExpEscape(query), $options: 'i' } },
+        { 'triggers.identifier': { $regex: regExpEscape(query), $options: 'i' } },
+      ];
+    }
+
+    if (excludeNewDashboardWorkflows) {
+      searchQuery.$nor = [{ origin: 'novu-cloud', type: 'BRIDGE' }];
     }
 
     const totalItemsCount = await this.count({
@@ -204,13 +214,9 @@ export class NotificationTemplateRepository extends BaseRepository<
       ...searchQuery,
     });
 
-    const requestQuery: NotificationTemplateQuery = {
+    const items = await this.MongooseModel.find({
       _environmentId: environmentId,
       _organizationId: organizationId,
-    };
-
-    const items = await this.MongooseModel.find({
-      ...requestQuery,
       ...searchQuery,
     })
       .sort({ createdAt: -1 })
@@ -218,7 +224,7 @@ export class NotificationTemplateRepository extends BaseRepository<
       .limit(limit)
       .populate({ path: 'notificationGroup' })
       .populate('steps.template', { type: 1 })
-      .select('-steps.variants') // Excludes Variants from the list
+      .select('-steps.variants')
       .lean();
 
     return { totalCount: totalItemsCount, data: this.mapEntities(items) };

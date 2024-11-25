@@ -39,7 +39,12 @@ export class GetSubscriberGlobalPreference {
       subscriberGlobalPreference.channels,
     );
 
-    const channels = filteredPreference(channelsWithDefaults, activeChannels);
+    let channels: IPreferenceChannels;
+    if (command.includeInactiveChannels === true) {
+      channels = channelsWithDefaults;
+    } else {
+      channels = filteredPreference(channelsWithDefaults, activeChannels);
+    }
 
     return {
       preference: {
@@ -99,6 +104,7 @@ export class GetSubscriberGlobalPreference {
           environmentId: command.environmentId,
           subscriberId: command.subscriberId,
           organizationId: command.organizationId,
+          includeInactiveChannels: command.includeInactiveChannels,
         }),
       );
 
