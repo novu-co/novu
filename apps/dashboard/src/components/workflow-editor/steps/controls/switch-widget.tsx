@@ -4,12 +4,12 @@ import { useFormContext } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Switch } from '@/components/primitives/switch';
 import { capitalize } from '@/utils/string';
-import { JSON_SCHEMA_FORM_ID_DELIMITER } from './template-utils';
+import { getFieldName } from './template-utils';
 
 export function SwitchWidget(props: WidgetProps) {
   const { label, readonly, disabled, required, id } = props;
   const { control } = useFormContext();
-  const extractedName = useMemo(() => id.split(JSON_SCHEMA_FORM_ID_DELIMITER).join('.').slice(5), [id]);
+  const extractedName = useMemo(() => getFieldName(id), [id]);
 
   return (
     <FormField

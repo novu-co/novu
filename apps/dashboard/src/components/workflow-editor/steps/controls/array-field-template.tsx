@@ -4,7 +4,7 @@ import { ArrayFieldTemplateProps, getTemplate, getUiOptions } from '@rjsf/utils'
 import { useMemo, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { RiExpandUpDownLine } from 'react-icons/ri';
-import { JSON_SCHEMA_FORM_ID_DELIMITER } from './template-utils';
+import { getFieldName } from './template-utils';
 
 export function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
   const { disabled, idSchema, uiSchema, items, onAddClick, readonly, registry, required, title, schema, canAdd } =
@@ -38,10 +38,7 @@ export function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
   };
 
   const { control } = useFormContext();
-  const extractedName = useMemo(
-    () => idSchema.$id.split(JSON_SCHEMA_FORM_ID_DELIMITER).join('.').slice(5),
-    [idSchema.$id]
-  );
+  const extractedName = useMemo(() => getFieldName(idSchema.$id), [idSchema.$id]);
 
   const { append, remove } = useFieldArray({
     control,

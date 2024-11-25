@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { capitalize } from '@/utils/string';
-import { JSON_SCHEMA_FORM_ID_DELIMITER } from './template-utils';
+import { getFieldName } from './template-utils';
 
 export function SelectWidget(props: WidgetProps) {
   const { label, required, readonly, options, disabled, id } = props;
@@ -19,7 +19,7 @@ export function SelectWidget(props: WidgetProps) {
       }),
     [options.enumOptions]
   );
-  const extractedName = useMemo(() => id.split(JSON_SCHEMA_FORM_ID_DELIMITER).join('.').slice(5), [id]);
+  const extractedName = useMemo(() => getFieldName(id), [id]);
 
   const { control } = useFormContext();
 

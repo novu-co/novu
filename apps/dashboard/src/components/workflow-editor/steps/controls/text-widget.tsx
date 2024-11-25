@@ -7,13 +7,13 @@ import { Input, InputField } from '@/components/primitives/input';
 import { completions } from '@/utils/liquid-autocomplete';
 import { capitalize } from '@/utils/string';
 import { autocompletion } from '@codemirror/autocomplete';
-import { JSON_SCHEMA_FORM_ID_DELIMITER } from './template-utils';
+import { getFieldName } from './template-utils';
 
 export function TextWidget(props: WidgetProps) {
   const { label, readonly, disabled, id, required } = props;
   const { control } = useFormContext();
 
-  const extractedName = useMemo(() => id.split(JSON_SCHEMA_FORM_ID_DELIMITER).join('.').slice(5), [id]);
+  const extractedName = useMemo(() => getFieldName(id), [id]);
   const isNumberType = useMemo(() => props.schema.type === 'number', [props.schema.type]);
 
   return (
