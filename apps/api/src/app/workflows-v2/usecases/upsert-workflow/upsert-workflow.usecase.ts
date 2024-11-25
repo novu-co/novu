@@ -133,6 +133,7 @@ export class UpsertWorkflowUseCase {
       type: WorkflowTypeEnum.BRIDGE,
       origin: workflowDto.origin || WorkflowOriginEnum.NOVU_CLOUD,
       steps: this.mapSteps(workflowDto.steps),
+      rawData: workflowDto,
       active: isWorkflowActive,
       description: workflowDto.description || '',
       tags: workflowDto.tags || [],

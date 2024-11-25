@@ -95,7 +95,6 @@ export type FrameworkCommonsFields = {
   workflowId?: string;
   controlsSchema?: JSONSchemaDto;
   payloadSchema?: JSONSchemaDto;
-  rawData?: Record<string, unknown>;
   origin?: WorkflowOriginEnum;
 };
 

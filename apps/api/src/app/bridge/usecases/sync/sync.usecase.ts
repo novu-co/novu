@@ -173,7 +173,7 @@ export class Sync {
         );
 
         const upsertWorkflowCommand = fetchedWorkflow
-          ? this.mapDiscoverWorkflowToUpdateWorkflowDto(fetchedWorkflow._id, command, workflow)
+          ? this.mapDiscoverWorkflowToUpdateWorkflowDto(fetchedWorkflow, command, workflow)
           : this.mapDiscoverWorkflowToCreateWorkflowDto(command, workflow);
 
         return await this.upsertWorkflowUseCase.execute(upsertWorkflowCommand);
@@ -201,35 +201,35 @@ export class Sync {
     };
   }
 
-  private getPartialWorkflowDto(workflow: DiscoverWorkflowOutput) {
+  private getPartialWorkflowDto(discoverWorkflow: DiscoverWorkflowOutput, workflow?: NotificationTemplateEntity) {
     return {
-      name: this.getWorkflowName(workflow),
-      workflowId: workflow.workflowId,
-      steps: this.mapSteps2(workflow.steps),
-      controlsSchema: workflow.controls?.schema as JSONSchemaDto,
-      rawData: workflow as unknown as Record<string, unknown>,
-      payloadSchema: workflow.payload?.schema as JSONSchemaDto,
+      name: this.getWorkflowName(discoverWorkflow),
+      workflowId: discoverWorkflow.workflowId,
+      steps: this.mapDiscoverStepToUpsertStep(discoverWorkflow.steps, workflow),
+      controlsSchema: discoverWorkflow.controls?.schema as JSONSchemaDto,
+      rawData: discoverWorkflow as unknown as Record<string, unknown>,
+      payloadSchema: discoverWorkflow.payload?.schema as JSONSchemaDto,
       active: true,
-      description: this.getWorkflowDescription(workflow),
-      tags: this.getWorkflowTags(workflow),
+      description: this.getWorkflowDescription(discoverWorkflow),
+      tags: this.getWorkflowTags(discoverWorkflow),
       preferences: {
         user: null,
-        workflow: this.getWorkflowPreferences(workflow),
+        workflow: this.getWorkflowPreferences(discoverWorkflow),
       },
     };
   }
 
   private mapDiscoverWorkflowToUpdateWorkflowDto(
-    _workflowId: string,
+    workflow: NotificationTemplateEntity,
     command: SyncCommand,
-    workflow: DiscoverWorkflowOutput
+    discoverWorkflow: DiscoverWorkflowOutput
   ): UpsertWorkflowCommand {
     const workflowDto: UpdateWorkflowDto = {
-      ...this.getPartialWorkflowDto(workflow),
+      ...this.getPartialWorkflowDto(discoverWorkflow, workflow),
     };
 
     return {
-      identifierOrInternalId: _workflowId,
+      identifierOrInternalId: workflow._id,
       workflowDto,
       user: {
         environmentId: command.environmentId,
@@ -239,11 +239,11 @@ export class Sync {
     };
   }
 
-  private mapSteps2(
-    commandWorkflowSteps: DiscoverStepOutput[],
+  private mapDiscoverStepToUpsertStep(
+    discoverWorkflowSteps: DiscoverStepOutput[],
     workflow?: NotificationTemplateEntity | undefined
   ): (StepCreateDto | StepUpdateDto)[] {
-    return commandWorkflowSteps.map((step) => {
+    return discoverWorkflowSteps.map((step) => {
       const foundStep = workflow?.steps?.find((workflowStep) => workflowStep.stepId === step.stepId);
 
       let stepDto: StepCreateDto | StepUpdateDto;
@@ -284,6 +284,8 @@ export class Sync {
         return StepTypeEnum.DIGEST;
       case 'delay':
         return StepTypeEnum.DELAY;
+      case 'custom':
+        return StepTypeEnum.CUSTOM;
       default:
         throw new BadRequestException('Invalid step type');
     }
