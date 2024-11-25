@@ -20,7 +20,7 @@ export class WorkflowsPage {
     await expect(workflow).toBeVisible();
   }
 
-  async verifyWorkflowDoesntExists(workflowName: string): Promise<void> {
+  async verifyWorkflowDoesNotExists(workflowName: string): Promise<void> {
     const workflow = await this.page.getByRole('link').filter({ hasText: workflowName });
     await expect(workflow).not.toBeVisible();
   }
@@ -30,13 +30,13 @@ export class WorkflowsPage {
     await workflow.click();
   }
 
-  async vefifyWorkflowActive(workflowName: string): Promise<void> {
+  async verifyWorkflowActive(workflowName: string): Promise<void> {
     const workflowRow = await this.page.getByRole('row').filter({ hasText: workflowName });
     const activeBadge = await workflowRow.locator('td', { hasText: 'Active' });
     await expect(activeBadge).toBeVisible();
   }
 
-  async vefifyWorkflowInactive(workflowName: string): Promise<void> {
+  async verifyWorkflowInactive(workflowName: string): Promise<void> {
     const workflowRow = await this.page.getByRole('row').filter({ hasText: workflowName });
     const inactiveBadge = await workflowRow.locator('td', { hasText: 'Inactive' });
     await expect(inactiveBadge).toBeVisible();

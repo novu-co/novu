@@ -35,8 +35,8 @@ export class InAppStepEditor {
     const actionDropdownTrigger = await this.page.getByTestId('in-app-action-dropdown-trigger');
     await actionDropdownTrigger.click();
     if (action === 'primary') {
-      const primatyAction = await this.page.getByRole('menuitem').filter({ hasText: 'Primary action' }).first();
-      await primatyAction.click();
+      const primaryAction = await this.page.getByRole('menuitem').filter({ hasText: 'Primary action' }).first();
+      await primaryAction.click();
     } else if (action === 'both') {
       const bothActions = await this.page.getByRole('menuitem').filter({ hasText: 'Secondary action' });
       await bothActions.click();

@@ -54,11 +54,11 @@ test('dashboard defined workflow user journey', async ({ page }) => {
   await workflowEditorPage.verifyLastStepVisible(StepTypeEnum.IN_APP);
   await workflowEditorPage.clickLastStep(StepTypeEnum.IN_APP);
 
-  const stepConfirSidebar = new StepConfigSidebar(page);
-  await stepConfirSidebar.waitStepConfigSidebarNavigation(inAppStepName);
+  const stepConfigSidebar = new StepConfigSidebar(page);
+  await stepConfigSidebar.waitStepConfigSidebarNavigation(inAppStepName);
   const inAppStepNameUpdated = `${inAppStepName}-updated`;
-  await stepConfirSidebar.updateStepName({ oldStepName: inAppStepName, newStepName: inAppStepNameUpdated });
-  await stepConfirSidebar.configureTemplateClick();
+  await stepConfigSidebar.updateStepName({ oldStepName: inAppStepName, newStepName: inAppStepNameUpdated });
+  await stepConfigSidebar.configureTemplateClick();
 
   const inAppStepEditor = new InAppStepEditor(page);
   await inAppStepEditor.waitInAppStepEditorNavigation(inAppStepNameUpdated);
@@ -77,15 +77,15 @@ test('dashboard defined workflow user journey', async ({ page }) => {
   });
   await inAppStepEditor.close();
 
-  await stepConfirSidebar.waitStepConfigSidebarNavigation(inAppStepNameUpdated);
+  await stepConfigSidebar.waitStepConfigSidebarNavigation(inAppStepNameUpdated);
 
   await workflowEditorPage.addStepAsLast(StepTypeEnum.IN_APP);
   await workflowEditorPage.verifyStepsCount({ count: 2, stepType: StepTypeEnum.IN_APP });
   await workflowEditorPage.verifyLastStepVisible(StepTypeEnum.IN_APP);
   await workflowEditorPage.clickLastStep(StepTypeEnum.IN_APP);
 
-  await stepConfirSidebar.waitStepConfigSidebarNavigation(inAppStepName);
-  await stepConfirSidebar.delete();
+  await stepConfigSidebar.waitStepConfigSidebarNavigation(inAppStepName);
+  await stepConfigSidebar.delete();
 
   await workflowEditorPage.verifyStepsCount({ count: 1, stepType: StepTypeEnum.IN_APP });
   await workflowEditorPage.triggerTabClick();
@@ -99,17 +99,17 @@ test('dashboard defined workflow user journey', async ({ page }) => {
 
   await workflowsPage.waitWorkflowListNavigation();
   await workflowsPage.verifyWorkflowExists(workflowNameUpdated);
-  await workflowsPage.vefifyWorkflowActive(workflowNameUpdated);
+  await workflowsPage.verifyWorkflowActive(workflowNameUpdated);
 
   await workflowsPage.clickWorkflowActionsMenu(workflowNameUpdated);
   await workflowsPage.pauseWorkflow();
-  await workflowsPage.vefifyWorkflowInactive(workflowNameUpdated);
+  await workflowsPage.verifyWorkflowInactive(workflowNameUpdated);
 
   await workflowsPage.clickWorkflowActionsMenu(workflowNameUpdated);
   await workflowsPage.enableWorkflow();
-  await workflowsPage.vefifyWorkflowActive(workflowNameUpdated);
+  await workflowsPage.verifyWorkflowActive(workflowNameUpdated);
 
   await workflowsPage.clickWorkflowActionsMenu(workflowNameUpdated);
   await workflowsPage.deleteWorkflow();
-  await workflowsPage.verifyWorkflowDoesntExists(workflowNameUpdated);
+  await workflowsPage.verifyWorkflowDoesNotExists(workflowNameUpdated);
 });
