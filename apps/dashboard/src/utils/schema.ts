@@ -167,3 +167,31 @@ export const buildDefaultValues = (uiSchema: UiSchema): object => {
 
   return keys;
 };
+
+export const buildDefaultValuesOfDataSchema = (dataSchema: JSONSchemaDto) => {
+  const schema = dataSchema.properties ?? {};
+
+  const keys: Record<string, unknown> = Object.keys(schema).reduce((acc, key) => {
+    const property = schema[key];
+    if (typeof property !== 'object') {
+      return acc;
+    }
+
+    const { default: defaultValue } = property;
+    if (typeof defaultValue === 'undefined') {
+      return acc;
+    }
+
+    if (defaultValue === null) {
+      return { ...acc, [key]: defaultValue };
+    }
+
+    if (typeof defaultValue === 'object') {
+      return { ...acc, [key]: buildDefaultValues({ properties: { ...defaultValue } }) };
+    }
+
+    return { ...acc, [key]: defaultValue };
+  }, {});
+
+  return keys;
+};

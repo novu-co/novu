@@ -1,8 +1,10 @@
 import { CollapsibleContent, CollapsibleTrigger } from '@/components/primitives/collapsible';
 import { Collapsible } from '@radix-ui/react-collapsible';
 import { ArrayFieldTemplateProps, getTemplate, getUiOptions } from '@rjsf/utils';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 import { RiExpandUpDownLine } from 'react-icons/ri';
+import { JSON_SCHEMA_FORM_ID_DELIMITER } from './json-form';
 
 export function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
   const { disabled, idSchema, uiSchema, items, onAddClick, readonly, registry, required, title, schema, canAdd } =
@@ -10,11 +12,15 @@ export function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
   const {
     ButtonTemplates: { AddButton },
   } = registry.templates;
-  const uiOptions = getUiOptions(uiSchema);
-
-  const ArrayFieldTitleTemplate = getTemplate('ArrayFieldTitleTemplate', registry, uiOptions);
-
-  const ArrayFieldItemTemplate = getTemplate('ArrayFieldItemTemplate', registry, uiOptions);
+  const uiOptions = useMemo(() => getUiOptions(uiSchema), [uiSchema]);
+  const ArrayFieldTitleTemplate = useMemo(
+    () => getTemplate('ArrayFieldTitleTemplate', registry, uiOptions),
+    [registry, uiOptions]
+  );
+  const ArrayFieldItemTemplate = useMemo(
+    () => getTemplate('ArrayFieldItemTemplate', registry, uiOptions),
+    [registry, uiOptions]
+  );
 
   const [isEditorOpen, setIsEditorOpen] = useState(true);
 
@@ -23,7 +29,24 @@ export function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
       setIsEditorOpen(true);
     }
     onAddClick();
+    /**
+     * If the array field has a default value, append it to the array
+     */
+    const defaultValue = schema.default ?? undefined;
+    const value = Array.isArray(defaultValue) ? defaultValue[0] : defaultValue;
+    append(value);
   };
+
+  const { control } = useFormContext();
+  const extractedName = useMemo(
+    () => idSchema.$id.split(JSON_SCHEMA_FORM_ID_DELIMITER).join('.').slice(5),
+    [idSchema.$id]
+  );
+
+  const { append, remove } = useFieldArray({
+    control,
+    name: extractedName,
+  });
 
   return (
     <Collapsible
@@ -53,8 +76,17 @@ export function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
       </div>
 
       <CollapsibleContent className="flex flex-col gap-3">
-        {items.map(({ key, ...itemProps }) => {
-          return <ArrayFieldItemTemplate key={key} {...itemProps} />;
+        {items.map(({ key, onDropIndexClick, ...itemProps }) => {
+          return (
+            <ArrayFieldItemTemplate
+              key={key}
+              {...itemProps}
+              onDropIndexClick={(index) => {
+                remove(index);
+                return onDropIndexClick(index);
+              }}
+            />
+          );
         })}
       </CollapsibleContent>
     </Collapsible>

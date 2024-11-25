@@ -4,20 +4,24 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { capitalize } from '@/utils/string';
 import { JSON_SCHEMA_FORM_ID_DELIMITER } from './json-form';
+import { useMemo } from 'react';
 
 export function SelectWidget(props: WidgetProps) {
   const { label, required, readonly, options, disabled, id } = props;
 
-  const data = options.enumOptions?.map((option) => {
-    return {
-      label: option.label,
-      value: String(option.value),
-    };
-  });
+  const data = useMemo(
+    () =>
+      options.enumOptions?.map((option) => {
+        return {
+          label: option.label,
+          value: String(option.value),
+        };
+      }),
+    [options.enumOptions]
+  );
+  const extractedName = useMemo(() => id.split(JSON_SCHEMA_FORM_ID_DELIMITER).join('.').slice(5), [id]);
 
   const { control } = useFormContext();
-
-  const extractedName = id.split(JSON_SCHEMA_FORM_ID_DELIMITER).join('.').slice(5);
 
   return (
     <FormField

@@ -7,15 +7,14 @@ import { autocompletion } from '@codemirror/autocomplete';
 import { type WidgetProps } from '@rjsf/utils';
 import { useFormContext } from 'react-hook-form';
 import { JSON_SCHEMA_FORM_ID_DELIMITER } from './json-form';
-import { DevTool } from '@hookform/devtools';
+import { useMemo } from 'react';
 
 export function TextWidget(props: WidgetProps) {
-  const { label, readonly, disabled, id } = props;
+  const { label, readonly, disabled, id, required } = props;
   const { control } = useFormContext();
 
-  const extractedName = id.split(JSON_SCHEMA_FORM_ID_DELIMITER).join('.').slice(5);
-
-  const isNumberType = props.schema.type === 'number';
+  const extractedName = useMemo(() => id.split(JSON_SCHEMA_FORM_ID_DELIMITER).join('.').slice(5), [id]);
+  const isNumberType = useMemo(() => props.schema.type === 'number', [props.schema.type]);
 
   return (
     <FormField
@@ -32,8 +31,14 @@ export function TextWidget(props: WidgetProps) {
                   {...field}
                   onChange={(e) => {
                     const val = Number(e.target.value);
-                    field.onChange(val);
+                    const isNaN = Number.isNaN(val);
+                    const finalValue = isNaN ? undefined : val;
+                    field.onChange(finalValue);
                   }}
+                  required={required}
+                  readOnly={readonly}
+                  disabled={disabled}
+                  placeholder={capitalize(label)}
                 />
               ) : (
                 <Editor
@@ -49,7 +54,6 @@ export function TextWidget(props: WidgetProps) {
             </InputField>
           </FormControl>
           <FormMessage />
-          <DevTool control={control} />
         </FormItem>
       )}
     />

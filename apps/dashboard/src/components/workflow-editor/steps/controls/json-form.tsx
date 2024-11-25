@@ -51,13 +51,8 @@ export function JsonForm(props: JsonFormProps) {
       uiSchema={UI_SCHEMA}
       widgets={WIDGETS}
       validator={validator}
-      autoComplete={'false'}
-      /**
-       * TODO: Add support for variables
-       */
-      formContext={{ variables: [] }}
+      autoComplete="false"
       idSeparator={JSON_SCHEMA_FORM_ID_DELIMITER}
-      {...props}
       templates={{
         ButtonTemplates: {
           AddButton,
@@ -68,6 +63,7 @@ export function JsonForm(props: JsonFormProps) {
         ArrayFieldTitleTemplate,
         ObjectFieldTemplate,
       }}
+      {...props}
     />
   );
 }
@@ -100,13 +96,13 @@ const ArrayFieldItemTemplate = (props: ArrayFieldTemplateItemType) => {
           { 'right-4 justify-start': isChildObjectType }
         )}
       >
-        {
+        {props.hasRemove && (
           <RemoveButton
             disabled={props.disabled || props.readonly}
-            onClick={props.onDropIndexClick(props.index)}
+            onClick={(e) => props.onDropIndexClick(props.index)(e)}
             registry={props.registry}
           />
-        }
+        )}
       </div>
     </div>
   );

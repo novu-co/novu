@@ -4,11 +4,12 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Switch } from '@/components/primitives/switch';
 import { capitalize } from '@/utils/string';
 import { JSON_SCHEMA_FORM_ID_DELIMITER } from './json-form';
+import { useMemo } from 'react';
 
 export function SwitchWidget(props: WidgetProps) {
   const { label, readonly, disabled, required, id } = props;
   const { control } = useFormContext();
-  const extractedName = id.split(JSON_SCHEMA_FORM_ID_DELIMITER).join('.').slice(5);
+  const extractedName = useMemo(() => id.split(JSON_SCHEMA_FORM_ID_DELIMITER).join('.').slice(5), [id]);
 
   return (
     <FormField

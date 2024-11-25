@@ -20,7 +20,7 @@ import { InAppEditorPreview } from '@/components/workflow-editor/steps/in-app/in
 import useDebouncedEffect from '@/hooks/use-debounced-effect';
 import { usePreviewStep } from '@/hooks/use-preview-step';
 import { useUpdateWorkflow } from '@/hooks/use-update-workflow';
-import { buildDefaultValues, buildDynamicZodSchema } from '@/utils/schema';
+import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
 import { useWorkflowEditorContext } from '../../hooks';
 import { flattenIssues } from '../../step-utils';
 import { CustomStepControls } from '../controls/custom-step-controls';
@@ -37,7 +37,10 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
 
   const { dataSchema, uiSchema, values } = step.controls;
   const schema = useMemo(() => buildDynamicZodSchema(dataSchema ?? {}), [dataSchema]);
-  const newFormValues = useMemo(() => merge(buildDefaultValues(uiSchema ?? {}), values), [uiSchema, values]);
+  const newFormValues = useMemo(
+    () => merge(buildDefaultValues(uiSchema ?? {}), buildDefaultValuesOfDataSchema(dataSchema ?? {}), values),
+    [uiSchema, values, dataSchema]
+  );
 
   const form = useForm({
     mode: 'onChange',
@@ -123,7 +126,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
       },
     });
 
-    form.reset({ ...values, ...updatedValues });
+    form.reset(data);
   };
 
   const preview = async (props: {
@@ -186,6 +189,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
             event.stopPropagation();
             form.handleSubmit(onSubmit)(event);
           }}
+          noValidate
         >
           <Tabs defaultValue="editor" className="flex h-full flex-1 flex-col">
             <header className="flex flex-row items-center gap-3 px-3 py-1.5">
@@ -221,7 +225,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
             <Separator />
             <TabsContent value="editor" className={tabsContentClassName}>
               <InAppEditor uiSchema={uiSchema} />
-              <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} formData={values} />
+              <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} formData={formValues} />
             </TabsContent>
             <TabsContent value="preview" className={tabsContentClassName}>
               {previewData === undefined ||
