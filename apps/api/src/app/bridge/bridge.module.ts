@@ -15,7 +15,7 @@ import {
   DeletePreferencesUseCase,
   TierRestrictionsValidateUsecase,
 } from '@novu/application-generic';
-import { PreferencesRepository } from '@novu/dal';
+import { CommunityOrganizationRepository, PreferencesRepository } from '@novu/dal';
 import { SharedModule } from '../shared/shared.module';
 import { BridgeController } from './bridge.controller';
 import { USECASES } from './usecases';
@@ -69,6 +69,7 @@ const PROVIDERS = [
   UpsertPreferences,
   DeletePreferencesUseCase,
   UpsertControlValuesUseCase,
+  CommunityOrganizationRepository,
   ...SHARED_USECASES,
 ];
 

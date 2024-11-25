@@ -20,35 +20,47 @@ export class CollectPlaceholderWithDefaultsUsecase {
     }
 
     if (command.origin === WorkflowOriginEnum.EXTERNAL) {
-      // for external workflows, the source of truth is the payload schema
-      for (const placeholderAggregation of Object.values(placeholders)) {
-        const regularPlaceholders = placeholderAggregation.regularPlaceholdersToDefaultValue;
-        const nestedPlaceholders = placeholderAggregation.nestedForPlaceholders;
-
-        placeholderAggregation.regularPlaceholdersToDefaultValue = Object.fromEntries(
-          Object.entries(regularPlaceholders).filter(([key]) => !key.includes('{{payload.'))
-        );
-        placeholderAggregation.nestedForPlaceholders = Object.fromEntries(
-          Object.entries(nestedPlaceholders).filter(([key]) => !key.includes('{{payload.'))
-        );
-      }
-
-      const payloadPlaceholders: Record<string, PlaceholderAggregation> = {
-        payloadPlaceholder: {
-          nestedForPlaceholders: {},
-          regularPlaceholdersToDefaultValue: {},
-        },
-      };
-
-      for (const [key, value] of Object.entries(command.payloadSchema?.properties || {})) {
-        payloadPlaceholders.payloadPlaceholder.regularPlaceholdersToDefaultValue[`{{payload.${key}}}`] =
-          typeof value === 'boolean' ? `{{payload.${key}}}` : (value.default as string);
-      }
-
+      placeholders = this.filterPayloadVariables(placeholders);
+      const payloadPlaceholders: Record<string, PlaceholderAggregation> = this.buildPayloadPlaceholders(command);
       placeholders = { ...placeholders, ...payloadPlaceholders };
     }
 
     return placeholders;
+  }
+
+  private buildPayloadPlaceholders(command: CollectPlaceholderWithDefaultsCommand) {
+    const payloadPlaceholders: Record<string, PlaceholderAggregation> = {
+      payloadPlaceholder: {
+        nestedForPlaceholders: {},
+        regularPlaceholdersToDefaultValue: {},
+      },
+    };
+
+    for (const [key, value] of Object.entries(command.payloadSchema?.properties || {})) {
+      payloadPlaceholders.payloadPlaceholder.regularPlaceholdersToDefaultValue[`{{payload.${key}}}`] =
+        typeof value === 'boolean' ? `{{payload.${key}}}` : (value.default as string);
+    }
+
+    return payloadPlaceholders;
+  }
+
+  private filterPayloadVariables(
+    placeholders: Record<string, PlaceholderAggregation>
+  ): Record<string, PlaceholderAggregation> {
+    const resultPlaceholders = { ...placeholders };
+    for (const placeholderAggregation of Object.values(resultPlaceholders)) {
+      const regularPlaceholders = placeholderAggregation.regularPlaceholdersToDefaultValue;
+      const nestedPlaceholders = placeholderAggregation.nestedForPlaceholders;
+
+      placeholderAggregation.regularPlaceholdersToDefaultValue = Object.fromEntries(
+        Object.entries(regularPlaceholders).filter(([key]) => !key.includes('{{payload.'))
+      );
+      placeholderAggregation.nestedForPlaceholders = Object.fromEntries(
+        Object.entries(nestedPlaceholders).filter(([key]) => !key.includes('{{payload.'))
+      );
+    }
+
+    return resultPlaceholders;
   }
 
   private extractPlaceholdersLogic(controlValue: unknown): PlaceholderAggregation {
