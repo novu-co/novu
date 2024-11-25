@@ -125,8 +125,6 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
         ),
       },
     });
-
-    form.reset(data);
   };
 
   const preview = async (props: {
@@ -176,7 +174,8 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
     [formValues]
   );
 
-  const blocker = useBlocker(formState.isDirty || isPending);
+  const isNotDirty = Object.keys(formState.dirtyFields).length === 0;
+  const blocker = useBlocker(isNotDirty || isPending);
 
   return (
     <>
@@ -250,13 +249,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
             </TabsContent>
             <Separator />
             <footer className="flex justify-end px-3 py-3.5">
-              <Button
-                className="ml-auto"
-                variant="default"
-                type="submit"
-                form="save-step"
-                disabled={!formState.isDirty}
-              >
+              <Button className="ml-auto" variant="default" type="submit" form="save-step" disabled={isNotDirty}>
                 Save step
               </Button>
             </footer>
