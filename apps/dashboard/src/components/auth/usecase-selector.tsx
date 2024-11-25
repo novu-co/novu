@@ -1,54 +1,21 @@
 import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent } from '../primitives/card';
-import { STEP_TYPE_TO_ICON } from '../icons/utils';
-import { ChannelTypeEnum, StepTypeEnum } from '@novu/shared';
-import { STEP_TYPE_TO_COLOR } from '../../utils/color';
-
-const channelOptions = [
-  {
-    icon: STEP_TYPE_TO_ICON[StepTypeEnum.EMAIL],
-    title: 'E-Mail',
-    color: STEP_TYPE_TO_COLOR[StepTypeEnum.EMAIL],
-    id: ChannelTypeEnum.EMAIL,
-    description: 'Sends Emails to your users via Novu',
-  },
-  {
-    icon: STEP_TYPE_TO_ICON[StepTypeEnum.IN_APP],
-    title: 'Inbox',
-    color: STEP_TYPE_TO_COLOR[StepTypeEnum.IN_APP],
-    id: ChannelTypeEnum.IN_APP,
-    description: 'Integrate & Embed <Inbox/> in your product',
-  },
-  {
-    icon: STEP_TYPE_TO_ICON[StepTypeEnum.SMS],
-    title: 'SMS',
-    color: STEP_TYPE_TO_COLOR[StepTypeEnum.SMS],
-    id: ChannelTypeEnum.SMS,
-    description: 'Sends SMS messages to your users',
-  },
-  {
-    icon: STEP_TYPE_TO_ICON[StepTypeEnum.PUSH],
-    title: 'Push',
-    color: STEP_TYPE_TO_COLOR[StepTypeEnum.PUSH],
-    id: ChannelTypeEnum.PUSH,
-    description: 'Send push notifications to your users',
-  },
-  {
-    icon: STEP_TYPE_TO_ICON[StepTypeEnum.CHAT],
-    title: 'Chat',
-    color: STEP_TYPE_TO_COLOR[StepTypeEnum.CHAT],
-    id: ChannelTypeEnum.CHAT,
-    description: 'Send chat notifications via Novu to your users',
-  },
-];
+import { ChannelTypeEnum } from '@novu/shared';
+import { Usecase } from './usecases-list.utils';
 
 interface UsecaseSelectOnboardingProps {
   onHover: (id: ChannelTypeEnum | null) => void;
   onClick: (id: ChannelTypeEnum) => void;
   selectedUseCases: ChannelTypeEnum[];
+  channelOptions: Usecase[];
 }
 
-export function UsecaseSelectOnboarding({ onHover, onClick, selectedUseCases }: UsecaseSelectOnboardingProps) {
+export function UsecaseSelectOnboarding({
+  onHover,
+  onClick,
+  selectedUseCases,
+  channelOptions,
+}: UsecaseSelectOnboardingProps) {
   return (
     <div className="flex w-full flex-col items-center justify-center">
       <div className="flex w-full flex-col items-center gap-8">
