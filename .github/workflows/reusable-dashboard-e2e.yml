@@ -76,7 +76,7 @@ jobs:
           echo VITE_API_HOSTNAME=http://127.0.0.1:1336 >> .env
           echo VITE_WEBSOCKET_HOSTNAME=http://127.0.0.1:1340 >> .env
           echo VITE_LEGACY_DASHBOARD_URL=http://127.0.0.1:4200 >> .env
-          echo VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.CLERK_PUBLISHABLE_KEY }}
+          echo VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.CLERK_PUBLISHABLE_KEY }} >> .env
 
       - name: Create .env file for the Playwright
         working-directory: apps/dashboard
