@@ -68,26 +68,6 @@ jobs:
         with:
           submodules: true
 
-      - uses: mansagroup/nrwl-nx-action@v3
-        with:
-          targets: build
-          projects: '@novu/dashboard,@novu/api,@novu/worker'
-          args: --skip-nx-cache
-
-      - uses: ./.github/actions/start-localstack
-      - uses: ./.github/actions/setup-redis-cluster
-
-      - uses: ./.github/actions/run-backend
-        with:
-          cypress_github_oauth_client_id: ${{ secrets.CYPRESS_GITHUB_OAUTH_CLIENT_ID }}
-          cypress_github_oauth_client_secret: ${{ secrets.CYPRESS_GITHUB_OAUTH_CLIENT_SECRET }}
-          launch_darkly_sdk_key: ${{ secrets.LAUNCH_DARKLY_SDK_KEY }}
-          ci_ee_test: ${{ steps.determine_run_type.outputs.enterprise_run }}
-
-      - name: Start WS
-        run: |
-          cd apps/ws && pnpm start:test &
-
       - name: Create .env file for the Dashboard app
         working-directory: apps/dashboard
         run: |
@@ -117,6 +97,26 @@ jobs:
           echo CLERK_PEM_PUBLIC_KEY=$(echo ${{ secrets.CLERK_PEM_PUBLIC_KEY_BASE64 }} | base64 -d) >> .env.playwright
           echo CLERK_EXTERNAL_ORG_ID=org_2p9RYIgFs6Z2sSdQDpnuA1mJ4dx >> .env.playwright
           echo CLERK_EXTERNAL_USER_ID=user_2p7nkg2pyfTjLopPsLMh5ukMRkF >> .env.playwright
+
+      - uses: mansagroup/nrwl-nx-action@v3
+        with:
+          targets: build
+          projects: '@novu/dashboard,@novu/api,@novu/worker'
+          args: --skip-nx-cache
+
+      - uses: ./.github/actions/start-localstack
+      - uses: ./.github/actions/setup-redis-cluster
+
+      - uses: ./.github/actions/run-backend
+        with:
+          cypress_github_oauth_client_id: ${{ secrets.CYPRESS_GITHUB_OAUTH_CLIENT_ID }}
+          cypress_github_oauth_client_secret: ${{ secrets.CYPRESS_GITHUB_OAUTH_CLIENT_SECRET }}
+          launch_darkly_sdk_key: ${{ secrets.LAUNCH_DARKLY_SDK_KEY }}
+          ci_ee_test: ${{ steps.determine_run_type.outputs.enterprise_run }}
+
+      - name: Start WS
+        run: |
+          cd apps/ws && pnpm start:test &
 
       - name: Start Novu Dashboard
         working-directory: apps/dashboard
