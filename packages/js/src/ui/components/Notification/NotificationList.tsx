@@ -17,7 +17,7 @@ const EmptyNotificationList = () => {
     <div
       class={style(
         'notificationListEmptyNoticeContainer',
-        'nt-flex nt-flex-col nt-items-center nt-m-auto nt-h-fit nt-w-full nt-text-foreground-alpha-100 p-6 text-center'
+        'nt-flex nt-flex-col nt-items-center nt-m-auto nt-h-fit nt-w-full nt-text-foreground-alpha-100 nt-p-6 nt-text-center'
       )}
     >
       <EmptyIcon class={style('notificationListEmptyNoticeIcon')} />
