@@ -175,14 +175,15 @@ function deepMergeObjects<
   source: Record<string, unknown> | Record<string, unknown>[],
   options?: IDeepMergeOptions,
 ): T {
-  options = options || {};
-  options.arrayMerge = options.arrayMerge || defaultArrayMerge;
-  options.isMergeableObject = options.isMergeableObject || isMergeableObject;
+  const mergeOptions = options || {};
+  mergeOptions.arrayMerge = mergeOptions.arrayMerge || defaultArrayMerge;
+  mergeOptions.isMergeableObject =
+    mergeOptions.isMergeableObject || isMergeableObject;
   /*
    * cloneUnlessOtherwiseSpecified is added to `options` so that custom arrayMerge()
    * implementations can use it. The caller may not replace it.
    */
-  options.cloneUnlessOtherwiseSpecified = cloneUnlessOtherwiseSpecified;
+  mergeOptions.cloneUnlessOtherwiseSpecified = cloneUnlessOtherwiseSpecified;
 
   const sourceIsArray = Array.isArray(source);
   const targetIsArray = Array.isArray(target);
@@ -191,7 +192,7 @@ function deepMergeObjects<
   if (!sourceAndTargetTypesMatch) {
     return cloneUnlessOtherwiseSpecified(
       source as Record<string, unknown>,
-      options as IOptions,
+      mergeOptions as IOptions,
     ) as T;
   }
   if (sourceIsArray) {

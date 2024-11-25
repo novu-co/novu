@@ -143,6 +143,7 @@ const mockServiceInstance = {
 };
 
 jest.mock('@novu/client', () => ({
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   ...jest.requireActual<typeof import('@novu/client')>('@novu/client'),
   ApiService: jest.fn().mockImplementation(() => mockServiceInstance),
 }));
@@ -153,6 +154,7 @@ const mockSocket = {
 };
 
 jest.mock('socket.io-client', () => ({
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   ...jest.requireActual<typeof import('socket.io-client')>('socket.io-client'),
   __esModule: true,
   default: jest.fn().mockImplementation(() => mockSocket),
