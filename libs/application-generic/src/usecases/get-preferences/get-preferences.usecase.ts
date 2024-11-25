@@ -12,6 +12,7 @@ import { GetPreferencesCommand } from './get-preferences.command';
 import { GetPreferencesResponseDto } from './get-preferences.dto';
 import { InstrumentUsecase } from '../../instrumentation';
 import { MergePreferences } from '../merge-preferences/merge-preferences.usecase';
+import { MergePreferencesCommand } from '../merge-preferences/merge-preferences.command';
 
 class PreferencesNotFoundException extends BadRequestException {
   constructor(featureFlagCommand: GetPreferencesCommand) {
@@ -33,7 +34,11 @@ export class GetPreferences {
       throw new PreferencesNotFoundException(command);
     }
 
-    const mergedPreferences = MergePreferences.merge(items);
+    const mergedPreferences = MergePreferences.merge(
+      MergePreferencesCommand.create({
+        preferences: items,
+      }),
+    );
 
     if (!mergedPreferences.preferences) {
       throw new PreferencesNotFoundException(command);

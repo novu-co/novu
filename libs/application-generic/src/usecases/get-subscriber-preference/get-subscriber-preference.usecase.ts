@@ -22,6 +22,7 @@ import {
   filteredPreference,
   overridePreferences,
 } from '../get-subscriber-template-preference';
+import { MergePreferencesCommand } from '../merge-preferences/merge-preferences.command';
 
 @Injectable()
 export class GetSubscriberPreference {
@@ -67,11 +68,11 @@ export class GetSubscriberPreference {
       _environmentId: command.environmentId,
       $or: [
         {
-          _subscriberId: command.subscriberId,
+          _subscriberId: subscriber._id,
           type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
         },
         {
-          _templateId: { $in: workflowList.map((template) => template._id) },
+          _templateId: { $in: workflowList.map((wf) => wf._id) },
           type: {
             $in: [
               PreferencesTypeEnum.WORKFLOW_RESOURCE,
@@ -80,15 +81,15 @@ export class GetSubscriberPreference {
           },
         },
         {
-          _subscriberId: command.subscriberId,
+          _subscriberId: subscriber._id,
           type: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
         },
       ],
     });
 
-    const subscriberGlobalPreference = allPreferences.find(
+    const subscriberGlobalPreferences = allPreferences.filter(
       (preference) =>
-        preference._subscriberId === command.subscriberId &&
+        preference._subscriberId === subscriber._id &&
         preference.type === PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
     );
 
@@ -110,58 +111,58 @@ export class GetSubscriberPreference {
       return acc;
     }, {});
 
-    const mergedPreferences: ISubscriberPreferenceResponse[] = Object.entries(
-      workflowPreferenceSets,
-    ).map(([workflowId, preferences]) => {
-      const merged = MergePreferences.merge([
-        ...preferences,
-        subscriberGlobalPreference,
-      ]);
+    const mergedPreferences: ISubscriberPreferenceResponse[] = workflowList.map(
+      (workflow) => {
+        const preferences = workflowPreferenceSets[workflow._id] || [];
+        const mergeCommand = MergePreferencesCommand.create({
+          preferences: [...preferences, ...subscriberGlobalPreferences],
+        });
+        const merged = MergePreferences.merge(mergeCommand);
 
-      const workflow = workflowList.find((wf) => wf._id === workflowId);
+        const includedChannels = this.getChannels(
+          workflow,
+          command.includeInactiveChannels,
+        );
 
-      const includedChannels = this.getChannels(
-        workflow,
-        command.includeInactiveChannels,
-      );
+        const initialChannels = filteredPreference(
+          {
+            email: true,
+            sms: true,
+            in_app: true,
+            chat: true,
+            push: true,
+          },
+          includedChannels,
+        );
 
-      const initialChannels = filteredPreference(
-        {
-          email: true,
-          sms: true,
-          in_app: true,
-          chat: true,
-          push: true,
-        },
-        includedChannels,
-      );
+        const { channels, overrides } = overridePreferences(
+          {
+            template: GetPreferences.mapWorkflowPreferencesToChannelPreferences(
+              merged.source.WORKFLOW_RESOURCE,
+            ),
+            subscriber:
+              GetPreferences.mapWorkflowPreferencesToChannelPreferences(
+                merged.preferences,
+              ),
+            workflowOverride: {},
+          },
+          initialChannels,
+        );
 
-      const { channels, overrides } = overridePreferences(
-        {
-          template: GetPreferences.mapWorkflowPreferencesToChannelPreferences(
-            merged.source.WORKFLOW_RESOURCE,
-          ),
-          subscriber: GetPreferences.mapWorkflowPreferencesToChannelPreferences(
-            merged.preferences,
-          ),
-          workflowOverride: {},
-        },
-        initialChannels,
-      );
-
-      return {
-        preference: {
-          channels,
-          enabled: true,
-          overrides,
-        },
-        template: {
-          ...workflow,
-          critical: merged.preferences.all.readOnly,
-        },
-        type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
-      };
-    });
+        return {
+          preference: {
+            channels,
+            enabled: true,
+            overrides,
+          },
+          template: {
+            ...workflow,
+            critical: merged.preferences.all.readOnly,
+          },
+          type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+        };
+      },
+    );
 
     const nonCriticalWorkflowPreferences = mergedPreferences.filter(
       (preference) => !preference.template.critical,
@@ -171,14 +172,14 @@ export class GetSubscriberPreference {
   }
 
   private getChannels(
-    template: NotificationTemplateEntity,
+    workflow: NotificationTemplateEntity,
     includeInactiveChannels: boolean,
   ): ChannelTypeEnum[] {
     if (includeInactiveChannels) {
       return Object.values(ChannelTypeEnum);
     }
 
-    const activeSteps = template.steps.filter((step) => step.active === true);
+    const activeSteps = workflow.steps.filter((step) => step.active === true);
 
     const channels = activeSteps
       .map((item) => item.template.type as StepTypeEnum)

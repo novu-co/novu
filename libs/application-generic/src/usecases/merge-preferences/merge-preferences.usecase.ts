@@ -2,6 +2,7 @@ import { PreferencesEntity } from '@novu/dal';
 import { PreferencesTypeEnum, WorkflowPreferences } from '@novu/shared';
 import { deepMerge } from '../../utils';
 import { GetPreferencesResponseDto } from '../get-preferences';
+import { MergePreferencesCommand } from './merge-preferences.command';
 
 /**
  * Merge preferences for a subscriber.
@@ -19,10 +20,15 @@ import { GetPreferencesResponseDto } from '../get-preferences';
  * If the subscriber has no preferences, the workflow preferences are returned.
  */
 export class MergePreferences {
-  public static merge(items: PreferencesEntity[]): GetPreferencesResponseDto {
-    const workflowResourcePreferences =
-      this.getWorkflowResourcePreferences(items);
-    const workflowUserPreferences = this.getWorkflowUserPreferences(items);
+  public static merge(
+    command: MergePreferencesCommand,
+  ): GetPreferencesResponseDto {
+    const workflowResourcePreferences = this.getWorkflowResourcePreferences(
+      command.preferences,
+    );
+    const workflowUserPreferences = this.getWorkflowUserPreferences(
+      command.preferences,
+    );
 
     const workflowPreferences = deepMerge(
       [workflowResourcePreferences, workflowUserPreferences]
@@ -30,10 +36,12 @@ export class MergePreferences {
         .map((item) => item.preferences),
     ) as WorkflowPreferences;
 
-    const subscriberGlobalPreferences =
-      this.getSubscriberGlobalPreferences(items);
-    const subscriberWorkflowPreferences =
-      this.getSubscriberWorkflowPreferences(items);
+    const subscriberGlobalPreferences = this.getSubscriberGlobalPreferences(
+      command.preferences,
+    );
+    const subscriberWorkflowPreferences = this.getSubscriberWorkflowPreferences(
+      command.preferences,
+    );
 
     const subscriberPreferences = deepMerge(
       [subscriberGlobalPreferences, subscriberWorkflowPreferences]
@@ -55,7 +63,9 @@ export class MergePreferences {
     ];
     const source = Object.values(PreferencesTypeEnum).reduce(
       (acc, type) => {
-        const preference = items.find((item) => item.type === type);
+        const preference = command.preferences.find(
+          (item) => item.type === type,
+        );
         if (preference) {
           acc[type] = preference.preferences as WorkflowPreferences;
         } else {
