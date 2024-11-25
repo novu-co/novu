@@ -41,7 +41,6 @@ test.beforeEach(async ({ page }) => {
   await session.testAgent.post(`/v1/bridge/sync`).send({
     bridgeUrl: bridgeServer.serverPath,
   });
-  await page.waitForTimeout(2000);
 });
 
 test.afterEach(async () => {
