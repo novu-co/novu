@@ -1,8 +1,8 @@
-import { CollapsibleContent, CollapsibleTrigger } from '@/components/primitives/collapsible';
-import { Collapsible } from '@radix-ui/react-collapsible';
-import { getTemplate, getUiOptions, ObjectFieldTemplateProps } from '@rjsf/utils';
 import { useState } from 'react';
 import { RiExpandUpDownLine } from 'react-icons/ri';
+
+import { getTemplate, getUiOptions, ObjectFieldTemplateProps } from '@rjsf/utils';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/primitives/collapsible';
 
 export function ObjectFieldTemplate(props: ObjectFieldTemplateProps) {
   const { idSchema, uiSchema, registry, required, title, schema, properties } = props;

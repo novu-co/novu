@@ -1,10 +1,10 @@
+import { useMemo } from 'react';
 import { type WidgetProps } from '@rjsf/utils';
 import { useFormContext } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Switch } from '@/components/primitives/switch';
 import { capitalize } from '@/utils/string';
-import { JSON_SCHEMA_FORM_ID_DELIMITER } from './json-form';
-import { useMemo } from 'react';
+import { JSON_SCHEMA_FORM_ID_DELIMITER } from './template-utils';
 
 export function SwitchWidget(props: WidgetProps) {
   const { label, readonly, disabled, required, id } = props;

@@ -1,13 +1,13 @@
+import { useMemo } from 'react';
+import { type WidgetProps } from '@rjsf/utils';
+import { useFormContext } from 'react-hook-form';
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';
 import { completions } from '@/utils/liquid-autocomplete';
 import { capitalize } from '@/utils/string';
 import { autocompletion } from '@codemirror/autocomplete';
-import { type WidgetProps } from '@rjsf/utils';
-import { useFormContext } from 'react-hook-form';
-import { JSON_SCHEMA_FORM_ID_DELIMITER } from './json-form';
-import { useMemo } from 'react';
+import { JSON_SCHEMA_FORM_ID_DELIMITER } from './template-utils';
 
 export function TextWidget(props: WidgetProps) {
   const { label, readonly, disabled, id, required } = props;
@@ -46,9 +46,8 @@ export function TextWidget(props: WidgetProps) {
                   placeholder={capitalize(label)}
                   id={label}
                   extensions={[autocompletion({ override: [completions([])] })]}
-                  value={field.value}
-                  onChange={field.onChange}
                   readOnly={readonly || disabled}
+                  {...field}
                 />
               )}
             </InputField>

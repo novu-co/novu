@@ -4,7 +4,7 @@ import { ArrayFieldTemplateProps, getTemplate, getUiOptions } from '@rjsf/utils'
 import { useMemo, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { RiExpandUpDownLine } from 'react-icons/ri';
-import { JSON_SCHEMA_FORM_ID_DELIMITER } from './json-form';
+import { JSON_SCHEMA_FORM_ID_DELIMITER } from './template-utils';
 
 export function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
   const { disabled, idSchema, uiSchema, items, onAddClick, readonly, registry, required, title, schema, canAdd } =
