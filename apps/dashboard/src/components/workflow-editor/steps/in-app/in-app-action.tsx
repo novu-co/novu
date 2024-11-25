@@ -76,7 +76,7 @@ export const InAppAction = () => {
             <DropdownMenuTrigger className="absolute size-full" />
           </div>
           <DropdownMenuTrigger asChild>
-            <Button size={'icon'} variant={'ghost'}>
+            <Button size={'icon'} variant={'ghost'} data-testid="in-app-action-dropdown-trigger">
               <RiExpandUpDownLine className="size-4" />
             </Button>
           </DropdownMenuTrigger>

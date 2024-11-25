@@ -121,3 +121,4 @@ backups/
 
 # Nest.js auto-generated metadata (https://docs.nestjs.com/recipes/swc#monorepo-and-cli-plugins)
 src/metadata.ts
+src/.env.test

@@ -123,9 +123,17 @@ const Markdown = (props: MarkdownProps) => {
 };
 
 const Subject = ({ text, className }: { text: string; className?: string }) => {
-  return <Markdown className={cn('text-foreground-600 text-xs font-medium', className)}>{text}</Markdown>;
+  return (
+    <Markdown className={cn('text-foreground-600 text-xs font-medium', className)} data-testid="in-app-preview-subject">
+      {text}
+    </Markdown>
+  );
 };
 
 const Body = ({ text, className }: { text: string; className?: string }) => {
-  return <Markdown className={cn('text-foreground-400 text-xs font-normal', className)}>{text}</Markdown>;
+  return (
+    <Markdown className={cn('text-foreground-400 text-xs font-normal', className)} data-testid="in-app-preview-body">
+      {text}
+    </Markdown>
+  );
 };
