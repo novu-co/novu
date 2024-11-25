@@ -56,6 +56,7 @@ describe('test onesignal notification user api', () => {
       include_aliases: {
         external_id: ['userId'],
       },
+      target_channel: 'push',
       app_id: 'test-app-id',
       headings: { en: 'Test' },
       contents: { en: 'Test push' },
