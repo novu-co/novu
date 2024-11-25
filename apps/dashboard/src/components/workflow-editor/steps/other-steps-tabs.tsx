@@ -1,12 +1,14 @@
 /**
  * This component is used as a placeholder for the other step configuration until the actual configuration is implemented.
  */
+import { useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
 import { Cross2Icon } from '@radix-ui/react-icons';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
 import { useNavigate, useParams } from 'react-router-dom';
+import merge from 'lodash.merge';
 
 import { Notification5Fill } from '@/components/icons';
 import { Button } from '@/components/primitives/button';
@@ -16,25 +18,29 @@ import { ToastIcon } from '@/components/primitives/sonner';
 import { showToast } from '@/components/primitives/sonner-helpers';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { useUpdateWorkflow } from '@/hooks/use-update-workflow';
-import { buildDefaultValues, buildDynamicZodSchema } from '@/utils/schema';
+import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
 import { CustomStepControls } from './controls/custom-step-controls';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5 overflow-y-auto';
 
 export const OtherStepTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; step: StepDataDto }) => {
   const { stepSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
-  const { dataSchema, uiSchema } = step.controls;
+  const { dataSchema, uiSchema, values } = step.controls;
   const navigate = useNavigate();
   const schema = buildDynamicZodSchema(dataSchema ?? {});
+  const newFormValues = useMemo(
+    () => merge(buildDefaultValues(uiSchema ?? {}), buildDefaultValuesOfDataSchema(dataSchema ?? {}), values),
+    [uiSchema, values, dataSchema]
+  );
   const form = useForm({
     mode: 'onSubmit',
     resolver: zodResolver(schema),
     resetOptions: { keepDirtyValues: true },
-    defaultValues: buildDefaultValues(uiSchema ?? {}),
-    values: step.controls.values,
+    values: newFormValues,
   });
 
   const { reset, formState } = form;
+  const formValues = useWatch(form);
 
   const { updateWorkflow } = useUpdateWorkflow({
     onSuccess: () => {
@@ -126,7 +132,7 @@ export const OtherStepTabs = ({ workflow, step }: { workflow: WorkflowResponseDt
           </header>
           <Separator />
           <TabsContent value="editor" className={tabsContentClassName}>
-            <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
+            <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} formData={formValues} />
           </TabsContent>
           <Separator />
           <footer className="flex justify-end px-3 py-3.5">
