@@ -40,19 +40,19 @@ export function UsecaseSelectOnboarding({
           {channelOptions.map((option, index) => (
             <Card
               key={index}
-              className={`rounded-xl border ${selectedUseCases.includes(option.id) ? 'border-transparent' : 'border-neutral-200'} shadow-none transition-all duration-300`}
+              className={`rounded-xl ${selectedUseCases.includes(option.id) ? 'shadow-sm' : ''} shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)] transition-all duration-300 hover:shadow-sm`}
               onMouseEnter={() => onHover(option.id)}
               onMouseLeave={() => onHover(null)}
               onClick={() => onClick(option.id)}
             >
               <CardContent
-                className={`rounded-xl p-[2.5px] hover:cursor-pointer ${
+                className={`rounded-[11px] p-[2.5px] hover:cursor-pointer ${
                   selectedUseCases.includes(option.id)
-                    ? 'bg-gradient-to-r from-[hsla(20,100%,65%,1)] to-[hsla(310,100%,45%,1)]'
+                    ? 'bg-gradient-to-tr from-[hsla(310,100%,45%,1)] to-[hsla(20,100%,65%,1)]'
                     : 'border-transparent'
                 }`}
               >
-                <div className="flex items-start gap-3.5 rounded-xl bg-[#ffffff] p-4">
+                <div className="flex items-start gap-3.5 rounded-[9px] bg-[#ffffff] p-4">
                   <div
                     className={`flex h-10 w-10 items-center justify-center opacity-40`}
                     style={{ color: `hsl(var(--${option.color}))` }}
