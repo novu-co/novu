@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { ContentIssue, JSONSchemaDto, PreviewPayload, StepContentIssueEnum, WorkflowOriginEnum } from '@novu/shared';
-import { merge } from 'lodash';
 import {
   ContentIssue,
-  DigestUnitEnum,
   JSONSchemaDto,
   PreviewPayload,
   StepContentIssueEnum,
+  WorkflowOriginEnum,
+  DigestUnitEnum,
   StepTypeEnum,
   UserSessionData,
 } from '@novu/shared';
+import { merge } from 'lodash';
 import { TierRestrictionsValidateUsecase } from '@novu/application-generic';
 
 import { PrepareAndValidateContentCommand } from './prepare-and-validate-content.command';
