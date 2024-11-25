@@ -13,6 +13,7 @@ import {
   UpsertControlValuesUseCase,
   UpsertPreferences,
   DeletePreferencesUseCase,
+  TierRestrictionsValidateUsecase,
 } from '@novu/application-generic';
 import { PreferencesRepository } from '@novu/dal';
 import { SharedModule } from '../shared/shared.module';
@@ -49,6 +50,7 @@ const SHARED_USECASES = [
   CollectPlaceholderWithDefaultsUsecase,
   ExtractDefaultValuesFromSchemaUsecase,
   HydrateEmailSchemaUseCase,
+  TierRestrictionsValidateUsecase,
 ];
 
 const PROVIDERS = [
