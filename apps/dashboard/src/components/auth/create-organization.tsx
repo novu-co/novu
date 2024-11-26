@@ -37,7 +37,7 @@ export default function OrganizationCreate() {
 
 function StepIndicator(): JSX.Element {
   return (
-    <div className="inline-flex items-center gap-[2px] pl-[20px] text-[#525866]">
+    <div className="text-foreground-600 inline-flex items-center gap-[2px] pl-[20px]">
       <RiArrowLeftSLine className="h-4 w-4" />
       <span className="font-label-x-small text-xs">1/3</span>
     </div>

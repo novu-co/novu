@@ -7,9 +7,7 @@ export const OrganizationListPage = () => {
     <>
       <PageMeta title="Select or create organization" />
 
-      <AuthCard>
-        <OrganizationCreate />
-      </AuthCard>
+      <OrganizationCreate />
     </>
   );
 };
