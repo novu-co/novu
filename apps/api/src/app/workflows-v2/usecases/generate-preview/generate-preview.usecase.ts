@@ -62,8 +62,8 @@ export class GeneratePreviewUsecase {
 
   private async getStepData(command: GeneratePreviewCommand) {
     return await this.buildStepDataUsecase.execute({
-      identifierOrInternalId: command.workflowId,
-      stepId: command.stepDatabaseId,
+      workflowIdentifierOrInternalId: command.workflowId,
+      _stepId: command.stepDatabaseId,
       user: command.user,
     });
   }

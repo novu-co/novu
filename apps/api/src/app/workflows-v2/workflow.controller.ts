@@ -190,10 +190,10 @@ export class WorkflowController {
   async getWorkflowStepData(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
     @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
-    @Param('stepId', ParseSlugIdPipe) stepId: IdentifierOrInternalId
+    @Param('stepId', ParseSlugIdPipe) stepId: string
   ): Promise<StepDataDto> {
     return await this.buildStepDataUsecase.execute(
-      BuildStepDataCommand.create({ user, identifierOrInternalId: workflowId, stepId })
+      BuildStepDataCommand.create({ user, workflowIdentifierOrInternalId: workflowId, _stepId: stepId })
     );
   }
 
@@ -201,12 +201,17 @@ export class WorkflowController {
   @UseGuards(UserAuthGuard)
   async patchWorkflowStepData(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
-    @Param('workflowId', ParseSlugIdPipe) identifierOrInternalId: IdentifierOrInternalId,
-    @Param('stepId', ParseSlugIdPipe) stepId: IdentifierOrInternalId,
+    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
+    @Param('stepId', ParseSlugIdPipe) stepId: string,
     @Body() patchStepDataDto: PatchStepDataDto
   ): Promise<StepDataDto> {
     return await this.patchStepDataUsecase.execute(
-      PatchStepCommand.create({ user, identifierOrInternalId, stepId, ...patchStepDataDto })
+      PatchStepCommand.create({
+        user,
+        workflowIdentifierOrInternalId: workflowId,
+        _stepId: stepId,
+        ...patchStepDataDto,
+      })
     );
   }
 

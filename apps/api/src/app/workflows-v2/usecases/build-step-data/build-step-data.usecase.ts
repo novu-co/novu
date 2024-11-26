@@ -11,7 +11,7 @@ export class BuildStepDataUsecase {
   constructor(
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private controlValuesRepository: ControlValuesRepository,
-    private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase // Dependency injection for new use case
+    private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase
   ) {}
 
   async execute(command: BuildStepDataCommand): Promise<StepDataDto> {
@@ -37,7 +37,7 @@ export class BuildStepDataUsecase {
       variables: this.buildAvailableVariableSchemaUsecase.execute({
         stepDatabaseId: currentStep._templateId,
         workflow,
-      }), // Use the new use case to build variables schema
+      }),
       name: currentStep.name,
       _id: currentStep._templateId,
       stepId: currentStep.stepId,
@@ -51,7 +51,7 @@ export class BuildStepDataUsecase {
 
   private async fetchWorkflow(command: BuildStepDataCommand) {
     return await this.getWorkflowByIdsUseCase.execute({
-      identifierOrInternalId: command.identifierOrInternalId,
+      identifierOrInternalId: command.workflowIdentifierOrInternalId,
       environmentId: command.user.environmentId,
       organizationId: command.user.organizationId,
       userId: command.user._id,
@@ -72,14 +72,15 @@ export class BuildStepDataUsecase {
 
   private async loadStepsFromDb(command: BuildStepDataCommand, workflow: NotificationTemplateEntity) {
     const currentStep = workflow.steps.find(
-      (stepItem) => stepItem._id === command.stepId || stepItem.stepId === command.stepId
+      (stepItem) => stepItem._id === command._stepId || stepItem.stepId === command.stepId
     );
 
     if (!currentStep) {
       throw new BadRequestException({
         message: 'No step found',
-        stepId: command.stepId,
-        workflowId: command.identifierOrInternalId,
+        ...(command.stepId ? { stepId: command.stepId } : {}),
+        _stepId: command._stepId,
+        workflowId: command.workflowIdentifierOrInternalId,
       });
     }
 

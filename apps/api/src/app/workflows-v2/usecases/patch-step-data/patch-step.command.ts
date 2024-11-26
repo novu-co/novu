@@ -5,11 +5,15 @@ import { IdentifierOrInternalId } from '@novu/shared';
 export class PatchStepCommand extends EnvironmentWithUserObjectCommand {
   @IsString()
   @IsNotEmpty()
-  identifierOrInternalId: IdentifierOrInternalId;
+  workflowIdentifierOrInternalId: IdentifierOrInternalId;
 
   @IsString()
   @IsNotEmpty()
-  stepId: IdentifierOrInternalId;
+  _stepId: string;
+
+  @IsString()
+  @IsOptional()
+  stepId?: string;
 
   @IsString()
   @IsOptional()

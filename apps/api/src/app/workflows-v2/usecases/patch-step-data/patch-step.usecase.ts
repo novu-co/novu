@@ -76,7 +76,7 @@ export class PatchStepUsecase {
 
   private async fetchWorkflow(command: PatchStepCommand) {
     return await this.getWorkflowByIdsUseCase.execute({
-      identifierOrInternalId: command.identifierOrInternalId,
+      identifierOrInternalId: command.workflowIdentifierOrInternalId,
       environmentId: command.user.environmentId,
       organizationId: command.user.organizationId,
       userId: command.user._id,
@@ -85,14 +85,15 @@ export class PatchStepUsecase {
 
   private async findStepByStepId(command: PatchStepCommand, workflow: NotificationTemplateEntity) {
     const currentStep = workflow.steps.find(
-      (stepItem) => stepItem._id === command.stepId || stepItem.stepId === command.stepId
+      (stepItem) => stepItem._id === command._stepId || stepItem.stepId === command.stepId
     );
 
     if (!currentStep) {
       throw new BadRequestException({
         message: 'No step found',
-        stepId: command.stepId,
-        workflowId: command.identifierOrInternalId,
+        ...(command.stepId ? { stepId: command.stepId } : {}),
+        _stepId: command._stepId,
+        workflowId: command.workflowIdentifierOrInternalId,
       });
     }
 

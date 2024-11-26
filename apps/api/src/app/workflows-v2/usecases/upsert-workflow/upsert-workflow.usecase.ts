@@ -289,9 +289,9 @@ export class UpsertWorkflowUseCase {
       }
       await this.patchStepDataUsecase.execute({
         controlValues,
-        identifierOrInternalId: workflow._id,
+        workflowIdentifierOrInternalId: workflow._id,
         name: step.name,
-        stepId: step._templateId,
+        _stepId: step._templateId,
         user: command.user,
       });
     }

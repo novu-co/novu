@@ -136,8 +136,9 @@ export class SyncToEnvironmentUseCase {
     for (const step of steps) {
       const idAsOptionalObject = this.prodDbIdAsOptionalObject(existingWorkflowSteps, step);
       const stepDataDto = await this.buildStepDataUsecase.execute({
-        identifierOrInternalId: command.identifierOrInternalId,
+        workflowIdentifierOrInternalId: command.identifierOrInternalId,
         stepId: step.stepId,
+        _stepId: step._id,
         user: command.user,
       });
 
