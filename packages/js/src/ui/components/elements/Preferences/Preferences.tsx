@@ -148,17 +148,14 @@ const PreferencesRow = (props: {
         <div
           class={style(
             'workflowLabelContainer',
-            'nt-flex nt-justify-between nt-flex-nowrap nt-self-stretch nt-cursor-pointer nt-items-center'
+            'nt-flex nt-justify-between nt-flex-nowrap nt-self-stretch nt-cursor-pointer nt-items-center nt-overflow-hidden'
           )}
           onClick={() => setIsOpen((prev) => !prev)}
           data-open={isOpen()}
         >
-          <div>
+          <div class={style('workflowLabelHeader', 'nt-overflow-hidden')}>
             <div
-              class={style(
-                'workflowLabel',
-                'nt-text-base nt-font-semibold nt-text-start nt-flex nt-items-center nt-gap-1'
-              )}
+              class={style('workflowLabel', 'nt-text-base nt-font-semibold nt-truncate')}
               data-localization={props.localizationKey}
               data-open={isOpen()}
             >

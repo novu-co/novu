@@ -4,7 +4,7 @@ import { RiArrowLeftSLine, RiCloseFill, RiDeleteBin2Line } from 'react-icons/ri'
 import { motion } from 'framer-motion';
 import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
-import { SidebarFooter, SidebarHeader } from '@/components/side-navigation/Sidebar';
+import { SidebarFooter, SidebarHeader } from '@/components/side-navigation/sidebar';
 import { useWorkflowEditorContext } from '@/components/workflow-editor/hooks';
 import { useEnvironment } from '@/context/environment/hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
