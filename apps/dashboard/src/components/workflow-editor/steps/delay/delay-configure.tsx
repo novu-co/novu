@@ -8,8 +8,6 @@ import { useStepEditorContext } from '@/components/workflow-editor/steps/hooks';
 import { buildDefaultValues, buildDynamicZodSchema } from '@/utils/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { NumberInputWithSelect } from '@/components/number-input-with-select';
-import { FormLabel } from '@/components/primitives/form/form';
 import { Form } from '@/components/primitives/form/form';
 import { useWorkflowEditorContext } from '@/components/workflow-editor/hooks';
 import debounce from 'lodash.debounce';
@@ -20,6 +18,7 @@ import { showToast } from '@/components/primitives/sonner-helpers';
 import { ToastIcon } from '@/components/primitives/sonner';
 import { UnsavedChangesAlertDialog } from '@/components/unsaved-changes-alert-dialog';
 import merge from 'lodash.merge';
+import { DelayAmount } from '@/components/workflow-editor/steps/delay/delay-amount';
 
 const TOAST_CONFIG = {
   position: 'bottom-left' as const,
@@ -34,15 +33,12 @@ const delayControlsSchema = z
   })
   .strict();
 
-const defaultUnitValues = Object.values(TimeUnitEnum);
-
 export const DelayConfigure = () => {
   const { stepSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
   const { step, refetch } = useStepEditorContext();
   const { workflow, isReadOnly } = useWorkflowEditorContext();
   const { uiSchema, dataSchema, values } = step?.controls ?? {};
 
-  const unitOptions = useMemo(() => (dataSchema?.properties?.unit as any)?.enum ?? defaultUnitValues, [dataSchema]);
   const schema = buildDynamicZodSchema(dataSchema ?? {});
   const newFormValues = useMemo(() => merge(buildDefaultValues(uiSchema ?? {}), values), [uiSchema, values]);
 
@@ -128,16 +124,7 @@ export const DelayConfigure = () => {
               debouncedSave(form.getValues());
             }}
           >
-            <FormLabel tooltip="Delays workflow for the set time, then proceeds to the next step.">
-              Delay execution by
-            </FormLabel>
-            <NumberInputWithSelect
-              form={form}
-              inputName="amount"
-              selectName="unit"
-              options={unitOptions}
-              isReadOnly={isReadOnly}
-            />
+            <DelayAmount dataSchema={dataSchema ?? {}} isReadOnly={isReadOnly} />
           </form>
         </Form>
       </SidebarContent>

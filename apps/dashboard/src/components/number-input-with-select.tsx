@@ -3,11 +3,10 @@ import { FormControl, FormField, FormItem, FormMessagePure } from '@/components/
 import { Input } from '@/components/primitives/input';
 import { InputFieldPure } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
-import { UseFormReturn } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { useMemo } from 'react';
 
 type InputWithSelectProps = {
-  form: UseFormReturn<any>;
   inputName: string;
   selectName: string;
   options: string[];
@@ -18,10 +17,12 @@ type InputWithSelectProps = {
 };
 
 export const NumberInputWithSelect = (props: InputWithSelectProps) => {
-  const { className, form, inputName, selectName, options, defaultOption, placeholder, isReadOnly } = props;
+  const { className, inputName, selectName, options, defaultOption, placeholder, isReadOnly } = props;
 
-  const amount = form.getFieldState(`${inputName}`);
-  const unit = form.getFieldState(`${selectName}`);
+  const { getFieldState, setValue, getValues, control } = useFormContext();
+
+  const amount = getFieldState(`${inputName}`);
+  const unit = getFieldState(`${selectName}`);
   const error = amount.error || unit.error;
 
   const defaultSelectedValue = useMemo(() => {
@@ -30,15 +31,15 @@ export const NumberInputWithSelect = (props: InputWithSelectProps) => {
 
   const handleChange = (value: { input: number; select: string }) => {
     // we want to always set both values and treat it as a single input
-    form.setValue(inputName, value.input, { shouldDirty: true });
-    form.setValue(selectName, value.select, { shouldDirty: true });
+    setValue(inputName, value.input, { shouldDirty: true });
+    setValue(selectName, value.select, { shouldDirty: true });
   };
 
   return (
     <>
       <InputFieldPure className="h-7 rounded-lg border pr-0">
         <FormField
-          control={form.control}
+          control={control}
           name={inputName}
           render={({ field }) => (
             <FormItem className="w-full overflow-hidden">
@@ -53,7 +54,7 @@ export const NumberInputWithSelect = (props: InputWithSelectProps) => {
                   disabled={isReadOnly}
                   {...field}
                   onChange={(e) => {
-                    handleChange({ input: Number(e.target.value), select: form.getValues(selectName) });
+                    handleChange({ input: Number(e.target.value), select: getValues(selectName) });
                   }}
                 />
               </FormControl>
@@ -61,14 +62,14 @@ export const NumberInputWithSelect = (props: InputWithSelectProps) => {
           )}
         />
         <FormField
-          control={form.control}
+          control={control}
           name={selectName}
           render={({ field }) => (
             <FormItem>
               <FormControl>
                 <Select
                   onValueChange={(value) => {
-                    handleChange({ input: Number(form.getValues(inputName)), select: value });
+                    handleChange({ input: Number(getValues(inputName)), select: value });
                   }}
                   defaultValue={defaultSelectedValue}
                   disabled={isReadOnly}
