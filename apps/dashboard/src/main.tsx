@@ -1,4 +1,4 @@
-import { StrictMode } from 'react';
+import { lazy, StrictMode, Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import ErrorPage from '@/components/error-page';
@@ -13,6 +13,7 @@ import { ConfigureStep } from './components/workflow-editor/steps/configure-step
 import { initializeSentry } from './utils/sentry';
 import { EditStepSidebar } from './components/workflow-editor/steps/edit-step-sidebar';
 import { overrideZodErrorMap } from './utils/validation';
+import { FeatureFlagsProvider } from '@/context/feature-flags-provider';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -90,6 +91,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <FeatureFlagsProvider>
+      <RouterProvider router={router} />
+    </FeatureFlagsProvider>
   </StrictMode>
 );
