@@ -79,5 +79,10 @@
       "@nestjs/platform-socket.io",
       "@nestjs/platform-socket.io/**"
     ]
+  },
+  "nx": {
+    "tags": [
+      "type:app"
+    ]
   }
 }

@@ -116,5 +116,10 @@
   },
   "peerDependencies": {
     "@novu/web": "workspace:*"
+  },
+  "nx": {
+    "tags": [
+      "type:app"
+    ]
   }
 }

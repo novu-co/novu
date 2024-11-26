@@ -132,5 +132,10 @@
     "@novu/ee-billing": "workspace:*",
     "@novu/ee-shared-services": "workspace:*",
     "@novu/ee-translation": "workspace:*"
+  },
+  "nx": {
+    "tags": [
+      "type:app"
+    ]
   }
 }
