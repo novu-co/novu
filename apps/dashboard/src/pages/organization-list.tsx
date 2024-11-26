@@ -1,5 +1,4 @@
 import { PageMeta } from '@/components/page-meta';
-import { AuthCard } from '../components/auth/auth-card';
 import OrganizationCreate from '../components/auth/create-organization';
 
 export const OrganizationListPage = () => {
@@ -7,9 +6,7 @@ export const OrganizationListPage = () => {
     <>
       <PageMeta title="Select or create organization" />
 
-      <AuthCard>
-        <OrganizationCreate />
-      </AuthCard>
+      <OrganizationCreate />
     </>
   );
 };
