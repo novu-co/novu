@@ -34,22 +34,6 @@ import { BuildAvailableVariableSchemaUsecase } from '../workflows-v2/usecases/bu
 import { ExtractDefaultValuesFromSchemaUsecase } from '../workflows-v2/usecases/extract-default-values-from-schema';
 import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-renderers/hydrate-email-schema.usecase';
 
-const SHARED_USE_CASES = [
-  UpsertWorkflowUseCase,
-  PostProcessWorkflowUpdate,
-  PatchStepUsecase,
-  OverloadContentDataOnWorkflowUseCase,
-  BuildStepDataUsecase,
-  PrepareAndValidateContentUsecase,
-  BuildAvailableVariableSchemaUsecase,
-  BuildDefaultPayloadUsecase,
-  ValidatePlaceholderUsecase,
-  CollectPlaceholderWithDefaultsUsecase,
-  ExtractDefaultValuesFromSchemaUsecase,
-  HydrateEmailSchemaUseCase,
-  TierRestrictionsValidateUsecase,
-];
-
 const PROVIDERS = [
   CreateWorkflow,
   UpdateWorkflow,
@@ -67,7 +51,19 @@ const PROVIDERS = [
   DeletePreferencesUseCase,
   UpsertControlValuesUseCase,
   CommunityOrganizationRepository,
-  ...SHARED_USE_CASES,
+  UpsertWorkflowUseCase,
+  PostProcessWorkflowUpdate,
+  PatchStepUsecase,
+  OverloadContentDataOnWorkflowUseCase,
+  BuildStepDataUsecase,
+  PrepareAndValidateContentUsecase,
+  BuildAvailableVariableSchemaUsecase,
+  BuildDefaultPayloadUsecase,
+  ValidatePlaceholderUsecase,
+  CollectPlaceholderWithDefaultsUsecase,
+  ExtractDefaultValuesFromSchemaUsecase,
+  HydrateEmailSchemaUseCase,
+  TierRestrictionsValidateUsecase,
 ];
 
 @Module({
