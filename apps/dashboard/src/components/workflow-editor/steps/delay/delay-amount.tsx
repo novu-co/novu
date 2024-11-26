@@ -13,7 +13,7 @@ export const DelayAmount = ({ dataSchema, isReadOnly }: { dataSchema: JSONSchema
   const unitOptions = useMemo(() => (dataSchema.properties?.unit as any)?.enum ?? defaultUnitValues, [dataSchema]);
 
   return (
-    <div>
+    <div className="flex h-full flex-col gap-2">
       <FormLabel tooltip="Delays workflow for the set time, then proceeds to the next step.">
         Delay execution by
       </FormLabel>

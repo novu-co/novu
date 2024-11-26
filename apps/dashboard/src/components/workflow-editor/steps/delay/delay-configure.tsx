@@ -117,7 +117,6 @@ export const DelayConfigure = () => {
       <SidebarContent>
         <Form {...form}>
           <form
-            className="flex h-full flex-col gap-2"
             onChange={(e) => {
               e.preventDefault();
               e.stopPropagation();
