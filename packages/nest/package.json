@@ -84,10 +84,5 @@
     "exclude": [
       "**/*.spec.js"
     ]
-  },
-  "nx": {
-    "tags": [
-      "package:public"
-    ]
   }
 }
