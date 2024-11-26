@@ -6,71 +6,160 @@ import { useOnboardingSteps, StepIdEnum } from '../../hooks/use-onboarding-steps
 import { Link } from 'react-router-dom';
 import { buildRoute, LEGACY_ROUTES } from '../../utils/routes';
 import { ROUTES } from '../../utils/routes';
+import { motion } from 'framer-motion';
 
 export function ProgressSection() {
   const { currentEnvironment } = useEnvironment();
   const { steps } = useOnboardingSteps();
 
+  const mainCard = {
+    hidden: { opacity: 0, scale: 0.98 },
+    show: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.4,
+        ease: [0.16, 1, 0.3, 1],
+        when: 'beforeChildren',
+      },
+    },
+  };
+
+  const leftSection = {
+    hidden: { opacity: 0, x: -10 },
+    show: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.6,
+        ease: 'easeOut',
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const textItem = {
+    hidden: { opacity: 0, y: 8 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: 'easeOut',
+      },
+    },
+  };
+
+  const stepsList = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+        delayChildren: 0.2,
+        ease: 'easeOut',
+      },
+    },
+  };
+
+  const stepItem = {
+    hidden: {
+      opacity: 0,
+      y: 10,
+      scale: 0.98,
+    },
+    show: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.4,
+        ease: [0.21, 1.02, 0.73, 0.99], // subtle bounce
+      },
+    },
+  };
+
+  const logo = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 0.5,
+      transition: {
+        delay: 0.4,
+        duration: 0.6,
+      },
+    },
+  };
+
   return (
-    <Card className="relative flex items-stretch gap-2 rounded-xl border-neutral-100 shadow-none">
-      <div className="flex w-full max-w-[380px] grow flex-col items-start justify-between gap-2 rounded-l-xl bg-[#FBFBFB] p-6">
-        <div className="flex w-full flex-col gap-2">
-          <h2 className="font-label-medium text-base font-medium">You're doing great work! 💪</h2>
+    <motion.div variants={mainCard} initial="hidden" animate="show">
+      <Card className="relative flex items-stretch gap-2 rounded-xl border-neutral-100 shadow-none">
+        <motion.div
+          variants={leftSection}
+          className="flex w-full max-w-[380px] grow flex-col items-start justify-between gap-2 rounded-l-xl bg-[#FBFBFB] p-6"
+        >
+          <div className="flex w-full flex-col gap-2">
+            <motion.h2 variants={textItem} className="font-label-medium text-base font-medium">
+              You're doing great work! 💪
+            </motion.h2>
 
-          <div className="flex flex-col gap-6 text-sm text-neutral-400">
-            <p>Set up Novu to send notifications your users will love.</p>
+            <div className="flex flex-col gap-6 text-sm text-neutral-400">
+              <motion.p variants={textItem}>Set up Novu to send notifications your users will love.</motion.p>
 
-            <p>Streamline all your customer messaging in one tool and delight them at every touchpoint.</p>
-          </div>
-        </div>
-
-        <div className="space-between flex items-center gap-0">
-          <p className="text-sm text-neutral-400">Get started with our setup guide.</p>
-          <PointingArrow className="relative left-[15px] top-[-10px]" />
-        </div>
-      </div>
-
-      <div className="flex flex-1 flex-col gap-3 p-6">
-        {steps.map((step, index) => (
-          <div key={index} className="flex max-w-[370px] items-center gap-1.5">
-            <div
-              className={`${step.status === 'completed' ? 'bg-success' : 'shadow-xs'} flex h-6 w-6 min-w-6 items-center justify-center rounded-full`}
-            >
-              {step.status === 'completed' ? (
-                <RiCheckLine className="h-4 w-4 text-[#ffffff]" />
-              ) : (
-                <RiLoader3Line className="h-4 w-4 text-neutral-400" />
-              )}
+              <motion.p variants={textItem}>
+                Streamline all your customer messaging in one tool and delight them at every touchpoint.
+              </motion.p>
             </div>
-
-            <Link
-              to={getStepRoute(step.id, currentEnvironment?.slug).path}
-              reloadDocument={getStepRoute(step.id).isLegacy}
-              className="w-full"
-            >
-              <Card
-                className={`shadow-xs w-full p-1 ${step.status !== 'completed' ? 'transition-all duration-200 hover:translate-x-[1px] hover:shadow-md' : ''}`}
-              >
-                <CardContent className="flex flex-col rounded-[6px] bg-[#FBFBFB] px-2 py-1.5">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`text-xs ${step.status === 'completed' ? 'text-neutral-400 line-through' : 'text-neutral-600'}`}
-                    >
-                      {step.title}
-                    </span>
-                    <RiArrowRightDoubleFill className="h-4 w-4 text-neutral-400" />
-                  </div>
-                  <p className="text-[10px] leading-[14px] text-neutral-400">{step.description}</p>
-                </CardContent>
-              </Card>
-            </Link>
           </div>
-        ))}
-      </div>
-      <div className="absolute bottom-0 right-0">
-        <NovuLogo />
-      </div>
-    </Card>
+
+          <motion.div variants={textItem} className="space-between flex items-center gap-0">
+            <p className="text-sm text-neutral-400">Get started with our setup guide.</p>
+            <PointingArrow className="relative left-[15px] top-[-10px]" />
+          </motion.div>
+        </motion.div>
+
+        <motion.div className="flex flex-1 flex-col gap-3 p-6" variants={stepsList}>
+          {steps.map((step, index) => (
+            <motion.div key={index} className="flex max-w-[370px] items-center gap-1.5" variants={stepItem}>
+              <div
+                className={`${step.status === 'completed' ? 'bg-success' : 'shadow-xs'} flex h-6 w-6 min-w-6 items-center justify-center rounded-full`}
+              >
+                {step.status === 'completed' ? (
+                  <RiCheckLine className="h-4 w-4 text-[#ffffff]" />
+                ) : (
+                  <RiLoader3Line className="h-4 w-4 text-neutral-400" />
+                )}
+              </div>
+
+              <Link
+                to={getStepRoute(step.id, currentEnvironment?.slug).path}
+                reloadDocument={getStepRoute(step.id).isLegacy}
+                className="w-full"
+              >
+                <Card
+                  className={`shadow-xs w-full p-1 ${step.status !== 'completed' ? 'transition-all duration-200 hover:translate-x-[1px] hover:shadow-md' : ''}`}
+                >
+                  <CardContent className="flex flex-col rounded-[6px] bg-[#FBFBFB] px-2 py-1.5">
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`text-xs ${step.status === 'completed' ? 'text-neutral-400 line-through' : 'text-neutral-600'}`}
+                      >
+                        {step.title}
+                      </span>
+                      <RiArrowRightDoubleFill className="h-4 w-4 text-neutral-400" />
+                    </div>
+                    <p className="text-[10px] leading-[14px] text-neutral-400">{step.description}</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <motion.div variants={logo} className="absolute bottom-0 right-0">
+          <NovuLogo />
+        </motion.div>
+      </Card>
+    </motion.div>
   );
 }
 

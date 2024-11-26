@@ -1,4 +1,5 @@
 import { ReactElement } from 'react';
+import { motion } from 'framer-motion';
 import { PageMeta } from '../components/page-meta';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { ProgressSection } from '../components/welcome/progress-section';
@@ -34,19 +35,50 @@ const helpfulResources: Resource[] = [
 ];
 
 export function WelcomePage(): ReactElement {
+  const pageVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+  };
+
   return (
     <>
       <PageMeta title="Get Started with Novu" />
       <DashboardLayout>
-        <div className="flex flex-col gap-8 p-9 pt-6">
-          <ProgressSection />
-          <ResourcesList
-            title="Helpful resources"
-            icon={<RiBookmark2Fill className="h-4 w-4" />}
-            resources={helpfulResources}
-          />
-          <ResourcesList title="Learn" icon={<RiBookletFill className="h-4 w-4" />} resources={helpfulResources} />
-        </div>
+        <motion.div className="flex flex-col gap-8 p-9 pt-6" variants={pageVariants} initial="hidden" animate="show">
+          <motion.div variants={sectionVariants}>
+            <ProgressSection />
+          </motion.div>
+
+          <motion.div variants={sectionVariants}>
+            <ResourcesList
+              title="Helpful resources"
+              icon={<RiBookmark2Fill className="h-4 w-4" />}
+              resources={helpfulResources}
+            />
+          </motion.div>
+
+          <motion.div variants={sectionVariants}>
+            <ResourcesList title="Learn" icon={<RiBookletFill className="h-4 w-4" />} resources={helpfulResources} />
+          </motion.div>
+        </motion.div>
       </DashboardLayout>
     </>
   );
