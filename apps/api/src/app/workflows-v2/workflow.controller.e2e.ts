@@ -384,6 +384,63 @@ describe('Workflow Controller E2E API Testing', () => {
       const idsDeduplicated = buildIdSet(listWorkflowResponse1, listWorkflowResponse2);
       expect(idsDeduplicated.size).to.be.equal(10);
     });
+
+    async function createV1Workflow() {
+      const novuRestResult = await workflowsClient.createWorkflowsV1({
+        name: `test api template: ${generateUUID()}`,
+        description: 'This is a test description',
+        tags: ['test-tag-api'],
+        notificationGroupId: session.notificationGroups[0]._id,
+        steps: [],
+      });
+      if (!novuRestResult.isSuccessResult()) {
+        throw new Error(`Failed to create V1 Workflow ${JSON.stringify(novuRestResult.error)}`);
+      }
+
+      return novuRestResult.value;
+    }
+
+    async function searchWorkflowsV1(workflowId?: string) {
+      const novuRestResult = await workflowsClient.searchWorkflowsV1(workflowId);
+      if (!novuRestResult.isSuccessResult()) {
+        throw new Error('should not fail to get list ');
+      }
+      const data = novuRestResult.value;
+
+      return data;
+    }
+
+    async function getV2WorkflowIdAndExternalId(uuid: string) {
+      await create10Workflows(uuid);
+      const listWorkflowResponse: ListWorkflowResponse = await getListWorkflows(uuid, 0, 5);
+      const workflowV2Id = listWorkflowResponse.workflows[0]._id;
+      const { workflowId } = listWorkflowResponse.workflows[0];
+
+      return { workflowV2Id, workflowId, name: listWorkflowResponse.workflows[0].name };
+    }
+
+    async function create3V1Workflows() {
+      let workflowV1Created = await createV1Workflow();
+      workflowV1Created = await createV1Workflow();
+
+      return await createV1Workflow();
+    }
+
+    it('old list endpoint should not retreive the new workflow', async () => {
+      const uuid = generateUUID();
+      const { workflowV2Id, name } = await getV2WorkflowIdAndExternalId(uuid);
+      const workflowV1Created = await create3V1Workflows();
+      let workflowsFromSearch = await searchWorkflowsV1(workflowV1Created?.name);
+      expect(workflowsFromSearch[0]._id).to.deep.eq(workflowV1Created._id);
+
+      workflowsFromSearch = await searchWorkflowsV1();
+      const ids = workflowsFromSearch?.map((workflow) => workflow._id);
+      const found = ids?.some((localId) => localId === workflowV2Id);
+      expect(found, `FoundIds:${ids} SearchedID:${workflowV2Id}`).to.be.false;
+
+      workflowsFromSearch = await searchWorkflowsV1(name);
+      expect(workflowsFromSearch?.length).to.eq(0);
+    });
   });
 
   describe('Promote Workflow Permutations', () => {
