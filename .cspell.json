@@ -703,7 +703,11 @@
     "xyflow",
     "zulip",
     "zwnj",
-    "SOLOPRENEUR"
+    "SOLOPRENEUR",
+    "rstrip",
+    "truncatewords",
+    "xmlschema",
+    "jsonify"
   ],
   "flagWords": [],
   "patterns": [

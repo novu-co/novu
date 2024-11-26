@@ -9,8 +9,10 @@ export default {
       md: '0px 16px 32px -12px rgba(14, 18, 27, 0.10)',
       DEFAULT: '0px 16px 32px -12px #0E121B1A',
     },
+
     colors: {
       black: 'black',
+      white: 'white',
       transparent: 'transparent',
       background: 'hsl(var(--background))',
       foreground: {

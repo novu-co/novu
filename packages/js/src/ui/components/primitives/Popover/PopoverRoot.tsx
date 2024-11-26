@@ -1,4 +1,4 @@
-import { autoUpdate, flip, offset, Placement, shift } from '@floating-ui/dom';
+import { autoUpdate, flip, offset, OffsetOptions, Placement, shift } from '@floating-ui/dom';
 import { useFloating } from 'solid-floating-ui';
 import { Accessor, createContext, createMemo, createSignal, JSX, Setter, useContext } from 'solid-js';
 
@@ -8,6 +8,7 @@ type PopoverRootProps = {
   fallbackPlacements?: Placement[];
   placement?: Placement;
   onOpenChange?: Setter<boolean>;
+  offset?: OffsetOptions;
 };
 
 type PopoverContextValue = {
@@ -40,7 +41,7 @@ export function PopoverRoot(props: PopoverRootProps) {
         layoutShift: false,
       }),
     middleware: [
-      offset(10),
+      offset(props.offset ?? 10),
       flip({
         fallbackPlacements: props.fallbackPlacements || ['top-start'],
       }),
