@@ -224,7 +224,7 @@ export class CommunityAuthService implements IAuthService {
       },
       {
         expiresIn:
-          process.env.SUBSCRIBER_WIDGET_JWT_EXPIRATION_TIME || '15 day',
+          process.env.SUBSCRIBER_WIDGET_JWT_EXPIRATION_TIME || '15 days',
         issuer: 'novu_api',
         audience: 'widget_user',
       },
