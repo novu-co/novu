@@ -1,10 +1,8 @@
 import { SVGProps, useState } from 'react';
 import { Info, Layers, LightbulbIcon } from 'lucide-react';
-import { Separator } from '../primitives/separator';
 import { Button } from '../primitives/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../primitives/accordion';
-import { AlertDialog, AlertDialogDescription } from '../primitives/alert-dialog';
-import { Inbox, Notifications } from '@novu/react';
+import { Inbox, InboxContent, Notifications } from '@novu/react';
 import { RiArrowLeftSLine, RiInputField, RiLayoutLine } from 'react-icons/ri';
 
 interface PreviewStyle {
@@ -54,7 +52,6 @@ export function InboxPreview() {
 
   return (
     <div className="flex flex-1 flex-col">
-      {/* Header */}
       <div className="flex items-center justify-between gap-4 border-b p-4">
         <div className="flex items-start gap-1">
           <Button variant="ghost" size="icon" className="mt-[5px] h-5 w-5">
@@ -73,7 +70,7 @@ export function InboxPreview() {
       </div>
 
       <div className="flex flex-1">
-        <div className="flex w-[480px] flex-col">
+        <div className="flex min-w-[480px] flex-col">
           <div className="space-y-3 p-3">
             <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
               <AccordionItem value="layout" className="bg-white p-0">
@@ -160,8 +157,8 @@ export function InboxPreview() {
           </div>
 
           {/* Footer */}
-          <div className="bg-muted mt-auto border-t p-2">
-            <div className="flex justify-end gap-3 px-3 py-2">
+          <div className="bg-muted mt-auto border-t">
+            <div className="flex justify-end gap-3 p-2">
               <Button variant="outline" className="gap-1">
                 <Layers className="h-5 w-5" />
                 Copy cURL
@@ -171,15 +168,24 @@ export function InboxPreview() {
           </div>
         </div>
 
-        <div className="flex-1 border-l">
-          <div className="relative flex h-full flex-col items-center">
-            {selectedStyle === 'popover' && (
-              <div className="mt-10 flex w-full max-w-[440px] items-end">
+        <div className="w-full border-l">
+          {selectedStyle === 'popover' && (
+            <div className="relative flex h-full w-full flex-col items-center">
+              <div className="mt-10 flex w-full max-w-[440px] items-center justify-end">
                 <Inbox applicationIdentifier="123" subscriberId="123" open appearance={novuAppearance} />
               </div>
-            )}
-            {selectedStyle === 'sidebar' && (
-              <div className="mt-10 max-h-[400px] min-h-[200px] w-full">
+              <div className="absolute bottom-[-10px] left-2 flex flex-col items-start">
+                <SendNotificationArrow className="mt-2 h-[73px] w-[86px]" />
+
+                <p className="text-success relative top-[-32px] text-[10px] italic">
+                  Hit send, to get an notification!
+                </p>
+              </div>
+            </div>
+          )}
+          {selectedStyle === 'sidebar' && (
+            <div className="h-full">
+              <div className="h-full w-[300px] border-r">
                 <Inbox
                   applicationIdentifier="123"
                   subscriberId="123"
@@ -280,40 +286,18 @@ export function InboxPreview() {
                     },
                   }}
                 >
-                  <Notifications />
+                  <InboxContent />
                 </Inbox>
               </div>
-            )}
-            {selectedStyle === 'full-width' && (
-              <div className="mt-10 max-h-[400px] min-h-[200px] w-full">
-                <Inbox
-                  applicationIdentifier="123"
-                  subscriberId="123"
-                  appearance={{
-                    ...novuAppearance,
-                    elements: {
-                      ...novuAppearance.elements,
-                      root: {
-                        height: '100%',
-                        width: '100%',
-                        borderRadius: '12px',
-                      },
-                      notificationList: {
-                        padding: '24px',
-                      },
-                    },
-                  }}
-                >
-                  <Notifications />
-                </Inbox>
-              </div>
-            )}
-
-            <div className="absolute bottom-24 left-2">
-              <p className="text-success text-[10px] italic">Hit send, to get an notification!</p>
-              <SendNotificationArrow className="mt-2 h-[73px] w-[86px]" />
             </div>
-          </div>
+          )}
+          {selectedStyle === 'full-width' && (
+            <div className="mt-10 h-full w-full">
+              <Inbox applicationIdentifier="123" subscriberId="123">
+                <InboxContent />
+              </Inbox>
+            </div>
+          )}
         </div>
       </div>
     </div>
