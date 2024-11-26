@@ -170,7 +170,7 @@ export const SideNavigation = () => {
                           rotate: [0, 4, -4, 0],
                           opacity: [0, 1, 1],
                           transition: {
-                            duration: 2,
+                            duration: 1.4,
                             repeat: 0,
                             ease: 'easeInOut',
                           },
