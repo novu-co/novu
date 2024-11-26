@@ -1,4 +1,3 @@
-import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent } from '../primitives/card';
 import { ChannelTypeEnum } from '@novu/shared';
 import { Usecase } from './usecases-list.utils';
