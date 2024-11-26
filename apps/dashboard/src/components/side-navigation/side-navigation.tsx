@@ -52,6 +52,7 @@ type NavLinkProps = {
 const NavigationLink = ({ to, isExternal, className, children }: NavLinkProps) => {
   const { pathname } = useLocation();
   const isSelected = pathname === to;
+
   const variant = isSelected ? 'selected' : 'default';
 
   const classNames = cn(linkVariants({ variant, className }));
@@ -151,33 +152,38 @@ export const SideNavigation = () => {
                 <RiUserAddLine className="size-4" />
                 <span>Invite teammates</span>
               </NavigationLink>
-              <NavigationLink to={ROUTES.WELCOME}>
-                <RiQuestionLine className="size-4" />
-                <span>Getting started</span>
+              <motion.div className="contents" whileHover="hover" initial="initial">
+                <NavigationLink to={buildRoute(ROUTES.WELCOME, { environmentSlug: currentEnvironment?.slug ?? '' })}>
+                  <RiQuestionLine className="size-4" />
+                  <span>Getting started</span>
 
-                <Badge
-                  variant="soft"
-                  size="pill"
-                  className="bg-primary-alpha-10 text-primary inline-flex items-center gap-0.5 px-1 py-0.5 leading-4"
-                >
-                  <motion.div
-                    whileHover={{
-                      scale: [1, 1.2, 1],
-                      rotate: [0, 5, -5, 0],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: 0,
-                      ease: 'easeInOut',
-                    }}
+                  <Badge
+                    variant="soft"
+                    size="pill"
+                    className="bg-primary-alpha-10 text-primary inline-flex items-center gap-0.5 px-1 py-0.5 leading-4"
                   >
-                    <RiSparkling2Fill className="h-4 w-4" />
-                  </motion.div>
-                  <span className="text-xs">
-                    {steps.filter((step) => step.status === 'completed').length}/{steps.length}
-                  </span>
-                </Badge>
-              </NavigationLink>
+                    <motion.div
+                      variants={{
+                        initial: { scale: 1, rotate: 0 },
+                        hover: {
+                          scale: [1, 1.1, 1],
+                          rotate: [0, 3, -3, 0],
+                          transition: {
+                            duration: 2,
+                            repeat: Infinity,
+                            ease: 'easeInOut',
+                          },
+                        },
+                      }}
+                    >
+                      <RiSparkling2Fill className="h-4 w-4" />
+                    </motion.div>
+                    <span className="text-xs">
+                      {steps.filter((step) => step.status === 'completed').length}/{steps.length}
+                    </span>
+                  </Badge>
+                </NavigationLink>
+              </motion.div>
             </NavigationGroup>
           </div>
         </nav>
