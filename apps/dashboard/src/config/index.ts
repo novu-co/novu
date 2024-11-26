@@ -4,7 +4,6 @@ export const MODE = import.meta.env.MODE;
 
 export const LAUNCH_DARKLY_CLIENT_SIDE_ID = import.meta.env.VITE_LAUNCH_DARKLY_CLIENT_SIDE_ID;
 
-console.log(LAUNCH_DARKLY_CLIENT_SIDE_ID);
 export const HUBSPOT_PORTAL_ID = import.meta.env.VITE_HUBSPOT_EMBED;
 
 export const IS_EE_AUTH_ENABLED = import.meta.env.VITE_IS_EE_AUTH_ENABLED === 'true';
