@@ -32,7 +32,6 @@ import { OverloadContentDataOnWorkflowUseCase } from '../overload-content-data';
 export class PostProcessWorkflowUpdate {
   constructor(
     private notificationTemplateRepository: NotificationTemplateRepository,
-    private controlValuesRepository: ControlValuesRepository,
     private overloadContentDataOnWorkflowUseCase: OverloadContentDataOnWorkflowUseCase
   ) {}
 

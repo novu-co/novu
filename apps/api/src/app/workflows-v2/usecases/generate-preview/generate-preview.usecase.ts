@@ -4,10 +4,12 @@ import {
   GeneratePreviewRequestDto,
   GeneratePreviewResponseDto,
   JobStatusEnum,
+  JSONSchemaDto,
   PreviewPayload,
   StepDataDto,
   UserSessionData,
 } from '@novu/shared';
+import { GetWorkflowByIdsCommand, GetWorkflowByIdsUseCase } from '@novu/application-generic';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
 import { StepMissingControlsException } from '../../exceptions/step-not-found-exception';
@@ -20,14 +22,22 @@ export class GeneratePreviewUsecase {
   constructor(
     private legacyPreviewStepUseCase: PreviewStep,
     private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase,
-    private buildStepDataUsecase: BuildStepDataUsecase
+    private buildStepDataUsecase: BuildStepDataUsecase,
+    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase
   ) {}
 
   async execute(command: GeneratePreviewCommand): Promise<GeneratePreviewResponseDto> {
     const dto = command.generatePreviewRequestDto;
     const stepData = await this.getStepData(command);
+    const workflow = await this.findWorkflow(command);
 
-    const validatedContent: ValidatedContentResponse = await this.getValidatedContent(dto, stepData, command.user);
+    const validatedContent: ValidatedContentResponse = await this.getValidatedContent(
+      dto,
+      stepData,
+      command.user,
+      workflow.payloadSchema
+    );
+
     const executeOutput = await this.executePreviewUsecase(
       command,
       stepData,
@@ -45,24 +55,80 @@ export class GeneratePreviewUsecase {
     };
   }
 
-  private async getValidatedContent(dto: GeneratePreviewRequestDto, stepData: StepDataDto, user: UserSessionData) {
+  private async findWorkflow(command: GeneratePreviewCommand) {
+    return await this.getWorkflowByIdsUseCase.execute(
+      GetWorkflowByIdsCommand.create({
+        identifierOrInternalId: command.identifierOrInternalId,
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
+        userId: command.user._id,
+      })
+    );
+  }
+
+  /**
+   * Generates a payload based solely on the schema.
+   * Supports nested schemas and applies defaults where defined.
+   * @param JSONSchemaDto - Defining the structure. example:
+   *  {
+   *    firstName: { type: 'string', default: 'John' },
+   *    lastName: { type: 'string' }
+   *  }
+   * @returns - Generated payload. example: { firstName: 'John', lastName: '{{payload.lastName}}' }
+   */
+  private generatePayloadVariableExample(schema: JSONSchemaDto, path = 'payload'): Record<string, unknown> {
+    if (schema.type !== 'object' || !schema.properties) {
+      throw new Error('Schema must define an object with properties.');
+    }
+
+    return Object.entries(schema.properties).reduce((acc, [key, definition]) => {
+      if (typeof definition === 'boolean') {
+        return acc;
+      }
+
+      const currentPath = `${path}.${key}`;
+
+      if (definition.default) {
+        acc[key] = definition.default;
+      } else if (definition.type === 'object' && definition.properties) {
+        acc[key] = this.generatePayloadVariableExample(definition, currentPath);
+      } else {
+        acc[key] = `{{${currentPath}}}`;
+      }
+
+      return acc;
+    }, {});
+  }
+
+  private async getValidatedContent(
+    dto: GeneratePreviewRequestDto,
+    stepData: StepDataDto,
+    user: UserSessionData,
+    payloadSchema: JSONSchemaDto
+  ) {
     if (!stepData.controls?.dataSchema) {
       throw new StepMissingControlsException(stepData.stepId, stepData);
     }
+
+    const payloadVariablesFromSchema = payloadSchema ? this.generatePayloadVariableExample(payloadSchema) : {};
+    const payloadVariablesExample = { ...payloadVariablesFromSchema, ...dto.previewPayload?.payload };
 
     return await this.prepareAndValidateContentUsecase.execute({
       stepType: stepData.type,
       controlValues: dto.controlValues || stepData.controls.values,
       controlDataSchema: stepData.controls.dataSchema,
       variableSchema: stepData.variables,
-      previewPayloadFromDto: dto.previewPayload,
+      previewPayloadFromDto: {
+        ...dto.previewPayload,
+        payload: payloadVariablesExample,
+      },
       user,
     });
   }
 
   private async getStepData(command: GeneratePreviewCommand) {
     return await this.buildStepDataUsecase.execute({
-      identifierOrInternalId: command.workflowId,
+      identifierOrInternalId: command.identifierOrInternalId,
       stepId: command.stepDatabaseId,
       user: command.user,
     });
