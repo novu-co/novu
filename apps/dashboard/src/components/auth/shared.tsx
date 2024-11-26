@@ -16,7 +16,7 @@ export function StepIndicator({ step, className, hideBackButton }: StepIndicator
   }
 
   return (
-    <div className={cn('inline-flex items-center gap-0.5 text-[#525866]', className)}>
+    <div className={cn('text-foreground-600 inline-flex items-center gap-0.5', className)}>
       {!hideBackButton && (
         <button
           onClick={handleGoBack}
