@@ -19,8 +19,38 @@ const previewStyles: PreviewStyle[] = [
   { id: 'full-width', label: 'Full Width', image: '/images/auth/full-width-layout.svg' },
 ];
 
+const novuAppearance = {
+  baseTheme: {
+    variables: {
+      colorPrimary: '#DD2450',
+      colorBackground: 'white',
+      colorBackgroundHover: '#F9FAFB',
+      colorBorder: '#E5E7EB',
+    },
+  },
+  elements: {
+    notificationItem: {
+      borderRadius: '8px',
+      marginBottom: '8px',
+      backgroundColor: 'white',
+    },
+    popoverContent: {
+      boxShadow: '0px 4px 6px -1px rgba(0, 0, 0, 0.1)',
+      borderRadius: '12px',
+      border: '1px solid #E5E7EB',
+    },
+    unseenBadge: {
+      backgroundColor: '#DD2450',
+    },
+    dropdown: {
+      padding: '16px',
+    },
+  },
+};
+
 export function InboxPreview() {
   const [selectedStyle, setSelectedStyle] = useState<string>('popover');
+  const [openAccordion, setOpenAccordion] = useState<string | undefined>('layout');
 
   return (
     <div className="flex flex-1 flex-col">
@@ -45,8 +75,8 @@ export function InboxPreview() {
       <div className="flex flex-1">
         <div className="flex w-[480px] flex-col">
           <div className="space-y-3 p-3">
-            <Accordion type="single" collapsible value={'inbox'}>
-              <AccordionItem value="inbox" className="bg-white p-0">
+            <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
+              <AccordionItem value="layout" className="bg-white p-0">
                 <AccordionTrigger className="bg-neutral-alpha-50 border-b p-2">
                   <div className="flex items-center gap-1 text-xs">
                     <RiLayoutLine className="text-feature size-5" />
@@ -116,8 +146,8 @@ export function InboxPreview() {
               </AccordionItem>
             </Accordion>
 
-            <Accordion type="single" collapsible value={'inbox'}>
-              <AccordionItem value="inbox" className="bg-white p-0">
+            <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
+              <AccordionItem value="configure" className="bg-white p-0">
                 <AccordionTrigger className="bg-neutral-alpha-50 border-b p-2">
                   <div className="flex items-center gap-1 text-xs">
                     <RiInputField className="text-feature size-5" />
@@ -145,19 +175,135 @@ export function InboxPreview() {
           <div className="relative flex h-full flex-col items-center">
             {selectedStyle === 'popover' && (
               <div className="mt-10 flex w-full max-w-[440px] items-end">
-                <Inbox applicationIdentifier="123" subscriberId="123" open />{' '}
+                <Inbox applicationIdentifier="123" subscriberId="123" open appearance={novuAppearance} />
               </div>
             )}
             {selectedStyle === 'sidebar' && (
               <div className="mt-10 max-h-[400px] min-h-[200px] w-full">
-                <Inbox applicationIdentifier="123" subscriberId="123">
+                <Inbox
+                  applicationIdentifier="123"
+                  subscriberId="123"
+                  appearance={{
+                    variables: {
+                      colorBackground: '#FCFCFC',
+                      colorForeground: '#1A1523',
+                      colorPrimary: '#0081F1',
+                      colorPrimaryForeground: '#ffffff',
+                      colorSecondary: '#F3F3F3',
+                      colorSecondaryForeground: '#1A1523',
+                      colorCounter: '#E5484D',
+                      colorCounterForeground: 'white',
+                      colorNeutral: 'black',
+                      fontSize: 'inherit',
+                      borderRadius: '0.375rem',
+                    },
+                    elements: {
+                      notificationListNewNotificationsNotice__button: {
+                        background: '#2b6cb0',
+                      },
+                      notificationListContainer: {
+                        paddingRight: '10px',
+                      },
+                      inboxHeader: {
+                        padding: '8px 16px',
+                      },
+                      inboxStatus__dropdownTrigger: {
+                        gap: '2px',
+                      },
+                      moreActionsContainer: {
+                        marginRight: '-4px',
+                      },
+                      inboxStatus__title: {
+                        fontSize: '14px',
+                        fontWeight: '500',
+                      },
+                      bellContainer: {
+                        display: 'none',
+                      },
+                      preferences__button: {
+                        display: 'none',
+                      },
+                      popoverContent: {
+                        width: '100%',
+                        maxWidth: '390px',
+                        height: 'calc(100% - 136px)',
+                        maxHeight: '100%',
+                        borderRadius: '0px',
+                        overflow: 'auto',
+                        boxShadow:
+                          'rgba(15, 15, 15, 0.04) 0px 0px 0px 1px, rgba(15, 15, 15, 0.03) 0px 3px 6px, rgba(15, 15, 15, 0.06) 0px 9px 24px',
+                        backgroundColor: '#fff',
+                        marginTop: '-64px',
+                        marginLeft: '-32px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                      },
+                      notificationImage: {
+                        borderRadius: '50%',
+                        width: '24px',
+                        height: '24px',
+                      },
+                      notificationDot: {
+                        marginTop: '2px',
+                        backgroundColor: '#0081F1',
+                      },
+                      notificationSubject: {
+                        color: 'black',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                      },
+                      notificationBody: {},
+                      notificationPrimaryAction__button: {
+                        variant: 'outline',
+                        paddingLeft: '8px',
+                        paddingRight: '8px',
+                        height: '26px',
+                        borderRadius: '4px',
+                        border: '0.5px solid #dfdfdf',
+                        fontWeight: '500',
+                        backgroundColor: 'transparent',
+                        color: 'black',
+                        fontSize: '14px',
+                      },
+                      notificationSecondaryAction__button: {
+                        variant: 'outline',
+                        paddingLeft: '8px',
+                        paddingRight: '8px',
+                        height: '26px',
+                        borderRadius: '4px',
+                        border: '0.5px solid #dfdfdf',
+                        fontWeight: '500',
+                        backgroundColor: 'transparent',
+                        color: 'black',
+                        fontSize: '14px',
+                      },
+                    },
+                  }}
+                >
                   <Notifications />
                 </Inbox>
               </div>
             )}
             {selectedStyle === 'full-width' && (
               <div className="mt-10 max-h-[400px] min-h-[200px] w-full">
-                <Inbox applicationIdentifier="123" subscriberId="123">
+                <Inbox
+                  applicationIdentifier="123"
+                  subscriberId="123"
+                  appearance={{
+                    ...novuAppearance,
+                    elements: {
+                      ...novuAppearance.elements,
+                      root: {
+                        height: '100%',
+                        width: '100%',
+                        borderRadius: '12px',
+                      },
+                      notificationList: {
+                        padding: '24px',
+                      },
+                    },
+                  }}
+                >
                   <Notifications />
                 </Inbox>
               </div>
