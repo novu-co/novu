@@ -138,7 +138,7 @@ export class SyncToEnvironmentUseCase {
       const stepDataDto = await this.buildStepDataUsecase.execute({
         workflowIdentifierOrInternalId: command.identifierOrInternalId,
         stepId: originStep.stepId,
-        _stepId: step._id,
+        _stepId: originStep._id,
         user: command.user,
       });
 
