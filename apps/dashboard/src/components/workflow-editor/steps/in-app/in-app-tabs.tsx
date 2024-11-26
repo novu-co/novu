@@ -42,7 +42,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
   const newFormValues = useMemo(() => merge(buildDefaultValues(uiSchema ?? {}), values), [uiSchema, values]);
 
   const form = useForm({
-    mode: 'onSubmit',
+    mode: 'onChange',
     resolver: zodResolver(schema),
     values: newFormValues,
     shouldFocusError: true,
