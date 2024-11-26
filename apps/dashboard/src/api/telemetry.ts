@@ -1,5 +1,6 @@
 import { OrganizationTypeEnum, CompanySizeEnum, JobTitleEnum } from '@novu/shared';
 import { post } from './api.client';
+import * as Sentry from '@sentry/react';
 
 export const sendTelemetry = async (event: string, data?: Record<string, unknown>): Promise<void> => {
   await post('/telemetry/measure', {
@@ -22,5 +23,6 @@ export const identifyUser = async (userData: IdentifyUserProps) => {
     await post('/telemetry/identify', userData);
   } catch (error) {
     console.error('Error identifying user:', error);
+    Sentry.captureException(error);
   }
 };

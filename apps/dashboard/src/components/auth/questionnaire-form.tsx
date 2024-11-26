@@ -12,6 +12,7 @@ import { useTelemetry } from '../../hooks';
 import { TelemetryEvent } from '../../utils/telemetry';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../utils/routes';
+import { useMutation } from '@tanstack/react-query';
 
 interface QuestionnaireFormData {
   jobTitle: JobTitleEnum;
@@ -19,12 +20,18 @@ interface QuestionnaireFormData {
   companySize?: CompanySizeEnum;
 }
 
+interface SubmitQuestionnaireData {
+  jobTitle: JobTitleEnum;
+  organizationType: OrganizationTypeEnum;
+  companySize?: CompanySizeEnum;
+  pageUri: string;
+  pageName: string;
+  hubspotContext: string;
+}
+
 export function QuestionnaireForm() {
   const { control, watch, handleSubmit } = useForm<QuestionnaireFormData>();
-  const track = useTelemetry();
-  const navigate = useNavigate();
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitQuestionnaireMutation = useSubmitQuestionnaire();
 
   const selectedJobTitle = watch('jobTitle');
   const selectedOrgType = watch('organizationType');
@@ -42,53 +49,30 @@ export function QuestionnaireForm() {
   }, [selectedJobTitle, selectedOrgType, shouldShowCompanySize, companySize]);
 
   const onSubmit = async (data: QuestionnaireFormData) => {
-    setIsSubmitting(true);
+    const hubspotContext = hubspotCookie.get();
 
-    try {
-      await updateClerkOrgMetadata({
-        companySize: data.companySize,
-        jobTitle: data.jobTitle,
-        organizationType: data.organizationType,
-      });
-
-      const hubspotContext = hubspotCookie.get();
-
-      await identifyUser({
-        jobTitle: data.jobTitle,
-        pageUri: window.location.href,
-        pageName: 'Create Organization Form',
-        hubspotContext: hubspotContext || '',
-        companySize: data.companySize,
-        organizationType: data.organizationType,
-      });
-
-      track(TelemetryEvent.CREATE_ORGANIZATION_FORM_SUBMITTED, {
-        location: 'web',
-        jobTitle: data.jobTitle,
-        companySize: data.companySize,
-        organizationType: data.organizationType,
-      });
-
-      navigate(ROUTES.USECASE_SELECT);
-    } finally {
-      setIsSubmitting(false);
-    }
+    submitQuestionnaireMutation.mutate({
+      ...data,
+      pageUri: window.location.href,
+      pageName: 'Create Organization Form',
+      hubspotContext: hubspotContext || '',
+    });
   };
 
   return (
     <>
-      <div className="w-[564px] px-0 py-[60px]">
+      <div className="w-full max-w-[564px] px-0 pt-[80px]">
         <div className="flex flex-col items-center gap-8">
           <div className="flex w-[350px] flex-col gap-1">
             <div className="flex w-full items-center gap-1.5">
               <div className="flex flex-1 flex-col gap-1">
                 <StepIndicator step={2} />
-                <CardTitle className="text-lg font-medium text-[#232529]">
+                <CardTitle className="text-foreground-900 text-lg font-medium">
                   Help us personalize your experience
                 </CardTitle>
               </div>
             </div>
-            <CardDescription className="text-xs text-[#99A0AE]">
+            <CardDescription className="text-foreground-400 text-xs">
               This helps us set up Novu to match your goals and plan features and improvements.
             </CardDescription>
           </div>
@@ -96,7 +80,7 @@ export function QuestionnaireForm() {
           <form onSubmit={handleSubmit(onSubmit)} className="flex w-[350px] flex-col gap-8">
             <div className="flex flex-col gap-7">
               <div className="flex flex-col gap-[4px]">
-                <label className="text-xs font-medium text-[#525866]">Job title</label>
+                <label className="text-foreground-600 text-xs font-medium">Job title</label>
                 <Controller
                   name="jobTitle"
                   control={control}
@@ -182,8 +166,8 @@ export function QuestionnaireForm() {
 
             {isFormValid && (
               <div className="flex flex-col gap-3">
-                <Button variant="primary" type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? 'Creating...' : 'Get started'}
+                <Button className="bg-black" type="submit" disabled={submitQuestionnaireMutation.isPending}>
+                  {submitQuestionnaireMutation.isPending ? 'Creating...' : 'Get started'}
                 </Button>
               </div>
             )}
@@ -196,4 +180,38 @@ export function QuestionnaireForm() {
       </div>
     </>
   );
+}
+
+function useSubmitQuestionnaire() {
+  const track = useTelemetry();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: async (data: SubmitQuestionnaireData) => {
+      await updateClerkOrgMetadata({
+        companySize: data.companySize,
+        jobTitle: data.jobTitle,
+        organizationType: data.organizationType,
+      });
+
+      await identifyUser({
+        jobTitle: data.jobTitle,
+        pageUri: data.pageUri,
+        pageName: data.pageName,
+        hubspotContext: data.hubspotContext,
+        companySize: data.companySize,
+        organizationType: data.organizationType,
+      });
+
+      track(TelemetryEvent.CREATE_ORGANIZATION_FORM_SUBMITTED, {
+        location: 'web',
+        jobTitle: data.jobTitle,
+        companySize: data.companySize,
+        organizationType: data.organizationType,
+      });
+    },
+    onSuccess: () => {
+      navigate(ROUTES.USECASE_SELECT);
+    },
+  });
 }

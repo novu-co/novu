@@ -1,10 +1,32 @@
 import { RiArrowLeftSLine } from 'react-icons/ri';
 import { cn } from '../../utils/ui';
+import { useNavigate } from 'react-router-dom';
 
-export function StepIndicator({ step, className }: { step: number; className?: string }) {
+interface StepIndicatorProps {
+  step: number;
+  className?: string;
+  hideBackButton?: boolean;
+}
+
+export function StepIndicator({ step, className, hideBackButton }: StepIndicatorProps) {
+  const navigate = useNavigate();
+
+  function handleGoBack() {
+    navigate(-1);
+  }
+
   return (
     <div className={cn('inline-flex items-center gap-0.5 text-[#525866]', className)}>
-      <RiArrowLeftSLine className="h-4 w-4" />
+      {!hideBackButton && (
+        <button
+          onClick={handleGoBack}
+          className="transition-colors hover:text-gray-700"
+          type="button"
+          aria-label="Go back to previous step"
+        >
+          <RiArrowLeftSLine className="h-4 w-4" />
+        </button>
+      )}
       <span className="font-label-x-small text-xs">{step}/3</span>
     </div>
   );
