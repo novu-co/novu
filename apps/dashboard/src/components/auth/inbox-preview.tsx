@@ -51,7 +51,7 @@ export function InboxPreview() {
   const [openAccordion, setOpenAccordion] = useState<string | undefined>('layout');
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col overflow-hidden">
       <div className="flex items-center justify-between gap-4 border-b p-4">
         <div className="flex items-start gap-1">
           <Button variant="ghost" size="icon" className="mt-[5px] h-5 w-5">
@@ -168,7 +168,7 @@ export function InboxPreview() {
           </div>
         </div>
 
-        <div className="w-full border-l">
+        <div className="max-h-[610px] w-full border-l">
           {selectedStyle === 'popover' && (
             <div className="relative flex h-full w-full flex-col items-center">
               <div className="mt-10 flex w-full max-w-[440px] items-center justify-end">
