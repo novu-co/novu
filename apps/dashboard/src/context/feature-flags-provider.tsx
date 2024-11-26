@@ -17,6 +17,12 @@ const LD_CONFIG = {
 } as const;
 
 const AsyncFeatureFlagsProvider = lazy(async () => {
+  if (!LAUNCH_DARKLY_CLIENT_SIDE_ID) {
+    return {
+      default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    };
+  }
+
   const LaunchDarklyProvider = await asyncWithLDProvider(LD_CONFIG);
   return {
     default: ({ children }: { children: React.ReactNode }) => <LaunchDarklyProvider>{children}</LaunchDarklyProvider>,
