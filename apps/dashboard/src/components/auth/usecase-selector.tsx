@@ -2,6 +2,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent } from '../primitives/card';
 import { ChannelTypeEnum } from '@novu/shared';
 import { Usecase } from './usecases-list.utils';
+import { StepIndicator } from './shared';
 
 interface UsecaseSelectOnboardingProps {
   onHover: (id: ChannelTypeEnum | null) => void;
@@ -20,11 +21,8 @@ export function UsecaseSelectOnboarding({
     <div className="flex w-full flex-col items-center justify-center">
       <div className="flex w-full flex-col items-center gap-8">
         <div className="flex w-full flex-col items-start gap-1">
-          <div className="flex w-full items-center gap-1.5">
-            <div className="flex items-center gap-0.5">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="text-xs text-[#717784]">3/3</span>
-            </div>
+          <div>
+            <StepIndicator step={3} />
           </div>
 
           <div className="flex flex-col gap-1">
