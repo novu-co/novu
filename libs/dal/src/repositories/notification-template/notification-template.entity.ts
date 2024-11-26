@@ -86,8 +86,8 @@ export class NotificationTemplateEntity implements INotificationTemplate {
 
   rawData?: any;
 
-  // TODO deprecate the string type after we are sure that all payload schemas are JSONSchemaDto
-  payloadSchema?: JSONSchemaDto | string;
+  // TODO deprecate the any type in behalf of JSONSchemaDto
+  payloadSchema?: any;
 
   issues: Record<string, ContentIssue[]>;
 
