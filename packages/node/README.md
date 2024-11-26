@@ -345,10 +345,14 @@ import { Novu } from '@novu/node';
 const novu = new Novu('<NOVU_SECRET_KEY>');
 
 // return subscriber preference for all workflows without inactive channels
-await novu.subscribers.getPreference('subscriberId', false);
+await novu.subscribers.getPreference('subscriberId', {
+  includeInactiveChannels: false,
+});
 
 // return subscriber preference for all workflows with inactive channels
-await novu.subscribers.getPreference('subscriberId', true);
+await novu.subscribers.getPreference('subscriberId', {
+  includeInactiveChannels: true,
+});
 ```
 
 - #### Get subscriber global preference
