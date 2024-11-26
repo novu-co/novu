@@ -1,6 +1,7 @@
 import { ClassSerializerInterceptor, Controller, Get, Param, UseInterceptors } from '@nestjs/common';
 import { UserSessionData } from '@novu/shared';
 import { ApiTags } from '@nestjs/swagger';
+import { ApiExcludeController } from '@nestjs/swagger/dist/decorators/api-exclude-controller.decorator';
 import { UserSession } from '../shared/framework/user.decorator';
 import { GetEnvironmentTags, GetEnvironmentTagsCommand } from './usecases/get-environment-tags';
 import { ExternalApiAccessible } from '../auth/framework/external-api.decorator';
@@ -13,6 +14,7 @@ import { GetEnvironmentTagsDto } from './dtos/get-environment-tags.dto';
 @UseInterceptors(ClassSerializerInterceptor)
 @UserAuthentication()
 @ApiTags('Environments')
+@ApiExcludeController()
 export class EnvironmentsController {
   constructor(private getEnvironmentTagsUsecase: GetEnvironmentTags) {}
 
