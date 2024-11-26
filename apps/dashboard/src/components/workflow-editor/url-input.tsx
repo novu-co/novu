@@ -41,10 +41,11 @@ export const URLInput = ({
               control={control}
               name={urlKey}
               render={({ field }) => (
-                <FormItem className="w-full overflow-hidden">
+                <FormItem className="mr-auto min-w-px max-w-full">
                   <FormControl>
                     {asEditor ? (
                       <Editor
+                        asInput
                         fontFamily="inherit"
                         placeholder={placeholder}
                         extensions={[autocompletion({ override: [completions(variables)] })]}
