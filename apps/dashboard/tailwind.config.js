@@ -64,6 +64,9 @@ export default {
         DEFAULT: 'hsl(var(--primary))',
         foreground: 'hsl(var(--primary-foreground))',
       },
+      'primary-alpha': {
+        10: 'hsl(var(--primary-alpha-10))',
+      },
       accent: {
         DEFAULT: 'hsl(var(--accent))',
       },
@@ -185,7 +188,8 @@ export default {
         jingle: 'jingle 3s ease-in-out',
       },
       backgroundImage: {
-        'test-pattern': 'repeating-linear-gradient(135deg, hsl(var(--neutral-100)) 0, hsl(var(--neutral-100)) 2px, hsl(var(--neutral-200)) 2px, hsl(var(--neutral-200)) 4px)',
+        'test-pattern':
+          'repeating-linear-gradient(135deg, hsl(var(--neutral-100)) 0, hsl(var(--neutral-100)) 2px, hsl(var(--neutral-200)) 2px, hsl(var(--neutral-200)) 4px)',
       },
     },
   },
