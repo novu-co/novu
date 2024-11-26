@@ -164,13 +164,14 @@ export const SideNavigation = () => {
                   >
                     <motion.div
                       variants={{
-                        initial: { scale: 1, rotate: 0 },
+                        initial: { scale: 1, rotate: 0, opacity: 1 },
                         hover: {
                           scale: [1, 1.1, 1],
                           rotate: [0, 4, -4, 0],
+                          opacity: [0, 1, 1],
                           transition: {
                             duration: 2,
-                            repeat: Infinity,
+                            repeat: 0,
                             ease: 'easeInOut',
                           },
                         },
