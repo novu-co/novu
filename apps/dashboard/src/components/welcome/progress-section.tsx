@@ -1,37 +1,93 @@
-import { ArrowRight, CheckCircle, Loader2 } from 'lucide-react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent } from '../primitives/card';
-import { RiArrowRightDoubleFill, RiCheckLine, RiLoader3Line, RiLoaderLine } from 'react-icons/ri';
+import { RiArrowRightDoubleFill, RiCheckLine, RiLoader3Line } from 'react-icons/ri';
+import { useWorkflows } from '../../hooks/use-workflows';
+import { useOrganization } from '@clerk/clerk-react';
+import { ChannelTypeEnum } from '@novu/shared';
+import { Link } from 'react-router-dom';
+import { buildRoute, LEGACY_ROUTES } from '../../utils/routes';
+import { ROUTES } from '../../utils/routes';
+import { useEnvironment } from '../../context/environment/hooks';
+import { useIntegrations } from '../../hooks/use-integrations';
 
-const steps = [
-  {
-    title: 'Account creation',
-    description: "We know it's not always easy — take a moment to celebrate!",
-    status: 'completed',
-  },
-  {
-    title: 'Create a workflow',
-    description: 'Workflows in Novu, orchestrate notifications across channels.',
-    status: 'in-progress',
-  },
-  {
-    title: 'Connect SMS provider',
-    description: 'Connect your provider to send SMS notifications with Novu.',
-    status: 'pending',
-  },
-  {
-    title: 'Sync to production',
-    description: "It's time to send that notification, your users deserve",
-    status: 'pending',
-  },
-  {
-    title: 'Invite a team member?',
-    description: 'Need help from a team member, let them know',
-    status: 'pending',
-  },
-];
+enum StepIdEnum {
+  ACCOUNT_CREATION = 'account-creation',
+  CREATE_A_WORKFLOW = 'create-a-workflow',
+  INVITE_TEAM_MEMBER = 'invite-team-member',
+  SYNC_TO_PRODUCTION = 'sync-to-production',
+  CONNECT_EMAIL_PROVIDER = 'connect-email-provider',
+  CONNECT_IN_APP_PROVIDER = 'connect-in-app-provider',
+  CONNECT_PUSH_PROVIDER = 'connect-push-provider',
+  CONNECT_CHAT_PROVIDER = 'connect-chat-provider',
+  CONNECT_SMS_PROVIDER = 'connect-sms-provider',
+}
+
+interface Step {
+  id: StepIdEnum;
+  title: string;
+  description: string;
+  status: 'completed' | 'in-progress' | 'pending';
+}
 
 export function ProgressSection() {
+  const { currentEnvironment } = useEnvironment();
+  const { data: workflows } = useWorkflows();
+  const { organization } = useOrganization();
+  const { integrations } = useIntegrations();
+
+  console.log(integrations);
+  const hasInvitedTeamMember = useMemo(() => {
+    return organization?.membersCount && organization.membersCount > 1;
+  }, [organization?.membersCount]);
+
+  const providerType = useMemo(() => {
+    const metadata = organization?.publicMetadata as Record<string, unknown>;
+    const useCases = (metadata?.useCases as ChannelTypeEnum[]) || ['in-app'];
+
+    // If In App exists, we prioritize it over email, and fallback to the first use case
+    if (useCases.includes(ChannelTypeEnum.IN_APP)) return ChannelTypeEnum.IN_APP;
+    if (useCases.includes(ChannelTypeEnum.EMAIL)) return ChannelTypeEnum.EMAIL;
+
+    return useCases[0];
+  }, [organization?.publicMetadata]);
+
+  const steps: Step[] = useMemo(
+    () => [
+      {
+        id: StepIdEnum.ACCOUNT_CREATION,
+        title: 'Account creation',
+        description: "We know it's not always easy — take a moment to celebrate!",
+        status: 'completed',
+      },
+      {
+        id: StepIdEnum.CREATE_A_WORKFLOW,
+        title: 'Create a workflow',
+        description: 'Workflows in Novu, orchestrate notifications across channels.',
+        status: workflows && workflows.totalCount > 0 ? 'completed' : 'in-progress',
+      },
+      {
+        id: `connect-${providerType}-provider` as StepIdEnum,
+        title:
+          providerType === ChannelTypeEnum.IN_APP
+            ? 'Add an Inbox to your app'
+            : `Connect your ${providerType} provider`,
+        description: `Connect your provider to send ${providerType} notifications with Novu.`,
+        status: integrations?.some(
+          (integration) => integration.channel === providerType && !integration.providerId.startsWith('novu-')
+        )
+          ? 'completed'
+          : 'pending',
+      },
+      {
+        id: StepIdEnum.INVITE_TEAM_MEMBER,
+        title: 'Invite a team member?',
+        description: 'Need help from a team member, let them know',
+        status: hasInvitedTeamMember ? 'completed' : 'pending',
+      },
+    ],
+    [workflows, hasInvitedTeamMember, providerType, integrations]
+  );
+
   return (
     <Card className="relative flex items-stretch gap-2 rounded-xl border-neutral-100 shadow-none">
       <div className="flex w-full max-w-[380px] grow flex-col items-start justify-between gap-2 rounded-l-xl bg-[#FBFBFB] p-6">
@@ -64,21 +120,27 @@ export function ProgressSection() {
               )}
             </div>
 
-            <Card className="shadow-xs w-full p-1 transition-all duration-200 hover:translate-x-[1px] hover:cursor-pointer hover:shadow-md">
-              <CardContent className="flex flex-col rounded-[6px] bg-[#FBFBFB] px-2 py-1.5">
-                <div className="flex items-center justify-between">
-                  <span
-                    className={`text-xs ${
-                      step.status === 'completed' ? 'text-neutral-400 line-through' : 'text-neutral-600'
-                    }`}
-                  >
-                    {step.title}
-                  </span>
-                  <RiArrowRightDoubleFill className="h-4 w-4 text-neutral-400" />
-                </div>
-                <p className="text-[10px] leading-[14px] text-neutral-400">{step.description}</p>
-              </CardContent>
-            </Card>
+            <Link
+              to={getStepRoute(step.id, currentEnvironment?.slug).path}
+              reloadDocument={getStepRoute(step.id).isLegacy}
+              className="w-full"
+            >
+              <Card
+                className={`shadow-xs w-full p-1 ${step.status !== 'completed' ? 'transition-all duration-200 hover:translate-x-[1px] hover:shadow-md' : ''}`}
+              >
+                <CardContent className="flex flex-col rounded-[6px] bg-[#FBFBFB] px-2 py-1.5">
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`text-xs ${step.status === 'completed' ? 'text-neutral-400 line-through' : 'text-neutral-600'}`}
+                    >
+                      {step.title}
+                    </span>
+                    <RiArrowRightDoubleFill className="h-4 w-4 text-neutral-400" />
+                  </div>
+                  <p className="text-[10px] leading-[14px] text-neutral-400">{step.description}</p>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         ))}
       </div>
@@ -134,4 +196,33 @@ function NovuLogo() {
       </defs>
     </svg>
   );
+}
+
+function getStepRoute(stepId: StepIdEnum, environmentSlug: string = '') {
+  switch (stepId) {
+    case StepIdEnum.CREATE_A_WORKFLOW:
+      return {
+        path: buildRoute(ROUTES.WORKFLOWS, { environmentSlug }),
+        isLegacy: false,
+      };
+    case StepIdEnum.CONNECT_EMAIL_PROVIDER:
+    case StepIdEnum.CONNECT_IN_APP_PROVIDER:
+    case StepIdEnum.CONNECT_PUSH_PROVIDER:
+    case StepIdEnum.CONNECT_CHAT_PROVIDER:
+    case StepIdEnum.CONNECT_SMS_PROVIDER:
+      return {
+        path: LEGACY_ROUTES.INTEGRATIONS,
+        isLegacy: true,
+      };
+    case StepIdEnum.INVITE_TEAM_MEMBER:
+      return {
+        path: LEGACY_ROUTES.INVITE_TEAM_MEMBERS,
+        isLegacy: true,
+      };
+    default:
+      return {
+        path: '#',
+        isLegacy: false,
+      };
+  }
 }
