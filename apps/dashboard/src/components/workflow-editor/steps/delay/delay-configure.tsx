@@ -1,5 +1,5 @@
 import { Separator } from '@/components/primitives/separator';
-import { SidebarContent } from '@/components/side-navigation/Sidebar';
+import { SidebarContent } from '@/components/side-navigation/sidebar';
 import { CommonFields } from '@/components/workflow-editor/steps/common-fields';
 import { useBlocker, useParams } from 'react-router-dom';
 import { flattenIssues } from '@/components/workflow-editor/step-utils';
@@ -86,8 +86,6 @@ export const DelayConfigure = () => {
 
   const onSubmit = useCallback(
     async (data: z.infer<typeof delayControlsSchema>) => {
-      console.log('submit', data);
-
       if (!workflow) {
         return false;
       }
