@@ -5,4 +5,5 @@ export enum TelemetryEvent {
   CREATE_ORGANIZATION_FORM_SUBMITTED = 'Create Organization Form Submitted',
   USE_CASE_SELECTED = 'Use Case Selected',
   USE_CASE_SKIPPED = 'Use Case Skipped',
+  RESOURCE_CLICKED = 'Resource clicked - [Welcome]',
 }

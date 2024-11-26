@@ -11,21 +11,25 @@ const helpfulResources: Resource[] = [
     title: "Let's meet? Let's chat about notifications.",
     duration: '15m meet',
     image: 'calendar_schedule.png',
+    url: 'https://cal.com/novu/30min',
   },
   {
-    title: 'View our code on GitHub',
-    duration: '5m read',
+    title: 'Join our community on Discord',
+    duration: '30s',
+    image: 'calendar_schedule.png',
+    url: 'https://discord.gg/novu',
+  },
+  {
+    title: 'Star us on GitHub',
+    duration: '10s for happiness',
     image: 'view_code.png',
-  },
-  {
-    title: 'No-Code tools to manage your notifications.',
-    duration: '5m read',
-    image: 'compliance.png',
+    url: 'https://github.com/novuhq/novu',
   },
   {
     title: 'Security & Compliance with Novu',
     duration: '5m read',
     image: 'compliance.png',
+    url: 'https://trust.novu.co/',
   },
 ];
 

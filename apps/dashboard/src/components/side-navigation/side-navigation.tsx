@@ -167,7 +167,7 @@ export const SideNavigation = () => {
                         initial: { scale: 1, rotate: 0 },
                         hover: {
                           scale: [1, 1.1, 1],
-                          rotate: [0, 3, -3, 0],
+                          rotate: [0, 4, -4, 0],
                           transition: {
                             duration: 2,
                             repeat: Infinity,
