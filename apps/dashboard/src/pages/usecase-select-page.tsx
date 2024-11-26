@@ -91,14 +91,14 @@ export function UsecaseSelectPage() {
           </form>
         </div>
 
-        <div className="flex h-full w-full max-w-[640px] flex-1 justify-center border-l border-l-neutral-200">
+        <div className="flex h-full w-full max-w-[640px] flex-1 items-center justify-center border-l border-l-neutral-200 px-10">
           <AnimatePresence mode="wait">
             {displayedUseCase && (
               <motion.img
                 key={displayedUseCase}
                 src={`/images/auth/${channelOptions.find((option) => option.id === displayedUseCase)?.image}`}
                 alt={`${displayedUseCase}-usecase-illustration`}
-                className="h-auto w-full object-contain"
+                className="h-auto max-h-[500px] w-full object-contain"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

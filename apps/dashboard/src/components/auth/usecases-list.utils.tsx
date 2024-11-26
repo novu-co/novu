@@ -15,20 +15,20 @@ export interface Usecase {
 
 export const channelOptions: Usecase[] = [
   {
-    icon: STEP_TYPE_TO_ICON[StepTypeEnum.EMAIL],
-    title: 'E-Mail',
-    color: STEP_TYPE_TO_COLOR[StepTypeEnum.EMAIL],
-    id: ChannelTypeEnum.EMAIL,
-    description: 'Sends Emails to your users',
-    image: 'email-preview.svg',
-  },
-  {
     icon: STEP_TYPE_TO_ICON[StepTypeEnum.IN_APP],
     title: 'Inbox',
     color: STEP_TYPE_TO_COLOR[StepTypeEnum.IN_APP],
     id: ChannelTypeEnum.IN_APP,
     description: 'Embed real-time <Inbox/> in your product',
-    image: 'in_app-preview.svg',
+    image: 'in_app-preview.webp',
+  },
+  {
+    icon: STEP_TYPE_TO_ICON[StepTypeEnum.EMAIL],
+    title: 'E-Mail',
+    color: STEP_TYPE_TO_COLOR[StepTypeEnum.EMAIL],
+    id: ChannelTypeEnum.EMAIL,
+    description: 'Sends Emails to your users',
+    image: 'email-preview.webp',
   },
   {
     icon: STEP_TYPE_TO_ICON[StepTypeEnum.SMS],
@@ -52,6 +52,6 @@ export const channelOptions: Usecase[] = [
     color: STEP_TYPE_TO_COLOR[StepTypeEnum.CHAT],
     id: ChannelTypeEnum.CHAT,
     description: 'Send Slack and other chat notifications',
-    image: 'chat-preview.svg',
+    image: 'chat-preview.webp',
   },
 ];
