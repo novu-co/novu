@@ -161,13 +161,13 @@ export const SideNavigation = () => {
                   className="bg-primary-alpha-10 text-primary inline-flex items-center gap-0.5 px-1 py-0.5 leading-4"
                 >
                   <motion.div
-                    animate={{
+                    whileHover={{
                       scale: [1, 1.2, 1],
                       rotate: [0, 5, -5, 0],
                     }}
                     transition={{
                       duration: 2,
-                      repeat: Infinity,
+                      repeat: 0,
                       ease: 'easeInOut',
                     }}
                   >
