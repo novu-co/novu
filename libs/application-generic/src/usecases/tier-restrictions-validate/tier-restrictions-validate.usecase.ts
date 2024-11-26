@@ -58,7 +58,7 @@ export class TierRestrictionsValidateUsecase {
         issues.push({
           error: ErrorEnum.TIER_LIMIT_EXCEEDED,
           message:
-            `The maximum delay allowed is ${BUSINESS_TIER_MAX_DELAY_DAYS} days.` +
+            `The maximum delay allowed is ${BUSINESS_TIER_MAX_DELAY_DAYS} days. ` +
             'Please contact our support team to discuss extending this limit for your use case.',
         });
       }
@@ -69,7 +69,7 @@ export class TierRestrictionsValidateUsecase {
         issues.push({
           error: ErrorEnum.TIER_LIMIT_EXCEEDED,
           message:
-            `The maximum delay allowed is ${FREE_TIER_MAX_DELAY_DAYS} days.` +
+            `The maximum delay allowed is ${FREE_TIER_MAX_DELAY_DAYS} days. ` +
             'Please contact our support team to discuss extending this limit for your use case.',
         });
       }
