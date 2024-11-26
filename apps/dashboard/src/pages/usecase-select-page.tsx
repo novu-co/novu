@@ -13,34 +13,35 @@ import { PageMeta } from '../components/page-meta';
 import { useTelemetry } from '../hooks';
 import { TelemetryEvent } from '../utils/telemetry';
 import { channelOptions } from '../components/auth/usecases-list.utils';
+import { useMutation } from '@tanstack/react-query';
+import * as Sentry from '@sentry/react';
 
 export function UsecaseSelectPage() {
   const navigate = useNavigate();
   const track = useTelemetry();
-  const [loading, setIsLoading] = useState(false);
   const [selectedUseCases, setSelectedUseCases] = useState<ChannelTypeEnum[]>([]);
   const [hoveredUseCase, setHoveredUseCase] = useState<ChannelTypeEnum | null>(null);
 
-  const displayedUseCase = hoveredUseCase || (selectedUseCases.length > 0 ? selectedUseCases[0] : null);
+  const displayedUseCase =
+    hoveredUseCase || (selectedUseCases.length > 0 ? selectedUseCases[selectedUseCases.length - 1] : null);
 
-  async function handleContinue() {
-    setIsLoading(true);
-
-    try {
+  const { mutate: handleContinue, isPending } = useMutation({
+    mutationFn: async () => {
       await updateClerkOrgMetadata({
         useCases: selectedUseCases,
       });
-
+    },
+    onSuccess: () => {
       track(TelemetryEvent.USE_CASE_SELECTED, {
         useCases: selectedUseCases,
       });
       navigate(ROUTES.WORKFLOWS);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+    },
+    onError: (error) => {
+      console.error('Failed to update use cases:', error);
+      Sentry.captureException(error);
+    },
+  });
 
   function handleSkip() {
     track(TelemetryEvent.USE_CASE_SKIPPED);
@@ -50,8 +51,16 @@ export function UsecaseSelectPage() {
 
   function handleSelectUseCase(useCase: ChannelTypeEnum) {
     setSelectedUseCases((prev) =>
-      prev.includes(useCase) ? prev.filter((useCase) => useCase !== useCase) : [...prev, useCase]
+      prev.includes(useCase) ? prev.filter((item) => item !== useCase) : [...prev, useCase]
     );
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (selectedUseCases.length === 0 || isPending) return;
+
+    handleContinue();
   }
 
   return (
@@ -60,24 +69,26 @@ export function UsecaseSelectPage() {
 
       <AuthCard>
         <div className="flex w-[480px] justify-center px-0">
-          <div className="flex max-w-[480px] flex-col items-center justify-center gap-8 p-[60px]">
-            <UsecaseSelectOnboarding
-              channelOptions={channelOptions}
-              selectedUseCases={selectedUseCases}
-              onHover={(id) => setHoveredUseCase(id)}
-              onClick={(id) => handleSelectUseCase(id)}
-            />
+          <form onSubmit={handleSubmit} noValidate>
+            <div className="flex max-w-[480px] flex-col items-center justify-center gap-8 p-[60px]">
+              <UsecaseSelectOnboarding
+                channelOptions={channelOptions}
+                selectedUseCases={selectedUseCases}
+                onHover={(id) => setHoveredUseCase(id)}
+                onClick={(id) => handleSelectUseCase(id)}
+              />
 
-            <div className="flex w-full flex-col items-center gap-3">
-              <Button disabled={selectedUseCases.length === 0 || loading} className="w-full" onClick={handleContinue}>
-                Continue
-                {loading && <RiLoader2Line className="animate-spin" />}
-              </Button>
-              <Button variant="link" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
-                Skip to Homepage
-              </Button>
+              <div className="flex w-full flex-col items-center gap-3">
+                <Button disabled={selectedUseCases.length === 0 || isPending} className="w-full" type="submit">
+                  Continue
+                  {isPending && <RiLoader2Line className="animate-spin" />}
+                </Button>
+                <Button type="button" variant="link" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
+                  Skip to Homepage
+                </Button>
+              </div>
             </div>
-          </div>
+          </form>
         </div>
 
         <div className="flex h-full w-full max-w-[640px] flex-1 justify-center border-l border-l-neutral-200">

@@ -10,7 +10,7 @@ export default function OrganizationCreate() {
       <AuthCard>
         <div className="flex min-w-[564px] max-w-[564px] items-center p-[60px]">
           <div className="flex flex-col gap-[4px]">
-            <StepIndicator className="pl-[20px]" step={1} />
+            <StepIndicator hideBackButton className="pl-[20px]" step={1} />
 
             <OrganizationListForm
               appearance={{
