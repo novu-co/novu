@@ -1,12 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Info, LightbulbIcon, Loader2 } from 'lucide-react';
 import { Button } from '../primitives/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../primitives/accordion';
-import { RiArrowLeftSLine, RiBellFill, RiInputField, RiLayoutLine, RiNotification2Fill } from 'react-icons/ri';
+import { RiArrowLeftSLine, RiInputField, RiLayoutLine, RiNotification2Fill } from 'react-icons/ri';
 import { InboxPreviewContent } from './inbox-preview-content';
 import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
 import { toast } from 'sonner';
 import { useAuth } from '../../context/auth/hooks';
+import { getComponentByType } from '../workflow-editor/steps/component-utils';
+import { StepTypeEnum, UiComponentEnum, WorkflowCreationSourceEnum } from '@novu/shared';
+import { createWorkflow } from '../../api/workflows';
+import { useWorkflows } from '../../hooks/use-workflows';
+import { FormProvider, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 interface PreviewStyle {
   id: string;
@@ -21,19 +28,62 @@ const previewStyles: PreviewStyle[] = [
 ];
 
 export function InboxPreview() {
+  const form = useForm({
+    mode: 'onSubmit',
+    resolver: zodResolver(
+      z.object({
+        subject: z.string(),
+        body: z.string(),
+      })
+    ),
+    values: {
+      subject: 'Welcome to Inbox!',
+      body: 'This is your first notification. Customize and explore more features.',
+    },
+    shouldFocusError: true,
+  });
+
   const [selectedStyle, setSelectedStyle] = useState<string>('popover');
   const [openAccordion, setOpenAccordion] = useState<string | undefined>('layout');
   const { triggerWorkflow, isPending } = useTriggerWorkflow();
+  const { data } = useWorkflows();
   const auth = useAuth();
+
+  useEffect(() => {
+    if (!data) return;
+
+    (async () => {
+      const workflow = data?.workflows.find((workflow) => workflow.workflowId === 'onboarding-demo-workflow');
+
+      if (!workflow) {
+        await createWorkflow({
+          name: 'Onboarding Demo Workflow',
+          description: 'A demo workflow to showcase the Inbox component',
+          workflowId: 'onboarding-demo-workflow',
+          steps: [
+            {
+              name: 'Inbox',
+              type: StepTypeEnum.IN_APP,
+              controlValues: {
+                subject: '{{payload.subject}}',
+                body: '{{payload.body}}',
+              },
+            },
+          ],
+          __source: WorkflowCreationSourceEnum.DASHBOARD,
+        });
+      }
+    })();
+  }, [data]);
 
   async function handleSendNotification() {
     try {
       await triggerWorkflow({
-        name: 'inbox-playground-onboarding',
+        name: 'onboarding-demo-workflow',
         to: auth.currentUser?._id,
         payload: {
-          title: 'Welcome to Inbox!',
-          content: 'This is your first notification. Customize and explore more features.',
+          subject: form.getValues('subject'),
+          body: form.getValues('body'),
         },
       });
 
@@ -136,17 +186,40 @@ export function InboxPreview() {
               </AccordionItem>
             </Accordion>
 
-            <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
-              <AccordionItem value="configure" className="bg-white p-0">
-                <AccordionTrigger className="bg-neutral-alpha-50 border-b p-2">
-                  <div className="flex items-center gap-1 text-xs">
-                    <RiInputField className="text-feature size-5" />
-                    Configure notification
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="flex flex-col gap-2 p-2">aaaa</AccordionContent>
-              </AccordionItem>
-            </Accordion>
+            <FormProvider {...form}>
+              <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
+                <AccordionItem value="configure" className="bg-white p-0">
+                  <AccordionTrigger className="bg-neutral-alpha-50 border-b p-2">
+                    <div className="flex items-center gap-1 text-xs">
+                      <RiInputField className="text-feature size-5" />
+                      Configure notification
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="flex flex-col gap-2 p-2">
+                    <div className="flex flex-col gap-1 p-1">
+                      <div className="flex gap-1">
+                        {getComponentByType({ component: UiComponentEnum.IN_APP_SUBJECT })}
+                      </div>
+                      {getComponentByType({ component: UiComponentEnum.IN_APP_BODY })}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </FormProvider>
+
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-neutral-100 bg-neutral-50 px-2 py-1.5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-[16px] items-center">
+                  <div className="h-full w-1 rounded-full bg-[#717784]" />
+                </div>
+                <div className="text-xs">
+                  <span className="font-medium">Send Again?</span> Edit the notification and resend
+                </div>
+              </div>
+              <Button variant="ghost" size="xs" className="p-0 text-xs font-medium text-[#DD2450] hover:bg-transparent">
+                Send again
+              </Button>
+            </div>
           </div>
 
           {/* Footer */}

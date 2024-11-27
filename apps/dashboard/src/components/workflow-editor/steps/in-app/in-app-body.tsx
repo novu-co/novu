@@ -41,7 +41,6 @@ export const InAppBody = () => {
               />
             </InputField>
           </FormControl>
-          <FormMessage>{`Type {{ for variables, or wrap text in ** for bold.`}</FormMessage>
         </FormItem>
       )}
     />
