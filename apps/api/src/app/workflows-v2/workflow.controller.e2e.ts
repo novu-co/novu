@@ -447,6 +447,9 @@ describe('Workflow Controller E2E API Testing', () => {
     it('should promote by creating a new workflow in production environment with the same properties', async () => {
       // Create a workflow in the development environment
       const devWorkflow = await createWorkflowAndValidate('-promote-workflow');
+      await workflowsClient.patchWorkflowStepData(devWorkflow._id, devWorkflow.steps[0]._id, {
+        controlValues: { vinyl: 'vinyl', color: 'red', band: 'beatles' },
+      });
 
       // Switch to production environment and get its ID
       const devEnvironmentId = session.environment._id;

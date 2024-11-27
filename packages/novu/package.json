@@ -1,6 +1,6 @@
 {
   "name": "novu",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Novu CLI. Run Novu Studio and sync workflows with Novu Cloud",
   "main": "src/index.js",
   "publishConfig": {
@@ -91,6 +91,8 @@
     "async-sema": "3.0.1"
   },
   "nx": {
-    "tags": ["package:public"]
+    "tags": [
+      "package:public"
+    ]
   }
 }
