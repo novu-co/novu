@@ -33,7 +33,10 @@ export class GetWorkflowByIdsUseCase {
   ): Promise<WorkflowInternalResponseDto> {
     const workflowEntity = await this.getDbWorkflow(command);
 
-    const workflowPreferences = await this.getWorkflowPreferences(command);
+    const workflowPreferences = await this.getWorkflowPreferences(
+      command,
+      workflowEntity,
+    );
 
     /**
      * @deprecated - use `userPreferences` and `defaultPreferences` instead
@@ -92,9 +95,16 @@ export class GetWorkflowByIdsUseCase {
   }
 
   @Instrument()
-  private async getWorkflowPreferences(command: GetWorkflowByIdsCommand) {
+  private async getWorkflowPreferences(
+    command: GetWorkflowByIdsCommand,
+    workflowEntity: NotificationTemplateEntity,
+  ) {
     return await this.getPreferences.safeExecute(
-      GetPreferencesCommand.create(command),
+      GetPreferencesCommand.create({
+        environmentId: command.environmentId,
+        organizationId: command.organizationId,
+        templateId: workflowEntity._id,
+      }),
     );
   }
 }
