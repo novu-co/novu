@@ -113,7 +113,7 @@ describe('Workflow Controller E2E API Testing', () => {
         expect(res.isSuccessResult()).to.be.false;
         expect(res.error?.responseText).to.include('description must be shorter than or equal to 256 characters');
       });
-      it('UPDATE: should respond with 400 when description is too long', async () => {
+      it('should respond with 400 when description is too long on an update call', async () => {
         const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('nameSuffix');
 
         const res = await workflowsClient.createWorkflow(createWorkflowDto);
