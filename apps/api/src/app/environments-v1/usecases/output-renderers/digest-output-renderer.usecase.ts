@@ -1,5 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DigestRenderOutput } from '@novu/shared';
+import { InstrumentUsecase } from '@novu/application-generic';
 import { RenderCommand } from './render-command';
 import {
   DigestControlSchemaType,
@@ -10,6 +11,7 @@ import {
 
 @Injectable()
 export class DigestOutputRendererUsecase {
+  @InstrumentUsecase()
   execute(renderCommand: RenderCommand): DigestRenderOutput {
     const parse: DigestControlSchemaType = DigestControlZodSchema.parse(renderCommand.controlValues);
     if (
