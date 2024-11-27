@@ -1,0 +1,172 @@
+import { useState } from 'react';
+import { Info, LightbulbIcon, Loader2 } from 'lucide-react';
+import { Button } from '../primitives/button';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../primitives/accordion';
+import { RiArrowLeftSLine, RiBellFill, RiInputField, RiLayoutLine, RiNotification2Fill } from 'react-icons/ri';
+import { InboxPreviewContent } from './inbox-preview-content';
+import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
+import { toast } from 'sonner';
+import { useAuth } from '../../context/auth/hooks';
+
+interface PreviewStyle {
+  id: string;
+  label: string;
+  image: string;
+}
+
+const previewStyles: PreviewStyle[] = [
+  { id: 'popover', label: 'Popover', image: '/images/auth/popover-layout.svg' },
+  { id: 'sidebar', label: 'Side Menu', image: '/images/auth/sidebar-layout.svg' },
+  { id: 'full-width', label: 'Full Width', image: '/images/auth/full-width-layout.svg' },
+];
+
+export function InboxPreview() {
+  const [selectedStyle, setSelectedStyle] = useState<string>('popover');
+  const [openAccordion, setOpenAccordion] = useState<string | undefined>('layout');
+  const { triggerWorkflow, isPending } = useTriggerWorkflow();
+  const auth = useAuth();
+
+  async function handleSendNotification() {
+    try {
+      await triggerWorkflow({
+        name: 'inbox-playground-onboarding',
+        to: auth.currentUser?._id,
+        payload: {
+          title: 'Welcome to Inbox!',
+          content: 'This is your first notification. Customize and explore more features.',
+        },
+      });
+
+      toast.success('Notification sent successfully!');
+    } catch (error) {
+      toast.error('Failed to send notification');
+    }
+  }
+
+  return (
+    <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex items-center justify-between gap-4 border-b p-4">
+        <div className="flex items-start gap-1">
+          <Button variant="ghost" size="icon" className="mt-[5px] h-5 w-5">
+            <RiArrowLeftSLine className="h-5 w-5" />
+          </Button>
+
+          <div className="flex-1">
+            <h2 className="text-lg font-medium">Send your first Inbox notification</h2>
+            <p className="text-foreground-400 text-sm">Customise your notification and hit 'Send notification' 🎉</p>
+          </div>
+        </div>
+
+        <Button variant="link" className="text-foreground-600 text-xs">
+          Skip, I'll explore myself
+        </Button>
+      </div>
+
+      <div className="flex flex-1">
+        <div className="flex min-w-[480px] flex-col">
+          <div className="space-y-3 p-3">
+            <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
+              <AccordionItem value="layout" className="bg-white p-0">
+                <AccordionTrigger className="bg-neutral-alpha-50 border-b p-2">
+                  <div className="flex items-center gap-1 text-xs">
+                    <RiLayoutLine className="text-feature size-5" />
+                    Customize Inbox
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="flex flex-col gap-2 p-2">
+                  <div className="grid grid-cols-3 gap-2.5">
+                    {previewStyles.map((style) => (
+                      <div
+                        key={style.id}
+                        className={`group relative h-[100px] cursor-pointer overflow-hidden rounded-lg border transition-all duration-200 active:scale-[0.98] ${
+                          selectedStyle === style.id
+                            ? 'shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05),0px_0px_0px_2px_#F2F4F7,0px_0px_2px_0px_#E0E0E0,0px_1px_4px_-2px_rgba(24,39,75,0.02),0px_4px_4px_-2px_rgba(24,39,75,0.06)]'
+                            : 'hover:shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05),0px_0px_0px_2px_#F2F4F7,0px_0px_2px_0px_#E0E0E0,0px_1px_4px_-2px_rgba(24,39,75,0.02),0px_4px_4px_-2px_rgba(24,39,75,0.06)]'
+                        }`}
+                        style={{
+                          backgroundImage: `url(${style.image})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'top',
+                        }}
+                        onClick={() => setSelectedStyle(style.id)}
+                        role="radio"
+                        aria-checked={selectedStyle === style.id}
+                        tabIndex={0}
+                      >
+                        <div
+                          className={`absolute bottom-0 w-full translate-y-full transform border-t bg-neutral-50/90 text-center opacity-0 transition-all duration-200 ease-out group-hover:translate-y-0 group-hover:opacity-100 ${selectedStyle === style.id ? '!translate-y-0 !opacity-100' : ''}`}
+                        >
+                          <span className="text-[11px] leading-[24px]">{style.label}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <div className="flex-1 rounded-lg border p-0.5">
+                        <div className="flex items-center justify-between p-2">
+                          <span className="text-sm">Primary color</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-muted-foreground text-sm">#DD2450</span>
+                            <div className="h-4 w-4 rounded border bg-[#dd2450] shadow-sm" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex-1 rounded-lg border p-0.5">
+                        <div className="flex items-center justify-between p-2">
+                          <span className="text-sm">Appearance: Light mode</span>
+                          <LightbulbIcon className="h-4 w-4" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-1 text-xs">
+                      <Info className="text-foreground-400 mt-0.5 h-4 w-4" />
+                      <p className="text-foreground-400 leading-[21px]">
+                        The Inbox is completely customizable, using the{' '}
+                        <a href="#" className="cursor-pointer underline">
+                          appearance prop
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+
+            <Accordion type="single" collapsible value={openAccordion} onValueChange={setOpenAccordion}>
+              <AccordionItem value="configure" className="bg-white p-0">
+                <AccordionTrigger className="bg-neutral-alpha-50 border-b p-2">
+                  <div className="flex items-center gap-1 text-xs">
+                    <RiInputField className="text-feature size-5" />
+                    Configure notification
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="flex flex-col gap-2 p-2">aaaa</AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+
+          {/* Footer */}
+          <div className="bg-muted mt-auto border-t">
+            <div className="flex justify-end gap-3 p-2">
+              <Button variant="ghost" size="sm" className="gap-1">
+                Copy cURL
+              </Button>
+              <Button size="sm" onClick={handleSendNotification} disabled={isPending} className="px-2">
+                Send notification
+                {isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <RiNotification2Fill className="h-3 w-3" />}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-h-[610px] w-full border-l">
+          <InboxPreviewContent selectedStyle={selectedStyle} />
+        </div>
+      </div>
+    </div>
+  );
+}
