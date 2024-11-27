@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { type WidgetProps } from '@rjsf/utils';
 import { useFormContext } from 'react-hook-form';
+import { EditorView } from '@uiw/react-codemirror';
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';
@@ -8,10 +9,14 @@ import { completions } from '@/utils/liquid-autocomplete';
 import { capitalize } from '@/utils/string';
 import { autocompletion } from '@codemirror/autocomplete';
 import { getFieldName } from './template-utils';
+import { useStepEditorContext } from '../hooks';
+import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 
 export function TextWidget(props: WidgetProps) {
   const { label, readonly, disabled, id, required } = props;
   const { control } = useFormContext();
+  const { step } = useStepEditorContext();
+  const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
 
   const extractedName = useMemo(() => getFieldName(id), [id]);
   const isNumberType = useMemo(() => props.schema.type === 'number', [props.schema.type]);
@@ -45,7 +50,7 @@ export function TextWidget(props: WidgetProps) {
                   fontFamily="inherit"
                   placeholder={capitalize(label)}
                   id={label}
-                  extensions={[autocompletion({ override: [completions([])] })]}
+                  extensions={[autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping]}
                   readOnly={readonly || disabled}
                   {...field}
                 />
