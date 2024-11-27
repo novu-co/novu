@@ -9,6 +9,7 @@
     "build:dashboard": "nx build @novu/dashboard",
     "build:embed": "nx build @novu/embed",
     "build:inbound-mail": "nx build @novu/inbound-mail",
+    "build:packages": "nx run-many --target=build --all --projects=tag:package:public",
     "build:storybook": "nx run @novu/design-system:build-storybook",
     "build:web:for-dashboard": "nx build:web:for-dashboard @novu/web",
     "build:web": "nx build @novu/web",
