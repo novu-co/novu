@@ -1,6 +1,7 @@
 import { Body, ClassSerializerInterceptor, Controller, Get, Param, Post, Query, UseInterceptors } from '@nestjs/common';
 import { ApiRateLimitCostEnum, UserSessionData } from '@novu/shared';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeController } from '@nestjs/swagger/dist/decorators/api-exclude-controller.decorator';
 import { UserSession } from '../shared/framework/user.decorator';
 import { ApplyChange, ApplyChangeCommand } from './usecases';
 import { GetChanges } from './usecases/get-changes/get-changes.usecase';
@@ -24,6 +25,7 @@ import { SdkMethodName } from '../shared/framework/swagger/sdk.decorators';
 @UseInterceptors(ClassSerializerInterceptor)
 @UserAuthentication()
 @ApiTags('Changes')
+@ApiExcludeController()
 export class ChangesController {
   constructor(
     private applyChange: ApplyChange,

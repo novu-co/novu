@@ -1,4 +1,5 @@
 import { createMemo, createSignal, Match, Show, Switch } from 'solid-js';
+import { type OffsetOptions, type Placement } from '@floating-ui/dom';
 import { useInboxContext } from '../context';
 import { useStyle } from '../helpers';
 import type {
@@ -19,6 +20,8 @@ export type InboxProps = {
   onNotificationClick?: NotificationClickHandler;
   onPrimaryActionClick?: NotificationActionClickHandler;
   onSecondaryActionClick?: NotificationActionClickHandler;
+  placement?: Placement;
+  placementOffset?: OffsetOptions;
 };
 
 export enum InboxPage {
@@ -93,7 +96,7 @@ export const Inbox = (props: InboxProps) => {
   const isOpen = () => props?.open ?? isOpened();
 
   return (
-    <Popover.Root open={isOpen()} onOpenChange={setIsOpened}>
+    <Popover.Root open={isOpen()} onOpenChange={setIsOpened} placement={props.placement} offset={props.placementOffset}>
       <Popover.Trigger
         asChild={(triggerProps) => (
           <Button class={style('inbox__popoverTrigger')} variant="ghost" size="icon" {...triggerProps}>

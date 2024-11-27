@@ -3,15 +3,23 @@ import { DefaultProps, DefaultInboxProps, WithChildrenProps } from '../utils/typ
 import { Mounter } from './Mounter';
 import { useNovuUI } from '../context/NovuUIContext';
 import { useRenderer } from '../context/RendererContext';
-import { InternalNovuProvider, NovuProvider, useNovu, useUnsafeNovu } from '../hooks/NovuProvider';
+import { InternalNovuProvider, useNovu, useUnsafeNovu } from '../hooks/NovuProvider';
 import { NovuUI } from './NovuUI';
 import { withRenderer } from './Renderer';
 
 export type InboxProps = DefaultProps | WithChildrenProps;
 
 const _DefaultInbox = (props: DefaultInboxProps) => {
-  const { open, renderNotification, renderBell, onNotificationClick, onPrimaryActionClick, onSecondaryActionClick } =
-    props;
+  const {
+    open,
+    renderNotification,
+    renderBell,
+    onNotificationClick,
+    onPrimaryActionClick,
+    onSecondaryActionClick,
+    placement,
+    placementOffset,
+  } = props;
   const { novuUI } = useNovuUI();
   const { mountElement } = useRenderer();
 
@@ -28,6 +36,8 @@ const _DefaultInbox = (props: DefaultInboxProps) => {
           onNotificationClick,
           onPrimaryActionClick,
           onSecondaryActionClick,
+          placementOffset,
+          placement,
         },
         element,
       });
@@ -106,8 +116,16 @@ const InboxChild = React.memo((props: InboxProps) => {
     );
   }
 
-  const { open, renderNotification, renderBell, onNotificationClick, onPrimaryActionClick, onSecondaryActionClick } =
-    props;
+  const {
+    open,
+    renderNotification,
+    renderBell,
+    onNotificationClick,
+    onPrimaryActionClick,
+    onSecondaryActionClick,
+    placementOffset,
+    placement,
+  } = props;
 
   return (
     <NovuUI options={options} novu={novu}>
@@ -118,6 +136,8 @@ const InboxChild = React.memo((props: InboxProps) => {
         onNotificationClick={onNotificationClick}
         onPrimaryActionClick={onPrimaryActionClick}
         onSecondaryActionClick={onSecondaryActionClick}
+        placement={placement}
+        placementOffset={placementOffset}
       />
     </NovuUI>
   );
