@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EnvironmentRepository } from '@novu/dal';
+import { EnvironmentRepository, IntegrationRepository } from '@novu/dal';
 import { ChannelTypeEnum, InAppProviderIdEnum } from '@novu/shared';
 import {
   AnalyticsService,
@@ -27,7 +27,8 @@ export class Session {
     private authService: AuthService,
     private selectIntegration: SelectIntegration,
     private analyticsService: AnalyticsService,
-    private notificationsCount: NotificationsCount
+    private notificationsCount: NotificationsCount,
+    private integrationRepository: IntegrationRepository
   ) {}
 
   @LogDecorator()
@@ -87,6 +88,19 @@ export class Session {
     const token = await this.authService.getSubscriberWidgetToken(subscriber);
 
     const removeNovuBranding = inAppIntegration.removeNovuBranding || false;
+
+    if (!inAppIntegration.connected) {
+      await this.integrationRepository.updateOne(
+        {
+          _id: inAppIntegration._id,
+          _organizationId: environment._organizationId,
+          _environmentId: environment._id,
+        },
+        {
+          connected: true,
+        }
+      );
+    }
 
     return {
       token,
