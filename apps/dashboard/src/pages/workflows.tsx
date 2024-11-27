@@ -6,8 +6,17 @@ import { RiSearch2Line } from 'react-icons/ri';
 import { CreateWorkflowButton } from '@/components/create-workflow-button';
 import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';
+import { useTelemetry } from '../hooks';
+import { TelemetryEvent } from '../utils/telemetry';
+import { useEffect } from 'react';
 
 export const WorkflowsPage = () => {
+  const track = useTelemetry();
+
+  useEffect(() => {
+    track(TelemetryEvent.WORKFLOWS_PAGE_VISIT);
+  }, [track]);
+
   return (
     <>
       <PageMeta title="Workflows" />

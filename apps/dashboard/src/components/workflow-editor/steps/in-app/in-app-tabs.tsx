@@ -24,7 +24,6 @@ import { buildDefaultValues, buildDynamicZodSchema } from '@/utils/schema';
 import { useWorkflowEditorContext } from '../../hooks';
 import { flattenIssues } from '../../step-utils';
 import { CustomStepControls } from '../controls/custom-step-controls';
-import { useStep } from '../use-step';
 import { useStepEditorContext } from '@/components/workflow-editor/steps/hooks';
 import { NovuApiError } from '@/api/api.client';
 
@@ -35,22 +34,22 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
   const { stepSlug = '', workflowSlug = '' } = useParams<{ workflowSlug: string; stepSlug: string }>();
   const { resetWorkflowForm } = useWorkflowEditorContext();
   const { refetch: refetchStep } = useStepEditorContext();
-  const { step: workflowStep } = useStep();
 
   const { dataSchema, uiSchema, values } = step.controls;
   const schema = useMemo(() => buildDynamicZodSchema(dataSchema ?? {}), [dataSchema]);
   const newFormValues = useMemo(() => merge(buildDefaultValues(uiSchema ?? {}), values), [uiSchema, values]);
 
   const form = useForm({
-    mode: 'onSubmit',
+    mode: 'onChange',
     resolver: zodResolver(schema),
-    values: newFormValues,
+    defaultValues: newFormValues,
     shouldFocusError: true,
   });
+
   const [editorValue, setEditorValue] = useState('{}');
   const { formState, setError } = form;
 
-  const controlErrors = useMemo(() => flattenIssues(workflowStep?.issues?.controls), [workflowStep]);
+  const controlErrors = useMemo(() => flattenIssues(step?.issues?.controls), [step]);
 
   useEffect(() => {
     if (Object.keys(controlErrors).length) {
@@ -62,9 +61,10 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
 
   const { previewStep, data: previewData, isPending: isPreviewPending } = usePreviewStep();
   const { isPending, updateWorkflow } = useUpdateWorkflow({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       resetWorkflowForm(data);
-      refetchStep();
+      const step = await refetchStep();
+      form.reset(merge(buildDefaultValues(uiSchema ?? {}), step.data?.controls.values));
       showToast({
         children: () => (
           <>
