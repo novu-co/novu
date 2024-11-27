@@ -15,6 +15,10 @@ import { useState } from 'react';
 import { SnippetEditor } from '../workflow-editor/test-workflow/snippet-editor';
 import { SnippetLanguage } from '../workflow-editor/test-workflow/types';
 import { Button } from '../primitives/button';
+import { useIntegrations } from '../../hooks/use-integrations';
+import { useFetchEnvironments } from '../../context/environment/hooks';
+import { useAuth } from '../../context/auth/hooks';
+import { ChannelTypeEnum } from '@novu/shared';
 
 interface Framework {
   name: string;
@@ -294,14 +298,21 @@ document.getElementById('notification-container').appendChild(notificationCenter
 
 export function InboxEmbed(): JSX.Element {
   const [selectedFramework, setSelectedFramework] = useState(frameworks.find((f) => f.selected) || frameworks[0]);
-  const [connected, setConnected] = useState(true);
+  const auth = useAuth();
+  const { environments } = useFetchEnvironments({ organizationId: auth?.currentOrganization?._id });
+  const { integrations } = useIntegrations({ refetchInterval: 1000, refetchOnWindowFocus: true });
+  const foundIntegration = integrations?.find(
+    (integration) =>
+      integration._environmentId === environments?.[0]?._id && integration.channel === ChannelTypeEnum.IN_APP
+  );
+
   function handleFrameworkSelect(framework: Framework) {
     setSelectedFramework(framework);
   }
 
   return (
     <main className="flex flex-col pl-[100px]">
-      {!connected && (
+      {!foundIntegration?.connected && (
         <>
           {/* Header Section */}
           <div className="flex items-start gap-4 pl-[72px]">
@@ -340,7 +351,7 @@ export function InboxEmbed(): JSX.Element {
         </>
       )}
 
-      {connected && (
+      {foundIntegration?.connected && (
         <>
           <div className="flex items-start gap-4 pl-[72px]">
             <div className="flex flex-col border-l border-[#eeeef0] p-8">
