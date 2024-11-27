@@ -1,5 +1,9 @@
 export function parsePayloadSchema(schema: unknown): Record<string, unknown> {
-  if (schema && typeof schema === 'string') {
+  if (!schema) {
+    return {};
+  }
+
+  if (typeof schema === 'string') {
     try {
       return JSON.parse(schema);
     } catch (error) {
@@ -7,7 +11,7 @@ export function parsePayloadSchema(schema: unknown): Record<string, unknown> {
     }
   }
 
-  if (schema && typeof schema === 'object') {
+  if (typeof schema === 'object') {
     return schema as Record<string, unknown>;
   }
 
