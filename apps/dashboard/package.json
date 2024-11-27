@@ -1,7 +1,7 @@
 {
   "name": "@novu/dashboard",
   "private": true,
-  "version": "0.0.6",
+  "version": "2.1.0",
   "type": "module",
   "scripts": {
     "start": "vite",
@@ -116,5 +116,10 @@
   },
   "peerDependencies": {
     "@novu/web": "workspace:*"
+  },
+  "nx": {
+    "tags": [
+      "type:app"
+    ]
   }
 }
