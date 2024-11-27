@@ -8,6 +8,7 @@ import {
   PreviewPayload,
   StepDataDto,
   UserSessionData,
+  WorkflowOriginEnum,
 } from '@novu/shared';
 import { GetWorkflowByIdsCommand, GetWorkflowByIdsUseCase } from '@novu/application-generic';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
@@ -16,6 +17,7 @@ import { StepMissingControlsException } from '../../exceptions/step-not-found-ex
 import { PrepareAndValidateContentUsecase, ValidatedContentResponse } from '../validate-content';
 import { BuildStepDataUsecase } from '../build-step-data';
 import { GeneratePreviewCommand } from './generate-preview.command';
+import { mergeObjects } from '../../util/jsonUtils';
 
 @Injectable()
 export class GeneratePreviewUsecase {
@@ -31,17 +33,17 @@ export class GeneratePreviewUsecase {
     const stepData = await this.getStepData(command);
     const workflow = await this.findWorkflow(command);
 
-    const validatedContent: ValidatedContentResponse = await this.getValidatedContent(
-      dto,
-      stepData,
-      command.user,
+    const validatedContent: ValidatedContentResponse = await this.getValidatedContent(dto, stepData, command.user);
+    const hydratedExampleVariables = this.normalizeExampleVariables(
+      validatedContent,
+      workflow.origin,
       workflow.payloadSchema
     );
 
     const executeOutput = await this.executePreviewUsecase(
       command,
       stepData,
-      validatedContent.finalPayload,
+      hydratedExampleVariables,
       validatedContent.finalControlValues
     );
 
@@ -51,7 +53,7 @@ export class GeneratePreviewUsecase {
         preview: executeOutput.outputs as any,
         type: stepData.type as unknown as ChannelTypeEnum,
       },
-      previewPayloadExample: validatedContent.finalPayload,
+      previewPayloadExample: hydratedExampleVariables,
     };
   }
 
@@ -100,30 +102,33 @@ export class GeneratePreviewUsecase {
     }, {});
   }
 
-  private async getValidatedContent(
-    dto: GeneratePreviewRequestDto,
-    stepData: StepDataDto,
-    user: UserSessionData,
-    payloadSchema: JSONSchemaDto
-  ) {
+  private async getValidatedContent(dto: GeneratePreviewRequestDto, stepData: StepDataDto, user: UserSessionData) {
     if (!stepData.controls?.dataSchema) {
       throw new StepMissingControlsException(stepData.stepId, stepData);
     }
-
-    const payloadVariablesFromSchema = payloadSchema ? this.generatePayloadVariableExample(payloadSchema) : {};
-    const payloadVariablesExample = { ...payloadVariablesFromSchema, ...dto.previewPayload?.payload };
 
     return await this.prepareAndValidateContentUsecase.execute({
       stepType: stepData.type,
       controlValues: dto.controlValues || stepData.controls.values,
       controlDataSchema: stepData.controls.dataSchema,
       variableSchema: stepData.variables,
-      previewPayloadFromDto: {
-        ...dto.previewPayload,
-        payload: payloadVariablesExample,
-      },
+      previewPayloadFromDto: dto.previewPayload,
       user,
     });
+  }
+
+  private normalizeExampleVariables(
+    validatedContent: ValidatedContentResponse,
+    origin?: WorkflowOriginEnum,
+    payloadSchema?: JSONSchemaDto
+  ) {
+    if (origin === WorkflowOriginEnum.EXTERNAL && payloadSchema) {
+      const payloadVariableExample = { payload: this.generatePayloadVariableExample(payloadSchema) };
+
+      return mergeObjects(payloadVariableExample, validatedContent.finalPayload as Record<string, unknown>);
+    }
+
+    return validatedContent.finalPayload;
   }
 
   private async getStepData(command: GeneratePreviewCommand) {
