@@ -57,7 +57,7 @@ export const envValidators = {
   STRIPE_API_KEY: str({ default: undefined }),
   NOTIFICATION_RETENTION_DAYS: num({ default: DEFAULT_NOTIFICATION_RETENTION_DAYS }),
   API_ROOT_URL: url(),
-
+  SUBSCRIBER_WIDGET_JWT_EXPIRATION_TIME: str({ default: '15 days' }),
   // Feature Flags
   ...Object.keys(FeatureFlagsKeysEnum).reduce(
     (acc, key) => {
