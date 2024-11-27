@@ -5,20 +5,30 @@ import { Bell, Inbox, InboxContent, useNovu } from '@novu/react';
 import { InboxBellFilled } from './icons/inbox-bell-filled';
 import { HeaderButton } from './header-navigation/header-button';
 import { useState, useEffect } from 'react';
+import { useEnvironment } from '../context/environment/hooks';
+import { useTestPage } from '@/hooks/use-test-page';
 
 const InboxInner = () => {
   const [open, setOpen] = useState(false);
   const [jingle, setJingle] = useState(false);
+  const { isTestPage } = useTestPage();
 
   const novu = useNovu();
   useEffect(() => {
+    // Store a timeout to debounce the jingle animation, preventing the bell from
+    // becoming jittery when multiple notifications are received in quick succession.
+    let timeout: NodeJS.Timeout;
+
     const cleanup = novu.on('notifications.notification_received', () => {
       setJingle(true);
-      const timeout = setTimeout(() => setJingle(false), 3000);
-
-      return () => clearTimeout(timeout);
+      clearTimeout(timeout);
+      timeout = setTimeout(() => setJingle(false), 3000);
     });
-    return () => cleanup();
+
+    return () => {
+      clearTimeout(timeout);
+      cleanup();
+    };
   }, [novu]);
 
   return (
@@ -26,12 +36,23 @@ const InboxInner = () => {
       <PopoverTrigger tabIndex={-1}>
         <Bell
           renderBell={(unreadCount) => (
-            <HeaderButton label={unreadCount ? `Inbox (${unreadCount})` : 'Inbox'} disableTooltip={open}>
+            <HeaderButton
+              label={
+                <>
+                  Inbox
+                  {isTestPage && ' (Test)'}
+                  {unreadCount > 0 && ` (${unreadCount})`}
+                </>
+              }
+              disableTooltip={open}
+              className={isTestPage ? 'bg-test-pattern' : ''}
+            >
               <div className="relative flex items-center justify-center">
                 <InboxBellFilled
                   className={`text-foreground-600 size-4 cursor-pointer stroke-[0.5px]`}
                   bellClassName={`origin-top ${jingle ? 'animate-swing' : ''}`}
                   ringerClassName={`origin-top ${jingle ? 'animate-jingle' : ''}`}
+                  codeClassName={isTestPage ? 'block' : 'hidden'}
                 />
                 {unreadCount > 0 && (
                   <div className="absolute right-[-4px] top-[-6px] flex h-3 w-3 items-center justify-center rounded-full border-[3px] border-[white] bg-white">
@@ -58,17 +79,36 @@ const InboxInner = () => {
 
 export const InboxButton = () => {
   const { user } = useUser();
+  const { currentEnvironment } = useEnvironment();
+  const { isTestPage } = useTestPage();
 
-  if (!user) {
+  if (!user || !currentEnvironment) {
     return null;
   }
+
+  /**
+   * If the page is a test page, we use the environment identifier as the appId.
+   *
+   * This displays a test inbox, where the user can see their test notifications appear
+   * in real-time.
+   */
+  const appId = isTestPage ? currentEnvironment?.identifier : APP_ID;
+
+  const localizationTestSuffix = isTestPage ? ' (Test)' : '';
 
   return (
     <Inbox
       subscriberId={user.externalId ?? ''}
-      applicationIdentifier={APP_ID}
+      applicationIdentifier={appId}
       backendUrl={API_HOSTNAME}
       socketUrl={WEBSOCKET_HOSTNAME}
+      localization={{
+        'inbox.filters.labels.default': `Inbox${localizationTestSuffix}`,
+        'inbox.filters.labels.unread': `Unread${localizationTestSuffix}`,
+        'inbox.filters.labels.archived': `Archived${localizationTestSuffix}`,
+        'preferences.title': `Preferences${localizationTestSuffix}`,
+        'notifications.emptyNotice': `${isTestPage ? 'This is a test inbox. Send a notification to preview it in real-time.' : 'No notifications'}`,
+      }}
     >
       <InboxInner />
     </Inbox>

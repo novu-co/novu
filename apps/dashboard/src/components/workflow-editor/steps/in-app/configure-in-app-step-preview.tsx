@@ -13,7 +13,7 @@ import {
 import { useStepEditorContext } from '@/components/workflow-editor/steps/hooks';
 import { InAppRenderOutput } from '@novu/shared';
 
-export function ConfigureInAppPreview() {
+export function ConfigureInAppStepPreview() {
   const { previewStep, data, isPending: isPreviewPending } = usePreviewStep();
   const { step, isPendingStep } = useStepEditorContext();
 

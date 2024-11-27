@@ -1,10 +1,10 @@
 import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   Logger,
   NotFoundException,
-  BadRequestException,
-  HttpStatus,
-  HttpException,
 } from '@nestjs/common';
 import got, {
   CacheError,
@@ -20,11 +20,11 @@ import got, {
 } from 'got';
 import { createHmac } from 'node:crypto';
 import {
-  PostActionEnum,
+  GetActionEnum,
   HttpHeaderKeysEnum,
   HttpQueryKeysEnum,
-  GetActionEnum,
   isFrameworkError,
+  PostActionEnum,
 } from '@novu/framework/internal';
 import { EnvironmentRepository } from '@novu/dal';
 import { WorkflowOriginEnum } from '@novu/shared';
@@ -122,6 +122,7 @@ export class ExecuteBridgeRequest {
       command.environmentId,
       command.workflowOrigin,
       command.statelessBridgeUrl,
+      command.action,
     );
 
     Logger.log(
@@ -243,6 +244,7 @@ export class ExecuteBridgeRequest {
     environmentId: string,
     workflowOrigin: WorkflowOriginEnum,
     statelessBridgeUrl?: string,
+    action?: PostActionEnum | GetActionEnum,
   ): string {
     if (statelessBridgeUrl) {
       return statelessBridgeUrl;
@@ -250,7 +252,9 @@ export class ExecuteBridgeRequest {
 
     switch (workflowOrigin) {
       case WorkflowOriginEnum.NOVU_CLOUD:
-        return `${this.getApiUrl()}/v1/environments/${environmentId}/bridge`;
+        const apiUrl = this.getApiUrl(action);
+
+        return `${apiUrl}/v1/environments/${environmentId}/bridge`;
       case WorkflowOriginEnum.EXTERNAL: {
         if (!environmentBridgeUrl) {
           throw new BadRequestException({
@@ -269,7 +273,11 @@ export class ExecuteBridgeRequest {
     }
   }
 
-  private getApiUrl(): string {
+  private getApiUrl(action: PostActionEnum | GetActionEnum): string {
+    if (action === PostActionEnum.PREVIEW) {
+      return `http://localhost:${process.env.PORT}`;
+    }
+
     const apiUrl = process.env.API_ROOT_URL;
 
     if (!apiUrl) {
