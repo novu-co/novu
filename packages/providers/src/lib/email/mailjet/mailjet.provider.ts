@@ -109,17 +109,21 @@ export class MailjetEmailProvider
         Subject: options.subject,
         TextPart: options.text,
         HTMLPart: options.html,
-        Attachments: options.attachments?.filter(x => !Boolean(x.cid))?.map((attachment) => ({
-          ContentType: attachment.mime,
-          Filename: attachment.name,
-          Base64Content: attachment.file.toString('base64'),
-        })),
-        InlinedAttachments: options.inlineAttachments?.filter(x => !Boolean(x.cid))?.map((attachment) => ({
-          ContentType: attachment.mime,
-          Filename: attachment.name,
-          Base64Content: attachment.file.toString('base64'),
-          ContentID: attachment.name,
-        })),
+        Attachments: options.attachments
+          ?.filter((attachment) => !attachment.cid)
+          ?.map((attachment) => ({
+            ContentType: attachment.mime,
+            Filename: attachment.name,
+            Base64Content: attachment.file.toString('base64'),
+          })),
+        InlinedAttachments: options.attachments
+          ?.filter((attachment) => attachment.cid)
+          ?.map((attachment) => ({
+            ContentType: attachment.mime,
+            Filename: attachment.name,
+            Base64Content: attachment.file.toString('base64'),
+            ContentID: attachment.cid,
+          })),
       }).body;
 
     if (options.replyTo) {
