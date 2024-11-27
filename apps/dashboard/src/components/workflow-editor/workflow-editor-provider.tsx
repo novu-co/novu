@@ -74,7 +74,7 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
     defaultValues: defaultFormValues,
   });
 
-  const { reset, getValues, setError, formState } = form;
+  const { reset, getValues, setError } = form;
   const steps = useFieldArray({
     control: form.control,
     name: 'steps',
