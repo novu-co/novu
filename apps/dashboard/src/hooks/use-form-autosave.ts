@@ -1,43 +1,24 @@
-import { useRef } from 'react';
-import { DeepPartialSkipArrayKey, FieldValues, UseFormReturn, useWatch } from 'react-hook-form';
-import useDeepCompareEffect from 'use-deep-compare-effect';
-import { useDebounce } from './use-debounce';
+// useFormAutosave.ts
+import { useEffect } from 'react';
+import { UseFormReturn, useWatch, FieldValues } from 'react-hook-form';
 
-export const useFormAutoSave = <T extends FieldValues>({
-  debouncedSave,
-  form,
-  shouldFlush,
-}: {
-  debouncedSave: ReturnType<typeof useDebounce>;
-  form: UseFormReturn<T>;
-  shouldFlush?: (
-    watchedData: DeepPartialSkipArrayKey<T>,
-    previousWatchedData: DeepPartialSkipArrayKey<T> | null
-  ) => boolean;
-}) => {
-  const { formState, control } = form;
-
+export function useFormAutosave<T extends FieldValues>(form: UseFormReturn<T>, save: (data: T) => void): void {
   const watchedData = useWatch<T>({
-    control,
+    control: form.control,
   });
 
-  const previousWatchedData = useRef<DeepPartialSkipArrayKey<T> | null>(null);
+  useEffect(() => {
+    const handleSave = async () => {
+      if (!form.formState.isDirty) {
+        return;
+      }
+      const isValid = await form.trigger();
+      if (isValid) {
+        const values = form.getValues();
+        save(values);
+      }
+    };
 
-  useDeepCompareEffect(() => {
-    if (!formState.isDirty) {
-      previousWatchedData.current = watchedData;
-      return;
-    }
-
-    const immediateSave = shouldFlush?.(watchedData, previousWatchedData.current) || false;
-
-    if (immediateSave) {
-      debouncedSave();
-      debouncedSave.flush();
-    } else {
-      debouncedSave();
-    }
-
-    previousWatchedData.current = watchedData;
-  }, [watchedData, formState.isDirty]);
-};
+    handleSave();
+  }, [watchedData]);
+}

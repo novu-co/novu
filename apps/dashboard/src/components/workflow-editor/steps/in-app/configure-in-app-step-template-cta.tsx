@@ -1,25 +1,20 @@
 import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
-import { CommonFields } from '@/components/workflow-editor/steps/common-fields';
 import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
-import { Step } from '@/utils/types';
+import { StepDataDto } from '@novu/shared';
 import { RiPencilRuler2Fill, RiArrowRightSLine, RiArrowRightUpLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 
-type ConfigureInAppStepTemplateProps = {
-  step: Step;
+type ConfigureInAppStepTemplateCtaProps = {
+  step: StepDataDto;
   issue?: string;
 };
-export const ConfigureInAppStepTemplate = (props: ConfigureInAppStepTemplateProps) => {
+export const ConfigureInAppStepTemplateCta = (props: ConfigureInAppStepTemplateCtaProps) => {
   const { step, issue } = props;
 
   return (
     <>
-      <SidebarContent>
-        <CommonFields />
-      </SidebarContent>
-      <Separator />
       <SidebarContent>
         <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
           <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
