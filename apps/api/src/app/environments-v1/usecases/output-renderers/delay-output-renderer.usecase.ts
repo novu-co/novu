@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DelayRenderOutput } from '@novu/shared';
+import { InstrumentUsecase } from '@novu/application-generic';
 import { RenderCommand } from './render-command';
 import {
   DelayTimeControlType,
@@ -8,6 +9,7 @@ import {
 
 @Injectable()
 export class DelayOutputRendererUsecase {
+  @InstrumentUsecase()
   execute(renderCommand: RenderCommand): DelayRenderOutput {
     const delayTimeControlType: DelayTimeControlType = DelayTimeControlZodSchema.parse(renderCommand.controlValues);
 
