@@ -18,9 +18,11 @@
   "extends": "@nx/workspace/presets/npm.json",
   "release": {
     "changelog": {
-      "workspaceChangelog": true,
+      "workspaceChangelog": false,
       "projectChangelogs": true
     },
+    "projectsRelationship": "independent",
+    "conventionalCommits": true,
     "groups": {
       "apps": {
         "projects": [

@@ -1,3 +1,12 @@
+/**
+ * Release all packages in the monorepo.
+ * 
+ * Usage: pnpm release <version>
+ * 
+ * Known issues:
+ * - nx release with independent versioning and updateDependents: "auto" increases patch by the amount of dependencies updated (https://github.com/nrwl/nx/issues/27823)
+ */
+
 import { hideBin } from 'yargs/helpers';
 import { releaseChangelog, releasePublish, releaseVersion } from 'nx/release/index.js';
 import inquirer from 'inquirer';
@@ -11,7 +20,7 @@ import { execa } from 'execa';
       alias: 'd',
       description: 'Whether or not to perform a dry-run of the release process, defaults to true',
       type: 'boolean',
-      default: false,
+      default: true,
     })
     .option('verbose', {
       description: 'Whether or not to enable verbose logging, defaults to false',
@@ -33,7 +42,7 @@ import { execa } from 'execa';
     specifier,
     dryRun,
     verbose,
-    firstRelease: true,
+    firstRelease: false,
   });
 
   await releaseChangelog({
