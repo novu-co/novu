@@ -1,6 +1,6 @@
 {
   "name": "@novu/notification-center",
-  "version": "2.0.1",
+  "version": "2.0.4",
   "repository": "https://github.com/novuhq/novu",
   "description": "",
   "scripts": {
@@ -92,10 +92,5 @@
     "socket.io-client": "4.7.2",
     "tslib": "^2.3.1",
     "webfontloader": "^1.6.28"
-  },
-  "nx": {
-    "tags": [
-      "package:public"
-    ]
   }
 }

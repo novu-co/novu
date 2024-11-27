@@ -28,18 +28,7 @@ import { useTagsQuery } from '@/hooks/use-tags-query';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
-
-const formSchema = z.object({
-  name: z.string().min(1, { message: 'Name is required' }),
-  workflowId: z.string(),
-  tags: z
-    .array(z.string().min(1))
-    .max(8)
-    .refine((tags) => new Set(tags).size === tags.length, {
-      message: 'Duplicate tags are not allowed.',
-    }),
-  description: z.string().max(200).optional(),
-});
+import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowMinimalSchema } from './workflow-editor/schema';
 
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
 export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
@@ -58,6 +47,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
         queryKey: [QueryKeys.fetchTags, currentEnvironment?._id],
       });
       setIsOpen(false);
+      form.reset();
       navigate(
         buildRoute(ROUTES.EDIT_WORKFLOW, {
           environmentSlug: currentEnvironment?.slug ?? '',
@@ -68,21 +58,13 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   });
   const tagsQuery = useTagsQuery();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof workflowMinimalSchema>>({
+    resolver: zodResolver(workflowMinimalSchema),
     defaultValues: { description: '', workflowId: '', name: '', tags: [] },
   });
 
   return (
-    <Sheet
-      open={isOpen}
-      onOpenChange={(open) => {
-        setIsOpen(open);
-        if (open) {
-          form.reset();
-        }
-      }}
-    >
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger {...props} />
       <SheetContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <SheetHeader>
@@ -93,7 +75,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
               <Link
                 target="_blank"
                 to="https://docs.novu.co/concepts/workflows"
-                className="text-foreground-400 inline-flex items-center text-sm underline"
+                className="text-foreground-400 inline-flex items-center text-xs underline"
               >
                 Learn more <RiExternalLinkLine className="inline size-4" />
               </Link>
@@ -106,6 +88,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
             <form
               id="create-workflow"
               autoComplete="off"
+              noValidate
               onSubmit={form.handleSubmit((values) => {
                 mutateAsync({
                   name: values.name,
@@ -116,7 +99,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                   tags: values.tags,
                 });
               })}
-              className="flex flex-col gap-6"
+              className="flex flex-col gap-4"
             >
               <FormField
                 control={form.control}
@@ -166,7 +149,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-1">
-                      <FormLabel hint="(max. 8)">Add tags</FormLabel>
+                      <FormLabel hint={`(max. ${MAX_TAG_ELEMENTS})`}>Add tags</FormLabel>
                     </div>
                     <FormControl>
                       <TagInput suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []} {...field} />
@@ -185,7 +168,12 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <FormLabel optional>Description</FormLabel>
                     </div>
                     <FormControl>
-                      <Textarea placeholder="Description of what this workflow does" {...field} />
+                      <Textarea
+                        className="min-h-36"
+                        placeholder="Description of what this workflow does"
+                        {...field}
+                        maxLength={MAX_DESCRIPTION_LENGTH}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

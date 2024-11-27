@@ -1,9 +1,8 @@
 import type { JSONSchemaDefinition } from '@novu/shared';
 
-interface LiquidVariable {
+export interface LiquidVariable {
   type: 'variable';
   label: string;
-  detail: string;
 }
 
 /**
@@ -25,7 +24,6 @@ export function parseStepVariablesToLiquidVariables(schema: JSONSchemaDefinition
         variables.push({
           type: 'variable',
           label: `${fullPath}`,
-          detail: typeof value !== 'boolean' ? value.description || 'JSON Schema variable' : 'JSON Schema variable',
         });
 
         // Recursively process nested objects

@@ -1,47 +1,50 @@
+import { useCallback } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { NewDashboardOptInStatusEnum } from '@novu/shared';
+
 import { NEW_DASHBOARD_URL } from '../config';
 import { useSegment } from '../components/providers/SegmentProvider';
 
 export function useNewDashboardOptIn() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const segment = useSegment();
 
-  const updateUserOptInStatus = (status: NewDashboardOptInStatusEnum) => {
-    if (!user) return;
+  const updateUserOptInStatus = useCallback(
+    async (status: NewDashboardOptInStatusEnum) => {
+      if (!user) return;
 
-    user.update({
-      unsafeMetadata: {
-        ...user.unsafeMetadata,
-        newDashboardOptInStatus: status,
-      },
-    });
-  };
+      await user.update({
+        unsafeMetadata: {
+          ...user.unsafeMetadata,
+          newDashboardOptInStatus: status,
+          newDashboardFirstVisit: true,
+        },
+      });
+    },
+    [user]
+  );
 
-  const getCurrentOptInStatus = () => {
-    if (!user) return null;
-
-    return user.unsafeMetadata?.newDashboardOptInStatus || null;
-  };
-
-  const redirectToNewDashboard = () => {
+  const redirectToNewDashboard = useCallback(() => {
     window.location.href = NEW_DASHBOARD_URL || window.location.origin;
-  };
+  }, []);
 
-  const optIn = () => {
+  const optIn = useCallback(async () => {
     segment.track('New dashboard opt-in');
-    updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_IN);
-  };
+    await updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_IN);
+    localStorage.setItem('mantine-theme', 'light');
+    redirectToNewDashboard();
+  }, [segment, updateUserOptInStatus, redirectToNewDashboard]);
 
-  const dismiss = () => {
+  const dismiss = useCallback(() => {
     segment.track('New dashboard opt-in dismissed');
     updateUserOptInStatus(NewDashboardOptInStatusEnum.DISMISSED);
-  };
+  }, [segment, updateUserOptInStatus]);
 
   return {
+    isLoaded,
     optIn,
     dismiss,
-    status: getCurrentOptInStatus(),
     redirectToNewDashboard,
+    status: user?.unsafeMetadata?.newDashboardOptInStatus as NewDashboardOptInStatusEnum | null | undefined,
   };
 }

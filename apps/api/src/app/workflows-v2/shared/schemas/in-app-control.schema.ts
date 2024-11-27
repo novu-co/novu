@@ -1,48 +1,44 @@
-import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum, UiSchemaProperty } from '@novu/shared';
+import { z } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
+import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 
-const ABSOLUTE_AND_RELATIVE_URL_REGEX = '^(?!mailto:)(?:(https?):\\/\\/[^\\s/$.?#].[^\\s]*)|^(\\/[^\\s]*)$';
+const redirectZodSchema = z
+  .object({
+    url: z.string().optional(),
+    target: z.enum(['_self', '_blank', '_parent', '_top', '_unfencedTop']).default('_blank'),
+  })
+  .strict()
+  .optional()
+  .nullable();
 
-const redirectSchema = {
-  type: 'object',
-  properties: {
-    url: {
-      type: 'string',
-      pattern: ABSOLUTE_AND_RELATIVE_URL_REGEX,
-    },
-    target: {
-      type: 'string',
-      enum: ['_self', '_blank', '_parent', '_top', '_unfencedTop'],
-      default: '_blank', // Default value for target
-    },
-  },
-  required: ['url'], // url remains required
-  additionalProperties: false, // No additional properties allowed
-} as const satisfies JSONSchemaDto;
+const actionZodSchema = z
+  .object({
+    label: z.string().optional(),
+    redirect: redirectZodSchema.optional(),
+  })
+  .strict()
+  .optional()
+  .nullable();
 
-const actionSchema = {
-  type: 'object',
-  properties: {
-    label: { type: 'string' },
-    redirect: redirectSchema,
-  },
-  required: ['label'],
-  additionalProperties: false,
-} as const satisfies JSONSchemaDto;
+export const InAppControlZodSchema = z
+  .object({
+    subject: z.string().optional(),
+    body: z.string(),
+    avatar: z.string().optional(),
+    primaryAction: actionZodSchema,
+    secondaryAction: actionZodSchema,
+    data: z.object({}).catchall(z.unknown()).optional(),
+    redirect: redirectZodSchema,
+  })
+  .strict();
 
-export const inAppControlSchema = {
-  type: 'object',
-  properties: {
-    subject: { type: 'string' },
-    body: { type: 'string' },
-    avatar: { type: 'string', format: 'uri' },
-    primaryAction: actionSchema, // Nested primaryAction
-    secondaryAction: actionSchema, // Nested secondaryAction
-    data: { type: 'object', additionalProperties: true },
-    redirect: redirectSchema,
-  },
-  required: ['body'],
-  additionalProperties: false,
-} as const satisfies JSONSchemaDto;
+export type InAppRedirectType = z.infer<typeof redirectZodSchema>;
+export type InAppActionType = z.infer<typeof actionZodSchema>;
+export type InAppControlType = z.infer<typeof InAppControlZodSchema>;
+
+export const InAppRedirectSchema = zodToJsonSchema(redirectZodSchema) as JSONSchemaDto;
+export const InAppActionSchema = zodToJsonSchema(actionZodSchema) as JSONSchemaDto;
+export const inAppControlSchema = zodToJsonSchema(InAppControlZodSchema) as JSONSchemaDto;
 
 const redirectPlaceholder = {
   url: {
@@ -53,7 +49,7 @@ const redirectPlaceholder = {
   },
 };
 
-export const InAppUiSchema: UiSchema = {
+export const inAppUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.IN_APP,
   properties: {
     body: {

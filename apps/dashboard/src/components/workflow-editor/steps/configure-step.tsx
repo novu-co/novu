@@ -4,7 +4,7 @@ import { RiArrowLeftSLine, RiCloseFill, RiDeleteBin2Line } from 'react-icons/ri'
 import { motion } from 'framer-motion';
 import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
-import { SidebarFooter, SidebarHeader } from '@/components/side-navigation/Sidebar';
+import { SidebarFooter, SidebarHeader } from '@/components/side-navigation/sidebar';
 import { useWorkflowEditorContext } from '@/components/workflow-editor/hooks';
 import { useEnvironment } from '@/context/environment/hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
@@ -12,8 +12,11 @@ import { useStep } from './use-step';
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { ConfigureStepContent } from './configure-step-content';
 import { PageMeta } from '@/components/page-meta';
+import { StepEditorProvider } from '@/components/workflow-editor/steps/step-editor-provider';
+import { EXCLUDED_EDITOR_TYPES } from '@/utils/constants';
+import TruncatedText from '@/components/truncated-text';
 
-export function ConfigureStep() {
+const ConfigureStepInternal = () => {
   const { step } = useStep();
   const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
@@ -21,7 +24,9 @@ export function ConfigureStep() {
     workflowSlug: string;
     stepSlug: string;
   }>();
-  const { isReadOnly, deleteStep } = useWorkflowEditorContext();
+  const { isReadOnly: isWorkflowReadOnly, deleteStep } = useWorkflowEditorContext();
+
+  const isReadOnly = isWorkflowReadOnly || EXCLUDED_EDITOR_TYPES.includes(step?.type ?? '');
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -80,8 +85,16 @@ export function ConfigureStep() {
                 open={isDeleteModalOpen}
                 onOpenChange={setIsDeleteModalOpen}
                 onConfirm={onDeleteStep}
-                title="Are you sure?"
-                description={`You're about to delete the ${step?.name}, this action cannot be undone.`}
+                title="Proceeding will delete the step"
+                description={
+                  <>
+                    You're about to delete the{' '}
+                    <strong>
+                      <TruncatedText className="max-w-[32ch]">{step?.name}</TruncatedText>
+                    </strong>{' '}
+                    step, this action is permanent.
+                  </>
+                }
                 confirmButtonText="Delete"
               />
               <Button
@@ -99,4 +112,12 @@ export function ConfigureStep() {
       </motion.div>
     </>
   );
-}
+};
+
+export const ConfigureStep = () => {
+  return (
+    <StepEditorProvider>
+      <ConfigureStepInternal />
+    </StepEditorProvider>
+  );
+};

@@ -1,32 +1,80 @@
 import { useFormContext } from 'react-hook-form';
 import { motion } from 'framer-motion';
+import { useLayoutEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import * as z from 'zod';
+// import { RiArrowRightSLine, RiSettingsLine } from 'react-icons/ri';
+
 import { RouteFill } from '../icons';
 import { Input, InputField } from '../primitives/input';
-// import { RiArrowRightSLine, RiSettingsLine } from 'react-icons/ri';
-import * as z from 'zod';
 import { Separator } from '../primitives/separator';
 import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
-import { workflowSchema } from './schema';
+import { MAX_DESCRIPTION_LENGTH, workflowSchema } from './schema';
 import { useTagsQuery } from '@/hooks/use-tags-query';
-// import { Button } from '../primitives/button';
 import { CopyButton } from '../primitives/copy-button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
 import { Switch } from '../primitives/switch';
 import { useWorkflowEditorContext } from '@/components/workflow-editor/hooks';
 import { cn } from '@/utils/ui';
-import { SidebarContent, SidebarHeader } from '@/components/side-navigation/Sidebar';
+import { SidebarContent, SidebarHeader } from '@/components/side-navigation/sidebar';
 import { PageMeta } from '../page-meta';
+import { ConfirmationModal } from '../confirmation-modal';
+import { PauseModalDescription, PAUSE_MODAL_TITLE } from '@/components/pause-workflow-dialog';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { useEnvironment } from '@/context/environment/hooks';
 
 export function ConfigureWorkflow() {
+  const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
   const tagsQuery = useTagsQuery();
-  const { isReadOnly } = useWorkflowEditorContext();
+  const { isReadOnly, workflow } = useWorkflowEditorContext();
+  const { currentEnvironment } = useEnvironment();
+  const { workflowSlug } = useParams<{ workflowSlug: string }>();
+  const navigate = useNavigate();
+  const [isBlurred, setIsBlurred] = useState(false);
 
-  const { control, watch } = useFormContext<z.infer<typeof workflowSchema>>();
+  const { control, watch, setValue } = useFormContext<z.infer<typeof workflowSchema>>();
   const workflowName = watch('name');
+  const isWorkflowSlugChanged = workflow && workflow?.slug && workflowSlug !== workflow?.slug;
+  const shouldUpdateWorkflowSlug = isBlurred && isWorkflowSlugChanged;
+
+  useLayoutEffect(() => {
+    if (shouldUpdateWorkflowSlug) {
+      const timeoutId = setTimeout(() => {
+        navigate(
+          buildRoute(ROUTES.EDIT_WORKFLOW, {
+            environmentSlug: currentEnvironment?.slug ?? '',
+            workflowSlug: workflow?.slug ?? '',
+          }),
+          {
+            replace: true,
+            state: { skipAnimation: true },
+          }
+        );
+      }, 0);
+      setIsBlurred(false);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [shouldUpdateWorkflowSlug, workflow?.slug, currentEnvironment?.slug, navigate]);
+
+  const onPauseWorkflow = () => {
+    setValue('active', false, { shouldValidate: true, shouldDirty: true });
+  };
 
   return (
     <>
+      <ConfirmationModal
+        open={isPauseModalOpen}
+        onOpenChange={setIsPauseModalOpen}
+        onConfirm={() => {
+          onPauseWorkflow();
+          setIsPauseModalOpen(false);
+        }}
+        title={PAUSE_MODAL_TITLE}
+        description={<PauseModalDescription workflowName={workflowName} />}
+        confirmButtonText="Proceed"
+      />
       <PageMeta title={workflowName} />
       <motion.div
         className={cn('relative flex h-full w-full flex-col')}
@@ -56,7 +104,17 @@ export function ConfigureWorkflow() {
                   <FormLabel>Active Workflow</FormLabel>
                 </div>
                 <FormControl>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} disabled={isReadOnly} />
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={(checked) => {
+                      if (!checked) {
+                        setIsPauseModalOpen(true);
+                        return;
+                      }
+                      field.onChange(checked);
+                    }}
+                    disabled={isReadOnly}
+                  />
                 </FormControl>
               </FormItem>
             )}
@@ -70,10 +128,16 @@ export function ConfigureWorkflow() {
             defaultValue=""
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Workflow Name</FormLabel>
+                <FormLabel>Name</FormLabel>
                 <FormControl>
                   <InputField>
-                    <Input placeholder="Untitled" {...field} disabled={isReadOnly} />
+                    <Input
+                      placeholder="New workflow"
+                      {...field}
+                      disabled={isReadOnly}
+                      onFocus={() => setIsBlurred(false)}
+                      onBlur={() => setIsBlurred(true)}
+                    />
                   </InputField>
                 </FormControl>
                 <FormMessage />
@@ -86,14 +150,11 @@ export function ConfigureWorkflow() {
             defaultValue=""
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Workflow Identifier</FormLabel>
+                <FormLabel>Identifier</FormLabel>
                 <FormControl>
                   <InputField className="flex overflow-hidden pr-0">
                     <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
-                    <CopyButton
-                      content={field.value}
-                      className="rounded-md rounded-s-none border-b-0 border-r-0 border-t-0 text-neutral-400"
-                    />
+                    <CopyButton size="input-right" valueToCopy={field.value} />
                   </InputField>
                 </FormControl>
                 <FormMessage />
@@ -107,7 +168,13 @@ export function ConfigureWorkflow() {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Description of what this workflow does" {...field} disabled={isReadOnly} />
+                  <Textarea
+                    className="min-h-36"
+                    placeholder="Description of what this workflow does"
+                    {...field}
+                    maxLength={MAX_DESCRIPTION_LENGTH}
+                    disabled={isReadOnly}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -129,6 +196,7 @@ export function ConfigureWorkflow() {
                     suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />

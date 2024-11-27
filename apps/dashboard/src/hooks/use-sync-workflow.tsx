@@ -24,7 +24,7 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
 
   const getTooltipContent = () => {
     if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
-      return `External workflows cannot be synced to ${oppositeEnvironment?.name} using dashboard.`;
+      return `Code-first workflows cannot be synced to ${oppositeEnvironment?.name} using dashboard.`;
     }
 
     if (workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1) {
@@ -90,7 +90,7 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
     });
   };
 
-  const { mutateAsync: syncWorkflowMutation } = useMutation({
+  const { mutateAsync: syncWorkflowMutation, isPending } = useMutation({
     mutationFn: async () =>
       syncWorkflow(workflow._id, {
         targetEnvironmentId: oppositeEnvironment?._id || '',
@@ -122,10 +122,14 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
       <ConfirmationModal
         open={showConfirmModal}
         onOpenChange={setShowConfirmModal}
-        onConfirm={syncWorkflowMutation}
+        onConfirm={() => {
+          syncWorkflowMutation();
+          setShowConfirmModal(false);
+        }}
         title={`Sync workflow to ${oppositeEnvironment?.name}`}
         description={`Workflow already exists in ${oppositeEnvironment?.name}. Proceeding will overwrite the existing workflow.`}
         confirmButtonText="Proceed"
+        isLoading={isPending}
       />
     ),
   };

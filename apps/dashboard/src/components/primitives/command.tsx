@@ -4,8 +4,7 @@ import { Command as CommandPrimitive } from 'cmdk';
 
 import { cn } from '@/utils/ui';
 import { Dialog, DialogContent } from '@/components/primitives/dialog';
-import { inputVariants } from '@/components/primitives/variants';
-import { InputField } from '@/components/primitives/input';
+import { InputField, inputVariants } from '@/components/primitives/input';
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -97,8 +96,9 @@ const CommandItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
+    style={{ wordBreak: 'break-all' }}
     className={cn(
-      'data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
+      'data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-xs outline-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
       className
     )}
     {...props}

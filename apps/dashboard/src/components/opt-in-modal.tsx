@@ -13,19 +13,16 @@ import {
 } from '@/components/primitives/dialog';
 import { RiCustomerService2Line } from 'react-icons/ri';
 import { useNewDashboardOptIn } from '@/hooks/use-new-dashboard-opt-in';
-import { NewDashboardOptInStatusEnum } from '@novu/shared';
 
 export const OptInModal = () => {
-  const { status, optIn } = useNewDashboardOptIn();
+  const { isFirstVisit, updateNewDashboardFirstVisit } = useNewDashboardOptIn();
 
-  const isOptedIn = status === NewDashboardOptInStatusEnum.OPTED_IN;
-
-  if (isOptedIn) {
+  if (!isFirstVisit) {
     return null;
   }
 
   return (
-    <Dialog modal open={!isOptedIn} onOpenChange={optIn}>
+    <Dialog modal open={!!isFirstVisit} onOpenChange={updateNewDashboardFirstVisit}>
       <DialogPortal>
         <DialogOverlay />
         <DialogContent className="p-0">
@@ -71,7 +68,7 @@ const Header = () => (
     <div className="flex flex-1 flex-col items-start gap-1">
       <DialogTitle className="text-lg font-medium">Thanks for opting-in! 🎉</DialogTitle>
       <DialogDescription className="text-foreground-400 text-xs font-normal">
-        Get an early look at our enhanced dashboard.
+        Get an early look at our new Dashboard.
       </DialogDescription>
     </div>
   </div>

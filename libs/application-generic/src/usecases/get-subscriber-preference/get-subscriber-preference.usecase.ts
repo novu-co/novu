@@ -63,6 +63,7 @@ export class GetSubscriberPreference {
             environmentId: command.environmentId,
             template,
             subscriber,
+            includeInactiveChannels: command.includeInactiveChannels,
           }),
         ),
       ),

@@ -1,6 +1,6 @@
 {
   "name": "@novu/worker",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "description",
   "author": "",
   "private": "true",
@@ -92,5 +92,10 @@
     "@novu/ee-billing": "workspace:*",
     "@novu/ee-shared-services": "workspace:*",
     "@novu/ee-translation": "workspace:*"
+  },
+  "nx": {
+    "tags": [
+      "type:app"
+    ]
   }
 }

@@ -82,7 +82,7 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useReactFlow();
 
-  const nodes = useMemo(() => {
+  const [nodes, edges] = useMemo(() => {
     const triggerNode = { id: '0', position: { x: 0, y: 0 }, data: {}, type: 'trigger' };
     let previousPosition = triggerNode.position;
 
@@ -99,35 +99,32 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
       type: 'add',
     };
 
-    return [triggerNode, ...createdNodes, addNode];
-  }, [steps]);
-
-  const edges = useMemo(
-    () =>
-      nodes.reduce<AddNodeEdgeType[]>((acc, node, index) => {
-        if (index === 0) {
-          return acc;
-        }
-
-        const parent = nodes[index - 1];
-        acc.push({
-          id: `edge-${parent.id}-${node.id}`,
-          source: parent.id,
-          sourceHandle: 'b',
-          targetHandle: 'a',
-          target: node.id,
-          type: 'addNode',
-          style: { stroke: 'hsl(var(--neutral-alpha-200))', strokeWidth: 2, strokeDasharray: 5 },
-          data: {
-            isLast: index === nodes.length - 1,
-            addStepIndex: index - 1,
-          },
-        });
-
+    const nodes = [triggerNode, ...createdNodes, addNode];
+    const edges = nodes.reduce<AddNodeEdgeType[]>((acc, node, index) => {
+      if (index === 0) {
         return acc;
-      }, []),
-    [nodes]
-  );
+      }
+
+      const parent = nodes[index - 1];
+      acc.push({
+        id: `edge-${parent.id}-${node.id}`,
+        source: parent.id,
+        sourceHandle: 'b',
+        targetHandle: 'a',
+        target: node.id,
+        type: 'addNode',
+        style: { stroke: 'hsl(var(--neutral-alpha-200))', strokeWidth: 2, strokeDasharray: 5 },
+        data: {
+          isLast: index === nodes.length - 1,
+          addStepIndex: index - 1,
+        },
+      });
+
+      return acc;
+    }, []);
+
+    return [nodes, edges];
+  }, [steps]);
 
   const positionCanvas = useCallback(
     (options?: ViewportHelperFunctionOptions) => {
@@ -167,7 +164,7 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
         selectionOnDrag
         panOnDrag={panOnDrag}
       >
-        <Controls showZoom={false} />
+        <Controls showZoom={false} showInteractive={false} />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>
     </div>

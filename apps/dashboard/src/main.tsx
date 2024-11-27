@@ -3,7 +3,14 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import ErrorPage from '@/components/error-page';
 import { RootRoute, AuthRoute, DashboardRoute, CatchAllRoute } from './routes';
-import { WorkflowsPage, SignInPage, SignUpPage, OrganizationListPage } from '@/pages';
+import {
+  WorkflowsPage,
+  SignInPage,
+  SignUpPage,
+  OrganizationListPage,
+  QuestionnairePage,
+  UsecaseSelectPage,
+} from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
@@ -12,8 +19,10 @@ import { ConfigureWorkflow } from './components/workflow-editor/configure-workfl
 import { ConfigureStep } from './components/workflow-editor/steps/configure-step';
 import { initializeSentry } from './utils/sentry';
 import { EditStepSidebar } from './components/workflow-editor/steps/edit-step-sidebar';
+import { overrideZodErrorMap } from './utils/validation';
 
 initializeSentry();
+overrideZodErrorMap();
 
 const router = createBrowserRouter([
   {
@@ -34,6 +43,14 @@ const router = createBrowserRouter([
           {
             path: ROUTES.SIGNUP_ORGANIZATION_LIST,
             element: <OrganizationListPage />,
+          },
+          {
+            path: ROUTES.SIGNUP_QUESTIONNAIRE,
+            element: <QuestionnairePage />,
+          },
+          {
+            path: ROUTES.USECASE_SELECT,
+            element: <UsecaseSelectPage />,
           },
         ],
       },

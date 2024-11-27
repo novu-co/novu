@@ -7,7 +7,12 @@ import { IntercomProvider } from 'react-use-intercom';
 import { css } from '@novu/novui/css';
 import { EnvironmentEnum } from '@novu/shared';
 
-import { BRIDGE_SYNC_SAMPLE_ENDPOINT, BRIDGE_ENDPOINTS_LEGACY_VERSIONS, INTERCOM_APP_ID } from '../../../config';
+import {
+  BRIDGE_SYNC_SAMPLE_ENDPOINT,
+  BRIDGE_ENDPOINTS_LEGACY_VERSIONS,
+  INTERCOM_APP_ID,
+  IS_EE_AUTH_ENABLED,
+} from '../../../config';
 import { SpotLight } from '../../utils/Spotlight';
 import { SpotLightProvider } from '../../providers/SpotlightProvider';
 import { useEnvironment, useRedirectURL, useRouteScopes } from '../../../hooks';
@@ -16,6 +21,7 @@ import { Sidebar } from '../../nav/Sidebar';
 import { HeaderNav } from './v2/HeaderNav';
 import { FreeTrialBanner } from './FreeTrialBanner';
 import { SampleModeBanner } from './v2/SampleWorkflowsBanner';
+import { useOptInRedirect } from '../../../hooks/useOptInRedirect';
 
 const AppShell = styled.div`
   display: flex;
@@ -61,6 +67,16 @@ export function PrivatePageLayout() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (IS_EE_AUTH_ENABLED) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const shouldRedirect = useOptInRedirect();
+
+    if (shouldRedirect) {
+      // prevent flickering of the legacy layout until the redirect is done
+      return null;
+    }
+  }
 
   return (
     <SpotLightProvider>

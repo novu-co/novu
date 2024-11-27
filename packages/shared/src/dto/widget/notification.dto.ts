@@ -14,7 +14,6 @@ export interface INotificationDto {
   _jobId: string;
   createdAt: string;
   updatedAt: string;
-  expireAt: string;
   lastSeenDate?: string;
   lastReadDate?: string;
   actor?: IActor;

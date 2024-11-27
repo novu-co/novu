@@ -52,6 +52,7 @@ export default defineConfig({
     },
   },
   server: {
+    port: 4201,
     headers: {
       'Document-Policy': 'js-profiling',
     },

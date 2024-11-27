@@ -36,12 +36,13 @@ npx novu@latest dev
 
 | flag | long form usage example | description                   | default value               |
 | ---- | ----------------------- | ----------------------------- | --------------------------- |
-| -p   | --port <port>           | local bridge application port | 4000                        |
-| -r   | --route <route>         | bridge application route      | /api/novu                   |
-| -o   | --origin <origin>       | bridge application origin     | http://localhost            |
-| -d   | --dashboard-url <url>   | Novu cloud dashboard URL      | https://dashboard.novu.co   |
+| -p   | --port <port>           | Bridge application port       | 4000                        |
+| -r   | --route <route>         | Bridge application route      | /api/novu                   |
+| -o   | --origin <origin>       | Bridge application origin     | http://localhost            |
+| -d   | --dashboard-url <url>   | Novu Cloud dashboard URL      | https://dashboard.novu.co   |
 | -sp  | --studio-port <port>    | Local Studio server port      | 2022                        |
-| -t   | --tunnel <url>          | self hosted tunnel url        | https://my-tunnel.ngrok.app |
+| -t   | --tunnel <url>          | Self hosted tunnel url        | null                        |
+| -H   | --headless              | Run bridge in headless mode   | false                       |
 
 Example: If bridge application is running on port `3002` and Novu account is in `EU` region.
 

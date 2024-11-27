@@ -24,7 +24,20 @@ export interface ContentIssue extends Issue<StepContentIssueEnum> {}
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface StepIssue extends Issue<StepIssueEnum> {}
+
 export type IdentifierOrInternalId = string;
+
+export type PatchStepDataDto = {
+  name?: string;
+  controlValues?: Record<string, unknown>;
+};
+
+export type PatchWorkflowDto = {
+  active?: boolean;
+  name?: string;
+  description?: string;
+  tags?: string[];
+};
 
 export type StepResponseDto = StepDto & {
   _id: string;
@@ -38,6 +51,9 @@ export type StepUpdateDto = StepCreateDto & {
 };
 
 export type StepCreateDto = StepDto & {
+  /**
+   * @deprecated This field is deprecated and will be removed in future versions, use the patch step data.
+   */
   controlValues?: Record<string, unknown>;
 };
 

@@ -66,25 +66,25 @@
 
     --stable: 172 72% 48%;
 
-    --alert: 42, 92%, 54%, 1;
+    --alert: 42 92% 54%;
 
     --verified: 200 100% 64%;
 
     --input: 220 18% 90%;
-    --ring: 222 32% 8%;
+    --ring: 346 73% 50%;
 
     --radius: 0.5rem;
   }
 }
 @layer base {
   * {
-    @apply border-neutral-alpha-200;
+    @apply border-neutral-alpha-200 focus-visible:outline-primary;
   }
   html {
     font-family: 'Inter', system-ui, sans-serif;
   }
   body {
-    @apply bg-background text-foreground-950;
+    @apply bg-background text-foreground-950 text-base;
   }
 
   body,

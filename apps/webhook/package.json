@@ -1,6 +1,6 @@
 {
   "name": "@novu/webhook",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "",
   "author": "",
   "private": true,
@@ -78,6 +78,11 @@
     "nohoist": [
       "@nestjs/platform-socket.io",
       "@nestjs/platform-socket.io/**"
+    ]
+  },
+  "nx": {
+    "tags": [
+      "type:app"
     ]
   }
 }

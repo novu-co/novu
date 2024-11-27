@@ -1,9 +1,9 @@
 'use client';
 
 import { Badge } from '@/components/primitives/badge';
-import { Popover, PopoverAnchor, PopoverContent } from '@/components/primitives/popover';
-import { inputVariants } from '@/components/primitives/variants';
 import { CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/primitives/command';
+import { inputVariants } from '@/components/primitives/input';
+import { Popover, PopoverAnchor, PopoverContent } from '@/components/primitives/popover';
 import { cn } from '@/utils/ui';
 import { Command } from 'cmdk';
 import { forwardRef, useEffect, useMemo, useState } from 'react';
@@ -20,7 +20,10 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
   const [tags, setTags] = useState<string[]>(value);
   const [inputValue, setInputValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const validSuggestions = useMemo(() => suggestions.filter((suggestion) => !tags.includes(suggestion)), [tags]);
+  const validSuggestions = useMemo(
+    () => suggestions.filter((suggestion) => !tags.includes(suggestion)),
+    [tags, suggestions]
+  );
 
   useEffect(() => {
     setTags(value);
@@ -54,8 +57,8 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
 
   return (
     <Popover open={isOpen}>
-      <Command>
-        <div className="flex flex-col gap-2">
+      <Command loop>
+        <div className="flex flex-col gap-2 pb-0.5">
           <PopoverAnchor asChild>
             <CommandInput
               ref={ref}
@@ -74,10 +77,10 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
           </PopoverAnchor>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, index) => (
-              <Badge key={index} variant="outline" kind="tag" className="gap-1">
-                <span>{tag}</span>
+              <Badge key={index} variant="outline" size="tag" className="gap-1">
+                <span style={{ wordBreak: 'break-all' }}>{tag}</span>
                 <button type="button" onClick={() => removeTag(tag)}>
-                  <RiCloseFill className="size-3" />
+                  <RiCloseFill className="-mr-0.5 size-3" />
                   <span className="sr-only">Remove tag</span>
                 </button>
               </Badge>
@@ -87,7 +90,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
         <CommandList>
           {(validSuggestions.length > 0 || inputValue !== '') && (
             <PopoverContent
-              className="p-1"
+              className="max-h-64 w-32 p-1"
               portal={false}
               onOpenAutoFocus={(e) => {
                 e.preventDefault();
@@ -96,16 +99,19 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
               onInteractOutside={(e) => e.preventDefault()}
             >
               <CommandGroup>
-                {inputValue !== '' && !tags.includes(inputValue) && (
+                {inputValue !== '' && !validSuggestions.includes(inputValue) && (
                   <CommandItem
                     value={inputValue}
                     onSelect={() => {
                       addTag(inputValue);
                     }}
+                    className="gap-1"
+                    disabled={inputValue === '' || tags.includes(inputValue)}
                   >
                     {inputValue}
                   </CommandItem>
                 )}
+
                 {validSuggestions.map((tag) => (
                   <CommandItem
                     key={tag}

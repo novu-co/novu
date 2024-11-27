@@ -19,15 +19,15 @@ import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { SubscribersStayTunedModal } from './subscribers-stay-tuned-modal';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { useTelemetry } from '@/hooks/use-telemetry';
-import { SidebarContent } from '@/components/side-navigation/Sidebar';
+import { SidebarContent } from '@/components/side-navigation/sidebar';
 
 const linkVariants = cva(
-  `flex items-center gap-2 text-sm py-1.5 px-2 rounded-lg focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer`,
+  `flex items-center gap-2 text-sm py-1.5 px-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer`,
   {
     variants: {
       variant: {
         default: 'text-foreground-600/95 transition ease-out duration-300 hover:bg-accent',
-        selected: 'text-foreground-950 transition ease-out duration-300 hover:bg-accent',
+        selected: 'text-foreground-950 bg-neutral-alpha-100 transition ease-out duration-300 hover:bg-accent',
         disabled: 'text-foreground-300 cursor-help',
       },
     },

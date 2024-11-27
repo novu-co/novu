@@ -9,6 +9,7 @@ import { cva } from 'class-variance-authority';
 import { FormFieldContext, FormItemContext, useFormField } from './form-context';
 import { RiErrorWarningFill, RiInformationFill } from 'react-icons/ri';
 import { BsFillInfoCircleFill } from 'react-icons/bs';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 
 const Form = FormProvider;
 
@@ -40,25 +41,26 @@ FormItem.displayName = 'FormItem';
 
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { optional?: boolean; hint?: string }
->(({ className, optional, hint, children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { optional?: boolean; hint?: string; tooltip?: string }
+>(({ className, optional, tooltip, hint, children, ...props }, ref) => {
   const { formItemId } = useFormField();
 
   return (
-    <Label ref={ref} className={cn('text-foreground-950', className)} htmlFor={formItemId} {...props}>
+    <Label ref={ref} className={cn('text-foreground-950 flex items-center', className)} htmlFor={formItemId} {...props}>
       {children}
-      {hint && (
-        <span className="text-foreground-400 ml-0.5 inline-flex items-center gap-1">
-          {hint}
-          <BsFillInfoCircleFill className="text-foreground-300 inline size-3" />
-        </span>
+
+      {tooltip && (
+        <Tooltip>
+          <TooltipTrigger className="ml-1">
+            <BsFillInfoCircleFill className="text-foreground-300 -mt-0.5 inline size-3" />
+          </TooltipTrigger>
+          <TooltipContent>{tooltip}</TooltipContent>
+        </Tooltip>
       )}
 
-      {optional && (
-        <span className="text-foreground-400 ml-0.5 inline-flex items-center gap-1">
-          (optional) <BsFillInfoCircleFill className="text-foreground-300 inline size-3" />
-        </span>
-      )}
+      {hint && <span className="text-foreground-400 ml-0.5 inline-flex items-center gap-1">{hint}</span>}
+
+      {optional && <span className="text-foreground-400 ml-0.5 inline-flex items-center gap-1">(optional)</span>}
     </Label>
   );
 });
@@ -95,7 +97,7 @@ FormDescription.displayName = 'FormDescription';
 const formMessageVariants = cva('flex items-center gap-1', {
   variants: {
     variant: {
-      default: '[&>svg]:text-foreground-300 text-foreground-400',
+      default: '[&>svg]:text-foreground-400 text-foreground-500',
       error: '[&>svg]:text-destructive [&>span]:text-destructive',
     },
   },

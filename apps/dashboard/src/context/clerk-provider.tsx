@@ -62,6 +62,9 @@ export const ClerkProvider = (props: ClerkProviderProps) => {
         elements: {
           formButtonPrimary: cn(buttonVariants({ variant: 'primary' })),
         },
+        variables: {
+          fontSize: '14px !important',
+        },
       }}
       localization={CLERK_LOCALIZATION}
       allowedRedirectOrigins={ALLOWED_REDIRECT_ORIGINS}

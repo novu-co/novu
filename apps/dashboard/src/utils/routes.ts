@@ -1,7 +1,9 @@
 export const ROUTES = {
-  SIGN_IN: '/sign-in',
-  SIGN_UP: '/sign-up',
-  SIGNUP_ORGANIZATION_LIST: '/sign-up/organization-list',
+  SIGN_IN: '/auth/sign-in',
+  SIGN_UP: '/auth/sign-up',
+  SIGNUP_ORGANIZATION_LIST: '/auth/organization-list',
+  SIGNUP_QUESTIONNAIRE: '/auth/questionnaire',
+  USECASE_SELECT: '/auth/usecase',
   ROOT: '/',
   ENV: '/env',
   WORKFLOWS: '/env/:environmentSlug/workflows',
@@ -25,4 +27,5 @@ export const LEGACY_ROUTES = {
   INVITE_TEAM_MEMBERS: '/legacy/manage-account/team-members',
   SETTINGS: '/legacy/manage-account/user-profile',
   EDIT_WORKFLOW: '/legacy/workflows/edit/:workflowId',
+  TEST_WORKFLOW: '/legacy/workflows/edit/:workflowId/test-workflow',
 };

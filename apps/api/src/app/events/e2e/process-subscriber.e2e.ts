@@ -212,15 +212,7 @@ describe('Trigger event - process subscriber /v1/events/trigger (POST)', functio
 
     await updateSubscriberPreference(updateData, session.subscriberToken, template._id);
 
-    const rest = await notificationTemplateRepository.update(
-      {
-        _id: template._id,
-        _environmentId: session.environment._id,
-      },
-      {
-        critical: true,
-      }
-    );
+    await session.testAgent.put(`/v1/workflows/${template._id}`).send({ critical: true });
 
     await triggerEvent(session, template, payload);
 

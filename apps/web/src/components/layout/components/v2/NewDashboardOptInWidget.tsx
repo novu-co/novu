@@ -2,20 +2,19 @@ import { Card } from '@mantine/core';
 import { css } from '@novu/novui/css';
 import { Text, Title, Button, IconButton } from '@novu/novui';
 import { IconOutlineClose } from '@novu/novui/icons';
-import { FeatureFlagsKeysEnum, NewDashboardOptInStatusEnum } from '@novu/shared';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { IS_SELF_HOSTED } from '../../../../config';
 import { useFeatureFlag } from '../../../../hooks';
 import { useNewDashboardOptIn } from '../../../../hooks/useNewDashboardOptIn';
 
 export function NewDashboardOptInWidget() {
-  const { dismiss, redirectToNewDashboard, status } = useNewDashboardOptIn();
+  const { dismiss, optIn, status } = useNewDashboardOptIn();
 
   const isNewDashboardEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ENABLED);
 
-  const isDismissed =
-    status === NewDashboardOptInStatusEnum.DISMISSED || status === NewDashboardOptInStatusEnum.OPTED_OUT;
+  const showWidget = !status && isNewDashboardEnabled;
 
-  if (IS_SELF_HOSTED || isDismissed || !isNewDashboardEnabled) {
+  if (IS_SELF_HOSTED || !showWidget) {
     return null;
   }
 
@@ -33,7 +32,7 @@ export function NewDashboardOptInWidget() {
         </Text>
       </div>
       <div className={styles.buttonContainer}>
-        <Button size="sm" variant="transparent" onClick={redirectToNewDashboard}>
+        <Button size="sm" variant="transparent" onClick={optIn}>
           Take me there
         </Button>
       </div>
@@ -44,7 +43,10 @@ export function NewDashboardOptInWidget() {
 const styles = {
   card: css({
     padding: '9px 16px !important',
+    marginBottom: '16px',
     backgroundColor: 'surface.popover !important',
+    borderTopLeftRadius: '100 !important',
+    borderBottomLeftRadius: '100 !important',
     _before: {
       content: '""',
       position: 'absolute',

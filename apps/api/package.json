@@ -1,6 +1,6 @@
 {
   "name": "@novu/api",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "description",
   "author": "",
   "private": "true",
@@ -46,10 +46,10 @@
     "@novu/dal": "workspace:*",
     "@novu/framework": "workspace:*",
     "@novu/node": "workspace:*",
+    "@novu/notifications": "workspace:*",
     "@novu/shared": "workspace:*",
     "@novu/stateless": "workspace:*",
     "@novu/testing": "workspace:*",
-    "@novu/notifications": "workspace:*",
     "@sendgrid/mail": "^8.1.0",
     "@sentry/browser": "^8.33.1",
     "@sentry/hub": "^7.114.0",
@@ -99,8 +99,7 @@
     "twilio": "^4.14.1",
     "uuid": "^8.3.2",
     "zod": "^3.23.8",
-    "zod-to-json-schema": "^3.23.3",
-    "json-schema-to-ts": "^3.0.0"
+    "zod-to-json-schema": "^3.23.3"
   },
   "devDependencies": {
     "@faker-js/faker": "^6.0.0",
@@ -108,6 +107,7 @@
     "@nestjs/schematics": "10.1.4",
     "@nestjs/testing": "10.4.1",
     "@stoplight/spectral-cli": "^6.11.0",
+    "@types/async": "^3.2.1",
     "@types/bcrypt": "^3.0.0",
     "@types/bull": "^3.15.8",
     "@types/chai": "^4.2.11",
@@ -118,8 +118,8 @@
     "@types/passport-jwt": "^3.0.3",
     "@types/sinon": "^9.0.0",
     "@types/supertest": "^2.0.8",
+    "async": "^3.2.0",
     "chai": "^4.2.0",
-    "express": "^4.17.1",
     "mocha": "^10.2.0",
     "sinon": "^9.2.4",
     "ts-loader": "~9.4.0",
@@ -127,11 +127,15 @@
     "tsconfig-paths": "~4.1.0",
     "typescript": "5.6.2"
   },
-
   "optionalDependencies": {
     "@novu/ee-auth": "workspace:*",
     "@novu/ee-billing": "workspace:*",
     "@novu/ee-shared-services": "workspace:*",
     "@novu/ee-translation": "workspace:*"
+  },
+  "nx": {
+    "tags": [
+      "type:app"
+    ]
   }
 }

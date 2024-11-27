@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/primitives/dialog';
+import { ReactNode } from 'react';
 import { RiAlertFill } from 'react-icons/ri';
 
 type ConfirmationModalProps = {
@@ -17,8 +18,9 @@ type ConfirmationModalProps = {
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   title: string;
-  description: string;
+  description: ReactNode;
   confirmButtonText: string;
+  isLoading?: boolean;
 };
 
 export const ConfirmationModal = ({
@@ -28,6 +30,7 @@ export const ConfirmationModal = ({
   title,
   description,
   confirmButtonText,
+  isLoading,
 }: ConfirmationModalProps) => {
   return (
     <Dialog modal open={open} onOpenChange={onOpenChange}>
@@ -49,11 +52,10 @@ export const ConfirmationModal = ({
                 Cancel
               </Button>
             </DialogClose>
-            <DialogClose asChild aria-label="Close">
-              <Button type="button" size="sm" variant="primary" onClick={onConfirm}>
-                {confirmButtonText}
-              </Button>
-            </DialogClose>
+
+            <Button type="button" size="sm" variant="primary" onClick={onConfirm} disabled={isLoading}>
+              {confirmButtonText}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </DialogPortal>

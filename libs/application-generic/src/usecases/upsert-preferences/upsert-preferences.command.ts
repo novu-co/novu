@@ -1,24 +1,24 @@
 import {
-  IsEnum,
   IsBoolean,
   IsOptional,
   IsObject,
   ValidateNested,
-  IsNotEmpty,
-  IsMongoId,
   ValidateIf,
 } from 'class-validator';
 import {
   ChannelPreference as ChannelPreferenceType,
-  PreferencesTypeEnum,
   WorkflowPreferencesPartial,
   WorkflowPreference as WorkflowPreferenceType,
   ChannelTypeEnum,
+  WorkflowPreferences,
 } from '@novu/shared';
 import { Type } from 'class-transformer';
 import { EnvironmentCommand } from '../../commands';
 
-class WorkflowPreference implements Partial<WorkflowPreferenceType> {
+// PARTIAL PREFERENCES
+export class WorkflowPreferencePartial
+  implements Partial<WorkflowPreferenceType>
+{
   @IsOptional()
   @IsBoolean()
   readonly enabled?: boolean;
@@ -28,81 +28,126 @@ class WorkflowPreference implements Partial<WorkflowPreferenceType> {
   readonly readOnly?: boolean;
 }
 
-export class ChannelPreference implements Partial<ChannelPreferenceType> {
+export class ChannelPreferencePartial
+  implements Partial<ChannelPreferenceType>
+{
   @IsOptional()
   @IsBoolean()
   readonly enabled?: boolean;
 }
 
-class ChannelPreferences
-  implements Partial<Record<ChannelTypeEnum, ChannelPreference>>
+export class ChannelPreferencesPartial
+  implements Partial<Record<ChannelTypeEnum, ChannelPreferencePartial>>
 {
   @IsOptional()
   @IsObject()
   @ValidateNested()
-  @Type(() => ChannelPreference)
-  readonly email?: ChannelPreference;
+  @Type(() => ChannelPreferencePartial)
+  readonly email?: ChannelPreferencePartial;
 
   @IsOptional()
   @IsObject()
   @ValidateNested()
-  @Type(() => ChannelPreference)
-  readonly sms?: ChannelPreference;
+  @Type(() => ChannelPreferencePartial)
+  readonly sms?: ChannelPreferencePartial;
 
   @IsOptional()
   @IsObject()
   @ValidateNested()
-  @Type(() => ChannelPreference)
-  readonly in_app?: ChannelPreference;
+  @Type(() => ChannelPreferencePartial)
+  readonly in_app?: ChannelPreferencePartial;
 
   @IsOptional()
   @IsObject()
   @ValidateNested()
-  @Type(() => ChannelPreference)
-  readonly push?: ChannelPreference;
+  @Type(() => ChannelPreferencePartial)
+  readonly push?: ChannelPreferencePartial;
 
   @IsOptional()
   @IsObject()
   @ValidateNested()
-  @Type(() => ChannelPreference)
-  readonly chat?: ChannelPreference;
+  @Type(() => ChannelPreferencePartial)
+  readonly chat?: ChannelPreferencePartial;
 }
 
-export class Preferences implements WorkflowPreferencesPartial {
+export class PreferencesPartial implements WorkflowPreferencesPartial {
   @IsOptional()
   @IsObject()
   @ValidateNested()
-  @Type(() => WorkflowPreference)
-  readonly all?: WorkflowPreference;
+  @Type(() => WorkflowPreferencePartial)
+  readonly all?: WorkflowPreferencePartial;
 
   @IsObject()
   @ValidateNested()
-  @Type(() => ChannelPreferences)
-  readonly channels?: ChannelPreferences;
+  @Type(() => ChannelPreferencesPartial)
+  readonly channels?: ChannelPreferencesPartial;
 }
 
-export class UpsertPreferencesBaseCommand extends EnvironmentCommand {
+export class UpsertPreferencesPartialBaseCommand extends EnvironmentCommand {
   @IsObject()
   @ValidateNested()
-  @Type(() => Preferences)
-  @ValidateIf((object, value) => value !== null)
-  readonly preferences: Preferences | null;
+  @Type(() => PreferencesPartial)
+  readonly preferences: PreferencesPartial;
 }
 
-export class UpsertPreferencesCommand extends UpsertPreferencesBaseCommand {
-  @IsOptional()
-  @IsMongoId()
-  readonly _subscriberId?: string;
+// FULL PREFERENCES
+export class WorkflowPreferenceRequired implements WorkflowPreferenceType {
+  @IsBoolean()
+  readonly enabled: boolean;
 
-  @IsOptional()
-  @IsMongoId()
-  readonly userId?: string;
+  @IsBoolean()
+  readonly readOnly: boolean;
+}
 
-  @IsOptional()
-  @IsMongoId()
-  readonly templateId?: string;
+export class ChannelPreferenceRequired implements ChannelPreferenceType {
+  @IsBoolean()
+  readonly enabled: boolean;
+}
 
-  @IsNotEmpty()
-  @IsEnum(PreferencesTypeEnum)
-  readonly type: PreferencesTypeEnum;
+export class ChannelPreferencesRequired
+  implements Record<ChannelTypeEnum, ChannelPreferenceRequired>
+{
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferenceRequired)
+  readonly email: ChannelPreferenceRequired;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferenceRequired)
+  readonly sms: ChannelPreferenceRequired;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferenceRequired)
+  readonly in_app: ChannelPreferenceRequired;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferenceRequired)
+  readonly push: ChannelPreferenceRequired;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferenceRequired)
+  readonly chat: ChannelPreferenceRequired;
+}
+
+export class PreferencesRequired implements WorkflowPreferences {
+  @IsObject()
+  @ValidateNested()
+  @Type(() => WorkflowPreferenceRequired)
+  readonly all: WorkflowPreferenceRequired;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferencesRequired)
+  readonly channels: ChannelPreferencesRequired;
+}
+
+export class UpsertPreferencesRequiredBaseCommand extends EnvironmentCommand {
+  @IsObject()
+  @ValidateNested()
+  @Type(() => PreferencesRequired)
+  readonly preferences: PreferencesRequired;
 }

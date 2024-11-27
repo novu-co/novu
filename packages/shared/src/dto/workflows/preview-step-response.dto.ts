@@ -1,4 +1,4 @@
-import { ChannelTypeEnum } from '../../types';
+import { ActionTypeEnum, ChannelTypeEnum } from '../../types';
 import { SubscriberDto } from '../subscriber';
 import { ContentIssue } from './workflow-commons-fields';
 
@@ -22,6 +22,57 @@ export class EmailRenderOutput extends RenderOutput {
   body: string;
 }
 
+export class DigestOutputProcessor {
+  static isDigestRegularOutput(output: unknown): output is DigestRegularOutput {
+    if (typeof output !== 'object' || output === null) return false;
+
+    const obj = output as { [key: string]: unknown };
+
+    return typeof obj.amount === 'number' && Object.values(TimeUnitEnum).includes(obj.unit as TimeUnitEnum);
+  }
+
+  static isDigestTimedOutput(output: unknown): output is DigestTimedOutput {
+    if (typeof output !== 'object' || output === null) return false;
+
+    const obj = output as { [key: string]: unknown };
+
+    return typeof obj.cron === 'string' && (typeof obj.digestKey === 'undefined' || typeof obj.digestKey === 'string');
+  }
+}
+
+class DigestRegularOutput {
+  amount: number;
+  unit: TimeUnitEnum;
+  digestKey?: string;
+  lookBackWindow: {
+    amount: number;
+    unit: TimeUnitEnum;
+  };
+}
+
+class DigestTimedOutput {
+  cron: string;
+  digestKey?: string;
+}
+
+export type DigestRenderOutput = DigestRegularOutput | DigestTimedOutput;
+
+export class DelayRenderOutput extends RenderOutput {
+  type: TimeType;
+  amount: number;
+  unit: TimeUnitEnum;
+}
+export enum TimeUnitEnum {
+  SECONDS = 'seconds',
+  MINUTES = 'minutes',
+  HOURS = 'hours',
+  DAYS = 'days',
+  WEEKS = 'weeks',
+  MONTHS = 'months',
+}
+
+type TimeType = 'regular';
+
 export enum RedirectTargetEnum {
   SELF = '_self',
   BLANK = '_blank',
@@ -36,14 +87,14 @@ export class InAppRenderOutput extends RenderOutput {
   avatar?: string;
   primaryAction?: {
     label: string;
-    redirect: {
+    redirect?: {
       url: string;
       target?: RedirectTargetEnum;
     };
   };
   secondaryAction?: {
     label: string;
-    redirect: {
+    redirect?: {
       url: string;
       target?: RedirectTargetEnum;
     };
@@ -84,5 +135,13 @@ export class GeneratePreviewResponseDto {
     | {
         type: ChannelTypeEnum.CHAT;
         preview: ChatRenderOutput;
+      }
+    | {
+        type: ActionTypeEnum.DELAY;
+        preview: DigestRenderOutput;
+      }
+    | {
+        type: ActionTypeEnum.DIGEST;
+        preview: DigestRenderOutput;
       };
 }

@@ -1,68 +1,88 @@
 import {
-  ArrayMaxSize,
+  ArrayUnique,
   IsArray,
   IsBoolean,
   IsDefined,
   IsEnum,
   IsMongoId,
+  IsObject,
   IsOptional,
   IsString,
+  Length,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 
 import {
-  IPreferenceChannels,
   JSONSchemaDto,
   NotificationTemplateCustomData,
+  WorkflowStatusEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
 
+import { Type } from 'class-transformer';
 import { EnvironmentWithUserCommand } from '../../../commands';
-import { NotificationStep } from '../..';
+import { PreferencesRequired } from '../../upsert-preferences';
+import {
+  ContentIssue,
+  IStepControl,
+  MAX_DESCRIPTION_LENGTH,
+  MAX_NAME_LENGTH,
+  MAX_TAG_ELEMENTS,
+  MAX_TAG_LENGTH,
+  NotificationStep,
+} from '../..';
 
 export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsDefined()
   @IsMongoId()
   id: string;
 
-  @IsArray()
   @IsOptional()
-  @ArrayMaxSize(8)
-  tags?: string[];
+  @IsString()
+  @Length(1, MAX_NAME_LENGTH)
+  name: string;
 
   @IsString()
   @IsOptional()
-  name?: string;
+  @Length(0, MAX_DESCRIPTION_LENGTH)
+  description?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @Length(1, MAX_TAG_LENGTH, { each: true })
+  tags?: string[];
 
   @IsBoolean()
   @IsOptional()
   active?: boolean;
 
-  @IsString()
+  @IsArray()
+  @ValidateNested()
   @IsOptional()
-  description?: string;
+  steps?: NotificationStep[];
 
-  @IsString()
   @IsOptional()
-  workflowId?: string;
+  @IsMongoId()
+  notificationGroupId?: string;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => PreferencesRequired)
+  @ValidateIf((object, value) => value !== null)
+  @IsOptional()
+  userPreferences?: PreferencesRequired | null;
 
   @IsBoolean()
   @IsOptional()
   critical?: boolean;
 
+  @IsObject()
   @IsOptional()
-  preferenceSettings?: IPreferenceChannels;
-
-  @IsOptional()
-  @IsMongoId({
-    message: 'Bad group id name',
-  })
-  notificationGroupId?: string;
-
-  @IsArray()
   @ValidateNested()
-  @IsOptional()
-  steps?: NotificationStep[];
+  @Type(() => PreferencesRequired)
+  defaultPreferences: PreferencesRequired;
 
   @ValidateNested()
   @IsOptional()
@@ -81,7 +101,7 @@ export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   controls?: IStepControl;
 
   @IsOptional()
-  rawData?: any;
+  rawData?: Record<string, unknown>;
 
   @IsOptional()
   payloadSchema?: JSONSchemaDto;
@@ -89,8 +109,17 @@ export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsEnum(WorkflowTypeEnum)
   @IsDefined()
   type: WorkflowTypeEnum;
-}
 
-export interface IStepControl {
-  schema: JSONSchemaDto;
+  @IsString()
+  @IsOptional()
+  workflowId?: string;
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => ContentIssue)
+  issues?: Record<string, ContentIssue[]>;
+
+  @IsEnum(WorkflowStatusEnum)
+  @IsOptional()
+  status?: WorkflowStatusEnum;
 }

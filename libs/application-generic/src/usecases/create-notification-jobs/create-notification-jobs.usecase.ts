@@ -60,7 +60,6 @@ export class CreateNotificationJobs {
       transactionId: command.transactionId,
       to: command.to,
       payload: command.payload,
-      expireAt: this.calculateExpireAt(command),
       channels,
       controls: command.controls,
       tags: command.template.tags,
@@ -108,7 +107,6 @@ export class CreateNotificationJobs {
         digest: step.metadata,
         type: step.template.type,
         providerId,
-        expireAt: notification.expireAt,
         ...(command.actor && {
           _actorId: command.actor?._id,
           actorId: command.actor?.subscriberId,
@@ -165,7 +163,6 @@ export class CreateNotificationJobs {
       subscriberId: command.subscriber.subscriberId,
       transactionId: command.transactionId,
       status: JobStatusEnum.PENDING,
-      expireAt: notification.expireAt,
       ...(command.actor && {
         _actorId: command.actor?._id,
         actorId: command.actor?.subscriberId,
@@ -223,41 +220,5 @@ export class CreateNotificationJobs {
     }
 
     return steps;
-  }
-
-  private calculateExpireAt(command: CreateNotificationJobsCommand) {
-    try {
-      /*
-       * If the workflow is a framework workflow, we'll set the expiration date to 1 month from now
-       * todo decide if we want to add another request in order to get more accurate expire at amount
-       */
-      if (isBridgeWorkflow(command.template.type)) {
-        return addMonths(Date.now(), 1);
-      }
-
-      const delayedSteps = command.template.steps.filter(
-        (step) =>
-          step.template?.type === StepTypeEnum.DIGEST ||
-          step.template?.type === StepTypeEnum.DELAY,
-      );
-
-      const delay = delayedSteps
-        .map((step) =>
-          this.computeJobWaitDurationService.calculateDelay({
-            stepMetadata: step.metadata,
-            payload: command.payload,
-            overrides: command.overrides,
-          }),
-        )
-        .reduce((sum, delayAmount) => sum + delayAmount, 0);
-
-      return addMilliseconds(Date.now(), delay);
-    } catch (e) {
-      /*
-       * If the user has entered an incorrect negative delay,
-       * we'll accept it as a temporary solution to enable printing error execution details later in the process when a job is available.
-       */
-      return addMonths(Date.now(), 1);
-    }
   }
 }

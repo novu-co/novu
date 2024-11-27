@@ -1,55 +1,61 @@
 import { ReactNode, useState } from 'react';
 import { cva, VariantProps } from 'class-variance-authority';
-import { Badge, BadgeContent, BadgeContentProps, BadgeProps } from '../primitives/badge';
-import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { StepTypeEnum } from '@/utils/enums';
 import { RiErrorWarningFill } from 'react-icons/ri';
 import { Popover, PopoverArrow, PopoverContent, PopoverPortal, PopoverTrigger } from '../primitives/popover';
+import { cn } from '@/utils/ui';
+import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 
-const nodeIconVariants = cva('w-5 h-5 border rounded-full opacity-40 flex items-center justify-center p-1', {
-  variants: {
-    variant: {
-      neutral: 'border-neutral-500 text-neutral-500',
-      feature: 'border-feature text-feature',
-      information: 'border-information text-information',
-      highlighted: 'border-highlighted text-highlighted',
-      stable: 'border-stable text-stable',
-      verified: 'border-verified text-verified',
-      destructive: 'border-destructive text-destructive',
-      success: 'border-success text-success',
-      warning: 'border-warning text-warning',
-      alert: 'border-alert text-alert',
-      soft: 'border-neutral-alpha-200 text-neutral-alpha-200',
+const nodeBadgeVariants = cva(
+  'min-w-5 text-xs h-5 border rounded-full opacity-40 flex items-center justify-center p-1',
+  {
+    variants: {
+      variant: {
+        neutral: 'border-neutral-500 text-neutral-500',
+        feature: 'border-feature text-feature',
+        information: 'border-information text-information',
+        highlighted: 'border-highlighted text-highlighted',
+        stable: 'border-stable text-stable',
+        verified: 'border-verified text-verified',
+        destructive: 'border-destructive text-destructive',
+        success: 'border-success text-success',
+        warning: 'border-warning text-warning',
+        alert: 'border-alert text-alert',
+        soft: 'border-neutral-alpha-200 text-neutral-alpha-200',
+      },
     },
-  },
-  defaultVariants: {
-    variant: 'neutral',
-  },
-});
+    defaultVariants: {
+      variant: 'neutral',
+    },
+  }
+);
 
-export interface NodeIconProps extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof nodeIconVariants> {}
+export interface NodeIconProps extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof nodeBadgeVariants> {}
 
 export const NodeIcon = ({ children, variant }: NodeIconProps) => {
-  return <span className={nodeIconVariants({ variant })}>{children}</span>;
+  return <span className={nodeBadgeVariants({ variant })}>{children}</span>;
 };
 
 export const NodeName = ({ children }: { children: ReactNode }) => {
-  return <span className="text-foreground-950 text-sm font-medium">{children}</span>;
+  return (
+    <span className="text-foreground-950 overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium">
+      {children}
+    </span>
+  );
 };
 
 export const NodeHeader = ({ children, type }: { children: ReactNode; type: StepTypeEnum }) => {
   return (
-    <div className="flex items-center justify-between px-1 py-2">
-      <div className="flex items-center gap-1.5">{children}</div>
-      <Badge
-        variant={STEP_TYPE_TO_COLOR[type] as BadgeProps['variant']}
-        kind="pill-stroke"
-        className="uppercase opacity-40"
+    <div className="flex w-full items-center gap-1.5 px-1 py-2">
+      {children}
+      <div
+        className={cn(
+          nodeBadgeVariants({ variant: STEP_TYPE_TO_COLOR[type] as any }),
+          'ml-auto min-w-max px-2 uppercase opacity-40'
+        )}
       >
-        <BadgeContent variant={STEP_TYPE_TO_COLOR[type] as BadgeContentProps['variant']}>
-          {type.replace('_', '-')}
-        </BadgeContent>
-      </Badge>
+        {type.replace('_', '-')}
+      </div>
     </div>
   );
 };
@@ -71,11 +77,11 @@ export const NodeError = ({ children }: { children: ReactNode }) => {
     <Popover open={isPopoverOpen}>
       <PopoverTrigger asChild>
         <span
-          className="absolute right-0 top-0 size-4 -translate-y-[6px] translate-x-[2px]"
+          className="absolute right-0 top-0 size-4 -translate-y-[5px] translate-x-[5px]"
           onMouseEnter={() => setIsPopoverOpen(true)}
           onMouseLeave={() => setIsPopoverOpen(false)}
         >
-          <RiErrorWarningFill className="border-destructive fill-destructive rounded-full border p-[1px]" />
+          <RiErrorWarningFill className="border-destructive fill-destructive bg-foreground-0 rounded-full border p-[1px]" />
         </span>
       </PopoverTrigger>
       <PopoverPortal>

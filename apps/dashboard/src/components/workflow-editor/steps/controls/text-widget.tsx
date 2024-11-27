@@ -1,39 +1,30 @@
-import { type WidgetProps } from '@rjsf/utils';
-import { EditorView } from '@uiw/react-codemirror';
-import { liquid } from '@codemirror/lang-liquid';
-import { useFormContext } from 'react-hook-form';
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { InputField } from '@/components/primitives/input';
+import { completions } from '@/utils/liquid-autocomplete';
 import { capitalize } from '@/utils/string';
+import { autocompletion } from '@codemirror/autocomplete';
+import { type WidgetProps } from '@rjsf/utils';
+import { useFormContext } from 'react-hook-form';
 
 export function TextWidget(props: WidgetProps) {
   const { label, readonly, name } = props;
-
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext();
+  const { control } = useFormContext();
 
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className="my-2 w-full py-1">
+        <FormItem className="my-2 py-1">
           <FormLabel>{capitalize(label)}</FormLabel>
           <FormControl>
-            <InputField size="md" className="px-1" state={errors[name] ? 'error' : 'default'}>
+            <InputField size="fit">
               <Editor
+                fontFamily="inherit"
                 placeholder={capitalize(label)}
-                size="md"
                 id={label}
-                extensions={[
-                  liquid({
-                    variables: [{ type: 'variable', label: 'asdf' }],
-                  }),
-                  EditorView.lineWrapping,
-                ]}
+                extensions={[autocompletion({ override: [completions([])] })]}
                 value={field.value}
                 onChange={(val) => field.onChange(val)}
                 readOnly={readonly}

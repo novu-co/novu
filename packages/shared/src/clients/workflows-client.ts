@@ -2,17 +2,18 @@ import { createNovuBaseClient, HttpError, NovuRestResult } from './novu-base-cli
 import {
   CreateWorkflowDto,
   GeneratePreviewRequestDto,
+  GeneratePreviewResponseDto,
   GetListQueryParams,
   ListWorkflowResponse,
+  PatchStepDataDto,
+  PatchWorkflowDto,
   StepDataDto,
   SyncWorkflowDto,
   UpdateWorkflowDto,
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
 } from '../dto';
-import { GeneratePreviewResponseDto } from '../dto/workflows/preview-step-response.dto';
 
-// Define the WorkflowClient as a function that utilizes the base client
 export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {}) => {
   const baseClient = createNovuBaseClient(baseUrl, headers);
 
@@ -47,6 +48,21 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     return await baseClient.safeGet<StepDataDto>(`/v2/workflows/${workflowId}/steps/${stepId}`);
   };
 
+  const patchWorkflowStepData = async (
+    workflowId: string,
+    stepId: string,
+    patchStepDataDto: PatchStepDataDto
+  ): Promise<NovuRestResult<StepDataDto, HttpError>> => {
+    return await baseClient.safePatch<StepDataDto>(`/v2/workflows/${workflowId}/steps/${stepId}`, patchStepDataDto);
+  };
+
+  const patchWorkflow = async (
+    workflowId: string,
+    patchWorkflowDto: PatchWorkflowDto
+  ): Promise<NovuRestResult<WorkflowResponseDto, HttpError>> => {
+    return await baseClient.safePatch<WorkflowResponseDto>(`/v2/workflows/${workflowId}`, patchWorkflowDto);
+  };
+
   const deleteWorkflow = async (workflowId: string): Promise<NovuRestResult<void, HttpError>> => {
     return await baseClient.safeDelete(`/v2/workflows/${workflowId}`);
   };
@@ -70,6 +86,40 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     return await baseClient.safeGet<ListWorkflowResponse>(`/v2/workflows?${query.toString()}`);
   };
 
+  /**
+   * @deprecated This function is deprecated and will be removed in future versions.
+   * Use `searchWorkflows` instead to retrieve workflows with updated parameters and functionality.
+   *
+   * @param {GetListQueryParams} queryParams - The parameters for querying workflows.
+   * @returns {Promise<NovuRestResult<ListWorkflowResponse, HttpError>>} - A promise that resolves to the result of the workflow retrieval.
+   */
+  const searchWorkflowsV1 = async (queryParams?: string): Promise<NovuRestResult<WorkflowResponseDto[], HttpError>> => {
+    const query = new URLSearchParams();
+    query.append('defaultLimit', '10');
+    query.append('maxLimit', '50');
+    if (queryParams) {
+      query.append('query', queryParams);
+    }
+
+    return await baseClient.safeGet<WorkflowResponseDto[]>(`/v1/workflows?${query.toString()}`);
+  };
+  /**
+   * @deprecated This function is deprecated and will be removed in future versions.
+   * Use `searchWorkflows` instead to retrieve workflows with updated parameters and functionality.
+   *
+   * @returns {Promise<NovuRestResult<ListWorkflowResponse, HttpError>>} - A promise that resolves to the result of the workflow retrieval.
+   * @param templateBody
+   */
+  const createWorkflowsV1 = async (templateBody: {
+    name: string;
+    description: string;
+    tags: string[];
+    notificationGroupId: string;
+    steps: any[];
+  }): Promise<NovuRestResult<WorkflowResponseDto, HttpError>> => {
+    return await baseClient.safePost<WorkflowResponseDto>(`/v1/workflows`, templateBody);
+  };
+
   const generatePreview = async (
     workflowId: string,
     stepDatabaseId: string,
@@ -87,7 +137,6 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     return await baseClient.safeGet<WorkflowTestDataResponseDto>(`/v2/workflows/${workflowId}/test-data`);
   };
 
-  // Return the methods as an object
   return {
     generatePreview,
     createWorkflow,
@@ -98,5 +147,9 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     searchWorkflows,
     getWorkflowTestData,
     getWorkflowStepData,
+    patchWorkflowStepData,
+    patchWorkflow,
+    searchWorkflowsV1,
+    createWorkflowsV1,
   };
 };
