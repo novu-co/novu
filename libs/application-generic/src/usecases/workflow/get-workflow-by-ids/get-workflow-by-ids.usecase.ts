@@ -17,7 +17,7 @@ import { GetPreferences, GetPreferencesCommand } from '../../get-preferences';
 
 import { GetWorkflowByIdsCommand } from './get-workflow-by-ids.command';
 import { WorkflowInternalResponseDto } from './get-workflow-by-ids.dto';
-import { Instrument, InstrumentUsecase } from '../../..';
+import { Instrument, InstrumentUsecase } from '../../../instrumentation';
 
 @Injectable()
 export class GetWorkflowByIdsUseCase {

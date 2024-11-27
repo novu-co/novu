@@ -39,7 +39,7 @@ import {
 } from '../get-decrypted-secret-key';
 import { BRIDGE_EXECUTION_ERROR } from '../../utils';
 import { HttpRequestHeaderKeysEnum } from '../../http';
-import { Instrument, InstrumentUsecase } from '../..';
+import { Instrument, InstrumentUsecase } from '../../instrumentation';
 
 export const DEFAULT_TIMEOUT = 5_000; // 5 seconds
 export const DEFAULT_RETRIES_LIMIT = 3;
