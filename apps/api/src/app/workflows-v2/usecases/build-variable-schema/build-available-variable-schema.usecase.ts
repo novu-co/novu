@@ -39,7 +39,7 @@ export class BuildAvailableVariableSchemaUsecase {
           additionalProperties: false,
         },
         steps: buildPreviousStepsSchema(previousSteps, workflow.payloadSchema),
-        payload: parsePayloadSchema(workflow, { safe: true }) || {
+        payload: parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {
           type: 'object',
           description: 'Payload for the current step',
         },

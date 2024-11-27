@@ -13,11 +13,11 @@ export class BuildWorkflowTestDataUseCase {
   async execute(command: WorkflowTestDataCommand): Promise<WorkflowTestDataResponseDto> {
     const _workflowEntity: NotificationTemplateEntity = await this.fetchWorkflow(command);
     const toSchema = buildToFieldSchema({ user: command.user, steps: _workflowEntity.steps });
-    const payloadSchema = parsePayloadSchema(_workflowEntity.payloadSchema);
+    const payloadSchema = parsePayloadSchema(_workflowEntity.payloadSchema, { safe: true });
 
     return {
       to: toSchema,
-      payload: payloadSchema,
+      payload: payloadSchema || {},
     };
   }
 
