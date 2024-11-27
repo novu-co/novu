@@ -9,16 +9,11 @@ import * as z from 'zod';
 
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/primitives/alert-dialog';
-import { buttonVariants } from '@/components/primitives/button';
-import { Separator } from '@/components/primitives/separator';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useFetchWorkflow, useFormAutoSave, useUpdateWorkflow } from '@/hooks';
 import { StepTypeEnum } from '@/utils/enums';
@@ -26,12 +21,14 @@ import { handleValidationIssues } from '@/utils/handleValidationIssues';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { Step } from '@/utils/types';
 import debounce from 'lodash.debounce';
-import { RiAlertFill } from 'react-icons/ri';
+import { RiAlertFill, RiCloseFill } from 'react-icons/ri';
 import { Form } from '../primitives/form/form';
 import { ToastIcon } from '../primitives/sonner';
 import { showToast } from '../primitives/sonner-helpers';
 import { workflowSchema } from './schema';
 import { WorkflowEditorContext } from './workflow-editor-context';
+import { toast } from 'sonner';
+import { CheckCircleIcon } from 'lucide-react';
 
 const STEP_NAME_BY_TYPE: Record<StepTypeEnum, string> = {
   email: 'Email Step',
@@ -77,12 +74,7 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
     defaultValues: defaultFormValues,
   });
 
-  const {
-    reset,
-    getValues,
-    setError,
-    formState: { isDirty },
-  } = form;
+  const { reset, getValues, setError, formState } = form;
   const steps = useFieldArray({
     control: form.control,
     name: 'steps',
@@ -108,6 +100,17 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
     resetWorkflowForm(workflow);
   }, [workflow, error, navigate, resetWorkflowForm, currentEnvironment]);
 
+  const blocker = useBlocker(({ nextLocation }) => {
+    const workflowEditorBasePath = buildRoute(ROUTES.EDIT_WORKFLOW, {
+      workflowSlug,
+      environmentSlug: currentEnvironment?.slug ?? '',
+    });
+
+    const isLeavingEditor = !nextLocation.pathname.startsWith(workflowEditorBasePath);
+
+    return isLeavingEditor && isPending;
+  });
+
   const { updateWorkflow, isPending } = useUpdateWorkflow({
     onMutate: () => {
       setToastId(
@@ -127,7 +130,13 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
         })
       );
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      if (blocker.state === 'blocked') {
+        // user is leaving the editor, proceed with the pending navigation
+        await handleBlockedNavigation();
+        return;
+      }
+
       resetWorkflowForm(data);
 
       if (data.issues) {
@@ -153,7 +162,27 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
     },
   });
 
-  const blocker = useBlocker(isDirty || isPending);
+  /*
+   * If there was a pending navigation when saving was in progress,
+   * proceed with that navigation now that changes are saved
+   *
+   * small timeout to briefly show the success dialog before navigating
+   */
+  const handleBlockedNavigation = useCallback(async () => {
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        blocker.proceed?.();
+        toast.dismiss();
+        resolve();
+      }, 500);
+    });
+  }, [blocker]);
+
+  const handleCancelNavigation = useCallback(() => {
+    if (blocker.state === 'blocked') {
+      blocker.reset();
+    }
+  }, [blocker]);
 
   const onSubmit = useCallback(
     async (data: z.infer<typeof workflowSchema>) => {
@@ -228,30 +257,37 @@ export const WorkflowEditorProvider = ({ children }: { children: ReactNode }) =>
   return (
     <WorkflowEditorContext.Provider value={value}>
       <AlertDialog open={blocker.state === 'blocked'}>
-        <AlertDialogContent>
+        <AlertDialogContent className="w-96">
           <AlertDialogHeader className="flex flex-row items-start gap-4">
-            <div className="bg-warning/10 rounded-lg p-3">
-              <RiAlertFill className="text-warning size-6" />
+            <div
+              className={`rounded-lg p-3 transition-all duration-300 ${
+                !isPending ? 'bg-success/10 scale-110' : 'bg-warning/10'
+              }`}
+            >
+              <div className="transition-opacity duration-300">
+                {!isPending ? (
+                  <CheckCircleIcon className="text-success animate-in fade-in size-6" />
+                ) : (
+                  <RiAlertFill className="text-warning animate-in fade-in size-6" />
+                )}
+              </div>
             </div>
             <div className="space-y-1">
-              <AlertDialogTitle>You might lose your progress</AlertDialogTitle>
-              <AlertDialogDescription>
-                This workflow has some unsaved changes. Save progress before you leave.
+              <div>
+                <AlertDialogTitle className="transition-all duration-300">
+                  {!isPending ? 'Changes saved!' : 'Saving changes'}
+                </AlertDialogTitle>
+              </div>
+              <AlertDialogDescription className="transition-all duration-300">
+                {!isPending ? 'Workflow has been saved successfully' : 'Please wait while we save your changes'}
               </AlertDialogDescription>
             </div>
+            {isPending && (
+              <button onClick={handleCancelNavigation} className="text-gray-500">
+                <RiCloseFill className="size-4" />
+              </button>
+            )}
           </AlertDialogHeader>
-
-          <Separator />
-
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => blocker.reset?.()}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => blocker.proceed?.()}
-              className={buttonVariants({ variant: 'destructive' })}
-            >
-              Proceed anyway
-            </AlertDialogAction>
-          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
       <Form {...form}>
