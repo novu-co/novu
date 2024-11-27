@@ -22,6 +22,7 @@ import { initializeSentry } from './utils/sentry';
 import { EditStepSidebar } from './components/workflow-editor/steps/edit-step-sidebar';
 import { overrideZodErrorMap } from './utils/validation';
 import { InboxUsecasePage } from './pages/inbox-usecase-page';
+import { InboxEmbedPage } from './pages/inbox-embed-page';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
           {
             path: ROUTES.INBOX_USECASE,
             element: <InboxUsecasePage />,
+          },
+          {
+            path: ROUTES.INBOX_EMBED,
+            element: <InboxEmbedPage />,
           },
         ],
       },

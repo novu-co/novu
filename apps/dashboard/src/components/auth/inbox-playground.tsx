@@ -14,6 +14,10 @@ import { useWorkflows } from '../../hooks/use-workflows';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { showToast } from '../primitives/sonner-helpers';
+import { ToastIcon } from '../primitives/sonner';
+import { ROUTES } from '../../utils/routes';
+import { useNavigate } from 'react-router-dom';
 
 interface PreviewStyle {
   id: string;
@@ -27,18 +31,40 @@ const previewStyles: PreviewStyle[] = [
   { id: 'full-width', label: 'Full Width', image: '/images/auth/full-width-layout.svg' },
 ];
 
-export function InboxPreview() {
+export function InboxPlayground() {
   const form = useForm({
     mode: 'onSubmit',
     resolver: zodResolver(
       z.object({
         subject: z.string(),
         body: z.string(),
+        primaryAction: z.object({
+          label: z.string(),
+          redirect: z.object({
+            target: z.string(),
+            url: z.string(),
+          }),
+        }),
+        secondaryAction: z.object({
+          label: z.string(),
+          redirect: z.object({
+            target: z.string(),
+            url: z.string(),
+          }),
+        }),
       })
     ),
     values: {
-      subject: 'Welcome to Inbox!',
+      subject: '**Welcome to Inbox!**',
       body: 'This is your first notification. Customize and explore more features.',
+      primaryAction: {
+        label: 'Add to your app',
+        redirect: {
+          target: '_self',
+          url: '/',
+        },
+      },
+      secondaryAction: null,
     },
     shouldFocusError: true,
   });
@@ -48,6 +74,8 @@ export function InboxPreview() {
   const { triggerWorkflow, isPending } = useTriggerWorkflow();
   const { data } = useWorkflows();
   const auth = useAuth();
+  const [hasNotificationBeenSent, setHasNotificationBeenSent] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!data) return;
@@ -67,6 +95,20 @@ export function InboxPreview() {
               controlValues: {
                 subject: '{{payload.subject}}',
                 body: '{{payload.body}}',
+                primaryAction: {
+                  label: '{{payload.primaryActionLabel}}',
+                  redirect: {
+                    target: '_self',
+                    url: '',
+                  },
+                },
+                secondaryAction: {
+                  label: '{{payload.secondaryActionLabel}}',
+                  redirect: {
+                    target: '_self',
+                    url: '',
+                  },
+                },
               },
             },
           ],
@@ -84,12 +126,36 @@ export function InboxPreview() {
         payload: {
           subject: form.getValues('subject'),
           body: form.getValues('body'),
+          primaryActionLabel: form.getValues('primaryAction.label') || '',
+          secondaryActionLabel: form.getValues('secondaryAction.label') || '',
         },
       });
 
-      toast.success('Notification sent successfully!');
+      setHasNotificationBeenSent(true);
+
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="success" />
+            <span className="text-sm">Notification sent successfully!</span>
+          </>
+        ),
+        options: {
+          position: 'bottom-center',
+        },
+      });
     } catch (error) {
-      toast.error('Failed to send notification');
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="error" />
+            <span className="text-sm">Failed to save</span>
+          </>
+        ),
+        options: {
+          position: 'bottom-center',
+        },
+      });
     }
   }
 
@@ -201,43 +267,67 @@ export function InboxPreview() {
                         {getComponentByType({ component: UiComponentEnum.IN_APP_SUBJECT })}
                       </div>
                       {getComponentByType({ component: UiComponentEnum.IN_APP_BODY })}
+                      {getComponentByType({ component: UiComponentEnum.IN_APP_BUTTON_DROPDOWN })}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
             </FormProvider>
 
-            <div className="flex items-center justify-between gap-3 rounded-lg border border-neutral-100 bg-neutral-50 px-2 py-1.5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-[16px] items-center">
-                  <div className="h-full w-1 rounded-full bg-[#717784]" />
+            {hasNotificationBeenSent && (
+              <div className="flex items-center justify-between gap-3 rounded-lg border border-neutral-100 bg-neutral-50 px-2 py-1.5">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-[16px] items-center">
+                    <div className="h-full w-1 rounded-full bg-[#717784]" />
+                  </div>
+                  <div className="text-xs">
+                    <span className="font-medium">Send Again?</span> Edit the notification and resend
+                  </div>
                 </div>
-                <div className="text-xs">
-                  <span className="font-medium">Send Again?</span> Edit the notification and resend
-                </div>
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  className="p-0 text-xs font-medium text-[#DD2450] hover:bg-transparent"
+                  onClick={handleSendNotification}
+                  disabled={isPending}
+                >
+                  Send again
+                  {isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : ''}
+                </Button>
               </div>
-              <Button variant="ghost" size="xs" className="p-0 text-xs font-medium text-[#DD2450] hover:bg-transparent">
-                Send again
-              </Button>
-            </div>
+            )}
           </div>
 
           {/* Footer */}
           <div className="bg-muted mt-auto border-t">
             <div className="flex justify-end gap-3 p-2">
-              <Button variant="ghost" size="sm" className="gap-1">
-                Copy cURL
-              </Button>
-              <Button size="sm" onClick={handleSendNotification} disabled={isPending} className="px-2">
-                Send notification
-                {isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <RiNotification2Fill className="h-3 w-3" />}
-              </Button>
+              {!hasNotificationBeenSent ? (
+                <>
+                  <Button size="sm" onClick={handleSendNotification} disabled={isPending} className="px-2">
+                    Send notification
+                    {isPending ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <RiNotification2Fill className="h-3 w-3" />
+                    )}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="ghost" size="sm" className="gap-1">
+                    Skip to Dashboard
+                  </Button>
+                  <Button size="sm" className="px-2" onClick={() => navigate(ROUTES.INBOX_EMBED)}>
+                    Implement &lt;Inbox /&gt;
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
 
         <div className="max-h-[610px] w-full border-l">
-          <InboxPreviewContent selectedStyle={selectedStyle} />
+          <InboxPreviewContent selectedStyle={selectedStyle} hideHint={hasNotificationBeenSent} />
         </div>
       </div>
     </div>

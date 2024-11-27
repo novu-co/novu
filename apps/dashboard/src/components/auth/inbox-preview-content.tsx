@@ -7,9 +7,10 @@ import { API_HOSTNAME, WEBSOCKET_HOSTNAME } from '../../config';
 
 interface InboxPreviewContentProps {
   selectedStyle: string;
+  hideHint?: boolean;
 }
 
-export function InboxPreviewContent({ selectedStyle }: InboxPreviewContentProps) {
+export function InboxPreviewContent({ selectedStyle, hideHint }: InboxPreviewContentProps) {
   const auth = useAuth();
   const { user } = useUser();
   const { environments } = useFetchEnvironments({ organizationId: auth?.currentOrganization?._id });
@@ -44,10 +45,12 @@ export function InboxPreviewContent({ selectedStyle }: InboxPreviewContentProps)
               open
             />
           </div>
-          <div className="absolute bottom-[-10px] left-2 flex flex-col items-start">
-            <SendNotificationArrow className="mt-2 h-[73px] w-[86px]" />
-            <p className="text-success relative top-[-32px] text-[10px] italic">Hit send, to get an notification!</p>
-          </div>
+          {!hideHint && (
+            <div className="absolute bottom-[-10px] left-2 flex flex-col items-start">
+              <SendNotificationArrow className="mt-2 h-[73px] w-[86px]" />
+              <p className="text-success relative top-[-32px] text-[10px] italic">Hit send, to get an notification!</p>
+            </div>
+          )}
         </div>
       )}
       {selectedStyle === 'sidebar' && (
@@ -158,7 +161,7 @@ export function InboxPreviewContent({ selectedStyle }: InboxPreviewContentProps)
         </div>
       )}
       {selectedStyle === 'full-width' && (
-        <div className="mt-10 h-full w-full">
+        <div className="h-full w-full">
           <Inbox {...configuration}>
             <InboxContent />
           </Inbox>
