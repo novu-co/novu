@@ -67,52 +67,54 @@ export function UsecaseSelectPage() {
     <>
       <PageMeta title="Customize you experience" />
 
-      <AuthCard>
-        <div className="flex w-[480px] justify-center px-0">
-          <form onSubmit={handleSubmit} noValidate>
-            <div className="flex max-w-[480px] flex-col items-center justify-center gap-8 p-[60px]">
-              <UsecaseSelectOnboarding
-                channelOptions={channelOptions}
-                selectedUseCases={selectedUseCases}
-                onHover={(id) => setHoveredUseCase(id)}
-                onClick={(id) => handleSelectUseCase(id)}
-              />
+      <div className="flex min-h-screen w-full items-center justify-center">
+        <AuthCard className="flex h-full min-h-[600px]">
+          <div className="flex w-[480px] justify-center px-0">
+            <form onSubmit={handleSubmit} noValidate>
+              <div className="flex max-w-[480px] flex-col items-center justify-center gap-8 p-[60px]">
+                <UsecaseSelectOnboarding
+                  channelOptions={channelOptions}
+                  selectedUseCases={selectedUseCases}
+                  onHover={(id) => setHoveredUseCase(id)}
+                  onClick={(id) => handleSelectUseCase(id)}
+                />
 
-              <div className="flex w-full flex-col items-center gap-3">
-                <Button disabled={selectedUseCases.length === 0 || isPending} className="w-full" type="submit">
-                  Continue
-                  {isPending && <RiLoader2Line className="animate-spin" />}
-                </Button>
-                <Button type="button" variant="link" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
-                  Skip to Homepage
-                </Button>
+                <div className="flex w-full flex-col items-center gap-3">
+                  <Button disabled={selectedUseCases.length === 0 || isPending} className="w-full" type="submit">
+                    Continue
+                    {isPending && <RiLoader2Line className="animate-spin" />}
+                  </Button>
+                  <Button type="button" variant="link" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
+                    Skip to Homepage
+                  </Button>
+                </div>
               </div>
-            </div>
-          </form>
-        </div>
+            </form>
+          </div>
 
-        <div className="flex h-full w-full max-w-[640px] flex-1 items-center justify-center border-l border-l-neutral-200 px-10">
-          <AnimatePresence mode="wait">
-            {displayedUseCase && (
-              <motion.img
-                key={displayedUseCase}
-                src={`/images/auth/${channelOptions.find((option) => option.id === displayedUseCase)?.image}`}
-                alt={`${displayedUseCase}-usecase-illustration`}
-                className="h-auto max-h-[500px] w-full object-contain"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{
-                  duration: 0.2,
-                  ease: 'easeInOut',
-                }}
-              />
-            )}
+          <div className="flex min-h-[600px] w-full max-w-[640px] flex-1 items-center justify-center border-l border-l-neutral-200 bg-white px-10">
+            <AnimatePresence mode="wait">
+              {displayedUseCase && (
+                <motion.img
+                  key={displayedUseCase}
+                  src={`/images/auth/${channelOptions.find((option) => option.id === displayedUseCase)?.image}`}
+                  alt={`${displayedUseCase}-usecase-illustration`}
+                  className="h-auto max-h-[500px] w-full object-contain"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{
+                    duration: 0.2,
+                    ease: 'easeInOut',
+                  }}
+                />
+              )}
 
-            {!displayedUseCase && <EmptyStateView />}
-          </AnimatePresence>
-        </div>
-      </AuthCard>
+              {!displayedUseCase && <EmptyStateView />}
+            </AnimatePresence>
+          </div>
+        </AuthCard>
+      </div>
     </>
   );
 }

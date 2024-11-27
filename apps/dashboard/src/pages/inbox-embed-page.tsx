@@ -9,8 +9,8 @@ export function InboxEmbedPage() {
   const navigate = useNavigate();
 
   return (
-    <AuthCard>
-      <div>
+    <AuthCard className="mt-10 w-full max-w-[1230px]">
+      <div className="w-full">
         <div className="flex flex-1 flex-col overflow-hidden">
           <div className="flex items-center justify-between gap-4 border-b p-4">
             <div className="flex items-start gap-1">
