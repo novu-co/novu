@@ -13,6 +13,7 @@ import {
   GeneratePreviewResponseDto,
   HttpError,
   NovuRestResult,
+  PreviewIssueEnum,
   RedirectTargetEnum,
   StepTypeEnum,
   WorkflowCreationSourceEnum,
@@ -480,7 +481,9 @@ describe('Generate Preview', () => {
             throw new Error('Expected email');
           }
           expect(previewResponseDto.result!.preview.body).to.exist;
-          expect(previewResponseDto.result!.preview.body).to.equal('PREVIEW_ISSUE:REQUIRED_CONTROL_VALUE_IS_MISSING');
+          expect(previewResponseDto.result!.preview.body).to.equal(
+            PreviewIssueEnum.PREVIEW_ISSUE_REQUIRED_CONTROL_VALUE_IS_MISSING
+          );
           const { issues } = previewResponseDto;
           expect(issues).to.exist;
           expect(issues.body).to.exist;

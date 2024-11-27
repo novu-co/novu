@@ -8,6 +8,7 @@ import { InboxSettings } from '@/components/icons/inbox-settings';
 import { Button, ButtonProps } from '@/components/primitives/button';
 import { cn } from '@/utils/ui';
 import { Skeleton } from '../primitives/skeleton';
+import { PreviewIssueEnum } from '@novu/shared';
 
 type InAppPreviewBellProps = HTMLAttributes<HTMLDivElement>;
 export const InAppPreviewBell = (props: InAppPreviewBellProps) => {
@@ -173,6 +174,10 @@ const Markdown = (props: MarkdownProps) => {
   const { children, ...rest } = props;
 
   const tokens = useMemo(() => parseMarkdownIntoTokens(children || ''), [children]);
+
+  if (children === PreviewIssueEnum.PREVIEW_ISSUE_REQUIRED_CONTROL_VALUE_IS_MISSING) {
+    return null;
+  }
 
   return (
     <p {...rest}>
