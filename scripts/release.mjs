@@ -1,46 +1,77 @@
-import { releaseChangelog, releasePublish, releaseVersion } from 'nx/release/index.js';
-import yargs from 'yargs/yargs';
+/**
+ * Release all packages in the monorepo.
+ * 
+ * Usage: pnpm release <version>
+ * 
+ * Known issues:
+ * - nx release with independent versioning and updateDependents: "auto" increases patch by the amount of dependencies updated (https://github.com/nrwl/nx/issues/27823)
+ */
+
 import { hideBin } from 'yargs/helpers';
+import { releaseChangelog, releasePublish, releaseVersion } from 'nx/release/index.js';
+import inquirer from 'inquirer';
+import yargs from 'yargs/yargs';
+import { execa } from 'execa';
 
 (async () => {
-  const options = yargs(hideBin(process.argv))
+  const { dryRun, verbose, ...rest } = yargs(hideBin(process.argv))
     .version(false)
-    .option('version', {
-      description: 'Explicit version specifier to use, if overriding conventional commits',
-      type: 'string',
-    })
     .option('dryRun', {
       alias: 'd',
       description: 'Whether or not to perform a dry-run of the release process, defaults to true',
       type: 'boolean',
+      default: true,
     })
     .option('verbose', {
       description: 'Whether or not to enable verbose logging, defaults to false',
       type: 'boolean',
       default: false,
     })
+    .help()
     .parse();
 
+  const specifier = rest._[0];
+
+  if (!specifier) {
+    console.error('Missing version! Usage: pnpm release <version>');
+    process.exit(1);
+  }
+
   const { workspaceVersion, projectsVersionData } = await releaseVersion({
-    specifier: options.version,
-    dryRun: options.dryRun,
-    verbose: options.verbose,
-    projects: ['tag:package:public'],
+    projects: ['tag:type:package'],
+    specifier,
+    dryRun,
+    verbose,
+    firstRelease: false,
   });
 
   await releaseChangelog({
+    projects: ['tag:type:package'],
+    specifier,
     versionData: projectsVersionData,
     version: workspaceVersion,
-    dryRun: options.dryRun,
-    verbose: options.verbose,
-    projects: ['tag:package:public'],
+    dryRun,
+    verbose,
   });
 
-  // The returned number value from releasePublish will be zero if all projects are published successfully, non-zero if not
-  const publishStatus = await releasePublish({
-    dryRun: options.dryRun,
-    verbose: options.verbose,
-    projects: ['tag:package:public'],
+  await execa({
+    stdout: process.stdout,
+    stderr: process.stderr,
+  })`pnpm run build:packages --skip-nx-cache`;
+
+  const answers = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'otp',
+      message: 'Enter NPM OTP:',
+    },
+  ]);
+
+  await releasePublish({
+    projects: ['tag:type:package'],
+    specifier: 'patch',
+    dryRun,
+    verbose,
+    otp: answers.otp,
   });
-  process.exit(publishStatus);
 })();

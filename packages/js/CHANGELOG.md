@@ -1,3 +1,30 @@
+## 2.6.3 (2024-11-26)
+
+### 🚀 Features
+
+- **dashboard:** Add test inbox for full E2E test journey ([#7117](https://github.com/novuhq/novu/pull/7117))
+- **js:** Popover props ([#7112](https://github.com/novuhq/novu/pull/7112))
+- **dashboard:** Codemirror liquid filter support ([#7122](https://github.com/novuhq/novu/pull/7122))
+- **root:** add support chat app ID to environment variables in d… ([#7120](https://github.com/novuhq/novu/pull/7120))
+- **root:** Add base Dockerfile for GHCR with Node.js and dependencies ([#7100](https://github.com/novuhq/novu/pull/7100))
+
+### 🩹 Fixes
+
+- **js:** Truncate workflow name and center empty notifications text ([#7123](https://github.com/novuhq/novu/pull/7123))
+- **api:** Migrate subscriber global preferences before workflow preferences ([#7118](https://github.com/novuhq/novu/pull/7118))
+- **api, dal, framework:** fix the uneven and unused dependencies ([#7103](https://github.com/novuhq/novu/pull/7103))
+
+### 🧱 Updated Dependencies
+
+- Updated @novu/client to 2.0.3
+
+### ❤️  Thank You
+
+- Biswajeet Das @BiswaViraj
+- George Desipris @desiprisg
+- Himanshu Garg @merrcury
+- Richard Fontein @rifont
+
 ## 2.0.2 (2024-11-19)
 
 ### 🚀 Features
