@@ -9,8 +9,8 @@ export const ROUTES = {
   WORKFLOWS: '/env/:environmentSlug/workflows',
   EDIT_WORKFLOW: '/env/:environmentSlug/workflows/:workflowSlug',
   TEST_WORKFLOW: '/env/:environmentSlug/workflows/:workflowSlug/test',
-  CONFIGURE_STEP: 'steps/:stepSlug',
-  EDIT_STEP: 'steps/:stepSlug/edit',
+  EDIT_STEP: 'steps/:stepSlug',
+  EDIT_STEP_TEMPLATE: 'steps/:stepSlug/edit',
 };
 
 export const buildRoute = (route: string, params: Record<string, string>) => {

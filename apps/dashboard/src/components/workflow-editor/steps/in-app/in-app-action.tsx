@@ -29,7 +29,7 @@ import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesT
 import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
 import { autocompletion } from '@codemirror/autocomplete';
-import { useStepEditorContext } from '../hooks';
+import { useStep } from '@/components/workflow-editor/steps/step-provider';
 
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
@@ -150,7 +150,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
     ...rest
   } = props;
   const { control } = useFormContext();
-  const { step } = useStepEditorContext();
+  const { step } = useStep();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
 
   return (
