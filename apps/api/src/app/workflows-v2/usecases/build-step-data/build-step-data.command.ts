@@ -9,9 +9,5 @@ export class BuildStepDataCommand extends EnvironmentWithUserObjectCommand {
 
   @IsString()
   @IsNotEmpty()
-  _stepId: string;
-
-  @IsString()
-  @IsOptional()
-  stepId?: string;
+  stepIdOrInternalId: IdentifierOrInternalId;
 }

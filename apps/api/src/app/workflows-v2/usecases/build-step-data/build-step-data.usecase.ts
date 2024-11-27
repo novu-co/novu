@@ -72,14 +72,13 @@ export class BuildStepDataUsecase {
 
   private async loadStepsFromDb(command: BuildStepDataCommand, workflow: NotificationTemplateEntity) {
     const currentStep = workflow.steps.find(
-      (stepItem) => stepItem._id === command._stepId || stepItem.stepId === command.stepId
+      (stepItem) => stepItem._id === command.stepIdOrInternalId || stepItem.stepId === command.stepIdOrInternalId
     );
 
     if (!currentStep) {
       throw new BadRequestException({
         message: 'No step found',
-        ...(command.stepId ? { stepId: command.stepId } : {}),
-        _stepId: command._stepId,
+        stepId: command.stepIdOrInternalId,
         workflowId: command.workflowIdentifierOrInternalId,
       });
     }

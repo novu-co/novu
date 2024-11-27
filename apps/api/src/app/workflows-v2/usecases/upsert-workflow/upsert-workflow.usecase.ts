@@ -291,7 +291,7 @@ export class UpsertWorkflowUseCase {
         controlValues,
         workflowIdentifierOrInternalId: workflow._id,
         name: step.name,
-        _stepId: step._templateId,
+        stepIdOrInternalId: step._templateId,
         user: command.user,
       });
     }
