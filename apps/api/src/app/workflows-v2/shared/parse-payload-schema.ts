@@ -1,13 +1,20 @@
-export function parsePayloadSchema(schema: unknown): Record<string, unknown> {
+type ParsePayloadSchemaOptions = {
+  safe?: boolean;
+};
+
+export function parsePayloadSchema(
+  schema: unknown,
+  { safe = false }: ParsePayloadSchemaOptions = {}
+): Record<string, unknown> | null {
   if (!schema) {
-    return {};
+    return null;
   }
 
   if (typeof schema === 'string') {
     try {
       return JSON.parse(schema);
     } catch (error) {
-      throw new Error('Invalid JSON string provided for payload schema');
+      return safe ? null : throwSchemaError('Invalid JSON string provided for payload schema');
     }
   }
 
@@ -15,5 +22,9 @@ export function parsePayloadSchema(schema: unknown): Record<string, unknown> {
     return schema as Record<string, unknown>;
   }
 
-  throw new Error('Payload schema must be either a valid JSON string or an object');
+  return safe ? null : throwSchemaError('Payload schema must be either a valid JSON string or an object');
+}
+
+function throwSchemaError(message: string): never {
+  throw new Error(message);
 }

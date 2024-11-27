@@ -78,7 +78,13 @@ export class GeneratePreviewUsecase {
    *  }
    * @returns - Generated payload. example: { firstName: 'John', lastName: '{{payload.lastName}}' }
    */
-  private generatePayloadVariableExample(schema: JSONSchemaDto, path = 'payload'): Record<string, unknown> {
+  private generateSamplePayload(schema: JSONSchemaDto, path = 'payload', depth = 0): Record<string, unknown> {
+    const MAX_DEPTH = 10;
+
+    if (depth > MAX_DEPTH) {
+      throw new Error(`Schema nesting depth exceeds maximum of ${MAX_DEPTH}`);
+    }
+
     if (schema.type !== 'object' || !schema.properties) {
       throw new Error('Schema must define an object with properties.');
     }
@@ -93,7 +99,7 @@ export class GeneratePreviewUsecase {
       if (definition.default) {
         acc[key] = definition.default;
       } else if (definition.type === 'object' && definition.properties) {
-        acc[key] = this.generatePayloadVariableExample(definition, currentPath);
+        acc[key] = this.generateSamplePayload(definition, currentPath, depth + 1);
       } else {
         acc[key] = `{{${currentPath}}}`;
       }
@@ -123,7 +129,7 @@ export class GeneratePreviewUsecase {
     payloadSchema?: JSONSchemaDto
   ) {
     if (origin === WorkflowOriginEnum.EXTERNAL && payloadSchema) {
-      const payloadVariableExample = { payload: this.generatePayloadVariableExample(payloadSchema) };
+      const payloadVariableExample = { payload: this.generateSamplePayload(payloadSchema) };
 
       return mergeObjects(payloadVariableExample, validatedContent.finalPayload as Record<string, unknown>);
     }

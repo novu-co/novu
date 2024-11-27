@@ -39,18 +39,13 @@ export class BuildAvailableVariableSchemaUsecase {
           additionalProperties: false,
         },
         steps: buildPreviousStepsSchema(previousSteps, workflow.payloadSchema),
-        payload: safePayloadSchema(workflow) || { type: 'object', description: 'Payload for the current step' },
+        payload: parsePayloadSchema(workflow, { safe: true }) || {
+          type: 'object',
+          description: 'Payload for the current step',
+        },
       },
       additionalProperties: false,
     } as const satisfies JSONSchemaDto;
-  }
-}
-
-function safePayloadSchema(workflow: NotificationTemplateEntity): JSONSchemaDto | undefined {
-  try {
-    return parsePayloadSchema(workflow.payloadSchema);
-  } catch (e) {
-    return undefined;
   }
 }
 
