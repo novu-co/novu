@@ -58,7 +58,6 @@ import { execa } from 'execa';
 
   await releasePublish({
     specifier: 'patch',
-    projects: 'tag:type:package',
     dryRun,
     verbose,
     otp: answers.otp,
