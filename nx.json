@@ -33,7 +33,12 @@
           "@novu/worker",
           "@novu/ws"
         ],
-        "projectsRelationship": "independent"
+        "projectsRelationship": "independent",
+        "version": {
+          "generatorOptions": {
+            "preserveLocalDependencyProtocols": true
+          }
+        }
       },
       "packages": {
         "projects": [

@@ -29,6 +29,7 @@ import { execa } from 'execa';
   }
 
   const { workspaceVersion, projectsVersionData } = await releaseVersion({
+    projects: ['tag:type:package'],
     specifier,
     dryRun,
     verbose,
@@ -36,6 +37,7 @@ import { execa } from 'execa';
   });
 
   await releaseChangelog({
+    projects: ['tag:type:package'],
     specifier,
     versionData: projectsVersionData,
     version: workspaceVersion,
@@ -57,6 +59,7 @@ import { execa } from 'execa';
   ]);
 
   await releasePublish({
+    projects: ['tag:type:package'],
     specifier: 'patch',
     dryRun,
     verbose,
