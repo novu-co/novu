@@ -49,7 +49,7 @@
   },
   "nx": {
     "tags": [
-      "package:public"
+      "type:package"
     ]
   }
 }

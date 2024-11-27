@@ -97,6 +97,8 @@
     "@novu/js": "workspace:*"
   },
   "nx": {
-    "tags": ["package:public"]
+    "tags": [
+      "type:package"
+    ]
   }
 }

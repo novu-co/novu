@@ -93,6 +93,8 @@
     "@novu/react": "workspace:*"
   },
   "nx": {
-    "tags": ["package:public"]
+    "tags": [
+      "type:package"
+    ]
   }
 }

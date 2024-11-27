@@ -91,6 +91,8 @@
     "async-sema": "3.0.1"
   },
   "nx": {
-    "tags": ["package:public"]
+    "tags": [
+      "type:package"
+    ]
   }
 }
