@@ -42,7 +42,6 @@ export function TextWidget(props: WidgetProps) {
                     const val = Number(e.target.value);
                     const isNaN = Number.isNaN(val);
                     const finalValue = isNaN ? undefined : val;
-                    console.log({ finalValue, val, isNaN, value: e.target.value });
                     field.onChange(finalValue);
                   }}
                   required={required}
