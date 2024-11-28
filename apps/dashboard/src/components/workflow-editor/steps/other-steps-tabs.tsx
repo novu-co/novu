@@ -28,15 +28,19 @@ export const OtherStepTabs = ({ workflow, step }: { workflow: WorkflowResponseDt
   const { dataSchema, uiSchema, values } = step.controls;
   const navigate = useNavigate();
   const schema = buildDynamicZodSchema(dataSchema ?? {});
-  const newFormValues = useMemo(
-    () => merge(buildDefaultValues(uiSchema ?? {}), buildDefaultValuesOfDataSchema(dataSchema ?? {}), values),
-    [uiSchema, values, dataSchema]
-  );
+  const newFormValues = useMemo(() => {
+    if (Object.keys(dataSchema ?? {}).length !== 0) {
+      return merge(buildDefaultValuesOfDataSchema(dataSchema ?? {}), values);
+    }
+
+    return merge(buildDefaultValues(uiSchema ?? {}), values);
+  }, [uiSchema, values, dataSchema]);
+
   const form = useForm({
     mode: 'onSubmit',
     resolver: zodResolver(schema),
     resetOptions: { keepDirtyValues: true },
-    values: newFormValues,
+    defaultValues: newFormValues,
   });
 
   const { reset, formState } = form;
