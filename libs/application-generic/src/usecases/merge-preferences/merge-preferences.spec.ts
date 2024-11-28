@@ -47,6 +47,12 @@ const testCases: TestCase[] = [
     readOnly: false,
   },
   {
+    comment: 'Subscriber global only',
+    types: [PreferencesTypeEnum.SUBSCRIBER_GLOBAL],
+    expectedType: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
+    readOnly: false,
+  },
+  {
     comment: 'Subscriber workflow overrides workflow resource',
     types: [
       PreferencesTypeEnum.WORKFLOW_RESOURCE,

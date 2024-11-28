@@ -1,17 +1,9 @@
-import { PreferencesTypeEnum, WorkflowPreferences } from '@novu/shared';
+import { PreferencesTypeEnum } from '@novu/shared';
 import { PreferencesEntity } from '@novu/dal';
 import { deepMerge } from '../../utils';
 import { GetPreferencesResponseDto } from '../get-preferences';
 import { MergePreferencesCommand } from './merge-preferences.command';
-
-/**
- * Recursively make all properties of type `T` required.
- */
-type DeepRequired<T> = T extends object
-  ? {
-      [P in keyof T]-?: DeepRequired<T[P]>;
-    }
-  : T;
+import { DeepRequired } from '../../http/utils.types';
 
 /**
  * Merge preferences for a subscriber.

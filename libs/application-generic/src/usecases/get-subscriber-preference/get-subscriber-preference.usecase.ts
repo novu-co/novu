@@ -23,6 +23,7 @@ import {
   overridePreferences,
 } from '../get-subscriber-template-preference';
 import { MergePreferencesCommand } from '../merge-preferences/merge-preferences.command';
+import { mapTemplateConfiguration } from '../get-subscriber-template-preference/get-subscriber-template-preference.usecase';
 
 @Injectable()
 export class GetSubscriberPreference {
@@ -183,10 +184,10 @@ export class GetSubscriberPreference {
             enabled: true,
             overrides,
           },
-          template: {
+          template: mapTemplateConfiguration({
             ...workflow,
             critical: merged.preferences.all.readOnly,
-          },
+          }),
           type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
         };
       },

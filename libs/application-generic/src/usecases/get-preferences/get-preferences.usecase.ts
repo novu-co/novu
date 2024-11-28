@@ -14,7 +14,7 @@ import { MergePreferences } from '../merge-preferences/merge-preferences.usecase
 import { MergePreferencesCommand } from '../merge-preferences/merge-preferences.command';
 
 export type PreferenceSet = {
-  workflowResourcePreference: PreferencesEntity & {
+  workflowResourcePreference?: PreferencesEntity & {
     preferences: WorkflowPreferences;
   };
   workflowUserPreference?: PreferencesEntity & {
@@ -145,12 +145,8 @@ export class GetPreferences {
       }) as Promise<PreferenceSet['subscriberGlobalPreference'] | null>,
     ]);
 
-    if (workflowResourcePreference === null) {
-      throw new PreferencesNotFoundException(command);
-    }
-
     return {
-      workflowResourcePreference,
+      ...(workflowResourcePreference ? { workflowResourcePreference } : {}),
       ...(workflowUserPreference ? { workflowUserPreference } : {}),
       ...(subscriberWorkflowPreference ? { subscriberWorkflowPreference } : {}),
       ...(subscriberGlobalPreference ? { subscriberGlobalPreference } : {}),
