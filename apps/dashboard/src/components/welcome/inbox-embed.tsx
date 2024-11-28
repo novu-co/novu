@@ -20,6 +20,9 @@ import { useAuth } from '../../context/auth/hooks';
 import { ChannelTypeEnum } from '@novu/shared';
 import { API_HOSTNAME, WEBSOCKET_HOSTNAME } from '../../config';
 import ReactConfetti from 'react-confetti';
+import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
+import { showToast } from '../primitives/sonner-helpers';
+import { ToastIcon } from '../primitives/sonner';
 
 interface Framework {
   name: string;
@@ -240,6 +243,7 @@ export function InboxEmbed(): JSX.Element {
   const auth = useAuth();
   const { environments } = useFetchEnvironments({ organizationId: auth?.currentOrganization?._id });
   const { integrations } = useIntegrations({ refetchInterval: 1000, refetchOnWindowFocus: true });
+  const { triggerWorkflow, isPending } = useTriggerWorkflow();
 
   const currentEnvironment = environments?.find((env) => !env._parentId);
   const subscriberId = auth?.currentUser?._id;
@@ -291,6 +295,45 @@ export function InboxEmbed(): JSX.Element {
 
   function handleFrameworkSelect(framework: Framework) {
     setSelectedFramework(framework);
+  }
+
+  async function handleSendNotification() {
+    try {
+      await triggerWorkflow({
+        name: 'onboarding-demo-workflow',
+        to: auth.currentUser?._id,
+        payload: {
+          subject: '**Welcome to Inbox!**',
+          body: 'This is your first notification. Customize and explore more features.',
+          primaryActionLabel: 'Add to your app',
+          secondaryActionLabel: '',
+        },
+      });
+
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="success" />
+            <span className="text-sm">Notification sent successfully!</span>
+          </>
+        ),
+        options: {
+          position: 'bottom-center',
+        },
+      });
+    } catch (error) {
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="error" />
+            <span className="text-sm">Failed to send notification</span>
+          </>
+        ),
+        options: {
+          position: 'bottom-center',
+        },
+      });
+    }
   }
 
   return (
@@ -364,7 +407,17 @@ export function InboxEmbed(): JSX.Element {
                     Now, trigger a notification to see it pop up in your app! If it doesn’t appear, double-check that
                     the subscriberId matches as above.
                   </p>
-                  <Button>Send Notification</Button>
+                  <div>
+                    <Button onClick={handleSendNotification} disabled={isPending}>
+                      {isPending ? (
+                        <>
+                          Sending... <Loader className="ml-2 h-3 w-3 animate-spin" />
+                        </>
+                      ) : (
+                        'Send Notification'
+                      )}
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="w-full max-w-[500px]">
