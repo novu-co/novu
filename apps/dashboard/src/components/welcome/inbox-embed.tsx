@@ -367,11 +367,28 @@ export function InboxEmbed(): JSX.Element {
                   <Button>Send Notification</Button>
                 </div>
 
-                <CodeBlock
-                  code={'curl -X POST https://api.novu.co/v1/events/trigger'}
-                  language="shell"
-                  title="Trigger notification"
-                />
+                <div className="w-full max-w-[500px]">
+                  <CodeBlock
+                    code={`curl -X POST 'https://api.novu.co/v1/events/trigger' \
+
+-H 'Authorization: ApiKey NOVU_SECRET_KEY' \
+
+-H 'Content-Type: application/json' \
+
+-d '{
+  "name": "onboarding_workflow",
+  "to": {
+    "subscriberId": "657c929208be7e008a458508"
+  },
+  "payload": {
+    "userName": "Naveen",
+    "organizationProfile": "https://lh3.googleusercontent.com/a/AEdFTp5OW-iWTevL6YlYHpaZ6z-D0pVXE0V_7Z9Dgp12=s100",
+  }
+}'`}
+                    language="shell"
+                    title="Terminal"
+                  />
+                </div>
               </div>
             </div>
           </div>
