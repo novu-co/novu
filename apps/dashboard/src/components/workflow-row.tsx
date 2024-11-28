@@ -203,7 +203,17 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           onOpenChange={setIsDeleteModalOpen}
           onConfirm={onDeleteWorkflow}
           title="Are you sure?"
-          description={`You're about to delete the ${workflow.name}, this action cannot be undone.`}
+          description={
+            <>
+              You're about to delete the{' '}
+              <strong>
+                <TruncatedText className="max-w-[32ch]">{workflow.name}</TruncatedText>
+              </strong>{' '}
+              workflow, this action is permanent. <br />
+              <br />
+              You won't be able to trigger this workflow anymore.
+            </>
+          }
           confirmButtonText="Delete"
           isLoading={isDeleteWorkflowPending}
         />
