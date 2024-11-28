@@ -135,6 +135,7 @@ export class GetPreferences {
       this.preferencesRepository.findOne({
         _subscriberId: command.subscriberId,
         _environmentId: command.environmentId,
+        _templateId: command.templateId,
         type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
       }) as Promise<PreferenceSet['subscriberWorkflowPreference'] | null>,
       this.preferencesRepository.findOne({
