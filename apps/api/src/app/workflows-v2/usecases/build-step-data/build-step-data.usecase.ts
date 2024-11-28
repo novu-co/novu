@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ControlValuesLevelEnum, StepDataDto, WorkflowOriginEnum } from '@novu/shared';
 import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
-import { GetWorkflowByIdsUseCase } from '@novu/application-generic';
+import { GetWorkflowByIdsUseCase, Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { BuildStepDataCommand } from './build-step-data.command';
 import { InvalidStepException } from '../../exceptions/invalid-step.exception';
 import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
@@ -14,6 +14,7 @@ export class BuildStepDataUsecase {
     private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase // Dependency injection for new use case
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: BuildStepDataCommand): Promise<StepDataDto> {
     const workflow = await this.fetchWorkflow(command);
 
@@ -49,6 +50,7 @@ export class BuildStepDataUsecase {
     };
   }
 
+  @Instrument()
   private async fetchWorkflow(command: BuildStepDataCommand) {
     return await this.getWorkflowByIdsUseCase.execute({
       identifierOrInternalId: command.identifierOrInternalId,
@@ -58,6 +60,7 @@ export class BuildStepDataUsecase {
     });
   }
 
+  @Instrument()
   private async getValues(command: BuildStepDataCommand, currentStep: NotificationStepEntity, _workflowId: string) {
     const controlValuesEntity = await this.controlValuesRepository.findOne({
       _environmentId: command.user.environmentId,
@@ -70,6 +73,7 @@ export class BuildStepDataUsecase {
     return controlValuesEntity?.controls || {};
   }
 
+  @Instrument()
   private async loadStepsFromDb(command: BuildStepDataCommand, workflow: NotificationTemplateEntity) {
     const currentStep = workflow.steps.find(
       (stepItem) => stepItem._id === command.stepId || stepItem.stepId === command.stepId
