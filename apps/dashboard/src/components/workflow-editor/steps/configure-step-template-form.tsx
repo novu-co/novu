@@ -36,6 +36,7 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
   const schema = useMemo(() => buildDynamicZodSchema(step.controls.dataSchema ?? {}), [step.controls.dataSchema]);
 
   const defaultValues = useMemo(() => {
+    // Use the UI Schema to build the default values if it exists else use the data schema (code-first approach) values
     if (Object.keys(step.controls.uiSchema ?? {}).length !== 0) {
       return merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values);
     }
@@ -46,8 +47,8 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
   const form = useForm({
     mode: 'onChange',
     resolver: zodResolver(schema),
-    defaultValues: defaultValues,
     shouldFocusError: true,
+    defaultValues,
   });
 
   const setIssuesFromStep = (step: StepDataDto) => {
@@ -58,7 +59,14 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
   };
 
   useEffect(() => {
-    form.reset(merge(buildDefaultValues(step.controls.uiSchema ?? {}), step?.controls.values));
+    // Use the UI Schema to build the default values if it exists else use the data schema (code-first approach) values
+    const defaultValues =
+      Object.keys(step.controls.uiSchema ?? {}).length !== 0
+        ? buildDefaultValues(step.controls.uiSchema ?? {})
+        : buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {});
+
+    const mergedDefaultValues = merge(defaultValues, step.controls.values);
+    form.reset(mergedDefaultValues);
     setIssuesFromStep(step);
   }, [step]);
 
