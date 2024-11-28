@@ -5,9 +5,8 @@ import {
   MessageTemplateRepository,
   NotificationTemplateEntity,
   NotificationTemplateRepository,
-  PreferencesRepository,
 } from '@novu/dal';
-import { PreferencesTypeEnum, WorkflowOriginEnum } from '@novu/shared';
+import { PreferencesTypeEnum } from '@novu/shared';
 
 import { DeleteWorkflowCommand } from './delete-workflow.command';
 import { InvalidateCacheService } from '../../../services/cache/invalidate-cache.service';
@@ -21,6 +20,7 @@ import {
   DeletePreferencesUseCase,
   DeletePreferencesCommand,
 } from '../../delete-preferences';
+import { Instrument, InstrumentUsecase } from '../../../instrumentation';
 
 @Injectable()
 export class DeleteWorkflowUseCase {
@@ -28,12 +28,12 @@ export class DeleteWorkflowUseCase {
     private notificationTemplateRepository: NotificationTemplateRepository,
     private messageTemplateRepository: MessageTemplateRepository,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private preferencesRepository: PreferencesRepository,
     private invalidateCache: InvalidateCacheService,
     private controlValuesRepository: ControlValuesRepository,
     private deletePreferencesUsecase: DeletePreferencesUseCase,
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: DeleteWorkflowCommand): Promise<void> {
     const workflowEntity = await this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({
@@ -47,6 +47,7 @@ export class DeleteWorkflowUseCase {
     await this.deleteRelatedEntities(command, workflowEntity);
   }
 
+  @Instrument()
   private async deleteRelatedEntities(
     command: DeleteWorkflowCommand,
     workflow: NotificationTemplateEntity,
@@ -94,6 +95,7 @@ export class DeleteWorkflowUseCase {
     });
   }
 
+  @Instrument()
   private async invalidateCacheForWorkflow(
     workflow: NotificationTemplateEntity,
     command: DeleteWorkflowCommand,
@@ -111,12 +113,5 @@ export class DeleteWorkflowUseCase {
         _environmentId: command.environmentId,
       }),
     });
-  }
-
-  private isNovuCloud(workflow: NotificationTemplateEntity) {
-    return (
-      workflow.origin === WorkflowOriginEnum.NOVU_CLOUD ||
-      workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1
-    );
   }
 }
