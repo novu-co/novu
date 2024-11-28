@@ -32,13 +32,14 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
     const stepId = workflowCreated.steps[0]._id;
     const controlValues = {
       subject: 'Welcome {{payload.firstName}}',
-      body: 'Hello {{payload.firstName}} {{payload.lastName}}, Welcome to {{organizationName}}!',
+      body: 'Hello {{payload.firstName}} {{payload.lastName}}, Welcome to {{payload.organizationName | upcase}}!',
     };
 
     const previewPayload = {
       payload: {
         firstName: 'John',
         lastName: 'Doe',
+        organizationName: 'Novu',
       },
     };
 
@@ -52,19 +53,10 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
     expect(status).to.equal(201);
     expect(body).to.deep.equal({
       data: {
-        issues: {
-          body: [
-            {
-              issueType: 'ILLEGAL_VARIABLE_IN_CONTROL_VALUE',
-              variableName: '{{organizationName}}',
-              message: 'Illegal variable in control value: {{organizationName}}',
-            },
-          ],
-        },
         result: {
           preview: {
             subject: 'Welcome John',
-            body: 'Hello John Doe, Welcome to!',
+            body: 'Hello John Doe, Welcome to NOVU!',
           },
           type: 'in_app',
         },
@@ -72,6 +64,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
           payload: {
             firstName: 'John',
             lastName: 'Doe',
+            organizationName: 'Novu',
           },
         },
       },
@@ -114,7 +107,6 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
 
     expect(response.status).to.equal(201);
     expect(response.body.data).to.deep.equal({
-      issues: {},
       result: {
         preview: {
           subject: 'Order {{payload.orderId}}',
