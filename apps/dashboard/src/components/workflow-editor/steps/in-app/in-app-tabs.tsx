@@ -37,10 +37,13 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
 
   const { dataSchema, uiSchema, values } = step.controls;
   const schema = useMemo(() => buildDynamicZodSchema(dataSchema ?? {}), [dataSchema]);
-  const newFormValues = useMemo(
-    () => merge(buildDefaultValues(uiSchema ?? {}), buildDefaultValuesOfDataSchema(dataSchema ?? {}), values),
-    [uiSchema, values, dataSchema]
-  );
+  const newFormValues = useMemo(() => {
+    if (Object.keys(dataSchema ?? {}).length !== 0) {
+      merge(buildDefaultValuesOfDataSchema(dataSchema ?? {}), values);
+    }
+
+    return merge(buildDefaultValues(uiSchema ?? {}), values);
+  }, [uiSchema, values, dataSchema]);
 
   const form = useForm({
     mode: 'onChange',
@@ -67,13 +70,15 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
     onSuccess: async (data) => {
       resetWorkflowForm(data);
       const step = await refetchStep();
+
+      const dataSchema = step.data?.controls.dataSchema;
+      const values = step.data?.controls.values;
+      const uiSchema = step.data?.controls.uiSchema;
+
       form.reset(
-        merge(
-          buildDefaultValues(uiSchema ?? {}),
-          buildDefaultValuesOfDataSchema(step.data?.controls.dataSchema ?? {}),
-          step.data?.controls.values
-        )
+        merge(dataSchema ? buildDefaultValuesOfDataSchema(dataSchema) : buildDefaultValues(uiSchema ?? {}), values)
       );
+
       showToast({
         children: () => (
           <>
