@@ -153,14 +153,27 @@ export function NotificationCenter() {
       {
         title: 'Install',
         description: 'The npm package to use with novu and Remix.',
-        code: 'npm install @novu/notification-center',
+        code: 'npm install @novu/react',
         codeLanguage: 'shell',
       },
       {
         title: 'Add the inbox code to your Remix app',
         description: 'Implement the notification center in your Remix application.',
-        code: 'npm install @novu/notification-center',
-        codeLanguage: 'shell',
+        code: `import { Inbox } from '@novu/react';
+import { useNavigate } from '@remix-run/react';
+
+function Novu() {
+  const navigate = useNavigate();
+
+  return (
+    <Inbox
+      applicationIdentifier="YOUR_APPLICATION_IDENTIFIER"
+      subscriberId="YOUR_SUBSCRIBER_ID"
+      routerPush={(path: string) => navigate(path)}
+    />
+  );
+}`,
+        codeLanguage: 'typescript',
       },
     ],
   },
