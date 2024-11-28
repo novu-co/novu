@@ -181,7 +181,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
   );
 
   const isNotDirty = Object.keys(formState.dirtyFields).length === 0;
-  const blocker = useBlocker(isNotDirty || isPending);
+  const blocker = useBlocker(!isNotDirty || isPending);
 
   return (
     <>
