@@ -9,13 +9,13 @@ import { completions } from '@/utils/liquid-autocomplete';
 import { capitalize } from '@/utils/string';
 import { autocompletion } from '@codemirror/autocomplete';
 import { getFieldName } from './template-utils';
-import { useStepEditorContext } from '../hooks';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
+import { useStep } from '../step-provider';
 
 export function TextWidget(props: WidgetProps) {
   const { label, readonly, disabled, id, required } = props;
   const { control } = useFormContext();
-  const { step } = useStepEditorContext();
+  const { step } = useStep();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
 
   const extractedName = useMemo(() => getFieldName(id), [id]);
