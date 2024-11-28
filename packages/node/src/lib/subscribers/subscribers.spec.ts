@@ -199,7 +199,7 @@ describe('test use of novus node package - Subscribers class', () => {
 
     expect(mockedAxios.get).toHaveBeenCalled();
     expect(mockedAxios.get).toHaveBeenCalledWith(
-      '/subscribers/test-subscriber-preference/preferences',
+      '/subscribers/test-subscriber-preference/preferences?includeInactiveChannels=true',
     );
   });
 
