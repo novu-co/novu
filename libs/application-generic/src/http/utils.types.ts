@@ -5,6 +5,15 @@
 export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 /**
+ * Recursively make all properties of type `T` required.
+ */
+export type DeepRequired<T> = T extends object
+  ? {
+      [P in keyof T]-?: DeepRequired<T[P]>;
+    }
+  : T;
+
+/**
  * Transform S to CONSTANT_CASE.
  */
 export type ConvertToConstantCase<S extends string> =

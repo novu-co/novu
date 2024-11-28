@@ -13,7 +13,7 @@ import { ApiException } from '../../utils/exceptions';
 import { GetPreferences } from '../get-preferences';
 import { GetSubscriberPreference } from '../get-subscriber-preference/get-subscriber-preference.usecase';
 import { filteredPreference } from '../get-subscriber-template-preference/get-subscriber-template-preference.usecase';
-import { InstrumentUsecase } from '../../instrumentation';
+import { Instrument, InstrumentUsecase } from '../../instrumentation';
 
 @Injectable()
 export class GetSubscriberGlobalPreference {
@@ -54,6 +54,7 @@ export class GetSubscriberGlobalPreference {
     };
   }
 
+  @Instrument()
   private async getSubscriberGlobalPreference(
     command: GetSubscriberGlobalPreferenceCommand,
     subscriberId: string,
@@ -95,6 +96,7 @@ export class GetSubscriberGlobalPreference {
     };
   }
 
+  @Instrument()
   private async getActiveChannels(
     command: GetSubscriberGlobalPreferenceCommand,
   ): Promise<ChannelTypeEnum[]> {
