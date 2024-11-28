@@ -7,12 +7,26 @@ import {
   WorkflowPreferences,
   WorkflowPreferencesPartial,
 } from '@novu/shared';
-import { deepMerge } from '../../utils';
 import { GetPreferencesCommand } from './get-preferences.command';
 import { GetPreferencesResponseDto } from './get-preferences.dto';
 import { InstrumentUsecase } from '../../instrumentation';
 import { MergePreferences } from '../merge-preferences/merge-preferences.usecase';
 import { MergePreferencesCommand } from '../merge-preferences/merge-preferences.command';
+
+export type PreferenceSet = {
+  workflowResourcePreference: PreferencesEntity & {
+    preferences: WorkflowPreferences;
+  };
+  workflowUserPreference?: PreferencesEntity & {
+    preferences: WorkflowPreferences;
+  };
+  subscriberGlobalPreference?: PreferencesEntity & {
+    preferences: WorkflowPreferencesPartial;
+  };
+  subscriberWorkflowPreference?: PreferencesEntity & {
+    preferences: WorkflowPreferencesPartial;
+  };
+};
 
 class PreferencesNotFoundException extends BadRequestException {
   constructor(featureFlagCommand: GetPreferencesCommand) {
@@ -30,14 +44,8 @@ export class GetPreferences {
   ): Promise<GetPreferencesResponseDto> {
     const items = await this.getPreferencesFromDb(command);
 
-    if (items.length === 0) {
-      throw new PreferencesNotFoundException(command);
-    }
-
-    const mergedPreferences = MergePreferences.merge(
-      MergePreferencesCommand.create({
-        preferences: items,
-      }),
+    const mergedPreferences = MergePreferences.execute(
+      MergePreferencesCommand.create(items),
     );
 
     if (!mergedPreferences.preferences) {
@@ -107,16 +115,13 @@ export class GetPreferences {
 
   private async getPreferencesFromDb(
     command: GetPreferencesCommand,
-  ): Promise<PreferencesEntity[]> {
-    const items: PreferencesEntity[] = [];
-
-    /*
-     * Fetch the Workflow Preferences. This includes:
-     * - Workflow Resource Preferences - the Code-defined Workflow Preferences
-     * - User Workflow Preferences - the Dashboard-defined Workflow Preferences
-     */
-    if (command.templateId) {
-      const workflowPreferences = await this.preferencesRepository.find({
+  ): Promise<PreferenceSet> {
+    const [
+      workflowPreferences,
+      subscriberWorkflowPreference,
+      subscriberGlobalPreference,
+    ] = await Promise.all([
+      this.preferencesRepository.find({
         _templateId: command.templateId,
         _environmentId: command.environmentId,
         type: {
@@ -125,35 +130,29 @@ export class GetPreferences {
             PreferencesTypeEnum.USER_WORKFLOW,
           ],
         },
-      });
-
-      items.push(...workflowPreferences);
-    }
-
-    // Fetch the Subscriber Global Preference.
-    if (command.subscriberId) {
-      const subscriberGlobalPreference = await this.preferencesRepository.find({
+      }),
+      this.preferencesRepository.findOne({
+        _subscriberId: command.subscriberId,
+        _environmentId: command.environmentId,
+        type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+      }),
+      this.preferencesRepository.findOne({
         _subscriberId: command.subscriberId,
         _environmentId: command.environmentId,
         type: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
-      });
+      }),
+    ]);
 
-      items.push(...subscriberGlobalPreference);
-    }
-
-    // Fetch the Subscriber Workflow Preference.
-    if (command.subscriberId && command.templateId) {
-      const subscriberWorkflowPreference =
-        await this.preferencesRepository.find({
-          _subscriberId: command.subscriberId,
-          _templateId: command.templateId,
-          _environmentId: command.environmentId,
-          type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
-        });
-
-      items.push(...subscriberWorkflowPreference);
-    }
-
-    return items;
+    return {
+      workflowResourcePreference: workflowPreferences.find(
+        (preference) =>
+          preference.type === PreferencesTypeEnum.WORKFLOW_RESOURCE,
+      ) as PreferenceSet['workflowResourcePreference'],
+      workflowUserPreference: workflowPreferences.find(
+        (preference) => preference.type === PreferencesTypeEnum.USER_WORKFLOW,
+      ) as PreferenceSet['workflowUserPreference'],
+      subscriberWorkflowPreference,
+      subscriberGlobalPreference,
+    };
   }
 }

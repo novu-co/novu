@@ -17,7 +17,7 @@ import { AnalyticsService } from '../../services/analytics.service';
 import { GetSubscriberPreferenceCommand } from './get-subscriber-preference.command';
 import { InstrumentUsecase } from '../../instrumentation';
 import { MergePreferences } from '../merge-preferences/merge-preferences.usecase';
-import { GetPreferences } from '../get-preferences';
+import { GetPreferences, PreferenceSet } from '../get-preferences';
 import {
   filteredPreference,
   overridePreferences,
@@ -64,37 +64,40 @@ export class GetSubscriberPreference {
       },
     );
 
-    const allPreferences = await this.preferencesRepository.find({
-      _environmentId: command.environmentId,
-      $or: [
-        {
-          _subscriberId: subscriber._id,
-          type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+    const [
+      workflowPreferences,
+      subscriberWorkflowPreference,
+      subscriberGlobalPreference,
+    ] = await Promise.all([
+      this.preferencesRepository.find({
+        _templateId: { $in: workflowList.map((wf) => wf._id) },
+        _environmentId: command.environmentId,
+        type: {
+          $in: [
+            PreferencesTypeEnum.WORKFLOW_RESOURCE,
+            PreferencesTypeEnum.USER_WORKFLOW,
+          ],
         },
-        {
-          _templateId: { $in: workflowList.map((wf) => wf._id) },
-          type: {
-            $in: [
-              PreferencesTypeEnum.WORKFLOW_RESOURCE,
-              PreferencesTypeEnum.USER_WORKFLOW,
-            ],
-          },
-        },
-        {
-          _subscriberId: subscriber._id,
-          type: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
-        },
-      ],
-    });
+      }),
+      this.preferencesRepository.find({
+        _subscriberId: subscriber._id,
+        _environmentId: command.environmentId,
+        type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+      }),
+      this.preferencesRepository.findOne({
+        _subscriberId: subscriber._id,
+        _environmentId: command.environmentId,
+        type: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
+      }),
+    ]);
 
-    const subscriberGlobalPreferences = allPreferences.filter(
-      (preference) =>
-        preference._subscriberId === subscriber._id &&
-        preference.type === PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
-    );
+    const allWorkflowPreferences = [
+      ...workflowPreferences,
+      ...subscriberWorkflowPreference,
+    ];
 
-    const workflowPreferenceSets = allPreferences.reduce<
-      Record<string, PreferencesEntity[]>
+    const workflowPreferenceSets = allWorkflowPreferences.reduce<
+      Record<string, PreferenceSet>
     >((acc, preference) => {
       const workflowId = preference._templateId;
 
@@ -104,20 +107,41 @@ export class GetSubscriberPreference {
       }
 
       if (!acc[workflowId]) {
-        acc[workflowId] = [];
+        acc[workflowId] = {
+          workflowResourcePreference: undefined,
+          workflowUserPreference: undefined,
+          subscriberWorkflowPreference: undefined,
+        };
       }
-      acc[workflowId].push(preference);
+      switch (preference.type) {
+        case PreferencesTypeEnum.WORKFLOW_RESOURCE:
+          acc[workflowId].workflowResourcePreference =
+            preference as PreferenceSet['workflowResourcePreference'];
+          break;
+        case PreferencesTypeEnum.USER_WORKFLOW:
+          acc[workflowId].workflowUserPreference =
+            preference as PreferenceSet['workflowUserPreference'];
+          break;
+        case PreferencesTypeEnum.SUBSCRIBER_WORKFLOW:
+          acc[workflowId].subscriberWorkflowPreference = preference;
+          break;
+        default:
+      }
 
       return acc;
     }, {});
 
     const mergedPreferences: ISubscriberPreferenceResponse[] = workflowList.map(
       (workflow) => {
-        const preferences = workflowPreferenceSets[workflow._id] || [];
+        const preferences = workflowPreferenceSets[workflow._id];
         const mergeCommand = MergePreferencesCommand.create({
-          preferences: [...preferences, ...subscriberGlobalPreferences],
+          workflowResourcePreference: preferences.workflowResourcePreference,
+          workflowUserPreference: preferences.workflowUserPreference,
+          subscriberWorkflowPreference:
+            preferences.subscriberWorkflowPreference,
+          subscriberGlobalPreference,
         });
-        const merged = MergePreferences.merge(mergeCommand);
+        const merged = MergePreferences.execute(mergeCommand);
 
         const includedChannels = this.getChannels(
           workflow,
