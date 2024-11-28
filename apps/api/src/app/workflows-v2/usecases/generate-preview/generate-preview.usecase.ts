@@ -1,4 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import _ from 'lodash';
 import {
   ChannelTypeEnum,
   GeneratePreviewRequestDto,
@@ -10,7 +11,11 @@ import {
   UserSessionData,
   WorkflowOriginEnum,
 } from '@novu/shared';
-import { GetWorkflowByIdsCommand, GetWorkflowByIdsUseCase } from '@novu/application-generic';
+import {
+  GetWorkflowByIdsCommand,
+  GetWorkflowByIdsUseCase,
+  WorkflowInternalResponseDto,
+} from '@novu/application-generic';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
 import { StepMissingControlsException } from '../../exceptions/step-not-found-exception';
@@ -18,6 +23,8 @@ import { PrepareAndValidateContentUsecase, ValidatedContentResponse } from '../v
 import { BuildStepDataUsecase } from '../build-step-data';
 import { GeneratePreviewCommand } from './generate-preview.command';
 import { mergeObjects } from '../../util/jsonUtils';
+import { extractTemplateVars } from '../../util/template-variables/extract-template-variables';
+import { pathsToObject } from '../../util/path-to-object';
 
 @Injectable()
 export class GeneratePreviewUsecase {
@@ -34,16 +41,12 @@ export class GeneratePreviewUsecase {
     const workflow = await this.findWorkflow(command);
 
     const validatedContent: ValidatedContentResponse = await this.getValidatedContent(dto, stepData, command.user);
-    const hydratedExampleVariables = this.normalizeExampleVariables(
-      validatedContent,
-      workflow.origin,
-      workflow.payloadSchema
-    );
+    const variablesExample = this.buildVariablesExample(workflow, stepData, dto, validatedContent.finalPayload);
 
     const executeOutput = await this.executePreviewUsecase(
       command,
       stepData,
-      hydratedExampleVariables,
+      variablesExample,
       validatedContent.finalControlValues
     );
 
@@ -53,8 +56,41 @@ export class GeneratePreviewUsecase {
         preview: executeOutput.outputs as any,
         type: stepData.type as unknown as ChannelTypeEnum,
       },
-      previewPayloadExample: hydratedExampleVariables,
+      previewPayloadExample: variablesExample,
     };
+  }
+
+  private buildVariablesExample(
+    workflow: WorkflowInternalResponseDto,
+    stepData: StepDataDto,
+    dto: GeneratePreviewRequestDto,
+    finalPayload: PreviewPayload
+  ) {
+    const payloadExampleResult = this.buildPayloadExample(workflow, dto, stepData);
+
+    return _.merge(payloadExampleResult, finalPayload, dto.previewPayload as Record<string, unknown>);
+  }
+
+  private buildPayloadExample(
+    workflow: WorkflowInternalResponseDto,
+    dto: GeneratePreviewRequestDto,
+    stepData: StepDataDto
+  ) {
+    let payloadVariableExample: Record<string, unknown> = {};
+    if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
+      payloadVariableExample = this.generateSamplePayload(workflow.payloadSchema);
+    } else {
+      const controlValues = Object.values(dto.controlValues || stepData.controls.values).join('');
+      const pathVariables = extractTemplateVars(controlValues);
+      payloadVariableExample = pathsToObject(pathVariables, { valuePrefix: '{{', valueSuffix: '}}' }).payload as Record<
+        string,
+        unknown
+      >;
+    }
+
+    return payloadVariableExample && Object.keys(payloadVariableExample).length > 0
+      ? { payload: payloadVariableExample }
+      : {};
   }
 
   private async findWorkflow(command: GeneratePreviewCommand) {
@@ -81,8 +117,8 @@ export class GeneratePreviewUsecase {
   private generateSamplePayload(schema: JSONSchemaDto, path = 'payload', depth = 0): Record<string, unknown> {
     const MAX_DEPTH = 10;
 
-    if (depth > MAX_DEPTH) {
-      throw new Error(`Schema nesting depth exceeds maximum of ${MAX_DEPTH}`);
+    if (Object.values(schema.properties || {}).length === 0) {
+      return {};
     }
 
     if (schema.type !== 'object' || !schema.properties) {
