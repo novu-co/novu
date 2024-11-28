@@ -14,8 +14,8 @@ export function CustomStepControls({
   origin: WorkflowOriginEnum;
 }) {
   const [isEditorOpen, setIsEditorOpen] = useState(true);
-
-  if (!dataSchema || origin !== WorkflowOriginEnum.EXTERNAL) {
+  console.log({ dataSchema });
+  if (!dataSchema?.properties || origin !== WorkflowOriginEnum.EXTERNAL) {
     return null;
   }
 
