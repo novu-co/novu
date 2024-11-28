@@ -17,6 +17,7 @@ import { EditWorkflowPage } from './pages/edit-workflow';
 import { TestWorkflowPage } from './pages/test-workflow';
 import { initializeSentry } from './utils/sentry';
 import { overrideZodErrorMap } from './utils/validation';
+import { FeatureFlagsProvider } from '@/context/feature-flags-provider';
 import { EditStepTemplate } from '@/components/workflow-editor/steps/edit-step-template';
 import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workflow';
 import { EditStep } from '@/components/workflow-editor/steps/edit-step';
@@ -105,6 +106,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <FeatureFlagsProvider>
+      <RouterProvider router={router} />
+    </FeatureFlagsProvider>
   </StrictMode>
 );

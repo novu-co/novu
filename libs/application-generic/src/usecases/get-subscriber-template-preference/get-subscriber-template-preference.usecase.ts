@@ -25,7 +25,7 @@ import { GetSubscriberTemplatePreferenceCommand } from './get-subscriber-templat
 import { ApiException } from '../../utils/exceptions';
 import { buildSubscriberKey, CachedEntity } from '../../services/cache';
 import { GetPreferences } from '../get-preferences';
-import { InstrumentUsecase } from '../../instrumentation';
+import { Instrument, InstrumentUsecase } from '../../instrumentation';
 
 const PRIORITY_ORDER = [
   PreferenceOverrideSourceEnum.TEMPLATE,
@@ -89,6 +89,7 @@ export class GetSubscriberTemplatePreference {
     };
   }
 
+  @Instrument()
   private async getSubscriberWorkflowPreference(
     command: GetSubscriberTemplatePreferenceCommand,
     subscriberId: string,
@@ -148,6 +149,7 @@ export class GetSubscriberTemplatePreference {
     };
   }
 
+  @Instrument()
   private async getWorkflowOverride(
     command: GetSubscriberTemplatePreferenceCommand,
   ) {
@@ -172,6 +174,7 @@ export class GetSubscriberTemplatePreference {
     });
   }
 
+  @Instrument()
   private async getChannels(
     command: GetSubscriberTemplatePreferenceCommand,
   ): Promise<IPreferenceChannels> {
@@ -196,6 +199,7 @@ export class GetSubscriberTemplatePreference {
     return initialChannels;
   }
 
+  @Instrument()
   private async queryActiveChannels(
     command: GetSubscriberTemplatePreferenceCommand,
   ): Promise<ChannelTypeEnum[]> {
@@ -354,7 +358,7 @@ export const filteredPreference = (
     {},
   );
 
-function mapTemplateConfiguration(
+export function mapTemplateConfiguration(
   template: NotificationTemplateEntity,
 ): ITemplateConfiguration {
   return {

@@ -8,7 +8,7 @@ import {
   WorkflowResponseDto,
 } from '@novu/shared';
 import { motion } from 'framer-motion';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiCloseFill, RiDeleteBin2Line, RiPencilRuler2Fill } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
@@ -40,9 +40,10 @@ type ConfigureStepFormProps = {
   step: StepDataDto;
   debouncedUpdate: (data: UpdateWorkflowDto) => void;
   update: (data: UpdateWorkflowDto) => void;
+  onDirtyChange: (dirty: boolean) => void;
 };
 export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
-  const { step, workflow, debouncedUpdate, update, environment } = props;
+  const { step, workflow, debouncedUpdate, update, environment, onDirtyChange } = props;
   const navigate = useNavigate();
 
   const isCodeCreatedWorkflow = workflow.origin === WorkflowOriginEnum.EXTERNAL;
@@ -73,6 +74,10 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
       }),
     });
   });
+
+  useEffect(() => {
+    onDirtyChange(form.formState.isDirty);
+  }, [form.formState.isDirty, onDirtyChange]);
 
   const firstError = useMemo(
     () => (step ? getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues) : undefined),

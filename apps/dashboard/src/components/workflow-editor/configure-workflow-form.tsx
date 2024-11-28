@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { PAUSE_MODAL_TITLE, PauseModalDescription } from '@/components/pause-workflow-dialog';
@@ -26,10 +26,11 @@ type ConfigureWorkflowFormProps = {
   workflow: WorkflowResponseDto;
   debouncedUpdate: (data: UpdateWorkflowDto) => void;
   patch: (data: PatchWorkflowDto) => void;
+  onDirtyChange: (isDirty: boolean) => void;
 };
 
 export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
-  const { workflow, debouncedUpdate, patch } = props;
+  const { workflow, debouncedUpdate, patch, onDirtyChange } = props;
   const isReadOnly = workflow.origin === WorkflowOriginEnum.EXTERNAL;
   const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
   const tagsQuery = useTagsQuery();
@@ -61,6 +62,11 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
   useFormAutosave(statusForm, (data) => {
     patch(data);
   });
+
+  useEffect(() => {
+    // inform the parent about the form's dirty state to block navigation
+    onDirtyChange?.(form.formState.isDirty || statusForm.formState.isDirty);
+  }, [form.formState.isDirty, statusForm.formState.isDirty, onDirtyChange]);
 
   return (
     <>
