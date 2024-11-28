@@ -93,7 +93,7 @@ export class Subscribers extends WithHttp implements ISubscribers {
 
   async getPreference(
     subscriberId: string,
-    { includeInactiveChannels }: { includeInactiveChannels: boolean },
+    { includeInactiveChannels = true }: { includeInactiveChannels: boolean },
   ) {
     return await this.http.get(
       `/subscribers/${subscriberId}/preferences?includeInactiveChannels=${includeInactiveChannels}`,
