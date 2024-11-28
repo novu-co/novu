@@ -1,6 +1,7 @@
 import { getV2, NovuApiError } from '@/api/api.client';
 import { syncWorkflow } from '@/api/workflows';
 import { ConfirmationModal } from '@/components/confirmation-modal';
+import { ToastIcon } from '@/components/primitives/sonner';
 import { showToast } from '@/components/primitives/sonner-helpers';
 import { SuccessButtonToast } from '@/components/success-button-toast';
 import TruncatedText from '@/components/truncated-text';
@@ -69,7 +70,8 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
           title={`Workflow synced to ${environment?.name}`}
           description={
             <>
-              Workflow <strong>{workflow.name}</strong> has been successfully synced to {environment?.name}.
+              Workflow <span className="font-bold">{workflow.name}</span> has been successfully synced to{' '}
+              {environment?.name}.
             </>
           }
           actionLabel={`Switch to ${environment?.name}`}
@@ -102,7 +104,14 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
       }).then((res) => ({ workflow: res.data, environment: oppositeEnvironment || undefined })),
     onMutate: () => {
       setIsLoading(true);
-      loadingToast = toast.loading('Syncing workflow...');
+      loadingToast = toast.loading(
+        <>
+          <ToastIcon variant="default" />
+          <span className="text-sm">
+            Syncing workflow <span className="font-bold">{workflow.name}</span> to {oppositeEnvironment?.name}...
+          </span>
+        </>
+      );
     },
     onSuccess: ({ workflow, environment }) => onSyncSuccess(workflow, environment),
     onError: onSyncError,
@@ -134,11 +143,8 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
         title={`Sync workflow to ${oppositeEnvironment?.name}`}
         description={
           <>
-            Workflow{' '}
-            <TruncatedText className="max-w-[32ch]">
-              <strong>{workflow.name}</strong>
-            </TruncatedText>{' '}
-            already exists in {oppositeEnvironment?.name}.<br />
+            Workflow <TruncatedText className="max-w-[32ch] font-bold">{workflow.name}</TruncatedText> already exists in{' '}
+            {oppositeEnvironment?.name}.<br />
             <br />
             Proceeding will overwrite the existing workflow.
           </>

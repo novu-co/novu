@@ -29,7 +29,9 @@ export const useDebouncedPreview = ({ workflow, step }: { workflow: WorkflowResp
           children: () => (
             <>
               <ToastIcon variant="error" />
-              <span className="text-sm">Failed to preview, Error: ${err.message}</span>
+              <span className="text-sm">
+                Failed to preview step <span className="font-bold">{step.name}</span> with error: {err.message}
+              </span>
             </>
           ),
           options: {
