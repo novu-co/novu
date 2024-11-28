@@ -39,6 +39,7 @@ import {
 } from '../get-decrypted-secret-key';
 import { BRIDGE_EXECUTION_ERROR } from '../../utils';
 import { HttpRequestHeaderKeysEnum } from '../../http';
+import { Instrument, InstrumentUsecase } from '../../instrumentation';
 
 export const DEFAULT_TIMEOUT = 5_000; // 5 seconds
 export const DEFAULT_RETRIES_LIMIT = 3;
@@ -104,6 +105,7 @@ export class ExecuteBridgeRequest {
     private getDecryptedSecretKey: GetDecryptedSecretKey,
   ) {}
 
+  @InstrumentUsecase()
   async execute<T extends PostActionEnum | GetActionEnum>(
     command: ExecuteBridgeRequestCommand,
   ): Promise<ExecuteBridgeRequestDto<T>> {
@@ -190,6 +192,7 @@ export class ExecuteBridgeRequest {
     }
   }
 
+  @Instrument()
   private async buildRequestHeaders(command: ExecuteBridgeRequestCommand) {
     const novuSignatureHeader = await this.buildRequestSignature(command);
 
@@ -200,6 +203,7 @@ export class ExecuteBridgeRequest {
     };
   }
 
+  @Instrument()
   private async buildRequestSignature(command: ExecuteBridgeRequestCommand) {
     const secretKey = await this.getDecryptedSecretKey.execute(
       GetDecryptedSecretKeyCommand.create({
@@ -217,6 +221,7 @@ export class ExecuteBridgeRequest {
     return novuSignatureHeader;
   }
 
+  @Instrument()
   private createHmacBySecretKey(
     secretKey: string,
     timestamp: number,
@@ -239,6 +244,7 @@ export class ExecuteBridgeRequest {
    * @param statelessBridgeUrl - The URL of the stateless bridge app.
    * @returns The correct bridge URL.
    */
+  @Instrument()
   private getBridgeUrl(
     environmentBridgeUrl: string,
     environmentId: string,
@@ -251,10 +257,11 @@ export class ExecuteBridgeRequest {
     }
 
     switch (workflowOrigin) {
-      case WorkflowOriginEnum.NOVU_CLOUD:
+      case WorkflowOriginEnum.NOVU_CLOUD: {
         const apiUrl = this.getApiUrl(action);
 
         return `${apiUrl}/v1/environments/${environmentId}/bridge`;
+      }
       case WorkflowOriginEnum.EXTERNAL: {
         if (!environmentBridgeUrl) {
           throw new BadRequestException({
@@ -287,6 +294,7 @@ export class ExecuteBridgeRequest {
     return apiUrl;
   }
 
+  @Instrument()
   private async handleResponseError(
     error: unknown,
     url: string,

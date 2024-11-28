@@ -113,6 +113,25 @@ describe('Workflow Controller E2E API Testing', () => {
         expect(res.isSuccessResult()).to.be.false;
         expect(res.error?.responseText).to.include('description must be shorter than or equal to 256 characters');
       });
+      it('should respond with 400 when description is too long on an update call', async () => {
+        const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('nameSuffix');
+
+        const res = await workflowsClient.createWorkflow(createWorkflowDto);
+        expect(res.isSuccessResult()).to.be.true;
+        if (res.isSuccessResult()) {
+          const updateWorkflowDto = {
+            ...buildUpdateRequest(res.value),
+            description: Array.from({ length: 260 }).join('X'),
+          };
+          const updateResult = await workflowsClient.updateWorkflow(res.value?._id, updateWorkflowDto);
+          expect(updateResult.isSuccessResult(), JSON.stringify(updateResult.value)).to.be.false;
+          if (!updateResult.isSuccessResult()) {
+            expect(updateResult.error?.responseText).to.include(
+              'description must be shorter than or equal to 256 characters'
+            );
+          }
+        }
+      });
 
       it('should respond with 400 when a tag is too long', async () => {
         const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('nameSuffix', {
