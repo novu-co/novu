@@ -117,42 +117,42 @@ export class GetPreferences {
     command: GetPreferencesCommand,
   ): Promise<PreferenceSet> {
     const [
-      workflowPreferences,
+      workflowResourcePreference,
+      workflowUserPreference,
       subscriberWorkflowPreference,
       subscriberGlobalPreference,
     ] = await Promise.all([
-      this.preferencesRepository.find({
+      this.preferencesRepository.findOne({
         _templateId: command.templateId,
         _environmentId: command.environmentId,
-        type: {
-          $in: [
-            PreferencesTypeEnum.WORKFLOW_RESOURCE,
-            PreferencesTypeEnum.USER_WORKFLOW,
-          ],
-        },
-      }),
+        type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
+      }) as Promise<PreferenceSet['workflowResourcePreference'] | null>,
+      this.preferencesRepository.findOne({
+        _templateId: command.templateId,
+        _environmentId: command.environmentId,
+        type: PreferencesTypeEnum.USER_WORKFLOW,
+      }) as Promise<PreferenceSet['workflowUserPreference'] | null>,
       this.preferencesRepository.findOne({
         _subscriberId: command.subscriberId,
         _environmentId: command.environmentId,
         type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
-      }),
+      }) as Promise<PreferenceSet['subscriberWorkflowPreference'] | null>,
       this.preferencesRepository.findOne({
         _subscriberId: command.subscriberId,
         _environmentId: command.environmentId,
         type: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
-      }),
+      }) as Promise<PreferenceSet['subscriberGlobalPreference'] | null>,
     ]);
 
+    if (workflowResourcePreference === null) {
+      throw new PreferencesNotFoundException(command);
+    }
+
     return {
-      workflowResourcePreference: workflowPreferences.find(
-        (preference) =>
-          preference.type === PreferencesTypeEnum.WORKFLOW_RESOURCE,
-      ) as PreferenceSet['workflowResourcePreference'],
-      workflowUserPreference: workflowPreferences.find(
-        (preference) => preference.type === PreferencesTypeEnum.USER_WORKFLOW,
-      ) as PreferenceSet['workflowUserPreference'],
-      subscriberWorkflowPreference,
-      subscriberGlobalPreference,
+      workflowResourcePreference,
+      ...(workflowUserPreference ? { workflowUserPreference } : {}),
+      ...(subscriberWorkflowPreference ? { subscriberWorkflowPreference } : {}),
+      ...(subscriberGlobalPreference ? { subscriberGlobalPreference } : {}),
     };
   }
 }
