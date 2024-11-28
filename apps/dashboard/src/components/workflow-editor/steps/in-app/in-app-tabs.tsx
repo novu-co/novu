@@ -39,7 +39,7 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
   const schema = useMemo(() => buildDynamicZodSchema(dataSchema ?? {}), [dataSchema]);
   const newFormValues = useMemo(() => {
     if (Object.keys(dataSchema ?? {}).length !== 0) {
-      merge(buildDefaultValuesOfDataSchema(dataSchema ?? {}), values);
+      return merge(buildDefaultValuesOfDataSchema(dataSchema ?? {}), values);
     }
 
     return merge(buildDefaultValues(uiSchema ?? {}), values);
