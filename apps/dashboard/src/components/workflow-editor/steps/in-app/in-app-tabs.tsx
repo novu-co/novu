@@ -1,83 +1,30 @@
 import { ChannelTypeEnum } from '@novu/shared';
 import { Cross2Icon } from '@radix-ui/react-icons';
-import { useState } from 'react';
-import { FieldValues, useFormContext, useWatch } from 'react-hook-form';
+import { FieldValues, useFormContext } from 'react-hook-form';
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 
-import { NovuApiError } from '@/api/api.client';
 import { Notification5Fill } from '@/components/icons';
 import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
-import { ToastIcon } from '@/components/primitives/sonner';
-import { showToast } from '@/components/primitives/sonner-helpers';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { InAppEditor } from '@/components/workflow-editor/steps/in-app/in-app-editor';
 import { InAppEditorPreview } from '@/components/workflow-editor/steps/in-app/in-app-editor-preview';
-import useDebouncedEffect from '@/hooks/use-debounced-effect';
-import { usePreviewStep } from '@/hooks/use-preview-step';
 import { CustomStepControls } from '../controls/custom-step-controls';
 import { ConfigureStepTemplateFormProps } from '@/components/workflow-editor/steps/configure-step-template-form';
+import { useDebouncedPreview } from '../use-debounced-preview';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5 overflow-y-auto';
 
 export const InAppTabs = (props: ConfigureStepTemplateFormProps) => {
   const { workflow, step } = props;
-  const navigate = useNavigate();
-
   const { dataSchema, uiSchema } = step.controls;
-
-  const [editorValue, setEditorValue] = useState('{}');
-
-  const { previewStep, data: previewData, isPending: isPreviewPending } = usePreviewStep();
-
-  const preview = async (props: {
-    controlValues: Record<string, unknown>;
-    previewPayload: Record<string, unknown>;
-  }) => {
-    try {
-      const res = await previewStep({
-        workflowSlug: workflow.workflowId,
-        stepSlug: step.stepId,
-        data: { controlValues: props.controlValues, previewPayload: props.previewPayload },
-      });
-      setEditorValue(JSON.stringify(res.previewPayloadExample, null, 2));
-    } catch (err) {
-      if (err instanceof NovuApiError) {
-        showToast({
-          children: () => (
-            <>
-              <ToastIcon variant="error" />
-              <span className="text-sm">Failed to preview, Error: ${err.message}</span>
-            </>
-          ),
-          options: {
-            position: 'bottom-right',
-            classNames: {
-              toast: 'ml-10 mb-4',
-            },
-          },
-        });
-      }
-    }
-  };
-
   const form = useFormContext();
-  const formValues = useWatch(form);
-  useDebouncedEffect(
-    () => {
-      preview({
-        controlValues: form.getValues() as Record<string, unknown>,
-        /**
-         * Reset the preview payload to an empty object on form change
-         * to prevent showing the previous payload
-         */
-        previewPayload: {},
-      });
-    },
-    2000,
-    [formValues]
-  );
+  const navigate = useNavigate();
+  const { editorValue, setEditorValue, previewStep, previewData, isPreviewPending } = useDebouncedPreview({
+    workflow,
+    step,
+  });
 
   return (
     <Tabs defaultValue="editor" className="flex h-full flex-1 flex-col">
