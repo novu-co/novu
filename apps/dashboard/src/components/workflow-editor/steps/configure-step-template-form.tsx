@@ -1,6 +1,6 @@
 import { flattenIssues } from '@/components/workflow-editor/step-utils';
 import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
-import { buildDefaultValues, buildDynamicZodSchema } from '@/utils/schema';
+import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type StepDataDto, StepTypeEnum, UpdateWorkflowDto, type WorkflowResponseDto } from '@novu/shared';
 import merge from 'lodash.merge';
@@ -35,10 +35,13 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
 
   const schema = useMemo(() => buildDynamicZodSchema(step.controls.dataSchema ?? {}), [step.controls.dataSchema]);
 
-  const defaultValues = useMemo(
-    () => merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values),
-    []
-  );
+  const defaultValues = useMemo(() => {
+    if (Object.keys(step.controls.uiSchema ?? {}).length !== 0) {
+      return merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values);
+    }
+
+    return merge(buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {}), step.controls.values);
+  }, []);
 
   const form = useForm({
     mode: 'onChange',
