@@ -67,7 +67,13 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
     onSuccess: async (data) => {
       resetWorkflowForm(data);
       const step = await refetchStep();
-      form.reset(merge(buildDefaultValues(uiSchema ?? {}), step.data?.controls.values));
+      form.reset(
+        merge(
+          buildDefaultValues(uiSchema ?? {}),
+          buildDefaultValuesOfDataSchema(step.data?.controls.dataSchema ?? {}),
+          step.data?.controls.values
+        )
+      );
       showToast({
         children: () => (
           <>
