@@ -65,7 +65,7 @@ export function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
           </span>
           <div className="bg-background text-foreground-600 -mt-px ml-auto mr-4 flex items-center gap-1">
             {canAdd && <AddButton onClick={handleAddClick} disabled={disabled || readonly} registry={registry} />}
-            <CollapsibleTrigger>
+            <CollapsibleTrigger className="hover:bg-accent size-4 rounded-sm p-0.5">
               <RiExpandUpDownLine className="text-foreground-600 size-3" />
             </CollapsibleTrigger>
           </div>

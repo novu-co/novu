@@ -52,7 +52,7 @@ export function ObjectFieldTemplate(props: ObjectFieldTemplateProps) {
                   </span>
                   <div className="bg-background text-foreground-600 ml-auto flex items-center gap-1">
                     <CollapsibleTrigger
-                      className="flex size-4 items-center justify-center rounded-sm p-0.5"
+                      className="hover:bg-accent flex size-4 items-center justify-center rounded-sm p-0.5"
                       title="Collapse section"
                     >
                       <RiExpandUpDownLine className="text-foreground-600 size-3" />
