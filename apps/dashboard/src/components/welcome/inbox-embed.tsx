@@ -12,8 +12,7 @@ import {
   RiVuejsFill,
 } from 'react-icons/ri';
 import { useState, useEffect } from 'react';
-import { SnippetEditor } from '../workflow-editor/test-workflow/snippet-editor';
-import { SnippetLanguage } from '../workflow-editor/test-workflow/types';
+import { CodeBlock, Language } from '../primitives/code-block';
 import { Button } from '../primitives/button';
 import { useIntegrations } from '../../hooks/use-integrations';
 import { useFetchEnvironments } from '../../context/environment/hooks';
@@ -33,7 +32,7 @@ interface InstallationStep {
   title: string;
   description: string;
   code?: string;
-  codeLanguage: SnippetLanguage;
+  codeLanguage: Language;
   codeTitle?: string;
 }
 
@@ -56,7 +55,15 @@ function FrameworkInstructions({ framework }: { framework: Framework }) {
               <p className="text-foreground-400 text-xs">{step.description}</p>
             </div>
 
-            {step.code && <SnippetEditor readOnly language={step.codeLanguage as SnippetLanguage} value={step.code} />}
+            {step.code && (
+              <div className="w-full max-w-[500px]">
+                <CodeBlock
+                  code={step.code}
+                  language={step.codeLanguage === 'shell' ? 'shell' : step.codeLanguage}
+                  title={step.codeTitle}
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -76,6 +83,7 @@ const frameworks: Framework[] = [
         description: '@novu/react is the package that is powering the notification center in Next.js.',
         code: 'npm install @novu/react',
         codeLanguage: 'shell',
+        codeTitle: 'Terminal',
       },
       {
         title: 'Add the inbox code to your Next.js app',
@@ -97,6 +105,7 @@ function Novu() {
   );
 }`,
         codeLanguage: 'tsx',
+        codeTitle: 'App.tsx',
       },
     ],
   },
@@ -358,7 +367,11 @@ export function InboxEmbed(): JSX.Element {
                   <Button>Send Notification</Button>
                 </div>
 
-                <SnippetEditor readOnly language="shell" value={'curl -X POST https://api.novu.co/v1/events/trigger'} />
+                <CodeBlock
+                  code={'curl -X POST https://api.novu.co/v1/events/trigger'}
+                  language="shell"
+                  title="Trigger notification"
+                />
               </div>
             </div>
           </div>
