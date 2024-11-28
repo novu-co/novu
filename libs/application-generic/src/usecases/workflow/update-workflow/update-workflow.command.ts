@@ -28,7 +28,11 @@ import {
   MAX_NAME_LENGTH,
   MAX_TAG_LENGTH,
 } from './upsert-validation-constants';
-import { ContentIssue, IStepControl, NotificationStep } from '../..';
+import {
+  ContentIssue,
+  IStepControl,
+  NotificationStep,
+} from '../../create-workflow/create-workflow.command';
 
 export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsDefined()
