@@ -15,7 +15,7 @@ import {
 
 import { AnalyticsService } from '../../services/analytics.service';
 import { GetSubscriberPreferenceCommand } from './get-subscriber-preference.command';
-import { InstrumentUsecase } from '../../instrumentation';
+import { Instrument, InstrumentUsecase } from '../../instrumentation';
 import { MergePreferences } from '../merge-preferences/merge-preferences.usecase';
 import { GetPreferences, PreferenceSet } from '../get-preferences';
 import {
@@ -72,27 +72,17 @@ export class GetSubscriberPreference {
       subscriberWorkflowPreferences,
       subscriberGlobalPreference,
     ] = await Promise.all([
-      this.preferencesRepository.find({
-        _templateId: { $in: workflowIds },
-        _environmentId: command.environmentId,
-        type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
-      }) as Promise<PreferenceSet['workflowResourcePreference'][] | null>,
-      this.preferencesRepository.find({
-        _templateId: { $in: workflowIds },
-        _environmentId: command.environmentId,
-        type: PreferencesTypeEnum.USER_WORKFLOW,
-      }) as Promise<PreferenceSet['workflowUserPreference'][] | null>,
-      this.preferencesRepository.find({
-        _templateId: { $in: workflowIds },
-        _subscriberId: subscriber._id,
-        _environmentId: command.environmentId,
-        type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
-      }),
-      this.preferencesRepository.findOne({
-        _subscriberId: subscriber._id,
-        _environmentId: command.environmentId,
-        type: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
-      }),
+      this.getWorkflowResourcePreference(workflowIds, command.environmentId),
+      this.getWorkflowUserPreference(workflowIds, command.environmentId),
+      this.getSubscriberWorkflowPreference(
+        command.subscriberId,
+        workflowIds,
+        command.environmentId,
+      ),
+      this.getSubscriberGlobalPreference(
+        command.subscriberId,
+        command.environmentId,
+      ),
     ]);
 
     const allWorkflowPreferences = [
@@ -198,6 +188,56 @@ export class GetSubscriberPreference {
     );
 
     return nonCriticalWorkflowPreferences;
+  }
+
+  @Instrument()
+  private async getWorkflowResourcePreference(
+    workflowIds: string[],
+    environmentId: string,
+  ): Promise<PreferenceSet['workflowResourcePreference'][]> {
+    return (await this.preferencesRepository.find({
+      _templateId: { $in: workflowIds },
+      _environmentId: environmentId,
+      type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
+    })) as PreferenceSet['workflowResourcePreference'][];
+  }
+
+  @Instrument()
+  private async getWorkflowUserPreference(
+    workflowIds: string[],
+    environmentId: string,
+  ): Promise<PreferenceSet['workflowUserPreference'][]> {
+    return (await this.preferencesRepository.find({
+      _templateId: { $in: workflowIds },
+      _environmentId: environmentId,
+      type: PreferencesTypeEnum.USER_WORKFLOW,
+    })) as PreferenceSet['workflowUserPreference'][];
+  }
+
+  @Instrument()
+  private async getSubscriberWorkflowPreference(
+    subscriberId: string,
+    workflowIds: string[],
+    environmentId: string,
+  ): Promise<PreferenceSet['subscriberWorkflowPreference'][]> {
+    return await this.preferencesRepository.find({
+      _subscriberId: subscriberId,
+      _templateId: { $in: workflowIds },
+      _environmentId: environmentId,
+      type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+    });
+  }
+
+  @Instrument()
+  private async getSubscriberGlobalPreference(
+    subscriberId: string,
+    environmentId: string,
+  ): Promise<PreferenceSet['subscriberGlobalPreference']> {
+    return await this.preferencesRepository.findOne({
+      _subscriberId: subscriberId,
+      _environmentId: environmentId,
+      type: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
+    });
   }
 
   private getChannels(

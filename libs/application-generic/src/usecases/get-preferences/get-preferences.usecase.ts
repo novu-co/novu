@@ -9,7 +9,7 @@ import {
 } from '@novu/shared';
 import { GetPreferencesCommand } from './get-preferences.command';
 import { GetPreferencesResponseDto } from './get-preferences.dto';
-import { InstrumentUsecase } from '../../instrumentation';
+import { Instrument, InstrumentUsecase } from '../../instrumentation';
 import { MergePreferences } from '../merge-preferences/merge-preferences.usecase';
 import { MergePreferencesCommand } from '../merge-preferences/merge-preferences.command';
 
@@ -122,27 +122,20 @@ export class GetPreferences {
       subscriberWorkflowPreference,
       subscriberGlobalPreference,
     ] = await Promise.all([
-      this.preferencesRepository.findOne({
-        _templateId: command.templateId,
-        _environmentId: command.environmentId,
-        type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
-      }) as Promise<PreferenceSet['workflowResourcePreference'] | null>,
-      this.preferencesRepository.findOne({
-        _templateId: command.templateId,
-        _environmentId: command.environmentId,
-        type: PreferencesTypeEnum.USER_WORKFLOW,
-      }) as Promise<PreferenceSet['workflowUserPreference'] | null>,
-      this.preferencesRepository.findOne({
-        _subscriberId: command.subscriberId,
-        _environmentId: command.environmentId,
-        _templateId: command.templateId,
-        type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
-      }) as Promise<PreferenceSet['subscriberWorkflowPreference'] | null>,
-      this.preferencesRepository.findOne({
-        _subscriberId: command.subscriberId,
-        _environmentId: command.environmentId,
-        type: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
-      }) as Promise<PreferenceSet['subscriberGlobalPreference'] | null>,
+      this.getWorkflowResourcePreference(
+        command.templateId,
+        command.environmentId,
+      ),
+      this.getWorkflowUserPreference(command.templateId, command.environmentId),
+      this.getSubscriberWorkflowPreference(
+        command.subscriberId,
+        command.templateId,
+        command.environmentId,
+      ),
+      this.getSubscriberGlobalPreference(
+        command.subscriberId,
+        command.environmentId,
+      ),
     ]);
 
     return {
@@ -151,5 +144,55 @@ export class GetPreferences {
       ...(subscriberWorkflowPreference ? { subscriberWorkflowPreference } : {}),
       ...(subscriberGlobalPreference ? { subscriberGlobalPreference } : {}),
     };
+  }
+
+  @Instrument()
+  private async getWorkflowResourcePreference(
+    workflowId: string,
+    environmentId: string,
+  ): Promise<PreferenceSet['workflowResourcePreference']> {
+    return (await this.preferencesRepository.findOne({
+      _templateId: workflowId,
+      _environmentId: environmentId,
+      type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
+    })) as PreferenceSet['workflowResourcePreference'];
+  }
+
+  @Instrument()
+  private async getWorkflowUserPreference(
+    workflowId: string,
+    environmentId: string,
+  ): Promise<PreferenceSet['workflowUserPreference']> {
+    return (await this.preferencesRepository.findOne({
+      _templateId: workflowId,
+      _environmentId: environmentId,
+      type: PreferencesTypeEnum.USER_WORKFLOW,
+    })) as PreferenceSet['workflowUserPreference'];
+  }
+
+  @Instrument()
+  private async getSubscriberWorkflowPreference(
+    subscriberId: string,
+    workflowId: string,
+    environmentId: string,
+  ): Promise<PreferenceSet['subscriberWorkflowPreference']> {
+    return (await this.preferencesRepository.findOne({
+      _subscriberId: subscriberId,
+      _templateId: workflowId,
+      _environmentId: environmentId,
+      type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+    })) as PreferenceSet['subscriberWorkflowPreference'];
+  }
+
+  @Instrument()
+  private async getSubscriberGlobalPreference(
+    subscriberId: string,
+    environmentId: string,
+  ): Promise<PreferenceSet['subscriberGlobalPreference']> {
+    return (await this.preferencesRepository.findOne({
+      _subscriberId: subscriberId,
+      _environmentId: environmentId,
+      type: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
+    })) as PreferenceSet['subscriberGlobalPreference'];
   }
 }
