@@ -5,11 +5,13 @@ import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { AddStepMenu } from './add-step-menu';
 import { Node, NodeBody, NodeError, NodeHeader, NodeIcon, NodeName } from './base-node';
 import { StepTypeEnum } from '@/utils/enums';
-import { useWorkflowEditorContext } from './hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { ComponentProps } from 'react';
 import { cn } from '@/utils/ui';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
+import { WorkflowOriginEnum } from '@novu/shared';
+import { createStep } from '@/components/workflow-editor/steps/step-provider';
 
 export type NodeData = {
   name?: string;
@@ -57,7 +59,7 @@ export const EmailNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.EMAIL];
 
   return (
-    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.EMAIL}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.EMAIL]}>
@@ -79,7 +81,7 @@ export const SmsNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.SMS];
 
   return (
-    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.SMS}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.SMS]}>
@@ -101,7 +103,7 @@ export const InAppNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.IN_APP];
 
   return (
-    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.IN_APP}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.IN_APP]}>
@@ -123,7 +125,7 @@ export const PushNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.PUSH];
 
   return (
-    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.PUSH}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.PUSH]}>
@@ -145,7 +147,7 @@ export const ChatNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.CHAT];
 
   return (
-    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.CHAT}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.CHAT]}>
@@ -167,7 +169,7 @@ export const DelayNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.DELAY];
 
   return (
-    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.DELAY}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.DELAY]}>
@@ -188,7 +190,7 @@ export const DigestNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.DIGEST];
 
   return (
-    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.DIGEST}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.DIGEST]}>
@@ -211,7 +213,7 @@ export const CustomNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.CUSTOM];
 
   return (
-    <Link to={buildRoute(ROUTES.CONFIGURE_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.CUSTOM}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.CUSTOM]}>
@@ -228,8 +230,12 @@ export const CustomNode = (props: NodeProps<NodeType>) => {
 };
 
 export const AddNode = (_props: NodeProps<NodeType>) => {
-  const { addStep, isReadOnly } = useWorkflowEditorContext();
+  const { workflow, update } = useWorkflow();
+  if (!workflow) {
+    return null;
+  }
 
+  const isReadOnly = workflow.origin === WorkflowOriginEnum.EXTERNAL;
   if (isReadOnly) {
     return null;
   }
@@ -240,7 +246,7 @@ export const AddNode = (_props: NodeProps<NodeType>) => {
       <AddStepMenu
         visible
         onMenuItemClick={(stepType) => {
-          addStep(stepType);
+          update({ ...workflow, steps: [...workflow.steps, createStep(stepType)] });
         }}
       />
     </div>
