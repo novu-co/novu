@@ -5,7 +5,7 @@ import { useEnvironment } from '@/context/environment/hooks';
 
 export const ConfigureStep = () => {
   const { step } = useStep();
-  const { workflow, debouncedUpdate, update } = useWorkflow();
+  const { workflow, debouncedUpdate, update, onDirtyChange } = useWorkflow();
   const { currentEnvironment } = useEnvironment();
   if (!currentEnvironment || !step || !workflow) {
     return null;
@@ -18,6 +18,7 @@ export const ConfigureStep = () => {
       environment={currentEnvironment}
       debouncedUpdate={debouncedUpdate}
       update={update}
+      onDirtyChange={onDirtyChange}
     />
   );
 };
