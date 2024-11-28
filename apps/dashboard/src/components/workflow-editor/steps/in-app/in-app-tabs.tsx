@@ -260,7 +260,13 @@ export const InAppTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; s
             </TabsContent>
             <Separator />
             <footer className="flex justify-end px-3 py-3.5">
-              <Button className="ml-auto" variant="default" type="submit" form="save-step" disabled={isNotDirty}>
+              <Button
+                className="ml-auto"
+                variant="default"
+                type="submit"
+                form="save-step"
+                disabled={isPending || isNotDirty}
+              >
                 Save step
               </Button>
             </footer>
