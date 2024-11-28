@@ -5,7 +5,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { RiArrowLeftSLine, RiInputField, RiLayoutLine, RiNotification2Fill } from 'react-icons/ri';
 import { InboxPreviewContent } from './inbox-preview-content';
 import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
-import { toast } from 'sonner';
 import { useAuth } from '../../context/auth/hooks';
 import { getComponentByType } from '../workflow-editor/steps/component-utils';
 import { StepTypeEnum, UiComponentEnum, WorkflowCreationSourceEnum } from '@novu/shared';

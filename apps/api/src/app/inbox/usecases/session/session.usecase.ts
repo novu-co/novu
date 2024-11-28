@@ -89,7 +89,16 @@ export class Session {
 
     const removeNovuBranding = inAppIntegration.removeNovuBranding || false;
 
-    if (!inAppIntegration.connected) {
+    /**
+     * We want to prevent the playground inbox demo from marking the integration as connected
+     * And only treat the real customer domain or local environment as valid origins
+     */
+    const isOriginFromNovu =
+      command.origin &&
+      ((process.env.DASHBOARD_V2_BASE_URL && command.origin?.includes(process.env.DASHBOARD_V2_BASE_URL as string)) ||
+        (process.env.FRONT_BASE_URL && command.origin?.includes(process.env.FRONT_BASE_URL as string)));
+
+    if (!isOriginFromNovu && !inAppIntegration.connected) {
       await this.integrationRepository.updateOne(
         {
           _id: inAppIntegration._id,

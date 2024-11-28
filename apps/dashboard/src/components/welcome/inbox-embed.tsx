@@ -11,7 +11,7 @@ import {
   RiSvelteFill,
   RiVuejsFill,
 } from 'react-icons/ri';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SnippetEditor } from '../workflow-editor/test-workflow/snippet-editor';
 import { SnippetLanguage } from '../workflow-editor/test-workflow/types';
 import { Button } from '../primitives/button';
@@ -19,6 +19,8 @@ import { useIntegrations } from '../../hooks/use-integrations';
 import { useFetchEnvironments } from '../../context/environment/hooks';
 import { useAuth } from '../../context/auth/hooks';
 import { ChannelTypeEnum } from '@novu/shared';
+import { API_HOSTNAME, WEBSOCKET_HOSTNAME } from '../../config';
+import ReactConfetti from 'react-confetti';
 
 interface Framework {
   name: string;
@@ -79,20 +81,19 @@ const frameworks: Framework[] = [
         title: 'Add the inbox code to your Next.js app',
         description: 'Novu uses the onNavigate prop to make your notifications navigatable in Next.js.',
         code: `'use client';
-import { Novu, PopoverNotificationCenter } from '@novu/react';
+
+import { Inbox } from '@novu/react';
 import { useRouter } from 'next/navigation';
 
-export default function NotificationCenter() {
+function Novu() {
   const router = useRouter();
-  
+
   return (
-    <Novu subscriberId="YOUR_SUBSCRIBER_ID" applicationIdentifier="YOUR_APP_ID">
-      <PopoverNotificationCenter
-        onNotificationClick={(notification) => {
-          router.push(notification.cta.data.url);
-        }}
-      />
-    </NovuProvider>
+    <Inbox
+      applicationIdentifier="YOUR_APPLICATION_IDENTIFIER"
+      subscriberId="YOUR_SUBSCRIBER_ID"
+      routerPush={(path: string) => router.push(path)}
+    />
   );
 }`,
         codeLanguage: 'tsx',
@@ -145,23 +146,8 @@ export function NotificationCenter() {
       {
         title: 'Add the inbox code to your Remix app',
         description: 'Implement the notification center in your Remix application.',
-        code: `import { NovuProvider, PopoverNotificationCenter } from '@novu/notification-center';
-import { useNavigate } from '@remix-run/react';
-
-export function NotificationCenter() {
-  const navigate = useNavigate();
-  
-  return (
-    <NovuProvider subscriberId="YOUR_SUBSCRIBER_ID" applicationIdentifier="YOUR_APP_ID">
-      <PopoverNotificationCenter
-        onNotificationClick={(notification) => {
-          navigate(notification.cta.data.url);
-        }}
-      />
-    </NovuProvider>
-  );
-}`,
-        codeLanguage: 'typescript',
+        code: 'npm install @novu/notification-center',
+        codeLanguage: 'shell',
       },
     ],
   },
@@ -178,19 +164,8 @@ export function NotificationCenter() {
       {
         title: 'Add the inbox code to your Svelte app',
         description: 'Implement the notification center in your Svelte application.',
-        code: `<script lang="ts">
-  import { NovuProvider, PopoverNotificationCenter } from '@novu/notification-center';
-  import { goto } from '$app/navigation';
-</script>
-
-<NovuProvider subscriberId="YOUR_SUBSCRIBER_ID" applicationIdentifier="YOUR_APP_ID">
-  <PopoverNotificationCenter
-    onNotificationClick={(notification) => {
-      goto(notification.cta.data.url);
-    }}
-  />
-</NovuProvider>`,
-        codeLanguage: 'typescript',
+        code: 'npm install @novu/notification-center',
+        codeLanguage: 'shell',
       },
     ],
   },
@@ -207,27 +182,8 @@ export function NotificationCenter() {
       {
         title: 'Add the inbox code to your Angular app',
         description: 'Implement the notification center in your Angular application.',
-        code: `import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-
-@Component({
-  selector: 'app-notification-center',
-  template: \`
-    <novu-provider [subscriberId]="'YOUR_SUBSCRIBER_ID'" [applicationIdentifier]="'YOUR_APP_ID'">
-      <popover-notification-center
-        [onNotificationClick]="handleNotificationClick"
-      ></popover-notification-center>
-    </novu-provider>
-  \`,
-})
-export class NotificationCenterComponent {
-  constructor(private router: Router) {}
-
-  handleNotificationClick = (notification: any) => {
-    this.router.navigate([notification.cta.data.url]);
-  };
-}`,
-        codeLanguage: 'typescript',
+        code: 'npm install @novu/notification-center',
+        codeLanguage: 'shell',
       },
     ],
   },
@@ -244,25 +200,8 @@ export class NotificationCenterComponent {
       {
         title: 'Add the inbox code to your Vue app',
         description: 'Implement the notification center in your Vue application.',
-        code: `<script setup lang="ts">
-import { NovuProvider, PopoverNotificationCenter } from '@novu/notification-center';
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-
-const handleNotificationClick = (notification: any) => {
-  router.push(notification.cta.data.url);
-};
-</script>
-
-<template>
-  <NovuProvider subscriberId="YOUR_SUBSCRIBER_ID" applicationIdentifier="YOUR_APP_ID">
-    <PopoverNotificationCenter
-      @notification-click="handleNotificationClick"
-    />
-  </NovuProvider>
-</template>`,
-        codeLanguage: 'typescript',
+        code: 'npm install @novu/notification-center',
+        codeLanguage: 'shell',
       },
     ],
   },
@@ -279,17 +218,7 @@ const handleNotificationClick = (notification: any) => {
       {
         title: 'Add the inbox code to your JavaScript app',
         description: 'Implement the notification center in your vanilla JavaScript application.',
-        code: `import { NovuProvider, PopoverNotificationCenter } from '@novu/notification-center';
-
-const notificationCenter = new PopoverNotificationCenter({
-  subscriberId: 'YOUR_SUBSCRIBER_ID',
-  applicationIdentifier: 'YOUR_APP_ID',
-  onNotificationClick: (notification) => {
-    window.location.href = notification.cta.data.url;
-  }
-});
-
-document.getElementById('notification-container').appendChild(notificationCenter);`,
+        code: 'npm install @novu/notification-center',
         codeLanguage: 'shell',
       },
     ],
@@ -298,13 +227,58 @@ document.getElementById('notification-container').appendChild(notificationCenter
 
 export function InboxEmbed(): JSX.Element {
   const [selectedFramework, setSelectedFramework] = useState(frameworks.find((f) => f.selected) || frameworks[0]);
+  const [showConfetti, setShowConfetti] = useState(false);
   const auth = useAuth();
   const { environments } = useFetchEnvironments({ organizationId: auth?.currentOrganization?._id });
   const { integrations } = useIntegrations({ refetchInterval: 1000, refetchOnWindowFocus: true });
+
+  const currentEnvironment = environments?.find((env) => !env._parentId);
+  const subscriberId = auth?.currentUser?._id;
+
+  useEffect(() => {
+    if (!currentEnvironment?.identifier || !subscriberId) return;
+
+    const isDefaultApi = API_HOSTNAME === 'https://api.novu.co';
+    const isDefaultWs = WEBSOCKET_HOSTNAME === 'https://ws.novu.co';
+
+    // Create the props string based on environment
+    const additionalProps = [
+      ...(isDefaultApi ? [] : [`backendUrl="${API_HOSTNAME}"`]),
+      ...(isDefaultWs ? [] : [`socketUrl="${WEBSOCKET_HOSTNAME}"`]),
+    ].join('\n      ');
+
+    // Create the full Inbox component string
+    const inboxComponentString = `<Inbox
+      applicationIdentifier="${currentEnvironment.identifier}"
+      subscriberId="${subscriberId}"
+      routerPush={(path: string) => router.push(path)}${additionalProps ? '\n      ' + additionalProps : ''}
+    />`;
+
+    const updatedFrameworks = frameworks.map((framework) => ({
+      ...framework,
+      installSteps: framework.installSteps.map((step) => ({
+        ...step,
+        code: step.code
+          ?.replace(/<Inbox[\s\S]*?\/>/, inboxComponentString)
+          ?.replace(/YOUR_APP_ID/g, currentEnvironment.identifier),
+      })),
+    }));
+
+    setSelectedFramework(updatedFrameworks.find((f) => f.name === selectedFramework.name) || updatedFrameworks[0]);
+  }, [currentEnvironment?.identifier, subscriberId, selectedFramework.name]);
+
   const foundIntegration = integrations?.find(
     (integration) =>
       integration._environmentId === environments?.[0]?._id && integration.channel === ChannelTypeEnum.IN_APP
   );
+
+  useEffect(() => {
+    if (foundIntegration?.connected) {
+      setShowConfetti(true);
+      const timer = setTimeout(() => setShowConfetti(false), 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [foundIntegration?.connected]);
 
   function handleFrameworkSelect(framework: Framework) {
     setSelectedFramework(framework);
@@ -312,6 +286,7 @@ export function InboxEmbed(): JSX.Element {
 
   return (
     <main className="flex flex-col pl-[100px]">
+      {showConfetti && <ReactConfetti recycle={false} numberOfPieces={1000} />}
       {!foundIntegration?.connected && (
         <>
           {/* Header Section */}
