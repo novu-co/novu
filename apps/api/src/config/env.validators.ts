@@ -41,6 +41,7 @@ export const envValidators = {
   LEGACY_STAGING_DASHBOARD_URL: url({ default: undefined }),
   API_ROOT_URL: url(),
   NOVU_INVITE_TEAM_MEMBER_NUDGE_TRIGGER_IDENTIFIER: str({ default: undefined }),
+  SUBSCRIBER_WIDGET_JWT_EXPIRATION_TIME: str({ default: '15 days' }),
 
   // Novu Cloud third party services
   ...(processEnv.IS_SELF_HOSTED !== 'true' &&

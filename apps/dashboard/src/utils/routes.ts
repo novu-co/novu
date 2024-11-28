@@ -1,14 +1,16 @@
 export const ROUTES = {
-  SIGN_IN: '/sign-in',
-  SIGN_UP: '/sign-up',
-  SIGNUP_ORGANIZATION_LIST: '/sign-up/organization-list',
+  SIGN_IN: '/auth/sign-in',
+  SIGN_UP: '/auth/sign-up',
+  SIGNUP_ORGANIZATION_LIST: '/auth/organization-list',
+  SIGNUP_QUESTIONNAIRE: '/auth/questionnaire',
+  USECASE_SELECT: '/auth/usecase',
   ROOT: '/',
   ENV: '/env',
   WORKFLOWS: '/env/:environmentSlug/workflows',
   EDIT_WORKFLOW: '/env/:environmentSlug/workflows/:workflowSlug',
   TEST_WORKFLOW: '/env/:environmentSlug/workflows/:workflowSlug/test',
-  CONFIGURE_STEP: 'steps/:stepSlug',
-  EDIT_STEP: 'steps/:stepSlug/edit',
+  EDIT_STEP: 'steps/:stepSlug',
+  EDIT_STEP_TEMPLATE: 'steps/:stepSlug/edit',
 };
 
 export const buildRoute = (route: string, params: Record<string, string>) => {

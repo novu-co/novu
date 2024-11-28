@@ -13,6 +13,8 @@ import {
   GetWorkflowByIdsCommand,
   GetWorkflowByIdsUseCase,
   WorkflowInternalResponseDto,
+  Instrument,
+  InstrumentUsecase,
 } from '@novu/application-generic';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
@@ -29,6 +31,7 @@ export class GeneratePreviewUsecase {
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: GeneratePreviewCommand): Promise<GeneratePreviewResponseDto> {
     const { previewPayload: commandVariablesExample, controlValues: commandControlValues } =
       command.generatePreviewRequestDto;
@@ -57,6 +60,7 @@ export class GeneratePreviewUsecase {
     } as GeneratePreviewResponseDto;
   }
 
+  @Instrument()
   private buildVariablesExample(
     workflow: WorkflowInternalResponseDto,
     stepData: StepDataDto,
@@ -72,6 +76,7 @@ export class GeneratePreviewUsecase {
     return _.merge(variablesExample, commandVariablesExample as Record<string, unknown>);
   }
 
+  @Instrument()
   private generateVariablesExample(stepData: StepDataDto, commandControlValues?: Record<string, unknown>) {
     const controlValues = Object.values(commandControlValues || stepData.controls.values).join('');
     const variablesExample = pathsToObject(extractTemplateVars(controlValues), {
@@ -82,6 +87,7 @@ export class GeneratePreviewUsecase {
     return variablesExample;
   }
 
+  @Instrument()
   private async findWorkflow(command: GeneratePreviewCommand) {
     return await this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({
@@ -103,6 +109,7 @@ export class GeneratePreviewUsecase {
    *  }
    * @returns - Generated payload. example: { firstName: 'John', lastName: '{{payload.lastName}}' }
    */
+  @Instrument()
   private generateSamplePayload(schema: JSONSchemaDto, path = 'payload', depth = 0): Record<string, unknown> {
     const MAX_DEPTH = 10;
     if (depth >= MAX_DEPTH) {
@@ -136,6 +143,7 @@ export class GeneratePreviewUsecase {
     }, {});
   }
 
+  @Instrument()
   private async getStepData(command: GeneratePreviewCommand) {
     return await this.buildStepDataUsecase.execute({
       identifierOrInternalId: command.identifierOrInternalId,
@@ -143,9 +151,12 @@ export class GeneratePreviewUsecase {
       user: command.user,
     });
   }
+
   private isFrameworkError(obj: any): obj is FrameworkError {
     return typeof obj === 'object' && obj.status === '400' && obj.name === 'BridgeRequestError';
   }
+
+  @Instrument()
   private async executePreviewUsecase(
     command: GeneratePreviewCommand,
     stepData: StepDataDto,
@@ -192,6 +203,7 @@ function buildState(steps: Record<string, unknown> | undefined): FrameworkPrevio
 
   return outputArray;
 }
+
 export class GeneratePreviewError extends InternalServerErrorException {
   constructor(error: FrameworkError) {
     super({

@@ -10,9 +10,9 @@ import {
   WorkflowResponseDto,
   WorkflowStatusEnum,
 } from '@novu/shared';
-import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
+import { NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
 import { Injectable } from '@nestjs/common';
-import { WorkflowInternalResponseDto } from '@novu/application-generic';
+import { Instrument, InstrumentUsecase, WorkflowInternalResponseDto } from '@novu/application-generic';
 
 import { PostProcessWorkflowUpdateCommand } from './post-process-workflow-update.command';
 import { OverloadContentDataOnWorkflowUseCase } from '../overload-content-data';
@@ -35,6 +35,7 @@ export class PostProcessWorkflowUpdate {
     private overloadContentDataOnWorkflowUseCase: OverloadContentDataOnWorkflowUseCase
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: PostProcessWorkflowUpdateCommand): Promise<WorkflowInternalResponseDto> {
     const workflowIssues = await this.validateWorkflow(command);
     const stepIssues = this.validateSteps(command.workflow.steps, command.workflow._id);
@@ -106,6 +107,7 @@ export class PostProcessWorkflowUpdate {
     return stepIdToIssues;
   }
 
+  @Instrument()
   private async validateWorkflow(
     command: PostProcessWorkflowUpdateCommand
   ): Promise<Record<keyof WorkflowResponseDto, RuntimeIssue[]>> {
@@ -116,6 +118,7 @@ export class PostProcessWorkflowUpdate {
     return issues;
   }
 
+  @Instrument()
   private async addTriggerIdentifierNotUniqueIfApplicable(
     command: PostProcessWorkflowUpdateCommand,
     issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>

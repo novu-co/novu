@@ -2,7 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { JSONSchemaDto, StepTypeEnum, UserSessionData, WorkflowTestDataResponseDto } from '@novu/shared';
 
-import { GetWorkflowByIdsCommand, GetWorkflowByIdsUseCase } from '@novu/application-generic';
+import {
+  GetWorkflowByIdsCommand,
+  GetWorkflowByIdsUseCase,
+  Instrument,
+  InstrumentUsecase,
+} from '@novu/application-generic';
 import { WorkflowTestDataCommand } from './build-workflow-test-data.command';
 import { parsePayloadSchema } from '../../shared/parse-payload-schema';
 
@@ -10,6 +15,7 @@ import { parsePayloadSchema } from '../../shared/parse-payload-schema';
 export class BuildWorkflowTestDataUseCase {
   constructor(private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase) {}
 
+  @InstrumentUsecase()
   async execute(command: WorkflowTestDataCommand): Promise<WorkflowTestDataResponseDto> {
     const _workflowEntity: NotificationTemplateEntity = await this.fetchWorkflow(command);
     const toSchema = buildToFieldSchema({ user: command.user, steps: _workflowEntity.steps });
@@ -21,6 +27,7 @@ export class BuildWorkflowTestDataUseCase {
     };
   }
 
+  @Instrument()
   private async fetchWorkflow(command: WorkflowTestDataCommand): Promise<NotificationTemplateEntity> {
     return await this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({

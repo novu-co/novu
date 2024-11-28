@@ -9,12 +9,12 @@ import { Label } from '@/components/primitives/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import TextSeparator from '@/components/primitives/text-separator';
-import { useStepEditorContext } from '@/components/workflow-editor/steps/hooks';
 import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { autocompletion } from '@codemirror/autocomplete';
 import { Editor } from '../editor';
 import { useFormField } from './form-context';
+import { useStep } from '@/components/workflow-editor/steps/step-provider';
 
 const predefinedAvatars = [
   `${window.location.origin}/images/avatar.svg`,
@@ -38,7 +38,7 @@ type AvatarPickerProps = {
 };
 
 export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(({ name, value, onChange }, ref) => {
-  const { step } = useStepEditorContext();
+  const { step } = useStep();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
   const [isOpen, setIsOpen] = useState(false);
   const { error } = useFormField();

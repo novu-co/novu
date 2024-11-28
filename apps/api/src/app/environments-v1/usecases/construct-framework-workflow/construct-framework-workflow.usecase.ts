@@ -3,6 +3,7 @@ import { workflow } from '@novu/framework/express';
 import { ActionStep, ChannelStep, JsonSchema, Step, StepOptions, StepOutput, Workflow } from '@novu/framework/internal';
 import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import { StepTypeEnum } from '@novu/shared';
+import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { ConstructFrameworkWorkflowCommand } from './construct-framework-workflow.command';
 import {
   ChatOutputRendererUsecase,
@@ -28,6 +29,7 @@ export class ConstructFrameworkWorkflow {
     private digestOutputRendererUseCase: DigestOutputRendererUsecase
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: ConstructFrameworkWorkflowCommand): Promise<Workflow> {
     const dbWorkflow = await this.getDbWorkflow(command.environmentId, command.workflowId);
     if (command.controlValues) {
@@ -39,6 +41,7 @@ export class ConstructFrameworkWorkflow {
     return this.constructFrameworkWorkflow(dbWorkflow);
   }
 
+  @Instrument()
   private constructFrameworkWorkflow(newWorkflow: NotificationTemplateEntity): Workflow {
     return workflow(
       newWorkflow.triggers[0].identifier,
@@ -67,6 +70,7 @@ export class ConstructFrameworkWorkflow {
     );
   }
 
+  @Instrument()
   private constructStep(
     step: Step,
     staticStep: NotificationStepEntity,
@@ -154,6 +158,7 @@ export class ConstructFrameworkWorkflow {
     }
   }
 
+  @Instrument()
   private constructChannelStepOptions(staticStep: NotificationStepEntity): Required<Parameters<ChannelStep>[2]> {
     return {
       ...this.constructCommonStepOptions(staticStep),
@@ -164,12 +169,14 @@ export class ConstructFrameworkWorkflow {
     };
   }
 
+  @Instrument()
   private constructActionStepOptions(staticStep: NotificationStepEntity): Required<Parameters<ActionStep>[2]> {
     return {
       ...this.constructCommonStepOptions(staticStep),
     };
   }
 
+  @Instrument()
   private constructCommonStepOptions(staticStep: NotificationStepEntity): Required<StepOptions> {
     return {
       // TODO: fix the `JSONSchemaDto` type to enforce a non-primitive schema type.
@@ -181,6 +188,8 @@ export class ConstructFrameworkWorkflow {
       skip: (controlValues) => false,
     };
   }
+
+  @Instrument()
   private async getDbWorkflow(environmentId: string, workflowId: string): Promise<NotificationTemplateEntity> {
     const foundWorkflow = await this.workflowsRepository.findByTriggerIdentifier(environmentId, workflowId);
 
