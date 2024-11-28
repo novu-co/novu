@@ -369,6 +369,7 @@ export function InboxEmbed(): JSX.Element {
 
                 <div className="w-full max-w-[500px]">
                   <CodeBlock
+                    secretMask={[{ line: 2, maskStart: 26, maskEnd: 37 }]}
                     code={`curl -X POST 'https://api.novu.co/v1/events/trigger' \
 
 -H 'Authorization: ApiKey NOVU_SECRET_KEY' \
