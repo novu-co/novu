@@ -1,17 +1,33 @@
 import {
   DEFAULT_WORKFLOW_PREFERENCES,
   PreferencesTypeEnum,
+  WorkflowPreferences,
 } from '@novu/shared';
 import { describe, expect, it } from 'vitest';
 import { MergePreferencesCommand } from './merge-preferences.command';
 import { MergePreferences } from './merge-preferences.usecase';
-import { PreferenceSet } from '../..';
+import { PreferenceSet } from '../get-preferences/get-preferences.usecase';
 
-const DEFAULT_WORKFLOW_PREFERENCES_WITH_EMAIL_DISABLED = {
+/**
+ * This test spec is used to test the merge preferences usecase.
+ * It covers all the possible combinations of preferences types and readOnly flag.
+ */
+
+const MOCK_SUBSCRIBER_GLOBAL_PREFERENCE = {
   ...DEFAULT_WORKFLOW_PREFERENCES,
   channels: {
     ...DEFAULT_WORKFLOW_PREFERENCES.channels,
     email: { enabled: false },
+    in_app: { enabled: true },
+  },
+};
+
+const MOCK_SUBSCRIBER_WORKFLOW_PREFERENCE = {
+  ...DEFAULT_WORKFLOW_PREFERENCES,
+  channels: {
+    ...DEFAULT_WORKFLOW_PREFERENCES.channels,
+    email: { enabled: true },
+    in_app: { enabled: true },
   },
 };
 
@@ -20,7 +36,6 @@ type TestCase = {
   types: PreferencesTypeEnum[];
   expectedType: PreferencesTypeEnum;
   readOnly: boolean;
-  subscriberOverrides?: boolean;
 };
 
 const testCases: TestCase[] = [
@@ -144,7 +159,6 @@ const testCases: TestCase[] = [
     ],
     expectedType: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
     readOnly: false,
-    subscriberOverrides: true,
   },
   {
     comment: 'Subscriber global overrides workflow resource',
@@ -154,7 +168,6 @@ const testCases: TestCase[] = [
     ],
     expectedType: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
     readOnly: false,
-    subscriberOverrides: true,
   },
   {
     comment: 'Subscriber workflow overrides user workflow',
@@ -165,7 +178,6 @@ const testCases: TestCase[] = [
     ],
     expectedType: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
     readOnly: false,
-    subscriberOverrides: true,
   },
   {
     comment: 'Subscriber global overrides user workflow',
@@ -176,7 +188,17 @@ const testCases: TestCase[] = [
     ],
     expectedType: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
     readOnly: false,
-    subscriberOverrides: true,
+  },
+  {
+    comment: 'Subscriber workflow overrides subscriber global',
+    types: [
+      PreferencesTypeEnum.WORKFLOW_RESOURCE,
+      PreferencesTypeEnum.USER_WORKFLOW,
+      PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
+      PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+    ],
+    expectedType: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+    readOnly: false,
   },
   // Subscriber overrides with readOnly true behavior
   {
@@ -188,7 +210,6 @@ const testCases: TestCase[] = [
     ],
     expectedType: PreferencesTypeEnum.WORKFLOW_RESOURCE,
     readOnly: true,
-    subscriberOverrides: true,
   },
   {
     comment:
@@ -199,7 +220,6 @@ const testCases: TestCase[] = [
     ],
     expectedType: PreferencesTypeEnum.WORKFLOW_RESOURCE,
     readOnly: true,
-    subscriberOverrides: true,
   },
   {
     comment:
@@ -211,7 +231,6 @@ const testCases: TestCase[] = [
     ],
     expectedType: PreferencesTypeEnum.USER_WORKFLOW,
     readOnly: true,
-    subscriberOverrides: true,
   },
   {
     comment:
@@ -223,97 +242,111 @@ const testCases: TestCase[] = [
     ],
     expectedType: PreferencesTypeEnum.USER_WORKFLOW,
     readOnly: true,
-    subscriberOverrides: true,
+  },
+  {
+    comment:
+      'Subscriber global+workflow cannot override user workflow when readOnly is true',
+    types: [
+      PreferencesTypeEnum.WORKFLOW_RESOURCE,
+      PreferencesTypeEnum.USER_WORKFLOW,
+      PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
+      PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+    ],
+    expectedType: PreferencesTypeEnum.USER_WORKFLOW,
+    readOnly: true,
   },
 ];
 
 describe('MergePreferences', () => {
   describe('merging readOnly and subscriberOverrides', () => {
-    testCases.forEach(
-      ({
-        types,
-        expectedType,
-        readOnly,
-        subscriberOverrides = false,
-        comment = '',
-      }) => {
-        it(`should merge preferences for types: ${types.join(', ')} with readOnly: ${readOnly}${comment ? ` (${comment})` : ''}`, () => {
-          const preferenceSet = types.reduce((acc, type, index) => {
-            const preference = {
-              _id: `${index + 1}`,
-              _organizationId: '1',
-              _environmentId: '1',
-              type,
-              preferences: {
-                // default
-                ...DEFAULT_WORKFLOW_PREFERENCES,
-                // readOnly
-                all: { ...DEFAULT_WORKFLOW_PREFERENCES.all, readOnly },
-                // subscriber overrides
-                ...([
-                  PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
-                  PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
-                ].includes(type) &&
-                subscriberOverrides &&
-                // only apply subscriber overrides if readOnly is false
-                !readOnly
-                  ? DEFAULT_WORKFLOW_PREFERENCES_WITH_EMAIL_DISABLED
-                  : {}),
-              },
-            };
-
-            switch (type) {
-              case PreferencesTypeEnum.WORKFLOW_RESOURCE:
-                acc.workflowResourcePreference = preference;
-                break;
-              case PreferencesTypeEnum.USER_WORKFLOW:
-                acc.workflowUserPreference = preference;
-                break;
-              case PreferencesTypeEnum.SUBSCRIBER_GLOBAL:
-                acc.subscriberGlobalPreference = preference;
-                break;
-              case PreferencesTypeEnum.SUBSCRIBER_WORKFLOW:
-                acc.subscriberWorkflowPreference = preference;
-                break;
-              default:
-                throw new Error(`Unknown preference type: ${type}`);
-            }
-
-            return acc;
-          }, {} as PreferenceSet);
-
-          const command = MergePreferencesCommand.create(preferenceSet);
-
-          const result = MergePreferences.execute(command);
-
-          const expectedPreferences =
-            subscriberOverrides && !readOnly
-              ? DEFAULT_WORKFLOW_PREFERENCES_WITH_EMAIL_DISABLED
-              : {
-                  ...DEFAULT_WORKFLOW_PREFERENCES,
-                  all: { ...DEFAULT_WORKFLOW_PREFERENCES.all, readOnly },
-                };
-
-          expect(result).toEqual({
-            preferences: expectedPreferences,
-            type: expectedType,
-            source: {
-              [PreferencesTypeEnum.WORKFLOW_RESOURCE]: null,
-              [PreferencesTypeEnum.USER_WORKFLOW]: null,
-              [PreferencesTypeEnum.SUBSCRIBER_GLOBAL]: null,
-              [PreferencesTypeEnum.SUBSCRIBER_WORKFLOW]: null,
-              ...Object.entries(preferenceSet).reduce((acc, [key, pref]) => {
-                if (pref) {
-                  acc[pref.type] = pref.preferences;
-                }
-
-                return acc;
-              }, {}),
+    testCases.forEach(({ types, expectedType, readOnly, comment = '' }) => {
+      it(`should merge preferences for types: ${types.join(', ')} with readOnly: ${readOnly}${comment ? ` (${comment})` : ''}`, () => {
+        const preferenceSet = types.reduce((acc, type, index) => {
+          const preference = {
+            _id: `${index + 1}`,
+            _organizationId: '1',
+            _environmentId: '1',
+            type,
+            preferences: {
+              // default
+              ...DEFAULT_WORKFLOW_PREFERENCES,
+              // readOnly
+              all: { ...DEFAULT_WORKFLOW_PREFERENCES.all, readOnly },
+              // subscriber overrides
+              ...(PreferencesTypeEnum.SUBSCRIBER_GLOBAL === type
+                ? MOCK_SUBSCRIBER_GLOBAL_PREFERENCE
+                : {}),
+              ...(PreferencesTypeEnum.SUBSCRIBER_WORKFLOW === type
+                ? MOCK_SUBSCRIBER_WORKFLOW_PREFERENCE
+                : {}),
             },
-          });
+          };
+
+          switch (type) {
+            case PreferencesTypeEnum.WORKFLOW_RESOURCE:
+              acc.workflowResourcePreference = preference;
+              break;
+            case PreferencesTypeEnum.USER_WORKFLOW:
+              acc.workflowUserPreference = preference;
+              break;
+            case PreferencesTypeEnum.SUBSCRIBER_GLOBAL:
+              acc.subscriberGlobalPreference = preference;
+              break;
+            case PreferencesTypeEnum.SUBSCRIBER_WORKFLOW:
+              acc.subscriberWorkflowPreference = preference;
+              break;
+            default:
+              throw new Error(`Unknown preference type: ${type}`);
+          }
+
+          return acc;
+        }, {} as PreferenceSet);
+
+        const command = MergePreferencesCommand.create(preferenceSet);
+
+        const result = MergePreferences.execute(command);
+
+        const hasSubscriberGlobalPreference =
+          !!preferenceSet.subscriberGlobalPreference;
+        const hasSubscriberWorkflowPreference =
+          !!preferenceSet.subscriberWorkflowPreference;
+
+        let expectedPreferences: WorkflowPreferences;
+
+        if (!readOnly) {
+          if (hasSubscriberWorkflowPreference) {
+            expectedPreferences = MOCK_SUBSCRIBER_WORKFLOW_PREFERENCE;
+          } else if (hasSubscriberGlobalPreference) {
+            expectedPreferences = MOCK_SUBSCRIBER_GLOBAL_PREFERENCE;
+          } else {
+            expectedPreferences = DEFAULT_WORKFLOW_PREFERENCES;
+          }
+        } else {
+          expectedPreferences = {
+            ...DEFAULT_WORKFLOW_PREFERENCES,
+            all: { ...DEFAULT_WORKFLOW_PREFERENCES.all, readOnly },
+          };
+        }
+
+        expect(result).toEqual({
+          preferences: expectedPreferences,
+          type: expectedType,
+          source: {
+            [PreferencesTypeEnum.WORKFLOW_RESOURCE]: null,
+            [PreferencesTypeEnum.USER_WORKFLOW]: null,
+            [PreferencesTypeEnum.SUBSCRIBER_GLOBAL]: null,
+            [PreferencesTypeEnum.SUBSCRIBER_WORKFLOW]: null,
+            ...Object.entries(preferenceSet).reduce((acc, [key, pref]) => {
+              if (pref) {
+                acc[pref.type] = pref.preferences;
+              }
+
+              return acc;
+            }, {}),
+          },
         });
-      },
-    );
+      });
+    });
   });
 
   it('should have test cases for all combinations of PreferencesTypeEnum', () => {
@@ -344,7 +377,10 @@ describe('MergePreferences', () => {
 
     allCombinations.forEach((combination) => {
       const combinationKey = combination.sort().join(',');
-      expect(coveredCombinations).toContain(combinationKey);
+      expect(
+        coveredCombinations,
+        `Combination ${combinationKey} is not covered`,
+      ).toContain(combinationKey);
     });
   });
 });

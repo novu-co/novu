@@ -63,23 +63,26 @@ export class GetSubscriberPreference {
         templatesSize: workflowList.length,
       },
     );
+    const workflowIds = workflowList.map((wf) => wf._id);
 
     const [
-      workflowPreferences,
-      subscriberWorkflowPreference,
+      workflowResourcePreferences,
+      workflowUserPreferences,
+      subscriberWorkflowPreferences,
       subscriberGlobalPreference,
     ] = await Promise.all([
       this.preferencesRepository.find({
-        _templateId: { $in: workflowList.map((wf) => wf._id) },
+        _templateId: { $in: workflowIds },
         _environmentId: command.environmentId,
-        type: {
-          $in: [
-            PreferencesTypeEnum.WORKFLOW_RESOURCE,
-            PreferencesTypeEnum.USER_WORKFLOW,
-          ],
-        },
-      }),
+        type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
+      }) as Promise<PreferenceSet['workflowResourcePreference'][] | null>,
       this.preferencesRepository.find({
+        _templateId: { $in: workflowIds },
+        _environmentId: command.environmentId,
+        type: PreferencesTypeEnum.USER_WORKFLOW,
+      }) as Promise<PreferenceSet['workflowUserPreference'][] | null>,
+      this.preferencesRepository.find({
+        _templateId: { $in: workflowIds },
         _subscriberId: subscriber._id,
         _environmentId: command.environmentId,
         type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
@@ -92,8 +95,9 @@ export class GetSubscriberPreference {
     ]);
 
     const allWorkflowPreferences = [
-      ...workflowPreferences,
-      ...subscriberWorkflowPreference,
+      ...workflowResourcePreferences,
+      ...workflowUserPreferences,
+      ...subscriberWorkflowPreferences,
     ];
 
     const workflowPreferenceSets = allWorkflowPreferences.reduce<
@@ -139,7 +143,7 @@ export class GetSubscriberPreference {
           workflowUserPreference: preferences.workflowUserPreference,
           subscriberWorkflowPreference:
             preferences.subscriberWorkflowPreference,
-          subscriberGlobalPreference,
+          ...(subscriberGlobalPreference ? { subscriberGlobalPreference } : {}),
         });
         const merged = MergePreferences.execute(mergeCommand);
 
