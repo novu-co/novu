@@ -7,6 +7,7 @@ import {
   JSONSchemaDto,
   PreviewPayload,
   StepDataDto,
+  WorkflowOriginEnum,
 } from '@novu/shared';
 import {
   GetWorkflowByIdsCommand,
@@ -64,7 +65,7 @@ export class GeneratePreviewUsecase {
   ) {
     const variablesExample = this.generateVariablesExample(stepData, commandControlValues);
 
-    if (workflow.payloadSchema) {
+    if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
       variablesExample.payload = this.generateSamplePayload(workflow.payloadSchema);
     }
 

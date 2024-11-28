@@ -97,9 +97,6 @@ export class OverloadContentDataOnWorkflowUseCase {
       finalPayload = _.merge(finalPayload, value.finalPayload.payload);
     }
 
-    if (Object.keys(finalPayload).length === 0) {
-      return undefined;
-    }
     // eslint-disable-next-line no-param-reassign
     workflow.payloadSchema = convertJsonToSchemaWithDefaults(finalPayload);
   }

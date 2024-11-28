@@ -175,7 +175,6 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
             payload: {
               orderId: '{{payload.orderId}}',
               userName: '{{payload.userName}}',
-              organizationName: '{{payload.organizationName}}',
             },
           },
         });
