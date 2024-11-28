@@ -9,11 +9,9 @@ import { WorkflowOriginEnum } from '@/utils/enums';
 export function CustomStepControls({
   dataSchema,
   origin,
-  formData,
 }: {
   dataSchema: ControlsMetadata['dataSchema'];
   origin: WorkflowOriginEnum;
-  formData: Record<string, unknown>;
 }) {
   const [isEditorOpen, setIsEditorOpen] = useState(true);
 
@@ -42,7 +40,7 @@ export function CustomStepControls({
 
       <CollapsibleContent>
         <div className="bg-background rounded-md border border-dashed p-3">
-          <JsonForm schema={(dataSchema as RJSFSchema) || {}} formData={formData} />
+          <JsonForm schema={(dataSchema as RJSFSchema) || {}} />
         </div>
       </CollapsibleContent>
     </Collapsible>
