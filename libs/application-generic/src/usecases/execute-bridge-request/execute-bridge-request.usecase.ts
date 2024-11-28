@@ -1,10 +1,10 @@
 import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   Logger,
   NotFoundException,
-  BadRequestException,
-  HttpStatus,
-  HttpException,
 } from '@nestjs/common';
 import got, {
   CacheError,
@@ -20,11 +20,11 @@ import got, {
 } from 'got';
 import { createHmac } from 'node:crypto';
 import {
-  PostActionEnum,
+  GetActionEnum,
   HttpHeaderKeysEnum,
   HttpQueryKeysEnum,
-  GetActionEnum,
   isFrameworkError,
+  PostActionEnum,
 } from '@novu/framework/internal';
 import { EnvironmentRepository } from '@novu/dal';
 import { WorkflowOriginEnum } from '@novu/shared';
@@ -39,6 +39,7 @@ import {
 } from '../get-decrypted-secret-key';
 import { BRIDGE_EXECUTION_ERROR } from '../../utils';
 import { HttpRequestHeaderKeysEnum } from '../../http';
+import { Instrument, InstrumentUsecase } from '../../instrumentation';
 
 export const DEFAULT_TIMEOUT = 5_000; // 5 seconds
 export const DEFAULT_RETRIES_LIMIT = 3;
@@ -104,6 +105,7 @@ export class ExecuteBridgeRequest {
     private getDecryptedSecretKey: GetDecryptedSecretKey,
   ) {}
 
+  @InstrumentUsecase()
   async execute<T extends PostActionEnum | GetActionEnum>(
     command: ExecuteBridgeRequestCommand,
   ): Promise<ExecuteBridgeRequestDto<T>> {
@@ -122,6 +124,7 @@ export class ExecuteBridgeRequest {
       command.environmentId,
       command.workflowOrigin,
       command.statelessBridgeUrl,
+      command.action,
     );
 
     Logger.log(
@@ -189,6 +192,7 @@ export class ExecuteBridgeRequest {
     }
   }
 
+  @Instrument()
   private async buildRequestHeaders(command: ExecuteBridgeRequestCommand) {
     const novuSignatureHeader = await this.buildRequestSignature(command);
 
@@ -199,6 +203,7 @@ export class ExecuteBridgeRequest {
     };
   }
 
+  @Instrument()
   private async buildRequestSignature(command: ExecuteBridgeRequestCommand) {
     const secretKey = await this.getDecryptedSecretKey.execute(
       GetDecryptedSecretKeyCommand.create({
@@ -216,6 +221,7 @@ export class ExecuteBridgeRequest {
     return novuSignatureHeader;
   }
 
+  @Instrument()
   private createHmacBySecretKey(
     secretKey: string,
     timestamp: number,
@@ -238,19 +244,24 @@ export class ExecuteBridgeRequest {
    * @param statelessBridgeUrl - The URL of the stateless bridge app.
    * @returns The correct bridge URL.
    */
+  @Instrument()
   private getBridgeUrl(
     environmentBridgeUrl: string,
     environmentId: string,
     workflowOrigin: WorkflowOriginEnum,
     statelessBridgeUrl?: string,
+    action?: PostActionEnum | GetActionEnum,
   ): string {
     if (statelessBridgeUrl) {
       return statelessBridgeUrl;
     }
 
     switch (workflowOrigin) {
-      case WorkflowOriginEnum.NOVU_CLOUD:
-        return `${this.getApiUrl()}/v1/environments/${environmentId}/bridge`;
+      case WorkflowOriginEnum.NOVU_CLOUD: {
+        const apiUrl = this.getApiUrl(action);
+
+        return `${apiUrl}/v1/environments/${environmentId}/bridge`;
+      }
       case WorkflowOriginEnum.EXTERNAL: {
         if (!environmentBridgeUrl) {
           throw new BadRequestException({
@@ -269,7 +280,11 @@ export class ExecuteBridgeRequest {
     }
   }
 
-  private getApiUrl(): string {
+  private getApiUrl(action: PostActionEnum | GetActionEnum): string {
+    if (action === PostActionEnum.PREVIEW) {
+      return `http://localhost:${process.env.PORT}`;
+    }
+
     const apiUrl = process.env.API_ROOT_URL;
 
     if (!apiUrl) {
@@ -279,6 +294,7 @@ export class ExecuteBridgeRequest {
     return apiUrl;
   }
 
+  @Instrument()
   private async handleResponseError(
     error: unknown,
     url: string,

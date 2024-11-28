@@ -702,7 +702,12 @@
     "xkeysib",
     "xyflow",
     "zulip",
-    "zwnj"
+    "zwnj",
+    "SOLOPRENEUR",
+    "rstrip",
+    "truncatewords",
+    "xmlschema",
+    "jsonify"
   ],
   "flagWords": [],
   "patterns": [

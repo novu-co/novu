@@ -3,7 +3,14 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import ErrorPage from '@/components/error-page';
 import { RootRoute, AuthRoute, DashboardRoute, CatchAllRoute } from './routes';
-import { WorkflowsPage, SignInPage, SignUpPage, OrganizationListPage } from '@/pages';
+import {
+  WorkflowsPage,
+  SignInPage,
+  SignUpPage,
+  OrganizationListPage,
+  QuestionnairePage,
+  UsecaseSelectPage,
+} from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
@@ -36,6 +43,14 @@ const router = createBrowserRouter([
           {
             path: ROUTES.SIGNUP_ORGANIZATION_LIST,
             element: <OrganizationListPage />,
+          },
+          {
+            path: ROUTES.SIGNUP_QUESTIONNAIRE,
+            element: <QuestionnairePage />,
+          },
+          {
+            path: ROUTES.USECASE_SELECT,
+            element: <UsecaseSelectPage />,
           },
         ],
       },

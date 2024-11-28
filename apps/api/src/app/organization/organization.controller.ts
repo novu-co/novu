@@ -13,6 +13,7 @@ import {
 import { OrganizationEntity } from '@novu/dal';
 import { MemberRoleEnum, UserSessionData } from '@novu/shared';
 import { ApiExcludeEndpoint, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeController } from '@nestjs/swagger/dist/decorators/api-exclude-controller.decorator';
 import { UserSession } from '../shared/framework/user.decorator';
 import { CreateOrganizationDto } from './dtos/create-organization.dto';
 import { CreateOrganizationCommand } from './usecases/create-organization/create-organization.command';
@@ -48,6 +49,7 @@ import { SdkGroupName, SdkMethodName } from '../shared/framework/swagger/sdk.dec
 @UserAuthentication()
 @ApiTags('Organizations')
 @ApiCommonResponses()
+@ApiExcludeController()
 export class OrganizationController {
   constructor(
     private createOrganizationUsecase: CreateOrganization,

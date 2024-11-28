@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { UserSessionData } from '@novu/shared';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeController } from '@nestjs/swagger/dist/decorators/api-exclude-controller.decorator';
 import { UserSession } from '../shared/framework/user.decorator';
 import { CreateFeed } from './usecases/create-feed/create-feed.usecase';
 import { CreateFeedCommand } from './usecases/create-feed/create-feed.command';
@@ -28,6 +29,7 @@ import { UserAuthentication } from '../shared/framework/swagger/api.key.security
 @UseInterceptors(ClassSerializerInterceptor)
 @UserAuthentication()
 @ApiTags('Feeds')
+@ApiExcludeController()
 export class FeedsController {
   constructor(
     private createFeedUsecase: CreateFeed,

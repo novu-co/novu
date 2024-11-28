@@ -9,8 +9,10 @@ export default {
       md: '0px 16px 32px -12px rgba(14, 18, 27, 0.10)',
       DEFAULT: '0px 16px 32px -12px #0E121B1A',
     },
+
     colors: {
       black: 'black',
+      white: 'white',
       transparent: 'transparent',
       background: 'hsl(var(--background))',
       foreground: {
@@ -153,15 +155,15 @@ export default {
         },
         swing: {
           '0%, 9.9%, 100%': { transform: 'rotate(0deg)' },
-          '10%': { transform: 'rotate(2deg)' },
-          '20%': { transform: 'rotate(-2deg)' },
-          '30%': { transform: 'rotate(1.5deg)' },
-          '40%': { transform: 'rotate(-1.5deg)' },
-          '50%': { transform: 'rotate(1deg)' },
-          '60%': { transform: 'rotate(-1deg)' },
-          '70%': { transform: 'rotate(0.5deg)' },
-          '80%': { transform: 'rotate(-0.5deg)' },
-          '90%': { transform: 'rotate(0.2deg)' },
+          '10%': { transform: 'rotate(3deg)' },
+          '20%': { transform: 'rotate(-3deg)' },
+          '30%': { transform: 'rotate(2.25deg)' },
+          '40%': { transform: 'rotate(-2.25deg)' },
+          '50%': { transform: 'rotate(1.5deg)' },
+          '60%': { transform: 'rotate(-1.5deg)' },
+          '70%': { transform: 'rotate(0.75deg)' },
+          '80%': { transform: 'rotate(-0.75deg)' },
+          '90%': { transform: 'rotate(0.3deg)' },
         },
         jingle: {
           '0%, 100%': { transform: 'rotate(0deg)' },
@@ -181,6 +183,9 @@ export default {
         'accordion-up': 'accordion-up 0.2s ease-out',
         swing: 'swing 3s ease-in-out',
         jingle: 'jingle 3s ease-in-out',
+      },
+      backgroundImage: {
+        'test-pattern': 'repeating-linear-gradient(135deg, hsl(var(--neutral-100)) 0, hsl(var(--neutral-100)) 2px, hsl(var(--neutral-200)) 2px, hsl(var(--neutral-200)) 4px)',
       },
     },
   },

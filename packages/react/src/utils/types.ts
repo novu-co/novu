@@ -7,6 +7,7 @@ import type {
   Localization,
   RouterPush,
   PreferencesFilter,
+  InboxProps,
 } from '@novu/js/ui';
 
 export type NotificationsRenderer = (notification: Notification) => React.ReactNode;
@@ -19,6 +20,8 @@ export type DefaultInboxProps = {
   onNotificationClick?: NotificationClickHandler;
   onPrimaryActionClick?: NotificationActionClickHandler;
   onSecondaryActionClick?: NotificationActionClickHandler;
+  placement?: InboxProps['placement'];
+  placementOffset?: InboxProps['placementOffset'];
 };
 
 export type BaseProps = {
