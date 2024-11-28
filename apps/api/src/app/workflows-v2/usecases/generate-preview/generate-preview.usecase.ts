@@ -2,13 +2,11 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import _ from 'lodash';
 import {
   ChannelTypeEnum,
-  GeneratePreviewRequestDto,
   GeneratePreviewResponseDto,
   JobStatusEnum,
   JSONSchemaDto,
   PreviewPayload,
   StepDataDto,
-  WorkflowOriginEnum,
 } from '@novu/shared';
 import {
   GetWorkflowByIdsCommand,
@@ -31,16 +29,22 @@ export class GeneratePreviewUsecase {
   ) {}
 
   async execute(command: GeneratePreviewCommand): Promise<GeneratePreviewResponseDto> {
-    const dto = command.generatePreviewRequestDto;
+    const { previewPayload: commandVariablesExample, controlValues: commandControlValues } =
+      command.generatePreviewRequestDto;
     const stepData = await this.getStepData(command);
     const workflow = await this.findWorkflow(command);
 
-    const variablesExample = this.buildVariablesExample(workflow, stepData, dto);
+    const variablesExample = this.buildVariablesExample(
+      workflow,
+      stepData,
+      commandVariablesExample,
+      commandControlValues
+    );
     const executeOutput = await this.executePreviewUsecase(
       command,
       stepData,
       variablesExample,
-      dto.controlValues || {}
+      commandControlValues || {}
     );
 
     return {
@@ -55,46 +59,26 @@ export class GeneratePreviewUsecase {
   private buildVariablesExample(
     workflow: WorkflowInternalResponseDto,
     stepData: StepDataDto,
-    dto: GeneratePreviewRequestDto
+    commandVariablesExample?: PreviewPayload,
+    commandControlValues?: Record<string, unknown>
   ) {
-    const variablesExample = this.generateVariablesExample(dto, stepData);
+    const variablesExample = this.generateVariablesExample(stepData, commandControlValues);
 
-    if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
+    if (workflow.payloadSchema) {
       variablesExample.payload = this.generateSamplePayload(workflow.payloadSchema);
     }
 
-    return _.merge(variablesExample, dto.previewPayload as Record<string, unknown>);
+    return _.merge(variablesExample, commandVariablesExample as Record<string, unknown>);
   }
 
-  private generateVariablesExample(dto: GeneratePreviewRequestDto, stepData: StepDataDto) {
-    const controlValues = Object.values(dto.controlValues || stepData.controls.values).join('');
+  private generateVariablesExample(stepData: StepDataDto, commandControlValues?: Record<string, unknown>) {
+    const controlValues = Object.values(commandControlValues || stepData.controls.values).join('');
     const variablesExample = pathsToObject(extractTemplateVars(controlValues), {
       valuePrefix: '{{',
       valueSuffix: '}}',
     });
 
     return variablesExample;
-  }
-
-  private buildPayloadExample(
-    workflow: WorkflowInternalResponseDto,
-    dto: GeneratePreviewRequestDto,
-    stepData: StepDataDto
-  ) {
-    let payloadVariableExample: Record<string, unknown> = {};
-    if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
-      payloadVariableExample = this.generateSamplePayload(workflow.payloadSchema);
-    } else {
-      const controlValues = Object.values(dto.controlValues || stepData.controls.values).join('');
-      payloadVariableExample = pathsToObject(extractTemplateVars(controlValues), {
-        valuePrefix: '{{',
-        valueSuffix: '}}',
-      }).payload as Record<string, unknown>;
-    }
-
-    return payloadVariableExample && Object.keys(payloadVariableExample).length > 0
-      ? { payload: payloadVariableExample }
-      : {};
   }
 
   private async findWorkflow(command: GeneratePreviewCommand) {
@@ -120,6 +104,9 @@ export class GeneratePreviewUsecase {
    */
   private generateSamplePayload(schema: JSONSchemaDto, path = 'payload', depth = 0): Record<string, unknown> {
     const MAX_DEPTH = 10;
+    if (depth >= MAX_DEPTH) {
+      return {};
+    }
 
     if (Object.values(schema.properties || {}).length === 0) {
       return {};

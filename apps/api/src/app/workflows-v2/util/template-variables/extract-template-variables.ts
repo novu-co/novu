@@ -1,4 +1,4 @@
-import { Liquid } from 'liquidjs';
+import { Template, Liquid } from 'liquidjs';
 
 /**
  * Extracts variable names from a Liquid template string by parsing and traversing the tokens.
@@ -18,22 +18,20 @@ export const extractTemplateVars = function (str: string): string[] {
 
   const variables = new Set<string>();
   const engine = new Liquid();
-  const parsed = engine.parse(str);
 
-  function traverseTokens(templates) {
-    for (const template of templates) {
-      if (template.token.constructor.name === 'OutputToken') {
-        for (const postfix of template.value?.initial?.postfix || []) {
-          const prop = postfix.props[0];
-          if (prop.constructor.name === 'IdentifierToken') {
-            variables.add(postfix.props.map((propX) => propX.content).join('.'));
-          }
+  // TODO: Temporary workaround - Template type definition appears incorrect and should be properly typed
+  const parsed = engine.parse(str) as Template[] as any;
+
+  for (const template of parsed) {
+    if (template.token.constructor.name === 'OutputToken') {
+      for (const postfix of template.value?.initial?.postfix || []) {
+        const prop = postfix.props[0];
+        if (prop.constructor.name === 'IdentifierToken') {
+          variables.add(postfix.props.map((propX) => propX.content).join('.'));
         }
       }
     }
   }
-
-  traverseTokens(parsed);
 
   return Array.from(variables);
 };
