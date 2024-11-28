@@ -1,6 +1,9 @@
-import { PreferencesEntity } from '@novu/dal';
 import { BaseCommand } from '../../commands';
+import { PreferenceSet } from '../get-preferences/get-preferences.usecase';
 
 export class MergePreferencesCommand extends BaseCommand {
-  preferences: PreferencesEntity[];
+  workflowResourcePreference: PreferenceSet['workflowResourcePreference'];
+  workflowUserPreference?: PreferenceSet['workflowUserPreference'];
+  subscriberGlobalPreference?: PreferenceSet['subscriberGlobalPreference'];
+  subscriberWorkflowPreference?: PreferenceSet['subscriberWorkflowPreference'];
 }
