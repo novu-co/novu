@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { JSONSchemaDto, UiSchema } from '@novu/shared';
+import { JSONSchemaDefinition, JSONSchemaDto, UiSchema } from '@novu/shared';
 import { capitalize } from './string';
 
 type ZodValue =
@@ -168,30 +168,61 @@ export const buildDefaultValues = (uiSchema: UiSchema): object => {
   return keys;
 };
 
-export const buildDefaultValuesOfDataSchema = (dataSchema: JSONSchemaDto) => {
-  const schema = dataSchema.properties ?? {};
+const getProperties = (defaults: Record<string, unknown>, properties?: Record<string, JSONSchemaDefinition>): void => {
+  if (!properties) return;
 
-  const keys: Record<string, unknown> = Object.keys(schema).reduce((acc, key) => {
-    const property = schema[key];
-    if (typeof property !== 'object') {
-      return acc;
+  for (const [key, propDef] of Object.entries(properties)) {
+    const prop = propDef as JSONSchemaDto; // Narrowing to JSONSchemaDto for easier access to properties
+
+    // Handle `default` value if specified
+    if (prop.default !== undefined) {
+      defaults[key] = prop.default;
+      continue;
     }
 
-    const { default: defaultValue } = property;
-    if (typeof defaultValue === 'undefined') {
-      return acc;
+    // Handle `type` to determine defaults
+    if (prop.type === 'object' && prop.properties) {
+      const nestedDefaults: Record<string, unknown> = {};
+      getProperties(nestedDefaults, prop.properties);
+      defaults[key] = nestedDefaults;
+      continue;
     }
 
-    if (defaultValue === null) {
-      return { ...acc, [key]: defaultValue };
+    if (prop.type === 'array' && prop.items) {
+      const arrayDefaults: unknown[] = [];
+      if (Array.isArray(prop.items)) {
+        arrayDefaults.push(...prop.items.map(() => ({})));
+      } else if (typeof prop.items === 'object' && (prop.items as JSONSchemaDto).type === 'object') {
+        const itemDefaults: Record<string, unknown> = {};
+        getProperties(itemDefaults, (prop.items as JSONSchemaDto).properties);
+        arrayDefaults.push(itemDefaults);
+      }
+      defaults[key] = arrayDefaults;
+      continue;
     }
 
-    if (typeof defaultValue === 'object') {
-      return { ...acc, [key]: buildDefaultValues({ properties: { ...defaultValue } }) };
+    switch (prop.type) {
+      case 'string':
+        defaults[key] = '';
+        break;
+      case 'number':
+      case 'integer':
+        defaults[key] = undefined;
+        break;
+      case 'boolean':
+        defaults[key] = false;
+        break;
+      case 'null':
+        defaults[key] = null;
+        break;
+      default:
+        defaults[key] = undefined; // Fallback for unknown or unsupported types
     }
+  }
+};
 
-    return { ...acc, [key]: defaultValue };
-  }, {});
-
-  return keys;
+export const buildDefaultValuesOfDataSchema = (schema: JSONSchemaDto): Record<string, unknown> => {
+  const result: Record<string, unknown> = {};
+  getProperties(result, schema.properties);
+  return result;
 };
