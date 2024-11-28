@@ -1,5 +1,5 @@
 import { PatchWorkflowDto, UpdateWorkflowDto, WorkflowResponseDto } from '@novu/shared';
-import { createContext, ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { createContext, ReactNode, useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { useBlocker, useNavigate, useParams } from 'react-router-dom';
 
 import { ToastIcon } from '@/components/primitives/sonner';

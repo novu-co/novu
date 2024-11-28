@@ -1,5 +1,3 @@
-// import { RiArrowRightSLine, RiSettingsLine } from 'react-icons/ri';
-
 import { ConfigureWorkflowForm } from '@/components/workflow-editor/configure-workflow-form';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
