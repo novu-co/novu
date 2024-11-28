@@ -227,10 +227,11 @@ export class AuthService {
         subscriberId: subscriber.subscriberId,
       },
       {
-        expiresIn: '15 day',
+        expiresIn:
+          process.env.SUBSCRIBER_WIDGET_JWT_EXPIRATION_TIME || '15 days',
         issuer: 'novu_api',
         audience: 'widget_user',
-      }
+      },
     );
   }
 
