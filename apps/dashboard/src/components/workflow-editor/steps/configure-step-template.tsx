@@ -9,25 +9,25 @@ import {
   SheetPortal,
   SheetTitle,
 } from '@/components/primitives/sheet';
-import { StepEditor } from '@/components/workflow-editor/steps/step-editor';
+import { ConfigureStepTemplateForm } from '@/components/workflow-editor/steps/configure-step-template-form';
 import { VisuallyHidden } from '@/components/primitives/visually-hidden';
 import { PageMeta } from '@/components/page-meta';
-import { StepSkeleton } from './step-skeleton';
-import { StepEditorProvider } from './step-editor-provider';
-import { useStepEditorContext } from './hooks';
-import { useWorkflowEditorContext } from '../hooks';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
+import { useStep } from '@/components/workflow-editor/steps/step-provider';
 
 const transitionSetting = { ease: [0.29, 0.83, 0.57, 0.99], duration: 0.4 };
 
-const EditStepSidebarInternal = () => {
+export const ConfigureStepTemplate = () => {
   const navigate = useNavigate();
-  const { workflow, isPendingWorkflow } = useWorkflowEditorContext();
-  const { step, stepType, isPendingStep } = useStepEditorContext();
-  const handleCloseSidebar = () => {
+  const { workflow, debouncedUpdate } = useWorkflow();
+  const { step } = useStep();
+  const handleCloseSheet = () => {
     navigate('..', { relative: 'path' });
   };
 
-  const isPending = isPendingWorkflow || isPendingStep;
+  if (!workflow || !step) {
+    return null;
+  }
 
   return (
     <>
@@ -48,7 +48,7 @@ const EditStepSidebarInternal = () => {
               transition={transitionSetting}
             />
           </SheetOverlay>
-          <SheetContentBase asChild onInteractOutside={handleCloseSidebar} onEscapeKeyDown={handleCloseSidebar}>
+          <SheetContentBase asChild onInteractOutside={handleCloseSheet} onEscapeKeyDown={handleCloseSheet}>
             <motion.div
               initial={{
                 x: '100%',
@@ -68,25 +68,11 @@ const EditStepSidebarInternal = () => {
                 <SheetTitle />
                 <SheetDescription />
               </VisuallyHidden>
-              {isPending ? (
-                <StepSkeleton stepType={stepType} workflowOrigin={workflow?.origin} />
-              ) : (
-                <>
-                  {workflow && step && stepType && <StepEditor workflow={workflow} step={step} stepType={stepType} />}
-                </>
-              )}
+              <ConfigureStepTemplateForm workflow={workflow} step={step} debouncedUpdate={debouncedUpdate} />
             </motion.div>
           </SheetContentBase>
         </SheetPortal>
       </Sheet>
     </>
-  );
-};
-
-export const EditStepSidebar = () => {
-  return (
-    <StepEditorProvider>
-      <EditStepSidebarInternal />
-    </StepEditorProvider>
   );
 };

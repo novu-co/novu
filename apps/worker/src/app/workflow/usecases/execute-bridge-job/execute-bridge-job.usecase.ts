@@ -26,6 +26,8 @@ import {
   DetailEnum,
   ExecuteBridgeRequest,
   ExecuteBridgeRequestCommand,
+  Instrument,
+  InstrumentUsecase,
 } from '@novu/application-generic';
 import { ExecuteBridgeJobCommand } from './execute-bridge-job.command';
 
@@ -43,6 +45,7 @@ export class ExecuteBridgeJob {
     private executeBridgeRequest: ExecuteBridgeRequest
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: ExecuteBridgeJobCommand): Promise<ExecuteOutput | null> {
     const stepId = command.job.step.stepId || command.job.step.uuid;
 
@@ -183,6 +186,7 @@ export class ExecuteBridgeJob {
     return previousJobs;
   }
 
+  @Instrument()
   private async sendBridgeRequest({
     statelessBridgeUrl,
     event,
@@ -222,6 +226,7 @@ export class ExecuteBridgeJob {
     }) as Promise<ExecuteOutput>;
   }
 
+  @Instrument()
   private async mapState(job: JobEntity, payload: Record<string, unknown>) {
     let output = {};
 

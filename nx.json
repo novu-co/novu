@@ -18,27 +18,51 @@
   "extends": "@nx/workspace/presets/npm.json",
   "release": {
     "changelog": {
-      "workspaceChangelog": true,
+      "workspaceChangelog": false,
       "projectChangelogs": true
     },
-    "projects": [
-      "novu",
-      "@novu/client",
-      "@novu/framework",
-      "@novu/headless",
-      "@novu/js",
-      "@novu/react",
-      "@novu/react-native",
-      "@novu/nextjs",
-      "@novu/node",
-      "@novu/providers",
-      "@novu/shared",
-      "@novu/stateless"
-    ],
     "projectsRelationship": "independent",
-    "version": {
-      "generatorOptions": {
-        "preserveLocalDependencyProtocols": true
+    "conventionalCommits": true,
+    "groups": {
+      "apps": {
+        "projects": [
+          "@novu/api",
+          "@novu/dashboard",
+          "@novu/inbound-mail",
+          "@novu/web",
+          "@novu/webhook",
+          "@novu/widget",
+          "@novu/worker",
+          "@novu/ws"
+        ],
+        "projectsRelationship": "independent",
+        "version": {
+          "generatorOptions": {
+            "preserveLocalDependencyProtocols": true
+          }
+        }
+      },
+      "packages": {
+        "projects": [
+          "novu",
+          "@novu/client",
+          "@novu/framework",
+          "@novu/headless",
+          "@novu/js",
+          "@novu/react",
+          "@novu/react-native",
+          "@novu/nextjs",
+          "@novu/node",
+          "@novu/providers",
+          "@novu/shared",
+          "@novu/stateless"
+        ],
+        "projectsRelationship": "independent",
+        "version": {
+          "generatorOptions": {
+            "preserveLocalDependencyProtocols": true
+          }
+        }
       }
     }
   },

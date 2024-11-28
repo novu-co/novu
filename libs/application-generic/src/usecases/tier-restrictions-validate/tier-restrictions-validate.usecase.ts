@@ -14,6 +14,7 @@ import {
   MAX_DELAY_FREE_TIER,
   MAX_DELAY_BUSINESS_TIER,
 } from './tier-restrictions-validate.consts';
+import { InstrumentUsecase } from '../../instrumentation';
 
 @Injectable()
 export class TierRestrictionsValidateUsecase {
@@ -21,6 +22,7 @@ export class TierRestrictionsValidateUsecase {
     private organizationRepository: CommunityOrganizationRepository,
   ) {}
 
+  @InstrumentUsecase()
   async execute(
     command: TierRestrictionsValidateCommand,
   ): Promise<TierRestrictionsValidateResponse> {
