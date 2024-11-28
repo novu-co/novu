@@ -1,20 +1,3 @@
-import { ConfirmationModal } from '@/components/confirmation-modal';
-import { PageMeta } from '@/components/page-meta';
-import { Button } from '@/components/primitives/button';
-import { CopyButton } from '@/components/primitives/copy-button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { Input, InputField } from '@/components/primitives/input';
-import { Separator } from '@/components/primitives/separator';
-import { SidebarContent, SidebarFooter, SidebarHeader } from '@/components/side-navigation/sidebar';
-import TruncatedText from '@/components/truncated-text';
-import { stepSchema } from '@/components/workflow-editor/schema';
-import { getFirstBodyErrorMessage, getFirstControlsErrorMessage } from '@/components/workflow-editor/step-utils';
-import { ConfigureInAppStepTemplateCta } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-template-cta';
-import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
-import { STEP_NAME_BY_TYPE } from '@/components/workflow-editor/steps/step-provider';
-import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { EXCLUDED_EDITOR_TYPES } from '@/utils/constants';
-import { buildRoute, ROUTES } from '@/utils/routes';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   IEnvironment,
@@ -31,6 +14,26 @@ import { RiArrowLeftSLine, RiArrowRightSLine, RiCloseFill, RiDeleteBin2Line, RiP
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
+import { ConfirmationModal } from '@/components/confirmation-modal';
+import { PageMeta } from '@/components/page-meta';
+import { Button } from '@/components/primitives/button';
+import { CopyButton } from '@/components/primitives/copy-button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
+import { Input, InputField } from '@/components/primitives/input';
+import { Separator } from '@/components/primitives/separator';
+import { SidebarContent, SidebarFooter, SidebarHeader } from '@/components/side-navigation/sidebar';
+import TruncatedText from '@/components/truncated-text';
+import { stepSchema } from '@/components/workflow-editor/schema';
+import { getFirstBodyErrorMessage, getFirstControlsErrorMessage } from '@/components/workflow-editor/step-utils';
+import { ConfigureInAppStepTemplateCta } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-template-cta';
+import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
+import { useFormAutosave } from '@/hooks/use-form-autosave';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { EXCLUDED_EDITOR_TYPES } from '@/utils/constants';
+import { STEP_NAME_BY_TYPE } from './step-provider';
+
+const SUPPORTED_STEP_TYPES = [StepTypeEnum.IN_APP];
+
 type ConfigureStepFormProps = {
   workflow: WorkflowResponseDto;
   environment: IEnvironment;
@@ -42,7 +45,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   const { step, workflow, debouncedUpdate, update, environment } = props;
   const navigate = useNavigate();
 
-  const isReadOnly = workflow.origin === WorkflowOriginEnum.EXTERNAL || EXCLUDED_EDITOR_TYPES.includes(step.type);
+  const isCodeCreatedWorkflow = workflow.origin === WorkflowOriginEnum.EXTERNAL;
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -75,6 +78,10 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     () => (step ? getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues) : undefined),
     [step]
   );
+
+  const isDashboardStepThatSupportsEditor = !isCodeCreatedWorkflow && SUPPORTED_STEP_TYPES.includes(step.type);
+  const isCodeStepThatSupportsEditor = isCodeCreatedWorkflow && !EXCLUDED_EDITOR_TYPES.includes(step.type);
+  const isStepSupportsEditor = isDashboardStepThatSupportsEditor || isCodeStepThatSupportsEditor;
 
   return (
     <>
@@ -125,7 +132,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                     <FormLabel>Name</FormLabel>
                     <FormControl>
                       <InputField>
-                        <Input placeholder="Untitled" {...field} disabled={isReadOnly} />
+                        <Input placeholder="Untitled" {...field} disabled={isCodeCreatedWorkflow} />
                       </InputField>
                     </FormControl>
                     <FormMessage />
@@ -153,9 +160,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
         </Form>
         <Separator />
 
-        {step.type === StepTypeEnum.IN_APP && <ConfigureInAppStepTemplateCta step={step} issue={firstError} />}
-
-        {EXCLUDED_EDITOR_TYPES.includes(step.type) && (
+        {isStepSupportsEditor && (
           <>
             <SidebarContent>
               <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
@@ -174,18 +179,17 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
           </>
         )}
 
-        {isReadOnly && (
+        {step.type === StepTypeEnum.IN_APP && <ConfigureInAppStepTemplateCta step={step} issue={firstError} />}
+
+        {!isCodeCreatedWorkflow && !SUPPORTED_STEP_TYPES.includes(step.type) && (
           <>
             <SidebarContent>
               <SdkBanner />
             </SidebarContent>
-            <Separator />
           </>
         )}
 
-        <Separator />
-
-        {!isReadOnly && (
+        {!isCodeCreatedWorkflow && (
           <>
             <SidebarFooter>
               <Separator />
