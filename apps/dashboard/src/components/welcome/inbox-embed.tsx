@@ -1,4 +1,4 @@
-import { Loader } from 'lucide-react';
+import { Loader, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '../primitives/card';
 import {
   RiAngularjsFill,
@@ -6,6 +6,7 @@ import {
   RiJavascriptFill,
   RiLoader3Line,
   RiNextjsFill,
+  RiNotification2Fill,
   RiReactjsFill,
   RiRemixRunFill,
   RiSvelteFill,
@@ -408,14 +409,13 @@ export function InboxEmbed(): JSX.Element {
                     the subscriberId matches as above.
                   </p>
                   <div>
-                    <Button onClick={handleSendNotification} disabled={isPending}>
+                    <Button size="sm" className="gap-1 px-2" onClick={handleSendNotification} disabled={isPending}>
                       {isPending ? (
-                        <>
-                          Sending... <Loader className="ml-2 h-3 w-3 animate-spin" />
-                        </>
+                        <Loader2 className="h-3 w-3 animate-spin" />
                       ) : (
-                        'Send Notification'
+                        <RiNotification2Fill className="h-3 w-3" />
                       )}
+                      Send notification
                     </Button>
                   </div>
                 </div>
