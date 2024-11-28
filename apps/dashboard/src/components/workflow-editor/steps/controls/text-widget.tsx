@@ -35,7 +35,7 @@ export function TextWidget(props: WidgetProps) {
                   type="number"
                   {...field}
                   onChange={(e) => {
-                    if (!e.target.value) {
+                    if (e.target.value === '') {
                       field.onChange(undefined);
                       return;
                     }
