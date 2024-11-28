@@ -16,13 +16,13 @@ import './index.css';
 import { ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
 import { TestWorkflowPage } from './pages/test-workflow';
-import { ConfigureWorkflow } from './components/workflow-editor/configure-workflow';
-import { ConfigureStep } from './components/workflow-editor/steps/configure-step';
 import { initializeSentry } from './utils/sentry';
-import { EditStepSidebar } from './components/workflow-editor/steps/edit-step-sidebar';
 import { overrideZodErrorMap } from './utils/validation';
 import { InboxUsecasePage } from './pages/inbox-usecase-page';
 import { InboxEmbedPage } from './pages/inbox-embed-page';
+import { EditStepTemplate } from '@/components/workflow-editor/steps/edit-step-template';
+import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workflow';
+import { EditStep } from '@/components/workflow-editor/steps/edit-step';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -89,12 +89,12 @@ const router = createBrowserRouter([
                     index: true,
                   },
                   {
-                    element: <ConfigureStep />,
-                    path: ROUTES.CONFIGURE_STEP,
+                    element: <EditStep />,
+                    path: ROUTES.EDIT_STEP,
                   },
                   {
-                    element: <EditStepSidebar />,
-                    path: ROUTES.EDIT_STEP,
+                    element: <EditStepTemplate />,
+                    path: ROUTES.EDIT_STEP_TEMPLATE,
                   },
                 ],
               },

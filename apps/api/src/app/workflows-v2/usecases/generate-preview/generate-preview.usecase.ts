@@ -8,6 +8,7 @@ import {
   StepDataDto,
   UserSessionData,
 } from '@novu/shared';
+import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
 import { StepMissingControlsException } from '../../exceptions/step-not-found-exception';
@@ -23,6 +24,7 @@ export class GeneratePreviewUsecase {
     private buildStepDataUsecase: BuildStepDataUsecase
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: GeneratePreviewCommand): Promise<GeneratePreviewResponseDto> {
     const dto = command.generatePreviewRequestDto;
     const stepData = await this.getStepData(command);
@@ -45,6 +47,7 @@ export class GeneratePreviewUsecase {
     };
   }
 
+  @Instrument()
   private async getValidatedContent(dto: GeneratePreviewRequestDto, stepData: StepDataDto, user: UserSessionData) {
     if (!stepData.controls?.dataSchema) {
       throw new StepMissingControlsException(stepData.stepId, stepData);
@@ -60,6 +63,7 @@ export class GeneratePreviewUsecase {
     });
   }
 
+  @Instrument()
   private async getStepData(command: GeneratePreviewCommand) {
     return await this.buildStepDataUsecase.execute({
       identifierOrInternalId: command.workflowId,
@@ -67,9 +71,12 @@ export class GeneratePreviewUsecase {
       user: command.user,
     });
   }
+
   private isFrameworkError(obj: any): obj is FrameworkError {
     return typeof obj === 'object' && obj.status === '400' && obj.name === 'BridgeRequestError';
   }
+
+  @Instrument()
   private async executePreviewUsecase(
     command: GeneratePreviewCommand,
     stepData: StepDataDto,

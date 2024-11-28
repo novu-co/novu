@@ -24,14 +24,15 @@ import { Type } from 'class-transformer';
 import { EnvironmentWithUserCommand } from '../../../commands';
 import { PreferencesRequired } from '../../upsert-preferences';
 import {
-  ContentIssue,
-  IStepControl,
   MAX_DESCRIPTION_LENGTH,
   MAX_NAME_LENGTH,
-  MAX_TAG_ELEMENTS,
   MAX_TAG_LENGTH,
+} from './upsert-validation-constants';
+import {
+  ContentIssue,
+  IStepControl,
   NotificationStep,
-} from '../..';
+} from '../../create-workflow/create-workflow.command';
 
 export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsDefined()

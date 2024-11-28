@@ -1,26 +1,12 @@
 import * as z from 'zod';
 import type { JSONSchemaDefinition } from '@novu/shared';
-import { StepTypeEnum } from '@/utils/enums';
-
-const enabledSchema = z.object({
-  enabled: z.boolean(),
-});
-
-// Reusable schema for channels
-const channelsSchema = z.object({
-  in_app: enabledSchema,
-  sms: enabledSchema,
-  email: enabledSchema,
-  push: enabledSchema,
-  chat: enabledSchema,
-});
 
 export const MAX_TAG_ELEMENTS = 16;
 export const MAX_TAG_LENGTH = 32;
 export const MAX_NAME_LENGTH = 64;
 export const MAX_DESCRIPTION_LENGTH = 256;
 
-export const workflowMinimalSchema = z.object({
+export const workflowSchema = z.object({
   name: z.string().min(1).max(MAX_NAME_LENGTH),
   workflowId: z.string(),
   tags: z
@@ -35,39 +21,9 @@ export const workflowMinimalSchema = z.object({
   description: z.string().max(MAX_DESCRIPTION_LENGTH).optional(),
 });
 
-export const workflowSchema = workflowMinimalSchema.extend({
-  active: z.boolean().optional(),
-  critical: z.boolean().optional(),
-  steps: z.array(
-    z
-      .object({
-        name: z.string(),
-        type: z.nativeEnum(StepTypeEnum),
-        _id: z.string(),
-        stepId: z.string(),
-        slug: z.string(),
-        issues: z
-          .object({
-            body: z.any().optional(),
-            controls: z.any().optional(),
-          })
-          .optional(),
-      })
-      .passthrough()
-  ),
-  preferences: z.object({
-    /**
-     * TODO: Add user schema
-     */
-    user: z.any().nullable(),
-    default: z.object({
-      all: z.object({
-        enabled: z.boolean(),
-        readOnly: z.boolean(),
-      }),
-      channels: channelsSchema,
-    }),
-  }),
+export const stepSchema = z.object({
+  name: z.string().min(1).max(MAX_NAME_LENGTH),
+  stepId: z.string(),
 });
 
 export const buildDynamicFormSchema = ({

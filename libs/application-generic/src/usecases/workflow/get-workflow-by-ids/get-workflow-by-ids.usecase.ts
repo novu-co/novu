@@ -17,6 +17,7 @@ import { GetPreferences, GetPreferencesCommand } from '../../get-preferences';
 
 import { GetWorkflowByIdsCommand } from './get-workflow-by-ids.command';
 import { WorkflowInternalResponseDto } from './get-workflow-by-ids.dto';
+import { Instrument, InstrumentUsecase } from '../../../instrumentation';
 
 @Injectable()
 export class GetWorkflowByIdsUseCase {
@@ -25,42 +26,18 @@ export class GetWorkflowByIdsUseCase {
     @Inject(forwardRef(() => GetPreferences))
     private getPreferences: GetPreferences,
   ) {}
+
+  @InstrumentUsecase()
   async execute(
     command: GetWorkflowByIdsCommand,
   ): Promise<WorkflowInternalResponseDto> {
-    const isInternalId = NotificationTemplateRepository.isInternalId(
-      command.identifierOrInternalId,
+    const workflowEntity = await this.getDbWorkflow(command);
+
+    const workflowPreferences = await this.getWorkflowPreferences(
+      command,
+      workflowEntity,
     );
 
-    let workflowEntity: NotificationTemplateEntity | null;
-
-    if (isInternalId) {
-      workflowEntity = await this.notificationTemplateRepository.findById(
-        command.identifierOrInternalId,
-        command.environmentId,
-      );
-    } else {
-      workflowEntity =
-        await this.notificationTemplateRepository.findByTriggerIdentifier(
-          command.environmentId,
-          command.identifierOrInternalId,
-        );
-    }
-
-    if (!workflowEntity) {
-      throw new NotFoundException({
-        message: 'Workflow cannot be found',
-        workflowId: command.identifierOrInternalId,
-      });
-    }
-
-    const workflowPreferences = await this.getPreferences.safeExecute(
-      GetPreferencesCommand.create({
-        environmentId: command.environmentId,
-        organizationId: command.organizationId,
-        templateId: workflowEntity._id,
-      }),
-    );
     /**
      * @deprecated - use `userPreferences` and `defaultPreferences` instead
      */
@@ -85,5 +62,49 @@ export class GetWorkflowByIdsUseCase {
       userPreferences,
       defaultPreferences,
     };
+  }
+
+  @Instrument()
+  private async getDbWorkflow(command: GetWorkflowByIdsCommand) {
+    const isInternalId = NotificationTemplateRepository.isInternalId(
+      command.identifierOrInternalId,
+    );
+
+    let workflowEntity: NotificationTemplateEntity | null;
+    if (isInternalId) {
+      workflowEntity = await this.notificationTemplateRepository.findById(
+        command.identifierOrInternalId,
+        command.environmentId,
+      );
+    } else {
+      workflowEntity =
+        await this.notificationTemplateRepository.findByTriggerIdentifier(
+          command.environmentId,
+          command.identifierOrInternalId,
+        );
+    }
+
+    if (!workflowEntity) {
+      throw new NotFoundException({
+        message: 'Workflow cannot be found',
+        workflowId: command.identifierOrInternalId,
+      });
+    }
+
+    return workflowEntity;
+  }
+
+  @Instrument()
+  private async getWorkflowPreferences(
+    command: GetWorkflowByIdsCommand,
+    workflowEntity: NotificationTemplateEntity,
+  ) {
+    return await this.getPreferences.safeExecute(
+      GetPreferencesCommand.create({
+        environmentId: command.environmentId,
+        organizationId: command.organizationId,
+        templateId: workflowEntity._id,
+      }),
+    );
   }
 }

@@ -1,19 +1,18 @@
-import { Link, useParams } from 'react-router-dom';
-import { useWatch, useFormContext } from 'react-hook-form';
-import * as z from 'zod';
+import { Link } from 'react-router-dom';
 
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
+import { useEnvironment } from '@/context/environment/hooks';
+import { buildRoute, ROUTES } from '@/utils/routes';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../primitives/tabs';
 import { WorkflowCanvas } from './workflow-canvas';
-import { workflowSchema } from './schema';
-import { buildRoute, ROUTES } from '@/utils/routes';
 
-export const WorkflowEditor = () => {
-  const { environmentSlug = '', workflowSlug = '' } = useParams<{ environmentSlug: string; workflowSlug: string }>();
-  const form = useFormContext<z.infer<typeof workflowSchema>>();
-  const steps = useWatch({
-    control: form.control,
-    name: 'steps',
-  });
+export const WorkflowTabs = () => {
+  const { workflow } = useWorkflow();
+  const { currentEnvironment } = useEnvironment();
+
+  if (!currentEnvironment || !workflow) {
+    return null;
+  }
 
   return (
     <div className="flex h-full flex-1 flex-nowrap">
@@ -22,8 +21,8 @@ export const WorkflowEditor = () => {
           <TabsTrigger value="workflow" asChild variant="regular">
             <Link
               to={buildRoute(ROUTES.EDIT_WORKFLOW, {
-                environmentSlug,
-                workflowSlug,
+                environmentSlug: currentEnvironment.slug!,
+                workflowSlug: workflow.slug,
               })}
             >
               Workflow
@@ -32,8 +31,8 @@ export const WorkflowEditor = () => {
           <TabsTrigger value="trigger" asChild variant="regular">
             <Link
               to={buildRoute(ROUTES.TEST_WORKFLOW, {
-                environmentSlug,
-                workflowSlug,
+                environmentSlug: currentEnvironment.slug!,
+                workflowSlug: workflow.slug,
               })}
             >
               Trigger
@@ -41,7 +40,7 @@ export const WorkflowEditor = () => {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="workflow" className="mt-0 h-full w-full" variant="regular">
-          {steps && <WorkflowCanvas steps={steps} />}
+          <WorkflowCanvas steps={workflow.steps} />
         </TabsContent>
       </Tabs>
     </div>
