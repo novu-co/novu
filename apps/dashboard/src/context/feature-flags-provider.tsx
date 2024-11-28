@@ -31,7 +31,7 @@ const AsyncFeatureFlagsProvider = lazy(async () => {
 
 export function FeatureFlagsProvider({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense>
       <AsyncFeatureFlagsProvider>{children}</AsyncFeatureFlagsProvider>
     </Suspense>
   );
