@@ -76,9 +76,7 @@ export function InboxPreviewContent({ selectedStyle, hideHint }: InboxPreviewCon
                   notificationListNewNotificationsNotice__button: {
                     background: '#2b6cb0',
                   },
-                  notificationListContainer: {
-                    paddingRight: '10px',
-                  },
+
                   inboxHeader: {
                     padding: '8px 16px',
                   },
