@@ -19,6 +19,7 @@ import { ToastIcon } from '../primitives/sonner';
 import { ROUTES } from '../../utils/routes';
 import { useNavigate } from 'react-router-dom';
 import { Popover, PopoverContent, PopoverTrigger } from '../primitives/popover';
+import { InlineToast } from '../primitives/inline-toast';
 
 interface PreviewStyle {
   id: string;
@@ -286,26 +287,14 @@ export function InboxPlayground() {
             </FormProvider>
 
             {hasNotificationBeenSent && (
-              <div className="flex items-center justify-between gap-3 rounded-lg border border-neutral-100 bg-neutral-50 px-2 py-1.5">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-[16px] items-center">
-                    <div className="h-full w-1 rounded-full bg-[#717784]" />
-                  </div>
-                  <div className="text-xs">
-                    <span className="font-medium">Send Again?</span> Edit the notification and resend
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="xs"
-                  className="p-0 text-xs font-medium text-[#DD2450] hover:bg-transparent"
-                  onClick={handleSendNotification}
-                  disabled={isPending}
-                >
-                  Send again
-                  {isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : ''}
-                </Button>
-              </div>
+              <InlineToast
+                variant="tip"
+                title="Send Again?"
+                description="Edit the notification and resend"
+                ctaLabel="Send again"
+                onCtaClick={handleSendNotification}
+                isCtaLoading={isPending}
+              />
             )}
           </div>
 
