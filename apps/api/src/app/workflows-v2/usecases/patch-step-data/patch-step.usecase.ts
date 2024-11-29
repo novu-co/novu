@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { StepDataDto, UserSessionData } from '@novu/shared';
+import { StepDataDto, StepTypeEnum, UserSessionData } from '@novu/shared';
 import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import {
   GetWorkflowByIdsUseCase,
@@ -10,6 +10,8 @@ import {
 import { PatchStepCommand } from './patch-step.command';
 import { BuildStepDataUsecase } from '../build-step-data';
 import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
+import { getSchemaDefaults } from '../../shared/schemas/utils';
+import { DelayTimeControlZodSchema } from '../../shared/schemas/delay-control.schema';
 
 type ValidNotificationWorkflow = {
   currentStep: NonNullable<NotificationStepEntity>;
@@ -42,9 +44,7 @@ export class PatchStepUsecase {
       await this.updateName(persistedItems, command);
     }
 
-    if (command.controlValues !== undefined) {
-      await this.updateControlValues(persistedItems, command);
-    }
+    await this.updateControlValues(persistedItems, command);
   }
 
   private async loadPersistedItems(command: PatchStepCommand) {
@@ -100,14 +100,30 @@ export class PatchStepUsecase {
   }
 
   private async updateControlValues(persistedItems: ValidNotificationWorkflow, command: PatchStepCommand) {
-    return await this.upsertControlValuesUseCase.execute(
+    const defaultControlValues = this.getDefaultControlValues(persistedItems.currentStep.template?.type);
+
+    const mergedControlValues = {
+      ...defaultControlValues,
+      ...command.controlValues,
+    };
+
+    return this.upsertControlValuesUseCase.execute(
       UpsertControlValuesCommand.create({
         organizationId: command.user.organizationId,
         environmentId: command.user.environmentId,
         notificationStepEntity: persistedItems.currentStep,
         workflowId: persistedItems.workflow._id,
-        newControlValues: command.controlValues || {},
+        newControlValues: mergedControlValues,
       })
     );
+  }
+
+  private getDefaultControlValues(stepType: StepTypeEnum | undefined): Record<string, unknown> {
+    switch (stepType) {
+      case StepTypeEnum.DELAY:
+        return getSchemaDefaults(DelayTimeControlZodSchema);
+      default:
+        return {};
+    }
   }
 }

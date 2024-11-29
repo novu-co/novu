@@ -31,7 +31,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
-import { PatchStepUsecase } from '../patch-step-data';
+import { PatchStepCommand, PatchStepUsecase } from '../patch-step-data';
 import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
 
 @Injectable()
@@ -293,19 +293,19 @@ export class UpsertWorkflowUseCase {
   ): Promise<WorkflowInternalResponseDto> {
     for (const step of workflow.steps) {
       const controlValues = this.findControlValueInRequest(step, command.workflowDto.steps);
-      if (!controlValues) {
-        continue;
-      }
-      await this.patchStepDataUsecase.execute({
-        controlValues,
-        identifierOrInternalId: workflow._id,
-        name: step.name,
-        stepId: step._templateId,
-        user: command.user,
-      });
+
+      await this.patchStepDataUsecase.execute(
+        PatchStepCommand.create({
+          controlValues,
+          identifierOrInternalId: workflow._id,
+          name: step.name,
+          stepId: step._templateId,
+          user: command.user,
+        })
+      );
     }
 
-    return await this.getWorkflow(workflow._id, command);
+    return this.getWorkflow(workflow._id, command);
   }
 
   private findControlValueInRequest(
