@@ -1,4 +1,5 @@
 import Redis, { RedisOptions, ScanStream } from 'ioredis';
+import newrelic from 'newrelic';
 import { ConnectionOptions } from 'tls';
 
 import { convertStringValues } from './variable-mappers';
@@ -99,7 +100,11 @@ export const getRedisInstance = (): Redis | undefined => {
   };
 
   if (port && host) {
-    return new Redis(port, host, options);
+    const redisInstance = new Redis(port, host, options);
+    if (typeof newrelic !== 'undefined' && newrelic.instrumentDatastore) {
+      newrelic.instrumentDatastore('Redis', () => redisInstance);
+    }
+    return redisInstance;
   }
 
   return undefined;
