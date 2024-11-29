@@ -321,7 +321,7 @@ export class PrepareAndValidateContentUsecase {
             {
               issueType: StepContentIssueEnum.INVALID_URL,
               variableName: controlValue,
-              message: `Invalid URL: [[${controlValue}]]`,
+              message: 'Provide an absolute URL starting with https:// or a valid path starting with /',
             },
           ];
         }
