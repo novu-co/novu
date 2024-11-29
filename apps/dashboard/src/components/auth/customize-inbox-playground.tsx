@@ -5,6 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { ColorPicker } from '../primitives/color-picker';
 import { getComponentByType } from '../workflow-editor/steps/component-utils';
 import { UiComponentEnum } from '@novu/shared';
+import type { InboxPlaygroundFormData } from './inbox-playground';
 
 interface PreviewStyle {
   id: string;
@@ -12,39 +13,70 @@ interface PreviewStyle {
   image: string;
 }
 
-interface RedirectConfig {
-  target: string;
-  url: string;
-}
-
-interface ActionConfig {
-  label: string;
-  redirect: RedirectConfig;
-}
-
-interface InboxPlaygroundFormData {
-  subject: string;
-  body: string;
-  primaryColor: string;
-  foregroundColor: string;
-  selectedStyle: string;
-  openAccordion?: string;
-  primaryAction: ActionConfig;
-  secondaryAction: ActionConfig | null;
-}
-
 interface CustomizeInboxProps {
   form: UseFormReturn<InboxPlaygroundFormData>;
 }
 
-// Constants
 const previewStyles: PreviewStyle[] = [
   { id: 'popover', label: 'Popover', image: '/images/auth/popover-layout.svg' },
   { id: 'sidebar', label: 'Side Menu', image: '/images/auth/sidebar-layout.svg' },
   { id: 'full-width', label: 'Full Width', image: '/images/auth/full-width-layout.svg' },
 ];
 
-// Components
+export function CustomizeInbox({ form }: CustomizeInboxProps) {
+  const selectedStyle = form.watch('selectedStyle');
+  const openAccordion = form.watch('openAccordion');
+
+  const handleAccordionChange = (value: string | undefined) => {
+    form.setValue('openAccordion', value);
+  };
+
+  return (
+    <div className="space-y-3 p-3">
+      <Accordion type="single" collapsible value={openAccordion} onValueChange={handleAccordionChange}>
+        <AccordionItem value="layout" className="bg-white p-0">
+          <AccordionTrigger className="bg-neutral-alpha-50 p-2 data-[state=open]:border-b">
+            <div className="flex items-center gap-1 text-xs">
+              <RiLayoutLine className="text-feature size-5" />
+              Customize Inbox
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="flex flex-col gap-2 p-2">
+            <div className="grid grid-cols-3 gap-2.5">
+              {previewStyles.map((style) => (
+                <StylePreviewCard
+                  key={style.id}
+                  style={style}
+                  isSelected={selectedStyle === style.id}
+                  onSelect={() => form.setValue('selectedStyle', style.id)}
+                />
+              ))}
+            </div>
+
+            <ColorPickerSection form={form} />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
+      <FormProvider {...form}>
+        <Accordion type="single" collapsible value={openAccordion} onValueChange={handleAccordionChange}>
+          <AccordionItem value="configure" className="bg-white p-0">
+            <AccordionTrigger className="bg-neutral-alpha-50 p-2 data-[state=open]:border-b">
+              <div className="flex items-center gap-1 text-xs">
+                <RiInputField className="text-feature size-5" />
+                Configure notification
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="flex flex-col gap-2 p-2">
+              <NotificationConfigSection />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </FormProvider>
+    </div>
+  );
+}
+
 function StylePreviewCard({
   style,
   isSelected,
@@ -125,60 +157,6 @@ function NotificationConfigSection() {
       <div className="flex gap-1">{getComponentByType({ component: UiComponentEnum.IN_APP_SUBJECT })}</div>
       {getComponentByType({ component: UiComponentEnum.IN_APP_BODY })}
       {getComponentByType({ component: UiComponentEnum.IN_APP_BUTTON_DROPDOWN })}
-    </div>
-  );
-}
-
-export function CustomizeInbox({ form }: CustomizeInboxProps) {
-  const selectedStyle = form.watch('selectedStyle');
-  const openAccordion = form.watch('openAccordion');
-
-  const handleAccordionChange = (value: string | undefined) => {
-    form.setValue('openAccordion', value);
-  };
-
-  return (
-    <div className="space-y-3 p-3">
-      <Accordion type="single" collapsible value={openAccordion} onValueChange={handleAccordionChange}>
-        <AccordionItem value="layout" className="bg-white p-0">
-          <AccordionTrigger className="bg-neutral-alpha-50 p-2 data-[state=open]:border-b">
-            <div className="flex items-center gap-1 text-xs">
-              <RiLayoutLine className="text-feature size-5" />
-              Customize Inbox
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="flex flex-col gap-2 p-2">
-            <div className="grid grid-cols-3 gap-2.5">
-              {previewStyles.map((style) => (
-                <StylePreviewCard
-                  key={style.id}
-                  style={style}
-                  isSelected={selectedStyle === style.id}
-                  onSelect={() => form.setValue('selectedStyle', style.id)}
-                />
-              ))}
-            </div>
-
-            <ColorPickerSection form={form} />
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-
-      <FormProvider {...form}>
-        <Accordion type="single" collapsible value={openAccordion} onValueChange={handleAccordionChange}>
-          <AccordionItem value="configure" className="bg-white p-0">
-            <AccordionTrigger className="bg-neutral-alpha-50 p-2 data-[state=open]:border-b">
-              <div className="flex items-center gap-1 text-xs">
-                <RiInputField className="text-feature size-5" />
-                Configure notification
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="flex flex-col gap-2 p-2">
-              <NotificationConfigSection />
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </FormProvider>
     </div>
   );
 }
