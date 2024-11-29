@@ -169,7 +169,7 @@ export function InboxPlayground() {
     <div className="flex flex-1 flex-col overflow-hidden">
       <div className="flex items-center justify-between gap-4 border-b p-4">
         <div className="flex items-start gap-1">
-          <Button variant="ghost" size="icon" className="mt-[5px] h-5 w-5">
+          <Button variant="ghost" size="icon" className="mt-[5px] h-5 w-5" onClick={() => navigate(-1)}>
             <RiArrowLeftSLine className="h-5 w-5" />
           </Button>
 
