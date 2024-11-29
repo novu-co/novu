@@ -3,6 +3,7 @@ import { Language } from '../primitives/code-block';
 import { CodeBlock } from '../primitives/code-block';
 import { InlineToast } from '../primitives/inline-toast';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export interface Framework {
   name: string;
@@ -39,37 +40,74 @@ const customizationTip = {
 
 export function FrameworkInstructions({ framework }: { framework: Framework }) {
   return (
-    <div className="flex flex-col gap-8 pl-[72px]">
-      <div className="relative border-l border-[#eeeef0] p-8 pt-[24px]">
-        {framework.installSteps.map((step, index) => (
-          <div key={index} className="relative mt-8 flex gap-8 first:mt-0">
-            {/* Step number overlay */}
-            <div className="absolute -left-[43px] flex h-5 w-5 items-center justify-center rounded-full bg-neutral-950">
-              <span className="text-xs font-medium text-white">{index + 1}</span>
-            </div>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={framework.name}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+        className="flex flex-col gap-8 pl-[72px]"
+      >
+        <div className="relative border-l border-[#eeeef0] p-8 pt-[24px]">
+          {framework.installSteps.map((step, index) => (
+            <motion.div
+              key={`${framework.name}-step-${index}`}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{
+                duration: 0.15,
+                delay: index * 0.05,
+                ease: 'easeOut',
+              }}
+              className="relative mt-8 flex gap-8 first:mt-0"
+            >
+              {/* Step number overlay */}
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{
+                  duration: 0.2,
+                  delay: index * 0.05,
+                  ease: 'easeOut',
+                }}
+                className="absolute -left-[43px] flex h-5 w-5 items-center justify-center rounded-full bg-neutral-950"
+              >
+                <span className="text-xs font-medium text-white">{index + 1}</span>
+              </motion.div>
 
-            {/* Step content */}
-            <div className="flex w-[344px] max-w-md flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">{step.title}</span>
+              {/* Step content */}
+              <div className="flex w-[344px] max-w-md flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{step.title}</span>
+                </div>
+                <p className="text-foreground-400 text-xs">{step.description}</p>
+                {step.tip && <InlineToast variant="tip" title={step.tip.title} description={step.tip.description} />}
               </div>
-              <p className="text-foreground-400 text-xs">{step.description}</p>
-              {step.tip && <InlineToast variant="tip" title={step.tip.title} description={step.tip.description} />}
-            </div>
 
-            {step.code && (
-              <div className="w-full max-w-[500px]">
-                <CodeBlock
-                  code={step.code}
-                  language={step.codeLanguage === 'shell' ? 'shell' : step.codeLanguage}
-                  title={step.codeTitle}
-                />
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
+              {step.code && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{
+                    duration: 0.2,
+                    delay: index * 0.05,
+                    ease: 'easeOut',
+                  }}
+                  className="w-full max-w-[500px]"
+                >
+                  <CodeBlock
+                    code={step.code}
+                    language={step.codeLanguage === 'shell' ? 'shell' : step.codeLanguage}
+                    title={step.codeTitle}
+                  />
+                </motion.div>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
 

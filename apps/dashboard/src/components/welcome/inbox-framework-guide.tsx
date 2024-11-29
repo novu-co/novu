@@ -4,6 +4,34 @@ import { useState, useEffect } from 'react';
 import { Framework, frameworks, FrameworkInstructions } from './framework-guides';
 import { IEnvironment } from '@novu/shared';
 import { API_HOSTNAME, WEBSOCKET_HOSTNAME } from '../../config';
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Add container animation variants
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+// Add card animation variants
+const cardVariants = {
+  hidden: {
+    opacity: 0,
+    y: 10,
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.2,
+      ease: 'easeOut',
+    },
+  },
+};
 
 interface InboxFrameworkGuideProps {
   currentEnvironment: IEnvironment | undefined;
@@ -76,7 +104,12 @@ export function InboxFrameworkGuide({
   return (
     <>
       {/* Header Section */}
-      <div className="flex items-start gap-4 pl-[72px]">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+        className="flex items-start gap-4 pl-[72px]"
+      >
         <div className="flex flex-col border-l border-[#eeeef0] p-8">
           <div className="flex items-center gap-2">
             <Loader className="h-3.5 w-3.5 text-[#dd2476] [animation:spin_3s_linear_infinite]" />
@@ -86,25 +119,34 @@ export function InboxFrameworkGuide({
           </div>
           <p className="text-foreground-400 text-xs">You're just a couple steps away from your first notification.</p>
         </div>
-      </div>
+      </motion.div>
 
       {/* Framework Cards */}
-      <div className="flex gap-2 px-6">
+      <motion.div variants={containerVariants} initial="hidden" animate="show" className="flex gap-2 px-6">
         {frameworks.map((framework) => (
-          <Card
+          <motion.div
             key={framework.name}
-            onClick={() => handleFrameworkSelect(framework)}
-            className={`flex h-[100px] w-[100px] flex-col items-center justify-center border-none p-6 shadow-none transition-all duration-200 ease-in-out hover:translate-y-[-2px] hover:cursor-pointer hover:shadow-md ${
-              framework.name === selectedFramework.name ? 'bg-neutral-100' : ''
-            }`}
+            variants={cardVariants}
+            whileHover={{
+              y: -2,
+              transition: { duration: 0.2 },
+            }}
+            whileTap={{ scale: 0.98 }}
           >
-            <CardContent className="flex flex-col items-center gap-3 p-0">
-              <span className="text-2xl">{framework.icon}</span>
-              <span className="text-sm text-[#525866]">{framework.name}</span>
-            </CardContent>
-          </Card>
+            <Card
+              onClick={() => handleFrameworkSelect(framework)}
+              className={`flex h-[100px] w-[100px] flex-col items-center justify-center border-none p-6 shadow-none hover:cursor-pointer ${
+                framework.name === selectedFramework.name ? 'bg-neutral-100' : ''
+              }`}
+            >
+              <CardContent className="flex flex-col items-center gap-3 p-0">
+                <span className="text-2xl">{framework.icon}</span>
+                <span className="text-sm text-[#525866]">{framework.name}</span>
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       <div className="min-h-[600px] w-full">
         <FrameworkInstructions framework={selectedFramework} />
