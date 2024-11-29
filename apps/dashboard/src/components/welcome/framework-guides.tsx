@@ -93,31 +93,30 @@ function Novu() {
       },
     ],
   },
+
   {
     name: 'React',
     icon: <RiReactjsFill className="h-8 w-8 text-[#61DAFB]" />,
     installSteps: [
-      commonInstallStep('@novu/notification-center'),
+      commonInstallStep('@novu/react'),
       {
         title: 'Add the inbox code to your React app',
         description: 'Novu uses the onNavigate prop to handle notification clicks in React.',
-        code: `import { NovuProvider, PopoverNotificationCenter } from '@novu/notification-center';
+        code: `import { Inbox } from '@novu/react';
 import { useNavigate } from 'react-router-dom';
 
-export function NotificationCenter() {
+function Novu() {
   const navigate = useNavigate();
-  
+
   return (
-    <NovuProvider subscriberId="YOUR_SUBSCRIBER_ID" applicationIdentifier="YOUR_APP_ID">
-      <PopoverNotificationCenter
-        onNotificationClick={(notification) => {
-          navigate(notification.cta.data.url);
-        }}
-      />
-    </NovuProvider>
+    <Inbox
+      applicationIdentifier="YOUR_APPLICATION_IDENTIFIER"
+      subscriberId="YOUR_SUBSCRIBER_ID"
+      routerPush={(path: string) => navigate(path)}
+    />
   );
 }`,
-        codeLanguage: 'typescript',
+        codeLanguage: 'tsx',
       },
     ],
   },
@@ -144,6 +143,100 @@ function Novu() {
   );
 }`,
         codeLanguage: 'typescript',
+      },
+    ],
+  },
+  {
+    name: 'Native',
+    icon: <RiReactjsFill className="h-8 w-8 text-black" />,
+    installSteps: [
+      commonInstallStep('@novu/react-native'),
+      {
+        title: 'Add the inbox code to your React Native app',
+        description: 'Implement the notification center in your React Native application.',
+        code: `import { NovuProvider } from '@novu/react-native';
+import { YourCustomInbox } from './Inbox';
+
+function Layout() {
+  return (
+     <NovuProvider
+      subscriberId="YOUR_SUBSCRIBER_ID"
+      applicationIdentifier="YOUR_APPLICATION_IDENTIFIER"
+    >
+      <YourCustomInbox />
+    </NovuProvider>
+  );
+}`,
+        codeLanguage: 'tsx',
+        codeTitle: 'App.tsx',
+      },
+      {
+        title: 'Build your custom inbox component',
+        description: 'Build your custom inbox component to use within your app.',
+        code: `import {
+  FlatList,
+  View,
+  Text,
+  ActivityIndicator,
+  RefreshControl,
+} from "react-native";
+import { useNotifications, Notification } from "@novu/react-native";
+
+export function YourCustomInbox() {
+   const { notifications, isLoading, fetchMore, hasMore, refetch } = useNotifications();
+
+  const renderItem = ({ item }) => (  
+    <View>
+      <Text>{item.body}</Text>
+    </View>
+  );
+
+  const renderFooter = () => {
+    if (!hasMore) return null;
+
+    return (
+      <View>
+        <ActivityIndicator size="small" color="#2196F3" />
+      </View>
+    );
+  };
+
+  const renderEmpty = () => (
+    <View>
+      <Text>No updates available</Text>
+    </View>
+  );
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#2196F3" />
+      </View>
+    );
+  }
+
+  return (
+    <FlatList
+      data={notifications}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={styles.listContainer}
+      onEndReached={fetchMore}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={renderFooter}
+      ListEmptyComponent={renderEmpty}
+      refreshControl={
+        <RefreshControl
+          refreshing={isLoading}
+          onRefresh={refetch}
+          colors={["#2196F3"]}
+        />
+      }
+    />
+  );
+}`,
+        codeLanguage: 'tsx',
+        codeTitle: 'Inbox.tsx',
       },
     ],
   },

@@ -26,24 +26,32 @@ export function InboxFrameworkGuide({
     const isDefaultApi = API_HOSTNAME === 'https://api.novu.co';
     const isDefaultWs = WEBSOCKET_HOSTNAME === 'https://ws.novu.co';
 
-    // Create the props string based on environment
-    const additionalProps = [
+    // Create the common URL props based on environment
+    const urlProps = [
       ...(isDefaultApi ? [] : [`backendUrl="${API_HOSTNAME}"`]),
       ...(isDefaultWs ? [] : [`socketUrl="${WEBSOCKET_HOSTNAME}"`]),
-      `appearance={{
+    ].join('\n      ');
+
+    // Create the full Inbox component string (with appearance)
+    const inboxComponentString = `<Inbox
+      applicationIdentifier="${currentEnvironment.identifier}"
+      subscriberId="${subscriberId}"
+      routerPush={(path: string) => router.push(path)}${urlProps ? '\n      ' + urlProps : ''}
+      appearance={{
         variables: {
           colorPrimary: "${primaryColor}",
           colorForeground: "${foregroundColor}"
         }
-      }}`,
-    ].join('\n      ');
-
-    // Create the full Inbox component string
-    const inboxComponentString = `<Inbox
-      applicationIdentifier="${currentEnvironment.identifier}"
-      subscriberId="${subscriberId}"
-      routerPush={(path: string) => router.push(path)}${additionalProps ? '\n      ' + additionalProps : ''}
+      }}
     />`;
+
+    // Create the full NovuProvider component string (without appearance)
+    const novuProviderString = `<NovuProvider
+      applicationIdentifier="${currentEnvironment.identifier}"
+      subscriberId="${subscriberId}"${urlProps ? '\n      ' + urlProps : ''}
+    >
+      <YourCustomInbox />
+    </NovuProvider>`;
 
     const updatedFrameworks = frameworks.map((framework) => ({
       ...framework,
@@ -51,7 +59,10 @@ export function InboxFrameworkGuide({
         ...step,
         code: step.code
           ?.replace(/<Inbox[\s\S]*?\/>/, inboxComponentString)
-          ?.replace(/YOUR_APP_ID/g, currentEnvironment.identifier),
+          ?.replace(/<NovuProvider[\s\S]*?<\/NovuProvider>/, novuProviderString)
+          ?.replace(/YOUR_APP_ID/g, currentEnvironment.identifier)
+          ?.replace(/YOUR_APPLICATION_IDENTIFIER/g, currentEnvironment.identifier)
+          ?.replace(/YOUR_SUBSCRIBER_ID/g, subscriberId),
       })),
     }));
 
