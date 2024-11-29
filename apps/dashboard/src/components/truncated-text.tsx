@@ -1,9 +1,10 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { cn } from '@/utils/ui';
 import { Slot, SlotProps } from '@radix-ui/react-slot';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 type TruncatedTextProps = SlotProps & { asChild?: boolean };
+
 export default function TruncatedText(props: TruncatedTextProps) {
   const { className, children, asChild, ...rest } = props;
   const [isTruncated, setIsTruncated] = useState(false);
@@ -12,15 +13,23 @@ export default function TruncatedText(props: TruncatedTextProps) {
   const checkTruncation = useCallback(() => {
     if (textRef.current) {
       const { scrollWidth, clientWidth } = textRef.current;
+      console.log(scrollWidth);
       setIsTruncated(scrollWidth > clientWidth);
     }
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const observer = new MutationObserver(checkTruncation);
+    if (textRef.current) observer.observe(textRef.current, { childList: true, subtree: true });
+
     checkTruncation();
     window.addEventListener('resize', checkTruncation);
-    return () => window.removeEventListener('resize', checkTruncation);
-  }, [checkTruncation]);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', checkTruncation);
+    };
+  }, [checkTruncation, children]);
 
   return (
     <Tooltip>
@@ -28,7 +37,7 @@ export default function TruncatedText(props: TruncatedTextProps) {
         {asChild ? (
           <Slot
             ref={textRef}
-            className={cn('truncate', isTruncated && 'block', !isTruncated && 'inline-flex', className)}
+            className={cn('truncate', { block: isTruncated, 'inline-flex': !isTruncated }, className)}
             {...rest}
           >
             {children}
@@ -36,7 +45,7 @@ export default function TruncatedText(props: TruncatedTextProps) {
         ) : (
           <span
             ref={textRef}
-            className={cn('truncate', isTruncated && 'block', !isTruncated && 'inline-flex', className)}
+            className={cn('truncate', { block: isTruncated, 'inline-flex': !isTruncated }, className)}
             {...rest}
           >
             {children}
