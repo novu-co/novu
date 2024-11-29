@@ -1,8 +1,10 @@
 import { getV2, NovuApiError } from '@/api/api.client';
 import { syncWorkflow } from '@/api/workflows';
 import { ConfirmationModal } from '@/components/confirmation-modal';
+import { ToastIcon } from '@/components/primitives/sonner';
 import { showToast } from '@/components/primitives/sonner-helpers';
 import { SuccessButtonToast } from '@/components/success-button-toast';
+import TruncatedText from '@/components/truncated-text';
 import { useEnvironment } from '@/context/environment/hooks';
 import type { IEnvironment, WorkflowListResponseDto, WorkflowResponseDto } from '@novu/shared';
 import { WorkflowOriginEnum, WorkflowStatusEnum } from '@novu/shared';
@@ -66,7 +68,12 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
       children: ({ close }) => (
         <SuccessButtonToast
           title={`Workflow synced to ${environment?.name}`}
-          description={`Workflow '${workflow.name}' has been successfully synced to ${environment?.name}.`}
+          description={
+            <>
+              Workflow <span className="font-bold">{workflow.name}</span> has been successfully synced to{' '}
+              {environment?.name}.
+            </>
+          }
           actionLabel={`Switch to ${environment?.name}`}
           onAction={() => {
             close();
@@ -97,7 +104,14 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
       }).then((res) => ({ workflow: res.data, environment: oppositeEnvironment || undefined })),
     onMutate: () => {
       setIsLoading(true);
-      loadingToast = toast.loading('Syncing workflow...');
+      loadingToast = toast.loading(
+        <>
+          <ToastIcon variant="default" />
+          <span className="text-sm">
+            Syncing workflow <span className="font-bold">{workflow.name}</span> to {oppositeEnvironment?.name}...
+          </span>
+        </>
+      );
     },
     onSuccess: ({ workflow, environment }) => onSyncSuccess(workflow, environment),
     onError: onSyncError,
@@ -127,7 +141,14 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
           setShowConfirmModal(false);
         }}
         title={`Sync workflow to ${oppositeEnvironment?.name}`}
-        description={`Workflow already exists in ${oppositeEnvironment?.name}. Proceeding will overwrite the existing workflow.`}
+        description={
+          <>
+            Workflow <TruncatedText className="max-w-[32ch] font-bold">{workflow.name}</TruncatedText> already exists in{' '}
+            {oppositeEnvironment?.name}.<br />
+            <br />
+            Proceeding will overwrite the existing workflow.
+          </>
+        }
         confirmButtonText="Proceed"
         isLoading={isPending}
       />

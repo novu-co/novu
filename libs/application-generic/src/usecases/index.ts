@@ -28,7 +28,6 @@ export * from './switch-environment';
 export * from './switch-organization';
 export * from './create-user';
 export * from './get-subscriber-global-preference';
-export * from './get-subscriber-global-preference-v1';
 export * from './get-topic-subscribers';
 export * from './create-change';
 export * from './update-change';

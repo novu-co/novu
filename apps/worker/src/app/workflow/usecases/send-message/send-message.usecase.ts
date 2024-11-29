@@ -21,9 +21,6 @@ import {
   ExecutionLogRoute,
   ExecutionLogRouteCommand,
   GetPreferences,
-  GetPreferencesCommand,
-  GetSubscriberGlobalPreferenceCommandV1,
-  GetSubscriberGlobalPreferenceV1,
   GetSubscriberTemplatePreference,
   GetSubscriberTemplatePreferenceCommand,
   IConditionsFilterResponse,
@@ -67,7 +64,6 @@ export class SendMessage {
     private digest: Digest,
     private executionLogRoute: ExecutionLogRoute,
     private getSubscriberTemplatePreferenceUsecase: GetSubscriberTemplatePreference,
-    private getSubscriberGlobalPreferenceV1Usecase: GetSubscriberGlobalPreferenceV1,
     private notificationTemplateRepository: NotificationTemplateRepository,
     private jobRepository: JobRepository,
     private sendMessageDelay: SendMessageDelay,
@@ -77,8 +73,7 @@ export class SendMessage {
     private tenantRepository: TenantRepository,
     private analyticsService: AnalyticsService,
     private normalizeVariablesUsecase: NormalizeVariables,
-    private executeBridgeJob: ExecuteBridgeJob,
-    private getPreferencesUseCase: GetPreferences
+    private executeBridgeJob: ExecuteBridgeJob
   ) {}
 
   @InstrumentUsecase()
@@ -311,62 +306,6 @@ export class SendMessage {
       subscriberId: job.subscriberId,
     });
     if (!subscriber) throw new PlatformException(`Subscriber not found with id ${job._subscriberId}`);
-
-    /*
-     * START: V1 PREFERENCES
-     *
-     * The `critical` flag and Subscriber Preferences check is needed here for backward-compatibility
-     * of V1 Workflow Preferences only.
-     *
-     * V2 Preferences are stored on the Preference entity instead, and resolved in `GetPreferences`.
-     *
-     * TODO: remove the following code block after we remove v1 preferences
-     */
-    const workflowPreferencesV2 = await this.getPreferencesUseCase.safeExecute(
-      GetPreferencesCommand.create({
-        environmentId: job._environmentId,
-        organizationId: job._organizationId,
-        templateId: job._templateId,
-      })
-    );
-    const isWorkflowWithV2Preferences =
-      workflowPreferencesV2?.preferences !== undefined || command.statelessPreferences !== undefined;
-    if (!isWorkflowWithV2Preferences) {
-      if (workflow?.critical) {
-        return true;
-      }
-
-      /*
-       * TODO: Remove this check after we remove V1 preferences, global subscriber
-       * preferences are handled in `GetPreferences` for V2 preferences.
-       */
-      const { preference: globalPreference } = await this.getSubscriberGlobalPreferenceV1Usecase.execute(
-        GetSubscriberGlobalPreferenceCommandV1.create({
-          organizationId: job._organizationId,
-          environmentId: job._environmentId,
-          subscriberId: job.subscriberId,
-        })
-      );
-
-      const globalPreferenceResult = this.stepPreferred(globalPreference, job);
-
-      if (!globalPreferenceResult) {
-        await this.executionLogRoute.execute(
-          ExecutionLogRouteCommand.create({
-            ...ExecutionLogRouteCommand.getDetailsFromJob(job),
-            detail: DetailEnum.STEP_FILTERED_BY_SUBSCRIBER_GLOBAL_PREFERENCES,
-            source: ExecutionDetailsSourceEnum.INTERNAL,
-            status: ExecutionDetailsStatusEnum.SUCCESS,
-            isTest: false,
-            isRetry: false,
-            raw: JSON.stringify(globalPreference),
-          })
-        );
-
-        return false;
-      }
-    }
-    /** END: V1 PREFERENCES */
 
     let subscriberPreference: { enabled: boolean; channels: IPreferenceChannels };
     let subscriberPreferenceType: PreferencesTypeEnum;

@@ -18,7 +18,6 @@ import {
   MessageRepository,
   MessageTemplateRepository,
   NotificationGroupRepository,
-  SubscriberPreferenceRepository,
   TenantRepository,
   TopicRepository,
   TopicSubscribersRepository,
@@ -96,7 +95,6 @@ connect(async () => {
   await removeData(new NotificationGroupRepository(), 'notificationgroups', organization._id, envIds);
   // await removeData(new NotificationRepository(), 'notifications', organization._id, envIds);
   await removeData(new NotificationTemplateRepository(), 'workflows', organization._id, envIds);
-  await removeData(new SubscriberPreferenceRepository(), 'subscriberpreferences', organization._id, envIds);
   await removeData(new SubscriberRepository(), 'subscribers', organization._id, envIds);
   await removeData(new TenantRepository(), 'tenants', organization._id, envIds);
   await removeData(new TopicRepository(), 'topics', organization._id, envIds);
