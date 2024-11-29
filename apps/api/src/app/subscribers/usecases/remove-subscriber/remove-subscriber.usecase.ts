@@ -1,10 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import {
-  SubscriberRepository,
-  TopicSubscribersRepository,
-  SubscriberPreferenceRepository,
-  PreferencesRepository,
-} from '@novu/dal';
+import { SubscriberRepository, TopicSubscribersRepository, PreferencesRepository } from '@novu/dal';
 import {
   buildSubscriberKey,
   buildFeedKey,
@@ -20,7 +15,6 @@ export class RemoveSubscriber {
     private invalidateCache: InvalidateCacheService,
     private subscriberRepository: SubscriberRepository,
     private topicSubscribersRepository: TopicSubscribersRepository,
-    private subscriberPreferenceRepository: SubscriberPreferenceRepository,
     private preferenceRepository: PreferencesRepository
   ) {}
 
@@ -73,10 +67,6 @@ export class RemoveSubscriber {
       await this.topicSubscribersRepository.delete({
         _environmentId,
         externalSubscriberId: subscriberId,
-      });
-      await this.subscriberPreferenceRepository.delete({
-        _environmentId,
-        _subscriberId: { $in: subscriberInternalIds },
       });
       await this.preferenceRepository.delete({
         _environmentId,
