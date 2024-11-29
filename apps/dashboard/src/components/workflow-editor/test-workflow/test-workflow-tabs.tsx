@@ -55,7 +55,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
             <div className="flex flex-col gap-2">
               <span className="font-medium">Test workflow succeeded</span>
               <span className="text-foreground-600 inline">
-                Workflow <strong>{workflow?.name}</strong> was triggered successfully.
+                Workflow <span className="font-bold">{workflow?.name}</span> was triggered successfully.
               </span>
               <Link
                 to={`${LEGACY_ROUTES.ACTIVITY_FEED}?transactionId=${transactionId}`}
