@@ -2,8 +2,6 @@ import { PatchWorkflowDto, UpdateWorkflowDto, WorkflowResponseDto } from '@novu/
 import { createContext, ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useBlocker, useNavigate, useParams } from 'react-router-dom';
 
-import { ToastIcon } from '@/components/primitives/sonner';
-import { showToast } from '@/components/primitives/sonner-helpers';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useFetchWorkflow, useUpdateWorkflow } from '@/hooks';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
