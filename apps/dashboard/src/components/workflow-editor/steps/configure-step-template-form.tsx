@@ -22,6 +22,14 @@ const STEP_TYPE_TO_EDITOR: Record<StepTypeEnum, (args: ConfigureStepTemplateForm
   [StepTypeEnum.CUSTOM]: () => null,
 };
 
+const calculateDefaultValues = (step: StepDataDto) => {
+  if (Object.keys(step.controls.uiSchema ?? {}).length !== 0) {
+    return merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values);
+  }
+
+  return merge(buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {}), step.controls.values);
+};
+
 export type StepEditorProps = {
   workflow: WorkflowResponseDto;
   step: StepDataDto;
@@ -37,11 +45,7 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
 
   const defaultValues = useMemo(() => {
     // Use the UI Schema to build the default values if it exists else use the data schema (code-first approach) values
-    if (Object.keys(step.controls.uiSchema ?? {}).length !== 0) {
-      return merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values);
-    }
-
-    return merge(buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {}), step.controls.values);
+    return calculateDefaultValues(step);
   }, []);
 
   const form = useForm({
@@ -59,14 +63,7 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
   };
 
   useEffect(() => {
-    // Use the UI Schema to build the default values if it exists else use the data schema (code-first approach) values
-    const defaultValues =
-      Object.keys(step.controls.uiSchema ?? {}).length !== 0
-        ? buildDefaultValues(step.controls.uiSchema ?? {})
-        : buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {});
-
-    const mergedDefaultValues = merge(defaultValues, step.controls.values);
-    form.reset(mergedDefaultValues);
+    form.reset(calculateDefaultValues(step));
     setIssuesFromStep(step);
   }, [step]);
 
