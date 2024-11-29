@@ -35,7 +35,7 @@ export function UsecaseSelectPage() {
       track(TelemetryEvent.USE_CASE_SELECTED, {
         useCases: selectedUseCases,
       });
-      navigate(ROUTES.WELCOME);
+      navigate(ROUTES.INBOX_USECASE);
     },
     onError: (error) => {
       console.error('Failed to update use cases:', error);
