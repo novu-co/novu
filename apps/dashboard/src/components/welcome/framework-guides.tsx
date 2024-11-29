@@ -43,32 +43,32 @@ export function FrameworkInstructions({ framework }: { framework: Framework }) {
     <AnimatePresence mode="wait">
       <motion.div
         key={framework.name}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.2, ease: 'easeOut' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
         className="flex flex-col gap-8 pl-[72px]"
       >
         <div className="relative border-l border-[#eeeef0] p-8 pt-[24px]">
           {framework.installSteps.map((step, index) => (
             <motion.div
               key={`${framework.name}-step-${index}`}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{
-                duration: 0.15,
-                delay: index * 0.05,
+                duration: 0.3,
+                delay: index * 0.15,
                 ease: 'easeOut',
               }}
               className="relative mt-8 flex gap-8 first:mt-0"
             >
               {/* Step number overlay */}
               <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
+                initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{
                   duration: 0.2,
-                  delay: index * 0.05,
+                  delay: index * 0.15 + 0.1,
                   ease: 'easeOut',
                 }}
                 className="absolute -left-[43px] flex h-5 w-5 items-center justify-center rounded-full bg-neutral-950"
@@ -85,13 +85,14 @@ export function FrameworkInstructions({ framework }: { framework: Framework }) {
                 {step.tip && <InlineToast variant="tip" title={step.tip.title} description={step.tip.description} />}
               </div>
 
+              {/* Code block with delayed appearance */}
               {step.code && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{
-                    duration: 0.2,
-                    delay: index * 0.05,
+                    duration: 0.3,
+                    delay: index * 0.15 + 0.2,
                     ease: 'easeOut',
                   }}
                   className="w-full max-w-[500px]"

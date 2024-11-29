@@ -33,6 +33,22 @@ const cardVariants = {
   },
 };
 
+// Add icon animation variants
+const iconVariants = {
+  initial: {
+    scale: 1,
+  },
+  hover: {
+    scale: 1.1,
+    transition: {
+      scale: {
+        duration: 0.2,
+        ease: 'easeOut',
+      },
+    },
+  },
+};
+
 interface InboxFrameworkGuideProps {
   currentEnvironment: IEnvironment | undefined;
   subscriberId: string;
@@ -112,8 +128,8 @@ export function InboxFrameworkGuide({
       >
         <div className="flex flex-col border-l border-[#eeeef0] p-8">
           <div className="flex items-center gap-2">
-            <Loader className="h-3.5 w-3.5 text-[#dd2476] [animation:spin_3s_linear_infinite]" />
-            <span className="bg-gradient-to-r from-[#dd2476] to-[#ff512f] bg-clip-text text-sm font-medium text-transparent">
+            <Loader className="h-3.5 w-3.5 text-[#dd2476] [animation:spin_5s_linear_infinite]" />
+            <span className="animate-gradient bg-gradient-to-r from-[#dd2476] via-[#ff512f] to-[#dd2476] bg-[length:400%_400%] bg-clip-text text-sm font-medium text-transparent">
               Watching for Inbox Integration
             </span>
           </div>
@@ -127,11 +143,10 @@ export function InboxFrameworkGuide({
           <motion.div
             key={framework.name}
             variants={cardVariants}
-            whileHover={{
-              y: -2,
-              transition: { duration: 0.2 },
-            }}
-            whileTap={{ scale: 0.98 }}
+            initial="initial"
+            whileHover="hover"
+            animate={framework.name === selectedFramework.name ? 'hover' : 'initial'}
+            className="relative"
           >
             <Card
               onClick={() => handleFrameworkSelect(framework)}
@@ -140,7 +155,9 @@ export function InboxFrameworkGuide({
               }`}
             >
               <CardContent className="flex flex-col items-center gap-3 p-0">
-                <span className="text-2xl">{framework.icon}</span>
+                <motion.div variants={iconVariants} className="relative text-2xl">
+                  {framework.icon}
+                </motion.div>
                 <span className="text-sm text-[#525866]">{framework.name}</span>
               </CardContent>
             </Card>
