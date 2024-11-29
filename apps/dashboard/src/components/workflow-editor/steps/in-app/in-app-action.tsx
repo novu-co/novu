@@ -30,7 +30,7 @@ import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
 import { autocompletion } from '@codemirror/autocomplete';
 import { useStep } from '@/components/workflow-editor/steps/step-provider';
-import { useFlushFormUpdates } from '../flush-form-updates-context';
+import { useFlushFormUpdates } from '@/components/workflow-editor/steps/flush-form-updates-context';
 
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
@@ -88,6 +88,8 @@ export const InAppAction = () => {
           className="p-1"
           align="end"
           onBlur={(e) => {
+            // weird behaviour but onBlur event happens when hovering over the menu items, this is used to prevent
+            // the blur event that submits the form
             e.preventDefault();
             e.stopPropagation();
           }}

@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { capitalize } from '@/utils/string';
-import { useFlushFormUpdates } from '../flush-form-updates-context';
+import { useFlushFormUpdates } from '@/components/workflow-editor/steps/flush-form-updates-context';
 
 export function SelectWidget(props: WidgetProps) {
   const { label, required, readonly, options, name } = props;

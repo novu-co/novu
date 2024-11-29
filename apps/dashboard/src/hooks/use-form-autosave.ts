@@ -1,8 +1,8 @@
 // useFormAutosave.ts
 import { useEffect } from 'react';
 import { UseFormReturn, useWatch, FieldValues } from 'react-hook-form';
-import { useDataRef } from './use-data-ref';
-import { useDebounce } from './use-debounce';
+import { useDataRef } from '@/hooks/use-data-ref';
+import { useDebounce } from '@/hooks/use-debounce';
 
 const TEN_SECONDS = 10 * 1000;
 
@@ -41,19 +41,16 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
     save(values);
   };
 
-  const onFlushInternal = async () => {
-    // use the form reference instead of destructuring the props to avoid stale closures
-    const form = formRef.current;
-    const values = form.getValues();
-    onSave({ ...values });
-  };
-
   const debouncedOnSave = useDebounce(onSave, TEN_SECONDS);
 
   const onBlur = (e: React.FocusEvent<HTMLFormElement, Element>) => {
     e.preventDefault();
     e.stopPropagation();
-    propsForm.handleSubmit(onSave)(e);
+
+    const form = formRef.current;
+    const values = form.getValues();
+    onSave(values);
+    // propsForm.handleSubmit(onSave)(e);
   };
 
   // flush the form updates right away
@@ -61,7 +58,10 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
     return new Promise((resolve) => {
       // await for the state to be updated
       setTimeout(async () => {
-        await onFlushInternal();
+        // use the form reference instead of destructuring the props to avoid stale closures
+        const form = formRef.current;
+        const values = form.getValues();
+        await onSave({ ...values });
 
         resolve();
       }, 0);

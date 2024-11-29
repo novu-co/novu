@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { completions } from '@/utils/liquid-autocomplete';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 import { autocompletion } from '@codemirror/autocomplete';
-import { useFlushFormUpdates } from './steps/flush-form-updates-context';
+import { useFlushFormUpdates } from '@/components/workflow-editor/steps/flush-form-updates-context';
 
 type URLInputProps = Omit<InputProps, 'value' | 'onChange' | 'size'> & {
   options: string[];

@@ -2,14 +2,20 @@ import { flattenIssues } from '@/components/workflow-editor/step-utils';
 import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
 import { buildDefaultValues, buildDynamicZodSchema } from '@/utils/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type StepDataDto, StepTypeEnum, UpdateWorkflowDto, type WorkflowResponseDto } from '@novu/shared';
+import {
+  type StepDataDto,
+  StepIssuesDto,
+  StepTypeEnum,
+  UpdateWorkflowDto,
+  type WorkflowResponseDto,
+} from '@novu/shared';
 import merge from 'lodash.merge';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { OtherStepTabs } from './other-steps-tabs';
 import { Form } from '@/components/primitives/form/form';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { FlashFormUpdatesContext } from './flush-form-updates-context';
+import { FlashFormUpdatesContext } from '@/components/workflow-editor/steps/flush-form-updates-context';
 
 const STEP_TYPE_TO_EDITOR: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
   [StepTypeEnum.EMAIL]: OtherStepTabs,
@@ -29,11 +35,12 @@ export type StepEditorProps = {
 };
 
 type ConfigureStepTemplateFormProps = StepEditorProps & {
+  issues?: StepIssuesDto;
   update: (data: UpdateWorkflowDto) => void;
 };
 
 export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps) => {
-  const { workflow, step, update } = props;
+  const { workflow, step, issues, update } = props;
   const schema = useMemo(() => buildDynamicZodSchema(step.controls.dataSchema ?? {}), [step.controls.dataSchema]);
   const defaultValues = useMemo(
     () => merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values),
@@ -62,20 +69,16 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
     },
   });
 
-  const setIssuesFromStep = useCallback(
-    (step: StepDataDto) => {
-      const issues = flattenIssues(step.issues?.controls);
-      Object.entries(issues).forEach(([key, value]) => {
-        form.setError(key as string, { message: value });
-      });
-    },
-    [form]
-  );
+  const setIssuesFromStep = useCallback(() => {
+    const stepIssues = flattenIssues(issues?.controls);
+    Object.entries(stepIssues).forEach(([key, value]) => {
+      form.setError(key as string, { message: value });
+    });
+  }, [form, issues]);
 
   useEffect(() => {
-    form.reset(merge(buildDefaultValues(step.controls.uiSchema ?? {}), step?.controls.values));
-    setIssuesFromStep(step);
-  }, [form, step, setIssuesFromStep]);
+    setIssuesFromStep();
+  }, [setIssuesFromStep]);
 
   const Editor = STEP_TYPE_TO_EDITOR[step.type];
 

@@ -9,8 +9,8 @@ import { Notification5Fill } from '@/components/icons';
 import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
-import { CustomStepControls } from './controls/custom-step-controls';
-import { StepEditorProps } from './configure-step-template-form';
+import { CustomStepControls } from '@/components/workflow-editor/steps/controls/custom-step-controls';
+import type { StepEditorProps } from '@/components/workflow-editor/steps/configure-step-template-form';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5 overflow-y-auto';
 

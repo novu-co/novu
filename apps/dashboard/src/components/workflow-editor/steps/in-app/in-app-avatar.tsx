@@ -2,7 +2,7 @@ import { useFormContext } from 'react-hook-form';
 
 import { FormControl, FormField, FormItem } from '@/components/primitives/form/form';
 import { AvatarPicker } from '@/components/primitives/form/avatar-picker';
-import { useFlushFormUpdates } from '../flush-form-updates-context';
+import { useFlushFormUpdates } from '@/components/workflow-editor/steps/flush-form-updates-context';
 
 const avatarKey = 'avatar';
 
