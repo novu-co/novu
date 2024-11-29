@@ -227,7 +227,7 @@ export function InboxPlayground() {
                     <div className="flex gap-2">
                       <div className="flex-1 rounded-lg border">
                         <div className="flex items-center justify-between p-1 px-2">
-                          <span className="text-xs">Primary</span>
+                          <span className="text-xs font-medium">Primary</span>
                           <ColorPicker
                             value={form.watch('primaryColor')}
                             onChange={(color) => form.setValue('primaryColor', color)}
@@ -237,7 +237,7 @@ export function InboxPlayground() {
 
                       <div className="flex-1 rounded-lg border">
                         <div className="flex items-center justify-between p-1 px-2">
-                          <span className="text-xs">Foreground</span>
+                          <span className="text-xs font-medium">Foreground</span>
                           <ColorPicker
                             value={form.watch('foregroundColor')}
                             onChange={(color) => form.setValue('foregroundColor', color)}

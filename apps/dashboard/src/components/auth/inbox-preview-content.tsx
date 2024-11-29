@@ -35,6 +35,26 @@ export function InboxPreviewContent({
     localization: {
       'notifications.emptyNotice': 'Click Send Notification to see your first notification',
     },
+    appearance: {
+      variables: {
+        colorPrimary: primaryColor,
+        colorForeground: foregroundColor,
+      },
+      elements: {
+        button: {
+          fontSize: '12px',
+          lineHeight: '24px',
+          height: '24px',
+          borderRadius: '6px',
+        },
+        notificationBody: {
+          colorForeground: `color-mix(in srgb, ${foregroundColor} 70%, white)`,
+        },
+        notification: {
+          paddingRight: '12px',
+        },
+      },
+    },
   };
 
   return (
@@ -42,22 +62,7 @@ export function InboxPreviewContent({
       {selectedStyle === 'popover' && (
         <div className="relative flex h-full w-full flex-col items-center">
           <div className="mt-10 flex w-full max-w-[440px] items-center justify-end">
-            <Inbox
-              {...configuration}
-              placement="bottom-end"
-              appearance={{
-                variables: {
-                  colorPrimary: primaryColor,
-                  colorForeground: foregroundColor,
-                },
-                elements: {
-                  popoverContent: {
-                    maxHeight: '450px',
-                  },
-                },
-              }}
-              open
-            />
+            <Inbox {...configuration} placement="bottom-end" open />
           </div>
           {!hideHint && (
             <div className="absolute bottom-[-10px] left-2 flex flex-col items-start">
@@ -69,104 +74,8 @@ export function InboxPreviewContent({
       )}
       {selectedStyle === 'sidebar' && (
         <div className="h-full">
-          <div className="h-full w-[300px] border-r">
-            <Inbox
-              {...configuration}
-              appearance={{
-                variables: {
-                  colorBackground: '#FCFCFC',
-                  colorForeground: foregroundColor,
-                  colorPrimary: primaryColor,
-                  colorPrimaryForeground: '#ffffff',
-                  colorSecondary: '#F3F3F3',
-                  colorSecondaryForeground: foregroundColor,
-                  colorCounter: '#E5484D',
-                  colorCounterForeground: 'white',
-                  colorNeutral: 'black',
-                  fontSize: 'inherit',
-                  borderRadius: '0.375rem',
-                },
-                elements: {
-                  notificationListNewNotificationsNotice__button: {
-                    background: '#2b6cb0',
-                  },
-
-                  inboxHeader: {
-                    padding: '8px 16px',
-                  },
-                  inboxStatus__dropdownTrigger: {
-                    gap: '2px',
-                  },
-                  moreActionsContainer: {
-                    marginRight: '-4px',
-                  },
-                  inboxStatus__title: {
-                    fontSize: '14px',
-                    fontWeight: '500',
-                  },
-                  bellContainer: {
-                    display: 'none',
-                  },
-                  preferences__button: {
-                    display: 'none',
-                  },
-                  popoverContent: {
-                    width: '100%',
-                    maxWidth: '390px',
-                    height: 'calc(100% - 136px)',
-                    maxHeight: '100%',
-                    borderRadius: '0px',
-                    overflow: 'auto',
-                    boxShadow:
-                      'rgba(15, 15, 15, 0.04) 0px 0px 0px 1px, rgba(15, 15, 15, 0.03) 0px 3px 6px, rgba(15, 15, 15, 0.06) 0px 9px 24px',
-                    backgroundColor: '#fff',
-                    marginTop: '-64px',
-                    marginLeft: '-32px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                  },
-                  notificationImage: {
-                    borderRadius: '50%',
-                    width: '24px',
-                    height: '24px',
-                  },
-                  notificationDot: {
-                    marginTop: '2px',
-                    backgroundColor: '#0081F1',
-                  },
-                  notificationSubject: {
-                    color: 'black',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                  },
-                  notificationBody: {},
-                  notificationPrimaryAction__button: {
-                    variant: 'outline',
-                    paddingLeft: '8px',
-                    paddingRight: '8px',
-                    height: '26px',
-                    borderRadius: '4px',
-                    border: '0.5px solid #dfdfdf',
-                    fontWeight: '500',
-                    backgroundColor: 'transparent',
-                    color: 'black',
-                    fontSize: '14px',
-                  },
-                  notificationSecondaryAction__button: {
-                    variant: 'outline',
-                    paddingLeft: '8px',
-                    paddingRight: '8px',
-                    height: '26px',
-                    borderRadius: '4px',
-                    border: '0.5px solid #dfdfdf',
-                    fontWeight: '500',
-                    backgroundColor: 'transparent',
-                    color: 'black',
-                    fontSize: '14px',
-                  },
-                },
-              }}
-            >
+          <div className="h-full w-[350px] border-r">
+            <Inbox {...configuration}>
               <InboxContent />
             </Inbox>
           </div>
@@ -174,15 +83,7 @@ export function InboxPreviewContent({
       )}
       {selectedStyle === 'full-width' && (
         <div className="h-full w-full">
-          <Inbox
-            {...configuration}
-            appearance={{
-              variables: {
-                colorPrimary: primaryColor,
-                colorForeground: foregroundColor,
-              },
-            }}
-          >
+          <Inbox {...configuration}>
             <InboxContent />
           </Inbox>
         </div>
