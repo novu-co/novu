@@ -328,7 +328,19 @@ export function InboxPlayground() {
                   <Button variant="ghost" size="sm" className="gap-1">
                     Skip to Dashboard
                   </Button>
-                  <Button size="sm" className="px-2" onClick={() => navigate(ROUTES.INBOX_EMBED)}>
+                  <Button
+                    size="sm"
+                    className="px-2"
+                    onClick={() => {
+                      const primaryColor = form.getValues('primaryColor');
+                      const foregroundColor = form.getValues('foregroundColor');
+                      const queryParams = new URLSearchParams({
+                        primaryColor,
+                        foregroundColor,
+                      }).toString();
+                      navigate(`${ROUTES.INBOX_EMBED}?${queryParams}`);
+                    }}
+                  >
                     Implement &lt;Inbox /&gt;
                   </Button>
                 </>

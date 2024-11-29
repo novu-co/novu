@@ -8,9 +8,16 @@ import { API_HOSTNAME, WEBSOCKET_HOSTNAME } from '../../config';
 interface InboxFrameworkGuideProps {
   currentEnvironment: IEnvironment | undefined;
   subscriberId: string;
+  primaryColor: string;
+  foregroundColor: string;
 }
 
-export function InboxFrameworkGuide({ currentEnvironment, subscriberId }: InboxFrameworkGuideProps) {
+export function InboxFrameworkGuide({
+  currentEnvironment,
+  subscriberId,
+  primaryColor,
+  foregroundColor,
+}: InboxFrameworkGuideProps) {
   const [selectedFramework, setSelectedFramework] = useState(frameworks.find((f) => f.selected) || frameworks[0]);
 
   useEffect(() => {
@@ -23,6 +30,12 @@ export function InboxFrameworkGuide({ currentEnvironment, subscriberId }: InboxF
     const additionalProps = [
       ...(isDefaultApi ? [] : [`backendUrl="${API_HOSTNAME}"`]),
       ...(isDefaultWs ? [] : [`socketUrl="${WEBSOCKET_HOSTNAME}"`]),
+      `appearance={{
+        variables: {
+          colorPrimary: "${primaryColor}",
+          colorForeground: "${foregroundColor}"
+        }
+      }}`,
     ].join('\n      ');
 
     // Create the full Inbox component string
@@ -43,7 +56,7 @@ export function InboxFrameworkGuide({ currentEnvironment, subscriberId }: InboxF
     }));
 
     setSelectedFramework(updatedFrameworks.find((f) => f.name === selectedFramework.name) || updatedFrameworks[0]);
-  }, [currentEnvironment?.identifier, subscriberId, selectedFramework.name]);
+  }, [currentEnvironment?.identifier, subscriberId, selectedFramework.name, primaryColor, foregroundColor]);
 
   function handleFrameworkSelect(framework: Framework) {
     setSelectedFramework(framework);
