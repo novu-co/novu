@@ -193,13 +193,11 @@ describe('test use of novus node package - Subscribers class', () => {
   test('should get subscriber preference', async () => {
     mockedAxios.get.mockResolvedValue({});
 
-    await novu.subscribers.getPreference('test-subscriber-preference', {
-      includeInactiveChannels: true,
-    });
+    await novu.subscribers.getPreference('test-subscriber-preference');
 
     expect(mockedAxios.get).toHaveBeenCalled();
     expect(mockedAxios.get).toHaveBeenCalledWith(
-      '/subscribers/test-subscriber-preference/preferences?includeInactiveChannels=true',
+      '/subscribers/test-subscriber-preference/preferences',
     );
   });
 

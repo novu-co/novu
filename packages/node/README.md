@@ -337,22 +337,12 @@ await novu.subscribers.updateOnlineStatus('subscriberId', false);
 
 - #### Get subscriber preference for all workflows
 
-This method returns subscriber preference for all workflows with inactive channels by default. To get subscriber preference for all workflows without inactive (means only active) channels, pass `false` as second argument.
-
 ```ts
 import { Novu } from '@novu/node';
 
 const novu = new Novu('<NOVU_SECRET_KEY>');
 
-// return subscriber preference for all workflows without inactive channels
-await novu.subscribers.getPreference('subscriberId', {
-  includeInactiveChannels: false,
-});
-
-// return subscriber preference for all workflows with inactive channels
-await novu.subscribers.getPreference('subscriberId', {
-  includeInactiveChannels: true,
-});
+await novu.subscribers.getPreference('subscriberId');
 ```
 
 - #### Get subscriber global preference
@@ -766,21 +756,11 @@ await novu.messages.list(params);
 - #### Delete a message by `messageId`
 
 ```ts
-import { Novu } from '@novu/node';
+import { Novu, ChannelTypeEnum } from '@novu/node';
 
 const novu = new Novu('<NOVU_SECRET_KEY>');
 
 await novu.messages.deleteById('messageId');
-```
-
-- #### Delete multiple messages by `transactionId`
-
-```ts
-import { Novu } from '@novu/node';
-
-const novu = new Novu('<NOVU_SECRET_KEY>');
-
-await novu.messages.deleteByTransactionId('transactionId');
 ```
 
 ### Layouts
