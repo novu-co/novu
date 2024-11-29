@@ -1,4 +1,3 @@
-import type { ListWorkflowResponse } from '@novu/shared';
 import { RiMore2Fill } from 'react-icons/ri';
 import { createSearchParams, useLocation, useSearchParams } from 'react-router-dom';
 import { DefaultPagination } from '@/components/default-pagination';
