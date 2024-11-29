@@ -24,7 +24,6 @@ export interface InstallationStep {
   };
 }
 
-// First, let's add the reusable tip at the top of the file, after the interfaces
 const customizationTip = {
   title: 'Tip:',
   description: (
@@ -112,7 +111,6 @@ export function FrameworkInstructions({ framework }: { framework: Framework }) {
   );
 }
 
-// Add common installation steps
 export const commonInstallStep = (packageName: string): InstallationStep => ({
   title: 'Install the package',
   description: `${packageName} is the package that powers the notification center.`,
@@ -121,7 +119,6 @@ export const commonInstallStep = (packageName: string): InstallationStep => ({
   codeTitle: 'Terminal',
 });
 
-// Updated frameworks with reused installation steps
 export const frameworks: Framework[] = [
   {
     name: 'Next.js',
