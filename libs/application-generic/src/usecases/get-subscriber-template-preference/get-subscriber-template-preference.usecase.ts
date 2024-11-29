@@ -70,10 +70,7 @@ export class GetSubscriberTemplatePreference {
 
     const template = mapTemplateConfiguration({
       ...command.template,
-      // Use the critical flag from the V2 Preference object if it exists
-      ...(subscriberWorkflowPreference.critical !== undefined && {
-        critical: subscriberWorkflowPreference.critical,
-      }),
+      critical: subscriberWorkflowPreference.critical,
     });
 
     return {
