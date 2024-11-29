@@ -61,7 +61,7 @@ export function InboxPlayground() {
       subject: '**Welcome to Inbox!**',
       body: 'This is your first notification. Customize and explore more features.',
       primaryColor: '#DD2450',
-      foregroundColor: '#99A0AE',
+      foregroundColor: '#0E121B',
       primaryAction: {
         label: 'Add to your app',
         redirect: {
