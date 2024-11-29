@@ -54,6 +54,65 @@ interface InboxFrameworkGuideProps {
   foregroundColor: string;
 }
 
+function getUrlProps(isDefaultApi: boolean, isDefaultWs: boolean): string {
+  const props = [
+    ...(isDefaultApi ? [] : [`backendUrl="${API_HOSTNAME}"`]),
+    ...(isDefaultWs ? [] : [`socketUrl="${WEBSOCKET_HOSTNAME}"`]),
+  ];
+
+  return props.length ? '\n      ' + props.join('\n      ') : '';
+}
+
+function generateInboxComponent(
+  environmentIdentifier: string,
+  subscriberId: string,
+  urlProps: string,
+  primaryColor: string,
+  foregroundColor: string
+): string {
+  return `<Inbox
+      applicationIdentifier="${environmentIdentifier}"
+      subscriberId="${subscriberId}"
+      routerPush={(path: string) => router.push(path)}${urlProps}
+      appearance={{
+        variables: {
+          colorPrimary: "${primaryColor}",
+          colorForeground: "${foregroundColor}"
+        }
+      }}
+    />`;
+}
+
+function generateNovuProvider(environmentIdentifier: string, subscriberId: string, urlProps: string): string {
+  return `<NovuProvider
+      applicationIdentifier="${environmentIdentifier}"
+      subscriberId="${subscriberId}"${urlProps}
+    >
+      <YourCustomInbox />
+    </NovuProvider>`;
+}
+
+function updateFrameworkCode(
+  framework: Framework,
+  inboxComponent: string,
+  novuProvider: string,
+  environmentIdentifier: string,
+  subscriberId: string
+): Framework {
+  return {
+    ...framework,
+    installSteps: framework.installSteps.map((step) => ({
+      ...step,
+      code: step.code
+        ?.replace(/<Inbox[\s\S]*?\/>/, inboxComponent)
+        ?.replace(/<NovuProvider[\s\S]*?<\/NovuProvider>/, novuProvider)
+        ?.replace(/YOUR_APP_ID/g, environmentIdentifier)
+        ?.replace(/YOUR_APPLICATION_IDENTIFIER/g, environmentIdentifier)
+        ?.replace(/YOUR_SUBSCRIBER_ID/g, subscriberId),
+    })),
+  };
+}
+
 export function InboxFrameworkGuide({
   currentEnvironment,
   subscriberId,
@@ -68,42 +127,19 @@ export function InboxFrameworkGuide({
     const isDefaultApi = API_HOSTNAME === 'https://api.novu.co';
     const isDefaultWs = WEBSOCKET_HOSTNAME === 'https://ws.novu.co';
 
-    const urlProps = [
-      ...(isDefaultApi ? [] : [`backendUrl="${API_HOSTNAME}"`]),
-      ...(isDefaultWs ? [] : [`socketUrl="${WEBSOCKET_HOSTNAME}"`]),
-    ].join('\n      ');
+    const urlProps = getUrlProps(isDefaultApi, isDefaultWs);
+    const inboxComponent = generateInboxComponent(
+      currentEnvironment.identifier,
+      subscriberId,
+      urlProps,
+      primaryColor,
+      foregroundColor
+    );
+    const novuProvider = generateNovuProvider(currentEnvironment.identifier, subscriberId, urlProps);
 
-    const inboxComponentString = `<Inbox
-      applicationIdentifier="${currentEnvironment.identifier}"
-      subscriberId="${subscriberId}"
-      routerPush={(path: string) => router.push(path)}${urlProps ? '\n      ' + urlProps : ''}
-      appearance={{
-        variables: {
-          colorPrimary: "${primaryColor}",
-          colorForeground: "${foregroundColor}"
-        }
-      }}
-    />`;
-
-    const novuProviderString = `<NovuProvider
-      applicationIdentifier="${currentEnvironment.identifier}"
-      subscriberId="${subscriberId}"${urlProps ? '\n      ' + urlProps : ''}
-    >
-      <YourCustomInbox />
-    </NovuProvider>`;
-
-    const updatedFrameworks = frameworks.map((framework) => ({
-      ...framework,
-      installSteps: framework.installSteps.map((step) => ({
-        ...step,
-        code: step.code
-          ?.replace(/<Inbox[\s\S]*?\/>/, inboxComponentString)
-          ?.replace(/<NovuProvider[\s\S]*?<\/NovuProvider>/, novuProviderString)
-          ?.replace(/YOUR_APP_ID/g, currentEnvironment.identifier)
-          ?.replace(/YOUR_APPLICATION_IDENTIFIER/g, currentEnvironment.identifier)
-          ?.replace(/YOUR_SUBSCRIBER_ID/g, subscriberId),
-      })),
-    }));
+    const updatedFrameworks = frameworks.map((framework) =>
+      updateFrameworkCode(framework, inboxComponent, novuProvider, currentEnvironment.identifier, subscriberId)
+    );
 
     setSelectedFramework(updatedFrameworks.find((f) => f.name === selectedFramework.name) || updatedFrameworks[0]);
   }, [currentEnvironment?.identifier, subscriberId, selectedFramework.name, primaryColor, foregroundColor]);
