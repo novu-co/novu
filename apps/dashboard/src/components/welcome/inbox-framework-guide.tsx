@@ -1,12 +1,12 @@
 import { Loader } from 'lucide-react';
 import { Card, CardContent } from '../primitives/card';
 import { useState, useEffect } from 'react';
-import { Framework, frameworks, FrameworkInstructions } from './framework-guides';
 import { IEnvironment } from '@novu/shared';
 import { API_HOSTNAME, WEBSOCKET_HOSTNAME } from '../../config';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { Framework, frameworks } from './framework-guides.instructions';
+import { FrameworkInstructions } from './framework-guides';
 
-// Add container animation variants
 const containerVariants = {
   hidden: {},
   show: {
@@ -17,7 +17,6 @@ const containerVariants = {
   },
 };
 
-// Add card animation variants
 const cardVariants = {
   hidden: {
     opacity: 0,
@@ -33,7 +32,6 @@ const cardVariants = {
   },
 };
 
-// Add icon animation variants
 const iconVariants = {
   initial: {
     scale: 1,
