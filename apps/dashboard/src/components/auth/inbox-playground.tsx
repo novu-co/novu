@@ -188,7 +188,6 @@ export function InboxPlayground() {
             </div>
           )}
 
-          {/* Footer */}
           <div className="bg-muted mt-auto border-t">
             <div className="flex justify-end gap-3 p-2">
               {!hasNotificationBeenSent ? (

@@ -70,12 +70,10 @@ export function InboxConnectedGuide({ subscriberId }: InboxConnectedGuideProps) 
       <div className="flex flex-col gap-8 pl-[72px]">
         <div className="relative border-l border-[#eeeef0] p-8 pt-[24px]">
           <div className="relative mt-8 flex gap-8 first:mt-0">
-            {/* Step number overlay */}
             <div className="absolute -left-[43px] flex h-5 w-5 items-center justify-center rounded-full bg-white">
               <RiLoader3Line className="h-4 w-4 text-neutral-300" />
             </div>
 
-            {/* Step content */}
             <div className="flex w-[344px] max-w-md flex-col gap-3">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">Let the magic happen 🪄</span>
