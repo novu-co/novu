@@ -40,6 +40,7 @@ export function InboxPlayground() {
         subject: z.string(),
         body: z.string(),
         primaryColor: z.string(),
+        foregroundColor: z.string(),
         primaryAction: z.object({
           label: z.string(),
           redirect: z.object({
@@ -60,6 +61,7 @@ export function InboxPlayground() {
       subject: '**Welcome to Inbox!**',
       body: 'This is your first notification. Customize and explore more features.',
       primaryColor: '#DD2450',
+      foregroundColor: '#99A0AE',
       primaryAction: {
         label: 'Add to your app',
         redirect: {
@@ -224,20 +226,21 @@ export function InboxPlayground() {
                   <div className="space-y-2">
                     <div className="flex gap-2">
                       <div className="flex-1 rounded-lg border">
-                        <div className="flex items-center justify-between p-0.5 px-2">
-                          <span className="text-foreground-950 text-xs font-medium">Primary color</span>
+                        <div className="flex items-center justify-between p-1 px-2">
+                          <span className="text-xs">Primary</span>
                           <ColorPicker
                             value={form.watch('primaryColor')}
                             onChange={(color) => form.setValue('primaryColor', color)}
                           />
                         </div>
                       </div>
+
                       <div className="flex-1 rounded-lg border">
-                        <div className="flex items-center justify-between p-0.5 px-2">
-                          <span className="text-foreground-950 text-xs font-medium">Primary color</span>
+                        <div className="flex items-center justify-between p-1 px-2">
+                          <span className="text-xs">Foreground</span>
                           <ColorPicker
-                            value={form.watch('primaryColor')}
-                            onChange={(color) => form.setValue('primaryColor', color)}
+                            value={form.watch('foregroundColor')}
+                            onChange={(color) => form.setValue('foregroundColor', color)}
                           />
                         </div>
                       </div>
@@ -247,7 +250,10 @@ export function InboxPlayground() {
                       <Info className="text-foreground-400 mt-0.5 h-4 w-4" />
                       <p className="text-foreground-400 leading-[21px]">
                         The Inbox is completely customizable, using the{' '}
-                        <a href="#" className="cursor-pointer underline">
+                        <a
+                          href="https://docs.novu.co/inbox/react/styling#appearance-prop"
+                          className="cursor-pointer underline"
+                        >
                           appearance prop
                         </a>
                       </p>
@@ -332,7 +338,12 @@ export function InboxPlayground() {
         </div>
 
         <div className="max-h-[610px] w-full border-l">
-          <InboxPreviewContent selectedStyle={selectedStyle} hideHint={hasNotificationBeenSent} />
+          <InboxPreviewContent
+            selectedStyle={selectedStyle}
+            hideHint={hasNotificationBeenSent}
+            primaryColor={form.watch('primaryColor')}
+            foregroundColor={form.watch('foregroundColor')}
+          />
         </div>
       </div>
     </div>

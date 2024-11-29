@@ -8,9 +8,16 @@ import { API_HOSTNAME, WEBSOCKET_HOSTNAME } from '../../config';
 interface InboxPreviewContentProps {
   selectedStyle: string;
   hideHint?: boolean;
+  primaryColor: string;
+  foregroundColor: string;
 }
 
-export function InboxPreviewContent({ selectedStyle, hideHint }: InboxPreviewContentProps) {
+export function InboxPreviewContent({
+  selectedStyle,
+  hideHint,
+  primaryColor,
+  foregroundColor,
+}: InboxPreviewContentProps) {
   const auth = useAuth();
   const { user } = useUser();
   const { environments } = useFetchEnvironments({ organizationId: auth?.currentOrganization?._id });
@@ -25,6 +32,9 @@ export function InboxPreviewContent({ selectedStyle, hideHint }: InboxPreviewCon
     subscriberId: user?.externalId as string,
     backendUrl: API_HOSTNAME ?? 'https://api.novu.co',
     socketUrl: WEBSOCKET_HOSTNAME ?? 'https://ws.novu.co',
+    localization: {
+      'notifications.emptyNotice': 'Click Send Notification to see your first notification',
+    },
   };
 
   return (
@@ -36,6 +46,10 @@ export function InboxPreviewContent({ selectedStyle, hideHint }: InboxPreviewCon
               {...configuration}
               placement="bottom-end"
               appearance={{
+                variables: {
+                  colorPrimary: primaryColor,
+                  colorForeground: foregroundColor,
+                },
                 elements: {
                   popoverContent: {
                     maxHeight: '450px',
@@ -61,11 +75,11 @@ export function InboxPreviewContent({ selectedStyle, hideHint }: InboxPreviewCon
               appearance={{
                 variables: {
                   colorBackground: '#FCFCFC',
-                  colorForeground: '#1A1523',
-                  colorPrimary: '#0081F1',
+                  colorForeground: foregroundColor,
+                  colorPrimary: primaryColor,
                   colorPrimaryForeground: '#ffffff',
                   colorSecondary: '#F3F3F3',
-                  colorSecondaryForeground: '#1A1523',
+                  colorSecondaryForeground: foregroundColor,
                   colorCounter: '#E5484D',
                   colorCounterForeground: 'white',
                   colorNeutral: 'black',
@@ -160,7 +174,15 @@ export function InboxPreviewContent({ selectedStyle, hideHint }: InboxPreviewCon
       )}
       {selectedStyle === 'full-width' && (
         <div className="h-full w-full">
-          <Inbox {...configuration}>
+          <Inbox
+            {...configuration}
+            appearance={{
+              variables: {
+                colorPrimary: primaryColor,
+                colorForeground: foregroundColor,
+              },
+            }}
+          >
             <InboxContent />
           </Inbox>
         </div>
