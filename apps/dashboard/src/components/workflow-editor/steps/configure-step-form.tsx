@@ -39,10 +39,9 @@ type ConfigureStepFormProps = {
   environment: IEnvironment;
   step: StepDataDto;
   update: (data: UpdateWorkflowDto) => void;
-  onDirtyChange: (dirty: boolean) => void;
 };
 export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
-  const { step, workflow, update, environment, onDirtyChange } = props;
+  const { step, workflow, update, environment } = props;
   const navigate = useNavigate();
   const isCodeCreatedWorkflow = workflow.origin === WorkflowOriginEnum.EXTERNAL;
 
@@ -73,10 +72,6 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
       });
     },
   });
-
-  useEffect(() => {
-    onDirtyChange(form.formState.isDirty);
-  }, [form.formState.isDirty, onDirtyChange]);
 
   const firstError = useMemo(
     () => (step ? getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues) : undefined),

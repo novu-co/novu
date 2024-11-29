@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -25,11 +25,10 @@ import { useFormAutosave } from '@/hooks/use-form-autosave';
 type ConfigureWorkflowFormProps = {
   workflow: WorkflowResponseDto;
   update: (data: UpdateWorkflowDto) => void;
-  onDirtyChange: (isDirty: boolean) => void;
 };
 
 export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
-  const { workflow, update, onDirtyChange } = props;
+  const { workflow, update } = props;
   const isReadOnly = workflow.origin === WorkflowOriginEnum.EXTERNAL;
   const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
   const tagsQuery = useTagsQuery();
@@ -57,11 +56,6 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
     form.setValue('active', active, { shouldValidate: true, shouldDirty: true });
     flushFormUpdates();
   };
-
-  useEffect(() => {
-    // inform the parent about the form's dirty state to block navigation
-    onDirtyChange?.(form.formState.isDirty);
-  }, [form.formState.isDirty, onDirtyChange]);
 
   return (
     <>

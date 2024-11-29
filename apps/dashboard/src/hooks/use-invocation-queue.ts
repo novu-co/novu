@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 type CallbackFunction = () => Promise<unknown>;
 
@@ -6,6 +6,7 @@ export function useInvocationQueue<T extends CallbackFunction = CallbackFunction
   debounceInMs = 200,
   waitingRoom = Number.MAX_SAFE_INTEGER,
 } = {}) {
+  const [hasPendingItems, setHasPendingItems] = useState(false);
   const queueRef = useRef<T[]>([]); // Queue to hold pending saves
   const isSavingRef = useRef(false); // Flag to track if a save is in-flight
   const debounceTimerRef = useRef<number | null>(null); // Timer for debouncing
@@ -31,6 +32,9 @@ export function useInvocationQueue<T extends CallbackFunction = CallbackFunction
         await nextInvocation(); // Execute the next autosave function
       }
     }
+    if (queueRef.current.length === 0) {
+      setHasPendingItems(false);
+    }
 
     isSavingRef.current = false;
   }, [waitingRoom]);
@@ -42,9 +46,12 @@ export function useInvocationQueue<T extends CallbackFunction = CallbackFunction
         clearTimeout(debounceTimerRef.current);
       }
 
+      // push the new data to the queue
+      queueRef.current.push(data);
+      setHasPendingItems(true);
+
       // Set a new debounce timer
       debounceTimerRef.current = setTimeout(() => {
-        queueRef.current.push(data);
         processQueue(); // Trigger queue processing
       }, debounceInMs) as any;
     },
@@ -53,5 +60,6 @@ export function useInvocationQueue<T extends CallbackFunction = CallbackFunction
 
   return {
     enqueue,
+    hasPendingItems,
   };
 }

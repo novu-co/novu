@@ -2,11 +2,11 @@ import { ConfigureWorkflowForm } from '@/components/workflow-editor/configure-wo
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 export function ConfigureWorkflow() {
-  const { workflow, update, onDirtyChange } = useWorkflow();
+  const { workflow, update } = useWorkflow();
 
   if (!workflow) {
     return null;
   }
 
-  return <ConfigureWorkflowForm workflow={workflow} update={update} onDirtyChange={onDirtyChange} />;
+  return <ConfigureWorkflowForm workflow={workflow} update={update} />;
 }
