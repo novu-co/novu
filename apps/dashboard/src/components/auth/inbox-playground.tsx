@@ -19,7 +19,7 @@ import { InlineToast } from '../primitives/inline-toast';
 import { UsecasePlaygroundHeader } from '../usecase-playground-header';
 import { CustomizeInbox } from './customize-inbox-playground';
 
-interface ActionConfig {
+export interface ActionConfig {
   label: string;
   redirect: {
     target: string;
@@ -27,7 +27,7 @@ interface ActionConfig {
   };
 }
 
-interface InboxPlaygroundFormData {
+export interface InboxPlaygroundFormData {
   subject: string;
   body: string;
   primaryColor: string;
@@ -111,7 +111,6 @@ export function InboxPlayground() {
     initializeDemoWorkflow();
   }, [data]);
 
-  // Handlers
   const handleSendNotification = async () => {
     try {
       const formValues = form.getValues();
@@ -177,7 +176,7 @@ export function InboxPlayground() {
           <CustomizeInbox form={form} />
 
           {hasNotificationBeenSent && (
-            <div className="px-2">
+            <div className="px-3">
               <InlineToast
                 variant="tip"
                 title="Send Again?"
