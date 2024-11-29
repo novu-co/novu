@@ -59,6 +59,7 @@
     "@sentry/tracing": "^7.40.0",
     "@types/newrelic": "^9.14.0",
     "@upstash/ratelimit": "^0.4.4",
+    "@novu/api": "^0.0.1-alpha.39",
     "axios": "^1.6.8",
     "liquidjs": "^10.13.1",
     "bcrypt": "^5.0.0",
