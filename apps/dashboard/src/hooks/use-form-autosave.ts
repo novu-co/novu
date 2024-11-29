@@ -32,6 +32,7 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
       if (!isDirty || isReadOnly) {
         return;
       }
+      // manually trigger the validation of the form
       const isValid = await form.trigger();
       if (!isValid) {
         return;
@@ -64,14 +65,14 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
   );
 
   // flush the form updates right away
-  const flushFormUpdates = (): Promise<void> => {
+  const saveForm = (): Promise<void> => {
     return new Promise((resolve) => {
       // await for the state to be updated
       setTimeout(async () => {
         // use the form reference instead of destructuring the props to avoid stale closures
         const form = formRef.current;
         const values = form.getValues();
-        await onSave({ ...values });
+        await onSave(values);
 
         resolve();
       }, 0);
@@ -86,6 +87,6 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
 
   return {
     onBlur,
-    flushFormUpdates,
+    saveForm,
   };
 }

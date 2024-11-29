@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { completions } from '@/utils/liquid-autocomplete';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 import { autocompletion } from '@codemirror/autocomplete';
-import { useFlushFormUpdates } from '@/components/workflow-editor/steps/flush-form-updates-context';
+import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
 
 type URLInputProps = Omit<InputProps, 'value' | 'onChange' | 'size'> & {
   options: string[];
@@ -29,7 +29,7 @@ export const URLInput = ({
   variables = [],
 }: URLInputProps) => {
   const { control, getFieldState } = useFormContext();
-  const { flushFormUpdates } = useFlushFormUpdates();
+  const { saveForm } = useSaveForm();
   const url = getFieldState(`${urlKey}`);
   const target = getFieldState(`${targetKey}`);
   const error = url.error || target.error;
@@ -71,7 +71,7 @@ export const URLInput = ({
                       value={field.value}
                       onValueChange={(value) => {
                         field.onChange(value);
-                        flushFormUpdates();
+                        saveForm();
                       }}
                     >
                       <SelectTrigger className="h-full max-w-24 rounded-l-none border-0 border-l">

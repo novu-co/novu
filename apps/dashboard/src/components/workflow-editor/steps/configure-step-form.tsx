@@ -24,7 +24,11 @@ import { Separator } from '@/components/primitives/separator';
 import { SidebarContent, SidebarFooter, SidebarHeader } from '@/components/side-navigation/sidebar';
 import TruncatedText from '@/components/truncated-text';
 import { stepSchema } from '@/components/workflow-editor/schema';
-import { getFirstBodyErrorMessage, getFirstControlsErrorMessage } from '@/components/workflow-editor/step-utils';
+import {
+  getFirstBodyErrorMessage,
+  getFirstControlsErrorMessage,
+  updateStepInWorkflow,
+} from '@/components/workflow-editor/step-utils';
 import { ConfigureInAppStepTemplateCta } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-template-cta';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { buildRoute, ROUTES } from '@/utils/routes';
@@ -40,6 +44,7 @@ type ConfigureStepFormProps = {
   step: StepDataDto;
   update: (data: UpdateWorkflowDto) => void;
 };
+
 export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   const { step, workflow, update, environment } = props;
   const navigate = useNavigate();
@@ -66,10 +71,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     form,
     isReadOnly: isCodeCreatedWorkflow,
     save: (data) => {
-      update({
-        ...workflow,
-        steps: workflow.steps.map((s) => (s._id === step._id ? { ...s, ...data } : s)),
-      });
+      update(updateStepInWorkflow(workflow, data));
     },
   });
 

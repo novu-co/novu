@@ -45,7 +45,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
     shouldFocusError: false,
   });
 
-  const { onBlur, flushFormUpdates } = useFormAutosave({
+  const { onBlur, saveForm } = useFormAutosave({
     previousData: workflow,
     form,
     isReadOnly,
@@ -54,7 +54,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
 
   const onPauseWorkflow = (active: boolean) => {
     form.setValue('active', active, { shouldValidate: true, shouldDirty: true });
-    flushFormUpdates();
+    saveForm();
   };
 
   return (
@@ -184,7 +184,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                         {...field}
                         onChange={(tags) => {
                           form.setValue('tags', tags, { shouldValidate: true, shouldDirty: true });
-                          flushFormUpdates();
+                          saveForm();
                         }}
                         disabled={isReadOnly}
                         value={field.value ?? []}

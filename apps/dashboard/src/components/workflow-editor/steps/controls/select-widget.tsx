@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { capitalize } from '@/utils/string';
-import { useFlushFormUpdates } from '@/components/workflow-editor/steps/flush-form-updates-context';
+import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
 import { getFieldName } from './template-utils';
 
 export function SelectWidget(props: WidgetProps) {
@@ -23,7 +23,7 @@ export function SelectWidget(props: WidgetProps) {
   const extractedName = useMemo(() => getFieldName(id), [id]);
 
   const { control } = useFormContext();
-  const { flushFormUpdates } = useFlushFormUpdates();
+  const { saveForm } = useSaveForm();
 
   return (
     <FormField
@@ -37,7 +37,7 @@ export function SelectWidget(props: WidgetProps) {
               value={field.value}
               onValueChange={(value) => {
                 field.onChange(value);
-                flushFormUpdates();
+                saveForm();
               }}
               disabled={disabled || readonly}
               required={required}

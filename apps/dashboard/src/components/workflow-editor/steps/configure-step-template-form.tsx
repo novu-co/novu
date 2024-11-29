@@ -1,6 +1,6 @@
-import { flattenIssues } from '@/components/workflow-editor/step-utils';
-import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
-import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
+import { useCallback, useEffect, useMemo } from 'react';
+import merge from 'lodash.merge';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   type StepDataDto,
@@ -9,13 +9,14 @@ import {
   UpdateWorkflowDto,
   type WorkflowResponseDto,
 } from '@novu/shared';
-import merge from 'lodash.merge';
-import { useCallback, useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+
+import { flattenIssues, updateStepControlValuesInWorkflow } from '@/components/workflow-editor/step-utils';
+import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
+import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
 import { OtherStepTabs } from './other-steps-tabs';
 import { Form } from '@/components/primitives/form/form';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { FlashFormUpdatesContext } from '@/components/workflow-editor/steps/flush-form-updates-context';
+import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 
 const STEP_TYPE_TO_EDITOR: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
   [StepTypeEnum.EMAIL]: OtherStepTabs,
@@ -62,19 +63,11 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
     shouldFocusError: false,
   });
 
-  const { onBlur, flushFormUpdates } = useFormAutosave({
+  const { onBlur, saveForm } = useFormAutosave({
     previousData: defaultValues,
     form,
     save: (data) => {
-      update({
-        ...workflow,
-        steps: workflow.steps.map((s) => {
-          if (s._id === step._id) {
-            return { ...s, controlValues: data };
-          }
-          return s;
-        }),
-      });
+      update(updateStepControlValuesInWorkflow(workflow, step, data));
     },
   });
 
@@ -91,14 +84,14 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
 
   const Editor = STEP_TYPE_TO_EDITOR[step.type];
 
-  const value = useMemo(() => ({ flushFormUpdates }), [flushFormUpdates]);
+  const value = useMemo(() => ({ saveForm }), [saveForm]);
 
   return (
     <Form {...form}>
       <form className="flex h-full flex-col" onBlur={onBlur}>
-        <FlashFormUpdatesContext.Provider value={value}>
+        <SaveFormContext.Provider value={value}>
           <Editor workflow={workflow} step={step} />
-        </FlashFormUpdatesContext.Provider>
+        </SaveFormContext.Provider>
       </form>
     </Form>
   );
