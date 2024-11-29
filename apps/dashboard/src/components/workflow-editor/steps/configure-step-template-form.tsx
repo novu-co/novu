@@ -22,6 +22,7 @@ const STEP_TYPE_TO_EDITOR: Record<StepTypeEnum, (args: ConfigureStepTemplateForm
   [StepTypeEnum.CUSTOM]: () => null,
 };
 
+// Use the UI Schema to build the default values if it exists else use the data schema (code-first approach) values
 const calculateDefaultValues = (step: StepDataDto) => {
   if (Object.keys(step.controls.uiSchema ?? {}).length !== 0) {
     return merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values);
@@ -44,7 +45,6 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
   const schema = useMemo(() => buildDynamicZodSchema(step.controls.dataSchema ?? {}), [step.controls.dataSchema]);
 
   const defaultValues = useMemo(() => {
-    // Use the UI Schema to build the default values if it exists else use the data schema (code-first approach) values
     return calculateDefaultValues(step);
   }, []);
 
