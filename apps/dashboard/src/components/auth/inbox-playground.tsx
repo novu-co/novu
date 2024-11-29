@@ -91,36 +91,7 @@ export function InboxPlayground() {
       const workflow = data?.workflows.find((workflow) => workflow.workflowId === 'onboarding-demo-workflow');
 
       if (!workflow) {
-        await createWorkflow({
-          name: 'Onboarding Demo Workflow',
-          description: 'A demo workflow to showcase the Inbox component',
-          workflowId: 'onboarding-demo-workflow',
-          steps: [
-            {
-              name: 'Inbox',
-              type: StepTypeEnum.IN_APP,
-              controlValues: {
-                subject: '{{payload.subject}}',
-                body: '{{payload.body}}',
-                primaryAction: {
-                  label: '{{payload.primaryActionLabel}}',
-                  redirect: {
-                    target: '_self',
-                    url: '',
-                  },
-                },
-                secondaryAction: {
-                  label: '{{payload.secondaryActionLabel}}',
-                  redirect: {
-                    target: '_self',
-                    url: '',
-                  },
-                },
-              },
-            },
-          ],
-          __source: WorkflowCreationSourceEnum.DASHBOARD,
-        });
+        await createDemoWorkflow();
       }
     })();
   }, [data]);
@@ -336,4 +307,37 @@ export function InboxPlayground() {
       </div>
     </div>
   );
+}
+
+async function createDemoWorkflow() {
+  await createWorkflow({
+    name: 'Onboarding Demo Workflow',
+    description: 'A demo workflow to showcase the Inbox component',
+    workflowId: 'onboarding-demo-workflow',
+    steps: [
+      {
+        name: 'Inbox',
+        type: StepTypeEnum.IN_APP,
+        controlValues: {
+          subject: '{{payload.subject}}',
+          body: '{{payload.body}}',
+          primaryAction: {
+            label: '{{payload.primaryActionLabel}}',
+            redirect: {
+              target: '_self',
+              url: '',
+            },
+          },
+          secondaryAction: {
+            label: '{{payload.secondaryActionLabel}}',
+            redirect: {
+              target: '_self',
+              url: '',
+            },
+          },
+        },
+      },
+    ],
+    __source: WorkflowCreationSourceEnum.DASHBOARD,
+  });
 }
