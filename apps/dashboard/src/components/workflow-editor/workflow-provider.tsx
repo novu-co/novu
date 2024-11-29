@@ -6,7 +6,6 @@ import { ToastIcon } from '@/components/primitives/sonner';
 import { showToast } from '@/components/primitives/sonner-helpers';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useFetchWorkflow, useUpdateWorkflow } from '@/hooks';
-import { useDebounce } from '@/hooks/use-debounce';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 import { createContextHook } from '@/utils/context';
 import { buildRoute, ROUTES } from '@/utils/routes';
@@ -21,12 +20,12 @@ import {
 } from '@/components/primitives/alert-dialog';
 import { RiAlertFill } from 'react-icons/ri';
 import { CheckCircleIcon } from 'lucide-react';
+import { useInvocationQueue } from '@/hooks/use-invocation-queue';
 
 export type WorkflowContextType = {
   isPending: boolean;
   workflow?: WorkflowResponseDto;
   update: (data: UpdateWorkflowDto) => void;
-  debouncedUpdate: (data: UpdateWorkflowDto) => void;
   patch: (data: PatchWorkflowDto) => void;
   onDirtyChange: (isDirty: boolean) => void;
 };
@@ -43,6 +42,8 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
   const { workflow, isPending, error } = useFetchWorkflow({
     workflowSlug,
   });
+
+  const { enqueue } = useInvocationQueue();
 
   const { patchWorkflow, isPending: isPatchPending } = usePatchWorkflow({
     //TODO: Make these toasts more DRY
@@ -174,25 +175,23 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
     [isPatchPending, isUpdatePending, isFormDirty]
   );
 
-  const debounce = useDebounce(updateWorkflow, 500);
-  const debouncedUpdate = (data: UpdateWorkflowDto) => {
-    if (workflow) {
-      debounce({ id: workflow.workflowId, workflow: data });
-    }
-  };
+  const update = useCallback(
+    (data: UpdateWorkflowDto) => {
+      if (workflow) {
+        enqueue(() => updateWorkflow({ workflowId: workflow.workflowId, workflow: { ...data } }));
+      }
+    },
+    [enqueue, updateWorkflow, workflow]
+  );
 
-  const update = (data: UpdateWorkflowDto) => {
-    if (workflow) {
-      debouncedUpdate(data);
-      debounce.flush();
-    }
-  };
-
-  const patch = (data: PatchWorkflowDto) => {
-    if (workflow) {
-      patchWorkflow({ workflow: data, workflowId: workflow.workflowId });
-    }
-  };
+  const patch = useCallback(
+    (data: PatchWorkflowDto) => {
+      if (workflow) {
+        enqueue(() => patchWorkflow({ workflowId: workflow.workflowId, workflow: { ...data } }));
+      }
+    },
+    [enqueue, patchWorkflow, workflow]
+  );
 
   useLayoutEffect(() => {
     if (error) {
@@ -237,6 +236,11 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [blocker]);
 
+  const value = useMemo(
+    () => ({ update, patch, isPending, workflow, onDirtyChange: setIsFormDirty }),
+    [update, patch, isPending, workflow, setIsFormDirty]
+  );
+
   return (
     <>
       <SavingChangesDialog
@@ -244,11 +248,7 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
         isUpdatePatchPending={isUpdatePatchPending}
         onCancel={handleCancelNavigation}
       />
-      <WorkflowContext.Provider
-        value={{ debouncedUpdate, update, patch, isPending, workflow, onDirtyChange: setIsFormDirty }}
-      >
-        {children}
-      </WorkflowContext.Provider>
+      <WorkflowContext.Provider value={value}>{children}</WorkflowContext.Provider>
     </>
   );
 };

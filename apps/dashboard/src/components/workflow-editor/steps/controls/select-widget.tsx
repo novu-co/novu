@@ -3,6 +3,7 @@ import { useFormContext } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { capitalize } from '@/utils/string';
+import { useFlushFormUpdates } from '../flush-form-updates-context';
 
 export function SelectWidget(props: WidgetProps) {
   const { label, required, readonly, options, name } = props;
@@ -15,6 +16,7 @@ export function SelectWidget(props: WidgetProps) {
   });
 
   const { control } = useFormContext();
+  const { flushFormUpdates } = useFlushFormUpdates();
 
   return (
     <FormField
@@ -24,7 +26,15 @@ export function SelectWidget(props: WidgetProps) {
         <FormItem className="my-2 py-1">
           <FormLabel>{capitalize(label)}</FormLabel>
           <FormControl>
-            <Select value={field.value} onValueChange={field.onChange} disabled={readonly} required={required}>
+            <Select
+              value={field.value}
+              onValueChange={(value) => {
+                field.onChange(value);
+                flushFormUpdates();
+              }}
+              disabled={readonly}
+              required={required}
+            >
               <SelectTrigger className="group p-1.5 shadow-sm last:[&>svg]:hidden">
                 <SelectValue asChild>
                   <div className="flex items-center gap-2">

@@ -2,11 +2,13 @@ import { useFormContext } from 'react-hook-form';
 
 import { FormControl, FormField, FormItem } from '@/components/primitives/form/form';
 import { AvatarPicker } from '@/components/primitives/form/avatar-picker';
+import { useFlushFormUpdates } from '../flush-form-updates-context';
 
 const avatarKey = 'avatar';
 
 export const InAppAvatar = () => {
   const { control } = useFormContext();
+  const { flushFormUpdates } = useFlushFormUpdates();
 
   return (
     <FormField
@@ -15,7 +17,13 @@ export const InAppAvatar = () => {
       render={({ field }) => (
         <FormItem>
           <FormControl>
-            <AvatarPicker {...field} />
+            <AvatarPicker
+              {...field}
+              onPick={(value) => {
+                field.onChange(value);
+                flushFormUpdates();
+              }}
+            />
           </FormControl>
         </FormItem>
       )}

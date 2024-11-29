@@ -4,13 +4,14 @@ import { buildDefaultValues, buildDynamicZodSchema } from '@/utils/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type StepDataDto, StepTypeEnum, UpdateWorkflowDto, type WorkflowResponseDto } from '@novu/shared';
 import merge from 'lodash.merge';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { OtherStepTabs } from './other-steps-tabs';
 import { Form } from '@/components/primitives/form/form';
-import { useFormAutosave } from '@/hooks';
+import { useFormAutosave } from '@/hooks/use-form-autosave';
+import { FlashFormUpdatesContext } from './flush-form-updates-context';
 
-const STEP_TYPE_TO_EDITOR: Record<StepTypeEnum, (args: ConfigureStepTemplateFormProps) => React.JSX.Element | null> = {
+const STEP_TYPE_TO_EDITOR: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
   [StepTypeEnum.EMAIL]: OtherStepTabs,
   [StepTypeEnum.CHAT]: OtherStepTabs,
   [StepTypeEnum.IN_APP]: InAppTabs,
@@ -27,55 +28,65 @@ export type StepEditorProps = {
   step: StepDataDto;
 };
 
-export type ConfigureStepTemplateFormProps = StepEditorProps & {
-  debouncedUpdate: (data: UpdateWorkflowDto) => void;
+type ConfigureStepTemplateFormProps = StepEditorProps & {
+  update: (data: UpdateWorkflowDto) => void;
 };
+
 export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps) => {
-  const { workflow, step, debouncedUpdate } = props;
-
+  const { workflow, step, update } = props;
   const schema = useMemo(() => buildDynamicZodSchema(step.controls.dataSchema ?? {}), [step.controls.dataSchema]);
-
   const defaultValues = useMemo(
     () => merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values),
-    []
+    [step]
   );
 
   const form = useForm({
-    mode: 'onChange',
     resolver: zodResolver(schema),
     defaultValues: defaultValues,
-    shouldFocusError: true,
+    shouldFocusError: false,
   });
 
-  const setIssuesFromStep = (step: StepDataDto) => {
-    const issues = flattenIssues(step.issues?.controls);
-    Object.entries(issues).forEach(([key, value]) => {
-      form.setError(key as string, { message: value }, { shouldFocus: true });
-    });
-  };
+  const { onBlur, flushFormUpdates } = useFormAutosave({
+    previousData: defaultValues,
+    form,
+    update: (data) => {
+      update({
+        ...workflow,
+        steps: workflow.steps.map((s) => {
+          if (s._id === step._id) {
+            return { ...s, controlValues: data };
+          }
+          return s;
+        }),
+      });
+    },
+  });
+
+  const setIssuesFromStep = useCallback(
+    (step: StepDataDto) => {
+      const issues = flattenIssues(step.issues?.controls);
+      Object.entries(issues).forEach(([key, value]) => {
+        form.setError(key as string, { message: value });
+      });
+    },
+    [form]
+  );
 
   useEffect(() => {
     form.reset(merge(buildDefaultValues(step.controls.uiSchema ?? {}), step?.controls.values));
     setIssuesFromStep(step);
-  }, [step]);
-
-  useFormAutosave(form, (data) => {
-    debouncedUpdate({
-      ...workflow,
-      steps: workflow.steps.map((s) => {
-        if (s._id === step._id) {
-          return { ...s, controlValues: data };
-        }
-        return s;
-      }),
-    });
-  });
+  }, [form, step, setIssuesFromStep]);
 
   const Editor = STEP_TYPE_TO_EDITOR[step.type];
+
+  const value = useMemo(() => ({ flushFormUpdates }), [flushFormUpdates]);
+
   return (
     <Form {...form}>
-      <form className="flex h-full flex-col">
-        <Editor workflow={workflow} step={step} debouncedUpdate={debouncedUpdate} />
+      <form className="flex h-full flex-col" onBlur={onBlur}>
+        <FlashFormUpdatesContext.Provider value={value}>
+          <Editor workflow={workflow} step={step} />
+        </FlashFormUpdatesContext.Provider>
       </form>
     </Form>
   );

@@ -19,7 +19,7 @@ const transitionSetting = { ease: [0.29, 0.83, 0.57, 0.99], duration: 0.4 };
 
 export const ConfigureStepTemplate = () => {
   const navigate = useNavigate();
-  const { workflow, debouncedUpdate } = useWorkflow();
+  const { workflow, update } = useWorkflow();
   const { step } = useStep();
   const handleCloseSheet = () => {
     navigate('..', { relative: 'path' });
@@ -68,7 +68,7 @@ export const ConfigureStepTemplate = () => {
                 <SheetTitle />
                 <SheetDescription />
               </VisuallyHidden>
-              <ConfigureStepTemplateForm workflow={workflow} step={step} debouncedUpdate={debouncedUpdate} />
+              <ConfigureStepTemplateForm workflow={workflow} step={step} update={update} />
             </motion.div>
           </SheetContentBase>
         </SheetPortal>
