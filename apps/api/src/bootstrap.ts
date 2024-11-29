@@ -1,6 +1,6 @@
+import 'newrelic';
 import './config/env.config';
 import './instrument';
-import 'newrelic';
 
 import helmet from 'helmet';
 import { INestApplication, Logger, ValidationPipe, VersioningType } from '@nestjs/common';
