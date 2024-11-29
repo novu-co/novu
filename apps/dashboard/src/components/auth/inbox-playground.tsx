@@ -325,9 +325,6 @@ export function InboxPlayground() {
                 </>
               ) : (
                 <>
-                  <Button variant="ghost" size="sm" className="gap-1">
-                    Skip to Dashboard
-                  </Button>
                   <Button
                     size="sm"
                     className="px-2"

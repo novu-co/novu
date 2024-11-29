@@ -41,6 +41,9 @@ export function InboxPreviewContent({
         colorForeground: foregroundColor,
       },
       elements: {
+        inbox__popoverContent: {
+          maxHeight: '440px',
+        },
         button: {
           fontSize: '12px',
           lineHeight: '24px',
