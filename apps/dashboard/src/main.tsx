@@ -24,6 +24,7 @@ import { FeatureFlagsProvider } from '@/context/feature-flags-provider';
 import { EditStepTemplate } from '@/components/workflow-editor/steps/edit-step-template';
 import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workflow';
 import { EditStep } from '@/components/workflow-editor/steps/edit-step';
+import { InboxEmbedSuccessPage } from './pages/inbox-embed-success-page';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
           {
             path: ROUTES.INBOX_EMBED,
             element: <InboxEmbedPage />,
+          },
+          {
+            path: ROUTES.INBOX_EMBED_SUCCESS,
+            element: <InboxEmbedSuccessPage />,
           },
         ],
       },

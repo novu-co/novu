@@ -6,6 +6,7 @@ export const ROUTES = {
   USECASE_SELECT: '/onboarding/usecase',
   INBOX_USECASE: '/onboarding/inbox',
   INBOX_EMBED: '/onboarding/inbox/embed',
+  INBOX_EMBED_SUCCESS: '/onboarding/inbox/success',
   ROOT: '/',
   ENV: '/env',
   WORKFLOWS: '/env/:environmentSlug/workflows',

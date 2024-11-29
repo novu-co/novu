@@ -4,12 +4,15 @@ import { Button } from '../primitives/button';
 import { showToast } from '../primitives/sonner-helpers';
 import { ToastIcon } from '../primitives/sonner';
 import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
+import { ROUTES } from '../../utils/routes';
+import { useNavigate } from 'react-router-dom';
 
 interface InboxConnectedGuideProps {
   subscriberId: string;
 }
 
 export function InboxConnectedGuide({ subscriberId }: InboxConnectedGuideProps) {
+  const navigate = useNavigate();
   const { triggerWorkflow, isPending } = useTriggerWorkflow();
 
   async function handleSendNotification() {
@@ -36,6 +39,7 @@ export function InboxConnectedGuide({ subscriberId }: InboxConnectedGuideProps) 
           position: 'bottom-center',
         },
       });
+      navigate(ROUTES.INBOX_EMBED_SUCCESS);
     } catch (error) {
       showToast({
         children: () => (
