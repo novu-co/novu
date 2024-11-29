@@ -26,11 +26,19 @@ export default function TruncatedText(props: TruncatedTextProps) {
     <Tooltip>
       <TooltipTrigger asChild>
         {asChild ? (
-          <Slot ref={textRef} className={cn('block truncate', className)} {...rest}>
+          <Slot
+            ref={textRef}
+            className={cn('truncate', isTruncated && 'block', !isTruncated && 'inline-flex', className)}
+            {...rest}
+          >
             {children}
           </Slot>
         ) : (
-          <span ref={textRef} className={cn('block truncate', className)} {...rest}>
+          <span
+            ref={textRef}
+            className={cn('truncate', isTruncated && 'block', !isTruncated && 'inline-flex', className)}
+            {...rest}
+          >
             {children}
           </span>
         )}

@@ -81,7 +81,9 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         children: () => (
           <>
             <ToastIcon variant="success" />
-            <span className="text-sm">Deleted</span>
+            <span className="text-sm">
+              Deleted workflow <span className="font-bold">{workflow.name}</span>.
+            </span>
           </>
         ),
         options: toastOptions,
@@ -92,7 +94,9 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         children: () => (
           <>
             <ToastIcon variant="error" />
-            <span className="text-sm">Failed to delete</span>
+            <span className="text-sm">
+              Failed to delete workflow <span className="font-bold">{workflow.name}</span>.
+            </span>
           </>
         ),
         options: toastOptions,
@@ -112,7 +116,9 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         children: () => (
           <>
             <ToastIcon variant="success" />
-            <span className="text-sm">{data.active ? 'Enabled' : 'Paused'} workflow</span>
+            <span className="text-sm">
+              {data.active ? 'Enabled' : 'Paused'} workflow <span className="font-bold">{workflow.name}</span>.
+            </span>
           </>
         ),
         options: toastOptions,
@@ -123,7 +129,10 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         children: () => (
           <>
             <ToastIcon variant="error" />
-            <span className="text-sm">Failed to {workflow.active ? 'enable' : 'pause'} workflow</span>
+            <span className="text-sm">
+              Failed to {workflow.active ? 'enable' : 'pause'} workflow{' '}
+              <span className="font-bold">{workflow.name}</span>.
+            </span>
           </>
         ),
         options: toastOptions,
@@ -203,7 +212,15 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           onOpenChange={setIsDeleteModalOpen}
           onConfirm={onDeleteWorkflow}
           title="Are you sure?"
-          description={`You're about to delete the ${workflow.name}, this action cannot be undone.`}
+          description={
+            <>
+              You're about to delete the{' '}
+              <TruncatedText className="max-w-[32ch] font-bold">{workflow.name}</TruncatedText> workflow, this action is
+              permanent. <br />
+              <br />
+              You won't be able to trigger this workflow anymore.
+            </>
+          }
           confirmButtonText="Delete"
           isLoading={isDeleteWorkflowPending}
         />

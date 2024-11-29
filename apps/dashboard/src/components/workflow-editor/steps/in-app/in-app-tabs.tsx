@@ -14,7 +14,7 @@ import { CustomStepControls } from '../controls/custom-step-controls';
 import { ConfigureStepTemplateFormProps } from '@/components/workflow-editor/steps/configure-step-template-form';
 import { useDebouncedPreview } from '../use-debounced-preview';
 
-const tabsContentClassName = 'h-full w-full px-3 py-3.5 overflow-y-auto';
+const tabsContentClassName = 'h-full w-full overflow-y-auto';
 
 export const InAppTabs = (props: ConfigureStepTemplateFormProps) => {
   const { workflow, step } = props;
