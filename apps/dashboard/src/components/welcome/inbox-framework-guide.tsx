@@ -68,13 +68,11 @@ export function InboxFrameworkGuide({
     const isDefaultApi = API_HOSTNAME === 'https://api.novu.co';
     const isDefaultWs = WEBSOCKET_HOSTNAME === 'https://ws.novu.co';
 
-    // Create the common URL props based on environment
     const urlProps = [
       ...(isDefaultApi ? [] : [`backendUrl="${API_HOSTNAME}"`]),
       ...(isDefaultWs ? [] : [`socketUrl="${WEBSOCKET_HOSTNAME}"`]),
     ].join('\n      ');
 
-    // Create the full Inbox component string (with appearance)
     const inboxComponentString = `<Inbox
       applicationIdentifier="${currentEnvironment.identifier}"
       subscriberId="${subscriberId}"
@@ -87,7 +85,6 @@ export function InboxFrameworkGuide({
       }}
     />`;
 
-    // Create the full NovuProvider component string (without appearance)
     const novuProviderString = `<NovuProvider
       applicationIdentifier="${currentEnvironment.identifier}"
       subscriberId="${subscriberId}"${urlProps ? '\n      ' + urlProps : ''}
@@ -117,7 +114,6 @@ export function InboxFrameworkGuide({
 
   return (
     <>
-      {/* Header Section */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
