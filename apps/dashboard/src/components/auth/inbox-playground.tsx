@@ -175,11 +175,11 @@ export function InboxPlayground() {
 
           <div className="flex-1">
             <h2 className="text-lg font-medium">Send your first Inbox notification</h2>
-            <p className="text-foreground-400 text-sm">Customise your notification and hit 'Send notification' 🎉</p>
+            <p className="text-foreground-400 text-sm">Customize your notification and hit 'Send notification' 🎉</p>
           </div>
         </div>
 
-        <Button variant="link" className="text-foreground-600 text-xs">
+        <Button variant="link" className="text-foreground-600 text-xs" onClick={() => navigate(ROUTES.WELCOME)}>
           Skip, I'll explore myself
         </Button>
       </div>

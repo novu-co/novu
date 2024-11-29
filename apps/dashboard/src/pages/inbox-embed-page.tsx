@@ -26,7 +26,7 @@ export function InboxEmbedPage() {
               </div>
             </div>
 
-            <Button variant="link" className="text-foreground-600 text-xs" onClick={() => navigate(ROUTES.ROOT)}>
+            <Button variant="link" className="text-foreground-600 text-xs" onClick={() => navigate(ROUTES.WELCOME)}>
               Skip, I'll explore myself
             </Button>
           </div>

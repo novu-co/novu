@@ -29,7 +29,7 @@ const customizationTip = {
   title: 'Tip:',
   description: (
     <>
-      You can customise your inbox to match your app theme,{' '}
+      You can customize your inbox to match your app theme,{' '}
       <a href="https://docs.novu.co/inbox/react/styling#appearance-prop" target="_blank" className="underline">
         learn more
       </a>
