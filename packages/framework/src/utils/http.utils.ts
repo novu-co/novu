@@ -1,5 +1,10 @@
-import { checkIsResponseError } from '@novu/shared';
+import type { IResponseError } from '@novu/shared';
 import { BridgeError, MissingSecretKeyError, PlatformError } from '../errors';
+
+// TODO: Reuse from @novu/shared after debugging the ESM/CJS import issues in Next.js 13
+export const checkIsResponseError = (err: unknown): err is IResponseError => {
+  return !!err && typeof err === 'object' && 'error' in err && 'message' in err && 'statusCode' in err;
+};
 
 export const initApiClient = (secretKey: string, apiUrl: string) => {
   if (!secretKey) {
