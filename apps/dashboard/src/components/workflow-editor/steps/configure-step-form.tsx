@@ -66,7 +66,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     previousData: step,
     form,
     isReadOnly: isCodeCreatedWorkflow,
-    update: (data) => {
+    save: (data) => {
       update({
         ...workflow,
         steps: workflow.steps.map((s) => (s._id === step._id ? { ...s, ...data } : s)),

@@ -50,7 +50,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
     previousData: workflow,
     form,
     isReadOnly,
-    update,
+    save: update,
   });
 
   const onPauseWorkflow = (active: boolean) => {

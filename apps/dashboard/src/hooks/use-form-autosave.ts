@@ -10,20 +10,20 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
   previousData,
   form: propsForm,
   isReadOnly,
-  update,
+  save,
 }: {
   previousData: U;
   form: UseFormReturn<T>;
   isReadOnly?: boolean;
-  update: (data: U) => void;
+  save: (data: U) => void;
 }) {
   const formRef = useDataRef(propsForm);
   const watchedData = useWatch<T>({
     control: propsForm.control,
   });
 
-  const onUpdate = async (data: T) => {
-    // use the form reference instead of descructuring the props to avoid stale closures
+  const onSave = async (data: T) => {
+    // use the form reference instead of destructuring the props to avoid stale closures
     const form = formRef.current;
     const isDirty = form.formState.isDirty;
     if (!isDirty || isReadOnly) {
@@ -38,22 +38,22 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
     // reset the dirty fields right away because on slow networks the patch request might take a while
     // so other blur/change events might trigger in the meantime
     form.reset(values);
-    update(values);
+    save(values);
   };
 
   const onFlushInternal = async () => {
-    // use the form reference instead of descructuring the props to avoid stale closures
+    // use the form reference instead of destructuring the props to avoid stale closures
     const form = formRef.current;
     const values = form.getValues();
-    onUpdate({ ...values });
+    onSave({ ...values });
   };
 
-  const debouncedOnUpdate = useDebounce(onUpdate, TEN_SECONDS);
+  const debouncedOnSave = useDebounce(onSave, TEN_SECONDS);
 
   const onBlur = (e: React.FocusEvent<HTMLFormElement, Element>) => {
     e.preventDefault();
     e.stopPropagation();
-    propsForm.handleSubmit(onUpdate)(e);
+    propsForm.handleSubmit(onSave)(e);
   };
 
   // flush the form updates right away
@@ -71,8 +71,8 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
   // handles form changes
   useEffect(() => {
     const values = formRef.current.getValues();
-    debouncedOnUpdate(values);
-  }, [watchedData, debouncedOnUpdate, formRef]);
+    debouncedOnSave(values);
+  }, [watchedData, debouncedOnSave, formRef]);
 
   return {
     onBlur,

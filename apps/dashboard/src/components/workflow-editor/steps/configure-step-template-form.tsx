@@ -49,7 +49,7 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
   const { onBlur, flushFormUpdates } = useFormAutosave({
     previousData: defaultValues,
     form,
-    update: (data) => {
+    save: (data) => {
       update({
         ...workflow,
         steps: workflow.steps.map((s) => {
