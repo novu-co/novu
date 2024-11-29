@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Info, LightbulbIcon, Loader2 } from 'lucide-react';
 import { Button } from '../primitives/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../primitives/accordion';
+import { ColorPicker } from '../primitives/color-picker';
 import { RiArrowLeftSLine, RiInputField, RiLayoutLine, RiNotification2Fill } from 'react-icons/ri';
 import { InboxPreviewContent } from './inbox-preview-content';
 import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
@@ -17,6 +18,7 @@ import { showToast } from '../primitives/sonner-helpers';
 import { ToastIcon } from '../primitives/sonner';
 import { ROUTES } from '../../utils/routes';
 import { useNavigate } from 'react-router-dom';
+import { Popover, PopoverContent, PopoverTrigger } from '../primitives/popover';
 
 interface PreviewStyle {
   id: string;
@@ -37,6 +39,7 @@ export function InboxPlayground() {
       z.object({
         subject: z.string(),
         body: z.string(),
+        primaryColor: z.string(),
         primaryAction: z.object({
           label: z.string(),
           redirect: z.object({
@@ -56,6 +59,7 @@ export function InboxPlayground() {
     values: {
       subject: '**Welcome to Inbox!**',
       body: 'This is your first notification. Customize and explore more features.',
+      primaryColor: '#DD2450',
       primaryAction: {
         label: 'Add to your app',
         redirect: {
@@ -219,20 +223,22 @@ export function InboxPlayground() {
 
                   <div className="space-y-2">
                     <div className="flex gap-2">
-                      <div className="flex-1 rounded-lg border p-0.5">
-                        <div className="flex items-center justify-between p-2">
-                          <span className="text-sm">Primary color</span>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-muted-foreground text-sm">#DD2450</span>
-                            <div className="h-4 w-4 rounded border bg-[#dd2450] shadow-sm" />
-                          </div>
+                      <div className="flex-1 rounded-lg border">
+                        <div className="flex items-center justify-between p-0.5 px-2">
+                          <span className="text-foreground-950 text-xs font-medium">Primary color</span>
+                          <ColorPicker
+                            value={form.watch('primaryColor')}
+                            onChange={(color) => form.setValue('primaryColor', color)}
+                          />
                         </div>
                       </div>
-
-                      <div className="flex-1 rounded-lg border p-0.5">
-                        <div className="flex items-center justify-between p-2">
-                          <span className="text-sm">Appearance: Light mode</span>
-                          <LightbulbIcon className="h-4 w-4" />
+                      <div className="flex-1 rounded-lg border">
+                        <div className="flex items-center justify-between p-0.5 px-2">
+                          <span className="text-foreground-950 text-xs font-medium">Primary color</span>
+                          <ColorPicker
+                            value={form.watch('primaryColor')}
+                            onChange={(color) => form.setValue('primaryColor', color)}
+                          />
                         </div>
                       </div>
                     </div>
