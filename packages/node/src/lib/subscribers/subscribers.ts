@@ -93,11 +93,23 @@ export class Subscribers extends WithHttp implements ISubscribers {
 
   async getPreference(
     subscriberId: string,
-    { includeInactiveChannels = true }: { includeInactiveChannels: boolean },
+    options: { includeInactiveChannels?: boolean } = {},
   ) {
-    return await this.http.get(
-      `/subscribers/${subscriberId}/preferences?includeInactiveChannels=${includeInactiveChannels}`,
-    );
+    const { includeInactiveChannels } = options;
+    const searchParams = new URLSearchParams();
+
+    if (includeInactiveChannels) {
+      searchParams.append('includeInactiveChannels', 'true');
+    }
+
+    const searchParamsString = searchParams.toString();
+
+    let url = `/subscribers/${subscriberId}/preferences`;
+    if (searchParamsString) {
+      url += `?${searchParamsString}`;
+    }
+
+    return await this.http.get(url);
   }
 
   async getGlobalPreference(subscriberId: string) {
