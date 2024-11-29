@@ -1,4 +1,4 @@
-import { RiJavascriptFill, RiNextjsFill, RiReactjsFill, RiRemixRunFill } from 'react-icons/ri';
+import { RiAngularjsFill, RiJavascriptFill, RiNextjsFill, RiReactjsFill, RiRemixRunFill } from 'react-icons/ri';
 import { Language } from '../primitives/code-block';
 import { CodeBlock } from '../primitives/code-block';
 
@@ -71,7 +71,7 @@ export const frameworks: Framework[] = [
       commonInstallStep('@novu/react'),
       {
         title: 'Add the inbox code to your Next.js app',
-        description: 'Novu uses the onNavigate prop to make your notifications navigatable in Next.js.',
+        description: 'Novu uses the router hook to make your notifications navigatable in Next.js.',
         code: `'use client';
 
 import { Inbox } from '@novu/react';
@@ -89,7 +89,7 @@ function Novu() {
   );
 }`,
         codeLanguage: 'tsx',
-        codeTitle: 'App.tsx',
+        codeTitle: 'Inbox.tsx',
       },
     ],
   },
@@ -117,6 +117,7 @@ function Novu() {
   );
 }`,
         codeLanguage: 'tsx',
+        codeTitle: 'Inbox.tsx',
       },
     ],
   },
@@ -142,7 +143,8 @@ function Novu() {
     />
   );
 }`,
-        codeLanguage: 'typescript',
+        codeLanguage: 'tsx',
+        codeTitle: 'Inbox.tsx',
       },
     ],
   },
@@ -241,13 +243,13 @@ export function YourCustomInbox() {
     ],
   },
   {
-    name: 'JavaScript',
-    icon: <RiJavascriptFill className="h-8 w-8 text-[#F7DF1E]" />,
+    name: 'Angular',
+    icon: <RiAngularjsFill className="h-8 w-8 text-[#DD0031]" />,
     installSteps: [
       commonInstallStep('@novu/js'),
       {
-        title: 'Add the inbox code to your JavaScript app',
-        description: 'Implement the notification center in your vanilla JavaScript application.',
+        title: 'Add the inbox code to your Angular app',
+        description: 'Currently, angular applications are supported with the Novu UI library.',
         code: `import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NovuUI } from '@novu/js/ui';
@@ -278,6 +280,33 @@ export class AppComponent implements AfterViewInit {
     });
   }
 }`,
+        codeLanguage: 'typescript',
+      },
+    ],
+  },
+  {
+    name: 'JavaScript',
+    icon: <RiJavascriptFill className="h-8 w-8 text-[#F7DF1E]" />,
+    installSteps: [
+      commonInstallStep('@novu/js'),
+      {
+        title: 'Add the inbox code to your JavaScript app',
+        description:
+          'You can use the Novu UI library to implement the notification center in your vanilla JavaScript application or any other non-supported framework like Vue.',
+        code: `import { NovuUI } from '@novu/js/ui';
+
+ const novu = new NovuUI({
+  options: {
+    applicationIdentifier: '123',
+    subscriberId: '456',
+  },
+});
+
+novu.mountComponent({
+  name: 'Inbox',
+  props: {},
+  element: document.getElementById('notification-inbox'),
+});`,
         codeLanguage: 'typescript',
       },
     ],

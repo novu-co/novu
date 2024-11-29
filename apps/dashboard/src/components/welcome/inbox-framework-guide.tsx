@@ -106,7 +106,9 @@ export function InboxFrameworkGuide({
         ))}
       </div>
 
-      <FrameworkInstructions framework={selectedFramework} />
+      <div className="min-h-[600px] w-full">
+        <FrameworkInstructions framework={selectedFramework} />
+      </div>
     </>
   );
 }
