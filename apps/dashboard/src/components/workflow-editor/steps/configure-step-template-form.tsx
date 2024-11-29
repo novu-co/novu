@@ -1,6 +1,6 @@
 import { flattenIssues } from '@/components/workflow-editor/step-utils';
 import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
-import { buildDefaultValues, buildDynamicZodSchema } from '@/utils/schema';
+import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   type StepDataDto,
@@ -29,6 +29,15 @@ const STEP_TYPE_TO_EDITOR: Record<StepTypeEnum, (args: StepEditorProps) => React
   [StepTypeEnum.CUSTOM]: () => null,
 };
 
+// Use the UI Schema to build the default values if it exists else use the data schema (code-first approach) values
+const calculateDefaultValues = (step: StepDataDto) => {
+  if (Object.keys(step.controls.uiSchema ?? {}).length !== 0) {
+    return merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values);
+  }
+
+  return merge(buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {}), step.controls.values);
+};
+
 export type StepEditorProps = {
   workflow: WorkflowResponseDto;
   step: StepDataDto;
@@ -42,14 +51,14 @@ type ConfigureStepTemplateFormProps = StepEditorProps & {
 export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps) => {
   const { workflow, step, issues, update } = props;
   const schema = useMemo(() => buildDynamicZodSchema(step.controls.dataSchema ?? {}), [step.controls.dataSchema]);
-  const defaultValues = useMemo(
-    () => merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values),
-    [step]
-  );
+
+  const defaultValues = useMemo(() => {
+    return calculateDefaultValues(step);
+  }, [step]);
 
   const form = useForm({
     resolver: zodResolver(schema),
-    defaultValues: defaultValues,
+    defaultValues,
     shouldFocusError: false,
   });
 

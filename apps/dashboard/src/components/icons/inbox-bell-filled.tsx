@@ -6,14 +6,10 @@ type InboxBellFilledProps = {
   codeClassName?: string;
 };
 
-export function InboxBellFilled({
-  bellClassName,
-  codeClassName,
-  ringerClassName,
-  ...props
-}: HTMLAttributes<HTMLOrSVGElement> & InboxBellFilledProps) {
+export function InboxBellFilled(props: HTMLAttributes<HTMLOrSVGElement> & InboxBellFilledProps) {
+  const { bellClassName, codeClassName, ringerClassName, ...rest } = props;
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 9 12" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 9 12" {...rest}>
       <g className={bellClassName}>
         <path
           fill="currentColor"

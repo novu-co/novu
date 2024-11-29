@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { JSONSchemaDto, UiSchema } from '@novu/shared';
+import { JSONSchemaDefinition, JSONSchemaDto, UiSchema } from '@novu/shared';
 import { capitalize } from './string';
 
 type ZodValue =
@@ -166,4 +166,63 @@ export const buildDefaultValues = (uiSchema: UiSchema): object => {
   }, {});
 
   return keys;
+};
+
+const getProperties = (defaults: Record<string, unknown>, properties?: Record<string, JSONSchemaDefinition>): void => {
+  if (!properties) return;
+
+  for (const [key, propDef] of Object.entries(properties)) {
+    const prop = propDef as JSONSchemaDto; // Narrowing to JSONSchemaDto for easier access to properties
+
+    // Handle `default` value if specified
+    if (prop.default !== undefined) {
+      defaults[key] = prop.default;
+      continue;
+    }
+
+    // Handle `type` to determine defaults
+    if (prop.type === 'object' && prop.properties) {
+      const nestedDefaults: Record<string, unknown> = {};
+      getProperties(nestedDefaults, prop.properties);
+      defaults[key] = nestedDefaults;
+      continue;
+    }
+
+    if (prop.type === 'array' && prop.items) {
+      const arrayDefaults: unknown[] = [];
+      if (Array.isArray(prop.items)) {
+        arrayDefaults.push(...prop.items.map(() => ({})));
+      } else if (typeof prop.items === 'object' && (prop.items as JSONSchemaDto).type === 'object') {
+        const itemDefaults: Record<string, unknown> = {};
+        getProperties(itemDefaults, (prop.items as JSONSchemaDto).properties);
+        arrayDefaults.push(itemDefaults);
+      }
+      defaults[key] = arrayDefaults;
+      continue;
+    }
+
+    switch (prop.type) {
+      case 'string':
+        defaults[key] = '';
+        break;
+      case 'number':
+      case 'integer':
+        defaults[key] = undefined;
+        break;
+      case 'boolean':
+        defaults[key] = false;
+        break;
+      case 'null':
+        defaults[key] = null;
+        break;
+      default:
+        defaults[key] = undefined; // Fallback for unknown or unsupported types
+    }
+  }
+};
+
+export const buildDefaultValuesOfDataSchema = (schema: JSONSchemaDto): Record<string, unknown> => {
+  const result: Record<string, unknown> = {};
+  getProperties(result, schema.properties);
+  return result;
 };

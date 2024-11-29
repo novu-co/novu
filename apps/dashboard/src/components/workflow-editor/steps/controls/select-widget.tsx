@@ -1,19 +1,26 @@
+import { useMemo } from 'react';
 import { type WidgetProps } from '@rjsf/utils';
 import { useFormContext } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { capitalize } from '@/utils/string';
 import { useFlushFormUpdates } from '@/components/workflow-editor/steps/flush-form-updates-context';
+import { getFieldName } from './template-utils';
 
 export function SelectWidget(props: WidgetProps) {
-  const { label, required, readonly, options, name } = props;
+  const { label, required, readonly, options, disabled, id } = props;
 
-  const data = options.enumOptions?.map((option) => {
-    return {
-      label: option.label,
-      value: String(option.value),
-    };
-  });
+  const data = useMemo(
+    () =>
+      options.enumOptions?.map((option) => {
+        return {
+          label: option.label,
+          value: String(option.value),
+        };
+      }),
+    [options.enumOptions]
+  );
+  const extractedName = useMemo(() => getFieldName(id), [id]);
 
   const { control } = useFormContext();
   const { flushFormUpdates } = useFlushFormUpdates();
@@ -21,9 +28,9 @@ export function SelectWidget(props: WidgetProps) {
   return (
     <FormField
       control={control}
-      name={name}
+      name={extractedName}
       render={({ field }) => (
-        <FormItem className="my-2 py-1">
+        <FormItem className="py-1">
           <FormLabel>{capitalize(label)}</FormLabel>
           <FormControl>
             <Select
@@ -32,7 +39,7 @@ export function SelectWidget(props: WidgetProps) {
                 field.onChange(value);
                 flushFormUpdates();
               }}
-              disabled={readonly}
+              disabled={disabled || readonly}
               required={required}
             >
               <SelectTrigger className="group p-1.5 shadow-sm last:[&>svg]:hidden">
