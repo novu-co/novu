@@ -5,20 +5,11 @@ import { useEnvironment } from '@/context/environment/hooks';
 
 export const ConfigureStep = () => {
   const { step } = useStep();
-  const { workflow, debouncedUpdate, update, onDirtyChange } = useWorkflow();
+  const { workflow, update } = useWorkflow();
   const { currentEnvironment } = useEnvironment();
   if (!currentEnvironment || !step || !workflow) {
     return null;
   }
 
-  return (
-    <ConfigureStepForm
-      workflow={workflow}
-      step={step}
-      environment={currentEnvironment}
-      debouncedUpdate={debouncedUpdate}
-      update={update}
-      onDirtyChange={onDirtyChange}
-    />
-  );
+  return <ConfigureStepForm workflow={workflow} step={step} environment={currentEnvironment} update={update} />;
 };

@@ -33,7 +33,6 @@ import {
 } from '@novu/application-generic';
 import { ChatOutput, ExecuteOutput } from '@novu/framework/internal';
 
-import { CreateLog } from '../../../shared/logs';
 import { SendMessageCommand } from './send-message.command';
 import { SendMessageBase } from './send-message.base';
 import { PlatformException } from '../../../shared/utils';
@@ -47,7 +46,6 @@ export class SendMessageChat extends SendMessageBase {
   constructor(
     protected subscriberRepository: SubscriberRepository,
     protected messageRepository: MessageRepository,
-    protected createLogUsecase: CreateLog,
     private compileTemplate: CompileTemplate,
     protected selectIntegration: SelectIntegration,
     protected getNovuProviderCredentials: GetNovuProviderCredentials,
@@ -57,7 +55,6 @@ export class SendMessageChat extends SendMessageBase {
   ) {
     super(
       messageRepository,
-      createLogUsecase,
       executionLogRoute,
       subscriberRepository,
       selectIntegration,

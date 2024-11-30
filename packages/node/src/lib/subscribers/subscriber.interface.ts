@@ -34,7 +34,10 @@ export interface ISubscribers {
    */
   unsetCredentials(subscriberId: string, providerId: string);
   updateOnlineStatus(subscriberId: string, online: boolean);
-  getPreference(subscriberId: string);
+  getPreference(
+    subscriberId: string,
+    { includeInactiveChannels }: { includeInactiveChannels: boolean },
+  );
   getGlobalPreference(subscriberId: string);
   getPreferenceByLevel(subscriberId: string, level: PreferenceLevelEnum);
   updatePreference(
