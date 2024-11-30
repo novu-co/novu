@@ -4,7 +4,6 @@ import {
   ChannelTypeEnum,
   GeneratePreviewResponseDto,
   JobStatusEnum,
-  JSONSchemaDto,
   PreviewPayload,
   StepDataDto,
   WorkflowOriginEnum,
@@ -22,6 +21,7 @@ import { BuildStepDataUsecase } from '../build-step-data';
 import { GeneratePreviewCommand } from './generate-preview.command';
 import { extractTemplateVars } from '../../util/template-variables/extract-template-variables';
 import { pathsToObject } from '../../util/path-to-object';
+import { createMockPayloadFromSchema, flattenObjectValues } from '../../util/utils';
 
 @Injectable()
 export class GeneratePreviewUsecase {
@@ -70,7 +70,7 @@ export class GeneratePreviewUsecase {
     const variablesExample = this.generateVariablesExample(stepData, commandControlValues);
 
     if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
-      variablesExample.payload = this.generateSamplePayload(workflow.payloadSchema);
+      variablesExample.payload = createMockPayloadFromSchema(workflow.payloadSchema);
     }
 
     return _.merge(variablesExample, commandVariablesExample as Record<string, unknown>);
@@ -78,8 +78,9 @@ export class GeneratePreviewUsecase {
 
   @Instrument()
   private generateVariablesExample(stepData: StepDataDto, commandControlValues?: Record<string, unknown>) {
-    const controlValues = Object.values(commandControlValues || stepData.controls.values).join('');
-    const variablesExample = pathsToObject(extractTemplateVars(controlValues), {
+    const controlValues = flattenObjectValues(commandControlValues || stepData.controls.values).join(' ');
+    const templateVars = extractTemplateVars(controlValues);
+    const variablesExample = pathsToObject(templateVars, {
       valuePrefix: '{{',
       valueSuffix: '}}',
     });
@@ -97,55 +98,6 @@ export class GeneratePreviewUsecase {
         userId: command.user._id,
       })
     );
-  }
-
-  /**
-   * Generates a payload based solely on the schema.
-   * Supports nested schemas and applies defaults where defined.
-   * @param JSONSchemaDto - Defining the structure. example:
-   *  {
-   *    firstName: { type: 'string', default: 'John' },
-   *    lastName: { type: 'string' }
-   *  }
-   * @returns - Generated payload. example: { firstName: 'John', lastName: '{{payload.lastName}}' }
-   */
-  @Instrument()
-  private generateSamplePayload(schema: JSONSchemaDto, path = 'payload', depth = 0): Record<string, unknown> {
-    const MAX_DEPTH = 10;
-    if (depth >= MAX_DEPTH) {
-      throw new BadRequestException({
-        message: 'Schema has surpassed the maximum allowed depth. Please specify a more shallow payload schema.',
-        maxDepth: MAX_DEPTH,
-      });
-    }
-
-    if (Object.values(schema.properties || {}).length === 0) {
-      return {};
-    }
-
-    if (schema.type !== 'object' || !schema.properties) {
-      throw new BadRequestException({
-        message: 'Schema must define an object with properties.',
-      });
-    }
-
-    return Object.entries(schema.properties).reduce((acc, [key, definition]) => {
-      if (typeof definition === 'boolean') {
-        return acc;
-      }
-
-      const currentPath = `${path}.${key}`;
-
-      if (definition.default) {
-        acc[key] = definition.default;
-      } else if (definition.type === 'object' && definition.properties) {
-        acc[key] = this.generateSamplePayload(definition, currentPath, depth + 1);
-      } else {
-        acc[key] = `{{${currentPath}}}`;
-      }
-
-      return acc;
-    }, {});
   }
 
   @Instrument()
