@@ -24,7 +24,7 @@ import { InAppControlType } from './shared';
 const SUBJECT_TEST_PAYLOAD = '{{payload.subject.test.payload}}';
 const PLACEHOLDER_SUBJECT_INAPP = '{{payload.subject}}';
 const PLACEHOLDER_SUBJECT_INAPP_PAYLOAD_VALUE = 'this is the replacement text for the placeholder';
-describe.only('Generate Preview', () => {
+describe('Generate Preview', () => {
   let session: UserSession;
   let workflowsClient: ReturnType<typeof createWorkflowClient>;
 
