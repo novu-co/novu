@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import _ from 'lodash';
 import {
   ChannelTypeEnum,
@@ -113,7 +113,10 @@ export class GeneratePreviewUsecase {
   private generateSamplePayload(schema: JSONSchemaDto, path = 'payload', depth = 0): Record<string, unknown> {
     const MAX_DEPTH = 10;
     if (depth >= MAX_DEPTH) {
-      return {};
+      throw new BadRequestException({
+        message: 'Schema has surpassed the maximum allowed depth. Please specify a more shallow payload schema.',
+        maxDepth: MAX_DEPTH,
+      });
     }
 
     if (Object.values(schema.properties || {}).length === 0) {
@@ -121,7 +124,9 @@ export class GeneratePreviewUsecase {
     }
 
     if (schema.type !== 'object' || !schema.properties) {
-      throw new Error('Schema must define an object with properties.');
+      throw new BadRequestException({
+        message: 'Schema must define an object with properties.',
+      });
     }
 
     return Object.entries(schema.properties).reduce((acc, [key, definition]) => {
