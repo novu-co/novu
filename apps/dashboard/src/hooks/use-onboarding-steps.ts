@@ -12,7 +12,7 @@ export enum StepIdEnum {
   INVITE_TEAM_MEMBER = 'invite-team-member',
   SYNC_TO_PRODUCTION = 'sync-to-production',
   CONNECT_EMAIL_PROVIDER = 'connect-email-provider',
-  CONNECT_IN_APP_PROVIDER = 'connect-in-app-provider',
+  CONNECT_IN_APP_PROVIDER = 'connect-in_app-provider',
   CONNECT_PUSH_PROVIDER = 'connect-push-provider',
   CONNECT_CHAT_PROVIDER = 'connect-chat-provider',
   CONNECT_SMS_PROVIDER = 'connect-sms-provider',
