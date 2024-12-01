@@ -1,6 +1,5 @@
 import { AuthCard } from '../components/auth/auth-card';
 import { Button } from '../components/primitives/button';
-import { SVGProps } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../utils/routes';
 import { useTelemetry } from '../hooks/use-telemetry';
@@ -50,18 +49,5 @@ export function InboxEmbedSuccessPage() {
         </div>
       </div>
     </AuthCard>
-  );
-}
-
-function SuccessArrow(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="124" height="120" viewBox="0 0 124 120" fill="none" {...props}>
-      <path
-        d="M57.7726 41.7932C59.9124 46.9372 68.3706 63.1813 77.1347 56.9207C79.6169 55.1475 81.4268 49.3982 77.8295 47.5515C73.0325 45.0889 71.3329 52.7806 72.7927 55.8469C76.6384 63.9248 88.5427 64.7525 95.7927 61.9402C101.881 59.5785 106.414 54.2069 109.74 48.7955C111.301 46.2571 111.512 43.4148 112.876 40.8842C114.987 36.9695 114.177 43.202 114.769 45.5616C115.978 50.3831 113.773 42.6138 113.365 40.9491C112.694 38.2024 106.503 41.5659 103.969 42.4419"
-        stroke="#99A0AE"
-        stroke-width="1.5"
-        stroke-linecap="round"
-      />
-    </svg>
   );
 }

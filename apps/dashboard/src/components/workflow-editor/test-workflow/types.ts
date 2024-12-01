@@ -1,1 +1,1 @@
-export type SnippetLanguage = 'shell' | 'framework' | 'typescript' | 'php' | 'go' | 'python' | 'tsx';
+export type SnippetLanguage = 'shell' | 'framework' | 'typescript' | 'php' | 'go' | 'python';

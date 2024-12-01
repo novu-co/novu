@@ -16,6 +16,24 @@ import { channelOptions } from '../components/auth/usecases-list.utils';
 import { useMutation } from '@tanstack/react-query';
 import * as Sentry from '@sentry/react';
 
+const containerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1],
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 export function UsecaseSelectPage() {
   const navigate = useNavigate();
   const track = useTelemetry();
@@ -76,9 +94,14 @@ export function UsecaseSelectPage() {
     <>
       <PageMeta title="Customize you experience" />
 
-      <div className="flex min-h-screen w-full items-center justify-center">
+      <motion.div
+        className="flex min-h-screen w-full items-center justify-center"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
         <AuthCard className="flex h-full min-h-[600px]">
-          <div className="flex w-[480px] justify-center px-0">
+          <motion.div className="flex w-[480px] justify-center px-0" variants={itemVariants}>
             <form onSubmit={handleSubmit} noValidate>
               <div className="flex max-w-[480px] flex-col items-center justify-center gap-8 p-[60px]">
                 <UsecaseSelectOnboarding
@@ -88,7 +111,7 @@ export function UsecaseSelectPage() {
                   onClick={(id) => handleSelectUseCase(id)}
                 />
 
-                <div className="flex w-full flex-col items-center gap-3">
+                <motion.div className="flex w-full flex-col items-center gap-3" variants={itemVariants}>
                   <Button disabled={selectedUseCases.length === 0 || isPending} className="w-full" type="submit">
                     Continue
                     {isPending && <RiLoader2Line className="animate-spin" />}
@@ -96,12 +119,15 @@ export function UsecaseSelectPage() {
                   <Button type="button" variant="link" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
                     Skip to Homepage
                   </Button>
-                </div>
+                </motion.div>
               </div>
             </form>
-          </div>
+          </motion.div>
 
-          <div className="flex min-h-[600px] w-full max-w-[640px] flex-1 items-center justify-center border-l border-l-neutral-200 bg-white px-10">
+          <motion.div
+            className="flex min-h-[600px] w-full max-w-[640px] flex-1 items-center justify-center border-l border-l-neutral-200 bg-white px-10"
+            variants={itemVariants}
+          >
             <AnimatePresence mode="wait">
               {displayedUseCase && (
                 <motion.img
@@ -109,21 +135,21 @@ export function UsecaseSelectPage() {
                   src={`/images/auth/${channelOptions.find((option) => option.id === displayedUseCase)?.image}`}
                   alt={`${displayedUseCase}-usecase-illustration`}
                   className="h-auto max-h-[500px] w-full object-contain"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
                   transition={{
                     duration: 0.2,
-                    ease: 'easeInOut',
+                    ease: [0.22, 1, 0.36, 1],
                   }}
                 />
               )}
 
               {!displayedUseCase && <EmptyStateView />}
             </AnimatePresence>
-          </div>
+          </motion.div>
         </AuthCard>
-      </div>
+      </motion.div>
     </>
   );
 }
@@ -136,28 +162,46 @@ function EmptyStateView() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{
-        duration: 0.2,
-        ease: 'easeInOut',
+        duration: 0.4,
+        ease: [0.22, 1, 0.36, 1],
       }}
     >
-      <div className="absolute left-2 top-[175px]">
+      <motion.div
+        className="absolute left-2 top-[175px]"
+        animate={{
+          x: [0, 5, 0],
+          transition: {
+            duration: 2,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          },
+        }}
+      >
         <OnboardingArrowLeft className="text-success h-[25px] w-[65px]" />
-      </div>
+      </motion.div>
 
-      {/* Instruction Text */}
-      <p className="text-success absolute left-10 top-[211px] text-xs italic">
+      <motion.p
+        className="text-success absolute left-10 top-[211px] text-xs italic"
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.4 }}
+      >
         Hover on the cards to visualize, <br />
         select all that apply.
-      </p>
+      </motion.p>
 
-      {/* Help Text */}
-      <p className="absolute bottom-4 left-3.5 w-[400px] text-xs italic text-neutral-400">
+      <motion.p
+        className="absolute bottom-4 left-3.5 w-[400px] text-xs italic text-neutral-400"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.4 }}
+      >
         This helps us understand your use-case better with the channels you'd use in your product to communicate with
         your users.
         <br />
         <br />
         don't worry, you can always change later as you build.
-      </p>
+      </motion.p>
     </motion.div>
   );
 }
