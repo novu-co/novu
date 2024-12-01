@@ -181,7 +181,12 @@ export class WorkflowController {
     @Body() generatePreviewRequestDto: GeneratePreviewRequestDto
   ): Promise<GeneratePreviewResponseDto> {
     return await this.generatePreviewUseCase.execute(
-      GeneratePreviewCommand.create({ user, workflowId, stepDatabaseId: stepId, generatePreviewRequestDto })
+      GeneratePreviewCommand.create({
+        user,
+        identifierOrInternalId: workflowId,
+        stepDatabaseId: stepId,
+        generatePreviewRequestDto,
+      })
     );
   }
 

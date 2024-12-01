@@ -16,14 +16,16 @@ import {
 } from '@novu/shared';
 import {
   CreateWorkflow as CreateWorkflowGeneric,
+  UpdateWorkflow as UpdateWorkflowGeneric,
   CreateWorkflowCommand,
   GetWorkflowByIdsCommand,
   GetWorkflowByIdsUseCase,
   WorkflowInternalResponseDto,
   NotificationStep,
   shortId,
-  UpdateWorkflow,
   UpdateWorkflowCommand,
+  InstrumentUsecase,
+  Instrument,
 } from '@novu/application-generic';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
@@ -36,13 +38,14 @@ import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
 export class UpsertWorkflowUseCase {
   constructor(
     private createWorkflowGenericUsecase: CreateWorkflowGeneric,
-    private updateWorkflowUsecase: UpdateWorkflow,
+    private updateWorkflowGenericUsecase: UpdateWorkflowGeneric,
     private notificationGroupRepository: NotificationGroupRepository,
     private workflowUpdatePostProcess: PostProcessWorkflowUpdate,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private patchStepDataUsecase: PatchStepUsecase
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
     const workflowForUpdate = await this.queryWorkflow(command);
     let persistedWorkflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
@@ -57,6 +60,7 @@ export class UpsertWorkflowUseCase {
     return toResponseWorkflowDto(persistedWorkflow);
   }
 
+  @Instrument()
   private async getWorkflow(workflowId: string, command: UpsertWorkflowCommand): Promise<WorkflowInternalResponseDto> {
     return await this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({
@@ -68,6 +72,7 @@ export class UpsertWorkflowUseCase {
     );
   }
 
+  @Instrument()
   private async persistWorkflow(workflowWithIssues: WorkflowInternalResponseDto) {
     const command = UpdateWorkflowCommand.create({
       id: workflowWithIssues._id,
@@ -78,9 +83,10 @@ export class UpsertWorkflowUseCase {
       ...workflowWithIssues,
     });
 
-    await this.updateWorkflowUsecase.execute(command);
+    await this.updateWorkflowGenericUsecase.execute(command);
   }
 
+  @Instrument()
   private async queryWorkflow(command: UpsertWorkflowCommand): Promise<WorkflowInternalResponseDto | null> {
     if (!command.identifierOrInternalId) {
       return null;
@@ -96,12 +102,13 @@ export class UpsertWorkflowUseCase {
     );
   }
 
+  @Instrument()
   private async createOrUpdateWorkflow(
     existingWorkflow: NotificationTemplateEntity | null,
     command: UpsertWorkflowCommand
   ): Promise<WorkflowInternalResponseDto> {
     if (existingWorkflow && isWorkflowUpdateDto(command.workflowDto, command.identifierOrInternalId)) {
-      return await this.updateWorkflowUsecase.execute(
+      return await this.updateWorkflowGenericUsecase.execute(
         UpdateWorkflowCommand.create(
           this.convertCreateToUpdateCommand(command.workflowDto, command.user, existingWorkflow)
         )
@@ -113,6 +120,7 @@ export class UpsertWorkflowUseCase {
     );
   }
 
+  @Instrument()
   private async buildCreateWorkflowGenericCommand(command: UpsertWorkflowCommand): Promise<CreateWorkflowCommand> {
     const { user } = command;
     // It's safe to assume we're dealing with CreateWorkflowDto on the creation path
@@ -134,7 +142,6 @@ export class UpsertWorkflowUseCase {
       type: WorkflowTypeEnum.BRIDGE,
       origin: WorkflowOriginEnum.NOVU_CLOUD,
       steps: this.mapSteps(workflowDto.steps),
-      payloadSchema: {},
       active: isWorkflowActive,
       description: workflowDto.description || '',
       tags: workflowDto.tags || [],
@@ -278,6 +285,7 @@ export class UpsertWorkflowUseCase {
    * @deprecated This method will be removed in future versions.
    * Please use `the patch step data instead, do not add here anything` instead.
    */
+  @Instrument()
   private async upsertControlValues(
     workflow: NotificationTemplateEntity,
     command: UpsertWorkflowCommand

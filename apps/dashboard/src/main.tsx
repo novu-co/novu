@@ -3,16 +3,24 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import ErrorPage from '@/components/error-page';
 import { RootRoute, AuthRoute, DashboardRoute, CatchAllRoute } from './routes';
-import { WorkflowsPage, SignInPage, SignUpPage, OrganizationListPage } from '@/pages';
+import {
+  WorkflowsPage,
+  SignInPage,
+  SignUpPage,
+  OrganizationListPage,
+  QuestionnairePage,
+  UsecaseSelectPage,
+} from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
 import { TestWorkflowPage } from './pages/test-workflow';
-import { ConfigureWorkflow } from './components/workflow-editor/configure-workflow';
-import { ConfigureStep } from './components/workflow-editor/steps/configure-step';
 import { initializeSentry } from './utils/sentry';
-import { EditStepSidebar } from './components/workflow-editor/steps/edit-step-sidebar';
 import { overrideZodErrorMap } from './utils/validation';
+import { FeatureFlagsProvider } from '@/context/feature-flags-provider';
+import { EditStepTemplate } from '@/components/workflow-editor/steps/edit-step-template';
+import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workflow';
+import { EditStep } from '@/components/workflow-editor/steps/edit-step';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -37,6 +45,14 @@ const router = createBrowserRouter([
             path: ROUTES.SIGNUP_ORGANIZATION_LIST,
             element: <OrganizationListPage />,
           },
+          {
+            path: ROUTES.SIGNUP_QUESTIONNAIRE,
+            element: <QuestionnairePage />,
+          },
+          {
+            path: ROUTES.USECASE_SELECT,
+            element: <UsecaseSelectPage />,
+          },
         ],
       },
       {
@@ -59,12 +75,12 @@ const router = createBrowserRouter([
                     index: true,
                   },
                   {
-                    element: <ConfigureStep />,
-                    path: ROUTES.CONFIGURE_STEP,
+                    element: <EditStep />,
+                    path: ROUTES.EDIT_STEP,
                   },
                   {
-                    element: <EditStepSidebar />,
-                    path: ROUTES.EDIT_STEP,
+                    element: <EditStepTemplate />,
+                    path: ROUTES.EDIT_STEP_TEMPLATE,
                   },
                 ],
               },
@@ -90,6 +106,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <FeatureFlagsProvider>
+      <RouterProvider router={router} />
+    </FeatureFlagsProvider>
   </StrictMode>
 );

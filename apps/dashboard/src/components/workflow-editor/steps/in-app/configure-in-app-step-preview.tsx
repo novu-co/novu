@@ -10,12 +10,12 @@ import {
   InAppPreviewNotificationContent,
   InAppPreviewSubject,
 } from '@/components/workflow-editor/in-app-preview';
-import { useStepEditorContext } from '@/components/workflow-editor/steps/hooks';
 import { InAppRenderOutput } from '@novu/shared';
+import { useStep } from '@/components/workflow-editor/steps/step-provider';
 
 export function ConfigureInAppStepPreview() {
   const { previewStep, data, isPending: isPreviewPending } = usePreviewStep();
-  const { step, isPendingStep } = useStepEditorContext();
+  const { step, isPending } = useStep();
 
   const { workflowSlug, stepSlug } = useParams<{
     workflowSlug: string;
@@ -23,14 +23,14 @@ export function ConfigureInAppStepPreview() {
   }>();
 
   useEffect(() => {
-    if (!workflowSlug || !stepSlug || !step || isPendingStep) return;
+    if (!workflowSlug || !stepSlug || !step || isPending) return;
 
     previewStep({
       workflowSlug,
       stepSlug,
       data: { controlValues: step.controls.values, previewPayload: {} },
     });
-  }, [workflowSlug, stepSlug, previewStep, step, isPendingStep]);
+  }, [workflowSlug, stepSlug, previewStep, step, isPending]);
 
   if (!isPreviewPending && !data?.result) {
     return null;

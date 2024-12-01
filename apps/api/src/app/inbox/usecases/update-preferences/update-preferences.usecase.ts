@@ -14,12 +14,15 @@ import {
 import {
   NotificationTemplateEntity,
   NotificationTemplateRepository,
-  PreferenceLevelEnum,
   SubscriberEntity,
-  SubscriberPreferenceRepository,
   SubscriberRepository,
 } from '@novu/dal';
-import { IPreferenceChannels, WorkflowPreferences, WorkflowPreferencesPartial } from '@novu/shared';
+import {
+  IPreferenceChannels,
+  PreferenceLevelEnum,
+  WorkflowPreferences,
+  WorkflowPreferencesPartial,
+} from '@novu/shared';
 import { ApiException } from '../../../shared/exceptions/api.exception';
 import { AnalyticsEventsEnum } from '../../utils';
 import { InboxPreference } from '../../utils/types';
@@ -28,7 +31,6 @@ import { UpdatePreferencesCommand } from './update-preferences.command';
 @Injectable()
 export class UpdatePreferences {
   constructor(
-    private subscriberPreferenceRepository: SubscriberPreferenceRepository,
     private notificationTemplateRepository: NotificationTemplateRepository,
     private subscriberRepository: SubscriberRepository,
     private analyticsService: AnalyticsService,
@@ -67,7 +69,7 @@ export class UpdatePreferences {
   ): Promise<void> {
     const channelPreferences: IPreferenceChannels = this.buildPreferenceChannels(command);
 
-    await this.storePreferencesV2({
+    await this.storePreferences({
       channels: channelPreferences,
       organizationId: command.organizationId,
       environmentId: command.environmentId,
@@ -81,18 +83,6 @@ export class UpdatePreferences {
       _workflowId: command.workflowId,
       level: command.level,
       channels: channelPreferences,
-    });
-
-    const updateFields = {};
-    for (const [key, value] of Object.entries(channelPreferences)) {
-      if (value !== undefined) {
-        updateFields[`channels.${key}`] = value;
-      }
-    }
-
-    const query = this.commonQuery(command, subscriber);
-    await this.subscriberPreferenceRepository.update(query, {
-      $set: updateFields,
     });
   }
 
@@ -158,21 +148,8 @@ export class UpdatePreferences {
     };
   }
 
-  private commonQuery(command: UpdatePreferencesCommand, subscriber: SubscriberEntity) {
-    return {
-      _organizationId: command.organizationId,
-      _environmentId: command.environmentId,
-      _subscriberId: subscriber._id,
-      level: command.level,
-      ...(command.level === PreferenceLevelEnum.TEMPLATE && command.workflowId && { _templateId: command.workflowId }),
-    };
-  }
-
-  /**
-   * Strangler pattern to migrate to V2 preferences.
-   */
   @Instrument()
-  private async storePreferencesV2(item: {
+  private async storePreferences(item: {
     channels: IPreferenceChannels;
     organizationId: string;
     _subscriberId: string;
