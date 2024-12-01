@@ -1,7 +1,7 @@
 import { RiCheckboxCircleFill, RiLoader3Line, RiNotification2Fill } from 'react-icons/ri';
 import { Loader2 } from 'lucide-react';
 import { Button } from '../primitives/button';
-import { showToast } from '../primitives/sonner-helpers';
+import { showErrorToast, showSuccessToast, showToast } from '../primitives/sonner-helpers';
 import { ToastIcon } from '../primitives/sonner';
 import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
 import { ROUTES } from '../../utils/routes';
@@ -28,30 +28,10 @@ export function InboxConnectedGuide({ subscriberId }: InboxConnectedGuideProps) 
         },
       });
 
-      showToast({
-        children: () => (
-          <>
-            <ToastIcon variant="success" />
-            <span className="text-sm">Notification sent successfully!</span>
-          </>
-        ),
-        options: {
-          position: 'bottom-center',
-        },
-      });
+      showSuccessToast('Notification sent successfully!');
       navigate(ROUTES.INBOX_EMBED_SUCCESS);
     } catch (error) {
-      showToast({
-        children: () => (
-          <>
-            <ToastIcon variant="error" />
-            <span className="text-sm">Failed to send notification</span>
-          </>
-        ),
-        options: {
-          position: 'bottom-center',
-        },
-      });
+      showErrorToast('Failed to send notification');
     }
   }
 
