@@ -102,7 +102,7 @@ export function ProgressSection() {
               You're doing great work! 💪
             </motion.h2>
 
-            <div className="flex flex-col gap-6 text-sm text-neutral-400">
+            <div className="text-foreground-400 flex flex-col gap-6 text-sm">
               <motion.p variants={textItem}>Set up Novu to send notifications your users will love.</motion.p>
 
               <motion.p variants={textItem}>
@@ -112,7 +112,7 @@ export function ProgressSection() {
           </div>
 
           <motion.div variants={textItem} className="space-between flex items-center gap-0">
-            <p className="text-sm text-neutral-400">Get started with our setup guide.</p>
+            <p className="text-foreground-400 text-sm">Get started with our setup guide.</p>
             <PointingArrow className="relative left-[15px] top-[-10px]" />
           </motion.div>
         </motion.div>
@@ -126,7 +126,7 @@ export function ProgressSection() {
                 {step.status === 'completed' ? (
                   <RiCheckLine className="h-4 w-4 text-[#ffffff]" />
                 ) : (
-                  <RiLoader3Line className="h-4 w-4 text-neutral-400" />
+                  <RiLoader3Line className="text-foreground-400 h-4 w-4" />
                 )}
               </div>
 
@@ -141,13 +141,13 @@ export function ProgressSection() {
                   <CardContent className="flex flex-col rounded-[6px] bg-[#FBFBFB] px-2 py-1.5">
                     <div className="flex items-center justify-between">
                       <span
-                        className={`text-xs ${step.status === 'completed' ? 'text-neutral-400 line-through' : 'text-neutral-600'}`}
+                        className={`text-xs ${step.status === 'completed' ? 'text-foreground-400 line-through' : 'text-foreground-600'}`}
                       >
                         {step.title}
                       </span>
-                      <RiArrowRightDoubleFill className="h-4 w-4 text-neutral-400" />
+                      <RiArrowRightDoubleFill className="text-foreground-400 h-4 w-4" />
                     </div>
-                    <p className="text-[10px] leading-[14px] text-neutral-400">{step.description}</p>
+                    <p className="text-foreground-400 text-[10px] leading-[14px]">{step.description}</p>
                   </CardContent>
                 </Card>
               </Link>
