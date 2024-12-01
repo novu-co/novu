@@ -1,8 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { useWorkflows } from './use-workflows';
 import { useOrganization } from '@clerk/clerk-react';
 import { ChannelTypeEnum } from '@novu/shared';
 import { useIntegrations } from './use-integrations';
+import { useTelemetry } from './use-telemetry';
+import { TelemetryEvent } from '../utils/telemetry';
 
 export enum StepIdEnum {
   ACCOUNT_CREATION = 'account-creation',
@@ -46,6 +48,8 @@ export function useOnboardingSteps(): OnboardingStepsResult {
   const { data: workflows } = useWorkflows();
   const { organization } = useOrganization();
   const { integrations } = useIntegrations();
+  const telemetry = useTelemetry();
+  const previousStepsRef = useRef<Step[]>([]);
 
   const hasInvitedTeamMember = useMemo(() => {
     return (organization?.membersCount ?? 0) > 1;
@@ -91,6 +95,23 @@ export function useOnboardingSteps(): OnboardingStepsResult {
     ],
     [workflows, hasInvitedTeamMember, providerType, integrations]
   );
+
+  useEffect(() => {
+    const previousSteps = previousStepsRef.current;
+
+    // Track step completion changes
+    steps.forEach((step) => {
+      const previousStep = previousSteps.find((prev) => prev.id === step.id);
+      if (previousStep?.status !== 'completed' && step.status === 'completed') {
+        telemetry(TelemetryEvent.WELCOME_STEP_COMPLETED, {
+          stepId: step.id,
+          stepTitle: step.title,
+        });
+      }
+    });
+
+    previousStepsRef.current = steps;
+  }, [steps, telemetry]);
 
   return { steps, providerType };
 }

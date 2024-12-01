@@ -7,6 +7,8 @@ import { buildRoute, LEGACY_ROUTES, ROUTES } from '../../utils/routes';
 import { motion } from 'framer-motion';
 import { mainCard, leftSection, textItem, stepsList, stepItem, logo } from './progress-section.animations';
 import { PointingArrow, NovuLogo } from './icons';
+import { useTelemetry } from '../../hooks/use-telemetry';
+import { TelemetryEvent } from '../../utils/telemetry';
 
 interface StepItemProps {
   step: {
@@ -42,6 +44,16 @@ export function ProgressSection() {
 }
 
 function StepItem({ step, environmentSlug }: StepItemProps) {
+  const telemetry = useTelemetry();
+
+  const handleStepClick = () => {
+    telemetry(TelemetryEvent.WELCOME_STEP_CLICKED, {
+      stepId: step.id,
+      stepTitle: step.title,
+      stepStatus: step.status,
+    });
+  };
+
   return (
     <motion.div className="flex max-w-[370px] items-center gap-1.5" variants={stepItem}>
       <div
@@ -58,6 +70,7 @@ function StepItem({ step, environmentSlug }: StepItemProps) {
         to={getStepRoute(step.id, environmentSlug).path}
         reloadDocument={getStepRoute(step.id).isLegacy}
         className="w-full"
+        onClick={handleStepClick}
       >
         <Card
           className={`shadow-xs w-full p-1 ${step.status !== 'completed' ? 'transition-all duration-200 hover:translate-x-[1px] hover:shadow-md' : ''}`}

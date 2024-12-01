@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactElement, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PageMeta } from '../components/page-meta';
 import { DashboardLayout } from '../components/dashboard-layout';
@@ -6,6 +6,8 @@ import { ProgressSection } from '../components/welcome/progress-section';
 import { ResourcesList } from '../components/welcome/resources-list';
 import { RiBookletFill, RiBookmark2Fill } from 'react-icons/ri';
 import { Resource } from '../components/welcome/resources-list';
+import { useTelemetry } from '../hooks/use-telemetry';
+import { TelemetryEvent } from '../utils/telemetry';
 
 const helpfulResources: Resource[] = [
   {
@@ -35,6 +37,12 @@ const helpfulResources: Resource[] = [
 ];
 
 export function WelcomePage(): ReactElement {
+  const telemetry = useTelemetry();
+
+  useEffect(() => {
+    telemetry(TelemetryEvent.WELCOME_PAGE_VIEWED);
+  }, [telemetry]);
+
   const pageVariants = {
     hidden: { opacity: 0 },
     show: {
