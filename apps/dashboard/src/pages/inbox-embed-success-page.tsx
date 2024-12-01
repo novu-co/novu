@@ -3,9 +3,17 @@ import { Button } from '../components/primitives/button';
 import { SVGProps } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../utils/routes';
+import { useTelemetry } from '../hooks/use-telemetry';
+import { TelemetryEvent } from '../utils/telemetry';
+import { useEffect } from 'react';
 
 export function InboxEmbedSuccessPage() {
   const navigate = useNavigate();
+  const telemetry = useTelemetry();
+
+  useEffect(() => {
+    telemetry(TelemetryEvent.INBOX_EMBED_SUCCESS_PAGE_VIEWED);
+  }, [telemetry]);
 
   function handleNavigateToDashboard() {
     navigate(ROUTES.WORKFLOWS);

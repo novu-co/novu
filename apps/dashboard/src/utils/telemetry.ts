@@ -10,4 +10,13 @@ export enum TelemetryEvent {
   WELCOME_PAGE_VIEWED = 'Welcome page viewed',
   WELCOME_STEP_CLICKED = 'Welcome step clicked',
   WELCOME_STEP_COMPLETED = 'Welcome step completed',
+  INBOX_NOTIFICATION_SENT = 'Inbox notification sent - [Onboarding]',
+  INBOX_CUSTOMIZATION_CHANGED = 'Inbox customization changed - [Onboarding]',
+  INBOX_IMPLEMENTATION_CLICKED = 'Inbox implementation clicked - [Onboarding]',
+  INBOX_PREVIEW_STYLE_CHANGED = 'Inbox preview style changed - [Onboarding]',
+  SKIP_ONBOARDING_CLICKED = 'Skip onboarding clicked',
+  USECASE_SELECT_PAGE_VIEWED = 'Use case select page viewed',
+  INBOX_USECASE_PAGE_VIEWED = 'Inbox use case page viewed',
+  INBOX_EMBED_PAGE_VIEWED = 'Inbox embed page viewed',
+  INBOX_EMBED_SUCCESS_PAGE_VIEWED = 'Inbox embed success page viewed',
 }

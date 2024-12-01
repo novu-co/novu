@@ -17,6 +17,8 @@ import { useNavigate } from 'react-router-dom';
 import { InlineToast } from '../primitives/inline-toast';
 import { UsecasePlaygroundHeader } from '../usecase-playground-header';
 import { CustomizeInbox } from './customize-inbox-playground';
+import { useTelemetry } from '../../hooks/use-telemetry';
+import { TelemetryEvent } from '../../utils/telemetry';
 
 export interface ActionConfig {
   label: string;
@@ -92,6 +94,11 @@ export function InboxPlayground() {
   const auth = useAuth();
   const [hasNotificationBeenSent, setHasNotificationBeenSent] = useState(false);
   const navigate = useNavigate();
+  const telemetry = useTelemetry();
+
+  useEffect(() => {
+    telemetry(TelemetryEvent.INBOX_USECASE_PAGE_VIEWED);
+  }, [telemetry]);
 
   useEffect(() => {
     if (!data) return;
@@ -125,6 +132,11 @@ export function InboxPlayground() {
         },
       });
 
+      telemetry(TelemetryEvent.INBOX_NOTIFICATION_SENT, {
+        subject: formValues.subject,
+        hasSecondaryAction: !!formValues.secondaryAction,
+      });
+
       setHasNotificationBeenSent(true);
       showSuccessToast('Notification sent successfully!');
     } catch (error) {
@@ -134,9 +146,31 @@ export function InboxPlayground() {
 
   const handleImplementClick = () => {
     const { primaryColor, foregroundColor } = form.getValues();
+    telemetry(TelemetryEvent.INBOX_IMPLEMENTATION_CLICKED, {
+      primaryColor,
+      foregroundColor,
+    });
     const queryParams = new URLSearchParams({ primaryColor, foregroundColor }).toString();
     navigate(`${ROUTES.INBOX_EMBED}?${queryParams}`);
   };
+
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'selectedStyle') {
+        telemetry(TelemetryEvent.INBOX_PREVIEW_STYLE_CHANGED, {
+          style: value.selectedStyle,
+        });
+      }
+
+      if (['primaryColor', 'foregroundColor', 'subject', 'body'].includes(name || '')) {
+        telemetry(TelemetryEvent.INBOX_CUSTOMIZATION_CHANGED, {
+          field: name,
+        });
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form, telemetry]);
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -144,6 +178,11 @@ export function InboxPlayground() {
         title="Send your first Inbox notification"
         description="Customize your notification and hit 'Send notification' 🎉"
         skipPath={ROUTES.WELCOME}
+        onSkip={() =>
+          telemetry(TelemetryEvent.SKIP_ONBOARDING_CLICKED, {
+            skippedFrom: 'inbox-playground',
+          })
+        }
       />
 
       <div className="flex flex-1">

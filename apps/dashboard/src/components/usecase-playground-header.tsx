@@ -6,10 +6,16 @@ interface UsecasePlaygroundHeaderProps {
   title: string;
   description: string;
   skipPath: string;
+  onSkip?: () => void;
 }
 
-export function UsecasePlaygroundHeader({ title, description, skipPath }: UsecasePlaygroundHeaderProps) {
+export function UsecasePlaygroundHeader({ title, description, skipPath, onSkip }: UsecasePlaygroundHeaderProps) {
   const navigate = useNavigate();
+
+  const handleSkip = () => {
+    onSkip?.();
+    navigate(skipPath);
+  };
 
   return (
     <div className="flex items-center justify-between gap-4 border-b p-4">
@@ -24,7 +30,7 @@ export function UsecasePlaygroundHeader({ title, description, skipPath }: Usecas
         </div>
       </div>
 
-      <Button variant="link" className="text-foreground-600 text-xs" onClick={() => navigate(skipPath)}>
+      <Button variant="link" className="text-foreground-600 text-xs" onClick={handleSkip}>
         Skip, I'll explore myself
       </Button>
     </div>

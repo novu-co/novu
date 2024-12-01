@@ -1,6 +1,6 @@
 import { UsecaseSelectOnboarding } from '../components/auth/usecase-selector';
 import { AuthCard } from '../components/auth/auth-card';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../components/primitives/button';
 import { ROUTES } from '../utils/routes';
@@ -21,6 +21,10 @@ export function UsecaseSelectPage() {
   const track = useTelemetry();
   const [selectedUseCases, setSelectedUseCases] = useState<ChannelTypeEnum[]>([]);
   const [hoveredUseCase, setHoveredUseCase] = useState<ChannelTypeEnum | null>(null);
+
+  useEffect(() => {
+    track(TelemetryEvent.USECASE_SELECT_PAGE_VIEWED);
+  }, [track]);
 
   const displayedUseCase =
     hoveredUseCase || (selectedUseCases.length > 0 ? selectedUseCases[selectedUseCases.length - 1] : null);
