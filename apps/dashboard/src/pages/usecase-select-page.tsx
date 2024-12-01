@@ -39,7 +39,12 @@ export function UsecaseSelectPage() {
       track(TelemetryEvent.USE_CASE_SELECTED, {
         useCases: selectedUseCases,
       });
-      navigate(ROUTES.INBOX_USECASE);
+
+      if (selectedUseCases.includes(ChannelTypeEnum.IN_APP)) {
+        navigate(ROUTES.INBOX_USECASE);
+      } else {
+        navigate(ROUTES.WELCOME);
+      }
     },
     onError: (error) => {
       console.error('Failed to update use cases:', error);
