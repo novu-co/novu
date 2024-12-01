@@ -12,7 +12,7 @@ import { Template, Liquid } from 'liquidjs';
  * // Returns Array [ "user.name", "order.id", "order.status" ]
  */
 export const extractTemplateVars = function (str: string): string[] {
-  if (str === null || str === undefined || typeof str !== 'string') {
+  if (str === null || str === undefined || str === '' || typeof str !== 'string') {
     return [];
   }
 
