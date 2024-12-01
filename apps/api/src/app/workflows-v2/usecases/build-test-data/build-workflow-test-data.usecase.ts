@@ -10,6 +10,7 @@ import {
 } from '@novu/application-generic';
 import { WorkflowTestDataCommand } from './build-workflow-test-data.command';
 import { parsePayloadSchema } from '../../shared/parse-payload-schema';
+import { mockSchemaDefaults } from '../../util/utils';
 
 @Injectable()
 export class BuildWorkflowTestDataUseCase {
@@ -20,10 +21,12 @@ export class BuildWorkflowTestDataUseCase {
     const _workflowEntity: NotificationTemplateEntity = await this.fetchWorkflow(command);
     const toSchema = buildToFieldSchema({ user: command.user, steps: _workflowEntity.steps });
     const payloadSchema = parsePayloadSchema(_workflowEntity.payloadSchema, { safe: true });
+    const payloadSchemaMock =
+      payloadSchema && Object.keys(payloadSchema.properties || {}).length > 0 ? mockSchemaDefaults(payloadSchema) : {};
 
     return {
       to: toSchema,
-      payload: payloadSchema || {},
+      payload: payloadSchemaMock,
     };
   }
 
