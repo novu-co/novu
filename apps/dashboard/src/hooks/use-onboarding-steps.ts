@@ -16,34 +16,50 @@ export enum StepIdEnum {
   CONNECT_SMS_PROVIDER = 'connect-sms-provider',
 }
 
+export type StepStatus = 'completed' | 'in-progress' | 'pending';
+
 export interface Step {
   id: StepIdEnum;
   title: string;
   description: string;
-  status: 'completed' | 'in-progress' | 'pending';
+  status: StepStatus;
 }
 
-export function useOnboardingSteps() {
+interface OrganizationMetadata {
+  useCases?: ChannelTypeEnum[];
+  [key: string]: unknown;
+}
+
+interface OnboardingStepsResult {
+  steps: Step[];
+  providerType: ChannelTypeEnum;
+}
+
+const DEFAULT_USE_CASES: ChannelTypeEnum[] = [ChannelTypeEnum.IN_APP];
+const PROVIDER_TYPE_PRIORITIES: ChannelTypeEnum[] = [ChannelTypeEnum.IN_APP, ChannelTypeEnum.EMAIL];
+
+function getProviderTitle(providerType: ChannelTypeEnum): string {
+  return providerType === ChannelTypeEnum.IN_APP ? 'Add an Inbox to your app' : `Connect your ${providerType} provider`;
+}
+
+export function useOnboardingSteps(): OnboardingStepsResult {
   const { data: workflows } = useWorkflows();
   const { organization } = useOrganization();
   const { integrations } = useIntegrations();
 
   const hasInvitedTeamMember = useMemo(() => {
-    return organization?.membersCount && organization.membersCount > 1;
+    return (organization?.membersCount ?? 0) > 1;
   }, [organization?.membersCount]);
 
   const providerType = useMemo(() => {
-    const metadata = organization?.publicMetadata as Record<string, unknown>;
-    const useCases = (metadata?.useCases as ChannelTypeEnum[]) || ['in-app'];
+    const metadata = organization?.publicMetadata as OrganizationMetadata;
+    const useCases = metadata?.useCases ?? DEFAULT_USE_CASES;
 
-    if (useCases.includes(ChannelTypeEnum.IN_APP)) return ChannelTypeEnum.IN_APP;
-    if (useCases.includes(ChannelTypeEnum.EMAIL)) return ChannelTypeEnum.EMAIL;
-
-    return useCases[0];
+    return PROVIDER_TYPE_PRIORITIES.find((type) => useCases.includes(type)) ?? useCases[0];
   }, [organization?.publicMetadata]);
 
   const steps = useMemo(
-    () => [
+    (): Step[] => [
       {
         id: StepIdEnum.ACCOUNT_CREATION,
         title: 'Account creation',
@@ -58,10 +74,7 @@ export function useOnboardingSteps() {
       },
       {
         id: `connect-${providerType}-provider` as StepIdEnum,
-        title:
-          providerType === ChannelTypeEnum.IN_APP
-            ? 'Add an Inbox to your app'
-            : `Connect your ${providerType} provider`,
+        title: getProviderTitle(providerType),
         description: `Connect your provider to send ${providerType} notifications with Novu.`,
         status: integrations?.some(
           (integration) => integration.channel === providerType && !integration.providerId.startsWith('novu-')
