@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ControlValuesLevelEnum, UserSessionData } from '@novu/shared';
+import { ControlValuesLevelEnum, UserSessionData, WorkflowOriginEnum } from '@novu/shared';
 import { ControlValuesRepository, NotificationStepEntity } from '@novu/dal';
 import _ from 'lodash';
 import { WorkflowInternalResponseDto } from '@novu/application-generic';
@@ -8,7 +8,6 @@ import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
 import { OverloadContentDataOnWorkflowCommand } from './overload-content-data-on-workflow.command';
 import { StepMissingControlsException } from '../../exceptions/step-not-found-exception';
 import { convertJsonToSchemaWithDefaults } from '../../util/jsonToSchema';
-import { mergeObjects } from '../../util/jsonUtils';
 
 @Injectable()
 export class OverloadContentDataOnWorkflowUseCase {
@@ -89,11 +88,16 @@ export class OverloadContentDataOnWorkflowUseCase {
     workflow: WorkflowInternalResponseDto,
     stepIdToControlValuesMap: { [p: string]: ValidatedContentResponse }
   ) {
+    if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
+      return;
+    }
+
     let finalPayload = {};
     for (const value of Object.values(stepIdToControlValuesMap)) {
       finalPayload = _.merge(finalPayload, value.finalPayload.payload);
     }
+
     // eslint-disable-next-line no-param-reassign
-    workflow.payloadSchema = JSON.stringify(convertJsonToSchemaWithDefaults(finalPayload));
+    workflow.payloadSchema = convertJsonToSchemaWithDefaults(finalPayload);
   }
 }
