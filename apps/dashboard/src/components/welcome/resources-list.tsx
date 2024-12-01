@@ -60,7 +60,7 @@ export function ResourcesList({ resources, title, icon }: ResourcesListProps) {
   return (
     <div className="flex flex-col gap-3">
       <motion.div
-        className="font-weight-medium flex items-center gap-2 text-neutral-600"
+        className="font-weight-medium text-foreground-600 flex items-center gap-2"
         initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -76,7 +76,7 @@ export function ResourcesList({ resources, title, icon }: ResourcesListProps) {
               <Link to={resource.url} target="_blank" rel="noopener" onClick={() => handleResourceClick(resource)}>
                 <Card className="w-60 shrink-0 overflow-hidden border-none shadow-[0px_12px_32px_0px_rgba(0,0,0,0.02),0px_0px_0px_1px_rgba(0,0,0,0.05)] transition-all duration-200 hover:translate-y-[1px] hover:cursor-pointer hover:shadow-md">
                   <motion.div
-                    className="h-[126px] overflow-hidden bg-neutral-50"
+                    className="bg-foreground-50 h-[126px] overflow-hidden"
                     whileHover={{ scale: 1.03 }}
                     transition={{ duration: 0.2 }}
                   >
@@ -88,11 +88,11 @@ export function ResourcesList({ resources, title, icon }: ResourcesListProps) {
                   </motion.div>
 
                   <CardContent className="flex h-[94px] flex-col justify-between p-3">
-                    <h3 className="whitespace-normal text-sm font-medium text-neutral-900">{resource.title}</h3>
+                    <h3 className="text-foreground-900 whitespace-normal text-sm font-medium">{resource.title}</h3>
 
                     <div className="flex items-center gap-1">
-                      <BookOpen className="h-3 w-3 text-neutral-400" />
-                      <span className="text-[10px] text-neutral-400">{resource.duration}</span>
+                      <BookOpen className="text-foreground-400 h-3 w-3" />
+                      <span className="text-foreground-400 text-[10px]">{resource.duration}</span>
                     </div>
                   </CardContent>
                 </Card>
