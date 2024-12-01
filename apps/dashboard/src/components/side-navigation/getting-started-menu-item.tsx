@@ -90,7 +90,7 @@ export function GettingStartedMenuItem() {
                 <RiCloseLine className="size-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>This will hide the welcome page</TooltipContent>
+            <TooltipContent>This will hide the Getting Started page</TooltipContent>
           </Tooltip>
         )}
       </NavigationLink>
