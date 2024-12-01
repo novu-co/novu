@@ -60,6 +60,7 @@
     "@types/newrelic": "^9.14.0",
     "@upstash/ratelimit": "^0.4.4",
     "axios": "^1.6.8",
+    "liquidjs": "^10.13.1",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.20.0",
     "bull": "^4.2.1",
