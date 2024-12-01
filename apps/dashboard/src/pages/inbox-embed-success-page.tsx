@@ -16,19 +16,14 @@ export function InboxEmbedSuccessPage() {
   }, [telemetry]);
 
   function handleNavigateToDashboard() {
-    navigate(ROUTES.WORKFLOWS);
+    navigate(ROUTES.WELCOME);
   }
 
   return (
     <AuthCard className="relative mt-10 block max-h-[366px] min-h-[380px] w-full max-w-[366px] border-none bg-transparent bg-[linear-gradient(180deg,rgba(255,255,255,0.35)_0%,rgba(255,255,255,0.15)_39.37%)]">
       <div className="flex w-full flex-col justify-center p-0">
         <div className="relative mb-[50px] flex w-full flex-row items-end justify-end p-2">
-          <p className="text-foreground-600 mb-2 mr-[30px] text-center text-sm">look for this in your application</p>
-          <div className="flex items-center gap-2">
-            <div className="h-10 flex-1 rounded-md bg-white/10" />
-            <img src="/images/bell.svg" alt="Bell" className="h-6 w-6" />
-          </div>
-          <SuccessArrow className="absolute right-0 right-[20px] top-[7px] ml-auto" />
+          <img src="/images/auth/success-usecase-hint.svg" alt="Onboarding succcess hint to look for inbox" />
         </div>
 
         <div className="flex flex-col items-center justify-center gap-[50px] p-5">
