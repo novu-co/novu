@@ -10,6 +10,7 @@ export enum TelemetryEvent {
   WELCOME_PAGE_VIEWED = 'Welcome page viewed - [Welcome]',
   WELCOME_STEP_CLICKED = 'Welcome step clicked - [Welcome]',
   WELCOME_STEP_COMPLETED = 'Welcome step completed - [Welcome]',
+  WELCOME_MENU_HIDDEN = 'Welcome menu hidden - [Welcome]',
   INBOX_NOTIFICATION_SENT = 'Inbox notification sent - [Onboarding]',
   INBOX_CUSTOMIZATION_CHANGED = 'Inbox customization changed - [Onboarding]',
   INBOX_IMPLEMENTATION_CLICKED = 'Inbox implementation clicked - [Onboarding]',

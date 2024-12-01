@@ -1,14 +1,46 @@
 import { motion } from 'framer-motion';
-import { RiQuestionLine, RiSparkling2Fill } from 'react-icons/ri';
+import { RiQuestionLine, RiSparkling2Fill, RiCloseLine } from 'react-icons/ri';
+import { useUser } from '@clerk/clerk-react';
 import { Badge } from '../primitives/badge';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useOnboardingSteps } from '../../hooks/use-onboarding-steps';
 import { NavigationLink } from './navigation-link';
+import { useTelemetry } from '@/hooks/use-telemetry';
+import { TelemetryEvent } from '@/utils/telemetry';
+import { Button } from '../primitives/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 
 export function GettingStartedMenuItem() {
   const { steps } = useOnboardingSteps();
   const { currentEnvironment } = useEnvironment();
+  const { user } = useUser();
+  const track = useTelemetry();
+
+  const completedSteps = steps.filter((step) => step.status === 'completed').length;
+  const allStepsCompleted = completedSteps === steps.length;
+
+  const handleClose = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    track(TelemetryEvent.WELCOME_MENU_HIDDEN, {
+      completedSteps: steps.filter((step) => step.status === 'completed').map((step) => step.id),
+      totalSteps: steps.length,
+      allStepsCompleted,
+    });
+
+    await user?.update({
+      unsafeMetadata: {
+        ...user.unsafeMetadata,
+        hideGettingStarted: true,
+      },
+    });
+  };
+
+  if (user?.unsafeMetadata?.hideGettingStarted) {
+    return null;
+  }
 
   return (
     <motion.div className="contents" whileHover="hover" initial="initial">
@@ -16,32 +48,51 @@ export function GettingStartedMenuItem() {
         <RiQuestionLine className="size-4" />
         <span>Getting started</span>
 
-        <Badge
-          variant="soft"
-          size="pill"
-          className="bg-primary-alpha-10 text-primary inline-flex items-center gap-0.5 px-1 py-0.5 leading-4"
-        >
-          <motion.div
-            variants={{
-              initial: { scale: 1, rotate: 0, opacity: 1 },
-              hover: {
-                scale: [1, 1.1, 1],
-                rotate: [0, 4, -4, 0],
-                opacity: [0, 1, 1],
-                transition: {
-                  duration: 1.4,
-                  repeat: 0,
-                  ease: 'easeInOut',
-                },
-              },
-            }}
+        {!allStepsCompleted && (
+          <Badge
+            variant="soft"
+            size="pill"
+            className="bg-primary-alpha-10 text-primary inline-flex items-center gap-0.5 px-1 py-0.5 leading-4"
           >
-            <RiSparkling2Fill className="h-4 w-4" />
-          </motion.div>
-          <span className="text-xs">
-            {steps.filter((step) => step.status === 'completed').length}/{steps.length}
-          </span>
-        </Badge>
+            <motion.div
+              variants={{
+                initial: { scale: 1, rotate: 0, opacity: 1 },
+                hover: {
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 4, -4, 0],
+                  opacity: [0, 1, 1],
+                  transition: {
+                    duration: 1.4,
+                    repeat: 0,
+                    ease: 'easeInOut',
+                  },
+                },
+              }}
+            >
+              <RiSparkling2Fill className="h-4 w-4" />
+            </motion.div>
+            <span className="text-xs">
+              {completedSteps}/{steps.length}
+            </span>
+          </Badge>
+        )}
+
+        {allStepsCompleted && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={handleClose}
+                className="ml-auto h-4 w-4 hover:bg-neutral-300"
+                aria-label="Close getting started menu"
+              >
+                <RiCloseLine className="size-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>This will hide the welcome page</TooltipContent>
+          </Tooltip>
+        )}
       </NavigationLink>
     </motion.div>
   );
