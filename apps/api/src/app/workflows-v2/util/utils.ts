@@ -113,7 +113,7 @@ export function createMockPayloadFromSchema(
     if (definition.default) {
       acc[key] = definition.default;
     } else if (definition.type === 'object' && definition.properties) {
-      acc[key] = this.createMockPayloadFromSchema(definition, currentPath, depth + 1);
+      acc[key] = createMockPayloadFromSchema(definition, currentPath, depth + 1);
     } else {
       acc[key] = `{{${currentPath}}}`;
     }
