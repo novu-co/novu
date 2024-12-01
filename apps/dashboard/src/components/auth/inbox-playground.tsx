@@ -11,7 +11,7 @@ import { useWorkflows } from '../../hooks/use-workflows';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { showToast } from '../primitives/sonner-helpers';
+import { showErrorToast, showSuccessToast, showToast } from '../primitives/sonner-helpers';
 import { ToastIcon } from '../primitives/sonner';
 import { ROUTES } from '../../utils/routes';
 import { useNavigate } from 'react-router-dom';
@@ -127,9 +127,9 @@ export function InboxPlayground() {
       });
 
       setHasNotificationBeenSent(true);
-      showSuccessToast();
+      showSuccessToast('Notification sent successfully!');
     } catch (error) {
-      showErrorToast();
+      showErrorToast('Failed to send notification');
     }
   };
 
@@ -137,30 +137,6 @@ export function InboxPlayground() {
     const { primaryColor, foregroundColor } = form.getValues();
     const queryParams = new URLSearchParams({ primaryColor, foregroundColor }).toString();
     navigate(`${ROUTES.INBOX_EMBED}?${queryParams}`);
-  };
-
-  const showSuccessToast = () => {
-    showToast({
-      children: () => (
-        <>
-          <ToastIcon variant="success" />
-          <span className="text-sm">Notification sent successfully!</span>
-        </>
-      ),
-      options: { position: 'bottom-center' },
-    });
-  };
-
-  const showErrorToast = () => {
-    showToast({
-      children: () => (
-        <>
-          <ToastIcon variant="error" />
-          <span className="text-sm">Failed to save</span>
-        </>
-      ),
-      options: { position: 'bottom-center' },
-    });
   };
 
   return (
