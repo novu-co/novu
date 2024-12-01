@@ -14,7 +14,6 @@ import {
   EnforceEnvOrOrgIds,
   FeedRepository,
   LayoutRepository,
-  LogRepository,
   MessageRepository,
   MessageTemplateRepository,
   NotificationGroupRepository,
@@ -89,7 +88,6 @@ connect(async () => {
   await removeData(new IntegrationRepository(), 'integrations', organization._id, envIds);
   // await removeData(new JobRepository(), 'jobs', organization._id, envIds);
   await removeData(new LayoutRepository(), 'layouts', organization._id, envIds);
-  await removeData(new LogRepository(), 'logs', organization._id, envIds);
   await removeData(new MessageRepository(), 'messages', organization._id, envIds);
   await removeData(new MessageTemplateRepository(), 'messagetemplates', organization._id, envIds);
   await removeData(new NotificationGroupRepository(), 'notificationgroups', organization._id, envIds);

@@ -1,6 +1,6 @@
 import { ActionTypeEnum, ChannelTypeEnum } from '../../types';
 import { SubscriberDto } from '../subscriber';
-import { ContentIssue } from './workflow-commons-fields';
+import { ContentIssue } from './workflow-response.dto';
 
 export class RenderOutput {}
 

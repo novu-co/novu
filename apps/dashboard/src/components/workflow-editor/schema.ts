@@ -7,15 +7,17 @@ export const MAX_NAME_LENGTH = 64;
 export const MAX_DESCRIPTION_LENGTH = 256;
 
 export const workflowSchema = z.object({
+  active: z.boolean().optional(),
   name: z.string().min(1).max(MAX_NAME_LENGTH),
   workflowId: z.string(),
   tags: z
     .array(z.string().min(0).max(MAX_TAG_LENGTH))
     .max(MAX_TAG_ELEMENTS)
-    .refine((tags) => tags.every((tag) => tag.length <= MAX_TAG_LENGTH), {
+    .optional()
+    .refine((tags) => tags?.every((tag) => tag.length <= MAX_TAG_LENGTH), {
       message: `Tags must be less than ${MAX_TAG_LENGTH} characters`,
     })
-    .refine((tags) => new Set(tags).size === tags.length, {
+    .refine((tags) => new Set(tags).size === tags?.length, {
       message: 'Duplicate tags are not allowed',
     }),
   description: z.string().max(MAX_DESCRIPTION_LENGTH).optional(),

@@ -7,4 +7,7 @@ export enum TelemetryEvent {
   USE_CASE_SKIPPED = 'Use Case Skipped',
   RESOURCE_CLICKED = 'Resource clicked - [Welcome]',
   WORKFLOWS_PAGE_VISIT = 'Workflows page visit',
+  WELCOME_PAGE_VIEWED = 'Welcome page viewed',
+  WELCOME_STEP_CLICKED = 'Welcome step clicked',
+  WELCOME_STEP_COMPLETED = 'Welcome step completed',
 }

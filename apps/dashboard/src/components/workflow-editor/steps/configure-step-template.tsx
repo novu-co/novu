@@ -1,5 +1,6 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   Sheet,
@@ -14,16 +15,30 @@ import { VisuallyHidden } from '@/components/primitives/visually-hidden';
 import { PageMeta } from '@/components/page-meta';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { useStep } from '@/components/workflow-editor/steps/step-provider';
+import { getEncodedId, STEP_DIVIDER } from '@/utils/step';
 
 const transitionSetting = { ease: [0.29, 0.83, 0.57, 0.99], duration: 0.4 };
 
 export const ConfigureStepTemplate = () => {
+  const { stepSlug = '' } = useParams<{
+    workflowSlug: string;
+    stepSlug: string;
+  }>();
   const navigate = useNavigate();
-  const { workflow, debouncedUpdate } = useWorkflow();
+  const { workflow, update } = useWorkflow();
   const { step } = useStep();
   const handleCloseSheet = () => {
     navigate('..', { relative: 'path' });
   };
+  const issues = useMemo(() => {
+    const newIssues = workflow?.steps.find(
+      (s) =>
+        getEncodedId({ slug: s.slug, divider: STEP_DIVIDER }) ===
+        getEncodedId({ slug: stepSlug, divider: STEP_DIVIDER })
+    )?.issues;
+
+    return { ...newIssues };
+  }, [workflow, stepSlug]);
 
   if (!workflow || !step) {
     return null;
@@ -68,7 +83,7 @@ export const ConfigureStepTemplate = () => {
                 <SheetTitle />
                 <SheetDescription />
               </VisuallyHidden>
-              <ConfigureStepTemplateForm workflow={workflow} step={step} debouncedUpdate={debouncedUpdate} />
+              <ConfigureStepTemplateForm workflow={workflow} step={step} update={update} issues={issues} />
             </motion.div>
           </SheetContentBase>
         </SheetPortal>

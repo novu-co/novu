@@ -3,13 +3,11 @@ import { MessageEntity, MessageRepository } from '@novu/dal';
 import { LogCodeEnum } from '@novu/shared';
 import { ExecutionLogRoute } from '@novu/application-generic';
 
-import { CreateLog } from '../../../shared/logs';
 import { SendMessageCommand } from './send-message.command';
 
 export abstract class SendMessageType {
   protected constructor(
     protected messageRepository: MessageRepository,
-    protected createLogUsecase: CreateLog,
     protected executionLogRoute: ExecutionLogRoute
   ) {}
 

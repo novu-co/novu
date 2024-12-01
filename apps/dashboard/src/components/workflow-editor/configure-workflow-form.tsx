@@ -1,14 +1,14 @@
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import { PAUSE_MODAL_TITLE, PauseModalDescription } from '@/components/pause-workflow-dialog';
 import { SidebarContent, SidebarHeader } from '@/components/side-navigation/sidebar';
-import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { useTagsQuery } from '@/hooks/use-tags-query';
 import { cn } from '@/utils/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PatchWorkflowDto, UpdateWorkflowDto, WorkflowOriginEnum, WorkflowResponseDto } from '@novu/shared';
+import { UpdateWorkflowDto, WorkflowOriginEnum, WorkflowResponseDto } from '@novu/shared';
 import { ConfirmationModal } from '../confirmation-modal';
 import { RouteFill } from '../icons';
 import { PageMeta } from '../page-meta';
@@ -20,53 +20,42 @@ import { Switch } from '../primitives/switch';
 import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
 import { MAX_DESCRIPTION_LENGTH, workflowSchema } from '@/components/workflow-editor/schema';
-import { z } from 'zod';
+import { useFormAutosave } from '@/hooks/use-form-autosave';
 
 type ConfigureWorkflowFormProps = {
   workflow: WorkflowResponseDto;
-  debouncedUpdate: (data: UpdateWorkflowDto) => void;
-  patch: (data: PatchWorkflowDto) => void;
-  onDirtyChange: (isDirty: boolean) => void;
+  update: (data: UpdateWorkflowDto) => void;
 };
 
 export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
-  const { workflow, debouncedUpdate, patch, onDirtyChange } = props;
+  const { workflow, update } = props;
   const isReadOnly = workflow.origin === WorkflowOriginEnum.EXTERNAL;
   const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
   const tagsQuery = useTagsQuery();
 
   const form = useForm<z.infer<typeof workflowSchema>>({
     defaultValues: {
+      active: workflow.active,
       name: workflow.name,
       workflowId: workflow.workflowId,
       description: workflow.description,
       tags: workflow.tags,
     },
     resolver: zodResolver(workflowSchema),
+    shouldFocusError: false,
   });
 
-  const statusForm = useForm({
-    defaultValues: {
-      active: workflow.active,
-    },
+  const { onBlur, saveForm } = useFormAutosave({
+    previousData: workflow,
+    form,
+    isReadOnly,
+    save: update,
   });
 
-  const onPauseWorkflow = () => {
-    statusForm.setValue('active', false, { shouldValidate: true, shouldDirty: true });
+  const onPauseWorkflow = (active: boolean) => {
+    form.setValue('active', active, { shouldValidate: true, shouldDirty: true });
+    saveForm();
   };
-
-  useFormAutosave(form, (data) => {
-    debouncedUpdate({ ...workflow, ...data });
-  });
-
-  useFormAutosave(statusForm, (data) => {
-    patch(data);
-  });
-
-  useEffect(() => {
-    // inform the parent about the form's dirty state to block navigation
-    onDirtyChange?.(form.formState.isDirty || statusForm.formState.isDirty);
-  }, [form.formState.isDirty, statusForm.formState.isDirty, onDirtyChange]);
 
   return (
     <>
@@ -74,7 +63,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
         open={isPauseModalOpen}
         onOpenChange={setIsPauseModalOpen}
         onConfirm={() => {
-          onPauseWorkflow();
+          onPauseWorkflow(false);
           setIsPauseModalOpen(false);
         }}
         title={PAUSE_MODAL_TITLE}
@@ -96,11 +85,11 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
           </div>
         </SidebarHeader>
         <Separator />
-        <Form {...statusForm}>
-          <form>
+        <Form {...form}>
+          <form className="h-full" onBlur={onBlur}>
             <SidebarContent size="md">
               <FormField
-                control={statusForm.control}
+                control={form.control}
                 name="active"
                 render={({ field }) => (
                   <FormItem className="flex w-full items-center justify-between">
@@ -119,7 +108,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                             setIsPauseModalOpen(true);
                             return;
                           }
-                          field.onChange(checked);
+                          onPauseWorkflow(checked);
                         }}
                         disabled={isReadOnly}
                       />
@@ -128,11 +117,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                 )}
               />
             </SidebarContent>
-          </form>
-        </Form>
-        <Separator />
-        <Form {...form}>
-          <form>
+            <Separator />
             <SidebarContent>
               <FormField
                 control={form.control}
@@ -197,6 +182,10 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                     <FormControl className="text-xs text-neutral-600">
                       <TagInput
                         {...field}
+                        onChange={(tags) => {
+                          form.setValue('tags', tags, { shouldValidate: true, shouldDirty: true });
+                          saveForm();
+                        }}
                         disabled={isReadOnly}
                         value={field.value ?? []}
                         suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []}

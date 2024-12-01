@@ -8,7 +8,7 @@ import {
   WorkflowResponseDto,
 } from '@novu/shared';
 import { motion } from 'framer-motion';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiCloseFill, RiDeleteBin2Line, RiPencilRuler2Fill } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
@@ -24,13 +24,17 @@ import { Separator } from '@/components/primitives/separator';
 import { SidebarContent, SidebarFooter, SidebarHeader } from '@/components/side-navigation/sidebar';
 import TruncatedText from '@/components/truncated-text';
 import { stepSchema } from '@/components/workflow-editor/schema';
-import { getFirstBodyErrorMessage, getFirstControlsErrorMessage } from '@/components/workflow-editor/step-utils';
+import {
+  getFirstBodyErrorMessage,
+  getFirstControlsErrorMessage,
+  updateStepInWorkflow,
+} from '@/components/workflow-editor/step-utils';
 import { ConfigureInAppStepTemplateCta } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-template-cta';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
-import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { EXCLUDED_EDITOR_TYPES } from '@/utils/constants';
 import { STEP_NAME_BY_TYPE } from './step-provider';
+import { useFormAutosave } from '@/hooks/use-form-autosave';
 
 const SUPPORTED_STEP_TYPES = [StepTypeEnum.IN_APP];
 
@@ -38,14 +42,12 @@ type ConfigureStepFormProps = {
   workflow: WorkflowResponseDto;
   environment: IEnvironment;
   step: StepDataDto;
-  debouncedUpdate: (data: UpdateWorkflowDto) => void;
   update: (data: UpdateWorkflowDto) => void;
-  onDirtyChange: (dirty: boolean) => void;
 };
-export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
-  const { step, workflow, debouncedUpdate, update, environment, onDirtyChange } = props;
-  const navigate = useNavigate();
 
+export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
+  const { step, workflow, update, environment } = props;
+  const navigate = useNavigate();
   const isCodeCreatedWorkflow = workflow.origin === WorkflowOriginEnum.EXTERNAL;
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -61,23 +63,17 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
       stepId: step.stepId,
     },
     resolver: zodResolver(stepSchema),
+    shouldFocusError: false,
   });
 
-  useFormAutosave(form, (data) => {
-    debouncedUpdate({
-      ...workflow,
-      steps: workflow.steps.map((s) => {
-        if (s._id === step._id) {
-          return { ...s, ...data };
-        }
-        return s;
-      }),
-    });
+  const { onBlur } = useFormAutosave({
+    previousData: step,
+    form,
+    isReadOnly: isCodeCreatedWorkflow,
+    save: (data) => {
+      update(updateStepInWorkflow(workflow, data));
+    },
   });
-
-  useEffect(() => {
-    onDirtyChange(form.formState.isDirty);
-  }, [form.formState.isDirty, onDirtyChange]);
 
   const firstError = useMemo(
     () => (step ? getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues) : undefined),
@@ -127,7 +123,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
         <Separator />
 
         <Form {...form}>
-          <form>
+          <form onBlur={onBlur}>
             <SidebarContent>
               <FormField
                 control={form.control}
