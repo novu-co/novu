@@ -76,7 +76,7 @@ export class PatchStepUsecase {
 
   private async fetchWorkflow(command: PatchStepCommand) {
     return await this.getWorkflowByIdsUseCase.execute({
-      identifierOrInternalId: command.workflowIdentifierOrInternalId,
+      workflowIdOrInternalId: command.workflowIdOrInternalId,
       environmentId: command.user.environmentId,
       organizationId: command.user.organizationId,
       userId: command.user._id,
@@ -92,7 +92,7 @@ export class PatchStepUsecase {
       throw new BadRequestException({
         message: 'No step found',
         stepIdOrInternalId: command.stepIdOrInternalId,
-        workflowId: command.workflowIdentifierOrInternalId,
+        workflowId: command.workflowIdOrInternalId,
       });
     }
 

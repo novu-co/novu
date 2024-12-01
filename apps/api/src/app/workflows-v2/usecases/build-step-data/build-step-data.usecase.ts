@@ -53,7 +53,7 @@ export class BuildStepDataUsecase {
   @Instrument()
   private async fetchWorkflow(command: BuildStepDataCommand) {
     return await this.getWorkflowByIdsUseCase.execute({
-      identifierOrInternalId: command.workflowIdentifierOrInternalId,
+      workflowIdOrInternalId: command.workflowIdOrInternalId,
       environmentId: command.user.environmentId,
       organizationId: command.user.organizationId,
       userId: command.user._id,
@@ -83,7 +83,7 @@ export class BuildStepDataUsecase {
       throw new BadRequestException({
         message: 'No step found',
         stepId: command.stepIdOrInternalId,
-        workflowId: command.workflowIdentifierOrInternalId,
+        workflowId: command.workflowIdOrInternalId,
       });
     }
 

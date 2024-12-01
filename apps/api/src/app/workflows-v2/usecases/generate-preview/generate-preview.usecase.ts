@@ -92,7 +92,7 @@ export class GeneratePreviewUsecase {
   private async findWorkflow(command: GeneratePreviewCommand) {
     return await this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({
-        identifierOrInternalId: command.identifierOrInternalId,
+        workflowIdOrInternalId: command.workflowIdOrInternalId,
         environmentId: command.user.environmentId,
         organizationId: command.user.organizationId,
         userId: command.user._id,
@@ -103,8 +103,8 @@ export class GeneratePreviewUsecase {
   @Instrument()
   private async getStepData(command: GeneratePreviewCommand) {
     return await this.buildStepDataUsecase.execute({
-      workflowIdentifierOrInternalId: command.identifierOrInternalId,
-      stepIdOrInternalId: command.stepDatabaseId,
+      workflowIdOrInternalId: command.workflowIdOrInternalId,
+      stepIdOrInternalId: command.stepIdOrInternalId,
       user: command.user,
     });
   }

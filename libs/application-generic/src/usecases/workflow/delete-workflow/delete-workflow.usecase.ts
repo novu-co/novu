@@ -38,7 +38,7 @@ export class DeleteWorkflowUseCase {
     const workflowEntity = await this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({
         ...command,
-        identifierOrInternalId: command.identifierOrInternalId,
+        workflowIdOrInternalId: command.workflowIdOrInternalId,
       }),
     );
 

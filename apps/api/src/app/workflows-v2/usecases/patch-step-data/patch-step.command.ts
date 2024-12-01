@@ -1,15 +1,14 @@
 import { EnvironmentWithUserObjectCommand } from '@novu/application-generic';
 import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
-import { IdentifierOrInternalId } from '@novu/shared';
 
 export class PatchStepCommand extends EnvironmentWithUserObjectCommand {
   @IsString()
   @IsNotEmpty()
-  workflowIdentifierOrInternalId: IdentifierOrInternalId;
+  workflowIdOrInternalId: string;
 
   @IsString()
   @IsNotEmpty()
-  stepIdOrInternalId: IdentifierOrInternalId;
+  stepIdOrInternalId: string;
 
   @IsString()
   @IsOptional()

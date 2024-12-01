@@ -26,15 +26,14 @@ export class DeleteNotificationTemplate {
     private changeRepository: ChangeRepository,
     private analyticsService: AnalyticsService,
     private deleteWorkflowUseCase: DeleteWorkflowUseCase,
-    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private notificationTemplateRepository: NotificationTemplateRepository
   ) {}
 
   async execute(command: DeleteNotificationTemplateCommand) {
     try {
-      const workflowEntity = await this.getWorkflowByIdsUseCase.execute(
-        GetWorkflowByIdsCommand.create({
-          identifierOrInternalId: command.templateId,
+      await this.deleteWorkflowUseCase.execute(
+        DeleteWorkflowCommand.create({
+          workflowIdOrInternalId: command.templateId,
           environmentId: command.environmentId,
           organizationId: command.organizationId,
           userId: command.userId,
@@ -45,15 +44,6 @@ export class DeleteNotificationTemplate {
         command.environmentId,
         ChangeEntityTypeEnum.NOTIFICATION_TEMPLATE,
         command.templateId
-      );
-
-      await this.deleteWorkflowUseCase.execute(
-        DeleteWorkflowCommand.create({
-          identifierOrInternalId: command.templateId,
-          environmentId: command.environmentId,
-          organizationId: command.organizationId,
-          userId: command.userId,
-        })
       );
 
       const item: NotificationTemplateEntity = (
