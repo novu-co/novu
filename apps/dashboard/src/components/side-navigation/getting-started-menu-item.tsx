@@ -48,50 +48,56 @@ export function GettingStartedMenuItem() {
         <RiQuestionLine className="size-4" />
         <span>Getting started</span>
 
-        {!allStepsCompleted && (
-          <Badge
-            variant="soft"
-            size="pill"
-            className="bg-primary-alpha-10 text-primary inline-flex items-center gap-0.5 px-1 py-0.5 leading-4"
-          >
-            <motion.div
-              variants={{
-                initial: { scale: 1, rotate: 0, opacity: 1 },
-                hover: {
-                  scale: [1, 1.1, 1],
-                  rotate: [0, 4, -4, 0],
-                  opacity: [0, 1, 1],
-                  transition: {
-                    duration: 1.4,
-                    repeat: 0,
-                    ease: 'easeInOut',
-                  },
+        <Badge
+          variant="soft"
+          size="pill"
+          className="bg-primary-alpha-10 text-primary inline-flex items-center gap-0.5 px-1 py-0.5 leading-4"
+        >
+          <motion.div
+            variants={{
+              initial: { scale: 1, rotate: 0, opacity: 1 },
+              hover: {
+                scale: [1, 1.1, 1],
+                rotate: [0, 4, -4, 0],
+                opacity: [0, 1, 1],
+                transition: {
+                  duration: 1.4,
+                  repeat: 0,
+                  ease: 'easeInOut',
                 },
-              }}
-            >
-              <RiSparkling2Fill className="h-4 w-4" />
-            </motion.div>
-            <span className="text-xs">
-              {completedSteps}/{steps.length}
-            </span>
-          </Badge>
-        )}
+              },
+            }}
+          >
+            <RiSparkling2Fill className="h-4 w-4" />
+          </motion.div>
+          <span className="text-xs">
+            {completedSteps}/{steps.length}
+          </span>
+        </Badge>
 
         {allStepsCompleted && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={handleClose}
-                className="ml-auto h-4 w-4 hover:bg-neutral-300"
-                aria-label="Close getting started menu"
-              >
-                <RiCloseLine className="size-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>This will hide the Getting Started page</TooltipContent>
-          </Tooltip>
+          <motion.div
+            className="ml-auto h-4 w-4"
+            variants={{
+              initial: { opacity: 0 },
+              hover: { opacity: 1 },
+            }}
+          >
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={handleClose}
+                  className="h-4 w-4 hover:bg-neutral-300"
+                  aria-label="Close getting started menu"
+                >
+                  <RiCloseLine className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>This will hide the Getting Started page</TooltipContent>
+            </Tooltip>
+          </motion.div>
         )}
       </NavigationLink>
     </motion.div>
