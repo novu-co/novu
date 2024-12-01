@@ -1,83 +1,24 @@
 import React, { ReactNode, useMemo } from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
-import { cva } from 'class-variance-authority';
 import {
   RiBarChartBoxLine,
   RiGroup2Line,
   RiKey2Line,
-  RiQuestionLine,
   RiRouteFill,
   RiSettings4Line,
-  RiSparkling2Fill,
   RiStore3Line,
   RiUserAddLine,
 } from 'react-icons/ri';
-import { cn } from '@/utils/ui';
-import { EnvironmentDropdown } from './environment-dropdown';
 import { useEnvironment } from '@/context/environment/hooks';
-import { OrganizationDropdown } from './organization-dropdown';
-import { FreeTrialCard } from './free-trial-card';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
-import { SubscribersStayTunedModal } from './subscribers-stay-tuned-modal';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { useTelemetry } from '@/hooks/use-telemetry';
+import { EnvironmentDropdown } from './environment-dropdown';
+import { OrganizationDropdown } from './organization-dropdown';
+import { FreeTrialCard } from './free-trial-card';
+import { SubscribersStayTunedModal } from './subscribers-stay-tuned-modal';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
-import { Badge } from '../primitives/badge';
-import { useOnboardingSteps } from '../../hooks/use-onboarding-steps';
-import { motion } from 'framer-motion';
-
-const linkVariants = cva(
-  `flex items-center gap-2 text-sm py-1.5 px-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer`,
-  {
-    variants: {
-      variant: {
-        default: 'text-foreground-600/95 transition ease-out duration-300 hover:bg-accent',
-        selected: 'text-foreground-950 bg-neutral-alpha-100 transition ease-out duration-300 hover:bg-accent',
-        disabled: 'text-foreground-300 cursor-help',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-    },
-  }
-);
-
-type NavLinkProps = {
-  to?: string;
-  isExternal?: boolean;
-  className?: string;
-  children: React.ReactNode;
-};
-
-const NavigationLink = ({ to, isExternal, className, children }: NavLinkProps) => {
-  const { pathname } = useLocation();
-  const isSelected = pathname === to;
-
-  const variant = isSelected ? 'selected' : 'default';
-
-  const classNames = cn(linkVariants({ variant, className }));
-  if (!to) {
-    return <span className={classNames}>{children}</span>;
-  }
-
-  if (isExternal) {
-    return (
-      <a
-        href={to}
-        className={classNames}
-        target={to.startsWith('https') ? '_blank' : '_self'}
-        rel="noreferrer noopener"
-      >
-        {children}
-      </a>
-    );
-  }
-  return (
-    <RouterLink to={to ?? '/'} className={classNames}>
-      {children}
-    </RouterLink>
-  );
-};
+import { NavigationLink } from './navigation-link';
+import { GettingStartedMenuItem } from './getting-started-menu-item';
 
 const NavigationGroup = ({ children, label }: { children: ReactNode; label?: string }) => {
   return (
@@ -89,13 +30,11 @@ const NavigationGroup = ({ children, label }: { children: ReactNode; label?: str
 };
 
 export const SideNavigation = () => {
-  const { steps } = useOnboardingSteps();
   const { currentEnvironment, environments, switchEnvironment } = useEnvironment();
   const track = useTelemetry();
   const environmentNames = useMemo(() => environments?.map((env) => env.name), [environments]);
   const onEnvironmentChange = (value: string) => {
     const environment = environments?.find((env) => env.name === value);
-
     switchEnvironment(environment?.slug);
   };
 
@@ -152,39 +91,7 @@ export const SideNavigation = () => {
                 <RiUserAddLine className="size-4" />
                 <span>Invite teammates</span>
               </NavigationLink>
-              <motion.div className="contents" whileHover="hover" initial="initial">
-                <NavigationLink to={buildRoute(ROUTES.WELCOME, { environmentSlug: currentEnvironment?.slug ?? '' })}>
-                  <RiQuestionLine className="size-4" />
-                  <span>Getting started</span>
-
-                  <Badge
-                    variant="soft"
-                    size="pill"
-                    className="bg-primary-alpha-10 text-primary inline-flex items-center gap-0.5 px-1 py-0.5 leading-4"
-                  >
-                    <motion.div
-                      variants={{
-                        initial: { scale: 1, rotate: 0, opacity: 1 },
-                        hover: {
-                          scale: [1, 1.1, 1],
-                          rotate: [0, 4, -4, 0],
-                          opacity: [0, 1, 1],
-                          transition: {
-                            duration: 1.4,
-                            repeat: 0,
-                            ease: 'easeInOut',
-                          },
-                        },
-                      }}
-                    >
-                      <RiSparkling2Fill className="h-4 w-4" />
-                    </motion.div>
-                    <span className="text-xs">
-                      {steps.filter((step) => step.status === 'completed').length}/{steps.length}
-                    </span>
-                  </Badge>
-                </NavigationLink>
-              </motion.div>
+              <GettingStartedMenuItem />
             </NavigationGroup>
           </div>
         </nav>
