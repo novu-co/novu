@@ -17,10 +17,9 @@ import { useMutation } from '@tanstack/react-query';
 import * as Sentry from '@sentry/react';
 
 const containerVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    y: 0,
     transition: {
       duration: 0.6,
       ease: [0.22, 1, 0.36, 1],
@@ -30,8 +29,8 @@ const containerVariants = {
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
 };
 
 export function UsecaseSelectPage() {
