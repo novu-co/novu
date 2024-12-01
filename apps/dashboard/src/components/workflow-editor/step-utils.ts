@@ -1,5 +1,5 @@
 import { flatten } from 'flat';
-import type { ContentIssue, StepIssuesDto } from '@novu/shared';
+import type { ContentIssue, StepDataDto, StepIssuesDto, WorkflowResponseDto } from '@novu/shared';
 
 export const getFirstBodyErrorMessage = (issues?: StepIssuesDto) => {
   const stepIssuesArray = Object.entries({ ...issues?.body });
@@ -31,4 +31,23 @@ export const flattenIssues = (controlIssues?: Record<string, ContentIssue[]>): R
 
     return { ...acc, [key]: errorMessage };
   }, {});
+};
+
+export const updateStepControlValuesInWorkflow = (workflow: WorkflowResponseDto, step: StepDataDto, data: any) => {
+  return {
+    ...workflow,
+    steps: workflow.steps.map((s) => {
+      if (s._id === step._id) {
+        return { ...s, controlValues: data };
+      }
+      return s;
+    }),
+  };
+};
+
+export const updateStepInWorkflow = (workflow: WorkflowResponseDto, data: StepDataDto) => {
+  return {
+    ...workflow,
+    steps: workflow.steps.map((s) => (s._id === data._id ? { ...s, ...data } : s)),
+  };
 };

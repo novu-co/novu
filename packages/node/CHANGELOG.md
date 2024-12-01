@@ -1,3 +1,18 @@
+## 2.0.4 (2024-11-29)
+
+### 🚀 Features
+
+- **node:** add deleteByTransactionId method ([#6980](https://github.com/novuhq/novu/pull/6980))
+
+### 🩹 Fixes
+
+- **node:** add includeInactiveChannels option in sdk method" ([#7171](https://github.com/novuhq/novu/pull/7171))
+
+### ❤️ Thank You
+
+- Pawan Jain
+- Sokratis Vidros @SokratisVidros
+
 ## 2.0.3 (2024-11-26)
 
 ### 🚀 Features
@@ -15,7 +30,7 @@
 
 - Updated @novu/shared to 2.1.4
 
-### ❤️  Thank You
+### ❤️ Thank You
 
 - George Desipris @desiprisg
 - Himanshu Garg @merrcury
@@ -205,7 +220,7 @@
 - after pr ([9e54d573e](https://github.com/novuhq/novu/commit/9e54d573e))
 - update @novu/shared version ([ed25dd806](https://github.com/novuhq/novu/commit/ed25dd806))
 
-### ❤️  Thank You
+### ❤️ Thank You
 
 - ainouzgali
 - Amin Mahfouz

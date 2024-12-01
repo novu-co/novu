@@ -28,7 +28,7 @@ import { useTagsQuery } from '@/hooks/use-tags-query';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
-import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowMinimalSchema } from './workflow-editor/schema';
+import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowSchema } from './workflow-editor/schema';
 
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
 export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
@@ -58,8 +58,8 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   });
   const tagsQuery = useTagsQuery();
 
-  const form = useForm<z.infer<typeof workflowMinimalSchema>>({
-    resolver: zodResolver(workflowMinimalSchema),
+  const form = useForm<z.infer<typeof workflowSchema>>({
+    resolver: zodResolver(workflowSchema),
     defaultValues: { description: '', workflowId: '', name: '', tags: [] },
   });
 
@@ -152,7 +152,11 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <FormLabel hint={`(max. ${MAX_TAG_ELEMENTS})`}>Add tags</FormLabel>
                     </div>
                     <FormControl>
-                      <TagInput suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []} {...field} />
+                      <TagInput
+                        suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []}
+                        {...field}
+                        value={field.value ?? []}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -170,7 +174,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     <FormControl>
                       <Textarea
                         className="min-h-36"
-                        placeholder="Description of what this workflow does"
+                        placeholder="Describe what this workflow does"
                         {...field}
                         maxLength={MAX_DESCRIPTION_LENGTH}
                       />

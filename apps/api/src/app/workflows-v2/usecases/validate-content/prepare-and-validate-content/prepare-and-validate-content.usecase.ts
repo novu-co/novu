@@ -9,7 +9,7 @@ import {
   StepTypeEnum,
   UserSessionData,
 } from '@novu/shared';
-import { TierRestrictionsValidateUsecase } from '@novu/application-generic';
+import { Instrument, InstrumentUsecase, TierRestrictionsValidateUsecase } from '@novu/application-generic';
 
 import { PrepareAndValidateContentCommand } from './prepare-and-validate-content.command';
 import { flattenJson, flattenToNested, mergeObjects } from '../../../util/jsonUtils';
@@ -39,6 +39,7 @@ export class PrepareAndValidateContentUsecase {
     private tierRestrictionsValidateUsecase: TierRestrictionsValidateUsecase
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: PrepareAndValidateContentCommand): Promise<ValidatedContentResponse> {
     const controlValueToPlaceholders = this.collectPlaceholders(command.controlValues);
     const controlValueToValidPlaceholders = this.validatePlaceholders(
@@ -234,6 +235,7 @@ export class PrepareAndValidateContentUsecase {
     return targetText.trim();
   }
 
+  @Instrument()
   private async buildIssues(
     payload: PreviewPayload,
     providedPayload: PreviewPayload,
@@ -319,7 +321,7 @@ export class PrepareAndValidateContentUsecase {
             {
               issueType: StepContentIssueEnum.INVALID_URL,
               variableName: controlValue,
-              message: `Invalid URL: [[${controlValue}]]`,
+              message: 'Provide an absolute URL starting with https:// or a valid path starting with /',
             },
           ];
         }
@@ -338,6 +340,7 @@ export class PrepareAndValidateContentUsecase {
     );
   }
 
+  @Instrument()
   private async computeTierIssues(
     defaultControlValues: Record<string, unknown>,
     user: UserSessionData,

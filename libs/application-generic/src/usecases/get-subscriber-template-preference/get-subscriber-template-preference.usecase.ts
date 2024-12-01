@@ -3,7 +3,6 @@ import {
   MessageTemplateRepository,
   NotificationTemplateEntity,
   SubscriberEntity,
-  SubscriberPreferenceRepository,
   SubscriberRepository,
   TenantRepository,
   WorkflowOverrideRepository,
@@ -25,7 +24,7 @@ import { GetSubscriberTemplatePreferenceCommand } from './get-subscriber-templat
 import { ApiException } from '../../utils/exceptions';
 import { buildSubscriberKey, CachedEntity } from '../../services/cache';
 import { GetPreferences } from '../get-preferences';
-import { InstrumentUsecase } from '../../instrumentation';
+import { Instrument, InstrumentUsecase } from '../../instrumentation';
 
 const PRIORITY_ORDER = [
   PreferenceOverrideSourceEnum.TEMPLATE,
@@ -36,7 +35,6 @@ const PRIORITY_ORDER = [
 @Injectable()
 export class GetSubscriberTemplatePreference {
   constructor(
-    private subscriberPreferenceRepository: SubscriberPreferenceRepository,
     private messageTemplateRepository: MessageTemplateRepository,
     private subscriberRepository: SubscriberRepository,
     private workflowOverrideRepository: WorkflowOverrideRepository,
@@ -72,10 +70,7 @@ export class GetSubscriberTemplatePreference {
 
     const template = mapTemplateConfiguration({
       ...command.template,
-      // Use the critical flag from the V2 Preference object if it exists
-      ...(subscriberWorkflowPreference.critical !== undefined && {
-        critical: subscriberWorkflowPreference.critical,
-      }),
+      critical: subscriberWorkflowPreference.critical,
     });
 
     return {
@@ -89,6 +84,7 @@ export class GetSubscriberTemplatePreference {
     };
   }
 
+  @Instrument()
   private async getSubscriberWorkflowPreference(
     command: GetSubscriberTemplatePreferenceCommand,
     subscriberId: string,
@@ -98,47 +94,20 @@ export class GetSubscriberTemplatePreference {
     type: PreferencesTypeEnum;
     enabled: boolean;
   }> {
-    const subscriberWorkflowPreferenceV2 =
-      await this.getPreferences.safeExecute({
-        environmentId: command.environmentId,
-        organizationId: command.organizationId,
-        subscriberId,
-        templateId: command.template._id,
-      });
+    const subscriberWorkflowPreference = await this.getPreferences.safeExecute({
+      environmentId: command.environmentId,
+      organizationId: command.organizationId,
+      subscriberId,
+      templateId: command.template._id,
+    });
 
-    let subscriberWorkflowChannels: IPreferenceChannels;
-    let subscriberPreferenceType: PreferencesTypeEnum;
-    let critical: boolean | undefined;
-    let enabled: boolean;
-    // Prefer the V2 preference object if it exists, otherwise fallback to V1
-    if (subscriberWorkflowPreferenceV2 !== undefined) {
-      subscriberWorkflowChannels =
-        GetPreferences.mapWorkflowPreferencesToChannelPreferences(
-          subscriberWorkflowPreferenceV2.preferences,
-        );
-      subscriberPreferenceType = subscriberWorkflowPreferenceV2.type;
-      critical = subscriberWorkflowPreferenceV2.preferences?.all?.readOnly;
-      enabled = true;
-    } else {
-      // Lookup V1 preferences only if V2 is not available
-      /** @deprecated */
-      const subscriberWorkflowPreferenceV1 =
-        await this.subscriberPreferenceRepository.findOne(
-          {
-            _environmentId: command.environmentId,
-            _subscriberId: subscriberId,
-            _templateId: command.template._id,
-          },
-          'enabled channels',
-          { readPreference: 'secondaryPreferred' },
-        );
-
-      subscriberWorkflowChannels =
-        subscriberWorkflowPreferenceV1?.channels ?? {};
-      subscriberPreferenceType = PreferencesTypeEnum.SUBSCRIBER_WORKFLOW;
-      critical = undefined;
-      enabled = subscriberWorkflowPreferenceV1?.enabled ?? true;
-    }
+    const subscriberWorkflowChannels =
+      GetPreferences.mapWorkflowPreferencesToChannelPreferences(
+        subscriberWorkflowPreference.preferences,
+      );
+    const subscriberPreferenceType = subscriberWorkflowPreference.type;
+    const critical = subscriberWorkflowPreference.preferences?.all?.readOnly;
+    const enabled = true;
 
     return {
       channels: subscriberWorkflowChannels,
@@ -148,6 +117,7 @@ export class GetSubscriberTemplatePreference {
     };
   }
 
+  @Instrument()
   private async getWorkflowOverride(
     command: GetSubscriberTemplatePreferenceCommand,
   ) {
@@ -172,6 +142,7 @@ export class GetSubscriberTemplatePreference {
     });
   }
 
+  @Instrument()
   private async getChannels(
     command: GetSubscriberTemplatePreferenceCommand,
   ): Promise<IPreferenceChannels> {
@@ -196,6 +167,7 @@ export class GetSubscriberTemplatePreference {
     return initialChannels;
   }
 
+  @Instrument()
   private async queryActiveChannels(
     command: GetSubscriberTemplatePreferenceCommand,
   ): Promise<ChannelTypeEnum[]> {
@@ -354,7 +326,7 @@ export const filteredPreference = (
     {},
   );
 
-function mapTemplateConfiguration(
+export function mapTemplateConfiguration(
   template: NotificationTemplateEntity,
 ): ITemplateConfiguration {
   return {

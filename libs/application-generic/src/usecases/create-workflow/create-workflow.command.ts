@@ -17,32 +17,32 @@ import {
   BuilderFieldType,
   BuilderGroupValues,
   ChannelCTATypeEnum,
+  ContentIssue as ContentIssueDto,
+  CustomDataType,
   FilterParts,
   IMessageAction,
   INotificationGroup,
   IStepVariant,
-  StepIssuesDto,
-  StepIssue as StepIssueDto,
-  ContentIssue as ContentIssueDto,
   IWorkflowStepMetadata,
   JSONSchemaDto,
-  NotificationTemplateCustomData,
-  WorkflowOriginEnum,
-  WorkflowTypeEnum,
-  StepIssueEnum,
   StepContentIssueEnum,
   StepCreateAndUpdateKeys,
+  StepIssue as StepIssueDto,
+  StepIssueEnum,
+  StepIssuesDto,
+  WorkflowOriginEnum,
   WorkflowStatusEnum,
+  WorkflowTypeEnum,
 } from '@novu/shared';
 
 import { Type } from 'class-transformer';
 import { EnvironmentWithUserCommand } from '../../commands';
 import { PreferencesRequired } from '../upsert-preferences';
-
-export const MAX_TAG_ELEMENTS = 16;
-export const MAX_TAG_LENGTH = 32;
-export const MAX_NAME_LENGTH = 64;
-export const MAX_DESCRIPTION_LENGTH = 256;
+import {
+  MAX_DESCRIPTION_LENGTH,
+  MAX_NAME_LENGTH,
+  MAX_TAG_LENGTH,
+} from '../workflow';
 
 export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsDefined()
@@ -105,7 +105,7 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
   __source?: string;
 
   @IsOptional()
-  data?: NotificationTemplateCustomData;
+  data?: CustomDataType;
 
   @IsOptional()
   inputs?: {
