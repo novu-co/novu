@@ -8,7 +8,7 @@ import { TelemetryEvent } from '@/utils/telemetry';
 
 export interface Resource {
   title: string;
-  duration: string;
+  duration?: string;
   image: string;
   url: string;
 }
@@ -76,7 +76,7 @@ export function ResourcesList({ resources, title, icon }: ResourcesListProps) {
               <Link to={resource.url} target="_blank" rel="noopener" onClick={() => handleResourceClick(resource)}>
                 <Card className="w-60 shrink-0 overflow-hidden border-none shadow-[0px_12px_32px_0px_rgba(0,0,0,0.02),0px_0px_0px_1px_rgba(0,0,0,0.05)] transition-all duration-200 hover:translate-y-[1px] hover:cursor-pointer hover:shadow-md">
                   <motion.div
-                    className="bg-foreground-50 h-[126px] overflow-hidden"
+                    className="bg-foreground-50 h-[80px] overflow-hidden"
                     whileHover={{ scale: 1.03 }}
                     transition={{ duration: 0.2 }}
                   >
@@ -87,13 +87,15 @@ export function ResourcesList({ resources, title, icon }: ResourcesListProps) {
                     />
                   </motion.div>
 
-                  <CardContent className="flex h-[94px] flex-col justify-between p-3">
+                  <CardContent className="flex h-[60px] flex-col justify-between p-3">
                     <h3 className="text-foreground-900 whitespace-normal text-sm font-medium">{resource.title}</h3>
 
-                    <div className="flex items-center gap-1">
-                      <BookOpen className="text-foreground-400 h-3 w-3" />
-                      <span className="text-foreground-400 text-[10px]">{resource.duration}</span>
-                    </div>
+                    {resource.duration && (
+                      <div className="flex items-center gap-1">
+                        <BookOpen className="text-foreground-400 h-3 w-3" />
+                        <span className="text-foreground-400 text-[10px]">{resource.duration}</span>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </Link>
