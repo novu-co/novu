@@ -114,7 +114,6 @@ export class PreviewPayload {
 
 export class GeneratePreviewResponseDto {
   previewPayloadExample: PreviewPayload;
-  issues: Record<string, ContentIssue[]>;
   result?:
     | {
         type: ChannelTypeEnum.EMAIL;

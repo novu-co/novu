@@ -57,7 +57,7 @@ export class GeneratePreviewUsecase {
         type: stepData.type as unknown as ChannelTypeEnum,
       },
       previewPayloadExample: variablesExample,
-    } as GeneratePreviewResponseDto;
+    };
   }
 
   @Instrument()
