@@ -1,8 +1,7 @@
 import { IWorkflowStepMetadata } from '../../entities/step';
 import { BuilderFieldType, BuilderGroupValues, FilterParts } from '../../types';
 import { MessageTemplateDto } from '../message-template';
-import { UpdateWorkflowDto } from './update-workflow-dto';
-import { StepCreateDto, StepUpdateDto } from './workflow-commons-fields';
+import { UpdateWorkflowDto, StepCreateDto, StepUpdateDto } from './workflow-response.dto';
 
 export class StepVariantDto {
   id?: string;

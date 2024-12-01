@@ -18,13 +18,13 @@ import {
   BuilderGroupValues,
   ChannelCTATypeEnum,
   ContentIssue as ContentIssueDto,
+  CustomDataType,
   FilterParts,
   IMessageAction,
   INotificationGroup,
   IStepVariant,
   IWorkflowStepMetadata,
   JSONSchemaDto,
-  NotificationTemplateCustomData,
   StepContentIssueEnum,
   StepCreateAndUpdateKeys,
   StepIssue as StepIssueDto,
@@ -105,7 +105,7 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
   __source?: string;
 
   @IsOptional()
-  data?: NotificationTemplateCustomData;
+  data?: CustomDataType;
 
   @IsOptional()
   inputs?: {

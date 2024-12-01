@@ -37,7 +37,6 @@ import {
   IntegrationRepository,
   JobRepository,
   LayoutRepository,
-  LogRepository,
   MessageRepository,
   MessageTemplateRepository,
   NotificationGroupRepository,
@@ -54,7 +53,6 @@ import { JobTopicNameEnum } from '@novu/shared';
 import packageJson from '../../../package.json';
 import { UNIQUE_WORKER_DEPENDENCIES } from '../../config/worker-init.config';
 import { ActiveJobsMetricService } from '../workflow/services';
-import { CreateLog } from './logs';
 
 const DAL_MODELS = [
   EnvironmentRepository,
@@ -66,7 +64,6 @@ const DAL_MODELS = [
   MessageTemplateRepository,
   NotificationGroupRepository,
   LayoutRepository,
-  LogRepository,
   IntegrationRepository,
   JobRepository,
   TopicRepository,
@@ -93,7 +90,6 @@ const PROVIDERS = [
   cacheService,
   ComputeJobWaitDurationService,
   CreateExecutionDetails,
-  CreateLog,
   CreateNotificationJobs,
   CreateSubscriber,
   dalService,

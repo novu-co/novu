@@ -10,7 +10,6 @@ export * from './repositories/message';
 export * from './repositories/message-template';
 export * from './repositories/notification-group';
 export * from './repositories/member';
-export * from './repositories/log';
 export * from './repositories/integration';
 export * from './repositories/change';
 export * from './repositories/job';

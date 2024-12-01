@@ -5,6 +5,7 @@ import {
   ContentIssue,
   ControlSchemas,
   ControlsDto,
+  CustomDataType,
   FilterParts,
   IMessageFilter,
   IMessageTemplate,
@@ -16,7 +17,6 @@ import {
   IStepVariant,
   ITriggerReservedVariable,
   IWorkflowStepMetadata,
-  NotificationTemplateCustomData,
   StepIssues,
   TriggerTypeEnum,
   WorkflowOriginEnum,
@@ -77,7 +77,7 @@ export class NotificationTemplateEntity implements INotificationTemplate {
 
   blueprintId?: string;
 
-  data?: NotificationTemplateCustomData;
+  data?: CustomDataType;
 
   type?: WorkflowTypeEnum;
 

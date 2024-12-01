@@ -11,12 +11,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitive
 import { InAppEditor } from '@/components/workflow-editor/steps/in-app/in-app-editor';
 import { InAppEditorPreview } from '@/components/workflow-editor/steps/in-app/in-app-editor-preview';
 import { CustomStepControls } from '../controls/custom-step-controls';
-import { ConfigureStepTemplateFormProps } from '@/components/workflow-editor/steps/configure-step-template-form';
+import { StepEditorProps } from '@/components/workflow-editor/steps/configure-step-template-form';
 import { useDebouncedPreview } from '../use-debounced-preview';
 
 const tabsContentClassName = 'h-full w-full overflow-y-auto';
 
-export const InAppTabs = (props: ConfigureStepTemplateFormProps) => {
+export const InAppTabs = (props: StepEditorProps) => {
   const { workflow, step } = props;
   const { dataSchema, uiSchema } = step.controls;
   const form = useFormContext();
