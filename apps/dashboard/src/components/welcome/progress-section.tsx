@@ -120,7 +120,6 @@ function WelcomeHeader() {
 }
 
 function getStepRoute(stepId: StepIdEnum, environmentSlug: string = '') {
-  console.log('stepId', stepId);
   switch (stepId) {
     case StepIdEnum.CREATE_A_WORKFLOW:
       return {
