@@ -6,6 +6,7 @@ import {
   buildSubscriberKey,
   CachedEntity,
   CachedQuery,
+  InstrumentUsecase,
 } from '@novu/application-generic';
 import { MessageRepository, SubscriberEntity, SubscriberRepository } from '@novu/dal';
 
@@ -33,6 +34,7 @@ export class GetNotificationsFeed {
     }
   }
 
+  @InstrumentUsecase()
   @CachedQuery({
     builder: ({ environmentId, subscriberId, ...command }: GetNotificationsFeedCommand) =>
       buildFeedKey().cache({

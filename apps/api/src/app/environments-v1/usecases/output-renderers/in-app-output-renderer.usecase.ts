@@ -1,6 +1,7 @@
 // Concrete Renderer for In-App Message Preview
 import { InAppRenderOutput, RedirectTargetEnum } from '@novu/shared';
 import { Injectable } from '@nestjs/common';
+import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { RenderCommand } from './render-command';
 import {
   InAppActionType,
@@ -12,6 +13,7 @@ import { isValidUrlForActionButton } from '../../../workflows-v2/util/url-utils'
 
 @Injectable()
 export class InAppOutputRendererUsecase {
+  @InstrumentUsecase()
   execute(renderCommand: RenderCommand): InAppRenderOutput {
     const inApp: InAppControlType = InAppControlZodSchema.parse(renderCommand.controlValues);
     if (!inApp) {
@@ -23,7 +25,7 @@ export class InAppOutputRendererUsecase {
     return {
       subject: inApp.subject,
       body: inApp.body,
-      avatar: inApp.avatar,
+      avatar: inApp.avatar?.trim() || undefined,
       primaryAction: this.buildActionIfAllPartsAvailable(primaryAction),
       secondaryAction: this.buildActionIfAllPartsAvailable(secondaryAction),
       redirect: this.buildRedirect(redirect),

@@ -43,13 +43,13 @@ export async function syncWorkflow(workflowId: string, payload: SyncWorkflowDto)
 }
 
 export const updateWorkflow = async ({
-  id,
+  workflowId,
   workflow,
 }: {
-  id: string;
+  workflowId: string;
   workflow: UpdateWorkflowDto;
 }): Promise<WorkflowResponseDto> => {
-  const { data } = await putV2<{ data: WorkflowResponseDto }>(`/workflows/${id}`, workflow);
+  const { data } = await putV2<{ data: WorkflowResponseDto }>(`/workflows/${workflowId}`, workflow);
 
   return data;
 };

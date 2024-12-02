@@ -1,10 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  PreferenceLevelEnum,
-  SubscriberEntity,
-  SubscriberPreferenceRepository,
-  SubscriberRepository,
-} from '@novu/dal';
+import { SubscriberEntity, SubscriberRepository } from '@novu/dal';
 
 import { IPreferenceChannels, ChannelTypeEnum } from '@novu/shared';
 import { GetSubscriberGlobalPreferenceCommand } from './get-subscriber-global-preference.command';
@@ -13,12 +8,11 @@ import { ApiException } from '../../utils/exceptions';
 import { GetPreferences } from '../get-preferences';
 import { GetSubscriberPreference } from '../get-subscriber-preference/get-subscriber-preference.usecase';
 import { filteredPreference } from '../get-subscriber-template-preference/get-subscriber-template-preference.usecase';
-import { InstrumentUsecase } from '../../instrumentation';
+import { Instrument, InstrumentUsecase } from '../../instrumentation';
 
 @Injectable()
 export class GetSubscriberGlobalPreference {
   constructor(
-    private subscriberPreferenceRepository: SubscriberPreferenceRepository,
     private subscriberRepository: SubscriberRepository,
     private getPreferences: GetPreferences,
     private getSubscriberPreference: GetSubscriberPreference,
@@ -54,6 +48,7 @@ export class GetSubscriberGlobalPreference {
     };
   }
 
+  @Instrument()
   private async getSubscriberGlobalPreference(
     command: GetSubscriberGlobalPreferenceCommand,
     subscriberId: string,
@@ -61,40 +56,20 @@ export class GetSubscriberGlobalPreference {
     channels: IPreferenceChannels;
     enabled: boolean;
   }> {
-    let subscriberGlobalChannels: IPreferenceChannels;
-    let enabled: boolean;
-
-    const subscriberGlobalPreferenceV2 =
+    const subscriberGlobalChannels =
       await this.getPreferences.getPreferenceChannels({
         environmentId: command.environmentId,
         organizationId: command.organizationId,
         subscriberId,
       });
 
-    // Prefer the V2 preference object if it exists, otherwise fallback to V1
-    if (subscriberGlobalPreferenceV2 !== undefined) {
-      subscriberGlobalChannels = subscriberGlobalPreferenceV2;
-      enabled = true;
-    } else {
-      // Lookup V1 preferences only if V2 is not available
-      /** @deprecated */
-      const subscriberGlobalPreferenceV1 =
-        await this.subscriberPreferenceRepository.findOne({
-          _environmentId: command.environmentId,
-          _subscriberId: subscriberId,
-          level: PreferenceLevelEnum.GLOBAL,
-        });
-
-      subscriberGlobalChannels = subscriberGlobalPreferenceV1?.channels ?? {};
-      enabled = subscriberGlobalPreferenceV1?.enabled ?? true;
-    }
-
     return {
       channels: subscriberGlobalChannels,
-      enabled,
+      enabled: true,
     };
   }
 
+  @Instrument()
   private async getActiveChannels(
     command: GetSubscriberGlobalPreferenceCommand,
   ): Promise<ChannelTypeEnum[]> {

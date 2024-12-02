@@ -13,6 +13,7 @@ import { Button } from '@/components/primitives/button';
 import { useEnvironment } from '@/context/environment/hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { useFetchWorkflow } from '@/hooks';
+import TruncatedText from '@/components/truncated-text';
 
 export const EditorBreadcrumbs = () => {
   const { workflowSlug = '' } = useParams<{ workflowSlug: string }>();
@@ -36,7 +37,7 @@ export const EditorBreadcrumbs = () => {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center overflow-hidden">
       <Button variant="link" onClick={handleBackNav}>
         <ArrowRight className="text-neutral-950" />
       </Button>
@@ -53,7 +54,9 @@ export const EditorBreadcrumbs = () => {
           <BreadcrumbItem>
             <BreadcrumbPage>
               <RouteFill />
-              {workflow?.name}
+              <div className="flex max-w-[32ch]">
+                <TruncatedText>{workflow?.name}</TruncatedText>
+              </div>
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>

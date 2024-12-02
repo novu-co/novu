@@ -9,7 +9,7 @@ import { Command } from 'cmdk';
 import { forwardRef, useEffect, useMemo, useState } from 'react';
 import { RiCloseFill } from 'react-icons/ri';
 
-type TagInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+type TagInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
   value: string[];
   suggestions: string[];
   onChange: (tags: string[]) => void;

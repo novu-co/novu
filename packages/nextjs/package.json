@@ -1,6 +1,6 @@
 {
   "name": "@novu/nextjs",
-  "version": "2.6.1",
+  "version": "2.6.3",
   "repository": "https://github.com/novuhq/novu",
   "description": "Novu's Next.js SDK for building custom inbox notification experiences",
   "author": "",
@@ -93,6 +93,8 @@
     "@novu/react": "workspace:*"
   },
   "nx": {
-    "tags": ["package:public"]
+    "tags": [
+      "type:package"
+    ]
   }
 }

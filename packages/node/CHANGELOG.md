@@ -1,3 +1,41 @@
+## 2.0.4 (2024-11-29)
+
+### 🚀 Features
+
+- **node:** add deleteByTransactionId method ([#6980](https://github.com/novuhq/novu/pull/6980))
+
+### 🩹 Fixes
+
+- **node:** add includeInactiveChannels option in sdk method" ([#7171](https://github.com/novuhq/novu/pull/7171))
+
+### ❤️ Thank You
+
+- Pawan Jain
+- Sokratis Vidros @SokratisVidros
+
+## 2.0.3 (2024-11-26)
+
+### 🚀 Features
+
+- **dashboard:** Codemirror liquid filter support ([#7122](https://github.com/novuhq/novu/pull/7122))
+- **root:** add support chat app ID to environment variables in d… ([#7120](https://github.com/novuhq/novu/pull/7120))
+- **root:** Add base Dockerfile for GHCR with Node.js and dependencies ([#7100](https://github.com/novuhq/novu/pull/7100))
+
+### 🩹 Fixes
+
+- **api:** Migrate subscriber global preferences before workflow preferences ([#7118](https://github.com/novuhq/novu/pull/7118))
+- **api, dal, framework:** fix the uneven and unused dependencies ([#7103](https://github.com/novuhq/novu/pull/7103))
+
+### 🧱 Updated Dependencies
+
+- Updated @novu/shared to 2.1.4
+
+### ❤️ Thank You
+
+- George Desipris @desiprisg
+- Himanshu Garg @merrcury
+- Richard Fontein @rifont
+
 ## 2.0.2 (2024-11-19)
 
 ### 🚀 Features
@@ -182,7 +220,7 @@
 - after pr ([9e54d573e](https://github.com/novuhq/novu/commit/9e54d573e))
 - update @novu/shared version ([ed25dd806](https://github.com/novuhq/novu/commit/ed25dd806))
 
-### ❤️  Thank You
+### ❤️ Thank You
 
 - ainouzgali
 - Amin Mahfouz
