@@ -135,7 +135,7 @@ export const SideNavigation = () => {
             </NavigationLink>
           </NavigationGroup>
           <NavigationGroup>
-            <NavigationLink to={LEGACY_ROUTES.INVITE_TEAM_MEMBERS} isExternal>
+            <NavigationLink to={ROUTES.TEAM}>
               <RiUserAddLine className="size-4" />
               <span>Invite teammates</span>
             </NavigationLink>
