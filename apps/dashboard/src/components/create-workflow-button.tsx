@@ -152,7 +152,11 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <FormLabel hint={`(max. ${MAX_TAG_ELEMENTS})`}>Add tags</FormLabel>
                     </div>
                     <FormControl>
-                      <TagInput suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []} {...field} />
+                      <TagInput
+                        suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []}
+                        {...field}
+                        value={field.value ?? []}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

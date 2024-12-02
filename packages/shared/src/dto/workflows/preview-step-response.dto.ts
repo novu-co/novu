@@ -1,6 +1,6 @@
 import { ActionTypeEnum, ChannelTypeEnum } from '../../types';
 import { SubscriberDto } from '../subscriber';
-import { ContentIssue } from './workflow-commons-fields';
+import { ContentIssue } from './workflow-response.dto';
 
 export class RenderOutput {}
 
@@ -114,7 +114,6 @@ export class PreviewPayload {
 
 export class GeneratePreviewResponseDto {
   previewPayloadExample: PreviewPayload;
-  issues: Record<string, ContentIssue[]>;
   result?:
     | {
         type: ChannelTypeEnum.EMAIL;

@@ -3,6 +3,7 @@ import { NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { JSONSchemaDto } from '@novu/shared';
 import { computeResultSchema } from '../../shared';
 import { BuildAvailableVariableSchemaCommand } from './build-available-variable-schema.command';
+import { parsePayloadSchema } from '../../shared/parse-payload-schema';
 
 @Injectable()
 export class BuildAvailableVariableSchemaUsecase {
@@ -38,17 +39,13 @@ export class BuildAvailableVariableSchemaUsecase {
           additionalProperties: false,
         },
         steps: buildPreviousStepsSchema(previousSteps, workflow.payloadSchema),
-        payload: safePayloadSchema(workflow) || { type: 'object', description: 'Payload for the current step' },
+        payload: parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {
+          type: 'object',
+          description: 'Payload for the current step',
+        },
       },
       additionalProperties: false,
     } as const satisfies JSONSchemaDto;
-  }
-}
-function safePayloadSchema(workflow: NotificationTemplateEntity): JSONSchemaDto | undefined {
-  try {
-    return JSON.parse(workflow.payloadSchema);
-  } catch (e) {
-    return undefined;
   }
 }
 

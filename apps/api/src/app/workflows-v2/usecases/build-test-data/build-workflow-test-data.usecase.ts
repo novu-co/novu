@@ -9,6 +9,8 @@ import {
   InstrumentUsecase,
 } from '@novu/application-generic';
 import { WorkflowTestDataCommand } from './build-workflow-test-data.command';
+import { parsePayloadSchema } from '../../shared/parse-payload-schema';
+import { mockSchemaDefaults } from '../../util/utils';
 
 @Injectable()
 export class BuildWorkflowTestDataUseCase {
@@ -18,11 +20,13 @@ export class BuildWorkflowTestDataUseCase {
   async execute(command: WorkflowTestDataCommand): Promise<WorkflowTestDataResponseDto> {
     const _workflowEntity: NotificationTemplateEntity = await this.fetchWorkflow(command);
     const toSchema = buildToFieldSchema({ user: command.user, steps: _workflowEntity.steps });
-    const payloadSchema = parsePayloadSchema(_workflowEntity.payloadSchema);
+    const payloadSchema = parsePayloadSchema(_workflowEntity.payloadSchema, { safe: true });
+    const payloadSchemaMock =
+      payloadSchema && Object.keys(payloadSchema.properties || {}).length > 0 ? mockSchemaDefaults(payloadSchema) : {};
 
     return {
       to: toSchema,
-      payload: payloadSchema,
+      payload: payloadSchemaMock,
     };
   }
 
@@ -57,20 +61,4 @@ function buildToFieldSchema({ user, steps }: { user: UserSessionData; steps: Not
 
 function isContainsStepType(steps: NotificationStepEntity[], type: StepTypeEnum) {
   return steps.some((step) => step.template?.type === type);
-}
-
-function parsePayloadSchema(schema: unknown): Record<string, unknown> {
-  if (typeof schema === 'string') {
-    try {
-      return JSON.parse(schema);
-    } catch (error) {
-      throw new Error('Invalid JSON string provided for payload schema');
-    }
-  }
-
-  if (schema && typeof schema === 'object') {
-    return schema as Record<string, unknown>;
-  }
-
-  throw new Error('Payload schema must be either a valid JSON string or an object');
 }

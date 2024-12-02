@@ -30,12 +30,15 @@ import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
 import { autocompletion } from '@codemirror/autocomplete';
 import { useStep } from '@/components/workflow-editor/steps/step-provider';
+import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
 
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
 
 export const InAppAction = () => {
   const { control, setValue, getFieldState } = useFormContext();
+  const { saveForm } = useSaveForm();
+
   const primaryAction = useWatch({ control, name: primaryActionKey });
   const secondaryAction = useWatch({ control, name: secondaryActionKey });
   const primaryActionLabel = getFieldState(`${primaryActionKey}.label`);
@@ -81,11 +84,21 @@ export const InAppAction = () => {
             </Button>
           </DropdownMenuTrigger>
         </div>
-        <DropdownMenuContent className="p-1" align="end">
+        <DropdownMenuContent
+          className="p-1"
+          align="end"
+          onBlur={(e) => {
+            // weird behaviour but onBlur event happens when hovering over the menu items, this is used to prevent
+            // the blur event that submits the form
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        >
           <DropdownMenuItem
             onClick={() => {
-              setValue(primaryActionKey, null, { shouldDirty: true, shouldValidate: false });
-              setValue(secondaryActionKey, null, { shouldDirty: true, shouldValidate: false });
+              setValue(primaryActionKey, null, { shouldDirty: true, shouldValidate: true });
+              setValue(secondaryActionKey, null, { shouldDirty: true, shouldValidate: true });
+              saveForm();
             }}
           >
             <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'pointer-events-none gap-2')}>
@@ -102,8 +115,9 @@ export const InAppAction = () => {
                 },
                 primaryAction
               );
-              setValue(primaryActionKey, primaryActionValue, { shouldDirty: true, shouldValidate: false });
-              setValue(secondaryActionKey, null, { shouldDirty: true, shouldValidate: false });
+              setValue(primaryActionKey, primaryActionValue, { shouldDirty: true, shouldValidate: true });
+              setValue(secondaryActionKey, null, { shouldDirty: true, shouldValidate: true });
+              saveForm();
             }}
           >
             <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
@@ -119,15 +133,13 @@ export const InAppAction = () => {
                 },
                 primaryAction
               );
-              setValue(primaryActionKey, primaryActionValue, { shouldDirty: true, shouldValidate: false });
-              setValue(
-                secondaryActionKey,
-                {
-                  label: 'Secondary action',
-                  redirect: { target: '_self', url: '' },
-                },
-                { shouldDirty: true, shouldValidate: false }
-              );
+              const secondaryActionValue = {
+                label: 'Secondary action',
+                redirect: { target: '_self', url: '' },
+              };
+              setValue(primaryActionKey, primaryActionValue, { shouldDirty: true, shouldValidate: true });
+              setValue(secondaryActionKey, secondaryActionValue, { shouldDirty: true, shouldValidate: true });
+              saveForm();
             }}
           >
             <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>

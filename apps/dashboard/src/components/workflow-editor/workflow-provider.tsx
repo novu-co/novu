@@ -1,12 +1,9 @@
 import { PatchWorkflowDto, UpdateWorkflowDto, WorkflowResponseDto } from '@novu/shared';
-import { createContext, ReactNode, useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import { createContext, ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useBlocker, useNavigate, useParams } from 'react-router-dom';
 
-import { ToastIcon } from '@/components/primitives/sonner';
-import { showToast } from '@/components/primitives/sonner-helpers';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useFetchWorkflow, useUpdateWorkflow } from '@/hooks';
-import { useDebounce } from '@/hooks/use-debounce';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 import { createContextHook } from '@/utils/context';
 import { buildRoute, ROUTES } from '@/utils/routes';
@@ -21,14 +18,14 @@ import {
 } from '@/components/primitives/alert-dialog';
 import { RiAlertFill } from 'react-icons/ri';
 import { CheckCircleIcon } from 'lucide-react';
+import { useInvocationQueue } from '@/hooks/use-invocation-queue';
+import { showErrorToast, showSavingToast, showSuccessToast } from './toasts';
 
 export type WorkflowContextType = {
   isPending: boolean;
   workflow?: WorkflowResponseDto;
   update: (data: UpdateWorkflowDto) => void;
-  debouncedUpdate: (data: UpdateWorkflowDto) => void;
   patch: (data: PatchWorkflowDto) => void;
-  onDirtyChange: (isDirty: boolean) => void;
 };
 
 export const WorkflowContext = createContext<WorkflowContextType>({} as WorkflowContextType);
@@ -37,162 +34,89 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
   const { currentEnvironment } = useEnvironment();
   const { workflowSlug = '' } = useParams<{ workflowSlug?: string; stepSlug?: string }>();
   const [toastId, setToastId] = useState<string | number>('');
-  const [isFormDirty, setIsFormDirty] = useState(false);
   const navigate = useNavigate();
 
   const { workflow, isPending, error } = useFetchWorkflow({
     workflowSlug,
   });
 
-  const { patchWorkflow, isPending: isPatchPending } = usePatchWorkflow({
-    //TODO: Make these toasts more DRY
-    onMutate: () => {
-      setToastId(
-        showToast({
-          children: () => (
-            <>
-              <ToastIcon variant={'default'} />
-              <span className="text-sm">Saving</span>
-            </>
-          ),
-          options: {
-            position: 'bottom-left',
-            classNames: {
-              toast: 'ml-10',
-            },
-          },
-        })
-      );
-    },
-    onSuccess: async () => {
-      setIsFormDirty(false);
+  const { enqueue, hasPendingItems } = useInvocationQueue();
+  const blocker = useBlocker(({ nextLocation }) => {
+    const workflowEditorBasePath = buildRoute(ROUTES.EDIT_WORKFLOW, {
+      workflowSlug,
+      environmentSlug: currentEnvironment?.slug ?? '',
+    });
 
-      if (blocker.state === 'blocked') {
-        // user is leaving the editor, proceed with the pending navigation
-        await handleBlockedNavigation();
+    const isLeavingEditor = !nextLocation.pathname.startsWith(workflowEditorBasePath);
+
+    return isLeavingEditor && isUpdatePatchPending;
+  });
+  const isBlocked = blocker.state === 'blocked';
+  const isAllowedToUnblock = isBlocked && !hasPendingItems;
+
+  const { patchWorkflow, isPending: isPatchPending } = usePatchWorkflow({
+    onMutate: () => {
+      // when the navigation is blocked, we don't want to show the toast
+      if (isBlocked) {
         return;
       }
 
-      showToast({
-        children: () => (
-          <>
-            <ToastIcon variant="success" />
-            <span className="text-sm">Saved</span>
-          </>
-        ),
-        options: {
-          position: 'bottom-left',
-          classNames: {
-            toast: 'ml-10',
-          },
-          id: toastId,
-        },
-      });
+      showSavingToast(setToastId);
+    },
+    onSuccess: async () => {
+      // when the navigation is blocked, we don't want to show the toast
+      if (isBlocked) {
+        return;
+      }
+
+      showSuccessToast(toastId);
     },
     onError: () => {
-      showToast({
-        children: () => (
-          <>
-            <ToastIcon variant="error" />
-            <span className="text-sm">Failed to save</span>
-          </>
-        ),
-        options: {
-          position: 'bottom-left',
-          classNames: {
-            toast: 'ml-10',
-          },
-        },
-      });
+      showErrorToast(toastId);
     },
   });
 
   const { updateWorkflow, isPending: isUpdatePending } = useUpdateWorkflow({
     onMutate: () => {
-      setToastId(
-        showToast({
-          children: () => (
-            <>
-              <ToastIcon variant={'default'} />
-              <span className="text-sm">Saving</span>
-            </>
-          ),
-          options: {
-            position: 'bottom-left',
-            classNames: {
-              toast: 'ml-10',
-            },
-          },
-        })
-      );
-    },
-    onSuccess: async () => {
-      setIsFormDirty(false);
-
-      if (blocker.state === 'blocked') {
-        // user is leaving the editor, proceed with the pending navigation
-        await handleBlockedNavigation();
+      // when the navigation is blocked, we don't want to show the toast
+      if (isBlocked) {
         return;
       }
 
-      showToast({
-        children: () => (
-          <>
-            <ToastIcon variant="success" />
-            <span className="text-sm">Saved</span>
-          </>
-        ),
-        options: {
-          position: 'bottom-left',
-          classNames: {
-            toast: 'ml-10',
-          },
-          id: toastId,
-        },
-      });
+      showSavingToast(setToastId);
+    },
+    onSuccess: async () => {
+      // when the navigation is blocked, we don't want to show the toast
+      if (isBlocked) {
+        return;
+      }
+
+      showSuccessToast(toastId);
     },
     onError: () => {
-      showToast({
-        children: () => (
-          <>
-            <ToastIcon variant="error" />
-            <span className="text-sm">Failed to save</span>
-          </>
-        ),
-        options: {
-          position: 'bottom-left',
-          classNames: {
-            toast: 'ml-10',
-          },
-        },
-      });
+      showErrorToast(toastId);
     },
   });
 
-  const isUpdatePatchPending = useMemo(
-    () => isPatchPending || isUpdatePending || isFormDirty,
-    [isPatchPending, isUpdatePending, isFormDirty]
+  const isUpdatePatchPending = isPatchPending || isUpdatePending || hasPendingItems;
+
+  const update = useCallback(
+    (data: UpdateWorkflowDto) => {
+      if (workflow) {
+        enqueue(() => updateWorkflow({ workflowId: workflow.workflowId, workflow: { ...data } }));
+      }
+    },
+    [enqueue, updateWorkflow, workflow]
   );
 
-  const debounce = useDebounce(updateWorkflow, 500);
-  const debouncedUpdate = (data: UpdateWorkflowDto) => {
-    if (workflow) {
-      debounce({ id: workflow.workflowId, workflow: data });
-    }
-  };
-
-  const update = (data: UpdateWorkflowDto) => {
-    if (workflow) {
-      debouncedUpdate(data);
-      debounce.flush();
-    }
-  };
-
-  const patch = (data: PatchWorkflowDto) => {
-    if (workflow) {
-      patchWorkflow({ workflow: data, workflowId: workflow.workflowId });
-    }
-  };
+  const patch = useCallback(
+    (data: PatchWorkflowDto) => {
+      if (workflow) {
+        enqueue(() => patchWorkflow({ workflowId: workflow.workflowId, workflow: { ...data } }));
+      }
+    },
+    [enqueue, patchWorkflow, workflow]
+  );
 
   useLayoutEffect(() => {
     if (error) {
@@ -204,16 +128,11 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [workflow, error, navigate, currentEnvironment]);
 
-  const blocker = useBlocker(({ nextLocation }) => {
-    const workflowEditorBasePath = buildRoute(ROUTES.EDIT_WORKFLOW, {
-      workflowSlug,
-      environmentSlug: currentEnvironment?.slug ?? '',
-    });
-
-    const isLeavingEditor = !nextLocation.pathname.startsWith(workflowEditorBasePath);
-
-    return isLeavingEditor && isUpdatePatchPending;
-  });
+  const handleCancelNavigation = useCallback(() => {
+    if (blocker.state === 'blocked') {
+      blocker.reset();
+    }
+  }, [blocker]);
 
   /*
    * If there was a pending navigation when saving was in progress,
@@ -221,21 +140,16 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
    *
    * small timeout to briefly show the success dialog before navigating
    */
-  const handleBlockedNavigation = useCallback(async () => {
-    toast.dismiss();
-    return new Promise<void>((resolve) => {
+  useEffect(() => {
+    if (isAllowedToUnblock) {
+      toast.dismiss();
       setTimeout(() => {
         blocker.proceed?.();
-        resolve();
       }, 500);
-    });
-  }, [blocker]);
-
-  const handleCancelNavigation = useCallback(() => {
-    if (blocker.state === 'blocked') {
-      blocker.reset();
     }
-  }, [blocker]);
+  }, [isAllowedToUnblock, blocker]);
+
+  const value = useMemo(() => ({ update, patch, isPending, workflow }), [update, patch, isPending, workflow]);
 
   return (
     <>
@@ -244,11 +158,7 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
         isUpdatePatchPending={isUpdatePatchPending}
         onCancel={handleCancelNavigation}
       />
-      <WorkflowContext.Provider
-        value={{ debouncedUpdate, update, patch, isPending, workflow, onDirtyChange: setIsFormDirty }}
-      >
-        {children}
-      </WorkflowContext.Provider>
+      <WorkflowContext.Provider value={value}>{children}</WorkflowContext.Provider>
     </>
   );
 };

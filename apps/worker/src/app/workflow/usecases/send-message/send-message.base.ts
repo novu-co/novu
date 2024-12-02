@@ -26,7 +26,6 @@ import {
   ExecutionLogRouteCommand,
 } from '@novu/application-generic';
 import { SendMessageType } from './send-message-type.usecase';
-import { CreateLog } from '../../../shared/logs';
 import { PlatformException } from '../../../shared/utils';
 import { SendMessageCommand } from './send-message.command';
 
@@ -34,7 +33,6 @@ export abstract class SendMessageBase extends SendMessageType {
   abstract readonly channelType: ChannelTypeEnum;
   protected constructor(
     protected messageRepository: MessageRepository,
-    protected createLogUsecase: CreateLog,
     protected executionLogRoute: ExecutionLogRoute,
     protected subscriberRepository: SubscriberRepository,
     protected selectIntegration: SelectIntegration,
@@ -42,7 +40,7 @@ export abstract class SendMessageBase extends SendMessageType {
     protected selectVariant: SelectVariant,
     protected moduleRef: ModuleRef
   ) {
-    super(messageRepository, createLogUsecase, executionLogRoute);
+    super(messageRepository, executionLogRoute);
   }
 
   protected async getIntegration(params: {

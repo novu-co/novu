@@ -14,8 +14,8 @@ import {
 } from 'class-validator';
 
 import {
+  CustomDataType,
   JSONSchemaDto,
-  NotificationTemplateCustomData,
   WorkflowStatusEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
@@ -93,7 +93,7 @@ export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   };
 
   @IsOptional()
-  data?: NotificationTemplateCustomData;
+  data?: CustomDataType;
 
   @IsOptional()
   inputs?: IStepControl;

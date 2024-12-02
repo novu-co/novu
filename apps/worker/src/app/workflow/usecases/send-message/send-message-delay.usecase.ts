@@ -4,17 +4,15 @@ import { ExecutionDetailsSourceEnum, ExecutionDetailsStatusEnum } from '@novu/sh
 import { InstrumentUsecase, DetailEnum, ExecutionLogRoute, ExecutionLogRouteCommand } from '@novu/application-generic';
 
 import { SendMessageType } from './send-message-type.usecase';
-import { CreateLog } from '../../../shared/logs';
 import { SendMessageCommand } from './send-message.command';
 
 @Injectable()
 export class SendMessageDelay extends SendMessageType {
   constructor(
     protected messageRepository: MessageRepository,
-    protected createLogUsecase: CreateLog,
     protected executionLogRoute: ExecutionLogRoute
   ) {
-    super(messageRepository, createLogUsecase, executionLogRoute);
+    super(messageRepository, executionLogRoute);
   }
 
   @InstrumentUsecase()
