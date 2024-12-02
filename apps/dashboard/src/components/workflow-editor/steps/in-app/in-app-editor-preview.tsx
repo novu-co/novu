@@ -1,5 +1,5 @@
 import { CSSProperties, useEffect, useRef, useState } from 'react';
-import { InAppRenderOutput } from '@novu/shared';
+import { InAppRenderOutput, StepDataDto, WorkflowResponseDto } from '@novu/shared';
 
 import { Notification5Fill } from '@/components/icons';
 import { Code2 } from '@/components/icons/code-2';
@@ -21,6 +21,7 @@ import {
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
 import { InAppTabsSection } from '@/components/workflow-editor/steps/in-app/in-app-tabs-section';
+import { useEditorPreview } from '../use-editor-preview';
 
 const getInitialAccordionValue = (value: string) => {
   try {
@@ -31,22 +32,28 @@ const getInitialAccordionValue = (value: string) => {
 };
 
 type InAppEditorPreviewProps = {
-  value: string;
-  onChange: (value: string) => void;
-  preview?: InAppRenderOutput;
-  applyPreview: () => void;
-  isPreviewPending?: boolean;
+  workflow: WorkflowResponseDto;
+  step: StepDataDto;
+  formValues: Record<string, unknown>;
 };
-export const InAppEditorPreview = (props: InAppEditorPreviewProps) => {
-  const { value, onChange, preview, applyPreview, isPreviewPending } = props;
-  const [accordionValue, setAccordionValue] = useState<string | undefined>(getInitialAccordionValue(value));
+
+export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPreviewProps) => {
+  const workflowSlug = workflow.workflowId;
+  const stepSlug = step.stepId;
+  const { editorValue, setEditorValue, previewStep, previewData, isPreviewPending } = useEditorPreview({
+    workflowSlug,
+    stepSlug,
+    stepName: step.name,
+    controlValues: formValues,
+  });
+  const [accordionValue, setAccordionValue] = useState<string | undefined>(getInitialAccordionValue(editorValue));
   const [payloadError, setPayloadError] = useState('');
   const [height, setHeight] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setAccordionValue(getInitialAccordionValue(value));
-  }, [value]);
+    setAccordionValue(getInitialAccordionValue(editorValue));
+  }, [editorValue]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -57,7 +64,10 @@ export const InAppEditorPreview = (props: InAppEditorPreviewProps) => {
     }, 0);
 
     return () => clearTimeout(timeout);
-  }, [value]);
+  }, [editorValue]);
+
+  const previewResult = previewData?.result;
+  const preview = previewResult?.preview as InAppRenderOutput | undefined;
 
   return (
     <InAppTabsSection>
@@ -113,8 +123,8 @@ export const InAppEditorPreview = (props: InAppEditorPreviewProps) => {
               style={{ '--radix-collapsible-content-height': `${height}px` } as CSSProperties}
             >
               <Editor
-                value={value}
-                onChange={onChange}
+                value={editorValue}
+                onChange={setEditorValue}
                 lang="json"
                 extensions={[loadLanguage('json')?.extension ?? []]}
                 className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 rounded-lg border border-dashed p-3"
@@ -127,7 +137,7 @@ export const InAppEditorPreview = (props: InAppEditorPreviewProps) => {
                 className="self-end"
                 onClick={() => {
                   try {
-                    applyPreview();
+                    previewStep();
                     setPayloadError('');
                   } catch (e) {
                     setPayloadError(String(e));
