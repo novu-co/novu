@@ -47,11 +47,32 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
       const {
         data: { transactionId },
       } = await triggerWorkflow({ name: workflow?.workflowId ?? '', to: data.to, payload: data.payload });
-      showToast({
+      if (!transactionId) {
+        return showToast({
+          variant: 'lg',
+          children: ({ close }) => (
+            <>
+              <ToastIcon variant="error" />
+              <div className="flex flex-col gap-2">
+                <span className="font-medium">Test workflow failed</span>
+                <span className="text-foreground-600 inline">
+                  Workflow <span className="font-bold">{workflow?.name}</span> cannot be triggered. Ensure that it is
+                  active and requires not further actions.
+                </span>
+              </div>
+              <ToastClose onClick={close} />
+            </>
+          ),
+          options: {
+            position: 'bottom-right',
+          },
+        });
+      }
+      return showToast({
         variant: 'lg',
         children: ({ close }) => (
           <>
-            <ToastIcon variant="default" />
+            <ToastIcon variant="success" />
             <div className="flex flex-col gap-2">
               <span className="font-medium">Test workflow succeeded</span>
               <span className="text-foreground-600 inline">
