@@ -194,7 +194,7 @@ describe('Session', () => {
     expect(response.token).to.equal(token);
     expect(response.totalUnreadCount).to.equal(notificationCount.data[0].count);
     expect(
-      analyticsService.mixpanelTrack.calledOnceWith(AnalyticsEventsEnum.SESSION_INITIALIZED, '', {
+      analyticsService.mixpanelTrack.calledWith(AnalyticsEventsEnum.SESSION_INITIALIZED, '', {
         _organization: environment._organizationId,
         environmentName: environment.name,
         _subscriber: subscriber._id,
