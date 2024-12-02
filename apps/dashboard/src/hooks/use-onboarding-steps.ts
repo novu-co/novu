@@ -1,7 +1,7 @@
 import { useMemo, useEffect, useRef } from 'react';
 import { useWorkflows } from './use-workflows';
 import { useOrganization } from '@clerk/clerk-react';
-import { ChannelTypeEnum } from '@novu/shared';
+import { ChannelTypeEnum, IIntegration } from '@novu/shared';
 import { useIntegrations } from './use-integrations';
 import { useTelemetry } from './use-telemetry';
 import { TelemetryEvent } from '../utils/telemetry';
@@ -43,6 +43,20 @@ const PROVIDER_TYPE_PRIORITIES: ChannelTypeEnum[] = [ChannelTypeEnum.IN_APP, Cha
 
 function getProviderTitle(providerType: ChannelTypeEnum): string {
   return providerType === ChannelTypeEnum.IN_APP ? 'Add an Inbox to your app' : `Connect your ${providerType} provider`;
+}
+
+function getProviderDescription(providerType: ChannelTypeEnum): string {
+  return providerType === ChannelTypeEnum.IN_APP
+    ? 'Add an Inbox to your app'
+    : `Connect your provider to send ${providerType} notifications with Novu.`;
+}
+
+function isActiveIntegration(integration: IIntegration, providerType: ChannelTypeEnum): boolean {
+  const isMatchingChannel = integration.channel === providerType;
+  const isNotNovuProvider = !integration.providerId.startsWith('novu-');
+  const isConnected = providerType === ChannelTypeEnum.IN_APP ? !!integration.connected : true;
+
+  return isMatchingChannel && isNotNovuProvider && isConnected;
 }
 
 export function useOnboardingSteps(): OnboardingStepsResult {
@@ -87,17 +101,15 @@ export function useOnboardingSteps(): OnboardingStepsResult {
       {
         id: `connect-${providerType}-provider` as StepIdEnum,
         title: getProviderTitle(providerType),
-        description: `Connect your provider to send ${providerType} notifications with Novu.`,
-        status: integrations?.some(
-          (integration) => integration.channel === providerType && !integration.providerId.startsWith('novu-')
-        )
+        description: getProviderDescription(providerType),
+        status: integrations?.some((integration) => isActiveIntegration(integration, providerType))
           ? 'completed'
           : 'pending',
       },
       {
         id: StepIdEnum.INVITE_TEAM_MEMBER,
-        title: 'Invite a team member?',
-        description: 'Need help from a team member, let them know',
+        title: 'Invite a team member',
+        description: 'Collaborate with your team to manage notifications',
         status: hasInvitedTeamMember ? 'completed' : 'pending',
       },
     ],
@@ -121,5 +133,10 @@ export function useOnboardingSteps(): OnboardingStepsResult {
     previousStepsRef.current = steps;
   }, [steps, telemetry]);
 
-  return { steps, providerType };
+  return {
+    steps,
+    providerType,
+    totalSteps: steps.length,
+    completedSteps: steps.filter((step) => step.status === 'completed').length,
+  };
 }

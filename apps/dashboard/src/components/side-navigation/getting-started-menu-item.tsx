@@ -12,13 +12,12 @@ import { Button } from '../primitives/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 
 export function GettingStartedMenuItem() {
-  const { steps } = useOnboardingSteps();
+  const { totalSteps, completedSteps, steps } = useOnboardingSteps();
   const { currentEnvironment } = useEnvironment();
   const { user } = useUser();
   const track = useTelemetry();
 
-  const completedSteps = steps.filter((step) => step.status === 'completed').length;
-  const allStepsCompleted = completedSteps === steps.length;
+  const allStepsCompleted = completedSteps === totalSteps;
 
   const handleClose = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -26,7 +25,7 @@ export function GettingStartedMenuItem() {
 
     track(TelemetryEvent.WELCOME_MENU_HIDDEN, {
       completedSteps: steps.filter((step) => step.status === 'completed').map((step) => step.id),
-      totalSteps: steps.length,
+      totalSteps,
       allStepsCompleted,
     });
 
@@ -71,7 +70,7 @@ export function GettingStartedMenuItem() {
             <RiSparkling2Fill className="h-4 w-4" />
           </motion.div>
           <span className="text-xs">
-            {completedSteps}/{steps.length}
+            {completedSteps}/{totalSteps}
           </span>
         </Badge>
 
