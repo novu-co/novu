@@ -99,6 +99,11 @@ export class Session {
         (process.env.FRONT_BASE_URL && command.origin?.includes(process.env.FRONT_BASE_URL as string)));
 
     if (!isOriginFromNovu && !inAppIntegration.connected) {
+      this.analyticsService.mixpanelTrack(AnalyticsEventsEnum.INBOX_CONNECTED, '', {
+        _organization: environment._organizationId,
+        environmentName: environment.name,
+      });
+
       await this.integrationRepository.updateOne(
         {
           _id: inAppIntegration._id,
