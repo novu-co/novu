@@ -19,6 +19,7 @@ import { UsecasePlaygroundHeader } from '../usecase-playground-header';
 import { CustomizeInbox } from './customize-inbox-playground';
 import { useTelemetry } from '../../hooks/use-telemetry';
 import { TelemetryEvent } from '../../utils/telemetry';
+import { ONBOARDING_DEMO_WORKFLOW_ID } from '../../config';
 
 export interface ActionConfig {
   label: string;
@@ -108,7 +109,7 @@ export function InboxPlayground() {
      * This workflow will be used by the inbox preview examples
      */
     const initializeDemoWorkflow = async () => {
-      const workflow = data?.workflows.find((workflow) => workflow.workflowId === 'onboarding-demo-workflow');
+      const workflow = data?.workflows.find((workflow) => workflow.workflowId === ONBOARDING_DEMO_WORKFLOW_ID);
       if (!workflow) {
         await createDemoWorkflow();
       }
@@ -122,7 +123,7 @@ export function InboxPlayground() {
       const formValues = form.getValues();
 
       await triggerWorkflow({
-        name: 'onboarding-demo-workflow',
+        name: ONBOARDING_DEMO_WORKFLOW_ID,
         to: auth.currentUser?._id,
         payload: {
           subject: formValues.subject,
@@ -239,7 +240,7 @@ async function createDemoWorkflow() {
   await createWorkflow({
     name: 'Onboarding Demo Workflow',
     description: 'A demo workflow to showcase the Inbox component',
-    workflowId: 'onboarding-demo-workflow',
+    workflowId: ONBOARDING_DEMO_WORKFLOW_ID,
     steps: [
       {
         name: 'Inbox',

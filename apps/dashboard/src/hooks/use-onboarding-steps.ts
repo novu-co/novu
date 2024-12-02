@@ -55,6 +55,10 @@ export function useOnboardingSteps(): OnboardingStepsResult {
     return (organization?.membersCount ?? 0) > 1;
   }, [organization?.membersCount]);
 
+  const hasCreatedWorkflow = useMemo(() => {
+    return workflows?.data?.filter((workflow) => workflow.workflowId !== ONBOARDING_DEMO_WORKFLOW_ID).length > 0;
+  }, [workflows?.data]);
+
   const providerType = useMemo(() => {
     const metadata = organization?.publicMetadata as OrganizationMetadata;
     const useCases = metadata?.useCases ?? DEFAULT_USE_CASES;
@@ -74,7 +78,7 @@ export function useOnboardingSteps(): OnboardingStepsResult {
         id: StepIdEnum.CREATE_A_WORKFLOW,
         title: 'Create a workflow',
         description: 'Workflows in Novu, orchestrate notifications across channels.',
-        status: workflows && workflows.totalCount > 0 ? 'completed' : 'in-progress',
+        status: hasCreatedWorkflow ? 'completed' : 'in-progress',
       },
       {
         id: `connect-${providerType}-provider` as StepIdEnum,
@@ -93,13 +97,13 @@ export function useOnboardingSteps(): OnboardingStepsResult {
         status: hasInvitedTeamMember ? 'completed' : 'pending',
       },
     ],
-    [workflows, hasInvitedTeamMember, providerType, integrations]
+    [hasInvitedTeamMember, providerType, integrations, hasCreatedWorkflow]
   );
 
   useEffect(() => {
     const previousSteps = previousStepsRef.current;
 
-    // Track step completion changes
+    // Track step completion changes for analytics
     steps.forEach((step) => {
       const previousStep = previousSteps.find((prev) => prev.id === step.id);
       if (previousStep?.status !== 'completed' && step.status === 'completed') {
