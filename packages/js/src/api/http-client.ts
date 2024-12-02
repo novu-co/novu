@@ -109,6 +109,7 @@ export class HttpClient {
     }
 
     const res = await response.json();
+
     return (unwrapEnvelope ? res.data : res) as Promise<T>;
   }
 }
