@@ -1,23 +1,20 @@
 import { useOrganization } from '@clerk/clerk-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/primitives/card';
+import { Card, CardContent } from '@/components/primitives/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/primitives/table';
 import { Button } from '@/components/primitives/button';
 import { RiDeleteBin2Line, RiMailAddLine, RiUserLine, RiMailLine } from 'react-icons/ri';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { Badge } from '@/components/primitives/badge';
-import { useState } from 'react';
 import { Input } from '@/components/primitives/input';
-import { Label } from '@/components/primitives/label';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from '@/components/primitives/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/primitives/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/primitives/avatar';
+import { Form, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
+import { cn } from '../../utils/ui';
+import { Label } from '@/components/primitives/label';
 
 const OrgMembersParams = {
   memberships: {
@@ -40,22 +37,102 @@ const ROLE_LABELS = {
 
 type RoleType = keyof typeof ROLE_LABELS;
 
+const inviteFormSchema = z.object({
+  email: z.string().email({ message: 'Please enter a valid email address' }),
+  role: z.enum(['org:admin', 'org:member'] as const),
+});
+
+type InviteFormValues = z.infer<typeof inviteFormSchema>;
+
+interface InviteMemberFormProps {
+  onSubmit: (data: InviteFormValues) => Promise<void>;
+}
+
+const InviteMemberForm = ({ onSubmit }: InviteMemberFormProps) => {
+  const form = useForm<InviteFormValues>({
+    resolver: zodResolver(inviteFormSchema),
+    defaultValues: {
+      email: '',
+      role: 'org:member',
+    },
+  });
+
+  return (
+    <form id="invite-member" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <div className="p-6">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email address</Label>
+            <Input
+              id="email"
+              {...form.register('email')}
+              placeholder="member@company.com"
+              className="border-input ring-offset-background text-foreground-600 placeholder:text-foreground-400 focus:ring-ring shadow-xs flex h-10 w-full items-center justify-between whitespace-nowrap rounded-md border bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1"
+            />
+            {form.formState.errors.email && (
+              <p className="text-destructive text-xs">{form.formState.errors.email.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="role">Role</Label>
+            <Select value={form.watch('role')} onValueChange={(value: RoleType) => form.setValue('role', value)}>
+              <SelectTrigger className="h-10 border">
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(ROLE_LABELS).map(([value, label]) => (
+                  <SelectItem key={value} value={value} className="cursor-pointer">
+                    <div className="flex w-full items-center justify-between">
+                      <span>{label}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {form.formState.errors.role && (
+              <p className="text-destructive text-xs">{form.formState.errors.role.message}</p>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="bg-muted/40 border-t px-6 py-4">
+        <Button type="submit" className="h-10 w-full">
+          {form.formState.isSubmitting ? <span>Sending invitation...</span> : <span>Send Invitation</span>}
+        </Button>
+      </div>
+    </form>
+  );
+};
+
 export function TeamManagement() {
   const { organization, memberships, invitations } = useOrganization({
     ...OrgMembersParams,
     ...OrgInvitationsParams,
   });
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState<RoleType>('org:member');
 
   if (!organization) return null;
 
-  const handleInviteMember = async () => {
+  const handleInviteMember = async (data: InviteFormValues) => {
     try {
-      await organization.inviteMember({ emailAddress: inviteEmail, role: inviteRole });
-      setInviteEmail('');
+      await organization.inviteMember({ emailAddress: data.email, role: data.role });
     } catch (err) {
       console.error('Failed to invite member:', err);
+    }
+  };
+
+  const handleRemoveMember = async (memberId: string) => {
+    try {
+      await organization.removeMember(memberId);
+    } catch (err) {
+      console.error('Failed to remove member:', err);
+    }
+  };
+
+  const handleUpdateRole = async (memberId: string, role: string) => {
+    try {
+      await organization.updateMember({ userId: memberId, role });
+    } catch (err) {
+      console.error('Failed to update role:', err);
     }
   };
 
@@ -79,134 +156,50 @@ export function TeamManagement() {
             Invite Team Members
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Invite Team Member</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email address</Label>
-              <Input
-                id="email"
-                type="email"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                placeholder="member@company.com"
-                required
-                className="h-9"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="role">Role</Label>
-              <Select value={inviteRole} onValueChange={(value: RoleType) => setInviteRole(value)}>
-                <SelectTrigger className="h-9">
-                  <SelectValue placeholder="Select a role" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(ROLE_LABELS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        <DialogContent className="p-0 sm:max-w-[400px]">
+          <div className="border-b px-6 py-4">
+            <DialogTitle className="text-xl font-semibold tracking-tight">Invite Team Member</DialogTitle>
           </div>
-          <DialogFooter>
-            <Button onClick={handleInviteMember} className="w-full">
-              Send Invitation
-            </Button>
-          </DialogFooter>
+          <InviteMemberForm onSubmit={handleInviteMember} />
         </DialogContent>
       </Dialog>
     </div>
   );
 
-  const handleRemoveMember = async (memberId: string) => {
-    try {
-      await organization.removeMember(memberId);
-    } catch (err) {
-      console.error('Failed to remove member:', err);
-    }
-  };
-
-  const handleUpdateRole = async (memberId: string, role: string) => {
-    try {
-      await organization.updateMember({ userId: memberId, role });
-    } catch (err) {
-      console.error('Failed to update role:', err);
-    }
-  };
-
   return (
     <Card className="border-none shadow-none">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>
-                <RiMailAddLine className="mr-2 size-4" />
-                Invite Member
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Invite Team Member</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={inviteEmail}
-                    onChange={(e) => setInviteEmail(e.target.value)}
-                    placeholder="member@company.com"
-                    required
-                    className="h-9"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="role">Role</Label>
-                  <Select value={inviteRole} onValueChange={(value: RoleType) => setInviteRole(value)}>
-                    <SelectTrigger className="h-9">
-                      <SelectValue placeholder="Select a role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(ROLE_LABELS).map(([value, label]) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button onClick={handleInviteMember} className="w-full">
-                  Send Invitation
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </CardHeader>
       <CardContent>
         <Tabs defaultValue="members" className="w-full">
-          <div className="mb-4 flex justify-center">
-            <TabsList className="grid w-[400px] grid-cols-2">
-              <TabsTrigger value="members">Members</TabsTrigger>
-              <TabsTrigger value="invitations">
+          <div className="mb-6 flex items-center justify-between">
+            <TabsList className="bg-muted inline-flex h-10 space-x-1 rounded-lg p-1">
+              <TabsTrigger value="members" className="rounded-md px-6">
+                Members
+              </TabsTrigger>
+              <TabsTrigger value="invitations" className="rounded-md px-6">
                 Pending {invitations?.count ? `(${invitations.count})` : null}
               </TabsTrigger>
             </TabsList>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="lg" className="px-6">
+                  <RiMailAddLine className="mr-2.5 size-4" />
+                  Invite Member
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="p-0 sm:max-w-[400px]">
+                <div className="border-b px-6 py-4">
+                  <DialogTitle className="text-xl font-semibold tracking-tight">Invite Team Member</DialogTitle>
+                </div>
+                <InviteMemberForm onSubmit={handleInviteMember} />
+              </DialogContent>
+            </Dialog>
           </div>
           <TabsContent value="members">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>User</TableHead>
-                  <TableHead>Role</TableHead>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="w-[300px]">User</TableHead>
+                  <TableHead className="w-[140px]">Role</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="w-[100px]">Actions</TableHead>
                 </TableRow>
@@ -216,12 +209,12 @@ export function TeamManagement() {
                   <TableRow key={member.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
+                        <Avatar className="size-9 border">
                           <AvatarImage
                             src={member.publicUserData?.imageUrl}
                             alt={`${member.publicUserData?.firstName} ${member.publicUserData?.lastName}`}
                           />
-                          <AvatarFallback>
+                          <AvatarFallback className="bg-muted">
                             <RiUserLine className="size-4" />
                           </AvatarFallback>
                         </Avatar>
@@ -239,7 +232,7 @@ export function TeamManagement() {
                         onValueChange={(role: RoleType) => handleUpdateRole(member.id, role)}
                         disabled={member.role === 'org:admin'}
                       >
-                        <SelectTrigger className="h-8 w-[110px]">
+                        <SelectTrigger className="h-9 w-[120px]">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -252,7 +245,13 @@ export function TeamManagement() {
                       </Select>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={member.role === 'org:admin' ? 'neutral' : 'outline'} className="font-normal">
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          'font-normal',
+                          member.role === 'org:admin' ? 'bg-primary/10 text-primary border-primary/20' : ''
+                        )}
+                      >
                         {ROLE_LABELS[member.role as RoleType]}
                       </Badge>
                     </TableCell>
@@ -279,9 +278,9 @@ export function TeamManagement() {
             ) : (
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Role</TableHead>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="w-[300px]">User</TableHead>
+                    <TableHead className="w-[140px]">Role</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="w-[100px]">Actions</TableHead>
                   </TableRow>
@@ -289,21 +288,23 @@ export function TeamManagement() {
                 <TableBody>
                   {invitations?.data?.map((invitation) => (
                     <TableRow key={invitation.id}>
-                      <TableCell className="font-medium">
+                      <TableCell>
                         <div className="flex flex-col">
-                          <span>{invitation.emailAddress}</span>
+                          <span className="font-medium">{invitation.emailAddress}</span>
                           <span className="text-muted-foreground text-sm">Pending invitation</span>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{invitation.role}</Badge>
+                        <Badge variant="outline" className="font-normal">
+                          {ROLE_LABELS[invitation.role as RoleType]}
+                        </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="neutral">Invited</Badge>
+                        <Badge variant="outline">Invited</Badge>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="icon" onClick={() => invitation.revoke()}>
-                          <RiDeleteBin2Line className="size-4" />
+                        <Button variant="ghost" size="icon" onClick={() => invitation.revoke()} className="h-8 w-8">
+                          <RiDeleteBin2Line className="text-muted-foreground hover:text-destructive size-4" />
                         </Button>
                       </TableCell>
                     </TableRow>
