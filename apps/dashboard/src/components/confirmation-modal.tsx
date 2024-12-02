@@ -53,7 +53,7 @@ export const ConfirmationModal = ({
               </Button>
             </DialogClose>
 
-            <Button type="button" size="sm" variant="primary" onClick={onConfirm} disabled={isLoading}>
+            <Button type="button" size="sm" variant="primary" onClick={onConfirm} isLoading={isLoading}>
               {confirmButtonText}
             </Button>
           </DialogFooter>

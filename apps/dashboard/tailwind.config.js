@@ -137,6 +137,10 @@ export default {
             boxShadow: '0 0 0 0 rgba(255, 82, 82, 0)',
           },
         },
+        'pulse-subtle': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.85' },
+        },
         'accordion-down': {
           from: {
             height: '0',
@@ -181,11 +185,13 @@ export default {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'pulse-subtle': 'pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         swing: 'swing 3s ease-in-out',
         jingle: 'jingle 3s ease-in-out',
       },
       backgroundImage: {
-        'test-pattern': 'repeating-linear-gradient(135deg, hsl(var(--neutral-100)) 0, hsl(var(--neutral-100)) 2px, hsl(var(--neutral-200)) 2px, hsl(var(--neutral-200)) 4px)',
+        'test-pattern':
+          'repeating-linear-gradient(135deg, hsl(var(--neutral-100)) 0, hsl(var(--neutral-100)) 2px, hsl(var(--neutral-200)) 2px, hsl(var(--neutral-200)) 4px)',
       },
     },
   },
