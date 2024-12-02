@@ -5,6 +5,7 @@ import { ChannelTypeEnum } from '@novu/shared';
 import { useIntegrations } from './use-integrations';
 import { useTelemetry } from './use-telemetry';
 import { TelemetryEvent } from '../utils/telemetry';
+import { ONBOARDING_DEMO_WORKFLOW_ID } from '../config';
 
 export enum StepIdEnum {
   ACCOUNT_CREATION = 'account-creation',
@@ -45,7 +46,7 @@ function getProviderTitle(providerType: ChannelTypeEnum): string {
 }
 
 export function useOnboardingSteps(): OnboardingStepsResult {
-  const { data: workflows } = useWorkflows();
+  const workflows = useWorkflows();
   const { organization } = useOrganization();
   const { integrations } = useIntegrations();
   const telemetry = useTelemetry();
@@ -56,8 +57,11 @@ export function useOnboardingSteps(): OnboardingStepsResult {
   }, [organization?.membersCount]);
 
   const hasCreatedWorkflow = useMemo(() => {
-    return workflows?.data?.filter((workflow) => workflow.workflowId !== ONBOARDING_DEMO_WORKFLOW_ID).length > 0;
-  }, [workflows?.data]);
+    return (
+      (workflows?.data?.workflows ?? []).filter((workflow) => workflow.workflowId !== ONBOARDING_DEMO_WORKFLOW_ID)
+        .length > 0
+    );
+  }, [workflows?.data?.workflows]);
 
   const providerType = useMemo(() => {
     const metadata = organization?.publicMetadata as OrganizationMetadata;
