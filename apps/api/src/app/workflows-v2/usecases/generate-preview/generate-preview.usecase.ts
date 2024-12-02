@@ -46,7 +46,11 @@ export class GeneratePreviewUsecase {
       controlDataSchema: stepData.controls.dataSchema || {},
       variableSchema: stepData.variables,
     });
-    const variablesExample = this.buildVariablesExample(workflow, preparedAndValidatedContent.finalPayload);
+    const variablesExample = this.buildVariablesExample(
+      workflow,
+      preparedAndValidatedContent.finalPayload,
+      commandVariablesExample
+    );
 
     const executeOutput = await this.executePreviewUsecase(
       command,
@@ -65,18 +69,26 @@ export class GeneratePreviewUsecase {
   }
 
   @Instrument()
-  private buildVariablesExample(workflow: WorkflowInternalResponseDto, finalPayload?: PreviewPayload) {
+  private buildVariablesExample(
+    workflow: WorkflowInternalResponseDto,
+    finalPayload?: PreviewPayload,
+    commandVariablesExample?: PreviewPayload | undefined
+  ) {
     if (workflow.origin !== WorkflowOriginEnum.EXTERNAL) {
       return finalPayload;
     }
 
     const examplePayloadSchema = createMockPayloadFromSchema(workflow.payloadSchema);
 
-    if (!examplePayloadSchema || !Object.keys(examplePayloadSchema).length) {
+    if (!examplePayloadSchema || Object.keys(examplePayloadSchema).length === 0) {
       return finalPayload;
     }
 
-    return _.merge(finalPayload as Record<string, unknown>, { payload: examplePayloadSchema });
+    return _.merge(
+      finalPayload as Record<string, unknown>,
+      { payload: examplePayloadSchema },
+      commandVariablesExample || {}
+    );
   }
 
   @Instrument()
