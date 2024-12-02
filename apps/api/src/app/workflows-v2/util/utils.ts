@@ -86,17 +86,24 @@ export function flattenObjectValues(obj: Record<string, unknown>): string[] {
 export function createMockPayloadFromSchema(
   schema: JSONSchemaDto,
   path = 'payload',
-  depth = 0
+  depth = 0,
+  safe = true
 ): Record<string, unknown> {
   const MAX_DEPTH = 10;
   if (depth >= MAX_DEPTH) {
+    if (safe) {
+      return {};
+    }
     throw new BadRequestException({
       message: 'Schema has surpassed the maximum allowed depth. Please specify a more shallow payload schema.',
       maxDepth: MAX_DEPTH,
     });
   }
 
-  if (schema.type !== 'object' || !schema.properties) {
+  if (schema?.type !== 'object' || !schema?.properties) {
+    if (safe) {
+      return {};
+    }
     throw new BadRequestException({
       message: 'Schema must define an object with properties.',
     });
