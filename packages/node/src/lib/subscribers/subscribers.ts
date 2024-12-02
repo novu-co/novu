@@ -98,8 +98,10 @@ export class Subscribers extends WithHttp implements ISubscribers {
     const { includeInactiveChannels } = options;
     const searchParams = new URLSearchParams();
 
-    if (includeInactiveChannels) {
+    if (includeInactiveChannels === true) {
       searchParams.append('includeInactiveChannels', 'true');
+    } else if (includeInactiveChannels === false) {
+      searchParams.append('includeInactiveChannels', 'false');
     }
 
     const searchParamsString = searchParams.toString();

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import _ from 'lodash';
 import {
   ChannelTypeEnum,
@@ -22,13 +22,15 @@ import { GeneratePreviewCommand } from './generate-preview.command';
 import { extractTemplateVars } from '../../util/template-variables/extract-template-variables';
 import { pathsToObject } from '../../util/path-to-object';
 import { createMockPayloadFromSchema, flattenObjectValues } from '../../util/utils';
+import { PrepareAndValidateContentUsecase } from '../validate-content/prepare-and-validate-content/prepare-and-validate-content.usecase';
 
 @Injectable()
 export class GeneratePreviewUsecase {
   constructor(
     private legacyPreviewStepUseCase: PreviewStep,
     private buildStepDataUsecase: BuildStepDataUsecase,
-    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase
+    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
+    private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase
   ) {}
 
   @InstrumentUsecase()
@@ -37,18 +39,24 @@ export class GeneratePreviewUsecase {
       command.generatePreviewRequestDto;
     const stepData = await this.getStepData(command);
     const workflow = await this.findWorkflow(command);
-
+    const preparedAndValidatedContent = await this.prepareAndValidateContentUsecase.execute({
+      user: command.user,
+      previewPayloadFromDto: commandVariablesExample,
+      controlValues: commandControlValues || stepData.controls.values || {},
+      controlDataSchema: stepData.controls.dataSchema || {},
+      variableSchema: stepData.variables,
+    });
     const variablesExample = this.buildVariablesExample(
       workflow,
-      stepData,
-      commandVariablesExample,
-      commandControlValues
+      preparedAndValidatedContent.finalPayload,
+      commandVariablesExample
     );
+
     const executeOutput = await this.executePreviewUsecase(
       command,
       stepData,
       variablesExample,
-      commandControlValues || {}
+      preparedAndValidatedContent.finalControlValues
     );
 
     return {
@@ -63,17 +71,24 @@ export class GeneratePreviewUsecase {
   @Instrument()
   private buildVariablesExample(
     workflow: WorkflowInternalResponseDto,
-    stepData: StepDataDto,
-    commandVariablesExample?: PreviewPayload,
-    commandControlValues?: Record<string, unknown>
+    finalPayload?: PreviewPayload,
+    commandVariablesExample?: PreviewPayload | undefined
   ) {
-    const variablesExample = this.generateVariablesExample(stepData, commandControlValues);
-
-    if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
-      variablesExample.payload = createMockPayloadFromSchema(workflow.payloadSchema);
+    if (workflow.origin !== WorkflowOriginEnum.EXTERNAL) {
+      return finalPayload;
     }
 
-    return _.merge(variablesExample, commandVariablesExample as Record<string, unknown>);
+    const examplePayloadSchema = createMockPayloadFromSchema(workflow.payloadSchema);
+
+    if (!examplePayloadSchema || Object.keys(examplePayloadSchema).length === 0) {
+      return finalPayload;
+    }
+
+    return _.merge(
+      finalPayload as Record<string, unknown>,
+      { payload: examplePayloadSchema },
+      commandVariablesExample || {}
+    );
   }
 
   @Instrument()
