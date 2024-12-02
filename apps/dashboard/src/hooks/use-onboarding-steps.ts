@@ -35,6 +35,8 @@ interface OrganizationMetadata {
 interface OnboardingStepsResult {
   steps: Step[];
   providerType: ChannelTypeEnum;
+  totalSteps: number;
+  completedSteps: number;
 }
 
 const DEFAULT_USE_CASES: ChannelTypeEnum[] = [ChannelTypeEnum.IN_APP];
