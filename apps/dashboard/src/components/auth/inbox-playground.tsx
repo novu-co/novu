@@ -247,6 +247,7 @@ async function createDemoWorkflow() {
         controlValues: {
           subject: '{{payload.subject}}',
           body: '{{payload.body}}',
+          avatar: window.location.origin + '/images/novu.svg',
           primaryAction: {
             label: '{{payload.primaryActionLabel}}',
             redirect: {
