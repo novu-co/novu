@@ -70,5 +70,11 @@ export const useEditorPreview = ({
     });
   }, [workflowSlug, stepSlug, controlValues, editorValue, previewStep]);
 
-  return { editorValue, setEditorValue, previewStep: previewStepCallback, previewData, isPreviewPending };
+  return {
+    editorValue,
+    setEditorValue,
+    previewStep: previewStepCallback,
+    previewData,
+    isPreviewPending,
+  };
 };
