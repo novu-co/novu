@@ -58,8 +58,8 @@ const InviteMemberForm = ({ onSubmit }: InviteMemberFormProps) => {
   });
 
   return (
-    <form id="invite-member" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-      <div className="p-6">
+    <form id="invite-member" onSubmit={form.handleSubmit(onSubmit)}>
+      <div className="p-6 pt-0">
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email address</Label>
@@ -181,7 +181,7 @@ export function TeamManagement() {
             </TabsList>
             <Dialog>
               <DialogTrigger asChild>
-                <Button size="lg" className="px-6">
+                <Button>
                   <RiMailAddLine className="mr-2.5 size-4" />
                   Invite Member
                 </Button>
