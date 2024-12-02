@@ -93,16 +93,11 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
               <TextSeparator text="or" />
               <div className="grid grid-cols-6 gap-4">
                 {predefinedAvatars.map((url, index) => (
-                  <Button
-                    key={index}
-                    variant="ghost"
-                    className="rounded-full p-0"
-                    onClick={() => handlePredefinedAvatarClick(url)}
-                  >
+                  <button key={index} className="rounded-full" onClick={() => handlePredefinedAvatarClick(url)}>
                     <Avatar>
                       <AvatarImage src={url} />
                     </Avatar>
-                  </Button>
+                  </button>
                 ))}
               </div>
             </div>
