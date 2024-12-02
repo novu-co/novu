@@ -79,9 +79,8 @@ export function UsecaseSelectPage() {
               />
 
               <div className="flex w-full flex-col items-center gap-3">
-                <Button disabled={selectedUseCases.length === 0 || isPending} className="w-full" type="submit">
+                <Button disabled={selectedUseCases.length === 0} isLoading={isPending} className="w-full" type="submit">
                   Continue
-                  {isPending && <RiLoader2Line className="animate-spin" />}
                 </Button>
                 <Button type="button" variant="link" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
                   Skip to Homepage

@@ -127,8 +127,8 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
                 </Link>
               </TabsTrigger>
               <div className="ml-auto">
-                <Button type="submit" variant="primary" size="sm" className="flex gap-1" disabled={isPending}>
-                  {isPending ? <RiProgress1Fill className="size-5" /> : <RiPlayCircleLine className="size-5" />}
+                <Button type="submit" variant="primary" size="sm" className="flex gap-1" isLoading={isPending}>
+                  <RiPlayCircleLine className="size-5" />
                   <span>Test workflow</span>
                 </Button>
               </div>
