@@ -7,7 +7,7 @@ import {
   WorkflowOriginEnum,
   WorkflowResponseDto,
 } from '@novu/shared';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiCloseFill, RiDeleteBin2Line, RiPencilRuler2Fill } from 'react-icons/ri';
