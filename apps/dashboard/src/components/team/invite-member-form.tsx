@@ -5,6 +5,7 @@ import { Input } from '@/components/primitives/input';
 import { Label } from '@/components/primitives/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { InviteFormValues, inviteFormSchema, RoleType, Role } from './types';
+import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../utils/constants';
 
 interface InviteMemberFormProps {
   onSubmit: (data: InviteFormValues) => Promise<void>;
@@ -21,9 +22,14 @@ export function InviteMemberForm({ onSubmit, roles }: InviteMemberFormProps) {
   });
 
   return (
-    <form id="invite-member" onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <form
+      id="invite-member"
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="space-y-4"
+      {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
+    >
       <div className="px-6">
-        <div className="space-y-2">
+        <div className="mb-4">
           <Label htmlFor="email">Email address</Label>
           <Input
             id="email"
@@ -35,7 +41,7 @@ export function InviteMemberForm({ onSubmit, roles }: InviteMemberFormProps) {
             <p className="text-destructive text-xs">{form.formState.errors.email.message}</p>
           )}
         </div>
-        <div className="space-y-2">
+        <div className="mb-4">
           <Label htmlFor="role">Role</Label>
           <Select value={form.watch('role')} onValueChange={(value: RoleType) => form.setValue('role', value)}>
             <SelectTrigger className="h-10 border">

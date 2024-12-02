@@ -11,7 +11,6 @@ import { InvitationsTable } from './invitations-table';
 import { InviteMemberForm } from './invite-member-form';
 import { EmptyInvitations } from './empty-invitations';
 import { toast } from 'sonner';
-import { Skeleton } from '@/components/primitives/skeleton';
 
 const OrgMembersParams = {
   memberships: {
@@ -35,6 +34,7 @@ export function TeamManagement() {
   });
   const [roles, setRoles] = useState<Role[]>([]);
   const currentUserId = user?.id;
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     async function fetchRoles() {
@@ -63,7 +63,9 @@ export function TeamManagement() {
         role,
       });
       await memberships?.revalidate?.();
-    } catch (err) {
+      toast.success('Member role updated successfully');
+    } catch (err: any) {
+      toast.error(err?.errors?.[0]?.message || 'Failed to update member role');
       console.error('Failed to update member role:', err);
     }
   };
@@ -76,6 +78,7 @@ export function TeamManagement() {
       });
       await invitations?.revalidate?.();
       toast.success('Team member invited successfully');
+      setIsDialogOpen(false);
     } catch (err: any) {
       toast.error(err?.errors?.[0]?.message || 'Failed to invite member');
     }
@@ -85,16 +88,20 @@ export function TeamManagement() {
     try {
       await invitation.revoke();
       await Promise.all([memberships?.revalidate?.(), invitations?.revalidate?.()]);
-    } catch (err) {
+      toast.success('Invitation revoked successfully');
+    } catch (err: any) {
+      toast.error(err?.errors?.[0]?.message || 'Failed to revoke invitation');
       console.error('Failed to revoke invitation:', err);
     }
   };
 
-  const handleRemoveMember = async (memberId: string) => {
+  const handleRemoveMember = async (userId: string) => {
     try {
-      await organization?.removeMember(memberId);
+      await organization?.removeMember(userId);
       await memberships?.revalidate?.();
-    } catch (err) {
+      toast.success('Team member removed successfully');
+    } catch (err: any) {
+      toast.error(err?.errors?.[0]?.message || 'Failed to remove team member');
       console.error('Failed to remove member:', err);
     }
   };
@@ -112,7 +119,7 @@ export function TeamManagement() {
                 Pending {invitations?.count ? `(${invitations.count})` : null}
               </TabsTrigger>
             </TabsList>
-            <Dialog>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <RiMailAddLine className="mr-2.5 size-4" />

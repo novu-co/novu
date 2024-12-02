@@ -2,10 +2,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/primitives/button';
 import { RiDeleteBin2Line } from 'react-icons/ri';
 import { PaginationControls } from './pagination-controls';
+import { InvitationStatusBadge } from './invitation-status-badge';
+import { OrganizationInvitationResource } from '@clerk/types';
 
 interface InvitationsTableProps {
-  invitations: any[];
-  onRevokeInvitation: (invitation: any) => Promise<void>;
+  invitations: OrganizationInvitationResource[];
+  onRevokeInvitation: (invitation: OrganizationInvitationResource) => Promise<void>;
   pagination: {
     hasPreviousPage?: boolean;
     hasNextPage?: boolean;
@@ -37,7 +39,7 @@ export function InvitationsTable({ invitations, onRevokeInvitation, pagination }
                 <span className="text-muted-foreground">{invitation.role}</span>
               </TableCell>
               <TableCell>
-                <span className="text-muted-foreground">{invitation.status}</span>
+                <InvitationStatusBadge status={invitation.status} />
               </TableCell>
               <TableCell>
                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onRevokeInvitation(invitation)}>

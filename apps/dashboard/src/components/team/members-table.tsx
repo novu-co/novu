@@ -12,9 +12,10 @@ import {
 } from '@/components/primitives/dropdown-menu';
 import { RoleType } from './types';
 import { PaginationControls } from './pagination-controls';
+import { OrganizationMembershipResource } from '@clerk/types';
 
 interface MembersTableProps {
-  members: any[];
+  members: OrganizationMembershipResource[];
   roles: { key: string; label: string }[];
   currentUserId: string;
   onUpdateRole: (memberId: string, role: RoleType) => Promise<void>;
@@ -130,7 +131,7 @@ export function MembersTable({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
-                        onClick={() => onRemoveMember(member.id)}
+                        onClick={() => onRemoveMember(member.publicUserData?.userId ?? '')}
                         className="text-destructive focus:text-destructive"
                       >
                         <RiDeleteBin2Line className="mr-2 size-4" />
