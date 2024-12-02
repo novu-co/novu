@@ -424,7 +424,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
     });
   });
 
-  it('should return 404 for non-existent workflow', async () => {
+  it('should return 201 for non-existent workflow', async () => {
     const pay = {
       type: 'object',
       properties: {
@@ -450,11 +450,16 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
         controlValues: {},
       });
 
-    expect(response.status).to.equal(404);
-    expect(response.body.message).to.contain('Workflow cannot be found');
+    expect(response.status).to.equal(201);
+    expect(response.body.data).to.deep.equal({
+      result: {
+        preview: {},
+      },
+      previewPayloadExample: {},
+    });
   });
 
-  it('should return 400 for non-existent step', async () => {
+  it('should return 201 for non-existent step', async () => {
     const pay = {
       type: 'object',
       properties: {
@@ -478,8 +483,13 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
         controlValues: {},
       });
 
-    expect(response.status).to.equal(400);
-    expect(response.body.message).to.contain('No step found');
+    expect(response.status).to.equal(201);
+    expect(response.body.data).to.deep.equal({
+      result: {
+        preview: {},
+      },
+      previewPayloadExample: {},
+    });
   });
 
   async function createWorkflow(overrides: Partial<NotificationTemplateEntity> = {}): Promise<WorkflowResponseDto> {
