@@ -175,10 +175,6 @@ const Markdown = (props: MarkdownProps) => {
 
   const tokens = useMemo(() => parseMarkdownIntoTokens(children || ''), [children]);
 
-  if (children === PreviewIssueEnum.PREVIEW_ISSUE_REQUIRED_CONTROL_VALUE_IS_MISSING) {
-    return null;
-  }
-
   return (
     <p {...rest}>
       {tokens.map((token, index) => {
