@@ -147,6 +147,15 @@ export class CreateWorkflow {
       );
     }
 
+    this.analyticsService.track('Workflow created', command.userId, {
+      _organization: command.organizationId,
+      _environment: command.environmentId,
+      workflowId: storedWorkflow._id,
+      name: storedWorkflow.name,
+      description: storedWorkflow.description,
+      tags: storedWorkflow.tags,
+    });
+
     return storedWorkflow;
   }
 
