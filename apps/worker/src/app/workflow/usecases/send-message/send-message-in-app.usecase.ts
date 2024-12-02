@@ -28,7 +28,6 @@ import {
 } from '@novu/application-generic';
 import { InAppOutput } from '@novu/framework/internal';
 
-import { CreateLog } from '../../../shared/logs';
 import { SendMessageCommand } from './send-message.command';
 import { SendMessageBase } from './send-message.base';
 import { PlatformException } from '../../../shared/utils';
@@ -41,7 +40,6 @@ export class SendMessageInApp extends SendMessageBase {
     private invalidateCache: InvalidateCacheService,
     protected messageRepository: MessageRepository,
     private webSocketsQueueService: WebSocketsQueueService,
-    protected createLogUsecase: CreateLog,
     protected executionLogRoute: ExecutionLogRoute,
     protected subscriberRepository: SubscriberRepository,
     protected selectIntegration: SelectIntegration,
@@ -52,7 +50,6 @@ export class SendMessageInApp extends SendMessageBase {
   ) {
     super(
       messageRepository,
-      createLogUsecase,
       executionLogRoute,
       subscriberRepository,
       selectIntegration,

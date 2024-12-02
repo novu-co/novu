@@ -5,7 +5,7 @@ import {
   GetSubscriberGlobalPreferenceCommand,
   UpsertPreferences,
 } from '@novu/application-generic';
-import { NotificationTemplateRepository, SubscriberPreferenceRepository, SubscriberRepository } from '@novu/dal';
+import { NotificationTemplateRepository, SubscriberRepository } from '@novu/dal';
 import { PreferenceLevelEnum } from '@novu/shared';
 import { expect } from 'chai';
 import sinon from 'sinon';
@@ -59,7 +59,6 @@ describe('UpdatePreferences', () => {
   let subscriberRepositoryMock: sinon.SinonStubbedInstance<SubscriberRepository>;
   let analyticsServiceMock: sinon.SinonStubbedInstance<AnalyticsService>;
   let notificationTemplateRepositoryMock: sinon.SinonStubbedInstance<NotificationTemplateRepository>;
-  let subscriberPreferenceRepositoryMock: sinon.SinonStubbedInstance<SubscriberPreferenceRepository>;
   let getSubscriberGlobalPreferenceMock: sinon.SinonStubbedInstance<GetSubscriberGlobalPreference>;
   let getSubscriberTemplatePreferenceUsecase: sinon.SinonStubbedInstance<GetSubscriberTemplatePreference>;
   let upsertPreferencesMock: sinon.SinonStubbedInstance<UpsertPreferences>;
@@ -68,13 +67,11 @@ describe('UpdatePreferences', () => {
     subscriberRepositoryMock = sinon.createStubInstance(SubscriberRepository);
     analyticsServiceMock = sinon.createStubInstance(AnalyticsService);
     notificationTemplateRepositoryMock = sinon.createStubInstance(NotificationTemplateRepository);
-    subscriberPreferenceRepositoryMock = sinon.createStubInstance(SubscriberPreferenceRepository);
     getSubscriberGlobalPreferenceMock = sinon.createStubInstance(GetSubscriberGlobalPreference);
     getSubscriberTemplatePreferenceUsecase = sinon.createStubInstance(GetSubscriberTemplatePreference);
     upsertPreferencesMock = sinon.createStubInstance(UpsertPreferences);
 
     updatePreferences = new UpdatePreferences(
-      subscriberPreferenceRepositoryMock as any,
       notificationTemplateRepositoryMock as any,
       subscriberRepositoryMock as any,
       analyticsServiceMock as any,
@@ -141,7 +138,6 @@ describe('UpdatePreferences', () => {
     };
 
     subscriberRepositoryMock.findBySubscriberId.resolves(mockedSubscriber);
-    subscriberPreferenceRepositoryMock.findOne.resolves(mockedSubscriberPreference);
     getSubscriberGlobalPreferenceMock.execute.resolves(mockedGlobalPreference);
 
     const result = await updatePreferences.execute(command);
@@ -189,29 +185,10 @@ describe('UpdatePreferences', () => {
     };
 
     subscriberRepositoryMock.findBySubscriberId.resolves(mockedSubscriber);
-    subscriberPreferenceRepositoryMock.findOne.resolves(mockedSubscriberPreference);
     getSubscriberTemplatePreferenceUsecase.execute.resolves({ ...mockedGlobalPreference });
     notificationTemplateRepositoryMock.findById.resolves(mockedWorkflow);
 
     const result = await updatePreferences.execute(command);
-
-    expect(subscriberPreferenceRepositoryMock.create.calledOnce).to.be.false;
-    expect(subscriberPreferenceRepositoryMock.update.calledOnce).to.be.true;
-    expect(subscriberPreferenceRepositoryMock.update.firstCall.args).to.deep.equal([
-      {
-        _environmentId: command.environmentId,
-        _organizationId: command.organizationId,
-        _subscriberId: mockedSubscriber._id,
-        level: command.level,
-        _templateId: command.workflowId,
-      },
-      {
-        $set: {
-          'channels.chat': true,
-          'channels.email': false,
-        },
-      },
-    ]);
 
     expect(analyticsServiceMock.mixpanelTrack.calledOnce).to.be.true;
     expect(analyticsServiceMock.mixpanelTrack.firstCall.args).to.deep.equal([

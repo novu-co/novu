@@ -31,10 +31,11 @@ import {
   ButtonTypeEnum,
   ChatProviderIdEnum,
   IPreferenceChannels,
+  PreferenceLevelEnum,
   TriggerTypeEnum,
   UserSessionData,
 } from '@novu/shared';
-import { MessageEntity, PreferenceLevelEnum } from '@novu/dal';
+import { MessageEntity } from '@novu/dal';
 
 import { RemoveSubscriber, RemoveSubscriberCommand } from './usecases/remove-subscriber';
 import { ExternalApiAccessible } from '../auth/framework/external-api.decorator';

@@ -83,7 +83,7 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
   const reactFlowInstance = useReactFlow();
 
   const [nodes, edges] = useMemo(() => {
-    const triggerNode = { id: '0', position: { x: 0, y: 0 }, data: {}, type: 'trigger' };
+    const triggerNode = { id: crypto.randomUUID(), position: { x: 0, y: 0 }, data: {}, type: 'trigger' };
     let previousPosition = triggerNode.position;
 
     const createdNodes = steps?.map((el, index) => {

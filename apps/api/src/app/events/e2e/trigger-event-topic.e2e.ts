@@ -1,10 +1,4 @@
-import {
-  LogRepository,
-  MessageRepository,
-  NotificationRepository,
-  NotificationTemplateEntity,
-  SubscriberEntity,
-} from '@novu/dal';
+import { MessageRepository, NotificationRepository, NotificationTemplateEntity, SubscriberEntity } from '@novu/dal';
 import {
   ChannelTypeEnum,
   StepTypeEnum,
@@ -310,7 +304,6 @@ describe('Topic Trigger Event', () => {
     let to: TriggerRecipients;
     const notificationRepository = new NotificationRepository();
     const messageRepository = new MessageRepository();
-    const logRepository = new LogRepository();
 
     beforeEach(async () => {
       session = new UserSession();
