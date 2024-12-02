@@ -2,24 +2,46 @@ import * as React from 'react';
 
 import { cn } from '@/utils/ui';
 import { ClassNameValue } from 'tailwind-merge';
+import { Skeleton } from './skeleton';
 
-const Table = React.forwardRef<
-  HTMLTableElement,
-  React.HTMLAttributes<HTMLDivElement> & { containerClassname?: ClassNameValue }
->(({ className, containerClassname, ...props }, ref) => (
-  <div
-    className={cn(
-      'border-neutral-alpha-200 relative w-full overflow-x-auto rounded-md border shadow-sm',
-      containerClassname
-    )}
-  >
-    <table
-      ref={ref}
-      className={cn('relative w-full caption-bottom border-separate border-spacing-0 text-sm', className)}
-      {...props}
-    />
-  </div>
-));
+interface TableProps extends React.HTMLAttributes<HTMLDivElement> {
+  containerClassname?: ClassNameValue;
+}
+
+interface TableBodyProps extends React.HTMLAttributes<HTMLTableSectionElement> {
+  isLoading?: boolean;
+  loadingRows?: number;
+  loadingRowsContent?: (index: number) => React.ReactNode;
+}
+
+const DefaultLoadingRow = () => (
+  <TableRow>
+    {Array.from({ length: 4 }).map((_, i) => (
+      <TableCell key={i}>
+        <Skeleton className="h-4 w-[100px]" />
+      </TableCell>
+    ))}
+  </TableRow>
+);
+
+const Table = React.forwardRef<HTMLTableElement, TableProps>(
+  ({ className, containerClassname, children, ...props }, ref) => (
+    <div
+      className={cn(
+        'border-neutral-alpha-200 relative w-full overflow-x-auto rounded-md border shadow-sm',
+        containerClassname
+      )}
+    >
+      <table
+        ref={ref}
+        className={cn('relative w-full caption-bottom border-separate border-spacing-0 text-sm', className)}
+        {...props}
+      >
+        {children}
+      </table>
+    </div>
+  )
+);
 Table.displayName = 'Table';
 
 const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
@@ -33,8 +55,15 @@ const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttribut
 );
 TableHeader.displayName = 'TableHeader';
 
-const TableBody = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
-  ({ className, ...props }, ref) => <tbody ref={ref} className={cn('', className)} {...props} />
+const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(
+  (
+    { className, isLoading, loadingRows = 5, loadingRowsContent = () => <DefaultLoadingRow />, children, ...props },
+    ref
+  ) => (
+    <tbody ref={ref} className={cn('', className)} {...props}>
+      {isLoading ? Array.from({ length: loadingRows }).map((_, index) => loadingRowsContent(index)) : children}
+    </tbody>
+  )
 );
 TableBody.displayName = 'TableBody';
 
