@@ -88,8 +88,8 @@ export function useOnboardingSteps(): OnboardingStepsResult {
       },
       {
         id: StepIdEnum.INVITE_TEAM_MEMBER,
-        title: 'Invite a team member?',
-        description: 'Need help from a team member, let them know',
+        title: 'Invite a team member',
+        description: 'Collaborate with your team to manage notifications',
         status: hasInvitedTeamMember ? 'completed' : 'pending',
       },
     ],
