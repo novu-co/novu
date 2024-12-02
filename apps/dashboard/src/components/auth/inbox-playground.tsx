@@ -40,7 +40,7 @@ export interface InboxPlaygroundFormData {
 }
 
 const formSchema = z.object({
-  subject: z.string(),
+  subject: z.string().optional(),
   body: z.string(),
   primaryColor: z.string(),
   foregroundColor: z.string(),
