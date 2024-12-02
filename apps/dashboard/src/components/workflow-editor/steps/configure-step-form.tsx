@@ -57,10 +57,16 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     navigate(buildRoute(ROUTES.EDIT_WORKFLOW, { environmentSlug: environment.slug!, workflowSlug: workflow.slug }));
   };
 
+  const defaultValues = {
+    name: step.name,
+    stepId: step.stepId,
+  };
+
   const form = useForm<z.infer<typeof stepSchema>>({
-    defaultValues: {
-      name: step.name,
-      stepId: step.stepId,
+    defaultValues,
+    values: {
+      ...defaultValues,
+      ...step.controls.values,
     },
     resolver: zodResolver(stepSchema),
     shouldFocusError: false,
