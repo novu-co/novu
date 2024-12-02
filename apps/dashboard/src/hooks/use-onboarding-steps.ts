@@ -44,6 +44,12 @@ function getProviderTitle(providerType: ChannelTypeEnum): string {
   return providerType === ChannelTypeEnum.IN_APP ? 'Add an Inbox to your app' : `Connect your ${providerType} provider`;
 }
 
+function getProviderDescription(providerType: ChannelTypeEnum): string {
+  return providerType === ChannelTypeEnum.IN_APP
+    ? 'Add an Inbox to your app'
+    : `Connect your provider to send ${providerType} notifications with Novu.`;
+}
+
 function isActiveIntegration(integration: IIntegration, providerType: ChannelTypeEnum): boolean {
   const isMatchingChannel = integration.channel === providerType;
   const isNotNovuProvider = !integration.providerId.startsWith('novu-');
@@ -87,7 +93,7 @@ export function useOnboardingSteps(): OnboardingStepsResult {
       {
         id: `connect-${providerType}-provider` as StepIdEnum,
         title: getProviderTitle(providerType),
-        description: `Connect your provider to send ${providerType} notifications with Novu.`,
+        description: getProviderDescription(providerType),
         status: integrations?.some((integration) => isActiveIntegration(integration, providerType))
           ? 'completed'
           : 'pending',
@@ -119,5 +125,10 @@ export function useOnboardingSteps(): OnboardingStepsResult {
     previousStepsRef.current = steps;
   }, [steps, telemetry]);
 
-  return { steps, providerType };
+  return {
+    steps,
+    providerType,
+    totalSteps: steps.length,
+    completedSteps: steps.filter((step) => step.status === 'completed').length,
+  };
 }

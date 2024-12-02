@@ -7,7 +7,7 @@ import { useOnboardingSteps } from '../../hooks/use-onboarding-steps';
 import { NavigationLink } from './navigation-link';
 
 export function GettingStartedMenuItem() {
-  const { steps } = useOnboardingSteps();
+  const { totalSteps, completedSteps } = useOnboardingSteps();
   const { currentEnvironment } = useEnvironment();
 
   return (
@@ -39,7 +39,7 @@ export function GettingStartedMenuItem() {
             <RiSparkling2Fill className="h-4 w-4" />
           </motion.div>
           <span className="text-xs">
-            {steps.filter((step) => step.status === 'completed').length}/{steps.length}
+            {completedSteps}/{totalSteps}
           </span>
         </Badge>
       </NavigationLink>
