@@ -49,7 +49,7 @@ export class BuildWorkflowTestDataUseCase {
       return parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {};
     }
 
-    return this.generatePayloadVariableExample({
+    return this.generatePayloadSchema({
       environmentId: command.user.environmentId,
       organizationId: command.user.organizationId,
       workflowId: workflow._id,
@@ -65,7 +65,7 @@ export class BuildWorkflowTestDataUseCase {
   }
 
   @Instrument()
-  private async generatePayloadVariableExample({
+  private async generatePayloadSchema({
     environmentId,
     organizationId,
     workflowId,
