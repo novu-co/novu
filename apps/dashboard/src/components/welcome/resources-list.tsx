@@ -76,14 +76,14 @@ export function ResourcesList({ resources, title, icon }: ResourcesListProps) {
               <Link to={resource.url} target="_blank" rel="noopener" onClick={() => handleResourceClick(resource)}>
                 <Card className="w-60 shrink-0 overflow-hidden border-none shadow-[0px_12px_32px_0px_rgba(0,0,0,0.02),0px_0px_0px_1px_rgba(0,0,0,0.05)] transition-all duration-200 hover:translate-y-[1px] hover:cursor-pointer hover:shadow-md">
                   <motion.div
-                    className="bg-foreground-50 h-[80px] overflow-hidden"
+                    className="bg-foreground-50 h-[95px] overflow-hidden"
                     whileHover={{ scale: 1.03 }}
                     transition={{ duration: 0.2 }}
                   >
                     <img
-                      src={`/images/welcome/${resource.image}`}
+                      src={`/images/welcome/illustrations/${resource.image}`}
                       alt={resource.title}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-contain"
                     />
                   </motion.div>
 

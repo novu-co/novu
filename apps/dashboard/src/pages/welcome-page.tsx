@@ -12,22 +12,22 @@ import { TelemetryEvent } from '../utils/telemetry';
 const helpfulResources: Resource[] = [
   {
     title: 'Documentation',
-    image: 'view_code.png',
+    image: 'blog.svg',
     url: 'https://docs.novu.co/',
   },
   {
     title: 'Join our community on Discord',
-    image: 'calendar_schedule.png',
+    image: 'discord.svg',
     url: 'https://discord.gg/novu',
   },
   {
     title: 'See our code on GitHub',
-    image: 'view_code.png',
+    image: 'git.svg',
     url: 'https://github.com/novuhq/novu',
   },
   {
     title: 'Security & Compliance',
-    image: 'compliance.png',
+    image: 'security.svg',
     url: 'https://trust.novu.co/',
   },
 ];
@@ -36,25 +36,25 @@ const learnResources: Resource[] = [
   {
     title: 'Manage Subscribers',
     duration: '5m read',
-    image: 'view_code.png',
+    image: 'subscribers.svg',
     url: 'https://docs.novu.co/concepts/subscribers?utm_source=novu.co&utm_medium=welcome-page',
   },
   {
     title: 'Topics',
     duration: '5m read',
-    image: 'view_code.png',
+    image: 'topics.svg',
     url: 'https://docs.novu.co/concepts/topics?utm_source=novu.co&utm_medium=welcome-page',
   },
   {
     title: 'Code First Workflows',
     duration: '5m read',
-    image: 'view_code.png',
+    image: 'code-first.svg',
     url: 'https://docs.novu.co/workflow/introduction?utm_source=novu.co&utm_medium=welcome-page',
   },
   {
     title: 'Digest Engine',
     duration: '3m read',
-    image: 'view_code.png',
+    image: 'digest engine-1.svg',
     url: 'https://docs.novu.co/workflow/digest?utm_source=novu.co&utm_medium=welcome-page',
   },
 ];
