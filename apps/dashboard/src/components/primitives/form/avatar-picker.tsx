@@ -56,7 +56,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
           <PopoverTrigger asChild>
             <Button variant="outline" size="icon" className="text-foreground-600 relative size-full overflow-hidden">
               {value ? (
-                <Avatar className="bg-transparent p-px">
+                <Avatar className="bg-transparent p-1">
                   <AvatarImage src={value as string} />
                 </Avatar>
               ) : (
