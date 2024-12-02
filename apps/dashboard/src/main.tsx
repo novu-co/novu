@@ -11,6 +11,7 @@ import {
   QuestionnairePage,
   UsecaseSelectPage,
 } from '@/pages';
+import TeamPage from '@/pages/team';
 import './index.css';
 import { ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
         path: ROUTES.ROOT,
         element: <DashboardRoute />,
         children: [
+          {
+            path: ROUTES.TEAM,
+            element: <TeamPage />,
+          },
           {
             path: ROUTES.ENV,
             children: [
