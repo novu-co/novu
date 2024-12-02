@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { OnboardingArrowLeft } from '../components/icons/onboarding-arrow-left';
 import { updateClerkOrgMetadata } from '../api/organization';
 import { ChannelTypeEnum } from '@novu/shared';
-import { RiLoader2Line } from 'react-icons/ri';
 import { PageMeta } from '../components/page-meta';
 import { useTelemetry } from '../hooks';
 import { TelemetryEvent } from '../utils/telemetry';

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { RiPlayCircleLine, RiProgress1Fill } from 'react-icons/ri';
+import { RiPlayCircleLine } from 'react-icons/ri';
 import { useForm } from 'react-hook-form';
 // eslint-disable-next-line
 // @ts-ignore
