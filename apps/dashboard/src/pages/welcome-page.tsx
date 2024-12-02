@@ -35,7 +35,7 @@ const helpfulResources: Resource[] = [
 const learnResources: Resource[] = [
   {
     title: 'Manage Subscribers',
-    duration: '5m read',
+    duration: '4m read',
     image: 'subscribers.svg',
     url: 'https://docs.novu.co/concepts/subscribers?utm_source=novu.co&utm_medium=welcome-page',
   },
@@ -47,7 +47,7 @@ const learnResources: Resource[] = [
   },
   {
     title: 'Code First Workflows',
-    duration: '5m read',
+    duration: '4m read',
     image: 'code-first.svg',
     url: 'https://docs.novu.co/workflow/introduction?utm_source=novu.co&utm_medium=welcome-page',
   },
