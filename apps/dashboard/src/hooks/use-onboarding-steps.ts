@@ -1,7 +1,7 @@
 import { useMemo, useEffect, useRef } from 'react';
 import { useWorkflows } from './use-workflows';
 import { useOrganization } from '@clerk/clerk-react';
-import { ChannelTypeEnum } from '@novu/shared';
+import { ChannelTypeEnum, IIntegration } from '@novu/shared';
 import { useIntegrations } from './use-integrations';
 import { useTelemetry } from './use-telemetry';
 import { TelemetryEvent } from '../utils/telemetry';
@@ -44,6 +44,14 @@ function getProviderTitle(providerType: ChannelTypeEnum): string {
   return providerType === ChannelTypeEnum.IN_APP ? 'Add an Inbox to your app' : `Connect your ${providerType} provider`;
 }
 
+function isActiveIntegration(integration: IIntegration, providerType: ChannelTypeEnum): boolean {
+  const isMatchingChannel = integration.channel === providerType;
+  const isNotNovuProvider = !integration.providerId.startsWith('novu-');
+  const isConnected = providerType === ChannelTypeEnum.IN_APP ? !!integration.connected : true;
+
+  return isMatchingChannel && isNotNovuProvider && isConnected;
+}
+
 export function useOnboardingSteps(): OnboardingStepsResult {
   const { data: workflows } = useWorkflows();
   const { organization } = useOrganization();
@@ -80,9 +88,7 @@ export function useOnboardingSteps(): OnboardingStepsResult {
         id: `connect-${providerType}-provider` as StepIdEnum,
         title: getProviderTitle(providerType),
         description: `Connect your provider to send ${providerType} notifications with Novu.`,
-        status: integrations?.some(
-          (integration) => integration.channel === providerType && !integration.providerId.startsWith('novu-')
-        )
+        status: integrations?.some((integration) => isActiveIntegration(integration, providerType))
           ? 'completed'
           : 'pending',
       },
