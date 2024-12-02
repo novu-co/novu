@@ -1,20 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
+import * as Sentry from '@sentry/react';
 
 import { usePreviewStep } from '@/hooks';
-import { NovuApiError } from '@/api/api.client';
-import { ToastIcon } from '@/components/primitives/sonner';
-import { showToast } from '@/components/primitives/sonner-helpers';
 import { useDataRef } from '@/hooks/use-data-ref';
 
 export const useEditorPreview = ({
   workflowSlug,
   stepSlug,
-  stepName,
   controlValues,
 }: {
   workflowSlug: string;
   stepSlug: string;
-  stepName: string;
   controlValues: Record<string, unknown>;
 }) => {
   const [editorValue, setEditorValue] = useState('{}');
@@ -27,24 +23,7 @@ export const useEditorPreview = ({
       setEditorValue(JSON.stringify(res.previewPayloadExample, null, 2));
     },
     onError: (error) => {
-      if (error instanceof NovuApiError) {
-        showToast({
-          children: () => (
-            <>
-              <ToastIcon variant="error" />
-              <span className="text-sm">
-                Failed to preview step <span className="font-bold">{stepName}</span> with error: {error.message}
-              </span>
-            </>
-          ),
-          options: {
-            position: 'bottom-right',
-            classNames: {
-              toast: 'ml-10 mb-4',
-            },
-          },
-        });
-      }
+      Sentry.captureException(error);
     },
   });
   const dataRef = useDataRef({

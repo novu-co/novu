@@ -31,7 +31,6 @@ export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPr
   const { editorValue, setEditorValue, previewStep, previewData, isPreviewPending } = useEditorPreview({
     workflowSlug,
     stepSlug,
-    stepName: step.name,
     controlValues: formValues,
   });
   const [accordionValue, setAccordionValue] = useState<string | undefined>(getInitialAccordionValue(editorValue));

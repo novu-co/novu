@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import * as Sentry from '@sentry/react';
 import { ChannelTypeEnum } from '@novu/shared';
 
 import { usePreviewStep } from '@/hooks';
@@ -15,7 +16,15 @@ import {
 import { useStep } from '@/components/workflow-editor/steps/step-provider';
 
 export function ConfigureInAppStepPreview() {
-  const { previewStep, data: previewData, isPending: isPreviewPending } = usePreviewStep();
+  const {
+    previewStep,
+    data: previewData,
+    isPending: isPreviewPending,
+  } = usePreviewStep({
+    onError: (error) => {
+      Sentry.captureException(error);
+    },
+  });
   const { step, isPending } = useStep();
 
   const { workflowSlug, stepSlug } = useParams<{
