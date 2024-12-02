@@ -49,7 +49,7 @@ function getProviderTitle(providerType: ChannelTypeEnum): string {
 
 function getProviderDescription(providerType: ChannelTypeEnum): string {
   return providerType === ChannelTypeEnum.IN_APP
-    ? 'Add an Inbox to your app'
+    ? 'Embed a full-featured Inbox in your app in minutes'
     : `Connect your provider to send ${providerType} notifications with Novu.`;
 }
 
