@@ -1,7 +1,6 @@
 import { Card } from '@/components/primitives/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { OrganizationProfile, UserProfile } from '@clerk/clerk-react';
-import { useOrganization } from '@clerk/clerk-react';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ROUTES } from '@/utils/routes';
