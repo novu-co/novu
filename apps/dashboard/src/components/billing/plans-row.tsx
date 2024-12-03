@@ -2,6 +2,7 @@ import { Badge } from '@/components/primitives/badge';
 import { Button } from '@/components/primitives/button';
 import { ApiServiceLevelEnum } from '@novu/shared';
 import { useSubscriptionContext } from './subscription-provider';
+import { useSubscription } from './hooks/use-subscription';
 
 interface PlansRowProps {
   selectedBillingInterval: 'month' | 'year';
@@ -26,7 +27,8 @@ function PlanDisplay({ price, subtitle, events }: PlanDisplayProps) {
 }
 
 export function PlansRow({ selectedBillingInterval }: PlansRowProps) {
-  const { apiServiceLevel } = useSubscriptionContext();
+  const { data: subscription } = useSubscription();
+  const { apiServiceLevel } = subscription || {};
   const businessPlanPrice = selectedBillingInterval === 'year' ? '$2,700' : '$250';
 
   return (
@@ -58,7 +60,9 @@ export function PlansRow({ selectedBillingInterval }: PlansRowProps) {
             window.location.href = '/v1/billing/checkout-session';
           }}
         >
-          {apiServiceLevel === ApiServiceLevelEnum.BUSINESS ? 'Manage subscription' : 'Upgrade plan'}
+          {apiServiceLevel === ApiServiceLevelEnum.BUSINESS && !subscription?.trial?.isActive
+            ? 'Manage subscription'
+            : 'Upgrade plan'}
         </Button>
       </div>
 
