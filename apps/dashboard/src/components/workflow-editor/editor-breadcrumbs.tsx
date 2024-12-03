@@ -1,5 +1,8 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { FaCode } from 'react-icons/fa6';
+import { WorkflowOriginEnum } from '@novu/shared';
+
 import { ArrowRight, RouteFill } from '@/components/icons';
 import {
   Breadcrumb,
@@ -31,7 +34,7 @@ export const EditorBreadcrumbs = () => {
       label: 'Workflows',
       href: workflowsRoute,
       node: (
-        <Badge variant="warning" kind="pill" size="2xs" className="no-underline">
+        <Badge kind="pill" size="2xs" className="no-underline">
           BETA
         </Badge>
       ),
@@ -59,12 +62,20 @@ export const EditorBreadcrumbs = () => {
             </React.Fragment>
           ))}
           <BreadcrumbItem>
-            <BreadcrumbPage>
-              <RouteFill />
-              <div className="flex max-w-[32ch]">
-                <TruncatedText>{workflow?.name}</TruncatedText>
-              </div>
-            </BreadcrumbPage>
+            {workflow && (
+              <BreadcrumbPage className="flex items-center gap-1">
+                {workflow.origin === WorkflowOriginEnum.EXTERNAL ? (
+                  <Badge variant="warning" kind="pill" size="2xs">
+                    <FaCode className="size-3.5" />
+                  </Badge>
+                ) : (
+                  <RouteFill className="size-4" />
+                )}
+                <div className="flex max-w-[32ch]">
+                  <TruncatedText>{workflow?.name}</TruncatedText>
+                </div>
+              </BreadcrumbPage>
+            )}
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
