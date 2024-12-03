@@ -66,7 +66,7 @@ export const SideNavigation = () => {
               </NavigationLink>
             </NavigationGroup>
             <NavigationGroup label="Developer">
-              <NavigationLink to={LEGACY_ROUTES.INTEGRATIONS} isExternal>
+              <NavigationLink to={buildRoute(ROUTES.INTEGRATIONS, { environmentSlug: currentEnvironment?.slug ?? '' })}>
                 <RiStore3Line className="size-4" />
                 <span>Integration Store</span>
               </NavigationLink>

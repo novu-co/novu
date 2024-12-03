@@ -5,3 +5,4 @@ export * from './organization-list';
 export * from './questionnaire-page';
 export * from './usecase-select-page';
 export * from './welcome-page';
+export * from './integrations/integrations-list-page';

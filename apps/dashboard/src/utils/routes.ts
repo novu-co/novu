@@ -12,6 +12,8 @@ export const ROUTES = {
   WELCOME: '/env/:environmentSlug/welcome',
   EDIT_STEP: 'steps/:stepSlug',
   EDIT_STEP_TEMPLATE: 'steps/:stepSlug/edit',
+  INTEGRATIONS: '/env/:environmentSlug/integrations',
+  INTEGRATIONS_CREATE: '/env/:environmentSlug/integrations/create',
 };
 
 export const buildRoute = (route: string, params: Record<string, string>) => {

@@ -11,6 +11,7 @@ import {
   QuestionnairePage,
   UsecaseSelectPage,
   WelcomePage,
+  IntegrationsListPage,
 } from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
@@ -92,6 +93,10 @@ const router = createBrowserRouter([
               {
                 path: ROUTES.TEST_WORKFLOW,
                 element: <TestWorkflowPage />,
+              },
+              {
+                path: ROUTES.INTEGRATIONS,
+                element: <IntegrationsListPage />,
               },
               {
                 path: '*',
