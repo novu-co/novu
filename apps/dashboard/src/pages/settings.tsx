@@ -38,26 +38,22 @@ export const clerkComponentAppearance = {
 };
 
 export function SettingsPage() {
-  const { organization } = useOrganization();
   const navigate = useNavigate();
   const location = useLocation();
 
   const currentTab =
-    location.pathname === ROUTES.SETTINGS ? 'profile' : location.pathname.split('/settings/')[1] || 'profile';
+    location.pathname === ROUTES.SETTINGS ? 'account' : location.pathname.split('/settings/')[1] || 'account';
 
   const handleTabChange = (value: string) => {
     switch (value) {
-      case 'profile':
-        navigate(ROUTES.SETTINGS_PROFILE);
+      case 'account':
+        navigate(ROUTES.SETTINGS_ACCOUNT);
         break;
       case 'organization':
         navigate(ROUTES.SETTINGS_ORGANIZATION);
         break;
       case 'team':
         navigate(ROUTES.SETTINGS_TEAM);
-        break;
-      case 'security':
-        navigate(ROUTES.SETTINGS_SECURITY);
         break;
     }
   };
@@ -70,7 +66,7 @@ export function SettingsPage() {
           className="border-border/20 relative mt-4 flex w-full items-end justify-start space-x-2 rounded-none border-b bg-transparent px-1.5 pb-0"
         >
           <TabsTrigger
-            value="profile"
+            value="account"
             className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
           >
             Account
@@ -90,7 +86,7 @@ export function SettingsPage() {
         </TabsList>
 
         <div className="mx-auto mt-1 max-w-[700px] px-1.5">
-          <TabsContent value="profile" className="rounded-lg">
+          <TabsContent value="account" className="rounded-lg">
             <Card className="mx-auto mt-10 border-none shadow-none">
               <UserProfile appearance={clerkComponentAppearance}>
                 <UserProfile.Page label="account" />
