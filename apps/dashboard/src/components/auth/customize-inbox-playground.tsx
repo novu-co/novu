@@ -90,9 +90,7 @@ function StylePreviewCard({
     <div
       key={style.id}
       className={`group relative h-[100px] cursor-pointer overflow-hidden rounded-lg border transition-all duration-200 active:scale-[0.98] ${
-        isSelected
-          ? 'shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05),0px_0px_0px_2px_#F2F4F7,0px_0px_2px_0px_#E0E0E0,0px_1px_4px_-2px_rgba(24,39,75,0.02),0px_4px_4px_-2px_rgba(24,39,75,0.06)]'
-          : 'hover:shadow-[0px_1px_2px_0px_rgba(16,24,40,0.05),0px_0px_0px_2px_#F2F4F7,0px_0px_2px_0px_#E0E0E0,0px_1px_4px_-2px_rgba(24,39,75,0.02),0px_4px_4px_-2px_rgba(24,39,75,0.06)]'
+        isSelected ? 'border-2 border-neutral-200' : 'border border-neutral-100 hover:border-neutral-200'
       }`}
       style={{
         backgroundImage: `url(${style.image})`,

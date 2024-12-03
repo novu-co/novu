@@ -1,9 +1,8 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { useWorkflows } from './use-workflows';
 import { useOrganization } from '@clerk/clerk-react';
 import { ChannelTypeEnum, IIntegration } from '@novu/shared';
 import { useIntegrations } from './use-integrations';
-import { useTelemetry } from './use-telemetry';
 import { ONBOARDING_DEMO_WORKFLOW_ID } from '../config';
 
 export enum StepIdEnum {

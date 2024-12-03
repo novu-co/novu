@@ -14,6 +14,7 @@ import { TelemetryEvent } from '../utils/telemetry';
 import { channelOptions } from '../components/auth/usecases-list.utils';
 import { useMutation } from '@tanstack/react-query';
 import * as Sentry from '@sentry/react';
+import { useOrganization } from '@clerk/clerk-react';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -33,6 +34,7 @@ const itemVariants = {
 };
 
 export function UsecaseSelectPage() {
+  const { organization } = useOrganization();
   const navigate = useNavigate();
   const track = useTelemetry();
   const [selectedUseCases, setSelectedUseCases] = useState<ChannelTypeEnum[]>([]);
@@ -41,6 +43,13 @@ export function UsecaseSelectPage() {
   useEffect(() => {
     track(TelemetryEvent.USECASE_SELECT_PAGE_VIEWED);
   }, [track]);
+
+  useEffect(() => {
+    console.log('organization', organization?.publicMetadata);
+    if (organization?.publicMetadata?.useCases) {
+      setSelectedUseCases(organization.publicMetadata.useCases as ChannelTypeEnum[]);
+    }
+  }, [organization]);
 
   const displayedUseCase =
     hoveredUseCase || (selectedUseCases.length > 0 ? selectedUseCases[selectedUseCases.length - 1] : null);
