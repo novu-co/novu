@@ -26,7 +26,7 @@ export const WorkflowsPage = () => {
         headerStartItems={
           <h1 className="text-foreground-950 flex items-center gap-1">
             <span>Workflows</span>
-            <Badge variant="warning" kind="pill" size="xxs">
+            <Badge variant="warning" kind="pill" size="2xs">
               BETA
             </Badge>
           </h1>

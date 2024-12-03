@@ -31,7 +31,7 @@ export const EditorBreadcrumbs = () => {
       label: 'Workflows',
       href: workflowsRoute,
       node: (
-        <Badge variant="warning" kind="pill" size="xxs" className="no-underline">
+        <Badge variant="warning" kind="pill" size="2xs" className="no-underline">
           BETA
         </Badge>
       ),
