@@ -8,12 +8,11 @@ interface PlanSwitcherProps {
 
 export function PlanSwitcher({ selectedBillingInterval, setSelectedBillingInterval }: PlanSwitcherProps) {
   return (
-    <div className="border-border/20 relative flex h-10 items-end justify-between self-stretch border-b">
-      <h2 className="absolute left-0 top-0 text-base font-semibold">All plans</h2>
-      <div className="flex flex-1 justify-center">
+    <div className="border-border/20 relative flex h-10 items-end justify-between self-stretch border-none">
+      <div className="flex flex-1 justify-start">
         <Tabs
           value={selectedBillingInterval}
-          onValueChange={(value: 'month' | 'year') => setSelectedBillingInterval(value)}
+          onValueChange={(value) => setSelectedBillingInterval(value as 'month' | 'year')}
         >
           <TabsList className="h-auto border-none bg-transparent p-0">
             <TabsTrigger

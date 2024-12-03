@@ -1,10 +1,10 @@
 import { Badge } from '@/components/primitives/badge';
-import { Button } from '@/components/primitives/button';
 import { Card } from '@/components/primitives/card';
 import { Progress } from '@/components/primitives/progress';
 import { cn } from '../../utils/ui';
 import { useSubscription } from './hooks/use-subscription';
-import { CalendarDays, ChevronRight } from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
+import { PlanActionButton } from './plan-action-button';
 
 interface ActivePlanBannerProps {
   selectedBillingInterval: 'month' | 'year';
@@ -14,6 +14,8 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
   const { data: subscription } = useSubscription();
   const { trial, apiServiceLevel, events } = subscription || {};
   const { current: currentEvents, included: maxEvents } = events || {};
+  const isPaidSubscriptionActive =
+    subscription?.isActive && !trial?.isActive && apiServiceLevel !== ApiServiceLevelEnum.FREE;
 
   const getProgressColor = (current: number, max: number) => {
     const percentage = (current / max) * 100;
@@ -38,8 +40,8 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
   };
 
   return (
-    <div className="mt-6 flex justify-center space-y-3">
-      <Card className="w-full max-w-2xl overflow-hidden border">
+    <div className="mt-6 flex space-y-3">
+      <Card className="w-full max-w-2xl overflow-hidden border shadow-none">
         <div className="space-y-5 p-5">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
@@ -54,17 +56,13 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
               {trial?.isActive && <div className="text-warning text-sm font-medium">{trial.daysLeft} days left</div>}
             </div>
 
-            <Button
+            <PlanActionButton
+              selectedBillingInterval={selectedBillingInterval}
               variant="outline"
               size="sm"
-              className="shrink-0 gap-2"
-              onClick={() => {
-                window.location.href = '/v1/billing/portal';
-              }}
-            >
-              {trial?.isActive ? 'Upgrade plan' : 'Manage subscription'}
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+              showIcon
+              className="shrink-0"
+            />
           </div>
 
           <div className="space-y-4">

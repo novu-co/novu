@@ -72,7 +72,7 @@ export function SettingsPage() {
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
         <TabsList
           align="start"
-          className="border-border/20 relative mt-4 flex w-full items-end justify-start space-x-2 rounded-none border-b bg-transparent px-1.5 pb-0"
+          className="border-border/20 relative ml-[-4px] mt-4 flex w-full items-end justify-start space-x-2 rounded-none border-b bg-transparent px-1.5 pb-0 pl-0"
         >
           <TabsTrigger
             value="profile"

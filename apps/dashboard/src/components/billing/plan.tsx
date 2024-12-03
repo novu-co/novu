@@ -51,7 +51,7 @@ export function Plan() {
   }
 
   return (
-    <div className={cn('flex w-full flex-col gap-6')}>
+    <div className={cn('flex w-full flex-col gap-6 p-6 pt-0')}>
       <ActivePlanBanner selectedBillingInterval={selectedBillingInterval} />
       <PlanSwitcher
         selectedBillingInterval={selectedBillingInterval}

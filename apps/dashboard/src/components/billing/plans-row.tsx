@@ -1,8 +1,11 @@
 import { Badge } from '@/components/primitives/badge';
 import { Button } from '@/components/primitives/button';
+import { Card } from '@/components/primitives/card';
 import { ApiServiceLevelEnum } from '@novu/shared';
-import { useSubscriptionContext } from './subscription-provider';
 import { useSubscription } from './hooks/use-subscription';
+import { cn } from '../../utils/ui';
+import { Check } from 'lucide-react';
+import { PlanActionButton } from './plan-action-button';
 
 interface PlansRowProps {
   selectedBillingInterval: 'month' | 'year';
@@ -18,8 +21,8 @@ function PlanDisplay({ price, subtitle, events }: PlanDisplayProps) {
   return (
     <div className="space-y-1">
       <div className="flex items-baseline gap-1">
-        <span className="text-2xl font-semibold">{price}</span>
-        <span className="text-muted-foreground text-sm">{subtitle}</span>
+        <span className="text-3xl font-bold tracking-tight">{price}</span>
+        <span className="text-muted-foreground text-sm font-medium">{subtitle}</span>
       </div>
       <span className="text-muted-foreground text-sm">{events}</span>
     </div>
@@ -28,53 +31,107 @@ function PlanDisplay({ price, subtitle, events }: PlanDisplayProps) {
 
 export function PlansRow({ selectedBillingInterval }: PlansRowProps) {
   const { data: subscription } = useSubscription();
-  const { apiServiceLevel } = subscription || {};
+  const { apiServiceLevel, trial } = subscription || {};
   const businessPlanPrice = selectedBillingInterval === 'year' ? '$2,700' : '$250';
+  const isPaidSubscriptionActive =
+    subscription?.isActive && !trial?.isActive && apiServiceLevel !== ApiServiceLevelEnum.FREE;
 
   return (
-    <div className="divide-border grid grid-cols-4 divide-x">
-      <div className="space-y-4 p-6">
-        <h3 className="text-muted-foreground text-base font-semibold">Plans</h3>
-      </div>
-
-      <div className="space-y-4 p-6">
-        <h3 className="text-base font-semibold">Free</h3>
-        <PlanDisplay price="$0" subtitle="free forever" events="30,000 events per month" />
-      </div>
-
-      <div className="space-y-4 p-6">
-        <div className="flex items-center gap-2">
-          <h3 className="text-base font-semibold">Business</h3>
-          <Badge variant="secondary">Popular</Badge>
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+      {/* Free Plan */}
+      <Card className="hover:border-primary/50 relative overflow-hidden border transition-colors">
+        <div className="flex h-full flex-col p-6">
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold">Free</h3>
+            <PlanDisplay price="$0" subtitle="free forever" events="30,000 events per month" />
+            <ul className="space-y-2">
+              <li className="flex items-center gap-2 text-sm">
+                <Check className="text-primary h-4 w-4" />
+                <span>All core features</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm">
+                <Check className="text-primary h-4 w-4" />
+                <span>Up to 3 team members</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm">
+                <Check className="text-primary h-4 w-4" />
+                <span>Community support</span>
+              </li>
+            </ul>
+          </div>
         </div>
-        <PlanDisplay
-          price={businessPlanPrice}
-          subtitle={`billed ${selectedBillingInterval === 'year' ? 'annually' : 'monthly'}`}
-          events="250,000 events per month"
-        />
-        <Button
-          variant="default"
-          className="w-full"
-          onClick={() => {
-            // TODO: Implement checkout
-            window.location.href = '/v1/billing/checkout-session';
-          }}
-        >
-          {apiServiceLevel === ApiServiceLevelEnum.BUSINESS && !subscription?.trial?.isActive
-            ? 'Manage subscription'
-            : 'Upgrade plan'}
-        </Button>
-      </div>
+      </Card>
 
-      <div className="flex flex-col justify-between p-6">
-        <div>
-          <h3 className="text-base font-semibold">Enterprise</h3>
-          <p className="text-muted-foreground mt-4 text-sm">Custom pricing, billing, and extended services.</p>
+      {/* Business Plan */}
+      <Card className="border-primary relative overflow-hidden border-2 shadow-md">
+        <div className="bg-primary absolute -right-12 top-4 rotate-45 px-12 py-1">
+          <span className="text-primary-foreground text-xs font-medium">POPULAR</span>
         </div>
-        <Button variant="outline" className="w-full">
-          Contact sales
-        </Button>
-      </div>
+        <div className="flex h-full flex-col p-6">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <h3 className="text-xl font-semibold">Business</h3>
+              <Badge variant="secondary">Most Popular</Badge>
+            </div>
+            <PlanDisplay
+              price={businessPlanPrice}
+              subtitle={`billed ${selectedBillingInterval === 'year' ? 'annually' : 'monthly'}`}
+              events="250,000 events per month"
+            />
+            <ul className="space-y-2">
+              <li className="flex items-center gap-2 text-sm">
+                <Check className="text-primary h-4 w-4" />
+                <span>Everything in Free</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm">
+                <Check className="text-primary h-4 w-4" />
+                <span>Up to 10 team members</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm">
+                <Check className="text-primary h-4 w-4" />
+                <span>Priority support</span>
+              </li>
+            </ul>
+          </div>
+          <div className="mt-6">
+            <PlanActionButton selectedBillingInterval={selectedBillingInterval} className="w-full" />
+          </div>
+        </div>
+      </Card>
+
+      {/* Enterprise Plan */}
+      <Card className="hover:border-primary/50 relative overflow-hidden border transition-colors">
+        <div className="flex h-full flex-col p-6">
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold">Enterprise</h3>
+            <div className="space-y-1">
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-semibold">Custom pricing</span>
+              </div>
+              <span className="text-muted-foreground text-sm">For large-scale operations</span>
+            </div>
+            <ul className="space-y-2">
+              <li className="flex items-center gap-2 text-sm">
+                <Check className="text-primary h-4 w-4" />
+                <span>Everything in Business</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm">
+                <Check className="text-primary h-4 w-4" />
+                <span>Unlimited team members</span>
+              </li>
+              <li className="flex items-center gap-2 text-sm">
+                <Check className="text-primary h-4 w-4" />
+                <span>Custom contracts & SLA</span>
+              </li>
+            </ul>
+          </div>
+          <div className="mt-6">
+            <Button variant="outline" className="w-full">
+              Contact sales
+            </Button>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

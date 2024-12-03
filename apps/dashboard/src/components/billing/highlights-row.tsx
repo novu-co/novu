@@ -1,5 +1,7 @@
 import { Badge } from '@/components/primitives/badge';
+import { Card } from '@/components/primitives/card';
 import { ApiServiceLevelEnum } from '@novu/shared';
+import { cn } from '../../utils/ui';
 
 interface Highlight {
   text: string;
@@ -30,24 +32,22 @@ const highlights: PlanHighlights = {
 
 function PlanHighlights({ planHighlights }: { planHighlights: Highlight[] }) {
   return (
-    <div className="flex-1 p-6">
-      <ul className="text-muted-foreground list-inside list-disc space-y-2 text-sm">
+    <Card className="bg-muted/30 flex-1 border-none p-6">
+      <ul className="text-muted-foreground list-inside space-y-3 text-sm">
         {planHighlights.map((item, index) => (
           <li key={index} className="flex items-center gap-2">
+            <div className="bg-primary h-1.5 w-1.5 rounded-full" />
             {item.text} {item.badgeLabel && <Badge variant="outline">{item.badgeLabel}</Badge>}
           </li>
         ))}
       </ul>
-    </div>
+    </Card>
   );
 }
 
 export function HighlightsRow() {
   return (
-    <div className="divide-border bg-muted/50 grid grid-cols-4 divide-x">
-      <div className="p-6">
-        <span className="text-muted-foreground text-sm">Highlights</span>
-      </div>
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
       {Object.entries(highlights).map(([planName, planHighlights]) => (
         <PlanHighlights key={planName} planHighlights={planHighlights} />
       ))}
