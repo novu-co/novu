@@ -44,7 +44,7 @@ export const NumberInputWithSelect = ({
 
   return (
     <>
-      <InputFieldPure className="h-7 rounded-lg border pr-0" state={error ? 'error' : 'default'}>
+      <InputFieldPure className="h-7 rounded-lg border pr-0">
         <FormField
           control={control}
           name={fields.inputKey}
