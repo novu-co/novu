@@ -1,19 +1,17 @@
 import { useOrganization, useUser } from '@clerk/clerk-react';
 import { Card, CardContent } from '@/components/primitives/card';
 import { Button } from '@/components/primitives/button';
-import { RiMailAddLine, RiTeamLine, RiTimeLine } from 'react-icons/ri';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/primitives/dialog';
+import { RiMailAddLine } from 'react-icons/ri';
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/primitives/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { useState, useEffect } from 'react';
-import { InviteFormValues, Role } from './types';
+import { Role } from './types';
 import { MembersTable } from './members-table';
 import { InvitationsTable } from './invitations-table';
 import { InviteMemberForm } from './invite-member-form';
 import { EmptyInvitations } from './empty-invitations';
-import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Skeleton } from '@/components/primitives/skeleton';
-import { cn } from '@/lib/utils';
 
 const OrgMembersParams = {
   memberships: {
@@ -74,56 +72,6 @@ export function TeamManagement() {
     );
   }
 
-  const handleUpdateRole = async (memberId: string, role: string) => {
-    try {
-      await organization.updateMember({
-        userId: memberId,
-        role,
-      });
-      await memberships?.revalidate?.();
-      toast.success('Member role updated successfully');
-    } catch (err: any) {
-      toast.error(err?.errors?.[0]?.message || 'Failed to update member role');
-      console.error('Failed to update member role:', err);
-    }
-  };
-
-  const handleInviteMember = async (data: InviteFormValues) => {
-    try {
-      await organization?.inviteMember({
-        emailAddress: data.email,
-        role: data.role,
-      });
-      await invitations?.revalidate?.();
-      toast.success('Team member invited successfully');
-      setIsDialogOpen(false);
-    } catch (err: any) {
-      toast.error(err?.errors?.[0]?.message || 'Failed to invite member');
-    }
-  };
-
-  const handleRevokeInvitation = async (invitation: any) => {
-    try {
-      await invitation.revoke();
-      await Promise.all([memberships?.revalidate?.(), invitations?.revalidate?.()]);
-      toast.success('Invitation revoked successfully');
-    } catch (err: any) {
-      toast.error(err?.errors?.[0]?.message || 'Failed to revoke invitation');
-      console.error('Failed to revoke invitation:', err);
-    }
-  };
-
-  const handleRemoveMember = async (userId: string) => {
-    try {
-      await organization?.removeMember(userId);
-      await memberships?.revalidate?.();
-      toast.success('Team member removed successfully');
-    } catch (err: any) {
-      toast.error(err?.errors?.[0]?.message || 'Failed to remove team member');
-      console.error('Failed to remove member:', err);
-    }
-  };
-
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <Card className="border-none shadow-none">
@@ -165,7 +113,7 @@ export function TeamManagement() {
                       whileHover={{ x: '100%' }}
                       transition={{ duration: 0.5 }}
                     />
-                    <RiMailAddLine className="mr-2.5 size-4 transition-transform group-hover:scale-110" />
+                    <RiMailAddLine className="mr-2.5 size-4 transition-transform" />
                     Invite Member
                   </Button>
                 </DialogTrigger>
@@ -178,7 +126,14 @@ export function TeamManagement() {
                     <div className="border-b px-6 py-4">
                       <DialogTitle className="text-xl font-semibold tracking-tight">Invite Team Member</DialogTitle>
                     </div>
-                    <InviteMemberForm onSubmit={handleInviteMember} roles={roles} />
+                    <InviteMemberForm
+                      roles={roles}
+                      onClose={async () => {
+                        setIsDialogOpen(false);
+                        await memberships?.revalidate?.();
+                        await invitations?.revalidate?.();
+                      }}
+                    />
                   </motion.div>
                 </DialogContent>
               </Dialog>
@@ -191,8 +146,6 @@ export function TeamManagement() {
                     members={memberships?.data ?? []}
                     roles={roles}
                     currentUserId={currentUserId ?? ''}
-                    onUpdateRole={handleUpdateRole}
-                    onRemoveMember={handleRemoveMember}
                     pagination={{
                       hasPreviousPage: memberships?.hasPreviousPage,
                       hasNextPage: memberships?.hasNextPage,
@@ -210,7 +163,9 @@ export function TeamManagement() {
                   ) : (
                     <InvitationsTable
                       invitations={invitations.data}
-                      onRevokeInvitation={handleRevokeInvitation}
+                      onRevokeInvitation={async () => {
+                        await Promise.all([memberships?.revalidate?.(), invitations?.revalidate?.()]);
+                      }}
                       pagination={{
                         hasPreviousPage: invitations.hasPreviousPage,
                         hasNextPage: invitations.hasNextPage,

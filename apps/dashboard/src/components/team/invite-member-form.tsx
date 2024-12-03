@@ -6,13 +6,17 @@ import { Label } from '@/components/primitives/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { InviteFormValues, inviteFormSchema, RoleType, Role } from './types';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../utils/constants';
+import { toast } from 'sonner';
+import { useOrganization } from '@clerk/clerk-react';
 
 interface InviteMemberFormProps {
-  onSubmit: (data: InviteFormValues) => Promise<void>;
   roles: Role[];
+  onSuccess?: () => void;
+  onClose?: () => void;
 }
 
-export function InviteMemberForm({ onSubmit, roles }: InviteMemberFormProps) {
+export function InviteMemberForm({ roles, onSuccess, onClose }: InviteMemberFormProps) {
+  const { organization, invitations } = useOrganization();
   const form = useForm<InviteFormValues>({
     resolver: zodResolver(inviteFormSchema),
     defaultValues: {
@@ -21,11 +25,26 @@ export function InviteMemberForm({ onSubmit, roles }: InviteMemberFormProps) {
     },
   });
 
+  const handleInviteMember = async (data: InviteFormValues) => {
+    try {
+      await organization?.inviteMember({
+        emailAddress: data.email,
+        role: data.role,
+      });
+      await invitations?.revalidate?.();
+      toast.success('Team member invited successfully');
+      onSuccess?.();
+      onClose?.();
+    } catch (err: any) {
+      toast.error(err?.errors?.[0]?.message || 'Failed to invite member');
+    }
+  };
+
   return (
     <form
       id="invite-member"
-      onSubmit={form.handleSubmit(onSubmit)}
-      className="space-y-4"
+      onSubmit={form.handleSubmit(handleInviteMember)}
+      className="py-4"
       {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
     >
       <div className="px-6">
@@ -63,7 +82,7 @@ export function InviteMemberForm({ onSubmit, roles }: InviteMemberFormProps) {
         </div>
       </div>
 
-      <div className="bg-muted/40 border-t px-6 py-4">
+      <div className="bg-muted/40 border-t px-6 py-4 pb-0">
         <Button type="submit" className="h-10 w-full" isLoading={form.formState.isSubmitting}>
           <span>Send Invitation</span>
         </Button>

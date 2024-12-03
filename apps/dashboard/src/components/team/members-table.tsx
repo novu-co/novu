@@ -13,13 +13,13 @@ import {
 import { RoleType } from './types';
 import { PaginationControls } from './pagination-controls';
 import { OrganizationMembershipResource } from '@clerk/types';
+import { useOrganization } from '@clerk/clerk-react';
+import { toast } from 'sonner';
 
 interface MembersTableProps {
   members: OrganizationMembershipResource[];
   roles: { key: string; label: string }[];
   currentUserId: string;
-  onUpdateRole: (memberId: string, role: RoleType) => Promise<void>;
-  onRemoveMember: (memberId: string) => Promise<void>;
   pagination: {
     hasPreviousPage?: boolean;
     hasNextPage?: boolean;
@@ -52,14 +52,34 @@ const LoadingRow = () => (
   </TableRow>
 );
 
-export function MembersTable({
-  members,
-  roles,
-  currentUserId,
-  onUpdateRole,
-  onRemoveMember,
-  pagination,
-}: MembersTableProps) {
+export function MembersTable({ members, roles, currentUserId, pagination }: MembersTableProps) {
+  const { organization, memberships } = useOrganization();
+
+  const handleUpdateRole = async (memberId: string, role: RoleType) => {
+    try {
+      await organization?.updateMember({
+        userId: memberId,
+        role,
+      });
+      await memberships?.revalidate?.();
+      toast.success('Member role updated successfully');
+    } catch (err: any) {
+      toast.error(err?.errors?.[0]?.message || 'Failed to update member role');
+      console.error('Failed to update member role:', err);
+    }
+  };
+
+  const handleRemoveMember = async (userId: string) => {
+    try {
+      await organization?.removeMember(userId);
+      await memberships?.revalidate?.();
+      toast.success('Team member removed successfully');
+    } catch (err: any) {
+      toast.error(err?.errors?.[0]?.message || 'Failed to remove team member');
+      console.error('Failed to remove member:', err);
+    }
+  };
+
   return (
     <>
       <Table>
@@ -100,7 +120,7 @@ export function MembersTable({
               <TableCell>
                 <Select
                   value={member.role}
-                  onValueChange={(role: RoleType) => onUpdateRole(member.id, role)}
+                  onValueChange={(role: RoleType) => handleUpdateRole(member.id, role)}
                   disabled={member.publicUserData?.userId === currentUserId}
                 >
                   <SelectTrigger className="h-9 w-[120px]">
@@ -131,7 +151,7 @@ export function MembersTable({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
-                        onClick={() => onRemoveMember(member.publicUserData?.userId ?? '')}
+                        onClick={() => handleRemoveMember(member.publicUserData?.userId ?? '')}
                         className="text-destructive focus:text-destructive"
                       >
                         <RiDeleteBin2Line className="mr-2 size-4" />
