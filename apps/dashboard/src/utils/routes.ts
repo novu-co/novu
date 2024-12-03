@@ -11,6 +11,7 @@ export const ROUTES = {
   SETTINGS_ORGANIZATION: '/settings/organization',
   SETTINGS_TEAM: '/settings/team',
   SETTINGS_SECURITY: '/settings/security',
+  SETTINGS_BILLING: '/settings/billing',
   WORKFLOWS: '/env/:environmentSlug/workflows',
   EDIT_WORKFLOW: '/env/:environmentSlug/workflows/:workflowSlug',
   TEST_WORKFLOW: '/env/:environmentSlug/workflows/:workflowSlug/test',

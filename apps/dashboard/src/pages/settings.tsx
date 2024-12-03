@@ -5,6 +5,8 @@ import { useOrganization } from '@clerk/clerk-react';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ROUTES } from '@/utils/routes';
+import { SubscriptionProvider } from '../components/billing/subscription-provider';
+import { Plan } from '../components/billing/plan';
 
 export const clerkComponentAppearance = {
   elements: {
@@ -56,6 +58,9 @@ export function SettingsPage() {
       case 'team':
         navigate(ROUTES.SETTINGS_TEAM);
         break;
+      case 'billing':
+        navigate(ROUTES.SETTINGS_BILLING);
+        break;
       case 'security':
         navigate(ROUTES.SETTINGS_SECURITY);
         break;
@@ -95,6 +100,12 @@ export function SettingsPage() {
           >
             Team
           </TabsTrigger>
+          <TabsTrigger
+            value="billing"
+            className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
+          >
+            Billing
+          </TabsTrigger>
         </TabsList>
 
         <div className="mt-1 px-1.5">
@@ -131,6 +142,14 @@ export function SettingsPage() {
                 <OrganizationProfile.Page label="members" />
                 <OrganizationProfile.Page label="general" />
               </OrganizationProfile>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="billing" className="rounded-lg">
+            <Card className="border-none shadow-none">
+              <SubscriptionProvider>
+                <Plan />
+              </SubscriptionProvider>
             </Card>
           </TabsContent>
         </div>
