@@ -484,6 +484,15 @@ export class UpdateWorkflow {
             CreateMessageTemplateCommand.create(messageTemplatePayload),
           );
 
+      if (!messageTemplateExist) {
+        this.analyticsService.track('Workflow step added', command.userId, {
+          _organization: command.organizationId,
+          _environment: command.environmentId,
+          workflowId: command.id,
+          type: messageTemplatePayload.type,
+        });
+      }
+
       messageTemplateId = updatedTemplate._id;
 
       const partialNotificationStep = this.getPartialTemplateStep(

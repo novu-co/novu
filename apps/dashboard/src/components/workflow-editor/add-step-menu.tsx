@@ -57,7 +57,7 @@ const MenuItem = ({
       />
       <span className="text-xs">{children}</span>
       {disabled && (
-        <Badge size="pill" variant="soft" className="ml-auto opacity-40">
+        <Badge kind="pill" variant="soft" className="ml-auto opacity-40">
           coming soon
         </Badge>
       )}

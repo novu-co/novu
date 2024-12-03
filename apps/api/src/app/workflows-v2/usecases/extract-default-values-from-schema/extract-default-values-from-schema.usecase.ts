@@ -1,4 +1,4 @@
-import { JSONSchemaDto } from '@novu/shared';
+import { JSONSchemaDto, PreviewIssueEnum } from '@novu/shared';
 import { Injectable } from '@nestjs/common';
 import { ExtractDefaultValuesFromSchemaCommand } from './extract-default-values-from-schema.command';
 
@@ -35,7 +35,7 @@ export class ExtractDefaultValuesFromSchemaUsecase {
           if (key.toLowerCase().trim().includes('url')) {
             result[key] = 'https://www.example.com/search?query=placeholder';
           }
-          result[key] = 'PREVIEW_ISSUE:REQUIRED_CONTROL_VALUE_IS_MISSING';
+          result[key] = PreviewIssueEnum.PREVIEW_ISSUE_REQUIRED_CONTROL_VALUE_IS_MISSING;
         } else {
           result[key] = value.default;
         }

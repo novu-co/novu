@@ -59,7 +59,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
           preview: {
             subject: 'Welcome {{subscriber.firstName}}',
             // cspell:disable-next-line
-            body: 'Hello {{subscriber.firstName}} {{subscriber.lastName}}, Welcome to {{PAYLOAD.ORGANIZATIONNAME}}!',
+            body: 'Hello {{subscriber.firstName}} {{subscriber.lastName}}, Welcome to {{PAYLOAD.ORGANIZATIONNAME | UPCASE}}!',
           },
           type: 'in_app',
         },
@@ -69,7 +69,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
             lastName: '{{subscriber.lastName}}',
           },
           payload: {
-            organizationName: '{{payload.organizationName}}',
+            organizationName: '{{payload.organizationName | upcase}}',
           },
         },
       },
@@ -409,7 +409,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
       result: {
         preview: {
           subject: 'Welcome John',
-          body: 'Hello John, your order #undefined is ready!', // orderId is not defined in the payload schema
+          body: 'Hello John, your order #{{payload.orderId}} is ready!', // orderId is not defined in the payload schema
         },
         type: 'in_app',
       },
@@ -417,13 +417,14 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
         payload: {
           lastName: '{{payload.lastName}}',
           organizationName: '{{payload.organizationName}}',
+          orderId: '{{payload.orderId}}',
           firstName: 'John',
         },
       },
     });
   });
 
-  it('should return 404 for non-existent workflow', async () => {
+  it('should return 201 for non-existent workflow', async () => {
     const pay = {
       type: 'object',
       properties: {
@@ -449,11 +450,16 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
         controlValues: {},
       });
 
-    expect(response.status).to.equal(404);
-    expect(response.body.message).to.contain('Workflow cannot be found');
+    expect(response.status).to.equal(201);
+    expect(response.body.data).to.deep.equal({
+      result: {
+        preview: {},
+      },
+      previewPayloadExample: {},
+    });
   });
 
-  it('should return 400 for non-existent step', async () => {
+  it('should return 201 for non-existent step', async () => {
     const pay = {
       type: 'object',
       properties: {
@@ -477,8 +483,13 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
         controlValues: {},
       });
 
-    expect(response.status).to.equal(400);
-    expect(response.body.message).to.contain('No step found');
+    expect(response.status).to.equal(201);
+    expect(response.body.data).to.deep.equal({
+      result: {
+        preview: {},
+      },
+      previewPayloadExample: {},
+    });
   });
 
   async function createWorkflow(overrides: Partial<NotificationTemplateEntity> = {}): Promise<WorkflowResponseDto> {
