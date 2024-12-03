@@ -7,15 +7,18 @@ import { useEnvironment } from '../context/environment/hooks';
 interface UseWorkflowsParams {
   limit?: number;
   offset?: number;
+  query?: string;
 }
 
-export function useWorkflows({ limit = 12, offset = 0 }: UseWorkflowsParams = {}) {
+export function useWorkflows({ limit = 12, offset = 0, query = '' }: UseWorkflowsParams = {}) {
   const { currentEnvironment } = useEnvironment();
 
   const workflowsQuery = useQuery({
-    queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id, { limit, offset }],
+    queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id, { limit, offset, query }],
     queryFn: async () => {
-      const { data } = await getV2<{ data: ListWorkflowResponse }>(`/workflows?limit=${limit}&offset=${offset}`);
+      const { data } = await getV2<{ data: ListWorkflowResponse }>(
+        `/workflows?limit=${limit}&offset=${offset}&query=${query}`
+      );
       return data;
     },
     placeholderData: keepPreviousData,
