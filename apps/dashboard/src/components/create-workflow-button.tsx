@@ -188,7 +188,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
         </SheetMain>
         <Separator />
         <SheetFooter>
-          <Button disabled={isPending} variant="default" type="submit" form="create-workflow">
+          <Button isLoading={isPending} variant="default" type="submit" form="create-workflow">
             Create workflow
           </Button>
         </SheetFooter>

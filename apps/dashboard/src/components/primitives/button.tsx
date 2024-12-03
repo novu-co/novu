@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/utils/ui';
+import { RiLoader4Line } from 'react-icons/ri';
 
 export const buttonVariants = cva(
   `relative isolate inline-flex items-center justify-center whitespace-nowrap rounded-lg gap-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50`,
@@ -43,12 +44,34 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  isLoading?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, isLoading = false, children, disabled, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';
-    return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }), isLoading && 'animate-pulse-subtle')}
+        ref={ref}
+        disabled={disabled || isLoading}
+        {...props}
+      >
+        <span
+          className={cn(
+            'flex items-center gap-1 transition-all duration-300',
+            isLoading ? 'scale-95 transform opacity-0' : 'scale-100 opacity-100'
+          )}
+        >
+          {children}
+        </span>
+        {isLoading && (
+          <div className="animate-in zoom-in-50 fade-in absolute inset-0 flex items-center justify-center text-current duration-300">
+            <RiLoader4Line className="size-4 animate-spin" />
+          </div>
+        )}
+      </Comp>
+    );
   }
 );
 Button.displayName = 'Button';
