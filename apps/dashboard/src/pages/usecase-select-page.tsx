@@ -1,7 +1,7 @@
 import { UsecaseSelectOnboarding } from '../components/auth/usecase-selector';
 import { AuthCard } from '../components/auth/auth-card';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../components/primitives/button';
 import { ROUTES } from '../utils/routes';
 import { useNavigate } from 'react-router-dom';
