@@ -4,7 +4,7 @@ import { useEnvironment } from '../../context/environment/hooks';
 import { useOnboardingSteps, StepIdEnum } from '../../hooks/use-onboarding-steps';
 import { Link } from 'react-router-dom';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '../../utils/routes';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { mainCard, leftSection, textItem, stepsList, stepItem, logo } from './progress-section.animations';
 import { PointingArrow, NovuLogo } from './icons';
 import { useTelemetry } from '../../hooks/use-telemetry';

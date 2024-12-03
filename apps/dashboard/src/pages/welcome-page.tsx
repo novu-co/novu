@@ -1,5 +1,5 @@
 import { ReactElement, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { PageMeta } from '../components/page-meta';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { ProgressSection } from '../components/welcome/progress-section';

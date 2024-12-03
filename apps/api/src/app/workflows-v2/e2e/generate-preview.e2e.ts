@@ -59,7 +59,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
           preview: {
             subject: 'Welcome {{subscriber.firstName}}',
             // cspell:disable-next-line
-            body: 'Hello {{subscriber.firstName}} {{subscriber.lastName}}, Welcome to {{PAYLOAD.ORGANIZATIONNAME}}!',
+            body: 'Hello {{subscriber.firstName}} {{subscriber.lastName}}, Welcome to {{PAYLOAD.ORGANIZATIONNAME | UPCASE}}!',
           },
           type: 'in_app',
         },
@@ -69,7 +69,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
             lastName: '{{subscriber.lastName}}',
           },
           payload: {
-            organizationName: '{{payload.organizationName}}',
+            organizationName: '{{payload.organizationName | upcase}}',
           },
         },
       },
@@ -409,7 +409,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
       result: {
         preview: {
           subject: 'Welcome John',
-          body: 'Hello John, your order #undefined is ready!', // orderId is not defined in the payload schema
+          body: 'Hello John, your order #{{payload.orderId}} is ready!', // orderId is not defined in the payload schema
         },
         type: 'in_app',
       },
@@ -417,6 +417,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
         payload: {
           lastName: '{{payload.lastName}}',
           organizationName: '{{payload.organizationName}}',
+          orderId: '{{payload.orderId}}',
           firstName: 'John',
         },
       },

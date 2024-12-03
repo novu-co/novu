@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
-import { RiQuestionLine, RiSparkling2Fill, RiCloseLine } from 'react-icons/ri';
 import { useUser } from '@clerk/clerk-react';
+import { motion } from 'motion/react';
+import { RiQuestionLine, RiSparkling2Fill, RiCloseLine } from 'react-icons/ri';
 import { Badge } from '../primitives/badge';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { useEnvironment } from '@/context/environment/hooks';

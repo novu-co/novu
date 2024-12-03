@@ -1,14 +1,13 @@
 import { UsecaseSelectOnboarding } from '../components/auth/usecase-selector';
 import { AuthCard } from '../components/auth/auth-card';
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../components/primitives/button';
 import { ROUTES } from '../utils/routes';
 import { useNavigate } from 'react-router-dom';
 import { OnboardingArrowLeft } from '../components/icons/onboarding-arrow-left';
 import { updateClerkOrgMetadata } from '../api/organization';
 import { ChannelTypeEnum } from '@novu/shared';
-import { RiLoader2Line } from 'react-icons/ri';
 import { PageMeta } from '../components/page-meta';
 import { useTelemetry } from '../hooks';
 import { TelemetryEvent } from '../utils/telemetry';
@@ -111,9 +110,13 @@ export function UsecaseSelectPage() {
                 />
 
                 <motion.div className="flex w-full flex-col items-center gap-3" variants={itemVariants}>
-                  <Button disabled={selectedUseCases.length === 0 || isPending} className="w-full" type="submit">
+                  <Button
+                    disabled={selectedUseCases.length === 0}
+                    isLoading={isPending}
+                    className="w-full"
+                    type="submit"
+                  >
                     Continue
-                    {isPending && <RiLoader2Line className="animate-spin" />}
                   </Button>
                   <Button type="button" variant="link" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
                     Skip to Homepage
