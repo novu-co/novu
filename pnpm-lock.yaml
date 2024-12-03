@@ -3638,6 +3638,9 @@ importers:
       '@floating-ui/dom':
         specifier: ^1.6.7
         version: 1.6.7
+      '@novu/client':
+        specifier: workspace:*
+        version: link:../client
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0

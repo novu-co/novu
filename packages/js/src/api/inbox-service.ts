@@ -1,3 +1,4 @@
+import { ApiOptions, HttpClient } from '@novu/client';
 import type {
   ActionTypeEnum,
   ChannelPreference,
@@ -6,10 +7,10 @@ import type {
   PreferencesResponse,
   Session,
 } from '../types';
-import { HttpClient, HttpClientOptions } from './http-client';
 
-export type InboxServiceOptions = HttpClientOptions;
+export type InboxServiceOptions = ApiOptions;
 
+const NOVU_API_VERSION = '2024-06-26';
 const INBOX_ROUTE = '/inbox';
 const INBOX_NOTIFICATIONS_ROUTE = `${INBOX_ROUTE}/notifications`;
 
@@ -19,6 +20,10 @@ export class InboxService {
 
   constructor(options: InboxServiceOptions = {}) {
     this.#httpClient = new HttpClient(options);
+    this.#httpClient.updateHeaders({
+      'Novu-API-Version': NOVU_API_VERSION,
+      'Novu-User-Agent': options.userAgent || '@novu/js',
+    });
   }
 
   async initializeSession({
@@ -56,24 +61,24 @@ export class InboxService {
     after?: string;
     offset?: number;
   }): Promise<{ data: InboxNotification[]; hasMore: boolean; filter: NotificationFilter }> {
-    const searchParams = new URLSearchParams(`limit=${limit}`);
+    const queryParams = new URLSearchParams(`limit=${limit}`);
     if (after) {
-      searchParams.append('after', after);
+      queryParams.append('after', after);
     }
     if (offset) {
-      searchParams.append('offset', `${offset}`);
+      queryParams.append('offset', `${offset}`);
     }
     if (tags) {
-      tags.forEach((tag) => searchParams.append('tags[]', tag));
+      tags.forEach((tag) => queryParams.append('tags[]', tag));
     }
     if (read !== undefined) {
-      searchParams.append('read', `${read}`);
+      queryParams.append('read', `${read}`);
     }
     if (archived !== undefined) {
-      searchParams.append('archived', `${archived}`);
+      queryParams.append('archived', `${archived}`);
     }
 
-    return this.#httpClient.get(INBOX_NOTIFICATIONS_ROUTE, searchParams, false);
+    return this.#httpClient.getFullResponse(`${INBOX_NOTIFICATIONS_ROUTE}?${queryParams.toString()}`);
   }
 
   count({ filters }: { filters: Array<{ tags?: string[]; read?: boolean; archived?: boolean }> }): Promise<{
@@ -82,13 +87,7 @@ export class InboxService {
       filter: NotificationFilter;
     }>;
   }> {
-    return this.#httpClient.get(
-      `${INBOX_NOTIFICATIONS_ROUTE}/count`,
-      new URLSearchParams({
-        filters: JSON.stringify(filters),
-      }),
-      false
-    );
+    return this.#httpClient.getFullResponse(`${INBOX_NOTIFICATIONS_ROUTE}/count?filters=${JSON.stringify(filters)}`);
   }
 
   read(notificationId: string): Promise<InboxNotification> {

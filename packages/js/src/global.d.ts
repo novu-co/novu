@@ -1,11 +1,10 @@
-import type { Novu } from './novu';
-
-export {};
+/* eslint-disable vars-on-top */
+/* eslint-disable no-var */
+import { Novu } from './novu';
 
 declare global {
-  const NOVU_API_VERSION: string;
-  const PACKAGE_NAME: string;
-  const PACKAGE_VERSION: string;
+  var PACKAGE_NAME: string;
+  var PACKAGE_VERSION: string;
   interface Window {
     Novu: typeof Novu;
   }

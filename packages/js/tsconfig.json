@@ -19,5 +19,5 @@
     "removeComments": false
   },
   "include": ["src/**/*", "src/**/*.d.ts"],
-  "exclude": ["node_modules", "**/node_modules/*"]
+  "exclude": ["src/**/*.test.ts", "src/*.test.ts", "node_modules", "**/node_modules/*"]
 }
