@@ -74,8 +74,8 @@ export function TeamManagement() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-      <Card className="border-none shadow-none">
-        <CardContent>
+      <Card className="border-none p-0 shadow-none">
+        <CardContent className="px-2.5 py-1.5">
           <Tabs defaultValue="members" className="w-full">
             <div className="mb-6 flex items-center justify-between">
               <TabsList className="bg-muted relative inline-flex h-10 space-x-1 rounded-lg p-1">

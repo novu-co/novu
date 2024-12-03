@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/primitives/table';
 import { Button } from '@/components/primitives/button';
-import { RiDeleteBin2Line, RiUserLine, RiMoreFill } from 'react-icons/ri';
+import { RiDeleteBin2Line, RiUserLine, RiMoreFill, RiLockLine } from 'react-icons/ri';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/primitives/avatar';
 import { Skeleton } from '@/components/primitives/skeleton';
@@ -15,6 +15,8 @@ import { PaginationControls } from './pagination-controls';
 import { OrganizationMembershipResource } from '@clerk/types';
 import { useOrganization } from '@clerk/clerk-react';
 import { toast } from 'sonner';
+import { Badge } from '@/components/primitives/badge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 
 interface MembersTableProps {
   members: OrganizationMembershipResource[];
@@ -111,9 +113,11 @@ export function MembersTable({ members, roles, currentUserId, pagination }: Memb
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <span className="font-medium">
-                      {member.publicUserData?.firstName} {member.publicUserData?.lastName}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">
+                        {member.publicUserData?.firstName} {member.publicUserData?.lastName}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </TableCell>
@@ -142,7 +146,18 @@ export function MembersTable({ members, roles, currentUserId, pagination }: Memb
                 <span className="text-muted-foreground">{new Date(member.createdAt).toLocaleDateString()}</span>
               </TableCell>
               <TableCell>
-                {member.publicUserData?.userId !== currentUserId && (
+                {member.publicUserData?.userId === currentUserId ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex justify-center">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 cursor-not-allowed opacity-50">
+                          <RiLockLine className="text-muted-foreground size-4" />
+                        </Button>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>You cannot delete yourself from the team</TooltipContent>
+                  </Tooltip>
+                ) : (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
