@@ -79,7 +79,7 @@ export const FreeTrialCard = () => {
 
   const pluralizedDays = pluralizeDaysLeft(daysLeft);
   const cardClassName =
-    'bg-background group absolute bottom-3 left-2 flex w-[calc(100%-1rem)] cursor-pointer flex-col gap-2 rounded-lg p-3 shadow';
+    'bg-background group relative left-2 mb-2 flex w-[calc(100%-1rem)] cursor-pointer flex-col gap-2 rounded-lg p-3 shadow';
 
   if (isV2BillingEnabled) {
     return (

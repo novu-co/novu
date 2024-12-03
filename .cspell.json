@@ -709,7 +709,8 @@
     "truncatewords",
     "xmlschema",
     "jsonify",
-    "hsforms"
+    "hsforms",
+    "touchpoint"
   ],
   "flagWords": [],
   "patterns": [

@@ -34,7 +34,7 @@ export function UsecaseSelectPage() {
       track(TelemetryEvent.USE_CASE_SELECTED, {
         useCases: selectedUseCases,
       });
-      navigate(ROUTES.WORKFLOWS);
+      navigate(ROUTES.WELCOME);
     },
     onError: (error) => {
       console.error('Failed to update use cases:', error);
@@ -45,7 +45,7 @@ export function UsecaseSelectPage() {
   function handleSkip() {
     track(TelemetryEvent.USE_CASE_SKIPPED);
 
-    navigate(ROUTES.WORKFLOWS);
+    navigate(ROUTES.WELCOME);
   }
 
   function handleSelectUseCase(useCase: ChannelTypeEnum) {
