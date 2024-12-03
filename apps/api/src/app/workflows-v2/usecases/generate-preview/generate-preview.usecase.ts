@@ -15,6 +15,7 @@ import {
   Instrument,
   InstrumentUsecase,
 } from '@novu/application-generic';
+import { captureException } from '@sentry/node';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
 import { BuildStepDataUsecase } from '../build-step-data';
@@ -75,6 +76,10 @@ export class GeneratePreviewUsecase {
         `Unexpected error while generating preview`,
         LOG_CONTEXT
       );
+
+      if (process.env.SENTRY_DSN) {
+        captureException(error);
+      }
 
       return {
         result: {
