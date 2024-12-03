@@ -4,9 +4,11 @@ import { OrganizationProfile, UserProfile } from '@clerk/clerk-react';
 import { useOrganization } from '@clerk/clerk-react';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ROUTES } from '@/utils/routes';
+import { ROUTES, LEGACY_ROUTES } from '@/utils/routes';
 import { SubscriptionProvider } from '../components/billing/subscription-provider';
 import { Plan } from '../components/billing/plan';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 
 export const clerkComponentAppearance = {
   elements: {
@@ -43,6 +45,7 @@ export function SettingsPage() {
   const { organization } = useOrganization();
   const navigate = useNavigate();
   const location = useLocation();
+  const isV2BillingEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_DASHBOARD_BILLING_ENABLED);
 
   const currentTab =
     location.pathname === ROUTES.SETTINGS ? 'profile' : location.pathname.split('/settings/')[1] || 'profile';
@@ -59,7 +62,11 @@ export function SettingsPage() {
         navigate(ROUTES.SETTINGS_TEAM);
         break;
       case 'billing':
-        navigate(ROUTES.SETTINGS_BILLING);
+        if (isV2BillingEnabled) {
+          navigate(ROUTES.SETTINGS_BILLING);
+        } else {
+          window.location.href = LEGACY_ROUTES.BILLING;
+        }
         break;
       case 'security':
         navigate(ROUTES.SETTINGS_SECURITY);
@@ -145,13 +152,15 @@ export function SettingsPage() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="billing" className="rounded-lg">
-            <Card className="border-none shadow-none">
-              <SubscriptionProvider>
-                <Plan />
-              </SubscriptionProvider>
-            </Card>
-          </TabsContent>
+          {isV2BillingEnabled && (
+            <TabsContent value="billing" className="rounded-lg">
+              <Card className="border-none shadow-none">
+                <SubscriptionProvider>
+                  <Plan />
+                </SubscriptionProvider>
+              </Card>
+            </TabsContent>
+          )}
         </div>
       </Tabs>
     </DashboardLayout>
