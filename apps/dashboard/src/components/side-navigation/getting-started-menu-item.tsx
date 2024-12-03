@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { RiQuestionLine, RiSparkling2Fill } from 'react-icons/ri';
 import { Badge } from '../primitives/badge';
 import { buildRoute, ROUTES } from '@/utils/routes';

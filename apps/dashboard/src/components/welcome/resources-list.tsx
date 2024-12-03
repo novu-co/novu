@@ -1,5 +1,5 @@
 import { BookOpen } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { Card, CardContent } from '../primitives/card';
 import { ScrollBar, ScrollArea } from '../primitives/scroll-area';
 import { Link } from 'react-router-dom';
