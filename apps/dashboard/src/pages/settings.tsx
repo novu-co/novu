@@ -89,7 +89,7 @@ export function SettingsPage() {
           </TabsTrigger>
         </TabsList>
 
-        <div className="mx-auto mt-1 max-w-[600px] px-1.5">
+        <div className="mx-auto mt-1 max-w-[700px] px-1.5">
           <TabsContent value="profile" className="rounded-lg">
             <Card className="mx-auto mt-10 border-none shadow-none">
               <UserProfile appearance={clerkComponentAppearance}>
