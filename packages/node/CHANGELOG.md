@@ -1,3 +1,13 @@
+## 2.0.5 (2024-12-02)
+
+### 🩹 Fixes
+
+- **node:** Allow setting includeInactiveChannels to false ([129355e269](https://github.com/novuhq/novu/commit/129355e269))
+
+### ❤️ Thank You
+
+- Sokratis Vidros @SokratisVidros
+
 ## 2.0.4 (2024-11-29)
 
 ### 🚀 Features
