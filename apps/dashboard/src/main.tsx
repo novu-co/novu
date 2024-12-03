@@ -11,6 +11,7 @@ import {
   QuestionnairePage,
   UsecaseSelectPage,
   ApiKeysPage,
+  WelcomePage,
 } from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
           {
             path: ROUTES.ENV,
             children: [
+              {
+                path: ROUTES.WELCOME,
+                element: <WelcomePage />,
+              },
               {
                 path: ROUTES.WORKFLOWS,
                 element: <WorkflowsPage />,

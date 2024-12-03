@@ -708,7 +708,8 @@
     "rstrip",
     "truncatewords",
     "xmlschema",
-    "jsonify"
+    "jsonify",
+    "touchpoint"
   ],
   "flagWords": [],
   "patterns": [
