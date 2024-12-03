@@ -1,5 +1,4 @@
 import { Tabs, TabsList, TabsTrigger } from '@/components/primitives/tabs';
-import { Title } from '@radix-ui/react-dialog';
 
 interface PlanSwitcherProps {
   selectedBillingInterval: 'month' | 'year';
