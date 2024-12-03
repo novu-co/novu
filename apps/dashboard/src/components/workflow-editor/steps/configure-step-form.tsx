@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   IEnvironment,
   StepDataDto,
-  StepTypeEnum,
+  StepIssuesDto,
   UpdateWorkflowDto,
   WorkflowOriginEnum,
   WorkflowResponseDto,
@@ -32,24 +32,33 @@ import {
 import { ConfigureInAppStepTemplateCta } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-template-cta';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { buildRoute, ROUTES } from '@/utils/routes';
-import { EXCLUDED_EDITOR_TYPES } from '@/utils/constants';
+import {
+  INLINE_CONFIGURABLE_STEP_TYPES,
+  TEMPLATE_CONFIGURABLE_STEP_TYPES,
+  UNSUPPORTED_STEP_TYPES,
+} from '@/utils/constants';
 import { STEP_NAME_BY_TYPE } from './step-provider';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
-
-const SUPPORTED_STEP_TYPES = [StepTypeEnum.IN_APP];
+import { ConfigureStepInlineForm } from '@/components/workflow-editor/steps/configure-inline/configure-step-inline-form';
 
 type ConfigureStepFormProps = {
   workflow: WorkflowResponseDto;
   environment: IEnvironment;
   step: StepDataDto;
+  issues?: StepIssuesDto;
   update: (data: UpdateWorkflowDto) => void;
 };
 
 export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
-  const { step, workflow, update, environment } = props;
-  const navigate = useNavigate();
-  const isCodeCreatedWorkflow = workflow.origin === WorkflowOriginEnum.EXTERNAL;
+  const { step, workflow, update, environment, issues } = props;
 
+  const isSupportedStep = !UNSUPPORTED_STEP_TYPES.includes(step.type);
+  const isReadOnly = !isSupportedStep || workflow.origin === WorkflowOriginEnum.EXTERNAL;
+
+  const isTemplateConfigurableStep = isSupportedStep && TEMPLATE_CONFIGURABLE_STEP_TYPES.includes(step.type);
+  const isInlineConfigurableStep = isSupportedStep && INLINE_CONFIGURABLE_STEP_TYPES.includes(step.type);
+
+  const navigate = useNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const onDeleteStep = () => {
@@ -57,10 +66,16 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     navigate(buildRoute(ROUTES.EDIT_WORKFLOW, { environmentSlug: environment.slug!, workflowSlug: workflow.slug }));
   };
 
+  const defaultValues = {
+    name: step.name,
+    stepId: step.stepId,
+  };
+
   const form = useForm<z.infer<typeof stepSchema>>({
-    defaultValues: {
-      name: step.name,
-      stepId: step.stepId,
+    defaultValues,
+    values: {
+      ...defaultValues,
+      ...step.controls.values,
     },
     resolver: zodResolver(stepSchema),
     shouldFocusError: false,
@@ -69,20 +84,16 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   const { onBlur } = useFormAutosave({
     previousData: step,
     form,
-    isReadOnly: isCodeCreatedWorkflow,
+    isReadOnly,
     save: (data) => {
       update(updateStepInWorkflow(workflow, data));
     },
   });
 
   const firstError = useMemo(
-    () => (step ? getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues) : undefined),
-    [step]
+    () => (issues ? getFirstBodyErrorMessage(issues) || getFirstControlsErrorMessage(issues) : undefined),
+    [issues]
   );
-
-  const isDashboardStepThatSupportsEditor = !isCodeCreatedWorkflow && SUPPORTED_STEP_TYPES.includes(step.type);
-  const isCodeStepThatSupportsEditor = isCodeCreatedWorkflow && !EXCLUDED_EDITOR_TYPES.includes(step.type);
-  const isStepSupportsEditor = isDashboardStepThatSupportsEditor || isCodeStepThatSupportsEditor;
 
   return (
     <>
@@ -133,7 +144,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                     <FormLabel>Name</FormLabel>
                     <FormControl>
                       <InputField>
-                        <Input placeholder="Untitled" {...field} disabled={isCodeCreatedWorkflow} />
+                        <Input placeholder="Untitled" {...field} disabled={isReadOnly} />
                       </InputField>
                     </FormControl>
                     <FormMessage />
@@ -161,28 +172,13 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
         </Form>
         <Separator />
 
-        {isStepSupportsEditor && (
-          <>
-            <SidebarContent>
-              <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
-                <Button
-                  variant="outline"
-                  className="flex w-full justify-start gap-1.5 text-xs font-medium"
-                  type="button"
-                >
-                  <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
-                  Configure {STEP_NAME_BY_TYPE[step.type]} template{' '}
-                  <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
-                </Button>
-              </Link>
-            </SidebarContent>
-            <Separator />
-          </>
+        {isInlineConfigurableStep && (
+          <InlineConfigurableStep workflow={workflow} step={step} update={update} issues={issues} />
         )}
 
-        {step.type === StepTypeEnum.IN_APP && <ConfigureInAppStepTemplateCta step={step} issue={firstError} />}
+        {isTemplateConfigurableStep && <TemplateConfigurableStep step={step} firstError={firstError} />}
 
-        {!isCodeCreatedWorkflow && !SUPPORTED_STEP_TYPES.includes(step.type) && (
+        {!isSupportedStep && (
           <>
             <SidebarContent>
               <SdkBanner />
@@ -190,7 +186,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
           </>
         )}
 
-        {!isCodeCreatedWorkflow && (
+        {!isReadOnly && (
           <>
             <SidebarFooter>
               <Separator />
@@ -221,6 +217,43 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
           </>
         )}
       </motion.div>
+    </>
+  );
+};
+
+const TemplateConfigurableStep = ({ step, firstError }: { step: StepDataDto; firstError: string | undefined }) => (
+  <>
+    <SidebarContent>
+      <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
+        <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
+          <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
+          Configure {STEP_NAME_BY_TYPE[step.type]} template{' '}
+          <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
+        </Button>
+      </Link>
+    </SidebarContent>
+    <Separator />
+    <ConfigureInAppStepTemplateCta step={step} issue={firstError} />
+  </>
+);
+
+const InlineConfigurableStep = ({
+  workflow,
+  step,
+  update,
+  issues,
+}: {
+  workflow: WorkflowResponseDto;
+  step: StepDataDto;
+  update: (data: UpdateWorkflowDto) => void;
+  issues?: StepIssuesDto;
+}) => {
+  return (
+    <>
+      <SidebarContent>
+        <ConfigureStepInlineForm workflow={workflow} step={step} update={update} issues={issues} />
+      </SidebarContent>
+      <Separator />
     </>
   );
 };

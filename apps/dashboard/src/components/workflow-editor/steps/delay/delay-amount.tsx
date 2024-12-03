@@ -2,22 +2,29 @@ import { NumberInputWithSelect } from '@/components/number-input-with-select';
 
 import { FormLabel } from '@/components/primitives/form/form';
 import { useMemo } from 'react';
-import { JSONSchemaDto, TimeUnitEnum } from '@novu/shared';
+import { TimeUnitEnum } from '@novu/shared';
+import { useStep } from '@/components/workflow-editor/steps/step-provider';
+
+const defaultUnitValues = Object.values(TimeUnitEnum);
 
 const amountKey = 'amount';
 const unitKey = 'unit';
 
-const defaultUnitValues = Object.values(TimeUnitEnum);
+export const DelayAmount = () => {
+  const { step } = useStep();
+  const { dataSchema } = step?.controls ?? {};
 
-export const DelayAmount = ({ dataSchema, isReadOnly }: { dataSchema: JSONSchemaDto; isReadOnly: boolean }) => {
-  const unitOptions = useMemo(() => (dataSchema.properties?.unit as any)?.enum ?? defaultUnitValues, [dataSchema]);
+  const unitOptions = useMemo(
+    () => (dataSchema?.properties?.[unitKey] as any).enum ?? defaultUnitValues,
+    [dataSchema?.properties]
+  );
 
   return (
     <div className="flex h-full flex-col gap-2">
       <FormLabel tooltip="Delays workflow for the set time, then proceeds to the next step.">
         Delay execution by
       </FormLabel>
-      <NumberInputWithSelect inputName={amountKey} selectName={unitKey} options={unitOptions} isReadOnly={isReadOnly} />
+      <NumberInputWithSelect fields={{ inputKey: amountKey, selectKey: unitKey }} options={unitOptions} />
     </div>
   );
 };

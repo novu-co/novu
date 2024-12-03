@@ -12,7 +12,7 @@ import {
 export const DelayTimeControlZodSchema = z
   .object({
     type: z.enum(['regular']).default('regular'),
-    amount: z.number(),
+    amount: z.number().min(1),
     unit: z.nativeEnum(TimeUnitEnum),
   })
   .strict();
@@ -26,7 +26,7 @@ export const delayUiSchema: UiSchema = {
   properties: {
     amount: {
       component: UiComponentEnum.DELAY_AMOUNT,
-      placeholder: '30',
+      placeholder: null,
     },
     unit: {
       component: UiComponentEnum.DELAY_UNIT,
@@ -34,7 +34,7 @@ export const delayUiSchema: UiSchema = {
     },
     type: {
       component: UiComponentEnum.DELAY_TYPE,
-      placeholder: null,
+      placeholder: 'regular',
     },
   },
 };

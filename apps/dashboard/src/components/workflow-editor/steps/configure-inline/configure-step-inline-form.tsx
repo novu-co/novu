@@ -11,23 +11,22 @@ import {
 } from '@novu/shared';
 
 import { flattenIssues, updateStepControlValuesInWorkflow } from '@/components/workflow-editor/step-utils';
-import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
 import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
-import { OtherStepTabs } from './other-steps-tabs';
 import { Form } from '@/components/primitives/form/form';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
+import { DelayForm } from '@/components/workflow-editor/steps/delay/delay-form';
 
-const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
-  [StepTypeEnum.EMAIL]: OtherStepTabs,
-  [StepTypeEnum.CHAT]: OtherStepTabs,
-  [StepTypeEnum.IN_APP]: InAppTabs,
-  [StepTypeEnum.SMS]: OtherStepTabs,
-  [StepTypeEnum.PUSH]: OtherStepTabs,
-  [StepTypeEnum.DIGEST]: () => null,
-  [StepTypeEnum.DELAY]: () => null,
-  [StepTypeEnum.TRIGGER]: () => null,
+const STEP_TYPE_TO_INLINE_FORM: Record<StepTypeEnum, (args: StepInlineFormProps) => React.JSX.Element | null> = {
+  [StepTypeEnum.DELAY]: DelayForm,
+  [StepTypeEnum.IN_APP]: () => null,
+  [StepTypeEnum.EMAIL]: () => null,
+  [StepTypeEnum.SMS]: () => null,
+  [StepTypeEnum.CHAT]: () => null,
+  [StepTypeEnum.PUSH]: () => null,
   [StepTypeEnum.CUSTOM]: () => null,
+  [StepTypeEnum.TRIGGER]: () => null,
+  [StepTypeEnum.DIGEST]: () => null,
 };
 
 // Use the UI Schema to build the default values if it exists else use the data schema (code-first approach) values
@@ -39,31 +38,31 @@ const calculateDefaultValues = (step: StepDataDto) => {
   return merge(buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {}), step.controls.values);
 };
 
-export type StepEditorProps = {
+export type StepInlineFormProps = {
   workflow: WorkflowResponseDto;
   step: StepDataDto;
 };
 
-type ConfigureStepTemplateFormProps = StepEditorProps & {
+type ConfigureStepInlineFormProps = StepInlineFormProps & {
   issues?: StepIssuesDto;
   update: (data: UpdateWorkflowDto) => void;
 };
 
-export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps) => {
+export const ConfigureStepInlineForm = (props: ConfigureStepInlineFormProps) => {
   const { workflow, step, issues, update } = props;
   const schema = useMemo(() => buildDynamicZodSchema(step.controls.dataSchema ?? {}), [step.controls.dataSchema]);
 
   const defaultValues = useMemo(() => {
-    return calculateDefaultValues(step);
+    return {
+      ...calculateDefaultValues(step),
+      ...step.controls.values,
+    };
   }, [step]);
 
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues,
-    values: {
-      ...defaultValues,
-      ...step.controls.values,
-    },
+    values: defaultValues,
     shouldFocusError: false,
   });
 
@@ -84,9 +83,9 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
 
   useEffect(() => {
     setIssuesFromStep();
-  }, [setIssuesFromStep]);
+  }, [setIssuesFromStep, issues]);
 
-  const TemplateForm = STEP_TYPE_TO_TEMPLATE_FORM[step.type];
+  const InlineForm = STEP_TYPE_TO_INLINE_FORM[step.type];
 
   const value = useMemo(() => ({ saveForm }), [saveForm]);
 
@@ -94,7 +93,7 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
     <Form {...form}>
       <form className="flex h-full flex-col" onBlur={onBlur}>
         <SaveFormContext.Provider value={value}>
-          <TemplateForm workflow={workflow} step={step} />
+          <InlineForm workflow={workflow} step={step} />
         </SaveFormContext.Provider>
       </form>
     </Form>

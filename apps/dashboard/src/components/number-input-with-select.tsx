@@ -7,8 +7,10 @@ import { useFormContext } from 'react-hook-form';
 import { useMemo } from 'react';
 
 type InputWithSelectProps = {
-  inputName: string;
-  selectName: string;
+  fields: {
+    inputKey: string;
+    selectKey: string;
+  };
   options: string[];
   defaultOption?: string;
   className?: string;
@@ -16,14 +18,19 @@ type InputWithSelectProps = {
   isReadOnly?: boolean;
 };
 
-export const NumberInputWithSelect = (props: InputWithSelectProps) => {
-  const { className, inputName, selectName, options, defaultOption, placeholder, isReadOnly } = props;
-
+export const NumberInputWithSelect = ({
+  fields,
+  options,
+  defaultOption,
+  className,
+  placeholder,
+  isReadOnly,
+}: InputWithSelectProps) => {
   const { getFieldState, setValue, getValues, control } = useFormContext();
 
-  const amount = getFieldState(`${inputName}`);
-  const unit = getFieldState(`${selectName}`);
-  const error = amount.error || unit.error;
+  const input = getFieldState(`${fields.inputKey}`);
+  const select = getFieldState(`${fields.selectKey}`);
+  const error = input.error || select.error;
 
   const defaultSelectedValue = useMemo(() => {
     return defaultOption ?? options[0];
@@ -31,16 +38,16 @@ export const NumberInputWithSelect = (props: InputWithSelectProps) => {
 
   const handleChange = (value: { input: number; select: string }) => {
     // we want to always set both values and treat it as a single input
-    setValue(inputName, value.input, { shouldDirty: true });
-    setValue(selectName, value.select, { shouldDirty: true });
+    setValue(fields.inputKey, value.input, { shouldDirty: true });
+    setValue(fields.selectKey, value.select, { shouldDirty: true });
   };
 
   return (
     <>
-      <InputFieldPure className="h-7 rounded-lg border pr-0">
+      <InputFieldPure className="h-7 rounded-lg border pr-0" state={error ? 'error' : 'default'}>
         <FormField
           control={control}
-          name={inputName}
+          name={fields.inputKey}
           render={({ field }) => (
             <FormItem className="w-full overflow-hidden">
               <FormControl>
@@ -54,7 +61,7 @@ export const NumberInputWithSelect = (props: InputWithSelectProps) => {
                   disabled={isReadOnly}
                   {...field}
                   onChange={(e) => {
-                    handleChange({ input: Number(e.target.value), select: getValues(selectName) });
+                    handleChange({ input: Number(e.target.value), select: getValues(fields.selectKey) });
                   }}
                 />
               </FormControl>
@@ -63,19 +70,19 @@ export const NumberInputWithSelect = (props: InputWithSelectProps) => {
         />
         <FormField
           control={control}
-          name={selectName}
+          name={fields.selectKey}
           render={({ field }) => (
             <FormItem>
               <FormControl>
                 <Select
                   onValueChange={(value) => {
-                    handleChange({ input: Number(getValues(inputName)), select: value });
+                    handleChange({ input: Number(getValues(fields.inputKey)), select: value });
                   }}
                   defaultValue={defaultSelectedValue}
                   disabled={isReadOnly}
                   {...field}
                 >
-                  <SelectTrigger className="h-7 w-auto translate-x-1 gap-1 rounded-l-none border-l bg-neutral-50 p-2 text-xs">
+                  <SelectTrigger className="h-7 w-auto translate-x-0.5 gap-1 rounded-l-none border-l bg-neutral-50 p-2 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

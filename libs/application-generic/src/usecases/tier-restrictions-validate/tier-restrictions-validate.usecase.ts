@@ -72,7 +72,7 @@ export class TierRestrictionsValidateUsecase {
           error: ErrorEnum.TIER_LIMIT_EXCEEDED,
           message:
             `The maximum delay allowed is ${FREE_TIER_MAX_DELAY_DAYS} days. ` +
-            'Please contact our support team to discuss extending this limit for your use case.',
+            'Please upgrade your plan.',
         });
       }
     }
