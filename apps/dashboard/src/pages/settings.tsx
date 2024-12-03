@@ -66,29 +66,21 @@ export function SettingsPage() {
     <DashboardLayout headerStartItems={<h1 className="text-foreground-950">Settings</h1>}>
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
         <TabsList
-          align="start"
+          align="center"
           className="border-border/20 relative mt-4 flex w-full items-end justify-start space-x-2 rounded-none border-b bg-transparent px-1.5 pb-0"
         >
           <TabsTrigger
             value="profile"
             className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
           >
-            Profile
+            Account
           </TabsTrigger>
           <TabsTrigger
-            value="security"
+            value="organization"
             className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
           >
-            Security
+            Organization
           </TabsTrigger>
-          {organization && (
-            <TabsTrigger
-              value="organization"
-              className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
-            >
-              Organization
-            </TabsTrigger>
-          )}
           <TabsTrigger
             value="team"
             className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
@@ -97,18 +89,15 @@ export function SettingsPage() {
           </TabsTrigger>
         </TabsList>
 
-        <div className="mt-1 px-1.5">
+        <div className="mx-auto mt-1 max-w-[600px] px-1.5">
           <TabsContent value="profile" className="rounded-lg">
-            <Card className="border-none shadow-none">
+            <Card className="mx-auto mt-10 border-none shadow-none">
               <UserProfile appearance={clerkComponentAppearance}>
                 <UserProfile.Page label="account" />
                 <UserProfile.Page label="security" />
               </UserProfile>
-            </Card>
-          </TabsContent>
 
-          <TabsContent value="security" className="rounded-lg">
-            <Card className="border-none shadow-none">
+              <h1 className="text-foreground mb-6 mt-10 text-xl font-semibold">Security</h1>
               <UserProfile appearance={clerkComponentAppearance}>
                 <UserProfile.Page label="security" />
                 <UserProfile.Page label="account" />
