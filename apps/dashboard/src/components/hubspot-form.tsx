@@ -21,13 +21,7 @@ interface HubspotFormProps {
 
 const HUBSPOT_FORM_CLASS = 'hubspot-form-wrapper';
 
-export function HubspotForm({
-  formId,
-  properties = {},
-  readonlyProperties = [],
-  focussedProperty,
-  onFormSubmitted,
-}: HubspotFormProps) {
+export function HubspotForm({ formId, properties = {}, readonlyProperties = [], onFormSubmitted }: HubspotFormProps) {
   const formContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -5,7 +5,6 @@ import { cn } from '../../utils/ui';
 import { useSubscription } from './hooks/use-subscription';
 import { CalendarDays } from 'lucide-react';
 import { PlanActionButton } from './plan-action-button';
-import { ApiServiceLevelEnum } from '@novu/shared';
 
 interface ActivePlanBannerProps {
   selectedBillingInterval: 'month' | 'year';

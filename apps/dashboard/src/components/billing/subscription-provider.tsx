@@ -4,23 +4,25 @@ import { useSubscription, type UseSubscriptionType } from './hooks/use-subscript
 
 const SubscriptionContext = createContext<UseSubscriptionType>({
   isLoading: false,
-  apiServiceLevel: ApiServiceLevelEnum.FREE,
-  isActive: false,
-  hasPaymentMethod: false,
-  status: 'trialing',
-  currentPeriodStart: null,
-  currentPeriodEnd: null,
-  billingInterval: null,
-  events: {
-    current: 0,
-    included: 0,
-  },
-  trial: {
+  data: {
+    apiServiceLevel: ApiServiceLevelEnum.FREE,
     isActive: false,
-    start: new Date().toISOString(),
-    end: new Date().toISOString(),
-    daysTotal: 0,
-    daysLeft: 0,
+    hasPaymentMethod: false,
+    status: 'trialing',
+    currentPeriodStart: null,
+    currentPeriodEnd: null,
+    billingInterval: null,
+    events: {
+      current: 0,
+      included: 0,
+    },
+    trial: {
+      isActive: false,
+      start: new Date().toISOString(),
+      end: new Date().toISOString(),
+      daysTotal: 0,
+      daysLeft: 0,
+    },
   },
 });
 
