@@ -28,7 +28,7 @@ interface MembersTableProps {
     fetchPrevious?: () => void;
     fetchNext?: () => void;
   };
-  onRoleUpdate?: (userId: string, role: RoleType) => void;
+  onChange?: () => void;
 }
 
 const LoadingRow = () => (
@@ -54,7 +54,7 @@ const LoadingRow = () => (
   </TableRow>
 );
 
-export function MembersTable({ members, roles, currentUserId, pagination, onRoleUpdate }: MembersTableProps) {
+export function MembersTable({ members, roles, currentUserId, pagination, onChange }: MembersTableProps) {
   const { organization, memberships } = useOrganization();
 
   const handleUpdateRole = async (userId: string, role: RoleType) => {
@@ -66,7 +66,7 @@ export function MembersTable({ members, roles, currentUserId, pagination, onRole
         role,
       });
       await memberships?.revalidate?.();
-      onRoleUpdate?.(userId, role);
+      onChange?.();
       toast.success('Member role updated successfully');
     } catch (err: any) {
       toast.error(err?.errors?.[0]?.message || 'Failed to update member role');
@@ -78,6 +78,8 @@ export function MembersTable({ members, roles, currentUserId, pagination, onRole
     try {
       await organization?.removeMember(userId);
       await memberships?.revalidate?.();
+      onChange?.();
+
       toast.success('Team member removed successfully');
     } catch (err: any) {
       toast.error(err?.errors?.[0]?.message || 'Failed to remove team member');
