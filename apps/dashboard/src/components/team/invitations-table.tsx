@@ -4,7 +4,6 @@ import { RiDeleteBin2Line } from 'react-icons/ri';
 import { PaginationControls } from './pagination-controls';
 import { InvitationStatusBadge } from './invitation-status-badge';
 import { OrganizationInvitationResource } from '@clerk/types';
-import { useOrganization } from '@clerk/clerk-react';
 import { toast } from 'sonner';
 
 interface InvitationsTableProps {

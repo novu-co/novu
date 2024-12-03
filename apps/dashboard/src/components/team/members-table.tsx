@@ -15,7 +15,6 @@ import { PaginationControls } from './pagination-controls';
 import { OrganizationMembershipResource } from '@clerk/types';
 import { useOrganization } from '@clerk/clerk-react';
 import { toast } from 'sonner';
-import { Badge } from '@/components/primitives/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 
 interface MembersTableProps {
