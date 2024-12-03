@@ -59,6 +59,7 @@ export function UsecaseSelectPage() {
       await updateClerkOrgMetadata({
         useCases: selectedUseCases,
       });
+      await organization?.reload();
     },
     onSuccess: () => {
       track(TelemetryEvent.USE_CASE_SELECTED, {
