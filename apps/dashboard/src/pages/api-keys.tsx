@@ -133,25 +133,21 @@ export function ApiKeysPage() {
                   <pre className="bg-background-100 rounded-md p-3 text-sm">Authorization: ApiKey YOUR_API_KEY</pre>
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-medium">Example Request</h3>
+                  <h3 className="font-medium">SDK Usage</h3>
                   <pre className="bg-background-100 overflow-x-auto rounded-md p-3 text-sm">
-                    {`fetch('https://api.novu.co/v1/notifications', {
-  method: 'POST',
-  headers: {
-    'Authorization': 'ApiKey YOUR_API_KEY',
-    'Content-Type': 'application/json'
+                    {`import { Novu } from '@novu/node'; 
+
+const novu = new Novu(process.env['NOVU_SECRET_KEY']);
+
+novu.trigger('workflow-id', {
+  to: {
+    subscriberId: '123456'
   },
-  body: JSON.stringify({
-    name: "Trigger Name",
-    to: {
-      subscriberId: "...",
-      email: "..."
-    },
-    payload: {
-      // your custom payload
-    }
-  })
-});`}
+  payload: {
+
+  }
+});
+`}
                   </pre>
                 </div>
                 <a
