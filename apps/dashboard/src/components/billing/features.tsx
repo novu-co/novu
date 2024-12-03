@@ -258,7 +258,7 @@ const features: Feature[] = [
 function FeatureRow({ feature, index }: { feature: Feature; index: number }) {
   return (
     <div
-      className={cn('divide-border grid grid-cols-4 divide-x', {
+      className={cn('divide-border grid grid-cols-4 divide-x bg-neutral-50', {
         'bg-muted/50': index % 2 === 1,
         'border-border border-y': feature.isTitle,
       })}

@@ -1,9 +1,5 @@
 import { Badge } from '@/components/primitives/badge';
-import { Button } from '@/components/primitives/button';
 import { Card } from '@/components/primitives/card';
-import { ApiServiceLevelEnum } from '@novu/shared';
-import { useSubscription } from './hooks/use-subscription';
-import { cn } from '../../utils/ui';
 import { Check } from 'lucide-react';
 import { PlanActionButton } from './plan-action-button';
 import { ContactSalesButton } from './contact-sales-button';
@@ -31,11 +27,7 @@ function PlanDisplay({ price, subtitle, events }: PlanDisplayProps) {
 }
 
 export function PlansRow({ selectedBillingInterval }: PlansRowProps) {
-  const { data: subscription } = useSubscription();
-  const { apiServiceLevel, trial } = subscription || {};
   const businessPlanPrice = selectedBillingInterval === 'year' ? '$2,700' : '$250';
-  const isPaidSubscriptionActive =
-    subscription?.isActive && !trial?.isActive && apiServiceLevel !== ApiServiceLevelEnum.FREE;
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
