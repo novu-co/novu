@@ -20,14 +20,14 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
     const percentage = (current / max) * 100;
     if (percentage > 90) return 'text-destructive';
     if (percentage > 75) return 'text-warning';
-    return 'text-primary';
+    return 'text-success';
   };
 
   const getProgressBarColor = (current: number, max: number) => {
     const percentage = (current / max) * 100;
     if (percentage > 90) return 'bg-destructive';
     if (percentage > 75) return 'bg-warning';
-    return 'bg-primary';
+    return 'bg-success';
   };
 
   const formatDate = (date: string | number) => {
@@ -40,7 +40,7 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
 
   return (
     <div className="mt-6 flex space-y-3">
-      <Card className="w-full max-w-2xl overflow-hidden border shadow-none">
+      <Card className="mx-auto w-full max-w-[500px] overflow-hidden border shadow-none">
         <div className="space-y-5 p-5">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
@@ -52,7 +52,9 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
                   </Badge>
                 )}
               </div>
-              {trial?.isActive && <div className="text-warning text-sm font-medium">{trial.daysLeft} days left</div>}
+              {trial?.isActive && (
+                <div className="text-warning text-sm font-medium">{trial.daysLeft} days left for trial</div>
+              )}
             </div>
 
             <PlanActionButton

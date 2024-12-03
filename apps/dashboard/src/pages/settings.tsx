@@ -8,6 +8,7 @@ import { SubscriptionProvider } from '../components/billing/subscription-provide
 import { Plan } from '../components/billing/plan';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
+import { cn } from '../utils/ui';
 
 export const clerkComponentAppearance = {
   elements: {
@@ -102,7 +103,12 @@ export function SettingsPage() {
           </TabsTrigger>
         </TabsList>
 
-        <div className="mx-auto mt-1 max-w-[700px] px-1.5">
+        <div
+          className={cn('mx-auto mt-1 px-1.5', {
+            'max-w-[1100px]': currentTab === 'billing',
+            'max-w-[700px]': currentTab !== 'billing',
+          })}
+        >
           <TabsContent value="account" className="rounded-lg">
             <Card className="mx-auto mt-10 border-none shadow-none">
               <UserProfile appearance={clerkComponentAppearance}>
