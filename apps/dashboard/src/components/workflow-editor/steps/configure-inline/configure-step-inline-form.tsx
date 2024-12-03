@@ -2,13 +2,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import merge from 'lodash.merge';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  type StepDataDto,
-  StepIssuesDto,
-  StepTypeEnum,
-  UpdateWorkflowDto,
-  type WorkflowResponseDto,
-} from '@novu/shared';
+import { type StepDataDto, StepTypeEnum, UpdateWorkflowDto, type WorkflowResponseDto } from '@novu/shared';
 
 import { flattenIssues, updateStepControlValuesInWorkflow } from '@/components/workflow-editor/step-utils';
 import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
@@ -44,25 +38,21 @@ export type StepInlineFormProps = {
 };
 
 type ConfigureStepInlineFormProps = StepInlineFormProps & {
-  issues?: StepIssuesDto;
   update: (data: UpdateWorkflowDto) => void;
+  updateStepCache: (step: Partial<StepDataDto>) => void;
 };
 
 export const ConfigureStepInlineForm = (props: ConfigureStepInlineFormProps) => {
-  const { workflow, step, issues, update } = props;
+  const { workflow, step, update, updateStepCache } = props;
   const schema = useMemo(() => buildDynamicZodSchema(step.controls.dataSchema ?? {}), [step.controls.dataSchema]);
 
   const defaultValues = useMemo(() => {
-    return {
-      ...calculateDefaultValues(step),
-      ...step.controls.values,
-    };
+    return calculateDefaultValues(step);
   }, [step]);
 
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues,
-    values: defaultValues,
     shouldFocusError: false,
   });
 
@@ -71,19 +61,20 @@ export const ConfigureStepInlineForm = (props: ConfigureStepInlineFormProps) => 
     form,
     save: (data) => {
       update(updateStepControlValuesInWorkflow(workflow, step, data));
+      updateStepCache({ ...step, controls: { ...step.controls, values: data } });
     },
   });
 
   const setIssuesFromStep = useCallback(() => {
-    const stepIssues = flattenIssues(issues?.controls);
+    const stepIssues = flattenIssues(step.issues?.controls);
     Object.entries(stepIssues).forEach(([key, value]) => {
       form.setError(key as string, { message: value });
     });
-  }, [form, issues]);
+  }, [form, step]);
 
   useEffect(() => {
     setIssuesFromStep();
-  }, [setIssuesFromStep, issues]);
+  }, [setIssuesFromStep]);
 
   const InlineForm = STEP_TYPE_TO_INLINE_FORM[step.type];
 

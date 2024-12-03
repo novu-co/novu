@@ -1,12 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  IEnvironment,
-  StepDataDto,
-  StepIssuesDto,
-  UpdateWorkflowDto,
-  WorkflowOriginEnum,
-  WorkflowResponseDto,
-} from '@novu/shared';
+import { IEnvironment, StepDataDto, UpdateWorkflowDto, WorkflowOriginEnum, WorkflowResponseDto } from '@novu/shared';
 import { motion } from 'motion/react';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -45,12 +38,12 @@ type ConfigureStepFormProps = {
   workflow: WorkflowResponseDto;
   environment: IEnvironment;
   step: StepDataDto;
-  issues?: StepIssuesDto;
   update: (data: UpdateWorkflowDto) => void;
+  updateStepCache: (step: Partial<StepDataDto>) => void;
 };
 
 export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
-  const { step, workflow, update, environment, issues } = props;
+  const { step, workflow, update, updateStepCache, environment } = props;
 
   const isSupportedStep = !UNSUPPORTED_STEP_TYPES.includes(step.type);
   const isReadOnly = !isSupportedStep || workflow.origin === WorkflowOriginEnum.EXTERNAL;
@@ -66,16 +59,10 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     navigate(buildRoute(ROUTES.EDIT_WORKFLOW, { environmentSlug: environment.slug!, workflowSlug: workflow.slug }));
   };
 
-  const defaultValues = {
-    name: step.name,
-    stepId: step.stepId,
-  };
-
   const form = useForm<z.infer<typeof stepSchema>>({
-    defaultValues,
-    values: {
-      ...defaultValues,
-      ...step.controls.values,
+    defaultValues: {
+      name: step.name,
+      stepId: step.stepId,
     },
     resolver: zodResolver(stepSchema),
     shouldFocusError: false,
@@ -87,12 +74,14 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     isReadOnly,
     save: (data) => {
       update(updateStepInWorkflow(workflow, data));
+      updateStepCache(data);
     },
   });
 
   const firstError = useMemo(
-    () => (issues ? getFirstBodyErrorMessage(issues) || getFirstControlsErrorMessage(issues) : undefined),
-    [issues]
+    () =>
+      step.issues ? getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues) : undefined,
+    [step]
   );
 
   return (
@@ -173,7 +162,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
         <Separator />
 
         {isInlineConfigurableStep && (
-          <InlineConfigurableStep workflow={workflow} step={step} update={update} issues={issues} />
+          <InlineConfigurableStep workflow={workflow} step={step} update={update} updateStepCache={updateStepCache} />
         )}
 
         {isTemplateConfigurableStep && <TemplateConfigurableStep step={step} firstError={firstError} />}
@@ -241,17 +230,17 @@ const InlineConfigurableStep = ({
   workflow,
   step,
   update,
-  issues,
+  updateStepCache,
 }: {
   workflow: WorkflowResponseDto;
   step: StepDataDto;
   update: (data: UpdateWorkflowDto) => void;
-  issues?: StepIssuesDto;
+  updateStepCache: (step: Partial<StepDataDto>) => void;
 }) => {
   return (
     <>
       <SidebarContent>
-        <ConfigureStepInlineForm workflow={workflow} step={step} update={update} issues={issues} />
+        <ConfigureStepInlineForm workflow={workflow} step={step} update={update} updateStepCache={updateStepCache} />
       </SidebarContent>
       <Separator />
     </>

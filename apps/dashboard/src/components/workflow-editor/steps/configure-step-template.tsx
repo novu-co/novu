@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -20,7 +20,7 @@ const transitionSetting = { ease: [0.29, 0.83, 0.57, 0.99], duration: 0.4 };
 export const ConfigureStepTemplate = () => {
   const navigate = useNavigate();
   const { workflow, update } = useWorkflow();
-  const { step, issues } = useStep();
+  const { step, updateStepCache } = useStep();
   const handleCloseSheet = () => {
     navigate('..', { relative: 'path' });
   };
@@ -68,7 +68,12 @@ export const ConfigureStepTemplate = () => {
                 <SheetTitle />
                 <SheetDescription />
               </VisuallyHidden>
-              <ConfigureStepTemplateForm workflow={workflow} step={step} update={update} issues={issues} />
+              <ConfigureStepTemplateForm
+                workflow={workflow}
+                step={step}
+                update={update}
+                updateStepCache={updateStepCache}
+              />
             </motion.div>
           </SheetContentBase>
         </SheetPortal>

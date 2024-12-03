@@ -45,12 +45,12 @@ export type StepEditorProps = {
 };
 
 type ConfigureStepTemplateFormProps = StepEditorProps & {
-  issues?: StepIssuesDto;
   update: (data: UpdateWorkflowDto) => void;
+  updateStepCache: (step: Partial<StepDataDto>) => void;
 };
 
 export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps) => {
-  const { workflow, step, issues, update } = props;
+  const { workflow, step, update, updateStepCache } = props;
   const schema = useMemo(() => buildDynamicZodSchema(step.controls.dataSchema ?? {}), [step.controls.dataSchema]);
 
   const defaultValues = useMemo(() => {
@@ -60,10 +60,6 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues,
-    values: {
-      ...defaultValues,
-      ...step.controls.values,
-    },
     shouldFocusError: false,
   });
 
@@ -72,15 +68,16 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
     form,
     save: (data) => {
       update(updateStepControlValuesInWorkflow(workflow, step, data));
+      updateStepCache(data);
     },
   });
 
   const setIssuesFromStep = useCallback(() => {
-    const stepIssues = flattenIssues(issues?.controls);
+    const stepIssues = flattenIssues(step.issues?.controls);
     Object.entries(stepIssues).forEach(([key, value]) => {
       form.setError(key as string, { message: value });
     });
-  }, [form, issues]);
+  }, [form, step]);
 
   useEffect(() => {
     setIssuesFromStep();
