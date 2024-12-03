@@ -5,10 +5,17 @@ import { buildRoute, ROUTES } from '@/utils/routes';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useOnboardingSteps } from '../../hooks/use-onboarding-steps';
 import { NavigationLink } from './navigation-link';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 
 export function GettingStartedMenuItem() {
   const { totalSteps, completedSteps } = useOnboardingSteps();
   const { currentEnvironment } = useEnvironment();
+  const isGettingStartedEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_GETTING_STARTED_ENABLED);
+
+  if (!isGettingStartedEnabled) {
+    return null;
+  }
 
   return (
     <motion.div className="contents" whileHover="hover" initial="initial">
