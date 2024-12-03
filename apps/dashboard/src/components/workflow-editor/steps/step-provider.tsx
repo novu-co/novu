@@ -31,7 +31,7 @@ export const StepProvider = ({ children }: { children: ReactNode }) => {
 
   /**
    * We need to get the issues from the workflow response
-   * because the step is not refetched when workflow is updated
+   * because the step is not re-fetched when workflow is updated
    *
    * TODO:
    * 1. add all step data to workflow response
