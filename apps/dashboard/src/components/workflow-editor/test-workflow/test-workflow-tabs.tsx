@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { RiPlayCircleLine, RiProgress1Fill } from 'react-icons/ri';
+import { RiPlayCircleLine } from 'react-icons/ri';
 import { useForm } from 'react-hook-form';
 // eslint-disable-next-line
 // @ts-ignore
@@ -127,8 +127,8 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
                 </Link>
               </TabsTrigger>
               <div className="ml-auto">
-                <Button type="submit" variant="primary" size="sm" className="flex gap-1" disabled={isPending}>
-                  {isPending ? <RiProgress1Fill className="size-5" /> : <RiPlayCircleLine className="size-5" />}
+                <Button type="submit" variant="primary" size="sm" className="flex gap-1" isLoading={isPending}>
+                  <RiPlayCircleLine className="size-5" />
                   <span>Test workflow</span>
                 </Button>
               </div>
