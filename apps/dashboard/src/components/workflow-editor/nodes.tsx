@@ -12,6 +12,7 @@ import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { WorkflowOriginEnum } from '@novu/shared';
 import { createStep } from '@/components/workflow-editor/steps/step-provider';
+import { getEncodedId, STEP_DIVIDER } from '@/utils/step';
 
 export type NodeData = {
   name?: string;
@@ -52,7 +53,11 @@ const StepNode = (props: StepNodeProps) => {
     stepSlug: string;
   }>();
 
-  return <Node aria-selected={stepSlug === data.stepSlug} className={cn('group', className)} {...rest} />;
+  const isSelected =
+    getEncodedId({ slug: stepSlug ?? '', divider: STEP_DIVIDER }) ===
+    getEncodedId({ slug: data.stepSlug ?? '', divider: STEP_DIVIDER });
+
+  return <Node aria-selected={isSelected} className={cn('group', className)} {...rest} />;
 };
 
 export const EmailNode = ({ data }: NodeProps<NodeType>) => {

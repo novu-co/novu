@@ -1,7 +1,6 @@
 import { createContext, useMemo, type ReactNode } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { useFetchStep } from '@/hooks/use-fetch-step';
 import { StepDataDto, StepTypeEnum } from '@novu/shared';
 import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
@@ -12,22 +11,25 @@ export type StepEditorContextType = {
   isPending: boolean;
   step?: StepDataDto;
   refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<StepDataDto, Error>>;
+  updateStepCache: (step: Partial<StepDataDto>) => void;
 };
 
 export const StepContext = createContext<StepEditorContextType>({} as StepEditorContextType);
 
 export const StepProvider = ({ children }: { children: ReactNode }) => {
-  const { workflow } = useWorkflow();
-  const { stepSlug = '' } = useParams<{
+  const { stepSlug = '', workflowSlug = '' } = useParams<{
     workflowSlug: string;
     stepSlug: string;
   }>();
-  const { step, isPending, refetch } = useFetchStep({
-    workflowSlug: workflow?.slug,
+  const { step, isPending, refetch, updateStepCache } = useFetchStep({
+    workflowSlug,
     stepSlug,
   });
 
-  const value = useMemo(() => ({ isPending, step, refetch }), [isPending, step, refetch]);
+  const value = useMemo(
+    () => ({ isPending, step, refetch, updateStepCache }),
+    [isPending, step, refetch, updateStepCache]
+  );
 
   return <StepContext.Provider value={value}>{children}</StepContext.Provider>;
 };

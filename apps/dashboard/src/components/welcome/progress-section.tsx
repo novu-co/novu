@@ -1,8 +1,7 @@
 import { Card, CardContent } from '../primitives/card';
 import { RiArrowRightDoubleFill, RiCheckLine, RiLoader3Line } from 'react-icons/ri';
-import { useEnvironment } from '../../context/environment/hooks';
 import { useOnboardingSteps, StepIdEnum } from '../../hooks/use-onboarding-steps';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '../../utils/routes';
 import { motion } from 'motion/react';
 import { mainCard, leftSection, textItem, stepsList, stepItem, logo } from './progress-section.animations';
@@ -21,7 +20,7 @@ interface StepItemProps {
 }
 
 export function ProgressSection() {
-  const { currentEnvironment } = useEnvironment();
+  const { environmentSlug } = useParams<{ environmentSlug?: string }>();
   const { steps } = useOnboardingSteps();
 
   return (
@@ -31,7 +30,7 @@ export function ProgressSection() {
 
         <motion.div className="flex flex-1 flex-col gap-3 p-6" variants={stepsList}>
           {steps.map((step, index) => (
-            <StepItem key={index} step={step} environmentSlug={currentEnvironment?.slug} />
+            <StepItem key={index} step={step} environmentSlug={environmentSlug} />
           ))}
         </motion.div>
 
