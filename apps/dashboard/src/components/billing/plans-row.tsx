@@ -6,6 +6,7 @@ import { useSubscription } from './hooks/use-subscription';
 import { cn } from '../../utils/ui';
 import { Check } from 'lucide-react';
 import { PlanActionButton } from './plan-action-button';
+import { ContactSalesButton } from './contact-sales-button';
 
 interface PlansRowProps {
   selectedBillingInterval: 'month' | 'year';
@@ -71,7 +72,7 @@ export function PlansRow({ selectedBillingInterval }: PlansRowProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <h3 className="text-xl font-semibold">Business</h3>
-              <Badge variant="secondary">Most Popular</Badge>
+              <Badge variant="soft">Most Popular</Badge>
             </div>
             <PlanDisplay
               price={businessPlanPrice}
@@ -126,9 +127,7 @@ export function PlansRow({ selectedBillingInterval }: PlansRowProps) {
             </ul>
           </div>
           <div className="mt-6">
-            <Button variant="outline" className="w-full">
-              Contact sales
-            </Button>
+            <ContactSalesButton variant="outline" className="w-full" />
           </div>
         </div>
       </Card>
