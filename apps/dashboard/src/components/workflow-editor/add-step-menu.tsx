@@ -8,6 +8,8 @@ import { Badge } from '../primitives/badge';
 import { cn } from '@/utils/ui';
 import { StepTypeEnum } from '@/utils/enums';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 
 const MenuGroup = ({ children }: { children: ReactNode }) => {
   return <div className="flex flex-col">{children}</div>;
@@ -41,7 +43,7 @@ const MenuItem = ({
 
   return (
     <span
-      onClick={onClick}
+      onClick={!disabled ? onClick : undefined}
       className={cn(
         'shadow-xs text-foreground-600 hover:bg-accent flex cursor-pointer items-center gap-2 rounded-lg p-1.5',
         {
@@ -73,6 +75,7 @@ export const AddStepMenu = ({
   onMenuItemClick: (stepType: StepTypeEnum) => void;
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const isDelayDigestEmailEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
 
   const handleMenuItemClick = (stepType: StepTypeEnum) => {
     onMenuItemClick(stepType);
@@ -123,7 +126,7 @@ export const AddStepMenu = ({
                 <MenuItem stepType={StepTypeEnum.DIGEST}>Digest</MenuItem>
                 <MenuItem
                   stepType={StepTypeEnum.DELAY}
-                  disabled={true}
+                  disabled={!isDelayDigestEmailEnabled}
                   onClick={() => handleMenuItemClick(StepTypeEnum.DELAY)}
                 >
                   Delay
