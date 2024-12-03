@@ -1,14 +1,12 @@
 import { UserButton } from '@clerk/clerk-react';
 import { useNewDashboardOptIn } from '@/hooks/use-new-dashboard-opt-in';
 import { RiSignpostFill } from 'react-icons/ri';
-import { LEGACY_DASHBOARD_URL } from '@/config';
 
 export function UserProfile() {
   const { optOut } = useNewDashboardOptIn();
 
   return (
     <UserButton
-      afterSignOutUrl={`${LEGACY_DASHBOARD_URL}/auth/login`}
       appearance={{
         elements: {
           avatarBox: 'h-6 w-6',
