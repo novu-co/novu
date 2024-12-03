@@ -7,7 +7,7 @@ import {
   WorkflowOriginEnum,
   WorkflowResponseDto,
 } from '@novu/shared';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiCloseFill, RiDeleteBin2Line, RiPencilRuler2Fill } from 'react-icons/ri';
@@ -43,10 +43,11 @@ type ConfigureStepFormProps = {
   environment: IEnvironment;
   step: StepDataDto;
   update: (data: UpdateWorkflowDto) => void;
+  updateStepCache: (step: Partial<StepDataDto>) => void;
 };
 
 export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
-  const { step, workflow, update, environment } = props;
+  const { step, workflow, update, updateStepCache, environment } = props;
   const navigate = useNavigate();
   const isCodeCreatedWorkflow = workflow.origin === WorkflowOriginEnum.EXTERNAL;
 
@@ -57,11 +58,13 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     navigate(buildRoute(ROUTES.EDIT_WORKFLOW, { environmentSlug: environment.slug!, workflowSlug: workflow.slug }));
   };
 
+  const defaultValues = {
+    name: step.name,
+    stepId: step.stepId,
+  };
+
   const form = useForm<z.infer<typeof stepSchema>>({
-    defaultValues: {
-      name: step.name,
-      stepId: step.stepId,
-    },
+    defaultValues,
     resolver: zodResolver(stepSchema),
     shouldFocusError: false,
   });
@@ -72,6 +75,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     isReadOnly: isCodeCreatedWorkflow,
     save: (data) => {
       update(updateStepInWorkflow(workflow, data));
+      updateStepCache(data);
     },
   });
 

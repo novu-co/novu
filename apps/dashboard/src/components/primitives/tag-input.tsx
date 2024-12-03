@@ -77,7 +77,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
           </PopoverAnchor>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, index) => (
-              <Badge key={index} variant="outline" size="tag" className="gap-1">
+              <Badge key={index} variant="outline" kind="tag" className="gap-1">
                 <span style={{ wordBreak: 'break-all' }}>{tag}</span>
                 <button type="button" onClick={() => removeTag(tag)}>
                   <RiCloseFill className="-mr-0.5 size-3" />
