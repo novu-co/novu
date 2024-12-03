@@ -70,11 +70,11 @@ export function ResourcesList({ resources, title, icon }: ResourcesListProps) {
       </motion.div>
 
       <ScrollArea className="w-full whitespace-nowrap">
-        <motion.div className="flex gap-4 pb-7 pl-1" variants={containerVariants} initial="hidden" animate="show">
+        <motion.div className="flex gap-4 pb-0.5 pl-1" variants={containerVariants} initial="hidden" animate="show">
           {resources.map((resource, index) => (
             <motion.div key={index} variants={itemVariants}>
               <Link to={resource.url} target="_blank" rel="noopener" onClick={() => handleResourceClick(resource)}>
-                <Card className="w-60 shrink-0 overflow-hidden border-none shadow-[0px_12px_32px_0px_rgba(0,0,0,0.02),0px_0px_0px_1px_rgba(0,0,0,0.05)] transition-all duration-200">
+                <Card className="w-60 shrink-0 overflow-hidden border-none shadow-[0px_5px_12px_0px_rgba(0,0,0,0.02),0px_0px_0px_1px_rgba(0,0,0,0.05)] transition-all duration-200">
                   <motion.div
                     className="bg-foreground-50 h-[126px] overflow-hidden"
                     whileHover={{ scale: 1.03 }}
