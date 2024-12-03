@@ -10,6 +10,7 @@ import {
   OrganizationListPage,
   QuestionnairePage,
   UsecaseSelectPage,
+  SettingsPage,
 } from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
@@ -93,6 +94,26 @@ const router = createBrowserRouter([
                 element: <CatchAllRoute />,
               },
             ],
+          },
+          {
+            path: ROUTES.SETTINGS,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_PROFILE,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_ORGANIZATION,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_TEAM,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_SECURITY,
+            element: <SettingsPage />,
           },
           {
             path: '*',

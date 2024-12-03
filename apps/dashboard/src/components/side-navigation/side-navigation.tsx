@@ -129,7 +129,7 @@ export const SideNavigation = () => {
             </NavigationLink>
           </NavigationGroup>
           <NavigationGroup label="Application">
-            <NavigationLink to={LEGACY_ROUTES.SETTINGS} isExternal>
+            <NavigationLink to={ROUTES.SETTINGS}>
               <RiSettings4Line className="size-4" />
               <span>Settings</span>
             </NavigationLink>
