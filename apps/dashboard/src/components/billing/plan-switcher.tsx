@@ -1,4 +1,5 @@
 import { Tabs, TabsList, TabsTrigger } from '@/components/primitives/tabs';
+import { Title } from '@radix-ui/react-dialog';
 
 interface PlanSwitcherProps {
   selectedBillingInterval: 'month' | 'year';
@@ -8,7 +9,8 @@ interface PlanSwitcherProps {
 export function PlanSwitcher({ selectedBillingInterval, setSelectedBillingInterval }: PlanSwitcherProps) {
   return (
     <div className="border-border/20 relative flex h-10 items-end justify-between self-stretch border-none">
-      <div className="flex flex-1 justify-center">
+      <h2 className="text-lg font-semibold">Compare Plans</h2>
+      <div className="flex flex-1 justify-end">
         <Tabs
           value={selectedBillingInterval}
           onValueChange={(value) => setSelectedBillingInterval(value as 'month' | 'year')}
