@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { OnboardingArrowLeft } from '../components/icons/onboarding-arrow-left';
 import { updateClerkOrgMetadata } from '../api/organization';
 import { ChannelTypeEnum } from '@novu/shared';
-import { RiLoader2Line } from 'react-icons/ri';
 import { PageMeta } from '../components/page-meta';
 import { useTelemetry } from '../hooks';
 import { TelemetryEvent } from '../utils/telemetry';
@@ -79,9 +78,8 @@ export function UsecaseSelectPage() {
               />
 
               <div className="flex w-full flex-col items-center gap-3">
-                <Button disabled={selectedUseCases.length === 0 || isPending} className="w-full" type="submit">
+                <Button disabled={selectedUseCases.length === 0} isLoading={isPending} className="w-full" type="submit">
                   Continue
-                  {isPending && <RiLoader2Line className="animate-spin" />}
                 </Button>
                 <Button type="button" variant="link" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
                   Skip to Homepage

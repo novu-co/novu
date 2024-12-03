@@ -109,6 +109,7 @@ export const EditBridgeUrlButton = () => {
                   type="submit"
                   variant="primary"
                   size="xs"
+                  isLoading={isUpdatingBridgeUrl}
                   disabled={!isDirty || isValidatingBridgeUrl || isUpdatingBridgeUrl}
                 >
                   Update endpoint

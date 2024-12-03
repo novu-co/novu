@@ -57,6 +57,12 @@ export class TriggerEventRequestDto {
       },
     },
   })
+  @ApiProperty({
+    type: 'object',
+    description: 'An optional payload object that can contain any properties',
+    required: false,
+    additionalProperties: true,
+  })
   @IsObject()
   @IsOptional()
   payload?: Record<string, unknown>;
@@ -88,12 +94,12 @@ export class TriggerEventRequestDto {
           $ref: getSchemaPath(SubscriberPayloadDto),
         },
         {
+          $ref: getSchemaPath(TopicPayloadDto),
+        },
+        {
           type: 'string',
           description: 'Unique identifier of a subscriber in your systems',
           example: 'SUBSCRIBER_ID',
-        },
-        {
-          $ref: getSchemaPath(TopicPayloadDto),
         },
       ],
     },
