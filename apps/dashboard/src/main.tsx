@@ -10,6 +10,7 @@ import {
   OrganizationListPage,
   QuestionnairePage,
   UsecaseSelectPage,
+  WelcomePage,
   SettingsPage,
 } from '@/pages';
 import './index.css';
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
           {
             path: ROUTES.ENV,
             children: [
+              {
+                path: ROUTES.WELCOME,
+                element: <WelcomePage />,
+              },
               {
                 path: ROUTES.WORKFLOWS,
                 element: <WorkflowsPage />,
