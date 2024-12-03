@@ -14,6 +14,7 @@ import {
   WorkflowInternalResponseDto,
   Instrument,
   InstrumentUsecase,
+  PinoLogger,
 } from '@novu/application-generic';
 import { captureException } from '@sentry/node';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
@@ -33,6 +34,7 @@ export class GeneratePreviewUsecase {
     private legacyPreviewStepUseCase: PreviewStep,
     private buildStepDataUsecase: BuildStepDataUsecase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
+    private readonly logger: PinoLogger,
     private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase
   ) {}
 
@@ -71,8 +73,12 @@ export class GeneratePreviewUsecase {
         previewPayloadExample: variablesExample,
       };
     } catch (error) {
-      Logger.error(
-        { error, workflowIdOrInternalId: command.identifierOrInternalId, stepIdOrInternalId: command.stepDatabaseId },
+      this.logger.error(
+        {
+          err: error,
+          workflowIdOrInternalId: command.identifierOrInternalId,
+          stepIdOrInternalId: command.stepDatabaseId,
+        },
         `Unexpected error while generating preview`,
         LOG_CONTEXT
       );
