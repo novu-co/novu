@@ -55,7 +55,7 @@ export function ApiKeysPage() {
                   <CardTitle>Environment Keys</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="max-w-2xl space-y-4">
+                  <div className="space-y-4">
                     <div className="space-y-2">
                       <label className="text-foreground-600 text-sm font-medium">API Key</label>
                       <div className="flex items-center gap-2">
