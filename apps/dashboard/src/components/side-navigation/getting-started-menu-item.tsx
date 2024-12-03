@@ -10,9 +10,13 @@ import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { Button } from '../primitives/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 
 export function GettingStartedMenuItem() {
   const { totalSteps, completedSteps, steps } = useOnboardingSteps();
+  const isGettingStartedEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_GETTING_STARTED_ENABLED);
+
   const { currentEnvironment } = useEnvironment();
   const { user } = useUser();
   const track = useTelemetry();
@@ -37,7 +41,7 @@ export function GettingStartedMenuItem() {
     });
   };
 
-  if (user?.unsafeMetadata?.hideGettingStarted) {
+  if (!isGettingStartedEnabled || user?.unsafeMetadata?.hideGettingStarted) {
     return null;
   }
 
