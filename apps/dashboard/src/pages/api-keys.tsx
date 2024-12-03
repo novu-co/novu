@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { RiKey2Line, RiEyeLine, RiEyeOffLine, RiLockStarFill, RiExternalLinkLine } from 'react-icons/ri';
 import { useEnvironment } from '@/context/environment/hooks';
 import { CopyButton } from '@/components/primitives/copy-button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/primitives/card';
+import { Card, CardContent } from '@/components/primitives/card';
 import { Button } from '@/components/primitives/button';
 import { InputField } from '@/components/primitives/input';
 import { Form } from '@/components/primitives/form/form';
