@@ -110,7 +110,7 @@ export function SettingsPage() {
           })}
         >
           <TabsContent value="account" className="rounded-lg">
-            <Card className="mx-auto mt-10 border-none shadow-none">
+            <Card className="mx-auto border-none shadow-none">
               <UserProfile appearance={clerkComponentAppearance}>
                 <UserProfile.Page label="account" />
                 <UserProfile.Page label="security" />
