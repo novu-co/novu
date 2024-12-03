@@ -9,7 +9,7 @@
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\"",
-    "docker:build": "pnpm --silent --workspace-root pnpm-context -- apps/worker/Dockerfile | BULL_MQ_PRO_NPM_TOKEN=${BULL_MQ_PRO_NPM_TOKEN} docker buildx build --secret id=BULL_MQ_PRO_NPM_TOKEN --build-arg PACKAGE_PATH=apps/worker - -t novu-worker --load $DOCKER_BUILD_ARGUMENTS",
+  "docker:build": "pnpm --silent --workspace-root pnpm-context -- apps/worker/Dockerfile | BULL_MQ_PRO_NPM_TOKEN=${BULL_MQ_PRO_NPM_TOKEN} docker buildx build --secret id=BULL_MQ_PRO_NPM_TOKEN --build-arg PACKAGE_PATH=apps/worker - -t novu-worker --load $DOCKER_BUILD_ARGUMENTS",
     "docker:build:depot": "pnpm --silent --workspace-root pnpm-context -- apps/worker/Dockerfile | depot build --build-arg PACKAGE_PATH=apps/worker - -t novu-worker --load",
     "start": "pnpm start:dev",
     "start:dev": "nest start --watch",
@@ -64,8 +64,8 @@
     "shortid": "^2.2.16",
     "simple-statistics": "^7.8.3",
     "uuid": "^8.3.2",
-    "zod": "^3.23.8",
-    "zod-to-json-schema": "^3.23.3"
+    "zod": "3.23.8",
+    "zod-to-json-schema": "3.23.5"
   },
   "devDependencies": {
     "@faker-js/faker": "^6.0.0",
