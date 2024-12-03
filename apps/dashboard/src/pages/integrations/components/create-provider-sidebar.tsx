@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/primitives/sheet';
 import { Button } from '@/components/primitives/button';
@@ -8,9 +8,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitive
 import { ChannelTypeEnum, CredentialsKeyEnum } from '@novu/shared';
 import { useProviders, IProvider } from '@/hooks/use-providers';
 import { useCreateIntegration } from '@/hooks/use-create-integration';
-import { ArrowLeft, Check, ChevronRight, Info } from 'lucide-react';
+import { ArrowLeft, Check, ChevronRight, Info, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SecretInput } from '@/components/primitives/secret-input';
+import { Badge } from '@/components/primitives/badge';
 
 interface CreateProviderSidebarProps {
   isOpened: boolean;
@@ -42,24 +43,24 @@ function ProviderCard({ provider, onClick }: ProviderCardProps) {
   return (
     <button
       onClick={onClick}
-      className="bg-card hover:border-primary/20 focus:ring-primary/20 group relative flex items-start gap-4 rounded-lg border p-4 text-left transition-all hover:shadow-sm focus:outline-none focus:ring-2"
+      className="bg-card hover:border-primary/20 focus:ring-primary/20 group relative flex h-full items-start gap-4 rounded-lg border p-4 text-left transition-all hover:scale-[1.02] hover:shadow-md focus:outline-none focus:ring-2"
     >
-      <div className="relative overflow-hidden rounded-lg border bg-white p-2 shadow-sm transition-transform duration-200 group-hover:scale-105">
+      <div className="relative overflow-hidden rounded-lg border bg-white p-2.5 shadow-sm transition-transform duration-200 group-hover:scale-105">
         <img
           src={`/static/images/providers/dark/square/${provider.id}.svg`}
           alt={provider.displayName}
-          className="h-10 w-10"
+          className="h-12 w-12"
           onError={(e) => {
             e.currentTarget.src = `/static/images/providers/dark/square/${provider.id}.png`;
           }}
         />
       </div>
-      <div className="flex-1 space-y-1">
+      <div className="flex-1 space-y-2">
         <div className="flex items-center justify-between">
-          <div className="font-medium">{provider.displayName}</div>
-          <ChevronRight className="text-muted-foreground h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          <div className="font-medium tracking-tight">{provider.displayName}</div>
+          <ChevronRight className="text-muted-foreground h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
         </div>
-        <div className="text-muted-foreground text-sm">{provider.description ?? ''}</div>
+        <div className="text-muted-foreground line-clamp-2 text-sm">{provider.description ?? ''}</div>
       </div>
     </button>
   );
@@ -69,6 +70,7 @@ export function CreateProviderSidebar({ isOpened, onClose, scrollToChannel }: Cr
   const { providers } = useProviders();
   const [selectedProvider, setSelectedProvider] = useState<string>();
   const [step, setStep] = useState<'select' | 'configure'>('select');
+  const [searchQuery, setSearchQuery] = useState('');
   const { mutateAsync: createIntegration, isLoading } = useCreateIntegration();
 
   const {
@@ -77,6 +79,23 @@ export function CreateProviderSidebar({ isOpened, onClose, scrollToChannel }: Cr
     reset,
     formState: { errors, isDirty },
   } = useForm<ProviderFormData>();
+
+  const filteredProviders = useMemo(() => {
+    if (!providers) return [];
+    return providers.filter((provider: IProvider) =>
+      provider.displayName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [providers, searchQuery]);
+
+  const providersByChannel = useMemo(() => {
+    return Object.values(ChannelTypeEnum).reduce(
+      (acc, channel) => {
+        acc[channel] = filteredProviders.filter((provider: IProvider) => provider.channel === channel);
+        return acc;
+      },
+      {} as Record<ChannelTypeEnum, IProvider[]>
+    );
+  }, [filteredProviders]);
 
   const provider = providers?.find((p: IProvider) => p.id === selectedProvider);
 
@@ -122,7 +141,7 @@ export function CreateProviderSidebar({ isOpened, onClose, scrollToChannel }: Cr
 
   return (
     <Sheet open={isOpened} onOpenChange={onClose}>
-      <SheetContent className="w-full sm:max-w-xl">
+      <SheetContent className="w-full sm:max-w-2xl">
         <SheetHeader className="space-y-1 pb-6">
           {step === 'configure' && provider && (
             <Button variant="ghost" size="sm" className="hover:bg-muted -ml-2 -mt-2 h-9 px-2" onClick={onBack}>
@@ -155,25 +174,55 @@ export function CreateProviderSidebar({ isOpened, onClose, scrollToChannel }: Cr
 
         {step === 'select' ? (
           <div className="flex flex-1 flex-col gap-6">
-            <Tabs defaultValue={scrollToChannel ?? ChannelTypeEnum.EMAIL}>
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value={ChannelTypeEnum.EMAIL}>Email</TabsTrigger>
-                <TabsTrigger value={ChannelTypeEnum.SMS}>SMS</TabsTrigger>
-                <TabsTrigger value={ChannelTypeEnum.PUSH}>Push</TabsTrigger>
-                <TabsTrigger value={ChannelTypeEnum.CHAT}>Chat</TabsTrigger>
+            <div className="relative">
+              <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform" />
+              <Input
+                placeholder="Search providers..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+
+            <Tabs defaultValue={scrollToChannel ?? ChannelTypeEnum.EMAIL} className="flex-1">
+              <TabsList className="bg-muted/50 inline-flex h-auto w-full justify-start gap-2 rounded-lg p-1">
+                {Object.values(ChannelTypeEnum).map((channel) => (
+                  <TabsTrigger
+                    key={channel}
+                    value={channel}
+                    className="data-[state=active]:bg-background relative rounded-md px-3 py-1.5 text-sm font-medium transition-all"
+                  >
+                    {channel}
+                    {providersByChannel[channel]?.length > 0 && (
+                      <Badge variant="soft" className="ml-2 px-1 py-0">
+                        {providersByChannel[channel].length}
+                      </Badge>
+                    )}
+                  </TabsTrigger>
+                ))}
               </TabsList>
 
               {Object.values(ChannelTypeEnum).map((channel) => (
-                <TabsContent key={channel} value={channel} className="space-y-4 py-4">
-                  {providers
-                    ?.filter((provider: IProvider) => provider.channel === channel)
-                    .map((provider: IProvider) => (
-                      <ProviderCard
-                        key={provider.id}
-                        provider={provider}
-                        onClick={() => onProviderSelect(provider.id)}
-                      />
-                    ))}
+                <TabsContent key={channel} value={channel} className="py-6">
+                  {providersByChannel[channel]?.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      {providersByChannel[channel].map((provider: IProvider) => (
+                        <ProviderCard
+                          key={provider.id}
+                          provider={provider}
+                          onClick={() => onProviderSelect(provider.id)}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-muted-foreground flex min-h-[200px] items-center justify-center text-center">
+                      {searchQuery ? (
+                        <p>No {channel.toLowerCase()} providers match your search</p>
+                      ) : (
+                        <p>No {channel.toLowerCase()} providers available</p>
+                      )}
+                    </div>
+                  )}
                 </TabsContent>
               ))}
             </Tabs>
