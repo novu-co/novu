@@ -27,9 +27,8 @@ export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string;
   });
 
   const updateStepCache = useCallback(
-    (newStep: Partial<StepDataDto>) => {
-      client.setQueryData(queryKey, (oldData: StepDataDto | undefined) => ({ ...oldData, ...newStep }));
-    },
+    (newStep: Partial<StepDataDto>) =>
+      client.setQueryData(queryKey, (oldData: StepDataDto | undefined) => ({ ...oldData, ...newStep })),
     [client, queryKey]
   );
 
