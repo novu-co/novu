@@ -21,6 +21,7 @@ export class Session {
     try {
       const { applicationIdentifier, subscriberId, subscriberHash } = this.#options;
       this.#emitter.emit('session.initialize.pending', { args: this.#options });
+
       const response = await this.#inboxService.initializeSession({
         applicationIdentifier,
         subscriberId,
