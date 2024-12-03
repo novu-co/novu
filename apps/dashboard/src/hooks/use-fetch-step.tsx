@@ -20,7 +20,7 @@ export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string;
     [currentEnvironment?._id, workflowSlug, stepSlug]
   );
 
-  const { data, isPending, isRefetching, error, refetch } = useQuery<StepDataDto>({
+  const { data, isPending, isRefetching, error } = useQuery<StepDataDto>({
     queryKey,
     queryFn: () => fetchStep({ workflowSlug: workflowSlug, stepSlug: stepSlug }),
     enabled: !!currentEnvironment?._id && !!stepSlug && !!workflowSlug,
@@ -37,7 +37,6 @@ export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string;
     isPending,
     isRefetching,
     error,
-    refetch,
     updateStepCache,
   };
 };

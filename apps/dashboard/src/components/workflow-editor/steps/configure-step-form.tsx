@@ -1,5 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { IEnvironment, StepDataDto, UpdateWorkflowDto, WorkflowOriginEnum, WorkflowResponseDto } from '@novu/shared';
+import {
+  IEnvironment,
+  StepDataDto,
+  StepIssuesDto,
+  UpdateWorkflowDto,
+  WorkflowOriginEnum,
+  WorkflowResponseDto,
+} from '@novu/shared';
 import { motion } from 'motion/react';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -38,12 +45,13 @@ type ConfigureStepFormProps = {
   workflow: WorkflowResponseDto;
   environment: IEnvironment;
   step: StepDataDto;
+  issues?: StepIssuesDto;
   update: (data: UpdateWorkflowDto) => void;
   updateStepCache: (step: Partial<StepDataDto>) => void;
 };
 
 export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
-  const { step, workflow, update, updateStepCache, environment } = props;
+  const { step, workflow, update, updateStepCache, environment, issues } = props;
 
   const isSupportedStep = !UNSUPPORTED_STEP_TYPES.includes(step.type);
   const isReadOnly = !isSupportedStep || workflow.origin === WorkflowOriginEnum.EXTERNAL;
@@ -162,7 +170,13 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
         <Separator />
 
         {isInlineConfigurableStep && (
-          <InlineConfigurableStep workflow={workflow} step={step} update={update} updateStepCache={updateStepCache} />
+          <InlineConfigurableStep
+            workflow={workflow}
+            step={step}
+            issues={issues}
+            update={update}
+            updateStepCache={updateStepCache}
+          />
         )}
 
         {isTemplateConfigurableStep && <TemplateConfigurableStep step={step} firstError={firstError} />}
@@ -229,18 +243,26 @@ const TemplateConfigurableStep = ({ step, firstError }: { step: StepDataDto; fir
 const InlineConfigurableStep = ({
   workflow,
   step,
+  issues,
   update,
   updateStepCache,
 }: {
   workflow: WorkflowResponseDto;
   step: StepDataDto;
+  issues?: StepIssuesDto;
   update: (data: UpdateWorkflowDto) => void;
   updateStepCache: (step: Partial<StepDataDto>) => void;
 }) => {
   return (
     <>
       <SidebarContent>
-        <ConfigureStepInlineForm workflow={workflow} step={step} update={update} updateStepCache={updateStepCache} />
+        <ConfigureStepInlineForm
+          workflow={workflow}
+          step={step}
+          issues={issues}
+          update={update}
+          updateStepCache={updateStepCache}
+        />
       </SidebarContent>
       <Separator />
     </>

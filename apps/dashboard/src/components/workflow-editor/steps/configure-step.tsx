@@ -4,7 +4,7 @@ import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { useEnvironment } from '@/context/environment/hooks';
 
 export const ConfigureStep = () => {
-  const { step, updateStepCache } = useStep();
+  const { step, updateStepCache, issues } = useStep();
   const { workflow, update } = useWorkflow();
   const { currentEnvironment } = useEnvironment();
 
@@ -19,6 +19,7 @@ export const ConfigureStep = () => {
       environment={currentEnvironment}
       update={update}
       updateStepCache={updateStepCache}
+      issues={issues}
     />
   );
 };
