@@ -5,6 +5,7 @@ import { showErrorToast, showSuccessToast } from '../primitives/sonner-helpers';
 import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
 import { ROUTES } from '../../utils/routes';
 import { useNavigate } from 'react-router-dom';
+import { ONBOARDING_DEMO_WORKFLOW_ID } from '../../config';
 
 interface InboxConnectedGuideProps {
   subscriberId: string;
@@ -17,7 +18,7 @@ export function InboxConnectedGuide({ subscriberId }: InboxConnectedGuideProps) 
   async function handleSendNotification() {
     try {
       await triggerWorkflow({
-        name: 'onboarding-demo-workflow',
+        name: ONBOARDING_DEMO_WORKFLOW_ID,
         to: subscriberId,
         payload: {
           subject: '**Welcome to Inbox!**',
