@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { CodeBlock, Language } from '../primitives/code-block';
 import { InlineToast } from '../primitives/inline-toast';
 import { Framework, InstallationStep } from './framework-guides.instructions';

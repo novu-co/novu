@@ -3,7 +3,7 @@ import { Card, CardContent } from '../primitives/card';
 import { useState, useEffect } from 'react';
 import { IEnvironment } from '@novu/shared';
 import { API_HOSTNAME, WEBSOCKET_HOSTNAME } from '../../config';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { Framework, frameworks } from './framework-guides.instructions';
 import { FrameworkInstructions } from './framework-guides';
 

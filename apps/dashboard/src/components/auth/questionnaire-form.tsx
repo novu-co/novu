@@ -2,7 +2,7 @@ import { Button } from '@/components/primitives/button';
 import { CardDescription, CardTitle } from '@/components/primitives/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { StepIndicator } from './shared';
 import { JobTitleEnum, jobTitleToLabelMapper, OrganizationTypeEnum, CompanySizeEnum } from '@novu/shared';
 import { useForm, Controller } from 'react-hook-form';
