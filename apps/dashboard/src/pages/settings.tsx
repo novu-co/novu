@@ -1,7 +1,6 @@
 import { Card } from '@/components/primitives/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { OrganizationProfile, UserProfile } from '@clerk/clerk-react';
-import { useOrganization } from '@clerk/clerk-react';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ROUTES, LEGACY_ROUTES } from '@/utils/routes';
@@ -42,18 +41,17 @@ export const clerkComponentAppearance = {
 };
 
 export function SettingsPage() {
-  const { organization } = useOrganization();
   const navigate = useNavigate();
   const location = useLocation();
   const isV2BillingEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_DASHBOARD_BILLING_ENABLED);
 
   const currentTab =
-    location.pathname === ROUTES.SETTINGS ? 'profile' : location.pathname.split('/settings/')[1] || 'profile';
+    location.pathname === ROUTES.SETTINGS ? 'account' : location.pathname.split('/settings/')[1] || 'account';
 
   const handleTabChange = (value: string) => {
     switch (value) {
-      case 'profile':
-        navigate(ROUTES.SETTINGS_PROFILE);
+      case 'account':
+        navigate(ROUTES.SETTINGS_ACCOUNT);
         break;
       case 'organization':
         navigate(ROUTES.SETTINGS_ORGANIZATION);
@@ -68,9 +66,6 @@ export function SettingsPage() {
           window.location.href = LEGACY_ROUTES.BILLING;
         }
         break;
-      case 'security':
-        navigate(ROUTES.SETTINGS_SECURITY);
-        break;
     }
   };
 
@@ -78,29 +73,21 @@ export function SettingsPage() {
     <DashboardLayout headerStartItems={<h1 className="text-foreground-950">Settings</h1>}>
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
         <TabsList
-          align="start"
-          className="border-border/20 relative ml-[-4px] mt-4 flex w-full items-end justify-start space-x-2 rounded-none border-b bg-transparent px-1.5 pb-0 pl-0"
+          align="center"
+          className="border-border/20 relative mt-4 flex w-full items-end justify-start space-x-2 rounded-none border-b bg-transparent px-1.5 pb-0"
         >
           <TabsTrigger
-            value="profile"
+            value="account"
             className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
           >
-            Profile
+            Account
           </TabsTrigger>
           <TabsTrigger
-            value="security"
+            value="organization"
             className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
           >
-            Security
+            Organization
           </TabsTrigger>
-          {organization && (
-            <TabsTrigger
-              value="organization"
-              className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
-            >
-              Organization
-            </TabsTrigger>
-          )}
           <TabsTrigger
             value="team"
             className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
@@ -115,18 +102,15 @@ export function SettingsPage() {
           </TabsTrigger>
         </TabsList>
 
-        <div className="mt-1 px-1.5">
-          <TabsContent value="profile" className="rounded-lg">
-            <Card className="border-none shadow-none">
+        <div className="mx-auto mt-1 max-w-[700px] px-1.5">
+          <TabsContent value="account" className="rounded-lg">
+            <Card className="mx-auto mt-10 border-none shadow-none">
               <UserProfile appearance={clerkComponentAppearance}>
                 <UserProfile.Page label="account" />
                 <UserProfile.Page label="security" />
               </UserProfile>
-            </Card>
-          </TabsContent>
 
-          <TabsContent value="security" className="rounded-lg">
-            <Card className="border-none shadow-none">
+              <h1 className="text-foreground mb-6 mt-10 text-xl font-semibold">Security</h1>
               <UserProfile appearance={clerkComponentAppearance}>
                 <UserProfile.Page label="security" />
                 <UserProfile.Page label="account" />

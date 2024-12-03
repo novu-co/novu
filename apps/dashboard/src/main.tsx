@@ -100,7 +100,7 @@ const router = createBrowserRouter([
             element: <SettingsPage />,
           },
           {
-            path: ROUTES.SETTINGS_PROFILE,
+            path: ROUTES.SETTINGS_ACCOUNT,
             element: <SettingsPage />,
           },
           {
@@ -109,10 +109,6 @@ const router = createBrowserRouter([
           },
           {
             path: ROUTES.SETTINGS_TEAM,
-            element: <SettingsPage />,
-          },
-          {
-            path: ROUTES.SETTINGS_SECURITY,
             element: <SettingsPage />,
           },
           {
