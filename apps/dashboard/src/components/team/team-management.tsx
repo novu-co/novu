@@ -143,6 +143,9 @@ export function TeamManagement() {
               <TabsContent value="members" asChild>
                 <motion.div {...fadeInUp}>
                   <MembersTable
+                    onRoleUpdate={(userId, role) => {
+                      memberships?.revalidate?.();
+                    }}
                     members={memberships?.data ?? []}
                     roles={roles}
                     currentUserId={currentUserId ?? ''}

@@ -28,6 +28,7 @@ interface MembersTableProps {
     fetchPrevious?: () => void;
     fetchNext?: () => void;
   };
+  onRoleUpdate?: (userId: string, role: RoleType) => void;
 }
 
 const LoadingRow = () => (
@@ -53,16 +54,19 @@ const LoadingRow = () => (
   </TableRow>
 );
 
-export function MembersTable({ members, roles, currentUserId, pagination }: MembersTableProps) {
+export function MembersTable({ members, roles, currentUserId, pagination, onRoleUpdate }: MembersTableProps) {
   const { organization, memberships } = useOrganization();
 
-  const handleUpdateRole = async (memberId: string, role: RoleType) => {
+  const handleUpdateRole = async (userId: string, role: RoleType) => {
+    if (!userId) return;
+
     try {
       await organization?.updateMember({
-        userId: memberId,
+        userId,
         role,
       });
       await memberships?.revalidate?.();
+      onRoleUpdate?.(userId, role);
       toast.success('Member role updated successfully');
     } catch (err: any) {
       toast.error(err?.errors?.[0]?.message || 'Failed to update member role');
@@ -123,7 +127,7 @@ export function MembersTable({ members, roles, currentUserId, pagination }: Memb
               <TableCell>
                 <Select
                   value={member.role}
-                  onValueChange={(role: RoleType) => handleUpdateRole(member.id, role)}
+                  onValueChange={(role: RoleType) => handleUpdateRole(member.publicUserData?.userId ?? '', role)}
                   disabled={member.publicUserData?.userId === currentUserId}
                 >
                   <SelectTrigger className="h-9 w-[120px]">
@@ -144,7 +148,7 @@ export function MembersTable({ members, roles, currentUserId, pagination }: Memb
               <TableCell>
                 <span className="text-muted-foreground">{new Date(member.createdAt).toLocaleDateString()}</span>
               </TableCell>
-              <TableCell>
+              <TableCell className="flex justify-center">
                 {member.publicUserData?.userId === currentUserId ? (
                   <Tooltip>
                     <TooltipTrigger asChild>
