@@ -14,6 +14,7 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { useFetchWorkflow } from '@/hooks';
 import TruncatedText from '@/components/truncated-text';
+import { Badge } from '@/components/primitives/badge';
 
 export const EditorBreadcrumbs = () => {
   const { workflowSlug = '' } = useParams<{ workflowSlug: string }>();
@@ -29,6 +30,11 @@ export const EditorBreadcrumbs = () => {
     {
       label: 'Workflows',
       href: workflowsRoute,
+      node: (
+        <Badge variant="warning" kind="pill" size="xxs" className="no-underline">
+          BETA
+        </Badge>
+      ),
     },
   ];
 
@@ -43,10 +49,11 @@ export const EditorBreadcrumbs = () => {
       </Button>
       <Breadcrumb>
         <BreadcrumbList>
-          {breadcrumbs.map(({ label, href }) => (
+          {breadcrumbs.map(({ label, href, node }) => (
             <React.Fragment key={`${href}_${label}`}>
-              <BreadcrumbItem>
+              <BreadcrumbItem className="flex items-center gap-1">
                 <BreadcrumbLink to={href}>{label}</BreadcrumbLink>
+                {node}
               </BreadcrumbItem>
               <BreadcrumbSeparator />
             </React.Fragment>
