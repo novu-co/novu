@@ -1,6 +1,5 @@
 import { Card, CardContent } from '../primitives/card';
 import { RiArrowRightDoubleFill, RiCheckLine, RiLoader3Line } from 'react-icons/ri';
-import { useEnvironment } from '../../context/environment/hooks';
 import { useOnboardingSteps, StepIdEnum } from '../../hooks/use-onboarding-steps';
 import { Link, useParams } from 'react-router-dom';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '../../utils/routes';
