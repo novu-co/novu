@@ -8,25 +8,24 @@ import { HighlightsRow } from './highlights-row';
 import { Features } from './features';
 import { cn } from '../../utils/ui';
 import { Skeleton } from '../primitives/skeleton';
+import { toast } from 'sonner';
 
 export function Plan() {
   const segment = useSegment();
-  const { isLoading, billingInterval: subscriptionBillingInterval } = useSubscription();
+  const { isLoading, data } = useSubscription();
   const [selectedBillingInterval, setSelectedBillingInterval] = useState<'month' | 'year'>(
-    subscriptionBillingInterval || 'month'
+    data?.billingInterval || 'month'
   );
 
   useEffect(() => {
     const checkoutResult = new URLSearchParams(window.location.search).get('result');
 
     if (checkoutResult === 'success') {
-      // TODO: Add toast notification
-      console.log('Payment was successful.');
+      toast.success('Payment was successful.');
     }
 
     if (checkoutResult === 'canceled') {
-      // TODO: Add toast notification
-      console.log('Order canceled.');
+      toast.error('Payment canseledt canceled.');
     }
   }, []);
 

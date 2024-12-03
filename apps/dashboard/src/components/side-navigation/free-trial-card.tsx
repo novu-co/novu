@@ -3,8 +3,9 @@ import { RiArrowRightDoubleLine, RiInformationFill } from 'react-icons/ri';
 import { Progress } from '../primitives/progress';
 import { Button } from '../primitives/button';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipArrow } from '../primitives/tooltip';
-import { LEGACY_ROUTES } from '@/utils/routes';
+import { LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { useBillingSubscription } from '@/hooks/use-billing-subscription';
+import { Link } from 'react-router-dom';
 
 const transition = 'transition-all duration-300 ease-out';
 
@@ -23,8 +24,8 @@ export const FreeTrialCard = () => {
   const pluralizedDays = pluralizeDaysLeft(daysLeft);
 
   return (
-    <a
-      href={LEGACY_ROUTES.BILLING}
+    <Link
+      to={ROUTES.SETTINGS_BILLING}
       className="bg-background group absolute bottom-3 left-2 flex w-[calc(100%-1rem)] cursor-pointer flex-col gap-2 rounded-lg p-3 shadow"
     >
       <div className="flex items-center gap-1.5">
@@ -67,6 +68,6 @@ export const FreeTrialCard = () => {
           Upgrade now
         </Button>
       </div>
-    </a>
+    </Link>
   );
 };
