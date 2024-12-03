@@ -28,7 +28,7 @@ export function PlanActionButton({
     subscription?.isActive && !trial?.isActive && apiServiceLevel !== ApiServiceLevelEnum.FREE;
 
   const { mutateAsync: goToPortal, isPending: isGoingToPortal } = useMutation({
-    mutationFn: () => get<{ data: string }>('/billing/portal'),
+    mutationFn: () => get<{ data: string }>('/billing/portal?isV2Dashboard=true'),
     onSuccess: (data) => {
       window.location.href = data.data;
     },
@@ -42,6 +42,7 @@ export function PlanActionButton({
       post<{ data: { stripeCheckoutUrl: string } }>('/billing/checkout-session', {
         billingInterval: selectedBillingInterval,
         apiServiceLevel: ApiServiceLevelEnum.BUSINESS,
+        isV2Dashboard: true,
       }),
     onSuccess: (data) => {
       window.location.href = data.data.stripeCheckoutUrl;

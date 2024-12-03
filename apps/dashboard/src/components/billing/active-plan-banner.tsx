@@ -5,6 +5,7 @@ import { cn } from '../../utils/ui';
 import { useSubscription } from './hooks/use-subscription';
 import { CalendarDays } from 'lucide-react';
 import { PlanActionButton } from './plan-action-button';
+import { ApiServiceLevelEnum } from '@novu/shared';
 
 interface ActivePlanBannerProps {
   selectedBillingInterval: 'month' | 'year';
@@ -14,8 +15,6 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
   const { data: subscription } = useSubscription();
   const { trial, apiServiceLevel, events } = subscription || {};
   const { current: currentEvents, included: maxEvents } = events || {};
-  const isPaidSubscriptionActive =
-    subscription?.isActive && !trial?.isActive && apiServiceLevel !== ApiServiceLevelEnum.FREE;
 
   const getProgressColor = (current: number, max: number) => {
     const percentage = (current / max) * 100;
