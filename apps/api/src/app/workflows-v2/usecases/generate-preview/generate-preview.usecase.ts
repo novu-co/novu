@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import _ from 'lodash';
 import {
   ChannelTypeEnum,
@@ -14,7 +14,9 @@ import {
   WorkflowInternalResponseDto,
   Instrument,
   InstrumentUsecase,
+  PinoLogger,
 } from '@novu/application-generic';
+import { captureException } from '@sentry/node';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
 import { BuildStepDataUsecase } from '../build-step-data';
@@ -24,48 +26,75 @@ import { pathsToObject } from '../../util/path-to-object';
 import { createMockPayloadFromSchema, flattenObjectValues } from '../../util/utils';
 import { PrepareAndValidateContentUsecase } from '../validate-content/prepare-and-validate-content/prepare-and-validate-content.usecase';
 
+const LOG_CONTEXT = 'GeneratePreviewUsecase';
+
 @Injectable()
 export class GeneratePreviewUsecase {
   constructor(
     private legacyPreviewStepUseCase: PreviewStep,
     private buildStepDataUsecase: BuildStepDataUsecase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
+    private readonly logger: PinoLogger,
     private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase
   ) {}
 
   @InstrumentUsecase()
   async execute(command: GeneratePreviewCommand): Promise<GeneratePreviewResponseDto> {
-    const { previewPayload: commandVariablesExample, controlValues: commandControlValues } =
-      command.generatePreviewRequestDto;
-    const stepData = await this.getStepData(command);
-    const workflow = await this.findWorkflow(command);
-    const preparedAndValidatedContent = await this.prepareAndValidateContentUsecase.execute({
-      user: command.user,
-      previewPayloadFromDto: commandVariablesExample,
-      controlValues: commandControlValues || stepData.controls.values || {},
-      controlDataSchema: stepData.controls.dataSchema || {},
-      variableSchema: stepData.variables,
-    });
-    const variablesExample = this.buildVariablesExample(
-      workflow,
-      preparedAndValidatedContent.finalPayload,
-      commandVariablesExample
-    );
+    try {
+      const { previewPayload: commandVariablesExample, controlValues: commandControlValues } =
+        command.generatePreviewRequestDto;
+      const stepData = await this.getStepData(command);
+      const workflow = await this.findWorkflow(command);
+      const preparedAndValidatedContent = await this.prepareAndValidateContentUsecase.execute({
+        user: command.user,
+        previewPayloadFromDto: commandVariablesExample,
+        controlValues: commandControlValues || stepData.controls.values || {},
+        controlDataSchema: stepData.controls.dataSchema || {},
+        variableSchema: stepData.variables,
+      });
+      const variablesExample = this.buildVariablesExample(
+        workflow,
+        preparedAndValidatedContent.finalPayload,
+        commandVariablesExample
+      );
 
-    const executeOutput = await this.executePreviewUsecase(
-      command,
-      stepData,
-      variablesExample,
-      preparedAndValidatedContent.finalControlValues
-    );
+      const executeOutput = await this.executePreviewUsecase(
+        command,
+        stepData,
+        variablesExample,
+        preparedAndValidatedContent.finalControlValues
+      );
 
-    return {
-      result: {
-        preview: executeOutput.outputs as any,
-        type: stepData.type as unknown as ChannelTypeEnum,
-      },
-      previewPayloadExample: variablesExample,
-    };
+      return {
+        result: {
+          preview: executeOutput.outputs as any,
+          type: stepData.type as unknown as ChannelTypeEnum,
+        },
+        previewPayloadExample: variablesExample,
+      };
+    } catch (error) {
+      this.logger.error(
+        {
+          err: error,
+          workflowIdOrInternalId: command.identifierOrInternalId,
+          stepIdOrInternalId: command.stepDatabaseId,
+        },
+        `Unexpected error while generating preview`,
+        LOG_CONTEXT
+      );
+
+      if (process.env.SENTRY_DSN) {
+        captureException(error);
+      }
+
+      return {
+        result: {
+          preview: {},
+          type: undefined,
+        },
+        previewPayloadExample: {},
+      } as any;
+    }
   }
 
   @Instrument()
