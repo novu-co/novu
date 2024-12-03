@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { RiKey2Line, RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
+import { RiKey2Line, RiEyeLine, RiEyeOffLine, RiLockStarFill, RiExternalLinkLine } from 'react-icons/ri';
 import { useEnvironment } from '@/context/environment/hooks';
 import { CopyButton } from '@/components/primitives/copy-button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/primitives/card';
@@ -47,14 +47,11 @@ export function ApiKeysPage() {
     <>
       <PageMeta title="Environment Keys" />
       <DashboardLayout headerStartItems={<h1 className="text-foreground-950">API Keys</h1>}>
-        <div className="flex flex-col gap-6 p-1.5 pt-6">
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr,500px]">
+        <div className="flex flex-col gap-6 p-2">
+          <div className="grid grid-cols-1 gap-6 pt-10 lg:grid-cols-[1fr,500px]">
             <Form {...form}>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Environment Keys</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
+              <Card className="shadow-none">
+                <CardContent className="p-6">
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <label className="text-foreground-600 text-sm font-medium">API Key</label>
@@ -119,50 +116,31 @@ export function ApiKeysPage() {
                 </CardContent>
               </Card>
             </Form>
-            <Card className="h-fit">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <RiKey2Line className="size-5" />
-                  Using Your API Keys
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <h3 className="font-medium">Authentication</h3>
-                  <p className="text-foreground-600 text-sm">Add your API key to the request headers:</p>
-                  <pre className="bg-background-100 rounded-md p-3 text-sm">Authorization: ApiKey YOUR_API_KEY</pre>
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium">SDK Usage</h3>
-                  <pre className="bg-background-100 overflow-x-auto rounded-md p-3 text-sm">
-                    {`import { Novu } from '@novu/node'; 
-
-const novu = new Novu(process.env['NOVU_SECRET_KEY']);
-
-novu.trigger('workflow-id', {
-  to: {
-    subscriberId: '123456'
-  },
-  payload: {
-
-  }
-});
-`}
-                  </pre>
-                </div>
+            <div className="column flex gap-2 p-6 pt-0">
+              <div className="flex flex-col gap-2">
+                <RiLockStarFill className="h-10 w-10" />
+                <h2 className="text-foreground-950 font-medium">Environment Keys</h2>
+                <p className="text-foreground-400 text-xs">Copy and manage your public and private keys</p>
                 <a
                   href="https://docs.novu.co/api-reference/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary inline-flex items-center gap-1 text-sm hover:underline"
+                  className="inline-flex items-center gap-1 text-sm hover:underline"
                 >
-                  View Full API Reference
-                  <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" />
-                  </svg>
+                  View API Reference
+                  <RiExternalLinkLine className="size-4" />
                 </a>
-              </CardContent>
-            </Card>
+                <a
+                  href="https://docs.novu.co/sdks/overview"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-sm hover:underline"
+                >
+                  Read about our SDKs
+                  <RiExternalLinkLine className="size-4" />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </DashboardLayout>
