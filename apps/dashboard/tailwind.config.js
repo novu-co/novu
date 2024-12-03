@@ -64,9 +64,6 @@ export default {
         DEFAULT: 'hsl(var(--primary))',
         foreground: 'hsl(var(--primary-foreground))',
       },
-      'primary-alpha': {
-        10: 'hsl(var(--primary-alpha-10))',
-      },
       accent: {
         DEFAULT: 'hsl(var(--accent))',
       },

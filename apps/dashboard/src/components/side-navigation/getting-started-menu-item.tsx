@@ -26,7 +26,7 @@ export function GettingStartedMenuItem() {
         <Badge
           variant="soft"
           size="pill"
-          className="bg-primary-alpha-10 text-primary inline-flex items-center gap-0.5 px-1 py-0.5 leading-4"
+          className="bg-primary/10 text-primary inline-flex items-center gap-0.5 px-1 py-0.5 leading-4"
         >
           <motion.div
             variants={{
