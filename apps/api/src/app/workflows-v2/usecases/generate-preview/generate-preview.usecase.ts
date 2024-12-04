@@ -4,6 +4,7 @@ import {
   ChannelTypeEnum,
   GeneratePreviewResponseDto,
   JobStatusEnum,
+  JSONSchemaDto,
   PreviewPayload,
   StepDataDto,
   WorkflowOriginEnum,
@@ -23,6 +24,8 @@ import { BuildStepDataUsecase } from '../build-step-data';
 import { GeneratePreviewCommand } from './generate-preview.command';
 import { createMockPayloadFromSchema } from '../../util/utils';
 import { PrepareAndValidateContentUsecase } from '../validate-content/prepare-and-validate-content/prepare-and-validate-content.usecase';
+import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
+import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
@@ -33,7 +36,8 @@ export class GeneratePreviewUsecase {
     private buildStepDataUsecase: BuildStepDataUsecase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private readonly logger: PinoLogger,
-    private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase
+    private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase,
+    private buildPayloadSchema: BuildPayloadSchema
   ) {}
 
   @InstrumentUsecase()
@@ -42,13 +46,25 @@ export class GeneratePreviewUsecase {
       const { previewPayload: commandVariablesExample, controlValues: commandControlValues } =
         command.generatePreviewRequestDto;
       const stepData = await this.getStepData(command);
+      const controlValues = commandControlValues || stepData.controls.values || {};
       const workflow = await this.findWorkflow(command);
+      const payloadSchema = await this.buildPayloadSchema.execute(
+        BuildPayloadSchemaCommand.create({
+          environmentId: command.user.environmentId,
+          organizationId: command.user.organizationId,
+          userId: command.user._id,
+          workflowId: command.workflowIdOrInternalId,
+          controlValues,
+        })
+      );
+
+      const res = this.buildVariablesSchema(stepData.variables, payloadSchema);
       const preparedAndValidatedContent = await this.prepareAndValidateContentUsecase.execute({
         user: command.user,
         previewPayloadFromDto: commandVariablesExample,
-        controlValues: commandControlValues || stepData.controls.values || {},
+        controlValues,
         controlDataSchema: stepData.controls.dataSchema || {},
-        variableSchema: stepData.variables,
+        variableSchema: res,
       });
       const variablesExample = this.buildVariablesExample(
         workflow,
@@ -93,6 +109,19 @@ export class GeneratePreviewUsecase {
         previewPayloadExample: {},
       } as any;
     }
+  }
+
+  /**
+   * Merges the payload schema into the variables schema to enable proper validation
+   * and sanitization of control values in the prepareAndValidateContentUsecase.
+   */
+  @Instrument()
+  private buildVariablesSchema(variables: Record<string, unknown>, payloadSchema: JSONSchemaDto) {
+    if (Object.keys(payloadSchema).length === 0) {
+      return variables;
+    }
+
+    return _.merge(variables, { properties: { payload: payloadSchema } });
   }
 
   @Instrument()

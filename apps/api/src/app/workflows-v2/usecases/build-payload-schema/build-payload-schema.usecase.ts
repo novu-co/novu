@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ControlValuesRepository } from '@novu/dal';
+import { ControlValuesEntity, ControlValuesRepository } from '@novu/dal';
 import { ControlValuesLevelEnum, JSONSchemaDto } from '@novu/shared';
 import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { flattenObjectValues } from '../../util/utils';
@@ -14,14 +14,9 @@ export class BuildPayloadSchema {
 
   @InstrumentUsecase()
   async execute(command: BuildPayloadSchemaCommand): Promise<JSONSchemaDto> {
-    const controlValues = await this.controlValuesRepository.find({
-      _environmentId: command.environmentId,
-      _organizationId: command.organizationId,
-      _workflowId: command.workflowId,
-      level: ControlValuesLevelEnum.STEP_CONTROLS,
-    });
+    const controlValues = await this.buildControlValues(command);
 
-    if (!controlValues?.length) {
+    if (!controlValues.length) {
       return {};
     }
 
@@ -38,13 +33,28 @@ export class BuildPayloadSchema {
     return convertJsonToSchemaWithDefaults(variablesExample);
   }
 
-  @Instrument()
-  private extractTemplateVariables(controlValues: Array<{ controls: unknown | null }>): string[] {
-    const flattenedControls = controlValues
-      .map((item) => item.controls)
-      .filter((control): control is NonNullable<typeof control> => control != null);
+  private async buildControlValues(command: BuildPayloadSchemaCommand) {
+    let aggregateControlValues = command.controlValues ? [command.controlValues] : [];
 
-    const concatenatedControlValues = flattenedControls.map(flattenObjectValues).flat().join(' ');
+    if (!aggregateControlValues.length) {
+      aggregateControlValues = (
+        await this.controlValuesRepository.find({
+          _environmentId: command.environmentId,
+          _organizationId: command.organizationId,
+          _workflowId: command.workflowId,
+          level: ControlValuesLevelEnum.STEP_CONTROLS,
+        })
+      )
+        .map((item) => item.controls)
+        .filter((control): control is NonNullable<typeof control> => control != null);
+    }
+
+    return aggregateControlValues;
+  }
+
+  @Instrument()
+  private extractTemplateVariables(aggregateControlValues: Record<string, unknown>[]): string[] {
+    const concatenatedControlValues = aggregateControlValues.map(flattenObjectValues).flat().join(' ');
 
     return extractLiquidTemplateVariables(concatenatedControlValues).validVariables;
   }
