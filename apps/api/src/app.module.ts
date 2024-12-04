@@ -9,7 +9,7 @@ import { ForwardReference } from '@nestjs/common/interfaces/modules/forward-refe
 import { isClerkEnabled } from '@novu/shared';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { ApiExcludeController } from '@nestjs/swagger';
-import { usageLimitsWorkflow } from '@novu/notifications';
+import { usageInsightsWorkflow, usageLimitsWorkflow } from '@novu/notifications';
 import packageJson from '../package.json';
 import { SharedModule } from './app/shared/shared.module';
 import { UserModule } from './app/user/user.module';
@@ -167,7 +167,7 @@ modules.push(
         process.env.NOVU_STRICT_AUTHENTICATION_ENABLED === 'true',
     }),
     controllerDecorators: [ApiExcludeController()],
-    workflows: [usageLimitsWorkflow],
+    workflows: [usageLimitsWorkflow, usageInsightsWorkflow],
   })
 );
 
