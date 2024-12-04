@@ -16,6 +16,7 @@ import { useMutation } from '@tanstack/react-query';
 import * as Sentry from '@sentry/react';
 import { useOrganization } from '@clerk/clerk-react';
 import { AnimatedPage } from '@/components/onboarding/animated-page';
+import { Helmet } from 'react-helmet-async';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -42,19 +43,10 @@ export function UsecaseSelectPage() {
   const [hoveredUseCase, setHoveredUseCase] = useState<ChannelTypeEnum | null>(null);
 
   useEffect(() => {
-    // Preload all usecase images
-    channelOptions.forEach((option) => {
-      const img = new Image();
-      img.src = `/images/auth/${option.image}`;
-    });
-  }, []);
-
-  useEffect(() => {
     track(TelemetryEvent.USECASE_SELECT_PAGE_VIEWED);
   }, [track]);
 
   useEffect(() => {
-    console.log('organization', organization?.publicMetadata);
     if (organization?.publicMetadata?.useCases) {
       setSelectedUseCases(organization.publicMetadata.useCases as ChannelTypeEnum[]);
     }
@@ -109,6 +101,11 @@ export function UsecaseSelectPage() {
 
   return (
     <>
+      <Helmet>
+        {channelOptions.map((option) => (
+          <link key={option.id} rel="prefetch" href={`/images/auth/${option.image}`} as="image" />
+        ))}
+      </Helmet>
       <PageMeta title="Customize you experience" />
       <motion.div
         initial="hidden"

@@ -102,21 +102,21 @@ export function InboxPlayground() {
   }, [telemetry]);
 
   useEffect(() => {
-    if (!data || isLoading) return;
+    if (!data) return;
 
     /**
      * We only want to create the demo workflow if it doesn't exist yet.
      * This workflow will be used by the inbox preview examples
      */
     const initializeDemoWorkflow = async () => {
-      const workflow = data?.workflows.find((workflow) => workflow.workflowId === ONBOARDING_DEMO_WORKFLOW_ID);
+      const workflow = data?.workflows.find((workflow) => workflow.workflowId?.includes(ONBOARDING_DEMO_WORKFLOW_ID));
       if (!workflow) {
         await createDemoWorkflow();
       }
     };
 
     initializeDemoWorkflow();
-  }, [data, isLoading]);
+  }, [data]);
 
   const handleSendNotification = async () => {
     try {
