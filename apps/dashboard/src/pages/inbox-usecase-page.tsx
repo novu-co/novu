@@ -4,6 +4,7 @@ import { InboxPlayground } from '../components/auth/inbox-playground';
 import { useTelemetry } from '../hooks/use-telemetry';
 import { TelemetryEvent } from '../utils/telemetry';
 import { useEffect } from 'react';
+import { AnimatedPage } from '@/components/onboarding/animated-page';
 
 export function InboxUsecasePage() {
   const telemetry = useTelemetry();
@@ -13,12 +14,11 @@ export function InboxUsecasePage() {
   }, [telemetry]);
 
   return (
-    <>
+    <AnimatedPage>
       <PageMeta title="Integrate with the Inbox component" />
-
       <AuthCard>
         <InboxPlayground />
       </AuthCard>
-    </>
+    </AnimatedPage>
   );
 }

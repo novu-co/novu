@@ -15,6 +15,7 @@ import { channelOptions } from '../components/auth/usecases-list.utils';
 import { useMutation } from '@tanstack/react-query';
 import * as Sentry from '@sentry/react';
 import { useOrganization } from '@clerk/clerk-react';
+import { AnimatedPage } from '@/components/onboarding/animated-page';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -101,66 +102,67 @@ export function UsecaseSelectPage() {
   return (
     <>
       <PageMeta title="Customize you experience" />
-
       <motion.div
-        className="flex min-h-screen w-full items-center justify-center"
         initial="hidden"
         animate="visible"
+        className="flex h-full w-full items-center justify-center"
         variants={containerVariants}
       >
-        <AuthCard className="flex h-full min-h-[600px]">
-          <motion.div className="flex w-[480px] justify-center px-0" variants={itemVariants}>
-            <form onSubmit={handleSubmit} noValidate>
-              <div className="flex max-w-[480px] flex-col items-center justify-center gap-8 p-[60px]">
-                <UsecaseSelectOnboarding
-                  channelOptions={channelOptions}
-                  selectedUseCases={selectedUseCases}
-                  onHover={(id) => setHoveredUseCase(id)}
-                  onClick={(id) => handleSelectUseCase(id)}
-                />
+        <AnimatedPage className="flex w-full justify-center">
+          <AuthCard className="flex h-full min-h-[600px]">
+            <motion.div className="flex w-[480px] justify-center px-0" variants={itemVariants}>
+              <form onSubmit={handleSubmit} noValidate>
+                <div className="flex max-w-[480px] flex-col items-center justify-center gap-8 p-[60px]">
+                  <UsecaseSelectOnboarding
+                    channelOptions={channelOptions}
+                    selectedUseCases={selectedUseCases}
+                    onHover={(id) => setHoveredUseCase(id)}
+                    onClick={(id) => handleSelectUseCase(id)}
+                  />
 
-                <motion.div className="flex w-full flex-col items-center gap-3" variants={itemVariants}>
-                  <Button
-                    disabled={selectedUseCases.length === 0}
-                    isLoading={isPending}
-                    className="w-full"
-                    type="submit"
-                  >
-                    Continue
-                  </Button>
-                  <Button type="button" variant="link" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
-                    Skip to Homepage
-                  </Button>
-                </motion.div>
-              </div>
-            </form>
-          </motion.div>
+                  <motion.div className="flex w-full flex-col items-center gap-3" variants={itemVariants}>
+                    <Button
+                      disabled={selectedUseCases.length === 0}
+                      isLoading={isPending}
+                      className="w-full"
+                      type="submit"
+                    >
+                      Continue
+                    </Button>
+                    <Button type="button" variant="link" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
+                      Skip to Homepage
+                    </Button>
+                  </motion.div>
+                </div>
+              </form>
+            </motion.div>
 
-          <motion.div
-            className="flex min-h-[600px] w-full max-w-[640px] flex-1 items-center justify-center border-l border-l-neutral-200 bg-white px-10"
-            variants={itemVariants}
-          >
-            <AnimatePresence mode="wait">
-              {displayedUseCase && (
-                <motion.img
-                  key={displayedUseCase}
-                  src={`/images/auth/${channelOptions.find((option) => option.id === displayedUseCase)?.image}`}
-                  alt={`${displayedUseCase}-usecase-illustration`}
-                  className="h-auto max-h-[500px] w-full object-contain"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{
-                    duration: 0.2,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                />
-              )}
+            <motion.div
+              className="flex min-h-[600px] w-full max-w-[640px] flex-1 items-center justify-center border-l border-l-neutral-200 bg-white px-10"
+              variants={itemVariants}
+            >
+              <AnimatePresence mode="wait">
+                {displayedUseCase && (
+                  <motion.img
+                    key={displayedUseCase}
+                    src={`/images/auth/${channelOptions.find((option) => option.id === displayedUseCase)?.image}`}
+                    alt={`${displayedUseCase}-usecase-illustration`}
+                    className="h-auto max-h-[500px] w-full object-contain"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{
+                      duration: 0.2,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                  />
+                )}
 
-              {!displayedUseCase && <EmptyStateView />}
-            </AnimatePresence>
-          </motion.div>
-        </AuthCard>
+                {!displayedUseCase && <EmptyStateView />}
+              </AnimatePresence>
+            </motion.div>
+          </AuthCard>
+        </AnimatedPage>
       </motion.div>
     </>
   );

@@ -209,7 +209,7 @@ export function QuestionnaireForm() {
                         opacity: submitQuestionnaireMutation.isPending ? 0 : 1,
                       }}
                     >
-                      Get started
+                      Continue
                     </motion.span>
                   </Button>
                 </motion.div>

@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import ErrorPage from '@/components/error-page';
 import { RootRoute, AuthRoute, DashboardRoute, CatchAllRoute } from './routes';
+import { OnboardingParentRoute } from './routes/onboarding';
 import {
   WorkflowsPage,
   SignInPage,
@@ -53,6 +54,12 @@ const router = createBrowserRouter([
             path: ROUTES.SIGNUP_QUESTIONNAIRE,
             element: <QuestionnairePage />,
           },
+        ],
+      },
+      {
+        path: '/onboarding',
+        element: <OnboardingParentRoute />,
+        children: [
           {
             path: ROUTES.USECASE_SELECT,
             element: <UsecaseSelectPage />,
