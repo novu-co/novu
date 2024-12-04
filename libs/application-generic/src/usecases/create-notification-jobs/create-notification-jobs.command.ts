@@ -6,7 +6,7 @@ import {
   ISubscribersDefine,
   ITenantDefine,
   ProvidersIdEnum,
-  StatelessWorkflowToStepControlValues,
+  StatelessControls,
   WorkflowPreferences,
 } from '@novu/shared';
 
@@ -47,7 +47,7 @@ export class CreateNotificationJobsCommand extends EnvironmentWithUserCommand {
 
   bridgeUrl?: string;
 
-  controls?: StatelessWorkflowToStepControlValues;
+  controls?: StatelessControls;
 
   preferences?: WorkflowPreferences;
 }

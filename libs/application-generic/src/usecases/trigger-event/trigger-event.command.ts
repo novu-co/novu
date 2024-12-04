@@ -9,7 +9,7 @@ import {
 
 import {
   AddressingTypeEnum,
-  StatelessWorkflowToStepControlValues,
+  StatelessControls,
   TriggerRecipientsPayload,
   TriggerRecipientSubscriber,
   TriggerRequestCategoryEnum,
@@ -55,7 +55,7 @@ export class TriggerEventBaseCommand extends EnvironmentWithUserCommand {
   @IsOptional()
   bridgeWorkflow?: DiscoverWorkflowOutput;
 
-  controls?: StatelessWorkflowToStepControlValues;
+  controls?: StatelessControls;
 }
 
 export class TriggerEventMulticastCommand extends TriggerEventBaseCommand {

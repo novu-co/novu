@@ -24,7 +24,7 @@ describe('Cancel event - /v1/events/trigger/:transactionId (DELETE)', function (
 
   async function cancelEvent(transactionId: string | undefined) {
     if (!transactionId) {
-      throw new Error('id missing to cancel');
+      throw new Error('Missing transactionId');
     }
     await novuClient.cancel(transactionId);
   }

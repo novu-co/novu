@@ -3,7 +3,7 @@ import { IsDefined, IsEnum, IsMongoId, IsOptional, IsString, ValidateNested } fr
 import {
   ISubscribersDefine,
   ITenantDefine,
-  StatelessWorkflowToStepControlValues,
+  StatelessControls,
   SubscriberSourceEnum,
   TriggerRequestCategoryEnum,
 } from '@novu/shared';
@@ -50,7 +50,7 @@ export class SubscriberJobBoundCommand extends EnvironmentWithUserCommand {
 
   bridge?: { url: string; workflow: DiscoverWorkflowOutput };
 
-  controls?: StatelessWorkflowToStepControlValues;
+  controls?: StatelessControls;
 
   @IsDefined()
   @IsString()

@@ -1,6 +1,6 @@
 import {
   AddressingTypeEnum,
-  StatelessWorkflowToStepControlValues,
+  StatelessControls,
   TriggerRecipientsPayload,
   TriggerRecipientSubscriber,
   TriggerRequestCategoryEnum,
@@ -36,7 +36,7 @@ export type IWorkflowDataDto = {
   requestCategory?: TriggerRequestCategoryEnum;
   bridgeUrl?: string;
   bridgeWorkflow?: DiscoverWorkflowOutput;
-  controls?: StatelessWorkflowToStepControlValues;
+  controls?: StatelessControls;
 } & Addressing;
 
 export interface IWorkflowJobDto extends IJobParams {

@@ -138,7 +138,7 @@ export class EventsController {
       In the future could be used to trigger events to a subset of subscribers based on defined filters.`,
   })
   @ApiCreatedResponse({
-    description: 'The trigger event has been successfully created.',
+    description: 'Broadcast request has been registered successfully ',
     type: TriggerEventResponseDto, // Specify the response type
   })
   async broadcastEventToAll(

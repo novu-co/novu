@@ -1,4 +1,4 @@
-import { ISubscribersDefine, StatelessWorkflowToStepControlValues, StepTypeEnum } from '@novu/shared';
+import { ISubscribersDefine, StatelessControls, StepTypeEnum } from '@novu/shared';
 
 import { NotificationTemplateEntity } from '../notification-template';
 import type { OrganizationId } from '../organization';
@@ -37,7 +37,7 @@ export class NotificationEntity {
   createdAt?: string;
   updatedAt?: string;
   tags?: string[];
-  controls?: StatelessWorkflowToStepControlValues;
+  controls?: StatelessControls;
 }
 
 export type NotificationDBModel = ChangePropsValueType<

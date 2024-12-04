@@ -28,7 +28,7 @@ export class TriggerEventResponseDto {
   error?: string[];
 
   @ApiProperty({
-    description: 'Transaction ID for the trigger',
+    description: 'The returned transaction ID of the trigger',
     type: String, // Specify that this is a string
     required: false, // Not required since it's optional
   })

@@ -1,7 +1,7 @@
 import { IsDefined, IsEnum, IsOptional, IsString, ValidateIf, ValidateNested } from 'class-validator';
 import {
   AddressingTypeEnum,
-  StatelessWorkflowToStepControlValues,
+  StatelessControls,
   TriggerRecipients,
   TriggerRecipientSubscriber,
   TriggerRequestCategoryEnum,
@@ -49,7 +49,7 @@ export class ParseEventRequestBaseCommand extends EnvironmentWithUserCommand {
    * @type {Record<stepId, Data>}
    * @optional
    */
-  controls?: StatelessWorkflowToStepControlValues;
+  controls?: StatelessControls;
 }
 
 export class ParseEventRequestMulticastCommand extends ParseEventRequestBaseCommand {
