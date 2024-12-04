@@ -185,6 +185,13 @@ export default function UsageInsightsEmail(props: IUsageEmailData & { marketingC
       </Preview>
       <Tailwind>
         <Body className="bg-gray-50 font-sans">
+          <Img
+            src={`https://dashboard.novu.co/static/images/novu-colored-text.png`}
+            width="119"
+            height="37"
+            alt="Novu"
+            className="mx-auto my-[32px]"
+          />
           <Container className="mx-auto w-full">
             <Section className="rounded-t-lg bg-indigo-600 px-6 py-8">
               <Heading className="text-center text-2xl font-bold text-white">Usage Insights Report</Heading>
