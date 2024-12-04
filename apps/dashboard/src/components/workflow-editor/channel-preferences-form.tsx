@@ -22,6 +22,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '../primitives
 import { Separator } from '../primitives/separator';
 import { Step } from '../primitives/step';
 import { Switch } from '../primitives/switch';
+import { useTelemetry } from '@/hooks';
+import { TelemetryEvent } from '@/utils/telemetry';
 
 type ConfigureWorkflowFormProps = {
   workflow: WorkflowResponseDto;
@@ -50,6 +52,7 @@ const checkIsEveryChannelSameValue = (
 
 export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
   const { workflow, update } = props;
+  const track = useTelemetry();
 
   const { formDataToRender, isDefaultPreferences, isDashboardWorkflow } = useMemo(() => {
     const isDefaultPreferences = workflow.preferences.user === null;
@@ -201,6 +204,9 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
                               if (!checked) {
                                 updateUserPreference(null);
                               }
+                              track(TelemetryEvent.WORKFLOW_PREFERENCES_OVERRIDE_USED, {
+                                new_status: checked,
+                              });
                             }}
                             disabled={isDashboardWorkflow}
                           />
