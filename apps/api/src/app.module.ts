@@ -49,6 +49,7 @@ import { WorkflowModule } from './app/workflows-v2/workflow.module';
 import { WorkflowModuleV1 } from './app/workflows-v1/workflow-v1.module';
 import { EnvironmentsModuleV1 } from './app/environments-v1/environments-v1.module';
 import { EnvironmentsModule } from './app/environments-v2/environments.module';
+import { InsightsModule } from './app/insights/insights.module';
 
 const enterpriseImports = (): Array<Type | DynamicModule | Promise<DynamicModule> | ForwardReference> => {
   const modules: Array<Type | DynamicModule | Promise<DynamicModule> | ForwardReference> = [];
@@ -115,6 +116,7 @@ const baseModules: Array<Type | DynamicModule | Promise<DynamicModule> | Forward
   WorkflowModule,
   EnvironmentsModule,
   NovuModule,
+  InsightsModule,
 ];
 
 const enterpriseModules = enterpriseImports();
