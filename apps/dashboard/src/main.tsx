@@ -27,6 +27,7 @@ import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workfl
 import { EditStep } from '@/components/workflow-editor/steps/edit-step';
 import { InboxEmbedSuccessPage } from './pages/inbox-embed-success-page';
 import { ChannelPreferences } from './components/workflow-editor/channel-preferences';
+import { InboxEmbedSuccessPage } from './pages/inbox-embed-success-page';
 
 initializeSentry();
 overrideZodErrorMap();
