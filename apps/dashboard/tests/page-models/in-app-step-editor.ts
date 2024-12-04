@@ -1,9 +1,14 @@
 import { expect, type Page } from '@playwright/test';
+import os from 'node:os';
+
+const isMac = os.platform() === 'darwin';
+const modifier = isMac ? 'Meta' : 'Control';
 
 export class InAppStepEditor {
   constructor(private page: Page) {}
 
   async waitInAppStepEditorNavigation(stepName: string): Promise<void> {
+    await this.page.waitForResponse('**/v2/workflows/**/steps/**');
     await expect(this.page).toHaveTitle(`Edit ${stepName} | Novu Cloud Dashboard`);
   }
 
@@ -23,14 +28,16 @@ export class InAppStepEditor {
     const subjectField = await this.page.locator('div[contenteditable="true"]', {
       hasText: 'Subject',
     });
-    await subjectField.click({ force: true });
+    await subjectField.click();
     await subjectField.fill(subject);
+    await this.page.waitForTimeout(50);
 
     const bodyField = await this.page.locator('div[contenteditable="true"]', {
       hasText: 'Body',
     });
-    await bodyField.click({ force: true });
+    await bodyField.click();
     await bodyField.fill(body);
+    await this.page.waitForTimeout(50);
 
     const actionDropdownTrigger = await this.page.getByTestId('in-app-action-dropdown-trigger');
     await actionDropdownTrigger.click();
@@ -46,11 +53,10 @@ export class InAppStepEditor {
     }
   }
 
-  async save(): Promise<void> {
-    const saveButton = await this.page.getByRole('button', { name: 'Save step' });
-    await saveButton.click();
+  async checkSaved(): Promise<void> {
+    await this.page.locator('header', { hasText: 'Configure Template' }).evaluate((e) => e.blur());
 
-    await this.page.waitForResponse('**/v2/workflows/**');
+    await expect(await this.page.locator('ol li:first-child', { hasText: 'Saved' })).toBeVisible();
   }
 
   async previewTabClick(): Promise<void> {
@@ -89,6 +95,7 @@ export class InAppStepEditor {
       hasText: oldValue,
     });
     await input.click({ force: true });
-    await input.fill(value);
+    await input.press(`${modifier}+KeyX`);
+    await this.page.keyboard.type(value);
   }
 }

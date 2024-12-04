@@ -4,7 +4,8 @@ import { Notification5Fill } from '@/components/icons';
 import { Separator } from '@/components/primitives/separator';
 import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
 import { InAppTabsSection } from '@/components/workflow-editor/steps/in-app/in-app-tabs-section';
-import { FormMessage } from '../../../primitives/form/form';
+import { FormMessagePure } from '../../../primitives/form/form';
+import { useFormContext } from 'react-hook-form';
 
 const avatarKey = 'avatar';
 const subjectKey = 'subject';
@@ -14,6 +15,9 @@ const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
 
 export const InAppEditor = ({ uiSchema }: { uiSchema?: UiSchema }) => {
+  const { getFieldState } = useFormContext();
+  const bodyError = getFieldState(bodyKey).error;
+
   if (!uiSchema || uiSchema?.group !== UiSchemaGroupEnum.IN_APP) {
     return null;
   }
@@ -44,7 +48,9 @@ export const InAppEditor = ({ uiSchema }: { uiSchema?: UiSchema }) => {
           {body && (
             <>
               {getComponentByType({ component: body.component })}
-              <FormMessage>{`Type {{ for variables, or wrap text in ** for bold.`}</FormMessage>
+              <FormMessagePure
+                error={bodyError ? String(bodyError.message) : undefined}
+              >{`Type {{ for variables, or wrap text in ** for bold.`}</FormMessagePure>
             </>
           )}
           {(primaryAction || secondaryAction) &&

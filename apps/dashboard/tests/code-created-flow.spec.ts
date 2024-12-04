@@ -61,16 +61,16 @@ test('code defined workflow user journey', async ({ page }) => {
 
   const stepConfigSidebar = new StepConfigSidebar(page);
   await stepConfigSidebar.waitStepConfigSidebarNavigation(inAppStepId);
-  await stepConfigSidebar.verifyStepNameInput({ stepIndex: 0, stepName: inAppStepId, disabled: true });
-  await stepConfigSidebar.verifyStepIdentifierInput({ stepIndex: 0, stepId: inAppStepId, isReadOnly: true });
+  await stepConfigSidebar.verifyStepNameInput({ stepName: inAppStepId, disabled: true });
+  await stepConfigSidebar.verifyStepIdentifierInput({ stepId: inAppStepId, isReadOnly: true });
   await stepConfigSidebar.configureTemplateClick();
 
   const inAppStepEditor = new InAppStepEditor(page);
   await inAppStepEditor.waitInAppStepEditorNavigation(inAppStepId);
   // TODO fix the default value to John when the bug is fixed
-  await inAppStepEditor.verifyCustomControlsForm({ customControls: [{ name: 'Name', defaultValue: 'Name' }] });
-  await inAppStepEditor.fillCustomControlField({ value: 'Tim', oldValue: 'Name' });
-  await inAppStepEditor.save();
+  await inAppStepEditor.verifyCustomControlsForm({ customControls: [{ name: 'Name', defaultValue: 'John' }] });
+  await inAppStepEditor.fillCustomControlField({ value: 'Tim', oldValue: 'John' });
+  await inAppStepEditor.checkSaved();
   await inAppStepEditor.previewTabClick();
   await inAppStepEditor.checkPreview({ subject: `Hi Tim! You've been invited to join the Novu project`, body });
   await inAppStepEditor.close();

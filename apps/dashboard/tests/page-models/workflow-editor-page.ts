@@ -34,7 +34,7 @@ export class WorkflowEditorPage {
       });
     }
 
-    const descriptionTextArea = await this.page.getByPlaceholder('Description of what this workflow does');
+    const descriptionTextArea = await this.page.locator('textarea[name="description"]');
     await expect(await descriptionTextArea.inputValue()).toEqual(workflowDescription);
   }
 

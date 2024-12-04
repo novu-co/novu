@@ -13,10 +13,7 @@ export class TriggerWorkflowPage {
   }
 
   async checkSuccessfulToastShown(): Promise<void> {
-    const toastItem = await this.page
-      .getByRole('listitem')
-      .filter({ hasText: 'Test workflow triggered successfully' })
-      .first();
+    const toastItem = await this.page.getByRole('listitem').filter({ hasText: 'Test workflow succeeded' }).first();
     await expect(toastItem).toBeVisible();
   }
 }

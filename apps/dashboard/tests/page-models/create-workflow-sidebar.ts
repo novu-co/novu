@@ -58,7 +58,7 @@ export class CreateWorkflowSidebar {
     }
 
     // fill the description
-    const descriptionTextArea = await this.page.getByPlaceholder('Description of what this workflow does');
+    const descriptionTextArea = await this.page.getByPlaceholder('Describe what this workflow does');
     await descriptionTextArea.click();
     await descriptionTextArea.fill(workflowDescription);
   }

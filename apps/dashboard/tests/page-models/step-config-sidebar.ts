@@ -7,30 +7,20 @@ export class StepConfigSidebar {
     await expect(this.page).toHaveTitle(`Configure ${stepName} | Novu Cloud Dashboard`);
   }
 
-  async verifyStepNameInput({
-    stepIndex,
-    stepName,
-    disabled = false,
-  }: {
-    stepIndex: number;
-    stepName: string;
-    disabled?: boolean;
-  }): Promise<void> {
-    const stepNameInput = await this.page.locator(`input[name="steps.${stepIndex}.name"]`);
+  async verifyStepNameInput({ stepName, disabled = false }: { stepName: string; disabled?: boolean }): Promise<void> {
+    const stepNameInput = await this.page.locator(`input[name="name"]`);
     await expect(await stepNameInput.inputValue()).toEqual(stepName);
     await expect(await stepNameInput.isDisabled()).toEqual(disabled);
   }
 
   async verifyStepIdentifierInput({
-    stepIndex,
     stepId,
     isReadOnly = false,
   }: {
-    stepIndex: number;
     stepId: string;
     isReadOnly?: boolean;
   }): Promise<void> {
-    const stepIdentifierInput = await this.page.locator(`input[name="steps.${stepIndex}.stepId"]`);
+    const stepIdentifierInput = await this.page.locator(`input[name="stepId"]`);
     await expect(await stepIdentifierInput.inputValue()).toEqual(stepId);
     await expect(await stepIdentifierInput.getAttribute('readonly')).toEqual(isReadOnly ? '' : null);
   }

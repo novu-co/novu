@@ -68,7 +68,7 @@ test('dashboard defined workflow user journey', async ({ page }) => {
     body,
     action: 'both',
   });
-  await inAppStepEditor.save();
+  await inAppStepEditor.checkSaved();
   await inAppStepEditor.previewTabClick();
   // TODO: add assertions for the primary and secondary actions
   await inAppStepEditor.checkPreview({
