@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { StepDataDto } from '@novu/shared';
+import type { StepDataDto, StepUpdateDto } from '@novu/shared';
 
 import { QueryKeys } from '@/utils/query-keys';
 import { useEnvironment } from '@/context/environment/hooks';
@@ -27,8 +27,15 @@ export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string;
   });
 
   const updateStepCache = useCallback(
-    (newStep: Partial<StepDataDto>) =>
-      client.setQueryData(queryKey, (oldData: StepDataDto | undefined) => ({ ...oldData, ...newStep })),
+    (newStep: Partial<StepUpdateDto>) => {
+      const oldData = client.getQueryData<StepDataDto>(queryKey);
+      const newStepData: Partial<StepDataDto> = {
+        ...oldData,
+        name: newStep.name,
+        ...(newStep.controlValues ? { controls: { ...oldData?.controls, values: newStep.controlValues } } : {}),
+      };
+      client.setQueryData(queryKey, newStepData);
+    },
     [client, queryKey]
   );
 

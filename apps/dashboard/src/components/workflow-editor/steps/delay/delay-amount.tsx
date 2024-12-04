@@ -24,7 +24,10 @@ export const DelayAmount = () => {
       <FormLabel tooltip="Delays workflow for the set time, then proceeds to the next step.">
         Delay execution by
       </FormLabel>
-      <NumberInputWithSelect fields={{ inputKey: amountKey, selectKey: unitKey }} options={unitOptions} />
+      <NumberInputWithSelect
+        fields={{ inputKey: `controlValues.${amountKey}`, selectKey: `controlValues.${unitKey}` }}
+        options={unitOptions}
+      />
     </div>
   );
 };

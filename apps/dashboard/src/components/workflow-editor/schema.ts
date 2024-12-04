@@ -23,10 +23,12 @@ export const workflowSchema = z.object({
   description: z.string().max(MAX_DESCRIPTION_LENGTH).optional(),
 });
 
-export const stepSchema = z.object({
-  name: z.string().min(1).max(MAX_NAME_LENGTH),
-  stepId: z.string(),
-});
+export const buildStepSchema = (controlsSchema?: z.ZodObject<any>) =>
+  z.object({
+    name: z.string().min(1).max(MAX_NAME_LENGTH),
+    stepId: z.string(),
+    ...(controlsSchema ? { controlValues: controlsSchema } : {}),
+  });
 
 export const buildDynamicFormSchema = ({
   to,

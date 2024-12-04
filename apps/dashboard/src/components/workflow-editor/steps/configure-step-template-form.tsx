@@ -6,11 +6,12 @@ import {
   type StepDataDto,
   StepIssuesDto,
   StepTypeEnum,
+  StepUpdateDto,
   UpdateWorkflowDto,
   type WorkflowResponseDto,
 } from '@novu/shared';
 
-import { flattenIssues, updateStepControlValuesInWorkflow } from '@/components/workflow-editor/step-utils';
+import { flattenIssues, updateStepInWorkflow } from '@/components/workflow-editor/step-utils';
 import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
 import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
 import { OtherStepTabs } from './other-steps-tabs';
@@ -68,8 +69,12 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
     previousData: defaultValues,
     form,
     save: (data) => {
-      update(updateStepControlValuesInWorkflow(workflow, step, data));
-      updateStepCache(data);
+      // tranform form fields to step update dto
+      const updateStepData: Partial<StepUpdateDto> = {
+        controlValues: data,
+      };
+      update(updateStepInWorkflow(workflow, step.stepId, updateStepData));
+      updateStepCache(updateStepData);
     },
   });
 

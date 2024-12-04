@@ -3,16 +3,17 @@ import {
   IEnvironment,
   StepDataDto,
   StepIssuesDto,
+  StepTypeEnum,
+  StepUpdateDto,
   UpdateWorkflowDto,
   WorkflowOriginEnum,
   WorkflowResponseDto,
 } from '@novu/shared';
 import { motion } from 'motion/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiCloseFill, RiDeleteBin2Line, RiPencilRuler2Fill } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
-import { z } from 'zod';
 
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { PageMeta } from '@/components/page-meta';
@@ -23,8 +24,9 @@ import { Input, InputField } from '@/components/primitives/input';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarContent, SidebarFooter, SidebarHeader } from '@/components/side-navigation/sidebar';
 import TruncatedText from '@/components/truncated-text';
-import { stepSchema } from '@/components/workflow-editor/schema';
+import { buildStepSchema } from '@/components/workflow-editor/schema';
 import {
+  flattenIssues,
   getFirstBodyErrorMessage,
   getFirstControlsErrorMessage,
   updateStepInWorkflow,
@@ -39,7 +41,30 @@ import {
 } from '@/utils/constants';
 import { STEP_NAME_BY_TYPE } from './step-provider';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { ConfigureStepInlineForm } from '@/components/workflow-editor/steps/configure-inline/configure-step-inline-form';
+import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
+import { buildDefaultValues } from '@/utils/schema';
+import merge from 'lodash.merge';
+import { DelayControlValues } from '@/components/workflow-editor/steps/delay/delay-control-values';
+
+const STEP_TYPE_TO_CONTROL_VALUES_FORM: Record<StepTypeEnum, () => React.JSX.Element | null> = {
+  [StepTypeEnum.DELAY]: DelayControlValues,
+  [StepTypeEnum.IN_APP]: () => null,
+  [StepTypeEnum.EMAIL]: () => null,
+  [StepTypeEnum.SMS]: () => null,
+  [StepTypeEnum.CHAT]: () => null,
+  [StepTypeEnum.PUSH]: () => null,
+  [StepTypeEnum.CUSTOM]: () => null,
+  [StepTypeEnum.TRIGGER]: () => null,
+  [StepTypeEnum.DIGEST]: () => null,
+};
+
+const calculateDefaultControlsValues = (step: StepDataDto) => {
+  if (Object.keys(step.controls.uiSchema ?? {}).length !== 0) {
+    return merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values);
+  }
+
+  return merge(buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {}), step.controls.values);
+};
 
 type ConfigureStepFormProps = {
   workflow: WorkflowResponseDto;
@@ -67,22 +92,50 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     navigate(buildRoute(ROUTES.EDIT_WORKFLOW, { environmentSlug: environment.slug!, workflowSlug: workflow.slug }));
   };
 
-  const form = useForm<z.infer<typeof stepSchema>>({
-    defaultValues: {
+  const registerInlineControlValues = useMemo(() => {
+    return (step: StepDataDto) => {
+      if (isInlineConfigurableStep) {
+        return {
+          controlValues: calculateDefaultControlsValues(step),
+        };
+      }
+
+      return {};
+    };
+  }, [isInlineConfigurableStep]);
+
+  const controlsSchema = useMemo(
+    () => (isInlineConfigurableStep ? buildDynamicZodSchema(step.controls.dataSchema ?? {}) : undefined),
+    [step.controls.dataSchema, isInlineConfigurableStep]
+  );
+
+  const defaultValues = useMemo(
+    () => ({
       name: step.name,
       stepId: step.stepId,
-    },
-    resolver: zodResolver(stepSchema),
+      ...registerInlineControlValues(step),
+    }),
+    [step, registerInlineControlValues]
+  );
+
+  const form = useForm({
+    defaultValues,
+    resolver: zodResolver(buildStepSchema(controlsSchema)),
     shouldFocusError: false,
   });
 
   const { onBlur } = useFormAutosave({
-    previousData: step,
+    previousData: defaultValues,
     form,
     isReadOnly,
     save: (data) => {
-      update(updateStepInWorkflow(workflow, data));
-      updateStepCache(data);
+      // tranform form fields to step update dto
+      const updateStepData: Partial<StepUpdateDto> = {
+        name: data.name,
+        ...(data.controlValues ? { controlValues: data.controlValues } : {}),
+      };
+      update(updateStepInWorkflow(workflow, step.stepId, updateStepData));
+      updateStepCache(updateStepData);
     },
   });
 
@@ -91,6 +144,17 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
       step.issues ? getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues) : undefined,
     [step]
   );
+
+  const setControlValuesIssues = useCallback(() => {
+    const stepIssues = flattenIssues(issues?.controls);
+    Object.entries(stepIssues).forEach(([key, value]) => {
+      form.setError(`controlValues.${key}`, { message: value });
+    });
+  }, [form, issues]);
+
+  useEffect(() => {
+    setControlValuesIssues();
+  }, [setControlValuesIssues]);
 
   return (
     <>
@@ -165,19 +229,11 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                 )}
               />
             </SidebarContent>
+
+            {isInlineConfigurableStep && <InlineConfigurableStep step={step} />}
           </form>
         </Form>
         <Separator />
-
-        {isInlineConfigurableStep && (
-          <InlineConfigurableStep
-            workflow={workflow}
-            step={step}
-            issues={issues}
-            update={update}
-            updateStepCache={updateStepCache}
-          />
-        )}
 
         {isTemplateConfigurableStep && <TemplateConfigurableStep step={step} firstError={firstError} />}
 
@@ -240,31 +296,15 @@ const TemplateConfigurableStep = ({ step, firstError }: { step: StepDataDto; fir
   </>
 );
 
-const InlineConfigurableStep = ({
-  workflow,
-  step,
-  issues,
-  update,
-  updateStepCache,
-}: {
-  workflow: WorkflowResponseDto;
-  step: StepDataDto;
-  issues?: StepIssuesDto;
-  update: (data: UpdateWorkflowDto) => void;
-  updateStepCache: (step: Partial<StepDataDto>) => void;
-}) => {
+const InlineConfigurableStep = ({ step }: { step: StepDataDto }) => {
+  const ControlValuesForm = STEP_TYPE_TO_CONTROL_VALUES_FORM[step.type];
+
   return (
     <>
-      <SidebarContent>
-        <ConfigureStepInlineForm
-          workflow={workflow}
-          step={step}
-          issues={issues}
-          update={update}
-          updateStepCache={updateStepCache}
-        />
-      </SidebarContent>
       <Separator />
+      <SidebarContent>
+        <ControlValuesForm />
+      </SidebarContent>
     </>
   );
 };

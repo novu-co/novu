@@ -6,7 +6,7 @@ const amountKey = 'amount';
 const unitKey = 'unit';
 const typeKey = 'type';
 
-export const DelayForm = () => {
+export const DelayControlValues = () => {
   const { step } = useStep();
   const { uiSchema } = step?.controls ?? {};
 
