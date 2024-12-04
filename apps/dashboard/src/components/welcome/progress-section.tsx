@@ -126,13 +126,17 @@ function getStepRoute(stepId: StepIdEnum, environmentSlug: string = '') {
         isLegacy: false,
       };
     case StepIdEnum.CONNECT_EMAIL_PROVIDER:
-    case StepIdEnum.CONNECT_IN_APP_PROVIDER:
     case StepIdEnum.CONNECT_PUSH_PROVIDER:
     case StepIdEnum.CONNECT_CHAT_PROVIDER:
     case StepIdEnum.CONNECT_SMS_PROVIDER:
       return {
         path: LEGACY_ROUTES.INTEGRATIONS,
         isLegacy: true,
+      };
+    case StepIdEnum.CONNECT_IN_APP_PROVIDER:
+      return {
+        path: ROUTES.INBOX_EMBED,
+        isLegacy: false,
       };
     case StepIdEnum.INVITE_TEAM_MEMBER:
       return {

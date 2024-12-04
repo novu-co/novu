@@ -13,4 +13,8 @@ export class SessionCommand extends BaseCommand {
   @IsDefined()
   @IsString()
   readonly subscriberId: string;
+
+  @IsOptional()
+  @IsString()
+  readonly origin?: string;
 }

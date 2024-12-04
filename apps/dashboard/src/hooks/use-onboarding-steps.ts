@@ -3,6 +3,7 @@ import { useWorkflows } from './use-workflows';
 import { useOrganization } from '@clerk/clerk-react';
 import { ChannelTypeEnum, IIntegration } from '@novu/shared';
 import { useIntegrations } from './use-integrations';
+import { ONBOARDING_DEMO_WORKFLOW_ID } from '../config';
 
 export enum StepIdEnum {
   ACCOUNT_CREATION = 'account-creation',
@@ -10,7 +11,7 @@ export enum StepIdEnum {
   INVITE_TEAM_MEMBER = 'invite-team-member',
   SYNC_TO_PRODUCTION = 'sync-to-production',
   CONNECT_EMAIL_PROVIDER = 'connect-email-provider',
-  CONNECT_IN_APP_PROVIDER = 'connect-in-app-provider',
+  CONNECT_IN_APP_PROVIDER = 'connect-in_app-provider',
   CONNECT_PUSH_PROVIDER = 'connect-push-provider',
   CONNECT_CHAT_PROVIDER = 'connect-chat-provider',
   CONNECT_SMS_PROVIDER = 'connect-sms-provider',
@@ -46,7 +47,7 @@ function getProviderTitle(providerType: ChannelTypeEnum): string {
 
 function getProviderDescription(providerType: ChannelTypeEnum): string {
   return providerType === ChannelTypeEnum.IN_APP
-    ? 'Add an Inbox to your app'
+    ? 'Embed a full-featured Inbox in your app in minutes'
     : `Connect your provider to send ${providerType} notifications with Novu.`;
 }
 
@@ -59,13 +60,20 @@ function isActiveIntegration(integration: IIntegration, providerType: ChannelTyp
 }
 
 export function useOnboardingSteps(): OnboardingStepsResult {
-  const { data: workflows } = useWorkflows();
+  const workflows = useWorkflows();
   const { organization } = useOrganization();
   const { integrations } = useIntegrations();
 
   const hasInvitedTeamMember = useMemo(() => {
     return (organization?.membersCount ?? 0) > 1;
   }, [organization?.membersCount]);
+
+  const hasCreatedWorkflow = useMemo(() => {
+    return (
+      (workflows?.data?.workflows ?? []).filter((workflow) => workflow.workflowId !== ONBOARDING_DEMO_WORKFLOW_ID)
+        .length > 0
+    );
+  }, [workflows?.data?.workflows]);
 
   const providerType = useMemo(() => {
     const metadata = organization?.publicMetadata as OrganizationMetadata;
@@ -86,7 +94,7 @@ export function useOnboardingSteps(): OnboardingStepsResult {
         id: StepIdEnum.CREATE_A_WORKFLOW,
         title: 'Create a workflow',
         description: 'Workflows in Novu, orchestrate notifications across channels.',
-        status: workflows && workflows.totalCount > 0 ? 'completed' : 'in-progress',
+        status: hasCreatedWorkflow ? 'completed' : 'in-progress',
       },
       {
         id: `connect-${providerType}-provider` as StepIdEnum,
@@ -103,7 +111,7 @@ export function useOnboardingSteps(): OnboardingStepsResult {
         status: hasInvitedTeamMember ? 'completed' : 'pending',
       },
     ],
-    [workflows, hasInvitedTeamMember, providerType, integrations]
+    [hasInvitedTeamMember, providerType, integrations, hasCreatedWorkflow]
   );
 
   return {
