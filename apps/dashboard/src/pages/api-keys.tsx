@@ -1,12 +1,5 @@
 import { useState } from 'react';
-import {
-  RiKey2Line,
-  RiEyeLine,
-  RiEyeOffLine,
-  RiLockStarFill,
-  RiExternalLinkLine,
-  RiLockStarLine,
-} from 'react-icons/ri';
+import { RiKey2Line, RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 import { useEnvironment } from '@/context/environment/hooks';
 import { CopyButton } from '@/components/primitives/copy-button';
 import { Card, CardContent } from '@/components/primitives/card';
