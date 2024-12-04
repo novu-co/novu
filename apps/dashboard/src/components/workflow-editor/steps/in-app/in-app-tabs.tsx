@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useFormContext } from 'react-hook-form';
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
@@ -18,20 +17,11 @@ const tabsContentClassName = 'h-full w-full overflow-y-auto';
 export const InAppTabs = (props: StepEditorProps) => {
   const { workflow, step } = props;
   const { dataSchema, uiSchema } = step.controls;
-  const [formValues, setFormValues] = useState({});
   const form = useFormContext();
   const navigate = useNavigate();
 
   return (
-    <Tabs
-      defaultValue="editor"
-      className="flex h-full flex-1 flex-col"
-      onValueChange={(val) => {
-        if (val === 'preview') {
-          setFormValues(form.getValues());
-        }
-      }}
-    >
+    <Tabs defaultValue="editor" className="flex h-full flex-1 flex-col">
       <header className="flex flex-row items-center gap-3 px-3 py-1.5">
         <div className="mr-auto flex items-center gap-2.5 text-sm font-medium">
           <RiEdit2Line className="size-4" />
@@ -68,7 +58,7 @@ export const InAppTabs = (props: StepEditorProps) => {
         <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
       </TabsContent>
       <TabsContent value="preview" className={tabsContentClassName}>
-        <InAppEditorPreview workflow={workflow} step={step} formValues={formValues} />
+        <InAppEditorPreview workflow={workflow} step={step} formValues={form.getValues()} />
       </TabsContent>
       <Separator />
     </Tabs>
