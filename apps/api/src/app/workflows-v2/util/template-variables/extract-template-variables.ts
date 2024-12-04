@@ -71,7 +71,7 @@ function parseByLiquid(str: string): Set<string> {
  * "{{ username | append: 'hi' }}" => ["{{ username | append: 'hi' }}"]
  * "<input value='{{username}}'>" => ["{{username}}"]
  */
-function extractLiquidExpressions(str: string): string[] {
+export function extractLiquidExpressions(str: string): string[] {
   if (!str) return [];
 
   const liquidExpressionPattern = /{{\s*[^{}]+}}/g;
