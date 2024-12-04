@@ -45,28 +45,7 @@ export const usageInsightsWorkflow = workflow(
           marketingConfig: z
             .object({
               title: z.string().default('Discover More with Novu'),
-              links: z.array(marketingLinkSchema).default([
-                {
-                  href: 'https://docs.novu.co',
-                  text: 'Read our Documentation',
-                  emoji: '📚',
-                },
-                {
-                  href: 'https://discord.novu.co',
-                  text: 'Join our Discord Community',
-                  emoji: '💬',
-                },
-                {
-                  href: 'https://github.com/novuhq/novu',
-                  text: 'Star us on GitHub',
-                  emoji: '⭐',
-                },
-                {
-                  href: 'https://novu.co/blog',
-                  text: 'Check out our Blog',
-                  emoji: '📝',
-                },
-              ]),
+              links: z.array(marketingLinkSchema),
               cta: z.object({
                 text: z.string().default('Ready to take your notifications to the next level?'),
                 buttonText: z.string().default('Upgrade Your Plan →'),
