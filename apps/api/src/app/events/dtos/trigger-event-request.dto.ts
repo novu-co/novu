@@ -97,6 +97,12 @@ export class TriggerEventRequestDto {
         },
       },
     },
+    type: 'object',
+    additionalProperties: {
+      type: 'object',
+      additionalProperties: true, // Allows any additional properties
+    },
+    required: false, // Indicates that this property is optional
   })
   @IsObject()
   @IsOptional()
