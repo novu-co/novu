@@ -1,7 +1,6 @@
 import { expect } from 'chai';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { v4 as uuid } from 'uuid';
-import { differenceInMilliseconds, subDays } from 'date-fns';
 import {
   EnvironmentRepository,
   ExecutionDetailsRepository,
@@ -30,7 +29,6 @@ import {
   FilterPartTypeEnum,
   IEmailBlock,
   InAppProviderIdEnum,
-  ISubscribersDefine,
   PreviousStepTypeEnum,
   SmsProviderIdEnum,
   StepTypeEnum,
@@ -39,10 +37,13 @@ import {
 } from '@novu/shared';
 import { EmailEventStatusEnum } from '@novu/stateless';
 import { DetailEnum } from '@novu/application-generic';
+import { Novu } from '@novu/api';
+import { SubscriberPayloadDto } from '@novu/api/src/models/components/subscriberpayloaddto';
+import { TriggerEventResponseDto } from '@novu/api/models/components';
+import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 import { createTenant } from '../../tenant/e2e/create-tenant.e2e';
 
 const axiosInstance = axios.create();
-
 const eventTriggerPath = '/v1/events/trigger';
 
 const promiseTimeout = (ms: number): Promise<void> =>
@@ -65,6 +66,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
   const executionDetailsRepository = new ExecutionDetailsRepository();
   const environmentRepository = new EnvironmentRepository();
   const tenantRepository = new TenantRepository();
+  let novuClient: Novu;
 
   describe(`Trigger Event - ${eventTriggerPath} (POST)`, function () {
     beforeEach(async () => {
@@ -77,6 +79,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         organizationId: session.organization._id,
         environmentId: session.environment._id,
       });
+      novuClient = initNovuClassSdk(session);
     });
 
     it('should filter delay step', async function () {
@@ -123,21 +126,13 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {
-            customVar: 'Testing of User Name',
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          customVar: 'Testing of User Name',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs(template?._id, true, 0);
 
@@ -195,21 +190,13 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {
-            customVar: 'Testing of User Name',
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          customVar: 'Testing of User Name',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs(template?._id, true, 0);
 
@@ -275,21 +262,13 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {
-            customVar: 'Testing of User Name',
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          customVar: 'Testing of User Name',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs(template?._id, true, 0);
 
@@ -403,22 +382,14 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {
-            customVar: 'Testing of User Name',
-            digest_type: '2',
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          customVar: 'Testing of User Name',
+          digest_type: '2',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs(template?._id, true, 0);
 
@@ -485,22 +456,14 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {
-            customVar: 'Testing of User Name',
-            exclude: false,
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          customVar: 'Testing of User Name',
+          exclude: false,
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs(template?._id, true, 0);
 
@@ -556,36 +519,20 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {
-            exclude: false,
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          exclude: false,
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {
-            exclude: false,
-          },
+      });
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          exclude: false,
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs(template?._id, true, 0);
 
@@ -737,22 +684,14 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {
-            customVar: 'Testing of User Name',
-            exclude: false,
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          customVar: 'Testing of User Name',
+          exclude: false,
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs(template?._id, true, 0);
 
@@ -894,47 +833,31 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
 
       const result = await sendTrigger(session, template, subscriber.subscriberId, {}, {}, 'test1');
 
-      expect(result.data.data.status).to.equal('no_tenant_found');
+      expect(result.status).to.equal('no_tenant_found');
     });
 
     it('should trigger an event successfully', async function () {
-      const response = await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
-          payload: {
-            firstName: 'Testing of User Name',
-            urlVariable: '/test/url/path',
-          },
+      const response = await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          firstName: 'Testing of User Name',
+          urlVariable: '/test/url/path',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
-      const { data: body } = response;
+      const body = response.result;
 
-      expect(body.data).to.be.ok;
-      expect(body.data.status).to.equal('processed');
-      expect(body.data.acknowledged).to.equal(true);
+      expect(body).to.be.ok;
+      expect(body.status).to.equal('processed');
+      expect(body.acknowledged).to.equal(true);
     });
 
     it('should store jobs & message provider id successfully', async function () {
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
-        },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -965,7 +888,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
 
     it('should create a subscriber based on event', async function () {
       const subscriberId = SubscriberRepository.createObjectId();
-      const payload: ISubscribersDefine = {
+      const payload: SubscriberPayloadDto = {
         subscriberId,
         firstName: 'Test Name',
         lastName: 'Last of name',
@@ -973,26 +896,18 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         locale: 'en',
         data: { custom1: 'custom value1', custom2: 'custom value2' },
       };
-      const { data: body } = await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: {
-            ...payload,
-          },
-          payload: {
-            urlVar: '/test/url/path',
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [payload],
+        payload: {
+          urlVar: '/test/url/path',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs();
-      const createdSubscriber = await subscriberRepository.findBySubscriberId(session.environment._id, subscriberId);
+      const envId = session.environment._id;
+      console.log(`created sub envId:${envId} subscriberId: ${subscriberId}`);
+      const createdSubscriber = await subscriberRepository.findBySubscriberId(envId, subscriberId);
 
       expect(createdSubscriber?.subscriberId).to.equal(subscriberId);
       expect(createdSubscriber?.firstName).to.equal(payload.firstName);
@@ -1012,23 +927,17 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         locale: 'en',
       };
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: {
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [
+          {
             ...payload,
           },
-          payload: {
-            urlVar: '/test/url/path',
-          },
+        ],
+        payload: {
+          urlVar: '/test/url/path',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs();
       const createdSubscriber = await subscriberRepository.findBySubscriberId(session.environment._id, subscriberId);
@@ -1039,24 +948,18 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       expect(createdSubscriber?.email).to.equal(payload.email);
       expect(createdSubscriber?.locale).to.equal(payload.locale);
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: {
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [
+          {
             ...payload,
             email: 'hello@world.com',
           },
-          payload: {
-            urlVar: '/test/url/path',
-          },
+        ],
+        payload: {
+          urlVar: '/test/url/path',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs();
 
@@ -1072,7 +975,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
     describe('Subscriber channels', function () {
       it('should set a new subscriber with channels array', async function () {
         const subscriberId = SubscriberRepository.createObjectId();
-        const payload: ISubscribersDefine = {
+        const payload: SubscriberPayloadDto = {
           subscriberId,
           firstName: 'Test Name',
           lastName: 'Last of name',
@@ -1089,37 +992,44 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
           ],
         };
 
-        await axiosInstance.post(
-          `${session.serverUrl}${eventTriggerPath}`,
-          {
-            name: template.triggers[0].identifier,
-            to: {
+        await novuClient.trigger({
+          name: template.triggers[0].identifier,
+          to: [
+            {
               ...payload,
             },
-            payload: {
-              urlVar: '/test/url/path',
-            },
+          ],
+          payload: {
+            urlVar: '/test/url/path',
           },
-          {
-            headers: {
-              authorization: `ApiKey ${session.apiKey}`,
-            },
-          }
-        );
+        });
 
         await session.awaitRunningJobs();
 
         const createdSubscriber = await subscriberRepository.findBySubscriberId(session.environment._id, subscriberId);
 
         expect(createdSubscriber?.channels?.length).to.equal(1);
+        if (createdSubscriber?.channels?.length !== 1) {
+          throw new Error('need to have 1 channel');
+        }
         expect(createdSubscriber?.channels[0]?.providerId).to.equal(ChatProviderIdEnum.Slack);
-        expect(createdSubscriber?.channels[0]?.credentials?.webhookUrl).to.equal('https://slack.com/webhook/test');
-        expect(createdSubscriber?.channels[0]?.credentials?.deviceTokens.length).to.equal(2);
+        const credentials = createdSubscriber?.channels[0]?.credentials;
+        expect(credentials).to.be.ok;
+        if (!credentials) {
+          throw new Error('must have credentials');
+        }
+        expect(credentials.webhookUrl).to.equal('https://slack.com/webhook/test');
+        const { deviceTokens } = credentials;
+        expect(deviceTokens).to.be.ok;
+        if (!deviceTokens) {
+          throw new Error('');
+        }
+        expect(deviceTokens?.length).to.equal(2);
       });
 
       it('should update a subscribers channels array', async function () {
         const subscriberId = SubscriberRepository.createObjectId();
-        const payload: ISubscribersDefine = {
+        const payload: SubscriberPayloadDto = {
           subscriberId,
           firstName: 'Test Name',
           lastName: 'Last of name',
@@ -1135,23 +1045,17 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
           ],
         };
 
-        await axiosInstance.post(
-          `${session.serverUrl}${eventTriggerPath}`,
-          {
-            name: template.triggers[0].identifier,
-            to: {
+        await novuClient.trigger({
+          name: template.triggers[0].identifier,
+          to: [
+            {
               ...payload,
             },
-            payload: {
-              urlVar: '/test/url/path',
-            },
+          ],
+          payload: {
+            urlVar: '/test/url/path',
           },
-          {
-            headers: {
-              authorization: `ApiKey ${session.apiKey}`,
-            },
-          }
-        );
+        });
 
         await session.awaitRunningJobs();
         const createdSubscriber = await subscriberRepository.findBySubscriberId(session.environment._id, subscriberId);
@@ -1159,11 +1063,10 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         expect(createdSubscriber?.subscriberId).to.equal(subscriberId);
         expect(createdSubscriber?.channels?.length).to.equal(1);
 
-        await axiosInstance.post(
-          `${session.serverUrl}${eventTriggerPath}`,
-          {
-            name: template.triggers[0].identifier,
-            to: {
+        await novuClient.trigger({
+          name: template.triggers[0].identifier,
+          to: [
+            {
               ...payload,
               channels: [
                 {
@@ -1174,22 +1077,20 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
                 },
               ],
             },
-            payload: {
-              urlVar: '/test/url/path',
-            },
+          ],
+          payload: {
+            urlVar: '/test/url/path',
           },
-          {
-            headers: {
-              authorization: `ApiKey ${session.apiKey}`,
-            },
-          }
-        );
+        });
 
         await session.awaitRunningJobs();
 
         const updatedSubscriber = await subscriberRepository.findBySubscriberId(session.environment._id, subscriberId);
 
         expect(updatedSubscriber?.channels?.length).to.equal(1);
+        if (!updatedSubscriber?.channels?.length) {
+          throw new Error('Channels must be an array');
+        }
         expect(updatedSubscriber?.channels[0]?.providerId).to.equal(ChatProviderIdEnum.Slack);
         expect(updatedSubscriber?.channels[0]?.credentials?.webhookUrl).to.equal('https://slack.com/webhook/test2');
       });
@@ -1205,23 +1106,17 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         locale: 'en',
       };
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: {
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [
+          {
             ...payload,
           },
-          payload: {
-            urlVar: '/test/url/path',
-          },
+        ],
+        payload: {
+          urlVar: '/test/url/path',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs();
       const createdSubscriber = await subscriberRepository.findBySubscriberId(session.environment._id, subscriberId);
@@ -1232,24 +1127,18 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       expect(createdSubscriber?.email).to.equal(payload.email);
       expect(createdSubscriber?.locale).to.equal(payload.locale);
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: {
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [
+          {
             ...payload,
             email: undefined,
           },
-          payload: {
-            urlVar: '/test/url/path',
-          },
+        ],
+        payload: {
+          urlVar: '/test/url/path',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs();
 
@@ -1266,27 +1155,19 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       const subscriberId = SubscriberRepository.createObjectId();
       const transactionId = SubscriberRepository.createObjectId();
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          transactionId,
-          to: [
-            { subscriberId: subscriber.subscriberId, email: 'gg@ff.com' },
-            { subscriberId, email: 'gg@ff.com' },
-          ],
-          payload: {
-            email: 'new-test-email@gmail.com',
-            firstName: 'Testing of User Name',
-            urlVar: '/test/url/path',
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        transactionId,
+        to: [
+          { subscriberId: subscriber.subscriberId, email: 'gg@ff.com' },
+          { subscriberId, email: 'gg@ff.com' },
+        ],
+        payload: {
+          email: 'new-test-email@gmail.com',
+          firstName: 'Testing of User Name',
+          urlVar: '/test/url/path',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       let completedCount = 0;
       do {
@@ -1311,7 +1192,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       );
       const createdSubscriber = await subscriberRepository.findBySubscriberId(session.environment._id, subscriberId);
 
-      const messages2 = await messageRepository.findBySubscriberChannel(
+      await messageRepository.findBySubscriberChannel(
         session.environment._id,
         createdSubscriber?._id as string,
         ChannelTypeEnum.EMAIL
@@ -1322,34 +1203,28 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
     });
 
     it('should generate message and notification based on event', async function () {
-      const { data: body } = await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: {
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [
+          {
             subscriberId: subscriber.subscriberId,
           },
-          payload: {
-            firstName: 'Testing of User Name',
-            urlVar: '/test/url/path',
-            attachments: [
-              {
-                name: 'text1.txt',
-                file: 'hello world!',
-              },
-              {
-                name: 'text2.txt',
-                file: Buffer.from('hello world!', 'utf-8'),
-              },
-            ],
-          },
+        ],
+        payload: {
+          firstName: 'Testing of User Name',
+          urlVar: '/test/url/path',
+          attachments: [
+            {
+              name: 'text1.txt',
+              file: 'hello world!',
+            },
+            {
+              name: 'text2.txt',
+              file: Buffer.from('hello world!', 'utf-8'),
+            },
+          ],
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -1395,29 +1270,23 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
     it('should correctly set expiration date (TTL) for notification and messages', async function () {
       const templateName = template.triggers[0].identifier;
 
-      const { data: body } = await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: templateName,
-          to: {
+      const response = await novuClient.trigger({
+        name: templateName,
+        to: [
+          {
             subscriberId: subscriber.subscriberId,
           },
-          payload: {
-            firstName: 'Testing of User Name',
-            urlVar: '/test/url/path',
-          },
+        ],
+        payload: {
+          firstName: 'Testing of User Name',
+          urlVar: '/test/url/path',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
-
-      expect(body.data).to.have.all.keys('acknowledged', 'status', 'transactionId');
-      expect(body.data.acknowledged).to.equal(true);
-      expect(body.data.status).to.equal('processed');
-      expect(body.data.transaction).to.be.a.string;
+      });
+      const body = response.result;
+      expect(body).to.have.all.keys('acknowledged', 'status', 'transactionId');
+      expect(body.acknowledged).to.equal(true);
+      expect(body.status).to.equal('processed');
+      expect(body.transactionId).to.be.a.string;
 
       await session.awaitRunningJobs(template._id);
 
@@ -1430,8 +1299,6 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       const notifications = await notificationRepository.findBySubscriberId(session.environment._id, subscriber._id);
 
       expect(notifications.length).to.equal(1);
-
-      const notification = notifications[0];
 
       const messages = await messageRepository.findBySubscriberChannel(
         session.environment._id,
@@ -1466,21 +1333,13 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      const { data: body } = await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {
-            customVar: 'Testing of User Name',
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          customVar: 'Testing of User Name',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -1505,21 +1364,13 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      const { data: body } = await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: [{ subscriberId: subscriber.subscriberId }, { subscriberId, phone: '+972541111111' }],
-          payload: {
-            organizationName: 'Testing of Organization Name',
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [{ subscriberId: subscriber.subscriberId }, { subscriberId, phone: '+972541111111' }],
+        payload: {
+          organizationName: 'Testing of Organization Name',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -1551,22 +1402,14 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
           },
         ],
       });
-      const { data: body } = await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
-          payload: {
-            phone: '+972541111111',
-            firstName: 'Testing of User Name',
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          phone: '+972541111111',
+          firstName: 'Testing of User Name',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -1945,7 +1788,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         .post(eventTriggerPath)
         .send({
           name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
+          to: [subscriber.subscriberId],
           payload: {},
         })
         .expect(400);
@@ -1958,7 +1801,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         .post(eventTriggerPath)
         .send({
           name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
+          to: [subscriber.subscriberId],
           payload: {
             myUser: {
               lastName: true,
@@ -1977,7 +1820,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         .post(eventTriggerPath)
         .send({
           name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
+          to: [subscriber.subscriberId],
           payload: {
             myUser: {
               lastName: '',
@@ -2057,7 +1900,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         .post(eventTriggerPath)
         .send({
           name: 'non-existent-template-identifier',
-          to: subscriber.subscriberId,
+          to: [subscriber.subscriberId],
           payload: {
             myUser: {
               lastName: 'Test',
@@ -2082,7 +1925,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         .post(eventTriggerPath)
         .send({
           name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
+          to: [subscriber.subscriberId],
           payload: {
             myUser: {
               lastName: 'Test',
@@ -2091,7 +1934,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         })
         .expect(201);
 
-      const { status, acknowledged } = response.body.data;
+      const { status, acknowledged } = response.body;
       expect(status).to.equal('no_workflow_steps_defined');
       expect(acknowledged).to.equal(true);
     });
@@ -2118,7 +1961,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         .post(eventTriggerPath)
         .send({
           name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
+          to: [subscriber.subscriberId],
           payload: {
             myUser: {
               lastName: 'Test',
@@ -2153,20 +1996,12 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}/broadcast`,
-        {
-          name: template.triggers[0].identifier,
-          payload: {
-            organizationName: 'Umbrella Corp',
-          },
+      await novuClient.triggerBroadcast({
+        name: template.triggers[0].identifier,
+        payload: {
+          organizationName: 'Umbrella Corp',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
       await session.awaitRunningJobs(template._id);
       const messages = await messageRepository.find({
         _environmentId: session.environment._id,
@@ -2251,23 +2086,15 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
-          payload: {
-            firstName: 'Testing of User Name',
-            urlVariable: '/test/url/path',
-            run: true,
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          firstName: 'Testing of User Name',
+          urlVariable: '/test/url/path',
+          run: true,
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -2324,19 +2151,11 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
        * );
        */
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
-          payload: {},
-        },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {},
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -2356,19 +2175,11 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
        * );
        */
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
-          payload: {},
-        },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {},
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -2420,19 +2231,11 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
 
       // const axiosPostStub = sinon.stub(axios, 'post').throws(new Error('Users remote error'));
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
-          payload: {},
-        },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {},
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -2495,19 +2298,11 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
        *   });
        */
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
-          payload: {},
-        },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {},
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -2535,19 +2330,11 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
        *   );
        */
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
-          payload: {},
-        },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {},
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -2633,20 +2420,12 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: templateWithVariants.triggers[0].identifier,
-          to: subscriber.subscriberId,
-          payload: {},
-          tenant: { identifier: tenant.identifier },
-        },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      await novuClient.trigger({
+        name: templateWithVariants.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {},
+        tenant: { identifier: tenant.identifier },
+      });
 
       await session.awaitRunningJobs(templateWithVariants._id);
 
@@ -2666,6 +2445,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       await session.initialize();
       subscriberService = new SubscribersService(session.organization._id, session.environment._id);
       subscriber = await subscriberService.createSubscriber();
+      novuClient = initNovuClassSdk(session);
     });
 
     it('should filter a message with variables', async function () {
@@ -2729,24 +2509,16 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
-          payload: {
-            firstName: 'Testing of User Name',
-            urlVariable: '/test/url/path',
-            run: true,
-            var: true,
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          firstName: 'Testing of User Name',
+          urlVariable: '/test/url/path',
+          run: true,
+          var: true,
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -2793,24 +2565,16 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: subscriber.subscriberId,
-          payload: {
-            firstName: 'Testing of User Name',
-            urlVariable: '/test/url/path',
-            name: 'Test Actor',
-          },
-          actor: actorSubscriber.subscriberId,
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          firstName: 'Testing of User Name',
+          urlVariable: '/test/url/path',
+          name: 'Test Actor',
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+        actor: actorSubscriber.subscriberId,
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -2860,20 +2624,12 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: templateWithVariants.triggers[0].identifier,
-          to: subscriber.subscriberId,
-          payload: { count: 5 },
-          tenant: { identifier: tenant.identifier },
-        },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      await novuClient.trigger({
+        name: templateWithVariants.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: { count: 5 },
+        tenant: { identifier: tenant.identifier },
+      });
 
       await session.awaitRunningJobs(templateWithVariants._id);
 
@@ -2884,20 +2640,12 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
 
       expect(messages.length).to.equal(0);
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: templateWithVariants.triggers[0].identifier,
-          to: subscriber.subscriberId,
-          payload: { count: 1 },
-          tenant: { identifier: tenant.identifier },
-        },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      await novuClient.trigger({
+        name: templateWithVariants.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: { count: 1 },
+        tenant: { identifier: tenant.identifier },
+      });
       await session.awaitRunningJobs(templateWithVariants._id);
 
       messages = await messageRepository.find({
@@ -2987,19 +2735,11 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
           ],
         });
 
-        await axiosInstance.post(
-          `${session.serverUrl}${eventTriggerPath}`,
-          {
-            name: template.triggers[0].identifier,
-            to: [subscriber.subscriberId],
-            payload: {},
-          },
-          {
-            headers: {
-              authorization: `ApiKey ${session.apiKey}`,
-            },
-          }
-        );
+        await novuClient.trigger({
+          name: template.triggers[0].identifier,
+          to: [subscriber.subscriberId],
+          payload: {},
+        });
 
         await session.awaitRunningJobs(template?._id, true, 1);
 
@@ -3033,19 +2773,11 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
           ],
         });
 
-        await axiosInstance.post(
-          `${session.serverUrl}${eventTriggerPath}`,
-          {
-            name: template.triggers[0].identifier,
-            to: [subscriber.subscriberId],
-            payload: {},
-          },
-          {
-            headers: {
-              authorization: `ApiKey ${session.apiKey}`,
-            },
-          }
-        );
+        await novuClient.trigger({
+          name: template.triggers[0].identifier,
+          to: [subscriber.subscriberId],
+          payload: {},
+        });
 
         await session.awaitRunningJobs(template?._id, true, 1);
 
@@ -3081,20 +2813,12 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
           ],
         });
 
-        await axiosInstance.post(
-          `${session.serverUrl}${eventTriggerPath}`,
-          {
-            name: template.triggers[0].identifier,
-            to: [subscriber.subscriberId],
-            payload: {},
-            actor: actor.subscriberId,
-          },
-          {
-            headers: {
-              authorization: `ApiKey ${session.apiKey}`,
-            },
-          }
-        );
+        await novuClient.trigger({
+          name: template.triggers[0].identifier,
+          to: [subscriber.subscriberId],
+          payload: {},
+          actor: actor.subscriberId,
+        });
 
         await session.awaitRunningJobs(template?._id, true, 1);
 
@@ -3152,21 +2876,13 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
           ],
         });
 
-        await axiosInstance.post(
-          `${session.serverUrl}${eventTriggerPath}`,
-          {
-            name: template.triggers[0].identifier,
-            to: [subscriber.subscriberId],
-            payload: {
-              customVar: 'Testing of User Name',
-            },
+        await novuClient.trigger({
+          name: template.triggers[0].identifier,
+          to: [subscriber.subscriberId],
+          payload: {
+            customVar: 'Testing of User Name',
           },
-          {
-            headers: {
-              authorization: `ApiKey ${session.apiKey}`,
-            },
-          }
-        );
+        });
 
         await session.awaitRunningJobs(template?._id, true, 1);
 
@@ -3244,21 +2960,13 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
           ],
         });
 
-        await axiosInstance.post(
-          `${session.serverUrl}${eventTriggerPath}`,
-          {
-            name: template.triggers[0].identifier,
-            to: [subscriber.subscriberId],
-            payload: {
-              customVar: 'Testing of User Name',
-            },
+        await novuClient.trigger({
+          name: template.triggers[0].identifier,
+          to: [subscriber.subscriberId],
+          payload: {
+            customVar: 'Testing of User Name',
           },
-          {
-            headers: {
-              authorization: `ApiKey ${session.apiKey}`,
-            },
-          }
-        );
+        });
 
         await session.awaitRunningJobs(template?._id, true, 1);
 
@@ -3325,26 +3033,17 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
           throw new Error('Tenant not found');
         }
 
-        const triggerResponse = await axiosInstance.post(
-          `${session.serverUrl}${eventTriggerPath}`,
-          {
-            name: workflow.triggers[0].identifier,
-            to: subscriberOverride,
-            tenant: tenant.identifier,
-            payload: {
-              firstName: 'Testing of User Name',
-              urlVariable: '/test/url/path',
-            },
+        const triggerResponse = await novuClient.trigger({
+          name: workflow.triggers[0].identifier,
+          to: [subscriberOverride],
+          tenant: tenant.identifier,
+          payload: {
+            firstName: 'Testing of User Name',
+            urlVariable: '/test/url/path',
           },
-          {
-            headers: {
-              authorization: `ApiKey ${session.apiKey}`,
-            },
-          }
-        );
+        });
 
-        expect(triggerResponse.status).to.equal(201);
-        expect(triggerResponse.data.data.status).to.equal('trigger_not_active');
+        expect(triggerResponse.result.status).to.equal('trigger_not_active');
 
         await session.awaitRunningJobs();
 
@@ -3361,26 +3060,17 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
           { $set: { active: false } }
         );
 
-        const triggerResponse2 = await axiosInstance.post(
-          `${session.serverUrl}${eventTriggerPath}`,
-          {
-            name: workflow.triggers[0].identifier,
-            to: subscriberOverride,
-            tenant: tenant.identifier,
-            payload: {
-              firstName: 'Testing of User Name',
-              urlVariable: '/test/url/path',
-            },
+        const triggerResponse2 = await novuClient.trigger({
+          name: workflow.triggers[0].identifier,
+          to: [subscriberOverride],
+          tenant: tenant.identifier,
+          payload: {
+            firstName: 'Testing of User Name',
+            urlVariable: '/test/url/path',
           },
-          {
-            headers: {
-              authorization: `ApiKey ${session.apiKey}`,
-            },
-          }
-        );
+        });
 
-        expect(triggerResponse2.status).to.equal(201);
-        expect(triggerResponse2.data.data.status).to.equal('trigger_not_active');
+        expect(triggerResponse2.result.status).to.equal('trigger_not_active');
 
         await session.awaitRunningJobs();
 
@@ -3412,26 +3102,17 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
           throw new Error('Tenant not found');
         }
 
-        const triggerResponse = await axiosInstance.post(
-          `${session.serverUrl}${eventTriggerPath}`,
-          {
-            name: workflow.triggers[0].identifier,
-            to: subscriberOverride,
-            tenant: tenant.identifier,
-            payload: {
-              firstName: 'Testing of User Name',
-              urlVariable: '/test/url/path',
-            },
+        const triggerResponse = await novuClient.trigger({
+          name: workflow.triggers[0].identifier,
+          to: [subscriberOverride],
+          tenant: tenant.identifier,
+          payload: {
+            firstName: 'Testing of User Name',
+            urlVariable: '/test/url/path',
           },
-          {
-            headers: {
-              authorization: `ApiKey ${session.apiKey}`,
-            },
-          }
-        );
+        });
 
-        expect(triggerResponse.status).to.equal(201);
-        expect(triggerResponse.data.data.status).to.equal('processed');
+        expect(triggerResponse.result.status).to.equal('processed');
 
         await session.awaitRunningJobs();
 
@@ -3448,26 +3129,17 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
           { $set: { active: false } }
         );
 
-        const triggerResponse2 = await axiosInstance.post(
-          `${session.serverUrl}${eventTriggerPath}`,
-          {
-            name: workflow.triggers[0].identifier,
-            to: subscriberOverride,
-            tenant: tenant.identifier,
-            payload: {
-              firstName: 'Testing of User Name',
-              urlVariable: '/test/url/path',
-            },
+        const triggerResponse2 = await novuClient.trigger({
+          name: workflow.triggers[0].identifier,
+          to: [subscriberOverride],
+          tenant: tenant.identifier,
+          payload: {
+            firstName: 'Testing of User Name',
+            urlVariable: '/test/url/path',
           },
-          {
-            headers: {
-              authorization: `ApiKey ${session.apiKey}`,
-            },
-          }
-        );
+        });
 
-        expect(triggerResponse2.status).to.equal(201);
-        expect(triggerResponse2.data.data.status).to.equal('processed');
+        expect(triggerResponse2.result.status).to.equal('processed');
 
         await session.awaitRunningJobs();
 
@@ -3499,26 +3171,17 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         if (!tenant) {
           throw new Error('Tenant not found');
         }
-        const triggerResponse = await axiosInstance.post(
-          `${session.serverUrl}${eventTriggerPath}`,
-          {
-            name: workflow.triggers[0].identifier,
-            to: subscriberOverride,
-            tenant: tenant.identifier,
-            payload: {
-              firstName: 'Testing of User Name',
-              urlVariable: '/test/url/path',
-            },
+        const triggerResponse = await novuClient.trigger({
+          name: workflow.triggers[0].identifier,
+          to: [subscriberOverride],
+          tenant: tenant.identifier,
+          payload: {
+            firstName: 'Testing of User Name',
+            urlVariable: '/test/url/path',
           },
-          {
-            headers: {
-              authorization: `ApiKey ${session.apiKey}`,
-            },
-          }
-        );
+        });
 
-        expect(triggerResponse.status).to.equal(201);
-        expect(triggerResponse.data.data.status).to.equal('processed');
+        expect(triggerResponse.result.status).to.equal('processed');
 
         await session.awaitRunningJobs();
 
@@ -3559,26 +3222,18 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
           throw new Error('Tenant not found');
         }
 
-        const triggerResponse = await axiosInstance.post(
-          `${session.serverUrl}${eventTriggerPath}`,
-          {
-            name: workflow.triggers[0].identifier,
-            to: subscriberOverride,
-            tenant: tenant.identifier,
-            payload: {
-              firstName: 'Testing of User Name',
-              urlVariable: '/test/url/path',
-            },
+        const triggerResponse = await novuClient.trigger({
+          name: workflow.triggers[0].identifier,
+          to: [subscriberOverride],
+          tenant: tenant.identifier,
+          payload: {
+            firstName: 'Testing of User Name',
+            urlVariable: '/test/url/path',
           },
-          {
-            headers: {
-              authorization: `ApiKey ${session.apiKey}`,
-            },
-          }
-        );
+        });
 
-        expect(triggerResponse.status).to.equal(201);
-        expect(triggerResponse.data.data.status).to.equal('processed');
+        expect(triggerResponse.result.status).to.equal(201);
+        expect(triggerResponse.result.status).to.equal('processed');
 
         await session.awaitRunningJobs();
 
@@ -3591,6 +3246,30 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       });
     });
   });
+  async function sendTrigger(
+    session,
+    template,
+    newSubscriberIdInAppNotification: string,
+    payload: Record<string, unknown> = {},
+    overrides: Record<string, unknown> = {},
+    tenant?: string,
+    actor?: string
+  ): Promise<TriggerEventResponseDto> {
+    return (
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [{ subscriberId: newSubscriberIdInAppNotification, lastName: 'Smith', email: 'test@email.novu' }],
+        payload: {
+          organizationName: 'Umbrella Corp',
+          compiledVariable: 'test-env',
+          ...payload,
+        },
+        overrides,
+        tenant,
+        actor,
+      })
+    ).result;
+  }
 });
 
 async function createTemplate(session, channelType) {
@@ -3602,35 +3281,4 @@ async function createTemplate(session, channelType) {
       },
     ],
   });
-}
-
-export async function sendTrigger(
-  session,
-  template,
-  newSubscriberIdInAppNotification: string,
-  payload: Record<string, unknown> = {},
-  overrides: Record<string, unknown> = {},
-  tenant?: string,
-  actor?: string
-): Promise<AxiosResponse> {
-  return await axiosInstance.post(
-    `${session.serverUrl}${eventTriggerPath}`,
-    {
-      name: template.triggers[0].identifier,
-      to: [{ subscriberId: newSubscriberIdInAppNotification, lastName: 'Smith', email: 'test@email.novu' }],
-      payload: {
-        organizationName: 'Umbrella Corp',
-        compiledVariable: 'test-env',
-        ...payload,
-      },
-      overrides,
-      tenant,
-      actor,
-    },
-    {
-      headers: {
-        authorization: `ApiKey ${session.apiKey}`,
-      },
-    }
-  );
 }

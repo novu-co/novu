@@ -5,22 +5,23 @@ import {
   IsArray,
   IsDefined,
   IsEmail,
-  IsEnum,
   IsLocale,
+  IsObject,
   IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
-import {
-  ChatProviderIdEnum,
-  IChannelCredentials,
-  ISubscriberChannel,
-  PushProviderIdEnum,
-  SubscriberCustomData,
-} from '@novu/shared';
+import { ChatProviderIdEnum, IChannelCredentials, PushProviderIdEnum, SubscriberCustomData } from '@novu/shared';
 import { Type } from 'class-transformer';
-import { SubscriberPayloadDto, TopicPayloadDto } from '../../events/dtos';
 
+export class SubscriberChannelDto {
+  providerId: ChatProviderIdEnum | PushProviderIdEnum;
+
+  @ApiPropertyOptional()
+  integrationIdentifier?: string;
+
+  credentials: ChannelCredentialsDto;
+}
 export class CreateSubscriberRequestDto {
   @ApiProperty({
     description:
@@ -62,23 +63,27 @@ export class CreateSubscriberRequestDto {
   @IsOptional()
   locale?: string;
 
-  @ApiPropertyOptional()
+  @ApiProperty({
+    type: 'object',
+    description: 'An optional payload object that can contain any properties',
+    required: false,
+    additionalProperties: {
+      oneOf: [
+        { type: 'string' },
+        { type: 'array', items: { type: 'string' } },
+        { type: 'boolean' },
+        { type: 'number' },
+      ],
+    },
+  })
   @IsOptional()
+  @IsObject()
   data?: SubscriberCustomData;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: [SubscriberChannelDto] })
   @IsOptional()
   @IsArray()
   channels?: SubscriberChannelDto[];
-}
-
-export class SubscriberChannelDto {
-  providerId: ChatProviderIdEnum | PushProviderIdEnum;
-
-  @ApiPropertyOptional()
-  integrationIdentifier?: string;
-
-  credentials: ChannelCredentialsDto;
 }
 
 export class ChannelCredentialsDto implements IChannelCredentials {
