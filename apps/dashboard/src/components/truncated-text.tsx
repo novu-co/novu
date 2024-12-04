@@ -13,7 +13,6 @@ export default function TruncatedText(props: TruncatedTextProps) {
   const checkTruncation = useCallback(() => {
     if (textRef.current) {
       const { scrollWidth, clientWidth } = textRef.current;
-      console.log(scrollWidth);
       setIsTruncated(scrollWidth > clientWidth);
     }
   }, []);

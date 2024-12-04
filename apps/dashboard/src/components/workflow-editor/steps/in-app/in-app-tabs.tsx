@@ -1,6 +1,5 @@
-import { ChannelTypeEnum } from '@novu/shared';
 import { Cross2Icon } from '@radix-ui/react-icons';
-import { FieldValues, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,7 +11,6 @@ import { InAppEditor } from '@/components/workflow-editor/steps/in-app/in-app-ed
 import { InAppEditorPreview } from '@/components/workflow-editor/steps/in-app/in-app-editor-preview';
 import { CustomStepControls } from '../controls/custom-step-controls';
 import { StepEditorProps } from '@/components/workflow-editor/steps/configure-step-template-form';
-import { useDebouncedPreview } from '../use-debounced-preview';
 
 const tabsContentClassName = 'h-full w-full overflow-y-auto';
 
@@ -21,10 +19,6 @@ export const InAppTabs = (props: StepEditorProps) => {
   const { dataSchema, uiSchema } = step.controls;
   const form = useFormContext();
   const navigate = useNavigate();
-  const { editorValue, setEditorValue, previewStep, previewData, isPreviewPending } = useDebouncedPreview({
-    workflow,
-    step,
-  });
 
   return (
     <Tabs defaultValue="editor" className="flex h-full flex-1 flex-col">
@@ -64,25 +58,7 @@ export const InAppTabs = (props: StepEditorProps) => {
         <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
       </TabsContent>
       <TabsContent value="preview" className={tabsContentClassName}>
-        {previewData === undefined ||
-          (previewData.result?.type === ChannelTypeEnum.IN_APP && (
-            <InAppEditorPreview
-              value={editorValue}
-              onChange={setEditorValue}
-              preview={previewData?.result.preview}
-              isPreviewPending={isPreviewPending}
-              applyPreview={() => {
-                previewStep({
-                  stepSlug: step.stepId,
-                  workflowSlug: workflow.workflowId,
-                  data: {
-                    controlValues: form.getValues() as FieldValues,
-                    previewPayload: JSON.parse(editorValue),
-                  },
-                });
-              }}
-            />
-          ))}
+        <InAppEditorPreview workflow={workflow} step={step} formValues={form.getValues()} />
       </TabsContent>
       <Separator />
     </Tabs>

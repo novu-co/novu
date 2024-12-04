@@ -208,6 +208,15 @@ describe('test use of novus node package - Subscribers class', () => {
       2,
       '/subscribers/test-subscriber-preference/preferences?includeInactiveChannels=true',
     );
+
+    await novu.subscribers.getPreference('test-subscriber-preference', {
+      includeInactiveChannels: false,
+    });
+
+    expect(mockedAxios.get).toHaveBeenNthCalledWith(
+      3,
+      '/subscribers/test-subscriber-preference/preferences?includeInactiveChannels=false',
+    );
   });
 
   test('should update subscriber preference', async () => {

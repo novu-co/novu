@@ -96,7 +96,7 @@ export class UpdateWorkflow {
 
     const existingTemplate = await this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({
-        identifierOrInternalId: command.id,
+        workflowIdOrInternalId: command.id,
         environmentId: command.environmentId,
         organizationId: command.organizationId,
         userId: command.userId,
@@ -327,7 +327,7 @@ export class UpdateWorkflow {
             userId: command.userId,
             environmentId: command.environmentId,
             organizationId: command.organizationId,
-            identifierOrInternalId: command.id,
+            workflowIdOrInternalId: command.id,
           }),
         );
 
@@ -483,6 +483,15 @@ export class UpdateWorkflow {
         : await this.createMessageTemplate.execute(
             CreateMessageTemplateCommand.create(messageTemplatePayload),
           );
+
+      if (!messageTemplateExist) {
+        this.analyticsService.track('Workflow step added', command.userId, {
+          _organization: command.organizationId,
+          _environment: command.environmentId,
+          workflowId: command.id,
+          type: messageTemplatePayload.type,
+        });
+      }
 
       messageTemplateId = updatedTemplate._id;
 

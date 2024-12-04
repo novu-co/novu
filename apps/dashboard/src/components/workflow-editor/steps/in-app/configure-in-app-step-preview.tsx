@@ -1,5 +1,8 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import * as Sentry from '@sentry/react';
+import { ChannelTypeEnum } from '@novu/shared';
+
 import { usePreviewStep } from '@/hooks';
 import {
   InAppPreview,
@@ -10,11 +13,18 @@ import {
   InAppPreviewNotificationContent,
   InAppPreviewSubject,
 } from '@/components/workflow-editor/in-app-preview';
-import { InAppRenderOutput } from '@novu/shared';
 import { useStep } from '@/components/workflow-editor/steps/step-provider';
 
 export function ConfigureInAppStepPreview() {
-  const { previewStep, data, isPending: isPreviewPending } = usePreviewStep();
+  const {
+    previewStep,
+    data: previewData,
+    isPending: isPreviewPending,
+  } = usePreviewStep({
+    onError: (error) => {
+      Sentry.captureException(error);
+    },
+  });
   const { step, isPending } = useStep();
 
   const { workflowSlug, stepSlug } = useParams<{
@@ -32,24 +42,45 @@ export function ConfigureInAppStepPreview() {
     });
   }, [workflowSlug, stepSlug, previewStep, step, isPending]);
 
-  if (!isPreviewPending && !data?.result) {
-    return null;
+  const previewResult = previewData?.result;
+  if (isPreviewPending || previewData === undefined) {
+    return (
+      <InAppPreview>
+        <InAppPreviewHeader />
+        <InAppPreviewNotification>
+          <InAppPreviewAvatar isPending />
+          <InAppPreviewNotificationContent>
+            <InAppPreviewSubject isPending />
+            <InAppPreviewBody isPending className="line-clamp-2" />
+          </InAppPreviewNotificationContent>
+        </InAppPreviewNotification>
+      </InAppPreview>
+    );
   }
 
-  const preview = data?.result?.preview as InAppRenderOutput | undefined;
+  if (previewResult?.type === undefined || previewResult?.type !== ChannelTypeEnum.IN_APP) {
+    return (
+      <InAppPreview>
+        <InAppPreviewHeader />
+        <InAppPreviewNotification className="flex-1 items-center">
+          <InAppPreviewNotificationContent className="my-auto">
+            <InAppPreviewBody className="mb-4 text-center">No preview available</InAppPreviewBody>
+          </InAppPreviewNotificationContent>
+        </InAppPreviewNotification>
+      </InAppPreview>
+    );
+  }
+
+  const preview = previewResult.preview;
 
   return (
     <InAppPreview>
       <InAppPreviewHeader />
-
       <InAppPreviewNotification>
-        <InAppPreviewAvatar src={preview?.avatar} isPending={isPreviewPending} />
-
+        <InAppPreviewAvatar src={preview?.avatar} />
         <InAppPreviewNotificationContent>
-          <InAppPreviewSubject isPending={isPreviewPending}>{preview?.subject}</InAppPreviewSubject>
-          <InAppPreviewBody isPending={isPreviewPending} className="line-clamp-2">
-            {preview?.body}
-          </InAppPreviewBody>
+          <InAppPreviewSubject>{preview?.subject}</InAppPreviewSubject>
+          <InAppPreviewBody className="line-clamp-2">{preview?.body}</InAppPreviewBody>
         </InAppPreviewNotificationContent>
       </InAppPreviewNotification>
     </InAppPreview>

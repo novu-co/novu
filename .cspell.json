@@ -6,6 +6,7 @@
     "ABNF",
     "addrs",
     "adresses",
+    "sdkerror",
     "africas",
     "africastalking",
     "Aland",
@@ -707,7 +708,10 @@
     "rstrip",
     "truncatewords",
     "xmlschema",
-    "jsonify"
+    "jsonify",
+    "touchpoint",
+    "Angularjs",
+    "navigatable"
   ],
   "flagWords": [],
   "patterns": [
