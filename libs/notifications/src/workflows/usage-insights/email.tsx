@@ -12,6 +12,8 @@ import {
   Img,
   Row,
   Column,
+  Link,
+  Hr,
 } from '@react-email/components';
 import { IUsageEmailData } from './types';
 
@@ -125,7 +127,56 @@ function WorkflowStats({ workflows }: { workflows: IUsageEmailData['workflowStat
   );
 }
 
-export default function UsageInsightsEmail(props: IUsageEmailData) {
+interface IMarketingLink {
+  href: string;
+  text: string;
+  emoji: string;
+}
+
+interface IMarketingConfig {
+  title: string;
+  links: IMarketingLink[];
+  cta: {
+    text: string;
+    buttonText: string;
+    buttonUrl: string;
+  };
+}
+
+function MarketingSection({ config }: { config: IMarketingConfig }) {
+  return (
+    <Section className="mt-8">
+      <Hr className="mb-6 border-t border-gray-200" />
+      <div className="mb-6">
+        <Heading className="mb-4 text-base font-semibold text-gray-900">{config.title}</Heading>
+        <div className="flex flex-col space-y-3">
+          {config.links.map((link, index) => (
+            <Link
+              key={index}
+              href={link.href}
+              className="flex items-center rounded-lg border border-gray-200 bg-white p-3 text-xs font-medium text-gray-700 hover:underline"
+            >
+              <span className="mr-2">{link.emoji}</span>
+              {link.text}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-indigo-100 bg-indigo-50/50 p-4 text-center">
+        <Text className="mb-2 text-sm font-medium text-indigo-900">{config.cta.text}</Text>
+        <Link
+          href={config.cta.buttonUrl}
+          className="inline-block rounded-lg bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:underline"
+        >
+          {config.cta.buttonText}
+        </Link>
+      </div>
+    </Section>
+  );
+}
+
+export default function UsageInsightsEmail(props: IUsageEmailData & { marketingConfig: IMarketingConfig }) {
   return (
     <Html>
       <Head />
@@ -135,18 +186,8 @@ export default function UsageInsightsEmail(props: IUsageEmailData) {
       <Tailwind>
         <Body className="bg-gray-50 font-sans">
           <Container className="mx-auto w-full">
-            <Section>
-              <Img
-                src={`https://dashboard.novu.co/static/images/novu-colored-text.png`}
-                width="119"
-                height="37"
-                alt="Novu"
-                className="mx-auto my-[32px]"
-              />
-            </Section>
-
-            <Section className="rounded-t-lg bg-[#000000] px-6 py-8">
-              <Heading className="text-center text-2xl font-bold text-white">Novu Insights Report</Heading>
+            <Section className="rounded-t-lg bg-indigo-600 px-6 py-8">
+              <Heading className="text-center text-2xl font-bold text-white">Usage Insights Report</Heading>
               <Text className="text-center text-sm text-indigo-100">{props.organizationName}</Text>
             </Section>
 
@@ -174,7 +215,9 @@ export default function UsageInsightsEmail(props: IUsageEmailData) {
               <InboxMetrics metrics={props.inboxMetrics} />
               <WorkflowStats workflows={props.workflowStats} />
 
-              <Section className="mt-8 border-t border-gray-100 pt-6">
+              <MarketingSection config={props.marketingConfig} />
+
+              <Section className="mt-6 border-t border-gray-100 pt-6">
                 <Text className="text-center text-xs text-gray-400">Generated with ❤️ by Novu</Text>
               </Section>
             </Container>

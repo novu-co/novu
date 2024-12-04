@@ -5,8 +5,16 @@ import UsageInsightsEmail from './email';
 import { IUsageEmailData } from './types';
 import { sampleUsageData } from './sample-data';
 
+const marketingLinkSchema = z
+  .object({
+    href: z.string(),
+    text: z.string(),
+    emoji: z.string(),
+  })
+  .required();
+
 async function renderUsageInsightsEmail(payload: IUsageEmailData, controls: any) {
-  const html = await renderAsync(UsageInsightsEmail(payload));
+  const html = await renderAsync(UsageInsightsEmail({ ...payload, marketingConfig: controls.marketingConfig }));
 
   return html;
 }
@@ -34,6 +42,52 @@ export const usageInsightsWorkflow = workflow(
         controlSchema: z.object({
           subject: z.string().default('Your Monthly Usage Insights'),
           previewText: z.string().default('Here are your usage insights for {{payload.organizationName}}'),
+          marketingConfig: z
+            .object({
+              title: z.string().default('Discover More with Novu'),
+              links: z.array(marketingLinkSchema).default([
+                {
+                  href: 'https://docs.novu.co',
+                  text: 'Read our Documentation',
+                  emoji: '📚',
+                },
+                {
+                  href: 'https://discord.novu.co',
+                  text: 'Join our Discord Community',
+                  emoji: '💬',
+                },
+                {
+                  href: 'https://github.com/novuhq/novu',
+                  text: 'Star us on GitHub',
+                  emoji: '⭐',
+                },
+                {
+                  href: 'https://novu.co/blog',
+                  text: 'Check out our Blog',
+                  emoji: '📝',
+                },
+              ]),
+              cta: z.object({
+                text: z.string().default('Ready to take your notifications to the next level?'),
+                buttonText: z.string().default('Upgrade Your Plan →'),
+                buttonUrl: z.string().default('https://novu.co/pricing'),
+              }),
+            })
+            .default({
+              cta: {
+                text: 'Ready to take your notifications to the next level?',
+                buttonText: 'Upgrade Your Plan →',
+                buttonUrl: 'https://novu.co/pricing',
+              },
+              links: [
+                {
+                  href: 'https://docs.novu.co',
+                  text: 'Read our Documentation',
+                  emoji: '📚',
+                },
+              ],
+              title: 'Discover More with Novu',
+            }),
         }),
       }
     );
