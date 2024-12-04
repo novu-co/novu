@@ -86,25 +86,28 @@ describe('extractTemplateVars', () => {
       expect(variables).to.have.lengthOf(0);
       expect(errors).to.have.lengthOf(2);
       expect(errors[0].message).to.contain('expected "|" before filter');
+      expect(errors[0].variable).to.equal('{{invalid..syntax}}');
+      expect(errors[1].variable).to.equal('{{invalid2..syntax}}');
     });
 
     it('should handle invalid liquid syntax gracefully return valid variables', () => {
-      const { validVariables: variables, invalidVariables: errors } = extractTemplateVars(
+      const { validVariables, invalidVariables: errors } = extractTemplateVars(
         '{{subscriber.name}} {{invalid..syntax}}'
       );
 
-      expect(variables).to.have.members(['subscriber.name']);
+      expect(validVariables).to.have.members(['subscriber.name']);
       expect(errors[0].message).to.contain('expected "|" before filter');
+      expect(errors[0].variable).to.equal('{{invalid..syntax}}');
     });
 
     it('should handle undefined input gracefully', () => {
       expect(() => extractTemplateVars(undefined as any)).to.not.throw();
-      expect(extractTemplateVars(undefined as any)).to.have.lengthOf(0);
+      expect(extractTemplateVars(undefined as any)).to.deep.equal({ validVariables: [], invalidVariables: [] });
     });
 
     it('should handle non-string input gracefully', () => {
       expect(() => extractTemplateVars({} as any)).to.not.throw();
-      expect(extractTemplateVars({} as any)).to.have.lengthOf(0);
+      expect(extractTemplateVars({} as any)).to.deep.equal({ validVariables: [], invalidVariables: [] });
     });
   });
 });

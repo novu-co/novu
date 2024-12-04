@@ -1,32 +1,6 @@
 import { Template, Liquid } from 'liquidjs';
 
 /**
- * Matches Liquid template variables wrapped in double curly braces, including filters
- * @example
- * Basic variables:
- * "{{username}}" => ["username"]
- * "{{ username }}" => ["username"]
- *
- * With filters:
- * "{{username | append: ', hi!'}}" => ["username"]
- * "{{user.name | capitalize | append: '!'}}" => ["user.name"]
- *
- * Multiple variables:
- * "Hello {{user.name}} and {{order.id | append: '-x'}}" => ["user.name", "order.id"]
- */
-const LIQUID_VARIABLE_PATTERN = /{{\s*([^}\s|]+)(?:\s*\|[^}]*)?}}/g;
-
-/**
- * Validates if string is a proper dot-notation variable path
- * @example
- * "user.name" => true
- * "order.items.0.id" => true
- * ".invalid" => false
- * "user..name" => false
- */
-const VALID_VARIABLE_PATH_PATTERN = /^[\w]+(\.[\w]+)*$/;
-
-/**
  * Extracts variable names from a Liquid template string using both parsing and regex approaches
  * to be more permissive with invalid syntax while still capturing valid variables.
  */
@@ -38,24 +12,27 @@ export const extractTemplateVars = function (str: string): {
     return { validVariables: [], invalidVariables: [] };
   }
 
+  const liquidExpressions = extractLiquidExpressions(str);
+  if (liquidExpressions.length === 0) {
+    return { validVariables: [], invalidVariables: [] };
+  }
+
   let variables = new Set<string>();
   const invalidVariables: { context: string; message: string; variable: string }[] = [];
 
-  try {
-    variables = parseByLiquid(str);
-  } catch (error) {
-    invalidVariables.push(
-      ...error.errors.map((e) => ({ context: e.context, message: e.message, variable: e.variable || 'unknown' }))
-    );
+  for (const liquidExpression of liquidExpressions) {
     try {
-      variables = parseByRegex(str);
-    } catch (e) {
-      return { validVariables: [], invalidVariables: e };
+      variables = new Set([...variables, ...parseByLiquid(liquidExpression)]);
+    } catch (error) {
+      invalidVariables.push(
+        ...error.errors.map((e) => ({ context: e.context, message: e.message, variable: liquidExpression }))
+      );
     }
   }
 
   return { validVariables: Array.from(variables), invalidVariables };
 };
+
 function parseByLiquid(str: string): Set<string> {
   const variables = new Set<string>();
 
@@ -88,23 +65,16 @@ function parseByLiquid(str: string): Set<string> {
   return variables;
 }
 
-function parseByRegex(str: string): Set<string> {
-  const variables = new Set<string>();
+/**
+ * Extracts all Liquid expressions wrapped in {{ }} from a given string
+ * @example
+ * "{{ username | append: 'hi' }}" => ["{{ username | append: 'hi' }}"]
+ * "<input value='{{username}}'>" => ["{{username}}"]
+ */
+function extractLiquidExpressions(str: string): string[] {
+  if (!str) return [];
 
-  const matches = str.match(LIQUID_VARIABLE_PATTERN) || [];
+  const liquidExpressionPattern = /{{\s*[^{}]+}}/g;
 
-  for (const match of matches) {
-    const normalizedVariable = match
-      .replace(/{{/g, '')
-      .replace(/}}/g, '')
-      .trim()
-      .split('|')[0] // Remove any liquid filters
-      .trim();
-
-    if (VALID_VARIABLE_PATH_PATTERN.test(normalizedVariable)) {
-      variables.add(normalizedVariable);
-    }
-  }
-
-  return variables;
+  return str.match(liquidExpressionPattern) || [];
 }
