@@ -90,7 +90,7 @@ describe('extractTemplateVars', () => {
       expect(errors[1].variable).to.equal('{{invalid2..syntax}}');
     });
 
-    it('should handle invalid liquid syntax gracefully return valid variables', () => {
+    it('should handle invalid liquid syntax gracefully, return valid variables', () => {
       const { validVariables, invalidVariables: errors } = extractTemplateVars(
         '{{subscriber.name}} {{invalid..syntax}}'
       );

@@ -19,9 +19,7 @@ import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/previe
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
 import { BuildStepDataUsecase } from '../build-step-data';
 import { GeneratePreviewCommand } from './generate-preview.command';
-import { extractTemplateVars } from '../../util/template-variables/extract-template-variables';
-import { pathsToObject } from '../../util/path-to-object';
-import { createMockPayloadFromSchema, flattenObjectValues } from '../../util/utils';
+import { createMockPayloadFromSchema } from '../../util/utils';
 import { PrepareAndValidateContentUsecase } from '../validate-content/prepare-and-validate-content/prepare-and-validate-content.usecase';
 
 @Injectable()
