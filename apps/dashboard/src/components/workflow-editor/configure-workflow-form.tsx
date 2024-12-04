@@ -21,6 +21,10 @@ import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
 import { MAX_DESCRIPTION_LENGTH, workflowSchema } from '@/components/workflow-editor/schema';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
+import { Button } from '../primitives/button';
+import { RiArrowRightSLine, RiSettingsLine } from 'react-icons/ri';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '@/utils/routes';
 
 type ConfigureWorkflowFormProps = {
   workflow: WorkflowResponseDto;
@@ -86,7 +90,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
         </SidebarHeader>
         <Separator />
         <Form {...form}>
-          <form className="h-full" onBlur={onBlur}>
+          <form onBlur={onBlur}>
             <SidebarContent size="md">
               <FormField
                 control={form.control}
@@ -199,13 +203,19 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
           </form>
         </Form>
         <Separator />
-        {/* <SidebarContent size="lg">
-        <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
-        <RiSettingsLine className="h-4 w-4 text-neutral-600" />
-          Configure channel preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
-          </Button>
-          </SidebarContent>
-          <Separator /> */}
+        <SidebarContent size="lg">
+          <Link to={ROUTES.EDIT_WORKFLOW_PREFERENCES}>
+            <Button
+              variant="outline"
+              className="flex w-full justify-start gap-1.5 p-1.5 text-xs font-medium"
+              type="button"
+            >
+              <RiSettingsLine className="h-4 w-4 text-neutral-600" />
+              Configure default preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
+            </Button>
+          </Link>
+        </SidebarContent>
+        <Separator />
       </motion.div>
     </>
   );
