@@ -4,7 +4,6 @@ import { Input } from '@/components/primitives/input';
 import { InputFieldPure } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { useFormContext } from 'react-hook-form';
-import { useMemo } from 'react';
 
 type InputWithSelectProps = {
   fields: {
@@ -31,10 +30,6 @@ export const NumberInputWithSelect = ({
   const input = getFieldState(`${fields.inputKey}`);
   const select = getFieldState(`${fields.selectKey}`);
   const error = input.error || select.error;
-
-  const defaultSelectedValue = useMemo(() => {
-    return defaultOption ?? options[0];
-  }, [defaultOption, options]);
 
   const handleChange = (value: { input: number; select: string }) => {
     // we want to always set both values and treat it as a single input
@@ -78,7 +73,7 @@ export const NumberInputWithSelect = ({
                   onValueChange={(value) => {
                     handleChange({ input: Number(getValues(fields.inputKey)), select: value });
                   }}
-                  defaultValue={defaultSelectedValue}
+                  defaultValue={defaultOption}
                   disabled={isReadOnly}
                   {...field}
                 >

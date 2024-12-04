@@ -12,11 +12,16 @@ const unitKey = 'unit';
 
 export const DelayAmount = () => {
   const { step } = useStep();
-  const { dataSchema } = step?.controls ?? {};
+  const { dataSchema, uiSchema } = step?.controls ?? {};
 
   const unitOptions = useMemo(
     () => (dataSchema?.properties?.[unitKey] as any).enum ?? defaultUnitValues,
     [dataSchema?.properties]
+  );
+
+  const defaultUnitOption = useMemo(
+    () => (uiSchema?.properties?.[unitKey] as any).placeholder ?? defaultUnitValues[0],
+    [uiSchema?.properties]
   );
 
   return (
@@ -27,6 +32,7 @@ export const DelayAmount = () => {
       <NumberInputWithSelect
         fields={{ inputKey: `controlValues.${amountKey}`, selectKey: `controlValues.${unitKey}` }}
         options={unitOptions}
+        defaultOption={defaultUnitOption}
       />
     </div>
   );

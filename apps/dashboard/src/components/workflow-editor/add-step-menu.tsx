@@ -11,6 +11,8 @@ import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 
+const noop = () => {};
+
 const MenuGroup = ({ children }: { children: ReactNode }) => {
   return <div className="flex flex-col">{children}</div>;
 };
@@ -43,7 +45,7 @@ const MenuItem = ({
 
   return (
     <span
-      onClick={!disabled ? onClick : undefined}
+      onClick={!disabled ? onClick : noop}
       className={cn(
         'shadow-xs text-foreground-600 hover:bg-accent flex cursor-pointer items-center gap-2 rounded-lg p-1.5',
         {
