@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import axios from 'axios';
 import { v4 as uuid } from 'uuid';
 import {
   EnvironmentRepository,
@@ -39,19 +38,16 @@ import { EmailEventStatusEnum } from '@novu/stateless';
 import { DetailEnum } from '@novu/application-generic';
 import { Novu } from '@novu/api';
 import { SubscriberPayloadDto } from '@novu/api/src/models/components/subscriberpayloaddto';
-import { TriggerEventResponseDto } from '@novu/api/models/components';
+import { CreateIntegrationRequestDto, TriggerEventResponseDto } from '@novu/api/models/components';
 import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 import { createTenant } from '../../tenant/e2e/create-tenant.e2e';
-
-const axiosInstance = axios.create();
-const eventTriggerPath = '/v1/events/trigger';
 
 const promiseTimeout = (ms: number): Promise<void> =>
   new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
 
-describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
+describe(`Trigger event - /v1/events/trigger (POST)`, function () {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let subscriber: SubscriberEntity;
@@ -68,7 +64,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
   const tenantRepository = new TenantRepository();
   let novuClient: Novu;
 
-  describe(`Trigger Event - ${eventTriggerPath} (POST)`, function () {
+  describe(`Trigger Event - /v1/events/trigger (POST)`, function () {
     beforeEach(async () => {
       session = new UserSession();
       await session.initialize();
@@ -589,34 +585,18 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {
-            exclude: false,
-          },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          exclude: false,
         },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
-      await axiosInstance.post(
-        `${session.serverUrl}${eventTriggerPath}`,
-        {
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {},
-        },
-        {
-          headers: {
-            authorization: `ApiKey ${session.apiKey}`,
-          },
-        }
-      );
+      });
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {},
+      });
 
       await session.awaitRunningJobs(template?._id, true, 0);
 
@@ -734,7 +714,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
 
       await createTenant({ session, identifier: 'test', name: 'test' });
 
-      await sendTrigger(session, template, subscriber.subscriberId, {}, {}, 'test');
+      await sendTrigger(template, subscriber.subscriberId, {}, {}, 'test');
 
       await session.awaitRunningJobs(template._id);
 
@@ -778,7 +758,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       await createTenant({ session, identifier: 'test3', name: 'test3' });
       await createTenant({ session, identifier: 'test2', name: 'test2' });
 
-      await sendTrigger(session, template, subscriber.subscriberId, {}, {}, 'test3');
+      await sendTrigger(template, subscriber.subscriberId, {}, {}, 'test3');
 
       await session.awaitRunningJobs(template._id);
 
@@ -795,7 +775,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
 
       expect(firstMessage?.providerId).to.equal(payload.providerId);
 
-      await sendTrigger(session, template, subscriber.subscriberId, {}, {}, 'test2');
+      await sendTrigger(template, subscriber.subscriberId, {}, {}, 'test2');
 
       await session.awaitRunningJobs(template._id);
 
@@ -831,7 +811,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
 
       template = await createTemplate(session, ChannelTypeEnum.EMAIL);
 
-      const result = await sendTrigger(session, template, subscriber.subscriberId, {}, {}, 'test1');
+      const result = await sendTrigger(template, subscriber.subscriberId, {}, {}, 'test1');
 
       expect(result.status).to.equal('no_tenant_found');
     });
@@ -979,7 +959,6 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
           subscriberId,
           firstName: 'Test Name',
           lastName: 'Last of name',
-          email: undefined,
           locale: 'en',
           channels: [
             {
@@ -994,11 +973,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
 
         await novuClient.trigger({
           name: template.triggers[0].identifier,
-          to: [
-            {
-              ...payload,
-            },
-          ],
+          to: [payload],
           payload: {
             urlVar: '/test/url/path',
           },
@@ -1429,7 +1404,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
 
       template = await createTemplate(session, channelType);
 
-      await sendTrigger(session, template, newSubscriberIdInAppNotification);
+      await sendTrigger(template, newSubscriberIdInAppNotification);
 
       await session.awaitRunningJobs(template._id);
 
@@ -1453,7 +1428,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
 
       template = await createTemplate(session, channelType);
 
-      await sendTrigger(session, template, newSubscriberIdInAppNotification);
+      await sendTrigger(template, newSubscriberIdInAppNotification);
 
       await session.awaitRunningJobs(template._id);
 
@@ -1493,7 +1468,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await sendTrigger(session, template, newSubscriberIdInAppNotification, {
+      await sendTrigger(template, newSubscriberIdInAppNotification, {
         nested: {
           subject: 'a subject nested',
         },
@@ -1539,7 +1514,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await sendTrigger(session, template, newSubscriberId, {}, {}, '', actorSubscriber.subscriberId);
+      await sendTrigger(template, newSubscriberId, {}, {}, '', actorSubscriber.subscriberId);
 
       await session.awaitRunningJobs(template._id);
 
@@ -1589,7 +1564,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await sendTrigger(session, template, newSubscriberIdInAppNotification, {
+      await sendTrigger(template, newSubscriberIdInAppNotification, {
         nested: {
           subject: 'a subject nested',
         },
@@ -1668,7 +1643,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await sendTrigger(session, template, newSubscriberIdInAppNotification, {
+      await sendTrigger(template, newSubscriberIdInAppNotification, {
         nested: {
           subject: 'a subject nested',
         },
@@ -1705,7 +1680,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await sendTrigger(session, template, newSubscriberIdInAppNotification, {
+      await sendTrigger(template, newSubscriberIdInAppNotification, {
         nested: {
           subject: 'a subject nested',
         },
@@ -1740,7 +1715,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       } = await session.testAgent.post('/v1/integrations').send(payload);
       await session.testAgent.post(`/v1/integrations/${data._id}/set-primary`).send({});
 
-      await sendTrigger(session, template, newSubscriberIdInAppNotification, {
+      await sendTrigger(template, newSubscriberIdInAppNotification, {
         nested: {
           subject: 'a subject nested',
         },
@@ -1785,7 +1760,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       });
 
       let response = await session.testAgent
-        .post(eventTriggerPath)
+        .post('/v1/events/trigger')
         .send({
           name: template.triggers[0].identifier,
           to: [subscriber.subscriberId],
@@ -1798,7 +1773,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       );
 
       response = await session.testAgent
-        .post(eventTriggerPath)
+        .post('/v1/events/trigger')
         .send({
           name: template.triggers[0].identifier,
           to: [subscriber.subscriberId],
@@ -1817,7 +1792,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       );
 
       response = await session.testAgent
-        .post(eventTriggerPath)
+        .post('/v1/events/trigger')
         .send({
           name: template.triggers[0].identifier,
           to: [subscriber.subscriberId],
@@ -1867,7 +1842,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
       });
 
       await session.testAgent
-        .post(eventTriggerPath)
+        .post('/v1/events/trigger')
         .send({
           name: template.triggers[0].identifier,
           to: newSubscriberIdInAppNotification,
@@ -1897,7 +1872,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
 
     it('should throw an error when workflow identifier provided is not in the database', async () => {
       const response = await session.testAgent
-        .post(eventTriggerPath)
+        .post('/v1/events/trigger')
         .send({
           name: 'non-existent-template-identifier',
           to: [subscriber.subscriberId],
@@ -1921,20 +1896,17 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         steps: [],
       });
 
-      const response = await session.testAgent
-        .post(eventTriggerPath)
-        .send({
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {
-            myUser: {
-              lastName: 'Test',
-            },
+      const response = await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          myUser: {
+            lastName: 'Test',
           },
-        })
-        .expect(201);
+        },
+      });
 
-      const { status, acknowledged } = response.body;
+      const { status, acknowledged } = response.result;
       expect(status).to.equal('no_workflow_steps_defined');
       expect(acknowledged).to.equal(true);
     });
@@ -1957,18 +1929,15 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         ],
       });
 
-      await session.testAgent
-        .post(eventTriggerPath)
-        .send({
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {
-            myUser: {
-              lastName: 'Test',
-            },
+      await novuClient.trigger({
+        name: template.triggers[0].identifier,
+        to: [subscriber.subscriberId],
+        payload: {
+          myUser: {
+            lastName: 'Test',
           },
-        })
-        .expect(201);
+        },
+      });
     });
 
     it('should broadcast trigger to all subscribers', async () => {
@@ -2661,7 +2630,7 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
 
       template = await createTemplate(session, channelType);
 
-      await sendTrigger(session, template, newSubscriberId);
+      await sendTrigger(template, newSubscriberId);
 
       await session.awaitRunningJobs(template._id);
 
@@ -2681,26 +2650,17 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
         _organizationId: session.organization._id,
       });
 
-      const payload = {
+      const payload: CreateIntegrationRequestDto = {
         providerId: EmailProviderIdEnum.Mailgun,
         channel: 'email',
         credentials: { apiKey: '123', secretKey: 'abc' },
-        _environmentId: prodEnv?._id,
+        environmentId: prodEnv?._id,
         active: true,
         check: false,
       };
 
-      const {
-        body: { data: newIntegration },
-      } = await session.testAgent.post('/v1/integrations').send(payload);
-
-      await sendTrigger(
-        session,
-        template,
-        newSubscriberId,
-        {},
-        { email: { integrationIdentifier: newIntegration.identifier } }
-      );
+      const { result } = await novuClient.integrations.create(payload);
+      await sendTrigger(template, newSubscriberId, {}, { email: { integrationIdentifier: result.identifier } });
 
       await session.awaitRunningJobs(template._id);
 
@@ -3247,28 +3207,28 @@ describe(`Trigger event - ${eventTriggerPath} (POST)`, function () {
     });
   });
   async function sendTrigger(
-    session,
-    template,
+    templateInner: NotificationTemplateEntity,
     newSubscriberIdInAppNotification: string,
     payload: Record<string, unknown> = {},
     overrides: Record<string, unknown> = {},
     tenant?: string,
     actor?: string
   ): Promise<TriggerEventResponseDto> {
-    return (
-      await novuClient.trigger({
-        name: template.triggers[0].identifier,
-        to: [{ subscriberId: newSubscriberIdInAppNotification, lastName: 'Smith', email: 'test@email.novu' }],
-        payload: {
-          organizationName: 'Umbrella Corp',
-          compiledVariable: 'test-env',
-          ...payload,
-        },
-        overrides,
-        tenant,
-        actor,
-      })
-    ).result;
+    const request = {
+      name: templateInner.triggers[0].identifier,
+      to: [{ subscriberId: newSubscriberIdInAppNotification, lastName: 'Smith', email: 'test@email.novu' }],
+      payload: {
+        organizationName: 'Umbrella Corp',
+        compiledVariable: 'test-env',
+        ...payload,
+      },
+      overrides,
+      tenant,
+      actor,
+    };
+    console.log('request111', JSON.stringify(request, null, 2));
+
+    return (await novuClient.trigger(request)).result;
   }
 });
 

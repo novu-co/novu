@@ -13,4 +13,4 @@ export * from './workflow-override';
 export * from './widget';
 export * from './session';
 export * from './subscription';
-export * from './controls';
+export * from './stateless-control-values';
