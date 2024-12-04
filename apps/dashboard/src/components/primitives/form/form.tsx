@@ -51,7 +51,7 @@ const FormLabel = React.forwardRef<
 
       {tooltip && (
         <Tooltip>
-          <TooltipTrigger className="ml-1">
+          <TooltipTrigger className="ml-1" type="button">
             <BsFillInfoCircleFill className="text-foreground-300 -mt-0.5 inline size-3" />
           </TooltipTrigger>
           <TooltipContent>{tooltip}</TooltipContent>
