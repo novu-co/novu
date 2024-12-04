@@ -59,7 +59,7 @@ const mapStepToNode = (
 ): Node<NodeData, keyof typeof nodeTypes> => {
   let content = '';
   if (step.type === StepTypeEnum.DELAY) {
-    content = `Delay sending for a specified duration`;
+    content = `Delay execution for a specified duration`;
   }
 
   const error = getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues);

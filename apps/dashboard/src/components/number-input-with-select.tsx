@@ -98,7 +98,7 @@ export const NumberInputWithSelect = ({
           )}
         />
       </InputFieldPure>
-      <FormMessagePure error={error ? String(error.message) : undefined} />
+      {error && <FormMessagePure error={error.message} />}
     </>
   );
 };
