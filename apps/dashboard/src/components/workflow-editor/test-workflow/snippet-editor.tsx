@@ -4,6 +4,8 @@ import { loadLanguage, LanguageName } from '@uiw/codemirror-extensions-langs';
 import { Editor } from '@/components/primitives/editor';
 import type { SnippetLanguage } from './types';
 
+const basicSetup = { lineNumbers: true };
+
 export const SnippetEditor = ({ language, value }: { language: SnippetLanguage; value: string }) => {
   const editorLanguage: LanguageName = language === 'framework' ? 'typescript' : language;
 
@@ -17,12 +19,6 @@ export const SnippetEditor = ({ language, value }: { language: SnippetLanguage; 
   }, [editorLanguage]);
 
   return (
-    <Editor
-      lang={editorLanguage}
-      className="h-full"
-      value={value}
-      extensions={extensions}
-      basicSetup={{ lineNumbers: true }}
-    />
+    <Editor lang={editorLanguage} className="h-full" value={value} extensions={extensions} basicSetup={basicSetup} />
   );
 };
