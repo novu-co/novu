@@ -4,7 +4,7 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { IApiKey } from '@novu/shared';
 import { getApiKeys } from '../api/environments';
 
-export const useApiKeysQuery = () => {
+export const useApiKeys = () => {
   const { currentEnvironment } = useEnvironment();
 
   const query = useQuery<{ data: IApiKey[] }>({
