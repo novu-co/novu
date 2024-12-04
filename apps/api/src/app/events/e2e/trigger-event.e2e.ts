@@ -2406,811 +2406,808 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
       expect(messages.length).to.equal(1);
       expect(messages[0].subject).to.equal('Better Variant subject');
     });
-  });
+    describe('filters logic', () => {
+      beforeEach(async () => {
+        subscriberService = new SubscribersService(session.organization._id, session.environment._id);
+        subscriber = await subscriberService.createSubscriber();
+      });
 
-  describe('filters logic', () => {
-    beforeEach(async () => {
-      session = new UserSession();
-      await session.initialize();
-      subscriberService = new SubscribersService(session.organization._id, session.environment._id);
-      subscriber = await subscriberService.createSubscriber();
-      novuClient = initNovuClassSdk(session);
-    });
+      it('should filter a message with variables', async function () {
+        template = await session.createTemplate({
+          steps: [
+            {
+              type: StepTypeEnum.EMAIL,
+              subject: 'Password reset',
+              content: [
+                {
+                  type: EmailBlockTypeEnum.TEXT,
+                  content: 'This are the text contents of the template for {{firstName}}',
+                },
+                {
+                  type: EmailBlockTypeEnum.BUTTON,
+                  content: 'SIGN UP',
+                  url: 'https://url-of-app.com/{{urlVariable}}',
+                },
+              ],
+              filters: [
+                {
+                  isNegated: false,
+                  type: 'GROUP',
+                  value: FieldLogicalOperatorEnum.AND,
+                  children: [
+                    {
+                      field: 'run',
+                      value: '{{payload.var}}',
+                      operator: FieldOperatorEnum.EQUAL,
+                      on: FilterPartTypeEnum.PAYLOAD,
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: StepTypeEnum.EMAIL,
+              subject: 'Password reset',
+              content: [
+                {
+                  type: EmailBlockTypeEnum.TEXT,
+                  content: 'This are the text contents of the template for {{firstName}}',
+                },
+              ],
+              filters: [
+                {
+                  isNegated: false,
+                  type: 'GROUP',
+                  value: FieldLogicalOperatorEnum.AND,
+                  children: [
+                    {
+                      field: 'subscriberId',
+                      value: subscriber.subscriberId,
+                      operator: FieldOperatorEnum.NOT_EQUAL,
+                      on: FilterPartTypeEnum.SUBSCRIBER,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        });
 
-    it('should filter a message with variables', async function () {
-      template = await session.createTemplate({
-        steps: [
-          {
-            type: StepTypeEnum.EMAIL,
-            subject: 'Password reset',
-            content: [
-              {
-                type: EmailBlockTypeEnum.TEXT,
-                content: 'This are the text contents of the template for {{firstName}}',
-              },
-              {
-                type: EmailBlockTypeEnum.BUTTON,
-                content: 'SIGN UP',
-                url: 'https://url-of-app.com/{{urlVariable}}',
-              },
-            ],
-            filters: [
-              {
-                isNegated: false,
-                type: 'GROUP',
-                value: FieldLogicalOperatorEnum.AND,
-                children: [
-                  {
-                    field: 'run',
-                    value: '{{payload.var}}',
-                    operator: FieldOperatorEnum.EQUAL,
-                    on: FilterPartTypeEnum.PAYLOAD,
-                  },
-                ],
-              },
-            ],
+        await novuClient.trigger({
+          name: template.triggers[0].identifier,
+          to: [subscriber.subscriberId],
+          payload: {
+            firstName: 'Testing of User Name',
+            urlVariable: '/test/url/path',
+            run: true,
+            var: true,
           },
-          {
-            type: StepTypeEnum.EMAIL,
-            subject: 'Password reset',
-            content: [
-              {
-                type: EmailBlockTypeEnum.TEXT,
-                content: 'This are the text contents of the template for {{firstName}}',
-              },
-            ],
-            filters: [
-              {
-                isNegated: false,
-                type: 'GROUP',
-                value: FieldLogicalOperatorEnum.AND,
-                children: [
-                  {
-                    field: 'subscriberId',
-                    value: subscriber.subscriberId,
-                    operator: FieldOperatorEnum.NOT_EQUAL,
-                    on: FilterPartTypeEnum.SUBSCRIBER,
-                  },
-                ],
-              },
-            ],
+        });
+
+        await session.awaitRunningJobs(template._id);
+
+        const messages = await messageRepository.count({
+          _environmentId: session.environment._id,
+          _templateId: template._id,
+        });
+
+        expect(messages).to.equal(1);
+      });
+
+      it('should filter a message with value that includes variables and strings', async function () {
+        const actorSubscriber = await subscriberService.createSubscriber({
+          firstName: 'Actor',
+        });
+
+        template = await session.createTemplate({
+          steps: [
+            {
+              type: StepTypeEnum.EMAIL,
+              subject: 'Password reset',
+              content: [
+                {
+                  type: EmailBlockTypeEnum.TEXT,
+                  content: 'This are the text contents of the template for {{firstName}}',
+                },
+              ],
+              filters: [
+                {
+                  isNegated: false,
+                  type: 'GROUP',
+                  value: FieldLogicalOperatorEnum.AND,
+                  children: [
+                    {
+                      field: 'name',
+                      value: 'Test {{actor.firstName}}',
+                      operator: FieldOperatorEnum.EQUAL,
+                      on: FilterPartTypeEnum.PAYLOAD,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        });
+
+        await novuClient.trigger({
+          name: template.triggers[0].identifier,
+          to: [subscriber.subscriberId],
+          payload: {
+            firstName: 'Testing of User Name',
+            urlVariable: '/test/url/path',
+            name: 'Test Actor',
           },
-        ],
+          actor: actorSubscriber.subscriberId,
+        });
+
+        await session.awaitRunningJobs(template._id);
+
+        const messages = await messageRepository.count({
+          _environmentId: session.environment._id,
+          _templateId: template._id,
+        });
+
+        expect(messages).to.equal(1);
       });
 
-      await novuClient.trigger({
-        name: template.triggers[0].identifier,
-        to: [subscriber.subscriberId],
-        payload: {
-          firstName: 'Testing of User Name',
-          urlVariable: '/test/url/path',
-          run: true,
-          var: true,
-        },
+      it('should filter by tenant variables data', async function () {
+        const tenant = await tenantRepository.create({
+          _organizationId: session.organization._id,
+          _environmentId: session.environment._id,
+          identifier: 'one_123',
+          name: 'The one and only tenant',
+          data: { value1: 'Best fighter', value2: 'Ever', count: 4 },
+        });
+
+        const templateWithVariants = await session.createTemplate({
+          name: 'test email template',
+          description: 'This is a test description',
+          steps: [
+            {
+              name: 'Message Name',
+              subject: 'Test email subject',
+              preheader: 'Test email preheader',
+              content: [{ type: EmailBlockTypeEnum.TEXT, content: 'This is a sample text block' }],
+              type: StepTypeEnum.EMAIL,
+              filters: [
+                {
+                  isNegated: false,
+                  type: 'GROUP',
+                  value: FieldLogicalOperatorEnum.AND,
+                  children: [
+                    {
+                      on: FilterPartTypeEnum.TENANT,
+                      field: 'data.count',
+                      value: '{{payload.count}}',
+                      operator: FieldOperatorEnum.LARGER,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        });
+
+        await novuClient.trigger({
+          name: templateWithVariants.triggers[0].identifier,
+          to: [subscriber.subscriberId],
+          payload: { count: 5 },
+          tenant: { identifier: tenant.identifier },
+        });
+
+        await session.awaitRunningJobs(templateWithVariants._id);
+
+        let messages = await messageRepository.find({
+          _environmentId: session.environment._id,
+          _templateId: templateWithVariants._id,
+        });
+
+        expect(messages.length).to.equal(0);
+
+        await novuClient.trigger({
+          name: templateWithVariants.triggers[0].identifier,
+          to: [subscriber.subscriberId],
+          payload: { count: 1 },
+          tenant: { identifier: tenant.identifier },
+        });
+        await session.awaitRunningJobs(templateWithVariants._id);
+
+        messages = await messageRepository.find({
+          _environmentId: session.environment._id,
+          _templateId: templateWithVariants._id,
+        });
+
+        expect(messages.length).to.equal(1);
       });
+      it('should trigger message with override integration identifier', async function () {
+        const newSubscriberId = SubscriberRepository.createObjectId();
+        const channelType = ChannelTypeEnum.EMAIL;
 
-      await session.awaitRunningJobs(template._id);
+        template = await createTemplate(session, channelType);
 
-      const messages = await messageRepository.count({
-        _environmentId: session.environment._id,
-        _templateId: template._id,
-      });
+        await sendTrigger(template, newSubscriberId);
 
-      expect(messages).to.equal(1);
-    });
+        await session.awaitRunningJobs(template._id);
 
-    it('should filter a message with value that includes variables and strings', async function () {
-      const actorSubscriber = await subscriberService.createSubscriber({
-        firstName: 'Actor',
-      });
+        const createdSubscriber = await subscriberRepository.findBySubscriberId(
+          session.environment._id,
+          newSubscriberId
+        );
 
-      template = await session.createTemplate({
-        steps: [
-          {
-            type: StepTypeEnum.EMAIL,
-            subject: 'Password reset',
-            content: [
-              {
-                type: EmailBlockTypeEnum.TEXT,
-                content: 'This are the text contents of the template for {{firstName}}',
-              },
-            ],
-            filters: [
-              {
-                isNegated: false,
-                type: 'GROUP',
-                value: FieldLogicalOperatorEnum.AND,
-                children: [
-                  {
-                    field: 'name',
-                    value: 'Test {{actor.firstName}}',
-                    operator: FieldOperatorEnum.EQUAL,
-                    on: FilterPartTypeEnum.PAYLOAD,
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      });
-
-      await novuClient.trigger({
-        name: template.triggers[0].identifier,
-        to: [subscriber.subscriberId],
-        payload: {
-          firstName: 'Testing of User Name',
-          urlVariable: '/test/url/path',
-          name: 'Test Actor',
-        },
-        actor: actorSubscriber.subscriberId,
-      });
-
-      await session.awaitRunningJobs(template._id);
-
-      const messages = await messageRepository.count({
-        _environmentId: session.environment._id,
-        _templateId: template._id,
-      });
-
-      expect(messages).to.equal(1);
-    });
-
-    it('should filter by tenant variables data', async function () {
-      const tenant = await tenantRepository.create({
-        _organizationId: session.organization._id,
-        _environmentId: session.environment._id,
-        identifier: 'one_123',
-        name: 'The one and only tenant',
-        data: { value1: 'Best fighter', value2: 'Ever', count: 4 },
-      });
-
-      const templateWithVariants = await session.createTemplate({
-        name: 'test email template',
-        description: 'This is a test description',
-        steps: [
-          {
-            name: 'Message Name',
-            subject: 'Test email subject',
-            preheader: 'Test email preheader',
-            content: [{ type: EmailBlockTypeEnum.TEXT, content: 'This is a sample text block' }],
-            type: StepTypeEnum.EMAIL,
-            filters: [
-              {
-                isNegated: false,
-                type: 'GROUP',
-                value: FieldLogicalOperatorEnum.AND,
-                children: [
-                  {
-                    on: FilterPartTypeEnum.TENANT,
-                    field: 'data.count',
-                    value: '{{payload.count}}',
-                    operator: FieldOperatorEnum.LARGER,
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      });
-
-      await novuClient.trigger({
-        name: templateWithVariants.triggers[0].identifier,
-        to: [subscriber.subscriberId],
-        payload: { count: 5 },
-        tenant: { identifier: tenant.identifier },
-      });
-
-      await session.awaitRunningJobs(templateWithVariants._id);
-
-      let messages = await messageRepository.find({
-        _environmentId: session.environment._id,
-        _templateId: templateWithVariants._id,
-      });
-
-      expect(messages.length).to.equal(0);
-
-      await novuClient.trigger({
-        name: templateWithVariants.triggers[0].identifier,
-        to: [subscriber.subscriberId],
-        payload: { count: 1 },
-        tenant: { identifier: tenant.identifier },
-      });
-      await session.awaitRunningJobs(templateWithVariants._id);
-
-      messages = await messageRepository.find({
-        _environmentId: session.environment._id,
-        _templateId: templateWithVariants._id,
-      });
-
-      expect(messages.length).to.equal(1);
-    });
-    it('should trigger message with override integration identifier', async function () {
-      const newSubscriberId = SubscriberRepository.createObjectId();
-      const channelType = ChannelTypeEnum.EMAIL;
-
-      template = await createTemplate(session, channelType);
-
-      await sendTrigger(template, newSubscriberId);
-
-      await session.awaitRunningJobs(template._id);
-
-      const createdSubscriber = await subscriberRepository.findBySubscriberId(session.environment._id, newSubscriberId);
-
-      let messages = await messageRepository.find({
-        _environmentId: session.environment._id,
-        _subscriberId: createdSubscriber?._id,
-        channel: channelType,
-      });
-
-      expect(messages.length).to.be.equal(1);
-      expect(messages[0].providerId).to.be.equal(EmailProviderIdEnum.SendGrid);
-
-      const prodEnv = await environmentRepository.findOne({
-        name: 'Production',
-        _organizationId: session.organization._id,
-      });
-
-      const payload: CreateIntegrationRequestDto = {
-        providerId: EmailProviderIdEnum.Mailgun,
-        channel: 'email',
-        credentials: { apiKey: '123', secretKey: 'abc' },
-        environmentId: prodEnv?._id,
-        active: true,
-        check: false,
-      };
-
-      const { result } = await novuClient.integrations.create(payload);
-      await sendTrigger(template, newSubscriberId, {}, { email: { integrationIdentifier: result.identifier } });
-
-      await session.awaitRunningJobs(template._id);
-
-      messages = await messageRepository.find(
-        {
+        let messages = await messageRepository.find({
           _environmentId: session.environment._id,
           _subscriberId: createdSubscriber?._id,
           channel: channelType,
-        },
-        '',
-        { sort: { createdAt: -1 } }
-      );
-
-      expect(messages.length).to.be.equal(2);
-      expect(messages[0].providerId).to.be.equal(EmailProviderIdEnum.Mailgun);
-    });
-
-    describe('in-app avatar', () => {
-      it('should send the message with choosed system avatar', async () => {
-        const firstStepUuid = uuid();
-        template = await session.createTemplate({
-          steps: [
-            {
-              type: StepTypeEnum.IN_APP,
-              content: 'Hello world!',
-              uuid: firstStepUuid,
-              actor: {
-                type: ActorTypeEnum.SYSTEM_ICON,
-                data: SystemAvatarIconEnum.WARNING,
-              },
-            },
-          ],
         });
 
-        await novuClient.trigger({
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {},
-        });
+        expect(messages.length).to.be.equal(1);
+        expect(messages[0].providerId).to.be.equal(EmailProviderIdEnum.SendGrid);
 
-        await session.awaitRunningJobs(template?._id, true, 1);
-
-        const messages = await messageRepository.find({
-          _environmentId: session.environment._id,
-          _subscriberId: subscriber._id,
-          channel: StepTypeEnum.IN_APP,
-        });
-
-        expect(messages.length).to.equal(1);
-        expect(messages[0].actor).to.be.ok;
-        expect(messages[0].actor?.type).to.eq(ActorTypeEnum.SYSTEM_ICON);
-        expect(messages[0].actor?.data).to.eq(SystemAvatarIconEnum.WARNING);
-      });
-
-      it('should send the message with custom system avatar url', async () => {
-        const firstStepUuid = uuid();
-        const avatarUrl = 'https://gravatar.com/avatar/5246ec47a6a90ef2bcd29f0ef7d2faa6?s=400&d=robohash&r=x';
-
-        template = await session.createTemplate({
-          steps: [
-            {
-              type: StepTypeEnum.IN_APP,
-              content: 'Hello world!',
-              uuid: firstStepUuid,
-              actor: {
-                type: ActorTypeEnum.SYSTEM_CUSTOM,
-                data: avatarUrl,
-              },
-            },
-          ],
-        });
-
-        await novuClient.trigger({
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {},
-        });
-
-        await session.awaitRunningJobs(template?._id, true, 1);
-
-        const messages = await messageRepository.find({
-          _environmentId: session.environment._id,
-          _subscriberId: subscriber._id,
-          channel: StepTypeEnum.IN_APP,
-        });
-
-        expect(messages.length).to.equal(1);
-        expect(messages[0].actor).to.be.ok;
-        expect(messages[0].actor?.type).to.eq(ActorTypeEnum.SYSTEM_CUSTOM);
-        expect(messages[0].actor?.data).to.eq(avatarUrl);
-      });
-
-      it('should send the message with the actor avatar', async () => {
-        const firstStepUuid = uuid();
-        const avatarUrl = 'https://gravatar.com/avatar/5246ec47a6a90ef2bcd29f0ef7d2faa6?s=400&d=robohash&r=x';
-
-        const actor = await subscriberService.createSubscriber({ avatar: avatarUrl });
-
-        template = await session.createTemplate({
-          steps: [
-            {
-              type: StepTypeEnum.IN_APP,
-              content: 'Hello world!',
-              uuid: firstStepUuid,
-              actor: {
-                type: ActorTypeEnum.USER,
-                data: null,
-              },
-            },
-          ],
-        });
-
-        await novuClient.trigger({
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {},
-          actor: actor.subscriberId,
-        });
-
-        await session.awaitRunningJobs(template?._id, true, 1);
-
-        const messages = await messageRepository.find({
-          _environmentId: session.environment._id,
-          _subscriberId: subscriber._id,
-          channel: StepTypeEnum.IN_APP,
-        });
-
-        expect(messages.length).to.equal(1);
-        expect(messages[0].actor).to.be.ok;
-        expect(messages[0].actor?.type).to.eq(ActorTypeEnum.USER);
-        expect(messages[0].actor?.data).to.eq(null);
-        expect(messages[0]._actorId).to.eq(actor._id);
-      });
-    });
-
-    describe('seen/read filter', () => {
-      it('should filter in app seen/read step', async function () {
-        const firstStepUuid = uuid();
-        template = await session.createTemplate({
-          steps: [
-            {
-              type: StepTypeEnum.IN_APP,
-              content: 'Not Delayed {{customVar}}' as string,
-              uuid: firstStepUuid,
-            },
-            {
-              type: StepTypeEnum.DELAY,
-              content: '',
-              metadata: {
-                unit: DigestUnitEnum.SECONDS,
-                amount: 2,
-                type: DelayTypeEnum.REGULAR,
-              },
-            },
-            {
-              type: StepTypeEnum.IN_APP,
-              content: 'Hello world {{customVar}}' as string,
-              filters: [
-                {
-                  isNegated: false,
-                  type: 'GROUP',
-                  value: FieldLogicalOperatorEnum.AND,
-                  children: [
-                    {
-                      on: FilterPartTypeEnum.PREVIOUS_STEP,
-                      stepType: PreviousStepTypeEnum.READ,
-                      step: firstStepUuid,
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        });
-
-        await novuClient.trigger({
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {
-            customVar: 'Testing of User Name',
-          },
-        });
-
-        await session.awaitRunningJobs(template?._id, true, 1);
-
-        const delayedJob = await jobRepository.findOne({
-          _environmentId: session.environment._id,
-          _templateId: template._id,
-          type: StepTypeEnum.DELAY,
-        });
-
-        if (!delayedJob) {
-          throw new Error();
-        }
-
-        expect(delayedJob.status).to.equal(JobStatusEnum.DELAYED);
-
-        const messages = await messageRepository.find({
-          _environmentId: session.environment._id,
-          _subscriberId: subscriber._id,
-          channel: StepTypeEnum.IN_APP,
-        });
-
-        expect(messages.length).to.equal(1);
-
-        await session.awaitRunningJobs(template?._id, true, 0);
-
-        const messagesAfter = await messageRepository.find({
-          _environmentId: session.environment._id,
-          _subscriberId: subscriber._id,
-          channel: StepTypeEnum.IN_APP,
-        });
-
-        expect(messagesAfter.length).to.equal(1);
-      });
-
-      it('should filter email seen/read step', async function () {
-        const firstStepUuid = uuid();
-        template = await session.createTemplate({
-          steps: [
-            {
-              type: StepTypeEnum.EMAIL,
-              name: 'Message Name',
-              subject: 'Test email subject',
-              content: [{ type: EmailBlockTypeEnum.TEXT, content: 'This is a sample text block' }],
-              uuid: firstStepUuid,
-            },
-            {
-              type: StepTypeEnum.DELAY,
-              content: '',
-              metadata: {
-                unit: DigestUnitEnum.SECONDS,
-                amount: 2,
-                type: DelayTypeEnum.REGULAR,
-              },
-            },
-            {
-              type: StepTypeEnum.EMAIL,
-              name: 'Message Name',
-              subject: 'Test email subject',
-              content: [{ type: EmailBlockTypeEnum.TEXT, content: 'This is a sample text block' }],
-              filters: [
-                {
-                  isNegated: false,
-                  type: 'GROUP',
-                  value: FieldLogicalOperatorEnum.AND,
-                  children: [
-                    {
-                      on: FilterPartTypeEnum.PREVIOUS_STEP,
-                      stepType: PreviousStepTypeEnum.READ,
-                      step: firstStepUuid,
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        });
-
-        await novuClient.trigger({
-          name: template.triggers[0].identifier,
-          to: [subscriber.subscriberId],
-          payload: {
-            customVar: 'Testing of User Name',
-          },
-        });
-
-        await session.awaitRunningJobs(template?._id, true, 1);
-
-        const delayedJob = await jobRepository.findOne({
-          _environmentId: session.environment._id,
-          _templateId: template._id,
-          type: StepTypeEnum.DELAY,
-        });
-
-        expect(delayedJob!.status).to.equal(JobStatusEnum.DELAYED);
-
-        const messages = await messageRepository.find({
-          _environmentId: session.environment._id,
-          _subscriberId: subscriber._id,
-          channel: StepTypeEnum.EMAIL,
-        });
-
-        expect(messages.length).to.equal(1);
-
-        await executionDetailsRepository.create({
-          _jobId: delayedJob!._parentId,
-          _messageId: messages[0]._id,
-          _environmentId: session.environment._id,
+        const prodEnv = await environmentRepository.findOne({
+          name: 'Production',
           _organizationId: session.organization._id,
-          webhookStatus: EmailEventStatusEnum.OPENED,
         });
 
-        await session.awaitRunningJobs(template?._id, true, 0);
+        const payload: CreateIntegrationRequestDto = {
+          providerId: EmailProviderIdEnum.Mailgun,
+          channel: 'email',
+          credentials: { apiKey: '123', secretKey: 'abc' },
+          environmentId: prodEnv?._id,
+          active: true,
+          check: false,
+        };
 
-        const messagesAfter = await messageRepository.find({
-          _environmentId: session.environment._id,
-          _subscriberId: subscriber._id,
-          channel: StepTypeEnum.EMAIL,
-        });
+        const { result } = await novuClient.integrations.create(payload);
+        await sendTrigger(template, newSubscriberId, {}, { email: { integrationIdentifier: result.identifier } });
 
-        expect(messagesAfter.length).to.equal(1);
-      });
-    });
+        await session.awaitRunningJobs(template._id);
 
-    describe('workflow override', () => {
-      beforeEach(async () => {
-        session = new UserSession();
-        await session.initialize();
-
-        workflowOverrideService = new WorkflowOverrideService({
-          organizationId: session.organization._id,
-          environmentId: session.environment._id,
-        });
-      });
-
-      it('should override - active false', async function () {
-        const subscriberOverride = SubscriberRepository.createObjectId();
-
-        // Create active workflow
-        const workflow = await createTemplate(session, ChannelTypeEnum.IN_APP);
-
-        // Create workflow override with active false
-        const { tenant } = await workflowOverrideService.createWorkflowOverride({
-          workflowId: workflow._id,
-          active: false,
-        });
-
-        if (!tenant) {
-          throw new Error('Tenant not found');
-        }
-
-        const triggerResponse = await novuClient.trigger({
-          name: workflow.triggers[0].identifier,
-          to: [subscriberOverride],
-          tenant: tenant.identifier,
-          payload: {
-            firstName: 'Testing of User Name',
-            urlVariable: '/test/url/path',
+        messages = await messageRepository.find(
+          {
+            _environmentId: session.environment._id,
+            _subscriberId: createdSubscriber?._id,
+            channel: channelType,
           },
-        });
-
-        expect(triggerResponse.result.status).to.equal('trigger_not_active');
-
-        await session.awaitRunningJobs();
-
-        const messages = await messageRepository.find({
-          _environmentId: session.environment._id,
-          _templateId: workflow._id,
-        });
-
-        expect(messages.length).to.equal(0);
-
-        // Disable workflow - should not take effect, test for anomalies
-        await notificationTemplateRepository.update(
-          { _id: workflow._id, _environmentId: session.environment._id },
-          { $set: { active: false } }
+          '',
+          { sort: { createdAt: -1 } }
         );
 
-        const triggerResponse2 = await novuClient.trigger({
-          name: workflow.triggers[0].identifier,
-          to: [subscriberOverride],
-          tenant: tenant.identifier,
-          payload: {
-            firstName: 'Testing of User Name',
-            urlVariable: '/test/url/path',
-          },
-        });
-
-        expect(triggerResponse2.result.status).to.equal('trigger_not_active');
-
-        await session.awaitRunningJobs();
-
-        const messages2 = await messageRepository.find({
-          _environmentId: session.environment._id,
-          _templateId: workflow._id,
-        });
-
-        expect(messages2.length).to.equal(0);
+        expect(messages.length).to.be.equal(2);
+        expect(messages[0].providerId).to.be.equal(EmailProviderIdEnum.Mailgun);
       });
 
-      /*
-       * TODO: we need to add support for Tenants in V2 Preferences
-       * This test is skipped for now as the tenant-level active flag is not taken into account for V2 Preferences
-       */
-      it.skip('should override - active true', async function () {
-        const subscriberOverride = SubscriberRepository.createObjectId();
+      describe('in-app avatar', () => {
+        it('should send the message with choosed system avatar', async () => {
+          const firstStepUuid = uuid();
+          template = await session.createTemplate({
+            steps: [
+              {
+                type: StepTypeEnum.IN_APP,
+                content: 'Hello world!',
+                uuid: firstStepUuid,
+                actor: {
+                  type: ActorTypeEnum.SYSTEM_ICON,
+                  data: SystemAvatarIconEnum.WARNING,
+                },
+              },
+            ],
+          });
 
-        // Create active workflow
-        const workflow = await createTemplate(session, ChannelTypeEnum.IN_APP);
+          await novuClient.trigger({
+            name: template.triggers[0].identifier,
+            to: [subscriber.subscriberId],
+            payload: {},
+          });
 
-        // Create active workflow override
-        const { tenant } = await workflowOverrideService.createWorkflowOverride({
-          workflowId: workflow._id,
-          active: true,
+          await session.awaitRunningJobs(template?._id, true, 1);
+
+          const messages = await messageRepository.find({
+            _environmentId: session.environment._id,
+            _subscriberId: subscriber._id,
+            channel: StepTypeEnum.IN_APP,
+          });
+
+          expect(messages.length).to.equal(1);
+          expect(messages[0].actor).to.be.ok;
+          expect(messages[0].actor?.type).to.eq(ActorTypeEnum.SYSTEM_ICON);
+          expect(messages[0].actor?.data).to.eq(SystemAvatarIconEnum.WARNING);
         });
 
-        if (!tenant) {
-          throw new Error('Tenant not found');
-        }
+        it('should send the message with custom system avatar url', async () => {
+          const firstStepUuid = uuid();
+          const avatarUrl = 'https://gravatar.com/avatar/5246ec47a6a90ef2bcd29f0ef7d2faa6?s=400&d=robohash&r=x';
 
-        const triggerResponse = await novuClient.trigger({
-          name: workflow.triggers[0].identifier,
-          to: [subscriberOverride],
-          tenant: tenant.identifier,
-          payload: {
-            firstName: 'Testing of User Name',
-            urlVariable: '/test/url/path',
-          },
+          template = await session.createTemplate({
+            steps: [
+              {
+                type: StepTypeEnum.IN_APP,
+                content: 'Hello world!',
+                uuid: firstStepUuid,
+                actor: {
+                  type: ActorTypeEnum.SYSTEM_CUSTOM,
+                  data: avatarUrl,
+                },
+              },
+            ],
+          });
+
+          await novuClient.trigger({
+            name: template.triggers[0].identifier,
+            to: [subscriber.subscriberId],
+            payload: {},
+          });
+
+          await session.awaitRunningJobs(template?._id, true, 1);
+
+          const messages = await messageRepository.find({
+            _environmentId: session.environment._id,
+            _subscriberId: subscriber._id,
+            channel: StepTypeEnum.IN_APP,
+          });
+
+          expect(messages.length).to.equal(1);
+          expect(messages[0].actor).to.be.ok;
+          expect(messages[0].actor?.type).to.eq(ActorTypeEnum.SYSTEM_CUSTOM);
+          expect(messages[0].actor?.data).to.eq(avatarUrl);
         });
 
-        expect(triggerResponse.result.status).to.equal('processed');
+        it('should send the message with the actor avatar', async () => {
+          const firstStepUuid = uuid();
+          const avatarUrl = 'https://gravatar.com/avatar/5246ec47a6a90ef2bcd29f0ef7d2faa6?s=400&d=robohash&r=x';
 
-        await session.awaitRunningJobs();
+          const actor = await subscriberService.createSubscriber({ avatar: avatarUrl });
 
-        const messages = await messageRepository.find({
-          _environmentId: session.environment._id,
-          _templateId: workflow._id,
+          template = await session.createTemplate({
+            steps: [
+              {
+                type: StepTypeEnum.IN_APP,
+                content: 'Hello world!',
+                uuid: firstStepUuid,
+                actor: {
+                  type: ActorTypeEnum.USER,
+                  data: null,
+                },
+              },
+            ],
+          });
+
+          await novuClient.trigger({
+            name: template.triggers[0].identifier,
+            to: [subscriber.subscriberId],
+            payload: {},
+            actor: actor.subscriberId,
+          });
+
+          await session.awaitRunningJobs(template?._id, true, 1);
+
+          const messages = await messageRepository.find({
+            _environmentId: session.environment._id,
+            _subscriberId: subscriber._id,
+            channel: StepTypeEnum.IN_APP,
+          });
+
+          expect(messages.length).to.equal(1);
+          expect(messages[0].actor).to.be.ok;
+          expect(messages[0].actor?.type).to.eq(ActorTypeEnum.USER);
+          expect(messages[0].actor?.data).to.eq(null);
+          expect(messages[0]._actorId).to.eq(actor._id);
         });
-
-        expect(messages.length).to.equal(1);
-
-        // Disable workflow - should not take effect as override is active
-        await notificationTemplateRepository.update(
-          { _id: workflow._id, _environmentId: session.environment._id },
-          { $set: { active: false } }
-        );
-
-        const triggerResponse2 = await novuClient.trigger({
-          name: workflow.triggers[0].identifier,
-          to: [subscriberOverride],
-          tenant: tenant.identifier,
-          payload: {
-            firstName: 'Testing of User Name',
-            urlVariable: '/test/url/path',
-          },
-        });
-
-        expect(triggerResponse2.result.status).to.equal('processed');
-
-        await session.awaitRunningJobs();
-
-        const messages2 = await messageRepository.find({
-          _environmentId: session.environment._id,
-          _templateId: workflow._id,
-        });
-
-        expect(messages2.length).to.equal(2);
       });
 
-      /*
-       * TODO: we need to add support for Tenants in V2 Preferences
-       * This test is skipped for now as the tenant-level active flag is not taken into account for V2 Preferences
-       */
-      it.skip('should override - preference - should disable in app channel', async function () {
-        const subscriberOverride = SubscriberRepository.createObjectId();
+      describe('seen/read filter', () => {
+        it('should filter in app seen/read step', async function () {
+          const firstStepUuid = uuid();
+          template = await session.createTemplate({
+            steps: [
+              {
+                type: StepTypeEnum.IN_APP,
+                content: 'Not Delayed {{customVar}}' as string,
+                uuid: firstStepUuid,
+              },
+              {
+                type: StepTypeEnum.DELAY,
+                content: '',
+                metadata: {
+                  unit: DigestUnitEnum.SECONDS,
+                  amount: 2,
+                  type: DelayTypeEnum.REGULAR,
+                },
+              },
+              {
+                type: StepTypeEnum.IN_APP,
+                content: 'Hello world {{customVar}}' as string,
+                filters: [
+                  {
+                    isNegated: false,
+                    type: 'GROUP',
+                    value: FieldLogicalOperatorEnum.AND,
+                    children: [
+                      {
+                        on: FilterPartTypeEnum.PREVIOUS_STEP,
+                        stepType: PreviousStepTypeEnum.READ,
+                        step: firstStepUuid,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          });
 
-        // Create a workflow with in app channel enabled
-        const workflow = await createTemplate(session, ChannelTypeEnum.IN_APP);
-
-        // Create a workflow with in app channel disabled
-        const { tenant } = await workflowOverrideService.createWorkflowOverride({
-          workflowId: workflow._id,
-          active: true,
-          preferenceSettings: { in_app: false },
-        });
-
-        if (!tenant) {
-          throw new Error('Tenant not found');
-        }
-        const triggerResponse = await novuClient.trigger({
-          name: workflow.triggers[0].identifier,
-          to: [subscriberOverride],
-          tenant: tenant.identifier,
-          payload: {
-            firstName: 'Testing of User Name',
-            urlVariable: '/test/url/path',
-          },
-        });
-
-        expect(triggerResponse.result.status).to.equal('processed');
-
-        await session.awaitRunningJobs();
-
-        const messages = await messageRepository.find({
-          _environmentId: session.environment._id,
-          _templateId: workflow._id,
-        });
-
-        expect(messages.length).to.equal(0);
-      });
-
-      /*
-       * TODO: we need to add support for Tenants in V2 Preferences
-       * This test is skipped for now as the tenant-level active flag is not taken into account for V2 Preferences
-       */
-      it.skip('should override - preference - should enable in app channel', async function () {
-        const subscriberOverride = SubscriberRepository.createObjectId();
-
-        // Create a workflow with in-app channel disabled
-        const workflow = await session.createTemplate({
-          steps: [
-            {
-              type: StepTypeEnum.IN_APP,
-              content: 'Hello' as string,
+          await novuClient.trigger({
+            name: template.triggers[0].identifier,
+            to: [subscriber.subscriberId],
+            payload: {
+              customVar: 'Testing of User Name',
             },
-          ],
-          preferenceSettingsOverride: { in_app: false },
+          });
+
+          await session.awaitRunningJobs(template?._id, true, 1);
+
+          const delayedJob = await jobRepository.findOne({
+            _environmentId: session.environment._id,
+            _templateId: template._id,
+            type: StepTypeEnum.DELAY,
+          });
+
+          if (!delayedJob) {
+            throw new Error();
+          }
+
+          expect(delayedJob.status).to.equal(JobStatusEnum.DELAYED);
+
+          const messages = await messageRepository.find({
+            _environmentId: session.environment._id,
+            _subscriberId: subscriber._id,
+            channel: StepTypeEnum.IN_APP,
+          });
+
+          expect(messages.length).to.equal(1);
+
+          await session.awaitRunningJobs(template?._id, true, 0);
+
+          const messagesAfter = await messageRepository.find({
+            _environmentId: session.environment._id,
+            _subscriberId: subscriber._id,
+            channel: StepTypeEnum.IN_APP,
+          });
+
+          expect(messagesAfter.length).to.equal(1);
         });
 
-        // Create workflow override with in app channel enabled
-        const { tenant } = await workflowOverrideService.createWorkflowOverride({
-          workflowId: workflow._id,
-          active: true,
-          preferenceSettings: { in_app: true },
+        it('should filter email seen/read step', async function () {
+          const firstStepUuid = uuid();
+          template = await session.createTemplate({
+            steps: [
+              {
+                type: StepTypeEnum.EMAIL,
+                name: 'Message Name',
+                subject: 'Test email subject',
+                content: [{ type: EmailBlockTypeEnum.TEXT, content: 'This is a sample text block' }],
+                uuid: firstStepUuid,
+              },
+              {
+                type: StepTypeEnum.DELAY,
+                content: '',
+                metadata: {
+                  unit: DigestUnitEnum.SECONDS,
+                  amount: 2,
+                  type: DelayTypeEnum.REGULAR,
+                },
+              },
+              {
+                type: StepTypeEnum.EMAIL,
+                name: 'Message Name',
+                subject: 'Test email subject',
+                content: [{ type: EmailBlockTypeEnum.TEXT, content: 'This is a sample text block' }],
+                filters: [
+                  {
+                    isNegated: false,
+                    type: 'GROUP',
+                    value: FieldLogicalOperatorEnum.AND,
+                    children: [
+                      {
+                        on: FilterPartTypeEnum.PREVIOUS_STEP,
+                        stepType: PreviousStepTypeEnum.READ,
+                        step: firstStepUuid,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          });
+
+          await novuClient.trigger({
+            name: template.triggers[0].identifier,
+            to: [subscriber.subscriberId],
+            payload: {
+              customVar: 'Testing of User Name',
+            },
+          });
+
+          await session.awaitRunningJobs(template?._id, true, 1);
+
+          const delayedJob = await jobRepository.findOne({
+            _environmentId: session.environment._id,
+            _templateId: template._id,
+            type: StepTypeEnum.DELAY,
+          });
+
+          expect(delayedJob!.status).to.equal(JobStatusEnum.DELAYED);
+
+          const messages = await messageRepository.find({
+            _environmentId: session.environment._id,
+            _subscriberId: subscriber._id,
+            channel: StepTypeEnum.EMAIL,
+          });
+
+          expect(messages.length).to.equal(1);
+
+          await executionDetailsRepository.create({
+            _jobId: delayedJob!._parentId,
+            _messageId: messages[0]._id,
+            _environmentId: session.environment._id,
+            _organizationId: session.organization._id,
+            webhookStatus: EmailEventStatusEnum.OPENED,
+          });
+
+          await session.awaitRunningJobs(template?._id, true, 0);
+
+          const messagesAfter = await messageRepository.find({
+            _environmentId: session.environment._id,
+            _subscriberId: subscriber._id,
+            channel: StepTypeEnum.EMAIL,
+          });
+
+          expect(messagesAfter.length).to.equal(1);
+        });
+      });
+
+      describe('workflow override', () => {
+        beforeEach(async () => {
+          workflowOverrideService = new WorkflowOverrideService({
+            organizationId: session.organization._id,
+            environmentId: session.environment._id,
+          });
         });
 
-        if (!tenant) {
-          throw new Error('Tenant not found');
-        }
+        it('should override - active false', async function () {
+          const subscriberOverride = SubscriberRepository.createObjectId();
 
-        const triggerResponse = await novuClient.trigger({
-          name: workflow.triggers[0].identifier,
-          to: [subscriberOverride],
-          tenant: tenant.identifier,
-          payload: {
-            firstName: 'Testing of User Name',
-            urlVariable: '/test/url/path',
-          },
+          // Create active workflow
+          const workflow = await createTemplate(session, ChannelTypeEnum.IN_APP);
+
+          // Create workflow override with active false
+          const { tenant } = await workflowOverrideService.createWorkflowOverride({
+            workflowId: workflow._id,
+            active: false,
+          });
+
+          if (!tenant) {
+            throw new Error('Tenant not found');
+          }
+
+          const triggerResponse = await novuClient.trigger({
+            name: workflow.triggers[0].identifier,
+            to: [subscriberOverride],
+            tenant: tenant.identifier,
+            payload: {
+              firstName: 'Testing of User Name',
+              urlVariable: '/test/url/path',
+            },
+          });
+
+          expect(triggerResponse.result.status).to.equal('trigger_not_active');
+
+          await session.awaitRunningJobs();
+
+          const messages = await messageRepository.find({
+            _environmentId: session.environment._id,
+            _templateId: workflow._id,
+          });
+
+          expect(messages.length).to.equal(0);
+
+          // Disable workflow - should not take effect, test for anomalies
+          await notificationTemplateRepository.update(
+            { _id: workflow._id, _environmentId: session.environment._id },
+            { $set: { active: false } }
+          );
+
+          const triggerResponse2 = await novuClient.trigger({
+            name: workflow.triggers[0].identifier,
+            to: [subscriberOverride],
+            tenant: tenant.identifier,
+            payload: {
+              firstName: 'Testing of User Name',
+              urlVariable: '/test/url/path',
+            },
+          });
+
+          expect(triggerResponse2.result.status).to.equal('trigger_not_active');
+
+          await session.awaitRunningJobs();
+
+          const messages2 = await messageRepository.find({
+            _environmentId: session.environment._id,
+            _templateId: workflow._id,
+          });
+
+          expect(messages2.length).to.equal(0);
         });
 
-        expect(triggerResponse.result.status).to.equal(201);
-        expect(triggerResponse.result.status).to.equal('processed');
+        /*
+         * TODO: we need to add support for Tenants in V2 Preferences
+         * This test is skipped for now as the tenant-level active flag is not taken into account for V2 Preferences
+         */
+        it.skip('should override - active true', async function () {
+          const subscriberOverride = SubscriberRepository.createObjectId();
 
-        await session.awaitRunningJobs();
+          // Create active workflow
+          const workflow = await createTemplate(session, ChannelTypeEnum.IN_APP);
 
-        const messages = await messageRepository.find({
-          _environmentId: session.environment._id,
-          _templateId: workflow._id,
+          // Create active workflow override
+          const { tenant } = await workflowOverrideService.createWorkflowOverride({
+            workflowId: workflow._id,
+            active: true,
+          });
+
+          if (!tenant) {
+            throw new Error('Tenant not found');
+          }
+
+          const triggerResponse = await novuClient.trigger({
+            name: workflow.triggers[0].identifier,
+            to: [subscriberOverride],
+            tenant: tenant.identifier,
+            payload: {
+              firstName: 'Testing of User Name',
+              urlVariable: '/test/url/path',
+            },
+          });
+
+          expect(triggerResponse.result.status).to.equal('processed');
+
+          await session.awaitRunningJobs();
+
+          const messages = await messageRepository.find({
+            _environmentId: session.environment._id,
+            _templateId: workflow._id,
+          });
+
+          expect(messages.length).to.equal(1);
+
+          // Disable workflow - should not take effect as override is active
+          await notificationTemplateRepository.update(
+            { _id: workflow._id, _environmentId: session.environment._id },
+            { $set: { active: false } }
+          );
+
+          const triggerResponse2 = await novuClient.trigger({
+            name: workflow.triggers[0].identifier,
+            to: [subscriberOverride],
+            tenant: tenant.identifier,
+            payload: {
+              firstName: 'Testing of User Name',
+              urlVariable: '/test/url/path',
+            },
+          });
+
+          expect(triggerResponse2.result.status).to.equal('processed');
+
+          await session.awaitRunningJobs();
+
+          const messages2 = await messageRepository.find({
+            _environmentId: session.environment._id,
+            _templateId: workflow._id,
+          });
+
+          expect(messages2.length).to.equal(2);
         });
 
-        expect(messages.length).to.equal(1);
+        /*
+         * TODO: we need to add support for Tenants in V2 Preferences
+         * This test is skipped for now as the tenant-level active flag is not taken into account for V2 Preferences
+         */
+        it.skip('should override - preference - should disable in app channel', async function () {
+          const subscriberOverride = SubscriberRepository.createObjectId();
+
+          // Create a workflow with in app channel enabled
+          const workflow = await createTemplate(session, ChannelTypeEnum.IN_APP);
+
+          // Create a workflow with in app channel disabled
+          const { tenant } = await workflowOverrideService.createWorkflowOverride({
+            workflowId: workflow._id,
+            active: true,
+            preferenceSettings: { in_app: false },
+          });
+
+          if (!tenant) {
+            throw new Error('Tenant not found');
+          }
+          const triggerResponse = await novuClient.trigger({
+            name: workflow.triggers[0].identifier,
+            to: [subscriberOverride],
+            tenant: tenant.identifier,
+            payload: {
+              firstName: 'Testing of User Name',
+              urlVariable: '/test/url/path',
+            },
+          });
+
+          expect(triggerResponse.result.status).to.equal('processed');
+
+          await session.awaitRunningJobs();
+
+          const messages = await messageRepository.find({
+            _environmentId: session.environment._id,
+            _templateId: workflow._id,
+          });
+
+          expect(messages.length).to.equal(0);
+        });
+
+        /*
+         * TODO: we need to add support for Tenants in V2 Preferences
+         * This test is skipped for now as the tenant-level active flag is not taken into account for V2 Preferences
+         */
+        it.skip('should override - preference - should enable in app channel', async function () {
+          const subscriberOverride = SubscriberRepository.createObjectId();
+
+          // Create a workflow with in-app channel disabled
+          const workflow = await session.createTemplate({
+            steps: [
+              {
+                type: StepTypeEnum.IN_APP,
+                content: 'Hello' as string,
+              },
+            ],
+            preferenceSettingsOverride: { in_app: false },
+          });
+
+          // Create workflow override with in app channel enabled
+          const { tenant } = await workflowOverrideService.createWorkflowOverride({
+            workflowId: workflow._id,
+            active: true,
+            preferenceSettings: { in_app: true },
+          });
+
+          if (!tenant) {
+            throw new Error('Tenant not found');
+          }
+
+          const triggerResponse = await novuClient.trigger({
+            name: workflow.triggers[0].identifier,
+            to: [subscriberOverride],
+            tenant: tenant.identifier,
+            payload: {
+              firstName: 'Testing of User Name',
+              urlVariable: '/test/url/path',
+            },
+          });
+
+          expect(triggerResponse.result.status).to.equal(201);
+          expect(triggerResponse.result.status).to.equal('processed');
+
+          await session.awaitRunningJobs();
+
+          const messages = await messageRepository.find({
+            _environmentId: session.environment._id,
+            _templateId: workflow._id,
+          });
+
+          expect(messages.length).to.equal(1);
+        });
       });
     });
   });
+
   async function sendTrigger(
     templateInner: NotificationTemplateEntity,
     newSubscriberIdInAppNotification: string,
     payload: Record<string, unknown> = {},
-    overrides: Record<string, unknown> = {},
+    overrides: Record<string, Record<string, unknown>> = {},
     tenant?: string,
     actor?: string
   ): Promise<TriggerEventResponseDto> {
