@@ -1,0 +1,113 @@
+{
+  "timestamp": 1733311977381,
+  "data": {
+    "headers": ["$event", "$distinct_id"],
+    "computed_at": "2024-12-04T11:32:56.526066+00:00",
+    "date_range": {
+      "from_date": "2024-11-25T00:00:00+02:00",
+      "to_date": "2024-12-04T13:32:54.570035+02:00"
+    },
+    "meta": {
+      "min_sampling_factor": 1,
+      "is_segmentation_limit_hit": false,
+      "report_sections": {
+        "group": [
+          {
+            "bookmark": {
+              "dataGroupId": "7400984862319914261",
+              "dataset": "$mixpanel",
+              "propertyType": "string",
+              "resourceType": "people",
+              "search": "",
+              "value": "$distinct_id"
+            }
+          }
+        ],
+        "show": [
+          {
+            "metric_key": "A. Session Initialized - [Inbox] [Total Events]"
+          },
+          {
+            "metric_key": "B. Update Preferences - [Inbox] [Total Events]"
+          },
+          {
+            "metric_key": "C. Mark Notification As - [Inbox] [Total Events]"
+          },
+          {
+            "metric_key": "D. Update Notification Action - [Inbox] [Total Events]"
+          }
+        ]
+      }
+    },
+    "series": {
+      "A. Session Initialized - [Inbox] [Total Events]": {
+        "$overall": {
+          "2024-11-25T00:00:00+02:00": 1110879,
+          "2024-12-02T00:00:00+02:00": 350009
+        },
+        "66bdd7144a759ebff0deb5e2": {
+          "2024-11-25T00:00:00+02:00": 1110879,
+          "2024-12-02T00:00:00+02:00": 350009
+        }
+      },
+      "B. Update Preferences - [Inbox] [Total Events]": {
+        "$overall": {
+          "2024-11-25T00:00:00+02:00": 2,
+          "2024-12-02T00:00:00+02:00": 0
+        },
+        "66bdd7144a759ebff0deb5e2": {
+          "2024-11-25T00:00:00+02:00": 2,
+          "2024-12-02T00:00:00+02:00": 0
+        }
+      },
+      "C. Mark Notification As - [Inbox] [Total Events]": {
+        "$overall": {
+          "2024-11-25T00:00:00+02:00": 249,
+          "2024-12-02T00:00:00+02:00": 74
+        },
+        "66bdd7144a759ebff0deb5e2": {
+          "2024-11-25T00:00:00+02:00": 249,
+          "2024-12-02T00:00:00+02:00": 74
+        }
+      }
+    },
+    "time_comparison": {
+      "date_range": {
+        "from_date": "2024-10-25T00:00:00+03:00",
+        "to_date": "2024-11-03T23:59:59.999000+02:00"
+      },
+      "series": {
+        "A. Session Initialized - [Inbox] [Total Events]": {
+          "$overall": {
+            "2024-10-21T00:00:00+03:00": 227100,
+            "2024-10-28T00:00:00+02:00": 474209
+          },
+          "66bdd7144a759ebff0deb5e2": {
+            "2024-10-21T00:00:00+03:00": 227100,
+            "2024-10-28T00:00:00+02:00": 474209
+          }
+        },
+        "B. Update Preferences - [Inbox] [Total Events]": {
+          "$overall": {
+            "2024-10-21T00:00:00+03:00": 6,
+            "2024-10-28T00:00:00+02:00": 2
+          },
+          "66bdd7144a759ebff0deb5e2": {
+            "2024-10-21T00:00:00+03:00": 6,
+            "2024-10-28T00:00:00+02:00": 2
+          }
+        },
+        "C. Mark Notification As - [Inbox] [Total Events]": {
+          "$overall": {
+            "2024-10-21T00:00:00+03:00": 94,
+            "2024-10-28T00:00:00+02:00": 162
+          },
+          "66bdd7144a759ebff0deb5e2": {
+            "2024-10-21T00:00:00+03:00": 94,
+            "2024-10-28T00:00:00+02:00": 162
+          }
+        }
+      }
+    }
+  }
+}
