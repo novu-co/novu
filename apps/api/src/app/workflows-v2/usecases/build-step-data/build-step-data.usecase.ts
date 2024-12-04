@@ -38,7 +38,7 @@ export class BuildStepDataUsecase {
       variables: this.buildAvailableVariableSchemaUsecase.execute({
         stepDatabaseId: currentStep._templateId,
         workflow,
-      }), // Use the new use case to build variables schema
+      }),
       name: currentStep.name,
       _id: currentStep._templateId,
       stepId: currentStep.stepId,

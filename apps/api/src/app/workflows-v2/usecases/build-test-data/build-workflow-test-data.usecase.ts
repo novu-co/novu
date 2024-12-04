@@ -105,7 +105,7 @@ export class BuildWorkflowTestDataUseCase {
 
     const concatenatedControlValues = flattenedControls.map(flattenObjectValues).flat().join(' ');
 
-    return extractTemplateVars(concatenatedControlValues);
+    return extractTemplateVars(concatenatedControlValues).validVariables;
   }
 
   @Instrument()

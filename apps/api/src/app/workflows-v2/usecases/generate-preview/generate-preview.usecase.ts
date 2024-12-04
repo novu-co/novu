@@ -92,18 +92,6 @@ export class GeneratePreviewUsecase {
   }
 
   @Instrument()
-  private generateVariablesExample(stepData: StepDataDto, commandControlValues?: Record<string, unknown>) {
-    const controlValues = flattenObjectValues(commandControlValues || stepData.controls.values).join(' ');
-    const templateVars = extractTemplateVars(controlValues);
-    const variablesExample = pathsToObject(templateVars, {
-      valuePrefix: '{{',
-      valueSuffix: '}}',
-    });
-
-    return variablesExample;
-  }
-
-  @Instrument()
   private async findWorkflow(command: GeneratePreviewCommand) {
     return await this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({
