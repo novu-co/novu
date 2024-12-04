@@ -1,15 +1,6 @@
 import { Template, Liquid, RenderError, LiquidError } from 'liquidjs';
-
-type InvalidVariable = {
-  context: string;
-  message: string;
-  variable: string;
-};
-
-type TemplateParseResult = {
-  validVariables: string[];
-  invalidVariables: InvalidVariable[];
-};
+import { TemplateParseResult, InvalidVariable } from './parser-types';
+import { isValidTemplate, extractLiquidExpressions } from './parser-utils';
 
 const LIQUID_CONFIG = {
   strictVariables: true,
@@ -23,7 +14,6 @@ const LIQUID_CONFIG = {
  * Used to handle multiple render errors that can occur during template parsing.
  * @see https://github.com/harttle/liquidjs/blob/d61855bf725a6deba203201357f7455f6f9b4a32/src/util/error.ts#L65
  */
-
 class LiquidErrors extends LiquidError {
   errors: RenderError[];
 }
@@ -32,7 +22,36 @@ function isLiquidErrors(error: unknown): error is LiquidErrors {
   return error instanceof LiquidError && 'errors' in error && Array.isArray((error as LiquidErrors).errors);
 }
 
-export function extractTemplateVars(template: string): TemplateParseResult {
+/**
+ * Parses a Liquid template string and extracts all variable names, including nested paths.
+ * Validates the syntax and separates valid variables from invalid ones.
+ *
+ * @example
+ * // Valid variables
+ * parseLiquidVariables('Hello {{user.name}}, your score is {{user.score}}')
+ * // Returns:
+ * {
+ *   validVariables: ['user.name', 'user.score'],
+ *   invalidVariables: []
+ * }
+ *
+ * @example
+ * // Mixed valid and invalid syntax
+ * parseLiquidVariables('{{user.name}} {{invalid..syntax}}')
+ * // Returns:
+ * {
+ *   validVariables: ['user.name'],
+ *   invalidVariables: [{
+ *     context: '>> 1| {{invalid..syntax}}\n                ^',
+ *     message: 'expected "|" before filter',
+ *     variable: '{{invalid..syntax}}'
+ *   }]
+ * }
+ *
+ * @param template - The Liquid template string to parse
+ * @returns Object containing arrays of valid and invalid variables found in the template
+ */
+export function extractLiquidTemplateVariables(template: string): TemplateParseResult {
   if (!isValidTemplate(template)) {
     return { validVariables: [], invalidVariables: [] };
   }
@@ -43,10 +62,6 @@ export function extractTemplateVars(template: string): TemplateParseResult {
   }
 
   return processLiquidRawOutput(liquidRawOutput);
-}
-
-function isValidTemplate(template: unknown): template is string {
-  return typeof template === 'string' && template.length > 0;
 }
 
 function processLiquidRawOutput(rawOutputs: string[]): TemplateParseResult {
@@ -108,18 +123,4 @@ function extractValidProps(template: any): string[] {
   }
 
   return validProps;
-}
-
-/**
- * Extracts all Liquid expressions wrapped in {{ }} from a given string
- * @example
- * "{{ username | append: 'hi' }}" => ["{{ username | append: 'hi' }}"]
- * "<input value='{{username}}'>" => ["{{username}}"]
- */
-export function extractLiquidExpressions(str: string): string[] {
-  if (!str) return [];
-
-  const LIQUID_EXPRESSION_PATTERN = /{{\s*[^{}]+}}/g;
-
-  return str.match(LIQUID_EXPRESSION_PATTERN) || [];
 }

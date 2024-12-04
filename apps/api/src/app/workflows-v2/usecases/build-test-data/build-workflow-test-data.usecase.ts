@@ -17,7 +17,7 @@ import { WorkflowTestDataCommand } from './build-workflow-test-data.command';
 import { parsePayloadSchema } from '../../shared/parse-payload-schema';
 import { flattenObjectValues, mockSchemaDefaults } from '../../util/utils';
 import { pathsToObject } from '../../util/path-to-object';
-import { extractTemplateVars } from '../../util/template-variables/extract-template-variables';
+import { extractLiquidTemplateVariables } from '../../util/template-parser/liquid-parser';
 import { convertJsonToSchemaWithDefaults } from '../../util/jsonToSchema';
 
 @Injectable()
@@ -105,7 +105,7 @@ export class BuildWorkflowTestDataUseCase {
 
     const concatenatedControlValues = flattenedControls.map(flattenObjectValues).flat().join(' ');
 
-    return extractTemplateVars(concatenatedControlValues).validVariables;
+    return extractLiquidTemplateVariables(concatenatedControlValues).validVariables;
   }
 
   @Instrument()
