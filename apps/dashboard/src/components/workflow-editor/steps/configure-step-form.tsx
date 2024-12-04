@@ -43,10 +43,11 @@ type ConfigureStepFormProps = {
   environment: IEnvironment;
   step: StepDataDto;
   update: (data: UpdateWorkflowDto) => void;
+  updateStepCache: (step: Partial<StepDataDto>) => void;
 };
 
 export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
-  const { step, workflow, update, environment } = props;
+  const { step, workflow, update, updateStepCache, environment } = props;
   const navigate = useNavigate();
   const isCodeCreatedWorkflow = workflow.origin === WorkflowOriginEnum.EXTERNAL;
 
@@ -64,10 +65,6 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
 
   const form = useForm<z.infer<typeof stepSchema>>({
     defaultValues,
-    values: {
-      ...defaultValues,
-      ...step.controls.values,
-    },
     resolver: zodResolver(stepSchema),
     shouldFocusError: false,
   });
@@ -78,6 +75,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     isReadOnly: isCodeCreatedWorkflow,
     save: (data) => {
       update(updateStepInWorkflow(workflow, data));
+      updateStepCache(data);
     },
   });
 

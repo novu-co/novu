@@ -1,4 +1,16 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+  Headers,
+} from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { SubscriberEntity } from '@novu/dal';
@@ -51,12 +63,16 @@ export class InboxController {
   ) {}
 
   @Post('/session')
-  async sessionInitialize(@Body() body: SubscriberSessionRequestDto): Promise<SubscriberSessionResponseDto> {
+  async sessionInitialize(
+    @Body() body: SubscriberSessionRequestDto,
+    @Headers('origin') origin: string
+  ): Promise<SubscriberSessionResponseDto> {
     return await this.initializeSessionUsecase.execute(
       SessionCommand.create({
         subscriberId: body.subscriberId,
         applicationIdentifier: body.applicationIdentifier,
         subscriberHash: body.subscriberHash,
+        origin,
       })
     );
   }

@@ -60,10 +60,6 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues,
-    values: {
-      ...defaultValues,
-      ...step.controls.values,
-    },
     shouldFocusError: false,
   });
 

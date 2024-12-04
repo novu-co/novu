@@ -25,7 +25,7 @@ export const FreeTrialCard = () => {
   return (
     <a
       href={LEGACY_ROUTES.BILLING}
-      className="bg-background group absolute bottom-3 left-2 flex w-[calc(100%-1rem)] cursor-pointer flex-col gap-2 rounded-lg p-3 shadow"
+      className="bg-background group relative left-2 mb-2 flex w-[calc(100%-1rem)] cursor-pointer flex-col gap-2 rounded-lg p-3 shadow"
     >
       <div className="flex items-center gap-1.5">
         <div

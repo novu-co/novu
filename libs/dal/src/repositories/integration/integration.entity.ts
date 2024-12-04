@@ -37,6 +37,8 @@ export class IntegrationEntity {
   conditions?: StepFilter[];
 
   removeNovuBranding?: boolean;
+
+  connected?: boolean;
 }
 
 export type ICredentialsEntity = ICredentials;
