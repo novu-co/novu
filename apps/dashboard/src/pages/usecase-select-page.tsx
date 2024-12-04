@@ -42,6 +42,14 @@ export function UsecaseSelectPage() {
   const [hoveredUseCase, setHoveredUseCase] = useState<ChannelTypeEnum | null>(null);
 
   useEffect(() => {
+    // Preload all usecase images
+    channelOptions.forEach((option) => {
+      const img = new Image();
+      img.src = `/images/auth/${option.image}`;
+    });
+  }, []);
+
+  useEffect(() => {
     track(TelemetryEvent.USECASE_SELECT_PAGE_VIEWED);
   }, [track]);
 

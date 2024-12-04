@@ -14,6 +14,7 @@ import { TelemetryEvent } from '../../utils/telemetry';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../utils/routes';
 import { useMutation } from '@tanstack/react-query';
+import { useUser } from '@clerk/clerk-react';
 
 interface QuestionnaireFormData {
   jobTitle: JobTitleEnum;
@@ -33,7 +34,7 @@ interface SubmitQuestionnaireData {
 export function QuestionnaireForm() {
   const { control, watch, handleSubmit } = useForm<QuestionnaireFormData>();
   const submitQuestionnaireMutation = useSubmitQuestionnaire();
-
+  const { user } = useUser();
   const selectedJobTitle = watch('jobTitle');
   const selectedOrgType = watch('organizationType');
   const companySize = watch('companySize');
@@ -58,6 +59,15 @@ export function QuestionnaireForm() {
       pageName: 'Create Organization Form',
       hubspotContext: hubspotContext || '',
     });
+
+    if (!user?.unsafeMetadata?.newDashboardOptInStatus) {
+      await user?.update({
+        unsafeMetadata: {
+          newDashboardOptInStatus: 'opted_in',
+        },
+      });
+      await user?.reload();
+    }
   };
 
   return (

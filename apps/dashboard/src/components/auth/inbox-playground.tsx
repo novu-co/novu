@@ -91,7 +91,7 @@ export function InboxPlayground() {
   });
 
   const { triggerWorkflow, isPending } = useTriggerWorkflow();
-  const { data } = useWorkflows({ query: ONBOARDING_DEMO_WORKFLOW_ID });
+  const { data, isLoading } = useWorkflows({ query: ONBOARDING_DEMO_WORKFLOW_ID });
   const auth = useAuth();
   const [hasNotificationBeenSent, setHasNotificationBeenSent] = useState(false);
   const navigate = useNavigate();
@@ -102,7 +102,7 @@ export function InboxPlayground() {
   }, [telemetry]);
 
   useEffect(() => {
-    if (!data) return;
+    if (!data || isLoading) return;
 
     /**
      * We only want to create the demo workflow if it doesn't exist yet.
@@ -116,7 +116,7 @@ export function InboxPlayground() {
     };
 
     initializeDemoWorkflow();
-  }, [data]);
+  }, [data, isLoading]);
 
   const handleSendNotification = async () => {
     try {
