@@ -1,8 +1,5 @@
-import type { ListWorkflowResponse } from '@novu/shared';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { RiMore2Fill } from 'react-icons/ri';
 import { createSearchParams, useLocation, useSearchParams } from 'react-router-dom';
-import { getV2 } from '@/api/api.client';
 import { DefaultPagination } from '@/components/default-pagination';
 import { Skeleton } from '@/components/primitives/skeleton';
 import {
@@ -14,13 +11,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/primitives/table';
-import { useEnvironment } from '@/context/environment/hooks';
-import { QueryKeys } from '@/utils/query-keys';
 import { WorkflowRow } from '@/components/workflow-row';
 import { WorkflowListEmpty } from '@/components/workflow-list-empty';
+import { useWorkflows } from '@/hooks/use-workflows';
 
-export const WorkflowList = () => {
-  const { currentEnvironment } = useEnvironment();
+export function WorkflowList() {
   const [searchParams] = useSearchParams();
   const location = useLocation();
 
@@ -33,21 +28,15 @@ export const WorkflowList = () => {
 
   const offset = parseInt(searchParams.get('offset') || '0');
   const limit = parseInt(searchParams.get('limit') || '12');
-  const workflowsQuery = useQuery({
-    queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id, { limit, offset }],
-    queryFn: async () => {
-      const { data } = await getV2<{ data: ListWorkflowResponse }>(`/workflows?limit=${limit}&offset=${offset}`);
-      return data;
-    },
-    placeholderData: keepPreviousData,
+
+  const { data, isPending, isError, currentPage, totalPages } = useWorkflows({
+    limit,
+    offset,
   });
-  const currentPage = Math.floor(offset / limit) + 1;
 
-  if (workflowsQuery.isError) {
-    return null;
-  }
+  if (isError) return null;
 
-  if (!workflowsQuery.isPending && workflowsQuery.data.totalCount === 0) {
+  if (!isPending && data.totalCount === 0) {
     return <WorkflowListEmpty />;
   }
 
@@ -65,7 +54,7 @@ export const WorkflowList = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {workflowsQuery.isPending ? (
+          {isPending ? (
             <>
               {new Array(limit).fill(0).map((_, index) => (
                 <TableRow key={index}>
@@ -93,28 +82,28 @@ export const WorkflowList = () => {
             </>
           ) : (
             <>
-              {workflowsQuery.data.workflows.map((workflow) => (
+              {data.workflows.map((workflow) => (
                 <WorkflowRow key={workflow._id} workflow={workflow} />
               ))}
             </>
           )}
         </TableBody>
-        {workflowsQuery.data && limit < workflowsQuery.data.totalCount && (
+        {data && limit < data.totalCount && (
           <TableFooter>
             <TableRow>
               <TableCell colSpan={5}>
                 <div className="flex items-center justify-between">
-                  {workflowsQuery.data ? (
+                  {data ? (
                     <span className="text-foreground-600 block text-sm font-normal">
-                      Page {currentPage} of {Math.ceil(workflowsQuery.data.totalCount / limit)}
+                      Page {currentPage} of {totalPages}
                     </span>
                   ) : (
                     <Skeleton className="h-5 w-[20ch]" />
                   )}
-                  {workflowsQuery.data ? (
+                  {data ? (
                     <DefaultPagination
                       hrefFromOffset={hrefFromOffset}
-                      totalCount={workflowsQuery.data.totalCount}
+                      totalCount={data.totalCount}
                       limit={limit}
                       offset={offset}
                     />
@@ -130,4 +119,4 @@ export const WorkflowList = () => {
       </Table>
     </div>
   );
-};
+}
