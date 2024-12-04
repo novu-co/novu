@@ -1,15 +1,15 @@
 import {
   IsDefined,
-  IsString,
-  IsOptional,
-  ValidateNested,
-  ValidateIf,
   IsEnum,
+  IsOptional,
+  IsString,
+  ValidateIf,
+  ValidateNested,
 } from 'class-validator';
 
 import {
   AddressingTypeEnum,
-  ControlsDto,
+  StatelessWorkflowToStepControlValues,
   TriggerRecipientsPayload,
   TriggerRecipientSubscriber,
   TriggerRequestCategoryEnum,
@@ -55,7 +55,7 @@ export class TriggerEventBaseCommand extends EnvironmentWithUserCommand {
   @IsOptional()
   bridgeWorkflow?: DiscoverWorkflowOutput;
 
-  controls?: ControlsDto;
+  controls?: StatelessWorkflowToStepControlValues;
 }
 
 export class TriggerEventMulticastCommand extends TriggerEventBaseCommand {
