@@ -1,8 +1,7 @@
 import { Template, Liquid } from 'liquidjs';
 
 /**
- * Extracts variable names from a Liquid template string using both parsing and regex approaches
- * to be more permissive with invalid syntax while still capturing valid variables.
+ * Extracts variable names from a Liquid template
  */
 export const extractTemplateVars = function (str: string): {
   validVariables: string[];
