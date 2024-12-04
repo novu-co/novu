@@ -6,7 +6,15 @@ import type { SnippetLanguage } from './types';
 
 const basicSetup = { lineNumbers: true };
 
-export const SnippetEditor = ({ language, value }: { language: SnippetLanguage; value: string }) => {
+export const SnippetEditor = ({
+  language,
+  value,
+  readOnly = false,
+}: {
+  language: SnippetLanguage;
+  value: string;
+  readOnly?: boolean;
+}) => {
   const editorLanguage: LanguageName = language === 'framework' ? 'typescript' : language;
 
   const extensions = useMemo(() => {
@@ -19,6 +27,13 @@ export const SnippetEditor = ({ language, value }: { language: SnippetLanguage; 
   }, [editorLanguage]);
 
   return (
-    <Editor lang={editorLanguage} className="h-full" value={value} extensions={extensions} basicSetup={basicSetup} />
+    <Editor
+      readOnly={readOnly}
+      lang={editorLanguage}
+      className="h-full"
+      value={value}
+      extensions={extensions}
+      basicSetup={basicSetup}
+    />
   );
 };
