@@ -15,16 +15,15 @@ import {
 } from '@novu/application-generic';
 import { WorkflowTestDataCommand } from './build-workflow-test-data.command';
 import { parsePayloadSchema } from '../../shared/parse-payload-schema';
-import { flattenObjectValues, mockSchemaDefaults } from '../../util/utils';
-import { pathsToObject } from '../../util/path-to-object';
-import { extractLiquidTemplateVariables } from '../../util/template-parser/liquid-parser';
-import { convertJsonToSchemaWithDefaults } from '../../util/jsonToSchema';
+import { mockSchemaDefaults } from '../../util/utils';
+import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
+import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
 
 @Injectable()
 export class BuildWorkflowTestDataUseCase {
   constructor(
     private readonly getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private readonly controlValuesRepository: ControlValuesRepository
+    private readonly buildPayloadSchema: BuildPayloadSchema
   ) {}
 
   @InstrumentUsecase()
@@ -49,11 +48,14 @@ export class BuildWorkflowTestDataUseCase {
       return parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {};
     }
 
-    return this.generatePayloadSchema({
-      environmentId: command.user.environmentId,
-      organizationId: command.user.organizationId,
-      workflowId: workflow._id,
-    });
+    return this.buildPayloadSchema.execute(
+      BuildPayloadSchemaCommand.create({
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
+        userId: command.user._id,
+        workflowId: workflow._id,
+      })
+    );
   }
 
   private generatePayloadMock(schema: JSONSchemaDto): Record<string, unknown> {
@@ -62,50 +64,6 @@ export class BuildWorkflowTestDataUseCase {
     }
 
     return mockSchemaDefaults(schema);
-  }
-
-  @Instrument()
-  private async generatePayloadSchema({
-    environmentId,
-    organizationId,
-    workflowId,
-  }: {
-    environmentId: string;
-    organizationId: string;
-    workflowId: string;
-  }): Promise<JSONSchemaDto> {
-    const controlValues = await this.controlValuesRepository.find({
-      _environmentId: environmentId,
-      _organizationId: organizationId,
-      _workflowId: workflowId,
-      level: ControlValuesLevelEnum.STEP_CONTROLS,
-    });
-
-    if (!controlValues?.length) {
-      return {};
-    }
-
-    const templateVars = this.extractTemplateVariables(controlValues);
-    if (templateVars.length === 0) {
-      return {};
-    }
-
-    const variablesExample = pathsToObject(templateVars, {
-      valuePrefix: '{{',
-      valueSuffix: '}}',
-    }).payload as Record<string, unknown>;
-
-    return convertJsonToSchemaWithDefaults(variablesExample);
-  }
-
-  private extractTemplateVariables(controlValues: Array<{ controls: unknown | null }>): string[] {
-    const flattenedControls = controlValues
-      .map((item) => item.controls)
-      .filter((control): control is NonNullable<typeof control> => control != null);
-
-    const concatenatedControlValues = flattenedControls.map(flattenObjectValues).flat().join(' ');
-
-    return extractLiquidTemplateVariables(concatenatedControlValues).validVariables;
   }
 
   @Instrument()

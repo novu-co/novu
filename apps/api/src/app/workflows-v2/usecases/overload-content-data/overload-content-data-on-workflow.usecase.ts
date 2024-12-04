@@ -41,9 +41,12 @@ export class OverloadContentDataOnWorkflowUseCase {
       }
       const controlValues = stepIdToControlValuesMap[step._templateId];
 
-      const jsonSchemaDto = this.buildAvailableVariableSchemaUsecase.execute({
+      const jsonSchemaDto = await this.buildAvailableVariableSchemaUsecase.execute({
+        environmentId: user.environmentId,
+        organizationId: user.organizationId,
+        userId: user._id,
         workflow,
-        stepDatabaseId: step._templateId,
+        stepInternalId: step._templateId,
       });
       validatedStepContent[step._templateId] = await this.prepareAndValidateContentUsecase.execute({
         stepType: step?.template?.type,

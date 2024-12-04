@@ -35,8 +35,11 @@ export class BuildStepDataUsecase {
         uiSchema: currentStep.template?.controls?.uiSchema,
         values: controlValues,
       },
-      variables: this.buildAvailableVariableSchemaUsecase.execute({
-        stepDatabaseId: currentStep._templateId,
+      variables: await this.buildAvailableVariableSchemaUsecase.execute({
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
+        userId: command.user._id,
+        stepInternalId: currentStep._templateId,
         workflow,
       }),
       name: currentStep.name,
