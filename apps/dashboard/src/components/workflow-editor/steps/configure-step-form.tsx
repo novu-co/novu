@@ -49,7 +49,7 @@ import { ConfigureStepTemplateCta } from '@/components/workflow-editor/steps/con
 import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
 import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/email/configure-email-step-preview';
 
-const STEP_TYPE_TO_CONTROL_VALUES_FORM: Record<StepTypeEnum, () => React.JSX.Element | null> = {
+const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
   [StepTypeEnum.IN_APP]: () => null,
   [StepTypeEnum.EMAIL]: () => null,
@@ -144,7 +144,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     form,
     isReadOnly,
     save: (data) => {
-      // tranform form fields to step update dto
+      // transform form fields to step update dto
       const updateStepData: Partial<StepUpdateDto> = {
         name: data.name,
         ...(data.controlValues ? { controlValues: data.controlValues } : {}),
@@ -172,7 +172,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   }, [setControlValuesIssues]);
 
   const Preview = STEP_TYPE_TO_PREVIEW[step.type];
-  const ControlValuesForm = STEP_TYPE_TO_CONTROL_VALUES_FORM[step.type];
+  const InlineControlValues = STEP_TYPE_TO_INLINE_CONTROL_VALUES[step.type];
 
   return (
     <>
@@ -252,7 +252,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               <>
                 <Separator />
                 <SidebarContent>
-                  <ControlValuesForm />
+                  <InlineControlValues />
                 </SidebarContent>
               </>
             )}

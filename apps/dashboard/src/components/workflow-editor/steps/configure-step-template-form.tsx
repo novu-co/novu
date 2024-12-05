@@ -70,7 +70,7 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
     previousData: defaultValues,
     form,
     save: (data) => {
-      // tranform form fields to step update dto
+      // transform form fields to step update dto
       const updateStepData: Partial<StepUpdateDto> = {
         controlValues: data,
       };
