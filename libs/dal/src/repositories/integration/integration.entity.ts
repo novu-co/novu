@@ -1,4 +1,4 @@
-import { BuilderFieldType, BuilderGroupValues, ChannelTypeEnum, FilterParts, ICredentials } from '@novu/shared';
+import { ChannelTypeEnum, ICredentials } from '@novu/shared';
 
 import type { EnvironmentId } from '../environment';
 import type { OrganizationId } from '../organization';
@@ -30,9 +30,9 @@ export class IntegrationEntity {
 
   deleted: boolean;
 
-  deletedAt: string;
+  deletedAt?: string;
 
-  deletedBy: string;
+  deletedBy?: string;
 
   conditions?: StepFilter[];
 
