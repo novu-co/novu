@@ -102,7 +102,7 @@ export function useSyncWorkflow(workflow: WorkflowResponseDto | WorkflowListResp
       syncWorkflow(workflow._id, {
         targetEnvironmentId: oppositeEnvironment?._id || '',
       }).then((res) => ({ workflow: res.data, environment: oppositeEnvironment || undefined })),
-    onMutate: async () => {
+    onMutate: () => {
       setIsLoading(true);
       loadingToast = toast.loading(
         <>
