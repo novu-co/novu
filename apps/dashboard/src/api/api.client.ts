@@ -1,5 +1,5 @@
 import { getToken } from '@/utils/auth';
-import { API_HOSTNAME } from '../config';
+import { API_HOSTNAME } from '@/config';
 import { getEnvironmentId } from '@/utils/environment';
 
 export class NovuApiError extends Error {
