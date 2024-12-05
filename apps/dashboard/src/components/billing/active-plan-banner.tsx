@@ -5,15 +5,14 @@ import { cn } from '../../utils/ui';
 import { useSubscription } from './hooks/use-subscription';
 import { CalendarDays } from 'lucide-react';
 import { PlanActionButton } from './plan-action-button';
+import { Skeleton } from '@/components/primitives/skeleton';
 
 interface ActivePlanBannerProps {
   selectedBillingInterval: 'month' | 'year';
 }
 
 export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerProps) {
-  const { data: subscription } = useSubscription();
-  const { trial, apiServiceLevel, events } = subscription || {};
-  const { current: currentEvents, included: maxEvents } = events || {};
+  const { data: subscription, isLoading } = useSubscription();
 
   const getProgressColor = (current: number, max: number) => {
     const percentage = (current / max) * 100;
@@ -44,15 +43,21 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-3">
-                <h3 className="text-lg font-semibold capitalize">{apiServiceLevel?.toLowerCase()}</h3>
-                {trial?.isActive && (
+                {!subscription ? (
+                  <Skeleton className="h-7 w-24" />
+                ) : (
+                  <h3 className="text-lg font-semibold capitalize">{subscription.apiServiceLevel.toLowerCase()}</h3>
+                )}
+                {subscription?.trial.isActive && (
                   <Badge variant="outline" className="font-medium">
                     Trial
                   </Badge>
                 )}
               </div>
-              {trial?.isActive && (
-                <div className="text-warning text-sm font-medium">{trial.daysLeft} days left for trial</div>
+              {subscription?.trial.isActive && (
+                <div className="text-warning text-sm font-medium">
+                  {subscription.trial.daysLeft} days left for trial
+                </div>
               )}
             </div>
 
@@ -68,26 +73,53 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
           <div className="space-y-4">
             <div className="text-muted-foreground flex items-center gap-2 text-sm">
               <CalendarDays className="h-4 w-4" />
-              <span>
-                {formatDate(subscription.currentPeriodStart || Date.now())} -{' '}
-                {formatDate(subscription.currentPeriodEnd || Date.now())}
-              </span>
+              {!subscription ? (
+                <Skeleton className="h-4 w-48" />
+              ) : (
+                <span>
+                  {formatDate(subscription.currentPeriodStart ?? Date.now())} -{' '}
+                  {formatDate(subscription.currentPeriodEnd ?? Date.now())}
+                </span>
+              )}
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <div>
-                  <span className={cn('font-medium', getProgressColor(currentEvents, maxEvents))}>
-                    {currentEvents?.toLocaleString()}
-                  </span>{' '}
-                  <span className="text-muted-foreground">of {maxEvents?.toLocaleString()} events</span>
-                </div>
-                <span className="text-muted-foreground text-xs">Updates hourly</span>
+                {!subscription ? (
+                  <>
+                    <Skeleton className="h-4 w-36" />
+                    <Skeleton className="h-4 w-24" />
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <span
+                        className={cn(
+                          'font-medium',
+                          getProgressColor(subscription.events.current, subscription.events.included)
+                        )}
+                      >
+                        {subscription.events.current.toLocaleString()}
+                      </span>{' '}
+                      <span className="text-muted-foreground">
+                        of {subscription.events.included.toLocaleString()} events
+                      </span>
+                    </div>
+                    <span className="text-muted-foreground text-xs">Updates hourly</span>
+                  </>
+                )}
               </div>
-              <Progress
-                value={(currentEvents / maxEvents) * 100}
-                className={cn('h-1.5 rounded-lg', getProgressBarColor(currentEvents, maxEvents))}
-              />
+              {!subscription ? (
+                <Skeleton className="h-1.5 w-full" />
+              ) : (
+                <Progress
+                  value={(subscription.events.current / subscription.events.included) * 100}
+                  className={cn(
+                    'h-1.5 rounded-lg',
+                    getProgressBarColor(subscription.events.current, subscription.events.included)
+                  )}
+                />
+              )}
             </div>
           </div>
         </div>

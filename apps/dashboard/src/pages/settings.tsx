@@ -3,9 +3,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitive
 import { OrganizationProfile, UserProfile } from '@clerk/clerk-react';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ROUTES } from '@/utils/routes';
+import { LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { Appearance } from '@clerk/types';
 import { motion } from 'motion/react';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
+import { useFeatureFlag } from '../hooks/use-feature-flag';
+import { SubscriptionProvider } from '../components/billing/subscription-provider';
+import { Plan } from '../components/billing/plan';
 
 const FADE_ANIMATION = {
   initial: { opacity: 0 },
