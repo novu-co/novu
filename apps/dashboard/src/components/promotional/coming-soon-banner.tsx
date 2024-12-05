@@ -87,6 +87,49 @@ export function usePromotionalBanner(props: UsePromotionalBannerProps): UsePromo
   return { show, hide };
 }
 
+function PromotionalBannerContent({ onDismiss, onReactionSelect, content }: UsePromotionalBannerProps) {
+  const track = useTelemetry();
+  const [showThankYou, setShowThankYou] = useState(false);
+
+  const handleReactionSelect = (reaction: Reaction) => {
+    track(content.telemetryEvent, {
+      title: content.title,
+      question: content.feedbackQuestion,
+      reaction,
+    });
+    setShowThankYou(true);
+    onReactionSelect?.(reaction);
+    setTimeout(() => {
+      onDismiss?.();
+    }, 2000);
+  };
+
+  return (
+    <motion.div
+      {...ANIMATION_CONFIG.banner}
+      className="flex flex-col gap-6 rounded-2xl border border-[#E6E9F0] bg-white p-3 shadow-lg"
+    >
+      <BannerHeader
+        emoji={content.emoji}
+        title={content.title}
+        description={content.description}
+        onDismiss={onDismiss}
+      />
+
+      <AnimatePresence mode="wait">
+        {showThankYou ? (
+          <ThankYouMessage />
+        ) : (
+          <FeedbackSection
+            question={content.feedbackQuestion || "Sounds like a feature you'd need?"}
+            onReactionSelect={handleReactionSelect}
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
 function BannerHeader({
   emoji,
   title,
@@ -185,49 +228,6 @@ function FeedbackSection({
           </ToggleGroup>
         </CardContent>
       </Card>
-    </motion.div>
-  );
-}
-
-function PromotionalBannerContent({ onDismiss, onReactionSelect, content }: UsePromotionalBannerProps) {
-  const track = useTelemetry();
-  const [showThankYou, setShowThankYou] = useState(false);
-
-  const handleReactionSelect = (reaction: Reaction) => {
-    track(content.telemetryEvent, {
-      title: content.title,
-      question: content.feedbackQuestion,
-      reaction,
-    });
-    setShowThankYou(true);
-    onReactionSelect?.(reaction);
-    setTimeout(() => {
-      onDismiss?.();
-    }, 2000);
-  };
-
-  return (
-    <motion.div
-      {...ANIMATION_CONFIG.banner}
-      className="flex flex-col gap-6 rounded-2xl border border-[#E6E9F0] bg-white p-3 shadow-lg"
-    >
-      <BannerHeader
-        emoji={content.emoji}
-        title={content.title}
-        description={content.description}
-        onDismiss={onDismiss}
-      />
-
-      <AnimatePresence mode="wait">
-        {showThankYou ? (
-          <ThankYouMessage />
-        ) : (
-          <FeedbackSection
-            question={content.feedbackQuestion || "Sounds like a feature you'd need?"}
-            onReactionSelect={handleReactionSelect}
-          />
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }
