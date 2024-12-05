@@ -52,6 +52,7 @@ interface UsePromotionalBannerResult {
 
 export function usePromotionalBanner(props: UsePromotionalBannerProps): UsePromotionalBannerResult {
   const toastId = useRef<string | number>();
+  const track = useTelemetry();
 
   const hide = useCallback(() => {
     if (toastId.current) {
@@ -62,6 +63,11 @@ export function usePromotionalBanner(props: UsePromotionalBannerProps): UsePromo
 
   const show = useCallback(() => {
     if (toastId.current) return;
+
+    track(('Banner Viewed ' + props.content.telemetryEvent) as TelemetryEvent, {
+      title: props.content.title,
+      question: props.content.feedbackQuestion,
+    });
 
     const id = toast.custom(
       (id) => (
