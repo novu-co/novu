@@ -18,7 +18,7 @@ const tabsListVariants = cva('inline-flex', {
   },
   defaultVariants: {
     variant: 'default',
-    align: 'center',
+    align: 'start',
   },
 });
 
