@@ -75,7 +75,7 @@ export function SettingsPage() {
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
         <TabsList
           align="center"
-          className="border-border/20 relative mt-4 flex w-full items-end justify-start space-x-2 rounded-none border-b bg-transparent px-1.5 pb-0"
+          className="border-border/20 relative mt-2.5 flex w-full items-end justify-start space-x-2 rounded-none border-b bg-transparent px-1.5 pb-0"
         >
           <TabsTrigger
             value="account"
