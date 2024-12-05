@@ -137,6 +137,10 @@ export default {
             boxShadow: '0 0 0 0 rgba(255, 82, 82, 0)',
           },
         },
+        gradient: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
         'pulse-subtle': {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.85' },
@@ -188,6 +192,7 @@ export default {
         'pulse-subtle': 'pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         swing: 'swing 3s ease-in-out',
         jingle: 'jingle 3s ease-in-out',
+        gradient: 'gradient 5s ease infinite',
       },
       backgroundImage: {
         'test-pattern':

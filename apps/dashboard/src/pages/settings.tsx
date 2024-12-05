@@ -3,14 +3,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitive
 import { OrganizationProfile, UserProfile } from '@clerk/clerk-react';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ROUTES, LEGACY_ROUTES } from '@/utils/routes';
-import { SubscriptionProvider } from '../components/billing/subscription-provider';
-import { Plan } from '../components/billing/plan';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
-import { FeatureFlagsKeysEnum } from '@novu/shared';
-import { cn } from '../utils/ui';
+import { ROUTES } from '@/utils/routes';
+import { Appearance } from '@clerk/types';
+import { motion } from 'motion/react';
 
-export const clerkComponentAppearance = {
+const FADE_ANIMATION = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  transition: { duration: 0.15 },
+} as const;
+
+const clerkComponentAppearance: Appearance = {
+  variables: {
+    colorPrimary: 'rgba(82, 88, 102, 0.95)',
+    colorText: 'rgba(82, 88, 102, 0.95)',
+  },
   elements: {
     navbar: { display: 'none' },
     navbarMobileMenuRow: { display: 'none !important' },
@@ -75,7 +83,7 @@ export function SettingsPage() {
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
         <TabsList
           align="center"
-          className="border-border/20 relative mt-4 flex w-full items-end justify-start space-x-2 rounded-none border-b bg-transparent px-1.5 pb-0"
+          className="border-border/20 relative mt-2.5 flex w-full items-end justify-start space-x-2 rounded-none border-b bg-transparent px-1.5 pb-0"
         >
           <TabsTrigger
             value="account"
@@ -95,60 +103,57 @@ export function SettingsPage() {
           >
             Team
           </TabsTrigger>
-          <TabsTrigger
-            value="billing"
-            className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
-          >
-            Billing
-          </TabsTrigger>
         </TabsList>
 
-        <div
-          className={cn('mx-auto mt-1 px-1.5', {
-            'max-w-[1100px]': currentTab === 'billing',
-            'max-w-[700px]': currentTab !== 'billing',
-          })}
-        >
+        <div className="mx-auto mt-1 max-w-[700px] px-1.5">
           <TabsContent value="account" className="rounded-lg">
-            <Card className="mx-auto border-none shadow-none">
-              <UserProfile appearance={clerkComponentAppearance}>
-                <UserProfile.Page label="account" />
-                <UserProfile.Page label="security" />
-              </UserProfile>
+            <motion.div {...FADE_ANIMATION}>
+              <Card className="mx-auto border-none shadow-none">
+                <UserProfile appearance={clerkComponentAppearance}>
+                  <UserProfile.Page label="account" />
+                  <UserProfile.Page label="security" />
+                </UserProfile>
 
-              <h1 className="text-foreground mb-6 mt-10 text-xl font-semibold">Security</h1>
-              <UserProfile appearance={clerkComponentAppearance}>
-                <UserProfile.Page label="security" />
-                <UserProfile.Page label="account" />
-              </UserProfile>
-            </Card>
+                <h1 className="text-foreground mb-6 mt-10 text-xl font-semibold">Security</h1>
+                <UserProfile appearance={clerkComponentAppearance}>
+                  <UserProfile.Page label="security" />
+                  <UserProfile.Page label="account" />
+                </UserProfile>
+              </Card>
+            </motion.div>
           </TabsContent>
 
           <TabsContent value="organization" className="rounded-lg">
-            <Card className="border-none shadow-none">
-              <OrganizationProfile appearance={clerkComponentAppearance}>
-                <OrganizationProfile.Page label="general" />
-                <OrganizationProfile.Page label="members" />
-              </OrganizationProfile>
-            </Card>
+            <motion.div {...FADE_ANIMATION}>
+              <Card className="border-none shadow-none">
+                <OrganizationProfile appearance={clerkComponentAppearance}>
+                  <OrganizationProfile.Page label="general" />
+                  <OrganizationProfile.Page label="members" />
+                </OrganizationProfile>
+              </Card>
+            </motion.div>
           </TabsContent>
 
           <TabsContent value="team" className="rounded-lg">
-            <Card className="border-none shadow-none">
-              <OrganizationProfile appearance={clerkComponentAppearance}>
-                <OrganizationProfile.Page label="members" />
-                <OrganizationProfile.Page label="general" />
-              </OrganizationProfile>
-            </Card>
+            <motion.div {...FADE_ANIMATION}>
+              <Card className="border-none shadow-none">
+                <OrganizationProfile appearance={clerkComponentAppearance}>
+                  <OrganizationProfile.Page label="members" />
+                  <OrganizationProfile.Page label="general" />
+                </OrganizationProfile>
+              </Card>
+            </motion.div>
           </TabsContent>
 
           {isV2BillingEnabled && (
             <TabsContent value="billing" className="rounded-lg">
-              <Card className="border-none shadow-none">
-                <SubscriptionProvider>
-                  <Plan />
-                </SubscriptionProvider>
-              </Card>
+              <motion.div {...FADE_ANIMATION}>
+                <Card className="border-none shadow-none">
+                  <SubscriptionProvider>
+                    <Plan />
+                  </SubscriptionProvider>
+                </Card>
+              </motion.div>
             </TabsContent>
           )}
         </div>

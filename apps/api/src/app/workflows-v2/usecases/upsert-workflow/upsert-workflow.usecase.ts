@@ -2,7 +2,6 @@ import { NotificationGroupRepository, NotificationStepEntity, NotificationTempla
 import {
   CreateWorkflowDto,
   DEFAULT_WORKFLOW_PREFERENCES,
-  IdentifierOrInternalId,
   slugify,
   StepCreateDto,
   StepDto,
@@ -67,7 +66,7 @@ export class UpsertWorkflowUseCase {
         environmentId: command.user.environmentId,
         organizationId: command.user.organizationId,
         userId: command.user._id,
-        identifierOrInternalId: workflowId,
+        workflowIdOrInternalId: workflowId,
       })
     );
   }
@@ -88,7 +87,7 @@ export class UpsertWorkflowUseCase {
 
   @Instrument()
   private async queryWorkflow(command: UpsertWorkflowCommand): Promise<WorkflowInternalResponseDto | null> {
-    if (!command.identifierOrInternalId) {
+    if (!command.workflowIdOrInternalId) {
       return null;
     }
 
@@ -97,7 +96,7 @@ export class UpsertWorkflowUseCase {
         environmentId: command.user.environmentId,
         organizationId: command.user.organizationId,
         userId: command.user._id,
-        identifierOrInternalId: command.identifierOrInternalId,
+        workflowIdOrInternalId: command.workflowIdOrInternalId,
       })
     );
   }
@@ -107,7 +106,7 @@ export class UpsertWorkflowUseCase {
     existingWorkflow: NotificationTemplateEntity | null,
     command: UpsertWorkflowCommand
   ): Promise<WorkflowInternalResponseDto> {
-    if (existingWorkflow && isWorkflowUpdateDto(command.workflowDto, command.identifierOrInternalId)) {
+    if (existingWorkflow && isWorkflowUpdateDto(command.workflowDto, command.workflowIdOrInternalId)) {
       return await this.updateWorkflowGenericUsecase.execute(
         UpdateWorkflowCommand.create(
           this.convertCreateToUpdateCommand(command.workflowDto, command.user, existingWorkflow)
@@ -297,9 +296,9 @@ export class UpsertWorkflowUseCase {
       }
       await this.patchStepDataUsecase.execute({
         controlValues,
-        identifierOrInternalId: workflow._id,
+        workflowIdOrInternalId: workflow._id,
         name: step.name,
-        stepId: step._templateId,
+        stepIdOrInternalId: step._templateId,
         user: command.user,
       });
     }
@@ -323,7 +322,7 @@ export class UpsertWorkflowUseCase {
 
 function isWorkflowUpdateDto(
   workflowDto: CreateWorkflowDto | UpdateWorkflowDto,
-  id?: IdentifierOrInternalId
+  id?: string
 ): workflowDto is UpdateWorkflowDto {
   return !!id;
 }

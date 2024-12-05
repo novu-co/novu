@@ -2,6 +2,7 @@ import { Button } from '@/components/primitives/button';
 import { CardDescription, CardTitle } from '@/components/primitives/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import React from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { StepIndicator } from './shared';
 import { JobTitleEnum, jobTitleToLabelMapper, OrganizationTypeEnum, CompanySizeEnum } from '@novu/shared';
 import { useForm, Controller } from 'react-hook-form';
@@ -13,6 +14,8 @@ import { TelemetryEvent } from '../../utils/telemetry';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../utils/routes';
 import { useMutation } from '@tanstack/react-query';
+import { useOrganization, useUser } from '@clerk/clerk-react';
+import { useFetchEnvironments } from '../../context/environment/hooks';
 
 interface QuestionnaireFormData {
   jobTitle: JobTitleEnum;
@@ -30,9 +33,12 @@ interface SubmitQuestionnaireData {
 }
 
 export function QuestionnaireForm() {
+  const { organization } = useOrganization();
+  useFetchEnvironments({ organizationId: organization?.id });
+
   const { control, watch, handleSubmit } = useForm<QuestionnaireFormData>();
   const submitQuestionnaireMutation = useSubmitQuestionnaire();
-
+  const { user } = useUser();
   const selectedJobTitle = watch('jobTitle');
   const selectedOrgType = watch('organizationType');
   const companySize = watch('companySize');
@@ -57,6 +63,15 @@ export function QuestionnaireForm() {
       pageName: 'Create Organization Form',
       hubspotContext: hubspotContext || '',
     });
+
+    if (!user?.unsafeMetadata?.newDashboardOptInStatus) {
+      await user?.update({
+        unsafeMetadata: {
+          newDashboardOptInStatus: 'opted_in',
+        },
+      });
+      await user?.reload();
+    }
   };
 
   return (
@@ -103,74 +118,117 @@ export function QuestionnaireForm() {
                 />
               </div>
 
-              {selectedJobTitle && (
-                <div className="flex flex-col gap-[4px]">
-                  <label className="text-xs font-medium text-[#525866]">Organization type</label>
-                  <div className="flex flex-wrap gap-[8px]">
-                    <Controller
-                      name="organizationType"
-                      control={control}
-                      render={({ field }) => (
-                        <>
-                          {Object.values(OrganizationTypeEnum).map((type) => (
-                            <Button
-                              key={type}
-                              variant="outline"
-                              size="xs"
-                              type="button"
-                              className={`h-[28px] rounded-full px-3 py-1 text-sm ${
-                                field.value === type ? 'border-[#E1E4EA] bg-[#F2F5F8]' : 'border-[#E1E4EA]'
-                              }`}
-                              onClick={() => field.onChange(type)}
-                            >
-                              {type}
-                            </Button>
-                          ))}
-                        </>
-                      )}
-                    />
-                  </div>
-                </div>
-              )}
+              <AnimatePresence mode="sync">
+                {selectedJobTitle && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 4 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                    className="flex flex-col gap-[4px]"
+                  >
+                    <label className="text-xs font-medium text-[#525866]">Organization type</label>
+                    <div className="flex flex-wrap gap-[8px]">
+                      <Controller
+                        name="organizationType"
+                        control={control}
+                        render={({ field }) => (
+                          <>
+                            {Object.values(OrganizationTypeEnum).map((type) => (
+                              <Button
+                                key={type}
+                                variant="outline"
+                                size="xs"
+                                type="button"
+                                className={`h-[28px] rounded-full px-3 py-1 text-sm ${
+                                  field.value === type ? 'border-[#E1E4EA] bg-[#F2F5F8]' : 'border-[#E1E4EA]'
+                                }`}
+                                onClick={() => field.onChange(type)}
+                              >
+                                {type}
+                              </Button>
+                            ))}
+                          </>
+                        )}
+                      />
+                    </div>
+                  </motion.div>
+                )}
 
-              {shouldShowCompanySize && (
-                <div className="flex flex-col gap-[4px]">
-                  <label className="text-xs font-medium text-[#525866]">Company size</label>
-                  <div className="flex flex-wrap gap-[8px]">
-                    <Controller
-                      name="companySize"
-                      control={control}
-                      render={({ field }) => (
-                        <>
-                          {Object.values(CompanySizeEnum).map((size) => (
-                            <Button
-                              key={size}
-                              variant="outline"
-                              size="xs"
-                              type="button"
-                              className={`h-[28px] rounded-full px-3 py-1 text-sm ${
-                                field.value === size ? 'border-[#E1E4EA] bg-[#F2F5F8]' : 'border-[#E1E4EA]'
-                              }`}
-                              onClick={() => field.onChange(size)}
-                            >
-                              {size}
-                            </Button>
-                          ))}
-                        </>
-                      )}
-                    />
-                  </div>
-                </div>
-              )}
+                {shouldShowCompanySize && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 4 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                    className="flex flex-col gap-[4px]"
+                  >
+                    <label className="text-xs font-medium text-[#525866]">Company size</label>
+                    <div className="flex flex-wrap gap-[8px]">
+                      <Controller
+                        name="companySize"
+                        control={control}
+                        render={({ field }) => (
+                          <>
+                            {Object.values(CompanySizeEnum).map((size) => (
+                              <Button
+                                key={size}
+                                variant="outline"
+                                size="xs"
+                                type="button"
+                                className={`h-[28px] rounded-full px-3 py-1 text-sm ${
+                                  field.value === size ? 'border-[#E1E4EA] bg-[#F2F5F8]' : 'border-[#E1E4EA]'
+                                }`}
+                                onClick={() => field.onChange(size)}
+                              >
+                                {size}
+                              </Button>
+                            ))}
+                          </>
+                        )}
+                      />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {isFormValid && (
-              <div className="flex flex-col gap-3">
-                <Button className="bg-black" type="submit" disabled={submitQuestionnaireMutation.isPending}>
-                  {submitQuestionnaireMutation.isPending ? 'Creating...' : 'Get started'}
-                </Button>
-              </div>
-            )}
+            <AnimatePresence>
+              {isFormValid && (
+                <motion.div
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 4 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="flex flex-col gap-3"
+                >
+                  <Button
+                    className={`relative bg-black ${submitQuestionnaireMutation.isPending ? 'cursor-not-allowed' : ''}`}
+                    type="submit"
+                    disabled={submitQuestionnaireMutation.isPending}
+                  >
+                    <motion.div
+                      initial={false}
+                      animate={{
+                        opacity: submitQuestionnaireMutation.isPending ? 1 : 0,
+                        scale: submitQuestionnaireMutation.isPending ? [1, 1.1, 1] : 1,
+                      }}
+                      transition={{ duration: 1, repeat: Infinity }}
+                      className="absolute inset-0 flex items-center justify-center"
+                    >
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    </motion.div>
+                    <motion.span
+                      animate={{
+                        opacity: submitQuestionnaireMutation.isPending ? 0 : 1,
+                      }}
+                    >
+                      Continue
+                    </motion.span>
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </form>
         </div>
       </div>

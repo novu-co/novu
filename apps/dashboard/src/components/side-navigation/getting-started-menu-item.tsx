@@ -1,19 +1,47 @@
+import { useUser } from '@clerk/clerk-react';
 import { motion } from 'motion/react';
-import { RiQuestionLine, RiSparkling2Fill } from 'react-icons/ri';
+import { RiQuestionLine, RiSparkling2Fill, RiCloseLine } from 'react-icons/ri';
 import { Badge } from '../primitives/badge';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useOnboardingSteps } from '../../hooks/use-onboarding-steps';
 import { NavigationLink } from './navigation-link';
+import { useTelemetry } from '@/hooks/use-telemetry';
+import { TelemetryEvent } from '@/utils/telemetry';
+import { Button } from '../primitives/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 
 export function GettingStartedMenuItem() {
-  const { totalSteps, completedSteps } = useOnboardingSteps();
-  const { currentEnvironment } = useEnvironment();
+  const { totalSteps, completedSteps, steps } = useOnboardingSteps();
   const isGettingStartedEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_GETTING_STARTED_ENABLED);
 
-  if (!isGettingStartedEnabled) {
+  const { currentEnvironment } = useEnvironment();
+  const { user } = useUser();
+  const track = useTelemetry();
+
+  const allStepsCompleted = completedSteps === totalSteps;
+
+  const handleClose = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    track(TelemetryEvent.WELCOME_MENU_HIDDEN, {
+      completedSteps: steps.filter((step) => step.status === 'completed').map((step) => step.id),
+      totalSteps,
+      allStepsCompleted,
+    });
+
+    await user?.update({
+      unsafeMetadata: {
+        ...user.unsafeMetadata,
+        hideGettingStarted: true,
+      },
+    });
+  };
+
+  if (!isGettingStartedEnabled || user?.unsafeMetadata?.hideGettingStarted) {
     return null;
   }
 
@@ -49,6 +77,31 @@ export function GettingStartedMenuItem() {
             {completedSteps}/{totalSteps}
           </span>
         </Badge>
+
+        {allStepsCompleted && (
+          <motion.div
+            className="ml-auto h-4 w-4"
+            variants={{
+              initial: { opacity: 0 },
+              hover: { opacity: 1 },
+            }}
+          >
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={handleClose}
+                  className="h-4 w-4 hover:bg-neutral-300"
+                  aria-label="Close getting started menu"
+                >
+                  <RiCloseLine className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>This will hide the Getting Started page</TooltipContent>
+            </Tooltip>
+          </motion.div>
+        )}
       </NavigationLink>
     </motion.div>
   );

@@ -5,6 +5,7 @@
   "words": [
     "ABNF",
     "addrs",
+    "subscriberpayloaddto",
     "adresses",
     "sdkerror",
     "africas",
@@ -710,7 +711,9 @@
     "xmlschema",
     "jsonify",
     "hsforms",
-    "touchpoint"
+    "touchpoint",
+    "Angularjs",
+    "navigatable"
   ],
   "flagWords": [],
   "patterns": [
