@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSProperties, useEffect, useRef, useState } from 'react';
 import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
 
 import { Notification5Fill } from '@/components/icons';
