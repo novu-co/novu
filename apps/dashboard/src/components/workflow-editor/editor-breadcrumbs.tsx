@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/primitives/button';
 import { useEnvironment } from '@/context/environment/hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
-import { useFetchWorkflow } from '@/hooks';
+import { useFetchWorkflow } from '@/hooks/use-fetch-workflow';
 import TruncatedText from '@/components/truncated-text';
 import { Badge } from '@/components/primitives/badge';
 

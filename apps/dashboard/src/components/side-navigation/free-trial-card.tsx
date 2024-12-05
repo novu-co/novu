@@ -4,7 +4,7 @@ import { Progress } from '../primitives/progress';
 import { Button } from '../primitives/button';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipArrow } from '../primitives/tooltip';
 import { LEGACY_ROUTES } from '@/utils/routes';
-import { useBillingSubscription } from '@/hooks/use-billing-subscription';
+import { useFetchSubscription } from '@/hooks/use-fetch-subscription';
 
 const transition = 'transition-all duration-300 ease-out';
 
@@ -13,7 +13,7 @@ const pluralizeDaysLeft = (numberOfDays: number) => {
 };
 
 export const FreeTrialCard = () => {
-  const { subscription, daysLeft, isLoading } = useBillingSubscription();
+  const { subscription, daysLeft, isLoading } = useFetchSubscription();
   const daysTotal = subscription && subscription.trial.daysTotal > 0 ? subscription.trial.daysTotal : 100;
 
   if (isLoading || !subscription || !subscription.trial.isActive || subscription?.hasPaymentMethod) {

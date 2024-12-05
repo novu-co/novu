@@ -70,7 +70,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
   const isReadOnly = workflow.origin === WorkflowOriginEnum.EXTERNAL;
   const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const tagsQuery = useTags();
+  const { tags } = useTags();
   const { currentEnvironment } = useEnvironment();
   const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
   const { show: showComingSoonBanner } = usePromotionalBanner({
@@ -115,7 +115,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
 
   const onDeleteWorkflow = async () => {
     await deleteWorkflow({
-      workflowId: workflow._id,
+      workflowSlug: workflow.slug,
     });
   };
 
@@ -339,7 +339,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                         }}
                         disabled={isReadOnly}
                         value={field.value ?? []}
-                        suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []}
+                        suggestions={tags.map((tag) => tag.name)}
                       />
                     </FormControl>
                     <FormMessage />

@@ -9,7 +9,7 @@ import { Form } from '@/components/primitives/form/form';
 import { useForm } from 'react-hook-form';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { PageMeta } from '@/components/page-meta';
-import { useApiKeys } from '../hooks/use-api-keys';
+import { useFetchApiKeys } from '../hooks/use-fetch-api-keys';
 import { ExternalLink } from '@/components/shared/external-link';
 
 interface ApiKeysFormData {
@@ -19,7 +19,7 @@ interface ApiKeysFormData {
 }
 
 export function ApiKeysPage() {
-  const apiKeysQuery = useApiKeys();
+  const apiKeysQuery = useFetchApiKeys();
   const { currentEnvironment } = useEnvironment();
   const [showApiKey, setShowApiKey] = useState(false);
   const apiKeys = apiKeysQuery.data?.data;

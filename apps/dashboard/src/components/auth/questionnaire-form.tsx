@@ -9,7 +9,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { updateClerkOrgMetadata } from '../../api/organization';
 import { hubspotCookie } from '../../utils/cookies';
 import { identifyUser } from '../../api/telemetry';
-import { useTelemetry } from '../../hooks';
+import { useTelemetry } from '../../hooks/use-telemetry';
 import { TelemetryEvent } from '../../utils/telemetry';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../utils/routes';

@@ -1,25 +1,26 @@
-import { useEffect, useState } from 'react';
-import { Loader2 } from 'lucide-react';
 import { Button } from '../primitives/button';
-import { RiNotification2Fill } from 'react-icons/ri';
-import { InboxPreviewContent } from './inbox-preview-content';
-import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
-import { useAuth } from '../../context/auth/hooks';
-import { StepTypeEnum, WorkflowCreationSourceEnum } from '@novu/shared';
 import { createWorkflow } from '../../api/workflows';
-import { useWorkflows } from '../../hooks/use-workflows';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { showErrorToast, showSuccessToast } from '../primitives/sonner-helpers';
-import { ROUTES } from '../../utils/routes';
-import { useNavigate } from 'react-router-dom';
-import { InlineToast } from '../primitives/inline-toast';
-import { UsecasePlaygroundHeader } from '../usecase-playground-header';
 import { CustomizeInbox } from './customize-inbox-playground';
-import { useTelemetry } from '../../hooks/use-telemetry';
-import { TelemetryEvent } from '../../utils/telemetry';
+import { InboxPreviewContent } from './inbox-preview-content';
+import { InlineToast } from '../primitives/inline-toast';
+import { Loader2 } from 'lucide-react';
 import { ONBOARDING_DEMO_WORKFLOW_ID } from '../../config';
+import { RiNotification2Fill } from 'react-icons/ri';
+import { ROUTES } from '../../utils/routes';
+import { showErrorToast, showSuccessToast } from '../primitives/sonner-helpers';
+import { IEnvironment, StepTypeEnum, WorkflowCreationSourceEnum } from '@novu/shared';
+import { TelemetryEvent } from '../../utils/telemetry';
+import { useAuth } from '../../context/auth/hooks';
+import { UsecasePlaygroundHeader } from '../usecase-playground-header';
+import { useEffect, useState } from 'react';
+import { useEnvironment } from '@/context/environment/hooks';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { useTelemetry } from '../../hooks/use-telemetry';
+import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
+import { useFetchWorkflows } from '../../hooks/use-fetch-workflows';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 export interface ActionConfig {
   label: string;
@@ -83,6 +84,7 @@ const defaultFormValues: InboxPlaygroundFormData = {
 };
 
 export function InboxPlayground() {
+  const { currentEnvironment } = useEnvironment();
   const form = useForm<InboxPlaygroundFormData>({
     mode: 'onSubmit',
     resolver: zodResolver(formSchema),
@@ -91,7 +93,7 @@ export function InboxPlayground() {
   });
 
   const { triggerWorkflow, isPending } = useTriggerWorkflow();
-  const { data } = useWorkflows({ query: ONBOARDING_DEMO_WORKFLOW_ID });
+  const { data } = useFetchWorkflows({ query: ONBOARDING_DEMO_WORKFLOW_ID });
   const auth = useAuth();
   const [hasNotificationBeenSent, setHasNotificationBeenSent] = useState(false);
   const navigate = useNavigate();
@@ -111,7 +113,7 @@ export function InboxPlayground() {
     const initializeDemoWorkflow = async () => {
       const workflow = data?.workflows.find((workflow) => workflow.workflowId?.includes(ONBOARDING_DEMO_WORKFLOW_ID));
       if (!workflow) {
-        await createDemoWorkflow();
+        await createDemoWorkflow({ environment: currentEnvironment! });
       }
     };
 
@@ -236,36 +238,39 @@ export function InboxPlayground() {
   );
 }
 
-async function createDemoWorkflow() {
+async function createDemoWorkflow({ environment }: { environment: IEnvironment }) {
   await createWorkflow({
-    name: 'Onboarding Demo Workflow',
-    description: 'A demo workflow to showcase the Inbox component',
-    workflowId: ONBOARDING_DEMO_WORKFLOW_ID,
-    steps: [
-      {
-        name: 'Inbox',
-        type: StepTypeEnum.IN_APP,
-        controlValues: {
-          subject: '{{payload.subject}}',
-          body: '{{payload.body}}',
-          avatar: window.location.origin + '/images/novu.svg',
-          primaryAction: {
-            label: '{{payload.primaryActionLabel}}',
-            redirect: {
-              target: '_self',
-              url: '',
+    environment,
+    workflow: {
+      name: 'Onboarding Demo Workflow',
+      description: 'A demo workflow to showcase the Inbox component',
+      workflowId: ONBOARDING_DEMO_WORKFLOW_ID,
+      steps: [
+        {
+          name: 'Inbox',
+          type: StepTypeEnum.IN_APP,
+          controlValues: {
+            subject: '{{payload.subject}}',
+            body: '{{payload.body}}',
+            avatar: window.location.origin + '/images/novu.svg',
+            primaryAction: {
+              label: '{{payload.primaryActionLabel}}',
+              redirect: {
+                target: '_self',
+                url: '',
+              },
             },
-          },
-          secondaryAction: {
-            label: '{{payload.secondaryActionLabel}}',
-            redirect: {
-              target: '_self',
-              url: '',
+            secondaryAction: {
+              label: '{{payload.secondaryActionLabel}}',
+              redirect: {
+                target: '_self',
+                url: '',
+              },
             },
           },
         },
-      },
-    ],
-    __source: WorkflowCreationSourceEnum.DASHBOARD,
+      ],
+      __source: WorkflowCreationSourceEnum.DASHBOARD,
+    },
   });
 }
