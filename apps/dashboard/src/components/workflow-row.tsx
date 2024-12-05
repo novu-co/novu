@@ -52,9 +52,47 @@ const toastOptions: ExternalToast = {
   },
 };
 
+const SyncWorkflowMenuItem = ({
+  currentEnvironment,
+  isSyncable,
+  tooltipContent,
+  onSync,
+}: {
+  currentEnvironment: IEnvironment | undefined;
+  isSyncable: boolean;
+  tooltipContent: string | undefined;
+  onSync: () => void;
+}) => {
+  const syncToLabel = `Sync to ${currentEnvironment?.name === 'Production' ? 'Development' : 'Production'}`;
+
+  if (isSyncable) {
+    return (
+      <DropdownMenuItem onClick={onSync}>
+        <RiGitPullRequestFill />
+        {syncToLabel}
+      </DropdownMenuItem>
+    );
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger>
+        <DropdownMenuItem disabled>
+          <RiGitPullRequestFill />
+          {syncToLabel}
+        </DropdownMenuItem>
+      </TooltipTrigger>
+      <TooltipPortal>
+        <TooltipContent>{tooltipContent}</TooltipContent>
+      </TooltipPortal>
+    </Tooltip>
+  );
+};
+
 export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { currentEnvironment } = useEnvironment();
   const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
 
@@ -239,10 +277,10 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         {/**
          * Needs modal={false} to prevent the click freeze after the modal is closed
          */}
-        <DropdownMenu modal={false}>
+        <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <RiMore2Fill />
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <RiMore2Fill className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
@@ -296,42 +334,5 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         </DropdownMenu>
       </TableCell>
     </TableRow>
-  );
-};
-
-const SyncWorkflowMenuItem = ({
-  currentEnvironment,
-  isSyncable,
-  tooltipContent,
-  onSync,
-}: {
-  currentEnvironment: IEnvironment | undefined;
-  isSyncable: boolean;
-  tooltipContent: string | undefined;
-  onSync: () => void;
-}) => {
-  const syncToLabel = `Sync to ${currentEnvironment?.name === 'Production' ? 'Development' : 'Production'}`;
-
-  if (isSyncable) {
-    return (
-      <DropdownMenuItem onClick={onSync}>
-        <RiGitPullRequestFill />
-        {syncToLabel}
-      </DropdownMenuItem>
-    );
-  }
-
-  return (
-    <Tooltip>
-      <TooltipTrigger>
-        <DropdownMenuItem disabled>
-          <RiGitPullRequestFill />
-          {syncToLabel}
-        </DropdownMenuItem>
-      </TooltipTrigger>
-      <TooltipPortal>
-        <TooltipContent>{tooltipContent}</TooltipContent>
-      </TooltipPortal>
-    </Tooltip>
   );
 };

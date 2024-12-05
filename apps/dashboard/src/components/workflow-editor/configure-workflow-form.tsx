@@ -21,6 +21,19 @@ import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
 import { MAX_DESCRIPTION_LENGTH, workflowSchema } from '@/components/workflow-editor/schema';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
+import { RiDeleteBin2Line, RiGitPullRequestFill, RiMore2Fill } from 'react-icons/ri';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/primitives/dropdown-menu';
+import { Button } from '../primitives/button';
+import { Tooltip, TooltipContent, TooltipPortal, TooltipTrigger } from '../primitives/tooltip';
+import { useEnvironment } from '@/context/environment/hooks';
+import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
 
 type ConfigureWorkflowFormProps = {
   workflow: WorkflowResponseDto;
@@ -31,7 +44,10 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
   const { workflow, update } = props;
   const isReadOnly = workflow.origin === WorkflowOriginEnum.EXTERNAL;
   const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const tagsQuery = useTags();
+  const { currentEnvironment } = useEnvironment();
+  const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
 
   const form = useForm<z.infer<typeof workflowSchema>>({
     defaultValues: {
@@ -57,6 +73,8 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
     saveForm();
   };
 
+  const syncToLabel = `Sync to ${currentEnvironment?.name === 'Production' ? 'Development' : 'Production'}`;
+
   return (
     <>
       <ConfirmationModal
@@ -78,11 +96,54 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
         exit={{ opacity: 0.1 }}
         transition={{ duration: 0.1 }}
       >
-        <SidebarHeader className="items-center text-sm font-medium">
+        <SidebarHeader className="space-between items-center text-sm font-medium">
           <div className="flex items-center gap-1">
             <RouteFill />
             <span>Configure workflow</span>
           </div>
+          <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="ml-auto">
+                <RiMore2Fill />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuGroup>
+                {isSyncable ? (
+                  <DropdownMenuItem onClick={safeSync}>
+                    <RiGitPullRequestFill />
+                    {syncToLabel}
+                  </DropdownMenuItem>
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <DropdownMenuItem disabled>
+                        <RiGitPullRequestFill />
+                        {syncToLabel}
+                      </DropdownMenuItem>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                      <TooltipContent>{tooltipContent}</TooltipContent>
+                    </TooltipPortal>
+                  </Tooltip>
+                )}
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup className="*:cursor-pointer">
+                <DropdownMenuItem
+                  className="text-destructive"
+                  disabled={workflow.origin === WorkflowOriginEnum.EXTERNAL}
+                  onClick={() => {
+                    //setIsDeleteModalOpen(true);
+                  }}
+                >
+                  <RiDeleteBin2Line />
+                  Delete workflow
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <PromoteConfirmModal />
         </SidebarHeader>
         <Separator />
         <Form {...form}>
