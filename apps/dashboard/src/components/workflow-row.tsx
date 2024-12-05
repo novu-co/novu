@@ -169,6 +169,9 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
               <FaCode className="size-3" />
             </Badge>
           )}
+          {/**
+           * reloadDocument is needed for v1 workflows to reload the document when the user navigates to the workflow editor
+           */}
           <TruncatedText className="max-w-[32ch]" asChild>
             <Link to={workflowLink} reloadDocument={isV1Workflow}>
               {workflow.name}
