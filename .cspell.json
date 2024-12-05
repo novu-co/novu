@@ -814,6 +814,7 @@
     "pnpm-workspace.yaml",
     "tsconfig.json",
     "unreadRead",
-    "websockets"
+    "websockets",
+    "apps/dashboard/src/components/header-navigation/customer-support-button.tsx"
   ]
 }
