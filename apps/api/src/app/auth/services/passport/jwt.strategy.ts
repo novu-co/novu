@@ -44,7 +44,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       );
 
       if (!environment) {
-        throw new UnauthorizedException('Cannot find environment');
+        throw new UnauthorizedException('Cannot find environment', JSON.stringify({ session }));
       }
     }
 
