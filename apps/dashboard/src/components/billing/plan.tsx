@@ -39,7 +39,11 @@ export function Plan() {
         selectedBillingInterval={selectedBillingInterval}
         setSelectedBillingInterval={setSelectedBillingInterval}
       />
-      <PlansRow selectedBillingInterval={selectedBillingInterval} />
+      <PlansRow
+        selectedBillingInterval={selectedBillingInterval}
+        currentPlan={data?.apiServiceLevel as 'free' | 'business' | 'enterprise'}
+        trial={data?.trial}
+      />
       <HighlightsRow />
       <Features />
     </div>

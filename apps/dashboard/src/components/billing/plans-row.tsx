@@ -6,6 +6,10 @@ import { ContactSalesButton } from './contact-sales-button';
 
 interface PlansRowProps {
   selectedBillingInterval: 'month' | 'year';
+  currentPlan?: 'free' | 'business' | 'enterprise';
+  trial?: {
+    isActive: boolean;
+  };
 }
 
 interface PlanDisplayProps {
@@ -26,16 +30,22 @@ function PlanDisplay({ price, subtitle, events }: PlanDisplayProps) {
   );
 }
 
-export function PlansRow({ selectedBillingInterval }: PlansRowProps) {
+export function PlansRow({ selectedBillingInterval, currentPlan, trial }: PlansRowProps) {
   const businessPlanPrice = selectedBillingInterval === 'year' ? '$2,700' : '$250';
+  const effectiveCurrentPlan = trial?.isActive ? 'free' : currentPlan;
 
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
       {/* Free Plan */}
-      <Card className="hover:border-primary/50 relative overflow-hidden border transition-colors">
+      <Card
+        className={`hover:border-primary/50 relative overflow-hidden border transition-colors ${currentPlan === 'free' && !trial?.isActive ? 'border-primary border-2 shadow-md' : ''}`}
+      >
         <div className="flex h-full flex-col p-6">
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Free</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold">Free</h3>
+              {effectiveCurrentPlan === 'free' && <Badge variant="soft">Current Plan</Badge>}
+            </div>
             <PlanDisplay price="$0" subtitle="free forever" events="30,000 events per month" />
             <ul className="space-y-2">
               <li className="flex items-center gap-2 text-sm">
@@ -56,11 +66,14 @@ export function PlansRow({ selectedBillingInterval }: PlansRowProps) {
       </Card>
 
       {/* Business Plan */}
-      <Card className="border-primary relative overflow-hidden border-2 shadow-md">
+      <Card
+        className={`relative overflow-hidden border transition-colors ${currentPlan === 'business' && !trial?.isActive ? 'border-primary border-2 shadow-md' : 'hover:border-primary/50'}`}
+      >
         <div className="flex h-full flex-col p-6">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold">Business</h3>
+              {effectiveCurrentPlan === 'business' && <Badge variant="soft">Current Plan</Badge>}
             </div>
             <PlanDisplay
               price={businessPlanPrice}
@@ -83,16 +96,23 @@ export function PlansRow({ selectedBillingInterval }: PlansRowProps) {
             </ul>
           </div>
           <div className="mt-6">
-            <PlanActionButton selectedBillingInterval={selectedBillingInterval} className="w-full" />
+            {effectiveCurrentPlan !== 'enterprise' && (
+              <PlanActionButton selectedBillingInterval={selectedBillingInterval} className="w-full" />
+            )}
           </div>
         </div>
       </Card>
 
       {/* Enterprise Plan */}
-      <Card className="hover:border-primary/50 relative overflow-hidden border transition-colors">
+      <Card
+        className={`relative overflow-hidden border transition-colors ${currentPlan === 'enterprise' && !trial?.isActive ? 'border-primary border-2 shadow-md' : 'hover:border-primary/50'}`}
+      >
         <div className="flex h-full flex-col p-6">
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold">Enterprise</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold">Enterprise</h3>
+              {effectiveCurrentPlan === 'enterprise' && <Badge variant="soft">Current Plan</Badge>}
+            </div>
             <div className="space-y-1">
               <div className="flex items-baseline gap-1">
                 <span className="text-2xl font-semibold">Custom pricing</span>
@@ -115,7 +135,11 @@ export function PlansRow({ selectedBillingInterval }: PlansRowProps) {
             </ul>
           </div>
           <div className="mt-6">
-            <ContactSalesButton variant="outline" className="w-full" />
+            {effectiveCurrentPlan === 'enterprise' ? (
+              <PlanActionButton selectedBillingInterval={selectedBillingInterval} className="w-full" />
+            ) : (
+              <ContactSalesButton variant="outline" className="w-full" />
+            )}
           </div>
         </div>
       </Card>
