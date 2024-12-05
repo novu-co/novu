@@ -122,8 +122,20 @@ jobs:
       - uses: ./.github/actions/setup-redis-cluster
 
       - name: Start API in TEST
+        env:
+          LAUNCH_DARKLY_SDK_KEY: ${{ secrets.LAUNCH_DARKLY_SDK_KEY }}
+          CI_EE_TEST: true
+          CLERK_ENABLED: true
+          CLERK_ISSUER_URL: ${{ vars.CLERK_ISSUER_URL }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          CLERK_PRIVATE_KEY_BASE64: ${{ secrets.CLERK_PRIVATE_KEY_BASE64 }}
+          CLERK_PEM_PUBLIC_KEY_BASE64: ${{ secrets.CLERK_PEM_PUBLIC_KEY_BASE64 }}
+          CLERK_WEBHOOK_SECRET: ${{ secrets.CLERK_WEBHOOK_SECRET }}
+          CLERK_LONG_LIVED_TOKEN: ${{ secrets.CLERK_LONG_LIVED_TOKEN }}
         run: |
-          cd apps/api && pnpm start:test &
+          export CLERK_PEM_PUBLIC_KEY=$(echo $CLERK_PEM_PUBLIC_KEY_BASE64 | base64 -d)
+          export CLERK_PRIVATE_KEY=$(echo $CLERK_PRIVATE_KEY_BASE64 | base64 -d)
+          cd apps/api && pnpm start:test
 
       - name: Start Worker
         shell: bash
@@ -141,10 +153,6 @@ jobs:
       - name: Start WS
         run: |
           cd apps/ws && pnpm start:test &
-
-      - name: Start Novu Dashboard
-        working-directory: apps/dashboard
-        run: pnpm start:static:build
 
       - name: Wait on Services
         run: wait-on --timeout=180000 http://127.0.0.1:1340/v1/health-check http://127.0.0.1:8080/
