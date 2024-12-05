@@ -135,7 +135,7 @@ jobs:
         run: |
           export CLERK_PEM_PUBLIC_KEY=$(echo $CLERK_PEM_PUBLIC_KEY_BASE64 | base64 -d)
           export CLERK_PRIVATE_KEY=$(echo $CLERK_PRIVATE_KEY_BASE64 | base64 -d)
-          cd apps/api && pnpm start:test
+          cd apps/api && pnpm start:test &
 
       - name: Start Worker
         shell: bash
