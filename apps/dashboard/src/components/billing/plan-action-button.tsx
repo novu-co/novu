@@ -5,6 +5,8 @@ import { get, post } from '../../api/api.client';
 import { toast } from 'sonner';
 import { useSubscription } from './hooks/use-subscription';
 import { cn } from '../../utils/ui';
+import { useTelemetry } from '../../hooks/use-telemetry';
+import { TelemetryEvent } from '../../utils/telemetry';
 
 interface PlanActionButtonProps {
   selectedBillingInterval: 'month' | 'year';
@@ -20,46 +22,69 @@ export function PlanActionButton({
   className,
   size = 'default',
 }: PlanActionButtonProps) {
-  const { data: subscription, isLoading } = useSubscription();
-  const { trial, apiServiceLevel } = subscription || {};
+  const { data, isLoading } = useSubscription();
+  const track = useTelemetry();
 
-  const { mutateAsync: goToPortal, isPending: isGoingToPortal } = useMutation({
-    mutationFn: () => get<{ data: string }>('/billing/portal?isV2Dashboard=true'),
-    onSuccess: (data) => {
-      window.location.href = data.data;
-    },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Unexpected error occurred');
-    },
-  });
+  const isPaidSubscriptionActive = () => {
+    return data?.isActive && !data?.trial?.isActive && data?.apiServiceLevel !== ApiServiceLevelEnum.FREE;
+  };
 
-  const { mutateAsync: checkout, isPending: isCheckingOut } = useMutation({
-    mutationFn: () =>
-      post<{ data: { stripeCheckoutUrl: string } }>('/billing/checkout-session', {
+  const { mutateAsync: checkout, isLoading: isCheckingOut } = useMutation(
+    () =>
+      post('/v1/billing/checkout-session', {
         billingInterval: selectedBillingInterval,
         apiServiceLevel: ApiServiceLevelEnum.BUSINESS,
-        isV2Dashboard: true,
       }),
-    onSuccess: (data) => {
-      window.location.href = data.data.stripeCheckoutUrl;
+    {
+      onSuccess: (data) => {
+        track(TelemetryEvent.BILLING_UPGRADE_INITIATED, {
+          fromPlan: data?.apiServiceLevel,
+          toPlan: ApiServiceLevelEnum.BUSINESS,
+          billingInterval: selectedBillingInterval,
+        });
+        window.location.href = data.stripeCheckoutUrl;
+      },
+      onError: (error: Error) => {
+        track(TelemetryEvent.BILLING_UPGRADE_ERROR, {
+          error: error.message,
+          billingInterval: selectedBillingInterval,
+        });
+        toast.error(error.message || 'Unexpected error');
+      },
+    }
+  );
+
+  const { mutateAsync: goToPortal, isLoading: isGoingToPortal } = useMutation(() => get('/v1/billing/portal'), {
+    onSuccess: (url) => {
+      track(TelemetryEvent.BILLING_PORTAL_ACCESSED, {
+        currentPlan: data?.apiServiceLevel,
+        billingInterval: selectedBillingInterval,
+      });
+      window.location.href = url;
     },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Unexpected error occurred');
+    onError: (error: Error) => {
+      track(TelemetryEvent.BILLING_PORTAL_ERROR, {
+        error: error.message,
+        currentPlan: data?.apiServiceLevel,
+      });
+      toast.error(error.message || 'Unexpected error');
     },
   });
 
-  function isPaidSubscriptionActive() {
-    if (!subscription || !trial) return false;
-
-    return subscription.isActive && !trial.isActive && apiServiceLevel !== ApiServiceLevelEnum.FREE;
-  }
+  const handleAction = () => {
+    if (isPaidSubscriptionActive()) {
+      goToPortal();
+    } else {
+      checkout();
+    }
+  };
 
   return (
     <Button
       variant={variant}
       size={size}
       className={cn('gap-2', className)}
-      onClick={() => (isPaidSubscriptionActive() ? goToPortal() : checkout())}
+      onClick={handleAction}
       disabled={isGoingToPortal}
       isLoading={isCheckingOut || isLoading}
     >
