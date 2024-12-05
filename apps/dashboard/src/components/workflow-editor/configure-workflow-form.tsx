@@ -24,7 +24,6 @@ import { Textarea } from '../primitives/textarea';
 import { MAX_DESCRIPTION_LENGTH, workflowSchema } from '@/components/workflow-editor/schema';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { RiCodeSSlashLine, RiDeleteBin2Line, RiGitPullRequestFill, RiMore2Fill } from 'react-icons/ri';
-import { useComingSoonBanner } from '../promotional/coming-soon-banner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,6 +41,8 @@ import { showToast } from '@/components/primitives/sonner-helpers';
 import { ToastIcon } from '@/components/primitives/sonner';
 import { DeleteWorkflowDialog } from '../delete-workflow-dialog';
 import { ROUTES } from '@/utils/routes';
+import { TelemetryEvent } from '../../utils/telemetry';
+import { usePromotionalBanner } from '../promotional/coming-soon-banner';
 
 type ConfigureWorkflowFormProps = {
   workflow: WorkflowResponseDto;
@@ -65,10 +66,13 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
   const tagsQuery = useTags();
   const { currentEnvironment } = useEnvironment();
   const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
-  const { show: showComingSoonBanner } = useComingSoonBanner({
-    onReactionSelect: (reaction) => {
-      // You can handle the reaction here if needed
-      console.log('User reacted with:', reaction);
+  const { show: showComingSoonBanner } = usePromotionalBanner({
+    content: {
+      title: '🚧 Export to Code is on the way!',
+      description:
+        'With Export to Code, design workflows in the GUI and switch to code anytime for custom logic and advanced features!',
+      feedbackQuestion: "Sounds like a feature you'd need?",
+      telemetryEvent: TelemetryEvent.EXPORT_TO_CODE_BANNER_REACTION,
     },
   });
 

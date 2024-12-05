@@ -20,4 +20,5 @@ export enum TelemetryEvent {
   INBOX_USECASE_PAGE_VIEWED = 'Inbox use case page viewed - [Onboarding]',
   INBOX_EMBED_PAGE_VIEWED = 'Inbox embed page viewed - [Onboarding]',
   INBOX_EMBED_SUCCESS_PAGE_VIEWED = 'Inbox embed success page viewed - [Onboarding]',
+  EXPORT_TO_CODE_BANNER_REACTION = 'Export to Code banner reaction - [Promotional]',
 }
