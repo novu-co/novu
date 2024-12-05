@@ -1,10 +1,9 @@
 import type { BuilderFieldType, BuilderGroupValues, CustomDataType, FilterParts, WorkflowTypeEnum } from '../../types';
-import type { ControlsDto } from '../../dto/controls';
-import type { JSONSchemaDto } from '../../dto/workflows';
+import { JSONSchemaDto } from '../../dto/workflows';
 import type { ContentIssue, StepIssue } from '../../dto/workflows/workflow-response.dto';
 import { ControlSchemas, IMessageTemplate } from '../message-template';
 import { INotificationGroup } from '../notification-group';
-import { INotificationTrigger, INotificationBridgeTrigger } from '../notification-trigger';
+import { INotificationBridgeTrigger, INotificationTrigger } from '../notification-trigger';
 import { IPreferenceChannels } from '../subscriber-preference';
 import { IWorkflowStepMetadata } from '../step';
 
@@ -77,7 +76,7 @@ export interface IStepVariant {
    * controlVariables exists
    * only on none production environment in order to provide stateless control variables on fly
    */
-  controlVariables?: ControlsDto;
+  controlVariables?: Record<string, unknown>;
   bridgeUrl?: string;
 }
 

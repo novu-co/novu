@@ -17,9 +17,10 @@ import { OtherStepTabs } from './other-steps-tabs';
 import { Form } from '@/components/primitives/form/form';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
+import { EmailTabs } from '@/components/workflow-editor/steps/email/email-tabs';
 
 const STEP_TYPE_TO_EDITOR: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
-  [StepTypeEnum.EMAIL]: OtherStepTabs,
+  [StepTypeEnum.EMAIL]: EmailTabs,
   [StepTypeEnum.CHAT]: OtherStepTabs,
   [StepTypeEnum.IN_APP]: InAppTabs,
   [StepTypeEnum.SMS]: OtherStepTabs,

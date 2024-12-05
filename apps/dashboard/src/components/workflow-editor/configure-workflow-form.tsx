@@ -5,7 +5,7 @@ import { z } from 'zod';
 
 import { PAUSE_MODAL_TITLE, PauseModalDescription } from '@/components/pause-workflow-dialog';
 import { SidebarContent, SidebarHeader } from '@/components/side-navigation/sidebar';
-import { useTagsQuery } from '@/hooks/use-tags-query';
+import { useTags } from '@/hooks/use-tags';
 import { cn } from '@/utils/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { UpdateWorkflowDto, WorkflowOriginEnum, WorkflowResponseDto } from '@novu/shared';
@@ -31,7 +31,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
   const { workflow, update } = props;
   const isReadOnly = workflow.origin === WorkflowOriginEnum.EXTERNAL;
   const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
-  const tagsQuery = useTagsQuery();
+  const tagsQuery = useTags();
 
   const form = useForm<z.infer<typeof workflowSchema>>({
     defaultValues: {

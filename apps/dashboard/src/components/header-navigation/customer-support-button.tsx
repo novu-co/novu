@@ -139,7 +139,7 @@ export const CustomerSupportButton = () => {
       onClick={showPlainLiveChat}
     >
       <HeaderButton label="Help">
-        <RiQuestionFill className="text-foreground-600 size-4" />
+        <RiQuestionFill className="text-foreground-600 size-4" />{' '}
       </HeaderButton>
     </button>
   );
