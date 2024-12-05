@@ -7,7 +7,7 @@ import { clerkSignupAppearance } from '@/utils/clerk-appearance';
 
 export const SignInPage = () => {
   return (
-    <>
+    <div className="flex max-w-[1100px] gap-36">
       <PageMeta title="Sign in" />
       <AuthSideBanner />
       <div className="flex flex-1 items-center justify-end">
@@ -16,6 +16,6 @@ export const SignInPage = () => {
           <RegionPicker />
         </div>
       </div>
-    </>
+    </div>
   );
 };

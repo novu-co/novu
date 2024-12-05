@@ -10,6 +10,7 @@ const editorVariants = cva('h-full w-full flex-1 [&_.cm-focused]:outline-none', 
   variants: {
     size: {
       default: 'text-xs [&_.cm-editor]:py-1',
+      lg: 'text-base [&_.cm-editor]:py-1',
     },
   },
   defaultVariants: {

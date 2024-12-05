@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
-import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
+import { FormControl, FormField, FormItem } from '@/components/primitives/form/form';
 import { InputField } from '@/components/primitives/input';
 import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
@@ -41,7 +41,6 @@ export const InAppBody = () => {
               />
             </InputField>
           </FormControl>
-          <FormMessage>{`Type {{ for variables, or wrap text in ** for bold.`}</FormMessage>
         </FormItem>
       )}
     />

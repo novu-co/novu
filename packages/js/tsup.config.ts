@@ -22,14 +22,13 @@ const buildCSS = async () => {
   fs.writeFileSync(destinationCssFilePath, processedCss);
 };
 
-const isProd = process.env?.NODE_ENV === 'production';
+const isProd = process.env.NODE_ENV === 'production';
 
 const baseConfig: Options = {
   splitting: true,
   sourcemap: false,
   clean: true,
   esbuildPlugins: [solidPlugin()],
-  define: { PACKAGE_NAME: `"${name}"`, PACKAGE_VERSION: `"${version}"`, __DEV__: `${!isProd}` },
 };
 
 const baseModuleConfig: Options = {
@@ -41,6 +40,12 @@ const baseModuleConfig: Options = {
     'ui/index': './src/ui/index.ts',
     'themes/index': './src/ui/themes/index.ts',
     'internal/index': './src/ui/internal/index.ts',
+  },
+  define: {
+    NOVU_API_VERSION: `"2024-06-26"`,
+    PACKAGE_NAME: `"${name}"`,
+    PACKAGE_VERSION: `"${version}"`,
+    __DEV__: `${isProd ? false : true}`,
   },
 };
 
