@@ -23,7 +23,7 @@ import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
 import { MAX_DESCRIPTION_LENGTH, workflowSchema } from '@/components/workflow-editor/schema';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { RiDeleteBin2Line, RiGitPullRequestFill, RiMore2Fill } from 'react-icons/ri';
+import { RiCodeSSlashLine, RiDeleteBin2Line, RiGitPullRequestFill, RiMore2Fill } from 'react-icons/ri';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -162,12 +162,16 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
           </div>
           <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="ml-auto">
+              <Button variant="ghost" size="icon" className="ml-auto h-[20px] w-[22px]">
                 <RiMore2Fill />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuGroup>
+                <DropdownMenuItem onClick={safeSync}>
+                  <RiCodeSSlashLine />
+                  Export to Code
+                </DropdownMenuItem>
                 {isSyncable ? (
                   <DropdownMenuItem onClick={safeSync}>
                     <RiGitPullRequestFill />
