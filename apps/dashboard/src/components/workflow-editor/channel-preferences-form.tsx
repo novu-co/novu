@@ -256,7 +256,7 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
                 return (
                   <FormField
                     control={form.control}
-                    name={`user.channels.${channel}.enabled` as `user.channels.${ChannelTypeEnum}.enabled`}
+                    name={`user.channels.${channel}.enabled`}
                     render={({ field }) => (
                       <FormItem className="mt-2 flex w-full items-center justify-between">
                         <div className="flex items-center gap-2">
