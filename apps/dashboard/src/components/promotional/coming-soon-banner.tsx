@@ -92,7 +92,7 @@ function PromotionalBannerContent({ onDismiss, onReactionSelect, content }: UseP
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="flex flex-col items-center gap-2 py-2 text-center"
+            className="flex flex-col items-center gap-2 pb-3 text-center"
           >
             <motion.span animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 0.5 }} className="text-2xl">
               🙏
@@ -125,7 +125,7 @@ function PromotionalBannerContent({ onDismiss, onReactionSelect, content }: UseP
                       key={reaction.value}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 + index * 0.1 }}
+                      transition={{ delay: 0.2 + index * 0.1 }}
                       className="w-full rounded-none border-r-[1px] border-[#D1D5DB] transition-colors last:border-r-0 hover:bg-[#F8F9FB] data-[state=on]:bg-[#F8F9FB]"
                       whileTap={{ scale: 0.95 }}
                     >
