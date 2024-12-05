@@ -70,7 +70,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
     content: {
       title: '🚧 Export to Code is on the way!',
       description:
-        'With Export to Code, design workflows in the GUI and switch to code anytime for custom logic and advanced features!',
+        'With Export to Code, you can design workflows in the GUI and switch to code anytime you need more control and flexibility.',
       feedbackQuestion: "Sounds like a feature you'd need?",
       telemetryEvent: TelemetryEvent.EXPORT_TO_CODE_BANNER_REACTION,
     },
