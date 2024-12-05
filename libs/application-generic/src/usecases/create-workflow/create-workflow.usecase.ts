@@ -407,7 +407,7 @@ export class CreateWorkflow {
         userId: command.userId,
         environmentId: command.environmentId,
         organizationId: command.organizationId,
-        identifierOrInternalId: savedWorkflow._id,
+        workflowIdOrInternalId: savedWorkflow._id,
       }),
     );
   }

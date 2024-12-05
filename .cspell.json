@@ -709,7 +709,9 @@
     "truncatewords",
     "xmlschema",
     "jsonify",
-    "touchpoint"
+    "touchpoint",
+    "Angularjs",
+    "navigatable"
   ],
   "flagWords": [],
   "patterns": [

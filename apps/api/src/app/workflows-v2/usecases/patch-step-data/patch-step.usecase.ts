@@ -34,7 +34,7 @@ export class PatchStepUsecase {
     });
     await this.persistWorkflow(updatedWorkflow, command.user);
 
-    return await this.buildStepDataUsecase.execute({ ...command });
+    return await this.buildStepDataUsecase.execute(command);
   }
 
   private async patchFieldsOnPersistedItems(command: PatchStepCommand, persistedItems: ValidNotificationWorkflow) {
@@ -76,7 +76,7 @@ export class PatchStepUsecase {
 
   private async fetchWorkflow(command: PatchStepCommand) {
     return await this.getWorkflowByIdsUseCase.execute({
-      identifierOrInternalId: command.identifierOrInternalId,
+      workflowIdOrInternalId: command.workflowIdOrInternalId,
       environmentId: command.user.environmentId,
       organizationId: command.user.organizationId,
       userId: command.user._id,
@@ -85,14 +85,14 @@ export class PatchStepUsecase {
 
   private async findStepByStepId(command: PatchStepCommand, workflow: NotificationTemplateEntity) {
     const currentStep = workflow.steps.find(
-      (stepItem) => stepItem._id === command.stepId || stepItem.stepId === command.stepId
+      (stepItem) => stepItem._id === command.stepIdOrInternalId || stepItem.stepId === command.stepIdOrInternalId
     );
 
     if (!currentStep) {
       throw new BadRequestException({
         message: 'No step found',
-        stepId: command.stepId,
-        workflowId: command.identifierOrInternalId,
+        stepIdOrInternalId: command.stepIdOrInternalId,
+        workflowId: command.workflowIdOrInternalId,
       });
     }
 

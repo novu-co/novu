@@ -11,28 +11,51 @@ import { TelemetryEvent } from '../utils/telemetry';
 
 const helpfulResources: Resource[] = [
   {
-    title: "Let's meet? Let's chat about notifications.",
-    duration: '15m meet',
-    image: 'calendar_schedule.png',
-    url: 'https://cal.com/novu/30min',
+    title: 'Documentation',
+    image: 'blog.svg',
+    url: 'https://docs.novu.co/',
   },
   {
     title: 'Join our community on Discord',
-    duration: '30s',
-    image: 'calendar_schedule.png',
+    image: 'discord.svg',
     url: 'https://discord.gg/novu',
   },
   {
-    title: 'Star us on GitHub',
-    duration: '10s for happiness',
-    image: 'view_code.png',
+    title: 'See our code on GitHub',
+    image: 'git.svg',
     url: 'https://github.com/novuhq/novu',
   },
   {
-    title: 'Security & Compliance with Novu',
-    duration: '5m read',
-    image: 'compliance.png',
+    title: 'Security & Compliance',
+    image: 'security.svg',
     url: 'https://trust.novu.co/',
+  },
+];
+
+const learnResources: Resource[] = [
+  {
+    title: 'Manage Subscribers',
+    duration: '4m read',
+    image: 'subscribers.svg',
+    url: 'https://docs.novu.co/concepts/subscribers?utm_source=novu.co&utm_medium=welcome-page',
+  },
+  {
+    title: 'Topics',
+    duration: '5m read',
+    image: 'topics.svg',
+    url: 'https://docs.novu.co/concepts/topics?utm_source=novu.co&utm_medium=welcome-page',
+  },
+  {
+    title: 'Code First Workflows',
+    duration: '4m read',
+    image: 'code-first.svg',
+    url: 'https://docs.novu.co/workflow/introduction?utm_source=novu.co&utm_medium=welcome-page',
+  },
+  {
+    title: 'Digest Engine',
+    duration: '3m read',
+    image: 'digest engine-1.svg',
+    url: 'https://docs.novu.co/workflow/digest?utm_source=novu.co&utm_medium=welcome-page',
   },
 ];
 
@@ -84,7 +107,7 @@ export function WelcomePage(): ReactElement {
           </motion.div>
 
           <motion.div variants={sectionVariants}>
-            <ResourcesList title="Learn" icon={<RiBookletFill className="h-4 w-4" />} resources={helpfulResources} />
+            <ResourcesList title="Learn" icon={<RiBookletFill className="h-4 w-4" />} resources={learnResources} />
           </motion.div>
         </motion.div>
       </DashboardLayout>
