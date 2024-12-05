@@ -4,15 +4,13 @@ import { RiQuestionFill } from 'react-icons/ri';
 import { HeaderButton } from './header-button';
 import { PLAIN_SUPPORT_CHAT_APP_ID } from '@/config';
 import { useAuth } from '@/context/auth/hooks';
+import * as Sentry from '@sentry/react';
 
 export const CustomerSupportButton = () => {
   const [isFirstRender, setIsFirstRender] = useState(true);
-  const { currentOrganization, currentUser } = useAuth();
+  const { currentUser } = useAuth();
 
-  const isLiveChatVisible =
-    currentOrganization?.apiServiceLevel !== 'free' &&
-    currentUser?.servicesHashes?.plain &&
-    PLAIN_SUPPORT_CHAT_APP_ID !== undefined;
+  const isLiveChatVisible = currentUser?.servicesHashes?.plain && PLAIN_SUPPORT_CHAT_APP_ID !== undefined;
 
   useBootIntercom();
 
@@ -115,7 +113,8 @@ export const CustomerSupportButton = () => {
           ],
         });
       } catch (error) {
-        console.error('error initializing plain chat', error);
+        console.error('Error initializing plain chat: ', error);
+        Sentry.captureException(error);
       }
     }
     setIsFirstRender(false);
@@ -127,7 +126,8 @@ export const CustomerSupportButton = () => {
         // @ts-ignore
         window?.Plain?.open();
       } catch (error) {
-        console.error('error opening plain chat', error);
+        console.error('Error opening plain chat: ', error);
+        Sentry.captureException(error);
       }
     }
   };

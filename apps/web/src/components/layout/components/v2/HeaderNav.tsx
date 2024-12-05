@@ -11,6 +11,7 @@ import { Tooltip, Dropdown } from '@novu/design-system';
 import { css } from '@novu/novui/css';
 import { HStack } from '@novu/novui/jsx';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
+import { captureException } from '@sentry/react';
 import { IS_EE_AUTH_ENABLED, IS_NOVU_PROD_STAGING } from '../../../../config';
 import { useBootIntercom, useFeatureFlag } from '../../../../hooks';
 import useThemeChange from '../../../../hooks/useThemeChange';
@@ -76,7 +77,8 @@ export function HeaderNav() {
           },
         });
       } catch (error) {
-        console.error('error initializing plain chat', error);
+        console.error('Error initializing plain chat: ', error);
+        captureException(error);
       }
     }
     setIsFirstRender(false);
@@ -88,7 +90,8 @@ export function HeaderNav() {
         // @ts-ignore
         window?.Plain?.open();
       } catch (error) {
-        console.error('error opening plain chat', error);
+        console.error('Error opening plain chat: ', error);
+        captureException(error);
       }
     }
   };
