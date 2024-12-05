@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { RiPlayCircleLine, RiProgress1Fill } from 'react-icons/ri';
+import { RiPlayCircleLine } from 'react-icons/ri';
 import { useForm } from 'react-hook-form';
 // eslint-disable-next-line
 // @ts-ignore
@@ -47,15 +47,36 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
       const {
         data: { transactionId },
       } = await triggerWorkflow({ name: workflow?.workflowId ?? '', to: data.to, payload: data.payload });
-      showToast({
+      if (!transactionId) {
+        return showToast({
+          variant: 'lg',
+          children: ({ close }) => (
+            <>
+              <ToastIcon variant="error" />
+              <div className="flex flex-col gap-2">
+                <span className="font-medium">Test workflow failed</span>
+                <span className="text-foreground-600 inline">
+                  Workflow <span className="font-bold">{workflow?.name}</span> cannot be triggered. Ensure that it is
+                  active and requires not further actions.
+                </span>
+              </div>
+              <ToastClose onClick={close} />
+            </>
+          ),
+          options: {
+            position: 'bottom-right',
+          },
+        });
+      }
+      return showToast({
         variant: 'lg',
         children: ({ close }) => (
           <>
-            <ToastIcon variant="default" />
+            <ToastIcon variant="success" />
             <div className="flex flex-col gap-2">
               <span className="font-medium">Test workflow succeeded</span>
               <span className="text-foreground-600 inline">
-                Workflow <strong>{workflow?.name}</strong> was triggered successfully.
+                Workflow <span className="font-bold">{workflow?.name}</span> was triggered successfully.
               </span>
               <Link
                 to={`${LEGACY_ROUTES.ACTIVITY_FEED}?transactionId=${transactionId}`}
@@ -106,8 +127,8 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
                 </Link>
               </TabsTrigger>
               <div className="ml-auto">
-                <Button type="submit" variant="primary" size="sm" className="flex gap-1" disabled={isPending}>
-                  {isPending ? <RiProgress1Fill className="size-5" /> : <RiPlayCircleLine className="size-5" />}
+                <Button type="submit" variant="primary" size="sm" className="flex gap-1" isLoading={isPending}>
+                  <RiPlayCircleLine className="size-5" />
                   <span>Test workflow</span>
                 </Button>
               </div>

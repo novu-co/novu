@@ -4,7 +4,7 @@ import {
   BuilderGroupValues,
   ContentIssue,
   ControlSchemas,
-  ControlsDto,
+  CustomDataType,
   FilterParts,
   IMessageFilter,
   IMessageTemplate,
@@ -16,7 +16,6 @@ import {
   IStepVariant,
   ITriggerReservedVariable,
   IWorkflowStepMetadata,
-  NotificationTemplateCustomData,
   StepIssues,
   TriggerTypeEnum,
   WorkflowOriginEnum,
@@ -77,7 +76,7 @@ export class NotificationTemplateEntity implements INotificationTemplate {
 
   blueprintId?: string;
 
-  data?: NotificationTemplateCustomData;
+  data?: CustomDataType;
 
   type?: WorkflowTypeEnum;
 
@@ -142,11 +141,11 @@ export class StepVariantEntity implements IStepVariant {
   shouldStopOnFail?: boolean;
 
   bridgeUrl?: string;
-  /**
-   * @deprecated This property is deprecated and will be removed in future versions.
-   * Use `fullName` instead.
+  /*
+   * controlVariables exists
+   * only on none production environment in order to provide stateless control variables on fly
    */
-  controlVariables?: ControlsDto;
+  controlVariables?: Record<string, unknown>;
   /**
    * @deprecated This property is deprecated and will be removed in future versions.
    * Use IMessageTemplate.controls

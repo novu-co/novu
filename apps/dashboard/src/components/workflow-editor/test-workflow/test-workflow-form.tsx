@@ -135,7 +135,7 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
               <TabsTrigger className={tabsTriggerClassName} value="python" variant="regular">
                 Python
               </TabsTrigger>
-              <CopyButton variant="ghost" className="text-foreground-400 ml-auto" size="sm" valueToCopy="Copy code">
+              <CopyButton variant="ghost" className="text-foreground-400 ml-auto" size="sm" valueToCopy={snippetValue}>
                 <RiFileCopyLine className="size-4" /> Copy code
               </CopyButton>
             </TabsList>

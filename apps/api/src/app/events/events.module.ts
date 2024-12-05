@@ -14,7 +14,6 @@ import { SharedModule } from '../shared/shared.module';
 import { WidgetsModule } from '../widgets/widgets.module';
 import { AuthModule } from '../auth/auth.module';
 import { SubscribersModule } from '../subscribers/subscribers.module';
-import { LogsModule } from '../logs/logs.module';
 import { ContentTemplatesModule } from '../content-templates/content-templates.module';
 import { IntegrationModule } from '../integrations/integrations.module';
 import { ExecutionDetailsModule } from '../execution-details/execution-details.module';
@@ -32,7 +31,6 @@ const PROVIDERS = [GetNovuProviderCredentials, StorageHelperService, EventsDistr
     WidgetsModule,
     AuthModule,
     SubscribersModule,
-    LogsModule,
     ContentTemplatesModule,
     IntegrationModule,
     ExecutionDetailsModule,

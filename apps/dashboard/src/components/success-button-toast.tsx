@@ -1,10 +1,11 @@
 import { Button } from '@/components/primitives/button';
 import { ToastClose, ToastIcon } from '@/components/primitives/sonner';
+import { ReactNode } from 'react';
 import { RiArrowRightSLine } from 'react-icons/ri';
 
 interface SuccessToastProps {
   title: string;
-  description: string;
+  description: ReactNode;
   actionLabel: string;
   onAction: () => void;
   onClose: () => void;
@@ -13,7 +14,7 @@ interface SuccessToastProps {
 export function SuccessButtonToast({ title, description, actionLabel, onAction, onClose }: SuccessToastProps) {
   return (
     <>
-      <ToastIcon variant="default" />
+      <ToastIcon variant="success" />
       <div className="flex flex-1 flex-col items-start gap-2.5">
         <div className="flex flex-col items-start justify-center gap-1 self-stretch">
           <div className="text-foreground-950 text-sm font-medium">{title}</div>

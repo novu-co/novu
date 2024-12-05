@@ -4,6 +4,7 @@ import { CLERK_PUBLISHABLE_KEY } from '@/config';
 import { ClerkProvider as _ClerkProvider } from '@clerk/clerk-react';
 import { PropsWithChildren } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../utils/routes';
 
 const CLERK_LOCALIZATION = {
   userProfile: {
@@ -40,6 +41,7 @@ export const ClerkProvider = (props: ClerkProviderProps) => {
       routerPush={(to) => navigate(to)}
       routerReplace={(to) => navigate(to, { replace: true })}
       publishableKey={CLERK_PUBLISHABLE_KEY}
+      afterSignOutUrl={ROUTES.SIGN_IN}
       appearance={{
         userButton: {
           elements: {

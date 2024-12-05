@@ -24,17 +24,18 @@ import {
   UpdateSubscriberChannelCommand,
   UpdateSubscriberCommand,
 } from '@novu/application-generic';
-import { ApiExcludeEndpoint, ApiOperation, ApiParam, ApiTags, ApiQuery } from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import {
   ApiRateLimitCategoryEnum,
   ApiRateLimitCostEnum,
   ButtonTypeEnum,
   ChatProviderIdEnum,
   IPreferenceChannels,
+  PreferenceLevelEnum,
   TriggerTypeEnum,
   UserSessionData,
 } from '@novu/shared';
-import { MessageEntity, PreferenceLevelEnum } from '@novu/dal';
+import { MessageEntity } from '@novu/dal';
 
 import { RemoveSubscriber, RemoveSubscriberCommand } from './usecases/remove-subscriber';
 import { ExternalApiAccessible } from '../auth/framework/external-api.decorator';

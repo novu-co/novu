@@ -3,16 +3,31 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import ErrorPage from '@/components/error-page';
 import { RootRoute, AuthRoute, DashboardRoute, CatchAllRoute } from './routes';
-import { WorkflowsPage, SignInPage, SignUpPage, OrganizationListPage } from '@/pages';
+import { OnboardingParentRoute } from './routes/onboarding';
+import {
+  WorkflowsPage,
+  SignInPage,
+  SignUpPage,
+  OrganizationListPage,
+  QuestionnairePage,
+  UsecaseSelectPage,
+  ApiKeysPage,
+  WelcomePage,
+  SettingsPage,
+} from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
 import { TestWorkflowPage } from './pages/test-workflow';
-import { ConfigureWorkflow } from './components/workflow-editor/configure-workflow';
-import { ConfigureStep } from './components/workflow-editor/steps/configure-step';
 import { initializeSentry } from './utils/sentry';
-import { EditStepSidebar } from './components/workflow-editor/steps/edit-step-sidebar';
 import { overrideZodErrorMap } from './utils/validation';
+import { InboxUsecasePage } from './pages/inbox-usecase-page';
+import { InboxEmbedPage } from './pages/inbox-embed-page';
+import { FeatureFlagsProvider } from '@/context/feature-flags-provider';
+import { EditStepTemplate } from '@/components/workflow-editor/steps/edit-step-template';
+import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workflow';
+import { EditStep } from '@/components/workflow-editor/steps/edit-step';
+import { InboxEmbedSuccessPage } from './pages/inbox-embed-success-page';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -40,6 +55,32 @@ const router = createBrowserRouter([
         ],
       },
       {
+        path: '/onboarding',
+        element: <OnboardingParentRoute />,
+        children: [
+          {
+            path: ROUTES.SIGNUP_QUESTIONNAIRE,
+            element: <QuestionnairePage />,
+          },
+          {
+            path: ROUTES.USECASE_SELECT,
+            element: <UsecaseSelectPage />,
+          },
+          {
+            path: ROUTES.INBOX_USECASE,
+            element: <InboxUsecasePage />,
+          },
+          {
+            path: ROUTES.INBOX_EMBED,
+            element: <InboxEmbedPage />,
+          },
+          {
+            path: ROUTES.INBOX_EMBED_SUCCESS,
+            element: <InboxEmbedSuccessPage />,
+          },
+        ],
+      },
+      {
         path: ROUTES.ROOT,
         element: <DashboardRoute />,
         children: [
@@ -47,8 +88,16 @@ const router = createBrowserRouter([
             path: ROUTES.ENV,
             children: [
               {
+                path: ROUTES.WELCOME,
+                element: <WelcomePage />,
+              },
+              {
                 path: ROUTES.WORKFLOWS,
                 element: <WorkflowsPage />,
+              },
+              {
+                path: ROUTES.API_KEYS,
+                element: <ApiKeysPage />,
               },
               {
                 path: ROUTES.EDIT_WORKFLOW,
@@ -59,12 +108,12 @@ const router = createBrowserRouter([
                     index: true,
                   },
                   {
-                    element: <ConfigureStep />,
-                    path: ROUTES.CONFIGURE_STEP,
+                    element: <EditStep />,
+                    path: ROUTES.EDIT_STEP,
                   },
                   {
-                    element: <EditStepSidebar />,
-                    path: ROUTES.EDIT_STEP,
+                    element: <EditStepTemplate />,
+                    path: ROUTES.EDIT_STEP_TEMPLATE,
                   },
                 ],
               },
@@ -79,6 +128,22 @@ const router = createBrowserRouter([
             ],
           },
           {
+            path: ROUTES.SETTINGS,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_ACCOUNT,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_ORGANIZATION,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_TEAM,
+            element: <SettingsPage />,
+          },
+          {
             path: '*',
             element: <CatchAllRoute />,
           },
@@ -90,6 +155,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <FeatureFlagsProvider>
+      <RouterProvider router={router} />
+    </FeatureFlagsProvider>
   </StrictMode>
 );

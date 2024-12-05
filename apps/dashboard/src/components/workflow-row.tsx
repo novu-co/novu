@@ -40,6 +40,7 @@ import { showToast } from './primitives/sonner-helpers';
 import { ToastIcon } from './primitives/sonner';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 import { PauseModalDescription, PAUSE_MODAL_TITLE } from '@/components/pause-workflow-dialog';
+import { DeleteWorkflowDialog } from './delete-workflow-dialog';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -81,7 +82,9 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         children: () => (
           <>
             <ToastIcon variant="success" />
-            <span className="text-sm">Deleted</span>
+            <span className="text-sm">
+              Deleted workflow <span className="font-bold">{workflow.name}</span>.
+            </span>
           </>
         ),
         options: toastOptions,
@@ -92,7 +95,9 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         children: () => (
           <>
             <ToastIcon variant="error" />
-            <span className="text-sm">Failed to delete</span>
+            <span className="text-sm">
+              Failed to delete workflow <span className="font-bold">{workflow.name}</span>.
+            </span>
           </>
         ),
         options: toastOptions,
@@ -112,7 +117,9 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         children: () => (
           <>
             <ToastIcon variant="success" />
-            <span className="text-sm">{data.active ? 'Enabled' : 'Paused'} workflow</span>
+            <span className="text-sm">
+              {data.active ? 'Enabled' : 'Paused'} workflow <span className="font-bold">{workflow.name}</span>.
+            </span>
           </>
         ),
         options: toastOptions,
@@ -123,7 +130,10 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         children: () => (
           <>
             <ToastIcon variant="error" />
-            <span className="text-sm">Failed to {workflow.active ? 'enable' : 'pause'} workflow</span>
+            <span className="text-sm">
+              Failed to {workflow.active ? 'enable' : 'pause'} workflow{' '}
+              <span className="font-bold">{workflow.name}</span>.
+            </span>
           </>
         ),
         options: toastOptions,
@@ -154,7 +164,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
       <TableCell className="font-medium">
         <div className="flex items-center gap-1">
           {workflow.origin === WorkflowOriginEnum.EXTERNAL && (
-            <Badge variant="warning" size="pill">
+            <Badge variant="warning" kind="pill">
               <FaCode className="size-3" />
             </Badge>
           )}
@@ -198,13 +208,11 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
       </Tooltip>
 
       <TableCell className="w-1">
-        <ConfirmationModal
+        <DeleteWorkflowDialog
+          workflow={workflow}
           open={isDeleteModalOpen}
           onOpenChange={setIsDeleteModalOpen}
           onConfirm={onDeleteWorkflow}
-          title="Are you sure?"
-          description={`You're about to delete the ${workflow.name}, this action cannot be undone.`}
-          confirmButtonText="Delete"
           isLoading={isDeleteWorkflowPending}
         />
         <ConfirmationModal

@@ -27,7 +27,7 @@ export const fetchWorkflowTestData = async ({
 };
 
 export async function triggerWorkflow({ name, payload, to }: { name: string; payload: unknown; to: unknown }) {
-  return post<{ data: { transactionId: string } }>(`/events/trigger`, {
+  return post<{ data: { transactionId?: string } }>(`/events/trigger`, {
     name,
     to,
     payload: { ...(payload ?? {}), __source: 'dashboard' },
@@ -43,13 +43,13 @@ export async function syncWorkflow(workflowId: string, payload: SyncWorkflowDto)
 }
 
 export const updateWorkflow = async ({
-  id,
+  workflowId,
   workflow,
 }: {
-  id: string;
+  workflowId: string;
   workflow: UpdateWorkflowDto;
 }): Promise<WorkflowResponseDto> => {
-  const { data } = await putV2<{ data: WorkflowResponseDto }>(`/workflows/${id}`, workflow);
+  const { data } = await putV2<{ data: WorkflowResponseDto }>(`/workflows/${workflowId}`, workflow);
 
   return data;
 };

@@ -1,14 +1,16 @@
-import { tags as t } from '@lezer/highlight';
+import React, { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCodeMirror, ReactCodeMirrorProps, EditorView } from '@uiw/react-codemirror';
 import createTheme from '@uiw/codemirror-themes';
-import { EditorView, ReactCodeMirrorProps, useCodeMirror } from '@uiw/react-codemirror';
+import { tags as t } from '@lezer/highlight';
 import { cva, VariantProps } from 'class-variance-authority';
-import React, { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef } from 'react';
-import { autocompleteFooter, autocompleteHeader, functionIcon } from './constants';
+import debounce from 'lodash.debounce';
+import { autocompleteFooter, autocompleteHeader, functionIcon } from '@/components/primitives/constants';
 
 const editorVariants = cva('h-full w-full flex-1 [&_.cm-focused]:outline-none', {
   variants: {
     size: {
       default: 'text-xs [&_.cm-editor]:py-1',
+      lg: 'text-base [&_.cm-editor]:py-1',
     },
   },
   defaultVariants: {
@@ -16,10 +18,7 @@ const editorVariants = cva('h-full w-full flex-1 [&_.cm-focused]:outline-none', 
   },
 });
 
-type baseThemeOptions = {
-  asInput?: boolean;
-};
-const baseTheme = (options: baseThemeOptions) =>
+const baseTheme = (options: { asInput?: boolean }) =>
   EditorView.baseTheme({
     '&light': {
       backgroundColor: 'transparent',
@@ -119,7 +118,7 @@ type EditorProps = {
   placeholder?: string;
   className?: string;
   height?: string;
-  onChange?: (val: string) => void;
+  onChange?: (value: string) => void;
   fontFamily?: 'inherit';
 } & ReactCodeMirrorProps &
   VariantProps<typeof editorVariants>;
@@ -141,27 +140,33 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
     },
     ref
   ) => {
-    const editor = useRef<HTMLDivElement>(null);
-    const [shouldFocus, setShouldFocus] = React.useState(false);
+    const editorRef = useRef<HTMLDivElement>(null);
+    const [shouldFocus, setShouldFocus] = useState(false);
 
-    const theme = useMemo(() => {
-      return createTheme({
-        theme: 'light',
-        styles: [
-          { tag: t.keyword, color: 'hsl(var(--feature))' },
-          { tag: t.string, color: 'hsl(var(--highlighted))' },
-          { tag: t.operatorKeyword, color: 'hsl(var(--highlighted))' },
-          { tag: t.function(t.variableName), color: 'hsl(var(--information))' },
-          { tag: t.brace, color: 'hsl(var(--foreground-400))' },
-          { tag: t.variableName, color: 'hsl(var(--foreground-950))' },
-        ],
-        settings: {
-          background: 'transparent',
-          lineHighlight: 'transparent',
-          fontFamily: fontFamily === 'inherit' ? 'inherit' : undefined,
-        },
-      });
-    }, [fontFamily]);
+    const theme = useMemo(
+      () =>
+        createTheme({
+          theme: 'light',
+          styles: [
+            { tag: t.keyword, color: 'hsl(var(--feature))' },
+            { tag: t.string, color: 'hsl(var(--highlighted))' },
+            { tag: t.function(t.variableName), color: 'hsl(var(--information))' },
+          ],
+          settings: {
+            background: 'transparent',
+            fontFamily: fontFamily === 'inherit' ? 'inherit' : undefined,
+          },
+        }),
+      [fontFamily]
+    );
+
+    const debouncedOnChange = useMemo(
+      () =>
+        debounce((value: string) => {
+          if (onChange) onChange(value);
+        }, 50),
+      [onChange]
+    );
 
     const { setContainer, view } = useCodeMirror({
       extensions: [...(extensions ?? []), baseTheme({ asInput })],
@@ -171,16 +176,12 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
         lineNumbers: false,
         foldGutter: false,
         highlightActiveLine: false,
-        highlightActiveLineGutter: false,
-        indentOnInput: false,
-        searchKeymap: false,
-        ...(typeof basicSetup === 'object' ? basicSetup : {}),
+        ...((typeof basicSetup === 'object' ? basicSetup : {}) ?? {}),
       },
-      container: editor.current,
+      container: editorRef.current,
       value,
-      onChange,
+      onChange: debouncedOnChange,
       theme,
-      lang: 'liquid',
       ...restCodeMirrorProps,
     });
 
@@ -194,8 +195,8 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
     );
 
     useEffect(() => {
-      if (editor.current) {
-        setContainer(editor.current);
+      if (editorRef.current) {
+        setContainer(editorRef.current);
       }
     }, [setContainer]);
 
@@ -206,6 +207,12 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
       }
     }, [shouldFocus, view]);
 
-    return <div ref={editor} className={editorVariants({ size, className })} />;
+    useEffect(() => {
+      return () => {
+        debouncedOnChange.cancel();
+      };
+    }, [debouncedOnChange]);
+
+    return <div ref={editorRef} className={editorVariants({ size, className })} />;
   }
 );

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ControlValuesLevelEnum, StepDataDto, WorkflowOriginEnum } from '@novu/shared';
 import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
-import { GetWorkflowByIdsUseCase } from '@novu/application-generic';
+import { GetWorkflowByIdsUseCase, Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { BuildStepDataCommand } from './build-step-data.command';
 import { InvalidStepException } from '../../exceptions/invalid-step.exception';
 import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
@@ -11,9 +11,10 @@ export class BuildStepDataUsecase {
   constructor(
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private controlValuesRepository: ControlValuesRepository,
-    private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase // Dependency injection for new use case
+    private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: BuildStepDataCommand): Promise<StepDataDto> {
     const workflow = await this.fetchWorkflow(command);
 
@@ -37,7 +38,7 @@ export class BuildStepDataUsecase {
       variables: this.buildAvailableVariableSchemaUsecase.execute({
         stepDatabaseId: currentStep._templateId,
         workflow,
-      }), // Use the new use case to build variables schema
+      }),
       name: currentStep.name,
       _id: currentStep._templateId,
       stepId: currentStep.stepId,
@@ -49,15 +50,17 @@ export class BuildStepDataUsecase {
     };
   }
 
+  @Instrument()
   private async fetchWorkflow(command: BuildStepDataCommand) {
     return await this.getWorkflowByIdsUseCase.execute({
-      identifierOrInternalId: command.identifierOrInternalId,
+      workflowIdOrInternalId: command.workflowIdOrInternalId,
       environmentId: command.user.environmentId,
       organizationId: command.user.organizationId,
       userId: command.user._id,
     });
   }
 
+  @Instrument()
   private async getValues(command: BuildStepDataCommand, currentStep: NotificationStepEntity, _workflowId: string) {
     const controlValuesEntity = await this.controlValuesRepository.findOne({
       _environmentId: command.user.environmentId,
@@ -70,16 +73,17 @@ export class BuildStepDataUsecase {
     return controlValuesEntity?.controls || {};
   }
 
+  @Instrument()
   private async loadStepsFromDb(command: BuildStepDataCommand, workflow: NotificationTemplateEntity) {
     const currentStep = workflow.steps.find(
-      (stepItem) => stepItem._id === command.stepId || stepItem.stepId === command.stepId
+      (stepItem) => stepItem._id === command.stepIdOrInternalId || stepItem.stepId === command.stepIdOrInternalId
     );
 
     if (!currentStep) {
       throw new BadRequestException({
         message: 'No step found',
-        stepId: command.stepId,
-        workflowId: command.identifierOrInternalId,
+        stepId: command.stepIdOrInternalId,
+        workflowId: command.workflowIdOrInternalId,
       });
     }
 

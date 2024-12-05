@@ -12,6 +12,7 @@ import {
   WorkflowResponseDto,
 } from '@novu/shared';
 import { PreferencesEntity, PreferencesRepository } from '@novu/dal';
+import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { SyncToEnvironmentCommand } from './sync-to-environment.command';
 import { GetWorkflowCommand, GetWorkflowUseCase } from '../get-workflow';
 import { UpsertWorkflowCommand, UpsertWorkflowUseCase } from '../upsert-workflow';
@@ -35,6 +36,7 @@ export class SyncToEnvironmentUseCase {
     private buildStepDataUsecase: BuildStepDataUsecase
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: SyncToEnvironmentCommand): Promise<WorkflowResponseDto> {
     if (command.user.environmentId === command.targetEnvironmentId) {
       throw new BadRequestException('Cannot sync workflow to the same environment');
@@ -49,12 +51,13 @@ export class SyncToEnvironmentUseCase {
     return await this.upsertWorkflowUseCase.execute(
       UpsertWorkflowCommand.create({
         user: { ...command.user, environmentId: command.targetEnvironmentId },
-        identifierOrInternalId: targetWorkflow?._id,
+        workflowIdOrInternalId: targetWorkflow?._id,
         workflowDto,
       })
     );
   }
 
+  @Instrument()
   private async buildRequestDto(
     originWorkflow: WorkflowResponseDto,
     preferencesToClone: PreferencesEntity[],
@@ -68,15 +71,17 @@ export class SyncToEnvironmentUseCase {
     return await this.mapWorkflowToCreateWorkflowDto(originWorkflow, preferencesToClone, command);
   }
 
+  @Instrument()
   private async getWorkflowToClone(command: SyncToEnvironmentCommand): Promise<WorkflowResponseDto> {
     return this.getWorkflowUseCase.execute(
       GetWorkflowCommand.create({
         user: command.user,
-        identifierOrInternalId: command.identifierOrInternalId,
+        workflowIdOrInternalId: command.workflowIdOrInternalId,
       })
     );
   }
 
+  @Instrument()
   private async findWorkflowInTargetEnvironment(
     command: SyncToEnvironmentCommand,
     externalId: string
@@ -85,7 +90,7 @@ export class SyncToEnvironmentUseCase {
       return await this.getWorkflowUseCase.execute(
         GetWorkflowCommand.create({
           user: { ...command.user, environmentId: command.targetEnvironmentId },
-          identifierOrInternalId: externalId,
+          workflowIdOrInternalId: externalId,
         })
       );
     } catch (error) {
@@ -93,6 +98,7 @@ export class SyncToEnvironmentUseCase {
     }
   }
 
+  @Instrument()
   private async mapWorkflowToCreateWorkflowDto(
     originWorkflow: WorkflowResponseDto,
     preferences: PreferencesEntity[],
@@ -110,6 +116,7 @@ export class SyncToEnvironmentUseCase {
     };
   }
 
+  @Instrument()
   private async mapWorkflowToUpdateWorkflowDto(
     originWorkflow: WorkflowResponseDto,
     existingWorkflowInProd: WorkflowResponseDto | undefined,
@@ -127,6 +134,7 @@ export class SyncToEnvironmentUseCase {
     };
   }
 
+  @Instrument()
   private async mapStepsToDto(
     originSteps: StepResponseDto[],
     command: SyncToEnvironmentCommand,
@@ -136,8 +144,8 @@ export class SyncToEnvironmentUseCase {
     for (const originStep of originSteps) {
       const idAsOptionalObject = this.prodDbIdAsOptionalObject(originStep, targetWorkflowSteps);
       const stepDataDto = await this.buildStepDataUsecase.execute({
-        identifierOrInternalId: command.identifierOrInternalId,
-        stepId: originStep.stepId,
+        workflowIdOrInternalId: command.workflowIdOrInternalId,
+        stepIdOrInternalId: originStep._id || originStep.stepId,
         user: command.user,
       });
 
