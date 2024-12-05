@@ -1,4 +1,4 @@
-import { NumberInputWithSelect } from '@/components/number-input-with-select';
+import { AmountInput } from '@/components/amount-input';
 
 import { FormLabel } from '@/components/primitives/form/form';
 import { useMemo } from 'react';
@@ -20,7 +20,7 @@ export const DelayAmount = () => {
   );
 
   const defaultUnitOption = useMemo(
-    () => (uiSchema?.properties?.[unitKey] as any).placeholder ?? defaultUnitValues[0],
+    () => (uiSchema?.properties?.[unitKey] as any).placeholder ?? TimeUnitEnum.SECONDS,
     [uiSchema?.properties]
   );
 
@@ -29,7 +29,7 @@ export const DelayAmount = () => {
       <FormLabel tooltip="Delays workflow for the set time, then proceeds to the next step.">
         Delay execution by
       </FormLabel>
-      <NumberInputWithSelect
+      <AmountInput
         fields={{ inputKey: `controlValues.${amountKey}`, selectKey: `controlValues.${unitKey}` }}
         options={unitOptions}
         defaultOption={defaultUnitOption}

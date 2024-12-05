@@ -17,7 +17,7 @@ type InputWithSelectProps = {
   isReadOnly?: boolean;
 };
 
-export const NumberInputWithSelect = ({
+export const AmountInput = ({
   fields,
   options,
   defaultOption,
