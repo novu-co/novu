@@ -91,7 +91,7 @@ export function InboxPlayground() {
   });
 
   const { triggerWorkflow, isPending } = useTriggerWorkflow();
-  const { data, isLoading } = useWorkflows({ query: ONBOARDING_DEMO_WORKFLOW_ID });
+  const { data } = useWorkflows({ query: ONBOARDING_DEMO_WORKFLOW_ID });
   const auth = useAuth();
   const [hasNotificationBeenSent, setHasNotificationBeenSent] = useState(false);
   const navigate = useNavigate();
