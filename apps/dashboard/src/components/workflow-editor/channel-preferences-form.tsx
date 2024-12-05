@@ -111,9 +111,10 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
       },
     };
 
-    // If all channels are same value(all true or all false), update the all channel value to true/false
+    // If all channels are same value(all true or all false), update the "all" channel value to true/false
+    // Also, update the "all" channel value to true if a single channel is enabled and it's not already enabled
     const areAllChannelsSameValue = checkIsEveryChannelSameValue(updatedUserPreferences.channels, value);
-    if (areAllChannelsSameValue) {
+    if (areAllChannelsSameValue || (value && !updatedUserPreferences.all.enabled)) {
       updatedUserPreferences.all.enabled = value;
     }
 
