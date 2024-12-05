@@ -230,8 +230,8 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         />
         <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <RiMore2Fill className="h-4 w-4" />
+            <Button variant="ghost" size="icon">
+              <RiMore2Fill />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
