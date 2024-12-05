@@ -12,20 +12,22 @@ interface ActivePlanBannerProps {
 }
 
 export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerProps) {
-  const { data: subscription, isLoading } = useSubscription();
+  const { data: subscription } = useSubscription();
 
   const getProgressColor = (current: number, max: number) => {
     const percentage = (current / max) * 100;
     if (percentage > 90) return 'text-destructive';
     if (percentage > 75) return 'text-warning';
-    return 'text-success';
+
+    return '';
   };
 
   const getProgressBarColor = (current: number, max: number) => {
     const percentage = (current / max) * 100;
-    if (percentage > 90) return 'bg-destructive';
-    if (percentage > 75) return 'bg-warning';
-    return 'bg-success';
+    if (percentage > 90) return 'bg-gradient-to-r from-red-500 to-red-400';
+    if (percentage > 75) return 'bg-gradient-to-r from-amber-500 to-amber-400';
+
+    return 'bg-gradient-to-r from-emerald-500 to-emerald-400';
   };
 
   const formatDate = (date: string | number) => {
@@ -65,7 +67,6 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
               selectedBillingInterval={selectedBillingInterval}
               variant="outline"
               size="sm"
-              showIcon
               className="shrink-0"
             />
           </div>
@@ -113,9 +114,9 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
                 <Skeleton className="h-1.5 w-full" />
               ) : (
                 <Progress
-                  value={(subscription.events.current / subscription.events.included) * 100}
+                  value={Math.min((subscription.events.current / subscription.events.included) * 100, 100)}
                   className={cn(
-                    'h-1.5 rounded-lg',
+                    'h-1.5 rounded-lg transition-all duration-300',
                     getProgressBarColor(subscription.events.current, subscription.events.included)
                   )}
                 />

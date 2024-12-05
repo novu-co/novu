@@ -57,14 +57,10 @@ export function PlansRow({ selectedBillingInterval }: PlansRowProps) {
 
       {/* Business Plan */}
       <Card className="border-primary relative overflow-hidden border-2 shadow-md">
-        <div className="bg-primary absolute -right-12 top-4 rotate-45 px-12 py-1">
-          <span className="text-primary-foreground text-xs font-medium">POPULAR</span>
-        </div>
         <div className="flex h-full flex-col p-6">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <h3 className="text-xl font-semibold">Business</h3>
-              <Badge variant="soft">Most Popular</Badge>
             </div>
             <PlanDisplay
               price={businessPlanPrice}

@@ -5,7 +5,6 @@ import { get, post } from '../../api/api.client';
 import { toast } from 'sonner';
 import { useSubscription } from './hooks/use-subscription';
 import { cn } from '../../utils/ui';
-import { ChevronRight } from 'lucide-react';
 
 interface PlanActionButtonProps {
   selectedBillingInterval: 'month' | 'year';
@@ -18,14 +17,11 @@ interface PlanActionButtonProps {
 export function PlanActionButton({
   selectedBillingInterval,
   variant = 'default',
-  showIcon = false,
   className,
   size = 'default',
 }: PlanActionButtonProps) {
-  const { data: subscription } = useSubscription();
+  const { data: subscription, isLoading } = useSubscription();
   const { trial, apiServiceLevel } = subscription || {};
-  const isPaidSubscriptionActive =
-    subscription?.isActive && !trial?.isActive && apiServiceLevel !== ApiServiceLevelEnum.FREE;
 
   const { mutateAsync: goToPortal, isPending: isGoingToPortal } = useMutation({
     mutationFn: () => get<{ data: string }>('/billing/portal?isV2Dashboard=true'),
@@ -52,16 +48,22 @@ export function PlanActionButton({
     },
   });
 
+  function isPaidSubscriptionActive() {
+    if (!subscription || !trial) return false;
+
+    return subscription.isActive && !trial.isActive && apiServiceLevel !== ApiServiceLevelEnum.FREE;
+  }
+
   return (
     <Button
       variant={variant}
       size={size}
       className={cn('gap-2', className)}
-      onClick={() => (isPaidSubscriptionActive ? goToPortal() : checkout())}
-      disabled={isGoingToPortal || isCheckingOut}
+      onClick={() => (isPaidSubscriptionActive() ? goToPortal() : checkout())}
+      disabled={isGoingToPortal}
+      isLoading={isCheckingOut || isLoading}
     >
-      {isPaidSubscriptionActive ? 'Manage subscription' : 'Upgrade plan'}
-      {showIcon && <ChevronRight className="h-4 w-4" />}
+      {isPaidSubscriptionActive() ? 'Manage Account' : 'Upgrade plan'}
     </Button>
   );
 }
