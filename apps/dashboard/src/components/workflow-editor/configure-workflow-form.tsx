@@ -125,6 +125,8 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
     saveForm();
   };
 
+  function handleExportToCode() {}
+
   const syncToLabel = `Sync to ${currentEnvironment?.name === 'Production' ? 'Development' : 'Production'}`;
 
   return (
@@ -168,7 +170,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuGroup>
-                <DropdownMenuItem onClick={safeSync}>
+                <DropdownMenuItem onClick={handleExportToCode}>
                   <RiCodeSSlashLine />
                   Export to Code
                 </DropdownMenuItem>
