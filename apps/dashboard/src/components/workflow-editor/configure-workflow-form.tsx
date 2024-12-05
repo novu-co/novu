@@ -155,7 +155,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
         exit={{ opacity: 0.1 }}
         transition={{ duration: 0.1 }}
       >
-        <SidebarHeader className="space-between items-center text-sm font-medium">
+        <SidebarHeader className="items-center text-sm font-medium">
           <div className="flex items-center gap-1">
             <RouteFill />
             <span>Configure workflow</span>
