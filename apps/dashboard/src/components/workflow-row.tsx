@@ -53,43 +53,6 @@ const toastOptions: ExternalToast = {
   },
 };
 
-const SyncWorkflowMenuItem = ({
-  currentEnvironment,
-  isSyncable,
-  tooltipContent,
-  onSync,
-}: {
-  currentEnvironment: IEnvironment | undefined;
-  isSyncable: boolean;
-  tooltipContent: string | undefined;
-  onSync: () => void;
-}) => {
-  const syncToLabel = `Sync to ${currentEnvironment?.name === 'Production' ? 'Development' : 'Production'}`;
-
-  if (isSyncable) {
-    return (
-      <DropdownMenuItem onClick={onSync}>
-        <RiGitPullRequestFill />
-        {syncToLabel}
-      </DropdownMenuItem>
-    );
-  }
-
-  return (
-    <Tooltip>
-      <TooltipTrigger>
-        <DropdownMenuItem disabled>
-          <RiGitPullRequestFill />
-          {syncToLabel}
-        </DropdownMenuItem>
-      </TooltipTrigger>
-      <TooltipPortal>
-        <TooltipContent>{tooltipContent}</TooltipContent>
-      </TooltipPortal>
-    </Tooltip>
-  );
-};
-
 export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
@@ -320,5 +283,42 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         </DropdownMenu>
       </TableCell>
     </TableRow>
+  );
+};
+
+const SyncWorkflowMenuItem = ({
+  currentEnvironment,
+  isSyncable,
+  tooltipContent,
+  onSync,
+}: {
+  currentEnvironment: IEnvironment | undefined;
+  isSyncable: boolean;
+  tooltipContent: string | undefined;
+  onSync: () => void;
+}) => {
+  const syncToLabel = `Sync to ${currentEnvironment?.name === 'Production' ? 'Development' : 'Production'}`;
+
+  if (isSyncable) {
+    return (
+      <DropdownMenuItem onClick={onSync}>
+        <RiGitPullRequestFill />
+        {syncToLabel}
+      </DropdownMenuItem>
+    );
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger>
+        <DropdownMenuItem disabled>
+          <RiGitPullRequestFill />
+          {syncToLabel}
+        </DropdownMenuItem>
+      </TooltipTrigger>
+      <TooltipPortal>
+        <TooltipContent>{tooltipContent}</TooltipContent>
+      </TooltipPortal>
+    </Tooltip>
   );
 };
