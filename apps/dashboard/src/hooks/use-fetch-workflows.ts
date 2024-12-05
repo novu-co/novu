@@ -17,6 +17,7 @@ export function useFetchWorkflows({ limit = 12, offset = 0, query = '' }: UseWor
     queryFn: () => getWorkflows({ environment: currentEnvironment!, limit, offset, query }),
     placeholderData: keepPreviousData,
     enabled: !!currentEnvironment?._id,
+    refetchOnWindowFocus: true,
   });
 
   const currentPage = Math.floor(offset / limit) + 1;
