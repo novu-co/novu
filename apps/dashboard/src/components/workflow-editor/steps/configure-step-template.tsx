@@ -14,8 +14,14 @@ import { VisuallyHidden } from '@/components/primitives/visually-hidden';
 import { PageMeta } from '@/components/page-meta';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { useStep } from '@/components/workflow-editor/steps/step-provider';
+import { StepTypeEnum } from '@novu/shared';
+import { cn } from '@/utils/ui';
 
 const transitionSetting = { ease: [0.29, 0.83, 0.57, 0.99], duration: 0.4 };
+const stepTypeToClassname: Record<string, string | undefined> = {
+  [StepTypeEnum.IN_APP]: 'sm:max-w-[600px]',
+  [StepTypeEnum.EMAIL]: 'sm:max-w-[800px]',
+};
 
 export const ConfigureStepTemplate = () => {
   const navigate = useNavigate();
@@ -60,9 +66,10 @@ export const ConfigureStepTemplate = () => {
                 x: '100%',
               }}
               transition={transitionSetting}
-              className={
-                'bg-background fixed inset-y-0 right-0 z-50 flex h-full w-3/4 flex-col border-l shadow-lg outline-none sm:max-w-[600px]'
-              }
+              className={cn(
+                'bg-background fixed inset-y-0 right-0 z-50 flex h-full w-3/4 flex-col border-l shadow-lg outline-none sm:max-w-[600px]',
+                stepTypeToClassname[step.type]
+              )}
             >
               <VisuallyHidden>
                 <SheetTitle />

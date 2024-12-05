@@ -26,8 +26,6 @@ export interface ContentIssue extends Issue<StepContentIssueEnum> {}
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export interface StepIssue extends Issue<StepIssueEnum> {}
 
-export type IdentifierOrInternalId = string;
-
 export type PatchStepDataDto = {
   name?: string;
   controlValues?: Record<string, unknown>;

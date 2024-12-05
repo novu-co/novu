@@ -77,7 +77,7 @@ export const AddStepMenu = ({
   onMenuItemClick: (stepType: StepTypeEnum) => void;
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const isDelayDigestEmailEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
+  const areNewStepsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
 
   const handleMenuItemClick = (stepType: StepTypeEnum) => {
     onMenuItemClick(stepType);
@@ -109,7 +109,13 @@ export const AddStepMenu = ({
             <MenuGroup>
               <MenuTitle>Channels</MenuTitle>
               <MenuItemsGroup>
-                <MenuItem stepType={StepTypeEnum.EMAIL}>Email</MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.EMAIL}
+                  disabled={!areNewStepsEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.EMAIL)}
+                >
+                  Email
+                </MenuItem>
                 <MenuItem
                   stepType={StepTypeEnum.IN_APP}
                   disabled={false}
@@ -128,7 +134,7 @@ export const AddStepMenu = ({
                 <MenuItem stepType={StepTypeEnum.DIGEST}>Digest</MenuItem>
                 <MenuItem
                   stepType={StepTypeEnum.DELAY}
-                  disabled={!isDelayDigestEmailEnabled}
+                  disabled={!areNewStepsEnabled}
                   onClick={() => handleMenuItemClick(StepTypeEnum.DELAY)}
                 >
                   Delay

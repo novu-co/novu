@@ -94,6 +94,7 @@ const integrationSchema = new Schema<IntegrationDBModel>(
         ],
       },
     ],
+    connected: Schema.Types.Boolean,
   },
   schemaOptions
 );

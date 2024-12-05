@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  FeatureFlagsKeysEnum,
   IEnvironment,
   StepDataDto,
   StepIssuesDto,
@@ -10,7 +11,7 @@ import {
   WorkflowResponseDto,
 } from '@novu/shared';
 import { motion } from 'motion/react';
-import { useEffect, useCallback, useMemo, useState } from 'react';
+import { useEffect, useCallback, useMemo, useState, HTMLAttributes, ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiCloseFill, RiDeleteBin2Line, RiPencilRuler2Fill } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
@@ -31,7 +32,6 @@ import {
   getFirstControlsErrorMessage,
   updateStepInWorkflow,
 } from '@/components/workflow-editor/step-utils';
-import { ConfigureInAppStepTemplateCta } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-template-cta';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import {
@@ -45,6 +45,9 @@ import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/s
 import { buildDefaultValues } from '@/utils/schema';
 import merge from 'lodash.merge';
 import { DelayControlValues } from '@/components/workflow-editor/steps/delay/delay-control-values';
+import { ConfigureStepTemplateCta } from '@/components/workflow-editor/steps/configure-step-template-cta';
+import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
+import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/email/configure-email-step-preview';
 
 const STEP_TYPE_TO_CONTROL_VALUES_FORM: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
@@ -56,6 +59,18 @@ const STEP_TYPE_TO_CONTROL_VALUES_FORM: Record<StepTypeEnum, () => React.JSX.Ele
   [StepTypeEnum.CUSTOM]: () => null,
   [StepTypeEnum.TRIGGER]: () => null,
   [StepTypeEnum.DIGEST]: () => null,
+};
+
+const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, (props: HTMLAttributes<HTMLDivElement>) => ReactNode> = {
+  [StepTypeEnum.IN_APP]: ConfigureInAppStepPreview,
+  [StepTypeEnum.EMAIL]: ConfigureEmailStepPreview,
+  [StepTypeEnum.SMS]: () => null,
+  [StepTypeEnum.CHAT]: () => null,
+  [StepTypeEnum.PUSH]: () => null,
+  [StepTypeEnum.CUSTOM]: () => null,
+  [StepTypeEnum.TRIGGER]: () => null,
+  [StepTypeEnum.DIGEST]: () => null,
+  [StepTypeEnum.DELAY]: () => null,
 };
 
 const calculateDefaultControlsValues = (step: StepDataDto) => {
@@ -156,6 +171,9 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     setControlValuesIssues();
   }, [setControlValuesIssues]);
 
+  const Preview = STEP_TYPE_TO_PREVIEW[step.type];
+  const ControlValuesForm = STEP_TYPE_TO_CONTROL_VALUES_FORM[step.type];
+
   return (
     <>
       <PageMeta title={`Configure ${step.name}`} />
@@ -230,12 +248,39 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               />
             </SidebarContent>
 
-            {isInlineConfigurableStep && <InlineConfigurableStep step={step} />}
+            {isInlineConfigurableStep && (
+              <>
+                <Separator />
+                <SidebarContent>
+                  <ControlValuesForm />
+                </SidebarContent>
+              </>
+            )}
           </form>
         </Form>
         <Separator />
 
-        {isTemplateConfigurableStep && <TemplateConfigurableStep step={step} firstError={firstError} />}
+        {isTemplateConfigurableStep && (
+          <>
+            <SidebarContent>
+              <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
+                <Button
+                  variant="outline"
+                  className="flex w-full justify-start gap-1.5 text-xs font-medium"
+                  type="button"
+                >
+                  <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
+                  Configure {STEP_NAME_BY_TYPE[step.type]} template{' '}
+                  <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
+                </Button>
+              </Link>
+            </SidebarContent>
+            <Separator />
+            <ConfigureStepTemplateCta step={step} issue={firstError}>
+              <Preview />
+            </ConfigureStepTemplateCta>
+          </>
+        )}
 
         {!isSupportedStep && (
           <>
@@ -276,35 +321,6 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
           </>
         )}
       </motion.div>
-    </>
-  );
-};
-
-const TemplateConfigurableStep = ({ step, firstError }: { step: StepDataDto; firstError: string | undefined }) => (
-  <>
-    <SidebarContent>
-      <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
-        <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
-          <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
-          Configure {STEP_NAME_BY_TYPE[step.type]} template{' '}
-          <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
-        </Button>
-      </Link>
-    </SidebarContent>
-    <Separator />
-    <ConfigureInAppStepTemplateCta step={step} issue={firstError} />
-  </>
-);
-
-const InlineConfigurableStep = ({ step }: { step: StepDataDto }) => {
-  const ControlValuesForm = STEP_TYPE_TO_CONTROL_VALUES_FORM[step.type];
-
-  return (
-    <>
-      <Separator />
-      <SidebarContent>
-        <ControlValuesForm />
-      </SidebarContent>
     </>
   );
 };

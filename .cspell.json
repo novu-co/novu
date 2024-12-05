@@ -5,6 +5,7 @@
   "words": [
     "ABNF",
     "addrs",
+    "subscriberpayloaddto",
     "adresses",
     "sdkerror",
     "africas",
@@ -708,7 +709,10 @@
     "rstrip",
     "truncatewords",
     "xmlschema",
-    "jsonify"
+    "jsonify",
+    "touchpoint",
+    "Angularjs",
+    "navigatable"
   ],
   "flagWords": [],
   "patterns": [
@@ -810,6 +814,7 @@
     "pnpm-workspace.yaml",
     "tsconfig.json",
     "unreadRead",
-    "websockets"
+    "websockets",
+    "apps/dashboard/src/components/header-navigation/customer-support-button.tsx"
   ]
 }
