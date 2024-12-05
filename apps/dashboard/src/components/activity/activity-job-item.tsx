@@ -13,6 +13,9 @@ import {
 } from 'react-icons/ri';
 import { type Activity } from '@/hooks/use-activities';
 import { format } from 'date-fns';
+import { useState } from 'react';
+import { cn } from '@/utils/ui';
+import { ExecutionDetailItem } from './execution-detail-item';
 
 interface ActivityJobItemProps {
   job: Activity['jobs'][0];
@@ -51,7 +54,34 @@ function getJobColor(status: string) {
   }
 }
 
+function hasDigestAmount(job: any): job is { digestAmount: number } {
+  return 'digestAmount' in job && typeof job.digestAmount === 'number';
+}
+
+function JobDetails({ job }: { job: Activity['jobs'][0] }) {
+  return (
+    <div className="border-t border-neutral-100 p-4">
+      <div className="flex flex-col gap-4">
+        {job.executionDetails && job.executionDetails.length > 0 && (
+          <div className="flex flex-col gap-2">
+            {job.executionDetails.map((detail, index) => (
+              <ExecutionDetailItem key={index} detail={detail} />
+            ))}
+          </div>
+        )}
+        {hasDigestAmount(job) && job.digestAmount > 0 && (
+          <div className="flex items-center justify-between">
+            <span className="text-foreground-950 text-xs font-medium">Digest Count</span>
+            <span className="text-foreground-600 font-mono text-xs">{job.digestAmount}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function ActivityJobItem({ job, isLast }: ActivityJobItemProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const jobColor = getJobColor(job.status);
 
   return (
@@ -81,9 +111,10 @@ export function ActivityJobItem({ job, isLast }: ActivityJobItemProps) {
             variant="ghost"
             size="sm"
             className="text-foreground-600 !mt-0 h-5 gap-0 p-0 leading-[12px] hover:bg-transparent"
+            onClick={() => setIsExpanded(!isExpanded)}
           >
             Show more
-            <ChevronDown className="h-4 w-4" />
+            <ChevronDown className={cn('h-4 w-4 transition-transform', isExpanded && 'rotate-180')} />
           </Button>
         </CardHeader>
 
@@ -95,6 +126,8 @@ export function ActivityJobItem({ job, isLast }: ActivityJobItemProps) {
             </Badge>
           </div>
         </CardContent>
+
+        {isExpanded && <JobDetails job={job} />}
       </Card>
     </div>
   );
