@@ -5,6 +5,14 @@ import { DashboardLayout } from '../components/dashboard-layout';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ROUTES } from '@/utils/routes';
 import { Appearance } from '@clerk/types';
+import { motion } from 'motion/react';
+
+const FADE_ANIMATION = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  transition: { duration: 0.15 },
+} as const;
 
 const clerkComponentAppearance: Appearance = {
   variables: {
@@ -91,36 +99,42 @@ export function SettingsPage() {
 
         <div className="mx-auto mt-1 max-w-[700px] px-1.5">
           <TabsContent value="account" className="rounded-lg">
-            <Card className="mx-auto border-none shadow-none">
-              <UserProfile appearance={clerkComponentAppearance}>
-                <UserProfile.Page label="account" />
-                <UserProfile.Page label="security" />
-              </UserProfile>
+            <motion.div {...FADE_ANIMATION}>
+              <Card className="mx-auto border-none shadow-none">
+                <UserProfile appearance={clerkComponentAppearance}>
+                  <UserProfile.Page label="account" />
+                  <UserProfile.Page label="security" />
+                </UserProfile>
 
-              <h1 className="text-foreground mb-6 mt-10 text-xl font-semibold">Security</h1>
-              <UserProfile appearance={clerkComponentAppearance}>
-                <UserProfile.Page label="security" />
-                <UserProfile.Page label="account" />
-              </UserProfile>
-            </Card>
+                <h1 className="text-foreground mb-6 mt-10 text-xl font-semibold">Security</h1>
+                <UserProfile appearance={clerkComponentAppearance}>
+                  <UserProfile.Page label="security" />
+                  <UserProfile.Page label="account" />
+                </UserProfile>
+              </Card>
+            </motion.div>
           </TabsContent>
 
           <TabsContent value="organization" className="rounded-lg">
-            <Card className="border-none shadow-none">
-              <OrganizationProfile appearance={clerkComponentAppearance}>
-                <OrganizationProfile.Page label="general" />
-                <OrganizationProfile.Page label="members" />
-              </OrganizationProfile>
-            </Card>
+            <motion.div {...FADE_ANIMATION}>
+              <Card className="border-none shadow-none">
+                <OrganizationProfile appearance={clerkComponentAppearance}>
+                  <OrganizationProfile.Page label="general" />
+                  <OrganizationProfile.Page label="members" />
+                </OrganizationProfile>
+              </Card>
+            </motion.div>
           </TabsContent>
 
           <TabsContent value="team" className="rounded-lg">
-            <Card className="border-none shadow-none">
-              <OrganizationProfile appearance={clerkComponentAppearance}>
-                <OrganizationProfile.Page label="members" />
-                <OrganizationProfile.Page label="general" />
-              </OrganizationProfile>
-            </Card>
+            <motion.div {...FADE_ANIMATION}>
+              <Card className="border-none shadow-none">
+                <OrganizationProfile appearance={clerkComponentAppearance}>
+                  <OrganizationProfile.Page label="members" />
+                  <OrganizationProfile.Page label="general" />
+                </OrganizationProfile>
+              </Card>
+            </motion.div>
           </TabsContent>
         </div>
       </Tabs>
