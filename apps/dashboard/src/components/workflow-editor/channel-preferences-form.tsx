@@ -132,13 +132,15 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
       {} as Record<ChannelTypeEnum, { enabled: boolean }>
     );
 
-    form.setValue('user', {
+    const updatedUserPreferences = {
       all: {
         enabled: value,
         readOnly: form.getValues('user.all.readOnly'),
       },
       channels: channelPreferences,
-    });
+    };
+
+    updateUserPreference(updatedUserPreferences);
   };
 
   const handleCriticalToggle = (value: boolean) => {
