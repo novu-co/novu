@@ -185,7 +185,7 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
               <p className="text-xs text-neutral-400">
                 Set default notification channels for subscribers and specify which channels they can customize.
               </p>
-              {/* This doesnt needs to be a form, but using it as a form allows to re-use the formItem designs without duplicating the same styles */}
+              {/* This doesn't needs to be a form, but using it as a form allows to re-use the formItem designs without duplicating the same styles */}
               <Form {...overrideForm}>
                 <form>
                   <FormField
