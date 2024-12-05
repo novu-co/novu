@@ -12,7 +12,7 @@ const reactions = [
   { value: '100', emoji: '💯' },
   { value: 'ok', emoji: '👌' },
   { value: 'thinking', emoji: '🤔' },
-  { value: 'thumbsdown', emoji: '👎' },
+  { value: 'thumbs_down', emoji: '👎' },
 ] as const;
 
 type Reaction = (typeof reactions)[number]['value'];
