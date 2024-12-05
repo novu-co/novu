@@ -20,7 +20,7 @@ export const CustomerSupportButton = () => {
     if (isFirstRender && isLiveChatVisible) {
       try {
         // @ts-ignore
-        window.Plain.init({
+        window?.Plain?.init({
           appId: PLAIN_SUPPORT_CHAT_APP_ID,
           hideLauncher: true,
           title: 'Chat with us',
@@ -31,7 +31,12 @@ export const CustomerSupportButton = () => {
               url: 'https://docs.novu.co?utm_campaign=in_app_live_chat',
             },
             {
-              icon: 'link',
+              icon: 'pencil',
+              text: 'Roadmap',
+              url: 'https://roadmap.novu.co/roadmap?utm_campaign=in_app_live_chat',
+            },
+            {
+              icon: 'support',
               text: 'Contact Sales',
               url: 'https://notify.novu.co/meetings/novuhq/novu-discovery-session-rr?utm_campaign=in_app_live_chat',
             },
