@@ -56,9 +56,15 @@ export function usePromotionalBanner(props: UsePromotionalBannerProps): UsePromo
 
   const hide = useCallback(() => {
     if (toastId.current) {
+      track(('Banner Hidden ' + props.content.telemetryEvent) as TelemetryEvent, {
+        title: props.content.title,
+        question: props.content.feedbackQuestion,
+      });
+
       toast.dismiss(toastId.current);
       toastId.current = undefined;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const show = useCallback(() => {
@@ -88,6 +94,7 @@ export function usePromotionalBanner(props: UsePromotionalBannerProps): UsePromo
     );
 
     toastId.current = id;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props]);
 
   return { show, hide };
