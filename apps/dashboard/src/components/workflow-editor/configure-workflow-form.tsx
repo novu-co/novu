@@ -2,6 +2,8 @@ import { motion } from 'motion/react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { useNavigate } from 'react-router-dom';
+import type { ExternalToast } from 'sonner';
 
 import { PAUSE_MODAL_TITLE, PauseModalDescription } from '@/components/pause-workflow-dialog';
 import { SidebarContent, SidebarHeader } from '@/components/side-navigation/sidebar';
@@ -21,17 +23,83 @@ import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
 import { MAX_DESCRIPTION_LENGTH, workflowSchema } from '@/components/workflow-editor/schema';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
+import { RiDeleteBin2Line, RiGitPullRequestFill, RiMore2Fill } from 'react-icons/ri';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/primitives/dropdown-menu';
+import { Button } from '../primitives/button';
+import { Tooltip, TooltipContent, TooltipPortal, TooltipTrigger } from '../primitives/tooltip';
+import { useEnvironment } from '@/context/environment/hooks';
+import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
+import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
+import { showToast } from '@/components/primitives/sonner-helpers';
+import { ToastIcon } from '@/components/primitives/sonner';
+import { DeleteWorkflowDialog } from '../delete-workflow-dialog';
+import { ROUTES } from '@/utils/routes';
 
 type ConfigureWorkflowFormProps = {
   workflow: WorkflowResponseDto;
   update: (data: UpdateWorkflowDto) => void;
 };
 
+const toastOptions: ExternalToast = {
+  position: 'bottom-right',
+  classNames: {
+    toast: 'mb-4 right-0',
+  },
+};
+
 export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
   const { workflow, update } = props;
+  const navigate = useNavigate();
   const isReadOnly = workflow.origin === WorkflowOriginEnum.EXTERNAL;
   const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const tagsQuery = useTags();
+  const { currentEnvironment } = useEnvironment();
+  const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
+
+  const { deleteWorkflow, isPending: isDeleteWorkflowPending } = useDeleteWorkflow({
+    onSuccess: () => {
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="success" />
+            <span className="text-sm">
+              Deleted workflow <span className="font-bold">{workflow.name}</span>.
+            </span>
+          </>
+        ),
+        options: toastOptions,
+      });
+      navigate(ROUTES.WORKFLOWS);
+    },
+    onError: () => {
+      showToast({
+        children: () => (
+          <>
+            <ToastIcon variant="error" />
+            <span className="text-sm">
+              Failed to delete workflow <span className="font-bold">{workflow.name}</span>.
+            </span>
+          </>
+        ),
+        options: toastOptions,
+      });
+    },
+  });
+
+  const onDeleteWorkflow = async () => {
+    await deleteWorkflow({
+      workflowId: workflow._id,
+    });
+  };
 
   const form = useForm<z.infer<typeof workflowSchema>>({
     defaultValues: {
@@ -57,6 +125,8 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
     saveForm();
   };
 
+  const syncToLabel = `Sync to ${currentEnvironment?.name === 'Production' ? 'Development' : 'Production'}`;
+
   return (
     <>
       <ConfirmationModal
@@ -69,6 +139,13 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
         title={PAUSE_MODAL_TITLE}
         description={<PauseModalDescription workflowName={workflow.name} />}
         confirmButtonText="Proceed"
+      />
+      <DeleteWorkflowDialog
+        workflow={workflow}
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        onConfirm={onDeleteWorkflow}
+        isLoading={isDeleteWorkflowPending}
       />
       <PageMeta title={workflow.name} />
       <motion.div
@@ -83,6 +160,50 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
             <RouteFill />
             <span>Configure workflow</span>
           </div>
+          <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="ml-auto h-[20px] w-[22px]">
+                <RiMore2Fill />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuGroup>
+                {isSyncable ? (
+                  <DropdownMenuItem onClick={safeSync}>
+                    <RiGitPullRequestFill />
+                    {syncToLabel}
+                  </DropdownMenuItem>
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <DropdownMenuItem disabled>
+                        <RiGitPullRequestFill />
+                        {syncToLabel}
+                      </DropdownMenuItem>
+                    </TooltipTrigger>
+                    <TooltipPortal>
+                      <TooltipContent>{tooltipContent}</TooltipContent>
+                    </TooltipPortal>
+                  </Tooltip>
+                )}
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup className="*:cursor-pointer">
+                <DropdownMenuItem
+                  className="text-destructive"
+                  disabled={workflow.origin === WorkflowOriginEnum.EXTERNAL}
+                  onClick={() => {
+                    setIsDeleteModalOpen(true);
+                    setIsDropdownOpen(false);
+                  }}
+                >
+                  <RiDeleteBin2Line />
+                  Delete workflow
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <PromoteConfirmModal />
         </SidebarHeader>
         <Separator />
         <Form {...form}>
