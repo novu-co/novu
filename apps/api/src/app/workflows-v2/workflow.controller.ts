@@ -19,7 +19,6 @@ import {
   GeneratePreviewRequestDto,
   GeneratePreviewResponseDto,
   GetListQueryParams,
-  IdentifierOrInternalId,
   ListWorkflowResponse,
   PatchStepDataDto,
   PatchWorkflowDto,
@@ -92,14 +91,14 @@ export class WorkflowController {
   @UseGuards(UserAuthGuard)
   async sync(
     @UserSession() user: UserSessionData,
-    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
+    @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string,
     @Body() syncWorkflowDto: SyncWorkflowDto
   ): Promise<WorkflowResponseDto> {
     return this.syncToEnvironmentUseCase.execute(
       SyncToEnvironmentCommand.create({
-        identifierOrInternalId: workflowId,
-        targetEnvironmentId: syncWorkflowDto.targetEnvironmentId,
         user,
+        workflowIdOrInternalId,
+        targetEnvironmentId: syncWorkflowDto.targetEnvironmentId,
       })
     );
   }
@@ -108,14 +107,14 @@ export class WorkflowController {
   @UseGuards(UserAuthGuard)
   async update(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
-    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
+    @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string,
     @Body() updateWorkflowDto: UpdateWorkflowDto
   ): Promise<WorkflowResponseDto> {
     return await this.upsertWorkflowUseCase.execute(
       UpsertWorkflowCommand.create({
         workflowDto: updateWorkflowDto,
         user,
-        identifierOrInternalId: workflowId,
+        workflowIdOrInternalId,
       })
     );
   }
@@ -124,12 +123,12 @@ export class WorkflowController {
   @UseGuards(UserAuthGuard)
   async getWorkflow(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
-    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
+    @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string,
     @Query('environmentId') environmentId?: string
   ): Promise<WorkflowResponseDto> {
     return this.getWorkflowUseCase.execute(
       GetWorkflowCommand.create({
-        identifierOrInternalId: workflowId,
+        workflowIdOrInternalId,
         user: {
           ...user,
           environmentId: environmentId || user.environmentId,
@@ -142,11 +141,11 @@ export class WorkflowController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeWorkflow(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
-    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId
+    @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string
   ) {
     await this.deleteWorkflowUsecase.execute(
       DeleteWorkflowCommand.create({
-        identifierOrInternalId: workflowId,
+        workflowIdOrInternalId,
         environmentId: user.environmentId,
         organizationId: user.organizationId,
         userId: user._id,
@@ -176,15 +175,15 @@ export class WorkflowController {
   @UseGuards(UserAuthGuard)
   async generatePreview(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
-    @Param('workflowId', ParseSlugIdPipe) workflowId: string,
-    @Param('stepId', ParseSlugIdPipe) stepId: string,
+    @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string,
+    @Param('stepId', ParseSlugIdPipe) stepIdOrInternalId: string,
     @Body() generatePreviewRequestDto: GeneratePreviewRequestDto
   ): Promise<GeneratePreviewResponseDto> {
     return await this.generatePreviewUseCase.execute(
       GeneratePreviewCommand.create({
         user,
-        identifierOrInternalId: workflowId,
-        stepDatabaseId: stepId,
+        workflowIdOrInternalId,
+        stepIdOrInternalId,
         generatePreviewRequestDto,
       })
     );
@@ -194,11 +193,11 @@ export class WorkflowController {
   @UseGuards(UserAuthGuard)
   async getWorkflowStepData(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
-    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId,
-    @Param('stepId', ParseSlugIdPipe) stepId: IdentifierOrInternalId
+    @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string,
+    @Param('stepId', ParseSlugIdPipe) stepIdOrInternalId: string
   ): Promise<StepDataDto> {
     return await this.buildStepDataUsecase.execute(
-      BuildStepDataCommand.create({ user, identifierOrInternalId: workflowId, stepId })
+      BuildStepDataCommand.create({ user, workflowIdOrInternalId, stepIdOrInternalId })
     );
   }
 
@@ -206,12 +205,17 @@ export class WorkflowController {
   @UseGuards(UserAuthGuard)
   async patchWorkflowStepData(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
-    @Param('workflowId', ParseSlugIdPipe) identifierOrInternalId: IdentifierOrInternalId,
-    @Param('stepId', ParseSlugIdPipe) stepId: IdentifierOrInternalId,
+    @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string,
+    @Param('stepId', ParseSlugIdPipe) stepIdOrInternalId: string,
     @Body() patchStepDataDto: PatchStepDataDto
   ): Promise<StepDataDto> {
     return await this.patchStepDataUsecase.execute(
-      PatchStepCommand.create({ user, identifierOrInternalId, stepId, ...patchStepDataDto })
+      PatchStepCommand.create({
+        user,
+        workflowIdOrInternalId,
+        stepIdOrInternalId,
+        ...patchStepDataDto,
+      })
     );
   }
 
@@ -219,11 +223,11 @@ export class WorkflowController {
   @UseGuards(UserAuthGuard)
   async patchWorkflow(
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
-    @Param('workflowId', ParseSlugIdPipe) identifierOrInternalId: IdentifierOrInternalId,
+    @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string,
     @Body() patchWorkflowDto: PatchWorkflowDto
   ): Promise<WorkflowResponseDto> {
     return await this.patchWorkflowUsecase.execute(
-      PatchWorkflowCommand.create({ user, identifierOrInternalId, ...patchWorkflowDto })
+      PatchWorkflowCommand.create({ user, workflowIdOrInternalId, ...patchWorkflowDto })
     );
   }
 
@@ -231,10 +235,13 @@ export class WorkflowController {
   @UseGuards(UserAuthGuard)
   async getWorkflowTestData(
     @UserSession() user: UserSessionData,
-    @Param('workflowId', ParseSlugIdPipe) workflowId: IdentifierOrInternalId
+    @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string
   ): Promise<WorkflowTestDataResponseDto> {
     return this.buildWorkflowTestDataUseCase.execute(
-      WorkflowTestDataCommand.create({ identifierOrInternalId: workflowId, user })
+      WorkflowTestDataCommand.create({
+        workflowIdOrInternalId,
+        user,
+      })
     );
   }
 }

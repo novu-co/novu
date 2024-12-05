@@ -26,7 +26,7 @@ export class PatchWorkflowUsecase {
     await this.persistWorkflow(transientWorkflow, command.user);
 
     return await this.getWorkflowUseCase.execute({
-      identifierOrInternalId: command.identifierOrInternalId,
+      workflowIdOrInternalId: command.workflowIdOrInternalId,
       user: command.user,
     });
   }
@@ -69,7 +69,7 @@ export class PatchWorkflowUsecase {
 
   private async fetchWorkflow(command: PatchWorkflowCommand): Promise<WorkflowInternalResponseDto> {
     return await this.getWorkflowByIdsUseCase.execute({
-      identifierOrInternalId: command.identifierOrInternalId,
+      workflowIdOrInternalId: command.workflowIdOrInternalId,
       environmentId: command.user.environmentId,
       organizationId: command.user.organizationId,
       userId: command.user._id,
