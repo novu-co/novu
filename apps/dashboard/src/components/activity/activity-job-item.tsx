@@ -118,14 +118,16 @@ export function ActivityJobItem({ job, isLast }: ActivityJobItemProps) {
           </Button>
         </CardHeader>
 
-        <CardContent className="rounded-lg bg-neutral-50 p-2">
-          <div className="flex items-center justify-between">
-            <span className="text-foreground-400 text-xs capitalize">{job.status}</span>
-            <Badge variant="soft" className="bg-foreground-50 px-2 py-0.5 text-[11px] leading-3">
-              {format(new Date(job.updatedAt), 'MMM d yyyy, HH:mm:ss')}
-            </Badge>
-          </div>
-        </CardContent>
+        {!isExpanded && (
+          <CardContent className="rounded-lg bg-neutral-50 p-2">
+            <div className="flex items-center justify-between">
+              <span className="text-foreground-400 text-xs capitalize">{job.status}</span>
+              <Badge variant="soft" className="bg-foreground-50 px-2 py-0.5 text-[11px] leading-3">
+                {format(new Date(job.updatedAt), 'MMM d yyyy, HH:mm:ss')}
+              </Badge>
+            </div>
+          </CardContent>
+        )}
 
         {isExpanded && <JobDetails job={job} />}
       </Card>
