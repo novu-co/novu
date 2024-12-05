@@ -14,7 +14,7 @@ interface SuccessToastProps {
 export function SuccessButtonToast({ title, description, actionLabel, onAction, onClose }: SuccessToastProps) {
   return (
     <>
-      <ToastIcon variant="default" />
+      <ToastIcon variant="success" />
       <div className="flex flex-1 flex-col items-start gap-2.5">
         <div className="flex flex-col items-start justify-center gap-1 self-stretch">
           <div className="text-foreground-950 text-sm font-medium">{title}</div>

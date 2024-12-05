@@ -40,6 +40,7 @@ import { showToast } from './primitives/sonner-helpers';
 import { ToastIcon } from './primitives/sonner';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 import { PauseModalDescription, PAUSE_MODAL_TITLE } from '@/components/pause-workflow-dialog';
+import { DeleteWorkflowDialog } from './delete-workflow-dialog';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -207,21 +208,11 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
       </Tooltip>
 
       <TableCell className="w-1">
-        <ConfirmationModal
+        <DeleteWorkflowDialog
+          workflow={workflow}
           open={isDeleteModalOpen}
           onOpenChange={setIsDeleteModalOpen}
           onConfirm={onDeleteWorkflow}
-          title="Are you sure?"
-          description={
-            <>
-              You're about to delete the{' '}
-              <TruncatedText className="max-w-[32ch] font-bold">{workflow.name}</TruncatedText> workflow, this action is
-              permanent. <br />
-              <br />
-              You won't be able to trigger this workflow anymore.
-            </>
-          }
-          confirmButtonText="Delete"
           isLoading={isDeleteWorkflowPending}
         />
         <ConfirmationModal

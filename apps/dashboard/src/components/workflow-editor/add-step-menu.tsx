@@ -8,6 +8,8 @@ import { Badge } from '../primitives/badge';
 import { cn } from '@/utils/ui';
 import { StepTypeEnum } from '@/utils/enums';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 
 const MenuGroup = ({ children }: { children: ReactNode }) => {
   return <div className="flex flex-col">{children}</div>;
@@ -73,6 +75,7 @@ export const AddStepMenu = ({
   onMenuItemClick: (stepType: StepTypeEnum) => void;
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const areNewStepsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
 
   const handleMenuItemClick = (stepType: StepTypeEnum) => {
     onMenuItemClick(stepType);
@@ -104,7 +107,18 @@ export const AddStepMenu = ({
             <MenuGroup>
               <MenuTitle>Channels</MenuTitle>
               <MenuItemsGroup>
-                <MenuItem stepType={StepTypeEnum.EMAIL}>Email</MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.EMAIL}
+                  disabled={!areNewStepsEnabled}
+                  onClick={() => {
+                    if (!areNewStepsEnabled) {
+                      return;
+                    }
+                    handleMenuItemClick(StepTypeEnum.EMAIL);
+                  }}
+                >
+                  Email
+                </MenuItem>
                 <MenuItem
                   stepType={StepTypeEnum.IN_APP}
                   disabled={false}

@@ -12,7 +12,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
+export function useSyncWorkflow(workflow: WorkflowResponseDto | WorkflowListResponseDto) {
   const { oppositeEnvironment, switchEnvironment } = useEnvironment();
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -106,7 +106,7 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
       setIsLoading(true);
       loadingToast = toast.loading(
         <>
-          <ToastIcon variant="default" />
+          <ToastIcon variant="default" className="animate-spin" />
           <span className="text-sm">
             Syncing workflow <span className="font-bold">{workflow.name}</span> to {oppositeEnvironment?.name}...
           </span>

@@ -70,7 +70,7 @@ export const SideNavigation = () => {
                 <RiStore3Line className="size-4" />
                 <span>Integration Store</span>
               </NavigationLink>
-              <NavigationLink to={LEGACY_ROUTES.API_KEYS} isExternal>
+              <NavigationLink to={ROUTES.API_KEYS}>
                 <RiKey2Line className="size-4" />
                 <span>API Keys</span>
               </NavigationLink>

@@ -11,6 +11,7 @@ import {
   OrganizationListPage,
   QuestionnairePage,
   UsecaseSelectPage,
+  ApiKeysPage,
   WelcomePage,
   SettingsPage,
 } from '@/pages';
@@ -93,6 +94,10 @@ const router = createBrowserRouter([
               {
                 path: ROUTES.WORKFLOWS,
                 element: <WorkflowsPage />,
+              },
+              {
+                path: ROUTES.API_KEYS,
+                element: <ApiKeysPage />,
               },
               {
                 path: ROUTES.EDIT_WORKFLOW,
