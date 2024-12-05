@@ -155,7 +155,7 @@ jobs:
           cd apps/ws && pnpm start:test &
 
       - name: Wait on Services
-        run: wait-on --timeout=180000 http://127.0.0.1:1340/v1/health-check http://127.0.0.1:8080/
+        run: wait-on --timeout=180000 http://127.0.0.1:1340/v1/health-check
 
       - name: Install Playwright
         working-directory: apps/dashboard
