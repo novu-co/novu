@@ -50,16 +50,16 @@ const router = createBrowserRouter([
             path: ROUTES.SIGNUP_ORGANIZATION_LIST,
             element: <OrganizationListPage />,
           },
-          {
-            path: ROUTES.SIGNUP_QUESTIONNAIRE,
-            element: <QuestionnairePage />,
-          },
         ],
       },
       {
         path: '/onboarding',
         element: <OnboardingParentRoute />,
         children: [
+          {
+            path: ROUTES.SIGNUP_QUESTIONNAIRE,
+            element: <QuestionnairePage />,
+          },
           {
             path: ROUTES.USECASE_SELECT,
             element: <UsecaseSelectPage />,
