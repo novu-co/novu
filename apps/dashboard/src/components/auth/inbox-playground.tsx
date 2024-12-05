@@ -109,7 +109,7 @@ export function InboxPlayground() {
      * This workflow will be used by the inbox preview examples
      */
     const initializeDemoWorkflow = async () => {
-      const workflow = data?.workflows.find((workflow) => workflow.workflowId === ONBOARDING_DEMO_WORKFLOW_ID);
+      const workflow = data?.workflows.find((workflow) => workflow.workflowId?.includes(ONBOARDING_DEMO_WORKFLOW_ID));
       if (!workflow) {
         await createDemoWorkflow();
       }
