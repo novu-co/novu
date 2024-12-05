@@ -76,8 +76,8 @@ export class GeneratePreviewUsecase {
       this.logger.error(
         {
           err: error,
-          workflowIdOrInternalId: command.identifierOrInternalId,
-          stepIdOrInternalId: command.stepDatabaseId,
+          workflowIdOrInternalId: command.workflowIdOrInternalId,
+          stepIdOrInternalId: command.stepIdOrInternalId,
         },
         `Unexpected error while generating preview`,
         LOG_CONTEXT
