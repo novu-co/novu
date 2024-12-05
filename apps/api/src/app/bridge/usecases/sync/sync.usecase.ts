@@ -134,7 +134,7 @@ export class Sync {
           environmentId: command.environmentId,
           organizationId: command.organizationId,
           userId: command.userId,
-          identifierOrInternalId: workflow._id,
+          workflowIdOrInternalId: workflow._id,
         })
       )
     );

@@ -51,7 +51,7 @@ export class SyncToEnvironmentUseCase {
     return await this.upsertWorkflowUseCase.execute(
       UpsertWorkflowCommand.create({
         user: { ...command.user, environmentId: command.targetEnvironmentId },
-        identifierOrInternalId: targetWorkflow?._id,
+        workflowIdOrInternalId: targetWorkflow?._id,
         workflowDto,
       })
     );
@@ -76,7 +76,7 @@ export class SyncToEnvironmentUseCase {
     return this.getWorkflowUseCase.execute(
       GetWorkflowCommand.create({
         user: command.user,
-        identifierOrInternalId: command.identifierOrInternalId,
+        workflowIdOrInternalId: command.workflowIdOrInternalId,
       })
     );
   }
@@ -90,7 +90,7 @@ export class SyncToEnvironmentUseCase {
       return await this.getWorkflowUseCase.execute(
         GetWorkflowCommand.create({
           user: { ...command.user, environmentId: command.targetEnvironmentId },
-          identifierOrInternalId: externalId,
+          workflowIdOrInternalId: externalId,
         })
       );
     } catch (error) {
@@ -144,8 +144,8 @@ export class SyncToEnvironmentUseCase {
     for (const originStep of originSteps) {
       const idAsOptionalObject = this.prodDbIdAsOptionalObject(originStep, targetWorkflowSteps);
       const stepDataDto = await this.buildStepDataUsecase.execute({
-        identifierOrInternalId: command.identifierOrInternalId,
-        stepId: originStep.stepId,
+        workflowIdOrInternalId: command.workflowIdOrInternalId,
+        stepIdOrInternalId: originStep._id || originStep.stepId,
         user: command.user,
       });
 

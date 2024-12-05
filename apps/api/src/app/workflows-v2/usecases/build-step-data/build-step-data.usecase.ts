@@ -11,7 +11,7 @@ export class BuildStepDataUsecase {
   constructor(
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private controlValuesRepository: ControlValuesRepository,
-    private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase // Dependency injection for new use case
+    private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase
   ) {}
 
   @InstrumentUsecase()
@@ -38,7 +38,7 @@ export class BuildStepDataUsecase {
       variables: this.buildAvailableVariableSchemaUsecase.execute({
         stepDatabaseId: currentStep._templateId,
         workflow,
-      }), // Use the new use case to build variables schema
+      }),
       name: currentStep.name,
       _id: currentStep._templateId,
       stepId: currentStep.stepId,
@@ -53,7 +53,7 @@ export class BuildStepDataUsecase {
   @Instrument()
   private async fetchWorkflow(command: BuildStepDataCommand) {
     return await this.getWorkflowByIdsUseCase.execute({
-      identifierOrInternalId: command.identifierOrInternalId,
+      workflowIdOrInternalId: command.workflowIdOrInternalId,
       environmentId: command.user.environmentId,
       organizationId: command.user.organizationId,
       userId: command.user._id,
@@ -76,14 +76,14 @@ export class BuildStepDataUsecase {
   @Instrument()
   private async loadStepsFromDb(command: BuildStepDataCommand, workflow: NotificationTemplateEntity) {
     const currentStep = workflow.steps.find(
-      (stepItem) => stepItem._id === command.stepId || stepItem.stepId === command.stepId
+      (stepItem) => stepItem._id === command.stepIdOrInternalId || stepItem.stepId === command.stepIdOrInternalId
     );
 
     if (!currentStep) {
       throw new BadRequestException({
         message: 'No step found',
-        stepId: command.stepId,
-        workflowId: command.identifierOrInternalId,
+        stepId: command.stepIdOrInternalId,
+        workflowId: command.workflowIdOrInternalId,
       });
     }
 
