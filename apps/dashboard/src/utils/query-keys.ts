@@ -6,5 +6,6 @@ export const QueryKeys = Object.freeze({
   fetchWorkflowTestData: 'fetchWorkflowTestData',
   fetchWorkflows: 'fetchWorkflows',
   fetchTags: 'fetchTags',
+  getApiKeys: 'getApiKeys',
   fetchIntegrations: 'fetchIntegrations',
 });

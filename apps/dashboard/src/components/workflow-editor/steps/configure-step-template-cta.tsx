@@ -1,17 +1,17 @@
 import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
-import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
 import { StepDataDto } from '@novu/shared';
+import { PropsWithChildren } from 'react';
 import { RiArrowRightUpLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 
-type ConfigureInAppStepTemplateCtaProps = {
+type ConfigureStepTemplateCtaProps = PropsWithChildren & {
   step: StepDataDto;
   issue?: string;
 };
-export const ConfigureInAppStepTemplateCta = (props: ConfigureInAppStepTemplateCtaProps) => {
-  const { step, issue } = props;
+export const ConfigureStepTemplateCta = (props: ConfigureStepTemplateCtaProps) => {
+  const { step, children, issue } = props;
 
   if (issue) {
     return (
@@ -44,9 +44,7 @@ export const ConfigureInAppStepTemplateCta = (props: ConfigureInAppStepTemplateC
 
   return (
     <>
-      <SidebarContent>
-        <ConfigureInAppStepPreview />
-      </SidebarContent>
+      <SidebarContent>{children}</SidebarContent>
       <Separator />
     </>
   );

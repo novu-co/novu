@@ -70,13 +70,13 @@ export const SideNavigation = () => {
                 <RiStore3Line className="size-4" />
                 <span>Integration Store</span>
               </NavigationLink>
-              <NavigationLink to={LEGACY_ROUTES.API_KEYS} isExternal>
+              <NavigationLink to={ROUTES.API_KEYS}>
                 <RiKey2Line className="size-4" />
                 <span>API Keys</span>
               </NavigationLink>
             </NavigationGroup>
             <NavigationGroup label="Application">
-              <NavigationLink to={LEGACY_ROUTES.SETTINGS} isExternal>
+              <NavigationLink to={ROUTES.SETTINGS}>
                 <RiSettings4Line className="size-4" />
                 <span>Settings</span>
               </NavigationLink>
@@ -87,7 +87,7 @@ export const SideNavigation = () => {
             <FreeTrialCard />
 
             <NavigationGroup>
-              <NavigationLink to={LEGACY_ROUTES.INVITE_TEAM_MEMBERS} isExternal>
+              <NavigationLink to={ROUTES.SETTINGS_TEAM}>
                 <RiUserAddLine className="size-4" />
                 <span>Invite teammates</span>
               </NavigationLink>

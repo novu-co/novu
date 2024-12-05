@@ -11,7 +11,9 @@ import {
   OrganizationListPage,
   QuestionnairePage,
   UsecaseSelectPage,
+  ApiKeysPage,
   WelcomePage,
+  SettingsPage,
 } from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
@@ -94,6 +96,10 @@ const router = createBrowserRouter([
                 element: <WorkflowsPage />,
               },
               {
+                path: ROUTES.API_KEYS,
+                element: <ApiKeysPage />,
+              },
+              {
                 path: ROUTES.EDIT_WORKFLOW,
                 element: <EditWorkflowPage />,
                 children: [
@@ -120,6 +126,22 @@ const router = createBrowserRouter([
                 element: <CatchAllRoute />,
               },
             ],
+          },
+          {
+            path: ROUTES.SETTINGS,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_ACCOUNT,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_ORGANIZATION,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_TEAM,
+            element: <SettingsPage />,
           },
           {
             path: '*',

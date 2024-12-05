@@ -3,7 +3,7 @@ import { QueryKeys } from '@/utils/query-keys';
 import { useEnvironment } from '@/context/environment/hooks';
 import { getV2 } from '@/api/api.client';
 
-export const useTagsQuery = () => {
+export const useTags = () => {
   const { currentEnvironment } = useEnvironment();
   const query = useQuery<{ data: { name: string }[] }>({
     queryKey: [QueryKeys.fetchTags, currentEnvironment?._id],
