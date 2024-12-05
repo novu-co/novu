@@ -4,8 +4,13 @@ import { OrganizationProfile, UserProfile } from '@clerk/clerk-react';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ROUTES } from '@/utils/routes';
+import { Appearance } from '@clerk/types';
 
-export const clerkComponentAppearance = {
+const clerkComponentAppearance: Appearance = {
+  variables: {
+    colorPrimary: 'rgba(82, 88, 102, 0.95)',
+    colorText: 'rgba(82, 88, 102, 0.95)',
+  },
   elements: {
     navbar: { display: 'none' },
     navbarMobileMenuRow: { display: 'none !important' },

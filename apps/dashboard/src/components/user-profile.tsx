@@ -1,12 +1,14 @@
 import { UserButton } from '@clerk/clerk-react';
 import { useNewDashboardOptIn } from '@/hooks/use-new-dashboard-opt-in';
 import { RiSignpostFill } from 'react-icons/ri';
+import { ROUTES } from '../utils/routes';
 
 export function UserProfile() {
   const { optOut } = useNewDashboardOptIn();
 
   return (
     <UserButton
+      userProfileUrl={ROUTES.SETTINGS_ACCOUNT}
       appearance={{
         elements: {
           avatarBox: 'h-6 w-6',
