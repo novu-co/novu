@@ -50,7 +50,6 @@ export function useSubscription(): UseSubscriptionType {
       ...data.data,
       trial: {
         ...data.data.trial,
-        isActive: true,
         daysLeft,
       },
     };
