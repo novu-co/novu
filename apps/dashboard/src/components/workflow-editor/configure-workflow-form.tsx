@@ -24,6 +24,7 @@ import { Textarea } from '../primitives/textarea';
 import { MAX_DESCRIPTION_LENGTH, workflowSchema } from '@/components/workflow-editor/schema';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { RiCodeSSlashLine, RiDeleteBin2Line, RiGitPullRequestFill, RiMore2Fill } from 'react-icons/ri';
+import { useComingSoonBanner } from '../promotional/coming-soon-banner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -64,6 +65,12 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
   const tagsQuery = useTags();
   const { currentEnvironment } = useEnvironment();
   const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
+  const { show: showComingSoonBanner } = useComingSoonBanner({
+    onReactionSelect: (reaction) => {
+      // You can handle the reaction here if needed
+      console.log('User reacted with:', reaction);
+    },
+  });
 
   const { deleteWorkflow, isPending: isDeleteWorkflowPending } = useDeleteWorkflow({
     onSuccess: () => {
@@ -125,7 +132,10 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
     saveForm();
   };
 
-  function handleExportToCode() {}
+  function handleExportToCode() {
+    showComingSoonBanner();
+    setIsDropdownOpen(false);
+  }
 
   const syncToLabel = `Sync to ${currentEnvironment?.name === 'Production' ? 'Development' : 'Production'}`;
 
