@@ -14,4 +14,10 @@ export const UNSUPPORTED_STEP_TYPES: readonly StepTypeEnum[] = [
 
 export const INLINE_CONFIGURABLE_STEP_TYPES: readonly StepTypeEnum[] = [StepTypeEnum.DELAY];
 
-export const TEMPLATE_CONFIGURABLE_STEP_TYPES: readonly StepTypeEnum[] = [StepTypeEnum.IN_APP, StepTypeEnum.EMAIL];
+export const TEMPLATE_CONFIGURABLE_STEP_TYPES: readonly StepTypeEnum[] = [
+  StepTypeEnum.IN_APP,
+  StepTypeEnum.EMAIL,
+  StepTypeEnum.SMS,
+  StepTypeEnum.CHAT,
+  StepTypeEnum.PUSH,
+];
