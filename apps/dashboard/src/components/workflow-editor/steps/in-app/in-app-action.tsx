@@ -57,9 +57,9 @@ export const InAppAction = () => {
         <div className={cn('mt-3 flex items-center gap-1')}>
           <div className="border-neutral-alpha-200 relative flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
             {!primaryAction && !secondaryAction && (
-              <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'z-10')}>
+              <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'z-10 cursor-not-allowed')}>
                 <RiForbid2Line className="size-4" />
-                <span className="cursor-default">No action</span>
+                <span>No action</span>
               </div>
             )}
             {primaryAction && (

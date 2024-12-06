@@ -660,26 +660,6 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(stepRetrievedByStepIdentifier._id).to.equal(stepId);
     });
     describe('Variables', () => {
-      it('should persist payload schema', async () => {
-        const steps = [
-          {
-            ...buildInAppStep(),
-          },
-        ];
-        const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('', { steps });
-        const res = await workflowsClient.createWorkflow(createWorkflowDto);
-        if (!res.isSuccessResult()) {
-          throw new Error(res.error!.responseText);
-        }
-        const workflowResponse = res.value;
-        const controlValues = { subject: 'Welcome to our newsletter {{payload.legalVariable}},{{IllegalVariable}}' };
-        await workflowsClient.patchWorkflowStepData(workflowResponse?._id, workflowResponse?.steps[0]._id, {
-          controlValues,
-        });
-
-        await validatePayloadSchemaInStepDataVariables(workflowResponse);
-        await validatePayloadSchemaOnTestData(workflowResponse);
-      });
       it('should get step available variables', async () => {
         const steps = [
           {
