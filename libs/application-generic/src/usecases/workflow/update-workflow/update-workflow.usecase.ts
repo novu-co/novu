@@ -233,15 +233,6 @@ export class UpdateWorkflow {
           },
         );
 
-        this.analyticsService.track(
-          'Update Critical Template - [Platform]',
-          command.userId,
-          {
-            _organization: command.organizationId,
-            critical: command.userPreferences?.all?.readOnly,
-          },
-        );
-
         /*
          * This builder pattern is only needed for the `critical` property,
          * ensuring it's set in the `userPreferences.all.readOnly` property
