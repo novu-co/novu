@@ -28,6 +28,7 @@ import { EditStepTemplate } from '@/components/workflow-editor/steps/edit-step-t
 import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workflow';
 import { EditStep } from '@/components/workflow-editor/steps/edit-step';
 import { InboxEmbedSuccessPage } from './pages/inbox-embed-success-page';
+import { ChannelPreferences } from './components/workflow-editor/channel-preferences';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -114,6 +115,10 @@ const router = createBrowserRouter([
                   {
                     element: <EditStepTemplate />,
                     path: ROUTES.EDIT_STEP_TEMPLATE,
+                  },
+                  {
+                    element: <ChannelPreferences />,
+                    path: ROUTES.EDIT_WORKFLOW_PREFERENCES,
                   },
                 ],
               },

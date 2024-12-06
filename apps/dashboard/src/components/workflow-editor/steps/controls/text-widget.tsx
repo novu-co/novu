@@ -20,6 +20,10 @@ export function TextWidget(props: WidgetProps) {
 
   const extractedName = useMemo(() => getFieldName(id), [id]);
   const isNumberType = useMemo(() => props.schema.type === 'number', [props.schema.type]);
+  const extensions = useMemo(
+    () => [autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping],
+    [variables]
+  );
 
   return (
     <FormField
@@ -54,7 +58,7 @@ export function TextWidget(props: WidgetProps) {
                   fontFamily="inherit"
                   placeholder={capitalize(label)}
                   id={label}
-                  extensions={[autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping]}
+                  extensions={extensions}
                   readOnly={readonly || disabled}
                   {...field}
                 />

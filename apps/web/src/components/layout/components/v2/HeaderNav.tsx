@@ -11,6 +11,7 @@ import { Tooltip, Dropdown } from '@novu/design-system';
 import { css } from '@novu/novui/css';
 import { HStack } from '@novu/novui/jsx';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
+import { captureException } from '@sentry/react';
 import { IS_EE_AUTH_ENABLED, IS_NOVU_PROD_STAGING } from '../../../../config';
 import { useBootIntercom, useFeatureFlag } from '../../../../hooks';
 import useThemeChange from '../../../../hooks/useThemeChange';
@@ -46,34 +47,52 @@ export function HeaderNav() {
 
   useEffect(() => {
     if (isLiveChatVisible && isFirstRender) {
-      // @ts-ignore
-      window.Plain.init({
-        appId: process.env.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID,
-        hideLauncher: true,
-        title: 'Chat with us',
-        links: [
-          {
-            icon: 'call',
-            text: 'Contact Sales',
-            url: 'https://notify.novu.co/meetings/novuhq/novu-discovery-session-rr?utm_campaign=in_app_live_chat',
+      try {
+        // @ts-ignore
+        window?.Plain?.init({
+          appId: process.env.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID,
+          hideLauncher: true,
+          title: 'Chat with us',
+          links: [
+            {
+              icon: 'pencil',
+              text: 'Roadmap',
+              url: 'https://roadmap.novu.co/roadmap?utm_campaign=in_app_live_chat',
+            },
+            {
+              icon: 'support',
+              text: 'Contact Sales',
+              url: 'https://notify.novu.co/meetings/novuhq/novu-discovery-session-rr?utm_campaign=in_app_live_chat',
+            },
+          ],
+          entryPoint: 'default',
+          theme: 'light',
+          logo: {
+            url: 'https://dashboard.novu.co/static/images/novu.png',
+            alt: 'Novu Logo',
           },
-        ],
-        entryPoint: 'default',
-        theme: 'light',
-
-        customerDetails: {
-          email: currentUser?.email,
-          emailHash: currentUser?.servicesHashes?.plain,
-        },
-      });
+          customerDetails: {
+            email: currentUser?.email,
+            emailHash: currentUser?.servicesHashes?.plain,
+          },
+        });
+      } catch (error) {
+        console.error('Error initializing plain chat: ', error);
+        captureException(error);
+      }
     }
     setIsFirstRender(false);
-  }, [isLiveChatVisible, currentUser]);
+  }, [isLiveChatVisible, currentUser, isFirstRender]);
 
   const showLiveChat = () => {
-    if (currentUser?.servicesHashes?.plain && process.env.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID) {
-      // @ts-ignore
-      window.Plain.open();
+    if (isLiveChatVisible) {
+      try {
+        // @ts-ignore
+        window?.Plain?.open();
+      } catch (error) {
+        console.error('Error opening plain chat: ', error);
+        captureException(error);
+      }
     }
   };
 

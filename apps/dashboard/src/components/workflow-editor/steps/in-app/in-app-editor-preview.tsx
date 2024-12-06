@@ -25,6 +25,8 @@ type InAppEditorPreviewProps = {
   formValues: Record<string, unknown>;
 };
 
+const extensions = [loadLanguage('json')?.extension ?? []];
+
 export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPreviewProps) => {
   const workflowSlug = workflow.workflowId;
   const stepSlug = step.stepId;
@@ -78,7 +80,7 @@ export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPr
                 value={editorValue}
                 onChange={setEditorValue}
                 lang="json"
-                extensions={[loadLanguage('json')?.extension ?? []]}
+                extensions={extensions}
                 className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 rounded-lg border border-dashed p-3"
               />
               {payloadError && <p className="text-destructive text-xs">{payloadError}</p>}
