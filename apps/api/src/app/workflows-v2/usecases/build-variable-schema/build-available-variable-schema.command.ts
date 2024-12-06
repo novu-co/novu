@@ -1,7 +1,7 @@
-import { BaseCommand } from '@novu/application-generic';
+import { EnvironmentWithUserCommand } from '@novu/application-generic';
 import { NotificationTemplateEntity } from '@novu/dal';
 
-export class BuildAvailableVariableSchemaCommand extends BaseCommand {
+export class BuildAvailableVariableSchemaCommand extends EnvironmentWithUserCommand {
   workflow: NotificationTemplateEntity;
-  stepDatabaseId: string;
+  stepInternalId: string;
 }

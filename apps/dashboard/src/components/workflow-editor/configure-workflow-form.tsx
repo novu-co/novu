@@ -1,29 +1,11 @@
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 import type { ExternalToast } from 'sonner';
+import { z } from 'zod';
 
 import { PAUSE_MODAL_TITLE, PauseModalDescription } from '@/components/pause-workflow-dialog';
-import { SidebarContent, SidebarHeader } from '@/components/side-navigation/sidebar';
-import { useTags } from '@/hooks/use-tags';
-import { cn } from '@/utils/ui';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { UpdateWorkflowDto, WorkflowOriginEnum, WorkflowResponseDto } from '@novu/shared';
-import { ConfirmationModal } from '../confirmation-modal';
-import { RouteFill } from '../icons';
-import { PageMeta } from '../page-meta';
-import { CopyButton } from '../primitives/copy-button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
-import { Input, InputField } from '../primitives/input';
-import { Separator } from '../primitives/separator';
-import { Switch } from '../primitives/switch';
-import { TagInput } from '../primitives/tag-input';
-import { Textarea } from '../primitives/textarea';
-import { MAX_DESCRIPTION_LENGTH, workflowSchema } from '@/components/workflow-editor/schema';
-import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { RiCodeSSlashLine, RiDeleteBin2Line, RiGitPullRequestFill, RiMore2Fill } from 'react-icons/ri';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,16 +14,42 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/primitives/dropdown-menu';
-import { Button } from '../primitives/button';
-import { Tooltip, TooltipContent, TooltipPortal, TooltipTrigger } from '../primitives/tooltip';
-import { useEnvironment } from '@/context/environment/hooks';
-import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
-import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
-import { showToast } from '@/components/primitives/sonner-helpers';
 import { ToastIcon } from '@/components/primitives/sonner';
-import { DeleteWorkflowDialog } from '../delete-workflow-dialog';
+import { showToast } from '@/components/primitives/sonner-helpers';
+import { SidebarContent, SidebarHeader } from '@/components/side-navigation/sidebar';
+import { MAX_DESCRIPTION_LENGTH, workflowSchema } from '@/components/workflow-editor/schema';
+import { useEnvironment } from '@/context/environment/hooks';
+import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
+import { useFormAutosave } from '@/hooks/use-form-autosave';
+import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
+import { useTags } from '@/hooks/use-tags';
 import { ROUTES } from '@/utils/routes';
+import { cn } from '@/utils/ui';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { UpdateWorkflowDto, WorkflowOriginEnum, WorkflowResponseDto } from '@novu/shared';
+import {
+  RiArrowRightSLine,
+  RiCodeSSlashLine,
+  RiDeleteBin2Line,
+  RiGitPullRequestFill,
+  RiMore2Fill,
+  RiSettingsLine,
+} from 'react-icons/ri';
+import { Link } from 'react-router-dom';
 import { TelemetryEvent } from '../../utils/telemetry';
+import { ConfirmationModal } from '../confirmation-modal';
+import { DeleteWorkflowDialog } from '../delete-workflow-dialog';
+import { RouteFill } from '../icons';
+import { PageMeta } from '../page-meta';
+import { Button } from '../primitives/button';
+import { CopyButton } from '../primitives/copy-button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
+import { Input, InputField } from '../primitives/input';
+import { Separator } from '../primitives/separator';
+import { Switch } from '../primitives/switch';
+import { TagInput } from '../primitives/tag-input';
+import { Textarea } from '../primitives/textarea';
+import { Tooltip, TooltipContent, TooltipPortal, TooltipTrigger } from '../primitives/tooltip';
 import { usePromotionalBanner } from '../promotional/coming-soon-banner';
 
 type ConfigureWorkflowFormProps = {
@@ -229,7 +237,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
         </SidebarHeader>
         <Separator />
         <Form {...form}>
-          <form className="h-full" onBlur={onBlur}>
+          <form onBlur={onBlur}>
             <SidebarContent size="md">
               <FormField
                 control={form.control}
@@ -342,13 +350,19 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
           </form>
         </Form>
         <Separator />
-        {/* <SidebarContent size="lg">
-        <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
-        <RiSettingsLine className="h-4 w-4 text-neutral-600" />
-          Configure channel preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
-          </Button>
-          </SidebarContent>
-          <Separator /> */}
+        <SidebarContent size="lg">
+          <Link to={ROUTES.EDIT_WORKFLOW_PREFERENCES}>
+            <Button
+              variant="outline"
+              className="flex w-full justify-start gap-1.5 p-1.5 text-xs font-medium"
+              type="button"
+            >
+              <RiSettingsLine className="h-4 w-4 text-neutral-600" />
+              Configure channel preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
+            </Button>
+          </Link>
+        </SidebarContent>
+        <Separator />
       </motion.div>
     </>
   );

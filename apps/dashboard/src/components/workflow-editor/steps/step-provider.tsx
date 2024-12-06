@@ -2,33 +2,54 @@ import { createContext, useMemo, type ReactNode } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useFetchStep } from '@/hooks/use-fetch-step';
-import { StepDataDto, StepTypeEnum } from '@novu/shared';
-import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
+import { StepDataDto, StepIssuesDto, StepTypeEnum } from '@novu/shared';
 import { createContextHook } from '@/utils/context';
 import { Step } from '@/utils/types';
+import { STEP_DIVIDER } from '@/utils/step';
+import { getEncodedId } from '@/utils/step';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 export type StepEditorContextType = {
   isPending: boolean;
   step?: StepDataDto;
-  refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<StepDataDto, Error>>;
+  issues?: StepIssuesDto;
   updateStepCache: (step: Partial<StepDataDto>) => void;
 };
 
 export const StepContext = createContext<StepEditorContextType>({} as StepEditorContextType);
 
 export const StepProvider = ({ children }: { children: ReactNode }) => {
+  const { workflow } = useWorkflow();
   const { stepSlug = '', workflowSlug = '' } = useParams<{
     workflowSlug: string;
     stepSlug: string;
   }>();
-  const { step, isPending, refetch, updateStepCache } = useFetchStep({
+  const { step, isPending, updateStepCache } = useFetchStep({
     workflowSlug,
     stepSlug,
   });
 
+  /**
+   * We need to get the issues from the workflow response
+   * because the step is not re-fetched when workflow is updated
+   *
+   * TODO:
+   * 1. add all step data to workflow response
+   * 2. remove StepProvider and keep just the WorkflowProvider with step value
+   */
+  const issues = useMemo(() => {
+    const newIssues = workflow?.steps.find(
+      (s) =>
+        getEncodedId({ slug: s.slug, divider: STEP_DIVIDER }) ===
+        getEncodedId({ slug: stepSlug, divider: STEP_DIVIDER })
+    )?.issues;
+
+    return { ...newIssues };
+  }, [workflow, stepSlug]);
+
   const value = useMemo(
-    () => ({ isPending, step, refetch, updateStepCache }),
-    [isPending, step, refetch, updateStepCache]
+    () => ({ isPending, step, issues, updateStepCache }),
+    [isPending, step, issues, updateStepCache]
   );
 
   return <StepContext.Provider value={value}>{children}</StepContext.Provider>;

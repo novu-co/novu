@@ -183,6 +183,7 @@ export const DelayNode = (props: NodeProps<NodeType>) => {
           <NodeName>{data.name || 'Delay Step'}</NodeName>
         </NodeHeader>
         <NodeBody>{data.content || 'You have been invited to the Novu party on "commentSnippet"'}</NodeBody>
+        {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>

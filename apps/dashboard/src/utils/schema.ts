@@ -84,6 +84,32 @@ const handleStringType = ({
   return stringValue;
 };
 
+const handleNumberType = ({
+  minimum,
+  maximum,
+  defaultValue,
+}: {
+  key: string;
+  minimum?: number;
+  maximum?: number;
+  defaultValue?: unknown;
+  requiredFields: Readonly<Array<string>>;
+}) => {
+  let numberValue: z.ZodNumber | z.ZodDefault<z.ZodNumber> = z.number();
+
+  if (typeof minimum === 'number') {
+    numberValue = numberValue.min(minimum);
+  }
+  if (typeof maximum === 'number') {
+    numberValue = numberValue.max(maximum);
+  }
+  if (defaultValue !== undefined) {
+    numberValue = numberValue.default(defaultValue as number);
+  }
+
+  return numberValue;
+};
+
 /**
  * Transform JSONSchema to Zod schema.
  * The function will recursively build the schema based on the JSONSchema object.
@@ -100,7 +126,16 @@ export const buildDynamicZodSchema = (obj: JSONSchemaDto): z.AnyZodObject => {
     }
 
     let zodValue: ZodValue;
-    const { type, format, pattern, enum: enumValues, default: defaultValue, required } = jsonSchemaProp;
+    const {
+      type,
+      format,
+      pattern,
+      enum: enumValues,
+      default: defaultValue,
+      required,
+      minimum,
+      maximum,
+    } = jsonSchemaProp;
     const isRequired = requiredFields.includes(key);
 
     if (type === 'object') {
@@ -119,10 +154,7 @@ export const buildDynamicZodSchema = (obj: JSONSchemaDto): z.AnyZodObject => {
     } else if (type === 'boolean') {
       zodValue = z.boolean();
     } else if (type === 'number') {
-      zodValue = z.number();
-      if (defaultValue) {
-        zodValue = zodValue.default(defaultValue as number);
-      }
+      zodValue = handleNumberType({ key, minimum, maximum, defaultValue, requiredFields });
     } else {
       zodValue = z.any();
     }

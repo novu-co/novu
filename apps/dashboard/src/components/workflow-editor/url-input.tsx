@@ -45,7 +45,7 @@ export const URLInput = ({
               control={control}
               name={urlKey}
               render={({ field }) => (
-                <FormItem className="mr-auto min-w-px max-w-full">
+                <FormItem className="min-w-px max-w-full basis-full">
                   <FormControl>
                     {asEditor ? (
                       <Editor
