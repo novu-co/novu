@@ -12,8 +12,11 @@ import _ from 'lodash';
  * // Returns: { payload: { old: 'payload.old', new: 'payload.new' } }
  * // Note: 'payload' entry is ignored as it has no namespace
  */
-export function pathsToObject(keys: string[], { valuePrefix = '', valueSuffix = '' } = {}): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
+export function pathsToObject(
+  keys: string[],
+  { valuePrefix = '', valueSuffix = '' } = {}
+): Record<string, Record<string, unknown>> {
+  const result: Record<string, Record<string, unknown>> = {};
 
   keys
     .filter((key) => key.includes('.'))

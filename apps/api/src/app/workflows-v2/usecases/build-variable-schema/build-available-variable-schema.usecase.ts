@@ -56,12 +56,7 @@ export class BuildAvailableVariableSchemaUsecase {
     command: BuildAvailableVariableSchemaCommand
   ): Promise<JSONSchemaDto> {
     if (workflow.payloadSchema) {
-      return (
-        parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {
-          type: 'object',
-          description: 'Payload for the current step',
-        }
-      );
+      return parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {};
     }
 
     return this.buildPayloadSchema.execute(

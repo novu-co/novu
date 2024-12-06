@@ -1,5 +1,4 @@
 import { Template, Liquid, RenderError, LiquidError } from 'liquidjs';
-import { TemplateParseResult, InvalidVariable } from './parser-types';
 import { isValidTemplate, extractLiquidExpressions } from './parser-utils';
 
 const LIQUID_CONFIG = {
@@ -8,6 +7,17 @@ const LIQUID_CONFIG = {
   greedy: false,
   catchAllErrors: true,
 } as const;
+
+export type Variable = {
+  context?: string;
+  message?: string;
+  name: string;
+};
+
+export type TemplateParseResult = {
+  validVariables: Variable[];
+  invalidVariables: Variable[];
+};
 
 /**
  * Copy of LiquidErrors type from liquidjs since it's not exported.
@@ -65,20 +75,20 @@ export function extractLiquidTemplateVariables(template: string): TemplateParseR
 }
 
 function processLiquidRawOutput(rawOutputs: string[]): TemplateParseResult {
-  const variables = new Set<string>();
-  const invalidVariables: InvalidVariable[] = [];
+  const validVariables = new Set<string>();
+  const invalidVariables: Variable[] = [];
 
   for (const rawOutput of rawOutputs) {
     try {
       const parsedVars = parseByLiquid(rawOutput);
-      parsedVars.forEach((variable) => variables.add(variable));
+      parsedVars.forEach((variable) => validVariables.add(variable));
     } catch (error: unknown) {
       if (isLiquidErrors(error)) {
         invalidVariables.push(
           ...error.errors.map((e: RenderError) => ({
             context: e.context,
             message: e.message,
-            variable: rawOutput,
+            name: rawOutput,
           }))
         );
       }
@@ -86,7 +96,7 @@ function processLiquidRawOutput(rawOutputs: string[]): TemplateParseResult {
   }
 
   return {
-    validVariables: Array.from(variables),
+    validVariables: [...validVariables].map((name) => ({ name })),
     invalidVariables,
   };
 }

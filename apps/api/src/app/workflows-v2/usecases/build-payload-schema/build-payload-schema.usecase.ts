@@ -28,34 +28,39 @@ export class BuildPayloadSchema {
     const variablesExample = pathsToObject(templateVars, {
       valuePrefix: '{{',
       valueSuffix: '}}',
-    }).payload as Record<string, unknown>;
+    }).payload;
 
     return convertJsonToSchemaWithDefaults(variablesExample);
   }
 
   private async buildControlValues(command: BuildPayloadSchemaCommand) {
-    let aggregateControlValues = command.controlValues ? [command.controlValues] : [];
+    let controlValues = command.controlValues ? [command.controlValues] : [];
 
-    if (!aggregateControlValues.length) {
-      aggregateControlValues = (
-        await this.controlValuesRepository.find({
-          _environmentId: command.environmentId,
-          _organizationId: command.organizationId,
-          _workflowId: command.workflowId,
-          level: ControlValuesLevelEnum.STEP_CONTROLS,
-        })
-      )
-        .map((item) => item.controls)
-        .filter((control): control is NonNullable<typeof control> => control != null);
+    if (!controlValues.length) {
+      controlValues = (
+        await this.controlValuesRepository.find(
+          {
+            _environmentId: command.environmentId,
+            _organizationId: command.organizationId,
+            _workflowId: command.workflowId,
+            level: ControlValuesLevelEnum.STEP_CONTROLS,
+            controls: { $ne: null },
+          },
+          {
+            controls: 1,
+            _id: 0,
+          }
+        )
+      ).map((item) => item.controls);
     }
 
-    return aggregateControlValues;
+    return controlValues;
   }
 
   @Instrument()
-  private extractTemplateVariables(aggregateControlValues: Record<string, unknown>[]): string[] {
-    const concatenatedControlValues = aggregateControlValues.map(flattenObjectValues).flat().join(' ');
+  private extractTemplateVariables(controlValues: Record<string, unknown>[]): string[] {
+    const controlValuesString = controlValues.map(flattenObjectValues).flat().join(' ');
 
-    return extractLiquidTemplateVariables(concatenatedControlValues).validVariables;
+    return extractLiquidTemplateVariables(controlValuesString).validVariables.map((variable) => variable.name);
   }
 }
