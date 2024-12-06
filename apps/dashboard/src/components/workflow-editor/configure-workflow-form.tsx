@@ -62,7 +62,6 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
   const isReadOnly = workflow.origin === WorkflowOriginEnum.EXTERNAL;
   const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const tagsQuery = useTags();
   const { currentEnvironment } = useEnvironment();
   const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
@@ -138,7 +137,6 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
 
   function handleExportToCode() {
     showComingSoonBanner();
-    setIsDropdownOpen(false);
   }
 
   const syncToLabel = `Sync to ${currentEnvironment?.name === 'Production' ? 'Development' : 'Production'}`;
@@ -176,7 +174,10 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
             <RouteFill />
             <span>Configure workflow</span>
           </div>
-          <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+          {/**
+           * Needs modal={false} to prevent the click freeze after the modal is closed
+           */}
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="ml-auto h-[20px] w-[22px]">
                 <RiMore2Fill />
@@ -184,10 +185,12 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuGroup>
-                <DropdownMenuItem onClick={handleExportToCode}>
-                  <RiCodeSSlashLine />
-                  Export to Code
-                </DropdownMenuItem>
+                {isSyncable && (
+                  <DropdownMenuItem onClick={handleExportToCode}>
+                    <RiCodeSSlashLine />
+                    Export to Code
+                  </DropdownMenuItem>
+                )}
                 {isSyncable ? (
                   <DropdownMenuItem onClick={safeSync}>
                     <RiGitPullRequestFill />
@@ -214,7 +217,6 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                   disabled={workflow.origin === WorkflowOriginEnum.EXTERNAL}
                   onClick={() => {
                     setIsDeleteModalOpen(true);
-                    setIsDropdownOpen(false);
                   }}
                 >
                   <RiDeleteBin2Line />
