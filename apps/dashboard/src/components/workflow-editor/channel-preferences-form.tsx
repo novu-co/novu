@@ -30,20 +30,16 @@ type ConfigureWorkflowFormProps = {
   update: (data: UpdateWorkflowDto) => void;
 };
 
-const CHANNEL_TYPE_TO_STRING: Record<ChannelTypeEnum, string> = {
+const CHANNEL_LABELS_LOOKUP: Record<`${ChannelTypeEnum}` | 'all', string> = {
   [ChannelTypeEnum.IN_APP]: 'In-App',
   [ChannelTypeEnum.EMAIL]: 'Email',
   [ChannelTypeEnum.SMS]: 'SMS',
   [ChannelTypeEnum.CHAT]: 'Chat',
   [ChannelTypeEnum.PUSH]: 'Push',
-};
-
-const CHANNEL_LABELS_LOOKUP: Record<`${ChannelTypeEnum}` | 'all', string> = {
-  ...CHANNEL_TYPE_TO_STRING,
   all: 'All',
 };
 
-const checkIsEveryChannelSameValue = (
+const checkHasEveryChannelSameValue = (
   channels: Record<ChannelTypeEnum, { enabled: boolean }>,
   checkForEnabled: boolean
 ) => {
@@ -54,16 +50,11 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
   const { workflow, update } = props;
   const track = useTelemetry();
 
-  const { formDataToRender, isDefaultPreferences, isDashboardWorkflow } = useMemo(() => {
-    const isDefaultPreferences = workflow.preferences.user === null;
-    const isDashboardWorkflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD;
-
-    return {
-      isDefaultPreferences,
-      isDashboardWorkflow,
-      formDataToRender: isDefaultPreferences ? workflow.preferences.default : workflow.preferences.user,
-    };
-  }, [workflow.origin, workflow.preferences.default, workflow.preferences.user]);
+  const isDefaultPreferences = useMemo(() => workflow.preferences.user === null, [workflow.preferences.user]);
+  const isDashboardWorkflow = useMemo(() => workflow.origin === WorkflowOriginEnum.NOVU_CLOUD, [workflow.origin]);
+  const formDataToRender = useMemo(() => {
+    return isDefaultPreferences ? workflow.preferences.default : workflow.preferences.user;
+  }, [isDefaultPreferences, workflow.preferences.default, workflow.preferences.user]);
 
   const form = useForm<z.infer<typeof UserPreferencesFormSchema>>({
     defaultValues: {
@@ -113,7 +104,7 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
 
     // If all channels are same value(all true or all false), update the "all" channel value to true/false
     // Also, update the "all" channel value to true if a single channel is enabled and it's not already enabled
-    const areAllChannelsSameValue = checkIsEveryChannelSameValue(updatedUserPreferences.channels, value);
+    const areAllChannelsSameValue = checkHasEveryChannelSameValue(updatedUserPreferences.channels, value);
     if (areAllChannelsSameValue || (value && !updatedUserPreferences.all.enabled)) {
       updatedUserPreferences.all.enabled = value;
     }
@@ -181,13 +172,15 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
           </Link>
         </SidebarHeader>
         <Separator />
+        <SidebarContent size="md">
+          <p className="text-xs text-neutral-400">
+            Set default channel preferences for subscribers and specify which channels they can customize.
+          </p>
+        </SidebarContent>
 
         {isDashboardWorkflow ? null : (
           <>
             <SidebarContent size="md">
-              <p className="text-xs text-neutral-400">
-                Set default notification channels for subscribers and specify which channels they can customize.
-              </p>
               {/* This doesn't needs to be a form, but using it as a form allows to re-use the formItem designs without duplicating the same styles */}
               <Form {...overrideForm}>
                 <form>
@@ -242,7 +235,7 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
               />
             </SidebarContent>
             <div className="flex items-center justify-between gap-1.5 bg-neutral-50 px-3 py-0.5">
-              <span className="text-2xs uppercase text-neutral-400">channels</span>
+              <span className="text-2xs uppercase text-neutral-400">All channels</span>
               <FormField
                 control={form.control}
                 name="user.all.enabled"
