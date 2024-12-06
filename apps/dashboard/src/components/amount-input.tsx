@@ -15,6 +15,7 @@ type InputWithSelectProps = {
   className?: string;
   placeholder?: string;
   isReadOnly?: boolean;
+  onValueChange?: (value: string) => void;
 };
 
 export const AmountInput = ({
@@ -24,22 +25,17 @@ export const AmountInput = ({
   className,
   placeholder,
   isReadOnly,
+  onValueChange,
 }: InputWithSelectProps) => {
-  const { getFieldState, setValue, getValues, control } = useFormContext();
+  const { getFieldState, setValue, control } = useFormContext();
 
   const input = getFieldState(`${fields.inputKey}`);
   const select = getFieldState(`${fields.selectKey}`);
   const error = input.error || select.error;
 
-  const handleChange = (value: { input: number; select: string }) => {
-    // we want to always set both values and treat it as a single input
-    setValue(fields.inputKey, value.input, { shouldDirty: true });
-    setValue(fields.selectKey, value.select, { shouldDirty: true });
-  };
-
   return (
     <>
-      <InputFieldPure className="h-7 rounded-lg border pr-0">
+      <InputFieldPure className={cn('h-7 w-auto rounded-lg border pr-0', className)}>
         <FormField
           control={control}
           name={fields.inputKey}
@@ -48,15 +44,12 @@ export const AmountInput = ({
               <FormControl>
                 <Input
                   type="number"
-                  className={cn(
-                    'min-w-[20ch] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
-                    className
-                  )}
+                  className="min-w-[20ch] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   placeholder={placeholder}
                   disabled={isReadOnly}
-                  {...field}
+                  value={field.value}
                   onChange={(e) => {
-                    handleChange({ input: Number(e.target.value), select: getValues(fields.selectKey) });
+                    field.onChange(Number(e.target.value));
                   }}
                 />
               </FormControl>
@@ -71,11 +64,12 @@ export const AmountInput = ({
               <FormControl>
                 <Select
                   onValueChange={(value) => {
-                    handleChange({ input: Number(getValues(fields.inputKey)), select: value });
+                    setValue(fields.selectKey, value, { shouldDirty: true });
+                    onValueChange?.(value);
                   }}
                   defaultValue={defaultOption}
                   disabled={isReadOnly}
-                  {...field}
+                  value={field.value}
                 >
                   <SelectTrigger className="h-7 w-auto translate-x-0.5 gap-1 rounded-l-none border-l bg-neutral-50 p-2 text-xs">
                     <SelectValue />

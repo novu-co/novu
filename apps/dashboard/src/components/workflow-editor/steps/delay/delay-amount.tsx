@@ -4,6 +4,7 @@ import { FormLabel } from '@/components/primitives/form/form';
 import { useMemo } from 'react';
 import { TimeUnitEnum } from '@novu/shared';
 import { useStep } from '@/components/workflow-editor/steps/step-provider';
+import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
 
 const defaultUnitValues = Object.values(TimeUnitEnum);
 
@@ -12,6 +13,7 @@ const unitKey = 'unit';
 
 export const DelayAmount = () => {
   const { step } = useStep();
+  const { saveForm } = useSaveForm();
   const { dataSchema, uiSchema } = step?.controls ?? {};
 
   const unitOptions = useMemo(
@@ -33,6 +35,7 @@ export const DelayAmount = () => {
         fields={{ inputKey: `controlValues.${amountKey}`, selectKey: `controlValues.${unitKey}` }}
         options={unitOptions}
         defaultOption={defaultUnitOption}
+        onValueChange={saveForm}
       />
     </div>
   );

@@ -67,7 +67,7 @@ export const digestUiSchema: UiSchema = {
     },
     digestKey: {
       component: UiComponentEnum.DIGEST_KEY,
-      placeholder: null,
+      placeholder: '',
     },
     cron: {
       component: UiComponentEnum.DIGEST_CRON,
