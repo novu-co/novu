@@ -177,45 +177,42 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
             Set default channel preferences for subscribers and specify which channels they can customize.
           </p>
         </SidebarContent>
-
         {isDashboardWorkflow ? null : (
-          <>
-            <SidebarContent size="md">
-              {/* This doesn't needs to be a form, but using it as a form allows to re-use the formItem designs without duplicating the same styles */}
-              <Form {...overrideForm}>
-                <form>
-                  <FormField
-                    control={overrideForm.control}
-                    name="override"
-                    render={({ field }) => (
-                      <FormItem className="mt-2 flex w-full items-center justify-between">
-                        <FormLabel tooltip="Override preferences to use dashboard-defined preferences instead of code defaults. Disable to restore defaults.">
-                          Override preferences
-                        </FormLabel>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={(checked) => {
-                              field.onChange(checked);
-                              if (!checked) {
-                                updateUserPreference(null);
-                              }
-                              track(TelemetryEvent.WORKFLOW_PREFERENCES_OVERRIDE_USED, {
-                                new_status: checked,
-                              });
-                            }}
-                            disabled={isDashboardWorkflow}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </form>
-              </Form>
-            </SidebarContent>
-            <Separator />
-          </>
+          <SidebarContent size="md">
+            {/* This doesn't needs to be a form, but using it as a form allows to re-use the formItem designs without duplicating the same styles */}
+            <Form {...overrideForm}>
+              <form>
+                <FormField
+                  control={overrideForm.control}
+                  name="override"
+                  render={({ field }) => (
+                    <FormItem className="mt-2 flex w-full items-center justify-between">
+                      <FormLabel tooltip="Override preferences to use dashboard-defined preferences instead of code defaults. Disable to restore defaults.">
+                        Override preferences
+                      </FormLabel>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={(checked) => {
+                            field.onChange(checked);
+                            if (!checked) {
+                              updateUserPreference(null);
+                            }
+                            track(TelemetryEvent.WORKFLOW_PREFERENCES_OVERRIDE_USED, {
+                              new_status: checked,
+                            });
+                          }}
+                          disabled={isDashboardWorkflow}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          </SidebarContent>
         )}
+        <Separator />
         <Form {...form}>
           <form>
             <SidebarContent size="md">
