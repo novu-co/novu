@@ -4,23 +4,29 @@ import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { cn } from '@/utils/ui';
 import { cva, VariantProps } from 'class-variance-authority';
 
-const tabsListVariants = cva('inline-flex items-center', {
+const tabsListVariants = cva('inline-flex', {
   variants: {
     variant: {
-      default: 'h-9 justify-center rounded-[10px] bg-neutral-alpha-100 p-1 text-muted-foreground',
+      default: 'h-9 rounded-[10px] bg-neutral-alpha-100 p-1 text-muted-foreground',
       regular: 'border-neutral-alpha-200 w-full justify-start gap-6 border-b border-t px-3.5',
+    },
+    align: {
+      center: 'justify-center',
+      start: 'justify-start',
+      end: 'justify-end',
     },
   },
   defaultVariants: {
     variant: 'default',
+    align: 'start',
   },
 });
 
 type TabsListProps = React.ComponentPropsWithoutRef<typeof TabsPrimitive.List> & VariantProps<typeof tabsListVariants>;
 
 const TabsList = React.forwardRef<React.ElementRef<typeof TabsPrimitive.List>, TabsListProps>(
-  ({ className, variant, ...props }, ref) => (
-    <TabsPrimitive.List ref={ref} className={tabsListVariants({ variant, className })} {...props} />
+  ({ className, variant, align, ...props }, ref) => (
+    <TabsPrimitive.List ref={ref} className={tabsListVariants({ variant, align, className })} {...props} />
   )
 );
 TabsList.displayName = TabsPrimitive.List.displayName;

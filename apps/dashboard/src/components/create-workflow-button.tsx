@@ -24,7 +24,7 @@ import {
 import { TagInput } from '@/components/primitives/tag-input';
 import { Textarea } from '@/components/primitives/textarea';
 import { useEnvironment } from '@/context/environment/hooks';
-import { useTagsQuery } from '@/hooks/use-tags-query';
+import { useTags } from '@/hooks/use-tags';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
@@ -56,7 +56,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
       );
     },
   });
-  const tagsQuery = useTagsQuery();
+  const tagsQuery = useTags();
 
   const form = useForm<z.infer<typeof workflowSchema>>({
     resolver: zodResolver(workflowSchema),

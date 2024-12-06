@@ -11,7 +11,9 @@ import {
   OrganizationListPage,
   QuestionnairePage,
   UsecaseSelectPage,
+  ApiKeysPage,
   WelcomePage,
+  SettingsPage,
 } from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
@@ -51,16 +53,16 @@ const router = createBrowserRouter([
             path: ROUTES.SIGNUP_ORGANIZATION_LIST,
             element: <OrganizationListPage />,
           },
-          {
-            path: ROUTES.SIGNUP_QUESTIONNAIRE,
-            element: <QuestionnairePage />,
-          },
         ],
       },
       {
         path: '/onboarding',
         element: <OnboardingParentRoute />,
         children: [
+          {
+            path: ROUTES.SIGNUP_QUESTIONNAIRE,
+            element: <QuestionnairePage />,
+          },
           {
             path: ROUTES.USECASE_SELECT,
             element: <UsecaseSelectPage />,
@@ -95,6 +97,10 @@ const router = createBrowserRouter([
                 element: <WorkflowsPage />,
               },
               {
+                path: ROUTES.API_KEYS,
+                element: <ApiKeysPage />,
+              },
+              {
                 path: ROUTES.EDIT_WORKFLOW,
                 element: <EditWorkflowPage />,
                 children: [
@@ -125,6 +131,22 @@ const router = createBrowserRouter([
                 element: <CatchAllRoute />,
               },
             ],
+          },
+          {
+            path: ROUTES.SETTINGS,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_ACCOUNT,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_ORGANIZATION,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_TEAM,
+            element: <SettingsPage />,
           },
           {
             path: '*',

@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  FeatureFlagsKeysEnum,
   IEnvironment,
   StepDataDto,
   StepTypeEnum,
@@ -8,7 +9,7 @@ import {
   WorkflowResponseDto,
 } from '@novu/shared';
 import { motion } from 'motion/react';
-import { useMemo, useState } from 'react';
+import { HTMLAttributes, ReactNode, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiCloseFill, RiDeleteBin2Line, RiPencilRuler2Fill } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
@@ -29,14 +30,20 @@ import {
   getFirstControlsErrorMessage,
   updateStepInWorkflow,
 } from '@/components/workflow-editor/step-utils';
-import { ConfigureInAppStepTemplateCta } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-template-cta';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { EXCLUDED_EDITOR_TYPES } from '@/utils/constants';
 import { STEP_NAME_BY_TYPE } from './step-provider';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
+import { ConfigureStepTemplateCta } from '@/components/workflow-editor/steps/configure-step-template-cta';
+import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/email/configure-email-step-preview';
 
-const SUPPORTED_STEP_TYPES = [StepTypeEnum.IN_APP];
+const stepTypeToPreview: Record<string, ((props: HTMLAttributes<HTMLDivElement>) => ReactNode) | undefined> = {
+  [StepTypeEnum.IN_APP]: ConfigureInAppStepPreview,
+  [StepTypeEnum.EMAIL]: ConfigureEmailStepPreview,
+};
 
 type ConfigureStepFormProps = {
   workflow: WorkflowResponseDto;
@@ -50,6 +57,13 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   const { step, workflow, update, updateStepCache, environment } = props;
   const navigate = useNavigate();
   const isCodeCreatedWorkflow = workflow.origin === WorkflowOriginEnum.EXTERNAL;
+  const areNewStepsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
+
+  const supportedStepTypes = [StepTypeEnum.IN_APP];
+  if (areNewStepsEnabled) {
+    supportedStepTypes.push(StepTypeEnum.EMAIL);
+  }
+  const Preview = stepTypeToPreview[step.type] || (() => null);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -84,7 +98,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     [step]
   );
 
-  const isDashboardStepThatSupportsEditor = !isCodeCreatedWorkflow && SUPPORTED_STEP_TYPES.includes(step.type);
+  const isDashboardStepThatSupportsEditor = !isCodeCreatedWorkflow && supportedStepTypes.includes(step.type);
   const isCodeStepThatSupportsEditor = isCodeCreatedWorkflow && !EXCLUDED_EDITOR_TYPES.includes(step.type);
   const isStepSupportsEditor = isDashboardStepThatSupportsEditor || isCodeStepThatSupportsEditor;
 
@@ -184,9 +198,13 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
           </>
         )}
 
-        {step.type === StepTypeEnum.IN_APP && <ConfigureInAppStepTemplateCta step={step} issue={firstError} />}
+        {supportedStepTypes.includes(step.type) && (
+          <ConfigureStepTemplateCta step={step} issue={firstError}>
+            <Preview />
+          </ConfigureStepTemplateCta>
+        )}
 
-        {!isCodeCreatedWorkflow && !SUPPORTED_STEP_TYPES.includes(step.type) && (
+        {!isCodeCreatedWorkflow && !supportedStepTypes.includes(step.type) && (
           <>
             <SidebarContent>
               <SdkBanner />
