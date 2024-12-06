@@ -29,6 +29,9 @@ import { NODE_HEIGHT, NODE_WIDTH } from './base-node';
 import { StepTypeEnum } from '@/utils/enums';
 import { Step } from '@/utils/types';
 import { getFirstControlsErrorMessage, getFirstBodyErrorMessage } from './step-utils';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
+import { useEnvironment } from '@/context/environment/hooks';
+import { IEnvironment, WorkflowResponseDto } from '@novu/shared';
 
 const nodeTypes = {
   trigger: TriggerNode,
@@ -52,11 +55,15 @@ const panOnDrag = [1, 2];
 // y distance = node height + space between nodes
 const Y_DISTANCE = NODE_HEIGHT + 50;
 
-const mapStepToNode = (
-  step: Step,
-  previousPosition: { x: number; y: number },
-  addStepIndex: number
-): Node<NodeData, keyof typeof nodeTypes> => {
+const mapStepToNode = ({
+  addStepIndex,
+  previousPosition,
+  step,
+}: {
+  addStepIndex: number;
+  previousPosition: { x: number; y: number };
+  step: Step;
+}): Node<NodeData, keyof typeof nodeTypes> => {
   let content = '';
   if (step.type === StepTypeEnum.DELAY) {
     content = `Delay action for a set time`;
@@ -81,13 +88,27 @@ const mapStepToNode = (
 const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useReactFlow();
+  const { currentEnvironment } = useEnvironment();
+  const { workflow: currentWorkflow } = useWorkflow();
 
   const [nodes, edges] = useMemo(() => {
-    const triggerNode = { id: crypto.randomUUID(), position: { x: 0, y: 0 }, data: {}, type: 'trigger' };
+    const triggerNode = {
+      id: crypto.randomUUID(),
+      position: { x: 0, y: 0 },
+      data: {
+        workflowSlug: currentWorkflow!.slug,
+        environment: currentEnvironment!.slug,
+      },
+      type: 'trigger',
+    };
     let previousPosition = triggerNode.position;
 
-    const createdNodes = steps?.map((el, index) => {
-      const node = mapStepToNode(el, previousPosition, index);
+    const createdNodes = steps?.map((step, index) => {
+      const node = mapStepToNode({
+        step,
+        previousPosition,
+        addStepIndex: index,
+      });
       previousPosition = node.position;
       return node;
     });
