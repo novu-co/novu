@@ -174,6 +174,9 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
             <RouteFill />
             <span>Configure workflow</span>
           </div>
+          {/**
+           * Needs modal={false} to prevent the click freeze after the modal is closed
+           */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="ml-auto h-[20px] w-[22px]">
