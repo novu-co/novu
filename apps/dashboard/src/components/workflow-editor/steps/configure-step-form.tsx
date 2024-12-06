@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  FeatureFlagsKeysEnum,
   IEnvironment,
   StepDataDto,
   StepIssuesDto,
@@ -33,11 +34,7 @@ import {
 } from '@/components/workflow-editor/step-utils';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { buildRoute, ROUTES } from '@/utils/routes';
-import {
-  INLINE_CONFIGURABLE_STEP_TYPES,
-  TEMPLATE_CONFIGURABLE_STEP_TYPES,
-  UNSUPPORTED_STEP_TYPES,
-} from '@/utils/constants';
+import { INLINE_CONFIGURABLE_STEP_TYPES, TEMPLATE_CONFIGURABLE_STEP_TYPES } from '@/utils/constants';
 import { STEP_NAME_BY_TYPE } from './step-provider';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
@@ -47,6 +44,7 @@ import { DelayControlValues } from '@/components/workflow-editor/steps/delay/del
 import { ConfigureStepTemplateCta } from '@/components/workflow-editor/steps/configure-step-template-cta';
 import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
 import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/email/configure-email-step-preview';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
 
 const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
@@ -91,15 +89,21 @@ type ConfigureStepFormProps = {
 
 export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   const { step, workflow, update, updateStepCache, environment, issues } = props;
+  const navigate = useNavigate();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const areNewStepsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
 
-  const isSupportedStep = !UNSUPPORTED_STEP_TYPES.includes(step.type);
+  let supportedStepTypes = [StepTypeEnum.IN_APP, StepTypeEnum.SMS, StepTypeEnum.CHAT, StepTypeEnum.PUSH];
+
+  if (areNewStepsEnabled) {
+    supportedStepTypes = [...supportedStepTypes, StepTypeEnum.DIGEST, StepTypeEnum.DELAY, StepTypeEnum.EMAIL];
+  }
+
+  const isSupportedStep = supportedStepTypes.includes(step.type);
   const isReadOnly = !isSupportedStep || workflow.origin === WorkflowOriginEnum.EXTERNAL;
 
   const isTemplateConfigurableStep = isSupportedStep && TEMPLATE_CONFIGURABLE_STEP_TYPES.includes(step.type);
   const isInlineConfigurableStep = isSupportedStep && INLINE_CONFIGURABLE_STEP_TYPES.includes(step.type);
-
-  const navigate = useNavigate();
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const onDeleteStep = () => {
     update({ ...workflow, steps: workflow.steps.filter((s) => s._id !== step._id) });
