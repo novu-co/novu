@@ -1,7 +1,7 @@
 import { Injectable, Scope } from '@nestjs/common';
-import { OrganizationRepository, UserRepository, MemberRepository } from '@novu/dal';
+import { MemberRepository, OrganizationRepository, UserRepository } from '@novu/dal';
 import { MemberStatusEnum } from '@novu/shared';
-import { Novu } from '@novu/node';
+import { Novu } from '@novu/api';
 import { ApiException } from '../../../shared/exceptions/api.exception';
 import { ResendInviteCommand } from './resend-invite.command';
 import { capitalize, createGuid } from '../../../shared/services/helper/helper.service';
@@ -34,14 +34,17 @@ export class ResendInvite {
     const token = createGuid();
 
     if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'production') {
-      const novu = new Novu(process.env.NOVU_API_KEY ?? '');
+      const novu = new Novu({ apiKey: process.env.NOVU_API_KEY ?? '' });
 
       // cspell:disable-next
-      await novu.trigger(process.env.NOVU_TEMPLATEID_INVITE_TO_ORGANISATION || 'invite-to-organization-wBnO8NpDn', {
-        to: {
-          subscriberId: foundInvitee.invite.email,
-          email: foundInvitee.invite.email,
-        },
+      await novu.trigger({
+        name: process.env.NOVU_TEMPLATEID_INVITE_TO_ORGANISATION || 'invite-to-organization-wBnO8NpDn',
+        to: [
+          {
+            subscriberId: foundInvitee.invite.email,
+            email: foundInvitee.invite.email,
+          },
+        ],
         payload: {
           email: foundInvitee.invite.email,
           inviteeName: capitalize(foundInvitee.invite.email.split('@')[0]),
