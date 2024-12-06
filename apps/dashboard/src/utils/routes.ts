@@ -9,12 +9,17 @@ export const ROUTES = {
   INBOX_EMBED_SUCCESS: '/onboarding/inbox/success',
   ROOT: '/',
   ENV: '/env',
+  SETTINGS: '/settings',
+  SETTINGS_ACCOUNT: '/settings/account',
+  SETTINGS_ORGANIZATION: '/settings/organization',
+  SETTINGS_TEAM: '/settings/team',
   WORKFLOWS: '/env/:environmentSlug/workflows',
   EDIT_WORKFLOW: '/env/:environmentSlug/workflows/:workflowSlug',
   TEST_WORKFLOW: '/env/:environmentSlug/workflows/:workflowSlug/test',
   WELCOME: '/env/:environmentSlug/welcome',
   EDIT_STEP: 'steps/:stepSlug',
   EDIT_STEP_TEMPLATE: 'steps/:stepSlug/edit',
+  API_KEYS: '/env/:environmentSlug/api-keys',
 };
 
 export const buildRoute = (route: string, params: Record<string, string>) => {

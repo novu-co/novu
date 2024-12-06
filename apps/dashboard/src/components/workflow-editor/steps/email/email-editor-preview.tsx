@@ -7,9 +7,8 @@ import { Button } from '@/components/primitives/button';
 import { Editor } from '@/components/primitives/editor';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
-import { InAppTabsSection } from '@/components/workflow-editor/steps/in-app/in-app-tabs-section';
 import { useEditorPreview } from '../use-editor-preview';
-import { InboxPreview } from './inbox-preview';
+import { EmailTabsPreviewSection } from '@/components/workflow-editor/steps/email/email-tabs-section';
 
 const getInitialAccordionValue = (value: string) => {
   try {
@@ -19,18 +18,16 @@ const getInitialAccordionValue = (value: string) => {
   }
 };
 
-type InAppEditorPreviewProps = {
+type EmailEditorPreviewProps = {
   workflow: WorkflowResponseDto;
   step: StepDataDto;
   formValues: Record<string, unknown>;
 };
 
-const extensions = [loadLanguage('json')?.extension ?? []];
-
-export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPreviewProps) => {
+export const EmailEditorPreview = ({ workflow, step, formValues }: EmailEditorPreviewProps) => {
   const workflowSlug = workflow.workflowId;
   const stepSlug = step.stepId;
-  const { editorValue, setEditorValue, previewStep, previewData, isPreviewPending } = useEditorPreview({
+  const { editorValue, setEditorValue, previewStep } = useEditorPreview({
     workflowSlug,
     stepSlug,
     controlValues: formValues,
@@ -56,13 +53,13 @@ export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPr
   }, [editorValue]);
 
   return (
-    <InAppTabsSection>
+    <EmailTabsPreviewSection>
       <div className="relative flex flex-col gap-3">
         <div className="flex items-center gap-2.5 text-sm font-medium">
           <Notification5Fill className="size-3" />
           In-app template editor
         </div>
-        <InboxPreview isPreviewPending={isPreviewPending} previewData={previewData} />
+        {/* Email preview goes here */}
         <Accordion type="single" collapsible value={accordionValue} onValueChange={setAccordionValue}>
           <AccordionItem value="payload">
             <AccordionTrigger>
@@ -80,7 +77,7 @@ export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPr
                 value={editorValue}
                 onChange={setEditorValue}
                 lang="json"
-                extensions={extensions}
+                extensions={[loadLanguage('json')?.extension ?? []]}
                 className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 rounded-lg border border-dashed p-3"
               />
               {payloadError && <p className="text-destructive text-xs">{payloadError}</p>}
@@ -104,6 +101,6 @@ export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPr
           </AccordionItem>
         </Accordion>
       </div>
-    </InAppTabsSection>
+    </EmailTabsPreviewSection>
   );
 };

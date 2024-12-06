@@ -164,6 +164,10 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
   const { control } = useFormContext();
   const { step } = useStep();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
+  const extensions = useMemo(
+    () => [autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping],
+    [variables]
+  );
 
   return (
     <Popover modal={true}>
@@ -190,7 +194,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                       placeholder="Button text"
                       value={field.value}
                       onChange={field.onChange}
-                      extensions={[autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping]}
+                      extensions={extensions}
                     />
                   </InputField>
                 </FormControl>

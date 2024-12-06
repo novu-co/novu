@@ -1,15 +1,16 @@
-import React, { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { useCodeMirror, ReactCodeMirrorProps, EditorView } from '@uiw/react-codemirror';
 import createTheme from '@uiw/codemirror-themes';
 import { tags as t } from '@lezer/highlight';
 import { cva, VariantProps } from 'class-variance-authority';
-import debounce from 'lodash.debounce';
 import { autocompleteFooter, autocompleteHeader, functionIcon } from '@/components/primitives/constants';
 
 const editorVariants = cva('h-full w-full flex-1 [&_.cm-focused]:outline-none', {
   variants: {
     size: {
       default: 'text-xs [&_.cm-editor]:py-1',
+      lg: 'text-base [&_.cm-editor]:py-1',
     },
   },
   defaultVariants: {
@@ -133,14 +134,24 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
       asInput,
       fontFamily,
       onChange,
-      extensions,
-      basicSetup,
+      extensions: extensionsProp,
+      basicSetup: basicSetupProp,
       ...restCodeMirrorProps
     },
     ref
   ) => {
     const editorRef = useRef<HTMLDivElement>(null);
     const [shouldFocus, setShouldFocus] = useState(false);
+    const extensions = useMemo(() => [...(extensionsProp ?? []), baseTheme({ asInput })], [extensionsProp, asInput]);
+    const basicSetup = useMemo(
+      () => ({
+        lineNumbers: false,
+        foldGutter: false,
+        highlightActiveLine: false,
+        ...((typeof basicSetupProp === 'object' ? basicSetupProp : {}) ?? {}),
+      }),
+      [basicSetupProp]
+    );
 
     const theme = useMemo(
       () =>
@@ -159,27 +170,27 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
       [fontFamily]
     );
 
-    const debouncedOnChange = useMemo(
-      () =>
-        debounce((value: string) => {
-          if (onChange) onChange(value);
-        }, 50),
+    const onChangeCallback = useCallback(
+      (value: string) => {
+        // when typing fast the onChange event is called multiple times during one render phase
+        // by default react batches state updates and only triggers one render phase
+        // which results in value not being updated and "jumping" effect in the editor
+        // to prevent this we need to flush the state updates synchronously
+        flushSync(() => {
+          onChange?.(value);
+        });
+      },
       [onChange]
     );
 
     const { setContainer, view } = useCodeMirror({
-      extensions: [...(extensions ?? []), baseTheme({ asInput })],
+      extensions,
       height,
       placeholder,
-      basicSetup: {
-        lineNumbers: false,
-        foldGutter: false,
-        highlightActiveLine: false,
-        ...((typeof basicSetup === 'object' ? basicSetup : {}) ?? {}),
-      },
+      basicSetup,
       container: editorRef.current,
       value,
-      onChange: debouncedOnChange,
+      onChange: onChangeCallback,
       theme,
       ...restCodeMirrorProps,
     });
@@ -205,12 +216,6 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
         setShouldFocus(false);
       }
     }, [shouldFocus, view]);
-
-    useEffect(() => {
-      return () => {
-        debouncedOnChange.cancel();
-      };
-    }, [debouncedOnChange]);
 
     return <div ref={editorRef} className={editorVariants({ size, className })} />;
   }

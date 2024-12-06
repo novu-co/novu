@@ -1,6 +1,6 @@
 // useFormAutosave.ts
 import { useCallback, useEffect } from 'react';
-import { UseFormReturn, useWatch, FieldValues } from 'react-hook-form';
+import { UseFormReturn, FieldValues } from 'react-hook-form';
 import { useDataRef } from '@/hooks/use-data-ref';
 import { useDebounce } from '@/hooks/use-debounce';
 
@@ -18,9 +18,6 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
   save: (data: U) => void;
 }) {
   const formRef = useDataRef(propsForm);
-  const watchedData = useWatch<T>({
-    control: propsForm.control,
-  });
 
   const onSave = useCallback(
     async (data: T) => {
@@ -79,11 +76,16 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
     });
   };
 
-  // handles form changes
   useEffect(() => {
-    const values = formRef.current.getValues();
-    debouncedOnSave(values);
-  }, [watchedData, debouncedOnSave, formRef]);
+    const form = formRef.current;
+
+    const { unsubscribe } = form.watch((partial) => {
+      const values = form.getValues();
+      debouncedOnSave({ ...values, ...partial });
+    });
+
+    return () => unsubscribe();
+  }, [formRef, debouncedOnSave]);
 
   return {
     onBlur,
