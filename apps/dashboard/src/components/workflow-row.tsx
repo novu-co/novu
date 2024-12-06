@@ -168,9 +168,6 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
               <FaCode className="size-3" />
             </Badge>
           )}
-          {/**
-           * reloadDocument is needed for v1 workflows to reload the document when the user navigates to the workflow editor
-           */}
           <TruncatedText className="max-w-[32ch]" asChild>
             <Link to={workflowLink} reloadDocument={isV1Workflow}>
               {workflow.name}
@@ -232,8 +229,8 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
          */}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <RiMore2Fill />
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <RiMore2Fill className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">

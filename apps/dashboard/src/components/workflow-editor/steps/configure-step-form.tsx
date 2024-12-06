@@ -1,19 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  FeatureFlagsKeysEnum,
   IEnvironment,
   StepDataDto,
+  StepIssuesDto,
   StepTypeEnum,
+  StepUpdateDto,
   UpdateWorkflowDto,
   WorkflowOriginEnum,
   WorkflowResponseDto,
 } from '@novu/shared';
 import { motion } from 'motion/react';
-import { HTMLAttributes, ReactNode, useMemo, useState } from 'react';
+import { useEffect, useCallback, useMemo, useState, HTMLAttributes, ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiCloseFill, RiDeleteBin2Line, RiPencilRuler2Fill } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
-import { z } from 'zod';
 
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { PageMeta } from '@/components/page-meta';
@@ -24,47 +24,81 @@ import { Input, InputField } from '@/components/primitives/input';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarContent, SidebarFooter, SidebarHeader } from '@/components/side-navigation/sidebar';
 import TruncatedText from '@/components/truncated-text';
-import { stepSchema } from '@/components/workflow-editor/schema';
+import { buildStepSchema } from '@/components/workflow-editor/schema';
 import {
+  flattenIssues,
   getFirstBodyErrorMessage,
   getFirstControlsErrorMessage,
   updateStepInWorkflow,
 } from '@/components/workflow-editor/step-utils';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { buildRoute, ROUTES } from '@/utils/routes';
-import { EXCLUDED_EDITOR_TYPES } from '@/utils/constants';
+import {
+  INLINE_CONFIGURABLE_STEP_TYPES,
+  TEMPLATE_CONFIGURABLE_STEP_TYPES,
+  UNSUPPORTED_STEP_TYPES,
+} from '@/utils/constants';
 import { STEP_NAME_BY_TYPE } from './step-provider';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
+import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
+import { buildDefaultValues } from '@/utils/schema';
+import merge from 'lodash.merge';
+import { DelayControlValues } from '@/components/workflow-editor/steps/delay/delay-control-values';
 import { ConfigureStepTemplateCta } from '@/components/workflow-editor/steps/configure-step-template-cta';
 import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/email/configure-email-step-preview';
 
-const stepTypeToPreview: Record<string, ((props: HTMLAttributes<HTMLDivElement>) => ReactNode) | undefined> = {
+const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
+  [StepTypeEnum.DELAY]: DelayControlValues,
+  [StepTypeEnum.IN_APP]: () => null,
+  [StepTypeEnum.EMAIL]: () => null,
+  [StepTypeEnum.SMS]: () => null,
+  [StepTypeEnum.CHAT]: () => null,
+  [StepTypeEnum.PUSH]: () => null,
+  [StepTypeEnum.CUSTOM]: () => null,
+  [StepTypeEnum.TRIGGER]: () => null,
+  [StepTypeEnum.DIGEST]: () => null,
+};
+
+const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, (props: HTMLAttributes<HTMLDivElement>) => ReactNode> = {
   [StepTypeEnum.IN_APP]: ConfigureInAppStepPreview,
   [StepTypeEnum.EMAIL]: ConfigureEmailStepPreview,
+  [StepTypeEnum.SMS]: () => null,
+  [StepTypeEnum.CHAT]: () => null,
+  [StepTypeEnum.PUSH]: () => null,
+  [StepTypeEnum.CUSTOM]: () => null,
+  [StepTypeEnum.TRIGGER]: () => null,
+  [StepTypeEnum.DIGEST]: () => null,
+  [StepTypeEnum.DELAY]: () => null,
+};
+
+const calculateDefaultControlsValues = (step: StepDataDto) => {
+  if (Object.keys(step.controls.uiSchema ?? {}).length !== 0) {
+    return merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values);
+  }
+
+  return merge(buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {}), step.controls.values);
 };
 
 type ConfigureStepFormProps = {
   workflow: WorkflowResponseDto;
   environment: IEnvironment;
   step: StepDataDto;
+  issues?: StepIssuesDto;
   update: (data: UpdateWorkflowDto) => void;
   updateStepCache: (step: Partial<StepDataDto>) => void;
 };
 
 export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
-  const { step, workflow, update, updateStepCache, environment } = props;
+  const { step, workflow, update, updateStepCache, environment, issues } = props;
+
+  const isSupportedStep = !UNSUPPORTED_STEP_TYPES.includes(step.type);
+  const isReadOnly = !isSupportedStep || workflow.origin === WorkflowOriginEnum.EXTERNAL;
+
+  const isTemplateConfigurableStep = isSupportedStep && TEMPLATE_CONFIGURABLE_STEP_TYPES.includes(step.type);
+  const isInlineConfigurableStep = isSupportedStep && INLINE_CONFIGURABLE_STEP_TYPES.includes(step.type);
+
   const navigate = useNavigate();
-  const isCodeCreatedWorkflow = workflow.origin === WorkflowOriginEnum.EXTERNAL;
-  const areNewStepsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
-
-  const supportedStepTypes = [StepTypeEnum.IN_APP];
-  if (areNewStepsEnabled) {
-    supportedStepTypes.push(StepTypeEnum.EMAIL);
-  }
-  const Preview = stepTypeToPreview[step.type] || (() => null);
-
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const onDeleteStep = () => {
@@ -72,35 +106,72 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     navigate(buildRoute(ROUTES.EDIT_WORKFLOW, { environmentSlug: environment.slug!, workflowSlug: workflow.slug }));
   };
 
-  const defaultValues = {
-    name: step.name,
-    stepId: step.stepId,
-  };
+  const registerInlineControlValues = useMemo(() => {
+    return (step: StepDataDto) => {
+      if (isInlineConfigurableStep) {
+        return {
+          controlValues: calculateDefaultControlsValues(step),
+        };
+      }
 
-  const form = useForm<z.infer<typeof stepSchema>>({
+      return {};
+    };
+  }, [isInlineConfigurableStep]);
+
+  const controlsSchema = useMemo(
+    () => (isInlineConfigurableStep ? buildDynamicZodSchema(step.controls.dataSchema ?? {}) : undefined),
+    [step.controls.dataSchema, isInlineConfigurableStep]
+  );
+
+  const defaultValues = useMemo(
+    () => ({
+      name: step.name,
+      stepId: step.stepId,
+      ...registerInlineControlValues(step),
+    }),
+    [step, registerInlineControlValues]
+  );
+
+  const form = useForm({
     defaultValues,
-    resolver: zodResolver(stepSchema),
+    resolver: zodResolver(buildStepSchema(controlsSchema)),
     shouldFocusError: false,
   });
 
   const { onBlur } = useFormAutosave({
-    previousData: step,
+    previousData: defaultValues,
     form,
-    isReadOnly: isCodeCreatedWorkflow,
+    isReadOnly,
     save: (data) => {
-      update(updateStepInWorkflow(workflow, data));
-      updateStepCache(data);
+      // transform form fields to step update dto
+      const updateStepData: Partial<StepUpdateDto> = {
+        name: data.name,
+        ...(data.controlValues ? { controlValues: data.controlValues } : {}),
+      };
+      update(updateStepInWorkflow(workflow, step.stepId, updateStepData));
+      updateStepCache(updateStepData);
     },
   });
 
   const firstError = useMemo(
-    () => (step ? getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues) : undefined),
+    () =>
+      step.issues ? getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues) : undefined,
     [step]
   );
 
-  const isDashboardStepThatSupportsEditor = !isCodeCreatedWorkflow && supportedStepTypes.includes(step.type);
-  const isCodeStepThatSupportsEditor = isCodeCreatedWorkflow && !EXCLUDED_EDITOR_TYPES.includes(step.type);
-  const isStepSupportsEditor = isDashboardStepThatSupportsEditor || isCodeStepThatSupportsEditor;
+  const setControlValuesIssues = useCallback(() => {
+    const stepIssues = flattenIssues(issues?.controls);
+    Object.entries(stepIssues).forEach(([key, value]) => {
+      form.setError(`controlValues.${key}`, { message: value });
+    });
+  }, [form, issues]);
+
+  useEffect(() => {
+    setControlValuesIssues();
+  }, [setControlValuesIssues]);
+
+  const Preview = STEP_TYPE_TO_PREVIEW[step.type];
+  const InlineControlValues = STEP_TYPE_TO_INLINE_CONTROL_VALUES[step.type];
 
   return (
     <>
@@ -151,7 +222,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                     <FormLabel>Name</FormLabel>
                     <FormControl>
                       <InputField>
-                        <Input placeholder="Untitled" {...field} disabled={isCodeCreatedWorkflow} />
+                        <Input placeholder="Untitled" {...field} disabled={isReadOnly} />
                       </InputField>
                     </FormControl>
                     <FormMessage />
@@ -175,11 +246,20 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                 )}
               />
             </SidebarContent>
+
+            {isInlineConfigurableStep && (
+              <>
+                <Separator />
+                <SidebarContent>
+                  <InlineControlValues />
+                </SidebarContent>
+              </>
+            )}
           </form>
         </Form>
         <Separator />
 
-        {isStepSupportsEditor && (
+        {isTemplateConfigurableStep && (
           <>
             <SidebarContent>
               <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
@@ -195,16 +275,13 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               </Link>
             </SidebarContent>
             <Separator />
+            <ConfigureStepTemplateCta step={step} issue={firstError}>
+              <Preview />
+            </ConfigureStepTemplateCta>
           </>
         )}
 
-        {supportedStepTypes.includes(step.type) && (
-          <ConfigureStepTemplateCta step={step} issue={firstError}>
-            <Preview />
-          </ConfigureStepTemplateCta>
-        )}
-
-        {!isCodeCreatedWorkflow && !supportedStepTypes.includes(step.type) && (
+        {!isSupportedStep && (
           <>
             <SidebarContent>
               <SdkBanner />
@@ -212,7 +289,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
           </>
         )}
 
-        {!isCodeCreatedWorkflow && (
+        {!isReadOnly && (
           <>
             <SidebarFooter>
               <Separator />
