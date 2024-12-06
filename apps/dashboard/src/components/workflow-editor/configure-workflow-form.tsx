@@ -211,7 +211,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
               type="button"
             >
               <RiSettingsLine className="h-4 w-4 text-neutral-600" />
-              Configure default preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
+              Configure channel preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
             </Button>
           </Link>
         </SidebarContent>
