@@ -6,11 +6,12 @@ import {
   type StepDataDto,
   StepIssuesDto,
   StepTypeEnum,
+  StepUpdateDto,
   UpdateWorkflowDto,
   type WorkflowResponseDto,
 } from '@novu/shared';
 
-import { flattenIssues, updateStepControlValuesInWorkflow } from '@/components/workflow-editor/step-utils';
+import { flattenIssues, updateStepInWorkflow } from '@/components/workflow-editor/step-utils';
 import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
 import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
 import { OtherStepTabs } from './other-steps-tabs';
@@ -19,7 +20,7 @@ import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { EmailTabs } from '@/components/workflow-editor/steps/email/email-tabs';
 
-const STEP_TYPE_TO_EDITOR: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
+const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
   [StepTypeEnum.EMAIL]: EmailTabs,
   [StepTypeEnum.CHAT]: OtherStepTabs,
   [StepTypeEnum.IN_APP]: InAppTabs,
@@ -48,10 +49,11 @@ export type StepEditorProps = {
 type ConfigureStepTemplateFormProps = StepEditorProps & {
   issues?: StepIssuesDto;
   update: (data: UpdateWorkflowDto) => void;
+  updateStepCache: (step: Partial<StepDataDto>) => void;
 };
 
 export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps) => {
-  const { workflow, step, issues, update } = props;
+  const { workflow, step, update, updateStepCache, issues } = props;
   const schema = useMemo(() => buildDynamicZodSchema(step.controls.dataSchema ?? {}), [step.controls.dataSchema]);
 
   const defaultValues = useMemo(() => {
@@ -68,7 +70,12 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
     previousData: defaultValues,
     form,
     save: (data) => {
-      update(updateStepControlValuesInWorkflow(workflow, step, data));
+      // transform form fields to step update dto
+      const updateStepData: Partial<StepUpdateDto> = {
+        controlValues: data,
+      };
+      update(updateStepInWorkflow(workflow, step.stepId, updateStepData));
+      updateStepCache(updateStepData);
     },
   });
 
@@ -83,7 +90,7 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
     setIssuesFromStep();
   }, [setIssuesFromStep]);
 
-  const Editor = STEP_TYPE_TO_EDITOR[step.type];
+  const TemplateForm = STEP_TYPE_TO_TEMPLATE_FORM[step.type];
 
   const value = useMemo(() => ({ saveForm }), [saveForm]);
 
@@ -91,7 +98,7 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
     <Form {...form}>
       <form className="flex h-full flex-col" onBlur={onBlur}>
         <SaveFormContext.Provider value={value}>
-          <Editor workflow={workflow} step={step} />
+          <TemplateForm workflow={workflow} step={step} />
         </SaveFormContext.Provider>
       </form>
     </Form>

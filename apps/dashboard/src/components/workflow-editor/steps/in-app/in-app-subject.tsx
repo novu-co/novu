@@ -1,5 +1,5 @@
-import { EditorView } from '@uiw/react-codemirror';
 import { useMemo } from 'react';
+import { EditorView } from '@uiw/react-codemirror';
 import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
@@ -17,6 +17,10 @@ export const InAppSubject = () => {
   const { control } = useFormContext();
   const { step } = useStep();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
+  const extensions = useMemo(
+    () => [autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping],
+    [variables]
+  );
 
   return (
     <FormField
@@ -30,9 +34,9 @@ export const InAppSubject = () => {
                 fontFamily="inherit"
                 placeholder={capitalize(field.name)}
                 id={field.name}
-                extensions={[autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping]}
+                extensions={extensions}
                 value={field.value}
-                onChange={(val) => field.onChange(val)}
+                onChange={field.onChange}
               />
             </FormControl>
             <FormMessage />

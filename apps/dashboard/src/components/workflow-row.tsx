@@ -56,7 +56,6 @@ const toastOptions: ExternalToast = {
 export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { currentEnvironment } = useEnvironment();
   const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
 
@@ -225,7 +224,10 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           confirmButtonText="Proceed"
           isLoading={isPauseWorkflowPending}
         />
-        <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+        {/**
+         * Needs modal={false} to prevent the click freeze after the modal is closed
+         */}
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
               <RiMore2Fill className="h-4 w-4" />
@@ -272,7 +274,6 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
                 disabled={workflow.origin === WorkflowOriginEnum.EXTERNAL}
                 onClick={() => {
                   setIsDeleteModalOpen(true);
-                  setIsDropdownOpen(false);
                 }}
               >
                 <RiDeleteBin2Line />

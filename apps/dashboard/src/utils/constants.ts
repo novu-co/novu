@@ -6,9 +6,12 @@ export const AUTOCOMPLETE_PASSWORD_MANAGERS_OFF = {
   'data-form-type': 'other',
 };
 
-export const EXCLUDED_EDITOR_TYPES: string[] = [
+export const UNSUPPORTED_STEP_TYPES: readonly StepTypeEnum[] = [
   StepTypeEnum.DIGEST,
-  StepTypeEnum.DELAY,
   StepTypeEnum.TRIGGER,
   StepTypeEnum.CUSTOM,
 ];
+
+export const INLINE_CONFIGURABLE_STEP_TYPES: readonly StepTypeEnum[] = [StepTypeEnum.DELAY];
+
+export const TEMPLATE_CONFIGURABLE_STEP_TYPES: readonly StepTypeEnum[] = [StepTypeEnum.IN_APP, StepTypeEnum.EMAIL];

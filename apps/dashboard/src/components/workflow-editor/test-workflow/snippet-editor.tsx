@@ -4,6 +4,8 @@ import { loadLanguage, LanguageName } from '@uiw/codemirror-extensions-langs';
 import { Editor } from '@/components/primitives/editor';
 import type { SnippetLanguage } from './types';
 
+const basicSetup = { lineNumbers: true };
+
 export const SnippetEditor = ({
   language,
   value,
@@ -31,7 +33,7 @@ export const SnippetEditor = ({
       className="h-full"
       value={value}
       extensions={extensions}
-      basicSetup={{ lineNumbers: true }}
+      basicSetup={basicSetup}
     />
   );
 };
