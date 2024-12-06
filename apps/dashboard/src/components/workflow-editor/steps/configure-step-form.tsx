@@ -93,10 +93,17 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const areNewStepsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
 
-  let supportedStepTypes = [StepTypeEnum.IN_APP, StepTypeEnum.SMS, StepTypeEnum.CHAT, StepTypeEnum.PUSH];
+  // we allow some form of configuration in the dashboard
+  let supportedStepTypes = [
+    StepTypeEnum.IN_APP,
+    StepTypeEnum.SMS,
+    StepTypeEnum.CHAT,
+    StepTypeEnum.PUSH,
+    StepTypeEnum.EMAIL,
+  ];
 
   if (areNewStepsEnabled) {
-    supportedStepTypes = [...supportedStepTypes, StepTypeEnum.DIGEST, StepTypeEnum.DELAY, StepTypeEnum.EMAIL];
+    supportedStepTypes = [...supportedStepTypes, StepTypeEnum.DIGEST, StepTypeEnum.DELAY];
   }
 
   const isSupportedStep = supportedStepTypes.includes(step.type);
