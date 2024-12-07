@@ -15,8 +15,8 @@ import {
   slugify,
   StepContentIssueEnum,
   StepCreateDto,
+  StepDataDto,
   StepIssueEnum,
-  StepResponseDto,
   StepTypeEnum,
   StepUpdateDto,
   UpdateStepBody,
@@ -498,10 +498,7 @@ describe('Workflow Controller E2E API Testing', () => {
          * TODO: this is not true yet, but some ID will remain the same across environments
          * expect(prodStep.stepId).to.equal(devStep.stepId, 'Step ID should be the same');
          */
-        const prodValues = await getWorkflowStepControlValues(prodWorkflow, prodStep, prodEnvironmentId);
-
-        const devValues = await getWorkflowStepControlValues(devWorkflow, devStep, devEnvironmentId);
-        expect(prodValues).to.deep.equal(devValues, 'Step controlValues should match');
+        expect(prodStep.controls.values).to.deep.equal(devStep.controls.values, 'Step controlValues should match');
         expect(prodStep.name).to.equal(devStep.name, 'Step name should match');
         expect(prodStep.type).to.equal(devStep.type, 'Step type should match');
       }
@@ -875,7 +872,7 @@ describe('Workflow Controller E2E API Testing', () => {
     return Object.keys(controlValues).length === 0 ? undefined : controlValues;
   }
 
-  function prepareStepsForUpdateWithNewValues(steps: StepResponseDto[]): StepUpdateDto[] {
+  function prepareStepsForUpdateWithNewValues(steps: StepDataDto[]): StepUpdateDto[] {
     const newSteps: StepUpdateDto[] = [];
     for (const step of steps) {
       const newStep: StepUpdateDto = {
@@ -924,11 +921,6 @@ describe('Workflow Controller E2E API Testing', () => {
     return value;
   }
 
-  async function getWorkflowStepControlValues(workflow: WorkflowResponseDto, step: StepResponseDto, envId: string) {
-    const value = await getStepData(workflow._id, step._id, envId);
-
-    return value.controls.values;
-  }
   async function updateWorkflowAndValidate(
     workflowRequestId: string,
     expectedPastUpdatedAt: string,
@@ -951,18 +943,15 @@ describe('Workflow Controller E2E API Testing', () => {
   }
   async function assertValuesInSteps(workflowCreated: WorkflowResponseDto) {
     for (const step of workflowCreated.steps) {
-      const stepDataDto = await getStepData(workflowCreated._id, step._id);
-      expect(stepDataDto).to.be.ok;
-      expect(stepDataDto.controls).to.be.ok;
-      if (stepDataDto.controls) {
-        expect(stepDataDto.controls.values).to.be.ok;
-        expect(stepDataDto.controls.dataSchema).to.be.ok;
-        expect(Object.keys(stepDataDto.controls.dataSchema?.properties || {}).length).to.deep.equal(
+      expect(step).to.be.ok;
+      expect(step.controls).to.be.ok;
+      if (step.controls) {
+        expect(step.controls.values).to.be.ok;
+        expect(step.controls.dataSchema).to.be.ok;
+        expect(Object.keys(step.controls.dataSchema?.properties || {}).length).to.deep.equal(
           Object.keys(stepTypeToDefaultDashboardControlSchema[step.type].schema.properties).length
         );
-        expect(stepDataDto.controls.uiSchema).to.deep.equal(
-          stepTypeToDefaultDashboardControlSchema[step.type].uiSchema
-        );
+        expect(step.controls.uiSchema).to.deep.equal(stepTypeToDefaultDashboardControlSchema[step.type].uiSchema);
       }
     }
   }

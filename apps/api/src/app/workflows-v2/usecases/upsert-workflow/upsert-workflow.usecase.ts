@@ -28,10 +28,11 @@ import {
 } from '@novu/application-generic';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
-import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
 import { PatchStepUsecase } from '../patch-step-data';
 import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
+import { GetWorkflowUseCase } from '../get-workflow/get-workflow.usecase';
+import { GetWorkflowCommand } from '../get-workflow/get-workflow.command';
 
 @Injectable()
 export class UpsertWorkflowUseCase {
@@ -41,6 +42,7 @@ export class UpsertWorkflowUseCase {
     private notificationGroupRepository: NotificationGroupRepository,
     private workflowUpdatePostProcess: PostProcessWorkflowUpdate,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
+    private getWorkflowUseCase: GetWorkflowUseCase,
     private patchStepDataUsecase: PatchStepUsecase
   ) {}
 
@@ -54,9 +56,15 @@ export class UpsertWorkflowUseCase {
       workflow: persistedWorkflow,
     });
     await this.persistWorkflow(validatedWorkflowWithIssues);
-    persistedWorkflow = await this.getWorkflow(validatedWorkflowWithIssues._id, command);
 
-    return toResponseWorkflowDto(persistedWorkflow);
+    const workflow = await this.getWorkflowUseCase.execute(
+      GetWorkflowCommand.create({
+        workflowIdOrInternalId: validatedWorkflowWithIssues._id,
+        user: command.user,
+      })
+    );
+
+    return workflow;
   }
 
   @Instrument()
