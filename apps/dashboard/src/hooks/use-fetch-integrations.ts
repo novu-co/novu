@@ -4,7 +4,7 @@ import { IIntegration } from '@novu/shared';
 import { useEnvironment } from '../context/environment/hooks';
 import { QueryKeys } from '../utils/query-keys';
 
-export function useIntegrations({
+export function useFetchIntegrations({
   refetchInterval,
   refetchOnWindowFocus,
 }: { refetchInterval?: number; refetchOnWindowFocus?: boolean } = {}) {
@@ -12,9 +12,10 @@ export function useIntegrations({
 
   const { data: integrations, ...rest } = useQuery<IIntegration[]>({
     queryKey: [QueryKeys.fetchIntegrations, currentEnvironment?._id],
-    queryFn: getIntegrations,
+    queryFn: () => getIntegrations({ environment: currentEnvironment! }),
     refetchInterval,
     refetchOnWindowFocus,
+    enabled: !!currentEnvironment?._id,
   });
 
   return {

@@ -22,7 +22,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '../primitives
 import { Separator } from '../primitives/separator';
 import { Step } from '../primitives/step';
 import { Switch } from '../primitives/switch';
-import { useTelemetry } from '@/hooks';
+import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 
 type ConfigureWorkflowFormProps = {

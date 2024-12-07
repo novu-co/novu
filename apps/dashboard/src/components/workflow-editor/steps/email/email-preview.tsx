@@ -22,3 +22,66 @@ export const EmailPreviewHeader = (props: EmailPreviewHeaderProps) => {
     </div>
   );
 };
+
+type EmailPreviewSubjectProps = HTMLAttributes<HTMLHeadingElement> & {
+  subject: string;
+};
+export const EmailPreviewSubject = (props: EmailPreviewSubjectProps) => {
+  const { subject, className, ...rest } = props;
+
+  return (
+    <h3 className={cn('px-6 py-4', className)} {...rest}>
+      {subject}
+    </h3>
+  );
+};
+
+type EmailPreviewBodyProps = HTMLAttributes<HTMLIFrameElement> & {
+  body: string;
+};
+export const EmailPreviewBody = (props: EmailPreviewBodyProps) => {
+  const { body, className, ...rest } = props;
+
+  return (
+    <iframe
+      className={cn('mx-auto h-96 w-full py-6', className)}
+      src={'data:text/html,' + encodeURIComponent(body)}
+      {...rest}
+    />
+  );
+};
+
+type EmailPreviewContentMobileProps = HTMLAttributes<HTMLDivElement>;
+export const EmailPreviewContentMobile = (props: EmailPreviewContentMobileProps) => {
+  const { className, ...rest } = props;
+
+  return <div className={cn('bg-background max-w-sm', className)} {...rest} />;
+};
+
+type EmailPreviewBodyMobileProps = HTMLAttributes<HTMLIFrameElement> & {
+  body: string;
+};
+export const EmailPreviewBodyMobile = (props: EmailPreviewBodyMobileProps) => {
+  const { body, className, ...rest } = props;
+
+  return (
+    <iframe
+      className={cn('mx-auto h-96 w-full px-4', className)}
+      src={'data:text/html,' + encodeURIComponent(body)}
+      {...rest}
+    />
+  );
+};
+
+type EmailPreviewSubjectMobileProps = HTMLAttributes<HTMLDivElement> & {
+  subject: string;
+};
+export const EmailPreviewSubjectMobile = (props: EmailPreviewSubjectMobileProps) => {
+  const { subject, className, ...rest } = props;
+
+  return (
+    <div className={cn('bg-neutral-50 px-6 py-4', className)} {...rest}>
+      <h3 className="line-clamp-2">{subject}</h3>
+    </div>
+  );
+};

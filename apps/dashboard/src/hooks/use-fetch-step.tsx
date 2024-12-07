@@ -4,7 +4,7 @@ import type { StepDataDto, StepUpdateDto } from '@novu/shared';
 
 import { QueryKeys } from '@/utils/query-keys';
 import { useEnvironment } from '@/context/environment/hooks';
-import { fetchStep } from '@/api/steps';
+import { getStep } from '@/api/steps';
 import { getEncodedId, STEP_DIVIDER, WORKFLOW_DIVIDER } from '@/utils/step';
 
 export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string; stepSlug: string }) => {
@@ -22,7 +22,7 @@ export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string;
 
   const { data, isPending, isRefetching, error } = useQuery<StepDataDto>({
     queryKey,
-    queryFn: () => fetchStep({ workflowSlug: workflowSlug, stepSlug: stepSlug }),
+    queryFn: () => getStep({ environment: currentEnvironment!, workflowSlug: workflowSlug, stepSlug: stepSlug }),
     enabled: !!currentEnvironment?._id && !!stepSlug && !!workflowSlug,
   });
 
