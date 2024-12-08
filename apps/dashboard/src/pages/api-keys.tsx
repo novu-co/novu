@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, ReactNode } from 'react';
 import { RiKey2Line, RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 import { useEnvironment } from '@/context/environment/hooks';
 import { CopyButton } from '@/components/primitives/copy-button';
-import { Card, CardContent } from '@/components/primitives/card';
+import { Card, CardContent, CardHeader } from '@/components/primitives/card';
 import { Button } from '@/components/primitives/button';
 import { Input, InputField } from '@/components/primitives/input';
 import { Form } from '@/components/primitives/form/form';
@@ -11,6 +11,63 @@ import { DashboardLayout } from '../components/dashboard-layout';
 import { PageMeta } from '@/components/page-meta';
 import { useFetchApiKeys } from '../hooks/use-fetch-api-keys';
 import { ExternalLink } from '@/components/shared/external-link';
+import { Container } from '../components/primitives/container';
+import { HelpTooltipIndicator } from '../components/primitives/help-tooltip-indicator';
+
+interface SettingFieldProps {
+  label: string;
+  tooltip?: string;
+  children: ReactNode;
+}
+
+function SettingField({ label, tooltip, children }: SettingFieldProps) {
+  return (
+    <div className="grid grid-cols-[1fr,400px] items-start gap-3">
+      <label className={`text-foreground-950 text-xs font-medium`}>
+        {label}
+        {tooltip && <HelpTooltipIndicator text={tooltip} className="relative top-[5px] ml-1" />}
+      </label>
+      <div className="space-y-2">{children}</div>
+    </div>
+  );
+}
+
+interface SettingSecretFieldProps extends Omit<SettingFieldProps, 'children'> {
+  value: string;
+  onCopy: (value: string) => void;
+}
+
+function SettingSecretField({ label, tooltip, value, onCopy }: SettingSecretFieldProps) {
+  const [showSecret, setShowSecret] = useState(false);
+
+  const toggleSecretVisibility = () => {
+    setShowSecret(!showSecret);
+  };
+
+  const maskSecret = (secret: string) => {
+    return `${'•'.repeat(28)} ${secret.slice(-4)}`;
+  };
+
+  return (
+    <SettingField label={label} tooltip={tooltip}>
+      <div className="flex items-center gap-2">
+        <InputField className="flex overflow-hidden pr-0">
+          <Input className="cursor-default" value={showSecret ? value : maskSecret(value)} readOnly />
+          <CopyButton size="input-right" valueToCopy={value} />
+        </InputField>
+
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={toggleSecretVisibility}
+          aria-label={showSecret ? 'Hide Secret' : 'Show Secret'}
+        >
+          {showSecret ? <RiEyeOffLine className="size-4" /> : <RiEyeLine className="size-4" />}
+        </Button>
+      </div>
+    </SettingField>
+  );
+}
 
 interface ApiKeysFormData {
   apiKey: string;
@@ -21,7 +78,6 @@ interface ApiKeysFormData {
 export function ApiKeysPage() {
   const apiKeysQuery = useFetchApiKeys();
   const { currentEnvironment } = useEnvironment();
-  const [showApiKey, setShowApiKey] = useState(false);
   const apiKeys = apiKeysQuery.data?.data;
 
   const form = useForm<ApiKeysFormData>({
@@ -36,79 +92,79 @@ export function ApiKeysPage() {
     return null;
   }
 
-  const toggleApiKeyVisibility = () => {
-    setShowApiKey(!showApiKey);
-  };
-
-  const maskApiKey = (key: string) => {
-    return `${'•'.repeat(28)} ${key.slice(-4)}`;
-  };
-
   return (
     <>
       <PageMeta title={`API Keys for ${currentEnvironment?.name} environment`} />
       <DashboardLayout headerStartItems={<h1 className="text-foreground-950">API Keys</h1>}>
-        <div className="flex flex-col gap-6 p-6">
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr,500px]">
-            <Form {...form}>
-              <Card className="shadow-none">
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <label className="text-foreground-600 text-sm font-medium">Secret Key</label>
-                      <div className="flex items-center gap-2">
-                        <InputField className="flex overflow-hidden pr-0">
-                          <Input
-                            className="cursor-default"
-                            value={showApiKey ? form.getValues('apiKey') : maskApiKey(form.getValues('apiKey'))}
-                            readOnly
-                          />
-                          <CopyButton size="input-right" valueToCopy={form.getValues('apiKey')} />
-                        </InputField>
-
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={toggleApiKeyVisibility}
-                          aria-label={showApiKey ? 'Hide API Key' : 'Show API Key'}
-                        >
-                          {showApiKey ? <RiEyeOffLine className="size-4" /> : <RiEyeLine className="size-4" />}
-                        </Button>
-                      </div>
-                      <p className="text-foreground-600 text-xs">
-                        Use this key to authenticate your API requests. Keep it secure and never share it publicly.
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-foreground-600 text-sm font-medium">Application Identifier</label>
-                      <div className="flex items-center gap-2">
-                        <InputField className="flex overflow-hidden pr-0">
-                          <Input className="cursor-default" value={form.getValues('identifier')} readOnly />
-                          <CopyButton size="input-right" valueToCopy={form.getValues('identifier')} />
-                        </InputField>
-                      </div>
-                      <p className="text-foreground-600 text-xs">
-                        The public application identifier used for the Inbox component
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Form>
+        <Container>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[224px,1fr]">
             <div className="column flex gap-2 p-6 pt-0">
               <div className="flex flex-col gap-2">
-                <RiKey2Line className="h-10 w-10" />
-                <h2 className="text-foreground-950 text-lg font-medium">Environment Keys</h2>
-                <p className="text-foreground-400 text-md">Copy and manage your public and private keys</p>
+                <RiKey2Line className="h-8 w-8" />
+                <h2 className="text-foreground-950 text-md font-medium">Environment Keys</h2>
+                <p className="text-foreground-400 text-xs">Copy and manage your public and private keys</p>
 
-                <ExternalLink href="https://docs.novu.co/sdks/overview" className="text-sm">
+                <ExternalLink variant="documentation" href="https://docs.novu.co/sdks/overview" className="text-sm">
                   Read about our SDKs
                 </ExternalLink>
               </div>
             </div>
+            <div className="flex flex-col gap-6">
+              <Form {...form}>
+                <Card className="w-full overflow-hidden shadow-none">
+                  <CardHeader>Application</CardHeader>
+
+                  <CardContent className="rounded-b-xl border-t bg-neutral-50 bg-white p-3">
+                    <div className="space-y-4 p-3">
+                      <SettingField label="API URL" tooltip="The base URL for making API requests to Novu">
+                        <div className="flex items-center gap-2">
+                          <InputField className="flex overflow-hidden pr-0">
+                            <Input className="cursor-default" value={form.getValues('identifier')} readOnly />
+                            <CopyButton size="input-right" valueToCopy={form.getValues('identifier')} />
+                          </InputField>
+                        </div>
+                      </SettingField>
+
+                      <SettingField
+                        label="Application Identifier"
+                        tooltip="This is a unique identifier for the current environment, used to initialize the Inbox component"
+                        alignTop
+                      >
+                        <div className="flex items-center gap-2">
+                          <InputField className="flex overflow-hidden pr-0">
+                            <Input className="cursor-default" value={form.getValues('identifier')} readOnly />
+                            <CopyButton size="input-right" valueToCopy={form.getValues('identifier')} />
+                          </InputField>
+                        </div>
+                      </SettingField>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="w-full overflow-hidden shadow-none">
+                  <CardHeader>
+                    Secret Keys
+                    <p className="text-foreground-600 mt-1 text-xs">
+                      Use this key to authenticate your API requests. Keep it secure and never share it publicly.
+                    </p>
+                  </CardHeader>
+
+                  <CardContent className="rounded-b-xl border-t bg-neutral-50 bg-white p-3">
+                    <div className="space-y-4 p-3">
+                      <SettingSecretField
+                        label="Secret Key"
+                        tooltip="Use this key to authenticate your API requests. Keep it secure and never share it publicly."
+                        value={form.getValues('apiKey')}
+                        onCopy={(value) => {}}
+                        alignTop
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Form>
+            </div>
           </div>
-        </div>
+        </Container>
       </DashboardLayout>
     </>
   );
