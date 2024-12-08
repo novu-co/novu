@@ -226,7 +226,10 @@ export function ActivityTable({ activities, selectedActivity, onActivitySelect }
           {activities.map((activity) => (
             <TableRow
               key={activity._id}
-              className={cn('hover:bg-muted/50 cursor-pointer', selectedActivity?._id === activity._id && 'bg-muted')}
+              className={cn(
+                'cursor-pointer hover:bg-neutral-50',
+                selectedActivity?._id === activity._id && 'bg-neutral-50'
+              )}
               onClick={() => onActivitySelect(activity)}
             >
               <TableCell>

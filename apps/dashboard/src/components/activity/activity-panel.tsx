@@ -58,7 +58,9 @@ export function ActivityPanel({ activity }: ActivityPanelProps) {
       <div>
         <div className="flex items-center gap-2 border-b border-t border-neutral-200 border-b-neutral-100 p-2">
           <Route className="h-3 w-3" />
-          <span className="text-foreground-950 text-sm font-medium">{activity.template?.name}</span>
+          <span className="text-foreground-950 text-sm font-medium">
+            {activity.template?.name || 'Deleted workflow'}
+          </span>
         </div>
         <Overview activity={activity} />
 
