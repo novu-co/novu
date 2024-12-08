@@ -16,6 +16,8 @@ import {
   HourglassIcon,
 } from 'lucide-react';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
+import { useState } from 'react';
 
 type ActivityStatus = 'SUCCESS' | 'ERROR' | 'QUEUED';
 
@@ -33,7 +35,9 @@ function getActivityStatus(jobs: Activity['jobs']): ActivityStatus {
   }
 }
 
-function StatusBadge({ status }: { status: ActivityStatus }) {
+function StatusBadge({ status, jobs }: { status: ActivityStatus; jobs: Activity['jobs'] }) {
+  const errorCount = jobs.filter((job) => job.status === 'failed').length;
+
   const config = {
     SUCCESS: {
       variant: 'success' as const,
@@ -43,7 +47,7 @@ function StatusBadge({ status }: { status: ActivityStatus }) {
     ERROR: {
       variant: 'destructive' as const,
       icon: AlertCircle,
-      label: '2 ERRORS',
+      label: `${errorCount} ${errorCount === 1 ? 'ERROR' : 'ERRORS'}`,
     },
     QUEUED: {
       variant: 'warning' as const,
@@ -68,24 +72,106 @@ function getStepIcon(type: string) {
   return <Icon className="h-4 w-4" />;
 }
 
+function StepInfo({ job }: { job: Activity['jobs'][number] }) {
+  const statusMap = {
+    completed: 'Completed',
+    failed: 'Failed',
+    pending: 'Pending',
+  };
+
+  const typeMap: Record<string, string> = {
+    email: 'Email',
+    sms: 'SMS',
+    in_app: 'In-App',
+    chat: 'Chat',
+    push: 'Push Notification',
+    digest: 'Digest',
+  };
+
+  const formattedType = typeMap[job.type] || job.type;
+  const formattedStatus = statusMap[job.status as keyof typeof statusMap] || job.status;
+  const lastExecutionDetail = job.executionDetails?.at(-1);
+
+  return (
+    <div className="flex flex-col gap-2 p-1">
+      <div className="flex items-center gap-2">
+        <div className="flex h-6 w-6 items-center justify-center">{getStepIcon(job.type)}</div>
+        <span className="font-medium">{formattedType}</span>
+      </div>
+      <div className="flex flex-col gap-1.5 text-sm">
+        <div className="flex items-center justify-between">
+          <span className="text-foreground-600">Status</span>
+          <Badge
+            variant={job.status === 'completed' ? 'success' : job.status === 'failed' ? 'destructive' : 'warning'}
+            className="capitalize"
+          >
+            {formattedStatus}
+          </Badge>
+        </div>
+        {lastExecutionDetail && (
+          <div className="flex flex-col gap-1">
+            <span className="text-foreground-600">Details</span>
+            <span className="text-xs">{lastExecutionDetail.detail || 'No details available'}</span>
+          </div>
+        )}
+        <div className="flex items-center justify-between">
+          <span className="text-foreground-600">Timestamp</span>
+          <span className="text-xs">{formatDate(job.createdAt)}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function StepIndicators({ jobs }: { jobs: Activity['jobs'] }) {
+  const [openPopoverId, setOpenPopoverId] = useState<string | null>(null);
+  let hoverTimeout: NodeJS.Timeout;
+
+  const handleMouseEnter = (jobId: string) => {
+    clearTimeout(hoverTimeout);
+
+    hoverTimeout = setTimeout(() => {
+      setOpenPopoverId(jobId);
+    }, 300);
+  };
+
+  const handleMouseLeave = () => {
+    clearTimeout(hoverTimeout);
+    setOpenPopoverId(null);
+  };
+
   return (
     <div className="flex items-center">
       {jobs.map((job) => (
-        <div
-          key={job._id}
-          className={cn(
-            '-ml-2 flex h-7 w-7 items-center justify-center rounded-full first:ml-0',
-            job.status === 'completed'
-              ? 'border-[1px] border-[#b4e6c5] bg-[#e8f9ef] text-[#b4e6c5]'
-              : job.status === 'failed'
-                ? 'border-[1px] border-[#fca5a5] bg-[#fde8e8] text-[#fca5a5]'
-                : 'border-[1px] border-[#e0e0e0] bg-[#f0f0f0] text-[#e0e0e0]'
-          )}
-          title={`${job.type} - ${job.status}`}
-        >
-          {getStepIcon(job.type)}
-        </div>
+        <Popover key={job._id} open={openPopoverId === job._id}>
+          <PopoverTrigger
+            onMouseEnter={() => handleMouseEnter(job._id)}
+            onMouseLeave={handleMouseLeave}
+            className="-ml-2 cursor-pointer"
+          >
+            <div
+              className={cn(
+                'flex h-7 w-7 cursor-pointer items-center justify-center rounded-full first:ml-0',
+                job.status === 'completed'
+                  ? 'border-[1px] border-[#b4e6c5] bg-[#e8f9ef] text-[#b4e6c5]'
+                  : job.status === 'failed'
+                    ? 'border-[1px] border-[#fca5a5] bg-[#fde8e8] text-[#fca5a5]'
+                    : 'border-[1px] border-[#e0e0e0] bg-[#f0f0f0] text-[#e0e0e0]'
+              )}
+            >
+              {getStepIcon(job.type)}
+            </div>
+          </PopoverTrigger>
+          <PopoverContent
+            className="w-64"
+            align="center"
+            sideOffset={5}
+            onMouseEnter={() => setOpenPopoverId(job._id)}
+            onMouseLeave={handleMouseLeave}
+          >
+            <StepInfo job={job} />
+          </PopoverContent>
+        </Popover>
       ))}
     </div>
   );
@@ -127,7 +213,7 @@ export function ActivityTable({ activities, selectedActivity, onActivitySelect }
                 </div>
               </TableCell>
               <TableCell>
-                <StatusBadge status={getActivityStatus(activity.jobs)} />
+                <StatusBadge status={getActivityStatus(activity.jobs)} jobs={activity.jobs} />
               </TableCell>
               <TableCell>
                 <StepIndicators jobs={activity.jobs} />
