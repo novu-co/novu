@@ -58,13 +58,13 @@ export class GeneratePreviewUsecase {
         })
       );
 
-      const res = this.buildVariablesSchema(stepData.variables, payloadSchema);
+      const variableSchema = this.buildVariablesSchema(stepData.variables, payloadSchema);
       const preparedAndValidatedContent = await this.prepareAndValidateContentUsecase.execute({
         user: command.user,
         previewPayloadFromDto: commandVariablesExample,
         controlValues,
         controlDataSchema: stepData.controls.dataSchema || {},
-        variableSchema: res,
+        variableSchema,
       });
       const variablesExample = this.buildVariablesExample(
         workflow,
