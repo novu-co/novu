@@ -32,4 +32,5 @@ export enum TelemetryEvent {
   BILLING_CONTACT_SALES_MODAL_CLOSED = 'Contact sales modal closed - [Billing]',
   WORKFLOW_PREFERENCES_OVERRIDE_USED = 'Workflow preferences override used',
   EXPORT_TO_CODE_BANNER_REACTION = 'Export to Code banner reaction - [Promotional]',
+  EXTERNAL_LINK_CLICKED = 'External link clicked',
 }

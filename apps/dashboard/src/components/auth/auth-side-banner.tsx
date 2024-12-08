@@ -29,7 +29,7 @@ export function AuthSideBanner() {
       <div className="flex flex-col items-start justify-start gap-8 self-stretch">
         <AuthFeatureRow
           icon={<Plug className="h-6 w-6" />}
-          title="Integrates easily, delivers powerful notifications"
+          title="Powerful notifications, easy integrations"
           description="Unlimited workflows, unlimited providers, unlimited subscribers with 99.9% uptime SLA"
         />
         <AuthFeatureRow
@@ -39,7 +39,7 @@ export function AuthSideBanner() {
         />
         <AuthFeatureRow
           icon={<ShieldZap className="h-6 w-6" />}
-          title="Built-in security, Observable and Scalable"
+          title="Observable and scalable with built-in security"
           description="Novu handles any volume, any channel, and any team for mission-critical notifications."
         />
       </div>
