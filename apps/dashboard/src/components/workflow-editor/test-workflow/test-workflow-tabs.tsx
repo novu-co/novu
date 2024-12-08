@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 // eslint-disable-next-line
 // @ts-ignore
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { WorkflowTestDataResponseDto } from '@novu/shared';
+import { createMockObjectFromSchema, type WorkflowTestDataResponseDto } from '@novu/shared';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitives/tabs';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { useFetchWorkflow } from '@/hooks/use-fetch-workflow';
@@ -13,7 +13,7 @@ import { Form } from '../../primitives/form/form';
 import { Button } from '../../primitives/button';
 import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
 import { showToast } from '../../primitives/sonner-helpers';
-import { buildDynamicFormSchema, makeObjectFromSchema, TestWorkflowFormType } from '../schema';
+import { buildDynamicFormSchema, TestWorkflowFormType } from '../schema';
 import { TestWorkflowForm } from './test-workflow-form';
 import { toast } from 'sonner';
 import { ToastClose, ToastIcon } from '@/components/primitives/sonner';
@@ -23,17 +23,8 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
   const { workflow } = useFetchWorkflow({
     workflowSlug,
   });
-  const to = useMemo(
-    () => (typeof testData.to === 'object' ? makeObjectFromSchema({ properties: testData.to.properties ?? {} }) : {}),
-    [testData]
-  );
-  const payload = useMemo(
-    () =>
-      typeof testData.payload === 'object'
-        ? makeObjectFromSchema({ properties: testData.payload.properties ?? {} })
-        : {},
-    [testData]
-  );
+  const to = useMemo(() => createMockObjectFromSchema(testData.to, true), [testData]);
+  const payload = useMemo(() => createMockObjectFromSchema(testData.payload, true), [testData]);
   const form = useForm<TestWorkflowFormType>({
     mode: 'onSubmit',
     resolver: zodResolver(buildDynamicFormSchema({ to: testData?.to ?? {} })),
