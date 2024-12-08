@@ -1,18 +1,21 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query';
-import type { WorkflowResponseDto } from '@novu/shared';
+import { getEncodedId, WORKFLOW_DIVIDER } from '@/utils/step';
+import { OmitEnvironmentFromParameters } from '@/utils/types';
+import { QueryKeys } from '@/utils/query-keys';
 import { updateWorkflow } from '@/api/workflows';
 import { useEnvironment } from '@/context/environment/hooks';
-import { QueryKeys } from '@/utils/query-keys';
-import { getEncodedId, WORKFLOW_DIVIDER } from '@/utils/step';
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query';
+import type { WorkflowResponseDto } from '@novu/shared';
+
+type UpdateWorkflowParameters = OmitEnvironmentFromParameters<typeof updateWorkflow>;
 
 export const useUpdateWorkflow = (
-  options?: UseMutationOptions<WorkflowResponseDto, unknown, Parameters<typeof updateWorkflow>[0]>
+  options?: UseMutationOptions<WorkflowResponseDto, unknown, UpdateWorkflowParameters>
 ) => {
   const { currentEnvironment } = useEnvironment();
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: updateWorkflow,
+    mutationFn: (args: UpdateWorkflowParameters) => updateWorkflow({ environment: currentEnvironment!, ...args }),
     ...options,
     onSuccess: async (data, variables, context) => {
       await queryClient.setQueryData(

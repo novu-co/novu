@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import * as Sentry from '@sentry/react';
 
-import { usePreviewStep } from '@/hooks';
+import { usePreviewStep } from '@/hooks/use-preview-step';
 import { useDataRef } from '@/hooks/use-data-ref';
 
 export const useEditorPreview = ({
@@ -37,7 +37,10 @@ export const useEditorPreview = ({
     previewStep({
       workflowSlug: dataRef.current.workflowSlug,
       stepSlug: dataRef.current.stepSlug,
-      data: { controlValues: dataRef.current.controlValues, previewPayload: JSON.parse(dataRef.current.editorValue) },
+      previewData: {
+        controlValues: dataRef.current.controlValues,
+        previewPayload: JSON.parse(dataRef.current.editorValue),
+      },
     });
   }, [dataRef, previewStep]);
 
@@ -45,7 +48,7 @@ export const useEditorPreview = ({
     return previewStep({
       workflowSlug,
       stepSlug,
-      data: { controlValues, previewPayload: JSON.parse(editorValue) },
+      previewData: { controlValues, previewPayload: JSON.parse(editorValue) },
     });
   }, [workflowSlug, stepSlug, controlValues, editorValue, previewStep]);
 

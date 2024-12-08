@@ -1,15 +1,20 @@
-import { useQuery } from '@tanstack/react-query';
+import { getTags } from '@/api/environments';
 import { QueryKeys } from '@/utils/query-keys';
 import { useEnvironment } from '@/context/environment/hooks';
-import { getV2 } from '@/api/api.client';
+import { useQuery } from '@tanstack/react-query';
+import type { ITagsResponse } from '@novu/shared';
 
 export const useTags = () => {
   const { currentEnvironment } = useEnvironment();
-  const query = useQuery<{ data: { name: string }[] }>({
+  const { data: tags, ...query } = useQuery<ITagsResponse>({
     queryKey: [QueryKeys.fetchTags, currentEnvironment?._id],
-    queryFn: async () => await getV2(`/environments/${currentEnvironment!._id}/tags`),
+    queryFn: () => getTags({ environment: currentEnvironment! }),
     enabled: !!currentEnvironment?._id,
+    initialData: [],
   });
 
-  return query;
+  return {
+    tags,
+    ...query,
+  };
 };

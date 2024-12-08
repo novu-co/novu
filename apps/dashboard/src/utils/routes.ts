@@ -17,11 +17,12 @@ export const ROUTES = {
   EDIT_WORKFLOW: '/env/:environmentSlug/workflows/:workflowSlug',
   TEST_WORKFLOW: '/env/:environmentSlug/workflows/:workflowSlug/test',
   WELCOME: '/env/:environmentSlug/welcome',
+  EDIT_WORKFLOW_PREFERENCES: 'preferences',
   EDIT_STEP: 'steps/:stepSlug',
   EDIT_STEP_TEMPLATE: 'steps/:stepSlug/edit',
   API_KEYS: '/env/:environmentSlug/api-keys',
   ACTIVITY_FEED: '/env/:environmentSlug/activity-feed',
-};
+} as const;
 
 export const buildRoute = (route: string, params: Record<string, string>) => {
   return Object.entries(params).reduce((acc, [key, value]) => {

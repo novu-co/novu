@@ -1,17 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { JSONSchemaDto } from '@novu/shared';
+import { Instrument } from '@novu/application-generic';
 import { computeResultSchema } from '../../shared';
 import { BuildAvailableVariableSchemaCommand } from './build-available-variable-schema.command';
 import { parsePayloadSchema } from '../../shared/parse-payload-schema';
+import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
+import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
 
 @Injectable()
 export class BuildAvailableVariableSchemaUsecase {
-  execute(command: BuildAvailableVariableSchemaCommand): JSONSchemaDto {
+  constructor(private readonly buildPayloadSchema: BuildPayloadSchema) {}
+
+  async execute(command: BuildAvailableVariableSchemaCommand): Promise<JSONSchemaDto> {
     const { workflow } = command;
     const previousSteps = workflow.steps.slice(
       0,
-      workflow.steps.findIndex((stepItem) => stepItem._id === command.stepDatabaseId)
+      workflow.steps.findIndex((stepItem) => stepItem._id === command.stepInternalId)
     );
 
     return {
@@ -39,13 +44,29 @@ export class BuildAvailableVariableSchemaUsecase {
           additionalProperties: false,
         },
         steps: buildPreviousStepsSchema(previousSteps, workflow.payloadSchema),
-        payload: parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {
-          type: 'object',
-          description: 'Payload for the current step',
-        },
+        payload: await this.resolvePayloadSchema(workflow, command),
       },
       additionalProperties: false,
     } as const satisfies JSONSchemaDto;
+  }
+
+  @Instrument()
+  private async resolvePayloadSchema(
+    workflow: NotificationTemplateEntity,
+    command: BuildAvailableVariableSchemaCommand
+  ): Promise<JSONSchemaDto> {
+    if (workflow.payloadSchema) {
+      return parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {};
+    }
+
+    return this.buildPayloadSchema.execute(
+      BuildPayloadSchemaCommand.create({
+        environmentId: command.environmentId,
+        organizationId: command.organizationId,
+        userId: command.userId,
+        workflowId: workflow._id,
+      })
+    );
   }
 }
 

@@ -219,12 +219,17 @@ export class UpdateWorkflow {
          */
 
         updatePayload.critical = command.critical;
+
         this.analyticsService.track(
-          'Update Critical Template - [Platform]',
+          'Workflow critical status changed',
           command.userId,
           {
             _organization: command.organizationId,
-            critical: command.userPreferences?.all?.readOnly,
+            name: updatePayload.name ?? existingTemplate.name,
+            description:
+              updatePayload.description ?? existingTemplate.description,
+            new_status: command.userPreferences?.all?.readOnly,
+            tags: updatePayload.tags ?? existingTemplate.tags,
           },
         );
 

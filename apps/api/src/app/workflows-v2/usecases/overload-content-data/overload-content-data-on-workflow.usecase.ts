@@ -1,13 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { ControlValuesLevelEnum, UserSessionData, WorkflowOriginEnum } from '@novu/shared';
+import { ControlValuesLevelEnum, UserSessionData } from '@novu/shared';
 import { ControlValuesRepository, NotificationStepEntity } from '@novu/dal';
-import _ from 'lodash';
 import { WorkflowInternalResponseDto } from '@novu/application-generic';
 import { PrepareAndValidateContentUsecase, ValidatedContentResponse } from '../validate-content';
 import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
 import { OverloadContentDataOnWorkflowCommand } from './overload-content-data-on-workflow.command';
 import { StepMissingControlsException } from '../../exceptions/step-not-found-exception';
-import { convertJsonToSchemaWithDefaults } from '../../util/jsonToSchema';
 
 @Injectable()
 export class OverloadContentDataOnWorkflowUseCase {
@@ -19,7 +17,6 @@ export class OverloadContentDataOnWorkflowUseCase {
 
   async execute(command: OverloadContentDataOnWorkflowCommand): Promise<WorkflowInternalResponseDto> {
     const validatedContentResponses = await this.validateStepContent(command.workflow, command.user);
-    await this.overloadPayloadSchema(command.workflow, validatedContentResponses);
     for (const step of command.workflow.steps) {
       if (!step.issues) {
         step.issues = {};
@@ -44,9 +41,12 @@ export class OverloadContentDataOnWorkflowUseCase {
       }
       const controlValues = stepIdToControlValuesMap[step._templateId];
 
-      const jsonSchemaDto = this.buildAvailableVariableSchemaUsecase.execute({
+      const jsonSchemaDto = await this.buildAvailableVariableSchemaUsecase.execute({
+        environmentId: user.environmentId,
+        organizationId: user.organizationId,
+        userId: user._id,
         workflow,
-        stepDatabaseId: step._templateId,
+        stepInternalId: step._templateId,
       });
       validatedStepContent[step._templateId] = await this.prepareAndValidateContentUsecase.execute({
         stepType: step?.template?.type,
@@ -82,22 +82,5 @@ export class OverloadContentDataOnWorkflowUseCase {
     });
 
     return controlValuesEntity?.controls || {};
-  }
-
-  private async overloadPayloadSchema(
-    workflow: WorkflowInternalResponseDto,
-    stepIdToControlValuesMap: { [p: string]: ValidatedContentResponse }
-  ) {
-    if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
-      return;
-    }
-
-    let finalPayload = {};
-    for (const value of Object.values(stepIdToControlValuesMap)) {
-      finalPayload = _.merge(finalPayload, value.finalPayload.payload);
-    }
-
-    // eslint-disable-next-line no-param-reassign
-    workflow.payloadSchema = convertJsonToSchemaWithDefaults(finalPayload);
   }
 }

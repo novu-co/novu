@@ -99,6 +99,7 @@ export default {
       ring: 'hsl(var(--ring))',
     },
     fontSize: {
+      '2xs': ['0.625rem', '0.875rem'], // 10px font size, 14px line height
       xs: ['0.75rem', '1rem'], // 12px font size, 16px line height
       sm: ['0.875rem', '1.25rem'], // 14px font size, 20px line height
       base: ['1rem', '1.5rem'], // 16px font size, 24px line height (default)

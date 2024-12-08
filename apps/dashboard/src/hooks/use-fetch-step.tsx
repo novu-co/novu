@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { StepDataDto } from '@novu/shared';
+import type { StepDataDto, StepUpdateDto } from '@novu/shared';
 
 import { QueryKeys } from '@/utils/query-keys';
 import { useEnvironment } from '@/context/environment/hooks';
-import { fetchStep } from '@/api/steps';
+import { getStep } from '@/api/steps';
 import { getEncodedId, STEP_DIVIDER, WORKFLOW_DIVIDER } from '@/utils/step';
 
 export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string; stepSlug: string }) => {
@@ -20,15 +20,22 @@ export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string;
     [currentEnvironment?._id, workflowSlug, stepSlug]
   );
 
-  const { data, isPending, isRefetching, error, refetch } = useQuery<StepDataDto>({
+  const { data, isPending, isRefetching, error } = useQuery<StepDataDto>({
     queryKey,
-    queryFn: () => fetchStep({ workflowSlug: workflowSlug, stepSlug: stepSlug }),
+    queryFn: () => getStep({ environment: currentEnvironment!, workflowSlug: workflowSlug, stepSlug: stepSlug }),
     enabled: !!currentEnvironment?._id && !!stepSlug && !!workflowSlug,
   });
 
   const updateStepCache = useCallback(
-    (newStep: Partial<StepDataDto>) =>
-      client.setQueryData(queryKey, (oldData: StepDataDto | undefined) => ({ ...oldData, ...newStep })),
+    (newStep: Partial<StepUpdateDto>) => {
+      const oldData = client.getQueryData<StepDataDto>(queryKey);
+      const newStepData: Partial<StepDataDto> = {
+        ...oldData,
+        name: newStep.name,
+        ...(newStep.controlValues ? { controls: { ...oldData?.controls, values: newStep.controlValues } } : {}),
+      };
+      client.setQueryData(queryKey, newStepData);
+    },
     [client, queryKey]
   );
 
@@ -37,7 +44,6 @@ export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string;
     isPending,
     isRefetching,
     error,
-    refetch,
     updateStepCache,
   };
 };

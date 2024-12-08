@@ -9,14 +9,15 @@ import { OnboardingArrowLeft } from '../components/icons/onboarding-arrow-left';
 import { updateClerkOrgMetadata } from '../api/organization';
 import { ChannelTypeEnum } from '@novu/shared';
 import { PageMeta } from '../components/page-meta';
-import { useTelemetry } from '../hooks';
-import { TelemetryEvent } from '../utils/telemetry';
-import { channelOptions } from '../components/auth/usecases-list.utils';
+import { useTelemetry } from '@/hooks/use-telemetry';
+import { TelemetryEvent } from '@/utils/telemetry';
+import { channelOptions } from '@/components/auth/usecases-list.utils';
 import { useMutation } from '@tanstack/react-query';
 import * as Sentry from '@sentry/react';
 import { useOrganization } from '@clerk/clerk-react';
 import { AnimatedPage } from '@/components/onboarding/animated-page';
 import { Helmet } from 'react-helmet-async';
+import { useEnvironment } from '@/context/environment/hooks';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -37,6 +38,7 @@ const itemVariants = {
 
 export function UsecaseSelectPage() {
   const { organization } = useOrganization();
+  const { currentEnvironment } = useEnvironment();
   const navigate = useNavigate();
   const track = useTelemetry();
   const [selectedUseCases, setSelectedUseCases] = useState<ChannelTypeEnum[]>([]);
@@ -58,7 +60,10 @@ export function UsecaseSelectPage() {
   const { mutate: handleContinue, isPending } = useMutation({
     mutationFn: async () => {
       await updateClerkOrgMetadata({
-        useCases: selectedUseCases,
+        environment: currentEnvironment!,
+        data: {
+          useCases: selectedUseCases,
+        },
       });
       await organization?.reload();
     },
