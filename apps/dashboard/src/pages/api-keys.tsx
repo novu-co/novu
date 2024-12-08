@@ -1,5 +1,5 @@
-import { useState, ReactNode } from 'react';
-import { RiKey2Line, RiEyeLine, RiEyeOffLine, RiQuestionLine } from 'react-icons/ri';
+import { useState } from 'react';
+import { RiKey2Line, RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 import { useEnvironment } from '@/context/environment/hooks';
 import { CopyButton } from '@/components/primitives/copy-button';
 import { Card, CardContent, CardHeader } from '@/components/primitives/card';
@@ -15,7 +15,6 @@ import { Container } from '../components/primitives/container';
 import { HelpTooltipIndicator } from '../components/primitives/help-tooltip-indicator';
 import { API_HOSTNAME } from '../config';
 import { Skeleton } from '@/components/primitives/skeleton';
-import { HelpCircle } from 'lucide-react';
 
 interface ApiKeysFormData {
   apiKey: string;
