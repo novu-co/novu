@@ -48,7 +48,7 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
                 {!subscription ? (
                   <Skeleton className="h-7 w-24" />
                 ) : (
-                  <h3 className="text-lg font-semibold capitalize">{subscription.apiServiceLevel.toLowerCase()}</h3>
+                  <h3 className="text-lg font-semibold capitalize">{subscription.apiServiceLevel?.toLowerCase()}</h3>
                 )}
                 {subscription?.trial.isActive && (
                   <Badge variant="outline" className="font-medium">
