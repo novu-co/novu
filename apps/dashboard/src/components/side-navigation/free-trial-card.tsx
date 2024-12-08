@@ -4,7 +4,6 @@ import { Progress } from '../primitives/progress';
 import { Button } from '../primitives/button';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipArrow } from '../primitives/tooltip';
 import { LEGACY_ROUTES, ROUTES } from '@/utils/routes';
-import { useBillingSubscription } from '@/hooks/use-billing-subscription';
 import { Link } from 'react-router-dom';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { FeatureFlagsKeysEnum } from '@novu/shared';

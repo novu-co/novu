@@ -8,7 +8,6 @@ import { Appearance } from '@clerk/types';
 import { motion } from 'motion/react';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { useFeatureFlag } from '../hooks/use-feature-flag';
-import { SubscriptionProvider } from '../components/billing/subscription-provider';
 import { Plan } from '../components/billing/plan';
 
 const FADE_ANIMATION = {
