@@ -22,7 +22,7 @@ export function ActivityFeed() {
 
   return (
     <DashboardLayout>
-      <div className="relative flex h-[calc(100vh-4rem)]">
+      <div className="relative mt-10 flex h-[calc(100vh-4rem)]">
         <motion.div
           layout="position"
           transition={{

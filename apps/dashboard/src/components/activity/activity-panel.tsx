@@ -56,7 +56,7 @@ export function ActivityPanel({ activity }: ActivityPanelProps) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
       <div>
-        <div className="flex items-center gap-2 border-b border-neutral-100 p-2">
+        <div className="flex items-center gap-2 border-b border-t border-neutral-200 border-b-neutral-100 p-2">
           <Route className="h-3 w-3" />
           <span className="text-foreground-950 text-sm font-medium">{activity.template?.name}</span>
         </div>

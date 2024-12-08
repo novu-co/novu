@@ -26,7 +26,7 @@ interface ExecutionDetail {
 
 interface Job {
   _id: string;
-  status: 'completed' | 'failed' | 'pending';
+  status: 'completed' | 'failed' | 'pending' | 'merged';
   payload: Record<string, unknown>;
   type: string;
   providerId: string;
