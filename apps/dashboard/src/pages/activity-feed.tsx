@@ -47,14 +47,12 @@ export function ActivityFeed() {
                 duration: 0.4,
                 ease: 'easeInOut',
               }}
-              className="bg-background h-full overflow-hidden border-l"
+              className="bg-background h-full w-[500px] overflow-auto border-l"
             >
-              <div className="w-[500px]">
-                <ActivityPanel
-                  activityId={selectedActivityId}
-                  onActivitySelect={(activityId) => setSelectedActivityId(activityId)}
-                />
-              </div>
+              <ActivityPanel
+                activityId={selectedActivityId}
+                onActivitySelect={(activityId) => setSelectedActivityId(activityId)}
+              />
             </motion.div>
           )}
         </AnimatePresence>

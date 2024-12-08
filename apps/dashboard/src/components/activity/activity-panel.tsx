@@ -123,7 +123,7 @@ export function ActivityPanel({ activityId, onActivitySelect }: ActivityPanelPro
       initial={{ opacity: 0.7 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="h-full overflow-auto"
+      className="h-full"
     >
       <div>
         <div className="flex items-center gap-2 border-b border-t border-neutral-200 border-b-neutral-100 p-2">
