@@ -11,6 +11,8 @@ import {
   RiTimeLine,
   RiShadowLine,
   RiCheckboxCircleLine,
+  RiForbidFill,
+  RiErrorWarningLine,
 } from 'react-icons/ri';
 import { type Activity } from '@/hooks/use-activities';
 import { format } from 'date-fns';
@@ -41,8 +43,10 @@ function getJobColor(status: string) {
       return 'success';
     case 'failed':
       return 'destructive';
+    case 'merged':
+      return 'neutral-300';
     default:
-      return 'muted';
+      return 'neutral-300';
   }
 }
 
@@ -72,6 +76,30 @@ function JobDetails({ job }: { job: Activity['jobs'][0] }) {
   );
 }
 
+interface JobStatusIndicatorProps {
+  status: string;
+}
+
+function JobStatusIndicator({ status }: JobStatusIndicatorProps) {
+  return (
+    <div className="relative flex-shrink-0">
+      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
+        <div className={`text-${getJobColor(status)} flex items-center justify-center`}>
+          {status === 'completed' ? (
+            <RiCheckboxCircleLine className="h-4 w-4" />
+          ) : status === 'failed' ? (
+            <RiErrorWarningLine className="h-4 w-4" />
+          ) : status === 'merged' ? (
+            <RiForbidFill className="h-4 w-4" />
+          ) : (
+            <RiShadowLine className="h-4 w-4" />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ActivityJobItem({ job, isLast }: ActivityJobItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -79,13 +107,7 @@ export function ActivityJobItem({ job, isLast }: ActivityJobItemProps) {
     <div className="relative flex items-center gap-4">
       {!isLast && <div className="absolute left-[11px] top-[50%] h-[calc(100%+24px)] w-[1px] bg-neutral-200" />}
 
-      <div className="relative flex-shrink-0">
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
-          <div className={`text-success flex items-center justify-center`}>
-            <RiCheckboxCircleLine className="h-4 w-4" />
-          </div>
-        </div>
-      </div>
+      <JobStatusIndicator status={job.status} />
 
       <Card className="border-1 flex-1 border-neutral-200 p-1 shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between p-3">
