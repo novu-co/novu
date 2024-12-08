@@ -11,7 +11,7 @@ function LogsSection({ jobs }: { jobs: Activity['jobs'] }): JSX.Element {
   return (
     <div className="flex flex-col gap-6 bg-white p-3">
       {jobs.map((job, index) => (
-        <ActivityJobItem key={job._id} job={job} isLast={index === jobs.length - 1} />
+        <ActivityJobItem key={job._id} job={job} isFirst={index === 0} isLast={index === jobs.length - 1} />
       ))}
     </div>
   );

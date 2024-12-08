@@ -21,9 +21,22 @@ import { cn } from '@/utils/ui';
 import { ExecutionDetailItem } from './execution-detail-item';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { STEP_TYPE_TO_COLOR } from '../../utils/color';
+import { ActivityDetailCard } from './activity-detail-card';
+
+interface DigestEvent {
+  type: string;
+  [key: string]: unknown;
+}
+
+type JobWithDigest = Activity['jobs'][0] & {
+  digest?: {
+    events: DigestEvent[];
+  };
+};
 
 interface ActivityJobItemProps {
-  job: Activity['jobs'][0];
+  job: JobWithDigest;
+  isFirst: boolean;
   isLast: boolean;
 }
 
@@ -50,11 +63,7 @@ function getJobColor(status: string) {
   }
 }
 
-function hasDigestAmount(job: any): job is { digestAmount: number } {
-  return 'digestAmount' in job && typeof job.digestAmount === 'number';
-}
-
-function JobDetails({ job }: { job: Activity['jobs'][0] }) {
+function JobDetails({ job }: { job: JobWithDigest }) {
   return (
     <div className="border-t border-neutral-100 p-4">
       <div className="flex flex-col gap-4">
@@ -65,16 +74,22 @@ function JobDetails({ job }: { job: Activity['jobs'][0] }) {
             ))}
           </div>
         )}
-        {job.type === 'digest' && (
-          <div className="flex items-center justify-between">
-            <Card className="border-1 border-neutral-200 p-2">
-              <CardHeader>asdasd</CardHeader>
-              <CardContent>
-                <span className="text-foreground-950 text-xs font-medium">Digest Count</span>
-                <span className="text-foreground-600 font-mono text-xs">123123</span>
-              </CardContent>
-            </Card>
-          </div>
+        {job.type === 'digest' && job.digest?.events && (
+          <ActivityDetailCard title="Digest Events" expandable={true} open>
+            <div className="min-w-0 max-w-full font-mono">
+              {job.digest.events.map((event: DigestEvent, index: number) => (
+                <div key={index} className="group flex items-center gap-2 rounded-sm px-1 py-1.5 hover:bg-neutral-100">
+                  <RiCheckboxCircleLine className="text-success h-4 w-4 shrink-0" />
+                  <div className="flex items-center gap-2 truncate">
+                    <span className="truncate text-xs text-neutral-500">{event.type}</span>
+                    <span className="text-xs text-neutral-400">
+                      {`${format(new Date(job.updatedAt), 'HH:mm')} UTC`}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ActivityDetailCard>
         )}
       </div>
     </div>
@@ -105,17 +120,24 @@ function JobStatusIndicator({ status }: JobStatusIndicatorProps) {
   );
 }
 
-export function ActivityJobItem({ job, isLast }: ActivityJobItemProps) {
+export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div className="relative flex items-center gap-4">
-      {!isLast && <div className="absolute left-[11px] top-[50%] h-[calc(100%+24px)] w-[1px] bg-neutral-200" />}
+      <div
+        className={cn(
+          'absolute left-[11px] h-[calc(100%+24px)] w-[1px] bg-neutral-200',
+          isFirst ? 'top-[50%]' : 'top-0',
+          isLast ? 'h-[50%]' : 'h-[calc(100%+24px)]',
+          isFirst && isLast && 'bg-transparent'
+        )}
+      />
 
       <JobStatusIndicator status={job.status} />
 
       <Card className="border-1 flex-1 border-neutral-200 p-1 shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between p-3">
+        <CardHeader className="flex flex-row items-center justify-between bg-white p-3">
           <div className="flex items-center gap-1.5">
             <div
               className={`h-5 w-5 rounded-full border opacity-40 border-${STEP_TYPE_TO_COLOR[job.type as keyof typeof STEP_TYPE_TO_COLOR]}`}
