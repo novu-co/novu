@@ -50,7 +50,7 @@ export function ApiKeysPage() {
               <div className="flex flex-col gap-2">
                 <RiKey2Line className="h-8 w-8" />
                 <h2 className="text-foreground-950 text-md font-medium">Environment Keys</h2>
-                <p className="text-foreground-400 text-xs">Copy and manage your public and private keys</p>
+                <p className="text-foreground-400 text-xs">Manage your public and private keys</p>
 
                 <ExternalLink variant="documentation" href="https://docs.novu.co/sdks/overview" className="text-sm">
                   Read about our SDKs
