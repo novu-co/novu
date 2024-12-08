@@ -153,9 +153,7 @@ export function SettingsPage() {
             <TabsContent value="billing" className="rounded-lg">
               <motion.div {...FADE_ANIMATION}>
                 <Card className="border-none shadow-none">
-                  <SubscriptionProvider>
-                    <Plan />
-                  </SubscriptionProvider>
+                  <Plan />
                 </Card>
               </motion.div>
             </TabsContent>

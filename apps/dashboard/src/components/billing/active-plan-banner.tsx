@@ -2,17 +2,17 @@ import { Badge } from '@/components/primitives/badge';
 import { Card } from '@/components/primitives/card';
 import { Progress } from '@/components/primitives/progress';
 import { cn } from '../../utils/ui';
-import { useSubscription } from './hooks/use-subscription';
 import { CalendarDays } from 'lucide-react';
 import { PlanActionButton } from './plan-action-button';
 import { Skeleton } from '@/components/primitives/skeleton';
+import { useFetchSubscription } from '../../hooks/use-fetch-subscription';
 
 interface ActivePlanBannerProps {
   selectedBillingInterval: 'month' | 'year';
 }
 
 export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerProps) {
-  const { data: subscription } = useSubscription();
+  const { subscription, daysLeft } = useFetchSubscription();
 
   const getProgressColor = (current: number, max: number) => {
     const percentage = (current / max) * 100;
@@ -57,9 +57,7 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
                 )}
               </div>
               {subscription?.trial.isActive && (
-                <div className="text-warning text-sm font-medium">
-                  {subscription.trial.daysLeft} days left for trial
-                </div>
+                <div className="text-warning text-sm font-medium">{daysLeft} days left for trial</div>
               )}
             </div>
 
@@ -86,40 +84,43 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
 
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                {!subscription ? (
-                  <>
-                    <Skeleton className="h-4 w-36" />
-                    <Skeleton className="h-4 w-24" />
-                  </>
-                ) : (
+                {subscription ? (
                   <>
                     <div>
                       <span
                         className={cn(
                           'font-medium',
-                          getProgressColor(subscription.events.current, subscription.events.included)
+                          getProgressColor(subscription.events.current ?? 0, subscription.events.included ?? 0)
                         )}
                       >
-                        {subscription.events.current.toLocaleString()}
+                        {subscription.events.current?.toLocaleString() ?? 0}
                       </span>{' '}
                       <span className="text-muted-foreground">
-                        of {subscription.events.included.toLocaleString()} events
+                        of {subscription.events.included?.toLocaleString() ?? 0} events
                       </span>
                     </div>
                     <span className="text-muted-foreground text-xs">Updates hourly</span>
                   </>
+                ) : (
+                  <>
+                    <Skeleton className="h-4 w-36" />
+                    <Skeleton className="h-4 w-24" />
+                  </>
                 )}
               </div>
-              {!subscription ? (
-                <Skeleton className="h-1.5 w-full" />
-              ) : (
+              {subscription ? (
                 <Progress
-                  value={Math.min((subscription.events.current / subscription.events.included) * 100, 100)}
+                  value={Math.min(
+                    ((subscription.events.current ?? 0) / (subscription.events.included ?? 0)) * 100,
+                    100
+                  )}
                   className={cn(
                     'h-1.5 rounded-lg transition-all duration-300',
-                    getProgressBarColor(subscription.events.current, subscription.events.included)
+                    getProgressBarColor(subscription.events.current ?? 0, subscription.events.included ?? 0)
                   )}
                 />
+              ) : (
+                <Skeleton className="h-1.5 w-full" />
               )}
             </div>
           </div>

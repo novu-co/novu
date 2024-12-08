@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useSegment } from '../../context/segment';
-import { useSubscription } from './hooks/use-subscription';
 import { ActivePlanBanner } from './active-plan-banner';
 import { PlanSwitcher } from './plan-switcher';
 import { PlansRow } from './plans-row';
@@ -10,11 +8,11 @@ import { cn } from '../../utils/ui';
 import { toast } from 'sonner';
 import { useTelemetry } from '../../hooks/use-telemetry';
 import { TelemetryEvent } from '../../utils/telemetry';
+import { useFetchSubscription } from '../../hooks/use-fetch-subscription';
 
 export function Plan() {
-  const segment = useSegment();
   const track = useTelemetry();
-  const { data } = useSubscription();
+  const { subscription: data } = useFetchSubscription();
   const [selectedBillingInterval, setSelectedBillingInterval] = useState<'month' | 'year'>(
     data?.billingInterval || 'month'
   );
@@ -47,7 +45,7 @@ export function Plan() {
       isTrialActive: data?.trial?.isActive,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [segment]);
+  }, []);
 
   const handleBillingIntervalChange = (interval: 'month' | 'year') => {
     track(TelemetryEvent.BILLING_INTERVAL_CHANGED, {
