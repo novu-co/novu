@@ -1,10 +1,10 @@
-import { RiBookMarkedLine, RiBookmarkLine, RiExternalLinkLine } from 'react-icons/ri';
+import { RiBookMarkedLine, RiExternalLinkLine, RiQuestionLine } from 'react-icons/ri';
 import { cn } from '@/utils/ui';
 
 interface ExternalLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   children: React.ReactNode;
   iconClassName?: string;
-  variant?: 'default' | 'documentation';
+  variant?: 'default' | 'documentation' | 'tip';
 }
 
 export function ExternalLink({ children, className, variant = 'default', iconClassName, ...props }: ExternalLinkProps) {
@@ -17,7 +17,7 @@ export function ExternalLink({ children, className, variant = 'default', iconCla
     >
       {variant === 'documentation' && <RiBookMarkedLine className={cn('size-4', iconClassName)} aria-hidden="true" />}
       {variant === 'default' && <RiExternalLinkLine className={cn('size-4', iconClassName)} aria-hidden="true" />}
-
+      {variant === 'tip' && <RiQuestionLine className={cn('size-4', iconClassName)} aria-hidden="true" />}
       {children}
     </a>
   );

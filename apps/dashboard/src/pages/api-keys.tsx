@@ -1,5 +1,5 @@
 import { useState, ReactNode } from 'react';
-import { RiKey2Line, RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
+import { RiKey2Line, RiEyeLine, RiEyeOffLine, RiQuestionLine } from 'react-icons/ri';
 import { useEnvironment } from '@/context/environment/hooks';
 import { CopyButton } from '@/components/primitives/copy-button';
 import { Card, CardContent, CardHeader } from '@/components/primitives/card';
@@ -15,6 +15,7 @@ import { Container } from '../components/primitives/container';
 import { HelpTooltipIndicator } from '../components/primitives/help-tooltip-indicator';
 import { API_HOSTNAME } from '../config';
 import { Skeleton } from '@/components/primitives/skeleton';
+import { HelpCircle } from 'lucide-react';
 
 interface ApiKeysFormData {
   apiKey: string;
@@ -80,26 +81,36 @@ export function ApiKeysPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="w-full overflow-hidden shadow-none">
-                  <CardHeader>
-                    Secret Keys
-                    <p className="text-foreground-600 mt-1 text-xs">
-                      Use this key to authenticate your API requests. Keep it secure and never share it publicly.
-                    </p>
-                  </CardHeader>
+                <div>
+                  <Card className="w-full overflow-hidden shadow-none">
+                    <CardHeader>
+                      Secret Keys
+                      <p className="text-foreground-600 mt-1 text-xs">
+                        Use this key to authenticate your API requests. Keep it secure and never share it publicly.
+                      </p>
+                    </CardHeader>
 
-                  <CardContent className="rounded-b-xl border-t bg-neutral-50 bg-white p-3">
-                    <div className="space-y-4 p-3">
-                      <SettingField
-                        label="Secret Key"
-                        tooltip="Use this key to authenticate your API requests. Keep it secure and never share it publicly."
-                        value={form.getValues('apiKey')}
-                        secret
-                        isLoading={isLoading}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
+                    <CardContent className="rounded-b-xl border-t bg-neutral-50 bg-white p-3">
+                      <div className="space-y-4 p-3">
+                        <SettingField
+                          label="Secret Key"
+                          tooltip="Use this key to authenticate your API requests. Keep it secure and never share it publicly."
+                          value={form.getValues('apiKey')}
+                          secret
+                          isLoading={isLoading}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <ExternalLink
+                    variant="tip"
+                    iconClassName="text-neutral-400"
+                    href="https://docs.novu.co/sdks/overview"
+                    className="mt-2 text-xs text-neutral-600"
+                  >
+                    Learn more about APIs in Novu
+                  </ExternalLink>
+                </div>
               </Form>
             </div>
           </div>
