@@ -2,18 +2,7 @@ import { Route, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/primitives/button';
 import { Badge } from '@/components/primitives/badge';
 import { Card, CardContent, CardHeader } from '../primitives/card';
-import {
-  RiCheckLine,
-  RiMailLine,
-  RiMessage2Line,
-  RiSmartphoneLine,
-  RiNotification3Line,
-  RiTimeLine,
-  RiShadowLine,
-  RiCheckboxCircleLine,
-  RiForbidFill,
-  RiErrorWarningLine,
-} from 'react-icons/ri';
+import { RiShadowLine, RiCheckboxCircleLine, RiForbidFill, RiErrorWarningLine } from 'react-icons/ri';
 import { type Activity } from '@/hooks/use-activities';
 import { format } from 'date-fns';
 import { useState } from 'react';

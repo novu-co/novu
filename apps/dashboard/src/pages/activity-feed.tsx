@@ -1,5 +1,5 @@
 import { DashboardLayout } from '@/components/dashboard-layout';
-import { useActivities, type Activity } from '@/hooks/use-activities';
+import { useActivities } from '@/hooks/use-activities';
 import { ActivityTable } from '@/components/activity/activity-table';
 import { cn } from '@/utils/ui';
 import { motion, AnimatePresence } from 'motion/react';
