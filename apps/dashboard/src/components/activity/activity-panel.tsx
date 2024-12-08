@@ -118,7 +118,12 @@ export function ActivityPanel({ activityId, onActivitySelect }: ActivityPanelPro
   const isMerged = activity.jobs.some((job) => job.status === 'merged');
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+    <motion.div
+      key={activityId}
+      initial={{ opacity: 0.7 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
       <div>
         <div className="flex items-center gap-2 border-b border-t border-neutral-200 border-b-neutral-100 p-2">
           <Route className="h-3 w-3" />
