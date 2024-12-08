@@ -22,4 +22,5 @@ export enum TelemetryEvent {
   INBOX_EMBED_SUCCESS_PAGE_VIEWED = 'Inbox embed success page viewed - [Onboarding]',
   WORKFLOW_PREFERENCES_OVERRIDE_USED = 'Workflow preferences override used',
   EXPORT_TO_CODE_BANNER_REACTION = 'Export to Code banner reaction - [Promotional]',
+  EXTERNAL_LINK_CLICKED = 'External link clicked',
 }
