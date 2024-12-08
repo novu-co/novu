@@ -1,8 +1,8 @@
-import { JSONSchemaDto, PreviewIssueEnum } from '@novu/shared';
+import { JSONSchemaDto, PreviewIssueEnum, TipTapNode } from '@novu/shared';
 import { Injectable } from '@nestjs/common';
 import { ExtractDefaultValuesFromSchemaCommand } from './extract-default-values-from-schema.command';
 
-const DEFAULT_PREVIEW_ISSUE_MESSAGE = {
+const DEFAULT_PREVIEW_ISSUE_MESSAGE: TipTapNode = {
   type: 'doc',
   content: [
     {
