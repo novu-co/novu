@@ -17,7 +17,11 @@ import {
 } from 'lucide-react';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { QueryKeys } from '@/utils/query-keys';
+import { useEnvironment } from '@/context/environment/hooks';
+import { getNotification } from '@/api/activity';
 
 type ActivityStatus = 'SUCCESS' | 'ERROR' | 'QUEUED' | 'MERGED';
 
@@ -211,6 +215,34 @@ interface ActivityTableProps {
 }
 
 export function ActivityTable({ activities, selectedActivityId, onActivitySelect }: ActivityTableProps) {
+  const queryClient = useQueryClient();
+  const { currentEnvironment } = useEnvironment();
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleRowMouseEnter = (activity: Activity) => {
+    hoverTimerRef.current = setTimeout(() => {
+      queryClient.prefetchQuery({
+        queryKey: [QueryKeys.fetchActivity, currentEnvironment?._id, activity._id],
+        queryFn: () => getNotification(activity._id, currentEnvironment!),
+      });
+    }, 1000);
+  };
+
+  const handleRowMouseLeave = () => {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="min-w-[800px]">
       <Table containerClassname="border-x-0 border-b-0 border-t border-t-neutral-200 rounded-none shadow-none">
@@ -231,6 +263,8 @@ export function ActivityTable({ activities, selectedActivityId, onActivitySelect
                 selectedActivityId === activity._id && 'bg-neutral-50'
               )}
               onClick={() => onActivitySelect(activity)}
+              onMouseEnter={() => handleRowMouseEnter(activity)}
+              onMouseLeave={handleRowMouseLeave}
             >
               <TableCell>
                 <div className="flex flex-col">

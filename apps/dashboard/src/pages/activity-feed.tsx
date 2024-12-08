@@ -50,7 +50,10 @@ export function ActivityFeed() {
               className="bg-background h-full overflow-hidden border-l"
             >
               <div className="w-[500px]">
-                <ActivityPanel activityId={selectedActivityId} />
+                <ActivityPanel
+                  activityId={selectedActivityId}
+                  onActivitySelect={(activityId) => setSelectedActivityId(activityId)}
+                />
               </div>
             </motion.div>
           )}

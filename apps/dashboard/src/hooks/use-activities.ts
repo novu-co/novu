@@ -62,6 +62,7 @@ export interface Activity {
   _environmentId: string;
   _organizationId: string;
   _subscriberId: string;
+  _digestedNotificationId?: string;
   transactionId: string;
   channels: string[];
   to: {
