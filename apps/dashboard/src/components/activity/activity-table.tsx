@@ -202,9 +202,10 @@ interface ActivityTableProps {
   activities: Activity[];
   selectedActivityId: string | null;
   onActivitySelect: (activity: Activity) => void;
+  isLoading: boolean;
 }
 
-export function ActivityTable({ activities, selectedActivityId, onActivitySelect }: ActivityTableProps) {
+export function ActivityTable({ activities, selectedActivityId, onActivitySelect, isLoading }: ActivityTableProps) {
   const queryClient = useQueryClient();
   const { currentEnvironment } = useEnvironment();
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -235,7 +236,10 @@ export function ActivityTable({ activities, selectedActivityId, onActivitySelect
 
   return (
     <div className="min-w-[800px]">
-      <Table containerClassname="border-x-0 border-b-0 border-t border-t-neutral-200 rounded-none shadow-none">
+      <Table
+        isLoading={isLoading}
+        containerClassname="border-x-0 border-b-0 border-t border-t-neutral-200 rounded-none shadow-none"
+      >
         <TableHeader>
           <TableRow>
             <TableHead className="h-9 py-0">Details</TableHead>

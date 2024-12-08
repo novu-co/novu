@@ -28,11 +28,11 @@ function LogsSection({ jobs }: { jobs: Activity['jobs'] }): JSX.Element {
 
 function Overview({ activity }: { activity: Activity }) {
   const { currentEnvironment } = useEnvironment();
-  const status = activity.jobs[activity.jobs.length - 1]?.status;
+  const status = activity.jobs[activity?.jobs?.length - 1]?.status;
 
   const workflowPath = buildRoute(ROUTES.EDIT_WORKFLOW, {
     environmentSlug: currentEnvironment?.slug ?? '',
-    workflowSlug: activity.template._id,
+    workflowSlug: activity?.template?._id,
   });
 
   return (
@@ -52,10 +52,12 @@ function Overview({ activity }: { activity: Activity }) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link
-                  to={workflowPath}
-                  className="text-foreground-600 cursor-pointer font-mono text-xs group-hover:underline"
+                  to={activity.template?._id ? workflowPath : '#'}
+                  className={cn('text-foreground-600 cursor-pointer font-mono text-xs group-hover:underline', {
+                    'text-foreground-300 cursor-not-allowed': !activity.template?._id,
+                  })}
                 >
-                  {activity.template?.name}
+                  {activity.template?.name || 'Deleted workflow'}
                 </Link>
               </TooltipTrigger>
               <TooltipContent>Navigate to workflow page</TooltipContent>

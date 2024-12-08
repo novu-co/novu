@@ -31,6 +31,7 @@ export function ActivityFeed() {
           className={cn('h-full flex-1 overflow-auto', selectedActivityId ? 'w-[65%]' : 'w-full')}
         >
           <ActivityTable
+            isLoading={isLoading}
             activities={activities}
             selectedActivityId={selectedActivityId}
             onActivitySelect={(activity) => setSelectedActivityId(activity._id)}
