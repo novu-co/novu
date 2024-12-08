@@ -104,10 +104,10 @@ export function ApiKeysPage() {
                   <ExternalLink
                     variant="tip"
                     iconClassName="text-neutral-400"
-                    href="https://docs.novu.co/sdks/overview"
+                    href="https://docs.novu.co/api-reference/overview"
                     className="mt-2 text-xs text-neutral-600"
                   >
-                    Learn more about APIs in Novu
+                    Learn more about our APIs
                   </ExternalLink>
                 </div>
               </Form>
