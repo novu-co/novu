@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 export function ActivityFeed() {
   const { activities, isLoading } = useActivities();
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -28,17 +28,17 @@ export function ActivityFeed() {
           transition={{
             layout: { duration: 0.4, ease: 'easeInOut' },
           }}
-          className={cn('h-full flex-1 overflow-auto', selectedActivity ? 'w-[65%]' : 'w-full')}
+          className={cn('h-full flex-1 overflow-auto', selectedActivityId ? 'w-[65%]' : 'w-full')}
         >
           <ActivityTable
             activities={activities}
-            selectedActivity={selectedActivity}
-            onActivitySelect={setSelectedActivity}
+            selectedActivityId={selectedActivityId}
+            onActivitySelect={(activity) => setSelectedActivityId(activity._id)}
           />
         </motion.div>
 
         <AnimatePresence mode="sync">
-          {selectedActivity && (
+          {selectedActivityId && (
             <motion.div
               initial={{ width: 0, opacity: 0 }}
               animate={{ width: '35%', opacity: 1 }}
@@ -50,7 +50,7 @@ export function ActivityFeed() {
               className="bg-background h-full overflow-hidden border-l"
             >
               <div className="w-[500px]">
-                <ActivityPanel activity={selectedActivity} />
+                <ActivityPanel activityId={selectedActivityId} />
               </div>
             </motion.div>
           )}

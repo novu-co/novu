@@ -206,11 +206,11 @@ function formatDate(date: string) {
 
 interface ActivityTableProps {
   activities: Activity[];
-  selectedActivity: Activity | null;
+  selectedActivityId: string | null;
   onActivitySelect: (activity: Activity) => void;
 }
 
-export function ActivityTable({ activities, selectedActivity, onActivitySelect }: ActivityTableProps) {
+export function ActivityTable({ activities, selectedActivityId, onActivitySelect }: ActivityTableProps) {
   return (
     <div className="min-w-[800px]">
       <Table containerClassname="border-x-0 border-b-0 border-t border-t-neutral-200 rounded-none shadow-none">
@@ -228,7 +228,7 @@ export function ActivityTable({ activities, selectedActivity, onActivitySelect }
               key={activity._id}
               className={cn(
                 'cursor-pointer hover:bg-neutral-50',
-                selectedActivity?._id === activity._id && 'bg-neutral-50'
+                selectedActivityId === activity._id && 'bg-neutral-50'
               )}
               onClick={() => onActivitySelect(activity)}
             >

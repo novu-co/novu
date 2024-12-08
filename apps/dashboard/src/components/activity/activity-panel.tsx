@@ -4,6 +4,8 @@ import { motion } from 'motion/react';
 import { RiPlayCircleLine } from 'react-icons/ri';
 import { type Activity } from '@/hooks/use-activities';
 import { ActivityJobItem } from './activity-job-item';
+import { InlineToast } from '../primitives/inline-toast';
+import { useFetchActivity } from '@/hooks/use-fetch-activity';
 
 function LogsSection({ jobs }: { jobs: Activity['jobs'] }): JSX.Element {
   return (
@@ -49,10 +51,34 @@ function Overview({ activity }: { activity: Activity }) {
 }
 
 interface ActivityPanelProps {
-  activity: Activity;
+  activityId: string;
 }
 
-export function ActivityPanel({ activity }: ActivityPanelProps) {
+export function ActivityPanel({ activityId }: ActivityPanelProps) {
+  const { activity, isPending, error } = useFetchActivity({ activityId });
+
+  if (isPending) {
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+        <div className="flex h-96 items-center justify-center">
+          <div className="border-primary h-8 w-8 animate-spin rounded-full border-b-2 border-t-2" />
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (error || !activity) {
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+        <div className="flex h-96 items-center justify-center">
+          <div className="text-foreground-600 text-sm">Failed to load activity details</div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  const isMerged = activity.jobs.some((job) => job.status === 'merged');
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
       <div>
@@ -68,6 +94,17 @@ export function ActivityPanel({ activity }: ActivityPanelProps) {
           <RiPlayCircleLine className="h-3 w-3" />
           <span className="text-foreground-950 text-sm font-medium">Logs</span>
         </div>
+
+        {isMerged && (
+          <div className="px-3 py-2">
+            <InlineToast
+              ctaClassName="text-foreground-950"
+              variant={'tip'}
+              ctaLabel="View Execution"
+              description="Remaining execution has been merged to an active Digest of an existing workflow execution."
+            />
+          </div>
+        )}
         <LogsSection jobs={activity.jobs} />
       </div>
     </motion.div>
