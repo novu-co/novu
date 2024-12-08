@@ -13,61 +13,7 @@ import { useFetchApiKeys } from '../hooks/use-fetch-api-keys';
 import { ExternalLink } from '@/components/shared/external-link';
 import { Container } from '../components/primitives/container';
 import { HelpTooltipIndicator } from '../components/primitives/help-tooltip-indicator';
-
-interface SettingFieldProps {
-  label: string;
-  tooltip?: string;
-  children: ReactNode;
-}
-
-function SettingField({ label, tooltip, children }: SettingFieldProps) {
-  return (
-    <div className="grid grid-cols-[1fr,400px] items-start gap-3">
-      <label className={`text-foreground-950 text-xs font-medium`}>
-        {label}
-        {tooltip && <HelpTooltipIndicator text={tooltip} className="relative top-[5px] ml-1" />}
-      </label>
-      <div className="space-y-2">{children}</div>
-    </div>
-  );
-}
-
-interface SettingSecretFieldProps extends Omit<SettingFieldProps, 'children'> {
-  value: string;
-  onCopy: (value: string) => void;
-}
-
-function SettingSecretField({ label, tooltip, value, onCopy }: SettingSecretFieldProps) {
-  const [showSecret, setShowSecret] = useState(false);
-
-  const toggleSecretVisibility = () => {
-    setShowSecret(!showSecret);
-  };
-
-  const maskSecret = (secret: string) => {
-    return `${'•'.repeat(28)} ${secret.slice(-4)}`;
-  };
-
-  return (
-    <SettingField label={label} tooltip={tooltip}>
-      <div className="flex items-center gap-2">
-        <InputField className="flex overflow-hidden pr-0">
-          <Input className="cursor-default" value={showSecret ? value : maskSecret(value)} readOnly />
-          <CopyButton size="input-right" valueToCopy={value} />
-        </InputField>
-
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={toggleSecretVisibility}
-          aria-label={showSecret ? 'Hide Secret' : 'Show Secret'}
-        >
-          {showSecret ? <RiEyeOffLine className="size-4" /> : <RiEyeLine className="size-4" />}
-        </Button>
-      </div>
-    </SettingField>
-  );
-}
+import { API_HOSTNAME } from '../config';
 
 interface ApiKeysFormData {
   apiKey: string;
@@ -119,8 +65,8 @@ export function ApiKeysPage() {
                       <SettingField label="API URL" tooltip="The base URL for making API requests to Novu">
                         <div className="flex items-center gap-2">
                           <InputField className="flex overflow-hidden pr-0">
-                            <Input className="cursor-default" value={form.getValues('identifier')} readOnly />
-                            <CopyButton size="input-right" valueToCopy={form.getValues('identifier')} />
+                            <Input className="cursor-default" value={API_HOSTNAME} readOnly />
+                            <CopyButton size="input-right" valueToCopy={API_HOSTNAME} />
                           </InputField>
                         </div>
                       </SettingField>
@@ -128,7 +74,6 @@ export function ApiKeysPage() {
                       <SettingField
                         label="Application Identifier"
                         tooltip="This is a unique identifier for the current environment, used to initialize the Inbox component"
-                        alignTop
                       >
                         <div className="flex items-center gap-2">
                           <InputField className="flex overflow-hidden pr-0">
@@ -151,12 +96,11 @@ export function ApiKeysPage() {
 
                   <CardContent className="rounded-b-xl border-t bg-neutral-50 bg-white p-3">
                     <div className="space-y-4 p-3">
-                      <SettingSecretField
+                      <SettingField
                         label="Secret Key"
                         tooltip="Use this key to authenticate your API requests. Keep it secure and never share it publicly."
                         value={form.getValues('apiKey')}
-                        onCopy={(value) => {}}
-                        alignTop
+                        secret
                       />
                     </div>
                   </CardContent>
@@ -167,5 +111,55 @@ export function ApiKeysPage() {
         </Container>
       </DashboardLayout>
     </>
+  );
+}
+
+interface SettingFieldProps {
+  label: string;
+  tooltip?: string;
+  children?: ReactNode;
+  value?: string;
+  secret?: boolean;
+}
+
+function SettingField({ label, tooltip, children, value, secret = false }: SettingFieldProps) {
+  const [showSecret, setShowSecret] = useState(false);
+
+  const toggleSecretVisibility = () => {
+    setShowSecret(!showSecret);
+  };
+
+  const maskSecret = (secret: string) => {
+    return `${'•'.repeat(28)} ${secret.slice(-4)}`;
+  };
+
+  return (
+    <div className="grid grid-cols-[1fr,400px] items-start gap-3">
+      <label className={`text-foreground-950 text-xs font-medium`}>
+        {label}
+        {tooltip && <HelpTooltipIndicator text={tooltip} className="relative top-[5px] ml-1" />}
+      </label>
+      <div className="space-y-2">
+        {secret && value ? (
+          <div className="flex items-center gap-2">
+            <InputField className="flex overflow-hidden pr-0">
+              <Input className="cursor-default" value={showSecret ? value : maskSecret(value)} readOnly />
+              <CopyButton size="input-right" valueToCopy={value} />
+            </InputField>
+
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={toggleSecretVisibility}
+              aria-label={showSecret ? 'Hide Secret' : 'Show Secret'}
+            >
+              {showSecret ? <RiEyeOffLine className="size-4" /> : <RiEyeLine className="size-4" />}
+            </Button>
+          </div>
+        ) : (
+          children
+        )}
+      </div>
+    </div>
   );
 }
