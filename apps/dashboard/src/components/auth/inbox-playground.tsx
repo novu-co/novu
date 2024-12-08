@@ -118,6 +118,7 @@ export function InboxPlayground() {
     };
 
     initializeDemoWorkflow();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   const handleSendNotification = async () => {

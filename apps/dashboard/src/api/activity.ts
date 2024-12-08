@@ -45,14 +45,6 @@ export function getActivityList(
   });
 }
 
-export function getActivityStats() {
-  return get<{ stats: any }>('/notifications/stats');
-}
-
-export function getActivityGraphStats() {
-  return get<{ stats: any }>('/notifications/graph/stats');
-}
-
 export function getNotification(notificationId: string, environment: IEnvironment) {
   return get<{ data: Activity }>(`/notifications/${notificationId}`, {
     environment,
