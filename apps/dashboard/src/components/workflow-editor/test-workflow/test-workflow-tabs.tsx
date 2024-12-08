@@ -23,8 +23,8 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
   const { workflow } = useFetchWorkflow({
     workflowSlug,
   });
-  const to = useMemo(() => createMockObjectFromSchema(testData.to, true), [testData]);
-  const payload = useMemo(() => createMockObjectFromSchema(testData.payload, true), [testData]);
+  const to = useMemo(() => createMockObjectFromSchema(testData.to), [testData]);
+  const payload = useMemo(() => createMockObjectFromSchema(testData.payload), [testData]);
   const form = useForm<TestWorkflowFormType>({
     mode: 'onSubmit',
     resolver: zodResolver(buildDynamicFormSchema({ to: testData?.to ?? {} })),

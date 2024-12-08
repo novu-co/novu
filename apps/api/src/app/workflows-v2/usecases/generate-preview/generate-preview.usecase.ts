@@ -134,13 +134,10 @@ export class GeneratePreviewUsecase {
       return finalPayload;
     }
 
-    const examplePayloadSchema = createMockObjectFromSchema(
-      {
-        type: 'object',
-        properties: { payload: workflow.payloadSchema },
-      },
-      true
-    );
+    const examplePayloadSchema = createMockObjectFromSchema({
+      type: 'object',
+      properties: { payload: workflow.payloadSchema },
+    });
 
     if (!examplePayloadSchema || Object.keys(examplePayloadSchema).length === 0) {
       return finalPayload;

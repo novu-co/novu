@@ -17,9 +17,9 @@ import { JSONSchemaDto } from '../../dto';
  */
 export function createMockObjectFromSchema(
   schema: JSONSchemaDto,
-  safe = true,
   path = '',
-  depth = 0
+  depth = 0,
+  safe = true
 ): Record<string, unknown> {
   const MAX_DEPTH = 10;
   if (depth >= MAX_DEPTH) {
@@ -48,7 +48,7 @@ export function createMockObjectFromSchema(
     if (definition.default) {
       acc[key] = definition.default;
     } else if (definition.type === 'object' && definition.properties) {
-      acc[key] = createMockObjectFromSchema(definition, safe, currentPath, depth + 1);
+      acc[key] = createMockObjectFromSchema(definition, currentPath, depth + 1);
     } else {
       acc[key] = `{{${currentPath}}}`;
     }
