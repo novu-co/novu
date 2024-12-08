@@ -15,6 +15,7 @@ import {
   ClockIcon as Clock,
   HourglassIcon,
 } from 'lucide-react';
+import { STEP_TYPE_TO_ICON } from '../icons/utils';
 
 type ActivityStatus = 'SUCCESS' | 'ERROR' | 'QUEUED';
 
@@ -62,37 +63,25 @@ function StatusBadge({ status }: { status: ActivityStatus }) {
 }
 
 function getStepIcon(type: string) {
-  switch (type.toLowerCase()) {
-    case 'delay':
-      return <HourglassIcon className="h-4 w-4" />;
-    case 'in_app':
-      return <BellIcon className="h-4 w-4" />;
-    case 'push':
-      return <SmartphoneIcon className="h-4 w-4" />;
-    case 'email':
-      return <MailIcon className="h-4 w-4" />;
-    case 'sms':
-      return <MessageSquareIcon className="h-4 w-4" />;
-    case 'chat':
-      return <MonitorIcon className="h-4 w-4" />;
-    default:
-      return <AlertCircleIcon className="h-4 w-4" />;
-  }
+  const Icon = STEP_TYPE_TO_ICON[type as keyof typeof STEP_TYPE_TO_ICON];
+
+  return <Icon className="h-4 w-4" />;
 }
 
 function StepIndicators({ jobs }: { jobs: Activity['jobs'] }) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center">
       {jobs.map((job) => (
         <div
           key={job._id}
-          className={`flex items-center gap-1 rounded-full p-1 ${
+          className={cn(
+            '-ml-2 flex h-7 w-7 items-center justify-center rounded-full first:ml-0',
             job.status === 'completed'
-              ? 'bg-success/10 text-success'
+              ? 'border-[1px] border-[#b4e6c5] bg-[#e8f9ef] text-[#b4e6c5]'
               : job.status === 'failed'
-                ? 'bg-destructive/10 text-destructive'
-                : 'bg-muted text-muted-foreground'
-          }`}
+                ? 'border-[1px] border-[#fca5a5] bg-[#fde8e8] text-[#fca5a5]'
+                : 'border-[1px] border-[#e0e0e0] bg-[#f0f0f0] text-[#e0e0e0]'
+          )}
           title={`${job.type} - ${job.status}`}
         >
           {getStepIcon(job.type)}
