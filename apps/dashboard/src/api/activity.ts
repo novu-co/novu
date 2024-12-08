@@ -1,3 +1,4 @@
+import { IEnvironment } from '@novu/shared';
 import { get } from './api.client';
 import type { Activity } from '@/hooks/use-activities';
 
@@ -15,7 +16,11 @@ interface ActivityResponse {
   pageSize: number;
 }
 
-export function getActivityList(page = 0, filters?: IActivityFilters): Promise<ActivityResponse> {
+export function getActivityList(
+  environment: IEnvironment,
+  page = 0,
+  filters?: IActivityFilters
+): Promise<ActivityResponse> {
   const searchParams = new URLSearchParams();
   searchParams.append('page', page.toString());
 
@@ -35,7 +40,9 @@ export function getActivityList(page = 0, filters?: IActivityFilters): Promise<A
     searchParams.append('transactionId', filters.transactionId);
   }
 
-  return get<ActivityResponse>(`/notifications?${searchParams.toString()}`);
+  return get<ActivityResponse>(`/notifications?${searchParams.toString()}`, {
+    environment,
+  });
 }
 
 export function getActivityStats() {
