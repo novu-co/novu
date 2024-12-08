@@ -10,37 +10,29 @@ import {
   RiNotification3Line,
   RiTimeLine,
   RiShadowLine,
+  RiCheckboxCircleLine,
 } from 'react-icons/ri';
 import { type Activity } from '@/hooks/use-activities';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { cn } from '@/utils/ui';
 import { ExecutionDetailItem } from './execution-detail-item';
+import { STEP_TYPE_TO_ICON } from '../icons/utils';
+import { STEP_TYPE_TO_COLOR } from '../../utils/color';
 
 interface ActivityJobItemProps {
   job: Activity['jobs'][0];
   isLast: boolean;
 }
 
+function formatJobType(type: string): string {
+  return type.replace(/_/g, ' ');
+}
+
 function getJobIcon(type: string) {
-  switch (type.toLowerCase()) {
-    case 'delay':
-      return <RiTimeLine className="h-3.5 w-3.5" />;
-    case 'in_app':
-      return <RiNotification3Line className="h-3.5 w-3.5" />;
-    case 'push':
-      return <RiSmartphoneLine className="h-3.5 w-3.5" />;
-    case 'email':
-      return <RiMailLine className="h-3.5 w-3.5" />;
-    case 'sms':
-      return <RiMessage2Line className="h-3.5 w-3.5" />;
-    case 'chat':
-      return <RiMessage2Line className="h-3.5 w-3.5" />;
-    case 'digest':
-      return <RiShadowLine className="h-3.5 w-3.5" />;
-    default:
-      return <Route className="h-3.5 w-3.5" />;
-  }
+  const Icon = STEP_TYPE_TO_ICON[type.toLowerCase() as keyof typeof STEP_TYPE_TO_ICON] ?? Route;
+
+  return <Icon className="h-3.5 w-3.5" />;
 }
 
 function getJobColor(status: string) {
@@ -82,7 +74,6 @@ function JobDetails({ job }: { job: Activity['jobs'][0] }) {
 
 export function ActivityJobItem({ job, isLast }: ActivityJobItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const jobColor = getJobColor(job.status);
 
   return (
     <div className="relative flex items-center gap-4">
@@ -90,8 +81,8 @@ export function ActivityJobItem({ job, isLast }: ActivityJobItemProps) {
 
       <div className="relative flex-shrink-0">
         <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
-          <div className={`bg-${jobColor} flex h-4 w-4 items-center justify-center rounded-full`}>
-            <RiCheckLine className="h-3.5 w-3.5 text-white" />
+          <div className={`text-success flex items-center justify-center`}>
+            <RiCheckboxCircleLine className="h-4 w-4" />
           </div>
         </div>
       </div>
@@ -99,12 +90,16 @@ export function ActivityJobItem({ job, isLast }: ActivityJobItemProps) {
       <Card className="border-1 flex-1 border-neutral-200 p-1 shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between p-3">
           <div className="flex items-center gap-1.5">
-            <div className={`h-5 w-5 rounded-full border border-${jobColor}`}>
-              <div className={`h-full w-full rounded-full text-${jobColor} flex items-center justify-center`}>
+            <div
+              className={`h-5 w-5 rounded-full border opacity-40 border-${STEP_TYPE_TO_COLOR[job.type as keyof typeof STEP_TYPE_TO_COLOR]}`}
+            >
+              <div
+                className={`h-full w-full rounded-full bg-neutral-50 text-${STEP_TYPE_TO_COLOR[job.type as keyof typeof STEP_TYPE_TO_COLOR]} flex items-center justify-center`}
+              >
                 {getJobIcon(job.type)}
               </div>
             </div>
-            <span className="text-foreground-950 text-xs capitalize">{job.type}</span>
+            <span className="text-foreground-950 text-xs capitalize">{formatJobType(job.type)}</span>
           </div>
 
           <Button

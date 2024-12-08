@@ -1,4 +1,4 @@
-import { RiCheckLine, RiTimeLine, RiErrorWarningLine } from 'react-icons/ri';
+import { RiErrorWarningLine, RiCheckboxCircleLine, RiLoader3Line } from 'react-icons/ri';
 import { format } from 'date-fns';
 import { type Activity } from '@/hooks/use-activities';
 import { ChevronDown } from 'lucide-react';
@@ -13,25 +13,25 @@ function getStatusConfig(status: string) {
   switch (status.toLowerCase()) {
     case 'success':
       return {
-        icon: RiCheckLine,
-        colorClass: 'text-success border-success',
+        icon: RiCheckboxCircleLine,
+        colorClass: 'text-success',
       };
     case 'failed':
     case 'error':
       return {
         icon: RiErrorWarningLine,
-        colorClass: 'text-destructive border-destructive',
+        colorClass: 'text-destructive',
       };
     case 'pending':
     case 'queued':
       return {
-        icon: RiTimeLine,
-        colorClass: 'text-muted-foreground border-muted',
+        icon: RiLoader3Line,
+        colorClass: 'text-neutral-300',
       };
     default:
       return {
-        icon: RiCheckLine,
-        colorClass: 'text-success border-success',
+        icon: RiCheckboxCircleLine,
+        colorClass: 'text-success',
       };
   }
 }
@@ -45,11 +45,11 @@ export function ExecutionDetailItem({ detail }: ExecutionDetailItemProps) {
       <div className="flex h-full items-center pt-2">
         <div
           className={cn(
-            'flex h-4 w-4 items-center justify-center rounded-full border-[1px] bg-white shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]',
+            'flex items-center justify-center rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]',
             colorClass
           )}
         >
-          <StatusIcon className={cn('h-3 w-3', colorClass)} />
+          <StatusIcon className={cn('h-4 w-4', colorClass)} />
         </div>
       </div>
       <div className="border-1 w-full rounded-lg border border-neutral-200">
