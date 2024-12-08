@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
-import { JSONSchemaDto, StepTypeEnum, UserSessionData, WorkflowTestDataResponseDto } from '@novu/shared';
-
+import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
+import {
+  ControlValuesLevelEnum,
+  JSONSchemaDto,
+  StepTypeEnum,
+  UserSessionData,
+  WorkflowTestDataResponseDto,
+} from '@novu/shared';
 import {
   GetWorkflowByIdsCommand,
   GetWorkflowByIdsUseCase,
@@ -11,18 +16,22 @@ import {
 import { WorkflowTestDataCommand } from './build-workflow-test-data.command';
 import { parsePayloadSchema } from '../../shared/parse-payload-schema';
 import { mockSchemaDefaults } from '../../util/utils';
+import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
+import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
 
 @Injectable()
 export class BuildWorkflowTestDataUseCase {
-  constructor(private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase) {}
+  constructor(
+    private readonly getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
+    private readonly buildPayloadSchema: BuildPayloadSchema
+  ) {}
 
   @InstrumentUsecase()
   async execute(command: WorkflowTestDataCommand): Promise<WorkflowTestDataResponseDto> {
-    const _workflowEntity: NotificationTemplateEntity = await this.fetchWorkflow(command);
-    const toSchema = buildToFieldSchema({ user: command.user, steps: _workflowEntity.steps });
-    const payloadSchema = parsePayloadSchema(_workflowEntity.payloadSchema, { safe: true });
-    const payloadSchemaMock =
-      payloadSchema && Object.keys(payloadSchema.properties || {}).length > 0 ? mockSchemaDefaults(payloadSchema) : {};
+    const workflow = await this.fetchWorkflow(command);
+    const toSchema = this.buildToFieldSchema({ user: command.user, steps: workflow.steps });
+    const payloadSchema = await this.resolvePayloadSchema(workflow, command);
+    const payloadSchemaMock = this.generatePayloadMock(payloadSchema);
 
     return {
       to: toSchema,
@@ -31,8 +40,35 @@ export class BuildWorkflowTestDataUseCase {
   }
 
   @Instrument()
+  private async resolvePayloadSchema(
+    workflow: NotificationTemplateEntity,
+    command: WorkflowTestDataCommand
+  ): Promise<JSONSchemaDto> {
+    if (workflow.payloadSchema) {
+      return parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {};
+    }
+
+    return this.buildPayloadSchema.execute(
+      BuildPayloadSchemaCommand.create({
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
+        userId: command.user._id,
+        workflowId: workflow._id,
+      })
+    );
+  }
+
+  private generatePayloadMock(schema: JSONSchemaDto): Record<string, unknown> {
+    if (!schema?.properties || Object.keys(schema.properties).length === 0) {
+      return {};
+    }
+
+    return mockSchemaDefaults(schema);
+  }
+
+  @Instrument()
   private async fetchWorkflow(command: WorkflowTestDataCommand): Promise<NotificationTemplateEntity> {
-    return await this.getWorkflowByIdsUseCase.execute(
+    return this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({
         environmentId: command.user.environmentId,
         organizationId: command.user.organizationId,
@@ -41,24 +77,42 @@ export class BuildWorkflowTestDataUseCase {
       })
     );
   }
-}
 
-function buildToFieldSchema({ user, steps }: { user: UserSessionData; steps: NotificationStepEntity[] }) {
-  const isEmailExist = isContainsStepType(steps, StepTypeEnum.EMAIL);
-  const isSmsExist = isContainsStepType(steps, StepTypeEnum.SMS);
+  private buildToFieldSchema({
+    user,
+    steps,
+  }: {
+    user: UserSessionData;
+    steps: NotificationStepEntity[];
+  }): JSONSchemaDto {
+    const hasEmailStep = this.hasStepType(steps, StepTypeEnum.EMAIL);
+    const hasSmsStep = this.hasStepType(steps, StepTypeEnum.SMS);
 
-  return {
-    type: 'object',
-    properties: {
+    const properties: { [key: string]: JSONSchemaDto } = {
       subscriberId: { type: 'string', default: user._id },
-      ...(isEmailExist ? { email: { type: 'string', default: user.email ?? '', format: 'email' } } : {}),
-      ...(isSmsExist ? { phone: { type: 'string', default: '' } } : {}),
-    },
-    required: ['subscriberId', ...(isEmailExist ? ['email'] : []), ...(isSmsExist ? ['phone'] : [])],
-    additionalProperties: false,
-  } as const satisfies JSONSchemaDto;
-}
+    };
 
-function isContainsStepType(steps: NotificationStepEntity[], type: StepTypeEnum) {
-  return steps.some((step) => step.template?.type === type);
+    const required: string[] = ['subscriberId'];
+
+    if (hasEmailStep) {
+      properties.email = { type: 'string', default: user.email ?? '', format: 'email' };
+      required.push('email');
+    }
+
+    if (hasSmsStep) {
+      properties.phone = { type: 'string', default: '' };
+      required.push('phone');
+    }
+
+    return {
+      type: 'object',
+      properties,
+      required,
+      additionalProperties: false,
+    } satisfies JSONSchemaDto;
+  }
+
+  private hasStepType(steps: NotificationStepEntity[], type: StepTypeEnum): boolean {
+    return steps.some((step) => step.template?.type === type);
+  }
 }

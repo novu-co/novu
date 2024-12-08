@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import { ChannelTypeEnum } from '@novu/shared';
 
-import { usePreviewStep } from '@/hooks';
+import { usePreviewStep } from '@/hooks/use-preview-step';
 import {
   InAppPreview,
   InAppPreviewAvatar,
@@ -39,7 +39,7 @@ export const ConfigureInAppStepPreview = (props: ConfigureInAppStepPreviewProps)
     previewStep({
       workflowSlug,
       stepSlug,
-      data: { controlValues: step.controls.values, previewPayload: {} },
+      previewData: { controlValues: step.controls.values, previewPayload: {} },
     });
   }, [workflowSlug, stepSlug, previewStep, step, isPending]);
 

@@ -44,6 +44,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
     const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
     const [isOpen, setIsOpen] = useState(false);
     const { error } = useFormField();
+    const extensions = useMemo(() => [autocompletion({ override: [completions(variables)] })], [variables]);
 
     const handlePredefinedAvatarClick = (url: string) => {
       onPick?.(url);
@@ -82,9 +83,9 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
                       ref={ref}
                       placeholder="Enter avatar URL"
                       id={name}
-                      extensions={[autocompletion({ override: [completions(variables)] })]}
+                      extensions={extensions}
                       value={`${value}`}
-                      onChange={(newValue) => onChange?.(newValue)}
+                      onChange={onChange}
                     />
                   </InputField>
                   <FormMessage />

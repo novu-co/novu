@@ -4,7 +4,6 @@ import { Notification5Fill } from '@/components/icons';
 import { Separator } from '@/components/primitives/separator';
 import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
 import { InAppTabsSection } from '@/components/workflow-editor/steps/in-app/in-app-tabs-section';
-import { FormMessage } from '../../../primitives/form/form';
 
 const avatarKey = 'avatar';
 const subjectKey = 'subject';
@@ -41,12 +40,7 @@ export const InAppEditor = ({ uiSchema }: { uiSchema?: UiSchema }) => {
               {subject && getComponentByType({ component: subject.component })}
             </div>
           )}
-          {body && (
-            <>
-              {getComponentByType({ component: body.component })}
-              <FormMessage>{`Type {{ for variables, or wrap text in ** for bold.`}</FormMessage>
-            </>
-          )}
+          {body && getComponentByType({ component: body.component })}
           {(primaryAction || secondaryAction) &&
             getComponentByType({
               component: primaryAction.component || secondaryAction.component,

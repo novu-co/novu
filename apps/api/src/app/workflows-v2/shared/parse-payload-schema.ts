@@ -1,3 +1,5 @@
+import { JSONSchemaDto } from '@novu/shared';
+
 type ParsePayloadSchemaOptions = {
   safe?: boolean;
 };
@@ -5,7 +7,7 @@ type ParsePayloadSchemaOptions = {
 export function parsePayloadSchema(
   schema: unknown,
   { safe = false }: ParsePayloadSchemaOptions = {}
-): Record<string, unknown> | null {
+): JSONSchemaDto | null {
   if (!schema) {
     return null;
   }
@@ -19,7 +21,7 @@ export function parsePayloadSchema(
   }
 
   if (typeof schema === 'object') {
-    return schema as Record<string, unknown>;
+    return schema as JSONSchemaDto;
   }
 
   return safe ? null : throwSchemaError('Payload schema must be either a valid JSON string or an object');

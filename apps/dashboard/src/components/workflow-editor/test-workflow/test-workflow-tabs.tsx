@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { WorkflowTestDataResponseDto } from '@novu/shared';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitives/tabs';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
-import { useFetchWorkflow } from '@/hooks';
+import { useFetchWorkflow } from '@/hooks/use-fetch-workflow';
 import { Form } from '../../primitives/form/form';
 import { Button } from '../../primitives/button';
 import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';

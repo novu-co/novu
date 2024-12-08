@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useIntegrations } from '../../hooks/use-integrations';
+import { useFetchIntegrations } from '../../hooks/use-fetch-integrations';
 import { useFetchEnvironments } from '../../context/environment/hooks';
 import { useAuth } from '../../context/auth/hooks';
 import { ChannelTypeEnum } from '@novu/shared';
@@ -11,7 +11,7 @@ import { useSearchParams } from 'react-router-dom';
 export function InboxEmbed(): JSX.Element | null {
   const [showConfetti, setShowConfetti] = useState(false);
   const auth = useAuth();
-  const { integrations } = useIntegrations({ refetchInterval: 1000, refetchOnWindowFocus: true });
+  const { integrations } = useFetchIntegrations({ refetchInterval: 1000, refetchOnWindowFocus: true });
   const { environments } = useFetchEnvironments({ organizationId: auth?.currentOrganization?._id });
   const [searchParams] = useSearchParams();
 

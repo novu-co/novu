@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { useWorkflows } from './use-workflows';
+import { useFetchWorkflows } from './use-fetch-workflows';
 import { useOrganization } from '@clerk/clerk-react';
 import { ChannelTypeEnum, IIntegration } from '@novu/shared';
-import { useIntegrations } from './use-integrations';
+import { useFetchIntegrations } from './use-fetch-integrations';
 import { ONBOARDING_DEMO_WORKFLOW_ID } from '../config';
 
 export enum StepIdEnum {
@@ -60,9 +60,9 @@ function isActiveIntegration(integration: IIntegration, providerType: ChannelTyp
 }
 
 export function useOnboardingSteps(): OnboardingStepsResult {
-  const workflows = useWorkflows();
+  const workflows = useFetchWorkflows();
   const { organization } = useOrganization();
-  const { integrations } = useIntegrations();
+  const { integrations } = useFetchIntegrations();
 
   const hasInvitedTeamMember = useMemo(() => {
     return (organization?.membersCount ?? 0) > 1;

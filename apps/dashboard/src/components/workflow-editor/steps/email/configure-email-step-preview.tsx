@@ -3,7 +3,7 @@ import { HTMLAttributes, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useStep } from '@/components/workflow-editor/steps/step-provider';
-import { usePreviewStep } from '@/hooks';
+import { usePreviewStep } from '@/hooks/use-preview-step';
 import { EmailPreviewHeader } from '@/components/workflow-editor/steps/email/email-preview';
 import { Separator } from '@/components/primitives/separator';
 import { Skeleton } from '@/components/primitives/skeleton';
@@ -37,9 +37,7 @@ export function ConfigureEmailStepPreview(props: ConfigureEmailStepPreviewProps)
     data: previewData,
     isPending: isPreviewPending,
   } = usePreviewStep({
-    onError: (error) => {
-      Sentry.captureException(error);
-    },
+    onError: (error) => Sentry.captureException(error),
   });
   const { step, isPending } = useStep();
 
@@ -54,7 +52,7 @@ export function ConfigureEmailStepPreview(props: ConfigureEmailStepPreviewProps)
     previewStep({
       workflowSlug,
       stepSlug,
-      data: { controlValues: step.controls.values, previewPayload: {} },
+      previewData: { controlValues: step.controls.values, previewPayload: {} },
     });
   }, [workflowSlug, stepSlug, previewStep, step, isPending]);
 

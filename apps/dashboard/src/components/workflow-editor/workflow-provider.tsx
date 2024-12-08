@@ -3,7 +3,8 @@ import { createContext, ReactNode, useCallback, useEffect, useLayoutEffect, useM
 import { useBlocker, useNavigate, useParams } from 'react-router-dom';
 
 import { useEnvironment } from '@/context/environment/hooks';
-import { useFetchWorkflow, useUpdateWorkflow } from '@/hooks';
+import { useFetchWorkflow } from '@/hooks/use-fetch-workflow';
+import { useUpdateWorkflow } from '@/hooks/use-update-workflow';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 import { createContextHook } from '@/utils/context';
 import { buildRoute, ROUTES } from '@/utils/routes';
@@ -103,7 +104,7 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
   const update = useCallback(
     (data: UpdateWorkflowDto) => {
       if (workflow) {
-        enqueue(() => updateWorkflow({ workflowId: workflow.workflowId, workflow: { ...data } }));
+        enqueue(() => updateWorkflow({ workflowSlug: workflow.slug, workflow: { ...data } }));
       }
     },
     [enqueue, updateWorkflow, workflow]
@@ -112,7 +113,7 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
   const patch = useCallback(
     (data: PatchWorkflowDto) => {
       if (workflow) {
-        enqueue(() => patchWorkflow({ workflowId: workflow.workflowId, workflow: { ...data } }));
+        enqueue(() => patchWorkflow({ workflowSlug: workflow.slug, workflow: { ...data } }));
       }
     },
     [enqueue, patchWorkflow, workflow]

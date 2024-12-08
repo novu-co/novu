@@ -20,8 +20,6 @@ export enum TelemetryEvent {
   INBOX_USECASE_PAGE_VIEWED = 'Inbox use case page viewed - [Onboarding]',
   INBOX_EMBED_PAGE_VIEWED = 'Inbox embed page viewed - [Onboarding]',
   INBOX_EMBED_SUCCESS_PAGE_VIEWED = 'Inbox embed success page viewed - [Onboarding]',
-
-  // Billing related events
   BILLING_PAGE_VIEWED = 'Billing page viewed - [Billing]',
   BILLING_INTERVAL_CHANGED = 'Billing interval changed - [Billing]',
   BILLING_PAYMENT_SUCCESS = 'Payment successful - [Billing]',
@@ -32,4 +30,6 @@ export enum TelemetryEvent {
   BILLING_PORTAL_ERROR = 'Portal access error - [Billing]',
   BILLING_CONTACT_SALES_CLICKED = 'Contact sales clicked - [Billing]',
   BILLING_CONTACT_SALES_MODAL_CLOSED = 'Contact sales modal closed - [Billing]',
+  WORKFLOW_PREFERENCES_OVERRIDE_USED = 'Workflow preferences override used',
+  EXPORT_TO_CODE_BANNER_REACTION = 'Export to Code banner reaction - [Promotional]',
 }

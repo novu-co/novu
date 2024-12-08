@@ -27,7 +27,19 @@ export class AllExceptionsFilter implements ExceptionFilter {
   ): ErrorDto {
     const responseBody = this.buildBaseResponseBody(status, request, message);
     if (status !== HttpStatus.INTERNAL_SERVER_ERROR) {
-      return message instanceof Object ? { ...responseBody, ...message } : responseBody;
+      const error = message instanceof Object ? { ...responseBody, ...message } : responseBody;
+      this.logger.error({
+        /**
+         * It's important to use `err` as the key, pino (the logger we use) will
+         * log an empty object if the key is not `err`
+         *
+         * @see https://github.com/pinojs/pino/issues/819#issuecomment-611995074
+         */
+        err: exception,
+        error,
+      });
+
+      return error;
     }
 
     return this.build500Error(exception, responseBody);

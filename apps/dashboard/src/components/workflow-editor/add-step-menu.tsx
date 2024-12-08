@@ -11,6 +11,8 @@ import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 
+const noop = () => {};
+
 const MenuGroup = ({ children }: { children: ReactNode }) => {
   return <div className="flex flex-col">{children}</div>;
 };
@@ -43,7 +45,7 @@ const MenuItem = ({
 
   return (
     <span
-      onClick={onClick}
+      onClick={!disabled ? onClick : noop}
       className={cn(
         'shadow-xs text-foreground-600 hover:bg-accent flex cursor-pointer items-center gap-2 rounded-lg p-1.5',
         {
@@ -110,12 +112,7 @@ export const AddStepMenu = ({
                 <MenuItem
                   stepType={StepTypeEnum.EMAIL}
                   disabled={!areNewStepsEnabled}
-                  onClick={() => {
-                    if (!areNewStepsEnabled) {
-                      return;
-                    }
-                    handleMenuItemClick(StepTypeEnum.EMAIL);
-                  }}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.EMAIL)}
                 >
                   Email
                 </MenuItem>
@@ -135,7 +132,13 @@ export const AddStepMenu = ({
               <MenuTitle>Action Steps</MenuTitle>
               <MenuItemsGroup>
                 <MenuItem stepType={StepTypeEnum.DIGEST}>Digest</MenuItem>
-                <MenuItem stepType={StepTypeEnum.DELAY}>Delay</MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.DELAY}
+                  disabled={!areNewStepsEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.DELAY)}
+                >
+                  Delay
+                </MenuItem>
               </MenuItemsGroup>
             </MenuGroup>
           </div>

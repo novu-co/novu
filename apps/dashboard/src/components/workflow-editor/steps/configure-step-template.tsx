@@ -1,6 +1,5 @@
-import { useMemo } from 'react';
 import { motion } from 'motion/react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import {
   Sheet,
@@ -15,7 +14,6 @@ import { VisuallyHidden } from '@/components/primitives/visually-hidden';
 import { PageMeta } from '@/components/page-meta';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { useStep } from '@/components/workflow-editor/steps/step-provider';
-import { getEncodedId, STEP_DIVIDER } from '@/utils/step';
 import { StepTypeEnum } from '@novu/shared';
 import { cn } from '@/utils/ui';
 
@@ -26,25 +24,12 @@ const stepTypeToClassname: Record<string, string | undefined> = {
 };
 
 export const ConfigureStepTemplate = () => {
-  const { stepSlug = '' } = useParams<{
-    workflowSlug: string;
-    stepSlug: string;
-  }>();
   const navigate = useNavigate();
   const { workflow, update } = useWorkflow();
-  const { step } = useStep();
+  const { step, updateStepCache, issues } = useStep();
   const handleCloseSheet = () => {
     navigate('..', { relative: 'path' });
   };
-  const issues = useMemo(() => {
-    const newIssues = workflow?.steps.find(
-      (s) =>
-        getEncodedId({ slug: s.slug, divider: STEP_DIVIDER }) ===
-        getEncodedId({ slug: stepSlug, divider: STEP_DIVIDER })
-    )?.issues;
-
-    return { ...newIssues };
-  }, [workflow, stepSlug]);
 
   if (!workflow || !step) {
     return null;
@@ -90,7 +75,13 @@ export const ConfigureStepTemplate = () => {
                 <SheetTitle />
                 <SheetDescription />
               </VisuallyHidden>
-              <ConfigureStepTemplateForm workflow={workflow} step={step} update={update} issues={issues} />
+              <ConfigureStepTemplateForm
+                workflow={workflow}
+                step={step}
+                issues={issues}
+                update={update}
+                updateStepCache={updateStepCache}
+              />
             </motion.div>
           </SheetContentBase>
         </SheetPortal>

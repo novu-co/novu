@@ -8,6 +8,7 @@ import { useBillingSubscription } from '@/hooks/use-billing-subscription';
 import { Link } from 'react-router-dom';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
+import { useFetchSubscription } from '@/hooks/use-fetch-subscription';
 
 const transition = 'transition-all duration-300 ease-out';
 
@@ -69,7 +70,7 @@ const CardContent = ({
 );
 
 export const FreeTrialCard = () => {
-  const { subscription, daysLeft, isLoading } = useBillingSubscription();
+  const { subscription, daysLeft, isLoading } = useFetchSubscription();
   const daysTotal = subscription && subscription.trial.daysTotal > 0 ? subscription.trial.daysTotal : 100;
   const isV2BillingEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_DASHBOARD_BILLING_ENABLED);
 
