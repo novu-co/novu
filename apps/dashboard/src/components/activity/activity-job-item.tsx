@@ -65,10 +65,15 @@ function JobDetails({ job }: { job: Activity['jobs'][0] }) {
             ))}
           </div>
         )}
-        {hasDigestAmount(job) && job.digestAmount > 0 && (
+        {job.type === 'digest' && (
           <div className="flex items-center justify-between">
-            <span className="text-foreground-950 text-xs font-medium">Digest Count</span>
-            <span className="text-foreground-600 font-mono text-xs">{job.digestAmount}</span>
+            <Card className="border-1 border-neutral-200 p-2">
+              <CardHeader>asdasd</CardHeader>
+              <CardContent>
+                <span className="text-foreground-950 text-xs font-medium">Digest Count</span>
+                <span className="text-foreground-600 font-mono text-xs">123123</span>
+              </CardContent>
+            </Card>
           </div>
         )}
       </div>
