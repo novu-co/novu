@@ -14,6 +14,7 @@ import { ExternalLink } from '@/components/shared/external-link';
 import { Container } from '../components/primitives/container';
 import { HelpTooltipIndicator } from '../components/primitives/help-tooltip-indicator';
 import { API_HOSTNAME } from '../config';
+import { Skeleton } from '@/components/primitives/skeleton';
 
 interface ApiKeysFormData {
   apiKey: string;
@@ -25,6 +26,7 @@ export function ApiKeysPage() {
   const apiKeysQuery = useFetchApiKeys();
   const { currentEnvironment } = useEnvironment();
   const apiKeys = apiKeysQuery.data?.data;
+  const isLoading = apiKeysQuery.isLoading;
 
   const form = useForm<ApiKeysFormData>({
     values: {
@@ -62,26 +64,18 @@ export function ApiKeysPage() {
 
                   <CardContent className="rounded-b-xl border-t bg-neutral-50 bg-white p-3">
                     <div className="space-y-4 p-3">
-                      <SettingField label="API URL" tooltip="The base URL for making API requests to Novu">
-                        <div className="flex items-center gap-2">
-                          <InputField className="flex overflow-hidden pr-0">
-                            <Input className="cursor-default" value={API_HOSTNAME} readOnly />
-                            <CopyButton size="input-right" valueToCopy={API_HOSTNAME} />
-                          </InputField>
-                        </div>
-                      </SettingField>
+                      <SettingField
+                        label="API URL"
+                        tooltip="The base URL for making API requests to Novu"
+                        value={API_HOSTNAME}
+                      />
 
                       <SettingField
                         label="Application Identifier"
                         tooltip="This is a unique identifier for the current environment, used to initialize the Inbox component"
-                      >
-                        <div className="flex items-center gap-2">
-                          <InputField className="flex overflow-hidden pr-0">
-                            <Input className="cursor-default" value={form.getValues('identifier')} readOnly />
-                            <CopyButton size="input-right" valueToCopy={form.getValues('identifier')} />
-                          </InputField>
-                        </div>
-                      </SettingField>
+                        value={form.getValues('identifier')}
+                        isLoading={isLoading}
+                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -101,6 +95,7 @@ export function ApiKeysPage() {
                         tooltip="Use this key to authenticate your API requests. Keep it secure and never share it publicly."
                         value={form.getValues('apiKey')}
                         secret
+                        isLoading={isLoading}
                       />
                     </div>
                   </CardContent>
@@ -117,12 +112,20 @@ export function ApiKeysPage() {
 interface SettingFieldProps {
   label: string;
   tooltip?: string;
-  children?: ReactNode;
   value?: string;
   secret?: boolean;
+  isLoading?: boolean;
+  readOnly?: boolean;
 }
 
-function SettingField({ label, tooltip, children, value, secret = false }: SettingFieldProps) {
+function SettingField({
+  label,
+  tooltip,
+  value,
+  secret = false,
+  isLoading = false,
+  readOnly = true,
+}: SettingFieldProps) {
   const [showSecret, setShowSecret] = useState(false);
 
   const toggleSecretVisibility = () => {
@@ -139,25 +142,35 @@ function SettingField({ label, tooltip, children, value, secret = false }: Setti
         {label}
         {tooltip && <HelpTooltipIndicator text={tooltip} className="relative top-[5px] ml-1" />}
       </label>
-      <div className="space-y-2">
-        {secret && value ? (
-          <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2">
+        {isLoading ? (
+          <>
+            <Skeleton className="h-[38px] flex-1 rounded-lg" />
+            {secret && <Skeleton className="h-[38px] w-[38px] rounded-lg" />}
+          </>
+        ) : (
+          <>
             <InputField className="flex overflow-hidden pr-0">
-              <Input className="cursor-default" value={showSecret ? value : maskSecret(value)} readOnly />
-              <CopyButton size="input-right" valueToCopy={value} />
+              <Input
+                className="cursor-default"
+                value={secret ? (showSecret ? value : maskSecret(value ?? '')) : value}
+                readOnly={readOnly}
+              />
+              <CopyButton size="input-right" valueToCopy={value ?? ''} />
             </InputField>
 
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleSecretVisibility}
-              aria-label={showSecret ? 'Hide Secret' : 'Show Secret'}
-            >
-              {showSecret ? <RiEyeOffLine className="size-4" /> : <RiEyeLine className="size-4" />}
-            </Button>
-          </div>
-        ) : (
-          children
+            {secret && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={toggleSecretVisibility}
+                disabled={isLoading}
+                aria-label={showSecret ? 'Hide Secret' : 'Show Secret'}
+              >
+                {showSecret ? <RiEyeOffLine className="size-4" /> : <RiEyeLine className="size-4" />}
+              </Button>
+            )}
+          </>
         )}
       </div>
     </div>
