@@ -10,16 +10,6 @@ export function ActivityFeed() {
   const { activities, isLoading } = useActivities();
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
 
-  if (isLoading) {
-    return (
-      <DashboardLayout>
-        <div className="flex h-96 items-center justify-center">
-          <div className="border-primary h-8 w-8 animate-spin rounded-full border-b-2 border-t-2" />
-        </div>
-      </DashboardLayout>
-    );
-  }
-
   return (
     <DashboardLayout>
       <div className="relative mt-10 flex h-[calc(100vh-4rem)]">
