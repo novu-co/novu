@@ -46,7 +46,7 @@ export function ApiKeysPage() {
       <DashboardLayout headerStartItems={<h1 className="text-foreground-950">API Keys</h1>}>
         <Container>
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[224px,1fr]">
-            <div className="column flex gap-2 p-6 pt-0">
+            <div className="column flex gap-2 pt-0">
               <div className="flex flex-col gap-2">
                 <RiKey2Line className="h-8 w-8" />
                 <h2 className="text-foreground-950 text-md font-medium">Environment Keys</h2>
@@ -57,7 +57,7 @@ export function ApiKeysPage() {
                 </ExternalLink>
               </div>
             </div>
-            <div className="flex flex-col gap-6">
+            <div className="ml-auto flex w-full max-w-[700px] flex-col gap-6">
               <Form {...form}>
                 <Card className="w-full overflow-hidden shadow-none">
                   <CardHeader>Application</CardHeader>
