@@ -40,6 +40,29 @@ export function ExecutionDetailItem({ detail }: ExecutionDetailItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { icon: StatusIcon, colorClass } = getStatusConfig(detail.status);
 
+  const formatContent = (raw: unknown): string => {
+    if (typeof raw === 'string') {
+      try {
+        const parsed = JSON.parse(raw);
+        return JSON.stringify(parsed, null, 2)
+          .split('\n')
+          .map((line) => line.trimEnd())
+          .join('\n');
+      } catch {
+        return raw;
+      }
+    }
+
+    if (typeof raw === 'object') {
+      return JSON.stringify(raw, null, 2)
+        .split('\n')
+        .map((line) => line.trimEnd())
+        .join('\n');
+    }
+
+    return String(raw);
+  };
+
   return (
     <div className="flex items-start gap-3">
       <div className="flex h-full items-center pt-2">
@@ -66,7 +89,11 @@ export function ExecutionDetailItem({ detail }: ExecutionDetailItemProps) {
         {isExpanded && detail.raw && (
           <div className="border-t border-neutral-200 bg-neutral-50 p-3">
             <div className="text-foreground-600 text-xs">
-              {typeof detail.raw === 'string' ? detail.raw : JSON.stringify(detail.raw, null, 2)}
+              <div className="overflow-x-auto">
+                <pre className="max-w-fullfont-mono min-w-0" style={{ width: '1px' }}>
+                  {formatContent(detail.raw)}
+                </pre>
+              </div>
             </div>
           </div>
         )}
