@@ -6,13 +6,11 @@ import { type Activity } from '@/hooks/use-activities';
 import { ActivityJobItem } from './activity-job-item';
 import { InlineToast } from '../primitives/inline-toast';
 import { useFetchActivity } from '@/hooks/use-fetch-activity';
-import { toast } from 'sonner';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { buildRoute, ROUTES } from '../../utils/routes';
 import { useEnvironment } from '../../context/environment/hooks';
 import { CopyButton } from '../primitives/copy-button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '../primitives/hover-card';
 import { cn } from '@/utils/ui';
 import { TimeDisplayHoverCard } from '../time-display-hover-card';
 
