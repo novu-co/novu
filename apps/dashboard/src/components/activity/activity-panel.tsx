@@ -12,6 +12,9 @@ import { buildRoute, ROUTES } from '../../utils/routes';
 import { useEnvironment } from '../../context/environment/hooks';
 import { CopyButton } from '../primitives/copy-button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '../primitives/hover-card';
+import { cn } from '@/utils/ui';
+import { TimeDisplayHoverCard } from '../time-display-hover-card';
 
 function LogsSection({ jobs }: { jobs: Activity['jobs'] }): JSX.Element {
   return (
@@ -25,6 +28,7 @@ function LogsSection({ jobs }: { jobs: Activity['jobs'] }): JSX.Element {
 
 function Overview({ activity }: { activity: Activity }) {
   const { currentEnvironment } = useEnvironment();
+  const status = activity.jobs[activity.jobs.length - 1]?.status;
 
   const workflowPath = buildRoute(ROUTES.EDIT_WORKFLOW, {
     environmentSlug: currentEnvironment?.slug ?? '',
@@ -32,8 +36,8 @@ function Overview({ activity }: { activity: Activity }) {
   });
 
   return (
-    <div className="px-3 py-3">
-      <div className="flex flex-col gap-[14px]">
+    <div className="px-3 py-2">
+      <div className="mb-2 flex flex-col gap-[14px]">
         <div className="group flex items-center justify-between">
           <span className="text-foreground-950 text-xs font-medium">Workflow Identifier</span>
           <div className="group relative flex items-center gap-2">
@@ -58,25 +62,57 @@ function Overview({ activity }: { activity: Activity }) {
             </Tooltip>
           </div>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="group flex items-center justify-between">
           <span className="text-foreground-950 text-xs font-medium">TransactionID</span>
-          <span className="text-foreground-600 font-mono text-xs">{activity.transactionId}</span>
+          <div className="relative flex items-center gap-2">
+            <CopyButton
+              valueToCopy={activity.transactionId}
+              variant="ghost"
+              size="icon"
+              className="text-foreground-600 mr-0 size-3 gap-0 p-0 opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              <Copy className="h-3 w-3" />
+            </CopyButton>
+            <span className="text-foreground-600 font-mono text-xs">{activity.transactionId}</span>
+          </div>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="group flex items-center justify-between">
           <span className="text-foreground-950 text-xs font-medium">SubscriberID</span>
-          <span className="text-foreground-600 font-mono text-xs">{activity.subscriber?.subscriberId}</span>
+          <div className="relative flex items-center gap-2">
+            <CopyButton
+              valueToCopy={activity.subscriber?.subscriberId ?? ''}
+              variant="ghost"
+              size="icon"
+              className="text-foreground-600 mr-0 size-3 gap-0 p-0 opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              <Copy className="h-3 w-3" />
+            </CopyButton>
+            <span className="text-foreground-600 font-mono text-xs">{activity.subscriber?.subscriberId}</span>
+          </div>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="group flex items-center justify-between">
           <span className="text-foreground-950 text-xs font-medium">Triggered at</span>
-          <span className="text-foreground-600 font-mono text-xs">
-            {format(new Date(activity.createdAt), 'MMM d yyyy, HH:mm:ss')} UTC
-          </span>
+          <div className="relative flex items-center gap-2">
+            <TimeDisplayHoverCard date={new Date(activity.createdAt)}>
+              <span className="text-foreground-600 font-mono text-xs">
+                {format(new Date(activity.createdAt), 'MMM d yyyy, HH:mm:ss')}
+              </span>
+            </TimeDisplayHoverCard>
+          </div>
         </div>
-        <div className="flex items-center justify-between">
+        <div className="group flex items-center justify-between">
           <span className="text-foreground-950 text-xs font-medium">Status</span>
-          <span className="text-success font-mono text-xs uppercase">
-            {activity.jobs[activity.jobs.length - 1]?.status || 'QUEUED'}
-          </span>
+          <div className="relative flex items-center gap-2">
+            <span
+              className={cn('font-mono text-xs uppercase', {
+                'text-success': status === 'completed' || status === 'merged',
+                'text-destructive': status === 'failed',
+                'text-neutral-300': ['pending', 'queued', 'delayed', 'canceled', 'skipped'].includes(status || ''),
+              })}
+            >
+              {status || 'QUEUED'}
+            </span>
+          </div>
         </div>
       </div>
     </div>

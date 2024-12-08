@@ -3,18 +3,7 @@ import { Badge } from '@/components/primitives/badge';
 import { format } from 'date-fns';
 import { cn } from '@/utils/ui';
 import { type Activity } from '@/hooks/use-activities';
-import {
-  BellIcon,
-  SmartphoneIcon,
-  MonitorIcon,
-  MailIcon,
-  MessageSquareIcon,
-  AlertCircleIcon,
-  CheckCircleIcon as CheckCircle,
-  AlertCircleIcon as AlertCircle,
-  ClockIcon as Clock,
-  HourglassIcon,
-} from 'lucide-react';
+import { CheckCircleIcon as CheckCircle, AlertCircleIcon as AlertCircle, ClockIcon as Clock } from 'lucide-react';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { useState, useEffect, useRef } from 'react';
@@ -22,6 +11,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { QueryKeys } from '@/utils/query-keys';
 import { useEnvironment } from '@/context/environment/hooks';
 import { getNotification } from '@/api/activity';
+import { TimeDisplayHoverCard } from '../time-display-hover-card';
 
 type ActivityStatus = 'SUCCESS' | 'ERROR' | 'QUEUED' | 'MERGED';
 
@@ -280,7 +270,11 @@ export function ActivityTable({ activities, selectedActivityId, onActivitySelect
               <TableCell>
                 <StepIndicators jobs={activity.jobs} />
               </TableCell>
-              <TableCell className="text-foreground-600">{formatDate(activity.createdAt)}</TableCell>
+              <TableCell className="text-foreground-600">
+                <TimeDisplayHoverCard date={new Date(activity.createdAt)}>
+                  <span className="font-mono text-xs">{formatDate(activity.createdAt)}</span>
+                </TimeDisplayHoverCard>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
