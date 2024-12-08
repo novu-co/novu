@@ -1,4 +1,4 @@
-import { Route } from 'lucide-react';
+import { Route, Copy } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'motion/react';
 import { RiPlayCircleLine } from 'react-icons/ri';
@@ -6,6 +6,12 @@ import { type Activity } from '@/hooks/use-activities';
 import { ActivityJobItem } from './activity-job-item';
 import { InlineToast } from '../primitives/inline-toast';
 import { useFetchActivity } from '@/hooks/use-fetch-activity';
+import { toast } from 'sonner';
+import { useNavigate, Link } from 'react-router-dom';
+import { buildRoute, ROUTES } from '../../utils/routes';
+import { useEnvironment } from '../../context/environment/hooks';
+import { CopyButton } from '../primitives/copy-button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 
 function LogsSection({ jobs }: { jobs: Activity['jobs'] }): JSX.Element {
   return (
@@ -18,12 +24,39 @@ function LogsSection({ jobs }: { jobs: Activity['jobs'] }): JSX.Element {
 }
 
 function Overview({ activity }: { activity: Activity }) {
+  const { currentEnvironment } = useEnvironment();
+
+  const workflowPath = buildRoute(ROUTES.EDIT_WORKFLOW, {
+    environmentSlug: currentEnvironment?.slug ?? '',
+    workflowSlug: activity.template._id,
+  });
+
   return (
-    <div className="px-3 py-2">
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
+    <div className="px-3 py-3">
+      <div className="flex flex-col gap-[14px]">
+        <div className="group flex items-center justify-between">
           <span className="text-foreground-950 text-xs font-medium">Workflow Identifier</span>
-          <span className="text-foreground-600 font-mono text-xs">{activity.template?.name}</span>
+          <div className="group relative flex items-center gap-2">
+            <CopyButton
+              valueToCopy={activity.template?.name ?? ''}
+              variant="ghost"
+              size="icon"
+              className="text-foreground-600 mr-0 size-3 gap-0 p-0 opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              <Copy className="h-3 w-3" />
+            </CopyButton>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  to={workflowPath}
+                  className="text-foreground-600 cursor-pointer font-mono text-xs group-hover:underline"
+                >
+                  {activity.template?.name}
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>Navigate to workflow page</TooltipContent>
+            </Tooltip>
+          </div>
         </div>
         <div className="flex items-center justify-between">
           <span className="text-foreground-950 text-xs font-medium">TransactionID</span>
@@ -41,7 +74,7 @@ function Overview({ activity }: { activity: Activity }) {
         </div>
         <div className="flex items-center justify-between">
           <span className="text-foreground-950 text-xs font-medium">Status</span>
-          <span className="text-success font-mono text-xs">
+          <span className="text-success font-mono text-xs uppercase">
             {activity.jobs[activity.jobs.length - 1]?.status || 'QUEUED'}
           </span>
         </div>

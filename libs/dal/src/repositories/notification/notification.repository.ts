@@ -96,7 +96,7 @@ export class NotificationRepository extends BaseRepository<
           readPreference: 'secondaryPreferred',
         },
         path: 'template',
-        select: '_id name triggers',
+        select: '_id name triggers slug',
       })
       .populate({
         options: {

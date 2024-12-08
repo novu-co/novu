@@ -39,6 +39,7 @@ interface Job {
 interface Template {
   _id: string;
   name: string;
+  slug: string;
   triggers: Array<{
     type: string;
     identifier: string;
