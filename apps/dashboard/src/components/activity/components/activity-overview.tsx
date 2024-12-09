@@ -37,8 +37,8 @@ export function ActivityOverview({ activity }: ActivityOverviewProps) {
           </div>
         </div>
 
-        <CopyableField label="TransactionID" value={activity.transactionId} />
-        <CopyableField label="SubscriberID" value={activity.subscriber?.subscriberId ?? ''} />
+        <CopyableField label="Transaction ID" value={activity.transactionId} />
+        <CopyableField label="Subscriber ID" value={activity.subscriber?.subscriberId ?? ''} />
 
         <div className="group flex items-center justify-between">
           <span className="text-foreground-950 text-xs font-medium">Triggered at</span>
