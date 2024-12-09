@@ -14,6 +14,7 @@ import { StepIndicators } from './components/step-indicators';
 import { Pagination } from './components/pagination';
 import { useRef, useEffect } from 'react';
 import { IActivityFilters } from '@/api/activity';
+import { DataTableFacetedFilter } from '../primitives/data-table/data-table-faceted-filter';
 
 export interface ActivityTableProps {
   selectedActivityId: string | null;
