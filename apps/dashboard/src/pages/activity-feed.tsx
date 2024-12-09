@@ -1,5 +1,4 @@
 import { DashboardLayout } from '@/components/dashboard-layout';
-import { useActivities } from '@/hooks/use-activities';
 import { ActivityTable } from '@/components/activity/activity-table';
 import { cn } from '@/utils/ui';
 import { motion, AnimatePresence } from 'motion/react';
@@ -7,7 +6,6 @@ import { ActivityPanel } from '@/components/activity/activity-panel';
 import { useState } from 'react';
 
 export function ActivityFeed() {
-  const { activities, isLoading, hasMore, pageSize, offset } = useActivities();
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
 
   return (
@@ -21,9 +19,6 @@ export function ActivityFeed() {
           className={cn('h-full flex-1 overflow-auto', selectedActivityId ? 'w-[65%]' : 'w-full')}
         >
           <ActivityTable
-            hasMore={hasMore}
-            isLoading={isLoading}
-            activities={activities}
             selectedActivityId={selectedActivityId}
             onActivitySelect={(activity) => setSelectedActivityId(activity._id)}
           />

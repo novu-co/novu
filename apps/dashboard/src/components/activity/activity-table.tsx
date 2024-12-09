@@ -23,6 +23,7 @@ import { TimeDisplayHoverCard } from '../time-display-hover-card';
 import { createSearchParams, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/primitives/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useActivities } from '@/hooks/use-activities';
 
 type ActivityStatus = 'SUCCESS' | 'ERROR' | 'QUEUED' | 'MERGED';
 
@@ -217,26 +218,52 @@ function formatDate(date: string) {
 }
 
 interface ActivityTableProps {
-  activities: Activity[];
   selectedActivityId: string | null;
   onActivitySelect: (activity: Activity) => void;
-  isLoading: boolean;
-  hasMore: boolean;
 }
 
-export function ActivityTable({
-  activities,
-  selectedActivityId,
-  onActivitySelect,
-  isLoading,
-  hasMore,
-}: ActivityTableProps) {
+function SkeletonRow() {
+  return (
+    <TableRow className="animate-pulse">
+      <TableCell>
+        <div className="flex flex-col gap-1.5">
+          <div className="h-4 w-32 rounded bg-neutral-200" />
+          <div className="h-2.5 w-24 rounded bg-neutral-100" />
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex h-6 w-24 items-center justify-center gap-1.5 rounded-full bg-neutral-100">
+          <div className="h-3 w-3 rounded-full bg-neutral-200" />
+          <div className="h-3 w-16 rounded bg-neutral-200" />
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center">
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="border-input -ml-2 flex h-7 w-7 items-center justify-center rounded-full border bg-neutral-100 first:ml-0"
+            >
+              <div className="h-4 w-4 rounded bg-neutral-200" />
+            </div>
+          ))}
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="h-3 w-28 rounded bg-neutral-100" />
+      </TableCell>
+    </TableRow>
+  );
+}
+
+export function ActivityTable({ selectedActivityId, onActivitySelect }: ActivityTableProps) {
   const queryClient = useQueryClient();
   const { currentEnvironment } = useEnvironment();
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const { activities, isLoading, hasMore } = useActivities();
 
   const offset = parseInt(searchParams.get('offset') || '0');
   const limit = parseInt(searchParams.get('limit') || '10');
@@ -277,6 +304,7 @@ export function ActivityTable({
     <div className="flex min-h-full min-w-[800px] flex-1 flex-col">
       <Table
         isLoading={isLoading}
+        loadingRow={<SkeletonRow />}
         containerClassname="border-x-0 border-b-0 border-t border-t-neutral-200 rounded-none shadow-none"
       >
         <TableHeader>
