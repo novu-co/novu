@@ -57,7 +57,14 @@ export class GetActivityFeed {
   private async getFeedNotifications(command: GetActivityFeedCommand, subscriberIds: string[], LIMIT: number) {
     const { data: notifications } = await this.notificationRepository.getFeed(
       command.environmentId,
-      { channels: command.channels, templates: command.templates, subscriberIds, transactionId: command.transactionId },
+      {
+        channels: command.channels,
+        templates: command.templates,
+        subscriberIds,
+        transactionId: command.transactionId,
+        startDate: command.startDate,
+        endDate: command.endDate,
+      },
       command.page * LIMIT,
       LIMIT
     );

@@ -7,6 +7,9 @@ export interface IActivityFilters {
   email?: string;
   subscriberId?: string;
   transactionId?: string;
+  search?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 interface ActivityResponse {
@@ -18,7 +21,8 @@ interface ActivityResponse {
 export function getActivityList(
   environment: IEnvironment,
   page = 0,
-  filters?: IActivityFilters
+  filters?: IActivityFilters,
+  signal?: AbortSignal
 ): Promise<ActivityResponse> {
   const searchParams = new URLSearchParams();
   searchParams.append('page', page.toString());
@@ -38,9 +42,20 @@ export function getActivityList(
   if (filters?.transactionId) {
     searchParams.append('transactionId', filters.transactionId);
   }
+  if (filters?.startDate) {
+    searchParams.append('startDate', filters.startDate);
+  }
+  if (filters?.endDate) {
+    searchParams.append('endDate', filters.endDate);
+  }
+
+  if (filters?.search) {
+    searchParams.append('search', filters.search);
+  }
 
   return get<ActivityResponse>(`/notifications?${searchParams.toString()}`, {
     environment,
+    signal,
   });
 }
 

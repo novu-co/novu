@@ -23,8 +23,9 @@ export function useActivities({ filters }: UseActivitiesOptions = {}) {
 
   const { data, isLoading, isFetching } = useQuery<ActivityResponse>({
     queryKey: ['activitiesList', currentEnvironment?._id, offset, limit, filters],
-    queryFn: () => getActivityList(currentEnvironment!, Math.floor(offset / limit), filters),
+    queryFn: ({ signal }) => getActivityList(currentEnvironment!, Math.floor(offset / limit), filters, signal),
     staleTime: 0,
+    enabled: !!currentEnvironment,
   });
 
   return {

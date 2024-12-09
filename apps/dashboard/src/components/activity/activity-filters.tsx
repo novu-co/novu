@@ -7,11 +7,11 @@ import { useForm, ControllerRenderProps } from 'react-hook-form';
 import { Form, FormControl } from '../primitives/form/form';
 import { FormItem } from '../primitives/form/form';
 import { FormField } from '../primitives/form/form';
-import { Search, Filter } from 'lucide-react';
 import { RiCalendarLine, RiListCheck, RiRouteFill, RiSearchLine } from 'react-icons/ri';
 
 interface IActivityFilters {
   onFiltersChange: (filters: IActivityFiltersData) => void;
+  initialValues: IActivityFiltersData;
 }
 
 interface IActivityFiltersData {
@@ -35,27 +35,39 @@ const CHANNEL_OPTIONS = [
   { value: ChannelTypeEnum.PUSH, label: 'Push' },
 ];
 
-const defaultValues: IActivityFiltersData = {
-  dateRange: '30d',
-  channels: [],
-  templates: [],
-  searchTerm: '',
-};
-
-export function ActivityFilters({ onFiltersChange }: IActivityFilters) {
+export function ActivityFilters({ onFiltersChange, initialValues }: IActivityFilters) {
   const form = useForm<IActivityFiltersData>({
-    defaultValues,
+    defaultValues: initialValues,
   });
 
   const { data: workflowTemplates } = useFetchWorkflows({ limit: 100 });
 
   useEffect(() => {
     const subscription = form.watch((value) => {
-      onFiltersChange(value as IActivityFiltersData);
+      if (value) {
+        onFiltersChange(value as IActivityFiltersData);
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, [form.watch, onFiltersChange]);
+  }, [onFiltersChange]);
+
+  // Only reset non-search fields when initialValues change
+  useEffect(() => {
+    const { searchTerm: currentSearchTerm, ...currentValues } = form.getValues();
+    const { searchTerm: newSearchTerm, ...newValues } = initialValues;
+
+    const hasNonSearchChanges = Object.entries(newValues).some(([key, value]) => {
+      const current = currentValues[key as keyof typeof currentValues];
+
+      return JSON.stringify(value) !== JSON.stringify(current);
+    });
+
+    if (hasNonSearchChanges) {
+      form.reset({ ...initialValues, searchTerm: currentSearchTerm });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialValues]);
 
   return (
     <Form {...form}>
@@ -67,7 +79,7 @@ export function ActivityFilters({ onFiltersChange }: IActivityFilters) {
             <FormItem className="space-y-0">
               <Select value={field.value} onValueChange={field.onChange}>
                 <FormControl>
-                  <SelectTrigger className="text-foreground-400 h-[26px] min-w-[74px] px-2 py-1.5 text-xs">
+                  <SelectTrigger className="text-foreground-400 h-[26px] px-2 py-1.5 text-xs">
                     <RiCalendarLine className="mr-1 h-4 w-4" />
                     <SelectValue placeholder="Select time range" />
                   </SelectTrigger>
@@ -100,9 +112,9 @@ export function ActivityFilters({ onFiltersChange }: IActivityFilters) {
                 }}
               >
                 <FormControl>
-                  <SelectTrigger className="text-foreground-400 h-[26px] w-[140px] px-2 py-1.5 text-xs">
+                  <SelectTrigger className="text-foreground-400 h-[26px] px-2 py-1.5 text-xs">
                     <RiListCheck className="mr-1 h-4 w-4" />
-                    <SelectValue placeholder="Channel Steps" />
+                    <SelectValue placeholder="All Channels" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -125,15 +137,22 @@ export function ActivityFilters({ onFiltersChange }: IActivityFilters) {
             <FormItem className="space-y-0">
               <Select
                 value={field.value?.join(',')}
-                onValueChange={(value) => field.onChange(value ? value.split(',').filter(Boolean) : [])}
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    field.onChange([]);
+                  } else {
+                    field.onChange(value ? value.split(',').filter(Boolean) : []);
+                  }
+                }}
               >
                 <FormControl>
-                  <SelectTrigger className="text-foreground-400 h-[26px] min-w-[115px] px-2 py-1.5 text-xs">
+                  <SelectTrigger className="text-foreground-400 h-[26px] px-2 py-1.5 text-xs">
                     <RiRouteFill className="mr-1 h-4 w-4" />
-                    <SelectValue placeholder="Workflows" />
+                    <SelectValue placeholder="All Workflows" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
+                  <SelectItem value="all">Show All</SelectItem>
                   {workflowTemplates?.workflows?.map((template) => (
                     <SelectItem key={template._id} value={template._id}>
                       {template.name}

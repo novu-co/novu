@@ -13,20 +13,22 @@ import { StatusBadge } from './components/status-badge';
 import { StepIndicators } from './components/step-indicators';
 import { Pagination } from './components/pagination';
 import { useRef, useEffect } from 'react';
+import { IActivityFilters } from '@/api/activity';
 
 export interface ActivityTableProps {
   selectedActivityId: string | null;
   onActivitySelect: (activity: IActivity) => void;
+  filters?: IActivityFilters;
 }
 
-export function ActivityTable({ selectedActivityId, onActivitySelect }: ActivityTableProps) {
+export function ActivityTable({ selectedActivityId, onActivitySelect, filters }: ActivityTableProps) {
   const queryClient = useQueryClient();
   const { currentEnvironment } = useEnvironment();
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { activities, isLoading, hasMore } = useActivities();
+  const { activities, isLoading, hasMore } = useActivities({ filters });
 
   const offset = parseInt(searchParams.get('offset') || '0');
   const limit = parseInt(searchParams.get('limit') || '10');
@@ -160,12 +162,8 @@ function SkeletonRow() {
   );
 }
 
-function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriberId' | 'firstName' | 'lastName'>) {
+function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriberId'>) {
   if (!subscriber) return '';
 
-  if (subscriber.firstName || subscriber.lastName) {
-    return `• ${subscriber.firstName || ''} ${subscriber.lastName || ''}`;
-  }
-
-  return '';
+  return subscriber.subscriberId ? `• ${subscriber.subscriberId}` : '';
 }
