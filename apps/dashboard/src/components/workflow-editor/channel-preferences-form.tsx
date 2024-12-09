@@ -58,17 +58,7 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
     const allChannels = defaultPreferences?.channels;
     if (!allChannels) return null;
 
-    const filteredChannels = Object.keys(allChannels).reduce(
-      (acc, curr) => {
-        if (steps.includes(curr as StepTypeEnum)) {
-          acc[curr as ChannelTypeEnum] = allChannels[curr as ChannelTypeEnum];
-        }
-        return acc;
-      },
-      {} as Record<ChannelTypeEnum, { enabled: boolean }>
-    );
-
-    return filteredChannels;
+    return allChannels;
   }, [isDefaultPreferences, workflow.preferences.default, workflow.preferences.user, workflow.steps]);
 
   const form = useForm<z.infer<typeof UserPreferencesFormSchema>>({

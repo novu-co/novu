@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import type { ExternalToast } from 'sonner';
@@ -26,13 +26,7 @@ import { useTags } from '@/hooks/use-tags';
 import { ROUTES } from '@/utils/routes';
 import { cn } from '@/utils/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  ChannelTypeEnum,
-  STEP_TYPE_TO_CHANNEL_TYPE,
-  UpdateWorkflowDto,
-  WorkflowOriginEnum,
-  WorkflowResponseDto,
-} from '@novu/shared';
+import { UpdateWorkflowDto, WorkflowOriginEnum, WorkflowResponseDto } from '@novu/shared';
 import {
   RiArrowRightSLine,
   RiCodeSSlashLine,
@@ -88,11 +82,6 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
       telemetryEvent: TelemetryEvent.EXPORT_TO_CODE_BANNER_REACTION,
     },
   });
-
-  const hasStepsForPreferences = useMemo(
-    () => workflow.steps.some((step) => STEP_TYPE_TO_CHANNEL_TYPE.has(step.type)),
-    [workflow.steps]
-  );
 
   const { deleteWorkflow, isPending: isDeleteWorkflowPending } = useDeleteWorkflow({
     onSuccess: () => {
@@ -361,33 +350,19 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
           </form>
         </Form>
         <Separator />
-
         <SidebarContent size="lg">
-          <Tooltip>
-            <TooltipTrigger disabled={hasStepsForPreferences} className="w-full">
-              <Button
-                variant="outline"
-                type="button"
-                disabled={!hasStepsForPreferences}
-                className="w-full justify-start p-0"
-              >
-                <Link
-                  to={ROUTES.EDIT_WORKFLOW_PREFERENCES}
-                  className="flex w-full justify-start gap-1.5 p-1.5 text-xs font-medium"
-                >
-                  <RiSettingsLine className="h-4 w-4 text-neutral-600" />
-                  Configure channel preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent>
-                Channel preference configuration is available for the Email, In-App, SMS, Chat, and Push channels.
-              </TooltipContent>
-            </TooltipPortal>
-          </Tooltip>
-          <Tooltip></Tooltip>
+          <Link to={ROUTES.EDIT_WORKFLOW_PREFERENCES}>
+            <Button
+              variant="outline"
+              type="button"
+              className="flex w-full justify-start gap-1.5 p-1.5 text-xs font-medium"
+            >
+              <RiSettingsLine className="h-4 w-4 text-neutral-600" />
+              Configure channel preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
+            </Button>
+          </Link>
         </SidebarContent>
+
         <Separator />
       </motion.div>
     </>
