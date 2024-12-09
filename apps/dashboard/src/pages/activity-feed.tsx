@@ -4,12 +4,22 @@ import { cn } from '@/utils/ui';
 import { motion, AnimatePresence } from 'motion/react';
 import { ActivityPanel } from '@/components/activity/activity-panel';
 import { useState } from 'react';
+import { Badge } from '../components/primitives/badge';
 
 export function ActivityFeed() {
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
 
   return (
-    <DashboardLayout>
+    <DashboardLayout
+      headerStartItems={
+        <h1 className="text-foreground-950 flex items-center gap-1">
+          <span>Activity Feed</span>
+          <Badge kind="pill" size="2xs">
+            BETA
+          </Badge>
+        </h1>
+      }
+    >
       <div className="relative mt-10 flex h-[calc(100vh-4rem)]">
         <motion.div
           layout="position"

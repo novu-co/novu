@@ -1,18 +1,12 @@
-import { Route, Copy } from 'lucide-react';
-import { format } from 'date-fns';
+import { Route } from 'lucide-react';
 import { motion } from 'motion/react';
 import { RiPlayCircleLine } from 'react-icons/ri';
 import { ActivityJobItem } from './activity-job-item';
 import { InlineToast } from '../primitives/inline-toast';
 import { useFetchActivity } from '@/hooks/use-fetch-activity';
-import { Link } from 'react-router-dom';
-import { buildRoute, ROUTES } from '../../utils/routes';
-import { useEnvironment } from '../../context/environment/hooks';
-import { CopyButton } from '../primitives/copy-button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
-import { cn } from '@/utils/ui';
-import { TimeDisplayHoverCard } from '../time-display-hover-card';
-import { IActivity, IActivityJob } from '@novu/shared';
+import { ActivityPanelProps } from './types';
+import { ActivityOverview } from './components/activity-overview';
+import { IActivityJob } from '@novu/shared';
 
 function LogsSection({ jobs }: { jobs: IActivityJob[] }): JSX.Element {
   return (
@@ -22,106 +16,6 @@ function LogsSection({ jobs }: { jobs: IActivityJob[] }): JSX.Element {
       ))}
     </div>
   );
-}
-
-function Overview({ activity }: { activity: IActivity }) {
-  const { currentEnvironment } = useEnvironment();
-  const status = activity.jobs[activity?.jobs?.length - 1]?.status;
-
-  const workflowPath = buildRoute(ROUTES.EDIT_WORKFLOW, {
-    environmentSlug: currentEnvironment?.slug ?? '',
-    workflowSlug: activity?.template?._id ?? '',
-  });
-
-  return (
-    <div className="px-3 py-2">
-      <div className="mb-2 flex flex-col gap-[14px]">
-        <div className="group flex items-center justify-between">
-          <span className="text-foreground-950 text-xs font-medium">Workflow Identifier</span>
-          <div className="group relative flex items-center gap-2">
-            <CopyButton
-              valueToCopy={activity.template?.name ?? ''}
-              variant="ghost"
-              size="icon"
-              className="text-foreground-600 mr-0 size-3 gap-0 p-0 opacity-0 transition-opacity group-hover:opacity-100"
-            >
-              <Copy className="h-3 w-3" />
-            </CopyButton>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link
-                  to={activity.template?._id ? workflowPath : '#'}
-                  className={cn('text-foreground-600 cursor-pointer font-mono text-xs group-hover:underline', {
-                    'text-foreground-300 cursor-not-allowed': !activity.template?._id,
-                  })}
-                >
-                  {activity.template?.name || 'Deleted workflow'}
-                </Link>
-              </TooltipTrigger>
-              <TooltipContent>Navigate to workflow page</TooltipContent>
-            </Tooltip>
-          </div>
-        </div>
-        <div className="group flex items-center justify-between">
-          <span className="text-foreground-950 text-xs font-medium">TransactionID</span>
-          <div className="relative flex items-center gap-2">
-            <CopyButton
-              valueToCopy={activity.transactionId}
-              variant="ghost"
-              size="icon"
-              className="text-foreground-600 mr-0 size-3 gap-0 p-0 opacity-0 transition-opacity group-hover:opacity-100"
-            >
-              <Copy className="h-3 w-3" />
-            </CopyButton>
-            <span className="text-foreground-600 font-mono text-xs">{activity.transactionId}</span>
-          </div>
-        </div>
-        <div className="group flex items-center justify-between">
-          <span className="text-foreground-950 text-xs font-medium">SubscriberID</span>
-          <div className="relative flex items-center gap-2">
-            <CopyButton
-              valueToCopy={activity.subscriber?.subscriberId ?? ''}
-              variant="ghost"
-              size="icon"
-              className="text-foreground-600 mr-0 size-3 gap-0 p-0 opacity-0 transition-opacity group-hover:opacity-100"
-            >
-              <Copy className="h-3 w-3" />
-            </CopyButton>
-            <span className="text-foreground-600 font-mono text-xs">{activity.subscriber?.subscriberId}</span>
-          </div>
-        </div>
-        <div className="group flex items-center justify-between">
-          <span className="text-foreground-950 text-xs font-medium">Triggered at</span>
-          <div className="relative flex items-center gap-2">
-            <TimeDisplayHoverCard date={new Date(activity.createdAt)}>
-              <span className="text-foreground-600 font-mono text-xs">
-                {format(new Date(activity.createdAt), 'MMM d yyyy, HH:mm:ss')}
-              </span>
-            </TimeDisplayHoverCard>
-          </div>
-        </div>
-        <div className="group flex items-center justify-between">
-          <span className="text-foreground-950 text-xs font-medium">Status</span>
-          <div className="relative flex items-center gap-2">
-            <span
-              className={cn('font-mono text-xs uppercase', {
-                'text-success': status === 'completed' || status === 'merged',
-                'text-destructive': status === 'failed',
-                'text-neutral-300': ['pending', 'queued', 'delayed', 'canceled', 'skipped'].includes(status || ''),
-              })}
-            >
-              {status || 'QUEUED'}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-interface ActivityPanelProps {
-  activityId: string;
-  onActivitySelect: (activityId: string) => void;
 }
 
 function LoadingSkeleton() {
@@ -201,7 +95,7 @@ export function ActivityPanel({ activityId, onActivitySelect }: ActivityPanelPro
             {activity.template?.name || 'Deleted workflow'}
           </span>
         </div>
-        <Overview activity={activity} />
+        <ActivityOverview activity={activity} />
 
         <div className="flex items-center gap-2 border-b border-t border-neutral-100 p-2 px-3">
           <RiPlayCircleLine className="h-3 w-3" />
