@@ -3,6 +3,7 @@ import { ActivityPanel } from '@/components/activity/activity-panel';
 import { useActivities } from '@/hooks/use-activities';
 import { useEffect, useState } from 'react';
 import { JobStatusEnum } from '@novu/shared';
+import { Loader2 } from 'lucide-react';
 
 interface TestWorkflowLogsSidebarProps {
   transactionId?: string;
@@ -10,7 +11,7 @@ interface TestWorkflowLogsSidebarProps {
 
 export const TestWorkflowLogsSidebar = ({ transactionId }: TestWorkflowLogsSidebarProps) => {
   const [shouldRefetch, setShouldRefetch] = useState(true);
-  const { activities, isLoading } = useActivities(
+  const { activities } = useActivities(
     {
       filters: transactionId ? { transactionId } : undefined,
     },
@@ -39,9 +40,12 @@ export const TestWorkflowLogsSidebar = ({ transactionId }: TestWorkflowLogsSideb
 
   return (
     <aside className="flex h-full w-[500px] flex-col border-l">
-      {isLoading ? (
+      {transactionId && !activityId ? (
         <div className="flex h-full items-center justify-center">
-          <div className="text-foreground-600 text-sm">Loading activity...</div>
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="size-8 animate-spin text-neutral-500" />
+            <div className="text-foreground-600 text-sm">Waiting for activity...</div>
+          </div>
         </div>
       ) : activityId ? (
         <ActivityPanel activityId={activityId} onActivitySelect={() => {}} headerClassName="h-[49px]" />

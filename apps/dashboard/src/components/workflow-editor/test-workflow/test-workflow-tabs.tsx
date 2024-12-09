@@ -71,31 +71,6 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
         });
       }
       setTransactionId(newTransactionId);
-      return showToast({
-        variant: 'lg',
-        children: ({ close }) => (
-          <>
-            <ToastIcon variant="success" />
-            <div className="flex flex-col gap-2">
-              <span className="font-medium">Test workflow succeeded</span>
-              <span className="text-foreground-600 inline">
-                Workflow <span className="font-bold">{workflow?.name}</span> was triggered successfully.
-              </span>
-              <Link
-                to={`${LEGACY_ROUTES.ACTIVITY_FEED}?transactionId=${newTransactionId}`}
-                reloadDocument
-                className="text-primary text-sm font-medium"
-              >
-                View activity feed
-              </Link>
-            </div>
-            <ToastClose onClick={close} />
-          </>
-        ),
-        options: {
-          position: 'bottom-right',
-        },
-      });
     } catch (e) {
       toast.error('Failed to trigger workflow', {
         description: e instanceof Error ? e.message : 'There was an error triggering the workflow.',
