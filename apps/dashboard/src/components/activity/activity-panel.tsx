@@ -2,7 +2,6 @@ import { Route, Copy } from 'lucide-react';
 import { format } from 'date-fns';
 import { motion } from 'motion/react';
 import { RiPlayCircleLine } from 'react-icons/ri';
-import { type Activity } from '@/hooks/use-activities';
 import { ActivityJobItem } from './activity-job-item';
 import { InlineToast } from '../primitives/inline-toast';
 import { useFetchActivity } from '@/hooks/use-fetch-activity';
@@ -13,8 +12,9 @@ import { CopyButton } from '../primitives/copy-button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 import { cn } from '@/utils/ui';
 import { TimeDisplayHoverCard } from '../time-display-hover-card';
+import { IActivityJob } from '@novu/shared';
 
-function LogsSection({ jobs }: { jobs: Activity['jobs'] }): JSX.Element {
+function LogsSection({ jobs }: { jobs: IActivityJob[] }): JSX.Element {
   return (
     <div className="flex flex-col gap-6 bg-white p-3">
       {jobs.map((job, index) => (
@@ -24,7 +24,7 @@ function LogsSection({ jobs }: { jobs: Activity['jobs'] }): JSX.Element {
   );
 }
 
-function Overview({ activity }: { activity: Activity }) {
+function Overview({ activity }: { activity: IActivity }) {
   const { currentEnvironment } = useEnvironment();
   const status = activity.jobs[activity?.jobs?.length - 1]?.status;
 

@@ -1,9 +1,9 @@
 import { Route, ChevronDown } from 'lucide-react';
+import { IActivityJob } from '@novu/shared';
 import { Button } from '@/components/primitives/button';
 import { Badge } from '@/components/primitives/badge';
 import { Card, CardContent, CardHeader } from '../primitives/card';
 import { RiShadowLine, RiCheckboxCircleLine, RiForbidFill, RiErrorWarningLine, RiLoader4Fill } from 'react-icons/ri';
-import { type Activity } from '@/hooks/use-activities';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { cn } from '@/utils/ui';
@@ -11,21 +11,8 @@ import { ExecutionDetailItem } from './execution-detail-item';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { STEP_TYPE_TO_COLOR } from '../../utils/color';
 
-interface DigestEvent {
-  type: string;
-  [key: string]: unknown;
-}
-
-type JobWithDigest = Activity['jobs'][0] & {
-  digest?: {
-    events: DigestEvent[];
-    amount: number;
-    unit: string;
-  };
-};
-
 interface ActivityJobItemProps {
-  job: JobWithDigest;
+  job: IActivityJob;
   isFirst: boolean;
   isLast: boolean;
 }
@@ -34,7 +21,7 @@ function formatJobType(type: string): string {
   return type.replace(/_/g, ' ');
 }
 
-function getStatusMessage(job: JobWithDigest): string {
+function getStatusMessage(job: IActivityJob): string {
   if (job.status === 'merged') {
     return 'Step merged with another execution';
   }
@@ -98,7 +85,7 @@ function getJobColor(status: string) {
   }
 }
 
-function JobDetails({ job }: { job: JobWithDigest }) {
+function JobDetails({ job }: { job: IActivityJob }) {
   return (
     <div className="border-t border-neutral-100 p-4">
       <div className="flex flex-col gap-4">

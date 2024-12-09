@@ -1,16 +1,8 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableFooter,
-} from '@/components/primitives/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/primitives/table';
 import { Badge } from '@/components/primitives/badge';
 import { format } from 'date-fns';
 import { cn } from '@/utils/ui';
-import { type Activity } from '@/hooks/use-activities';
+import { IActivityJob, IActivity } from '@novu/shared';
 import { CheckCircleIcon as CheckCircle, AlertCircleIcon as AlertCircle, ClockIcon as Clock } from 'lucide-react';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
@@ -27,10 +19,11 @@ import { useActivities } from '@/hooks/use-activities';
 
 type ActivityStatus = 'SUCCESS' | 'ERROR' | 'QUEUED' | 'MERGED';
 
-function getActivityStatus(jobs: Activity['jobs']): ActivityStatus {
+function getActivityStatus(jobs: IActivityJob[]): ActivityStatus {
   if (!jobs.length) return 'QUEUED';
 
   const lastJob = jobs[jobs.length - 1];
+
   switch (lastJob.status) {
     case 'completed':
       return 'SUCCESS';
@@ -43,7 +36,7 @@ function getActivityStatus(jobs: Activity['jobs']): ActivityStatus {
   }
 }
 
-function JobsList({ jobs }: { jobs: Activity['jobs'] }) {
+function JobsList({ jobs }: { jobs: IActivityJob[] }) {
   const statusConfig = {
     completed: {
       color: 'text-success',
@@ -118,7 +111,7 @@ function JobsList({ jobs }: { jobs: Activity['jobs'] }) {
   );
 }
 
-function StatusBadge({ status, jobs }: { status: ActivityStatus; jobs: Activity['jobs'] }) {
+function StatusBadge({ status, jobs }: { status: ActivityStatus; jobs: IActivityJob[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const errorCount = jobs.filter((job) => job.status === 'failed').length;
   let hoverTimeout: NodeJS.Timeout;
@@ -188,7 +181,7 @@ function getStepIcon(type: string) {
   return <Icon className="h-4 w-4" />;
 }
 
-function StepIndicators({ jobs }: { jobs: Activity['jobs'] }) {
+function StepIndicators({ jobs }: { jobs: IActivityJob[] }) {
   const statusStyles = {
     completed: 'border-[1px] border-[#b4e6c5] bg-[#e8f9ef] text-[#b4e6c5]',
     failed: 'border-[1px] border-[#fca5a5] bg-[#fde8e8] text-[#fca5a5]',
@@ -219,7 +212,7 @@ function formatDate(date: string) {
 
 interface ActivityTableProps {
   selectedActivityId: string | null;
-  onActivitySelect: (activity: Activity) => void;
+  onActivitySelect: (activity: IActivity) => void;
 }
 
 function SkeletonRow() {
@@ -276,7 +269,7 @@ export function ActivityTable({ selectedActivityId, onActivitySelect }: Activity
     navigate(`${location.pathname}?${newParams}`);
   };
 
-  const handleRowMouseEnter = (activity: Activity) => {
+  const handleRowMouseEnter = (activity: IActivity) => {
     hoverTimerRef.current = setTimeout(() => {
       queryClient.prefetchQuery({
         queryKey: [QueryKeys.fetchActivity, currentEnvironment?._id, activity._id],
