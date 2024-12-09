@@ -162,8 +162,12 @@ function SkeletonRow() {
   );
 }
 
-function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriberId'>) {
+function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriberId' | 'firstName' | 'lastName'>) {
   if (!subscriber) return '';
 
-  return subscriber.subscriberId ? `• ${subscriber.subscriberId}` : '';
+  if (subscriber.firstName || subscriber.lastName) {
+    return `• ${subscriber.firstName || ''} ${subscriber.lastName || ''}`;
+  }
+
+  return '';
 }
