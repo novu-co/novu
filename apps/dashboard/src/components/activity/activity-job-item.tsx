@@ -10,7 +10,6 @@ import { cn } from '@/utils/ui';
 import { ExecutionDetailItem } from './execution-detail-item';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { STEP_TYPE_TO_COLOR } from '../../utils/color';
-import { ActivityDetailCard } from './activity-detail-card';
 
 interface DigestEvent {
   type: string;
@@ -20,6 +19,8 @@ interface DigestEvent {
 type JobWithDigest = Activity['jobs'][0] & {
   digest?: {
     events: DigestEvent[];
+    amount: number;
+    unit: string;
   };
 };
 
@@ -31,6 +32,50 @@ interface ActivityJobItemProps {
 
 function formatJobType(type: string): string {
   return type.replace(/_/g, ' ');
+}
+
+function getStatusMessage(job: JobWithDigest): string {
+  if (job.status === 'merged') {
+    return 'Step merged with another execution';
+  }
+
+  if (job.status === 'failed' && job.executionDetails?.length > 0) {
+    return (
+      job.executionDetails[job.executionDetails.length - 1].detail + ' asda sd sad sad sad as d asdasd asd asd as' ||
+      'Step execution failed'
+    );
+  }
+
+  switch (job.type.toLowerCase()) {
+    case 'digest':
+      if (job.status === 'completed') {
+        return `Digested ${job.digest?.events?.length ?? 0} events for ${job.digest?.amount ?? 0} ${
+          job.digest?.unit ?? ''
+        }`;
+      }
+      if (job.status === 'pending') {
+        return 'Collecting Digest events';
+      }
+      return 'Digest failed';
+
+    case 'delay':
+      if (job.status === 'completed') {
+        return 'Delay completed';
+      }
+      if (job.status === 'pending') {
+        return 'Delaying execution';
+      }
+      return 'Delay failed';
+
+    default:
+      if (job.status === 'completed') {
+        return 'Message sent successfully';
+      }
+      if (job.status === 'pending') {
+        return 'Sending message';
+      }
+      return 'Message delivery failed';
+  }
 }
 
 function getJobIcon(type: string) {
@@ -63,6 +108,8 @@ function JobDetails({ job }: { job: JobWithDigest }) {
             ))}
           </div>
         )}
+        {/*
+        TODO: Missing backend support for digest events widget
         {job.type === 'digest' && job.digest?.events && (
           <ActivityDetailCard title="Digest Events" expandable={true} open>
             <div className="min-w-0 max-w-full font-mono">
@@ -79,7 +126,7 @@ function JobDetails({ job }: { job: JobWithDigest }) {
               ))}
             </div>
           </ActivityDetailCard>
-        )}
+        )} */}
       </div>
     </div>
   );
@@ -154,8 +201,8 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
         {!isExpanded && (
           <CardContent className="rounded-lg bg-neutral-50 p-2">
             <div className="flex items-center justify-between">
-              <span className="text-foreground-400 text-xs capitalize">{job.status}</span>
-              <Badge variant="soft" className="bg-foreground-50 px-2 py-0.5 text-[11px] leading-3">
+              <span className="text-foreground-400 max-w-[300px] truncate pr-2 text-xs">{getStatusMessage(job)}</span>
+              <Badge variant="soft" className="bg-foreground-50 shrink-0 px-2 py-0.5 text-[11px] leading-3">
                 {format(new Date(job.updatedAt), 'MMM d yyyy, HH:mm:ss')}
               </Badge>
             </div>

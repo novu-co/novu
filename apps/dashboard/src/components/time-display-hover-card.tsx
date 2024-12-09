@@ -7,7 +7,7 @@ interface TimeDisplayHoverCardProps {
 }
 
 export function TimeDisplayHoverCard({ date, children }: TimeDisplayHoverCardProps) {
-  const utcTime = format(date, 'MMM d yyyy, HH:mm:ss');
+  const utcTime = format(new Date(date.toUTCString()), 'MMM d yyyy, HH:mm:ss');
   const localTime = format(date, 'MMM d yyyy, HH:mm:ss');
   const timeAgo = formatDistanceToNow(date, { addSuffix: true });
 
