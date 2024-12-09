@@ -2,7 +2,7 @@ import { Route, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/primitives/button';
 import { Badge } from '@/components/primitives/badge';
 import { Card, CardContent, CardHeader } from '../primitives/card';
-import { RiShadowLine, RiCheckboxCircleLine, RiForbidFill, RiErrorWarningLine } from 'react-icons/ri';
+import { RiShadowLine, RiCheckboxCircleLine, RiForbidFill, RiErrorWarningLine, RiLoader4Fill } from 'react-icons/ri';
 import { type Activity } from '@/hooks/use-activities';
 import { format } from 'date-fns';
 import { useState } from 'react';
@@ -62,9 +62,11 @@ function getStatusMessage(job: JobWithDigest): string {
       if (job.status === 'completed') {
         return 'Delay completed';
       }
-      if (job.status === 'pending') {
-        return 'Delaying execution';
+
+      if (job.status === 'delayed') {
+        return 'Waiting for ' + job.digest?.amount + ' ' + job.digest?.unit;
       }
+
       return 'Delay failed';
 
     default:
@@ -90,6 +92,8 @@ function getJobColor(status: string) {
       return 'success';
     case 'failed':
       return 'destructive';
+    case 'delayed':
+      return 'warning';
     case 'merged':
       return 'neutral-300';
     default:
@@ -145,6 +149,8 @@ function JobStatusIndicator({ status }: JobStatusIndicatorProps) {
             <RiCheckboxCircleLine className="h-4 w-4" />
           ) : status === 'failed' ? (
             <RiErrorWarningLine className="h-4 w-4" />
+          ) : status === 'delayed' ? (
+            <RiLoader4Fill className="text-warning animate-spin-slow h-4 w-4" />
           ) : status === 'merged' ? (
             <RiForbidFill className="h-4 w-4" />
           ) : (
@@ -160,7 +166,7 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="relative flex items-center gap-4">
+    <div className="relative flex items-center gap-1">
       <div
         className={cn(
           'absolute left-[11px] h-[calc(100%+24px)] w-[1px] bg-neutral-200',

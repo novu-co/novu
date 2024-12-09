@@ -195,7 +195,7 @@ export function ActivityPanel({ activityId, onActivitySelect }: ActivityPanelPro
       className="h-full"
     >
       <div>
-        <div className="flex items-center gap-2 border-b border-t border-neutral-200 border-b-neutral-100 p-2">
+        <div className="flex items-center gap-2 border-b border-t border-neutral-200 border-b-neutral-100 p-2 px-3">
           <Route className="h-3 w-3" />
           <span className="text-foreground-950 text-sm font-medium">
             {activity.template?.name || 'Deleted workflow'}
@@ -203,7 +203,7 @@ export function ActivityPanel({ activityId, onActivitySelect }: ActivityPanelPro
         </div>
         <Overview activity={activity} />
 
-        <div className="flex items-center gap-2 border-b border-t border-neutral-100 p-2">
+        <div className="flex items-center gap-2 border-b border-t border-neutral-100 p-2 px-3">
           <RiPlayCircleLine className="h-3 w-3" />
           <span className="text-foreground-950 text-sm font-medium">Logs</span>
         </div>

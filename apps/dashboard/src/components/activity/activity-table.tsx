@@ -173,6 +173,13 @@ function getStepIcon(type: string) {
 }
 
 function StepIndicators({ jobs }: { jobs: Activity['jobs'] }) {
+  const statusStyles = {
+    completed: 'border-[1px] border-[#b4e6c5] bg-[#e8f9ef] text-[#b4e6c5]',
+    failed: 'border-[1px] border-[#fca5a5] bg-[#fde8e8] text-[#fca5a5]',
+    delayed: 'border-[1px] border-[#f7d794] bg-[#fef9e7] text-[#f7d794]',
+    default: 'border-[1px] border-[#e0e0e0] bg-[#f0f0f0] text-[#e0e0e0]',
+  } as const;
+
   return (
     <div className="flex items-center">
       {jobs.map((job) => (
@@ -180,11 +187,7 @@ function StepIndicators({ jobs }: { jobs: Activity['jobs'] }) {
           key={job._id}
           className={cn(
             '-ml-2 flex h-7 w-7 items-center justify-center rounded-full first:ml-0',
-            job.status === 'completed'
-              ? 'border-[1px] border-[#b4e6c5] bg-[#e8f9ef] text-[#b4e6c5]'
-              : job.status === 'failed'
-                ? 'border-[1px] border-[#fca5a5] bg-[#fde8e8] text-[#fca5a5]'
-                : 'border-[1px] border-[#e0e0e0] bg-[#f0f0f0] text-[#e0e0e0]'
+            statusStyles[job.status as keyof typeof statusStyles] ?? statusStyles.default
           )}
         >
           {getStepIcon(job.type)}
