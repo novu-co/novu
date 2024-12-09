@@ -73,10 +73,10 @@ export function ActivityTable({ selectedActivityId, onActivitySelect }: Activity
       >
         <TableHeader>
           <TableRow>
-            <TableHead className="h-9 py-0">Details</TableHead>
-            <TableHead className="h-9 py-0">Status</TableHead>
-            <TableHead className="h-9 py-0">Steps</TableHead>
-            <TableHead className="h-9 py-0">Created At</TableHead>
+            <TableHead className="h-9 px-3 py-0">Event</TableHead>
+            <TableHead className="h-9 px-3 py-0">Status</TableHead>
+            <TableHead className="h-9 px-3 py-0">Steps</TableHead>
+            <TableHead className="h-9 px-3 py-0">Triggered Date</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -92,23 +92,23 @@ export function ActivityTable({ selectedActivityId, onActivitySelect }: Activity
               onMouseEnter={() => handleRowMouseEnter(activity)}
               onMouseLeave={handleRowMouseLeave}
             >
-              <TableCell>
+              <TableCell className="px-3">
                 <div className="flex flex-col">
                   <span className="text-foreground-950 font-medium">
                     {activity.template?.name || 'Deleted workflow'}
                   </span>
-                  <span className="text-foreground-400 text-[10px]">
+                  <span className="text-foreground-400 text-[10px] leading-[14px]">
                     {activity.transactionId} {getSubscriberDisplay(activity.subscriber)}
                   </span>
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className="px-3">
                 <StatusBadge status={getActivityStatus(activity.jobs)} jobs={activity.jobs} />
               </TableCell>
-              <TableCell>
+              <TableCell className="px-3">
                 <StepIndicators jobs={activity.jobs} />
               </TableCell>
-              <TableCell className="text-foreground-600">
+              <TableCell className="text-foreground-600 px-3">
                 <TimeDisplayHoverCard date={new Date(activity.createdAt)}>
                   <span>{formatDate(activity.createdAt)}</span>
                 </TimeDisplayHoverCard>
@@ -130,19 +130,19 @@ function formatDate(date: string) {
 function SkeletonRow() {
   return (
     <TableRow className="animate-pulse">
-      <TableCell>
+      <TableCell className="px-3">
         <div className="flex flex-col gap-1">
           <div className="h-5 w-36 rounded bg-neutral-200" />
           <div className="h-2.5 w-20 rounded bg-neutral-100" />
         </div>
       </TableCell>
-      <TableCell>
+      <TableCell className="px-3">
         <div className="flex h-7 w-28 items-center justify-center gap-1.5 rounded-full bg-neutral-100">
           <div className="h-3.5 w-3.5 rounded-full bg-neutral-200" />
           <div className="h-3.5 w-16 rounded bg-neutral-200" />
         </div>
       </TableCell>
-      <TableCell>
+      <TableCell className="px-3">
         <div className="flex items-center">
           {[...Array(3)].map((_, i) => (
             <div
@@ -154,7 +154,7 @@ function SkeletonRow() {
           ))}
         </div>
       </TableCell>
-      <TableCell>
+      <TableCell className="px-3">
         <div className="h-4 w-36 rounded bg-neutral-100 font-mono" />
       </TableCell>
     </TableRow>
