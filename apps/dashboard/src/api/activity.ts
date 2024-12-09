@@ -1,6 +1,5 @@
-import { IEnvironment } from '@novu/shared';
+import { IActivity, IEnvironment } from '@novu/shared';
 import { get } from './api.client';
-import type { Activity } from '@/hooks/use-activities';
 
 export interface IActivityFilters {
   channels?: string[];
@@ -11,7 +10,7 @@ export interface IActivityFilters {
 }
 
 interface ActivityResponse {
-  data: Activity[];
+  data: IActivity[];
   hasMore: boolean;
   pageSize: number;
 }
@@ -46,7 +45,7 @@ export function getActivityList(
 }
 
 export function getNotification(notificationId: string, environment: IEnvironment) {
-  return get<{ data: Activity }>(`/notifications/${notificationId}`, {
+  return get<{ data: IActivity }>(`/notifications/${notificationId}`, {
     environment,
   });
 }

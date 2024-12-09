@@ -1,5 +1,5 @@
 import { Route, ChevronDown } from 'lucide-react';
-import { IActivityJob } from '@novu/shared';
+import { IActivityJob, IDelayRegularMetadata, IDigestRegularMetadata, StepTypeEnum } from '@novu/shared';
 import { Button } from '@/components/primitives/button';
 import { Badge } from '@/components/primitives/badge';
 import { Card, CardContent, CardHeader } from '../primitives/card';
@@ -17,8 +17,8 @@ interface ActivityJobItemProps {
   isLast: boolean;
 }
 
-function formatJobType(type: string): string {
-  return type.replace(/_/g, ' ');
+function formatJobType(type?: StepTypeEnum): string {
+  return type?.replace(/_/g, ' ') || '';
 }
 
 function getStatusMessage(job: IActivityJob): string {
@@ -30,15 +30,17 @@ function getStatusMessage(job: IActivityJob): string {
     return job.executionDetails[job.executionDetails.length - 1].detail || 'Step execution failed';
   }
 
-  switch (job.type.toLowerCase()) {
+  switch (job.type?.toLowerCase()) {
     case 'digest':
       if (job.status === 'completed') {
-        return `Digested ${job.digest?.events?.length ?? 0} events for ${job.digest?.amount ?? 0} ${
-          job.digest?.unit ?? ''
+        return `Digested ${job.digest?.events?.length ?? 0} events for ${(job.digest as IDigestRegularMetadata)?.amount ?? 0} ${
+          (job.digest as IDigestRegularMetadata)?.unit ?? ''
         }`;
       }
       if (job.status === 'delayed') {
-        return `Collecting Digest events for ${job.digest?.amount ?? 0} ${job.digest?.unit ?? ''}`;
+        return `Collecting Digest events for ${(job.digest as IDigestRegularMetadata)?.amount ?? 0} ${
+          (job.digest as IDigestRegularMetadata)?.unit ?? ''
+        }`;
       }
       return 'Digest failed';
 
@@ -48,7 +50,12 @@ function getStatusMessage(job: IActivityJob): string {
       }
 
       if (job.status === 'delayed') {
-        return 'Waiting for ' + job.digest?.amount + ' ' + job.digest?.unit;
+        return (
+          'Waiting for ' +
+          (job.digest as IDelayRegularMetadata)?.amount +
+          ' ' +
+          (job.digest as IDelayRegularMetadata)?.unit
+        );
       }
 
       return 'Delay failed';
@@ -64,8 +71,8 @@ function getStatusMessage(job: IActivityJob): string {
   }
 }
 
-function getJobIcon(type: string) {
-  const Icon = STEP_TYPE_TO_ICON[type.toLowerCase() as keyof typeof STEP_TYPE_TO_ICON] ?? Route;
+function getJobIcon(type?: StepTypeEnum) {
+  const Icon = STEP_TYPE_TO_ICON[type?.toLowerCase() as keyof typeof STEP_TYPE_TO_ICON] ?? Route;
 
   return <Icon className="h-3.5 w-3.5" />;
 }

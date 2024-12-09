@@ -12,7 +12,7 @@ import { CopyButton } from '../primitives/copy-button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 import { cn } from '@/utils/ui';
 import { TimeDisplayHoverCard } from '../time-display-hover-card';
-import { IActivityJob } from '@novu/shared';
+import { IActivity, IActivityJob } from '@novu/shared';
 
 function LogsSection({ jobs }: { jobs: IActivityJob[] }): JSX.Element {
   return (
@@ -30,7 +30,7 @@ function Overview({ activity }: { activity: IActivity }) {
 
   const workflowPath = buildRoute(ROUTES.EDIT_WORKFLOW, {
     environmentSlug: currentEnvironment?.slug ?? '',
-    workflowSlug: activity?.template?._id,
+    workflowSlug: activity?.template?._id ?? '',
   });
 
   return (

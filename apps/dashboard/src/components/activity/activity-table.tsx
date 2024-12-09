@@ -2,7 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/primitives/badge';
 import { format } from 'date-fns';
 import { cn } from '@/utils/ui';
-import { IActivityJob, IActivity } from '@novu/shared';
+import { IActivityJob, IActivity, StepTypeEnum } from '@novu/shared';
 import { CheckCircleIcon as CheckCircle, AlertCircleIcon as AlertCircle, ClockIcon as Clock } from 'lucide-react';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
@@ -92,7 +92,7 @@ function JobsList({ jobs }: { jobs: IActivityJob[] }) {
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 text-xs">
-                <span className="font-medium">{typeLabels[job.type] || job.type}</span>
+                <span className="font-medium">{typeLabels[job.type || ''] || job.type}</span>
                 <span className={cn('rounded-full text-[10px] font-medium', color)}>{label}</span>
               </div>
 
@@ -175,7 +175,7 @@ function StatusBadge({ status, jobs }: { status: ActivityStatus; jobs: IActivity
   );
 }
 
-function getStepIcon(type: string) {
+function getStepIcon(type?: StepTypeEnum) {
   const Icon = STEP_TYPE_TO_ICON[type as keyof typeof STEP_TYPE_TO_ICON];
 
   return <Icon className="h-4 w-4" />;
@@ -337,7 +337,7 @@ export function ActivityTable({ selectedActivityId, onActivitySelect }: Activity
               </TableCell>
               <TableCell className="text-foreground-600">
                 <TimeDisplayHoverCard date={new Date(activity.createdAt)}>
-                  <span className="font-mono text-xs">{formatDate(activity.createdAt)}</span>
+                  <span>{formatDate(activity.createdAt)}</span>
                 </TimeDisplayHoverCard>
               </TableCell>
             </TableRow>

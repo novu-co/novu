@@ -1,11 +1,11 @@
 import { RiErrorWarningLine, RiCheckboxCircleLine, RiLoader3Line } from 'react-icons/ri';
 import { format } from 'date-fns';
-import { type Activity } from '@/hooks/use-activities';
 import { cn } from '@/utils/ui';
 import { ActivityDetailCard } from './activity-detail-card';
+import { IExecutionDetail } from '@novu/shared';
 
 interface ExecutionDetailItemProps {
-  detail: Activity['jobs'][0]['executionDetails'][0];
+  detail: IExecutionDetail;
 }
 
 function getStatusConfig(status: string) {
