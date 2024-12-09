@@ -1,5 +1,5 @@
 import { Route, ChevronDown } from 'lucide-react';
-import { IActivityJob, IDelayRegularMetadata, IDigestRegularMetadata, StepTypeEnum } from '@novu/shared';
+import { IActivityJob, IDelayRegularMetadata, IDigestRegularMetadata, JobStatusEnum, StepTypeEnum } from '@novu/shared';
 import { Button } from '@/components/primitives/button';
 import { Badge } from '@/components/primitives/badge';
 import { Card, CardContent, CardHeader } from '../primitives/card';
@@ -83,22 +83,22 @@ function formatJobType(type?: StepTypeEnum): string {
 }
 
 function getStatusMessage(job: IActivityJob): string {
-  if (job.status === 'merged') {
+  if (job.status === JobStatusEnum.MERGED) {
     return 'Step merged with another execution';
   }
 
-  if (job.status === 'failed' && job.executionDetails?.length > 0) {
+  if (job.status === JobStatusEnum.FAILED && job.executionDetails?.length > 0) {
     return job.executionDetails[job.executionDetails.length - 1].detail || 'Step execution failed';
   }
 
   switch (job.type?.toLowerCase()) {
     case 'digest':
-      if (job.status === 'completed') {
+      if (job.status === JobStatusEnum.COMPLETED) {
         return `Digested ${job.digest?.events?.length ?? 0} events for ${(job.digest as IDigestRegularMetadata)?.amount ?? 0} ${
           (job.digest as IDigestRegularMetadata)?.unit ?? ''
         }`;
       }
-      if (job.status === 'delayed') {
+      if (job.status === JobStatusEnum.DELAYED) {
         return `Collecting Digest events for ${(job.digest as IDigestRegularMetadata)?.amount ?? 0} ${
           (job.digest as IDigestRegularMetadata)?.unit ?? ''
         }`;
@@ -106,11 +106,11 @@ function getStatusMessage(job: IActivityJob): string {
       return 'Digest failed';
 
     case 'delay':
-      if (job.status === 'completed') {
+      if (job.status === JobStatusEnum.COMPLETED) {
         return 'Delay completed';
       }
 
-      if (job.status === 'delayed') {
+      if (job.status === JobStatusEnum.DELAYED) {
         return (
           'Waiting for ' +
           (job.digest as IDelayRegularMetadata)?.amount +
@@ -122,10 +122,10 @@ function getStatusMessage(job: IActivityJob): string {
       return 'Delay failed';
 
     default:
-      if (job.status === 'completed') {
+      if (job.status === JobStatusEnum.COMPLETED) {
         return 'Message sent successfully';
       }
-      if (job.status === 'pending') {
+      if (job.status === JobStatusEnum.PENDING) {
         return 'Sending message';
       }
 
@@ -190,7 +190,7 @@ function JobDetails({ job }: { job: IActivityJob }) {
 }
 
 interface JobStatusIndicatorProps {
-  status: string;
+  status: JobStatusEnum;
 }
 
 function JobStatusIndicator({ status }: JobStatusIndicatorProps) {
@@ -198,13 +198,13 @@ function JobStatusIndicator({ status }: JobStatusIndicatorProps) {
     <div className="relative flex-shrink-0">
       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
         <div className={`text-${getJobColor(status)} flex items-center justify-center`}>
-          {status === 'completed' ? (
+          {status === JobStatusEnum.COMPLETED ? (
             <RiCheckboxCircleLine className="h-4 w-4" />
-          ) : status === 'failed' ? (
+          ) : status === JobStatusEnum.FAILED ? (
             <RiErrorWarningLine className="h-4 w-4" />
-          ) : status === 'delayed' ? (
+          ) : status === JobStatusEnum.DELAYED ? (
             <RiLoader4Fill className="text-warning animate-spin-slow h-4 w-4" />
-          ) : status === 'merged' ? (
+          ) : status === JobStatusEnum.MERGED ? (
             <RiForbidFill className="h-4 w-4" />
           ) : (
             <RiShadowLine className="h-4 w-4" />
