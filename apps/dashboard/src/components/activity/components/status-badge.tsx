@@ -5,8 +5,6 @@ import { IActivityJob, JobStatusEnum } from '@novu/shared';
 import { StatusPreviewCard } from './status-preview-card';
 import { JOB_STATUS_CONFIG } from '../constants';
 
-export type ActivityStatus = 'SUCCESS' | 'ERROR' | 'QUEUED' | 'MERGED';
-
 export interface StatusBadgeProps {
   jobs: IActivityJob[];
 }
