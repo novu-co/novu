@@ -40,7 +40,7 @@ export function ActivityFeed() {
         </h1>
       }
     >
-      <div className="relative mt-10 flex h-[calc(100vh-20px)]">
+      <div className="relative mt-10 flex h-[calc(100vh-88px)]">
         <motion.div
           layout="position"
           transition={{
