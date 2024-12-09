@@ -41,7 +41,7 @@ import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/s
 import { buildDefaultValues } from '@/utils/schema';
 import merge from 'lodash.merge';
 import { DelayControlValues } from '@/components/workflow-editor/steps/delay/delay-control-values';
-import { ConfigureStepTemplateCta } from '@/components/workflow-editor/steps/configure-step-template-cta';
+import { ConfigureStepTemplateIssueCta } from '@/components/workflow-editor/steps/configure-step-template-issue-cta';
 import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
 import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/email/configure-email-step-preview';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
@@ -58,16 +58,16 @@ const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.E
   [StepTypeEnum.DIGEST]: () => null,
 };
 
-const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, (props: HTMLAttributes<HTMLDivElement>) => ReactNode> = {
+const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, ((props: HTMLAttributes<HTMLDivElement>) => ReactNode) | null> = {
   [StepTypeEnum.IN_APP]: ConfigureInAppStepPreview,
   [StepTypeEnum.EMAIL]: ConfigureEmailStepPreview,
-  [StepTypeEnum.SMS]: () => null,
-  [StepTypeEnum.CHAT]: () => null,
-  [StepTypeEnum.PUSH]: () => null,
-  [StepTypeEnum.CUSTOM]: () => null,
-  [StepTypeEnum.TRIGGER]: () => null,
-  [StepTypeEnum.DIGEST]: () => null,
-  [StepTypeEnum.DELAY]: () => null,
+  [StepTypeEnum.SMS]: null,
+  [StepTypeEnum.CHAT]: null,
+  [StepTypeEnum.PUSH]: null,
+  [StepTypeEnum.CUSTOM]: null,
+  [StepTypeEnum.TRIGGER]: null,
+  [StepTypeEnum.DIGEST]: null,
+  [StepTypeEnum.DELAY]: null,
 };
 
 const calculateDefaultControlsValues = (step: StepDataDto) => {
@@ -286,9 +286,22 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               </Link>
             </SidebarContent>
             <Separator />
-            <ConfigureStepTemplateCta step={step} issue={firstError}>
-              <Preview />
-            </ConfigureStepTemplateCta>
+
+            {firstError ? (
+              <>
+                <ConfigureStepTemplateIssueCta step={step} issue={firstError} />
+                <Separator />
+              </>
+            ) : (
+              Preview && (
+                <>
+                  <SidebarContent>
+                    <Preview />
+                  </SidebarContent>
+                  <Separator />
+                </>
+              )
+            )}
           </>
         )}
 
