@@ -49,6 +49,10 @@ function JobsList({ jobs }: { jobs: Activity['jobs'] }) {
       color: 'text-warning',
       label: 'Pending',
     },
+    delayed: {
+      color: 'text-warning',
+      label: 'Delayed',
+    },
   };
 
   const typeLabels: Record<string, string> = {
