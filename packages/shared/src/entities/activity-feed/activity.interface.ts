@@ -25,6 +25,6 @@ export interface IActivity {
   createdAt: string;
   updatedAt: string;
   template: Pick<INotificationTemplate, '_id' | 'name' | 'triggers'>;
-  subscriber: Pick<ISubscriber, '_id' | 'subscriberId'>;
+  subscriber: Pick<ISubscriber, '_id' | 'subscriberId' | 'firstName' | 'lastName'>;
   jobs: IActivityJob[];
 }

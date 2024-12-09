@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/primitives/table';
 import { format } from 'date-fns';
 import { cn } from '@/utils/ui';
-import { IActivity } from '@novu/shared';
+import { IActivity, ISubscriber } from '@novu/shared';
 import { TimeDisplayHoverCard } from '@/components/time-display-hover-card';
 import { createSearchParams, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -97,7 +97,9 @@ export function ActivityTable({ selectedActivityId, onActivitySelect }: Activity
                   <span className="text-foreground-950 font-medium">
                     {activity.template?.name || 'Deleted workflow'}
                   </span>
-                  <span className="text-foreground-400 text-[10px]">{activity.transactionId}</span>
+                  <span className="text-foreground-400 text-[10px]">
+                    {activity.transactionId} {getSubscriberDisplay(activity.subscriber)}
+                  </span>
                 </div>
               </TableCell>
               <TableCell>
@@ -157,4 +159,14 @@ function SkeletonRow() {
       </TableCell>
     </TableRow>
   );
+}
+
+function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriberId' | 'firstName' | 'lastName'>) {
+  if (!subscriber) return '';
+
+  if (subscriber.firstName || subscriber.lastName) {
+    return `• ${subscriber.firstName || ''} ${subscriber.lastName || ''}`;
+  }
+
+  return '';
 }
