@@ -226,15 +226,15 @@ function SkeletonRow() {
   return (
     <TableRow className="animate-pulse">
       <TableCell>
-        <div className="flex flex-col gap-1.5">
-          <div className="h-4 w-32 rounded bg-neutral-200" />
-          <div className="h-2.5 w-24 rounded bg-neutral-100" />
+        <div className="flex flex-col gap-1">
+          <div className="h-5 w-36 rounded bg-neutral-200" />
+          <div className="h-2.5 w-20 rounded bg-neutral-100" />
         </div>
       </TableCell>
       <TableCell>
-        <div className="flex h-6 w-24 items-center justify-center gap-1.5 rounded-full bg-neutral-100">
-          <div className="h-3 w-3 rounded-full bg-neutral-200" />
-          <div className="h-3 w-16 rounded bg-neutral-200" />
+        <div className="flex h-7 w-28 items-center justify-center gap-1.5 rounded-full bg-neutral-100">
+          <div className="h-3.5 w-3.5 rounded-full bg-neutral-200" />
+          <div className="h-3.5 w-16 rounded bg-neutral-200" />
         </div>
       </TableCell>
       <TableCell>
@@ -242,7 +242,7 @@ function SkeletonRow() {
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="border-input -ml-2 flex h-7 w-7 items-center justify-center rounded-full border bg-neutral-100 first:ml-0"
+              className="-ml-2 flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100 first:ml-0"
             >
               <div className="h-4 w-4 rounded bg-neutral-200" />
             </div>
@@ -250,7 +250,7 @@ function SkeletonRow() {
         </div>
       </TableCell>
       <TableCell>
-        <div className="h-3 w-28 rounded bg-neutral-100" />
+        <div className="h-4 w-36 rounded bg-neutral-100 font-mono" />
       </TableCell>
     </TableRow>
   );
@@ -320,8 +320,9 @@ export function ActivityTable({ selectedActivityId, onActivitySelect }: Activity
             <TableRow
               key={activity._id}
               className={cn(
-                'cursor-pointer hover:bg-neutral-50',
-                selectedActivityId === activity._id && 'bg-neutral-50'
+                'relative cursor-pointer hover:bg-neutral-50',
+                selectedActivityId === activity._id &&
+                  'bg-neutral-50 after:absolute after:right-0 after:top-0 after:h-[calc(100%-1px)] after:w-[5px] after:bg-neutral-200'
               )}
               onClick={() => onActivitySelect(activity)}
               onMouseEnter={() => handleRowMouseEnter(activity)}
