@@ -3,7 +3,14 @@ import { IActivityJob, IDelayRegularMetadata, IDigestRegularMetadata, JobStatusE
 import { Button } from '@/components/primitives/button';
 import { Badge } from '@/components/primitives/badge';
 import { Card, CardContent, CardHeader } from '../primitives/card';
-import { RiShadowLine, RiCheckboxCircleLine, RiForbidFill, RiErrorWarningLine, RiLoader4Fill } from 'react-icons/ri';
+import {
+  RiShadowLine,
+  RiCheckboxCircleLine,
+  RiForbidFill,
+  RiErrorWarningLine,
+  RiLoader4Fill,
+  RiLoader3Line,
+} from 'react-icons/ri';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { cn } from '@/utils/ui';
@@ -206,6 +213,8 @@ function JobStatusIndicator({ status }: JobStatusIndicatorProps) {
             <RiLoader4Fill className="text-warning animate-spin-slow h-4 w-4" />
           ) : status === JobStatusEnum.MERGED ? (
             <RiForbidFill className="h-4 w-4" />
+          ) : status === JobStatusEnum.PENDING ? (
+            <RiLoader3Line className="h-4 w-4" />
           ) : (
             <RiShadowLine className="h-4 w-4" />
           )}
