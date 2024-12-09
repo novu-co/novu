@@ -1,20 +1,20 @@
-import { useQuery } from '@tanstack/react-query';
-import { getBridgeHealthCheck } from '@/api/bridge';
 import { ConnectionStatus } from '@/utils/types';
+import { getBridgeHealthCheck } from '@/api/bridge';
 import { QueryKeys } from '@/utils/query-keys';
-import { useMemo } from 'react';
 import { useEnvironment } from '@/context/environment/hooks';
+import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import type { HealthCheck } from '@novu/framework/internal';
 
 const BRIDGE_STATUS_REFRESH_INTERVAL_IN_MS = 10 * 1000;
 
-export const useBridgeHealthCheck = () => {
+export const useFetchBridgeHealthCheck = () => {
   const { currentEnvironment } = useEnvironment();
   const bridgeURL = currentEnvironment?.bridge?.url || '';
 
   const { data, isLoading, error } = useQuery<HealthCheck>({
     queryKey: [QueryKeys.bridgeHealthCheck, currentEnvironment?._id, bridgeURL],
-    queryFn: getBridgeHealthCheck,
+    queryFn: () => getBridgeHealthCheck({ environment: currentEnvironment! }),
     enabled: !!bridgeURL,
     networkMode: 'always',
     refetchOnWindowFocus: true,

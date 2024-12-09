@@ -5,6 +5,17 @@ import { InputFieldPure } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { useFormContext } from 'react-hook-form';
 
+const HEIGHT = {
+  sm: {
+    base: 'h-7',
+    trigger: 'h-[26px]',
+  },
+  md: {
+    base: 'h-9',
+    trigger: 'h-[34px]',
+  },
+} as const;
+
 type InputWithSelectProps = {
   fields: {
     inputKey: string;
@@ -15,6 +26,7 @@ type InputWithSelectProps = {
   className?: string;
   placeholder?: string;
   isReadOnly?: boolean;
+  size?: 'sm' | 'md';
 };
 
 export const AmountInput = ({
@@ -24,6 +36,7 @@ export const AmountInput = ({
   className,
   placeholder,
   isReadOnly,
+  size = 'sm',
 }: InputWithSelectProps) => {
   const { getFieldState, setValue, getValues, control } = useFormContext();
 
@@ -39,7 +52,10 @@ export const AmountInput = ({
 
   return (
     <>
-      <InputFieldPure className="h-7 rounded-lg border pr-0">
+      <InputFieldPure
+        className={cn(HEIGHT[size].base, 'rounded-lg border pr-0')}
+        state={input.error ? 'error' : 'default'}
+      >
         <FormField
           control={control}
           name={fields.inputKey}
@@ -77,7 +93,12 @@ export const AmountInput = ({
                   disabled={isReadOnly}
                   {...field}
                 >
-                  <SelectTrigger className="h-7 w-auto translate-x-0.5 gap-1 rounded-l-none border-l bg-neutral-50 p-2 text-xs">
+                  <SelectTrigger
+                    className={cn(
+                      HEIGHT[size].trigger,
+                      'w-auto gap-1 rounded-l-none border-x-0 border-y-0 border-l bg-neutral-50 p-2 text-xs'
+                    )}
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

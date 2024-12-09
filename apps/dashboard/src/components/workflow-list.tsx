@@ -13,7 +13,7 @@ import {
 } from '@/components/primitives/table';
 import { WorkflowRow } from '@/components/workflow-row';
 import { WorkflowListEmpty } from '@/components/workflow-list-empty';
-import { useWorkflows } from '@/hooks/use-workflows';
+import { useFetchWorkflows } from '@/hooks/use-fetch-workflows';
 
 export function WorkflowList() {
   const [searchParams] = useSearchParams();
@@ -29,7 +29,7 @@ export function WorkflowList() {
   const offset = parseInt(searchParams.get('offset') || '0');
   const limit = parseInt(searchParams.get('limit') || '12');
 
-  const { data, isPending, isError, currentPage, totalPages } = useWorkflows({
+  const { data, isPending, isError, currentPage, totalPages } = useFetchWorkflows({
     limit,
     offset,
   });

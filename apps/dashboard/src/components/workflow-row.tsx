@@ -107,7 +107,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
 
   const onDeleteWorkflow = async () => {
     await deleteWorkflow({
-      workflowId: workflow._id,
+      workflowSlug: workflow.slug,
     });
   };
 
@@ -143,7 +143,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
 
   const onPauseWorkflow = async () => {
     await patchWorkflow({
-      workflowId: workflow._id,
+      workflowSlug: workflow.slug,
       workflow: {
         active: workflow.status === WorkflowStatusEnum.ACTIVE ? false : true,
       },

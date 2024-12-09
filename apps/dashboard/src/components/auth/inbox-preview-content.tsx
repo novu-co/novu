@@ -1,5 +1,6 @@
 import { Inbox, InboxContent, InboxProps } from '@novu/react';
 import { SVGProps } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useFetchEnvironments } from '../../context/environment/hooks';
 import { useUser } from '@clerk/clerk-react';
 import { useAuth } from '../../context/auth/hooks';
@@ -7,14 +8,14 @@ import { API_HOSTNAME, WEBSOCKET_HOSTNAME } from '../../config';
 
 interface InboxPreviewContentProps {
   selectedStyle: string;
-  hideHint?: boolean;
+  hasNotificationBeenSent?: boolean;
   primaryColor: string;
   foregroundColor: string;
 }
 
 export function InboxPreviewContent({
   selectedStyle,
-  hideHint,
+  hasNotificationBeenSent,
   primaryColor,
   foregroundColor,
 }: InboxPreviewContentProps) {
@@ -67,12 +68,26 @@ export function InboxPreviewContent({
           <div className="mt-10 flex w-full max-w-[440px] items-center justify-end">
             <Inbox {...configuration} placement="bottom-end" open />
           </div>
-          {!hideHint && (
-            <div className="absolute bottom-[-10px] left-2 flex flex-col items-start">
-              <SendNotificationArrow className="mt-2 h-[73px] w-[86px]" />
-              <p className="text-success relative top-[-32px] text-[10px] italic">Hit send, to get an notification!</p>
-            </div>
-          )}
+          <div className="absolute bottom-[-10px] left-2 flex flex-col items-start">
+            <SendNotificationArrow className="mt-2 h-[73px] w-[86px]" />
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={hasNotificationBeenSent ? 'implement' : 'send'}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{
+                  type: 'spring',
+                  duration: 0.2,
+                }}
+                className="text-success relative top-[-32px] max-w-[200px] text-[10px] italic leading-[12px]"
+              >
+                {hasNotificationBeenSent
+                  ? 'Click to implement the Inbox in your application now'
+                  : 'Hit send, to get an notification!'}
+              </motion.p>
+            </AnimatePresence>
+          </div>
         </div>
       )}
       {selectedStyle === 'sidebar' && (

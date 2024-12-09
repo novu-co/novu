@@ -8,8 +8,8 @@ import { Button } from '@/components/primitives/button';
 import { CreateWorkflowButton } from '@/components/create-workflow-button';
 import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';
-import { useTelemetry } from '../hooks';
-import { TelemetryEvent } from '../utils/telemetry';
+import { useTelemetry } from '@/hooks/use-telemetry';
+import { TelemetryEvent } from '@/utils/telemetry';
 import { Badge } from '@/components/primitives/badge';
 
 export const WorkflowsPage = () => {

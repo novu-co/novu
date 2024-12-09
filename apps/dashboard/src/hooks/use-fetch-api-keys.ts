@@ -4,12 +4,12 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { IApiKey } from '@novu/shared';
 import { getApiKeys } from '../api/environments';
 
-export const useApiKeys = () => {
+export const useFetchApiKeys = () => {
   const { currentEnvironment } = useEnvironment();
 
   const query = useQuery<{ data: IApiKey[] }>({
     queryKey: [QueryKeys.getApiKeys, currentEnvironment?._id],
-    queryFn: async () => await getApiKeys(),
+    queryFn: async () => await getApiKeys({ environment: currentEnvironment! }),
     enabled: !!currentEnvironment?._id,
   });
 

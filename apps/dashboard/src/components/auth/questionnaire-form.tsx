@@ -9,13 +9,13 @@ import { useForm, Controller } from 'react-hook-form';
 import { updateClerkOrgMetadata } from '../../api/organization';
 import { hubspotCookie } from '../../utils/cookies';
 import { identifyUser } from '../../api/telemetry';
-import { useTelemetry } from '../../hooks';
+import { useTelemetry } from '../../hooks/use-telemetry';
 import { TelemetryEvent } from '../../utils/telemetry';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../utils/routes';
 import { useMutation } from '@tanstack/react-query';
 import { useOrganization, useUser } from '@clerk/clerk-react';
-import { useFetchEnvironments } from '../../context/environment/hooks';
+import { useEnvironment, useFetchEnvironments } from '../../context/environment/hooks';
 
 interface QuestionnaireFormData {
   jobTitle: JobTitleEnum;
@@ -243,13 +243,17 @@ export function QuestionnaireForm() {
 function useSubmitQuestionnaire() {
   const track = useTelemetry();
   const navigate = useNavigate();
+  const { currentEnvironment } = useEnvironment();
 
   return useMutation({
     mutationFn: async (data: SubmitQuestionnaireData) => {
       await updateClerkOrgMetadata({
-        companySize: data.companySize,
-        jobTitle: data.jobTitle,
-        organizationType: data.organizationType,
+        environment: currentEnvironment!,
+        data: {
+          companySize: data.companySize,
+          jobTitle: data.jobTitle,
+          organizationType: data.organizationType,
+        },
       });
 
       await identifyUser({
