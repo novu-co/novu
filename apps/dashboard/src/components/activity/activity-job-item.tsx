@@ -17,6 +17,67 @@ interface ActivityJobItemProps {
   isLast: boolean;
 }
 
+export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="relative flex items-center gap-1">
+      <div
+        className={cn(
+          'absolute left-[11px] h-[calc(100%+24px)] w-[1px] bg-neutral-200',
+          isFirst ? 'top-[50%]' : 'top-0',
+          isLast ? 'h-[50%]' : 'h-[calc(100%+24px)]',
+          isFirst && isLast && 'bg-transparent'
+        )}
+      />
+
+      <JobStatusIndicator status={job.status} />
+
+      <Card className="border-1 flex-1 border border-neutral-200 p-1 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
+        <CardHeader
+          className="flex flex-row items-center justify-between bg-white p-3 hover:cursor-pointer"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <div className="flex items-center gap-1.5">
+            <div
+              className={`h-5 w-5 rounded-full border opacity-40 border-${STEP_TYPE_TO_COLOR[job.type as keyof typeof STEP_TYPE_TO_COLOR]}`}
+            >
+              <div
+                className={`h-full w-full rounded-full bg-neutral-50 text-${STEP_TYPE_TO_COLOR[job.type as keyof typeof STEP_TYPE_TO_COLOR]} flex items-center justify-center`}
+              >
+                {getJobIcon(job.type)}
+              </div>
+            </div>
+            <span className="text-foreground-950 text-xs capitalize">{formatJobType(job.type)}</span>
+          </div>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-foreground-600 !mt-0 h-5 gap-0 p-0 leading-[12px] hover:bg-transparent"
+          >
+            Show more
+            <ChevronDown className={cn('h-4 w-4 transition-transform', isExpanded && 'rotate-180')} />
+          </Button>
+        </CardHeader>
+
+        {!isExpanded && (
+          <CardContent className="rounded-lg bg-neutral-50 p-2">
+            <div className="flex items-center justify-between">
+              <span className="text-foreground-400 max-w-[300px] truncate pr-2 text-xs">{getStatusMessage(job)}</span>
+              <Badge variant="soft" className="bg-foreground-50 shrink-0 px-2 py-0.5 text-[11px] leading-3">
+                {format(new Date(job.updatedAt), 'MMM d yyyy, HH:mm:ss')}
+              </Badge>
+            </div>
+          </CardContent>
+        )}
+
+        {isExpanded && <JobDetails job={job} />}
+      </Card>
+    </div>
+  );
+}
+
 function formatJobType(type?: StepTypeEnum): string {
   return type?.replace(/_/g, ' ') || '';
 }
@@ -67,7 +128,8 @@ function getStatusMessage(job: IActivityJob): string {
       if (job.status === 'pending') {
         return 'Sending message';
       }
-      return 'Message delivery failed';
+
+      return '';
   }
 }
 
@@ -149,67 +211,6 @@ function JobStatusIndicator({ status }: JobStatusIndicatorProps) {
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  return (
-    <div className="relative flex items-center gap-1">
-      <div
-        className={cn(
-          'absolute left-[11px] h-[calc(100%+24px)] w-[1px] bg-neutral-200',
-          isFirst ? 'top-[50%]' : 'top-0',
-          isLast ? 'h-[50%]' : 'h-[calc(100%+24px)]',
-          isFirst && isLast && 'bg-transparent'
-        )}
-      />
-
-      <JobStatusIndicator status={job.status} />
-
-      <Card className="border-1 flex-1 border border-neutral-200 p-1 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
-        <CardHeader
-          className="flex flex-row items-center justify-between bg-white p-3 hover:cursor-pointer"
-          onClick={() => setIsExpanded(!isExpanded)}
-        >
-          <div className="flex items-center gap-1.5">
-            <div
-              className={`h-5 w-5 rounded-full border opacity-40 border-${STEP_TYPE_TO_COLOR[job.type as keyof typeof STEP_TYPE_TO_COLOR]}`}
-            >
-              <div
-                className={`h-full w-full rounded-full bg-neutral-50 text-${STEP_TYPE_TO_COLOR[job.type as keyof typeof STEP_TYPE_TO_COLOR]} flex items-center justify-center`}
-              >
-                {getJobIcon(job.type)}
-              </div>
-            </div>
-            <span className="text-foreground-950 text-xs capitalize">{formatJobType(job.type)}</span>
-          </div>
-
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-foreground-600 !mt-0 h-5 gap-0 p-0 leading-[12px] hover:bg-transparent"
-          >
-            Show more
-            <ChevronDown className={cn('h-4 w-4 transition-transform', isExpanded && 'rotate-180')} />
-          </Button>
-        </CardHeader>
-
-        {!isExpanded && (
-          <CardContent className="rounded-lg bg-neutral-50 p-2">
-            <div className="flex items-center justify-between">
-              <span className="text-foreground-400 max-w-[300px] truncate pr-2 text-xs">{getStatusMessage(job)}</span>
-              <Badge variant="soft" className="bg-foreground-50 shrink-0 px-2 py-0.5 text-[11px] leading-3">
-                {format(new Date(job.updatedAt), 'MMM d yyyy, HH:mm:ss')}
-              </Badge>
-            </div>
-          </CardContent>
-        )}
-
-        {isExpanded && <JobDetails job={job} />}
-      </Card>
     </div>
   );
 }
