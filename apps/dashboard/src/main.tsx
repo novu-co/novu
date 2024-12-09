@@ -154,6 +154,10 @@ const router = createBrowserRouter([
             element: <SettingsPage />,
           },
           {
+            path: ROUTES.SETTINGS_BILLING,
+            element: <SettingsPage />,
+          },
+          {
             path: '*',
             element: <CatchAllRoute />,
           },
