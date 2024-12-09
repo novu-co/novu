@@ -91,6 +91,8 @@ export function ActivityFeed() {
       } else if (dateRange === '30d') {
         result.endDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
       }
+    } else {
+      result.endDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     }
 
     return result;
