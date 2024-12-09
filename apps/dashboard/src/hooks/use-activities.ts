@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { getActivityList, IActivityFilters } from '@/api/activity';
 import { useEnvironment } from '../context/environment/hooks';
+import { useSearchParams } from 'react-router-dom';
 
 interface UseActivitiesOptions {
-  page?: number;
   filters?: IActivityFilters;
 }
 
@@ -85,20 +85,25 @@ interface ActivityResponse {
   pageSize: number;
 }
 
-export function useActivities({ page = 0, filters }: UseActivitiesOptions = {}) {
+export function useActivities({ filters }: UseActivitiesOptions = {}) {
   const { currentEnvironment } = useEnvironment();
+  const [searchParams] = useSearchParams();
+
+  const offset = parseInt(searchParams.get('offset') || '0');
+  const limit = parseInt(searchParams.get('limit') || '10');
 
   const { data, isLoading, isFetching } = useQuery<ActivityResponse>({
-    queryKey: ['activitiesList', currentEnvironment?._id, page, filters],
-    queryFn: () => getActivityList(currentEnvironment!, page, filters),
+    queryKey: ['activitiesList', currentEnvironment?._id, offset, limit, filters],
+    queryFn: () => getActivityList(currentEnvironment!, Math.floor(offset / limit), filters),
     staleTime: 1000 * 60, // 1 minute
   });
 
   return {
     activities: data?.data || [],
     hasMore: data?.hasMore || false,
-    pageSize: data?.pageSize || 10,
+    pageSize: limit,
     isLoading,
     isFetching,
+    offset,
   };
 }

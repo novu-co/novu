@@ -7,7 +7,7 @@ import { ActivityPanel } from '@/components/activity/activity-panel';
 import { useState } from 'react';
 
 export function ActivityFeed() {
-  const { activities, isLoading } = useActivities();
+  const { activities, isLoading, hasMore, pageSize, offset } = useActivities();
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
 
   return (
@@ -21,6 +21,7 @@ export function ActivityFeed() {
           className={cn('h-full flex-1 overflow-auto', selectedActivityId ? 'w-[65%]' : 'w-full')}
         >
           <ActivityTable
+            hasMore={hasMore}
             isLoading={isLoading}
             activities={activities}
             selectedActivityId={selectedActivityId}

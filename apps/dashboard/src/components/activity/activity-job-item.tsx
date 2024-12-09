@@ -40,10 +40,7 @@ function getStatusMessage(job: JobWithDigest): string {
   }
 
   if (job.status === 'failed' && job.executionDetails?.length > 0) {
-    return (
-      job.executionDetails[job.executionDetails.length - 1].detail + ' asda sd sad sad sad as d asdasd asd asd as' ||
-      'Step execution failed'
-    );
+    return job.executionDetails[job.executionDetails.length - 1].detail || 'Step execution failed';
   }
 
   switch (job.type.toLowerCase()) {
@@ -53,8 +50,8 @@ function getStatusMessage(job: JobWithDigest): string {
           job.digest?.unit ?? ''
         }`;
       }
-      if (job.status === 'pending') {
-        return 'Collecting Digest events';
+      if (job.status === 'delayed') {
+        return `Collecting Digest events for ${job.digest?.amount ?? 0} ${job.digest?.unit ?? ''}`;
       }
       return 'Digest failed';
 
