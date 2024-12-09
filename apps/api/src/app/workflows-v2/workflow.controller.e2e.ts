@@ -34,7 +34,7 @@ import { PreferencesRepository } from '@novu/dal';
 import { after } from 'mocha';
 import { sleep } from '@nestjs/terminus/dist/utils';
 import { encodeBase62 } from '../shared/helpers';
-import { stepTypeToDefaultDashboardControlSchema } from './shared';
+import { stepTypeToControlSchema } from './shared';
 
 const v2Prefix = '/v2';
 const PARTIAL_UPDATED_NAME = 'Updated';
@@ -972,11 +972,9 @@ describe('Workflow Controller E2E API Testing', () => {
         expect(stepDataDto.controls.values).to.be.ok;
         expect(stepDataDto.controls.dataSchema).to.be.ok;
         expect(Object.keys(stepDataDto.controls.dataSchema?.properties || {}).length).to.deep.equal(
-          Object.keys(stepTypeToDefaultDashboardControlSchema[step.type].schema.properties).length
+          Object.keys(stepTypeToControlSchema[step.type].schema.properties).length
         );
-        expect(stepDataDto.controls.uiSchema).to.deep.equal(
-          stepTypeToDefaultDashboardControlSchema[step.type].uiSchema
-        );
+        expect(stepDataDto.controls.uiSchema).to.deep.equal(stepTypeToControlSchema[step.type].uiSchema);
       }
     }
   }

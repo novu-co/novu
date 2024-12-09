@@ -20,6 +20,7 @@ export enum UiSchemaGroupEnum {
   EMAIL = 'EMAIL',
   DIGEST = 'DIGEST',
   DELAY = 'DELAY',
+  SMS = 'SMS',
 }
 
 export enum UiComponentEnum {
@@ -38,6 +39,7 @@ export enum UiComponentEnum {
   DELAY_TYPE = 'DELAY_TYPE',
   DELAY_AMOUNT = 'DELAY_AMOUNT',
   DELAY_UNIT = 'DELAY_UNIT',
+  SMS_BODY = 'SMS_BODY',
 }
 
 export class UiSchemaProperty {

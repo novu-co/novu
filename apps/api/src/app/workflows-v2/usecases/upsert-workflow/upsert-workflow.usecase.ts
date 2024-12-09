@@ -29,7 +29,7 @@ import {
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
-import { stepTypeToDefaultDashboardControlSchema } from '../../shared';
+import { stepTypeToControlSchema } from '../../shared';
 import { PatchStepUsecase } from '../patch-step-data';
 import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
 
@@ -241,7 +241,7 @@ export class UpsertWorkflowUseCase {
       template: {
         type: step.type,
         name: step.name,
-        controls: foundPersistedStep?.template?.controls || stepTypeToDefaultDashboardControlSchema[step.type],
+        controls: foundPersistedStep?.template?.controls || stepTypeToControlSchema[step.type],
         content: '',
       },
       stepId: foundPersistedStep?.stepId || slugify(step.name),

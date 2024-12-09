@@ -3,6 +3,7 @@ import { ControlSchemas, JSONSchemaDto } from '@novu/shared';
 import { emailStepControlSchema, emailStepUiSchema, inAppControlSchema, inAppUiSchema } from './schemas';
 import { DelayTimeControlSchema, delayUiSchema } from './schemas/delay-control.schema';
 import { DigestOutputJsonSchema, digestUiSchema } from './schemas/digest-control.schema';
+import { smsStepControl } from './schemas/sms-control.schema';
 
 export const PERMISSIVE_EMPTY_SCHEMA = {
   type: 'object',
@@ -11,7 +12,7 @@ export const PERMISSIVE_EMPTY_SCHEMA = {
   additionalProperties: true,
 } as JSONSchemaDto;
 
-export const stepTypeToDefaultDashboardControlSchema: Record<ChannelStepEnum | ActionStepEnum, ControlSchemas> = {
+export const stepTypeToControlSchema: Record<ChannelStepEnum | ActionStepEnum, ControlSchemas> = {
   [ChannelStepEnum.IN_APP]: {
     schema: inAppControlSchema,
     uiSchema: inAppUiSchema,
@@ -21,7 +22,8 @@ export const stepTypeToDefaultDashboardControlSchema: Record<ChannelStepEnum | A
     uiSchema: emailStepUiSchema,
   },
   [ChannelStepEnum.SMS]: {
-    schema: channelStepSchemas[ChannelStepEnum.SMS].output as unknown as JSONSchemaDto,
+    schema: smsStepControl.schema,
+    uiSchema: smsStepControl.uiSchema,
   },
   [ChannelStepEnum.PUSH]: {
     schema: channelStepSchemas[ChannelStepEnum.PUSH].output as unknown as JSONSchemaDto,
