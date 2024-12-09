@@ -64,16 +64,16 @@ export class ExtractDefaultValuesFromSchemaUsecase {
   private getValue(value: JSONSchemaDto, key: string) {
     const normalizedKey = key.toLowerCase().trim();
 
+    if (value.default != null) {
+      return value.default;
+    }
+
     if (normalizedKey.includes('url')) {
       return 'https://www.example.com/search?query=placeholder';
     }
 
     if (normalizedKey.includes('emaileditor')) {
       return JSON.stringify(DEFAULT_PREVIEW_ISSUE_MESSAGE);
-    }
-
-    if (value.default != null) {
-      return value.default;
     }
 
     return PreviewIssueEnum.PREVIEW_ISSUE_REQUIRED_CONTROL_VALUE_IS_MISSING;
