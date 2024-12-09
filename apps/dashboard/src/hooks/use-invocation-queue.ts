@@ -64,7 +64,6 @@ export function useInvocationQueue<T extends CallbackFunction = CallbackFunction
       await invocation();
     } catch (error) {
       // If the invocation fails, we want to log the error and continue with the next invocation
-      console.error('Error processing queue item:', error);
       Sentry.captureException(error);
     }
   }, []);
