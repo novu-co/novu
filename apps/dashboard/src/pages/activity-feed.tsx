@@ -40,13 +40,13 @@ export function ActivityFeed() {
         </h1>
       }
     >
-      <div className="relative mt-10 flex h-[calc(100vh-4rem)]">
+      <div className="relative mt-10 flex h-[calc(100vh-20px)]">
         <motion.div
           layout="position"
           transition={{
             layout: { duration: 0.4, ease: 'easeInOut' },
           }}
-          className={cn('h-full flex-1 overflow-auto', activityItemId ? 'w-[65%]' : 'w-full')}
+          className={cn('h-full flex-1', activityItemId ? 'w-[65%]' : 'w-full')}
         >
           <ActivityTable selectedActivityId={activityItemId} onActivitySelect={handleActivitySelect} />
         </motion.div>
@@ -61,7 +61,7 @@ export function ActivityFeed() {
                 duration: 0.4,
                 ease: 'easeInOut',
               }}
-              className="bg-background h-full w-[500px] overflow-auto border-l"
+              className="bg-background min-h-full w-[500px] overflow-auto border-l"
             >
               <ActivityPanel activityId={activityItemId} onActivitySelect={handleActivityPanelSelect} />
             </motion.div>
