@@ -92,7 +92,7 @@ function getStatusMessage(job: IActivityJob): string {
   }
 
   switch (job.type?.toLowerCase()) {
-    case 'digest':
+    case StepTypeEnum.DIGEST:
       if (job.status === JobStatusEnum.COMPLETED) {
         return `Digested ${job.digest?.events?.length ?? 0} events for ${(job.digest as IDigestRegularMetadata)?.amount ?? 0} ${
           (job.digest as IDigestRegularMetadata)?.unit ?? ''
@@ -105,7 +105,7 @@ function getStatusMessage(job: IActivityJob): string {
       }
       return 'Digest failed';
 
-    case 'delay':
+    case StepTypeEnum.DELAY:
       if (job.status === JobStatusEnum.COMPLETED) {
         return 'Delay completed';
       }
