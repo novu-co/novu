@@ -17,7 +17,7 @@ import { buildSlug } from '../../shared/helpers/build-slug';
 
 export function toResponseWorkflowDto(
   workflow: WorkflowInternalResponseDto,
-  fullSteps: StepDataDto[]
+  steps: StepDataDto[]
 ): WorkflowResponseDto {
   const preferencesDto: PreferencesResponseDto = {
     user: workflow.userPreferences,
@@ -33,7 +33,7 @@ export function toResponseWorkflowDto(
     tags: workflow.tags,
     active: workflow.active,
     preferences: preferencesDto,
-    steps: fullSteps,
+    steps: steps,
     description: workflow.description,
     origin: computeOrigin(workflow),
     updatedAt: workflow.updatedAt || 'Missing Updated At',

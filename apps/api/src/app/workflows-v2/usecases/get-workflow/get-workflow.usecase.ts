@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
 import { StepDataDto, UserSessionData, WorkflowResponseDto } from '@novu/shared';
 import {
@@ -42,19 +42,32 @@ export class GetWorkflowUseCase {
     user: UserSessionData
   ): Promise<StepDataDto[]> {
     const stepPromises = workflow.steps.map((step: NotificationStepEntity & { _id: string }) =>
-      this.buildStepDataUsecase.execute(
+      this.buildStepForWorkflow(workflow, step, user)
+    );
+
+    return Promise.all(stepPromises);
+  }
+
+  private async buildStepForWorkflow(
+    workflow: WorkflowInternalResponseDto,
+    step: NotificationStepEntity & { _id: string },
+    user: UserSessionData
+  ): Promise<StepDataDto> {
+    try {
+      return await this.buildStepDataUsecase.execute(
         BuildStepDataCommand.create({
           workflowIdOrInternalId: workflow._id,
           stepIdOrInternalId: step._id,
           user,
         })
-      )
-    );
-
-    try {
-      return Promise.all(stepPromises);
+      );
     } catch (error) {
-      throw new Error(`Failed to build full workflow steps: ${error.message}`);
+      throw new InternalServerErrorException({
+        message: 'Failed to build workflow step',
+        workflowId: workflow._id,
+        stepId: step._id,
+        error: error.message,
+      });
     }
   }
 }

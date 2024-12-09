@@ -61,10 +61,10 @@ export class SyncToEnvironmentUseCase {
     targetWorkflow?: WorkflowResponseDto
   ) {
     if (targetWorkflow) {
-      return this.mapWorkflowToUpdateWorkflowDto(originWorkflow, targetWorkflow, preferencesToClone);
+      return await this.mapWorkflowToUpdateWorkflowDto(originWorkflow, targetWorkflow, preferencesToClone);
     }
 
-    return this.mapWorkflowToCreateWorkflowDto(originWorkflow, preferencesToClone);
+    return await this.mapWorkflowToCreateWorkflowDto(originWorkflow, preferencesToClone);
   }
 
   @Instrument()

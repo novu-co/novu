@@ -2,6 +2,9 @@ import { IWorkflowStepMetadata } from '../../entities/step';
 import { BuilderFieldType, BuilderGroupValues, FilterParts } from '../../types';
 import { MessageTemplateDto } from '../message-template';
 
+/**
+ * @deprecated use DTOs from step.dto.ts
+ */
 export class StepVariantDto {
   id?: string;
   _id?: string;
@@ -24,6 +27,9 @@ export class StepVariantDto {
   metadata?: IWorkflowStepMetadata;
 }
 
+/**
+ * @deprecated use DTOs from step.dto.ts
+ */
 export class NotificationStepDto extends StepVariantDto {
   variants?: StepVariantDto[];
 }
