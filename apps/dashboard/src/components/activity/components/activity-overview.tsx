@@ -6,6 +6,7 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { TimeDisplayHoverCard } from '@/components/time-display-hover-card';
 import { OverviewItem } from './overview-item';
 import { IActivity } from '@novu/shared';
+import { JOB_STATUS_CONFIG } from '../constants';
 
 export interface ActivityOverviewProps {
   activity: IActivity;
@@ -47,13 +48,7 @@ export function ActivityOverview({ activity }: ActivityOverviewProps) {
         </OverviewItem>
 
         <OverviewItem label="Status">
-          <span
-            className={cn('font-mono text-xs uppercase', {
-              'text-success': status === 'completed' || status === 'merged',
-              'text-destructive': status === 'failed',
-              'text-neutral-300': ['pending', 'queued', 'delayed', 'canceled', 'skipped'].includes(status || ''),
-            })}
-          >
+          <span className={cn('font-mono text-xs uppercase', 'text-' + JOB_STATUS_CONFIG[status]?.color)}>
             {status || 'QUEUED'}
           </span>
         </OverviewItem>

@@ -1,8 +1,8 @@
 import { format } from 'date-fns';
 import { cn } from '@/utils/ui';
 import { STEP_TYPE_TO_ICON } from '@/components/icons/utils';
-import { STATUS_CONFIG, STEP_TYPE_LABELS } from '../constants';
-import { IActivityJob, StepTypeEnum } from '@novu/shared';
+import { JOB_STATUS_CONFIG, STEP_TYPE_LABELS } from '../constants';
+import { IActivityJob, JobStatusEnum, StepTypeEnum } from '@novu/shared';
 
 function getStepIcon(type?: StepTypeEnum) {
   const Icon = STEP_TYPE_TO_ICON[type as keyof typeof STEP_TYPE_TO_ICON];
@@ -19,11 +19,8 @@ export function StatusPreviewCard({ jobs }: StatusPreviewCardProps) {
     <div className="flex flex-col gap-0.5">
       {jobs.map((job, index) => {
         const lastExecutionDetail = job.executionDetails?.at(-1);
-        const status = job.status as keyof typeof STATUS_CONFIG;
-        const { color, label } = STATUS_CONFIG[status] || {
-          color: 'text-muted-700 bg-muted-50 border border-muted-200',
-          label: 'Unknown',
-        };
+        const status = job.status;
+        const { color, label } = JOB_STATUS_CONFIG[status] || JOB_STATUS_CONFIG[JobStatusEnum.PENDING];
         const isLastItem = index === jobs.length - 1;
 
         return (
@@ -39,7 +36,7 @@ export function StatusPreviewCard({ jobs }: StatusPreviewCardProps) {
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 text-xs">
                 <span className="font-medium">{STEP_TYPE_LABELS[job.type!] || job.type}</span>
-                <span className={cn('rounded-full text-[10px] font-medium', color)}>{label}</span>
+                <span className={cn('rounded-full text-[10px] font-medium', 'text-' + color)}>{label}</span>
               </div>
 
               {lastExecutionDetail?.detail && (

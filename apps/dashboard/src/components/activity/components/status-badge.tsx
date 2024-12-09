@@ -1,18 +1,17 @@
 import { useState } from 'react';
-import { CheckCircleIcon as CheckCircle, AlertCircleIcon as AlertCircle, ClockIcon as Clock } from 'lucide-react';
-import { Badge } from '@/components/primitives/badge';
+import { Badge, BadgeVariant } from '@/components/primitives/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { IActivityJob, JobStatusEnum } from '@novu/shared';
 import { StatusPreviewCard } from './status-preview-card';
+import { JOB_STATUS_CONFIG } from '../constants';
 
 export type ActivityStatus = 'SUCCESS' | 'ERROR' | 'QUEUED' | 'MERGED';
 
 export interface StatusBadgeProps {
-  status: ActivityStatus;
   jobs: IActivityJob[];
 }
 
-export function StatusBadge({ status, jobs }: StatusBadgeProps) {
+export function StatusBadge({ jobs }: StatusBadgeProps) {
   const [isOpen, setIsOpen] = useState(false);
   const errorCount = jobs.filter((job) => job.status === JobStatusEnum.FAILED).length;
   let hoverTimeout: NodeJS.Timeout;
@@ -30,37 +29,18 @@ export function StatusBadge({ status, jobs }: StatusBadgeProps) {
     setIsOpen(false);
   };
 
-  const config = {
-    SUCCESS: {
-      variant: 'success' as const,
-      icon: CheckCircle,
-      label: 'SUCCESS',
-    },
-    ERROR: {
-      variant: 'destructive' as const,
-      icon: AlertCircle,
-      label: `${errorCount} ${errorCount === 1 ? 'ERROR' : 'ERRORS'}`,
-    },
-    MERGED: {
-      variant: 'success' as const,
-      icon: CheckCircle,
-      label: 'MERGED',
-    },
-    QUEUED: {
-      variant: 'warning' as const,
-      icon: Clock,
-      label: 'QUEUED',
-    },
-  };
+  const status = getActivityStatus(jobs);
 
-  const { variant, icon: Icon, label } = config[status];
+  const { variant, icon: Icon, label } = JOB_STATUS_CONFIG[status] || JOB_STATUS_CONFIG[JobStatusEnum.PENDING];
+  const displayLabel =
+    status === JobStatusEnum.FAILED ? `${errorCount} ${errorCount === 1 ? 'ERROR' : 'ERRORS'}` : label;
 
   return (
     <Popover open={isOpen}>
       <PopoverTrigger onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-        <Badge variant={variant} className="cursor-pointer gap-1.5">
+        <Badge variant={variant as BadgeVariant} className="cursor-pointer gap-1.5">
           <Icon className="h-3.5 w-3.5" />
-          {label}
+          {displayLabel}
         </Badge>
       </PopoverTrigger>
       <PopoverContent
@@ -75,3 +55,10 @@ export function StatusBadge({ status, jobs }: StatusBadgeProps) {
     </Popover>
   );
 }
+const getActivityStatus = (jobs: IActivityJob[]) => {
+  if (!jobs.length) return JobStatusEnum.PENDING;
+
+  const lastJob = jobs[jobs.length - 1];
+
+  return lastJob.status;
+};

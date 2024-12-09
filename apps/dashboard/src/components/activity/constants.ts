@@ -1,27 +1,9 @@
-import { IActivityJob, JobStatusEnum, StepTypeEnum } from '@novu/shared';
-
-export const STATUS_CONFIG = {
-  [JobStatusEnum.COMPLETED]: {
-    color: 'text-success',
-    label: 'Delivered',
-  },
-  [JobStatusEnum.MERGED]: {
-    color: 'text-info',
-    label: 'Merged',
-  },
-  [JobStatusEnum.FAILED]: {
-    color: 'text-destructive',
-    label: 'Failed',
-  },
-  [JobStatusEnum.PENDING]: {
-    color: 'text-warning',
-    label: 'Pending',
-  },
-  [JobStatusEnum.DELAYED]: {
-    color: 'text-warning',
-    label: 'Delayed',
-  },
-} as const;
+import { JobStatusEnum, StepTypeEnum } from '@novu/shared';
+import { RiForbidFill } from 'react-icons/ri';
+import { RiErrorWarningLine } from 'react-icons/ri';
+import { BadgeVariant } from '../primitives/badge';
+import { RiCheckboxCircleLine, RiLoader3Line, RiLoader4Fill } from 'react-icons/ri';
+import { IconType } from 'react-icons/lib';
 
 export const STEP_TYPE_LABELS: Record<StepTypeEnum, string> = {
   [StepTypeEnum.EMAIL]: 'Email',
@@ -42,19 +24,69 @@ export const STATUS_STYLES = {
   default: 'border-[1px] border-[#e0e0e0] bg-[#f0f0f0] text-[#e0e0e0]',
 } as const;
 
-export const getActivityStatus = (jobs: IActivityJob[]) => {
-  if (!jobs.length) return 'QUEUED';
-
-  const lastJob = jobs[jobs.length - 1];
-
-  switch (lastJob.status) {
-    case JobStatusEnum.COMPLETED:
-      return 'SUCCESS';
-    case JobStatusEnum.FAILED:
-      return 'ERROR';
-    case JobStatusEnum.MERGED:
-      return 'MERGED';
-    default:
-      return 'QUEUED';
+export const JOB_STATUS_CONFIG: Record<
+  JobStatusEnum,
+  {
+    variant: BadgeVariant;
+    color: string;
+    icon: IconType;
+    label: string;
+    animationClass?: string;
   }
+> = {
+  [JobStatusEnum.COMPLETED]: {
+    variant: 'success' as const,
+    color: 'success',
+    icon: RiCheckboxCircleLine,
+    label: 'SUCCESS',
+  },
+  [JobStatusEnum.FAILED]: {
+    variant: 'destructive' as const,
+    color: 'destructive',
+    icon: RiErrorWarningLine,
+    label: `ERROR`,
+  },
+  [JobStatusEnum.MERGED]: {
+    variant: 'success' as const,
+    color: 'success',
+    icon: RiForbidFill,
+    label: 'MERGED',
+  },
+  [JobStatusEnum.PENDING]: {
+    variant: 'warning' as const,
+    icon: RiLoader3Line,
+    color: 'neutral-300',
+    label: 'PENDING',
+  },
+  [JobStatusEnum.CANCELED]: {
+    variant: 'warning' as const,
+    icon: RiLoader3Line,
+    color: 'neutral-300',
+    label: 'CANCELED',
+  },
+  [JobStatusEnum.SKIPPED]: {
+    variant: 'warning' as const,
+    icon: RiLoader3Line,
+    color: 'neutral-300',
+    label: 'SKIPPED',
+  },
+  [JobStatusEnum.RUNNING]: {
+    variant: 'warning' as const,
+    icon: RiLoader3Line,
+    color: 'warning',
+    label: 'RUNNING',
+  },
+  [JobStatusEnum.DELAYED]: {
+    variant: 'warning' as const,
+    icon: RiLoader4Fill,
+    label: 'DELAYED',
+    color: 'warning',
+    animationClass: 'animate-spin-slow',
+  },
+  [JobStatusEnum.QUEUED]: {
+    variant: 'warning' as const,
+    icon: RiLoader3Line,
+    color: 'warning',
+    label: 'QUEUED',
+  },
 };

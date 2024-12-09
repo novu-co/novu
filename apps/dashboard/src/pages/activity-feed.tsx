@@ -6,6 +6,7 @@ import { ActivityPanel } from '@/components/activity/activity-panel';
 import { Badge } from '../components/primitives/badge';
 import { useSearchParams } from 'react-router-dom';
 import { IActivity } from '@novu/shared';
+import { PageMeta } from '../components/page-meta';
 
 export function ActivityFeed() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -30,44 +31,47 @@ export function ActivityFeed() {
   };
 
   return (
-    <DashboardLayout
-      headerStartItems={
-        <h1 className="text-foreground-950 flex items-center gap-1">
-          <span>Activity Feed</span>
-          <Badge kind="pill" size="2xs">
-            BETA
-          </Badge>
-        </h1>
-      }
-    >
-      <div className="relative mt-10 flex h-[calc(100vh-88px)]">
-        <motion.div
-          layout="position"
-          transition={{
-            layout: { duration: 0.4, ease: 'easeInOut' },
-          }}
-          className={cn('h-full flex-1', activityItemId ? 'w-[65%]' : 'w-full')}
-        >
-          <ActivityTable selectedActivityId={activityItemId} onActivitySelect={handleActivitySelect} />
-        </motion.div>
+    <>
+      <PageMeta title="Activity Feed" />
+      <DashboardLayout
+        headerStartItems={
+          <h1 className="text-foreground-950 flex items-center gap-1">
+            <span>Activity Feed</span>
+            <Badge kind="pill" size="2xs">
+              BETA
+            </Badge>
+          </h1>
+        }
+      >
+        <div className="relative mt-10 flex h-[calc(100vh-88px)]">
+          <motion.div
+            layout="position"
+            transition={{
+              layout: { duration: 0.4, ease: 'easeInOut' },
+            }}
+            className={cn('h-full flex-1', activityItemId ? 'w-[65%]' : 'w-full')}
+          >
+            <ActivityTable selectedActivityId={activityItemId} onActivitySelect={handleActivitySelect} />
+          </motion.div>
 
-        <AnimatePresence mode="sync">
-          {activityItemId && (
-            <motion.div
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: '35%', opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{
-                duration: 0.4,
-                ease: 'easeInOut',
-              }}
-              className="bg-background min-h-full w-[500px] overflow-auto border-l"
-            >
-              <ActivityPanel activityId={activityItemId} onActivitySelect={handleActivityPanelSelect} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </DashboardLayout>
+          <AnimatePresence mode="sync">
+            {activityItemId && (
+              <motion.div
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: '35%', opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                transition={{
+                  duration: 0.4,
+                  ease: 'easeInOut',
+                }}
+                className="bg-background min-h-full w-[500px] overflow-auto border-l"
+              >
+                <ActivityPanel activityId={activityItemId} onActivitySelect={handleActivityPanelSelect} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </DashboardLayout>
+    </>
   );
 }

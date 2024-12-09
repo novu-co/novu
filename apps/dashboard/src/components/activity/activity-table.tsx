@@ -11,7 +11,6 @@ import { getNotification } from '@/api/activity';
 import { useActivities } from '@/hooks/use-activities';
 import { StatusBadge } from './components/status-badge';
 import { StepIndicators } from './components/step-indicators';
-import { getActivityStatus } from './constants';
 import { Pagination } from './components/pagination';
 import { useRef, useEffect } from 'react';
 
@@ -103,7 +102,7 @@ export function ActivityTable({ selectedActivityId, onActivitySelect }: Activity
                 </div>
               </TableCell>
               <TableCell className="px-3">
-                <StatusBadge status={getActivityStatus(activity.jobs)} jobs={activity.jobs} />
+                <StatusBadge jobs={activity.jobs} />
               </TableCell>
               <TableCell className="px-3">
                 <StepIndicators jobs={activity.jobs} />

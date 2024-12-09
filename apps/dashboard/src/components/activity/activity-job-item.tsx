@@ -3,20 +3,13 @@ import { IActivityJob, IDelayRegularMetadata, IDigestRegularMetadata, JobStatusE
 import { Button } from '@/components/primitives/button';
 import { Badge } from '@/components/primitives/badge';
 import { Card, CardContent, CardHeader } from '../primitives/card';
-import {
-  RiShadowLine,
-  RiCheckboxCircleLine,
-  RiForbidFill,
-  RiErrorWarningLine,
-  RiLoader4Fill,
-  RiLoader3Line,
-} from 'react-icons/ri';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { cn } from '@/utils/ui';
 import { ExecutionDetailItem } from './execution-detail-item';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { STEP_TYPE_TO_COLOR } from '../../utils/color';
+import { JOB_STATUS_CONFIG } from './constants';
 
 interface ActivityJobItemProps {
   job: IActivityJob;
@@ -201,23 +194,13 @@ interface JobStatusIndicatorProps {
 }
 
 function JobStatusIndicator({ status }: JobStatusIndicatorProps) {
+  const { icon: Icon, animationClass } = JOB_STATUS_CONFIG[status] || JOB_STATUS_CONFIG[JobStatusEnum.PENDING];
+
   return (
     <div className="relative flex-shrink-0">
       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
         <div className={`text-${getJobColor(status)} flex items-center justify-center`}>
-          {status === JobStatusEnum.COMPLETED ? (
-            <RiCheckboxCircleLine className="h-4 w-4" />
-          ) : status === JobStatusEnum.FAILED ? (
-            <RiErrorWarningLine className="h-4 w-4" />
-          ) : status === JobStatusEnum.DELAYED ? (
-            <RiLoader4Fill className="text-warning animate-spin-slow h-4 w-4" />
-          ) : status === JobStatusEnum.MERGED ? (
-            <RiForbidFill className="h-4 w-4" />
-          ) : status === JobStatusEnum.PENDING ? (
-            <RiLoader3Line className="h-4 w-4" />
-          ) : (
-            <RiShadowLine className="h-4 w-4" />
-          )}
+          <Icon className={cn('h-4 w-4', animationClass)} />
         </div>
       </div>
     </div>
