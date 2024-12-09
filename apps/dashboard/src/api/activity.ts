@@ -27,20 +27,28 @@ export function getActivityList(
   searchParams.append('page', page.toString());
 
   if (filters?.channels?.length) {
-    searchParams.append('channels', filters.channels.join(','));
+    filters.channels.forEach((channel) => {
+      searchParams.append('channels', channel);
+    });
   }
   if (filters?.templates?.length) {
-    searchParams.append('templates', filters.templates.join(','));
+    filters.templates.forEach((template) => {
+      searchParams.append('templates', template);
+    });
   }
+
   if (filters?.email) {
     searchParams.append('emails', filters.email);
   }
+
   if (filters?.subscriberId) {
     searchParams.append('subscriberIds', filters.subscriberId);
   }
+
   if (filters?.transactionId) {
     searchParams.append('transactionId', filters.transactionId);
   }
+
   if (filters?.startDate) {
     searchParams.append('startDate', filters.startDate);
   }

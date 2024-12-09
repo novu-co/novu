@@ -37,7 +37,7 @@ const inputStyles = {
   text: 'text-neutral-600',
 } as const;
 
-interface DataTableFacetedFilterProps {
+interface FacetedFilterProps {
   title?: string;
   type?: ValueType;
   size?: SizeType;
@@ -51,9 +51,11 @@ interface DataTableFacetedFilterProps {
   value?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function DataTableFacetedFilter({
+export function FacetedFormFilter({
   title,
   type = 'multi',
   size = 'default',
@@ -63,12 +65,21 @@ export function DataTableFacetedFilter({
   value = '',
   onChange,
   placeholder,
-}: DataTableFacetedFilterProps) {
+  open,
+  onOpenChange,
+}: FacetedFilterProps) {
   const [searchQuery, setSearchQuery] = React.useState('');
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   const selectedValues = React.useMemo(() => new Set(selected), [selected]);
   const currentValue = React.useMemo(() => value, [value]);
   const sizes = sizeVariants[size];
+
+  React.useEffect(() => {
+    if (open && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [open]);
 
   const filteredOptions = React.useMemo(() => {
     if (!searchQuery) return options;
@@ -87,6 +98,7 @@ export function DataTableFacetedFilter({
     } else {
       newSelectedValues.add(selectedValue);
     }
+
     onSelect?.(Array.from(newSelectedValues));
   };
 
@@ -96,6 +108,7 @@ export function DataTableFacetedFilter({
     } else {
       onSelect?.([]);
     }
+
     setSearchQuery('');
   };
 
@@ -150,6 +163,7 @@ export function DataTableFacetedFilter({
       return (
         <div className={sizes.content}>
           <Input
+            ref={inputRef}
             value={currentValue}
             onChange={handleInputChange}
             placeholder={placeholder}
@@ -178,6 +192,7 @@ export function DataTableFacetedFilter({
       return (
         <div className={sizes.content}>
           <Input
+            ref={inputRef}
             placeholder={`Search ${title}...`}
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
@@ -215,6 +230,7 @@ export function DataTableFacetedFilter({
     return (
       <div className={sizes.content}>
         <Input
+          ref={inputRef}
           placeholder={`Search ${title}...`}
           value={searchQuery}
           onChange={(e) => handleSearchChange(e.target.value)}
@@ -267,7 +283,7 @@ export function DataTableFacetedFilter({
   };
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
