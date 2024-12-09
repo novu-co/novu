@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { RiPlayCircleLine } from 'react-icons/ri';
 import { useForm } from 'react-hook-form';
@@ -17,12 +17,14 @@ import { buildDynamicFormSchema, makeObjectFromSchema, TestWorkflowFormType } fr
 import { TestWorkflowForm } from './test-workflow-form';
 import { toast } from 'sonner';
 import { ToastClose, ToastIcon } from '@/components/primitives/sonner';
+import { TestWorkflowLogsSidebar } from './test-workflow-logs-sidebar';
 
 export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataResponseDto }) => {
   const { environmentSlug = '', workflowSlug = '' } = useParams<{ environmentSlug: string; workflowSlug: string }>();
   const { workflow } = useFetchWorkflow({
     workflowSlug,
   });
+  const [transactionId, setTransactionId] = useState<string>();
   const to = useMemo(
     () => (typeof testData.to === 'object' ? makeObjectFromSchema({ properties: testData.to.properties ?? {} }) : {}),
     [testData]
@@ -45,9 +47,9 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
   const onSubmit = async (data: TestWorkflowFormType) => {
     try {
       const {
-        data: { transactionId },
+        data: { transactionId: newTransactionId },
       } = await triggerWorkflow({ name: workflow?.workflowId ?? '', to: data.to, payload: data.payload });
-      if (!transactionId) {
+      if (!newTransactionId) {
         return showToast({
           variant: 'lg',
           children: ({ close }) => (
@@ -68,6 +70,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
           },
         });
       }
+      setTransactionId(newTransactionId);
       return showToast({
         variant: 'lg',
         children: ({ close }) => (
@@ -79,7 +82,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
                 Workflow <span className="font-bold">{workflow?.name}</span> was triggered successfully.
               </span>
               <Link
-                to={`${LEGACY_ROUTES.ACTIVITY_FEED}?transactionId=${transactionId}`}
+                to={`${LEGACY_ROUTES.ACTIVITY_FEED}?transactionId=${newTransactionId}`}
                 reloadDocument
                 className="text-primary text-sm font-medium"
               >
@@ -137,7 +140,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
               <TestWorkflowForm workflow={workflow} />
             </TabsContent>
           </Tabs>
-          {/* <TestWorkflowLogsSidebar /> */}
+          <TestWorkflowLogsSidebar transactionId={transactionId} />
         </form>
       </Form>
     </div>

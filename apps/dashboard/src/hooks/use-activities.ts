@@ -14,7 +14,10 @@ interface ActivityResponse {
   pageSize: number;
 }
 
-export function useActivities({ filters }: UseActivitiesOptions = {}) {
+export function useActivities(
+  { filters }: UseActivitiesOptions = {},
+  { enabled = true, refetchInterval = false }: { enabled?: boolean; refetchInterval?: number | false } = {}
+) {
   const { currentEnvironment } = useEnvironment();
   const [searchParams] = useSearchParams();
 
@@ -25,6 +28,8 @@ export function useActivities({ filters }: UseActivitiesOptions = {}) {
     queryKey: ['activitiesList', currentEnvironment?._id, offset, limit, filters],
     queryFn: () => getActivityList(currentEnvironment!, Math.floor(offset / limit), filters),
     staleTime: 0,
+    enabled,
+    refetchInterval,
   });
 
   return {
