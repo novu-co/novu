@@ -5,12 +5,10 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ActivityPanel } from '@/components/activity/activity-panel';
 import { Badge } from '../components/primitives/badge';
 import { useSearchParams } from 'react-router-dom';
-import { useActivities } from '@/hooks/use-activities';
 import { IActivity } from '@novu/shared';
 
 export function ActivityFeed() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { activities } = useActivities();
   const activityItemId = searchParams.get('activityItemId');
 
   const handleActivitySelect = (activity: IActivity) => {
