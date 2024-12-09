@@ -2,12 +2,15 @@ import { format } from 'date-fns';
 import { cn } from '@/utils/ui';
 import { STEP_TYPE_TO_ICON } from '@/components/icons/utils';
 import { STATUS_CONFIG, STEP_TYPE_LABELS } from '../constants';
-import { JobsListProps } from '../types';
-import { StepTypeEnum } from '@novu/shared';
+import { IActivityJob, StepTypeEnum } from '@novu/shared';
 
 function getStepIcon(type?: StepTypeEnum) {
   const Icon = STEP_TYPE_TO_ICON[type as keyof typeof STEP_TYPE_TO_ICON];
   return <Icon className="h-4 w-4" />;
+}
+
+export interface JobsListProps {
+  jobs: IActivityJob[];
 }
 
 export function JobsList({ jobs }: JobsListProps) {

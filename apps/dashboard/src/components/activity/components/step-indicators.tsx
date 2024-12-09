@@ -1,12 +1,15 @@
 import { cn } from '@/utils/ui';
 import { STATUS_STYLES } from '../constants';
-import { StepIndicatorsProps } from '../types';
-import { StepTypeEnum } from '@novu/shared';
+import { IActivityJob, StepTypeEnum } from '@novu/shared';
 import { STEP_TYPE_TO_ICON } from '@/components/icons/utils';
 
 function getStepIcon(type?: StepTypeEnum) {
   const Icon = STEP_TYPE_TO_ICON[type as keyof typeof STEP_TYPE_TO_ICON];
   return <Icon className="h-4 w-4" />;
+}
+
+export interface StepIndicatorsProps {
+  jobs: IActivityJob[];
 }
 
 export function StepIndicators({ jobs }: StepIndicatorsProps) {

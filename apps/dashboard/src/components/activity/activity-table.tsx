@@ -9,7 +9,6 @@ import { QueryKeys } from '@/utils/query-keys';
 import { useEnvironment } from '@/context/environment/hooks';
 import { getNotification } from '@/api/activity';
 import { useActivities } from '@/hooks/use-activities';
-import { ActivityTableProps } from './types';
 import { StatusBadge } from './components/status-badge';
 import { StepIndicators } from './components/step-indicators';
 import { getActivityStatus } from './constants';
@@ -52,6 +51,11 @@ function SkeletonRow() {
       </TableCell>
     </TableRow>
   );
+}
+
+export interface ActivityTableProps {
+  selectedActivityId: string | null;
+  onActivitySelect: (activity: IActivity) => void;
 }
 
 export function ActivityTable({ selectedActivityId, onActivitySelect }: ActivityTableProps) {

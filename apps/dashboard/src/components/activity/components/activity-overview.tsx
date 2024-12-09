@@ -4,8 +4,12 @@ import { cn } from '@/utils/ui';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { useEnvironment } from '@/context/environment/hooks';
 import { TimeDisplayHoverCard } from '@/components/time-display-hover-card';
-import { ActivityOverviewProps } from '../types';
 import { CopyableField } from './copyable-field';
+import { IActivity } from '@novu/shared';
+
+export interface ActivityOverviewProps {
+  activity: IActivity;
+}
 
 export function ActivityOverview({ activity }: ActivityOverviewProps) {
   const { currentEnvironment } = useEnvironment();

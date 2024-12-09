@@ -2,8 +2,15 @@ import { useState } from 'react';
 import { CheckCircleIcon as CheckCircle, AlertCircleIcon as AlertCircle, ClockIcon as Clock } from 'lucide-react';
 import { Badge } from '@/components/primitives/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
+import { IActivityJob } from '@novu/shared';
 import { JobsList } from './jobs-list';
-import { StatusBadgeProps } from '../types';
+
+export type ActivityStatus = 'SUCCESS' | 'ERROR' | 'QUEUED' | 'MERGED';
+
+export interface StatusBadgeProps {
+  status: ActivityStatus;
+  jobs: IActivityJob[];
+}
 
 export function StatusBadge({ status, jobs }: StatusBadgeProps) {
   const [isOpen, setIsOpen] = useState(false);

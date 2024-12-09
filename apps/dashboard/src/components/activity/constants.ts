@@ -1,4 +1,4 @@
-import { StepTypeEnum, IActivityJob } from '@novu/shared';
+import { IActivityJob, StepTypeEnum } from '@novu/shared';
 
 export const STATUS_CONFIG = {
   completed: {
@@ -24,12 +24,12 @@ export const STATUS_CONFIG = {
 } as const;
 
 export const STEP_TYPE_LABELS: Record<string, string> = {
-  email: 'Email',
-  sms: 'SMS',
-  in_app: 'In-App',
-  chat: 'Chat',
-  push: 'Push',
-  digest: 'Digest',
+  [StepTypeEnum.EMAIL]: 'Email',
+  [StepTypeEnum.SMS]: 'SMS',
+  [StepTypeEnum.IN_APP]: 'In-App',
+  [StepTypeEnum.CHAT]: 'Chat',
+  [StepTypeEnum.PUSH]: 'Push',
+  [StepTypeEnum.DIGEST]: 'Digest',
 };
 
 export const STATUS_STYLES = {

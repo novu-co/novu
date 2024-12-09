@@ -4,7 +4,6 @@ import { RiPlayCircleLine } from 'react-icons/ri';
 import { ActivityJobItem } from './activity-job-item';
 import { InlineToast } from '../primitives/inline-toast';
 import { useFetchActivity } from '@/hooks/use-fetch-activity';
-import { ActivityPanelProps } from './types';
 import { ActivityOverview } from './components/activity-overview';
 import { IActivityJob } from '@novu/shared';
 
@@ -55,6 +54,11 @@ function LoadingSkeleton() {
       </div>
     </div>
   );
+}
+
+export interface ActivityPanelProps {
+  activityId: string;
+  onActivitySelect: (activityId: string) => void;
 }
 
 export function ActivityPanel({ activityId, onActivitySelect }: ActivityPanelProps) {
