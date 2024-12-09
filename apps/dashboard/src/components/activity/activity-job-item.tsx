@@ -139,15 +139,15 @@ function getJobIcon(type?: StepTypeEnum) {
   return <Icon className="h-3.5 w-3.5" />;
 }
 
-function getJobColor(status: string) {
+function getJobColor(status: JobStatusEnum) {
   switch (status) {
-    case 'completed':
+    case JobStatusEnum.COMPLETED:
       return 'success';
-    case 'failed':
+    case JobStatusEnum.FAILED:
       return 'destructive';
-    case 'delayed':
+    case JobStatusEnum.DELAYED:
       return 'warning';
-    case 'merged':
+    case JobStatusEnum.MERGED:
       return 'neutral-300';
     default:
       return 'neutral-300';
