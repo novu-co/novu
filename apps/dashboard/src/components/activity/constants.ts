@@ -1,23 +1,23 @@
-import { IActivityJob, StepTypeEnum } from '@novu/shared';
+import { IActivityJob, JobStatusEnum, StepTypeEnum } from '@novu/shared';
 
 export const STATUS_CONFIG = {
-  completed: {
+  [JobStatusEnum.COMPLETED]: {
     color: 'text-success',
     label: 'Delivered',
   },
-  merged: {
+  [JobStatusEnum.MERGED]: {
     color: 'text-info',
     label: 'Merged',
   },
-  failed: {
+  [JobStatusEnum.FAILED]: {
     color: 'text-destructive',
     label: 'Failed',
   },
-  pending: {
+  [JobStatusEnum.PENDING]: {
     color: 'text-warning',
     label: 'Pending',
   },
-  delayed: {
+  [JobStatusEnum.DELAYED]: {
     color: 'text-warning',
     label: 'Delayed',
   },
@@ -45,11 +45,11 @@ export const getActivityStatus = (jobs: IActivityJob[]) => {
   const lastJob = jobs[jobs.length - 1];
 
   switch (lastJob.status) {
-    case 'completed':
+    case JobStatusEnum.COMPLETED:
       return 'SUCCESS';
-    case 'failed':
+    case JobStatusEnum.FAILED:
       return 'ERROR';
-    case 'merged':
+    case JobStatusEnum.MERGED:
       return 'MERGED';
     default:
       return 'QUEUED';

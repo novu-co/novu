@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CheckCircleIcon as CheckCircle, AlertCircleIcon as AlertCircle, ClockIcon as Clock } from 'lucide-react';
 import { Badge } from '@/components/primitives/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
-import { IActivityJob } from '@novu/shared';
+import { IActivityJob, JobStatusEnum } from '@novu/shared';
 import { JobsList } from './jobs-list';
 
 export type ActivityStatus = 'SUCCESS' | 'ERROR' | 'QUEUED' | 'MERGED';
@@ -14,11 +14,12 @@ export interface StatusBadgeProps {
 
 export function StatusBadge({ status, jobs }: StatusBadgeProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const errorCount = jobs.filter((job) => job.status === 'failed').length;
+  const errorCount = jobs.filter((job) => job.status === JobStatusEnum.FAILED).length;
   let hoverTimeout: NodeJS.Timeout;
 
   const handleMouseEnter = () => {
     clearTimeout(hoverTimeout);
+
     hoverTimeout = setTimeout(() => {
       setIsOpen(true);
     }, 300);
