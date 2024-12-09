@@ -35,7 +35,7 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
 
       <Card className="border-1 flex-1 border border-neutral-200 p-1 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
         <CardHeader
-          className="flex flex-row items-center justify-between bg-white p-3 hover:cursor-pointer"
+          className="flex flex-row items-center justify-between bg-white p-2 px-1 hover:cursor-pointer"
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <div className="flex items-center gap-1.5">
