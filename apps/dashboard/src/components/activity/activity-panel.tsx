@@ -7,55 +7,6 @@ import { useFetchActivity } from '@/hooks/use-fetch-activity';
 import { ActivityOverview } from './components/activity-overview';
 import { IActivityJob } from '@novu/shared';
 
-function LogsSection({ jobs }: { jobs: IActivityJob[] }): JSX.Element {
-  return (
-    <div className="flex flex-col gap-6 bg-white p-3">
-      {jobs.map((job, index) => (
-        <ActivityJobItem key={job._id} job={job} isFirst={index === 0} isLast={index === jobs.length - 1} />
-      ))}
-    </div>
-  );
-}
-
-function LoadingSkeleton() {
-  return (
-    <div className="animate-pulse">
-      <div className="flex items-center gap-2 border-b border-t border-neutral-200 border-b-neutral-100 p-2">
-        <div className="h-3 w-3 rounded-full bg-neutral-200" />
-        <div className="h-[20px] w-32 rounded bg-neutral-200" />
-      </div>
-
-      <div className="px-3 py-2">
-        <div className="flex flex-col gap-3">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center justify-between">
-              <div className="h-3 w-24 rounded bg-neutral-200" />
-              <div className="h-3 w-32 rounded bg-neutral-200" />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2 border-b border-t border-neutral-100 p-2">
-        <div className="h-3 w-3 rounded-full bg-neutral-200" />
-        <div className="h-4 w-16 rounded bg-neutral-200" />
-      </div>
-
-      <div className="flex flex-col gap-6 bg-white p-3">
-        {[...Array(2)].map((_, i) => (
-          <div key={i} className="flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <div className="h-4 w-40 rounded bg-neutral-200" />
-              <div className="h-4 w-24 rounded bg-neutral-200" />
-            </div>
-            <div className="h-16 w-full rounded bg-neutral-100" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export interface ActivityPanelProps {
   activityId: string;
   onActivitySelect: (activityId: string) => void;
@@ -124,5 +75,54 @@ export function ActivityPanel({ activityId, onActivitySelect }: ActivityPanelPro
         <LogsSection jobs={activity.jobs} />
       </div>
     </motion.div>
+  );
+}
+
+function LogsSection({ jobs }: { jobs: IActivityJob[] }): JSX.Element {
+  return (
+    <div className="flex flex-col gap-6 bg-white p-3">
+      {jobs.map((job, index) => (
+        <ActivityJobItem key={job._id} job={job} isFirst={index === 0} isLast={index === jobs.length - 1} />
+      ))}
+    </div>
+  );
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="flex items-center gap-2 border-b border-t border-neutral-200 border-b-neutral-100 p-2">
+        <div className="h-3 w-3 rounded-full bg-neutral-200" />
+        <div className="h-[20px] w-32 rounded bg-neutral-200" />
+      </div>
+
+      <div className="px-3 py-2">
+        <div className="flex flex-col gap-3">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="flex items-center justify-between">
+              <div className="h-3 w-24 rounded bg-neutral-200" />
+              <div className="h-3 w-32 rounded bg-neutral-200" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 border-b border-t border-neutral-100 p-2">
+        <div className="h-3 w-3 rounded-full bg-neutral-200" />
+        <div className="h-4 w-16 rounded bg-neutral-200" />
+      </div>
+
+      <div className="flex flex-col gap-6 bg-white p-3">
+        {[...Array(2)].map((_, i) => (
+          <div key={i} className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <div className="h-4 w-40 rounded bg-neutral-200" />
+              <div className="h-4 w-24 rounded bg-neutral-200" />
+            </div>
+            <div className="h-16 w-full rounded bg-neutral-100" />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
