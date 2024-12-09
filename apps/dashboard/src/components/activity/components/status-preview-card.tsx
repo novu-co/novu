@@ -10,11 +10,11 @@ function getStepIcon(type?: StepTypeEnum) {
   return <Icon className="h-4 w-4" />;
 }
 
-export interface JobsListProps {
+export interface StatusPreviewCardProps {
   jobs: IActivityJob[];
 }
 
-export function JobsList({ jobs }: JobsListProps) {
+export function StatusPreviewCard({ jobs }: StatusPreviewCardProps) {
   return (
     <div className="flex flex-col gap-0.5">
       {jobs.map((job, index) => {
@@ -38,7 +38,7 @@ export function JobsList({ jobs }: JobsListProps) {
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 text-xs">
-                <span className="font-medium">{STEP_TYPE_LABELS[job.type || ''] || job.type}</span>
+                <span className="font-medium">{STEP_TYPE_LABELS[job.type!] || job.type}</span>
                 <span className={cn('rounded-full text-[10px] font-medium', color)}>{label}</span>
               </div>
 

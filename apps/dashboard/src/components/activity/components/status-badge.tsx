@@ -3,7 +3,7 @@ import { CheckCircleIcon as CheckCircle, AlertCircleIcon as AlertCircle, ClockIc
 import { Badge } from '@/components/primitives/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { IActivityJob, JobStatusEnum } from '@novu/shared';
-import { JobsList } from './jobs-list';
+import { StatusPreviewCard } from './status-preview-card';
 
 export type ActivityStatus = 'SUCCESS' | 'ERROR' | 'QUEUED' | 'MERGED';
 
@@ -70,7 +70,7 @@ export function StatusBadge({ status, jobs }: StatusBadgeProps) {
         onMouseEnter={() => setIsOpen(true)}
         onMouseLeave={handleMouseLeave}
       >
-        <JobsList jobs={jobs} />
+        <StatusPreviewCard jobs={jobs} />
       </PopoverContent>
     </Popover>
   );

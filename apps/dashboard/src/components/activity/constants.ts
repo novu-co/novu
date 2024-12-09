@@ -23,13 +23,16 @@ export const STATUS_CONFIG = {
   },
 } as const;
 
-export const STEP_TYPE_LABELS: Record<string, string> = {
+export const STEP_TYPE_LABELS: Record<StepTypeEnum, string> = {
   [StepTypeEnum.EMAIL]: 'Email',
   [StepTypeEnum.SMS]: 'SMS',
   [StepTypeEnum.IN_APP]: 'In-App',
   [StepTypeEnum.CHAT]: 'Chat',
   [StepTypeEnum.PUSH]: 'Push',
   [StepTypeEnum.DIGEST]: 'Digest',
+  [StepTypeEnum.DELAY]: 'Delay',
+  [StepTypeEnum.TRIGGER]: 'Trigger',
+  [StepTypeEnum.CUSTOM]: 'Custom',
 };
 
 export const STATUS_STYLES = {
