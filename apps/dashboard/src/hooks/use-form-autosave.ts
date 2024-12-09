@@ -30,10 +30,7 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
         return;
       }
       // manually trigger the validation of the form
-      const isValid = await form.trigger();
-      if (!isValid) {
-        return;
-      }
+      await form.trigger();
 
       const values = { ...previousData, ...data };
       // reset the dirty fields right away because on slow networks the patch request might take a while
