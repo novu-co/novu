@@ -79,7 +79,7 @@ export function ExecutionDetailItem({ detail }: ExecutionDetailItemProps) {
         expandable={!!detail.raw}
       >
         {detail.raw && (
-          <pre className="max-w-fullfont-mono min-w-0" style={{ width: '1px' }}>
+          <pre className="min-w-0 max-w-full font-mono" style={{ width: '1px' }}>
             {formatContent(detail.raw)}
           </pre>
         )}
