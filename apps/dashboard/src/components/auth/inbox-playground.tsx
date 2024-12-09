@@ -157,6 +157,13 @@ export function InboxPlayground() {
     navigate(`${ROUTES.INBOX_EMBED}?${queryParams}`);
   };
 
+  const handleSkipToDashboard = () => {
+    telemetry(TelemetryEvent.SKIP_ONBOARDING_CLICKED, {
+      skippedFrom: 'inbox-playground',
+    });
+    navigate(ROUTES.WELCOME);
+  };
+
   useEffect(() => {
     const subscription = form.watch((value, { name }) => {
       if (name === 'selectedStyle') {
@@ -217,9 +224,14 @@ export function InboxPlayground() {
                   )}
                 </Button>
               ) : (
-                <Button size="sm" className="px-2" onClick={handleImplementClick}>
-                  Implement &lt;Inbox /&gt;
-                </Button>
+                <>
+                  <Button size="sm" variant="ghost" className="px-2" onClick={handleSkipToDashboard}>
+                    Skip to Dashboard
+                  </Button>
+                  <Button size="sm" className="px-2" onClick={handleImplementClick}>
+                    Implement &lt;Inbox /&gt;
+                  </Button>
+                </>
               )}
             </div>
           </div>
@@ -227,8 +239,8 @@ export function InboxPlayground() {
 
         <div className="max-h-[610px] w-full border-l">
           <InboxPreviewContent
+            hasNotificationBeenSent={hasNotificationBeenSent}
             selectedStyle={form.watch('selectedStyle')}
-            hideHint={hasNotificationBeenSent}
             primaryColor={form.watch('primaryColor')}
             foregroundColor={form.watch('foregroundColor')}
           />
