@@ -3,11 +3,33 @@ import { ActivityTable } from '@/components/activity/activity-table';
 import { cn } from '@/utils/ui';
 import { motion, AnimatePresence } from 'motion/react';
 import { ActivityPanel } from '@/components/activity/activity-panel';
-import { useState } from 'react';
 import { Badge } from '../components/primitives/badge';
+import { useSearchParams } from 'react-router-dom';
+import { useActivities } from '@/hooks/use-activities';
+import { IActivity } from '@novu/shared';
 
 export function ActivityFeed() {
-  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { activities } = useActivities();
+  const activityItemId = searchParams.get('activityItemId');
+
+  const handleActivitySelect = (activity: IActivity) => {
+    setSearchParams((prev) => {
+      if (activity._id === activityItemId) {
+        prev.delete('activityItemId');
+      } else {
+        prev.set('activityItemId', activity._id);
+      }
+      return prev;
+    });
+  };
+
+  const handleActivityPanelSelect = (activityId: string) => {
+    setSearchParams((prev) => {
+      prev.set('activityItemId', activityId);
+      return prev;
+    });
+  };
 
   return (
     <DashboardLayout
@@ -26,16 +48,13 @@ export function ActivityFeed() {
           transition={{
             layout: { duration: 0.4, ease: 'easeInOut' },
           }}
-          className={cn('h-full flex-1 overflow-auto', selectedActivityId ? 'w-[65%]' : 'w-full')}
+          className={cn('h-full flex-1 overflow-auto', activityItemId ? 'w-[65%]' : 'w-full')}
         >
-          <ActivityTable
-            selectedActivityId={selectedActivityId}
-            onActivitySelect={(activity) => setSelectedActivityId(activity._id)}
-          />
+          <ActivityTable selectedActivityId={activityItemId} onActivitySelect={handleActivitySelect} />
         </motion.div>
 
         <AnimatePresence mode="sync">
-          {selectedActivityId && (
+          {activityItemId && (
             <motion.div
               initial={{ width: 0, opacity: 0 }}
               animate={{ width: '35%', opacity: 1 }}
@@ -46,10 +65,7 @@ export function ActivityFeed() {
               }}
               className="bg-background h-full w-[500px] overflow-auto border-l"
             >
-              <ActivityPanel
-                activityId={selectedActivityId}
-                onActivitySelect={(activityId) => setSelectedActivityId(activityId)}
-              />
+              <ActivityPanel activityId={activityItemId} onActivitySelect={handleActivityPanelSelect} />
             </motion.div>
           )}
         </AnimatePresence>
