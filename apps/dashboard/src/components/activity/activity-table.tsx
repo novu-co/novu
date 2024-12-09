@@ -15,44 +15,6 @@ import { getActivityStatus } from './constants';
 import { Pagination } from './components/pagination';
 import { useRef, useEffect } from 'react';
 
-function formatDate(date: string) {
-  return format(new Date(date), 'MMM d yyyy, HH:mm:ss');
-}
-
-function SkeletonRow() {
-  return (
-    <TableRow className="animate-pulse">
-      <TableCell>
-        <div className="flex flex-col gap-1">
-          <div className="h-5 w-36 rounded bg-neutral-200" />
-          <div className="h-2.5 w-20 rounded bg-neutral-100" />
-        </div>
-      </TableCell>
-      <TableCell>
-        <div className="flex h-7 w-28 items-center justify-center gap-1.5 rounded-full bg-neutral-100">
-          <div className="h-3.5 w-3.5 rounded-full bg-neutral-200" />
-          <div className="h-3.5 w-16 rounded bg-neutral-200" />
-        </div>
-      </TableCell>
-      <TableCell>
-        <div className="flex items-center">
-          {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="-ml-2 flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100 first:ml-0"
-            >
-              <div className="h-4 w-4 rounded bg-neutral-200" />
-            </div>
-          ))}
-        </div>
-      </TableCell>
-      <TableCell>
-        <div className="h-4 w-36 rounded bg-neutral-100 font-mono" />
-      </TableCell>
-    </TableRow>
-  );
-}
-
 export interface ActivityTableProps {
   selectedActivityId: string | null;
   onActivitySelect: (activity: IActivity) => void;
@@ -156,5 +118,43 @@ export function ActivityTable({ selectedActivityId, onActivitySelect }: Activity
 
       <Pagination offset={offset} limit={limit} hasMore={hasMore} onOffsetChange={handleOffsetChange} />
     </div>
+  );
+}
+
+function formatDate(date: string) {
+  return format(new Date(date), 'MMM d yyyy, HH:mm:ss');
+}
+
+function SkeletonRow() {
+  return (
+    <TableRow className="animate-pulse">
+      <TableCell>
+        <div className="flex flex-col gap-1">
+          <div className="h-5 w-36 rounded bg-neutral-200" />
+          <div className="h-2.5 w-20 rounded bg-neutral-100" />
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex h-7 w-28 items-center justify-center gap-1.5 rounded-full bg-neutral-100">
+          <div className="h-3.5 w-3.5 rounded-full bg-neutral-200" />
+          <div className="h-3.5 w-16 rounded bg-neutral-200" />
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center">
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="-ml-2 flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100 first:ml-0"
+            >
+              <div className="h-4 w-4 rounded bg-neutral-200" />
+            </div>
+          ))}
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="h-4 w-36 rounded bg-neutral-100 font-mono" />
+      </TableCell>
+    </TableRow>
   );
 }
