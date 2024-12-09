@@ -169,7 +169,7 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
 
       <JobStatusIndicator status={job.status} />
 
-      <Card className="border-1 flex-1 border-neutral-200 p-1 shadow-sm">
+      <Card className="border-1 flex-1 border border-neutral-200 p-1 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
         <CardHeader
           className="flex flex-row items-center justify-between bg-white p-3 hover:cursor-pointer"
           onClick={() => setIsExpanded(!isExpanded)}
