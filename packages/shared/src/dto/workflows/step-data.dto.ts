@@ -21,6 +21,7 @@ export enum UiSchemaGroupEnum {
   DIGEST = 'DIGEST',
   DELAY = 'DELAY',
   SMS = 'SMS',
+  PUSH = 'PUSH',
 }
 
 export enum UiComponentEnum {
@@ -40,6 +41,8 @@ export enum UiComponentEnum {
   DELAY_AMOUNT = 'DELAY_AMOUNT',
   DELAY_UNIT = 'DELAY_UNIT',
   SMS_BODY = 'SMS_BODY',
+  PUSH_BODY = 'PUSH_BODY',
+  PUSH_SUBJECT = 'PUSH_SUBJECT',
 }
 
 export class UiSchemaProperty {
