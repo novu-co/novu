@@ -118,7 +118,7 @@ export function ActivityFilters({ onFiltersChange, initialValues }: IActivityFil
               <FormItem className="space-y-0">
                 <FacetedFormFilter
                   size="small"
-                  type="single"
+                  type="multi"
                   title="Workflows"
                   options={
                     workflowTemplates?.workflows?.map((workflow) => ({
