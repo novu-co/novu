@@ -53,8 +53,23 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
   const isDefaultPreferences = useMemo(() => workflow.preferences.user === null, [workflow.preferences.user]);
   const isDashboardWorkflow = useMemo(() => workflow.origin === WorkflowOriginEnum.NOVU_CLOUD, [workflow.origin]);
   const formDataToRender = useMemo(() => {
-    return isDefaultPreferences ? workflow.preferences.default : workflow.preferences.user;
-  }, [isDefaultPreferences, workflow.preferences.default, workflow.preferences.user]);
+    const steps = workflow.steps.map((step) => step.type);
+    const defaultPreferences = isDefaultPreferences ? workflow.preferences.default : workflow.preferences.user;
+    const allChannels = defaultPreferences?.channels;
+    if (!allChannels) return null;
+
+    const filteredChannels = Object.keys(allChannels).reduce(
+      (acc, curr) => {
+        if (steps.includes(curr as StepTypeEnum)) {
+          acc[curr as ChannelTypeEnum] = allChannels[curr as ChannelTypeEnum];
+        }
+        return acc;
+      },
+      {} as Record<ChannelTypeEnum, { enabled: boolean }>
+    );
+
+    return filteredChannels;
+  }, [isDefaultPreferences, workflow.preferences.default, workflow.preferences.user, workflow.steps]);
 
   const form = useForm<z.infer<typeof UserPreferencesFormSchema>>({
     defaultValues: {
@@ -113,9 +128,9 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
   };
 
   const handleAllToggle = (value: boolean) => {
-    if (!formDataToRender?.channels) return;
+    if (!formDataToRender) return;
 
-    const channelPreferences = Object.keys(formDataToRender?.channels).reduce(
+    const channelPreferences = Object.keys(formDataToRender).reduce(
       (acc, curr) => {
         acc[curr as ChannelTypeEnum] = { enabled: value };
         return acc;
@@ -177,105 +192,7 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
             Set default channel preferences for subscribers and specify which channels they can customize.
           </p>
         </SidebarContent>
-        {isDashboardWorkflow ? null : (
-          <SidebarContent size="md">
-            {/* This doesn't needs to be a form, but using it as a form allows to re-use the formItem designs without duplicating the same styles */}
-            <Form {...overrideForm}>
-              <form>
-                <FormField
-                  control={overrideForm.control}
-                  name="override"
-                  render={({ field }) => (
-                    <FormItem className="mt-2 flex w-full items-center justify-between">
-                      <FormLabel tooltip="Override preferences to use dashboard-defined preferences instead of code defaults. Disable to restore defaults.">
-                        Override preferences
-                      </FormLabel>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={(checked) => {
-                            field.onChange(checked);
-                            if (!checked) {
-                              updateUserPreference(null);
-                            }
-                            track(TelemetryEvent.WORKFLOW_PREFERENCES_OVERRIDE_USED, {
-                              new_status: checked,
-                            });
-                          }}
-                          disabled={isDashboardWorkflow}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </form>
-            </Form>
-          </SidebarContent>
-        )}
-        <Separator />
-        <Form {...form}>
-          <form>
-            <SidebarContent size="md">
-              <FormField
-                control={form.control}
-                name="user.all.readOnly"
-                render={({ field }) => (
-                  <FormItem className="my-2 flex w-full items-center justify-between">
-                    <FormLabel tooltip="Critical workflows ensure essential notifications can't be unsubscribed.">
-                      Mark as critical
-                    </FormLabel>
-                    <FormControl>
-                      <Switch checked={field.value} onCheckedChange={handleCriticalToggle} disabled={!override} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </SidebarContent>
-            <div className="flex items-center justify-between gap-1.5 bg-neutral-50 px-3 py-0.5">
-              <span className="text-2xs uppercase text-neutral-400">All channels</span>
-              <FormField
-                control={form.control}
-                name="user.all.enabled"
-                render={({ field }) => (
-                  <FormControl className="m-1">
-                    <Checkbox checked={field.value} onCheckedChange={handleAllToggle} disabled={!override} />
-                  </FormControl>
-                )}
-              />
-            </div>
-            <SidebarContent size="md">
-              {Object.keys(formDataToRender?.channels ?? {}).map((channel) => {
-                const Icon = STEP_TYPE_TO_ICON[channel as StepTypeEnum];
-                return (
-                  <FormField
-                    control={form.control}
-                    name={`user.channels.${channel}.enabled`}
-                    render={({ field }) => (
-                      <FormItem className="mt-2 flex w-full items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Step variant={STEP_TYPE_TO_COLOR[channel as StepTypeEnum]} className="size-5">
-                            <Icon />
-                          </Step>
-                          <FormLabel>{capitalize(CHANNEL_LABELS_LOOKUP[channel as ChannelTypeEnum])}</FormLabel>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={(checked) => handleChannelToggle(channel as ChannelTypeEnum, checked)}
-                            disabled={!override}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                    key={channel}
-                  />
-                );
-              })}
-            </SidebarContent>
-            <Separator />
-          </form>
-        </Form>
-        {!isDashboardWorkflow && override && (
+        {Object.keys(formDataToRender ?? {}).length === 0 ? (
           <SidebarContent size="md">
             <Card className="bg-information/10 border-information/40 border px-2.5 py-2">
               <CardContent className="flex flex-nowrap items-center gap-2 p-0">
@@ -283,11 +200,126 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
                   <RiInformationFill className="text-information m-0.5 size-4" />
                 </div>
                 <span className="text-2xs">
-                  Preferences defined in code have been overridden. Disable overrides to restore original.
+                  Channel preference configuration is available for the Email, In-App, SMS, Chat, and Push channels.
                 </span>
               </CardContent>
             </Card>
           </SidebarContent>
+        ) : (
+          <>
+            {isDashboardWorkflow ? null : (
+              <SidebarContent size="md">
+                {/* This doesn't needs to be a form, but using it as a form allows to re-use the formItem designs without duplicating the same styles */}
+                <Form {...overrideForm}>
+                  <form>
+                    <FormField
+                      control={overrideForm.control}
+                      name="override"
+                      render={({ field }) => (
+                        <FormItem className="mt-2 flex w-full items-center justify-between">
+                          <FormLabel tooltip="Override preferences to use dashboard-defined preferences instead of code defaults. Disable to restore defaults.">
+                            Override preferences
+                          </FormLabel>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={(checked) => {
+                                field.onChange(checked);
+                                if (!checked) {
+                                  updateUserPreference(null);
+                                }
+                                track(TelemetryEvent.WORKFLOW_PREFERENCES_OVERRIDE_USED, {
+                                  new_status: checked,
+                                });
+                              }}
+                              disabled={isDashboardWorkflow}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </form>
+                </Form>
+              </SidebarContent>
+            )}
+            <Separator />
+            <Form {...form}>
+              <form>
+                <SidebarContent size="md">
+                  <FormField
+                    control={form.control}
+                    name="user.all.readOnly"
+                    render={({ field }) => (
+                      <FormItem className="my-2 flex w-full items-center justify-between">
+                        <FormLabel tooltip="Critical workflows ensure essential notifications can't be unsubscribed.">
+                          Mark as critical
+                        </FormLabel>
+                        <FormControl>
+                          <Switch checked={field.value} onCheckedChange={handleCriticalToggle} disabled={!override} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </SidebarContent>
+                <div className="flex items-center justify-between gap-1.5 bg-neutral-50 px-3 py-0.5">
+                  <span className="text-2xs uppercase text-neutral-400">All channels</span>
+                  <FormField
+                    control={form.control}
+                    name="user.all.enabled"
+                    render={({ field }) => (
+                      <FormControl className="m-1">
+                        <Checkbox checked={field.value} onCheckedChange={handleAllToggle} disabled={!override} />
+                      </FormControl>
+                    )}
+                  />
+                </div>
+                <SidebarContent size="md">
+                  {Object.keys(formDataToRender ?? {}).map((channel) => {
+                    const Icon = STEP_TYPE_TO_ICON[channel as StepTypeEnum];
+                    return (
+                      <FormField
+                        control={form.control}
+                        name={`user.channels.${channel}.enabled`}
+                        render={({ field }) => (
+                          <FormItem className="mt-2 flex w-full items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Step variant={STEP_TYPE_TO_COLOR[channel as StepTypeEnum]} className="size-5">
+                                <Icon />
+                              </Step>
+                              <FormLabel>{capitalize(CHANNEL_LABELS_LOOKUP[channel as ChannelTypeEnum])}</FormLabel>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={(checked) => handleChannelToggle(channel as ChannelTypeEnum, checked)}
+                                disabled={!override}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                        key={channel}
+                      />
+                    );
+                  })}
+                </SidebarContent>
+                <Separator />
+              </form>
+            </Form>
+            {!isDashboardWorkflow && override && (
+              <SidebarContent size="md">
+                <Card className="bg-information/10 border-information/40 border px-2.5 py-2">
+                  <CardContent className="flex flex-nowrap items-center gap-2 p-0">
+                    <div className="size-5">
+                      <RiInformationFill className="text-information m-0.5 size-4" />
+                    </div>
+                    <span className="text-2xs">
+                      Preferences defined in code have been overridden. Disable overrides to restore original.
+                    </span>
+                  </CardContent>
+                </Card>
+              </SidebarContent>
+            )}
+          </>
         )}
       </motion.div>
     </>
