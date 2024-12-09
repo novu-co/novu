@@ -33,7 +33,7 @@ export function toResponseWorkflowDto(
     tags: workflow.tags,
     active: workflow.active,
     preferences: preferencesDto,
-    steps: steps,
+    steps,
     description: workflow.description,
     origin: computeOrigin(workflow),
     updatedAt: workflow.updatedAt || 'Missing Updated At',

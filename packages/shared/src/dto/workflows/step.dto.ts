@@ -29,7 +29,6 @@ export type PatchStepDataDto = {
   controlValues?: Record<string, unknown>;
 };
 
-// remove all these useless step dtos
 export type StepDto = {
   name: string;
   type: StepTypeEnum;

@@ -20,15 +20,12 @@ export class BuildStepDataUsecase {
     const workflow = await this.fetchWorkflow(command);
 
     const { currentStep } = await this.loadStepsFromDb(command, workflow);
-    if (
-      currentStep.name === undefined ||
-      !currentStep._templateId ||
-      currentStep.stepId === undefined ||
-      !currentStep.template?.type
-    ) {
+
+    if (!currentStep._templateId || !currentStep.template?.type) {
       throw new InvalidStepException(currentStep);
     }
     const controlValues = await this.getValues(command, currentStep, workflow._id);
+    const stepName = currentStep.name || 'Missing Step Name';
 
     return {
       controls: {
@@ -43,10 +40,10 @@ export class BuildStepDataUsecase {
         stepInternalId: currentStep._templateId,
         workflow,
       }),
-      name: currentStep.name,
-      slug: buildSlug(currentStep.name, ShortIsPrefixEnum.STEP, currentStep._templateId),
+      name: stepName,
+      slug: buildSlug(stepName, ShortIsPrefixEnum.STEP, currentStep._templateId),
       _id: currentStep._templateId,
-      stepId: currentStep.stepId,
+      stepId: currentStep.stepId || 'Missing Step Id',
       type: currentStep.template?.type,
       origin: workflow.origin || WorkflowOriginEnum.EXTERNAL,
       workflowId: workflow.triggers[0].identifier,

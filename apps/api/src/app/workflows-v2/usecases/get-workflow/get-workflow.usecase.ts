@@ -8,11 +8,11 @@ import {
   WorkflowInternalResponseDto,
 } from '@novu/application-generic';
 
+import { NotificationStepEntity } from '@novu/dal';
 import { GetWorkflowCommand } from './get-workflow.command';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
 import { BuildStepDataUsecase } from '../build-step-data/build-step-data.usecase';
 import { BuildStepDataCommand } from '../build-step-data/build-step-data.command';
-import { NotificationStepEntity } from '@novu/dal';
 
 @Injectable()
 export class GetWorkflowUseCase {

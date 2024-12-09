@@ -83,7 +83,7 @@ export class SyncToEnvironmentUseCase {
     externalId: string
   ): Promise<WorkflowResponseDto | undefined> {
     try {
-      return this.getWorkflowUseCase.execute(
+      return await this.getWorkflowUseCase.execute(
         GetWorkflowCommand.create({
           user: { ...command.user, environmentId: command.targetEnvironmentId },
           workflowIdOrInternalId: externalId,
