@@ -5,7 +5,8 @@ export interface IActivityFiltersData {
   dateRange: string;
   channels: ChannelTypeEnum[];
   templates: string[];
-  searchTerm: string;
+  transactionId: string;
+  subscriberId: string;
 }
 
 export interface IActivityUrlState {

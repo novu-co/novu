@@ -7,7 +7,6 @@ export interface IActivityFilters {
   email?: string;
   subscriberId?: string;
   transactionId?: string;
-  search?: string;
   startDate?: string;
   endDate?: string;
 }
@@ -47,10 +46,6 @@ export function getActivityList(
   }
   if (filters?.endDate) {
     searchParams.append('endDate', filters.endDate);
-  }
-
-  if (filters?.search) {
-    searchParams.append('search', filters.search);
   }
 
   return get<ActivityResponse>(`/notifications?${searchParams.toString()}`, {

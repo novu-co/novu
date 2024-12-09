@@ -19,9 +19,14 @@ function parseFilters(searchParams: URLSearchParams): IActivityFilters {
     result.templates = templates;
   }
 
-  const searchTerm = searchParams.get('searchTerm');
-  if (searchTerm) {
-    result.search = searchTerm;
+  const transactionId = searchParams.get('transactionId');
+  if (transactionId) {
+    result.transactionId = transactionId;
+  }
+
+  const subscriberId = searchParams.get('subscriberId');
+  if (subscriberId) {
+    result.subscriberId = subscriberId;
   }
 
   const dateRange = searchParams.get('dateRange');
@@ -48,7 +53,8 @@ function parseFilterValues(searchParams: URLSearchParams): IActivityFiltersData 
     dateRange: searchParams.get('dateRange') || DEFAULT_DATE_RANGE,
     channels: (searchParams.get('channels')?.split(',').filter(Boolean) as ChannelTypeEnum[]) || [],
     templates: searchParams.get('templates')?.split(',').filter(Boolean) || [],
-    searchTerm: searchParams.get('searchTerm') || '',
+    transactionId: searchParams.get('transactionId') || '',
+    subscriberId: searchParams.get('subscriberId') || '',
   };
 }
 
@@ -76,7 +82,7 @@ export function useActivityUrlState(): IActivityUrlState & {
   const handleFiltersChange = useCallback(
     (data: IActivityFiltersData) => {
       setSearchParams((prev) => {
-        ['channels', 'templates', 'searchTerm', 'dateRange'].forEach((key) => prev.delete(key));
+        ['channels', 'templates', 'transactionId', 'subscriberId', 'dateRange'].forEach((key) => prev.delete(key));
 
         if (data.channels?.length) {
           prev.set('channels', data.channels.join(','));
@@ -84,8 +90,11 @@ export function useActivityUrlState(): IActivityUrlState & {
         if (data.templates?.length) {
           prev.set('templates', data.templates.join(','));
         }
-        if (data.searchTerm) {
-          prev.set('searchTerm', data.searchTerm);
+        if (data.transactionId) {
+          prev.set('transactionId', data.transactionId);
+        }
+        if (data.subscriberId) {
+          prev.set('subscriberId', data.subscriberId);
         }
         if (data.dateRange && data.dateRange !== DEFAULT_DATE_RANGE) {
           prev.set('dateRange', data.dateRange);

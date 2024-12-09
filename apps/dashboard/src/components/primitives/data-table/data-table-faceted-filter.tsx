@@ -119,7 +119,12 @@ export function DataTableFacetedFilter({
 
   const renderTriggerContent = () => {
     if (type === 'text') {
-      return currentValue ? renderBadge(`${title}: ${currentValue}`) : null;
+      return currentValue ? (
+        <>
+          <Separator orientation="vertical" className={cn('mx-2', sizes.separator)} />
+          {renderBadge(`${currentValue}`)}
+        </>
+      ) : null;
     }
 
     if (selectedValues.size === 0) return null;
@@ -272,7 +277,7 @@ export function DataTableFacetedFilter({
             sizes.trigger
           )}
         >
-          <PlusCircle className="mr-2 h-4 w-4" />
+          {(type === 'text' ? !currentValue : selectedValues.size === 0) && <PlusCircle className="mr-2 h-4 w-4" />}
           {title}
           {renderTriggerContent()}
         </Button>

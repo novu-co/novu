@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { ChannelTypeEnum } from '@novu/shared';
 import { Input, InputField } from '../primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../primitives/select';
@@ -9,6 +9,8 @@ import { FormItem } from '../primitives/form/form';
 import { FormField } from '../primitives/form/form';
 import { RiCalendarLine, RiListCheck, RiSearchLine } from 'react-icons/ri';
 import { DataTableFacetedFilter } from '../primitives/data-table/data-table-faceted-filter';
+import { Button } from '../primitives/button';
+import { cn } from '../../utils/ui';
 
 interface IActivityFilters {
   onFiltersChange: (filters: IActivityFiltersData) => void;
@@ -19,7 +21,8 @@ interface IActivityFiltersData {
   dateRange: string;
   channels: ChannelTypeEnum[];
   templates: string[];
-  searchTerm: string;
+  transactionId: string;
+  subscriberId: string;
 }
 
 const DATE_RANGE_OPTIONS = [
@@ -36,11 +39,30 @@ const CHANNEL_OPTIONS = [
 ];
 
 export function ActivityFilters({ onFiltersChange, initialValues }: IActivityFilters) {
+  const originalInitialValues = useRef(initialValues);
+
   const form = useForm<IActivityFiltersData>({
     defaultValues: initialValues,
   });
 
   const { data: workflowTemplates } = useFetchWorkflows({ limit: 100 });
+  const formValues = form.watch();
+
+  const hasChanges = useMemo(() => {
+    const original = originalInitialValues.current;
+    return Object.entries(original).some(([key, value]) => {
+      const current = formValues[key as keyof IActivityFiltersData];
+      if (Array.isArray(value) && Array.isArray(current)) {
+        return value.length !== current.length || value.some((v, i) => v !== current[i]);
+      }
+      return value !== current;
+    });
+  }, [formValues]);
+
+  const handleReset = () => {
+    form.reset(originalInitialValues.current);
+    onFiltersChange(originalInitialValues.current);
+  };
 
   useEffect(() => {
     const subscription = form.watch((value) => {
@@ -52,24 +74,25 @@ export function ActivityFilters({ onFiltersChange, initialValues }: IActivityFil
     return () => subscription.unsubscribe();
   }, [onFiltersChange]);
 
-  useEffect(() => {
-    const { searchTerm: currentSearchTerm, ...currentValues } = form.getValues();
-    const { searchTerm: newSearchTerm, ...newValues } = initialValues;
-
-    const hasNonSearchChanges = Object.entries(newValues).some(([key, value]) => {
-      const current = currentValues[key as keyof typeof currentValues];
-
-      return JSON.stringify(value) !== JSON.stringify(current);
-    });
-
-    if (hasNonSearchChanges) {
-      form.reset({ ...initialValues, searchTerm: currentSearchTerm });
-    }
-  }, [initialValues]);
-
   return (
     <Form {...form}>
       <form className="flex items-center gap-3 px-2.5 py-2">
+        <FormField
+          control={form.control}
+          name="dateRange"
+          render={({ field }) => (
+            <FormItem className="space-y-0">
+              <DataTableFacetedFilter
+                size="small"
+                type="single"
+                title="Time Range"
+                options={DATE_RANGE_OPTIONS}
+                selected={field.value ? [field.value] : []}
+                onSelect={(values) => field.onChange(values[0])}
+              />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="templates"
@@ -111,16 +134,16 @@ export function ActivityFilters({ onFiltersChange, initialValues }: IActivityFil
 
         <FormField
           control={form.control}
-          name="dateRange"
+          name="transactionId"
           render={({ field }) => (
-            <FormItem className="space-y-0">
+            <FormItem className="relative">
               <DataTableFacetedFilter
+                type="text"
                 size="small"
-                type="single"
-                title="Time Range"
-                options={DATE_RANGE_OPTIONS}
-                selected={field.value ? [field.value] : []}
-                onSelect={(values) => field.onChange(values[0])}
+                title="Transaction ID"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Search by Transaction ID"
               />
             </FormItem>
           )}
@@ -128,20 +151,34 @@ export function ActivityFilters({ onFiltersChange, initialValues }: IActivityFil
 
         <FormField
           control={form.control}
-          name="searchTerm"
+          name="subscriberId"
           render={({ field }) => (
-            <FormItem className="relative border-l border-neutral-100 pl-3">
+            <FormItem className="relative">
               <DataTableFacetedFilter
                 type="text"
                 size="small"
-                title="Search"
+                title="Subscriber ID"
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="Search by Transaction ID, E-mail, Subscriber ID"
+                placeholder="Search by Subscriber ID"
               />
             </FormItem>
           )}
         />
+
+        {hasChanges && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleReset}
+            className={cn(
+              'h-7 px-2 py-1.5 text-xs text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900',
+              'ml-auto'
+            )}
+          >
+            Reset
+          </Button>
+        )}
       </form>
     </Form>
   );
