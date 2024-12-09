@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
+import * as Sentry from '@sentry/react';
 
 type CallbackFunction = () => Promise<unknown>;
 
@@ -64,6 +65,7 @@ export function useInvocationQueue<T extends CallbackFunction = CallbackFunction
     } catch (error) {
       // If the invocation fails, we want to log the error and continue with the next invocation
       console.error('Error processing queue item:', error);
+      Sentry.captureException(error);
     }
   }, []);
 
