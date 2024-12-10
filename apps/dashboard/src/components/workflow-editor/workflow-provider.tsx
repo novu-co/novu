@@ -1,4 +1,4 @@
-import { PatchWorkflowDto, UpdateWorkflowDto, WorkflowResponseDto } from '@novu/shared';
+import { PatchWorkflowDto, StepDataDto, UpdateWorkflowDto, WorkflowResponseDto } from '@novu/shared';
 import { createContext, ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useBlocker, useNavigate, useParams } from 'react-router-dom';
 
@@ -21,10 +21,13 @@ import { RiAlertFill } from 'react-icons/ri';
 import { CheckCircleIcon } from 'lucide-react';
 import { useInvocationQueue } from '@/hooks/use-invocation-queue';
 import { showErrorToast, showSavingToast, showSuccessToast } from './toasts';
+import { STEP_DIVIDER } from '@/utils/step';
+import { getWorkflowIdFromSlug } from '@/utils/step';
 
 export type WorkflowContextType = {
   isPending: boolean;
   workflow?: WorkflowResponseDto;
+  step?: StepDataDto;
   update: (data: UpdateWorkflowDto) => void;
   patch: (data: PatchWorkflowDto) => void;
 };
@@ -33,13 +36,21 @@ export const WorkflowContext = createContext<WorkflowContextType>({} as Workflow
 
 export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
   const { currentEnvironment } = useEnvironment();
-  const { workflowSlug = '' } = useParams<{ workflowSlug?: string; stepSlug?: string }>();
+  const { workflowSlug = '', stepSlug = '' } = useParams<{ workflowSlug?: string; stepSlug?: string }>();
   const [toastId, setToastId] = useState<string | number>('');
   const navigate = useNavigate();
 
   const { workflow, isPending, error } = useFetchWorkflow({
     workflowSlug,
   });
+
+  const getStep = useCallback(() => {
+    return workflow?.steps.find(
+      (step) =>
+        getWorkflowIdFromSlug({ slug: stepSlug, divider: STEP_DIVIDER }) ===
+        getWorkflowIdFromSlug({ slug: step.slug, divider: STEP_DIVIDER })
+    );
+  }, [workflow, stepSlug]);
 
   const { enqueue, hasPendingItems } = useInvocationQueue();
   const blocker = useBlocker(({ nextLocation }) => {
@@ -58,19 +69,15 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
   const { patchWorkflow, isPending: isPatchPending } = usePatchWorkflow({
     onMutate: () => {
       // when the navigation is blocked, we don't want to show the toast
-      if (isBlocked) {
-        return;
+      if (!isBlocked) {
+        showSavingToast(setToastId);
       }
-
-      showSavingToast(setToastId);
     },
     onSuccess: async () => {
       // when the navigation is blocked, we don't want to show the toast
-      if (isBlocked) {
-        return;
+      if (!isBlocked) {
+        showSuccessToast(toastId);
       }
-
-      showSuccessToast(toastId);
     },
     onError: () => {
       showErrorToast(toastId);
@@ -80,19 +87,15 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
   const { updateWorkflow, isPending: isUpdatePending } = useUpdateWorkflow({
     onMutate: () => {
       // when the navigation is blocked, we don't want to show the toast
-      if (isBlocked) {
-        return;
+      if (!isBlocked) {
+        showSavingToast(setToastId);
       }
-
-      showSavingToast(setToastId);
     },
     onSuccess: async () => {
       // when the navigation is blocked, we don't want to show the toast
-      if (isBlocked) {
-        return;
+      if (!isBlocked) {
+        showSuccessToast(toastId);
       }
-
-      showSuccessToast(toastId);
     },
     onError: () => {
       showErrorToast(toastId);
@@ -150,7 +153,10 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [isAllowedToUnblock, blocker]);
 
-  const value = useMemo(() => ({ update, patch, isPending, workflow }), [update, patch, isPending, workflow]);
+  const value = useMemo(
+    () => ({ update, patch, isPending, workflow, step: getStep() }),
+    [update, patch, isPending, workflow, getStep]
+  );
 
   return (
     <>

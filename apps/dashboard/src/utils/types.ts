@@ -1,4 +1,4 @@
-import type { StepResponseDto } from '@novu/shared';
+import type { StepDataDto } from '@novu/shared';
 
 export enum ConnectionStatus {
   CONNECTED = 'connected',
@@ -20,9 +20,7 @@ export type RuntimeIssue = {
   message: string;
 };
 
-export type Step = Pick<StepResponseDto, 'name' | 'type' | '_id' | 'stepId' | 'issues'> & {
-  slug: string;
-};
+export type Step = Pick<StepDataDto, 'name' | 'type' | '_id' | 'stepId' | 'issues' | 'slug'>;
 
 /**
  * Omit the `environment` field from the parameters of a function.

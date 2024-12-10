@@ -51,7 +51,12 @@ export function ActivityFeed() {
             }}
             className={cn('h-full flex-1', activityItemId ? 'w-[65%]' : 'w-full')}
           >
-            <ActivityTable selectedActivityId={activityItemId} onActivitySelect={handleActivitySelect} />
+            <ActivityTable
+              selectedActivityId={activityItemId}
+              onActivitySelect={handleActivitySelect}
+              hasActiveFilters={false}
+              onClearFilters={() => {}}
+            />
           </motion.div>
 
           <AnimatePresence mode="sync">

@@ -13,7 +13,7 @@ import {
   InAppPreviewNotificationContent,
   InAppPreviewSubject,
 } from '@/components/workflow-editor/in-app-preview';
-import { useStep } from '@/components/workflow-editor/steps/step-provider';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 type ConfigureInAppStepPreviewProps = HTMLAttributes<HTMLDivElement>;
 export const ConfigureInAppStepPreview = (props: ConfigureInAppStepPreviewProps) => {
@@ -26,7 +26,7 @@ export const ConfigureInAppStepPreview = (props: ConfigureInAppStepPreviewProps)
       Sentry.captureException(error);
     },
   });
-  const { step, isPending } = useStep();
+  const { step, isPending } = useWorkflow();
 
   const { workflowSlug, stepSlug } = useParams<{
     workflowSlug: string;

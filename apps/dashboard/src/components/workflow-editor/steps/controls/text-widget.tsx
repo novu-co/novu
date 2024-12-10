@@ -10,12 +10,12 @@ import { capitalize } from '@/utils/string';
 import { autocompletion } from '@codemirror/autocomplete';
 import { getFieldName } from './template-utils';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
-import { useStep } from '../step-provider';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 export function TextWidget(props: WidgetProps) {
   const { label, readonly, disabled, id, required } = props;
   const { control } = useFormContext();
-  const { step } = useStep();
+  const { step } = useWorkflow();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
 
   const extractedName = useMemo(() => getFieldName(id), [id]);
