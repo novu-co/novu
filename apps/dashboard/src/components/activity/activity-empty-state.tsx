@@ -122,7 +122,7 @@ export function ActivityEmptyState({ className, emptySearchResults, onClearFilte
 function ActivityIllustration() {
   return (
     <svg width="137" height="126" viewBox="0 0 137 126" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="1" y="1" width="135" height="45" rx="7.5" stroke="#CACFD8" stroke-dasharray="5 3" />
+      <rect x="1" y="1" width="135" height="45" rx="7.5" stroke="#CACFD8" strokeDasharray="5 3" />
       <rect x="5" y="5" width="127" height="37" rx="5.5" fill="white" />
       <rect x="5" y="5" width="127" height="37" rx="5.5" stroke="#F2F5F8" />
       <path
@@ -142,7 +142,7 @@ function ActivityIllustration() {
       />
       <rect x="44.5" y="96.5" width="44" height="5" rx="2.5" fill="url(#paint0_linear_7279_27982)" />
       <rect x="44.5" y="103.5" width="77" height="5" rx="2.5" fill="url(#paint1_linear_7279_27982)" />
-      <path d="M68.5 76.625V49.375" stroke="#E1E4EA" stroke-width="0.75" stroke-linejoin="bevel" />
+      <path d="M68.5 76.625V49.375" stroke="#E1E4EA" strokeWidth="0.75" strokeLinejoin="bevel" />
       <defs>
         <linearGradient
           id="paint0_linear_7279_27982"
@@ -153,8 +153,8 @@ function ActivityIllustration() {
           gradientUnits="userSpaceOnUse"
         >
           <stop stop-color="#F1EFEF" />
-          <stop offset="0.48" stop-color="#F9F8F8" />
-          <stop offset="0.992158" stop-color="#F9F8F8" stop-opacity="0.75" />
+          <stop offset="0.48" stopColor="#F9F8F8" />
+          <stop offset="0.992158" stopColor="#F9F8F8" stopOpacity="0.75" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_7279_27982"
@@ -165,8 +165,8 @@ function ActivityIllustration() {
           gradientUnits="userSpaceOnUse"
         >
           <stop stop-color="#F1EFEF" />
-          <stop offset="0.48" stop-color="#F9F8F8" />
-          <stop offset="0.992158" stop-color="#F9F8F8" stop-opacity="0.75" />
+          <stop offset="0.48" stopColor="#F9F8F8" />
+          <stop offset="0.992158" stopColor="#F9F8F8" stopOpacity="0.75" />
         </linearGradient>
       </defs>
     </svg>
