@@ -3,18 +3,26 @@ import { css } from '@novu/novui/css';
 import { Text, Title, Button, IconButton } from '@novu/novui';
 import { IconOutlineClose } from '@novu/novui/icons';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
+import { useEffect } from 'react';
 import { IS_SELF_HOSTED } from '../../../../config';
 import { useFeatureFlag } from '../../../../hooks';
 import { useNewDashboardOptIn } from '../../../../hooks/useNewDashboardOptIn';
+import { useSegment } from '../../../providers/SegmentProvider';
 
 export function NewDashboardOptInWidget() {
   const { dismiss, optIn, status } = useNewDashboardOptIn();
-
+  const segment = useSegment();
   const isNewDashboardEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ENABLED);
 
-  const showWidget = !status && isNewDashboardEnabled;
+  const showWidget = !status && isNewDashboardEnabled && !IS_SELF_HOSTED;
 
-  if (IS_SELF_HOSTED || !showWidget) {
+  useEffect(() => {
+    if (showWidget) {
+      segment.track('New dashboard opt-in displayed - [WEB]');
+    }
+  }, [showWidget, segment]);
+
+  if (!showWidget) {
     return null;
   }
 

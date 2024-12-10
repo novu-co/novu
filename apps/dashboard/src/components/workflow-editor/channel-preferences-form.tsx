@@ -24,6 +24,7 @@ import { Step } from '../primitives/step';
 import { Switch } from '../primitives/switch';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 
 type ConfigureWorkflowFormProps = {
   workflow: WorkflowResponseDto;
@@ -53,8 +54,20 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
   const isDefaultPreferences = useMemo(() => workflow.preferences.user === null, [workflow.preferences.user]);
   const isDashboardWorkflow = useMemo(() => workflow.origin === WorkflowOriginEnum.NOVU_CLOUD, [workflow.origin]);
   const formDataToRender = useMemo(() => {
-    return isDefaultPreferences ? workflow.preferences.default : workflow.preferences.user;
-  }, [isDefaultPreferences, workflow.preferences.default, workflow.preferences.user]);
+    const steps = new Set(workflow.steps.map((step) => step.type));
+    const defaultPreferences = isDefaultPreferences ? workflow.preferences.default : workflow.preferences.user;
+    const allChannels = defaultPreferences?.channels;
+    if (!allChannels) return null;
+
+    const allChannelsArr = Object.keys(allChannels);
+    const channelsInUse = allChannelsArr.filter((channel) => steps.has(channel as StepTypeEnum));
+    const channelsNotInUse = allChannelsArr.filter((channel) => !steps.has(channel as StepTypeEnum));
+
+    return {
+      channelsInUse,
+      channelsNotInUse,
+    };
+  }, [isDefaultPreferences, workflow.preferences.default, workflow.preferences.user, workflow.steps]);
 
   const form = useForm<z.infer<typeof UserPreferencesFormSchema>>({
     defaultValues: {
@@ -113,9 +126,10 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
   };
 
   const handleAllToggle = (value: boolean) => {
-    if (!formDataToRender?.channels) return;
+    if (!formDataToRender) return;
+    const currentPreference = form.getValues('user') as WorkflowPreferences;
 
-    const channelPreferences = Object.keys(formDataToRender?.channels).reduce(
+    const channelPreferences = Object.keys(currentPreference.channels).reduce(
       (acc, curr) => {
         acc[curr as ChannelTypeEnum] = { enabled: value };
         return acc;
@@ -126,9 +140,12 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
     const updatedUserPreferences = {
       all: {
         enabled: value,
-        readOnly: form.getValues('user.all.readOnly'),
+        readOnly: currentPreference.all.readOnly,
       },
-      channels: channelPreferences,
+      channels: {
+        ...currentPreference.channels,
+        ...channelPreferences,
+      },
     };
 
     updateUserPreference(updatedUserPreferences);
@@ -186,7 +203,7 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
                   control={overrideForm.control}
                   name="override"
                   render={({ field }) => (
-                    <FormItem className="mt-2 flex w-full items-center justify-between">
+                    <FormItem className="flex w-full items-center justify-between">
                       <FormLabel tooltip="Override preferences to use dashboard-defined preferences instead of code defaults. Disable to restore defaults.">
                         Override preferences
                       </FormLabel>
@@ -202,7 +219,6 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
                               new_status: checked,
                             });
                           }}
-                          disabled={isDashboardWorkflow}
                         />
                       </FormControl>
                     </FormItem>
@@ -238,37 +254,93 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
                 name="user.all.enabled"
                 render={({ field }) => (
                   <FormControl className="m-1">
-                    <Checkbox checked={field.value} onCheckedChange={handleAllToggle} disabled={!override} />
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={handleAllToggle}
+                      disabled={!override || formDataToRender?.channelsInUse.length === 0}
+                    />
                   </FormControl>
                 )}
               />
             </div>
             <SidebarContent size="md">
-              {Object.keys(formDataToRender?.channels ?? {}).map((channel) => {
+              {formDataToRender?.channelsInUse.map((channel) => {
                 const Icon = STEP_TYPE_TO_ICON[channel as StepTypeEnum];
                 return (
-                  <FormField
-                    control={form.control}
-                    name={`user.channels.${channel}.enabled`}
-                    render={({ field }) => (
-                      <FormItem className="mt-2 flex w-full items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Step variant={STEP_TYPE_TO_COLOR[channel as StepTypeEnum]} className="size-5">
-                            <Icon />
-                          </Step>
-                          <FormLabel>{capitalize(CHANNEL_LABELS_LOOKUP[channel as ChannelTypeEnum])}</FormLabel>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={(checked) => handleChannelToggle(channel as ChannelTypeEnum, checked)}
-                            disabled={!override}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
+                  <motion.div
                     key={channel}
-                  />
+                    layout
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <FormField
+                      control={form.control}
+                      name={`user.channels.${channel}.enabled`}
+                      render={({ field }) => (
+                        <FormItem className="mt-2 flex w-full items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Step variant={STEP_TYPE_TO_COLOR[channel as StepTypeEnum]} className="size-5">
+                              <Icon />
+                            </Step>
+                            <FormLabel>{capitalize(CHANNEL_LABELS_LOOKUP[channel as ChannelTypeEnum])}</FormLabel>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={(checked) => handleChannelToggle(channel as ChannelTypeEnum, checked)}
+                              disabled={!override}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                      key={channel}
+                    />
+                  </motion.div>
+                );
+              })}
+              {formDataToRender?.channelsNotInUse.map((channel) => {
+                const Icon = STEP_TYPE_TO_ICON[channel as StepTypeEnum];
+                return (
+                  <motion.div
+                    key={channel}
+                    layout
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <FormField
+                      control={form.control}
+                      name={`user.channels.${channel}.enabled`}
+                      render={({ field }) => (
+                        <FormItem className="mt-2 flex w-full items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Step variant={STEP_TYPE_TO_COLOR[channel as StepTypeEnum]} className="size-5">
+                              <Icon />
+                            </Step>
+                            <FormLabel>{capitalize(CHANNEL_LABELS_LOOKUP[channel as ChannelTypeEnum])}</FormLabel>
+                          </div>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div>
+                                <FormControl>
+                                  <Switch checked={field.value} disabled />
+                                </FormControl>
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent className="w-64" align="end">
+                              <span className="text-2xs">
+                                Add the channel to your workflow to control its subscriber preferences.
+                              </span>
+                            </TooltipContent>
+                          </Tooltip>
+                        </FormItem>
+                      )}
+                      key={channel}
+                    />
+                  </motion.div>
                 );
               })}
             </SidebarContent>

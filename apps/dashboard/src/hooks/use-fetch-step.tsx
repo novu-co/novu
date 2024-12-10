@@ -5,7 +5,7 @@ import type { StepDataDto, StepUpdateDto } from '@novu/shared';
 import { QueryKeys } from '@/utils/query-keys';
 import { useEnvironment } from '@/context/environment/hooks';
 import { getStep } from '@/api/steps';
-import { getEncodedId, STEP_DIVIDER, WORKFLOW_DIVIDER } from '@/utils/step';
+import { getWorkflowIdFromSlug, STEP_DIVIDER, WORKFLOW_DIVIDER } from '@/utils/step';
 
 export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string; stepSlug: string }) => {
   const client = useQueryClient();
@@ -14,8 +14,8 @@ export const useFetchStep = ({ workflowSlug, stepSlug }: { workflowSlug: string;
     () => [
       QueryKeys.fetchWorkflow,
       currentEnvironment?._id,
-      getEncodedId({ slug: workflowSlug, divider: WORKFLOW_DIVIDER }),
-      getEncodedId({ slug: stepSlug, divider: STEP_DIVIDER }),
+      getWorkflowIdFromSlug({ slug: workflowSlug, divider: WORKFLOW_DIVIDER }),
+      getWorkflowIdFromSlug({ slug: stepSlug, divider: STEP_DIVIDER }),
     ],
     [currentEnvironment?._id, workflowSlug, stepSlug]
   );
