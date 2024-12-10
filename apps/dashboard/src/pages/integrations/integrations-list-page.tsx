@@ -53,7 +53,7 @@ export function IntegrationsListPage() {
     >
       <Tabs defaultValue="providers">
         <div className="border-neutral-alpha-200 flex items-center justify-between border-b border-t">
-          <TabsList variant="regular" className="border-0 border-b-0 border-t-0 p-0 px-0">
+          <TabsList variant="regular" className="border-0 border-b-0 border-t-0 p-0 !px-3">
             <TabsTrigger value="providers" variant="regular">
               Providers
             </TabsTrigger>

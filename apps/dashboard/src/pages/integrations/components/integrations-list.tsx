@@ -54,7 +54,7 @@ export function IntegrationsList({ onAddProviderClick, onRowClickCallback, onCha
 
   if (!integrations || !providers || !currentEnvironment) {
     return (
-      <div className="space-y-12">
+      <div className="space-y-6">
         <IntegrationChannelGroupSkeleton />
         <IntegrationChannelGroupSkeleton />
       </div>
@@ -75,7 +75,7 @@ export function IntegrationsList({ onAddProviderClick, onRowClickCallback, onCha
   );
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-6">
       {Object.entries(groupedIntegrations).map(([channel, channelIntegrations]) => (
         <IntegrationChannelGroup
           key={channel}

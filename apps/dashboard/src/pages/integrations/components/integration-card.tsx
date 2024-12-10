@@ -2,11 +2,11 @@ import { Badge } from '@/components/primitives/badge';
 import { cn } from '@/lib/utils';
 import { RiCheckboxCircleFill, RiGitBranchFill, RiStarSmileFill } from 'react-icons/ri';
 import { ITableIntegration } from '../types';
-import type { IEnvironment } from '@novu/shared';
+import type { IEnvironment, IIntegration } from '@novu/shared';
 import { IProvider } from '@/hooks/use-providers';
 
 interface IntegrationCardProps {
-  integration: any;
+  integration: IIntegration;
   provider: IProvider;
   environment: IEnvironment;
   onRowClickCallback: (item: { original: ITableIntegration }) => void;
@@ -26,7 +26,7 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
   return (
     <div
       className={cn(
-        'bg-card group relative flex cursor-pointer flex-col gap-2 overflow-hidden rounded-xl border p-3 shadow-md transition-all',
+        'bg-card group relative flex cursor-pointer flex-col gap-2 overflow-hidden rounded-xl border p-3 shadow-md transition-all hover:shadow-lg',
         !integration.active && 'opacity-75 grayscale'
       )}
       onClick={() => onRowClickCallback({ original: tableIntegration })}
