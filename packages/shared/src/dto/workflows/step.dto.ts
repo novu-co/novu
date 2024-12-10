@@ -1,6 +1,6 @@
 import type { JSONSchemaDto } from './json-schema-dto';
-import { StepTypeEnum, WorkflowOriginEnum } from '../../types';
-import { StepIssuesDto } from './workflow-response.dto';
+import { Slug, StepTypeEnum, WorkflowOriginEnum } from '../../types';
+import { StepContentIssueEnum, StepIssueEnum } from './step-content-issue.enum';
 
 export type StepDataDto = {
   controls: ControlsMetadata;
@@ -8,12 +8,51 @@ export type StepDataDto = {
   stepId: string;
   _id: string;
   name: string;
+  slug: Slug;
   type: StepTypeEnum;
   origin: WorkflowOriginEnum;
   workflowId: string;
   workflowDatabaseId: string;
   issues?: StepIssuesDto;
 };
+
+export type StepUpdateDto = StepCreateDto & {
+  _id: string;
+};
+
+export type StepCreateDto = StepDto & {
+  controlValues?: Record<string, unknown>;
+};
+
+export type PatchStepDataDto = {
+  name?: string;
+  controlValues?: Record<string, unknown>;
+};
+
+export type StepDto = {
+  name: string;
+  type: StepTypeEnum;
+};
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+interface Issue<T> {
+  issueType: T;
+  variableName?: string;
+  message: string;
+}
+
+export class StepIssuesDto {
+  body?: Record<StepCreateAndUpdateKeys, StepIssue>;
+  controls?: Record<string, ContentIssue[]>;
+}
+
+export type StepCreateAndUpdateKeys = keyof StepCreateDto | keyof StepUpdateDto;
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export interface ContentIssue extends Issue<StepContentIssueEnum> {}
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export interface StepIssue extends Issue<StepIssueEnum> {}
 
 export enum UiSchemaGroupEnum {
   IN_APP = 'IN_APP',
