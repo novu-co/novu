@@ -59,8 +59,9 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
     const allChannels = defaultPreferences?.channels;
     if (!allChannels) return null;
 
-    const channelsInUse = Object.keys(allChannels).filter((channel) => steps.has(channel as StepTypeEnum));
-    const channelsNotInUse = Object.keys(allChannels).filter((channel) => !steps.has(channel as StepTypeEnum));
+    const allChannelsArr = Object.keys(allChannels);
+    const channelsInUse = allChannelsArr.filter((channel) => steps.has(channel as StepTypeEnum));
+    const channelsNotInUse = allChannelsArr.filter((channel) => !steps.has(channel as StepTypeEnum));
 
     return {
       channelsInUse,
@@ -128,7 +129,7 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
     if (!formDataToRender) return;
     const currentPreference = form.getValues('user') as WorkflowPreferences;
 
-    const channelPreferences = formDataToRender.channelsInUse.reduce(
+    const channelPreferences = Object.keys(currentPreference.channels).reduce(
       (acc, curr) => {
         acc[curr as ChannelTypeEnum] = { enabled: value };
         return acc;
