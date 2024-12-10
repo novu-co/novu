@@ -3231,6 +3231,12 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
   }
 
   describe('Trigger Event New Dashboard - /v1/events/trigger (POST)', function () {
+    afterEach(async () => {
+      await messageRepository.deleteMany({
+        _environmentId: session.environment._id,
+      });
+    });
+
     it('should skip step based on skip', async function () {
       const workflowBody: CreateWorkflowDto = {
         name: 'Test Skip Workflow',
@@ -3282,6 +3288,106 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
       });
       expect(notSkippedMessages.length).to.equal(1);
     });
+  });
+
+  it('should handle complex skip logic with subscriber data', async function () {
+    const workflowBody: CreateWorkflowDto = {
+      name: 'Test Complex Skip Logic',
+      workflowId: 'test-complex-skip-workflow',
+      __source: WorkflowCreationSourceEnum.DASHBOARD,
+      steps: [
+        {
+          type: StepTypeEnum.IN_APP,
+          name: 'Message Name',
+          controlValues: {
+            body: 'Hello {{subscriber.lastName}}, Welcome!',
+            skip: {
+              and: [
+                {
+                  or: [
+                    { '==': [{ var: 'subscriber.firstName' }, 'John'] },
+                    { '==': [{ var: 'subscriber.data.role' }, 'admin'] },
+                  ],
+                },
+                {
+                  and: [
+                    { '>=': [{ var: 'payload.userScore' }, 100] },
+                    { '==': [{ var: 'subscriber.lastName' }, 'Doe'] },
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      ],
+    };
+
+    const response = await session.testAgent.post('/v2/workflows').send(workflowBody);
+    expect(response.status).to.equal(201);
+    const workflow: WorkflowResponseDto = response.body.data;
+
+    // Should skip - matches all conditions
+    subscriber = await subscriberService.createSubscriber({
+      firstName: 'John',
+      lastName: 'Doe',
+      data: { role: 'admin' },
+    });
+
+    await novuClient.trigger({
+      name: workflow.workflowId,
+      to: [subscriber.subscriberId],
+      payload: {
+        userScore: 150,
+      },
+    });
+    await session.awaitRunningJobs(workflow._id);
+    const skippedMessages = await messageRepository.find({
+      _environmentId: session.environment._id,
+      _subscriberId: subscriber._id,
+    });
+    expect(skippedMessages.length).to.equal(0);
+
+    // Should not skip - doesn't match lastName condition
+    subscriber = await subscriberService.createSubscriber({
+      firstName: 'John',
+      lastName: 'Smith',
+      data: { role: 'admin' },
+    });
+
+    await novuClient.trigger({
+      name: workflow.workflowId,
+      to: [subscriber.subscriberId],
+      payload: {
+        userScore: 150,
+      },
+    });
+    await session.awaitRunningJobs(workflow._id);
+    const notSkippedMessages1 = await messageRepository.find({
+      _environmentId: session.environment._id,
+      _subscriberId: subscriber._id,
+    });
+    expect(notSkippedMessages1.length).to.equal(1);
+
+    // Should not skip - doesn't match score condition
+    subscriber = await subscriberService.createSubscriber({
+      firstName: 'John',
+      lastName: 'Doe',
+      data: { role: 'admin' },
+    });
+
+    await novuClient.trigger({
+      name: workflow.workflowId,
+      to: [subscriber.subscriberId],
+      payload: {
+        userScore: 50,
+      },
+    });
+    await session.awaitRunningJobs(workflow._id);
+    const notSkippedMessages2 = await messageRepository.find({
+      _environmentId: session.environment._id,
+      _subscriberId: subscriber._id,
+    });
+    expect(notSkippedMessages2.length).to.equal(1);
   });
 });
 
