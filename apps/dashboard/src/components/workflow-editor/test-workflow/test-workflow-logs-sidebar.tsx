@@ -1,9 +1,9 @@
 import { ActivityPanel } from '@/components/activity/activity-panel';
-import { useActivities } from '@/hooks/use-activities';
 import { useEffect, useState } from 'react';
 import { JobStatusEnum } from '@novu/shared';
 import { Loader2 } from 'lucide-react';
 import { WorkflowTriggerInboxIllustration } from '../../icons/workflow-trigger-inbox';
+import { useFetchActivities } from '../../../hooks/use-fetch-activities';
 
 interface TestWorkflowLogsSidebarProps {
   transactionId?: string;
@@ -11,7 +11,7 @@ interface TestWorkflowLogsSidebarProps {
 
 export const TestWorkflowLogsSidebar = ({ transactionId }: TestWorkflowLogsSidebarProps) => {
   const [shouldRefetch, setShouldRefetch] = useState(true);
-  const { activities } = useActivities(
+  const { activities } = useFetchActivities(
     {
       filters: transactionId ? { transactionId } : undefined,
     },

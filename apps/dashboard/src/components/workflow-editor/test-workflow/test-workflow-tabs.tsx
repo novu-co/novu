@@ -139,7 +139,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
               <TestWorkflowForm workflow={workflow} />
             </TabsContent>
           </Tabs>
-          {!isNewActivityFeedEnabled && <TestWorkflowLogsSidebar transactionId={transactionId} />}
+          {isNewActivityFeedEnabled && <TestWorkflowLogsSidebar transactionId={transactionId} />}
         </form>
       </Form>
     </div>
