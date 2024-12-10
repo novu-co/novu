@@ -8,10 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitive
 import { ChannelTypeEnum, CredentialsKeyEnum } from '@novu/shared';
 import { useProviders, IProvider } from '@/hooks/use-providers';
 import { useCreateIntegration } from '@/hooks/use-create-integration';
-import { ArrowLeft, Check, ChevronRight, Info, Search } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ArrowLeft, Check, Info } from 'lucide-react';
 import { SecretInput } from '@/components/primitives/secret-input';
-import { Badge } from '@/components/primitives/badge';
 
 interface CreateProviderSidebarProps {
   isOpened: boolean;
@@ -41,28 +39,25 @@ const secureCredentials = [
 
 function ProviderCard({ provider, onClick }: ProviderCardProps) {
   return (
-    <button
+    <Button
       onClick={onClick}
-      className="bg-card hover:border-primary/20 focus:ring-primary/20 group relative flex h-full items-start gap-4 rounded-lg border p-4 text-left transition-all hover:scale-[1.02] hover:shadow-md focus:outline-none focus:ring-2"
+      variant="outline"
+      className="flex h-[48px] w-full items-start justify-start gap-3 border-neutral-100 p-3"
     >
-      <div className="relative overflow-hidden rounded-lg border bg-white p-2.5 shadow-sm transition-transform duration-200 group-hover:scale-105">
-        <img
-          src={`/static/images/providers/dark/square/${provider.id}.svg`}
-          alt={provider.displayName}
-          className="h-12 w-12"
-          onError={(e) => {
-            e.currentTarget.src = `/static/images/providers/dark/square/${provider.id}.png`;
-          }}
-        />
-      </div>
-      <div className="flex-1 space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="font-medium tracking-tight">{provider.displayName}</div>
-          <ChevronRight className="text-muted-foreground h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+      <div className="flex w-full items-start justify-start gap-3">
+        <div>
+          <img
+            src={`/static/images/providers/dark/square/${provider.id}.svg`}
+            alt={provider.displayName}
+            className="h-6 w-6"
+            onError={(e) => {
+              e.currentTarget.src = `/static/images/providers/dark/square/${provider.id}.png`;
+            }}
+          />
         </div>
-        <div className="text-muted-foreground line-clamp-2 text-sm">{provider.description ?? ''}</div>
+        <div className="text-md text-foreground-950 leading-6">{provider.displayName}</div>
       </div>
-    </button>
+    </Button>
   );
 }
 
@@ -141,17 +136,19 @@ export function CreateProviderSidebar({ isOpened, onClose, scrollToChannel }: Cr
 
   return (
     <Sheet open={isOpened} onOpenChange={onClose}>
-      <SheetContent className="w-full sm:max-w-2xl">
-        <SheetHeader className="space-y-1 pb-6">
+      <SheetContent className="w-full sm:max-w-lg">
+        <SheetHeader className="borde-neutral-300 space-y-1 border-b p-3">
           {step === 'configure' && provider && (
             <Button variant="ghost" size="sm" className="hover:bg-muted -ml-2 -mt-2 h-9 px-2" onClick={onBack}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </Button>
           )}
-          <SheetTitle>{step === 'select' ? 'Add Integration' : 'Configure Integration'}</SheetTitle>
+          <SheetTitle className="text-lg">
+            {step === 'select' ? 'Connect Provider' : 'Configure Integration'}
+          </SheetTitle>
           {step === 'select' ? (
-            <p className="text-muted-foreground text-sm">Select a provider to integrate with your application.</p>
+            <p className="text-foreground-400 text-xs">Select a provider to integrate with your application.</p>
           ) : provider ? (
             <div className="flex items-center gap-4">
               <div className="relative overflow-hidden rounded-lg border bg-white p-2 shadow-sm">
@@ -173,60 +170,39 @@ export function CreateProviderSidebar({ isOpened, onClose, scrollToChannel }: Cr
         </SheetHeader>
 
         {step === 'select' ? (
-          <div className="flex flex-1 flex-col gap-6">
-            <div className="relative">
-              <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform" />
-              <Input
-                placeholder="Search providers..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-
-            <Tabs defaultValue={scrollToChannel ?? ChannelTypeEnum.EMAIL} className="flex-1">
-              <TabsList className="bg-muted/50 inline-flex h-auto w-full justify-start gap-2 rounded-lg p-1">
-                {Object.values(ChannelTypeEnum).map((channel) => (
-                  <TabsTrigger
-                    key={channel}
-                    value={channel}
-                    className="data-[state=active]:bg-background relative rounded-md px-3 py-1.5 text-sm font-medium transition-all"
-                  >
-                    {channel}
-                    {providersByChannel[channel]?.length > 0 && (
-                      <Badge variant="soft" className="ml-2 px-1 py-0">
-                        {providersByChannel[channel].length}
-                      </Badge>
-                    )}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-
+          <Tabs defaultValue={ChannelTypeEnum.EMAIL} className="flex-1">
+            <TabsList variant="regular" className="gap-6 border-t-0 !px-3">
               {Object.values(ChannelTypeEnum).map((channel) => (
-                <TabsContent key={channel} value={channel} className="py-6">
-                  {providersByChannel[channel]?.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      {providersByChannel[channel].map((provider: IProvider) => (
-                        <ProviderCard
-                          key={provider.id}
-                          provider={provider}
-                          onClick={() => onProviderSelect(provider.id)}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-muted-foreground flex min-h-[200px] items-center justify-center text-center">
-                      {searchQuery ? (
-                        <p>No {channel.toLowerCase()} providers match your search</p>
-                      ) : (
-                        <p>No {channel.toLowerCase()} providers available</p>
-                      )}
-                    </div>
-                  )}
-                </TabsContent>
+                <TabsTrigger key={channel} value={channel} variant="regular" className="!px-0 !py-3 capitalize">
+                  {channel}
+                </TabsTrigger>
               ))}
-            </Tabs>
-          </div>
+            </TabsList>
+
+            {Object.values(ChannelTypeEnum).map((channel) => (
+              <TabsContent key={channel} value={channel}>
+                {providersByChannel[channel]?.length > 0 ? (
+                  <div className="flex flex-col gap-4 p-3">
+                    {providersByChannel[channel].map((provider: IProvider) => (
+                      <ProviderCard
+                        key={provider.id}
+                        provider={provider}
+                        onClick={() => onProviderSelect(provider.id)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-muted-foreground flex min-h-[200px] items-center justify-center text-center">
+                    {searchQuery ? (
+                      <p>No {channel.toLowerCase()} providers match your search</p>
+                    ) : (
+                      <p>No {channel.toLowerCase()} providers available</p>
+                    )}
+                  </div>
+                )}
+              </TabsContent>
+            ))}
+          </Tabs>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-1 flex-col">
             <div className="flex-1 space-y-6 overflow-y-auto pb-8">
