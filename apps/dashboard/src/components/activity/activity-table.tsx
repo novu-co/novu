@@ -8,7 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { QueryKeys } from '@/utils/query-keys';
 import { useEnvironment } from '@/context/environment/hooks';
 import { getNotification } from '@/api/activity';
-import { useActivities } from '@/hooks/use-activities';
+import { useActivities } from '@/hooks/use-fetch-activities';
 import { StatusBadge } from './components/status-badge';
 import { StepIndicators } from './components/step-indicators';
 import { Pagination } from './components/pagination';
@@ -28,13 +28,13 @@ export function ActivityTable({ selectedActivityId, onActivitySelect }: Activity
   const navigate = useNavigate();
   const { activities, isLoading, hasMore } = useActivities();
 
-  const offset = parseInt(searchParams.get('offset') || '0');
+  const page = parseInt(searchParams.get('page') || '0');
   const limit = parseInt(searchParams.get('limit') || '10');
 
-  const handleOffsetChange = (newOffset: number) => {
+  const handlePageChange = (newPage: number) => {
     const newParams = createSearchParams({
       ...Object.fromEntries(searchParams),
-      offset: newOffset.toString(),
+      page: newPage.toString(),
     });
     navigate(`${location.pathname}?${newParams}`);
   };
@@ -97,7 +97,7 @@ export function ActivityTable({ selectedActivityId, onActivitySelect }: Activity
                     {activity.template?.name || 'Deleted workflow'}
                   </span>
                   <span className="text-foreground-400 text-[10px] leading-[14px]">
-                    {activity.transactionId} {getSubscriberDisplay(activity.subscriber)}
+                    {activity.transactionId} {getSubscriberDisplayName(activity.subscriber)}
                   </span>
                 </div>
               </TableCell>
@@ -117,7 +117,7 @@ export function ActivityTable({ selectedActivityId, onActivitySelect }: Activity
         </TableBody>
       </Table>
 
-      <Pagination offset={offset} limit={limit} hasMore={hasMore} onOffsetChange={handleOffsetChange} />
+      <Pagination page={page} limit={limit} hasMore={hasMore} onPageChange={handlePageChange} />
     </div>
   );
 }
@@ -160,12 +160,12 @@ function SkeletonRow() {
   );
 }
 
-function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriberId' | 'firstName' | 'lastName'>) {
+function getSubscriberDisplayName(subscriber?: Pick<ISubscriber, '_id' | 'subscriberId' | 'firstName' | 'lastName'>) {
   if (!subscriber) return '';
 
   if (subscriber.firstName || subscriber.lastName) {
-    return `• ${subscriber.firstName || ''} ${subscriber.lastName || ''}`;
+    return `• ${subscriber.firstName || ''} ${subscriber.lastName || ''}`.trim();
   }
 
-  return '';
+  return `• ${subscriber.subscriberId}`;
 }

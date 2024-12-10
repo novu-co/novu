@@ -18,21 +18,21 @@ export function useActivities({ filters }: UseActivitiesOptions = {}) {
   const { currentEnvironment } = useEnvironment();
   const [searchParams] = useSearchParams();
 
-  const offset = parseInt(searchParams.get('offset') || '0');
+  const page = parseInt(searchParams.get('page') || '0');
   const limit = parseInt(searchParams.get('limit') || '10');
 
-  const { data, isLoading, isFetching } = useQuery<ActivityResponse>({
-    queryKey: ['activitiesList', currentEnvironment?._id, offset, limit, filters],
-    queryFn: () => getActivityList(currentEnvironment!, Math.floor(offset / limit), filters),
+  const { data, ...rest } = useQuery<ActivityResponse>({
+    queryKey: ['activitiesList', currentEnvironment?._id, page, limit, filters],
+    queryFn: () => getActivityList(currentEnvironment!, page, filters),
     staleTime: 0,
+    enabled: !!currentEnvironment,
   });
 
   return {
     activities: data?.data || [],
     hasMore: data?.hasMore || false,
     pageSize: limit,
-    isLoading,
-    isFetching,
-    offset,
+    ...rest,
+    page,
   };
 }

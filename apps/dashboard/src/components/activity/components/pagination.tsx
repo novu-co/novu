@@ -2,13 +2,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/primitives/button';
 
 interface PaginationProps {
-  offset: number;
+  page: number;
   limit: number;
   hasMore: boolean;
-  onOffsetChange: (newOffset: number) => void;
+  onPageChange: (newPage: number) => void;
 }
 
-export function Pagination({ offset, limit, hasMore, onOffsetChange }: PaginationProps) {
+export function Pagination({ page, limit, hasMore, onPageChange }: PaginationProps) {
   return (
     <div className="bottom-0 mt-auto border-t border-t-neutral-200 bg-white py-3">
       <div className="flex items-center justify-end px-6">
@@ -16,8 +16,8 @@ export function Pagination({ offset, limit, hasMore, onOffsetChange }: Paginatio
           <Button
             variant="ghost"
             size="icon"
-            disabled={offset === 0}
-            onClick={() => onOffsetChange(0)}
+            disabled={page === 0}
+            onClick={() => onPageChange(0)}
             className="rounded-r-none border-0"
           >
             <div className="flex items-center">
@@ -28,8 +28,8 @@ export function Pagination({ offset, limit, hasMore, onOffsetChange }: Paginatio
           <Button
             variant="ghost"
             size="icon"
-            disabled={offset === 0}
-            onClick={() => onOffsetChange(Math.max(0, offset - limit))}
+            disabled={page === 0}
+            onClick={() => onPageChange(Math.max(0, page - 1))}
             className="border-l-input rounded-none border-0 border-l"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -38,7 +38,7 @@ export function Pagination({ offset, limit, hasMore, onOffsetChange }: Paginatio
             variant="ghost"
             size="icon"
             disabled={!hasMore}
-            onClick={() => onOffsetChange(offset + limit)}
+            onClick={() => onPageChange(page + 1)}
             className="border-l-input rounded-none border-0 border-l"
           >
             <ChevronRight className="h-4 w-4" />
@@ -47,7 +47,7 @@ export function Pagination({ offset, limit, hasMore, onOffsetChange }: Paginatio
             variant="ghost"
             size="icon"
             disabled={!hasMore}
-            onClick={() => onOffsetChange(offset + limit * 5)}
+            onClick={() => onPageChange(page + 5)}
             className="border-l-input rounded-l-none border-0 border-l"
           >
             <div className="flex items-center">
