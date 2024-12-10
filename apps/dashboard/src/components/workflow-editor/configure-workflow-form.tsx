@@ -362,7 +362,6 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
             </Button>
           </Link>
         </SidebarContent>
-
         <Separator />
       </motion.div>
     </>
