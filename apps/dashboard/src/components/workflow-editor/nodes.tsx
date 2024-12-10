@@ -11,7 +11,7 @@ import { cn } from '@/utils/ui';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { WorkflowOriginEnum } from '@novu/shared';
-import { createStep } from '@/components/workflow-editor/steps/step-provider';
+import { createStep } from '@/components/workflow-editor/step-utils';
 import { getWorkflowIdFromSlug, STEP_DIVIDER } from '@/utils/step';
 
 export type NodeData = {

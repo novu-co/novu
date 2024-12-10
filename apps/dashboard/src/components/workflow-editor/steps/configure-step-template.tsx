@@ -13,7 +13,6 @@ import { ConfigureStepTemplateForm } from '@/components/workflow-editor/steps/co
 import { VisuallyHidden } from '@/components/primitives/visually-hidden';
 import { PageMeta } from '@/components/page-meta';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { useStep } from '@/components/workflow-editor/steps/step-provider';
 import { StepTypeEnum } from '@novu/shared';
 import { cn } from '@/utils/ui';
 
@@ -25,8 +24,7 @@ const stepTypeToClassname: Record<string, string | undefined> = {
 
 export const ConfigureStepTemplate = () => {
   const navigate = useNavigate();
-  const { workflow, update } = useWorkflow();
-  const { step, updateStepCache, issues } = useStep();
+  const { workflow, update, step } = useWorkflow();
   const handleCloseSheet = () => {
     navigate('..', { relative: 'path' });
   };
@@ -75,13 +73,7 @@ export const ConfigureStepTemplate = () => {
                 <SheetTitle />
                 <SheetDescription />
               </VisuallyHidden>
-              <ConfigureStepTemplateForm
-                workflow={workflow}
-                step={step}
-                issues={issues}
-                update={update}
-                updateStepCache={updateStepCache}
-              />
+              <ConfigureStepTemplateForm workflow={workflow} step={step} update={update} />
             </motion.div>
           </SheetContentBase>
         </SheetPortal>
