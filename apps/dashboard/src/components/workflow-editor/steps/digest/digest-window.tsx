@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { Tabs } from '@radix-ui/react-tabs';
 import { RiCalendarScheduleFill } from 'react-icons/ri';
+import { useFormContext } from 'react-hook-form';
 import { JSONSchemaDto, TimeUnitEnum } from '@novu/shared';
 
-import { FormLabel } from '@/components/primitives/form/form';
+import { FormLabel, FormMessagePure } from '@/components/primitives/form/form';
 import { AmountInput } from '@/components/amount-input';
 import { Separator } from '@/components/primitives/separator';
 import { TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
@@ -12,21 +13,38 @@ import { useStep } from '../step-provider';
 import { useSaveForm } from '../save-form-context';
 
 const defaultUnitValues = Object.values(TimeUnitEnum);
-const amountKey = 'amount';
-const unitKey = 'unit';
+const amountKey = 'controlValues.amount';
+const unitKey = 'controlValues.unit';
 
 export const DigestWindow = () => {
   const { step } = useStep();
   const { saveForm } = useSaveForm();
+  const { getFieldState } = useFormContext();
   const { dataSchema, uiSchema } = step?.controls ?? {};
+  const amountField = getFieldState(`${amountKey}`);
+  const unitField = getFieldState(`${unitKey}`);
+  const digestError = amountField.error || unitField.error;
+
+  const minAmountValue = useMemo(() => {
+    const fixedDurationSchema = dataSchema?.anyOf?.[0];
+    if (typeof fixedDurationSchema === 'object') {
+      const amountField = fixedDurationSchema.properties?.amount;
+
+      if (typeof amountField === 'object' && amountField.type === 'number') {
+        return amountField.minimum ?? 1;
+      }
+    }
+
+    return 1;
+  }, [dataSchema]);
 
   const unitOptions = useMemo(
-    () => ((dataSchema?.anyOf?.[0] as JSONSchemaDto).properties?.[unitKey] as any).enum ?? defaultUnitValues,
+    () => ((dataSchema?.anyOf?.[0] as JSONSchemaDto).properties?.unit as any).enum ?? defaultUnitValues,
     [dataSchema]
   );
 
   const defaultUnitOption = useMemo(
-    () => (uiSchema?.properties?.[unitKey] as any).placeholder ?? TimeUnitEnum.SECONDS,
+    () => (uiSchema?.properties?.unit as any).placeholder ?? TimeUnitEnum.SECONDS,
     [uiSchema?.properties]
   );
 
@@ -38,7 +56,7 @@ export const DigestWindow = () => {
           <span>Digest window</span>
         </span>
       </FormLabel>
-      <Tabs defaultValue="editor" className="flex h-full flex-1 flex-col">
+      <Tabs defaultValue="editor" className="flex h-full flex-1 flex-col" value="editor">
         <div className="bg-neutral-alpha-50 flex flex-col rounded-lg border border-solid border-neutral-100">
           <div className="rounded-t-lg p-2">
             <TabsList className="w-full">
@@ -66,7 +84,7 @@ export const DigestWindow = () => {
                   </span>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-48" side="top" sideOffset={10}>
-                  <span>Digest aggregates events within the selected time period.</span>
+                  <span>Coming soon...</span>
                 </TooltipContent>
               </Tooltip>
             </TabsList>
@@ -77,11 +95,13 @@ export const DigestWindow = () => {
               <div className="flex items-center justify-between">
                 <span className="text-foreground-600 text-xs font-medium">Digest events for</span>
                 <AmountInput
-                  fields={{ inputKey: `controlValues.${amountKey}`, selectKey: `controlValues.${unitKey}` }}
+                  fields={{ inputKey: `${amountKey}`, selectKey: `${unitKey}` }}
                   options={unitOptions}
                   defaultOption={defaultUnitOption}
-                  className="[&_input]:!w-[3ch] [&_input]:!min-w-[3ch]"
+                  className="w-min [&_input]:!w-[3ch] [&_input]:!min-w-[3ch]"
                   onValueChange={saveForm}
+                  showError={false}
+                  min={minAmountValue}
                 />
               </div>
             </TabsContent>
@@ -91,6 +111,7 @@ export const DigestWindow = () => {
           </div>
         </div>
       </Tabs>
+      <FormMessagePure error={digestError ? String(digestError.message) : undefined} />
     </div>
   );
 };

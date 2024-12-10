@@ -4,6 +4,7 @@ import { Input } from '@/components/primitives/input';
 import { InputFieldPure } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { useFormContext } from 'react-hook-form';
+import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 
 const HEIGHT = {
   sm: {
@@ -28,6 +29,8 @@ type InputWithSelectProps = {
   isReadOnly?: boolean;
   onValueChange?: (value: string) => void;
   size?: 'sm' | 'md';
+  min?: number;
+  showError?: boolean;
 };
 
 export const AmountInput = ({
@@ -39,6 +42,8 @@ export const AmountInput = ({
   isReadOnly,
   onValueChange,
   size = 'sm',
+  min,
+  showError = true,
 }: InputWithSelectProps) => {
   const { getFieldState, setValue, control } = useFormContext();
 
@@ -64,9 +69,22 @@ export const AmountInput = ({
                   placeholder={placeholder}
                   disabled={isReadOnly}
                   value={field.value}
-                  onChange={(e) => {
-                    field.onChange(Number(e.target.value));
+                  onKeyDown={(e) => {
+                    if (e.key === 'e' || e.key === '-' || e.key === '+' || e.key === '.' || e.key === ',') {
+                      e.preventDefault();
+                    }
                   }}
+                  onChange={(e) => {
+                    if (e.target.value === '') {
+                      field.onChange('');
+                      return;
+                    }
+
+                    const numberValue = Number(e.target.value);
+                    field.onChange(numberValue);
+                  }}
+                  min={min}
+                  {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
                 />
               </FormControl>
             </FormItem>
@@ -108,7 +126,7 @@ export const AmountInput = ({
           )}
         />
       </InputFieldPure>
-      <FormMessagePure error={error ? String(error.message) : undefined} />
+      {showError && <FormMessagePure error={error ? String(error.message) : undefined} />}
     </>
   );
 };
