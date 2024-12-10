@@ -10,10 +10,9 @@ export function IdentityProvider({ children }: { children: React.ReactNode }) {
   const { currentUser, currentOrganization } = useAuth();
   const hasIdentified = useRef(false);
 
-  const isNovuUser = currentUser && currentUser._id && !currentUser._id.startsWith('user_');
-  const isNovuOrganization =
-    currentOrganization && currentOrganization._id && !currentOrganization._id.startsWith('org_');
-  const shouldMonitor = isNovuUser && isNovuOrganization;
+  const hasExternalId = currentUser?._id;
+  const hasOrganization = currentOrganization && currentOrganization._id;
+  const shouldMonitor = hasExternalId && hasOrganization;
 
   useEffect(() => {
     if (!currentOrganization || !currentUser || hasIdentified.current) return;

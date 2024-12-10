@@ -16,7 +16,7 @@ export const toUserEntity = (clerkUser: UserResource): IUserEntity => {
    */
 
   return {
-    _id: clerkUser.externalId ?? clerkUser.id,
+    _id: clerkUser.externalId as string,
     firstName: clerkUser.firstName,
     lastName: clerkUser.lastName,
     email: clerkUser.emailAddresses[0].emailAddress,
@@ -46,7 +46,7 @@ export const toOrganizationEntity = (clerkOrganization: OrganizationResource): I
    */
 
   return {
-    _id: (clerkOrganization.publicMetadata.externalOrgId as string) ?? clerkOrganization.id,
+    _id: clerkOrganization.publicMetadata.externalOrgId as string,
     name: clerkOrganization.name,
     createdAt: clerkOrganization.createdAt.toISOString(),
     updatedAt: clerkOrganization.updatedAt.toISOString(),
