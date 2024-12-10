@@ -9,6 +9,10 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { UpdateProviderSidebar } from './components/update-provider-sidebar';
 import { CreateProviderSidebar } from './components/create-provider-sidebar';
+import { Badge } from '../../components/primitives/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
+import { Button } from '@/components/primitives/button';
+import { RiPlayListAddLine } from 'react-icons/ri';
 
 export function IntegrationsListPage() {
   const navigate = useNavigate();
@@ -37,24 +41,55 @@ export function IntegrationsListPage() {
   );
 
   return (
-    <DashboardLayout>
-      <div className="p-6">
-        <IntegrationsList
-          onAddProviderClick={onAddProviderClickCallback}
-          onRowClickCallback={onRowClickCallback}
-          onChannelClick={onChannelClickCallback}
-        />
-        <UpdateProviderSidebar
-          isOpened={!!selectedIntegrationId}
-          integrationId={selectedIntegrationId}
-          onClose={() => setSelectedIntegrationId(undefined)}
-        />
-        <CreateProviderSidebar
-          isOpened={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          scrollToChannel={searchParams.get('scrollTo') as ChannelTypeEnum}
-        />
-      </div>
+    <DashboardLayout
+      headerStartItems={
+        <h1 className="text-foreground-950 flex items-center gap-1">
+          <span>Integration Store</span>
+          <Badge kind="pill" size="2xs">
+            BETA
+          </Badge>
+        </h1>
+      }
+    >
+      <Tabs defaultValue="providers">
+        <div className="border-neutral-alpha-200 flex items-center justify-between border-b border-t">
+          <TabsList variant="regular" className="border-0 border-b-0 border-t-0 p-0 px-0">
+            <TabsTrigger value="providers" variant="regular">
+              Providers
+            </TabsTrigger>
+            <TabsTrigger value="data-warehouse" variant="regular" disabled>
+              Data Warehouse{' '}
+              <Badge kind="pill" size="2xs">
+                COMING SOON
+              </Badge>
+            </TabsTrigger>
+          </TabsList>
+          <Button variant="primary" size={'xs'} onClick={onAddProviderClickCallback} className="my-1.5 mr-2.5">
+            <RiPlayListAddLine className="mr-2 h-4 w-4" />
+            Connect Provider
+          </Button>
+        </div>
+        <TabsContent value="providers" variant="regular" className="p-2.5">
+          <IntegrationsList
+            onAddProviderClick={onAddProviderClickCallback}
+            onRowClickCallback={onRowClickCallback}
+            onChannelClick={onChannelClickCallback}
+          />
+        </TabsContent>
+        <TabsContent value="data-warehouse" variant="regular">
+          <div className="text-muted-foreground flex h-64 items-center justify-center">Coming soon</div>
+        </TabsContent>
+      </Tabs>
+      <UpdateProviderSidebar
+        isOpened={!!selectedIntegrationId}
+        integrationId={selectedIntegrationId}
+        onClose={() => setSelectedIntegrationId(undefined)}
+      />
+      <CreateProviderSidebar
+        isOpened={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        scrollToChannel={searchParams.get('scrollTo') as ChannelTypeEnum}
+      />
     </DashboardLayout>
   );
 }

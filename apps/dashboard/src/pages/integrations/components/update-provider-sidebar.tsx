@@ -5,7 +5,6 @@ import { Button } from '@/components/primitives/button';
 import { Input } from '@/components/primitives/input';
 import { Label } from '@/components/primitives/label';
 import { Switch } from '@/components/primitives/switch';
-import { useIntegrations } from '@/hooks/use-integrations';
 import { useProviders, IProvider } from '@/hooks/use-providers';
 import { useUpdateIntegration } from '@/hooks/use-update-integration';
 import { IIntegration } from '@novu/shared';
@@ -24,6 +23,7 @@ import {
 import { Info, Save, Trash2 } from 'lucide-react';
 import { SecretInput } from '@/components/primitives/secret-input';
 import { CredentialsKeyEnum } from '@novu/shared';
+import { useFetchIntegrations } from '../../../hooks/use-fetch-integrations';
 
 const secureCredentials = [
   CredentialsKeyEnum.ApiKey,
@@ -66,7 +66,7 @@ function mapIntegrationToFormData(integration: IIntegration): UpdateIntegrationF
 }
 
 export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: UpdateProviderSidebarProps) {
-  const { integrations } = useIntegrations();
+  const { integrations } = useFetchIntegrations();
   const { providers } = useProviders();
   const { mutateAsync: updateIntegration, isLoading } = useUpdateIntegration();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
