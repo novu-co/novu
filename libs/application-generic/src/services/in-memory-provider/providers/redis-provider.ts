@@ -101,9 +101,15 @@ export const getRedisInstance = (): Redis | undefined => {
 
   if (port && host) {
     const redisInstance = new Redis(port, host, options);
-    if (typeof newrelic !== 'undefined' && newrelic.instrumentDatastore) {
+    const isNewRelicEnabled =
+      typeof newrelic !== 'undefined' && newrelic.instrumentDatastore;
+    const isNewRelicEnvSet =
+      process.env.NEW_RELIC_LICENSE_KEY && process.env.NEW_RELIC_APP_NAME;
+
+    if (isNewRelicEnabled && isNewRelicEnvSet) {
       newrelic.instrumentDatastore('Redis', () => redisInstance);
     }
+
     return redisInstance;
   }
 
