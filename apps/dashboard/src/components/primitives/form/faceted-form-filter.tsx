@@ -289,7 +289,8 @@ export function FacetedFormFilter({
           variant="outline"
           size="sm"
           className={cn(
-            'border-dashed border-neutral-200 text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-900',
+            'border-neutral-200 text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-900',
+            (type === 'text' ? !currentValue : selectedValues.size === 0) && 'border-dashed',
             sizes.trigger
           )}
         >
