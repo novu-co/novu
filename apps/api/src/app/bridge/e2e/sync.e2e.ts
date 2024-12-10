@@ -680,9 +680,7 @@ describe('Bridge Sync - /bridge/sync (POST)', async () => {
     });
 
     expect(result.status).to.equal(400);
-    expect(result.body.message).to.contain(
-      `Workflow with same workflow id was already created in Dashboard please use another workflow id ${workflowId}`
-    );
+    expect(result.body.message).to.contain(`was already created in Dashboard. Please use another workflowId.`);
 
     // Verify the original workflow wasn't modified
     const workflows = await workflowsRepository.findOne({
