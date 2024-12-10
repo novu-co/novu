@@ -14,7 +14,7 @@ interface ActivityResponse {
   pageSize: number;
 }
 
-export function useActivities({ filters }: UseActivitiesOptions = {}) {
+export function useFetchActivities({ filters }: UseActivitiesOptions = {}) {
   const { currentEnvironment } = useEnvironment();
   const [searchParams] = useSearchParams();
 

@@ -8,25 +8,35 @@ import { useQueryClient } from '@tanstack/react-query';
 import { QueryKeys } from '@/utils/query-keys';
 import { useEnvironment } from '@/context/environment/hooks';
 import { getNotification } from '@/api/activity';
-import { useActivities } from '@/hooks/use-fetch-activities';
 import { StatusBadge } from './components/status-badge';
 import { StepIndicators } from './components/step-indicators';
 import { Pagination } from './components/pagination';
 import { useRef, useEffect } from 'react';
+import { IActivityFilters } from '@/api/activity';
+import { useFetchActivities } from '../../hooks/use-fetch-activities';
 
 export interface ActivityTableProps {
   selectedActivityId: string | null;
   onActivitySelect: (activity: IActivity) => void;
+  filters?: IActivityFilters;
+  hasActiveFilters: boolean;
+  onClearFilters: () => void;
 }
 
-export function ActivityTable({ selectedActivityId, onActivitySelect }: ActivityTableProps) {
+export function ActivityTable({
+  selectedActivityId,
+  onActivitySelect,
+  filters,
+  hasActiveFilters,
+  onClearFilters,
+}: ActivityTableProps) {
   const queryClient = useQueryClient();
   const { currentEnvironment } = useEnvironment();
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { activities, isLoading, hasMore } = useActivities();
+  const { activities, isLoading, hasMore } = useFetchActivities({ filters });
 
   const page = parseInt(searchParams.get('page') || '0');
   const limit = parseInt(searchParams.get('limit') || '10');
@@ -97,7 +107,7 @@ export function ActivityTable({ selectedActivityId, onActivitySelect }: Activity
                     {activity.template?.name || 'Deleted workflow'}
                   </span>
                   <span className="text-foreground-400 text-[10px] leading-[14px]">
-                    {activity.transactionId} {getSubscriberDisplayName(activity.subscriber)}
+                    {activity.transactionId} {getSubscriberDisplay(activity.subscriber)}
                   </span>
                 </div>
               </TableCell>
@@ -160,12 +170,12 @@ function SkeletonRow() {
   );
 }
 
-function getSubscriberDisplayName(subscriber?: Pick<ISubscriber, '_id' | 'subscriberId' | 'firstName' | 'lastName'>) {
+function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriberId' | 'firstName' | 'lastName'>) {
   if (!subscriber) return '';
 
   if (subscriber.firstName || subscriber.lastName) {
-    return `• ${subscriber.firstName || ''} ${subscriber.lastName || ''}`.trim();
+    return `• ${subscriber.firstName || ''} ${subscriber.lastName || ''}`;
   }
 
-  return `• ${subscriber.subscriberId}`;
+  return '';
 }
