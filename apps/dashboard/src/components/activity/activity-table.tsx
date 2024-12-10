@@ -39,7 +39,6 @@ export function ActivityTable({
   const { activities, isLoading, hasMore } = useFetchActivities({ filters });
 
   const page = parseInt(searchParams.get('page') || '0');
-  const limit = parseInt(searchParams.get('limit') || '10');
 
   const handlePageChange = (newPage: number) => {
     const newParams = createSearchParams({
@@ -127,7 +126,7 @@ export function ActivityTable({
         </TableBody>
       </Table>
 
-      <ArrowPagination page={page} limit={limit} hasMore={hasMore} onPageChange={handlePageChange} />
+      <ArrowPagination page={page} hasMore={hasMore} onPageChange={handlePageChange} />
     </div>
   );
 }
