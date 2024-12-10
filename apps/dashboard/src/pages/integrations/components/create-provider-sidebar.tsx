@@ -1,6 +1,6 @@
 import { useCallback, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/primitives/sheet';
+import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/components/primitives/sheet';
 import { Button } from '@/components/primitives/button';
 import { Input, InputField } from '@/components/primitives/input';
 import { Label } from '@/components/primitives/label';
@@ -8,11 +8,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitive
 import { ChannelTypeEnum, CredentialsKeyEnum } from '@novu/shared';
 import { useProviders, IProvider } from '@/hooks/use-providers';
 import { useCreateIntegration } from '@/hooks/use-create-integration';
-import { Check, Info } from 'lucide-react';
 import { SecretInput } from '@/components/primitives/secret-input';
-import { RiArrowLeftSLine, RiInputField } from 'react-icons/ri';
+import { RiArrowLeftSLine, RiArrowRightSLine, RiInputField } from 'react-icons/ri';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../../components/primitives/accordion';
 import { Form } from '../../../components/primitives/form/form';
+import { Separator } from '../../../components/primitives/separator';
+import { Switch } from '../../../components/primitives/switch';
+import { HelpTooltipIndicator } from '../../../components/primitives/help-tooltip-indicator';
 
 interface CreateProviderSidebarProps {
   isOpened: boolean;
@@ -29,6 +31,8 @@ interface ProviderFormData {
   name: string;
   identifier: string;
   credentials: Record<string, string>;
+  enabled: boolean;
+  primary: boolean;
 }
 
 const secureCredentials = [
@@ -64,19 +68,24 @@ function ProviderCard({ provider, onClick }: ProviderCardProps) {
   );
 }
 
-export function CreateProviderSidebar({ isOpened, onClose, scrollToChannel }: CreateProviderSidebarProps) {
+export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSidebarProps) {
   const { providers } = useProviders();
   const [selectedProvider, setSelectedProvider] = useState<string>();
   const [step, setStep] = useState<'select' | 'configure'>('select');
   const [searchQuery, setSearchQuery] = useState('');
-  const { mutateAsync: createIntegration, isLoading } = useCreateIntegration();
+  const { mutateAsync: createIntegration, isPending } = useCreateIntegration();
 
-  const form = useForm<ProviderFormData>();
+  const form = useForm<ProviderFormData>({
+    defaultValues: {
+      enabled: true,
+      primary: false,
+    },
+  });
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isDirty },
+    formState: { errors },
   } = form;
   const filteredProviders = useMemo(() => {
     if (!providers) return [];
@@ -105,6 +114,8 @@ export function CreateProviderSidebar({ isOpened, onClose, scrollToChannel }: Cr
         name: providers?.find((p: IProvider) => p.id === providerId)?.displayName ?? '',
         identifier: '',
         credentials: {},
+        enabled: true,
+        primary: false,
       });
     },
     [providers, reset]
@@ -201,7 +212,7 @@ export function CreateProviderSidebar({ isOpened, onClose, scrollToChannel }: Cr
         ) : (
           <Form {...form}>
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-1 flex-col p-3">
-              <div className="flex-1 space-y-6 overflow-y-auto pb-8">
+              <div className="flex-1 space-y-3 overflow-y-auto pb-8">
                 <Accordion type="single" collapsible value={'layout'}>
                   <AccordionItem value="layout">
                     <AccordionTrigger>
@@ -212,6 +223,29 @@ export function CreateProviderSidebar({ isOpened, onClose, scrollToChannel }: Cr
                     </AccordionTrigger>
                     <AccordionContent>
                       <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <Label className="text-xs" htmlFor="enabled">
+                            Enable Provider{' '}
+                            <HelpTooltipIndicator
+                              className="relative top-1"
+                              size="4"
+                              text="Disabling a provider will stop sending notifications through it."
+                            />
+                          </Label>
+                          <Switch id="enabled" {...register('enabled')} />
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                          <Label className="text-xs" htmlFor="primary">
+                            Primary Provider{' '}
+                            <HelpTooltipIndicator
+                              className="relative top-1"
+                              size="4"
+                              text="Primary provider will be used for all notifications by defauly, there can be only one primary provider per channel"
+                            />
+                          </Label>
+                          <Switch id="primary" {...register('primary')} />
+                        </div>
+                        <Separator />
                         <div className="space-y-2">
                           <Label className="text-xs" htmlFor="name">
                             Name
@@ -239,70 +273,71 @@ export function CreateProviderSidebar({ isOpened, onClose, scrollToChannel }: Cr
                   </AccordionItem>
                 </Accordion>
 
-                {provider && (
-                  <div className="space-y-4">
-                    <h3 className="text-muted-foreground text-sm font-medium">Provider Credentials</h3>
-                    <div className="space-y-4 rounded-lg border p-4">
-                      {provider.credentials.map((credential) => (
-                        <div key={credential.key} className="space-y-2">
-                          <Label htmlFor={credential.key}>{credential.displayName}</Label>
-                          {credential.type === 'secret' ||
-                          secureCredentials.includes(credential.key as CredentialsKeyEnum) ? (
-                            <SecretInput
-                              id={credential.key}
-                              placeholder={`Enter ${credential.displayName.toLowerCase()}`}
-                              register={register}
-                              registerKey={`credentials.${credential.key}`}
-                              registerOptions={{
-                                required: credential.required ? `${credential.displayName} is required` : false,
-                              }}
-                            />
-                          ) : (
-                            <Input
-                              id={credential.key}
-                              type="text"
-                              placeholder={`Enter ${credential.displayName.toLowerCase()}`}
-                              className="border-input ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring h-9 rounded-md border px-3 py-1 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                              {...register(`credentials.${credential.key}`, {
-                                required: credential.required ? `${credential.displayName} is required` : false,
-                              })}
-                            />
-                          )}
-                          {credential.description && (
-                            <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                              <Info className="h-3 w-3" />
-                              <span>{credential.description}</span>
-                            </div>
-                          )}
-                          {errors.credentials?.[credential.key] && (
-                            <p className="text-sm text-red-500">{errors.credentials[credential.key]?.message}</p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+                <Separator />
 
-              <div className="border-t pt-4">
-                <div className="flex justify-end gap-4">
-                  <Button type="button" variant="outline" onClick={onClose}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={!isDirty || isLoading}>
-                    {isLoading ? (
-                      'Creating...'
-                    ) : (
-                      <>
-                        <Check className="mr-2 h-4 w-4" /> Create Integration
-                      </>
-                    )}
-                  </Button>
-                </div>
+                <Accordion type="single" collapsible value={'credentials'}>
+                  <AccordionItem value="credentials">
+                    <AccordionTrigger>
+                      <div className="flex items-center gap-1 text-xs">
+                        <RiInputField className="text-feature size-5" />
+                        Provider Credentials
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
+                        {provider?.credentials?.map((credential) => (
+                          <div key={credential.key} className="space-y-2">
+                            <Label htmlFor={credential.key}>{credential.displayName}</Label>
+                            {credential.type === 'secret' ||
+                            secureCredentials.includes(credential.key as CredentialsKeyEnum) ? (
+                              <InputField className="flex overflow-hidden pr-0">
+                                <SecretInput
+                                  id={credential.key}
+                                  placeholder={`Enter ${credential.displayName.toLowerCase()}`}
+                                  register={register}
+                                  registerKey={`credentials.${credential.key}`}
+                                  registerOptions={{
+                                    required: credential.required ? `${credential.displayName} is required` : false,
+                                  }}
+                                />
+                              </InputField>
+                            ) : (
+                              <InputField>
+                                <Input
+                                  id={credential.key}
+                                  type="text"
+                                  placeholder={`Enter ${credential.displayName.toLowerCase()}`}
+                                  {...register(`credentials.${credential.key}`, {
+                                    required: credential.required ? `${credential.displayName} is required` : false,
+                                  })}
+                                />
+                              </InputField>
+                            )}
+                            {credential.description && (
+                              <div className="text-foreground-400 flex items-center gap-1 text-xs">
+                                <span>{credential.description}</span>
+                              </div>
+                            )}
+                            {errors.credentials?.[credential.key] && (
+                              <p className="text-sm text-red-500">{errors.credentials[credential.key]?.message}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
             </form>
           </Form>
         )}
+        <SheetFooter className="border-t border-neutral-200 p-0">
+          <div className="flex justify-end gap-4 p-3">
+            <Button type="submit" isLoading={isPending} size="sm">
+              Connect Integration <RiArrowRightSLine className="size-4" />
+            </Button>
+          </div>
+        </SheetFooter>
       </SheetContent>
     </Sheet>
   );
