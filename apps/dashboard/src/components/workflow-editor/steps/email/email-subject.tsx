@@ -8,13 +8,13 @@ import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
 import { autocompletion } from '@codemirror/autocomplete';
-import { useStep } from '@/components/workflow-editor/steps/step-provider';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 const subjectKey = 'subject';
 
 export const EmailSubject = () => {
   const { control } = useFormContext();
-  const { step } = useStep();
+  const { step } = useWorkflow();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
 
   return (

@@ -1,5 +1,5 @@
 import { FormControl, FormField, FormMessage } from '@/components/primitives/form/form';
-import { useStep } from '@/components/workflow-editor/steps/step-provider';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { cn } from '@/utils/ui';
 import { Editor } from '@maily-to/core';
@@ -12,7 +12,7 @@ const bodyKey = 'emailEditor';
 type MailyProps = HTMLAttributes<HTMLDivElement>;
 export const Maily = (props: MailyProps) => {
   const { className, ...rest } = props;
-  const { step } = useStep();
+  const { step } = useWorkflow();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
   const [_, setEditor] = useState<TiptapEditor>();
   const { control } = useFormContext();

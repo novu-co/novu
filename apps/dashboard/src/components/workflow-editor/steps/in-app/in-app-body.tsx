@@ -9,7 +9,7 @@ import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
 import { autocompletion } from '@codemirror/autocomplete';
-import { useStep } from '@/components/workflow-editor/steps/step-provider';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 const bodyKey = 'body';
 
@@ -19,7 +19,7 @@ const basicSetup = {
 
 export const InAppBody = () => {
   const { control } = useFormContext();
-  const { step } = useStep();
+  const { step } = useWorkflow();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
   const extensions = useMemo(
     () => [autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping],
