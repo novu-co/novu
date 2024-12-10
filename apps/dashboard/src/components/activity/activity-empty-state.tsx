@@ -55,7 +55,7 @@ export function ActivityEmptyState({ className, emptySearchResults, onClearFilte
             }}
             className="relative"
           >
-            <ActivitiyIllustration />
+            <ActivityIllustration />
           </motion.div>
 
           <motion.div
@@ -119,7 +119,7 @@ export function ActivityEmptyState({ className, emptySearchResults, onClearFilte
   );
 }
 
-function ActivitiyIllustration() {
+function ActivityIllustration() {
   return (
     <svg width="137" height="126" viewBox="0 0 137 126" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="1" y="1" width="135" height="45" rx="7.5" stroke="#CACFD8" stroke-dasharray="5 3" />
