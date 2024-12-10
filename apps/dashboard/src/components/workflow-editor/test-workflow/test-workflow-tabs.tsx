@@ -18,6 +18,8 @@ import { TestWorkflowForm } from './test-workflow-form';
 import { toast } from 'sonner';
 import { ToastClose, ToastIcon } from '@/components/primitives/sonner';
 import { TestWorkflowLogsSidebar } from './test-workflow-logs-sidebar';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 
 export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataResponseDto }) => {
   const { environmentSlug = '', workflowSlug = '' } = useParams<{ environmentSlug: string; workflowSlug: string }>();
@@ -25,6 +27,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
     workflowSlug,
   });
   const [transactionId, setTransactionId] = useState<string>();
+  const isNewActivityFeedEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ACTIVITY_FEED_ENABLED);
   const to = useMemo(
     () => (typeof testData.to === 'object' ? makeObjectFromSchema({ properties: testData.to.properties ?? {} }) : {}),
     [testData]
@@ -71,6 +74,34 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
         });
       }
       setTransactionId(newTransactionId);
+
+      if (!isNewActivityFeedEnabled) {
+        showToast({
+          variant: 'lg',
+          children: ({ close }) => (
+            <>
+              <ToastIcon variant="success" />
+              <div className="flex flex-col gap-2">
+                <span className="font-medium">Test workflow succeeded</span>
+                <span className="text-foreground-600 inline">
+                  Workflow <span className="font-bold">{workflow?.name}</span> was triggered successfully.
+                </span>
+                <Link
+                  to={`${LEGACY_ROUTES.ACTIVITY_FEED}?transactionId=${transactionId}`}
+                  reloadDocument
+                  className="text-primary text-sm font-medium"
+                >
+                  View activity feed
+                </Link>
+              </div>
+              <ToastClose onClick={close} />
+            </>
+          ),
+          options: {
+            position: 'bottom-right',
+          },
+        });
+      }
     } catch (e) {
       toast.error('Failed to trigger workflow', {
         description: e instanceof Error ? e.message : 'There was an error triggering the workflow.',
@@ -115,7 +146,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
               <TestWorkflowForm workflow={workflow} />
             </TabsContent>
           </Tabs>
-          <TestWorkflowLogsSidebar transactionId={transactionId} />
+          {!isNewActivityFeedEnabled && <TestWorkflowLogsSidebar transactionId={transactionId} />}
         </form>
       </Form>
     </div>
