@@ -1,5 +1,4 @@
 import { Button } from '../../../button';
-import { Separator } from '../../../separator';
 import { cn } from '../../../../../utils/ui';
 import { SizeType } from '../types';
 import { STYLES } from '../styles';

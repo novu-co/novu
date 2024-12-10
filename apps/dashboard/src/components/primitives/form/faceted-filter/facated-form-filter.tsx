@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { PlusCircle } from 'lucide-react';
 import { Button } from '../../button';
-import { Separator } from '../../separator';
 import { Popover, PopoverContent, PopoverTrigger } from '../../popover';
 import { cn } from '../../../../utils/ui';
 import { FacetedFilterProps } from './types';

@@ -2,7 +2,6 @@ import { Input } from '../../../input';
 import { cn } from '../../../../../utils/ui';
 import { SizeType } from '../types';
 import { STYLES } from '../styles';
-import { ArrowLeftRight } from 'lucide-react';
 import { EnterLineIcon } from '../../../../icons/enter-line';
 
 interface FilterInputProps {
