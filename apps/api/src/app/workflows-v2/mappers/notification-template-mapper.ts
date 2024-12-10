@@ -2,7 +2,7 @@ import {
   PreferencesResponseDto,
   RuntimeIssue,
   ShortIsPrefixEnum,
-  StepResponseDto,
+  StepDataDto,
   StepTypeEnum,
   WorkflowCreateAndUpdateKeys,
   WorkflowListResponseDto,
@@ -15,7 +15,10 @@ import { NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { WorkflowInternalResponseDto } from '@novu/application-generic';
 import { buildSlug } from '../../shared/helpers/build-slug';
 
-export function toResponseWorkflowDto(workflow: WorkflowInternalResponseDto): WorkflowResponseDto {
+export function toResponseWorkflowDto(
+  workflow: WorkflowInternalResponseDto,
+  steps: StepDataDto[]
+): WorkflowResponseDto {
   const preferencesDto: PreferencesResponseDto = {
     user: workflow.userPreferences,
     default: workflow.defaultPreferences,
@@ -30,7 +33,7 @@ export function toResponseWorkflowDto(workflow: WorkflowInternalResponseDto): Wo
     tags: workflow.tags,
     active: workflow.active,
     preferences: preferencesDto,
-    steps: getSteps(workflow),
+    steps,
     description: workflow.description,
     origin: computeOrigin(workflow),
     updatedAt: workflow.updatedAt || 'Missing Updated At',
@@ -38,16 +41,6 @@ export function toResponseWorkflowDto(workflow: WorkflowInternalResponseDto): Wo
     status: workflow.status || WorkflowStatusEnum.ACTIVE,
     issues: workflow.issues as unknown as Record<WorkflowCreateAndUpdateKeys, RuntimeIssue>,
   };
-}
-
-function getSteps(template: NotificationTemplateEntity) {
-  const steps: StepResponseDto[] = [];
-  for (const step of template.steps) {
-    const stepResponseDto = toStepResponseDto(step);
-    steps.push(stepResponseDto);
-  }
-
-  return steps;
 }
 
 function toMinifiedWorkflowDto(template: NotificationTemplateEntity): WorkflowListResponseDto {
@@ -69,19 +62,6 @@ function toMinifiedWorkflowDto(template: NotificationTemplateEntity): WorkflowLi
 
 export function toWorkflowsMinifiedDtos(templates: NotificationTemplateEntity[]): WorkflowListResponseDto[] {
   return templates.map(toMinifiedWorkflowDto);
-}
-
-function toStepResponseDto(persistedStep: NotificationStepEntity): StepResponseDto {
-  const stepName = persistedStep.name || 'Missing Name';
-
-  return {
-    _id: persistedStep._templateId,
-    slug: buildSlug(stepName, ShortIsPrefixEnum.STEP, persistedStep._templateId),
-    name: stepName,
-    stepId: persistedStep.stepId || 'Missing Step Id',
-    type: persistedStep.template?.type || StepTypeEnum.EMAIL,
-    issues: persistedStep.issues,
-  } satisfies StepResponseDto;
 }
 
 function buildStepTypeOverview(step: NotificationStepEntity): StepTypeEnum | undefined {

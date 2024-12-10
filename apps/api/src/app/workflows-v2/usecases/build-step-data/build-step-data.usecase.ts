@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ControlValuesLevelEnum, StepDataDto, WorkflowOriginEnum } from '@novu/shared';
+import { ControlValuesLevelEnum, ShortIsPrefixEnum, StepDataDto, WorkflowOriginEnum } from '@novu/shared';
 import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { GetWorkflowByIdsUseCase, Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { BuildStepDataCommand } from './build-step-data.command';
 import { InvalidStepException } from '../../exceptions/invalid-step.exception';
 import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
+import { buildSlug } from '../../../shared/helpers/build-slug';
 
 @Injectable()
 export class BuildStepDataUsecase {
@@ -19,15 +20,12 @@ export class BuildStepDataUsecase {
     const workflow = await this.fetchWorkflow(command);
 
     const { currentStep } = await this.loadStepsFromDb(command, workflow);
-    if (
-      currentStep.name === undefined ||
-      !currentStep._templateId ||
-      currentStep.stepId === undefined ||
-      !currentStep.template?.type
-    ) {
+
+    if (!currentStep._templateId || !currentStep.template?.type) {
       throw new InvalidStepException(currentStep);
     }
     const controlValues = await this.getValues(command, currentStep, workflow._id);
+    const stepName = currentStep.name || 'Missing Step Name';
 
     return {
       controls: {
@@ -42,9 +40,10 @@ export class BuildStepDataUsecase {
         stepInternalId: currentStep._templateId,
         workflow,
       }),
-      name: currentStep.name,
+      name: stepName,
+      slug: buildSlug(stepName, ShortIsPrefixEnum.STEP, currentStep._templateId),
       _id: currentStep._templateId,
-      stepId: currentStep.stepId,
+      stepId: currentStep.stepId || 'Missing Step Id',
       type: currentStep.template?.type,
       origin: workflow.origin || WorkflowOriginEnum.EXTERNAL,
       workflowId: workflow.triggers[0].identifier,

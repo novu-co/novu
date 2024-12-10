@@ -1,4 +1,4 @@
-import { NotificationStepDto } from './workflow.dto';
+import { NotificationStepDto } from './workflow-deprecated.dto';
 import { CustomDataType } from '../../types';
 
 /**
