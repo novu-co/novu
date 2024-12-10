@@ -2,13 +2,13 @@ import * as Sentry from '@sentry/react';
 import { HTMLAttributes, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { useStep } from '@/components/workflow-editor/steps/step-provider';
 import { usePreviewStep } from '@/hooks/use-preview-step';
 import { EmailPreviewHeader } from '@/components/workflow-editor/steps/email/email-preview';
 import { Separator } from '@/components/primitives/separator';
 import { Skeleton } from '@/components/primitives/skeleton';
 import { ChannelTypeEnum } from '@novu/shared';
 import { cn } from '@/utils/ui';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 type MiniEmailPreviewProps = HTMLAttributes<HTMLDivElement>;
 const MiniEmailPreview = (props: MiniEmailPreviewProps) => {
@@ -39,7 +39,7 @@ export function ConfigureEmailStepPreview(props: ConfigureEmailStepPreviewProps)
   } = usePreviewStep({
     onError: (error) => Sentry.captureException(error),
   });
-  const { step, isPending } = useStep();
+  const { step, isPending } = useWorkflow();
 
   const { workflowSlug, stepSlug } = useParams<{
     workflowSlug: string;

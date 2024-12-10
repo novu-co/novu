@@ -16,7 +16,7 @@ services:
       interval: 10s
   mongo:
     container_name: '${MONGO_DOCKER_NAME-mongo_main}'
-    image: mongo
+    image: mongo:8.0.3
     network_mode: bridge
     ports:
       - '${DOCKER_MONGO_PORT:-27017}:27017'

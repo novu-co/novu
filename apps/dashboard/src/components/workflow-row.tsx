@@ -41,6 +41,7 @@ import { ToastIcon } from './primitives/sonner';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 import { PauseModalDescription, PAUSE_MODAL_TITLE } from '@/components/pause-workflow-dialog';
 import { DeleteWorkflowDialog } from './delete-workflow-dialog';
+import { TimeDisplayHoverCard } from './time-display-hover-card';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -189,20 +190,15 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         <WorkflowTags tags={workflow.tags || []} />
       </TableCell>
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <TableCell className="text-foreground-600 min-w-[180px] text-sm font-medium">
-            {new Date(workflow.updatedAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })}
-          </TableCell>
-        </TooltipTrigger>
-        <TooltipPortal>
-          <TooltipContent align="start">{new Date(workflow.updatedAt).toUTCString()}</TooltipContent>
-        </TooltipPortal>
-      </Tooltip>
+      <TableCell className="text-foreground-600 min-w-[180px] text-sm font-medium">
+        <TimeDisplayHoverCard date={new Date(workflow.updatedAt)}>
+          {new Date(workflow.updatedAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+          })}
+        </TimeDisplayHoverCard>
+      </TableCell>
 
       <TableCell className="w-1">
         <DeleteWorkflowDialog

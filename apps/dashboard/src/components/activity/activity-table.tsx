@@ -8,14 +8,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import { QueryKeys } from '@/utils/query-keys';
 import { useEnvironment } from '@/context/environment/hooks';
 import { getNotification } from '@/api/activity';
-import { useActivities } from '@/hooks/use-activities';
 import { StatusBadge } from './components/status-badge';
 import { StepIndicators } from './components/step-indicators';
-import { Pagination } from './components/pagination';
 import { ActivityEmptyState } from './activity-empty-state';
+import { AnimatePresence, motion } from 'motion/react';
+import { ArrowPagination } from './components/arrow-pagination';
 import { useRef, useEffect } from 'react';
 import { IActivityFilters } from '@/api/activity';
-import { AnimatePresence, motion } from 'motion/react';
+import { useFetchActivities } from '../../hooks/use-fetch-activities';
 
 export interface ActivityTableProps {
   selectedActivityId: string | null;
@@ -38,15 +38,14 @@ export function ActivityTable({
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { activities, isLoading, hasMore } = useActivities({ filters });
+  const { activities, isLoading, hasMore } = useFetchActivities({ filters });
 
-  const offset = parseInt(searchParams.get('offset') || '0');
-  const limit = parseInt(searchParams.get('limit') || '10');
+  const page = parseInt(searchParams.get('page') || '0');
 
-  const handleOffsetChange = (newOffset: number) => {
+  const handlePageChange = (newPage: number) => {
     const newParams = createSearchParams({
       ...Object.fromEntries(searchParams),
-      offset: newOffset.toString(),
+      page: newPage.toString(),
     });
     navigate(`${location.pathname}?${newParams}`);
   };
@@ -152,7 +151,7 @@ export function ActivityTable({
             </TableBody>
           </Table>
 
-          <Pagination offset={offset} limit={limit} hasMore={hasMore} onOffsetChange={handleOffsetChange} />
+          <ArrowPagination page={page} hasMore={hasMore} onPageChange={handlePageChange} />
         </motion.div>
       )}
     </AnimatePresence>
