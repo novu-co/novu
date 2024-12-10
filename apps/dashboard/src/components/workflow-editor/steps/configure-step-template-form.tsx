@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   type StepDataDto,
-  StepIssuesDto,
   StepTypeEnum,
   StepUpdateDto,
   UpdateWorkflowDto,
@@ -47,13 +46,11 @@ export type StepEditorProps = {
 };
 
 type ConfigureStepTemplateFormProps = StepEditorProps & {
-  issues?: StepIssuesDto;
   update: (data: UpdateWorkflowDto) => void;
-  updateStepCache: (step: Partial<StepDataDto>) => void;
 };
 
 export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps) => {
-  const { workflow, step, update, updateStepCache, issues } = props;
+  const { workflow, step, update } = props;
   const schema = useMemo(() => buildDynamicZodSchema(step.controls.dataSchema ?? {}), [step.controls.dataSchema]);
 
   const defaultValues = useMemo(() => {
@@ -75,16 +72,15 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
         controlValues: data,
       };
       update(updateStepInWorkflow(workflow, step.stepId, updateStepData));
-      updateStepCache(updateStepData);
     },
   });
 
   const setIssuesFromStep = useCallback(() => {
-    const stepIssues = flattenIssues(issues?.controls);
+    const stepIssues = flattenIssues(step.issues?.controls);
     Object.entries(stepIssues).forEach(([key, value]) => {
       form.setError(key as string, { message: value });
     });
-  }, [form, issues]);
+  }, [form, step.issues]);
 
   useEffect(() => {
     setIssuesFromStep();

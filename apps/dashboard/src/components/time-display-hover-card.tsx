@@ -14,7 +14,7 @@ export function TimeDisplayHoverCard({ date, children }: TimeDisplayHoverCardPro
   return (
     <HoverCard openDelay={100} closeDelay={100}>
       <HoverCardTrigger asChild className="hover:cursor-default">
-        {children}
+        <span>{children}</span>
       </HoverCardTrigger>
       <HoverCardContent className="w-fit" align="end" sideOffset={4}>
         <div className="flex flex-col gap-2">

@@ -3,7 +3,7 @@ import { get } from './api.client';
 
 export interface IActivityFilters {
   channels?: string[];
-  templates?: string[];
+  workflows?: string[];
   email?: string;
   subscriberId?: string;
   transactionId?: string;
@@ -26,8 +26,8 @@ export function getActivityList(
   if (filters?.channels?.length) {
     searchParams.append('channels', filters.channels.join(','));
   }
-  if (filters?.templates?.length) {
-    searchParams.append('templates', filters.templates.join(','));
+  if (filters?.workflows?.length) {
+    searchParams.append('templates', filters.workflows.join(','));
   }
   if (filters?.email) {
     searchParams.append('emails', filters.email);
