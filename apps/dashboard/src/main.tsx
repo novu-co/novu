@@ -23,7 +23,6 @@ import { initializeSentry } from './utils/sentry';
 import { overrideZodErrorMap } from './utils/validation';
 import { InboxUsecasePage } from './pages/inbox-usecase-page';
 import { InboxEmbedPage } from './pages/inbox-embed-page';
-import { FeatureFlagsProvider } from '@/context/feature-flags-provider';
 import { EditStepTemplate } from '@/components/workflow-editor/steps/edit-step-template';
 import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workflow';
 import { EditStep } from '@/components/workflow-editor/steps/edit-step';
@@ -164,8 +163,6 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <FeatureFlagsProvider>
-      <RouterProvider router={router} />
-    </FeatureFlagsProvider>
+    <RouterProvider router={router} />
   </StrictMode>
 );

@@ -12,7 +12,7 @@ export const toUserEntity = (clerkUser: UserResource): IUserEntity => {
    * entity identifier) that gets used further in the app. There are a few consumers that
    * want to use this identifier before it is set to the internal value. These consumers
    * should make sure they only report with the correct value, a reference
-   * implementation can be found in 'apps/web/src/hooks/useMonitoring.ts'
+   * implementation can be found in 'apps/dashboard/src/context/identity-provider.tsx'
    */
 
   return {
@@ -42,7 +42,7 @@ export const toOrganizationEntity = (clerkOrganization: OrganizationResource): I
    * entity identifier) that gets used further in the app. There are a few consumers that
    * want to use this identifier before it is set to the internal value. These consumers
    * should make sure they only report with the correct value, a reference
-   * implementation can be found in 'apps/web/src/hooks/useMonitoring.ts'
+   * implementation can be found in 'apps/dashboard/src/context/identity-provider.tsx'
    */
 
   return {
