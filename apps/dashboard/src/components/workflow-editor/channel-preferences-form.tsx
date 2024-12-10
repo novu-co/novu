@@ -126,6 +126,7 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
 
   const handleAllToggle = (value: boolean) => {
     if (!formDataToRender) return;
+    const currentPreference = form.getValues('user') as WorkflowPreferences;
 
     const channelPreferences = formDataToRender.channelsInUse.reduce(
       (acc, curr) => {
@@ -138,9 +139,12 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
     const updatedUserPreferences = {
       all: {
         enabled: value,
-        readOnly: form.getValues('user.all.readOnly'),
+        readOnly: currentPreference.all.readOnly,
       },
-      channels: channelPreferences,
+      channels: {
+        ...currentPreference.channels,
+        ...channelPreferences,
+      },
     };
 
     updateUserPreference(updatedUserPreferences);
@@ -216,7 +220,6 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
                                 new_status: checked,
                               });
                             }}
-                            disabled={isDashboardWorkflow}
                           />
                         </FormControl>
                       </FormItem>
@@ -252,7 +255,11 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
                   name="user.all.enabled"
                   render={({ field }) => (
                     <FormControl className="m-1">
-                      <Checkbox checked={field.value} onCheckedChange={handleAllToggle} disabled={!override} />
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={handleAllToggle}
+                        disabled={!override || formDataToRender?.channelsInUse.length === 0}
+                      />
                     </FormControl>
                   )}
                 />
@@ -309,8 +316,7 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
                             </TooltipTrigger>
                             <TooltipContent className="w-64" align="end">
                               <span className="text-2xs">
-                                Channel preference configuration is available for the Email, In-App, SMS, Chat, and Push
-                                channels.
+                                To enable configuration for this channel, add the channel step to the workflow.
                               </span>
                             </TooltipContent>
                           </Tooltip>
