@@ -31,7 +31,6 @@ import { Step } from '@/utils/types';
 import { getFirstControlsErrorMessage, getFirstBodyErrorMessage } from './step-utils';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { useEnvironment } from '@/context/environment/hooks';
-import { IEnvironment, WorkflowResponseDto } from '@novu/shared';
 
 const nodeTypes = {
   trigger: TriggerNode,
