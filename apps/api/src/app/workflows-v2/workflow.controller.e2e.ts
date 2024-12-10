@@ -44,6 +44,13 @@ const TEST_WORKFLOW_NAME = 'Test Workflow Name';
 const TEST_TAGS = ['test'];
 let session: UserSession;
 
+function getHeaders(overrideEnv?: string): HeadersInit {
+  return {
+    Authorization: session.token,
+    'Novu-Environment-Id': overrideEnv || session.environment._id,
+  };
+}
+
 describe('Workflow Controller E2E API Testing', () => {
   let workflowsClient: ReturnType<typeof createWorkflowClient>;
 
@@ -55,12 +62,6 @@ describe('Workflow Controller E2E API Testing', () => {
   after(async () => {
     await sleep(1000);
   });
-  function getHeaders(overrideEnv?: string): HeadersInit {
-    return {
-      Authorization: session.token, // Fixed space
-      'Novu-Environment-Id': overrideEnv || session.environment._id,
-    };
-  }
 
   it('Smoke Testing', async () => {
     const workflowCreated = await createWorkflowAndValidate();
@@ -1138,6 +1139,85 @@ describe('Workflow Controller E2E API Testing', () => {
       steps: [updatedStep, newStep],
     };
   }
+
+  describe('Workflow Step Issues', () => {
+    it('should show issues for illegal variables in control values', async () => {
+      const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('test-issues', {
+        steps: [
+          {
+            name: 'Email Test Step',
+            type: StepTypeEnum.EMAIL,
+          },
+        ],
+      });
+
+      const res = await workflowsClient.createWorkflow(createWorkflowDto);
+      expect(res.isSuccessResult()).to.be.true;
+      if (res.isSuccessResult()) {
+        const workflow = res.value;
+        await workflowsClient.patchWorkflowStepData(workflow._id, workflow.steps[0]._id, {
+          controlValues: { body: 'Welcome {{}}' },
+        });
+
+        const stepData = await getStepData(workflow._id, workflow.steps[0]._id);
+        expect(stepData.issues, 'Step data should have issues').to.exist;
+        expect(stepData.issues?.controls?.body, 'Step data should have body issues').to.exist;
+        expect(stepData.issues?.controls?.body?.[0]?.variableName).to.equal('{{}}');
+        expect(stepData.issues?.controls?.body?.[0]?.issueType).to.equal('ILLEGAL_VARIABLE_IN_CONTROL_VALUE');
+      }
+    });
+
+    it('should show issues for invalid URLs', async () => {
+      const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('test-issues', {
+        steps: [
+          {
+            name: 'In-App Test Step',
+            type: StepTypeEnum.IN_APP,
+          },
+        ],
+      });
+
+      const res = await workflowsClient.createWorkflow(createWorkflowDto);
+      expect(res.isSuccessResult()).to.be.true;
+      if (res.isSuccessResult()) {
+        const workflow = res.value;
+        await workflowsClient.patchWorkflowStepData(workflow._id, workflow.steps[0]._id, {
+          controlValues: {
+            redirect: { url: 'not-good-url-please-replace' },
+            primaryAction: { redirect: { url: 'not-good-url-please-replace' } },
+            secondaryAction: { redirect: { url: 'not-good-url-please-replace' } },
+          },
+        });
+
+        const stepData = await getStepData(workflow._id, workflow.steps[0]._id);
+        expect(stepData.issues, 'Step data should have issues').to.exist;
+        expect(stepData.issues?.controls?.['redirect.url']?.[0]?.issueType).to.equal('INVALID_URL');
+        expect(stepData.issues?.controls?.['primaryAction.redirect.url']?.[0]?.issueType).to.equal('INVALID_URL');
+        expect(stepData.issues?.controls?.['secondaryAction.redirect.url']?.[0]?.issueType).to.equal('INVALID_URL');
+      }
+    });
+
+    it('should show issues for missing required control values', async () => {
+      const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('test-issues', {
+        steps: [
+          {
+            name: 'In-App Test Step',
+            type: StepTypeEnum.IN_APP,
+          },
+        ],
+      });
+
+      const res = await workflowsClient.createWorkflow(createWorkflowDto);
+      expect(res.isSuccessResult()).to.be.true;
+      if (res.isSuccessResult()) {
+        const workflow = res.value;
+        const stepData = await getStepData(workflow._id, workflow.steps[0]._id);
+        expect(stepData.issues, 'Step data should have issues').to.exist;
+        expect(stepData.issues?.controls, 'Step data should have control issues').to.exist;
+        expect(stepData.issues?.controls?.body?.[0]?.issueType).to.equal('MISSING_VALUE');
+      }
+    });
+  });
 });
 
 function buildEmailStep(): StepCreateDto {
