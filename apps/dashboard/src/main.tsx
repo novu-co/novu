@@ -24,11 +24,11 @@ import { overrideZodErrorMap } from './utils/validation';
 import { InboxUsecasePage } from './pages/inbox-usecase-page';
 import { InboxEmbedPage } from './pages/inbox-embed-page';
 import { FeatureFlagsProvider } from '@/context/feature-flags-provider';
-import { EditStepTemplate } from '@/components/workflow-editor/steps/edit-step-template';
 import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workflow';
-import { EditStep } from '@/components/workflow-editor/steps/edit-step';
 import { InboxEmbedSuccessPage } from './pages/inbox-embed-success-page';
 import { ChannelPreferences } from './components/workflow-editor/channel-preferences';
+import { ConfigureStep } from '@/components/workflow-editor/steps/configure-step';
+import { ConfigureStepTemplate } from '@/components/workflow-editor/steps/configure-step-template';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -109,11 +109,11 @@ const router = createBrowserRouter([
                     index: true,
                   },
                   {
-                    element: <EditStep />,
+                    element: <ConfigureStep />,
                     path: ROUTES.EDIT_STEP,
                   },
                   {
-                    element: <EditStepTemplate />,
+                    element: <ConfigureStepTemplate />,
                     path: ROUTES.EDIT_STEP_TEMPLATE,
                   },
                   {

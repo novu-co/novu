@@ -3,7 +3,6 @@ import {
   FeatureFlagsKeysEnum,
   IEnvironment,
   StepDataDto,
-  StepIssuesDto,
   StepTypeEnum,
   StepUpdateDto,
   UpdateWorkflowDto,
@@ -34,8 +33,7 @@ import {
 } from '@/components/workflow-editor/step-utils';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { buildRoute, ROUTES } from '@/utils/routes';
-import { INLINE_CONFIGURABLE_STEP_TYPES, TEMPLATE_CONFIGURABLE_STEP_TYPES } from '@/utils/constants';
-import { STEP_NAME_BY_TYPE } from './step-provider';
+import { INLINE_CONFIGURABLE_STEP_TYPES, TEMPLATE_CONFIGURABLE_STEP_TYPES, STEP_NAME_BY_TYPE } from '@/utils/constants';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
 import { buildDefaultValues } from '@/utils/schema';
@@ -82,13 +80,11 @@ type ConfigureStepFormProps = {
   workflow: WorkflowResponseDto;
   environment: IEnvironment;
   step: StepDataDto;
-  issues?: StepIssuesDto;
   update: (data: UpdateWorkflowDto) => void;
-  updateStepCache: (step: Partial<StepDataDto>) => void;
 };
 
 export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
-  const { step, workflow, update, updateStepCache, environment, issues } = props;
+  const { step, workflow, update, environment } = props;
   const navigate = useNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const areNewStepsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
@@ -160,7 +156,6 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
         ...(data.controlValues ? { controlValues: data.controlValues } : {}),
       };
       update(updateStepInWorkflow(workflow, step.stepId, updateStepData));
-      updateStepCache(updateStepData);
     },
   });
 
@@ -171,11 +166,11 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   );
 
   const setControlValuesIssues = useCallback(() => {
-    const stepIssues = flattenIssues(issues?.controls);
+    const stepIssues = flattenIssues(step.issues?.controls);
     Object.entries(stepIssues).forEach(([key, value]) => {
       form.setError(`controlValues.${key}`, { message: value });
     });
-  }, [form, issues]);
+  }, [form, step]);
 
   useEffect(() => {
     setControlValuesIssues();

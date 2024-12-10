@@ -14,7 +14,7 @@ import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesT
 import { autocompletion } from '@codemirror/autocomplete';
 import { Editor } from '../editor';
 import { useFormField } from './form-context';
-import { useStep } from '@/components/workflow-editor/steps/step-provider';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 const predefinedAvatars = [
   `${window.location.origin}/images/avatar.svg`,
@@ -40,7 +40,7 @@ type AvatarPickerProps = {
 
 export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
   ({ name, value, onChange, onPick }, ref) => {
-    const { step } = useStep();
+    const { step } = useWorkflow();
     const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
     const [isOpen, setIsOpen] = useState(false);
     const { error } = useFormField();
