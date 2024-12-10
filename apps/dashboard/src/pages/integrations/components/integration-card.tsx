@@ -2,12 +2,12 @@ import { Badge } from '@/components/primitives/badge';
 import { cn } from '@/lib/utils';
 import { RiCheckboxCircleFill, RiGitBranchFill, RiStarSmileFill } from 'react-icons/ri';
 import { ITableIntegration } from '../types';
-import type { IEnvironment, IProviderConfig } from '@novu/shared';
-import type { IntegrationEntity } from '../types';
+import type { IEnvironment } from '@novu/shared';
+import { IProvider } from '@/hooks/use-providers';
 
 interface IntegrationCardProps {
-  integration: IntegrationEntity;
-  provider: IProviderConfig;
+  integration: any;
+  provider: IProvider;
   environment: IEnvironment;
   onRowClickCallback: (item: { original: ITableIntegration }) => void;
 }
