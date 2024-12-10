@@ -28,6 +28,7 @@ import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workfl
 import { EditStep } from '@/components/workflow-editor/steps/edit-step';
 import { InboxEmbedSuccessPage } from './pages/inbox-embed-success-page';
 import { ChannelPreferences } from './components/workflow-editor/channel-preferences';
+import { FeatureFlagsProvider } from './context/feature-flags-provider';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -163,6 +164,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <FeatureFlagsProvider>
+      <RouterProvider router={router} />
+    </FeatureFlagsProvider>
   </StrictMode>
 );

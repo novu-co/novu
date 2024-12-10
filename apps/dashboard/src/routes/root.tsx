@@ -6,7 +6,6 @@ import { SegmentProvider } from '@/context/segment';
 import { AuthProvider } from '@/context/auth/auth-provider';
 import { ClerkProvider } from '@/context/clerk-provider';
 import { TooltipProvider } from '@/components/primitives/tooltip';
-import { FeatureFlagsProvider } from '@/context/feature-flags-provider';
 import { IdentityProvider } from '@/context/identity-provider';
 
 const queryClient = new QueryClient({
@@ -39,15 +38,13 @@ const RootRouteInternal = () => {
         <ClerkProvider>
           <SegmentProvider>
             <AuthProvider>
-              <FeatureFlagsProvider>
-                <IdentityProvider>
-                  <HelmetProvider>
-                    <TooltipProvider delayDuration={100}>
-                      <Outlet />
-                    </TooltipProvider>
-                  </HelmetProvider>
-                </IdentityProvider>
-              </FeatureFlagsProvider>
+              <IdentityProvider>
+                <HelmetProvider>
+                  <TooltipProvider delayDuration={100}>
+                    <Outlet />
+                  </TooltipProvider>
+                </HelmetProvider>
+              </IdentityProvider>
             </AuthProvider>
           </SegmentProvider>
         </ClerkProvider>
