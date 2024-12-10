@@ -170,9 +170,9 @@ export class Sync {
 
     existingFrameworkWorkflows.forEach((workflow, index) => {
       if (workflow?.origin && workflow.origin !== WorkflowOriginEnum.EXTERNAL) {
+        const { workflowId } = workflowsFromBridge[index];
         throw new BadRequestException(
-          'Workflow with same workflow id was already created in Dashboard please use another workflow id ' +
-            `${workflowsFromBridge[index].workflowId}`
+          `Workflow ${workflowId} was already created in Dashboard. Please use another workflowId.`
         );
       }
     });
