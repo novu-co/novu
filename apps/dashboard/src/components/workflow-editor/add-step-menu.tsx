@@ -77,7 +77,8 @@ export const AddStepMenu = ({
   onMenuItemClick: (stepType: StepTypeEnum) => void;
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const areNewStepsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
+  const delayDigestEmailEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
+  const smsChatPushEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_SMS_CHAT_PUSH_ENABLED);
 
   const handleMenuItemClick = (stepType: StepTypeEnum) => {
     onMenuItemClick(stepType);
@@ -111,7 +112,7 @@ export const AddStepMenu = ({
               <MenuItemsGroup>
                 <MenuItem
                   stepType={StepTypeEnum.EMAIL}
-                  disabled={!areNewStepsEnabled}
+                  disabled={!delayDigestEmailEnabled}
                   onClick={() => handleMenuItemClick(StepTypeEnum.EMAIL)}
                 >
                   Email
@@ -124,7 +125,13 @@ export const AddStepMenu = ({
                   In-App
                 </MenuItem>
                 <MenuItem stepType={StepTypeEnum.PUSH}>Push</MenuItem>
-                <MenuItem stepType={StepTypeEnum.CHAT}>Chat</MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.CHAT}
+                  disabled={!smsChatPushEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.CHAT)}
+                >
+                  Chat
+                </MenuItem>
                 <MenuItem stepType={StepTypeEnum.SMS}>SMS</MenuItem>
               </MenuItemsGroup>
             </MenuGroup>
@@ -134,7 +141,7 @@ export const AddStepMenu = ({
                 <MenuItem stepType={StepTypeEnum.DIGEST}>Digest</MenuItem>
                 <MenuItem
                   stepType={StepTypeEnum.DELAY}
-                  disabled={!areNewStepsEnabled}
+                  disabled={!delayDigestEmailEnabled}
                   onClick={() => handleMenuItemClick(StepTypeEnum.DELAY)}
                 >
                   Delay

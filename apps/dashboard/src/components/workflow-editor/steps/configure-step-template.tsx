@@ -21,6 +21,7 @@ const transitionSetting = { ease: [0.29, 0.83, 0.57, 0.99], duration: 0.4 };
 const stepTypeToClassname: Record<string, string | undefined> = {
   [StepTypeEnum.IN_APP]: 'sm:max-w-[600px]',
   [StepTypeEnum.EMAIL]: 'sm:max-w-[800px]',
+  [StepTypeEnum.CHAT]: 'sm:max-w-[600px]',
 };
 
 export const ConfigureStepTemplate = () => {

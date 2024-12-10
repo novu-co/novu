@@ -60,6 +60,7 @@ export enum UiSchemaGroupEnum {
   DIGEST = 'DIGEST',
   DELAY = 'DELAY',
   SMS = 'SMS',
+  CHAT = 'CHAT',
 }
 
 export enum UiComponentEnum {
@@ -79,6 +80,7 @@ export enum UiComponentEnum {
   DELAY_AMOUNT = 'DELAY_AMOUNT',
   DELAY_UNIT = 'DELAY_UNIT',
   SMS_BODY = 'SMS_BODY',
+  CHAT_BODY = 'CHAT_BODY',
 }
 
 export class UiSchemaProperty {
