@@ -21,4 +21,8 @@ export interface FacetedFilterProps {
   placeholder?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  icon?: ComponentType<{ className?: string }>;
+  hideTitle?: boolean;
+  hideSearch?: boolean;
+  hideClear?: boolean;
 }

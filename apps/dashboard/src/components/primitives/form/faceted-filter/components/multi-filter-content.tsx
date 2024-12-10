@@ -15,6 +15,8 @@ interface MultiFilterContentProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
   size: SizeType;
+  hideSearch?: boolean;
+  hideClear?: boolean;
 }
 
 export function MultiFilterContent({
@@ -27,17 +29,21 @@ export function MultiFilterContent({
   searchQuery,
   onSearchChange,
   size,
+  hideSearch = false,
+  hideClear = false,
 }: MultiFilterContentProps) {
   return (
     <div className={STYLES.size[size].content}>
-      <FilterInput
-        inputRef={inputRef}
-        value={searchQuery}
-        onChange={(e) => onSearchChange(e.target.value)}
-        placeholder={`Search ${title}...`}
-        size={size}
-      />
-      <div className="mt-2">
+      {!hideSearch && (
+        <FilterInput
+          inputRef={inputRef}
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder={`Search ${title}...`}
+          size={size}
+        />
+      )}
+      <div className={cn('mt-2', hideSearch && 'mt-0')}>
         {options.map((option) => {
           const isSelected = selectedValues.has(option.value);
           return (
@@ -64,7 +70,7 @@ export function MultiFilterContent({
           );
         })}
       </div>
-      {selectedValues.size > 0 && <ClearButton onClick={onClear} size={size} label="Clear filters" />}
+      {!hideClear && selectedValues.size > 0 && <ClearButton onClick={onClear} size={size} label="Clear filters" />}
     </div>
   );
 }

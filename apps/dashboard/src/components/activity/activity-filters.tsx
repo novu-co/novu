@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { Form, FormItem, FormField } from '../primitives/form/form';
 import { Button } from '../primitives/button';
 import { FacetedFormFilter } from '../primitives/form/faceted-filter/facated-form-filter';
+import { CalendarIcon } from 'lucide-react';
 
 interface IActivityFilters {
   onFiltersChange: (filters: IActivityFiltersData) => void;
@@ -41,55 +42,55 @@ const defaultValues: IActivityFiltersData = {
 };
 
 export function ActivityFilters({ onFiltersChange, initialValues }: IActivityFilters) {
-  const originalInitialValues = useRef(defaultValues);
   const form = useForm<IActivityFiltersData>({
-    defaultValues: initialValues,
+    defaultValues: initialValues || defaultValues,
   });
 
-  const { data: workflowTemplates } = useFetchWorkflows({ limit: 100 });
-  const formValues = form.watch();
+  const { data: workflowTemplates } = useFetchWorkflows({});
 
   const hasChanges = useMemo(() => {
-    const original = originalInitialValues.current;
-    return Object.entries(formValues).some(([key, value]) => {
-      const defaultValue = original[key as keyof IActivityFiltersData];
-      if (Array.isArray(value) && Array.isArray(defaultValue)) {
-        return value.length > 0;
-      }
-      return value !== defaultValue;
-    });
-  }, [formValues]);
+    const currentValues = form.getValues();
 
-  const handleReset = () => {
-    form.reset(originalInitialValues.current);
-    onFiltersChange(originalInitialValues.current);
-  };
+    return (
+      currentValues.dateRange !== defaultValues.dateRange ||
+      currentValues.channels.length > 0 ||
+      currentValues.templates.length > 0 ||
+      currentValues.transactionId !== defaultValues.transactionId ||
+      currentValues.subscriberId !== defaultValues.subscriberId
+    );
+  }, [form.watch()]);
 
   useEffect(() => {
     const subscription = form.watch((value) => {
-      if (value) {
-        onFiltersChange(value as IActivityFiltersData);
-      }
+      onFiltersChange(value as IActivityFiltersData);
     });
 
     return () => subscription.unsubscribe();
-  }, [onFiltersChange]);
+  }, [form, onFiltersChange]);
+
+  const handleReset = () => {
+    form.reset(defaultValues);
+  };
 
   return (
     <Form {...form}>
-      <form className="flex items-center gap-3 px-2.5 py-2">
+      <form className="flex items-center gap-2 p-2.5">
         <FormField
           control={form.control}
           name="dateRange"
           render={({ field }) => (
             <FormItem className="space-y-0">
               <FacetedFormFilter
+                hideTitle
                 size="small"
                 type="single"
-                title="Time Range"
+                title="Time period"
                 options={DATE_RANGE_OPTIONS}
-                selected={field.value ? [field.value] : []}
+                selected={[field.value]}
                 onSelect={(values) => field.onChange(values[0])}
+                hideSearch
+                hideClear
+                icon={CalendarIcon}
               />
             </FormItem>
           )}

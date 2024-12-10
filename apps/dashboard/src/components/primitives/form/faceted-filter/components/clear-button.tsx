@@ -8,13 +8,21 @@ interface ClearButtonProps {
   onClick: () => void;
   size: SizeType;
   label?: string;
+  className?: string;
+  separatorClassName?: string;
 }
 
-export function ClearButton({ onClick, size, label = 'Clear filter' }: ClearButtonProps) {
+export function ClearButton({
+  onClick,
+  size,
+  label = 'Clear filter',
+  className,
+  separatorClassName,
+}: ClearButtonProps) {
   return (
     <>
-      <Separator className="my-2" />
-      <Button variant="ghost" onClick={onClick} className={cn(STYLES.clearButton, STYLES.size[size].input)}>
+      <Separator className={cn('my-2', separatorClassName)} />
+      <Button variant="ghost" onClick={onClick} className={cn(STYLES.clearButton, STYLES.size[size].input, className)}>
         {label}
       </Button>
     </>

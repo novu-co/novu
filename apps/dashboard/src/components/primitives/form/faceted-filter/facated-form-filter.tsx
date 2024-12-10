@@ -23,6 +23,10 @@ export function FacetedFormFilter({
   placeholder,
   open,
   onOpenChange,
+  icon: Icon,
+  hideTitle = false,
+  hideSearch = false,
+  hideClear = false,
 }: FacetedFilterProps) {
   const [searchQuery, setSearchQuery] = React.useState('');
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -71,7 +75,6 @@ export function FacetedFormFilter({
     if (type === 'text' && currentValue) {
       return (
         <>
-          <Separator orientation="vertical" className={cn('mx-2', sizes.separator)} />
           <FilterBadge content={currentValue} size={size} />
         </>
       );
@@ -84,7 +87,6 @@ export function FacetedFormFilter({
 
     return (
       <>
-        <Separator orientation="vertical" className={cn('mx-2', sizes.separator)} />
         <div className="lg:hidden">
           <FilterBadge content={selectedCount} size={size} />
         </div>
@@ -105,6 +107,8 @@ export function FacetedFormFilter({
       title,
       size,
       onClear: handleClear,
+      hideSearch,
+      hideClear,
     };
 
     if (type === 'text') {
@@ -139,17 +143,27 @@ export function FacetedFormFilter({
           variant="outline"
           size="sm"
           className={cn(
-            'border-neutral-200 px-1.5 text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-900',
-            isEmpty && 'border-dashed',
-            sizes.trigger
+            'h-10 border-neutral-300 bg-white px-3 text-neutral-600',
+            'hover:border-neutral-300 hover:bg-neutral-50/30 hover:text-neutral-700',
+            'rounded-lg transition-colors duration-200 ease-out',
+            sizes.trigger,
+            isEmpty && 'border-dashed border-neutral-200 px-1.5 hover:border-neutral-300',
+            !isEmpty && 'border-solid bg-white'
           )}
         >
-          {isEmpty && <PlusCircle className="h-4 w-4" />}
-          {title}
-          {renderTriggerContent()}
+          <div className="flex items-center gap-1">
+            {Icon && <Icon className="h-4 w-4 text-neutral-600" />}
+            {isEmpty && <PlusCircle className="h-4 w-4 text-neutral-300" />}
+            {(isEmpty || !hideTitle) && (
+              <span className={cn('text-xs font-normal', isEmpty ? 'text-neutral-400' : 'text-neutral-600')}>
+                {title}
+              </span>
+            )}
+            {!isEmpty && renderTriggerContent()}
+          </div>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0" align="start">
+      <PopoverContent className="min-w-[200px] p-0" align="start">
         {renderContent()}
       </PopoverContent>
     </Popover>
