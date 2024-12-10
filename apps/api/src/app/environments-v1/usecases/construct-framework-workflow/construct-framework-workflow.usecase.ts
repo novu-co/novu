@@ -195,7 +195,7 @@ export class ConstructFrameworkWorkflow {
     return {
       // TODO: fix the `JSONSchemaDto` type to enforce a non-primitive schema type.
       controlSchema: staticStep.template!.controls!.schema as JsonSchema,
-      skip: (controlValues) => this.processSkipOption(controlValues, fullPayloadForRender),
+      skip: (controlValues: { [x: string]: unknown }) => this.processSkipOption(controlValues, fullPayloadForRender),
     };
   }
 

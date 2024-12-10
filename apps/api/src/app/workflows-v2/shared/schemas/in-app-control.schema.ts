@@ -22,6 +22,7 @@ const actionZodSchema = z
 
 export const InAppControlZodSchema = z
   .object({
+    skip: z.object({}).catchall(z.unknown()).optional(),
     subject: z.string().optional(),
     body: z.string(),
     avatar: z.string().optional(),

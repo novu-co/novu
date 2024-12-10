@@ -7,6 +7,7 @@ export const EmailStepControlZodSchema = z
   .object({
     emailEditor: z.string(),
     subject: z.string(),
+    skip: z.object({}).catchall(z.unknown()).optional(),
   })
   .strict()
   .required({

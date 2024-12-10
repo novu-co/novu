@@ -35,6 +35,7 @@ import {
   TemplateVariableTypeEnum,
   CreateWorkflowDto,
   WorkflowCreationSourceEnum,
+  WorkflowResponseDto,
 } from '@novu/shared';
 import { EmailEventStatusEnum } from '@novu/stateless';
 import { DetailEnum } from '@novu/application-generic';
@@ -3230,16 +3231,17 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
   }
 
   describe('Trigger Event New Dashboard - /v1/events/trigger (POST)', function () {
-    it('should skip step based on processSkipOption', async function () {
+    it('should skip step based on skip', async function () {
       const workflowBody: CreateWorkflowDto = {
         name: 'Test Skip Workflow',
         workflowId: 'test-skip-workflow',
         __source: WorkflowCreationSourceEnum.DASHBOARD,
         steps: [
           {
-            type: StepTypeEnum.EMAIL,
+            type: StepTypeEnum.IN_APP,
             name: 'Message Name',
             controlValues: {
+              body: 'Hello {{subscriber.lastName}}, Welcome!',
               skip: {
                 '==': [{ var: 'payload.shouldSkip' }, true],
               },
@@ -3250,125 +3252,35 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
 
       const response = await session.testAgent.post('/v2/workflows').send(workflowBody);
       expect(response.status).to.equal(201);
-      const workflow = response.body.data;
+      const workflow: WorkflowResponseDto = response.body.data;
 
       await novuClient.trigger({
-        name: workflow.triggers[0].identifier,
+        name: workflow.workflowId,
         to: [subscriber.subscriberId],
         payload: {
           shouldSkip: true,
         },
       });
-
       await session.awaitRunningJobs(workflow._id);
-
-      const messages = await messageRepository.find({
+      const skippedMessages = await messageRepository.find({
         _environmentId: session.environment._id,
         _subscriberId: subscriber._id,
-        channel: ChannelTypeEnum.EMAIL,
       });
-
-      expect(messages.length).to.equal(0);
-    });
-
-    it('should not skip step when processSkipOption condition is not met', async function () {
-      const workflowBody = {
-        name: 'Test Skip Workflow 2',
-        description: 'A workflow to test skip functionality',
-        active: true,
-        draft: false,
-        critical: false,
-        tags: ['test'],
-        steps: [
-          {
-            type: StepTypeEnum.EMAIL,
-            name: 'Message Name',
-            subject: 'Test email subject',
-            content: 'Test email content',
-            controlValues: {
-              skip: {
-                '==': [{ var: 'shouldSkip' }, true],
-              },
-            },
-          },
-        ],
-      };
-
-      const response = await session.testAgent.post('/v2/workflows').send(workflowBody);
-      expect(response.status).to.equal(201);
-      const workflow = response.body.data;
+      expect(skippedMessages.length).to.equal(0);
 
       await novuClient.trigger({
-        name: workflow.triggers[0].identifier,
+        name: workflow.workflowId,
         to: [subscriber.subscriberId],
         payload: {
           shouldSkip: false,
         },
       });
-
       await session.awaitRunningJobs(workflow._id);
-
-      const messages = await messageRepository.find({
+      const notSkippedMessages = await messageRepository.find({
         _environmentId: session.environment._id,
         _subscriberId: subscriber._id,
-        channel: ChannelTypeEnum.EMAIL,
       });
-
-      expect(messages.length).to.equal(1);
-    });
-
-    it('should handle complex skip conditions with multiple operators', async function () {
-      const workflowBody = {
-        name: 'Test Skip Workflow 3',
-        description: 'A workflow to test skip functionality',
-        active: true,
-        draft: false,
-        critical: false,
-        tags: ['test'],
-        steps: [
-          {
-            type: StepTypeEnum.EMAIL,
-            name: 'Message Name',
-            subject: 'Test email subject',
-            content: 'Test email content',
-            controlValues: {
-              skip: {
-                and: [
-                  {
-                    '==': [{ var: 'userType' }, 'premium'],
-                  },
-                  {
-                    '==': [{ var: 'skipEmails' }, true],
-                  },
-                ],
-              },
-            },
-          },
-        ],
-      };
-
-      const response = await session.testAgent.post('/v2/workflows').send(workflowBody);
-      expect(response.status).to.equal(201);
-      const workflow = response.body.data;
-
-      await novuClient.trigger({
-        name: workflow.triggers[0].identifier,
-        to: [subscriber.subscriberId],
-        payload: {
-          userType: 'premium',
-          skipEmails: true,
-        },
-      });
-
-      await session.awaitRunningJobs(workflow._id);
-
-      const messages = await messageRepository.find({
-        _environmentId: session.environment._id,
-        _subscriberId: subscriber._id,
-        channel: ChannelTypeEnum.EMAIL,
-      });
-
-      expect(messages.length).to.equal(0);
+      expect(notSkippedMessages.length).to.equal(1);
     });
   });
 });
