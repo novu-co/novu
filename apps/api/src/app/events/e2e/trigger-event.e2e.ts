@@ -33,17 +33,14 @@ import {
   StepTypeEnum,
   SystemAvatarIconEnum,
   TemplateVariableTypeEnum,
+  CreateWorkflowDto,
   WorkflowCreationSourceEnum,
-  IWorkflowStepMetadata,
-  IWorkflowResponse,
 } from '@novu/shared';
 import { EmailEventStatusEnum } from '@novu/stateless';
 import { DetailEnum } from '@novu/application-generic';
-import { Novu } from '@novu/node';
+import { Novu } from '@novu/api';
 import { SubscriberPayloadDto } from '@novu/api/src/models/components/subscriberpayloaddto';
 import { CreateIntegrationRequestDto, TriggerEventResponseDto } from '@novu/api/models/components';
-import { CreateWorkflowDto } from '@novu/api/models/components/workflow';
-import { createWorkflowClient } from '@novu/api/src/helpers/workflow-client';
 import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 import { createTenant } from '../../tenant/e2e/create-tenant.e2e';
 
@@ -68,7 +65,7 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
   const environmentRepository = new EnvironmentRepository();
   const tenantRepository = new TenantRepository();
   let novuClient: Novu;
-  let workflowsClient: ReturnType<typeof createWorkflowClient>;
+
   beforeEach(async () => {
     session = new UserSession();
     await session.initialize();
@@ -80,10 +77,6 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
       environmentId: session.environment._id,
     });
     novuClient = initNovuClassSdk(session);
-    workflowsClient = createWorkflowClient(session.serverUrl, {
-      Authorization: session.token,
-      'Novu-Environment-Id': session.environment._id,
-    });
   });
 
   describe(`Trigger Event - /v1/events/trigger (POST)`, function () {
@@ -2207,7 +2200,7 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
         ],
       });
 
-      // const axiosPostStub = sinon.stub(axios, 'post').throws(new Error('Users remote error'));
+      // const axiosPostStub = sinon.stub(axios, 'post').throws(new Error('Users remote error')));
 
       await novuClient.trigger({
         name: template.triggers[0].identifier,
@@ -3232,59 +3225,24 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
       tenant,
       actor,
     };
-    console.log('request111', JSON.stringify(request, null, 2));
 
     return (await novuClient.trigger(request)).result;
   }
 
   describe('Trigger Event New Dashboard - /v1/events/trigger (POST)', function () {
-    let session: UserSession;
-    let workflow: IWorkflowResponse;
-    let subscriber: SubscriberEntity;
-    let subscriberService: SubscribersService;
-    const notificationRepository = new NotificationRepository();
-    const messageRepository = new MessageRepository();
-    const subscriberRepository = new SubscriberRepository();
-    const jobRepository = new JobRepository();
-    let novuClient: Novu;
-
-    beforeEach(async () => {
-      session = new UserSession();
-      await session.initialize();
-      subscriberService = new SubscribersService(session.organization._id, session.environment._id);
-      subscriber = await subscriberService.createSubscriber();
-      novuClient = initNovuClassSdk(session);
-    });
-
     it('should skip step based on processSkipOption', async function () {
-      const workflowBody = {
+      const workflowBody: CreateWorkflowDto = {
         name: 'Test Skip Workflow',
-        description: 'A workflow to test skip functionality',
-        active: true,
-        draft: false,
-        critical: false,
-        tags: ['test'],
+        workflowId: 'test-skip-workflow',
+        __source: WorkflowCreationSourceEnum.DASHBOARD,
         steps: [
           {
-            template: {
-              type: StepTypeEnum.EMAIL,
-              name: 'Message Name',
-              subject: 'Test email subject',
-              content: 'Test email content',
-            },
-            metadata: {
+            type: StepTypeEnum.EMAIL,
+            name: 'Message Name',
+            controlValues: {
               skip: {
-                type: 'boolean',
-                defaultValue: false,
-                conditions: [
-                  {
-                    field: 'shouldSkip',
-                    value: 'true',
-                    operator: FieldOperatorEnum.EQUAL,
-                    on: FilterPartTypeEnum.PAYLOAD,
-                  },
-                ],
-              } as IWorkflowStepMetadata,
+                '==': [{ var: 'payload.shouldSkip' }, true],
+              },
             },
           },
         ],
@@ -3292,7 +3250,7 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
 
       const response = await session.testAgent.post('/v2/workflows').send(workflowBody);
       expect(response.status).to.equal(201);
-      workflow = response.body.data;
+      const workflow = response.body.data;
 
       await novuClient.trigger({
         name: workflow.triggers[0].identifier,
@@ -3323,25 +3281,14 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
         tags: ['test'],
         steps: [
           {
-            template: {
-              type: StepTypeEnum.EMAIL,
-              name: 'Message Name',
-              subject: 'Test email subject',
-              content: 'Test email content',
-            },
-            metadata: {
+            type: StepTypeEnum.EMAIL,
+            name: 'Message Name',
+            subject: 'Test email subject',
+            content: 'Test email content',
+            controlValues: {
               skip: {
-                type: 'boolean',
-                defaultValue: false,
-                conditions: [
-                  {
-                    field: 'shouldSkip',
-                    value: 'true',
-                    operator: FieldOperatorEnum.EQUAL,
-                    on: FilterPartTypeEnum.PAYLOAD,
-                  },
-                ],
-              } as IWorkflowStepMetadata,
+                '==': [{ var: 'shouldSkip' }, true],
+              },
             },
           },
         ],
@@ -3349,7 +3296,7 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
 
       const response = await session.testAgent.post('/v2/workflows').send(workflowBody);
       expect(response.status).to.equal(201);
-      workflow = response.body.data;
+      const workflow = response.body.data;
 
       await novuClient.trigger({
         name: workflow.triggers[0].identifier,
@@ -3380,31 +3327,21 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
         tags: ['test'],
         steps: [
           {
-            template: {
-              type: StepTypeEnum.EMAIL,
-              name: 'Message Name',
-              subject: 'Test email subject',
-              content: 'Test email content',
-            },
-            metadata: {
+            type: StepTypeEnum.EMAIL,
+            name: 'Message Name',
+            subject: 'Test email subject',
+            content: 'Test email content',
+            controlValues: {
               skip: {
-                type: 'boolean',
-                defaultValue: false,
-                conditions: [
+                and: [
                   {
-                    field: 'userType',
-                    value: 'premium',
-                    operator: FieldOperatorEnum.EQUAL,
-                    on: FilterPartTypeEnum.PAYLOAD,
+                    '==': [{ var: 'userType' }, 'premium'],
                   },
                   {
-                    field: 'skipEmails',
-                    value: 'true',
-                    operator: FieldOperatorEnum.EQUAL,
-                    on: FilterPartTypeEnum.PAYLOAD,
+                    '==': [{ var: 'skipEmails' }, true],
                   },
                 ],
-              } as IWorkflowStepMetadata,
+              },
             },
           },
         ],
@@ -3412,7 +3349,7 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
 
       const response = await session.testAgent.post('/v2/workflows').send(workflowBody);
       expect(response.status).to.equal(201);
-      workflow = response.body.data;
+      const workflow = response.body.data;
 
       await novuClient.trigger({
         name: workflow.triggers[0].identifier,
