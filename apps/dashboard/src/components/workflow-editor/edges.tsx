@@ -2,7 +2,7 @@ import { BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xy
 import { AddStepMenu } from './add-step-menu';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { WorkflowOriginEnum } from '@novu/shared';
-import { createStep } from '@/components/workflow-editor/steps/step-provider';
+import { createStep } from '@/components/workflow-editor/step-utils';
 
 export type AddNodeEdgeType = Edge<{ isLast: boolean; addStepIndex: number }>;
 

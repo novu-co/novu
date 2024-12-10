@@ -88,7 +88,7 @@ export function EnvironmentProvider({ children }: { children: React.ReactNode })
     refetch: refetchEnvironments,
   } = useQuery<IEnvironment[]>([QueryKeys.myEnvironments, currentOrganization?._id], getEnvironments, {
     enabled: !!currentOrganization,
-    retry: false,
+    retry: 2, // Retry once on 401 if the stored environment is invalid
     staleTime: Infinity,
     onSuccess(envs) {
       /*
