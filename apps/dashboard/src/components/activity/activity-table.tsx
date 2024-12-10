@@ -14,7 +14,6 @@ import { StepIndicators } from './components/step-indicators';
 import { Pagination } from './components/pagination';
 import { useRef, useEffect } from 'react';
 import { IActivityFilters } from '@/api/activity';
-import { FacetedFormFilter } from '../primitives/form/faceted-form-filter';
 
 export interface ActivityTableProps {
   selectedActivityId: string | null;
