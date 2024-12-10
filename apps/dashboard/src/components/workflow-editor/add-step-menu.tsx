@@ -8,6 +8,10 @@ import { Badge } from '../primitives/badge';
 import { cn } from '@/utils/ui';
 import { StepTypeEnum } from '@/utils/enums';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
+
+const noop = () => {};
 
 const MenuGroup = ({ children }: { children: ReactNode }) => {
   return <div className="flex flex-col">{children}</div>;
@@ -41,7 +45,7 @@ const MenuItem = ({
 
   return (
     <span
-      onClick={onClick}
+      onClick={!disabled ? onClick : noop}
       className={cn(
         'shadow-xs text-foreground-600 hover:bg-accent flex cursor-pointer items-center gap-2 rounded-lg p-1.5',
         {
@@ -73,6 +77,7 @@ export const AddStepMenu = ({
   onMenuItemClick: (stepType: StepTypeEnum) => void;
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const areNewStepsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
 
   const handleMenuItemClick = (stepType: StepTypeEnum) => {
     onMenuItemClick(stepType);
@@ -104,7 +109,13 @@ export const AddStepMenu = ({
             <MenuGroup>
               <MenuTitle>Channels</MenuTitle>
               <MenuItemsGroup>
-                <MenuItem stepType={StepTypeEnum.EMAIL}>Email</MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.EMAIL}
+                  disabled={!areNewStepsEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.EMAIL)}
+                >
+                  Email
+                </MenuItem>
                 <MenuItem
                   stepType={StepTypeEnum.IN_APP}
                   disabled={false}
@@ -121,7 +132,13 @@ export const AddStepMenu = ({
               <MenuTitle>Action Steps</MenuTitle>
               <MenuItemsGroup>
                 <MenuItem stepType={StepTypeEnum.DIGEST}>Digest</MenuItem>
-                <MenuItem stepType={StepTypeEnum.DELAY}>Delay</MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.DELAY}
+                  disabled={!areNewStepsEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.DELAY)}
+                >
+                  Delay
+                </MenuItem>
               </MenuItemsGroup>
             </MenuGroup>
           </div>

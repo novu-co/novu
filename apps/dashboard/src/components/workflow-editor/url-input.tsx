@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
@@ -33,6 +34,7 @@ export const URLInput = ({
   const url = getFieldState(`${urlKey}`);
   const target = getFieldState(`${targetKey}`);
   const error = url.error || target.error;
+  const extensions = useMemo(() => [autocompletion({ override: [completions(variables)] })], [variables]);
 
   return (
     <div className="flex flex-col gap-1">
@@ -43,14 +45,14 @@ export const URLInput = ({
               control={control}
               name={urlKey}
               render={({ field }) => (
-                <FormItem className="mr-auto min-w-px max-w-full">
+                <FormItem className="min-w-px max-w-full basis-full">
                   <FormControl>
                     {asEditor ? (
                       <Editor
                         asInput
                         fontFamily="inherit"
                         placeholder={placeholder}
-                        extensions={[autocompletion({ override: [completions(variables)] })]}
+                        extensions={extensions}
                         value={field.value}
                         onChange={field.onChange}
                       />

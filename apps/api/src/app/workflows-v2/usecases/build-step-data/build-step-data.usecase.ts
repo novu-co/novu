@@ -1,17 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ControlValuesLevelEnum, StepDataDto, WorkflowOriginEnum } from '@novu/shared';
+import { ControlValuesLevelEnum, ShortIsPrefixEnum, StepDataDto, WorkflowOriginEnum } from '@novu/shared';
 import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { GetWorkflowByIdsUseCase, Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { BuildStepDataCommand } from './build-step-data.command';
 import { InvalidStepException } from '../../exceptions/invalid-step.exception';
 import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
+import { buildSlug } from '../../../shared/helpers/build-slug';
 
 @Injectable()
 export class BuildStepDataUsecase {
   constructor(
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private controlValuesRepository: ControlValuesRepository,
-    private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase // Dependency injection for new use case
+    private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase
   ) {}
 
   @InstrumentUsecase()
@@ -19,15 +20,12 @@ export class BuildStepDataUsecase {
     const workflow = await this.fetchWorkflow(command);
 
     const { currentStep } = await this.loadStepsFromDb(command, workflow);
-    if (
-      currentStep.name === undefined ||
-      !currentStep._templateId ||
-      currentStep.stepId === undefined ||
-      !currentStep.template?.type
-    ) {
+
+    if (!currentStep._templateId || !currentStep.template?.type) {
       throw new InvalidStepException(currentStep);
     }
     const controlValues = await this.getValues(command, currentStep, workflow._id);
+    const stepName = currentStep.name || 'Missing Step Name';
 
     return {
       controls: {
@@ -35,13 +33,17 @@ export class BuildStepDataUsecase {
         uiSchema: currentStep.template?.controls?.uiSchema,
         values: controlValues,
       },
-      variables: this.buildAvailableVariableSchemaUsecase.execute({
-        stepDatabaseId: currentStep._templateId,
+      variables: await this.buildAvailableVariableSchemaUsecase.execute({
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
+        userId: command.user._id,
+        stepInternalId: currentStep._templateId,
         workflow,
-      }), // Use the new use case to build variables schema
-      name: currentStep.name,
+      }),
+      name: stepName,
+      slug: buildSlug(stepName, ShortIsPrefixEnum.STEP, currentStep._templateId),
       _id: currentStep._templateId,
-      stepId: currentStep.stepId,
+      stepId: currentStep.stepId || 'Missing Step Id',
       type: currentStep.template?.type,
       origin: workflow.origin || WorkflowOriginEnum.EXTERNAL,
       workflowId: workflow.triggers[0].identifier,
@@ -53,7 +55,7 @@ export class BuildStepDataUsecase {
   @Instrument()
   private async fetchWorkflow(command: BuildStepDataCommand) {
     return await this.getWorkflowByIdsUseCase.execute({
-      identifierOrInternalId: command.identifierOrInternalId,
+      workflowIdOrInternalId: command.workflowIdOrInternalId,
       environmentId: command.user.environmentId,
       organizationId: command.user.organizationId,
       userId: command.user._id,
@@ -76,14 +78,14 @@ export class BuildStepDataUsecase {
   @Instrument()
   private async loadStepsFromDb(command: BuildStepDataCommand, workflow: NotificationTemplateEntity) {
     const currentStep = workflow.steps.find(
-      (stepItem) => stepItem._id === command.stepId || stepItem.stepId === command.stepId
+      (stepItem) => stepItem._id === command.stepIdOrInternalId || stepItem.stepId === command.stepIdOrInternalId
     );
 
     if (!currentStep) {
       throw new BadRequestException({
         message: 'No step found',
-        stepId: command.stepId,
-        workflowId: command.identifierOrInternalId,
+        stepId: command.stepIdOrInternalId,
+        workflowId: command.workflowIdOrInternalId,
       });
     }
 

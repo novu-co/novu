@@ -106,13 +106,13 @@ export class PrepareAndValidateContentUsecase {
     let flatSanitizedControlValues: Record<string, unknown> = flattenJson(controlValues);
     const controlValueToContentIssues: Record<string, ContentIssue[]> = {};
 
+    flatSanitizedControlValues = this.removeEmptyValuesFromMap(flatSanitizedControlValues);
     this.overloadMissingRequiredValuesIssues(
       defaultControlValues,
       flatSanitizedControlValues,
       controlValueToContentIssues
     );
 
-    flatSanitizedControlValues = this.removeEmptyValuesFromMap(flatSanitizedControlValues);
     flatSanitizedControlValues = this.removeIllegalValuesAndOverloadIssues(
       flatSanitizedControlValues,
       controlValueToValidPlaceholders,

@@ -71,6 +71,7 @@ program
   .option('-o, --origin <origin>', 'The Bridge endpoint origin')
   .option('-d, --dashboard-url <url>', 'The Novu Cloud Dashboard URL', 'https://dashboard.novu.co')
   .option('-sp, --studio-port <port>', 'The Local Studio server port', '2022')
+  .option('-sh, --studio-host <host>', 'The Local Studio server host', 'localhost')
   .option('-t, --tunnel <url>', 'Self hosted tunnel. e.g. https://my-tunnel.ngrok.app')
   .option('-H, --headless', 'Run the Bridge in headless mode without opening the browser', false)
   .action(async (options: DevCommandOptions) => {

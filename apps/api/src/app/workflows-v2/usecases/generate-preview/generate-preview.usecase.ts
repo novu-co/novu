@@ -2,8 +2,10 @@ import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common
 import _ from 'lodash';
 import {
   ChannelTypeEnum,
+  createMockObjectFromSchema,
   GeneratePreviewResponseDto,
   JobStatusEnum,
+  JSONSchemaDto,
   PreviewPayload,
   StepDataDto,
   WorkflowOriginEnum,
@@ -21,10 +23,9 @@ import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/previe
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
 import { BuildStepDataUsecase } from '../build-step-data';
 import { GeneratePreviewCommand } from './generate-preview.command';
-import { extractTemplateVars } from '../../util/template-variables/extract-template-variables';
-import { pathsToObject } from '../../util/path-to-object';
-import { createMockPayloadFromSchema, flattenObjectValues } from '../../util/utils';
 import { PrepareAndValidateContentUsecase } from '../validate-content/prepare-and-validate-content/prepare-and-validate-content.usecase';
+import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
+import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
@@ -35,7 +36,8 @@ export class GeneratePreviewUsecase {
     private buildStepDataUsecase: BuildStepDataUsecase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private readonly logger: PinoLogger,
-    private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase
+    private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase,
+    private buildPayloadSchema: BuildPayloadSchema
   ) {}
 
   @InstrumentUsecase()
@@ -44,13 +46,25 @@ export class GeneratePreviewUsecase {
       const { previewPayload: commandVariablesExample, controlValues: commandControlValues } =
         command.generatePreviewRequestDto;
       const stepData = await this.getStepData(command);
+      const controlValues = commandControlValues || stepData.controls.values || {};
       const workflow = await this.findWorkflow(command);
+      const payloadSchema = await this.buildPayloadSchema.execute(
+        BuildPayloadSchemaCommand.create({
+          environmentId: command.user.environmentId,
+          organizationId: command.user.organizationId,
+          userId: command.user._id,
+          workflowId: command.workflowIdOrInternalId,
+          controlValues,
+        })
+      );
+
+      const variableSchema = this.buildVariablesSchema(stepData.variables, payloadSchema);
       const preparedAndValidatedContent = await this.prepareAndValidateContentUsecase.execute({
         user: command.user,
         previewPayloadFromDto: commandVariablesExample,
-        controlValues: commandControlValues || stepData.controls.values || {},
+        controlValues,
         controlDataSchema: stepData.controls.dataSchema || {},
-        variableSchema: stepData.variables,
+        variableSchema,
       });
       const variablesExample = this.buildVariablesExample(
         workflow,
@@ -76,8 +90,8 @@ export class GeneratePreviewUsecase {
       this.logger.error(
         {
           err: error,
-          workflowIdOrInternalId: command.identifierOrInternalId,
-          stepIdOrInternalId: command.stepDatabaseId,
+          workflowIdOrInternalId: command.workflowIdOrInternalId,
+          stepIdOrInternalId: command.stepIdOrInternalId,
         },
         `Unexpected error while generating preview`,
         LOG_CONTEXT
@@ -97,6 +111,19 @@ export class GeneratePreviewUsecase {
     }
   }
 
+  /**
+   * Merges the payload schema into the variables schema to enable proper validation
+   * and sanitization of control values in the prepareAndValidateContentUsecase.
+   */
+  @Instrument()
+  private buildVariablesSchema(variables: Record<string, unknown>, payloadSchema: JSONSchemaDto) {
+    if (Object.keys(payloadSchema).length === 0) {
+      return variables;
+    }
+
+    return _.merge(variables, { properties: { payload: payloadSchema } });
+  }
+
   @Instrument()
   private buildVariablesExample(
     workflow: WorkflowInternalResponseDto,
@@ -107,36 +134,23 @@ export class GeneratePreviewUsecase {
       return finalPayload;
     }
 
-    const examplePayloadSchema = createMockPayloadFromSchema(workflow.payloadSchema);
+    const examplePayloadSchema = createMockObjectFromSchema({
+      type: 'object',
+      properties: { payload: workflow.payloadSchema },
+    });
 
     if (!examplePayloadSchema || Object.keys(examplePayloadSchema).length === 0) {
       return finalPayload;
     }
 
-    return _.merge(
-      finalPayload as Record<string, unknown>,
-      { payload: examplePayloadSchema },
-      commandVariablesExample || {}
-    );
-  }
-
-  @Instrument()
-  private generateVariablesExample(stepData: StepDataDto, commandControlValues?: Record<string, unknown>) {
-    const controlValues = flattenObjectValues(commandControlValues || stepData.controls.values).join(' ');
-    const templateVars = extractTemplateVars(controlValues);
-    const variablesExample = pathsToObject(templateVars, {
-      valuePrefix: '{{',
-      valueSuffix: '}}',
-    });
-
-    return variablesExample;
+    return _.merge(finalPayload as Record<string, unknown>, examplePayloadSchema, commandVariablesExample || {});
   }
 
   @Instrument()
   private async findWorkflow(command: GeneratePreviewCommand) {
     return await this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({
-        identifierOrInternalId: command.identifierOrInternalId,
+        workflowIdOrInternalId: command.workflowIdOrInternalId,
         environmentId: command.user.environmentId,
         organizationId: command.user.organizationId,
         userId: command.user._id,
@@ -147,8 +161,8 @@ export class GeneratePreviewUsecase {
   @Instrument()
   private async getStepData(command: GeneratePreviewCommand) {
     return await this.buildStepDataUsecase.execute({
-      identifierOrInternalId: command.identifierOrInternalId,
-      stepId: command.stepDatabaseId,
+      workflowIdOrInternalId: command.workflowIdOrInternalId,
+      stepIdOrInternalId: command.stepIdOrInternalId,
       user: command.user,
     });
   }

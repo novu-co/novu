@@ -12,8 +12,8 @@ import { useMutation } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
-  const { oppositeEnvironment, switchEnvironment } = useEnvironment();
+export function useSyncWorkflow(workflow: WorkflowResponseDto | WorkflowListResponseDto) {
+  const { currentEnvironment, oppositeEnvironment, switchEnvironment } = useEnvironment();
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
@@ -24,6 +24,7 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
     [workflow.origin, workflow.status]
   );
 
+  // TODO: Move UI logic outside of a hook to the Sync related UI component
   const getTooltipContent = () => {
     if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
       return `Code-first workflows cannot be synced to ${oppositeEnvironment?.name} using dashboard.`;
@@ -62,6 +63,7 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
     toast.dismiss(loadingToast);
     setIsLoading(false);
 
+    // TODO: Move UI logic outside of a hook to the Sync related UI component
     return showToast({
       variant: 'lg',
       className: 'gap-3',
@@ -99,14 +101,16 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
 
   const { mutateAsync: syncWorkflowMutation, isPending } = useMutation({
     mutationFn: async () =>
-      syncWorkflow(workflow._id, {
-        targetEnvironmentId: oppositeEnvironment?._id || '',
+      syncWorkflow({
+        environment: currentEnvironment!,
+        workflowSlug: workflow.slug,
+        payload: { targetEnvironmentId: oppositeEnvironment?._id || '' },
       }).then((res) => ({ workflow: res.data, environment: oppositeEnvironment || undefined })),
-    onMutate: () => {
+    onMutate: async () => {
       setIsLoading(true);
       loadingToast = toast.loading(
         <>
-          <ToastIcon variant="default" />
+          <ToastIcon variant="default" className="animate-spin" />
           <span className="text-sm">
             Syncing workflow <span className="font-bold">{workflow.name}</span> to {oppositeEnvironment?.name}...
           </span>
@@ -120,7 +124,8 @@ export function useSyncWorkflow(workflow: WorkflowListResponseDto) {
   const { mutateAsync: isWorkflowInTargetEnvironment } = useMutation({
     mutationFn: async () => {
       const { data } = await getV2<{ data: WorkflowResponseDto }>(
-        `/workflows/${workflow.workflowId}?environmentId=${oppositeEnvironment?._id || ''}`
+        `/workflows/${workflow.workflowId}?environmentId=${oppositeEnvironment?._id || ''}`,
+        { environment: currentEnvironment! }
       );
       return data;
     },

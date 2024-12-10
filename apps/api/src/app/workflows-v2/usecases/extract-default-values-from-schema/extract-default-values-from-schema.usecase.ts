@@ -1,6 +1,24 @@
-import { JSONSchemaDto, PreviewIssueEnum } from '@novu/shared';
+import { JSONSchemaDto, PreviewIssueEnum, TipTapNode } from '@novu/shared';
 import { Injectable } from '@nestjs/common';
 import { ExtractDefaultValuesFromSchemaCommand } from './extract-default-values-from-schema.command';
+
+const DEFAULT_PREVIEW_ISSUE_MESSAGE: TipTapNode = {
+  type: 'doc',
+  content: [
+    {
+      type: 'paragraph',
+      attrs: {
+        textAlign: 'left',
+      },
+      content: [
+        {
+          type: 'text',
+          text: PreviewIssueEnum.PREVIEW_ISSUE_REQUIRED_CONTROL_VALUE_IS_MISSING,
+        },
+      ],
+    },
+  ],
+};
 
 @Injectable()
 export class ExtractDefaultValuesFromSchemaUsecase {
@@ -31,14 +49,7 @@ export class ExtractDefaultValuesFromSchemaUsecase {
           continue;
         }
 
-        if (value.default === undefined) {
-          if (key.toLowerCase().trim().includes('url')) {
-            result[key] = 'https://www.example.com/search?query=placeholder';
-          }
-          result[key] = PreviewIssueEnum.PREVIEW_ISSUE_REQUIRED_CONTROL_VALUE_IS_MISSING;
-        } else {
-          result[key] = value.default;
-        }
+        result[key] = this.getValue(value, key);
 
         const nestedDefaults = this.extractDefaults(value);
         if (Object.keys(nestedDefaults).length > 0) {
@@ -48,6 +59,24 @@ export class ExtractDefaultValuesFromSchemaUsecase {
     }
 
     return result;
+  }
+
+  private getValue(value: JSONSchemaDto, key: string) {
+    const normalizedKey = key.toLowerCase().trim();
+
+    if (value.default != null) {
+      return value.default;
+    }
+
+    if (normalizedKey.includes('url')) {
+      return 'https://www.example.com/search?query=placeholder';
+    }
+
+    if (normalizedKey.includes('emaileditor')) {
+      return JSON.stringify(DEFAULT_PREVIEW_ISSUE_MESSAGE);
+    }
+
+    return PreviewIssueEnum.PREVIEW_ISSUE_REQUIRED_CONTROL_VALUE_IS_MISSING;
   }
 }
 

@@ -24,7 +24,7 @@ import {
 import { TagInput } from '@/components/primitives/tag-input';
 import { Textarea } from '@/components/primitives/textarea';
 import { useEnvironment } from '@/context/environment/hooks';
-import { useTagsQuery } from '@/hooks/use-tags-query';
+import { useTags } from '@/hooks/use-tags';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
@@ -36,8 +36,9 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
   const [isOpen, setIsOpen] = useState(false);
+  // TODO: Move to a use-create-workflow.ts hook
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (data: CreateWorkflowDto) => createWorkflow(data),
+    mutationFn: async (workflow: CreateWorkflowDto) => createWorkflow({ environment: currentEnvironment!, workflow }),
     onSuccess: async (result) => {
       await queryClient.invalidateQueries({ queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id] });
       await queryClient.invalidateQueries({
@@ -56,7 +57,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
       );
     },
   });
-  const tagsQuery = useTagsQuery();
+  const { tags } = useTags();
 
   const form = useForm<z.infer<typeof workflowSchema>>({
     resolver: zodResolver(workflowSchema),
@@ -152,11 +153,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <FormLabel hint={`(max. ${MAX_TAG_ELEMENTS})`}>Add tags</FormLabel>
                     </div>
                     <FormControl>
-                      <TagInput
-                        suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []}
-                        {...field}
-                        value={field.value ?? []}
-                      />
+                      <TagInput suggestions={tags.map((tag) => tag.name)} {...field} value={field.value ?? []} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

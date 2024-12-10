@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
+import { HTMLAttributes, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import { ChannelTypeEnum } from '@novu/shared';
 
-import { usePreviewStep } from '@/hooks';
+import { usePreviewStep } from '@/hooks/use-preview-step';
 import {
   InAppPreview,
   InAppPreviewAvatar,
@@ -15,7 +15,8 @@ import {
 } from '@/components/workflow-editor/in-app-preview';
 import { useStep } from '@/components/workflow-editor/steps/step-provider';
 
-export function ConfigureInAppStepPreview() {
+type ConfigureInAppStepPreviewProps = HTMLAttributes<HTMLDivElement>;
+export const ConfigureInAppStepPreview = (props: ConfigureInAppStepPreviewProps) => {
   const {
     previewStep,
     data: previewData,
@@ -38,14 +39,14 @@ export function ConfigureInAppStepPreview() {
     previewStep({
       workflowSlug,
       stepSlug,
-      data: { controlValues: step.controls.values, previewPayload: {} },
+      previewData: { controlValues: step.controls.values, previewPayload: {} },
     });
   }, [workflowSlug, stepSlug, previewStep, step, isPending]);
 
   const previewResult = previewData?.result;
   if (isPreviewPending || previewData === undefined) {
     return (
-      <InAppPreview>
+      <InAppPreview {...props}>
         <InAppPreviewHeader />
         <InAppPreviewNotification>
           <InAppPreviewAvatar isPending />
@@ -60,7 +61,7 @@ export function ConfigureInAppStepPreview() {
 
   if (previewResult?.type === undefined || previewResult?.type !== ChannelTypeEnum.IN_APP) {
     return (
-      <InAppPreview>
+      <InAppPreview {...props}>
         <InAppPreviewHeader />
         <InAppPreviewNotification className="flex-1 items-center">
           <InAppPreviewNotificationContent className="my-auto">
@@ -74,7 +75,7 @@ export function ConfigureInAppStepPreview() {
   const preview = previewResult.preview;
 
   return (
-    <InAppPreview>
+    <InAppPreview {...props}>
       <InAppPreviewHeader />
       <InAppPreviewNotification>
         <InAppPreviewAvatar src={preview?.avatar} />
@@ -85,4 +86,4 @@ export function ConfigureInAppStepPreview() {
       </InAppPreviewNotification>
     </InAppPreview>
   );
-}
+};

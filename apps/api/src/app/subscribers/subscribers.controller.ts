@@ -163,7 +163,7 @@ export class SubscribersController {
   })
   @ApiQuery({
     name: 'includeTopics',
-    type: String,
+    type: Boolean,
     description: 'Includes the topics associated with the subscriber',
     required: false,
   })

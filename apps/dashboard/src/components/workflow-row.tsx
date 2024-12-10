@@ -40,6 +40,7 @@ import { showToast } from './primitives/sonner-helpers';
 import { ToastIcon } from './primitives/sonner';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 import { PauseModalDescription, PAUSE_MODAL_TITLE } from '@/components/pause-workflow-dialog';
+import { DeleteWorkflowDialog } from './delete-workflow-dialog';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -106,7 +107,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
 
   const onDeleteWorkflow = async () => {
     await deleteWorkflow({
-      workflowId: workflow._id,
+      workflowSlug: workflow.slug,
     });
   };
 
@@ -142,7 +143,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
 
   const onPauseWorkflow = async () => {
     await patchWorkflow({
-      workflowId: workflow._id,
+      workflowSlug: workflow.slug,
       workflow: {
         active: workflow.status === WorkflowStatusEnum.ACTIVE ? false : true,
       },
@@ -167,9 +168,6 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
               <FaCode className="size-3" />
             </Badge>
           )}
-          {/**
-           * reloadDocument is needed for v1 workflows to reload the document when the user navigates to the workflow editor
-           */}
           <TruncatedText className="max-w-[32ch]" asChild>
             <Link to={workflowLink} reloadDocument={isV1Workflow}>
               {workflow.name}
@@ -207,21 +205,11 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
       </Tooltip>
 
       <TableCell className="w-1">
-        <ConfirmationModal
+        <DeleteWorkflowDialog
+          workflow={workflow}
           open={isDeleteModalOpen}
           onOpenChange={setIsDeleteModalOpen}
           onConfirm={onDeleteWorkflow}
-          title="Are you sure?"
-          description={
-            <>
-              You're about to delete the{' '}
-              <TruncatedText className="max-w-[32ch] font-bold">{workflow.name}</TruncatedText> workflow, this action is
-              permanent. <br />
-              <br />
-              You won't be able to trigger this workflow anymore.
-            </>
-          }
-          confirmButtonText="Delete"
           isLoading={isDeleteWorkflowPending}
         />
         <ConfirmationModal
@@ -241,8 +229,8 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
          */}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <RiMore2Fill />
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <RiMore2Fill className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">

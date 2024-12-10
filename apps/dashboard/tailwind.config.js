@@ -99,6 +99,7 @@ export default {
       ring: 'hsl(var(--ring))',
     },
     fontSize: {
+      '2xs': ['0.625rem', '0.875rem'], // 10px font size, 14px line height
       xs: ['0.75rem', '1rem'], // 12px font size, 16px line height
       sm: ['0.875rem', '1.25rem'], // 14px font size, 20px line height
       base: ['1rem', '1.5rem'], // 16px font size, 24px line height (default)
@@ -136,6 +137,10 @@ export default {
           '100%': {
             boxShadow: '0 0 0 0 rgba(255, 82, 82, 0)',
           },
+        },
+        gradient: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
         },
         'pulse-subtle': {
           '0%, 100%': { opacity: '1' },
@@ -188,6 +193,7 @@ export default {
         'pulse-subtle': 'pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         swing: 'swing 3s ease-in-out',
         jingle: 'jingle 3s ease-in-out',
+        gradient: 'gradient 5s ease infinite',
       },
       backgroundImage: {
         'test-pattern':
