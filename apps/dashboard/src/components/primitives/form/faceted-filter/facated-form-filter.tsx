@@ -1,14 +1,14 @@
-import * as React from 'react';
 import { PlusCircle } from 'lucide-react';
+import * as React from 'react';
+import { cn } from '../../../../utils/ui';
 import { Button } from '../../button';
 import { Popover, PopoverContent, PopoverTrigger } from '../../popover';
-import { cn } from '../../../../utils/ui';
-import { FacetedFilterProps } from './types';
-import { STYLES } from './styles';
 import { FilterBadge } from './components/filter-badge';
-import { TextFilterContent } from './components/text-filter-content';
-import { SingleFilterContent } from './components/single-filter-content';
 import { MultiFilterContent } from './components/multi-filter-content';
+import { SingleFilterContent } from './components/single-filter-content';
+import { TextFilterContent } from './components/text-filter-content';
+import { STYLES } from './styles';
+import { FacetedFilterProps } from './types';
 
 export function FacetedFormFilter({
   title,
