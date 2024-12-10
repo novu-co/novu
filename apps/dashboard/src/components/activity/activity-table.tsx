@@ -10,7 +10,7 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { getNotification } from '@/api/activity';
 import { StatusBadge } from './components/status-badge';
 import { StepIndicators } from './components/step-indicators';
-import { Pagination } from './components/pagination';
+import { ArrowPagination } from './components/arrow-pagination';
 import { useRef, useEffect } from 'react';
 import { IActivityFilters } from '@/api/activity';
 import { useFetchActivities } from '../../hooks/use-fetch-activities';
@@ -127,7 +127,7 @@ export function ActivityTable({
         </TableBody>
       </Table>
 
-      <Pagination page={page} limit={limit} hasMore={hasMore} onPageChange={handlePageChange} />
+      <ArrowPagination page={page} limit={limit} hasMore={hasMore} onPageChange={handlePageChange} />
     </div>
   );
 }

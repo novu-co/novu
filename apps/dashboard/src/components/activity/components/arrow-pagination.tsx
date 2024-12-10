@@ -1,14 +1,13 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/primitives/button';
 
-interface PaginationProps {
+interface ArrowPaginationProps {
   page: number;
-  limit: number;
   hasMore: boolean;
   onPageChange: (newPage: number) => void;
 }
 
-export function Pagination({ page, limit, hasMore, onPageChange }: PaginationProps) {
+export function ArrowPagination({ page, hasMore, onPageChange }: ArrowPaginationProps) {
   return (
     <div className="bottom-0 mt-auto border-t border-t-neutral-200 bg-white py-3">
       <div className="flex items-center justify-end px-6">
