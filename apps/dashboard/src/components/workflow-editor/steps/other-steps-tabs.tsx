@@ -52,7 +52,9 @@ export const OtherStepTabs = ({ workflow, step }: StepEditorProps) => {
       </header>
       <Separator />
       <TabsContent value="editor" className={tabsContentClassName}>
-        <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
+        <div className="px-3 py-5">
+          <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
+        </div>
       </TabsContent>
       <Separator />
     </Tabs>
