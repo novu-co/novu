@@ -6,7 +6,7 @@ import { StepDataDto, StepIssuesDto, StepTypeEnum } from '@novu/shared';
 import { createContextHook } from '@/utils/context';
 import { Step } from '@/utils/types';
 import { STEP_DIVIDER } from '@/utils/step';
-import { getEncodedId } from '@/utils/step';
+import { getWorkflowIdFromSlug } from '@/utils/step';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 export type StepEditorContextType = {
@@ -40,8 +40,8 @@ export const StepProvider = ({ children }: { children: ReactNode }) => {
   const issues = useMemo(() => {
     const newIssues = workflow?.steps.find(
       (s) =>
-        getEncodedId({ slug: s.slug, divider: STEP_DIVIDER }) ===
-        getEncodedId({ slug: stepSlug, divider: STEP_DIVIDER })
+        getWorkflowIdFromSlug({ slug: s.slug, divider: STEP_DIVIDER }) ===
+        getWorkflowIdFromSlug({ slug: stepSlug, divider: STEP_DIVIDER })
     )?.issues;
 
     return { ...newIssues };
