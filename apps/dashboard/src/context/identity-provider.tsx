@@ -18,23 +18,6 @@ export function IdentityProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!currentOrganization || !currentUser || hasIdentified.current) return;
 
-    if (ldClient) {
-      ldClient.identify({
-        kind: 'multi',
-        organization: {
-          key: currentOrganization._id,
-          name: currentOrganization.name,
-          createdAt: currentOrganization.createdAt,
-        },
-        user: {
-          key: currentUser._id,
-          firstName: currentUser.firstName,
-          lastName: currentUser.lastName,
-          email: currentUser.email,
-        },
-      });
-    }
-
     if (shouldMonitor) {
       segment.identify(currentUser);
 
@@ -45,6 +28,23 @@ export function IdentityProvider({ children }: { children: React.ReactNode }) {
         organizationId: currentOrganization._id,
         organizationName: currentOrganization.name,
       });
+
+      if (ldClient) {
+        ldClient.identify({
+          kind: 'multi',
+          organization: {
+            key: currentOrganization._id,
+            name: currentOrganization.name,
+            createdAt: currentOrganization.createdAt,
+          },
+          user: {
+            key: currentUser._id,
+            firstName: currentUser.firstName,
+            lastName: currentUser.lastName,
+            email: currentUser.email,
+          },
+        });
+      }
     } else {
       sentrySetUser(null);
     }
