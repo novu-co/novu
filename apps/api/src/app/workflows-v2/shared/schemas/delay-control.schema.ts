@@ -8,9 +8,11 @@ import {
   UiSchema,
   UiSchemaGroupEnum,
 } from '@novu/shared';
+import { skipZodSchema } from './skip-control.schema';
 
 export const DelayTimeControlZodSchema = z
   .object({
+    skip: skipZodSchema,
     type: z.enum(['regular']).default('regular'),
     amount: z.number().min(1),
     unit: z.nativeEnum(TimeUnitEnum),
