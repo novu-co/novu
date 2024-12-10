@@ -16,7 +16,7 @@ export interface IActivityFilters {
 export interface IActivityFiltersData {
   dateRange: string;
   channels: ChannelTypeEnum[];
-  templates: string[];
+  workflows: string[];
   transactionId: string;
   subscriberId: string;
 }
@@ -37,7 +37,7 @@ const CHANNEL_OPTIONS = [
 export const defaultActivityFilters: IActivityFiltersData = {
   dateRange: '30d',
   channels: [],
-  templates: [],
+  workflows: [],
   transactionId: '',
   subscriberId: '',
 } as const;
@@ -53,7 +53,7 @@ export function ActivityFilters({ onFiltersChange, initialValues, onReset }: IAc
     return (
       watchedValues.dateRange !== defaultActivityFilters.dateRange ||
       watchedValues.channels.length > 0 ||
-      watchedValues.templates.length > 0 ||
+      watchedValues.workflows.length > 0 ||
       watchedValues.transactionId !== defaultActivityFilters.transactionId ||
       watchedValues.subscriberId !== defaultActivityFilters.subscriberId
     );
@@ -100,7 +100,7 @@ export function ActivityFilters({ onFiltersChange, initialValues, onReset }: IAc
 
         <FormField
           control={form.control}
-          name="templates"
+          name="workflows"
           render={({ field }) => (
             <FormItem className="space-y-0">
               <FacetedFormFilter

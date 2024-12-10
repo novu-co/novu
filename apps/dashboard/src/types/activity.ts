@@ -4,7 +4,7 @@ import { IActivityFilters } from '@/api/activity';
 export interface IActivityFiltersData {
   dateRange: string;
   channels: ChannelTypeEnum[];
-  templates: string[];
+  workflows: string[];
   transactionId: string;
   subscriberId: string;
 }

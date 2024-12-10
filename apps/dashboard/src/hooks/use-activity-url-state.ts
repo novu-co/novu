@@ -14,9 +14,9 @@ function parseFilters(searchParams: URLSearchParams): IActivityFilters {
     result.channels = channels as ChannelTypeEnum[];
   }
 
-  const templates = searchParams.get('templates')?.split(',').filter(Boolean);
-  if (templates?.length) {
-    result.templates = templates;
+  const workflows = searchParams.get('workflows')?.split(',').filter(Boolean);
+  if (workflows?.length) {
+    result.workflows = workflows;
   }
 
   const transactionId = searchParams.get('transactionId');
@@ -52,7 +52,7 @@ function parseFilterValues(searchParams: URLSearchParams): IActivityFiltersData 
   return {
     dateRange: searchParams.get('dateRange') || DEFAULT_DATE_RANGE,
     channels: (searchParams.get('channels')?.split(',').filter(Boolean) as ChannelTypeEnum[]) || [],
-    templates: searchParams.get('templates')?.split(',').filter(Boolean) || [],
+    workflows: searchParams.get('templates')?.split(',').filter(Boolean) || [],
     transactionId: searchParams.get('transactionId') || '',
     subscriberId: searchParams.get('subscriberId') || '',
   };
@@ -87,8 +87,8 @@ export function useActivityUrlState(): IActivityUrlState & {
         if (data.channels?.length) {
           prev.set('channels', data.channels.join(','));
         }
-        if (data.templates?.length) {
-          prev.set('templates', data.templates.join(','));
+        if (data.workflows?.length) {
+          prev.set('workflows', data.workflows.join(','));
         }
         if (data.transactionId) {
           prev.set('transactionId', data.transactionId);
