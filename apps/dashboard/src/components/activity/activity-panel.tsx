@@ -12,9 +12,15 @@ export interface ActivityPanelProps {
   activityId: string;
   onActivitySelect: (activityId: string) => void;
   headerClassName?: string;
+  overviewHeaderClassName?: string;
 }
 
-export function ActivityPanel({ activityId, onActivitySelect, headerClassName }: ActivityPanelProps) {
+export function ActivityPanel({
+  activityId,
+  onActivitySelect,
+  headerClassName,
+  overviewHeaderClassName,
+}: ActivityPanelProps) {
   const { activity, isPending, error } = useFetchActivity({ activityId });
 
   if (isPending) {
@@ -49,7 +55,8 @@ export function ActivityPanel({ activityId, onActivitySelect, headerClassName }:
         <div
           className={cn(
             'flex items-center gap-2 border-b border-t border-neutral-200 border-b-neutral-100 p-2 px-3',
-            headerClassName
+            headerClassName,
+            overviewHeaderClassName
           )}
         >
           <Route className="h-3 w-3" />
