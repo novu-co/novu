@@ -3,7 +3,6 @@ import {
   FeatureFlagsKeysEnum,
   IEnvironment,
   StepDataDto,
-  StepIssuesDto,
   StepTypeEnum,
   StepUpdateDto,
   UpdateWorkflowDto,
@@ -39,13 +38,13 @@ import {
   AUTOCOMPLETE_PASSWORD_MANAGERS_OFF,
   INLINE_CONFIGURABLE_STEP_TYPES,
   TEMPLATE_CONFIGURABLE_STEP_TYPES,
+  STEP_NAME_BY_TYPE,
 } from '@/utils/constants';
-import { STEP_NAME_BY_TYPE } from './step-provider';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
 import { buildDefaultValues } from '@/utils/schema';
 import { DelayControlValues } from '@/components/workflow-editor/steps/delay/delay-control-values';
-import { ConfigureStepTemplateCta } from '@/components/workflow-editor/steps/configure-step-template-cta';
+import { ConfigureStepTemplateIssueCta } from '@/components/workflow-editor/steps/configure-step-template-issue-cta';
 import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
 import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/email/configure-email-step-preview';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
@@ -64,16 +63,16 @@ const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.E
   [StepTypeEnum.TRIGGER]: () => null,
 };
 
-const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, (props: HTMLAttributes<HTMLDivElement>) => ReactNode> = {
+const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, ((props: HTMLAttributes<HTMLDivElement>) => ReactNode) | null> = {
   [StepTypeEnum.IN_APP]: ConfigureInAppStepPreview,
   [StepTypeEnum.EMAIL]: ConfigureEmailStepPreview,
-  [StepTypeEnum.SMS]: () => null,
-  [StepTypeEnum.CHAT]: () => null,
-  [StepTypeEnum.PUSH]: () => null,
-  [StepTypeEnum.CUSTOM]: () => null,
-  [StepTypeEnum.TRIGGER]: () => null,
-  [StepTypeEnum.DIGEST]: () => null,
-  [StepTypeEnum.DELAY]: () => null,
+  [StepTypeEnum.SMS]: null,
+  [StepTypeEnum.CHAT]: null,
+  [StepTypeEnum.PUSH]: null,
+  [StepTypeEnum.CUSTOM]: null,
+  [StepTypeEnum.TRIGGER]: null,
+  [StepTypeEnum.DIGEST]: null,
+  [StepTypeEnum.DELAY]: null,
 };
 
 const calculateDefaultControlsValues = (step: StepDataDto) => {
@@ -88,13 +87,11 @@ type ConfigureStepFormProps = {
   workflow: WorkflowResponseDto;
   environment: IEnvironment;
   step: StepDataDto;
-  issues?: StepIssuesDto;
   update: (data: UpdateWorkflowDto) => void;
-  updateStepCache: (step: Partial<StepDataDto>) => void;
 };
 
 export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
-  const { step, workflow, update, updateStepCache, environment, issues } = props;
+  const { step, workflow, update, environment } = props;
   const navigate = useNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const areNewStepsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
@@ -166,7 +163,6 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
         ...(data.controlValues ? { controlValues: data.controlValues } : {}),
       };
       update(updateStepInWorkflow(workflow, step.stepId, updateStepData));
-      updateStepCache(updateStepData);
     },
   });
 
@@ -177,11 +173,11 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   );
 
   const setControlValuesIssues = useCallback(() => {
-    const stepIssues = flattenIssues(issues?.controls);
+    const stepIssues = flattenIssues(step.issues?.controls);
     Object.entries(stepIssues).forEach(([key, value]) => {
       form.setError(`controlValues.${key}`, { message: value });
     });
-  }, [form, issues]);
+  }, [form, step]);
 
   useEffect(() => {
     setControlValuesIssues();
@@ -294,9 +290,22 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               </Link>
             </SidebarContent>
             <Separator />
-            <ConfigureStepTemplateCta step={step} issue={firstError}>
-              <Preview />
-            </ConfigureStepTemplateCta>
+
+            {firstError ? (
+              <>
+                <ConfigureStepTemplateIssueCta step={step} issue={firstError} />
+                <Separator />
+              </>
+            ) : (
+              Preview && (
+                <>
+                  <SidebarContent>
+                    <Preview />
+                  </SidebarContent>
+                  <Separator />
+                </>
+              )
+            )}
           </>
         )}
 
