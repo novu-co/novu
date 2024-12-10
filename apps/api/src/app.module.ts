@@ -1,11 +1,15 @@
 /* eslint-disable global-require */
-import { DynamicModule, HttpException, Module, Logger, Provider } from '@nestjs/common';
-import { RavenInterceptor, RavenModule } from 'nest-raven';
+import { DynamicModule, Logger, Module, Provider } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ProfilingModule, TracingModule } from '@novu/application-generic';
+import { Client, NovuModule } from '@novu/framework/nest';
+
 import { Type } from '@nestjs/common/interfaces/type.interface';
 import { ForwardReference } from '@nestjs/common/interfaces/modules/forward-reference.interface';
-import { ProfilingModule, TracingModule } from '@novu/application-generic';
 import { isClerkEnabled } from '@novu/shared';
+import { SentryModule } from '@sentry/nestjs/setup';
+import { ApiExcludeController } from '@nestjs/swagger';
+import { usageLimitsWorkflow } from '@novu/notifications';
 import packageJson from '../package.json';
 import { SharedModule } from './app/shared/shared.module';
 import { UserModule } from './app/user/user.module';
@@ -13,9 +17,7 @@ import { AuthModule } from './app/auth/auth.module';
 import { TestingModule } from './app/testing/testing.module';
 import { HealthModule } from './app/health/health.module';
 import { OrganizationModule } from './app/organization/organization.module';
-import { EnvironmentsModule } from './app/environments/environments.module';
 import { ExecutionDetailsModule } from './app/execution-details/execution-details.module';
-import { WorkflowModule } from './app/workflows/workflow.module';
 import { EventsModule } from './app/events/events.module';
 import { WidgetsModule } from './app/widgets/widgets.module';
 import { NotificationModule } from './app/notifications/notification.module';
@@ -43,6 +45,10 @@ import { AnalyticsModule } from './app/analytics/analytics.module';
 import { InboxModule } from './app/inbox/inbox.module';
 import { BridgeModule } from './app/bridge/bridge.module';
 import { PreferencesModule } from './app/preferences';
+import { WorkflowModule } from './app/workflows-v2/workflow.module';
+import { WorkflowModuleV1 } from './app/workflows-v1/workflow-v1.module';
+import { EnvironmentsModuleV1 } from './app/environments-v1/environments-v1.module';
+import { EnvironmentsModule } from './app/environments-v2/environments.module';
 
 const enterpriseImports = (): Array<Type | DynamicModule | Promise<DynamicModule> | ForwardReference> => {
   const modules: Array<Type | DynamicModule | Promise<DynamicModule> | ForwardReference> = [];
@@ -52,6 +58,9 @@ const enterpriseImports = (): Array<Type | DynamicModule | Promise<DynamicModule
     }
     if (require('@novu/ee-billing')?.BillingModule) {
       modules.push(require('@novu/ee-billing')?.BillingModule.forRoot());
+    }
+    if (require('./app/support/support.module')?.SupportModule) {
+      modules.push(require('./app/support/support.module')?.SupportModule);
     }
   }
 
@@ -74,9 +83,9 @@ const baseModules: Array<Type | DynamicModule | Promise<DynamicModule> | Forward
   InboundParseModule,
   SharedModule,
   HealthModule,
-  EnvironmentsModule,
+  EnvironmentsModuleV1,
   ExecutionDetailsModule,
-  WorkflowModule,
+  WorkflowModuleV1,
   EventsModule,
   WidgetsModule,
   InboxModule,
@@ -103,6 +112,9 @@ const baseModules: Array<Type | DynamicModule | Promise<DynamicModule> | Forward
   TracingModule.register(packageJson.name, packageJson.version),
   BridgeModule,
   PreferencesModule,
+  WorkflowModule,
+  EnvironmentsModule,
+  NovuModule,
 ];
 
 const enterpriseModules = enterpriseImports();
@@ -131,20 +143,7 @@ const providers: Provider[] = [
 ];
 
 if (process.env.SENTRY_DSN) {
-  modules.push(RavenModule);
-  providers.push({
-    provide: APP_INTERCEPTOR,
-    useValue: new RavenInterceptor({
-      filters: [
-        /*
-         * Filter exceptions to type HttpException. Ignore those that
-         * have status code of less than 500
-         */
-        { type: HttpException, filter: (exception: HttpException) => exception.getStatus() < 500 },
-      ],
-      user: ['_id', 'firstName', 'organizationId', 'environmentId', 'roles', 'domain'],
-    }),
-  });
+  modules.unshift(SentryModule.forRoot());
 }
 
 if (process.env.SEGMENT_TOKEN) {
@@ -154,6 +153,21 @@ if (process.env.SEGMENT_TOKEN) {
 if (process.env.NODE_ENV === 'test') {
   modules.push(TestingModule);
 }
+
+modules.push(
+  NovuModule.register({
+    apiPath: '/bridge/novu',
+    client: new Client({
+      secretKey: process.env.NOVU_INTERNAL_SECRET_KEY,
+      strictAuthentication:
+        process.env.NODE_ENV === 'production' ||
+        process.env.NODE_ENV === 'dev' ||
+        process.env.NOVU_STRICT_AUTHENTICATION_ENABLED === 'true',
+    }),
+    controllerDecorators: [ApiExcludeController()],
+    workflows: [usageLimitsWorkflow],
+  })
+);
 
 @Module({
   imports: modules,

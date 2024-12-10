@@ -26,6 +26,7 @@ import {
   UpdateTenant,
   UpdateTenantCommand,
 } from '@novu/application-generic';
+import { ApiExcludeController } from '@nestjs/swagger/dist/decorators/api-exclude-controller.decorator';
 import { UserSession } from '../shared/framework/user.decorator';
 import { ExternalApiAccessible } from '../auth/framework/external-api.decorator';
 import {
@@ -62,6 +63,7 @@ const v2TenantsApiDescription = ' Tenants is not supported in code first version
 @ApiTags('Tenants')
 @UseInterceptors(ClassSerializerInterceptor)
 @UserAuthentication()
+@ApiExcludeController()
 export class TenantController {
   constructor(
     private createTenantUsecase: CreateTenant,

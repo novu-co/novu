@@ -42,20 +42,16 @@ export const WorkflowStepEditorControlsPanel: FC<IWorkflowStepEditorControlsPane
   const { Component, toggle, setPath } = useDocsModal();
 
   const [payloadProperties, havePayloadProperties] = useMemo(() => {
-    const payloadObject =
-      workflow?.payload?.schema?.properties ||
-      workflow?.options?.payloadSchema?.properties ||
-      workflow?.payloadSchema?.properties ||
-      {};
+    const payloadObject = workflow?.payload?.schema?.properties || workflow?.payloadSchema?.properties || {};
 
     return [getSuggestionVariables(payloadObject, 'payload'), Object.keys(payloadObject).length > 0];
-  }, [workflow?.payload?.schema, workflow?.options?.payloadSchema, workflow?.payloadSchema]);
+  }, [workflow?.payload?.schema, workflow?.payloadSchema]);
 
   const [haveControlProperties] = useMemo(() => {
-    const controlsObject = step?.controls?.schema?.properties || step?.inputs?.schema?.properties || {};
+    const controlsObject = step?.controls?.schema?.properties || {};
 
     return [Object.keys(controlsObject).length > 0];
-  }, [step?.controls?.schema, step?.inputs?.schema]);
+  }, [step?.controls?.schema]);
 
   const handleOnChange = useDebouncedCallback(async (type: OnChangeType, data: any, id?: string) => {
     onChange(type, data, id);
@@ -104,7 +100,7 @@ export const WorkflowStepEditorControlsPanel: FC<IWorkflowStepEditorControlsPane
 
                   <JsonSchemaForm
                     onChange={(data, id) => handleOnChange('step', data, id)}
-                    schema={step?.controls?.schema || step?.inputs?.schema || {}}
+                    schema={step?.controls?.schema || {}}
                     formData={defaultControls || {}}
                     variables={variables}
                   />
@@ -130,9 +126,7 @@ export const WorkflowStepEditorControlsPanel: FC<IWorkflowStepEditorControlsPane
                 <When truthy={havePayloadProperties}>
                   <JsonSchemaForm
                     onChange={(data, id) => handleOnChange('payload', data, id)}
-                    schema={
-                      workflow?.payload?.schema || workflow?.options?.payloadSchema || workflow?.payloadSchema || {}
-                    }
+                    schema={workflow?.payload?.schema || workflow?.payloadSchema || {}}
                     formData={{}}
                   />
                 </When>

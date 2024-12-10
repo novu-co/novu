@@ -1,21 +1,21 @@
 import {
   IsDefined,
-  IsString,
-  IsOptional,
-  ValidateNested,
-  ValidateIf,
   IsEnum,
+  IsOptional,
+  IsString,
+  ValidateIf,
+  ValidateNested,
 } from 'class-validator';
 
 import {
   AddressingTypeEnum,
-  ControlsDto,
+  StatelessControls,
   TriggerRecipientsPayload,
   TriggerRecipientSubscriber,
   TriggerRequestCategoryEnum,
   TriggerTenantContext,
 } from '@novu/shared';
-import { DiscoverWorkflowOutput } from '@novu/framework';
+import { DiscoverWorkflowOutput } from '@novu/framework/internal';
 
 import { EnvironmentWithUserCommand } from '../../commands';
 
@@ -55,7 +55,7 @@ export class TriggerEventBaseCommand extends EnvironmentWithUserCommand {
   @IsOptional()
   bridgeWorkflow?: DiscoverWorkflowOutput;
 
-  controls?: ControlsDto;
+  controls?: StatelessControls;
 }
 
 export class TriggerEventMulticastCommand extends TriggerEventBaseCommand {

@@ -1,6 +1,6 @@
 {
   "name": "@novu/node",
-  "version": "2.0.1",
+  "version": "2.0.5",
   "description": "Notification Management Framework",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -16,13 +16,10 @@
     "build": "run-p build:*",
     "build:main": "tsc -p tsconfig.json",
     "build:module": "tsc -p tsconfig.module.json",
-    "fix": "run-s fix:*",
-    "fix:prettier": "prettier \"src/**/*.ts\" --write",
-    "lint:fix": "eslint src --fix",
-    "test": "run-s test:*",
-    "lint": "eslint src",
-    "test:prettier": "prettier \"src/**/*.ts\"",
-    "test:unit": "jest src",
+    "test": "jest src",
+    "lint": "run-s lint:*",
+    "lint:eslint": "eslint src --fix",
+    "lint:prettier": "prettier \"src/**/*.ts\" --write",
     "check-cli": "run-s test diff-integration-tests check-integration-tests",
     "check-integration-tests": "run-s check-integration-test:*",
     "diff-integration-tests": "mkdir -p diff && rm -rf diff/test && cp -r test diff/test && rm -rf diff/test/test-*/.git && cd diff && git init --quiet && git add -A && git commit --quiet --no-verify --allow-empty -m 'WIP' && echo '\\n\\nCommitted most recent integration test output in the \"diff\" directory. Review the changes with \"cd diff && git diff HEAD\" or your preferred git diff viewer.'",
@@ -54,7 +51,7 @@
     "@types/jest": "29.5.2",
     "@types/lodash.get": "^4.4.6",
     "@types/lodash.merge": "^4.6.6",
-    "@types/node": "^20.14.10",
+    "@types/node": "^20.15.0",
     "@types/uuid": "^8.3.4",
     "codecov": "^3.5.0",
     "jest": "^29.7.0",
@@ -65,7 +62,7 @@
     "run-p": "0.0.0",
     "ts-jest": "^29.1.2",
     "typedoc": "^0.24.0",
-    "typescript": "4.9.5"
+    "typescript": "5.6.2"
   },
   "files": [
     "build/main",
@@ -78,5 +75,10 @@
   ],
   "prettier": {
     "singleQuote": true
+  },
+  "nx": {
+    "tags": [
+      "type:package"
+    ]
   }
 }

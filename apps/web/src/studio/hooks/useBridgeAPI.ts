@@ -1,11 +1,7 @@
 import { useEffect, useMemo } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import {
-  buildBridgeHTTPClient,
-  type StepPreviewParams,
-  type TriggerParams,
-  type BridgeStatus,
-} from '../../bridgeApi/bridgeApi.client';
+import { useMutation, useQuery, UseQueryResult } from '@tanstack/react-query';
+import type { DiscoverWorkflowOutput, Event, HealthCheck } from '@novu/framework/internal';
+import { buildBridgeHTTPClient, type TriggerParams } from '../../bridgeApi/bridgeApi.client';
 import { useStudioState } from '../StudioStateProvider';
 import { api as cloudApi } from '../../api';
 
@@ -46,7 +42,7 @@ export const useHealthCheck = (options?: any) => {
   const bridgeAPI = useBridgeAPI();
   const { bridgeURL, isLocalStudio } = useStudioState();
 
-  const res = useQuery<BridgeStatus>(
+  const res = useQuery<HealthCheck>(
     ['bridge-health-check', bridgeURL],
     async () => {
       if (isLocalStudio) {
@@ -70,7 +66,7 @@ export const useHealthCheck = (options?: any) => {
   };
 };
 
-export const useWorkflow = (templateId: string, options?: any) => {
+export const useWorkflow = (templateId: string, options?: any): UseQueryResult<DiscoverWorkflowOutput, unknown> => {
   const api = useBridgeAPI();
 
   return useQuery(
@@ -86,7 +82,15 @@ export const useWorkflow = (templateId: string, options?: any) => {
 };
 
 export const useWorkflowPreview = (
-  { workflowId, stepId, controls = {}, payload = {} }: StepPreviewParams,
+  {
+    workflowId,
+    stepId,
+    controls = {},
+    payload = {},
+    state = [],
+    subscriber = {},
+  }: Omit<Event, 'action' | 'subscriber' | 'payload' | 'state' | 'controls'> &
+    Partial<Pick<Event, 'subscriber' | 'payload' | 'state' | 'controls'>>,
   options?: any
 ) => {
   const api = useBridgeAPI();
@@ -94,7 +98,7 @@ export const useWorkflowPreview = (
   return useQuery(
     ['workflow-preview', workflowId, stepId, controls, payload],
     async () => {
-      return api.getStepPreview({ workflowId, stepId, payload, controls });
+      return api.getStepPreview({ workflowId, stepId, payload, controls, state, subscriber });
     },
     {
       refetchOnWindowFocus: true,

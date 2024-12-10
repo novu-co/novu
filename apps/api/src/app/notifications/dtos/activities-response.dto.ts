@@ -169,7 +169,7 @@ export class ActivitiesResponseDto {
   @ApiProperty()
   hasMore: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ type: [ActivityNotificationResponseDto], description: 'Array of Activity notifications' })
   data: ActivityNotificationResponseDto[];
 
   @ApiProperty()

@@ -1,24 +1,24 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import axios from 'axios';
-import { HealthCheck } from '@novu/framework';
+import { Logger, Injectable } from '@nestjs/common';
+import { HealthCheck, GetActionEnum } from '@novu/framework/internal';
+import { ExecuteBridgeRequest, ExecuteBridgeRequestCommand, ExecuteBridgeRequestDto } from '@novu/application-generic';
+import { WorkflowOriginEnum } from '@novu/shared';
 import { GetBridgeStatusCommand } from './get-bridge-status.command';
 
-const axiosInstance = axios.create();
+export const LOG_CONTEXT = 'GetBridgeStatusUsecase';
 
 @Injectable()
 export class GetBridgeStatus {
-  async execute(command: GetBridgeStatusCommand): Promise<HealthCheck> {
-    try {
-      const response = await axiosInstance.get<HealthCheck>(`${command.bridgeUrl}?action=health-check`, {
-        headers: {
-          'Bypass-Tunnel-Reminder': 'true',
-          'content-type': 'application/json',
-        },
-      });
+  constructor(private executeBridgeRequest: ExecuteBridgeRequest) {}
 
-      return response.data;
-    } catch (err: any) {
-      throw new BadRequestException(`Bridge is not accessible. ${err.message}`);
-    }
+  async execute(command: GetBridgeStatusCommand): Promise<HealthCheck> {
+    return (await this.executeBridgeRequest.execute(
+      ExecuteBridgeRequestCommand.create({
+        environmentId: command.environmentId,
+        action: GetActionEnum.HEALTH_CHECK,
+        workflowOrigin: WorkflowOriginEnum.EXTERNAL,
+        statelessBridgeUrl: command.statelessBridgeUrl,
+        retriesLimit: 1,
+      })
+    )) as ExecuteBridgeRequestDto<GetActionEnum.HEALTH_CHECK>;
   }
 }

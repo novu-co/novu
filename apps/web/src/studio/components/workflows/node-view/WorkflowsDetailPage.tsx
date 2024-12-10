@@ -1,12 +1,10 @@
 import { Skeleton } from '@mantine/core';
-import { IconButton } from '@novu/novui';
+import { IconButton, Text } from '@novu/novui';
 import { css } from '@novu/novui/css';
 import { IconCable, IconPlayArrow, IconSettings } from '@novu/novui/icons';
 import { HStack, Stack } from '@novu/novui/jsx';
 import { token } from '@novu/novui/tokens';
-import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { useEffect, useState } from 'react';
-import { useFeatureFlag } from '../../../../hooks/useFeatureFlag';
 import { useTelemetry } from '../../../../hooks/useNovuAPI';
 import { useWorkflow } from '../../../hooks/useBridgeAPI';
 import { useStudioWorkflowsNavigation } from '../../../hooks/useStudioWorkflowsNavigation';
@@ -14,20 +12,19 @@ import { PageContainer } from '../../../layout/PageContainer';
 import { useStudioState } from '../../../StudioStateProvider';
 import { OutlineButton } from '../../OutlineButton';
 import { WorkflowsPageTemplate } from '../layout/WorkflowsPageTemplate';
-import { WorkflowSettingsSidePanel } from '../preferences/WorkflowSettingsSidePanel';
+import { StudioWorkflowSettingsSidePanel } from '../preferences/StudioWorkflowSettingsSidePanel';
+import { WorkflowDetailFormContextProvider } from '../preferences/WorkflowDetailFormContextProvider';
 import { WorkflowBackgroundWrapper } from './WorkflowBackgroundWrapper';
 import { WorkflowFloatingMenu } from './WorkflowFloatingMenu';
 import { WorkflowNodes } from './WorkflowNodes';
+import { WorkflowNotFound } from '../WorkflowNotFound';
 
-export const WorkflowsDetailPage = () => {
+const BaseWorkflowsDetailPage = () => {
   const { currentWorkflowId, goToStep, goToTest } = useStudioWorkflowsNavigation();
   const { data: workflow, isLoading } = useWorkflow(currentWorkflowId);
   const track = useTelemetry();
   const { isLocalStudio } = useStudioState() || {};
 
-  const areWorkflowPreferencesEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_WORKFLOW_PREFERENCES_ENABLED);
-
-  // TODO: this is a temporary solution while we scaffold the components, and should be replaced w/ modal manager
   const [isPanelOpen, setPanelOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -42,7 +39,11 @@ export const WorkflowsDetailPage = () => {
     return <WorkflowsContentLoading />;
   }
 
-  const title = workflow?.workflowId;
+  if (!workflow) {
+    return <WorkflowNotFound />;
+  }
+
+  const title = workflow?.name || workflow.workflowId;
 
   return (
     <WorkflowsPageTemplate
@@ -54,7 +55,7 @@ export const WorkflowsDetailPage = () => {
           <OutlineButton Icon={IconPlayArrow} onClick={() => goToTest(currentWorkflowId)}>
             Test workflow
           </OutlineButton>
-          {areWorkflowPreferencesEnabled && <IconButton Icon={IconSettings} onClick={() => setPanelOpen(true)} />}
+          <IconButton Icon={IconSettings} onClick={() => setPanelOpen(true)} />
         </HStack>
       }
     >
@@ -76,8 +77,16 @@ export const WorkflowsDetailPage = () => {
           right: '50',
         })}
       />
-      {isPanelOpen && <WorkflowSettingsSidePanel onClose={() => setPanelOpen(false)} />}
+      {isPanelOpen && <StudioWorkflowSettingsSidePanel onClose={() => setPanelOpen(false)} />}
     </WorkflowsPageTemplate>
+  );
+};
+
+export const WorkflowsDetailPage = () => {
+  return (
+    <WorkflowDetailFormContextProvider>
+      <BaseWorkflowsDetailPage />
+    </WorkflowDetailFormContextProvider>
   );
 };
 

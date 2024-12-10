@@ -1,38 +1,49 @@
-import { IsDefined, IsOptional, IsString } from 'class-validator';
-import { AfterResponseHook } from 'got';
+import { IsDefined, IsOptional } from 'class-validator';
 import {
   CodeResult,
   DiscoverOutput,
-  ExecuteOutput,
-  HealthCheck,
   Event,
+  ExecuteOutput,
   GetActionEnum,
-  PostActionEnum,
+  HealthCheck,
   HttpQueryKeysEnum,
-} from '@novu/framework';
-import { BaseCommand } from '../../commands';
+  PostActionEnum,
+} from '@novu/framework/internal';
+import { WorkflowOriginEnum } from '@novu/shared';
+import { EnvironmentLevelCommand } from '../../commands';
 
-export class ExecuteBridgeRequestCommand extends BaseCommand {
-  @IsString()
-  bridgeUrl: string;
+export type BridgeError = {
+  url: string;
+  code: string;
+  message: string;
+  statusCode: number;
+  data?: unknown;
+  cause?: unknown;
+};
 
+export type ProcessError = (response: BridgeError) => Promise<void>;
+
+export class ExecuteBridgeRequestCommand extends EnvironmentLevelCommand {
   @IsOptional()
   event?: Omit<Event, `${HttpQueryKeysEnum}`>;
 
-  @IsString()
-  apiKey: string;
+  @IsOptional()
+  searchParams?: Partial<Record<HttpQueryKeysEnum, string>>;
 
   @IsOptional()
-  searchParams?: Record<string, string>;
-
-  @IsOptional()
-  afterResponse?: AfterResponseHook;
+  processError?: ProcessError;
 
   @IsDefined()
   action: PostActionEnum | GetActionEnum;
 
   @IsOptional()
   retriesLimit?: number;
+
+  @IsDefined()
+  workflowOrigin: WorkflowOriginEnum;
+
+  @IsOptional()
+  statelessBridgeUrl?: string;
 }
 
 // will generate the output type based on the action

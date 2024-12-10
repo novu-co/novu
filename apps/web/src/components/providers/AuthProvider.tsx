@@ -1,8 +1,7 @@
 import { useContext } from 'react';
-import { IOrganizationEntity, IUserEntity, IJwtClaims } from '@novu/shared';
-import jwtDecode from 'jwt-decode';
+import { IOrganizationEntity, IUserEntity } from '@novu/shared';
+import { type BrowserClerk } from '@clerk/clerk-react';
 import { IS_EE_AUTH_ENABLED } from '../../config/index';
-import { eeAuthTokenCookie } from '../../utils/cookies';
 import {
   CommunityAuthContext,
   CommunityAuthProvider,
@@ -60,14 +59,16 @@ export const useAuth = () => {
   return value;
 };
 
-export function getToken(): string {
-  const token = IS_EE_AUTH_ENABLED ? eeAuthTokenCookie.get() : getCommunityAuthToken();
-
-  return token || '';
+declare global {
+  interface Window {
+    Clerk: BrowserClerk;
+  }
 }
 
-export function getTokenClaims(): IJwtClaims | null {
-  const token = getToken();
+export async function getToken() {
+  if (IS_EE_AUTH_ENABLED) {
+    return (await window?.Clerk?.session?.getToken()) || '';
+  }
 
-  return token ? jwtDecode<IJwtClaims>(token) : null;
+  return getCommunityAuthToken() || '';
 }

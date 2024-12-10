@@ -9,6 +9,11 @@ import type { EnforceEnvOrOrgIds } from '../../types/enforce';
 import { EnvironmentRepository } from '../environment';
 
 type NotificationTemplateQuery = FilterQuery<NotificationTemplateDBModel> & EnforceEnvOrOrgIds;
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export interface FindByIdQuery {
+  id: string;
+  environmentId: string;
+}
 
 export class NotificationTemplateRepository extends BaseRepository<
   NotificationTemplateDBModel,
@@ -33,14 +38,26 @@ export class NotificationTemplateRepository extends BaseRepository<
 
     return this.mapEntity(item);
   }
-
-  async findById(id: string, environmentId: string) {
+  async findAllByTriggerIdentifier(environmentId: string, identifier: string): Promise<NotificationTemplateEntity[]> {
     const requestQuery: NotificationTemplateQuery = {
-      _id: id,
       _environmentId: environmentId,
+      'triggers.identifier': identifier,
     };
 
-    const item = await this.MongooseModel.findOne(requestQuery)
+    const query = await this._model.find(requestQuery, { _id: 1, 'triggers.identifier': 1 });
+
+    return this.mapEntities(query);
+  }
+
+  async findById(id: string, environmentId: string) {
+    return this.findByIdQuery({ id, environmentId });
+  }
+
+  async findByIdQuery(query: FindByIdQuery) {
+    const item = await this.MongooseModel.findOne({
+      _id: query.id,
+      _environmentId: query.environmentId,
+    })
       .populate('steps.template')
       .populate('steps.variants.template');
 
@@ -171,15 +188,25 @@ export class NotificationTemplateRepository extends BaseRepository<
     return { totalCount: totalItemsCount, data: this.mapEntities(items) };
   }
 
-  async getList(organizationId: string, environmentId: string, skip = 0, limit = 10, query?: string) {
-    let searchQuery: FilterQuery<NotificationTemplateDBModel> = {};
+  async getList(
+    organizationId: string,
+    environmentId: string,
+    skip: number = 0,
+    limit: number = 10,
+    query?: string,
+    excludeNewDashboardWorkflows: boolean = false
+  ): Promise<{ totalCount: number; data: NotificationTemplateEntity[] }> {
+    const searchQuery: FilterQuery<NotificationTemplateDBModel> = {};
+
     if (query) {
-      searchQuery = {
-        $or: [
-          { name: { $regex: regExpEscape(query), $options: 'i' } },
-          { 'triggers.identifier': { $regex: regExpEscape(query), $options: 'i' } },
-        ],
-      };
+      searchQuery.$or = [
+        { name: { $regex: regExpEscape(query), $options: 'i' } },
+        { 'triggers.identifier': { $regex: regExpEscape(query), $options: 'i' } },
+      ];
+    }
+
+    if (excludeNewDashboardWorkflows) {
+      searchQuery.$nor = [{ origin: 'novu-cloud', type: 'BRIDGE' }];
     }
 
     const totalItemsCount = await this.count({
@@ -187,13 +214,9 @@ export class NotificationTemplateRepository extends BaseRepository<
       ...searchQuery,
     });
 
-    const requestQuery: NotificationTemplateQuery = {
+    const items = await this.MongooseModel.find({
       _environmentId: environmentId,
       _organizationId: organizationId,
-    };
-
-    const items = await this.MongooseModel.find({
-      ...requestQuery,
       ...searchQuery,
     })
       .sort({ createdAt: -1 })
@@ -201,18 +224,36 @@ export class NotificationTemplateRepository extends BaseRepository<
       .limit(limit)
       .populate({ path: 'notificationGroup' })
       .populate('steps.template', { type: 1 })
-      .select('-steps.variants') // Excludes Variants from the list
+      .select('-steps.variants')
       .lean();
 
     return { totalCount: totalItemsCount, data: this.mapEntities(items) };
   }
 
-  async getActiveList(organizationId: string, environmentId: string, active?: boolean) {
+  async filterActive({
+    organizationId,
+    environmentId,
+    tags,
+    critical,
+  }: {
+    organizationId: string;
+    environmentId: string;
+    tags?: string[];
+    critical?: boolean;
+  }) {
     const requestQuery: NotificationTemplateQuery = {
       _environmentId: environmentId,
       _organizationId: organizationId,
-      active,
+      active: true,
     };
+
+    if (tags && tags?.length > 0) {
+      requestQuery.tags = { $in: tags };
+    }
+
+    if (critical !== undefined) {
+      requestQuery.critical = { $eq: critical };
+    }
 
     const items = await this.MongooseModel.find(requestQuery)
       .populate('steps.template', { type: 1 })
@@ -241,6 +282,34 @@ export class NotificationTemplateRepository extends BaseRepository<
 
   public static getBlueprintOrganizationId(): string | undefined {
     return process.env.BLUEPRINT_CREATOR;
+  }
+
+  async estimatedDocumentCount(): Promise<any> {
+    return this.notificationTemplate.estimatedDocumentCount();
+  }
+
+  async getTotalSteps(): Promise<number> {
+    const res = await this.notificationTemplate.aggregate<{ totalSteps: number }>([
+      {
+        $group: {
+          _id: null,
+          totalSteps: {
+            $sum: {
+              $cond: {
+                if: { $isArray: '$steps' },
+                then: { $size: '$steps' },
+                else: 0,
+              },
+            },
+          },
+        },
+      },
+    ]);
+    if (res.length > 0) {
+      return res[0].totalSteps;
+    } else {
+      return 0;
+    }
   }
 }
 

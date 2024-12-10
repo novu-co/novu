@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Deploy DEV WEB
 
 # Controls when the action will run. Triggers the workflow on push or pull request
@@ -13,6 +11,9 @@ on:
     paths:
       - 'apps/web/**'
       - 'packages/shared/**'
+
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -42,16 +43,5 @@ jobs:
       netlify_site_id: 45396446-dc86-4ad6-81e4-86d3eb78d06f
       clerk_publishable_key: pk_live_Y2xlcmsubm92dS1zdGFnaW5nLmNvJA
       clerk_is_ee_auth_enabled: true
-    secrets: inherit
-
-  publish_docker_image_web:
-    needs: test_web
-    if: "!contains(github.event.head_commit.message, 'ci skip')"
-    uses: ./.github/workflows/reusable-docker.yml
-    with:
-      environment: Development
-      package_name: novu/web
-      project_path: apps/web
-      local_tag: novu-web
-      env_tag: dev
+      new_dashboard_url: https://dashboard-v2.novu-staging.co
     secrets: inherit

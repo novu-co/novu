@@ -1,4 +1,3 @@
-import { ApiOptions, HttpClient } from '@novu/client';
 import type {
   ActionTypeEnum,
   ChannelPreference,
@@ -7,10 +6,10 @@ import type {
   PreferencesResponse,
   Session,
 } from '../types';
+import { HttpClient, HttpClientOptions } from './http-client';
 
-export type InboxServiceOptions = ApiOptions;
+export type InboxServiceOptions = HttpClientOptions;
 
-const NOVU_API_VERSION = '2024-06-26';
 const INBOX_ROUTE = '/inbox';
 const INBOX_NOTIFICATIONS_ROUTE = `${INBOX_ROUTE}/notifications`;
 
@@ -20,9 +19,6 @@ export class InboxService {
 
   constructor(options: InboxServiceOptions = {}) {
     this.#httpClient = new HttpClient(options);
-    this.#httpClient.updateHeaders({
-      'Novu-API-Version': NOVU_API_VERSION,
-    });
   }
 
   async initializeSession({
@@ -60,24 +56,24 @@ export class InboxService {
     after?: string;
     offset?: number;
   }): Promise<{ data: InboxNotification[]; hasMore: boolean; filter: NotificationFilter }> {
-    const queryParams = new URLSearchParams(`limit=${limit}`);
+    const searchParams = new URLSearchParams(`limit=${limit}`);
     if (after) {
-      queryParams.append('after', after);
+      searchParams.append('after', after);
     }
     if (offset) {
-      queryParams.append('offset', `${offset}`);
+      searchParams.append('offset', `${offset}`);
     }
     if (tags) {
-      tags.forEach((tag) => queryParams.append('tags[]', tag));
+      tags.forEach((tag) => searchParams.append('tags[]', tag));
     }
     if (read !== undefined) {
-      queryParams.append('read', `${read}`);
+      searchParams.append('read', `${read}`);
     }
     if (archived !== undefined) {
-      queryParams.append('archived', `${archived}`);
+      searchParams.append('archived', `${archived}`);
     }
 
-    return this.#httpClient.getFullResponse(`${INBOX_NOTIFICATIONS_ROUTE}?${queryParams.toString()}`);
+    return this.#httpClient.get(INBOX_NOTIFICATIONS_ROUTE, searchParams, false);
   }
 
   count({ filters }: { filters: Array<{ tags?: string[]; read?: boolean; archived?: boolean }> }): Promise<{
@@ -86,7 +82,13 @@ export class InboxService {
       filter: NotificationFilter;
     }>;
   }> {
-    return this.#httpClient.getFullResponse(`${INBOX_NOTIFICATIONS_ROUTE}/count?filters=${JSON.stringify(filters)}`);
+    return this.#httpClient.get(
+      `${INBOX_NOTIFICATIONS_ROUTE}/count`,
+      new URLSearchParams({
+        filters: JSON.stringify(filters),
+      }),
+      false
+    );
   }
 
   read(notificationId: string): Promise<InboxNotification> {
@@ -141,8 +143,15 @@ export class InboxService {
     });
   }
 
-  fetchPreferences(): Promise<PreferencesResponse[]> {
-    return this.#httpClient.get(`${INBOX_ROUTE}/preferences`);
+  fetchPreferences(tags?: string[]): Promise<PreferencesResponse[]> {
+    const queryParams = new URLSearchParams();
+    if (tags) {
+      tags.forEach((tag) => queryParams.append('tags[]', tag));
+    }
+
+    const query = queryParams.size ? `?${queryParams.toString()}` : '';
+
+    return this.#httpClient.get(`${INBOX_ROUTE}/preferences${query}`);
   }
 
   updateGlobalPreferences(channelPreferences: ChannelPreference): Promise<PreferencesResponse> {

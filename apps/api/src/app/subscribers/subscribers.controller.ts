@@ -7,6 +7,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -23,16 +24,18 @@ import {
   UpdateSubscriberChannelCommand,
   UpdateSubscriberCommand,
 } from '@novu/application-generic';
-import { ApiExcludeEndpoint, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import {
   ApiRateLimitCategoryEnum,
   ApiRateLimitCostEnum,
   ButtonTypeEnum,
   ChatProviderIdEnum,
-  TriggerRecipientsTypeEnum,
+  IPreferenceChannels,
+  PreferenceLevelEnum,
+  TriggerTypeEnum,
   UserSessionData,
 } from '@novu/shared';
-import { MessageEntity, PreferenceLevelEnum } from '@novu/dal';
+import { MessageEntity } from '@novu/dal';
 
 import { RemoveSubscriber, RemoveSubscriberCommand } from './usecases/remove-subscriber';
 import { ExternalApiAccessible } from '../auth/framework/external-api.decorator';
@@ -51,8 +54,6 @@ import { GetSubscribers, GetSubscribersCommand } from './usecases/get-subscriber
 import { GetSubscriber, GetSubscriberCommand } from './usecases/get-subscriber';
 import { GetPreferencesByLevelCommand } from './usecases/get-preferences-by-level/get-preferences-by-level.command';
 import { GetPreferencesByLevel } from './usecases/get-preferences-by-level/get-preferences-by-level.usecase';
-import { UpdatePreference } from './usecases/update-preference/update-preference.usecase';
-import { UpdateSubscriberPreferenceCommand } from './usecases/update-subscriber-preference';
 import { UpdateSubscriberPreferenceResponseDto } from '../widgets/dtos/update-subscriber-preference-response.dto';
 import { UpdateSubscriberPreferenceRequestDto } from '../widgets/dtos/update-subscriber-preference-request.dto';
 import { MessageResponseDto } from '../widgets/dtos/message-response.dto';
@@ -91,10 +92,6 @@ import { MarkAllMessagesAs } from '../widgets/usecases/mark-all-messages-as/mark
 import { MarkAllMessageAsRequestDto } from './dtos/mark-all-messages-as-request.dto';
 import { BulkCreateSubscribers } from './usecases/bulk-create-subscribers/bulk-create-subscribers.usecase';
 import { BulkCreateSubscribersCommand } from './usecases/bulk-create-subscribers';
-import {
-  UpdateSubscriberGlobalPreferences,
-  UpdateSubscriberGlobalPreferencesCommand,
-} from './usecases/update-subscriber-global-preferences';
 import { GetSubscriberPreferencesByLevelParams } from './params';
 import { ThrottlerCategory, ThrottlerCost } from '../rate-limiting/guards';
 import { MessageMarkAsRequestDto } from '../widgets/dtos/mark-as-request.dto';
@@ -103,6 +100,8 @@ import { MarkMessageAsByMark } from '../widgets/usecases/mark-message-as-by-mark
 import { FeedResponseDto } from '../widgets/dtos/feeds-response.dto';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
 import { SdkGroupName, SdkMethodName, SdkUsePagination } from '../shared/framework/swagger/sdk.decorators';
+import { UpdatePreferences } from '../inbox/usecases/update-preferences/update-preferences.usecase';
+import { UpdatePreferencesCommand } from '../inbox/usecases/update-preferences/update-preferences.command';
 
 @ThrottlerCategory(ApiRateLimitCategoryEnum.CONFIGURATION)
 @ApiCommonResponses()
@@ -118,8 +117,7 @@ export class SubscribersController {
     private getSubscriberUseCase: GetSubscriber,
     private getSubscribersUsecase: GetSubscribers,
     private getPreferenceUsecase: GetPreferencesByLevel,
-    private updatePreferenceUsecase: UpdatePreference,
-    private updateGlobalPreferenceUsecase: UpdateSubscriberGlobalPreferences,
+    private updatePreferencesUsecase: UpdatePreferences,
     private getNotificationsFeedUsecase: GetNotificationsFeed,
     private getFeedCountUsecase: GetFeedCount,
     private markMessageAsUsecase: MarkMessageAs,
@@ -163,15 +161,23 @@ export class SubscribersController {
     summary: 'Get subscriber',
     description: 'Get subscriber by your internal id used to identify the subscriber',
   })
+  @ApiQuery({
+    name: 'includeTopics',
+    type: Boolean,
+    description: 'Includes the topics associated with the subscriber',
+    required: false,
+  })
   async getSubscriber(
     @UserSession() user: UserSessionData,
-    @Param('subscriberId') subscriberId: string
+    @Param('subscriberId') subscriberId: string,
+    @Query('includeTopics') includeTopics: string
   ): Promise<SubscriberResponseDto> {
-    return await this.getSubscriberUseCase.execute(
+    return this.getSubscriberUseCase.execute(
       GetSubscriberCommand.create({
         environmentId: user.environmentId,
         organizationId: user.organizationId,
         subscriberId,
+        includeTopics: includeTopics === 'true',
       })
     );
   }
@@ -255,6 +261,7 @@ export class SubscribersController {
         avatar: body.avatar,
         locale: body.locale,
         data: body.data,
+        channels: body.channels,
       })
     );
   }
@@ -395,16 +402,25 @@ export class SubscribersController {
   @ApiOperation({
     summary: 'Get subscriber preferences',
   })
+  @ApiQuery({
+    name: 'includeInactiveChannels',
+    type: Boolean,
+    required: false,
+    description:
+      'A flag which specifies if the inactive workflow channels should be included in the retrieved preferences. Default is true',
+  })
   @SdkGroupName('Subscribers.Preferences')
   async listSubscriberPreferences(
     @UserSession() user: UserSessionData,
-    @Param('subscriberId') subscriberId: string
+    @Param('subscriberId') subscriberId: string,
+    @Query('includeInactiveChannels') includeInactiveChannels: boolean
   ): Promise<UpdateSubscriberPreferenceResponseDto[]> {
     const command = GetPreferencesByLevelCommand.create({
       organizationId: user.organizationId,
       subscriberId,
       environmentId: user.environmentId,
       level: PreferenceLevelEnum.TEMPLATE,
+      includeInactiveChannels: includeInactiveChannels ?? true,
     });
 
     return (await this.getPreferenceUsecase.execute(command)) as UpdateSubscriberPreferenceResponseDto[];
@@ -421,21 +437,30 @@ export class SubscribersController {
   @ApiParam({
     name: 'parameter',
     type: String,
-    enum: TriggerRecipientsTypeEnum,
+    enum: PreferenceLevelEnum,
     required: true,
-    description: 'the preferences level to be retrieved( Subscriber / Topic) ',
+    description: 'the preferences level to be retrieved (template / global) ',
+  })
+  @ApiQuery({
+    name: 'includeInactiveChannels',
+    type: Boolean,
+    required: false,
+    description:
+      'A flag which specifies if the inactive workflow channels should be included in the retrieved preferences. Default is true',
   })
   @SdkGroupName('Subscribers.Preferences')
   @SdkMethodName('retrieveByLevel')
   async getSubscriberPreferenceByLevel(
     @UserSession() user: UserSessionData,
-    @Param() { parameter, subscriberId }: GetSubscriberPreferencesByLevelParams
+    @Param() { parameter, subscriberId }: GetSubscriberPreferencesByLevelParams,
+    @Query('includeInactiveChannels') includeInactiveChannels: boolean
   ): Promise<GetSubscriberPreferencesResponseDto[]> {
     const command = GetPreferencesByLevelCommand.create({
       organizationId: user.organizationId,
       subscriberId,
       environmentId: user.environmentId,
       level: parameter,
+      includeInactiveChannels: includeInactiveChannels ?? true,
     });
 
     return await this.getPreferenceUsecase.execute(command);
@@ -457,16 +482,38 @@ export class SubscribersController {
     @Param('parameter') templateId: string,
     @Body() body: UpdateSubscriberPreferenceRequestDto
   ): Promise<UpdateSubscriberPreferenceResponseDto> {
-    const command = UpdateSubscriberPreferenceCommand.create({
-      organizationId: user.organizationId,
-      subscriberId,
-      environmentId: user.environmentId,
-      templateId,
-      ...(typeof body.enabled === 'boolean' && { enabled: body.enabled }),
-      ...(body.channel && { channel: body.channel }),
-    });
+    const result = await this.updatePreferencesUsecase.execute(
+      UpdatePreferencesCommand.create({
+        environmentId: user.environmentId,
+        organizationId: user.organizationId,
+        subscriberId,
+        workflowId: templateId,
+        level: PreferenceLevelEnum.TEMPLATE,
+        includeInactiveChannels: true,
+        ...(body.channel && { [body.channel.type]: body.channel.enabled }),
+      })
+    );
 
-    return await this.updatePreferenceUsecase.execute(command);
+    if (!result.workflow) throw new NotFoundException('Workflow not found');
+
+    return {
+      preference: {
+        channels: result.channels,
+        enabled: result.enabled,
+      },
+      template: {
+        _id: result.workflow.id,
+        name: result.workflow.name,
+        critical: result.workflow.critical,
+        triggers: [
+          {
+            identifier: result.workflow.identifier,
+            type: TriggerTypeEnum.EVENT,
+            variables: [],
+          },
+        ],
+      },
+    };
   }
 
   @Patch('/:subscriberId/preferences')
@@ -482,16 +529,30 @@ export class SubscribersController {
     @UserSession() user: UserSessionData,
     @Param('subscriberId') subscriberId: string,
     @Body() body: UpdateSubscriberGlobalPreferencesRequestDto
-  ) {
-    const command = UpdateSubscriberGlobalPreferencesCommand.create({
-      organizationId: user.organizationId,
-      subscriberId,
-      environmentId: user.environmentId,
-      enabled: body.enabled,
-      preferences: body.preferences,
-    });
+  ): Promise<Omit<UpdateSubscriberPreferenceResponseDto, 'template'>> {
+    const channels = body.preferences?.reduce((acc, curr) => {
+      acc[curr.type] = curr.enabled;
 
-    return await this.updateGlobalPreferenceUsecase.execute(command);
+      return acc;
+    }, {} as IPreferenceChannels);
+
+    const result = await this.updatePreferencesUsecase.execute(
+      UpdatePreferencesCommand.create({
+        environmentId: user.environmentId,
+        organizationId: user.organizationId,
+        subscriberId,
+        level: PreferenceLevelEnum.GLOBAL,
+        includeInactiveChannels: true,
+        ...channels,
+      })
+    );
+
+    return {
+      preference: {
+        channels: result.channels,
+        enabled: result.enabled,
+      },
+    };
   }
 
   @ExternalApiAccessible()

@@ -2,7 +2,7 @@
 import { Module } from '@nestjs/common';
 import {
   ChangeRepository,
-  ControlVariablesRepository,
+  ControlValuesRepository,
   DalService,
   EnvironmentRepository,
   ExecutionDetailsRepository,
@@ -10,7 +10,6 @@ import {
   IntegrationRepository,
   JobRepository,
   LayoutRepository,
-  LogRepository,
   MemberRepository,
   MessageRepository,
   MessageTemplateRepository,
@@ -18,7 +17,7 @@ import {
   NotificationRepository,
   NotificationTemplateRepository,
   OrganizationRepository,
-  SubscriberPreferenceRepository,
+  PreferencesRepository,
   SubscriberRepository,
   TenantRepository,
   TopicRepository,
@@ -31,22 +30,24 @@ import {
   cacheService,
   CacheServiceHealthIndicator,
   ComputeJobWaitDurationService,
+  CreateExecutionDetails,
   createNestLoggingModuleOptions,
   DalServiceHealthIndicator,
   distributedLockService,
+  ExecuteBridgeRequest,
+  ExecutionLogRoute,
   featureFlagsService,
+  GetDecryptedSecretKey,
   getFeatureFlag,
+  injectCommunityAuthProviders,
   InvalidateCacheService,
   LoggerModule,
   QueuesModule,
   storageService,
-  ExecutionLogRoute,
-  CreateExecutionDetails,
-  injectCommunityAuthProviders,
-  ExecuteBridgeRequest,
 } from '@novu/application-generic';
 
-import { JobTopicNameEnum, isClerkEnabled } from '@novu/shared';
+import { isClerkEnabled, JobTopicNameEnum } from '@novu/shared';
+import { JwtModule } from '@nestjs/jwt';
 import packageJson from '../../../package.json';
 
 function getDynamicAuthProviders() {
@@ -72,18 +73,16 @@ const DAL_MODELS = [
   NotificationGroupRepository,
   MemberRepository,
   LayoutRepository,
-  LogRepository,
   IntegrationRepository,
   ChangeRepository,
   JobRepository,
   FeedRepository,
-  SubscriberPreferenceRepository,
   TopicRepository,
   TopicSubscribersRepository,
   TenantRepository,
   WorkflowOverrideRepository,
-  ControlVariablesRepository,
-  ...getDynamicAuthProviders(),
+  ControlValuesRepository,
+  PreferencesRepository,
 ];
 
 const dalService = {
@@ -112,23 +111,46 @@ const PROVIDERS = [
   CreateExecutionDetails,
   ExecuteBridgeRequest,
   getFeatureFlag,
+  GetDecryptedSecretKey,
 ];
 
+const IMPORTS = [
+  QueuesModule.forRoot([
+    JobTopicNameEnum.EXECUTION_LOG,
+    JobTopicNameEnum.WEB_SOCKETS,
+    JobTopicNameEnum.WORKFLOW,
+    JobTopicNameEnum.INBOUND_PARSE_MAIL,
+  ]),
+  LoggerModule.forRoot(
+    createNestLoggingModuleOptions({
+      serviceName: packageJson.name,
+      version: packageJson.version,
+    })
+  ),
+];
+
+if (process.env.NODE_ENV === 'test') {
+  /**
+   * This is here only because of the tests. These providers are available at AppModule level,
+   * but since in tests we are often importing just the SharedModule and not the entire AppModule
+   * we need to make sure these providers are available.
+   *
+   * TODO: modify tests to either import all services they need explicitly, or remove repositories from SharedModule,
+   * and then import SharedModule + repositories explicitly.
+   */
+  PROVIDERS.push(...getDynamicAuthProviders());
+  IMPORTS.push(
+    JwtModule.register({
+      secret: `${process.env.JWT_SECRET}`,
+      signOptions: {
+        expiresIn: 360000,
+      },
+    })
+  );
+}
+
 @Module({
-  imports: [
-    QueuesModule.forRoot([
-      JobTopicNameEnum.EXECUTION_LOG,
-      JobTopicNameEnum.WEB_SOCKETS,
-      JobTopicNameEnum.WORKFLOW,
-      JobTopicNameEnum.INBOUND_PARSE_MAIL,
-    ]),
-    LoggerModule.forRoot(
-      createNestLoggingModuleOptions({
-        serviceName: packageJson.name,
-        version: packageJson.version,
-      })
-    ),
-  ],
+  imports: [...IMPORTS],
   providers: [...PROVIDERS],
   exports: [...PROVIDERS, LoggerModule, QueuesModule],
 })

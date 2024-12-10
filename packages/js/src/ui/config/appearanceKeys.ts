@@ -57,7 +57,9 @@ export const appearanceKeys = [
   'notification',
   'notificationDot',
   'notificationSubject',
+  'notificationSubject__strong',
   'notificationBody',
+  'notificationBody__strong',
   'notificationBodyContainer',
   'notificationImage',
   'notificationDate',
@@ -109,6 +111,7 @@ export const appearanceKeys = [
   // workflow
   'workflowContainer',
   'workflowLabel',
+  'workflowLabelHeader',
   'workflowLabelContainer',
   'workflowContainerDisabledNotice',
   'workflowLabelDisabled__icon',
@@ -117,6 +120,7 @@ export const appearanceKeys = [
 
   // channel
   'channelContainer',
+  'channelsContainerCollapsible',
   'channelsContainer',
   'channelLabel',
   'channelLabelContainer',
@@ -133,4 +137,7 @@ export const appearanceKeys = [
 
   // Preferences Loading
   'preferencesLoadingContainer',
+
+  // Text formatting
+  'strong',
 ] as const;

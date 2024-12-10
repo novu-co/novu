@@ -76,6 +76,7 @@ const integrationSchema = new Schema<IntegrationDBModel>(
       type: Schema.Types.Boolean,
       default: false,
     },
+    removeNovuBranding: Schema.Types.Boolean,
     conditions: [
       {
         isNegated: Schema.Types.Boolean,
@@ -93,6 +94,7 @@ const integrationSchema = new Schema<IntegrationDBModel>(
         ],
       },
     ],
+    connected: Schema.Types.Boolean,
   },
   schemaOptions
 );

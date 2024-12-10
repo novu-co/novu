@@ -6,7 +6,7 @@ import { IEnvironment } from '@novu/shared';
 import { QueryKeys } from '../../api/query.keys';
 import { getEnvironments } from '../../api/environment';
 import { createContextAndHook } from './createContextAndHook';
-import { IS_DOCKER_HOSTED } from '../../config/index';
+import { IS_SELF_HOSTED } from '../../config/index';
 import { BaseEnvironmentEnum } from '../../constants/BaseEnvironmentEnum';
 import { useAuth } from './AuthProvider';
 import { ROUTES } from '../../constants/routes';
@@ -88,7 +88,7 @@ export function EnvironmentProvider({ children }: { children: React.ReactNode })
     refetch: refetchEnvironments,
   } = useQuery<IEnvironment[]>([QueryKeys.myEnvironments, currentOrganization?._id], getEnvironments, {
     enabled: !!currentOrganization,
-    retry: false,
+    retry: 2, // Retry once on 401 if the stored environment is invalid
     staleTime: Infinity,
     onSuccess(envs) {
       /*
@@ -201,9 +201,9 @@ export function useEnvironment({ bridge }: { bridge?: boolean } = {}) {
 
   return {
     ...rest,
-    readOnly: readOnly || (!IS_DOCKER_HOSTED && bridge) || false,
+    readOnly: readOnly || (!IS_SELF_HOSTED && bridge) || false,
     // @deprecated use readOnly instead
-    readonly: readOnly || (!IS_DOCKER_HOSTED && bridge) || false,
-    bridge: (!IS_DOCKER_HOSTED && bridge) || false,
+    readonly: readOnly || (!IS_SELF_HOSTED && bridge) || false,
+    bridge: (!IS_SELF_HOSTED && bridge) || false,
   };
 }

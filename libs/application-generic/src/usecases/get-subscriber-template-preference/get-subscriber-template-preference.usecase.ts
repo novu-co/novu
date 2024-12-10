@@ -3,7 +3,6 @@ import {
   MessageTemplateRepository,
   NotificationTemplateEntity,
   SubscriberEntity,
-  SubscriberPreferenceRepository,
   SubscriberRepository,
   TenantRepository,
   WorkflowOverrideRepository,
@@ -16,14 +15,16 @@ import {
   ISubscriberPreferenceResponse,
   ITemplateConfiguration,
   PreferenceOverrideSourceEnum,
+  PreferencesTypeEnum,
   StepTypeEnum,
 } from '@novu/shared';
 
 import { GetSubscriberTemplatePreferenceCommand } from './get-subscriber-template-preference.command';
 
 import { ApiException } from '../../utils/exceptions';
-import { CachedEntity, buildSubscriberKey } from '../../services/cache';
-import { GetPreferences, GetPreferencesCommand } from '../get-preferences';
+import { buildSubscriberKey, CachedEntity } from '../../services/cache';
+import { GetPreferences } from '../get-preferences';
+import { Instrument, InstrumentUsecase } from '../../instrumentation';
 
 const PRIORITY_ORDER = [
   PreferenceOverrideSourceEnum.TEMPLATE,
@@ -34,73 +35,91 @@ const PRIORITY_ORDER = [
 @Injectable()
 export class GetSubscriberTemplatePreference {
   constructor(
-    private subscriberPreferenceRepository: SubscriberPreferenceRepository,
     private messageTemplateRepository: MessageTemplateRepository,
     private subscriberRepository: SubscriberRepository,
     private workflowOverrideRepository: WorkflowOverrideRepository,
     private tenantRepository: TenantRepository,
-    private getPreferences: GetPreferences
+    private getPreferences: GetPreferences,
   ) {}
 
+  @InstrumentUsecase()
   async execute(
-    command: GetSubscriberTemplatePreferenceCommand
+    command: GetSubscriberTemplatePreferenceCommand,
   ): Promise<ISubscriberPreferenceResponse> {
-    const subscriber =
-      command.subscriber ??
-      (await this.fetchSubscriber({
-        subscriberId: command.subscriberId,
-        _environmentId: command.environmentId,
-      }));
+    const subscriber = await this.getSubscriber(command);
 
-    if (!subscriber) {
-      throw new ApiException(`Subscriber ${command.subscriberId} not found`);
-    }
+    const initialChannels = await this.getChannels(command);
 
-    const initialActiveChannels = await this.getActiveChannels(command);
-    const subscriberPreference =
-      await this.subscriberPreferenceRepository.findOne(
-        {
-          _environmentId: command.environmentId,
-          _subscriberId: subscriber._id,
-          _templateId: command.template._id,
-        },
-        'enabled channels',
-        { readPreference: 'secondaryPreferred' }
-      );
     const workflowOverride = await this.getWorkflowOverride(command);
 
     const templateChannelPreference = command.template.preferenceSettings;
-    const subscriberChannelPreference =
-      (await this.getPreferences.getPreferenceChannels({
-        environmentId: command.environmentId,
-        organizationId: command.organizationId,
-        subscriberId: command.subscriberId,
-        templateId: command.template._id,
-      })) || subscriberPreference?.channels;
+
+    const subscriberWorkflowPreference =
+      await this.getSubscriberWorkflowPreference(command, subscriber._id);
     const workflowOverrideChannelPreference =
       workflowOverride?.preferenceSettings;
 
     const { channels, overrides } = overridePreferences(
       {
         template: templateChannelPreference,
-        subscriber: subscriberChannelPreference,
+        subscriber: subscriberWorkflowPreference.channels,
         workflowOverride: workflowOverrideChannelPreference,
       },
-      initialActiveChannels
+      initialChannels,
     );
 
+    const template = mapTemplateConfiguration({
+      ...command.template,
+      critical: subscriberWorkflowPreference.critical,
+    });
+
     return {
-      template: mapTemplateConfiguration(command.template),
+      template,
       preference: {
-        enabled: subscriberPreference?.enabled ?? true,
+        enabled: subscriberWorkflowPreference.enabled,
         channels,
         overrides,
       },
+      type: subscriberWorkflowPreference.type,
     };
   }
 
+  @Instrument()
+  private async getSubscriberWorkflowPreference(
+    command: GetSubscriberTemplatePreferenceCommand,
+    subscriberId: string,
+  ): Promise<{
+    channels: IPreferenceChannels;
+    critical?: boolean;
+    type: PreferencesTypeEnum;
+    enabled: boolean;
+  }> {
+    const subscriberWorkflowPreference = await this.getPreferences.safeExecute({
+      environmentId: command.environmentId,
+      organizationId: command.organizationId,
+      subscriberId,
+      templateId: command.template._id,
+    });
+
+    const subscriberWorkflowChannels =
+      GetPreferences.mapWorkflowPreferencesToChannelPreferences(
+        subscriberWorkflowPreference.preferences,
+      );
+    const subscriberPreferenceType = subscriberWorkflowPreference.type;
+    const critical = subscriberWorkflowPreference.preferences?.all?.readOnly;
+    const enabled = true;
+
+    return {
+      channels: subscriberWorkflowChannels,
+      critical,
+      type: subscriberPreferenceType,
+      enabled,
+    };
+  }
+
+  @Instrument()
   private async getWorkflowOverride(
-    command: GetSubscriberTemplatePreferenceCommand
+    command: GetSubscriberTemplatePreferenceCommand,
   ) {
     if (!command.tenant?.identifier) {
       return null;
@@ -123,11 +142,18 @@ export class GetSubscriberTemplatePreference {
     });
   }
 
-  private async getActiveChannels(
-    command: GetSubscriberTemplatePreferenceCommand
+  @Instrument()
+  private async getChannels(
+    command: GetSubscriberTemplatePreferenceCommand,
   ): Promise<IPreferenceChannels> {
-    const activeChannels = await this.queryActiveChannels(command);
-    const initialActiveChannels = filteredPreference(
+    let includedChannels: ChannelTypeEnum[];
+    if (command.includeInactiveChannels === true) {
+      includedChannels = Object.values(ChannelTypeEnum);
+    } else {
+      includedChannels = await this.queryActiveChannels(command);
+    }
+
+    const initialChannels = filteredPreference(
       {
         email: true,
         sms: true,
@@ -135,17 +161,18 @@ export class GetSubscriberTemplatePreference {
         chat: true,
         push: true,
       },
-      activeChannels
+      includedChannels,
     );
 
-    return initialActiveChannels;
+    return initialChannels;
   }
 
+  @Instrument()
   private async queryActiveChannels(
-    command: GetSubscriberTemplatePreferenceCommand
+    command: GetSubscriberTemplatePreferenceCommand,
   ): Promise<ChannelTypeEnum[]> {
     const activeSteps = command.template.steps.filter(
-      (step) => step.active === true
+      (step) => step.active === true,
     );
 
     const stepMissingTemplate = activeSteps.some((step) => !step.template);
@@ -163,8 +190,8 @@ export class GetSubscriberTemplatePreference {
       return [
         ...new Set(
           messageTemplates.map(
-            (messageTemplate) => messageTemplate.type
-          ) as unknown as ChannelTypeEnum[]
+            (messageTemplate) => messageTemplate.type,
+          ) as unknown as ChannelTypeEnum[],
         ),
       ];
     }
@@ -184,23 +211,29 @@ export class GetSubscriberTemplatePreference {
   }
 
   @CachedEntity({
-    builder: (command: { subscriberId: string; _environmentId: string }) =>
+    builder: (command: GetSubscriberTemplatePreferenceCommand) =>
       buildSubscriberKey({
-        _environmentId: command._environmentId,
+        _environmentId: command.environmentId,
         subscriberId: command.subscriberId,
       }),
   })
-  private async fetchSubscriber({
-    subscriberId,
-    _environmentId,
-  }: {
-    subscriberId: string;
-    _environmentId: string;
-  }): Promise<SubscriberEntity | null> {
-    return await this.subscriberRepository.findBySubscriberId(
-      _environmentId,
-      subscriberId
+  private async getSubscriber(
+    command: GetSubscriberTemplatePreferenceCommand,
+  ): Promise<SubscriberEntity | null> {
+    if (command.subscriber) {
+      return command.subscriber;
+    }
+
+    const subscriber = await this.subscriberRepository.findBySubscriberId(
+      command.environmentId,
+      command.subscriberId,
     );
+
+    if (!subscriber) {
+      throw new ApiException(`Subscriber ${command.subscriberId} not found`);
+    }
+
+    return subscriber;
   }
 }
 
@@ -208,7 +241,7 @@ function updateOverrideReasons(
   channelName,
   sourceName: PreferenceOverrideSourceEnum,
   index: number,
-  overrideReasons: IPreferenceOverride[]
+  overrideReasons: IPreferenceOverride[],
 ) {
   const currentOverride: IPreferenceOverride = {
     channel: channelName as ChannelTypeEnum,
@@ -231,7 +264,7 @@ function overridePreference(
     channels: IPreferenceChannels;
   },
   sourcePreference: IPreferenceChannels,
-  sourceName: PreferenceOverrideSourceEnum
+  sourceName: PreferenceOverrideSourceEnum,
 ) {
   const channels = { ...oldPreferenceState.channels };
   const overrides = [...oldPreferenceState.overrides];
@@ -240,7 +273,7 @@ function overridePreference(
     if (typeof channels[channelName] !== 'boolean') continue;
 
     const index = overrides.findIndex(
-      (overrideReason) => overrideReason.channel === channelName
+      (overrideReason) => overrideReason.channel === channelName,
     );
 
     const isSameReason = overrides[index]?.source !== channelValue;
@@ -259,7 +292,7 @@ function overridePreference(
 
 export function overridePreferences(
   preferenceSources: IOverridePreferencesSources,
-  initialActiveChannels: IPreferenceChannels
+  initialActiveChannels: IPreferenceChannels,
 ) {
   let result: {
     overrides: IPreferenceOverride[];
@@ -285,16 +318,16 @@ export function overridePreferences(
 
 export const filteredPreference = (
   preferences: IPreferenceChannels,
-  filterKeys: string[]
+  filterKeys: string[],
 ): IPreferenceChannels =>
   Object.entries(preferences).reduce(
     (obj, [key, value]) =>
       filterKeys.includes(key) ? { ...obj, [key]: value } : obj,
-    {}
+    {},
   );
 
-function mapTemplateConfiguration(
-  template: NotificationTemplateEntity
+export function mapTemplateConfiguration(
+  template: NotificationTemplateEntity,
 ): ITemplateConfiguration {
   return {
     _id: template._id,

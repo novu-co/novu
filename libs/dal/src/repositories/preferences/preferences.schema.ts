@@ -27,68 +27,40 @@ const preferencesSchema = new Schema<PreferencesDBModel>(
       type: Schema.Types.ObjectId,
       ref: 'NotificationTemplate',
     },
-    actor: Schema.Types.String,
     type: Schema.Types.String,
     preferences: {
-      workflow: {
-        defaultValue: {
+      all: {
+        enabled: {
           type: Schema.Types.Boolean,
-          default: true,
         },
         readOnly: {
           type: Schema.Types.Boolean,
-          default: false,
         },
       },
       channels: {
         [ChannelTypeEnum.EMAIL]: {
-          defaultValue: {
+          enabled: {
             type: Schema.Types.Boolean,
-            default: true,
-          },
-          readOnly: {
-            type: Schema.Types.Boolean,
-            default: false,
           },
         },
         [ChannelTypeEnum.SMS]: {
-          defaultValue: {
+          enabled: {
             type: Schema.Types.Boolean,
-            default: true,
-          },
-          readOnly: {
-            type: Schema.Types.Boolean,
-            default: false,
           },
         },
         [ChannelTypeEnum.IN_APP]: {
-          defaultValue: {
+          enabled: {
             type: Schema.Types.Boolean,
-            default: true,
-          },
-          readOnly: {
-            type: Schema.Types.Boolean,
-            default: false,
           },
         },
         [ChannelTypeEnum.CHAT]: {
-          defaultValue: {
+          enabled: {
             type: Schema.Types.Boolean,
-            default: true,
-          },
-          readOnly: {
-            type: Schema.Types.Boolean,
-            default: false,
           },
         },
         [ChannelTypeEnum.PUSH]: {
-          defaultValue: {
+          enabled: {
             type: Schema.Types.Boolean,
-            default: true,
-          },
-          readOnly: {
-            type: Schema.Types.Boolean,
-            default: false,
           },
         },
       },
@@ -98,6 +70,28 @@ const preferencesSchema = new Schema<PreferencesDBModel>(
 );
 
 preferencesSchema.plugin(mongooseDelete, { deletedAt: true, deletedBy: true, overrideMethods: 'all' });
+
+// Subscriber Global Preferences
+preferencesSchema.index({
+  _environmentId: 1,
+  _subscriberId: 1,
+  type: 1,
+});
+
+// Subscriber Workflow Preferences
+preferencesSchema.index({
+  _environmentId: 1,
+  _subscriberId: 1,
+  _templateId: 1,
+  type: 1,
+});
+
+// Workflow Preferences (both Resource and User)
+preferencesSchema.index({
+  _environmentId: 1,
+  _templateId: 1,
+  type: 1,
+});
 
 export const Preferences =
   (mongoose.models.Preferences as mongoose.Model<PreferencesDBModel>) ||

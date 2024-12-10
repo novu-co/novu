@@ -12,7 +12,7 @@ import {
 } from '@novu/shared';
 
 import { ApiException } from '../../utils/exceptions';
-import { isRegularDelay, isRegularDigest } from '../../utils/digest';
+import { isRegularDigest } from '../../utils/digest';
 import { TimedDigestDelayService } from './timed-digest-delay.service';
 
 export class ComputeJobWaitDurationService {
@@ -39,9 +39,10 @@ export class ComputeJobWaitDurationService {
       const delay = differenceInMilliseconds(new Date(delayDate), new Date());
 
       if (delay < 0) {
-        throw new ApiException(
-          `Delay date at path ${delayPath} must be a future date`,
-        );
+        throw new ApiException({
+          message: `Delay date at path must be a future date`,
+          delayPath,
+        });
       }
 
       return delay;

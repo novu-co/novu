@@ -22,7 +22,6 @@ export class ExecutionDetailsEntity {
   isTest: boolean;
   isRetry: boolean;
   createdAt: string;
-  expireAt?: string;
   raw?: string | null;
   webhookStatus?: string;
 }

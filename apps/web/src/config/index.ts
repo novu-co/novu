@@ -49,8 +49,11 @@ export const WIDGET_EMBED_PATH =
   process.env.REACT_APP_WIDGET_EMBED_PATH ||
   'http://localhost:4701/embed.umd.min.js';
 
-export const IS_DOCKER_HOSTED =
-  window._env_.REACT_APP_DOCKER_HOSTED_ENV === 'true' || process.env.REACT_APP_DOCKER_HOSTED_ENV === 'true';
+export const IS_SELF_HOSTED =
+  window._env_.REACT_APP_IS_SELF_HOSTED === 'true' || process.env.REACT_APP_IS_SELF_HOSTED === 'true';
+
+// To test feature in prod and staging. Excluding self host and local
+export const IS_NOVU_PROD_STAGING = !IS_SELF_HOSTED && !API_ROOT.includes('localhost');
 
 export const REACT_APP_VERSION = process.env.NOVU_VERSION;
 
@@ -88,11 +91,19 @@ export const IS_EE_AUTH_ENABLED =
 export const CLERK_PUBLISHABLE_KEY =
   window._env_.REACT_APP_CLERK_PUBLISHABLE_KEY || process.env.REACT_APP_CLERK_PUBLISHABLE_KEY || '';
 
+export const IS_UNDER_DASHBOARD =
+  window._env_.REACT_IS_UNDER_DASHBOARD || process.env.REACT_IS_UNDER_DASHBOARD || 'false';
+
+export const WEB_APP_URL =
+  window._env_.REACT_APP_WEB_APP_URL || process.env.REACT_APP_WEB_APP_URL || window.location.origin;
+
+export const NEW_DASHBOARD_URL = window._env_.REACT_APP_NEW_DASHBOARD_URL || process.env.REACT_APP_NEW_DASHBOARD_URL;
+
 if (IS_EE_AUTH_ENABLED && !CLERK_PUBLISHABLE_KEY) {
   throw new Error('Missing Clerk Publishable Key');
 }
 
-export const BRIDGE_SYNC_SAMPLE_ENDPOINT = 'https://deploy-preview-6--onboarding-sandbox.netlify.app/api/novu';
+export const BRIDGE_SYNC_SAMPLE_ENDPOINT = 'https://deploy-preview-8--onboarding-sandbox.netlify.app/api/novu';
 /**
  * This is used for versioning the sandbox endpoints across revisions
  * On change, we should move the current one to the legacy list
@@ -101,4 +112,5 @@ export const BRIDGE_ENDPOINTS_LEGACY_VERSIONS = [
   'https://onboarding-sandbox.netlify.app/api/novu',
   'https://deploy-preview-1--onboarding-sandbox.netlify.app/api/novu',
   'https://deploy-preview-4--onboarding-sandbox.netlify.app/api/novu',
+  'https://deploy-preview-6--onboarding-sandbox.netlify.app/api/novu',
 ];

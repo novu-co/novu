@@ -19,6 +19,7 @@
       <option name="ENFORCE_TRAILING_COMMA" value="Remove" />
       <option name="SPACES_WITHIN_OBJECT_LITERAL_BRACES" value="true" />
       <option name="SPACES_WITHIN_IMPORTS" value="true" />
+      <option name="BLACKLIST_IMPORTS" value="rxjs/Rx,node_modules/**,**/node_modules/**,@angular/material,@angular/material/typings/**,twilio/lib/twiml/VoiceResponse" />
     </TypeScriptCodeStyleSettings>
     <VueCodeStyleSettings>
       <option name="INTERPOLATION_NEW_LINE_AFTER_START_DELIMITER" value="false" />

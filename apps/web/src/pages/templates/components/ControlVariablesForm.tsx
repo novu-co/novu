@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { IS_DOCKER_HOSTED } from '../../../config/index';
+import { IS_SELF_HOSTED } from '../../../config/index';
 import { useStepFormPath } from '../hooks/useStepFormPath';
 import { useTemplateEditorForm } from './TemplateEditorFormProvider';
 import { ControlVariablesForm as Component } from '../../../ee/editor/index';
@@ -9,8 +9,7 @@ export const ControlVariablesForm = ({ onChange }: { onChange?: (data: any) => v
   const stepFormPath = useStepFormPath();
   const { watch } = useFormContext();
   const { template } = useTemplateEditorForm();
-  const controls =
-    watch(`${stepFormPath}.template.controls.schema`) || watch(`${stepFormPath}.template.inputs.schema`) || {};
+  const controls = watch(`${stepFormPath}.template.controls.schema`) || {};
   const workflowPayloadSchema = watch(`payloadSchema`) || {};
 
   const stepId = watch(`${stepFormPath}.stepId`);
@@ -24,7 +23,7 @@ export const ControlVariablesForm = ({ onChange }: { onChange?: (data: any) => v
     };
   }, [stepId, _stepId, template]);
 
-  if (IS_DOCKER_HOSTED) {
+  if (IS_SELF_HOSTED) {
     return null;
   }
 

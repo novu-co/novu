@@ -1,6 +1,6 @@
-import { ActionStepEnum, ChannelStepEnum } from '../constants';
-import { digestRegularOutputSchema, digestTimedOutputSchema } from '../schemas';
+import { ChannelStepEnum } from '../constants';
 import { actionStepSchemas } from '../schemas/steps/actions';
+import { digestRegularOutputSchema, digestTimedOutputSchema } from '../schemas/steps/actions/digest.schema';
 import { channelStepSchemas } from '../schemas/steps/channels';
 import type { Providers } from './provider.types';
 import type { FromSchema, FromSchemaUnvalidated, Schema } from './schema.types';
@@ -18,13 +18,7 @@ export type StepOptions<
    */
   skip?: Skip<T_Controls>;
   /**
-   * The schema for the controls of the step. Used to validate the user-provided controls from Novu Web.
-   *
-   * @deprecated Use `controlSchema` instead
-   */
-  inputSchema?: T_ControlSchema;
-  /**
-   * The schema for the controls of the step. Used to validate the user-provided controls from Novu Web.
+   * The schema for the controls of the step. Used to validate the user-provided controls from Novu Dashboard.
    */
   controlSchema?: T_ControlSchema;
 };
@@ -178,47 +172,47 @@ export type ChannelStep<
      * The providers for the step. Used to override the behaviour of the providers for the step.
      */
     providers?: Prettify<Providers<T_StepType, T_Controls, T_Outputs>>;
+    /**
+     * A flag to disable output sanitization for the step.
+     *
+     * @default false
+     */
+    disableOutputSanitization?: boolean;
   }
 ) => StepOutput<T_Result>;
 
-export type EmailOutput = FromSchema<(typeof channelStepSchemas)[ChannelStepEnum.EMAIL]['output']>;
-export type EmailOutputUnvalidated = FromSchemaUnvalidated<
-  (typeof channelStepSchemas)[ChannelStepEnum.EMAIL]['output']
->;
-export type EmailResult = FromSchema<(typeof channelStepSchemas)[ChannelStepEnum.EMAIL]['result']>;
+export type EmailOutput = FromSchema<(typeof channelStepSchemas)['email']['output']>;
+export type EmailOutputUnvalidated = FromSchemaUnvalidated<(typeof channelStepSchemas)['email']['output']>;
+export type EmailResult = FromSchema<(typeof channelStepSchemas)['email']['result']>;
 
-export type SmsOutput = FromSchema<(typeof channelStepSchemas)[ChannelStepEnum.SMS]['output']>;
-export type SmsOutputUnvalidated = FromSchemaUnvalidated<(typeof channelStepSchemas)[ChannelStepEnum.SMS]['output']>;
-export type SmsResult = FromSchema<(typeof channelStepSchemas)[ChannelStepEnum.SMS]['result']>;
+export type SmsOutput = FromSchema<(typeof channelStepSchemas)['sms']['output']>;
+export type SmsOutputUnvalidated = FromSchemaUnvalidated<(typeof channelStepSchemas)['sms']['output']>;
+export type SmsResult = FromSchema<(typeof channelStepSchemas)['sms']['result']>;
 
-export type PushOutput = FromSchema<(typeof channelStepSchemas)[ChannelStepEnum.PUSH]['output']>;
-export type PushOutputUnvalidated = FromSchemaUnvalidated<(typeof channelStepSchemas)[ChannelStepEnum.PUSH]['output']>;
-export type PushResult = FromSchema<(typeof channelStepSchemas)[ChannelStepEnum.PUSH]['result']>;
+export type PushOutput = FromSchema<(typeof channelStepSchemas)['push']['output']>;
+export type PushOutputUnvalidated = FromSchemaUnvalidated<(typeof channelStepSchemas)['push']['output']>;
+export type PushResult = FromSchema<(typeof channelStepSchemas)['push']['result']>;
 
-export type ChatOutput = FromSchema<(typeof channelStepSchemas)[ChannelStepEnum.CHAT]['output']>;
-export type ChatOutputUnvalidated = FromSchemaUnvalidated<(typeof channelStepSchemas)[ChannelStepEnum.CHAT]['output']>;
-export type ChatResult = FromSchema<(typeof channelStepSchemas)[ChannelStepEnum.CHAT]['result']>;
+export type ChatOutput = FromSchema<(typeof channelStepSchemas)['chat']['output']>;
+export type ChatOutputUnvalidated = FromSchemaUnvalidated<(typeof channelStepSchemas)['chat']['output']>;
+export type ChatResult = FromSchema<(typeof channelStepSchemas)['chat']['result']>;
 
-export type InAppOutput = FromSchema<(typeof channelStepSchemas)[ChannelStepEnum.IN_APP]['output']>;
-export type InAppOutputUnvalidated = FromSchemaUnvalidated<
-  (typeof channelStepSchemas)[ChannelStepEnum.IN_APP]['output']
->;
-export type InAppResult = FromSchema<(typeof channelStepSchemas)[ChannelStepEnum.IN_APP]['result']>;
+export type InAppOutput = FromSchema<(typeof channelStepSchemas)['in_app']['output']>;
+export type InAppOutputUnvalidated = FromSchemaUnvalidated<(typeof channelStepSchemas)['in_app']['output']>;
+export type InAppResult = FromSchema<(typeof channelStepSchemas)['in_app']['result']>;
 
-export type DelayOutput = FromSchema<(typeof actionStepSchemas)[ActionStepEnum.DELAY]['output']>;
-export type DelayOutputUnvalidated = FromSchemaUnvalidated<(typeof actionStepSchemas)[ActionStepEnum.DELAY]['output']>;
-export type DelayResult = FromSchema<(typeof actionStepSchemas)[ActionStepEnum.DELAY]['result']>;
+export type DelayOutput = FromSchema<(typeof actionStepSchemas)['delay']['output']>;
+export type DelayOutputUnvalidated = FromSchemaUnvalidated<(typeof actionStepSchemas)['delay']['output']>;
+export type DelayResult = FromSchema<(typeof actionStepSchemas)['delay']['result']>;
 
 export type DigestRegularOutput = FromSchema<typeof digestRegularOutputSchema>;
 export type DigestRegularOutputUnvalidated = FromSchemaUnvalidated<typeof digestRegularOutputSchema>;
 export type DigestTimedOutput = FromSchema<typeof digestTimedOutputSchema>;
 export type DigestTimedOutputUnvalidated = FromSchemaUnvalidated<typeof digestTimedOutputSchema>;
 
-export type DigestOutput = FromSchema<(typeof actionStepSchemas)[ActionStepEnum.DIGEST]['output']>;
-export type DigestOutputUnvalidated = FromSchemaUnvalidated<
-  (typeof actionStepSchemas)[ActionStepEnum.DIGEST]['output']
->;
-export type DigestResult = FromSchema<(typeof actionStepSchemas)[ActionStepEnum.DIGEST]['result']>;
+export type DigestOutput = FromSchema<(typeof actionStepSchemas)['digest']['output']>;
+export type DigestOutputUnvalidated = FromSchemaUnvalidated<(typeof actionStepSchemas)['digest']['output']>;
+export type DigestResult = FromSchema<(typeof actionStepSchemas)['digest']['result']>;
 
 /**
  * The step type.

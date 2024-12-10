@@ -174,7 +174,7 @@ export const GetStartedPageV2 = ({ location }: { location: 'onboarding' | 'get-s
                     border: 'none !important',
                     padding: '1px',
                     borderRadius: '100',
-                    boxShadow: 'dark !important',
+                    boxShadow: '!important dark',
                   })}
                   onDoubleClick={() => {
                     track('Command copied - [Get Started - V2]');

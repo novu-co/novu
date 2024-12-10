@@ -1,27 +1,5 @@
 import { Module } from '@nestjs/common';
 import {
-  ControlVariablesRepository,
-  DalService,
-  EnvironmentRepository,
-  ExecutionDetailsRepository,
-  IntegrationRepository,
-  JobRepository,
-  LayoutRepository,
-  LogRepository,
-  MessageRepository,
-  MessageTemplateRepository,
-  NotificationGroupRepository,
-  NotificationRepository,
-  NotificationTemplateRepository,
-  OrganizationRepository,
-  SubscriberPreferenceRepository,
-  SubscriberRepository,
-  TenantRepository,
-  TopicRepository,
-  TopicSubscribersRepository,
-  WorkflowOverrideRepository,
-} from '@novu/dal';
-import {
   analyticsService,
   BulkCreateExecutionDetails,
   cacheService,
@@ -35,7 +13,9 @@ import {
   DigestFilterSteps,
   distributedLockService,
   EventsDistributedLockService,
+  ExecuteBridgeRequest,
   featureFlagsService,
+  GetDecryptedSecretKey,
   GetTenant,
   InvalidateCacheService,
   LoggerModule,
@@ -48,29 +28,33 @@ import {
   UpdateSubscriber,
   UpdateSubscriberChannel,
   UpdateTenant,
-  injectCommunityAuthProviders,
-  ExecuteBridgeRequest,
 } from '@novu/application-generic';
+import {
+  ControlValuesRepository,
+  DalService,
+  EnvironmentRepository,
+  ExecutionDetailsRepository,
+  IntegrationRepository,
+  JobRepository,
+  LayoutRepository,
+  MessageRepository,
+  MessageTemplateRepository,
+  NotificationGroupRepository,
+  NotificationRepository,
+  NotificationTemplateRepository,
+  SubscriberRepository,
+  TenantRepository,
+  TopicRepository,
+  TopicSubscribersRepository,
+  WorkflowOverrideRepository,
+} from '@novu/dal';
 
-import { JobTopicNameEnum, isClerkEnabled } from '@novu/shared';
+import { JobTopicNameEnum } from '@novu/shared';
 import packageJson from '../../../package.json';
-import { CreateLog } from './logs';
-import { ActiveJobsMetricService } from '../workflow/services';
 import { UNIQUE_WORKER_DEPENDENCIES } from '../../config/worker-init.config';
-
-function getDynamicAuthProviders() {
-  if (isClerkEnabled()) {
-    // eslint-disable-next-line global-require
-    const eeAuthPackage = require('@novu/ee-auth');
-
-    return eeAuthPackage.injectEEAuthProviders();
-  } else {
-    return injectCommunityAuthProviders();
-  }
-}
+import { ActiveJobsMetricService } from '../workflow/services';
 
 const DAL_MODELS = [
-  OrganizationRepository,
   EnvironmentRepository,
   ExecutionDetailsRepository,
   NotificationTemplateRepository,
@@ -80,16 +64,13 @@ const DAL_MODELS = [
   MessageTemplateRepository,
   NotificationGroupRepository,
   LayoutRepository,
-  LogRepository,
   IntegrationRepository,
   JobRepository,
-  SubscriberPreferenceRepository,
   TopicRepository,
   TopicSubscribersRepository,
   TenantRepository,
   WorkflowOverrideRepository,
-  ControlVariablesRepository,
-  ...getDynamicAuthProviders(),
+  ControlValuesRepository,
 ];
 
 const dalService = {
@@ -109,7 +90,6 @@ const PROVIDERS = [
   cacheService,
   ComputeJobWaitDurationService,
   CreateExecutionDetails,
-  CreateLog,
   CreateNotificationJobs,
   CreateSubscriber,
   dalService,
@@ -131,6 +111,7 @@ const PROVIDERS = [
   ...DAL_MODELS,
   ActiveJobsMetricService,
   ExecuteBridgeRequest,
+  GetDecryptedSecretKey,
 ];
 
 @Module({

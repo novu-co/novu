@@ -1,4 +1,4 @@
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 
 const sound = {
   anyOf: [
@@ -10,7 +10,7 @@ const sound = {
       required: ['name', 'volume', 'critical'],
     },
   ],
-} satisfies Schema;
+} satisfies JsonSchema;
 
 /**
  * APNS `POST /3/device/{device_token}` schema
@@ -100,7 +100,7 @@ The value of this header must accurately reflect the contents of your notificati
   },
   required: [],
   additionalProperties: true,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 export const apnsProviderSchemas = {
   output: apnsOutputSchema,

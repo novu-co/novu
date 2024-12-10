@@ -1,24 +1,19 @@
-import { createHmac } from 'node:crypto';
-
 import { Client } from './client';
 import {
-  ErrorCodeEnum,
-  FRAMEWORK_VERSION,
   GetActionEnum,
   HttpHeaderKeysEnum,
   HttpMethodEnum,
   HttpQueryKeysEnum,
   HttpStatusEnum,
   PostActionEnum,
-  SDK_VERSION,
   SIGNATURE_TIMESTAMP_TOLERANCE,
 } from './constants';
 import {
   BridgeError,
   FrameworkError,
   InvalidActionError,
+  isFrameworkError,
   MethodNotAllowedError,
-  PlatformError,
   SignatureExpiredError,
   SignatureInvalidError,
   SignatureMismatchError,
@@ -26,7 +21,8 @@ import {
   SigningKeyNotFoundError,
 } from './errors';
 import type { Awaitable, EventTriggerParams, Workflow } from './types';
-import { initApiClient } from './utils';
+import { initApiClient, createHmacSubtle } from './utils';
+import { isPlatformError } from './errors/guard.errors';
 
 export type ServeHandlerOptions = {
   client?: Client;
@@ -70,18 +66,20 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
   public readonly client: Client;
   private readonly hmacEnabled: boolean;
   private readonly http;
+  private readonly workflows: Array<Workflow>;
 
   constructor(options: INovuRequestHandlerOptions<Input, Output>) {
     this.handler = options.handler;
     this.client = options.client ? options.client : new Client();
-    this.client.addWorkflows(options.workflows);
-    this.http = initApiClient(this.client.secretKey as string);
+    this.workflows = options.workflows;
+    this.http = initApiClient(this.client.secretKey, this.client.apiUrl);
     this.frameworkName = options.frameworkName;
     this.hmacEnabled = this.client.strictAuthentication;
   }
 
   public createHandler(): (...args: Input) => Promise<Output> {
     return async (...args: Input) => {
+      await this.client.addWorkflows(this.workflows);
       const actions = await this.handler(...args);
       const actionResponse = await this.handleAction({
         actions,
@@ -132,13 +130,10 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
   private async handleAction({ actions }: { actions: HandlerResponse<Output> }): Promise<IActionResponse> {
     const url = await actions.url();
     const method = await actions.method();
-    const action = url.searchParams.get(HttpQueryKeysEnum.ACTION) || '';
+    const action = url.searchParams.get(HttpQueryKeysEnum.ACTION) || GetActionEnum.HEALTH_CHECK;
     const workflowId = url.searchParams.get(HttpQueryKeysEnum.WORKFLOW_ID) || '';
     const stepId = url.searchParams.get(HttpQueryKeysEnum.STEP_ID) || '';
-    const signatureHeader =
-      (await actions.headers(HttpHeaderKeysEnum.NOVU_SIGNATURE)) ||
-      (await actions.headers(HttpHeaderKeysEnum.NOVU_SIGNATURE_DEPRECATED)) ||
-      '';
+    const signatureHeader = (await actions.headers(HttpHeaderKeysEnum.NOVU_SIGNATURE)) || '';
 
     let body: Record<string, unknown> = {};
     try {
@@ -151,7 +146,7 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
 
     try {
       if (action !== GetActionEnum.HEALTH_CHECK) {
-        this.validateHmac(body, signatureHeader);
+        await this.validateHmac(body, signatureHeader);
       }
 
       const postActionMap = this.getPostActionMap(body, workflowId, stepId, action);
@@ -273,20 +268,11 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
     }
   }
 
-  private isBridgeError(error: unknown): error is FrameworkError {
-    return Object.values(ErrorCodeEnum).includes((error as FrameworkError)?.code);
-  }
-
-  private isPlatformError(error: unknown): error is PlatformError {
-    // TODO: replace with check against known Platform error codes.
-    return (error as PlatformError)?.statusCode >= 400 && (error as PlatformError)?.statusCode < 500;
-  }
-
   private handleError(error: unknown): IActionResponse {
-    if (this.isBridgeError(error)) {
-      if (error.statusCode === HttpStatusEnum.INTERNAL_SERVER_ERROR) {
+    if (isFrameworkError(error)) {
+      if (error.statusCode >= 500) {
         /*
-         * Log bridge application exceptions to assist the Developer in debugging errors with their integration.
+         * Log bridge server errors to assist the Developer in debugging errors with their integration.
          * This path is reached when the Bridge application throws an error, ensuring they can see the error in their logs.
          */
         // eslint-disable-next-line no-console
@@ -294,17 +280,18 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
       }
 
       return this.createError(error);
-    } else if (this.isPlatformError(error)) {
+    } else if (isPlatformError(error)) {
       return this.createError(error);
     } else {
+      const bridgeError = new BridgeError(error);
       // eslint-disable-next-line no-console
-      console.error(error);
+      console.error(bridgeError);
 
-      return this.createError(new BridgeError());
+      return this.createError(bridgeError);
     }
   }
 
-  private validateHmac(payload: unknown, hmacHeader: string | null): void {
+  private async validateHmac(payload: unknown, hmacHeader: string | null): Promise<void> {
     if (!this.hmacEnabled) return;
     if (!hmacHeader) {
       throw new SignatureNotFoundError();
@@ -327,16 +314,12 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
       throw new SignatureExpiredError();
     }
 
-    const localHash = this.hashHmac(this.client.secretKey as string, `${timestampPayload}.${JSON.stringify(payload)}`);
+    const localHash = await createHmacSubtle(this.client.secretKey, `${timestampPayload}.${JSON.stringify(payload)}`);
 
     const isMatching = localHash === signaturePayload;
 
     if (!isMatching) {
       throw new SignatureMismatchError();
     }
-  }
-
-  private hashHmac(secretKey: string, data: string): string {
-    return createHmac('sha256', secretKey).update(data).digest('hex');
   }
 }

@@ -363,9 +363,8 @@ class Novu {
       wrapper.className = 'wrapper-novu-widget';
       wrapper.style.display = 'none';
       wrapper.id = WEASL_WRAPPER_ID;
-      (
-        wrapper as any
-      ).style = `z-index: ${Number.MAX_SAFE_INTEGER}; width: 0; height: 0; position: relative; display: none;`;
+      (wrapper as any).style =
+        `z-index: ${Number.MAX_SAFE_INTEGER}; width: 0; height: 0; position: relative; display: none;`;
       wrapper.appendChild(this.iframe);
       document.body.appendChild(wrapper);
     }

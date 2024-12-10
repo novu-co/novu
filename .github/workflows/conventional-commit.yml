@@ -1,4 +1,4 @@
-name: "Lint PR title"
+name: 'Lint PR title'
 
 on:
   pull_request_target:
@@ -44,7 +44,6 @@ jobs:
           requireScope: true
           scopes: |
             ${{ env.SCOPES }}
-
 
       - uses: marocchino/sticky-pull-request-comment@v2
         # When the previous steps fails, the workflow would stop. By adding this

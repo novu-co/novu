@@ -22,7 +22,8 @@ export const DocsContainer = ({ children, context }) => {
             },
           };
         },
-      }}>
+      }}
+    >
       {children}
     </BaseContainer>
   );
