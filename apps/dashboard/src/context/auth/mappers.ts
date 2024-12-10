@@ -7,12 +7,7 @@ export const toUserEntity = (clerkUser: UserResource): IUserEntity => {
    *  - user exists and has signed in
    *  - user is signing up
    *
-   * In the case where the user is still signing up, we are using the clerk identifier for the id.
-   * This however quickly gets update to the externalId (which is actually the novu internal
-   * entity identifier) that gets used further in the app. There are a few consumers that
-   * want to use this identifier before it is set to the internal value. These consumers
-   * should make sure they only report with the correct value, a reference
-   * implementation can be found in 'apps/dashboard/src/context/identity-provider.tsx'
+   * In cases where the externalId is not received yet from clerk, the "_id" field will be null.
    */
 
   return {
@@ -36,13 +31,7 @@ export const toOrganizationEntity = (clerkOrganization: OrganizationResource): I
    *  - user exists and has signed in
    *  - user is signing up
    *
-   *
-   * In the case where the user is still signing up, we are using the clerk identifier for the id.
-   * This however quickly gets update to the externalId (which is actually the novu internal
-   * entity identifier) that gets used further in the app. There are a few consumers that
-   * want to use this identifier before it is set to the internal value. These consumers
-   * should make sure they only report with the correct value, a reference
-   * implementation can be found in 'apps/dashboard/src/context/identity-provider.tsx'
+   * In cases where the externalOrgId is not received yet from clerk, the "_id" field will be null.
    */
 
   return {
