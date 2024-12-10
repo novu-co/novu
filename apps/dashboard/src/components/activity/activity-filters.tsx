@@ -83,6 +83,9 @@ export function ActivityFilters({ onFiltersChange, initialValues }: IActivityFil
               <FacetedFormFilter
                 size="small"
                 type="single"
+                hideClear
+                hideSearch
+                hideTitle
                 title="Time period"
                 options={DATE_RANGE_OPTIONS}
                 selected={[field.value]}

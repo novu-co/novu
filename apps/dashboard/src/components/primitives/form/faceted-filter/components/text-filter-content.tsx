@@ -1,8 +1,5 @@
 import { SizeType } from '../types';
-import { STYLES } from '../styles';
-import { FilterInput } from './filter-input';
-import { ClearButton } from './clear-button';
-import { cn } from '../../../../../utils/ui';
+import { BaseFilterContent } from './base-filter-content';
 
 interface TextFilterContentProps {
   inputRef: React.RefObject<HTMLInputElement>;
@@ -13,6 +10,7 @@ interface TextFilterContentProps {
   size: SizeType;
   hideSearch?: boolean;
   hideClear?: boolean;
+  title?: string;
 }
 
 export function TextFilterContent({
@@ -24,20 +22,21 @@ export function TextFilterContent({
   size,
   hideSearch = false,
   hideClear = false,
+  title,
 }: TextFilterContentProps) {
   return (
-    <div>
-      {!hideSearch && (
-        <FilterInput
-          inputRef={inputRef}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          size={size}
-          showEnterIcon={true}
-        />
-      )}
-      {!hideClear && value && <ClearButton onClick={onClear} size={size} separatorClassName="mt-0" />}
-    </div>
+    <BaseFilterContent
+      inputRef={inputRef}
+      title={title}
+      onClear={onClear}
+      size={size}
+      hideSearch={hideSearch}
+      hideClear={hideClear}
+      searchValue={value}
+      onSearchChange={onChange}
+      searchPlaceholder={placeholder}
+      showNavigationFooter={false}
+      showEnterIcon={true}
+    />
   );
 }
