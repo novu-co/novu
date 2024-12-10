@@ -52,6 +52,7 @@ export function HeaderNav() {
         window?.Plain?.init({
           appId: process.env.REACT_APP_PLAIN_SUPPORT_CHAT_APP_ID,
           hideLauncher: true,
+          hideBranding: true,
           title: 'Chat with us',
           links: [
             {
@@ -74,6 +75,7 @@ export function HeaderNav() {
           customerDetails: {
             email: currentUser?.email,
             emailHash: currentUser?.servicesHashes?.plain,
+            externalId: currentUser?._id,
           },
         });
       } catch (error) {
