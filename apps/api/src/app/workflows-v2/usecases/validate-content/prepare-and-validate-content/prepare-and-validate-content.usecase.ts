@@ -306,7 +306,7 @@ export class PrepareAndValidateContentUsecase {
   private overloadMinValueIssues(
     jsonSchema: JSONSchemaDto,
     controlValues: Record<string, unknown>,
-    contronValueIssues: Record<string, ContentIssue[]>
+    controlValueIssues: Record<string, ContentIssue[]>
   ) {
     if (typeof jsonSchema !== 'object') {
       return;
@@ -330,7 +330,7 @@ export class PrepareAndValidateContentUsecase {
       }
 
       this.addToIssues(
-        contronValueIssues,
+        controlValueIssues,
         key,
         StepContentIssueEnum.MIN_VALUE,
         `${toSentenceCase(key)} must be at least ${minValue}`,

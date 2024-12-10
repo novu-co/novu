@@ -172,7 +172,7 @@ export const buildDynamicZodSchema = (obj: JSONSchemaDefinition, key = ''): ZodV
 
     return z.object({ ...keys });
   } else {
-    // handle different JSONSchama types
+    // handle different JSONSchema types
     return getZodValueByType(obj, key);
   }
 };
