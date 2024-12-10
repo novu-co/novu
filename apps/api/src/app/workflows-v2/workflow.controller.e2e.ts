@@ -223,6 +223,20 @@ describe('Workflow Controller E2E API Testing', () => {
           }
         }
       });
+      it('should show control value required when empty', async () => {
+        const { issues, status } = await createWorkflowAndReturnStepIssues(
+          { steps: [{ ...buildInAppStep(), controlValues: { body: '' } }] },
+          0
+        );
+        expect(status, JSON.stringify(issues)).to.equal(WorkflowStatusEnum.ERROR);
+        expect(issues).to.be.ok;
+        if (issues.controls) {
+          expect(issues.controls?.body).to.be.ok;
+          if (issues.controls?.body) {
+            expect(issues.controls?.body[0].issueType).to.be.equal(StepContentIssueEnum.MISSING_VALUE);
+          }
+        }
+      });
 
       it('should show digest control value issues when illegal value provided', async () => {
         const steps = [{ ...buildDigestStep() }];

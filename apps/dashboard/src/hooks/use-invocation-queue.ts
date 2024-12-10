@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
+import * as Sentry from '@sentry/react';
 
 type CallbackFunction = () => Promise<unknown>;
 
@@ -28,9 +29,7 @@ export function useInvocationQueue<T extends CallbackFunction = CallbackFunction
         nextInvocation = queueRef.current.shift(); // Get the next item in the queue
       }
 
-      if (nextInvocation) {
-        await nextInvocation(); // Execute the next autosave function
-      }
+      await safelyRunInvocation(nextInvocation); // Execute the next autosave function
     }
     if (queueRef.current.length === 0) {
       setHasPendingItems(false);
@@ -57,6 +56,17 @@ export function useInvocationQueue<T extends CallbackFunction = CallbackFunction
     },
     [debounceInMs, processQueue]
   );
+
+  const safelyRunInvocation = useCallback(async (invocation: T | undefined) => {
+    if (!invocation) return;
+
+    try {
+      await invocation();
+    } catch (error) {
+      // If the invocation fails, we want to log the error and continue with the next invocation
+      Sentry.captureException(error);
+    }
+  }, []);
 
   return {
     enqueue,
