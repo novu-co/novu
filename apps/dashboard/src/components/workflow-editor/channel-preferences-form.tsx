@@ -203,7 +203,7 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
                   control={overrideForm.control}
                   name="override"
                   render={({ field }) => (
-                    <FormItem className="mt-2 flex w-full items-center justify-between">
+                    <FormItem className="flex w-full items-center justify-between">
                       <FormLabel tooltip="Override preferences to use dashboard-defined preferences instead of code defaults. Disable to restore defaults.">
                         Override preferences
                       </FormLabel>
