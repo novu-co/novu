@@ -16,7 +16,7 @@ import {
 } from '../output-renderers';
 import { DelayOutputRendererUsecase } from '../output-renderers/delay-output-renderer.usecase';
 import { DigestOutputRendererUsecase } from '../output-renderers/digest-output-renderer.usecase';
-import { evaluateRules } from '../../../shared/services/query-parser.service';
+import { evaluateRules } from '../../../shared/services/query-parser/query-parser.service';
 
 const LOG_CONTEXT = 'ConstructFrameworkWorkflow';
 
