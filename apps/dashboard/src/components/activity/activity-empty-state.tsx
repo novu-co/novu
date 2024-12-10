@@ -2,7 +2,7 @@ import { Button } from '@/components/primitives/button';
 import { cn } from '@/utils/ui';
 import { PlayCircleIcon } from 'lucide-react';
 import { RiCloseCircleLine } from 'react-icons/ri';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { ExternalLink } from '../shared/external-link';
 import { useNavigate } from 'react-router-dom';
 import { buildRoute, ROUTES } from '@/utils/routes';
@@ -23,50 +23,99 @@ export function ActivityEmptyState({ className, emptySearchResults, onClearFilte
   };
 
   return (
-    <div className={cn('flex h-full w-full items-center justify-center', className)}>
+    <AnimatePresence mode="wait">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
-        className="flex flex-col items-center gap-6"
+        key="empty-state"
+        className={cn('flex h-full w-full items-center justify-center', className)}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{
+          duration: 0.15,
+          ease: [0.4, 0, 0.2, 1],
+        }}
       >
-        <div className="relative">
-          <ActivitiyIllustration />
-        </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98, y: 5 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.98, y: 5 }}
+          transition={{
+            duration: 0.25,
+            delay: 0.1,
+            ease: [0.4, 0, 0.2, 1],
+          }}
+          className="flex flex-col items-center gap-6"
+        >
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{
+              duration: 0.2,
+              delay: 0.2,
+            }}
+            className="relative"
+          >
+            <ActivitiyIllustration />
+          </motion.div>
 
-        <div className="flex flex-col items-center gap-1 text-center">
-          <h2 className="text-foreground-900 text-lg font-medium">
-            {emptySearchResults ? 'No activity match that filter' : 'No activity in the past 30 days'}
-          </h2>
-          <p className="text-foreground-600 max-w-md text-sm font-normal">
-            {emptySearchResults
-              ? 'Try changing your filter to see more activity or trigger notifications that match your search criteria.'
-              : "Your activity feed is empty. Once events start appearing, you'll be able to track notifications, troubleshoot issues, and view delivery details."}
-          </p>
-        </div>
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.2,
+              delay: 0.25,
+            }}
+            className="flex flex-col items-center gap-1 text-center"
+          >
+            <h2 className="text-foreground-900 text-lg font-medium">
+              {emptySearchResults ? 'No activity match that filter' : 'No activity in the past 30 days'}
+            </h2>
+            <p className="text-foreground-600 max-w-md text-sm font-normal">
+              {emptySearchResults
+                ? 'Try changing your filter to see more activity or trigger notifications that match your search criteria.'
+                : "Your activity feed is empty. Once events start appearing, you'll be able to track notifications, troubleshoot issues, and view delivery details."}
+            </p>
+          </motion.div>
 
-        {emptySearchResults && onClearFilters && (
-          <div className="flex gap-6">
-            <Button variant="outline" className="gap-2" onClick={onClearFilters}>
-              <RiCloseCircleLine className="h-4 w-4" />
-              Clear Filters
-            </Button>
-          </div>
-        )}
+          {emptySearchResults && onClearFilters && (
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.2,
+                delay: 0.3,
+              }}
+              className="flex gap-6"
+            >
+              <Button variant="outline" className="gap-2" onClick={onClearFilters}>
+                <RiCloseCircleLine className="h-4 w-4" />
+                Clear Filters
+              </Button>
+            </motion.div>
+          )}
 
-        {!emptySearchResults && (
-          <div className="flex gap-6">
-            <ExternalLink href="https://docs.novu.co" variant="documentation" target="_blank" className="text-sm">
-              View Docs
-            </ExternalLink>
-            <Button variant="primary" className="gap-2" onClick={handleNavigateToWorkflows}>
-              <PlayCircleIcon className="h-4 w-4" />
-              Trigger Workflow
-            </Button>
-          </div>
-        )}
+          {!emptySearchResults && (
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.2,
+                delay: 0.3,
+              }}
+              className="flex gap-6"
+            >
+              <ExternalLink href="https://docs.novu.co" variant="documentation" target="_blank">
+                View Docs
+              </ExternalLink>
+              <Button variant="primary" className="gap-2" onClick={handleNavigateToWorkflows}>
+                <PlayCircleIcon className="h-4 w-4" />
+                Trigger Workflow
+              </Button>
+            </motion.div>
+          )}
+        </motion.div>
       </motion.div>
-    </div>
+    </AnimatePresence>
   );
 }
 

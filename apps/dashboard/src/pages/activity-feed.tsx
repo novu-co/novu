@@ -48,7 +48,7 @@ export function ActivityFeed() {
           initialValues={filterValues}
           onReset={handleClearFilters}
         />
-        <div className="relative flex h-[calc(100vh)]">
+        <div className="relative h-[calc(100vh)] w-full">
           <ActivityTable
             selectedActivityId={activityItemId}
             onActivitySelect={handleActivitySelect}

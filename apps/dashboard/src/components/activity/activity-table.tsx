@@ -15,6 +15,7 @@ import { Pagination } from './components/pagination';
 import { ActivityEmptyState } from './activity-empty-state';
 import { useRef, useEffect } from 'react';
 import { IActivityFilters } from '@/api/activity';
+import { AnimatePresence, motion } from 'motion/react';
 
 export interface ActivityTableProps {
   selectedActivityId: string | null;
@@ -74,66 +75,87 @@ export function ActivityTable({
     };
   }, []);
 
-  if (!isLoading && activities.length === 0) {
-    return <ActivityEmptyState emptySearchResults={hasActiveFilters} onClearFilters={onClearFilters} />;
-  }
-
   return (
-    <div className="flex min-h-full min-w-[800px] flex-1 flex-col">
-      <Table
-        isLoading={isLoading}
-        loadingRow={<SkeletonRow />}
-        containerClassname="border-x-0 border-b-0 border-t border-t-neutral-200 rounded-none shadow-none"
-      >
-        <TableHeader>
-          <TableRow>
-            <TableHead className="h-9 px-3 py-0">Event</TableHead>
-            <TableHead className="h-9 px-3 py-0">Status</TableHead>
-            <TableHead className="h-9 px-3 py-0">Steps</TableHead>
-            <TableHead className="h-9 px-3 py-0">Triggered Date</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {activities.map((activity) => (
-            <TableRow
-              key={activity._id}
-              className={cn(
-                'relative cursor-pointer hover:bg-neutral-50',
-                selectedActivityId === activity._id &&
-                  'bg-neutral-50 after:absolute after:right-0 after:top-0 after:h-[calc(100%-1px)] after:w-[5px] after:bg-neutral-200'
-              )}
-              onClick={() => onActivitySelect(activity)}
-              onMouseEnter={() => handleRowMouseEnter(activity)}
-              onMouseLeave={handleRowMouseLeave}
-            >
-              <TableCell className="px-3">
-                <div className="flex flex-col">
-                  <span className="text-foreground-950 font-medium">
-                    {activity.template?.name || 'Deleted workflow'}
-                  </span>
-                  <span className="text-foreground-400 text-[10px] leading-[14px]">
-                    {activity.transactionId} {getSubscriberDisplay(activity.subscriber)}
-                  </span>
-                </div>
-              </TableCell>
-              <TableCell className="px-3">
-                <StatusBadge jobs={activity.jobs} />
-              </TableCell>
-              <TableCell className="px-3">
-                <StepIndicators jobs={activity.jobs} />
-              </TableCell>
-              <TableCell className="text-foreground-600 px-3">
-                <TimeDisplayHoverCard date={new Date(activity.createdAt)}>
-                  <span>{formatDate(activity.createdAt)}</span>
-                </TimeDisplayHoverCard>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <AnimatePresence mode="wait" initial={false}>
+      {!isLoading && activities.length === 0 ? (
+        <motion.div
+          key="empty-state"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="flex h-full w-full items-center justify-center"
+        >
+          <ActivityEmptyState emptySearchResults={hasActiveFilters} onClearFilters={onClearFilters} />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="table-state"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="flex min-h-full min-w-[800px] flex-1 flex-col"
+        >
+          <Table
+            isLoading={isLoading}
+            loadingRow={<SkeletonRow />}
+            containerClassname="border-x-0 border-b-0 border-t border-t-neutral-200 rounded-none shadow-none"
+          >
+            <TableHeader>
+              <TableRow>
+                <TableHead className="h-9 px-3 py-0">Event</TableHead>
+                <TableHead className="h-9 px-3 py-0">Status</TableHead>
+                <TableHead className="h-9 px-3 py-0">Steps</TableHead>
+                <TableHead className="h-9 px-3 py-0">Triggered Date</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {activities.map((activity) => (
+                <TableRow
+                  key={activity._id}
+                  className={cn(
+                    'relative cursor-pointer hover:bg-neutral-50',
+                    selectedActivityId === activity._id &&
+                      'bg-neutral-50 after:absolute after:right-0 after:top-0 after:h-[calc(100%-1px)] after:w-[5px] after:bg-neutral-200'
+                  )}
+                  onClick={() => onActivitySelect(activity)}
+                  onMouseEnter={() => handleRowMouseEnter(activity)}
+                  onMouseLeave={handleRowMouseLeave}
+                >
+                  <TableCell className="px-3">
+                    <div className="flex flex-col">
+                      <span className="text-foreground-950 font-medium">
+                        {activity.template?.name || 'Deleted workflow'}
+                      </span>
+                      <span className="text-foreground-400 text-[10px] leading-[14px]">
+                        {activity.transactionId}{' '}
+                        {getSubscriberDisplay(
+                          activity.subscriber as Pick<ISubscriber, '_id' | 'subscriberId' | 'firstName' | 'lastName'>
+                        )}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-3">
+                    <StatusBadge jobs={activity.jobs} />
+                  </TableCell>
+                  <TableCell className="px-3">
+                    <StepIndicators jobs={activity.jobs} />
+                  </TableCell>
+                  <TableCell className="text-foreground-600 px-3">
+                    <TimeDisplayHoverCard date={new Date(activity.createdAt)}>
+                      <span>{formatDate(activity.createdAt)}</span>
+                    </TimeDisplayHoverCard>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
 
-      <Pagination offset={offset} limit={limit} hasMore={hasMore} onOffsetChange={handleOffsetChange} />
-    </div>
+          <Pagination offset={offset} limit={limit} hasMore={hasMore} onOffsetChange={handleOffsetChange} />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
