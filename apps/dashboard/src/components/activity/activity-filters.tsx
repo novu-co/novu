@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { ChannelTypeEnum } from '@novu/shared';
 import { useFetchWorkflows } from '../../hooks/use-fetch-workflows';
-import { useForm } from 'react-hook-form';
+import { useForm, useFormState } from 'react-hook-form';
 import { Form, FormItem, FormField } from '../primitives/form/form';
 import { Button } from '../primitives/button';
 import { FacetedFormFilter } from '../primitives/form/faceted-filter/facated-form-filter';
@@ -46,19 +46,19 @@ export function ActivityFilters({ onFiltersChange, initialValues }: IActivityFil
     defaultValues: initialValues || defaultValues,
   });
 
-  const { data: workflowTemplates } = useFetchWorkflows({});
+  const watchedValues = form.watch();
 
   const hasChanges = useMemo(() => {
-    const currentValues = form.getValues();
-
     return (
-      currentValues.dateRange !== defaultValues.dateRange ||
-      currentValues.channels.length > 0 ||
-      currentValues.templates.length > 0 ||
-      currentValues.transactionId !== defaultValues.transactionId ||
-      currentValues.subscriberId !== defaultValues.subscriberId
+      watchedValues.dateRange !== defaultValues.dateRange ||
+      watchedValues.channels.length > 0 ||
+      watchedValues.templates.length > 0 ||
+      watchedValues.transactionId !== defaultValues.transactionId ||
+      watchedValues.subscriberId !== defaultValues.subscriberId
     );
-  }, [form.watch()]);
+  }, [watchedValues]);
+
+  const { data: workflowTemplates } = useFetchWorkflows({});
 
   useEffect(() => {
     const subscription = form.watch((value) => {
