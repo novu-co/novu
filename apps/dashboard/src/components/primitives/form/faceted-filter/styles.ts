@@ -21,5 +21,5 @@ export const STYLES = {
     base: 'border-neutral-200 placeholder:text-neutral-400 focus:border-neutral-400 focus:ring-0 focus:ring-offset-0',
     text: 'text-neutral-600',
   },
-  clearButton: 'w-full justify-center px-2 text-xs text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900',
+  clearButton: 'justify-center px-0 text-xs text-foreground-500 hover:bg-neutral-50 hover:text-foreground-800',
 } as const;

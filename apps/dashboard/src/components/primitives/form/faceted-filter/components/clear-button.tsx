@@ -12,16 +12,9 @@ interface ClearButtonProps {
   separatorClassName?: string;
 }
 
-export function ClearButton({
-  onClick,
-  size,
-  label = 'Clear filter',
-  className,
-  separatorClassName,
-}: ClearButtonProps) {
+export function ClearButton({ onClick, size, label = 'Clear filter', className }: ClearButtonProps) {
   return (
     <>
-      <Separator className={cn('my-2', separatorClassName)} />
       <Button variant="ghost" onClick={onClick} className={cn(STYLES.clearButton, STYLES.size[size].input, className)}>
         {label}
       </Button>

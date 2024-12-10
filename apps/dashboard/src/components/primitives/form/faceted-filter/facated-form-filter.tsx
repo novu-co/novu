@@ -163,7 +163,7 @@ export function FacetedFormFilter({
           </div>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="min-w-[200px] p-0" align="start">
+      <PopoverContent className="min-w-[245px] p-0" align="start">
         {renderContent()}
       </PopoverContent>
     </Popover>

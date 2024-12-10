@@ -81,15 +81,12 @@ export function ActivityFilters({ onFiltersChange, initialValues }: IActivityFil
           render={({ field }) => (
             <FormItem className="space-y-0">
               <FacetedFormFilter
-                hideTitle
                 size="small"
                 type="single"
                 title="Time period"
                 options={DATE_RANGE_OPTIONS}
                 selected={[field.value]}
                 onSelect={(values) => field.onChange(values[0])}
-                hideSearch
-                hideClear
                 icon={CalendarIcon}
               />
             </FormItem>
