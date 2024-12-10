@@ -332,7 +332,7 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
                             </TooltipTrigger>
                             <TooltipContent className="w-64" align="end">
                               <span className="text-2xs">
-                                To enable configuration for this channel, add the channel step to the workflow.
+                                Add the channel to your workflow to control its subscriber preferences.
                               </span>
                             </TooltipContent>
                           </Tooltip>
