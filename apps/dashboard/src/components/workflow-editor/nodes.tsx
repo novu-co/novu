@@ -15,11 +15,11 @@ import { createStep } from '@/components/workflow-editor/steps/step-provider';
 import { getWorkflowIdFromSlug, STEP_DIVIDER } from '@/utils/step';
 
 export type NodeData = {
-  name?: string;
-  content?: string;
   addStepIndex?: number;
-  stepSlug?: string;
+  content?: string;
   error?: string;
+  name?: string;
+  stepSlug?: string;
 };
 
 export type NodeType = FlowNode<NodeData>;
@@ -30,8 +30,13 @@ const bottomHandleClasses = `data-[handlepos=bottom]:w-2 data-[handlepos=bottom]
 
 const handleClassName = `${topHandleClasses} ${bottomHandleClasses}`;
 
-export const TriggerNode = (_props: NodeProps) => {
-  return (
+export const TriggerNode = ({ data }: NodeProps<FlowNode<{ environmentSlug: string; workflowSlug: string }>>) => (
+  <Link
+    to={buildRoute(ROUTES.TEST_WORKFLOW, {
+      environmentSlug: data.environmentSlug,
+      workflowSlug: data.workflowSlug,
+    })}
+  >
     <Node className="relative rounded-tl-none border-r">
       <div className="border-neutral-alpha-200 text-foreground-600 absolute -left-[1px] top-0 flex -translate-y-full items-center gap-1 rounded-t-lg border bg-neutral-50 px-2 py-1 text-xs font-medium">
         <RiPlayCircleLine className="size-3" />
@@ -43,8 +48,8 @@ export const TriggerNode = (_props: NodeProps) => {
       <NodeBody>This step triggers this workflow</NodeBody>
       <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
     </Node>
-  );
-};
+  </Link>
+);
 
 type StepNodeProps = ComponentProps<typeof Node> & { data: NodeData };
 const StepNode = (props: StepNodeProps) => {
