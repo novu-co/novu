@@ -3,8 +3,8 @@ import { ChannelTypeEnum } from '@novu/shared';
 import { useFetchWorkflows } from '../../hooks/use-fetch-workflows';
 import { useForm } from 'react-hook-form';
 import { Form, FormItem, FormField } from '../primitives/form/form';
-import { FacetedFormFilter } from '../primitives/form/faceted-form-filter';
 import { Button } from '../primitives/button';
+import { FacetedFormFilter } from '../primitives/form/faceted-filter/facated-form-filter';
 
 interface IActivityFilters {
   onFiltersChange: (filters: IActivityFiltersData) => void;
