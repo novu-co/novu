@@ -12,6 +12,7 @@ import { useActivities } from '@/hooks/use-activities';
 import { StatusBadge } from './components/status-badge';
 import { StepIndicators } from './components/step-indicators';
 import { Pagination } from './components/pagination';
+import { ActivityEmptyState } from './activity-empty-state';
 import { useRef, useEffect } from 'react';
 import { IActivityFilters } from '@/api/activity';
 
@@ -19,9 +20,17 @@ export interface ActivityTableProps {
   selectedActivityId: string | null;
   onActivitySelect: (activity: IActivity) => void;
   filters?: IActivityFilters;
+  hasActiveFilters: boolean;
+  onClearFilters: () => void;
 }
 
-export function ActivityTable({ selectedActivityId, onActivitySelect, filters }: ActivityTableProps) {
+export function ActivityTable({
+  selectedActivityId,
+  onActivitySelect,
+  filters,
+  hasActiveFilters,
+  onClearFilters,
+}: ActivityTableProps) {
   const queryClient = useQueryClient();
   const { currentEnvironment } = useEnvironment();
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -64,6 +73,10 @@ export function ActivityTable({ selectedActivityId, onActivitySelect, filters }:
       }
     };
   }, []);
+
+  if (!isLoading && activities.length === 0) {
+    return <ActivityEmptyState emptySearchResults={hasActiveFilters} onClearFilters={onClearFilters} />;
+  }
 
   return (
     <div className="flex min-h-full min-w-[800px] flex-1 flex-col">

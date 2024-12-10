@@ -7,12 +7,13 @@ import { Button } from '../primitives/button';
 import { FacetedFormFilter } from '../primitives/form/faceted-filter/facated-form-filter';
 import { CalendarIcon } from 'lucide-react';
 
-interface IActivityFilters {
+export interface IActivityFilters {
   onFiltersChange: (filters: IActivityFiltersData) => void;
   initialValues: IActivityFiltersData;
+  onReset?: () => void;
 }
 
-interface IActivityFiltersData {
+export interface IActivityFiltersData {
   dateRange: string;
   channels: ChannelTypeEnum[];
   templates: string[];
@@ -33,28 +34,28 @@ const CHANNEL_OPTIONS = [
   { value: ChannelTypeEnum.PUSH, label: 'Push' },
 ];
 
-const defaultValues: IActivityFiltersData = {
+export const defaultActivityFilters: IActivityFiltersData = {
   dateRange: '30d',
   channels: [],
   templates: [],
   transactionId: '',
   subscriberId: '',
-};
+} as const;
 
-export function ActivityFilters({ onFiltersChange, initialValues }: IActivityFilters) {
+export function ActivityFilters({ onFiltersChange, initialValues, onReset }: IActivityFilters) {
   const form = useForm<IActivityFiltersData>({
-    defaultValues: initialValues || defaultValues,
+    defaultValues: initialValues || defaultActivityFilters,
   });
 
   const watchedValues = form.watch();
 
   const hasChanges = useMemo(() => {
     return (
-      watchedValues.dateRange !== defaultValues.dateRange ||
+      watchedValues.dateRange !== defaultActivityFilters.dateRange ||
       watchedValues.channels.length > 0 ||
       watchedValues.templates.length > 0 ||
-      watchedValues.transactionId !== defaultValues.transactionId ||
-      watchedValues.subscriberId !== defaultValues.subscriberId
+      watchedValues.transactionId !== defaultActivityFilters.transactionId ||
+      watchedValues.subscriberId !== defaultActivityFilters.subscriberId
     );
   }, [watchedValues]);
 
@@ -69,7 +70,8 @@ export function ActivityFilters({ onFiltersChange, initialValues }: IActivityFil
   }, [form, onFiltersChange]);
 
   const handleReset = () => {
-    form.reset(defaultValues);
+    form.reset(defaultActivityFilters);
+    onReset?.();
   };
 
   return (
