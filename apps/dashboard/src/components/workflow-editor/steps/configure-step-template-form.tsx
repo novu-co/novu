@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import merge from 'lodash.merge';
+import isEqual from 'lodash.isequal';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -67,9 +68,12 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
     previousData: defaultValues,
     form,
     save: (data) => {
+      const defaultValues = buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {});
+      const isDefaulValues = isEqual(data, defaultValues);
+      const updateData = isDefaulValues ? {} : data;
       // transform form fields to step update dto
       const updateStepData: Partial<StepUpdateDto> = {
-        controlValues: data,
+        controlValues: updateData,
       };
       update(updateStepInWorkflow(workflow, step.stepId, updateStepData));
     },
