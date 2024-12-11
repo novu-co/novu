@@ -67,27 +67,27 @@ export class GetWorkflowByIdsUseCase {
   @Instrument()
   private async getDbWorkflow(command: GetWorkflowByIdsCommand) {
     const isInternalId = NotificationTemplateRepository.isInternalId(
-      command.identifierOrInternalId,
+      command.workflowIdOrInternalId,
     );
 
     let workflowEntity: NotificationTemplateEntity | null;
     if (isInternalId) {
       workflowEntity = await this.notificationTemplateRepository.findById(
-        command.identifierOrInternalId,
+        command.workflowIdOrInternalId,
         command.environmentId,
       );
     } else {
       workflowEntity =
         await this.notificationTemplateRepository.findByTriggerIdentifier(
           command.environmentId,
-          command.identifierOrInternalId,
+          command.workflowIdOrInternalId,
         );
     }
 
     if (!workflowEntity) {
       throw new NotFoundException({
         message: 'Workflow cannot be found',
-        workflowId: command.identifierOrInternalId,
+        workflowId: command.workflowIdOrInternalId,
       });
     }
 

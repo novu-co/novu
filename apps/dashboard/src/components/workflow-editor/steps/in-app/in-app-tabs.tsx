@@ -1,6 +1,5 @@
-import { ChannelTypeEnum } from '@novu/shared';
 import { Cross2Icon } from '@radix-ui/react-icons';
-import { FieldValues, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,20 +10,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitive
 import { InAppEditor } from '@/components/workflow-editor/steps/in-app/in-app-editor';
 import { InAppEditorPreview } from '@/components/workflow-editor/steps/in-app/in-app-editor-preview';
 import { CustomStepControls } from '../controls/custom-step-controls';
-import { ConfigureStepTemplateFormProps } from '@/components/workflow-editor/steps/configure-step-template-form';
-import { useDebouncedPreview } from '../use-debounced-preview';
+import { StepEditorProps } from '@/components/workflow-editor/steps/configure-step-template-form';
+import { InAppTabsSection } from '@/components/workflow-editor/steps/in-app/in-app-tabs-section';
 
-const tabsContentClassName = 'h-full w-full px-3 py-3.5 overflow-y-auto';
+const tabsContentClassName = 'h-full w-full overflow-y-auto';
 
-export const InAppTabs = (props: ConfigureStepTemplateFormProps) => {
+export const InAppTabs = (props: StepEditorProps) => {
   const { workflow, step } = props;
   const { dataSchema, uiSchema } = step.controls;
   const form = useFormContext();
   const navigate = useNavigate();
-  const { editorValue, setEditorValue, previewStep, previewData, isPreviewPending } = useDebouncedPreview({
-    workflow,
-    step,
-  });
 
   return (
     <Tabs defaultValue="editor" className="flex h-full flex-1 flex-col">
@@ -61,28 +56,12 @@ export const InAppTabs = (props: ConfigureStepTemplateFormProps) => {
       <Separator />
       <TabsContent value="editor" className={tabsContentClassName}>
         <InAppEditor uiSchema={uiSchema} />
-        <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
+        <InAppTabsSection>
+          <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
+        </InAppTabsSection>
       </TabsContent>
       <TabsContent value="preview" className={tabsContentClassName}>
-        {previewData === undefined ||
-          (previewData.result?.type === ChannelTypeEnum.IN_APP && (
-            <InAppEditorPreview
-              value={editorValue}
-              onChange={setEditorValue}
-              preview={previewData?.result.preview}
-              isPreviewPending={isPreviewPending}
-              applyPreview={() => {
-                previewStep({
-                  stepSlug: step.stepId,
-                  workflowSlug: workflow.workflowId,
-                  data: {
-                    controlValues: form.getValues() as FieldValues,
-                    previewPayload: JSON.parse(editorValue),
-                  },
-                });
-              }}
-            />
-          ))}
+        <InAppEditorPreview workflow={workflow} step={step} formValues={form.getValues()} />
       </TabsContent>
       <Separator />
     </Tabs>

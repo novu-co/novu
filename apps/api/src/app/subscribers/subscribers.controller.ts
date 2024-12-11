@@ -24,17 +24,18 @@ import {
   UpdateSubscriberChannelCommand,
   UpdateSubscriberCommand,
 } from '@novu/application-generic';
-import { ApiExcludeEndpoint, ApiOperation, ApiParam, ApiTags, ApiQuery } from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import {
   ApiRateLimitCategoryEnum,
   ApiRateLimitCostEnum,
   ButtonTypeEnum,
   ChatProviderIdEnum,
   IPreferenceChannels,
+  PreferenceLevelEnum,
   TriggerTypeEnum,
   UserSessionData,
 } from '@novu/shared';
-import { MessageEntity, PreferenceLevelEnum } from '@novu/dal';
+import { MessageEntity } from '@novu/dal';
 
 import { RemoveSubscriber, RemoveSubscriberCommand } from './usecases/remove-subscriber';
 import { ExternalApiAccessible } from '../auth/framework/external-api.decorator';
@@ -76,7 +77,12 @@ import { ApiOkPaginatedResponse } from '../shared/framework/paginated-ok-respons
 import { PaginatedResponseDto } from '../shared/dtos/pagination-response';
 import { GetSubscribersDto } from './dtos/get-subscribers.dto';
 import { GetInAppNotificationsFeedForSubscriberDto } from './dtos/get-in-app-notification-feed-for-subscriber.dto';
-import { ApiCommonResponses, ApiNoContentResponse, ApiResponse } from '../shared/framework/response.decorator';
+import {
+  ApiCommonResponses,
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiResponse,
+} from '../shared/framework/response.decorator';
 import { ChatOauthCallbackRequestDto, ChatOauthRequestDto } from './dtos/chat-oauth-request.dto';
 import { ChatOauthCallback } from './usecases/chat-oauth-callback/chat-oauth-callback.usecase';
 import { ChatOauthCallbackCommand } from './usecases/chat-oauth-callback/chat-oauth-callback.command';
@@ -162,7 +168,7 @@ export class SubscribersController {
   })
   @ApiQuery({
     name: 'includeTopics',
-    type: String,
+    type: Boolean,
     description: 'Includes the topics associated with the subscriber',
     required: false,
   })
@@ -560,8 +566,9 @@ export class SubscribersController {
   @ApiOperation({
     summary: 'Get in-app notification feed for a particular subscriber',
   })
-  @ApiOkPaginatedResponse(FeedResponseDto)
+  @ApiResponse(FeedResponseDto)
   @SdkGroupName('Subscribers.Notifications')
+  @SdkMethodName('feed')
   async getNotificationsFeed(
     @UserSession() user: UserSessionData,
     @Param('subscriberId') subscriberId: string,
@@ -694,13 +701,16 @@ export class SubscribersController {
       'Marks all the subscriber messages as read, unread, seen or unseen. ' +
       'Optionally you can pass feed id (or array) to mark messages of a particular feed.',
   })
+  @ApiCreatedResponse({
+    type: Number,
+  })
   @SdkGroupName('Subscribers.Messages')
   @SdkMethodName('markAll')
   async markAllUnreadAsRead(
     @UserSession() user: UserSessionData,
     @Param('subscriberId') subscriberId: string,
     @Body() body: MarkAllMessageAsRequestDto
-  ) {
+  ): Promise<number> {
     const feedIdentifiers = this.toArray(body.feedIdentifier);
     const command = MarkAllMessagesAsCommand.create({
       organizationId: user.organizationId,

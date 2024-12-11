@@ -25,7 +25,7 @@ export class InAppOutputRendererUsecase {
     return {
       subject: inApp.subject,
       body: inApp.body,
-      avatar: inApp.avatar,
+      avatar: inApp.avatar?.trim() || undefined,
       primaryAction: this.buildActionIfAllPartsAvailable(primaryAction),
       secondaryAction: this.buildActionIfAllPartsAvailable(secondaryAction),
       redirect: this.buildRedirect(redirect),

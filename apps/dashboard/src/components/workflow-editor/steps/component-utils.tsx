@@ -5,6 +5,9 @@ import { InAppSubject } from '@/components/workflow-editor/steps/in-app/in-app-s
 import { InAppBody } from '@/components/workflow-editor/steps/in-app/in-app-body';
 import { InAppAvatar } from '@/components/workflow-editor/steps/in-app/in-app-avatar';
 import { InAppRedirect } from '@/components/workflow-editor/steps/in-app/in-app-redirect';
+import { DelayAmount } from '@/components/workflow-editor/steps/delay/delay-amount';
+import { Maily } from '@/components/workflow-editor/steps/email/maily';
+import { EmailSubject } from '@/components/workflow-editor/steps/email/email-subject';
 
 export const getComponentByType = ({ component }: { component?: UiComponentEnum }) => {
   switch (component) {
@@ -22,6 +25,17 @@ export const getComponentByType = ({ component }: { component?: UiComponentEnum 
     }
     case UiComponentEnum.URL_TEXT_BOX: {
       return <InAppRedirect />;
+    }
+    case UiComponentEnum.DELAY_AMOUNT:
+    case UiComponentEnum.DELAY_UNIT:
+    case UiComponentEnum.DELAY_TYPE: {
+      return <DelayAmount />;
+    }
+    case UiComponentEnum.MAILY: {
+      return <Maily />;
+    }
+    case UiComponentEnum.TEXT_INLINE_LABEL: {
+      return <EmailSubject />;
     }
     default: {
       return null;

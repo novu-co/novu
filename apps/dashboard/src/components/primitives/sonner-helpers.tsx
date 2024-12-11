@@ -1,5 +1,5 @@
 import { ExternalToast, toast } from 'sonner';
-import { Toast, ToastProps } from './sonner';
+import { Toast, ToastIcon, ToastProps } from './sonner';
 import { ReactNode } from 'react';
 
 export const showToast = ({
@@ -15,5 +15,29 @@ export const showToast = ({
     unstyled: true,
     closeButton: false,
     ...options,
+  });
+};
+
+export const showSuccessToast = (message: string, position: 'bottom-center' | 'top-center' = 'bottom-center') => {
+  showToast({
+    children: () => (
+      <>
+        <ToastIcon variant="success" />
+        <span className="text-sm">{message}</span>
+      </>
+    ),
+    options: { position },
+  });
+};
+
+export const showErrorToast = (message: string, position: 'bottom-center' | 'top-center' = 'bottom-center') => {
+  showToast({
+    children: () => (
+      <>
+        <ToastIcon variant="error" />
+        <span className="text-sm">{message}</span>
+      </>
+    ),
+    options: { position },
   });
 };

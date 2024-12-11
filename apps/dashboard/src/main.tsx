@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import ErrorPage from '@/components/error-page';
 import { RootRoute, AuthRoute, DashboardRoute, CatchAllRoute } from './routes';
+import { OnboardingParentRoute } from './routes/onboarding';
 import {
   WorkflowsPage,
   SignInPage,
@@ -10,6 +11,9 @@ import {
   OrganizationListPage,
   QuestionnairePage,
   UsecaseSelectPage,
+  ApiKeysPage,
+  WelcomePage,
+  SettingsPage,
 } from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
@@ -17,10 +21,14 @@ import { EditWorkflowPage } from './pages/edit-workflow';
 import { TestWorkflowPage } from './pages/test-workflow';
 import { initializeSentry } from './utils/sentry';
 import { overrideZodErrorMap } from './utils/validation';
-import { FeatureFlagsProvider } from '@/context/feature-flags-provider';
-import { EditStepTemplate } from '@/components/workflow-editor/steps/edit-step-template';
+import { InboxUsecasePage } from './pages/inbox-usecase-page';
+import { InboxEmbedPage } from './pages/inbox-embed-page';
 import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workflow';
-import { EditStep } from '@/components/workflow-editor/steps/edit-step';
+import { InboxEmbedSuccessPage } from './pages/inbox-embed-success-page';
+import { ChannelPreferences } from './components/workflow-editor/channel-preferences';
+import { FeatureFlagsProvider } from './context/feature-flags-provider';
+import { ConfigureStep } from '@/components/workflow-editor/steps/configure-step';
+import { ConfigureStepTemplate } from '@/components/workflow-editor/steps/configure-step-template';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -45,6 +53,12 @@ const router = createBrowserRouter([
             path: ROUTES.SIGNUP_ORGANIZATION_LIST,
             element: <OrganizationListPage />,
           },
+        ],
+      },
+      {
+        path: '/onboarding',
+        element: <OnboardingParentRoute />,
+        children: [
           {
             path: ROUTES.SIGNUP_QUESTIONNAIRE,
             element: <QuestionnairePage />,
@@ -52,6 +66,18 @@ const router = createBrowserRouter([
           {
             path: ROUTES.USECASE_SELECT,
             element: <UsecaseSelectPage />,
+          },
+          {
+            path: ROUTES.INBOX_USECASE,
+            element: <InboxUsecasePage />,
+          },
+          {
+            path: ROUTES.INBOX_EMBED,
+            element: <InboxEmbedPage />,
+          },
+          {
+            path: ROUTES.INBOX_EMBED_SUCCESS,
+            element: <InboxEmbedSuccessPage />,
           },
         ],
       },
@@ -63,8 +89,16 @@ const router = createBrowserRouter([
             path: ROUTES.ENV,
             children: [
               {
+                path: ROUTES.WELCOME,
+                element: <WelcomePage />,
+              },
+              {
                 path: ROUTES.WORKFLOWS,
                 element: <WorkflowsPage />,
+              },
+              {
+                path: ROUTES.API_KEYS,
+                element: <ApiKeysPage />,
               },
               {
                 path: ROUTES.EDIT_WORKFLOW,
@@ -75,12 +109,16 @@ const router = createBrowserRouter([
                     index: true,
                   },
                   {
-                    element: <EditStep />,
+                    element: <ConfigureStep />,
                     path: ROUTES.EDIT_STEP,
                   },
                   {
-                    element: <EditStepTemplate />,
+                    element: <ConfigureStepTemplate />,
                     path: ROUTES.EDIT_STEP_TEMPLATE,
+                  },
+                  {
+                    element: <ChannelPreferences />,
+                    path: ROUTES.EDIT_WORKFLOW_PREFERENCES,
                   },
                 ],
               },
@@ -93,6 +131,26 @@ const router = createBrowserRouter([
                 element: <CatchAllRoute />,
               },
             ],
+          },
+          {
+            path: ROUTES.SETTINGS,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_ACCOUNT,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_ORGANIZATION,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_TEAM,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_BILLING,
+            element: <SettingsPage />,
           },
           {
             path: '*',

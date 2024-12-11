@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
@@ -7,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { completions } from '@/utils/liquid-autocomplete';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 import { autocompletion } from '@codemirror/autocomplete';
+import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
 
 type URLInputProps = Omit<InputProps, 'value' | 'onChange' | 'size'> & {
   options: string[];
@@ -28,9 +30,11 @@ export const URLInput = ({
   variables = [],
 }: URLInputProps) => {
   const { control, getFieldState } = useFormContext();
+  const { saveForm } = useSaveForm();
   const url = getFieldState(`${urlKey}`);
   const target = getFieldState(`${targetKey}`);
   const error = url.error || target.error;
+  const extensions = useMemo(() => [autocompletion({ override: [completions(variables)] })], [variables]);
 
   return (
     <div className="flex flex-col gap-1">
@@ -41,14 +45,14 @@ export const URLInput = ({
               control={control}
               name={urlKey}
               render={({ field }) => (
-                <FormItem className="mr-auto min-w-px max-w-full">
+                <FormItem className="min-w-px max-w-full basis-full">
                   <FormControl>
                     {asEditor ? (
                       <Editor
                         asInput
                         fontFamily="inherit"
                         placeholder={placeholder}
-                        extensions={[autocompletion({ override: [completions(variables)] })]}
+                        extensions={extensions}
                         value={field.value}
                         onChange={field.onChange}
                       />
@@ -65,7 +69,13 @@ export const URLInput = ({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        saveForm();
+                      }}
+                    >
                       <SelectTrigger className="h-full max-w-24 rounded-l-none border-0 border-l">
                         <SelectValue />
                       </SelectTrigger>

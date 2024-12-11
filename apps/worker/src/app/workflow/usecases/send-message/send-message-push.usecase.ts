@@ -38,7 +38,6 @@ import { PushOutput } from '@novu/framework/internal';
 import { SendMessageCommand } from './send-message.command';
 import { SendMessageBase } from './send-message.base';
 
-import { CreateLog } from '../../../shared/logs';
 import { PlatformException } from '../../../shared/utils';
 
 const LOG_CONTEXT = 'SendMessagePush';
@@ -50,7 +49,6 @@ export class SendMessagePush extends SendMessageBase {
   constructor(
     protected subscriberRepository: SubscriberRepository,
     protected messageRepository: MessageRepository,
-    protected createLogUsecase: CreateLog,
     protected executionLogRoute: ExecutionLogRoute,
     private compileTemplate: CompileTemplate,
     protected selectIntegration: SelectIntegration,
@@ -60,7 +58,6 @@ export class SendMessagePush extends SendMessageBase {
   ) {
     super(
       messageRepository,
-      createLogUsecase,
       executionLogRoute,
       subscriberRepository,
       selectIntegration,

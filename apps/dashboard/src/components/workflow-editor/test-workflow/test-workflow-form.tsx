@@ -37,6 +37,9 @@ const LANGUAGE_TO_SNIPPET_UTIL: Record<SnippetLanguage, (props: CodeSnippet) => 
   python: createPythonSnippet,
 };
 
+const basicSetup = { lineNumbers: true, defaultKeymap: true };
+const extensions = [loadLanguage('json')?.extension ?? []];
+
 export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto }) => {
   const { control } = useFormContext<TestWorkflowFormType>();
   const [activeSnippetTab, setActiveSnippetTab] = useState<SnippetLanguage>(() =>
@@ -92,12 +95,7 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
               <FormItem className="h-full">
                 <FormControl>
                   <PanelContent>
-                    <Editor
-                      lang="json"
-                      basicSetup={{ lineNumbers: true, defaultKeymap: true }}
-                      extensions={[loadLanguage('json')?.extension ?? []]}
-                      {...restField}
-                    />
+                    <Editor lang="json" basicSetup={basicSetup} extensions={extensions} {...restField} />
                     <FormMessage />
                   </PanelContent>
                 </FormControl>
@@ -135,7 +133,7 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
               <TabsTrigger className={tabsTriggerClassName} value="python" variant="regular">
                 Python
               </TabsTrigger>
-              <CopyButton variant="ghost" className="text-foreground-400 ml-auto" size="sm" valueToCopy="Copy code">
+              <CopyButton variant="ghost" className="text-foreground-400 ml-auto" size="sm" valueToCopy={snippetValue}>
                 <RiFileCopyLine className="size-4" /> Copy code
               </CopyButton>
             </TabsList>

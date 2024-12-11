@@ -9,7 +9,7 @@ import { Command } from 'cmdk';
 import { forwardRef, useEffect, useMemo, useState } from 'react';
 import { RiCloseFill } from 'react-icons/ri';
 
-type TagInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+type TagInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
   value: string[];
   suggestions: string[];
   onChange: (tags: string[]) => void;
@@ -77,7 +77,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
           </PopoverAnchor>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, index) => (
-              <Badge key={index} variant="outline" size="tag" className="gap-1">
+              <Badge key={index} variant="outline" kind="tag" className="gap-1">
                 <span style={{ wordBreak: 'break-all' }}>{tag}</span>
                 <button type="button" onClick={() => removeTag(tag)}>
                   <RiCloseFill className="-mr-0.5 size-3" />

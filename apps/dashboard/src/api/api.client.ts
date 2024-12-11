@@ -1,6 +1,6 @@
 import { getToken } from '@/utils/auth';
 import { API_HOSTNAME } from '../config';
-import { getEnvironmentId } from '@/utils/environment';
+import type { IEnvironment } from '@novu/shared';
 
 export class NovuApiError extends Error {
   constructor(
@@ -17,28 +17,28 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 const request = async <T>(
   endpoint: string,
   options?: {
-    data?: unknown;
+    environment?: IEnvironment;
+    body?: unknown;
     method?: HttpMethod;
     headers?: HeadersInit;
     version?: 'v1' | 'v2';
   }
 ): Promise<T> => {
-  const { data, headers, method = 'GET', version = 'v1' } = options || {};
+  const { body, environment, headers, method = 'GET', version = 'v1' } = options || {};
   try {
     const jwt = await getToken();
-    const environmentId = getEnvironmentId();
     const config: RequestInit = {
       method,
       headers: {
         Authorization: `Bearer ${jwt}`,
         'Content-Type': 'application/json',
-        ...(environmentId && { 'Novu-Environment-Id': environmentId }),
+        ...(environment && { 'Novu-Environment-Id': environment._id }),
         ...headers,
       },
     };
 
-    if (data) {
-      config.body = JSON.stringify(data);
+    if (body) {
+      config.body = JSON.stringify(body);
     }
 
     const baseUrl = API_HOSTNAME ?? 'https://api.novu.co';
@@ -65,17 +65,26 @@ const request = async <T>(
   }
 };
 
-export const get = <T>(endpoint: string) => request<T>(endpoint, { method: 'GET' });
-export const post = <T>(endpoint: string, data: unknown) => request<T>(endpoint, { method: 'POST', data });
-export const put = <T>(endpoint: string, data: unknown) => request<T>(endpoint, { method: 'PUT', data });
-export const del = <T>(endpoint: string) => request<T>(endpoint, { method: 'DELETE' });
-export const patch = <T>(endpoint: string, data: unknown) => request<T>(endpoint, { method: 'PATCH', data });
+type RequestOptions = { body?: unknown; environment?: IEnvironment };
 
-export const getV2 = <T>(endpoint: string) => request<T>(endpoint, { version: 'v2', method: 'GET' });
-export const postV2 = <T>(endpoint: string, data: unknown) =>
-  request<T>(endpoint, { version: 'v2', method: 'POST', data });
-export const putV2 = <T>(endpoint: string, data: unknown) =>
-  request<T>(endpoint, { version: 'v2', method: 'PUT', data });
-export const delV2 = <T>(endpoint: string) => request<T>(endpoint, { version: 'v2', method: 'DELETE' });
-export const patchV2 = <T>(endpoint: string, data: unknown) =>
-  request<T>(endpoint, { version: 'v2', method: 'PATCH', data });
+export const get = <T>(endpoint: string, { environment }: RequestOptions = {}) =>
+  request<T>(endpoint, { method: 'GET', environment });
+export const post = <T>(endpoint: string, options: RequestOptions) =>
+  request<T>(endpoint, { method: 'POST', ...options });
+export const put = <T>(endpoint: string, options: RequestOptions) =>
+  request<T>(endpoint, { method: 'PUT', ...options });
+export const del = <T>(endpoint: string, { environment }: RequestOptions = {}) =>
+  request<T>(endpoint, { method: 'DELETE', environment });
+export const patch = <T>(endpoint: string, options: RequestOptions) =>
+  request<T>(endpoint, { method: 'PATCH', ...options });
+
+export const getV2 = <T>(endpoint: string, { environment }: RequestOptions = {}) =>
+  request<T>(endpoint, { version: 'v2', method: 'GET', environment });
+export const postV2 = <T>(endpoint: string, options: RequestOptions) =>
+  request<T>(endpoint, { version: 'v2', method: 'POST', ...options });
+export const putV2 = <T>(endpoint: string, options: RequestOptions) =>
+  request<T>(endpoint, { version: 'v2', method: 'PUT', ...options });
+export const delV2 = <T>(endpoint: string, { environment }: RequestOptions = {}) =>
+  request<T>(endpoint, { version: 'v2', method: 'DELETE', environment });
+export const patchV2 = <T>(endpoint: string, options: RequestOptions) =>
+  request<T>(endpoint, { version: 'v2', method: 'PATCH', ...options });

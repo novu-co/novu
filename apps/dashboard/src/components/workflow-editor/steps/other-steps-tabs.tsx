@@ -1,7 +1,6 @@
 /**
  * This component is used as a placeholder for the other step configuration until the actual configuration is implemented.
  */
-import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
@@ -10,11 +9,12 @@ import { Notification5Fill } from '@/components/icons';
 import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
-import { CustomStepControls } from './controls/custom-step-controls';
+import { CustomStepControls } from '@/components/workflow-editor/steps/controls/custom-step-controls';
+import type { StepEditorProps } from '@/components/workflow-editor/steps/configure-step-template-form';
 
 const tabsContentClassName = 'h-full w-full px-3 py-3.5 overflow-y-auto';
 
-export const OtherStepTabs = ({ workflow, step }: { workflow: WorkflowResponseDto; step: StepDataDto }) => {
+export const OtherStepTabs = ({ workflow, step }: StepEditorProps) => {
   const { dataSchema } = step.controls;
   const navigate = useNavigate();
 
@@ -52,7 +52,9 @@ export const OtherStepTabs = ({ workflow, step }: { workflow: WorkflowResponseDt
       </header>
       <Separator />
       <TabsContent value="editor" className={tabsContentClassName}>
-        <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
+        <div className="px-3 py-5">
+          <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
+        </div>
       </TabsContent>
       <Separator />
     </Tabs>
