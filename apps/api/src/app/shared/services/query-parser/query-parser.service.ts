@@ -1,5 +1,57 @@
 import jsonLogic, { AdditionalOperation, RulesLogic } from 'json-logic-js';
 
+type RangeValidation =
+  | {
+      isValid: true;
+      min: number;
+      max: number;
+    }
+  | {
+      isValid: false;
+    };
+
+type StringValidation =
+  | {
+      isValid: true;
+      input: string;
+      value: string;
+    }
+  | {
+      isValid: false;
+    };
+
+function validateStringInput(dataInput: unknown, ruleValue: unknown): StringValidation {
+  if (typeof dataInput !== 'string' || typeof ruleValue !== 'string') {
+    return { isValid: false };
+  }
+
+  return { isValid: true, input: dataInput, value: ruleValue };
+}
+
+function validateRangeInput(dataInput: unknown, ruleValue: unknown): RangeValidation {
+  if (!Array.isArray(ruleValue) || ruleValue.length !== 2) {
+    return { isValid: false };
+  }
+
+  if (typeof dataInput !== 'number') {
+    return { isValid: false };
+  }
+
+  const [min, max] = ruleValue;
+  const valid = typeof min === 'number' && typeof max === 'number';
+
+  return { isValid: valid, min, max };
+}
+
+function createStringOperator(evaluator: (input: string, value: string) => boolean) {
+  return (dataInput: unknown, ruleValue: unknown): boolean => {
+    const validation = validateStringInput(dataInput, ruleValue);
+    if (!validation.isValid) return false;
+
+    return evaluator(validation.input, validation.value);
+  };
+}
+
 const initializeCustomOperators = (): void => {
   jsonLogic.add_operation('=', (dataInput: unknown, ruleValue: unknown): boolean => {
     const result = jsonLogic.apply({ '==': [dataInput, ruleValue] }, {});
@@ -9,38 +61,32 @@ const initializeCustomOperators = (): void => {
 
   jsonLogic.add_operation(
     'beginsWith',
-    (dataInput: unknown, ruleValue: unknown): boolean =>
-      typeof dataInput === 'string' && typeof ruleValue === 'string' && dataInput.startsWith(ruleValue)
+    createStringOperator((input, value) => input.startsWith(value))
   );
 
   jsonLogic.add_operation(
     'endsWith',
-    (dataInput: unknown, ruleValue: unknown): boolean =>
-      typeof dataInput === 'string' && typeof ruleValue === 'string' && dataInput.endsWith(ruleValue)
+    createStringOperator((input, value) => input.endsWith(value))
   );
 
   jsonLogic.add_operation(
     'contains',
-    (dataInput: unknown, ruleValue: unknown): boolean =>
-      typeof dataInput === 'string' && typeof ruleValue === 'string' && dataInput.includes(ruleValue)
+    createStringOperator((input, value) => input.includes(value))
   );
 
   jsonLogic.add_operation(
     'doesNotContain',
-    (dataInput: unknown, ruleValue: unknown): boolean =>
-      typeof dataInput === 'string' && typeof ruleValue === 'string' && !dataInput.includes(ruleValue)
+    createStringOperator((input, value) => !input.includes(value))
   );
 
   jsonLogic.add_operation(
     'doesNotBeginWith',
-    (dataInput: unknown, ruleValue: unknown): boolean =>
-      typeof dataInput === 'string' && typeof ruleValue === 'string' && !dataInput.startsWith(ruleValue)
+    createStringOperator((input, value) => !input.startsWith(value))
   );
 
   jsonLogic.add_operation(
     'doesNotEndWith',
-    (dataInput: unknown, ruleValue: unknown): boolean =>
-      typeof dataInput === 'string' && typeof ruleValue === 'string' && !dataInput.endsWith(ruleValue)
+    createStringOperator((input, value) => !input.endsWith(value))
   );
 
   jsonLogic.add_operation('null', (dataInput: unknown): boolean => dataInput === null);
@@ -52,22 +98,24 @@ const initializeCustomOperators = (): void => {
     (dataInput: unknown, ruleValue: unknown[]): boolean => Array.isArray(ruleValue) && !ruleValue.includes(dataInput)
   );
 
-  jsonLogic.add_operation('between', (dataInput: unknown, ruleValue: unknown[]): boolean => {
-    if (!Array.isArray(ruleValue) || ruleValue.length !== 2) return false;
-    if (typeof dataInput !== 'number') return false;
-    const [min, max] = ruleValue;
-    if (typeof min !== 'number' || typeof max !== 'number') return false;
+  jsonLogic.add_operation('between', (dataInput, ruleValue) => {
+    const validation = validateRangeInput(dataInput, ruleValue);
 
-    return dataInput >= min && dataInput <= max;
+    if (!validation.isValid) {
+      return false;
+    }
+
+    return dataInput >= validation.min && dataInput <= validation.max;
   });
 
-  jsonLogic.add_operation('notBetween', (dataInput: unknown, ruleValue: unknown[]): boolean => {
-    if (!Array.isArray(ruleValue) || ruleValue.length !== 2) return false;
-    if (typeof dataInput !== 'number') return false;
-    const [min, max] = ruleValue;
-    if (typeof min !== 'number' || typeof max !== 'number') return false;
+  jsonLogic.add_operation('notBetween', (dataInput, ruleValue) => {
+    const validation = validateRangeInput(dataInput, ruleValue);
 
-    return dataInput < min || dataInput > max;
+    if (!validation.isValid) {
+      return false;
+    }
+
+    return dataInput < validation.min || dataInput > validation.max;
   });
 };
 
