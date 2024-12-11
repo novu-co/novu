@@ -63,6 +63,9 @@ function removeBracketsAndFlattenToNested(input: Record<string, unknown>): Recor
     const cleanedKey = key.replace(/^\{\{|\}\}$/g, '');
 
     const keys = cleanedKey.split('.');
+    if (keys.length === 1) {
+      return;
+    }
     keys.reduce((acc, part, index) => {
       if (index === keys.length - 1) {
         acc[part] = input[key];

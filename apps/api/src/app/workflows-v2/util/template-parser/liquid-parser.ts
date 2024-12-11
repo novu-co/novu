@@ -77,21 +77,32 @@ export function extractLiquidTemplateVariables(template: string): TemplateParseR
 function processLiquidRawOutput(rawOutputs: string[]): TemplateParseResult {
   const validVariables: Variable[] = [];
   const invalidVariables: Variable[] = [];
+  const processedVariables = new Set<string>();
+
+  function addVariable(variable: Variable, isValid: boolean) {
+    if (!processedVariables.has(variable.name)) {
+      processedVariables.add(variable.name);
+      (isValid ? validVariables : invalidVariables).push(variable);
+    }
+  }
 
   for (const rawOutput of rawOutputs) {
     try {
       const result = parseByLiquid(rawOutput);
-      validVariables.push(...result.validVariables);
-      invalidVariables.push(...result.invalidVariables);
+      result.validVariables.forEach((variable) => addVariable(variable, true));
+      result.invalidVariables.forEach((variable) => addVariable(variable, false));
     } catch (error: unknown) {
       if (isLiquidErrors(error)) {
-        invalidVariables.push(
-          ...error.errors.map((e: RenderError) => ({
-            context: e.context,
-            message: e.message,
-            name: rawOutput,
-          }))
-        );
+        error.errors.forEach((e: RenderError) => {
+          addVariable(
+            {
+              name: rawOutput,
+              message: e.message,
+              context: e.context,
+            },
+            false
+          );
+        });
       }
     }
   }
@@ -110,15 +121,11 @@ function parseByLiquid(expression: string): TemplateParseResult {
       const result = extractProps(template);
 
       if (result.valid && result.props.length > 0) {
-        const validCandidate = result.props.join('.');
-        validVariables.push({ name: validCandidate });
+        validVariables.push({ name: result.props.join('.') });
       }
 
       if (!result.valid) {
-        invalidVariables.push({
-          name: template?.token?.input,
-          message: result.error,
-        });
+        invalidVariables.push({ name: template?.token?.input, message: result.error });
       }
     }
   });
