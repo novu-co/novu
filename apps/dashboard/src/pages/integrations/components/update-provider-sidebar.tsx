@@ -199,7 +199,7 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
             </div>
             <div className="flex-shrink-0 border-t border-neutral-200 bg-white p-3">
               <div className="flex justify-end gap-4">
-                <Button type="submit" form="provider-form" isLoading={isPending} size="sm">
+                <Button type="submit" form="provider-configuration-form" isLoading={isPending} size="sm">
                   Save Changes <RiArrowRightSLine className="size-4" />
                 </Button>
               </div>

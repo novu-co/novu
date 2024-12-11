@@ -147,48 +147,40 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
           {step === 'select' ? (
             <Tabs defaultValue={ChannelTypeEnum.EMAIL} className="flex h-full flex-col">
               <TabsList variant="regular" className="bg-background sticky top-0 z-10 gap-6 border-t-0 !px-3">
-                {[
-                  ChannelTypeEnum.EMAIL,
-                  ChannelTypeEnum.SMS,
-                  ChannelTypeEnum.PUSH,
-                  ChannelTypeEnum.CHAT,
-                  ChannelTypeEnum.IN_APP,
-                ].map((channel) => (
-                  <TabsTrigger key={channel} value={channel} variant="regular" className="!px-0 !py-3">
-                    {CHANNEL_TYPE_TO_STRING[channel]}
-                  </TabsTrigger>
-                ))}
+                {[ChannelTypeEnum.EMAIL, ChannelTypeEnum.SMS, ChannelTypeEnum.PUSH, ChannelTypeEnum.CHAT].map(
+                  (channel) => (
+                    <TabsTrigger key={channel} value={channel} variant="regular" className="!px-0 !py-3">
+                      {CHANNEL_TYPE_TO_STRING[channel]}
+                    </TabsTrigger>
+                  )
+                )}
               </TabsList>
 
-              {[
-                ChannelTypeEnum.EMAIL,
-                ChannelTypeEnum.SMS,
-                ChannelTypeEnum.PUSH,
-                ChannelTypeEnum.CHAT,
-                ChannelTypeEnum.IN_APP,
-              ].map((channel) => (
-                <TabsContent key={channel} value={channel} className="flex-1">
-                  {providersByChannel[channel]?.length > 0 ? (
-                    <div className="flex flex-col gap-4 p-3">
-                      {providersByChannel[channel].map((provider: IProviderConfig) => (
-                        <ProviderCard
-                          key={provider.id}
-                          provider={provider}
-                          onClick={() => onProviderSelect(provider.id)}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-muted-foreground flex min-h-[200px] items-center justify-center text-center">
-                      {searchQuery ? (
-                        <p>No {channel.toLowerCase()} providers match your search</p>
-                      ) : (
-                        <p>No {channel.toLowerCase()} providers available</p>
-                      )}
-                    </div>
-                  )}
-                </TabsContent>
-              ))}
+              {[ChannelTypeEnum.EMAIL, ChannelTypeEnum.SMS, ChannelTypeEnum.PUSH, ChannelTypeEnum.CHAT].map(
+                (channel) => (
+                  <TabsContent key={channel} value={channel} className="flex-1">
+                    {providersByChannel[channel]?.length > 0 ? (
+                      <div className="flex flex-col gap-4 p-3">
+                        {providersByChannel[channel].map((provider: IProviderConfig) => (
+                          <ProviderCard
+                            key={provider.id}
+                            provider={provider}
+                            onClick={() => onProviderSelect(provider.id)}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-muted-foreground flex min-h-[200px] items-center justify-center text-center">
+                        {searchQuery ? (
+                          <p>No {channel.toLowerCase()} providers match your search</p>
+                        ) : (
+                          <p>No {channel.toLowerCase()} providers available</p>
+                        )}
+                      </div>
+                    )}
+                  </TabsContent>
+                )
+              )}
             </Tabs>
           ) : provider ? (
             <ProviderConfiguration provider={provider} onSubmit={onSubmit} isLoading={isPending} mode="create" />

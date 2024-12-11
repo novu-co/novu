@@ -16,7 +16,12 @@ export function ProviderSheetHeader({ provider, integration, mode, onBack, step 
     return (
       <SheetHeader className="borde-neutral-300 space-y-1 border-b p-3">
         <SheetTitle className="text-lg">Connect Provider</SheetTitle>
-        <p className="text-foreground-400 text-xs">Select a provider to integrate with your application.</p>
+        <p className="text-foreground-400 text-xs">
+          Select a provider to integrate with your application.{' '}
+          <a href="https://docs.novu.co/docs/providers" target="_blank" className="underline">
+            Learn More
+          </a>
+        </p>
       </SheetHeader>
     );
   }

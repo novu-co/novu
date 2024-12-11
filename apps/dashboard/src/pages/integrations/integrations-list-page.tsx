@@ -12,7 +12,6 @@ import { CreateProviderSidebar } from './components/create-provider-sidebar';
 import { Badge } from '../../components/primitives/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Button } from '@/components/primitives/button';
-import { RiPlayListAddLine } from 'react-icons/ri';
 
 export function IntegrationsListPage() {
   const navigate = useNavigate();
@@ -64,8 +63,7 @@ export function IntegrationsListPage() {
               </Badge>
             </TabsTrigger>
           </TabsList>
-          <Button variant="primary" size={'xs'} onClick={onAddProviderClickCallback} className="my-1.5 mr-2.5">
-            <RiPlayListAddLine className="mr-2 h-4 w-4" />
+          <Button variant="primary" onClick={onAddProviderClickCallback} className="my-1.5 mr-2.5">
             Connect Provider
           </Button>
         </div>
