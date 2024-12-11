@@ -61,6 +61,9 @@ export class BuildPayloadSchema {
   private extractTemplateVariables(controlValues: Record<string, unknown>[]): string[] {
     const controlValuesString = controlValues.map(flattenObjectValues).flat().join(' ');
 
-    return extractLiquidTemplateVariables(controlValuesString).validVariables.map((variable) => variable.name);
+    const test = extractLiquidTemplateVariables(controlValuesString);
+    const test2 = test.validVariables.map((variable) => variable.name);
+
+    return test2;
   }
 }

@@ -162,9 +162,25 @@ export class Sync {
     command: SyncCommand,
     workflowsFromBridge: DiscoverWorkflowOutput[]
   ): Promise<NotificationTemplateEntity[]> {
+    const existingFrameworkWorkflows = await Promise.all(
+      workflowsFromBridge.map((workflow) =>
+        this.notificationTemplateRepository.findByTriggerIdentifier(command.environmentId, workflow.workflowId)
+      )
+    );
+
+    existingFrameworkWorkflows.forEach((workflow, index) => {
+      if (workflow?.origin && workflow.origin !== WorkflowOriginEnum.EXTERNAL) {
+        const { workflowId } = workflowsFromBridge[index];
+        throw new BadRequestException(
+          `Workflow ${workflowId} was already created in Dashboard. Please use another workflowId.`
+        );
+      }
+    });
+
     return Promise.all(
-      workflowsFromBridge.map(async (workflow) => {
-        let savedWorkflow = await this.upsertWorkflow(command, workflow);
+      workflowsFromBridge.map(async (workflow, index) => {
+        const existingFrameworkWorkflow = existingFrameworkWorkflows[index];
+        let savedWorkflow = await this.upsertWorkflow(command, workflow, existingFrameworkWorkflow);
 
         const validatedWorkflowWithIssues = await this.workflowUpdatePostProcess.execute({
           user: {
@@ -197,24 +213,18 @@ export class Sync {
 
   private async upsertWorkflow(
     command: SyncCommand,
-    workflow: DiscoverWorkflowOutput
+    workflow: DiscoverWorkflowOutput,
+    existingFrameworkWorkflow: NotificationTemplateEntity | null
   ): Promise<NotificationTemplateEntity> {
-    const workflowExist = await this.notificationTemplateRepository.findByTriggerIdentifier(
-      command.environmentId,
-      workflow.workflowId
-    );
-
-    let savedWorkflow: NotificationTemplateEntity | undefined;
-
-    if (workflowExist) {
-      savedWorkflow = await this.updateWorkflowUsecase.execute(
-        UpdateWorkflowCommand.create(this.mapDiscoverWorkflowToUpdateWorkflowCommand(workflowExist, command, workflow))
+    if (existingFrameworkWorkflow) {
+      return await this.updateWorkflowUsecase.execute(
+        UpdateWorkflowCommand.create(
+          this.mapDiscoverWorkflowToUpdateWorkflowCommand(existingFrameworkWorkflow, command, workflow)
+        )
       );
-    } else {
-      savedWorkflow = await this.createWorkflow(command, workflow);
     }
 
-    return savedWorkflow;
+    return await this.createWorkflow(command, workflow);
   }
 
   private async createWorkflow(

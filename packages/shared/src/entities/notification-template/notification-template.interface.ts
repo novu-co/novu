@@ -1,6 +1,6 @@
 import type { BuilderFieldType, BuilderGroupValues, CustomDataType, FilterParts, WorkflowTypeEnum } from '../../types';
 import { JSONSchemaDto } from '../../dto/workflows';
-import type { ContentIssue, StepIssue } from '../../dto/workflows/workflow-response.dto';
+import type { ContentIssue, StepIssue } from '../../dto/workflows/step.dto';
 import { ControlSchemas, IMessageTemplate } from '../message-template';
 import { INotificationGroup } from '../notification-group';
 import { INotificationBridgeTrigger, INotificationTrigger } from '../notification-trigger';

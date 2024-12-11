@@ -82,21 +82,6 @@ export const buildDynamicFormSchema = ({
 
 export type TestWorkflowFormType = z.infer<ReturnType<typeof buildDynamicFormSchema>>;
 
-export const makeObjectFromSchema = ({
-  properties,
-}: {
-  properties: Readonly<Record<string, JSONSchemaDefinition>>;
-}) => {
-  return Object.keys(properties).reduce((acc, key) => {
-    const value = properties[key];
-    if (typeof value !== 'object') {
-      return acc;
-    }
-
-    return { ...acc, [key]: value.default };
-  }, {});
-};
-
 const ChannelPreferenceSchema = z.object({
   enabled: z.boolean().default(true),
 });
