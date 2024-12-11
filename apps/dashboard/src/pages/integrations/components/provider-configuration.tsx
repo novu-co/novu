@@ -92,7 +92,7 @@ export function ProviderConfiguration({
   return (
     <Form {...form}>
       <form id="provider-configuration-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-3 p-3">
-        <Accordion type="single" collapsible value={'layout'}>
+        <Accordion type="single" collapsible defaultValue="layout">
           <AccordionItem value="layout">
             <AccordionTrigger>
               <div className="flex items-center gap-1 text-xs">
@@ -163,7 +163,7 @@ export function ProviderConfiguration({
 
         <Separator />
 
-        <Accordion type="single" collapsible value={'credentials'}>
+        <Accordion type="single" collapsible defaultValue="credentials">
           <AccordionItem value="credentials">
             <AccordionTrigger>
               <div className="flex items-center gap-1 text-xs">

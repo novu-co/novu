@@ -147,14 +147,26 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
           {step === 'select' ? (
             <Tabs defaultValue={ChannelTypeEnum.EMAIL} className="flex h-full flex-col">
               <TabsList variant="regular" className="bg-background sticky top-0 z-10 gap-6 border-t-0 !px-3">
-                {Object.values(ChannelTypeEnum).map((channel) => (
+                {[
+                  ChannelTypeEnum.EMAIL,
+                  ChannelTypeEnum.SMS,
+                  ChannelTypeEnum.PUSH,
+                  ChannelTypeEnum.CHAT,
+                  ChannelTypeEnum.IN_APP,
+                ].map((channel) => (
                   <TabsTrigger key={channel} value={channel} variant="regular" className="!px-0 !py-3">
                     {CHANNEL_TYPE_TO_STRING[channel]}
                   </TabsTrigger>
                 ))}
               </TabsList>
 
-              {Object.values(ChannelTypeEnum).map((channel) => (
+              {[
+                ChannelTypeEnum.EMAIL,
+                ChannelTypeEnum.SMS,
+                ChannelTypeEnum.PUSH,
+                ChannelTypeEnum.CHAT,
+                ChannelTypeEnum.IN_APP,
+              ].map((channel) => (
                 <TabsContent key={channel} value={channel} className="flex-1">
                   {providersByChannel[channel]?.length > 0 ? (
                     <div className="flex flex-col gap-4 p-3">
