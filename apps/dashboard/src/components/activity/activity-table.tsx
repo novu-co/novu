@@ -31,7 +31,6 @@ export function ActivityTable({ selectedActivityId, onActivitySelect, filters }:
   const { activities, isLoading, hasMore } = useFetchActivities({ filters });
 
   const page = parseInt(searchParams.get('page') || '0');
-  const limit = parseInt(searchParams.get('limit') || '10');
 
   const handlePageChange = (newPage: number) => {
     const newParams = createSearchParams({
