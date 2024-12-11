@@ -77,6 +77,17 @@ describe('parseLiquidVariables', () => {
       expect(errors[1].name).to.equal('{{invalid2..syntax}}');
     });
 
+    it('should handle invalid liquid syntax gracefully', () => {
+      const { validVariables: variables, invalidVariables: errors } =
+        extractLiquidTemplateVariables('{{invalid. syntax}}  ');
+
+      expect(variables).to.have.lengthOf(0);
+      expect(errors).to.have.lengthOf(2);
+      expect(errors[0].message).to.contain('expected "|" before filter');
+      expect(errors[0].name).to.equal('{{invalid..syntax}}');
+      expect(errors[1].name).to.equal('{{invalid2..syntax}}');
+    });
+
     it('should handle invalid liquid syntax gracefully, return valid variables', () => {
       const { validVariables, invalidVariables: errors } = extractLiquidTemplateVariables(
         '{{subscriber.name}} {{invalid..syntax}}'

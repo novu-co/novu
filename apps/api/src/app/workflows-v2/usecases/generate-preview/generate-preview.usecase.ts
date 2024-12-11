@@ -26,7 +26,11 @@ import { GeneratePreviewCommand } from './generate-preview.command';
 import { PrepareAndValidateContentUsecase } from '../validate-content/prepare-and-validate-content/prepare-and-validate-content.usecase';
 import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
 import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
+import { extractLiquidTemplateVariables } from '../../util/template-parser/liquid-parser';
+import { ValidatedContentResponse } from '../validate-content';
 
+const INVALID_VARIABLE_PLACEHOLDER = '<INVALID_VARIABLE_PLACEHOLDER>';
+const PREVIEW_ERROR_MESSAGE_PLACEHOLDER = `[[Invalid Variable: ${INVALID_VARIABLE_PLACEHOLDER}]]`;
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
 @Injectable()
@@ -71,12 +75,14 @@ export class GeneratePreviewUsecase {
         preparedAndValidatedContent.finalPayload,
         commandVariablesExample
       );
-
+      const controlValueForPreview = this.fixInvalidLiquidOutputsForPreview(
+        preparedAndValidatedContent.finalControlValues
+      );
       const executeOutput = await this.executePreviewUsecase(
         command,
         stepData,
         variablesExample,
-        preparedAndValidatedContent.finalControlValues
+        controlValueForPreview
       );
 
       return {
@@ -109,6 +115,43 @@ export class GeneratePreviewUsecase {
         previewPayloadExample: {},
       } as any;
     }
+  }
+
+  /**
+   * Fixes invalid Liquid template variables for preview by replacing them with error messages.
+   *
+   * @example
+   * // Input controlValues:
+   * { "message": "Hello {{invalid.var}}" }
+   *
+   * // Output:
+   * { "message": "Hello [[Invalid Variable: invalid.var]]" }
+   */
+  private fixInvalidLiquidOutputsForPreview(controlValues: Record<string, unknown>): Record<string, unknown> {
+    const res = extractLiquidTemplateVariables(JSON.stringify(controlValues));
+
+    const { invalidVariables } = res;
+    let controlValuesString = JSON.stringify(controlValues);
+
+    for (const invalidVariable of invalidVariables) {
+      const invalidVariableExists = controlValuesString.includes(invalidVariable.name);
+      if (!invalidVariableExists) {
+        continue;
+      }
+
+      /*
+       * we need to remove the '{{' and '}}' from the invalid variable name
+       * so that framework can parse it without errors
+       */
+      const invalidVariableExpression = invalidVariable.name.replace('{{', '').replace('}}', '');
+      const invalidVariablePreviewError = PREVIEW_ERROR_MESSAGE_PLACEHOLDER.replace(
+        INVALID_VARIABLE_PLACEHOLDER,
+        invalidVariableExpression
+      );
+      controlValuesString = controlValuesString.replace(invalidVariable.name, invalidVariablePreviewError);
+    }
+
+    return JSON.parse(controlValuesString) as Record<string, unknown>;
   }
 
   /**

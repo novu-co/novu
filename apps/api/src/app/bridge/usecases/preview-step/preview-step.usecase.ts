@@ -11,9 +11,7 @@ export class PreviewStep {
   @InstrumentUsecase()
   async execute(command: PreviewStepCommand): Promise<ExecuteOutput> {
     const event = this.buildBridgeEventPayload(command);
-    const executeCommand = this.createExecuteCommand(command, event);
-
-    const bridgeResult = await this.executeBridgeRequest.execute(executeCommand);
+    const bridgeResult = await this.executeBridgeRequest.execute(this.createExecuteCommand(command, event));
 
     return bridgeResult as ExecuteOutput;
   }
