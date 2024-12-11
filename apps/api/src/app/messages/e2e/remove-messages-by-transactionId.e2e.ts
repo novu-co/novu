@@ -55,6 +55,7 @@ describe('Delete Messages By TransactionId - /messages/?transactionId= (DELETE)'
     });
 
     expect(messages.length).to.be.greaterThan(0);
+    expect(transactionId).to.be.ok;
 
     if (transactionId == null) {
       throw new Error('must have transaction id');
@@ -96,7 +97,7 @@ describe('Delete Messages By TransactionId - /messages/?transactionId= (DELETE)'
     expect(messages.length).to.be.greaterThan(0);
     expect(emailMessages.length).to.be.greaterThan(0);
     expect(inAppMessagesCount).to.be.greaterThan(0);
-
+    expect(transactionId).to.be.ok;
     if (transactionId == null) {
       throw new Error('must have transaction id');
     }
