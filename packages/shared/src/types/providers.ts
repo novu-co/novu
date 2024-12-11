@@ -46,6 +46,7 @@ export enum CredentialsKeyEnum {
   externalLink = 'externalLink',
   channelId = 'channelId',
   phoneNumberIdentification = 'phoneNumberIdentification',
+  ApiVersion = 'apiVersion',
 }
 
 export enum EmailProviderIdEnum {

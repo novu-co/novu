@@ -47,7 +47,7 @@ export class TopicPayloadDto {
   @ApiProperty()
   topicKey: string;
 
-  @ApiProperty({ example: 'Topic', enum: TriggerRecipientsTypeEnum })
+  @ApiProperty({ example: 'Topic', enum: TriggerRecipientsTypeEnum, enumName: 'TriggerRecipientsTypeEnum' })
   type: TriggerRecipientsTypeEnum;
 }
 
