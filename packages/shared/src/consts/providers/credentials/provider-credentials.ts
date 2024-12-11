@@ -884,7 +884,7 @@ export const novuInAppConfig: IConfigCredentials[] = [
     type: 'switch',
     required: false,
     tooltip: {
-      text: ' active it verifies if a request is performed by a specific user',
+      text: 'When active it verifies if a request is performed by a specific user',
       when: false,
     },
   },
