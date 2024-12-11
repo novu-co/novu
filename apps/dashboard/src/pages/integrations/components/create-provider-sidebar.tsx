@@ -1,7 +1,7 @@
 import { useCallback, useState, useMemo, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/primitives/sheet';
-import { ChannelTypeEnum } from '@novu/shared';
-import { useProviders, IProvider } from '@/hooks/use-providers';
+import { ChannelTypeEnum, IProviderConfig } from '@novu/shared';
+import { useProviders } from '@/hooks/use-providers';
 import { useCreateIntegration } from '@/hooks/use-create-integration';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Button } from '@/components/primitives/button';
@@ -39,7 +39,7 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
 
     // First filter out novu providers and apply search
     const filtered = providers.filter(
-      (provider: IProvider) =>
+      (provider: IProviderConfig) =>
         provider.displayName.toLowerCase().includes(searchQuery.toLowerCase()) &&
         provider.id !== 'novu-email' &&
         provider.id !== 'novu-sms'
@@ -85,14 +85,14 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
   const providersByChannel = useMemo(() => {
     return Object.values(ChannelTypeEnum).reduce(
       (acc, channel) => {
-        acc[channel] = filteredProviders.filter((provider: IProvider) => provider.channel === channel);
+        acc[channel] = filteredProviders.filter((provider: IProviderConfig) => provider.channel === channel);
         return acc;
       },
-      {} as Record<ChannelTypeEnum, IProvider[]>
+      {} as Record<ChannelTypeEnum, IProviderConfig[]>
     );
   }, [filteredProviders]);
 
-  const provider = providers?.find((p: IProvider) => p.id === selectedProvider);
+  const provider = providers?.find((p: IProviderConfig) => p.id === selectedProvider);
 
   const onProviderSelect = useCallback((providerId: string) => {
     setSelectedProvider(providerId);
@@ -158,7 +158,7 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
                 <TabsContent key={channel} value={channel} className="flex-1">
                   {providersByChannel[channel]?.length > 0 ? (
                     <div className="flex flex-col gap-4 p-3">
-                      {providersByChannel[channel].map((provider: IProvider) => (
+                      {providersByChannel[channel].map((provider: IProviderConfig) => (
                         <ProviderCard
                           key={provider.id}
                           provider={provider}

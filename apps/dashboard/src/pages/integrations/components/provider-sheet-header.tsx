@@ -1,11 +1,10 @@
 import { Button } from '@/components/primitives/button';
 import { SheetHeader, SheetTitle } from '@/components/primitives/sheet';
 import { RiArrowLeftSLine } from 'react-icons/ri';
-import { IProvider } from '@/hooks/use-providers';
 import { IIntegration } from '@novu/shared';
 
 interface ProviderSheetHeaderProps {
-  provider?: IProvider;
+  provider?: IProviderConfig;
   integration?: IIntegration;
   mode: 'create' | 'update';
   onBack?: () => void;

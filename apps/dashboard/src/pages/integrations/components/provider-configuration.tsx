@@ -9,9 +9,9 @@ import { HelpTooltipIndicator } from '@/components/primitives/help-tooltip-indic
 import { SecretInput } from '@/components/primitives/secret-input';
 import { RiInputField } from 'react-icons/ri';
 import { Info } from 'lucide-react';
-import { CredentialsKeyEnum, IIntegration } from '@novu/shared';
-import { IProvider } from '@/hooks/use-providers';
+import { CredentialsKeyEnum, IIntegration, IProviderConfig } from '@novu/shared';
 import { useEffect } from 'react';
+import { InlineToast } from '../../../components/primitives/inline-toast';
 
 const secureCredentials = [
   CredentialsKeyEnum.ApiKey,
@@ -31,7 +31,7 @@ interface ProviderFormData {
 }
 
 interface ProviderConfigurationProps {
-  provider: IProvider;
+  provider: IProviderConfig;
   integration?: IIntegration;
   onSubmit: (data: ProviderFormData) => Promise<void>;
   isLoading?: boolean;
@@ -229,6 +229,15 @@ export function ProviderConfiguration({
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+        <InlineToast
+          variant={'tip'}
+          title="Configure Provider"
+          description="To learn more about how to configure your provider, please refer to the documentation."
+          ctaLabel="View Guide"
+          onCtaClick={() => {
+            window.open(provider.docReference, '_blank');
+          }}
+        />
       </form>
     </Form>
   );

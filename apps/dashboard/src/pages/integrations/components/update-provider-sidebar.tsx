@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Sheet, SheetContent } from '@/components/primitives/sheet';
-import { useProviders, IProvider } from '@/hooks/use-providers';
+import { useProviders } from '@/hooks/use-providers';
 import { useUpdateIntegration } from '@/hooks/use-update-integration';
 import {
   AlertDialog,
@@ -17,7 +17,7 @@ import { ProviderConfiguration } from './provider-configuration';
 import { ProviderSheetHeader } from './provider-sheet-header';
 import { toast } from 'sonner';
 import { CheckIntegrationResponseEnum } from '../../../api/integrations';
-import { CHANNELS_WITH_PRIMARY } from '@novu/shared';
+import { CHANNELS_WITH_PRIMARY, IProviderConfig } from '@novu/shared';
 import { useSetPrimaryIntegration } from '../../../hooks/use-set-primary-integration';
 import { useQueryClient } from '@tanstack/react-query';
 import { QueryKeys } from '../../../utils/query-keys';
@@ -83,7 +83,7 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
   const { currentEnvironment } = useEnvironment();
 
   const integration = integrations?.find((i) => i._id === integrationId);
-  const provider = providers?.find((p: IProvider) => p.id === integration?.providerId);
+  const provider = providers?.find((p: IProviderConfig) => p.id === integration?.providerId);
 
   const executeUpdate = async (data: any) => {
     if (!integration) return;

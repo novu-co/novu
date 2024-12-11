@@ -1,13 +1,12 @@
-import { ChannelTypeEnum, IEnvironment, IIntegration } from '@novu/shared';
+import { ChannelTypeEnum, IEnvironment, IIntegration, IProviderConfig } from '@novu/shared';
 import { ITableIntegration } from '../types';
 import { IntegrationCard } from './integration-card';
-import { IProvider } from '@/hooks/use-providers';
 import { CHANNEL_TYPE_TO_STRING } from '@/utils/channels';
 
 interface IntegrationChannelGroupProps {
   channel: ChannelTypeEnum;
   integrations: IIntegration[];
-  providers: IProvider[];
+  providers: IProviderConfig[];
   environments?: IEnvironment[];
   onRowClickCallback: (item: { original: ITableIntegration }) => void;
 }
