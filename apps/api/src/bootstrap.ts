@@ -1,5 +1,3 @@
-import 'newrelic';
-import './config/env.config';
 import './instrument';
 
 import helmet from 'helmet';
