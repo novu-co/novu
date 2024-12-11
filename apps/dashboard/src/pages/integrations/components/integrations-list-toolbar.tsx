@@ -1,15 +1,18 @@
 import { Button } from '@/components/primitives/button';
 
 interface IntegrationsListToolbarProps {
-  onAddProviderClick: React.MouseEventHandler<HTMLButtonElement>;
+  onAddIntegrationClick: React.MouseEventHandler<HTMLButtonElement>;
   areIntegrationsLoading: boolean;
 }
 
-export function IntegrationsListToolbar({ onAddProviderClick, areIntegrationsLoading }: IntegrationsListToolbarProps) {
+export function IntegrationsListToolbar({
+  onAddIntegrationClick,
+  areIntegrationsLoading,
+}: IntegrationsListToolbarProps) {
   return (
     <div className="flex justify-end">
-      <Button onClick={onAddProviderClick} disabled={areIntegrationsLoading} data-test-id="add-provider">
-        Add Provider
+      <Button onClick={onAddIntegrationClick} disabled={areIntegrationsLoading} data-test-id="add-integration">
+        Add Integration
       </Button>
     </div>
   );

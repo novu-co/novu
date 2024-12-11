@@ -1,24 +1,23 @@
 import { Button } from '@/components/primitives/button';
 import { SheetHeader, SheetTitle } from '@/components/primitives/sheet';
 import { RiArrowLeftSLine } from 'react-icons/ri';
-import { IIntegration, IProviderConfig } from '@novu/shared';
+import { IProviderConfig } from '@novu/shared';
 
-interface ProviderSheetHeaderProps {
+interface IntegrationSheetHeaderProps {
   provider?: IProviderConfig;
-  integration?: IIntegration;
   mode: 'create' | 'update';
   onBack?: () => void;
   step?: 'select' | 'configure';
 }
 
-export function ProviderSheetHeader({ provider, integration, mode, onBack, step }: ProviderSheetHeaderProps) {
+export function IntegrationSheetHeader({ provider, mode, onBack, step }: IntegrationSheetHeaderProps) {
   if (mode === 'create' && step === 'select') {
     return (
       <SheetHeader className="borde-neutral-300 space-y-1 border-b p-3">
-        <SheetTitle className="text-lg">Connect Provider</SheetTitle>
+        <SheetTitle className="text-lg">Connect Integration</SheetTitle>
         <p className="text-foreground-400 text-xs">
-          Select a provider to integrate with your application.{' '}
-          <a href="https://docs.novu.co/docs/providers" target="_blank" className="underline">
+          Select an integration to connect with your application.{' '}
+          <a href="https://docs.novu.co/docs/integrations" target="_blank" className="underline">
             Learn More
           </a>
         </p>

@@ -14,8 +14,8 @@ import {
   AlertDialogTitle,
 } from '@/components/primitives/alert-dialog';
 import { useFetchIntegrations } from '@/hooks/use-fetch-integrations';
-import { ProviderConfiguration } from './provider-configuration';
-import { ProviderSheetHeader } from './provider-sheet-header';
+import { IntegrationConfiguration } from './integration-configuration';
+import { IntegrationSheetHeader } from './integration-sheet-header';
 import { toast } from 'sonner';
 import { CheckIntegrationResponseEnum } from '@/api/integrations';
 import { CHANNELS_WITH_PRIMARY, IProviderConfig } from '@novu/shared';
@@ -25,7 +25,7 @@ import { QueryKeys } from '@/utils/query-keys';
 import { useEnvironment } from '@/context/environment/hooks';
 import { Button } from '@/components/primitives/button';
 
-interface UpdateProviderSidebarProps {
+interface UpdateIntegrationSidebarProps {
   isOpened: boolean;
   integrationId?: string;
   onClose: () => void;
@@ -71,7 +71,7 @@ function SelectPrimaryIntegrationModal({
   );
 }
 
-export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: UpdateProviderSidebarProps) {
+export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: UpdateIntegrationSidebarProps) {
   const { integrations } = useFetchIntegrations();
   const { providers } = useProviders();
   const { mutateAsync: updateIntegration, isPending } = useUpdateIntegration();
@@ -176,7 +176,7 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
     if (!integration) return;
 
     try {
-      await deleteIntegration({ id: integration._id, name: integration.name });
+      await deleteIntegration({ id: integration._id });
       await queryClient.invalidateQueries({
         queryKey: [QueryKeys.fetchIntegrations, currentEnvironment?._id],
       });
@@ -203,13 +203,12 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
       <Sheet open={isOpened} onOpenChange={onClose}>
         <SheetContent className="sm:max-w-lg">
           <div className="flex h-full flex-col">
-            <ProviderSheetHeader provider={provider} integration={integration} mode="update" />
+            <IntegrationSheetHeader provider={provider} mode="update" />
             <div className="scrollbar-custom min-h-0 flex-1 overflow-y-auto">
-              <ProviderConfiguration
+              <IntegrationConfiguration
                 provider={provider}
                 integration={integration}
                 onSubmit={onSubmit}
-                isLoading={isPending}
                 mode="update"
               />
             </div>
@@ -226,7 +225,7 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
                     Delete Integration
                   </Button>
                 )}
-                <Button type="submit" form="provider-configuration-form" isLoading={isPending} size="sm">
+                <Button type="submit" form="integration-configuration-form" isLoading={isPending} size="sm">
                   Save Changes
                 </Button>
               </div>
@@ -248,29 +247,20 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
             <AlertDialogDescription className="space-y-2">
               {integration?.primary ? (
                 <>
+                  <p>Are you sure you want to delete this primary integration?</p>
                   <p>
-                    You are about to delete a primary integration. This will affect the delivery of notifications
-                    through this channel.
+                    You will need to set up a new integration and configure it as primary to continue sending
+                    notifications through this channel.
                   </p>
-                  <p>
-                    Please make sure to set up a new primary integration for this channel to ensure proper notification
-                    delivery.
-                  </p>
-                  <p className="font-medium">Are you sure you want to proceed?</p>
                 </>
               ) : (
-                <p>Are you sure you want to delete this integration? This action cannot be undone.</p>
+                <p>Are you sure you want to delete this integration?</p>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={onDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete{integration?.primary ? ' Primary' : ''} Integration
-            </AlertDialogAction>
+            <AlertDialogAction onClick={onDelete}>Delete Integration</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

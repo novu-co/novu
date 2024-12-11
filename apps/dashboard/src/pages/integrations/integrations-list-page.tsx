@@ -7,8 +7,8 @@ import { ITableIntegration } from './types';
 import { DashboardLayout } from '../../components/dashboard-layout';
 import { useEnvironment } from '@/context/environment/hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
-import { UpdateProviderSidebar } from './components/update-provider-sidebar';
-import { CreateProviderSidebar } from './components/create-provider-sidebar';
+import { UpdateIntegrationSidebar } from './components/update-integration-sidebar';
+import { CreateIntegrationSidebar } from './components/create-integration-sidebar';
 import { Badge } from '../../components/primitives/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Button } from '@/components/primitives/button';
@@ -24,7 +24,7 @@ export function IntegrationsListPage() {
     setSelectedIntegrationId(item.original.integrationId);
   }, []);
 
-  const onAddProviderClickCallback = useCallback(() => {
+  const onAddIntegrationClickCallback = useCallback(() => {
     setIsCreateModalOpen(true);
   }, []);
 
@@ -63,13 +63,13 @@ export function IntegrationsListPage() {
               </Badge>
             </TabsTrigger>
           </TabsList>
-          <Button size="sm" variant="primary" onClick={onAddProviderClickCallback} className="my-1.5 mr-2.5">
+          <Button size="sm" variant="primary" onClick={onAddIntegrationClickCallback} className="my-1.5 mr-2.5">
             Connect Provider
           </Button>
         </div>
         <TabsContent value="providers" variant="regular" className="p-2.5">
           <IntegrationsList
-            onAddProviderClick={onAddProviderClickCallback}
+            onAddIntegrationClick={onAddIntegrationClickCallback}
             onRowClickCallback={onRowClickCallback}
             onChannelClick={onChannelClickCallback}
           />
@@ -78,12 +78,12 @@ export function IntegrationsListPage() {
           <div className="text-muted-foreground flex h-64 items-center justify-center">Coming soon</div>
         </TabsContent>
       </Tabs>
-      <UpdateProviderSidebar
+      <UpdateIntegrationSidebar
         isOpened={!!selectedIntegrationId}
         integrationId={selectedIntegrationId}
         onClose={() => setSelectedIntegrationId(undefined)}
       />
-      <CreateProviderSidebar
+      <CreateIntegrationSidebar
         isOpened={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         scrollToChannel={searchParams.get('scrollTo') as ChannelTypeEnum}

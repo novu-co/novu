@@ -5,9 +5,9 @@ import { useProviders } from '@/hooks/use-providers';
 import { useCreateIntegration } from '@/hooks/use-create-integration';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Button } from '@/components/primitives/button';
-import { ProviderConfiguration } from './provider-configuration';
-import { ProviderSheetHeader } from './provider-sheet-header';
-import { ProviderCard } from './provider-card';
+import { IntegrationConfiguration } from './integration-configuration';
+import { IntegrationSheetHeader } from './integration-sheet-header';
+import { IntegrationListItem } from './integration-list-item';
 import { toast } from 'sonner';
 import { CheckIntegrationResponseEnum } from '../../../api/integrations';
 import { CHANNEL_TYPE_TO_STRING } from '@/utils/channels';
@@ -15,34 +15,32 @@ import { QueryKeys } from '@/utils/query-keys';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEnvironment } from '@/context/environment/hooks';
 
-interface CreateProviderSidebarProps {
+interface CreateIntegrationSidebarProps {
   isOpened: boolean;
   onClose: () => void;
   scrollToChannel?: ChannelTypeEnum;
 }
 
-export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSidebarProps) {
+export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegrationSidebarProps) {
   const { providers } = useProviders();
-  const [selectedProvider, setSelectedProvider] = useState<string>();
+  const [selectedIntegration, setSelectedIntegration] = useState<string>();
   const [step, setStep] = useState<'select' | 'configure'>('select');
   const [searchQuery, setSearchQuery] = useState('');
   const { mutateAsync: createIntegration, isPending } = useCreateIntegration();
   const queryClient = useQueryClient();
   const { currentEnvironment } = useEnvironment();
 
-  // Reset state when sidebar is opened
   useEffect(() => {
     if (isOpened) {
-      setSelectedProvider(undefined);
+      setSelectedIntegration(undefined);
       setStep('select');
       setSearchQuery('');
     }
   }, [isOpened]);
 
-  const filteredProviders = useMemo(() => {
+  const filteredIntegrations = useMemo(() => {
     if (!providers) return [];
 
-    // First filter out novu providers and apply search
     const filtered = providers.filter(
       (provider: IProviderConfig) =>
         provider.displayName.toLowerCase().includes(searchQuery.toLowerCase()) &&
@@ -50,7 +48,6 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
         provider.id !== 'novu-sms'
     );
 
-    // Sort providers by popularity based on predefined order
     const popularityOrder: Record<ChannelTypeEnum, string[]> = {
       [ChannelTypeEnum.EMAIL]: [
         'sendgrid',
@@ -87,26 +84,26 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
     });
   }, [providers, searchQuery]);
 
-  const providersByChannel = useMemo(() => {
+  const integrationsByChannel = useMemo(() => {
     return Object.values(ChannelTypeEnum).reduce(
       (acc, channel) => {
-        acc[channel] = filteredProviders.filter((provider: IProviderConfig) => provider.channel === channel);
+        acc[channel] = filteredIntegrations.filter((provider: IProviderConfig) => provider.channel === channel);
         return acc;
       },
       {} as Record<ChannelTypeEnum, IProviderConfig[]>
     );
-  }, [filteredProviders]);
+  }, [filteredIntegrations]);
 
-  const provider = providers?.find((p: IProviderConfig) => p.id === selectedProvider);
+  const provider = providers?.find((p: IProviderConfig) => p.id === selectedIntegration);
 
-  const onProviderSelect = useCallback((providerId: string) => {
-    setSelectedProvider(providerId);
+  const onIntegrationSelect = useCallback((integrationId: string) => {
+    setSelectedIntegration(integrationId);
     setStep('configure');
   }, []);
 
   const onBack = useCallback(() => {
     setStep('select');
-    setSelectedProvider(undefined);
+    setSelectedIntegration(undefined);
   }, []);
 
   const onSubmit = useCallback(
@@ -141,13 +138,13 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
         }
       }
     },
-    [provider, createIntegration, onClose, currentEnvironment?._id]
+    [createIntegration, onClose, currentEnvironment?._id, provider, queryClient]
   );
 
   return (
     <Sheet open={isOpened} onOpenChange={onClose}>
       <SheetContent className="flex w-full flex-col sm:max-w-lg">
-        <ProviderSheetHeader provider={provider} mode="create" step={step} onBack={onBack} />
+        <IntegrationSheetHeader provider={provider} mode="create" step={step} onBack={onBack} />
 
         <div className="flex-1 overflow-y-auto">
           {step === 'select' ? (
@@ -165,22 +162,22 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
               {[ChannelTypeEnum.EMAIL, ChannelTypeEnum.SMS, ChannelTypeEnum.PUSH, ChannelTypeEnum.CHAT].map(
                 (channel) => (
                   <TabsContent key={channel} value={channel} className="flex-1">
-                    {providersByChannel[channel]?.length > 0 ? (
+                    {integrationsByChannel[channel]?.length > 0 ? (
                       <div className="flex flex-col gap-4 p-3">
-                        {providersByChannel[channel].map((provider: IProviderConfig) => (
-                          <ProviderCard
-                            key={provider.id}
-                            provider={provider}
-                            onClick={() => onProviderSelect(provider.id)}
+                        {integrationsByChannel[channel].map((integration: IProviderConfig) => (
+                          <IntegrationListItem
+                            key={integration.id}
+                            integration={integration}
+                            onClick={() => onIntegrationSelect(integration.id)}
                           />
                         ))}
                       </div>
                     ) : (
                       <div className="text-muted-foreground flex min-h-[200px] items-center justify-center text-center">
                         {searchQuery ? (
-                          <p>No {channel.toLowerCase()} providers match your search</p>
+                          <p>No {channel.toLowerCase()} integrations match your search</p>
                         ) : (
-                          <p>No {channel.toLowerCase()} providers available</p>
+                          <p>No {channel.toLowerCase()} integrations available</p>
                         )}
                       </div>
                     )}
@@ -189,13 +186,13 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
               )}
             </Tabs>
           ) : provider ? (
-            <ProviderConfiguration provider={provider} onSubmit={onSubmit} isLoading={isPending} mode="create" />
+            <IntegrationConfiguration provider={provider} onSubmit={onSubmit} mode="create" />
           ) : null}
         </div>
 
         {step === 'configure' && (
           <div className="border-border bg-background mt-auto flex items-center justify-end gap-2 border-t p-4">
-            <Button type="submit" form="provider-configuration-form" disabled={isPending} isLoading={isPending}>
+            <Button type="submit" form="integration-configuration-form" disabled={isPending} isLoading={isPending}>
               Create Integration
             </Button>
           </div>

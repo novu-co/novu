@@ -1,12 +1,12 @@
 import { Button } from '@/components/primitives/button';
-import { IProvider } from '@/hooks/use-providers';
+import { IProviderConfig } from '@novu/shared';
 
-interface ProviderCardProps {
-  provider: IProvider;
+interface IntegrationListItemProps {
+  integration: IProviderConfig;
   onClick: () => void;
 }
 
-export function ProviderCard({ provider, onClick }: ProviderCardProps) {
+export function IntegrationListItem({ integration, onClick }: IntegrationListItemProps) {
   return (
     <Button
       onClick={onClick}
@@ -16,12 +16,12 @@ export function ProviderCard({ provider, onClick }: ProviderCardProps) {
       <div className="flex w-full items-start justify-start gap-3">
         <div>
           <img
-            src={`/images/providers/light/square/${provider.id}.svg`}
-            alt={provider.displayName}
+            src={`/images/providers/light/square/${integration.id}.svg`}
+            alt={integration.displayName}
             className="h-6 w-6"
           />
         </div>
-        <div className="text-md text-foreground-950 leading-6">{provider.displayName}</div>
+        <div className="text-md text-foreground-950 leading-6">{integration.displayName}</div>
       </div>
     </Button>
   );

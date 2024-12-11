@@ -7,7 +7,7 @@ import { IntegrationChannelGroup } from './integration-channel-group';
 import { Skeleton } from '@/components/primitives/skeleton';
 
 interface IntegrationsListProps {
-  onAddProviderClick: () => void;
+  onAddIntegrationClick: () => void;
   onRowClickCallback: (item: { original: ITableIntegration }) => void;
   onChannelClick: (channel: ChannelTypeEnum) => void;
 }
@@ -48,12 +48,12 @@ function IntegrationChannelGroupSkeleton() {
   );
 }
 
-export function IntegrationsList({ onAddProviderClick, onRowClickCallback, onChannelClick }: IntegrationsListProps) {
+export function IntegrationsList({ onAddIntegrationClick, onRowClickCallback, onChannelClick }: IntegrationsListProps) {
   const { currentEnvironment, environments } = useEnvironment();
   const { integrations } = useFetchIntegrations();
-  const { providers } = useProviders();
+  const { providers: availableIntegrations } = useProviders();
 
-  if (!integrations || !providers || !currentEnvironment) {
+  if (!integrations || !availableIntegrations || !currentEnvironment) {
     return (
       <div className="space-y-6">
         <IntegrationChannelGroupSkeleton />
@@ -62,7 +62,6 @@ export function IntegrationsList({ onAddProviderClick, onRowClickCallback, onCha
     );
   }
 
-  // Group integrations by channel
   const groupedIntegrations = integrations.reduce(
     (acc, integration) => {
       const channel = integration.channel;
@@ -82,7 +81,7 @@ export function IntegrationsList({ onAddProviderClick, onRowClickCallback, onCha
           key={channel}
           channel={channel as ChannelTypeEnum}
           integrations={channelIntegrations}
-          providers={providers}
+          providers={availableIntegrations}
           environments={environments}
           onRowClickCallback={onRowClickCallback}
         />

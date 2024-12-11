@@ -22,7 +22,7 @@ const secureCredentials = [
   CredentialsKeyEnum.ServiceAccount,
 ];
 
-interface ProviderFormData {
+interface IntegrationFormData {
   name: string;
   identifier: string;
   credentials: Record<string, string>;
@@ -30,31 +30,24 @@ interface ProviderFormData {
   primary: boolean;
 }
 
-interface ProviderConfigurationProps {
-  provider: IProviderConfig;
+interface IntegrationConfigurationProps {
+  provider?: IProviderConfig;
   integration?: IIntegration;
-  onSubmit: (data: ProviderFormData) => Promise<void>;
-  isLoading?: boolean;
+  onSubmit: (data: IntegrationFormData) => Promise<void>;
   mode: 'create' | 'update';
 }
 
 function generateSlug(name: string): string {
   return name
-    .toLowerCase()
+    ?.toLowerCase()
     .trim()
     .replace(/[^\w\s-]/g, '')
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
 
-export function ProviderConfiguration({
-  provider,
-  integration,
-  onSubmit,
-  isLoading,
-  mode,
-}: ProviderConfigurationProps) {
-  const form = useForm<ProviderFormData>({
+export function IntegrationConfiguration({ provider, integration, onSubmit, mode }: IntegrationConfigurationProps) {
+  const form = useForm<IntegrationFormData>({
     defaultValues: integration
       ? {
           name: integration.name,
@@ -64,8 +57,8 @@ export function ProviderConfiguration({
           credentials: integration.credentials as Record<string, string>,
         }
       : {
-          name: provider.displayName,
-          identifier: generateSlug(provider.displayName),
+          name: provider?.displayName ?? '',
+          identifier: generateSlug(provider?.displayName ?? ''),
           active: true,
           primary: false,
           credentials: {},
@@ -91,7 +84,11 @@ export function ProviderConfiguration({
 
   return (
     <Form {...form}>
-      <form id="provider-configuration-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-3 p-3">
+      <form
+        id="integration-configuration-form"
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col space-y-3 p-3"
+      >
         <Accordion type="single" collapsible defaultValue="layout">
           <AccordionItem value="layout">
             <AccordionTrigger>
@@ -104,11 +101,11 @@ export function ProviderConfiguration({
               <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
                 <div className="flex items-center justify-between gap-2">
                   <Label className="text-xs" htmlFor="active">
-                    Enable Provider{' '}
+                    Enable Integration{' '}
                     <HelpTooltipIndicator
                       className="relative top-1"
                       size="4"
-                      text="Disabling a provider will stop sending notifications through it."
+                      text="Disabling an integration will stop sending notifications through it."
                     />
                   </Label>
                   <Controller
@@ -121,11 +118,11 @@ export function ProviderConfiguration({
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <Label className="text-xs" htmlFor="primary">
-                    Primary Provider{' '}
+                    Primary Integration{' '}
                     <HelpTooltipIndicator
                       className="relative top-1"
                       size="4"
-                      text="Primary provider will be used for all notifications by default, there can be only one primary provider per channel"
+                      text="Primary integration will be used for all notifications by default, there can be only one primary integration per channel"
                     />
                   </Label>
                   <Controller
@@ -166,9 +163,9 @@ export function ProviderConfiguration({
         {integration?.providerId === 'novu-email' || integration?.providerId === 'novu-sms' ? (
           <InlineToast
             variant={'warning'}
-            title="Demo Provider"
-            description={`This is a demo provider intended for testing purposes only. It is limited to 300 ${
-              provider.channel === 'email' ? 'emails' : 'sms'
+            title="Demo Integration"
+            description={`This is a demo integration intended for testing purposes only. It is limited to 300 ${
+              provider?.channel === 'email' ? 'emails' : 'sms'
             } per month.`}
           />
         ) : (
@@ -178,7 +175,7 @@ export function ProviderConfiguration({
                 <AccordionTrigger>
                   <div className="flex items-center gap-1 text-xs">
                     <RiInputField className="text-feature size-5" />
-                    Provider Credentials
+                    Integration Credentials
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
@@ -241,11 +238,11 @@ export function ProviderConfiguration({
             </Accordion>
             <InlineToast
               variant={'tip'}
-              title="Configure Provider"
-              description="To learn more about how to configure your provider, please refer to the documentation."
+              title="Configure Integration"
+              description="To learn more about how to configure your integration, please refer to the documentation."
               ctaLabel="View Guide"
               onCtaClick={() => {
-                window.open(provider.docReference, '_blank');
+                window.open(provider?.docReference ?? '', '_blank');
               }}
             />
           </>
