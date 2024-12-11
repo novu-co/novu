@@ -2,6 +2,7 @@ import { Button } from '@/components/primitives/button';
 import { SheetHeader, SheetTitle } from '@/components/primitives/sheet';
 import { RiArrowLeftSLine } from 'react-icons/ri';
 import { IProviderConfig } from '@novu/shared';
+import { ProviderIcon } from './provider-icon';
 
 interface IntegrationSheetHeaderProps {
   provider?: IProviderConfig;
@@ -36,11 +37,7 @@ export function IntegrationSheetHeader({ provider, mode, onBack, step }: Integra
           </Button>
         )}
         <div>
-          <img
-            src={`/images/providers/light/square/${provider.id}.svg`}
-            alt={provider.displayName}
-            className="h-6 w-6"
-          />
+          <ProviderIcon providerId={provider.id} providerDisplayName={provider.displayName} />
         </div>
         <div className="text-md text-foreground-950 leading-6">{provider.displayName}</div>
       </div>

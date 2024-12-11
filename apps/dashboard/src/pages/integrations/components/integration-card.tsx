@@ -7,6 +7,8 @@ import type { IEnvironment, IIntegration, IProviderConfig } from '@novu/shared';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/utils/routes';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
+import { ProviderIcon } from './provider-icon';
+import { isDemoIntegration } from '../utils/is-demo-integration';
 
 interface IntegrationCardProps {
   integration: IIntegration;
@@ -37,7 +39,7 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
     }
   };
 
-  const isDemo = provider.id === 'novu-email' || provider.id === 'novu-sms';
+  const isDemo = isDemoIntegration(provider.id);
 
   return (
     <div
@@ -51,9 +53,9 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div className="relative h-6 w-6">
-            <img
-              src={`/images/providers/light/square/${provider.id}.svg`}
-              alt={integration.name}
+            <ProviderIcon
+              providerId={provider.id}
+              providerDisplayName={provider.displayName}
               className="h-full w-full"
             />
           </div>

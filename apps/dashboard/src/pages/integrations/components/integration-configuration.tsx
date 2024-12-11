@@ -12,8 +12,8 @@ import { Info } from 'lucide-react';
 import { CredentialsKeyEnum, IIntegration, IProviderConfig } from '@novu/shared';
 import { useEffect } from 'react';
 import { InlineToast } from '../../../components/primitives/inline-toast';
+import { isDemoIntegration } from '../utils/is-demo-integration';
 
-// Types
 interface IntegrationFormData {
   name: string;
   identifier: string;
@@ -43,7 +43,6 @@ interface CredentialsSectionProps {
   errors: FieldErrors<IntegrationFormData>;
 }
 
-// Constants
 const SECURE_CREDENTIALS = [
   CredentialsKeyEnum.ApiKey,
   CredentialsKeyEnum.ApiToken,
@@ -53,7 +52,106 @@ const SECURE_CREDENTIALS = [
   CredentialsKeyEnum.ServiceAccount,
 ];
 
-// Utilities
+export function IntegrationConfiguration({ provider, integration, onSubmit, mode }: IntegrationConfigurationProps) {
+  const form = useForm<IntegrationFormData>({
+    defaultValues: integration
+      ? {
+          name: integration.name,
+          identifier: integration.identifier,
+          active: integration.active,
+          primary: integration.primary ?? false,
+          credentials: integration.credentials as Record<string, string>,
+        }
+      : {
+          name: provider?.displayName ?? '',
+          identifier: generateSlug(provider?.displayName ?? ''),
+          active: true,
+          primary: false,
+          credentials: {},
+        },
+  });
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    watch,
+    setValue,
+  } = form;
+
+  const name = watch('name');
+
+  useEffect(() => {
+    if (mode === 'create') {
+      setValue('identifier', generateSlug(name));
+    }
+  }, [name, mode, setValue]);
+
+  const isDemo = integration && isDemoIntegration(integration.providerId);
+
+  return (
+    <Form {...form}>
+      <form
+        id="integration-configuration-form"
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col space-y-3 p-3"
+      >
+        <Accordion type="single" collapsible defaultValue="layout">
+          <AccordionItem value="layout">
+            <AccordionTrigger>
+              <div className="flex items-center gap-1 text-xs">
+                <RiInputField className="text-feature size-5" />
+                General Settings
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <GeneralSettings control={control} register={register} errors={errors} mode={mode} />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
+        <Separator />
+
+        {isDemo ? (
+          <InlineToast
+            variant={'warning'}
+            title="Demo Integration"
+            description={`This is a demo integration intended for testing purposes only. It is limited to 300 ${
+              provider?.channel === 'email' ? 'emails' : 'sms'
+            } per month.`}
+          />
+        ) : (
+          <>
+            <Accordion type="single" collapsible defaultValue="credentials">
+              <AccordionItem value="credentials">
+                <AccordionTrigger>
+                  <div className="flex items-center gap-1 text-xs">
+                    <RiInputField className="text-feature size-5" />
+                    Integration Credentials
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <CredentialsSection provider={provider} register={register} control={control} errors={errors} />
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            <InlineToast
+              variant={'tip'}
+              title="Configure Integration"
+              description="To learn more about how to configure your integration, please refer to the documentation."
+              ctaLabel="View Guide"
+              onCtaClick={() => {
+                window.open(provider?.docReference ?? '', '_blank');
+              }}
+            />
+          </>
+        )}
+      </form>
+    </Form>
+  );
+}
+
 function generateSlug(name: string): string {
   return name
     ?.toLowerCase()
@@ -63,7 +161,6 @@ function generateSlug(name: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-// Sub-components
 function GeneralSettings({ control, register, errors, mode }: GeneralSettingsProps) {
   return (
     <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
@@ -181,104 +278,5 @@ function CredentialsSection({ provider, register, control, errors }: Credentials
         </div>
       ))}
     </div>
-  );
-}
-
-// Main component
-export function IntegrationConfiguration({ provider, integration, onSubmit, mode }: IntegrationConfigurationProps) {
-  const form = useForm<IntegrationFormData>({
-    defaultValues: integration
-      ? {
-          name: integration.name,
-          identifier: integration.identifier,
-          active: integration.active,
-          primary: integration.primary ?? false,
-          credentials: integration.credentials as Record<string, string>,
-        }
-      : {
-          name: provider?.displayName ?? '',
-          identifier: generateSlug(provider?.displayName ?? ''),
-          active: true,
-          primary: false,
-          credentials: {},
-        },
-  });
-
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-    watch,
-    setValue,
-  } = form;
-
-  const name = watch('name');
-
-  useEffect(() => {
-    if (mode === 'create') {
-      setValue('identifier', generateSlug(name));
-    }
-  }, [name, mode, setValue]);
-
-  return (
-    <Form {...form}>
-      <form
-        id="integration-configuration-form"
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col space-y-3 p-3"
-      >
-        <Accordion type="single" collapsible defaultValue="layout">
-          <AccordionItem value="layout">
-            <AccordionTrigger>
-              <div className="flex items-center gap-1 text-xs">
-                <RiInputField className="text-feature size-5" />
-                General Settings
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <GeneralSettings control={control} register={register} errors={errors} mode={mode} />
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-
-        <Separator />
-
-        {integration?.providerId === 'novu-email' || integration?.providerId === 'novu-sms' ? (
-          <InlineToast
-            variant={'warning'}
-            title="Demo Integration"
-            description={`This is a demo integration intended for testing purposes only. It is limited to 300 ${
-              provider?.channel === 'email' ? 'emails' : 'sms'
-            } per month.`}
-          />
-        ) : (
-          <>
-            <Accordion type="single" collapsible defaultValue="credentials">
-              <AccordionItem value="credentials">
-                <AccordionTrigger>
-                  <div className="flex items-center gap-1 text-xs">
-                    <RiInputField className="text-feature size-5" />
-                    Integration Credentials
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <CredentialsSection provider={provider} register={register} control={control} errors={errors} />
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-            <InlineToast
-              variant={'tip'}
-              title="Configure Integration"
-              description="To learn more about how to configure your integration, please refer to the documentation."
-              ctaLabel="View Guide"
-              onCtaClick={() => {
-                window.open(provider?.docReference ?? '', '_blank');
-              }}
-            />
-          </>
-        )}
-      </form>
-    </Form>
   );
 }

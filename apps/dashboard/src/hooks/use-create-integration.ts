@@ -3,7 +3,7 @@ import { ChannelTypeEnum, IEnvironment } from '@novu/shared';
 import { post } from '../api/api.client';
 import { useEnvironment } from '../context/environment/hooks';
 
-interface CreateIntegrationData {
+export interface CreateIntegrationData {
   providerId: string;
   channel: ChannelTypeEnum;
   credentials: Record<string, string>;

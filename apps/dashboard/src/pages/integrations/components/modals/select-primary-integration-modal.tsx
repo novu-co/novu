@@ -15,6 +15,7 @@ export interface SelectPrimaryIntegrationModalProps {
   onConfirm: () => void;
   currentPrimaryName?: string;
   newPrimaryName?: string;
+  isLoading?: boolean;
 }
 
 export function SelectPrimaryIntegrationModal({
@@ -23,6 +24,7 @@ export function SelectPrimaryIntegrationModal({
   onConfirm,
   currentPrimaryName,
   newPrimaryName,
+  isLoading,
 }: SelectPrimaryIntegrationModalProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
@@ -42,7 +44,9 @@ export function SelectPrimaryIntegrationModal({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={onConfirm} disabled={isLoading}>
+            {isLoading ? 'Changing...' : 'Continue'}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

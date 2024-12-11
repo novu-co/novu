@@ -7,9 +7,10 @@ import { IntegrationFormData } from './types';
 import { useIntegrationForm } from './hooks/use-integration-form';
 import { IntegrationConfiguration } from './integration-configuration';
 import { Button } from '@/components/primitives/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/primitives/dialog';
-import { Sheet, SheetContent } from '@/components/primitives/sheet';
-import { IntegrationSheetHeader } from './integration-sheet-header';
+import { DeleteIntegrationModal } from './modals/delete-integration-modal';
+import { SelectPrimaryIntegrationModal } from './modals/select-primary-integration-modal';
+import { IntegrationSheet } from './integration-sheet';
+import { ChannelTypeEnum } from '@novu/shared';
 
 interface UpdateIntegrationSidebarProps {
   isOpened: boolean;
@@ -75,74 +76,49 @@ export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: U
 
   return (
     <>
-      <Sheet open={isOpened} onOpenChange={onClose}>
-        <SheetContent className="flex w-full flex-col sm:max-w-xl">
-          <IntegrationSheetHeader provider={provider} mode="update" />
+      <IntegrationSheet isOpened={isOpened} onClose={onClose} provider={provider} mode="update" maxWidth="xl">
+        <div className="scrollbar-custom flex-1 overflow-y-auto">
+          <IntegrationConfiguration
+            provider={provider}
+            integration={integration}
+            onSubmit={handleSubmit}
+            mode="update"
+          />
+        </div>
 
-          <div className="scrollbar-custom flex-1 overflow-y-auto">
-            <IntegrationConfiguration
-              provider={provider}
-              integration={integration}
-              onSubmit={handleSubmit}
-              mode="update"
-            />
-          </div>
+        <div className="bg-background flex justify-between gap-2 border-t p-3">
+          {integration.channel !== ChannelTypeEnum.IN_APP && (
+            <Button variant="ghostDestructive" size="sm" onClick={() => setIsDeleteDialogOpen(true)}>
+              Delete Integration
+            </Button>
+          )}
+          <Button
+            type="submit"
+            form="integration-configuration-form"
+            className="ml-auto"
+            isLoading={isUpdating || isSettingPrimary}
+            size="sm"
+          >
+            Save Changes
+          </Button>
+        </div>
+      </IntegrationSheet>
 
-          <div className="bg-background flex justify-between gap-2 border-t p-3">
-            {!integration.primary && (
-              <Button variant="destructive" size="sm" onClick={() => setIsDeleteDialogOpen(true)}>
-                Delete Integration
-              </Button>
-            )}
-            <Button
-              type="submit"
-              form="integration-configuration-form"
-              className="ml-auto"
-              isLoading={isUpdating || isSettingPrimary}
-              size="sm"
-            >
-              Save Changes
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
+      <DeleteIntegrationModal
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={onDelete}
+        isPrimary={integration.primary}
+      />
 
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Integration</DialogTitle>
-          </DialogHeader>
-          <p>Are you sure you want to delete this integration?</p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={onDelete} isLoading={isDeleting}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isPrimaryModalOpen} onOpenChange={setIsPrimaryModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Change Primary Integration</DialogTitle>
-          </DialogHeader>
-          <p>
-            Are you sure you want to change the primary integration from{' '}
-            <strong>{existingPrimaryIntegration?.name}</strong> to <strong>{integration.name}</strong>?
-          </p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsPrimaryModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handlePrimaryConfirm} isLoading={isUpdating || isSettingPrimary}>
-              Confirm
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <SelectPrimaryIntegrationModal
+        isOpen={isPrimaryModalOpen}
+        onOpenChange={setIsPrimaryModalOpen}
+        onConfirm={handlePrimaryConfirm}
+        currentPrimaryName={existingPrimaryIntegration?.name}
+        newPrimaryName={integration.name}
+        isLoading={isUpdating || isSettingPrimary}
+      />
     </>
   );
 }

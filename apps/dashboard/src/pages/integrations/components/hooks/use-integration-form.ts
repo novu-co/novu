@@ -5,7 +5,7 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { QueryKeys } from '@/utils/query-keys';
 import { CheckIntegrationResponseEnum } from '@/api/integrations';
 import { IntegrationFormData } from '../types';
-import { CHANNELS_WITH_PRIMARY, IIntegration } from '@novu/shared';
+import { CHANNELS_WITH_PRIMARY, IIntegration, IProviderConfig } from '@novu/shared';
 import { useUpdateIntegration } from '@/hooks/use-update-integration';
 import { useSetPrimaryIntegration } from '@/hooks/use-set-primary-integration';
 
@@ -13,9 +13,10 @@ interface UseIntegrationFormProps {
   onClose: () => void;
   integration?: IIntegration;
   integrations?: IIntegration[];
+  createIntegration?: (params: { data: IntegrationFormData; provider: IProviderConfig }) => Promise<any>;
 }
 
-export function useIntegrationForm({ onClose, integration, integrations }: UseIntegrationFormProps) {
+export function useIntegrationForm({ onClose, integration, integrations, createIntegration }: UseIntegrationFormProps) {
   const queryClient = useQueryClient();
   const { currentEnvironment } = useEnvironment();
   const { mutateAsync: updateIntegration, isPending: isUpdating } = useUpdateIntegration();
@@ -52,6 +53,23 @@ export function useIntegrationForm({ onClose, integration, integrations }: UseIn
     [integration, updateIntegration, setPrimaryIntegration, queryClient, currentEnvironment?._id, onClose]
   );
 
+  const executeCreate = useCallback(
+    async (data: IntegrationFormData, provider: IProviderConfig) => {
+      if (!createIntegration) return;
+
+      try {
+        await createIntegration({ data, provider });
+        await queryClient.invalidateQueries({
+          queryKey: [QueryKeys.fetchIntegrations, currentEnvironment?._id],
+        });
+        onClose();
+      } catch (error: any) {
+        handleError(error);
+      }
+    },
+    [createIntegration, queryClient, currentEnvironment?._id, onClose]
+  );
+
   const shouldShowPrimaryModal = useCallback(
     (data: IntegrationFormData) => {
       if (!integration || !integrations) return false;
@@ -79,6 +97,7 @@ export function useIntegrationForm({ onClose, integration, integrations }: UseIn
 
   return {
     executeUpdate,
+    executeCreate,
     shouldShowPrimaryModal,
     isUpdating,
     isSettingPrimary,
