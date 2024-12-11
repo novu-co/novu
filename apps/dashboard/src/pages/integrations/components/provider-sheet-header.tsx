@@ -1,7 +1,7 @@
 import { Button } from '@/components/primitives/button';
 import { SheetHeader, SheetTitle } from '@/components/primitives/sheet';
 import { RiArrowLeftSLine } from 'react-icons/ri';
-import { IIntegration } from '@novu/shared';
+import { IIntegration, IProviderConfig } from '@novu/shared';
 
 interface ProviderSheetHeaderProps {
   provider?: IProviderConfig;
