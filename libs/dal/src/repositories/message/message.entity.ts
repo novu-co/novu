@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { ChannelTypeEnum, IMessageCTA, IActor } from '@novu/shared';
+import { ChannelTypeEnum, IActor, IMessageCTA } from '@novu/shared';
 
 import { IEmailBlock } from '../message-template';
 import { SubscriberEntity } from '../subscriber';
