@@ -9,6 +9,7 @@ interface CreateIntegrationData {
   name: string;
   identifier: string;
   active: boolean;
+  primary?: boolean;
 }
 
 async function createIntegration(data: CreateIntegrationData) {
