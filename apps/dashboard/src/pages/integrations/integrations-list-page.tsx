@@ -63,7 +63,7 @@ export function IntegrationsListPage() {
               </Badge>
             </TabsTrigger>
           </TabsList>
-          <Button variant="primary" onClick={onAddProviderClickCallback} className="my-1.5 mr-2.5">
+          <Button size="sm" variant="primary" onClick={onAddProviderClickCallback} className="my-1.5 mr-2.5">
             Connect Provider
           </Button>
         </div>

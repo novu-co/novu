@@ -39,7 +39,7 @@ const tabsTriggerVariants = cva(
         default:
           'px-3 py-1 data-[state=active]:bg-background data-[state=active]:shadow data-[state=inactive]:text-foreground-400',
         regular:
-          "text-foreground-600 data-[state=active]:after:border-primary data-[state=active]:text-foreground-950 relative py-3.5 duration-300 ease-out after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:border-b-2 after:border-b-transparent after:content-['']",
+          "text-foreground-600 data-[state=active]:after:border-primary data-[state=active]:text-foreground-950 relative py-[15px] duration-300 ease-out after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:border-b-2 after:border-b-transparent after:content-['']",
       },
     },
     defaultVariants: {
