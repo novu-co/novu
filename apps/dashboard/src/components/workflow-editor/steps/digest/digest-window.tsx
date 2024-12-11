@@ -9,7 +9,7 @@ import { AmountInput } from '@/components/amount-input';
 import { Separator } from '@/components/primitives/separator';
 import { TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
-import { useStep } from '../step-provider';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { useSaveForm } from '../save-form-context';
 
 const defaultUnitValues = Object.values(TimeUnitEnum);
@@ -17,7 +17,7 @@ const amountKey = 'controlValues.amount';
 const unitKey = 'controlValues.unit';
 
 export const DigestWindow = () => {
-  const { step } = useStep();
+  const { step } = useWorkflow();
   const { saveForm } = useSaveForm();
   const { getFieldState } = useFormContext();
   const { dataSchema, uiSchema } = step?.controls ?? {};

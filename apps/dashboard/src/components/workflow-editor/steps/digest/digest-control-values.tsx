@@ -1,12 +1,12 @@
 import { UiSchemaGroupEnum } from '@novu/shared';
 
 import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
-import { useStep } from '@/components/workflow-editor/steps/step-provider';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
 
 export const DigestControlValues = () => {
-  const { step } = useStep();
+  const { step } = useWorkflow();
   const { uiSchema } = step?.controls ?? {};
 
   if (!uiSchema || uiSchema?.group !== UiSchemaGroupEnum.DIGEST) {
