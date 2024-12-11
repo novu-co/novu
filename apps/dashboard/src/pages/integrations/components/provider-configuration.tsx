@@ -163,81 +163,93 @@ export function ProviderConfiguration({
 
         <Separator />
 
-        <Accordion type="single" collapsible defaultValue="credentials">
-          <AccordionItem value="credentials">
-            <AccordionTrigger>
-              <div className="flex items-center gap-1 text-xs">
-                <RiInputField className="text-feature size-5" />
-                Provider Credentials
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
-                {provider?.credentials?.map((credential) => (
-                  <div key={credential.key} className="space-y-2">
-                    <Label htmlFor={credential.key}>
-                      {credential.displayName}
-                      {credential.required && <span className="text-destructive ml-1">*</span>}
-                    </Label>
-                    {credential.type === 'switch' ? (
-                      <div className="flex items-center justify-between gap-2">
-                        <Controller
-                          control={control}
-                          name={`credentials.${credential.key}`}
-                          render={({ field: { onChange, value } }) => (
-                            <Switch id={credential.key} checked={Boolean(value)} onCheckedChange={onChange} />
-                          )}
-                        />
-                      </div>
-                    ) : credential.type === 'secret' ||
-                      secureCredentials.includes(credential.key as CredentialsKeyEnum) ? (
-                      <InputField className="flex overflow-hidden pr-0">
-                        <SecretInput
-                          id={credential.key}
-                          placeholder={`Enter ${credential.displayName.toLowerCase()}`}
-                          register={register}
-                          registerKey={`credentials.${credential.key}`}
-                          registerOptions={{
-                            required: credential.required ? `${credential.displayName} is required` : false,
-                          }}
-                        />
-                      </InputField>
-                    ) : (
-                      <InputField>
-                        <Input
-                          id={credential.key}
-                          type="text"
-                          placeholder={`Enter ${credential.displayName.toLowerCase()}`}
-                          {...register(`credentials.${credential.key}`, {
-                            required: credential.required ? `${credential.displayName} is required` : false,
-                          })}
-                        />
-                      </InputField>
-                    )}
-                    {credential.description && (
-                      <div className="text-foreground-400 flex items-center gap-1 text-xs">
-                        <Info className="h-3 w-3" />
-                        <span>{credential.description}</span>
-                      </div>
-                    )}
-                    {errors.credentials?.[credential.key] && (
-                      <p className="text-sm text-red-500">{errors.credentials[credential.key]?.message}</p>
-                    )}
+        {integration?.providerId === 'novu-email' || integration?.providerId === 'novu-sms' ? (
+          <InlineToast
+            variant={'warning'}
+            title="Demo Provider"
+            description={`This is a demo provider intended for testing purposes only. It is limited to 300 ${
+              provider.channel === 'email' ? 'emails' : 'sms'
+            } per month.`}
+          />
+        ) : (
+          <>
+            <Accordion type="single" collapsible defaultValue="credentials">
+              <AccordionItem value="credentials">
+                <AccordionTrigger>
+                  <div className="flex items-center gap-1 text-xs">
+                    <RiInputField className="text-feature size-5" />
+                    Provider Credentials
                   </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-        <InlineToast
-          variant={'tip'}
-          title="Configure Provider"
-          description="To learn more about how to configure your provider, please refer to the documentation."
-          ctaLabel="View Guide"
-          onCtaClick={() => {
-            window.open(provider.docReference, '_blank');
-          }}
-        />
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
+                    {provider?.credentials?.map((credential) => (
+                      <div key={credential.key} className="space-y-2">
+                        <Label htmlFor={credential.key}>
+                          {credential.displayName}
+                          {credential.required && <span className="text-destructive ml-1">*</span>}
+                        </Label>
+                        {credential.type === 'switch' ? (
+                          <div className="flex items-center justify-between gap-2">
+                            <Controller
+                              control={control}
+                              name={`credentials.${credential.key}`}
+                              render={({ field: { onChange, value } }) => (
+                                <Switch id={credential.key} checked={Boolean(value)} onCheckedChange={onChange} />
+                              )}
+                            />
+                          </div>
+                        ) : credential.type === 'secret' ||
+                          secureCredentials.includes(credential.key as CredentialsKeyEnum) ? (
+                          <InputField className="flex overflow-hidden pr-0">
+                            <SecretInput
+                              id={credential.key}
+                              placeholder={`Enter ${credential.displayName.toLowerCase()}`}
+                              register={register}
+                              registerKey={`credentials.${credential.key}`}
+                              registerOptions={{
+                                required: credential.required ? `${credential.displayName} is required` : false,
+                              }}
+                            />
+                          </InputField>
+                        ) : (
+                          <InputField>
+                            <Input
+                              id={credential.key}
+                              type="text"
+                              placeholder={`Enter ${credential.displayName.toLowerCase()}`}
+                              {...register(`credentials.${credential.key}`, {
+                                required: credential.required ? `${credential.displayName} is required` : false,
+                              })}
+                            />
+                          </InputField>
+                        )}
+                        {credential.description && (
+                          <div className="text-foreground-400 flex items-center gap-1 text-xs">
+                            <Info className="h-3 w-3" />
+                            <span>{credential.description}</span>
+                          </div>
+                        )}
+                        {errors.credentials?.[credential.key] && (
+                          <p className="text-sm text-red-500">{errors.credentials[credential.key]?.message}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            <InlineToast
+              variant={'tip'}
+              title="Configure Provider"
+              description="To learn more about how to configure your provider, please refer to the documentation."
+              ctaLabel="View Guide"
+              onCtaClick={() => {
+                window.open(provider.docReference, '_blank');
+              }}
+            />
+          </>
+        )}
       </form>
     </Form>
   );

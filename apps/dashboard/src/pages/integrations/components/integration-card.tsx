@@ -6,6 +6,7 @@ import { ITableIntegration } from '../types';
 import type { IEnvironment, IIntegration, IProviderConfig } from '@novu/shared';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/utils/routes';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 
 interface IntegrationCardProps {
   integration: IIntegration;
@@ -36,10 +37,12 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
     }
   };
 
+  const isDemo = provider.id === 'novu-email' || provider.id === 'novu-sms';
+
   return (
     <div
       className={cn(
-        'bg-card group relative flex cursor-pointer flex-col gap-2 overflow-hidden rounded-xl border p-3 shadow-md transition-all hover:shadow-lg',
+        'bg-card group relative flex cursor-pointer flex-col gap-2 overflow-hidden rounded-xl border p-3 transition-all hover:shadow-lg',
         !integration.active && 'opacity-75 grayscale'
       )}
       onClick={handleConfigureClick}
@@ -63,10 +66,25 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
           </Badge>
         )}
       </div>
-      <div>
-        <div className="inline-block rounded-md bg-neutral-50 px-1.5 py-0.5 font-mono text-xs leading-4 text-neutral-400">
+      <div className="flex items-center gap-2">
+        <div className="inline-block rounded-md bg-neutral-50 px-1.5 py-[3px] font-mono text-xs leading-4 text-neutral-400">
           {integration.identifier}
         </div>
+        {isDemo && (
+          <Tooltip>
+            <TooltipTrigger>
+              <Badge variant="warning" className="h-[22px] text-xs text-[#F6B51E]">
+                DEMO
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>
+                This is a demo provider for testing purposes only and capped at 300{' '}
+                {provider.channel === 'email' ? 'emails' : 'sms'} per month. Not suitable for production use.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        )}
       </div>
 
       <div className="mt-4 flex items-center gap-2">
