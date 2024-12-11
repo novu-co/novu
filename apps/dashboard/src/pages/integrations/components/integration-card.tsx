@@ -36,15 +36,12 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
         <div className="flex items-center gap-3">
           <div className="relative h-6 w-6">
             <img
-              src={`/static/images/providers/dark/square/${provider.id}.svg`}
-              alt={provider.displayName}
+              src={`/images/providers/light/square/${provider.id}.svg`}
+              alt={integration.name}
               className="h-full w-full"
-              onError={(e) => {
-                e.currentTarget.src = `//static/images/providers/dark/square/${provider.id}.png`;
-              }}
             />
           </div>
-          <span className="text-sm font-medium">{provider.displayName}</span>
+          <span className="text-sm font-medium">{integration.name}</span>
         </div>
         {integration.primary && (
           <Badge variant={'neutral'} className="bg-feature/10 text-feature">

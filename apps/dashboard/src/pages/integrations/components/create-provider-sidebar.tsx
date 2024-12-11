@@ -23,9 +23,50 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
 
   const filteredProviders = useMemo(() => {
     if (!providers) return [];
-    return providers.filter((provider: IProvider) =>
-      provider.displayName.toLowerCase().includes(searchQuery.toLowerCase())
+
+    // First filter out novu providers and apply search
+    const filtered = providers.filter(
+      (provider: IProvider) =>
+        provider.displayName.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        provider.id !== 'novu-email' &&
+        provider.id !== 'novu-sms'
     );
+
+    // Sort providers by popularity based on predefined order
+    const popularityOrder: Record<ChannelTypeEnum, string[]> = {
+      [ChannelTypeEnum.EMAIL]: [
+        'sendgrid',
+        'mailgun',
+        'postmark',
+        'mailjet',
+        'mandrill',
+        'ses',
+        'outlook365',
+        'custom-smtp',
+      ],
+      [ChannelTypeEnum.SMS]: ['twilio', 'plivo', 'sns', 'nexmo', 'telnyx', 'sms77', 'infobip', 'gupshup'],
+      [ChannelTypeEnum.PUSH]: ['fcm', 'expo', 'apns', 'one-signal'],
+      [ChannelTypeEnum.CHAT]: ['slack', 'discord', 'ms-teams', 'mattermost'],
+      [ChannelTypeEnum.IN_APP]: [],
+    };
+
+    return filtered.sort((a, b) => {
+      const channelOrder = popularityOrder[a.channel] || [];
+      const indexA = channelOrder.indexOf(a.id);
+      const indexB = channelOrder.indexOf(b.id);
+
+      // If both providers are in the popularity order, sort by their position
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB;
+      }
+
+      // If only one provider is in the order, prioritize it
+      if (indexA !== -1) return -1;
+      if (indexB !== -1) return 1;
+
+      // For providers not in the order, maintain their original position
+      return 0;
+    });
   }, [providers, searchQuery]);
 
   const providersByChannel = useMemo(() => {

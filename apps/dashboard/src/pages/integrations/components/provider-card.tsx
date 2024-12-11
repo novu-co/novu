@@ -16,12 +16,9 @@ export function ProviderCard({ provider, onClick }: ProviderCardProps) {
       <div className="flex w-full items-start justify-start gap-3">
         <div>
           <img
-            src={`/static/images/providers/dark/square/${provider.id}.svg`}
+            src={`/images/providers/light/square/${provider.id}.svg`}
             alt={provider.displayName}
             className="h-6 w-6"
-            onError={(e) => {
-              e.currentTarget.src = `/static/images/providers/dark/square/${provider.id}.png`;
-            }}
           />
         </div>
         <div className="text-md text-foreground-950 leading-6">{provider.displayName}</div>
