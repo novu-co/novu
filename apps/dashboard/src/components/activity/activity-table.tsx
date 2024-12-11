@@ -19,17 +19,9 @@ export interface ActivityTableProps {
   selectedActivityId: string | null;
   onActivitySelect: (activity: IActivity) => void;
   filters?: IActivityFilters;
-  hasActiveFilters: boolean;
-  onClearFilters: () => void;
 }
 
-export function ActivityTable({
-  selectedActivityId,
-  onActivitySelect,
-  filters,
-  hasActiveFilters,
-  onClearFilters,
-}: ActivityTableProps) {
+export function ActivityTable({ selectedActivityId, onActivitySelect, filters }: ActivityTableProps) {
   const queryClient = useQueryClient();
   const { currentEnvironment } = useEnvironment();
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -127,7 +119,7 @@ export function ActivityTable({
         </TableBody>
       </Table>
 
-      <ArrowPagination page={page} limit={limit} hasMore={hasMore} onPageChange={handlePageChange} />
+      <ArrowPagination page={page} hasMore={hasMore} onPageChange={handlePageChange} />
     </div>
   );
 }
