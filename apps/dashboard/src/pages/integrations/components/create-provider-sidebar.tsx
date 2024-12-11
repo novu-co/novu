@@ -11,6 +11,9 @@ import { ProviderCard } from './provider-card';
 import { toast } from 'sonner';
 import { CheckIntegrationResponseEnum } from '../../../api/integrations';
 import { CHANNEL_TYPE_TO_STRING } from '@/utils/channels';
+import { QueryKeys } from '@/utils/query-keys';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEnvironment } from '@/context/environment/hooks';
 
 interface CreateProviderSidebarProps {
   isOpened: boolean;
@@ -24,6 +27,8 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
   const [step, setStep] = useState<'select' | 'configure'>('select');
   const [searchQuery, setSearchQuery] = useState('');
   const { mutateAsync: createIntegration, isPending } = useCreateIntegration();
+  const queryClient = useQueryClient();
+  const { currentEnvironment } = useEnvironment();
 
   // Reset state when sidebar is opened
   useEffect(() => {
@@ -118,6 +123,7 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
           active: data.active,
           primary: data.primary,
         });
+        queryClient.invalidateQueries({ queryKey: [QueryKeys.fetchIntegrations, currentEnvironment?._id] });
         onClose();
       } catch (error: any) {
         if (error?.message?.code === CheckIntegrationResponseEnum.INVALID_EMAIL) {
@@ -135,7 +141,7 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
         }
       }
     },
-    [provider, createIntegration, onClose]
+    [provider, createIntegration, onClose, currentEnvironment?._id]
   );
 
   return (

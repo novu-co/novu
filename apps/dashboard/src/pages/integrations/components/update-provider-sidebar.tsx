@@ -23,7 +23,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { QueryKeys } from '../../../utils/query-keys';
 import { useEnvironment } from '../../../context/environment/hooks';
 import { Button } from '@/components/primitives/button';
-import { RiArrowRightSLine } from 'react-icons/ri';
 
 interface UpdateProviderSidebarProps {
   isOpened: boolean;
@@ -200,7 +199,7 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
             <div className="flex-shrink-0 border-t border-neutral-200 bg-white p-3">
               <div className="flex justify-end gap-4">
                 <Button type="submit" form="provider-configuration-form" isLoading={isPending} size="sm">
-                  Save Changes <RiArrowRightSLine className="size-4" />
+                  Save Changes
                 </Button>
               </div>
             </div>
