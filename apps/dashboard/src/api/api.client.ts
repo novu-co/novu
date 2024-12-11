@@ -4,9 +4,9 @@ import type { IEnvironment } from '@novu/shared';
 
 export class NovuApiError extends Error {
   constructor(
-    message: string,
-    public error: unknown,
-    public status: number
+    public message: string,
+    public status: number,
+    public rawError?: unknown
   ) {
     super(message);
   }
@@ -46,7 +46,7 @@ const request = async <T>(
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new NovuApiError(`Novu API error`, errorData, response.status);
+      throw new NovuApiError(errorData?.message || 'Novu API error', response.status, errorData);
     }
 
     if (response.status === 204) {

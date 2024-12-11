@@ -22,7 +22,7 @@ export function useUpdateIntegration() {
 
   return useMutation<IIntegration, Error, UpdateIntegrationVariables>({
     mutationFn: async ({ integrationId, data }) => {
-      const response = await put<IIntegration>(`/v1/integrations/${integrationId}`, {
+      const response = await put<IIntegration>(`/integrations/${integrationId}`, {
         body: data,
         environment: currentEnvironment,
       });

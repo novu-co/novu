@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
-import { Sheet, SheetContent, SheetHeader } from '@/components/primitives/sheet';
+import { CheckIntegrationResponseEnum } from '@novu/shared';
+import { Sheet, SheetContent } from '@/components/primitives/sheet';
 import { useProviders, IProvider } from '@/hooks/use-providers';
 import { useUpdateIntegration } from '@/hooks/use-update-integration';
-import { Badge } from '@/components/primitives/badge';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +15,8 @@ import {
 } from '@/components/primitives/alert-dialog';
 import { useFetchIntegrations } from '../../../hooks/use-fetch-integrations';
 import { ProviderConfiguration } from './provider-configuration';
+import { ProviderSheetHeader } from './provider-sheet-header';
+import { toast } from 'sonner';
 
 interface UpdateProviderSidebarProps {
   isOpened: boolean;
@@ -36,7 +38,7 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
       if (!integration) return;
 
       try {
-        await updateIntegration({
+        const response = await updateIntegration({
           integrationId: integration._id,
           data: {
             name: data.name,
@@ -47,8 +49,20 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
           },
         });
         onClose();
-      } catch (error) {
-        console.error('Failed to update integration:', error);
+      } catch (error: any) {
+        if (error?.message?.code === CheckIntegrationResponseEnum.INVALID_EMAIL) {
+          toast.error('Invalid sender email', {
+            description: error.message?.message,
+          });
+        } else if (error?.message?.code === CheckIntegrationResponseEnum.BAD_CREDENTIALS) {
+          toast.error('Invalid credentials or credentials expired', {
+            description: error.message?.message,
+          });
+        } else {
+          toast.error('Failed to update integration', {
+            description: error?.message?.message || error?.message || 'There was an error updating the integration.',
+          });
+        }
       }
     },
     [integration, updateIntegration, onClose]
@@ -68,33 +82,8 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
   return (
     <>
       <Sheet open={isOpened} onOpenChange={onClose}>
-        <SheetContent className="w-full sm:max-w-xl">
-          <SheetHeader className="space-y-1 pb-6">
-            <div className="flex items-center gap-4">
-              <div className="relative overflow-hidden rounded-lg border bg-white p-2 shadow-sm">
-                <img
-                  src={`/static/images/providers/dark/square/${provider.id}.svg`}
-                  alt={provider.displayName}
-                  className="h-10 w-10"
-                  onError={(e) => {
-                    e.currentTarget.src = `/static/images/providers/dark/square/${provider.id}.png`;
-                  }}
-                />
-              </div>
-              <div className="space-y-1">
-                <div className="text-lg font-semibold">{provider.displayName}</div>
-                <div className="flex gap-2">
-                  <Badge variant="outline">{integration.channel}</Badge>
-                  {integration.active ? (
-                    <Badge variant="success">Active</Badge>
-                  ) : (
-                    <Badge variant="neutral">Inactive</Badge>
-                  )}
-                  {integration.primary && <Badge variant="soft">Primary</Badge>}
-                </div>
-              </div>
-            </div>
-          </SheetHeader>
+        <SheetContent className="flex w-full flex-col sm:max-w-lg">
+          <ProviderSheetHeader provider={provider} integration={integration} mode="update" />
 
           <ProviderConfiguration
             provider={provider}

@@ -1,46 +1,17 @@
 import { useCallback, useState, useMemo } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/primitives/sheet';
-import { Button } from '@/components/primitives/button';
+import { Sheet, SheetContent } from '@/components/primitives/sheet';
 import { ChannelTypeEnum } from '@novu/shared';
 import { useProviders, IProvider } from '@/hooks/use-providers';
 import { useCreateIntegration } from '@/hooks/use-create-integration';
-import { RiArrowLeftSLine } from 'react-icons/ri';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { ProviderConfiguration } from './provider-configuration';
+import { ProviderSheetHeader } from './provider-sheet-header';
+import { ProviderCard } from './provider-card';
 
 interface CreateProviderSidebarProps {
   isOpened: boolean;
   onClose: () => void;
   scrollToChannel?: ChannelTypeEnum;
-}
-
-interface ProviderCardProps {
-  provider: IProvider;
-  onClick: () => void;
-}
-
-function ProviderCard({ provider, onClick }: ProviderCardProps) {
-  return (
-    <Button
-      onClick={onClick}
-      variant="outline"
-      className="flex h-[48px] w-full items-start justify-start gap-3 border-neutral-100 p-3"
-    >
-      <div className="flex w-full items-start justify-start gap-3">
-        <div>
-          <img
-            src={`/static/images/providers/dark/square/${provider.id}.svg`}
-            alt={provider.displayName}
-            className="h-6 w-6"
-            onError={(e) => {
-              e.currentTarget.src = `/static/images/providers/dark/square/${provider.id}.png`;
-            }}
-          />
-        </div>
-        <div className="text-md text-foreground-950 leading-6">{provider.displayName}</div>
-      </div>
-    </Button>
-  );
 }
 
 export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSidebarProps) {
@@ -104,29 +75,7 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
   return (
     <Sheet open={isOpened} onOpenChange={onClose}>
       <SheetContent className="flex w-full flex-col sm:max-w-lg">
-        <SheetHeader className={'borde-neutral-300 space-y-1 border-b ' + (step === 'select' ? 'p-3' : 'p-3.5')}>
-          {step === 'select' ? <SheetTitle className="text-lg">Connect Provider</SheetTitle> : null}
-          {step === 'select' ? (
-            <p className="text-foreground-400 text-xs">Select a provider to integrate with your application.</p>
-          ) : provider ? (
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="xs" className="text-foreground-950 h-5 p-0.5 leading-none" onClick={onBack}>
-                <RiArrowLeftSLine className="h-4 w-4" />
-              </Button>
-              <div>
-                <img
-                  src={`/static/images/providers/dark/square/${provider.id}.svg`}
-                  alt={provider.displayName}
-                  className="h-6 w-6"
-                  onError={(e) => {
-                    e.currentTarget.src = `/static/images/providers/dark/square/${provider.id}.png`;
-                  }}
-                />
-              </div>
-              <div className="text-md text-foreground-950 leading-6">{provider.displayName}</div>
-            </div>
-          ) : null}
-        </SheetHeader>
+        <ProviderSheetHeader provider={provider} mode="create" step={step} onBack={onBack} />
 
         <div className="flex-1 overflow-y-auto">
           {step === 'select' ? (
