@@ -68,11 +68,7 @@ export function IntegrationsListPage() {
           </Button>
         </div>
         <TabsContent value="providers" variant="regular" className="p-2.5">
-          <IntegrationsList
-            onAddIntegrationClick={onAddIntegrationClickCallback}
-            onRowClickCallback={onRowClickCallback}
-            onChannelClick={onChannelClickCallback}
-          />
+          <IntegrationsList onRowClickCallback={onRowClickCallback} />
         </TabsContent>
         <TabsContent value="data-warehouse" variant="regular">
           <div className="text-muted-foreground flex h-64 items-center justify-center">Coming soon</div>

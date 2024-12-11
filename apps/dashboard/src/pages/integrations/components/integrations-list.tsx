@@ -7,9 +7,7 @@ import { IntegrationChannelGroup } from './integration-channel-group';
 import { Skeleton } from '@/components/primitives/skeleton';
 
 interface IntegrationsListProps {
-  onAddIntegrationClick: () => void;
   onRowClickCallback: (item: { original: ITableIntegration }) => void;
-  onChannelClick: (channel: ChannelTypeEnum) => void;
 }
 
 function IntegrationCardSkeleton() {
@@ -48,7 +46,7 @@ function IntegrationChannelGroupSkeleton() {
   );
 }
 
-export function IntegrationsList({ onAddIntegrationClick, onRowClickCallback, onChannelClick }: IntegrationsListProps) {
+export function IntegrationsList({ onRowClickCallback }: IntegrationsListProps) {
   const { currentEnvironment, environments } = useEnvironment();
   const { integrations } = useFetchIntegrations();
   const { providers: availableIntegrations } = useProviders();
