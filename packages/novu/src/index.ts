@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import { green } from 'picocolors';
 import { v4 as uuidv4 } from 'uuid';
 import { devCommand, DevCommandOptions } from './commands';
 import { sync } from './commands/sync';
 import { AnalyticService, ConfigService } from './services';
 import { IInitCommandOptions, init } from './commands/init';
+import { NOVU_API_URL, NOVU_SECRET_KEY } from './constants';
 
 const analytics = new AnalyticService();
 export const config = new ConfigService();
@@ -31,14 +31,15 @@ program
   (e.g., npx novu@latest sync -b https://acme.org/api/novu -s NOVU_SECRET_KEY -a https://eu.api.novu.co)`
   )
   .usage('-b <url> -s <secret-key> [-a <url>]')
-  .option('-a, --api-url <url>', 'The Novu Cloud API URL', 'https://api.novu.co')
+  .option('-a, --api-url <url>', 'The Novu Cloud API URL', NOVU_API_URL || 'https://api.novu.co')
   .requiredOption(
     '-b, --bridge-url <url>',
     'The Novu endpoint URL hosted in the Bridge application, by convention ends in /api/novu'
   )
   .requiredOption(
     '-s, --secret-key <secret-key>',
-    'The Novu Secret Key. Obtainable at https://dashboard.novu.co/api-keys'
+    'The Novu Secret Key. Obtainable at https://dashboard.novu.co/api-keys',
+    NOVU_SECRET_KEY || ''
   )
   .action(async (options) => {
     analytics.track({
