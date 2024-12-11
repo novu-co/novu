@@ -139,8 +139,6 @@ export class InvitesController {
       organizationId: body.payload.organizationId,
     });
 
-    const response = await this.inviteNudgeWebhookUsecase.execute(command);
-
-    return response;
+    return await this.inviteNudgeWebhookUsecase.execute(command);
   }
 }

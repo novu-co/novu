@@ -212,6 +212,7 @@ export const DigestNode = (props: NodeProps<NodeType>) => {
         <NodeBody>
           {data.content || 'Batches events into one coherent message before delivery to the subscriber.'}
         </NodeBody>
+        {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>
@@ -233,6 +234,7 @@ export const CustomNode = (props: NodeProps<NodeType>) => {
           <NodeName>{data.name || 'Custom Step'}</NodeName>
         </NodeHeader>
         <NodeBody>Executes the business logic in your bridge application</NodeBody>
+        {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>

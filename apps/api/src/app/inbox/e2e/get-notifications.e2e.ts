@@ -2,12 +2,12 @@ import { expect } from 'chai';
 import { UserSession } from '@novu/testing';
 import { MessageRepository, NotificationTemplateEntity, SubscriberEntity, SubscriberRepository } from '@novu/dal';
 import {
-  StepTypeEnum,
-  ChannelCTATypeEnum,
-  TemplateVariableTypeEnum,
   ActorTypeEnum,
-  SystemAvatarIconEnum,
+  ChannelCTATypeEnum,
   ChannelTypeEnum,
+  StepTypeEnum,
+  SystemAvatarIconEnum,
+  TemplateVariableTypeEnum,
 } from '@novu/shared';
 import { mapToDto } from '../utils/notification-mapper';
 
