@@ -3,7 +3,7 @@ import { AmountInput } from '@/components/amount-input';
 import { FormLabel } from '@/components/primitives/form/form';
 import { useMemo } from 'react';
 import { TimeUnitEnum } from '@novu/shared';
-import { useStep } from '@/components/workflow-editor/steps/step-provider';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 const defaultUnitValues = Object.values(TimeUnitEnum);
 
@@ -11,16 +11,16 @@ const amountKey = 'amount';
 const unitKey = 'unit';
 
 export const DelayAmount = () => {
-  const { step } = useStep();
+  const { step } = useWorkflow();
   const { dataSchema, uiSchema } = step?.controls ?? {};
 
   const unitOptions = useMemo(
-    () => (dataSchema?.properties?.[unitKey] as any).enum ?? defaultUnitValues,
+    () => (dataSchema?.properties?.[unitKey] as any)?.enum ?? defaultUnitValues,
     [dataSchema?.properties]
   );
 
   const defaultUnitOption = useMemo(
-    () => (uiSchema?.properties?.[unitKey] as any).placeholder ?? TimeUnitEnum.SECONDS,
+    () => (uiSchema?.properties?.[unitKey] as any)?.placeholder ?? TimeUnitEnum.SECONDS,
     [uiSchema?.properties]
   );
 

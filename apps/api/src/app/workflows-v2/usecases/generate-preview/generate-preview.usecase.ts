@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common
 import _ from 'lodash';
 import {
   ChannelTypeEnum,
+  createMockObjectFromSchema,
   GeneratePreviewResponseDto,
   JobStatusEnum,
   JSONSchemaDto,
@@ -22,7 +23,6 @@ import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/previe
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
 import { BuildStepDataUsecase } from '../build-step-data';
 import { GeneratePreviewCommand } from './generate-preview.command';
-import { createMockPayloadFromSchema } from '../../util/utils';
 import { PrepareAndValidateContentUsecase } from '../validate-content/prepare-and-validate-content/prepare-and-validate-content.usecase';
 import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
 import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
@@ -58,13 +58,13 @@ export class GeneratePreviewUsecase {
         })
       );
 
-      const res = this.buildVariablesSchema(stepData.variables, payloadSchema);
+      const variableSchema = this.buildVariablesSchema(stepData.variables, payloadSchema);
       const preparedAndValidatedContent = await this.prepareAndValidateContentUsecase.execute({
         user: command.user,
         previewPayloadFromDto: commandVariablesExample,
         controlValues,
         controlDataSchema: stepData.controls.dataSchema || {},
-        variableSchema: res,
+        variableSchema,
       });
       const variablesExample = this.buildVariablesExample(
         workflow,
@@ -134,17 +134,16 @@ export class GeneratePreviewUsecase {
       return finalPayload;
     }
 
-    const examplePayloadSchema = createMockPayloadFromSchema(workflow.payloadSchema);
+    const examplePayloadSchema = createMockObjectFromSchema({
+      type: 'object',
+      properties: { payload: workflow.payloadSchema },
+    });
 
     if (!examplePayloadSchema || Object.keys(examplePayloadSchema).length === 0) {
       return finalPayload;
     }
 
-    return _.merge(
-      finalPayload as Record<string, unknown>,
-      { payload: examplePayloadSchema },
-      commandVariablesExample || {}
-    );
+    return _.merge(finalPayload as Record<string, unknown>, examplePayloadSchema, commandVariablesExample || {});
   }
 
   @Instrument()

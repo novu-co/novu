@@ -11,6 +11,7 @@ import { InAppEditor } from '@/components/workflow-editor/steps/in-app/in-app-ed
 import { InAppEditorPreview } from '@/components/workflow-editor/steps/in-app/in-app-editor-preview';
 import { CustomStepControls } from '../controls/custom-step-controls';
 import { StepEditorProps } from '@/components/workflow-editor/steps/configure-step-template-form';
+import { InAppTabsSection } from '@/components/workflow-editor/steps/in-app/in-app-tabs-section';
 
 const tabsContentClassName = 'h-full w-full overflow-y-auto';
 
@@ -55,7 +56,9 @@ export const InAppTabs = (props: StepEditorProps) => {
       <Separator />
       <TabsContent value="editor" className={tabsContentClassName}>
         <InAppEditor uiSchema={uiSchema} />
-        <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
+        <InAppTabsSection>
+          <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
+        </InAppTabsSection>
       </TabsContent>
       <TabsContent value="preview" className={tabsContentClassName}>
         <InAppEditorPreview workflow={workflow} step={step} formValues={form.getValues()} />

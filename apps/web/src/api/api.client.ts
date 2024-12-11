@@ -2,7 +2,7 @@ import axios from 'axios';
 import { CustomDataType, WorkflowPreferences } from '@novu/shared';
 import { API_ROOT } from '../config';
 import { getToken } from '../components/providers/AuthProvider';
-import { getEnvironmentId } from '../components/providers/EnvironmentProvider';
+import { getEnvironmentId, clearEnvironmentId } from '../components/providers/EnvironmentProvider';
 
 interface IOptions {
   absoluteUrl: boolean;
@@ -24,6 +24,14 @@ export const api = {
         return response.data?.data;
       })
       .catch((error) => {
+        if (error?.response?.status === 401) {
+          /*
+           * 401 can be caused due to invalid user, organization or environment data.
+           * Clerk handles the invalid user and organization data, but we need to clear the invalid environment data.
+           */
+          clearEnvironmentId();
+        }
+
         return Promise.reject(error?.response?.data || error?.response || error);
       });
   },
