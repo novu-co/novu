@@ -10,11 +10,14 @@ export const OptInProvider = (props: PropsWithChildren) => {
   const hasV2OptIn = searchParams.has('v2_opt_in');
 
   useLayoutEffect(() => {
-    if (isLoaded && status !== NewDashboardOptInStatusEnum.OPTED_IN && !hasV2OptIn) {
-      (async () => {
-        await optIn();
+    if (isLoaded && status !== NewDashboardOptInStatusEnum.OPTED_IN) {
+      if (hasV2OptIn) {
+        (async () => {
+          await optIn();
+        })();
+      } else {
         redirectToLegacyDashboard();
-      })();
+      }
     }
 
     // set light theme on the new domain for both legacy and new dashboard
