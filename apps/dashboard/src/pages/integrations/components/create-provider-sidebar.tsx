@@ -1,12 +1,16 @@
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback, useState, useMemo, useEffect } from 'react';
 import { Sheet, SheetContent } from '@/components/primitives/sheet';
 import { ChannelTypeEnum } from '@novu/shared';
 import { useProviders, IProvider } from '@/hooks/use-providers';
 import { useCreateIntegration } from '@/hooks/use-create-integration';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
+import { Button } from '@/components/primitives/button';
 import { ProviderConfiguration } from './provider-configuration';
 import { ProviderSheetHeader } from './provider-sheet-header';
 import { ProviderCard } from './provider-card';
+import { toast } from 'sonner';
+import { CheckIntegrationResponseEnum } from '../../../api/integrations';
+import { CHANNEL_TYPE_TO_STRING } from '@/utils/channels';
 
 interface CreateProviderSidebarProps {
   isOpened: boolean;
@@ -20,6 +24,15 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
   const [step, setStep] = useState<'select' | 'configure'>('select');
   const [searchQuery, setSearchQuery] = useState('');
   const { mutateAsync: createIntegration, isPending } = useCreateIntegration();
+
+  // Reset state when sidebar is opened
+  useEffect(() => {
+    if (isOpened) {
+      setSelectedProvider(undefined);
+      setStep('select');
+      setSearchQuery('');
+    }
+  }, [isOpened]);
 
   const filteredProviders = useMemo(() => {
     if (!providers) return [];
@@ -102,12 +115,24 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
           credentials: data.credentials,
           name: data.name,
           identifier: data.identifier,
-          active: data.enabled,
+          active: data.active,
           primary: data.primary,
         });
         onClose();
-      } catch (error) {
-        console.error('Failed to create integration:', error);
+      } catch (error: any) {
+        if (error?.message?.code === CheckIntegrationResponseEnum.INVALID_EMAIL) {
+          toast.error('Invalid sender email', {
+            description: error.message?.message,
+          });
+        } else if (error?.message?.code === CheckIntegrationResponseEnum.BAD_CREDENTIALS) {
+          toast.error('Invalid credentials or credentials expired', {
+            description: error.message?.message,
+          });
+        } else {
+          toast.error('Failed to create integration', {
+            description: error?.message?.message || error?.message || 'There was an error creating the integration.',
+          });
+        }
       }
     },
     [provider, createIntegration, onClose]
@@ -123,14 +148,14 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
             <Tabs defaultValue={ChannelTypeEnum.EMAIL} className="flex h-full flex-col">
               <TabsList variant="regular" className="bg-background sticky top-0 z-10 gap-6 border-t-0 !px-3">
                 {Object.values(ChannelTypeEnum).map((channel) => (
-                  <TabsTrigger key={channel} value={channel} variant="regular" className="!px-0 !py-3 capitalize">
-                    {channel}
+                  <TabsTrigger key={channel} value={channel} variant="regular" className="!px-0 !py-3">
+                    {CHANNEL_TYPE_TO_STRING[channel]}
                   </TabsTrigger>
                 ))}
               </TabsList>
 
               {Object.values(ChannelTypeEnum).map((channel) => (
-                <TabsContent key={channel} value={channel}>
+                <TabsContent key={channel} value={channel} className="flex-1">
                   {providersByChannel[channel]?.length > 0 ? (
                     <div className="flex flex-col gap-4 p-3">
                       {providersByChannel[channel].map((provider: IProvider) => (
@@ -157,6 +182,14 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
             <ProviderConfiguration provider={provider} onSubmit={onSubmit} isLoading={isPending} mode="create" />
           ) : null}
         </div>
+
+        {step === 'configure' && (
+          <div className="border-border bg-background mt-auto flex items-center justify-end gap-2 border-t p-4">
+            <Button type="submit" form="provider-configuration-form" disabled={isPending} isLoading={isPending}>
+              Create Integration
+            </Button>
+          </div>
+        )}
       </SheetContent>
     </Sheet>
   );

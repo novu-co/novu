@@ -38,7 +38,8 @@ function IntegrationChannelGroupSkeleton() {
       <div className="flex items-center justify-between">
         <Skeleton className="h-6 w-32" />
       </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+        <IntegrationCardSkeleton />
         <IntegrationCardSkeleton />
         <IntegrationCardSkeleton />
         <IntegrationCardSkeleton />

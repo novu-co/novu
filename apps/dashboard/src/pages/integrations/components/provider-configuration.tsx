@@ -11,6 +11,7 @@ import { RiInputField } from 'react-icons/ri';
 import { Info } from 'lucide-react';
 import { CredentialsKeyEnum, IIntegration } from '@novu/shared';
 import { IProvider } from '@/hooks/use-providers';
+import { useEffect } from 'react';
 
 const secureCredentials = [
   CredentialsKeyEnum.ApiKey,
@@ -37,6 +38,15 @@ interface ProviderConfigurationProps {
   mode: 'create' | 'update';
 }
 
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 export function ProviderConfiguration({
   provider,
   integration,
@@ -55,7 +65,7 @@ export function ProviderConfiguration({
         }
       : {
           name: provider.displayName,
-          identifier: '',
+          identifier: generateSlug(provider.displayName),
           active: true,
           primary: false,
           credentials: {},
@@ -67,11 +77,21 @@ export function ProviderConfiguration({
     handleSubmit,
     control,
     formState: { errors },
+    watch,
+    setValue,
   } = form;
+
+  const name = watch('name');
+
+  useEffect(() => {
+    if (mode === 'create') {
+      setValue('identifier', generateSlug(name));
+    }
+  }, [name, mode, setValue]);
 
   return (
     <Form {...form}>
-      <form id="provider-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-3 p-3">
+      <form id="provider-configuration-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-3 p-3">
         <Accordion type="single" collapsible value={'layout'}>
           <AccordionItem value="layout">
             <AccordionTrigger>
@@ -155,7 +175,10 @@ export function ProviderConfiguration({
               <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
                 {provider?.credentials?.map((credential) => (
                   <div key={credential.key} className="space-y-2">
-                    <Label htmlFor={credential.key}>{credential.displayName}</Label>
+                    <Label htmlFor={credential.key}>
+                      {credential.displayName}
+                      {credential.required && <span className="text-destructive ml-1">*</span>}
+                    </Label>
                     {credential.type === 'switch' ? (
                       <div className="flex items-center justify-between gap-2">
                         <Controller
