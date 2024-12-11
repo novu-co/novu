@@ -272,16 +272,16 @@ describe('Workflow Controller E2E API Testing', () => {
     it('should update control values', async () => {
       const nameSuffix = `Test Workflow${new Date().toISOString()}`;
       const workflowCreated: WorkflowResponseDto = await createWorkflowAndValidate(nameSuffix);
-      const inAppControValue = `test-${generateUUID()}`;
-      const emailControValue = `test-${generateUUID()}`;
+      const inAppControlValue = `test-${generateUUID()}`;
+      const emailControlValue = `test-${generateUUID()}`;
       const updateRequest: UpdateWorkflowDto = {
         name: workflowCreated.name,
         preferences: {
           user: null,
         },
         steps: [
-          buildInAppStep({ controlValues: { test: inAppControValue } }),
-          buildEmailStep({ controlValues: { test: emailControValue } }),
+          buildInAppStep({ controlValues: { test: inAppControlValue } }),
+          buildEmailStep({ controlValues: { test: emailControlValue } }),
         ],
         workflowId: workflowCreated.workflowId,
       };
@@ -289,8 +289,8 @@ describe('Workflow Controller E2E API Testing', () => {
         workflowCreated._id,
         updateRequest as UpdateWorkflowDto
       );
-      expect(updatedWorkflow.steps[0].controls.values.test).to.be.equal(inAppControValue);
-      expect(updatedWorkflow.steps[1].controls.values.test).to.be.equal(emailControValue);
+      expect(updatedWorkflow.steps[0].controls.values.test).to.be.equal(inAppControlValue);
+      expect(updatedWorkflow.steps[1].controls.values.test).to.be.equal(emailControlValue);
     });
 
     it('should keep the step id on updated ', async () => {
