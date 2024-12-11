@@ -3,7 +3,6 @@ import { toast } from 'sonner';
 import { useFetchIntegrations } from '@/hooks/use-fetch-integrations';
 import { useProviders } from '@/hooks/use-providers';
 import { useDeleteIntegration } from '@/hooks/use-delete-integration';
-import { IntegrationFormData } from './types';
 import { useIntegrationForm } from './hooks/use-integration-form';
 import { IntegrationConfiguration } from './integration-configuration';
 import { Button } from '@/components/primitives/button';
@@ -11,6 +10,7 @@ import { DeleteIntegrationModal } from './modals/delete-integration-modal';
 import { SelectPrimaryIntegrationModal } from './modals/select-primary-integration-modal';
 import { IntegrationSheet } from './integration-sheet';
 import { ChannelTypeEnum } from '@novu/shared';
+import { IntegrationFormData } from '../types';
 
 interface UpdateIntegrationSidebarProps {
   isOpened: boolean;

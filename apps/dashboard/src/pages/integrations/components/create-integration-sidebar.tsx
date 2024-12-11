@@ -3,7 +3,7 @@ import { useProviders } from '@/hooks/use-providers';
 import { useCreateIntegration } from '@/hooks/use-create-integration';
 import { useIntegrationList } from './hooks/use-integration-list';
 import { useIntegrationForm } from './hooks/use-integration-form';
-import { useIntegrationSteps } from '../hooks/use-integration-steps';
+import { useSidebarNavigationManager } from './hooks/use-sidebar-navigation-manager';
 import { IntegrationSheet } from './integration-sheet';
 import { ChannelTabs } from './channel-tabs';
 import { IntegrationConfiguration } from './integration-configuration';
@@ -18,7 +18,7 @@ export interface CreateIntegrationSidebarProps {
 export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegrationSidebarProps) {
   const { providers } = useProviders();
   const { mutateAsync: createIntegration, isPending } = useCreateIntegration();
-  const { selectedIntegration, step, searchQuery, onIntegrationSelect, onBack } = useIntegrationSteps({
+  const { selectedIntegration, step, searchQuery, onIntegrationSelect, onBack } = useSidebarNavigationManager({
     isOpened,
   });
 

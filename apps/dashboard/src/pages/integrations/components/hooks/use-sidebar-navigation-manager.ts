@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { IntegrationStep } from '../types';
 
-interface UseIntegrationStepsProps {
+interface UseSidebarNavigationManagerProps {
   isOpened: boolean;
 }
 
-export function useIntegrationSteps({ isOpened }: UseIntegrationStepsProps) {
+export function useSidebarNavigationManager({ isOpened }: UseSidebarNavigationManagerProps) {
   const [selectedIntegration, setSelectedIntegration] = useState<string>();
   const [step, setStep] = useState<IntegrationStep>('select');
   const [searchQuery, setSearchQuery] = useState('');
