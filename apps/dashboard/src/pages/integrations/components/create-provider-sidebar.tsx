@@ -150,7 +150,7 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
 
   return (
     <Sheet open={isOpened} onOpenChange={onClose}>
-      <SheetContent className="w-full sm:max-w-lg">
+      <SheetContent className="flex w-full flex-col sm:max-w-lg">
         <SheetHeader className={'borde-neutral-300 space-y-1 border-b ' + (step === 'select' ? 'p-3' : 'p-3.5')}>
           {step === 'select' ? <SheetTitle className="text-lg">Connect Provider</SheetTitle> : null}
           {step === 'select' ? (
@@ -175,162 +175,174 @@ export function CreateProviderSidebar({ isOpened, onClose }: CreateProviderSideb
           ) : null}
         </SheetHeader>
 
-        {step === 'select' ? (
-          <Tabs defaultValue={ChannelTypeEnum.EMAIL} className="flex-1">
-            <TabsList variant="regular" className="gap-6 border-t-0 !px-3">
+        <div className="flex-1 overflow-y-auto">
+          {step === 'select' ? (
+            <Tabs defaultValue={ChannelTypeEnum.EMAIL} className="flex h-full flex-col">
+              <TabsList variant="regular" className="bg-background sticky top-0 z-10 gap-6 border-t-0 !px-3">
+                {Object.values(ChannelTypeEnum).map((channel) => (
+                  <TabsTrigger key={channel} value={channel} variant="regular" className="!px-0 !py-3 capitalize">
+                    {channel}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+
               {Object.values(ChannelTypeEnum).map((channel) => (
-                <TabsTrigger key={channel} value={channel} variant="regular" className="!px-0 !py-3 capitalize">
-                  {channel}
-                </TabsTrigger>
+                <TabsContent key={channel} value={channel}>
+                  {providersByChannel[channel]?.length > 0 ? (
+                    <div className="flex flex-col gap-4 p-3">
+                      {providersByChannel[channel].map((provider: IProvider) => (
+                        <ProviderCard
+                          key={provider.id}
+                          provider={provider}
+                          onClick={() => onProviderSelect(provider.id)}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-muted-foreground flex min-h-[200px] items-center justify-center text-center">
+                      {searchQuery ? (
+                        <p>No {channel.toLowerCase()} providers match your search</p>
+                      ) : (
+                        <p>No {channel.toLowerCase()} providers available</p>
+                      )}
+                    </div>
+                  )}
+                </TabsContent>
               ))}
-            </TabsList>
-
-            {Object.values(ChannelTypeEnum).map((channel) => (
-              <TabsContent key={channel} value={channel}>
-                {providersByChannel[channel]?.length > 0 ? (
-                  <div className="flex flex-col gap-4 p-3">
-                    {providersByChannel[channel].map((provider: IProvider) => (
-                      <ProviderCard
-                        key={provider.id}
-                        provider={provider}
-                        onClick={() => onProviderSelect(provider.id)}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-muted-foreground flex min-h-[200px] items-center justify-center text-center">
-                    {searchQuery ? (
-                      <p>No {channel.toLowerCase()} providers match your search</p>
-                    ) : (
-                      <p>No {channel.toLowerCase()} providers available</p>
-                    )}
-                  </div>
-                )}
-              </TabsContent>
-            ))}
-          </Tabs>
-        ) : (
-          <Form {...form}>
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-1 flex-col p-3">
-              <div className="flex-1 space-y-3 overflow-y-auto pb-8">
-                <Accordion type="single" collapsible value={'layout'}>
-                  <AccordionItem value="layout">
-                    <AccordionTrigger>
-                      <div className="flex items-center gap-1 text-xs">
-                        <RiInputField className="text-feature size-5" />
-                        General Settings
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
-                        <div className="flex items-center justify-between gap-2">
-                          <Label className="text-xs" htmlFor="enabled">
-                            Enable Provider{' '}
-                            <HelpTooltipIndicator
-                              className="relative top-1"
-                              size="4"
-                              text="Disabling a provider will stop sending notifications through it."
-                            />
-                          </Label>
-                          <Switch id="enabled" {...register('enabled')} />
+            </Tabs>
+          ) : (
+            <Form {...form}>
+              <form onSubmit={handleSubmit(onSubmit)} className="flex h-full flex-col">
+                <div className="flex-1 space-y-3 overflow-y-auto p-3">
+                  <Accordion type="single" collapsible value={'layout'}>
+                    <AccordionItem value="layout">
+                      <AccordionTrigger>
+                        <div className="flex items-center gap-1 text-xs">
+                          <RiInputField className="text-feature size-5" />
+                          General Settings
                         </div>
-                        <div className="flex items-center justify-between gap-2">
-                          <Label className="text-xs" htmlFor="primary">
-                            Primary Provider{' '}
-                            <HelpTooltipIndicator
-                              className="relative top-1"
-                              size="4"
-                              text="Primary provider will be used for all notifications by defauly, there can be only one primary provider per channel"
-                            />
-                          </Label>
-                          <Switch id="primary" {...register('primary')} />
-                        </div>
-                        <Separator />
-                        <div className="space-y-2">
-                          <Label className="text-xs" htmlFor="name">
-                            Name
-                          </Label>
-                          <InputField>
-                            <Input id="name" {...register('name', { required: 'Name is required' })} />
-                            {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
-                          </InputField>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label className="text-xs" htmlFor="identifier">
-                            Identifier
-                          </Label>
-                          <InputField>
-                            <Input
-                              id="identifier"
-                              {...register('identifier', { required: 'Identifier is required' })}
-                            />
-                            {errors.identifier && <p className="text-sm text-red-500">{errors.identifier.message}</p>}
-                          </InputField>
-                        </div>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-
-                <Separator />
-
-                <Accordion type="single" collapsible value={'credentials'}>
-                  <AccordionItem value="credentials">
-                    <AccordionTrigger>
-                      <div className="flex items-center gap-1 text-xs">
-                        <RiInputField className="text-feature size-5" />
-                        Provider Credentials
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
-                        {provider?.credentials?.map((credential) => (
-                          <div key={credential.key} className="space-y-2">
-                            <Label htmlFor={credential.key}>{credential.displayName}</Label>
-                            {credential.type === 'secret' ||
-                            secureCredentials.includes(credential.key as CredentialsKeyEnum) ? (
-                              <InputField className="flex overflow-hidden pr-0">
-                                <SecretInput
-                                  id={credential.key}
-                                  placeholder={`Enter ${credential.displayName.toLowerCase()}`}
-                                  register={register}
-                                  registerKey={`credentials.${credential.key}`}
-                                  registerOptions={{
-                                    required: credential.required ? `${credential.displayName} is required` : false,
-                                  }}
-                                />
-                              </InputField>
-                            ) : (
-                              <InputField>
-                                <Input
-                                  id={credential.key}
-                                  type="text"
-                                  placeholder={`Enter ${credential.displayName.toLowerCase()}`}
-                                  {...register(`credentials.${credential.key}`, {
-                                    required: credential.required ? `${credential.displayName} is required` : false,
-                                  })}
-                                />
-                              </InputField>
-                            )}
-                            {credential.description && (
-                              <div className="text-foreground-400 flex items-center gap-1 text-xs">
-                                <span>{credential.description}</span>
-                              </div>
-                            )}
-                            {errors.credentials?.[credential.key] && (
-                              <p className="text-sm text-red-500">{errors.credentials[credential.key]?.message}</p>
-                            )}
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <Label className="text-xs" htmlFor="enabled">
+                              Enable Provider{' '}
+                              <HelpTooltipIndicator
+                                className="relative top-1"
+                                size="4"
+                                text="Disabling a provider will stop sending notifications through it."
+                              />
+                            </Label>
+                            <Switch id="enabled" {...register('enabled')} />
                           </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </div>
-            </form>
-          </Form>
-        )}
+                          <div className="flex items-center justify-between gap-2">
+                            <Label className="text-xs" htmlFor="primary">
+                              Primary Provider{' '}
+                              <HelpTooltipIndicator
+                                className="relative top-1"
+                                size="4"
+                                text="Primary provider will be used for all notifications by defauly, there can be only one primary provider per channel"
+                              />
+                            </Label>
+                            <Switch id="primary" {...register('primary')} />
+                          </div>
+                          <Separator />
+                          <div className="space-y-2">
+                            <Label className="text-xs" htmlFor="name">
+                              Name
+                            </Label>
+                            <InputField>
+                              <Input id="name" {...register('name', { required: 'Name is required' })} />
+                              {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+                            </InputField>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label className="text-xs" htmlFor="identifier">
+                              Identifier
+                            </Label>
+                            <InputField>
+                              <Input
+                                id="identifier"
+                                {...register('identifier', { required: 'Identifier is required' })}
+                              />
+                              {errors.identifier && <p className="text-sm text-red-500">{errors.identifier.message}</p>}
+                            </InputField>
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+
+                  <Separator />
+
+                  <Accordion type="single" collapsible value={'credentials'}>
+                    <AccordionItem value="credentials">
+                      <AccordionTrigger>
+                        <div className="flex items-center gap-1 text-xs">
+                          <RiInputField className="text-feature size-5" />
+                          Provider Credentials
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
+                          {provider?.credentials?.map((credential) => (
+                            <div key={credential.key} className="space-y-2">
+                              <Label htmlFor={credential.key}>{credential.displayName}</Label>
+                              {credential.type === 'switch' ? (
+                                <div className="flex items-center justify-between gap-2">
+                                  <Switch
+                                    id={credential.key}
+                                    {...register(`credentials.${credential.key}`, {
+                                      required: credential.required ? `${credential.displayName} is required` : false,
+                                    })}
+                                  />
+                                </div>
+                              ) : credential.type === 'secret' ||
+                                secureCredentials.includes(credential.key as CredentialsKeyEnum) ? (
+                                <InputField className="flex overflow-hidden pr-0">
+                                  <SecretInput
+                                    id={credential.key}
+                                    placeholder={`Enter ${credential.displayName.toLowerCase()}`}
+                                    register={register}
+                                    registerKey={`credentials.${credential.key}`}
+                                    registerOptions={{
+                                      required: credential.required ? `${credential.displayName} is required` : false,
+                                    }}
+                                  />
+                                </InputField>
+                              ) : (
+                                <InputField>
+                                  <Input
+                                    id={credential.key}
+                                    type="text"
+                                    placeholder={`Enter ${credential.displayName.toLowerCase()}`}
+                                    {...register(`credentials.${credential.key}`, {
+                                      required: credential.required ? `${credential.displayName} is required` : false,
+                                    })}
+                                  />
+                                </InputField>
+                              )}
+                              {credential.description && (
+                                <div className="text-foreground-400 flex items-center gap-1 text-xs">
+                                  <span>{credential.description}</span>
+                                </div>
+                              )}
+                              {errors.credentials?.[credential.key] && (
+                                <p className="text-sm text-red-500">{errors.credentials[credential.key]?.message}</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+              </form>
+            </Form>
+          )}
+        </div>
+
         <SheetFooter className="border-t border-neutral-200 p-0">
           <div className="flex justify-end gap-4 p-3">
             <Button type="submit" isLoading={isPending} size="sm">
