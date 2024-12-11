@@ -59,7 +59,7 @@ export function IntegrationsListPage() {
             <TabsTrigger value="data-warehouse" variant="regular" disabled>
               Data Warehouse{' '}
               <Badge kind="pill" size="2xs">
-                COMING SOON
+                SOON
               </Badge>
             </TabsTrigger>
           </TabsList>
