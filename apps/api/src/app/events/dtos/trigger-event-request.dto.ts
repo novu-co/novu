@@ -12,7 +12,7 @@ import {
 import { Type } from 'class-transformer';
 import { ApiExtraModels, ApiProperty, ApiPropertyOptional, getSchemaPath } from '@nestjs/swagger';
 import {
-  TriggerRecipients,
+  TriggerRecipientsPayload,
   TriggerRecipientsTypeEnum,
   TriggerRecipientSubscriber,
   TriggerTenantContext,
@@ -110,25 +110,40 @@ export class TriggerEventRequestDto {
 
   @ApiProperty({
     description: 'The recipients list of people who will receive the notification.',
-    type: 'array',
-    items: {
-      oneOf: [
-        {
-          $ref: getSchemaPath(SubscriberPayloadDto),
+    oneOf: [
+      {
+        type: 'array',
+        items: {
+          oneOf: [
+            {
+              $ref: getSchemaPath(SubscriberPayloadDto),
+            },
+            {
+              $ref: getSchemaPath(TopicPayloadDto),
+            },
+            {
+              type: 'string',
+              description: 'Unique identifier of a subscriber in your systems',
+              example: 'SUBSCRIBER_ID',
+            },
+          ],
         },
-        {
-          $ref: getSchemaPath(TopicPayloadDto),
-        },
-        {
-          type: 'string',
-          description: 'Unique identifier of a subscriber in your systems',
-          example: 'SUBSCRIBER_ID',
-        },
-      ],
-    },
+      },
+      {
+        type: 'string',
+        description: 'Unique identifier of a subscriber in your systems',
+        example: 'SUBSCRIBER_ID',
+      },
+      {
+        $ref: getSchemaPath(SubscriberPayloadDto),
+      },
+      {
+        $ref: getSchemaPath(TopicPayloadDto),
+      },
+    ],
   })
   @IsDefined()
-  to: TriggerRecipients;
+  to: TriggerRecipientsPayload;
 
   @ApiPropertyOptional({
     description: 'A unique identifier for this transaction, we will generate a UUID if not provided.',
