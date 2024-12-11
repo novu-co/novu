@@ -14,7 +14,7 @@ export class DelayOutputRendererUsecase {
     const delayTimeControlType: DelayTimeControlType = DelayTimeControlZodSchema.parse(renderCommand.controlValues);
 
     return {
-      amount: delayTimeControlType.amount,
+      amount: delayTimeControlType.amount as number,
       type: delayTimeControlType.type,
       unit: delayTimeControlType.unit,
     };

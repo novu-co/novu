@@ -4,6 +4,7 @@ import { Input } from '@/components/primitives/input';
 import { InputFieldPure } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { useFormContext } from 'react-hook-form';
+import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 
 const HEIGHT = {
   sm: {
@@ -26,7 +27,10 @@ type InputWithSelectProps = {
   className?: string;
   placeholder?: string;
   isReadOnly?: boolean;
+  onValueChange?: (value: string) => void;
   size?: 'sm' | 'md';
+  min?: number;
+  showError?: boolean;
 };
 
 export const AmountInput = ({
@@ -36,24 +40,21 @@ export const AmountInput = ({
   className,
   placeholder,
   isReadOnly,
+  onValueChange,
   size = 'sm',
+  min,
+  showError = true,
 }: InputWithSelectProps) => {
-  const { getFieldState, setValue, getValues, control } = useFormContext();
+  const { getFieldState, setValue, control } = useFormContext();
 
   const input = getFieldState(`${fields.inputKey}`);
   const select = getFieldState(`${fields.selectKey}`);
   const error = input.error || select.error;
 
-  const handleChange = (value: { input: number; select: string }) => {
-    // we want to always set both values and treat it as a single input
-    setValue(fields.inputKey, value.input, { shouldDirty: true });
-    setValue(fields.selectKey, value.select, { shouldDirty: true });
-  };
-
   return (
     <>
       <InputFieldPure
-        className={cn(HEIGHT[size].base, 'rounded-lg border pr-0')}
+        className={cn(HEIGHT[size].base, 'rounded-lg border pr-0', className)}
         state={input.error ? 'error' : 'default'}
       >
         <FormField
@@ -64,16 +65,26 @@ export const AmountInput = ({
               <FormControl>
                 <Input
                   type="number"
-                  className={cn(
-                    'min-w-[20ch] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
-                    className
-                  )}
+                  className="min-w-[20ch] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                   placeholder={placeholder}
                   disabled={isReadOnly}
-                  {...field}
-                  onChange={(e) => {
-                    handleChange({ input: Number(e.target.value), select: getValues(fields.selectKey) });
+                  value={field.value}
+                  onKeyDown={(e) => {
+                    if (e.key === 'e' || e.key === '-' || e.key === '+' || e.key === '.' || e.key === ',') {
+                      e.preventDefault();
+                    }
                   }}
+                  onChange={(e) => {
+                    if (e.target.value === '') {
+                      field.onChange('');
+                      return;
+                    }
+
+                    const numberValue = Number(e.target.value);
+                    field.onChange(numberValue);
+                  }}
+                  min={min}
+                  {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
                 />
               </FormControl>
             </FormItem>
@@ -87,11 +98,12 @@ export const AmountInput = ({
               <FormControl>
                 <Select
                   onValueChange={(value) => {
-                    handleChange({ input: Number(getValues(fields.inputKey)), select: value });
+                    setValue(fields.selectKey, value, { shouldDirty: true });
+                    onValueChange?.(value);
                   }}
                   defaultValue={defaultOption}
                   disabled={isReadOnly}
-                  {...field}
+                  value={field.value}
                 >
                   <SelectTrigger
                     className={cn(
@@ -114,7 +126,7 @@ export const AmountInput = ({
           )}
         />
       </InputFieldPure>
-      <FormMessagePure error={error ? String(error.message) : undefined} />
+      {showError && <FormMessagePure error={error ? String(error.message) : undefined} />}
     </>
   );
 };
