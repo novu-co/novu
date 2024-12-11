@@ -1,5 +1,5 @@
 import { IEnvironment, IIntegration } from '@novu/shared';
-import { get } from './api.client';
+import { del, get } from './api.client';
 
 export enum CheckIntegrationResponseEnum {
   INVALID_EMAIL = 'invalid_email',
@@ -14,4 +14,10 @@ export async function getIntegrations({ environment }: { environment: IEnvironme
   const { data } = await get<{ data: IIntegration[] }>('/integrations', { environment });
 
   return data;
+}
+
+export async function deleteIntegration({ id, environment }: { id: string; environment: IEnvironment }) {
+  return del<{ acknowledged: boolean; status: number }>(`/integrations/${id}`, {
+    environment: environment,
+  });
 }

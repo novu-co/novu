@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { Sheet, SheetContent } from '@/components/primitives/sheet';
 import { useProviders } from '@/hooks/use-providers';
 import { useUpdateIntegration } from '@/hooks/use-update-integration';
+import { useDeleteIntegration } from '@/hooks/use-delete-integration';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,16 +13,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/primitives/alert-dialog';
-import { useFetchIntegrations } from '../../../hooks/use-fetch-integrations';
+import { useFetchIntegrations } from '@/hooks/use-fetch-integrations';
 import { ProviderConfiguration } from './provider-configuration';
 import { ProviderSheetHeader } from './provider-sheet-header';
 import { toast } from 'sonner';
-import { CheckIntegrationResponseEnum } from '../../../api/integrations';
+import { CheckIntegrationResponseEnum } from '@/api/integrations';
 import { CHANNELS_WITH_PRIMARY, IProviderConfig } from '@novu/shared';
-import { useSetPrimaryIntegration } from '../../../hooks/use-set-primary-integration';
+import { useSetPrimaryIntegration } from '@/hooks/use-set-primary-integration';
 import { useQueryClient } from '@tanstack/react-query';
-import { QueryKeys } from '../../../utils/query-keys';
-import { useEnvironment } from '../../../context/environment/hooks';
+import { QueryKeys } from '@/utils/query-keys';
+import { useEnvironment } from '@/context/environment/hooks';
 import { Button } from '@/components/primitives/button';
 
 interface UpdateProviderSidebarProps {
@@ -75,6 +76,7 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
   const { providers } = useProviders();
   const { mutateAsync: updateIntegration, isPending } = useUpdateIntegration();
   const { mutateAsync: setPrimaryIntegration } = useSetPrimaryIntegration();
+  const { deleteIntegration, isLoading: isDeleting } = useDeleteIntegration();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isPrimaryModalOpen, setIsPrimaryModalOpen] = useState(false);
   const [pendingUpdate, setPendingUpdate] = useState<any>(null);
@@ -84,45 +86,48 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
   const integration = integrations?.find((i) => i._id === integrationId);
   const provider = providers?.find((p: IProviderConfig) => p.id === integration?.providerId);
 
-  const executeUpdate = async (data: any) => {
-    if (!integration) return;
+  const executeUpdate = useCallback(
+    async (data: any) => {
+      if (!integration) return;
 
-    try {
-      await updateIntegration({
-        integrationId: integration._id,
-        data: {
-          name: data.name,
-          identifier: data.identifier,
-          active: data.active,
-          primary: data.primary,
-          credentials: data.credentials,
-        },
-      });
+      try {
+        await updateIntegration({
+          integrationId: integration._id,
+          data: {
+            name: data.name,
+            identifier: data.identifier,
+            active: data.active,
+            primary: data.primary,
+            credentials: data.credentials,
+          },
+        });
 
-      if (data.primary) {
-        await setPrimaryIntegration({ integrationId: integration._id });
+        if (data.primary) {
+          await setPrimaryIntegration({ integrationId: integration._id });
+        }
+
+        await queryClient.invalidateQueries({
+          queryKey: [QueryKeys.fetchIntegrations, currentEnvironment?._id],
+        });
+        onClose();
+      } catch (error: any) {
+        if (error?.message?.code === CheckIntegrationResponseEnum.INVALID_EMAIL) {
+          toast.error('Invalid sender email', {
+            description: error.message?.message,
+          });
+        } else if (error?.message?.code === CheckIntegrationResponseEnum.BAD_CREDENTIALS) {
+          toast.error('Invalid credentials or credentials expired', {
+            description: error.message?.message,
+          });
+        } else {
+          toast.error('Failed to update integration', {
+            description: error?.message?.message || error?.message || 'There was an error updating the integration.',
+          });
+        }
       }
-
-      await queryClient.invalidateQueries({
-        queryKey: [QueryKeys.fetchIntegrations, currentEnvironment?._id],
-      });
-      onClose();
-    } catch (error: any) {
-      if (error?.message?.code === CheckIntegrationResponseEnum.INVALID_EMAIL) {
-        toast.error('Invalid sender email', {
-          description: error.message?.message,
-        });
-      } else if (error?.message?.code === CheckIntegrationResponseEnum.BAD_CREDENTIALS) {
-        toast.error('Invalid credentials or credentials expired', {
-          description: error.message?.message,
-        });
-      } else {
-        toast.error('Failed to update integration', {
-          description: error?.message?.message || error?.message || 'There was an error updating the integration.',
-        });
-      }
-    }
-  };
+    },
+    [integration, updateIntegration, setPrimaryIntegration, queryClient, currentEnvironment?._id, onClose]
+  );
 
   const onSubmit = useCallback(
     async (data: any) => {
@@ -150,12 +155,13 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
           primary: isChangingToActive ? true : data.primary,
         });
         setIsPrimaryModalOpen(true);
+
         return;
       }
 
       await executeUpdate(data);
     },
-    [integration, integrations]
+    [integration, integrations, executeUpdate, setPendingUpdate, setIsPrimaryModalOpen]
   );
 
   const handlePrimaryConfirm = useCallback(async () => {
@@ -164,14 +170,25 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
       setPendingUpdate(null);
     }
     setIsPrimaryModalOpen(false);
-  }, [pendingUpdate]);
+  }, [pendingUpdate, executeUpdate, setPendingUpdate, setIsPrimaryModalOpen]);
 
   const onDelete = useCallback(async () => {
     if (!integration) return;
-    // TODO: Implement delete functionality
-    setIsDeleteDialogOpen(false);
-    onClose();
-  }, [integration, onClose]);
+
+    try {
+      await deleteIntegration({ id: integration._id, name: integration.name });
+      await queryClient.invalidateQueries({
+        queryKey: [QueryKeys.fetchIntegrations, currentEnvironment?._id],
+      });
+      toast.success('Integration deleted successfully');
+      setIsDeleteDialogOpen(false);
+      onClose();
+    } catch (error: any) {
+      toast.error('Failed to delete integration', {
+        description: error?.message || 'There was an error deleting the integration.',
+      });
+    }
+  }, [integration, deleteIntegration, queryClient, currentEnvironment?._id, onClose]);
 
   if (!integration || !provider) {
     return null;
@@ -197,7 +214,18 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
               />
             </div>
             <div className="flex-shrink-0 border-t border-neutral-200 bg-white p-3">
-              <div className="flex justify-end gap-4">
+              <div className="flex justify-between gap-4">
+                {integration.channel !== 'in_app' && (
+                  <Button
+                    type="button"
+                    variant="ghostDestructive"
+                    onClick={() => setIsDeleteDialogOpen(true)}
+                    isLoading={isDeleting}
+                    size="sm"
+                  >
+                    Delete Integration
+                  </Button>
+                )}
                 <Button type="submit" form="provider-configuration-form" isLoading={isPending} size="sm">
                   Save Changes
                 </Button>
@@ -216,15 +244,33 @@ export function UpdateProviderSidebar({ isOpened, integrationId, onClose }: Upda
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the integration and remove its data from our
-              servers.
+            <AlertDialogTitle>Delete {integration?.primary ? 'Primary ' : ''}Integration</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              {integration?.primary ? (
+                <>
+                  <p>
+                    You are about to delete a primary integration. This will affect the delivery of notifications
+                    through this channel.
+                  </p>
+                  <p>
+                    Please make sure to set up a new primary integration for this channel to ensure proper notification
+                    delivery.
+                  </p>
+                  <p className="font-medium">Are you sure you want to proceed?</p>
+                </>
+              ) : (
+                <p>Are you sure you want to delete this integration? This action cannot be undone.</p>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onDelete}>Delete Integration</AlertDialogAction>
+            <AlertDialogAction
+              onClick={onDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete{integration?.primary ? ' Primary' : ''} Integration
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
