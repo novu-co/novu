@@ -7,19 +7,19 @@ import { Button } from '../primitives/button';
 import { FacetedFormFilter } from '../primitives/form/faceted-filter/facated-form-filter';
 import { CalendarIcon } from 'lucide-react';
 
-export interface IActivityFilters {
-  onFiltersChange: (filters: IActivityFiltersData) => void;
-  initialValues: IActivityFiltersData;
+export type ActivityFilters = {
+  onFiltersChange: (filters: ActivityFiltersData) => void;
+  initialValues: ActivityFiltersData;
   onReset?: () => void;
-}
+};
 
-export interface IActivityFiltersData {
+export type ActivityFiltersData = {
   dateRange: string;
   channels: ChannelTypeEnum[];
   workflows: string[];
   transactionId: string;
   subscriberId: string;
-}
+};
 
 const DATE_RANGE_OPTIONS = [
   { value: '24h', label: 'Last 24 hours' },
@@ -32,9 +32,10 @@ const CHANNEL_OPTIONS = [
   { value: ChannelTypeEnum.EMAIL, label: 'Email' },
   { value: ChannelTypeEnum.IN_APP, label: 'In-App' },
   { value: ChannelTypeEnum.PUSH, label: 'Push' },
+  { value: ChannelTypeEnum.CHAT, label: 'Chat' },
 ];
 
-export const defaultActivityFilters: IActivityFiltersData = {
+export const defaultActivityFilters: ActivityFiltersData = {
   dateRange: '30d',
   channels: [],
   workflows: [],
@@ -42,8 +43,8 @@ export const defaultActivityFilters: IActivityFiltersData = {
   subscriberId: '',
 } as const;
 
-export function ActivityFilters({ onFiltersChange, initialValues, onReset }: IActivityFilters) {
-  const form = useForm<IActivityFiltersData>({
+export function ActivityFilters({ onFiltersChange, initialValues, onReset }: ActivityFilters) {
+  const form = useForm<ActivityFiltersData>({
     defaultValues: initialValues || defaultActivityFilters,
   });
 
@@ -63,7 +64,7 @@ export function ActivityFilters({ onFiltersChange, initialValues, onReset }: IAc
 
   useEffect(() => {
     const subscription = form.watch((value) => {
-      onFiltersChange(value as IActivityFiltersData);
+      onFiltersChange(value as ActivityFiltersData);
     });
 
     return () => subscription.unsubscribe();

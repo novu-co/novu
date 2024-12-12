@@ -34,7 +34,7 @@ export function BaseFilterContent({
   children,
 }: BaseFilterContentProps) {
   return (
-    <div className="p-0">
+    <div className="flex h-full flex-col">
       <div className="flex justify-between rounded-t-md bg-neutral-50 px-1.5 py-1">
         {title && <span className="text-foreground-400 text-[11px] uppercase">{title}</span>}
         {!hideClear && searchValue && <ClearButton onClick={onClear} size={size} label="Reset" />}
@@ -51,7 +51,7 @@ export function BaseFilterContent({
         />
       )}
 
-      {children}
+      <div className="max-h-[159px] overflow-y-auto">{children}</div>
 
       {showNavigationFooter && (
         <div className="flex justify-between rounded-b-md border-t border-neutral-100 bg-white p-1">

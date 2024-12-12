@@ -72,11 +72,7 @@ export function FacetedFormFilter({
 
   const renderTriggerContent = () => {
     if (type === 'text' && currentValue) {
-      return (
-        <>
-          <FilterBadge content={currentValue} size={size} />
-        </>
-      );
+      return <FilterBadge content={currentValue} size={size} />;
     }
 
     if (selectedValues.size === 0) return null;
