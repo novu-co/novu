@@ -328,9 +328,10 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                 title="Proceeding will delete the step"
                 description={
                   <>
-                    You're about to delete the{' '}
-                    <TruncatedText className="max-w-[32ch] font-bold">{step.name}</TruncatedText> step, this action is
-                    permanent.
+                    <SidebarContent>
+                      <Preview />
+                    </SidebarContent>
+                    <Separator />
                   </>
                 }
                 confirmButtonText="Delete"
