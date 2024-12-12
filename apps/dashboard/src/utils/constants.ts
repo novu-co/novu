@@ -6,7 +6,7 @@ export const AUTOCOMPLETE_PASSWORD_MANAGERS_OFF = {
   'data-form-type': 'other',
 };
 
-export const INLINE_CONFIGURABLE_STEP_TYPES: readonly StepTypeEnum[] = [StepTypeEnum.DELAY];
+export const INLINE_CONFIGURABLE_STEP_TYPES: readonly StepTypeEnum[] = [StepTypeEnum.DELAY, StepTypeEnum.DIGEST];
 
 export const TEMPLATE_CONFIGURABLE_STEP_TYPES: readonly StepTypeEnum[] = [
   StepTypeEnum.IN_APP,
@@ -16,14 +16,14 @@ export const TEMPLATE_CONFIGURABLE_STEP_TYPES: readonly StepTypeEnum[] = [
   StepTypeEnum.PUSH,
 ];
 
-export const STEP_NAME_BY_TYPE: Record<StepTypeEnum, string> = {
-  email: 'Email Step',
-  chat: 'Chat Step',
-  in_app: 'In-App Step',
-  sms: 'SMS Step',
-  push: 'Push Step',
-  digest: 'Digest Step',
-  delay: 'Delay Step',
-  trigger: 'Trigger Step',
-  custom: 'Custom Step',
+export const STEP_TYPE_LABELS: Record<StepTypeEnum, string> = {
+  [StepTypeEnum.EMAIL]: 'Email',
+  [StepTypeEnum.SMS]: 'SMS',
+  [StepTypeEnum.IN_APP]: 'In-App',
+  [StepTypeEnum.CHAT]: 'Chat',
+  [StepTypeEnum.PUSH]: 'Push',
+  [StepTypeEnum.DIGEST]: 'Digest',
+  [StepTypeEnum.DELAY]: 'Delay',
+  [StepTypeEnum.TRIGGER]: 'Trigger',
+  [StepTypeEnum.CUSTOM]: 'Custom',
 };

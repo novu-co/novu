@@ -4,41 +4,35 @@ import { cn } from '@/utils/ui';
 import { IActivity, ISubscriber } from '@novu/shared';
 import { TimeDisplayHoverCard } from '@/components/time-display-hover-card';
 import { createSearchParams, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
-import { QueryKeys } from '@/utils/query-keys';
-import { useEnvironment } from '@/context/environment/hooks';
-import { getNotification } from '@/api/activity';
 import { StatusBadge } from './components/status-badge';
 import { StepIndicators } from './components/step-indicators';
 import { ArrowPagination } from './components/arrow-pagination';
-import { useRef, useEffect } from 'react';
+import { useEffect } from 'react';
 import { IActivityFilters } from '@/api/activity';
 import { useFetchActivities } from '../../hooks/use-fetch-activities';
+import { toast } from 'sonner';
+import { Skeleton } from '@/components/primitives/skeleton';
 
 export interface ActivityTableProps {
   selectedActivityId: string | null;
   onActivitySelect: (activity: IActivity) => void;
   filters?: IActivityFilters;
-  hasActiveFilters: boolean;
-  onClearFilters: () => void;
 }
 
-export function ActivityTable({
-  selectedActivityId,
-  onActivitySelect,
-  filters,
-  hasActiveFilters,
-  onClearFilters,
-}: ActivityTableProps) {
-  const queryClient = useQueryClient();
-  const { currentEnvironment } = useEnvironment();
-  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+export function ActivityTable({ selectedActivityId, onActivitySelect, filters }: ActivityTableProps) {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { activities, isLoading, hasMore } = useFetchActivities({ filters });
+  const page = parsePageParam(searchParams.get('page'));
+  const { activities, isLoading, hasMore, error } = useFetchActivities({ filters, page });
 
-  const page = parseInt(searchParams.get('page') || '0');
+  useEffect(() => {
+    if (error) {
+      toast.error('Failed to fetch activities', {
+        description: error instanceof Error ? error.message : 'There was an error loading the activities.',
+      });
+    }
+  }, [error]);
 
   const handlePageChange = (newPage: number) => {
     const newParams = createSearchParams({
@@ -47,30 +41,6 @@ export function ActivityTable({
     });
     navigate(`${location.pathname}?${newParams}`);
   };
-
-  const handleRowMouseEnter = (activity: IActivity) => {
-    hoverTimerRef.current = setTimeout(() => {
-      queryClient.prefetchQuery({
-        queryKey: [QueryKeys.fetchActivity, currentEnvironment?._id, activity._id],
-        queryFn: () => getNotification(activity._id, currentEnvironment!),
-      });
-    }, 1000);
-  };
-
-  const handleRowMouseLeave = () => {
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current);
-      hoverTimerRef.current = null;
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (hoverTimerRef.current) {
-        clearTimeout(hoverTimerRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="flex min-h-full min-w-[800px] flex-1 flex-col">
@@ -97,8 +67,6 @@ export function ActivityTable({
                   'bg-neutral-50 after:absolute after:right-0 after:top-0 after:h-[calc(100%-1px)] after:w-[5px] after:bg-neutral-200'
               )}
               onClick={() => onActivitySelect(activity)}
-              onMouseEnter={() => handleRowMouseEnter(activity)}
-              onMouseLeave={handleRowMouseLeave}
             >
               <TableCell className="px-3">
                 <div className="flex flex-col">
@@ -137,33 +105,30 @@ function formatDate(date: string) {
 
 function SkeletonRow() {
   return (
-    <TableRow className="animate-pulse">
+    <TableRow>
       <TableCell className="px-3">
         <div className="flex flex-col gap-1">
-          <div className="h-5 w-36 rounded bg-neutral-200" />
-          <div className="h-2.5 w-20 rounded bg-neutral-100" />
+          <Skeleton className="h-5 w-36" />
+          <Skeleton className="h-2.5 w-20" />
         </div>
       </TableCell>
       <TableCell className="px-3">
-        <div className="flex h-7 w-28 items-center justify-center gap-1.5 rounded-full bg-neutral-100">
-          <div className="h-3.5 w-3.5 rounded-full bg-neutral-200" />
-          <div className="h-3.5 w-16 rounded bg-neutral-200" />
+        <div className="flex h-7 w-28 items-center justify-center gap-1.5">
+          <Skeleton className="h-3.5 w-3.5 rounded-full" />
+          <Skeleton className="h-3.5 w-16" />
         </div>
       </TableCell>
       <TableCell className="px-3">
         <div className="flex items-center">
           {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="-ml-2 flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100 first:ml-0"
-            >
-              <div className="h-4 w-4 rounded bg-neutral-200" />
+            <div key={i} className="-ml-2 flex h-7 w-7 items-center justify-center first:ml-0">
+              <Skeleton className="h-4 w-4" />
             </div>
           ))}
         </div>
       </TableCell>
       <TableCell className="px-3">
-        <div className="h-4 w-36 rounded bg-neutral-100 font-mono" />
+        <Skeleton className="h-4 w-36 font-mono" />
       </TableCell>
     </TableRow>
   );
@@ -177,4 +142,12 @@ function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriber
   }
 
   return '';
+}
+
+function parsePageParam(param: string | null): number {
+  if (!param) return 0;
+
+  const parsed = Number.parseInt(param, 10);
+
+  return Math.max(0, parsed || 0);
 }

@@ -19,11 +19,24 @@ export function handleSdkError(error: unknown): { error: SDKError; parsedBody: a
   if (!isSDKError(error)) {
     throw new Error('Provided error is not an SDKError');
   }
-
   expect(error.name).to.equal('SDKError');
   expect(error.body).to.be.ok;
   expect(typeof error.body).to.be.eq('string');
-  const errorBody = JSON.parse(error.body);
+  const errorBody = error.body ? JSON.parse(error.body) : 'No Body';
 
   return { error, parsedBody: errorBody };
+}
+
+type AsyncAction<U> = () => Promise<U>;
+
+export async function expectSdkExceptionGeneric<U>(
+  action: AsyncAction<U>
+): Promise<{ error?: SDKError; parsedBody?: any; successfulBody?: U }> {
+  try {
+    const response = await action();
+
+    return { successfulBody: response };
+  } catch (e) {
+    return handleSdkError(e);
+  }
 }

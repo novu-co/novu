@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { expect } from 'chai';
 import {
   ExecutionDetailsRepository,
@@ -9,8 +8,8 @@ import {
 import { DetailEnum } from '@novu/application-generic';
 import { ChannelTypeEnum, PushProviderIdEnum, StepTypeEnum } from '@novu/shared';
 import { UserSession } from '@novu/testing';
-
-const axiosInstance = axios.create();
+import { Novu } from '@novu/api';
+import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
 describe('Trigger event - Send Push Notification - /v1/events/trigger (POST)', () => {
   let session: UserSession;
@@ -19,7 +18,7 @@ describe('Trigger event - Send Push Notification - /v1/events/trigger (POST)', (
   const executionDetailsRepository = new ExecutionDetailsRepository();
   const integrationRepository = new IntegrationRepository();
   const messageRepository = new MessageRepository();
-
+  let novuClient: Novu;
   before(async () => {
     session = new UserSession();
     await session.initialize();
@@ -34,21 +33,19 @@ describe('Trigger event - Send Push Notification - /v1/events/trigger (POST)', (
         },
       ],
     });
+    novuClient = initNovuClassSdk(session);
   });
 
   describe('Multiple providers active', () => {
     before(async () => {
-      const payload = {
+      await novuClient.integrations.create({
         providerId: PushProviderIdEnum.EXPO,
         channel: ChannelTypeEnum.PUSH,
         credentials: { apiKey: '123' },
-        _environmentId: session.environment._id,
+        environmentId: session.environment._id,
         active: true,
         check: false,
-      };
-
-      await session.testAgent.post('/v1/integrations').send(payload);
-
+      });
       const integrations = await integrationRepository.find({
         _environmentId: session.environment._id,
         channel: ChannelTypeEnum.PUSH,
@@ -63,7 +60,7 @@ describe('Trigger event - Send Push Notification - /v1/events/trigger (POST)', (
     });
 
     it('should not create any message if subscriber has no configured channel', async () => {
-      await triggerEvent(session, template);
+      await triggerEvent(template);
 
       await session.awaitRunningJobs(template._id);
 
@@ -88,10 +85,10 @@ describe('Trigger event - Send Push Notification - /v1/events/trigger (POST)', (
     });
 
     it('should not create any message if subscriber has configured two providers without device tokens', async () => {
-      await updateCredentials(session, session.subscriberId, PushProviderIdEnum.FCM, []);
-      await updateCredentials(session, session.subscriberId, PushProviderIdEnum.EXPO, []);
+      await updateCredentials(session.subscriberId, PushProviderIdEnum.FCM, []);
+      await updateCredentials(session.subscriberId, PushProviderIdEnum.EXPO, []);
 
-      await triggerEvent(session, template);
+      await triggerEvent(template);
 
       await session.awaitRunningJobs(template._id);
 
@@ -121,10 +118,10 @@ describe('Trigger event - Send Push Notification - /v1/events/trigger (POST)', (
     });
 
     it('should not create any message if subscriber has configured one provider without device tokens and the other has invalid device token', async () => {
-      await updateCredentials(session, session.subscriberId, PushProviderIdEnum.FCM, ['invalidDeviceToken']);
-      await updateCredentials(session, session.subscriberId, PushProviderIdEnum.EXPO, []);
+      await updateCredentials(session.subscriberId, PushProviderIdEnum.FCM, ['invalidDeviceToken']);
+      await updateCredentials(session.subscriberId, PushProviderIdEnum.EXPO, []);
 
-      await triggerEvent(session, template);
+      await triggerEvent(template);
 
       await session.awaitRunningJobs(template._id);
 
@@ -160,43 +157,23 @@ describe('Trigger event - Send Push Notification - /v1/events/trigger (POST)', (
       expect(genericError).to.be.ok;
     });
   });
-});
-
-async function triggerEvent(session: UserSession, template: NotificationTemplateEntity) {
-  await axiosInstance.post(
-    `${session.serverUrl}/v1/events/trigger`,
-    {
-      name: template.triggers[0].identifier,
+  async function triggerEvent(template2) {
+    await novuClient.trigger({
+      name: template2.triggers[0].identifier,
       to: [{ subscriberId: session.subscriberId }],
       payload: {},
-    },
-    {
-      headers: {
-        authorization: `ApiKey ${session.apiKey}`,
+    });
+  }
+  async function updateCredentials(subscriberId: string, providerId: PushProviderIdEnum, deviceTokens: string[]) {
+    await novuClient.subscribers.credentials.update(
+      {
+        providerId,
+        credentials: {
+          deviceTokens,
+          webhookUrl: 'https:www.someurl.com',
+        },
       },
-    }
-  );
-}
-
-async function updateCredentials(
-  session: UserSession,
-  subscriberId: string,
-  providerId: PushProviderIdEnum,
-  deviceTokens: string[]
-) {
-  await axiosInstance.put(
-    `${session.serverUrl}/v1/subscribers/${subscriberId}/credentials`,
-    {
-      subscriberId,
-      providerId,
-      credentials: {
-        deviceTokens,
-      },
-    },
-    {
-      headers: {
-        authorization: `ApiKey ${session.apiKey}`,
-      },
-    }
-  );
-}
+      subscriberId
+    );
+  }
+});
