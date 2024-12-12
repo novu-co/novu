@@ -285,31 +285,25 @@ describe('Workflow Controller E2E API Testing', () => {
     it('should update control values', async () => {
       const nameSuffix = `Test Workflow${new Date().toISOString()}`;
       const workflowCreated: WorkflowResponseDto = await createWorkflowAndValidate(nameSuffix);
+      const inAppControlValue = `test-${generateUUID()}`;
+      const emailControlValue = `test-${generateUUID()}`;
       const updateRequest: UpdateWorkflowDto = {
         name: workflowCreated.name,
         preferences: {
           user: null,
         },
-        steps: prepareStepsForUpdateWithNewValues(workflowCreated.steps),
+        steps: [
+          buildInAppStep({ controlValues: { test: inAppControlValue } }),
+          buildEmailStep({ controlValues: { test: emailControlValue } }),
+        ],
         workflowId: workflowCreated.workflowId,
       };
       const updatedWorkflow: WorkflowResponseDto = await updateWorkflowRest(
         workflowCreated._id,
         updateRequest as UpdateWorkflowDto
       );
-      const workflowId = updatedWorkflow._id;
-      const stepId = updatedWorkflow.steps[0]._id;
-      const stepControlValuesAfterUpdate: string[] = [];
-      for (const step of workflowCreated.steps) {
-        const test = `test-${generateUUID()}`;
-        stepControlValuesAfterUpdate.push(test);
-        await workflowsClient.patchWorkflowStepData(workflowId, step._id, {
-          controlValues: { test },
-        });
-      }
-      expect(stepControlValuesAfterUpdate[0]).to.be.equal((await getControlValuesForStep(workflowId, stepId))?.test);
-      const stepId1 = updatedWorkflow.steps[1]._id;
-      expect(stepControlValuesAfterUpdate[1]).to.be.equal((await getControlValuesForStep(workflowId, stepId1))?.test);
+      expect(updatedWorkflow.steps[0].controls.values.test).to.be.equal(inAppControlValue);
+      expect(updatedWorkflow.steps[1].controls.values.test).to.be.equal(emailControlValue);
     });
 
     it('should keep the step id on updated ', async () => {
@@ -521,10 +515,8 @@ describe('Workflow Controller E2E API Testing', () => {
       for (const prodStep of prodWorkflow.steps) {
         const index = prodWorkflow.steps.indexOf(prodStep);
         const devStep = devWorkflow.steps[index];
-        /*
-         * TODO: this is not true yet, but some ID will remain the same across environments
-         * expect(prodStep.stepId).to.equal(devStep.stepId, 'Step ID should be the same');
-         */
+
+        expect(prodStep.stepId).to.equal(devStep.stepId, 'Step ID should be the same');
         expect(prodStep.controls.values).to.deep.equal(devStep.controls.values, 'Step controlValues should match');
         expect(prodStep.name).to.equal(devStep.name, 'Step name should match');
         expect(prodStep.type).to.equal(devStep.type, 'Step type should match');
@@ -554,7 +546,11 @@ describe('Workflow Controller E2E API Testing', () => {
         description: 'Updated Description',
         // modify existing Email Step, add new InApp Steps, previously existing InApp Step is removed
         steps: [
-          { ...buildEmailStep(), _id: devWorkflow.steps[0]._id, name: 'Updated Email Step' },
+          {
+            ...buildEmailStep({ controlValues: { test: 'test' } }),
+            _id: devWorkflow.steps[0]._id,
+            name: 'Updated Email Step',
+          },
           { ...buildInAppStep(), name: 'New InApp Step' },
         ],
       };
@@ -585,9 +581,10 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(prodWorkflowUpdated.steps[0].name).to.equal('Updated Email Step');
       expect(prodWorkflowUpdated.steps[0]._id).to.equal(prodWorkflowCreated.steps[0]._id);
       expect(prodWorkflowUpdated.steps[0].stepId).to.equal(prodWorkflowCreated.steps[0].stepId);
-      expect(prodWorkflowUpdated.steps[1].name).to.equal('New InApp Step');
+      expect(prodWorkflowUpdated.steps[0].controls.values).to.deep.equal({ test: 'test' });
 
       // Verify new created step
+      expect(prodWorkflowUpdated.steps[1].name).to.equal('New InApp Step');
       expect(prodWorkflowUpdated.steps[1]._id).to.not.equal(prodWorkflowCreated.steps[1]._id);
       expect(prodWorkflowUpdated.steps[1].stepId).to.equal('new-in-app-step');
     });
@@ -863,21 +860,7 @@ describe('Workflow Controller E2E API Testing', () => {
 
     return novuRestResult.value;
   }
-  async function validatePayloadSchemaInStepDataVariables(workflowResponse: WorkflowResponseDto) {
-    const stepData = await getStepData(workflowResponse._id, workflowResponse.steps[0]._id);
-    if (!stepData) throw new Error('Step data is not valid');
-    if (!stepData.variables.properties) throw new Error('Payload schema is not valid');
-    const payloadVariables = stepData.variables.properties.payload;
-    if (!payloadVariables) throw new Error('Payload schema is not valid');
-    expect(JSON.stringify(payloadVariables), JSON.stringify(payloadVariables)).to.contain('legalVariable');
-  }
 
-  async function validatePayloadSchemaOnTestData(workflowResponse: WorkflowResponseDto) {
-    const testData = await getWorkflowTestData(workflowResponse._id);
-    expect(testData.payload).to.be.ok;
-    expect(testData.payload.properties).to.be.ok;
-    expect(testData.payload.properties?.legalVariable).to.be.ok;
-  }
   async function updateWorkflowRest(id: string, workflow: UpdateWorkflowDto): Promise<WorkflowResponseDto> {
     const novuRestResult = await workflowsClient.updateWorkflow(id, workflow);
     if (novuRestResult.isSuccessResult()) {
@@ -888,30 +871,6 @@ describe('Workflow Controller E2E API Testing', () => {
 
   function constructSlugForStepRequest(stepInRequest: StepUpdateDto) {
     return `${slugify(stepInRequest.name)}_${ShortIsPrefixEnum.STEP}${encodeBase62((stepInRequest as StepUpdateDto)._id)}`;
-  }
-  async function getControlValuesForStep(workflowId: string, stepId: string) {
-    const workflowStepMetadataRestResult = await workflowsClient.getWorkflowStepData(workflowId, stepId);
-    if (!workflowStepMetadataRestResult.isSuccessResult()) {
-      throw new Error(workflowStepMetadataRestResult.error!.responseText);
-    }
-
-    const controlValues = workflowStepMetadataRestResult.value.controls.values;
-
-    return Object.keys(controlValues).length === 0 ? undefined : controlValues;
-  }
-
-  function prepareStepsForUpdateWithNewValues(steps: StepDataDto[]): StepUpdateDto[] {
-    const newSteps: StepUpdateDto[] = [];
-    for (const step of steps) {
-      const newStep: StepUpdateDto = {
-        _id: step._id,
-        name: step.name,
-        type: step.type,
-      };
-      newSteps.push(newStep);
-    }
-
-    return newSteps;
   }
 
   async function syncWorkflow(devWorkflow: WorkflowResponseDto, prodEnvironmentId: string) {
@@ -962,6 +921,10 @@ describe('Workflow Controller E2E API Testing', () => {
       const stepInRequest = updateRequest.steps[i];
       expect(stepInRequest.name).to.equal(updatedWorkflow.steps[i].name);
       expect(stepInRequest.type).to.equal(updatedWorkflow.steps[i].type);
+
+      if (stepInRequest.controlValues) {
+        expect(stepInRequest.controlValues).to.deep.equal(updatedWorkflow.steps[i].controls.values);
+      }
 
       if ('_id' in stepInRequest) {
         expect(constructSlugForStepRequest(stepInRequest)).to.equal(updatedWorkflow.steps[i].slug);
@@ -1224,10 +1187,11 @@ describe('Workflow Controller E2E API Testing', () => {
   });
 });
 
-function buildEmailStep(): StepCreateDto {
+function buildEmailStep(overrides: Partial<StepCreateDto> = {}): StepCreateDto {
   return {
     name: 'Email Test Step',
     type: StepTypeEnum.EMAIL,
+    ...overrides,
   };
 }
 function buildDigestStep(overrides: Partial<StepCreateDto> = {}): StepCreateDto {
@@ -1238,10 +1202,11 @@ function buildDigestStep(overrides: Partial<StepCreateDto> = {}): StepCreateDto 
   };
 }
 
-function buildInAppStep(): StepCreateDto {
+function buildInAppStep(overrides: Partial<StepCreateDto> = {}): StepCreateDto {
   return {
     name: 'In-App Test Step',
     type: StepTypeEnum.IN_APP,
+    ...overrides,
   };
 }
 
