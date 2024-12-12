@@ -56,28 +56,26 @@ export function SingleFilterContent({
       searchPlaceholder={`Search ${title}...`}
       showNavigationFooter={true}
     >
-      <div className={cn('flex flex-col gap-1 p-1')}>
-        <RadioGroup value={currentValue} onValueChange={onSelect}>
-          {options.map((option, index) => {
-            const isFocused = index === focusedIndex;
+      <RadioGroup value={currentValue} onValueChange={onSelect} className={cn('flex flex-col gap-1 p-1')}>
+        {options.map((option, index) => {
+          const isFocused = index === focusedIndex;
 
-            return (
-              <div
-                key={option.value}
-                className={cn(
-                  'flex items-center space-x-2 rounded-[4px] p-1.5',
-                  isFocused && 'bg-neutral-50 ring-1 ring-neutral-200'
-                )}
-                onMouseEnter={() => setFocusedIndex(index)}
-                onClick={() => onSelect(option.value)}
-              >
-                <RadioGroupItem value={option.value} id={option.value} />
-                <Label htmlFor={option.value}>{option.label}</Label>
-              </div>
-            );
-          })}
-        </RadioGroup>
-      </div>
+          return (
+            <div
+              key={option.value}
+              className={cn(
+                'flex items-center space-x-2 rounded-[4px] p-1.5',
+                isFocused && 'bg-neutral-50 ring-1 ring-neutral-200'
+              )}
+              onMouseEnter={() => setFocusedIndex(index)}
+              onClick={() => onSelect(option.value)}
+            >
+              <RadioGroupItem value={option.value} id={option.value} />
+              <Label htmlFor={option.value}>{option.label}</Label>
+            </div>
+          );
+        })}
+      </RadioGroup>
     </BaseFilterContent>
   );
 }

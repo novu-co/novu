@@ -4,7 +4,7 @@ import { FilterOption, SizeType } from '../types';
 import { BaseFilterContent } from './base-filter-content';
 import { useKeyboardNavigation } from '../hooks/use-keyboard-navigation';
 
-interface MultiFilterContentProps {
+type MultiFilterContentProps = {
   inputRef: React.RefObject<HTMLInputElement>;
   title?: string;
   options: FilterOption[];
@@ -16,7 +16,7 @@ interface MultiFilterContentProps {
   size: SizeType;
   hideSearch?: boolean;
   hideClear?: boolean;
-}
+};
 
 export function MultiFilterContent({
   inputRef,

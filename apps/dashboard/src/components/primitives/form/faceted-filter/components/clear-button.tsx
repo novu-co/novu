@@ -13,10 +13,8 @@ interface ClearButtonProps {
 
 export function ClearButton({ onClick, size, label = 'Clear filter', className }: ClearButtonProps) {
   return (
-    <>
-      <Button variant="ghost" onClick={onClick} className={cn(STYLES.clearButton, STYLES.size[size].input, className)}>
-        {label}
-      </Button>
-    </>
+    <Button variant="ghost" onClick={onClick} className={cn(STYLES.clearButton, STYLES.size[size].input, className)}>
+      {label}
+    </Button>
   );
 }
