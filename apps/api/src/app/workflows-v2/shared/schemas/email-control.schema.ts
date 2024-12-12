@@ -18,7 +18,7 @@ export const emailStepUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.EMAIL,
   properties: {
     body: {
-      component: UiComponentEnum.MAILY,
+      component: UiComponentEnum.BLOCK_EDITOR,
     },
     subject: {
       component: UiComponentEnum.TEXT_INLINE_LABEL,
