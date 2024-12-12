@@ -1,6 +1,5 @@
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { ActivityTable } from '@/components/activity/activity-table';
-import { cn } from '@/utils/ui';
 import { motion, AnimatePresence } from 'motion/react';
 import { ActivityPanel } from '@/components/activity/activity-panel';
 import { Badge } from '../components/primitives/badge';
@@ -45,31 +44,29 @@ export function ActivityFeed() {
       >
         <div className="relative mt-10 flex h-[calc(100vh-88px)]">
           <motion.div
-            layout="position"
+            layout
             transition={{
-              layout: { duration: 0.4, ease: 'easeInOut' },
+              duration: 0.2,
+              ease: [0.32, 0.72, 0, 1],
             }}
-            className={cn('h-full flex-1', activityItemId ? 'w-[65%]' : 'w-full')}
+            className="h-full flex-1"
+            style={{
+              width: activityItemId ? '65%' : '100%',
+            }}
           >
-            <ActivityTable
-              selectedActivityId={activityItemId}
-              onActivitySelect={handleActivitySelect}
-              hasActiveFilters={false}
-              onClearFilters={() => {}}
-            />
+            <ActivityTable selectedActivityId={activityItemId} onActivitySelect={handleActivitySelect} />
           </motion.div>
 
-          <AnimatePresence mode="sync">
+          <AnimatePresence mode="wait">
             {activityItemId && (
               <motion.div
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: '35%', opacity: 1 }}
-                exit={{ width: 0, opacity: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{
-                  duration: 0.4,
-                  ease: 'easeInOut',
+                  duration: 0.2,
                 }}
-                className="bg-background min-h-full w-[500px] overflow-auto border-l"
+                className="bg-background h-full w-[35%] overflow-auto border-l"
               >
                 <ActivityPanel activityId={activityItemId} onActivitySelect={handleActivityPanelSelect} />
               </motion.div>
