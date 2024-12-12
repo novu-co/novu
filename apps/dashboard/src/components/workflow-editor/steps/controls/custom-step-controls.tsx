@@ -185,3 +185,33 @@ const OverrideMessage = ({ isOverridden }: { isOverridden: boolean }) => {
     </motion.div>
   );
 };
+
+const OverrideMessage = ({ isOverridden }: { isOverridden: boolean }) => {
+  const fadeAnimation = {
+    initial: { opacity: 0, scale: 0.95 },
+    animate: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0.95 },
+    transition: { duration: 0.1 },
+  };
+
+  return (
+    <motion.div layout {...fadeAnimation} className="relative min-h-10">
+      {isOverridden ? (
+        <div className="mt-5 flex w-full items-center gap-3 rounded-md border bg-neutral-50 px-3 py-2.5">
+          <span className="w-1 self-stretch rounded-full bg-neutral-500" />
+          <span className="flex-1 text-xs font-medium text-neutral-600">
+            Custom controls defined in code have been overridden. Disable overrides to restore original.
+          </span>
+        </div>
+      ) : (
+        <Link
+          target="_blank"
+          to="https://docs.novu.co/concepts/controls"
+          className="mt-2 flex items-center gap-1 text-xs text-neutral-600 hover:underline"
+        >
+          <RiQuestionLine className="size-4" /> Learn more about code-defined controls.
+        </Link>
+      )}
+    </motion.div>
+  );
+};
