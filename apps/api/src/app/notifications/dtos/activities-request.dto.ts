@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { ChannelTypeEnum } from '@novu/shared';
-import { IsDateString, IsOptional } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export class ActivitiesRequestDto {
   @ApiPropertyOptional({
@@ -50,12 +50,12 @@ export class ActivitiesRequestDto {
     required: false,
   })
   @IsOptional()
-  startDate?: string;
+  after?: string;
 
   @ApiPropertyOptional({
     type: String,
     required: false,
   })
   @IsOptional()
-  endDate?: string;
+  before?: string;
 }

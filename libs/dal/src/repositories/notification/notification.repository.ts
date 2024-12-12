@@ -31,8 +31,8 @@ export class NotificationRepository extends BaseRepository<
       templates?: string[] | null;
       subscriberIds?: string[];
       transactionId?: string;
-      startDate?: string;
-      endDate?: string;
+      after?: string;
+      before?: string;
     } = {},
     skip = 0,
     limit = 10
@@ -45,12 +45,12 @@ export class NotificationRepository extends BaseRepository<
       requestQuery.transactionId = query.transactionId;
     }
 
-    if (query.startDate) {
-      requestQuery.createdAt = { $lte: query.startDate };
+    if (query.after) {
+      requestQuery.createdAt = { $gte: query.after };
     }
 
-    if (query.endDate) {
-      requestQuery.createdAt = { $gte: query.endDate };
+    if (query.before) {
+      requestQuery.createdAt = { $lte: query.before };
     }
 
     if (query?.templates) {

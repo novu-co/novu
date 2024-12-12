@@ -50,8 +50,8 @@ export function getActivityList(
   }
 
   if (filters?.dateRange) {
-    const endDate = new Date(Date.now() - getDateRangeInDays(filters?.dateRange) * 24 * 60 * 60 * 1000);
-    searchParams.append('endDate', endDate.toISOString());
+    const after = new Date(Date.now() - getDateRangeInDays(filters?.dateRange) * 24 * 60 * 60 * 1000);
+    searchParams.append('after', after.toISOString());
   }
 
   return get<ActivityResponse>(`/notifications?${searchParams.toString()}`, {

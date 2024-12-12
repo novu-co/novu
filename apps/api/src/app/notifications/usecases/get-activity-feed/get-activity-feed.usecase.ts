@@ -62,8 +62,8 @@ export class GetActivityFeed {
         templates: command.templates,
         subscriberIds,
         transactionId: command.transactionId,
-        startDate: command.startDate,
-        endDate: command.endDate,
+        after: command.after,
+        before: command.before,
       },
       command.page * LIMIT,
       LIMIT

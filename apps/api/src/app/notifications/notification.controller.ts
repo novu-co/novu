@@ -77,8 +77,8 @@ export class NotificationsController {
         search: query.search,
         subscriberIds: subscribersQuery,
         transactionId: query.transactionId,
-        startDate: query.startDate,
-        endDate: query.endDate,
+        after: query.after,
+        before: query.before,
       })
     );
   }

@@ -36,9 +36,9 @@ export class GetActivityFeedCommand extends EnvironmentWithUserCommand {
 
   @IsOptional()
   @IsString()
-  startDate?: string;
+  after?: string;
 
   @IsOptional()
   @IsString()
-  endDate?: string;
+  before?: string;
 }
