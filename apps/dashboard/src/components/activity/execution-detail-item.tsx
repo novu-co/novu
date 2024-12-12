@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { cn } from '@/utils/ui';
 import { ActivityDetailCard } from './activity-detail-card';
 import { IExecutionDetail } from '@novu/shared';
+import { formatJSONString } from '../../utils/string';
 
 interface ExecutionDetailItemProps {
   detail: IExecutionDetail;
@@ -38,29 +39,6 @@ function getStatusConfig(status: string) {
 export function ExecutionDetailItem({ detail }: ExecutionDetailItemProps) {
   const { icon: StatusIcon, colorClass } = getStatusConfig(detail.status);
 
-  const formatContent = (raw: unknown): string => {
-    if (typeof raw === 'string') {
-      try {
-        const parsed = JSON.parse(raw);
-        return JSON.stringify(parsed, null, 2)
-          .split('\n')
-          .map((line) => line.trimEnd())
-          .join('\n');
-      } catch {
-        return raw;
-      }
-    }
-
-    if (typeof raw === 'object') {
-      return JSON.stringify(raw, null, 2)
-        .split('\n')
-        .map((line) => line.trimEnd())
-        .join('\n');
-    }
-
-    return String(raw);
-  };
-
   return (
     <div className="flex items-start gap-3">
       <div className="flex h-full items-center pt-2">
@@ -80,7 +58,7 @@ export function ExecutionDetailItem({ detail }: ExecutionDetailItemProps) {
       >
         {detail.raw && (
           <pre className="min-w-0 max-w-full font-mono" style={{ width: '1px' }}>
-            {formatContent(detail.raw)}
+            {formatJSONString(detail.raw)}
           </pre>
         )}
       </ActivityDetailCard>
