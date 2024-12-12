@@ -4,16 +4,13 @@ import { cn } from '@/utils/ui';
 import { IActivity, ISubscriber } from '@novu/shared';
 import { TimeDisplayHoverCard } from '@/components/time-display-hover-card';
 import { createSearchParams, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
-import { QueryKeys } from '@/utils/query-keys';
-import { useEnvironment } from '@/context/environment/hooks';
-import { getNotification } from '@/api/activity';
 import { StatusBadge } from './components/status-badge';
 import { StepIndicators } from './components/step-indicators';
 import { ArrowPagination } from './components/arrow-pagination';
-import { useRef, useEffect } from 'react';
+import { useEffect } from 'react';
 import { IActivityFilters } from '@/api/activity';
 import { useFetchActivities } from '../../hooks/use-fetch-activities';
+import { toast } from 'sonner';
 
 export interface ActivityTableProps {
   selectedActivityId: string | null;
@@ -22,13 +19,18 @@ export interface ActivityTableProps {
 }
 
 export function ActivityTable({ selectedActivityId, onActivitySelect, filters }: ActivityTableProps) {
-  const queryClient = useQueryClient();
-  const { currentEnvironment } = useEnvironment();
-  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { activities, isLoading, hasMore } = useFetchActivities({ filters });
+  const { activities, isLoading, hasMore, error } = useFetchActivities({ filters });
+
+  useEffect(() => {
+    if (error) {
+      toast.error('Failed to fetch activities', {
+        description: error instanceof Error ? error.message : 'There was an error loading the activities.',
+      });
+    }
+  }, [error]);
 
   const page = parseInt(searchParams.get('page') || '0');
 
@@ -39,30 +41,6 @@ export function ActivityTable({ selectedActivityId, onActivitySelect, filters }:
     });
     navigate(`${location.pathname}?${newParams}`);
   };
-
-  const handleRowMouseEnter = (activity: IActivity) => {
-    hoverTimerRef.current = setTimeout(() => {
-      queryClient.prefetchQuery({
-        queryKey: [QueryKeys.fetchActivity, currentEnvironment?._id, activity._id],
-        queryFn: () => getNotification(activity._id, currentEnvironment!),
-      });
-    }, 1000);
-  };
-
-  const handleRowMouseLeave = () => {
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current);
-      hoverTimerRef.current = null;
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (hoverTimerRef.current) {
-        clearTimeout(hoverTimerRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className="flex min-h-full min-w-[800px] flex-1 flex-col">
@@ -89,8 +67,6 @@ export function ActivityTable({ selectedActivityId, onActivitySelect, filters }:
                   'bg-neutral-50 after:absolute after:right-0 after:top-0 after:h-[calc(100%-1px)] after:w-[5px] after:bg-neutral-200'
               )}
               onClick={() => onActivitySelect(activity)}
-              onMouseEnter={() => handleRowMouseEnter(activity)}
-              onMouseLeave={handleRowMouseLeave}
             >
               <TableCell className="px-3">
                 <div className="flex flex-col">
