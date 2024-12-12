@@ -17,12 +17,15 @@ interface ActivityResponse {
   pageSize: number;
 }
 
-export function useFetchActivities({
-  filters,
-  page,
-  staleTime = 0,
-  refetchOnWindowFocus = false,
-}: UseActivitiesOptions = {}) {
+export function useFetchActivities(
+  { filters, page }: UseActivitiesOptions = {},
+  {
+    enabled = true,
+    refetchInterval = false,
+    refetchOnWindowFocus = false,
+    staleTime = 0,
+  }: { enabled?: boolean; refetchInterval?: number | false; refetchOnWindowFocus?: boolean; staleTime?: number } = {}
+) {
   const { currentEnvironment } = useEnvironment();
 
   const { data, ...rest } = useQuery<ActivityResponse>({
@@ -30,7 +33,8 @@ export function useFetchActivities({
     queryFn: ({ signal }) => getActivityList(currentEnvironment!, page, filters, signal),
     staleTime,
     refetchOnWindowFocus,
-    enabled: !!currentEnvironment,
+    refetchInterval,
+    enabled: enabled && !!currentEnvironment,
   });
 
   return {

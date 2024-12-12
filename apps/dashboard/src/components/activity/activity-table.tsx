@@ -34,11 +34,15 @@ export function ActivityTable({
   const location = useLocation();
   const navigate = useNavigate();
   const page = parsePageParam(searchParams.get('page'));
-  const { activities, isLoading, hasMore, error } = useFetchActivities({
-    filters,
-    page,
-    refetchOnWindowFocus: true,
-  });
+  const { activities, isLoading, hasMore, error } = useFetchActivities(
+    {
+      filters,
+      page,
+    },
+    {
+      refetchOnWindowFocus: true,
+    }
+  );
 
   useEffect(() => {
     if (error) {

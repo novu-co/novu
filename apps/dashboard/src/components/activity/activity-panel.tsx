@@ -4,15 +4,23 @@ import { ActivityJobItem } from './activity-job-item';
 import { InlineToast } from '../primitives/inline-toast';
 import { useFetchActivity } from '@/hooks/use-fetch-activity';
 import { ActivityOverview } from './components/activity-overview';
+import { cn } from '../../utils/ui';
 import { IActivityJob } from '@novu/shared';
 import { Skeleton } from '../primitives/skeleton';
 
 export interface ActivityPanelProps {
   activityId: string;
   onActivitySelect: (activityId: string) => void;
+  headerClassName?: string;
+  overviewHeaderClassName?: string;
 }
 
-export function ActivityPanel({ activityId, onActivitySelect }: ActivityPanelProps) {
+export function ActivityPanel({
+  activityId,
+  onActivitySelect,
+  headerClassName,
+  overviewHeaderClassName,
+}: ActivityPanelProps) {
   const { activity, isPending, error } = useFetchActivity({ activityId });
 
   if (isPending) {
@@ -44,7 +52,13 @@ export function ActivityPanel({ activityId, onActivitySelect }: ActivityPanelPro
       className="h-full"
     >
       <div>
-        <div className="flex items-center gap-2 border-b border-t border-neutral-200 border-b-neutral-100 p-2 px-3">
+        <div
+          className={cn(
+            'flex items-center gap-2 border-b border-t border-neutral-200 border-b-neutral-100 px-3 pb-2 pt-[7px]',
+            headerClassName,
+            overviewHeaderClassName
+          )}
+        >
           <RiRouteFill className="h-3 w-3" />
           <span className="text-foreground-950 text-sm font-medium">
             {activity.template?.name || 'Deleted workflow'}
@@ -52,7 +66,7 @@ export function ActivityPanel({ activityId, onActivitySelect }: ActivityPanelPro
         </div>
         <ActivityOverview activity={activity} />
 
-        <div className="flex items-center gap-2 border-b border-t border-neutral-100 p-2 px-3">
+        <div className={cn('flex items-center gap-2 border-b border-t border-neutral-100 p-2 px-3', headerClassName)}>
           <RiPlayCircleLine className="h-3 w-3" />
           <span className="text-foreground-950 text-sm font-medium">Logs</span>
         </div>
