@@ -716,7 +716,8 @@
     "hsforms",
     "touchpoint",
     "Angularjs",
-    "navigatable"
+    "navigatable",
+    "facated"
   ],
   "flagWords": [],
   "patterns": [

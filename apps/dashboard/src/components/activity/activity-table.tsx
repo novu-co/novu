@@ -6,9 +6,11 @@ import { TimeDisplayHoverCard } from '@/components/time-display-hover-card';
 import { createSearchParams, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import { StatusBadge } from './components/status-badge';
 import { StepIndicators } from './components/step-indicators';
+import { ActivityEmptyState } from './activity-empty-state';
+import { AnimatePresence, motion } from 'motion/react';
 import { ArrowPagination } from './components/arrow-pagination';
 import { useEffect } from 'react';
-import { IActivityFilters } from '@/api/activity';
+import { ActivityFilters } from '@/api/activity';
 import { useFetchActivities } from '../../hooks/use-fetch-activities';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/primitives/skeleton';
@@ -16,15 +18,27 @@ import { Skeleton } from '@/components/primitives/skeleton';
 export interface ActivityTableProps {
   selectedActivityId: string | null;
   onActivitySelect: (activity: IActivity) => void;
-  filters?: IActivityFilters;
+  filters?: ActivityFilters;
+  hasActiveFilters: boolean;
+  onClearFilters: () => void;
 }
 
-export function ActivityTable({ selectedActivityId, onActivitySelect, filters }: ActivityTableProps) {
+export function ActivityTable({
+  selectedActivityId,
+  onActivitySelect,
+  filters,
+  hasActiveFilters,
+  onClearFilters,
+}: ActivityTableProps) {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
   const page = parsePageParam(searchParams.get('page'));
-  const { activities, isLoading, hasMore, error } = useFetchActivities({ filters, page });
+  const { activities, isLoading, hasMore, error } = useFetchActivities({
+    filters,
+    page,
+    refetchOnWindowFocus: true,
+  });
 
   useEffect(() => {
     if (error) {
@@ -34,68 +48,93 @@ export function ActivityTable({ selectedActivityId, onActivitySelect, filters }:
     }
   }, [error]);
 
-  const handlePageChange = (newPage: number) => {
+  function handlePageChange(newPage: number) {
     const newParams = createSearchParams({
       ...Object.fromEntries(searchParams),
       page: newPage.toString(),
     });
     navigate(`${location.pathname}?${newParams}`);
-  };
+  }
 
   return (
-    <div className="flex min-h-full min-w-[800px] flex-1 flex-col">
-      <Table
-        isLoading={isLoading}
-        loadingRow={<SkeletonRow />}
-        containerClassname="border-x-0 border-b-0 border-t border-t-neutral-200 rounded-none shadow-none"
-      >
-        <TableHeader>
-          <TableRow>
-            <TableHead className="h-9 px-3 py-0">Event</TableHead>
-            <TableHead className="h-9 px-3 py-0">Status</TableHead>
-            <TableHead className="h-9 px-3 py-0">Steps</TableHead>
-            <TableHead className="h-9 px-3 py-0">Triggered Date</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {activities.map((activity) => (
-            <TableRow
-              key={activity._id}
-              className={cn(
-                'relative cursor-pointer hover:bg-neutral-50',
-                selectedActivityId === activity._id &&
-                  'bg-neutral-50 after:absolute after:right-0 after:top-0 after:h-[calc(100%-1px)] after:w-[5px] after:bg-neutral-200'
-              )}
-              onClick={() => onActivitySelect(activity)}
-            >
-              <TableCell className="px-3">
-                <div className="flex flex-col">
-                  <span className="text-foreground-950 font-medium">
-                    {activity.template?.name || 'Deleted workflow'}
-                  </span>
-                  <span className="text-foreground-400 text-[10px] leading-[14px]">
-                    {activity.transactionId} {getSubscriberDisplay(activity.subscriber)}
-                  </span>
-                </div>
-              </TableCell>
-              <TableCell className="px-3">
-                <StatusBadge jobs={activity.jobs} />
-              </TableCell>
-              <TableCell className="px-3">
-                <StepIndicators jobs={activity.jobs} />
-              </TableCell>
-              <TableCell className="text-foreground-600 px-3">
-                <TimeDisplayHoverCard date={new Date(activity.createdAt)}>
-                  <span>{formatDate(activity.createdAt)}</span>
-                </TimeDisplayHoverCard>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <AnimatePresence mode="wait" initial={false}>
+      {!isLoading && activities.length === 0 ? (
+        <motion.div
+          key="empty-state"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="flex h-full w-full items-center justify-center"
+        >
+          <ActivityEmptyState emptySearchResults={hasActiveFilters} onClearFilters={onClearFilters} />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="table-state"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="flex min-h-full min-w-[800px] flex-1 flex-col"
+        >
+          <Table
+            isLoading={isLoading}
+            loadingRow={<SkeletonRow />}
+            containerClassname="border-x-0 border-b-0 border-t border-t-neutral-200 rounded-none shadow-none"
+          >
+            <TableHeader>
+              <TableRow>
+                <TableHead className="h-9 px-3 py-0">Event</TableHead>
+                <TableHead className="h-9 px-3 py-0">Status</TableHead>
+                <TableHead className="h-9 px-3 py-0">Steps</TableHead>
+                <TableHead className="h-9 px-3 py-0">Triggered Date</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {activities.map((activity) => (
+                <TableRow
+                  key={activity._id}
+                  className={cn(
+                    'relative cursor-pointer hover:bg-neutral-50',
+                    selectedActivityId === activity._id &&
+                      'bg-neutral-50 after:absolute after:right-0 after:top-0 after:h-[calc(100%-1px)] after:w-[5px] after:bg-neutral-200'
+                  )}
+                  onClick={() => onActivitySelect(activity)}
+                >
+                  <TableCell className="px-3">
+                    <div className="flex flex-col">
+                      <span className="text-foreground-950 font-medium">
+                        {activity.template?.name || 'Deleted workflow'}
+                      </span>
+                      <span className="text-foreground-400 text-[10px] leading-[14px]">
+                        {activity.transactionId}{' '}
+                        {getSubscriberDisplay(
+                          activity.subscriber as Pick<ISubscriber, '_id' | 'subscriberId' | 'firstName' | 'lastName'>
+                        )}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-3">
+                    <StatusBadge jobs={activity.jobs} />
+                  </TableCell>
+                  <TableCell className="px-3">
+                    <StepIndicators jobs={activity.jobs} />
+                  </TableCell>
+                  <TableCell className="text-foreground-600 px-3">
+                    <TimeDisplayHoverCard date={new Date(activity.createdAt)}>
+                      <span>{formatDate(activity.createdAt)}</span>
+                    </TimeDisplayHoverCard>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
 
-      <ArrowPagination page={page} hasMore={hasMore} onPageChange={handlePageChange} />
-    </div>
+          <ArrowPagination page={page} hasMore={hasMore} onPageChange={handlePageChange} />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -143,7 +182,6 @@ function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriber
 
   return '';
 }
-
 function parsePageParam(param: string | null): number {
   if (!param) return 0;
 

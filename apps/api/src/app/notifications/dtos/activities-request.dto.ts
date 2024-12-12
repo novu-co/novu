@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { ChannelTypeEnum } from '@novu/shared';
+import { IsOptional } from 'class-validator';
 
 export class ActivitiesRequestDto {
   @ApiPropertyOptional({
@@ -43,4 +44,18 @@ export class ActivitiesRequestDto {
     required: false,
   })
   transactionId?: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    required: false,
+  })
+  @IsOptional()
+  after?: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    required: false,
+  })
+  @IsOptional()
+  before?: string;
 }
