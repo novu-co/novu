@@ -83,8 +83,8 @@ export function ActivityTable({
             loadingRow={<SkeletonRow />}
             containerClassname="border-x-0 border-b-0 border-t border-t-neutral-200 rounded-none shadow-none"
           >
-            <TableHeader>
-              <TableRow>
+            <TableHeader className="shadow-none">
+              <TableRow className="border-b border-neutral-200 shadow-none [&>th]:border-b [&>th]:border-neutral-200">
                 <TableHead className="h-9 px-3 py-0">Event</TableHead>
                 <TableHead className="h-9 px-3 py-0">Status</TableHead>
                 <TableHead className="h-9 px-3 py-0">Steps</TableHead>
