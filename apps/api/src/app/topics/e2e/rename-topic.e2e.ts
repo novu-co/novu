@@ -48,16 +48,15 @@ describe('Rename a topic - /topics/:topicKey (PATCH)', async () => {
   it('should throw a not found error when the topic id provided does not exist in the database', async () => {
     await createTopicSubscriberAndAttach();
     const nonExistingId = 'ab12345678901234567890ab';
-    const { error, parsedBody } = await expectSdkExceptionGeneric(() =>
+    const { error } = await expectSdkExceptionGeneric(() =>
       novuClient.topics.rename({ name: renamedTopicName }, nonExistingId)
     );
     expect(error).to.be.ok;
-    if (error && parsedBody) {
+    if (error) {
       expect(error.statusCode).to.equal(404);
-      expect(parsedBody.message).to.eql(
+      expect(error.message).to.eql(
         `Topic not found for id ${nonExistingId} in the environment ${session.environment._id}`
       );
-      expect(parsedBody.error).to.eql('Not Found');
     }
   });
   async function createTopicSubscriberAndAttach() {
