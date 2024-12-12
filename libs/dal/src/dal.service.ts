@@ -6,6 +6,7 @@ export const baseConfig: ConnectOptions = {
   maxIdleTimeMS: process.env.MONGO_MAX_IDLE_TIME_IN_MS ? Number(process.env.MONGO_MAX_IDLE_TIME_IN_MS) : 1000 * 30,
   maxPoolSize: process.env.MONGO_MAX_POOL_SIZE ? Number(process.env.MONGO_MAX_POOL_SIZE) : 50,
   minPoolSize: process.env.MONGO_MIN_POOL_SIZE ? Number(process.env.MONGO_MIN_POOL_SIZE) : 10,
+  authMechanism: process.env.IS_SELF_HOSTED ? 'DEFAULT' : 'SCRAM-SHA-1',
 };
 
 export class DalService {
