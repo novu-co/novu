@@ -30,22 +30,9 @@ function parseFilters(searchParams: URLSearchParams): ActivityFilters {
   }
 
   const dateRange = searchParams.get('dateRange');
-  const endDate = new Date(Date.now() - getDateRangeInDays(dateRange || DEFAULT_DATE_RANGE) * 24 * 60 * 60 * 1000);
-  result.endDate = endDate.toISOString();
+  result.dateRange = dateRange || DEFAULT_DATE_RANGE;
 
   return result;
-}
-
-function getDateRangeInDays(range: string): number {
-  switch (range) {
-    case '24h':
-      return 1;
-    case '7d':
-      return 7;
-    case '30d':
-    default:
-      return 30;
-  }
 }
 
 function parseFilterValues(searchParams: URLSearchParams): ActivityFiltersData {

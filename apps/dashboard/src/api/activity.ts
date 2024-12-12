@@ -7,8 +7,7 @@ export type ActivityFilters = {
   email?: string;
   subscriberId?: string;
   transactionId?: string;
-  startDate?: string;
-  endDate?: string;
+  dateRange?: string;
 };
 
 interface ActivityResponse {
@@ -50,17 +49,27 @@ export function getActivityList(
     searchParams.append('transactionId', filters.transactionId);
   }
 
-  if (filters?.startDate) {
-    searchParams.append('startDate', filters.startDate);
-  }
-  if (filters?.endDate) {
-    searchParams.append('endDate', filters.endDate);
+  if (filters?.dateRange) {
+    const endDate = new Date(Date.now() - getDateRangeInDays(filters?.dateRange) * 24 * 60 * 60 * 1000);
+    searchParams.append('endDate', endDate.toISOString());
   }
 
   return get<ActivityResponse>(`/notifications?${searchParams.toString()}`, {
     environment,
     signal,
   });
+}
+
+function getDateRangeInDays(range: string): number {
+  switch (range) {
+    case '24h':
+      return 1;
+    case '7d':
+      return 7;
+    case '30d':
+    default:
+      return 30;
+  }
 }
 
 export function getNotification(notificationId: string, environment: IEnvironment) {

@@ -34,7 +34,11 @@ export function ActivityTable({
   const location = useLocation();
   const navigate = useNavigate();
   const page = parsePageParam(searchParams.get('page'));
-  const { activities, isLoading, hasMore, error } = useFetchActivities({ filters, page });
+  const { activities, isLoading, hasMore, error } = useFetchActivities({
+    filters,
+    page,
+    refetchOnWindowFocus: true,
+  });
 
   useEffect(() => {
     if (error) {
@@ -44,13 +48,13 @@ export function ActivityTable({
     }
   }, [error]);
 
-  const handlePageChange = (newPage: number) => {
+  function handlePageChange(newPage: number) {
     const newParams = createSearchParams({
       ...Object.fromEntries(searchParams),
       page: newPage.toString(),
     });
     navigate(`${location.pathname}?${newParams}`);
-  };
+  }
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -178,7 +182,6 @@ function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriber
 
   return '';
 }
-
 function parsePageParam(param: string | null): number {
   if (!param) return 0;
 

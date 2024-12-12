@@ -10,7 +10,7 @@ import { useDebounce } from '@/hooks/use-debounce';
 import { useSearchParams } from 'react-router-dom';
 
 export function ActivityFeed() {
-  const [_, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const {
     activityItemId,
@@ -25,6 +25,7 @@ export function ActivityFeed() {
   const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
     // Ignore endDate as it's always present
     if (key === 'endDate') return false;
+
     // For arrays, check if they have any items
     if (Array.isArray(value)) return value.length > 0;
     // For other values, check if they exist
@@ -36,11 +37,14 @@ export function ActivityFeed() {
   };
 
   const handleActivityPanelSelect = (activityId: string) => {
-    setSearchParams((prev) => {
-      prev.set('activityItemId', activityId);
+    setSearchParams(
+      (prev) => {
+        prev.set('activityItemId', activityId);
 
-      return prev;
-    });
+        return prev;
+      },
+      { replace: true }
+    );
   };
 
   return (
