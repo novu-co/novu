@@ -16,7 +16,6 @@ import {
   StepContentIssueEnum,
   StepCreateDto,
   StepDataDto,
-  StepIssueEnum,
   StepTypeEnum,
   StepUpdateDto,
   UpdateStepBody,
@@ -168,8 +167,7 @@ describe('Workflow Controller E2E API Testing', () => {
         expect(res.error?.responseText).to.include("All tags's elements must be unique");
       });
 
-      // TODO: fix use of `ArrayMaxSize` decorator in `{Create,Update}WorkflowCommand`
-      it.skip('should respond with 400 when more than 16 tags are provided', async () => {
+      it('should respond with 400 when more than 16 tags are provided', async () => {
         const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('nameSuffix', {
           tags: Array.from({ length: 17 }).map((_, index) => `tag${index}`),
         });
@@ -181,23 +179,38 @@ describe('Workflow Controller E2E API Testing', () => {
     });
 
     describe('Workflow Step Body Issues', () => {
-      it('should show name issue when missing', async () => {
-        const { issues, status } = await createWorkflowAndReturnStepIssues(
-          { steps: [{ ...buildEmailStep(), name: '' }] },
-          0
-        );
-        expect(status).to.be.equal(WorkflowStatusEnum.ERROR);
-        expect(issues).to.be.ok;
-        if (issues.body) {
-          expect(issues.body).to.be.ok;
-          expect(issues.body.name).to.be.ok;
-          expect(issues.body.name?.issueType, JSON.stringify(issues)).to.be.equal(StepIssueEnum.MISSING_REQUIRED_VALUE);
+      it('should throw 400 on name missing', async () => {
+        // @ts-ignore
+        const overrideDto = { steps: [{ ...buildEmailStep(), name: undefined } as unknown as StepCreateDto] };
+        const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('nameSuffix');
+        const dtoWithoutName = { ...createWorkflowDto, ...overrideDto };
+
+        const res = await workflowsClient.createWorkflow(dtoWithoutName);
+        if (res.isSuccessResult()) {
+          throw new Error(`should fail${JSON.stringify(res.value)}`);
         }
+        expect(res.error?.responseText, res.error?.responseText).to.contain('name');
+      });
+      it('should throw 400 on name empty', async () => {
+        // @ts-ignore
+        const overrideDto = { steps: [{ ...buildEmailStep(), name: '' } as unknown as StepCreateDto] };
+        const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto('nameSuffix');
+        const dtoWithoutName = { ...createWorkflowDto, ...overrideDto };
+
+        const res = await workflowsClient.createWorkflow(dtoWithoutName);
+        if (res.isSuccessResult()) {
+          throw new Error(`should fail${JSON.stringify(res.value)}`);
+        }
+        expect(res.error?.responseText, res.error?.responseText).to.contain('name');
       });
 
       it('should remove issues when no longer', async () => {
-        const inAppStep = { ...buildInAppStep(), controlValues: { body: 'some body here' }, name: '' };
+        const inAppStep = { ...buildInAppStep(), controlValues: {}, name: 'some name' };
         const workflowCreated = await createWorkflowAndReturn({ steps: [inAppStep] });
+        const firstStepIssues = workflowCreated.steps[0].issues;
+        expect(firstStepIssues).to.be.ok;
+        expect(firstStepIssues?.controls?.body).to.be.ok;
+        expect(firstStepIssues?.controls?.body[0].issueType).to.be.eq(StepContentIssueEnum.MISSING_VALUE);
         const novuRestResult = await workflowsClient.updateWorkflow(workflowCreated._id, {
           ...workflowCreated,
           steps: [{ ...inAppStep, name: 'New Name', controlValues: { body: 'some body here' } }],
@@ -439,9 +452,8 @@ describe('Workflow Controller E2E API Testing', () => {
       if (!novuRestResult.isSuccessResult()) {
         throw new Error('should not fail to get list ');
       }
-      const data = novuRestResult.value;
 
-      return data;
+      return novuRestResult.value;
     }
 
     async function getV2WorkflowIdAndExternalId(uuid: string) {
@@ -454,8 +466,8 @@ describe('Workflow Controller E2E API Testing', () => {
     }
 
     async function create3V1Workflows() {
-      let workflowV1Created = await createV1Workflow();
-      workflowV1Created = await createV1Workflow();
+      await createV1Workflow();
+      await createV1Workflow();
 
       return await createV1Workflow();
     }
@@ -487,7 +499,6 @@ describe('Workflow Controller E2E API Testing', () => {
       devWorkflow = await getWorkflowRest(devWorkflow._id);
 
       // Switch to production environment and get its ID
-      const devEnvironmentId = session.environment._id;
       await session.switchToProdEnvironment();
       const prodEnvironmentId = session.environment._id;
       await session.switchToDevEnvironment();
@@ -597,7 +608,7 @@ describe('Workflow Controller E2E API Testing', () => {
 
       expect(res.status).to.equal(404);
       expect(res.body.message).to.equal('Workflow cannot be found');
-      expect(res.body.workflowId).to.equal('123');
+      expect(res.body.ctx.workflowId).to.equal('123');
     });
   });
 
@@ -626,7 +637,8 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(novuRestResult.error).to.be.ok;
       expect(novuRestResult.error!.status).to.equal(404);
       expect(novuRestResult.error!.responseText).to.contain('Workflow');
-      expect(JSON.parse(novuRestResult.error!.responseText).workflowId).to.contain(notExistingId);
+      const parse = JSON.parse(novuRestResult.error!.responseText);
+      expect(parse.ctx.workflowId).to.contain(notExistingId);
     });
   });
 
@@ -1014,14 +1026,6 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(step.type, stringify(step)).to.be.equal(stepInRequest.type);
       expect(Object.keys(step.issues?.body || {}).length, stringify(step)).to.be.eq(0);
     }
-  }
-
-  async function createWorkflowAndReturnIssues(overrideDto: Partial<CreateWorkflowDto>) {
-    const workflowCreated = await createWorkflowAndReturn(overrideDto);
-    const { issues } = workflowCreated;
-    expect(issues, JSON.stringify(workflowCreated)).to.be.ok;
-
-    return issues;
   }
 
   async function createWorkflowAndReturn(

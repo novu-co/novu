@@ -8,6 +8,8 @@ import { InAppRedirect } from '@/components/workflow-editor/steps/in-app/in-app-
 import { DelayAmount } from '@/components/workflow-editor/steps/delay/delay-amount';
 import { Maily } from '@/components/workflow-editor/steps/email/maily';
 import { EmailSubject } from '@/components/workflow-editor/steps/email/email-subject';
+import { DigestKey } from '@/components/workflow-editor/steps/digest/digest-key';
+import { DigestWindow } from '@/components/workflow-editor/steps/digest/digest-window';
 
 export const getComponentByType = ({ component }: { component?: UiComponentEnum }) => {
   switch (component) {
@@ -36,6 +38,14 @@ export const getComponentByType = ({ component }: { component?: UiComponentEnum 
     }
     case UiComponentEnum.TEXT_INLINE_LABEL: {
       return <EmailSubject />;
+    }
+    case UiComponentEnum.DIGEST_KEY: {
+      return <DigestKey />;
+    }
+    case UiComponentEnum.DIGEST_AMOUNT:
+    case UiComponentEnum.DIGEST_UNIT:
+    case UiComponentEnum.DIGEST_CRON: {
+      return <DigestWindow />;
     }
     default: {
       return null;

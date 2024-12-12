@@ -4,6 +4,8 @@
   "language": "en",
   "words": [
     "ABNF",
+    "ORGANISATION",
+    "EQAs",
     "addrs",
     "subscriberpayloaddto",
     "adresses",
@@ -30,6 +32,7 @@
     "atext",
     "attatchment",
     "Attatchment",
+    "someurl",
     "authres",
     "authserv",
     "autobuild",

@@ -45,6 +45,7 @@ import {
 import { ThrottlerCategory } from '../rate-limiting/guards';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
 import { SdkGroupName, SdkMethodName } from '../shared/framework/swagger/sdk.decorators';
+import { AssignSubscriberToTopicDto } from './dtos/assignSubscriberToTopicDto';
 
 @ThrottlerCategory(ApiRateLimitCategoryEnum.CONFIGURATION)
 @ApiCommonResponses()
@@ -88,22 +89,17 @@ export class TopicsController {
 
   @Post('/:topicKey/subscribers')
   @ExternalApiAccessible()
-  @ApiNoContentResponse()
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: AssignSubscriberToTopicDto })
   @ApiOperation({ summary: 'Subscribers addition', description: 'Add subscribers to a topic by key' })
   @ApiParam({ name: 'topicKey', description: 'The topic key', type: String, required: true })
   @SdkGroupName('Topics.Subscribers')
   @SdkMethodName('assign')
-  async addSubscribers(
+  async assign(
     @UserSession() user: UserSessionData,
     @Param('topicKey') topicKey: TopicKey,
     @Body() body: AddSubscribersRequestDto
-  ): Promise<{
-    succeeded: ExternalSubscriberId[];
-    failed?: {
-      notFound?: ExternalSubscriberId[];
-    };
-  }> {
+  ): Promise<AssignSubscriberToTopicDto> {
     const { existingExternalSubscribers, nonExistingExternalSubscribers } = await this.addSubscribersUseCase.execute(
       AddSubscribersCommand.create({
         environmentId: user.environmentId,
@@ -130,6 +126,7 @@ export class TopicsController {
   @ApiParam({ name: 'topicKey', description: 'The topic key', type: String, required: true })
   @ApiParam({ name: 'externalSubscriberId', description: 'The external subscriber id', type: String, required: true })
   @SdkGroupName('Topics.Subscribers')
+  @ApiOkResponse({ type: TopicSubscriberDto })
   async getTopicSubscriber(
     @UserSession() user: UserSessionData,
     @Param('topicKey') topicKey: TopicKey,
@@ -152,6 +149,7 @@ export class TopicsController {
   @ApiOperation({ summary: 'Subscribers removal', description: 'Remove subscribers from a topic' })
   @ApiParam({ name: 'topicKey', description: 'The topic key', type: String, required: true })
   @SdkGroupName('Topics.Subscribers')
+  @SdkMethodName('remove')
   async removeSubscribers(
     @UserSession() user: UserSessionData,
     @Param('topicKey') topicKey: TopicKey,
@@ -227,7 +225,7 @@ export class TopicsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete topic', description: 'Delete a topic by its topic key if it has no subscribers' })
   async deleteTopic(@UserSession() user: UserSessionData, @Param('topicKey') topicKey: TopicKey): Promise<void> {
-    return await this.deleteTopicUseCase.execute(
+    await this.deleteTopicUseCase.execute(
       DeleteTopicCommand.create({
         environmentId: user.environmentId,
         topicKey,

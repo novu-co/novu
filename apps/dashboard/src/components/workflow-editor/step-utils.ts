@@ -8,7 +8,7 @@ import type {
   WorkflowResponseDto,
 } from '@novu/shared';
 import { Step } from '@/utils/types';
-import { STEP_NAME_BY_TYPE } from '@/utils/constants';
+import { STEP_TYPE_LABELS } from '@/utils/constants';
 
 export const getFirstBodyErrorMessage = (issues?: StepIssuesDto) => {
   const stepIssuesArray = Object.entries({ ...issues?.body });
@@ -59,7 +59,7 @@ export const updateStepInWorkflow = (
 };
 
 export const createStep = (type: StepTypeEnum): Step => ({
-  name: STEP_NAME_BY_TYPE[type],
+  name: STEP_TYPE_LABELS[type] + ' Step',
   stepId: '',
   slug: '_st_',
   type,

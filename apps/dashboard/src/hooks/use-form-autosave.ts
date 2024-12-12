@@ -35,7 +35,8 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
       const values = { ...previousData, ...data };
       // reset the dirty fields right away because on slow networks the patch request might take a while
       // so other blur/change events might trigger in the meantime
-      form.reset(values);
+      // we also send the invalid values to api and should keep the errors in the form
+      form.reset(values, { keepErrors: true });
       save(values);
     },
     [formRef, previousData, isReadOnly, save]
