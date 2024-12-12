@@ -72,8 +72,8 @@ export function ActivityEmptyState({ className, emptySearchResults, onClearFilte
             </h2>
             <p className="text-foreground-600 max-w-md text-sm font-normal">
               {emptySearchResults
-                ? 'Try changing your filter to see more activity or trigger notifications that match your search criteria.'
-                : "Your activity feed is empty. Once events start appearing, you'll be able to track notifications, troubleshoot issues, and view delivery details."}
+                ? 'Change your search criteria.'
+                : 'Your activity feed is empty. Once you trigger your first workflow, you can monitor notifications and view delivery details.'}
             </p>
           </motion.div>
 
