@@ -1,6 +1,7 @@
 import { ComponentProps, useState } from 'react';
-import { useForm, useFormContext, useWatch } from 'react-hook-form';
+import { useForm, useFormContext } from 'react-hook-form';
 import { RiArrowDownSLine, RiArrowUpSLine, RiInputField, RiQuestionLine } from 'react-icons/ri';
+import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { RJSFSchema } from '@rjsf/utils';
 import { type ControlsMetadata } from '@novu/shared';
@@ -23,8 +24,7 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
   const { className, dataSchema, origin, ...rest } = props;
   const [isEditorOpen, setIsEditorOpen] = useState(true);
   const { step } = useWorkflow();
-  const [isOverrideEnabled, setIsOverrideEnabled] = useState(() => Object.keys(step?.controls.values ?? {}).length > 0);
-  const { reset, setValue, trigger } = useFormContext();
+  const { reset } = useFormContext();
   const { saveForm } = useSaveForm();
   const overrideForm = useForm({ defaultValues: { override: false } });
 
@@ -34,50 +34,34 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
 
   return (
     <>
-      {/* This doesn't needs to be a form, but using it as a form allows to re-use the formItem designs without duplicating the same styles */}
-      <Switch
-        checked={isOverrideEnabled}
-        onCheckedChange={async (checked) => {
-          setIsOverrideEnabled(checked);
-          if (!checked) {
-            reset(buildDefaultValuesOfDataSchema(step?.controls.dataSchema ?? {}));
-            await trigger();
-            saveForm();
-          }
-        }}
-      />
       <Form {...overrideForm}>
-        <form id="override-controls-form">
-          <FormField
-            control={overrideForm.control}
-            name="override"
-            render={({ field }) => (
-              <FormItem className="mb-6 mt-2 flex w-full items-center justify-between">
-                <div>
-                  <FormLabel className="block">Override code defined defaults</FormLabel>
-                  <span className="text-xs text-neutral-400">
-                    Code-defined defaults are read-only by default, you can override them using this toggle.
-                  </span>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={(checked) => {
-                      field.onChange(checked);
-                      if (!checked) {
-                        setValue('controlValues', null);
-                        saveForm();
-                      }
-                      // track(TelemetryEvent.WORKFLOW_PREFERENCES_OVERRIDE_USED, {
-                      //   new_status: checked,
-                      // });
-                    }}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </form>
+        <FormField
+          control={overrideForm.control}
+          name="override"
+          render={({ field }) => (
+            <FormItem className="mb-6 mt-2 flex w-full items-center justify-between">
+              <div>
+                <FormLabel className="block">Override code defined defaults</FormLabel>
+                <span className="text-xs text-neutral-400">
+                  Code-defined defaults are read-only by default, you can override them using this toggle.
+                </span>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked);
+                    if (!checked) {
+                      const defaultValues = buildDefaultValuesOfDataSchema(step?.controls.dataSchema ?? {});
+                      reset(defaultValues);
+                      saveForm(true);
+                    }
+                  }}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
       </Form>
 
       <Separator className="mb-3" />
@@ -105,17 +89,41 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
 
         <CollapsibleContent>
           <div className="bg-background rounded-md border border-dashed p-3">
-            <JsonForm schema={(dataSchema as RJSFSchema) || {}} disabled={!isOverrideEnabled} />
+            <JsonForm schema={(dataSchema as RJSFSchema) || {}} disabled={!overrideForm.watch().override} />
           </div>
         </CollapsibleContent>
       </Collapsible>
-      <Link
-        target="_blank"
-        to="https://docs.novu.co/concepts/controls"
-        className="mt-1 flex items-center gap-1 text-xs text-neutral-600 hover:underline"
-      >
-        <RiQuestionLine className="size-4" /> Learn more about code-defined controls.
-      </Link>
+      <OverrideMessage isOverridden={overrideForm.watch().override} />
     </>
+  );
+};
+
+const OverrideMessage = ({ isOverridden }: { isOverridden: boolean }) => {
+  const fadeAnimation = {
+    initial: { opacity: 0, scale: 0.95 },
+    animate: { opacity: 1, scale: 1 },
+    exit: { opacity: 0, scale: 0.95 },
+    transition: { duration: 0.1 },
+  };
+
+  return (
+    <motion.div layout {...fadeAnimation} className="relative min-h-10">
+      {isOverridden ? (
+        <div className="mt-5 flex w-full items-center gap-3 rounded-md border bg-neutral-50 px-3 py-2.5">
+          <span className="w-1 self-stretch rounded-full bg-neutral-500" />
+          <span className="flex-1 text-xs font-medium text-neutral-600">
+            Custom controls defined in code have been overridden. Disable overrides to restore original.
+          </span>
+        </div>
+      ) : (
+        <Link
+          target="_blank"
+          to="https://docs.novu.co/concepts/controls"
+          className="mt-2 flex items-center gap-1 text-xs text-neutral-600 hover:underline"
+        >
+          <RiQuestionLine className="size-4" /> Learn more about code-defined controls.
+        </Link>
+      )}
+    </motion.div>
   );
 };
