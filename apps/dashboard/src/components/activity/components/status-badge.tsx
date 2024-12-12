@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Badge, BadgeVariant } from '@/components/primitives/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { IActivityJob, JobStatusEnum } from '@novu/shared';
@@ -12,20 +12,33 @@ export interface StatusBadgeProps {
 export function StatusBadge({ jobs }: StatusBadgeProps) {
   const [isOpen, setIsOpen] = useState(false);
   const errorCount = jobs.filter((job) => job.status === JobStatusEnum.FAILED).length;
-  let hoverTimeout: NodeJS.Timeout;
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const handleMouseEnter = () => {
-    clearTimeout(hoverTimeout);
-
-    hoverTimeout = setTimeout(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
       setIsOpen(true);
-    }, 300);
+    }, 200);
   };
 
   const handleMouseLeave = () => {
-    clearTimeout(hoverTimeout);
-    setIsOpen(false);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      setIsOpen(false);
+    }, 150);
   };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const status = getActivityStatus(jobs);
 
