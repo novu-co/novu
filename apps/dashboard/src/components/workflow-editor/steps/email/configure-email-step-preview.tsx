@@ -6,7 +6,6 @@ import { usePreviewStep } from '@/hooks/use-preview-step';
 import { EmailPreviewHeader } from '@/components/workflow-editor/steps/email/email-preview';
 import { Separator } from '@/components/primitives/separator';
 import { Skeleton } from '@/components/primitives/skeleton';
-import { ChannelTypeEnum } from '@novu/shared';
 import { cn } from '@/utils/ui';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
@@ -65,9 +64,13 @@ export function ConfigureEmailStepPreview(props: ConfigureEmailStepPreviewProps)
     );
   }
 
-  return (
-    <MiniEmailPreview {...props}>
-      <div className="text-foreground-400 line-clamp-2 text-xs">{previewData.result.preview.subject}</div>
-    </MiniEmailPreview>
-  );
+  if (previewData.result.type === 'email') {
+    return (
+      <MiniEmailPreview {...props}>
+        <div className="text-foreground-400 line-clamp-2 text-xs">{previewData.result.preview.subject}</div>
+      </MiniEmailPreview>
+    );
+  }
+
+  return null;
 }
