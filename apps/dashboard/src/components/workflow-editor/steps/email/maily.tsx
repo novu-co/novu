@@ -24,7 +24,7 @@ export const Maily = (props: MailyProps) => {
       render={({ field }) => {
         return (
           <>
-            <div className={cn('mx-auto w-full pl-4', className)} {...rest}>
+            <div className={cn('mx-auto w-full', className)} {...rest}>
               <FormControl>
                 <Editor
                   config={{
