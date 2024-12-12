@@ -4,9 +4,10 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from './primitives/hove
 interface TimeDisplayHoverCardProps {
   date: Date;
   children?: React.ReactNode;
+  className?: string;
 }
 
-export function TimeDisplayHoverCard({ date, children }: TimeDisplayHoverCardProps) {
+export function TimeDisplayHoverCard({ date, children, className }: TimeDisplayHoverCardProps) {
   const utcTime = format(new Date(date.toUTCString()), 'MMM d yyyy, HH:mm:ss');
   const localTime = format(date, 'MMM d yyyy, HH:mm:ss');
   const timeAgo = formatDistanceToNow(date, { addSuffix: true });
@@ -14,7 +15,7 @@ export function TimeDisplayHoverCard({ date, children }: TimeDisplayHoverCardPro
   return (
     <HoverCard openDelay={100} closeDelay={100}>
       <HoverCardTrigger asChild className="hover:cursor-default">
-        <span>{children}</span>
+        <span className={className}>{children}</span>
       </HoverCardTrigger>
       <HoverCardContent className="w-fit" align="end" sideOffset={4}>
         <div className="flex flex-col gap-2">

@@ -40,10 +40,11 @@ export function ActivityOverview({ activity }: ActivityOverviewProps) {
         <OverviewItem label="Subscriber ID" value={activity.subscriber?.subscriberId ?? ''} isCopyable />
 
         <OverviewItem label="Triggered at" value={format(new Date(activity.createdAt), 'MMM d yyyy, HH:mm:ss')}>
-          <TimeDisplayHoverCard date={new Date(activity.createdAt)}>
-            <span className="text-foreground-600 font-mono text-xs">
-              {format(new Date(activity.createdAt), 'MMM d yyyy, HH:mm:ss')}
-            </span>
+          <TimeDisplayHoverCard
+            date={new Date(activity.createdAt)}
+            className="text-foreground-600 font-mono text-xs leading-none"
+          >
+            {format(new Date(activity.createdAt), 'MMM d yyyy, HH:mm:ss')}
           </TimeDisplayHoverCard>
         </OverviewItem>
 
