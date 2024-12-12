@@ -72,6 +72,7 @@ export function ActivityFilters({ onFiltersChange, initialValues, onReset }: Act
 
   const handleReset = () => {
     form.reset(defaultActivityFilters);
+    onFiltersChange(defaultActivityFilters);
     onReset?.();
   };
 
@@ -173,7 +174,7 @@ export function ActivityFilters({ onFiltersChange, initialValues, onReset }: Act
         />
 
         {hasChanges && (
-          <Button variant="ghost" size="sm" onClick={handleReset}>
+          <Button variant="ghost" size="sm" className="h-[28px]" onClick={handleReset}>
             Reset
           </Button>
         )}

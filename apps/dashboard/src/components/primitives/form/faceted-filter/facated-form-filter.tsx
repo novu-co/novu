@@ -96,6 +96,16 @@ export function FacetedFormFilter({
     );
   };
 
+  const isEmpty = type === 'text' ? !currentValue : selectedValues.size === 0;
+
+  const shouldShowClear = React.useMemo(() => {
+    if (hideClear) return false;
+    if (type === 'text') return Boolean(currentValue);
+    if (type === 'multi' || type === 'single') return !isEmpty;
+
+    return false;
+  }, [hideClear, type, currentValue, isEmpty]);
+
   const renderContent = () => {
     const commonProps = {
       inputRef,
@@ -103,7 +113,7 @@ export function FacetedFormFilter({
       size,
       onClear: handleClear,
       hideSearch,
-      hideClear,
+      hideClear: !shouldShowClear,
     };
 
     if (type === 'text') {
@@ -128,8 +138,6 @@ export function FacetedFormFilter({
 
     return type === 'single' ? <SingleFilterContent {...filterProps} /> : <MultiFilterContent {...filterProps} />;
   };
-
-  const isEmpty = type === 'text' ? !currentValue : selectedValues.size === 0;
 
   return (
     <Popover open={open} onOpenChange={onOpenChange}>

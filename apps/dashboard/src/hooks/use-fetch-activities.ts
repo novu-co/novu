@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { getActivityList, IActivityFilters } from '@/api/activity';
+import { getActivityList, ActivityFilters } from '@/api/activity';
 import { useEnvironment } from '../context/environment/hooks';
 import { IActivity } from '@novu/shared';
 
 interface UseActivitiesOptions {
-  filters?: IActivityFilters;
+  filters?: ActivityFilters;
   page?: number;
   limit?: number;
 }

@@ -26,7 +26,7 @@ export function ActivityEmptyState({ className, emptySearchResults, onClearFilte
     <AnimatePresence mode="wait">
       <motion.div
         key="empty-state"
-        className={cn('flex h-full w-full items-center justify-center', className)}
+        className={cn('flex h-full w-full items-center justify-center border-t border-t-neutral-200', className)}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}

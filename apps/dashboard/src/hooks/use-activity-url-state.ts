@@ -1,13 +1,13 @@
 import { useSearchParams } from 'react-router-dom';
 import { useCallback, useMemo } from 'react';
 import { IActivity, ChannelTypeEnum } from '@novu/shared';
-import { IActivityFilters } from '@/api/activity';
-import { IActivityFiltersData, IActivityUrlState } from '@/types/activity';
+import { ActivityFilters } from '@/api/activity';
+import { ActivityFiltersData, ActivityUrlState } from '@/types/activity';
 
 const DEFAULT_DATE_RANGE = '30d';
 
-function parseFilters(searchParams: URLSearchParams): IActivityFilters {
-  const result: IActivityFilters = {};
+function parseFilters(searchParams: URLSearchParams): ActivityFilters {
+  const result: ActivityFilters = {};
 
   const channels = searchParams.get('channels')?.split(',').filter(Boolean);
   if (channels?.length) {
@@ -48,19 +48,19 @@ function getDateRangeInDays(range: string): number {
   }
 }
 
-function parseFilterValues(searchParams: URLSearchParams): IActivityFiltersData {
+function parseFilterValues(searchParams: URLSearchParams): ActivityFiltersData {
   return {
     dateRange: searchParams.get('dateRange') || DEFAULT_DATE_RANGE,
     channels: (searchParams.get('channels')?.split(',').filter(Boolean) as ChannelTypeEnum[]) || [],
-    workflows: searchParams.get('templates')?.split(',').filter(Boolean) || [],
+    workflows: searchParams.get('workflows')?.split(',').filter(Boolean) || [],
     transactionId: searchParams.get('transactionId') || '',
     subscriberId: searchParams.get('subscriberId') || '',
   };
 }
 
-export function useActivityUrlState(): IActivityUrlState & {
+export function useActivityUrlState(): ActivityUrlState & {
   handleActivitySelect: (activity: IActivity) => void;
-  handleFiltersChange: (data: IActivityFiltersData) => void;
+  handleFiltersChange: (data: ActivityFiltersData) => void;
 } {
   const [searchParams, setSearchParams] = useSearchParams();
   const activityItemId = searchParams.get('activityItemId');
@@ -80,9 +80,9 @@ export function useActivityUrlState(): IActivityUrlState & {
   );
 
   const handleFiltersChange = useCallback(
-    (data: IActivityFiltersData) => {
+    (data: ActivityFiltersData) => {
       setSearchParams((prev) => {
-        ['channels', 'templates', 'transactionId', 'subscriberId', 'dateRange'].forEach((key) => prev.delete(key));
+        ['channels', 'workflows', 'transactionId', 'subscriberId', 'dateRange'].forEach((key) => prev.delete(key));
 
         if (data.channels?.length) {
           prev.set('channels', data.channels.join(','));

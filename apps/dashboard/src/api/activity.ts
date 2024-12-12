@@ -1,7 +1,7 @@
 import { IActivity, IEnvironment } from '@novu/shared';
 import { get } from './api.client';
 
-export interface IActivityFilters {
+export type ActivityFilters = {
   channels?: string[];
   workflows?: string[];
   email?: string;
@@ -9,7 +9,7 @@ export interface IActivityFilters {
   transactionId?: string;
   startDate?: string;
   endDate?: string;
-}
+};
 
 interface ActivityResponse {
   data: IActivity[];
@@ -20,7 +20,7 @@ interface ActivityResponse {
 export function getActivityList(
   environment: IEnvironment,
   page = 0,
-  filters?: IActivityFilters,
+  filters?: ActivityFilters,
   signal?: AbortSignal
 ): Promise<ActivityResponse> {
   const searchParams = new URLSearchParams();

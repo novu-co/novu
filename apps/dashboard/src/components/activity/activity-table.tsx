@@ -10,7 +10,7 @@ import { ActivityEmptyState } from './activity-empty-state';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowPagination } from './components/arrow-pagination';
 import { useEffect } from 'react';
-import { IActivityFilters } from '@/api/activity';
+import { ActivityFilters } from '@/api/activity';
 import { useFetchActivities } from '../../hooks/use-fetch-activities';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/primitives/skeleton';
@@ -18,7 +18,7 @@ import { Skeleton } from '@/components/primitives/skeleton';
 export interface ActivityTableProps {
   selectedActivityId: string | null;
   onActivitySelect: (activity: IActivity) => void;
-  filters?: IActivityFilters;
+  filters?: ActivityFilters;
   hasActiveFilters: boolean;
   onClearFilters: () => void;
 }

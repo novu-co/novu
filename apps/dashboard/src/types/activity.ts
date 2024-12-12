@@ -1,16 +1,16 @@
 import { ChannelTypeEnum } from '@novu/shared';
-import { IActivityFilters } from '@/api/activity';
+import { ActivityFilters } from '@/api/activity';
 
-export interface IActivityFiltersData {
+export type ActivityFiltersData = {
   dateRange: string;
   channels: ChannelTypeEnum[];
   workflows: string[];
   transactionId: string;
   subscriberId: string;
-}
+};
 
-export interface IActivityUrlState {
+export type ActivityUrlState = {
   activityItemId: string | null;
-  filters: IActivityFilters;
-  filterValues: IActivityFiltersData;
-}
+  filters: ActivityFilters;
+  filterValues: ActivityFiltersData;
+};
