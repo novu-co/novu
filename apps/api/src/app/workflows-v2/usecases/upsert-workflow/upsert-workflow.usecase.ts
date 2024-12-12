@@ -29,7 +29,6 @@ import {
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { stepTypeToControlSchema } from '../../shared';
-import { PatchStepUsecase } from '../patch-step-data';
 import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
 import { GetWorkflowCommand, GetWorkflowUseCase } from '../get-workflow';
 import { UpsertWorkflowDataCommand } from './upsert-workflow-data.command';
@@ -48,22 +47,19 @@ export class UpsertWorkflowUseCase {
   @InstrumentUsecase()
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
     const workflowForUpdate = await this.queryWorkflow(command);
-    let persistedWorkflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
-    persistedWorkflow = await this.upsertControlValues(persistedWorkflow, command);
+    const persistedWorkflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
     const validatedWorkflowWithIssues = await this.workflowUpdatePostProcess.execute({
       user: command.user,
       workflow: persistedWorkflow,
     });
     await this.persistWorkflow(validatedWorkflowWithIssues);
 
-    const workflow = await this.getWorkflowUseCase.execute(
+    return await this.getWorkflowUseCase.execute(
       GetWorkflowCommand.create({
         workflowIdOrInternalId: validatedWorkflowWithIssues._id,
         user: command.user,
       })
     );
-
-    return workflow;
   }
 
   @Instrument()
@@ -285,44 +281,6 @@ export class UpsertWorkflowUseCase {
         '_id'
       )
     )?._id;
-  }
-
-  /**
-   * @deprecated This method will be removed in future versions.
-   * Please use `the patch step data instead, do not add here anything` instead.
-   */
-  @Instrument()
-  private async upsertControlValues(
-    workflow: NotificationTemplateEntity,
-    command: UpsertWorkflowCommand
-  ): Promise<WorkflowInternalResponseDto> {
-    for (const step of workflow.steps) {
-      const controlValues = this.findControlValueInRequest(step, command.workflowDto.steps);
-      if (!controlValues) {
-        continue;
-      }
-      await this.patchStepDataUsecase.execute({
-        controlValues,
-        workflowIdOrInternalId: workflow._id,
-        stepIdOrInternalId: step._templateId,
-        user: command.user,
-      });
-    }
-
-    return await this.getWorkflow(workflow._id, command);
-  }
-
-  private findControlValueInRequest(
-    step: NotificationStepEntity,
-    steps: (StepCreateDto | StepUpdateDto)[] | StepCreateDto[]
-  ): Record<string, unknown> | undefined {
-    return steps.find((stepRequest) => {
-      if (this.isStepUpdateDto(stepRequest)) {
-        return stepRequest._id === step._templateId;
-      }
-
-      return stepRequest.name === step.name;
-    })?.controlValues;
   }
 }
 

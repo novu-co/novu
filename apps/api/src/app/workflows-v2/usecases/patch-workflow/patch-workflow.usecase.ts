@@ -1,78 +1,51 @@
-import { Injectable } from '@nestjs/common';
-import { UserSessionData, WorkflowResponseDto } from '@novu/shared';
-import { NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
-import { GetWorkflowByIdsUseCase, WorkflowInternalResponseDto } from '@novu/application-generic';
-import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { WorkflowResponseDto } from '@novu/shared';
+import { NotificationTemplateRepository } from '@novu/dal';
 import { PatchWorkflowCommand } from './patch-workflow.command';
 import { GetWorkflowUseCase } from '../get-workflow';
 
 @Injectable()
 export class PatchWorkflowUsecase {
   constructor(
-    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private notificationTemplateRepository: NotificationTemplateRepository,
-    private postProcessWorkflowUpdate: PostProcessWorkflowUpdate,
     private getWorkflowUseCase: GetWorkflowUseCase
   ) {}
 
+  // NOTICE: The TODOS in this usecase explore a different way to fetch and update a resource, leveraging model classes
   async execute(command: PatchWorkflowCommand): Promise<WorkflowResponseDto> {
-    const persistedWorkflow = await this.fetchWorkflow(command);
-    let transientWorkflow = this.patchWorkflowFields(persistedWorkflow, command);
-
-    transientWorkflow = await this.postProcessWorkflowUpdate.execute({
-      workflow: transientWorkflow,
-      user: command.user,
+    // TODO: Return a Mongoose model
+    const workflow = await this.notificationTemplateRepository.findOne({
+      _id: command.workflowIdOrInternalId,
+      _environmentId: command.user.environmentId,
     });
-    await this.persistWorkflow(transientWorkflow, command.user);
 
+    if (!workflow) {
+      throw new NotFoundException({
+        message: 'Workflow cannot be found',
+        workflowId: command.workflowIdOrInternalId,
+      });
+    }
+
+    if (typeof command.active === 'boolean') {
+      workflow.active = command.active;
+    }
+
+    // TODO: Update the workflow using the Mongoose model.save()
+    await this.notificationTemplateRepository.update(
+      {
+        _id: workflow._id,
+        _environmentId: command.user.environmentId,
+      },
+      workflow
+    );
+
+    /*
+     * TODO: Convert to a serializer that also enriches the workflow with necessary data from other collections
+     * such as preferences, message templates, etc...
+     */
     return await this.getWorkflowUseCase.execute({
       workflowIdOrInternalId: command.workflowIdOrInternalId,
       user: command.user,
-    });
-  }
-
-  private patchWorkflowFields(
-    persistedWorkflow: WorkflowInternalResponseDto,
-    command: PatchWorkflowCommand
-  ): WorkflowInternalResponseDto {
-    const transientWorkflow = { ...persistedWorkflow };
-    if (command.active !== undefined && command.active !== null) {
-      transientWorkflow.active = command.active;
-    }
-
-    if (command.name !== undefined && command.name !== null) {
-      transientWorkflow.name = command.name;
-    }
-
-    if (command.description !== undefined && command.description !== null) {
-      transientWorkflow.description = command.description;
-    }
-
-    if (command.tags !== undefined && command.tags !== null) {
-      transientWorkflow.tags = command.tags;
-    }
-
-    return transientWorkflow;
-  }
-
-  private async persistWorkflow(workflowWithIssues: NotificationTemplateEntity, userSessionData: UserSessionData) {
-    await this.notificationTemplateRepository.update(
-      {
-        _id: workflowWithIssues._id,
-        _environmentId: userSessionData.environmentId,
-      },
-      {
-        ...workflowWithIssues,
-      }
-    );
-  }
-
-  private async fetchWorkflow(command: PatchWorkflowCommand): Promise<WorkflowInternalResponseDto> {
-    return await this.getWorkflowByIdsUseCase.execute({
-      workflowIdOrInternalId: command.workflowIdOrInternalId,
-      environmentId: command.user.environmentId,
-      organizationId: command.user.organizationId,
-      userId: command.user._id,
     });
   }
 }
