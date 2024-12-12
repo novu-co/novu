@@ -22,9 +22,8 @@ describe('Set Integration As Primary - /integrations/:integrationId/set-primary 
     const fakeIntegrationId = 'fakeIntegrationId';
 
     const { body } = await session.testAgent.post(`/v1/integrations/${fakeIntegrationId}/set-primary`).send({});
-
     expect(body.statusCode).to.equal(400);
-    expect(body.message[0]).to.equal(`integrationId must be a mongodb id`);
+    expect(body.cause.integrationId.messages[0]).to.equal(`integrationId must be a mongodb id`);
   });
 
   it('when integration does not exist should throw not found exception', async () => {

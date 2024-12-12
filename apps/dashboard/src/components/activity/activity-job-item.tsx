@@ -10,6 +10,7 @@ import { ExecutionDetailItem } from './execution-detail-item';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { STEP_TYPE_TO_COLOR } from '../../utils/color';
 import { JOB_STATUS_CONFIG } from './constants';
+import { TimeDisplayHoverCard } from '../time-display-hover-card';
 
 interface ActivityJobItemProps {
   job: IActivityJob;
@@ -66,7 +67,9 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
             <div className="flex items-center justify-between">
               <span className="text-foreground-400 max-w-[300px] truncate pr-2 text-xs">{getStatusMessage(job)}</span>
               <Badge variant="soft" className="bg-foreground-50 shrink-0 px-2 py-0.5 text-[11px] leading-3">
-                {format(new Date(job.updatedAt), 'MMM d yyyy, HH:mm:ss')}
+                <TimeDisplayHoverCard date={new Date(job.updatedAt)}>
+                  {format(new Date(job.updatedAt), 'MMM d yyyy, HH:mm:ss')}
+                </TimeDisplayHoverCard>
               </Badge>
             </div>
           </CardContent>

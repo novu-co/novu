@@ -1,5 +1,6 @@
 import { OrganizationSwitcher as ClerkOrganizationSwitcher } from '@clerk/clerk-react';
 import type { OrganizationSwitcherTheme } from '@clerk/types';
+import { ROUTES } from '../../utils/routes';
 
 const OrganizationSwitcherAppearance: OrganizationSwitcherTheme = {
   elements: {
@@ -11,19 +12,28 @@ const OrganizationSwitcherAppearance: OrganizationSwitcherTheme = {
     organizationSwitcherPopoverActionButton__manageOrganization: {
       display: 'none',
     },
+    organizationSwitcherPopoverInvitationActionsBox: 'p-0 pr-2',
+    organizationSwitcherInvitationAcceptButton: '!text-[10px] !min-w-[90px] !w-[90px] px-0',
     organizationPreviewMainIdentifier: 'text-foreground-950 text-base',
     organizationPreviewAvatarContainer: 'size-6 rounded-full',
     organizationPreviewAvatarBox: 'rounded-full size-6',
-    organizationPreview: 'py-1.5 px-4 gap-2',
-    organizationSwitcherPopoverActionButton: 'py-1.5 px-4 -ml-1.5 text-sm gap-0',
+    organizationPreview: 'py-1.5 px-2 gap-2',
+    organizationSwitcherPopoverActionButton: 'py-1 px-2 -ml-1.5 text-sm gap-0',
     organizationSwitcherPopoverCard: 'w-64',
     organizationSwitcherPreviewButton: 'p-0 [&>svg]:mr-2 !border-0',
     organizationPreviewSecondaryIdentifier: 'hidden',
     organizationSwitcherPopoverActions:
-      'py-2 [&_.cl-organizationPreviewMainIdentifier]:text-sm [&>div:nth-child(2)]:!border-0',
+      'py-0.5 [&_.cl-organizationPreviewMainIdentifier]:text-sm [&>div:nth-child(2)]:!border-0',
   },
 };
 
 export const OrganizationDropdown = () => {
-  return <ClerkOrganizationSwitcher hidePersonal appearance={OrganizationSwitcherAppearance} />;
+  return (
+    <ClerkOrganizationSwitcher
+      hidePersonal
+      skipInvitationScreen
+      afterCreateOrganizationUrl={ROUTES.USECASE_SELECT + '?v2_opt_in=true'}
+      appearance={OrganizationSwitcherAppearance}
+    />
+  );
 };

@@ -1,33 +1,50 @@
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { ActivityTable } from '@/components/activity/activity-table';
-import { cn } from '@/utils/ui';
+import { ActivityFilters, defaultActivityFilters } from '@/components/activity/activity-filters';
 import { motion, AnimatePresence } from 'motion/react';
 import { ActivityPanel } from '@/components/activity/activity-panel';
 import { Badge } from '../components/primitives/badge';
-import { useSearchParams } from 'react-router-dom';
-import { IActivity } from '@novu/shared';
 import { PageMeta } from '../components/page-meta';
+import { useActivityUrlState } from '@/hooks/use-activity-url-state';
+import { useDebounce } from '@/hooks/use-debounce';
+import { useSearchParams } from 'react-router-dom';
 
 export function ActivityFeed() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const activityItemId = searchParams.get('activityItemId');
 
-  const handleActivitySelect = (activity: IActivity) => {
-    setSearchParams((prev) => {
-      if (activity._id === activityItemId) {
-        prev.delete('activityItemId');
-      } else {
-        prev.set('activityItemId', activity._id);
-      }
-      return prev;
-    });
+  const {
+    activityItemId,
+    filters,
+    filterValues,
+    handleActivitySelect,
+    handleFiltersChange: handleFiltersChangeRaw,
+  } = useActivityUrlState();
+
+  const handleFiltersChange = useDebounce(handleFiltersChangeRaw, 500);
+
+  const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
+    // Ignore endDate as it's always present
+    if (key === 'endDate') return false;
+
+    // For arrays, check if they have any items
+    if (Array.isArray(value)) return value.length > 0;
+    // For other values, check if they exist
+    return !!value;
+  });
+
+  const handleClearFilters = () => {
+    handleFiltersChange(defaultActivityFilters);
   };
 
   const handleActivityPanelSelect = (activityId: string) => {
-    setSearchParams((prev) => {
-      prev.set('activityItemId', activityId);
-      return prev;
-    });
+    setSearchParams(
+      (prev) => {
+        prev.set('activityItemId', activityId);
+
+        return prev;
+      },
+      { replace: true }
+    );
   };
 
   return (
@@ -43,33 +60,40 @@ export function ActivityFeed() {
           </h1>
         }
       >
-        <div className="relative mt-10 flex h-[calc(100vh-88px)]">
+        <ActivityFilters
+          onFiltersChange={handleFiltersChange}
+          initialValues={filterValues}
+          onReset={handleClearFilters}
+        />
+        <div className="relative flex h-[calc(100vh-88px)]">
           <motion.div
-            layout="position"
             transition={{
-              layout: { duration: 0.4, ease: 'easeInOut' },
+              duration: 0.2,
+              ease: [0.32, 0.72, 0, 1],
             }}
-            className={cn('h-full flex-1', activityItemId ? 'w-[65%]' : 'w-full')}
+            className="h-full flex-1"
+            style={{
+              width: activityItemId ? '65%' : '100%',
+            }}
           >
             <ActivityTable
               selectedActivityId={activityItemId}
               onActivitySelect={handleActivitySelect}
-              hasActiveFilters={false}
-              onClearFilters={() => {}}
+              filters={filters}
+              hasActiveFilters={hasActiveFilters}
+              onClearFilters={handleClearFilters}
             />
           </motion.div>
 
-          <AnimatePresence mode="sync">
+          <AnimatePresence mode="wait">
             {activityItemId && (
               <motion.div
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: '35%', opacity: 1 }}
-                exit={{ width: 0, opacity: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{
-                  duration: 0.4,
-                  ease: 'easeInOut',
+                  duration: 0.2,
                 }}
-                className="bg-background min-h-full w-[500px] overflow-auto border-l"
+                className="bg-background h-full w-[35%] overflow-auto border-l"
               >
                 <ActivityPanel activityId={activityItemId} onActivitySelect={handleActivityPanelSelect} />
               </motion.div>

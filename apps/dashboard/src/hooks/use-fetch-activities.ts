@@ -1,11 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { getActivityList, IActivityFilters } from '@/api/activity';
+import { getActivityList, ActivityFilters } from '@/api/activity';
 import { useEnvironment } from '../context/environment/hooks';
-import { useSearchParams } from 'react-router-dom';
 import { IActivity } from '@novu/shared';
 
 interface UseActivitiesOptions {
-  filters?: IActivityFilters;
+  filters?: ActivityFilters;
+  page?: number;
+  limit?: number;
+  staleTime?: number;
+  refetchOnWindowFocus?: boolean;
 }
 
 interface ActivityResponse {
@@ -15,19 +18,21 @@ interface ActivityResponse {
 }
 
 export function useFetchActivities(
-  { filters }: UseActivitiesOptions = {},
-  { enabled = true, refetchInterval = false }: { enabled?: boolean; refetchInterval?: number | false } = {}
+  { filters, page }: UseActivitiesOptions = {},
+  {
+    enabled = true,
+    refetchInterval = false,
+    refetchOnWindowFocus = false,
+    staleTime = 0,
+  }: { enabled?: boolean; refetchInterval?: number | false; refetchOnWindowFocus?: boolean; staleTime?: number } = {}
 ) {
   const { currentEnvironment } = useEnvironment();
-  const [searchParams] = useSearchParams();
-
-  const page = parseInt(searchParams.get('page') || '0');
-  const limit = parseInt(searchParams.get('limit') || '10');
 
   const { data, ...rest } = useQuery<ActivityResponse>({
-    queryKey: ['activitiesList', currentEnvironment?._id, page, limit, filters],
-    queryFn: () => getActivityList(currentEnvironment!, page, filters),
-    staleTime: 0,
+    queryKey: ['activitiesList', currentEnvironment?._id, page, filters],
+    queryFn: ({ signal }) => getActivityList(currentEnvironment!, page, filters, signal),
+    staleTime,
+    refetchOnWindowFocus,
     refetchInterval,
     enabled: enabled && !!currentEnvironment,
   });
@@ -35,7 +40,6 @@ export function useFetchActivities(
   return {
     activities: data?.data || [],
     hasMore: data?.hasMore || false,
-    pageSize: limit,
     ...rest,
     page,
   };

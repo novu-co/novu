@@ -5,6 +5,7 @@ import { DelayTimeControlSchema, delayUiSchema } from './schemas/delay-control.s
 import { DigestOutputJsonSchema, digestUiSchema } from './schemas/digest-control.schema';
 import { smsStepControl } from './schemas/sms-control.schema';
 import { chatStepControl } from './schemas/chat-control.schema';
+import { pushStepControl } from './schemas/push-control.schema';
 
 export const PERMISSIVE_EMPTY_SCHEMA = {
   type: 'object',
@@ -27,7 +28,8 @@ export const stepTypeToControlSchema: Record<ChannelStepEnum | ActionStepEnum, C
     uiSchema: smsStepControl.uiSchema,
   },
   [ChannelStepEnum.PUSH]: {
-    schema: channelStepSchemas[ChannelStepEnum.PUSH].output as unknown as JSONSchemaDto,
+    schema: pushStepControl.schema,
+    uiSchema: pushStepControl.uiSchema,
   },
   [ChannelStepEnum.CHAT]: {
     schema: chatStepControl.schema,

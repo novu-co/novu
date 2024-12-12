@@ -1,12 +1,12 @@
-import { Route } from 'lucide-react';
 import { motion } from 'motion/react';
-import { RiPlayCircleLine } from 'react-icons/ri';
+import { RiPlayCircleLine, RiRouteFill } from 'react-icons/ri';
+import { ActivityJobItem } from './activity-job-item';
 import { InlineToast } from '../primitives/inline-toast';
 import { useFetchActivity } from '@/hooks/use-fetch-activity';
 import { ActivityOverview } from './components/activity-overview';
 import { cn } from '../../utils/ui';
 import { IActivityJob } from '@novu/shared';
-import { ActivityJobItem } from './activity-job-item';
+import { Skeleton } from '../primitives/skeleton';
 
 export interface ActivityPanelProps {
   activityId: string;
@@ -34,7 +34,7 @@ export function ActivityPanel({
   if (error || !activity) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-        <div className="flex h-96 items-center justify-center">
+        <div className="flex h-96 items-center justify-center border-t border-neutral-200">
           <div className="text-foreground-600 text-sm">Failed to load activity details</div>
         </div>
       </motion.div>
@@ -59,7 +59,7 @@ export function ActivityPanel({
             overviewHeaderClassName
           )}
         >
-          <Route className="h-3 w-3" />
+          <RiRouteFill className="h-3 w-3" />
           <span className="text-foreground-950 text-sm font-medium">
             {activity.template?.name || 'Deleted workflow'}
           </span>
@@ -104,36 +104,36 @@ function LogsSection({ jobs }: { jobs: IActivityJob[] }): JSX.Element {
 
 function LoadingSkeleton() {
   return (
-    <div className="animate-pulse">
+    <div>
       <div className="flex items-center gap-2 border-b border-t border-neutral-200 border-b-neutral-100 p-2">
-        <div className="h-3 w-3 rounded-full bg-neutral-200" />
-        <div className="h-[20px] w-32 rounded bg-neutral-200" />
+        <Skeleton className="h-3 w-3 rounded-full" />
+        <Skeleton className="h-[20px] w-32" />
       </div>
 
       <div className="px-3 py-2">
         <div className="flex flex-col gap-3">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="flex items-center justify-between">
-              <div className="h-3 w-24 rounded bg-neutral-200" />
-              <div className="h-3 w-32 rounded bg-neutral-200" />
+              <Skeleton className="h-3 w-24" />
+              <Skeleton className="h-3 w-32" />
             </div>
           ))}
         </div>
       </div>
 
       <div className="flex items-center gap-2 border-b border-t border-neutral-100 p-2">
-        <div className="h-3 w-3 rounded-full bg-neutral-200" />
-        <div className="h-4 w-16 rounded bg-neutral-200" />
+        <Skeleton className="h-3 w-3 rounded-full" />
+        <Skeleton className="h-4 w-16" />
       </div>
 
       <div className="flex flex-col gap-6 bg-white p-3">
         {[...Array(2)].map((_, i) => (
           <div key={i} className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <div className="h-4 w-40 rounded bg-neutral-200" />
-              <div className="h-4 w-24 rounded bg-neutral-200" />
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-4 w-24" />
             </div>
-            <div className="h-16 w-full rounded bg-neutral-100" />
+            <Skeleton className="h-16 w-full" />
           </div>
         ))}
       </div>

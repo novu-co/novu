@@ -131,7 +131,13 @@ export const AddStepMenu = ({
             <MenuGroup>
               <MenuTitle>Action Steps</MenuTitle>
               <MenuItemsGroup>
-                <MenuItem stepType={StepTypeEnum.DIGEST}>Digest</MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.DIGEST}
+                  disabled={!areNewStepsEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.DIGEST)}
+                >
+                  Digest
+                </MenuItem>
                 <MenuItem
                   stepType={StepTypeEnum.DELAY}
                   disabled={!areNewStepsEnabled}
