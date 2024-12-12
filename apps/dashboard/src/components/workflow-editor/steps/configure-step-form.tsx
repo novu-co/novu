@@ -38,7 +38,7 @@ import {
   AUTOCOMPLETE_PASSWORD_MANAGERS_OFF,
   INLINE_CONFIGURABLE_STEP_TYPES,
   TEMPLATE_CONFIGURABLE_STEP_TYPES,
-  STEP_NAME_BY_TYPE,
+  STEP_TYPE_LABELS,
 } from '@/utils/constants';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
@@ -284,7 +284,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                   type="button"
                 >
                   <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
-                  Configure {STEP_NAME_BY_TYPE[step.type]} template{' '}
+                  Configure {STEP_TYPE_LABELS[step.type]} Step template{' '}
                   <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
                 </Button>
               </Link>

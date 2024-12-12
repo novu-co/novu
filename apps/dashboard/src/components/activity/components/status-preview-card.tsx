@@ -1,8 +1,9 @@
 import { format } from 'date-fns';
 import { cn } from '@/utils/ui';
 import { STEP_TYPE_TO_ICON } from '@/components/icons/utils';
-import { JOB_STATUS_CONFIG, STEP_TYPE_LABELS } from '../constants';
+import { JOB_STATUS_CONFIG } from '../constants';
 import { IActivityJob, JobStatusEnum, StepTypeEnum } from '@novu/shared';
+import { STEP_TYPE_LABELS } from '@/utils/constants';
 
 function getStepIcon(type?: StepTypeEnum) {
   const Icon = STEP_TYPE_TO_ICON[type as keyof typeof STEP_TYPE_TO_ICON];
