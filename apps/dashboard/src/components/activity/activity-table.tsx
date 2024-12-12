@@ -19,9 +19,17 @@ export interface ActivityTableProps {
   selectedActivityId: string | null;
   onActivitySelect: (activity: IActivity) => void;
   filters?: IActivityFilters;
+  hasActiveFilters: boolean;
+  onClearFilters: () => void;
 }
 
-export function ActivityTable({ selectedActivityId, onActivitySelect, filters }: ActivityTableProps) {
+export function ActivityTable({
+  selectedActivityId,
+  onActivitySelect,
+  filters,
+  hasActiveFilters,
+  onClearFilters,
+}: ActivityTableProps) {
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -89,8 +97,6 @@ export function ActivityTable({ selectedActivityId, onActivitySelect, filters }:
                       'bg-neutral-50 after:absolute after:right-0 after:top-0 after:h-[calc(100%-1px)] after:w-[5px] after:bg-neutral-200'
                   )}
                   onClick={() => onActivitySelect(activity)}
-                  onMouseEnter={() => handleRowMouseEnter(activity)}
-                  onMouseLeave={handleRowMouseLeave}
                 >
                   <TableCell className="px-3">
                     <div className="flex flex-col">
