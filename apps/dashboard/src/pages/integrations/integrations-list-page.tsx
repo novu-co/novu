@@ -51,13 +51,13 @@ export function IntegrationsListPage() {
       }
     >
       <Tabs defaultValue="providers">
-        <div className="border-neutral-alpha-200 flex items-center justify-between border-b border-t">
+        <div className="border-neutral-alpha-200 flex items-center justify-between border-b">
           <TabsList variant="regular" className="border-b-0 border-t-2 border-transparent p-0 !px-3">
             <TabsTrigger value="providers" variant="regular">
               Providers
             </TabsTrigger>
             <TabsTrigger value="data-warehouse" variant="regular" disabled>
-              Data Warehouse{' '}
+              Data{' '}
               <Badge kind="pill" size="2xs">
                 SOON
               </Badge>

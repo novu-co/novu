@@ -11,22 +11,12 @@ interface IntegrationSheetProps {
   step?: 'select' | 'configure';
   onBack?: () => void;
   children: ReactNode;
-  maxWidth?: 'lg' | 'xl';
 }
 
-export function IntegrationSheet({
-  isOpened,
-  onClose,
-  provider,
-  mode,
-  step,
-  onBack,
-  children,
-  maxWidth = 'lg',
-}: IntegrationSheetProps) {
+export function IntegrationSheet({ isOpened, onClose, provider, mode, step, onBack, children }: IntegrationSheetProps) {
   return (
     <Sheet open={isOpened} onOpenChange={onClose}>
-      <SheetContent className={`flex w-full flex-col sm:max-w-${maxWidth}`}>
+      <SheetContent className={`w-auto min-w-[460px] flex-col`}>
         <IntegrationSheetHeader provider={provider} mode={mode} step={step} onBack={onBack} />
         {children}
       </SheetContent>

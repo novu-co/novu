@@ -76,7 +76,7 @@ export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: U
 
   return (
     <>
-      <IntegrationSheet isOpened={isOpened} onClose={onClose} provider={provider} mode="update" maxWidth="xl">
+      <IntegrationSheet isOpened={isOpened} onClose={onClose} provider={provider} mode="update">
         <div className="scrollbar-custom flex-1 overflow-y-auto">
           <IntegrationConfiguration
             provider={provider}

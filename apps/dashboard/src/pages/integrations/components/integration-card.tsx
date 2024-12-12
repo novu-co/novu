@@ -1,7 +1,7 @@
 import { Badge } from '@/components/primitives/badge';
 import { Button } from '@/components/primitives/button';
 import { cn } from '@/lib/utils';
-import { RiCheckboxCircleFill, RiGitBranchFill, RiStarSmileFill, RiSettings4Line } from 'react-icons/ri';
+import { RiCheckboxCircleFill, RiGitBranchFill, RiSettings4Line, RiStarSmileLine } from 'react-icons/ri';
 import { ITableIntegration } from '../types';
 import type { IEnvironment, IIntegration, IProviderConfig } from '@novu/shared';
 import { useNavigate } from 'react-router-dom';
@@ -44,14 +44,14 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
   return (
     <div
       className={cn(
-        'bg-card group relative flex cursor-pointer flex-col gap-2 overflow-hidden rounded-xl border p-3 transition-all hover:shadow-lg',
+        'bg-card group relative flex min-h-[125px] cursor-pointer flex-col gap-2 overflow-hidden rounded-xl border p-3 transition-all hover:shadow-lg',
         !integration.active && 'opacity-75 grayscale'
       )}
       onClick={handleConfigureClick}
       data-test-id={`integration-${integration._id}-row`}
     >
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5">
           <div className="relative h-6 w-6">
             <ProviderIcon
               providerId={provider.id}
@@ -62,22 +62,23 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
           <span className="text-sm font-medium">{integration.name}</span>
         </div>
         {integration.primary && (
-          <Badge variant={'neutral'} className="bg-feature/10 text-feature">
-            <RiStarSmileFill className="text-feature h-4 w-4" />
-            Primary
-          </Badge>
+          <Tooltip>
+            <TooltipTrigger>
+              <RiStarSmileLine className="text-feature h-4 w-4" />
+            </TooltipTrigger>
+            <TooltipContent>This is your primary integration for the {provider.channel} channel.</TooltipContent>
+          </Tooltip>
         )}
       </div>
       <div className="flex items-center gap-2">
-        <div className="inline-block rounded-md bg-neutral-50 px-1.5 py-[3px] font-mono text-xs leading-4 text-neutral-400">
-          {integration.identifier}
-        </div>
         {isDemo && (
           <Tooltip>
-            <TooltipTrigger>
-              <Badge variant="warning" className="h-[22px] text-xs text-[#F6B51E]">
-                DEMO
-              </Badge>
+            <TooltipTrigger className="flex h-[16px] items-center gap-1">
+              <span className="flex h-[16px] items-center gap-1">
+                <Badge variant="warning" className="text-2xs h-[16px] rounded-sm text-[#F6B51E]">
+                  DEMO
+                </Badge>
+              </span>
             </TooltipTrigger>
             <TooltipContent>
               <p>
@@ -89,7 +90,7 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
         )}
       </div>
 
-      <div className="mt-4 flex items-center gap-2">
+      <div className="mt-auto flex items-center gap-2">
         {integration.channel === 'in_app' && !integration.connected ? (
           <Button size="xs" className="h-[26px]" variant="outline" onClick={handleConfigureClick}>
             <RiSettings4Line className="h-4 w-4" />
