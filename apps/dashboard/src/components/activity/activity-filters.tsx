@@ -76,7 +76,7 @@ export function ActivityFilters({ onFiltersChange, initialValues, onReset }: IAc
 
   return (
     <Form {...form}>
-      <form className="flex items-center gap-2 p-2.5">
+      <form className="flex items-center gap-2 p-2 py-[11px]">
         <FormField
           control={form.control}
           name="dateRange"

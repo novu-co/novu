@@ -56,13 +56,12 @@ export function ActivityFeed() {
           </h1>
         }
       >
-        <div className="relative mt-10 flex h-[calc(100vh-88px)]">
-          <ActivityFilters
-            onFiltersChange={handleFiltersChange}
-            initialValues={filterValues}
-            onReset={handleClearFilters}
-          />
-
+        <ActivityFilters
+          onFiltersChange={handleFiltersChange}
+          initialValues={filterValues}
+          onReset={handleClearFilters}
+        />
+        <div className="relative flex h-[calc(100vh-88px)]">
           <motion.div
             layout
             transition={{
