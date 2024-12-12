@@ -5,22 +5,19 @@ import { zodToJsonSchema } from 'zod-to-json-schema';
 
 export const EmailStepControlZodSchema = z
   .object({
-    emailEditor: z.string(),
-    subject: z.string(),
+    body: z.string().optional().default(''),
+    subject: z.string().optional().default(''),
   })
-  .strict()
-  .required({
-    emailEditor: true,
-    subject: true,
-  });
+  .strict();
 
 export const emailStepControlSchema = zodToJsonSchema(EmailStepControlZodSchema) as JSONSchemaDto;
 
 export type EmailStepControlType = z.infer<typeof EmailStepControlZodSchema>;
+
 export const emailStepUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.EMAIL,
   properties: {
-    emailEditor: {
+    body: {
       component: UiComponentEnum.MAILY,
     },
     subject: {
