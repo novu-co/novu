@@ -12,6 +12,7 @@ import { EmailEditor } from '@/components/workflow-editor/steps/email/email-edit
 import { EmailEditorPreview } from '@/components/workflow-editor/steps/email/email-editor-preview';
 import { CustomStepControls } from '../controls/custom-step-controls';
 import { EmailTabsEditSection } from '@/components/workflow-editor/steps/email/email-tabs-section';
+import { WorkflowOriginEnum } from '@novu/shared';
 
 const tabsContentClassName = 'h-full w-full overflow-y-auto';
 
@@ -55,10 +56,16 @@ export const EmailTabs = (props: StepEditorProps) => {
       </header>
       <Separator />
       <TabsContent value="editor" className={tabsContentClassName}>
-        <EmailEditor uiSchema={uiSchema} />
-        <EmailTabsEditSection>
-          <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
-        </EmailTabsEditSection>
+        {workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && (
+          <EmailTabsEditSection>
+            <EmailEditor uiSchema={uiSchema} />
+          </EmailTabsEditSection>
+        )}
+        {workflow.origin === WorkflowOriginEnum.EXTERNAL && (
+          <EmailTabsEditSection>
+            <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
+          </EmailTabsEditSection>
+        )}
       </TabsContent>
       <TabsContent value="preview" className={tabsContentClassName}>
         <EmailEditorPreview workflow={workflow} step={step} formValues={form.getValues()} />

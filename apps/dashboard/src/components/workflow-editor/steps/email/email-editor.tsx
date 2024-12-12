@@ -1,7 +1,6 @@
 import { Separator } from '@/components/primitives/separator';
 import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
 import { EmailPreviewHeader } from '@/components/workflow-editor/steps/email/email-preview';
-import { EmailTabsEditSection } from '@/components/workflow-editor/steps/email/email-tabs-section';
 import { type UiSchema } from '@novu/shared';
 
 const subjectKey = 'subject';
@@ -14,13 +13,10 @@ export const EmailEditor = (props: EmailEditorProps) => {
 
   return (
     <>
-      <EmailPreviewHeader className="p-3" />
-      <EmailTabsEditSection>{subject && getComponentByType({ component: subject.component })}</EmailTabsEditSection>
-
+      <EmailPreviewHeader />
+      <div className="px-8 py-2">{getComponentByType({ component: subject.component })}</div>
       <Separator className="bg-neutral-100" />
-      <EmailTabsEditSection>
-        {emailEditor && getComponentByType({ component: emailEditor.component })}
-      </EmailTabsEditSection>
+      <div className="pl-6">{emailEditor && getComponentByType({ component: emailEditor.component })}</div>
     </>
   );
 };

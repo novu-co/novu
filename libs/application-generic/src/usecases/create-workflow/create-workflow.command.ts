@@ -36,6 +36,7 @@ import {
 } from '@novu/shared';
 
 import { Type } from 'class-transformer';
+import { RuntimeIssue } from '@novu/dal';
 import { EnvironmentWithUserCommand } from '../../commands';
 import { PreferencesRequired } from '../upsert-preferences';
 import {
@@ -139,11 +140,11 @@ export class CreateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsOptional()
   @IsString()
   triggerIdentifier?: string;
-
+  @IsObject()
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => ContentIssue)
-  issues?: Record<string, ContentIssue[]>;
+  issues?: Record<string, RuntimeIssue>;
 
   @IsEnum(WorkflowStatusEnum)
   @IsOptional()
@@ -253,6 +254,7 @@ export class NotificationStepVariantCommand implements IStepVariant {
   stepId?: string;
 
   @IsOptional()
+  @IsObject()
   @ValidateNested({ each: true })
   @Type(() => StepIssues)
   issues?: StepIssues;
