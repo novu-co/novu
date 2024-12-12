@@ -5,9 +5,9 @@ import { Loader2 } from 'lucide-react';
 import { WorkflowTriggerInboxIllustration } from '../../icons/workflow-trigger-inbox';
 import { useFetchActivities } from '../../../hooks/use-fetch-activities';
 
-interface TestWorkflowLogsSidebarProps {
+type TestWorkflowLogsSidebarProps = {
   transactionId?: string;
-}
+};
 
 export const TestWorkflowLogsSidebar = ({ transactionId }: TestWorkflowLogsSidebarProps) => {
   const [shouldRefetch, setShouldRefetch] = useState(true);
