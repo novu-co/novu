@@ -43,6 +43,7 @@ export interface InlineToastProps
   ctaLabel?: string;
   onCtaClick?: () => void;
   isCtaLoading?: boolean;
+  ctaClassName?: string;
 }
 
 export function InlineToast({
@@ -53,6 +54,7 @@ export function InlineToast({
   ctaLabel,
   onCtaClick,
   isCtaLoading,
+  ctaClassName,
   ...props
 }: InlineToastProps) {
   const barColorClass = VARIANT_COLORS[variant || 'tip'];
@@ -72,7 +74,7 @@ export function InlineToast({
         <Button
           variant="ghost"
           size="xs"
-          className={cn('shrink-0 p-0 text-xs font-medium hover:bg-transparent', buttonColorClass)}
+          className={cn('shrink-0 p-0 text-xs font-medium hover:bg-transparent', buttonColorClass, ctaClassName)}
           onClick={onCtaClick}
           disabled={isCtaLoading}
         >

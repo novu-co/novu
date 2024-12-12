@@ -12,6 +12,8 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { useTelemetry } from '@/hooks/use-telemetry';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { EnvironmentDropdown } from './environment-dropdown';
 import { OrganizationDropdown } from './organization-dropdown';
 import { FreeTrialCard } from './free-trial-card';
@@ -32,6 +34,7 @@ const NavigationGroup = ({ children, label }: { children: ReactNode; label?: str
 export const SideNavigation = () => {
   const { currentEnvironment, environments, switchEnvironment } = useEnvironment();
   const track = useTelemetry();
+  const isNewActivityFeedEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ACTIVITY_FEED_ENABLED, false);
   const environmentNames = useMemo(() => environments?.map((env) => env.name), [environments]);
   const onEnvironmentChange = (value: string) => {
     const environment = environments?.find((env) => env.name === value);
@@ -60,7 +63,14 @@ export const SideNavigation = () => {
               </SubscribersStayTunedModal>
             </NavigationGroup>
             <NavigationGroup label="Monitor">
-              <NavigationLink to={LEGACY_ROUTES.ACTIVITY_FEED} isExternal>
+              <NavigationLink
+                to={
+                  isNewActivityFeedEnabled
+                    ? buildRoute(ROUTES.ACTIVITY_FEED, { environmentSlug: currentEnvironment?.slug ?? '' })
+                    : LEGACY_ROUTES.ACTIVITY_FEED
+                }
+                isExternal={!isNewActivityFeedEnabled}
+              >
                 <RiBarChartBoxLine className="size-4" />
                 <span>Activity Feed</span>
               </NavigationLink>

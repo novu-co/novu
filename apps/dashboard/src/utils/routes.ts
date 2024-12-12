@@ -24,6 +24,7 @@ export const ROUTES = {
   INTEGRATIONS: '/env/:environmentSlug/integrations',
   INTEGRATIONS_CREATE: '/env/:environmentSlug/integrations/create',
   API_KEYS: '/env/:environmentSlug/api-keys',
+  ACTIVITY_FEED: '/env/:environmentSlug/activity-feed',
 } as const;
 
 export const buildRoute = (route: string, params: Record<string, string>) => {

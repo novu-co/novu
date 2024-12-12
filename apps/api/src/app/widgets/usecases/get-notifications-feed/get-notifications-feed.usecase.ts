@@ -8,7 +8,7 @@ import {
   CachedQuery,
   InstrumentUsecase,
 } from '@novu/application-generic';
-import { MessageEntity, MessageRepository, SubscriberEntity, SubscriberRepository } from '@novu/dal';
+import { MessageRepository, SubscriberEntity, SubscriberRepository } from '@novu/dal';
 
 import { GetNotificationsFeedCommand } from './get-notifications-feed.command';
 import { ApiException } from '../../../shared/exceptions/api.exception';
@@ -114,31 +114,6 @@ export class GetNotificationsFeed {
       pageSize: command.limit,
       page: command.page,
     };
-  }
-
-  private updateAnalytics(messageEntities, command: GetNotificationsFeedCommand) {
-    this.analyticsService.mixpanelTrack('Fetch Feed - [Notification Center]', '', {
-      _subscriber: messageEntities[0]?._subscriberId,
-      _organization: command.organizationId,
-      feedSize: messageEntities.length,
-    });
-  }
-
-  private async getPagedFilteredMessages(
-    command: GetNotificationsFeedCommand,
-    subscriber,
-    payload: object | undefined
-  ): Promise<MessageEntity[]> {
-    return await this.messageRepository.findBySubscriberChannel(
-      command.environmentId,
-      subscriber._id,
-      ChannelTypeEnum.IN_APP,
-      { feedId: command.feedId, seen: command.query.seen, read: command.query.read, payload },
-      {
-        limit: command.limit,
-        skip: command.page * command.limit,
-      }
-    );
   }
 
   @CachedEntity({
