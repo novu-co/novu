@@ -42,8 +42,7 @@ export class UpsertWorkflowUseCase {
     private notificationGroupRepository: NotificationGroupRepository,
     private workflowUpdatePostProcess: PostProcessWorkflowUpdate,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private getWorkflowUseCase: GetWorkflowUseCase,
-    private patchStepDataUsecase: PatchStepUsecase
+    private getWorkflowUseCase: GetWorkflowUseCase
   ) {}
 
   @InstrumentUsecase()

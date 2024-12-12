@@ -24,11 +24,6 @@ export type StepCreateDto = StepDto & {
   controlValues?: Record<string, unknown>;
 };
 
-export type PatchStepDataDto = {
-  name?: string;
-  controlValues?: Record<string, unknown>;
-};
-
 export type StepDto = {
   name: string;
   type: StepTypeEnum;
