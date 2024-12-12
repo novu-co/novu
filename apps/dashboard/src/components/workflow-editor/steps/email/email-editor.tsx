@@ -4,8 +4,7 @@ import { EmailPreviewHeader } from '@/components/workflow-editor/steps/email/ema
 import { EmailTabsSection } from '@/components/workflow-editor/steps/email/email-tabs-section';
 import { type UiSchema } from '@novu/shared';
 
-type EmailEditorProps = { uiSchema?: UiSchema };
-
+type EmailEditorProps = { uiSchema: UiSchema };
 export const EmailEditor = (props: EmailEditorProps) => {
   const { uiSchema } = props;
   const { body, subject } = uiSchema?.properties ?? {};
