@@ -54,7 +54,7 @@ export function ActivityPanel({
       <div>
         <div
           className={cn(
-            'flex items-center gap-2 border-b border-t border-neutral-200 border-b-neutral-100 p-2 px-3',
+            'flex items-center gap-2 border-b border-t border-neutral-200 border-b-neutral-100 px-3 pb-2 pt-[7px]',
             headerClassName,
             overviewHeaderClassName
           )}
