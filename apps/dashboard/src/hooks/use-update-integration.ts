@@ -9,6 +9,7 @@ interface UpdateIntegrationData {
   active: boolean;
   primary: boolean;
   credentials: Record<string, string>;
+  check: boolean;
 }
 
 interface UpdateIntegrationVariables {

@@ -4,10 +4,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEnvironment } from '@/context/environment/hooks';
 import { QueryKeys } from '@/utils/query-keys';
 import { CheckIntegrationResponseEnum } from '@/api/integrations';
-import { IntegrationFormData } from '../types';
 import { CHANNELS_WITH_PRIMARY, IIntegration, IProviderConfig } from '@novu/shared';
 import { useUpdateIntegration } from '@/hooks/use-update-integration';
 import { useSetPrimaryIntegration } from '@/hooks/use-set-primary-integration';
+import { IntegrationFormData } from '../../types';
 
 interface UseIntegrationFormProps {
   onClose: () => void;
@@ -35,6 +35,7 @@ export function useIntegrationForm({ onClose, integration, integrations, createI
             active: data.active,
             primary: data.primary,
             credentials: data.credentials,
+            check: data.check,
           },
         });
 

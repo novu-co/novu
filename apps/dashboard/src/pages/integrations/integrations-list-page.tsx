@@ -67,7 +67,7 @@ export function IntegrationsListPage() {
             Connect Provider
           </Button>
         </div>
-        <TabsContent value="providers" variant="regular" className="p-2.5">
+        <TabsContent value="providers" variant="regular" className="!mt-0 p-2.5">
           <IntegrationsList onRowClickCallback={onRowClickCallback} />
         </TabsContent>
         <TabsContent value="data-warehouse" variant="regular">

@@ -3,13 +3,13 @@ import { ITableIntegration } from '../types';
 import { IntegrationCard } from './integration-card';
 import { CHANNEL_TYPE_TO_STRING } from '@/utils/channels';
 
-interface IntegrationChannelGroupProps {
+type IntegrationChannelGroupProps = {
   channel: ChannelTypeEnum;
   integrations: IIntegration[];
   providers: IProviderConfig[];
   environments?: IEnvironment[];
   onRowClickCallback: (item: { original: ITableIntegration }) => void;
-}
+};
 
 export function IntegrationChannelGroup({
   channel,
@@ -20,7 +20,7 @@ export function IntegrationChannelGroup({
 }: IntegrationChannelGroupProps) {
   return (
     <div className="space-y-4">
-      <h2 className="text-md text-foreground-950 font-semibold">{CHANNEL_TYPE_TO_STRING[channel]}</h2>
+      <h2 className="text-md text-foreground-950 font-medium">{CHANNEL_TYPE_TO_STRING[channel]}</h2>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {integrations.map((integration) => {
           const provider = providers.find((p) => p.id === integration.providerId);

@@ -19,6 +19,7 @@ export interface IntegrationFormData {
   active: boolean;
   primary: boolean;
   credentials: Record<string, any>;
+  check: boolean;
 }
 
 export type IntegrationStep = 'select' | 'configure';

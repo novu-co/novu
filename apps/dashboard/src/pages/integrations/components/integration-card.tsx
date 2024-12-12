@@ -44,7 +44,7 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
   return (
     <div
       className={cn(
-        'bg-card group relative flex min-h-[125px] cursor-pointer flex-col gap-2 overflow-hidden rounded-xl border p-3 transition-all hover:shadow-lg',
+        'bg-card shadow-xs group relative flex min-h-[125px] cursor-pointer flex-col gap-2 overflow-hidden rounded-xl border border-neutral-100 p-3 transition-all hover:shadow-lg',
         !integration.active && 'opacity-75 grayscale'
       )}
       onClick={handleConfigureClick}

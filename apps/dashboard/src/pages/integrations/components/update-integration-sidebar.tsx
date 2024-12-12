@@ -41,6 +41,15 @@ export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: U
   const handleSubmit = async (data: IntegrationFormData) => {
     if (shouldShowPrimaryModal(data)) {
       setIsPrimaryModalOpen(true);
+
+      /**
+       * We don't want to check the integration if it's a demo integration
+       * Since we don't have credentials for it
+       */
+      if (integration?.providerId === 'novu-email' || integration?.providerId === 'novu-sms') {
+        data.check = false;
+      }
+
       setPendingUpdate(data);
 
       return;

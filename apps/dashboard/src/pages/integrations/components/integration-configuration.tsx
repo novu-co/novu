@@ -66,7 +66,7 @@ export function IntegrationConfiguration({ provider, integration, onSubmit, mode
           name: provider?.displayName ?? '',
           identifier: generateSlug(provider?.displayName ?? ''),
           active: true,
-          primary: false,
+          primary: true,
           credentials: {},
         },
   });
@@ -92,12 +92,8 @@ export function IntegrationConfiguration({ provider, integration, onSubmit, mode
 
   return (
     <Form {...form}>
-      <form
-        id="integration-configuration-form"
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col space-y-3 p-3"
-      >
-        <Accordion type="single" collapsible defaultValue="layout">
+      <form id="integration-configuration-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+        <Accordion type="single" collapsible defaultValue="layout" className="p-3">
           <AccordionItem value="layout">
             <AccordionTrigger>
               <div className="flex items-center gap-1 text-xs">
@@ -111,18 +107,20 @@ export function IntegrationConfiguration({ provider, integration, onSubmit, mode
           </AccordionItem>
         </Accordion>
 
-        <Separator />
+        <Separator className="mb-0 mt-0" />
 
         {isDemo ? (
-          <InlineToast
-            variant={'warning'}
-            title="Demo Integration"
-            description={`This is a demo integration intended for testing purposes only. It is limited to 300 ${
-              provider?.channel === 'email' ? 'emails' : 'sms'
-            } per month.`}
-          />
+          <div className="p-3">
+            <InlineToast
+              variant={'warning'}
+              title="Demo Integration"
+              description={`This is a demo integration intended for testing purposes only. It is limited to 300 ${
+                provider?.channel === 'email' ? 'emails' : 'sms'
+              } per month.`}
+            />
+          </div>
         ) : (
-          <>
+          <div className="p-3">
             <Accordion type="single" collapsible defaultValue="credentials">
               <AccordionItem value="credentials">
                 <AccordionTrigger>
@@ -138,6 +136,7 @@ export function IntegrationConfiguration({ provider, integration, onSubmit, mode
             </Accordion>
             <InlineToast
               variant={'tip'}
+              className="mt-3"
               title="Configure Integration"
               description="To learn more about how to configure your integration, please refer to the documentation."
               ctaLabel="View Guide"
@@ -145,7 +144,7 @@ export function IntegrationConfiguration({ provider, integration, onSubmit, mode
                 window.open(provider?.docReference ?? '', '_blank');
               }}
             />
-          </>
+          </div>
         )}
       </form>
     </Form>

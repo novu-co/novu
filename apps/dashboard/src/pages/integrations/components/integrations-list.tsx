@@ -12,19 +12,22 @@ interface IntegrationsListProps {
 
 function IntegrationCardSkeleton() {
   return (
-    <div className="bg-card group relative flex cursor-pointer flex-col gap-2 overflow-hidden rounded-xl border p-3 shadow-md transition-all">
+    <div className="bg-card shadow-xs group relative flex min-h-[125px] cursor-pointer flex-col gap-2 overflow-hidden rounded-xl border border-neutral-100 p-3 transition-all hover:shadow-lg">
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-6 w-6 rounded-lg" />
+        <div className="flex items-center gap-1.5">
+          <div className="relative h-6 w-6">
+            <Skeleton className="h-full w-full rounded-lg" />
+          </div>
           <Skeleton className="h-4 w-32" />
         </div>
+        <Skeleton className="h-4 w-4" />
       </div>
-      <div>
-        <Skeleton className="h-5 w-24" />
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-[16px] w-16 rounded-sm" />
       </div>
-      <div className="mt-4 flex items-center gap-2">
-        <Skeleton className="h-5 w-20" />
-        <Skeleton className="h-5 w-24" />
+      <div className="mt-auto flex items-center gap-2">
+        <Skeleton className="h-[26px] w-24" />
+        <Skeleton className="h-[26px] w-24" />
       </div>
     </div>
   );
