@@ -1,8 +1,7 @@
 import { JobStatusEnum } from '@novu/shared';
-import { RiForbidFill } from 'react-icons/ri';
-import { RiErrorWarningLine } from 'react-icons/ri';
+import { RiCheckboxCircleFill, RiErrorWarningFill, RiForbidFill } from 'react-icons/ri';
 import { BadgeVariant } from '../primitives/badge';
-import { RiCheckboxCircleLine, RiLoader3Line, RiLoader4Fill } from 'react-icons/ri';
+import { RiLoader3Line, RiLoader4Fill } from 'react-icons/ri';
 import { IconType } from 'react-icons/lib';
 
 export const STATUS_STYLES = {
@@ -25,13 +24,13 @@ export const JOB_STATUS_CONFIG: Record<
   [JobStatusEnum.COMPLETED]: {
     variant: 'success' as const,
     color: 'success',
-    icon: RiCheckboxCircleLine,
+    icon: RiCheckboxCircleFill,
     label: 'SUCCESS',
   },
   [JobStatusEnum.FAILED]: {
     variant: 'destructive' as const,
     color: 'destructive',
-    icon: RiErrorWarningLine,
+    icon: RiErrorWarningFill,
     label: `ERROR`,
   },
   [JobStatusEnum.MERGED]: {

@@ -23,7 +23,8 @@ export function ActivityTable({ selectedActivityId, onActivitySelect, filters }:
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { activities, isLoading, hasMore, error } = useFetchActivities({ filters });
+  const page = parsePageParam(searchParams.get('page'));
+  const { activities, isLoading, hasMore, error } = useFetchActivities({ filters, page });
 
   useEffect(() => {
     if (error) {
@@ -32,8 +33,6 @@ export function ActivityTable({ selectedActivityId, onActivitySelect, filters }:
       });
     }
   }, [error]);
-
-  const page = parseInt(searchParams.get('page') || '0');
 
   const handlePageChange = (newPage: number) => {
     const newParams = createSearchParams({
@@ -143,4 +142,12 @@ function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriber
   }
 
   return '';
+}
+
+function parsePageParam(param: string | null): number {
+  if (!param) return 0;
+
+  const parsed = Number.parseInt(param, 10);
+
+  return Math.max(0, parsed || 0);
 }

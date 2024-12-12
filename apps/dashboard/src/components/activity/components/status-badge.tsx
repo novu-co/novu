@@ -49,7 +49,7 @@ export function StatusBadge({ jobs }: StatusBadgeProps) {
   return (
     <Popover open={isOpen}>
       <PopoverTrigger onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-        <Badge variant={variant as BadgeVariant} className="cursor-pointer gap-1.5">
+        <Badge variant={variant as BadgeVariant} className="cursor-pointer gap-1 px-1 py-0 leading-6">
           <Icon className="h-3.5 w-3.5" />
           {displayLabel}
         </Badge>
