@@ -168,7 +168,7 @@ class ResponseMetadata {
 }
 class ErrorResponseBody {
   path: string;
-  message: string | object | Object;
+  message: string;
   statusCode: number;
   timestamp: string;
   ctx?: object | Object;
