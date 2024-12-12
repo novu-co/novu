@@ -24,12 +24,13 @@ export const Maily = (props: MailyProps) => {
       render={({ field }) => {
         return (
           <>
-            <div className={cn('mx-auto w-full', className)} {...rest}>
+            <div className={cn('mx-auto flex h-full w-full', className)} {...rest}>
               <FormControl>
                 <Editor
                   config={{
                     hasMenuBar: false,
-                    bodyClassName: '!bg-transparent !border-none !mt-0',
+                    wrapClassName: 'h-full ',
+                    bodyClassName: '!bg-transparent h-full !border-none !mt-0 [&>div]:h-full [&_.tiptap]:h-full',
                   }}
                   triggerSuggestionCharacter="{{"
                   variables={variables.map((v) => ({ name: v.label, required: false }))}
