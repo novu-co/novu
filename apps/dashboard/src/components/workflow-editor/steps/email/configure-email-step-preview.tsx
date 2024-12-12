@@ -16,7 +16,7 @@ const MiniEmailPreview = (props: MiniEmailPreviewProps) => {
   return (
     <div
       className={cn(
-        'border-neutral-alpha-200 before:to-background relative isolate mb-4 rounded-lg border border-dashed before:pointer-events-none before:absolute before:inset-0 before:-m-px before:rounded-lg before:bg-gradient-to-b before:from-transparent before:bg-clip-padding',
+        'border-neutral-alpha-200 before:to-background relative isolate rounded-lg border border-dashed before:pointer-events-none before:absolute before:inset-0 before:-m-px before:rounded-lg before:bg-gradient-to-b before:from-transparent before:bg-clip-padding',
         className
       )}
       {...rest}
@@ -56,17 +56,13 @@ export function ConfigureEmailStepPreview(props: ConfigureEmailStepPreviewProps)
     });
   }, [workflowSlug, stepSlug, previewStep, step, isPending]);
 
-  if (isPreviewPending) {
+  if (isPreviewPending || !previewData) {
     return (
       <MiniEmailPreview>
         <Skeleton className="h-5 w-full max-w-[25ch]" />
         <Skeleton className="h-5 w-full max-w-[15ch]" />
       </MiniEmailPreview>
     );
-  }
-
-  if (previewData?.result?.type !== ChannelTypeEnum.EMAIL) {
-    return <MiniEmailPreview>No preview available</MiniEmailPreview>;
   }
 
   return (
