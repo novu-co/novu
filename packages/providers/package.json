@@ -60,7 +60,6 @@
     "node-fetch": "^3.2.10",
     "node-mailjet": "^6.0.5",
     "nodemailer": "^6.6.5",
-    "pepipost-sdk-nodejs": "0.4.0",
     "plivo": "^4.60.1",
     "postmark": "^4.0.2",
     "proxy-agent": "^6.3.1",

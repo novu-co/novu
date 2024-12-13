@@ -2,7 +2,6 @@ import { Types } from 'mongoose';
 import {
   BuilderFieldType,
   BuilderGroupValues,
-  ContentIssue,
   ControlSchemas,
   CustomDataType,
   FilterParts,
@@ -18,6 +17,7 @@ import {
   IWorkflowStepMetadata,
   StepIssues,
   TriggerTypeEnum,
+  WorkflowIssueTypeEnum,
   WorkflowOriginEnum,
   WorkflowStatusEnum,
   WorkflowTypeEnum,
@@ -86,9 +86,14 @@ export class NotificationTemplateEntity implements INotificationTemplate {
 
   payloadSchema?: any;
 
-  issues: Record<string, ContentIssue[]>;
+  issues: Record<string, RuntimeIssue[]>;
 
   status?: WorkflowStatusEnum;
+}
+export class RuntimeIssue {
+  issueType: WorkflowIssueTypeEnum;
+  variableName?: string;
+  message: string;
 }
 
 export type NotificationTemplateDBModel = ChangePropsValueType<

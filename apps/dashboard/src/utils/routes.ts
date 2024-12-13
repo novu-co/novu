@@ -22,6 +22,7 @@ export const ROUTES = {
   EDIT_STEP: 'steps/:stepSlug',
   EDIT_STEP_TEMPLATE: 'steps/:stepSlug/edit',
   API_KEYS: '/env/:environmentSlug/api-keys',
+  ACTIVITY_FEED: '/env/:environmentSlug/activity-feed',
 } as const;
 
 export const buildRoute = (route: string, params: Record<string, string>) => {
