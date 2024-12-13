@@ -1,13 +1,13 @@
 import Title from '@/components/Title';
 import { novuConfig } from '@/utils/config';
-import { Inbox } from '@novu/react';
+import { Inbox } from '@novu/nextjs';
 import styles from './novu-theme.module.css';
 
 export default function NovuTheme() {
   return (
     <>
       <Title title="Novu theme" />
-      <div className="w-96 h-96 overflow-y-auto">
+      <div className="h-96 w-96 overflow-y-auto">
         <Inbox
           {...novuConfig}
           appearance={{

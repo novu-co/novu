@@ -1,8 +1,8 @@
 import { getToken } from '@/utils/auth';
-import { API_HOSTNAME } from '../config';
-import { getEnvironmentId } from '@/utils/environment';
+import { API_HOSTNAME } from '@/config';
+import type { IEnvironment } from '@novu/shared';
 
-class NovuApiError extends Error {
+export class NovuApiError extends Error {
   constructor(
     message: string,
     public error: unknown,
@@ -12,33 +12,35 @@ class NovuApiError extends Error {
   }
 }
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
 
 const request = async <T>(
   endpoint: string,
   options?: {
-    data?: unknown;
+    environment?: IEnvironment;
+    body?: unknown;
     method?: HttpMethod;
     headers?: HeadersInit;
     version?: 'v1' | 'v2';
+    signal?: AbortSignal;
   }
 ): Promise<T> => {
-  const { data, headers, method = 'GET', version = 'v1' } = options || {};
+  const { body, environment, headers, method = 'GET', version = 'v1', signal } = options || {};
   try {
     const jwt = await getToken();
-    const environmentId = getEnvironmentId();
     const config: RequestInit = {
       method,
       headers: {
         Authorization: `Bearer ${jwt}`,
         'Content-Type': 'application/json',
-        ...(environmentId && { 'Novu-Environment-Id': environmentId }),
+        ...(environment && { 'Novu-Environment-Id': environment._id }),
         ...headers,
       },
+      signal,
     };
 
-    if (data) {
-      config.body = JSON.stringify(data);
+    if (body) {
+      config.body = JSON.stringify(body);
     }
 
     const baseUrl = API_HOSTNAME ?? 'https://api.novu.co';
@@ -65,14 +67,26 @@ const request = async <T>(
   }
 };
 
-export const get = <T>(endpoint: string) => request<T>(endpoint, { method: 'GET' });
-export const post = <T>(endpoint: string, data: unknown) => request<T>(endpoint, { method: 'POST', data });
-export const put = <T>(endpoint: string, data: unknown) => request<T>(endpoint, { method: 'PUT', data });
-export const del = <T>(endpoint: string) => request<T>(endpoint, { method: 'DELETE' });
+type RequestOptions = { body?: unknown; environment?: IEnvironment; signal?: AbortSignal };
 
-export const getV2 = <T>(endpoint: string) => request<T>(endpoint, { version: 'v2', method: 'GET' });
-export const postV2 = <T>(endpoint: string, data: unknown) =>
-  request<T>(endpoint, { version: 'v2', method: 'POST', data });
-export const putV2 = <T>(endpoint: string, data: unknown) =>
-  request<T>(endpoint, { version: 'v2', method: 'PUT', data });
-export const delV2 = <T>(endpoint: string) => request<T>(endpoint, { version: 'v2', method: 'DELETE' });
+export const get = <T>(endpoint: string, { environment, signal }: RequestOptions = {}) =>
+  request<T>(endpoint, { method: 'GET', environment, signal });
+export const post = <T>(endpoint: string, options: RequestOptions) =>
+  request<T>(endpoint, { method: 'POST', ...options });
+export const put = <T>(endpoint: string, options: RequestOptions) =>
+  request<T>(endpoint, { method: 'PUT', ...options });
+export const del = <T>(endpoint: string, { environment, signal }: RequestOptions = {}) =>
+  request<T>(endpoint, { method: 'DELETE', environment, signal });
+export const patch = <T>(endpoint: string, options: RequestOptions) =>
+  request<T>(endpoint, { method: 'PATCH', ...options });
+
+export const getV2 = <T>(endpoint: string, { environment, signal }: RequestOptions = {}) =>
+  request<T>(endpoint, { version: 'v2', method: 'GET', environment, signal });
+export const postV2 = <T>(endpoint: string, options: RequestOptions) =>
+  request<T>(endpoint, { version: 'v2', method: 'POST', ...options });
+export const putV2 = <T>(endpoint: string, options: RequestOptions) =>
+  request<T>(endpoint, { version: 'v2', method: 'PUT', ...options });
+export const delV2 = <T>(endpoint: string, { environment, signal }: RequestOptions = {}) =>
+  request<T>(endpoint, { version: 'v2', method: 'DELETE', environment, signal });
+export const patchV2 = <T>(endpoint: string, options: RequestOptions) =>
+  request<T>(endpoint, { version: 'v2', method: 'PATCH', ...options });

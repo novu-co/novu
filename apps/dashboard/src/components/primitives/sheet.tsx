@@ -13,6 +13,8 @@ const SheetClose = SheetPrimitive.Close;
 
 const SheetPortal = SheetPrimitive.Portal;
 
+const SheetContentBase = SheetPrimitive.Content;
+
 const SheetOverlay = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>
@@ -89,7 +91,7 @@ const SheetDescription = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Description>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Description>
 >(({ className, ...props }, ref) => (
-  <SheetPrimitive.Description ref={ref} className={cn('text-foreground-400 text-sm', className)} {...props} />
+  <SheetPrimitive.Description ref={ref} className={cn('text-foreground-400 text-xs', className)} {...props} />
 ));
 SheetDescription.displayName = SheetPrimitive.Description.displayName;
 
@@ -104,6 +106,7 @@ export {
   SheetOverlay,
   SheetTrigger,
   SheetClose,
+  SheetContentBase,
   SheetContent,
   SheetHeader,
   SheetFooter,

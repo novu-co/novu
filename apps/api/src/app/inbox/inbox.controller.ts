@@ -1,4 +1,16 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+  Headers,
+} from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { SubscriberEntity } from '@novu/dal';
@@ -27,8 +39,8 @@ import { UpdateNotificationActionCommand } from './usecases/update-notification-
 import { UpdateAllNotificationsRequestDto } from './dtos/update-all-notifications-request.dto';
 import { UpdateAllNotificationsCommand } from './usecases/update-all-notifications/update-all-notifications.command';
 import { UpdateAllNotifications } from './usecases/update-all-notifications/update-all-notifications.usecase';
-import { GetPreferences } from './usecases/get-preferences/get-preferences.usecase';
-import { GetPreferencesCommand } from './usecases/get-preferences/get-preferences.command';
+import { GetInboxPreferences } from './usecases/get-inbox-preferences/get-inbox-preferences.usecase';
+import { GetInboxPreferencesCommand } from './usecases/get-inbox-preferences/get-inbox-preferences.command';
 import { GetPreferencesResponseDto } from './dtos/get-preferences-response.dto';
 import { UpdatePreferencesRequestDto } from './dtos/update-preferences-request.dto';
 import { UpdatePreferences } from './usecases/update-preferences/update-preferences.usecase';
@@ -46,17 +58,21 @@ export class InboxController {
     private markNotificationAsUsecase: MarkNotificationAs,
     private updateNotificationActionUsecase: UpdateNotificationAction,
     private updateAllNotifications: UpdateAllNotifications,
-    private getPreferencesUsecase: GetPreferences,
+    private getInboxPreferencesUsecase: GetInboxPreferences,
     private updatePreferencesUsecase: UpdatePreferences
   ) {}
 
   @Post('/session')
-  async sessionInitialize(@Body() body: SubscriberSessionRequestDto): Promise<SubscriberSessionResponseDto> {
+  async sessionInitialize(
+    @Body() body: SubscriberSessionRequestDto,
+    @Headers('origin') origin: string
+  ): Promise<SubscriberSessionResponseDto> {
     return await this.initializeSessionUsecase.execute(
       SessionCommand.create({
         subscriberId: body.subscriberId,
         applicationIdentifier: body.applicationIdentifier,
         subscriberHash: body.subscriberHash,
+        origin,
       })
     );
   }
@@ -107,8 +123,8 @@ export class InboxController {
     @SubscriberSession() subscriberSession: SubscriberEntity,
     @Query() query: GetPreferencesRequestDto
   ): Promise<GetPreferencesResponseDto[]> {
-    return await this.getPreferencesUsecase.execute(
-      GetPreferencesCommand.create({
+    return await this.getInboxPreferencesUsecase.execute(
+      GetInboxPreferencesCommand.create({
         organizationId: subscriberSession._organizationId,
         subscriberId: subscriberSession.subscriberId,
         environmentId: subscriberSession._environmentId,
@@ -240,6 +256,7 @@ export class InboxController {
         in_app: body.in_app,
         push: body.push,
         sms: body.sms,
+        includeInactiveChannels: false,
       })
     );
   }
@@ -263,6 +280,7 @@ export class InboxController {
         push: body.push,
         sms: body.sms,
         workflowId,
+        includeInactiveChannels: false,
       })
     );
   }

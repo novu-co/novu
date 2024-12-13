@@ -9,6 +9,7 @@ export const legacyHandler = (__dirname, req, res, next) => {
     if (fileExists) {
       // Serve the legacy index.html file
       res.setHeader('Content-Type', 'text/html');
+      res.setHeader('Document-Policy', 'js-profiling');
       res.statusCode = 200;
       fs.createReadStream(legacyPath).pipe(res);
       return;

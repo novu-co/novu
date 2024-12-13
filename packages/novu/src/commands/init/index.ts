@@ -93,6 +93,7 @@ export async function init(program: IInitCommandOptions, anonymousId?: string): 
     process.exit(1);
   }
 
+  let applicationId: string;
   let userId: string;
   // if no secret key is supplied set to empty string
   if (!program.secretKey) {
@@ -114,6 +115,15 @@ export async function init(program: IInitCommandOptions, anonymousId?: string): 
 
       userId = user.data?._id;
 
+      const integrationsResponse = await fetch(`${program.apiUrl}/v1/environments/me`, {
+        headers: {
+          Authorization: `ApiKey ${program.secretKey}`,
+        },
+      });
+
+      const environment = await integrationsResponse.json();
+      applicationId = environment.data.identifier;
+
       analytics.alias({
         previousId: anonymousId,
         userId,
@@ -121,7 +131,7 @@ export async function init(program: IInitCommandOptions, anonymousId?: string): 
     } catch (error) {
       console.error(
         // eslint-disable-next-line max-len
-        `Failed to verify your secret key against ${program.apiUrl}. For EU instances use --api-url https://eu.novu.co or provide the correct secret key`
+        `Failed to verify your secret key against ${program.apiUrl}. For EU instances use --api-url https://eu.api.novu.co or provide the correct secret key`
       );
 
       process.exit(1);
@@ -172,6 +182,8 @@ export async function init(program: IInitCommandOptions, anonymousId?: string): 
     srcDir: defaults.srcDir as boolean,
     importAlias: defaults.importAlias as string,
     secretKey: program.secretKey,
+    applicationId,
+    userId,
   });
 
   if (userId || anonymousId) {

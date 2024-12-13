@@ -21,6 +21,8 @@ export async function createApp({
   srcDir,
   importAlias,
   secretKey,
+  applicationId,
+  userId,
 }: {
   appPath: string;
   packageManager: PackageManager;
@@ -29,6 +31,8 @@ export async function createApp({
   srcDir: boolean;
   importAlias: string;
   secretKey: string;
+  applicationId: string;
+  userId: string;
 }): Promise<void> {
   let repoInfo: RepoInfo | undefined;
   const mode: TemplateMode = typescript ? 'ts' : 'js';
@@ -73,6 +77,8 @@ export async function createApp({
     srcDir,
     importAlias,
     secretKey,
+    applicationId,
+    userId,
   });
 
   if (tryGitInit(root)) {

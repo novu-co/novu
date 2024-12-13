@@ -1,37 +1,82 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import {
   CreateWorkflow,
+  DeletePreferencesUseCase,
+  DeleteWorkflowUseCase,
   GetPreferences,
+  GetWorkflowByIdsUseCase,
   UpdateWorkflow,
   UpsertControlValuesUseCase,
   UpsertPreferences,
+  TierRestrictionsValidateUsecase,
 } from '@novu/application-generic';
+
+import { CommunityOrganizationRepository } from '@novu/dal';
 import { SharedModule } from '../shared/shared.module';
 import { MessageTemplateModule } from '../message-template/message-template.module';
 import { ChangeModule } from '../change/change.module';
 import { AuthModule } from '../auth/auth.module';
 import { IntegrationModule } from '../integrations/integrations.module';
 import { WorkflowController } from './workflow.controller';
-import { UpsertWorkflowUseCase } from './usecases/upsert-workflow/upsert-workflow.usecase';
-import { GetWorkflowUseCase } from './usecases/get-workflow/get-workflow.usecase';
-import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.usecase';
-import { DeleteWorkflowUseCase } from './usecases/delete-workflow/delete-workflow.usecase';
-import { GetWorkflowByIdsUseCase } from './usecases/get-workflow-by-ids/get-workflow-by-ids.usecase';
+import {
+  BuildAvailableVariableSchemaUsecase,
+  BuildDefaultPayloadUsecase,
+  BuildStepDataUsecase,
+  BuildWorkflowTestDataUseCase,
+  CollectPlaceholderWithDefaultsUsecase,
+  ExtractDefaultValuesFromSchemaUsecase,
+  GeneratePreviewUsecase,
+  GetWorkflowUseCase,
+  ListWorkflowsUseCase,
+  PostProcessWorkflowUpdate,
+  PrepareAndValidateContentUsecase,
+  SyncToEnvironmentUseCase,
+  UpsertWorkflowUseCase,
+  ValidatePlaceholderUsecase,
+} from './usecases';
+import { BridgeModule } from '../bridge';
+import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-renderers';
+import { OverloadContentDataOnWorkflowUseCase } from './usecases/overload-content-data';
+import { PatchWorkflowUsecase } from './usecases/patch-workflow';
+import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
+import { BuildPayloadSchema } from './usecases/build-payload-schema/build-payload-schema.usecase';
+
+const DAL_REPOSITORIES = [CommunityOrganizationRepository];
 
 @Module({
-  imports: [SharedModule, MessageTemplateModule, ChangeModule, AuthModule, IntegrationModule],
+  imports: [SharedModule, MessageTemplateModule, ChangeModule, AuthModule, BridgeModule, IntegrationModule],
   controllers: [WorkflowController],
   providers: [
+    ...DAL_REPOSITORIES,
     CreateWorkflow,
     UpdateWorkflow,
     UpsertWorkflowUseCase,
-    GetWorkflowUseCase,
     ListWorkflowsUseCase,
     DeleteWorkflowUseCase,
     UpsertPreferences,
+    DeletePreferencesUseCase,
     UpsertControlValuesUseCase,
     GetPreferences,
     GetWorkflowByIdsUseCase,
+    SyncToEnvironmentUseCase,
+    BuildStepDataUsecase,
+    GeneratePreviewUsecase,
+    BuildWorkflowTestDataUseCase,
+    GetWorkflowUseCase,
+    HydrateEmailSchemaUseCase,
+    PostProcessWorkflowUpdate,
+    BuildDefaultPayloadUsecase,
+    BuildAvailableVariableSchemaUsecase,
+    CollectPlaceholderWithDefaultsUsecase,
+    PrepareAndValidateContentUsecase,
+    ValidatePlaceholderUsecase,
+    ExtractDefaultValuesFromSchemaUsecase,
+    PatchStepUsecase,
+    PostProcessWorkflowUpdate,
+    OverloadContentDataOnWorkflowUseCase,
+    PatchWorkflowUsecase,
+    TierRestrictionsValidateUsecase,
+    BuildPayloadSchema,
   ],
 })
 export class WorkflowModule implements NestModule {

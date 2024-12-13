@@ -1,17 +1,27 @@
 import { IsDefined, IsOptional } from 'class-validator';
-import { AfterResponseHook } from 'got';
 import {
   CodeResult,
   DiscoverOutput,
-  ExecuteOutput,
-  HealthCheck,
   Event,
+  ExecuteOutput,
   GetActionEnum,
-  PostActionEnum,
+  HealthCheck,
   HttpQueryKeysEnum,
-} from '@novu/framework';
+  PostActionEnum,
+} from '@novu/framework/internal';
 import { WorkflowOriginEnum } from '@novu/shared';
 import { EnvironmentLevelCommand } from '../../commands';
+
+export type BridgeError = {
+  url: string;
+  code: string;
+  message: string;
+  statusCode: number;
+  data?: unknown;
+  cause?: unknown;
+};
+
+export type ProcessError = (response: BridgeError) => Promise<void>;
 
 export class ExecuteBridgeRequestCommand extends EnvironmentLevelCommand {
   @IsOptional()
@@ -21,7 +31,7 @@ export class ExecuteBridgeRequestCommand extends EnvironmentLevelCommand {
   searchParams?: Partial<Record<HttpQueryKeysEnum, string>>;
 
   @IsOptional()
-  afterResponse?: AfterResponseHook;
+  processError?: ProcessError;
 
   @IsDefined()
   action: PostActionEnum | GetActionEnum;

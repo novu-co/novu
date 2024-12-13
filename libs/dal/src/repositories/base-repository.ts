@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ClassConstructor, plainToInstance } from 'class-transformer';
-import { addDays } from 'date-fns';
 import {
-  DEFAULT_MESSAGE_GENERIC_RETENTION_DAYS,
-  DEFAULT_MESSAGE_IN_APP_RETENTION_DAYS,
-  DEFAULT_NOTIFICATION_RETENTION_DAYS,
-} from '@novu/shared';
-import { FilterQuery, Model, ProjectionType, QueryOptions, QueryWithHelpers, Types, UpdateQuery } from 'mongoose';
+  ClientSession,
+  FilterQuery,
+  Model,
+  ProjectionType,
+  QueryOptions,
+  QueryWithHelpers,
+  Types,
+  UpdateQuery,
+} from 'mongoose';
 import { DalException } from '../shared';
 
 export class BaseRepository<T_DBModel, T_MappedEntity, T_Enforcement> {
@@ -213,41 +216,7 @@ export class BaseRepository<T_DBModel, T_MappedEntity, T_Enforcement> {
     };
   }
 
-  private calcExpireDate(modelName: string, data: FilterQuery<T_DBModel> & T_Enforcement) {
-    let startDate: Date = new Date();
-    if (data.expireAt) {
-      startDate = new Date(data.expireAt);
-    }
-
-    switch (modelName) {
-      case 'Message':
-        if (data.channel === 'in_app') {
-          return addDays(
-            startDate,
-            Number(process.env.MESSAGE_IN_APP_RETENTION_DAYS || DEFAULT_MESSAGE_IN_APP_RETENTION_DAYS)
-          );
-        } else {
-          return addDays(
-            startDate,
-            Number(process.env.MESSAGE_GENERIC_RETENTION_DAYS || DEFAULT_MESSAGE_GENERIC_RETENTION_DAYS)
-          );
-        }
-      case 'Notification':
-        return addDays(
-          startDate,
-          Number(process.env.NOTIFICATION_RETENTION_DAYS || DEFAULT_NOTIFICATION_RETENTION_DAYS)
-        );
-      default:
-        return null;
-    }
-  }
-
   async create(data: FilterQuery<T_DBModel> & T_Enforcement, options: IOptions = {}): Promise<T_MappedEntity> {
-    const expireAt = this.calcExpireDate(this.MongooseModel.modelName, data);
-    if (expireAt) {
-      // eslint-disable-next-line no-param-reassign
-      data = { ...data, expireAt };
-    }
     const newEntity = new this.MongooseModel(data);
 
     const saveOptions = options?.writeConcern ? { w: options?.writeConcern } : {};
@@ -337,6 +306,19 @@ export class BaseRepository<T_DBModel, T_MappedEntity, T_Enforcement> {
 
   protected mapEntities(data: any): T_MappedEntity[] {
     return plainToInstance<T_MappedEntity, T_MappedEntity[]>(this.entity, JSON.parse(JSON.stringify(data)));
+  }
+
+  /*
+   * Note about parallelism in transactions
+   *
+   * Running operations in parallel is not supported during a transaction.
+   * The use of Promise.all, Promise.allSettled, Promise.race, etc. to parallelize operations
+   * inside a transaction is undefined behaviour and should be avoided.
+   *
+   * Refer to https://mongoosejs.com/docs/transactions.html#note-about-parallelism-in-transactions
+   */
+  async withTransaction(fn: Parameters<ClientSession['withTransaction']>[0]) {
+    return (await this._model.db.startSession()).withTransaction(fn);
   }
 }
 

@@ -1,17 +1,14 @@
 import { Step, StepProps } from '@/components/primitives/step';
-import { stepVariants } from '@/components/primitives/variants';
 import { IconType } from 'react-icons/lib';
 import { STEP_TYPE_TO_ICON } from './icons/utils';
 import { StepTypeEnum } from '@/utils/enums';
+import { ComponentProps } from 'react';
 
 type WorkflowStepProps = StepProps & {
   step: StepTypeEnum;
 };
 
-const stepRenderData: Record<
-  StepTypeEnum,
-  { variant: NonNullable<Parameters<typeof stepVariants>[0]>['variant']; icon: IconType }
-> = {
+const stepRenderData: Record<StepTypeEnum, { variant: ComponentProps<typeof Step>['variant']; icon: IconType }> = {
   [StepTypeEnum.CHAT]: { variant: 'feature', icon: STEP_TYPE_TO_ICON[StepTypeEnum.CHAT] },
   [StepTypeEnum.CUSTOM]: { variant: 'alert', icon: STEP_TYPE_TO_ICON[StepTypeEnum.CUSTOM] },
   [StepTypeEnum.DELAY]: { variant: 'warning', icon: STEP_TYPE_TO_ICON[StepTypeEnum.DELAY] },

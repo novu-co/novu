@@ -1,5 +1,8 @@
 name: Deploy Workers Job
 
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
 # Controls when the action will run. Triggers the workflow on push or pull request
 on:
   workflow_call:
@@ -63,7 +66,6 @@ jobs:
           echo "queue_workers_services=$(terraform output -json queue_workers_services)" >> $GITHUB_OUTPUT
           echo "ecs_cluster=$(terraform output -json worker_ecs_cluster | jq -r .)" >> $GITHUB_OUTPUT
           echo "aws_region=$(terraform output -json aws_region | jq -r .)" >> $GITHUB_OUTPUT
-
 
   deploy_worker_queue:
     needs: infrastructure_data

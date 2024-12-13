@@ -1,6 +1,6 @@
 {
   "name": "nextjs",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "scripts": {
     "dev": "next dev -p 4011",
@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@novu/react": "workspace:*",
     "@novu/nextjs": "workspace:*",
     "@radix-ui/colors": "^3.0.0",
     "@radix-ui/react-dropdown-menu": "^2.1.1",

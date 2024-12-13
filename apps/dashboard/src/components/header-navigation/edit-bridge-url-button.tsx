@@ -10,7 +10,7 @@ import { Button } from '../primitives/button';
 import { Input, InputField } from '../primitives/input';
 import { ConnectionStatus } from '@/utils/types';
 import { useEnvironment } from '@/context/environment/hooks';
-import { useBridgeHealthCheck } from '@/hooks/use-bridge-health-check';
+import { useFetchBridgeHealthCheck } from '@/hooks/use-fetch-bridge-health-check';
 import { useValidateBridgeUrl } from '@/hooks/use-validate-bridge-url';
 import { useUpdateBridgeUrl } from '@/hooks/use-update-bridge-url';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
@@ -25,10 +25,10 @@ export const EditBridgeUrlButton = () => {
     handleSubmit,
     reset,
     setError,
-    formState: { isDirty, errors },
+    formState: { isDirty },
   } = form;
   const { currentEnvironment, setBridgeUrl } = useEnvironment();
-  const { status, bridgeURL: envBridgeUrl } = useBridgeHealthCheck();
+  const { status, bridgeURL: envBridgeUrl } = useFetchBridgeHealthCheck();
   const { validateBridgeUrl, isPending: isValidatingBridgeUrl } = useValidateBridgeUrl();
   const { updateBridgeUrl, isPending: isUpdatingBridgeUrl } = useUpdateBridgeUrl();
 
@@ -37,7 +37,7 @@ export const EditBridgeUrlButton = () => {
   }, [reset, envBridgeUrl]);
 
   const onSubmit = async ({ bridgeUrl }: z.infer<typeof formSchema>) => {
-    const { isValid } = await validateBridgeUrl(bridgeUrl);
+    const { isValid } = await validateBridgeUrl({ bridgeUrl });
     if (isValid) {
       await updateBridgeUrl({ url: bridgeUrl, environmentId: currentEnvironment?._id ?? '' });
       setBridgeUrl(bridgeUrl);
@@ -86,7 +86,7 @@ export const EditBridgeUrlButton = () => {
                     <FormItem>
                       <FormLabel>Bridge Endpoint URL</FormLabel>
                       <FormControl>
-                        <InputField state={errors.bridgeUrl?.message ? 'error' : 'default'}>
+                        <InputField>
                           <RiLinkM className="size-5 min-w-5" />
                           <Input id="bridgeUrl" {...field} />
                         </InputField>
@@ -109,6 +109,7 @@ export const EditBridgeUrlButton = () => {
                   type="submit"
                   variant="primary"
                   size="xs"
+                  isLoading={isUpdatingBridgeUrl}
                   disabled={!isDirty || isValidatingBridgeUrl || isUpdatingBridgeUrl}
                 >
                   Update endpoint

@@ -9,6 +9,7 @@ import { cva } from 'class-variance-authority';
 import { FormFieldContext, FormItemContext, useFormField } from './form-context';
 import { RiErrorWarningFill, RiInformationFill } from 'react-icons/ri';
 import { BsFillInfoCircleFill } from 'react-icons/bs';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 
 const Form = FormProvider;
 
@@ -40,25 +41,33 @@ FormItem.displayName = 'FormItem';
 
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { optional?: boolean; hint?: string }
->(({ className, optional, hint, children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & { optional?: boolean; hint?: string; tooltip?: string }
+>(({ className, optional, tooltip, hint, children, ...props }, ref) => {
   const { formItemId } = useFormField();
 
   return (
-    <Label ref={ref} className={cn('text-foreground-950', className)} htmlFor={formItemId} {...props}>
+    <Label ref={ref} className={cn('text-foreground-950 flex items-center', className)} htmlFor={formItemId} {...props}>
       {children}
-      {hint && (
-        <span className="text-foreground-400 ml-0.5 inline-flex items-center gap-1">
-          {hint}
-          <BsFillInfoCircleFill className="text-foreground-300 inline size-3" />
-        </span>
+
+      {tooltip && (
+        <Tooltip>
+          <TooltipTrigger
+            className="ml-1"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            <BsFillInfoCircleFill className="text-foreground-300 -mt-0.5 inline size-3" />
+          </TooltipTrigger>
+          <TooltipContent>{tooltip}</TooltipContent>
+        </Tooltip>
       )}
 
-      {optional && (
-        <span className="text-foreground-400 ml-0.5 inline-flex items-center gap-1">
-          (optional) <BsFillInfoCircleFill className="text-foreground-300 inline size-3" />
-        </span>
-      )}
+      {hint && <span className="text-foreground-400 ml-0.5 inline-flex items-center gap-1">{hint}</span>}
+
+      {optional && <span className="text-foreground-400 ml-0.5 inline-flex items-center gap-1">(optional)</span>}
     </Label>
   );
 });
@@ -95,34 +104,41 @@ FormDescription.displayName = 'FormDescription';
 const formMessageVariants = cva('flex items-center gap-1', {
   variants: {
     variant: {
-      default: '[&>svg]:text-foreground-300 text-foreground-400',
+      default: '[&>svg]:text-foreground-400 text-foreground-500',
       error: '[&>svg]:text-destructive [&>span]:text-destructive',
     },
   },
 });
 
-const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
-  ({ className, children, ...props }, ref) => {
-    const { error, formMessageId } = useFormField();
-    const body = error ? String(error?.message) : children;
+const FormMessagePure = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement> & { error?: string }
+>(({ className, children, error, id, ...props }, ref) => {
+  const body = error ? error : children;
 
-    if (!body) {
-      return null;
-    }
-
-    return (
-      <p
-        ref={ref}
-        id={formMessageId}
-        className={formMessageVariants({ variant: error ? 'error' : 'default', className })}
-        {...props}
-      >
-        {error ? <RiErrorWarningFill className="size-4" /> : <RiInformationFill className="size-4" />}
-        <span className="mt-[1px] text-xs leading-3">{body}</span>
-      </p>
-    );
+  if (!body) {
+    return null;
   }
-);
+
+  return (
+    <p
+      ref={ref}
+      id={id}
+      className={formMessageVariants({ variant: error ? 'error' : 'default', className })}
+      {...props}
+    >
+      <span>{error ? <RiErrorWarningFill className="size-4" /> : <RiInformationFill className="size-4" />}</span>
+      <span className="mt-[1px] text-xs leading-4">{body}</span>
+    </p>
+  );
+});
+FormMessagePure.displayName = 'FormMessagePure';
+
+const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>((props, ref) => {
+  const { error, formMessageId } = useFormField();
+
+  return <FormMessagePure ref={ref} id={formMessageId} error={error ? String(error?.message) : undefined} {...props} />;
+});
 FormMessage.displayName = 'FormMessage';
 
-export { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormField };
+export { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormMessagePure, FormField };

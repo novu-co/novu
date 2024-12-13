@@ -1,10 +1,9 @@
 {
   "name": "novu",
-  "version": "2.1.0",
+  "version": "2.2.1",
   "description": "Novu CLI. Run Novu Studio and sync workflows with Novu Cloud",
   "main": "src/index.js",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org",
     "access": "public"
   },
   "private": false,
@@ -87,11 +86,13 @@
     "validate-npm-package-name": "3.0.0",
     "prompts": "2.4.2",
     "@types/cross-spawn": "6.0.0",
-    "cross-spawn": "7.0.3",
+    "cross-spawn": "7.0.5",
     "fast-glob": "3.3.1",
     "async-sema": "3.0.1"
   },
   "nx": {
-    "tags": ["package:public"]
+    "tags": [
+      "type:package"
+    ]
   }
 }

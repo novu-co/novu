@@ -1,18 +1,16 @@
-import { JSONSchema } from 'json-schema-to-ts';
-
 import {
   ChannelCTATypeEnum,
   EnvironmentId,
   IEmailBlock,
   ITemplateVariable,
+  MessageTemplateContentType,
   OrganizationId,
   StepTypeEnum,
   TemplateVariableTypeEnum,
+  TriggerContextTypeEnum,
 } from '../../types';
-import { TriggerContextTypeEnum } from '../notification-template';
-import { IActor } from '../messages';
-
-export type MessageTemplateContentType = 'editor' | 'customHtml';
+import type { JSONSchemaDto, UiSchema } from '../../dto';
+import { IActor } from '../actor';
 
 export interface IMessageTemplate {
   id?: string;
@@ -42,20 +40,18 @@ export interface IMessageTemplate {
   preheader?: string;
   senderName?: string;
   actor?: IActor;
-  inputs?: {
-    schema: JSONSchema;
-  };
-  controls?: {
-    schema: JSONSchema;
-  };
+  controls?: ControlSchemas;
   output?: {
-    schema: JSONSchema;
+    schema: JSONSchemaDto;
   };
   code?: string;
   createdAt?: string;
   updatedAt?: string;
 }
-
+export class ControlSchemas {
+  schema: JSONSchemaDto;
+  uiSchema?: UiSchema;
+}
 export const TemplateSystemVariables = ['subscriber', 'step', 'branding', 'tenant', 'preheader', 'actor'];
 
 export const SystemVariablesWithTypes = {

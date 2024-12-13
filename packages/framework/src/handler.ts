@@ -1,15 +1,11 @@
-import { createHmac } from 'node:crypto';
-
 import { Client } from './client';
 import {
-  FRAMEWORK_VERSION,
   GetActionEnum,
   HttpHeaderKeysEnum,
   HttpMethodEnum,
   HttpQueryKeysEnum,
   HttpStatusEnum,
   PostActionEnum,
-  SDK_VERSION,
   SIGNATURE_TIMESTAMP_TOLERANCE,
 } from './constants';
 import {
@@ -25,7 +21,7 @@ import {
   SigningKeyNotFoundError,
 } from './errors';
 import type { Awaitable, EventTriggerParams, Workflow } from './types';
-import { initApiClient } from './utils';
+import { initApiClient, createHmacSubtle } from './utils';
 import { isPlatformError } from './errors/guard.errors';
 
 export type ServeHandlerOptions = {
@@ -70,18 +66,20 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
   public readonly client: Client;
   private readonly hmacEnabled: boolean;
   private readonly http;
+  private readonly workflows: Array<Workflow>;
 
   constructor(options: INovuRequestHandlerOptions<Input, Output>) {
     this.handler = options.handler;
     this.client = options.client ? options.client : new Client();
-    this.client.addWorkflows(options.workflows);
-    this.http = initApiClient(this.client.secretKey as string);
+    this.workflows = options.workflows;
+    this.http = initApiClient(this.client.secretKey, this.client.apiUrl);
     this.frameworkName = options.frameworkName;
     this.hmacEnabled = this.client.strictAuthentication;
   }
 
   public createHandler(): (...args: Input) => Promise<Output> {
     return async (...args: Input) => {
+      await this.client.addWorkflows(this.workflows);
       const actions = await this.handler(...args);
       const actionResponse = await this.handleAction({
         actions,
@@ -135,10 +133,7 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
     const action = url.searchParams.get(HttpQueryKeysEnum.ACTION) || GetActionEnum.HEALTH_CHECK;
     const workflowId = url.searchParams.get(HttpQueryKeysEnum.WORKFLOW_ID) || '';
     const stepId = url.searchParams.get(HttpQueryKeysEnum.STEP_ID) || '';
-    const signatureHeader =
-      (await actions.headers(HttpHeaderKeysEnum.NOVU_SIGNATURE)) ||
-      (await actions.headers(HttpHeaderKeysEnum.NOVU_SIGNATURE_DEPRECATED)) ||
-      '';
+    const signatureHeader = (await actions.headers(HttpHeaderKeysEnum.NOVU_SIGNATURE)) || '';
 
     let body: Record<string, unknown> = {};
     try {
@@ -151,7 +146,7 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
 
     try {
       if (action !== GetActionEnum.HEALTH_CHECK) {
-        this.validateHmac(body, signatureHeader);
+        await this.validateHmac(body, signatureHeader);
       }
 
       const postActionMap = this.getPostActionMap(body, workflowId, stepId, action);
@@ -296,7 +291,7 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
     }
   }
 
-  private validateHmac(payload: unknown, hmacHeader: string | null): void {
+  private async validateHmac(payload: unknown, hmacHeader: string | null): Promise<void> {
     if (!this.hmacEnabled) return;
     if (!hmacHeader) {
       throw new SignatureNotFoundError();
@@ -319,16 +314,12 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
       throw new SignatureExpiredError();
     }
 
-    const localHash = this.hashHmac(this.client.secretKey as string, `${timestampPayload}.${JSON.stringify(payload)}`);
+    const localHash = await createHmacSubtle(this.client.secretKey, `${timestampPayload}.${JSON.stringify(payload)}`);
 
     const isMatching = localHash === signaturePayload;
 
     if (!isMatching) {
       throw new SignatureMismatchError();
     }
-  }
-
-  private hashHmac(secretKey: string, data: string): string {
-    return createHmac('sha256', secretKey).update(data).digest('hex');
   }
 }

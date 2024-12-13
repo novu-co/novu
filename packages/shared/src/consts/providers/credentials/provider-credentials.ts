@@ -1,4 +1,4 @@
-import { CredentialsKeyEnum } from '../provider.enum';
+import { CredentialsKeyEnum } from '../../../types';
 import { IConfigCredentials } from '../provider.interface';
 
 const mailConfigBase: IConfigCredentials[] = [
@@ -605,6 +605,18 @@ export const oneSignalConfig: IConfigCredentials[] = [
     displayName: 'API Key',
     type: 'text',
     required: true,
+  },
+  {
+    key: CredentialsKeyEnum.ApiVersion,
+    displayName: 'One Signal API',
+    description: 'Select the One Signal API to use',
+    type: 'dropdown',
+    required: false,
+    value: null,
+    dropdown: [
+      { name: 'Default (Player Model)', value: 'playerModel' },
+      { name: 'External ID', value: 'externalId' },
+    ],
   },
   ...pushConfigBase,
 ];

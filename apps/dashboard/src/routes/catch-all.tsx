@@ -1,9 +1,18 @@
 import { Navigate } from 'react-router-dom';
-import { getEnvironmentId } from '@/utils/environment';
 import { buildRoute, ROUTES } from '@/utils/routes';
+import { useEnvironment } from '../context/environment/hooks';
 
 export const CatchAllRoute = () => {
-  const environmentId = getEnvironmentId();
+  const { currentEnvironment } = useEnvironment();
 
-  return <Navigate to={environmentId ? buildRoute(ROUTES.WORKFLOWS, { environmentId }) : ROUTES.ENV} />;
+  // TODO: check if this is the correct ROUTES
+  return (
+    <Navigate
+      to={
+        currentEnvironment?.slug
+          ? buildRoute(ROUTES.WORKFLOWS, { environmentSlug: currentEnvironment.slug })
+          : ROUTES.ENV
+      }
+    />
+  );
 };

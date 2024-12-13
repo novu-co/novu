@@ -1,6 +1,6 @@
 {
   "name": "@novu/inbound-mail",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "",
   "author": "",
   "private": true,
@@ -23,8 +23,8 @@
     "@novu/shared": "workspace:*",
     "@sentry/browser": "^8.33.1",
     "@sentry/hub": "^7.114.0",
-    "@sentry/node": "^8.33.1",
     "@sentry/nestjs": "^8.33.1",
+    "@sentry/node": "^8.33.1",
     "@sentry/profiling-node": "^8.33.1",
     "@sentry/tracing": "^7.40.0",
     "bluebird": "^2.9.30",
@@ -35,7 +35,7 @@
     "languagedetect": "^1.1.1",
     "lodash": "^4.17.15",
     "mailparser": "^0.6.0",
-    "newrelic": "^9.15.0",
+    "newrelic": "^12.8.1",
     "rimraf": "^3.0.2",
     "shelljs": "^0.8.5",
     "smtp-server": "^1.4.0",
@@ -62,5 +62,10 @@
     "ts-node": "~10.9.1",
     "tsconfig-paths": "~4.1.0",
     "typescript": "5.6.2"
+  },
+  "nx": {
+    "tags": [
+      "type:app"
+    ]
   }
 }

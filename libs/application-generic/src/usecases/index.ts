@@ -45,4 +45,6 @@ export * from './execute-bridge-request';
 export * from './upsert-preferences';
 export * from './upsert-control-values';
 export * from './get-preferences';
+export * from './delete-preferences';
 export * from './get-decrypted-secret-key';
+export * from './tier-restrictions-validate';

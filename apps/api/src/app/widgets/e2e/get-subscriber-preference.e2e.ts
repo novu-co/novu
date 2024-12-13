@@ -31,8 +31,7 @@ describe('GET /widget/preferences', function () {
     expect(data.preference.channels.email).to.equal(true);
     expect(data.preference.channels.in_app).to.equal(true);
 
-    expect(data.preference.overrides.find((sources) => sources.channel === 'email').source).to.equal('template');
-    expect(data.preference.overrides.find((sources) => sources.channel === 'email').source).to.equal('template');
+    expect(data.preference.overrides.find((sources) => sources.channel === 'email').source).to.equal('subscriber');
   });
 
   it('should fetch according to template preferences defaults ', async function () {
@@ -47,11 +46,11 @@ describe('GET /widget/preferences', function () {
     expect(data.preference.channels.email).to.equal(true);
     expect(data.preference.channels.in_app).to.equal(false);
 
-    expect(data.preference.overrides.find((sources) => sources.channel === 'email').source).to.equal('template');
-    expect(data.preference.overrides.find((sources) => sources.channel === 'email').source).to.equal('template');
+    expect(data.preference.overrides.find((sources) => sources.channel === 'email').source).to.equal('subscriber');
   });
 
-  it('should fetch according to merged subscriber and template preferences ', async function () {
+  // `enabled` flag is not used anymore. The presence of a preference object means that the subscriber has enabled notifications.
+  it.skip('should fetch according to merged subscriber and template preferences ', async function () {
     const templateDefaultSettings = await session.createTemplate({
       preferenceSettingsOverride: { email: true, chat: true, push: true, sms: true, in_app: false },
       noFeedId: true,

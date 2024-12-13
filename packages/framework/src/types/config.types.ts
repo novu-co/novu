@@ -1,8 +1,8 @@
 export type ClientOptions = {
   /**
-   * @deprecated use `secretKey` instead
+   * Use Novu Cloud US (https://api.novu.co) or EU deployment (https://eu.api.novu.co). Defaults to US.
    */
-  apiKey?: string;
+  apiUrl?: string;
 
   /**
    * Specify your Novu secret key, to secure the Bridge Endpoint, and Novu API communication.

@@ -111,6 +111,7 @@ export const appearanceKeys = [
   // workflow
   'workflowContainer',
   'workflowLabel',
+  'workflowLabelHeader',
   'workflowLabelContainer',
   'workflowContainerDisabledNotice',
   'workflowLabelDisabled__icon',

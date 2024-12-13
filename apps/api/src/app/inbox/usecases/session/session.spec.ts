@@ -1,7 +1,7 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
 import { NotFoundException } from '@nestjs/common';
-import { EnvironmentRepository } from '@novu/dal';
+import { EnvironmentRepository, IntegrationRepository } from '@novu/dal';
 import { AnalyticsService, CreateSubscriber, SelectIntegration, AuthService } from '@novu/application-generic';
 import { ChannelTypeEnum, InAppProviderIdEnum } from '@novu/shared';
 
@@ -39,7 +39,7 @@ describe('Session', () => {
   let selectIntegration: sinon.SinonStubbedInstance<SelectIntegration>;
   let analyticsService: sinon.SinonStubbedInstance<AnalyticsService>;
   let notificationsCount: sinon.SinonStubbedInstance<NotificationsCount>;
-
+  let integrationRepository: sinon.SinonStubbedInstance<IntegrationRepository>;
   beforeEach(() => {
     environmentRepository = sinon.createStubInstance(EnvironmentRepository);
     createSubscriber = sinon.createStubInstance(CreateSubscriber);
@@ -47,6 +47,7 @@ describe('Session', () => {
     selectIntegration = sinon.createStubInstance(SelectIntegration);
     analyticsService = sinon.createStubInstance(AnalyticsService);
     notificationsCount = sinon.createStubInstance(NotificationsCount);
+    integrationRepository = sinon.createStubInstance(IntegrationRepository);
 
     session = new Session(
       environmentRepository as any,
@@ -54,7 +55,8 @@ describe('Session', () => {
       authService as any,
       selectIntegration as any,
       analyticsService as any,
-      notificationsCount as any
+      notificationsCount as any,
+      integrationRepository as any
     );
   });
 
@@ -192,7 +194,7 @@ describe('Session', () => {
     expect(response.token).to.equal(token);
     expect(response.totalUnreadCount).to.equal(notificationCount.data[0].count);
     expect(
-      analyticsService.mixpanelTrack.calledOnceWith(AnalyticsEventsEnum.SESSION_INITIALIZED, '', {
+      analyticsService.mixpanelTrack.calledWith(AnalyticsEventsEnum.SESSION_INITIALIZED, '', {
         _organization: environment._organizationId,
         environmentName: environment.name,
         _subscriber: subscriber._id,
