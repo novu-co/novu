@@ -1,4 +1,5 @@
 import { DEFAULT_WORKFLOW_PREFERENCES } from '../consts';
+import { IPreferenceChannels } from '../entities/subscriber-preference';
 import { ChannelTypeEnum, WorkflowPreferencesPartial, WorkflowPreferences } from '../types';
 
 /**
@@ -41,4 +42,27 @@ export const buildWorkflowPreferences = (
       ),
     },
   };
+};
+
+/**
+ * Given a `critical` flag and a `IPreferenceChannels` object, build a `WorkflowPreferences` object
+ *
+ * @deprecated use `buildWorkflowPreferences` instead
+ */
+export const buildWorkflowPreferencesFromPreferenceChannels = (
+  critical: boolean = false,
+  preferenceChannels: IPreferenceChannels = {}
+): WorkflowPreferences => {
+  return buildWorkflowPreferences({
+    all: { enabled: true, readOnly: critical },
+    channels: Object.entries(preferenceChannels).reduce(
+      (output, [channel, value]) => ({
+        ...output,
+        [channel as ChannelTypeEnum]: {
+          enabled: value,
+        },
+      }),
+      {} as WorkflowPreferences['channels']
+    ),
+  });
 };

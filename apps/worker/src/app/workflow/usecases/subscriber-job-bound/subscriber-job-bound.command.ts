@@ -1,15 +1,15 @@
-import { IsDefined, IsString, IsOptional, ValidateNested, IsMongoId, IsEnum } from 'class-validator';
+import { IsDefined, IsEnum, IsMongoId, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 import {
-  ControlsDto,
   ISubscribersDefine,
   ITenantDefine,
+  StatelessControls,
   SubscriberSourceEnum,
   TriggerRequestCategoryEnum,
 } from '@novu/shared';
 import { SubscriberEntity } from '@novu/dal';
 import { EnvironmentWithUserCommand } from '@novu/application-generic';
-import { DiscoverWorkflowOutput } from '@novu/framework';
+import { DiscoverWorkflowOutput } from '@novu/framework/internal';
 
 export class SubscriberJobBoundCommand extends EnvironmentWithUserCommand {
   @IsString()
@@ -50,7 +50,7 @@ export class SubscriberJobBoundCommand extends EnvironmentWithUserCommand {
 
   bridge?: { url: string; workflow: DiscoverWorkflowOutput };
 
-  controls?: ControlsDto;
+  controls?: StatelessControls;
 
   @IsDefined()
   @IsString()

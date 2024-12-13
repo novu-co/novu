@@ -13,11 +13,12 @@ import {
   ControlValuesLevelEnum,
   ExecutionDetailsSourceEnum,
   ExecutionDetailsStatusEnum,
+  ITriggerPayload,
   JobStatusEnum,
   WorkflowOriginEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
-import { Event, State, PostActionEnum, ExecuteOutput } from '@novu/framework';
+import { Event, State, PostActionEnum, ExecuteOutput } from '@novu/framework/internal';
 
 import {
   CreateExecutionDetails,
@@ -25,6 +26,8 @@ import {
   DetailEnum,
   ExecuteBridgeRequest,
   ExecuteBridgeRequestCommand,
+  Instrument,
+  InstrumentUsecase,
 } from '@novu/application-generic';
 import { ExecuteBridgeJobCommand } from './execute-bridge-job.command';
 
@@ -42,6 +45,7 @@ export class ExecuteBridgeJob {
     private executeBridgeRequest: ExecuteBridgeRequest
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: ExecuteBridgeJobCommand): Promise<ExecuteOutput | null> {
     const stepId = command.job.step.stepId || command.job.step.uuid;
 
@@ -95,10 +99,7 @@ export class ExecuteBridgeJob {
       : command.job.step.controlVariables;
 
     const bridgeEvent: Omit<Event, 'workflowId' | 'stepId' | 'action'> = {
-      /** @deprecated */
-      data: payload ?? {},
       payload: payload ?? {},
-      inputs: variablesStores ?? {},
       controls: variablesStores ?? {},
       state,
       subscriber: subscriber ?? {},
@@ -147,10 +148,10 @@ export class ExecuteBridgeJob {
       level: ControlValuesLevelEnum.STEP_CONTROLS,
     });
 
-    return controls?.controls || controls?.inputs;
+    return controls?.controls;
   }
 
-  private normalizePayload(originalPayload) {
+  private normalizePayload(originalPayload: ITriggerPayload = {}) {
     // Remove internal params
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { __source, ...payload } = originalPayload;
@@ -166,7 +167,6 @@ export class ExecuteBridgeJob {
     })) as JobEntity;
 
     if (theJob) {
-      this.normalizeFirstJob(theJob, previousJobs, payload);
       const jobState = await this.mapState(theJob, payload);
       previousJobs.push(jobState);
     }
@@ -186,19 +186,7 @@ export class ExecuteBridgeJob {
     return previousJobs;
   }
 
-  /*
-   * Backward compatibility, If the first job is not a trigger, we need to add a trigger job to the state
-   */
-  private normalizeFirstJob(firstJob: JobEntity, previousJobs: State[], payload?: Record<string, unknown>) {
-    if (firstJob.type !== 'trigger') {
-      previousJobs.push({
-        stepId: 'trigger',
-        outputs: payload ?? {},
-        state: { status: JobStatusEnum.COMPLETED },
-      });
-    }
-  }
-
+  @Instrument()
   private async sendBridgeRequest({
     statelessBridgeUrl,
     event,
@@ -206,116 +194,43 @@ export class ExecuteBridgeJob {
     searchParams,
     workflowOrigin,
     environmentId,
-  }: Omit<ExecuteBridgeRequestCommand, 'afterResponse' | 'action' | 'retriesLimit'> & {
+  }: Omit<ExecuteBridgeRequestCommand, 'processError' | 'action' | 'retriesLimit'> & {
     job: JobEntity;
   }): Promise<ExecuteOutput> {
-    try {
-      return this.executeBridgeRequest.execute({
-        statelessBridgeUrl,
-        event,
-        action: PostActionEnum.EXECUTE,
-        searchParams,
-        afterResponse: async (response) => {
-          const body = response?.body as string;
-
-          if (response.statusCode >= 400) {
-            let rawMessage: Record<string, unknown>;
-            try {
-              rawMessage = JSON.parse(body);
-            } catch {
-              Logger.error(`Unexpected body received from Bridge: ${body}`, LOG_CONTEXT);
-              rawMessage = {
-                error: `Unexpected body received from Bridge: ${body}`,
-              };
-            }
-            const createExecutionDetailsCommand: CreateExecutionDetailsCommand = {
-              ...CreateExecutionDetailsCommand.getDetailsFromJob(job),
-              detail: DetailEnum.FAILED_BRIDGE_RETRY,
-              source: ExecutionDetailsSourceEnum.INTERNAL,
-              status: ExecutionDetailsStatusEnum.WARNING,
-              isTest: false,
-              isRetry: false,
-              raw: JSON.stringify({
-                url: statelessBridgeUrl,
-                statusCode: response.statusCode,
-                retryCount: response.retryCount,
-                message: response.statusMessage,
-                ...(body && body?.length > 0 ? { raw: rawMessage } : {}),
-              }),
-            };
-
-            await this.createExecutionDetails.execute(createExecutionDetailsCommand);
-          }
-
-          return response;
-        },
-        workflowOrigin,
-        environmentId,
-      }) as Promise<ExecuteOutput>;
-    } catch (error: any) {
-      Logger.error(error, 'Error sending Bridge request:', LOG_CONTEXT);
-
-      let raw: { retryCount?: number; statusCode?: number; message: string; url?: string };
-
-      if (error.response) {
-        let rawMessage: Record<string, unknown>;
-        const errorResponseBody = error?.response?.body;
-        try {
-          rawMessage = JSON.parse(errorResponseBody);
-        } catch {
-          Logger.error(`Unexpected body received from Bridge: ${errorResponseBody}`, LOG_CONTEXT);
-          rawMessage = {
-            error: `Unexpected body received from Bridge: ${errorResponseBody}`,
-          };
-        }
-
-        raw = {
-          url: statelessBridgeUrl,
-          statusCode: error.response?.statusCode,
-          message: error.response?.statusMessage,
-          ...(error.response?.retryCount ? { retryCount: error.response?.retryCount } : {}),
-          ...(error?.response?.body?.length > 0 ? { raw: rawMessage } : {}),
+    return this.executeBridgeRequest.execute({
+      statelessBridgeUrl,
+      event,
+      action: PostActionEnum.EXECUTE,
+      searchParams,
+      processError: async (response) => {
+        const createExecutionDetailsCommand: CreateExecutionDetailsCommand = {
+          ...CreateExecutionDetailsCommand.getDetailsFromJob(job),
+          detail: DetailEnum.FAILED_BRIDGE_EXECUTION,
+          source: ExecutionDetailsSourceEnum.INTERNAL,
+          status: ExecutionDetailsStatusEnum.FAILED,
+          isTest: false,
+          isRetry: false,
+          raw: JSON.stringify({
+            url: response.url,
+            statusCode: response.statusCode,
+            message: response.message,
+            code: response.code,
+            data: response.data,
+          }),
         };
-      } else if (error.message) {
-        raw = {
-          url: statelessBridgeUrl,
-          message: error.message,
-        };
-      } else {
-        raw = {
-          url: statelessBridgeUrl,
-          message: 'An Unexpected Error Occurred',
-        };
-      }
 
-      const createExecutionDetailsCommand: CreateExecutionDetailsCommand = {
-        ...CreateExecutionDetailsCommand.getDetailsFromJob(job),
-        detail: DetailEnum.FAILED_BRIDGE_EXECUTION,
-        source: ExecutionDetailsSourceEnum.INTERNAL,
-        status: ExecutionDetailsStatusEnum.FAILED,
-        isTest: false,
-        isRetry: false,
-        raw: JSON.stringify(raw),
-      };
-
-      await this.createExecutionDetails.execute(createExecutionDetailsCommand);
-
-      throw error;
-    }
+        await this.createExecutionDetails.execute(createExecutionDetailsCommand);
+      },
+      workflowOrigin,
+      environmentId,
+    }) as Promise<ExecuteOutput>;
   }
 
+  @Instrument()
   private async mapState(job: JobEntity, payload: Record<string, unknown>) {
     let output = {};
-    let state: State['state'] | null = null;
-    let stepId: string | null = null;
 
     switch (job.type) {
-      case 'trigger': {
-        stepId = 'trigger';
-        output = payload ?? {};
-        state = { status: JobStatusEnum.COMPLETED };
-        break;
-      }
       case 'delay': {
         output = {
           duration: Date.now() - new Date(job.createdAt).getTime(),
@@ -373,9 +288,9 @@ export class ExecuteBridgeJob {
     }
 
     return {
-      stepId: stepId || job?.step.stepId || job?.step.uuid || '',
+      stepId: job?.step.stepId || job?.step.uuid || '',
       outputs: output ?? {},
-      state: state || {
+      state: {
         status: job?.status,
         error: job?.error,
       },

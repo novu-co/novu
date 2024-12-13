@@ -3,10 +3,36 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import ErrorPage from '@/components/error-page';
 import { RootRoute, AuthRoute, DashboardRoute, CatchAllRoute } from './routes';
-import { WorkflowsPage, SignInPage, SignUpPage, OrganizationListPage } from '@/pages';
+import { OnboardingParentRoute } from './routes/onboarding';
+import {
+  WorkflowsPage,
+  SignInPage,
+  SignUpPage,
+  OrganizationListPage,
+  QuestionnairePage,
+  UsecaseSelectPage,
+  ApiKeysPage,
+  WelcomePage,
+  SettingsPage,
+  ActivityFeed,
+} from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
+import { TestWorkflowPage } from './pages/test-workflow';
+import { initializeSentry } from './utils/sentry';
+import { overrideZodErrorMap } from './utils/validation';
+import { InboxUsecasePage } from './pages/inbox-usecase-page';
+import { InboxEmbedPage } from './pages/inbox-embed-page';
+import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workflow';
+import { InboxEmbedSuccessPage } from './pages/inbox-embed-success-page';
+import { ChannelPreferences } from './components/workflow-editor/channel-preferences';
+import { FeatureFlagsProvider } from './context/feature-flags-provider';
+import { ConfigureStep } from '@/components/workflow-editor/steps/configure-step';
+import { ConfigureStepTemplate } from '@/components/workflow-editor/steps/configure-step-template';
+
+initializeSentry();
+overrideZodErrorMap();
 
 const router = createBrowserRouter([
   {
@@ -31,6 +57,32 @@ const router = createBrowserRouter([
         ],
       },
       {
+        path: '/onboarding',
+        element: <OnboardingParentRoute />,
+        children: [
+          {
+            path: ROUTES.SIGNUP_QUESTIONNAIRE,
+            element: <QuestionnairePage />,
+          },
+          {
+            path: ROUTES.USECASE_SELECT,
+            element: <UsecaseSelectPage />,
+          },
+          {
+            path: ROUTES.INBOX_USECASE,
+            element: <InboxUsecasePage />,
+          },
+          {
+            path: ROUTES.INBOX_EMBED,
+            element: <InboxEmbedPage />,
+          },
+          {
+            path: ROUTES.INBOX_EMBED_SUCCESS,
+            element: <InboxEmbedSuccessPage />,
+          },
+        ],
+      },
+      {
         path: ROUTES.ROOT,
         element: <DashboardRoute />,
         children: [
@@ -38,18 +90,72 @@ const router = createBrowserRouter([
             path: ROUTES.ENV,
             children: [
               {
+                path: ROUTES.WELCOME,
+                element: <WelcomePage />,
+              },
+              {
                 path: ROUTES.WORKFLOWS,
                 element: <WorkflowsPage />,
               },
               {
+                path: ROUTES.API_KEYS,
+                element: <ApiKeysPage />,
+              },
+              {
+                path: ROUTES.ACTIVITY_FEED,
+                element: <ActivityFeed />,
+              },
+              {
                 path: ROUTES.EDIT_WORKFLOW,
                 element: <EditWorkflowPage />,
+                children: [
+                  {
+                    element: <ConfigureWorkflow />,
+                    index: true,
+                  },
+                  {
+                    element: <ConfigureStep />,
+                    path: ROUTES.EDIT_STEP,
+                  },
+                  {
+                    element: <ConfigureStepTemplate />,
+                    path: ROUTES.EDIT_STEP_TEMPLATE,
+                  },
+                  {
+                    element: <ChannelPreferences />,
+                    path: ROUTES.EDIT_WORKFLOW_PREFERENCES,
+                  },
+                ],
+              },
+              {
+                path: ROUTES.TEST_WORKFLOW,
+                element: <TestWorkflowPage />,
               },
               {
                 path: '*',
                 element: <CatchAllRoute />,
               },
             ],
+          },
+          {
+            path: ROUTES.SETTINGS,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_ACCOUNT,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_ORGANIZATION,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_TEAM,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_BILLING,
+            element: <SettingsPage />,
           },
           {
             path: '*',
@@ -63,6 +169,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <FeatureFlagsProvider>
+      <RouterProvider router={router} />
+    </FeatureFlagsProvider>
   </StrictMode>
 );

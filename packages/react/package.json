@@ -1,6 +1,6 @@
 {
   "name": "@novu/react",
-  "version": "2.5.0",
+  "version": "2.6.2",
   "repository": "https://github.com/novuhq/novu",
   "description": "Novu's React SDK for building custom inbox notification experiences",
   "author": "",
@@ -77,7 +77,7 @@
     ]
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "^0.15.4",
+    "@arethetypeswrong/cli": "^0.16.4",
     "@types/node": "^20.14.12",
     "@types/react": "*",
     "@types/react-dom": "*",
@@ -97,6 +97,8 @@
     "@novu/js": "workspace:*"
   },
   "nx": {
-    "tags": ["package:public"]
+    "tags": [
+      "type:package"
+    ]
   }
 }

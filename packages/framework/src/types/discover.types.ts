@@ -2,7 +2,7 @@ import type { WorkflowPreferencesPartial } from '@novu/shared';
 import { ActionStepEnum, ChannelStepEnum } from '../constants';
 import type { JsonSchema, Schema } from './schema.types';
 import type { StepOptions } from './step.types';
-import type { Execute, WorkflowOptions } from './workflow.types';
+import type { Execute } from './workflow.types';
 import type { Awaitable, Prettify } from './util.types';
 import type { EventTriggerParams, EventTriggerResult } from './event.types';
 import type { WithPassthrough } from './provider.types';
@@ -28,10 +28,6 @@ export type DiscoverProviderOutput = {
 export type DiscoverStepOutput = {
   stepId: string;
   type: StepType;
-  inputs: {
-    schema: JsonSchema;
-    unknownSchema: Schema;
-  };
   controls: {
     schema: JsonSchema;
     unknownSchema: Schema;
@@ -53,20 +49,9 @@ export type DiscoverStepOutput = {
 export type DiscoverWorkflowOutput = {
   workflowId: string;
   execute: Execute<Record<string, unknown>, Record<string, unknown>>;
-  options: WorkflowOptions<Schema, Schema>;
   code: string;
   steps: Array<DiscoverStepOutput>;
   payload: {
-    schema: JsonSchema;
-    unknownSchema: Schema;
-  };
-  /** @deprecated */
-  data: {
-    schema: JsonSchema;
-    unknownSchema: Schema;
-  };
-  /** @deprecated */
-  inputs: {
     schema: JsonSchema;
     unknownSchema: Schema;
   };
@@ -80,12 +65,33 @@ export type DiscoverWorkflowOutput = {
   description?: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Workflow<T_Payload = any> = {
+/**
+ * A workflow resource.
+ *
+ * @property `id` - The unique identifier for the workflow.
+ * @property `trigger` - The function to trigger the workflow.
+ * @property `discover` - The function to discover the workflow definition.
+ */
+export type Workflow<T_Payload = never> = {
+  /**
+   * The unique identifier for the workflow.
+   */
+  id: string;
+  /**
+   * Trigger an event for this workflow with a strongly typed and validated `payload`, derived from the `payloadSchema`.
+   *
+   * @param event - The event to trigger
+   * @returns `EventTriggerResult` - The result of the event trigger
+   */
   trigger: (
     event: Prettify<Omit<EventTriggerParams<T_Payload>, 'workflowId' | 'bridgeUrl' | 'controls'>>
   ) => Promise<EventTriggerResult>;
-  definition: DiscoverWorkflowOutput;
+  /**
+   * Discover the workflow definition.
+   *
+   * @returns `DiscoverWorkflowOutput` - The workflow definition
+   */
+  discover: () => Promise<DiscoverWorkflowOutput>;
 };
 
 export type DiscoverOutput = {

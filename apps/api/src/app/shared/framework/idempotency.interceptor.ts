@@ -11,11 +11,17 @@ import {
   ServiceUnavailableException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { CacheService, GetFeatureFlag, GetFeatureFlagCommand, Instrument } from '@novu/application-generic';
+import {
+  CacheService,
+  GetFeatureFlag,
+  GetFeatureFlagCommand,
+  Instrument,
+  HttpResponseHeaderKeysEnum,
+} from '@novu/application-generic';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { createHash } from 'crypto';
-import { ApiAuthSchemeEnum, HttpResponseHeaderKeysEnum, FeatureFlagsKeysEnum, UserSessionData } from '@novu/shared';
+import { ApiAuthSchemeEnum, FeatureFlagsKeysEnum, UserSessionData } from '@novu/shared';
 
 const LOG_CONTEXT = 'IdempotencyInterceptor';
 const IDEMPOTENCY_CACHE_TTL = 60 * 60 * 24; // 24h

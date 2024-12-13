@@ -1,15 +1,15 @@
 'use client';
 
 import { Badge } from '@/components/primitives/badge';
+import { CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/primitives/command';
+import { inputVariants } from '@/components/primitives/input';
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/primitives/popover';
-import { inputVariants } from '@/components/primitives/variants';
-import { CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { cn } from '@/utils/ui';
 import { Command } from 'cmdk';
-import { forwardRef, useEffect, useState } from 'react';
+import { forwardRef, useEffect, useMemo, useState } from 'react';
 import { RiCloseFill } from 'react-icons/ri';
 
-type TagInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+type TagInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
   value: string[];
   suggestions: string[];
   onChange: (tags: string[]) => void;
@@ -20,16 +20,26 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
   const [tags, setTags] = useState<string[]>(value);
   const [inputValue, setInputValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const validSuggestions = useMemo(
+    () => suggestions.filter((suggestion) => !tags.includes(suggestion)),
+    [tags, suggestions]
+  );
 
   useEffect(() => {
     setTags(value);
   }, [value]);
 
   const addTag = (tag: string) => {
+    const newTag = tag.trim();
+    if (newTag === '') {
+      return;
+    }
+
     const newTags = [...tags, tag];
     if (new Set(newTags).size !== newTags.length) {
       return;
     }
+
     onChange(newTags);
     setInputValue('');
     setIsOpen(false);
@@ -47,8 +57,8 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
 
   return (
     <Popover open={isOpen}>
-      <Command>
-        <div className="flex flex-col gap-2">
+      <Command loop>
+        <div className="flex flex-col gap-2 pb-0.5">
           <PopoverAnchor asChild>
             <CommandInput
               ref={ref}
@@ -68,54 +78,60 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, index) => (
               <Badge key={index} variant="outline" kind="tag" className="gap-1">
-                <span>{tag}</span>
+                <span style={{ wordBreak: 'break-all' }}>{tag}</span>
                 <button type="button" onClick={() => removeTag(tag)}>
-                  <RiCloseFill className="size-3" />
+                  <RiCloseFill className="-mr-0.5 size-3" />
                   <span className="sr-only">Remove tag</span>
                 </button>
               </Badge>
             ))}
           </div>
         </div>
-        <PopoverContent
-          className="p-1"
-          portal={false}
-          onOpenAutoFocus={(e) => {
-            e.preventDefault();
-          }}
-        >
-          <CommandList>
-            <CommandGroup>
-              {inputValue !== '' && (
-                <CommandItem
-                  // We can't have duplicate keys in our list so adding a prefix
-                  // here to differentiate this from a possible suggestion value
-                  value={`input-${inputValue}`}
-                  onSelect={() => {
-                    addTag(inputValue);
-                  }}
-                >
-                  {inputValue}
-                </CommandItem>
-              )}
-              {suggestions.map((tag) => (
-                <CommandItem
-                  key={tag}
-                  value={tag}
-                  onSelect={() => {
-                    addTag(tag);
-                  }}
-                >
-                  {tag}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </PopoverContent>
+        <CommandList>
+          {(validSuggestions.length > 0 || inputValue !== '') && (
+            <PopoverContent
+              className="max-h-64 w-32 p-1"
+              portal={false}
+              onOpenAutoFocus={(e) => {
+                e.preventDefault();
+              }}
+              onFocusOutside={(e) => e.preventDefault()}
+              onInteractOutside={(e) => e.preventDefault()}
+            >
+              <CommandGroup>
+                {inputValue !== '' && !validSuggestions.includes(inputValue) && (
+                  <CommandItem
+                    value={inputValue}
+                    onSelect={() => {
+                      addTag(inputValue);
+                    }}
+                    className="gap-1"
+                    disabled={inputValue === '' || tags.includes(inputValue)}
+                  >
+                    {inputValue}
+                  </CommandItem>
+                )}
+
+                {validSuggestions.map((tag) => (
+                  <CommandItem
+                    key={tag}
+                    // We can't have duplicate keys in our list so adding a suffix
+                    // here to differentiate this from the value typed
+                    value={`${tag}-suggestion`}
+                    onSelect={() => {
+                      addTag(tag);
+                    }}
+                  >
+                    {tag}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </PopoverContent>
+          )}
+        </CommandList>
       </Command>
     </Popover>
   );
 });
-TagInput.displayName = 'TagInput';
 
 export { TagInput };

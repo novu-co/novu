@@ -15,7 +15,7 @@ export const IntervalSelect = ({
   showErrors,
   readonly,
   testId = 'time-unit',
-  defaultValue = DigestUnitEnum.MINUTES,
+  defaultValue = DigestUnitEnum.SECONDS,
 }) => {
   return (
     <Controller

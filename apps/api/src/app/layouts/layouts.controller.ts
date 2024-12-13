@@ -15,6 +15,7 @@ import {
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { OrderByEnum, OrderDirectionEnum, UserSessionData } from '@novu/shared';
 import { GetLayoutCommand, GetLayoutUseCase, OtelSpan } from '@novu/application-generic';
+import { ApiExcludeController } from '@nestjs/swagger/dist/decorators/api-exclude-controller.decorator';
 import {
   ApiBadRequestResponse,
   ApiCommonResponses,
@@ -56,6 +57,7 @@ import { SdkMethodName } from '../shared/framework/swagger/sdk.decorators';
 @Controller('/layouts')
 @ApiTags('Layouts')
 @UserAuthentication()
+@ApiExcludeController()
 export class LayoutsController {
   constructor(
     private createLayoutUseCase: CreateLayoutUseCase,

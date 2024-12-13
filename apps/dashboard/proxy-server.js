@@ -19,7 +19,13 @@ app.use(
 );
 
 // Serve static files for the front-end app
-app.use(express.static('dist'));
+app.use(
+  express.static('dist', {
+    setHeaders: function (res, path) {
+      res.set('Document-Policy', 'js-profiling');
+    },
+  })
+);
 
 app.get('/legacy/*', (req, res, next) => {
   legacyHandler(__dirname, req, res, next);

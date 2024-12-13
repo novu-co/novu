@@ -45,18 +45,8 @@ describe('Delete Subscriber - /subscribers/:subscriberId (DELETE)', function () 
       },
     });
 
-    const isDeleted = !(await subscriberRepository.findBySubscriberId(session.environment._id, '123'));
-
-    expect(isDeleted).to.equal(true);
-
-    const deletedSubscriber = (
-      await subscriberRepository.findDeleted({
-        _environmentId: session.environment._id,
-        subscriberId: '123',
-      })
-    )?.[0];
-
-    expect(deletedSubscriber.deleted).to.equal(true);
+    const subscriber = await subscriberRepository.findBySubscriberId(session.environment._id, '123');
+    expect(subscriber).to.be.null;
   });
 
   it('should dispose subscriber relations to topic once he was removed', async () => {

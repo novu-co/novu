@@ -1,3 +1,11 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ComponentProps, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { RiExternalLinkLine } from 'react-icons/ri';
+import { Link, useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify } from '@novu/shared';
 import { createWorkflow } from '@/api/workflows';
 import { Button } from '@/components/primitives/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
@@ -16,78 +24,63 @@ import {
 import { TagInput } from '@/components/primitives/tag-input';
 import { Textarea } from '@/components/primitives/textarea';
 import { useEnvironment } from '@/context/environment/hooks';
-import { useTagsQuery } from '@/hooks/use-tags-query';
+import { useTags } from '@/hooks/use-tags';
 import { QueryKeys } from '@/utils/query-keys';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { type CreateWorkflowDto, WorkflowCreationSourceEnum } from '@novu/shared';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ComponentProps, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { RiExternalLinkLine } from 'react-icons/ri';
-
-import { Link } from 'react-router-dom';
-import { z } from 'zod';
-
-const formSchema = z.object({
-  name: z.string(),
-  identifier: z.string().regex(/^[a-z0-9-]+$/, 'Invalid identifier format. Must follow ^[a-z0-9-]+$'),
-  tags: z
-    .array(z.string().min(1))
-    .max(8)
-    .refine((tags) => new Set(tags).size === tags.length, {
-      message: 'Duplicate tags are not allowed.',
-    }),
-  description: z.string().max(200).optional(),
-});
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
+import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowSchema } from './workflow-editor/schema';
 
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
 export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
   const [isOpen, setIsOpen] = useState(false);
+  // TODO: Move to a use-create-workflow.ts hook
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (data: CreateWorkflowDto) => createWorkflow(data),
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id] });
-      queryClient.invalidateQueries({
+    mutationFn: async (workflow: CreateWorkflowDto) => createWorkflow({ environment: currentEnvironment!, workflow }),
+    onSuccess: async (result) => {
+      await queryClient.invalidateQueries({ queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id] });
+      await queryClient.invalidateQueries({
         queryKey: [QueryKeys.fetchWorkflow, currentEnvironment?._id, result.data.workflowId],
       });
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.fetchTags, currentEnvironment?._id],
+      });
       setIsOpen(false);
+      form.reset();
+      navigate(
+        buildRoute(ROUTES.EDIT_WORKFLOW, {
+          environmentSlug: currentEnvironment?.slug ?? '',
+          workflowSlug: result.data.slug ?? '',
+        })
+      );
     },
   });
-  const tagsQuery = useTagsQuery();
+  const { tags } = useTags();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: { description: '', identifier: '', name: '', tags: [] },
+  const form = useForm<z.infer<typeof workflowSchema>>({
+    resolver: zodResolver(workflowSchema),
+    defaultValues: { description: '', workflowId: '', name: '', tags: [] },
   });
 
   return (
-    <Sheet
-      open={isOpen}
-      onOpenChange={(open) => {
-        setIsOpen(open);
-        if (open) {
-          form.reset();
-        }
-      }}
-    >
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger {...props} />
-      <SheetContent>
+      <SheetContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <SheetHeader>
           <SheetTitle>Create workflow</SheetTitle>
           <div>
             <SheetDescription>
-              Workflows manage event-driven notifications across multiple channels in a version-controlled flow, with
-              the ability to manage preference for each subscriber.
+              Define the steps to notify subscribers using channels like in-app, email, and more.{' '}
+              <Link
+                target="_blank"
+                to="https://docs.novu.co/concepts/workflows"
+                className="text-foreground-400 inline-flex items-center text-xs underline"
+              >
+                Learn more <RiExternalLinkLine className="inline size-4" />
+              </Link>
             </SheetDescription>
-            <Link
-              target="_blank"
-              to="https://docs.novu.co/api-reference/workflows/create-workflow"
-              className="text-foreground-400 flex items-center text-sm underline"
-            >
-              Learn more <RiExternalLinkLine className="inline size-4" />
-            </Link>
           </div>
         </SheetHeader>
         <Separator />
@@ -95,17 +88,19 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
           <Form {...form}>
             <form
               id="create-workflow"
+              autoComplete="off"
+              noValidate
               onSubmit={form.handleSubmit((values) => {
                 mutateAsync({
                   name: values.name,
                   steps: [],
                   __source: WorkflowCreationSourceEnum.DASHBOARD,
-                  workflowId: values.identifier,
+                  workflowId: values.workflowId,
                   description: values.description || undefined,
                   tags: values.tags,
                 });
               })}
-              className="flex flex-col gap-6"
+              className="flex flex-col gap-4"
             >
               <FormField
                 control={form.control}
@@ -115,7 +110,15 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     <FormLabel>Name</FormLabel>
                     <FormControl>
                       <InputField>
-                        <Input placeholder="Untitled" {...field} />
+                        <Input
+                          {...field}
+                          autoFocus
+                          {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            form.setValue('workflowId', slugify(e.target.value));
+                          }}
+                        />
                       </InputField>
                     </FormControl>
                     <FormMessage />
@@ -125,16 +128,16 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
 
               <FormField
                 control={form.control}
-                name="identifier"
+                name="workflowId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Identifier</FormLabel>
                     <FormControl>
                       <InputField>
-                        <Input placeholder="untitled" {...field} />
+                        <Input {...field} readOnly />
                       </InputField>
                     </FormControl>
-                    <FormMessage>Must be unique and all lowercase ^[a-z0-9\-]+$</FormMessage>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -147,10 +150,10 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-1">
-                      <FormLabel hint="(max. 8)">Add tags</FormLabel>
+                      <FormLabel hint={`(max. ${MAX_TAG_ELEMENTS})`}>Add tags</FormLabel>
                     </div>
                     <FormControl>
-                      <TagInput suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []} {...field} />
+                      <TagInput suggestions={tags.map((tag) => tag.name)} {...field} value={field.value ?? []} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -166,7 +169,12 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <FormLabel optional>Description</FormLabel>
                     </div>
                     <FormControl>
-                      <Textarea placeholder="Description of what this workflow does" {...field} />
+                      <Textarea
+                        className="min-h-36"
+                        placeholder="Describe what this workflow does"
+                        {...field}
+                        maxLength={MAX_DESCRIPTION_LENGTH}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -177,7 +185,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
         </SheetMain>
         <Separator />
         <SheetFooter>
-          <Button disabled={isPending} variant="default" type="submit" form="create-workflow">
+          <Button isLoading={isPending} variant="default" type="submit" form="create-workflow">
             Create workflow
           </Button>
         </SheetFooter>

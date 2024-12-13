@@ -1,5 +1,4 @@
-import { ChatProviderIdEnum, PushProviderIdEnum } from '../../consts';
-import { ISubscriberChannel } from '../../types';
+import { ChatProviderIdEnum, ISubscriberChannel, PushProviderIdEnum } from '../../types';
 
 interface IChannelCredentials {
   webhookUrl?: string;
@@ -25,6 +24,13 @@ export class SubscriberDto {
   subscriberId: string;
   channels?: IChannelSettings[];
   deleted: boolean;
+}
+export interface ISubscriberFeedResponseDto {
+  _id?: string;
+  firstName?: string;
+  lastName?: string;
+  avatar?: string;
+  subscriberId: string;
 }
 
 export interface ISubscriberResponseDto {

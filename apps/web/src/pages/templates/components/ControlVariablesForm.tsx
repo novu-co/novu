@@ -9,8 +9,7 @@ export const ControlVariablesForm = ({ onChange }: { onChange?: (data: any) => v
   const stepFormPath = useStepFormPath();
   const { watch } = useFormContext();
   const { template } = useTemplateEditorForm();
-  const controls =
-    watch(`${stepFormPath}.template.controls.schema`) || watch(`${stepFormPath}.template.inputs.schema`) || {};
+  const controls = watch(`${stepFormPath}.template.controls.schema`) || {};
   const workflowPayloadSchema = watch(`payloadSchema`) || {};
 
   const stepId = watch(`${stepFormPath}.stepId`);

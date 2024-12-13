@@ -39,6 +39,8 @@ export const installTemplate = async ({
   srcDir,
   importAlias,
   secretKey,
+  applicationId,
+  userId,
 }: InstallTemplateArgs) => {
   console.log(bold(`Using ${packageManager}.`));
 
@@ -170,6 +172,8 @@ export const installTemplate = async ({
   /* write .env file */
   const val = Object.entries({
     NOVU_SECRET_KEY: secretKey,
+    NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER: applicationId,
+    NEXT_PUBLIC_NOVU_SUBSCRIBER_ID: userId,
   }).reduce((acc, [key, value]) => {
     return `${acc}${key}=${value}${os.EOL}`;
   }, "");
@@ -204,6 +208,7 @@ export const installTemplate = async ({
       "react-dom": "^18",
       next: version,
       "@novu/framework": "latest",
+      "@novu/nextjs": "^2.5.0",
     },
     devDependencies: {},
   };

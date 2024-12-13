@@ -21,8 +21,8 @@ runs:
       shell: bash
       env:
         LAUNCH_DARKLY_SDK_KEY: ${{ inputs.launch_darkly_sdk_key }}
-        NODE_ENV: "test"
-        PORT: "1336"
+        NODE_ENV: 'test'
+        PORT: '1336'
       run: cd apps/api && pnpm start:prod &
 
     - name: Wait on API

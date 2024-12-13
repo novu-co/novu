@@ -1,36 +1,37 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { ChannelTypeEnum } from '@novu/shared';
+import { IsOptional } from 'class-validator';
 
 export class ActivitiesRequestDto {
-  @ApiProperty({
+  @ApiPropertyOptional({
     enum: ChannelTypeEnum,
     isArray: true,
   })
-  channels: ChannelTypeEnum[] | ChannelTypeEnum;
+  channels?: ChannelTypeEnum[] | ChannelTypeEnum;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: String,
     isArray: true,
   })
-  templates: string[] | string;
+  templates?: string[] | string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: String,
     isArray: true,
   })
-  emails: string | string[];
+  emails?: string | string[];
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: String,
     deprecated: true,
   })
-  search: string;
+  search?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     type: String,
     isArray: true,
   })
-  subscriberIds: string | string[];
+  subscriberIds?: string | string[];
 
   @ApiPropertyOptional({
     type: Number,
@@ -42,5 +43,19 @@ export class ActivitiesRequestDto {
     type: String,
     required: false,
   })
-  transactionId: string;
+  transactionId?: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    required: false,
+  })
+  @IsOptional()
+  after?: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    required: false,
+  })
+  @IsOptional()
+  before?: string;
 }

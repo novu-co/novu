@@ -1,72 +1,73 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
+import { StepDataDto, UserSessionData, WorkflowResponseDto } from '@novu/shared';
 import {
-  ControlValuesEntity,
-  ControlValuesRepository,
-  NotificationStepEntity,
-  NotificationTemplateEntity,
-} from '@novu/dal';
-import { ControlValuesLevelEnum, WorkflowResponseDto } from '@novu/shared';
-import { GetPreferences, GetPreferencesCommand } from '@novu/application-generic';
+  GetWorkflowByIdsCommand,
+  GetWorkflowByIdsUseCase,
+  InstrumentUsecase,
+  WorkflowInternalResponseDto,
+} from '@novu/application-generic';
 
+import { NotificationStepEntity } from '@novu/dal';
 import { GetWorkflowCommand } from './get-workflow.command';
 import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
-import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
-import { GetWorkflowByIdsCommand } from '../get-workflow-by-ids/get-workflow-by-ids.command';
+import { BuildStepDataUsecase } from '../build-step-data/build-step-data.usecase';
+import { BuildStepDataCommand } from '../build-step-data/build-step-data.command';
 
 @Injectable()
 export class GetWorkflowUseCase {
   constructor(
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private controlValuesRepository: ControlValuesRepository,
-    private getPreferencesUseCase: GetPreferences
+    private buildStepDataUsecase: BuildStepDataUsecase
   ) {}
-  async execute(command: GetWorkflowCommand): Promise<WorkflowResponseDto> {
-    const workflowEntity: NotificationTemplateEntity | null = await this.getWorkflowByIdsUseCase.execute(
-      GetWorkflowByIdsCommand.create({
-        ...command,
-        identifierOrInternalId: command.identifierOrInternalId,
-      })
-    );
 
-    const stepIdToControlValuesMap = await this.getControlsValuesMap(workflowEntity.steps, command, workflowEntity._id);
-    const preferences = await this.getPreferencesUseCase.safeExecute(
-      GetPreferencesCommand.create({
+  @InstrumentUsecase()
+  async execute(command: GetWorkflowCommand): Promise<WorkflowResponseDto> {
+    const workflowEntity = await this.getWorkflowByIdsUseCase.execute(
+      GetWorkflowByIdsCommand.create({
         environmentId: command.user.environmentId,
         organizationId: command.user.organizationId,
+        userId: command.user._id,
+        workflowIdOrInternalId: command.workflowIdOrInternalId,
       })
     );
 
-    return toResponseWorkflowDto(workflowEntity, preferences, stepIdToControlValuesMap);
+    const fullSteps = await this.getFullWorkflowSteps(workflowEntity, command.user);
+
+    return toResponseWorkflowDto(workflowEntity, fullSteps);
   }
 
-  private async getControlsValuesMap(
-    steps: NotificationStepEntity[],
-    command: GetWorkflowCommand,
-    _workflowId: string
-  ): Promise<{ [key: string]: ControlValuesEntity }> {
-    const acc: { [key: string]: ControlValuesEntity } = {};
+  private async getFullWorkflowSteps(
+    workflow: WorkflowInternalResponseDto,
+    user: UserSessionData
+  ): Promise<StepDataDto[]> {
+    const stepPromises = workflow.steps.map((step: NotificationStepEntity & { _id: string }) =>
+      this.buildStepForWorkflow(workflow, step, user)
+    );
 
-    for (const step of steps) {
-      const controlValuesEntity = await this.buildControlValuesForStep(step, command, _workflowId);
-      if (controlValuesEntity) {
-        acc[step._templateId] = controlValuesEntity;
-      }
+    return Promise.all(stepPromises);
+  }
+
+  private async buildStepForWorkflow(
+    workflow: WorkflowInternalResponseDto,
+    step: NotificationStepEntity & { _id: string },
+    user: UserSessionData
+  ): Promise<StepDataDto> {
+    try {
+      return await this.buildStepDataUsecase.execute(
+        BuildStepDataCommand.create({
+          workflowIdOrInternalId: workflow._id,
+          stepIdOrInternalId: step._id,
+          user,
+        })
+      );
+    } catch (error) {
+      throw new InternalServerErrorException({
+        message: 'Failed to build workflow step',
+        workflowId: workflow._id,
+        stepId: step._id,
+        error: error.message,
+      });
     }
-
-    return acc;
-  }
-  private async buildControlValuesForStep(
-    step: NotificationStepEntity,
-    command: GetWorkflowCommand,
-    _workflowId: string
-  ): Promise<ControlValuesEntity | null> {
-    return await this.controlValuesRepository.findFirst({
-      _environmentId: command.user.environmentId,
-      _organizationId: command.user.organizationId,
-      _workflowId,
-      _stepId: step._templateId,
-      level: ControlValuesLevelEnum.STEP_CONTROLS,
-    });
   }
 }

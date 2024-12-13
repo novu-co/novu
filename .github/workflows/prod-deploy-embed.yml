@@ -1,11 +1,12 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Deploy PROD EMBED
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
   workflow_dispatch:
+
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -21,15 +22,15 @@ jobs:
     secrets: inherit
 
   deploy_embed_us:
-      uses: ./.github/workflows/reusable-embed-deploy.yml
-      with:
-        environment: Production
-        widget_url: https://widget.novu.co
-        netlify_deploy_message: Production deployment
-        netlify_alias: prod
-        netlify_gh_env: Production
-        netlify_site_id: 0689c015-fca0-4940-a26d-3e33f561bc48
-      secrets: inherit
+    uses: ./.github/workflows/reusable-embed-deploy.yml
+    with:
+      environment: Production
+      widget_url: https://widget.novu.co
+      netlify_deploy_message: Production deployment
+      netlify_alias: prod
+      netlify_gh_env: Production
+      netlify_site_id: 0689c015-fca0-4940-a26d-3e33f561bc48
+    secrets: inherit
 
   publish_docker_image_embed:
     needs:

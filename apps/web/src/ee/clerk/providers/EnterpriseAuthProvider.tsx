@@ -1,6 +1,6 @@
-import { createContext, useCallback, useEffect, useState, useMemo } from 'react';
-import type { IOrganizationEntity, IUserEntity, ProductUseCases } from '@novu/shared';
-import { useAuth, useUser, useOrganization, useOrganizationList } from '@clerk/clerk-react';
+import { createContext, useCallback, useEffect, useMemo } from 'react';
+import type { IOrganizationEntity, IUserEntity } from '@novu/shared';
+import { useAuth, useUser, useOrganization } from '@clerk/clerk-react';
 import { OrganizationResource, UserResource } from '@clerk/types';
 
 import { useNavigate } from 'react-router-dom';
@@ -20,8 +20,6 @@ export const EnterpriseAuthProvider = ({ children }: { children: React.ReactNode
   const { signOut, orgId } = useAuth();
   const { user: clerkUser, isLoaded: isUserLoaded } = useUser();
   const { organization: clerkOrganization, isLoaded: isOrganizationLoaded } = useOrganization();
-  // TODO @ChmaraX: Can we use setActive from useSession, useSignIn, or useSignUp to avoid loading the list?
-  const { setActive, isLoaded: isOrgListLoaded } = useOrganizationList({ userMemberships: { infinite: true } });
 
   const segment = useSegment();
   const queryClient = useQueryClient();
@@ -90,23 +88,14 @@ export const EnterpriseAuthProvider = ({ children }: { children: React.ReactNode
     return {};
   }, [clerkOrganization]);
 
-  // check if user has active organization
   useEffect(() => {
-    if (orgId) {
-      return;
-    }
+    if (!clerkUser || orgId) return;
 
-    if (isOrgListLoaded && clerkUser) {
-      const hasOrgs = clerkUser.organizationMemberships.length > 0;
-
-      if (hasOrgs) {
-        const firstOrg = clerkUser.organizationMemberships[0].organization;
-        setActive({ organization: firstOrg });
-      } else if (!window.location.href.includes(ROUTES.AUTH_SIGNUP_ORGANIZATION_LIST)) {
-        redirectTo({ url: ROUTES.AUTH_SIGNUP_ORGANIZATION_LIST });
-      }
+    const hasOrganizations = clerkUser.organizationMemberships.length > 0;
+    if (!hasOrganizations && window.location.pathname !== ROUTES.AUTH_SIGNUP_ORGANIZATION_LIST) {
+      return redirectTo({ url: ROUTES.AUTH_SIGNUP_ORGANIZATION_LIST });
     }
-  }, [setActive, isOrgListLoaded, clerkUser, orgId, redirectTo]);
+  }, [clerkUser, orgId, redirectTo]);
 
   const currentUser = useMemo(() => (clerkUser ? toUserEntity(clerkUser) : undefined), [clerkUser]);
   const currentOrganization = useMemo(

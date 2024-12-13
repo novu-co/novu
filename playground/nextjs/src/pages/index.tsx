@@ -1,5 +1,4 @@
 import { Inbox } from '@novu/nextjs';
-import { dark } from '@novu/nextjs/themes';
 import Title from '@/components/Title';
 import { novuConfig } from '@/utils/config';
 
@@ -15,9 +14,8 @@ export default function Home() {
             '6697c185607852e9104daf33': 'My workflow in other language', // key is workflow id
           },
         }}
-        appearance={{
-          baseTheme: dark,
-        }}
+        placement="left-start"
+        placementOffset={25}
       />
     </>
   );

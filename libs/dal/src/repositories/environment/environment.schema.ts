@@ -77,6 +77,10 @@ environmentSchema.index({
   _organizationId: 1,
 });
 
+environmentSchema.index({
+  'apiKeys.hash': 1,
+});
+
 export const Environment =
   (mongoose.models.Environment as mongoose.Model<EnvironmentDBModel>) ||
   mongoose.model<EnvironmentDBModel>('Environment', environmentSchema);

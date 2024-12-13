@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { Group, Stack } from '@mantine/core';
 import { useForm } from 'react-hook-form';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
-import slugify from 'slugify';
 import type { IResponseError, ICreateTenantDto, ITenantEntity } from '@novu/shared';
+import { slugify } from '@novu/shared';
 import { Button, colors, Sidebar, Text, Title, Tooltip } from '@novu/design-system';
 
 import { createTenant } from '../../../api/tenants';
@@ -54,10 +54,7 @@ export function CreateTenantSidebar({
   const identifier = watch('identifier');
 
   useEffect(() => {
-    const newIdentifier = slugify(name, {
-      lower: true,
-      strict: true,
-    });
+    const newIdentifier = slugify(name);
 
     if (newIdentifier === identifier) {
       return;

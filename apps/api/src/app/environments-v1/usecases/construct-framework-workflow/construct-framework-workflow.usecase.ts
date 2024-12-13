@@ -1,53 +1,63 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import {
-  ActionStep,
-  ChannelStep,
-  ChatOutput,
-  DelayOutput,
-  DigestOutput,
-  EmailOutput,
-  InAppOutput,
-  PushOutput,
-  SmsOutput,
-  Step,
-  StepOptions,
-  StepOutput,
-  Workflow,
-  workflow,
-} from '@novu/framework';
-import { NotificationTemplateRepository, NotificationTemplateEntity, NotificationStepEntity } from '@novu/dal';
+import { workflow } from '@novu/framework/express';
+import { ActionStep, ChannelStep, JsonSchema, Step, StepOptions, StepOutput, Workflow } from '@novu/framework/internal';
+import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import { StepTypeEnum } from '@novu/shared';
+import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { ConstructFrameworkWorkflowCommand } from './construct-framework-workflow.command';
+import {
+  ChatOutputRendererUsecase,
+  FullPayloadForRender,
+  InAppOutputRendererUsecase,
+  PushOutputRendererUsecase,
+  RenderEmailOutputUsecase,
+  SmsOutputRendererUsecase,
+} from '../output-renderers';
+import { DelayOutputRendererUsecase } from '../output-renderers/delay-output-renderer.usecase';
+import { DigestOutputRendererUsecase } from '../output-renderers/digest-output-renderer.usecase';
 
 @Injectable()
 export class ConstructFrameworkWorkflow {
-  constructor(private workflowsRepository: NotificationTemplateRepository) {}
+  constructor(
+    private workflowsRepository: NotificationTemplateRepository,
+    private inAppOutputRendererUseCase: InAppOutputRendererUsecase,
+    private emailOutputRendererUseCase: RenderEmailOutputUsecase,
+    private smsOutputRendererUseCase: SmsOutputRendererUsecase,
+    private chatOutputRendererUseCase: ChatOutputRendererUsecase,
+    private pushOutputRendererUseCase: PushOutputRendererUsecase,
+    private delayOutputRendererUseCase: DelayOutputRendererUsecase,
+    private digestOutputRendererUseCase: DigestOutputRendererUsecase
+  ) {}
 
+  @InstrumentUsecase()
   async execute(command: ConstructFrameworkWorkflowCommand): Promise<Workflow> {
     const dbWorkflow = await this.getDbWorkflow(command.environmentId, command.workflowId);
+    if (command.controlValues) {
+      for (const step of dbWorkflow.steps) {
+        step.controlVariables = command.controlValues;
+      }
+    }
 
     return this.constructFrameworkWorkflow(dbWorkflow);
   }
 
-  private async getDbWorkflow(environmentId: string, workflowId: string): Promise<NotificationTemplateEntity> {
-    const foundWorkflow = await this.workflowsRepository.findByTriggerIdentifier(environmentId, workflowId);
-
-    if (!foundWorkflow) {
-      throw new InternalServerErrorException(`Workflow ${workflowId} not found`);
-    }
-
-    return foundWorkflow;
-  }
-
+  @Instrument()
   private constructFrameworkWorkflow(newWorkflow: NotificationTemplateEntity): Workflow {
     return workflow(
       newWorkflow.triggers[0].identifier,
-      async ({ step }) => {
+      async ({ step, payload, subscriber }) => {
+        const fullPayloadForRender: FullPayloadForRender = { payload, subscriber, steps: {} };
         for await (const staticStep of newWorkflow.steps) {
-          await this.constructStep(step, staticStep);
+          fullPayloadForRender.steps[staticStep.stepId || staticStep._templateId] = await this.constructStep(
+            step,
+            staticStep,
+            fullPayloadForRender
+          );
         }
       },
       {
+        payloadSchema: PERMISSIVE_EMPTY_SCHEMA,
+
         /*
          * TODO: Workflow options are not needed currently, given that this endpoint
          * focuses on execution only. However we should reconsider if we decide to
@@ -60,7 +70,12 @@ export class ConstructFrameworkWorkflow {
     );
   }
 
-  private constructStep(step: Step, staticStep: NotificationStepEntity): StepOutput<Record<string, unknown>> {
+  @Instrument()
+  private constructStep(
+    step: Step,
+    staticStep: NotificationStepEntity,
+    fullPayloadForRender: FullPayloadForRender
+  ): StepOutput<Record<string, unknown>> {
     const stepTemplate = staticStep.template;
 
     if (!stepTemplate) {
@@ -69,11 +84,9 @@ export class ConstructFrameworkWorkflow {
 
     const stepType = stepTemplate.type;
     const { stepId } = staticStep;
-
     if (!stepId) {
       throw new InternalServerErrorException(`Step id not found for step ${staticStep.stepId}`);
     }
-
     const stepControls = stepTemplate.controls;
 
     if (!stepControls) {
@@ -87,8 +100,7 @@ export class ConstructFrameworkWorkflow {
           stepId,
           // The step callback function. Takes controls and returns the step outputs
           async (controlValues) => {
-            // TODO: insert custom in-app hydration logic here.
-            return controlValues as InAppOutput;
+            return this.inAppOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           // Step options
           this.constructChannelStepOptions(staticStep)
@@ -97,8 +109,7 @@ export class ConstructFrameworkWorkflow {
         return step.email(
           stepId,
           async (controlValues) => {
-            // TODO: insert custom Maily.to hydration logic here.
-            return controlValues as EmailOutput;
+            return this.emailOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructChannelStepOptions(staticStep)
         );
@@ -106,8 +117,7 @@ export class ConstructFrameworkWorkflow {
         return step.inApp(
           stepId,
           async (controlValues) => {
-            // TODO: insert custom SMS hydration logic here.
-            return controlValues as SmsOutput;
+            return this.smsOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructChannelStepOptions(staticStep)
         );
@@ -115,8 +125,7 @@ export class ConstructFrameworkWorkflow {
         return step.inApp(
           stepId,
           async (controlValues) => {
-            // TODO: insert custom chat hydration logic here.
-            return controlValues as ChatOutput;
+            return this.chatOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructChannelStepOptions(staticStep)
         );
@@ -124,8 +133,7 @@ export class ConstructFrameworkWorkflow {
         return step.inApp(
           stepId,
           async (controlValues) => {
-            // TODO: insert custom push hydration logic here.
-            return controlValues as PushOutput;
+            return this.pushOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructChannelStepOptions(staticStep)
         );
@@ -133,7 +141,7 @@ export class ConstructFrameworkWorkflow {
         return step.digest(
           stepId,
           async (controlValues) => {
-            return controlValues as DigestOutput;
+            return this.digestOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructActionStepOptions(staticStep)
         );
@@ -141,7 +149,7 @@ export class ConstructFrameworkWorkflow {
         return step.delay(
           stepId,
           async (controlValues) => {
-            return controlValues as DelayOutput;
+            return this.delayOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructActionStepOptions(staticStep)
         );
@@ -150,6 +158,7 @@ export class ConstructFrameworkWorkflow {
     }
   }
 
+  @Instrument()
   private constructChannelStepOptions(staticStep: NotificationStepEntity): Required<Parameters<ChannelStep>[2]> {
     return {
       ...this.constructCommonStepOptions(staticStep),
@@ -160,17 +169,18 @@ export class ConstructFrameworkWorkflow {
     };
   }
 
+  @Instrument()
   private constructActionStepOptions(staticStep: NotificationStepEntity): Required<Parameters<ActionStep>[2]> {
     return {
       ...this.constructCommonStepOptions(staticStep),
     };
   }
 
+  @Instrument()
   private constructCommonStepOptions(staticStep: NotificationStepEntity): Required<StepOptions> {
     return {
-      /** @deprecated */
-      inputSchema: staticStep.template!.controls!.schema,
-      controlSchema: staticStep.template!.controls!.schema,
+      // TODO: fix the `JSONSchemaDto` type to enforce a non-primitive schema type.
+      controlSchema: staticStep.template!.controls!.schema as JsonSchema,
       /*
        * TODO: add conditions
        * Used to construct conditions defined with https://react-querybuilder.js.org/ or similar
@@ -178,4 +188,21 @@ export class ConstructFrameworkWorkflow {
       skip: (controlValues) => false,
     };
   }
+
+  @Instrument()
+  private async getDbWorkflow(environmentId: string, workflowId: string): Promise<NotificationTemplateEntity> {
+    const foundWorkflow = await this.workflowsRepository.findByTriggerIdentifier(environmentId, workflowId);
+
+    if (!foundWorkflow) {
+      throw new InternalServerErrorException(`Workflow ${workflowId} not found`);
+    }
+
+    return foundWorkflow;
+  }
 }
+const PERMISSIVE_EMPTY_SCHEMA = {
+  type: 'object',
+  properties: {},
+  required: [],
+  additionalProperties: true,
+} as const;
