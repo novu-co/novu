@@ -65,7 +65,7 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
                 <div className="flex w-full flex-col items-center gap-4">
                   <div className="flex w-full flex-col items-center justify-center py-2">
                     <div className="w-1/3 rounded-md border border-neutral-300 p-1">
-                      <div className="flex w-full flex-col items-start justify-center gap-2 rounded-sm border border-neutral-100 bg-white p-1 p-3">
+                      <div className="flex w-full flex-col items-start justify-center gap-2 rounded-sm border border-neutral-100 bg-white p-1">
                         <div className="bg-neutral-alpha-100 h-[5px] w-2/5 rounded-sm" />
                         <div className="bg-neutral-alpha-100 h-[5px] w-4/5 rounded-sm" />
                       </div>
@@ -191,7 +191,7 @@ const OverrideMessage = ({ isOverridden }: { isOverridden: boolean }) => {
         <div className="mt-4 flex w-full items-center gap-3 rounded-md border bg-neutral-50 px-3 py-2.5">
           <span className="w-1 self-stretch rounded-full bg-neutral-500" />
           <span className="flex-1 text-xs font-medium text-neutral-600">
-            Custom controls defined in code have been overridden. Disable overrides to restore original.
+            Custom controls defined in the code have been overridden. Disable overrides to restore the original.
           </span>
         </div>
       ) : (
