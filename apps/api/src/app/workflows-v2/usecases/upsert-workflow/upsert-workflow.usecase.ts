@@ -299,7 +299,7 @@ export class UpsertWorkflowUseCase {
   ): Promise<WorkflowInternalResponseDto> {
     for (const step of workflow.steps) {
       const controlValues = this.findControlValueInRequest(step, command.workflowDto.steps);
-      if (!controlValues) {
+      if (controlValues === undefined) {
         continue;
       }
       await this.patchStepDataUsecase.execute({
