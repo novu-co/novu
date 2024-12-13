@@ -19,6 +19,8 @@ import { Form } from '@/components/primitives/form/form';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { EmailTabs } from '@/components/workflow-editor/steps/email/email-tabs';
+import { DigestCustomControlValues } from './digest/digest-custom-control-values';
+import { DelayCustomControlValues } from './delay/delay-custom-control-values';
 
 const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
   [StepTypeEnum.EMAIL]: EmailTabs,
@@ -26,8 +28,8 @@ const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) =
   [StepTypeEnum.IN_APP]: InAppTabs,
   [StepTypeEnum.SMS]: OtherStepTabs,
   [StepTypeEnum.PUSH]: OtherStepTabs,
-  [StepTypeEnum.DIGEST]: () => null,
-  [StepTypeEnum.DELAY]: () => null,
+  [StepTypeEnum.DIGEST]: DigestCustomControlValues,
+  [StepTypeEnum.DELAY]: DelayCustomControlValues,
   [StepTypeEnum.TRIGGER]: () => null,
   [StepTypeEnum.CUSTOM]: () => null,
 };

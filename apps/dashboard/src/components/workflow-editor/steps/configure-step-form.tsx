@@ -114,6 +114,8 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
 
   const isTemplateConfigurableStep = isSupportedStep && TEMPLATE_CONFIGURABLE_STEP_TYPES.includes(step.type);
   const isInlineConfigurableStep = isSupportedStep && INLINE_CONFIGURABLE_STEP_TYPES.includes(step.type);
+  const hasCustomControls = Object.keys(step.controls.dataSchema ?? {}).length > 0 && !step.controls.uiSchema;
+  const isInlineConfigurableStepWithCustomControls = isInlineConfigurableStep && hasCustomControls;
 
   const onDeleteStep = () => {
     update({ ...workflow, steps: workflow.steps.filter((s) => s._id !== step._id) });
@@ -270,12 +272,12 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                 </SidebarContent>
                 <Separator />
 
-                {isInlineConfigurableStep && <InlineControlValues />}
+                {isInlineConfigurableStep && !hasCustomControls && <InlineControlValues />}
               </SaveFormContext.Provider>
             </form>
           </Form>
 
-          {isTemplateConfigurableStep && (
+          {(isTemplateConfigurableStep || isInlineConfigurableStepWithCustomControls) && (
             <>
               <SidebarContent>
                 <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>

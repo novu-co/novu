@@ -30,7 +30,36 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
   const overrideForm = useForm({ defaultValues: { override: Object.keys(step?.controls.values ?? {}).length > 0 } });
 
   if (!dataSchema?.properties || origin !== WorkflowOriginEnum.EXTERNAL) {
-    return <>hiii</>;
+    return (
+      <Collapsible
+        open={isEditorOpen}
+        onOpenChange={setIsEditorOpen}
+        className={cn(
+          'bg-neutral-alpha-50 border-neutral-alpha-200 flex w-full flex-col gap-2 rounded-lg border p-2 text-sm',
+          className
+        )}
+        {...rest}
+      >
+        <CollapsibleTrigger className="flex w-full items-center justify-between text-sm">
+          <div className="flex items-center gap-1">
+            <RiInputField className="text-feature size-5" />
+            <span className="text-sm font-medium">Code-defined step controls</span>
+          </div>
+
+          {isEditorOpen ? (
+            <RiArrowUpSLine className="text-neutral-alpha-400 size-5" />
+          ) : (
+            <RiArrowDownSLine className="text-neutral-alpha-400 size-5" />
+          )}
+        </CollapsibleTrigger>
+
+        <CollapsibleContent>
+          <div className="bg-background rounded-md border border-dashed p-3">
+            <div className="flex flex-row items-center justify-center gap-6"></div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    );
   }
 
   return (
@@ -80,7 +109,7 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
           <CollapsibleTrigger className="flex w-full items-center justify-between text-sm">
             <div className="flex items-center gap-1">
               <RiInputField className="text-feature size-5" />
-              <span className="text-sm font-medium">Custom step controls</span>
+              <span className="text-sm font-medium">Code-fe step controls</span>
             </div>
 
             {isEditorOpen ? (
