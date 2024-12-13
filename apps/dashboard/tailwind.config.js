@@ -129,6 +129,14 @@ export const texts = {
       fontWeight: '400',
     },
   ],
+  'paragraph-2xs': [
+    '0.625rem',
+    {
+      lineHeight: '0.875rem',
+      letterSpacing: '0em',
+      fontWeight: '400',
+    },
+  ],
   'subheading-md': [
     '1rem',
     {
