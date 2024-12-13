@@ -827,6 +827,9 @@ importers:
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
+      lodash.isequal:
+        specifier: ^4.5.0
+        version: 4.5.0
       lodash.merge:
         specifier: ^4.6.2
         version: 4.6.2
@@ -906,6 +909,9 @@ importers:
       '@types/lodash.debounce':
         specifier: ^4.0.9
         version: 4.0.9
+      '@types/lodash.isequal':
+        specifier: ^4.5.8
+        version: 4.5.8
       '@types/lodash.merge':
         specifier: ^4.6.6
         version: 4.6.7
@@ -17319,6 +17325,9 @@ packages:
 
   '@types/lodash.get@4.4.7':
     resolution: {integrity: sha512-af34Mj+KdDeuzsJBxc/XeTtOx0SZHZNLd+hdrn+PcKGQs0EG2TJTzQAOTCZTgDJCArahlCzLWSy8c2w59JRz7Q==}
+
+  '@types/lodash.isequal@4.5.8':
+    resolution: {integrity: sha512-uput6pg4E/tj2LGxCZo9+y27JNyB2OZuuI/T5F+ylVDYuqICLG2/ktjxx0v6GvVntAf8TvEzeQLcV0ffRirXuA==}
 
   '@types/lodash.merge@4.6.7':
     resolution: {integrity: sha512-OwxUJ9E50gw3LnAefSHJPHaBLGEKmQBQ7CZe/xflHkyy/wH2zVyEIAKReHvVrrn7zKdF58p16We9kMfh7v0RRQ==}
@@ -57461,6 +57470,10 @@ snapshots:
       '@types/lodash': 4.14.192
 
   '@types/lodash.get@4.4.7':
+    dependencies:
+      '@types/lodash': 4.14.192
+
+  '@types/lodash.isequal@4.5.8':
     dependencies:
       '@types/lodash': 4.14.192
 
