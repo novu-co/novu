@@ -38,7 +38,6 @@ import { BridgeModule } from '../bridge';
 import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-renderers';
 import { OverloadContentDataOnWorkflowUseCase } from './usecases/overload-content-data';
 import { PatchWorkflowUsecase } from './usecases/patch-workflow';
-import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
 import { BuildPayloadSchema } from './usecases/build-payload-schema/build-payload-schema.usecase';
 
 const DAL_REPOSITORIES = [CommunityOrganizationRepository];
@@ -71,7 +70,6 @@ const DAL_REPOSITORIES = [CommunityOrganizationRepository];
     PrepareAndValidateContentUsecase,
     ValidatePlaceholderUsecase,
     ExtractDefaultValuesFromSchemaUsecase,
-    PatchStepUsecase,
     PostProcessWorkflowUpdate,
     OverloadContentDataOnWorkflowUseCase,
     PatchWorkflowUsecase,

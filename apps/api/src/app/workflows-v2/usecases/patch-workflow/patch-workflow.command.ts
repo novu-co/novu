@@ -1,5 +1,5 @@
 import { EnvironmentWithUserObjectCommand } from '@novu/application-generic';
-import { IsArray, IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class PatchWorkflowCommand extends EnvironmentWithUserObjectCommand {
   @IsString()
@@ -9,16 +9,4 @@ export class PatchWorkflowCommand extends EnvironmentWithUserObjectCommand {
   @IsBoolean()
   @IsOptional()
   active?: boolean;
-
-  @IsString()
-  @IsOptional()
-  name?: string;
-
-  @IsString()
-  @IsOptional()
-  description?: string;
-
-  @IsArray()
-  @IsOptional()
-  tags?: string[];
 }

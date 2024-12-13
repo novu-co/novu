@@ -20,9 +20,7 @@ import {
   GeneratePreviewResponseDto,
   GetListQueryParams,
   ListWorkflowResponse,
-  PatchStepDataDto,
   PatchWorkflowDto,
-  StepDataDto,
   SyncWorkflowDto,
   UpdateWorkflowDto,
   UserSessionData,
@@ -43,16 +41,9 @@ import { SyncToEnvironmentCommand } from './usecases/sync-to-environment/sync-to
 import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
 import { ParseSlugIdPipe } from './pipes/parse-slug-id.pipe';
 import { ParseSlugEnvironmentIdPipe } from './pipes/parse-slug-env-id.pipe';
-import {
-  BuildStepDataCommand,
-  BuildStepDataUsecase,
-  BuildWorkflowTestDataUseCase,
-  WorkflowTestDataCommand,
-} from './usecases';
+import { BuildWorkflowTestDataUseCase, WorkflowTestDataCommand } from './usecases';
 import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview.command';
-import { PatchStepCommand } from './usecases/patch-step-data';
 import { PatchWorkflowCommand, PatchWorkflowUsecase } from './usecases/patch-workflow';
-import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
 
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
@@ -68,8 +59,6 @@ export class WorkflowController {
     private syncToEnvironmentUseCase: SyncToEnvironmentUseCase,
     private generatePreviewUseCase: GeneratePreviewUsecase,
     private buildWorkflowTestDataUseCase: BuildWorkflowTestDataUseCase,
-    private buildStepDataUsecase: BuildStepDataUsecase,
-    private patchStepDataUsecase: PatchStepUsecase,
     private patchWorkflowUsecase: PatchWorkflowUsecase
   ) {}
 
@@ -185,36 +174,6 @@ export class WorkflowController {
         workflowIdOrInternalId,
         stepIdOrInternalId,
         generatePreviewRequestDto,
-      })
-    );
-  }
-
-  @Get('/:workflowId/steps/:stepId')
-  @UseGuards(UserAuthGuard)
-  async getWorkflowStepData(
-    @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
-    @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string,
-    @Param('stepId', ParseSlugIdPipe) stepIdOrInternalId: string
-  ): Promise<StepDataDto> {
-    return await this.buildStepDataUsecase.execute(
-      BuildStepDataCommand.create({ user, workflowIdOrInternalId, stepIdOrInternalId })
-    );
-  }
-
-  @Patch('/:workflowId/steps/:stepId')
-  @UseGuards(UserAuthGuard)
-  async patchWorkflowStepData(
-    @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
-    @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string,
-    @Param('stepId', ParseSlugIdPipe) stepIdOrInternalId: string,
-    @Body() patchStepDataDto: PatchStepDataDto
-  ): Promise<StepDataDto> {
-    return await this.patchStepDataUsecase.execute(
-      PatchStepCommand.create({
-        user,
-        workflowIdOrInternalId,
-        stepIdOrInternalId,
-        ...patchStepDataDto,
       })
     );
   }
