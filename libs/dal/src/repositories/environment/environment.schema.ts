@@ -83,7 +83,7 @@ environmentSchema.index({
 
 environmentSchema.index(
   {
-    identfier: 1,
+    identifier: 1,
   },
   { unique: true }
 );
