@@ -1,11 +1,37 @@
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
-
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
+const TipTapNodeSchema = z.object({
+  type: z.literal('doc'),
+  content: z.array(
+    z.object({
+      type: z.string(),
+      attrs: z.record(z.any()).optional(),
+      content: z
+        .array(
+          z.object({
+            type: z.string(),
+            text: z.string().optional(),
+            marks: z
+              .array(
+                z.object({
+                  type: z.string(),
+                  attrs: z.record(z.any()).optional(),
+                })
+              )
+              .optional(),
+            attrs: z.record(z.any()).optional(),
+          })
+        )
+        .optional(),
+    })
+  ),
+});
+
 export const EmailStepControlZodSchema = z
   .object({
-    emailEditor: z.string(),
+    emailEditor: TipTapNodeSchema,
     subject: z.string(),
   })
   .strict()

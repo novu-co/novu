@@ -12,6 +12,7 @@ export type Variable = {
   context?: string;
   message?: string;
   name: string;
+  template: string;
 };
 
 export type TemplateParseResult = {
@@ -99,6 +100,7 @@ function processLiquidRawOutput(rawOutputs: string[]): TemplateParseResult {
               name: rawOutput,
               message: e.message,
               context: e.context,
+              template: rawOutput,
             },
             false
           );
@@ -110,22 +112,22 @@ function processLiquidRawOutput(rawOutputs: string[]): TemplateParseResult {
   return { validVariables, invalidVariables };
 }
 
-function parseByLiquid(expression: string): TemplateParseResult {
+function parseByLiquid(rawOutput: string): TemplateParseResult {
   const validVariables: Variable[] = [];
   const invalidVariables: Variable[] = [];
   const engine = new Liquid(LIQUID_CONFIG);
-  const parsed = engine.parse(expression) as unknown as Template[];
+  const parsed = engine.parse(rawOutput) as unknown as Template[];
 
   parsed.forEach((template: Template) => {
     if (isOutputToken(template)) {
       const result = extractProps(template);
 
       if (result.valid && result.props.length > 0) {
-        validVariables.push({ name: result.props.join('.') });
+        validVariables.push({ name: result.props.join('.'), template: rawOutput });
       }
 
       if (!result.valid) {
-        invalidVariables.push({ name: template?.token?.input, message: result.error });
+        invalidVariables.push({ name: template?.token?.input, message: result.error, template: rawOutput });
       }
     }
   });

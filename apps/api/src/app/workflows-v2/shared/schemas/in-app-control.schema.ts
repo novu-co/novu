@@ -2,33 +2,31 @@ import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 
+const absoluteUrlOrPathRegex = /^(?!mailto:)(?:(https?):\/\/[^\s/$.?#].[^\s]*)|^(\/[^\s]*)$|^$/;
+
 const redirectZodSchema = z
   .object({
-    url: z.string().optional(),
+    url: z.string().regex(absoluteUrlOrPathRegex),
     target: z.enum(['_self', '_blank', '_parent', '_top', '_unfencedTop']).default('_blank'),
   })
-  .strict()
-  .optional()
-  .nullable();
+  .strict();
 
 const actionZodSchema = z
   .object({
-    label: z.string().optional(),
-    redirect: redirectZodSchema.optional(),
+    label: z.string(),
+    redirect: redirectZodSchema,
   })
-  .strict()
-  .optional()
-  .nullable();
+  .strict();
 
 export const InAppControlZodSchema = z
   .object({
     subject: z.string().optional(),
-    body: z.string(),
-    avatar: z.string().optional(),
-    primaryAction: actionZodSchema,
-    secondaryAction: actionZodSchema,
+    body: z.string().min(1),
+    avatar: z.string().url().optional(),
+    primaryAction: actionZodSchema.optional(),
+    secondaryAction: actionZodSchema.optional(),
     data: z.object({}).catchall(z.unknown()).optional(),
-    redirect: redirectZodSchema,
+    redirect: redirectZodSchema.optional(),
   })
   .strict();
 

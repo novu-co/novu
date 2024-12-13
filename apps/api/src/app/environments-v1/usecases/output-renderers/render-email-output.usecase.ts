@@ -14,11 +14,16 @@ export class RenderEmailOutputUsecase {
 
   @InstrumentUsecase()
   async execute(renderCommand: RenderEmailOutputCommand): Promise<EmailRenderOutput> {
-    const { emailEditor, subject } = EmailStepControlZodSchema.parse(renderCommand.controlValues);
-    const expandedSchema = this.transformForAndShowLogic(emailEditor, renderCommand.fullPayloadForRender);
+    const expandedSchema = this.transformForAndShowLogic(
+      renderCommand.controlValues.emailEditor as unknown as string,
+      renderCommand.fullPayloadForRender
+    );
     const htmlRendered = await this.renderEmail(expandedSchema);
 
-    return { subject, body: htmlRendered };
+    return {
+      subject: renderCommand.controlValues.subject as unknown as string,
+      body: htmlRendered,
+    };
   }
 
   @Instrument()
