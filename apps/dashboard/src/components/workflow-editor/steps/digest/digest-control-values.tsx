@@ -4,10 +4,19 @@ import { getComponentByType } from '@/components/workflow-editor/steps/component
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
+import { CustomStepControls } from '../controls/custom-step-controls';
 
 export const DigestControlValues = () => {
-  const { step } = useWorkflow();
-  const { uiSchema } = step?.controls ?? {};
+  const { step, workflow } = useWorkflow();
+  const { uiSchema, dataSchema } = step?.controls ?? {};
+
+  if (dataSchema && workflow) {
+    return (
+      <div>
+        <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
+      </div>
+    );
+  }
 
   if (!uiSchema || uiSchema?.group !== UiSchemaGroupEnum.DIGEST) {
     return null;
