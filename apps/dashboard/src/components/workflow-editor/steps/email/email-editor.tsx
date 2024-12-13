@@ -2,15 +2,17 @@ import { Separator } from '@/components/primitives/separator';
 import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
 import { EmailPreviewHeader } from '@/components/workflow-editor/steps/email/email-preview';
 import { EmailTabsSection } from '@/components/workflow-editor/steps/email/email-tabs-section';
-import { type UiSchema } from '@novu/shared';
+import { UiSchemaGroupEnum, type UiSchema } from '@novu/shared';
 
 const subjectKey = 'subject';
 const emailEditorKey = 'emailEditor';
 
-type EmailEditorProps = { uiSchema: UiSchema };
-export const EmailEditor = (props: EmailEditorProps) => {
-  const { uiSchema } = props;
-  const { [emailEditorKey]: emailEditor, [subjectKey]: subject } = uiSchema?.properties ?? {};
+export const EmailEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
+  if (uiSchema.group !== UiSchemaGroupEnum.EMAIL) {
+    return null;
+  }
+
+  const { [emailEditorKey]: emailEditor, [subjectKey]: subject } = uiSchema.properties ?? {};
 
   return (
     <div className="flex h-full flex-col">

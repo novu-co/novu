@@ -12,8 +12,8 @@ const redirectKey = 'redirect';
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
 
-export const InAppEditor = ({ uiSchema }: { uiSchema?: UiSchema }) => {
-  if (!uiSchema || uiSchema?.group !== UiSchemaGroupEnum.IN_APP) {
+export const InAppEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
+  if (uiSchema.group !== UiSchemaGroupEnum.IN_APP) {
     return null;
   }
 
