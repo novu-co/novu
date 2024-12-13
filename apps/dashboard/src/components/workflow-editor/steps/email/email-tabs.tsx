@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { WorkflowOriginEnum } from '@novu/shared';
 import { EmailEditor } from '@/components/workflow-editor/steps/email/email-editor';
@@ -5,7 +6,6 @@ import { EmailEditorPreview } from '@/components/workflow-editor/steps/email/ema
 import { CustomStepControls } from '../controls/custom-step-controls';
 import { StepEditorProps } from '@/components/workflow-editor/steps/configure-step-template-form';
 import { TemplateTabs } from '@/components/workflow-editor/steps/template-tabs';
-import { useState } from 'react';
 
 export const EmailTabs = (props: StepEditorProps) => {
   const { workflow, step } = props;
