@@ -562,9 +562,9 @@ export default {
         20: '1.25rem',
         24: '1.5rem',
         full: '999px',
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        lg: 'var(--radius)', // DEPRECATED
+        md: 'calc(var(--radius) - 2px)', // DEPRECATED
+        sm: 'calc(var(--radius) - 4px)', // DEPRECATED
       },
       keyframes: {
         'pulse-shadow': {
