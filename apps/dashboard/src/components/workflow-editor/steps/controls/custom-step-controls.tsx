@@ -1,6 +1,6 @@
 import { ComponentProps, useState } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
-import { RiArrowDownSLine, RiArrowUpSLine, RiInputField, RiQuestionLine } from 'react-icons/ri';
+import { RiArrowDownSLine, RiArrowUpSLine, RiBookMarkedLine, RiInputField, RiQuestionLine } from 'react-icons/ri';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { RJSFSchema } from '@rjsf/utils';
@@ -16,21 +16,134 @@ import { useSaveForm } from '@/components/workflow-editor/steps/save-form-contex
 import { useWorkflow } from '../../workflow-provider';
 import { buildDefaultValuesOfDataSchema } from '@/utils/schema';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
+import { ConfirmationModal } from '@/components/confirmation-modal';
 
 type CustomStepControlsProps = ComponentProps<typeof Collapsible> & {
   dataSchema: ControlsMetadata['dataSchema'];
   origin: WorkflowOriginEnum;
 };
+
+const CONTROLS_DOCS_LINK = 'https://docs.novu.co/concepts/controls';
+
 export const CustomStepControls = (props: CustomStepControlsProps) => {
   const { className, dataSchema, origin, ...rest } = props;
   const [isEditorOpen, setIsEditorOpen] = useState(true);
+  const [isRestoreDefaultModalOpen, setIsRestoreDefaultModalOpen] = useState(false);
   const { step } = useWorkflow();
   const { reset } = useFormContext();
   const { saveForm } = useSaveForm();
   const overrideForm = useForm({ defaultValues: { override: Object.keys(step?.controls.values ?? {}).length > 0 } });
 
-  if (!dataSchema?.properties || origin !== WorkflowOriginEnum.EXTERNAL) {
+  if (origin !== WorkflowOriginEnum.EXTERNAL || Object.keys(dataSchema?.properties ?? {}).length === 0) {
     return (
+      <SidebarContent size="md">
+        <Collapsible
+          open={isEditorOpen}
+          onOpenChange={setIsEditorOpen}
+          className={cn(
+            'bg-neutral-alpha-50 border-neutral-alpha-200 flex w-full flex-col gap-2 rounded-lg border p-2 text-sm',
+            className
+          )}
+          {...rest}
+        >
+          <CollapsibleTrigger className="flex w-full items-center justify-between text-sm">
+            <div className="flex items-center gap-1">
+              <RiInputField className="text-feature size-5" />
+              <span className="text-sm font-medium">Code-defined step controls</span>
+            </div>
+
+            {isEditorOpen ? (
+              <RiArrowUpSLine className="text-neutral-alpha-400 size-5" />
+            ) : (
+              <RiArrowDownSLine className="text-neutral-alpha-400 size-5" />
+            )}
+          </CollapsibleTrigger>
+
+          <CollapsibleContent>
+            <div className="bg-background rounded-md border border-dashed p-3">
+              <div className="flex w-full flex-col items-center justify-center gap-6">
+                <div className="flex w-full flex-col items-center gap-4">
+                  <div className="flex w-full flex-col items-center justify-center py-2">
+                    <div className="w-1/3 rounded-md border border-neutral-300 p-1">
+                      <div className="flex w-full flex-col items-start justify-center gap-2 rounded-sm border border-neutral-100 bg-white p-1 p-3">
+                        <div className="bg-neutral-alpha-100 h-[5px] w-2/5 rounded-sm" />
+                        <div className="bg-neutral-alpha-100 h-[5px] w-4/5 rounded-sm" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center justify-center gap-1">
+                    <p className="text-sm font-medium">No controls defined yet</p>
+                    <span className="text-neutral-alpha-600 w-3/4 text-center text-xs">
+                      Define step controls to render fields here. This lets your team collaborate and ensure changes are
+                      validated in code.
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center p-1.5">
+                  <Link
+                    to={CONTROLS_DOCS_LINK}
+                    target="_blank"
+                    className="flex items-center gap-1.5 text-xs text-neutral-600 underline"
+                  >
+                    <RiBookMarkedLine className="size-4" />
+                    View docs
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </SidebarContent>
+    );
+  }
+
+  return (
+    <SidebarContent size="md">
+      <ConfirmationModal
+        open={isRestoreDefaultModalOpen}
+        onOpenChange={setIsRestoreDefaultModalOpen}
+        onConfirm={async () => {
+          const defaultValues = buildDefaultValuesOfDataSchema(step?.controls.dataSchema ?? {});
+          reset(defaultValues);
+          saveForm(true);
+          setIsRestoreDefaultModalOpen(false);
+          overrideForm.setValue('override', false);
+        }}
+        title="Proceeding will restore controls to defaults."
+        description="All edits will be discarded, and defaults will be restored from the code."
+        confirmButtonText="Proceed anyway"
+      />
+      <Form {...overrideForm}>
+        <FormField
+          control={overrideForm.control}
+          name="override"
+          render={({ field }) => (
+            <FormItem className="mb-6 mt-2 flex w-full items-center justify-between">
+              <div>
+                <FormLabel className="block">Override code defined defaults</FormLabel>
+                <span className="text-xs text-neutral-400">
+                  Code-defined defaults are read-only by default, you can override them using this toggle.
+                </span>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={(checked) => {
+                    if (!checked) {
+                      setIsRestoreDefaultModalOpen(true);
+                      return;
+                    }
+                    field.onChange(checked);
+                  }}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+      </Form>
+
+      <Separator className="mb-3" />
+
       <Collapsible
         open={isEditorOpen}
         onOpenChange={setIsEditorOpen}
@@ -55,79 +168,12 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
 
         <CollapsibleContent>
           <div className="bg-background rounded-md border border-dashed p-3">
-            <div className="flex flex-row items-center justify-center gap-6"></div>
+            <JsonForm schema={(dataSchema as RJSFSchema) || {}} disabled={!overrideForm.watch().override} />
           </div>
         </CollapsibleContent>
       </Collapsible>
-    );
-  }
-
-  return (
-    <>
-      <SidebarContent size="md">
-        <Form {...overrideForm}>
-          <FormField
-            control={overrideForm.control}
-            name="override"
-            render={({ field }) => (
-              <FormItem className="mb-6 mt-2 flex w-full items-center justify-between">
-                <div>
-                  <FormLabel className="block">Override code defined defaults</FormLabel>
-                  <span className="text-xs text-neutral-400">
-                    Code-defined defaults are read-only by default, you can override them using this toggle.
-                  </span>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={(checked) => {
-                      field.onChange(checked);
-                      if (!checked) {
-                        const defaultValues = buildDefaultValuesOfDataSchema(step?.controls.dataSchema ?? {});
-                        reset(defaultValues);
-                        saveForm(true);
-                      }
-                    }}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </Form>
-      </SidebarContent>
-      <Separator className="mb-3" />
-      <SidebarContent size="md">
-        <Collapsible
-          open={isEditorOpen}
-          onOpenChange={setIsEditorOpen}
-          className={cn(
-            'bg-neutral-alpha-50 border-neutral-alpha-200 flex w-full flex-col gap-2 rounded-lg border p-2 text-sm',
-            className
-          )}
-          {...rest}
-        >
-          <CollapsibleTrigger className="flex w-full items-center justify-between text-sm">
-            <div className="flex items-center gap-1">
-              <RiInputField className="text-feature size-5" />
-              <span className="text-sm font-medium">Code-fe step controls</span>
-            </div>
-
-            {isEditorOpen ? (
-              <RiArrowUpSLine className="text-neutral-alpha-400 size-5" />
-            ) : (
-              <RiArrowDownSLine className="text-neutral-alpha-400 size-5" />
-            )}
-          </CollapsibleTrigger>
-
-          <CollapsibleContent>
-            <div className="bg-background rounded-md border border-dashed p-3">
-              <JsonForm schema={(dataSchema as RJSFSchema) || {}} disabled={!overrideForm.watch().override} />
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-        <OverrideMessage isOverridden={overrideForm.watch().override} />
-      </SidebarContent>
-    </>
+      <OverrideMessage isOverridden={overrideForm.watch().override} />
+    </SidebarContent>
   );
 };
 
@@ -142,7 +188,7 @@ const OverrideMessage = ({ isOverridden }: { isOverridden: boolean }) => {
   return (
     <motion.div layout {...fadeAnimation} className="relative min-h-10">
       {isOverridden ? (
-        <div className="mt-5 flex w-full items-center gap-3 rounded-md border bg-neutral-50 px-3 py-2.5">
+        <div className="mt-4 flex w-full items-center gap-3 rounded-md border bg-neutral-50 px-3 py-2.5">
           <span className="w-1 self-stretch rounded-full bg-neutral-500" />
           <span className="flex-1 text-xs font-medium text-neutral-600">
             Custom controls defined in code have been overridden. Disable overrides to restore original.
@@ -151,7 +197,7 @@ const OverrideMessage = ({ isOverridden }: { isOverridden: boolean }) => {
       ) : (
         <Link
           target="_blank"
-          to="https://docs.novu.co/concepts/controls"
+          to={CONTROLS_DOCS_LINK}
           className="mt-2 flex items-center gap-1 text-xs text-neutral-600 hover:underline"
         >
           <RiQuestionLine className="size-4" /> Learn more about code-defined controls.
