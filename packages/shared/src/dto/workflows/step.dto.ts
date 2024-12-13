@@ -26,7 +26,7 @@ export type StepCreateDto = StepDto & {
 
 export type PatchStepDataDto = {
   name?: string;
-  controlValues?: Record<string, unknown>;
+  controlValues?: Record<string, unknown> | null;
 };
 
 export type StepDto = {
