@@ -316,7 +316,7 @@ export class UpsertWorkflowUseCase {
   private findControlValueInRequest(
     step: NotificationStepEntity,
     steps: (StepCreateDto | StepUpdateDto)[] | StepCreateDto[]
-  ): Record<string, unknown> | undefined {
+  ): Record<string, unknown> | undefined | null {
     return steps.find((stepRequest) => {
       if (this.isStepUpdateDto(stepRequest)) {
         return stepRequest._id === step._templateId;

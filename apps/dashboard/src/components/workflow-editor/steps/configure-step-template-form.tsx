@@ -71,7 +71,7 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
     save: (data) => {
       const defaultValues = buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {});
       const isDefaultValues = isEqual(data, defaultValues);
-      const updateData = isDefaultValues ? {} : data;
+      const updateData = isDefaultValues ? null : data;
       // transform form fields to step update dto
       const updateStepData: Partial<StepUpdateDto> = {
         controlValues: updateData,
