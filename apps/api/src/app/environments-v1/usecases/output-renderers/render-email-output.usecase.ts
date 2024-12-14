@@ -4,7 +4,6 @@ import { render as mailyRender } from '@maily-to/render';
 import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { FullPayloadForRender, RenderCommand } from './render-command';
 import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.usecase';
-import { EmailStepControlZodSchema } from '../../../workflows-v2/shared';
 
 export class RenderEmailOutputCommand extends RenderCommand {}
 

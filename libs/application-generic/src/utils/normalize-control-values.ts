@@ -1,3 +1,14 @@
+const EMPTY_TIP_TAP_OBJECT = JSON.stringify({
+  type: 'doc',
+  content: [
+    {
+      type: 'paragraph',
+      attrs: { textAlign: 'left' },
+      content: [{ type: 'text', text: ' ' }],
+    },
+  ],
+});
+
 type Redirect = {
   url: string;
   target: '_self' | '_blank' | '_parent' | '_top' | '_unfencedTop';
@@ -57,16 +68,29 @@ function normalizeInAppControlValues(controlValues: Record<string, unknown>) {
     normalized.redirect = redirect?.url ? redirect : null;
   }
 
+  if (typeof normalized === 'object' && normalized !== null) {
+    return Object.fromEntries(
+      Object.entries(normalized).filter(([_, value]) => value !== null),
+    );
+  }
+
   return normalized;
 }
 
 function normalizeEmailControlValues(controlValues: Record<string, unknown>) {
   if (!controlValues) return controlValues;
 
-  return {
-    subject: controlValues.subject || '',
-    emailEditor: controlValues.emailEditor || '',
-  };
+  const emailControls: Record<string, unknown> = {};
+
+  /*
+   * if (controlValues.body != null) {
+   *   emailControls.body = controlValues.body || '';
+   * }
+   */
+  emailControls.subject = controlValues.subject || '';
+  emailControls.emailEditor = controlValues.emailEditor || EMPTY_TIP_TAP_OBJECT;
+
+  return emailControls;
 }
 
 function normalizeSmsControlValues(controlValues: Record<string, unknown>) {
@@ -80,10 +104,18 @@ function normalizeSmsControlValues(controlValues: Record<string, unknown>) {
 function normalizePushControlValues(controlValues: Record<string, unknown>) {
   if (!controlValues) return controlValues;
 
-  return {
+  const mappedValues = {
     subject: controlValues.subject || '',
     body: controlValues.body || '',
   };
+
+  if (typeof mappedValues === 'object' && mappedValues !== null) {
+    return Object.fromEntries(
+      Object.entries(mappedValues).filter(([_, value]) => value !== null),
+    );
+  }
+
+  return mappedValues;
 }
 
 function normalizeChatControlValues(controlValues: Record<string, unknown>) {
@@ -97,7 +129,7 @@ function normalizeChatControlValues(controlValues: Record<string, unknown>) {
 function normalizeDigestControlValues(controlValues: Record<string, unknown>) {
   if (!controlValues) return controlValues;
 
-  return {
+  const mappedValues = {
     cron: controlValues.cron || '',
     amount: controlValues.amount || 0,
     unit: controlValues.unit || '',
@@ -109,6 +141,14 @@ function normalizeDigestControlValues(controlValues: Record<string, unknown>) {
         }
       : null,
   };
+
+  if (typeof mappedValues === 'object' && mappedValues !== null) {
+    return Object.fromEntries(
+      Object.entries(mappedValues).filter(([_, value]) => value !== null),
+    );
+  }
+
+  return mappedValues;
 }
 
 /**
@@ -160,14 +200,6 @@ export function normalizeControlValues(
       break;
     default:
       normalizedValues = controlValues;
-  }
-
-  if (typeof normalizedValues === 'object' && normalizedValues !== null) {
-    const test = Object.fromEntries(
-      Object.entries(normalizedValues).filter(([_, value]) => value !== null),
-    );
-
-    return test;
   }
 
   return normalizedValues;

@@ -1,7 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import _ from 'lodash';
-import Ajv, { ErrorObject } from 'ajv';
-import addFormats from 'ajv-formats';
+import { ErrorObject } from 'ajv';
 import {
   ChannelTypeEnum,
   createMockObjectFromSchema,
@@ -10,7 +9,7 @@ import {
   JSONSchemaDto,
   PreviewPayload,
   StepDataDto,
-  StepIssuesDto,
+  TipTapNode,
   WorkflowOriginEnum,
 } from '@novu/shared';
 import {
@@ -29,7 +28,6 @@ import { BuildStepDataUsecase } from '../build-step-data';
 import { GeneratePreviewCommand } from './generate-preview.command';
 import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
 import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
-import { previewControlValueDefault } from '../../shared/preview-control-value-default';
 import {
   extractLiquidTemplateVariables,
   TemplateParseResult,
@@ -37,6 +35,7 @@ import {
 } from '../../util/template-parser/liquid-parser';
 import { flattenObjectValues } from '../../util/utils';
 import { pathsToObject } from '../../util/path-to-object';
+import { HydrateEmailSchemaUseCase } from '../../../environments-v1/usecases/output-renderers';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 const INVALID_VARIABLE_PLACEHOLDER = '<INVALID_VARIABLE_PLACEHOLDER>';
@@ -49,23 +48,40 @@ export class GeneratePreviewUsecase {
     private buildStepDataUsecase: BuildStepDataUsecase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private readonly logger: PinoLogger,
-    private buildPayloadSchema: BuildPayloadSchema
+    private buildPayloadSchema: BuildPayloadSchema,
+    private hydrateEmailSchemaUseCase: HydrateEmailSchemaUseCase
   ) {}
 
   @InstrumentUsecase()
   async execute(command: GeneratePreviewCommand): Promise<GeneratePreviewResponseDto> {
     try {
-      const { stepData, controlValues, variableSchema, workflow } = await this.initializePreviewContext(command);
+      const {
+        stepData,
+        controlValues: initialControlValues,
+        variableSchema,
+        workflow,
+      } = await this.initializePreviewContext(command);
 
-      const { schemaCompliantControls } = processControlValuesBySchema(
-        stepData.controls.dataSchema,
-        controlValues,
-        stepData
-      );
+      const typeValidatedControls = normalizeControlValues(initialControlValues, stepData.type);
 
-      const variables = this.processControlValueVariables(schemaCompliantControls, variableSchema);
+      if (!typeValidatedControls) {
+        throw new Error(
+          // eslint-disable-next-line max-len
+          'Control values normalization failed: The normalizeControlValues function requires maintenance to sanitize the provided type or data structure correctly'
+        );
+      }
 
-      const controlValueForPreview = this.fixControlValueInvalidVariables(schemaCompliantControls, variables.invalid);
+      const { tiptapControlString, controlValues } = this.mapControlValues(typeValidatedControls);
+
+      let emailVariables: Record<string, unknown> | null = null;
+      if (tiptapControlString) {
+        // to do add to variablesExampleForPreview
+        emailVariables = this.safeAttemptToParseEmailSchema(tiptapControlString);
+      }
+
+      const variables = this.processControlValueVariables(controlValues, variableSchema);
+
+      const controlValueForPreview = this.fixControlValueInvalidVariables(controlValues, variables.invalid);
 
       const variablesExampleForPreview = this.buildVariableExample(
         controlValueForPreview,
@@ -73,12 +89,16 @@ export class GeneratePreviewUsecase {
         command.generatePreviewRequestDto.previewPayload
       );
 
-      const executeOutput = await this.executePreviewUsecase(
-        command,
-        stepData,
-        variablesExampleForPreview,
-        controlValueForPreview
-      );
+      const unitedVariables = {
+        ...variablesExampleForPreview,
+        ...emailVariables,
+      };
+      const unitedControlValues = {
+        ...controlValueForPreview,
+        ...(tiptapControlString ? { emailEditor: tiptapControlString } : {}),
+      };
+
+      const executeOutput = await this.executePreviewUsecase(command, stepData, unitedVariables, unitedControlValues);
 
       return {
         result: {
@@ -111,6 +131,30 @@ export class GeneratePreviewUsecase {
     }
   }
 
+  private safeAttemptToParseEmailSchema(tiptapControl: string): Record<string, unknown> | null {
+    if (typeof tiptapControl !== 'string') {
+      return null;
+    }
+
+    try {
+      const { placeholderAggregation } = this.hydrateEmailSchemaUseCase.execute({
+        emailEditor: tiptapControl,
+        fullPayloadForRender: {
+          payload: {},
+          subscriber: {},
+          steps: {},
+        },
+      });
+
+      return {
+        ...placeholderAggregation.nestedForPlaceholders,
+        ...placeholderAggregation.regularPlaceholdersToDefaultValue,
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
   private async initializePreviewContext(command: GeneratePreviewCommand) {
     const stepData = await this.getStepData(command);
     const controlValues = command.generatePreviewRequestDto.controlValues || stepData.controls.values || {};
@@ -137,8 +181,7 @@ export class GeneratePreviewUsecase {
     const templateVars = this.extractTemplateVariables([controlValueForPreview]);
 
     if (templateVars.length === 0) {
-      // eslint-disable-next-line no-console
-      console.log('No template variables found');
+      return {} as Record<string, unknown>;
     }
 
     const variablesExample = pathsToObject(templateVars, {
@@ -151,13 +194,19 @@ export class GeneratePreviewUsecase {
     return variablesExampleForPreview;
   }
 
-  private processControlValueVariables(schemaCompliantControls: Record<string, unknown>, variableSchema: any) {
-    const { validVariables, invalidVariables } = extractLiquidTemplateVariables(
-      JSON.stringify(schemaCompliantControls)
-    );
+  private processControlValueVariables(
+    controlValues: Record<string, unknown>,
+    variableSchema: Record<string, unknown>
+  ): {
+    valid: Variable[];
+    invalid: Variable[];
+  } {
+    const { validVariables, invalidVariables } = extractLiquidTemplateVariables(JSON.stringify(controlValues));
 
-    const { validVariables: validSchemaVariables, invalidVariables: invalidSchemaVariables } =
-      validateValidVariablesAgainstSchema(variableSchema, validVariables);
+    const { validVariables: validSchemaVariables, invalidVariables: invalidSchemaVariables } = identifyUnknownVariables(
+      variableSchema,
+      validVariables
+    );
 
     const resultVariables = {
       valid: validSchemaVariables,
@@ -191,9 +240,9 @@ export class GeneratePreviewUsecase {
     workflow: WorkflowInternalResponseDto,
     finalPayload?: PreviewPayload,
     commandVariablesExample?: PreviewPayload | undefined
-  ) {
+  ): Record<string, unknown> {
     if (workflow.origin !== WorkflowOriginEnum.EXTERNAL) {
-      return finalPayload;
+      return finalPayload as Record<string, unknown>;
     }
 
     const examplePayloadSchema = createMockObjectFromSchema({
@@ -202,7 +251,7 @@ export class GeneratePreviewUsecase {
     });
 
     if (!examplePayloadSchema || Object.keys(examplePayloadSchema).length === 0) {
-      return finalPayload;
+      return finalPayload as Record<string, unknown>;
     }
 
     return _.merge(finalPayload as Record<string, unknown>, examplePayloadSchema, commandVariablesExample || {});
@@ -295,6 +344,24 @@ export class GeneratePreviewUsecase {
 
     return JSON.parse(controlValuesString) as Record<string, unknown>;
   }
+
+  private mapControlValues(controlValues: Record<string, unknown>): {
+    tiptapControlString: string | null;
+    controlValues: Record<string, unknown>;
+  } {
+    const resultControlValues = _.cloneDeep(controlValues);
+    let tiptapControlString: string | null = null;
+
+    if (isTipTapNode(resultControlValues.emailEditor)) {
+      tiptapControlString = resultControlValues.emailEditor;
+      delete resultControlValues.emailEditor;
+    } else if (isTipTapNode(resultControlValues.body)) {
+      tiptapControlString = resultControlValues.body;
+      delete resultControlValues.body;
+    }
+
+    return { tiptapControlString, controlValues: resultControlValues };
+  }
 }
 
 function buildState(steps: Record<string, unknown> | undefined): FrameworkPreviousStepsOutputState[] {
@@ -335,77 +402,6 @@ class FrameworkError {
   name: string;
 }
 
-/**
- * Fixes invalid control values by applying default values from the schema
- *
- * @example
- * // Input:
- * const values = { foo: 'invalid' };
- * const errors = [{ instancePath: '/foo' }];
- * const defaults = { foo: 'default' };
- *
- * // Output:
- * const fixed = { foo: 'default' };
- */
-function replaceInvalidControlValues(
-  normalizedControlValues: Record<string, unknown>,
-  errors: ErrorObject[]
-): Record<string, unknown> {
-  const fixedValues = _.cloneDeep(normalizedControlValues);
-
-  errors.forEach((error) => {
-    const path = getErrorPath(error);
-    const defaultValue = _.get(previewControlValueDefault, path);
-    _.set(fixedValues, path, defaultValue);
-  });
-
-  return fixedValues;
-}
-
-function processControlValuesBySchema(
-  controlSchema: JSONSchemaDto | undefined,
-  controlValues: Record<string, unknown>,
-  stepData: StepDataDto
-): { issues: StepIssuesDto; schemaCompliantControls: Record<string, unknown> } {
-  const issues: StepIssuesDto = {};
-  let fixedValues: Record<string, unknown> | undefined;
-
-  const schemaCompliantControls = normalizeControlValues(controlValues, stepData.type);
-
-  if (!schemaCompliantControls) {
-    throw new Error(
-      // eslint-disable-next-line max-len
-      'Control values normalization failed: The normalizeControlValues function requires maintenance to handle the provided type or data structure correctly'
-    );
-  }
-
-  /*
-   * TODO: Consider if this validation is necessary since we already normalize in normalizeControlValues and,
-   * we can make it more robust by adding custom parsable by liquid js values
-   *
-   * Current purposes:
-   * 1. Validates control schema for code-first approach
-   * 2. Allows adding custom validation rules
-   *    Example: If emailEditor is renamed to 'body', we can validate it's valid TipTap JSON
-   */
-  if (controlSchema) {
-    const ajv = new Ajv({ allErrors: true });
-    addFormats(ajv);
-
-    const validate = ajv.compile(controlSchema);
-    const isValid = validate(schemaCompliantControls);
-    const errors = validate.errors as null | ErrorObject[];
-
-    if (!isValid && errors && errors?.length !== 0 && schemaCompliantControls) {
-      fixedValues = replaceInvalidControlValues(schemaCompliantControls, errors);
-
-      return { issues, schemaCompliantControls: fixedValues };
-    }
-  }
-
-  return { issues, schemaCompliantControls };
-}
-
 /*
  * Extracts the path from the error object:
  * 1. If instancePath exists, removes leading slash and converts remaining slashes to dots
@@ -441,7 +437,7 @@ function getErrorPath(error: ErrorObject): string {
  * //   invalidVariables: [{ name: 'unknown.variable' }, { name: 'subscriber.orderId' }]
  * // }
  */
-function validateValidVariablesAgainstSchema(
+function identifyUnknownVariables(
   variableSchema: Record<string, unknown>,
   validVariables: Variable[]
 ): TemplateParseResult {
@@ -501,4 +497,70 @@ function validateValidVariablesAgainstSchema(
  */
 function replaceAll(text: string, searchValue: string, replaceValue: string): string {
   return _.replace(text, new RegExp(_.escapeRegExp(searchValue), 'g'), replaceValue);
+}
+
+/**
+ *
+ * @param value minimal tiptap object from the client is
+ * {
+ *  "type": "doc",
+ *  "content": [
+ *    {
+ *      "type": "paragraph",
+ *      "attrs": {
+ *        "textAlign": "left"
+ *      },
+ *      "content": [
+ *        {
+ *          "type": "text",
+ *          "text": " "
+ *        }
+ *      ]
+ *  }
+ *]
+ *}
+ */
+
+export function isTipTapNode(value: unknown): value is string {
+  let localValue = value;
+  if (typeof localValue === 'string') {
+    try {
+      localValue = JSON.parse(localValue);
+    } catch {
+      return false;
+    }
+  }
+
+  if (!localValue || typeof localValue !== 'object') return false;
+
+  const doc = localValue as TipTapNode;
+
+  // TODO check if validate type === doc is enough
+  if (doc.type !== 'doc' || !Array.isArray(doc.content)) return false;
+
+  return true;
+
+  /*
+   * TODO check we need to validate the content
+   * return doc.content.every((node) => isValidTipTapContent(node));
+   */
+}
+
+function isValidTipTapContent(node: unknown): boolean {
+  if (!node || typeof node !== 'object') return false;
+  const content = node as TipTapNode;
+  if (typeof content.type !== 'string') return false;
+  if (content.attrs !== undefined && (typeof content.attrs !== 'object' || content.attrs === null)) {
+    return false;
+  }
+  if (content.text !== undefined && typeof content.text !== 'string') {
+    return false;
+  }
+  if (content.content !== undefined) {
+    if (!Array.isArray(content.content)) return false;
+
+    return content.content.every((child) => isValidTipTapContent(child));
+  }
+
+  return true;
 }
