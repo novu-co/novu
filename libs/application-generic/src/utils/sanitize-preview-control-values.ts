@@ -8,6 +8,7 @@ const EMPTY_TIP_TAP_OBJECT = JSON.stringify({
     },
   ],
 });
+const WHITESPACE = ' ';
 
 type Redirect = {
   url: string;
@@ -33,12 +34,15 @@ function normalizeRedirect(redirect: Redirect) {
   };
 }
 
-function normalizeInAppControlValues(controlValues: Record<string, unknown>) {
+function sanitizeInApp(controlValues: Record<string, unknown>) {
   if (!controlValues) return controlValues;
 
   const normalized: Record<string, unknown> = {
     subject: controlValues.subject || null,
-    body: controlValues.body,
+    body:
+      (controlValues.body as string)?.length === 0
+        ? WHITESPACE
+        : controlValues.body,
     avatar: controlValues.avatar || null,
     primaryAction: null,
     secondaryAction: null,
@@ -77,7 +81,7 @@ function normalizeInAppControlValues(controlValues: Record<string, unknown>) {
   return normalized;
 }
 
-function normalizeEmailControlValues(controlValues: Record<string, unknown>) {
+function sanitizeEmail(controlValues: Record<string, unknown>) {
   if (!controlValues) return controlValues;
 
   const emailControls: Record<string, unknown> = {};
@@ -93,7 +97,7 @@ function normalizeEmailControlValues(controlValues: Record<string, unknown>) {
   return emailControls;
 }
 
-function normalizeSmsControlValues(controlValues: Record<string, unknown>) {
+function sanitizeSms(controlValues: Record<string, unknown>) {
   if (!controlValues) return controlValues;
 
   return {
@@ -101,7 +105,7 @@ function normalizeSmsControlValues(controlValues: Record<string, unknown>) {
   };
 }
 
-function normalizePushControlValues(controlValues: Record<string, unknown>) {
+function sanitizePush(controlValues: Record<string, unknown>) {
   if (!controlValues) return controlValues;
 
   const mappedValues = {
@@ -118,7 +122,7 @@ function normalizePushControlValues(controlValues: Record<string, unknown>) {
   return mappedValues;
 }
 
-function normalizeChatControlValues(controlValues: Record<string, unknown>) {
+function sanitizeChat(controlValues: Record<string, unknown>) {
   if (!controlValues) return controlValues;
 
   return {
@@ -126,7 +130,7 @@ function normalizeChatControlValues(controlValues: Record<string, unknown>) {
   };
 }
 
-function normalizeDigestControlValues(controlValues: Record<string, unknown>) {
+function sanitizeDigest(controlValues: Record<string, unknown>) {
   if (!controlValues) return controlValues;
 
   const mappedValues = {
@@ -152,7 +156,7 @@ function normalizeDigestControlValues(controlValues: Record<string, unknown>) {
 }
 
 /**
- * Normalizes control values received from client-side forms into a clean minimal object.
+ * Sanitizes control values received from client-side forms into a clean minimal object.
  * This function processes potentially invalid form data that may contain default/placeholder values
  * and transforms it into a standardized format suitable for preview generation.
  *
@@ -167,11 +171,11 @@ function normalizeDigestControlValues(controlValues: Record<string, unknown>) {
  * // Normalized output:
  * {
  *   subject: "Hello",
- *   body: ""
+ *   body: " "
  * }
  *
  */
-export function normalizeControlValues(
+export function sanitizePreviewControlValues(
   controlValues: Record<string, unknown>,
   stepType: string,
 ): Record<string, unknown> | null {
@@ -181,22 +185,22 @@ export function normalizeControlValues(
   let normalizedValues: Record<string, unknown>;
   switch (stepType) {
     case 'in_app':
-      normalizedValues = normalizeInAppControlValues(controlValues);
+      normalizedValues = sanitizeInApp(controlValues);
       break;
     case 'email':
-      normalizedValues = normalizeEmailControlValues(controlValues);
+      normalizedValues = sanitizeEmail(controlValues);
       break;
     case 'sms':
-      normalizedValues = normalizeSmsControlValues(controlValues);
+      normalizedValues = sanitizeSms(controlValues);
       break;
     case 'push':
-      normalizedValues = normalizePushControlValues(controlValues);
+      normalizedValues = sanitizePush(controlValues);
       break;
     case 'chat':
-      normalizedValues = normalizeChatControlValues(controlValues);
+      normalizedValues = sanitizeChat(controlValues);
       break;
     case 'digest':
-      normalizedValues = normalizeDigestControlValues(controlValues);
+      normalizedValues = sanitizeDigest(controlValues);
       break;
     default:
       normalizedValues = controlValues;

@@ -1,6 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import _ from 'lodash';
-import { ErrorObject } from 'ajv';
 import {
   ChannelTypeEnum,
   createMockObjectFromSchema,
@@ -19,7 +18,7 @@ import {
   Instrument,
   InstrumentUsecase,
   PinoLogger,
-  normalizeControlValues,
+  sanitizePreviewControlValues,
 } from '@novu/application-generic';
 import { captureException } from '@sentry/node';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
@@ -41,10 +40,21 @@ const LOG_CONTEXT = 'GeneratePreviewUsecase';
 const INVALID_VARIABLE_PLACEHOLDER = '<INVALID_VARIABLE_PLACEHOLDER>';
 const PREVIEW_ERROR_MESSAGE_PLACEHOLDER = `[[Invalid Variable: ${INVALID_VARIABLE_PLACEHOLDER}]]`;
 
+type DestructuredControlValues = {
+  tiptapControlValues: { emailEditor?: string | null; body?: string | null } | null;
+  // this is the remaining control values after the tiptap control is extracted
+  simpleControlValues: Record<string, unknown>;
+};
+
+type ProcessedControlResult = {
+  controlValues: Record<string, unknown>;
+  variablesExample: Record<string, unknown> | null;
+};
+
 @Injectable()
 export class GeneratePreviewUsecase {
   constructor(
-    private legacyPreviewStepUseCase: PreviewStep,
+    private previewStepUsecase: PreviewStep,
     private buildStepDataUsecase: BuildStepDataUsecase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private readonly logger: PinoLogger,
@@ -62,42 +72,31 @@ export class GeneratePreviewUsecase {
         workflow,
       } = await this.initializePreviewContext(command);
 
-      const typeValidatedControls = normalizeControlValues(initialControlValues, stepData.type);
+      const sanitizedValidatedControls = sanitizePreviewControlValues(initialControlValues, stepData.type);
 
-      if (!typeValidatedControls) {
+      if (!sanitizedValidatedControls) {
         throw new Error(
           // eslint-disable-next-line max-len
           'Control values normalization failed: The normalizeControlValues function requires maintenance to sanitize the provided type or data structure correctly'
         );
       }
 
-      const { tiptapControlString, controlValues } = this.mapControlValues(typeValidatedControls);
+      const destructuredControlValues = this.destructureControlValues(sanitizedValidatedControls);
 
-      let emailVariables: Record<string, unknown> | null = null;
-      if (tiptapControlString) {
-        // to do add to variablesExampleForPreview
-        emailVariables = this.safeAttemptToParseEmailSchema(tiptapControlString);
-      }
-
-      const variables = this.processControlValueVariables(controlValues, variableSchema);
-
-      const controlValueForPreview = this.fixControlValueInvalidVariables(controlValues, variables.invalid);
-
-      const variablesExampleForPreview = this.buildVariableExample(
-        controlValueForPreview,
+      const { variablesExample: tiptapVariablesExample, controlValues: tiptapControlValues } = this.handleTipTapControl(
+        destructuredControlValues.tiptapControlValues
+      );
+      const { variablesExample: simpleVariablesExample, controlValues: simpleControlValues } = this.handleSimpleControl(
+        destructuredControlValues.simpleControlValues,
+        variableSchema,
         workflow,
         command.generatePreviewRequestDto.previewPayload
       );
 
-      const unitedVariables = {
-        ...variablesExampleForPreview,
-        ...emailVariables,
-      };
-      const unitedControlValues = {
-        ...controlValueForPreview,
-        ...(tiptapControlString ? { emailEditor: tiptapControlString } : {}),
-      };
-
+      const [unitedVariables, unitedControlValues] = [
+        { ...tiptapVariablesExample, ...simpleVariablesExample },
+        { ...tiptapControlValues, ...simpleControlValues },
+      ];
       const executeOutput = await this.executePreviewUsecase(command, stepData, unitedVariables, unitedControlValues);
 
       return {
@@ -105,7 +104,7 @@ export class GeneratePreviewUsecase {
           preview: executeOutput.outputs as any,
           type: stepData.type as unknown as ChannelTypeEnum,
         },
-        previewPayloadExample: variablesExampleForPreview,
+        previewPayloadExample: unitedVariables,
       };
     } catch (error) {
       this.logger.error(
@@ -155,43 +154,73 @@ export class GeneratePreviewUsecase {
     }
   }
 
-  private async initializePreviewContext(command: GeneratePreviewCommand) {
-    const stepData = await this.getStepData(command);
-    const controlValues = command.generatePreviewRequestDto.controlValues || stepData.controls.values || {};
-    const workflow = await this.findWorkflow(command);
-    const payloadSchema = await this.buildPayloadSchema.execute(
-      BuildPayloadSchemaCommand.create({
-        environmentId: command.user.environmentId,
-        organizationId: command.user.organizationId,
-        userId: command.user._id,
-        workflowId: command.workflowIdOrInternalId,
-        controlValues,
-      })
-    );
-    const variableSchema = this.buildVariablesSchema(stepData.variables, payloadSchema);
-
-    return { stepData, controlValues, variableSchema, workflow };
-  }
-
-  private buildVariableExample(
-    controlValueForPreview: Record<string, unknown>,
-    workflow: WorkflowInternalResponseDto,
-    commandVariablesExample: PreviewPayload | undefined
-  ) {
-    const templateVars = this.extractTemplateVariables([controlValueForPreview]);
-
-    if (templateVars.length === 0) {
-      return {} as Record<string, unknown>;
+  private handleTipTapControl(
+    tiptapControlValue: {
+      emailEditor?: string | null;
+      body?: string | null;
+    } | null
+  ): ProcessedControlResult {
+    if (!tiptapControlValue || (!tiptapControlValue?.emailEditor && !tiptapControlValue?.body)) {
+      return {
+        variablesExample: null,
+        controlValues: tiptapControlValue as Record<string, unknown>,
+      };
     }
 
-    const variablesExample = pathsToObject(templateVars, {
+    const emailVariables = this.safeAttemptToParseEmailSchema(
+      tiptapControlValue?.emailEditor || tiptapControlValue?.body || ''
+    );
+
+    return {
+      variablesExample: emailVariables,
+      controlValues: tiptapControlValue,
+    };
+  }
+
+  private handleSimpleControl(
+    controlValues: Record<string, unknown>,
+    variableSchema: Record<string, unknown>,
+    workflow: WorkflowInternalResponseDto,
+    commandVariablesExample: PreviewPayload | undefined
+  ): ProcessedControlResult {
+    const variables = this.processControlValueVariables(controlValues, variableSchema);
+    const processedControlValues = this.fixControlValueInvalidVariables(controlValues, variables.invalid);
+    const extractedTemplateVariables = this.extractTemplateVariables([processedControlValues]);
+    const payloadVariableExample =
+      workflow.origin === WorkflowOriginEnum.EXTERNAL
+        ? createMockObjectFromSchema({
+            type: 'object',
+            properties: { payload: workflow.payloadSchema },
+          })
+        : {};
+
+    if (extractedTemplateVariables.length === 0) {
+      return {
+        variablesExample: payloadVariableExample,
+        controlValues: processedControlValues,
+      };
+    }
+
+    const variablesExample: Record<string, unknown> = pathsToObject(extractedTemplateVariables, {
       valuePrefix: '{{',
       valueSuffix: '}}',
     });
 
-    const variablesExampleForPreview = this.buildVariablesExample(workflow, variablesExample, commandVariablesExample);
+    const variablesExampleForPreview = _.merge(variablesExample, payloadVariableExample, commandVariablesExample || {});
 
-    return variablesExampleForPreview;
+    return {
+      variablesExample: variablesExampleForPreview,
+      controlValues: processedControlValues,
+    };
+  }
+
+  private async initializePreviewContext(command: GeneratePreviewCommand) {
+    const stepData = await this.getStepData(command);
+    const controlValues = command.generatePreviewRequestDto.controlValues || stepData.controls.values || {};
+    const workflow = await this.findWorkflow(command);
+    const variableSchema = await this.buildVariablesSchema(stepData.variables, command, controlValues);
+
+    return { stepData, controlValues, variableSchema, workflow };
   }
 
   private processControlValueVariables(
@@ -208,53 +237,41 @@ export class GeneratePreviewUsecase {
       validVariables
     );
 
-    const resultVariables = {
+    return {
       valid: validSchemaVariables,
       invalid: [...invalidVariables, ...invalidSchemaVariables],
     };
-
-    return resultVariables;
   }
 
   @Instrument()
   private extractTemplateVariables(controlValues: Record<string, unknown>[]): string[] {
     const controlValuesString = controlValues.map(flattenObjectValues).flat().join(' ');
+    const { validVariables } = extractLiquidTemplateVariables(controlValuesString);
 
-    const test = extractLiquidTemplateVariables(controlValuesString);
-    const test2 = test.validVariables.map((variable) => variable.name);
-
-    return test2;
+    return validVariables.map((variable) => variable.name);
   }
 
   @Instrument()
-  private buildVariablesSchema(variables: Record<string, unknown>, payloadSchema: JSONSchemaDto) {
+  private async buildVariablesSchema(
+    variables: Record<string, unknown>,
+    command: GeneratePreviewCommand,
+    controlValues: Record<string, unknown>
+  ) {
+    const payloadSchema = await this.buildPayloadSchema.execute(
+      BuildPayloadSchemaCommand.create({
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
+        userId: command.user._id,
+        workflowId: command.workflowIdOrInternalId,
+        controlValues,
+      })
+    );
+
     if (Object.keys(payloadSchema).length === 0) {
       return variables;
     }
 
     return _.merge(variables, { properties: { payload: payloadSchema } });
-  }
-
-  @Instrument()
-  private buildVariablesExample(
-    workflow: WorkflowInternalResponseDto,
-    finalPayload?: PreviewPayload,
-    commandVariablesExample?: PreviewPayload | undefined
-  ): Record<string, unknown> {
-    if (workflow.origin !== WorkflowOriginEnum.EXTERNAL) {
-      return finalPayload as Record<string, unknown>;
-    }
-
-    const examplePayloadSchema = createMockObjectFromSchema({
-      type: 'object',
-      properties: { payload: workflow.payloadSchema },
-    });
-
-    if (!examplePayloadSchema || Object.keys(examplePayloadSchema).length === 0) {
-      return finalPayload as Record<string, unknown>;
-    }
-
-    return _.merge(finalPayload as Record<string, unknown>, examplePayloadSchema, commandVariablesExample || {});
   }
 
   @Instrument()
@@ -291,7 +308,7 @@ export class GeneratePreviewUsecase {
   ) {
     const state = buildState(hydratedPayload.steps);
     try {
-      return await this.legacyPreviewStepUseCase.execute(
+      return await this.previewStepUsecase.execute(
         PreviewStepCommand.create({
           payload: hydratedPayload.payload || {},
           subscriber: hydratedPayload.subscriber,
@@ -314,53 +331,57 @@ export class GeneratePreviewUsecase {
     }
   }
 
+  private destructureControlValues(controlValues: Record<string, unknown>): DestructuredControlValues {
+    try {
+      const localControlValue = _.cloneDeep(controlValues);
+      let tiptapControlString: string | null = null;
+
+      if (isTipTapNode(localControlValue.emailEditor)) {
+        tiptapControlString = localControlValue.emailEditor;
+        delete localControlValue.emailEditor;
+
+        return { tiptapControlValues: { emailEditor: tiptapControlString }, simpleControlValues: localControlValue };
+      }
+
+      if (isTipTapNode(localControlValue.body)) {
+        tiptapControlString = localControlValue.body;
+        delete localControlValue.body;
+
+        return { tiptapControlValues: { body: tiptapControlString }, simpleControlValues: localControlValue };
+      }
+
+      return { tiptapControlValues: null, simpleControlValues: localControlValue };
+    } catch (error) {
+      this.logger.error({ error }, 'Failed to extract TipTap control', LOG_CONTEXT);
+
+      return { tiptapControlValues: null, simpleControlValues: controlValues };
+    }
+  }
+
   private fixControlValueInvalidVariables(
     controlValues: Record<string, unknown>,
     invalidVariables: Variable[]
   ): Record<string, unknown> {
-    let controlValuesString = JSON.stringify(controlValues);
+    try {
+      let controlValuesString = JSON.stringify(controlValues);
 
-    for (const invalidVariable of invalidVariables) {
-      const invalidVariableExists = controlValuesString.includes(invalidVariable.name);
-      if (!invalidVariableExists) {
-        continue;
+      for (const invalidVariable of invalidVariables) {
+        if (!controlValuesString.includes(invalidVariable.name)) {
+          continue;
+        }
+
+        const invalidVariableExpression = invalidVariable.template.replace('{{', '').replace('}}', '');
+        const liquidJsParsableString = PREVIEW_ERROR_MESSAGE_PLACEHOLDER.replace(
+          INVALID_VARIABLE_PLACEHOLDER,
+          invalidVariableExpression
+        );
+        controlValuesString = replaceAll(controlValuesString, invalidVariable.template, liquidJsParsableString);
       }
 
-      /*
-       * we need to remove the '{{' and '}}' from the invalid variable name
-       * so that framework can parse it without errors
-       */
-      const EMPTY_STRING = '';
-      const invalidVariableExpression = invalidVariable.template
-        .replace('{{', EMPTY_STRING)
-        .replace('}}', EMPTY_STRING);
-      const liquidJsParsableString = PREVIEW_ERROR_MESSAGE_PLACEHOLDER.replace(
-        INVALID_VARIABLE_PLACEHOLDER,
-        invalidVariableExpression
-      );
-
-      controlValuesString = replaceAll(controlValuesString, invalidVariable.template, liquidJsParsableString);
+      return JSON.parse(controlValuesString) as Record<string, unknown>;
+    } catch (error) {
+      return controlValues;
     }
-
-    return JSON.parse(controlValuesString) as Record<string, unknown>;
-  }
-
-  private mapControlValues(controlValues: Record<string, unknown>): {
-    tiptapControlString: string | null;
-    controlValues: Record<string, unknown>;
-  } {
-    const resultControlValues = _.cloneDeep(controlValues);
-    let tiptapControlString: string | null = null;
-
-    if (isTipTapNode(resultControlValues.emailEditor)) {
-      tiptapControlString = resultControlValues.emailEditor;
-      delete resultControlValues.emailEditor;
-    } else if (isTipTapNode(resultControlValues.body)) {
-      tiptapControlString = resultControlValues.body;
-      delete resultControlValues.body;
-    }
-
-    return { tiptapControlString, controlValues: resultControlValues };
   }
 }
 
@@ -402,16 +423,6 @@ class FrameworkError {
   name: string;
 }
 
-/*
- * Extracts the path from the error object:
- * 1. If instancePath exists, removes leading slash and converts remaining slashes to dots
- * 2. If no instancePath, uses missingProperty from error params
- * Example: "/foo/bar" becomes "foo.bar"
- */
-function getErrorPath(error: ErrorObject): string {
-  return (error.instancePath.substring(1) || error.params.missingProperty).replace(/\//g, '.');
-}
-
 /**
  * Validates liquid template variables against a schema, the result is an object with valid and invalid variables
  * @example
@@ -441,7 +452,6 @@ function identifyUnknownVariables(
   variableSchema: Record<string, unknown>,
   validVariables: Variable[]
 ): TemplateParseResult {
-  // Create deep copies of input arrays to prevent side effects
   const validVariablesCopy: Variable[] = _.cloneDeep(validVariables);
 
   const result = validVariablesCopy.reduce<TemplateParseResult>(
@@ -520,7 +530,6 @@ function replaceAll(text: string, searchValue: string, replaceValue: string): st
  *]
  *}
  */
-
 export function isTipTapNode(value: unknown): value is string {
   let localValue = value;
   if (typeof localValue === 'string') {
