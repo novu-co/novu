@@ -124,7 +124,7 @@ initializeCustomOperators();
 export function evaluateRules(
   rule: RulesLogic<AdditionalOperation>,
   data: unknown,
-  safe = true
+  safe = false
 ): { result: boolean; error: string | undefined } {
   try {
     return { result: jsonLogic.apply(rule, data), error: undefined };
