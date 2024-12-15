@@ -13,15 +13,16 @@ import { skipZodSchema } from './skip-control.schema';
 const DigestRegularControlZodSchema = z
   .object({
     skip: skipZodSchema,
-    amount: z.number(),
-    unit: z.nativeEnum(TimeUnitEnum),
+    amount: z.union([z.number().min(1), z.string()]),
+    unit: z.nativeEnum(TimeUnitEnum).default(TimeUnitEnum.SECONDS),
     digestKey: z.string().optional(),
     lookBackWindow: z
       .object({
-        amount: z.number(),
-        unit: z.nativeEnum(TimeUnitEnum),
+        amount: z.number().min(1),
+        unit: z.nativeEnum(TimeUnitEnum).default(TimeUnitEnum.SECONDS),
       })
-      .strict(),
+      .strict()
+      .optional(),
   })
   .strict();
 
@@ -61,7 +62,7 @@ export const digestUiSchema: UiSchema = {
   properties: {
     amount: {
       component: UiComponentEnum.DIGEST_AMOUNT,
-      placeholder: '30',
+      placeholder: '',
     },
     unit: {
       component: UiComponentEnum.DIGEST_UNIT,
@@ -69,7 +70,7 @@ export const digestUiSchema: UiSchema = {
     },
     digestKey: {
       component: UiComponentEnum.DIGEST_KEY,
-      placeholder: null,
+      placeholder: '',
     },
     cron: {
       component: UiComponentEnum.DIGEST_CRON,

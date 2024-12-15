@@ -5,7 +5,7 @@ import { cva, VariantProps } from 'class-variance-authority';
 import { useFormField } from './form/form-context';
 
 export const inputVariants = cva(
-  'file:text-foreground placeholder:text-foreground-400 flex h-full w-full bg-transparent text-xs file:border-0 file:bg-transparent file:font-medium focus-visible:outline-none disabled:cursor-not-allowed'
+  'file:text-foreground placeholder:text-foreground-300 flex h-full w-full bg-transparent text-xs file:border-0 file:bg-transparent file:font-medium focus-visible:outline-none disabled:cursor-not-allowed'
 );
 
 const inputFieldVariants = cva(

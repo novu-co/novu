@@ -1,7 +1,6 @@
 import { EmailBlockTypeEnum, PreferenceLevelEnum, StepTypeEnum } from '@novu/shared';
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
-import e from 'express';
 
 describe('Update global preferences - /inbox/preferences (PATCH)', function () {
   let session: UserSession;
@@ -129,8 +128,8 @@ describe('Update workflow preferences - /inbox/preferences/:workflowId (PATCH)',
         chat: true,
       })
       .set('Authorization', `Bearer ${session.subscriberToken}`);
-
-    expect(response.body.message[0]).to.equal(`workflowId must be a mongodb id`);
+    expect(response.body.statusCode).to.equal(400);
+    expect(response.body.cause.workflowId.messages[0]).to.equal(`workflowId must be a mongodb id`);
     expect(response.status).to.equal(400);
   });
 

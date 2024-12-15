@@ -1,5 +1,7 @@
 import { UiSchemaGroupEnum } from '@novu/shared';
 import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
+import { SidebarContent } from '@/components/side-navigation/sidebar';
+import { Separator } from '@/components/primitives/separator';
 import { CustomStepControls } from '@/components/workflow-editor/steps/controls/custom-step-controls';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
@@ -19,7 +21,12 @@ export const DelayControlValues = () => {
 
   return (
     <>
-      {amount && type && unit && getComponentByType({ component: amount.component })}
+      {amount && type && unit && (
+        <>
+          <SidebarContent>{getComponentByType({ component: amount.component })}</SidebarContent>
+          <Separator />
+        </>
+      )}
       <CustomStepControls className="text-xs" dataSchema={dataSchema} origin={workflow.origin} />
     </>
   );

@@ -21,6 +21,7 @@ import {
 } from '@novu/shared';
 
 import { Type } from 'class-transformer';
+import { RuntimeIssue } from '@novu/dal';
 import { EnvironmentWithUserCommand } from '../../../commands';
 import { PreferencesRequired } from '../../upsert-preferences';
 import {
@@ -115,10 +116,11 @@ export class UpdateWorkflowCommand extends EnvironmentWithUserCommand {
   @IsOptional()
   workflowId?: string;
 
+  @IsObject()
   @IsOptional()
   @ValidateNested({ each: true })
-  @Type(() => ContentIssue)
-  issues?: Record<string, ContentIssue[]>;
+  @Type(() => Array<ContentIssue>)
+  issues?: Record<string, RuntimeIssue[]>;
 
   @IsEnum(WorkflowStatusEnum)
   @IsOptional()

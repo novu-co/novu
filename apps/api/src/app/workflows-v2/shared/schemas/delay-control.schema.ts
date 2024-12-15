@@ -14,7 +14,7 @@ export const DelayTimeControlZodSchema = z
   .object({
     skip: skipZodSchema,
     type: z.enum(['regular']).default('regular'),
-    amount: z.number().min(1),
+    amount: z.union([z.number().min(1), z.string()]),
     unit: z.nativeEnum(TimeUnitEnum),
   })
   .strict();

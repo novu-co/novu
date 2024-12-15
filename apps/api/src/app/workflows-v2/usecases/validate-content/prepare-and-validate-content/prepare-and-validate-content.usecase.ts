@@ -3,6 +3,7 @@ import { merge } from 'lodash';
 import {
   ContentIssue,
   DigestUnitEnum,
+  JSONSchemaDefinition,
   JSONSchemaDto,
   PreviewPayload,
   StepContentIssueEnum,
@@ -21,6 +22,7 @@ import { ExtractDefaultValuesFromSchemaUsecase } from '../../extract-default-val
 import { ValidatedContentResponse } from './validated-content.response';
 import { toSentenceCase } from '../../../../shared/services/helper/helper.service';
 import { isValidUrlForActionButton } from '../../../util/url-utils';
+import { extractMinValuesFromSchema, isMatchingJsonSchema } from '../../../util/jsonToSchema';
 
 /**
  * Validates and prepares workflow step content by collecting placeholders,
@@ -101,7 +103,7 @@ export class PrepareAndValidateContentUsecase {
     controlValues: Record<string, unknown>,
     controlValueToValidPlaceholders: Record<string, ValidatedPlaceholderAggregation>
   ) {
-    const defaultControlValues = this.extractDefaultsFromSchemaUseCase.execute({ jsonSchemaDto });
+    const defaultControlValues = this.extractDefaultsFromSchemaUseCase.execute({ jsonSchemaDto, controlValues });
 
     let flatSanitizedControlValues: Record<string, unknown> = flattenJson(controlValues);
     const controlValueToContentIssues: Record<string, ContentIssue[]> = {};
@@ -123,6 +125,9 @@ export class PrepareAndValidateContentUsecase {
       controlValueToValidPlaceholders,
       controlValueToContentIssues
     );
+
+    this.overloadMinValueIssues(jsonSchemaDto, flatSanitizedControlValues, controlValueToContentIssues);
+
     const finalControlValues = merge(defaultControlValues, flatSanitizedControlValues);
     const nestedJson = flattenToNested(finalControlValues);
 
@@ -292,8 +297,44 @@ export class PrepareAndValidateContentUsecase {
         controlValueToContentIssues,
         item,
         StepContentIssueEnum.MISSING_VALUE,
-        `${toSentenceCase(item)} is missing`,
+        `${toSentenceCase(item)} is required`,
         item
+      );
+    }
+  }
+
+  private overloadMinValueIssues(
+    jsonSchema: JSONSchemaDto,
+    controlValues: Record<string, unknown>,
+    controlValueIssues: Record<string, ContentIssue[]>
+  ) {
+    if (typeof jsonSchema !== 'object') {
+      return;
+    }
+
+    let schemaToExtractDefaults: JSONSchemaDefinition = jsonSchema;
+    if (jsonSchema.anyOf && jsonSchema.anyOf.length > 0) {
+      schemaToExtractDefaults =
+        jsonSchema.anyOf.find((item) => {
+          return isMatchingJsonSchema(item, controlValues);
+        }) ?? jsonSchema[0];
+    }
+    const minValuesFromSchema = extractMinValuesFromSchema(schemaToExtractDefaults);
+
+    for (const [key, minValue] of Object.entries(minValuesFromSchema)) {
+      if (typeof controlValues[key] !== 'number') {
+        continue;
+      }
+      if (controlValues[key] >= minValue) {
+        continue;
+      }
+
+      this.addToIssues(
+        controlValueIssues,
+        key,
+        StepContentIssueEnum.MIN_VALUE,
+        `${toSentenceCase(key)} must be at least ${minValue}`,
+        key
       );
     }
   }

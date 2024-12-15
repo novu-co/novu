@@ -57,9 +57,14 @@ export function useNewDashboardOptIn() {
     redirectToLegacyDashboard();
   };
 
+  const optIn = async () => {
+    await updateUserOptInStatus(NewDashboardOptInStatusEnum.OPTED_IN);
+  };
+
   return {
     isLoaded,
     optOut,
+    optIn,
     status: getCurrentOptInStatus(),
     isFirstVisit: getNewDashboardFirstVisit(),
     updateNewDashboardFirstVisit,

@@ -14,6 +14,7 @@ import {
   ApiKeysPage,
   WelcomePage,
   SettingsPage,
+  ActivityFeed,
 } from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
@@ -99,6 +100,10 @@ const router = createBrowserRouter([
               {
                 path: ROUTES.API_KEYS,
                 element: <ApiKeysPage />,
+              },
+              {
+                path: ROUTES.ACTIVITY_FEED,
+                element: <ActivityFeed />,
               },
               {
                 path: ROUTES.EDIT_WORKFLOW,
