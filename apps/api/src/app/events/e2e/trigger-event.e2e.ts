@@ -3230,7 +3230,7 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
     return (await novuClient.trigger(request)).result;
   }
 
-  describe('Trigger Event New Dashboard - /v1/events/trigger (POST)', function () {
+  describe('Trigger Event v2 workflow - /v1/events/trigger (POST)', function () {
     afterEach(async () => {
       await messageRepository.deleteMany({
         _environmentId: session.environment._id,

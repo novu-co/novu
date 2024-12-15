@@ -7,7 +7,7 @@ export const skipStepUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.SKIP,
   properties: {
     skip: {
-      component: UiComponentEnum.SKIP_RULES,
+      component: UiComponentEnum.QUERY_EDITOR,
     },
   },
 };

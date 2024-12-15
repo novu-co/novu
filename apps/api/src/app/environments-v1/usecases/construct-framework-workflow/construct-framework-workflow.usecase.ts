@@ -5,6 +5,7 @@ import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplat
 import { StepTypeEnum } from '@novu/shared';
 import { Instrument, InstrumentUsecase, PinoLogger } from '@novu/application-generic';
 import { AdditionalOperation, RulesLogic } from 'json-logic-js';
+import _ from 'lodash';
 import { ConstructFrameworkWorkflowCommand } from './construct-framework-workflow.command';
 import {
   ChatOutputRendererUsecase,
@@ -195,7 +196,7 @@ export class ConstructFrameworkWorkflow {
     return {
       // TODO: fix the `JSONSchemaDto` type to enforce a non-primitive schema type.
       controlSchema: staticStep.template!.controls!.schema as JsonSchema,
-      skip: (controlValues: { [x: string]: unknown }) => this.processSkipOption(controlValues, fullPayloadForRender),
+      skip: (controlValues: Record<string, unknown>) => this.processSkipOption(controlValues, fullPayloadForRender),
     };
   }
 
@@ -213,8 +214,7 @@ export class ConstructFrameworkWorkflow {
   private processSkipOption(controlValues: { [x: string]: unknown }, variables: FullPayloadForRender) {
     const skipRules = controlValues.skip as RulesLogic<AdditionalOperation>;
 
-    // TODO: check if we need to add more validation here (is empty object, etc.)
-    if (!skipRules) {
+    if (_.isEmpty(skipRules)) {
       return false;
     }
 

@@ -85,7 +85,7 @@ export enum UiComponentEnum {
   CHAT_BODY = 'CHAT_BODY',
   PUSH_BODY = 'PUSH_BODY',
   PUSH_SUBJECT = 'PUSH_SUBJECT',
-  SKIP_RULES = 'SKIP_RULES',
+  QUERY_EDITOR = 'QUERY_EDITOR',
 }
 
 export class UiSchemaProperty {
