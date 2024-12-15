@@ -3,7 +3,6 @@ import { createWorkflow } from '../../api/workflows';
 import { CustomizeInbox } from './customize-inbox-playground';
 import { InboxPreviewContent } from './inbox-preview-content';
 import { InlineToast } from '../primitives/inline-toast';
-import { Loader2 } from 'lucide-react';
 import { ONBOARDING_DEMO_WORKFLOW_ID } from '../../config';
 import { RiNotification2Fill } from 'react-icons/ri';
 import { ROUTES } from '../../utils/routes';
@@ -216,13 +215,14 @@ export function InboxPlayground() {
           <div className="bg-muted mt-auto border-t">
             <div className="flex justify-end gap-3 p-2">
               {!hasNotificationBeenSent ? (
-                <Button size="sm" onClick={handleSendNotification} disabled={isPending} className="px-2">
+                <Button
+                  size="sm"
+                  onClick={handleSendNotification}
+                  isLoading={isPending}
+                  trailingIcon={RiNotification2Fill}
+                  className="px-2"
+                >
                   Send notification
-                  {isPending ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <RiNotification2Fill className="h-3 w-3" />
-                  )}
                 </Button>
               ) : (
                 <>

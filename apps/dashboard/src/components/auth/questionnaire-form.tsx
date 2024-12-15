@@ -205,26 +205,9 @@ export function QuestionnaireForm() {
                   <Button
                     className={`relative bg-black ${submitQuestionnaireMutation.isPending ? 'cursor-not-allowed' : ''}`}
                     type="submit"
-                    disabled={submitQuestionnaireMutation.isPending}
+                    isLoading={submitQuestionnaireMutation.isPending}
                   >
-                    <motion.div
-                      initial={false}
-                      animate={{
-                        opacity: submitQuestionnaireMutation.isPending ? 1 : 0,
-                        scale: submitQuestionnaireMutation.isPending ? [1, 1.1, 1] : 1,
-                      }}
-                      transition={{ duration: 1, repeat: Infinity }}
-                      className="absolute inset-0 flex items-center justify-center"
-                    >
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    </motion.div>
-                    <motion.span
-                      animate={{
-                        opacity: submitQuestionnaireMutation.isPending ? 0 : 1,
-                      }}
-                    >
-                      Continue
-                    </motion.span>
+                    Continue
                   </Button>
                 </motion.div>
               )}

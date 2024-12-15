@@ -1,6 +1,6 @@
 import { RiBookMarkedLine, RiRouteFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-import { Button, ButtonIcon } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button';
 import { VersionControlProd } from '@/components/icons/version-control-prod';
 import { VersionControlDev } from '@/components/icons/version-control-dev';
 import { CreateWorkflowButton } from '@/components/create-workflow-button';
@@ -40,8 +40,7 @@ const WorkflowListEmptyProd = ({ switchToDev }: { switchToDev: () => void }) => 
         <RiBookMarkedLine className="size-4" />
         View docs
       </Link>
-      <Button variant="primary" className="gap-2" onClick={switchToDev}>
-        <ButtonIcon as={RiRouteFill} className="size-5" />
+      <Button variant="primary" className="gap-2" leadingIcon={RiRouteFill} onClick={switchToDev}>
         Switch to Development
       </Button>
     </div>
@@ -71,8 +70,7 @@ const WorkflowListEmptyDev = () => (
         View docs
       </Link>
       <CreateWorkflowButton asChild>
-        <Button variant="primary" className="gap-2">
-          <ButtonIcon as={RiRouteFill} className="size-5" />
+        <Button variant="primary" leadingIcon={RiRouteFill} className="gap-2">
           Create workflow
         </Button>
       </CreateWorkflowButton>

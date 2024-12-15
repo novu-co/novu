@@ -129,9 +129,15 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
                 </Link>
               </TabsTrigger>
               <div className="my-auto ml-auto flex items-center gap-2">
-                <Button type="submit" variant="primary" size="sm" className="flex gap-1" isLoading={isPending}>
-                  <RiPlayCircleLine className="size-5" />
-                  <span>Test workflow</span>
+                <Button
+                  type="submit"
+                  leadingIcon={RiPlayCircleLine}
+                  variant="primary"
+                  size="sm"
+                  className="flex gap-1"
+                  isLoading={isPending}
+                >
+                  Test workflow
                 </Button>
               </div>
             </TabsList>
