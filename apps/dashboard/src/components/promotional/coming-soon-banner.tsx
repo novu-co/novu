@@ -169,8 +169,8 @@ function BannerHeader({
       </motion.div>
       {onDismiss && (
         <Button
-          variant="ghost"
-          size="icon"
+          mode="ghost"
+          size="sm"
           className="absolute right-2.5 top-3 mt-[-3px] h-6 w-6 p-0 hover:bg-neutral-100"
           onClick={onDismiss}
         >

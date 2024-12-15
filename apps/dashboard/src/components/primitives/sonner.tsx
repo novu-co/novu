@@ -75,7 +75,7 @@ const ToastIcon = ({ className, variant = 'default', ...props }: ToastIconProps)
 
 const ToastClose = ({ className, ...props }: React.HTMLAttributes<HTMLButtonElement>) => {
   return (
-    <Button variant="ghost" className={cn('h-min w-min rounded-sm p-0', className)} {...props}>
+    <Button mode="ghost" className={cn('h-min w-min rounded-sm p-0', className)} {...props}>
       <RiCloseLine className="fill-foreground-400 size-5" />
     </Button>
   );

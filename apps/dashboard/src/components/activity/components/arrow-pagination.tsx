@@ -13,8 +13,8 @@ export function ArrowPagination({ page, hasMore, onPageChange }: ArrowPagination
       <div className="flex items-center justify-end px-6">
         <div className="border-input inline-flex items-center rounded-lg border bg-transparent">
           <Button
-            variant="ghost"
-            size="icon"
+            mode="ghost"
+            size="xs"
             disabled={page === 0}
             onClick={() => onPageChange(0)}
             className="rounded-r-none border-0"
@@ -25,8 +25,8 @@ export function ArrowPagination({ page, hasMore, onPageChange }: ArrowPagination
             </div>
           </Button>
           <Button
-            variant="ghost"
-            size="icon"
+            mode="ghost"
+            size="xs"
             disabled={page === 0}
             onClick={() => onPageChange(Math.max(0, page - 1))}
             className="border-l-input rounded-none border-0 border-l"
@@ -34,8 +34,8 @@ export function ArrowPagination({ page, hasMore, onPageChange }: ArrowPagination
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button
-            variant="ghost"
-            size="icon"
+            mode="ghost"
+            size="xs"
             disabled={!hasMore}
             onClick={() => onPageChange(page + 1)}
             className="border-l-input rounded-none border-0 border-l"
@@ -43,8 +43,8 @@ export function ArrowPagination({ page, hasMore, onPageChange }: ArrowPagination
             <ChevronRight className="h-4 w-4" />
           </Button>
           <Button
-            variant="ghost"
-            size="icon"
+            mode="ghost"
+            size="xs"
             disabled={!hasMore}
             onClick={() => onPageChange(page + 5)}
             className="border-l-input rounded-l-none border-0 border-l"

@@ -166,13 +166,13 @@ function SettingField({
                 value={secret ? (showSecret ? value : maskSecret(value ?? '')) : value}
                 readOnly={readOnly}
               />
-              <CopyButton size="input-right" valueToCopy={value ?? ''} />
+              <CopyButton size="sm" valueToCopy={value ?? ''} />
             </InputField>
 
             {secret && (
               <Button
-                variant="outline"
-                size="icon"
+                mode="outline"
+                size="sm"
                 onClick={toggleSecretVisibility}
                 disabled={isLoading}
                 aria-label={showSecret ? 'Hide Secret' : 'Show Secret'}

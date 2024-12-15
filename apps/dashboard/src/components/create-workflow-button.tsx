@@ -40,7 +40,9 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (workflow: CreateWorkflowDto) => createWorkflow({ environment: currentEnvironment!, workflow }),
     onSuccess: async (result) => {
-      await queryClient.invalidateQueries({ queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id] });
+      await queryClient.invalidateQueries({
+        queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id],
+      });
       await queryClient.invalidateQueries({
         queryKey: [QueryKeys.fetchWorkflow, currentEnvironment?._id, result.data.workflowId],
       });
@@ -185,7 +187,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
         </SheetMain>
         <Separator />
         <SheetFooter>
-          <Button isLoading={isPending} variant="default" type="submit" form="create-workflow">
+          <Button isLoading={isPending} variant="neutral" mode="filled" type="submit" form="create-workflow">
             Create workflow
           </Button>
         </SheetFooter>

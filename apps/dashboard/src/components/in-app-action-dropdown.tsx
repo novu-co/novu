@@ -4,7 +4,7 @@ import { useFormContext, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
 import merge from 'lodash.merge';
 
-import { Button, buttonVariants } from '@/components/primitives/button';
+import { Button, ButtonIcon, buttonVariants } from '@/components/primitives/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,7 +69,7 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
             )}
             {secondaryAction && (
               <ConfigureActionPopover asChild fields={{ actionKey: secondaryActionKey }}>
-                <Button variant="outline" size="xs" className="z-10">
+                <Button mode="outline" size="xs" className="z-10">
                   {secondaryAction.label}
                 </Button>
               </ConfigureActionPopover>
@@ -77,8 +77,8 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
             <DropdownMenuTrigger className="absolute size-full" />
           </div>
           <DropdownMenuTrigger asChild>
-            <Button size={'icon'} variant={'ghost'}>
-              <RiExpandUpDownLine className="size-4" />
+            <Button size={'xs'} mode={'ghost'}>
+              <ButtonIcon as={RiExpandUpDownLine} />
             </Button>
           </DropdownMenuTrigger>
         </div>
@@ -143,7 +143,7 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
             <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
               Primary action
             </div>
-            <div className={cn(buttonVariants({ variant: 'outline', size: 'xs' }), 'pointer-events-none')}>
+            <div className={cn(buttonVariants({ mode: 'outline', size: 'xs' }), 'pointer-events-none')}>
               Secondary action
             </div>
           </DropdownMenuItem>

@@ -46,9 +46,10 @@ export const ConfirmationModal = ({
               <DialogDescription className="text-foreground-600">{description}</DialogDescription>
             </div>
           </div>
+
           <DialogFooter>
             <DialogClose asChild aria-label="Close">
-              <Button type="button" size="sm" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button type="button" size="sm" mode="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
             </DialogClose>

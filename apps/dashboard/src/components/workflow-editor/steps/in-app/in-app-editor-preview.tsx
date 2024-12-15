@@ -87,7 +87,7 @@ export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPr
               <Button
                 size="xs"
                 type="button"
-                variant="outline"
+                mode="outline"
                 className="self-end"
                 onClick={() => {
                   try {

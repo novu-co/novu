@@ -187,7 +187,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
            */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="ml-auto h-[20px] w-[22px]">
+              <Button mode="ghost" size="sm" className="ml-auto h-[20px] w-[22px]">
                 <RiMore2Fill />
               </Button>
             </DropdownMenuTrigger>
@@ -296,7 +296,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                     <FormControl>
                       <InputField className="flex overflow-hidden pr-0">
                         <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
-                        <CopyButton size="input-right" valueToCopy={field.value} />
+                        <CopyButton size="sm" valueToCopy={field.value} />
                       </InputField>
                     </FormControl>
                     <FormMessage />
@@ -353,7 +353,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
         <SidebarContent size="lg">
           <Link to={ROUTES.EDIT_WORKFLOW_PREFERENCES}>
             <Button
-              variant="outline"
+              mode="outline"
               className="flex w-full justify-start gap-1.5 p-1.5 text-xs font-medium"
               type="button"
             >

@@ -137,7 +137,7 @@ export const EmailEditorPreview = ({ workflow, step, formValues }: EmailEditorPr
                 <Button
                   size="xs"
                   type="button"
-                  variant="outline"
+                  mode="outline"
                   className="self-end"
                   onClick={() => {
                     try {

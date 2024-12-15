@@ -48,6 +48,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
 
     const handlePredefinedAvatarClick = (url: string) => {
       onPick?.(url);
+
       setIsOpen(false);
     };
 
@@ -55,7 +56,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
       <div className="size-9 space-y-2">
         <Popover modal={true} open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="text-foreground-600 relative size-full overflow-hidden">
+            <Button mode="outline" size="sm" className="text-foreground-600 relative size-full overflow-hidden">
               {value ? (
                 <Avatar className="bg-transparent p-1">
                   <AvatarImage src={value as string} />

@@ -7,17 +7,17 @@ import { useBillingPortal } from '../../hooks/use-billing-portal';
 
 interface PlanActionButtonProps {
   selectedBillingInterval: 'month' | 'year';
-  variant?: 'default' | 'outline';
+  variant?: 'outline';
   showIcon?: boolean;
   className?: string;
-  size?: 'default' | 'sm' | 'lg';
+  size?: 'sm' | 'md';
 }
 
 export function PlanActionButton({
   selectedBillingInterval,
-  variant = 'default',
+  variant = 'outline',
   className,
-  size = 'default',
+  size = 'sm',
 }: PlanActionButtonProps) {
   const { subscription: data, isLoading: isLoadingSubscription } = useFetchSubscription();
   const { navigateToCheckout, isLoading: isCheckingOut } = useCheckoutSession();
@@ -37,7 +37,7 @@ export function PlanActionButton({
 
   return (
     <Button
-      variant={variant}
+      mode={variant}
       size={size}
       className={cn('gap-2', className)}
       onClick={handleAction}

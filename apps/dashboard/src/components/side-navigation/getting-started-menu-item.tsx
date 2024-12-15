@@ -89,8 +89,8 @@ export function GettingStartedMenuItem() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  size="icon"
-                  variant="ghost"
+                  size="sm"
+                  mode="ghost"
                   onClick={handleClose}
                   className="h-4 w-4 hover:bg-neutral-300"
                   aria-label="Close getting started menu"

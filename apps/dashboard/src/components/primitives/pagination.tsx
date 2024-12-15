@@ -8,7 +8,7 @@ import {
 } from '@radix-ui/react-icons';
 
 import { cn } from '@/utils/ui';
-import { ButtonProps, buttonVariants } from '@/components/primitives/button';
+import { ButtonRootProps, buttonVariants } from '@/components/primitives/button';
 import { Link, LinkProps } from 'react-router-dom';
 
 const Pagination = ({ className, ...props }: React.ComponentProps<'nav'>) => (
@@ -36,15 +36,15 @@ PaginationItem.displayName = 'PaginationItem';
 type PaginationLinkProps = {
   isActive?: boolean;
   isDisabled?: boolean;
-} & Pick<ButtonProps, 'size'> &
+} & Pick<ButtonRootProps, 'size'> &
   LinkProps;
 
-const PaginationLink = ({ className, isActive, isDisabled, size = 'icon', ...props }: PaginationLinkProps) => (
+const PaginationLink = ({ className, isActive, isDisabled, size = 'sm', ...props }: PaginationLinkProps) => (
   <Link
     aria-current={isActive ? 'page' : undefined}
     className={cn(
       buttonVariants({
-        variant: 'ghost',
+        mode: 'ghost',
         size,
       }),
       { 'bg-neutral-50': isActive },
@@ -58,28 +58,28 @@ const PaginationLink = ({ className, isActive, isDisabled, size = 'icon', ...pro
 PaginationLink.displayName = 'PaginationLink';
 
 const PaginationStart = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink aria-label="Go to first page" size="icon" className={cn('', className)} {...props}>
+  <PaginationLink aria-label="Go to first page" size="sm" className={cn('', className)} {...props}>
     <DoubleArrowLeftIcon className="size-3" />
   </PaginationLink>
 );
 PaginationStart.displayName = 'PaginationStart';
 
 const PaginationPrevious = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink aria-label="Go to previous page" size="icon" className={cn('', className)} {...props}>
+  <PaginationLink aria-label="Go to previous page" size="sm" className={cn('', className)} {...props}>
     <ChevronLeftIcon className="size-3" />
   </PaginationLink>
 );
 PaginationPrevious.displayName = 'PaginationPrevious';
 
 const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink aria-label="Go to next page" size="icon" className={cn('', className)} {...props}>
+  <PaginationLink aria-label="Go to next page" size="sm" className={cn('', className)} {...props}>
     <ChevronRightIcon className="size-3" />
   </PaginationLink>
 );
 PaginationNext.displayName = 'PaginationNext';
 
 const PaginationEnd = ({ className, ...props }: React.ComponentProps<typeof PaginationLink>) => (
-  <PaginationLink aria-label="Go to final page" size="icon" className={cn('', className)} {...props}>
+  <PaginationLink aria-label="Go to final page" size="sm" className={cn('', className)} {...props}>
     <DoubleArrowRightIcon className="size-3" />
   </PaginationLink>
 );
@@ -88,7 +88,7 @@ PaginationEnd.displayName = 'PaginationEnd';
 const PaginationEllipsis = ({ className, ...props }: React.ComponentProps<'span'>) => (
   <span
     aria-hidden
-    className={cn(buttonVariants({ size: 'icon', variant: 'ghost' }), 'bg-transparent hover:bg-transparent', className)}
+    className={cn(buttonVariants({ size: 'sm', mode: 'ghost' }), 'bg-transparent hover:bg-transparent', className)}
     {...props}
   >
     <DotsHorizontalIcon className="size-3" />

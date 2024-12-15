@@ -143,7 +143,7 @@ export function FacetedFormFilter({
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
+          mode="outline"
           size="sm"
           className={cn(
             'h-10 border-neutral-300 bg-white px-3 text-neutral-600',

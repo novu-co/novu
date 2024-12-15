@@ -4,13 +4,13 @@ import { RiSearch2Line } from 'react-icons/ri';
 import { WorkflowList } from '@/components/workflow-list';
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { Input } from '@/components/primitives/input';
-import { Button } from '@/components/primitives/button';
 import { CreateWorkflowButton } from '@/components/create-workflow-button';
 import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { Badge } from '@/components/primitives/badge';
+import { FancyButton } from '../components/primitives/fancy-button';
 
 export const WorkflowsPage = () => {
   const track = useTelemetry();
@@ -40,7 +40,9 @@ export const WorkflowsPage = () => {
           </div>
 
           <CreateWorkflowButton asChild>
-            <Button variant="primary">Create workflow</Button>
+            <FancyButton size="small" variant="primary">
+              Create workflow
+            </FancyButton>
           </CreateWorkflowButton>
         </div>
         <WorkflowList />

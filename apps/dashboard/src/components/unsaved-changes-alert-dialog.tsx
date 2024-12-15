@@ -12,6 +12,7 @@ import { buttonVariants } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
 import { RiAlertFill } from 'react-icons/ri';
 import { Blocker } from 'react-router-dom';
+import { cn } from '../utils/ui';
 
 type UnsavedChangesAlertDialogProps = {
   blocker: Blocker;
@@ -40,7 +41,7 @@ export const UnsavedChangesAlertDialog = (props: UnsavedChangesAlertDialogProps)
 
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => blocker.reset?.()}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => blocker.proceed?.()} className={buttonVariants({ variant: 'destructive' })}>
+          <AlertDialogAction onClick={() => blocker.proceed?.()} className={cn(buttonVariants({ variant: 'error' }))}>
             Proceed anyway
           </AlertDialogAction>
         </AlertDialogFooter>

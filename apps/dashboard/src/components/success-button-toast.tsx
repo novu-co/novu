@@ -21,7 +21,7 @@ export function SuccessButtonToast({ title, description, actionLabel, onAction, 
           <div className="text-foreground-600 text-sm">{description}</div>
         </div>
         <div className="flex items-center justify-end gap-2 self-stretch">
-          <Button variant="ghost" size="sm" className="text-destructive gap-1" onClick={onAction}>
+          <Button mode="ghost" size="sm" className="text-destructive gap-1" onClick={onAction}>
             {actionLabel}
             <RiArrowRightSLine />
           </Button>

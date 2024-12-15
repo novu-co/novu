@@ -1,10 +1,12 @@
 import { RiBookMarkedLine, RiRouteFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-import { Button, buttonVariants } from '@/components/primitives/button';
+import { Button, ButtonIcon } from '@/components/primitives/button';
 import { VersionControlProd } from '@/components/icons/version-control-prod';
 import { VersionControlDev } from '@/components/icons/version-control-dev';
 import { CreateWorkflowButton } from '@/components/create-workflow-button';
 import { useEnvironment } from '@/context/environment/hooks';
+import { LinkButtonIcon, linkButtonVariants } from './primitives/link-button';
+import { cn } from '../utils/ui';
 
 export const WorkflowListEmpty = () => {
   const { currentEnvironment, switchEnvironment, oppositeEnvironment } = useEnvironment();
@@ -33,13 +35,13 @@ const WorkflowListEmptyProd = ({ switchToDev }: { switchToDev: () => void }) => 
       <Link
         to={'https://docs.novu.co/concepts/workflows'}
         target="_blank"
-        className={buttonVariants({ variant: 'link', className: 'text-foreground-600 gap-1' })}
+        className={cn(linkButtonVariants({}).root, 'text-foreground-600 gap-1')}
       >
         <RiBookMarkedLine className="size-4" />
         View docs
       </Link>
       <Button variant="primary" className="gap-2" onClick={switchToDev}>
-        <RiRouteFill className="size-5" />
+        <ButtonIcon as={RiRouteFill} className="size-5" />
         Switch to Development
       </Button>
     </div>
@@ -63,14 +65,14 @@ const WorkflowListEmptyDev = () => (
       <Link
         to={'https://docs.novu.co/concepts/workflows'}
         target="_blank"
-        className={buttonVariants({ variant: 'link', className: 'text-foreground-600 gap-1' })}
+        className={cn(linkButtonVariants({}).root, 'text-foreground-600 gap-1')}
       >
-        <RiBookMarkedLine className="size-4" />
+        <LinkButtonIcon as={RiBookMarkedLine} className="size-4" />
         View docs
       </Link>
       <CreateWorkflowButton asChild>
         <Button variant="primary" className="gap-2">
-          <RiRouteFill className="size-5" />
+          <ButtonIcon as={RiRouteFill} className="size-5" />
           Create workflow
         </Button>
       </CreateWorkflowButton>

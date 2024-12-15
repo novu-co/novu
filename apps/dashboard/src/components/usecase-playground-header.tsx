@@ -1,6 +1,7 @@
 import { RiArrowLeftSLine } from 'react-icons/ri';
-import { Button } from './primitives/button';
+import { Button, ButtonIcon } from './primitives/button';
 import { useNavigate } from 'react-router-dom';
+import { LinkButton } from './primitives/link-button';
 
 interface UsecasePlaygroundHeaderProps {
   title: string;
@@ -20,8 +21,8 @@ export function UsecasePlaygroundHeader({ title, description, skipPath, onSkip }
   return (
     <div className="flex items-center justify-between gap-4 border-b p-4">
       <div className="flex items-start gap-1">
-        <Button variant="ghost" size="icon" className="mt-[5px] h-5 w-5" onClick={() => navigate(-1)}>
-          <RiArrowLeftSLine className="h-5 w-5" />
+        <Button mode="ghost" size="xs" className="mt-[5px] h-5 w-5" onClick={() => navigate(-1)}>
+          <ButtonIcon as={RiArrowLeftSLine} className="h-5 w-5" />
         </Button>
 
         <div className="flex-1">
@@ -30,9 +31,9 @@ export function UsecasePlaygroundHeader({ title, description, skipPath, onSkip }
         </div>
       </div>
 
-      <Button variant="link" className="text-foreground-600 text-xs" onClick={handleSkip}>
+      <LinkButton className="text-foreground-600 text-xs" onClick={handleSkip}>
         Skip, I'll explore myself
-      </Button>
+      </LinkButton>
     </div>
   );
 }

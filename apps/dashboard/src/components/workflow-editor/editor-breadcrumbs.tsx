@@ -47,7 +47,7 @@ export const EditorBreadcrumbs = () => {
 
   return (
     <div className="flex items-center overflow-hidden">
-      <Button variant="link" onClick={handleBackNav}>
+      <Button onClick={handleBackNav}>
         <ArrowRight className="text-neutral-950" />
       </Button>
       <Breadcrumb>

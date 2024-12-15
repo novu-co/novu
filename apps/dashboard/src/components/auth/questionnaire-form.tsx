@@ -137,7 +137,7 @@ export function QuestionnaireForm() {
                             {Object.values(OrganizationTypeEnum).map((type) => (
                               <Button
                                 key={type}
-                                variant="outline"
+                                mode="outline"
                                 size="xs"
                                 type="button"
                                 className={`h-[28px] rounded-full px-3 py-1 text-sm ${
@@ -173,7 +173,7 @@ export function QuestionnaireForm() {
                             {Object.values(CompanySizeEnum).map((size) => (
                               <Button
                                 key={size}
-                                variant="outline"
+                                mode="outline"
                                 size="xs"
                                 type="button"
                                 className={`h-[28px] rounded-full px-3 py-1 text-sm ${

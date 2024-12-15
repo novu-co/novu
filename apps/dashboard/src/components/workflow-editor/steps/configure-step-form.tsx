@@ -50,6 +50,7 @@ import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/em
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { DigestControlValues } from '@/components/workflow-editor/steps/digest/digest-control-values';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
+import { LinkButton } from '../../primitives/link-button';
 
 const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
@@ -206,9 +207,9 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
             })}
             className="flex items-center"
           >
-            <Button variant="link" size="icon" className="size-4" type="button">
+            <LinkButton size="sm" className="size-4" type="button">
               <RiArrowLeftSLine />
-            </Button>
+            </LinkButton>
           </Link>
           <span>Configure Step</span>
           <Link
@@ -218,9 +219,9 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
             })}
             className="ml-auto flex items-center"
           >
-            <Button variant="link" size="icon" className="size-4" type="button">
+            <LinkButton size="sm" className="size-4" type="button">
               <RiCloseFill />
-            </Button>
+            </LinkButton>
           </Link>
         </SidebarHeader>
 
@@ -260,7 +261,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                         <FormControl>
                           <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
                         </FormControl>
-                        <CopyButton valueToCopy={field.value} size="input-right" />
+                        <CopyButton valueToCopy={field.value} size="xs" />
                       </InputField>
                       <FormMessage />
                     </FormItem>
@@ -278,11 +279,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
           <>
             <SidebarContent>
               <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
-                <Button
-                  variant="outline"
-                  className="flex w-full justify-start gap-1.5 text-xs font-medium"
-                  type="button"
-                >
+                <Button mode="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
                   <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
                   Configure {STEP_TYPE_LABELS[step.type]} Step template{' '}
                   <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
@@ -336,7 +333,8 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                 confirmButtonText="Delete"
               />
               <Button
-                variant="ghostDestructive"
+                variant="error"
+                mode="ghost"
                 className="gap-1.5 text-xs"
                 type="button"
                 onClick={() => setIsDeleteModalOpen(true)}

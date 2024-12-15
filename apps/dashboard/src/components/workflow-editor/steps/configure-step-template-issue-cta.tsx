@@ -27,7 +27,7 @@ export const ConfigureStepTemplateIssueCta = (props: ConfigureStepTemplateIssueC
         </Link>
       </div>
       <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
-        <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
+        <Button mode="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
           <span className="bg-destructive h-4 min-w-1 rounded-full" />
           <TruncatedText>{issue}</TruncatedText>
           <RiArrowRightUpLine className="text-destructive ml-auto h-4 w-4" />

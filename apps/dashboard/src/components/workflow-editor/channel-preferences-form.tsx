@@ -176,14 +176,14 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
       >
         <SidebarHeader className="items-center text-sm font-medium">
           <Link to="../" className="flex items-center">
-            <Button variant="link" size="icon" className="size-4" type="button">
+            <Button size="sm" className="size-4" type="button">
               <RiArrowLeftSLine />
             </Button>
           </Link>
           <span>Channel Preferences</span>
 
           <Link to="../" className="ml-auto flex items-center">
-            <Button variant="link" size="icon" className="size-4" type="button">
+            <Button size="sm" className="size-4" type="button">
               <RiCloseFill />
             </Button>
           </Link>

@@ -41,11 +41,7 @@ export function InboxEmbedSuccessPage() {
           </div>
 
           <div className="flex flex-col px-6">
-            <Button
-              className="mt-8 w-full rounded-xl py-3 text-white"
-              variant="default"
-              onClick={handleNavigateToDashboard}
-            >
+            <Button className="mt-8 w-full rounded-xl py-3 text-white" onClick={handleNavigateToDashboard}>
               Go to the Dashboard
             </Button>
           </div>

@@ -431,6 +431,7 @@ export default {
         950: 'hsl(var(--neutral-alpha-950))',
         1000: 'hsl(var(--neutral-alpha-1000))',
       },
+
       primary: {
         DEFAULT: 'hsl(var(--primary))',
         dark: 'hsl(var(--primary-dark))',
@@ -442,12 +443,19 @@ export default {
         foreground: 'hsl(var(--primary-foreground))',
       },
       bg: {
-        strong: 'hsl(var(--bg-strong))',
-        surface: 'hsl(var(--bg-surface))',
-        sub: 'hsl(var(--bg-sub))',
-        soft: 'hsl(var(--bg-soft))',
-        weak: 'hsl(var(--bg-weak))',
-        white: 'hsl(var(--bg-white))',
+        'strong-950': 'hsl(var(--bg-strong-950))',
+        'surface-800': 'hsl(var(--bg-surface-800))',
+        'sub-300': 'hsl(var(--bg-sub-300))',
+        'soft-200': 'hsl(var(--bg-soft-200))',
+        'weak-50': 'hsl(var(--bg-weak-50))',
+        'white-0': 'hsl(var(--bg-white-0))',
+      },
+      text: {
+        'strong-950': 'hsl(var(--text-strong-950))',
+        'sub-600': 'hsl(var(--text-sub-600))',
+        'soft-400': 'hsl(var(--text-soft-400))',
+        'disabled-300': 'hsl(var(--text-disabled-300))',
+        'white-0': 'hsl(var(--text-white-0))',
       },
       stroke: {
         strong: 'hsl(var(--stroke-strong))',

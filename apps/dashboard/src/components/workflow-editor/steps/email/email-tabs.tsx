@@ -43,7 +43,7 @@ export const EmailTabs = (props: StepEditorProps) => {
         </TabsList>
 
         <Button
-          variant="ghost"
+          mode="ghost"
           size="xs"
           className="size-6"
           onClick={(e) => {

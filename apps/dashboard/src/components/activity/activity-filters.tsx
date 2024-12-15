@@ -178,7 +178,7 @@ export function ActivityFilters({ onFiltersChange, initialValues, onReset }: Act
         />
 
         {hasChanges && (
-          <Button variant="ghost" size="sm" className="h-[28px]" onClick={handleReset}>
+          <Button mode="ghost" size="sm" className="h-[28px]" onClick={handleReset}>
             Reset
           </Button>
         )}

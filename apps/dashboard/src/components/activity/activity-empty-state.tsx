@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/button';
+import { Button, ButtonIcon } from '@/components/primitives/button';
 import { cn } from '@/utils/ui';
 import { PlayCircleIcon } from 'lucide-react';
 import { RiCloseCircleLine } from 'react-icons/ri';
@@ -87,8 +87,8 @@ export function ActivityEmptyState({ className, emptySearchResults, onClearFilte
               }}
               className="flex gap-6"
             >
-              <Button variant="outline" className="gap-2" onClick={onClearFilters}>
-                <RiCloseCircleLine className="h-4 w-4" />
+              <Button mode="outline" className="gap-2" onClick={onClearFilters}>
+                <ButtonIcon as={RiCloseCircleLine} className="h-4 w-4" />
                 Clear Filters
               </Button>
             </motion.div>
@@ -108,7 +108,7 @@ export function ActivityEmptyState({ className, emptySearchResults, onClearFilte
                 View Docs
               </ExternalLink>
               <Button variant="primary" className="gap-2" onClick={handleNavigateToWorkflows}>
-                <PlayCircleIcon className="h-4 w-4" />
+                <ButtonIcon as={PlayCircleIcon} className="h-4 w-4" />
                 Trigger Workflow
               </Button>
             </motion.div>

@@ -53,7 +53,7 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
           </div>
 
           <Button
-            variant="ghost"
+            mode="ghost"
             size="sm"
             className="text-foreground-600 !mt-0 h-5 gap-0 p-0 leading-[12px] hover:bg-transparent"
           >

@@ -86,7 +86,7 @@ export const StepSkeleton = ({
         </Tabs>
 
         <Button
-          variant="ghost"
+          mode="ghost"
           size="xs"
           className="size-6"
           onClick={(e) => {
@@ -109,7 +109,7 @@ export const StepSkeleton = ({
       </div>
       <Separator />
       <footer className="flex justify-end px-3 py-3.5">
-        <Button className="ml-auto" variant="default" disabled>
+        <Button className="ml-auto" disabled>
           Save step
         </Button>
       </footer>

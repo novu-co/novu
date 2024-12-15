@@ -18,6 +18,7 @@ import { useOrganization } from '@clerk/clerk-react';
 import { AnimatedPage } from '@/components/onboarding/animated-page';
 import { Helmet } from 'react-helmet-async';
 import { useEnvironment } from '@/context/environment/hooks';
+import { LinkButton } from '../components/primitives/link-button';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -139,9 +140,9 @@ export function UsecaseSelectPage() {
                     >
                       Continue
                     </Button>
-                    <Button type="button" variant="link" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
+                    <LinkButton type="button" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
                       Skip to Homepage
-                    </Button>
+                    </LinkButton>
                   </motion.div>
                 </div>
               </form>
