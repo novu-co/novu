@@ -21,7 +21,7 @@ export function UsecasePlaygroundHeader({ title, description, skipPath, onSkip }
   return (
     <div className="flex items-center justify-between gap-4 border-b p-4">
       <div className="flex items-start gap-1">
-        <Button mode="ghost" size="xs" className="mt-[5px] h-5 w-5" onClick={() => navigate(-1)}>
+        <Button mode="ghost" variant="secondary" size="xs" className="mt-[5px] h-5 w-5" onClick={() => navigate(-1)}>
           <ButtonIcon as={RiArrowLeftSLine} className="h-5 w-5" />
         </Button>
 

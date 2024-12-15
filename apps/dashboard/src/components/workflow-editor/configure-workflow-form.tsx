@@ -187,7 +187,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
            */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <Button mode="ghost" size="sm" className="ml-auto h-[20px] w-[22px]">
+              <Button mode="ghost" variant="secondary" size="sm" className="ml-auto h-[20px] w-[22px]">
                 <RiMore2Fill />
               </Button>
             </DropdownMenuTrigger>

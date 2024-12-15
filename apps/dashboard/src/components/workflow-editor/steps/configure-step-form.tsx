@@ -335,6 +335,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               <Button
                 variant="error"
                 mode="ghost"
+                variant="secondary"
                 className="gap-1.5 text-xs"
                 type="button"
                 onClick={() => setIsDeleteModalOpen(true)}

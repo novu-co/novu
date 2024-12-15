@@ -28,6 +28,7 @@ export function OverviewItem({
           <CopyButton
             valueToCopy={value}
             mode="ghost"
+            variant="secondary"
             size="sm"
             className="text-foreground-600 mr-0 size-3 gap-0 p-0 opacity-0 transition-opacity group-hover:opacity-100"
           >

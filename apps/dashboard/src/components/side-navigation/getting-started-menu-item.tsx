@@ -91,6 +91,7 @@ export function GettingStartedMenuItem() {
                 <Button
                   size="sm"
                   mode="ghost"
+                  variant="secondary"
                   onClick={handleClose}
                   className="h-4 w-4 hover:bg-neutral-300"
                   aria-label="Close getting started menu"

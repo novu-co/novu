@@ -170,6 +170,7 @@ function BannerHeader({
       {onDismiss && (
         <Button
           mode="ghost"
+          variant="secondary"
           size="sm"
           className="absolute right-2.5 top-3 mt-[-3px] h-6 w-6 p-0 hover:bg-neutral-100"
           onClick={onDismiss}

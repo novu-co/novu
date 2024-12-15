@@ -31,7 +31,7 @@ export const buttonVariants = tv({
   variants: {
     variant: {
       primary: {},
-      neutral: {},
+      secondary: {},
       error: {},
     },
     mode: {
@@ -127,7 +127,7 @@ export const buttonVariants = tv({
 
     //#region variant=neutral
     {
-      variant: 'neutral',
+      variant: 'secondary',
       mode: 'filled',
       class: {
         root: [
@@ -141,7 +141,7 @@ export const buttonVariants = tv({
       },
     },
     {
-      variant: 'neutral',
+      variant: 'secondary',
       mode: 'outline',
       class: {
         root: [
@@ -155,7 +155,7 @@ export const buttonVariants = tv({
       },
     },
     {
-      variant: 'neutral',
+      variant: 'secondary',
       mode: 'lighter',
       class: {
         root: [
@@ -169,7 +169,7 @@ export const buttonVariants = tv({
       },
     },
     {
-      variant: 'neutral',
+      variant: 'secondary',
       mode: 'ghost',
       class: {
         root: [

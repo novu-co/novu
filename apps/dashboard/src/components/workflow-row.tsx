@@ -225,7 +225,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
          */}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
-            <Button mode="ghost" className="h-8 w-8 p-0">
+            <Button mode="ghost" variant="secondary" className="h-8 w-8 p-0">
               <ButtonIcon as={RiMore2Fill} className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>

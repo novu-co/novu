@@ -14,6 +14,7 @@ export function ArrowPagination({ page, hasMore, onPageChange }: ArrowPagination
         <div className="border-input inline-flex items-center rounded-lg border bg-transparent">
           <Button
             mode="ghost"
+            variant="secondary"
             size="xs"
             disabled={page === 0}
             onClick={() => onPageChange(0)}
@@ -26,6 +27,7 @@ export function ArrowPagination({ page, hasMore, onPageChange }: ArrowPagination
           </Button>
           <Button
             mode="ghost"
+            variant="secondary"
             size="xs"
             disabled={page === 0}
             onClick={() => onPageChange(Math.max(0, page - 1))}
@@ -35,6 +37,7 @@ export function ArrowPagination({ page, hasMore, onPageChange }: ArrowPagination
           </Button>
           <Button
             mode="ghost"
+            variant="secondary"
             size="xs"
             disabled={!hasMore}
             onClick={() => onPageChange(page + 1)}
@@ -44,6 +47,7 @@ export function ArrowPagination({ page, hasMore, onPageChange }: ArrowPagination
           </Button>
           <Button
             mode="ghost"
+            variant="secondary"
             size="xs"
             disabled={!hasMore}
             onClick={() => onPageChange(page + 5)}

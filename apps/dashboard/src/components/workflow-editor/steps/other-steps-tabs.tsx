@@ -38,6 +38,7 @@ export const OtherStepTabs = ({ workflow, step }: StepEditorProps) => {
 
         <Button
           mode="ghost"
+          variant="secondary"
           size="xs"
           className="size-6"
           onClick={(e) => {

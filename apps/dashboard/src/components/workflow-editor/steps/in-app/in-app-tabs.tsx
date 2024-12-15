@@ -41,6 +41,7 @@ export const InAppTabs = (props: StepEditorProps) => {
 
         <Button
           mode="ghost"
+          variant="secondary"
           size="xs"
           className="size-6"
           onClick={(e) => {
