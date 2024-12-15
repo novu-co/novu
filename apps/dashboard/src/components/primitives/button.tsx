@@ -1,7 +1,9 @@
 // AlignUI Button v0.0.0
 
 import * as React from 'react';
-import { Slot } from '@radix-ui/react-slot';
+import { Slot, Slottable } from '@radix-ui/react-slot';
+
+import { IconType } from 'react-icons';
 
 import type { PolymorphicComponentProps } from '@/utils/polymorphic';
 import { recursiveCloneChildren } from '@/utils/recursive-clone-children';
@@ -285,6 +287,23 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
 );
 ButtonRoot.displayName = BUTTON_ROOT_NAME;
 
+const Button = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof ButtonRoot> & {
+    leadingIcon?: IconType;
+    trailingIcon?: IconType;
+  }
+>(({ children, leadingIcon: LeadingIcon, trailingIcon: TrailingIcon, ...rest }, forwardedRef) => {
+  return (
+    <ButtonRoot ref={forwardedRef} {...rest}>
+      {LeadingIcon && <ButtonIcon as={LeadingIcon} />}
+      <Slottable>{children}</Slottable>
+      {TrailingIcon && <ButtonIcon as={TrailingIcon} />}
+    </ButtonRoot>
+  );
+});
+Button.displayName = 'Button';
+
 function ButtonIcon<T extends React.ElementType>({
   variant,
   mode,
@@ -300,4 +319,4 @@ function ButtonIcon<T extends React.ElementType>({
 }
 ButtonIcon.displayName = BUTTON_ICON_NAME;
 
-export { ButtonRoot as Root, ButtonIcon as ButtonIcon, ButtonRoot as Button };
+export { ButtonRoot as Root, ButtonIcon as ButtonIcon, Button };
