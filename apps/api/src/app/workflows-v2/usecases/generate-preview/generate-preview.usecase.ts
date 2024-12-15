@@ -92,19 +92,24 @@ export class GeneratePreviewUsecase {
         workflow,
         command.generatePreviewRequestDto.previewPayload
       );
+      const previewData = {
+        variablesExample: { ...tiptapVariablesExample, ...simpleVariablesExample },
+        controlValues: { ...tiptapControlValues, ...simpleControlValues },
+      };
 
-      const [unitedVariables, unitedControlValues] = [
-        { ...tiptapVariablesExample, ...simpleVariablesExample },
-        { ...tiptapControlValues, ...simpleControlValues },
-      ];
-      const executeOutput = await this.executePreviewUsecase(command, stepData, unitedVariables, unitedControlValues);
+      const executeOutput = await this.executePreviewUsecase(
+        command,
+        stepData,
+        previewData.variablesExample,
+        previewData.controlValues
+      );
 
       return {
         result: {
           preview: executeOutput.outputs as any,
           type: stepData.type as unknown as ChannelTypeEnum,
         },
-        previewPayloadExample: unitedVariables,
+        previewPayloadExample: previewData.variablesExample,
       };
     } catch (error) {
       this.logger.error(
