@@ -16,8 +16,8 @@ type Redirect = {
 };
 
 type Action = {
-  label: string;
-  redirect: Redirect;
+  label?: string;
+  redirect?: Redirect;
 };
 
 type LookBackWindow = {
@@ -25,12 +25,25 @@ type LookBackWindow = {
   unit: string;
 };
 
-function normalizeRedirect(redirect: Redirect) {
-  if (!redirect.url || !redirect.target) return null;
+function sanitizeRedirect(redirect: Redirect) {
+  if (!redirect.url || !redirect.target) {
+    return undefined;
+  }
 
   return {
-    url: redirect.url || null,
+    url: redirect.url || 'https://example.com',
     target: redirect.target || '_self',
+  };
+}
+
+function sanitizeAction(action: Action) {
+  if (!action?.label) {
+    return undefined;
+  }
+
+  return {
+    label: action.label,
+    redirect: sanitizeRedirect(action.redirect),
   };
 }
 
@@ -51,26 +64,19 @@ function sanitizeInApp(controlValues: Record<string, unknown>) {
   };
 
   if (controlValues.primaryAction) {
-    normalized.primaryAction = {
-      label: (controlValues.primaryAction as Action).label || null,
-      redirect: normalizeRedirect(
-        (controlValues.primaryAction as Action).redirect,
-      ),
-    };
+    normalized.primaryAction = sanitizeAction(
+      controlValues.primaryAction as Action,
+    );
   }
 
   if (controlValues.secondaryAction) {
-    normalized.secondaryAction = {
-      label: (controlValues.secondaryAction as Action).label || null,
-      redirect: normalizeRedirect(
-        (controlValues.secondaryAction as Action).redirect,
-      ),
-    };
+    normalized.secondaryAction = sanitizeAction(
+      controlValues.secondaryAction as Action,
+    );
   }
 
   if (controlValues.redirect) {
-    const redirect = normalizeRedirect(controlValues.redirect as Redirect);
-    normalized.redirect = redirect?.url ? redirect : null;
+    normalized.redirect = sanitizeRedirect(controlValues.redirect as Redirect);
   }
 
   if (typeof normalized === 'object' && normalized !== null) {

@@ -34,6 +34,7 @@ import {
 } from '../../util/template-parser/liquid-parser';
 import { pathsToObject } from '../../util/path-to-object';
 import { HydrateEmailSchemaUseCase } from '../../../environments-v1/usecases/output-renderers';
+import { PrepareAndValidateContentUsecase } from '../validate-content/prepare-and-validate-content/prepare-and-validate-content.usecase';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
@@ -56,7 +57,7 @@ export class GeneratePreviewUsecase {
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private readonly logger: PinoLogger,
     private buildPayloadSchema: BuildPayloadSchema,
-    private hydrateEmailSchemaUseCase: HydrateEmailSchemaUseCase
+    private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase
   ) {}
 
   @InstrumentUsecase()
@@ -80,9 +81,13 @@ export class GeneratePreviewUsecase {
 
       const destructuredControlValues = this.destructureControlValues(sanitizedValidatedControls);
 
-      const { variablesExample: tiptapVariablesExample, controlValues: tiptapControlValues } = this.handleTipTapControl(
-        destructuredControlValues.tiptapControlValues
-      );
+      const { variablesExample: tiptapVariablesExample, controlValues: tiptapControlValues } =
+        await this.handleTipTapControl(
+          destructuredControlValues.tiptapControlValues,
+          command,
+          stepData,
+          variableSchema
+        );
       const { variablesExample: simpleVariablesExample, controlValues: simpleControlValues } = this.handleSimpleControl(
         destructuredControlValues.simpleControlValues,
         variableSchema,
@@ -90,7 +95,7 @@ export class GeneratePreviewUsecase {
         command.generatePreviewRequestDto.previewPayload
       );
       const previewData = {
-        variablesExample: { ...tiptapVariablesExample, ...simpleVariablesExample },
+        variablesExample: _.merge({}, tiptapVariablesExample || {}, simpleVariablesExample || {}),
         controlValues: { ...tiptapControlValues, ...simpleControlValues },
       };
 
@@ -132,36 +137,41 @@ export class GeneratePreviewUsecase {
     }
   }
 
-  private safeAttemptToParseEmailSchema(tiptapControl: string): Record<string, unknown> | null {
+  private async safeAttemptToParseEmailSchema(
+    tiptapControl: string,
+    command: GeneratePreviewCommand,
+    controlValues: Record<string, unknown>,
+    controlSchema: Record<string, unknown>,
+    variableSchema: Record<string, unknown>
+  ): Promise<Record<string, unknown> | null> {
     if (typeof tiptapControl !== 'string') {
       return null;
     }
 
     try {
-      const { placeholderAggregation } = this.hydrateEmailSchemaUseCase.execute({
-        emailEditor: tiptapControl,
-        fullPayloadForRender: {
-          payload: {},
-          subscriber: {},
-          steps: {},
-        },
+      const preparedAndValidatedContent = await this.prepareAndValidateContentUsecase.execute({
+        user: command.user,
+        previewPayloadFromDto: command.generatePreviewRequestDto.previewPayload,
+        controlValues,
+        controlDataSchema: controlSchema || {},
+        variableSchema,
       });
 
-      return {
-        ...placeholderAggregation.nestedForPlaceholders,
-        ...placeholderAggregation.regularPlaceholdersToDefaultValue,
-      };
+      return preparedAndValidatedContent.finalPayload as Record<string, unknown>;
     } catch (e) {
       return null;
     }
   }
 
-  private handleTipTapControl(
+  private async handleTipTapControl(
     tiptapControlValue: {
       emailEditor?: string | null;
       body?: string | null;
-    } | null
-  ): ProcessedControlResult {
+    } | null,
+    command: GeneratePreviewCommand,
+    stepData: StepDataDto,
+    variableSchema: Record<string, unknown>
+  ): Promise<ProcessedControlResult> {
     if (!tiptapControlValue || (!tiptapControlValue?.emailEditor && !tiptapControlValue?.body)) {
       return {
         variablesExample: null,
@@ -169,8 +179,12 @@ export class GeneratePreviewUsecase {
       };
     }
 
-    const emailVariables = this.safeAttemptToParseEmailSchema(
-      tiptapControlValue?.emailEditor || tiptapControlValue?.body || ''
+    const emailVariables = await this.safeAttemptToParseEmailSchema(
+      tiptapControlValue?.emailEditor || tiptapControlValue?.body || '',
+      command,
+      tiptapControlValue,
+      stepData.controls.dataSchema || {},
+      variableSchema
     );
 
     return {

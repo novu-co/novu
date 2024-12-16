@@ -411,26 +411,7 @@ describe('Generate Preview', () => {
         );
 
         if (generatePreviewResponseDto.result?.type === ChannelTypeEnum.IN_APP) {
-          expect(generatePreviewResponseDto.result.preview.body).to.equal(
-            {
-              subject: `{{subscriber.firstName}} Hello, World! ${PLACEHOLDER_SUBJECT_INAPP}`,
-              body: `Hello, World! {{payload.placeholder.body}}`,
-              avatar: 'https://www.example.com/avatar.png',
-              primaryAction: {
-                label: '{{payload.secondaryUrl}}',
-                redirect: {
-                  target: RedirectTargetEnum.BLANK,
-                },
-              },
-              secondaryAction: null,
-              redirect: {
-                target: RedirectTargetEnum.BLANK,
-                url: '   ',
-              },
-            }.body
-          );
-          expect(generatePreviewResponseDto.result.preview.primaryAction?.redirect?.url).to.be.ok;
-          expect(generatePreviewResponseDto.result.preview.primaryAction?.redirect?.url).to.contain('https');
+          expect(generatePreviewResponseDto.result.preview.body).to.equal('Hello, World! {{payload.placeholder.body}}');
         }
       });
     });

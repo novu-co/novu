@@ -3,32 +3,34 @@ import { zodToJsonSchema } from 'zod-to-json-schema';
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 import { skipControl } from './skip-control.schema';
 
-const absoluteUrlOrPathRegex = /^(?!mailto:)(?:(https?):\/\/[^\s/$.?#].[^\s]*)|^(\/[^\s]*)$|^$/;
-
 const redirectZodSchema = z
   .object({
-    url: z.string().regex(absoluteUrlOrPathRegex),
+    url: z.string().optional(),
     target: z.enum(['_self', '_blank', '_parent', '_top', '_unfencedTop']).default('_blank'),
   })
-  .strict();
+  .strict()
+  .optional()
+  .nullable();
 
 const actionZodSchema = z
   .object({
-    label: z.string(),
-    redirect: redirectZodSchema,
+    label: z.string().optional(),
+    redirect: redirectZodSchema.optional(),
   })
-  .strict();
+  .strict()
+  .optional()
+  .nullable();
 
 export const InAppControlZodSchema = z
   .object({
     skip: skipControl.schema,
     subject: z.string().optional(),
-    body: z.string().min(1),
-    avatar: z.string().url().optional(),
-    primaryAction: actionZodSchema.optional(),
-    secondaryAction: actionZodSchema.optional(),
+    body: z.string(),
+    avatar: z.string().optional(),
+    primaryAction: actionZodSchema,
+    secondaryAction: actionZodSchema,
     data: z.object({}).catchall(z.unknown()).optional(),
-    redirect: redirectZodSchema.optional(),
+    redirect: redirectZodSchema,
   })
   .strict();
 
