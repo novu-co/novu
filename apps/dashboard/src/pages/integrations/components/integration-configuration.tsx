@@ -30,6 +30,7 @@ type IntegrationConfigurationProps = {
   integration?: IIntegration;
   onSubmit: (data: IntegrationFormData) => Promise<void>;
   mode: 'create' | 'update';
+  isChannelSupportPrimary: boolean;
 };
 
 function generateSlug(name: string): string {
@@ -41,7 +42,13 @@ function generateSlug(name: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-export function IntegrationConfiguration({ provider, integration, onSubmit, mode }: IntegrationConfigurationProps) {
+export function IntegrationConfiguration({
+  provider,
+  integration,
+  onSubmit,
+  mode,
+  isChannelSupportPrimary,
+}: IntegrationConfigurationProps) {
   const { currentOrganization } = useAuth();
   const { environments } = useFetchEnvironments({ organizationId: currentOrganization?._id });
   const { currentEnvironment } = useEnvironment();
@@ -119,7 +126,13 @@ export function IntegrationConfiguration({ provider, integration, onSubmit, mode
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <GeneralSettings control={control} register={register} errors={errors} mode={mode} />
+              <GeneralSettings
+                control={control}
+                register={register}
+                errors={errors}
+                mode={mode}
+                hidePrimarySelector={!isChannelSupportPrimary}
+              />
             </AccordionContent>
           </AccordionItem>
         </Accordion>

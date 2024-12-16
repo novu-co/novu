@@ -21,9 +21,10 @@ type GeneralSettingsProps = {
   register: UseFormRegister<IntegrationFormData>;
   errors: FieldErrors<IntegrationFormData>;
   mode: 'create' | 'update';
+  hidePrimarySelector?: boolean;
 };
 
-export function GeneralSettings({ control, register, errors, mode }: GeneralSettingsProps) {
+export function GeneralSettings({ control, register, errors, mode, hidePrimarySelector }: GeneralSettingsProps) {
   return (
     <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
       <div className="flex items-center justify-between gap-2">
@@ -41,24 +42,28 @@ export function GeneralSettings({ control, register, errors, mode }: GeneralSett
           render={({ field: { onChange, value } }) => <Switch id="active" checked={value} onCheckedChange={onChange} />}
         />
       </div>
-      <div className="flex items-center justify-between gap-2">
-        <Label className="text-xs" htmlFor="primary">
-          Primary Integration{' '}
-          <HelpTooltipIndicator
-            className="relative top-1"
-            size="4"
-            text="Primary integration will be used for all notifications by default, there can be only one primary integration per channel"
+      {!hidePrimarySelector && (
+        <div className="flex items-center justify-between gap-2">
+          <Label className="text-xs" htmlFor="primary">
+            Primary Integration{' '}
+            <HelpTooltipIndicator
+              className="relative top-1"
+              size="4"
+              text="Primary integration will be used for all notifications by default, there can be only one primary integration per channel"
+            />
+          </Label>
+
+          <Controller
+            control={control}
+            name="primary"
+            render={({ field: { onChange, value } }) => (
+              <Switch id="primary" checked={value} onCheckedChange={onChange} />
+            )}
           />
-        </Label>
-        <Controller
-          control={control}
-          name="primary"
-          render={({ field: { onChange, value } }) => (
-            <Switch id="primary" checked={value} onCheckedChange={onChange} />
-          )}
-        />
-      </div>
+        </div>
+      )}
       <Separator />
+
       <div className="space-y-2">
         <Label className="text-xs" htmlFor="name">
           Name

@@ -43,7 +43,7 @@ export async function deleteIntegration({ id, environment }: { id: string; envir
 }
 
 export async function createIntegration(data: CreateIntegrationData, environment: IEnvironment) {
-  return await post('/integrations', {
+  return await post<{ data: IIntegration }>('/integrations', {
     body: data,
     environment: environment,
   });
