@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Cross2Icon } from '@radix-ui/react-icons';
-import { useFormContext } from 'react-hook-form';
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,8 +8,7 @@ import { Button } from '@/components/primitives/button';
 import { Separator } from '@/components/primitives/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { StepEditorProps } from '@/components/workflow-editor/steps/configure-step-template-form';
-import { EmailEditor } from '@/components/workflow-editor/steps/email/email-editor';
-import { EmailEditorPreview } from '@/components/workflow-editor/steps/email/email-editor-preview';
+import { PushEditor } from '@/components/workflow-editor/steps/push/push-editor';
 import { WorkflowOriginEnum } from '@novu/shared';
 import { CustomStepControls } from '../controls/custom-step-controls';
 
@@ -19,7 +17,6 @@ const tabsContentClassName = 'h-full w-full overflow-y-auto data-[state=inactive
 export const PushTabs = (props: StepEditorProps) => {
   const { workflow, step } = props;
   const { dataSchema, uiSchema } = step.controls;
-  const form = useFormContext();
   const navigate = useNavigate();
   const [tabsValue, setTabsValue] = useState('editor');
 
@@ -57,15 +54,13 @@ export const PushTabs = (props: StepEditorProps) => {
       </header>
       <Separator />
       <TabsContent value="editor" forceMount className={tabsContentClassName}>
-        {workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && uiSchema && <EmailEditor uiSchema={uiSchema} />}
+        {workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && uiSchema && <PushEditor uiSchema={uiSchema} />}
         {workflow.origin === WorkflowOriginEnum.EXTERNAL && (
           <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
         )}
       </TabsContent>
       <TabsContent value="preview" forceMount className={tabsContentClassName}>
-        {tabsValue === 'preview' && (
-          <EmailEditorPreview workflow={workflow} step={step} formValues={form.getValues()} />
-        )}
+        {tabsValue === 'preview' && <>TODO</>}
       </TabsContent>
       <Separator />
     </Tabs>
