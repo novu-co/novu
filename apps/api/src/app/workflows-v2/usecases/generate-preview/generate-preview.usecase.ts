@@ -362,16 +362,12 @@ export class GeneratePreviewUsecase {
       let controlValuesString = JSON.stringify(controlValues);
 
       for (const invalidVariable of invalidVariables) {
-        if (!controlValuesString.includes(invalidVariable.name)) {
+        if (!controlValuesString.includes(invalidVariable.template)) {
           continue;
         }
 
-        const invalidVariableExpression = invalidVariable.template.replace('{{', '').replace('}}', '');
-        const liquidJsParsableString = PREVIEW_ERROR_MESSAGE_PLACEHOLDER.replace(
-          INVALID_VARIABLE_PLACEHOLDER,
-          invalidVariableExpression
-        );
-        controlValuesString = replaceAll(controlValuesString, invalidVariable.template, liquidJsParsableString);
+        const EMPTY_STRING = '';
+        controlValuesString = replaceAll(controlValuesString, invalidVariable.template, EMPTY_STRING);
       }
 
       return JSON.parse(controlValuesString) as Record<string, unknown>;
