@@ -1,33 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ChannelTypeEnum, IEnvironment } from '@novu/shared';
-import { post } from '../api/api.client';
 import { useEnvironment } from '../context/environment/hooks';
-
-export interface CreateIntegrationData {
-  providerId: string;
-  channel: ChannelTypeEnum;
-  credentials: Record<string, string>;
-  name: string;
-  identifier: string;
-  active: boolean;
-  primary?: boolean;
-  _environmentId: string;
-}
-
-async function createIntegration(data: CreateIntegrationData, environment: IEnvironment) {
-  const response = await post('/integrations', {
-    body: data,
-    environment: environment,
-  });
-
-  return response;
-}
+import { createIntegration } from '../api/integrations';
+import { CreateIntegrationData } from '../api/integrations';
 
 export function useCreateIntegration() {
   const { currentEnvironment } = useEnvironment();
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<unknown, unknown, CreateIntegrationData>({
     mutationFn: (data: CreateIntegrationData) => createIntegration(data, currentEnvironment!),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['integrations'] });

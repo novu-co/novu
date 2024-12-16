@@ -1,5 +1,4 @@
-import { ChannelTypeEnum } from '@novu/shared';
-import { useProviders } from '@/hooks/use-providers';
+import { ChannelTypeEnum, providers as novuProviders } from '@novu/shared';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useFetchIntegrations } from '../../../hooks/use-fetch-integrations';
 import { ITableIntegration } from '../types';
@@ -52,7 +51,7 @@ function IntegrationChannelGroupSkeleton() {
 export function IntegrationsList({ onRowClickCallback }: IntegrationsListProps) {
   const { currentEnvironment, environments } = useEnvironment();
   const { integrations } = useFetchIntegrations();
-  const { providers: availableIntegrations } = useProviders();
+  const availableIntegrations = novuProviders;
 
   if (!integrations || !availableIntegrations || !currentEnvironment) {
     return (

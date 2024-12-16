@@ -1,8 +1,7 @@
-import { ChannelTypeEnum } from '@novu/shared';
+import { ChannelTypeEnum, providers as novuProviders } from '@novu/shared';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEnvironment } from '@/context/environment/hooks';
 import { QueryKeys } from '@/utils/query-keys';
-import { useProviders } from '@/hooks/use-providers';
 import { useCreateIntegration } from '@/hooks/use-create-integration';
 import { useIntegrationList } from './hooks/use-integration-list';
 import { useSidebarNavigationManager } from './hooks/use-sidebar-navigation-manager';
@@ -21,7 +20,7 @@ export interface CreateIntegrationSidebarProps {
 export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegrationSidebarProps) {
   const queryClient = useQueryClient();
   const { currentEnvironment } = useEnvironment();
-  const { providers } = useProviders();
+  const providers = novuProviders;
   const { mutateAsync: createIntegration, isPending } = useCreateIntegration();
   const { selectedIntegration, step, searchQuery, onIntegrationSelect, onBack } = useSidebarNavigationManager({
     isOpened,
