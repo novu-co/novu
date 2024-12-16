@@ -20,13 +20,14 @@ import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { EmailTabs } from '@/components/workflow-editor/steps/email/email-tabs';
 import { CommonCustomControlValues } from './common/common-custom-control-values';
+import { PushTabs } from '@/components/workflow-editor/steps/push/push-tabs';
 
 const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
   [StepTypeEnum.EMAIL]: EmailTabs,
   [StepTypeEnum.CHAT]: OtherStepTabs,
   [StepTypeEnum.IN_APP]: InAppTabs,
   [StepTypeEnum.SMS]: OtherStepTabs,
-  [StepTypeEnum.PUSH]: OtherStepTabs,
+  [StepTypeEnum.PUSH]: PushTabs,
   [StepTypeEnum.DIGEST]: CommonCustomControlValues,
   [StepTypeEnum.DELAY]: CommonCustomControlValues,
   [StepTypeEnum.TRIGGER]: () => null,
