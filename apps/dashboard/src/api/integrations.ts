@@ -1,7 +1,7 @@
 import { IEnvironment, IIntegration, ChannelTypeEnum } from '@novu/shared';
 import { del, get, post, put } from './api.client';
 
-export interface CreateIntegrationData {
+export type CreateIntegrationData = {
   providerId: string;
   channel: ChannelTypeEnum;
   credentials: Record<string, string>;
@@ -10,7 +10,7 @@ export interface CreateIntegrationData {
   active: boolean;
   primary?: boolean;
   _environmentId: string;
-}
+};
 
 export enum CheckIntegrationResponseEnum {
   INVALID_EMAIL = 'invalid_email',
@@ -19,14 +19,14 @@ export enum CheckIntegrationResponseEnum {
   FAILED = 'failed',
 }
 
-export interface UpdateIntegrationData {
+export type UpdateIntegrationData = {
   name: string;
   identifier: string;
   active: boolean;
   primary: boolean;
   credentials: Record<string, string>;
   check: boolean;
-}
+};
 
 export async function getIntegrations({ environment }: { environment: IEnvironment }) {
   // TODO: This is a technical debt on the API side.

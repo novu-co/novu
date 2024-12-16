@@ -1,29 +1,10 @@
-import { ChannelTypeEnum } from '@novu/shared';
-import { useCallback, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-
 import { IntegrationsList } from './components/integrations-list';
-import { ITableIntegration } from './types';
 import { DashboardLayout } from '../../components/dashboard-layout';
-import { UpdateIntegrationSidebar } from './components/update-integration-sidebar';
-import { CreateIntegrationSidebar } from './components/create-integration-sidebar';
 import { Badge } from '../../components/primitives/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Button } from '@/components/primitives/button';
 
 export function IntegrationsListPage() {
-  const [searchParams] = useSearchParams();
-  const [selectedIntegrationId, setSelectedIntegrationId] = useState<string>();
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  const onRowClickCallback = useCallback((item: { original: ITableIntegration }) => {
-    setSelectedIntegrationId(item.original.integrationId);
-  }, []);
-
-  const onAddIntegrationClickCallback = useCallback(() => {
-    setIsCreateModalOpen(true);
-  }, []);
-
   return (
     <DashboardLayout
       headerStartItems={
@@ -48,27 +29,28 @@ export function IntegrationsListPage() {
               </Badge>
             </TabsTrigger>
           </TabsList>
-          <Button size="sm" variant="primary" onClick={onAddIntegrationClickCallback} className="my-1.5 mr-2.5">
+          <Button
+            size="sm"
+            variant="primary"
+            onClick={() => {
+              // Coming Soon
+            }}
+            className="my-1.5 mr-2.5"
+          >
             Connect Provider
           </Button>
         </div>
         <TabsContent value="providers" variant="regular" className="!mt-0 p-2.5">
-          <IntegrationsList onRowClickCallback={onRowClickCallback} />
+          <IntegrationsList
+            onRowClickCallback={() => {
+              // Coming Soon
+            }}
+          />
         </TabsContent>
         <TabsContent value="data-warehouse" variant="regular">
           <div className="text-muted-foreground flex h-64 items-center justify-center">Coming soon</div>
         </TabsContent>
       </Tabs>
-      <UpdateIntegrationSidebar
-        isOpened={!!selectedIntegrationId}
-        integrationId={selectedIntegrationId}
-        onClose={() => setSelectedIntegrationId(undefined)}
-      />
-      <CreateIntegrationSidebar
-        isOpened={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        scrollToChannel={searchParams.get('scrollTo') as ChannelTypeEnum}
-      />
     </DashboardLayout>
   );
 }
