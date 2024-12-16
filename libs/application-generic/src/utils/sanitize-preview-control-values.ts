@@ -26,7 +26,7 @@ type LookBackWindow = {
 };
 
 function normalizeRedirect(redirect: Redirect) {
-  if (!redirect) return null;
+  if (!redirect.url || !redirect.target) return null;
 
   return {
     url: redirect.url || null,
@@ -47,6 +47,7 @@ function sanitizeInApp(controlValues: Record<string, unknown>) {
     primaryAction: null,
     secondaryAction: null,
     redirect: null,
+    data: controlValues.data || null,
   };
 
   if (controlValues.primaryAction) {
@@ -92,7 +93,8 @@ function sanitizeEmail(controlValues: Record<string, unknown>) {
    * }
    */
   emailControls.subject = controlValues.subject || '';
-  emailControls.emailEditor = controlValues.emailEditor || EMPTY_TIP_TAP_OBJECT;
+  emailControls.body = controlValues.body || EMPTY_TIP_TAP_OBJECT;
+  emailControls.data = controlValues.data || null;
 
   return emailControls;
 }
@@ -102,6 +104,7 @@ function sanitizeSms(controlValues: Record<string, unknown>) {
 
   return {
     body: controlValues.body || '',
+    data: controlValues.data || null,
   };
 }
 
@@ -111,6 +114,7 @@ function sanitizePush(controlValues: Record<string, unknown>) {
   const mappedValues = {
     subject: controlValues.subject || '',
     body: controlValues.body || '',
+    data: controlValues.data || null,
   };
 
   if (typeof mappedValues === 'object' && mappedValues !== null) {
@@ -127,6 +131,7 @@ function sanitizeChat(controlValues: Record<string, unknown>) {
 
   return {
     body: controlValues.body || '',
+    data: controlValues.data || null,
   };
 }
 
@@ -138,6 +143,7 @@ function sanitizeDigest(controlValues: Record<string, unknown>) {
     amount: controlValues.amount || 0,
     unit: controlValues.unit || '',
     digestKey: controlValues.digestKey || '',
+    data: controlValues.data || null,
     lookBackWindow: controlValues.lookBackWindow
       ? {
           amount: (controlValues.lookBackWindow as LookBackWindow).amount || 0,

@@ -328,11 +328,9 @@ describe('Generate Preview', () => {
         if (previewResponseDto.result!.type !== 'sms') {
           throw new Error('Expected sms');
         }
-        expect(previewResponseDto.result!.preview.body).to.contain('{{PAYLOAD.VARIABLENAME | UPCASE}}');
+        expect(previewResponseDto.result!.preview.body).to.contain('{{PAYLOAD.VARIABLENAME}}');
         expect(previewResponseDto.previewPayloadExample).to.exist;
-        expect(previewResponseDto?.previewPayloadExample?.payload?.variableName).to.equal(
-          '{{payload.variableName | upcase}}'
-        );
+        expect(previewResponseDto?.previewPayloadExample?.payload?.variableName).to.equal('{{payload.variableName}}');
       });
 
       it('Should not fail if inApp is providing partial URL in redirect', async () => {

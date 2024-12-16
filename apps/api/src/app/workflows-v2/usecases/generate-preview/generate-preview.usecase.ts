@@ -36,8 +36,6 @@ import { pathsToObject } from '../../util/path-to-object';
 import { HydrateEmailSchemaUseCase } from '../../../environments-v1/usecases/output-renderers';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
-const INVALID_VARIABLE_PLACEHOLDER = '<INVALID_VARIABLE_PLACEHOLDER>';
-const PREVIEW_ERROR_MESSAGE_PLACEHOLDER = `[[Invalid Variable: ${INVALID_VARIABLE_PLACEHOLDER}]]`;
 
 type DestructuredControlValues = {
   tiptapControlValues: { emailEditor?: string | null; body?: string | null } | null;
