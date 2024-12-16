@@ -1,5 +1,5 @@
 import { ComponentProps, useState } from 'react';
-import { useForm, useFormContext } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { RiArrowDownSLine, RiArrowUpSLine, RiBookMarkedLine, RiInputField, RiQuestionLine } from 'react-icons/ri';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
@@ -27,12 +27,11 @@ const CONTROLS_DOCS_LINK = 'https://docs.novu.co/concepts/controls';
 export const CustomStepControls = (props: CustomStepControlsProps) => {
   const { className, dataSchema, origin, ...rest } = props;
   const [isEditorOpen, setIsEditorOpen] = useState(true);
-  const [isOverridden, setIsOverriden] = useState(false);
   const [isRestoreDefaultModalOpen, setIsRestoreDefaultModalOpen] = useState(false);
   const { step } = useWorkflow();
+  const [isOverridden, setIsOverriden] = useState(() => Object.keys(step?.controls.values ?? {}).length > 0);
   const { reset } = useFormContext();
   const { saveForm } = useSaveForm();
-  const overrideForm = useForm({ defaultValues: { override: Object.keys(step?.controls.values ?? {}).length > 0 } });
 
   if (origin !== WorkflowOriginEnum.EXTERNAL || Object.keys(dataSchema?.properties ?? {}).length === 0) {
     return (
@@ -107,15 +106,15 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
           reset(defaultValues);
           saveForm(true);
           setIsRestoreDefaultModalOpen(false);
-          overrideForm.setValue('override', false);
+          setIsOverriden(false);
         }}
         title="Proceeding will restore controls to defaults."
         description="All edits will be discarded, and defaults will be restored from the code."
         confirmButtonText="Proceed anyway"
       />
-      <div className="mb-6 mt-2 flex w-full items-center justify-between">
-        <div>
-          <span className="block">Override code defined defaults</span>
+      <div className="mb-3 mt-2 flex w-full items-center justify-between">
+        <div className="flex flex-col justify-center gap-1">
+          <span className="block text-sm">Override code defined defaults</span>
           <span className="text-xs text-neutral-400">
             Code-defined defaults are read-only by default, you can override them using this toggle.
           </span>
@@ -157,11 +156,11 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
 
         <CollapsibleContent>
           <div className="bg-background rounded-md border border-dashed p-3">
-            <JsonForm schema={(dataSchema as RJSFSchema) || {}} disabled={!overrideForm.watch().override} />
+            <JsonForm schema={(dataSchema as RJSFSchema) || {}} disabled={!isOverridden} />
           </div>
         </CollapsibleContent>
       </Collapsible>
-      <OverrideMessage isOverridden={overrideForm.watch().override} />
+      <OverrideMessage isOverridden={isOverridden} />
     </SidebarContent>
   );
 };
