@@ -65,7 +65,7 @@ export enum UiSchemaGroupEnum {
 }
 
 export enum UiComponentEnum {
-  MAILY = 'MAILY',
+  BLOCK_EDITOR = 'BLOCK_EDITOR',
   TEXT_FULL_LINE = 'TEXT_FULL_LINE',
   TEXT_INLINE_LABEL = 'TEXT_INLINE_LABEL',
   IN_APP_BODY = 'IN_APP_BODY',

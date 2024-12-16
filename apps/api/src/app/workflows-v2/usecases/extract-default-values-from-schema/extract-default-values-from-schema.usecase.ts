@@ -1,25 +1,7 @@
-import { JSONSchemaDto, PreviewIssueEnum, TipTapNode } from '@novu/shared';
+import { JSONSchemaDto } from '@novu/shared';
 import { Injectable } from '@nestjs/common';
 import { ExtractDefaultValuesFromSchemaCommand } from './extract-default-values-from-schema.command';
 import { isMatchingJsonSchema } from '../../util/jsonToSchema';
-
-const DEFAULT_PREVIEW_ISSUE_MESSAGE: TipTapNode = {
-  type: 'doc',
-  content: [
-    {
-      type: 'paragraph',
-      attrs: {
-        textAlign: 'left',
-      },
-      content: [
-        {
-          type: 'text',
-          text: PreviewIssueEnum.PREVIEW_ISSUE_REQUIRED_CONTROL_VALUE_IS_MISSING,
-        },
-      ],
-    },
-  ],
-};
 
 @Injectable()
 export class ExtractDefaultValuesFromSchemaUsecase {
@@ -82,15 +64,12 @@ export class ExtractDefaultValuesFromSchemaUsecase {
       return value.default;
     }
 
+    // TODO: Move this to a default value in the step controls schema.
     if (normalizedKey.includes('url')) {
       return 'https://www.example.com/search?query=placeholder';
     }
 
-    if (normalizedKey.includes('emaileditor')) {
-      return JSON.stringify(DEFAULT_PREVIEW_ISSUE_MESSAGE);
-    }
-
-    return PreviewIssueEnum.PREVIEW_ISSUE_REQUIRED_CONTROL_VALUE_IS_MISSING;
+    return null;
   }
 }
 

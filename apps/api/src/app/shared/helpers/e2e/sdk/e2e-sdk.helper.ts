@@ -1,42 +1,53 @@
 import { Novu } from '@novu/api';
 import { NovuCore } from '@novu/api/core';
 import { UserSession } from '@novu/testing';
-import { SDKError } from '@novu/api/models/errors/sdkerror';
 import { expect } from 'chai';
+import { ErrorDto, ValidationErrorDto } from '@novu/api/models/errors';
 
 export function initNovuClassSdk(session: UserSession): Novu {
-  return new Novu({ apiKey: session.apiKey, serverURL: session.serverUrl, debugLogger: console });
+  // return new Novu({ apiKey: session.apiKey, serverURL: session.serverUrl, debugLogger: console }); if needed debugging
+  return new Novu({ apiKey: session.apiKey, serverURL: session.serverUrl });
 }
 export function initNovuFunctionSdk(session: UserSession): NovuCore {
   return new NovuCore({ apiKey: session.apiKey, serverURL: session.serverUrl, debugLogger: console });
 }
 
-function isSDKError(error: unknown): error is SDKError {
-  return typeof error === 'object' && error !== null && 'name' in error && 'body' in error;
+function isErrorDto(error: unknown): error is ErrorDto {
+  return typeof error === 'object' && error !== null && 'name' in error && error.name === 'ErrorDto';
+}
+function isValidationErrorDto(error: unknown): error is ValidationErrorDto {
+  return typeof error === 'object' && error !== null && 'name' in error && error.name === 'ValidationErrorDto';
 }
 
-export function handleSdkError(error: unknown): { error: SDKError; parsedBody: any } {
-  if (!isSDKError(error)) {
-    throw new Error('Provided error is not an SDKError');
+export function handleSdkError(error: unknown): ErrorDto {
+  if (!isErrorDto(error)) {
+    throw new Error(`Provided error is not an ErrorDto error found: ${JSON.stringify(error)}`);
   }
-  expect(error.name).to.equal('SDKError');
-  expect(error.body).to.be.ok;
-  expect(typeof error.body).to.be.eq('string');
-  const errorBody = error.body ? JSON.parse(error.body) : 'No Body';
+  expect(error.name).to.equal('ErrorDto');
+  expect(error.ctx).to.be.ok;
 
-  return { error, parsedBody: errorBody };
+  return error;
+}
+export function handleValidationErrorDto(error: unknown): ValidationErrorDto {
+  if (!isValidationErrorDto(error)) {
+    throw new Error(`Provided error is not an ErrorDto error found: ${JSON.stringify(error)}`);
+  }
+  expect(error.name).to.equal('ValidationErrorDto');
+  expect(error.ctx).to.be.ok;
+
+  return error;
 }
 
 type AsyncAction<U> = () => Promise<U>;
 
 export async function expectSdkExceptionGeneric<U>(
   action: AsyncAction<U>
-): Promise<{ error?: SDKError; parsedBody?: any; successfulBody?: U }> {
+): Promise<{ error?: ErrorDto; successfulBody?: U }> {
   try {
     const response = await action();
 
     return { successfulBody: response };
   } catch (e) {
-    return handleSdkError(e);
+    return { error: handleSdkError(e) };
   }
 }

@@ -4,15 +4,15 @@ import { EmailPreviewHeader } from '@/components/workflow-editor/steps/email/ema
 import { EmailTabsSection } from '@/components/workflow-editor/steps/email/email-tabs-section';
 import { UiSchemaGroupEnum, type UiSchema } from '@novu/shared';
 
-const subjectKey = 'subject';
-const emailEditorKey = 'emailEditor';
+type EmailEditorProps = { uiSchema: UiSchema };
+export const EmailEditor = (props: EmailEditorProps) => {
+  const { uiSchema } = props;
 
-export const EmailEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
   if (uiSchema.group !== UiSchemaGroupEnum.EMAIL) {
     return null;
   }
 
-  const { [emailEditorKey]: emailEditor, [subjectKey]: subject } = uiSchema.properties ?? {};
+  const { body, subject } = uiSchema.properties ?? {};
 
   return (
     <div className="flex h-full flex-col">
@@ -25,7 +25,7 @@ export const EmailEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
       <Separator className="bg-neutral-100" />
       {/* extra padding on the left to account for the drag handle */}
       <EmailTabsSection className="basis-full pl-14">
-        {emailEditor && getComponentByType({ component: emailEditor.component })}
+        {getComponentByType({ component: body.component })}
       </EmailTabsSection>
     </div>
   );
