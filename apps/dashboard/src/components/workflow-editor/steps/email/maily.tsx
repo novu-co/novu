@@ -24,8 +24,6 @@ import type { Editor as TiptapEditor } from '@tiptap/core';
 import { HTMLAttributes, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-const bodyKey = 'emailEditor';
-
 type MailyProps = HTMLAttributes<HTMLDivElement>;
 export const Maily = (props: MailyProps) => {
   const { className, ...rest } = props;
@@ -37,7 +35,7 @@ export const Maily = (props: MailyProps) => {
   return (
     <FormField
       control={control}
-      name={bodyKey}
+      name="body"
       render={({ field }) => {
         return (
           <>

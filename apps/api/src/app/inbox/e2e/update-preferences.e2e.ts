@@ -128,9 +128,9 @@ describe('Update workflow preferences - /inbox/preferences/:workflowId (PATCH)',
         chat: true,
       })
       .set('Authorization', `Bearer ${session.subscriberToken}`);
-    expect(response.body.statusCode).to.equal(400);
-    expect(response.body.cause.workflowId.messages[0]).to.equal(`workflowId must be a mongodb id`);
-    expect(response.status).to.equal(400);
+    expect(response.body.statusCode).to.equal(422);
+    expect(response.body.errors.workflowId.messages[0]).to.equal(`workflowId must be a mongodb id`);
+    expect(response.status).to.equal(422);
   });
 
   it('should throw error when non-existing workflow id is passed', async function () {

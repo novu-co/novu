@@ -37,11 +37,26 @@
           "endsPattern": "Started application in NODE_ENV"
         }
       },
+    },
+    {
+      "type": "npm",
+      "script": "start:test",
+      "isBackground": true,
+      "label": "WORKER TEST",
+      "path": "/apps/worker",
+      "problemMatcher": {
+        "base": "$tsc-watch",
+        "owner": "typescript",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Successfully compiled",
+          "endsPattern": "Started application in NODE_ENV"
+        }
+      },
       "icon": {
         "id": "server",
         "color": "terminal.ansiGreen"
-      },
-      "dependsOn": ["SHARED", "API", "APPLICATION GENERIC", "DAL", "EE - TRANSLATION", "EE - BILLING"]
+      }
     },
     {
       "type": "npm",

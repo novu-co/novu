@@ -119,6 +119,7 @@ export class StepFilter {
 
   @ApiProperty({
     enum: ['BOOLEAN', 'TEXT', 'DATE', 'NUMBER', 'STATEMENT', 'LIST', 'MULTI_LIST', 'GROUP'],
+    enumName: 'BuilderFieldType',
   })
   type?: BuilderFieldType;
 

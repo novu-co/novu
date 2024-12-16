@@ -21,7 +21,7 @@ export abstract class BaseCommand {
   }
 }
 
-class ConstraintValidation {
+export class ConstraintValidation {
   messages: string[];
   value: any;
 }
