@@ -227,13 +227,13 @@ describe('Workflow Controller E2E API Testing', () => {
 
     describe('Workflow Step content Issues', () => {
       it('should show control value required when missing', async () => {
-        const { issues, status } = await createWorkflowAndReturnStepIssues({ steps: [{ ...buildEmailStep() }] }, 0);
+        const { issues, status } = await createWorkflowAndReturnStepIssues({ steps: [{ ...buildInAppStep() }] }, 0);
         expect(status, JSON.stringify(issues)).to.equal(WorkflowStatusEnum.ERROR);
         expect(issues).to.be.ok;
         if (issues.controls) {
-          expect(issues.controls?.emailEditor).to.be.ok;
-          if (issues.controls?.emailEditor) {
-            expect(issues.controls?.emailEditor[0].issueType).to.be.equal(StepContentIssueEnum.MISSING_VALUE);
+          expect(issues.controls?.body).to.be.ok;
+          if (issues.controls?.body) {
+            expect(issues.controls?.body[0].issueType).to.be.equal(StepContentIssueEnum.MISSING_VALUE);
           }
         }
       });

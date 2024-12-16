@@ -9,7 +9,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { UserSessionData } from '@novu/shared';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeController, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserSession } from '../shared/framework/user.decorator';
 import { UserAuthGuard } from '../auth/framework/user.auth.guard';
 import { UpdateBrandingDetailsCommand } from './usecases/update-branding-details/update-branding-details.command';
@@ -30,6 +30,7 @@ import { OrganizationBrandingResponseDto, OrganizationResponseDto } from './dtos
 @UseGuards(UserAuthGuard)
 @ApiTags('Organizations')
 @ApiCommonResponses()
+@ApiExcludeController()
 export class EEOrganizationController {
   constructor(
     private updateBrandingDetailsUsecase: UpdateBrandingDetails,

@@ -1,5 +1,5 @@
-import { Check } from 'lucide-react';
 import { ApiServiceLevelEnum } from '@novu/shared';
+import { Check } from 'lucide-react';
 import { cn } from '../../utils/ui';
 
 enum SupportedPlansEnum {
@@ -159,7 +159,7 @@ const features: Feature[] = [
     label: 'Team members',
     values: {
       [SupportedPlansEnum.FREE]: { value: '3' },
-      [SupportedPlansEnum.BUSINESS]: { value: '10' },
+      [SupportedPlansEnum.BUSINESS]: { value: '50' },
       [SupportedPlansEnum.ENTERPRISE]: { value: 'Unlimited' },
     },
   },

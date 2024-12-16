@@ -11,19 +11,21 @@ import { StepEditorProps } from '@/components/workflow-editor/steps/configure-st
 import { EmailEditor } from '@/components/workflow-editor/steps/email/email-editor';
 import { EmailEditorPreview } from '@/components/workflow-editor/steps/email/email-editor-preview';
 import { CustomStepControls } from '../controls/custom-step-controls';
-import { EmailTabsEditSection } from '@/components/workflow-editor/steps/email/email-tabs-section';
+import { EmailTabsSection } from '@/components/workflow-editor/steps/email/email-tabs-section';
 import { WorkflowOriginEnum } from '@novu/shared';
+import { useState } from 'react';
 
-const tabsContentClassName = 'h-full w-full overflow-y-auto';
+const tabsContentClassName = 'h-full w-full overflow-y-auto data-[state=inactive]:hidden';
 
 export const EmailTabs = (props: StepEditorProps) => {
   const { workflow, step } = props;
   const { dataSchema, uiSchema } = step.controls;
   const form = useFormContext();
   const navigate = useNavigate();
+  const [tabsValue, setTabsValue] = useState('editor');
 
   return (
-    <Tabs defaultValue="editor" className="flex h-full flex-1 flex-col">
+    <Tabs defaultValue="editor" value={tabsValue} onValueChange={setTabsValue} className="flex h-full flex-1 flex-col">
       <header className="flex flex-row items-center gap-3 px-3 py-1.5">
         <div className="mr-auto flex items-center gap-2.5 text-sm font-medium">
           <RiEdit2Line className="size-4" />
@@ -55,20 +57,18 @@ export const EmailTabs = (props: StepEditorProps) => {
         </Button>
       </header>
       <Separator />
-      <TabsContent value="editor" className={tabsContentClassName}>
-        {workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && (
-          <EmailTabsEditSection>
-            <EmailEditor uiSchema={uiSchema} />
-          </EmailTabsEditSection>
-        )}
+      <TabsContent value="editor" forceMount className={tabsContentClassName}>
+        {workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && uiSchema && <EmailEditor uiSchema={uiSchema} />}
         {workflow.origin === WorkflowOriginEnum.EXTERNAL && (
-          <EmailTabsEditSection>
+          <EmailTabsSection>
             <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
-          </EmailTabsEditSection>
+          </EmailTabsSection>
         )}
       </TabsContent>
-      <TabsContent value="preview" className={tabsContentClassName}>
-        <EmailEditorPreview workflow={workflow} step={step} formValues={form.getValues()} />
+      <TabsContent value="preview" forceMount className={tabsContentClassName}>
+        {tabsValue === 'preview' && (
+          <EmailEditorPreview workflow={workflow} step={step} formValues={form.getValues()} />
+        )}
       </TabsContent>
       <Separator />
     </Tabs>

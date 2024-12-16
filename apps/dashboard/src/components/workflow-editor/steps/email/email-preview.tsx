@@ -30,22 +30,22 @@ export const EmailPreviewSubject = (props: EmailPreviewSubjectProps) => {
   const { subject, className, ...rest } = props;
 
   return (
-    <h3 className={cn('px-6 py-4', className)} {...rest}>
+    <h3 className={cn('px-8 py-2', className)} {...rest}>
       {subject}
     </h3>
   );
 };
 
-type EmailPreviewBodyProps = HTMLAttributes<HTMLIFrameElement> & {
+type EmailPreviewBodyProps = HTMLAttributes<HTMLDivElement> & {
   body: string;
 };
 export const EmailPreviewBody = (props: EmailPreviewBodyProps) => {
   const { body, className, ...rest } = props;
 
   return (
-    <iframe
-      className={cn('mx-auto h-96 w-full py-6', className)}
-      src={'data:text/html,' + encodeURIComponent(body)}
+    <div
+      className={cn('mx-auto min-h-96 w-full overflow-auto px-8 py-6', className)}
+      dangerouslySetInnerHTML={{ __html: body }}
       {...rest}
     />
   );
@@ -58,16 +58,16 @@ export const EmailPreviewContentMobile = (props: EmailPreviewContentMobileProps)
   return <div className={cn('bg-background max-w-sm', className)} {...rest} />;
 };
 
-type EmailPreviewBodyMobileProps = HTMLAttributes<HTMLIFrameElement> & {
+type EmailPreviewBodyMobileProps = HTMLAttributes<HTMLDivElement> & {
   body: string;
 };
 export const EmailPreviewBodyMobile = (props: EmailPreviewBodyMobileProps) => {
   const { body, className, ...rest } = props;
 
   return (
-    <iframe
-      className={cn('mx-auto h-96 w-full px-4', className)}
-      src={'data:text/html,' + encodeURIComponent(body)}
+    <div
+      className={cn('mx-auto min-h-96 w-full px-4', className)}
+      dangerouslySetInnerHTML={{ __html: body }}
       {...rest}
     />
   );
@@ -80,7 +80,7 @@ export const EmailPreviewSubjectMobile = (props: EmailPreviewSubjectMobileProps)
   const { subject, className, ...rest } = props;
 
   return (
-    <div className={cn('bg-neutral-50 px-6 py-4', className)} {...rest}>
+    <div className={cn('bg-neutral-50 p-4', className)} {...rest}>
       <h3 className="line-clamp-2">{subject}</h3>
     </div>
   );
