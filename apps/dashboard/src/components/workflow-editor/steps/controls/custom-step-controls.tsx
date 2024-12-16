@@ -1,11 +1,10 @@
-import { ComponentProps, useState } from 'react';
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { RiArrowDownSLine, RiArrowUpSLine, RiBookMarkedLine, RiInputField, RiQuestionLine } from 'react-icons/ri';
+import { RiBookMarkedLine, RiInputField, RiQuestionLine } from 'react-icons/ri';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { RJSFSchema } from '@rjsf/utils';
 import { type ControlsMetadata } from '@novu/shared';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/primitives/collapsible';
 import { Separator } from '@/components/primitives/separator';
 import { Switch } from '@/components/primitives/switch';
 import { WorkflowOriginEnum } from '@/utils/enums';
@@ -16,17 +15,18 @@ import { useWorkflow } from '../../workflow-provider';
 import { buildDefaultValuesOfDataSchema } from '@/utils/schema';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
 import { ConfirmationModal } from '@/components/confirmation-modal';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
 
-type CustomStepControlsProps = ComponentProps<typeof Collapsible> & {
+type CustomStepControlsProps = {
   dataSchema: ControlsMetadata['dataSchema'];
   origin: WorkflowOriginEnum;
+  className?: string;
 };
 
 const CONTROLS_DOCS_LINK = 'https://docs.novu.co/concepts/controls';
 
 export const CustomStepControls = (props: CustomStepControlsProps) => {
-  const { className, dataSchema, origin, ...rest } = props;
-  const [isEditorOpen, setIsEditorOpen] = useState(true);
+  const { className, dataSchema, origin } = props;
   const [isRestoreDefaultModalOpen, setIsRestoreDefaultModalOpen] = useState(false);
   const { step } = useWorkflow();
   const [isOverridden, setIsOverriden] = useState(() => Object.keys(step?.controls.values ?? {}).length > 0);
@@ -36,62 +36,57 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
   if (origin !== WorkflowOriginEnum.EXTERNAL || Object.keys(dataSchema?.properties ?? {}).length === 0) {
     return (
       <SidebarContent size="md">
-        <Collapsible
-          open={isEditorOpen}
-          onOpenChange={setIsEditorOpen}
+        <Accordion
           className={cn(
             'bg-neutral-alpha-50 border-neutral-alpha-200 flex w-full flex-col gap-2 rounded-lg border p-2 text-sm',
             className
           )}
-          {...rest}
+          defaultValue="controls"
+          type="single"
+          collapsible
         >
-          <CollapsibleTrigger className="flex w-full items-center justify-between text-sm">
-            <div className="flex items-center gap-1">
-              <RiInputField className="text-feature size-5" />
-              <span className="text-sm font-medium">Code-defined step controls</span>
-            </div>
-
-            {isEditorOpen ? (
-              <RiArrowUpSLine className="text-neutral-alpha-400 size-5" />
-            ) : (
-              <RiArrowDownSLine className="text-neutral-alpha-400 size-5" />
-            )}
-          </CollapsibleTrigger>
-
-          <CollapsibleContent>
-            <div className="bg-background rounded-md border border-dashed p-3">
-              <div className="flex w-full flex-col items-center justify-center gap-6">
-                <div className="flex w-full flex-col items-center gap-4">
-                  <div className="flex w-full flex-col items-center justify-center py-2">
-                    <div className="w-1/3 rounded-md border border-neutral-300 p-1">
-                      <div className="flex w-full flex-col items-start justify-center gap-2 rounded-sm border border-neutral-100 bg-white p-1">
-                        <div className="bg-neutral-alpha-100 h-[5px] w-2/5 rounded-sm" />
-                        <div className="bg-neutral-alpha-100 h-[5px] w-4/5 rounded-sm" />
+          <AccordionItem value="controls">
+            <AccordionTrigger className="flex w-full items-center justify-between text-sm">
+              <div className="flex items-center gap-1">
+                <RiInputField className="text-feature size-5" />
+                <span className="text-sm font-medium">Code-defined step controls</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="bg-background rounded-md border border-dashed p-3">
+                <div className="flex w-full flex-col items-center justify-center gap-6">
+                  <div className="flex w-full flex-col items-center gap-4">
+                    <div className="flex w-full flex-col items-center justify-center py-2">
+                      <div className="w-1/3 rounded-md border border-neutral-300 p-1">
+                        <div className="flex w-full flex-col items-start justify-center gap-2 rounded-sm border border-neutral-100 bg-white p-1">
+                          <div className="bg-neutral-alpha-100 h-[5px] w-2/5 rounded-sm" />
+                          <div className="bg-neutral-alpha-100 h-[5px] w-4/5 rounded-sm" />
+                        </div>
                       </div>
                     </div>
+                    <div className="flex flex-col items-center justify-center gap-1">
+                      <p className="text-sm font-medium">No controls defined yet</p>
+                      <span className="text-neutral-alpha-600 w-3/4 text-center text-xs">
+                        Define step controls to render fields here. This lets your team collaborate and ensure changes
+                        are validated in code.
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col items-center justify-center gap-1">
-                    <p className="text-sm font-medium">No controls defined yet</p>
-                    <span className="text-neutral-alpha-600 w-3/4 text-center text-xs">
-                      Define step controls to render fields here. This lets your team collaborate and ensure changes are
-                      validated in code.
-                    </span>
+                  <div className="flex items-center justify-center p-1.5">
+                    <Link
+                      to={CONTROLS_DOCS_LINK}
+                      target="_blank"
+                      className="flex items-center gap-1.5 text-xs text-neutral-600 underline"
+                    >
+                      <RiBookMarkedLine className="size-4" />
+                      View docs
+                    </Link>
                   </div>
-                </div>
-                <div className="flex items-center justify-center p-1.5">
-                  <Link
-                    to={CONTROLS_DOCS_LINK}
-                    target="_blank"
-                    className="flex items-center gap-1.5 text-xs text-neutral-600 underline"
-                  >
-                    <RiBookMarkedLine className="size-4" />
-                    View docs
-                  </Link>
                 </div>
               </div>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </SidebarContent>
     );
   }
@@ -132,34 +127,30 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
       </div>
       <Separator className="mb-3" />
 
-      <Collapsible
-        open={isEditorOpen}
-        onOpenChange={setIsEditorOpen}
+      <Accordion
         className={cn(
           'bg-neutral-alpha-50 border-neutral-alpha-200 flex w-full flex-col gap-2 rounded-lg border p-2 text-sm',
           className
         )}
-        {...rest}
+        type="single"
+        defaultValue="controls"
+        collapsible
       >
-        <CollapsibleTrigger className="flex w-full items-center justify-between text-sm">
-          <div className="flex items-center gap-1">
-            <RiInputField className="text-feature size-5" />
-            <span className="text-sm font-medium">Code-defined step controls</span>
-          </div>
+        <AccordionItem value="controls">
+          <AccordionTrigger className="flex w-full items-center justify-between text-sm">
+            <div className="flex items-center gap-1">
+              <RiInputField className="text-feature size-5" />
+              <span className="text-sm font-medium">Code-defined step controls</span>
+            </div>
+          </AccordionTrigger>
 
-          {isEditorOpen ? (
-            <RiArrowUpSLine className="text-neutral-alpha-400 size-5" />
-          ) : (
-            <RiArrowDownSLine className="text-neutral-alpha-400 size-5" />
-          )}
-        </CollapsibleTrigger>
-
-        <CollapsibleContent>
-          <div className="bg-background rounded-md border border-dashed p-3">
-            <JsonForm schema={(dataSchema as RJSFSchema) || {}} disabled={!isOverridden} />
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+          <AccordionContent>
+            <div className="bg-background rounded-md border border-dashed p-3">
+              <JsonForm schema={(dataSchema as RJSFSchema) || {}} disabled={!isOverridden} />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
       <OverrideMessage isOverridden={isOverridden} />
     </SidebarContent>
   );
