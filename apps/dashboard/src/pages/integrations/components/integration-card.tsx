@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/utils/routes';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { ProviderIcon } from './provider-icon';
-import { isDemoIntegration } from '../utils/is-demo-integration';
 import { cn } from '../../../utils/ui';
 
 interface IntegrationCardProps {
@@ -111,4 +110,8 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
       </div>
     </div>
   );
+}
+
+export function isDemoIntegration(providerId: string) {
+  return providerId === 'novu-email' || providerId === 'novu-sms';
 }
