@@ -37,16 +37,14 @@ describe('Get a topic - /topics/:topicKey (GET)', async () => {
 
   it('should throw a not found error when the topic key does not exist in the database for the user requesting it', async () => {
     const nonExistingTopicKey = 'ab12345678901234567890ab';
-    const { error, parsedBody, successfulBody } = await expectSdkExceptionGeneric(() =>
-      novuClient.topics.retrieve(nonExistingTopicKey)
-    );
+    const { error } = await expectSdkExceptionGeneric(() => novuClient.topics.retrieve(nonExistingTopicKey));
     expect(error).to.be.ok;
-    if (error && parsedBody) {
+    if (error) {
       expect(error.statusCode).to.equal(404);
-      expect(parsedBody.message).to.eql(
+      expect(error.message).to.eql(
         `Topic not found for id ${nonExistingTopicKey} in the environment ${session.environment._id}`
       );
-      expect(parsedBody.error).to.eql('Not Found');
+      expect(error.ctx?.error, JSON.stringify(error)).to.eql('Not Found');
     }
   });
 });

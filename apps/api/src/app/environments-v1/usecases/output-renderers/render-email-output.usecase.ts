@@ -2,6 +2,7 @@ import { EmailRenderOutput, TipTapNode } from '@novu/shared';
 import { Injectable } from '@nestjs/common';
 import { render as mailyRender } from '@maily-to/render';
 import { Instrument, InstrumentUsecase } from '@novu/application-generic';
+import isEmpty from 'lodash/isEmpty';
 import { FullPayloadForRender, RenderCommand } from './render-command';
 import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.usecase';
 import { EmailStepControlZodSchema } from '../../../workflows-v2/shared';
@@ -14,8 +15,13 @@ export class RenderEmailOutputUsecase {
 
   @InstrumentUsecase()
   async execute(renderCommand: RenderEmailOutputCommand): Promise<EmailRenderOutput> {
-    const { emailEditor, subject } = EmailStepControlZodSchema.parse(renderCommand.controlValues);
-    const expandedSchema = this.transformForAndShowLogic(emailEditor, renderCommand.fullPayloadForRender);
+    const { body, subject } = EmailStepControlZodSchema.parse(renderCommand.controlValues);
+
+    if (isEmpty(body)) {
+      return { subject, body: '' };
+    }
+
+    const expandedSchema = this.transformForAndShowLogic(body, renderCommand.fullPayloadForRender);
     const htmlRendered = await this.renderEmail(expandedSchema);
 
     return { subject, body: htmlRendered };

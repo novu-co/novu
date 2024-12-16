@@ -38,6 +38,7 @@ export class NotificationsController {
   @ApiOperation({
     summary: 'Get notifications',
   })
+  @ApiCommonResponses()
   @UserAuthentication()
   @ExternalApiAccessible()
   listNotifications(

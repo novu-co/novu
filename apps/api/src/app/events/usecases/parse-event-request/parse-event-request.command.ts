@@ -2,7 +2,7 @@ import { IsDefined, IsEnum, IsOptional, IsString, ValidateIf, ValidateNested } f
 import {
   AddressingTypeEnum,
   StatelessControls,
-  TriggerRecipients,
+  TriggerRecipientsPayload,
   TriggerRecipientSubscriber,
   TriggerRequestCategoryEnum,
   TriggerTenantContext,
@@ -54,7 +54,7 @@ export class ParseEventRequestBaseCommand extends EnvironmentWithUserCommand {
 
 export class ParseEventRequestMulticastCommand extends ParseEventRequestBaseCommand {
   @IsDefined()
-  to: TriggerRecipients;
+  to: TriggerRecipientsPayload;
 
   @IsEnum(AddressingTypeEnum)
   addressingType: AddressingTypeEnum.MULTICAST;
