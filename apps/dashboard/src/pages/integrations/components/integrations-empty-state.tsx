@@ -1,9 +1,9 @@
 import { Button } from '@/components/primitives/button';
 import { Plus, Settings } from 'lucide-react';
 
-interface IntegrationsEmptyStateProps {
+type IntegrationsEmptyStateProps = {
   onAddIntegrationClick: () => void;
-}
+};
 
 export function IntegrationsEmptyState({ onAddIntegrationClick }: IntegrationsEmptyStateProps) {
   return (

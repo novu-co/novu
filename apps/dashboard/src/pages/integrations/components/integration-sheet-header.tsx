@@ -4,12 +4,12 @@ import { RiArrowLeftSLine } from 'react-icons/ri';
 import { IProviderConfig } from '@novu/shared';
 import { ProviderIcon } from './provider-icon';
 
-interface IntegrationSheetHeaderProps {
+type IntegrationSheetHeaderProps = {
   provider?: IProviderConfig;
   mode: 'create' | 'update';
   onBack?: () => void;
   step?: 'select' | 'configure';
-}
+};
 
 export function IntegrationSheetHeader({ provider, mode, onBack, step }: IntegrationSheetHeaderProps) {
   if (mode === 'create' && step === 'select') {

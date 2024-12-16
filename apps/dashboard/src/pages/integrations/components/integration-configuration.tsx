@@ -12,13 +12,13 @@ import { Info } from 'lucide-react';
 import { CredentialsKeyEnum, IIntegration, IProviderConfig } from '@novu/shared';
 import { useEffect } from 'react';
 import { InlineToast } from '../../../components/primitives/inline-toast';
-import { isDemoIntegration } from '../utils/is-demo-integration';
 import { SegmentedControl, SegmentedControlList } from '../../../components/primitives/segmented-control';
 import { SegmentedControlTrigger } from '../../../components/primitives/segmented-control';
 import { useEnvironment, useFetchEnvironments } from '@/context/environment/hooks';
 import { useAuth } from '@/context/auth/hooks';
+import { isDemoIntegration } from './integration-card';
 
-interface IntegrationFormData {
+type IntegrationFormData = {
   name: string;
   identifier: string;
   credentials: Record<string, string>;
@@ -26,28 +26,28 @@ interface IntegrationFormData {
   check: boolean;
   primary: boolean;
   environmentId: string;
-}
+};
 
-interface IntegrationConfigurationProps {
+type IntegrationConfigurationProps = {
   provider?: IProviderConfig;
   integration?: IIntegration;
   onSubmit: (data: IntegrationFormData) => Promise<void>;
   mode: 'create' | 'update';
-}
+};
 
-interface GeneralSettingsProps {
+type GeneralSettingsProps = {
   control: Control<IntegrationFormData>;
   register: UseFormRegister<IntegrationFormData>;
   errors: FieldErrors<IntegrationFormData>;
   mode: 'create' | 'update';
-}
+};
 
-interface CredentialsSectionProps {
+type CredentialsSectionProps = {
   provider?: IProviderConfig;
   control: Control<IntegrationFormData>;
   register: UseFormRegister<IntegrationFormData>;
   errors: FieldErrors<IntegrationFormData>;
-}
+};
 
 const SECURE_CREDENTIALS = [
   CredentialsKeyEnum.ApiKey,

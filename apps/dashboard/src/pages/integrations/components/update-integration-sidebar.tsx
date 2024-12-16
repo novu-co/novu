@@ -16,11 +16,11 @@ import { IntegrationFormData } from '../types';
 import { useDeleteIntegration } from '../../../hooks/use-delete-integration';
 import { handleIntegrationError } from './utils/handle-integration-error';
 
-interface UpdateIntegrationSidebarProps {
+type UpdateIntegrationSidebarProps = {
   isOpened: boolean;
   integrationId?: string;
   onClose: () => void;
-}
+};
 
 export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: UpdateIntegrationSidebarProps) {
   const queryClient = useQueryClient();

@@ -3,10 +3,10 @@ import { IProviderConfig } from '@novu/shared';
 import { ProviderIcon } from './provider-icon';
 import { RiArrowRightSLine } from 'react-icons/ri';
 
-interface IntegrationListItemProps {
+type IntegrationListItemProps = {
   integration: IProviderConfig;
   onClick: () => void;
-}
+};
 
 export function IntegrationListItem({ integration, onClick }: IntegrationListItemProps) {
   return (

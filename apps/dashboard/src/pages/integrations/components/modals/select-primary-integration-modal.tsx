@@ -9,14 +9,14 @@ import {
   AlertDialogTitle,
 } from '@/components/primitives/alert-dialog';
 
-export interface SelectPrimaryIntegrationModalProps {
+export type SelectPrimaryIntegrationModalProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   currentPrimaryName?: string;
   newPrimaryName?: string;
   isLoading?: boolean;
-}
+};
 
 export function SelectPrimaryIntegrationModal({
   isOpen,

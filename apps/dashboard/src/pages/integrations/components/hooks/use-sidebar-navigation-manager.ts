@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { IntegrationStep } from '../../types';
 
-interface UseSidebarNavigationManagerProps {
+type UseSidebarNavigationManagerProps = {
   isOpened: boolean;
-}
+};
 
 export function useSidebarNavigationManager({ isOpened }: UseSidebarNavigationManagerProps) {
   const [selectedIntegration, setSelectedIntegration] = useState<string>();

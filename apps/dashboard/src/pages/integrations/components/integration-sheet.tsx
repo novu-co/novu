@@ -3,7 +3,7 @@ import { Sheet, SheetContent } from '@/components/primitives/sheet';
 import { IntegrationSheetHeader } from './integration-sheet-header';
 import { IProviderConfig } from '@novu/shared';
 
-interface IntegrationSheetProps {
+type IntegrationSheetProps = {
   isOpened: boolean;
   onClose: () => void;
   provider?: IProviderConfig;
@@ -11,7 +11,7 @@ interface IntegrationSheetProps {
   step?: 'select' | 'configure';
   onBack?: () => void;
   children: ReactNode;
-}
+};
 
 export function IntegrationSheet({ isOpened, onClose, provider, mode, step, onBack, children }: IntegrationSheetProps) {
   return (

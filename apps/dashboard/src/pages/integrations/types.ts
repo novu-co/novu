@@ -1,6 +1,6 @@
 import { ChannelTypeEnum } from '@novu/shared';
 
-export interface ITableIntegration {
+export type ITableIntegration = {
   integrationId: string;
   name: string;
   identifier: string;
@@ -11,9 +11,9 @@ export interface ITableIntegration {
   conditions?: string[];
   primary?: boolean;
   isPrimary?: boolean;
-}
+};
 
-export interface IntegrationFormData {
+export type IntegrationFormData = {
   name: string;
   identifier: string;
   active: boolean;
@@ -21,6 +21,6 @@ export interface IntegrationFormData {
   credentials: Record<string, any>;
   check: boolean;
   environmentId: string;
-}
+};
 
 export type IntegrationStep = 'select' | 'configure';

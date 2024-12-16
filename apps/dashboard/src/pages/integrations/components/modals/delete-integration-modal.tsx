@@ -9,12 +9,12 @@ import {
   AlertDialogTitle,
 } from '@/components/primitives/alert-dialog';
 
-export interface DeleteIntegrationModalProps {
+export type DeleteIntegrationModalProps = {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   isPrimary?: boolean;
-}
+};
 
 export function DeleteIntegrationModal({ isOpen, onOpenChange, onConfirm, isPrimary }: DeleteIntegrationModalProps) {
   return (
