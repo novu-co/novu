@@ -78,6 +78,7 @@ export const AddStepMenu = ({
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const areNewStepsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
+  const arePushChatSMSEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_SMS_CHAT_PUSH_ENABLED);
 
   const handleMenuItemClick = (stepType: StepTypeEnum) => {
     onMenuItemClick(stepType);
@@ -123,7 +124,13 @@ export const AddStepMenu = ({
                 >
                   In-App
                 </MenuItem>
-                <MenuItem stepType={StepTypeEnum.PUSH}>Push</MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.PUSH}
+                  disabled={!arePushChatSMSEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.PUSH)}
+                >
+                  Push
+                </MenuItem>
                 <MenuItem stepType={StepTypeEnum.CHAT}>Chat</MenuItem>
                 <MenuItem stepType={StepTypeEnum.SMS}>SMS</MenuItem>
               </MenuItemsGroup>
