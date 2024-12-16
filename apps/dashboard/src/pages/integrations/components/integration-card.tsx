@@ -1,6 +1,5 @@
 import { Badge } from '@/components/primitives/badge';
 import { Button } from '@/components/primitives/button';
-import { cn } from '@/lib/utils';
 import { RiCheckboxCircleFill, RiGitBranchFill, RiSettings4Line, RiStarSmileLine } from 'react-icons/ri';
 import { ITableIntegration } from '../types';
 import type { IEnvironment, IIntegration, IProviderConfig } from '@novu/shared';
@@ -9,6 +8,7 @@ import { ROUTES } from '@/utils/routes';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { ProviderIcon } from './provider-icon';
 import { isDemoIntegration } from '../utils/is-demo-integration';
+import { cn } from '../../../utils/ui';
 
 interface IntegrationCardProps {
   integration: IIntegration;
