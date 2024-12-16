@@ -62,6 +62,7 @@ export enum UiSchemaGroupEnum {
   SMS = 'SMS',
   CHAT = 'CHAT',
   PUSH = 'PUSH',
+  SKIP = 'SKIP',
 }
 
 export enum UiComponentEnum {
@@ -84,6 +85,7 @@ export enum UiComponentEnum {
   CHAT_BODY = 'CHAT_BODY',
   PUSH_BODY = 'PUSH_BODY',
   PUSH_SUBJECT = 'PUSH_SUBJECT',
+  QUERY_EDITOR = 'QUERY_EDITOR',
 }
 
 export class UiSchemaProperty {

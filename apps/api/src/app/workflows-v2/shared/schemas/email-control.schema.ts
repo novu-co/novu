@@ -2,9 +2,11 @@ import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@no
 
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
+import { skipControl } from './skip-control.schema';
 
 export const EmailStepControlZodSchema = z
   .object({
+    skip: skipControl.schema,
     body: z.string().optional().default(''),
     subject: z.string().optional().default(''),
   })
@@ -23,5 +25,6 @@ export const emailStepUiSchema: UiSchema = {
     subject: {
       component: UiComponentEnum.TEXT_INLINE_LABEL,
     },
+    skip: skipControl.uiSchema.properties.skip,
   },
 };
