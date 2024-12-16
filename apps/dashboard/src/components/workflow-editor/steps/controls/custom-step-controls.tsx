@@ -29,7 +29,7 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
   const { className, dataSchema, origin } = props;
   const [isRestoreDefaultModalOpen, setIsRestoreDefaultModalOpen] = useState(false);
   const { step } = useWorkflow();
-  const [isOverridden, setIsOverriden] = useState(() => Object.keys(step?.controls.values ?? {}).length > 0);
+  const [isOverridden, setIsOverridden] = useState(() => Object.keys(step?.controls.values ?? {}).length > 0);
   const { reset } = useFormContext();
   const { saveForm } = useSaveForm();
 
@@ -101,7 +101,7 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
           reset(defaultValues);
           saveForm(true);
           setIsRestoreDefaultModalOpen(false);
-          setIsOverriden(false);
+          setIsOverridden(false);
         }}
         title="Proceeding will restore controls to defaults."
         description="All edits will be discarded, and defaults will be restored from the code."
@@ -121,7 +121,7 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
               setIsRestoreDefaultModalOpen(true);
               return;
             }
-            setIsOverriden(checked);
+            setIsOverridden(checked);
           }}
         />
       </div>
