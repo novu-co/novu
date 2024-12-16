@@ -27,9 +27,9 @@ export const BaseSubject = () => {
       control={control}
       name={subjectKey}
       render={({ field }) => (
-        <InputField size="fit">
-          <FormItem className="w-full">
-            <FormControl>
+        <FormItem className="w-full">
+          <FormControl>
+            <InputField size="fit" className="px-1">
               <Editor
                 fontFamily="inherit"
                 placeholder={capitalize(field.name)}
@@ -38,10 +38,10 @@ export const BaseSubject = () => {
                 value={field.value}
                 onChange={field.onChange}
               />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </InputField>
+            </InputField>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
       )}
     />
   );
