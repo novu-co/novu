@@ -103,8 +103,7 @@ describe('Create Integration - /workflow-overrides (POST)', function () {
     };
 
     const res = await session.testAgent.post('/v1/workflow-overrides').send(payload);
-    expect(res.body.statusCode).to.equal(400);
-    expect(res.body.cause._tenantId.messages[0]).to.equal(`_tenantId must be a mongodb id`);
-    expect(res.body.statusCode).to.equal(400);
+    expect(res.body.statusCode).to.equal(422);
+    expect(res.body.errors._tenantId.messages[0]).to.equal(`_tenantId must be a mongodb id`);
   });
 });

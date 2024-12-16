@@ -25,29 +25,24 @@ describe('Delete a topic - /topics/:topicKey (DELETE)', async () => {
     const topicRetrieved = await getTopic(session, topicCreated._id, topicKey, topicName);
     expect(topicRetrieved).to.be.ok;
     await novuClient.topics.delete(topicKey);
-    const optError = await expectSdkExceptionGeneric(() => novuClient.topics.retrieve(topicKey));
-    expect(optError.error).to.be.ok;
-    if (optError.error) {
-      expect(optError.error.statusCode).to.equal(404);
-      expect(optError.parsedBody.message).to.eql(
-        `Topic not found for id ${topicKey} in the environment ${session.environment._id}`
-      );
-      expect(optError.parsedBody.error).to.eql('Not Found');
+    const { error } = await expectSdkExceptionGeneric(() => novuClient.topics.retrieve(topicKey));
+    expect(error).to.be.ok;
+    if (error) {
+      expect(error.statusCode).to.equal(404);
+      expect(error.message).to.eql(`Topic not found for id ${topicKey} in the environment ${session.environment._id}`);
+      expect(error.ctx?.error).to.eql('Not Found');
     }
   });
 
   it('should throw a not found error when trying to delete a topic that does not exist', async () => {
     const nonExistingTopicKey = 'ab12345678901234567890ab';
-    const { error, parsedBody, successfulBody } = await expectSdkExceptionGeneric(() =>
-      novuClient.topics.delete(nonExistingTopicKey)
-    );
+    const { error } = await expectSdkExceptionGeneric(() => novuClient.topics.delete(nonExistingTopicKey));
     expect(error).to.be.ok;
-    if (error && parsedBody) {
+    if (error) {
       expect(error.statusCode).to.equal(404);
-      expect(parsedBody.message).to.eql(
+      expect(error.message).to.eql(
         `Topic not found for id ${nonExistingTopicKey} in the environment ${session.environment._id}`
       );
-      expect(parsedBody.error).to.eql('Not Found');
     }
   });
 

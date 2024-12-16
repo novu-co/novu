@@ -10,8 +10,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiAuthSchemeEnum, MemberRoleEnum, UserSessionData } from '@novu/shared';
-import { ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { RolesGuard, Roles } from '@novu/application-generic';
+import { ApiExcludeController, ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Roles, RolesGuard } from '@novu/application-generic';
 import { UserSession } from '../shared/framework/user.decorator';
 import { CreateEnvironment } from './usecases/create-environment/create-environment.usecase';
 import { CreateEnvironmentCommand } from './usecases/create-environment/create-environment.command';
@@ -40,6 +40,7 @@ import { SdkGroupName } from '../shared/framework/swagger/sdk.decorators';
 @UseInterceptors(ClassSerializerInterceptor)
 @UserAuthentication()
 @ApiTags('Environments')
+@ApiExcludeController()
 export class EnvironmentsControllerV1 {
   constructor(
     private createEnvironmentUsecase: CreateEnvironment,

@@ -38,7 +38,6 @@ import {
   ApiCommonResponses,
   ApiConflictResponse,
   ApiNoContentResponse,
-  ApiNotFoundResponse,
   ApiOkResponse,
   ApiResponse,
 } from '../shared/framework/response.decorator';
@@ -213,9 +212,6 @@ export class TopicsController {
   @ExternalApiAccessible()
   @ApiNoContentResponse({
     description: 'The topic has been deleted correctly',
-  })
-  @ApiNotFoundResponse({
-    description: 'The topic with the key provided does not exist in the database so it can not be deleted.',
   })
   @ApiConflictResponse({
     description:

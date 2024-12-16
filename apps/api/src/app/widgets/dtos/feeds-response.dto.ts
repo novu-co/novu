@@ -17,7 +17,6 @@ class ActorFeedItemDto implements IActor {
     description: 'The type of the actor, indicating the role in the notification process.',
     enum: [...Object.values(ActorTypeEnum)],
     enumName: 'ActorTypeEnum',
-    example: ActorTypeEnum.USER,
     type: ActorTypeEnum,
   })
   type: ActorTypeEnum;
@@ -160,7 +159,6 @@ export class NotificationFeedItemDto implements INotificationDto {
     description: 'The channel through which the notification is sent.',
     enum: [...Object.values(ChannelTypeEnum)],
     enumName: 'ChannelTypeEnum',
-    example: ChannelTypeEnum.EMAIL,
     type: ChannelTypeEnum,
   })
   channel: ChannelTypeEnum;
@@ -212,10 +210,10 @@ export class NotificationFeedItemDto implements INotificationDto {
     description: 'The payload that was used to send the notification trigger.',
     type: 'object',
     additionalProperties: true,
-    required: true,
+    required: false,
     example: { key: 'value' },
   })
-  payload: Record<string, unknown>;
+  payload?: Record<string, unknown>;
 
   @ApiProperty({
     description: 'Provider-specific overrides used when triggering the notification.',
