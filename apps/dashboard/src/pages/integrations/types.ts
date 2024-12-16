@@ -12,3 +12,15 @@ export interface ITableIntegration {
   primary?: boolean;
   isPrimary?: boolean;
 }
+
+export interface IntegrationFormData {
+  name: string;
+  identifier: string;
+  active: boolean;
+  primary: boolean;
+  credentials: Record<string, any>;
+  check: boolean;
+  environmentId: string;
+}
+
+export type IntegrationStep = 'select' | 'configure';
