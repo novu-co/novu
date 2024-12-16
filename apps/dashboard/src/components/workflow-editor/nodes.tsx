@@ -121,7 +121,7 @@ export const InAppNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'In-App Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>Sends In-app notification to your subscribers</NodeBody>
+        <NodeBody>Sends In-App notification to your subscribers</NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />

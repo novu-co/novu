@@ -1,8 +1,8 @@
 import { Badge } from '@/components/primitives/badge';
 import { Card } from '@/components/primitives/card';
 import { Check } from 'lucide-react';
-import { PlanActionButton } from './plan-action-button';
 import { ContactSalesButton } from './contact-sales-button';
+import { PlanActionButton } from './plan-action-button';
 
 interface PlansRowProps {
   selectedBillingInterval: 'month' | 'year';
@@ -87,7 +87,7 @@ export function PlansRow({ selectedBillingInterval, currentPlan, trial }: PlansR
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <Check className="text-primary h-4 w-4" />
-                <span>Up to 10 team members</span>
+                <span>Up to 50 team members</span>
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <Check className="text-primary h-4 w-4" />
