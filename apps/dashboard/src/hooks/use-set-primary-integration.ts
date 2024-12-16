@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { post } from '../api/api.client';
 import { useEnvironment } from '../context/environment/hooks';
+import { setAsPrimaryIntegration } from '../api/integrations';
+import { QueryKeys } from '../utils/query-keys';
 
 interface SetPrimaryIntegrationParams {
   integrationId: string;
@@ -12,12 +13,10 @@ export function useSetPrimaryIntegration() {
 
   return useMutation({
     mutationFn: async ({ integrationId }: SetPrimaryIntegrationParams) => {
-      return post(`/integrations/${integrationId}/set-primary`, {
-        environment: currentEnvironment,
-      });
+      return setAsPrimaryIntegration(integrationId, currentEnvironment!);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['integrations'] });
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.fetchIntegrations] });
     },
   });
 }

@@ -1,16 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { IIntegration } from '@novu/shared';
-import { put } from '../api/api.client';
 import { useEnvironment } from '../context/environment/hooks';
-
-interface UpdateIntegrationData {
-  name: string;
-  identifier: string;
-  active: boolean;
-  primary: boolean;
-  credentials: Record<string, string>;
-  check: boolean;
-}
+import { QueryKeys } from '../utils/query-keys';
+import { updateIntegration, UpdateIntegrationData } from '../api/integrations';
 
 interface UpdateIntegrationVariables {
   integrationId: string;
@@ -23,14 +15,10 @@ export function useUpdateIntegration() {
 
   return useMutation<IIntegration, Error, UpdateIntegrationVariables>({
     mutationFn: async ({ integrationId, data }) => {
-      const response = await put<IIntegration>(`/integrations/${integrationId}`, {
-        body: data,
-        environment: currentEnvironment,
-      });
-      return response;
+      return updateIntegration(integrationId, data, currentEnvironment!);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['integrations'] });
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.fetchIntegrations] });
     },
   });
 }
