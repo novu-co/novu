@@ -18,7 +18,7 @@ export const TestWorkflowPage = () => {
     <>
       <PageMeta title={`Trigger ${workflow?.name}`} />
       <EditWorkflowLayout headerStartItems={<EditorBreadcrumbs />}>
-        {testData && <TestWorkflowTabs testData={testData} />}
+        <TestWorkflowTabs testData={testData} />
         <Toaster />
       </EditWorkflowLayout>
     </>

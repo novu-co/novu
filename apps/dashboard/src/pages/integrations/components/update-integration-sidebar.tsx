@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { useFetchIntegrations } from '@/hooks/use-fetch-integrations';
 import { useProviders } from '@/hooks/use-providers';
-import { useDeleteIntegration } from '@/hooks/use-delete-integration';
 import { useIntegrationForm } from './hooks/use-integration-form';
 import { IntegrationConfiguration } from './integration-configuration';
 import { Button } from '@/components/primitives/button';
@@ -11,6 +10,7 @@ import { SelectPrimaryIntegrationModal } from './modals/select-primary-integrati
 import { IntegrationSheet } from './integration-sheet';
 import { ChannelTypeEnum } from '@novu/shared';
 import { IntegrationFormData } from '../types';
+import { useDeleteIntegration } from '../../../hooks/use-delete-integration';
 
 interface UpdateIntegrationSidebarProps {
   isOpened: boolean;

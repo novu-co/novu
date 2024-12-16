@@ -41,7 +41,7 @@ export function WorkflowList() {
   }
 
   return (
-    <div className="flex h-full flex-col px-2.5 py-2 pt-0">
+    <div className="flex h-full flex-col px-2.5 py-2">
       <Table>
         <TableHeader>
           <TableRow>

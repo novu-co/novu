@@ -7,12 +7,14 @@ import { Separator } from '@/components/primitives/separator';
 import { Switch } from '@/components/primitives/switch';
 import { HelpTooltipIndicator } from '@/components/primitives/help-tooltip-indicator';
 import { SecretInput } from '@/components/primitives/secret-input';
-import { RiInputField } from 'react-icons/ri';
+import { RiGitBranchLine, RiInputField } from 'react-icons/ri';
 import { Info } from 'lucide-react';
 import { CredentialsKeyEnum, IIntegration, IProviderConfig } from '@novu/shared';
 import { useEffect } from 'react';
 import { InlineToast } from '../../../components/primitives/inline-toast';
 import { isDemoIntegration } from '../utils/is-demo-integration';
+import { SegmentedControl, SegmentedControlList } from '../../../components/primitives/segmented-control';
+import { SegmentedControlTrigger } from '../../../components/primitives/segmented-control';
 
 interface IntegrationFormData {
   name: string;
@@ -20,6 +22,7 @@ interface IntegrationFormData {
   credentials: Record<string, string>;
   active: boolean;
   primary: boolean;
+  environment: 'development' | 'production';
 }
 
 interface IntegrationConfigurationProps {
@@ -61,6 +64,7 @@ export function IntegrationConfiguration({ provider, integration, onSubmit, mode
           active: integration.active,
           primary: integration.primary ?? false,
           credentials: integration.credentials as Record<string, string>,
+          environment: 'development',
         }
       : {
           name: provider?.displayName ?? '',
@@ -68,6 +72,7 @@ export function IntegrationConfiguration({ provider, integration, onSubmit, mode
           active: true,
           primary: true,
           credentials: {},
+          environment: 'development',
         },
   });
 
@@ -93,6 +98,28 @@ export function IntegrationConfiguration({ provider, integration, onSubmit, mode
   return (
     <Form {...form}>
       <form id="integration-configuration-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+        <div className="flex items-center justify-between gap-2 p-3">
+          <Label className="text-sm" htmlFor="environment">
+            Environment
+          </Label>
+          <SegmentedControl
+            value={watch('environment')}
+            onValueChange={(value) => setValue('environment', value as 'development' | 'production')}
+            className="w-full max-w-[260px]"
+          >
+            <SegmentedControlList>
+              <SegmentedControlTrigger value="development">
+                <RiGitBranchLine className="border-warning text-warning size-4" />
+                Development
+              </SegmentedControlTrigger>
+              <SegmentedControlTrigger value="production">
+                <RiGitBranchLine className="border-feature text-feature size-4" />
+                Production
+              </SegmentedControlTrigger>
+            </SegmentedControlList>
+          </SegmentedControl>
+        </div>
+
         <Accordion type="single" collapsible defaultValue="layout" className="p-3">
           <AccordionItem value="layout">
             <AccordionTrigger>

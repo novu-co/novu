@@ -8,6 +8,7 @@ export default {
       sm: '0px 1px 2px 0px #1018280F,0px 1px 3px 0px #1018281A',
       md: '0px 16px 32px -12px rgba(14, 18, 27, 0.10)',
       DEFAULT: '0px 16px 32px -12px #0E121B1A',
+      'toggle-switch': ['0 6px 10px 0 #0e121b0f', '0 2px 4px 0 #0e121b08'],
     },
 
     colors: {
