@@ -33,7 +33,7 @@ export const getComponentByType = ({ component }: { component?: UiComponentEnum 
     case UiComponentEnum.DELAY_TYPE: {
       return <DelayAmount />;
     }
-    case UiComponentEnum.MAILY: {
+    case UiComponentEnum.BLOCK_EDITOR: {
       return <Maily />;
     }
     case UiComponentEnum.TEXT_INLINE_LABEL: {

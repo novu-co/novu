@@ -13,12 +13,8 @@ export class ProcessBulkTrigger {
 
   async execute(command: ProcessBulkTriggerCommand) {
     const results: TriggerEventResponseDto[] = [];
-    console.log('event.to', JSON.stringify(command));
-
     for (const event of command.events) {
       let result: TriggerEventResponseDto;
-      console.log('event.to', event.to);
-      console.log('event.to', event.payload);
       try {
         result = (await this.parseEventRequest.execute(
           ParseEventRequestMulticastCommand.create({
