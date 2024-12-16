@@ -70,7 +70,7 @@ function StepItem({ step, environmentSlug }: StepItemProps) {
 
       <Link
         to={getStepRoute(step.id, environmentSlug, isNewIntegrationStoreEnabled).path}
-        reloadDocument={getStepRoute(step.id, isNewIntegrationStoreEnabled).isLegacy}
+        reloadDocument={getStepRoute(step.id, environmentSlug, isNewIntegrationStoreEnabled).isLegacy}
         className="w-full"
         onClick={handleStepClick}
       >

@@ -1,12 +1,10 @@
 import { ChannelTypeEnum } from '@novu/shared';
 import { useCallback, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import { IntegrationsList } from './components/integrations-list';
 import { ITableIntegration } from './types';
 import { DashboardLayout } from '../../components/dashboard-layout';
-import { useEnvironment } from '@/context/environment/hooks';
-import { buildRoute, ROUTES } from '@/utils/routes';
 import { UpdateIntegrationSidebar } from './components/update-integration-sidebar';
 import { CreateIntegrationSidebar } from './components/create-integration-sidebar';
 import { Badge } from '../../components/primitives/badge';
@@ -14,9 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitive
 import { Button } from '@/components/primitives/button';
 
 export function IntegrationsListPage() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { currentEnvironment: environment } = useEnvironment();
   const [selectedIntegrationId, setSelectedIntegrationId] = useState<string>();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -27,17 +23,6 @@ export function IntegrationsListPage() {
   const onAddIntegrationClickCallback = useCallback(() => {
     setIsCreateModalOpen(true);
   }, []);
-
-  const onChannelClickCallback = useCallback(
-    (channel: ChannelTypeEnum) => {
-      setIsCreateModalOpen(true);
-      if (!environment?.slug) return;
-      navigate(`${buildRoute(ROUTES.INTEGRATIONS, { environmentSlug: environment.slug })}?scrollTo=${channel}`, {
-        replace: true,
-      });
-    },
-    [navigate, environment]
-  );
 
   return (
     <DashboardLayout
