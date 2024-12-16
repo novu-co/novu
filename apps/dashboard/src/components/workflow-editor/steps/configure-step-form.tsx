@@ -313,42 +313,38 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
           )}
 
           {!isSupportedStep && (
-            <>
-              <SidebarContent>
-                <SdkBanner />
-              </SidebarContent>
-            </>
+            <SidebarContent>
+              <SdkBanner />
+            </SidebarContent>
           )}
 
           {!isReadOnly && (
-            <>
-              <SidebarFooter>
-                <Separator />
-                <ConfirmationModal
-                  open={isDeleteModalOpen}
-                  onOpenChange={setIsDeleteModalOpen}
-                  onConfirm={onDeleteStep}
-                  title="Proceeding will delete the step"
-                  description={
-                    <>
-                      You're about to delete the{' '}
-                      <TruncatedText className="max-w-[32ch] font-bold">{step.name}</TruncatedText> step, this action is
-                      permanent.
-                    </>
-                  }
-                  confirmButtonText="Delete"
-                />
-                <Button
-                  variant="ghostDestructive"
-                  className="gap-1.5 text-xs"
-                  type="button"
-                  onClick={() => setIsDeleteModalOpen(true)}
-                >
-                  <RiDeleteBin2Line className="size-4" />
-                  Delete step
-                </Button>
-              </SidebarFooter>
-            </>
+            <SidebarFooter>
+              <Separator />
+              <ConfirmationModal
+                open={isDeleteModalOpen}
+                onOpenChange={setIsDeleteModalOpen}
+                onConfirm={onDeleteStep}
+                title="Proceeding will delete the step"
+                description={
+                  <>
+                    You're about to delete the{' '}
+                    <TruncatedText className="max-w-[32ch] font-bold">{step.name}</TruncatedText> step, this action is
+                    permanent.
+                  </>
+                }
+                confirmButtonText="Delete"
+              />
+              <Button
+                variant="ghostDestructive"
+                className="gap-1.5 text-xs"
+                type="button"
+                onClick={() => setIsDeleteModalOpen(true)}
+              >
+                <RiDeleteBin2Line className="size-4" />
+                Delete step
+              </Button>
+            </SidebarFooter>
           )}
         </motion.div>
       </AnimatePresence>
