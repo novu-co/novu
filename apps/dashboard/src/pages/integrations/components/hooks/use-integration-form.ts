@@ -1,76 +1,13 @@
 import { useCallback } from 'react';
-import { toast } from 'sonner';
-import { useQueryClient } from '@tanstack/react-query';
-import { useEnvironment } from '@/context/environment/hooks';
-import { QueryKeys } from '@/utils/query-keys';
-import { CheckIntegrationResponseEnum } from '@/api/integrations';
-import { CHANNELS_WITH_PRIMARY, IIntegration, IProviderConfig } from '@novu/shared';
-import { useUpdateIntegration } from '@/hooks/use-update-integration';
-import { useSetPrimaryIntegration } from '@/hooks/use-set-primary-integration';
+import { CHANNELS_WITH_PRIMARY, IIntegration } from '@novu/shared';
 import { IntegrationFormData } from '../../types';
 
 interface UseIntegrationFormProps {
-  onClose: () => void;
   integration?: IIntegration;
   integrations?: IIntegration[];
-  createIntegration?: (params: { data: IntegrationFormData; provider: IProviderConfig }) => Promise<any>;
 }
 
-export function useIntegrationForm({ onClose, integration, integrations, createIntegration }: UseIntegrationFormProps) {
-  const queryClient = useQueryClient();
-  const { currentEnvironment } = useEnvironment();
-  const { mutateAsync: updateIntegration, isPending: isUpdating } = useUpdateIntegration();
-  const { mutateAsync: setPrimaryIntegration, isPending: isSettingPrimary } = useSetPrimaryIntegration();
-
-  const executeUpdate = useCallback(
-    async (data: IntegrationFormData) => {
-      if (!integration) return;
-
-      try {
-        await updateIntegration({
-          integrationId: integration._id,
-          data: {
-            name: data.name,
-            identifier: data.identifier,
-            active: data.active,
-            primary: data.primary,
-            credentials: data.credentials,
-            check: data.check,
-          },
-        });
-
-        if (data.primary) {
-          await setPrimaryIntegration({ integrationId: integration._id });
-        }
-
-        await queryClient.invalidateQueries({
-          queryKey: [QueryKeys.fetchIntegrations, currentEnvironment?._id],
-        });
-        onClose();
-      } catch (error: any) {
-        handleError(error);
-      }
-    },
-    [integration, updateIntegration, setPrimaryIntegration, queryClient, currentEnvironment?._id, onClose]
-  );
-
-  const executeCreate = useCallback(
-    async (data: IntegrationFormData, provider: IProviderConfig) => {
-      if (!createIntegration) return;
-
-      try {
-        await createIntegration({ data, provider });
-        await queryClient.invalidateQueries({
-          queryKey: [QueryKeys.fetchIntegrations, currentEnvironment?._id],
-        });
-        onClose();
-      } catch (error: any) {
-        handleError(error);
-      }
-    },
-    [createIntegration, queryClient, currentEnvironment?._id, onClose]
-  );
-
+export function useIntegrationForm({ integration, integrations }: UseIntegrationFormProps) {
   const shouldShowPrimaryModal = useCallback(
     (data: IntegrationFormData) => {
       if (!integration || !integrations) return false;
@@ -97,26 +34,6 @@ export function useIntegrationForm({ onClose, integration, integrations, createI
   );
 
   return {
-    executeUpdate,
-    executeCreate,
     shouldShowPrimaryModal,
-    isUpdating,
-    isSettingPrimary,
   };
-}
-
-function handleError(error: any) {
-  if (error?.message?.code === CheckIntegrationResponseEnum.INVALID_EMAIL) {
-    toast.error('Invalid sender email', {
-      description: error.message?.message,
-    });
-  } else if (error?.message?.code === CheckIntegrationResponseEnum.BAD_CREDENTIALS) {
-    toast.error('Invalid credentials or credentials expired', {
-      description: error.message?.message,
-    });
-  } else {
-    toast.error('Failed to update integration', {
-      description: error?.message?.message || error?.message || 'There was an error updating the integration.',
-    });
-  }
 }

@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 import { useFetchIntegrations } from '@/hooks/use-fetch-integrations';
 import { useProviders } from '@/hooks/use-providers';
+import { useEnvironment } from '@/context/environment/hooks';
+import { QueryKeys } from '@/utils/query-keys';
+import { useUpdateIntegration } from '@/hooks/use-update-integration';
+import { useSetPrimaryIntegration } from '@/hooks/use-set-primary-integration';
 import { useIntegrationForm } from './hooks/use-integration-form';
 import { IntegrationConfiguration } from './integration-configuration';
 import { Button } from '@/components/primitives/button';
@@ -11,6 +16,8 @@ import { IntegrationSheet } from './integration-sheet';
 import { ChannelTypeEnum } from '@novu/shared';
 import { IntegrationFormData } from '../types';
 import { useDeleteIntegration } from '../../../hooks/use-delete-integration';
+import { CheckIntegrationResponseEnum } from '@/api/integrations';
+import { handleIntegrationError } from './utils/handle-integration-error';
 
 interface UpdateIntegrationSidebarProps {
   isOpened: boolean;
@@ -19,9 +26,13 @@ interface UpdateIntegrationSidebarProps {
 }
 
 export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: UpdateIntegrationSidebarProps) {
+  const queryClient = useQueryClient();
+  const { currentEnvironment } = useEnvironment();
   const { integrations } = useFetchIntegrations();
   const { providers } = useProviders();
   const { deleteIntegration, isLoading: isDeleting } = useDeleteIntegration();
+  const { mutateAsync: updateIntegration, isPending: isUpdating } = useUpdateIntegration();
+  const { mutateAsync: setPrimaryIntegration, isPending: isSettingPrimary } = useSetPrimaryIntegration();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isPrimaryModalOpen, setIsPrimaryModalOpen] = useState(false);
   const [pendingUpdate, setPendingUpdate] = useState<IntegrationFormData | null>(null);
@@ -32,13 +43,14 @@ export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: U
     (i) => i.primary && i.channel === integration?.channel && i._id !== integration?._id
   );
 
-  const { executeUpdate, shouldShowPrimaryModal, isUpdating, isSettingPrimary } = useIntegrationForm({
-    onClose,
+  const { shouldShowPrimaryModal } = useIntegrationForm({
     integration,
     integrations,
   });
 
   const handleSubmit = async (data: IntegrationFormData) => {
+    if (!integration) return;
+
     if (shouldShowPrimaryModal(data)) {
       setIsPrimaryModalOpen(true);
 
@@ -55,12 +67,47 @@ export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: U
       return;
     }
 
-    await executeUpdate(data);
+    try {
+      await updateIntegration({
+        integrationId: integration._id,
+        data: {
+          name: data.name,
+          identifier: data.identifier,
+          active: data.active,
+          primary: data.primary,
+          credentials: data.credentials,
+          check: data.check,
+        },
+      });
+
+      if (data.primary) {
+        await setPrimaryIntegration({ integrationId: integration._id });
+      }
+
+      await queryClient.invalidateQueries({
+        queryKey: [QueryKeys.fetchIntegrations, currentEnvironment?._id],
+      });
+      onClose();
+    } catch (error: any) {
+      if (error?.message?.code === CheckIntegrationResponseEnum.INVALID_EMAIL) {
+        toast.error('Invalid sender email', {
+          description: error.message?.message,
+        });
+      } else if (error?.message?.code === CheckIntegrationResponseEnum.BAD_CREDENTIALS) {
+        toast.error('Invalid credentials or credentials expired', {
+          description: error.message?.message,
+        });
+      } else {
+        toast.error('Failed to update integration', {
+          description: error?.message?.message || error?.message || 'There was an error updating the integration.',
+        });
+      }
+    }
   };
 
   const handlePrimaryConfirm = async () => {
     if (pendingUpdate) {
-      await executeUpdate(pendingUpdate);
+      await handleSubmit(pendingUpdate);
       setPendingUpdate(null);
     }
     setIsPrimaryModalOpen(false);
@@ -75,9 +122,7 @@ export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: U
       setIsDeleteDialogOpen(false);
       onClose();
     } catch (error: any) {
-      toast.error('Failed to delete integration', {
-        description: error?.message || 'There was an error deleting the integration.',
-      });
+      handleIntegrationError(error, 'delete');
     }
   };
 

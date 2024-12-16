@@ -1,13 +1,16 @@
 import { ChannelTypeEnum } from '@novu/shared';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEnvironment } from '@/context/environment/hooks';
+import { QueryKeys } from '@/utils/query-keys';
 import { useProviders } from '@/hooks/use-providers';
 import { useCreateIntegration } from '@/hooks/use-create-integration';
 import { useIntegrationList } from './hooks/use-integration-list';
-import { useIntegrationForm } from './hooks/use-integration-form';
 import { useSidebarNavigationManager } from './hooks/use-sidebar-navigation-manager';
 import { IntegrationSheet } from './integration-sheet';
 import { ChannelTabs } from './channel-tabs';
 import { IntegrationConfiguration } from './integration-configuration';
 import { Button } from '../../../components/primitives/button';
+import { handleIntegrationError } from './utils/handle-integration-error';
 
 export interface CreateIntegrationSidebarProps {
   isOpened: boolean;
@@ -16,6 +19,8 @@ export interface CreateIntegrationSidebarProps {
 }
 
 export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegrationSidebarProps) {
+  const queryClient = useQueryClient();
+  const { currentEnvironment } = useEnvironment();
   const { providers } = useProviders();
   const { mutateAsync: createIntegration, isPending } = useCreateIntegration();
   const { selectedIntegration, step, searchQuery, onIntegrationSelect, onBack } = useSidebarNavigationManager({
@@ -23,9 +28,12 @@ export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegratio
   });
 
   const { integrationsByChannel } = useIntegrationList(providers, searchQuery);
-  const { executeCreate } = useIntegrationForm({
-    onClose,
-    createIntegration: async ({ data, provider }) => {
+  const provider = providers?.find((p) => p.id === selectedIntegration);
+
+  const onSubmit = async (data: any) => {
+    if (!provider) return;
+
+    try {
       await createIntegration({
         providerId: provider.id,
         channel: provider.channel,
@@ -35,15 +43,14 @@ export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegratio
         active: data.active,
         _environmentId: data.environmentId,
       });
-    },
-  });
 
-  const provider = providers?.find((p) => p.id === selectedIntegration);
-
-  const onSubmit = async (data: any) => {
-    if (!provider) return;
-
-    await executeCreate(data, provider);
+      await queryClient.invalidateQueries({
+        queryKey: [QueryKeys.fetchIntegrations, currentEnvironment?._id],
+      });
+      onClose();
+    } catch (error: any) {
+      handleIntegrationError(error, 'create');
+    }
   };
 
   return (
