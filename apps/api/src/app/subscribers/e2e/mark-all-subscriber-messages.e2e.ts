@@ -24,14 +24,14 @@ describe('Mark All Subscriber Messages - /subscribers/:subscriberId/messages/mar
 
   it("should throw not found when subscriberId doesn't exist", async function () {
     const fakeSubscriberId = 'fake-subscriber-id';
-    const { error, parsedBody, successfulBody } = await expectSdkExceptionGeneric(() =>
+    const { error } = await expectSdkExceptionGeneric(() =>
       markAllSubscriberMessagesAs(fakeSubscriberId, MessagesStatusEnum.READ)
     );
-    if (!error || !parsedBody) {
+    if (!error) {
       throw new Error('Call Should fail');
     }
     expect(error.statusCode).to.equal(404);
-    expect(parsedBody.message).to.equal(
+    expect(error.message, JSON.stringify(error)).to.equal(
       `Subscriber ${fakeSubscriberId} does not exist in environment ${session.environment._id}, ` +
         'please provide a valid subscriber identifier'
     );

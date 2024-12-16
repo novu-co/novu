@@ -34,7 +34,7 @@ const STEP_TYPE_TO_SKELETON_CONTENT: Record<StepTypeEnum | string, () => React.J
       <>
         <div className="flex items-center gap-2.5 text-sm font-medium">
           <Notification5Fill className="size-3" />
-          <span>In-app template editor</span>
+          <span>In-App template editor</span>
         </div>
         <div className="flex flex-col gap-1 rounded-xl border border-neutral-100 p-1">
           <div className="flex gap-1">
