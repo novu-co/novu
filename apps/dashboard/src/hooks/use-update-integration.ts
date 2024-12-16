@@ -4,10 +4,10 @@ import { useEnvironment } from '../context/environment/hooks';
 import { QueryKeys } from '../utils/query-keys';
 import { updateIntegration, UpdateIntegrationData } from '../api/integrations';
 
-interface UpdateIntegrationVariables {
+type UpdateIntegrationVariables = {
   integrationId: string;
   data: UpdateIntegrationData;
-}
+};
 
 export function useUpdateIntegration() {
   const { currentEnvironment } = useEnvironment();

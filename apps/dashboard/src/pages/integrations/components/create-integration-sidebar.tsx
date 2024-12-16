@@ -1,7 +1,4 @@
 import { ChannelTypeEnum, providers as novuProviders } from '@novu/shared';
-import { useQueryClient } from '@tanstack/react-query';
-import { useEnvironment } from '@/context/environment/hooks';
-import { QueryKeys } from '@/utils/query-keys';
 import { useCreateIntegration } from '@/hooks/use-create-integration';
 import { useIntegrationList } from './hooks/use-integration-list';
 import { useSidebarNavigationManager } from './hooks/use-sidebar-navigation-manager';
@@ -18,8 +15,6 @@ export type CreateIntegrationSidebarProps = {
 };
 
 export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegrationSidebarProps) {
-  const queryClient = useQueryClient();
-  const { currentEnvironment } = useEnvironment();
   const providers = novuProviders;
   const { mutateAsync: createIntegration, isPending } = useCreateIntegration();
   const { selectedIntegration, step, searchQuery, onIntegrationSelect, onBack } = useSidebarNavigationManager({
@@ -43,9 +38,6 @@ export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegratio
         _environmentId: data.environmentId,
       });
 
-      await queryClient.invalidateQueries({
-        queryKey: [QueryKeys.fetchIntegrations, currentEnvironment?._id],
-      });
       onClose();
     } catch (error: any) {
       handleIntegrationError(error, 'create');

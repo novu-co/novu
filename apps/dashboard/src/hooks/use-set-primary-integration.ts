@@ -3,9 +3,9 @@ import { useEnvironment } from '../context/environment/hooks';
 import { setAsPrimaryIntegration } from '../api/integrations';
 import { QueryKeys } from '../utils/query-keys';
 
-interface SetPrimaryIntegrationParams {
+type SetPrimaryIntegrationParams = {
   integrationId: string;
-}
+};
 
 export function useSetPrimaryIntegration() {
   const { currentEnvironment } = useEnvironment();
