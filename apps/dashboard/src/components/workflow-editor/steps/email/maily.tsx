@@ -3,6 +3,23 @@ import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { cn } from '@/utils/ui';
 import { Editor } from '@maily-to/core';
+import {
+  blockquote,
+  bulletList,
+  button,
+  columns,
+  divider,
+  forLoop,
+  hardBreak,
+  heading1,
+  heading2,
+  heading3,
+  image,
+  orderedList,
+  section,
+  spacer,
+  text,
+} from '@maily-to/core/blocks';
 import type { Editor as TiptapEditor } from '@tiptap/core';
 import { HTMLAttributes, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -29,9 +46,26 @@ export const Maily = (props: MailyProps) => {
                 <Editor
                   config={{
                     hasMenuBar: false,
-                    wrapClassName: 'h-full ',
+                    wrapClassName: 'h-full w-full',
                     bodyClassName: '!bg-transparent h-full !border-none !mt-0 [&>div]:h-full [&_.tiptap]:h-full',
                   }}
+                  blocks={[
+                    text,
+                    heading1,
+                    heading2,
+                    heading3,
+                    bulletList,
+                    orderedList,
+                    image,
+                    section,
+                    columns,
+                    forLoop,
+                    divider,
+                    spacer,
+                    button,
+                    hardBreak,
+                    blockquote,
+                  ]}
                   triggerSuggestionCharacter="{{"
                   variables={variables.map((v) => ({ name: v.label, required: false }))}
                   contentJson={field.value ? JSON.parse(field.value) : undefined}

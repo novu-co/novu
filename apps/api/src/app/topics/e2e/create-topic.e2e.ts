@@ -62,11 +62,11 @@ describe('Topic creation - /topics (POST)', async () => {
         { retryCodes: ['404'] }
       )
     );
-    expect(conflictResponse.error && conflictResponse.parsedBody).to.be.ok;
+    expect(conflictResponse.error).to.be.ok;
     if (conflictResponse.error) {
       expect(conflictResponse.error.statusCode).to.eql(409);
-      expect(conflictResponse.parsedBody.error).to.eql('Conflict');
-      expect(conflictResponse.parsedBody.message).to.eql(
+      expect(conflictResponse.error.ctx?.error).to.eql('Conflict');
+      expect(conflictResponse.error.message).to.eql(
         `Topic exists with key ${topicKey} in the environment ${session.environment._id} of the organization ${session.organization._id}`
       );
     }
