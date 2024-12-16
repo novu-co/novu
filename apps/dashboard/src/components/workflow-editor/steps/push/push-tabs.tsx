@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { useFormContext } from 'react-hook-form';
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
@@ -10,10 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitive
 import { StepEditorProps } from '@/components/workflow-editor/steps/configure-step-template-form';
 import { EmailEditor } from '@/components/workflow-editor/steps/email/email-editor';
 import { EmailEditorPreview } from '@/components/workflow-editor/steps/email/email-editor-preview';
-import { CustomStepControls } from '../controls/custom-step-controls';
-import { EmailTabsSection } from '@/components/workflow-editor/steps/email/email-tabs-section';
 import { WorkflowOriginEnum } from '@novu/shared';
-import { useState } from 'react';
+import { CustomStepControls } from '../controls/custom-step-controls';
 
 const tabsContentClassName = 'h-full w-full overflow-y-auto data-[state=inactive]:hidden';
 
@@ -60,9 +59,7 @@ export const PushTabs = (props: StepEditorProps) => {
       <TabsContent value="editor" forceMount className={tabsContentClassName}>
         {workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && uiSchema && <EmailEditor uiSchema={uiSchema} />}
         {workflow.origin === WorkflowOriginEnum.EXTERNAL && (
-          <EmailTabsSection>
-            <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
-          </EmailTabsSection>
+          <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
         )}
       </TabsContent>
       <TabsContent value="preview" forceMount className={tabsContentClassName}>
