@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 import { RJSFSchema } from '@rjsf/utils';
 import { type ControlsMetadata } from '@novu/shared';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/primitives/collapsible';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/primitives/form/form';
 import { Separator } from '@/components/primitives/separator';
 import { Switch } from '@/components/primitives/switch';
 import { WorkflowOriginEnum } from '@/utils/enums';
@@ -28,6 +27,7 @@ const CONTROLS_DOCS_LINK = 'https://docs.novu.co/concepts/controls';
 export const CustomStepControls = (props: CustomStepControlsProps) => {
   const { className, dataSchema, origin, ...rest } = props;
   const [isEditorOpen, setIsEditorOpen] = useState(true);
+  const [isOverridden, setIsOverriden] = useState(false);
   const [isRestoreDefaultModalOpen, setIsRestoreDefaultModalOpen] = useState(false);
   const { step } = useWorkflow();
   const { reset } = useFormContext();
@@ -113,35 +113,24 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
         description="All edits will be discarded, and defaults will be restored from the code."
         confirmButtonText="Proceed anyway"
       />
-      <Form {...overrideForm}>
-        <FormField
-          control={overrideForm.control}
-          name="override"
-          render={({ field }) => (
-            <FormItem className="mb-6 mt-2 flex w-full items-center justify-between">
-              <div>
-                <FormLabel className="block">Override code defined defaults</FormLabel>
-                <span className="text-xs text-neutral-400">
-                  Code-defined defaults are read-only by default, you can override them using this toggle.
-                </span>
-              </div>
-              <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={(checked) => {
-                    if (!checked) {
-                      setIsRestoreDefaultModalOpen(true);
-                      return;
-                    }
-                    field.onChange(checked);
-                  }}
-                />
-              </FormControl>
-            </FormItem>
-          )}
+      <div className="mb-6 mt-2 flex w-full items-center justify-between">
+        <div>
+          <span className="block">Override code defined defaults</span>
+          <span className="text-xs text-neutral-400">
+            Code-defined defaults are read-only by default, you can override them using this toggle.
+          </span>
+        </div>
+        <Switch
+          checked={isOverridden}
+          onCheckedChange={(checked) => {
+            if (!checked) {
+              setIsRestoreDefaultModalOpen(true);
+              return;
+            }
+            setIsOverriden(checked);
+          }}
         />
-      </Form>
-
+      </div>
       <Separator className="mb-3" />
 
       <Collapsible
