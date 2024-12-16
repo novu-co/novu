@@ -4,11 +4,11 @@ import { IProviderConfig } from '@novu/shared';
 import { IntegrationListItem } from './integration-list-item';
 import { INTEGRATION_CHANNELS } from '../utils/channels';
 
-interface ChannelTabsProps {
+type ChannelTabsProps = {
   integrationsByChannel: Record<string, IProviderConfig[]>;
   searchQuery: string;
   onIntegrationSelect: (integrationId: string) => void;
-}
+};
 
 export function ChannelTabs({ integrationsByChannel, searchQuery, onIntegrationSelect }: ChannelTabsProps) {
   return (

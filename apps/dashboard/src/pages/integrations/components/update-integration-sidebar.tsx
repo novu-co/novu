@@ -6,13 +6,12 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { QueryKeys } from '@/utils/query-keys';
 import { useUpdateIntegration } from '@/hooks/use-update-integration';
 import { useSetPrimaryIntegration } from '@/hooks/use-set-primary-integration';
-import { useIntegrationForm } from './hooks/use-integration-form';
 import { IntegrationConfiguration } from './integration-configuration';
 import { Button } from '@/components/primitives/button';
 import { DeleteIntegrationModal } from './modals/delete-integration-modal';
 import { SelectPrimaryIntegrationModal } from './modals/select-primary-integration-modal';
 import { IntegrationSheet } from './integration-sheet';
-import { ChannelTypeEnum, providers as novuProviders } from '@novu/shared';
+import { ChannelTypeEnum, providers as novuProviders, IIntegration, CHANNELS_WITH_PRIMARY } from '@novu/shared';
 import { IntegrationFormData } from '../types';
 import { useDeleteIntegration } from '../../../hooks/use-delete-integration';
 import { handleIntegrationError } from './utils/handle-integration-error';
@@ -41,11 +40,6 @@ export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: U
     (i) => i.primary && i.channel === integration?.channel && i._id !== integration?._id
   );
 
-  const { shouldShowPrimaryModal } = useIntegrationForm({
-    integration,
-    integrations,
-  });
-
   const handleSubmit = async (data: IntegrationFormData, skipPrimaryCheck = false) => {
     if (!integration) return;
 
@@ -57,7 +51,7 @@ export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: U
       data.check = false;
     }
 
-    if (!skipPrimaryCheck && shouldShowPrimaryModal(data)) {
+    if (!skipPrimaryCheck && shouldShowPrimaryModal(data, integration, integrations)) {
       setIsPrimaryModalOpen(true);
 
       setPendingUpdate(data);
@@ -171,5 +165,31 @@ export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: U
         isLoading={isUpdating || isSettingPrimary}
       />
     </>
+  );
+}
+
+function shouldShowPrimaryModal(
+  data: IntegrationFormData,
+  integration: IIntegration,
+  integrations: IIntegration[] = []
+) {
+  if (!integration || !integrations) return false;
+
+  const hasSameChannelActiveIntegration = integrations?.some(
+    (el) => el._id !== integration._id && el.active && el.channel === integration.channel
+  );
+
+  const isChangingToActive = !integration.active && data.active;
+  const isChangingToInactiveAndPrimary = integration.active && !data.active && integration.primary;
+  const isChangingToPrimary = !integration.primary && data.primary;
+  const isChannelSupportPrimary = CHANNELS_WITH_PRIMARY.includes(integration.channel);
+  const existingPrimaryIntegration = integrations?.find(
+    (el) => el._id !== integration._id && el.primary && el.channel === integration.channel
+  );
+
+  return (
+    isChannelSupportPrimary &&
+    (isChangingToActive || isChangingToInactiveAndPrimary || (isChangingToPrimary && existingPrimaryIntegration)) &&
+    hasSameChannelActiveIntegration
   );
 }

@@ -11,11 +11,11 @@ import { IntegrationConfiguration } from './integration-configuration';
 import { Button } from '../../../components/primitives/button';
 import { handleIntegrationError } from './utils/handle-integration-error';
 
-export interface CreateIntegrationSidebarProps {
+export type CreateIntegrationSidebarProps = {
   isOpened: boolean;
   onClose: () => void;
   scrollToChannel?: ChannelTypeEnum;
-}
+};
 
 export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegrationSidebarProps) {
   const queryClient = useQueryClient();
