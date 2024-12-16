@@ -235,7 +235,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                 <SidebarContent>
                   <FormField
                     control={form.control}
-                    name={'name'}
+                    name="name"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Name</FormLabel>
