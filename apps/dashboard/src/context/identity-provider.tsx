@@ -27,6 +27,7 @@ export function IdentityProvider({ children }: { children: React.ReactNode }) {
         organizationId: currentOrganization._id,
         organizationName: currentOrganization.name,
         organizationTier: currentOrganization.apiServiceLevel,
+        organizationCreatedAt: currentOrganization.createdAt,
       });
 
       if (ldClient) {

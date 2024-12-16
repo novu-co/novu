@@ -30,6 +30,7 @@ export function useMonitoring() {
         organizationId: currentOrganization._id,
         organizationName: currentOrganization.name,
         organizationTier: currentOrganization.apiServiceLevel,
+        organizationCreatedAt: currentOrganization.createdAt,
       });
     } else {
       sentryConfigureScope((scope) => scope.setUser(null));
