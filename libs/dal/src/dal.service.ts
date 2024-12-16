@@ -1,4 +1,5 @@
 import mongoose, { Connection, ConnectOptions } from 'mongoose';
+import { AuthMechanism } from './types';
 
 export const baseConfig: ConnectOptions = {
   // AUTO_CREATE_INDEXES is deprecated, use MONGO_AUTO_CREATE_INDEXES
@@ -6,6 +7,7 @@ export const baseConfig: ConnectOptions = {
   maxIdleTimeMS: process.env.MONGO_MAX_IDLE_TIME_IN_MS ? Number(process.env.MONGO_MAX_IDLE_TIME_IN_MS) : 1000 * 30,
   maxPoolSize: process.env.MONGO_MAX_POOL_SIZE ? Number(process.env.MONGO_MAX_POOL_SIZE) : 50,
   minPoolSize: process.env.MONGO_MIN_POOL_SIZE ? Number(process.env.MONGO_MIN_POOL_SIZE) : 10,
+  authMechanism: (process.env.MONGO_AUTH_MECHANISM as AuthMechanism) || ('DEFAULT' as AuthMechanism),
 };
 
 export class DalService {

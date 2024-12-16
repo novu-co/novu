@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient, UseMutationOptions, InfiniteData } from '@tanstack/react-query';
-import { IMessage, ButtonTypeEnum, MessageActionStatusEnum, IPaginatedResponse } from '@novu/shared';
+import { InfiniteData, useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query';
+import { ButtonTypeEnum, IMessage, INotificationDto, IPaginatedResponse, MessageActionStatusEnum } from '@novu/shared';
 
 import { useNovuContext } from './useNovuContext';
 import { useFetchNotificationsQueryKey } from './useFetchNotificationsQueryKey';
@@ -22,8 +22,20 @@ export const useUpdateAction = ({
   const fetchNotificationsQueryKey = useFetchNotificationsQueryKey();
 
   const { mutate, ...result } = useMutation<IMessage, Error, IUpdateActionVariables>(
-    (variables) =>
-      apiService.updateAction(variables.messageId, variables.actionButtonType, variables.status, variables.payload),
+    async (variables) => {
+      const notificationDto: INotificationDto = await apiService.updateAction(
+        variables.messageId,
+        variables.actionButtonType,
+        variables.status,
+        variables.payload
+      );
+
+      return {
+        ...notificationDto,
+        _id: notificationDto._id,
+        payload: notificationDto.payload || {},
+      };
+    },
     {
       ...options,
       onSuccess: (newMessage, variables, context) => {
