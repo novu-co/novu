@@ -16,7 +16,6 @@ import { IntegrationSheet } from './integration-sheet';
 import { ChannelTypeEnum } from '@novu/shared';
 import { IntegrationFormData } from '../types';
 import { useDeleteIntegration } from '../../../hooks/use-delete-integration';
-import { CheckIntegrationResponseEnum } from '@/api/integrations';
 import { handleIntegrationError } from './utils/handle-integration-error';
 
 interface UpdateIntegrationSidebarProps {
@@ -48,19 +47,19 @@ export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: U
     integrations,
   });
 
-  const handleSubmit = async (data: IntegrationFormData) => {
+  const handleSubmit = async (data: IntegrationFormData, skipPrimaryCheck = false) => {
     if (!integration) return;
 
-    if (shouldShowPrimaryModal(data)) {
-      setIsPrimaryModalOpen(true);
+    /**
+     * We don't want to check the integration if it's a demo integration
+     * Since we don't have credentials for it
+     */
+    if (integration?.providerId === 'novu-email' || integration?.providerId === 'novu-sms') {
+      data.check = false;
+    }
 
-      /**
-       * We don't want to check the integration if it's a demo integration
-       * Since we don't have credentials for it
-       */
-      if (integration?.providerId === 'novu-email' || integration?.providerId === 'novu-sms') {
-        data.check = false;
-      }
+    if (!skipPrimaryCheck && shouldShowPrimaryModal(data)) {
+      setIsPrimaryModalOpen(true);
 
       setPendingUpdate(data);
 
@@ -89,28 +88,22 @@ export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: U
       });
       onClose();
     } catch (error: any) {
-      if (error?.message?.code === CheckIntegrationResponseEnum.INVALID_EMAIL) {
-        toast.error('Invalid sender email', {
-          description: error.message?.message,
-        });
-      } else if (error?.message?.code === CheckIntegrationResponseEnum.BAD_CREDENTIALS) {
-        toast.error('Invalid credentials or credentials expired', {
-          description: error.message?.message,
-        });
-      } else {
-        toast.error('Failed to update integration', {
-          description: error?.message?.message || error?.message || 'There was an error updating the integration.',
-        });
-      }
+      handleIntegrationError(error, 'update');
     }
   };
 
   const handlePrimaryConfirm = async () => {
     if (pendingUpdate) {
-      await handleSubmit(pendingUpdate);
-      setPendingUpdate(null);
+      try {
+        await handleSubmit(pendingUpdate, true);
+        setPendingUpdate(null);
+        setIsPrimaryModalOpen(false);
+      } catch (error: any) {
+        handleIntegrationError(error, 'update');
+      }
+    } else {
+      setIsPrimaryModalOpen(false);
     }
-    setIsPrimaryModalOpen(false);
   };
 
   const onDelete = async () => {
@@ -135,7 +128,7 @@ export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: U
           <IntegrationConfiguration
             provider={provider}
             integration={integration}
-            onSubmit={handleSubmit}
+            onSubmit={(data) => handleSubmit(data)}
             mode="update"
           />
         </div>

@@ -1,7 +1,7 @@
 import { toast } from 'sonner';
 import { CheckIntegrationResponseEnum } from '@/api/integrations';
 
-export function handleIntegrationError(error: any, operation: 'update' | 'create' | 'delete' = 'update') {
+export function handleIntegrationError(error: any, operation: 'update' | 'create' | 'delete') {
   if (error?.message?.code === CheckIntegrationResponseEnum.INVALID_EMAIL) {
     toast.error('Invalid sender email', {
       description: error.message?.message,
