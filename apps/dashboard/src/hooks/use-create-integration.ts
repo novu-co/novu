@@ -11,6 +11,7 @@ export interface CreateIntegrationData {
   identifier: string;
   active: boolean;
   primary?: boolean;
+  _environmentId: string;
 }
 
 async function createIntegration(data: CreateIntegrationData, environment: IEnvironment) {

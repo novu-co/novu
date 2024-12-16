@@ -97,7 +97,12 @@ export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: U
 
         <div className="bg-background flex justify-between gap-2 border-t p-3">
           {integration.channel !== ChannelTypeEnum.IN_APP && (
-            <Button variant="ghostDestructive" size="sm" onClick={() => setIsDeleteDialogOpen(true)}>
+            <Button
+              variant="ghostDestructive"
+              size="sm"
+              isLoading={isDeleting}
+              onClick={() => setIsDeleteDialogOpen(true)}
+            >
               Delete Integration
             </Button>
           )}

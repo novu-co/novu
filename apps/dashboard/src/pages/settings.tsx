@@ -84,7 +84,7 @@ export function SettingsPage() {
   return (
     <DashboardLayout headerStartItems={<h1 className="text-foreground-950">Settings</h1>}>
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList align="center" variant="regular" className="!py-[2px]">
+        <TabsList align="center" variant="regular" className="border-t-0 !py-0">
           <TabsTrigger variant={'regular'} value="account">
             Account
           </TabsTrigger>

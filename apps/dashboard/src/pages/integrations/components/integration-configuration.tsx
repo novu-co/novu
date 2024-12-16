@@ -15,14 +15,17 @@ import { InlineToast } from '../../../components/primitives/inline-toast';
 import { isDemoIntegration } from '../utils/is-demo-integration';
 import { SegmentedControl, SegmentedControlList } from '../../../components/primitives/segmented-control';
 import { SegmentedControlTrigger } from '../../../components/primitives/segmented-control';
+import { useEnvironment, useFetchEnvironments } from '@/context/environment/hooks';
+import { useAuth } from '@/context/auth/hooks';
 
 interface IntegrationFormData {
   name: string;
   identifier: string;
   credentials: Record<string, string>;
   active: boolean;
+  check: boolean;
   primary: boolean;
-  environment: 'development' | 'production';
+  environmentId: string;
 }
 
 interface IntegrationConfigurationProps {
@@ -56,6 +59,10 @@ const SECURE_CREDENTIALS = [
 ];
 
 export function IntegrationConfiguration({ provider, integration, onSubmit, mode }: IntegrationConfigurationProps) {
+  const { currentOrganization } = useAuth();
+  const { environments } = useFetchEnvironments({ organizationId: currentOrganization?._id });
+  const { currentEnvironment } = useEnvironment();
+
   const form = useForm<IntegrationFormData>({
     defaultValues: integration
       ? {
@@ -64,7 +71,7 @@ export function IntegrationConfiguration({ provider, integration, onSubmit, mode
           active: integration.active,
           primary: integration.primary ?? false,
           credentials: integration.credentials as Record<string, string>,
-          environment: 'development',
+          environmentId: integration._environmentId,
         }
       : {
           name: provider?.displayName ?? '',
@@ -72,7 +79,7 @@ export function IntegrationConfiguration({ provider, integration, onSubmit, mode
           active: true,
           primary: true,
           credentials: {},
-          environment: 'development',
+          environmentId: currentEnvironment?._id ?? '',
         },
   });
 
@@ -99,23 +106,23 @@ export function IntegrationConfiguration({ provider, integration, onSubmit, mode
     <Form {...form}>
       <form id="integration-configuration-form" onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
         <div className="flex items-center justify-between gap-2 p-3">
-          <Label className="text-sm" htmlFor="environment">
+          <Label className="text-sm" htmlFor="environmentId">
             Environment
           </Label>
           <SegmentedControl
-            value={watch('environment')}
-            onValueChange={(value) => setValue('environment', value as 'development' | 'production')}
+            value={watch('environmentId')}
+            onValueChange={(value) => setValue('environmentId', value)}
             className="w-full max-w-[260px]"
           >
             <SegmentedControlList>
-              <SegmentedControlTrigger value="development">
-                <RiGitBranchLine className="border-warning text-warning size-4" />
-                Development
-              </SegmentedControlTrigger>
-              <SegmentedControlTrigger value="production">
-                <RiGitBranchLine className="border-feature text-feature size-4" />
-                Production
-              </SegmentedControlTrigger>
+              {environments?.map((env) => (
+                <SegmentedControlTrigger key={env._id} value={env._id} disabled={mode === 'update'}>
+                  <RiGitBranchLine
+                    className={`size-4 ${env.name.toLowerCase() === 'production' ? 'text-feature' : 'text-warning'}`}
+                  />
+                  {env.name}
+                </SegmentedControlTrigger>
+              ))}
             </SegmentedControlList>
           </SegmentedControl>
         </div>

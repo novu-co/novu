@@ -33,6 +33,7 @@ export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegratio
         name: data.name,
         identifier: data.identifier,
         active: data.active,
+        _environmentId: data.environmentId,
       });
     },
   });
@@ -41,6 +42,7 @@ export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegratio
 
   const onSubmit = async (data: any) => {
     if (!provider) return;
+
     await executeCreate(data, provider);
   };
 

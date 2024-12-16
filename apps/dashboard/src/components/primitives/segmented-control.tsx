@@ -59,7 +59,7 @@ SegmentedControlList.displayName = 'SegmentedControlList';
 const SegmentedControlTrigger = React.forwardRef<
   React.ComponentRef<typeof TabsPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
->(({ className, ...rest }, forwardedRef) => {
+>(({ className, disabled, ...rest }, forwardedRef) => {
   return (
     <TabsPrimitive.Trigger
       ref={forwardedRef}
@@ -73,9 +73,13 @@ const SegmentedControlTrigger = React.forwardRef<
         'focus:outline-none',
         // active
         'data-[state=active]:text-foreground-950',
-        className
+        className,
+        {
+          'pointer-events-none opacity-50': disabled,
+        }
       )}
       {...rest}
+      disabled={disabled}
     />
   );
 });
