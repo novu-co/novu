@@ -11,7 +11,7 @@ import { cn } from '@/utils/ui';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { WorkflowOriginEnum } from '@novu/shared';
-import { createStep } from '@/components/workflow-editor/steps/step-provider';
+import { createStep } from '@/components/workflow-editor/step-utils';
 import { getWorkflowIdFromSlug, STEP_DIVIDER } from '@/utils/step';
 
 export type NodeData = {
@@ -212,6 +212,7 @@ export const DigestNode = (props: NodeProps<NodeType>) => {
         <NodeBody>
           {data.content || 'Batches events into one coherent message before delivery to the subscriber.'}
         </NodeBody>
+        {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>
@@ -233,6 +234,7 @@ export const CustomNode = (props: NodeProps<NodeType>) => {
           <NodeName>{data.name || 'Custom Step'}</NodeName>
         </NodeHeader>
         <NodeBody>Executes the business logic in your bridge application</NodeBody>
+        {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>

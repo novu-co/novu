@@ -8,14 +8,13 @@ import {
   SubscriberRepository,
 } from '@novu/dal';
 import {
-  StepTypeEnum,
-  ChannelCTATypeEnum,
-  TemplateVariableTypeEnum,
   ActorTypeEnum,
-  SystemAvatarIconEnum,
   ButtonTypeEnum,
+  ChannelCTATypeEnum,
+  StepTypeEnum,
+  SystemAvatarIconEnum,
+  TemplateVariableTypeEnum,
 } from '@novu/shared';
-
 import { mapToDto } from '../utils/notification-mapper';
 
 describe('Update Notification Action - /inbox/notifications/:id/{complete/revert} (PATCH)', async () => {
@@ -118,8 +117,9 @@ describe('Update Notification Action - /inbox/notifications/:id/{complete/revert
       actionType: ButtonTypeEnum.PRIMARY,
     });
 
-    expect(status).to.equal(400);
-    expect(body.message[0]).to.equal(`notificationId must be a mongodb id`);
+    expect(status).to.equal(422);
+    expect(body.statusCode).to.equal(422);
+    expect(body.errors.notificationId.messages[0]).to.equal(`notificationId must be a mongodb id`);
   });
 
   it("should throw not found error when the message doesn't exist", async function () {

@@ -1,5 +1,14 @@
 import { flatten } from 'flat';
-import type { ContentIssue, StepIssuesDto, StepUpdateDto, UpdateWorkflowDto, WorkflowResponseDto } from '@novu/shared';
+import type {
+  ContentIssue,
+  StepIssuesDto,
+  StepTypeEnum,
+  StepUpdateDto,
+  UpdateWorkflowDto,
+  WorkflowResponseDto,
+} from '@novu/shared';
+import { Step } from '@/utils/types';
+import { STEP_TYPE_LABELS } from '@/utils/constants';
 
 export const getFirstBodyErrorMessage = (issues?: StepIssuesDto) => {
   const stepIssuesArray = Object.entries({ ...issues?.body });
@@ -48,3 +57,11 @@ export const updateStepInWorkflow = (
     }),
   };
 };
+
+export const createStep = (type: StepTypeEnum): Step => ({
+  name: STEP_TYPE_LABELS[type] + ' Step',
+  stepId: '',
+  slug: '_st_',
+  type,
+  _id: crypto.randomUUID(),
+});

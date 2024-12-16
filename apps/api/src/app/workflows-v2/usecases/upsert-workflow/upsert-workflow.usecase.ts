@@ -15,24 +15,24 @@ import {
 } from '@novu/shared';
 import {
   CreateWorkflow as CreateWorkflowGeneric,
-  UpdateWorkflow as UpdateWorkflowGeneric,
   CreateWorkflowCommand,
   GetWorkflowByIdsCommand,
   GetWorkflowByIdsUseCase,
-  WorkflowInternalResponseDto,
+  Instrument,
+  InstrumentUsecase,
   NotificationStep,
   shortId,
+  UpdateWorkflow as UpdateWorkflowGeneric,
   UpdateWorkflowCommand,
-  InstrumentUsecase,
-  Instrument,
+  WorkflowInternalResponseDto,
 } from '@novu/application-generic';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UpsertWorkflowCommand } from './upsert-workflow.command';
 import { stepTypeToControlSchema } from '../../shared';
 import { PatchStepUsecase } from '../patch-step-data';
 import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
-import { GetWorkflowUseCase } from '../get-workflow/get-workflow.usecase';
-import { GetWorkflowCommand } from '../get-workflow/get-workflow.command';
+import { GetWorkflowCommand, GetWorkflowUseCase } from '../get-workflow';
+import { UpsertWorkflowDataCommand } from './upsert-workflow-data.command';
 
 @Injectable()
 export class UpsertWorkflowUseCase {
@@ -305,7 +305,6 @@ export class UpsertWorkflowUseCase {
       await this.patchStepDataUsecase.execute({
         controlValues,
         workflowIdOrInternalId: workflow._id,
-        name: step.name,
         stepIdOrInternalId: step._templateId,
         user: command.user,
       });
@@ -328,10 +327,7 @@ export class UpsertWorkflowUseCase {
   }
 }
 
-function isWorkflowUpdateDto(
-  workflowDto: CreateWorkflowDto | UpdateWorkflowDto,
-  id?: string
-): workflowDto is UpdateWorkflowDto {
+function isWorkflowUpdateDto(workflowDto: UpsertWorkflowDataCommand, id?: string): workflowDto is UpdateWorkflowDto {
   return !!id;
 }
 

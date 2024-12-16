@@ -7,3 +7,4 @@ export * from './usecase-select-page';
 export * from './api-keys';
 export * from './settings';
 export * from './welcome-page';
+export * from './activity-feed';
