@@ -32,7 +32,6 @@ import {
   TemplateParseResult,
   Variable,
 } from '../../util/template-parser/liquid-parser';
-import { flattenObjectValues } from '../../util/utils';
 import { pathsToObject } from '../../util/path-to-object';
 import { HydrateEmailSchemaUseCase } from '../../../environments-v1/usecases/output-renderers';
 
@@ -190,7 +189,7 @@ export class GeneratePreviewUsecase {
   ): ProcessedControlResult {
     const variables = this.processControlValueVariables(controlValues, variableSchema);
     const processedControlValues = this.fixControlValueInvalidVariables(controlValues, variables.invalid);
-    const extractedTemplateVariables = this.extractTemplateVariables([processedControlValues]);
+    const extractedTemplateVariables = variables.valid.map((variable) => variable.name);
     const payloadVariableExample =
       workflow.origin === WorkflowOriginEnum.EXTERNAL
         ? createMockObjectFromSchema({
@@ -246,14 +245,6 @@ export class GeneratePreviewUsecase {
       valid: validSchemaVariables,
       invalid: [...invalidVariables, ...invalidSchemaVariables],
     };
-  }
-
-  @Instrument()
-  private extractTemplateVariables(controlValues: Record<string, unknown>[]): string[] {
-    const controlValuesString = controlValues.map(flattenObjectValues).flat().join(' ');
-    const { validVariables } = extractLiquidTemplateVariables(controlValuesString);
-
-    return validVariables.map((variable) => variable.name);
   }
 
   @Instrument()
