@@ -1,10 +1,12 @@
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
+import { skipControl } from './skip-control.schema';
 import { TipTapSchema } from '../../../environments-v1/usecases/output-renderers';
 
 export const emailStepControlZodSchema = z
   .object({
+    skip: skipControl.schema,
     /*
      * todo: we need to validate the email editor (body) by type and not string,
      * updating it to TipTapSchema will break the existing upsert issues generation
@@ -26,6 +28,7 @@ export const emailStepUiSchema: UiSchema = {
     subject: {
       component: UiComponentEnum.TEXT_INLINE_LABEL,
     },
+    skip: skipControl.uiSchema.properties.skip,
   },
 };
 

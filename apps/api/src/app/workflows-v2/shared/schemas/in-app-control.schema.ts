@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
+import { skipControl } from './skip-control.schema';
 
 const absoluteUrlOrPathRegex = /^(?!mailto:)(?:(https?):\/\/[^\s/$.?#].[^\s]*)|^(\/[^\s]*)$|^$/;
 
@@ -20,6 +21,7 @@ const actionZodSchema = z
 
 export const InAppControlZodSchema = z
   .object({
+    skip: skipControl.schema,
     subject: z.string().optional(),
     body: z.string().min(1),
     avatar: z.string().url().optional(),
@@ -74,5 +76,6 @@ export const inAppUiSchema: UiSchema = {
       component: UiComponentEnum.URL_TEXT_BOX,
       placeholder: redirectPlaceholder,
     },
+    skip: skipControl.uiSchema.properties.skip,
   },
 };
