@@ -4,7 +4,7 @@ import { RiCloseLine, RiEdit2Line } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import { CustomStepControls } from '../controls/custom-step-controls';
 
-export const DelayCustomControlValues = () => {
+export const CommonCustomControlValues = () => {
   const { step, workflow } = useWorkflow();
   const { dataSchema } = step?.controls ?? {};
   const navigate = useNavigate();

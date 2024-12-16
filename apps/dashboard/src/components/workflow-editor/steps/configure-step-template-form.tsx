@@ -19,8 +19,7 @@ import { Form } from '@/components/primitives/form/form';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { EmailTabs } from '@/components/workflow-editor/steps/email/email-tabs';
-import { DigestCustomControlValues } from './digest/digest-custom-control-values';
-import { DelayCustomControlValues } from './delay/delay-custom-control-values';
+import { CommonCustomControlValues } from './common/common-custom-control-values';
 
 const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
   [StepTypeEnum.EMAIL]: EmailTabs,
@@ -28,8 +27,8 @@ const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) =
   [StepTypeEnum.IN_APP]: InAppTabs,
   [StepTypeEnum.SMS]: OtherStepTabs,
   [StepTypeEnum.PUSH]: OtherStepTabs,
-  [StepTypeEnum.DIGEST]: DigestCustomControlValues,
-  [StepTypeEnum.DELAY]: DelayCustomControlValues,
+  [StepTypeEnum.DIGEST]: CommonCustomControlValues,
+  [StepTypeEnum.DELAY]: CommonCustomControlValues,
   [StepTypeEnum.TRIGGER]: () => null,
   [StepTypeEnum.CUSTOM]: () => null,
 };
@@ -72,7 +71,7 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
     save: (data) => {
       const defaultValues = buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {});
       const isDefaultValues = isEqual(data, defaultValues);
-      const updateData = isDefaultValues ? {} : data;
+      const updateData = isDefaultValues ? null : data;
       // transform form fields to step update dto
       const updateStepData: Partial<StepUpdateDto> = {
         controlValues: updateData,
