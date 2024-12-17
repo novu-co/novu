@@ -28,7 +28,7 @@ export function PushPreview({
     return (
       <PushBackgroundWithPhone>
         <PushNotificationContainer>
-          <PushContentContainerPreview className="relative z-10 h-10 justify-center">
+          <PushContentContainerPreview className="border-destructive/40 relative z-10 h-10 justify-center border border-dashed">
             <PushBodyPreview
               body="No preview available"
               isPending={isPreviewPending}
