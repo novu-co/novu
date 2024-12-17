@@ -68,7 +68,7 @@ const inputFieldVariants = cva(
 export type InputFieldPureProps = { children: React.ReactNode; className?: string } & VariantProps<
   typeof inputFieldVariants
 > &
-  React.InputHTMLAttributes<HTMLDivElement>;
+  Omit<React.InputHTMLAttributes<HTMLDivElement>, 'size'>;
 
 const InputFieldPure = React.forwardRef<HTMLDivElement, InputFieldPureProps>(
   ({ children, className, size, state, ...rest }, ref) => {
