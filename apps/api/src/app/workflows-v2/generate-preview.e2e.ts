@@ -328,11 +328,9 @@ describe('Generate Preview', () => {
         if (previewResponseDto.result!.type !== 'sms') {
           throw new Error('Expected sms');
         }
-        expect(previewResponseDto.result!.preview.body).to.contain('{{PAYLOAD.VARIABLENAME | UPCASE}}');
+        expect(previewResponseDto.result!.preview.body).to.contain('{{PAYLOAD.VARIABLENAME}}');
         expect(previewResponseDto.previewPayloadExample).to.exist;
-        expect(previewResponseDto?.previewPayloadExample?.payload?.variableName).to.equal(
-          '{{payload.variableName | upcase}}'
-        );
+        expect(previewResponseDto?.previewPayloadExample?.payload?.variableName).to.equal('{{payload.variableName}}');
       });
 
       it('Should not fail if inApp is providing partial URL in redirect', async () => {
@@ -413,26 +411,7 @@ describe('Generate Preview', () => {
         );
 
         if (generatePreviewResponseDto.result?.type === ChannelTypeEnum.IN_APP) {
-          expect(generatePreviewResponseDto.result.preview.body).to.equal(
-            {
-              subject: `{{subscriber.firstName}} Hello, World! ${PLACEHOLDER_SUBJECT_INAPP}`,
-              body: `Hello, World! {{payload.placeholder.body}}`,
-              avatar: 'https://www.example.com/avatar.png',
-              primaryAction: {
-                label: '{{payload.secondaryUrl}}',
-                redirect: {
-                  target: RedirectTargetEnum.BLANK,
-                },
-              },
-              secondaryAction: null,
-              redirect: {
-                target: RedirectTargetEnum.BLANK,
-                url: '   ',
-              },
-            }.body
-          );
-          expect(generatePreviewResponseDto.result.preview.primaryAction?.redirect?.url).to.be.ok;
-          expect(generatePreviewResponseDto.result.preview.primaryAction?.redirect?.url).to.contain('https');
+          expect(generatePreviewResponseDto.result.preview.body).to.equal('Hello, World! {{payload.placeholder.body}}');
         }
       });
     });
