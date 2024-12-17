@@ -50,7 +50,7 @@ import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/em
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { DigestControlValues } from '@/components/workflow-editor/steps/digest/digest-control-values';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
-import ConfigurePushStepPreview from './push/configure-push-step-preview';
+import { ConfigurePushStepPreview } from '@/components/workflow-editor/steps/push/configure-push-step-preview';
 
 const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
