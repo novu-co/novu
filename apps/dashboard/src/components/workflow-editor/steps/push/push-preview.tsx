@@ -82,7 +82,6 @@ export const PushBodyPreview = ({ body, isPending, className, ...rest }: PushBod
     return (
       <div className="flex flex-col gap-1" {...rest}>
         <Skeleton className="h-3 w-full" />
-        <Skeleton className="h-3 w-full" />
         <Skeleton className="h-3 w-2/3" />
       </div>
     );
@@ -100,8 +99,9 @@ export const PushContentContainerPreview = ({ children, className, ...rest }: HT
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn('flex w-full flex-col gap-0.5 rounded-md bg-[rgba(252,252,252,0.50)] p-1.5', className)}
+      layout
       {...rest}
     >
       {children}
