@@ -9,12 +9,12 @@ import {
   WorkflowOriginEnum,
   WorkflowResponseDto,
 } from '@novu/shared';
+import merge from 'lodash.merge';
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useCallback, useMemo, useState, HTMLAttributes, ReactNode } from 'react';
+import { HTMLAttributes, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiCloseFill, RiDeleteBin2Line, RiPencilRuler2Fill } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
-import merge from 'lodash.merge';
 
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { PageMeta } from '@/components/page-meta';
@@ -32,24 +32,24 @@ import {
   getFirstControlsErrorMessage,
   updateStepInWorkflow,
 } from '@/components/workflow-editor/step-utils';
+import { ConfigureStepTemplateIssueCta } from '@/components/workflow-editor/steps/configure-step-template-issue-cta';
+import { DelayControlValues } from '@/components/workflow-editor/steps/delay/delay-control-values';
+import { DigestControlValues } from '@/components/workflow-editor/steps/digest/digest-control-values';
+import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/email/configure-email-step-preview';
+import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
+import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
-import { buildRoute, ROUTES } from '@/utils/routes';
+import { ConfigureSmsStepPreview } from '@/components/workflow-editor/steps/sms/configure-sms-step-preview';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { useFormAutosave } from '@/hooks/use-form-autosave';
 import {
   AUTOCOMPLETE_PASSWORD_MANAGERS_OFF,
   INLINE_CONFIGURABLE_STEP_TYPES,
-  TEMPLATE_CONFIGURABLE_STEP_TYPES,
   STEP_TYPE_LABELS,
+  TEMPLATE_CONFIGURABLE_STEP_TYPES,
 } from '@/utils/constants';
-import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
-import { buildDefaultValues } from '@/utils/schema';
-import { DelayControlValues } from '@/components/workflow-editor/steps/delay/delay-control-values';
-import { ConfigureStepTemplateIssueCta } from '@/components/workflow-editor/steps/configure-step-template-issue-cta';
-import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
-import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/email/configure-email-step-preview';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
-import { DigestControlValues } from '@/components/workflow-editor/steps/digest/digest-control-values';
-import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
 
 const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
@@ -66,7 +66,7 @@ const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.E
 const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, ((props: HTMLAttributes<HTMLDivElement>) => ReactNode) | null> = {
   [StepTypeEnum.IN_APP]: ConfigureInAppStepPreview,
   [StepTypeEnum.EMAIL]: ConfigureEmailStepPreview,
-  [StepTypeEnum.SMS]: null,
+  [StepTypeEnum.SMS]: ConfigureSmsStepPreview,
   [StepTypeEnum.CHAT]: null,
   [StepTypeEnum.PUSH]: null,
   [StepTypeEnum.CUSTOM]: null,

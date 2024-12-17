@@ -1,7 +1,3 @@
-import { useCallback, useEffect, useMemo } from 'react';
-import merge from 'lodash.merge';
-import isEqual from 'lodash.isequal';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   type StepDataDto,
@@ -10,23 +6,28 @@ import {
   UpdateWorkflowDto,
   type WorkflowResponseDto,
 } from '@novu/shared';
+import isEqual from 'lodash.isequal';
+import merge from 'lodash.merge';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
 
-import { flattenIssues, updateStepInWorkflow } from '@/components/workflow-editor/step-utils';
-import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
-import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
-import { OtherStepTabs } from './other-steps-tabs';
 import { Form } from '@/components/primitives/form/form';
-import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
+import { flattenIssues, updateStepInWorkflow } from '@/components/workflow-editor/step-utils';
 import { EmailTabs } from '@/components/workflow-editor/steps/email/email-tabs';
-import { CommonCustomControlValues } from './common/common-custom-control-values';
+import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
 import { PushTabs } from '@/components/workflow-editor/steps/push/push-tabs';
+import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
+import { SmsTabs } from '@/components/workflow-editor/steps/sms/sms-tabs';
+import { useFormAutosave } from '@/hooks/use-form-autosave';
+import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
+import { CommonCustomControlValues } from './common/common-custom-control-values';
+import { OtherStepTabs } from './other-steps-tabs';
 
 const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
   [StepTypeEnum.EMAIL]: EmailTabs,
   [StepTypeEnum.CHAT]: OtherStepTabs,
   [StepTypeEnum.IN_APP]: InAppTabs,
-  [StepTypeEnum.SMS]: OtherStepTabs,
+  [StepTypeEnum.SMS]: SmsTabs,
   [StepTypeEnum.PUSH]: PushTabs,
   [StepTypeEnum.DIGEST]: CommonCustomControlValues,
   [StepTypeEnum.DELAY]: CommonCustomControlValues,
