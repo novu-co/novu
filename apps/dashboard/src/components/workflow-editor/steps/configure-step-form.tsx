@@ -14,7 +14,6 @@ import { useEffect, useCallback, useMemo, useState, HTMLAttributes, ReactNode } 
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiCloseFill, RiDeleteBin2Line, RiPencilRuler2Fill } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
-import merge from 'lodash.merge';
 
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { PageMeta } from '@/components/page-meta';
@@ -41,8 +40,7 @@ import {
   STEP_TYPE_LABELS,
 } from '@/utils/constants';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
-import { buildDefaultValues } from '@/utils/schema';
+import { buildDynamicZodSchema } from '@/utils/schema';
 import { DelayControlValues } from '@/components/workflow-editor/steps/delay/delay-control-values';
 import { ConfigureStepTemplateIssueCta } from '@/components/workflow-editor/steps/configure-step-template-issue-cta';
 import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
@@ -50,6 +48,7 @@ import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/em
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { DigestControlValues } from '@/components/workflow-editor/steps/digest/digest-control-values';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
+import { getStepDefaultValues } from '@/components/workflow-editor/step-default-values';
 
 const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
@@ -73,14 +72,6 @@ const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, ((props: HTMLAttributes<HTMLDiv
   [StepTypeEnum.TRIGGER]: null,
   [StepTypeEnum.DIGEST]: null,
   [StepTypeEnum.DELAY]: null,
-};
-
-const calculateDefaultControlsValues = (step: StepDataDto) => {
-  if (Object.keys(step.controls.uiSchema ?? {}).length !== 0) {
-    return merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values);
-  }
-
-  return merge(buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {}), step.controls.values);
 };
 
 type ConfigureStepFormProps = {
@@ -124,7 +115,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     return (step: StepDataDto) => {
       if (isInlineConfigurableStep) {
         return {
-          controlValues: calculateDefaultControlsValues(step),
+          controlValues: getStepDefaultValues(step),
         };
       }
 

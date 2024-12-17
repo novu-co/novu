@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import merge from 'lodash.merge';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -12,12 +11,13 @@ import {
 
 import { flattenIssues, updateStepInWorkflow } from '@/components/workflow-editor/step-utils';
 import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
-import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
-import { OtherStepTabs } from './other-steps-tabs';
+import { buildDynamicZodSchema } from '@/utils/schema';
+import { OtherStepTabs } from '@/components/workflow-editor/steps/other-steps-tabs';
 import { Form } from '@/components/primitives/form/form';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { EmailTabs } from '@/components/workflow-editor/steps/email/email-tabs';
+import { getStepDefaultValues } from '@/components/workflow-editor/step-default-values';
 
 const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
   [StepTypeEnum.EMAIL]: EmailTabs,
@@ -29,15 +29,6 @@ const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) =
   [StepTypeEnum.DELAY]: () => null,
   [StepTypeEnum.TRIGGER]: () => null,
   [StepTypeEnum.CUSTOM]: () => null,
-};
-
-// Use the UI Schema to build the default values if it exists else use the data schema (code-first approach) values
-const calculateDefaultValues = (step: StepDataDto) => {
-  if (Object.keys(step.controls.uiSchema ?? {}).length !== 0) {
-    return merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values);
-  }
-
-  return merge(buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {}), step.controls.values);
 };
 
 export type StepEditorProps = {
@@ -53,9 +44,7 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
   const { workflow, step, update } = props;
   const schema = useMemo(() => buildDynamicZodSchema(step.controls.dataSchema ?? {}), [step.controls.dataSchema]);
 
-  const defaultValues = useMemo(() => {
-    return calculateDefaultValues(step);
-  }, [step]);
+  const defaultValues = useMemo(() => getStepDefaultValues(step), [step]);
 
   const form = useForm({
     resolver: zodResolver(schema),
