@@ -17,7 +17,7 @@ import {
   ActivityFeed,
 } from '@/pages';
 import './index.css';
-import { LEGACY_ROUTES, ROUTES } from './utils/routes';
+import { ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
 import { TestWorkflowPage } from './pages/test-workflow';
 import { initializeSentry } from './utils/sentry';
