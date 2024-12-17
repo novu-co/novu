@@ -1,68 +1,33 @@
 import { useState } from 'react';
-import { Cross2Icon } from '@radix-ui/react-icons';
-import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
-import { useNavigate } from 'react-router-dom';
-
-import { Notification5Fill } from '@/components/icons';
-import { Button } from '@/components/primitives/button';
-import { Separator } from '@/components/primitives/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
+import { WorkflowOriginEnum } from '@novu/shared';
 import { StepEditorProps } from '@/components/workflow-editor/steps/configure-step-template-form';
 import { PushEditor } from '@/components/workflow-editor/steps/push/push-editor';
-import { WorkflowOriginEnum } from '@novu/shared';
 import { CustomStepControls } from '../controls/custom-step-controls';
-
-const tabsContentClassName = 'h-full w-full overflow-y-auto data-[state=inactive]:hidden';
+import { TemplateTabs } from '../template-tabs';
 
 export const PushTabs = (props: StepEditorProps) => {
   const { workflow, step } = props;
   const { dataSchema, uiSchema } = step.controls;
-  const navigate = useNavigate();
   const [tabsValue, setTabsValue] = useState('editor');
 
-  return (
-    <Tabs defaultValue="editor" value={tabsValue} onValueChange={setTabsValue} className="flex h-full flex-1 flex-col">
-      <header className="flex flex-row items-center gap-3 px-3 py-1.5">
-        <div className="mr-auto flex items-center gap-2.5 text-sm font-medium">
-          <RiEdit2Line className="size-4" />
-          <span>Configure Template</span>
-        </div>
-        <TabsList className="w-min">
-          <TabsTrigger value="editor" className="gap-1.5">
-            <RiPencilRuler2Line className="size-5 p-0.5" />
-            <span>Editor</span>
-          </TabsTrigger>
-          <TabsTrigger value="preview" className="gap-1.5">
-            <Notification5Fill className="size-5 p-0.5" />
-            <span>Preview</span>
-          </TabsTrigger>
-        </TabsList>
+  const isNovuCloud = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && uiSchema;
+  const isExternal = workflow.origin === WorkflowOriginEnum.EXTERNAL;
 
-        <Button
-          variant="ghost"
-          size="xs"
-          className="size-6"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            navigate('../', { relative: 'path' });
-          }}
-        >
-          <Cross2Icon className="h-4 w-4" />
-          <span className="sr-only">Close</span>
-        </Button>
-      </header>
-      <Separator />
-      <TabsContent value="editor" forceMount className={tabsContentClassName}>
-        {workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && uiSchema && <PushEditor uiSchema={uiSchema} />}
-        {workflow.origin === WorkflowOriginEnum.EXTERNAL && (
-          <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
-        )}
-      </TabsContent>
-      <TabsContent value="preview" forceMount className={tabsContentClassName}>
-        {tabsValue === 'preview' && <>TODO</>}
-      </TabsContent>
-      <Separator />
-    </Tabs>
+  const editorContent = (
+    <>
+      {isNovuCloud && <PushEditor uiSchema={uiSchema} />}
+      {isExternal && <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />}
+    </>
+  );
+
+  const previewContent = <>TODO</>;
+
+  return (
+    <TemplateTabs
+      editorContent={editorContent}
+      previewContent={previewContent}
+      tabsValue={tabsValue}
+      onTabChange={setTabsValue}
+    />
   );
 };
