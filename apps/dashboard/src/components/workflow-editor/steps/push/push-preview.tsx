@@ -1,4 +1,5 @@
 import { HTMLAttributes } from 'react';
+import { HTMLMotionProps, motion } from 'motion/react';
 import { ChannelTypeEnum, GeneratePreviewResponseDto } from '@novu/shared';
 import { Skeleton } from '@/components/primitives/skeleton';
 import { cn } from '@/utils/ui';
@@ -94,14 +95,17 @@ export const PushBodyPreview = ({ body, isPending, className, ...rest }: PushBod
   );
 };
 
-export const PushContentContainerPreview = ({ children, className, ...rest }: HTMLAttributes<HTMLDivElement>) => {
+export const PushContentContainerPreview = ({ children, className, ...rest }: HTMLMotionProps<'div'>) => {
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
       className={cn('flex w-full flex-col gap-0.5 rounded-md bg-[rgba(252,252,252,0.50)] p-1.5', className)}
       {...rest}
     >
       {children}
-    </div>
+    </motion.div>
   );
 };
 
