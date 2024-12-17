@@ -3,7 +3,7 @@ import { ChannelTypeEnum, GeneratePreviewResponseDto } from '@novu/shared';
 import { Skeleton } from '@/components/primitives/skeleton';
 import { cn } from '@/utils/ui';
 
-export function PushBasePreview({
+export function PushPreview({
   isPreviewPending,
   previewData,
 }: {

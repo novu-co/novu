@@ -1,5 +1,5 @@
 import { usePreviewStep } from '@/hooks/use-preview-step';
-import { PushBasePreview } from './push-base-preview';
+import { PushPreview } from './push-preview';
 import * as Sentry from '@sentry/react';
 import { useWorkflow } from '../../workflow-provider';
 import { useParams } from 'react-router-dom';
@@ -33,5 +33,5 @@ export function ConfigurePushStepPreview() {
     });
   }, [workflowSlug, stepSlug, previewStep, step, isPending]);
 
-  return <PushBasePreview previewData={previewData} isPreviewPending={isPreviewPending} />;
+  return <PushPreview previewData={previewData} isPreviewPending={isPreviewPending} />;
 }
