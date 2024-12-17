@@ -5,7 +5,6 @@ import {
   createMockObjectFromSchema,
   GeneratePreviewResponseDto,
   JobStatusEnum,
-  JSONSchemaDto,
   PreviewPayload,
   StepDataDto,
   TipTapNode,
@@ -33,21 +32,9 @@ import {
   Variable,
 } from '../../util/template-parser/liquid-parser';
 import { pathsToObject } from '../../util/path-to-object';
-import { HydrateEmailSchemaUseCase } from '../../../environments-v1/usecases/output-renderers';
 import { PrepareAndValidateContentUsecase } from '../validate-content/prepare-and-validate-content/prepare-and-validate-content.usecase';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
-
-type DestructuredControlValues = {
-  tiptapControlValues: { emailEditor?: string | null; body?: string | null } | null;
-  // this is the remaining control values after the tiptap control is extracted
-  simpleControlValues: Record<string, unknown>;
-};
-
-type ProcessedControlResult = {
-  controlValues: Record<string, unknown>;
-  variablesExample: Record<string, unknown> | null;
-};
 
 @Injectable()
 export class GeneratePreviewUsecase {
@@ -69,7 +56,7 @@ export class GeneratePreviewUsecase {
         variableSchema,
         workflow,
       } = await this.initializePreviewContext(command);
-
+      const commandVariablesExample = command.generatePreviewRequestDto.previewPayload;
       const sanitizedValidatedControls = sanitizePreviewControlValues(initialControlValues, stepData.type);
 
       if (!sanitizedValidatedControls) {
@@ -79,31 +66,58 @@ export class GeneratePreviewUsecase {
         );
       }
 
-      const destructuredControlValues = this.destructureControlValues(sanitizedValidatedControls);
-
-      const { variablesExample: tiptapVariablesExample, controlValues: tiptapControlValues } =
-        await this.handleTipTapControl(
-          destructuredControlValues.tiptapControlValues,
-          command,
-          stepData,
-          variableSchema
-        );
-      const { variablesExample: simpleVariablesExample, controlValues: simpleControlValues } = this.handleSimpleControl(
-        destructuredControlValues.simpleControlValues,
-        variableSchema,
-        workflow,
-        command.generatePreviewRequestDto.previewPayload
-      );
-      const previewData = {
-        variablesExample: _.merge({}, tiptapVariablesExample || {}, simpleVariablesExample || {}),
-        controlValues: { ...tiptapControlValues, ...simpleControlValues },
+      let previewDataResult = {
+        variablesExample: {},
+        controlValues: {},
       };
 
+      for (const [controlKey, controlValue] of Object.entries(sanitizedValidatedControls)) {
+        if (isTipTapNode(controlValue)) {
+          const emailVariables = await this.safeAttemptToParseEmailSchema(
+            command,
+            { [controlKey]: controlValue },
+            stepData.controls.dataSchema || {},
+            variableSchema
+          );
+
+          const res = {
+            variablesExample: emailVariables,
+            controlValues: controlValue,
+          };
+
+          previewDataResult.variablesExample = _.merge(previewDataResult.variablesExample, res.variablesExample);
+          previewDataResult.controlValues = {
+            ...previewDataResult.controlValues,
+            [controlKey]: res.controlValues,
+          };
+
+          continue;
+        }
+
+        const variables = this.processControlValueVariables(controlValue, variableSchema);
+        const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalid);
+
+        const validVariableNames = variables.valid.map((variable) => variable.name);
+        const variablesExampleResult = pathsToObject(validVariableNames, {
+          valuePrefix: '{{',
+          valueSuffix: '}}',
+        });
+
+        previewDataResult = {
+          variablesExample: _.merge(previewDataResult.variablesExample, variablesExampleResult),
+          controlValues: {
+            ...previewDataResult.controlValues,
+            [controlKey]: processedControlValues,
+          },
+        };
+      }
+
+      const finalVariablesExample = this.buildVariable(workflow, previewDataResult, commandVariablesExample);
       const executeOutput = await this.executePreviewUsecase(
         command,
         stepData,
-        previewData.variablesExample,
-        previewData.controlValues
+        finalVariablesExample,
+        previewDataResult.controlValues
       );
 
       return {
@@ -111,7 +125,7 @@ export class GeneratePreviewUsecase {
           preview: executeOutput.outputs as any,
           type: stepData.type as unknown as ChannelTypeEnum,
         },
-        previewPayloadExample: previewData.variablesExample,
+        previewPayloadExample: finalVariablesExample,
       };
     } catch (error) {
       this.logger.error(
@@ -137,17 +151,34 @@ export class GeneratePreviewUsecase {
     }
   }
 
+  private buildVariable(
+    workflow: WorkflowInternalResponseDto,
+    previewDataResult: { variablesExample: {}; controlValues: {} },
+    commandVariablesExample: PreviewPayload | undefined
+  ) {
+    let finalVariablesExample = {};
+    if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
+      // if external workflow, we need to override with stored payload schema
+      const tmp = createMockObjectFromSchema({
+        type: 'object',
+        properties: { payload: workflow.payloadSchema },
+      });
+      finalVariablesExample = { ...previewDataResult.variablesExample, ...tmp };
+    } else {
+      finalVariablesExample = previewDataResult.variablesExample;
+    }
+
+    finalVariablesExample = _.merge(finalVariablesExample, commandVariablesExample || {});
+
+    return finalVariablesExample;
+  }
+
   private async safeAttemptToParseEmailSchema(
-    tiptapControl: string,
     command: GeneratePreviewCommand,
     controlValues: Record<string, unknown>,
     controlSchema: Record<string, unknown>,
     variableSchema: Record<string, unknown>
   ): Promise<Record<string, unknown> | null> {
-    if (typeof tiptapControl !== 'string') {
-      return null;
-    }
-
     try {
       const preparedAndValidatedContent = await this.prepareAndValidateContentUsecase.execute({
         user: command.user,
@@ -163,73 +194,6 @@ export class GeneratePreviewUsecase {
     }
   }
 
-  private async handleTipTapControl(
-    tiptapControlValue: {
-      emailEditor?: string | null;
-      body?: string | null;
-    } | null,
-    command: GeneratePreviewCommand,
-    stepData: StepDataDto,
-    variableSchema: Record<string, unknown>
-  ): Promise<ProcessedControlResult> {
-    if (!tiptapControlValue || (!tiptapControlValue?.emailEditor && !tiptapControlValue?.body)) {
-      return {
-        variablesExample: null,
-        controlValues: tiptapControlValue as Record<string, unknown>,
-      };
-    }
-
-    const emailVariables = await this.safeAttemptToParseEmailSchema(
-      tiptapControlValue?.emailEditor || tiptapControlValue?.body || '',
-      command,
-      tiptapControlValue,
-      stepData.controls.dataSchema || {},
-      variableSchema
-    );
-
-    return {
-      variablesExample: emailVariables,
-      controlValues: tiptapControlValue,
-    };
-  }
-
-  private handleSimpleControl(
-    controlValues: Record<string, unknown>,
-    variableSchema: Record<string, unknown>,
-    workflow: WorkflowInternalResponseDto,
-    commandVariablesExample: PreviewPayload | undefined
-  ): ProcessedControlResult {
-    const variables = this.processControlValueVariables(controlValues, variableSchema);
-    const processedControlValues = this.fixControlValueInvalidVariables(controlValues, variables.invalid);
-    const extractedTemplateVariables = variables.valid.map((variable) => variable.name);
-    const payloadVariableExample =
-      workflow.origin === WorkflowOriginEnum.EXTERNAL
-        ? createMockObjectFromSchema({
-            type: 'object',
-            properties: { payload: workflow.payloadSchema },
-          })
-        : {};
-
-    if (extractedTemplateVariables.length === 0) {
-      return {
-        variablesExample: payloadVariableExample,
-        controlValues: processedControlValues,
-      };
-    }
-
-    const variablesExample: Record<string, unknown> = pathsToObject(extractedTemplateVariables, {
-      valuePrefix: '{{',
-      valueSuffix: '}}',
-    });
-
-    const variablesExampleForPreview = _.merge(variablesExample, payloadVariableExample, commandVariablesExample || {});
-
-    return {
-      variablesExample: variablesExampleForPreview,
-      controlValues: processedControlValues,
-    };
-  }
-
   private async initializePreviewContext(command: GeneratePreviewCommand) {
     const stepData = await this.getStepData(command);
     const controlValues = command.generatePreviewRequestDto.controlValues || stepData.controls.values || {};
@@ -240,13 +204,13 @@ export class GeneratePreviewUsecase {
   }
 
   private processControlValueVariables(
-    controlValues: Record<string, unknown>,
+    controlValue: unknown,
     variableSchema: Record<string, unknown>
   ): {
     valid: Variable[];
     invalid: Variable[];
   } {
-    const { validVariables, invalidVariables } = extractLiquidTemplateVariables(JSON.stringify(controlValues));
+    const { validVariables, invalidVariables } = extractLiquidTemplateVariables(JSON.stringify(controlValue));
 
     const { validVariables: validSchemaVariables, invalidVariables: invalidSchemaVariables } = identifyUnknownVariables(
       variableSchema,
@@ -339,35 +303,8 @@ export class GeneratePreviewUsecase {
     }
   }
 
-  private destructureControlValues(controlValues: Record<string, unknown>): DestructuredControlValues {
-    try {
-      const localControlValue = _.cloneDeep(controlValues);
-      let tiptapControlString: string | null = null;
-
-      if (isTipTapNode(localControlValue.emailEditor)) {
-        tiptapControlString = localControlValue.emailEditor;
-        delete localControlValue.emailEditor;
-
-        return { tiptapControlValues: { emailEditor: tiptapControlString }, simpleControlValues: localControlValue };
-      }
-
-      if (isTipTapNode(localControlValue.body)) {
-        tiptapControlString = localControlValue.body;
-        delete localControlValue.body;
-
-        return { tiptapControlValues: { body: tiptapControlString }, simpleControlValues: localControlValue };
-      }
-
-      return { tiptapControlValues: null, simpleControlValues: localControlValue };
-    } catch (error) {
-      this.logger.error({ error }, 'Failed to extract TipTap control', LOG_CONTEXT);
-
-      return { tiptapControlValues: null, simpleControlValues: controlValues };
-    }
-  }
-
   private fixControlValueInvalidVariables(
-    controlValues: Record<string, unknown>,
+    controlValues: unknown,
     invalidVariables: Variable[]
   ): Record<string, unknown> {
     try {
@@ -384,7 +321,7 @@ export class GeneratePreviewUsecase {
 
       return JSON.parse(controlValuesString) as Record<string, unknown>;
     } catch (error) {
-      return controlValues;
+      return controlValues as Record<string, unknown>;
     }
   }
 }
