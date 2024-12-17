@@ -87,7 +87,7 @@ export function PlansRow({ selectedBillingInterval, currentPlan, trial }: PlansR
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <Check className="text-primary h-4 w-4" />
-                <span>Up to 50 team members</span>
+                <span>Unlimited team members</span>
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <Check className="text-primary h-4 w-4" />

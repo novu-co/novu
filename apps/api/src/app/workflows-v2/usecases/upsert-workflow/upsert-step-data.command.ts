@@ -12,7 +12,7 @@ export class UpsertStepDataCommand {
   type: StepTypeEnum;
 
   @IsOptional()
-  controlValues?: Record<string, unknown>;
+  controlValues?: Record<string, unknown> | null;
 
   @IsOptional()
   @IsString()

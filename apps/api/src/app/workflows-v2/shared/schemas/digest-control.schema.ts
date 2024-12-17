@@ -8,10 +8,12 @@ import {
   UiSchema,
   UiSchemaGroupEnum,
 } from '@novu/shared';
+import { skipControl } from './skip-control.schema';
 
 const DigestRegularControlZodSchema = z
   .object({
     amount: z.union([z.number().min(1), z.string().min(1)]),
+    skip: skipControl.schema,
     unit: z.nativeEnum(TimeUnitEnum).default(TimeUnitEnum.SECONDS),
     digestKey: z.string().optional(),
     lookBackWindow: z
@@ -74,5 +76,6 @@ export const digestUiSchema: UiSchema = {
       component: UiComponentEnum.DIGEST_CRON,
       placeholder: '',
     },
+    skip: skipControl.uiSchema.properties.skip,
   },
 };

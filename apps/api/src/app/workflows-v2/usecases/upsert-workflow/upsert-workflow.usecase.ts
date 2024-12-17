@@ -299,7 +299,7 @@ export class UpsertWorkflowUseCase {
   ): Promise<WorkflowInternalResponseDto> {
     for (const step of workflow.steps) {
       const controlValues = this.findControlValueInRequest(step, command.workflowDto.steps);
-      if (!controlValues) {
+      if (controlValues === undefined) {
         continue;
       }
       await this.patchStepDataUsecase.execute({
@@ -316,7 +316,7 @@ export class UpsertWorkflowUseCase {
   private findControlValueInRequest(
     step: NotificationStepEntity,
     steps: (StepCreateDto | StepUpdateDto)[] | StepCreateDto[]
-  ): Record<string, unknown> | undefined {
+  ): Record<string, unknown> | undefined | null {
     return steps.find((stepRequest) => {
       if (this.isStepUpdateDto(stepRequest)) {
         return stepRequest._id === step._templateId;

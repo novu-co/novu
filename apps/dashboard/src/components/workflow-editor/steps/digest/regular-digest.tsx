@@ -33,7 +33,7 @@ export const RegularDigest = () => {
         options={TIME_UNIT_OPTIONS}
         defaultOption={TimeUnitEnum.SECONDS}
         className="w-min [&_input]:!w-[3ch] [&_input]:!min-w-[3ch]"
-        onValueChange={saveForm}
+        onValueChange={() => saveForm()}
         showError={false}
         min={minAmountValue}
       />
