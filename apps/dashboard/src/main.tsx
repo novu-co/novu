@@ -17,7 +17,7 @@ import {
   ActivityFeed,
 } from '@/pages';
 import './index.css';
-import { ROUTES } from './utils/routes';
+import { LEGACY_ROUTES, ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
 import { TestWorkflowPage } from './pages/test-workflow';
 import { initializeSentry } from './utils/sentry';
@@ -156,6 +156,15 @@ const router = createBrowserRouter([
           {
             path: ROUTES.SETTINGS_BILLING,
             element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.LOCAL_STUDIO_AUTH,
+            element: (() => {
+              const currentSearch = window.location.search;
+              window.location.href = `${LEGACY_ROUTES.LOCAL_STUDIO_AUTH}${currentSearch}&studio_path_hint=/legacy/studio`;
+
+              return null;
+            })(),
           },
           {
             path: '*',

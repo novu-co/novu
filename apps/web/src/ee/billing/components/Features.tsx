@@ -194,7 +194,7 @@ const features: Feature[] = [
     label: 'Team members',
     values: {
       [SupportedPlansEnum.FREE]: { value: '3' },
-      [SupportedPlansEnum.BUSINESS]: { value: '50' },
+      [SupportedPlansEnum.BUSINESS]: { value: 'Unlimited' },
       [SupportedPlansEnum.ENTERPRISE]: { value: 'Unlimited' },
     },
   },

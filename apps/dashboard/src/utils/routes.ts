@@ -8,6 +8,7 @@ export const ROUTES = {
   INBOX_EMBED: '/onboarding/inbox/embed',
   INBOX_EMBED_SUCCESS: '/onboarding/inbox/success',
   ROOT: '/',
+  LOCAL_STUDIO_AUTH: '/local-studio/auth',
   ENV: '/env',
   SETTINGS: '/settings',
   SETTINGS_ACCOUNT: '/settings/account',
@@ -40,4 +41,5 @@ export const LEGACY_ROUTES = {
   SETTINGS: '/legacy/manage-account/user-profile',
   EDIT_WORKFLOW: '/legacy/workflows/edit/:workflowId',
   TEST_WORKFLOW: '/legacy/workflows/edit/:workflowId/test-workflow',
+  LOCAL_STUDIO_AUTH: '/legacy/local-studio/auth',
 };
