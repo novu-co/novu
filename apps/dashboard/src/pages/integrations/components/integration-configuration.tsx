@@ -26,11 +26,12 @@ type IntegrationFormData = {
 };
 
 type IntegrationConfigurationProps = {
-  provider?: IProviderConfig;
+  provider: IProviderConfig;
   integration?: IIntegration;
-  onSubmit: (data: IntegrationFormData) => Promise<void>;
+  onSubmit: (data: IntegrationFormData) => void;
   mode: 'create' | 'update';
-  isChannelSupportPrimary: boolean;
+  isChannelSupportPrimary?: boolean;
+  hasOtherProviders?: boolean;
 };
 
 function generateSlug(name: string): string {
@@ -48,6 +49,7 @@ export function IntegrationConfiguration({
   onSubmit,
   mode,
   isChannelSupportPrimary,
+  hasOtherProviders,
 }: IntegrationConfigurationProps) {
   const { currentOrganization } = useAuth();
   const { environments } = useFetchEnvironments({ organizationId: currentOrganization?._id });
@@ -78,7 +80,6 @@ export function IntegrationConfiguration({
     handleSubmit,
     control,
     formState: { errors },
-    getValues,
     setValue,
   } = form;
 
@@ -133,6 +134,7 @@ export function IntegrationConfiguration({
                 errors={errors}
                 mode={mode}
                 hidePrimarySelector={!isChannelSupportPrimary}
+                disabledPrimary={!hasOtherProviders && integration?.primary}
               />
             </AccordionContent>
           </AccordionItem>

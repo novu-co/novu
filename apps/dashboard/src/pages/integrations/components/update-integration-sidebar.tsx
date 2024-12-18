@@ -37,18 +37,21 @@ export function UpdateIntegrationSidebar({ isOpened, onClose }: UpdateIntegratio
     isPrimaryModalOpen,
     setIsPrimaryModalOpen,
     pendingData,
+    setPendingData,
     handleSubmitWithPrimaryCheck,
     handlePrimaryConfirm,
     existingPrimaryIntegration,
     isChannelSupportPrimary,
+    hasOtherProviders,
   } = useIntegrationPrimaryModal({
     onSubmit,
     integrations,
     integration,
     mode: 'update',
+    setPrimaryIntegration: setPrimaryIntegration,
   });
 
-  async function onSubmit(data: IntegrationFormData) {
+  async function onSubmit(data: IntegrationFormData, skipPrimaryCheck?: boolean) {
     if (!integration) return;
 
     /**
@@ -57,6 +60,23 @@ export function UpdateIntegrationSidebar({ isOpened, onClose }: UpdateIntegratio
      */
     if (integration?.providerId === 'novu-email' || integration?.providerId === 'novu-sms') {
       data.check = false;
+    }
+
+    // If the integration was primary and is being unmarked or deactivated
+    if (!skipPrimaryCheck && integration.primary && ((!data.primary && data.active) || !data.active)) {
+      const otherActiveIntegrationsInChannel = integrations?.filter(
+        (i) =>
+          i._id !== integration._id &&
+          i.channel === integration.channel &&
+          i.active &&
+          i._environmentId === integration._environmentId
+      );
+
+      if (otherActiveIntegrationsInChannel && otherActiveIntegrationsInChannel.length > 0) {
+        setIsPrimaryModalOpen(true);
+        setPendingData(data);
+        return;
+      }
     }
 
     try {
@@ -112,6 +132,7 @@ export function UpdateIntegrationSidebar({ isOpened, onClose }: UpdateIntegratio
             integration={integration}
             onSubmit={handleSubmitWithPrimaryCheck}
             mode="update"
+            hasOtherProviders={hasOtherProviders}
           />
         </div>
 
@@ -152,6 +173,14 @@ export function UpdateIntegrationSidebar({ isOpened, onClose }: UpdateIntegratio
         currentPrimaryName={existingPrimaryIntegration?.name}
         newPrimaryName={pendingData?.name ?? ''}
         isLoading={isUpdating || isSettingPrimary}
+        otherIntegrations={integrations?.filter(
+          (i) =>
+            i._id !== integration?._id &&
+            i.channel === integration?.channel &&
+            i.active &&
+            i._environmentId === integration?._environmentId
+        )}
+        mode={integration?.primary ? 'select' : 'switch'}
       />
     </>
   );

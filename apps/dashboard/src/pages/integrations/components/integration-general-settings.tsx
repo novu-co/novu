@@ -22,9 +22,17 @@ type GeneralSettingsProps = {
   errors: FieldErrors<IntegrationFormData>;
   mode: 'create' | 'update';
   hidePrimarySelector?: boolean;
+  disabledPrimary?: boolean;
 };
 
-export function GeneralSettings({ control, register, errors, mode, hidePrimarySelector }: GeneralSettingsProps) {
+export function GeneralSettings({
+  control,
+  register,
+  errors,
+  mode,
+  hidePrimarySelector,
+  disabledPrimary,
+}: GeneralSettingsProps) {
   return (
     <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
       <div className="flex items-center justify-between gap-2">
@@ -57,7 +65,7 @@ export function GeneralSettings({ control, register, errors, mode, hidePrimarySe
             control={control}
             name="primary"
             render={({ field: { onChange, value } }) => (
-              <Switch id="primary" checked={value} onCheckedChange={onChange} />
+              <Switch id="primary" checked={value} onCheckedChange={onChange} disabled={disabledPrimary} />
             )}
           />
         </div>
