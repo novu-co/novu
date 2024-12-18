@@ -4,11 +4,11 @@ import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
 import { autocompletion } from '@codemirror/autocomplete';
-import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 const subjectKey = 'subject';
 
