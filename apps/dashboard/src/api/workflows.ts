@@ -60,7 +60,7 @@ export async function triggerWorkflow({
   payload,
   to,
 }: {
-  environment: Pick<IEnvironment, '_id'>;
+  environment: IEnvironment;
   name: string;
   payload: unknown;
   to: unknown;
