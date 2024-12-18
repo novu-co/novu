@@ -1,23 +1,26 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { Input } from './input';
+import { Input, InputField } from './input';
 import { Button } from './button';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../utils/constants';
 
-interface SecretInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  register?: any;
-  registerKey?: string;
-  registerOptions?: any;
+interface SecretInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+  value: string;
+  onChange: (value: string) => void;
 }
 
-export function SecretInput({ className, register, registerKey, registerOptions, ...props }: SecretInputProps) {
+export function SecretInput({ className, value, onChange, ...props }: SecretInputProps) {
   const [revealed, setRevealed] = useState(false);
 
-  const inputProps = register && registerKey ? register(registerKey, registerOptions) : props;
-
   return (
-    <>
-      <Input type={revealed ? 'text' : 'password'} {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF} {...inputProps} />
+    <InputField className="flex overflow-hidden pr-0">
+      <Input
+        type={revealed ? 'text' : 'password'}
+        {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        {...props}
+      />
       <Button
         type="button"
         variant="ghost"
@@ -32,6 +35,6 @@ export function SecretInput({ className, register, registerKey, registerOptions,
         )}
         <span className="sr-only">{revealed ? 'Hide' : 'Show'} password</span>
       </Button>
-    </>
+    </InputField>
   );
 }

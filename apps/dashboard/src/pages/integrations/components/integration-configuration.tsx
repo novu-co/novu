@@ -161,7 +161,7 @@ export function IntegrationConfiguration({
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <CredentialsSection provider={provider} register={register} control={control} errors={errors} />
+                  <CredentialsSection provider={provider} register={register} control={control} />
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

@@ -61,17 +61,12 @@ export function CredentialsSection({ provider, register, control }: CredentialsS
                 </div>
               ) : credential.type === 'secret' || SECURE_CREDENTIALS.includes(credential.key as CredentialsKeyEnum) ? (
                 <FormControl>
-                  <InputField className="flex overflow-hidden pr-0">
-                    <SecretInput
-                      id={credential.key}
-                      placeholder={`Enter ${credential.displayName.toLowerCase()}`}
-                      register={register}
-                      registerKey={`credentials.${credential.key}`}
-                      registerOptions={{
-                        required: credential.required ? `${credential.displayName} is required` : false,
-                      }}
-                    />
-                  </InputField>
+                  <SecretInput
+                    id={credential.key}
+                    placeholder={`Enter ${credential.displayName.toLowerCase()}`}
+                    value={field.value || ''}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
               ) : (
                 <FormControl>
