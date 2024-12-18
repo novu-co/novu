@@ -71,14 +71,6 @@ export function useIntegrationPrimaryModal({
 
     try {
       if (newPrimaryIntegrationId && setPrimaryIntegration) {
-        await onSubmit(
-          {
-            ...pendingData,
-            primary: false,
-          },
-          true
-        );
-
         await setPrimaryIntegration({ integrationId: newPrimaryIntegrationId });
       } else {
         await onSubmit(pendingData, true);
