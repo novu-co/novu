@@ -9,6 +9,7 @@ import { useEditorPreview } from '../use-editor-preview';
 import { PushPreview } from './push-preview';
 import { RiCellphoneFill } from 'react-icons/ri';
 import { PushTabsSection } from './push-tabs-section';
+import { InlineToast } from '@/components/primitives/inline-toast';
 
 const getInitialAccordionValue = (value: string) => {
   try {
@@ -63,12 +64,10 @@ export const PushEditorPreview = ({ workflow, step, formValues }: PushEditorPrev
         </div>
         <div className="flex flex-col items-center justify-center gap-4">
           <PushPreview isPreviewPending={isPreviewPending} previewData={previewData} />
-          <div className="flex w-full items-center gap-3 rounded-md border border-neutral-100 bg-neutral-50 px-3 py-2.5">
-            <span className="w-1 self-stretch rounded-full bg-neutral-500" />
-            <span className="flex-1 text-xs font-medium text-neutral-600">
-              This preview shows how your message will appear on mobile. Actual rendering may vary by device.
-            </span>
-          </div>
+          <InlineToast
+            description="This preview shows how your message will appear on mobile. Actual rendering may vary by device."
+            className="w-full px-3"
+          />
         </div>
         <Accordion type="single" collapsible value={accordionValue} onValueChange={setAccordionValue}>
           <AccordionItem value="payload">
