@@ -30,17 +30,19 @@ export function IntegrationSheetHeader({ provider, mode, onBack, step }: Integra
 
   return (
     <SheetHeader className="borde-neutral-300 space-y-1 border-b p-3">
-      <div className="flex items-center gap-2">
-        {mode === 'create' && onBack && (
-          <Button variant="ghost" size="xs" className="text-foreground-950 h-5 p-0.5 leading-none" onClick={onBack}>
-            <RiArrowLeftSLine className="h-4 w-4" />
-          </Button>
-        )}
-        <div>
-          <ProviderIcon providerId={provider.id} providerDisplayName={provider.displayName} />
+      <SheetTitle>
+        <div className="flex items-center gap-2">
+          {mode === 'create' && onBack && (
+            <Button variant="ghost" size="xs" className="text-foreground-950 h-5 p-0.5 leading-none" onClick={onBack}>
+              <RiArrowLeftSLine className="h-4 w-4" />
+            </Button>
+          )}
+          <div>
+            <ProviderIcon providerId={provider.id} providerDisplayName={provider.displayName} />
+          </div>
+          <div className="text-md text-foreground-950 leading-6">{provider.displayName}</div>
         </div>
-        <div className="text-md text-foreground-950 leading-6">{provider.displayName}</div>
-      </div>
+      </SheetTitle>
     </SheetHeader>
   );
 }
