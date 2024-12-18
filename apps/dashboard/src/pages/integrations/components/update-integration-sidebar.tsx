@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { toast } from 'sonner';
 import { useFetchIntegrations } from '@/hooks/use-fetch-integrations';
 import { useUpdateIntegration } from '@/hooks/use-update-integration';
 import { useSetPrimaryIntegration } from '@/hooks/use-set-primary-integration';
@@ -15,6 +14,7 @@ import { handleIntegrationError } from './utils/handle-integration-error';
 import { useIntegrationPrimaryModal } from './hooks/use-integration-primary-modal';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ROUTES } from '../../../utils/routes';
+import { showSuccessToast } from '../../../components/primitives/sonner-helpers';
 
 type UpdateIntegrationSidebarProps = {
   isOpened: boolean;
@@ -95,6 +95,8 @@ export function UpdateIntegrationSidebar({ isOpened }: UpdateIntegrationSidebarP
         await setPrimaryIntegration({ integrationId: integration._id });
       }
 
+      showSuccessToast('Integration updated successfully');
+
       navigate(ROUTES.INTEGRATIONS);
     } catch (error: unknown) {
       handleIntegrationError(error, 'update');
@@ -107,7 +109,7 @@ export function UpdateIntegrationSidebar({ isOpened }: UpdateIntegrationSidebarP
     try {
       await deleteIntegration({ id: integration._id });
 
-      toast.success('Integration deleted successfully');
+      showSuccessToast('Integration deleted successfully');
       setIsDeleteDialogOpen(false);
       navigate(ROUTES.INTEGRATIONS);
     } catch (error: unknown) {

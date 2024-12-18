@@ -14,6 +14,7 @@ import { IntegrationFormData } from '../types';
 import { useIntegrationPrimaryModal } from './hooks/use-integration-primary-modal';
 import { useFetchIntegrations } from '@/hooks/use-fetch-integrations';
 import { buildRoute, ROUTES } from '../../../utils/routes';
+import { showSuccessToast } from '../../../components/workflow-editor/toasts';
 
 export type CreateIntegrationSidebarProps = {
   isOpened: boolean;
@@ -77,6 +78,8 @@ export function CreateIntegrationSidebar({ isOpened }: CreateIntegrationSidebarP
       if (data.primary && isChannelSupportPrimary && data.active) {
         await setPrimaryIntegration({ integrationId: integration.data._id });
       }
+
+      showSuccessToast('Integration created successfully');
 
       navigate(ROUTES.INTEGRATIONS);
     } catch (error: unknown) {
