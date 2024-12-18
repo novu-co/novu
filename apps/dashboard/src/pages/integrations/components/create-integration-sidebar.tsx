@@ -43,7 +43,7 @@ export function CreateIntegrationSidebar({ isOpened }: CreateIntegrationSidebarP
     onBack: handleBack,
   });
 
-  const { integrationsByChannel } = useIntegrationList(providers, searchQuery);
+  const { integrationsByChannel } = useIntegrationList(searchQuery);
   const provider = providers?.find((p) => p.id === (selectedIntegration || providerId));
   const {
     isPrimaryModalOpen,

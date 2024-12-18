@@ -1,31 +1,52 @@
 import { useMemo } from 'react';
-import { ChannelTypeEnum, IProviderConfig } from '@novu/shared';
+import { ChannelTypeEnum, ChatProviderIdEnum, IProviderConfig, PushProviderIdEnum } from '@novu/shared';
+import { providers, EmailProviderIdEnum, SmsProviderIdEnum } from '@novu/shared';
+import { ProvidersIdEnum } from '@novu/shared';
 
-export function useIntegrationList(providers: IProviderConfig[] | undefined, searchQuery: string = '') {
+export function useIntegrationList(searchQuery: string = '') {
   const filteredIntegrations = useMemo(() => {
     if (!providers) return [];
 
     const filtered = providers.filter(
       (provider: IProviderConfig) =>
         provider.displayName.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        provider.id !== 'novu-email' &&
-        provider.id !== 'novu-sms'
+        provider.id !== EmailProviderIdEnum.Novu &&
+        provider.id !== SmsProviderIdEnum.Novu
     );
 
-    const popularityOrder: Record<ChannelTypeEnum, string[]> = {
+    const popularityOrder: Record<ChannelTypeEnum, ProvidersIdEnum[]> = {
       [ChannelTypeEnum.EMAIL]: [
-        'sendgrid',
-        'mailgun',
-        'postmark',
-        'mailjet',
-        'mandrill',
-        'ses',
-        'outlook365',
-        'custom-smtp',
+        EmailProviderIdEnum.SendGrid,
+        EmailProviderIdEnum.Mailgun,
+        EmailProviderIdEnum.Postmark,
+        EmailProviderIdEnum.Mailjet,
+        EmailProviderIdEnum.Mandrill,
+        EmailProviderIdEnum.SES,
+        EmailProviderIdEnum.Outlook365,
+        EmailProviderIdEnum.CustomSMTP,
       ],
-      [ChannelTypeEnum.SMS]: ['twilio', 'plivo', 'sns', 'nexmo', 'telnyx', 'sms77', 'infobip', 'gupshup'],
-      [ChannelTypeEnum.PUSH]: ['fcm', 'expo', 'apns', 'one-signal'],
-      [ChannelTypeEnum.CHAT]: ['slack', 'discord', 'ms-teams', 'mattermost'],
+      [ChannelTypeEnum.SMS]: [
+        SmsProviderIdEnum.Twilio,
+        SmsProviderIdEnum.Plivo,
+        SmsProviderIdEnum.SNS,
+        SmsProviderIdEnum.Nexmo,
+        SmsProviderIdEnum.Telnyx,
+        SmsProviderIdEnum.Sms77,
+        SmsProviderIdEnum.Infobip,
+        SmsProviderIdEnum.Gupshup,
+      ],
+      [ChannelTypeEnum.PUSH]: [
+        PushProviderIdEnum.FCM,
+        PushProviderIdEnum.EXPO,
+        PushProviderIdEnum.APNS,
+        PushProviderIdEnum.OneSignal,
+      ],
+      [ChannelTypeEnum.CHAT]: [
+        ChatProviderIdEnum.Slack,
+        ChatProviderIdEnum.Discord,
+        ChatProviderIdEnum.MsTeams,
+        ChatProviderIdEnum.Mattermost,
+      ],
       [ChannelTypeEnum.IN_APP]: [],
     };
 
@@ -49,6 +70,7 @@ export function useIntegrationList(providers: IProviderConfig[] | undefined, sea
     return Object.values(ChannelTypeEnum).reduce(
       (acc, channel) => {
         acc[channel] = filteredIntegrations.filter((provider: IProviderConfig) => provider.channel === channel);
+
         return acc;
       },
       {} as Record<ChannelTypeEnum, IProviderConfig[]>

@@ -37,7 +37,7 @@ export function GeneralSettings({
     <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
       <div className="flex items-center justify-between gap-2">
         <Label className="text-xs" htmlFor="active">
-          Enable Integration{' '}
+          Active Integration{' '}
           <HelpTooltipIndicator
             className="relative top-1"
             size="4"

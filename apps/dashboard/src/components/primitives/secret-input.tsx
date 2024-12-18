@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Input } from './input';
 import { Button } from './button';
+import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../utils/constants';
 
 interface SecretInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   register?: any;
@@ -16,7 +17,7 @@ export function SecretInput({ className, register, registerKey, registerOptions,
 
   return (
     <>
-      <Input type={revealed ? 'text' : 'password'} {...inputProps} />
+      <Input type={revealed ? 'text' : 'password'} {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF} {...inputProps} />
       <Button
         type="button"
         variant="ghost"

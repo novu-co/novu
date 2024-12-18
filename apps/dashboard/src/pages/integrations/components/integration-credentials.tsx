@@ -76,8 +76,8 @@ export function CredentialsSection({ provider, register, control, errors }: Cred
             </InputField>
           )}
           {credential.description && (
-            <div className="text-foreground-400 flex items-center gap-1 text-xs">
-              <Info className="h-3 w-3" />
+            <div className="text-foreground-400 flex gap-1 text-xs">
+              <Info className="relative top-[2px] h-3 w-3" />
               <span>{credential.description}</span>
             </div>
           )}
