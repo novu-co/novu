@@ -153,7 +153,15 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <FormLabel hint={`(max. ${MAX_TAG_ELEMENTS})`}>Add tags</FormLabel>
                     </div>
                     <FormControl>
-                      <TagInput suggestions={tags.map((tag) => tag.name)} {...field} value={field.value ?? []} />
+                      <TagInput
+                        suggestions={tags.map((tag) => tag.name)}
+                        {...field}
+                        value={field.value ?? []}
+                        onChange={(tags) => {
+                          field.onChange(tags);
+                          form.setValue('tags', tags, { shouldValidate: true });
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
