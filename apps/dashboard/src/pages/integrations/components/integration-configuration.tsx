@@ -130,8 +130,6 @@ export function IntegrationConfiguration({
             <AccordionContent>
               <GeneralSettings
                 control={control}
-                register={register}
-                errors={errors}
                 mode={mode}
                 hidePrimarySelector={!isChannelSupportPrimary}
                 disabledPrimary={!hasOtherProviders && integration?.primary}
