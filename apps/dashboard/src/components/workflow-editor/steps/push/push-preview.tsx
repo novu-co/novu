@@ -111,7 +111,10 @@ export const PushContentContainerPreview = ({ children, className, ...rest }: HT
 
 export const PushBackgroundWithPhone = ({ children, className, ...rest }: HTMLAttributes<HTMLDivElement>) => {
   return (
-    <div className={cn("relative h-60 w-full max-w-72 bg-[url('/images/push-bg.svg')] bg-cover", className)} {...rest}>
+    <div
+      className={cn("relative h-60 w-full max-w-72 bg-[url('/images/phones/iphone-push.svg')] bg-cover", className)}
+      {...rest}
+    >
       {children}
     </div>
   );
