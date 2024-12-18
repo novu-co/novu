@@ -14,7 +14,7 @@ import { IntegrationFormData } from '../types';
 import { useIntegrationPrimaryModal } from './hooks/use-integration-primary-modal';
 import { useFetchIntegrations } from '@/hooks/use-fetch-integrations';
 import { buildRoute, ROUTES } from '../../../utils/routes';
-import { showSuccessToast } from '../../../components/workflow-editor/toasts';
+import { showSuccessToast } from '../../../components/primitives/sonner-helpers';
 
 export type CreateIntegrationSidebarProps = {
   isOpened: boolean;

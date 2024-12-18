@@ -3,6 +3,8 @@ import { CHANNELS_WITH_PRIMARY, IIntegration, ChannelTypeEnum } from '@novu/shar
 import { IntegrationFormData } from '../../types';
 import { handleIntegrationError } from '../utils/handle-integration-error';
 import { UseMutateAsyncFunction } from '@tanstack/react-query';
+import { ROUTES } from '../../../../utils/routes';
+import { useNavigate } from 'react-router-dom';
 
 type SetPrimaryIntegrationParams = {
   integrationId: string;
@@ -25,6 +27,7 @@ export function useIntegrationPrimaryModal({
   mode,
   setPrimaryIntegration,
 }: UseIntegrationPrimaryModalProps) {
+  const navigate = useNavigate();
   const [isPrimaryModalOpen, setIsPrimaryModalOpen] = useState(false);
   const [pendingData, setPendingData] = useState<IntegrationFormData | null>(null);
 
@@ -72,11 +75,13 @@ export function useIntegrationPrimaryModal({
     try {
       if (newPrimaryIntegrationId && setPrimaryIntegration) {
         await setPrimaryIntegration({ integrationId: newPrimaryIntegrationId });
-      } else {
-        await onSubmit(pendingData, true);
       }
+
+      await onSubmit(pendingData, true);
+
       setPendingData(null);
       setIsPrimaryModalOpen(false);
+      navigate(ROUTES.INTEGRATIONS);
     } catch (error: unknown) {
       handleIntegrationError(error, mode);
     }

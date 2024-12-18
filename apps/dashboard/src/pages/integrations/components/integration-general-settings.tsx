@@ -76,7 +76,7 @@ export function GeneralSettings({ control, mode, hidePrimarySelector, disabledPr
         name="name"
         rules={{ required: 'Name is required' }}
         render={({ field }) => (
-          <FormItem className="space-y-2">
+          <FormItem>
             <FormLabel className="text-xs" htmlFor="name">
               Name
             </FormLabel>
@@ -95,7 +95,7 @@ export function GeneralSettings({ control, mode, hidePrimarySelector, disabledPr
         name="identifier"
         rules={{ required: 'Identifier is required' }}
         render={({ field }) => (
-          <FormItem className="space-y-2">
+          <FormItem>
             <FormLabel className="text-xs" htmlFor="identifier">
               Identifier
             </FormLabel>
