@@ -341,8 +341,6 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                         disabled={isReadOnly}
                         value={field.value ?? []}
                         suggestions={tags.map((tag) => tag.name)}
-                        // maxLength={MAX_TAG_ELEMENTS}
-                        // max={MAX_TAG_LENGTH}
                       />
                     </FormControl>
                     <FormMessage />
