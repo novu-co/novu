@@ -12,6 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from '../../../components/primitives/form/form';
+import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../../utils/constants';
 
 type IntegrationFormData = {
   name: string;
@@ -73,6 +74,7 @@ export function CredentialsSection({ provider, control }: CredentialsSectionProp
                     <Input
                       id={credential.key}
                       type="text"
+                      {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
                       placeholder={`Enter ${credential.displayName.toLowerCase()}`}
                       {...field}
                     />
