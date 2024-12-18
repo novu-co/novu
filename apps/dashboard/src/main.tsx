@@ -32,8 +32,8 @@ import { FeatureFlagsProvider } from './context/feature-flags-provider';
 import { ConfigureStep } from '@/components/workflow-editor/steps/configure-step';
 import { ConfigureStepTemplate } from '@/components/workflow-editor/steps/configure-step-template';
 import { RedirectToLegacyStudioAuth } from './pages/redirect-to-legacy-studio-auth';
-import { CreateIntegrationSidebar } from './pages/integrations/components/create-integration-sidebar';
-import { UpdateIntegrationSidebar } from './pages/integrations/components/update-integration-sidebar';
+import { CreateIntegrationSidebar } from './components/integrations/components/create-integration-sidebar';
+import { UpdateIntegrationSidebar } from './components/integrations/components/update-integration-sidebar';
 
 initializeSentry();
 overrideZodErrorMap();

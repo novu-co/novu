@@ -7,5 +7,5 @@ export * from './usecase-select-page';
 export * from './api-keys';
 export * from './settings';
 export * from './welcome-page';
-export * from './integrations/integrations-list-page';
+export * from './integrations-list-page';
 export * from './activity-feed';

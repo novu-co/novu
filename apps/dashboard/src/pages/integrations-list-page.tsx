@@ -1,14 +1,14 @@
 import { useCallback } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
-import { IntegrationsList } from './components/integrations-list';
-import { TableIntegration } from './types';
-import { DashboardLayout } from '../../components/dashboard-layout';
-import { Badge } from '../../components/primitives/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Button } from '@/components/primitives/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { ROUTES } from '@/utils/routes';
+import { DashboardLayout } from '../components/dashboard-layout';
+import { TableIntegration } from '../components/integrations/types';
+import { Badge } from '../components/primitives/badge';
+import { IntegrationsList } from '../components/integrations/components/integrations-list';
 
 export function IntegrationsListPage() {
   const navigate = useNavigate();
