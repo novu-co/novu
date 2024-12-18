@@ -10,6 +10,8 @@ import { Maily } from '@/components/workflow-editor/steps/email/maily';
 import { EmailSubject } from '@/components/workflow-editor/steps/email/email-subject';
 import { DigestKey } from '@/components/workflow-editor/steps/digest/digest-key';
 import { DigestWindow } from '@/components/workflow-editor/steps/digest/digest-window';
+import { BaseBody } from './base/base-body';
+import { BaseSubject } from './base/base-subject';
 
 export const getComponentByType = ({ component }: { component?: UiComponentEnum }) => {
   switch (component) {
@@ -47,6 +49,13 @@ export const getComponentByType = ({ component }: { component?: UiComponentEnum 
     case UiComponentEnum.DIGEST_CRON: {
       return <DigestWindow />;
     }
+    case UiComponentEnum.PUSH_BODY: {
+      return <BaseBody />;
+    }
+    case UiComponentEnum.PUSH_SUBJECT: {
+      return <BaseSubject />;
+    }
+
     default: {
       return null;
     }

@@ -29,5 +29,13 @@ const topicSchema = new Schema<TopicDBModel>(
   schemaOptions
 );
 
+topicSchema.index({
+  _environmentId: 1,
+});
+
+topicSchema.index({
+  _organizationId: 1,
+});
+
 export const Topic =
   (mongoose.models.Topic as mongoose.Model<TopicDBModel>) || mongoose.model<TopicDBModel>('Topic', topicSchema);

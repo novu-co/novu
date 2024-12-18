@@ -59,7 +59,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
           preview: {
             subject: 'Welcome {{subscriber.firstName}}',
             // cspell:disable-next-line
-            body: 'Hello {{subscriber.firstName}} {{subscriber.lastName}}, Welcome to {{PAYLOAD.ORGANIZATIONNAME | UPCASE}}!',
+            body: 'Hello {{subscriber.firstName}} {{subscriber.lastName}}, Welcome to {{PAYLOAD.ORGANIZATIONNAME}}!',
           },
           type: 'in_app',
         },
@@ -69,7 +69,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
             lastName: '{{subscriber.lastName}}',
           },
           payload: {
-            organizationName: '{{payload.organizationName | upcase}}',
+            organizationName: '{{payload.organizationName}}',
           },
         },
       },
