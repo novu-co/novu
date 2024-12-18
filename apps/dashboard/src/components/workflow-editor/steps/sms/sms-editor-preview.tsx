@@ -1,13 +1,13 @@
 import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
 import { CSSProperties, useEffect, useRef, useState } from 'react';
 
-import { Notification5Fill } from '@/components/icons';
+import { Sms } from '@/components/icons';
 import { Code2 } from '@/components/icons/code-2';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
 import { Button } from '@/components/primitives/button';
 import { Editor } from '@/components/primitives/editor';
-import { InAppTabsSection } from '@/components/workflow-editor/steps/in-app/in-app-tabs-section';
 import { SmsPreview } from '@/components/workflow-editor/steps/sms/sms-preview';
+import { SmsTabsSection } from '@/components/workflow-editor/steps/sms/sms-tabs-section';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { useEditorPreview } from '../use-editor-preview';
 
@@ -56,10 +56,10 @@ export const SmsEditorPreview = ({ workflow, step, formValues }: SmsEditorPrevie
   }, [editorValue]);
 
   return (
-    <InAppTabsSection>
+    <SmsTabsSection>
       <div className="relative flex flex-col gap-3">
         <div className="flex items-center gap-2.5 text-sm font-medium">
-          <Notification5Fill className="size-3" />
+          <Sms className="size-3" />
           SMS template editor
         </div>
         <div className="flex flex-col items-center justify-center gap-2">
@@ -106,6 +106,6 @@ export const SmsEditorPreview = ({ workflow, step, formValues }: SmsEditorPrevie
           </AccordionItem>
         </Accordion>
       </div>
-    </InAppTabsSection>
+    </SmsTabsSection>
   );
 };
