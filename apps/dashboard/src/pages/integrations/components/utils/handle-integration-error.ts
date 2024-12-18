@@ -1,5 +1,6 @@
 import { toast } from 'sonner';
 import { CheckIntegrationResponseEnum } from '@/api/integrations';
+import * as Sentry from '@sentry/react';
 
 export function handleIntegrationError(error: any, operation: 'update' | 'create' | 'delete') {
   if (error?.message?.code === CheckIntegrationResponseEnum.INVALID_EMAIL) {
@@ -11,6 +12,8 @@ export function handleIntegrationError(error: any, operation: 'update' | 'create
       description: error.message?.message,
     });
   } else {
+    Sentry.captureException(error);
+
     toast.error(`Failed to ${operation} integration`, {
       description: error?.message?.message || error?.message || `There was an error ${operation}ing the integration.`,
     });

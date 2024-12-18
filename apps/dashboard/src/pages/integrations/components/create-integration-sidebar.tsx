@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChannelTypeEnum, providers as novuProviders } from '@novu/shared';
+import { providers as novuProviders } from '@novu/shared';
 import { useCreateIntegration } from '@/hooks/use-create-integration';
 import { useIntegrationList } from './hooks/use-integration-list';
 import { useSidebarNavigationManager } from './hooks/use-sidebar-navigation-manager';
@@ -18,7 +18,6 @@ import { buildRoute, ROUTES } from '../../../utils/routes';
 export type CreateIntegrationSidebarProps = {
   isOpened: boolean;
   onClose: () => void;
-  scrollToChannel?: ChannelTypeEnum;
 };
 
 export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegrationSidebarProps) {
@@ -56,12 +55,13 @@ export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegratio
     existingPrimaryIntegration,
     isChannelSupportPrimary,
   } = useIntegrationPrimaryModal({
-    onSubmit,
+    onSubmit: handleCreateIntegration,
     integrations,
     channel: provider?.channel,
     mode: 'create',
   });
-  async function onSubmit(data: IntegrationFormData) {
+
+  async function handleCreateIntegration(data: IntegrationFormData) {
     if (!provider) return;
 
     try {

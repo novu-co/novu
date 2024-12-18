@@ -14,6 +14,7 @@ import { useDeleteIntegration } from '../../../hooks/use-delete-integration';
 import { handleIntegrationError } from './utils/handle-integration-error';
 import { useIntegrationPrimaryModal } from './hooks/use-integration-primary-modal';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ROUTES } from '../../../utils/routes';
 
 type UpdateIntegrationSidebarProps = {
   isOpened: boolean;
@@ -76,7 +77,7 @@ export function UpdateIntegrationSidebar({ isOpened, onClose }: UpdateIntegratio
       }
 
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       handleIntegrationError(error, 'update');
     }
   }
@@ -89,14 +90,14 @@ export function UpdateIntegrationSidebar({ isOpened, onClose }: UpdateIntegratio
       toast.success('Integration deleted successfully');
       setIsDeleteDialogOpen(false);
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       handleIntegrationError(error, 'delete');
     }
   };
 
   const handleClose = () => {
     onClose();
-    navigate('/integrations');
+    navigate(ROUTES.INTEGRATIONS);
   };
 
   if (!integration || !provider) return null;
