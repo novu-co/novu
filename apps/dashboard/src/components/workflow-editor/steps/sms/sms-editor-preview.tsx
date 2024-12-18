@@ -10,6 +10,7 @@ import { SmsPreview } from '@/components/workflow-editor/steps/sms/sms-preview';
 import { SmsTabsSection } from '@/components/workflow-editor/steps/sms/sms-tabs-section';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { useEditorPreview } from '../use-editor-preview';
+import { InlineToast } from '@/components/primitives/inline-toast';
 
 const getInitialAccordionValue = (value: string) => {
   try {
@@ -62,8 +63,12 @@ export const SmsEditorPreview = ({ workflow, step, formValues }: SmsEditorPrevie
           <Sms className="size-3" />
           SMS template editor
         </div>
-        <div className="flex flex-col items-center justify-center gap-2">
+        <div className="flex flex-col items-center justify-center gap-4">
           <SmsPreview isPreviewPending={isPreviewPending} previewData={previewData} />
+          <InlineToast
+            description="This preview shows how your message will appear on mobile. Actual rendering may vary by device."
+            className="w-full px-3"
+          />
         </div>
         <Accordion type="single" collapsible value={accordionValue} onValueChange={setAccordionValue}>
           <AccordionItem value="payload">
