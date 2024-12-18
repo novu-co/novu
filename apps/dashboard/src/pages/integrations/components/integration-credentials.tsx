@@ -1,4 +1,4 @@
-import { Control, UseFormRegister, FieldErrors } from 'react-hook-form';
+import { Control, UseFormRegister } from 'react-hook-form';
 import { Input, InputField } from '@/components/primitives/input';
 import { Switch } from '@/components/primitives/switch';
 import { SecretInput } from '@/components/primitives/secret-input';
@@ -27,7 +27,6 @@ type CredentialsSectionProps = {
   provider?: IProviderConfig;
   control: Control<IntegrationFormData>;
   register: UseFormRegister<IntegrationFormData>;
-  errors: FieldErrors<IntegrationFormData>;
 };
 
 const SECURE_CREDENTIALS = [
@@ -39,16 +38,17 @@ const SECURE_CREDENTIALS = [
   CredentialsKeyEnum.ServiceAccount,
 ];
 
-export function CredentialsSection({ provider, register, control, errors }: CredentialsSectionProps) {
+export function CredentialsSection({ provider, register, control }: CredentialsSectionProps) {
   return (
     <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
       {provider?.credentials?.map((credential) => (
         <FormField
+          key={credential.key}
           control={control}
           name={`credentials.${credential.key}`}
           rules={{ required: credential.required ? `${credential.displayName} is required` : false }}
           render={({ field }) => (
-            <FormItem key={credential.key} className="mb-2">
+            <FormItem className="mb-2">
               <FormLabel htmlFor={credential.key}>
                 {credential.displayName}
                 {credential.required && <span className="text-destructive ml-1">*</span>}
