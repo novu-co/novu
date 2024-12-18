@@ -17,7 +17,7 @@ import {
   ActivityFeed,
 } from '@/pages';
 import './index.css';
-import { LEGACY_ROUTES, ROUTES } from './utils/routes';
+import { ROUTES } from './utils/routes';
 import { EditWorkflowPage } from './pages/edit-workflow';
 import { TestWorkflowPage } from './pages/test-workflow';
 import { initializeSentry } from './utils/sentry';
@@ -30,6 +30,7 @@ import { ChannelPreferences } from './components/workflow-editor/channel-prefere
 import { FeatureFlagsProvider } from './context/feature-flags-provider';
 import { ConfigureStep } from '@/components/workflow-editor/steps/configure-step';
 import { ConfigureStepTemplate } from '@/components/workflow-editor/steps/configure-step-template';
+import { RedirectToLegacyStudioAuth } from './pages/redirect-to-legacy-studio-auth';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -159,12 +160,7 @@ const router = createBrowserRouter([
           },
           {
             path: ROUTES.LOCAL_STUDIO_AUTH,
-            element: (() => {
-              const currentSearch = window.location.search;
-              window.location.href = `${LEGACY_ROUTES.LOCAL_STUDIO_AUTH}${currentSearch}&studio_path_hint=/legacy/studio`;
-
-              return null;
-            })(),
+            element: <RedirectToLegacyStudioAuth />,
           },
           {
             path: '*',
