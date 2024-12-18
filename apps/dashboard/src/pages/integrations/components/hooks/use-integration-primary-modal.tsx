@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useState } from 'react';
 import { CHANNELS_WITH_PRIMARY, IIntegration, ChannelTypeEnum } from '@novu/shared';
 import { IntegrationFormData } from '../../types';
 import { handleIntegrationError } from '../utils/handle-integration-error';
@@ -32,35 +32,21 @@ export function useIntegrationPrimaryModal({
   const currentEnvironmentId = integration?._environmentId;
 
   const isChannelSupportPrimary = CHANNELS_WITH_PRIMARY.includes(currentChannel);
-
-  const filterOtherIntegrations = useCallback(
-    (predicate: (el: IIntegration) => boolean) => {
-      return integrations?.some(
-        (el) =>
-          (mode === 'update' ? el._id !== integration?._id : true) &&
-          el.channel === currentChannel &&
-          el._environmentId === currentEnvironmentId &&
-          predicate(el)
-      );
-    },
-    [integrations, mode, integration?._id, currentChannel, currentEnvironmentId]
+  const filteredIntegrations = integrations.filter(
+    (el) =>
+      el.channel === currentChannel &&
+      el._environmentId === currentEnvironmentId &&
+      (mode === 'update' ? el._id !== integration?._id : true)
   );
 
-  const findPrimaryIntegration = useMemo(
-    () => () => {
-      return filterOtherIntegrations((el) => el.primary);
-    },
-    [filterOtherIntegrations]
-  );
-
-  const hasOtherProviders = filterOtherIntegrations(() => true);
+  const existingPrimaryIntegration = filteredIntegrations.find((el) => el.primary);
+  const hasOtherProviders = filteredIntegrations.length;
 
   const shouldShowPrimaryModal = (data: IntegrationFormData) => {
     if (!channel && !integration) return false;
     if (!isChannelSupportPrimary) return false;
 
-    const hasSameChannelActiveIntegration = filterOtherIntegrations((el) => el.active);
-    const existingPrimaryIntegration = findPrimaryIntegration();
+    const hasSameChannelActiveIntegration = filteredIntegrations.find((el) => el.active);
 
     return data.active && data.primary && hasSameChannelActiveIntegration && existingPrimaryIntegration;
   };
@@ -112,7 +98,7 @@ export function useIntegrationPrimaryModal({
     setPendingData,
     handleSubmitWithPrimaryCheck,
     handlePrimaryConfirm,
-    existingPrimaryIntegration: findPrimaryIntegration(),
+    existingPrimaryIntegration,
     hasOtherProviders,
   };
 }
