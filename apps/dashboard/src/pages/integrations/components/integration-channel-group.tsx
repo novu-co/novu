@@ -1,5 +1,5 @@
 import { ChannelTypeEnum, IEnvironment, IIntegration, IProviderConfig } from '@novu/shared';
-import { ITableIntegration } from '../types';
+import { TableIntegration } from '../types';
 import { IntegrationCard } from './integration-card';
 import { CHANNEL_TYPE_TO_STRING } from '@/utils/channels';
 
@@ -8,7 +8,7 @@ type IntegrationChannelGroupProps = {
   integrations: IIntegration[];
   providers: IProviderConfig[];
   environments?: IEnvironment[];
-  onRowClickCallback: (item: { original: ITableIntegration }) => void;
+  onRowClickCallback: (item: TableIntegration) => void;
 };
 
 export function IntegrationChannelGroup({

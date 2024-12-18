@@ -1,6 +1,6 @@
 import { ChannelTypeEnum } from '@novu/shared';
 
-export interface ITableIntegration {
+export type TableIntegration = {
   integrationId: string;
   name: string;
   identifier: string;
@@ -11,4 +11,4 @@ export interface ITableIntegration {
   conditions?: string[];
   primary?: boolean;
   isPrimary?: boolean;
-}
+};
