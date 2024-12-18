@@ -16,6 +16,7 @@ import { buildDefaultValuesOfDataSchema } from '@/utils/schema';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
+import { InlineToast } from '@/components/primitives/inline-toast';
 
 type CustomStepControlsProps = {
   dataSchema: ControlsMetadata['dataSchema'];
@@ -167,12 +168,10 @@ const OverrideMessage = ({ isOverridden }: { isOverridden: boolean }) => {
   return (
     <motion.div layout {...fadeAnimation} className="relative min-h-10">
       {isOverridden ? (
-        <div className="mt-4 flex w-full items-center gap-3 rounded-md border bg-neutral-50 px-3 py-2.5">
-          <span className="w-1 self-stretch rounded-full bg-neutral-500" />
-          <span className="flex-1 text-xs font-medium text-neutral-600">
-            Custom controls defined in the code have been overridden. Disable overrides to restore the original.
-          </span>
-        </div>
+        <InlineToast
+          description="Custom controls defined in the code have been overridden. Disable overrides to restore the original."
+          className="w-full px-3"
+        />
       ) : (
         <Link
           target="_blank"
