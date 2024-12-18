@@ -1,6 +1,6 @@
-import { ActionStepEnum, ChannelStepEnum, channelStepSchemas } from '@novu/framework/internal';
+import { ActionStepEnum, ChannelStepEnum } from '@novu/framework/internal';
 import { ControlSchemas, JSONSchemaDto } from '@novu/shared';
-import { emailStepControlSchema, emailStepUiSchema, inAppControlSchema, inAppUiSchema } from './schemas';
+import { emailStepControl, inAppControlSchema, inAppUiSchema } from './schemas';
 import { DelayTimeControlSchema, delayUiSchema } from './schemas/delay-control.schema';
 import { DigestOutputJsonSchema, digestUiSchema } from './schemas/digest-control.schema';
 import { smsStepControl } from './schemas/sms-control.schema';
@@ -20,8 +20,8 @@ export const stepTypeToControlSchema: Record<ChannelStepEnum | ActionStepEnum, C
     uiSchema: inAppUiSchema,
   },
   [ChannelStepEnum.EMAIL]: {
-    schema: emailStepControlSchema,
-    uiSchema: emailStepUiSchema,
+    schema: emailStepControl.schema,
+    uiSchema: emailStepControl.uiSchema,
   },
   [ChannelStepEnum.SMS]: {
     schema: smsStepControl.schema,

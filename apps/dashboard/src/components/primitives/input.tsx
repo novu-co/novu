@@ -39,7 +39,12 @@ const inputFieldVariants = cva(
     'has-[input:read-only]:text-foreground-700',
     'has-[input:read-only]:bg-neutral-alpha-100',
     'has-[input:read-only]:opacity-70',
-    'has-[input:read-only]:border-neutral-alpha-200'
+    'has-[input:read-only]:border-neutral-alpha-200',
+    'has-[.cm-content[aria-readonly=true]]:cursor-not-allowed',
+    'has-[.cm-content[aria-readonly=true]]:text-foreground-700',
+    'has-[.cm-content[aria-readonly=true]]:bg-neutral-alpha-100',
+    'has-[.cm-content[aria-readonly=true]]:opacity-70',
+    'has-[.cm-content[aria-readonly=true]]:border-neutral-alpha-200'
   ),
   {
     variants: {

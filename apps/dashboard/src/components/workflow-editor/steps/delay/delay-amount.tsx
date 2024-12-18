@@ -47,7 +47,7 @@ export const DelayAmount = () => {
         fields={{ inputKey: `controlValues.${amountKey}`, selectKey: `controlValues.${unitKey}` }}
         options={unitOptions}
         defaultOption={defaultUnitOption}
-        onValueChange={saveForm}
+        onValueChange={() => saveForm()}
         min={minAmountValue}
       />
     </div>

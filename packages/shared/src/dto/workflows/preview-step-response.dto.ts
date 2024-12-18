@@ -113,7 +113,7 @@ export class PreviewPayload {
 
 export class GeneratePreviewResponseDto {
   previewPayloadExample: PreviewPayload;
-  result?:
+  result:
     | {
         type: ChannelTypeEnum.EMAIL;
         preview: EmailRenderOutput;

@@ -20,13 +20,16 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
   const formRef = useDataRef(propsForm);
 
   const onSave = useCallback(
-    async (data: T) => {
+    async (data: T, options?: { forceSubmit?: boolean }) => {
+      if (isReadOnly) {
+        return;
+      }
       // use the form reference instead of destructuring the props to avoid stale closures
       const form = formRef.current;
       const dirtyFields = form.formState.dirtyFields;
       // somehow the form isDirty flag is lost on first blur that why we fallback to dirtyFields
       const isDirty = form.formState.isDirty || Object.keys(dirtyFields).length > 0;
-      if (!isDirty || isReadOnly) {
+      if (!isDirty && !options?.forceSubmit) {
         return;
       }
       // manually trigger the validation of the form
@@ -60,14 +63,14 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
   );
 
   // flush the form updates right away
-  const saveForm = (): Promise<void> => {
+  const saveForm = (forceSubmit: boolean = false): Promise<void> => {
     return new Promise((resolve) => {
       // await for the state to be updated
       setTimeout(async () => {
         // use the form reference instead of destructuring the props to avoid stale closures
         const form = formRef.current;
         const values = form.getValues();
-        await onSave(values);
+        await onSave(values, { forceSubmit });
 
         resolve();
       }, 0);
