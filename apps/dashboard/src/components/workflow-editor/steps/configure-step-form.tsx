@@ -50,6 +50,7 @@ import {
 } from '@/utils/constants';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
+import { ConfigurePushStepPreview } from './push/configure-push-step-preview';
 
 const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
@@ -68,7 +69,7 @@ const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, ((props: HTMLAttributes<HTMLDiv
   [StepTypeEnum.EMAIL]: ConfigureEmailStepPreview,
   [StepTypeEnum.SMS]: ConfigureSmsStepPreview,
   [StepTypeEnum.CHAT]: null,
-  [StepTypeEnum.PUSH]: null,
+  [StepTypeEnum.PUSH]: ConfigurePushStepPreview,
   [StepTypeEnum.CUSTOM]: null,
   [StepTypeEnum.TRIGGER]: null,
   [StepTypeEnum.DIGEST]: null,
