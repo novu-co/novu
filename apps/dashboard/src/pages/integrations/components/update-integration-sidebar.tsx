@@ -18,10 +18,9 @@ import { ROUTES } from '../../../utils/routes';
 
 type UpdateIntegrationSidebarProps = {
   isOpened: boolean;
-  onClose: () => void;
 };
 
-export function UpdateIntegrationSidebar({ isOpened, onClose }: UpdateIntegrationSidebarProps) {
+export function UpdateIntegrationSidebar({ isOpened }: UpdateIntegrationSidebarProps) {
   const navigate = useNavigate();
   const { integrationId } = useParams();
   const { integrations } = useFetchIntegrations();
@@ -96,7 +95,7 @@ export function UpdateIntegrationSidebar({ isOpened, onClose }: UpdateIntegratio
         await setPrimaryIntegration({ integrationId: integration._id });
       }
 
-      onClose();
+      navigate(ROUTES.INTEGRATIONS);
     } catch (error: unknown) {
       handleIntegrationError(error, 'update');
     }
@@ -107,16 +106,16 @@ export function UpdateIntegrationSidebar({ isOpened, onClose }: UpdateIntegratio
 
     try {
       await deleteIntegration({ id: integration._id });
+
       toast.success('Integration deleted successfully');
       setIsDeleteDialogOpen(false);
-      onClose();
+      navigate(ROUTES.INTEGRATIONS);
     } catch (error: unknown) {
       handleIntegrationError(error, 'delete');
     }
   };
 
   const handleClose = () => {
-    onClose();
     navigate(ROUTES.INTEGRATIONS);
   };
 
@@ -132,7 +131,7 @@ export function UpdateIntegrationSidebar({ isOpened, onClose }: UpdateIntegratio
             integration={integration}
             onSubmit={handleSubmitWithPrimaryCheck}
             mode="update"
-            hasOtherProviders={hasOtherProviders}
+            hasOtherProviders={!!hasOtherProviders}
           />
         </div>
 

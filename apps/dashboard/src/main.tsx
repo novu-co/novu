@@ -148,15 +148,15 @@ const router = createBrowserRouter([
             children: [
               {
                 path: ROUTES.INTEGRATIONS_CONNECT,
-                element: <CreateIntegrationSidebar isOpened onClose={() => history.back()} />,
+                element: <CreateIntegrationSidebar isOpened />,
               },
               {
                 path: ROUTES.INTEGRATIONS_CONNECT_PROVIDER,
-                element: <CreateIntegrationSidebar isOpened onClose={() => history.back()} />,
+                element: <CreateIntegrationSidebar isOpened />,
               },
               {
                 path: ROUTES.INTEGRATIONS_UPDATE,
-                element: <UpdateIntegrationSidebar isOpened onClose={() => history.back()} />,
+                element: <UpdateIntegrationSidebar isOpened />,
               },
             ],
           },

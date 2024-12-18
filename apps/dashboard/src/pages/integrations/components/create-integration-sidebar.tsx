@@ -17,10 +17,9 @@ import { buildRoute, ROUTES } from '../../../utils/routes';
 
 export type CreateIntegrationSidebarProps = {
   isOpened: boolean;
-  onClose: () => void;
 };
 
-export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegrationSidebarProps) {
+export function CreateIntegrationSidebar({ isOpened }: CreateIntegrationSidebarProps) {
   const navigate = useNavigate();
   const { providerId } = useParams();
 
@@ -79,15 +78,14 @@ export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegratio
         await setPrimaryIntegration({ integrationId: integration.data._id });
       }
 
-      onClose();
-    } catch (error: any) {
+      navigate(ROUTES.INTEGRATIONS);
+    } catch (error: unknown) {
       handleIntegrationError(error, 'create');
     }
   }
 
   const handleClose = () => {
-    onClose();
-    navigate('/integrations');
+    navigate(ROUTES.INTEGRATIONS);
   };
 
   return (
