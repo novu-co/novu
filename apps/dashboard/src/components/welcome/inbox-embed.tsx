@@ -55,7 +55,7 @@ export function InboxEmbed(): JSX.Element | null {
       )}
 
       {foundIntegration?.connected && (
-        <InboxConnectedGuide subscriberId={subscriberId} environment={selectedEnvironment} />
+        <InboxConnectedGuide subscriberId={subscriberId} environment={selectedEnvironment!} />
       )}
     </main>
   );
