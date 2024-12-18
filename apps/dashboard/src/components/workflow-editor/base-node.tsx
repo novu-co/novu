@@ -98,7 +98,7 @@ export const NODE_WIDTH = 300;
 export const NODE_HEIGHT = 86;
 
 const nodeVariants = cva(
-  `relative bg-neutral-alpha-200 transition-colors aria-selected:bg-gradient-to-tr aria-selected:to-warning/50 aria-selected:from-destructive/60 [&>span]:bg-foreground-0 flex w-[300px] flex-col gap-1 p-px shadow-xs flex [&>span]:flex-1 [&>span]:rounded-[calc(var(--radius)-1px)]`,
+  `relative bg-neutral-alpha-200 transition-colors aria-selected:bg-gradient-to-tr aria-selected:to-warning/50 aria-selected:from-destructive/60 [&>span]:bg-foreground-0 flex w-[300px] flex-col p-px shadow-xs flex [&>span]:flex-1 [&>span]:rounded-[calc(var(--radius)-1px)] [&>span]:p-1 [&>span]:flex [&>span]:flex-col [&>span]:gap-1`,
   {
     variants: {
       variant: {
