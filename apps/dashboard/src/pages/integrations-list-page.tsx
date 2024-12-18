@@ -4,7 +4,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Button } from '@/components/primitives/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
-import { ROUTES } from '@/utils/routes';
+import { buildRoute, ROUTES } from '@/utils/routes';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { TableIntegration } from '../components/integrations/types';
 import { Badge } from '../components/primitives/badge';
@@ -13,12 +13,9 @@ import { IntegrationsList } from '../components/integrations/components/integrat
 export function IntegrationsListPage() {
   const navigate = useNavigate();
 
-  const onRowClickCallback = useCallback(
-    (item: TableIntegration) => {
-      navigate(`/integrations/${item.integrationId}/update`);
-    },
-    [navigate]
-  );
+  const onItemClick = function (item: TableIntegration) {
+    navigate(buildRoute(ROUTES.INTEGRATIONS_UPDATE, { integrationId: item.integrationId }));
+  };
 
   const onAddIntegrationClickCallback = useCallback(() => {
     navigate(ROUTES.INTEGRATIONS_CONNECT);
@@ -62,7 +59,7 @@ export function IntegrationsListPage() {
           </Button>
         </div>
         <TabsContent value="providers" variant="regular" className="!mt-0 p-2.5">
-          <IntegrationsList onRowClickCallback={onRowClickCallback} />
+          <IntegrationsList onItemClick={onItemClick} />
         </TabsContent>
         <TabsContent value="data-warehouse" variant="regular">
           <div className="text-muted-foreground flex h-64 items-center justify-center">Coming soon</div>

@@ -8,7 +8,7 @@ type IntegrationChannelGroupProps = {
   integrations: IIntegration[];
   providers: IProviderConfig[];
   environments?: IEnvironment[];
-  onRowClickCallback: (item: TableIntegration) => void;
+  onItemClick: (item: TableIntegration) => void;
 };
 
 export function IntegrationChannelGroup({
@@ -16,7 +16,7 @@ export function IntegrationChannelGroup({
   integrations,
   providers,
   environments,
-  onRowClickCallback,
+  onItemClick,
 }: IntegrationChannelGroupProps) {
   return (
     <div className="space-y-4">
@@ -35,7 +35,7 @@ export function IntegrationChannelGroup({
               integration={integration}
               provider={provider}
               environment={environment}
-              onRowClickCallback={onRowClickCallback}
+              onClick={onItemClick}
             />
           );
         })}

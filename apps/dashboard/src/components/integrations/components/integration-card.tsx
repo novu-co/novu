@@ -14,10 +14,10 @@ type IntegrationCardProps = {
   integration: IIntegration;
   provider: IProviderConfig;
   environment: IEnvironment;
-  onRowClickCallback: (item: TableIntegration) => void;
+  onClick: (item: TableIntegration) => void;
 };
 
-export function IntegrationCard({ integration, provider, environment, onRowClickCallback }: IntegrationCardProps) {
+export function IntegrationCard({ integration, provider, environment, onClick }: IntegrationCardProps) {
   const navigate = useNavigate();
 
   const handleConfigureClick = (e: React.MouseEvent) => {
@@ -26,7 +26,7 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
 
       navigate(ROUTES.INBOX_EMBED + `?environmentId=${environment._id}`);
     } else {
-      onRowClickCallback({
+      onClick({
         integrationId: integration._id ?? '',
         name: integration.name,
         identifier: integration.identifier,

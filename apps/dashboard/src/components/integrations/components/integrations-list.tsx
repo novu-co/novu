@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/primitives/skeleton';
 import { useMemo } from 'react';
 
 type IntegrationsListProps = {
-  onRowClickCallback: (item: TableIntegration) => void;
+  onItemClick: (item: TableIntegration) => void;
 };
 
 function IntegrationCardSkeleton() {
@@ -49,7 +49,7 @@ function IntegrationChannelGroupSkeleton() {
   );
 }
 
-export function IntegrationsList({ onRowClickCallback }: IntegrationsListProps) {
+export function IntegrationsList({ onItemClick }: IntegrationsListProps) {
   const { currentEnvironment, environments } = useEnvironment();
   const { integrations, isLoading } = useFetchIntegrations();
   const availableIntegrations = novuProviders;
@@ -88,7 +88,7 @@ export function IntegrationsList({ onRowClickCallback }: IntegrationsListProps) 
           integrations={channelIntegrations}
           providers={availableIntegrations}
           environments={environments}
-          onRowClickCallback={onRowClickCallback}
+          onItemClick={onItemClick}
         />
       ))}
     </div>
