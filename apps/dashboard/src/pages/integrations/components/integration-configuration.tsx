@@ -14,6 +14,7 @@ import { useAuth } from '@/context/auth/hooks';
 import { GeneralSettings } from './integration-general-settings';
 import { CredentialsSection } from './integration-credentials';
 import { isDemoIntegration } from './utils/helpers';
+import { cn } from '../../../utils/ui';
 
 type IntegrationFormData = {
   name: string;
@@ -75,13 +76,7 @@ export function IntegrationConfiguration({
         },
   });
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-    setValue,
-  } = form;
+  const { handleSubmit, control, setValue } = form;
 
   const name = useWatch({ control, name: 'name' });
   const environmentId = useWatch({ control, name: 'environmentId' });
@@ -104,17 +99,19 @@ export function IntegrationConfiguration({
           <SegmentedControl
             value={environmentId}
             onValueChange={(value) => setValue('environmentId', value)}
-            className="w-full max-w-[260px]"
+            className={cn('w-full', mode === 'update' ? 'max-w-[160px]' : 'max-w-[260px]')}
           >
             <SegmentedControlList>
-              {environments?.map((env) => (
-                <SegmentedControlTrigger key={env._id} value={env._id} disabled={mode === 'update'}>
-                  <RiGitBranchLine
-                    className={`size-4 ${env.name.toLowerCase() === 'production' ? 'text-feature' : 'text-warning'}`}
-                  />
-                  {env.name}
-                </SegmentedControlTrigger>
-              ))}
+              {environments
+                ?.filter((env) => (mode === 'update' ? env._id === integration?._environmentId : true))
+                .map((env) => (
+                  <SegmentedControlTrigger key={env._id} value={env._id} disabled={mode === 'update'}>
+                    <RiGitBranchLine
+                      className={`size-4 ${env.name.toLowerCase() === 'production' ? 'text-feature' : 'text-warning'}`}
+                    />
+                    {env.name}
+                  </SegmentedControlTrigger>
+                ))}
             </SegmentedControlList>
           </SegmentedControl>
         </div>
@@ -161,7 +158,7 @@ export function IntegrationConfiguration({
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <CredentialsSection provider={provider} register={register} control={control} />
+                  <CredentialsSection provider={provider} control={control} />
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

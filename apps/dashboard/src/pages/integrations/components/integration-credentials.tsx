@@ -1,4 +1,4 @@
-import { Control, UseFormRegister } from 'react-hook-form';
+import { Control } from 'react-hook-form';
 import { Input, InputField } from '@/components/primitives/input';
 import { Switch } from '@/components/primitives/switch';
 import { SecretInput } from '@/components/primitives/secret-input';
@@ -26,7 +26,6 @@ type IntegrationFormData = {
 type CredentialsSectionProps = {
   provider?: IProviderConfig;
   control: Control<IntegrationFormData>;
-  register: UseFormRegister<IntegrationFormData>;
 };
 
 const SECURE_CREDENTIALS = [
@@ -38,7 +37,7 @@ const SECURE_CREDENTIALS = [
   CredentialsKeyEnum.ServiceAccount,
 ];
 
-export function CredentialsSection({ provider, register, control }: CredentialsSectionProps) {
+export function CredentialsSection({ provider, control }: CredentialsSectionProps) {
   return (
     <div className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 flex flex-col gap-2 rounded-lg border p-3">
       {provider?.credentials?.map((credential) => (
@@ -75,9 +74,7 @@ export function CredentialsSection({ provider, register, control }: CredentialsS
                       id={credential.key}
                       type="text"
                       placeholder={`Enter ${credential.displayName.toLowerCase()}`}
-                      {...register(`credentials.${credential.key}`, {
-                        required: credential.required ? `${credential.displayName} is required` : false,
-                      })}
+                      {...field}
                     />
                   </InputField>
                 </FormControl>
