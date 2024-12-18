@@ -48,6 +48,7 @@ export class PrepareAndValidateContentUsecase {
       controlValueToPlaceholders,
       command.variableSchema
     );
+    //TODO: Variables used in `showIfKey` are shown as problematic here.
     const finalPayload = this.buildAndMergePayload(controlValueToValidPlaceholders, command.previewPayloadFromDto);
     const { finalControlValues, controlValueIssues } = this.mergeAndSanitizeControlValues(
       command.controlDataSchema,

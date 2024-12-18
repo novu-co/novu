@@ -155,7 +155,7 @@ export function fullCodeSnippet(stepId?: string) {
       {
         type: 'section',
         attrs: {
-          show: 'payload.params.isPayedUser',
+          showIfKey: 'payload.params.isPayedUser',
           borderRadius: 0,
           backgroundColor: '#f7f7f7',
           align: 'left',

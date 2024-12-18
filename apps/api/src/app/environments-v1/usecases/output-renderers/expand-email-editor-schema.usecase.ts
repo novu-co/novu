@@ -10,7 +10,7 @@ export class ExpandEmailEditorSchemaUsecase {
 
   execute(command: ExpandEmailEditorSchemaCommand): TipTapNode {
     const emailSchemaHydrated = this.hydrate(command);
-    this.processShowAndForControls(emailSchemaHydrated, undefined);
+    // this.processShowAndForControls(emailSchemaHydrated, undefined);
 
     return emailSchemaHydrated;
   }
@@ -51,8 +51,8 @@ export class ExpandEmailEditorSchemaUsecase {
     return !!(node.attrs && 'each' in node.attrs);
   }
 
-  private hasShow(node: TipTapNode): node is TipTapNode & { attrs: { show: string } } {
-    return !!(node.attrs && 'show' in node.attrs);
+  private hasShow(node: TipTapNode): node is TipTapNode & { attrs: { showIfKey: string } } {
+    return !!(node.attrs && 'showIfKey' in node.attrs);
   }
 
   private regularExpansion(eachObject: any, templateContent: TipTapNode[]): TipTapNode[] {
@@ -109,14 +109,14 @@ export class ExpandEmailEditorSchemaUsecase {
     }
   }
 
-  private hideShowIfNeeded(node: TipTapNode & { attrs: { show: unknown } }, parentNode?: TipTapNode): void {
-    const { show } = node.attrs;
-    const shouldShow = typeof show === 'boolean' ? show : this.stringToBoolean(show);
+  private hideShowIfNeeded(node: TipTapNode & { attrs: { showIfKey: unknown } }, parentNode?: TipTapNode): void {
+    const { showIfKey } = node.attrs;
+    const shouldShow = typeof showIfKey === 'boolean' ? showIfKey : this.stringToBoolean(showIfKey);
 
     if (!shouldShow) {
       this.removeNodeFromParent(node, parentNode);
     } else {
-      delete node.attrs.show;
+      delete node.attrs.showIfKey;
     }
   }
 
