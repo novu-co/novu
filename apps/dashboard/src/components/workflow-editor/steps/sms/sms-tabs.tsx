@@ -1,28 +1,29 @@
-import { useState } from 'react';
-import { WorkflowOriginEnum } from '@novu/shared';
 import { StepEditorProps } from '@/components/workflow-editor/steps/configure-step-template-form';
-import { PushEditor } from '@/components/workflow-editor/steps/push/push-editor';
-import { CustomStepControls } from '../controls/custom-step-controls';
-import { TemplateTabs } from '../template-tabs';
-import { PushEditorPreview } from './push-editor-preview';
+import { CustomStepControls } from '@/components/workflow-editor/steps/controls/custom-step-controls';
+import { SmsEditor } from '@/components/workflow-editor/steps/sms/sms-editor';
+import { SmsEditorPreview } from '@/components/workflow-editor/steps/sms/sms-editor-preview';
+import { TemplateTabs } from '@/components/workflow-editor/steps/template-tabs';
+import { WorkflowOriginEnum } from '@novu/shared';
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-export const PushTabs = (props: StepEditorProps) => {
+export const SmsTabs = (props: StepEditorProps) => {
   const { workflow, step } = props;
   const { dataSchema, uiSchema } = step.controls;
-  const [tabsValue, setTabsValue] = useState('editor');
   const form = useFormContext();
+  const [tabsValue, setTabsValue] = useState('editor');
+
   const isNovuCloud = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && uiSchema;
   const isExternal = workflow.origin === WorkflowOriginEnum.EXTERNAL;
 
   const editorContent = (
     <>
-      {isNovuCloud && <PushEditor uiSchema={uiSchema} />}
+      {isNovuCloud && <SmsEditor uiSchema={uiSchema} />}
       {isExternal && <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />}
     </>
   );
 
-  const previewContent = <PushEditorPreview workflow={workflow} step={step} formValues={form.getValues()} />;
+  const previewContent = <SmsEditorPreview workflow={workflow} step={step} formValues={form.getValues()} />;
 
   return (
     <TemplateTabs

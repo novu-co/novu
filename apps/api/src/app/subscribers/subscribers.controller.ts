@@ -444,7 +444,7 @@ export class SubscribersController {
     type: String,
     enum: PreferenceLevelEnum,
     required: true,
-    description: 'the preferences level to be retrieved (template / global) ',
+    description: 'Fetch global or per workflow channel preferences',
   })
   @ApiQuery({
     name: 'includeInactiveChannels',
