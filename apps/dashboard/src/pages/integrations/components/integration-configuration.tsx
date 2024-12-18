@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
 import { Form } from '@/components/primitives/form/form';
 import { Label } from '@/components/primitives/label';
@@ -11,9 +11,9 @@ import { SegmentedControl, SegmentedControlList } from '../../../components/prim
 import { SegmentedControlTrigger } from '../../../components/primitives/segmented-control';
 import { useEnvironment, useFetchEnvironments } from '@/context/environment/hooks';
 import { useAuth } from '@/context/auth/hooks';
-import { isDemoIntegration } from './integration-card';
 import { GeneralSettings } from './integration-general-settings';
 import { CredentialsSection } from './integration-credentials';
+import { isDemoIntegration } from './utils/helpers';
 
 type IntegrationFormData = {
   name: string;
@@ -78,11 +78,12 @@ export function IntegrationConfiguration({
     handleSubmit,
     control,
     formState: { errors },
-    watch,
+    getValues,
     setValue,
   } = form;
 
-  const name = watch('name');
+  const name = useWatch({ control, name: 'name' });
+  const environmentId = useWatch({ control, name: 'environmentId' });
 
   useEffect(() => {
     if (mode === 'create') {
@@ -100,7 +101,7 @@ export function IntegrationConfiguration({
             Environment
           </Label>
           <SegmentedControl
-            value={watch('environmentId')}
+            value={environmentId}
             onValueChange={(value) => setValue('environmentId', value)}
             className="w-full max-w-[260px]"
           >

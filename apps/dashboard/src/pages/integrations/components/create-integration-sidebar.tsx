@@ -1,3 +1,4 @@
+import { useNavigate, useParams } from 'react-router-dom';
 import { ChannelTypeEnum, providers as novuProviders } from '@novu/shared';
 import { useCreateIntegration } from '@/hooks/use-create-integration';
 import { useIntegrationList } from './hooks/use-integration-list';
@@ -12,6 +13,7 @@ import { SelectPrimaryIntegrationModal } from './modals/select-primary-integrati
 import { IntegrationFormData } from '../types';
 import { useIntegrationPrimaryModal } from './hooks/use-integration-primary-modal';
 import { useFetchIntegrations } from '@/hooks/use-fetch-integrations';
+import { buildRoute, ROUTES } from '../../../utils/routes';
 
 export type CreateIntegrationSidebarProps = {
   isOpened: boolean;
@@ -20,17 +22,31 @@ export type CreateIntegrationSidebarProps = {
 };
 
 export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegrationSidebarProps) {
+  const navigate = useNavigate();
+  const { providerId } = useParams();
+
   const providers = novuProviders;
   const { mutateAsync: createIntegration, isPending } = useCreateIntegration();
   const { mutateAsync: setPrimaryIntegration, isPending: isSettingPrimary } = useSetPrimaryIntegration();
   const { integrations } = useFetchIntegrations();
 
+  const handleIntegrationSelect = (integrationId: string) => {
+    navigate(buildRoute(ROUTES.INTEGRATIONS_CONNECT_PROVIDER, { providerId: integrationId }), { replace: true });
+  };
+
+  const handleBack = () => {
+    navigate(ROUTES.INTEGRATIONS_CONNECT, { replace: true });
+  };
+
   const { selectedIntegration, step, searchQuery, onIntegrationSelect, onBack } = useSidebarNavigationManager({
     isOpened,
+    initialProviderId: providerId,
+    onIntegrationSelect: handleIntegrationSelect,
+    onBack: handleBack,
   });
 
   const { integrationsByChannel } = useIntegrationList(providers, searchQuery);
-  const provider = providers?.find((p) => p.id === selectedIntegration);
+  const provider = providers?.find((p) => p.id === (selectedIntegration || providerId));
   const {
     isPrimaryModalOpen,
     setIsPrimaryModalOpen,
@@ -69,11 +85,16 @@ export function CreateIntegrationSidebar({ isOpened, onClose }: CreateIntegratio
     }
   }
 
+  const handleClose = () => {
+    onClose();
+    navigate('/integrations');
+  };
+
   return (
     <>
       <IntegrationSheet
         isOpened={isOpened}
-        onClose={onClose}
+        onClose={handleClose}
         provider={provider}
         mode="create"
         step={step}

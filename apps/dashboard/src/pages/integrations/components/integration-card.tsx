@@ -2,19 +2,13 @@ import { Badge } from '@/components/primitives/badge';
 import { Button } from '@/components/primitives/button';
 import { RiCheckboxCircleFill, RiGitBranchFill, RiSettings4Line, RiStarSmileLine } from 'react-icons/ri';
 import { TableIntegration } from '../types';
-import {
-  ChannelTypeEnum,
-  EmailProviderIdEnum,
-  SmsProviderIdEnum,
-  type IEnvironment,
-  type IIntegration,
-  type IProviderConfig,
-} from '@novu/shared';
+import { ChannelTypeEnum, type IEnvironment, type IIntegration, type IProviderConfig } from '@novu/shared';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/utils/routes';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { ProviderIcon } from './provider-icon';
 import { cn } from '../../../utils/ui';
+import { isDemoIntegration } from './utils/helpers';
 
 type IntegrationCardProps = {
   integration: IIntegration;
@@ -116,8 +110,4 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
       </div>
     </div>
   );
-}
-
-function isDemoIntegration(providerId: string) {
-  return providerId === EmailProviderIdEnum.Novu || providerId === SmsProviderIdEnum.Novu;
 }

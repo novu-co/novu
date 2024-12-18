@@ -1,29 +1,28 @@
-import { ChannelTypeEnum } from '@novu/shared';
-import { useCallback, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useCallback } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 import { IntegrationsList } from './components/integrations-list';
-import { ITableIntegration } from './types';
+import { TableIntegration } from './types';
 import { DashboardLayout } from '../../components/dashboard-layout';
-import { UpdateIntegrationSidebar } from './components/update-integration-sidebar';
-import { CreateIntegrationSidebar } from './components/create-integration-sidebar';
 import { Badge } from '../../components/primitives/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Button } from '@/components/primitives/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
+import { ROUTES } from '@/utils/routes';
 
 export function IntegrationsListPage() {
-  const [searchParams] = useSearchParams();
-  const [selectedIntegrationId, setSelectedIntegrationId] = useState<string>();
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const onRowClickCallback = useCallback((item: { original: ITableIntegration }) => {
-    setSelectedIntegrationId(item.original.integrationId);
-  }, []);
+  const onRowClickCallback = useCallback(
+    (item: TableIntegration) => {
+      navigate(`/integrations/${item.integrationId}/update`);
+    },
+    [navigate]
+  );
 
   const onAddIntegrationClickCallback = useCallback(() => {
-    setIsCreateModalOpen(true);
-  }, []);
+    navigate(ROUTES.INTEGRATIONS_CONNECT);
+  }, [navigate]);
 
   return (
     <DashboardLayout
@@ -69,16 +68,7 @@ export function IntegrationsListPage() {
           <div className="text-muted-foreground flex h-64 items-center justify-center">Coming soon</div>
         </TabsContent>
       </Tabs>
-      <UpdateIntegrationSidebar
-        isOpened={!!selectedIntegrationId}
-        integrationId={selectedIntegrationId}
-        onClose={() => setSelectedIntegrationId(undefined)}
-      />
-      <CreateIntegrationSidebar
-        isOpened={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        scrollToChannel={searchParams.get('scrollTo') as ChannelTypeEnum}
-      />
+      <Outlet />
     </DashboardLayout>
   );
 }

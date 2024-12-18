@@ -3,29 +3,44 @@ import { IntegrationStep } from '../../types';
 
 type UseSidebarNavigationManagerProps = {
   isOpened: boolean;
+  initialProviderId?: string;
+  onIntegrationSelect?: (integrationId: string) => void;
+  onBack?: () => void;
 };
 
-export function useSidebarNavigationManager({ isOpened }: UseSidebarNavigationManagerProps) {
+export function useSidebarNavigationManager({
+  isOpened,
+  initialProviderId,
+  onIntegrationSelect: externalOnIntegrationSelect,
+  onBack: externalOnBack,
+}: UseSidebarNavigationManagerProps) {
   const [selectedIntegration, setSelectedIntegration] = useState<string>();
   const [step, setStep] = useState<IntegrationStep>('select');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (isOpened) {
-      setSelectedIntegration(undefined);
-      setStep('select');
+      if (initialProviderId) {
+        setSelectedIntegration(initialProviderId);
+        setStep('configure');
+      } else {
+        setSelectedIntegration(undefined);
+        setStep('select');
+      }
       setSearchQuery('');
     }
-  }, [isOpened]);
+  }, [isOpened, initialProviderId]);
 
-  const onIntegrationSelect = (integrationId: string) => {
+  const handleIntegrationSelect = (integrationId: string) => {
     setSelectedIntegration(integrationId);
     setStep('configure');
+    externalOnIntegrationSelect?.(integrationId);
   };
 
-  const onBack = () => {
+  const handleBack = () => {
     setStep('select');
     setSelectedIntegration(undefined);
+    externalOnBack?.();
   };
 
   return {
@@ -33,7 +48,7 @@ export function useSidebarNavigationManager({ isOpened }: UseSidebarNavigationMa
     step,
     searchQuery,
     setSearchQuery,
-    onIntegrationSelect,
-    onBack,
+    onIntegrationSelect: handleIntegrationSelect,
+    onBack: handleBack,
   };
 }

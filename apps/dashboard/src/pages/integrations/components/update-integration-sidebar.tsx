@@ -13,14 +13,16 @@ import { IntegrationFormData } from '../types';
 import { useDeleteIntegration } from '../../../hooks/use-delete-integration';
 import { handleIntegrationError } from './utils/handle-integration-error';
 import { useIntegrationPrimaryModal } from './hooks/use-integration-primary-modal';
+import { useNavigate, useParams } from 'react-router-dom';
 
 type UpdateIntegrationSidebarProps = {
   isOpened: boolean;
-  integrationId?: string;
   onClose: () => void;
 };
 
-export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: UpdateIntegrationSidebarProps) {
+export function UpdateIntegrationSidebar({ isOpened, onClose }: UpdateIntegrationSidebarProps) {
+  const navigate = useNavigate();
+  const { integrationId } = useParams();
   const { integrations } = useFetchIntegrations();
   const integration = integrations?.find((i) => i._id === integrationId);
   const provider = novuProviders?.find((p) => p.id === integration?.providerId);
@@ -92,11 +94,16 @@ export function UpdateIntegrationSidebar({ isOpened, integrationId, onClose }: U
     }
   };
 
+  const handleClose = () => {
+    onClose();
+    navigate('/integrations');
+  };
+
   if (!integration || !provider) return null;
 
   return (
     <>
-      <IntegrationSheet isOpened={isOpened} onClose={onClose} provider={provider} mode="update">
+      <IntegrationSheet isOpened={isOpened} onClose={handleClose} provider={provider} mode="update">
         <div className="scrollbar-custom flex-1 overflow-y-auto">
           <IntegrationConfiguration
             isChannelSupportPrimary={isChannelSupportPrimary}
