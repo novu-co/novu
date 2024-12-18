@@ -827,6 +827,9 @@ importers:
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
+      lodash.isequal:
+        specifier: ^4.5.0
+        version: 4.5.0
       lodash.merge:
         specifier: ^4.6.2
         version: 4.6.2
@@ -909,6 +912,9 @@ importers:
       '@types/lodash.debounce':
         specifier: ^4.0.9
         version: 4.0.9
+      '@types/lodash.isequal':
+        specifier: ^4.5.8
+        version: 4.5.8
       '@types/lodash.merge':
         specifier: ^4.6.6
         version: 4.6.7
@@ -17323,6 +17329,9 @@ packages:
   '@types/lodash.get@4.4.7':
     resolution: {integrity: sha512-af34Mj+KdDeuzsJBxc/XeTtOx0SZHZNLd+hdrn+PcKGQs0EG2TJTzQAOTCZTgDJCArahlCzLWSy8c2w59JRz7Q==}
 
+  '@types/lodash.isequal@4.5.8':
+    resolution: {integrity: sha512-uput6pg4E/tj2LGxCZo9+y27JNyB2OZuuI/T5F+ylVDYuqICLG2/ktjxx0v6GvVntAf8TvEzeQLcV0ffRirXuA==}
+
   '@types/lodash.merge@4.6.7':
     resolution: {integrity: sha512-OwxUJ9E50gw3LnAefSHJPHaBLGEKmQBQ7CZe/xflHkyy/wH2zVyEIAKReHvVrrn7zKdF58p16We9kMfh7v0RRQ==}
 
@@ -20500,7 +20509,7 @@ packages:
     resolution: {integrity: sha512-T0+barUSQRTUQASh8bx02dl+DhF54GtIDY13Y3m9oWTklKbb3Wv974meRpeZ3lp1JpLVECWWNHC4vaG2XHXouQ==}
 
   compose-function@3.0.3:
-    resolution: {integrity: sha512-xzhzTJ5eC+gmIzvZq+C3kCJHsp9os6tJkrigDRZclyGtOKINbZtE8n1Tzmeh32jW+BUDPbvZpibwvJHBLGMVwg==}
+    resolution: {integrity: sha1-ntZ18TzFRQHTCVCkhv9qe6OrGF8=}
 
   compressible@2.0.18:
     resolution: {integrity: sha512-AF3r7P5dWxL8MxyITRMlORQNaOA2IkAFaTr4k7BUumjPtRpGDTZpl0Pb1XCO6JeDCBdp126Cgs9sMxqSjgYyRg==}
@@ -23404,7 +23413,7 @@ packages:
         optional: true
 
   fresh@0.5.2:
-    resolution: {integrity: sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==}
+    resolution: {integrity: sha1-PYyt2Q2XZWn6g1qx+OSyOhBWBac=}
     engines: {node: '>= 0.6'}
 
   from2@2.3.0:
@@ -31841,7 +31850,7 @@ packages:
     engines: {node: '>=10'}
 
   serve-favicon@2.5.0:
-    resolution: {integrity: sha512-FMW2RvqNr03x+C0WxTyu6sOv21oOjkq5j8tjquWccwa6ScNyGFOGJVpuS1NmTVGBAHS07xnSKotgf2ehQmf9iA==}
+    resolution: {integrity: sha1-k10kDN/g9YBTB/3+ln2IlCosvPA=}
     engines: {node: '>= 0.8.0'}
 
   serve-index@1.9.1:
@@ -33256,7 +33265,7 @@ packages:
     resolution: {integrity: sha512-y/mWCZinnvxjTKYhJ+pYxwD0mRLVvOtdS2Awbgxln6iEnt4rk0yBxeSBHkGJcPucRiG0e55mwWp+g/05rsrd6w==}
 
   toposort@2.0.2:
-    resolution: {integrity: sha512-0a5EOkAUp8D4moMi2W8ZF8jcga7BgZd91O/yabJCFY8az+XSzeGyTKs0Aoo897iV1Nj6guFq8orWDS96z91oGg==}
+    resolution: {integrity: sha1-riF2gXXRVZ1IvvNUILL0li8JwzA=}
 
   totalist@1.1.0:
     resolution: {integrity: sha512-gduQwd1rOdDMGxFG1gEvhV88Oirdo2p+KjoYFU7k2g+i7n6AFFbDQ5kMPUsW0pNbfQsB/cwXvT1i4Bue0s9g5g==}
@@ -51262,16 +51271,16 @@ snapshots:
   '@rjsf/validator-ajv8@5.17.1(@rjsf/utils@5.20.0(react@18.3.1))':
     dependencies:
       '@rjsf/utils': 5.20.0(react@18.3.1)
-      ajv: 8.12.0
-      ajv-formats: 2.1.1(ajv@8.12.0)
+      ajv: 8.13.0
+      ajv-formats: 2.1.1(ajv@8.13.0)
       lodash: 4.17.21
       lodash-es: 4.17.21
 
   '@rjsf/validator-ajv8@5.17.1(@rjsf/utils@5.20.1(react@18.3.1))':
     dependencies:
       '@rjsf/utils': 5.20.1(react@18.3.1)
-      ajv: 8.12.0
-      ajv-formats: 2.1.1(ajv@8.12.0)
+      ajv: 8.13.0
+      ajv-formats: 2.1.1(ajv@8.13.0)
       lodash: 4.17.21
       lodash-es: 4.17.21
 
@@ -53889,12 +53898,6 @@ snapshots:
       '@stdlib/utils-constructor-name': 0.0.8
       '@stdlib/utils-global': 0.0.7
 
-  '@stoplight/better-ajv-errors@1.0.3(ajv@8.12.0)':
-    dependencies:
-      ajv: 8.12.0
-      jsonpointer: 5.0.1
-      leven: 3.1.0
-
   '@stoplight/better-ajv-errors@1.0.3(ajv@8.13.0)':
     dependencies:
       ajv: 8.13.0
@@ -53960,7 +53963,7 @@ snapshots:
 
   '@stoplight/spectral-core@1.18.3(encoding@0.1.13)':
     dependencies:
-      '@stoplight/better-ajv-errors': 1.0.3(ajv@8.12.0)
+      '@stoplight/better-ajv-errors': 1.0.3(ajv@8.13.0)
       '@stoplight/json': 3.21.0
       '@stoplight/path': 1.3.2
       '@stoplight/spectral-parsers': 1.0.3
@@ -53969,9 +53972,9 @@ snapshots:
       '@stoplight/types': 13.6.0
       '@types/es-aggregate-error': 1.0.6
       '@types/json-schema': 7.0.15
-      ajv: 8.12.0
-      ajv-errors: 3.0.0(ajv@8.12.0)
-      ajv-formats: 2.1.1(ajv@8.12.0)
+      ajv: 8.13.0
+      ajv-errors: 3.0.0(ajv@8.13.0)
+      ajv-formats: 2.1.1(ajv@8.13.0)
       es-aggregate-error: 1.0.11
       jsonpath-plus: 7.1.0
       lodash: 4.17.21
@@ -54073,7 +54076,7 @@ snapshots:
       '@stoplight/types': 13.20.0
       '@stoplight/yaml': 4.2.3
       '@types/node': 20.16.5
-      ajv: 8.12.0
+      ajv: 8.13.0
       ast-types: 0.14.2
       astring: 1.8.6
       reserved: 0.1.2
@@ -54085,7 +54088,7 @@ snapshots:
   '@stoplight/spectral-rulesets@1.18.1(encoding@0.1.13)':
     dependencies:
       '@asyncapi/specs': 4.3.1
-      '@stoplight/better-ajv-errors': 1.0.3(ajv@8.12.0)
+      '@stoplight/better-ajv-errors': 1.0.3(ajv@8.13.0)
       '@stoplight/json': 3.21.0
       '@stoplight/spectral-core': 1.18.3(encoding@0.1.13)
       '@stoplight/spectral-formats': 1.6.0(encoding@0.1.13)
@@ -54093,8 +54096,8 @@ snapshots:
       '@stoplight/spectral-runtime': 1.1.2(encoding@0.1.13)
       '@stoplight/types': 13.20.0
       '@types/json-schema': 7.0.15
-      ajv: 8.12.0
-      ajv-formats: 2.1.1(ajv@8.12.0)
+      ajv: 8.13.0
+      ajv-formats: 2.1.1(ajv@8.13.0)
       json-schema-traverse: 1.0.0
       lodash: 4.17.21
       tslib: 2.7.0
@@ -57397,6 +57400,10 @@ snapshots:
     dependencies:
       '@types/lodash': 4.14.192
 
+  '@types/lodash.isequal@4.5.8':
+    dependencies:
+      '@types/lodash': 4.14.192
+
   '@types/lodash.merge@4.6.7':
     dependencies:
       '@types/lodash': 4.14.192
@@ -59670,10 +59677,6 @@ snapshots:
   ajv-draft-04@1.0.0(ajv@8.13.0):
     optionalDependencies:
       ajv: 8.13.0
-
-  ajv-errors@3.0.0(ajv@8.12.0):
-    dependencies:
-      ajv: 8.12.0
 
   ajv-errors@3.0.0(ajv@8.13.0):
     dependencies:

@@ -1,40 +1,46 @@
 import { Badge } from '@/components/primitives/badge';
 import { Button } from '@/components/primitives/button';
 import { RiCheckboxCircleFill, RiGitBranchFill, RiSettings4Line, RiStarSmileLine } from 'react-icons/ri';
-import { ITableIntegration } from '../types';
-import type { IEnvironment, IIntegration, IProviderConfig } from '@novu/shared';
+import { TableIntegration } from '../types';
+import {
+  ChannelTypeEnum,
+  EmailProviderIdEnum,
+  SmsProviderIdEnum,
+  type IEnvironment,
+  type IIntegration,
+  type IProviderConfig,
+} from '@novu/shared';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/utils/routes';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { ProviderIcon } from './provider-icon';
 import { cn } from '../../../utils/ui';
 
-interface IntegrationCardProps {
+type IntegrationCardProps = {
   integration: IIntegration;
   provider: IProviderConfig;
   environment: IEnvironment;
-  onRowClickCallback: (item: { original: ITableIntegration }) => void;
-}
+  onRowClickCallback: (item: TableIntegration) => void;
+};
 
 export function IntegrationCard({ integration, provider, environment, onRowClickCallback }: IntegrationCardProps) {
   const navigate = useNavigate();
 
-  const tableIntegration: ITableIntegration = {
-    integrationId: integration._id ?? '',
-    name: integration.name,
-    identifier: integration.identifier,
-    provider: provider.displayName,
-    channel: integration.channel,
-    environment: environment.name,
-    active: integration.active,
-  };
-
   const handleConfigureClick = (e: React.MouseEvent) => {
-    if (integration.channel === 'in_app' && !integration.connected) {
+    if (integration.channel === ChannelTypeEnum.IN_APP && !integration.connected) {
       e.stopPropagation();
-      navigate(ROUTES.INBOX_EMBED);
+
+      navigate(ROUTES.INBOX_EMBED + `?environmentId=${environment._id}`);
     } else {
-      onRowClickCallback({ original: tableIntegration });
+      onRowClickCallback({
+        integrationId: integration._id ?? '',
+        name: integration.name,
+        identifier: integration.identifier,
+        provider: provider.displayName,
+        channel: integration.channel,
+        environment: environment.name,
+        active: integration.active,
+      });
     }
   };
 
@@ -43,7 +49,7 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
   return (
     <div
       className={cn(
-        'bg-card shadow-xs group relative flex min-h-[125px] cursor-pointer flex-col gap-2 overflow-hidden rounded-xl border border-neutral-100 p-3 transition-all hover:shadow-lg',
+        'bg-card shadow-xs group relative flex min-h-[125px] cursor-pointer flex-col gap-2 overflow-hidden rounded-xl border border-neutral-200 p-3 transition-all hover:shadow-lg',
         !integration.active && 'opacity-75 grayscale'
       )}
       onClick={handleConfigureClick}
@@ -90,10 +96,10 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
       </div>
 
       <div className="mt-auto flex items-center gap-2">
-        {integration.channel === 'in_app' && !integration.connected ? (
+        {integration.channel === ChannelTypeEnum.IN_APP && !integration.connected ? (
           <Button size="xs" className="h-[26px]" variant="outline" onClick={handleConfigureClick}>
             <RiSettings4Line className="h-4 w-4" />
-            Configure
+            Connect
           </Button>
         ) : (
           <Badge variant={integration.active ? 'success' : 'neutral'} className="capitalize">
@@ -112,6 +118,6 @@ export function IntegrationCard({ integration, provider, environment, onRowClick
   );
 }
 
-export function isDemoIntegration(providerId: string) {
-  return providerId === 'novu-email' || providerId === 'novu-sms';
+function isDemoIntegration(providerId: string) {
+  return providerId === EmailProviderIdEnum.Novu || providerId === SmsProviderIdEnum.Novu;
 }

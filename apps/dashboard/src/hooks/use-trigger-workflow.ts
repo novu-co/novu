@@ -1,12 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { triggerWorkflow } from '@/api/workflows';
-import { useEnvironment } from '@/context/environment/hooks';
+import { IEnvironment } from '@novu/shared';
 
-export const useTriggerWorkflow = () => {
-  const { currentEnvironment } = useEnvironment();
+export const useTriggerWorkflow = (environment?: IEnvironment) => {
   const { mutateAsync, isPending, error, data } = useMutation({
     mutationFn: async ({ name, to, payload }: { name: string; to: unknown; payload: unknown }) =>
-      triggerWorkflow({ environment: currentEnvironment!, name, to, payload }),
+      triggerWorkflow({ environment: environment!, name, to, payload }),
   });
 
   return {

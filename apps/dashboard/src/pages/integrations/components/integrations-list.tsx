@@ -1,13 +1,14 @@
 import { ChannelTypeEnum, providers as novuProviders } from '@novu/shared';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useFetchIntegrations } from '../../../hooks/use-fetch-integrations';
-import { ITableIntegration } from '../types';
+import { TableIntegration } from '../types';
 import { IntegrationChannelGroup } from './integration-channel-group';
 import { Skeleton } from '@/components/primitives/skeleton';
+import { useMemo } from 'react';
 
-interface IntegrationsListProps {
-  onRowClickCallback: (item: { original: ITableIntegration }) => void;
-}
+type IntegrationsListProps = {
+  onRowClickCallback: (item: TableIntegration) => void;
+};
 
 function IntegrationCardSkeleton() {
   return (
@@ -50,10 +51,26 @@ function IntegrationChannelGroupSkeleton() {
 
 export function IntegrationsList({ onRowClickCallback }: IntegrationsListProps) {
   const { currentEnvironment, environments } = useEnvironment();
-  const { integrations } = useFetchIntegrations();
+  const { integrations, isLoading } = useFetchIntegrations();
   const availableIntegrations = novuProviders;
 
-  if (!integrations || !availableIntegrations || !currentEnvironment) {
+  const groupedIntegrations = useMemo(() => {
+    return integrations?.reduce(
+      (acc, integration) => {
+        const channel = integration.channel;
+        if (!acc[channel]) {
+          acc[channel] = [];
+        }
+
+        acc[channel].push(integration);
+
+        return acc;
+      },
+      {} as Record<ChannelTypeEnum, typeof integrations>
+    );
+  }, [integrations]);
+
+  if (isLoading || !currentEnvironment) {
     return (
       <div className="space-y-6">
         <IntegrationChannelGroupSkeleton />
@@ -62,21 +79,9 @@ export function IntegrationsList({ onRowClickCallback }: IntegrationsListProps) 
     );
   }
 
-  const groupedIntegrations = integrations.reduce(
-    (acc, integration) => {
-      const channel = integration.channel;
-      if (!acc[channel]) {
-        acc[channel] = [];
-      }
-      acc[channel].push(integration);
-      return acc;
-    },
-    {} as Record<ChannelTypeEnum, typeof integrations>
-  );
-
   return (
     <div className="space-y-6">
-      {Object.entries(groupedIntegrations).map(([channel, channelIntegrations]) => (
+      {Object.entries(groupedIntegrations || {}).map(([channel, channelIntegrations]) => (
         <IntegrationChannelGroup
           key={channel}
           channel={channel as ChannelTypeEnum}

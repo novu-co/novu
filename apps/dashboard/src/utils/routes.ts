@@ -8,6 +8,7 @@ export const ROUTES = {
   INBOX_EMBED: '/onboarding/inbox/embed',
   INBOX_EMBED_SUCCESS: '/onboarding/inbox/success',
   ROOT: '/',
+  LOCAL_STUDIO_AUTH: '/local-studio/auth',
   ENV: '/env',
   SETTINGS: '/settings',
   SETTINGS_ACCOUNT: '/settings/account',
@@ -21,7 +22,7 @@ export const ROUTES = {
   EDIT_WORKFLOW_PREFERENCES: 'preferences',
   EDIT_STEP: 'steps/:stepSlug',
   EDIT_STEP_TEMPLATE: 'steps/:stepSlug/edit',
-  INTEGRATIONS: '/env/:environmentSlug/integrations',
+  INTEGRATIONS: '/integrations',
   INTEGRATIONS_CREATE: '/env/:environmentSlug/integrations/create',
   API_KEYS: '/env/:environmentSlug/api-keys',
   ACTIVITY_FEED: '/env/:environmentSlug/activity-feed',
@@ -42,4 +43,5 @@ export const LEGACY_ROUTES = {
   SETTINGS: '/legacy/manage-account/user-profile',
   EDIT_WORKFLOW: '/legacy/workflows/edit/:workflowId',
   TEST_WORKFLOW: '/legacy/workflows/edit/:workflowId/test-workflow',
+  LOCAL_STUDIO_AUTH: '/legacy/local-studio/auth',
 };

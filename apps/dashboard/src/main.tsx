@@ -31,6 +31,7 @@ import { ChannelPreferences } from './components/workflow-editor/channel-prefere
 import { FeatureFlagsProvider } from './context/feature-flags-provider';
 import { ConfigureStep } from '@/components/workflow-editor/steps/configure-step';
 import { ConfigureStepTemplate } from '@/components/workflow-editor/steps/configure-step-template';
+import { RedirectToLegacyStudioAuth } from './pages/redirect-to-legacy-studio-auth';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -132,15 +133,16 @@ const router = createBrowserRouter([
                 path: ROUTES.TEST_WORKFLOW,
                 element: <TestWorkflowPage />,
               },
-              {
-                path: ROUTES.INTEGRATIONS,
-                element: <IntegrationsListPage />,
-              },
+
               {
                 path: '*',
                 element: <CatchAllRoute />,
               },
             ],
+          },
+          {
+            path: ROUTES.INTEGRATIONS,
+            element: <IntegrationsListPage />,
           },
           {
             path: ROUTES.SETTINGS,
@@ -161,6 +163,10 @@ const router = createBrowserRouter([
           {
             path: ROUTES.SETTINGS_BILLING,
             element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.LOCAL_STUDIO_AUTH,
+            element: <RedirectToLegacyStudioAuth />,
           },
           {
             path: '*',

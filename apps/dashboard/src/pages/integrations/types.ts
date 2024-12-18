@@ -1,6 +1,6 @@
 import { ChannelTypeEnum } from '@novu/shared';
 
-export type ITableIntegration = {
+export type TableIntegration = {
   integrationId: string;
   name: string;
   identifier: string;

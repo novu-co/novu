@@ -10,6 +10,7 @@ import { CreateIntegrationSidebar } from './components/create-integration-sideba
 import { Badge } from '../../components/primitives/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Button } from '@/components/primitives/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 
 export function IntegrationsListPage() {
   const [searchParams] = useSearchParams();
@@ -41,12 +42,21 @@ export function IntegrationsListPage() {
             <TabsTrigger value="providers" variant="regular">
               Providers
             </TabsTrigger>
-            <TabsTrigger value="data-warehouse" variant="regular" disabled>
-              Data{' '}
-              <Badge kind="pill" size="2xs">
-                SOON
-              </Badge>
-            </TabsTrigger>
+            <Tooltip>
+              <TooltipTrigger>
+                <TabsTrigger value="data-warehouse" variant="regular" disabled>
+                  Data{' '}
+                  <Badge kind="pill" size="2xs">
+                    SOON
+                  </Badge>
+                </TabsTrigger>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs">
+                  Data warehouse connectors for syncing user data and triggering notifications.
+                </p>
+              </TooltipContent>
+            </Tooltip>
           </TabsList>
           <Button size="sm" variant="primary" onClick={onAddIntegrationClickCallback} className="my-1.5 mr-2.5">
             Connect Provider
