@@ -1,15 +1,17 @@
 import { UiComponentEnum } from '@novu/shared';
 
-import { InAppAction } from '@/components/workflow-editor/steps/in-app/in-app-action';
-import { InAppSubject } from '@/components/workflow-editor/steps/in-app/in-app-subject';
-import { InAppBody } from '@/components/workflow-editor/steps/in-app/in-app-body';
-import { InAppAvatar } from '@/components/workflow-editor/steps/in-app/in-app-avatar';
-import { InAppRedirect } from '@/components/workflow-editor/steps/in-app/in-app-redirect';
 import { DelayAmount } from '@/components/workflow-editor/steps/delay/delay-amount';
-import { Maily } from '@/components/workflow-editor/steps/email/maily';
-import { EmailSubject } from '@/components/workflow-editor/steps/email/email-subject';
 import { DigestKey } from '@/components/workflow-editor/steps/digest/digest-key';
 import { DigestWindow } from '@/components/workflow-editor/steps/digest/digest-window';
+import { EmailSubject } from '@/components/workflow-editor/steps/email/email-subject';
+import { Maily } from '@/components/workflow-editor/steps/email/maily';
+import { InAppAction } from '@/components/workflow-editor/steps/in-app/in-app-action';
+import { InAppAvatar } from '@/components/workflow-editor/steps/in-app/in-app-avatar';
+import { InAppBody } from '@/components/workflow-editor/steps/in-app/in-app-body';
+import { InAppRedirect } from '@/components/workflow-editor/steps/in-app/in-app-redirect';
+import { InAppSubject } from '@/components/workflow-editor/steps/in-app/in-app-subject';
+import { BaseBody } from './base/base-body';
+import { BaseSubject } from './base/base-subject';
 
 export const getComponentByType = ({ component }: { component?: UiComponentEnum }) => {
   switch (component) {
@@ -46,6 +48,15 @@ export const getComponentByType = ({ component }: { component?: UiComponentEnum 
     case UiComponentEnum.DIGEST_UNIT:
     case UiComponentEnum.DIGEST_CRON: {
       return <DigestWindow />;
+    }
+    case UiComponentEnum.PUSH_BODY: {
+      return <BaseBody />;
+    }
+    case UiComponentEnum.PUSH_SUBJECT: {
+      return <BaseSubject />;
+    }
+    case UiComponentEnum.SMS_BODY: {
+      return <BaseBody />;
     }
     default: {
       return null;

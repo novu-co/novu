@@ -11,22 +11,24 @@ import {
 } from '@novu/shared';
 
 import { flattenIssues, updateStepInWorkflow } from '@/components/workflow-editor/step-utils';
-import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
-import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
-import { OtherStepTabs } from '@/components/workflow-editor/steps/other-steps-tabs';
 import { Form } from '@/components/primitives/form/form';
-import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { EmailTabs } from '@/components/workflow-editor/steps/email/email-tabs';
 import { getStepDefaultValues } from '@/components/workflow-editor/step-default-values';
+import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
+import { PushTabs } from '@/components/workflow-editor/steps/push/push-tabs';
+import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
+import { SmsTabs } from '@/components/workflow-editor/steps/sms/sms-tabs';
+import { OtherStepTabs } from '@/components/workflow-editor/steps/other-steps-tabs';
+import { useFormAutosave } from '@/hooks/use-form-autosave';
+import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
 import { CommonCustomControlValues } from './common/common-custom-control-values';
 
 const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
   [StepTypeEnum.EMAIL]: EmailTabs,
   [StepTypeEnum.CHAT]: OtherStepTabs,
   [StepTypeEnum.IN_APP]: InAppTabs,
-  [StepTypeEnum.SMS]: OtherStepTabs,
-  [StepTypeEnum.PUSH]: OtherStepTabs,
+  [StepTypeEnum.SMS]: SmsTabs,
+  [StepTypeEnum.PUSH]: PushTabs,
   [StepTypeEnum.DIGEST]: CommonCustomControlValues,
   [StepTypeEnum.DELAY]: CommonCustomControlValues,
   [StepTypeEnum.TRIGGER]: () => null,
