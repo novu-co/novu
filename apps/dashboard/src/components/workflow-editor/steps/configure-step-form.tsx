@@ -50,7 +50,8 @@ import {
 } from '@/utils/constants';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
-import { ConfigurePushStepPreview } from './push/configure-push-step-preview';
+import { ConfigurePushStepPreview } from '@/components/workflow-editor/steps/push/configure-push-step-preview';
+import { ConfigureChatStepPreview } from '@/components/workflow-editor/steps/chat/configure-chat-step-preview';
 
 const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
@@ -68,7 +69,7 @@ const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, ((props: HTMLAttributes<HTMLDiv
   [StepTypeEnum.IN_APP]: ConfigureInAppStepPreview,
   [StepTypeEnum.EMAIL]: ConfigureEmailStepPreview,
   [StepTypeEnum.SMS]: ConfigureSmsStepPreview,
-  [StepTypeEnum.CHAT]: null,
+  [StepTypeEnum.CHAT]: ConfigureChatStepPreview,
   [StepTypeEnum.PUSH]: ConfigurePushStepPreview,
   [StepTypeEnum.CUSTOM]: null,
   [StepTypeEnum.TRIGGER]: null,

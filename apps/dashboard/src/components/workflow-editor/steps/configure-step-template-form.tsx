@@ -18,14 +18,14 @@ import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs
 import { PushTabs } from '@/components/workflow-editor/steps/push/push-tabs';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { SmsTabs } from '@/components/workflow-editor/steps/sms/sms-tabs';
+import { ChatTabs } from '@/components/workflow-editor/steps/chat/chat-tabs';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
-import { CommonCustomControlValues } from './common/common-custom-control-values';
-import { OtherStepTabs } from './other-steps-tabs';
+import { CommonCustomControlValues } from '@/components/workflow-editor/steps/common/common-custom-control-values';
 
 const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
   [StepTypeEnum.EMAIL]: EmailTabs,
-  [StepTypeEnum.CHAT]: OtherStepTabs,
+  [StepTypeEnum.CHAT]: ChatTabs,
   [StepTypeEnum.IN_APP]: InAppTabs,
   [StepTypeEnum.SMS]: SmsTabs,
   [StepTypeEnum.PUSH]: PushTabs,
