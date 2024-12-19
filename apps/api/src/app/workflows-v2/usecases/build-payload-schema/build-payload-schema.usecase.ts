@@ -40,7 +40,9 @@ export class BuildPayloadSchema {
       valueSuffix: '}}',
     }).payload;
 
-    return convertJsonToSchemaWithDefaults(variablesExample);
+    const jsonSchemaDto = convertJsonToSchemaWithDefaults(variablesExample);
+
+    return addAdditionalPropertiesPointer(jsonSchemaDto);
   }
 
   private async buildControlValues(command: BuildPayloadSchemaCommand) {
@@ -95,4 +97,12 @@ export class BuildPayloadSchema {
 
     return processedValue;
   }
+}
+function addAdditionalPropertiesPointer(schema: JSONSchemaDto) {
+  if (schema.type === 'object' && schema.properties) {
+    // eslint-disable-next-line no-param-reassign
+    schema.additionalProperties = true;
+  }
+
+  return schema;
 }
