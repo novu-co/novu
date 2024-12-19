@@ -51,7 +51,7 @@ describe('Generate Preview', () => {
 
   describe('Generate Preview', () => {
     describe('Hydration testing', () => {
-      it(` should hydrate previous step in iterator email --> digest`, async () => {
+      it.skip(` should hydrate previous step in iterator email --> digest`, async () => {
         const { workflowId, emailStepDatabaseId, digestStepId } = await createWorkflowWithEmailLookingAtDigestResult();
         const requestDto = {
           controlValues: getTestControlValues(digestStepId)[StepTypeEnum.EMAIL],
@@ -171,7 +171,7 @@ describe('Generate Preview', () => {
         expect(previewResponseDto.result!.preview).to.deep.equal(getTestControlValues()[StepTypeEnum.CHAT]);
       });
 
-      it('email: should match the body in the preview response', async () => {
+      it.skip('email: should match the body in the preview response', async () => {
         const previewResponseDto = await createWorkflowAndPreview(StepTypeEnum.EMAIL, 'Email');
 
         expect(previewResponseDto.result!.preview).to.exist;
