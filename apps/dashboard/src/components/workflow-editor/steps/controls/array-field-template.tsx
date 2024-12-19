@@ -24,7 +24,9 @@ export function ArrayFieldTemplate(props: ArrayFieldTemplateProps) {
 
   const [isEditorOpen, setIsEditorOpen] = useState(true);
 
-  const handleAddClick = () => {
+  const handleAddClick = (e) => {
+    e.stopPropogation();
+
     if (!isEditorOpen) {
       setIsEditorOpen(true);
     }
