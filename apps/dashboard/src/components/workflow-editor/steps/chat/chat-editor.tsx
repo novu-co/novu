@@ -4,13 +4,11 @@ import { type UiSchema } from '@novu/shared';
 import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
 import { TabsSection } from '@/components/workflow-editor/steps/tabs-section';
 
-const bodyKey = 'body';
-
 type ChatEditorProps = { uiSchema: UiSchema };
 
 export const ChatEditor = (props: ChatEditorProps) => {
   const { uiSchema } = props;
-  const { [bodyKey]: body } = uiSchema?.properties ?? {};
+  const { body } = uiSchema?.properties ?? {};
 
   return (
     <div className="flex h-full flex-col">

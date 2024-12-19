@@ -4,14 +4,11 @@ import { type UiSchema } from '@novu/shared';
 import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
 import { TabsSection } from '@/components/workflow-editor/steps/tabs-section';
 
-const subjectKey = 'subject';
-const bodyKey = 'body';
-
 type PushEditorProps = { uiSchema: UiSchema };
 
 export const PushEditor = (props: PushEditorProps) => {
   const { uiSchema } = props;
-  const { [bodyKey]: body, [subjectKey]: subject } = uiSchema?.properties ?? {};
+  const { body, subject } = uiSchema?.properties ?? {};
 
   return (
     <div className="flex h-full flex-col">
