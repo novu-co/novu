@@ -66,7 +66,7 @@ export const ChatEditorPreview = ({ workflow, step, formValues }: ChatEditorPrev
         <div className="flex flex-col items-center justify-center gap-4">
           <ChatPreview isPreviewPending={isPreviewPending} previewData={previewData} />
           <InlineToast
-            description="This preview shows how your message will appear on mobile. Actual rendering may vary by device."
+            description="This preview shows how your message will appear. Actual rendering may vary by provider."
             className="w-full px-3"
           />
         </div>
