@@ -4,13 +4,23 @@ import type { IActivity } from '@novu/shared';
 import { useEnvironment } from '@/context/environment/hooks';
 import { getNotification } from '@/api/activity';
 
-export function useFetchActivity({ activityId }: { activityId?: string }) {
+export function useFetchActivity(
+  { activityId }: { activityId?: string },
+  {
+    refetchInterval = false,
+    refetchOnWindowFocus = false,
+    staleTime = 0,
+  }: { refetchInterval?: number | false; refetchOnWindowFocus?: boolean; staleTime?: number } = {}
+) {
   const { currentEnvironment } = useEnvironment();
 
   const { data, isPending, error } = useQuery<{ data: IActivity }>({
     queryKey: [QueryKeys.fetchActivity, currentEnvironment?._id, activityId],
     queryFn: () => getNotification(activityId!, currentEnvironment!),
     enabled: !!currentEnvironment?._id && !!activityId,
+    refetchInterval,
+    refetchOnWindowFocus,
+    staleTime,
   });
 
   return {
