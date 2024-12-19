@@ -23,7 +23,6 @@ export function SelectWidget(props: WidgetProps) {
 
   const { control } = useFormContext();
 
-  console.log({ props });
   return (
     <FormField
       control={control}
