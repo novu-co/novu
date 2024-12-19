@@ -31,6 +31,7 @@ import { FeatureFlagsProvider } from './context/feature-flags-provider';
 import { ConfigureStep } from '@/components/workflow-editor/steps/configure-step';
 import { ConfigureStepTemplate } from '@/components/workflow-editor/steps/configure-step-template';
 import { RedirectToLegacyStudioAuth } from './pages/redirect-to-legacy-studio-auth';
+import { ProviderControl } from './components/workflow-editor/steps/controls/provider-controls';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -169,6 +170,10 @@ const router = createBrowserRouter([
         ],
       },
     ],
+  },
+  {
+    path: '/dima',
+    element: <ProviderControl />,
   },
 ]);
 

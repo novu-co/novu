@@ -38,27 +38,29 @@ export function ObjectFieldTemplate(props: ObjectFieldTemplateProps) {
               onOpenChange={setIsEditorOpen}
               className="bg-background border-neutral-alpha-200 relative mt-2 flex w-full flex-col gap-2 border-t px-3 py-4 pb-0"
             >
-              <div className="absolute left-0 top-0 z-10 flex w-full -translate-y-1/2 items-center justify-between p-0 text-sm">
-                <div className="-mt-px flex w-full items-center gap-1">
-                  <span className="bg-background ml-3 px-1">
-                    <ArrayFieldTitleTemplate
-                      idSchema={idSchema}
-                      title={sectionTitle}
-                      schema={schema}
-                      uiSchema={uiSchema}
-                      required={required}
-                      registry={registry}
-                    />
-                  </span>
-                  <div className="bg-background text-foreground-600 ml-auto flex items-center gap-1">
-                    <CollapsibleTrigger
-                      className="hover:bg-accent flex size-4 items-center justify-center rounded-sm p-0.5"
-                      title="Collapse section"
-                    >
-                      <RiExpandUpDownLine className="text-foreground-600 size-3" />
-                    </CollapsibleTrigger>
+              <div className="absolute left-0 top-0 z-10 flex w-full -translate-y-1/2 items-center justify-between p-0 px-2 text-sm">
+                <CollapsibleTrigger className="w-full p-0">
+                  <div className="-mt-px flex w-full items-center gap-1">
+                    <span className="bg-background px-1 capitalize">
+                      <ArrayFieldTitleTemplate
+                        idSchema={idSchema}
+                        title={sectionTitle}
+                        schema={schema}
+                        uiSchema={uiSchema}
+                        required={required}
+                        registry={registry}
+                      />
+                    </span>
+                    <div className="bg-background text-foreground-600 ml-auto flex items-center gap-1">
+                      <div
+                        className="hover:bg-accent flex size-4 items-center justify-center rounded-sm p-0.5"
+                        title="Collapse section"
+                      >
+                        <RiExpandUpDownLine className="text-foreground-600 size-3" />
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </CollapsibleTrigger>
               </div>
 
               <CollapsibleContent className="flex flex-col gap-3">

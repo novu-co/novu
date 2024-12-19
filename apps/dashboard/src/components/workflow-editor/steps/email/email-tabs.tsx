@@ -6,6 +6,7 @@ import { EmailEditorPreview } from '@/components/workflow-editor/steps/email/ema
 import { CustomStepControls } from '../controls/custom-step-controls';
 import { StepEditorProps } from '@/components/workflow-editor/steps/configure-step-template-form';
 import { TemplateTabs } from '@/components/workflow-editor/steps/template-tabs';
+import { ProviderControl } from '../controls/provider-controls';
 
 export const EmailTabs = (props: StepEditorProps) => {
   const { workflow, step } = props;
@@ -20,6 +21,7 @@ export const EmailTabs = (props: StepEditorProps) => {
     <>
       {isNovuCloud && <EmailEditor uiSchema={uiSchema} />}
       {isExternal && <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />}
+      {isNovuCloud && <ProviderControl />}
     </>
   );
 

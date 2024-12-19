@@ -11,9 +11,12 @@ import { EditorView } from '@uiw/react-codemirror';
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { getFieldName } from './template-utils';
+import { RiInformation2Line } from 'react-icons/ri';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@radix-ui/react-tooltip';
+import { cn } from '../../../../utils/ui';
 
 export function TextWidget(props: WidgetProps) {
-  const { label, readonly, disabled, id, required } = props;
+  const { label, readonly, disabled, schema, id, required } = props;
   const { control } = useFormContext();
   const { step } = useWorkflow();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
@@ -31,7 +34,22 @@ export function TextWidget(props: WidgetProps) {
       name={extractedName}
       render={({ field }) => (
         <FormItem className="w-full py-1">
-          <FormLabel className="text-xs">{capitalize(label)}</FormLabel>
+          <FormLabel className="text-xs">
+            {capitalize(label)}
+
+            {schema.description ? (
+              <Tooltip>
+                <TooltipTrigger>
+                  <span className={cn('text-foreground-400 hover:cursor ml-1 inline-block')}>
+                    <RiInformation2Line className={`size-3.5`} />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent className="rounded-4 z-50 max-w-xl bg-neutral-700 p-3 text-white">
+                  <p>{schema.description}</p>
+                </TooltipContent>
+              </Tooltip>
+            ) : null}
+          </FormLabel>
           <FormControl>
             <InputField size="fit" className="w-full">
               {isNumberType ? (

@@ -17,9 +17,10 @@ import { SidebarContent } from '@/components/side-navigation/sidebar';
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
 import { InlineToast } from '@/components/primitives/inline-toast';
+import { JsonSchema } from '@novu/framework/internal';
 
 type CustomStepControlsProps = {
-  dataSchema: ControlsMetadata['dataSchema'];
+  dataSchema: ControlsMetadata['dataSchema'] | JsonSchema;
   origin: WorkflowOriginEnum;
   className?: string;
 };
@@ -147,7 +148,13 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
 
           <AccordionContent>
             <div className="bg-background rounded-md border border-dashed p-3">
-              <JsonForm schema={(dataSchema as RJSFSchema) || {}} disabled={!isOverridden} />
+              <JsonForm
+                schema={(dataSchema as RJSFSchema) || {}}
+                disabled={!isOverridden}
+                onChange={() => {
+                  saveForm();
+                }}
+              />
             </div>
           </AccordionContent>
         </AccordionItem>
