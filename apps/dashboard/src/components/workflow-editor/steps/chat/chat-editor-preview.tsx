@@ -1,16 +1,16 @@
-import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
 import { CSSProperties, useEffect, useRef, useState } from 'react';
+import { RiChat1Fill } from 'react-icons/ri';
+import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
 
-import { Sms } from '@/components/icons';
 import { Code2 } from '@/components/icons/code-2';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
 import { Button } from '@/components/primitives/button';
 import { Editor } from '@/components/primitives/editor';
-import { SmsPreview } from '@/components/workflow-editor/steps/sms/sms-preview';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
-import { useEditorPreview } from '../use-editor-preview';
-import { InlineToast } from '@/components/primitives/inline-toast';
+import { useEditorPreview } from '@/components/workflow-editor/steps/use-editor-preview';
+import { ChatPreview } from '@/components/workflow-editor/steps/chat/chat-preview';
 import { TabsSection } from '@/components/workflow-editor/steps/tabs-section';
+import { InlineToast } from '@/components/primitives/inline-toast';
 
 const getInitialAccordionValue = (value: string) => {
   try {
@@ -20,7 +20,7 @@ const getInitialAccordionValue = (value: string) => {
   }
 };
 
-type SmsEditorPreviewProps = {
+type ChatEditorPreviewProps = {
   workflow: WorkflowResponseDto;
   step: StepDataDto;
   formValues: Record<string, unknown>;
@@ -28,7 +28,7 @@ type SmsEditorPreviewProps = {
 
 const extensions = [loadLanguage('json')?.extension ?? []];
 
-export const SmsEditorPreview = ({ workflow, step, formValues }: SmsEditorPreviewProps) => {
+export const ChatEditorPreview = ({ workflow, step, formValues }: ChatEditorPreviewProps) => {
   const workflowSlug = workflow.workflowId;
   const stepSlug = step.stepId;
   const { editorValue, setEditorValue, previewStep, previewData, isPreviewPending } = useEditorPreview({
@@ -60,13 +60,13 @@ export const SmsEditorPreview = ({ workflow, step, formValues }: SmsEditorPrevie
     <TabsSection>
       <div className="relative flex flex-col gap-3">
         <div className="flex items-center gap-2.5 text-sm font-medium">
-          <Sms className="size-3" />
-          SMS template editor
+          <RiChat1Fill className="size-3" />
+          Chat template editor
         </div>
         <div className="flex flex-col items-center justify-center gap-4">
-          <SmsPreview isPreviewPending={isPreviewPending} previewData={previewData} />
+          <ChatPreview isPreviewPending={isPreviewPending} previewData={previewData} />
           <InlineToast
-            description="This preview shows how your message will appear on mobile. Actual rendering may vary by device."
+            description="This preview shows how your message will appear. Actual rendering may vary by provider."
             className="w-full px-3"
           />
         </div>

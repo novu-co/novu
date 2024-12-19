@@ -1,52 +1,36 @@
-import { useMemo } from 'react';
+import { useState } from 'react';
 import { Tabs } from '@radix-ui/react-tabs';
 import { RiCalendarScheduleFill } from 'react-icons/ri';
 import { useFormContext } from 'react-hook-form';
-import { JSONSchemaDto, TimeUnitEnum } from '@novu/shared';
+import { TimeUnitEnum } from '@novu/shared';
 
-import { FormLabel, FormMessagePure } from '@/components/primitives/form/form';
-import { AmountInput } from '@/components/amount-input';
+import { FormField, FormLabel, FormMessagePure } from '@/components/primitives/form/form';
 import { Separator } from '@/components/primitives/separator';
 import { TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
-import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { useSaveForm } from '../save-form-context';
+import { RegularDigest } from '@/components/workflow-editor/steps/digest/regular-digest';
+import { ScheduledDigest } from '@/components/workflow-editor/steps/digest/scheduled-digest';
+import { AMOUNT_KEY, CRON_KEY, UNIT_KEY } from '@/components/workflow-editor/steps/digest/keys';
+import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
+import { EVERY_MINUTE_CRON } from '@/components/workflow-editor/steps/digest/utils';
 
-const defaultUnitValues = Object.values(TimeUnitEnum);
-const amountKey = 'controlValues.amount';
-const unitKey = 'controlValues.unit';
+const REGULAR_DIGEST_TYPE = 'regular';
+const SCHEDULED_DIGEST_TYPE = 'scheduled';
+const TWO_SECONDS = 2000;
 
 export const DigestWindow = () => {
-  const { step } = useWorkflow();
+  const { control, getFieldState, setValue, setError, getValues, trigger } = useFormContext();
+  const formValues = getValues();
+  const { amount } = formValues.controlValues;
   const { saveForm } = useSaveForm();
-  const { getFieldState } = useFormContext();
-  const { dataSchema, uiSchema } = step?.controls ?? {};
-  const amountField = getFieldState(`${amountKey}`);
-  const unitField = getFieldState(`${unitKey}`);
-  const digestError = amountField.error || unitField.error;
-
-  const minAmountValue = useMemo(() => {
-    const fixedDurationSchema = dataSchema?.anyOf?.[0];
-    if (typeof fixedDurationSchema === 'object') {
-      const amountField = fixedDurationSchema.properties?.amount;
-
-      if (typeof amountField === 'object' && amountField.type === 'number') {
-        return amountField.minimum ?? 1;
-      }
-    }
-
-    return 1;
-  }, [dataSchema]);
-
-  const unitOptions = useMemo(
-    () => ((dataSchema?.anyOf?.[0] as JSONSchemaDto).properties?.unit as any).enum ?? defaultUnitValues,
-    [dataSchema]
+  const [digestType, setDigestType] = useState(
+    typeof amount !== 'undefined' ? REGULAR_DIGEST_TYPE : SCHEDULED_DIGEST_TYPE
   );
-
-  const defaultUnitOption = useMemo(
-    () => (uiSchema?.properties?.unit as any).placeholder ?? TimeUnitEnum.SECONDS,
-    [uiSchema?.properties]
-  );
+  const amountField = getFieldState(`${AMOUNT_KEY}`);
+  const unitField = getFieldState(`${UNIT_KEY}`);
+  const cronField = getFieldState(`${CRON_KEY}`);
+  const regularDigestError = amountField.error || unitField.error;
+  const scheduledDigestError = cronField.error;
 
   return (
     <div className="flex flex-col gap-2">
@@ -56,62 +40,92 @@ export const DigestWindow = () => {
           <span>Digest window</span>
         </span>
       </FormLabel>
-      <Tabs defaultValue="editor" className="flex h-full flex-1 flex-col" value="editor">
+      <Tabs
+        value={digestType}
+        className="flex h-full flex-1 flex-col"
+        onBlur={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onValueChange={async (value) => {
+          setDigestType(value);
+          if (value === SCHEDULED_DIGEST_TYPE) {
+            setValue(AMOUNT_KEY, undefined, { shouldDirty: true });
+            setValue(UNIT_KEY, undefined, { shouldDirty: true });
+            setValue(CRON_KEY, EVERY_MINUTE_CRON, { shouldDirty: true });
+          } else {
+            setValue(AMOUNT_KEY, '', { shouldDirty: true });
+            setValue(UNIT_KEY, TimeUnitEnum.SECONDS, { shouldDirty: true });
+            setValue(CRON_KEY, undefined, { shouldDirty: true });
+          }
+          await trigger();
+          saveForm();
+        }}
+      >
         <div className="bg-neutral-alpha-50 flex flex-col rounded-lg border border-solid border-neutral-100">
           <div className="rounded-t-lg p-2">
             <TabsList className="w-full">
-              <Tooltip>
+              <Tooltip delayDuration={TWO_SECONDS}>
                 <TooltipTrigger className="ml-1" asChild>
                   <span className="flex-1">
-                    <TabsTrigger value="editor" className="w-full text-xs">
-                      Fixed duration
+                    <TabsTrigger value={REGULAR_DIGEST_TYPE} className="w-full text-xs">
+                      Regular
                     </TabsTrigger>
                   </span>
                 </TooltipTrigger>
-                <TooltipContent className="max-w-48" side="top" sideOffset={10}>
+                <TooltipContent className="max-w-56" side="top" sideOffset={10}>
                   <span>
-                    Digest begins after the last sent digest, collecting events until the set time, then sends a
-                    summary.
+                    Set the amount of time to digest events for. Once the defined time has elapsed, the digested events
+                    are sent, and another digest begins immediately.
                   </span>
                 </TooltipContent>
               </Tooltip>
-              <Tooltip>
+              <Tooltip delayDuration={TWO_SECONDS}>
                 <TooltipTrigger className="ml-1" asChild>
                   <span className="flex-1">
-                    <TabsTrigger value="preview" className="w-full text-xs">
-                      Interval
+                    <TabsTrigger value={SCHEDULED_DIGEST_TYPE} className="w-full text-xs">
+                      Scheduled
                     </TabsTrigger>
                   </span>
                 </TooltipTrigger>
-                <TooltipContent className="max-w-48" side="top" sideOffset={10}>
-                  <span>Coming soon...</span>
+                <TooltipContent className="max-w-56" side="top" sideOffset={10}>
+                  <span>
+                    Schedule the digest on a repeating basis (every 3 hours, every Friday at 6 p.m., etc.) to get full
+                    control over when your digested events are processed and sent.
+                  </span>
                 </TooltipContent>
               </Tooltip>
             </TabsList>
           </div>
           <Separator className="bg-neutral-100" />
           <div className="bg-background rounded-b-lg p-2">
-            <TabsContent value="editor">
-              <div className="flex items-center justify-between">
-                <span className="text-foreground-600 text-xs font-medium">Digest events for</span>
-                <AmountInput
-                  fields={{ inputKey: `${amountKey}`, selectKey: `${unitKey}` }}
-                  options={unitOptions}
-                  defaultOption={defaultUnitOption}
-                  className="w-min [&_input]:!w-[3ch] [&_input]:!min-w-[3ch]"
-                  onValueChange={() => saveForm()}
-                  showError={false}
-                  min={minAmountValue}
-                />
-              </div>
+            <TabsContent value={REGULAR_DIGEST_TYPE}>
+              <RegularDigest />
             </TabsContent>
-            <TabsContent value="preview">
-              <span className="text-foreground-600 text-xs font-medium">Coming next...</span>
+            <TabsContent value={SCHEDULED_DIGEST_TYPE}>
+              <FormField
+                control={control}
+                name={CRON_KEY}
+                render={({ field }) => (
+                  <ScheduledDigest
+                    value={field.value}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      saveForm();
+                    }}
+                    onError={() => {
+                      setError(CRON_KEY, { message: 'Failed to parse cron' });
+                    }}
+                  />
+                )}
+              />
             </TabsContent>
           </div>
         </div>
       </Tabs>
-      <FormMessagePure error={digestError ? String(digestError.message) : undefined} />
+      <FormMessagePure
+        error={digestType === REGULAR_DIGEST_TYPE ? regularDigestError?.message : scheduledDigestError?.message}
+      />
     </div>
   );
 };

@@ -5,8 +5,7 @@ import { useMemo } from 'react';
 import { TimeUnitEnum } from '@novu/shared';
 import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-
-const defaultUnitValues = Object.values(TimeUnitEnum);
+import { TIME_UNIT_OPTIONS } from '@/components/workflow-editor/steps/time-units';
 
 const amountKey = 'amount';
 const unitKey = 'unit';
@@ -14,7 +13,7 @@ const unitKey = 'unit';
 export const DelayAmount = () => {
   const { step } = useWorkflow();
   const { saveForm } = useSaveForm();
-  const { dataSchema, uiSchema } = step?.controls ?? {};
+  const { dataSchema } = step?.controls ?? {};
 
   const minAmountValue = useMemo(() => {
     if (typeof dataSchema === 'object') {
@@ -28,16 +27,6 @@ export const DelayAmount = () => {
     return 1;
   }, [dataSchema]);
 
-  const unitOptions = useMemo(
-    () => (dataSchema?.properties?.[unitKey] as any)?.enum ?? defaultUnitValues,
-    [dataSchema?.properties]
-  );
-
-  const defaultUnitOption = useMemo(
-    () => (uiSchema?.properties?.[unitKey] as any)?.placeholder ?? TimeUnitEnum.SECONDS,
-    [uiSchema?.properties]
-  );
-
   return (
     <div className="flex h-full flex-col gap-2">
       <FormLabel tooltip="Delays workflow for the set time, then proceeds to the next step.">
@@ -45,8 +34,8 @@ export const DelayAmount = () => {
       </FormLabel>
       <AmountInput
         fields={{ inputKey: `controlValues.${amountKey}`, selectKey: `controlValues.${unitKey}` }}
-        options={unitOptions}
-        defaultOption={defaultUnitOption}
+        options={TIME_UNIT_OPTIONS}
+        defaultOption={TimeUnitEnum.SECONDS}
         onValueChange={() => saveForm()}
         min={minAmountValue}
       />

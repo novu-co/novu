@@ -131,7 +131,13 @@ export const AddStepMenu = ({
                 >
                   Push
                 </MenuItem>
-                <MenuItem stepType={StepTypeEnum.CHAT}>Chat</MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.CHAT}
+                  disabled={!arePushChatSMSEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.CHAT)}
+                >
+                  Chat
+                </MenuItem>
                 <MenuItem
                   stepType={StepTypeEnum.SMS}
                   disabled={!arePushChatSMSEnabled}
