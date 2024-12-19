@@ -1,5 +1,4 @@
 import { UiSchemaGroupEnum } from '@novu/shared';
-
 import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { Separator } from '@/components/primitives/separator';

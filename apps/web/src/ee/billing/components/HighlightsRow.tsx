@@ -32,7 +32,7 @@ const highlights: PlanHighlights = {
   ],
   [ApiServiceLevelEnum.BUSINESS]: [
     { text: 'Up to 250,000 events per month' },
-    { text: '50 teammates' },
+    { text: 'Unlimited teammates' },
     { text: '90 days Activity Feed retention' },
   ],
   [ApiServiceLevelEnum.ENTERPRISE]: [

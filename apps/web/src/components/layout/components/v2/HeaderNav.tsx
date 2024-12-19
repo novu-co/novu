@@ -28,7 +28,6 @@ import { SupportModal } from '../SupportModal';
 export function HeaderNav() {
   const { currentUser, currentOrganization } = useAuth();
   const [isSupportModalOpened, setIsSupportModalOpened] = useState(false);
-  const isV2Enabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_ENABLED);
 
   useBootIntercom();
   // variable to check if it's the first render for. Needed for Plain live chat initialization
@@ -113,7 +112,7 @@ export function HeaderNav() {
           <WorkflowHeaderBackButton />
         </HStack>
         <HStack flexWrap={'nowrap'} justifyContent="flex-end" gap={'100'}>
-          {isV2Enabled && <BridgeMenuItems />}
+          {<BridgeMenuItems />}
           <ActionIcon variant="transparent" onClick={() => toggleColorScheme()}>
             <Tooltip label={themeLabel}>
               <div>

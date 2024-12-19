@@ -5,7 +5,9 @@ import { randomUUID } from 'node:crypto';
 import { captureException } from '@sentry/node';
 import { ZodError } from 'zod';
 import { InternalServerErrorException } from '@nestjs/common/exceptions/internal-server-error.exception';
+import { ErrorDto, ValidationErrorDto } from './error-dto';
 
+const ERROR_MSG_500 = `Internal server error, contact support and provide them with the errorId`;
 export class AllExceptionsFilter implements ExceptionFilter {
   constructor(private readonly logger: PinoLogger) {}
   catch(exception: unknown, host: ArgumentsHost) {
@@ -13,22 +15,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    const responseMetadata = this.getResponseMetadata(exception);
-    const responseBody = this.buildResponseBody(request, responseMetadata, exception);
-
-    response.status(responseMetadata.status).json(responseBody);
+    const errorDto = this.buildErrorResponse(exception, request);
+    this.logError(errorDto, exception);
+    // This is for backwards compatibility for clients waiting for the context elements to appear flat
+    const finalResponse = { ...errorDto.ctx, ...errorDto };
+    response.status(errorDto.statusCode).json(finalResponse);
   }
 
-  private buildResponseBody(request: Request, responseMetadata: ResponseMetadata, exception: unknown): ErrorDto {
-    const responseBody = this.buildBaseResponseBody(request, responseMetadata);
-    if (responseMetadata.status === HttpStatus.INTERNAL_SERVER_ERROR) {
-      return this.logAndBuild500Error(exception, responseBody);
-    }
-
-    return this.logAndBuildOtherErrors(responseBody, exception);
-  }
-
-  private logAndBuildOtherErrors(responseBody: ErrorResponseBody, exception: unknown) {
+  private logError(errorDto: ErrorDto, exception: unknown) {
     this.logger.error({
       /**
        * It's important to use `err` as the key, pino (the logger we use) will
@@ -37,88 +31,73 @@ export class AllExceptionsFilter implements ExceptionFilter {
        * @see https://github.com/pinojs/pino/issues/819#issuecomment-611995074
        */
       err: exception,
-      error: responseBody,
+      error: errorDto,
     });
-
-    return responseBody;
   }
 
-  private logAndBuild500Error(exception: unknown, responseBody: ErrorResponseBody) {
-    const uuid = this.getUuid(exception);
-    this.logError(uuid, exception);
-
-    return { ...responseBody, errorId: uuid };
-  }
-
-  private buildBaseResponseBody(request: Request, responseMetadata: ResponseMetadata): ErrorResponseBody {
+  private buildErrorDto(request: Request, statusCode: number, message: string, ctx?: Object | object): ErrorDto {
     return {
-      ...responseMetadata.ctx,
-      statusCode: responseMetadata.status,
+      statusCode,
       timestamp: new Date().toISOString(),
       path: request.url,
-      message: responseMetadata.message,
-      ctx: responseMetadata.ctx,
+      message,
+      ctx,
     };
   }
 
-  private getResponseMetadata(exception: unknown): ResponseMetadata {
+  private buildErrorResponse(exception: unknown, request: Request): ErrorDto {
     if (exception instanceof ZodError) {
-      return handleZod(exception);
+      return this.handleZod(exception, request);
     }
     if (exception instanceof CommandValidationException) {
-      return this.handleCommandValidation(exception);
+      return this.handleCommandValidation(exception, request);
     }
 
     if (exception instanceof HttpException && !(exception instanceof InternalServerErrorException)) {
-      return this.handleOtherHttpExceptions(exception);
+      return this.handleOtherHttpExceptions(exception, request);
     }
 
+    return this.buildA5xxError(request, exception);
+  }
+
+  private buildA5xxError(request: Request, exception: unknown) {
+    const errorDto500 = this.buildErrorDto(request, HttpStatus.INTERNAL_SERVER_ERROR, ERROR_MSG_500);
+
     return {
-      status: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: `Internal server error, contact support and provide them with the errorId`,
+      ...errorDto500,
+      errorId: this.getUuid(exception),
     };
   }
 
-  private handleOtherHttpExceptions(exception: HttpException): ResponseMetadata {
+  private handleOtherHttpExceptions(exception: HttpException, request: Request): ErrorDto {
     const status = exception.getStatus();
     const response = exception.getResponse();
+    const { innerMsg, tempContext } = this.buildMsgAndContextForHttpError(response, status);
+
+    return this.buildErrorDto(request, status, innerMsg, tempContext);
+  }
+
+  private buildMsgAndContextForHttpError(response: string | object | { message: string }, status: number) {
     if (typeof response === 'string') {
-      return { status, message: response as string };
+      return { innerMsg: response as string };
     }
 
     if (hasMessage(response)) {
-      return {
-        status,
-        message: response.message,
-        ctx: { ...response, message: undefined },
-      };
+      const { message, ...ctx } = response;
+
+      return { innerMsg: message, tempContext: ctx };
+    }
+    if (typeof response === 'object' && response !== null) {
+      return { innerMsg: `Api Exception Raised with status ${status}`, tempContext: response };
     }
 
-    return { status, message: `Api Exception Raised with status ${status}` };
-  }
-  private handleCommandValidation(exception: CommandValidationException): ResponseMetadata {
-    return {
-      message: exception.message,
-      status: HttpStatus.BAD_REQUEST,
-      ctx: { cause: exception.constraintsViolated },
-    };
+    return { innerMsg: `Api Exception Raised with status ${status}` };
   }
 
-  private logError(uuid: string, exception: unknown) {
-    this.logger.error(
-      {
-        errorId: uuid,
-        /**
-         * It's important to use `err` as the key, pino (the logger we use) will
-         * log an empty object if the key is not `err`
-         *
-         * @see https://github.com/pinojs/pino/issues/819#issuecomment-611995074
-         */
-        err: exception,
-      },
-      `Unexpected exception thrown`,
-      'Exception'
-    );
+  private handleCommandValidation(exception: CommandValidationException, request: Request): ValidationErrorDto {
+    const errorDto = this.buildErrorDto(request, HttpStatus.UNPROCESSABLE_ENTITY, exception.message, {});
+
+    return { ...errorDto, errors: exception.constraintsViolated };
   }
 
   private getUuid(exception: unknown) {
@@ -132,47 +111,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
       return randomUUID();
     }
   }
+  private handleZod(exception: ZodError, request: Request): ErrorDto {
+    const ctx = {
+      errors: exception.errors.map((err) => ({
+        message: err.message,
+        path: err.path,
+      })),
+    };
+
+    return this.buildErrorDto(request, HttpStatus.BAD_REQUEST, 'Zod Validation Failed', ctx);
+  }
 }
 
-/**
- * Interface representing the structure of an error response.
- */
-export class ErrorDto {
-  statusCode: number;
-  timestamp: string;
-
-  /**
-   * Optional unique identifier for the error, useful for tracking using sentry and newrelic, only available for 500
-   */
-  errorId?: string;
-
-  path: string;
-  message: string | object;
-}
-
-function handleZod(exception: ZodError) {
-  const status = HttpStatus.BAD_REQUEST; // Set appropriate status for ZodError
-  const ctx = {
-    errors: exception.errors.map((err) => ({
-      message: err.message,
-      path: err.path,
-    })),
-  };
-
-  return { status, message: 'Zod Validation Failed', ctx };
-}
 class ResponseMetadata {
   status: number;
   message: string;
   ctx?: object | Object;
 }
-class ErrorResponseBody {
-  path: string;
-  message: string;
-  statusCode: number;
-  timestamp: string;
-  ctx?: object | Object;
-}
+
 function hasMessage(response: unknown): response is { message: string } {
   return typeof response === 'object' && response !== null && 'message' in response;
 }

@@ -1,8 +1,10 @@
 /* eslint-disable no-param-reassign */
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { StepDataDto, UserSessionData } from '@novu/shared';
 import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import {
+  DeleteControlValuesCommand,
+  DeleteControlValuesUseCase,
   GetWorkflowByIdsUseCase,
   UpsertControlValuesCommand,
   UpsertControlValuesUseCase,
@@ -22,7 +24,9 @@ export class PatchStepUsecase {
     private buildStepDataUsecase: BuildStepDataUsecase,
     private notificationTemplateRepository: NotificationTemplateRepository,
     private upsertControlValuesUseCase: UpsertControlValuesUseCase,
-    private postProcessWorkflowUpdate: PostProcessWorkflowUpdate
+    private postProcessWorkflowUpdate: PostProcessWorkflowUpdate,
+    @Inject(forwardRef(() => DeleteControlValuesUseCase))
+    private deleteControlValuesUseCase: DeleteControlValuesUseCase
   ) {}
 
   async execute(command: PatchStepCommand): Promise<StepDataDto> {
@@ -43,7 +47,19 @@ export class PatchStepUsecase {
     }
 
     if (command.controlValues !== undefined) {
-      await this.updateControlValues(persistedItems, command);
+      if (command.controlValues === null) {
+        await this.deleteControlValuesUseCase.execute(
+          DeleteControlValuesCommand.create({
+            environmentId: command.user.environmentId,
+            organizationId: command.user.organizationId,
+            stepId: persistedItems.currentStep._id as string,
+            workflowId: persistedItems.workflow._id,
+            userId: command.user._id,
+          })
+        );
+      } else {
+        await this.updateControlValues(persistedItems, command);
+      }
     }
   }
 

@@ -364,8 +364,8 @@ importers:
         specifier: ^6.2.3
         version: 6.9.5(encoding@0.1.13)
       '@maily-to/render':
-        specifier: ^0.0.15
-        version: 0.0.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.0.16
+        version: 0.0.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@nestjs/axios':
         specifier: 3.0.3
         version: 3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1)
@@ -394,8 +394,8 @@ importers:
         specifier: 6.2.1
         version: 6.2.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(reflect-metadata@0.2.2)
       '@novu/api':
-        specifier: 0.0.1-alpha.85
-        version: 0.0.1-alpha.85(zod@3.23.8)
+        specifier: 0.0.1-alpha.109
+        version: 0.0.1-alpha.109(zod@3.23.8)
       '@novu/application-generic':
         specifier: workspace:*
         version: link:../../libs/application-generic
@@ -489,6 +489,9 @@ importers:
       ioredis:
         specifier: 5.3.2
         version: 5.3.2
+      json-logic-js:
+        specifier: ^2.0.5
+        version: 2.0.5
       json-schema-to-ts:
         specifier: ^3.0.0
         version: 3.1.0
@@ -614,6 +617,9 @@ importers:
       '@types/express':
         specifier: 4.17.17
         version: 4.17.17
+      '@types/json-logic-js':
+        specifier: ^2.0.8
+        version: 2.0.8
       '@types/mocha':
         specifier: ^10.0.8
         version: 10.0.8
@@ -672,8 +678,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       '@maily-to/core':
-        specifier: ^0.0.17
-        version: 0.0.17(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@22.7.4)(typescript@5.6.2))(y-prosemirror@1.2.15(prosemirror-model@1.22.3)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.20))(yjs@13.6.20))
+        specifier: ^0.0.18
+        version: 0.0.18(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@22.7.4)(typescript@5.6.2))(y-prosemirror@1.2.15(prosemirror-model@1.22.3)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.20))(yjs@13.6.20))
       '@novu/framework':
         specifier: workspace:*
         version: link:../../packages/framework
@@ -779,6 +785,9 @@ importers:
       '@types/js-cookie':
         specifier: ^3.0.6
         version: 3.0.6
+      '@types/lodash.isequal':
+        specifier: ^4.5.8
+        version: 4.5.8
       '@uiw/codemirror-extensions-langs':
         specifier: ^4.23.6
         version: 4.23.6(@codemirror/autocomplete@6.18.3(@codemirror/language@6.10.3)(@codemirror/state@6.4.1)(@codemirror/view@6.34.3)(@lezer/common@1.2.3))(@codemirror/language-data@6.5.1(@codemirror/view@6.34.3))(@codemirror/language@6.10.3)(@codemirror/legacy-modes@6.4.1)(@codemirror/state@6.4.1)(@codemirror/view@6.34.3)(@lezer/common@1.2.3)(@lezer/highlight@1.2.1)(@lezer/javascript@1.4.19)(@lezer/lr@1.4.2)
@@ -806,6 +815,9 @@ importers:
       cmdk:
         specifier: 1.0.0
         version: 1.0.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      cron-parser:
+        specifier: ^4.9.0
+        version: 4.9.0
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -821,6 +833,9 @@ importers:
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
+      lodash.isequal:
+        specifier: ^4.5.0
+        version: 4.5.0
       lodash.merge:
         specifier: ^4.6.2
         version: 4.6.2
@@ -9895,14 +9910,14 @@ packages:
     resolution: {integrity: sha512-SaNFseFPSDQlOYM9JTyYY6wauMu6qJ8eExo+jssFyb20ZaVvxKX1eTb3Gm5aW/4aWuxn6nofU+02sCk51//wdw==}
     engines: {node: '>=10.0.0'}
 
-  '@maily-to/core@0.0.17':
-    resolution: {integrity: sha512-AWDEDq5RRLXod8fkjQW/vSl39UtT5J8LWUCHeXd8RKWkxrGbpvVrUZJElrODCf58tFniUMjOVmUJKAZiLe9R+A==}
+  '@maily-to/core@0.0.18':
+    resolution: {integrity: sha512-Ny+7kFDmLn0pZsE7/xcBJV2hhOXjtWccL5svZrtI0Md1WWsvcpO4Nib0GZVIbR+D28rHbYKYEu0LRn/PXxeKRg==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^18.3.1
 
-  '@maily-to/render@0.0.15':
-    resolution: {integrity: sha512-vouQtFUQW0aQKTGkv/YAK+X0i2D5DprhrUb6+PMXOnZ8gV37bhu4pWpo6shIkx/QC2Jz/9JvDnfr7FM1RBd6Fw==}
+  '@maily-to/render@0.0.16':
+    resolution: {integrity: sha512-zskDYnGazUjp4diAdR7dQAAPCCW3fvyGCFFdn3jVbwKx0CNvi0r1uHSrytQ4gG6IGC7CCa84mkEe3JohS5WXhQ==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^18.3.1
@@ -10610,8 +10625,8 @@ packages:
   '@nothing-but/utils@0.12.1':
     resolution: {integrity: sha512-1qZU1Q5El0IjE7JT/ucvJNzdr2hL3W8Rm27xNf1p6gb3Nw8pGnZmxp6/GEW9h+I1k1cICxXNq25hBwknTQ7yhg==}
 
-  '@novu/api@0.0.1-alpha.85':
-    resolution: {integrity: sha512-L4Dk/zC7jVhj5bpc4VZK7033tX8Kmwv+QQvTHiIxBo8yhUrWzylSY9042zFLRb7X0mRFELYZTvsERi4O3m/Bhg==}
+  '@novu/api@0.0.1-alpha.109':
+    resolution: {integrity: sha512-+fbdpvrhgzzRmdo6wh/gQG8whqSreTDGdkoW8N44sevTcMqg2LwQQs7E2hXkOcmBWUkyuZ7bbCPzMrf5uoKgfw==}
     peerDependencies:
       zod: '>= 3'
 
@@ -17287,6 +17302,9 @@ packages:
   '@types/jsdom@20.0.1':
     resolution: {integrity: sha512-d0r18sZPmMQr1eG35u12FZfhIXNrnsPU/g5wvRKCUf/tOGilKKwYMYGqh33BNR6ba+2gkHw1EUiHoN3mn7E5IQ==}
 
+  '@types/json-logic-js@2.0.8':
+    resolution: {integrity: sha512-WgNsDPuTPKYXl0Jh0IfoCoJoAGGYZt5qzpmjuLSEg7r0cKp/kWtWp0HAsVepyPSPyXiHo6uXp/B/kW/2J1fa2Q==}
+
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
@@ -17322,6 +17340,9 @@ packages:
 
   '@types/lodash.get@4.4.7':
     resolution: {integrity: sha512-af34Mj+KdDeuzsJBxc/XeTtOx0SZHZNLd+hdrn+PcKGQs0EG2TJTzQAOTCZTgDJCArahlCzLWSy8c2w59JRz7Q==}
+
+  '@types/lodash.isequal@4.5.8':
+    resolution: {integrity: sha512-uput6pg4E/tj2LGxCZo9+y27JNyB2OZuuI/T5F+ylVDYuqICLG2/ktjxx0v6GvVntAf8TvEzeQLcV0ffRirXuA==}
 
   '@types/lodash.merge@4.6.7':
     resolution: {integrity: sha512-OwxUJ9E50gw3LnAefSHJPHaBLGEKmQBQ7CZe/xflHkyy/wH2zVyEIAKReHvVrrn7zKdF58p16We9kMfh7v0RRQ==}
@@ -25704,6 +25725,9 @@ packages:
 
   json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
+
+  json-logic-js@2.0.5:
+    resolution: {integrity: sha512-rTT2+lqcuUmj4DgWfmzupZqQDA64AdmYqizzMPWj3DxGdfFNsxPpcNVSaTj4l8W2tG/+hg7/mQhxjU3aPacO6g==}
 
   json-parse-better-errors@1.0.2:
     resolution: {integrity: sha512-mrqyZKfX5EhL7hvqcV6WG1yYjnjeuYDzDhhcAAUrq8Po85NBQBJP+ZDUT75qZQ98IkUoBqdkExkukOU7Ts2wrw==}
@@ -46069,7 +46093,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@maily-to/core@0.0.17(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@22.7.4)(typescript@5.6.2))(y-prosemirror@1.2.15(prosemirror-model@1.22.3)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.20))(yjs@13.6.20))':
+  '@maily-to/core@0.0.18(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@22.7.4)(typescript@5.6.2))(y-prosemirror@1.2.15(prosemirror-model@1.22.3)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.20))(yjs@13.6.20))':
     dependencies:
       '@radix-ui/react-dropdown-menu': 2.1.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-popover': 1.1.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -46112,7 +46136,7 @@ snapshots:
       - ts-node
       - y-prosemirror
 
-  '@maily-to/render@0.0.15(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@maily-to/render@0.0.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@react-email/components': 0.0.25(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-email/render': 1.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -46966,7 +46990,7 @@ snapshots:
 
   '@nothing-but/utils@0.12.1': {}
 
-  '@novu/api@0.0.1-alpha.85(zod@3.23.8)':
+  '@novu/api@0.0.1-alpha.109(zod@3.23.8)':
     dependencies:
       zod: 3.23.8
 
@@ -51298,16 +51322,16 @@ snapshots:
   '@rjsf/validator-ajv8@5.17.1(@rjsf/utils@5.20.0(react@18.3.1))':
     dependencies:
       '@rjsf/utils': 5.20.0(react@18.3.1)
-      ajv: 8.12.0
-      ajv-formats: 2.1.1(ajv@8.12.0)
+      ajv: 8.13.0
+      ajv-formats: 2.1.1(ajv@8.13.0)
       lodash: 4.17.21
       lodash-es: 4.17.21
 
   '@rjsf/validator-ajv8@5.17.1(@rjsf/utils@5.20.1(react@18.3.1))':
     dependencies:
       '@rjsf/utils': 5.20.1(react@18.3.1)
-      ajv: 8.12.0
-      ajv-formats: 2.1.1(ajv@8.12.0)
+      ajv: 8.13.0
+      ajv-formats: 2.1.1(ajv@8.13.0)
       lodash: 4.17.21
       lodash-es: 4.17.21
 
@@ -53925,12 +53949,6 @@ snapshots:
       '@stdlib/utils-constructor-name': 0.0.8
       '@stdlib/utils-global': 0.0.7
 
-  '@stoplight/better-ajv-errors@1.0.3(ajv@8.12.0)':
-    dependencies:
-      ajv: 8.12.0
-      jsonpointer: 5.0.1
-      leven: 3.1.0
-
   '@stoplight/better-ajv-errors@1.0.3(ajv@8.13.0)':
     dependencies:
       ajv: 8.13.0
@@ -53996,7 +54014,7 @@ snapshots:
 
   '@stoplight/spectral-core@1.18.3(encoding@0.1.13)':
     dependencies:
-      '@stoplight/better-ajv-errors': 1.0.3(ajv@8.12.0)
+      '@stoplight/better-ajv-errors': 1.0.3(ajv@8.13.0)
       '@stoplight/json': 3.21.0
       '@stoplight/path': 1.3.2
       '@stoplight/spectral-parsers': 1.0.3
@@ -54005,9 +54023,9 @@ snapshots:
       '@stoplight/types': 13.6.0
       '@types/es-aggregate-error': 1.0.6
       '@types/json-schema': 7.0.15
-      ajv: 8.12.0
-      ajv-errors: 3.0.0(ajv@8.12.0)
-      ajv-formats: 2.1.1(ajv@8.12.0)
+      ajv: 8.13.0
+      ajv-errors: 3.0.0(ajv@8.13.0)
+      ajv-formats: 2.1.1(ajv@8.13.0)
       es-aggregate-error: 1.0.11
       jsonpath-plus: 7.1.0
       lodash: 4.17.21
@@ -54109,7 +54127,7 @@ snapshots:
       '@stoplight/types': 13.20.0
       '@stoplight/yaml': 4.2.3
       '@types/node': 20.16.5
-      ajv: 8.12.0
+      ajv: 8.13.0
       ast-types: 0.14.2
       astring: 1.8.6
       reserved: 0.1.2
@@ -54121,7 +54139,7 @@ snapshots:
   '@stoplight/spectral-rulesets@1.18.1(encoding@0.1.13)':
     dependencies:
       '@asyncapi/specs': 4.3.1
-      '@stoplight/better-ajv-errors': 1.0.3(ajv@8.12.0)
+      '@stoplight/better-ajv-errors': 1.0.3(ajv@8.13.0)
       '@stoplight/json': 3.21.0
       '@stoplight/spectral-core': 1.18.3(encoding@0.1.13)
       '@stoplight/spectral-formats': 1.6.0(encoding@0.1.13)
@@ -54129,8 +54147,8 @@ snapshots:
       '@stoplight/spectral-runtime': 1.1.2(encoding@0.1.13)
       '@stoplight/types': 13.20.0
       '@types/json-schema': 7.0.15
-      ajv: 8.12.0
-      ajv-formats: 2.1.1(ajv@8.12.0)
+      ajv: 8.13.0
+      ajv-formats: 2.1.1(ajv@8.13.0)
       json-schema-traverse: 1.0.0
       lodash: 4.17.21
       tslib: 2.7.0
@@ -57378,6 +57396,8 @@ snapshots:
       '@types/tough-cookie': 4.0.2
       parse5: 7.1.2
 
+  '@types/json-logic-js@2.0.8': {}
+
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
@@ -57422,6 +57442,10 @@ snapshots:
       '@types/lodash': 4.14.192
 
   '@types/lodash.get@4.4.7':
+    dependencies:
+      '@types/lodash': 4.14.192
+
+  '@types/lodash.isequal@4.5.8':
     dependencies:
       '@types/lodash': 4.14.192
 
@@ -57968,10 +57992,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/eslint-plugin@8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2)':
+  '@typescript-eslint/eslint-plugin@8.3.0(@typescript-eslint/parser@8.3.0(eslint@8.57.1)(typescript@5.6.2))(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2)':
     dependencies:
       '@eslint-community/regexpp': 4.11.0
-      '@typescript-eslint/parser': 8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2)
+      '@typescript-eslint/parser': 8.3.0(eslint@8.57.1)(typescript@5.6.2)
       '@typescript-eslint/scope-manager': 8.3.0
       '@typescript-eslint/type-utils': 8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2)
       '@typescript-eslint/utils': 8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2)
@@ -59688,10 +59712,6 @@ snapshots:
   ajv-draft-04@1.0.0(ajv@8.13.0):
     optionalDependencies:
       ajv: 8.13.0
-
-  ajv-errors@3.0.0(ajv@8.12.0):
-    dependencies:
-      ajv: 8.12.0
 
   ajv-errors@3.0.0(ajv@8.13.0):
     dependencies:
@@ -61428,7 +61448,7 @@ snapshots:
 
   bull@4.10.4:
     dependencies:
-      cron-parser: 4.8.1
+      cron-parser: 4.9.0
       debuglog: 1.0.1
       get-port: 5.1.1
       ioredis: 5.3.2
@@ -62630,10 +62650,11 @@ snapshots:
   cron-parser@4.8.1:
     dependencies:
       luxon: 3.3.0
+    optional: true
 
   cron-parser@4.9.0:
     dependencies:
-      luxon: 3.3.0
+      luxon: 3.4.4
 
   cron@3.1.7:
     dependencies:
@@ -70031,6 +70052,8 @@ snapshots:
       bignumber.js: 9.1.1
 
   json-buffer@3.0.1: {}
+
+  json-logic-js@2.0.5: {}
 
   json-parse-better-errors@1.0.2: {}
 
@@ -81045,7 +81068,7 @@ snapshots:
 
   typescript-eslint@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2)
+      '@typescript-eslint/eslint-plugin': 8.3.0(@typescript-eslint/parser@8.3.0(eslint@8.57.1)(typescript@5.6.2))(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2)
       '@typescript-eslint/parser': 8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2)
       '@typescript-eslint/utils': 8.3.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2)
     optionalDependencies:
