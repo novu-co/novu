@@ -4,6 +4,7 @@ import { render as mailyRender } from '@maily-to/render';
 import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import isEmpty from 'lodash/isEmpty';
 import { Liquid } from 'liquidjs';
+import { C } from '@novu/framework/dist/cjs/health-check.types-DjxZf7gi.cjs';
 import { FullPayloadForRender, RenderCommand } from './render-command';
 import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.usecase';
 import { emailStepControlZodSchema } from '../../../workflows-v2/shared';
@@ -22,7 +23,7 @@ export class RenderEmailOutputUsecase {
       return { subject, body: '' };
     }
 
-    const expandedMailyContent = this.transformForAndShowLogic(body, renderCommand.fullPayloadForRender);
+    const expandedMailyContent = this.transformMailyDynamicBlocks(body, renderCommand.fullPayloadForRender);
     const parsedTipTap = await this.parseTipTapNodeByLiquid(expandedMailyContent, renderCommand);
     const renderedHtml = await this.renderEmail(parsedTipTap);
 
@@ -50,7 +51,7 @@ export class RenderEmailOutputUsecase {
   }
 
   @Instrument()
-  private transformForAndShowLogic(body: string, fullPayloadForRender: FullPayloadForRender) {
+  private transformMailyDynamicBlocks(body: string, fullPayloadForRender: FullPayloadForRender) {
     return this.expandEmailEditorSchemaUseCase.execute({ emailEditorJson: body, fullPayloadForRender });
   }
 }

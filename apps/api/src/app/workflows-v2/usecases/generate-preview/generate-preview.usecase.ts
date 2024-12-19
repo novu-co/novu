@@ -7,7 +7,6 @@ import {
   JobStatusEnum,
   PreviewPayload,
   StepDataDto,
-  TipTapNode,
   WorkflowOriginEnum,
 } from '@novu/shared';
 import {
@@ -91,8 +90,16 @@ export class GeneratePreviewUsecase {
           try {
             variableControlValue = transformMailyContentToLiquid(JSON.parse(variableControlValue));
           } catch (error) {
-            console.log(error);
+            this.logger.error(
+              {
+                err: error,
+                controlKey,
+                message: 'Failed to transform maily content to liquid syntax',
+              },
+              LOG_CONTEXT
+            );
           }
+          // do nothing the preview will be presented with missing variables
         }
 
         const variables = this.processControlValueVariables(variableControlValue, variableSchema);
