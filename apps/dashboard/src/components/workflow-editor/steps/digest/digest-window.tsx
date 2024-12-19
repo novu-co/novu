@@ -99,7 +99,7 @@ export const DigestWindow = () => {
                   options={unitOptions}
                   defaultOption={defaultUnitOption}
                   className="w-min [&_input]:!w-[3ch] [&_input]:!min-w-[3ch]"
-                  onValueChange={saveForm}
+                  onValueChange={() => saveForm()}
                   showError={false}
                   min={minAmountValue}
                 />

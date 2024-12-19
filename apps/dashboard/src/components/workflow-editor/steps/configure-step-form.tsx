@@ -9,12 +9,12 @@ import {
   WorkflowOriginEnum,
   WorkflowResponseDto,
 } from '@novu/shared';
-import { motion } from 'motion/react';
-import { useEffect, useCallback, useMemo, useState, HTMLAttributes, ReactNode } from 'react';
+import merge from 'lodash.merge';
+import { AnimatePresence, motion } from 'motion/react';
+import { HTMLAttributes, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiCloseFill, RiDeleteBin2Line, RiPencilRuler2Fill } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
-import merge from 'lodash.merge';
 
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { PageMeta } from '@/components/page-meta';
@@ -32,24 +32,25 @@ import {
   getFirstControlsErrorMessage,
   updateStepInWorkflow,
 } from '@/components/workflow-editor/step-utils';
+import { ConfigureStepTemplateIssueCta } from '@/components/workflow-editor/steps/configure-step-template-issue-cta';
+import { DelayControlValues } from '@/components/workflow-editor/steps/delay/delay-control-values';
+import { DigestControlValues } from '@/components/workflow-editor/steps/digest/digest-control-values';
+import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/email/configure-email-step-preview';
+import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
+import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
-import { buildRoute, ROUTES } from '@/utils/routes';
+import { ConfigureSmsStepPreview } from '@/components/workflow-editor/steps/sms/configure-sms-step-preview';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { useFormAutosave } from '@/hooks/use-form-autosave';
 import {
   AUTOCOMPLETE_PASSWORD_MANAGERS_OFF,
   INLINE_CONFIGURABLE_STEP_TYPES,
-  TEMPLATE_CONFIGURABLE_STEP_TYPES,
   STEP_TYPE_LABELS,
+  TEMPLATE_CONFIGURABLE_STEP_TYPES,
 } from '@/utils/constants';
-import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
-import { buildDefaultValues } from '@/utils/schema';
-import { DelayControlValues } from '@/components/workflow-editor/steps/delay/delay-control-values';
-import { ConfigureStepTemplateIssueCta } from '@/components/workflow-editor/steps/configure-step-template-issue-cta';
-import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
-import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/email/configure-email-step-preview';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
-import { DigestControlValues } from '@/components/workflow-editor/steps/digest/digest-control-values';
-import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
+import { ConfigurePushStepPreview } from './push/configure-push-step-preview';
 
 const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
@@ -66,9 +67,9 @@ const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.E
 const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, ((props: HTMLAttributes<HTMLDivElement>) => ReactNode) | null> = {
   [StepTypeEnum.IN_APP]: ConfigureInAppStepPreview,
   [StepTypeEnum.EMAIL]: ConfigureEmailStepPreview,
-  [StepTypeEnum.SMS]: null,
+  [StepTypeEnum.SMS]: ConfigureSmsStepPreview,
   [StepTypeEnum.CHAT]: null,
-  [StepTypeEnum.PUSH]: null,
+  [StepTypeEnum.PUSH]: ConfigurePushStepPreview,
   [StepTypeEnum.CUSTOM]: null,
   [StepTypeEnum.TRIGGER]: null,
   [StepTypeEnum.DIGEST]: null,
@@ -114,6 +115,8 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
 
   const isTemplateConfigurableStep = isSupportedStep && TEMPLATE_CONFIGURABLE_STEP_TYPES.includes(step.type);
   const isInlineConfigurableStep = isSupportedStep && INLINE_CONFIGURABLE_STEP_TYPES.includes(step.type);
+  const hasCustomControls = Object.keys(step.controls.dataSchema ?? {}).length > 0 && !step.controls.uiSchema;
+  const isInlineConfigurableStepWithCustomControls = isInlineConfigurableStep && hasCustomControls;
 
   const onDeleteStep = () => {
     update({ ...workflow, steps: workflow.steps.filter((s) => s._id !== step._id) });
@@ -191,134 +194,132 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   return (
     <>
       <PageMeta title={`Configure ${step.name}`} />
-      <motion.div
-        className="flex h-full w-full flex-col"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0.1 }}
-        transition={{ duration: 0.1 }}
-      >
-        <SidebarHeader className="flex items-center gap-2.5 text-sm font-medium">
-          <Link
-            to={buildRoute(ROUTES.EDIT_WORKFLOW, {
-              environmentSlug: environment.slug!,
-              workflowSlug: workflow.slug,
-            })}
-            className="flex items-center"
-          >
-            <Button variant="link" size="icon" className="size-4" type="button">
-              <RiArrowLeftSLine />
-            </Button>
-          </Link>
-          <span>Configure Step</span>
-          <Link
-            to={buildRoute(ROUTES.EDIT_WORKFLOW, {
-              environmentSlug: environment.slug!,
-              workflowSlug: workflow.slug,
-            })}
-            className="ml-auto flex items-center"
-          >
-            <Button variant="link" size="icon" className="size-4" type="button">
-              <RiCloseFill />
-            </Button>
-          </Link>
-        </SidebarHeader>
+      <AnimatePresence>
+        <motion.div
+          className="flex h-full w-full flex-col"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0.1 }}
+          transition={{ duration: 0.1 }}
+        >
+          <SidebarHeader className="flex items-center gap-2.5 text-sm font-medium">
+            <Link
+              to={buildRoute(ROUTES.EDIT_WORKFLOW, {
+                environmentSlug: environment.slug!,
+                workflowSlug: workflow.slug,
+              })}
+              className="flex items-center"
+            >
+              <Button variant="link" size="icon" className="size-4" type="button">
+                <RiArrowLeftSLine />
+              </Button>
+            </Link>
+            <span>Configure Step</span>
+            <Link
+              to={buildRoute(ROUTES.EDIT_WORKFLOW, {
+                environmentSlug: environment.slug!,
+                workflowSlug: workflow.slug,
+              })}
+              className="ml-auto flex items-center"
+            >
+              <Button variant="link" size="icon" className="size-4" type="button">
+                <RiCloseFill />
+              </Button>
+            </Link>
+          </SidebarHeader>
 
-        <Separator />
+          <Separator />
 
-        <Form {...form}>
-          <form onBlur={onBlur}>
-            <SaveFormContext.Provider value={value}>
+          <Form {...form}>
+            <form onBlur={onBlur}>
+              <SaveFormContext.Provider value={value}>
+                <SidebarContent>
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <InputField>
+                          <FormControl>
+                            <Input
+                              placeholder="Untitled"
+                              {...field}
+                              disabled={isReadOnly}
+                              {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
+                            />
+                          </FormControl>
+                        </InputField>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={'stepId'}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Identifier</FormLabel>
+                        <InputField className="flex overflow-hidden pr-0">
+                          <FormControl>
+                            <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
+                          </FormControl>
+                          <CopyButton valueToCopy={field.value} size="input-right" />
+                        </InputField>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </SidebarContent>
+                <Separator />
+
+                {isInlineConfigurableStep && !hasCustomControls && <InlineControlValues />}
+              </SaveFormContext.Provider>
+            </form>
+          </Form>
+
+          {(isTemplateConfigurableStep || isInlineConfigurableStepWithCustomControls) && (
+            <>
               <SidebarContent>
-                <FormField
-                  control={form.control}
-                  name={'name'}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <InputField>
-                        <FormControl>
-                          <Input
-                            placeholder="Untitled"
-                            {...field}
-                            disabled={isReadOnly}
-                            {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
-                          />
-                        </FormControl>
-                      </InputField>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={'stepId'}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Identifier</FormLabel>
-                      <InputField className="flex overflow-hidden pr-0">
-                        <FormControl>
-                          <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
-                        </FormControl>
-                        <CopyButton valueToCopy={field.value} size="input-right" />
-                      </InputField>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
+                  <Button
+                    variant="outline"
+                    className="flex w-full justify-start gap-1.5 text-xs font-medium"
+                    type="button"
+                  >
+                    <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
+                    Configure {STEP_TYPE_LABELS[step.type]} Step template{' '}
+                    <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
+                  </Button>
+                </Link>
               </SidebarContent>
               <Separator />
 
-              {isInlineConfigurableStep && <InlineControlValues />}
-            </SaveFormContext.Provider>
-          </form>
-        </Form>
-
-        {isTemplateConfigurableStep && (
-          <>
-            <SidebarContent>
-              <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
-                <Button
-                  variant="outline"
-                  className="flex w-full justify-start gap-1.5 text-xs font-medium"
-                  type="button"
-                >
-                  <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
-                  Configure {STEP_TYPE_LABELS[step.type]} Step template{' '}
-                  <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
-                </Button>
-              </Link>
-            </SidebarContent>
-            <Separator />
-
-            {firstError ? (
-              <>
-                <ConfigureStepTemplateIssueCta step={step} issue={firstError} />
-                <Separator />
-              </>
-            ) : (
-              Preview && (
+              {firstError ? (
                 <>
-                  <SidebarContent>
-                    <Preview />
-                  </SidebarContent>
+                  <ConfigureStepTemplateIssueCta step={step} issue={firstError} />
                   <Separator />
                 </>
-              )
-            )}
-          </>
-        )}
+              ) : (
+                Preview && (
+                  <>
+                    <SidebarContent>
+                      <Preview />
+                    </SidebarContent>
+                    <Separator />
+                  </>
+                )
+              )}
+            </>
+          )}
 
-        {!isSupportedStep && (
-          <>
+          {!isSupportedStep && (
             <SidebarContent>
               <SdkBanner />
             </SidebarContent>
-          </>
-        )}
+          )}
 
-        {!isReadOnly && (
-          <>
+          {!isReadOnly && (
             <SidebarFooter>
               <Separator />
               <ConfirmationModal
@@ -345,9 +346,9 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                 Delete step
               </Button>
             </SidebarFooter>
-          </>
-        )}
-      </motion.div>
+          )}
+        </motion.div>
+      </AnimatePresence>
     </>
   );
 };

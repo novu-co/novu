@@ -20,11 +20,13 @@ export function parseStepVariablesToLiquidVariables(schema: JSONSchemaDefinition
       for (const [key, value] of Object.entries(obj.properties)) {
         const fullPath = path ? `${path}.${key}` : key;
 
-        // Add each property as a variable for autocompletion
-        variables.push({
-          type: 'variable',
-          label: `${fullPath}`,
-        });
+        // Only push variables that are not of type "object" or have additionalProperties set to true
+        if (typeof value === 'object' && (value.type !== 'object' || value.additionalProperties === true)) {
+          variables.push({
+            type: 'variable',
+            label: `${fullPath}`,
+          });
+        }
 
         // Recursively process nested objects
         if (typeof value === 'object' && (value.type === 'object' || value.type === 'array')) {

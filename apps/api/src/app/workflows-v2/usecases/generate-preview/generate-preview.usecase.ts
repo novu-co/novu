@@ -32,11 +32,21 @@ import {
   Variable,
 } from '../../util/template-parser/liquid-parser';
 import { pathsToObject } from '../../util/path-to-object';
-import { PrepareAndValidateContentUsecase } from '../validate-content/prepare-and-validate-content/prepare-and-validate-content.usecase';
 import { transformMailyContentToLiquid } from './transform-maily-content-to-liquid';
 import { isObjectTipTapNode, isStringTipTapNode } from '../../util/tip-tap.util';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
+
+type DestructuredControlValues = {
+  tiptapControlValues: { emailEditor?: string | null; body?: string | null } | null;
+  // this is the remaining control values after the tiptap control is extracted
+  simpleControlValues: Record<string, unknown>;
+};
+
+type ProcessedControlResult = {
+  controlValues: Record<string, unknown>;
+  variablesExample: Record<string, unknown> | null;
+};
 
 @Injectable()
 export class GeneratePreviewUsecase {
