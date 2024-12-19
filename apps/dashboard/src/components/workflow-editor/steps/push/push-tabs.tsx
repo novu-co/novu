@@ -4,12 +4,14 @@ import { StepEditorProps } from '@/components/workflow-editor/steps/configure-st
 import { PushEditor } from '@/components/workflow-editor/steps/push/push-editor';
 import { CustomStepControls } from '../controls/custom-step-controls';
 import { TemplateTabs } from '../template-tabs';
+import { PushEditorPreview } from './push-editor-preview';
+import { useFormContext } from 'react-hook-form';
 
 export const PushTabs = (props: StepEditorProps) => {
   const { workflow, step } = props;
   const { dataSchema, uiSchema } = step.controls;
   const [tabsValue, setTabsValue] = useState('editor');
-
+  const form = useFormContext();
   const isNovuCloud = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && uiSchema;
   const isExternal = workflow.origin === WorkflowOriginEnum.EXTERNAL;
 
@@ -20,7 +22,7 @@ export const PushTabs = (props: StepEditorProps) => {
     </>
   );
 
-  const previewContent = <>TODO</>;
+  const previewContent = <PushEditorPreview workflow={workflow} step={step} formValues={form.getValues()} />;
 
   return (
     <TemplateTabs

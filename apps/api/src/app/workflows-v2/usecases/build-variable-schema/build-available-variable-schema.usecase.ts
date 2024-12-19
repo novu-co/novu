@@ -39,6 +39,12 @@ export class BuildAvailableVariableSchemaUsecase {
               format: 'date-time',
               description: 'The last time the subscriber was online (optional)',
             },
+            data: {
+              type: 'object',
+              properties: {},
+              description: 'Additional data about the subscriber',
+              additionalProperties: true,
+            },
           },
           required: ['firstName', 'lastName', 'email', 'subscriberId'],
           additionalProperties: false,
@@ -56,7 +62,13 @@ export class BuildAvailableVariableSchemaUsecase {
     command: BuildAvailableVariableSchemaCommand
   ): Promise<JSONSchemaDto> {
     if (workflow.payloadSchema) {
-      return parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {};
+      return (
+        parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {
+          type: 'object',
+          properties: {},
+          additionalProperties: true,
+        }
+      );
     }
 
     return this.buildPayloadSchema.execute(

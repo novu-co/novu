@@ -1,15 +1,14 @@
-import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
 import { CSSProperties, useEffect, useRef, useState } from 'react';
-
-import { Sms } from '@/components/icons';
+import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
 import { Code2 } from '@/components/icons/code-2';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
 import { Button } from '@/components/primitives/button';
 import { Editor } from '@/components/primitives/editor';
-import { SmsPreview } from '@/components/workflow-editor/steps/sms/sms-preview';
-import { SmsTabsSection } from '@/components/workflow-editor/steps/sms/sms-tabs-section';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { useEditorPreview } from '../use-editor-preview';
+import { PushPreview } from './push-preview';
+import { RiCellphoneFill } from 'react-icons/ri';
+import { PushTabsSection } from './push-tabs-section';
 import { InlineToast } from '@/components/primitives/inline-toast';
 
 const getInitialAccordionValue = (value: string) => {
@@ -20,7 +19,7 @@ const getInitialAccordionValue = (value: string) => {
   }
 };
 
-type SmsEditorPreviewProps = {
+type PushEditorPreviewProps = {
   workflow: WorkflowResponseDto;
   step: StepDataDto;
   formValues: Record<string, unknown>;
@@ -28,7 +27,7 @@ type SmsEditorPreviewProps = {
 
 const extensions = [loadLanguage('json')?.extension ?? []];
 
-export const SmsEditorPreview = ({ workflow, step, formValues }: SmsEditorPreviewProps) => {
+export const PushEditorPreview = ({ workflow, step, formValues }: PushEditorPreviewProps) => {
   const workflowSlug = workflow.workflowId;
   const stepSlug = step.stepId;
   const { editorValue, setEditorValue, previewStep, previewData, isPreviewPending } = useEditorPreview({
@@ -57,14 +56,14 @@ export const SmsEditorPreview = ({ workflow, step, formValues }: SmsEditorPrevie
   }, [editorValue]);
 
   return (
-    <SmsTabsSection>
+    <PushTabsSection>
       <div className="relative flex flex-col gap-3">
-        <div className="flex items-center gap-2.5 text-sm font-medium">
-          <Sms className="size-3" />
-          SMS template editor
+        <div className="flex items-center gap-2.5 pb-2 text-sm font-medium">
+          <RiCellphoneFill className="size-3" />
+          <span>Push template editor</span>
         </div>
         <div className="flex flex-col items-center justify-center gap-4">
-          <SmsPreview isPreviewPending={isPreviewPending} previewData={previewData} />
+          <PushPreview isPreviewPending={isPreviewPending} previewData={previewData} />
           <InlineToast
             description="This preview shows how your message will appear on mobile. Actual rendering may vary by device."
             className="w-full px-3"
@@ -111,6 +110,6 @@ export const SmsEditorPreview = ({ workflow, step, formValues }: SmsEditorPrevie
           </AccordionItem>
         </Accordion>
       </div>
-    </SmsTabsSection>
+    </PushTabsSection>
   );
 };
