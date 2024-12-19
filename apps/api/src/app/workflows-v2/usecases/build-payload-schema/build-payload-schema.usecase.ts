@@ -17,12 +17,20 @@ export class BuildPayloadSchema {
     const controlValues = await this.buildControlValues(command);
 
     if (!controlValues.length) {
-      return {};
+      return {
+        type: 'object',
+        properties: {},
+        additionalProperties: true,
+      };
     }
 
     const templateVars = this.extractTemplateVariables(controlValues);
     if (templateVars.length === 0) {
-      return {};
+      return {
+        type: 'object',
+        properties: {},
+        additionalProperties: true,
+      };
     }
 
     const variablesExample = pathsToObject(templateVars, {

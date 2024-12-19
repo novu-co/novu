@@ -1,8 +1,8 @@
 // useFormAutosave.ts
-import { useCallback, useEffect } from 'react';
-import { UseFormReturn, FieldValues } from 'react-hook-form';
 import { useDataRef } from '@/hooks/use-data-ref';
 import { useDebounce } from '@/hooks/use-debounce';
+import { useCallback, useEffect } from 'react';
+import { FieldValues, UseFormReturn } from 'react-hook-form';
 
 const TEN_SECONDS = 10 * 1000;
 
@@ -10,11 +10,13 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
   previousData,
   form: propsForm,
   isReadOnly,
+  shouldClientValidate = false,
   save,
 }: {
   previousData: U;
   form: UseFormReturn<T>;
   isReadOnly?: boolean;
+  shouldClientValidate?: boolean;
   save: (data: U) => void;
 }) {
   const formRef = useDataRef(propsForm);
@@ -33,7 +35,10 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
         return;
       }
       // manually trigger the validation of the form
-      await form.trigger();
+      const isValid = await form.trigger();
+      if (!isValid && shouldClientValidate) {
+        return;
+      }
 
       const values = { ...previousData, ...data };
       // reset the dirty fields right away because on slow networks the patch request might take a while
@@ -42,7 +47,7 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
       form.reset(values, { keepErrors: true });
       save(values);
     },
-    [formRef, previousData, isReadOnly, save]
+    [formRef, previousData, isReadOnly, save, shouldClientValidate]
   );
 
   const debouncedOnSave = useDebounce(onSave, TEN_SECONDS);

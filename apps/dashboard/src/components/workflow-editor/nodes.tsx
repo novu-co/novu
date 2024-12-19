@@ -37,8 +37,8 @@ export const TriggerNode = ({ data }: NodeProps<FlowNode<{ environmentSlug: stri
       workflowSlug: data.workflowSlug,
     })}
   >
-    <Node className="relative rounded-tl-none border-r">
-      <div className="border-neutral-alpha-200 text-foreground-600 absolute -left-[1px] top-0 flex -translate-y-full items-center gap-1 rounded-t-lg border bg-neutral-50 px-2 py-1 text-xs font-medium">
+    <Node className="relative rounded-tl-none [&>span]:rounded-tl-none">
+      <div className="border-neutral-alpha-200 text-foreground-600 absolute left-0 top-0 flex -translate-y-full items-center gap-1 rounded-t-lg border border-b-0 bg-neutral-50 px-2 py-1 text-xs font-medium">
         <RiPlayCircleLine className="size-3" />
         <span>TRIGGER</span>
       </div>
