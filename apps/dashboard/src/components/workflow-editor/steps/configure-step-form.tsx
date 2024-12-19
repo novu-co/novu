@@ -9,7 +9,6 @@ import {
   WorkflowOriginEnum,
   WorkflowResponseDto,
 } from '@novu/shared';
-import merge from 'lodash.merge';
 import { AnimatePresence, motion } from 'motion/react';
 import { HTMLAttributes, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -48,8 +47,9 @@ import {
   STEP_TYPE_LABELS,
   TEMPLATE_CONFIGURABLE_STEP_TYPES,
 } from '@/utils/constants';
+import { getStepDefaultValues } from '@/components/workflow-editor/step-default-values';
 import { buildRoute, ROUTES } from '@/utils/routes';
-import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
+import { buildDynamicZodSchema } from '@/utils/schema';
 import { ConfigurePushStepPreview } from '@/components/workflow-editor/steps/push/configure-push-step-preview';
 import { ConfigureChatStepPreview } from '@/components/workflow-editor/steps/chat/configure-chat-step-preview';
 
@@ -75,14 +75,6 @@ const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, ((props: HTMLAttributes<HTMLDiv
   [StepTypeEnum.TRIGGER]: null,
   [StepTypeEnum.DIGEST]: null,
   [StepTypeEnum.DELAY]: null,
-};
-
-const calculateDefaultControlsValues = (step: StepDataDto) => {
-  if (Object.keys(step.controls.uiSchema ?? {}).length !== 0) {
-    return merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values);
-  }
-
-  return merge(buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {}), step.controls.values);
 };
 
 type ConfigureStepFormProps = {
@@ -128,7 +120,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     return (step: StepDataDto) => {
       if (isInlineConfigurableStep) {
         return {
-          controlValues: calculateDefaultControlsValues(step),
+          controlValues: getStepDefaultValues(step),
         };
       }
 

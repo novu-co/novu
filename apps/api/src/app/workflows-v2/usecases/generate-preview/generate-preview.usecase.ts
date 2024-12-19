@@ -5,7 +5,6 @@ import {
   createMockObjectFromSchema,
   GeneratePreviewResponseDto,
   JobStatusEnum,
-  JSONSchemaDto,
   PreviewPayload,
   StepDataDto,
   TipTapNode,
@@ -33,8 +32,8 @@ import {
   Variable,
 } from '../../util/template-parser/liquid-parser';
 import { pathsToObject } from '../../util/path-to-object';
-import { HydrateEmailSchemaUseCase } from '../../../environments-v1/usecases/output-renderers';
-import { PrepareAndValidateContentUsecase } from '../validate-content/prepare-and-validate-content/prepare-and-validate-content.usecase';
+import { transformMailyContentToLiquid } from './transform-maily-content-to-liquid';
+import { isObjectTipTapNode, isStringTipTapNode } from '../../util/tip-tap.util';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
@@ -56,8 +55,7 @@ export class GeneratePreviewUsecase {
     private buildStepDataUsecase: BuildStepDataUsecase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private readonly logger: PinoLogger,
-    private buildPayloadSchema: BuildPayloadSchema,
-    private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase
+    private buildPayloadSchema: BuildPayloadSchema
   ) {}
 
   @InstrumentUsecase()
@@ -69,7 +67,7 @@ export class GeneratePreviewUsecase {
         variableSchema,
         workflow,
       } = await this.initializePreviewContext(command);
-
+      const commandVariablesExample = command.generatePreviewRequestDto.previewPayload;
       const sanitizedValidatedControls = sanitizePreviewControlValues(initialControlValues, stepData.type);
 
       if (!sanitizedValidatedControls) {
@@ -79,31 +77,50 @@ export class GeneratePreviewUsecase {
         );
       }
 
-      const destructuredControlValues = this.destructureControlValues(sanitizedValidatedControls);
-
-      const { variablesExample: tiptapVariablesExample, controlValues: tiptapControlValues } =
-        await this.handleTipTapControl(
-          destructuredControlValues.tiptapControlValues,
-          command,
-          stepData,
-          variableSchema
-        );
-      const { variablesExample: simpleVariablesExample, controlValues: simpleControlValues } = this.handleSimpleControl(
-        destructuredControlValues.simpleControlValues,
-        variableSchema,
-        workflow,
-        command.generatePreviewRequestDto.previewPayload
-      );
-      const previewData = {
-        variablesExample: _.merge({}, tiptapVariablesExample || {}, simpleVariablesExample || {}),
-        controlValues: { ...tiptapControlValues, ...simpleControlValues },
+      let previewDataResult = {
+        variablesExample: {},
+        controlValues: {},
       };
 
+      for (const [controlKey, controlValue] of Object.entries(sanitizedValidatedControls)) {
+        // previewControlValue is the control value that will be used to render the preview
+        const previewControlValue = controlValue;
+        // variableControlValue is the control value that will be used to extract the variables example
+        let variableControlValue = controlValue;
+        if (isStringTipTapNode(variableControlValue)) {
+          try {
+            variableControlValue = transformMailyContentToLiquid(JSON.parse(variableControlValue));
+          } catch (error) {
+            console.log(error);
+          }
+        }
+
+        const variables = this.processControlValueVariables(variableControlValue, variableSchema);
+        const processedControlValues = this.fixControlValueInvalidVariables(previewControlValue, variables.invalid);
+
+        const validVariableNames = variables.valid.map((variable) => variable.name);
+        const variablesExampleResult = pathsToObject(validVariableNames, {
+          valuePrefix: '{{',
+          valueSuffix: '}}',
+        });
+
+        previewDataResult = {
+          variablesExample: _.merge(previewDataResult.variablesExample, variablesExampleResult),
+          controlValues: {
+            ...previewDataResult.controlValues,
+            [controlKey]: isObjectTipTapNode(processedControlValues)
+              ? JSON.stringify(processedControlValues)
+              : processedControlValues,
+          },
+        };
+      }
+
+      const finalVariablesExample = this.buildVariable(workflow, previewDataResult, commandVariablesExample);
       const executeOutput = await this.executePreviewUsecase(
         command,
         stepData,
-        previewData.variablesExample,
-        previewData.controlValues
+        finalVariablesExample,
+        previewDataResult.controlValues
       );
 
       return {
@@ -111,7 +128,7 @@ export class GeneratePreviewUsecase {
           preview: executeOutput.outputs as any,
           type: stepData.type as unknown as ChannelTypeEnum,
         },
-        previewPayloadExample: previewData.variablesExample,
+        previewPayloadExample: finalVariablesExample,
       };
     } catch (error) {
       this.logger.error(
@@ -137,97 +154,26 @@ export class GeneratePreviewUsecase {
     }
   }
 
-  private async safeAttemptToParseEmailSchema(
-    tiptapControl: string,
-    command: GeneratePreviewCommand,
-    controlValues: Record<string, unknown>,
-    controlSchema: Record<string, unknown>,
-    variableSchema: Record<string, unknown>
-  ): Promise<Record<string, unknown> | null> {
-    if (typeof tiptapControl !== 'string') {
-      return null;
-    }
-
-    try {
-      const preparedAndValidatedContent = await this.prepareAndValidateContentUsecase.execute({
-        user: command.user,
-        previewPayloadFromDto: command.generatePreviewRequestDto.previewPayload,
-        controlValues,
-        controlDataSchema: controlSchema || {},
-        variableSchema,
-      });
-
-      return preparedAndValidatedContent.finalPayload as Record<string, unknown>;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  private async handleTipTapControl(
-    tiptapControlValue: {
-      emailEditor?: string | null;
-      body?: string | null;
-    } | null,
-    command: GeneratePreviewCommand,
-    stepData: StepDataDto,
-    variableSchema: Record<string, unknown>
-  ): Promise<ProcessedControlResult> {
-    if (!tiptapControlValue || (!tiptapControlValue?.emailEditor && !tiptapControlValue?.body)) {
-      return {
-        variablesExample: null,
-        controlValues: tiptapControlValue as Record<string, unknown>,
-      };
-    }
-
-    const emailVariables = await this.safeAttemptToParseEmailSchema(
-      tiptapControlValue?.emailEditor || tiptapControlValue?.body || '',
-      command,
-      tiptapControlValue,
-      stepData.controls.dataSchema || {},
-      variableSchema
-    );
-
-    return {
-      variablesExample: emailVariables,
-      controlValues: tiptapControlValue,
-    };
-  }
-
-  private handleSimpleControl(
-    controlValues: Record<string, unknown>,
-    variableSchema: Record<string, unknown>,
+  private buildVariable(
     workflow: WorkflowInternalResponseDto,
+    previewDataResult: { variablesExample: {}; controlValues: {} },
     commandVariablesExample: PreviewPayload | undefined
-  ): ProcessedControlResult {
-    const variables = this.processControlValueVariables(controlValues, variableSchema);
-    const processedControlValues = this.fixControlValueInvalidVariables(controlValues, variables.invalid);
-    const extractedTemplateVariables = variables.valid.map((variable) => variable.name);
-    const payloadVariableExample =
-      workflow.origin === WorkflowOriginEnum.EXTERNAL
-        ? createMockObjectFromSchema({
-            type: 'object',
-            properties: { payload: workflow.payloadSchema },
-          })
-        : {};
-
-    if (extractedTemplateVariables.length === 0) {
-      return {
-        variablesExample: payloadVariableExample,
-        controlValues: processedControlValues,
-      };
+  ) {
+    let finalVariablesExample = {};
+    if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
+      // if external workflow, we need to override with stored payload schema
+      const tmp = createMockObjectFromSchema({
+        type: 'object',
+        properties: { payload: workflow.payloadSchema },
+      });
+      finalVariablesExample = { ...previewDataResult.variablesExample, ...tmp };
+    } else {
+      finalVariablesExample = previewDataResult.variablesExample;
     }
 
-    const variablesExample: Record<string, unknown> = pathsToObject(extractedTemplateVariables, {
-      valuePrefix: '{{',
-      valueSuffix: '}}',
-    });
+    finalVariablesExample = _.merge(finalVariablesExample, commandVariablesExample || {});
 
-    const variablesExampleForPreview = _.merge(variablesExample, payloadVariableExample, commandVariablesExample || {});
-
-    return {
-      variablesExample: variablesExampleForPreview,
-      controlValues: processedControlValues,
-    };
+    return finalVariablesExample;
   }
 
   private async initializePreviewContext(command: GeneratePreviewCommand) {
@@ -240,13 +186,13 @@ export class GeneratePreviewUsecase {
   }
 
   private processControlValueVariables(
-    controlValues: Record<string, unknown>,
+    controlValue: unknown,
     variableSchema: Record<string, unknown>
   ): {
     valid: Variable[];
     invalid: Variable[];
   } {
-    const { validVariables, invalidVariables } = extractLiquidTemplateVariables(JSON.stringify(controlValues));
+    const { validVariables, invalidVariables } = extractLiquidTemplateVariables(JSON.stringify(controlValue));
 
     const { validVariables: validSchemaVariables, invalidVariables: invalidSchemaVariables } = identifyUnknownVariables(
       variableSchema,
@@ -339,35 +285,8 @@ export class GeneratePreviewUsecase {
     }
   }
 
-  private destructureControlValues(controlValues: Record<string, unknown>): DestructuredControlValues {
-    try {
-      const localControlValue = _.cloneDeep(controlValues);
-      let tiptapControlString: string | null = null;
-
-      if (isTipTapNode(localControlValue.emailEditor)) {
-        tiptapControlString = localControlValue.emailEditor;
-        delete localControlValue.emailEditor;
-
-        return { tiptapControlValues: { emailEditor: tiptapControlString }, simpleControlValues: localControlValue };
-      }
-
-      if (isTipTapNode(localControlValue.body)) {
-        tiptapControlString = localControlValue.body;
-        delete localControlValue.body;
-
-        return { tiptapControlValues: { body: tiptapControlString }, simpleControlValues: localControlValue };
-      }
-
-      return { tiptapControlValues: null, simpleControlValues: localControlValue };
-    } catch (error) {
-      this.logger.error({ error }, 'Failed to extract TipTap control', LOG_CONTEXT);
-
-      return { tiptapControlValues: null, simpleControlValues: controlValues };
-    }
-  }
-
   private fixControlValueInvalidVariables(
-    controlValues: Record<string, unknown>,
+    controlValues: unknown,
     invalidVariables: Variable[]
   ): Record<string, unknown> {
     try {
@@ -384,7 +303,7 @@ export class GeneratePreviewUsecase {
 
       return JSON.parse(controlValuesString) as Record<string, unknown>;
     } catch (error) {
-      return controlValues;
+      return controlValues as Record<string, unknown>;
     }
   }
 }
@@ -511,69 +430,4 @@ function identifyUnknownVariables(
  */
 function replaceAll(text: string, searchValue: string, replaceValue: string): string {
   return _.replace(text, new RegExp(_.escapeRegExp(searchValue), 'g'), replaceValue);
-}
-
-/**
- *
- * @param value minimal tiptap object from the client is
- * {
- *  "type": "doc",
- *  "content": [
- *    {
- *      "type": "paragraph",
- *      "attrs": {
- *        "textAlign": "left"
- *      },
- *      "content": [
- *        {
- *          "type": "text",
- *          "text": " "
- *        }
- *      ]
- *  }
- *]
- *}
- */
-export function isTipTapNode(value: unknown): value is string {
-  let localValue = value;
-  if (typeof localValue === 'string') {
-    try {
-      localValue = JSON.parse(localValue);
-    } catch {
-      return false;
-    }
-  }
-
-  if (!localValue || typeof localValue !== 'object') return false;
-
-  const doc = localValue as TipTapNode;
-
-  // TODO check if validate type === doc is enough
-  if (doc.type !== 'doc' || !Array.isArray(doc.content)) return false;
-
-  return true;
-
-  /*
-   * TODO check we need to validate the content
-   * return doc.content.every((node) => isValidTipTapContent(node));
-   */
-}
-
-function isValidTipTapContent(node: unknown): boolean {
-  if (!node || typeof node !== 'object') return false;
-  const content = node as TipTapNode;
-  if (typeof content.type !== 'string') return false;
-  if (content.attrs !== undefined && (typeof content.attrs !== 'object' || content.attrs === null)) {
-    return false;
-  }
-  if (content.text !== undefined && typeof content.text !== 'string') {
-    return false;
-  }
-  if (content.content !== undefined) {
-    if (!Array.isArray(content.content)) return false;
-
-    return content.content.every((child) => isValidTipTapContent(child));
-  }
-
-  return true;
 }

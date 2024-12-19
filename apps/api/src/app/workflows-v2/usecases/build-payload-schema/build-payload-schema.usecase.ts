@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ControlValuesEntity, ControlValuesRepository } from '@novu/dal';
+import { ControlValuesRepository } from '@novu/dal';
 import { ControlValuesLevelEnum, JSONSchemaDto } from '@novu/shared';
 import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { flattenObjectValues } from '../../util/utils';
@@ -7,6 +7,8 @@ import { pathsToObject } from '../../util/path-to-object';
 import { extractLiquidTemplateVariables } from '../../util/template-parser/liquid-parser';
 import { convertJsonToSchemaWithDefaults } from '../../util/jsonToSchema';
 import { BuildPayloadSchemaCommand } from './build-payload-schema.command';
+import { transformMailyContentToLiquid } from '../generate-preview/transform-maily-content-to-liquid';
+import { isStringTipTapNode } from '../../util/tip-tap.util';
 
 @Injectable()
 export class BuildPayloadSchema {
@@ -24,7 +26,7 @@ export class BuildPayloadSchema {
       };
     }
 
-    const templateVars = this.extractTemplateVariables(controlValues);
+    const templateVars = await this.processControlValues(controlValues);
     if (templateVars.length === 0) {
       return {
         type: 'object',
@@ -66,12 +68,31 @@ export class BuildPayloadSchema {
   }
 
   @Instrument()
-  private extractTemplateVariables(controlValues: Record<string, unknown>[]): string[] {
-    const controlValuesString = controlValues.map(flattenObjectValues).flat().join(' ');
+  private async processControlValues(controlValues: Record<string, unknown>[]): Promise<string[]> {
+    const allVariables: string[] = [];
 
-    const test = extractLiquidTemplateVariables(controlValuesString);
-    const test2 = test.validVariables.map((variable) => variable.name);
+    for (const controlValue of controlValues) {
+      const processedControlValue = await this.processControlValue(controlValue);
+      const controlValuesString = flattenObjectValues(processedControlValue).join(' ');
+      const templateVariables = extractLiquidTemplateVariables(controlValuesString);
+      allVariables.push(...templateVariables.validVariables.map((variable) => variable.name));
+    }
 
-    return test2;
+    return [...new Set(allVariables)];
+  }
+
+  @Instrument()
+  private async processControlValue(controlValue: Record<string, unknown>): Promise<Record<string, unknown>> {
+    const processedValue: Record<string, unknown> = {};
+
+    for (const [key, value] of Object.entries(controlValue)) {
+      if (isStringTipTapNode(value)) {
+        processedValue[key] = transformMailyContentToLiquid(JSON.parse(value));
+      } else {
+        processedValue[key] = value;
+      }
+    }
+
+    return processedValue;
   }
 }
