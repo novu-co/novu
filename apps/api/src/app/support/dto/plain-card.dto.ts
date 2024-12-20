@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class PlainCutomer {
+export class PlainCustomer {
   @ApiProperty()
   id: string;
 
@@ -32,7 +32,7 @@ export class PlainCardRequestDto {
   cardKeys?: string[];
 
   @ApiProperty()
-  customer?: PlainCutomer | null;
+  customer?: PlainCustomer | null;
 
   @ApiProperty()
   tenant?: PlainTenant | null;

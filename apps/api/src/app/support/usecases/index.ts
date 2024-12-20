@@ -1,2 +1,2 @@
 export * from './create-thread.usecase';
-export * from './fetch-user-organizations/fetch-user-organizations.usecase';
+export * from './get-plain-cards.usecase';
