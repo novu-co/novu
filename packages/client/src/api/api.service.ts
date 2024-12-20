@@ -1,22 +1,22 @@
 import type {
   ButtonTypeEnum,
-  MessageActionStatusEnum,
   CustomDataType,
+  INotificationDto,
   IPaginatedResponse,
   ISessionDto,
-  INotificationDto,
+  MessageActionStatusEnum,
   MessagesStatusEnum,
   PreferenceLevelEnum,
 } from '@novu/shared';
 import { HttpClient } from '../http-client';
 import {
-  ITabCountQuery,
-  IStoreQuery,
-  IUserPreferenceSettings,
-  IUnseenCountQuery,
-  IUnreadCountQuery,
-  IUserGlobalPreferenceSettings,
   ApiOptions,
+  IStoreQuery,
+  ITabCountQuery,
+  IUnreadCountQuery,
+  IUnseenCountQuery,
+  IUserGlobalPreferenceSettings,
+  IUserPreferenceSettings,
 } from '../index';
 
 export class ApiService {
@@ -146,14 +146,14 @@ export class ApiService {
   ): Promise<IPaginatedResponse<INotificationDto>> {
     const payloadString = payload ? btoa(JSON.stringify(payload)) : undefined;
 
-    return await this.httpClient.getFullResponse(
-      `/widgets/notifications/feed`,
-      {
+    const newVar: IPaginatedResponse<INotificationDto> =
+      await this.httpClient.getFullResponse(`/widgets/notifications/feed`, {
         page,
         ...(payloadString && { payload: payloadString }),
         ...rest,
-      },
-    );
+      });
+
+    return newVar;
   }
 
   async initializeSession(

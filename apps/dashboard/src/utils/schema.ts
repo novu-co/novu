@@ -2,7 +2,7 @@ import * as z from 'zod';
 import { JSONSchemaDefinition, JSONSchemaDto, UiSchema } from '@novu/shared';
 import { capitalize } from './string';
 
-type ZodValue =
+export type ZodValue =
   | z.AnyZodObject
   | z.ZodString
   | z.ZodNumber
@@ -12,7 +12,8 @@ type ZodValue =
   | z.ZodEnum<[string, ...string[]]>
   | z.ZodOptional<z.ZodTypeAny>
   | z.ZodBoolean
-  | z.ZodAny;
+  | z.ZodAny
+  | z.ZodUnion<z.ZodUnionOptions>;
 
 const handleStringFormat = ({ value, key, format }: { value: z.ZodString; key: string; format: string }) => {
   if (format === 'email') {
@@ -38,19 +39,14 @@ const handleStringPattern = ({ value, key, pattern }: { value: z.ZodString; key:
 
 const handleStringType = ({
   key,
-  format,
-  pattern,
-  enumValues,
-  defaultValue,
   requiredFields,
+  jsonSchema,
 }: {
   key: string;
-  format?: string;
-  pattern?: string;
-  enumValues?: unknown;
-  defaultValue?: unknown;
   requiredFields: Readonly<Array<string>>;
+  jsonSchema: JSONSchemaDto;
 }) => {
+  const { format, pattern, enum: enumValues, default: defaultValue, minLength } = jsonSchema;
   const isRequired = requiredFields.includes(key);
 
   let stringValue:
@@ -73,8 +69,8 @@ const handleStringType = ({
     });
   } else if (enumValues) {
     stringValue = z.enum(enumValues as [string, ...string[]]);
-  } else if (isRequired) {
-    stringValue = stringValue.min(1);
+  } else if (isRequired || minLength) {
+    stringValue = stringValue.min(minLength ?? 1);
   }
 
   if (defaultValue) {
@@ -84,17 +80,8 @@ const handleStringType = ({
   return stringValue;
 };
 
-const handleNumberType = ({
-  minimum,
-  maximum,
-  defaultValue,
-}: {
-  key: string;
-  minimum?: number;
-  maximum?: number;
-  defaultValue?: unknown;
-  requiredFields: Readonly<Array<string>>;
-}) => {
+const handleNumberType = ({ jsonSchema }: { jsonSchema: JSONSchemaDto }) => {
+  const { default: defaultValue, minimum, maximum } = jsonSchema;
   let numberValue: z.ZodNumber | z.ZodDefault<z.ZodNumber> = z.number();
 
   if (typeof minimum === 'number') {
@@ -110,69 +97,76 @@ const handleNumberType = ({
   return numberValue;
 };
 
+const getZodValueByType = (jsonSchema: JSONSchemaDefinition, key: string): ZodValue => {
+  if (typeof jsonSchema !== 'object') {
+    return z.any();
+  }
+  const requiredFields = jsonSchema.required ?? [];
+  const { type, default: defaultValue, required } = jsonSchema;
+
+  if (type === 'object') {
+    let zodValue = buildDynamicZodSchema(jsonSchema, key) as z.ZodTypeAny;
+    if (defaultValue) {
+      zodValue = zodValue.default(defaultValue as object);
+    }
+    zodValue = zodValue.transform((val) => {
+      const hasAnyRequiredEmpty = required?.some((field) => val[field] === '' || val[field] === undefined);
+      // remove object if any required field is empty or undefined
+      return hasAnyRequiredEmpty ? undefined : val;
+    });
+    return zodValue.nullable();
+  } else if (type === 'string') {
+    return handleStringType({ key, requiredFields, jsonSchema });
+  } else if (type === 'boolean') {
+    return z.boolean();
+  } else if (type === 'number') {
+    return handleNumberType({ jsonSchema });
+  } else if (typeof jsonSchema === 'object' && jsonSchema.anyOf) {
+    const anyOf = jsonSchema.anyOf.map((oneOfObj) => buildDynamicZodSchema(oneOfObj, key));
+
+    return z.union(anyOf as any);
+  } else {
+    return z.any();
+  }
+};
+
 /**
  * Transform JSONSchema to Zod schema.
  * The function will recursively build the schema based on the JSONSchema object.
  * It removes empty strings and objects with empty required fields during the transformation phase after parsing.
  */
-export const buildDynamicZodSchema = (obj: JSONSchemaDto): z.AnyZodObject => {
-  const properties = typeof obj === 'object' ? (obj.properties ?? {}) : {};
-  const requiredFields = typeof obj === 'object' ? (obj.required ?? []) : [];
+export const buildDynamicZodSchema = (obj: JSONSchemaDefinition, key = ''): ZodValue => {
+  if (typeof obj === 'object' && obj.type === 'object') {
+    const properties = obj.properties ?? {};
+    const requiredFields = obj.required ?? [];
 
-  const keys: Record<string, z.ZodTypeAny> = Object.keys(properties).reduce((acc, key) => {
-    const jsonSchemaProp = properties[key];
-    if (typeof jsonSchemaProp !== 'object') {
-      return acc;
-    }
-
-    let zodValue: ZodValue;
-    const {
-      type,
-      format,
-      pattern,
-      enum: enumValues,
-      default: defaultValue,
-      required,
-      minimum,
-      maximum,
-    } = jsonSchemaProp;
-    const isRequired = requiredFields.includes(key);
-
-    if (type === 'object') {
-      zodValue = buildDynamicZodSchema(jsonSchemaProp);
-      if (defaultValue) {
-        zodValue = zodValue.default(defaultValue as object);
+    const keys: Record<string, z.ZodTypeAny> = Object.keys(properties).reduce((acc, key) => {
+      const jsonSchemaProp = properties[key];
+      if (typeof jsonSchemaProp !== 'object') {
+        return acc;
       }
-      zodValue = zodValue.transform((val) => {
-        const hasAnyRequiredEmpty = required?.some((field) => val[field] === '' || val[field] === undefined);
-        // remove object if any required field is empty or undefined
-        return hasAnyRequiredEmpty ? undefined : val;
-      });
-      zodValue = zodValue.nullable();
-    } else if (type === 'string') {
-      zodValue = handleStringType({ key, requiredFields, format, pattern, enumValues, defaultValue });
-    } else if (type === 'boolean') {
-      zodValue = z.boolean();
-    } else if (type === 'number') {
-      zodValue = handleNumberType({ key, minimum, maximum, defaultValue, requiredFields });
-    } else {
-      zodValue = z.any();
-    }
 
-    if (!isRequired) {
-      zodValue = zodValue.optional() as ZodValue;
-    }
+      let zodValue = getZodValueByType(jsonSchemaProp, key);
 
-    return { ...acc, [key]: zodValue };
-  }, {});
+      const isRequired = requiredFields.includes(key);
+      if (!isRequired) {
+        zodValue = zodValue.optional() as ZodValue;
+      }
 
-  return z.object({ ...keys });
+      return { ...acc, [key]: zodValue };
+    }, {});
+
+    return z.object({ ...keys });
+  } else {
+    // handle different JSONSchema types
+    return getZodValueByType(obj, key);
+  }
 };
 
 /**
  * Build default values based on the UI Schema object.
  */
-export const buildDefaultValues = (uiSchema: UiSchema): object => {
+export const buildDefaultValues = (uiSchema: UiSchema): Record<string, unknown> => {
   const properties = typeof uiSchema === 'object' ? (uiSchema.properties ?? {}) : {};
 
   const keys: Record<string, unknown> = Object.keys(properties).reduce((acc, key) => {

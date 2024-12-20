@@ -72,7 +72,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
           <SheetTitle>Create workflow</SheetTitle>
           <div>
             <SheetDescription>
-              Workflows manage event-driven notifications across channels.{' '}
+              Define the steps to notify subscribers using channels like in-app, email, and more.{' '}
               <Link
                 target="_blank"
                 to="https://docs.novu.co/concepts/workflows"
@@ -153,7 +153,15 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                       <FormLabel hint={`(max. ${MAX_TAG_ELEMENTS})`}>Add tags</FormLabel>
                     </div>
                     <FormControl>
-                      <TagInput suggestions={tags.map((tag) => tag.name)} {...field} value={field.value ?? []} />
+                      <TagInput
+                        suggestions={tags.map((tag) => tag.name)}
+                        {...field}
+                        value={field.value ?? []}
+                        onChange={(tags) => {
+                          field.onChange(tags);
+                          form.setValue('tags', tags, { shouldValidate: true });
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

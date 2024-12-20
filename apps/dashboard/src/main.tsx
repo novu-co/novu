@@ -13,7 +13,9 @@ import {
   UsecaseSelectPage,
   ApiKeysPage,
   WelcomePage,
+  IntegrationsListPage,
   SettingsPage,
+  ActivityFeed,
 } from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
@@ -29,6 +31,9 @@ import { ChannelPreferences } from './components/workflow-editor/channel-prefere
 import { FeatureFlagsProvider } from './context/feature-flags-provider';
 import { ConfigureStep } from '@/components/workflow-editor/steps/configure-step';
 import { ConfigureStepTemplate } from '@/components/workflow-editor/steps/configure-step-template';
+import { RedirectToLegacyStudioAuth } from './pages/redirect-to-legacy-studio-auth';
+import { CreateIntegrationSidebar } from './components/integrations/components/create-integration-sidebar';
+import { UpdateIntegrationSidebar } from './components/integrations/components/update-integration-sidebar';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -101,6 +106,10 @@ const router = createBrowserRouter([
                 element: <ApiKeysPage />,
               },
               {
+                path: ROUTES.ACTIVITY_FEED,
+                element: <ActivityFeed />,
+              },
+              {
                 path: ROUTES.EDIT_WORKFLOW,
                 element: <EditWorkflowPage />,
                 children: [
@@ -126,11 +135,34 @@ const router = createBrowserRouter([
                 path: ROUTES.TEST_WORKFLOW,
                 element: <TestWorkflowPage />,
               },
+
               {
                 path: '*',
                 element: <CatchAllRoute />,
               },
             ],
+          },
+          {
+            path: ROUTES.INTEGRATIONS,
+            element: <IntegrationsListPage />,
+            children: [
+              {
+                path: ROUTES.INTEGRATIONS_CONNECT,
+                element: <CreateIntegrationSidebar isOpened />,
+              },
+              {
+                path: ROUTES.INTEGRATIONS_CONNECT_PROVIDER,
+                element: <CreateIntegrationSidebar isOpened />,
+              },
+              {
+                path: ROUTES.INTEGRATIONS_UPDATE,
+                element: <UpdateIntegrationSidebar isOpened />,
+              },
+            ],
+          },
+          {
+            path: ROUTES.INTEGRATIONS,
+            element: <IntegrationsListPage />,
           },
           {
             path: ROUTES.SETTINGS,
@@ -151,6 +183,10 @@ const router = createBrowserRouter([
           {
             path: ROUTES.SETTINGS_BILLING,
             element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.LOCAL_STUDIO_AUTH,
+            element: <RedirectToLegacyStudioAuth />,
           },
           {
             path: '*',

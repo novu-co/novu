@@ -6,14 +6,16 @@ import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
 import { ROUTES } from '../../utils/routes';
 import { useNavigate } from 'react-router-dom';
 import { ONBOARDING_DEMO_WORKFLOW_ID } from '../../config';
+import { IEnvironment } from '@novu/shared';
 
-interface InboxConnectedGuideProps {
+type InboxConnectedGuideProps = {
   subscriberId: string;
-}
+  environment: IEnvironment;
+};
 
-export function InboxConnectedGuide({ subscriberId }: InboxConnectedGuideProps) {
+export function InboxConnectedGuide({ subscriberId, environment }: InboxConnectedGuideProps) {
   const navigate = useNavigate();
-  const { triggerWorkflow, isPending } = useTriggerWorkflow();
+  const { triggerWorkflow, isPending } = useTriggerWorkflow(environment);
 
   async function handleSendNotification() {
     try {

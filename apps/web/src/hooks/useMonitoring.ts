@@ -29,6 +29,8 @@ export function useMonitoring() {
         id: currentUser._id,
         organizationId: currentOrganization._id,
         organizationName: currentOrganization.name,
+        organizationTier: currentOrganization.apiServiceLevel,
+        organizationCreatedAt: currentOrganization.createdAt,
       });
     } else {
       sentryConfigureScope((scope) => scope.setUser(null));
@@ -46,6 +48,7 @@ export function useMonitoring() {
         key: currentOrganization._id,
         name: currentOrganization.name,
         createdAt: currentOrganization.createdAt,
+        tier: currentOrganization.apiServiceLevel,
       });
     } else {
       ldClient.identify({
