@@ -1,8 +1,8 @@
 import { EditorView } from '@uiw/react-codemirror';
+import merge from 'lodash.merge';
 import { ComponentProps, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
-import merge from 'lodash.merge';
 
 import { Button, buttonVariants } from '@/components/primitives/button';
 import {
@@ -24,12 +24,12 @@ import { InputField } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import { URLInput } from '@/components/workflow-editor/url-input';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
 import { autocompletion } from '@codemirror/autocomplete';
-import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';

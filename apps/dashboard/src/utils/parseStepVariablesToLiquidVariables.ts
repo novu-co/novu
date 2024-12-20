@@ -5,38 +5,62 @@ export interface LiquidVariable {
   label: string;
 }
 
+export interface ParsedVariables {
+  primitives: LiquidVariable[];
+  arrays: LiquidVariable[];
+  namespaces: LiquidVariable[];
+}
+
 /**
  * Parse JSON Schema and extract variables for Liquid autocompletion.
  * @param schema - The JSON Schema to parse.
- * @returns An array of variable objects suitable for the Liquid language.
+ * @returns An object containing three arrays: primitives, arrays, and namespaces.
  */
-export function parseStepVariablesToLiquidVariables(schema: JSONSchemaDefinition): LiquidVariable[] {
-  const variables: LiquidVariable[] = [];
+export function parseStepVariables(schema: JSONSchemaDefinition): ParsedVariables {
+  const result: ParsedVariables = {
+    primitives: [],
+    arrays: [],
+    namespaces: [],
+  };
 
   function extractProperties(obj: JSONSchemaDefinition, path = ''): void {
-    if (typeof obj === 'boolean') return; // Handle boolean schema
+    if (typeof obj === 'boolean') return;
 
-    if (obj.type === 'object' && obj.properties) {
+    if (obj.type === 'object') {
+      // Handle object with additionalProperties
+      if (obj.additionalProperties === true) {
+        result.namespaces.push({
+          type: 'variable',
+          label: path,
+        });
+        return;
+      }
+
+      if (!obj.properties) return;
+
       for (const [key, value] of Object.entries(obj.properties)) {
         const fullPath = path ? `${path}.${key}` : key;
 
-        // Only push variables that are not of type "object" or have additionalProperties set to true
-        if (typeof value === 'object' && (value.type !== 'object' || value.additionalProperties === true)) {
-          variables.push({
-            type: 'variable',
-            label: `${fullPath}`,
-          });
-        }
-
-        // Recursively process nested objects
-        if (typeof value === 'object' && (value.type === 'object' || value.type === 'array')) {
-          extractProperties(value, fullPath);
+        if (typeof value === 'object') {
+          if (value.type === 'array') {
+            result.arrays.push({
+              type: 'variable',
+              label: fullPath,
+            });
+            if (value.items) {
+              const items = Array.isArray(value.items) ? value.items[0] : value.items;
+              extractProperties(items, `${fullPath}[0]`);
+            }
+          } else if (value.type === 'object') {
+            extractProperties(value, fullPath);
+          } else if (value.type && ['string', 'number', 'boolean', 'integer'].includes(value.type as string)) {
+            result.primitives.push({
+              type: 'variable',
+              label: fullPath,
+            });
+          }
         }
       }
-    } else if (obj.type === 'array' && obj.items) {
-      // For arrays, add a placeholder for array indexing
-      const items = Array.isArray(obj.items) ? obj.items[0] : obj.items;
-      extractProperties(items, `${path}[0]`);
     }
 
     // Handle combinators (allOf, anyOf, oneOf)
@@ -55,5 +79,10 @@ export function parseStepVariablesToLiquidVariables(schema: JSONSchemaDefinition
   }
 
   extractProperties(schema);
-  return variables;
+  return result;
 }
+
+export const parseStepVariablesToLiquidVariables = (schema: JSONSchemaDefinition) => {
+  const variables = parseStepVariables(schema);
+  return [...variables.primitives, ...variables.namespaces];
+};

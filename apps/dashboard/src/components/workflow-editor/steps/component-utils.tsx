@@ -58,6 +58,9 @@ export const getComponentByType = ({ component }: { component?: UiComponentEnum 
     case UiComponentEnum.SMS_BODY: {
       return <BaseBody />;
     }
+    case UiComponentEnum.CHAT_BODY: {
+      return <BaseBody />;
+    }
     default: {
       return null;
     }

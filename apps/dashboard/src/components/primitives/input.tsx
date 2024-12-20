@@ -67,12 +67,13 @@ const inputFieldVariants = cva(
 
 export type InputFieldPureProps = { children: React.ReactNode; className?: string } & VariantProps<
   typeof inputFieldVariants
->;
+> &
+  Omit<React.InputHTMLAttributes<HTMLDivElement>, 'size'>;
 
-const InputFieldPure = React.forwardRef<HTMLInputElement, InputFieldPureProps>(
-  ({ children, className, size, state }, ref) => {
+const InputFieldPure = React.forwardRef<HTMLDivElement, InputFieldPureProps>(
+  ({ children, className, size, state, ...rest }, ref) => {
     return (
-      <div ref={ref} className={cn(inputFieldVariants({ size, state }), className)}>
+      <div ref={ref} className={cn(inputFieldVariants({ size, state }), className)} {...rest}>
         {children}
       </div>
     );
@@ -83,7 +84,7 @@ InputFieldPure.displayName = 'InputFieldPure';
 
 export type InputFieldProps = Omit<InputFieldPureProps, 'state'>;
 
-const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(({ ...props }, ref) => {
+const InputField = React.forwardRef<HTMLDivElement, InputFieldProps>(({ ...props }, ref) => {
   const { error } = useFormField();
 
   return <InputFieldPure ref={ref} {...props} state={error?.message ? 'error' : 'default'} />;
