@@ -1,5 +1,5 @@
 import { SmsPhone } from '@/components/workflow-editor/steps/sms/sms-phone';
-import { ChannelTypeEnum, type GeneratePreviewResponseDto } from '@novu/shared';
+import { ChannelTypeEnum, SmsRenderOutput, type GeneratePreviewResponseDto } from '@novu/shared';
 import { ReactNode } from 'react';
 
 const SmsPreviewContainer = ({ children }: { children: ReactNode }) => {
@@ -14,6 +14,9 @@ export const SmsPreview = ({
   previewData?: GeneratePreviewResponseDto;
 }) => {
   const previewResult = previewData?.result;
+  const isValidSmsPreview =
+    previewResult && previewResult.type === ChannelTypeEnum.SMS && previewResult.preview.body.length > 0;
+  const body = isValidSmsPreview ? ((previewData?.result.preview as SmsRenderOutput)?.body ?? '') : '';
 
   if (isPreviewPending || previewData === undefined) {
     return (
@@ -23,22 +26,9 @@ export const SmsPreview = ({
     );
   }
 
-  const isValidSmsPreview =
-    previewResult && previewResult.type === ChannelTypeEnum.SMS && previewResult.preview.body.length > 0;
-
-  if (!isValidSmsPreview) {
-    return (
-      <SmsPreviewContainer>
-        <SmsPhone smsBody="Preview not available" error={!isValidSmsPreview} />
-      </SmsPreviewContainer>
-    );
-  }
-
-  const smsBody = previewResult.preview.body;
-
   return (
     <SmsPreviewContainer>
-      <SmsPhone smsBody={smsBody} />
+      <SmsPhone smsBody={body} />
     </SmsPreviewContainer>
   );
 };
