@@ -2800,6 +2800,9 @@ importers:
       '@novu/ee-shared-services':
         specifier: workspace:*
         version: link:../../enterprise/packages/shared-services
+      '@taskforcesh/bullmq-pro':
+        specifier: 5.1.14
+        version: 5.1.14
     devDependencies:
       '@istanbuljs/nyc-config-typescript':
         specifier: ^1.0.1
@@ -14718,6 +14721,9 @@ packages:
     resolution: {integrity: sha512-P9dF7XbibHph2PFRz8gfBKEXEY/HJPOhym8CHmjF8y3q5mWpKx9xtZapXQUWCgkqvsK0R46Azuz+VaxD4Xl+Tg==}
     engines: {node: '>=12'}
 
+  '@taskforcesh/bullmq-pro@5.1.14':
+    resolution: {integrity: sha512-J/83Q1GTFWbUWn1bpsiX+CcQXktp7ADg/d1oID+wQ8ZwSB2W5l/1FV4yR1BEi3sO+UFEo+rK3qfXQuDml7aBYA==, tarball: https://npm.taskforce.sh/@taskforcesh/bullmq-pro/-/@taskforcesh/bullmq-pro-5.1.14.tgz}
+
   '@team-plain/typescript-sdk@5.4.3':
     resolution: {integrity: sha512-660VeutTdaspdzsgpLHKhYsBxX0BOH/O4r0FTi1HD67QyHnKeaMRbxBAen7Yi+vpcpBc3gJGq4HtgHWPZ5WEoA==}
 
@@ -17654,6 +17660,9 @@ packages:
 
   bullmq@3.16.2:
     resolution: {integrity: sha512-wZIsCdI2H6lza6GdePquCWbrslhYHS7GnDPpP0hzoHkvKiBOt/5jHcsHcHhJi/fob+dfo8dazWKTSLlGLFFqUw==}
+
+  bullmq@3.6.6:
+    resolution: {integrity: sha512-W71jXrcTdcT3Y5tzMyTx22Cd8O3dTML7vl6KG3YdGVGrO3+UmKRLYfGLn1QwIhIoTQJVvIrSB4qfGs1hgqYRVw==}
 
   bundle-n-require@1.1.1:
     resolution: {integrity: sha512-EB2wFjXF106LQLe/CYnKCMCdLeTW47AtcEtUfiqAOgr2a08k0+YgRklur2aLfEYHlhz6baMskZ8L2U92Hh0vyA==}
@@ -47657,6 +47666,18 @@ snapshots:
 
   '@tanstack/table-core@8.20.5': {}
 
+  '@taskforcesh/bullmq-pro@5.1.14':
+    dependencies:
+      bullmq: 3.6.6
+      lodash: 4.17.21
+      msgpackr: 1.11.2
+      rxjs: 6.6.7
+      tslib: 2.8.1
+      uuid: 8.3.2
+    transitivePeerDependencies:
+      - supports-color
+    optional: true
+
   '@team-plain/typescript-sdk@5.4.3':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.10.0)
@@ -51817,6 +51838,20 @@ snapshots:
       uuid: 9.0.1
     transitivePeerDependencies:
       - supports-color
+
+  bullmq@3.6.6:
+    dependencies:
+      cron-parser: 4.9.0
+      glob: 8.1.0
+      ioredis: 5.3.2
+      lodash: 4.17.21
+      msgpackr: 1.11.2
+      semver: 7.6.3
+      tslib: 2.8.1
+      uuid: 9.0.1
+    transitivePeerDependencies:
+      - supports-color
+    optional: true
 
   bundle-n-require@1.1.1:
     dependencies:
@@ -68037,7 +68072,7 @@ snapshots:
   snake-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
-      tslib: 2.4.1
+      tslib: 2.8.1
 
   snakecase-keys@5.4.4:
     dependencies:
