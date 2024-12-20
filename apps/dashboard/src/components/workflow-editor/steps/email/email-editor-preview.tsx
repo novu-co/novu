@@ -15,7 +15,7 @@ import {
   EmailPreviewSubject,
   EmailPreviewSubjectMobile,
 } from '@/components/workflow-editor/steps/email/email-preview';
-import { EmailTabsPreviewSection } from '@/components/workflow-editor/steps/email/email-tabs-section';
+import { EmailTabsSection } from '@/components/workflow-editor/steps/email/email-tabs-section';
 import { TabsContent } from '@radix-ui/react-tabs';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { RiMacLine, RiSmartphoneFill } from 'react-icons/ri';
@@ -67,7 +67,7 @@ export const EmailEditorPreview = ({ workflow, step, formValues }: EmailEditorPr
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab}>
-      <div className="flex w-full items-center justify-between p-3">
+      <EmailTabsSection className="flex w-full items-center justify-between">
         <EmailPreviewHeader />
         <TabsList>
           <TabsTrigger value="mobile">
@@ -77,10 +77,18 @@ export const EmailEditorPreview = ({ workflow, step, formValues }: EmailEditorPr
             <RiMacLine className="size-4" />
           </TabsTrigger>
         </TabsList>
-      </div>
-      <div className="relative flex flex-col gap-3">
+      </EmailTabsSection>
+      <div className="relative flex flex-col">
         {isPreviewPending ? (
-          <Skeleton className="h-96 w-full" />
+          <div className="flex flex-col">
+            <EmailTabsSection className="py-2">
+              <Skeleton className="h-6 w-full" />
+            </EmailTabsSection>
+            <Separator className="bg-neutral-100" />
+            <EmailTabsSection>
+              <Skeleton className="h-96 w-full" />
+            </EmailTabsSection>
+          </div>
         ) : (
           <>
             {previewData?.result?.type == ChannelTypeEnum.EMAIL ? (
@@ -95,8 +103,8 @@ export const EmailEditorPreview = ({ workflow, step, formValues }: EmailEditorPr
                 </TabsContent>
                 <TabsContent value="desktop">
                   <EmailPreviewSubject subject={previewData.result.preview.subject} />
-                  <Separator className="bg-neutral-200" />
-                  <EmailPreviewBody body={previewData.result.preview.body} />
+                  <Separator className="bg-neutral-100" />
+                  <EmailPreviewBody body={previewData.result.preview.body} className="bg-background rounded-lg" />
                 </TabsContent>
               </>
             ) : (
@@ -104,7 +112,7 @@ export const EmailEditorPreview = ({ workflow, step, formValues }: EmailEditorPr
             )}
           </>
         )}
-        <EmailTabsPreviewSection>
+        <EmailTabsSection>
           <Accordion type="single" collapsible value={accordionValue} onValueChange={setAccordionValue}>
             <AccordionItem value="payload">
               <AccordionTrigger>
@@ -145,7 +153,7 @@ export const EmailEditorPreview = ({ workflow, step, formValues }: EmailEditorPr
               </AccordionContent>
             </AccordionItem>
           </Accordion>
-        </EmailTabsPreviewSection>
+        </EmailTabsSection>
       </div>
     </Tabs>
   );

@@ -33,6 +33,10 @@ import {
   StepTypeEnum,
   SystemAvatarIconEnum,
   TemplateVariableTypeEnum,
+  CreateWorkflowDto,
+  WorkflowCreationSourceEnum,
+  WorkflowResponseDto,
+  ExecutionDetailsStatusEnum,
 } from '@novu/shared';
 import { EmailEventStatusEnum } from '@novu/stateless';
 import { DetailEnum } from '@novu/application-generic';
@@ -64,20 +68,20 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
   const tenantRepository = new TenantRepository();
   let novuClient: Novu;
 
-  describe(`Trigger Event - /v1/events/trigger (POST)`, function () {
-    beforeEach(async () => {
-      session = new UserSession();
-      await session.initialize();
-      template = await session.createTemplate();
-      subscriberService = new SubscribersService(session.organization._id, session.environment._id);
-      subscriber = await subscriberService.createSubscriber();
-      workflowOverrideService = new WorkflowOverrideService({
-        organizationId: session.organization._id,
-        environmentId: session.environment._id,
-      });
-      novuClient = initNovuClassSdk(session);
+  beforeEach(async () => {
+    session = new UserSession();
+    await session.initialize();
+    template = await session.createTemplate();
+    subscriberService = new SubscribersService(session.organization._id, session.environment._id);
+    subscriber = await subscriberService.createSubscriber();
+    workflowOverrideService = new WorkflowOverrideService({
+      organizationId: session.organization._id,
+      environmentId: session.environment._id,
     });
+    novuClient = initNovuClassSdk(session);
+  });
 
+  describe(`Trigger Event - /v1/events/trigger (POST)`, function () {
     it('should filter delay step', async function () {
       const firstStepUuid = uuid();
       template = await session.createTemplate({
@@ -2198,7 +2202,7 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
         ],
       });
 
-      // const axiosPostStub = sinon.stub(axios, 'post').throws(new Error('Users remote error'));
+      // const axiosPostStub = sinon.stub(axios, 'post').throws(new Error('Users remote error')));
 
       await novuClient.trigger({
         name: template.triggers[0].identifier,
@@ -3223,10 +3227,215 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
       tenant,
       actor,
     };
-    console.log('request111', JSON.stringify(request, null, 2));
 
     return (await novuClient.trigger(request)).result;
   }
+
+  describe('Trigger Event v2 workflow - /v1/events/trigger (POST)', function () {
+    afterEach(async () => {
+      await messageRepository.deleteMany({
+        _environmentId: session.environment._id,
+      });
+    });
+
+    it('should skip step based on skip', async function () {
+      const workflowBody: CreateWorkflowDto = {
+        name: 'Test Skip Workflow',
+        workflowId: 'test-skip-workflow',
+        __source: WorkflowCreationSourceEnum.DASHBOARD,
+        steps: [
+          {
+            type: StepTypeEnum.IN_APP,
+            name: 'Message Name',
+            controlValues: {
+              body: 'Hello {{subscriber.lastName}}, Welcome!',
+              skip: {
+                '==': [{ var: 'payload.shouldSkip' }, true],
+              },
+            },
+          },
+        ],
+      };
+
+      const response = await session.testAgent.post('/v2/workflows').send(workflowBody);
+      expect(response.status).to.equal(201);
+      const workflow: WorkflowResponseDto = response.body.data;
+
+      await novuClient.trigger({
+        name: workflow.workflowId,
+        to: [subscriber.subscriberId],
+        payload: {
+          shouldSkip: true,
+        },
+      });
+      await session.awaitRunningJobs(workflow._id);
+      const skippedMessages = await messageRepository.find({
+        _environmentId: session.environment._id,
+        _subscriberId: subscriber._id,
+      });
+      expect(skippedMessages.length).to.equal(0);
+
+      await novuClient.trigger({
+        name: workflow.workflowId,
+        to: [subscriber.subscriberId],
+        payload: {
+          shouldSkip: false,
+        },
+      });
+      await session.awaitRunningJobs(workflow._id);
+      const notSkippedMessages = await messageRepository.find({
+        _environmentId: session.environment._id,
+        _subscriberId: subscriber._id,
+      });
+      expect(notSkippedMessages.length).to.equal(1);
+    });
+  });
+
+  it('should handle complex skip logic with subscriber data', async function () {
+    const workflowBody: CreateWorkflowDto = {
+      name: 'Test Complex Skip Logic',
+      workflowId: 'test-complex-skip-workflow',
+      __source: WorkflowCreationSourceEnum.DASHBOARD,
+      steps: [
+        {
+          type: StepTypeEnum.IN_APP,
+          name: 'Message Name',
+          controlValues: {
+            body: 'Hello {{subscriber.lastName}}, Welcome!',
+            skip: {
+              and: [
+                {
+                  or: [
+                    { '==': [{ var: 'subscriber.firstName' }, 'John'] },
+                    { '==': [{ var: 'subscriber.data.role' }, 'admin'] },
+                  ],
+                },
+                {
+                  and: [
+                    { '>=': [{ var: 'payload.userScore' }, 100] },
+                    { '==': [{ var: 'subscriber.lastName' }, 'Doe'] },
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      ],
+    };
+
+    const response = await session.testAgent.post('/v2/workflows').send(workflowBody);
+    expect(response.status).to.equal(201);
+    const workflow: WorkflowResponseDto = response.body.data;
+
+    // Should skip - matches all conditions
+    subscriber = await subscriberService.createSubscriber({
+      firstName: 'John',
+      lastName: 'Doe',
+      data: { role: 'admin' },
+    });
+
+    await novuClient.trigger({
+      name: workflow.workflowId,
+      to: [subscriber.subscriberId],
+      payload: {
+        userScore: 150,
+      },
+    });
+    await session.awaitRunningJobs(workflow._id);
+    const skippedMessages = await messageRepository.find({
+      _environmentId: session.environment._id,
+      _subscriberId: subscriber._id,
+    });
+    expect(skippedMessages.length).to.equal(0);
+
+    // Should not skip - doesn't match lastName condition
+    subscriber = await subscriberService.createSubscriber({
+      firstName: 'John',
+      lastName: 'Smith',
+      data: { role: 'admin' },
+    });
+
+    await novuClient.trigger({
+      name: workflow.workflowId,
+      to: [subscriber.subscriberId],
+      payload: {
+        userScore: 150,
+      },
+    });
+    await session.awaitRunningJobs(workflow._id);
+    const notSkippedMessages1 = await messageRepository.find({
+      _environmentId: session.environment._id,
+      _subscriberId: subscriber._id,
+    });
+    expect(notSkippedMessages1.length).to.equal(1);
+
+    // Should not skip - doesn't match score condition
+    subscriber = await subscriberService.createSubscriber({
+      firstName: 'John',
+      lastName: 'Doe',
+      data: { role: 'admin' },
+    });
+
+    await novuClient.trigger({
+      name: workflow.workflowId,
+      to: [subscriber.subscriberId],
+      payload: {
+        userScore: 50,
+      },
+    });
+    await session.awaitRunningJobs(workflow._id);
+    const notSkippedMessages2 = await messageRepository.find({
+      _environmentId: session.environment._id,
+      _subscriberId: subscriber._id,
+    });
+    expect(notSkippedMessages2.length).to.equal(1);
+  });
+
+  it('should exit execution if skip condition execution throws an error', async function () {
+    const workflowBody: CreateWorkflowDto = {
+      name: 'Test Complex Skip Logic',
+      workflowId: 'test-complex-skip-workflow',
+      __source: WorkflowCreationSourceEnum.DASHBOARD,
+      steps: [
+        {
+          type: StepTypeEnum.IN_APP,
+          name: 'Message Name',
+          controlValues: {
+            body: 'Hello {{subscriber.lastName}}, Welcome!',
+            skip: { invalidOp: [1, 2] }, // INVALID OPERATOR
+          },
+        },
+      ],
+    };
+
+    const response = await session.testAgent.post('/v2/workflows').send(workflowBody);
+    expect(response.status).to.equal(201);
+    const workflow: WorkflowResponseDto = response.body.data;
+
+    subscriber = await subscriberService.createSubscriber({
+      firstName: 'John',
+      lastName: 'Doe',
+      data: { role: 'admin' },
+    });
+
+    await novuClient.trigger({
+      name: workflow.workflowId,
+      to: [subscriber.subscriberId],
+      payload: {
+        userScore: 150,
+      },
+    });
+    await session.awaitRunningJobs(workflow._id);
+    const executionDetails = await executionDetailsRepository.findOne({
+      _environmentId: session.environment._id,
+      _subscriberId: subscriber._id,
+      channel: ChannelTypeEnum.IN_APP,
+      status: ExecutionDetailsStatusEnum.FAILED,
+    });
+
+    expect(executionDetails?.raw).to.contain('Failed to evaluate rule');
+    expect(executionDetails?.raw).to.contain('Unrecognized operation invalidOp');
+  });
 });
 
 async function createTemplate(session, channelType) {

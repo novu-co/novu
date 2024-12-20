@@ -2,9 +2,11 @@ import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
+import { skipControl } from './skip-control.schema';
 
 export const SmsStepControlZodSchema = z
   .object({
+    skip: skipControl.schema,
     body: z.string(),
   })
   .strict();
@@ -18,6 +20,7 @@ export const smsStepUiSchema: UiSchema = {
     body: {
       component: UiComponentEnum.SMS_BODY,
     },
+    skip: skipControl.uiSchema.properties.skip,
   },
 };
 

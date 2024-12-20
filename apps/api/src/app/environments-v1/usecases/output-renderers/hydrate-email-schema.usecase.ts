@@ -117,10 +117,11 @@ export class HydrateEmailSchemaUseCase {
     node,
     placeholderAggregation: PlaceholderAggregation
   ) {
-    const resolvedValue = this.getValueByPath(masterPayload, node.attrs.id);
     const { fallback } = node.attrs;
+    const variableName = node.attrs.id;
+    const buildLiquidJSDefault = (mailyFallback: string) => (mailyFallback ? ` | default: '${mailyFallback}'` : '');
+    const finalValue = `{{ ${variableName} ${buildLiquidJSDefault(fallback)} }}`;
 
-    const finalValue = resolvedValue || fallback || `{{${node.attrs.id}}}`;
     placeholderAggregation.regularPlaceholdersToDefaultValue[`{{${node.attrs.id}}}`] = finalValue;
 
     return finalValue;

@@ -38,6 +38,7 @@ export class NotificationsController {
   @ApiOperation({
     summary: 'Get notifications',
   })
+  @ApiCommonResponses()
   @UserAuthentication()
   @ExternalApiAccessible()
   listNotifications(
@@ -77,6 +78,8 @@ export class NotificationsController {
         search: query.search,
         subscriberIds: subscribersQuery,
         transactionId: query.transactionId,
+        after: query.after,
+        before: query.before,
       })
     );
   }

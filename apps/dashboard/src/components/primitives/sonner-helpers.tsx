@@ -30,8 +30,13 @@ export const showSuccessToast = (message: string, position: 'bottom-center' | 't
   });
 };
 
-export const showErrorToast = (message: string, position: 'bottom-center' | 'top-center' = 'bottom-center') => {
+export const showErrorToast = (
+  message: string,
+  title?: string,
+  position: 'bottom-center' | 'top-center' = 'bottom-center'
+) => {
   showToast({
+    title,
     children: () => (
       <>
         <ToastIcon variant="error" />

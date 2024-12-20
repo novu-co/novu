@@ -31,6 +31,9 @@ import { Step } from '@/utils/types';
 import { getFirstControlsErrorMessage, getFirstBodyErrorMessage } from './step-utils';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { useEnvironment } from '@/context/environment/hooks';
+import { buildRoute } from '@/utils/routes';
+import { ROUTES } from '@/utils/routes';
+import { useNavigate } from 'react-router-dom';
 
 const nodeTypes = {
   trigger: TriggerNode,
@@ -89,14 +92,15 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
   const reactFlowInstance = useReactFlow();
   const { currentEnvironment } = useEnvironment();
   const { workflow: currentWorkflow } = useWorkflow();
+  const navigate = useNavigate();
 
   const [nodes, edges] = useMemo(() => {
     const triggerNode = {
       id: crypto.randomUUID(),
       position: { x: 0, y: 0 },
       data: {
-        workflowSlug: currentWorkflow!.slug,
-        environment: currentEnvironment!.slug,
+        workflowSlug: currentWorkflow?.slug ?? '',
+        environment: currentEnvironment?.slug ?? '',
       },
       type: 'trigger',
     };
@@ -183,6 +187,17 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
         panOnScroll
         selectionOnDrag
         panOnDrag={panOnDrag}
+        onPaneClick={() => {
+          // unselect node if clicked on background
+          if (currentEnvironment?.slug && currentWorkflow?.slug) {
+            navigate(
+              buildRoute(ROUTES.EDIT_WORKFLOW, {
+                environmentSlug: currentEnvironment.slug,
+                workflowSlug: currentWorkflow.slug,
+              })
+            );
+          }
+        }}
       >
         <Controls showZoom={false} showInteractive={false} />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />

@@ -1,6 +1,6 @@
 import {
   PreferencesResponseDto,
-  RuntimeIssue,
+  RuntimeIssueDto,
   ShortIsPrefixEnum,
   StepDataDto,
   StepTypeEnum,
@@ -23,7 +23,7 @@ export function toResponseWorkflowDto(
     user: workflow.userPreferences,
     default: workflow.defaultPreferences,
   };
-  const workflowName = workflow.name || 'Missing Name';
+  const workflowName = workflow.name || 'Missing Name | UPDATE IMMEDIATELY';
 
   return {
     _id: workflow._id,
@@ -39,7 +39,7 @@ export function toResponseWorkflowDto(
     updatedAt: workflow.updatedAt || 'Missing Updated At',
     createdAt: workflow.createdAt || 'Missing Create At',
     status: workflow.status || WorkflowStatusEnum.ACTIVE,
-    issues: workflow.issues as unknown as Record<WorkflowCreateAndUpdateKeys, RuntimeIssue>,
+    issues: workflow.issues as unknown as Record<WorkflowCreateAndUpdateKeys, RuntimeIssueDto>,
   };
 }
 

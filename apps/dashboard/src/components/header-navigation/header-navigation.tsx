@@ -14,7 +14,7 @@ export const HeaderNavigation = (props: HeaderNavigationProps) => {
   return (
     <div
       className={cn(
-        'bg-background flex h-12 w-full items-center justify-between border-b border-b-neutral-100 px-2.5 py-1.5',
+        'bg-background flex h-12 w-full items-center justify-between border-b border-b-neutral-200 px-2.5 py-1.5',
         className
       )}
       {...rest}

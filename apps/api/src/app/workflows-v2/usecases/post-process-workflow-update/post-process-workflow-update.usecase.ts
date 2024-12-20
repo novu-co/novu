@@ -1,6 +1,5 @@
 import {
-  ContentIssue,
-  RuntimeIssue,
+  RuntimeIssueDto,
   StepCreateAndUpdateKeys,
   StepIssue,
   StepIssueEnum,
@@ -10,10 +9,9 @@ import {
   WorkflowResponseDto,
   WorkflowStatusEnum,
 } from '@novu/shared';
-import { NotificationStepEntity, NotificationTemplateRepository } from '@novu/dal';
+import { NotificationStepEntity, NotificationTemplateRepository, RuntimeIssue } from '@novu/dal';
 import { Injectable } from '@nestjs/common';
 import { Instrument, InstrumentUsecase, WorkflowInternalResponseDto } from '@novu/application-generic';
-
 import { PostProcessWorkflowUpdateCommand } from './post-process-workflow-update.command';
 import { OverloadContentDataOnWorkflowUseCase } from '../overload-content-data';
 
@@ -39,7 +37,7 @@ export class PostProcessWorkflowUpdate {
   async execute(command: PostProcessWorkflowUpdateCommand): Promise<WorkflowInternalResponseDto> {
     const workflowIssues = await this.validateWorkflow(command);
     const stepIssues = this.validateSteps(command.workflow.steps, command.workflow._id);
-    let transientWorkflow = this.updateIssuesOnWorkflow(command.workflow, workflowIssues, stepIssues);
+    let transientWorkflow = this.updateIssuesOnWorkflow(command.workflow, stepIssues, workflowIssues);
 
     transientWorkflow = await this.overloadContentDataOnWorkflowUseCase.execute({
       user: command.user,
@@ -94,7 +92,10 @@ export class PostProcessWorkflowUpdate {
     return issue.body && Object.keys(issue.body).length > 0;
   }
 
-  private validateSteps(steps: NotificationStepEntity[], _workflowId: string): Record<string, StepIssuesDto> {
+  private validateSteps(
+    steps: NotificationStepEntity[],
+    _workflowId: string
+  ): Record<string, StepIssuesDto> | undefined {
     const stepIdToIssues: Record<string, StepIssuesDto> = {};
 
     for (const step of steps) {
@@ -104,18 +105,18 @@ export class PostProcessWorkflowUpdate {
       };
     }
 
-    return stepIdToIssues;
+    return Object.keys(stepIdToIssues).length > 0 ? stepIdToIssues : undefined;
   }
 
   @Instrument()
   private async validateWorkflow(
     command: PostProcessWorkflowUpdateCommand
-  ): Promise<Record<keyof WorkflowResponseDto, RuntimeIssue[]>> {
+  ): Promise<Record<keyof WorkflowResponseDto, RuntimeIssueDto[]> | undefined> {
     // @ts-ignore
-    const issues: Record<keyof WorkflowResponseDto, RuntimeIssue[]> = {};
+    const issues: Record<keyof WorkflowResponseDto, RuntimeIssueDTO[]> = {};
     await this.addTriggerIdentifierNotUniqueIfApplicable(command, issues);
 
-    return issues;
+    return Object.keys(issues).length > 0 ? issues : undefined;
   }
 
   @Instrument()
@@ -155,18 +156,22 @@ export class PostProcessWorkflowUpdate {
 
   private updateIssuesOnWorkflow(
     workflow: WorkflowInternalResponseDto,
-    workflowIssues: Record<keyof WorkflowResponseDto, RuntimeIssue[]>,
-    stepIssuesMap: Record<string, StepIssues>
+    stepIssuesMap?: Record<string, StepIssues>,
+    workflowIssues?: Record<keyof WorkflowResponseDto, RuntimeIssueDto[]>
   ): WorkflowInternalResponseDto {
-    const issues = workflowIssues as unknown as Record<string, ContentIssue[]>;
-    for (const step of workflow.steps) {
-      if (stepIssuesMap[step._templateId]) {
+    const { steps } = workflow;
+    for (const step of steps) {
+      if (stepIssuesMap && stepIssuesMap[step._templateId]) {
         step.issues = stepIssuesMap[step._templateId];
       } else {
         step.issues = undefined;
       }
     }
 
-    return { ...workflow, issues };
+    return {
+      ...workflow,
+      steps,
+      issues: workflowIssues as unknown as Record<string, RuntimeIssue[]>,
+    };
   }
 }

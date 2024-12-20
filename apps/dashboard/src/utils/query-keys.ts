@@ -8,4 +8,5 @@ export const QueryKeys = Object.freeze({
   fetchTags: 'fetchTags',
   getApiKeys: 'getApiKeys',
   fetchIntegrations: 'fetchIntegrations',
+  fetchActivity: 'fetchActivity',
 });

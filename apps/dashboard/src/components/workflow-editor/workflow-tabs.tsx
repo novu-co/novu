@@ -10,10 +10,6 @@ export const WorkflowTabs = () => {
   const { workflow } = useWorkflow();
   const { currentEnvironment } = useEnvironment();
 
-  if (!currentEnvironment || !workflow) {
-    return null;
-  }
-
   return (
     <div className="flex h-full flex-1 flex-nowrap">
       <Tabs defaultValue="workflow" className="-mt-px flex h-full flex-1 flex-col" value="workflow">
@@ -21,8 +17,8 @@ export const WorkflowTabs = () => {
           <TabsTrigger value="workflow" asChild variant="regular">
             <Link
               to={buildRoute(ROUTES.EDIT_WORKFLOW, {
-                environmentSlug: currentEnvironment.slug!,
-                workflowSlug: workflow.slug,
+                environmentSlug: currentEnvironment?.slug ?? '',
+                workflowSlug: workflow?.slug ?? '',
               })}
             >
               Workflow
@@ -31,8 +27,8 @@ export const WorkflowTabs = () => {
           <TabsTrigger value="trigger" asChild variant="regular">
             <Link
               to={buildRoute(ROUTES.TEST_WORKFLOW, {
-                environmentSlug: currentEnvironment.slug!,
-                workflowSlug: workflow.slug,
+                environmentSlug: currentEnvironment?.slug ?? '',
+                workflowSlug: workflow?.slug ?? '',
               })}
             >
               Trigger
@@ -40,7 +36,7 @@ export const WorkflowTabs = () => {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="workflow" className="mt-0 h-full w-full" variant="regular">
-          <WorkflowCanvas steps={workflow.steps} />
+          <WorkflowCanvas steps={workflow?.steps || []} />
         </TabsContent>
       </Tabs>
     </div>

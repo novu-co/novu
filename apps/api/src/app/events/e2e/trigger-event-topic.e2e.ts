@@ -1,29 +1,26 @@
 import { MessageRepository, NotificationRepository, NotificationTemplateEntity, SubscriberEntity } from '@novu/dal';
 import {
   ChannelTypeEnum,
-  StepTypeEnum,
+  DigestTypeEnum,
+  DigestUnitEnum,
+  ExternalSubscriberId,
   IEmailBlock,
-  ISubscribersDefine,
-  ITopic,
-  TopicId,
+  StepTypeEnum,
   TopicKey,
   TopicName,
-  TriggerRecipients,
-  TriggerRecipientsTypeEnum,
-  ExternalSubscriberId,
-  DigestUnitEnum,
-  DigestTypeEnum,
 } from '@novu/shared';
 import { SubscribersService, UserSession } from '@novu/testing';
-import axios from 'axios';
 import { expect } from 'chai';
 
-import { TriggerEventRequestDto } from '../dtos';
-
-const axiosInstance = axios.create();
-
-const TOPIC_PATH = '/v1/topics';
-const TRIGGER_ENDPOINT = '/v1/events/trigger';
+import { Novu } from '@novu/api';
+import {
+  CreateTopicResponseDto,
+  SubscriberPayloadDto,
+  TopicPayloadDto,
+  TriggerEventRequestDto,
+  TriggerRecipientsTypeEnum,
+} from '@novu/api/models/components';
+import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
 describe('Topic Trigger Event', () => {
   describe('Trigger event for a topic - /v1/events/trigger (POST)', () => {
@@ -33,17 +30,15 @@ describe('Topic Trigger Event', () => {
     let secondSubscriber: SubscriberEntity;
     let subscribers: SubscriberEntity[];
     let subscriberService: SubscribersService;
-    let createdTopicDto: { _id: TopicId; key: TopicKey };
-    let to: TriggerRecipients;
-    let triggerEndpointUrl: string;
+    let createdTopicDto: CreateTopicResponseDto;
+    let to: Array<TopicPayloadDto | SubscriberPayloadDto | string>;
     const notificationRepository = new NotificationRepository();
     const messageRepository = new MessageRepository();
+    let novuClient: Novu;
 
     beforeEach(async () => {
       session = new UserSession();
       await session.initialize();
-
-      triggerEndpointUrl = `${session.serverUrl}${TRIGGER_ENDPOINT}`;
 
       template = await session.createTemplate();
       subscriberService = new SubscribersService(session.organization._id, session.environment._id);
@@ -55,22 +50,19 @@ describe('Topic Trigger Event', () => {
       const topicName = 'topic-name-trigger-event';
       createdTopicDto = await createTopic(session, topicKey, topicName);
       await addSubscribersToTopic(session, createdTopicDto, subscribers);
-      to = [{ type: TriggerRecipientsTypeEnum.TOPIC, topicKey: createdTopicDto.key }];
+      to = [{ type: TriggerRecipientsTypeEnum.Topic, topicKey: createdTopicDto.key }];
+      novuClient = initNovuClassSdk(session);
     });
 
     it('should trigger an event successfully', async () => {
-      const response = await axiosInstance.post(
-        triggerEndpointUrl,
-        buildTriggerRequestPayload(template, to),
-        buildTriggerRequestHeaders(session)
-      );
+      const response = await novuClient.trigger(buildTriggerRequestPayload(template, to));
 
-      const { data: body } = response;
+      const body = response.result;
 
-      expect(body.data).to.be.ok;
-      expect(body.data.status).to.equal('processed');
-      expect(body.data.acknowledged).to.equal(true);
-      expect(body.data.transactionId).to.exist;
+      expect(body).to.be.ok;
+      expect(body.status).to.equal('processed');
+      expect(body.acknowledged).to.equal(true);
+      expect(body.transactionId).to.exist;
     });
 
     it('should generate message and notification based on event', async () => {
@@ -85,11 +77,7 @@ describe('Topic Trigger Event', () => {
         },
       ];
 
-      const { data: body } = await axiosInstance.post(
-        triggerEndpointUrl,
-        buildTriggerRequestPayload(template, to, attachments),
-        buildTriggerRequestHeaders(session)
-      );
+      await novuClient.trigger(buildTriggerRequestPayload(template, to, attachments));
 
       await session.awaitRunningJobs(template._id);
 
@@ -143,11 +131,10 @@ describe('Topic Trigger Event', () => {
 
     it('should exclude actor from topic events trigger', async () => {
       const actor = firstSubscriber;
-      const { data: body } = await axiosInstance.post(
-        triggerEndpointUrl,
-        { ...buildTriggerRequestPayload(template, to), actor: { subscriberId: actor.subscriberId } },
-        buildTriggerRequestHeaders(session)
-      );
+      await novuClient.trigger({
+        ...buildTriggerRequestPayload(template, to),
+        actor: { subscriberId: actor.subscriberId },
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -195,14 +182,10 @@ describe('Topic Trigger Event', () => {
 
     it('should only exclude actor from topic, should send event if actor explicitly included', async () => {
       const actor = firstSubscriber;
-      const { data: body } = await axiosInstance.post(
-        triggerEndpointUrl,
-        {
-          ...buildTriggerRequestPayload(template, [...to, actor.subscriberId]),
-          actor: { subscriberId: actor.subscriberId },
-        },
-        buildTriggerRequestHeaders(session)
-      );
+      await novuClient.trigger({
+        ...buildTriggerRequestPayload(template, [...to, actor.subscriberId]),
+        actor: { subscriberId: actor.subscriberId },
+      });
 
       await session.awaitRunningJobs(template._id);
 
@@ -262,11 +245,7 @@ describe('Topic Trigger Event', () => {
         ],
       });
 
-      const { data: body } = await axiosInstance.post(
-        triggerEndpointUrl,
-        buildTriggerRequestPayload(template, to),
-        buildTriggerRequestHeaders(session)
-      );
+      await novuClient.trigger(buildTriggerRequestPayload(template, to));
 
       await session.awaitRunningJobs(template._id);
 
@@ -298,18 +277,16 @@ describe('Topic Trigger Event', () => {
     let firstTopicSubscribers: SubscriberEntity[];
     let subscribers: SubscriberEntity[];
     let subscriberService: SubscribersService;
-    let firstTopicDto: { _id: TopicId; key: TopicKey };
-    let secondTopicDto: { _id: TopicId; key: TopicKey };
-    let triggerEndpointUrl: string;
-    let to: TriggerRecipients;
+    let firstTopicDto: CreateTopicResponseDto;
+    let secondTopicDto: CreateTopicResponseDto;
+    let to: Array<TopicPayloadDto | SubscriberPayloadDto | string>;
     const notificationRepository = new NotificationRepository();
     const messageRepository = new MessageRepository();
+    let novuClient: Novu;
 
     beforeEach(async () => {
       session = new UserSession();
       await session.initialize();
-
-      triggerEndpointUrl = `${session.serverUrl}${TRIGGER_ENDPOINT}`;
 
       template = await session.createTemplate();
       subscriberService = new SubscribersService(session.organization._id, session.environment._id);
@@ -345,8 +322,8 @@ describe('Topic Trigger Event', () => {
         sixthSubscriber,
       ];
       to = [
-        { type: TriggerRecipientsTypeEnum.TOPIC, topicKey: firstTopicDto.key },
-        { type: TriggerRecipientsTypeEnum.TOPIC, topicKey: secondTopicDto.key },
+        { type: TriggerRecipientsTypeEnum.Topic, topicKey: firstTopicDto.key },
+        { type: TriggerRecipientsTypeEnum.Topic, topicKey: secondTopicDto.key },
         fifthSubscriber.subscriberId,
         {
           subscriberId: sixthSubscriber.subscriberId,
@@ -355,21 +332,18 @@ describe('Topic Trigger Event', () => {
           email: 'subscribers-define@email.novu',
         },
       ];
+      novuClient = initNovuClassSdk(session);
     });
 
     it('should trigger an event successfully', async () => {
-      const response = await axiosInstance.post(
-        triggerEndpointUrl,
-        buildTriggerRequestPayload(template, to),
-        buildTriggerRequestHeaders(session)
-      );
+      const response = await novuClient.trigger(buildTriggerRequestPayload(template, to));
 
-      const { data: body } = response;
+      const body = response.result;
 
-      expect(body.data).to.be.ok;
-      expect(body.data.status).to.equal('processed');
-      expect(body.data.acknowledged).to.equal(true);
-      expect(body.data.transactionId).to.exist;
+      expect(body).to.be.ok;
+      expect(body.status).to.equal('processed');
+      expect(body.acknowledged).to.equal(true);
+      expect(body.transactionId).to.exist;
     });
 
     it('should generate message and notification based on event', async () => {
@@ -384,11 +358,7 @@ describe('Topic Trigger Event', () => {
         },
       ];
 
-      const { data: body } = await axiosInstance.post(
-        triggerEndpointUrl,
-        buildTriggerRequestPayload(template, to, attachments),
-        buildTriggerRequestHeaders(session)
-      );
+      await novuClient.trigger(buildTriggerRequestPayload(template, to, attachments));
 
       await session.awaitRunningJobs(template._id);
       expect(subscribers.length).to.be.greaterThan(0);
@@ -449,11 +419,7 @@ describe('Topic Trigger Event', () => {
         ],
       });
 
-      const { data: body } = await axiosInstance.post(
-        triggerEndpointUrl,
-        buildTriggerRequestPayload(template, to),
-        buildTriggerRequestHeaders(session)
-      );
+      await novuClient.trigger(buildTriggerRequestPayload(template, to));
 
       await session.awaitRunningJobs(template._id);
 
@@ -491,29 +457,26 @@ describe('Topic Trigger Event', () => {
           },
         ],
       });
+      const toFirstTopic = [{ type: TriggerRecipientsTypeEnum.Topic, topicKey: firstTopicDto.key }];
 
-      const toFirstTopic: TriggerRecipients = [{ type: TriggerRecipientsTypeEnum.TOPIC, topicKey: firstTopicDto.key }];
-
-      await Promise.all([
-        triggerEvent(session, template, toFirstTopic, {
-          id: 'key-1',
-        }),
-        triggerEvent(session, template, toFirstTopic, {
-          id: 'key-1',
-        }),
-        triggerEvent(session, template, toFirstTopic, {
-          id: 'key-1',
-        }),
-        triggerEvent(session, template, toFirstTopic, {
-          id: 'key-2',
-        }),
-        triggerEvent(session, template, toFirstTopic, {
-          id: 'key-2',
-        }),
-        triggerEvent(session, template, toFirstTopic, {
-          id: 'key-2',
-        }),
-      ]);
+      await triggerEvent(session, template, toFirstTopic, {
+        id: 'key-1',
+      });
+      await triggerEvent(session, template, toFirstTopic, {
+        id: 'key-1',
+      });
+      await triggerEvent(session, template, toFirstTopic, {
+        id: 'key-1',
+      });
+      await triggerEvent(session, template, toFirstTopic, {
+        id: 'key-2',
+      });
+      await triggerEvent(session, template, toFirstTopic, {
+        id: 'key-2',
+      });
+      await triggerEvent(session, template, toFirstTopic, {
+        id: 'key-2',
+      });
 
       await session.awaitRunningJobs(template?._id, false, 0);
 
@@ -533,65 +496,42 @@ describe('Topic Trigger Event', () => {
   });
 });
 
-const createTopic = async (
-  session: UserSession,
-  key: TopicKey,
-  name: TopicName
-): Promise<{ _id: TopicId; key: TopicKey }> => {
-  const response = await axiosInstance.post(
-    `${session.serverUrl}${TOPIC_PATH}`,
-    {
-      key,
-      name,
-    },
-    {
-      headers: {
-        authorization: `ApiKey ${session.apiKey}`,
-      },
-    }
-  );
+const createTopic = async (session: UserSession, key: TopicKey, name: TopicName): Promise<CreateTopicResponseDto> => {
+  const response = await initNovuClassSdk(session).topics.create({ key, name });
 
-  expect(response.status).to.eql(201);
-  const body = response.data;
-  expect(body.data._id).to.exist;
-  expect(body.data.key).to.eql(key);
+  expect(response.result.id).to.exist;
+  expect(response.result.key).to.eql(key);
 
-  return body.data;
+  return response.result;
 };
 
 const addSubscribersToTopic = async (
   session: UserSession,
-  createdTopicDto: { _id: TopicId; key: TopicKey },
+  createdTopicDto: CreateTopicResponseDto,
   subscribers: SubscriberEntity[]
 ) => {
   const subscriberIds: ExternalSubscriberId[] = subscribers.map(
     (subscriber: SubscriberEntity) => subscriber.subscriberId
   );
 
-  const response = await axiosInstance.post(
-    `${session.serverUrl}${TOPIC_PATH}/${createdTopicDto.key}/subscribers`,
+  const response = await initNovuClassSdk(session).topics.subscribers.assign(
     {
       subscribers: subscriberIds,
     },
-    {
-      headers: {
-        authorization: `ApiKey ${session.apiKey}`,
-      },
-    }
+    createdTopicDto.key
   );
 
-  expect(response.status).to.be.eq(200);
-  expect(response.data.data).to.be.eql({
+  expect(response.result).to.be.eql({
     succeeded: subscriberIds,
   });
 };
 
 const buildTriggerRequestPayload = (
   template: NotificationTemplateEntity,
-  to: (string | ITopic | ISubscribersDefine)[],
+  to: (string | TopicPayloadDto | SubscriberPayloadDto)[],
   attachments?: Record<string, unknown>[]
 ): TriggerEventRequestDto => {
-  const payload = {
+  return {
     name: template.triggers[0].identifier,
     to,
     payload: {
@@ -600,33 +540,17 @@ const buildTriggerRequestPayload = (
       ...(attachments && { attachments }),
     },
   };
-
-  return payload;
 };
-
-const buildTriggerRequestHeaders = (session: UserSession) => ({
-  headers: {
-    authorization: `ApiKey ${session.apiKey}`,
-  },
-});
 
 const triggerEvent = async (
   session: UserSession,
   template: NotificationTemplateEntity,
-  to: (string | ITopic | ISubscribersDefine)[],
+  to: (string | TopicPayloadDto | SubscriberPayloadDto)[],
   payload: Record<string, unknown> = {}
 ): Promise<void> => {
-  await axiosInstance.post(
-    `${session.serverUrl}/v1/events/trigger`,
-    {
-      name: template.triggers[0].identifier,
-      to,
-      payload,
-    },
-    {
-      headers: {
-        authorization: `ApiKey ${session.apiKey}`,
-      },
-    }
-  );
+  await initNovuClassSdk(session).trigger({
+    name: template.triggers[0].identifier,
+    to,
+    payload,
+  });
 };
