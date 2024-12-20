@@ -555,7 +555,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        code: ['Ubuntu', 'monospace'],
+        code: ['JetBrains Mono', 'monospace'],
       },
       opacity: {
         2.5: 0.025,

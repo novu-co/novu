@@ -1,13 +1,21 @@
+import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { RiAccountPinBoxFill } from 'react-icons/ri';
+import { autocompletion } from '@codemirror/autocomplete';
 
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { Input, InputFieldPure } from '@/components/primitives/input';
-import { cn } from '@/utils/ui';
+import { InputFieldPure } from '@/components/primitives/input';
 import { Code2 } from '@/components/icons/code-2';
+import { Editor } from '@/components/primitives/editor';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
+import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
+import { completions } from '@/utils/liquid-autocomplete';
 
 export const DigestKey = () => {
   const { control } = useFormContext();
+  const { step } = useWorkflow();
+  const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
+  const extensions = useMemo(() => [autocompletion({ override: [completions(variables)] })], [variables]);
 
   return (
     <FormField
@@ -22,18 +30,21 @@ export const DigestKey = () => {
                 <span>Aggregated by</span>
               </span>
             </FormLabel>
-            <InputFieldPure className="h-7 rounded-lg border pr-0">
+            <InputFieldPure className="h-7 items-center gap-0 rounded-lg border">
               <FormLabel className="flex h-full items-center gap-1 border-r border-neutral-100 pr-1">
                 <Code2 className="-ml-1.5 size-5" />
-                <span className="text-foreground-600 mt-[1px] text-xs font-normal">subscriberId</span>
+                <span className="text-foreground-600 text-xs font-normal">subscriberId</span>
               </FormLabel>
               <FormControl>
-                <Input
-                  className={cn(
-                    'min-w-[20ch] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
-                  )}
+                <Editor
+                  fontFamily="inherit"
+                  ref={field.ref}
                   placeholder="Add additional digest..."
-                  {...field}
+                  className="overflow-x-auto [&_.cm-line]:mt-px"
+                  id={field.name}
+                  extensions={extensions}
+                  value={field.value}
+                  onChange={field.onChange}
                 />
               </FormControl>
             </InputFieldPure>

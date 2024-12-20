@@ -1,16 +1,16 @@
-import { useMemo } from 'react';
-import { type WidgetProps } from '@rjsf/utils';
-import { useFormContext } from 'react-hook-form';
-import { EditorView } from '@uiw/react-codemirror';
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { completions } from '@/utils/liquid-autocomplete';
+import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
 import { autocompletion } from '@codemirror/autocomplete';
+import { type WidgetProps } from '@rjsf/utils';
+import { EditorView } from '@uiw/react-codemirror';
+import { useMemo } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { getFieldName } from './template-utils';
-import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
-import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 export function TextWidget(props: WidgetProps) {
   const { label, readonly, disabled, id, required } = props;

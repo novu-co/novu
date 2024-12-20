@@ -1,3 +1,6 @@
+import { useCallback, useEffect, useMemo } from 'react';
+import isEqual from 'lodash.isequal';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   type StepDataDto,
@@ -6,26 +9,23 @@ import {
   UpdateWorkflowDto,
   type WorkflowResponseDto,
 } from '@novu/shared';
-import isEqual from 'lodash.isequal';
-import merge from 'lodash.merge';
-import { useCallback, useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
 
-import { Form } from '@/components/primitives/form/form';
 import { flattenIssues, updateStepInWorkflow } from '@/components/workflow-editor/step-utils';
+import { Form } from '@/components/primitives/form/form';
 import { EmailTabs } from '@/components/workflow-editor/steps/email/email-tabs';
+import { getStepDefaultValues } from '@/components/workflow-editor/step-default-values';
 import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
 import { PushTabs } from '@/components/workflow-editor/steps/push/push-tabs';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { SmsTabs } from '@/components/workflow-editor/steps/sms/sms-tabs';
+import { ChatTabs } from '@/components/workflow-editor/steps/chat/chat-tabs';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { buildDefaultValues, buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
-import { CommonCustomControlValues } from './common/common-custom-control-values';
-import { OtherStepTabs } from './other-steps-tabs';
+import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
+import { CommonCustomControlValues } from '@/components/workflow-editor/steps/common/common-custom-control-values';
 
 const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
   [StepTypeEnum.EMAIL]: EmailTabs,
-  [StepTypeEnum.CHAT]: OtherStepTabs,
+  [StepTypeEnum.CHAT]: ChatTabs,
   [StepTypeEnum.IN_APP]: InAppTabs,
   [StepTypeEnum.SMS]: SmsTabs,
   [StepTypeEnum.PUSH]: PushTabs,
@@ -33,15 +33,6 @@ const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) =
   [StepTypeEnum.DELAY]: CommonCustomControlValues,
   [StepTypeEnum.TRIGGER]: () => null,
   [StepTypeEnum.CUSTOM]: () => null,
-};
-
-// Use the UI Schema to build the default values if it exists else use the data schema (code-first approach) values
-const calculateDefaultValues = (step: StepDataDto) => {
-  if (Object.keys(step.controls.uiSchema ?? {}).length !== 0) {
-    return merge(buildDefaultValues(step.controls.uiSchema ?? {}), step.controls.values);
-  }
-
-  return merge(buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {}), step.controls.values);
 };
 
 export type StepEditorProps = {
@@ -57,9 +48,7 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
   const { workflow, step, update } = props;
   const schema = useMemo(() => buildDynamicZodSchema(step.controls.dataSchema ?? {}), [step.controls.dataSchema]);
 
-  const defaultValues = useMemo(() => {
-    return calculateDefaultValues(step);
-  }, [step]);
+  const defaultValues = useMemo(() => getStepDefaultValues(step), [step]);
 
   const form = useForm({
     resolver: zodResolver(schema),

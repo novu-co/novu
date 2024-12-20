@@ -4,12 +4,17 @@ import { JobStatusEnum } from '@novu/shared';
 import { Loader2 } from 'lucide-react';
 import { WorkflowTriggerInboxIllustration } from '../../icons/workflow-trigger-inbox';
 import { useFetchActivities } from '../../../hooks/use-fetch-activities';
+import { QueryKeys } from '../../../utils/query-keys';
+import { useEnvironment } from '../../../context/environment/hooks';
+import { useQueryClient } from '@tanstack/react-query';
 
 type TestWorkflowLogsSidebarProps = {
   transactionId?: string;
 };
 
 export const TestWorkflowLogsSidebar = ({ transactionId }: TestWorkflowLogsSidebarProps) => {
+  const queryClient = useQueryClient();
+  const { currentEnvironment } = useEnvironment();
   const [shouldRefetch, setShouldRefetch] = useState(true);
   const { activities } = useFetchActivities(
     {
@@ -28,7 +33,11 @@ export const TestWorkflowLogsSidebar = ({ transactionId }: TestWorkflowLogsSideb
     const isPending = activity.jobs?.some((job) => job.status === JobStatusEnum.PENDING);
 
     // Only stop refetching if we have an activity and it's not pending
-    setShouldRefetch(!activity || isPending);
+    setShouldRefetch(isPending);
+
+    queryClient.invalidateQueries({
+      queryKey: [QueryKeys.fetchActivity, currentEnvironment?._id, activity._id],
+    });
   }, [activities]);
 
   // Reset refetch when transaction ID changes

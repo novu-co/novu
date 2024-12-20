@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { render as mailyRender } from '@maily-to/render';
 import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import isEmpty from 'lodash/isEmpty';
+import { Liquid } from 'liquidjs';
 import { FullPayloadForRender, RenderCommand } from './render-command';
 import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.usecase';
 import { emailStepControlZodSchema } from '../../../workflows-v2/shared';
@@ -21,10 +22,26 @@ export class RenderEmailOutputUsecase {
       return { subject, body: '' };
     }
 
-    const expandedSchema = this.transformForAndShowLogic(body, renderCommand.fullPayloadForRender);
-    const htmlRendered = await this.renderEmail(expandedSchema);
+    const expandedMailyContent = this.transformForAndShowLogic(body, renderCommand.fullPayloadForRender);
+    const parsedTipTap = await this.parseTipTapNodeByLiquid(expandedMailyContent, renderCommand);
+    const renderedHtml = await this.renderEmail(parsedTipTap);
 
-    return { subject, body: htmlRendered };
+    return { subject, body: renderedHtml };
+  }
+
+  private async parseTipTapNodeByLiquid(
+    value: TipTapNode,
+    renderCommand: RenderEmailOutputCommand
+  ): Promise<TipTapNode> {
+    const client = new Liquid();
+    const templateString = client.parse(JSON.stringify(value));
+    const parsedTipTap = await client.render(templateString, {
+      payload: renderCommand.fullPayloadForRender.payload,
+      subscriber: renderCommand.fullPayloadForRender.subscriber,
+      steps: renderCommand.fullPayloadForRender.steps,
+    });
+
+    return JSON.parse(parsedTipTap);
   }
 
   @Instrument()
