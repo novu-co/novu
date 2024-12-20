@@ -1,7 +1,7 @@
 import { IEnvironment, IIntegration } from '@novu/shared';
-import { ITableIntegration } from '../types';
+import { TableIntegration } from '../types';
 
-export function mapToTableIntegration(integration: IIntegration, environments: IEnvironment[]): ITableIntegration {
+export function mapToTableIntegration(integration: IIntegration, environments: IEnvironment[]): TableIntegration {
   const environment = environments.find((env) => env._id === integration._environmentId);
 
   return {

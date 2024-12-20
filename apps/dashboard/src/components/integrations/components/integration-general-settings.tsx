@@ -93,7 +93,13 @@ export function GeneralSettings({ control, mode, hidePrimarySelector, disabledPr
       <FormField
         control={control}
         name="identifier"
-        rules={{ required: 'Identifier is required' }}
+        rules={{
+          required: 'Identifier is required',
+          pattern: {
+            value: /^[^\s]+$/,
+            message: 'Identifier cannot contain spaces',
+          },
+        }}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="text-xs" htmlFor="identifier">

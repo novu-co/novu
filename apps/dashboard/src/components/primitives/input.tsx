@@ -3,6 +3,7 @@ import * as React from 'react';
 import { cn } from '@/utils/ui';
 import { cva, VariantProps } from 'class-variance-authority';
 import { useFormField } from './form/form-context';
+import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../utils/constants';
 
 export const inputVariants = cva(
   'file:text-foreground placeholder:text-foreground-300 flex h-full w-full bg-transparent text-xs file:border-0 file:bg-transparent file:font-medium focus-visible:outline-none disabled:cursor-not-allowed'
@@ -95,7 +96,15 @@ InputField.displayName = 'InputField';
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type, ...props }, ref) => {
-  return <input type={type} className={cn(inputVariants(), className)} ref={ref} {...props} />;
+  return (
+    <input
+      type={type}
+      {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
+      className={cn(inputVariants(), className)}
+      ref={ref}
+      {...props}
+    />
+  );
 });
 Input.displayName = 'Input';
 
