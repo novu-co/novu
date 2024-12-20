@@ -42,6 +42,7 @@ export function UpdateIntegrationSidebar({ isOpened }: UpdateIntegrationSidebarP
     existingPrimaryIntegration,
     isChannelSupportPrimary,
     hasOtherProviders,
+    hasSameChannelActiveIntegration,
   } = useIntegrationPrimaryModal({
     onSubmit,
     integrations,
@@ -63,15 +64,7 @@ export function UpdateIntegrationSidebar({ isOpened }: UpdateIntegrationSidebarP
 
     // If the integration was primary and is being unmarked or deactivated
     if (!skipPrimaryCheck && integration.primary && ((!data.primary && data.active) || !data.active)) {
-      const otherActiveIntegrationsInChannel = integrations?.filter(
-        (i) =>
-          i._id !== integration._id &&
-          i.channel === integration.channel &&
-          i.active &&
-          i._environmentId === integration._environmentId
-      );
-
-      if (otherActiveIntegrationsInChannel && otherActiveIntegrationsInChannel.length > 0) {
+      if (hasSameChannelActiveIntegration) {
         setIsPrimaryModalOpen(true);
         setPendingData(data);
         return;
@@ -103,10 +96,14 @@ export function UpdateIntegrationSidebar({ isOpened }: UpdateIntegrationSidebarP
     }
   }
 
-  const onDelete = async () => {
+  const onDelete = async (newPrimaryIntegrationId?: string) => {
     if (!integration) return;
 
     try {
+      if (newPrimaryIntegrationId) {
+        await setPrimaryIntegration({ integrationId: newPrimaryIntegrationId });
+      }
+
       await deleteIntegration({ id: integration._id });
 
       showSuccessToast('Integration deleted successfully');
@@ -165,6 +162,13 @@ export function UpdateIntegrationSidebar({ isOpened }: UpdateIntegrationSidebarP
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={onDelete}
         isPrimary={integration.primary}
+        otherIntegrations={integrations?.filter(
+          (i) =>
+            i._id !== integration?._id &&
+            i.channel === integration?.channel &&
+            i.active &&
+            i._environmentId === integration?._environmentId
+        )}
       />
 
       <SelectPrimaryIntegrationModal

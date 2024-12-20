@@ -44,12 +44,11 @@ export function useIntegrationPrimaryModal({
 
   const existingPrimaryIntegration = filteredIntegrations.find((el) => el.primary);
   const hasOtherProviders = filteredIntegrations.length;
+  const hasSameChannelActiveIntegration = filteredIntegrations.find((el) => el.active);
 
   const shouldShowPrimaryModal = (data: IntegrationFormData) => {
     if (!channel && !integration) return false;
     if (!isChannelSupportPrimary) return false;
-
-    const hasSameChannelActiveIntegration = filteredIntegrations.find((el) => el.active);
 
     return data.active && data.primary && hasSameChannelActiveIntegration && existingPrimaryIntegration;
   };
@@ -97,5 +96,6 @@ export function useIntegrationPrimaryModal({
     handlePrimaryConfirm,
     existingPrimaryIntegration,
     hasOtherProviders,
+    hasSameChannelActiveIntegration,
   };
 }
