@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { OrganizationRepository } from '@novu/dal';
-import { GetPlainCardsCommand } from './get-plain-cards.command';
+import { PlainCardsCommand } from './plain-cards.command';
 
 @Injectable()
-export class FetchUserOrganizationsUsecase {
+export class PlainCardsUsecase {
   constructor(private organizationRepository: OrganizationRepository) {}
-  async execute(command: GetPlainCardsCommand) {
+  async fetchUserOrganizations(command: PlainCardsCommand) {
     if (!command?.customer?.externalId) {
       return {
         data: {},

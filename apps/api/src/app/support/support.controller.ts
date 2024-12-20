@@ -4,21 +4,21 @@ import { UserSessionData } from '@novu/shared';
 import { CreateSupportThreadDto } from './dto/create-thread.dto';
 import { CreateSupportThreadCommand } from './usecases/create-thread.command';
 import { PlainCardRequestDto } from './dto/plain-card.dto';
-import { GetPlainCardsCommand } from './usecases/get-plain-cards.command';
-import { FetchUserOrganizationsUsecase, CreateSupportThreadUsecase } from './usecases';
+import { PlainCardsCommand } from './usecases/plain-cards.command';
+import { CreateSupportThreadUsecase, PlainCardsUsecase } from './usecases';
 import { PlainCardsGuard } from './guards/plain-cards.guard';
 
 @Controller('/support')
 export class SupportController {
   constructor(
     private createSupportThreadUsecase: CreateSupportThreadUsecase,
-    private fetchUserOrganizationsUsecase: FetchUserOrganizationsUsecase
+    private plainCardsUsercase: PlainCardsUsecase
   ) {}
 
   @UseGuards(PlainCardsGuard)
   @Post('user-organizations')
-  async getUserOrganizations(@Body() body: PlainCardRequestDto) {
-    return this.fetchUserOrganizationsUsecase.execute(GetPlainCardsCommand.create({ ...body }));
+  async fetchUserOrganizations(@Body() body: PlainCardRequestDto) {
+    return this.plainCardsUsercase.fetchUserOrganizations(PlainCardsCommand.create({ ...body }));
   }
 
   @UseGuards(UserAuthGuard)
