@@ -12,13 +12,13 @@ import { PlainCardsGuard } from './guards/plain-cards.guard';
 export class SupportController {
   constructor(
     private createSupportThreadUsecase: CreateSupportThreadUsecase,
-    private plainCardsUsercase: PlainCardsUsecase
+    private plainCardsUsecase: PlainCardsUsecase
   ) {}
 
   @UseGuards(PlainCardsGuard)
   @Post('user-organizations')
   async fetchUserOrganizations(@Body() body: PlainCardRequestDto) {
-    return this.plainCardsUsercase.fetchUserOrganizations(PlainCardsCommand.create({ ...body }));
+    return this.plainCardsUsecase.fetchUserOrganizations(PlainCardsCommand.create({ ...body }));
   }
 
   @UseGuards(UserAuthGuard)
