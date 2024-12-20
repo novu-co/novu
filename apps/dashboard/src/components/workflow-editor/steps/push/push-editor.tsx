@@ -1,20 +1,19 @@
-import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
-import { PushTabsSection } from '@/components/workflow-editor/steps/push/push-tabs-section';
-import { type UiSchema } from '@novu/shared';
 import { RiCellphoneFill } from 'react-icons/ri';
+import { type UiSchema } from '@novu/shared';
 
-const subjectKey = 'subject';
-const bodyKey = 'body';
+import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
+import { TabsSection } from '@/components/workflow-editor/steps/tabs-section';
 
 type PushEditorProps = { uiSchema: UiSchema };
+
 export const PushEditor = (props: PushEditorProps) => {
   const { uiSchema } = props;
-  const { [bodyKey]: body, [subjectKey]: subject } = uiSchema?.properties ?? {};
+  const { body, subject } = uiSchema?.properties ?? {};
 
   return (
     <div className="flex h-full flex-col">
-      <PushTabsSection className="py-5">
-        <div className="flex items-center gap-2.5 pb-2 text-sm font-medium">
+      <TabsSection>
+        <div className="flex items-center gap-2.5 text-sm font-medium">
           <RiCellphoneFill className="size-3" />
           <span>Push template editor</span>
         </div>
@@ -22,7 +21,7 @@ export const PushEditor = (props: PushEditorProps) => {
           {getComponentByType({ component: subject.component })}
           {getComponentByType({ component: body.component })}
         </div>
-      </PushTabsSection>
+      </TabsSection>
     </div>
   );
 };

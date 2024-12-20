@@ -7,10 +7,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Button } from '@/components/primitives/button';
 import { Editor } from '@/components/primitives/editor';
 import { SmsPreview } from '@/components/workflow-editor/steps/sms/sms-preview';
-import { SmsTabsSection } from '@/components/workflow-editor/steps/sms/sms-tabs-section';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { useEditorPreview } from '../use-editor-preview';
 import { InlineToast } from '@/components/primitives/inline-toast';
+import { TabsSection } from '@/components/workflow-editor/steps/tabs-section';
 
 const getInitialAccordionValue = (value: string) => {
   try {
@@ -57,7 +57,7 @@ export const SmsEditorPreview = ({ workflow, step, formValues }: SmsEditorPrevie
   }, [editorValue]);
 
   return (
-    <SmsTabsSection>
+    <TabsSection>
       <div className="relative flex flex-col gap-3">
         <div className="flex items-center gap-2.5 text-sm font-medium">
           <Sms className="size-3" />
@@ -111,6 +111,6 @@ export const SmsEditorPreview = ({ workflow, step, formValues }: SmsEditorPrevie
           </AccordionItem>
         </Accordion>
       </div>
-    </SmsTabsSection>
+    </TabsSection>
   );
 };

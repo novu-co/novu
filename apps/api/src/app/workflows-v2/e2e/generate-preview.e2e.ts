@@ -409,7 +409,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
       result: {
         preview: {
           subject: 'Welcome John',
-          body: 'Hello John, your order #{{payload.orderId}} is ready!', // orderId is not defined in the payload schema
+          body: 'Hello John, your order #undefined is ready!', // orderId is not defined in the payload schema or clientVariablesExample
         },
         type: 'in_app',
       },
@@ -417,7 +417,35 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
         payload: {
           lastName: '{{payload.lastName}}',
           organizationName: '{{payload.organizationName}}',
-          orderId: '{{payload.orderId}}',
+          firstName: 'John',
+        },
+      },
+    });
+
+    const response2 = await session.testAgent.post(`/v2/workflows/${workflow._id}/step/${stepId}/preview`).send({
+      controlValues,
+      previewPayload: {
+        payload: {
+          firstName: 'John',
+          orderId: '123456', // orderId is will override the variable example that driven by workflow payload schema
+        },
+      },
+    });
+
+    expect(response2.status).to.equal(201);
+    expect(response2.body.data).to.deep.equal({
+      result: {
+        preview: {
+          subject: 'Welcome John',
+          body: 'Hello John, your order #123456 is ready!', // orderId is not defined in the payload schema
+        },
+        type: 'in_app',
+      },
+      previewPayloadExample: {
+        payload: {
+          lastName: '{{payload.lastName}}',
+          organizationName: '{{payload.organizationName}}',
+          orderId: '123456',
           firstName: 'John',
         },
       },
@@ -489,6 +517,151 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
         preview: {},
       },
       previewPayloadExample: {},
+    });
+  });
+
+  it('should transform tip tap node to liquid variables', async () => {
+    const workflow = await createWorkflow();
+
+    const stepId = workflow.steps[1]._id; // Using the email step (second step)
+    const bodyControlValue = {
+      type: 'doc',
+      content: [
+        {
+          type: 'heading',
+          attrs: { textAlign: 'left', level: 1 },
+          content: [
+            { type: 'text', text: 'New Maily Email Editor ' },
+            { type: 'variable', attrs: { id: 'payload.foo', label: null, fallback: null, showIfKey: null } },
+            { type: 'text', text: ' ' },
+          ],
+        },
+        {
+          type: 'paragraph',
+          attrs: { textAlign: 'left' },
+          content: [
+            { type: 'text', text: 'free text last name is: ' },
+            {
+              type: 'variable',
+              attrs: { id: 'subscriber.lastName', label: null, fallback: null, showIfKey: `payload.show` },
+            },
+            { type: 'text', text: ' ' },
+            { type: 'hardBreak' },
+            { type: 'text', text: 'extra data : ' },
+            { type: 'variable', attrs: { id: 'payload.extraData', label: null, fallback: null, showIfKey: null } },
+            { type: 'text', text: ' ' },
+          ],
+        },
+      ],
+    };
+    const controlValues = {
+      subject: 'Hello {{subscriber.firstName}} World!',
+      body: JSON.stringify(bodyControlValue),
+    };
+
+    const { status, body } = await session.testAgent.post(`/v2/workflows/${workflow._id}/step/${stepId}/preview`).send({
+      controlValues,
+      previewPayload: {},
+    });
+
+    expect(status).to.equal(201);
+    expect(body.data.result.type).to.equal('email');
+    expect(body.data.result.preview.subject).to.equal('Hello {{subscriber.firstName}} World!');
+    expect(body.data.result.preview.body).to.include('{{subscriber.lastName}}');
+    expect(body.data.result.preview.body).to.include('{{payload.foo}}');
+    // expect(body.data.result.preview.body).to.include('{{payload.show}}');
+    expect(body.data.result.preview.body).to.include('{{payload.extraData}}');
+    expect(body.data.previewPayloadExample).to.deep.equal({
+      subscriber: {
+        firstName: '{{subscriber.firstName}}',
+        lastName: '{{subscriber.lastName}}',
+      },
+      payload: {
+        foo: '{{payload.foo}}',
+        show: '{{payload.show}}',
+        extraData: '{{payload.extraData}}',
+      },
+    });
+  });
+
+  it('should render tip tap node with api client variables example', async () => {
+    const workflow = await createWorkflow();
+
+    const stepId = workflow.steps[1]._id; // Using the email step (second step)
+    const bodyControlValue = {
+      type: 'doc',
+      content: [
+        {
+          type: 'heading',
+          attrs: { textAlign: 'left', level: 1 },
+          content: [
+            { type: 'text', text: 'New Maily Email Editor ' },
+            { type: 'variable', attrs: { id: 'payload.foo', label: null, fallback: null, showIfKey: null } },
+            { type: 'text', text: ' ' },
+          ],
+        },
+        {
+          type: 'paragraph',
+          attrs: { textAlign: 'left' },
+          content: [
+            { type: 'text', text: 'free text last name is: ' },
+            {
+              type: 'variable',
+              attrs: { id: 'subscriber.lastName', label: null, fallback: null, showIfKey: `payload.show` },
+            },
+            { type: 'text', text: ' ' },
+            { type: 'hardBreak' },
+            { type: 'text', text: 'extra data : ' },
+            {
+              type: 'variable',
+              attrs: {
+                id: 'payload.extraData',
+                label: null,
+                fallback: 'fallback extra data is awesome',
+                showIfKey: null,
+              },
+            },
+            { type: 'text', text: ' ' },
+          ],
+        },
+      ],
+    };
+    const controlValues = {
+      subject: 'Hello {{subscriber.firstName}} World!',
+      body: JSON.stringify(bodyControlValue),
+    };
+
+    const { status, body } = await session.testAgent.post(`/v2/workflows/${workflow._id}/step/${stepId}/preview`).send({
+      controlValues,
+      previewPayload: {
+        subscriber: {
+          firstName: 'John',
+          // lastName: 'Doe',
+        },
+        payload: {
+          foo: 'foo from client',
+          show: false,
+          extraData: '',
+        },
+      },
+    });
+
+    expect(status).to.equal(201);
+    expect(body.data.result.type).to.equal('email');
+    expect(body.data.result.preview.subject).to.equal('Hello John World!');
+    expect(body.data.result.preview.body).to.include('{{subscriber.lastName}}');
+    expect(body.data.result.preview.body).to.include('foo from client');
+    expect(body.data.result.preview.body).to.include('fallback extra data is awesome');
+    expect(body.data.previewPayloadExample).to.deep.equal({
+      subscriber: {
+        firstName: 'John',
+        lastName: '{{subscriber.lastName}}',
+      },
+      payload: {
+        foo: 'foo from client',
+        show: false,
+        extraData: '',
+      },
     });
   });
 

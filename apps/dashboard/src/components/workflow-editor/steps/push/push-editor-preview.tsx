@@ -1,14 +1,15 @@
 import { CSSProperties, useEffect, useRef, useState } from 'react';
+import { RiCellphoneFill } from 'react-icons/ri';
 import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
+
 import { Code2 } from '@/components/icons/code-2';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
 import { Button } from '@/components/primitives/button';
 import { Editor } from '@/components/primitives/editor';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
-import { useEditorPreview } from '../use-editor-preview';
-import { PushPreview } from './push-preview';
-import { RiCellphoneFill } from 'react-icons/ri';
-import { PushTabsSection } from './push-tabs-section';
+import { useEditorPreview } from '@/components/workflow-editor/steps/use-editor-preview';
+import { PushPreview } from '@/components/workflow-editor/steps/push/push-preview';
+import { TabsSection } from '@/components/workflow-editor/steps/tabs-section';
 import { InlineToast } from '@/components/primitives/inline-toast';
 
 const getInitialAccordionValue = (value: string) => {
@@ -56,7 +57,7 @@ export const PushEditorPreview = ({ workflow, step, formValues }: PushEditorPrev
   }, [editorValue]);
 
   return (
-    <PushTabsSection>
+    <TabsSection>
       <div className="relative flex flex-col gap-3">
         <div className="flex items-center gap-2.5 pb-2 text-sm font-medium">
           <RiCellphoneFill className="size-3" />
@@ -110,6 +111,6 @@ export const PushEditorPreview = ({ workflow, step, formValues }: PushEditorPrev
           </AccordionItem>
         </Accordion>
       </div>
-    </PushTabsSection>
+    </TabsSection>
   );
 };
