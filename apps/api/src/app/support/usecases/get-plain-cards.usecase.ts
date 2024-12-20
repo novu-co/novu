@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { SupportService } from '@novu/application-generic';
 import { OrganizationRepository } from '@novu/dal';
 import { GetPlainCardsCommand } from './get-plain-cards.command';
 
@@ -166,7 +165,7 @@ export class FetchUserOrganizationsUsecase {
                   rowAsideContent: [
                     {
                       componentText: {
-                        text: organization?.apiServiceLevel,
+                        text: organization?.apiServiceLevel || 'NA',
                       },
                     },
                   ],
