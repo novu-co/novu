@@ -8,7 +8,8 @@ const PERIOD_OPTIONS = [
   { value: PeriodValues.DAY, label: 'day' },
   { value: PeriodValues.WEEK, label: 'week' },
   { value: PeriodValues.MONTH, label: 'month' },
-  { value: PeriodValues.YEAR, label: 'year' },
+  // disable the year option for now as it might affect Redis memory and performance
+  // { value: PeriodValues.YEAR, label: 'year' },
 ];
 
 export const Period = ({
