@@ -21,6 +21,7 @@ import {
   StepUpdateDto,
   UpdateWorkflowDto,
   UserSessionData,
+  StepTypeEnum,
   WorkflowCreationSourceEnum,
   WorkflowOriginEnum,
   WorkflowResponseDto,
@@ -29,6 +30,7 @@ import {
   WorkflowStatusEnum,
   StepIssues,
   ControlSchemas,
+  DigestUnitEnum,
 } from '@novu/shared';
 import {
   CreateWorkflow as CreateWorkflowGeneric,
@@ -42,13 +44,18 @@ import {
   UpdateWorkflow as UpdateWorkflowGeneric,
   UpdateWorkflowCommand,
   WorkflowInternalResponseDto,
+  TierRestrictionsValidateUsecase,
+  UpsertControlValuesCommand,
+  DeleteControlValuesCommand,
+  UpsertControlValuesUseCase,
+  DeleteControlValuesUseCase,
+  TierRestrictionsValidateCommand,
 } from '@novu/application-generic';
 
-import { UpsertWorkflowCommand } from './upsert-workflow.command';
+import { UpsertWorkflowCommand, UpsertWorkflowDataCommand } from './upsert-workflow.command';
 import { stepTypeToControlSchema } from '../../shared';
 import { PatchStepUsecase } from '../patch-step-data';
 import { GetWorkflowCommand, GetWorkflowUseCase } from '../get-workflow';
-import { UpsertWorkflowDataCommand } from './upsert-workflow-data.command';
 import { buildVariables } from '../../util/build-variables';
 import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
 
@@ -60,16 +67,18 @@ export class UpsertWorkflowUseCase {
     private notificationGroupRepository: NotificationGroupRepository,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private getWorkflowUseCase: GetWorkflowUseCase,
-    private patchStepDataUsecase: PatchStepUsecase,
     private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase,
-    private controlValuesRepository: ControlValuesRepository
+    private controlValuesRepository: ControlValuesRepository,
+    private upsertControlValuesUseCase: UpsertControlValuesUseCase,
+    private deleteControlValuesUseCase: DeleteControlValuesUseCase,
+    private tierRestrictionsValidateUsecase: TierRestrictionsValidateUsecase
   ) {}
 
   @InstrumentUsecase()
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
     const workflowForUpdate = await this.queryWorkflow(command);
-    let persistedWorkflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
-    persistedWorkflow = await this.upsertControlValues(persistedWorkflow, command);
+    const persistedWorkflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
+    await this.upsertControlValues(persistedWorkflow, command);
     const workflow = await this.getWorkflowUseCase.execute(
       GetWorkflowCommand.create({
         workflowIdOrInternalId: persistedWorkflow._id,
@@ -78,18 +87,6 @@ export class UpsertWorkflowUseCase {
     );
 
     return workflow;
-  }
-
-  @Instrument()
-  private async getWorkflow(workflowId: string, command: UpsertWorkflowCommand): Promise<WorkflowInternalResponseDto> {
-    return await this.getWorkflowByIdsUseCase.execute(
-      GetWorkflowByIdsCommand.create({
-        environmentId: command.user.environmentId,
-        organizationId: command.user.organizationId,
-        userId: command.user._id,
-        workflowIdOrInternalId: workflowId,
-      })
-    );
   }
 
   @Instrument()
@@ -316,8 +313,10 @@ export class UpsertWorkflowUseCase {
 
     const controlIssues = processControlValuesBySchema(controlSchemas?.schema, controlValueLocal || {});
     const liquidTemplateIssues = processControlValuesByLiquid(variableSchema, controlValueLocal || {});
+    const customIssues = await this.processCustomControlValues(user, step.type, controlValueLocal || {});
+    const customControlIssues = _.isEmpty(customIssues) ? {} : { controls: customIssues };
 
-    return _.merge(controlIssues, liquidTemplateIssues);
+    return _.merge(controlIssues, liquidTemplateIssues, customControlIssues);
   }
 
   private getPersistedStepIfFound(
@@ -351,29 +350,60 @@ export class UpsertWorkflowUseCase {
     )?._id;
   }
 
-  /**
-   * @deprecated This method will be removed in future versions.
-   * Please use `the patch step data instead, do not add here anything` instead.
-   */
   @Instrument()
   private async upsertControlValues(
     workflow: NotificationTemplateEntity,
     command: UpsertWorkflowCommand
-  ): Promise<WorkflowInternalResponseDto> {
-    for (const step of workflow.steps) {
-      const controlValues = this.findControlValueInRequest(step, command.workflowDto.steps);
-      if (controlValues === undefined) {
-        continue;
-      }
-      await this.patchStepDataUsecase.execute({
-        controlValues,
-        workflowIdOrInternalId: workflow._id,
-        stepIdOrInternalId: step._templateId,
-        user: command.user,
-      });
+  ): Promise<void> {
+    const controlValuesUpdates = this.getControlValuesUpdates(workflow.steps, command);
+    if (controlValuesUpdates.length === 0) return;
+
+    await Promise.all(
+      controlValuesUpdates.map((update) => this.executeControlValuesUpdate(update, workflow._id, command))
+    );
+  }
+
+  private getControlValuesUpdates(steps: NotificationStepEntity[], command: UpsertWorkflowCommand) {
+    return steps
+      .map((step) => {
+        const controlValues = this.findControlValueInRequest(step, command.workflowDto.steps);
+        if (controlValues === undefined) return null;
+
+        return {
+          step,
+          controlValues,
+          shouldDelete: controlValues === null,
+        };
+      })
+      .filter((update): update is NonNullable<typeof update> => update !== null);
+  }
+
+  private executeControlValuesUpdate(
+    update: { step: NotificationStepEntity; controlValues: Record<string, unknown> | null; shouldDelete: boolean },
+    workflowId: string,
+    command: UpsertWorkflowCommand
+  ) {
+    if (update.shouldDelete) {
+      return this.deleteControlValuesUseCase.execute(
+        DeleteControlValuesCommand.create({
+          environmentId: command.user.environmentId,
+          organizationId: command.user.organizationId,
+          stepId: update.step._templateId,
+          workflowId,
+          userId: command.user._id,
+        })
+      );
     }
 
-    return await this.getWorkflow(workflow._id, command);
+    return this.upsertControlValuesUseCase.execute(
+      UpsertControlValuesCommand.create({
+        organizationId: command.user.organizationId,
+        environmentId: command.user.environmentId,
+        notificationStepEntity: update.step,
+        workflowId,
+        newControlValues: update.controlValues || {},
+      })
+    );
   }
 
   private findControlValueInRequest(
@@ -388,15 +418,54 @@ export class UpsertWorkflowUseCase {
       return stepRequest.name === step.name;
     })?.controlValues;
   }
+
+  private async processCustomControlValues(
+    user: UserSessionData,
+    stepType: StepTypeEnum,
+    controlValues: Record<string, unknown> | null
+  ): Promise<StepIssuesDto> {
+    const cleanedControlValues = controlValues ? cleanObject(controlValues) : {};
+
+    const restrictionsErrors = await this.tierRestrictionsValidateUsecase.execute(
+      TierRestrictionsValidateCommand.create({
+        amount: cleanedControlValues.amount as number | undefined,
+        unit: cleanedControlValues.unit as DigestUnitEnum | undefined,
+        organizationId: user.organizationId,
+        stepType,
+      })
+    );
+
+    if (!restrictionsErrors) {
+      return {};
+    }
+
+    const result: Record<string, ContentIssue[]> = {};
+    for (const restrictionsError of restrictionsErrors) {
+      result.amount = [
+        {
+          issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
+          message: restrictionsError.message,
+        },
+      ];
+      result.unit = [
+        {
+          issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
+          message: restrictionsError.message,
+        },
+      ];
+    }
+
+    return result;
+  }
 }
 
 function isWorkflowUpdateDto(workflowDto: UpsertWorkflowDataCommand, id?: string): workflowDto is UpdateWorkflowDto {
   return !!id;
 }
 
-const isUniqueStepId = (stepIdToValidate: string, otherStepsIds: string[]) => {
+function isUniqueStepId(stepIdToValidate: string, otherStepsIds: string[]) {
   return !otherStepsIds.some((stepId) => stepId === stepIdToValidate);
-};
+}
 
 function processControlValuesByLiquid(
   variableSchema: JSONSchemaDto | undefined,
