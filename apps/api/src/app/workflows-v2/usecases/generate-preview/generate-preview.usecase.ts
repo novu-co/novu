@@ -29,7 +29,6 @@ import { Variable } from '../../util/template-parser/liquid-parser';
 import { pathsToObject } from '../../util/path-to-object';
 import { isObjectTipTapNode } from '../../util/tip-tap.util';
 import { buildVariables } from '../../util/build-variables';
-import { replaceAll } from '../../util/string';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
@@ -139,7 +138,7 @@ export class GeneratePreviewUsecase {
         type: 'object',
         properties: { payload: workflow.payloadSchema },
       });
-      finalVariablesExample = { ...previewDataResult.variablesExample, ...tmp };
+      finalVariablesExample = { ...previewTemplateData.variablesExample, ...tmp };
     } else {
       finalVariablesExample = previewTemplateData.variablesExample;
     }
