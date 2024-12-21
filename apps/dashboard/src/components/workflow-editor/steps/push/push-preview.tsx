@@ -1,6 +1,6 @@
 import { HTMLAttributes } from 'react';
 import { HTMLMotionProps, motion } from 'motion/react';
-import { ChannelTypeEnum, GeneratePreviewResponseDto } from '@novu/shared';
+import { ChannelTypeEnum, GeneratePreviewResponseDto, PushRenderOutput } from '@novu/shared';
 import { Skeleton } from '@/components/primitives/skeleton';
 import { cn } from '@/utils/ui';
 
@@ -11,6 +11,10 @@ export function PushPreview({
   isPreviewPending: boolean;
   previewData?: GeneratePreviewResponseDto;
 }) {
+  const isValidPushPreview = previewData?.result.type === ChannelTypeEnum.PUSH;
+  const subject = isValidPushPreview ? ((previewData?.result.preview as PushRenderOutput)?.subject ?? '') : '';
+  const body = isValidPushPreview ? ((previewData?.result.preview as PushRenderOutput)?.body ?? '') : '';
+
   if (isPreviewPending) {
     return (
       <PushBackgroundWithPhone>
@@ -24,28 +28,12 @@ export function PushPreview({
     );
   }
 
-  if (previewData?.result.type !== ChannelTypeEnum.PUSH) {
-    return (
-      <PushBackgroundWithPhone>
-        <PushNotificationContainer>
-          <PushContentContainerPreview className="border-destructive/40 relative z-10 h-10 justify-center border border-dashed">
-            <PushBodyPreview
-              body="No preview available"
-              isPending={isPreviewPending}
-              className="w-full justify-center"
-            />
-          </PushContentContainerPreview>
-        </PushNotificationContainer>
-      </PushBackgroundWithPhone>
-    );
-  }
-
   return (
     <PushBackgroundWithPhone>
       <PushNotificationContainer>
         <PushContentContainerPreview className="relative z-10">
-          <PushSubjectPreview subject={previewData.result.preview.subject} isPending={isPreviewPending} />
-          <PushBodyPreview body={previewData.result.preview.body} isPending={isPreviewPending} />
+          <PushSubjectPreview subject={subject} isPending={isPreviewPending} />
+          <PushBodyPreview body={body} isPending={isPreviewPending} />
         </PushContentContainerPreview>
         <PushContentContainerPreview className="-mt-5 h-6 scale-95" />
         <PushContentContainerPreview className="-mt-5 h-6 scale-90" />
@@ -66,7 +54,7 @@ export const PushSubjectPreview = ({ subject, isPending, className, ...rest }: P
   return (
     <div className={cn('flex items-center gap-1.5', className)} {...rest}>
       <div className="flex-1">
-        <span className="line-clamp-1 text-xs font-medium">{subject}</span>
+        <span className="line-clamp-1 min-h-4 text-xs font-medium">{subject}</span>
       </div>
       <span className="text-2xs text-neutral-500">now</span>
     </div>
@@ -89,7 +77,7 @@ export const PushBodyPreview = ({ body, isPending, className, ...rest }: PushBod
 
   return (
     <div className={cn('flex items-center', className)} {...rest}>
-      <span className="text-2xs line-clamp-3">{body}</span>
+      <span className="text-2xs line-clamp-3 min-h-3.5">{body}</span>
     </div>
   );
 };

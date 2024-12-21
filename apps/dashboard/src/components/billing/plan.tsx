@@ -5,10 +5,10 @@ import { PlansRow } from './plans-row';
 import { HighlightsRow } from './highlights-row';
 import { Features } from './features';
 import { cn } from '../../utils/ui';
-import { toast } from 'sonner';
 import { useTelemetry } from '../../hooks/use-telemetry';
 import { TelemetryEvent } from '../../utils/telemetry';
 import { useFetchSubscription } from '../../hooks/use-fetch-subscription';
+import { showErrorToast, showSuccessToast } from '../primitives/sonner-helpers';
 
 export function Plan() {
   const track = useTelemetry();
@@ -21,7 +21,7 @@ export function Plan() {
     const checkoutResult = new URLSearchParams(window.location.search).get('result');
 
     if (checkoutResult === 'success') {
-      toast.success('Payment was successful.');
+      showSuccessToast('Payment was successful.');
       track(TelemetryEvent.BILLING_PAYMENT_SUCCESS, {
         billingInterval: selectedBillingInterval,
         plan: data?.apiServiceLevel,
@@ -29,7 +29,7 @@ export function Plan() {
     }
 
     if (checkoutResult === 'canceled') {
-      toast.error('Payment was canceled.');
+      showErrorToast('Payment was canceled.');
       track(TelemetryEvent.BILLING_PAYMENT_CANCELED, {
         billingInterval: selectedBillingInterval,
         plan: data?.apiServiceLevel,

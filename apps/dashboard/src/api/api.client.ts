@@ -4,9 +4,9 @@ import type { IEnvironment } from '@novu/shared';
 
 export class NovuApiError extends Error {
   constructor(
-    message: string,
-    public error: unknown,
-    public status: number
+    public message: string,
+    public status: number,
+    public rawError?: unknown
   ) {
     super(message);
   }
@@ -48,7 +48,7 @@ const request = async <T>(
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new NovuApiError(`Novu API error`, errorData, response.status);
+      throw new NovuApiError(parseErrorMessage(errorData), response.status, errorData);
     }
 
     if (response.status === 204) {
@@ -90,3 +90,22 @@ export const delV2 = <T>(endpoint: string, { environment, signal }: RequestOptio
   request<T>(endpoint, { version: 'v2', method: 'DELETE', environment, signal });
 export const patchV2 = <T>(endpoint: string, options: RequestOptions) =>
   request<T>(endpoint, { version: 'v2', method: 'PATCH', ...options });
+
+function parseErrorMessage(errorData: any): string {
+  const DEFAULT_ERROR = 'Novu API error';
+
+  if (!errorData?.message) {
+    return DEFAULT_ERROR;
+  }
+
+  if (typeof errorData.message !== 'string') {
+    return errorData.message?.message || DEFAULT_ERROR;
+  }
+
+  try {
+    const parsedMessage = JSON.parse(errorData.message);
+    return parsedMessage.message || DEFAULT_ERROR;
+  } catch {
+    return errorData.message?.message || errorData.message || DEFAULT_ERROR;
+  }
+}

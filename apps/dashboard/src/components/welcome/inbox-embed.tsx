@@ -14,13 +14,17 @@ export function InboxEmbed(): JSX.Element | null {
   const { integrations } = useFetchIntegrations({ refetchInterval: 1000, refetchOnWindowFocus: true });
   const { environments } = useFetchEnvironments({ organizationId: auth?.currentOrganization?._id });
   const [searchParams] = useSearchParams();
+  const environmentHint = searchParams.get('environmentId');
 
-  const currentEnvironment = environments?.find((env) => !env._parentId);
+  // If hint provided, use it, otherwise use the first dev environment
+  const selectedEnvironment = environments?.find((env) =>
+    environmentHint ? env._id === environmentHint : !env._parentId
+  );
   const subscriberId = auth?.currentUser?._id;
 
   const foundIntegration = integrations?.find(
     (integration) =>
-      integration._environmentId === environments?.[0]?._id && integration.channel === ChannelTypeEnum.IN_APP
+      integration._environmentId === selectedEnvironment?._id && integration.channel === ChannelTypeEnum.IN_APP
   );
 
   const primaryColor = searchParams.get('primaryColor') || '#DD2450';
@@ -30,6 +34,7 @@ export function InboxEmbed(): JSX.Element | null {
     if (foundIntegration?.connected) {
       setShowConfetti(true);
       const timer = setTimeout(() => setShowConfetti(false), 10000);
+
       return () => clearTimeout(timer);
     }
   }, [foundIntegration?.connected]);
@@ -42,14 +47,16 @@ export function InboxEmbed(): JSX.Element | null {
 
       {!foundIntegration?.connected && (
         <InboxFrameworkGuide
-          currentEnvironment={currentEnvironment}
+          currentEnvironment={selectedEnvironment}
           subscriberId={subscriberId}
           primaryColor={primaryColor}
           foregroundColor={foregroundColor}
         />
       )}
 
-      {foundIntegration?.connected && <InboxConnectedGuide subscriberId={subscriberId} />}
+      {foundIntegration?.connected && (
+        <InboxConnectedGuide subscriberId={subscriberId} environment={selectedEnvironment!} />
+      )}
     </main>
   );
 }

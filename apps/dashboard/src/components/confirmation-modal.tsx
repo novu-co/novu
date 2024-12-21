@@ -21,6 +21,7 @@ type ConfirmationModalProps = {
   description: ReactNode;
   confirmButtonText: string;
   isLoading?: boolean;
+  isConfirmDisabled?: boolean;
 };
 
 export const ConfirmationModal = ({
@@ -31,6 +32,7 @@ export const ConfirmationModal = ({
   description,
   confirmButtonText,
   isLoading,
+  isConfirmDisabled,
 }: ConfirmationModalProps) => {
   return (
     <Dialog modal open={open} onOpenChange={onOpenChange}>
@@ -53,7 +55,14 @@ export const ConfirmationModal = ({
               </Button>
             </DialogClose>
 
-            <Button type="button" size="sm" variant="primary" onClick={onConfirm} isLoading={isLoading}>
+            <Button
+              type="button"
+              size="sm"
+              variant="primary"
+              onClick={onConfirm}
+              isLoading={isLoading}
+              disabled={isConfirmDisabled}
+            >
               {confirmButtonText}
             </Button>
           </DialogFooter>
