@@ -1,3 +1,5 @@
+import { isEmpty } from 'lodash';
+
 const EMPTY_TIP_TAP_OBJECT = JSON.stringify({
   type: 'doc',
   content: [
@@ -52,10 +54,7 @@ function sanitizeInApp(controlValues: Record<string, unknown>) {
 
   const normalized: Record<string, unknown> = {
     subject: controlValues.subject || null,
-    body:
-      (controlValues.body as string)?.length === 0
-        ? WHITESPACE
-        : controlValues.body,
+    body: isEmpty(controlValues.body) ? WHITESPACE : controlValues.body,
     avatar: controlValues.avatar || null,
     primaryAction: null,
     secondaryAction: null,
