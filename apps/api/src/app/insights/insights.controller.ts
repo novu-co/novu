@@ -26,7 +26,7 @@ export class InsightsController {
   })
   async executeInsights(@Query('organizationId') organizationId: string) {
     const isAllowedToTestInsights = await this.featureFlagsService.get(
-      FeatureFlagsKeysEnum.IS_ALLOWED_TO_TEST_INSIGHTS,
+      FeatureFlagsKeysEnum.IS_ALLOWED_TO_TEST_INSIGHTS_ENABLED,
       false,
       {
         organizationId,
