@@ -4,13 +4,13 @@ import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
 
 import { Code2 } from '@/components/icons/code-2';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
-import { LegacyButton } from '@/components/primitives/legacy-button';
 import { Editor } from '@/components/primitives/editor';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { useEditorPreview } from '@/components/workflow-editor/steps/use-editor-preview';
 import { ChatPreview } from '@/components/workflow-editor/steps/chat/chat-preview';
 import { TabsSection } from '@/components/workflow-editor/steps/tabs-section';
 import { InlineToast } from '@/components/primitives/inline-toast';
+import { Button } from '../../../primitives/button';
 
 const getInitialAccordionValue = (value: string) => {
   try {
@@ -91,11 +91,11 @@ export const ChatEditorPreview = ({ workflow, step, formValues }: ChatEditorPrev
                 className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 rounded-lg border border-dashed p-3"
               />
               {payloadError && <p className="text-destructive text-xs">{payloadError}</p>}
-              <LegacyButton
-                size="xs"
-                type="button"
-                variant="outline"
-                className="self-end"
+              <Button
+                size="2xs"
+                mode="outline"
+                variant="secondary"
+                className="h-[24px] self-end"
                 onClick={() => {
                   try {
                     previewStep();
@@ -106,7 +106,7 @@ export const ChatEditorPreview = ({ workflow, step, formValues }: ChatEditorPrev
                 }}
               >
                 Apply
-              </LegacyButton>
+              </Button>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
