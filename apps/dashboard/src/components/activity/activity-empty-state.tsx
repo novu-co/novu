@@ -1,13 +1,12 @@
-import { LegacyButton } from '@/components/primitives/legacy-button';
 import { cn } from '@/utils/ui';
-import { PlayCircleIcon } from 'lucide-react';
-import { RiCloseCircleLine } from 'react-icons/ri';
+import { RiBookMarkedLine, RiCloseCircleLine, RiPlayCircleLine } from 'react-icons/ri';
 import { motion, AnimatePresence } from 'motion/react';
-import { ExternalLink } from '../shared/external-link';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { useEnvironment } from '@/context/environment/hooks';
+import { Button } from '../primitives/button';
 
+import { LinkButton } from '../primitives/button-link';
 interface ActivityEmptyStateProps {
   className?: string;
   emptySearchResults?: boolean;
@@ -87,10 +86,10 @@ export function ActivityEmptyState({ className, emptySearchResults, onClearFilte
               }}
               className="flex gap-6"
             >
-              <LegacyButton variant="outline" className="gap-2" onClick={onClearFilters}>
+              <Button variant="secondary" mode="outline" className="gap-2" onClick={onClearFilters}>
                 <RiCloseCircleLine className="h-4 w-4" />
                 Clear Filters
-              </LegacyButton>
+              </Button>
             </motion.div>
           )}
 
@@ -102,15 +101,17 @@ export function ActivityEmptyState({ className, emptySearchResults, onClearFilte
                 duration: 0.2,
                 delay: 0.3,
               }}
-              className="flex gap-6"
+              className="flex items-center gap-6"
             >
-              <ExternalLink href="https://docs.novu.co" variant="documentation" target="_blank">
-                View Docs
-              </ExternalLink>
-              <LegacyButton variant="primary" className="gap-2" onClick={handleNavigateToWorkflows}>
-                <PlayCircleIcon className="h-4 w-4" />
+              <LinkButton s leadingIcon={RiBookMarkedLine}>
+                <Link to={'https://docs.novu.co/'} target="_blank">
+                  View docs
+                </Link>
+              </LinkButton>
+
+              <Button size="xs" leadingIcon={RiPlayCircleLine} variant="primary" onClick={handleNavigateToWorkflows}>
                 Trigger Workflow
-              </LegacyButton>
+              </Button>
             </motion.div>
           )}
         </motion.div>
