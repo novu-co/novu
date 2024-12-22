@@ -1,4 +1,4 @@
-import { ReactNode, useMemo, useState } from 'react';
+import { ReactNode, useMemo } from 'react';
 import {
   RiBarChartBoxLine,
   RiGroup2Line,
@@ -22,6 +22,7 @@ import { SidebarContent } from '@/components/side-navigation/sidebar';
 import { NavigationLink } from './navigation-link';
 import { GettingStartedMenuItem } from './getting-started-menu-item';
 import { ChangelogStack } from './changelog-cards';
+import { useFetchSubscription } from '../../hooks/use-fetch-subscription';
 
 const NavigationGroup = ({ children, label }: { children: ReactNode; label?: string }) => {
   return (
@@ -33,13 +34,14 @@ const NavigationGroup = ({ children, label }: { children: ReactNode; label?: str
 };
 
 export const SideNavigation = () => {
+  const { subscription, daysLeft, isLoading: isLoadingSubscription } = useFetchSubscription();
+  const isFreeTrialActive = subscription?.trial.isActive || subscription?.hasPaymentMethod;
+
   const { currentEnvironment, environments, switchEnvironment } = useEnvironment();
   const track = useTelemetry();
   const isNewActivityFeedEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ACTIVITY_FEED_ENABLED, false);
   const isNewIntegrationStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_INTEGRATION_STORE_ENABLED, false);
   const environmentNames = useMemo(() => environments?.map((env) => env.name), [environments]);
-  const [hasChangelogItems, setHasChangelogItems] = useState(false);
-  const [isChangelogLoaded, setIsChangelogLoaded] = useState(false);
 
   const onEnvironmentChange = (value: string) => {
     const environment = environments?.find((env) => env.name === value);
@@ -106,8 +108,10 @@ export const SideNavigation = () => {
           </div>
 
           <div className="relative mt-auto gap-8 pt-4">
-            <ChangelogStack hasChangeLogItems={setHasChangelogItems} changeLogItemsLoaded={setIsChangelogLoaded} />
-            {isChangelogLoaded && !hasChangelogItems && <FreeTrialCard />}
+            {!isFreeTrialActive && !isLoadingSubscription && <ChangelogStack />}
+            {isFreeTrialActive && !isLoadingSubscription && (
+              <FreeTrialCard subscription={subscription} daysLeft={daysLeft} />
+            )}
 
             <NavigationGroup>
               <NavigationLink to={ROUTES.SETTINGS_TEAM}>

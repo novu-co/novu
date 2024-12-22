@@ -23,13 +23,7 @@ const CACHE_EXPIRY = 4 * 60 * 60 * 1000; // 4 hours
 const NUMBER_OF_CARDS = 3;
 const DISMISSED_STORAGE_KEY = 'dismissed_changelogs';
 
-export const ChangelogStack = ({
-  hasChangeLogItems,
-  changeLogItemsLoaded,
-}: {
-  hasChangeLogItems?: (hasItems: boolean) => void;
-  changeLogItemsLoaded?: (isLoaded: boolean) => void;
-}) => {
+export const ChangelogStack = () => {
   const CARD_OFFSET = 10;
   const SCALE_FACTOR = 0.06;
   const [changelogs, setChangelogs] = useState<Changelog[]>([]);
@@ -59,27 +53,17 @@ export const ChangelogStack = ({
     return filterChangelogs(rawData, getDismissedChangelogs());
   };
 
-  const { data: fetchedChangelogs, isLoading } = useQuery({
+  const { data: fetchedChangelogs } = useQuery({
     queryKey: ['changelogs'],
     queryFn: fetchChangelogs,
     staleTime: 1000 * 60 * 60 * 4, // 4 hours
   });
 
   useEffect(() => {
-    if (!isLoading) {
-      changeLogItemsLoaded?.(true);
-    }
-  }, [isLoading, changeLogItemsLoaded]);
-
-  useEffect(() => {
     if (fetchedChangelogs) {
       setChangelogs(fetchedChangelogs);
     }
   }, [fetchedChangelogs]);
-
-  useEffect(() => {
-    hasChangeLogItems?.(changelogs.length > 0);
-  }, [changelogs, hasChangeLogItems]);
 
   const handleChangelogClick = (changelog: Changelog) => {
     track(TelemetryEvent.CHANGELOG_ITEM_CLICKED, { title: changelog.title });
