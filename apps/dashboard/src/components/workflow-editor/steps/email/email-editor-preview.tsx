@@ -3,7 +3,6 @@ import { CSSProperties, useEffect, useRef, useState } from 'react';
 
 import { Code2 } from '@/components/icons/code-2';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
-import { LegacyButton } from '@/components/primitives/legacy-button';
 import { Editor } from '@/components/primitives/editor';
 import { Skeleton } from '@/components/primitives/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/primitives/tabs';
@@ -21,6 +20,7 @@ import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { RiMacLine, RiSmartphoneFill } from 'react-icons/ri';
 import { useEditorPreview } from '../use-editor-preview';
 import { Separator } from '@/components/primitives/separator';
+import { Button } from '../../../primitives/button';
 
 const getInitialAccordionValue = (value: string) => {
   try {
@@ -134,11 +134,11 @@ export const EmailEditorPreview = ({ workflow, step, formValues }: EmailEditorPr
                   className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 rounded-lg border border-dashed p-3"
                 />
                 {payloadError && <p className="text-destructive text-xs">{payloadError}</p>}
-                <LegacyButton
-                  size="xs"
-                  type="button"
-                  variant="outline"
-                  className="self-end"
+                <Button
+                  size="2xs"
+                  variant="secondary"
+                  mode="outline"
+                  className="h-[24px] self-end"
                   onClick={() => {
                     try {
                       previewStep();
@@ -149,7 +149,7 @@ export const EmailEditorPreview = ({ workflow, step, formValues }: EmailEditorPr
                   }}
                 >
                   Apply
-                </LegacyButton>
+                </Button>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
