@@ -1,4 +1,17 @@
-/** @type {import('tailwindcss').Config} */
+import type { Config } from 'tailwindcss';
+import animate from 'tailwindcss-animate';
+
+export const borderRadii = {
+  4: '.25rem',
+  6: '.375rem',
+  8: '.5rem',
+  10: '.625rem',
+  12: '.75rem',
+  16: '1rem',
+  20: '1.25rem',
+  24: '1.5rem',
+  full: '999px',
+} as unknown as Record<string, string>;
 
 export const texts = {
   'title-h1': [
@@ -177,14 +190,14 @@ export const texts = {
       fontWeight: '500',
     },
   ],
-};
+} as unknown as Record<string, string>;
 
 export const shadows = {
   xs: '0px 1px 2px 0px rgba(10, 13, 20, 0.03)',
   sm: '0px 1px 2px 0px #1018280F,0px 1px 3px 0px #1018281A',
   md: '0px 16px 32px -12px rgba(14, 18, 27, 0.10)',
   DEFAULT: '0px 16px 32px -12px #0E121B1A',
-};
+} as unknown as Record<string, string>;
 
 export default {
   darkMode: ['class'],
@@ -558,18 +571,10 @@ export default {
         code: ['JetBrains Mono', 'monospace'],
       },
       opacity: {
-        2.5: 0.025,
+        '2.5': '0.025',
       },
       borderRadius: {
-        4: '.25rem',
-        6: '.375rem',
-        8: '.5rem',
-        10: '.625rem',
-        12: '.75rem',
-        16: '1rem',
-        20: '1.25rem',
-        24: '1.5rem',
-        full: '999px',
+        ...borderRadii,
         lg: 'var(--radius)', // DEPRECATED
         md: 'calc(var(--radius) - 2px)', // DEPRECATED
         sm: 'calc(var(--radius) - 4px)', // DEPRECATED
@@ -654,5 +659,5 @@ export default {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
-};
+  plugins: [animate],
+} satisfies Config;
