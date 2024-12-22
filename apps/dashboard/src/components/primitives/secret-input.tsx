@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Input, InputField } from './input';
-import { Button } from './legacy-button';
+import { LegacyButton } from './legacy-button';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../utils/constants';
 
 interface SecretInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
@@ -21,7 +21,7 @@ export function SecretInput({ className, value, onChange, ...props }: SecretInpu
         onChange={(e) => onChange(e.target.value)}
         {...props}
       />
-      <Button
+      <LegacyButton
         type="button"
         variant="ghost"
         size="sm"
@@ -34,7 +34,7 @@ export function SecretInput({ className, value, onChange, ...props }: SecretInpu
           <Eye className="text-muted-foreground/70 h-4 w-4" />
         )}
         <span className="sr-only">{revealed ? 'Hide' : 'Show'} password</span>
-      </Button>
+      </LegacyButton>
     </InputField>
   );
 }

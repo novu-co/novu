@@ -1,6 +1,6 @@
 import { Route, ChevronDown } from 'lucide-react';
 import { IActivityJob, IDelayRegularMetadata, IDigestRegularMetadata, JobStatusEnum, StepTypeEnum } from '@novu/shared';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { Badge } from '@/components/primitives/badge';
 import { Card, CardContent, CardHeader } from '../primitives/card';
 import { format } from 'date-fns';
@@ -52,7 +52,7 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
             <span className="text-foreground-950 text-xs capitalize">{formatJobType(job.type)}</span>
           </div>
 
-          <Button
+          <LegacyButton
             variant="ghost"
             type="button"
             size="sm"
@@ -60,7 +60,7 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
           >
             Show more
             <ChevronDown className={cn('h-4 w-4 transition-transform', isExpanded && 'rotate-180')} />
-          </Button>
+          </LegacyButton>
         </CardHeader>
 
         {!isExpanded && (

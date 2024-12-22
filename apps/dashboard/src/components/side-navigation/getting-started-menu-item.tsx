@@ -8,7 +8,7 @@ import { useOnboardingSteps } from '../../hooks/use-onboarding-steps';
 import { NavigationLink } from './navigation-link';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
-import { Button } from '../primitives/legacy-button';
+import { LegacyButton } from '../primitives/legacy-button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
@@ -88,7 +88,7 @@ export function GettingStartedMenuItem() {
           >
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
+                <LegacyButton
                   size="icon"
                   variant="ghost"
                   onClick={handleClose}
@@ -96,7 +96,7 @@ export function GettingStartedMenuItem() {
                   aria-label="Close getting started menu"
                 >
                   <RiCloseLine className="size-4" />
-                </Button>
+                </LegacyButton>
               </TooltipTrigger>
               <TooltipContent>This will hide the Getting Started page</TooltipContent>
             </Tooltip>

@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { RiCloseLine, RiEdit2Line } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +20,7 @@ export const CommonCustomControlValues = () => {
           <RiEdit2Line className="size-4" />
           <span>Configure Template</span>
         </div>
-        <Button
+        <LegacyButton
           variant="ghost"
           size="xs"
           onClick={(e) => {
@@ -31,7 +31,7 @@ export const CommonCustomControlValues = () => {
         >
           <RiCloseLine className="h-4 w-4" />
           <span className="sr-only">Close</span>
-        </Button>
+        </LegacyButton>
       </header>
       <CustomStepControls dataSchema={dataSchema} origin={workflow.origin} />
     </>

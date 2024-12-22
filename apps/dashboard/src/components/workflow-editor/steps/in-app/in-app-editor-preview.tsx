@@ -3,7 +3,7 @@ import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
 
 import { Notification5Fill } from '@/components/icons';
 import { Code2 } from '@/components/icons/code-2';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { Editor } from '@/components/primitives/editor';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
@@ -84,7 +84,7 @@ export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPr
                 className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 rounded-lg border border-dashed p-3"
               />
               {payloadError && <p className="text-destructive text-xs">{payloadError}</p>}
-              <Button
+              <LegacyButton
                 size="xs"
                 type="button"
                 variant="outline"
@@ -99,7 +99,7 @@ export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPr
                 }}
               >
                 Apply
-              </Button>
+              </LegacyButton>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

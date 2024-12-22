@@ -1,7 +1,7 @@
 import { HoverToCopy } from '@/components/primitives/hover-to-copy';
 import { cn } from '@/utils/ui';
 import { RiFileCopyLine } from 'react-icons/ri';
-import { Button, ButtonProps } from './legacy-button';
+import { LegacyButton, ButtonProps } from './legacy-button';
 
 type CopyButtonProps = ButtonProps & {
   valueToCopy: string;
@@ -12,9 +12,9 @@ export const CopyButton = (props: CopyButtonProps) => {
 
   return (
     <HoverToCopy asChild valueToCopy={valueToCopy}>
-      <Button variant="outline" className={cn('flex items-center gap-1', className)} {...rest}>
+      <LegacyButton variant="outline" className={cn('flex items-center gap-1', className)} {...rest}>
         {children || <RiFileCopyLine className="size-4" />}
-      </Button>
+      </LegacyButton>
     </HoverToCopy>
   );
 };

@@ -12,7 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/primitives/breadcrumb';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { useEnvironment } from '@/context/environment/hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { useFetchWorkflow } from '@/hooks/use-fetch-workflow';
@@ -47,9 +47,9 @@ export const EditorBreadcrumbs = () => {
 
   return (
     <div className="flex items-center overflow-hidden">
-      <Button variant="link" onClick={handleBackNav}>
+      <LegacyButton variant="link" onClick={handleBackNav}>
         <ArrowRight className="text-neutral-950" />
-      </Button>
+      </LegacyButton>
       <Breadcrumb>
         <BreadcrumbList>
           {breadcrumbs.map(({ label, href, node }) => (

@@ -3,7 +3,7 @@ import { useFetchIntegrations } from '@/hooks/use-fetch-integrations';
 import { useUpdateIntegration } from '@/hooks/use-update-integration';
 import { useSetPrimaryIntegration } from '@/hooks/use-set-primary-integration';
 import { IntegrationConfiguration } from './integration-configuration';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { DeleteIntegrationModal } from './modals/delete-integration-modal';
 import { SelectPrimaryIntegrationModal } from './modals/select-primary-integration-modal';
 import { IntegrationSheet } from './integration-sheet';
@@ -136,16 +136,16 @@ export function UpdateIntegrationSidebar({ isOpened }: UpdateIntegrationSidebarP
 
         <div className="bg-background flex justify-between gap-2 border-t p-3">
           {integration.channel !== ChannelTypeEnum.IN_APP && (
-            <Button
+            <LegacyButton
               variant="ghostDestructive"
               size="sm"
               isLoading={isDeleting}
               onClick={() => setIsDeleteDialogOpen(true)}
             >
               Delete Integration
-            </Button>
+            </LegacyButton>
           )}
-          <Button
+          <LegacyButton
             type="submit"
             form="integration-configuration-form"
             className="ml-auto"
@@ -153,7 +153,7 @@ export function UpdateIntegrationSidebar({ isOpened }: UpdateIntegrationSidebarP
             size="sm"
           >
             Save Changes
-          </Button>
+          </LegacyButton>
         </div>
       </IntegrationSheet>
 

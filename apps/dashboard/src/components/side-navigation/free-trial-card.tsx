@@ -1,7 +1,7 @@
 import { LogoCircle } from '../icons';
 import { RiArrowRightDoubleLine, RiInformationFill } from 'react-icons/ri';
 import { Progress } from '../primitives/progress';
-import { Button } from '../primitives/legacy-button';
+import { LegacyButton } from '../primitives/legacy-button';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipArrow } from '../primitives/tooltip';
 import { LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { Link } from 'react-router-dom';
@@ -61,9 +61,13 @@ const CardContent = ({
     <div
       className={`-mt-2 max-h-0 overflow-hidden opacity-0 ${transition} group-hover:max-h-8 group-hover:opacity-100`}
     >
-      <Button className={`w-full translate-y-full ${transition} group-hover:translate-y-0`} variant="light" size="sm">
+      <LegacyButton
+        className={`w-full translate-y-full ${transition} group-hover:translate-y-0`}
+        variant="light"
+        size="sm"
+      >
         Upgrade now
-      </Button>
+      </LegacyButton>
     </div>
   </>
 );

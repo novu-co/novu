@@ -1,5 +1,5 @@
 import { Badge } from '@/components/primitives/badge';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { RiCheckboxCircleFill, RiGitBranchFill, RiSettings4Line, RiStarSmileLine } from 'react-icons/ri';
 import { TableIntegration } from '../types';
 import { ChannelTypeEnum, type IEnvironment, type IIntegration, type IProviderConfig } from '@novu/shared';
@@ -91,10 +91,10 @@ export function IntegrationCard({ integration, provider, environment, onClick }:
 
       <div className="mt-auto flex items-center gap-2">
         {integration.channel === ChannelTypeEnum.IN_APP && !integration.connected ? (
-          <Button size="xs" className="h-[26px]" variant="outline" onClick={handleConfigureClick}>
+          <LegacyButton size="xs" className="h-[26px]" variant="outline" onClick={handleConfigureClick}>
             <RiSettings4Line className="h-4 w-4" />
             Connect
-          </Button>
+          </LegacyButton>
         ) : (
           <Badge variant={integration.active ? 'success' : 'neutral'} className="capitalize">
             <RiCheckboxCircleFill className="text-success h-4 w-4" />

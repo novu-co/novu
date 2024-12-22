@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 
 interface ArrowPaginationProps {
   page: number;
@@ -12,7 +12,7 @@ export function ArrowPagination({ page, hasMore, onPageChange }: ArrowPagination
     <div className="bottom-0 mt-auto border-t border-t-neutral-200 bg-white py-3">
       <div className="flex items-center justify-end px-6">
         <div className="border-input inline-flex items-center rounded-lg border bg-transparent">
-          <Button
+          <LegacyButton
             variant="ghost"
             size="icon"
             disabled={page === 0}
@@ -23,8 +23,8 @@ export function ArrowPagination({ page, hasMore, onPageChange }: ArrowPagination
               <ChevronLeft className="h-4 w-4" />
               <ChevronLeft className="-ml-2 h-4 w-4" />
             </div>
-          </Button>
-          <Button
+          </LegacyButton>
+          <LegacyButton
             variant="ghost"
             size="icon"
             disabled={page === 0}
@@ -32,8 +32,8 @@ export function ArrowPagination({ page, hasMore, onPageChange }: ArrowPagination
             className="border-l-input rounded-none border-0 border-l"
           >
             <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
+          </LegacyButton>
+          <LegacyButton
             variant="ghost"
             size="icon"
             disabled={!hasMore}
@@ -41,8 +41,8 @@ export function ArrowPagination({ page, hasMore, onPageChange }: ArrowPagination
             className="border-l-input rounded-none border-0 border-l"
           >
             <ChevronRight className="h-4 w-4" />
-          </Button>
-          <Button
+          </LegacyButton>
+          <LegacyButton
             variant="ghost"
             size="icon"
             disabled={!hasMore}
@@ -53,7 +53,7 @@ export function ArrowPagination({ page, hasMore, onPageChange }: ArrowPagination
               <ChevronRight className="h-4 w-4" />
               <ChevronRight className="-ml-2 h-4 w-4" />
             </div>
-          </Button>
+          </LegacyButton>
         </div>
       </div>
     </div>

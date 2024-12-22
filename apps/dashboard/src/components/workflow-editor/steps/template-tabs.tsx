@@ -3,7 +3,7 @@ import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 
 import { Notification5Fill } from '@/components/icons';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { Separator } from '@/components/primitives/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 
@@ -35,7 +35,7 @@ export const TemplateTabs = ({ editorContent, previewContent, tabsValue, onTabCh
           </TabsTrigger>
         </TabsList>
 
-        <Button
+        <LegacyButton
           variant="ghost"
           size="xs"
           className="size-6"
@@ -47,7 +47,7 @@ export const TemplateTabs = ({ editorContent, previewContent, tabsValue, onTabCh
         >
           <Cross2Icon className="h-4 w-4" />
           <span className="sr-only">Close</span>
-        </Button>
+        </LegacyButton>
       </header>
       <Separator />
       <TabsContent value="editor" className="h-full w-full overflow-y-auto">

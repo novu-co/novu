@@ -1,4 +1,4 @@
-import { Button } from '../primitives/legacy-button';
+import { LegacyButton } from '../primitives/legacy-button';
 import { createWorkflow } from '../../api/workflows';
 import { CustomizeInbox } from './customize-inbox-playground';
 import { InboxPreviewContent } from './inbox-preview-content';
@@ -216,22 +216,22 @@ export function InboxPlayground() {
           <div className="bg-muted mt-auto border-t">
             <div className="flex justify-end gap-3 p-2">
               {!hasNotificationBeenSent ? (
-                <Button size="sm" onClick={handleSendNotification} disabled={isPending} className="px-2">
+                <LegacyButton size="sm" onClick={handleSendNotification} disabled={isPending} className="px-2">
                   Send notification
                   {isPending ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
                   ) : (
                     <RiNotification2Fill className="h-3 w-3" />
                   )}
-                </Button>
+                </LegacyButton>
               ) : (
                 <>
-                  <Button size="sm" variant="ghost" className="px-2" onClick={handleSkipToDashboard}>
+                  <LegacyButton size="sm" variant="ghost" className="px-2" onClick={handleSkipToDashboard}>
                     Skip to Dashboard
-                  </Button>
-                  <Button size="sm" className="px-2" onClick={handleImplementClick}>
+                  </LegacyButton>
+                  <LegacyButton size="sm" className="px-2" onClick={handleImplementClick}>
                     Implement &lt;Inbox /&gt;
-                  </Button>
+                  </LegacyButton>
                 </>
               )}
             </div>

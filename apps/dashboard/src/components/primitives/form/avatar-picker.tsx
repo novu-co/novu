@@ -2,7 +2,7 @@ import { forwardRef, useMemo, useState } from 'react';
 import { RiEdit2Line, RiErrorWarningFill, RiImageEditFill } from 'react-icons/ri';
 
 import { Avatar, AvatarImage } from '@/components/primitives/avatar';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { FormMessage } from '@/components/primitives/form/form';
 import { InputField } from '@/components/primitives/input';
 import { Label } from '@/components/primitives/label';
@@ -55,7 +55,11 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
       <div className="size-9 space-y-2">
         <Popover modal={true} open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="text-foreground-600 relative size-full overflow-hidden">
+            <LegacyButton
+              variant="outline"
+              size="icon"
+              className="text-foreground-600 relative size-full overflow-hidden"
+            >
               {value ? (
                 <Avatar className="bg-transparent p-1">
                   <AvatarImage src={value as string} />
@@ -66,7 +70,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
               {error && (
                 <RiErrorWarningFill className="text-destructive outline-destructive absolute right-0 top-0 size-3 -translate-y-1/2 translate-x-1/2 rounded-full outline outline-1 outline-offset-1" />
               )}
-            </Button>
+            </LegacyButton>
           </PopoverTrigger>
           <PopoverContent className="w-[300px] p-4">
             <div className="space-y-4">

@@ -4,7 +4,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/utils/ui';
 import { RiLoader4Line } from 'react-icons/ri';
 
-export const buttonVariants = cva(
+export const legacyButtonVariants = cva(
   `relative isolate inline-flex items-center justify-center whitespace-nowrap rounded-lg gap-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50`,
   {
     variants: {
@@ -42,7 +42,7 @@ export const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+    VariantProps<typeof legacyButtonVariants> {
   asChild?: boolean;
   isLoading?: boolean;
 }
@@ -52,7 +52,7 @@ const LegacyButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : 'button';
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }), isLoading && 'animate-pulse-subtle')}
+        className={cn(legacyButtonVariants({ variant, size, className }), isLoading && 'animate-pulse-subtle')}
         ref={ref}
         disabled={disabled || isLoading}
         {...props}
@@ -74,6 +74,6 @@ const LegacyButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
     );
   }
 );
-LegacyButton.displayName = 'Button';
+LegacyButton.displayName = 'LegacyButton';
 
-export { LegacyButton as Button };
+export { LegacyButton };

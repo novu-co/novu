@@ -1,6 +1,6 @@
 import { RiCheckboxCircleFill, RiLoader3Line, RiNotification2Fill } from 'react-icons/ri';
 import { Loader2 } from 'lucide-react';
-import { Button } from '../primitives/legacy-button';
+import { LegacyButton } from '../primitives/legacy-button';
 import { showErrorToast, showSuccessToast } from '../primitives/sonner-helpers';
 import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
 import { ROUTES } from '../../utils/routes';
@@ -65,14 +65,14 @@ export function InboxConnectedGuide({ subscriberId, environment }: InboxConnecte
                 subscriberId matches as above.
               </p>
               <div>
-                <Button size="sm" className="gap-1 px-2" onClick={handleSendNotification} disabled={isPending}>
+                <LegacyButton size="sm" className="gap-1 px-2" onClick={handleSendNotification} disabled={isPending}>
                   {isPending ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
                   ) : (
                     <RiNotification2Fill className="h-3 w-3" />
                   )}
                   Send notification
-                </Button>
+                </LegacyButton>
               </div>
             </div>
           </div>

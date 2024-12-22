@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from '@/components/primitives/dialog';
 import { ReactNode } from 'react';
 import { RiBookMarkedLine } from 'react-icons/ri';
@@ -30,9 +30,9 @@ export const SubscribersStayTunedModal = ({ children }: { children: ReactNode })
             View docs
           </a>
           <DialogClose asChild aria-label="Close">
-            <Button type="button" variant="primary">
+            <LegacyButton type="button" variant="primary">
               Alright!
-            </Button>
+            </LegacyButton>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

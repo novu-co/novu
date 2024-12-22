@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { CardDescription, CardTitle } from '@/components/primitives/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import React from 'react';
@@ -135,7 +135,7 @@ export function QuestionnaireForm() {
                         render={({ field }) => (
                           <>
                             {Object.values(OrganizationTypeEnum).map((type) => (
-                              <Button
+                              <LegacyButton
                                 key={type}
                                 variant="outline"
                                 size="xs"
@@ -146,7 +146,7 @@ export function QuestionnaireForm() {
                                 onClick={() => field.onChange(type)}
                               >
                                 {type}
-                              </Button>
+                              </LegacyButton>
                             ))}
                           </>
                         )}
@@ -171,7 +171,7 @@ export function QuestionnaireForm() {
                         render={({ field }) => (
                           <>
                             {Object.values(CompanySizeEnum).map((size) => (
-                              <Button
+                              <LegacyButton
                                 key={size}
                                 variant="outline"
                                 size="xs"
@@ -182,7 +182,7 @@ export function QuestionnaireForm() {
                                 onClick={() => field.onChange(size)}
                               >
                                 {size}
-                              </Button>
+                              </LegacyButton>
                             ))}
                           </>
                         )}
@@ -202,7 +202,7 @@ export function QuestionnaireForm() {
                   transition={{ duration: 0.2, ease: 'easeOut' }}
                   className="flex flex-col gap-3"
                 >
-                  <Button
+                  <LegacyButton
                     className={`relative bg-black ${submitQuestionnaireMutation.isPending ? 'cursor-not-allowed' : ''}`}
                     type="submit"
                     disabled={submitQuestionnaireMutation.isPending}
@@ -225,7 +225,7 @@ export function QuestionnaireForm() {
                     >
                       Continue
                     </motion.span>
-                  </Button>
+                  </LegacyButton>
                 </motion.div>
               )}
             </AnimatePresence>

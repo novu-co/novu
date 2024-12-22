@@ -1,7 +1,7 @@
 import { CircleCheck } from '@/components/icons/circle-check';
 import { PartyPopover } from '@/components/icons/party-popover';
 import { OptInArrow } from '@/components/icons/opt-in-arrow';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import {
   Dialog,
   DialogClose,
@@ -84,9 +84,9 @@ const CheckBulletPoint = ({ content }: { content: React.ReactNode }) => (
 const Footer = () => (
   <div className="flex w-full justify-end p-3">
     <DialogClose asChild aria-label="Close">
-      <Button type="button" size="sm" variant="primary" className="gap-2 p-2">
+      <LegacyButton type="button" size="sm" variant="primary" className="gap-2 p-2">
         I'm in <PartyPopover />
-      </Button>
+      </LegacyButton>
     </DialogClose>
   </div>
 );

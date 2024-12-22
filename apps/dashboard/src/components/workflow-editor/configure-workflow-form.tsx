@@ -41,7 +41,7 @@ import { ConfirmationModal } from '../confirmation-modal';
 import { DeleteWorkflowDialog } from '../delete-workflow-dialog';
 import { RouteFill } from '../icons';
 import { PageMeta } from '../page-meta';
-import { Button } from '../primitives/legacy-button';
+import { LegacyButton } from '../primitives/legacy-button';
 import { CopyButton } from '../primitives/copy-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
 import { Input, InputField } from '../primitives/input';
@@ -188,9 +188,9 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
            */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="ml-auto h-[20px] w-[22px]">
+              <LegacyButton variant="ghost" size="icon" className="ml-auto h-[20px] w-[22px]">
                 <RiMore2Fill />
-              </Button>
+              </LegacyButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuGroup>
@@ -353,14 +353,14 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
         <Separator />
         <SidebarContent size="lg">
           <Link to={ROUTES.EDIT_WORKFLOW_PREFERENCES}>
-            <Button
+            <LegacyButton
               variant="outline"
               className="flex w-full justify-start gap-1.5 p-1.5 text-xs font-medium"
               type="button"
             >
               <RiSettingsLine className="h-4 w-4 text-neutral-600" />
               Configure channel preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
-            </Button>
+            </LegacyButton>
           </Link>
         </SidebarContent>
         <Separator />

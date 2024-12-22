@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { Button } from '../primitives/legacy-button';
+import { LegacyButton } from '../primitives/legacy-button';
 import { Card, CardContent } from '../primitives/card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/primitives/toggle-group';
 import { toast } from 'sonner';
@@ -168,14 +168,14 @@ function BannerHeader({
         <p className="text-foreground-600 text-xs">{description}</p>
       </motion.div>
       {onDismiss && (
-        <Button
+        <LegacyButton
           variant="ghost"
           size="icon"
           className="absolute right-2.5 top-3 mt-[-3px] h-6 w-6 p-0 hover:bg-neutral-100"
           onClick={onDismiss}
         >
           <X className="text-foreground-600 h-4 w-4" />
-        </Button>
+        </LegacyButton>
       )}
     </div>
   );

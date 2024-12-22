@@ -8,7 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/primitives/alert-dialog';
-import { buttonVariants } from '@/components/primitives/legacy-button';
+import { legacyButtonVariants } from '@/components/primitives/legacy-button';
 import { Separator } from '@/components/primitives/separator';
 import { RiAlertFill } from 'react-icons/ri';
 import { Blocker } from 'react-router-dom';
@@ -40,7 +40,10 @@ export const UnsavedChangesAlertDialog = (props: UnsavedChangesAlertDialogProps)
 
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => blocker.reset?.()}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => blocker.proceed?.()} className={buttonVariants({ variant: 'destructive' })}>
+          <AlertDialogAction
+            onClick={() => blocker.proceed?.()}
+            className={legacyButtonVariants({ variant: 'destructive' })}
+          >
             Proceed anyway
           </AlertDialogAction>
         </AlertDialogFooter>

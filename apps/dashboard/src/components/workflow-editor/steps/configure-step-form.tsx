@@ -17,7 +17,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { PageMeta } from '@/components/page-meta';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { CopyButton } from '@/components/primitives/copy-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';
@@ -203,9 +203,9 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               })}
               className="flex items-center"
             >
-              <Button variant="link" size="icon" className="size-4" type="button">
+              <LegacyButton variant="link" size="icon" className="size-4" type="button">
                 <RiArrowLeftSLine />
-              </Button>
+              </LegacyButton>
             </Link>
             <span>Configure Step</span>
             <Link
@@ -215,9 +215,9 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               })}
               className="ml-auto flex items-center"
             >
-              <Button variant="link" size="icon" className="size-4" type="button">
+              <LegacyButton variant="link" size="icon" className="size-4" type="button">
                 <RiCloseFill />
-              </Button>
+              </LegacyButton>
             </Link>
           </SidebarHeader>
 
@@ -275,7 +275,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
             <>
               <SidebarContent>
                 <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
-                  <Button
+                  <LegacyButton
                     variant="outline"
                     className="flex w-full justify-start gap-1.5 text-xs font-medium"
                     type="button"
@@ -283,7 +283,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                     <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
                     Configure {STEP_TYPE_LABELS[step.type]} Step template{' '}
                     <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
-                  </Button>
+                  </LegacyButton>
                 </Link>
               </SidebarContent>
               <Separator />
@@ -329,7 +329,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                 }
                 confirmButtonText="Delete"
               />
-              <Button
+              <LegacyButton
                 variant="ghostDestructive"
                 className="gap-1.5 text-xs"
                 type="button"
@@ -337,7 +337,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               >
                 <RiDeleteBin2Line className="size-4" />
                 Delete step
-              </Button>
+              </LegacyButton>
             </SidebarFooter>
           )}
         </motion.div>

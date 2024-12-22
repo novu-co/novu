@@ -3,7 +3,7 @@ import { RiKey2Line, RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 import { useEnvironment } from '@/context/environment/hooks';
 import { CopyButton } from '@/components/primitives/copy-button';
 import { Card, CardContent, CardHeader } from '@/components/primitives/card';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { Input, InputField } from '@/components/primitives/input';
 import { Form } from '@/components/primitives/form/form';
 import { useForm } from 'react-hook-form';
@@ -170,7 +170,7 @@ function SettingField({
             </InputField>
 
             {secret && (
-              <Button
+              <LegacyButton
                 variant="outline"
                 size="icon"
                 onClick={toggleSecretVisibility}
@@ -178,7 +178,7 @@ function SettingField({
                 aria-label={showSecret ? 'Hide Secret' : 'Show Secret'}
               >
                 {showSecret ? <RiEyeOffLine className="size-4" /> : <RiEyeLine className="size-4" />}
-              </Button>
+              </LegacyButton>
             )}
           </>
         )}

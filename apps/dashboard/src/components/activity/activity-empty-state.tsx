@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { cn } from '@/utils/ui';
 import { PlayCircleIcon } from 'lucide-react';
 import { RiCloseCircleLine } from 'react-icons/ri';
@@ -87,10 +87,10 @@ export function ActivityEmptyState({ className, emptySearchResults, onClearFilte
               }}
               className="flex gap-6"
             >
-              <Button variant="outline" className="gap-2" onClick={onClearFilters}>
+              <LegacyButton variant="outline" className="gap-2" onClick={onClearFilters}>
                 <RiCloseCircleLine className="h-4 w-4" />
                 Clear Filters
-              </Button>
+              </LegacyButton>
             </motion.div>
           )}
 
@@ -107,10 +107,10 @@ export function ActivityEmptyState({ className, emptySearchResults, onClearFilte
               <ExternalLink href="https://docs.novu.co" variant="documentation" target="_blank">
                 View Docs
               </ExternalLink>
-              <Button variant="primary" className="gap-2" onClick={handleNavigateToWorkflows}>
+              <LegacyButton variant="primary" className="gap-2" onClick={handleNavigateToWorkflows}>
                 <PlayCircleIcon className="h-4 w-4" />
                 Trigger Workflow
-              </Button>
+              </LegacyButton>
             </motion.div>
           )}
         </motion.div>

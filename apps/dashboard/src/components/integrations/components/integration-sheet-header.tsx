@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { SheetHeader, SheetTitle } from '@/components/primitives/sheet';
 import { RiArrowLeftSLine } from 'react-icons/ri';
 import { IProviderConfig } from '@novu/shared';
@@ -33,9 +33,14 @@ export function IntegrationSheetHeader({ provider, mode, onBack, step }: Integra
       <SheetTitle>
         <div className="flex items-center gap-2">
           {mode === 'create' && onBack && (
-            <Button variant="ghost" size="xs" className="text-foreground-950 h-5 p-0.5 leading-none" onClick={onBack}>
+            <LegacyButton
+              variant="ghost"
+              size="xs"
+              className="text-foreground-950 h-5 p-0.5 leading-none"
+              onClick={onBack}
+            >
               <RiArrowLeftSLine className="h-4 w-4" />
-            </Button>
+            </LegacyButton>
           )}
           <div>
             <ProviderIcon providerId={provider.id} providerDisplayName={provider.displayName} />

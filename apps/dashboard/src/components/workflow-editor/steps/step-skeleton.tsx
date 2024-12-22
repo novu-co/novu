@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Cross2Icon } from '@radix-ui/react-icons';
 
 import { Skeleton } from '@/components/primitives/skeleton';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { Separator } from '@/components/primitives/separator';
 import { Tabs, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Notification5Fill } from '@/components/icons';
@@ -85,7 +85,7 @@ export const StepSkeleton = ({
           </TabsList>
         </Tabs>
 
-        <Button
+        <LegacyButton
           variant="ghost"
           size="xs"
           className="size-6"
@@ -97,7 +97,7 @@ export const StepSkeleton = ({
         >
           <Cross2Icon className="h-4 w-4" />
           <span className="sr-only">Close</span>
-        </Button>
+        </LegacyButton>
       </header>
       <Separator />
       <div className="flex h-full w-full flex-col gap-3 px-3 py-3.5">
@@ -109,9 +109,9 @@ export const StepSkeleton = ({
       </div>
       <Separator />
       <footer className="flex justify-end px-3 py-3.5">
-        <Button className="ml-auto" variant="default" disabled>
+        <LegacyButton className="ml-auto" variant="default" disabled>
           Save step
-        </Button>
+        </LegacyButton>
       </footer>
     </div>
   );

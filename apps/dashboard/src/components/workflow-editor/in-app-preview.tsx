@@ -5,7 +5,7 @@ import { InboxArrowDown } from '@/components/icons/inbox-arrow-down';
 import { InboxBell } from '@/components/icons/inbox-bell';
 import { InboxEllipsis } from '@/components/icons/inbox-ellipsis';
 import { InboxSettings } from '@/components/icons/inbox-settings';
-import { Button, ButtonProps } from '@/components/primitives/legacy-button';
+import { LegacyButton, ButtonProps } from '@/components/primitives/legacy-button';
 import { cn } from '@/utils/ui';
 import { Skeleton } from '../primitives/skeleton';
 
@@ -137,7 +137,7 @@ export const InAppPreviewPrimaryAction = (props: InAppPreviewPrimaryActionProps)
   }
 
   return (
-    <Button
+    <LegacyButton
       className={cn('px-3 text-xs font-medium shadow-none', className)}
       type="button"
       variant="primary"
@@ -145,7 +145,7 @@ export const InAppPreviewPrimaryAction = (props: InAppPreviewPrimaryActionProps)
       {...rest}
     >
       {children}
-    </Button>
+    </LegacyButton>
   );
 };
 
@@ -162,9 +162,15 @@ export const InAppPreviewSecondaryAction = (props: InAppPreviewSecondaryActionPr
   }
 
   return (
-    <Button variant="outline" className={cn('px-3 text-xs font-medium', className)} type="button" size="xs" {...rest}>
+    <LegacyButton
+      variant="outline"
+      className={cn('px-3 text-xs font-medium', className)}
+      type="button"
+      size="xs"
+      {...rest}
+    >
       {children}
-    </Button>
+    </LegacyButton>
   );
 };
 

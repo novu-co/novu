@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom';
 import { type ExternalToast } from 'sonner';
 import { IEnvironment, WorkflowListResponseDto } from '@novu/shared';
 import { Badge } from '@/components/primitives/badge';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -225,9 +225,9 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
          */}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <LegacyButton variant="ghost" className="h-8 w-8 p-0">
               <RiMore2Fill className="h-4 w-4" />
-            </Button>
+            </LegacyButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
             <DropdownMenuGroup>

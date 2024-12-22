@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { ToastClose, ToastIcon } from '@/components/primitives/sonner';
 import { ReactNode } from 'react';
 import { RiArrowRightSLine } from 'react-icons/ri';
@@ -21,10 +21,10 @@ export function SuccessButtonToast({ title, description, actionLabel, onAction, 
           <div className="text-foreground-600 text-sm">{description}</div>
         </div>
         <div className="flex items-center justify-end gap-2 self-stretch">
-          <Button variant="ghost" size="sm" className="text-destructive gap-1" onClick={onAction}>
+          <LegacyButton variant="ghost" size="sm" className="text-destructive gap-1" onClick={onAction}>
             {actionLabel}
             <RiArrowRightSLine />
-          </Button>
+          </LegacyButton>
         </div>
       </div>
       <ToastClose onClick={onClose} />

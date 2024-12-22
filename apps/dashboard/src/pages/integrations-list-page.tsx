@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { DashboardLayout } from '../components/dashboard-layout';
@@ -54,9 +54,9 @@ export function IntegrationsListPage() {
               </TooltipContent>
             </Tooltip>
           </TabsList>
-          <Button size="sm" variant="primary" onClick={onAddIntegrationClickCallback} className="my-1.5 mr-2.5">
+          <LegacyButton size="sm" variant="primary" onClick={onAddIntegrationClickCallback} className="my-1.5 mr-2.5">
             Connect Provider
-          </Button>
+          </LegacyButton>
         </div>
         <TabsContent value="providers" variant="regular" className="!mt-0 p-2.5">
           <IntegrationsList onItemClick={onItemClick} />

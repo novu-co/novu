@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { ApiServiceLevelEnum } from '@novu/shared';
 import { useState } from 'react';
 import { ContactSalesModal } from './contact-sales-modal';
@@ -31,9 +31,9 @@ export function ContactSalesButton({ className, variant = 'outline' }: ContactSa
 
   return (
     <>
-      <Button variant={variant} className={className} onClick={handleContactSales}>
+      <LegacyButton variant={variant} className={className} onClick={handleContactSales}>
         Contact sales
-      </Button>
+      </LegacyButton>
       <ContactSalesModal
         isOpen={isContactSalesModalOpen}
         onClose={handleModalClose}

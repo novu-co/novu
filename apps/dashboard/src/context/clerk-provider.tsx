@@ -1,4 +1,4 @@
-import { buttonVariants } from '@/components/primitives/legacy-button';
+import { legacyButtonVariants } from '@/components/primitives/legacy-button';
 import { cn } from '@/utils/ui';
 import { CLERK_PUBLISHABLE_KEY } from '@/config';
 import { ClerkProvider as _ClerkProvider } from '@clerk/clerk-react';
@@ -62,7 +62,7 @@ export const ClerkProvider = (props: ClerkProviderProps) => {
           },
         },
         elements: {
-          formButtonPrimary: cn(buttonVariants({ variant: 'primary' })),
+          formButtonPrimary: cn(legacyButtonVariants({ variant: 'primary' })),
         },
         variables: {
           fontSize: '14px !important',

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { WorkflowList } from '@/components/workflow-list';
 import { DashboardLayout } from '@/components/dashboard-layout';
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { CreateWorkflowButton } from '@/components/create-workflow-button';
 import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';
@@ -35,9 +35,9 @@ export const WorkflowsPage = () => {
           <div className="invisible flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2"></div>
 
           <CreateWorkflowButton asChild>
-            <Button variant="primary" size="sm">
+            <LegacyButton variant="primary" size="sm">
               Create workflow
-            </Button>
+            </LegacyButton>
           </CreateWorkflowButton>
         </div>
         <WorkflowList />

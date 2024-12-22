@@ -2,7 +2,7 @@ import { KeyboardEventHandler, useMemo, useRef, useState } from 'react';
 import { RiCornerDownLeftLine } from 'react-icons/ri';
 import type { PopoverContentProps } from '@radix-ui/react-popover';
 
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { InputFieldPure } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from '@/components/primitives/popover';
 import TruncatedText from '@/components/truncated-text';
@@ -94,7 +94,7 @@ export const NumbersPicker = <T extends string | number>({
           <div className="flex flex-col">
             <div className="grid max-w-full grid-cols-7 gap-2 p-3">
               {Array.from({ length }, (_, i) => (zeroBased ? i : i + 1)).map((day) => (
-                <Button
+                <LegacyButton
                   key={day}
                   size="sm"
                   variant={internalSelectedNumbers.includes(day as T) ? 'primary' : 'ghost'}
@@ -102,11 +102,11 @@ export const NumbersPicker = <T extends string | number>({
                   onClick={() => onNumberClick(day as T)}
                 >
                   {day}
-                </Button>
+                </LegacyButton>
               ))}
             </div>
             <div className="flex items-center justify-end gap-2 border-t border-t-neutral-100 p-3">
-              <Button
+              <LegacyButton
                 size="sm"
                 variant="outline"
                 onClick={() => {
@@ -115,8 +115,8 @@ export const NumbersPicker = <T extends string | number>({
                 }}
               >
                 Cancel
-              </Button>
-              <Button
+              </LegacyButton>
+              <LegacyButton
                 size="sm"
                 variant="primary"
                 onClick={() => {
@@ -125,7 +125,7 @@ export const NumbersPicker = <T extends string | number>({
                 }}
               >
                 Apply <RiCornerDownLeftLine className="size-4" />
-              </Button>
+              </LegacyButton>
             </div>
           </div>
         </PopoverContent>

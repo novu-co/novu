@@ -4,7 +4,7 @@ import { ComponentProps, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
 
-import { Button, buttonVariants } from '@/components/primitives/legacy-button';
+import { LegacyButton, legacyButtonVariants } from '@/components/primitives/legacy-button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,31 +55,31 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
         <div className={cn('mt-3 flex items-center gap-1')}>
           <div className="border-neutral-alpha-200 relative flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
             {!primaryAction && !secondaryAction && (
-              <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'z-10 cursor-not-allowed')}>
+              <div className={cn(legacyButtonVariants({ variant: 'dashed', size: 'xs' }), 'z-10 cursor-not-allowed')}>
                 <RiForbid2Line className="size-4" />
                 <span>No action</span>
               </div>
             )}
             {primaryAction && (
               <ConfigureActionPopover asChild fields={{ actionKey: primaryActionKey }}>
-                <Button variant="primary" size="xs" className="z-10">
+                <LegacyButton variant="primary" size="xs" className="z-10">
                   {primaryAction.label}
-                </Button>
+                </LegacyButton>
               </ConfigureActionPopover>
             )}
             {secondaryAction && (
               <ConfigureActionPopover asChild fields={{ actionKey: secondaryActionKey }}>
-                <Button variant="outline" size="xs" className="z-10">
+                <LegacyButton variant="outline" size="xs" className="z-10">
                   {secondaryAction.label}
-                </Button>
+                </LegacyButton>
               </ConfigureActionPopover>
             )}
             <DropdownMenuTrigger className="absolute size-full" />
           </div>
           <DropdownMenuTrigger asChild>
-            <Button size={'icon'} variant={'ghost'}>
+            <LegacyButton size={'icon'} variant={'ghost'}>
               <RiExpandUpDownLine className="size-4" />
-            </Button>
+            </LegacyButton>
           </DropdownMenuTrigger>
         </div>
         <DropdownMenuContent
@@ -99,7 +99,7 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
               onMenuItemClick?.();
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'pointer-events-none gap-2')}>
+            <div className={cn(legacyButtonVariants({ variant: 'dashed', size: 'xs' }), 'pointer-events-none gap-2')}>
               <RiForbid2Line className="size-4" />
               <span className="cursor-default">No action</span>
             </div>
@@ -118,7 +118,7 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
               onMenuItemClick?.();
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
+            <div className={cn(legacyButtonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
               Primary action
             </div>
           </DropdownMenuItem>
@@ -140,10 +140,10 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
               onMenuItemClick?.();
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
+            <div className={cn(legacyButtonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
               Primary action
             </div>
-            <div className={cn(buttonVariants({ variant: 'outline', size: 'xs' }), 'pointer-events-none')}>
+            <div className={cn(legacyButtonVariants({ variant: 'outline', size: 'xs' }), 'pointer-events-none')}>
               Secondary action
             </div>
           </DropdownMenuItem>

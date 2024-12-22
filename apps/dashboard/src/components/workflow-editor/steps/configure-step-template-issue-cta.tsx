@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
 import TruncatedText from '@/components/truncated-text';
 import { StepDataDto } from '@novu/shared';
@@ -27,11 +27,11 @@ export const ConfigureStepTemplateIssueCta = (props: ConfigureStepTemplateIssueC
         </Link>
       </div>
       <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
-        <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
+        <LegacyButton variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
           <span className="bg-destructive h-4 min-w-1 rounded-full" />
           <TruncatedText>{issue}</TruncatedText>
           <RiArrowRightUpLine className="text-destructive ml-auto h-4 w-4" />
-        </Button>
+        </LegacyButton>
       </Link>
     </SidebarContent>
   );

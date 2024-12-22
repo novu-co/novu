@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 
 import {
   Dialog,
@@ -50,12 +50,12 @@ export const ConfirmationModal = ({
           </div>
           <DialogFooter>
             <DialogClose asChild aria-label="Close">
-              <Button type="button" size="sm" variant="outline" onClick={() => onOpenChange(false)}>
+              <LegacyButton type="button" size="sm" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
-              </Button>
+              </LegacyButton>
             </DialogClose>
 
-            <Button
+            <LegacyButton
               type="button"
               size="sm"
               variant="primary"
@@ -64,7 +64,7 @@ export const ConfirmationModal = ({
               disabled={isConfirmDisabled}
             >
               {confirmButtonText}
-            </Button>
+            </LegacyButton>
           </DialogFooter>
         </DialogContent>
       </DialogPortal>

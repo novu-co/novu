@@ -1,5 +1,5 @@
 import { AuthCard } from '../components/auth/auth-card';
-import { Button } from '../components/primitives/legacy-button';
+import { LegacyButton } from '../components/primitives/legacy-button';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../utils/routes';
 import { useTelemetry } from '../hooks/use-telemetry';
@@ -41,13 +41,13 @@ export function InboxEmbedSuccessPage() {
           </div>
 
           <div className="flex flex-col px-6">
-            <Button
+            <LegacyButton
               className="mt-8 w-full rounded-xl py-3 text-white"
               variant="default"
               onClick={handleNavigateToDashboard}
             >
               Go to the Dashboard
-            </Button>
+            </LegacyButton>
           </div>
         </div>
       </AuthCard>

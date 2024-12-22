@@ -12,7 +12,7 @@ import {
   RiInformationFill,
   RiProgress1Line,
 } from 'react-icons/ri';
-import { Button } from './legacy-button';
+import { LegacyButton } from './legacy-button';
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
@@ -75,9 +75,9 @@ const ToastIcon = ({ className, variant = 'default', ...props }: ToastIconProps)
 
 const ToastClose = ({ className, ...props }: React.HTMLAttributes<HTMLButtonElement>) => {
   return (
-    <Button variant="ghost" className={cn('h-min w-min rounded-sm p-0', className)} {...props}>
+    <LegacyButton variant="ghost" className={cn('h-min w-min rounded-sm p-0', className)} {...props}>
       <RiCloseLine className="fill-foreground-400 size-5" />
-    </Button>
+    </LegacyButton>
   );
 };
 

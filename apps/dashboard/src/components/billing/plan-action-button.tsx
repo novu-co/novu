@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/legacy-button';
+import { LegacyButton } from '@/components/primitives/legacy-button';
 import { ApiServiceLevelEnum } from '@novu/shared';
 import { cn } from '../../utils/ui';
 import { useFetchSubscription } from '../../hooks/use-fetch-subscription';
@@ -36,7 +36,7 @@ export function PlanActionButton({
   };
 
   return (
-    <Button
+    <LegacyButton
       variant={variant}
       size={size}
       className={cn('gap-2', className)}
@@ -45,6 +45,6 @@ export function PlanActionButton({
       isLoading={isCheckingOut || isLoadingSubscription}
     >
       {isPaidSubscriptionActive() ? 'Manage Account' : 'Upgrade plan'}
-    </Button>
+    </LegacyButton>
   );
 }
