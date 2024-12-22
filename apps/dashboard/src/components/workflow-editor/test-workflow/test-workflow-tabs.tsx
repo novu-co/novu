@@ -14,7 +14,7 @@ import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type WorkflowTestDataResponseDto } from '@novu/shared';
 import { toast } from 'sonner';
-import { Button } from '../../primitives/button';
+import { Button } from '../../primitives/legacy-button';
 import { Form } from '../../primitives/form/form';
 import { showToast } from '../../primitives/sonner-helpers';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitives/tabs';

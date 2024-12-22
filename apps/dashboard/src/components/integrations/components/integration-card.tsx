@@ -1,5 +1,5 @@
 import { Badge } from '@/components/primitives/badge';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/legacy-button';
 import { RiCheckboxCircleFill, RiGitBranchFill, RiSettings4Line, RiStarSmileLine } from 'react-icons/ri';
 import { TableIntegration } from '../types';
 import { ChannelTypeEnum, type IEnvironment, type IIntegration, type IProviderConfig } from '@novu/shared';

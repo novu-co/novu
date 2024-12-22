@@ -41,7 +41,7 @@ import { ConfirmationModal } from '../confirmation-modal';
 import { DeleteWorkflowDialog } from '../delete-workflow-dialog';
 import { RouteFill } from '../icons';
 import { PageMeta } from '../page-meta';
-import { Button } from '../primitives/button';
+import { Button } from '../primitives/legacy-button';
 import { CopyButton } from '../primitives/copy-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
 import { Input, InputField } from '../primitives/input';

@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { Button } from '../primitives/button';
+import { Button } from '../primitives/legacy-button';
 import { Card, CardContent } from '../primitives/card';
 import { ToggleGroup, ToggleGroupItem } from '@/components/primitives/toggle-group';
 import { toast } from 'sonner';

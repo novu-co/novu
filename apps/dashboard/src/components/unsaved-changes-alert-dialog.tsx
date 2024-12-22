@@ -8,7 +8,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/primitives/alert-dialog';
-import { buttonVariants } from '@/components/primitives/button';
+import { buttonVariants } from '@/components/primitives/legacy-button';
 import { Separator } from '@/components/primitives/separator';
 import { RiAlertFill } from 'react-icons/ri';
 import { Blocker } from 'react-router-dom';

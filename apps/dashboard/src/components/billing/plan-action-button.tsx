@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/legacy-button';
 import { ApiServiceLevelEnum } from '@novu/shared';
 import { cn } from '../../utils/ui';
 import { useFetchSubscription } from '../../hooks/use-fetch-subscription';

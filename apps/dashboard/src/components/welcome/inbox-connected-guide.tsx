@@ -1,6 +1,6 @@
 import { RiCheckboxCircleFill, RiLoader3Line, RiNotification2Fill } from 'react-icons/ri';
 import { Loader2 } from 'lucide-react';
-import { Button } from '../primitives/button';
+import { Button } from '../primitives/legacy-button';
 import { showErrorToast, showSuccessToast } from '../primitives/sonner-helpers';
 import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
 import { ROUTES } from '../../utils/routes';

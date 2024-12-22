@@ -1,5 +1,5 @@
 import { RiArrowLeftSLine } from 'react-icons/ri';
-import { Button } from './primitives/button';
+import { Button } from './primitives/legacy-button';
 import { useNavigate } from 'react-router-dom';
 
 interface UsecasePlaygroundHeaderProps {

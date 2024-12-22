@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/legacy-button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { DashboardLayout } from '../components/dashboard-layout';

@@ -1,7 +1,7 @@
 import { cn } from '@/utils/ui';
 import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
-import { Button } from './button';
+import { Button } from './legacy-button';
 import { Loader2 } from 'lucide-react';
 
 const inlineToastVariants = cva('flex items-center justify-between gap-3 rounded-lg border px-2 py-1.5', {

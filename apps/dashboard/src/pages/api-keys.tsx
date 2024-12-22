@@ -3,7 +3,7 @@ import { RiKey2Line, RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 import { useEnvironment } from '@/context/environment/hooks';
 import { CopyButton } from '@/components/primitives/copy-button';
 import { Card, CardContent, CardHeader } from '@/components/primitives/card';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/legacy-button';
 import { Input, InputField } from '@/components/primitives/input';
 import { Form } from '@/components/primitives/form/form';
 import { useForm } from 'react-hook-form';

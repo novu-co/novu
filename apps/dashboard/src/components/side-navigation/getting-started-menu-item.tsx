@@ -8,7 +8,7 @@ import { useOnboardingSteps } from '../../hooks/use-onboarding-steps';
 import { NavigationLink } from './navigation-link';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
-import { Button } from '../primitives/button';
+import { Button } from '../primitives/legacy-button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { FeatureFlagsKeysEnum } from '@novu/shared';

@@ -1,7 +1,7 @@
 import { HoverToCopy } from '@/components/primitives/hover-to-copy';
 import { cn } from '@/utils/ui';
 import { RiFileCopyLine } from 'react-icons/ri';
-import { Button, ButtonProps } from './button';
+import { Button, ButtonProps } from './legacy-button';
 
 type CopyButtonProps = ButtonProps & {
   valueToCopy: string;

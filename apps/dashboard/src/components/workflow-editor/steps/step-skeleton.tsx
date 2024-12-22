@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Cross2Icon } from '@radix-ui/react-icons';
 
 import { Skeleton } from '@/components/primitives/skeleton';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/legacy-button';
 import { Separator } from '@/components/primitives/separator';
 import { Tabs, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Notification5Fill } from '@/components/icons';

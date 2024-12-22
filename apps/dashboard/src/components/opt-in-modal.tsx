@@ -1,7 +1,7 @@
 import { CircleCheck } from '@/components/icons/circle-check';
 import { PartyPopover } from '@/components/icons/party-popover';
 import { OptInArrow } from '@/components/icons/opt-in-arrow';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/legacy-button';
 import {
   Dialog,
   DialogClose,

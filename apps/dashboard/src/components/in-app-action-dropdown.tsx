@@ -4,7 +4,7 @@ import { ComponentProps, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
 
-import { Button, buttonVariants } from '@/components/primitives/button';
+import { Button, buttonVariants } from '@/components/primitives/legacy-button';
 import {
   DropdownMenu,
   DropdownMenuContent,

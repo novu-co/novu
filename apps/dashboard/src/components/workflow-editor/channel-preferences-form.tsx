@@ -15,7 +15,7 @@ import { capitalize } from '@/utils/string';
 import { cn } from '@/utils/ui';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { PageMeta } from '../page-meta';
-import { Button } from '../primitives/button';
+import { Button } from '../primitives/legacy-button';
 import { Card, CardContent } from '../primitives/card';
 import { Checkbox } from '../primitives/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '../primitives/form/form';

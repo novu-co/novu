@@ -3,7 +3,7 @@ import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
 
 import { Notification5Fill } from '@/components/icons';
 import { Code2 } from '@/components/icons/code-2';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/legacy-button';
 import { Editor } from '@/components/primitives/editor';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';

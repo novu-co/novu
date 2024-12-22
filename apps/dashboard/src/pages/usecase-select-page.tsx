@@ -2,7 +2,7 @@ import { UsecaseSelectOnboarding } from '../components/auth/usecase-selector';
 import { AuthCard } from '../components/auth/auth-card';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Button } from '../components/primitives/button';
+import { Button } from '../components/primitives/legacy-button';
 import { ROUTES } from '../utils/routes';
 import { useNavigate } from 'react-router-dom';
 import { OnboardingArrowLeft } from '../components/icons/onboarding-arrow-left';

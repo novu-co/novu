@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom';
 import { type ExternalToast } from 'sonner';
 import { IEnvironment, WorkflowListResponseDto } from '@novu/shared';
 import { Badge } from '@/components/primitives/badge';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/legacy-button';
 import {
   DropdownMenu,
   DropdownMenuContent,

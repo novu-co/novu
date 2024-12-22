@@ -1,4 +1,4 @@
-import { Button } from '../primitives/button';
+import { Button } from '../primitives/legacy-button';
 import { createWorkflow } from '../../api/workflows';
 import { CustomizeInbox } from './customize-inbox-playground';
 import { InboxPreviewContent } from './inbox-preview-content';

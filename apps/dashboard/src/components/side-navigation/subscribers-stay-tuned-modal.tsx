@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/legacy-button';
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from '@/components/primitives/dialog';
 import { ReactNode } from 'react';
 import { RiBookMarkedLine } from 'react-icons/ri';

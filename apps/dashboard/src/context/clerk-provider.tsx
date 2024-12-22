@@ -1,4 +1,4 @@
-import { buttonVariants } from '@/components/primitives/button';
+import { buttonVariants } from '@/components/primitives/legacy-button';
 import { cn } from '@/utils/ui';
 import { CLERK_PUBLISHABLE_KEY } from '@/config';
 import { ClerkProvider as _ClerkProvider } from '@clerk/clerk-react';

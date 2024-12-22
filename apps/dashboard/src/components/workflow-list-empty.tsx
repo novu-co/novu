@@ -1,6 +1,6 @@
 import { RiBookMarkedLine, RiRouteFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-import { Button, buttonVariants } from '@/components/primitives/button';
+import { Button, buttonVariants } from '@/components/primitives/legacy-button';
 import { VersionControlProd } from '@/components/icons/version-control-prod';
 import { VersionControlDev } from '@/components/icons/version-control-dev';
 import { CreateWorkflowButton } from '@/components/create-workflow-button';

@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/legacy-button';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { RiCloseLine, RiEdit2Line } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';

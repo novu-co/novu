@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/legacy-button';
 import { ApiServiceLevelEnum } from '@novu/shared';
 import { useState } from 'react';
 import { ContactSalesModal } from './contact-sales-modal';

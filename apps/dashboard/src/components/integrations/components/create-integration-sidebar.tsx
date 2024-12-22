@@ -6,7 +6,7 @@ import { useSidebarNavigationManager } from './hooks/use-sidebar-navigation-mana
 import { IntegrationSheet } from './integration-sheet';
 import { ChannelTabs } from './channel-tabs';
 import { IntegrationConfiguration } from './integration-configuration';
-import { Button } from '../../../components/primitives/button';
+import { Button } from '../../primitives/legacy-button';
 import { handleIntegrationError } from './utils/handle-integration-error';
 import { useSetPrimaryIntegration } from '../../../hooks/use-set-primary-integration';
 import { SelectPrimaryIntegrationModal } from './modals/select-primary-integration-modal';

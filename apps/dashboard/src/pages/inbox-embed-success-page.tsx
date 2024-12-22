@@ -1,5 +1,5 @@
 import { AuthCard } from '../components/auth/auth-card';
-import { Button } from '../components/primitives/button';
+import { Button } from '../components/primitives/legacy-button';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../utils/routes';
 import { useTelemetry } from '../hooks/use-telemetry';

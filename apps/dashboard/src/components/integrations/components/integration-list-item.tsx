@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/legacy-button';
 import { IProviderConfig } from '@novu/shared';
 import { ProviderIcon } from './provider-icon';
 import { RiArrowRightSLine } from 'react-icons/ri';

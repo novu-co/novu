@@ -12,7 +12,7 @@ import {
   RiInformationFill,
   RiProgress1Line,
 } from 'react-icons/ri';
-import { Button } from './button';
+import { Button } from './legacy-button';
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
