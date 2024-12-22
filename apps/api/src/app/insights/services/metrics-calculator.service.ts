@@ -9,6 +9,7 @@ import {
   IMixpanelResponse,
   IMetricStats,
   MixpanelSeriesNameEnum,
+  IChannelData,
 } from '../types/usage-insights.types';
 
 @Injectable()
@@ -59,73 +60,40 @@ export class MetricsCalculatorService {
     Logger.debug(`Calculating inbox metrics for organization: ${orgId}`);
     const getMetricStats = (
       currentSeriesData: ISeriesData | undefined,
-      previousSeriesData: ISeriesData | undefined,
-      orgKey: string
-    ): IMetricStats => {
-      if (!currentSeriesData || !previousSeriesData) {
-        Logger.debug(`No series data available for ${orgKey}`);
-
-        return { current: 0, previous: 0, change: 0 };
-      }
-
-      const currentData = currentSeriesData[orgKey];
-      const previousData = previousSeriesData[orgKey];
-      if (!currentData || !previousData) {
-        Logger.debug(`No data available for ${orgKey}`);
-
-        return { current: 0, previous: 0, change: 0 };
-      }
-
-      const current = Number(Object.values(currentData)[0] || 0);
-      const previous = Number(Object.values(previousData)[0] || 0);
-      const change = this.calculateChange(current, previous);
-
-      Logger.debug(`Metric stats for ${orgKey}: current=${current}, previous=${previous}, change=${change}%`);
-
-      return { current, previous, change };
-    };
-
-    return {
-      sessionInitialized: getMetricStats(
-        inboxSeries[MixpanelSeriesNameEnum.INBOX_SESSION_INITIALIZED],
-        inboxTimeComparison[MixpanelSeriesNameEnum.INBOX_SESSION_INITIALIZED],
-        orgId
-      ),
-      updatePreferences: getMetricStats(
-        inboxSeries[MixpanelSeriesNameEnum.INBOX_UPDATE_PREFERENCES],
-        inboxTimeComparison[MixpanelSeriesNameEnum.INBOX_UPDATE_PREFERENCES],
-        orgId
-      ),
-      markNotification: getMetricStats(
-        inboxSeries[MixpanelSeriesNameEnum.INBOX_MARK_NOTIFICATION],
-        inboxTimeComparison[MixpanelSeriesNameEnum.INBOX_MARK_NOTIFICATION],
-        orgId
-      ),
-      updateAction: getMetricStats(
-        inboxSeries[MixpanelSeriesNameEnum.INBOX_UPDATE_ACTION],
-        inboxTimeComparison[MixpanelSeriesNameEnum.INBOX_UPDATE_ACTION],
-        orgId
-      ),
-    };
-  }
-
-  calculateOverallInboxMetrics(
-    inboxSeries: IInboxResponse['series'],
-    inboxTimeComparison: IInboxResponse['time_comparison']['series']
-  ): IInboxMetrics {
-    Logger.debug('Calculating overall inbox metrics');
-
-    const getMetricStats = (
-      currentSeriesData: ISeriesData | undefined,
       previousSeriesData: ISeriesData | undefined
     ): IMetricStats => {
-      if (!currentSeriesData?.$overall || !previousSeriesData?.$overall) {
+      if (!currentSeriesData || !previousSeriesData) {
+        Logger.debug(`No series data available for ${orgId}`);
+
         return { current: 0, previous: 0, change: 0 };
       }
 
-      const current = Number(Object.values(currentSeriesData.$overall)[0] || 0);
-      const previous = Number(Object.values(previousSeriesData.$overall)[0] || 0);
+      const currentOrgData = currentSeriesData[orgId];
+      const previousOrgData = previousSeriesData[orgId];
+
+      if (!currentOrgData || !previousOrgData) {
+        Logger.debug(`No series data available for ${orgId}`);
+
+        return { current: 0, previous: 0, change: 0 };
+      }
+
+      const currentData = currentOrgData[this.roundToStartOfDay(dateRange.to_date)];
+      const previousData = previousOrgData[this.roundToStartOfDay(dateRange.from_date)];
+
+      console.log(currentOrgData, 'HIII', this.roundToStartOfDay(dateRange.to_date));
+      console.log(previousOrgData, 'HIII', this.roundToStartOfDay(dateRange.from_date));
+
+      if (!currentData || !previousData) {
+        Logger.debug(`No data available for ${orgId}`);
+
+        return { current: 0, previous: 0, change: 0 };
+      }
+
+      const current = Number(currentData || 0);
+      const previous = Number(previousData || 0);
       const change = this.calculateChange(current, previous);
+
+      Logger.debug(`Metric stats for ${orgId}: current=${current}, previous=${previous}, change=${change}%`);
 
       return { current, previous, change };
     };
@@ -146,6 +114,48 @@ export class MetricsCalculatorService {
       updateAction: getMetricStats(
         inboxSeries[MixpanelSeriesNameEnum.INBOX_UPDATE_ACTION],
         inboxTimeComparison[MixpanelSeriesNameEnum.INBOX_UPDATE_ACTION]
+      ),
+    };
+  }
+
+  calculateOverallInboxMetrics(
+    orgId: string,
+    inboxSeries: IInboxResponse['series'],
+    inboxTimeComparison: IInboxResponse['time_comparison']['series']
+  ): IInboxMetrics {
+    Logger.debug('Calculating overall inbox metrics');
+
+    const getMetricStats = (
+      currentSeriesData: IChannelData | undefined,
+      previousSeriesData: IChannelData | undefined
+    ): IMetricStats => {
+      if (!currentSeriesData?.$overall || !previousSeriesData?.$overall) {
+        return { current: 0, previous: 0, change: 0 };
+      }
+
+      const current = Number(Object.values(currentSeriesData.$overall)[0] || 0);
+      const previous = Number(Object.values(previousSeriesData.$overall)[0] || 0);
+      const change = this.calculateChange(current, previous);
+
+      return { current, previous, change };
+    };
+
+    return {
+      sessionInitialized: getMetricStats(
+        inboxSeries[MixpanelSeriesNameEnum.INBOX_SESSION_INITIALIZED][orgId],
+        inboxTimeComparison[MixpanelSeriesNameEnum.INBOX_SESSION_INITIALIZED][orgId]
+      ),
+      updatePreferences: getMetricStats(
+        inboxSeries[MixpanelSeriesNameEnum.INBOX_UPDATE_PREFERENCES][orgId],
+        inboxTimeComparison[MixpanelSeriesNameEnum.INBOX_UPDATE_PREFERENCES][orgId]
+      ),
+      markNotification: getMetricStats(
+        inboxSeries[MixpanelSeriesNameEnum.INBOX_MARK_NOTIFICATION][orgId],
+        inboxTimeComparison[MixpanelSeriesNameEnum.INBOX_MARK_NOTIFICATION][orgId]
+      ),
+      updateAction: getMetricStats(
+        inboxSeries[MixpanelSeriesNameEnum.INBOX_UPDATE_ACTION][orgId],
+        inboxTimeComparison[MixpanelSeriesNameEnum.INBOX_UPDATE_ACTION][orgId]
       ),
     };
   }
@@ -197,23 +207,17 @@ export class MetricsCalculatorService {
   }
 
   calculateWorkflowStats(
+    orgId: string,
     subscriberSeries: ISeriesData,
     subscriberTimeComparison: ISeriesData
   ): IMixpanelResponse['workflowStats'] {
     Logger.debug('Calculating workflow statistics');
     const workflowStats: IMixpanelResponse['workflowStats'] = { workflows: {} };
 
-    const firstOrgId = Object.keys(subscriberSeries).find((key) => key !== '$overall');
-    if (!firstOrgId) {
-      Logger.debug('No organization data found for workflow stats');
-
-      return workflowStats;
-    }
-
-    const orgData = subscriberSeries[firstOrgId]?.undefined;
-    const orgPreviousData = subscriberTimeComparison[firstOrgId]?.undefined;
+    const orgData = subscriberSeries[orgId]?.undefined;
+    const orgPreviousData = subscriberTimeComparison[orgId]?.undefined;
     if (!orgData || !orgPreviousData) {
-      Logger.debug(`No workflow data found for organization: ${firstOrgId}`);
+      Logger.debug(`No workflow data found for organization: ${orgId}`);
 
       return workflowStats;
     }

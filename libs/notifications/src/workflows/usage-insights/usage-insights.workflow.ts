@@ -3,7 +3,6 @@ import { workflow } from '@novu/framework';
 import { z } from 'zod';
 import UsageInsightsEmail from './email';
 import { IUsageEmailData } from './types';
-import { sampleUsageData } from './sample-data';
 
 const marketingLinkSchema = z
   .object({
@@ -75,30 +74,32 @@ export const usageInsightsWorkflow = workflow(
     name: 'Usage Insights',
     payloadSchema: z
       .object({
-        organizationName: z.string().default(sampleUsageData.organizationName),
+        organizationName: z.string(),
         period: z
           .object({
-            current: z.string().default(sampleUsageData.period.current),
-            previous: z.string().default(sampleUsageData.period.previous),
+            current: z.string(),
+            previous: z.string(),
           })
           .required(),
-        subscriberNotifications: channelMetricsSchema.default(sampleUsageData.subscriberNotifications),
+        subscriberNotifications: channelMetricsSchema,
         channelBreakdown: z
           .object({
-            email: channelMetricsSchema.default(sampleUsageData.channelBreakdown.email),
-            sms: channelMetricsSchema.default(sampleUsageData.channelBreakdown.sms),
-            push: channelMetricsSchema.default(sampleUsageData.channelBreakdown.push),
+            email: channelMetricsSchema,
+            sms: channelMetricsSchema,
+            push: channelMetricsSchema,
+            inApp: channelMetricsSchema,
+            chat: channelMetricsSchema,
           })
           .required(),
         inboxMetrics: z
           .object({
-            sessionInitialized: channelMetricsSchema.default(sampleUsageData.inboxMetrics.sessionInitialized),
-            updatePreferences: channelMetricsSchema.default(sampleUsageData.inboxMetrics.updatePreferences),
-            markNotification: channelMetricsSchema.default(sampleUsageData.inboxMetrics.markNotification),
-            updateAction: channelMetricsSchema.default(sampleUsageData.inboxMetrics.updateAction),
+            sessionInitialized: channelMetricsSchema,
+            updatePreferences: channelMetricsSchema,
+            markNotification: channelMetricsSchema,
+            updateAction: channelMetricsSchema,
           })
           .required(),
-        workflowStats: z.record(z.string(), channelMetricsSchema).default(sampleUsageData.workflowStats),
+        workflowStats: z.record(z.string(), channelMetricsSchema),
       })
       .required(),
   }

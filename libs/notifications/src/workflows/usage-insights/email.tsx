@@ -94,10 +94,10 @@ function ChannelBreakdown({ channels }: { channels: IUsageEmailData['channelBrea
         </Column>
         <Column className="p-2">
           <MetricCard
-            title="SMS"
-            current={channels.sms.current}
-            previous={channels.sms.previous}
-            change={channels.sms.change}
+            title="Inbox"
+            current={channels.inApp.current}
+            previous={channels.inApp.previous}
+            change={channels.inApp.change}
           />
         </Column>
         <Column className="p-2 pr-0">
@@ -114,6 +114,17 @@ function ChannelBreakdown({ channels }: { channels: IUsageEmailData['channelBrea
 }
 
 function InboxMetrics({ metrics }: { metrics: IUsageEmailData['inboxMetrics'] }) {
+  if (
+    !metrics.markNotification.current &&
+    !metrics.markNotification.previous &&
+    !metrics.sessionInitialized.current &&
+    !metrics.sessionInitialized.previous &&
+    !metrics.updatePreferences.previous &&
+    !metrics.updatePreferences.current
+  ) {
+    return null;
+  }
+
   return (
     <Section className="mt-6">
       <SectionHeader title="Inbox Activity" />

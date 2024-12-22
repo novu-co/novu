@@ -101,6 +101,7 @@ export class MixpanelService {
 
     try {
       Logger.debug('Making Mixpanel API request for inbox insights');
+
       const response = await axios.get<IInboxResponse>('https://mixpanel.com/api/2.0/insights', {
         params: {
           project_id: '2667883',

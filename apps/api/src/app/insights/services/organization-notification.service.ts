@@ -54,6 +54,7 @@ export class OrganizationNotificationService {
           email: `dima+testing-${organization._id}@novu.co`,
         },
         payload: {
+          organizationName: organization.name,
           period: {
             current: dateRange.to_date,
             previous: dateRange.from_date,
@@ -63,6 +64,8 @@ export class OrganizationNotificationService {
             email: metrics.channelBreakdown.email || { current: 0, previous: 0, change: 0 },
             sms: metrics.channelBreakdown.sms || { current: 0, previous: 0, change: 0 },
             push: metrics.channelBreakdown.push || { current: 0, previous: 0, change: 0 },
+            inApp: metrics.channelBreakdown.in_app || { current: 0, previous: 0, change: 0 },
+            chat: metrics.channelBreakdown.chat || { current: 0, previous: 0, change: 0 },
           },
           inboxMetrics: {
             sessionInitialized: metrics.inboxMetrics?.sessionInitialized,

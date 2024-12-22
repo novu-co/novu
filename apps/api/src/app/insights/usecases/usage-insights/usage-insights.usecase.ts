@@ -46,33 +46,25 @@ export class UsageInsights {
       return null;
     }
 
-    const seriesDateRange = {
-      from_date: mixpanelData.time_comparison.date_range.from_date,
-      to_date: mixpanelData.date_range.to_date,
-    };
-
-    const workflowStats = this.metricsCalculator.calculateWorkflowStats(subscriberSeries, subscriberTimeComparison);
-    mixpanelData.workflowStats = workflowStats;
-
-    const defaultInboxMetrics: IInboxMetrics = {
-      sessionInitialized: { current: 0, previous: 0, change: 0 },
-      updatePreferences: { current: 0, previous: 0, change: 0 },
-      markNotification: { current: 0, previous: 0, change: 0 },
-      updateAction: { current: 0, previous: 0, change: 0 },
-    };
-
-    Logger.debug('Initializing inbox stats');
-    const inboxStats: IUsageInsightsResponse['inboxStats'] = {
-      byOrganization: {},
-      overall: inboxData?.series
-        ? this.metricsCalculator.calculateOverallInboxMetrics(inboxData.series, inboxData.time_comparison.series)
-        : defaultInboxMetrics,
-    };
-
     Logger.debug('Processing organization data');
     for (const [orgId, orgData] of Object.entries(workflowSeries)) {
       if (orgId === '$overall') continue;
 
+      const workflowStats = this.metricsCalculator.calculateWorkflowStats(
+        orgId,
+        subscriberSeries,
+        subscriberTimeComparison
+      );
+      mixpanelData.workflowStats = workflowStats;
+
+      const defaultInboxMetrics: IInboxMetrics = {
+        sessionInitialized: { current: 0, previous: 0, change: 0 },
+        updatePreferences: { current: 0, previous: 0, change: 0 },
+        markNotification: { current: 0, previous: 0, change: 0 },
+        updateAction: { current: 0, previous: 0, change: 0 },
+      };
+
+      Logger.debug('Initializing inbox stats');
       Logger.debug(`Processing metrics for organization: ${orgId}`);
       const metrics = this.metricsCalculator.createOrganizationMetrics(
         orgId,
@@ -103,25 +95,23 @@ export class UsageInsights {
           inboxData.series,
           inboxData.time_comparison.series,
           orgId,
-          seriesDateRange
+          {
+            from_date: inboxData.time_comparison.date_range.from_date,
+            to_date: inboxData.date_range.from_date,
+          }
         );
         metrics.inboxMetrics = inboxMetrics;
-        inboxStats.byOrganization[orgId] = inboxMetrics;
       } else {
         Logger.debug(`Using default inbox metrics for organization: ${orgId}`);
         metrics.inboxMetrics = defaultInboxMetrics;
-        inboxStats.byOrganization[orgId] = defaultInboxMetrics;
       }
 
-      await this.organizationNotification.sendOrganizationNotification(metrics, workflowStats, seriesDateRange);
+      await this.organizationNotification.sendOrganizationNotification(metrics, workflowStats, {
+        from_date: mixpanelData.time_comparison.date_range.from_date,
+        to_date: mixpanelData.date_range.to_date,
+      });
     }
 
     Logger.debug('UsageInsights execution completed successfully');
-
-    return {
-      series: mixpanelData.series,
-      workflowStats: mixpanelData.workflowStats,
-      inboxStats,
-    };
   }
 }
