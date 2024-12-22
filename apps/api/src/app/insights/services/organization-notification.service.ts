@@ -15,7 +15,7 @@ export class OrganizationNotificationService {
   async sendOrganizationNotification(organizationId: string, metrics: IOrganizationMetrics, dateRange: IDateRange) {
     Logger.debug(`Processing metrics for organization: ${organizationId}`);
     try {
-      const organization = await this.organizationRepository.findById('675fe9bcab6a05bb6dcb7dab');
+      const organization = await this.organizationRepository.findById(organizationId);
 
       if (!organization) {
         Logger.warn(`Organization not found in repository: ${organizationId}`);
@@ -48,8 +48,6 @@ export class OrganizationNotificationService {
         inboxMetrics: metrics.inboxMetrics,
         workflowStats: metrics.workflowStats,
       };
-
-      delete (payload.channelBreakdown as any).trigger;
 
       Logger.debug(`Sending notification for ${organization.name} with payload:`, payload);
 
