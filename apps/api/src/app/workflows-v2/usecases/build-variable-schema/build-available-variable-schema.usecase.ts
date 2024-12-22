@@ -85,6 +85,7 @@ export class BuildAvailableVariableSchemaUsecase {
         organizationId: command.organizationId,
         userId: command.userId,
         workflowId: workflow._id,
+        ...(command.optimisticControlValues ? { controlValues: command.optimisticControlValues } : {}),
       })
     );
   }

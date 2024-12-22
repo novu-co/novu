@@ -54,10 +54,9 @@ import {
 
 import { UpsertWorkflowCommand, UpsertWorkflowDataCommand } from './upsert-workflow.command';
 import { stepTypeToControlSchema } from '../../shared';
-import { PatchStepUsecase } from '../patch-step-data';
 import { GetWorkflowCommand, GetWorkflowUseCase } from '../get-workflow';
 import { buildVariables } from '../../util/build-variables';
-import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
+import { BuildAvailableVariableSchemaCommand, BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
 
 @Injectable()
 export class UpsertWorkflowUseCase {
@@ -289,13 +288,16 @@ export class UpsertWorkflowUseCase {
     step: StepCreateDto | StepUpdateDto,
     controlSchemas: ControlSchemas
   ) {
-    const variableSchema = await this.buildAvailableVariableSchemaUsecase.execute({
-      environmentId: user.environmentId,
-      organizationId: user.organizationId,
-      userId: user._id,
-      stepInternalId: foundPersistedStep?.stepId,
-      workflow: persistedWorkflow,
-    });
+    const variableSchema = await this.buildAvailableVariableSchemaUsecase.execute(
+      BuildAvailableVariableSchemaCommand.create({
+        environmentId: user.environmentId,
+        organizationId: user.organizationId,
+        userId: user._id,
+        stepInternalId: foundPersistedStep?.stepId,
+        workflow: persistedWorkflow,
+        ...(step.controlValues ? { optimisticControlValues: step.controlValues } : {}),
+      })
+    );
 
     let controlValueLocal = step.controlValues;
 

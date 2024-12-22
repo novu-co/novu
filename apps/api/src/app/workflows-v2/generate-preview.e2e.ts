@@ -421,7 +421,7 @@ describe('Generate Preview', () => {
 
       channelTypes.forEach(({ type, description }) => {
         // TODO: We need to get back to the drawing board on this one to make the preview action of the framework more forgiving
-        it(`[${type}] catches the 400 error returned by the Bridge Preview action`, async () => {
+        it(`[${type}] will generate gracefully the preview if the control values are missing`, async () => {
           const { stepDatabaseId, workflowId, stepId } = await createWorkflowAndReturnId(workflowsClient, type);
           const requestDto = buildDtoWithMissingControlValues(type, stepId);
 
@@ -433,7 +433,7 @@ describe('Generate Preview', () => {
             description
           );
 
-          expect(previewResponseDto.result).to.eql({ preview: {} });
+          expect(previewResponseDto.result).to.not.eql({ preview: {} });
         });
       });
     });
