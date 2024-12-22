@@ -52,12 +52,14 @@ export class MetricsCalculatorService {
     orgId?: string,
     dateRange?: IDateRange
   ): IInboxMetrics {
+    const emptyResponse = { current: 0, previous: 0, change: 0 };
+
     if (!inboxSeries || !inboxTimeComparison || !orgId || !dateRange) {
       return {
-        sessionInitialized: { current: 0, previous: 0, change: 0 },
-        updatePreferences: { current: 0, previous: 0, change: 0 },
-        markNotification: { current: 0, previous: 0, change: 0 },
-        updateAction: { current: 0, previous: 0, change: 0 },
+        sessionInitialized: emptyResponse,
+        updatePreferences: emptyResponse,
+        markNotification: emptyResponse,
+        updateAction: emptyResponse,
       };
     }
 
@@ -69,7 +71,7 @@ export class MetricsCalculatorService {
       if (!currentSeriesData || !previousSeriesData) {
         Logger.debug(`No series data available for ${orgId}`);
 
-        return { current: 0, previous: 0, change: 0 };
+        return emptyResponse;
       }
 
       const currentOrgData = currentSeriesData[orgId];
@@ -78,7 +80,7 @@ export class MetricsCalculatorService {
       if (!currentOrgData || !previousOrgData) {
         Logger.debug(`No series data available for ${orgId}`);
 
-        return { current: 0, previous: 0, change: 0 };
+        return emptyResponse;
       }
 
       const currentData = currentOrgData[this.roundToStartOfDay(dateRange.to_date)];
@@ -87,7 +89,7 @@ export class MetricsCalculatorService {
       if (!currentData || !previousData) {
         Logger.debug(`No data available for ${orgId}`);
 
-        return { current: 0, previous: 0, change: 0 };
+        return emptyResponse;
       }
 
       const current = Number(currentData || 0);
