@@ -51,6 +51,7 @@ import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
 import { Tooltip, TooltipContent, TooltipPortal, TooltipTrigger } from '../primitives/tooltip';
 import { usePromotionalBanner } from '../promotional/coming-soon-banner';
+import { CompactButton } from '../primitives/button-compact';
 
 type ConfigureWorkflowFormProps = {
   workflow: WorkflowResponseDto;
@@ -188,9 +189,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
            */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <LegacyButton variant="ghost" size="icon" className="ml-auto h-[20px] w-[22px]">
-                <RiMore2Fill />
-              </LegacyButton>
+              <CompactButton variant="ghost" className="ml-auto" icon={RiMore2Fill}></CompactButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuGroup>

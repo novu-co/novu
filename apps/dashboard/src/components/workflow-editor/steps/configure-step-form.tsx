@@ -53,6 +53,7 @@ import { buildDynamicZodSchema } from '@/utils/schema';
 import { ConfigurePushStepPreview } from '@/components/workflow-editor/steps/push/configure-push-step-preview';
 import { ConfigureChatStepPreview } from '@/components/workflow-editor/steps/chat/configure-chat-step-preview';
 import { Button } from '../../primitives/button';
+import { CompactButton } from '../../primitives/button-compact';
 
 const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
@@ -204,9 +205,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               })}
               className="flex items-center"
             >
-              <LegacyButton variant="link" size="icon" className="size-4" type="button">
-                <RiArrowLeftSLine />
-              </LegacyButton>
+              <CompactButton size="md" variant="ghost" icon={RiArrowLeftSLine}></CompactButton>
             </Link>
             <span>Configure Step</span>
             <Link
@@ -216,9 +215,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               })}
               className="ml-auto flex items-center"
             >
-              <LegacyButton variant="link" size="icon" className="size-4" type="button">
-                <RiCloseFill />
-              </LegacyButton>
+              <CompactButton size="md" variant="ghost" icon={RiCloseFill}></CompactButton>
             </Link>
           </SidebarHeader>
 

@@ -4,6 +4,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { PolymorphicComponentProps } from '@/utils/polymorphic';
 import { recursiveCloneChildren } from '@/utils/recursive-clone-children';
 import { tv, type VariantProps } from '@/utils/tv';
+import { IconType } from 'react-icons';
 
 const COMPACT_BUTTON_ROOT_NAME = 'CompactButtonRoot';
 const COMPACT_BUTTON_ICON_NAME = 'CompactButtonIcon';
@@ -56,11 +57,11 @@ export const compactButtonVariants = tv({
       modifiable: {},
     },
     size: {
-      large: {
+      lg: {
         root: 'size-6',
         icon: 'size-5',
       },
-      medium: {
+      md: {
         root: 'size-5',
         icon: 'size-[18px]',
       },
@@ -76,7 +77,7 @@ export const compactButtonVariants = tv({
   },
   defaultVariants: {
     variant: 'stroke',
-    size: 'large',
+    size: 'md',
     fullRadius: false,
   },
 });
@@ -130,4 +131,18 @@ function CompactButtonIcon<T extends React.ElementType>({
 }
 CompactButtonIcon.displayName = COMPACT_BUTTON_ICON_NAME;
 
-export { CompactButtonRoot as Root, CompactButtonIcon as Icon };
+const CompactButton = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentProps<typeof CompactButtonRoot> & {
+    icon: IconType;
+  }
+>(({ children, icon: Icon, ...rest }, forwardedRef) => {
+  return (
+    <CompactButtonRoot ref={forwardedRef} {...rest}>
+      <CompactButtonIcon as={Icon} />
+    </CompactButtonRoot>
+  );
+});
+CompactButton.displayName = 'CompactButton';
+
+export { CompactButtonRoot as Root, CompactButtonIcon as Icon, CompactButton };
