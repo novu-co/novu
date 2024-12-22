@@ -52,6 +52,7 @@ import { buildRoute, ROUTES } from '@/utils/routes';
 import { buildDynamicZodSchema } from '@/utils/schema';
 import { ConfigurePushStepPreview } from '@/components/workflow-editor/steps/push/configure-push-step-preview';
 import { ConfigureChatStepPreview } from '@/components/workflow-editor/steps/chat/configure-chat-step-preview';
+import { Button } from '../../primitives/button';
 
 const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
@@ -329,15 +330,15 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                 }
                 confirmButtonText="Delete"
               />
-              <LegacyButton
-                variant="ghostDestructive"
-                className="gap-1.5 text-xs"
-                type="button"
+              <Button
+                variant="error"
+                size="2xs"
+                leadingIcon={RiDeleteBin2Line}
+                mode="ghost"
                 onClick={() => setIsDeleteModalOpen(true)}
               >
-                <RiDeleteBin2Line className="size-4" />
                 Delete step
-              </LegacyButton>
+              </Button>
             </SidebarFooter>
           )}
         </motion.div>

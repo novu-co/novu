@@ -46,6 +46,7 @@ export const TemplateTabs = ({ editorContent, previewContent, tabsValue, onTabCh
           }}
         >
           <Cross2Icon className="h-4 w-4" />
+
           <span className="sr-only">Close</span>
         </LegacyButton>
       </header>

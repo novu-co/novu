@@ -60,7 +60,7 @@ export const buttonVariants = tv({
       },
       '2xs': {
         root: 'h-7 gap-2.5 rounded-lg px-2 text-label-xs',
-        icon: '',
+        icon: 'size-4',
       },
     },
   },

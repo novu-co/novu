@@ -28,14 +28,6 @@ export const twMergeConfig = {
 
 const customTwMerge = extendTailwindMerge(twMergeConfig);
 
-/**
- * Utilizes `clsx` with `tailwind-merge`, use in cases of possible class conflicts.
- */
-export function cnExt(...classes: ClassValue[]) {
+export function cn(...classes: ClassValue[]) {
   return customTwMerge(clsx(...classes));
 }
-
-/**
- * A direct export of `clsx` without `tailwind-merge`.
- */
-export const cn = clsx;

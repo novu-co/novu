@@ -1,5 +1,3 @@
-import { LegacyButton } from '@/components/primitives/legacy-button';
-
 import {
   Dialog,
   DialogClose,
@@ -12,6 +10,7 @@ import {
 } from '@/components/primitives/dialog';
 import { ReactNode } from 'react';
 import { RiAlertFill } from 'react-icons/ri';
+import { Button } from './primitives/button';
 
 type ConfirmationModalProps = {
   open: boolean;
@@ -38,24 +37,24 @@ export const ConfirmationModal = ({
     <Dialog modal open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
         <DialogOverlay />
-        <DialogContent className="sm:max-w-[440px]">
+        <DialogContent className="pb-0 sm:max-w-[440px]" hideClose={true}>
           <div className="flex items-start gap-4 self-stretch">
             <div className="bg-warning/10 flex items-center justify-center gap-2 rounded-[10px] p-2">
               <RiAlertFill className="text-warning size-6" />
             </div>
             <div className="flex flex-1 flex-col items-start gap-1">
-              <DialogTitle className="text-md font-medium">{title}</DialogTitle>
-              <DialogDescription className="text-foreground-600">{description}</DialogDescription>
+              <DialogTitle className="text-label-md !font-medium">{title}</DialogTitle>
+              <DialogDescription className="text-text-sub text-paragraph-sm">{description}</DialogDescription>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="!py-4">
             <DialogClose asChild aria-label="Close">
-              <LegacyButton type="button" size="sm" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button type="button" size="sm" variant="secondary" mode="outline" onClick={() => onOpenChange(false)}>
                 Cancel
-              </LegacyButton>
+              </Button>
             </DialogClose>
 
-            <LegacyButton
+            <Button
               type="button"
               size="sm"
               variant="primary"
@@ -64,7 +63,7 @@ export const ConfirmationModal = ({
               disabled={isConfirmDisabled}
             >
               {confirmButtonText}
-            </LegacyButton>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </DialogPortal>

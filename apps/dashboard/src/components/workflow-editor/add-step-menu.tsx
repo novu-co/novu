@@ -105,7 +105,7 @@ export const AddStepMenu = ({
         </span>
       </PopoverTrigger>
       <PopoverPortal>
-        <PopoverContent side="right" className="flex w-[200px] flex-col rounded-lg p-0">
+        <PopoverContent side="right" className="flex w-[200px] flex-col rounded-lg !p-0">
           <div>
             <MenuGroup>
               <MenuTitle>Channels</MenuTitle>
