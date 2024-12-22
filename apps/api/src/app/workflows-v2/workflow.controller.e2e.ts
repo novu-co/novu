@@ -15,7 +15,6 @@ import {
   slugify,
   StepContentIssueEnum,
   StepCreateDto,
-  StepDataDto,
   StepTypeEnum,
   StepUpdateDto,
   UpdateStepBody,
@@ -220,8 +219,8 @@ describe('Workflow Controller E2E API Testing', () => {
         }
         const updatedWorkflow = novuRestResult.value;
         const firstStep = updatedWorkflow.steps[0];
-        expect(firstStep.issues?.body, JSON.stringify(firstStep)).to.be.empty;
-        expect(firstStep.issues?.controls, JSON.stringify(firstStep.issues)).to.be.empty;
+        expect(firstStep.issues, JSON.stringify(firstStep)).to.be.empty;
+        expect(firstStep.issues, JSON.stringify(firstStep.issues)).to.be.empty;
       });
     });
 
