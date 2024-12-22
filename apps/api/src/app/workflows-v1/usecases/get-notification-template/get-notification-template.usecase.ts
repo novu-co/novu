@@ -15,7 +15,7 @@ export class GetNotificationTemplate {
   async execute(command: GetNotificationTemplateCommand): Promise<NotificationTemplateEntity> {
     const workflow = await this.getWorkflowByIdsUseCase.execute(
       GetWorkflowByIdsCommand.create({
-        identifierOrInternalId: command.workflowIdOrIdentifier,
+        workflowIdOrInternalId: command.workflowIdOrIdentifier,
         environmentId: command.environmentId,
         organizationId: command.organizationId,
         userId: command.userId,

@@ -1,5 +1,5 @@
 import { ChannelTypeEnum } from '../../types';
-import { ISubscriberResponseDto } from '../subscriber';
+import { ISubscriberFeedResponseDto } from '../subscriber';
 import { IActorDto, IMessageCTADto } from '../message-template';
 
 export interface INotificationDto {
@@ -13,22 +13,23 @@ export interface INotificationDto {
   _feedId?: string | null;
   _jobId: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string | null;
   lastSeenDate?: string;
   lastReadDate?: string;
   actor?: IActorDto;
-  subscriber?: ISubscriberResponseDto;
+  subscriber?: ISubscriberFeedResponseDto;
   transactionId: string;
-  templateIdentifier: string;
-  providerId: string;
+  templateIdentifier?: string | null;
+  providerId?: string | null;
   content: string;
   channel: ChannelTypeEnum;
   read: boolean;
   seen: boolean;
+  subject?: string | null;
   deleted: boolean;
-  deviceTokens?: string[];
+  deviceTokens?: string[] | null;
   cta: IMessageCTADto;
   status: 'sent' | 'error' | 'warning';
-  payload: Record<string, unknown>;
-  overrides: Record<string, unknown>;
+  payload?: Record<string, unknown>;
+  overrides?: Record<string, unknown>;
 }

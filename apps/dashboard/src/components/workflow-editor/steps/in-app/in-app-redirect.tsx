@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 
 import { FormLabel } from '@/components/primitives/form/form';
-import { URLInput } from '../../url-input';
-import { urlTargetTypes } from '@/utils/url';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
-import { useStep } from '@/components/workflow-editor/steps/step-provider';
+import { urlTargetTypes } from '@/utils/url';
+import { URLInput } from '../../url-input';
 
 export const InAppRedirect = () => {
-  const { step } = useStep();
+  const { step } = useWorkflow();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
 
   return (

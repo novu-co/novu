@@ -3,23 +3,46 @@ import * as React from 'react';
 import { cn } from '@/utils/ui';
 import { ClassNameValue } from 'tailwind-merge';
 
-const Table = React.forwardRef<
-  HTMLTableElement,
-  React.HTMLAttributes<HTMLDivElement> & { containerClassname?: ClassNameValue }
->(({ className, containerClassname, ...props }, ref) => (
-  <div
-    className={cn(
-      'border-neutral-alpha-200 relative w-full overflow-x-auto rounded-md border shadow-sm',
-      containerClassname
-    )}
-  >
-    <table
-      ref={ref}
-      className={cn('relative w-full caption-bottom border-separate border-spacing-0 text-sm', className)}
-      {...props}
-    />
-  </div>
-));
+interface TableProps extends React.HTMLAttributes<HTMLDivElement> {
+  containerClassname?: ClassNameValue;
+  isLoading?: boolean;
+  loadingRowsCount?: number;
+  loadingRow?: React.ReactNode;
+}
+
+const LoadingRow = () => (
+  <TableRow>
+    <TableCell className="animate-pulse" colSpan={100}>
+      <div className="h-8 w-full rounded-md bg-neutral-100" />
+    </TableCell>
+  </TableRow>
+);
+
+const Table = React.forwardRef<HTMLTableElement, TableProps>(
+  ({ className, containerClassname, isLoading, loadingRowsCount = 5, loadingRow, children, ...props }, ref) => (
+    <div
+      className={cn(
+        'border-neutral-alpha-200 relative w-full overflow-x-auto rounded-md border shadow-sm',
+        containerClassname
+      )}
+    >
+      <table
+        ref={ref}
+        className={cn('relative w-full caption-bottom border-separate border-spacing-0 text-sm', className)}
+        {...props}
+      >
+        {children}
+        {isLoading && (
+          <TableBody>
+            {Array.from({ length: loadingRowsCount }).map((_, index) => (
+              <React.Fragment key={index}>{loadingRow || <LoadingRow />}</React.Fragment>
+            ))}
+          </TableBody>
+        )}
+      </table>
+    </div>
+  )
+);
 Table.displayName = 'Table';
 
 const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(

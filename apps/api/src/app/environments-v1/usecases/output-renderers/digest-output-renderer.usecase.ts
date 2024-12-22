@@ -23,7 +23,7 @@ export class DigestOutputRendererUsecase {
       parse.lookBackWindow.unit
     ) {
       return {
-        amount: parse.amount,
+        amount: parse.amount as number,
         unit: parse.unit,
         digestKey: parse.digestKey,
         lookBackWindow: {

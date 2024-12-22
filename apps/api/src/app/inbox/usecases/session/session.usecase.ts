@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EnvironmentRepository } from '@novu/dal';
+import { EnvironmentRepository, IntegrationRepository } from '@novu/dal';
 import { ChannelTypeEnum, InAppProviderIdEnum } from '@novu/shared';
 import {
   AnalyticsService,
@@ -27,7 +27,8 @@ export class Session {
     private authService: AuthService,
     private selectIntegration: SelectIntegration,
     private analyticsService: AnalyticsService,
-    private notificationsCount: NotificationsCount
+    private notificationsCount: NotificationsCount,
+    private integrationRepository: IntegrationRepository
   ) {}
 
   @LogDecorator()
@@ -87,6 +88,35 @@ export class Session {
     const token = await this.authService.getSubscriberWidgetToken(subscriber);
 
     const removeNovuBranding = inAppIntegration.removeNovuBranding || false;
+
+    /**
+     * We want to prevent the playground inbox demo from marking the integration as connected
+     * And only treat the real customer domain or local environment as valid origins
+     */
+    const isOriginFromNovu =
+      command.origin &&
+      ((process.env.DASHBOARD_V2_BASE_URL && command.origin?.includes(process.env.DASHBOARD_V2_BASE_URL as string)) ||
+        (process.env.FRONT_BASE_URL && command.origin?.includes(process.env.FRONT_BASE_URL as string)));
+
+    if (!isOriginFromNovu && !inAppIntegration.connected) {
+      this.analyticsService.mixpanelTrack(AnalyticsEventsEnum.INBOX_CONNECTED, '', {
+        _organization: environment._organizationId,
+        environmentName: environment.name,
+      });
+
+      await this.integrationRepository.updateOne(
+        {
+          _id: inAppIntegration._id,
+          _organizationId: environment._organizationId,
+          _environmentId: environment._id,
+        },
+        {
+          $set: {
+            connected: true,
+          },
+        }
+      );
+    }
 
     return {
       token,

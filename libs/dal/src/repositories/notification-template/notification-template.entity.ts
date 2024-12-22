@@ -2,9 +2,7 @@ import { Types } from 'mongoose';
 import {
   BuilderFieldType,
   BuilderGroupValues,
-  ContentIssue,
   ControlSchemas,
-  ControlsDto,
   CustomDataType,
   FilterParts,
   IMessageFilter,
@@ -19,6 +17,7 @@ import {
   IWorkflowStepMetadata,
   StepIssues,
   TriggerTypeEnum,
+  WorkflowIssueTypeEnum,
   WorkflowOriginEnum,
   WorkflowStatusEnum,
   WorkflowTypeEnum,
@@ -87,9 +86,14 @@ export class NotificationTemplateEntity implements INotificationTemplate {
 
   payloadSchema?: any;
 
-  issues: Record<string, ContentIssue[]>;
+  issues: Record<string, RuntimeIssue[]>;
 
   status?: WorkflowStatusEnum;
+}
+export class RuntimeIssue {
+  issueType: WorkflowIssueTypeEnum;
+  variableName?: string;
+  message: string;
 }
 
 export type NotificationTemplateDBModel = ChangePropsValueType<
@@ -142,11 +146,11 @@ export class StepVariantEntity implements IStepVariant {
   shouldStopOnFail?: boolean;
 
   bridgeUrl?: string;
-  /**
-   * @deprecated This property is deprecated and will be removed in future versions.
-   * Use `fullName` instead.
+  /*
+   * controlVariables exists
+   * only on none production environment in order to provide stateless control variables on fly
    */
-  controlVariables?: ControlsDto;
+  controlVariables?: Record<string, unknown>;
   /**
    * @deprecated This property is deprecated and will be removed in future versions.
    * Use IMessageTemplate.controls

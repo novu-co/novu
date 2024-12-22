@@ -25,6 +25,8 @@ type InAppEditorPreviewProps = {
   formValues: Record<string, unknown>;
 };
 
+const extensions = [loadLanguage('json')?.extension ?? []];
+
 export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPreviewProps) => {
   const workflowSlug = workflow.workflowId;
   const stepSlug = step.stepId;
@@ -58,7 +60,7 @@ export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPr
       <div className="relative flex flex-col gap-3">
         <div className="flex items-center gap-2.5 text-sm font-medium">
           <Notification5Fill className="size-3" />
-          In-app template editor
+          In-App template editor
         </div>
         <InboxPreview isPreviewPending={isPreviewPending} previewData={previewData} />
         <Accordion type="single" collapsible value={accordionValue} onValueChange={setAccordionValue}>
@@ -78,7 +80,7 @@ export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPr
                 value={editorValue}
                 onChange={setEditorValue}
                 lang="json"
-                extensions={[loadLanguage('json')?.extension ?? []]}
+                extensions={extensions}
                 className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 rounded-lg border border-dashed p-3"
               />
               {payloadError && <p className="text-destructive text-xs">{payloadError}</p>}

@@ -383,10 +383,6 @@ jobSchema.index({
   _notificationId: 1,
 });
 
-jobSchema.index({
-  _environmentId: 1,
-});
-
 jobSchema.index(
   {
     _mergedDigestId: 1,

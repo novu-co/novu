@@ -4,7 +4,10 @@
   "language": "en",
   "words": [
     "ABNF",
+    "ORGANISATION",
+    "EQAs",
     "addrs",
+    "subscriberpayloaddto",
     "adresses",
     "sdkerror",
     "africas",
@@ -29,6 +32,7 @@
     "atext",
     "attatchment",
     "Attatchment",
+    "someurl",
     "authres",
     "authserv",
     "autobuild",
@@ -709,7 +713,11 @@
     "truncatewords",
     "xmlschema",
     "jsonify",
-    "touchpoint"
+    "hsforms",
+    "touchpoint",
+    "Angularjs",
+    "navigatable",
+    "facated"
   ],
   "flagWords": [],
   "patterns": [
@@ -811,6 +819,7 @@
     "pnpm-workspace.yaml",
     "tsconfig.json",
     "unreadRead",
-    "websockets"
+    "websockets",
+    "apps/dashboard/src/components/header-navigation/customer-support-button.tsx"
   ]
 }

@@ -1,21 +1,21 @@
-import { EnvironmentWithUserObjectCommand } from '@novu/application-generic';
-import { IsArray, IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
-import { IdentifierOrInternalId } from '@novu/shared';
+import { EnvironmentWithUserObjectCommand, MAX_NAME_LENGTH } from '@novu/application-generic';
+import { IsNotEmpty, IsObject, IsOptional, IsString, Length } from 'class-validator';
 
 export class PatchStepCommand extends EnvironmentWithUserObjectCommand {
   @IsString()
   @IsNotEmpty()
-  identifierOrInternalId: IdentifierOrInternalId;
+  workflowIdOrInternalId: string;
 
   @IsString()
   @IsNotEmpty()
-  stepId: IdentifierOrInternalId;
+  stepIdOrInternalId: string;
 
-  @IsString()
   @IsOptional()
+  @Length(1, MAX_NAME_LENGTH)
+  @IsString()
   name?: string;
 
   @IsOptional()
   @IsObject()
-  controlValues?: Record<string, unknown>;
+  controlValues?: Record<string, unknown> | null;
 }

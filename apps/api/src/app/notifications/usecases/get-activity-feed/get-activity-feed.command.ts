@@ -33,4 +33,12 @@ export class GetActivityFeedCommand extends EnvironmentWithUserCommand {
   @IsOptional()
   @IsString()
   transactionId?: string;
+
+  @IsOptional()
+  @IsString()
+  after?: string;
+
+  @IsOptional()
+  @IsString()
+  before?: string;
 }
