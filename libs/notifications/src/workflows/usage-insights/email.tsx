@@ -17,6 +17,16 @@ import {
 } from '@react-email/components';
 import { IUsageEmailData } from './types';
 
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
 function MetricCard({
   title,
   current,
@@ -34,7 +44,7 @@ function MetricCard({
   const formatNumber = (num: number) => Math.floor(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
 
   return (
-    <div className="h-[88px] rounded-lg border border-gray-100 bg-gray-50/50 p-1">
+    <div className="h-[88px] rounded-lg border border-gray-100 bg-gray-50/50 p-2">
       <Row className="flex items-start justify-between gap-2">
         <Column align="left" className="w-full">
           <Text className="mb-0 mt-0 min-h-[28px] text-xs font-medium leading-tight text-gray-600">{title}</Text>
@@ -69,7 +79,7 @@ function ChannelBreakdown({ channels }: { channels: IUsageEmailData['channelBrea
       <SectionHeader title="Channel Breakdown" />
       <Row>
         {Object.entries(channels).map(([channel, metrics]) => (
-          <Column key={channel} className="p-2">
+          <Column key={channel} className="p-2 px-0">
             <MetricCard title={channel} current={metrics.current} previous={metrics.previous} change={metrics.change} />
           </Column>
         ))}
@@ -113,33 +123,42 @@ function InboxMetrics({ metrics }: { metrics: IUsageEmailData['inboxMetrics'] })
 }
 
 function WorkflowStats({ workflows }: { workflows: IUsageEmailData['workflowStats'] }) {
-  const entries = Object.entries(workflows);
-  const chunks: Array<Array<[string, (typeof workflows)[string]]>> = [];
-
-  for (let i = 0; i < entries.length; i += 4) {
-    chunks.push(entries.slice(i, i + 4));
-  }
+  const topWorkflows = Object.entries(workflows)
+    ?.sort((a, b) => b[1].current - a[1].current)
+    .slice(0, 6);
 
   return (
     <Section className="mt-6">
-      <SectionHeader title="Workflow Performance" />
-      {chunks.map((chunk, index) => (
-        <Row key={index}>
-          {chunk.map(([name, metrics]) => (
-            <Column key={name} className="p-2">
-              <MetricCard title={name} current={metrics.current} previous={metrics.previous} change={metrics.change} />
-            </Column>
-          ))}
-        </Row>
-      ))}
+      <SectionHeader title="Top Workflow Activity" />
+      <div className="rounded-lg border border-gray-100">
+        {topWorkflows?.map(([name, metrics], index) => {
+          const isPositive = metrics.change > 0;
+          const changeColor = isPositive ? 'text-emerald-600' : 'text-rose-600';
+          const isLast = index === topWorkflows.length - 1;
+
+          return (
+            <Row
+              key={index}
+              className={`flex items-center justify-between p-3 px-0 ${!isLast ? 'border-b border-gray-100' : ''}`}
+            >
+              <Column align="left" className="w-full">
+                <Text className="mb-0.5 mt-0 text-sm font-medium text-gray-900">{name}</Text>
+                <Text className="mb-0 mt-0 text-xs text-gray-500">
+                  {Math.floor(metrics.current).toLocaleString()} notifications sent vs{' '}
+                  {Math.floor(metrics.previous).toLocaleString()}
+                </Text>
+              </Column>
+              <Column align="right">
+                <Text className={`mb-0 mt-0 whitespace-nowrap text-sm font-medium ${changeColor}`}>
+                  {isPositive ? '↑' : '↓'} {Math.abs(Math.floor(metrics.change))}%
+                </Text>
+              </Column>
+            </Row>
+          );
+        })}
+      </div>
     </Section>
   );
-}
-
-interface IMarketingLink {
-  href: string;
-  text: string;
-  emoji: string;
 }
 
 interface IMarketingConfig {
@@ -201,18 +220,18 @@ export default function UsageInsightsEmail(props: IUsageEmailData & { marketingC
             alt="Novu"
             className="mx-auto my-[32px]"
           />
-          <Container className="mx-auto w-full">
+          <Container className="mx-auto w-full max-w-[700px]">
             <Section className="rounded-t-lg bg-indigo-600 px-6 py-8">
               <Heading className="text-center text-2xl font-bold text-white">Usage Insights Report</Heading>
               <Text className="text-center text-sm text-indigo-100">{props.organizationName}</Text>
             </Section>
 
-            <Container className="rounded-b-lg bg-white px-3 py-3 shadow-sm">
+            <div className="rounded-b-lg bg-white px-3 py-3 shadow-sm">
               <div className="mb-6 rounded-md border border-indigo-100/50 bg-indigo-50/50 p-3 text-center">
                 <Text className="text-xs font-medium text-indigo-900">
-                  Reporting Period: {props.period.current}
+                  Reporting Period: {formatDate(props.period.current)}
                   <span className="mx-2">•</span>
-                  Compared to: {props.period.previous}
+                  Compared to: {formatDate(props.period.previous)}
                 </Text>
               </div>
 
@@ -236,7 +255,7 @@ export default function UsageInsightsEmail(props: IUsageEmailData & { marketingC
               <Section className="mt-6 border-t border-gray-100 pt-6">
                 <Text className="text-center text-xs text-gray-400">Generated with ❤️ by Novu</Text>
               </Section>
-            </Container>
+            </div>
           </Container>
         </Body>
       </Tailwind>
