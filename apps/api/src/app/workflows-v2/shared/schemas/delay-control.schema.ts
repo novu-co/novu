@@ -8,24 +8,24 @@ import {
   UiSchema,
   UiSchemaGroupEnum,
 } from '@novu/shared';
-import { skipControl } from './skip-control.schema';
+import { skipStepUiSchema, skipZodSchema } from './skip-control.schema';
 
-export const delayTimeControlZodSchema = z
+export const delayControlZodSchema = z
   .object({
-    skip: skipControl.schema,
+    skip: skipZodSchema,
     type: z.enum(['regular']).default('regular'),
     amount: z.union([z.number().min(1), z.string()]),
     unit: z.nativeEnum(TimeUnitEnum),
   })
   .strict();
 
-export type DelayTimeControlType = z.infer<typeof delayTimeControlZodSchema>;
+export type DelayControlType = z.infer<typeof delayControlZodSchema>;
 
-const delayTimeControlSchema = zodToJsonSchema(delayTimeControlZodSchema) as JSONSchemaDto;
-const delayUiSchema: UiSchema = {
+export const delayControlSchema = zodToJsonSchema(delayControlZodSchema) as JSONSchemaDto;
+export const delayUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.DELAY,
   properties: {
-    skip: skipControl.uiSchema.properties.skip,
+    skip: skipStepUiSchema.properties.skip,
     amount: {
       component: UiComponentEnum.DELAY_AMOUNT,
       placeholder: null,
@@ -39,9 +39,4 @@ const delayUiSchema: UiSchema = {
       placeholder: 'regular',
     },
   },
-};
-
-export const delayControl = {
-  uiSchema: delayUiSchema,
-  schema: delayTimeControlSchema,
 };

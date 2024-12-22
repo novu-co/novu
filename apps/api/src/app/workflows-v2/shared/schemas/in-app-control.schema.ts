@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
-import { skipControl } from './skip-control.schema';
+import { skipStepUiSchema, skipZodSchema } from './skip-control.schema';
 
 const redirectZodSchema = z
   .object({
@@ -23,7 +23,7 @@ const actionZodSchema = z
 
 export const inAppControlZodSchema = z
   .object({
-    skip: skipControl.schema,
+    skip: skipZodSchema,
     subject: z.string().optional(),
     body: z.string(),
     avatar: z.string().optional(),
@@ -40,7 +40,7 @@ export type InAppControlType = z.infer<typeof inAppControlZodSchema>;
 
 export const inAppRedirectSchema = zodToJsonSchema(redirectZodSchema) as JSONSchemaDto;
 export const inAppActionSchema = zodToJsonSchema(actionZodSchema) as JSONSchemaDto;
-const inAppControlSchema = zodToJsonSchema(inAppControlZodSchema) as JSONSchemaDto;
+export const inAppControlSchema = zodToJsonSchema(inAppControlZodSchema) as JSONSchemaDto;
 
 const redirectPlaceholder = {
   url: {
@@ -51,7 +51,7 @@ const redirectPlaceholder = {
   },
 };
 
-const inAppUiSchema: UiSchema = {
+export const inAppUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.IN_APP,
   properties: {
     body: {
@@ -78,11 +78,6 @@ const inAppUiSchema: UiSchema = {
       component: UiComponentEnum.URL_TEXT_BOX,
       placeholder: redirectPlaceholder,
     },
-    skip: skipControl.uiSchema.properties.skip,
+    skip: skipStepUiSchema.properties.skip,
   },
-};
-
-export const inAppControl = {
-  uiSchema: inAppUiSchema,
-  schema: inAppControlSchema,
 };

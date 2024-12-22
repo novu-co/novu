@@ -8,11 +8,11 @@ import {
   UiSchema,
   UiSchemaGroupEnum,
 } from '@novu/shared';
-import { skipControl } from './skip-control.schema';
+import { skipStepUiSchema, skipZodSchema } from './skip-control.schema';
 
 const digestRegularControlZodSchema = z
   .object({
-    skip: skipControl.schema,
+    skip: skipZodSchema,
     amount: z.union([z.number().min(1), z.string().min(1)]),
     unit: z.nativeEnum(TimeUnitEnum).default(TimeUnitEnum.SECONDS),
     digestKey: z.string().optional(),
@@ -27,7 +27,7 @@ const digestRegularControlZodSchema = z
   .strict();
 const digestTimedControlZodSchema = z
   .object({
-    skip: skipControl.schema,
+    skip: skipZodSchema,
     cron: z.string().min(1),
     digestKey: z.string().optional(),
   })
@@ -38,7 +38,7 @@ export type DigestTimedControlType = z.infer<typeof digestTimedControlZodSchema>
 export type DigestControlSchemaType = z.infer<typeof digestControlZodSchema>;
 
 export const digestControlZodSchema = z.union([digestRegularControlZodSchema, digestTimedControlZodSchema]);
-const digestOutputJsonSchema = zodToJsonSchema(digestControlZodSchema) as JSONSchemaDto;
+export const digestControlSchema = zodToJsonSchema(digestControlZodSchema) as JSONSchemaDto;
 
 export function isDigestRegularControl(data: unknown): data is DigestRegularControlType {
   const result = digestRegularControlZodSchema.safeParse(data);
@@ -58,7 +58,7 @@ export function isDigestControl(data: unknown): data is DigestControlSchemaType 
   return result.success;
 }
 
-const digestUiSchema: UiSchema = {
+export const digestUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.DIGEST,
   properties: {
     amount: {
@@ -77,11 +77,6 @@ const digestUiSchema: UiSchema = {
       component: UiComponentEnum.DIGEST_CRON,
       placeholder: '',
     },
-    skip: skipControl.uiSchema.properties.skip,
+    skip: skipStepUiSchema.properties.skip,
   },
-};
-
-export const digestControl = {
-  uiSchema: digestUiSchema,
-  schema: digestOutputJsonSchema,
 };

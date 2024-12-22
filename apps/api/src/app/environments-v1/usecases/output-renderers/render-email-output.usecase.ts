@@ -8,7 +8,7 @@ import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 
 import { FullPayloadForRender, RenderCommand } from './render-command';
 import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.usecase';
-import { emailStepControlZodSchema } from '../../../workflows-v2/shared';
+import { emailControlZodSchema } from '../../../workflows-v2/shared/schemas/email-control.schema';
 
 export class RenderEmailOutputCommand extends RenderCommand {}
 
@@ -18,7 +18,7 @@ export class RenderEmailOutputUsecase {
 
   @InstrumentUsecase()
   async execute(renderCommand: RenderEmailOutputCommand): Promise<EmailRenderOutput> {
-    const { body, subject } = emailStepControlZodSchema.parse(renderCommand.controlValues);
+    const { body, subject } = emailControlZodSchema.parse(renderCommand.controlValues);
 
     if (isEmpty(body)) {
       return { subject, body: '' };

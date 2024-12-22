@@ -28,7 +28,7 @@ import { Variable } from '../../util/template-parser/liquid-parser';
 import { pathsToObject } from '../../util/path-to-object';
 import { isObjectTipTapNode } from '../../util/tip-tap.util';
 import { buildVariables } from '../../util/build-variables';
-import { sanitizePreviewControlValues } from '../../shared/sanitize-preview-control-values';
+import { sanitizeControlValues } from '../../shared/sanitize-control-values';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
@@ -52,7 +52,7 @@ export class GeneratePreviewUsecase {
         workflow,
       } = await this.initializePreviewContext(command);
       const commandVariablesExample = command.generatePreviewRequestDto.previewPayload;
-      const sanitizedValidatedControls = sanitizePreviewControlValues(initialControlValues, stepData.type);
+      const sanitizedValidatedControls = sanitizeControlValues(initialControlValues, stepData.type);
 
       if (!sanitizedValidatedControls) {
         throw new Error(

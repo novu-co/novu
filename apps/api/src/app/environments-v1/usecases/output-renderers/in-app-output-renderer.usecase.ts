@@ -3,13 +3,13 @@ import { InAppRenderOutput, RedirectTargetEnum } from '@novu/shared';
 import { Injectable } from '@nestjs/common';
 import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { RenderCommand } from './render-command';
+import { isValidUrlForActionButton } from '../../../workflows-v2/util/url-utils';
 import {
   InAppActionType,
   InAppControlType,
   inAppControlZodSchema,
   InAppRedirectType,
-} from '../../../workflows-v2/shared';
-import { isValidUrlForActionButton } from '../../../workflows-v2/util/url-utils';
+} from '../../../workflows-v2/shared/schemas/in-app-control.schema';
 
 @Injectable()
 export class InAppOutputRendererUsecase {
