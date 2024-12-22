@@ -1,6 +1,5 @@
-import { Route, ChevronDown } from 'lucide-react';
+import { Route } from 'lucide-react';
 import { IActivityJob, IDelayRegularMetadata, IDigestRegularMetadata, JobStatusEnum, StepTypeEnum } from '@novu/shared';
-import { LegacyButton } from '@/components/primitives/legacy-button';
 import { Badge } from '@/components/primitives/badge';
 import { Card, CardContent, CardHeader } from '../primitives/card';
 import { format } from 'date-fns';
@@ -11,6 +10,8 @@ import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { STEP_TYPE_TO_COLOR } from '../../utils/color';
 import { JOB_STATUS_CONFIG } from './constants';
 import { TimeDisplayHoverCard } from '../time-display-hover-card';
+import { Button } from '../primitives/button';
+import { RiArrowDownSLine } from 'react-icons/ri';
 
 interface ActivityJobItemProps {
   job: IActivityJob;
@@ -52,15 +53,16 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
             <span className="text-foreground-950 text-xs capitalize">{formatJobType(job.type)}</span>
           </div>
 
-          <LegacyButton
-            variant="ghost"
+          <Button
+            variant="secondary"
+            mode="ghost"
             type="button"
-            size="sm"
-            className="text-foreground-600 !mt-0 h-5 gap-0 p-0 leading-[12px] hover:bg-transparent"
+            size="2xs"
+            className="text-text-sub !mt-0 h-5 gap-0 p-0 leading-[12px] hover:bg-transparent"
           >
-            Show more
-            <ChevronDown className={cn('h-4 w-4 transition-transform', isExpanded && 'rotate-180')} />
-          </LegacyButton>
+            {isExpanded ? 'Show less' : 'Show more'}
+            <RiArrowDownSLine className={cn('h-4 w-4 transition-transform', isExpanded && 'rotate-180')} />
+          </Button>
         </CardHeader>
 
         {!isExpanded && (
