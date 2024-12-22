@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
+import { RiCloseLine } from 'react-icons/ri';
+import { useQuery } from '@tanstack/react-query';
 
 interface Changelog {
   id: string;
@@ -10,9 +12,12 @@ interface Changelog {
   notes: string;
   version: number;
   imageUrl?: string;
+  published: boolean;
 }
 
+const CHANGELOG_API_URL = 'https://productlane.com/api/v1/changelogs/f13f1996-c9b0-4fea-8ee7-2c3faf6a832d';
 export const ChangelogStack = () => {
+  const NUMBER_OF_CARDS = 3;
   const CARD_OFFSET = 10;
   const SCALE_FACTOR = 0.06;
   const STORAGE_KEY = 'dismissed_changelogs';
@@ -28,28 +33,35 @@ export const ChangelogStack = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify([...dismissed, changelogId]));
   };
 
+  const fetchChangelogs = async (): Promise<Changelog[]> => {
+    const response = await fetch(CHANGELOG_API_URL);
+    const data = await response.json();
+    const dismissedIds = getDismissedChangelogs();
+
+    return data
+      .filter((item: Changelog) => item.published && item.imageUrl)
+      .slice(0, NUMBER_OF_CARDS)
+      .filter((item: Changelog) => !dismissedIds.includes(item.id));
+  };
+
+  const { data: fetchedChangelogs } = useQuery({
+    queryKey: ['changelogs'],
+    queryFn: fetchChangelogs,
+    staleTime: 1000 * 60 * 60 * 4, // 4 hours
+    gcTime: 1000 * 60 * 60 * 4, // 4 hours
+  });
+
   useEffect(() => {
-    const fetchChangelogs = async () => {
-      try {
-        const response = await fetch('https://productlane.com/api/v1/changelogs/f13f1996-c9b0-4fea-8ee7-2c3faf6a832d');
-        const data = await response.json();
-        const dismissedIds = getDismissedChangelogs();
-        const latestChangelogs = data
-          .filter((item: any) => item.published && item.imageUrl)
-          .slice(0, 3)
-          .filter((item: any) => !dismissedIds.includes(item.id));
-        setChangelogs(latestChangelogs);
-      } catch (error) {
-        console.error('Error fetching changelogs:', error);
-      }
-    };
+    if (fetchedChangelogs) {
+      setChangelogs(fetchedChangelogs);
+    }
+  }, [fetchedChangelogs]);
 
-    fetchChangelogs();
-  }, []);
+  const handleChangelogClick = (changelog: Changelog) => {
+    window.open('https://roadmap.novu.co/changelog/' + changelog.id, '_blank');
 
-  const moveToFront = (clickedChangelog: Changelog) => {
-    const newChangelogs = changelogs.filter((log) => log.id !== clickedChangelog.id);
-    setChangelogs([clickedChangelog, ...newChangelogs]);
+    addToDismissed(changelog.id);
+    setChangelogs((prev) => prev.filter((log) => log.id !== changelog.id));
   };
 
   const handleDismiss = (e: React.MouseEvent, changelogId: string) => {
@@ -58,19 +70,14 @@ export const ChangelogStack = () => {
     setChangelogs((prev) => prev.filter((log) => log.id !== changelogId));
   };
 
-  const handleReadMore = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    // Add your read more logic here
-  };
-
   return (
-    <div className="absolute bottom-1 w-full">
+    <div className="absolute bottom-10 w-full">
       <div className="m-full relative mb-4 h-[190px]">
         {changelogs.map((changelog, index) => {
           return (
             <motion.div
               key={changelog.id}
-              className="group absolute flex h-[180px] w-full cursor-pointer flex-col justify-between overflow-hidden rounded-lg border border-neutral-200 bg-white p-2 shadow-xl shadow-black/[0.1] transition-[height] duration-200 hover:h-[220px] dark:border-white/[0.1] dark:bg-black dark:shadow-white/[0.05]"
+              className="border-stroke-soft rounded-8 group absolute flex h-[175px] w-full cursor-pointer flex-col justify-between overflow-hidden border bg-white p-3 shadow-xl shadow-black/[0.1] transition-[height] duration-200 dark:border-white/[0.1] dark:bg-black dark:shadow-white/[0.05]"
               style={{
                 transformOrigin: 'top center',
               }}
@@ -80,43 +87,36 @@ export const ChangelogStack = () => {
                 zIndex: changelogs.length - index,
               }}
               whileHover={{
-                scale: (1 - index * SCALE_FACTOR) * 1.05,
-                y: -5,
+                scale: (1 - index * SCALE_FACTOR) * 1.01,
+                y: -2,
                 transition: { duration: 0.2, ease: 'easeOut' },
               }}
-              onClick={() => moveToFront(changelog)}
+              onClick={() => handleChangelogClick(changelog)}
             >
-              <div className="flex-1">
-                <div className="text-2xs text-neutral-500">What's New</div>
-                <div className="mb-2 flex items-center justify-between">
-                  <h5 className="mt-0 line-clamp-1 text-sm font-medium text-neutral-900 dark:text-white">
-                    {changelog.title}
-                  </h5>
-                </div>
-                {changelog.imageUrl && (
-                  <div className="relative h-[120px] w-full">
-                    <img
-                      src={changelog.imageUrl}
-                      alt={changelog.title}
-                      className="h-full w-full rounded-lg object-cover"
-                    />
+              <div>
+                <div className="relative">
+                  <div className="text-text-soft text-subheading-2xs">WHAT'S NEW</div>
+                  <button
+                    onClick={(e) => handleDismiss(e, changelog.id)}
+                    className="absolute right-[-8px] top-[-8px] p-1 text-neutral-500 opacity-0 transition-opacity duration-200 hover:text-neutral-900 group-hover:opacity-100 dark:hover:text-white"
+                  >
+                    <RiCloseLine size={16} />
+                  </button>
+                  <div className="mb-2 flex items-center justify-between">
+                    <h5 className="text-label-sm text-text-strong mt-0 line-clamp-1 dark:text-white">
+                      {changelog.title}
+                    </h5>
                   </div>
-                )}
-              </div>
-
-              <div className="flex w-full justify-between bg-white/80 opacity-0 backdrop-blur transition-all duration-200 group-hover:opacity-100 dark:border-neutral-800 dark:bg-black/80">
-                <button
-                  onClick={(e) => handleDismiss(e, changelog.id)}
-                  className="rounded-md px-2 py-1 text-xs text-neutral-400 transition-colors hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-white"
-                >
-                  Dismiss
-                </button>
-                <button
-                  onClick={handleReadMore}
-                  className="rounded-md px-2 py-1 text-xs text-neutral-500 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
-                >
-                  Read more
-                </button>
+                  {changelog.imageUrl && (
+                    <div className="relative h-[110px] w-full">
+                      <img
+                        src={changelog.imageUrl}
+                        alt={changelog.title}
+                        className="h-full w-full rounded-[6px] object-cover"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </motion.div>
           );
