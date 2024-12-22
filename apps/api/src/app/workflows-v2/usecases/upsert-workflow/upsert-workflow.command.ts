@@ -15,16 +15,6 @@ import { Type } from 'class-transformer';
 import { EnvironmentWithUserObjectCommand, MAX_NAME_LENGTH } from '@novu/application-generic';
 import { StepTypeEnum, WorkflowCreationSourceEnum, ChannelTypeEnum } from '@novu/shared';
 
-export class UpsertWorkflowCommand extends EnvironmentWithUserObjectCommand {
-  @IsOptional()
-  @IsString()
-  workflowIdOrInternalId?: string;
-
-  @ValidateNested()
-  @Type(() => UpsertWorkflowDataCommand)
-  workflowDto: UpsertWorkflowDataCommand;
-}
-
 export class UpsertWorkflowDataCommand {
   @IsString()
   @IsOptional()
@@ -114,4 +104,14 @@ export class PreferencesRequestUpsertDataCommand {
   @ValidateNested()
   @Type(() => WorkflowPreferencesUpsertData)
   workflow?: WorkflowPreferencesUpsertData | null;
+}
+
+export class UpsertWorkflowCommand extends EnvironmentWithUserObjectCommand {
+  @IsOptional()
+  @IsString()
+  workflowIdOrInternalId?: string;
+
+  @ValidateNested()
+  @Type(() => UpsertWorkflowDataCommand)
+  workflowDto: UpsertWorkflowDataCommand;
 }
