@@ -8,6 +8,7 @@ import {
   IOrganizationMetrics,
   MixpanelInboxSeriesNameEnum,
   MixpanelTriggerEventNameEnum,
+  ISeriesData,
 } from '../../types/usage-insights.types';
 import { MixpanelService } from '../../services/mixpanel.service';
 import { MetricsCalculatorService } from '../../services/metrics-calculator.service';
@@ -27,6 +28,22 @@ interface IOrganizationData {
     current: Record<MixpanelInboxSeriesNameEnum, IChannelData>;
     previous: Record<MixpanelInboxSeriesNameEnum, IChannelData>;
   };
+}
+
+interface IProcessedSeriesData {
+  triggerEvents: {
+    current: ISeriesData;
+    previous: ISeriesData;
+  };
+  workflowSteps: {
+    current: ISeriesData;
+    previous: ISeriesData;
+  };
+}
+
+interface IProcessedInboxData {
+  current: Record<MixpanelInboxSeriesNameEnum, ISeriesData>;
+  previous: Record<MixpanelInboxSeriesNameEnum, ISeriesData>;
 }
 
 @Injectable()
@@ -75,70 +92,115 @@ export class UsageInsights {
     Logger.debug('Usage Insights execution completed successfully');
   }
 
+  private processSeriesData(mixpanelData: IMixpanelTriggerResponse): IProcessedSeriesData {
+    return {
+      triggerEvents: {
+        current: mixpanelData.series[MixpanelTriggerEventNameEnum.NOTIFICATION_SUBSCRIBER_EVENT],
+        previous: mixpanelData.time_comparison.series[MixpanelTriggerEventNameEnum.NOTIFICATION_SUBSCRIBER_EVENT],
+      },
+      workflowSteps: {
+        current: mixpanelData.series[MixpanelTriggerEventNameEnum.PROCESS_WORKFLOW_STEP],
+        previous: mixpanelData.time_comparison.series[MixpanelTriggerEventNameEnum.PROCESS_WORKFLOW_STEP],
+      },
+    };
+  }
+
+  private processInboxData(inboxData: IMixpanelInboxResponse): IProcessedInboxData {
+    const inboxSeries = inboxData?.series ?? {};
+    const previousInboxSeries = inboxData?.time_comparison.series ?? {};
+
+    return {
+      current: {
+        [MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED]:
+          inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED],
+        [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES]:
+          inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES],
+        [MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION]:
+          inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION],
+        [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION]: inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION],
+      },
+      previous: {
+        [MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED]:
+          previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED],
+        [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES]:
+          previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES],
+        [MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION]:
+          previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION],
+        [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION]:
+          previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION],
+      },
+    };
+  }
+
+  private getOrganizationInboxData(inboxData: IMixpanelInboxResponse, orgId: string) {
+    const currentInboxData: Record<MixpanelInboxSeriesNameEnum, IChannelData> = {
+      [MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED]: inboxData.series[
+        MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED
+      ][orgId] as IChannelData,
+      [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES]: inboxData.series[
+        MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES
+      ][orgId] as IChannelData,
+      [MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION]: inboxData.series[
+        MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION
+      ][orgId] as IChannelData,
+      [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION]: inboxData.series[
+        MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION
+      ][orgId] as IChannelData,
+    };
+
+    const previousInboxData: Record<MixpanelInboxSeriesNameEnum, IChannelData> = {
+      [MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED]: inboxData.time_comparison.series[
+        MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED
+      ][orgId] as IChannelData,
+      [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES]: inboxData.time_comparison.series[
+        MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES
+      ][orgId] as IChannelData,
+      [MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION]: inboxData.time_comparison.series[
+        MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION
+      ][orgId] as IChannelData,
+      [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION]: inboxData.time_comparison.series[
+        MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION
+      ][orgId] as IChannelData,
+    };
+
+    return {
+      current: currentInboxData,
+      previous: previousInboxData,
+    };
+  }
+
   private async processOrganization(
     orgId: string,
     mixpanelData: IMixpanelTriggerResponse,
     inboxData: IMixpanelInboxResponse
   ) {
     Logger.debug('Processing Mixpanel and Inbox data');
-    // Trigger Workflow data
-    const triggerEventSeries = mixpanelData.series[MixpanelTriggerEventNameEnum.NOTIFICATION_SUBSCRIBER_EVENT];
-    const triggerEventPreviousSeries =
-      mixpanelData.time_comparison.series[MixpanelTriggerEventNameEnum.NOTIFICATION_SUBSCRIBER_EVENT];
 
-    const processWorkflowSeries = mixpanelData.series[MixpanelTriggerEventNameEnum.PROCESS_WORKFLOW_STEP];
-    const previousProcessWorkflowSeries =
-      mixpanelData.time_comparison.series[MixpanelTriggerEventNameEnum.PROCESS_WORKFLOW_STEP];
-
-    // Inbox data
-    const inboxSeries = inboxData?.series ?? {};
-    const previousInboxSeries = inboxData?.time_comparison.series ?? {};
-    const inboxSessionInitializedSeries = inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED];
-    const inboxUpdatePreferencesSeries = inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES];
-    const inboxMarkNotificationSeries = inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION];
-    const inboxUpdateActionSeries = inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION];
-    const previousInboxSessionInitializedSeries =
-      previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED];
-    const previousInboxUpdatePreferencesSeries =
-      previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES];
-    const previousInboxMarkNotificationSeries =
-      previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION];
-    const previousInboxUpdateActionSeries = previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION];
+    // Process series data for triggers and workflows
+    const seriesData = this.processSeriesData(mixpanelData);
 
     if (
-      !triggerEventSeries ||
-      !processWorkflowSeries ||
-      !triggerEventPreviousSeries ||
-      !previousProcessWorkflowSeries
+      !seriesData.triggerEvents.current ||
+      !seriesData.workflowSteps.current ||
+      !seriesData.triggerEvents.previous ||
+      !seriesData.workflowSteps.previous
     ) {
       Logger.error('Required series data missing from Mixpanel response');
 
       return;
     }
 
+    // Construct organization data for metrics calculation
     const organizationData: IOrganizationData = {
       workflowTrigger: {
-        current: triggerEventSeries[orgId],
-        previous: triggerEventPreviousSeries[orgId],
+        current: seriesData.triggerEvents.current[orgId] as IChannelData,
+        previous: seriesData.triggerEvents.previous[orgId] as IChannelData,
       },
       stepProcessing: {
-        current: processWorkflowSeries[orgId],
-        previous: previousProcessWorkflowSeries[orgId],
+        current: seriesData.workflowSteps.current[orgId] as IChannelData,
+        previous: seriesData.workflowSteps.previous[orgId] as IChannelData,
       },
-      inbox: {
-        current: {
-          [MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED]: inboxSessionInitializedSeries[orgId],
-          [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES]: inboxUpdatePreferencesSeries[orgId],
-          [MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION]: inboxMarkNotificationSeries[orgId],
-          [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION]: inboxUpdateActionSeries[orgId],
-        },
-        previous: {
-          [MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED]: previousInboxSessionInitializedSeries[orgId],
-          [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES]: previousInboxUpdatePreferencesSeries[orgId],
-          [MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION]: previousInboxMarkNotificationSeries[orgId],
-          [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION]: previousInboxUpdateActionSeries[orgId],
-        },
-      },
+      inbox: this.getOrganizationInboxData(inboxData, orgId),
     };
 
     const dateRange = this.metricsCalculator.getSeriesDateRange(
@@ -146,6 +208,7 @@ export class UsageInsights {
       organizationData.workflowTrigger.previous
     );
 
+    // Calculate final metrics
     const metrics: IOrganizationMetrics = {
       eventTriggers: this.metricsCalculator.calculateEventTriggersMetrics(
         organizationData.workflowTrigger.current,
