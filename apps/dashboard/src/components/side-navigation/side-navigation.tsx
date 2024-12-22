@@ -21,7 +21,7 @@ import { SubscribersStayTunedModal } from './subscribers-stay-tuned-modal';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
 import { NavigationLink } from './navigation-link';
 import { GettingStartedMenuItem } from './getting-started-menu-item';
-import { ChangelogStack } from './stacked-card';
+import { ChangelogStack } from './changelog-cards';
 
 const NavigationGroup = ({ children, label }: { children: ReactNode; label?: string }) => {
   return (
@@ -38,8 +38,9 @@ export const SideNavigation = () => {
   const isNewActivityFeedEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ACTIVITY_FEED_ENABLED, false);
   const isNewIntegrationStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_INTEGRATION_STORE_ENABLED, false);
   const environmentNames = useMemo(() => environments?.map((env) => env.name), [environments]);
-  const [hasItems, setHasItems] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasChangelogItems, setHasChangelogItems] = useState(false);
+  const [isChangelogLoaded, setIsChangelogLoaded] = useState(false);
+
   const onEnvironmentChange = (value: string) => {
     const environment = environments?.find((env) => env.name === value);
     switchEnvironment(environment?.slug);
@@ -105,8 +106,8 @@ export const SideNavigation = () => {
           </div>
 
           <div className="relative mt-auto gap-8 pt-4">
-            <ChangelogStack hasChangeLogItems={setHasItems} changeLogItemsLoaded={setIsLoaded} />
-            {isLoaded && !hasItems && <FreeTrialCard />}
+            <ChangelogStack hasChangeLogItems={setHasChangelogItems} changeLogItemsLoaded={setIsChangelogLoaded} />
+            {isChangelogLoaded && !hasChangelogItems && <FreeTrialCard />}
 
             <NavigationGroup>
               <NavigationLink to={ROUTES.SETTINGS_TEAM}>

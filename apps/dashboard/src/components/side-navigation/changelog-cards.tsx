@@ -49,14 +49,14 @@ export const ChangelogStack = ({
     const response = await fetch(CHANGELOG_API_URL);
     const data = await response.json();
     const dismissedIds = getDismissedChangelogs();
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    const twoMonthsAgo = new Date();
+    twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
 
     return data
       .filter((item: Changelog) => {
         const changelogDate = new Date(item.date);
 
-        return item.published && changelogDate >= oneMonthAgo;
+        return item.published && item.imageUrl && changelogDate >= twoMonthsAgo;
       })
       .slice(0, NUMBER_OF_CARDS)
       .filter((item: Changelog) => !dismissedIds.includes(item.id));
