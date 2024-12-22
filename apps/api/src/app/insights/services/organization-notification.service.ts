@@ -21,6 +21,7 @@ export class OrganizationNotificationService {
     Logger.debug(`Processing metrics for organization: ${metrics.id}`);
     try {
       const organization = await this.organizationRepository.findById(metrics.id);
+
       if (!organization) {
         Logger.warn(`Organization not found in repository: ${metrics.id}`);
 
@@ -50,7 +51,7 @@ export class OrganizationNotificationService {
       await usageInsightsWorkflow.trigger({
         to: {
           subscriberId: '675fe9bcab6a05bb6dcb7dab_11',
-          email: `george+testing-${organization._id}@novu.co`,
+          email: `dima+testing-${organization._id}@novu.co`,
         },
         payload: {
           period: {

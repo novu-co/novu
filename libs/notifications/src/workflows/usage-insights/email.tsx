@@ -37,6 +37,7 @@ function MetricCard({
   current: number;
   previous: number;
   change: number;
+  padding?: string;
 }) {
   const isPositive = change > 0;
   const changeColor = isPositive ? 'text-emerald-600' : 'text-rose-600';
@@ -44,7 +45,7 @@ function MetricCard({
   const formatNumber = (num: number) => Math.floor(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
 
   return (
-    <div className="h-[75px] rounded-lg border border-gray-100 bg-gray-50/50 p-3">
+    <div className={`h-[75px] rounded-lg border border-gray-100 bg-gray-50/50 p-2`}>
       <Row className="flex items-start justify-between gap-2">
         <Column align="left" className="w-full">
           <Text className="mb-0 mt-0 min-h-[28px] text-xs font-medium capitalize leading-tight text-gray-600">
@@ -80,11 +81,30 @@ function ChannelBreakdown({ channels }: { channels: IUsageEmailData['channelBrea
     <Section className="mt-6">
       <SectionHeader title="Channel Breakdown" />
       <Row>
-        {Object.entries(channels).map(([channel, metrics]) => (
-          <Column key={channel} className="p-2">
-            <MetricCard title={channel} current={metrics.current} previous={metrics.previous} change={metrics.change} />
-          </Column>
-        ))}
+        <Column className="p-2 pl-0">
+          <MetricCard
+            title="Email"
+            current={channels.email.current}
+            previous={channels.email.previous}
+            change={channels.email.change}
+          />
+        </Column>
+        <Column className="p-2">
+          <MetricCard
+            title="SMS"
+            current={channels.sms.current}
+            previous={channels.sms.previous}
+            change={channels.sms.change}
+          />
+        </Column>
+        <Column className="p-2 pr-0">
+          <MetricCard
+            title="Push"
+            current={channels.push.current}
+            previous={channels.push.previous}
+            change={channels.push.change}
+          />
+        </Column>
       </Row>
     </Section>
   );
@@ -95,7 +115,7 @@ function InboxMetrics({ metrics }: { metrics: IUsageEmailData['inboxMetrics'] })
     <Section className="mt-6">
       <SectionHeader title="Inbox Activity" />
       <Row>
-        <Column className="p-2">
+        <Column className="p-2 pl-0">
           <MetricCard
             title="Sessions"
             current={metrics.sessionInitialized.current}
@@ -111,7 +131,7 @@ function InboxMetrics({ metrics }: { metrics: IUsageEmailData['inboxMetrics'] })
             change={metrics.updatePreferences.change}
           />
         </Column>
-        <Column className="p-2">
+        <Column className="p-2 pr-0">
           <MetricCard
             title="Notifications Marked"
             current={metrics.markNotification.current}
@@ -136,11 +156,14 @@ function WorkflowStats({ workflows }: { workflows: IUsageEmailData['workflowStat
         {topWorkflows?.map(([name, metrics], index) => {
           const isPositive = metrics.change > 0;
           const changeColor = isPositive ? 'text-emerald-600' : 'text-rose-600';
+          const isLast = index === topWorkflows.length - 1;
 
           return (
             <Row
               key={index}
-              className={`mb-2 flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/50 p-2`}
+              className={`flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/50 p-2 ${
+                !isLast ? 'mb-2' : ''
+              }`}
             >
               <Column align="left" className="w-full">
                 <Text className="mb-0.5 mt-0 text-sm font-medium text-gray-900">{name}</Text>
@@ -164,7 +187,11 @@ function WorkflowStats({ workflows }: { workflows: IUsageEmailData['workflowStat
 
 interface IMarketingConfig {
   title: string;
-  links: IMarketingLink[];
+  links: {
+    text: string;
+    href: string;
+    emoji: string;
+  }[];
   cta: {
     text: string;
     buttonText: string;
