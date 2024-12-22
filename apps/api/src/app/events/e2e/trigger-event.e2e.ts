@@ -37,9 +37,17 @@ import {
   WorkflowCreationSourceEnum,
   WorkflowResponseDto,
   ExecutionDetailsStatusEnum,
+  WorkflowStatusEnum,
+  TriggerSourceEnum,
 } from '@novu/shared';
 import { EmailEventStatusEnum } from '@novu/stateless';
-import { DetailEnum } from '@novu/application-generic';
+import {
+  buildNotificationTemplateIdentifierKey,
+  CacheInMemoryProviderService,
+  CacheService,
+  DetailEnum,
+  InvalidateCacheService,
+} from '@novu/application-generic';
 import { Novu } from '@novu/api';
 import { SubscriberPayloadDto } from '@novu/api/src/models/components/subscriberpayloaddto';
 import { CreateIntegrationRequestDto, TriggerEventResponseDto } from '@novu/api/models/components';
@@ -67,6 +75,7 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
   const environmentRepository = new EnvironmentRepository();
   const tenantRepository = new TenantRepository();
   let novuClient: Novu;
+  let invalidateCache: InvalidateCacheService;
 
   beforeEach(async () => {
     session = new UserSession();
@@ -79,6 +88,11 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
       environmentId: session.environment._id,
     });
     novuClient = initNovuClassSdk(session);
+
+    const cacheInMemoryProviderService = new CacheInMemoryProviderService();
+    const cacheService = new CacheService(cacheInMemoryProviderService);
+    await cacheService.initialize();
+    invalidateCache = new InvalidateCacheService(cacheService);
   });
 
   describe(`Trigger Event - /v1/events/trigger (POST)`, function () {
@@ -3435,6 +3449,100 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
 
     expect(executionDetails?.raw).to.contain('Failed to evaluate rule');
     expect(executionDetails?.raw).to.contain('Unrecognized operation invalidOp');
+  });
+
+  it('should allow trigger from dashboard but block from API when workflow is inactive', async function () {
+    const localTemplate = await session.createTemplate({
+      steps: [
+        {
+          type: StepTypeEnum.EMAIL,
+          name: 'Message Name',
+          subject: 'Test email subject',
+          content: [{ type: EmailBlockTypeEnum.TEXT, content: 'This is a sample text block' }],
+        },
+      ],
+    });
+
+    await notificationTemplateRepository.update(
+      { _id: localTemplate._id, _environmentId: session.environment._id },
+      { $set: { status: WorkflowStatusEnum.INACTIVE } }
+    );
+    await invalidateCache.invalidateByKey({
+      key: buildNotificationTemplateIdentifierKey({
+        templateIdentifier: localTemplate.triggers[0].identifier,
+        _environmentId: session.environment._id,
+      }),
+    });
+    const inactiveDashboardResponse = await novuClient.trigger({
+      name: localTemplate.triggers[0].identifier,
+      to: [subscriber.subscriberId],
+      payload: {
+        customVar: 'Testing of User Name',
+        __source: TriggerSourceEnum.DASHBOARD,
+      },
+    });
+    expect(inactiveDashboardResponse.result.status).to.equal('processed');
+    expect(inactiveDashboardResponse.result.acknowledged).to.equal(true);
+    const inactiveApiResponse = await novuClient.trigger({
+      name: localTemplate.triggers[0].identifier,
+      to: [subscriber.subscriberId],
+    });
+    expect(inactiveApiResponse.result.status).to.equal('trigger_not_active');
+    expect(inactiveApiResponse.result.acknowledged).to.equal(true);
+
+    await notificationTemplateRepository.update(
+      { _id: localTemplate._id, _environmentId: session.environment._id },
+      { $set: { status: WorkflowStatusEnum.ERROR } }
+    );
+    await invalidateCache.invalidateByKey({
+      key: buildNotificationTemplateIdentifierKey({
+        templateIdentifier: localTemplate.triggers[0].identifier,
+        _environmentId: session.environment._id,
+      }),
+    });
+    const errorDashboardResponse = await novuClient.trigger({
+      name: localTemplate.triggers[0].identifier,
+      to: [subscriber.subscriberId],
+      payload: {
+        customVar: 'Testing of User Name',
+        __source: TriggerSourceEnum.DASHBOARD,
+      },
+    });
+    expect(errorDashboardResponse.result.status).to.equal('processed');
+    expect(errorDashboardResponse.result.acknowledged).to.equal(true);
+    const errorApiResponse = await novuClient.trigger({
+      name: localTemplate.triggers[0].identifier,
+      to: [subscriber.subscriberId],
+    });
+    expect(errorApiResponse.result.status).to.equal('trigger_not_active');
+    expect(errorApiResponse.result.acknowledged).to.equal(true);
+
+    await notificationTemplateRepository.update(
+      { _id: localTemplate._id, _environmentId: session.environment._id },
+      { $set: { status: WorkflowStatusEnum.ACTIVE } }
+    );
+    await invalidateCache.invalidateByKey({
+      key: buildNotificationTemplateIdentifierKey({
+        templateIdentifier: localTemplate.triggers[0].identifier,
+        _environmentId: session.environment._id,
+      }),
+    });
+    const activeDashboardResponse = await novuClient.trigger({
+      name: localTemplate.triggers[0].identifier,
+      to: [subscriber.subscriberId],
+      payload: {
+        customVar: 'Testing of User Name',
+        __source: TriggerSourceEnum.DASHBOARD,
+      },
+    });
+    expect(activeDashboardResponse.result.status).to.equal('processed');
+    expect(activeDashboardResponse.result.acknowledged).to.equal(true);
+    const activeApiResponse = await novuClient.trigger({
+      name: localTemplate.triggers[0].identifier,
+      to: [subscriber.subscriberId],
+    });
+    expect(activeApiResponse.result.status).to.equal('processed');
+    expect(activeApiResponse.result.acknowledged).to.equal(true);
   });
 });
 
