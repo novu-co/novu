@@ -105,33 +105,6 @@ export class UsageInsights {
     };
   }
 
-  private processInboxData(inboxData: IMixpanelInboxResponse): IProcessedInboxData {
-    const inboxSeries = inboxData?.series ?? {};
-    const previousInboxSeries = inboxData?.time_comparison.series ?? {};
-
-    return {
-      current: {
-        [MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED]:
-          inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED],
-        [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES]:
-          inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES],
-        [MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION]:
-          inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION],
-        [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION]: inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION],
-      },
-      previous: {
-        [MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED]:
-          previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED],
-        [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES]:
-          previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES],
-        [MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION]:
-          previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION],
-        [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION]:
-          previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION],
-      },
-    };
-  }
-
   private getOrganizationInboxData(inboxData: IMixpanelInboxResponse, orgId: string) {
     const currentInboxData: Record<MixpanelInboxSeriesNameEnum, IChannelData> = {
       [MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED]: inboxData.series[
