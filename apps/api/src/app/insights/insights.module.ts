@@ -9,6 +9,9 @@ import { EEOrganizationRepository } from '@novu/ee-auth';
 import { USE_CASES } from './usecases';
 import { SharedModule } from '../shared/shared.module';
 import { InsightsInitializerService } from './services/insights-initializer.service';
+import { MixpanelService } from './services/mixpanel.service';
+import { MetricsCalculatorService } from './services/metrics-calculator.service';
+import { OrganizationNotificationService } from './services/organization-notification.service';
 
 @Module({
   imports: [SharedModule],
@@ -20,6 +23,9 @@ import { InsightsInitializerService } from './services/insights-initializer.serv
     NotificationRepository,
     EEOrganizationRepository,
     CommunityOrganizationRepository,
+    MixpanelService,
+    MetricsCalculatorService,
+    OrganizationNotificationService,
   ],
   exports: [...USE_CASES],
 })
