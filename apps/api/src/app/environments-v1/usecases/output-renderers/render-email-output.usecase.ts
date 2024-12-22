@@ -32,11 +32,15 @@ export class RenderEmailOutputUsecase {
   }
 
   private async parseTipTapNodeByLiquid(
-    value: TipTapNode,
+    tiptapNode: TipTapNode,
     renderCommand: RenderEmailOutputCommand
   ): Promise<TipTapNode> {
-    const client = new Liquid();
-    const templateString = client.parse(JSON.stringify(value));
+    const client = new Liquid({
+      outputEscape: (output) => {
+        return stringifyDataStructureWithSingleQuotes(output);
+      },
+    });
+    const templateString = client.parse(JSON.stringify(tiptapNode));
     const parsedTipTap = await client.render(templateString, {
       payload: renderCommand.fullPayloadForRender.payload,
       subscriber: renderCommand.fullPayloadForRender.subscriber,
@@ -56,3 +60,15 @@ export class RenderEmailOutputUsecase {
     return this.expandEmailEditorSchemaUseCase.execute({ emailEditorJson: body, fullPayloadForRender });
   }
 }
+
+export const stringifyDataStructureWithSingleQuotes = (value: unknown, spaces: number = 0): string => {
+  if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+    const valueStringified = JSON.stringify(value, null, spaces);
+    const valueSingleQuotes = valueStringified.replace(/"/g, "'");
+    const valueEscapedNewLines = valueSingleQuotes.replace(/\n/g, '\\n');
+
+    return valueEscapedNewLines;
+  } else {
+    return String(value);
+  }
+};
