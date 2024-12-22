@@ -3,7 +3,6 @@ import { startOfDay, formatISO } from 'date-fns';
 import { ChannelTypeEnum } from '@novu/shared';
 import {
   IDateRange,
-  ISeriesData,
   IMixpanelInboxResponse,
   IInboxMetrics,
   IOrganizationMetrics,
@@ -31,25 +30,6 @@ export class MetricsCalculatorService {
     Logger.debug(`Calculating change: current=${current}, previous=${previous}, change=${change}%`);
 
     return change;
-  }
-
-  getSeriesDateRange(currentSeries: ISeriesData, previousSeries: ISeriesData): IDateRange {
-    const firstOrgId = Object.keys(currentSeries).find((key) => key !== '$overall');
-    if (!firstOrgId) {
-      return { from_date: '', to_date: '' };
-    }
-
-    const currentDates = Object.keys(currentSeries[firstOrgId]?.$overall || {});
-    const previousDates = Object.keys(previousSeries[firstOrgId]?.$overall || {});
-
-    if (!currentDates.length || !previousDates.length) {
-      return { from_date: '', to_date: '' };
-    }
-
-    return {
-      from_date: this.roundToStartOfDay(previousDates[0]),
-      to_date: this.roundToStartOfDay(currentDates[0]),
-    };
   }
 
   calculateInboxMetrics(
