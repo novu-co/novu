@@ -102,7 +102,7 @@ export const SideNavigation = () => {
             </NavigationGroup>
           </div>
 
-          <div className="mt-auto gap-8 pt-4">
+          <div className="relative mt-auto gap-8 pt-4">
             <ChangelogStack />
             <FreeTrialCard />
 
