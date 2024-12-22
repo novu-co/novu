@@ -279,7 +279,7 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
     );
 
     return (
-      <Component ref={forwardedRef} className={root({ class: className })} {...rest}>
+      <Component ref={forwardedRef} className={root({ class: className })} type="button" {...rest}>
         {extendedChildren}
       </Component>
     );
