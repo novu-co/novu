@@ -430,6 +430,7 @@ export class UpsertWorkflowUseCase {
       TierRestrictionsValidateCommand.create({
         amount: cleanedControlValues.amount as number | undefined,
         unit: cleanedControlValues.unit as DigestUnitEnum | undefined,
+        cron: cleanedControlValues.cron as string | undefined,
         organizationId: user.organizationId,
         stepType,
       })
@@ -441,13 +442,7 @@ export class UpsertWorkflowUseCase {
 
     const result: Record<string, ContentIssue[]> = {};
     for (const restrictionsError of restrictionsErrors) {
-      result.amount = [
-        {
-          issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
-          message: restrictionsError.message,
-        },
-      ];
-      result.unit = [
+      result[restrictionsError.controlKey] = [
         {
           issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
           message: restrictionsError.message,

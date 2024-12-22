@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { parseExpression as parseCronExpression } from 'cron-parser';
 
 import {
   ApiServiceLevelEnum,
@@ -7,10 +8,13 @@ import {
 } from '@novu/shared';
 import { CommunityOrganizationRepository } from '@novu/dal';
 
+import { differenceInMilliseconds } from 'date-fns';
+
 import { TierRestrictionsValidateCommand } from './tier-restrictions-validate.command';
 import {
   ErrorEnum,
   TierRestrictionsValidateResponse,
+  TierValidationError,
 } from './tier-restrictions-validate.response';
 import { InstrumentUsecase } from '../../instrumentation';
 
@@ -33,54 +37,59 @@ export class TierRestrictionsValidateUsecase {
     command: TierRestrictionsValidateCommand,
   ): Promise<TierRestrictionsValidateResponse> {
     if (![StepTypeEnum.DIGEST, StepTypeEnum.DELAY].includes(command.stepType)) {
-      return null;
+      return [];
     }
 
-    const deferDurationMs = calculateDeferDuration(command);
+    const apiServiceLevel = (
+      await this.organizationRepository.findById(command.organizationId)
+    )?.apiServiceLevel;
 
-    if (!deferDurationMs) {
-      return [
-        {
-          error: ErrorEnum.INVALID_DEFER_DURATION,
-          message: 'Invalid defer duration',
-        },
-      ];
+    if (isCronExpression(command.cron)) {
+      // TODO: Implement cron expression validation
+
+      /*
+       * const deferDurationMs = this.buildCronDeltaDeferDuration(command);
+       * const issue = buildIssue(
+       *   deferDurationMs,
+       *   getMaxDelay(apiServiceLevel),
+       *   ErrorEnum.TIER_LIMIT_EXCEEDED,
+       *   'cron',
+       * );
+       */
+
+      return [];
     }
 
-    const issues: TierRestrictionsValidateResponse = [];
-    const organization = await this.organizationRepository.findById(
-      command.organizationId,
-    );
-    const tier = organization?.apiServiceLevel;
-    const isPaidTier = [
-      tier === undefined ||
-        tier === ApiServiceLevelEnum.BUSINESS ||
-        tier === ApiServiceLevelEnum.ENTERPRISE,
-    ];
+    if (isRegularDeferAction(command)) {
+      const deferDurationMs = calculateDeferDuration(command);
 
-    if (isPaidTier) {
-      if (deferDurationMs > MAX_DELAY_BUSINESS_TIER) {
-        issues.push({
-          error: ErrorEnum.TIER_LIMIT_EXCEEDED,
-          message:
-            `The maximum delay allowed is ${BUSINESS_TIER_MAX_DELAY_DAYS} days. ` +
-            'Please contact our support team to discuss extending this limit for your use case.',
-        });
-      }
+      const amountIssue = buildIssue(
+        deferDurationMs,
+        getMaxDelay(apiServiceLevel),
+        ErrorEnum.TIER_LIMIT_EXCEEDED,
+        'amount',
+      );
+      const unitIssue = buildIssue(
+        deferDurationMs,
+        getMaxDelay(apiServiceLevel),
+        ErrorEnum.TIER_LIMIT_EXCEEDED,
+        'unit',
+      );
+
+      return [amountIssue, unitIssue].filter(Boolean);
     }
 
-    if (tier === ApiServiceLevelEnum.FREE) {
-      if (deferDurationMs > MAX_DELAY_FREE_TIER) {
-        issues.push({
-          error: ErrorEnum.TIER_LIMIT_EXCEEDED,
-          message:
-            `The maximum delay allowed is ${FREE_TIER_MAX_DELAY_DAYS} days. ` +
-            'Please upgrade your plan.',
-        });
-      }
-    }
+    return [];
+  }
 
-    return issues.length === 0 ? null : issues;
+  private buildCronDeltaDeferDuration(
+    command: TierRestrictionsValidateCommand,
+  ): number | null {
+    const cronExpression = parseCronExpression(command.cron);
+    const firstTime = cronExpression.next().toDate();
+    const secondTime = cronExpression.next().toDate();
+
+    return differenceInMilliseconds(firstTime, secondTime);
   }
 }
 
@@ -123,4 +132,54 @@ function calculateMilliseconds(amount: number, unit: DigestUnitEnum): number {
     default:
       return 0;
   }
+}
+
+/*
+ * Cron expression is another term for a timed digest
+ */
+const isCronExpression = (cron: string) => {
+  return !!cron;
+};
+
+const isRegularDeferAction = (command: TierRestrictionsValidateCommand) => {
+  return (
+    !!command.amount &&
+    isNumber(command.amount) &&
+    !!command.unit &&
+    isValidDigestUnit(command.unit)
+  );
+};
+
+function getMaxDelay(tier: ApiServiceLevelEnum): number {
+  if (
+    tier === ApiServiceLevelEnum.BUSINESS ||
+    tier === ApiServiceLevelEnum.ENTERPRISE
+  ) {
+    return MAX_DELAY_BUSINESS_TIER;
+  }
+
+  return MAX_DELAY_FREE_TIER;
+}
+
+function buildIssue(
+  deferDurationMs: number,
+  maxDelayMs: number,
+  error: ErrorEnum,
+  controlKey: string,
+): TierValidationError | null {
+  if (deferDurationMs > maxDelayMs) {
+    return {
+      controlKey,
+      error,
+      message:
+        `The maximum delay allowed is ${msToDays(maxDelayMs)} days. ` +
+        'Please contact our support team to discuss extending this limit for your use case.',
+    };
+  }
+
+  return null;
+}
+
+function msToDays(ms: number): number {
+  return Math.floor(ms / (1000 * 60 * 60 * 24));
 }
