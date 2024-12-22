@@ -21,6 +21,7 @@ import { SubscribersStayTunedModal } from './subscribers-stay-tuned-modal';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
 import { NavigationLink } from './navigation-link';
 import { GettingStartedMenuItem } from './getting-started-menu-item';
+import { ChangelogStack } from './stacked-card';
 
 const NavigationGroup = ({ children, label }: { children: ReactNode; label?: string }) => {
   return (
@@ -102,6 +103,7 @@ export const SideNavigation = () => {
           </div>
 
           <div className="mt-auto gap-8 pt-4">
+            <ChangelogStack />
             <FreeTrialCard />
 
             <NavigationGroup>
