@@ -20,7 +20,7 @@ export class OrganizationNotificationService {
   ) {
     Logger.debug(`Processing metrics for organization: ${metrics.id}`);
     try {
-      const organization = await this.organizationRepository.findById(metrics.id);
+      const organization = await this.organizationRepository.findById('675fe9bcab6a05bb6dcb7dab');
 
       if (!organization) {
         Logger.warn(`Organization not found in repository: ${metrics.id}`);
