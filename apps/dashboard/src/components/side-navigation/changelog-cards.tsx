@@ -18,6 +18,10 @@ interface Changelog {
 }
 
 const CHANGELOG_API_URL = 'https://productlane.com/api/v1/changelogs/f13f1996-c9b0-4fea-8ee7-2c3faf6a832d';
+const CACHE_KEY = 'cached_changelogs';
+const CACHE_EXPIRY = 4 * 60 * 60 * 1000; // 4 hours
+const NUMBER_OF_CARDS = 3;
+const DISMISSED_STORAGE_KEY = 'dismissed_changelogs';
 
 export const ChangelogStack = ({
   hasChangeLogItems,
@@ -26,40 +30,33 @@ export const ChangelogStack = ({
   hasChangeLogItems?: (hasItems: boolean) => void;
   changeLogItemsLoaded?: (isLoaded: boolean) => void;
 }) => {
-  const NUMBER_OF_CARDS = 3;
   const CARD_OFFSET = 10;
   const SCALE_FACTOR = 0.06;
-  const STORAGE_KEY = 'dismissed_changelogs';
   const [changelogs, setChangelogs] = useState<Changelog[]>([]);
   const track = useTelemetry();
 
   const getDismissedChangelogs = (): string[] => {
-    const dismissed = localStorage.getItem(STORAGE_KEY);
-
+    const dismissed = localStorage.getItem(DISMISSED_STORAGE_KEY);
     return dismissed ? JSON.parse(dismissed) : [];
   };
 
   const addToDismissed = (changelogId: string) => {
     const dismissed = getDismissedChangelogs();
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...dismissed, changelogId]));
+    localStorage.setItem(DISMISSED_STORAGE_KEY, JSON.stringify([...dismissed, changelogId]));
   };
 
   const fetchChangelogs = async (): Promise<Changelog[]> => {
+    const cachedData = getCachedData();
+    if (cachedData) {
+      return filterChangelogs(cachedData, getDismissedChangelogs());
+    }
+
     const response = await fetch(CHANGELOG_API_URL);
-    const data = await response.json();
-    const dismissedIds = getDismissedChangelogs();
-    const twoMonthsAgo = new Date();
-    twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+    const rawData = await response.json();
 
-    return data
-      .filter((item: Changelog) => {
-        const changelogDate = new Date(item.date);
+    cacheData(rawData);
 
-        return item.published && item.imageUrl && changelogDate >= twoMonthsAgo;
-      })
-      .slice(0, NUMBER_OF_CARDS)
-      .filter((item: Changelog) => !dismissedIds.includes(item.id));
+    return filterChangelogs(rawData, getDismissedChangelogs());
   };
 
   const { data: fetchedChangelogs, isLoading } = useQuery({
@@ -154,3 +151,42 @@ export const ChangelogStack = ({
     </div>
   );
 };
+
+interface CachedChangelogs {
+  data: Changelog[];
+  timestamp: number;
+}
+
+function getCachedData(): Changelog[] | null {
+  const cachedData = localStorage.getItem(CACHE_KEY);
+  if (!cachedData) return null;
+
+  const { data, timestamp }: CachedChangelogs = JSON.parse(cachedData);
+  const isExpired = Date.now() - timestamp > CACHE_EXPIRY;
+
+  return isExpired ? null : data;
+}
+
+function cacheData(data: Changelog[]): void {
+  localStorage.setItem(
+    CACHE_KEY,
+    JSON.stringify({
+      data,
+      timestamp: Date.now(),
+    })
+  );
+}
+
+function filterChangelogs(changelogs: Changelog[], dismissedIds: string[]): Changelog[] {
+  const twoMonthsAgo = new Date();
+  twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 12);
+
+  return changelogs
+    .filter((item) => {
+      const changelogDate = new Date(item.date);
+
+      return item.published && item.imageUrl && changelogDate >= twoMonthsAgo;
+    })
+    .slice(0, NUMBER_OF_CARDS)
+    .filter((item) => !dismissedIds.includes(item.id));
+}
