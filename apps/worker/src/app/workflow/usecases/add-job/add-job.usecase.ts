@@ -173,7 +173,7 @@ export class AddJob {
         organizationId: command.organizationId,
       })
     );
-    if (errors) {
+    if (errors.length > 0) {
       const errorMessages = errors?.map((error) => error.message).join(', ');
       Logger.warn({ errors, jobId: job._id }, errorMessages, LOG_CONTEXT);
 
