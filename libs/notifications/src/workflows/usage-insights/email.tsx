@@ -256,13 +256,13 @@ export default function UsageInsightsEmail(props: IUsageEmailData & { marketingC
         📊 Usage Insights for {props.organizationName} - {formatDate(props.period.current)}
       </Preview>
       <Tailwind>
-        <Body className="bg-gray-50 pt-10 font-sans">
+        <Body className="bg-gray-50 font-sans">
           <Img
             src={`https://dashboard.novu.co/static/images/novu-colored-text.png`}
             width="119"
             height="37"
             alt="Novu Logo"
-            className="mx-auto"
+            className="mx-auto mb-10 mt-10"
           />
           <Container className="mx-auto w-full max-w-[700px]">
             <Section className="rounded-t-lg bg-gray-900 px-6 py-8">

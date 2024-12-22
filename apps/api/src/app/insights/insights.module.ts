@@ -12,6 +12,7 @@ import { InsightsInitializerService } from './services/insights-initializer.serv
 import { MixpanelService } from './services/mixpanel.service';
 import { MetricsCalculatorService } from './services/metrics-calculator.service';
 import { OrganizationNotificationService } from './services/organization-notification.service';
+import { InsightsController } from './insights.controller';
 
 @Module({
   imports: [SharedModule],
@@ -27,6 +28,7 @@ import { OrganizationNotificationService } from './services/organization-notific
     MetricsCalculatorService,
     OrganizationNotificationService,
   ],
+  controllers: [InsightsController],
   exports: [...USE_CASES],
 })
 export class InsightsModule {}
