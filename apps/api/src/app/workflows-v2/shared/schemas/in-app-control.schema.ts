@@ -21,7 +21,7 @@ const actionZodSchema = z
   .optional()
   .nullable();
 
-export const InAppControlZodSchema = z
+export const inAppControlZodSchema = z
   .object({
     skip: skipControl.schema,
     subject: z.string().optional(),
@@ -36,11 +36,11 @@ export const InAppControlZodSchema = z
 
 export type InAppRedirectType = z.infer<typeof redirectZodSchema>;
 export type InAppActionType = z.infer<typeof actionZodSchema>;
-export type InAppControlType = z.infer<typeof InAppControlZodSchema>;
+export type InAppControlType = z.infer<typeof inAppControlZodSchema>;
 
-export const InAppRedirectSchema = zodToJsonSchema(redirectZodSchema) as JSONSchemaDto;
-export const InAppActionSchema = zodToJsonSchema(actionZodSchema) as JSONSchemaDto;
-export const inAppControlSchema = zodToJsonSchema(InAppControlZodSchema) as JSONSchemaDto;
+export const inAppRedirectSchema = zodToJsonSchema(redirectZodSchema) as JSONSchemaDto;
+export const inAppActionSchema = zodToJsonSchema(actionZodSchema) as JSONSchemaDto;
+const inAppControlSchema = zodToJsonSchema(inAppControlZodSchema) as JSONSchemaDto;
 
 const redirectPlaceholder = {
   url: {
@@ -51,7 +51,7 @@ const redirectPlaceholder = {
   },
 };
 
-export const inAppUiSchema: UiSchema = {
+const inAppUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.IN_APP,
   properties: {
     body: {
@@ -80,4 +80,9 @@ export const inAppUiSchema: UiSchema = {
     },
     skip: skipControl.uiSchema.properties.skip,
   },
+};
+
+export const inAppControl = {
+  uiSchema: inAppUiSchema,
+  schema: inAppControlSchema,
 };

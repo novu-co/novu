@@ -10,7 +10,7 @@ import {
 } from '@novu/shared';
 import { skipControl } from './skip-control.schema';
 
-export const DelayTimeControlZodSchema = z
+export const delayTimeControlZodSchema = z
   .object({
     skip: skipControl.schema,
     type: z.enum(['regular']).default('regular'),
@@ -19,11 +19,10 @@ export const DelayTimeControlZodSchema = z
   })
   .strict();
 
-export const DelayTimeControlSchema = zodToJsonSchema(DelayTimeControlZodSchema) as JSONSchemaDto;
+export type DelayTimeControlType = z.infer<typeof delayTimeControlZodSchema>;
 
-export type DelayTimeControlType = z.infer<typeof DelayTimeControlZodSchema>;
-
-export const delayUiSchema: UiSchema = {
+const delayTimeControlSchema = zodToJsonSchema(delayTimeControlZodSchema) as JSONSchemaDto;
+const delayUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.DELAY,
   properties: {
     skip: skipControl.uiSchema.properties.skip,
@@ -40,4 +39,9 @@ export const delayUiSchema: UiSchema = {
       placeholder: 'regular',
     },
   },
+};
+
+export const delayControl = {
+  uiSchema: delayUiSchema,
+  schema: delayTimeControlSchema,
 };

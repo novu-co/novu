@@ -4,14 +4,14 @@ import { InstrumentUsecase } from '@novu/application-generic';
 import { RenderCommand } from './render-command';
 import {
   DelayTimeControlType,
-  DelayTimeControlZodSchema,
+  delayTimeControlZodSchema,
 } from '../../../workflows-v2/shared/schemas/delay-control.schema';
 
 @Injectable()
 export class DelayOutputRendererUsecase {
   @InstrumentUsecase()
   execute(renderCommand: RenderCommand): DelayRenderOutput {
-    const delayTimeControlType: DelayTimeControlType = DelayTimeControlZodSchema.parse(renderCommand.controlValues);
+    const delayTimeControlType: DelayTimeControlType = delayTimeControlZodSchema.parse(renderCommand.controlValues);
 
     return {
       amount: delayTimeControlType.amount as number,

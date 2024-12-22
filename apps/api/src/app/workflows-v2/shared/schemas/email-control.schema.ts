@@ -16,10 +16,10 @@ export const emailStepControlZodSchema = z
   })
   .strict();
 
-export const emailStepControlSchema = zodToJsonSchema(emailStepControlZodSchema) as JSONSchemaDto;
 export type EmailStepControlType = z.infer<typeof emailStepControlZodSchema>;
 
-export const emailStepUiSchema: UiSchema = {
+const emailStepControlSchema = zodToJsonSchema(emailStepControlZodSchema) as JSONSchemaDto;
+const emailStepUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.EMAIL,
   properties: {
     body: {

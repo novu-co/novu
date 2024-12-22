@@ -16,7 +16,6 @@ import {
   Instrument,
   InstrumentUsecase,
   PinoLogger,
-  sanitizePreviewControlValues,
 } from '@novu/application-generic';
 import { captureException } from '@sentry/node';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
@@ -29,6 +28,7 @@ import { Variable } from '../../util/template-parser/liquid-parser';
 import { pathsToObject } from '../../util/path-to-object';
 import { isObjectTipTapNode } from '../../util/tip-tap.util';
 import { buildVariables } from '../../util/build-variables';
+import { sanitizePreviewControlValues } from '../../shared/sanitize-preview-control-values';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 

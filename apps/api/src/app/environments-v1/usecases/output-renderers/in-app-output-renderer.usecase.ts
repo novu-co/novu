@@ -6,7 +6,7 @@ import { RenderCommand } from './render-command';
 import {
   InAppActionType,
   InAppControlType,
-  InAppControlZodSchema,
+  inAppControlZodSchema,
   InAppRedirectType,
 } from '../../../workflows-v2/shared';
 import { isValidUrlForActionButton } from '../../../workflows-v2/util/url-utils';
@@ -15,7 +15,7 @@ import { isValidUrlForActionButton } from '../../../workflows-v2/util/url-utils'
 export class InAppOutputRendererUsecase {
   @InstrumentUsecase()
   execute(renderCommand: RenderCommand): InAppRenderOutput {
-    const inApp: InAppControlType = InAppControlZodSchema.parse(renderCommand.controlValues);
+    const inApp: InAppControlType = inAppControlZodSchema.parse(renderCommand.controlValues);
     if (!inApp) {
       throw new Error('Invalid in-app control value data');
     }

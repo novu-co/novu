@@ -4,7 +4,7 @@ import { InstrumentUsecase } from '@novu/application-generic';
 import { RenderCommand } from './render-command';
 import {
   DigestControlSchemaType,
-  DigestControlZodSchema,
+  digestControlZodSchema,
   isDigestRegularControl,
   isDigestTimedControl,
 } from '../../../workflows-v2/shared/schemas/digest-control.schema';
@@ -13,7 +13,7 @@ import {
 export class DigestOutputRendererUsecase {
   @InstrumentUsecase()
   execute(renderCommand: RenderCommand): DigestRenderOutput {
-    const parse: DigestControlSchemaType = DigestControlZodSchema.parse(renderCommand.controlValues);
+    const parse: DigestControlSchemaType = digestControlZodSchema.parse(renderCommand.controlValues);
     if (
       isDigestRegularControl(parse) &&
       parse.amount &&

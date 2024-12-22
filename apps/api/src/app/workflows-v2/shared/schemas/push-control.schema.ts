@@ -4,7 +4,7 @@ import { zodToJsonSchema } from 'zod-to-json-schema';
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 import { skipControl } from './skip-control.schema';
 
-export const PushStepControlZodSchema = z
+export const pushStepControlZodSchema = z
   .object({
     skip: skipControl.schema,
     subject: z.string(),
@@ -12,9 +12,9 @@ export const PushStepControlZodSchema = z
   })
   .strict();
 
-export type PushStepControlType = z.infer<typeof PushStepControlZodSchema>;
+export type PushStepControlType = z.infer<typeof pushStepControlZodSchema>;
 
-export const pushStepControlSchema = zodToJsonSchema(PushStepControlZodSchema) as JSONSchemaDto;
+export const pushStepControlSchema = zodToJsonSchema(pushStepControlZodSchema) as JSONSchemaDto;
 export const pushStepUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.PUSH,
   properties: {
