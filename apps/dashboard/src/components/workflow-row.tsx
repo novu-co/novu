@@ -14,7 +14,6 @@ import { Link } from 'react-router-dom';
 import { type ExternalToast } from 'sonner';
 import { IEnvironment, WorkflowListResponseDto } from '@novu/shared';
 import { Badge } from '@/components/primitives/badge';
-import { LegacyButton } from '@/components/primitives/legacy-button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,6 +41,7 @@ import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 import { PauseModalDescription, PAUSE_MODAL_TITLE } from '@/components/pause-workflow-dialog';
 import { DeleteWorkflowDialog } from './delete-workflow-dialog';
 import { TimeDisplayHoverCard } from './time-display-hover-card';
+import { Button } from './primitives/button';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -225,9 +225,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
          */}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
-            <LegacyButton variant="ghost" className="h-8 w-8 p-0">
-              <RiMore2Fill className="h-4 w-4" />
-            </LegacyButton>
+            <Button variant="secondary" leadingIcon={RiMore2Fill} size="xs" mode="ghost"></Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
             <DropdownMenuGroup>

@@ -55,7 +55,7 @@ export const buttonVariants = tv({
         icon: '',
       },
       xs: {
-        root: 'h-8 gap-2.5 rounded-lg px-2.5 text-label-xs',
+        root: 'h-8 gap-2.5 rounded-lg px-2 text-label-xs',
         icon: '',
       },
       '2xs': {
@@ -245,7 +245,7 @@ export const buttonVariants = tv({
   defaultVariants: {
     variant: 'primary',
     mode: 'filled',
-    size: 'sm',
+    size: 'xs',
   },
 });
 
