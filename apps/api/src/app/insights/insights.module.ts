@@ -5,7 +5,6 @@ import {
   NotificationRepository,
   CommunityOrganizationRepository,
 } from '@novu/dal';
-import { EEOrganizationRepository } from '@novu/ee-auth';
 import { USE_CASES } from './usecases';
 import { SharedModule } from '../shared/shared.module';
 import { InsightsInitializerService } from './services/insights-initializer.service';
@@ -22,7 +21,6 @@ import { InsightsController } from './insights.controller';
     OrganizationRepository,
     MessageRepository,
     NotificationRepository,
-    EEOrganizationRepository,
     CommunityOrganizationRepository,
     MixpanelService,
     MetricsCalculatorService,
