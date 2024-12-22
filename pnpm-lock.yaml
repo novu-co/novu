@@ -3541,9 +3541,6 @@ importers:
 
   packages/framework:
     dependencies:
-      '@novu/shared':
-        specifier: workspace:*
-        version: link:../shared
       ajv:
         specifier: ^8.12.0
         version: 8.12.0
