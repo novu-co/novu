@@ -1,4 +1,3 @@
-import { LegacyButton } from '@/components/primitives/legacy-button';
 import { CardDescription, CardTitle } from '@/components/primitives/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import React from 'react';
@@ -16,6 +15,7 @@ import { ROUTES } from '../../utils/routes';
 import { useMutation } from '@tanstack/react-query';
 import { useOrganization, useUser } from '@clerk/clerk-react';
 import { useEnvironment, useFetchEnvironments } from '../../context/environment/hooks';
+import { Button } from '../primitives/button';
 
 interface QuestionnaireFormData {
   jobTitle: JobTitleEnum;
@@ -135,18 +135,18 @@ export function QuestionnaireForm() {
                         render={({ field }) => (
                           <>
                             {Object.values(OrganizationTypeEnum).map((type) => (
-                              <LegacyButton
+                              <Button
                                 key={type}
-                                variant="outline"
-                                size="xs"
-                                type="button"
+                                variant="secondary"
+                                mode="outline"
+                                size="2xs"
                                 className={`h-[28px] rounded-full px-3 py-1 text-sm ${
                                   field.value === type ? 'border-[#E1E4EA] bg-[#F2F5F8]' : 'border-[#E1E4EA]'
                                 }`}
                                 onClick={() => field.onChange(type)}
                               >
                                 {type}
-                              </LegacyButton>
+                              </Button>
                             ))}
                           </>
                         )}
@@ -171,18 +171,18 @@ export function QuestionnaireForm() {
                         render={({ field }) => (
                           <>
                             {Object.values(CompanySizeEnum).map((size) => (
-                              <LegacyButton
+                              <Button
                                 key={size}
-                                variant="outline"
-                                size="xs"
-                                type="button"
+                                variant="secondary"
+                                mode="outline"
+                                size="2xs"
                                 className={`h-[28px] rounded-full px-3 py-1 text-sm ${
                                   field.value === size ? 'border-[#E1E4EA] bg-[#F2F5F8]' : 'border-[#E1E4EA]'
                                 }`}
                                 onClick={() => field.onChange(size)}
                               >
                                 {size}
-                              </LegacyButton>
+                              </Button>
                             ))}
                           </>
                         )}
@@ -202,30 +202,9 @@ export function QuestionnaireForm() {
                   transition={{ duration: 0.2, ease: 'easeOut' }}
                   className="flex flex-col gap-3"
                 >
-                  <LegacyButton
-                    className={`relative bg-black ${submitQuestionnaireMutation.isPending ? 'cursor-not-allowed' : ''}`}
-                    type="submit"
-                    disabled={submitQuestionnaireMutation.isPending}
-                  >
-                    <motion.div
-                      initial={false}
-                      animate={{
-                        opacity: submitQuestionnaireMutation.isPending ? 1 : 0,
-                        scale: submitQuestionnaireMutation.isPending ? [1, 1.1, 1] : 1,
-                      }}
-                      transition={{ duration: 1, repeat: Infinity }}
-                      className="absolute inset-0 flex items-center justify-center"
-                    >
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    </motion.div>
-                    <motion.span
-                      animate={{
-                        opacity: submitQuestionnaireMutation.isPending ? 0 : 1,
-                      }}
-                    >
-                      Continue
-                    </motion.span>
-                  </LegacyButton>
+                  <Button variant="secondary" size="sm" type="submit" isLoading={submitQuestionnaireMutation.isPending}>
+                    Continue
+                  </Button>
                 </motion.div>
               )}
             </AnimatePresence>

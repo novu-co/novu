@@ -2,7 +2,6 @@ import { UsecaseSelectOnboarding } from '../components/auth/usecase-selector';
 import { AuthCard } from '../components/auth/auth-card';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { LegacyButton } from '../components/primitives/legacy-button';
 import { ROUTES } from '../utils/routes';
 import { useNavigate } from 'react-router-dom';
 import { OnboardingArrowLeft } from '../components/icons/onboarding-arrow-left';
@@ -18,6 +17,8 @@ import { useOrganization } from '@clerk/clerk-react';
 import { AnimatedPage } from '@/components/onboarding/animated-page';
 import { Helmet } from 'react-helmet-async';
 import { useEnvironment } from '@/context/environment/hooks';
+import { Button } from '../components/primitives/button';
+import { LinkButton } from '../components/primitives/button-link';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -131,22 +132,19 @@ export function UsecaseSelectPage() {
                   />
 
                   <motion.div className="flex w-full flex-col items-center gap-3" variants={itemVariants}>
-                    <LegacyButton
-                      disabled={selectedUseCases.length === 0}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      type="submit"
                       isLoading={isPending}
                       className="w-full"
-                      type="submit"
+                      disabled={selectedUseCases.length === 0}
                     >
                       Continue
-                    </LegacyButton>
-                    <LegacyButton
-                      type="button"
-                      variant="link"
-                      className="pt-0 text-xs text-[#717784]"
-                      onClick={handleSkip}
-                    >
+                    </Button>
+                    <LinkButton className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
                       Skip to Homepage
-                    </LegacyButton>
+                    </LinkButton>
                   </motion.div>
                 </div>
               </form>
