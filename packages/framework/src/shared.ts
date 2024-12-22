@@ -7,7 +7,7 @@
  * framework on the shared package.
  *
  * The shared package, doesn't support ESM/CJS with strict TS yet.
- * So we sacrified a bit code duplication in order to address ESM/CJS issues reported on the @novu/framework
+ * So we sacrificed a bit code duplication in order to address ESM/CJS issues reported on the @novu/framework
  * caused by its @novu/shared dependency.
  *
  * Treat this as a temporary solution until the shared package is updated with the above.
