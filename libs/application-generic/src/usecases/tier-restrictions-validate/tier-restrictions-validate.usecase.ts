@@ -32,17 +32,19 @@ export class TierRestrictionsValidateUsecase {
   async execute(
     command: TierRestrictionsValidateCommand,
   ): Promise<TierRestrictionsValidateResponse> {
-    const deferDurationMs =
-      isValidDigestUnit(command.unit) && isNumber(command.amount)
-        ? calculateMilliseconds(command.amount, command.unit)
-        : 0;
-
-    const controlValueNeedTierValidation =
-      command.stepType === StepTypeEnum.DIGEST ||
-      command.stepType === StepTypeEnum.DELAY;
-
-    if (!controlValueNeedTierValidation || !deferDurationMs) {
+    if (![StepTypeEnum.DIGEST, StepTypeEnum.DELAY].includes(command.stepType)) {
       return null;
+    }
+
+    const deferDurationMs = calculateDeferDuration(command);
+
+    if (!deferDurationMs) {
+      return [
+        {
+          error: ErrorEnum.INVALID_DEFER_DURATION,
+          message: 'Invalid defer duration',
+        },
+      ];
     }
 
     const issues: TierRestrictionsValidateResponse = [];
@@ -80,6 +82,20 @@ export class TierRestrictionsValidateUsecase {
 
     return issues.length === 0 ? null : issues;
   }
+}
+
+function calculateDeferDuration(
+  command: TierRestrictionsValidateCommand,
+): number | null {
+  if (command.deferDurationMs) {
+    return command.deferDurationMs;
+  }
+
+  if (isValidDigestUnit(command.unit) && isNumber(command.amount)) {
+    return calculateMilliseconds(command.amount, command.unit);
+  }
+
+  return null;
 }
 
 function isValidDigestUnit(unit: unknown): unit is DigestUnitEnum {

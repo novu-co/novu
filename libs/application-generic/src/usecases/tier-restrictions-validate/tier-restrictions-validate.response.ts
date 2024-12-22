@@ -1,5 +1,6 @@
 export enum ErrorEnum {
   TIER_LIMIT_EXCEEDED = 'TIER_LIMIT_EXCEEDED',
+  INVALID_DEFER_DURATION = 'INVALID_DEFER_DURATION',
 }
 
 type TierValidationError = {

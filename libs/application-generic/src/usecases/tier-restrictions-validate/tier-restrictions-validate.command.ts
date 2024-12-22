@@ -12,6 +12,10 @@ export class TierRestrictionsValidateCommand extends OrganizationLevelCommand {
   @IsOptional()
   unit?: DigestUnitEnum;
 
+  @IsNumber()
+  @IsOptional()
+  deferDurationMs?: number;
+
   @IsEnum(StepTypeEnum)
   @IsOptional()
   stepType?: StepTypeEnum;
