@@ -11,7 +11,7 @@ function assertValidationMessages(e: AxiosError<any, any>, field: string, msg1: 
     throw new Error(e);
   }
   console.log(JSON.stringify(e.response?.data));
-  const messages = e.response?.data.cause[field].messages;
+  const messages = e.response?.data.errors[field].messages;
 
   expect(messages).to.be.an('array').that.includes(msg1);
 }

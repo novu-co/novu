@@ -3,7 +3,7 @@ import { ApiServiceLevelEnum } from '@novu/shared';
 import { HubspotForm } from '../hubspot-form';
 import { HUBSPOT_FORM_IDS } from './utils/hubspot.constants';
 import { useAuth } from '@/context/auth/hooks';
-import { toast } from 'sonner';
+import { showSuccessToast } from '../primitives/sonner-helpers';
 
 interface ContactSalesModalProps {
   isOpen: boolean;
@@ -37,7 +37,7 @@ export function ContactSalesModal({ isOpen, onClose, intendedApiServiceLevel }: 
           readonlyProperties={['email']}
           focussedProperty="TICKET.content"
           onFormSubmitted={() => {
-            toast.success('Thank you for contacting us! We will be in touch soon.');
+            showSuccessToast('Thank you for contacting us! We will be in touch soon.');
             onClose();
           }}
         />

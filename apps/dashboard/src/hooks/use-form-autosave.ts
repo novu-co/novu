@@ -1,8 +1,8 @@
 // useFormAutosave.ts
-import { useCallback, useEffect } from 'react';
-import { UseFormReturn, FieldValues } from 'react-hook-form';
 import { useDataRef } from '@/hooks/use-data-ref';
 import { useDebounce } from '@/hooks/use-debounce';
+import { useCallback, useEffect } from 'react';
+import { FieldValues, UseFormReturn } from 'react-hook-form';
 
 const TEN_SECONDS = 10 * 1000;
 
@@ -10,27 +10,35 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
   previousData,
   form: propsForm,
   isReadOnly,
+  shouldClientValidate = false,
   save,
 }: {
   previousData: U;
   form: UseFormReturn<T>;
   isReadOnly?: boolean;
+  shouldClientValidate?: boolean;
   save: (data: U) => void;
 }) {
   const formRef = useDataRef(propsForm);
 
   const onSave = useCallback(
-    async (data: T) => {
+    async (data: T, options?: { forceSubmit?: boolean }) => {
+      if (isReadOnly) {
+        return;
+      }
       // use the form reference instead of destructuring the props to avoid stale closures
       const form = formRef.current;
       const dirtyFields = form.formState.dirtyFields;
       // somehow the form isDirty flag is lost on first blur that why we fallback to dirtyFields
       const isDirty = form.formState.isDirty || Object.keys(dirtyFields).length > 0;
-      if (!isDirty || isReadOnly) {
+      if (!isDirty && !options?.forceSubmit) {
         return;
       }
       // manually trigger the validation of the form
-      await form.trigger();
+      const isValid = await form.trigger();
+      if (!isValid && shouldClientValidate) {
+        return;
+      }
 
       const values = { ...previousData, ...data };
       // reset the dirty fields right away because on slow networks the patch request might take a while
@@ -39,7 +47,7 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
       form.reset(values, { keepErrors: true });
       save(values);
     },
-    [formRef, previousData, isReadOnly, save]
+    [formRef, previousData, isReadOnly, save, shouldClientValidate]
   );
 
   const debouncedOnSave = useDebounce(onSave, TEN_SECONDS);
@@ -60,14 +68,14 @@ export function useFormAutosave<U extends Record<string, unknown>, T extends Fie
   );
 
   // flush the form updates right away
-  const saveForm = (): Promise<void> => {
+  const saveForm = (forceSubmit: boolean = false): Promise<void> => {
     return new Promise((resolve) => {
       // await for the state to be updated
       setTimeout(async () => {
         // use the form reference instead of destructuring the props to avoid stale closures
         const form = formRef.current;
         const values = form.getValues();
-        await onSave(values);
+        await onSave(values, { forceSubmit });
 
         resolve();
       }, 0);

@@ -60,7 +60,7 @@ export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPr
       <div className="relative flex flex-col gap-3">
         <div className="flex items-center gap-2.5 text-sm font-medium">
           <Notification5Fill className="size-3" />
-          In-app template editor
+          In-App template editor
         </div>
         <InboxPreview isPreviewPending={isPreviewPending} previewData={previewData} />
         <Accordion type="single" collapsible value={accordionValue} onValueChange={setAccordionValue}>

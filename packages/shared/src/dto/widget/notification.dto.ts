@@ -30,6 +30,6 @@ export interface INotificationDto {
   deviceTokens?: string[] | null;
   cta: IMessageCTADto;
   status: 'sent' | 'error' | 'warning';
-  payload: Record<string, unknown>;
+  payload?: Record<string, unknown>;
   overrides?: Record<string, unknown>;
 }

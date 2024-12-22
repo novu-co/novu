@@ -107,6 +107,7 @@ export class CreateIntegration {
     if (command.identifier) {
       const existingIntegrationWithIdentifier = await this.integrationRepository.findOne({
         _organizationId: command.organizationId,
+        _environmentId: command.environmentId,
         identifier: command.identifier,
       });
 

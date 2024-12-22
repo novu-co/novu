@@ -1,15 +1,15 @@
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { STEP_TYPE_TO_COLOR } from '@/utils/color';
+import { StepTypeEnum } from '@/utils/enums';
+import { cn } from '@/utils/ui';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
+import { PopoverPortal } from '@radix-ui/react-popover';
 import React, { ReactNode, useState } from 'react';
 import { RiAddLine } from 'react-icons/ri';
-import { PopoverPortal } from '@radix-ui/react-popover';
-import { Node } from './base-node';
-import { Popover, PopoverContent, PopoverTrigger } from '../primitives/popover';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { Badge } from '../primitives/badge';
-import { cn } from '@/utils/ui';
-import { StepTypeEnum } from '@/utils/enums';
-import { STEP_TYPE_TO_COLOR } from '@/utils/color';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
-import { FeatureFlagsKeysEnum } from '@novu/shared';
+import { Popover, PopoverContent, PopoverTrigger } from '../primitives/popover';
+import { Node } from './base-node';
 
 const noop = () => {};
 
@@ -78,6 +78,7 @@ export const AddStepMenu = ({
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const areNewStepsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
+  const arePushChatSMSEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_SMS_CHAT_PUSH_ENABLED);
 
   const handleMenuItemClick = (stepType: StepTypeEnum) => {
     onMenuItemClick(stepType);
@@ -123,9 +124,27 @@ export const AddStepMenu = ({
                 >
                   In-App
                 </MenuItem>
-                <MenuItem stepType={StepTypeEnum.PUSH}>Push</MenuItem>
-                <MenuItem stepType={StepTypeEnum.CHAT}>Chat</MenuItem>
-                <MenuItem stepType={StepTypeEnum.SMS}>SMS</MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.PUSH}
+                  disabled={!arePushChatSMSEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.PUSH)}
+                >
+                  Push
+                </MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.CHAT}
+                  disabled={!arePushChatSMSEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.CHAT)}
+                >
+                  Chat
+                </MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.SMS}
+                  disabled={!arePushChatSMSEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.SMS)}
+                >
+                  SMS
+                </MenuItem>
               </MenuItemsGroup>
             </MenuGroup>
             <MenuGroup>

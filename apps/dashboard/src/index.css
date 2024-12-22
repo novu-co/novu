@@ -242,18 +242,18 @@
     --static-black: var(--neutral-950);
     --static-white: var(--neutral-0);
 
-    --bg-strong-950: var(--neutral-950);
-    --bg-surface-800: var(--neutral-800);
-    --bg-sub-300: var(--neutral-300);
-    --bg-soft-200: var(--neutral-200);
-    --bg-weak-50: var(--neutral-50);
-    --bg-white-0: var(--neutral-0);
+    --bg-strong: var(--neutral-950);
+    --bg-surface: var(--neutral-800);
+    --bg-sub: var(--neutral-300);
+    --bg-soft: var(--neutral-200);
+    --bg-weak: var(--neutral-50);
+    --bg-white: var(--neutral-0);
 
-    --text-strong-950: var(--neutral-950);
-    --text-sub-600: var(--neutral-600);
-    --text-soft-400: var(--neutral-400);
-    --text-disabled-300: var(--neutral-300);
-    --text-white-0: var(--neutral-0);
+    --text-strong: var(--neutral-950);
+    --text-sub: var(--neutral-600);
+    --text-soft: var(--neutral-400);
+    --text-disabled: var(--neutral-300);
+    --text-white: var(--neutral-0);
 
     --icon-strong: var(--neutral-950);
     --icon-sub: var(--neutral-600);
@@ -261,10 +261,10 @@
     --icon-disabled: var(--neutral-300);
     --icon-white: var(--neutral-0);
 
-    --stroke-strong-950: var(--neutral-950);
-    --stroke-sub-300: var(--neutral-300);
-    --stroke-soft-200: var(--neutral-200);
-    --stroke-white-0: var(--neutral-0);
+    --stroke-strong: var(--neutral-950);
+    --stroke-sub: var(--neutral-300);
+    --stroke-soft: var(--neutral-200);
+    --stroke-white: var(--neutral-0);
 
     --faded-dark: var(--neutral-800);
     --faded-base: var(--neutral-500);
@@ -342,7 +342,7 @@
     @apply border-neutral-alpha-200 focus-visible:outline-primary;
   }
   html {
-    font-family: "Inter", system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
   }
   body {
     @apply bg-background text-foreground-950 text-base;

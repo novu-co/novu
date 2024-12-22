@@ -66,7 +66,7 @@ export const NodeBody = ({ children }: { children: ReactNode }) => {
       <span className="text-foreground-400 overflow-hidden text-ellipsis text-nowrap text-sm font-medium">
         {children}
       </span>
-      <span className="to-background/90 absolute left-0 top-0 h-full w-full bg-gradient-to-r from-[rgba(255,255,255,0.00)] from-70% to-95%" />
+      <span className="to-background/90 absolute left-0 top-0 h-full w-full rounded-b-[calc(var(--radius)-1px)] bg-gradient-to-r from-[rgba(255,255,255,0.00)] from-70% to-95%" />
     </div>
   );
 };
@@ -98,11 +98,11 @@ export const NODE_WIDTH = 300;
 export const NODE_HEIGHT = 86;
 
 const nodeVariants = cva(
-  `relative border-neutral-alpha-200 transition-colors aria-selected:border-primary bg-foreground-0 flex w-[300px] flex-col gap-1 border p-1 shadow-xs`,
+  `relative bg-neutral-alpha-200 transition-colors aria-selected:bg-gradient-to-tr aria-selected:to-warning/50 aria-selected:from-destructive/60 [&>span]:bg-foreground-0 flex w-[300px] flex-col p-px shadow-xs flex [&>span]:flex-1 [&>span]:rounded-[calc(var(--radius)-1px)] [&>span]:p-1 [&>span]:flex [&>span]:flex-col [&>span]:gap-1`,
   {
     variants: {
       variant: {
-        default: 'rounded-xl',
+        default: 'rounded-lg',
         sm: 'text-neutral-400 w-min rounded-lg',
       },
     },
@@ -118,7 +118,7 @@ export const Node = (props: BaseNodeProps) => {
   const { children, variant, className, ...rest } = props;
   return (
     <div className={nodeVariants({ variant, className })} {...rest}>
-      {children}
+      <span>{children}</span>
     </div>
   );
 };

@@ -136,6 +136,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
     form,
     isReadOnly,
     save: update,
+    shouldClientValidate: true,
   });
 
   const onPauseWorkflow = (active: boolean) => {

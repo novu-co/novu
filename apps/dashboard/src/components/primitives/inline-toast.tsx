@@ -75,6 +75,7 @@ export function InlineToast({
           mode="ghost"
           variant="secondary"
           size="xs"
+          type="button"
           className={cn('shrink-0 p-0 text-xs font-medium hover:bg-transparent', buttonColorClass, ctaClassName)}
           onClick={onCtaClick}
           disabled={isCtaLoading}

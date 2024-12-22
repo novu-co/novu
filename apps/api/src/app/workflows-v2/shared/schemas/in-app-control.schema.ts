@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
+import { skipControl } from './skip-control.schema';
 
 const redirectZodSchema = z
   .object({
@@ -22,6 +23,7 @@ const actionZodSchema = z
 
 export const InAppControlZodSchema = z
   .object({
+    skip: skipControl.schema,
     subject: z.string().optional(),
     body: z.string(),
     avatar: z.string().optional(),
@@ -76,5 +78,6 @@ export const inAppUiSchema: UiSchema = {
       component: UiComponentEnum.URL_TEXT_BOX,
       placeholder: redirectPlaceholder,
     },
+    skip: skipControl.uiSchema.properties.skip,
   },
 };
