@@ -141,6 +141,11 @@ export class UsageInsights {
       },
     };
 
+    const dateRange = this.metricsCalculator.getSeriesDateRange(
+      organizationData.workflowTrigger.current,
+      organizationData.workflowTrigger.previous
+    );
+
     const metrics: IOrganizationMetrics = {
       eventTriggers: this.metricsCalculator.calculateEventTriggersMetrics(
         organizationData.workflowTrigger.current,
@@ -158,16 +163,10 @@ export class UsageInsights {
         organizationData.inbox?.current,
         organizationData.inbox?.previous,
         orgId,
-        {
-          from_date: inboxData!.time_comparison.date_range.from_date,
-          to_date: inboxData!.date_range.from_date,
-        }
+        dateRange
       ),
     };
 
-    await this.organizationNotification.sendOrganizationNotification(orgId, metrics, {
-      from_date: mixpanelData!.time_comparison.date_range.from_date,
-      to_date: mixpanelData!.date_range.to_date,
-    });
+    await this.organizationNotification.sendOrganizationNotification(orgId, metrics, dateRange);
   }
 }

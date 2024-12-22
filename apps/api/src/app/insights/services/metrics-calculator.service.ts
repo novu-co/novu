@@ -32,6 +32,20 @@ export class MetricsCalculatorService {
     return change;
   }
 
+  getSeriesDateRange(currentSeries: IChannelData, previousSeries: IChannelData): IDateRange {
+    const currentDates = Object.keys(currentSeries?.$overall || {});
+    const previousDates = Object.keys(previousSeries?.$overall || {});
+
+    if (!currentDates.length || !previousDates.length) {
+      return { from_date: '', to_date: '' };
+    }
+
+    return {
+      from_date: this.roundToStartOfDay(previousDates[0]),
+      to_date: this.roundToStartOfDay(currentDates[0]),
+    };
+  }
+
   calculateInboxMetrics(
     inboxSeries?: Record<MixpanelInboxSeriesNameEnum, IChannelData>,
     inboxTimeComparison?: Record<MixpanelInboxSeriesNameEnum, IChannelData>,
