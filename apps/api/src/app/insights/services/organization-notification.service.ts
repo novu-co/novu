@@ -3,8 +3,7 @@ import { CommunityOrganizationRepository } from '@novu/dal';
 import { FeatureFlagsService } from '@novu/application-generic';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { usageInsightsWorkflow } from '@novu/notifications';
-
-import { IDateRange, ICombinedMetrics, IMixpanelResponse } from '../usecases/usage-insights/types/usage-insights.types';
+import { IDateRange, IOrganizationMetrics } from '../types/usage-insights.types';
 
 @Injectable()
 export class OrganizationNotificationService {
@@ -13,28 +12,18 @@ export class OrganizationNotificationService {
     private featureFlagsService: FeatureFlagsService
   ) {}
 
-  async sendOrganizationNotification(
-    metrics: ICombinedMetrics,
-    workflowStats: IMixpanelResponse['workflowStats'],
-    dateRange: IDateRange
-  ) {
-    Logger.debug(`Processing metrics for organization: ${metrics.id}`);
+  async sendOrganizationNotification(organizationId: string, metrics: IOrganizationMetrics, dateRange: IDateRange) {
+    Logger.debug(`Processing metrics for organization: ${organizationId}`);
     try {
       const organization = await this.organizationRepository.findById('675fe9bcab6a05bb6dcb7dab');
 
       if (!organization) {
-        Logger.warn(`Organization not found in repository: ${metrics.id}`);
+        Logger.warn(`Organization not found in repository: ${organizationId}`);
 
         return;
       }
 
-      const enrichedMetrics = {
-        ...metrics,
-        name: organization.name,
-        workflowStats: workflowStats.workflows,
-      };
-
-      Logger.debug(`Enriched metrics for ${organization.name}:`, enrichedMetrics);
+      Logger.debug(`Enriched metrics for ${organization.name}:`, metrics);
 
       const isEnabled = await this.featureFlagsService.get(FeatureFlagsKeysEnum.IS_USAGE_INSIGHTS_ENABLED, false, {
         environmentId: 'system',
@@ -43,42 +32,37 @@ export class OrganizationNotificationService {
       });
 
       if (!isEnabled) {
-        Logger.log('Skipping notification delivery - usage insights disabled by feature flag', enrichedMetrics);
+        Logger.log('Skipping notification delivery - usage insights disabled by feature flag', metrics);
 
         return;
       }
+
+      const payload = {
+        organizationName: organization.name,
+        period: {
+          current: dateRange.to_date,
+          previous: dateRange.from_date,
+        },
+        subscriberNotifications: metrics.eventTriggers,
+        channelBreakdown: metrics.channelBreakdown,
+        inboxMetrics: metrics.inboxMetrics,
+        workflowStats: metrics.workflowStats,
+      };
+
+      delete (payload.channelBreakdown as any).trigger;
+
+      Logger.debug(`Sending notification for ${organization.name} with payload:`, payload);
 
       await usageInsightsWorkflow.trigger({
         to: {
           subscriberId: '675fe9bcab6a05bb6dcb7dab_11',
           email: `dima+testing-${organization._id}@novu.co`,
         },
-        payload: {
-          organizationName: organization.name,
-          period: {
-            current: dateRange.to_date,
-            previous: dateRange.from_date,
-          },
-          subscriberNotifications: metrics.subscriberNotifications,
-          channelBreakdown: {
-            email: metrics.channelBreakdown.email || { current: 0, previous: 0, change: 0 },
-            sms: metrics.channelBreakdown.sms || { current: 0, previous: 0, change: 0 },
-            push: metrics.channelBreakdown.push || { current: 0, previous: 0, change: 0 },
-            inApp: metrics.channelBreakdown.in_app || { current: 0, previous: 0, change: 0 },
-            chat: metrics.channelBreakdown.chat || { current: 0, previous: 0, change: 0 },
-          },
-          inboxMetrics: {
-            sessionInitialized: metrics.inboxMetrics?.sessionInitialized,
-            updatePreferences: metrics.inboxMetrics?.updatePreferences,
-            markNotification: metrics.inboxMetrics?.markNotification,
-            updateAction: metrics.inboxMetrics?.updateAction,
-          },
-          workflowStats: workflowStats.workflows,
-        },
+        payload,
         secretKey: process.env.NOVU_INTERNAL_SECRET_KEY,
       });
     } catch (error) {
-      Logger.error(`Failed to process metrics for organization ${metrics.id}:`, error);
+      Logger.error(`Failed to process metrics for organization ${organizationId}:`, error);
     }
   }
 }

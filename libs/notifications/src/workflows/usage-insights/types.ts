@@ -1,3 +1,5 @@
+import { ChannelTypeEnum } from '@novu/shared';
+
 export interface IChannelMetrics {
   current: number;
   previous: number;
@@ -25,7 +27,7 @@ export interface IUsageEmailData {
   };
   subscriberNotifications: IChannelMetrics;
   channelBreakdown: {
-    [channel: string]: IChannelMetrics;
+    [channel in ChannelTypeEnum]: IChannelMetrics;
   };
   inboxMetrics: IInboxMetrics;
   workflowStats: {

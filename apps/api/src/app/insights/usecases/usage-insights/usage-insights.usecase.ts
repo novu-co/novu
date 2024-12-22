@@ -1,11 +1,31 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InstrumentUsecase } from '@novu/application-generic';
 
-import { IUsageInsightsResponse, IInboxMetrics } from './types/usage-insights.types';
+import {
+  IChannelData,
+  IOrganizationMetrics,
+  MixpanelInboxSeriesNameEnum,
+  MixpanelTriggerEventNameEnum,
+} from '../../types/usage-insights.types';
 import { MixpanelService } from '../../services/mixpanel.service';
 import { MetricsCalculatorService } from '../../services/metrics-calculator.service';
 import { OrganizationNotificationService } from '../../services/organization-notification.service';
 import { UsageInsightsCommand } from './usage-insights.command';
+
+interface IOrganizationData {
+  workflowTrigger: {
+    current: IChannelData;
+    previous: IChannelData;
+  };
+  stepProcessing: {
+    current: IChannelData;
+    previous: IChannelData;
+  };
+  inbox?: {
+    current: Record<MixpanelInboxSeriesNameEnum, IChannelData>;
+    previous: Record<MixpanelInboxSeriesNameEnum, IChannelData>;
+  };
+}
 
 @Injectable()
 export class UsageInsights {
@@ -18,7 +38,7 @@ export class UsageInsights {
   }
 
   @InstrumentUsecase()
-  async execute(command: UsageInsightsCommand): Promise<IUsageInsightsResponse | null> {
+  async execute(command: UsageInsightsCommand): Promise<void> {
     Logger.debug('Executing UsageInsights usecase', { command });
 
     const [mixpanelData, inboxData] = await Promise.all([
@@ -29,89 +49,109 @@ export class UsageInsights {
     if (!mixpanelData?.series) {
       Logger.error('Mixpanel data unavailable or invalid');
 
-      return null;
+      return;
     }
 
     Logger.debug('Processing Mixpanel and Inbox data');
-    const subscriberSeries = mixpanelData.series['A. Notification Subscriber Event Trigger [Total Events]'];
-    const workflowSeries = mixpanelData.series['B. Process Workflow Step - [Triggers] [Total Events]'];
-    const subscriberTimeComparison =
-      mixpanelData.time_comparison.series['A. Notification Subscriber Event Trigger [Total Events]'];
-    const workflowTimeComparison =
-      mixpanelData.time_comparison.series['B. Process Workflow Step - [Triggers] [Total Events]'];
+    // Trigger Workflow data
+    const triggerEventSeries = mixpanelData.series[MixpanelTriggerEventNameEnum.NOTIFICATION_SUBSCRIBER_EVENT];
+    const triggerEventPreviousSeries =
+      mixpanelData.time_comparison.series[MixpanelTriggerEventNameEnum.NOTIFICATION_SUBSCRIBER_EVENT];
 
-    if (!subscriberSeries || !workflowSeries || !subscriberTimeComparison || !workflowTimeComparison) {
+    const processWorkflowSeries = mixpanelData.series[MixpanelTriggerEventNameEnum.PROCESS_WORKFLOW_STEP];
+    const previousProcessWorkflowSeries =
+      mixpanelData.time_comparison.series[MixpanelTriggerEventNameEnum.PROCESS_WORKFLOW_STEP];
+
+    // Inbox data
+    const inboxSeries = inboxData?.series ?? {};
+    const previousInboxSeries = inboxData?.time_comparison.series ?? {};
+    const inboxSessionInitializedSeries = inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED];
+    const inboxUpdatePreferencesSeries = inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES];
+    const inboxMarkNotificationSeries = inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION];
+    const inboxUpdateActionSeries = inboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION];
+    const previousInboxSessionInitializedSeries =
+      previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED];
+    const previousInboxUpdatePreferencesSeries =
+      previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES];
+    const previousInboxMarkNotificationSeries =
+      previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION];
+    const previousInboxUpdateActionSeries = previousInboxSeries[MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION];
+
+    if (
+      !triggerEventSeries ||
+      !processWorkflowSeries ||
+      !triggerEventPreviousSeries ||
+      !previousProcessWorkflowSeries
+    ) {
       Logger.error('Required series data missing from Mixpanel response');
 
-      return null;
+      return;
     }
 
+    let counter = 0;
     Logger.debug('Processing organization data');
-    for (const [orgId, orgData] of Object.entries(workflowSeries)) {
+    for (const [orgId, orgData] of Object.entries(processWorkflowSeries)) {
       if (orgId === '$overall') continue;
 
-      const workflowStats = this.metricsCalculator.calculateWorkflowStats(
-        orgId,
-        subscriberSeries,
-        subscriberTimeComparison
-      );
-      mixpanelData.workflowStats = workflowStats;
+      counter += 1;
 
-      const defaultInboxMetrics: IInboxMetrics = {
-        sessionInitialized: { current: 0, previous: 0, change: 0 },
-        updatePreferences: { current: 0, previous: 0, change: 0 },
-        markNotification: { current: 0, previous: 0, change: 0 },
-        updateAction: { current: 0, previous: 0, change: 0 },
+      if (counter > 5) break;
+
+      const organizationData: IOrganizationData = {
+        workflowTrigger: {
+          current: triggerEventSeries[orgId],
+          previous: triggerEventPreviousSeries[orgId],
+        },
+        stepProcessing: {
+          current: processWorkflowSeries[orgId],
+          previous: previousProcessWorkflowSeries[orgId],
+        },
+        inbox: {
+          current: {
+            [MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED]: inboxSessionInitializedSeries[orgId],
+            [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES]: inboxUpdatePreferencesSeries[orgId],
+            [MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION]: inboxMarkNotificationSeries[orgId],
+            [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION]: inboxUpdateActionSeries[orgId],
+          },
+          previous: {
+            [MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED]: previousInboxSessionInitializedSeries[orgId],
+            [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES]: previousInboxUpdatePreferencesSeries[orgId],
+            [MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION]: previousInboxMarkNotificationSeries[orgId],
+            [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION]: previousInboxUpdateActionSeries[orgId],
+          },
+        },
       };
 
-      Logger.debug('Initializing inbox stats');
-      Logger.debug(`Processing metrics for organization: ${orgId}`);
-      const metrics = this.metricsCalculator.createOrganizationMetrics(
-        orgId,
-        subscriberSeries,
-        subscriberTimeComparison,
-        workflowSeries,
-        workflowTimeComparison
-      );
-
-      metrics.subscriberNotifications.change = this.metricsCalculator.calculateChange(
-        metrics.subscriberNotifications.current,
-        metrics.subscriberNotifications.previous
-      );
-
-      metrics.channelBreakdown = Object.fromEntries(
-        Object.entries(metrics.channelBreakdown).map(([channel, channelData]) => [
-          channel,
-          {
-            ...channelData,
-            change: this.metricsCalculator.calculateChange(channelData.current, channelData.previous),
-          },
-        ])
-      );
-
-      if (inboxData?.series) {
-        Logger.debug(`Adding inbox metrics for organization: ${orgId}`);
-        const inboxMetrics = this.metricsCalculator.calculateInboxMetrics(
-          inboxData.series,
-          inboxData.time_comparison.series,
+      const metrics: IOrganizationMetrics = {
+        eventTriggers: this.metricsCalculator.calculateEventTriggersMetrics(
+          organizationData.workflowTrigger.current,
+          organizationData.workflowTrigger.previous
+        ),
+        channelBreakdown: this.metricsCalculator.calculateChannelBreakdown(
+          organizationData.stepProcessing.current,
+          organizationData.stepProcessing.previous
+        ),
+        workflowStats: this.metricsCalculator.calculateWorkflowStats(
+          organizationData.workflowTrigger.current,
+          organizationData.workflowTrigger.previous
+        ),
+        inboxMetrics: this.metricsCalculator.calculateInboxMetrics(
+          organizationData.inbox?.current,
+          organizationData.inbox?.previous,
           orgId,
           {
-            from_date: inboxData.time_comparison.date_range.from_date,
-            to_date: inboxData.date_range.from_date,
+            from_date: inboxData!.time_comparison.date_range.from_date,
+            to_date: inboxData!.date_range.from_date,
           }
-        );
-        metrics.inboxMetrics = inboxMetrics;
-      } else {
-        Logger.debug(`Using default inbox metrics for organization: ${orgId}`);
-        metrics.inboxMetrics = defaultInboxMetrics;
-      }
+        ),
+      };
 
-      await this.organizationNotification.sendOrganizationNotification(metrics, workflowStats, {
+      await this.organizationNotification.sendOrganizationNotification(orgId, metrics, {
         from_date: mixpanelData.time_comparison.date_range.from_date,
         to_date: mixpanelData.date_range.to_date,
       });
     }
 
-    Logger.debug('UsageInsights execution completed successfully');
+    Logger.debug('Usage Insights execution completed successfully');
   }
 }

@@ -1,6 +1,11 @@
-export enum MixpanelSeriesNameEnum {
+import { ChannelTypeEnum } from '@novu/shared';
+
+export enum MixpanelTriggerEventNameEnum {
   NOTIFICATION_SUBSCRIBER_EVENT = 'A. Notification Subscriber Event Trigger [Total Events]',
   PROCESS_WORKFLOW_STEP = 'B. Process Workflow Step - [Triggers] [Total Events]',
+}
+
+export enum MixpanelInboxSeriesNameEnum {
   INBOX_SESSION_INITIALIZED = 'A. Session Initialized - [Inbox] [Total Events]',
   INBOX_UPDATE_PREFERENCES = 'B. Update Preferences - [Inbox] [Total Events]',
   INBOX_MARK_NOTIFICATION = 'C. Mark Notification As - [Inbox] [Total Events]',
@@ -19,17 +24,14 @@ export interface IChannelMetrics {
 }
 
 export interface IOrganizationMetrics {
-  readonly id: string;
-  readonly name: string;
-  subscriberNotifications: {
-    current: number;
-    previous: number;
-    change: number;
-  };
+  eventTriggers: IChannelMetrics;
   channelBreakdown: {
-    [channel: string]: IChannelMetrics;
+    [channel in ChannelTypeEnum]: IChannelMetrics;
   };
-  inboxMetrics?: IInboxMetrics;
+  workflowStats: {
+    [workflow: string]: IChannelMetrics;
+  };
+  inboxMetrics: IInboxMetrics;
 }
 
 export interface IMetricData {
@@ -47,17 +49,17 @@ export type ISeriesData = {
   $overall: IMetricData;
 };
 
-export interface IMixpanelResponse {
+export interface IMixpanelTriggerResponse {
   series: {
-    [MixpanelSeriesNameEnum.NOTIFICATION_SUBSCRIBER_EVENT]: ISeriesData;
-    [MixpanelSeriesNameEnum.PROCESS_WORKFLOW_STEP]: ISeriesData;
+    [MixpanelTriggerEventNameEnum.NOTIFICATION_SUBSCRIBER_EVENT]: ISeriesData;
+    [MixpanelTriggerEventNameEnum.PROCESS_WORKFLOW_STEP]: ISeriesData;
   };
   date_range: IDateRange;
   time_comparison: {
     date_range: IDateRange;
     series: {
-      [MixpanelSeriesNameEnum.NOTIFICATION_SUBSCRIBER_EVENT]: ISeriesData;
-      [MixpanelSeriesNameEnum.PROCESS_WORKFLOW_STEP]: ISeriesData;
+      [MixpanelTriggerEventNameEnum.NOTIFICATION_SUBSCRIBER_EVENT]: ISeriesData;
+      [MixpanelTriggerEventNameEnum.PROCESS_WORKFLOW_STEP]: ISeriesData;
     };
   };
   workflowStats: {
@@ -71,21 +73,21 @@ export interface IMixpanelResponse {
   };
 }
 
-export interface IInboxResponse {
+export interface IMixpanelInboxResponse {
   series: {
-    [MixpanelSeriesNameEnum.INBOX_SESSION_INITIALIZED]: ISeriesData;
-    [MixpanelSeriesNameEnum.INBOX_UPDATE_PREFERENCES]: ISeriesData;
-    [MixpanelSeriesNameEnum.INBOX_MARK_NOTIFICATION]: ISeriesData;
-    [MixpanelSeriesNameEnum.INBOX_UPDATE_ACTION]: ISeriesData;
+    [MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED]: ISeriesData;
+    [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES]: ISeriesData;
+    [MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION]: ISeriesData;
+    [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION]: ISeriesData;
   };
   date_range: IDateRange;
   time_comparison: {
     date_range: IDateRange;
     series: {
-      [MixpanelSeriesNameEnum.INBOX_SESSION_INITIALIZED]: ISeriesData;
-      [MixpanelSeriesNameEnum.INBOX_UPDATE_PREFERENCES]: ISeriesData;
-      [MixpanelSeriesNameEnum.INBOX_MARK_NOTIFICATION]: ISeriesData;
-      [MixpanelSeriesNameEnum.INBOX_UPDATE_ACTION]: ISeriesData;
+      [MixpanelInboxSeriesNameEnum.INBOX_SESSION_INITIALIZED]: ISeriesData;
+      [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_PREFERENCES]: ISeriesData;
+      [MixpanelInboxSeriesNameEnum.INBOX_MARK_NOTIFICATION]: ISeriesData;
+      [MixpanelInboxSeriesNameEnum.INBOX_UPDATE_ACTION]: ISeriesData;
     };
   };
 }
@@ -104,16 +106,12 @@ export interface IInboxMetrics {
 }
 
 export interface IUsageInsightsResponse {
-  series: IMixpanelResponse['series'];
-  workflowStats: IMixpanelResponse['workflowStats'];
+  series: IMixpanelTriggerResponse['series'];
+  workflowStats: IMixpanelTriggerResponse['workflowStats'];
   inboxStats: {
     byOrganization: {
       [organizationId: string]: IInboxMetrics;
     };
     overall: IInboxMetrics;
   };
-}
-
-export interface ICombinedMetrics extends IOrganizationMetrics {
-  inboxMetrics?: IInboxMetrics;
 }

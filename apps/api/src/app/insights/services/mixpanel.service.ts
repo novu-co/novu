@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import { IMixpanelResponse, IInboxResponse } from '../usecases/usage-insights/types/usage-insights.types';
+import { IMixpanelInboxResponse, IMixpanelTriggerResponse } from '../types/usage-insights.types';
 
 const USE_INSIGHTS_CACHE = process.env.USE_INSIGHTS_CACHE === 'true';
 
@@ -61,7 +61,7 @@ export class MixpanelService {
     }
   }
 
-  async fetchMixpanelInsights(): Promise<IMixpanelResponse | null> {
+  async fetchMixpanelInsights(): Promise<IMixpanelTriggerResponse | null> {
     Logger.debug('Fetching Mixpanel insights');
     const cachedData = await this.readCacheFile(this.CACHE_FILE);
     if (cachedData) {
@@ -70,7 +70,7 @@ export class MixpanelService {
 
     try {
       Logger.debug('Making Mixpanel API request for insights');
-      const response = await axios.get<IMixpanelResponse>('https://mixpanel.com/api/2.0/insights', {
+      const response = await axios.get<IMixpanelTriggerResponse>('https://mixpanel.com/api/2.0/insights', {
         params: {
           project_id: '2667883',
           bookmark_id: '68515975',
@@ -92,7 +92,7 @@ export class MixpanelService {
     }
   }
 
-  async fetchInboxInsights(): Promise<IInboxResponse | null> {
+  async fetchInboxInsights(): Promise<IMixpanelInboxResponse | null> {
     Logger.debug('Fetching Inbox insights');
     const cachedData = await this.readCacheFile(this.INBOX_CACHE_FILE);
     if (cachedData) {
@@ -102,7 +102,7 @@ export class MixpanelService {
     try {
       Logger.debug('Making Mixpanel API request for inbox insights');
 
-      const response = await axios.get<IInboxResponse>('https://mixpanel.com/api/2.0/insights', {
+      const response = await axios.get<IMixpanelInboxResponse>('https://mixpanel.com/api/2.0/insights', {
         params: {
           project_id: '2667883',
           bookmark_id: '68521376',

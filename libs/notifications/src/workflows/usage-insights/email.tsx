@@ -46,7 +46,7 @@ function MetricCard({
   const formattedChange = Math.abs(Math.floor(change));
 
   return (
-    <div className={`h-[75px] rounded-lg border border-gray-100 bg-gray-50/50 p-2`}>
+    <div className={`h-[75px] rounded-lg border border-gray-100 bg-gray-50/50 p-3`}>
       <Row className="flex items-start justify-between gap-2">
         <Column align="left" className="w-full">
           <Text className="mb-0 mt-0 min-h-[28px] text-xs font-medium capitalize leading-tight text-gray-600">
@@ -95,9 +95,9 @@ function ChannelBreakdown({ channels }: { channels: IUsageEmailData['channelBrea
         <Column className="p-2">
           <MetricCard
             title="Inbox"
-            current={channels.inApp.current}
-            previous={channels.inApp.previous}
-            change={channels.inApp.change}
+            current={channels.in_app.current}
+            previous={channels.in_app.previous}
+            change={channels.in_app.change}
           />
         </Column>
         <Column className="p-2 pr-0">
@@ -182,8 +182,8 @@ function WorkflowStats({ workflows }: { workflows: IUsageEmailData['workflowStat
               <Column align="left" className="w-full">
                 <Text className="mb-0.5 mt-0 text-sm font-medium text-gray-900">{name}</Text>
                 <Text className="mb-0 mt-0 text-xs text-gray-500">
-                  {Math.floor(metrics.current).toLocaleString()} notifications sent vs{' '}
-                  {Math.floor(metrics.previous).toLocaleString()}
+                  <b>{Math.floor(metrics.current).toLocaleString()}</b> notifications sent vs{' '}
+                  <b>{Math.floor(metrics.previous).toLocaleString()}</b>
                 </Text>
               </Column>
               <Column align="right">
@@ -210,15 +210,15 @@ interface IMarketingConfig {
     text: string;
     buttonText: string;
     buttonUrl: string;
-  };
+  } | null;
 }
 
 function MarketingSection({ config }: { config: IMarketingConfig }) {
   return (
     <Section className="mt-8">
       <Hr className="mb-6 border-t border-gray-200" />
-      <div className="mb-6">
-        <Heading className="mb-4 text-base font-semibold text-gray-900">{config.title}</Heading>
+      <div>
+        <Heading className="text-base font-semibold text-gray-900">{config.title}</Heading>
         <div className="flex flex-col space-y-3">
           {config.links.map((link, index) => (
             <Link
@@ -233,15 +233,17 @@ function MarketingSection({ config }: { config: IMarketingConfig }) {
         </div>
       </div>
 
-      <div className="rounded-lg border border-indigo-100 bg-indigo-50/50 p-4 text-center">
-        <Text className="mb-2 text-sm font-medium text-indigo-900">{config.cta.text}</Text>
-        <Link
-          href={config.cta.buttonUrl}
-          className="inline-block rounded-lg bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:underline"
-        >
-          {config.cta.buttonText}
-        </Link>
-      </div>
+      {config.cta ? (
+        <div className="mt-6 rounded-lg border border-indigo-100 bg-indigo-50/50 p-4 text-center">
+          <Text className="mb-2 text-sm font-medium text-indigo-900">{config.cta.text}</Text>
+          <Link
+            href={config.cta.buttonUrl}
+            className="inline-block rounded-lg bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:underline"
+          >
+            {config.cta.buttonText}
+          </Link>
+        </div>
+      ) : null}
     </Section>
   );
 }
@@ -254,13 +256,13 @@ export default function UsageInsightsEmail(props: IUsageEmailData & { marketingC
         📊 Usage Insights for {props.organizationName} - {formatDate(props.period.current)}
       </Preview>
       <Tailwind>
-        <Body className="bg-gray-50 font-sans">
+        <Body className="bg-gray-50 pt-10 font-sans">
           <Img
             src={`https://dashboard.novu.co/static/images/novu-colored-text.png`}
             width="119"
             height="37"
-            alt="Novu"
-            className="mx-auto my-[32px]"
+            alt="Novu Logo"
+            className="mx-auto"
           />
           <Container className="mx-auto w-full max-w-[700px]">
             <Section className="rounded-t-lg bg-gray-900 px-6 py-8">

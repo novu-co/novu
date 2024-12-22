@@ -43,20 +43,19 @@ export const usageInsightsWorkflow = workflow(
           previewText: z.string().default('Here are your usage insights for {{payload.organizationName}}'),
           marketingConfig: z
             .object({
-              title: z.string().default('Discover More with Novu'),
+              title: z.string(),
               links: z.array(marketingLinkSchema),
-              cta: z.object({
-                text: z.string().default('Ready to take your notifications to the next level?'),
-                buttonText: z.string().default('Upgrade Your Plan →'),
-                buttonUrl: z.string().default('https://novu.co/pricing'),
-              }),
+              cta: z
+                .object({
+                  text: z.string(),
+                  buttonText: z.string(),
+                  buttonUrl: z.string(),
+                })
+                .optional()
+                .nullable(),
             })
             .default({
-              cta: {
-                text: 'Ready to take your notifications to the next level?',
-                buttonText: 'Upgrade Your Plan →',
-                buttonUrl: 'https://novu.co/pricing',
-              },
+              cta: null,
               links: [
                 {
                   href: 'https://docs.novu.co',
@@ -87,7 +86,7 @@ export const usageInsightsWorkflow = workflow(
             email: channelMetricsSchema,
             sms: channelMetricsSchema,
             push: channelMetricsSchema,
-            inApp: channelMetricsSchema,
+            in_app: channelMetricsSchema,
             chat: channelMetricsSchema,
           })
           .required(),
