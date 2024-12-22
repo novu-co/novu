@@ -179,7 +179,7 @@ function cacheData(data: Changelog[]): void {
 
 function filterChangelogs(changelogs: Changelog[], dismissedIds: string[]): Changelog[] {
   const twoMonthsAgo = new Date();
-  twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 12);
+  twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
 
   return changelogs
     .filter((item) => {
