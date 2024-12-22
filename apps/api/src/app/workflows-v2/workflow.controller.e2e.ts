@@ -253,15 +253,12 @@ describe('Workflow Controller E2E API Testing', () => {
       });
 
       it('should show digest control value issues when illegal value provided', async () => {
-        const steps = [{ ...buildDigestStep() }];
+        const steps = [{ ...buildDigestStep({ controlValues: { amount: '555', unit: 'days' } }) }];
         const workflowCreated = await createWorkflowAndReturn({ steps });
-        const values = { controlValues: { amount: '555', unit: 'days' } };
-        const updatedStep = await patchStepRest(workflowCreated._id, workflowCreated.steps[0]._id, values);
+        const step = workflowCreated.steps[0];
 
-        expect(updatedStep.issues?.controls?.amount[0].issueType).to.deep.equal(
-          StepContentIssueEnum.TIER_LIMIT_EXCEEDED
-        );
-        expect(updatedStep.issues?.controls?.unit[0].issueType).to.deep.equal(StepContentIssueEnum.TIER_LIMIT_EXCEEDED);
+        expect(step.issues?.controls?.amount[0].issueType).to.deep.equal(StepContentIssueEnum.TIER_LIMIT_EXCEEDED);
+        expect(step.issues?.controls?.unit[0].issueType).to.deep.equal(StepContentIssueEnum.TIER_LIMIT_EXCEEDED);
       });
     });
   });
@@ -1114,6 +1111,7 @@ describe('Workflow Controller E2E API Testing', () => {
           {
             name: 'Email Test Step',
             type: StepTypeEnum.EMAIL,
+            controlValues: { body: 'Welcome {{}}' },
           },
         ],
       });
@@ -1122,9 +1120,6 @@ describe('Workflow Controller E2E API Testing', () => {
       expect(res.isSuccessResult()).to.be.true;
       if (res.isSuccessResult()) {
         const workflow = res.value;
-        await workflowsClient.patchWorkflowStepData(workflow._id, workflow.steps[0]._id, {
-          controlValues: { body: 'Welcome {{}}' },
-        });
 
         const stepData = await getStepData(workflow._id, workflow.steps[0]._id);
         expect(stepData.issues, 'Step data should have issues').to.exist;

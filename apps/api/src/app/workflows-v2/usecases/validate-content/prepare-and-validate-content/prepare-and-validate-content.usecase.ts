@@ -394,8 +394,8 @@ export class PrepareAndValidateContentUsecase {
   ): Promise<Record<string, ContentIssue[]>> {
     const restrictionsErrors = await this.tierRestrictionsValidateUsecase.execute(
       TierRestrictionsValidateCommand.create({
-        amount: defaultControlValues.amount as number | undefined,
-        unit: defaultControlValues.unit as DigestUnitEnum | undefined,
+        amount: defaultControlValues.amount as string | undefined,
+        unit: defaultControlValues.unit as string | undefined,
         organizationId: user.organizationId,
         stepType,
       })

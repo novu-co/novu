@@ -430,8 +430,8 @@ export class UpsertWorkflowUseCase {
 
     const restrictionsErrors = await this.tierRestrictionsValidateUsecase.execute(
       TierRestrictionsValidateCommand.create({
-        amount: cleanedControlValues.amount as number | undefined,
-        unit: cleanedControlValues.unit as DigestUnitEnum | undefined,
+        amount: cleanedControlValues.amount as string | undefined,
+        unit: cleanedControlValues.unit as string | undefined,
         cron: cleanedControlValues.cron as string | undefined,
         organizationId: user.organizationId,
         stepType,
