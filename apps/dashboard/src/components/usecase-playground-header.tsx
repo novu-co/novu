@@ -1,6 +1,7 @@
 import { RiArrowLeftSLine } from 'react-icons/ri';
 import { LegacyButton } from './primitives/legacy-button';
 import { useNavigate } from 'react-router-dom';
+import { LinkButton } from './primitives/button-link';
 
 interface UsecasePlaygroundHeaderProps {
   title: string;
@@ -30,9 +31,9 @@ export function UsecasePlaygroundHeader({ title, description, skipPath, onSkip }
         </div>
       </div>
 
-      <LegacyButton variant="link" className="text-foreground-600 text-xs" onClick={handleSkip}>
+      <LinkButton size="md" className="text-xs" onClick={handleSkip}>
         Skip, I'll explore myself
-      </LegacyButton>
+      </LinkButton>
     </div>
   );
 }

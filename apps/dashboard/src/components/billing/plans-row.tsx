@@ -138,7 +138,7 @@ export function PlansRow({ selectedBillingInterval, currentPlan, trial }: PlansR
             {effectiveCurrentPlan === 'enterprise' ? (
               <PlanActionButton selectedBillingInterval={selectedBillingInterval} className="w-full" />
             ) : (
-              <ContactSalesButton variant="outline" className="w-full" />
+              <ContactSalesButton className="w-full" />
             )}
           </div>
         </div>

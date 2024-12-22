@@ -1,23 +1,23 @@
-import { LegacyButton } from '@/components/primitives/legacy-button';
 import { ApiServiceLevelEnum } from '@novu/shared';
 import { cn } from '../../utils/ui';
 import { useFetchSubscription } from '../../hooks/use-fetch-subscription';
 import { useCheckoutSession } from '../../hooks/use-checkout-session';
 import { useBillingPortal } from '../../hooks/use-billing-portal';
+import { Button } from '../primitives/button';
 
 interface PlanActionButtonProps {
   selectedBillingInterval: 'month' | 'year';
   variant?: 'default' | 'outline';
   showIcon?: boolean;
   className?: string;
-  size?: 'default' | 'sm' | 'lg';
+  size?: 'sm';
 }
 
 export function PlanActionButton({
   selectedBillingInterval,
   variant = 'default',
   className,
-  size = 'default',
+  size = 'sm',
 }: PlanActionButtonProps) {
   const { subscription: data, isLoading: isLoadingSubscription } = useFetchSubscription();
   const { navigateToCheckout, isLoading: isCheckingOut } = useCheckoutSession();
@@ -36,8 +36,9 @@ export function PlanActionButton({
   };
 
   return (
-    <LegacyButton
-      variant={variant}
+    <Button
+      mode={variant === 'outline' ? 'outline' : 'filled'}
+      variant={variant === 'outline' ? 'secondary' : 'primary'}
       size={size}
       className={cn('gap-2', className)}
       onClick={handleAction}
@@ -45,6 +46,6 @@ export function PlanActionButton({
       isLoading={isCheckingOut || isLoadingSubscription}
     >
       {isPaidSubscriptionActive() ? 'Manage Account' : 'Upgrade plan'}
-    </LegacyButton>
+    </Button>
   );
 }

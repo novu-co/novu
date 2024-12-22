@@ -147,7 +147,7 @@ export const buttonVariants = tv({
           // base
           'bg-bg-white text-text-sub shadow-regular-xs ring-stroke-soft',
           // hover
-          'hover:bg-bg-weak hover:text-text-strong hover:shadow-none hover:ring-transparent',
+          'hover:bg-bg-weak hover:text-text-strong hover:shadow-none ',
           // focus
           'focus-visible:text-text-strong focus-visible:shadow-button-important-focus focus-visible:ring-stroke-strong',
         ],

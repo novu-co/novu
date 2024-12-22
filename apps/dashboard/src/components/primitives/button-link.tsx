@@ -59,11 +59,11 @@ export const linkButtonVariants = tv({
       modifiable: {},
     },
     size: {
-      medium: {
+      md: {
         root: 'h-5 gap-1 text-label-sm',
         icon: 'size-5',
       },
-      small: {
+      sm: {
         root: 'h-4 gap-1 text-label-xs',
         icon: 'size-4',
       },
@@ -76,7 +76,7 @@ export const linkButtonVariants = tv({
   },
   defaultVariants: {
     variant: 'gray',
-    size: 'medium',
+    size: 'md',
   },
 });
 

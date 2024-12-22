@@ -1,11 +1,8 @@
-import { LegacyButton } from '../primitives/legacy-button';
 import { createWorkflow } from '../../api/workflows';
 import { CustomizeInbox } from './customize-inbox-playground';
 import { InboxPreviewContent } from './inbox-preview-content';
 import { InlineToast } from '../primitives/inline-toast';
-import { Loader2 } from 'lucide-react';
 import { ONBOARDING_DEMO_WORKFLOW_ID } from '../../config';
-import { RiNotification2Fill } from 'react-icons/ri';
 import { ROUTES } from '../../utils/routes';
 import { showErrorToast, showSuccessToast } from '../primitives/sonner-helpers';
 import { IEnvironment, StepTypeEnum, WorkflowCreationSourceEnum } from '@novu/shared';
@@ -21,6 +18,7 @@ import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
 import { useFetchWorkflows } from '../../hooks/use-fetch-workflows';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '../primitives/button';
 
 export interface ActionConfig {
   label: string;
@@ -216,22 +214,17 @@ export function InboxPlayground() {
           <div className="bg-muted mt-auto border-t">
             <div className="flex justify-end gap-3 p-2">
               {!hasNotificationBeenSent ? (
-                <LegacyButton size="sm" onClick={handleSendNotification} disabled={isPending} className="px-2">
+                <Button size="xs" variant="secondary" isLoading={isPending} onClick={handleSendNotification}>
                   Send notification
-                  {isPending ? (
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                  ) : (
-                    <RiNotification2Fill className="h-3 w-3" />
-                  )}
-                </LegacyButton>
+                </Button>
               ) : (
                 <>
-                  <LegacyButton size="sm" variant="ghost" className="px-2" onClick={handleSkipToDashboard}>
+                  <Button size="xs" mode="ghost" variant="secondary" onClick={handleSkipToDashboard}>
                     Skip to Dashboard
-                  </LegacyButton>
-                  <LegacyButton size="sm" className="px-2" onClick={handleImplementClick}>
+                  </Button>
+                  <Button size="xs" variant="secondary" onClick={handleImplementClick}>
                     Implement &lt;Inbox /&gt;
-                  </LegacyButton>
+                  </Button>
                 </>
               )}
             </div>

@@ -1,16 +1,15 @@
-import { LegacyButton } from '@/components/primitives/legacy-button';
 import { ApiServiceLevelEnum } from '@novu/shared';
 import { useState } from 'react';
 import { ContactSalesModal } from './contact-sales-modal';
 import { useTelemetry } from '../../hooks/use-telemetry';
 import { TelemetryEvent } from '../../utils/telemetry';
+import { Button } from '../primitives/button';
 
 interface ContactSalesButtonProps {
   className?: string;
-  variant?: 'default' | 'outline';
 }
 
-export function ContactSalesButton({ className, variant = 'outline' }: ContactSalesButtonProps) {
+export function ContactSalesButton({ className }: ContactSalesButtonProps) {
   const [isContactSalesModalOpen, setIsContactSalesModalOpen] = useState(false);
   const track = useTelemetry();
 
@@ -31,9 +30,9 @@ export function ContactSalesButton({ className, variant = 'outline' }: ContactSa
 
   return (
     <>
-      <LegacyButton variant={variant} className={className} onClick={handleContactSales}>
+      <Button size="sm" variant={'secondary'} mode="outline" className={className} onClick={handleContactSales}>
         Contact sales
-      </LegacyButton>
+      </Button>
       <ContactSalesModal
         isOpen={isContactSalesModalOpen}
         onClose={handleModalClose}
