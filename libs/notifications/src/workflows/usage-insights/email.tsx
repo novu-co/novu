@@ -43,6 +43,7 @@ function MetricCard({
   const changeColor = isPositive ? 'text-emerald-600' : 'text-rose-600';
 
   const formatNumber = (num: number) => Math.floor(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
+  const formattedChange = Math.abs(Math.floor(change));
 
   return (
     <div className={`h-[75px] rounded-lg border border-gray-100 bg-gray-50/50 p-2`}>
@@ -53,9 +54,11 @@ function MetricCard({
           </Text>
         </Column>
         <Column align="right" valign="top" className="w-full">
-          <Text className={`whitespace-nowrap text-xs font-medium ${changeColor} m-0 leading-[12px]`}>
-            {isPositive ? '↑' : '↓'} {Math.abs(Math.floor(change))}%
-          </Text>
+          {formattedChange !== 0 ? (
+            <Text className={`whitespace-nowrap text-[10px] font-medium ${changeColor} m-0 leading-[12px]`}>
+              {isPositive ? '↑' : '↓'} {formattedChange}%
+            </Text>
+          ) : null}
         </Column>
       </Row>
       <Row>
