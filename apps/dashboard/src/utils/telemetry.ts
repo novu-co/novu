@@ -33,4 +33,6 @@ export enum TelemetryEvent {
   WORKFLOW_PREFERENCES_OVERRIDE_USED = 'Workflow preferences override used',
   EXPORT_TO_CODE_BANNER_REACTION = 'Export to Code banner reaction - [Promotional]',
   EXTERNAL_LINK_CLICKED = 'External link clicked',
+  CHANGELOG_ITEM_CLICKED = 'Changelog item clicked',
+  CHANGELOG_ITEM_DISMISSED = 'Changelog item dismissed',
 }
