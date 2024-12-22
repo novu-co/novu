@@ -51,8 +51,8 @@ function MetricCard({
             {title}
           </Text>
         </Column>
-        <Column align="right" className="w-full">
-          <Text className={`whitespace-nowrap text-xs font-medium ${changeColor} mb-0 leading-[14px]`}>
+        <Column align="right" valign="top" className="w-full">
+          <Text className={`whitespace-nowrap text-xs font-medium ${changeColor} m-0 leading-[12px]`}>
             {isPositive ? '↑' : '↓'} {Math.abs(Math.floor(change))}%
           </Text>
         </Column>

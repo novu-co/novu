@@ -9,10 +9,12 @@ import { join } from 'path';
 import { usageInsightsWorkflow } from '@novu/notifications';
 import { UsageInsightsCommand } from './usage-insights.command';
 
-const CURRENT_PERIOD = '2024-12-16T00:00:00+02:00';
-const PREVIOUS_PERIOD = '2024-12-09T00:00:00+02:00';
-const WORKFLOW_CURRENT_PERIOD = '2024-12-16T00:00:00+02:00';
-const WORKFLOW_PREVIOUS_PERIOD = '2024-12-09T00:00:00+02:00';
+interface IDateRange {
+  from_date: string;
+  to_date: string;
+}
+
+const USE_INSIGHTS_CACHE = process.env.USE_INSIGHTS_CACHE === 'true';
 
 interface IChannelMetrics {
   current: number;
@@ -53,6 +55,14 @@ interface IMixpanelResponse {
     'A. Notification Subscriber Event Trigger [Total Events]': ISeriesData;
     'B. Process Workflow Step - [Triggers] [Total Events]': ISeriesData;
   };
+  date_range: IDateRange;
+  time_comparison: {
+    date_range: IDateRange;
+    series: {
+      'A. Notification Subscriber Event Trigger [Total Events]': ISeriesData;
+      'B. Process Workflow Step - [Triggers] [Total Events]': ISeriesData;
+    };
+  };
   workflowStats: {
     workflows: {
       [name: string]: {
@@ -70,6 +80,16 @@ interface IInboxResponse {
     'B. Update Preferences - [Inbox] [Total Events]': ISeriesData;
     'C. Mark Notification As - [Inbox] [Total Events]': ISeriesData;
     'D. Update Notification Action - [Inbox] [Total Events]': ISeriesData;
+  };
+  date_range: IDateRange;
+  time_comparison: {
+    date_range: IDateRange;
+    series: {
+      'A. Session Initialized - [Inbox] [Total Events]': ISeriesData;
+      'B. Update Preferences - [Inbox] [Total Events]': ISeriesData;
+      'C. Mark Notification As - [Inbox] [Total Events]': ISeriesData;
+      'D. Update Notification Action - [Inbox] [Total Events]': ISeriesData;
+    };
   };
 }
 
@@ -114,7 +134,36 @@ export class UsageInsights {
     Logger.debug('UsageInsights service initialized');
   }
 
+  private roundToStartOfDay(date: string): string {
+    return `${new Date(date).toISOString().split('T')[0]}T00:00:00+02:00`;
+  }
+
+  private getSeriesDateRange(currentSeries: ISeriesData, previousSeries: ISeriesData): IDateRange {
+    const firstOrgId = Object.keys(currentSeries).find((key) => key !== '$overall');
+    if (!firstOrgId) {
+      return { from_date: '', to_date: '' };
+    }
+
+    const currentDates = Object.keys(currentSeries[firstOrgId]?.$overall || {});
+    const previousDates = Object.keys(previousSeries[firstOrgId]?.$overall || {});
+
+    if (!currentDates.length || !previousDates.length) {
+      return { from_date: '', to_date: '' };
+    }
+
+    return {
+      from_date: this.roundToStartOfDay(previousDates[0]),
+      to_date: this.roundToStartOfDay(currentDates[0]),
+    };
+  }
+
   private async readCacheFile(cacheFile: string) {
+    if (!USE_INSIGHTS_CACHE) {
+      Logger.debug('Cache usage is disabled by environment variable');
+
+      return null;
+    }
+
     Logger.debug(`Attempting to read cache file: ${cacheFile}`);
     try {
       const fileContent = await fs.readFile(cacheFile, 'utf-8');
@@ -137,6 +186,12 @@ export class UsageInsights {
   }
 
   private async writeCacheFile(data: any, cacheFile: string) {
+    if (!USE_INSIGHTS_CACHE) {
+      Logger.debug('Cache usage is disabled by environment variable, skipping write');
+
+      return;
+    }
+
     Logger.debug(`Attempting to write cache file: ${cacheFile}`);
     try {
       const cache = {
@@ -227,24 +282,34 @@ export class UsageInsights {
     }
   }
 
-  private calculateInboxMetrics(inboxSeries: IInboxResponse['series'], orgId: string): IInboxMetrics {
+  private calculateInboxMetrics(
+    inboxSeries: IInboxResponse['series'],
+    inboxTimeComparison: IInboxResponse['time_comparison']['series'],
+    orgId: string,
+    dateRange: IDateRange
+  ): IInboxMetrics {
     Logger.debug(`Calculating inbox metrics for organization: ${orgId}`);
-    const getMetricStats = (seriesData: ISeriesData | undefined, orgKey: string): IMetricStats => {
-      if (!seriesData) {
+    const getMetricStats = (
+      currentSeriesData: ISeriesData | undefined,
+      previousSeriesData: ISeriesData | undefined,
+      orgKey: string
+    ): IMetricStats => {
+      if (!currentSeriesData || !previousSeriesData) {
         Logger.debug(`No series data available for ${orgKey}`);
 
         return { current: 0, previous: 0, change: 0 };
       }
 
-      const data = seriesData[orgKey];
-      if (!data) {
+      const currentData = currentSeriesData[orgKey];
+      const previousData = previousSeriesData[orgKey];
+      if (!currentData || !previousData) {
         Logger.debug(`No data available for ${orgKey}`);
 
         return { current: 0, previous: 0, change: 0 };
       }
 
-      const current = Number(data[CURRENT_PERIOD] || 0);
-      const previous = Number(data[PREVIOUS_PERIOD] || 0);
+      const current = Number(Object.values(currentData)[0] || 0);
+      const previous = Number(Object.values(previousData)[0] || 0);
       const change = this.calculateChange(current, previous);
 
       Logger.debug(`Metric stats for ${orgKey}: current=${current}, previous=${previous}, change=${change}%`);
@@ -252,28 +317,77 @@ export class UsageInsights {
       return { current, previous, change };
     };
 
-    const metrics = {
-      sessionInitialized: getMetricStats(inboxSeries['A. Session Initialized - [Inbox] [Total Events]'], orgId),
-      updatePreferences: getMetricStats(inboxSeries['B. Update Preferences - [Inbox] [Total Events]'], orgId),
-      markNotification: getMetricStats(inboxSeries['C. Mark Notification As - [Inbox] [Total Events]'], orgId),
-      updateAction: getMetricStats(inboxSeries['D. Update Notification Action - [Inbox] [Total Events]'], orgId),
+    return {
+      sessionInitialized: getMetricStats(
+        inboxSeries['A. Session Initialized - [Inbox] [Total Events]'],
+        inboxTimeComparison['A. Session Initialized - [Inbox] [Total Events]'],
+        orgId
+      ),
+      updatePreferences: getMetricStats(
+        inboxSeries['B. Update Preferences - [Inbox] [Total Events]'],
+        inboxTimeComparison['B. Update Preferences - [Inbox] [Total Events]'],
+        orgId
+      ),
+      markNotification: getMetricStats(
+        inboxSeries['C. Mark Notification As - [Inbox] [Total Events]'],
+        inboxTimeComparison['C. Mark Notification As - [Inbox] [Total Events]'],
+        orgId
+      ),
+      updateAction: getMetricStats(
+        inboxSeries['D. Update Notification Action - [Inbox] [Total Events]'],
+        inboxTimeComparison['D. Update Notification Action - [Inbox] [Total Events]'],
+        orgId
+      ),
     };
-
-    Logger.debug(`Inbox metrics calculated for ${orgId}:`, metrics);
-
-    return metrics;
   }
 
-  private calculateOverallInboxMetrics(inboxSeries: IInboxResponse['series']): IInboxMetrics {
+  private calculateOverallInboxMetrics(
+    inboxSeries: IInboxResponse['series'],
+    inboxTimeComparison: IInboxResponse['time_comparison']['series']
+  ): IInboxMetrics {
     Logger.debug('Calculating overall inbox metrics');
 
-    return this.calculateInboxMetrics(inboxSeries, '$overall');
+    const getMetricStats = (
+      currentSeriesData: ISeriesData | undefined,
+      previousSeriesData: ISeriesData | undefined
+    ): IMetricStats => {
+      if (!currentSeriesData?.$overall || !previousSeriesData?.$overall) {
+        return { current: 0, previous: 0, change: 0 };
+      }
+
+      const current = Number(Object.values(currentSeriesData.$overall)[0] || 0);
+      const previous = Number(Object.values(previousSeriesData.$overall)[0] || 0);
+      const change = this.calculateChange(current, previous);
+
+      return { current, previous, change };
+    };
+
+    return {
+      sessionInitialized: getMetricStats(
+        inboxSeries['A. Session Initialized - [Inbox] [Total Events]'],
+        inboxTimeComparison['A. Session Initialized - [Inbox] [Total Events]']
+      ),
+      updatePreferences: getMetricStats(
+        inboxSeries['B. Update Preferences - [Inbox] [Total Events]'],
+        inboxTimeComparison['B. Update Preferences - [Inbox] [Total Events]']
+      ),
+      markNotification: getMetricStats(
+        inboxSeries['C. Mark Notification As - [Inbox] [Total Events]'],
+        inboxTimeComparison['C. Mark Notification As - [Inbox] [Total Events]']
+      ),
+      updateAction: getMetricStats(
+        inboxSeries['D. Update Notification Action - [Inbox] [Total Events]'],
+        inboxTimeComparison['D. Update Notification Action - [Inbox] [Total Events]']
+      ),
+    };
   }
 
   private createOrganizationMetrics(
     orgId: string,
     subscriberSeries: ISeriesData,
-    workflowSeries: ISeriesData
+    subscriberTimeComparison: ISeriesData,
+    workflowSeries: ISeriesData,
+    workflowTimeComparison: ISeriesData
   ): IOrganizationMetrics {
     Logger.debug(`Creating organization metrics for: ${orgId}`);
 
@@ -281,8 +395,8 @@ export class UsageInsights {
       id: orgId,
       name: '',
       subscriberNotifications: {
-        current: subscriberSeries[orgId]?.$overall?.[WORKFLOW_CURRENT_PERIOD] || 0,
-        previous: subscriberSeries[orgId]?.$overall?.[WORKFLOW_PREVIOUS_PERIOD] || 0,
+        current: Number(Object.values(subscriberSeries[orgId]?.$overall || {})[0] || 0),
+        previous: Number(Object.values(subscriberTimeComparison[orgId]?.$overall || {})[0] || 0),
         change: 0,
       },
       channelBreakdown: {},
@@ -291,11 +405,12 @@ export class UsageInsights {
     Logger.debug(`Subscriber notifications for ${orgId}:`, orgMetrics.subscriberNotifications);
 
     const orgWorkflowData = workflowSeries[orgId];
-    if (orgWorkflowData) {
+    const orgWorkflowPreviousData = workflowTimeComparison[orgId];
+    if (orgWorkflowData && orgWorkflowPreviousData) {
       Object.entries(orgWorkflowData).forEach(([channel, data]) => {
         if (channel !== '$overall') {
-          const current = data.$overall?.[WORKFLOW_CURRENT_PERIOD] || 0;
-          const previous = data.$overall?.[WORKFLOW_PREVIOUS_PERIOD] || 0;
+          const current = Number(Object.values(data.$overall || {})[0] || 0);
+          const previous = Number(Object.values(orgWorkflowPreviousData[channel]?.$overall || {})[0] || 0);
 
           orgMetrics.channelBreakdown[channel] = {
             current,
@@ -313,9 +428,46 @@ export class UsageInsights {
     return orgMetrics;
   }
 
+  private calculateWorkflowStats(
+    subscriberSeries: ISeriesData,
+    subscriberTimeComparison: ISeriesData
+  ): IMixpanelResponse['workflowStats'] {
+    Logger.debug('Calculating workflow statistics');
+    const workflowStats: IMixpanelResponse['workflowStats'] = { workflows: {} };
+
+    const firstOrgId = Object.keys(subscriberSeries).find((key) => key !== '$overall');
+    if (!firstOrgId) {
+      Logger.debug('No organization data found for workflow stats');
+
+      return workflowStats;
+    }
+
+    const orgData = subscriberSeries[firstOrgId]?.undefined;
+    const orgPreviousData = subscriberTimeComparison[firstOrgId]?.undefined;
+    if (!orgData || !orgPreviousData) {
+      Logger.debug(`No workflow data found for organization: ${firstOrgId}`);
+
+      return workflowStats;
+    }
+
+    Object.entries(orgData)
+      .filter(([name]) => name !== '$overall')
+      .forEach(([name, data]) => {
+        const current = Number(Object.values(data)[0] || 0);
+        const previous = Number(Object.values(orgPreviousData[name] || {})[0] || 0);
+        const change = this.calculateChange(current, previous);
+
+        workflowStats.workflows[name] = { current, previous, change };
+        Logger.debug(`Workflow stats for ${name}: current=${current}, previous=${previous}, change=${change}%`);
+      });
+
+    return workflowStats;
+  }
+
   private async sendOrganizationNotification(
     metrics: ICombinedMetrics,
-    workflowStats: IMixpanelResponse['workflowStats']
+    workflowStats: IMixpanelResponse['workflowStats'],
+    dateRange: IDateRange
   ) {
     Logger.debug(`Processing metrics for organization: ${metrics.id}`);
     try {
@@ -353,8 +505,8 @@ export class UsageInsights {
         },
         payload: {
           period: {
-            current: CURRENT_PERIOD,
-            previous: PREVIOUS_PERIOD,
+            current: dateRange.to_date,
+            previous: dateRange.from_date,
           },
           subscriberNotifications: metrics.subscriberNotifications,
           channelBreakdown: {
@@ -377,38 +529,6 @@ export class UsageInsights {
     }
   }
 
-  private calculateWorkflowStats(subscriberSeries: ISeriesData): IMixpanelResponse['workflowStats'] {
-    Logger.debug('Calculating workflow statistics');
-    const workflowStats: IMixpanelResponse['workflowStats'] = { workflows: {} };
-
-    const firstOrgId = Object.keys(subscriberSeries).find((key) => key !== '$overall');
-    if (!firstOrgId) {
-      Logger.debug('No organization data found for workflow stats');
-
-      return workflowStats;
-    }
-
-    const orgData = subscriberSeries[firstOrgId]?.undefined;
-    if (!orgData) {
-      Logger.debug(`No workflow data found for organization: ${firstOrgId}`);
-
-      return workflowStats;
-    }
-
-    Object.entries(orgData)
-      .filter(([name]) => name !== '$overall')
-      .forEach(([name, data]) => {
-        const current = data[WORKFLOW_CURRENT_PERIOD] || 0;
-        const previous = data[WORKFLOW_PREVIOUS_PERIOD] || 0;
-        const change = this.calculateChange(current, previous);
-
-        workflowStats.workflows[name] = { current, previous, change };
-        Logger.debug(`Workflow stats for ${name}: current=${current}, previous=${previous}, change=${change}%`);
-      });
-
-    return workflowStats;
-  }
-
   @InstrumentUsecase()
   async execute(command: UsageInsightsCommand): Promise<IUsageInsightsResponse | null> {
     Logger.debug('Executing UsageInsights usecase', { command });
@@ -424,14 +544,23 @@ export class UsageInsights {
     Logger.debug('Processing Mixpanel and Inbox data');
     const subscriberSeries = mixpanelData.series['A. Notification Subscriber Event Trigger [Total Events]'];
     const workflowSeries = mixpanelData.series['B. Process Workflow Step - [Triggers] [Total Events]'];
+    const subscriberTimeComparison =
+      mixpanelData.time_comparison.series['A. Notification Subscriber Event Trigger [Total Events]'];
+    const workflowTimeComparison =
+      mixpanelData.time_comparison.series['B. Process Workflow Step - [Triggers] [Total Events]'];
 
-    if (!subscriberSeries || !workflowSeries) {
+    if (!subscriberSeries || !workflowSeries || !subscriberTimeComparison || !workflowTimeComparison) {
       Logger.error('Required series data missing from Mixpanel response');
 
       return null;
     }
 
-    const workflowStats = this.calculateWorkflowStats(subscriberSeries);
+    const seriesDateRange = {
+      from_date: mixpanelData.time_comparison.date_range.from_date,
+      to_date: mixpanelData.date_range.to_date,
+    };
+
+    const workflowStats = this.calculateWorkflowStats(subscriberSeries, subscriberTimeComparison);
     mixpanelData.workflowStats = workflowStats;
 
     const defaultInboxMetrics: IInboxMetrics = {
@@ -444,7 +573,9 @@ export class UsageInsights {
     Logger.debug('Initializing inbox stats');
     const inboxStats: IUsageInsightsResponse['inboxStats'] = {
       byOrganization: {},
-      overall: inboxData?.series ? this.calculateOverallInboxMetrics(inboxData.series) : defaultInboxMetrics,
+      overall: inboxData?.series
+        ? this.calculateOverallInboxMetrics(inboxData.series, inboxData.time_comparison.series)
+        : defaultInboxMetrics,
     };
 
     Logger.debug('Processing organization data');
@@ -452,7 +583,13 @@ export class UsageInsights {
       if (orgId === '$overall') continue;
 
       Logger.debug(`Processing metrics for organization: ${orgId}`);
-      const metrics = this.createOrganizationMetrics(orgId, subscriberSeries, workflowSeries) as ICombinedMetrics;
+      const metrics = this.createOrganizationMetrics(
+        orgId,
+        subscriberSeries,
+        subscriberTimeComparison,
+        workflowSeries,
+        workflowTimeComparison
+      ) as ICombinedMetrics;
 
       metrics.subscriberNotifications.change = this.calculateChange(
         metrics.subscriberNotifications.current,
@@ -471,7 +608,12 @@ export class UsageInsights {
 
       if (inboxData?.series) {
         Logger.debug(`Adding inbox metrics for organization: ${orgId}`);
-        const inboxMetrics = this.calculateInboxMetrics(inboxData.series, orgId);
+        const inboxMetrics = this.calculateInboxMetrics(
+          inboxData.series,
+          inboxData.time_comparison.series,
+          orgId,
+          seriesDateRange
+        );
         metrics.inboxMetrics = inboxMetrics;
         inboxStats.byOrganization[orgId] = inboxMetrics;
       } else {
@@ -480,7 +622,7 @@ export class UsageInsights {
         inboxStats.byOrganization[orgId] = defaultInboxMetrics;
       }
 
-      await this.sendOrganizationNotification(metrics, workflowStats);
+      await this.sendOrganizationNotification(metrics, workflowStats, seriesDateRange);
     }
 
     Logger.debug('UsageInsights execution completed successfully');
