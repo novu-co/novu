@@ -1,16 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
-import {
-  CommunityOrganizationRepository,
-  MessageRepository,
-  NotificationRepository,
-  OrganizationRepository,
-} from '@novu/dal';
+import { CommunityOrganizationRepository } from '@novu/dal';
 import { InstrumentUsecase } from '@novu/application-generic';
 import axios from 'axios';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 
+import { usageInsightsWorkflow } from '@novu/notifications';
 import { UsageInsightsCommand } from './usage-insights.command';
+
+const CURRENT_PERIOD = '2024-12-16T00:00:00+02:00';
+const PREVIOUS_PERIOD = '2024-12-09T00:00:00+02:00';
+const WORKFLOW_CURRENT_PERIOD = '2024-12-16T00:00:00+02:00';
+const WORKFLOW_PREVIOUS_PERIOD = '2024-12-09T00:00:00+02:00';
 
 interface IChannelMetrics {
   current: number;
@@ -105,30 +106,34 @@ export class UsageInsights {
   private readonly INBOX_CACHE_FILE = join(process.cwd(), 'mixpanel-inbox-cache.json');
   private readonly CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-  constructor(private organizationRepository: CommunityOrganizationRepository) {}
+  constructor(private organizationRepository: CommunityOrganizationRepository) {
+    Logger.debug('UsageInsights service initialized');
+  }
 
   private async readCacheFile(cacheFile: string) {
+    Logger.debug(`Attempting to read cache file: ${cacheFile}`);
     try {
       const fileContent = await fs.readFile(cacheFile, 'utf-8');
       const cache = JSON.parse(fileContent);
 
       if (cache.timestamp && Date.now() - cache.timestamp < this.CACHE_TTL) {
-        Logger.log(`Using cached Mixpanel data from ${cacheFile}`);
+        Logger.debug(`Cache hit: Using data from ${cacheFile}, age: ${(Date.now() - cache.timestamp) / 1000}s`);
 
         return cache.data;
       }
 
-      Logger.log('Cache expired, fetching fresh data');
+      Logger.debug(`Cache expired for ${cacheFile}, age: ${(Date.now() - cache.timestamp) / 1000}s`);
 
       return null;
     } catch (error) {
-      Logger.log('No cache file found or invalid cache');
+      Logger.debug(`Cache miss: No valid cache found for ${cacheFile}`);
 
       return null;
     }
   }
 
   private async writeCacheFile(data: any, cacheFile: string) {
+    Logger.debug(`Attempting to write cache file: ${cacheFile}`);
     try {
       const cache = {
         timestamp: Date.now(),
@@ -136,27 +141,35 @@ export class UsageInsights {
       };
 
       await fs.writeFile(cacheFile, JSON.stringify(cache, null, 2));
-      Logger.log(`Mixpanel data cached successfully to ${cacheFile}`);
+      Logger.debug(`Cache write successful: ${cacheFile}`);
     } catch (error) {
-      Logger.error('Failed to cache Mixpanel data:', error);
+      Logger.error(`Cache write failed for ${cacheFile}:`, error);
     }
   }
 
   private calculateChange(current: number, previous: number): number {
+    let change: number;
+
     if (previous === 0) {
-      return current > 0 ? 100 : 0;
+      change = current > 0 ? 100 : 0;
+    } else {
+      change = Number(((current - previous) / previous) * 100);
     }
 
-    return Number(((current - previous) / previous) * 100);
+    Logger.debug(`Calculating change: current=${current}, previous=${previous}, change=${change}%`);
+
+    return change;
   }
 
   private async fetchMixpanelInsights(): Promise<IMixpanelResponse | null> {
+    Logger.debug('Fetching Mixpanel insights');
     const cachedData = await this.readCacheFile(this.CACHE_FILE);
     if (cachedData) {
       return cachedData;
     }
 
     try {
+      Logger.debug('Making Mixpanel API request for insights');
       const response = await axios.get<IMixpanelResponse>('https://mixpanel.com/api/2.0/insights', {
         params: {
           project_id: '2667883',
@@ -168,23 +181,26 @@ export class UsageInsights {
         },
       });
 
+      Logger.debug('Mixpanel insights fetch successful');
       await this.writeCacheFile(response.data, this.CACHE_FILE);
 
       return response.data;
     } catch (error) {
-      Logger.error('Error fetching Mixpanel insights:', error);
+      Logger.error('Mixpanel insights fetch failed:', error);
 
       return null;
     }
   }
 
   private async fetchInboxInsights(): Promise<IInboxResponse | null> {
+    Logger.debug('Fetching Inbox insights');
     const cachedData = await this.readCacheFile(this.INBOX_CACHE_FILE);
     if (cachedData) {
       return cachedData;
     }
 
     try {
+      Logger.debug('Making Mixpanel API request for inbox insights');
       const response = await axios.get<IInboxResponse>('https://mixpanel.com/api/2.0/insights', {
         params: {
           project_id: '2667883',
@@ -196,47 +212,57 @@ export class UsageInsights {
         },
       });
 
+      Logger.debug('Inbox insights fetch successful');
       await this.writeCacheFile(response.data, this.INBOX_CACHE_FILE);
 
       return response.data;
     } catch (error) {
-      Logger.error('Error fetching Inbox insights:', error?.response?.data || error);
+      Logger.error('Inbox insights fetch failed:', error?.response?.data || error);
 
       return null;
     }
   }
 
   private calculateInboxMetrics(inboxSeries: IInboxResponse['series'], orgId: string): IInboxMetrics {
+    Logger.debug(`Calculating inbox metrics for organization: ${orgId}`);
     const getMetricStats = (seriesData: ISeriesData | undefined, orgKey: string): IMetricStats => {
-      const data = seriesData?.[orgKey];
-      if (!data) {
-        return {
-          current: 0,
-          previous: 0,
-          change: 0,
-        };
+      if (!seriesData) {
+        Logger.debug(`No series data available for ${orgKey}`);
+
+        return { current: 0, previous: 0, change: 0 };
       }
 
-      const current = data['2024-12-02T00:00:00+02:00'] || 0;
-      const previous = data['2024-11-25T00:00:00+02:00'] || 0;
+      const data = seriesData[orgKey];
+      if (!data) {
+        Logger.debug(`No data available for ${orgKey}`);
 
-      return {
-        current,
-        previous,
-        change: this.calculateChange(current, previous),
-      };
+        return { current: 0, previous: 0, change: 0 };
+      }
+
+      const current = Number(data[CURRENT_PERIOD] || 0);
+      const previous = Number(data[PREVIOUS_PERIOD] || 0);
+      const change = this.calculateChange(current, previous);
+
+      Logger.debug(`Metric stats for ${orgKey}: current=${current}, previous=${previous}, change=${change}%`);
+
+      return { current, previous, change };
     };
 
-    // Always return a complete metrics object
-    return {
+    const metrics = {
       sessionInitialized: getMetricStats(inboxSeries['A. Session Initialized - [Inbox] [Total Events]'], orgId),
       updatePreferences: getMetricStats(inboxSeries['B. Update Preferences - [Inbox] [Total Events]'], orgId),
       markNotification: getMetricStats(inboxSeries['C. Mark Notification As - [Inbox] [Total Events]'], orgId),
       updateAction: getMetricStats(inboxSeries['D. Update Notification Action - [Inbox] [Total Events]'], orgId),
     };
+
+    Logger.debug(`Inbox metrics calculated for ${orgId}:`, metrics);
+
+    return metrics;
   }
 
   private calculateOverallInboxMetrics(inboxSeries: IInboxResponse['series']): IInboxMetrics {
+    Logger.debug('Calculating overall inbox metrics');
+
     return this.calculateInboxMetrics(inboxSeries, '$overall');
   }
 
@@ -245,39 +271,50 @@ export class UsageInsights {
     subscriberSeries: ISeriesData,
     workflowSeries: ISeriesData
   ): IOrganizationMetrics {
+    Logger.debug(`Creating organization metrics for: ${orgId}`);
+
     const orgMetrics: IOrganizationMetrics = {
       id: orgId,
       name: '',
       subscriberNotifications: {
-        current: subscriberSeries[orgId]?.$overall?.['2024-12-02T00:00:00+02:00'] || 0,
-        previous: subscriberSeries[orgId]?.$overall?.['2024-11-25T00:00:00+02:00'] || 0,
+        current: subscriberSeries[orgId]?.$overall?.[WORKFLOW_CURRENT_PERIOD] || 0,
+        previous: subscriberSeries[orgId]?.$overall?.[WORKFLOW_PREVIOUS_PERIOD] || 0,
         change: 0,
       },
       channelBreakdown: {},
     };
 
-    // Process channel breakdown from workflowSeries
+    Logger.debug(`Subscriber notifications for ${orgId}:`, orgMetrics.subscriberNotifications);
+
     const orgWorkflowData = workflowSeries[orgId];
     if (orgWorkflowData) {
       Object.entries(orgWorkflowData).forEach(([channel, data]) => {
         if (channel !== '$overall') {
+          const current = data.$overall?.[WORKFLOW_CURRENT_PERIOD] || 0;
+          const previous = data.$overall?.[WORKFLOW_PREVIOUS_PERIOD] || 0;
+
           orgMetrics.channelBreakdown[channel] = {
-            current: data.$overall?.['2024-12-02T00:00:00+02:00'] || 0,
-            previous: data.$overall?.['2024-11-25T00:00:00+02:00'] || 0,
+            current,
+            previous,
             change: 0,
           };
+
+          Logger.debug(`Channel metrics for ${orgId}/${channel}: current=${current}, previous=${previous}`);
         }
       });
+    } else {
+      Logger.debug(`No workflow data available for organization: ${orgId}`);
     }
 
     return orgMetrics;
   }
 
   private async logOrganizationMetrics(metrics: ICombinedMetrics, workflowStats: IMixpanelResponse['workflowStats']) {
+    Logger.debug(`Processing metrics for organization: ${metrics.id}`);
     try {
       const organization = await this.organizationRepository.findById(metrics.id);
       if (!organization) {
-        Logger.warn(`Organization not found: ${metrics.id}`);
+        Logger.warn(`Organization not found in repository: ${metrics.id}`);
 
         return;
       }
@@ -288,36 +325,66 @@ export class UsageInsights {
         workflowStats: workflowStats.workflows,
       };
 
-      Logger.log(`Organization Metrics: ${JSON.stringify(enrichedMetrics, null, 2)}`);
+      Logger.debug(`Enriched metrics for ${organization.name}:`, enrichedMetrics);
+
+      await usageInsightsWorkflow.trigger({
+        to: {
+          subscriberId: '675fe9bcab6a05bb6dcb7dab_11',
+          email: 'dima@novu.co',
+        },
+        payload: {
+          period: {
+            current: CURRENT_PERIOD,
+            previous: PREVIOUS_PERIOD,
+          },
+          subscriberNotifications: metrics.subscriberNotifications,
+          channelBreakdown: {
+            email: metrics.channelBreakdown.email || { current: 0, previous: 0, change: 0 },
+            sms: metrics.channelBreakdown.sms || { current: 0, previous: 0, change: 0 },
+            push: metrics.channelBreakdown.push || { current: 0, previous: 0, change: 0 },
+          },
+          inboxMetrics: {
+            sessionInitialized: metrics.inboxMetrics?.sessionInitialized,
+            updatePreferences: metrics.inboxMetrics?.updatePreferences,
+            markNotification: metrics.inboxMetrics?.markNotification,
+            updateAction: metrics.inboxMetrics?.updateAction,
+          },
+          workflowStats: workflowStats.workflows,
+        },
+        secretKey: process.env.NOVU_INTERNAL_SECRET_KEY,
+      });
     } catch (error) {
-      Logger.error(`Error logging organization metrics for ${metrics.id}:`, error);
+      Logger.error(`Failed to process metrics for organization ${metrics.id}:`, error);
     }
   }
 
   private calculateWorkflowStats(subscriberSeries: ISeriesData): IMixpanelResponse['workflowStats'] {
+    Logger.debug('Calculating workflow statistics');
     const workflowStats: IMixpanelResponse['workflowStats'] = { workflows: {} };
-    const currentPeriod = '2024-12-02T00:00:00+02:00';
-    const previousPeriod = '2024-11-25T00:00:00+02:00';
 
-    // Extract workflow names and stats from the first organization's subscriber events
     const firstOrgId = Object.keys(subscriberSeries).find((key) => key !== '$overall');
-    if (!firstOrgId) return workflowStats;
+    if (!firstOrgId) {
+      Logger.debug('No organization data found for workflow stats');
+
+      return workflowStats;
+    }
 
     const orgData = subscriberSeries[firstOrgId]?.undefined;
-    if (!orgData) return workflowStats;
+    if (!orgData) {
+      Logger.debug(`No workflow data found for organization: ${firstOrgId}`);
 
-    // Process each workflow from the subscriber events breakdown
+      return workflowStats;
+    }
+
     Object.entries(orgData)
       .filter(([name]) => name !== '$overall')
       .forEach(([name, data]) => {
-        const current = data[currentPeriod] || 0;
-        const previous = data[previousPeriod] || 0;
+        const current = data[WORKFLOW_CURRENT_PERIOD] || 0;
+        const previous = data[WORKFLOW_PREVIOUS_PERIOD] || 0;
+        const change = this.calculateChange(current, previous);
 
-        workflowStats.workflows[name] = {
-          current,
-          previous,
-          change: this.calculateChange(current, previous),
-        };
+        workflowStats.workflows[name] = { current, previous, change };
+        Logger.debug(`Workflow stats for ${name}: current=${current}, previous=${previous}, change=${change}%`);
       });
 
     return workflowStats;
@@ -325,28 +392,29 @@ export class UsageInsights {
 
   @InstrumentUsecase()
   async execute(command: UsageInsightsCommand): Promise<IUsageInsightsResponse | null> {
+    Logger.debug('Executing UsageInsights usecase', { command });
+
     const [mixpanelData, inboxData] = await Promise.all([this.fetchMixpanelInsights(), this.fetchInboxInsights()]);
 
     if (!mixpanelData?.series) {
-      Logger.error('No Mixpanel data available');
+      Logger.error('Mixpanel data unavailable or invalid');
 
       return null;
     }
 
+    Logger.debug('Processing Mixpanel and Inbox data');
     const subscriberSeries = mixpanelData.series['A. Notification Subscriber Event Trigger [Total Events]'];
     const workflowSeries = mixpanelData.series['B. Process Workflow Step - [Triggers] [Total Events]'];
 
     if (!subscriberSeries || !workflowSeries) {
-      Logger.error('Required series data not found');
+      Logger.error('Required series data missing from Mixpanel response');
 
       return null;
     }
 
-    // Calculate workflow statistics
     const workflowStats = this.calculateWorkflowStats(subscriberSeries);
     mixpanelData.workflowStats = workflowStats;
 
-    // Initialize inbox stats with default values
     const defaultInboxMetrics: IInboxMetrics = {
       sessionInitialized: { current: 0, previous: 0, change: 0 },
       updatePreferences: { current: 0, previous: 0, change: 0 },
@@ -354,24 +422,24 @@ export class UsageInsights {
       updateAction: { current: 0, previous: 0, change: 0 },
     };
 
+    Logger.debug('Initializing inbox stats');
     const inboxStats: IUsageInsightsResponse['inboxStats'] = {
       byOrganization: {},
       overall: inboxData?.series ? this.calculateOverallInboxMetrics(inboxData.series) : defaultInboxMetrics,
     };
 
-    // Process each organization's data
+    Logger.debug('Processing organization data');
     for (const [orgId, orgData] of Object.entries(workflowSeries)) {
       if (orgId === '$overall') continue;
 
+      Logger.debug(`Processing metrics for organization: ${orgId}`);
       const metrics = this.createOrganizationMetrics(orgId, subscriberSeries, workflowSeries) as ICombinedMetrics;
 
-      // Calculate subscriber notifications change
       metrics.subscriberNotifications.change = this.calculateChange(
         metrics.subscriberNotifications.current,
         metrics.subscriberNotifications.previous
       );
 
-      // Calculate channel breakdown changes
       metrics.channelBreakdown = Object.fromEntries(
         Object.entries(metrics.channelBreakdown).map(([channel, channelData]) => [
           channel,
@@ -382,18 +450,21 @@ export class UsageInsights {
         ])
       );
 
-      // Add inbox metrics if available
       if (inboxData?.series) {
+        Logger.debug(`Adding inbox metrics for organization: ${orgId}`);
         const inboxMetrics = this.calculateInboxMetrics(inboxData.series, orgId);
         metrics.inboxMetrics = inboxMetrics;
         inboxStats.byOrganization[orgId] = inboxMetrics;
       } else {
+        Logger.debug(`Using default inbox metrics for organization: ${orgId}`);
         metrics.inboxMetrics = defaultInboxMetrics;
         inboxStats.byOrganization[orgId] = defaultInboxMetrics;
       }
 
       await this.logOrganizationMetrics(metrics, workflowStats);
     }
+
+    Logger.debug('UsageInsights execution completed successfully');
 
     return {
       series: mixpanelData.series,

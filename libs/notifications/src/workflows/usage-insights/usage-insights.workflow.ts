@@ -98,13 +98,7 @@ export const usageInsightsWorkflow = workflow(
             updateAction: channelMetricsSchema.default(sampleUsageData.inboxMetrics.updateAction),
           })
           .required(),
-        workflowStats: z
-          .object({
-            'Welcome Flow': channelMetricsSchema.default(sampleUsageData.workflowStats['Welcome Flow']),
-            'Order Confirmation': channelMetricsSchema.default(sampleUsageData.workflowStats['Order Confirmation']),
-            'Password Reset': channelMetricsSchema.default(sampleUsageData.workflowStats['Password Reset']),
-          })
-          .required(),
+        workflowStats: z.record(z.string(), channelMetricsSchema).default(sampleUsageData.workflowStats),
       })
       .required(),
   }

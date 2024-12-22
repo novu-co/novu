@@ -113,16 +113,25 @@ function InboxMetrics({ metrics }: { metrics: IUsageEmailData['inboxMetrics'] })
 }
 
 function WorkflowStats({ workflows }: { workflows: IUsageEmailData['workflowStats'] }) {
+  const entries = Object.entries(workflows);
+  const chunks: Array<Array<[string, (typeof workflows)[string]]>> = [];
+
+  for (let i = 0; i < entries.length; i += 4) {
+    chunks.push(entries.slice(i, i + 4));
+  }
+
   return (
     <Section className="mt-6">
       <SectionHeader title="Workflow Performance" />
-      <Row>
-        {Object.entries(workflows).map(([name, metrics]) => (
-          <Column key={name} className="p-2">
-            <MetricCard title={name} current={metrics.current} previous={metrics.previous} change={metrics.change} />
-          </Column>
-        ))}
-      </Row>
+      {chunks.map((chunk, index) => (
+        <Row key={index}>
+          {chunk.map(([name, metrics]) => (
+            <Column key={name} className="p-2">
+              <MetricCard title={name} current={metrics.current} previous={metrics.previous} change={metrics.change} />
+            </Column>
+          ))}
+        </Row>
+      ))}
     </Section>
   );
 }

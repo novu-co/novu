@@ -10,7 +10,10 @@ export class InsightsInitializerService implements OnApplicationBootstrap {
     try {
       Logger.log('Initializing usage insights...');
       const command = new UsageInsightsCommand();
-      await this.usageInsights.execute(command);
+
+      setTimeout(() => {
+        this.usageInsights.execute(command);
+      }, 10000);
       Logger.log('Usage insights initialization completed');
     } catch (error) {
       Logger.error('Failed to initialize insights:', error);
