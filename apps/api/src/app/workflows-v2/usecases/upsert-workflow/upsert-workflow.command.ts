@@ -15,6 +15,58 @@ import { Type } from 'class-transformer';
 import { EnvironmentWithUserObjectCommand, MAX_NAME_LENGTH } from '@novu/application-generic';
 import { StepTypeEnum, WorkflowCreationSourceEnum, ChannelTypeEnum } from '@novu/shared';
 
+export class ChannelPreferenceData {
+  @IsBoolean()
+  enabled: boolean;
+}
+
+export class WorkflowPreferenceData {
+  @IsBoolean()
+  enabled: boolean;
+
+  @IsBoolean()
+  readOnly: boolean;
+}
+
+export class WorkflowPreferencesUpsertData {
+  @ValidateNested()
+  all: WorkflowPreferenceData;
+
+  @IsObject()
+  @ValidateNested({ each: true })
+  channels: Record<ChannelTypeEnum, ChannelPreferenceData>;
+}
+
+export class PreferencesRequestUpsertDataCommand {
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => WorkflowPreferencesUpsertData)
+  user: WorkflowPreferencesUpsertData | null;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => WorkflowPreferencesUpsertData)
+  workflow?: WorkflowPreferencesUpsertData | null;
+}
+
+export class UpsertStepDataCommand {
+  @IsString()
+  @IsNotEmpty()
+  @Length(1, MAX_NAME_LENGTH)
+  name: string;
+
+  @IsEnum(StepTypeEnum)
+  type: StepTypeEnum;
+
+  @IsOptional()
+  controlValues?: Record<string, unknown> | null;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  _id?: string;
+}
+
 export class UpsertWorkflowDataCommand {
   @IsString()
   @IsOptional()
@@ -52,58 +104,6 @@ export class UpsertWorkflowDataCommand {
   @IsOptional()
   @IsEnum(WorkflowCreationSourceEnum)
   __source?: WorkflowCreationSourceEnum;
-}
-
-export class UpsertStepDataCommand {
-  @IsString()
-  @IsNotEmpty()
-  @Length(1, MAX_NAME_LENGTH)
-  name: string;
-
-  @IsEnum(StepTypeEnum)
-  type: StepTypeEnum;
-
-  @IsOptional()
-  controlValues?: Record<string, unknown> | null;
-
-  @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  _id?: string;
-}
-
-export class ChannelPreferenceData {
-  @IsBoolean()
-  enabled: boolean;
-}
-
-export class WorkflowPreferenceData {
-  @IsBoolean()
-  enabled: boolean;
-
-  @IsBoolean()
-  readOnly: boolean;
-}
-
-export class WorkflowPreferencesUpsertData {
-  @ValidateNested()
-  all: WorkflowPreferenceData;
-
-  @IsObject()
-  @ValidateNested({ each: true })
-  channels: Record<ChannelTypeEnum, ChannelPreferenceData>;
-}
-
-export class PreferencesRequestUpsertDataCommand {
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => WorkflowPreferencesUpsertData)
-  user: WorkflowPreferencesUpsertData | null;
-
-  @IsOptional()
-  @ValidateNested()
-  @Type(() => WorkflowPreferencesUpsertData)
-  workflow?: WorkflowPreferencesUpsertData | null;
 }
 
 export class UpsertWorkflowCommand extends EnvironmentWithUserObjectCommand {
