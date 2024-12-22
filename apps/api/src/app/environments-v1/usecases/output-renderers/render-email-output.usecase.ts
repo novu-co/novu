@@ -1,10 +1,11 @@
-import { EmailRenderOutput, TipTapNode } from '@novu/shared';
-import { Injectable } from '@nestjs/common';
 import { render as mailyRender } from '@maily-to/render';
-import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import isEmpty from 'lodash/isEmpty';
+import { Injectable } from '@nestjs/common';
 import { Liquid } from 'liquidjs';
-import { C } from '@novu/framework/dist/cjs/health-check.types-DjxZf7gi.cjs';
+
+import { EmailRenderOutput, TipTapNode } from '@novu/shared';
+import { Instrument, InstrumentUsecase } from '@novu/application-generic';
+
 import { FullPayloadForRender, RenderCommand } from './render-command';
 import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.usecase';
 import { emailStepControlZodSchema } from '../../../workflows-v2/shared';
