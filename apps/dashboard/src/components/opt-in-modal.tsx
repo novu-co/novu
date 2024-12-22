@@ -1,7 +1,6 @@
 import { CircleCheck } from '@/components/icons/circle-check';
 import { PartyPopover } from '@/components/icons/party-popover';
 import { OptInArrow } from '@/components/icons/opt-in-arrow';
-import { LegacyButton } from '@/components/primitives/legacy-button';
 import {
   Dialog,
   DialogClose,
@@ -13,6 +12,7 @@ import {
 } from '@/components/primitives/dialog';
 import { RiCustomerService2Line } from 'react-icons/ri';
 import { useNewDashboardOptIn } from '@/hooks/use-new-dashboard-opt-in';
+import { Button } from './primitives/button';
 
 export const OptInModal = () => {
   const { isFirstVisit, updateNewDashboardFirstVisit } = useNewDashboardOptIn();
@@ -84,9 +84,9 @@ const CheckBulletPoint = ({ content }: { content: React.ReactNode }) => (
 const Footer = () => (
   <div className="flex w-full justify-end p-3">
     <DialogClose asChild aria-label="Close">
-      <LegacyButton type="button" size="sm" variant="primary" className="gap-2 p-2">
+      <Button type="button" size="xs" variant="primary" className="gap-2">
         I'm in <PartyPopover />
-      </LegacyButton>
+      </Button>
     </DialogClose>
   </div>
 );

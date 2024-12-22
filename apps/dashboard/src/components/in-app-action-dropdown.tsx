@@ -30,6 +30,7 @@ import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesT
 import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
 import { autocompletion } from '@codemirror/autocomplete';
+import { Button } from './primitives/button';
 
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
@@ -62,16 +63,16 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
             )}
             {primaryAction && (
               <ConfigureActionPopover asChild fields={{ actionKey: primaryActionKey }}>
-                <LegacyButton variant="primary" size="xs" className="z-10">
+                <Button variant="primary" size="2xs" className="z-10 h-6 p-2">
                   {primaryAction.label}
-                </LegacyButton>
+                </Button>
               </ConfigureActionPopover>
             )}
             {secondaryAction && (
               <ConfigureActionPopover asChild fields={{ actionKey: secondaryActionKey }}>
-                <LegacyButton variant="outline" size="xs" className="z-10">
+                <Button mode="outline" variant="secondary" size="2xs" className="z-10 h-6 p-2">
                   {secondaryAction.label}
-                </LegacyButton>
+                </Button>
               </ConfigureActionPopover>
             )}
             <DropdownMenuTrigger className="absolute size-full" />

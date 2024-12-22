@@ -2,13 +2,13 @@ import { useCallback } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
-import { LegacyButton } from '@/components/primitives/legacy-button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { TableIntegration } from '../components/integrations/types';
 import { Badge } from '../components/primitives/badge';
 import { IntegrationsList } from '../components/integrations/components/integrations-list';
+import { Button } from '../components/primitives/button';
 
 export function IntegrationsListPage() {
   const navigate = useNavigate();
@@ -54,9 +54,9 @@ export function IntegrationsListPage() {
               </TooltipContent>
             </Tooltip>
           </TabsList>
-          <LegacyButton size="sm" variant="primary" onClick={onAddIntegrationClickCallback} className="my-1.5 mr-2.5">
+          <Button size="xs" variant="primary" onClick={onAddIntegrationClickCallback} className="my-1.5 mr-2.5">
             Connect Provider
-          </LegacyButton>
+          </Button>
         </div>
         <TabsContent value="providers" variant="regular" className="!mt-0 p-2.5">
           <IntegrationsList onItemClick={onItemClick} />

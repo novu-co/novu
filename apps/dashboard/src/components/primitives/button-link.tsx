@@ -1,9 +1,12 @@
+// AlignUI LinkButton v0.0.0
+
 import * as React from 'react';
-import { Slot } from '@radix-ui/react-slot';
+import { Slot, Slottable } from '@radix-ui/react-slot';
 
 import { PolymorphicComponentProps } from '@/utils/polymorphic';
 import { recursiveCloneChildren } from '@/utils/recursive-clone-children';
 import { tv, type VariantProps } from '@/utils/tv';
+import { IconType } from 'react-icons';
 
 const LINK_BUTTON_ROOT_NAME = 'LinkButtonRoot';
 const LINK_BUTTON_ICON_NAME = 'LinkButtonIcon';
@@ -56,11 +59,11 @@ export const linkButtonVariants = tv({
       modifiable: {},
     },
     size: {
-      md: {
+      medium: {
         root: 'h-5 gap-1 text-label-sm',
         icon: 'size-5',
       },
-      sm: {
+      small: {
         root: 'h-4 gap-1 text-label-xs',
         icon: 'size-4',
       },
@@ -73,7 +76,7 @@ export const linkButtonVariants = tv({
   },
   defaultVariants: {
     variant: 'gray',
-    size: 'md',
+    size: 'medium',
   },
 });
 
@@ -126,4 +129,21 @@ function LinkButtonIcon<T extends React.ElementType>({
 }
 LinkButtonIcon.displayName = LINK_BUTTON_ICON_NAME;
 
-export { LinkButtonRoot as Root, LinkButtonIcon as LinkButtonIcon, LinkButtonRoot as LinkButton };
+const LinkButton = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof LinkButtonRoot> & {
+    leadingIcon?: IconType;
+    trailingIcon?: IconType;
+  }
+>(({ children, leadingIcon: LeadingIcon, trailingIcon: TrailingIcon, ...rest }, forwardedRef) => {
+  return (
+    <LinkButtonRoot ref={forwardedRef} {...rest}>
+      {LeadingIcon && <LinkButtonIcon as={LeadingIcon} />}
+      <Slottable>{children}</Slottable>
+      {TrailingIcon && <LinkButtonIcon as={TrailingIcon} />}
+    </LinkButtonRoot>
+  );
+});
+LinkButton.displayName = 'LinkButton';
+
+export { LinkButtonRoot as Root, LinkButtonIcon as Icon, LinkButton };
