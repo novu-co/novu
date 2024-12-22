@@ -2,12 +2,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ComponentProps, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { RiExternalLinkLine } from 'react-icons/ri';
+import { RiArrowRightSLine, RiExternalLinkLine } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify } from '@novu/shared';
 import { createWorkflow } from '@/api/workflows';
-import { LegacyButton } from '@/components/primitives/legacy-button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';
 import { Separator } from '@/components/primitives/separator';
@@ -29,6 +28,7 @@ import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowSchema } from './workflow-editor/schema';
+import { Button } from './primitives/button';
 
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
 export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
@@ -193,9 +193,16 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
         </SheetMain>
         <Separator />
         <SheetFooter>
-          <LegacyButton isLoading={isPending} variant="default" type="submit" form="create-workflow">
+          <Button
+            isLoading={isPending}
+            variant="secondary"
+            size="xs"
+            type="submit"
+            form="create-workflow"
+            trailingIcon={RiArrowRightSLine}
+          >
             Create workflow
-          </LegacyButton>
+          </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>

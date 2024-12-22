@@ -14,19 +14,19 @@ export const buttonGroupVariants = tv({
     root: 'flex -space-x-[1.5px]',
     item: [
       // base
-      'group relative flex items-center justify-center whitespace-nowrap bg-bg-white-0 text-center text-text-sub-600 outline-none',
-      'border border-stroke-soft-200',
+      'group relative flex items-center justify-center whitespace-nowrap bg-bg-white text-center text-text-sub outline-none',
+      'border border-stroke-soft',
       'transition duration-200 ease-out',
       // hover
-      'hover:bg-bg-weak-50',
+      'hover:bg-bg-weak',
       // focus
-      'focus:bg-bg-weak-50 focus:outline-none',
+      'focus:bg-bg-weak focus:outline-none',
       // active
-      'data-[state=on]:bg-bg-weak-50',
-      'data-[state=on]:text-text-strong-950',
+      'data-[state=on]:bg-bg-weak',
+      'data-[state=on]:text-text-strong',
       // disabled
-      'disabled:pointer-events-none disabled:bg-bg-weak-50',
-      'disabled:text-text-disabled-300',
+      'disabled:pointer-events-none disabled:bg-bg-weak',
+      'disabled:text-text-disabled',
     ],
     icon: 'shrink-0',
   },

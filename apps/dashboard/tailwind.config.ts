@@ -441,6 +441,13 @@ export default {
         'alpha-10': 'hsl(var(--primary-alpha-10))',
         foreground: 'hsl(var(--primary-foreground))',
       },
+      text: {
+        strong: 'hsl(var(--text-strong))',
+        sub: 'hsl(var(--text-sub))',
+        soft: 'hsl(var(--text-soft))',
+        disabled: 'hsl(var(--text-disabled))',
+        white: 'hsl(var(--text-white))',
+      },
       bg: {
         strong: 'hsl(var(--bg-strong))',
         surface: 'hsl(var(--bg-surface))',

@@ -14,12 +14,12 @@ import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type WorkflowTestDataResponseDto } from '@novu/shared';
 import { toast } from 'sonner';
-import { LegacyButton } from '../../primitives/legacy-button';
 import { Form } from '../../primitives/form/form';
 import { showToast } from '../../primitives/sonner-helpers';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitives/tabs';
 import { buildDynamicFormSchema, TestWorkflowFormType } from '../schema';
 import { TestWorkflowForm } from './test-workflow-form';
+import { Button } from '../../primitives/button';
 
 export const TestWorkflowTabs = ({ testData }: { testData?: WorkflowTestDataResponseDto }) => {
   const { environmentSlug = '', workflowSlug = '' } = useParams<{ environmentSlug: string; workflowSlug: string }>();
@@ -129,10 +129,9 @@ export const TestWorkflowTabs = ({ testData }: { testData?: WorkflowTestDataResp
                 </Link>
               </TabsTrigger>
               <div className="my-auto ml-auto flex items-center gap-2">
-                <LegacyButton type="submit" variant="primary" size="sm" className="flex gap-1" isLoading={isPending}>
-                  <RiPlayCircleLine className="size-5" />
-                  <span>Test workflow</span>
-                </LegacyButton>
+                <Button leadingIcon={RiPlayCircleLine} type="submit" variant="primary" size="xs" isLoading={isPending}>
+                  Test workflow
+                </Button>
               </div>
             </TabsList>
             <TabsContent value="trigger" className="mt-0 flex w-full flex-1 flex-col overflow-hidden" variant="regular">

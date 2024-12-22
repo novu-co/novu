@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { Slot, Slottable } from '@radix-ui/react-slot';
-
 import { IconType } from 'react-icons';
+import { RiLoader4Line } from 'react-icons/ri';
 
 import type { PolymorphicComponentProps } from '@/utils/polymorphic';
 import { recursiveCloneChildren } from '@/utils/recursive-clone-children';
 import { tv, type VariantProps } from '@/utils/tv';
+import { cn } from '@/utils/ui';
 
 const BUTTON_ROOT_NAME = 'ButtonRoot';
 const BUTTON_ICON_NAME = 'ButtonIcon';
@@ -14,12 +15,12 @@ export const buttonVariants = tv({
   slots: {
     root: [
       // base
-      'group relative inline-flex items-center justify-center whitespace-nowrap outline-none',
+      'group select-none relative inline-flex items-center justify-center whitespace-nowrap outline-none',
       'transition duration-200 ease-out',
       // focus
       'focus:outline-none',
       // disabled
-      'disabled:pointer-events-none disabled:bg-bg-weak-50 disabled:text-text-disabled-300 disabled:ring-transparent',
+      'disabled:pointer-events-none [&:disabled:not(.loading)]:bg-bg-weak [&:disabled:not(.loading)]:text-text-disabled [&:disabled:not(.loading)]:ring-transparent',
     ],
     icon: [
       // base
@@ -47,19 +48,19 @@ export const buttonVariants = tv({
     size: {
       md: {
         root: 'h-10 gap-3 rounded-10 px-3.5 text-label-sm',
-        icon: '-mx-1',
+        icon: '',
       },
       sm: {
         root: 'h-9 gap-3 rounded-lg px-3 text-label-sm',
-        icon: '-mx-1',
+        icon: '',
       },
       xs: {
-        root: 'h-8 gap-2.5 rounded-lg px-2.5 text-label-sm',
-        icon: '-mx-1',
+        root: 'h-8 gap-2.5 rounded-lg px-2.5 text-label-xs',
+        icon: '',
       },
       '2xs': {
-        root: 'h-7 gap-2.5 rounded-lg px-2 text-label-sm',
-        icon: '-mx-1',
+        root: 'h-7 gap-2.5 rounded-lg px-2 text-label-xs',
+        icon: '',
       },
     },
   },
@@ -85,7 +86,7 @@ export const buttonVariants = tv({
       class: {
         root: [
           // base
-          'bg-bg-white-0 text-primary-base ring-primary-base',
+          'bg-bg-white text-primary-base ring-primary-base',
           // hover
           'hover:bg-primary-alpha-10 hover:ring-transparent',
           // focus
@@ -101,9 +102,9 @@ export const buttonVariants = tv({
           // base
           'bg-primary-alpha-10 text-primary-base ring-transparent',
           // hover
-          'hover:bg-bg-white-0 hover:ring-primary-base',
+          'hover:bg-bg-white hover:ring-primary-base',
           // focus
-          'focus-visible:bg-bg-white-0 focus-visible:shadow-button-primary-focus focus-visible:ring-primary-base',
+          'focus-visible:bg-bg-white focus-visible:shadow-button-primary-focus focus-visible:ring-primary-base',
         ],
       },
     },
@@ -117,7 +118,7 @@ export const buttonVariants = tv({
           // hover
           'hover:bg-primary-alpha-10',
           // focus
-          'focus-visible:bg-bg-white-0 focus-visible:shadow-button-primary-focus focus-visible:ring-primary-base',
+          'focus-visible:bg-bg-white focus-visible:shadow-button-primary-focus focus-visible:ring-primary-base',
         ],
       },
     },
@@ -130,9 +131,9 @@ export const buttonVariants = tv({
       class: {
         root: [
           // base
-          'bg-bg-strong-950 text-text-white-0',
+          'bg-bg-strong text-text-white',
           // hover
-          'hover:bg-bg-surface-800',
+          'hover:bg-bg-surface',
           // focus
           'focus-visible:shadow-button-important-focus',
         ],
@@ -144,11 +145,11 @@ export const buttonVariants = tv({
       class: {
         root: [
           // base
-          'bg-bg-white-0 text-text-sub-600 shadow-regular-xs ring-stroke-soft-200',
+          'bg-bg-white text-text-sub shadow-regular-xs ring-stroke-soft',
           // hover
-          'hover:bg-bg-weak-50 hover:text-text-strong-950 hover:shadow-none hover:ring-transparent',
+          'hover:bg-bg-weak hover:text-text-strong hover:shadow-none hover:ring-transparent',
           // focus
-          'focus-visible:text-text-strong-950 focus-visible:shadow-button-important-focus focus-visible:ring-stroke-strong-950',
+          'focus-visible:text-text-strong focus-visible:shadow-button-important-focus focus-visible:ring-stroke-strong',
         ],
       },
     },
@@ -158,11 +159,11 @@ export const buttonVariants = tv({
       class: {
         root: [
           // base
-          'bg-bg-weak-50 text-text-sub-600 ring-transparent',
+          'bg-bg-weak text-text-sub ring-transparent',
           // hover
-          'hover:bg-bg-white-0 hover:text-text-strong-950 hover:shadow-regular-xs hover:ring-stroke-soft-200',
+          'hover:bg-bg-white hover:text-text-strong hover:shadow-regular-xs hover:ring-stroke-soft',
           // focus
-          'focus-visible:bg-bg-white-0 focus-visible:text-text-strong-950 focus-visible:shadow-button-important-focus focus-visible:ring-stroke-strong-950',
+          'focus-visible:bg-bg-white focus-visible:text-text-strong focus-visible:shadow-button-important-focus focus-visible:ring-stroke-strong',
         ],
       },
     },
@@ -172,11 +173,11 @@ export const buttonVariants = tv({
       class: {
         root: [
           // base
-          'bg-transparent text-text-sub-600 ring-transparent',
+          'bg-transparent text-text-sub ring-transparent',
           // hover
-          'hover:bg-bg-weak-50 hover:text-text-strong-950',
+          'hover:bg-bg-weak hover:text-text-strong',
           // focus
-          'focus-visible:bg-bg-white-0 focus-visible:text-text-strong-950 focus-visible:shadow-button-important-focus focus-visible:ring-stroke-strong-950',
+          'focus-visible:bg-bg-white focus-visible:text-text-strong focus-visible:shadow-button-important-focus focus-visible:ring-stroke-strong',
         ],
       },
     },
@@ -203,7 +204,7 @@ export const buttonVariants = tv({
       class: {
         root: [
           // base
-          'bg-bg-white-0 text-error-base ring-error-base',
+          'bg-bg-white text-error-base ring-error-base',
           // hover
           'hover:bg-red-alpha-10 hover:ring-transparent',
           // focus
@@ -219,9 +220,9 @@ export const buttonVariants = tv({
           // base
           'bg-red-alpha-10 text-error-base ring-transparent',
           // hover
-          'hover:bg-bg-white-0 hover:ring-error-base',
+          'hover:bg-bg-white hover:ring-error-base',
           // focus
-          'focus-visible:bg-bg-white-0 focus-visible:shadow-button-error-focus focus-visible:ring-error-base',
+          'focus-visible:bg-bg-white focus-visible:shadow-button-error-focus focus-visible:ring-error-base',
         ],
       },
     },
@@ -235,7 +236,7 @@ export const buttonVariants = tv({
           // hover
           'hover:bg-red-alpha-10',
           // focus
-          'focus-visible:bg-bg-white-0 focus-visible:shadow-button-error-focus focus-visible:ring-error-base',
+          'focus-visible:bg-bg-white focus-visible:shadow-button-error-focus focus-visible:ring-error-base',
         ],
       },
     },
@@ -257,7 +258,7 @@ export type ButtonRootProps = VariantProps<typeof buttonVariants> &
   };
 
 const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
-  ({ children, variant, mode, size, asChild, isLoading, className, ...rest }, forwardedRef) => {
+  ({ children, variant, mode, size, asChild, isLoading, className, disabled, ...rest }, forwardedRef) => {
     const uniqueId = React.useId();
     const Component = asChild ? Slot : 'button';
     const { root } = buttonVariants({ variant, mode, size });
@@ -277,8 +278,25 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
     );
 
     return (
-      <Component ref={forwardedRef} className={root({ class: className })} type="button" {...rest}>
+      <Component
+        ref={forwardedRef}
+        className={root({
+          class: cn(
+            'relative flex items-center justify-center gap-1',
+            className,
+            isLoading && ['animate-pulse-subtle duration-2000', 'loading']
+          ),
+        })}
+        type="button"
+        disabled={disabled || isLoading}
+        {...rest}
+      >
         {extendedChildren}
+        {isLoading && (
+          <div className="animate-in zoom-in-50 fade-in absolute inset-0 flex w-full items-center justify-center rounded-lg text-current backdrop-blur duration-300">
+            <RiLoader4Line className="size-4 animate-spin" />
+          </div>
+        )}
       </Component>
     );
   }

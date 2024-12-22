@@ -2,13 +2,13 @@ import { useEffect } from 'react';
 
 import { WorkflowList } from '@/components/workflow-list';
 import { DashboardLayout } from '@/components/dashboard-layout';
-import { LegacyButton } from '@/components/primitives/legacy-button';
 import { CreateWorkflowButton } from '@/components/create-workflow-button';
 import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { Badge } from '@/components/primitives/badge';
+import { Button } from '../components/primitives/button';
 
 export const WorkflowsPage = () => {
   const track = useTelemetry();
@@ -35,9 +35,9 @@ export const WorkflowsPage = () => {
           <div className="invisible flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2"></div>
 
           <CreateWorkflowButton asChild>
-            <LegacyButton variant="primary" size="sm">
+            <Button variant="primary" size="xs">
               Create workflow
-            </LegacyButton>
+            </Button>
           </CreateWorkflowButton>
         </div>
         <WorkflowList />
