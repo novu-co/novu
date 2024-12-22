@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CommunityOrganizationRepository } from '@novu/dal';
-import { InstrumentUsecase } from '@novu/application-generic';
+import { InstrumentUsecase, FeatureFlagsService } from '@novu/application-generic';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 import axios from 'axios';
 import { promises as fs } from 'fs';
 import { join } from 'path';
@@ -106,7 +107,10 @@ export class UsageInsights {
   private readonly INBOX_CACHE_FILE = join(process.cwd(), 'mixpanel-inbox-cache.json');
   private readonly CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-  constructor(private organizationRepository: CommunityOrganizationRepository) {
+  constructor(
+    private organizationRepository: CommunityOrganizationRepository,
+    private featureFlagsService: FeatureFlagsService
+  ) {
     Logger.debug('UsageInsights service initialized');
   }
 
@@ -309,7 +313,10 @@ export class UsageInsights {
     return orgMetrics;
   }
 
-  private async logOrganizationMetrics(metrics: ICombinedMetrics, workflowStats: IMixpanelResponse['workflowStats']) {
+  private async sendOrganizationNotification(
+    metrics: ICombinedMetrics,
+    workflowStats: IMixpanelResponse['workflowStats']
+  ) {
     Logger.debug(`Processing metrics for organization: ${metrics.id}`);
     try {
       const organization = await this.organizationRepository.findById(metrics.id);
@@ -327,10 +334,22 @@ export class UsageInsights {
 
       Logger.debug(`Enriched metrics for ${organization.name}:`, enrichedMetrics);
 
+      const isEnabled = await this.featureFlagsService.get(FeatureFlagsKeysEnum.IS_USAGE_INSIGHTS_ENABLED, false, {
+        environmentId: 'system',
+        organizationId: organization._id,
+        userId: 'system',
+      });
+
+      if (!isEnabled) {
+        Logger.log('Skipping notification delivery - usage insights disabled by feature flag', enrichedMetrics);
+
+        return;
+      }
+
       await usageInsightsWorkflow.trigger({
         to: {
           subscriberId: '675fe9bcab6a05bb6dcb7dab_11',
-          email: 'dima@novu.co',
+          email: `dima+testing-${organization._id}@novu.co`,
         },
         payload: {
           period: {
@@ -461,7 +480,7 @@ export class UsageInsights {
         inboxStats.byOrganization[orgId] = defaultInboxMetrics;
       }
 
-      await this.logOrganizationMetrics(metrics, workflowStats);
+      await this.sendOrganizationNotification(metrics, workflowStats);
     }
 
     Logger.debug('UsageInsights execution completed successfully');

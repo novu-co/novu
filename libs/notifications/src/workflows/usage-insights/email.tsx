@@ -44,18 +44,20 @@ function MetricCard({
   const formatNumber = (num: number) => Math.floor(num).toLocaleString('en-US', { maximumFractionDigits: 0 });
 
   return (
-    <div className="h-[88px] rounded-lg border border-gray-100 bg-gray-50/50 p-2">
+    <div className="h-[75px] rounded-lg border border-gray-100 bg-gray-50/50 p-3">
       <Row className="flex items-start justify-between gap-2">
         <Column align="left" className="w-full">
-          <Text className="mb-0 mt-0 min-h-[28px] text-xs font-medium leading-tight text-gray-600">{title}</Text>
+          <Text className="mb-0 mt-0 min-h-[28px] text-xs font-medium capitalize leading-tight text-gray-600">
+            {title}
+          </Text>
         </Column>
         <Column align="right" className="w-full">
-          <Text className={`whitespace-nowrap text-xs font-medium ${changeColor} mb-0 mt-0`}>
+          <Text className={`whitespace-nowrap text-xs font-medium ${changeColor} mb-0 leading-[14px]`}>
             {isPositive ? '↑' : '↓'} {Math.abs(Math.floor(change))}%
           </Text>
         </Column>
       </Row>
-      <Row className="mt-[10px]">
+      <Row>
         <Column align="left">
           <Text className="mb-0 mt-0 text-lg font-bold leading-none text-gray-900">{formatNumber(current)}</Text>
           <Text className="mb-0 mt-0.5 text-[10px] leading-none text-gray-500">Previous: {formatNumber(previous)}</Text>
@@ -79,7 +81,7 @@ function ChannelBreakdown({ channels }: { channels: IUsageEmailData['channelBrea
       <SectionHeader title="Channel Breakdown" />
       <Row>
         {Object.entries(channels).map(([channel, metrics]) => (
-          <Column key={channel} className="p-2 px-0">
+          <Column key={channel} className="p-2">
             <MetricCard title={channel} current={metrics.current} previous={metrics.previous} change={metrics.change} />
           </Column>
         ))}
@@ -134,12 +136,11 @@ function WorkflowStats({ workflows }: { workflows: IUsageEmailData['workflowStat
         {topWorkflows?.map(([name, metrics], index) => {
           const isPositive = metrics.change > 0;
           const changeColor = isPositive ? 'text-emerald-600' : 'text-rose-600';
-          const isLast = index === topWorkflows.length - 1;
 
           return (
             <Row
               key={index}
-              className={`flex items-center justify-between p-3 px-0 ${!isLast ? 'border-b border-gray-100' : ''}`}
+              className={`mb-2 flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/50 p-2`}
             >
               <Column align="left" className="w-full">
                 <Text className="mb-0.5 mt-0 text-sm font-medium text-gray-900">{name}</Text>
@@ -206,10 +207,10 @@ function MarketingSection({ config }: { config: IMarketingConfig }) {
 
 export default function UsageInsightsEmail(props: IUsageEmailData & { marketingConfig: IMarketingConfig }) {
   return (
-    <Html>
+    <Html className="bg-gray-50 font-sans">
       <Head />
       <Preview>
-        📊 Usage Insights for {props.organizationName} - {props.period.current}
+        📊 Usage Insights for {props.organizationName} - {formatDate(props.period.current)}
       </Preview>
       <Tailwind>
         <Body className="bg-gray-50 font-sans">
@@ -221,13 +222,13 @@ export default function UsageInsightsEmail(props: IUsageEmailData & { marketingC
             className="mx-auto my-[32px]"
           />
           <Container className="mx-auto w-full max-w-[700px]">
-            <Section className="rounded-t-lg bg-indigo-600 px-6 py-8">
+            <Section className="rounded-t-lg bg-gray-900 px-6 py-8">
               <Heading className="text-center text-2xl font-bold text-white">Usage Insights Report</Heading>
               <Text className="text-center text-sm text-indigo-100">{props.organizationName}</Text>
             </Section>
 
             <div className="rounded-b-lg bg-white px-3 py-3 shadow-sm">
-              <div className="mb-6 rounded-md border border-indigo-100/50 bg-indigo-50/50 p-3 text-center">
+              <div className="mb-6 rounded-md border border-indigo-100/50 bg-indigo-50/50 p-2 text-center">
                 <Text className="text-xs font-medium text-indigo-900">
                   Reporting Period: {formatDate(props.period.current)}
                   <span className="mx-2">•</span>
@@ -236,9 +237,9 @@ export default function UsageInsightsEmail(props: IUsageEmailData & { marketingC
               </div>
 
               <Section className="mb-6">
-                <div className="rounded-lg border-2 border-indigo-100 bg-indigo-50/30 p-3">
+                <div className="rounded-lg border-2 border-indigo-100 bg-indigo-50/30">
                   <MetricCard
-                    title="Total Subscriber Notifications"
+                    title="Total Notification Triggers"
                     current={props.subscriberNotifications.current}
                     previous={props.subscriberNotifications.previous}
                     change={props.subscriberNotifications.change}
