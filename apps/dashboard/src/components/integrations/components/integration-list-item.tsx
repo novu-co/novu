@@ -1,7 +1,6 @@
-import { LegacyButton } from '@/components/primitives/legacy-button';
 import { IProviderConfig } from '@novu/shared';
 import { ProviderIcon } from './provider-icon';
-import { RiArrowRightSLine } from 'react-icons/ri';
+import { Button } from '../../primitives/button';
 
 type IntegrationListItemProps = {
   integration: IProviderConfig;
@@ -10,9 +9,10 @@ type IntegrationListItemProps = {
 
 export function IntegrationListItem({ integration, onClick }: IntegrationListItemProps) {
   return (
-    <LegacyButton
+    <Button
       onClick={onClick}
-      variant="outline"
+      mode="outline"
+      variant="secondary"
       className="group flex h-[48px] w-full items-start justify-start gap-3 border-neutral-100 p-3 hover:bg-white"
     >
       <div className="flex w-full items-start justify-start gap-3">
@@ -20,11 +20,16 @@ export function IntegrationListItem({ integration, onClick }: IntegrationListIte
           <ProviderIcon providerId={integration.id} providerDisplayName={integration.displayName} />
         </div>
         <div className="text-md text-foreground-950 leading-6">{integration.displayName}</div>
-        <LegacyButton variant="outline" size="xs" onClick={onClick} className="ml-auto hidden group-hover:block">
+        <Button
+          variant="secondary"
+          mode="outline"
+          size="2xs"
+          onClick={onClick}
+          className="ml-auto hidden h-[24px] group-hover:block"
+        >
           Connect
-          <RiArrowRightSLine />
-        </LegacyButton>
+        </Button>
       </div>
-    </LegacyButton>
+    </Button>
   );
 }

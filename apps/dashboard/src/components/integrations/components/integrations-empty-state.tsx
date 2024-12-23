@@ -1,5 +1,5 @@
-import { LegacyButton } from '@/components/primitives/legacy-button';
 import { Plus, Settings } from 'lucide-react';
+import { Button } from '../../primitives/button';
 
 type IntegrationsEmptyStateProps = {
   onAddIntegrationClick: () => void;
@@ -15,10 +15,10 @@ export function IntegrationsEmptyState({ onAddIntegrationClick }: IntegrationsEm
         <h2 className="text-xl font-semibold">No integrations found</h2>
         <p className="text-muted-foreground text-sm">Add your first integration to get started</p>
       </div>
-      <LegacyButton onClick={onAddIntegrationClick} data-test-id="add-first-integration">
+      <Button size="sm" onClick={onAddIntegrationClick} data-test-id="add-first-integration">
         <Plus className="mr-2 h-4 w-4" />
         Add Integration
-      </LegacyButton>
+      </Button>
     </div>
   );
 }
