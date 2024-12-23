@@ -1,5 +1,5 @@
 import { EditorView, ViewPlugin, Decoration, DecorationSet } from '@uiw/react-codemirror';
-import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
+import { useMemo, useState, useRef, useEffect, useCallback, ChangeEvent } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
@@ -11,7 +11,7 @@ import { capitalize } from '@/utils/string';
 import { autocompletion } from '@codemirror/autocomplete';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Button } from '@/components/primitives/button';
-import { Input } from '@/components/primitives/input';
+import { Input, InputField } from '@/components/primitives/input';
 import { GripVertical } from 'lucide-react';
 
 const subjectKey = 'subject';
@@ -117,90 +117,91 @@ const VariablePopover = ({ variable, onClose, onUpdate }: VariablePopoverProps) 
   };
 
   return (
-    <PopoverContent className="w-80">
-      <div className="grid gap-4">
-        <div className="space-y-2">
-          <h4 className="font-medium leading-none">Edit Variable</h4>
-          <p className="text-muted-foreground text-sm">Modify the variable name or add transformers.</p>
-        </div>
-        <div className="grid gap-3">
-          <div className="grid gap-2">
-            <label className="text-sm font-medium leading-none">Variable Name</label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} className="h-8" />
-          </div>
-
-          <div className="grid gap-2">
-            <label className="text-sm font-medium leading-none">Default Value</label>
-            <Input
-              value={defaultVal}
-              onChange={(e) => setDefaultVal(e.target.value)}
-              className="h-8"
-              placeholder="Enter default value..."
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <label className="text-sm font-medium leading-none">Transformers</label>
-            <div className="flex flex-col gap-2">
-              {/* Selected transformers with drag handles */}
-              {transformers.length > 0 && (
-                <div className="flex flex-col gap-1 rounded-md border p-2">
-                  {transformers.map((value, index) => {
-                    const transformer = TRANSFORMERS.find((t) => t.value === value);
-                    return (
-                      <div
-                        key={value}
-                        className="bg-secondary hover:bg-secondary/80 group flex cursor-move items-center gap-2 rounded p-1"
-                        draggable
-                        onDragStart={(e) => {
-                          e.dataTransfer.setData('text/plain', index.toString());
-                        }}
-                        onDragOver={(e) => {
-                          e.preventDefault();
-                        }}
-                        onDrop={(e) => {
-                          e.preventDefault();
-                          const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
-                          moveTransformer(fromIndex, index);
-                        }}
-                      >
-                        <GripVertical className="text-muted-foreground/50 group-hover:text-muted-foreground h-4 w-4" />
-                        <span className="flex-1">{transformer?.label}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="hover:bg-destructive/90 hover:text-destructive-foreground h-6 px-2"
-                          onClick={() => handleTransformerToggle(value)}
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
-              {/* Available transformers */}
-              <div className="flex flex-wrap gap-2">
-                {TRANSFORMERS.filter((t) => !transformers.includes(t.value)).map(({ label, value }) => (
-                  <Button
-                    key={value}
-                    size="sm"
-                    variant="outline"
-                    className="h-7"
-                    onClick={() => handleTransformerToggle(value)}
-                  >
-                    {label}
-                  </Button>
-                ))}
+    <PopoverContent className="w-72">
+      <div className="grid gap-1.5">
+        <div className="grid gap-1">
+          <FormItem>
+            <FormControl>
+              <div className="grid gap-0.5">
+                <label className="text-muted-foreground text-xs font-medium">Variable name</label>
+                <InputField size="fit">
+                  <Input
+                    value={name}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+                    className="h-7 text-sm"
+                  />
+                </InputField>
               </div>
-            </div>
-          </div>
+            </FormControl>
+          </FormItem>
+          <FormItem>
+            <FormControl>
+              <div className="grid gap-0.5">
+                <label className="text-muted-foreground text-xs font-medium">Default value</label>
+                <InputField size="fit">
+                  <Input
+                    value={defaultVal}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setDefaultVal(e.target.value)}
+                    className="h-7 text-sm"
+                  />
+                </InputField>
+              </div>
+            </FormControl>
+          </FormItem>
+        </div>
 
-          <div className="flex justify-end">
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              Close
-            </Button>
+        <div className="flex flex-col gap-1">
+          {/* Selected transformers with drag handles */}
+          {transformers.length > 0 && (
+            <div className="flex flex-col gap-0.5 rounded-md border p-1">
+              {transformers.map((value, index) => {
+                const transformer = TRANSFORMERS.find((t) => t.value === value);
+                return (
+                  <div
+                    key={value}
+                    className="bg-secondary hover:bg-secondary/80 group flex cursor-move items-center gap-1.5 rounded px-1.5 py-0.5 text-sm"
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData('text/plain', index.toString());
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                      moveTransformer(fromIndex, index);
+                    }}
+                  >
+                    <GripVertical className="text-muted-foreground/50 group-hover:text-muted-foreground h-3 w-3" />
+                    <span className="flex-1">{transformer?.label}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="hover:bg-destructive/90 hover:text-destructive-foreground h-5 px-1.5"
+                      onClick={() => handleTransformerToggle(value)}
+                    >
+                      ×
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Available transformers */}
+          <div className="flex flex-wrap gap-1">
+            {TRANSFORMERS.filter((t) => !transformers.includes(t.value)).map(({ label, value }) => (
+              <Button
+                key={value}
+                size="sm"
+                variant="outline"
+                className="h-6 px-2 text-xs"
+                onClick={() => handleTransformerToggle(value)}
+              >
+                {label}
+              </Button>
+            ))}
           </div>
         </div>
       </div>
