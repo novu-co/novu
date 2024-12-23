@@ -684,8 +684,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       '@maily-to/core':
-        specifier: ^0.0.19
-        version: 0.0.19(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@22.7.4)(typescript@5.6.2))(y-prosemirror@1.2.15(prosemirror-model@1.22.3)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.20))(yjs@13.6.20))
+        specifier: ^0.0.21
+        version: 0.0.21(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@22.7.4)(typescript@5.6.2))(y-prosemirror@1.2.15(prosemirror-model@1.22.3)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.20))(yjs@13.6.20))
       '@novu/framework':
         specifier: workspace:*
         version: link:../../packages/framework
@@ -9904,8 +9904,8 @@ packages:
     resolution: {integrity: sha512-SaNFseFPSDQlOYM9JTyYY6wauMu6qJ8eExo+jssFyb20ZaVvxKX1eTb3Gm5aW/4aWuxn6nofU+02sCk51//wdw==}
     engines: {node: '>=10.0.0'}
 
-  '@maily-to/core@0.0.19':
-    resolution: {integrity: sha512-FppQl3Wb2iwxxKMBoHmaoCwYiIyVwZxygbEA7qCAaTiHFZjvZIvifA8toU5xvL5Z5SEUtjkLe9Q3UQUzSnS1aQ==}
+  '@maily-to/core@0.0.21':
+    resolution: {integrity: sha512-69En5HE/jfUc1RDII1wr5ZD05/klII3JlNVscAfjdCbnhzXqxiwAyTVsucS7quOpXeN4B2P8ElbXeQAHhBNPEQ==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^18.3.1
@@ -45984,7 +45984,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@maily-to/core@0.0.19(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@22.7.4)(typescript@5.6.2))(y-prosemirror@1.2.15(prosemirror-model@1.22.3)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.20))(yjs@13.6.20))':
+  '@maily-to/core@0.0.21(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@22.7.4)(typescript@5.6.2))(y-prosemirror@1.2.15(prosemirror-model@1.22.3)(prosemirror-state@1.4.3)(prosemirror-view@1.37.0)(y-protocols@1.0.6(yjs@13.6.20))(yjs@13.6.20))':
     dependencies:
       '@radix-ui/react-dropdown-menu': 2.1.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@radix-ui/react-popover': 1.1.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
