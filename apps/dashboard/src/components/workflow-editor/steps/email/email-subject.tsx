@@ -12,6 +12,7 @@ import { autocompletion } from '@codemirror/autocomplete';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Button } from '@/components/primitives/button';
 import { Input } from '@/components/primitives/input';
+import { GripVertical } from 'lucide-react';
 
 const subjectKey = 'subject';
 
@@ -21,29 +22,157 @@ interface VariablePopoverProps {
   onUpdate: (newValue: string) => void;
 }
 
+const TRANSFORMERS = [
+  { label: 'Uppercase', value: 'upcase' },
+  { label: 'Lowercase', value: 'downcase' },
+  { label: 'Capitalize', value: 'capitalize' },
+  { label: 'Strip HTML', value: 'strip_html' },
+  { label: 'Strip Newlines', value: 'strip_newlines' },
+  { label: 'Escape', value: 'escape' },
+] as const;
+
 const VariablePopover = ({ variable, onClose, onUpdate }: VariablePopoverProps) => {
-  const [value, setValue] = useState(variable);
+  // Parse the variable to extract name, default value, and transformers
+  const [variableName, defaultValue = '', initialTransformers = []] = useMemo(() => {
+    const parts = variable.split('|').map((part) => part.trim());
+    const [nameWithDefault, ...rest] = parts;
+
+    // Handle default value
+    const defaultMatch = nameWithDefault.match(/default:\s*([^}]+)/);
+    const name = defaultMatch ? nameWithDefault.replace(/\s*\|\s*default:[^}]+/, '') : nameWithDefault;
+    const defaultVal = defaultMatch ? defaultMatch[1].trim() : '';
+
+    // Get all transformers
+    const transforms = rest.filter((part) => TRANSFORMERS.some((t) => t.value === part.trim()));
+
+    console.log('Parsed variable:', { name, defaultVal, transforms, parts });
+    return [name, defaultVal, transforms];
+  }, [variable]);
+
+  const [name, setName] = useState(variableName);
+  const [defaultVal, setDefaultVal] = useState(defaultValue);
+  const [transformers, setTransformers] = useState<string[]>(initialTransformers);
+
+  const handleTransformerToggle = (value: string) => {
+    setTransformers((current) => {
+      if (current.includes(value)) {
+        return current.filter((t) => t !== value);
+      }
+      return [...current, value];
+    });
+  };
+
+  const moveTransformer = (from: number, to: number) => {
+    setTransformers((current) => {
+      const newTransformers = [...current];
+      const [removed] = newTransformers.splice(from, 1);
+      newTransformers.splice(to, 0, removed);
+      return newTransformers;
+    });
+  };
+
+  const handleUpdate = () => {
+    let finalValue = name.trim();
+
+    if (defaultVal) {
+      finalValue += ` | default: ${defaultVal.trim()}`;
+    }
+
+    // Add all active transformers in order
+    transformers.forEach((t) => {
+      finalValue += ` | ${t}`;
+    });
+
+    console.log('Updating with value:', finalValue);
+    onUpdate(finalValue);
+  };
 
   return (
     <PopoverContent className="w-80">
       <div className="grid gap-4">
         <div className="space-y-2">
           <h4 className="font-medium leading-none">Edit Variable</h4>
-          <p className="text-muted-foreground text-sm">Modify the variable name or select from available options.</p>
+          <p className="text-muted-foreground text-sm">Modify the variable name or add transformers.</p>
         </div>
-        <div className="grid gap-2">
-          <Input value={value} onChange={(e) => setValue(e.target.value)} className="h-8" />
+        <div className="grid gap-3">
+          <div className="grid gap-2">
+            <label className="text-sm font-medium leading-none">Variable Name</label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} className="h-8" />
+          </div>
+
+          <div className="grid gap-2">
+            <label className="text-sm font-medium leading-none">Default Value</label>
+            <Input
+              value={defaultVal}
+              onChange={(e) => setDefaultVal(e.target.value)}
+              className="h-8"
+              placeholder="Enter default value..."
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <label className="text-sm font-medium leading-none">Transformers</label>
+            <div className="flex flex-col gap-2">
+              {/* Selected transformers with drag handles */}
+              {transformers.length > 0 && (
+                <div className="flex flex-col gap-1 rounded-md border p-2">
+                  {transformers.map((value, index) => {
+                    const transformer = TRANSFORMERS.find((t) => t.value === value);
+                    return (
+                      <div
+                        key={value}
+                        className="bg-secondary hover:bg-secondary/80 group flex cursor-move items-center gap-2 rounded p-1"
+                        draggable
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData('text/plain', index.toString());
+                        }}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                          moveTransformer(fromIndex, index);
+                        }}
+                      >
+                        <GripVertical className="text-muted-foreground/50 group-hover:text-muted-foreground h-4 w-4" />
+                        <span className="flex-1">{transformer?.label}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="hover:bg-destructive/90 hover:text-destructive-foreground h-6 px-2"
+                          onClick={() => handleTransformerToggle(value)}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Available transformers */}
+              <div className="flex flex-wrap gap-2">
+                {TRANSFORMERS.filter((t) => !transformers.includes(t.value)).map(({ label, value }) => (
+                  <Button
+                    key={value}
+                    size="sm"
+                    variant="outline"
+                    className="h-7"
+                    onClick={() => handleTransformerToggle(value)}
+                  >
+                    {label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <div className="flex justify-end gap-2">
             <Button variant="ghost" size="sm" onClick={onClose}>
               Cancel
             </Button>
-            <Button
-              size="sm"
-              onClick={() => {
-                onUpdate(value);
-                onClose();
-              }}
-            >
+            <Button size="sm" onClick={handleUpdate}>
               Update
             </Button>
           </div>
@@ -104,6 +233,24 @@ export const EmailSubject = () => {
   const { step } = useWorkflow();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
   const [selectedVariable, setSelectedVariable] = useState<{ value: string; from: number; to: number } | null>(null);
+  const viewRef = useRef<EditorView | null>(null);
+  const fieldRef = useRef<any>(null);
+
+  const handleVariableClick = (e: MouseEvent, view: EditorView) => {
+    const target = e.target as HTMLElement;
+    const pill = target.closest('.cm-variable-pill');
+
+    if (pill instanceof HTMLElement) {
+      const variable = pill.getAttribute('data-variable');
+      const start = parseInt(pill.getAttribute('data-start') || '0');
+      const end = parseInt(pill.getAttribute('data-end') || '0');
+
+      if (variable) {
+        console.log('Selected variable:', { variable, start, end });
+        setSelectedVariable({ value: variable, from: start, to: end });
+      }
+    }
+  };
 
   // Plugin to find and decorate variables
   const createVariablePlugin = () => {
@@ -113,11 +260,15 @@ export const EmailSubject = () => {
 
         constructor(view: EditorView) {
           this.decorations = this.createDecorations(view);
+          viewRef.current = view;
         }
 
         update(update: any) {
           if (update.docChanged || update.viewportChanged) {
             this.decorations = this.createDecorations(update.view);
+          }
+          if (update.view) {
+            viewRef.current = update.view;
           }
         }
 
@@ -132,13 +283,6 @@ export const EmailSubject = () => {
             const end = start + match[0].length;
             const variableName = match[1].trim();
 
-            // Add bracket decoration for the opening {{
-            decorations.push(
-              Decoration.mark({
-                class: 'cm-bracket',
-              }).range(start, start + 2)
-            );
-
             // Add the main variable decoration
             decorations.push(
               Decoration.mark({
@@ -151,7 +295,12 @@ export const EmailSubject = () => {
               }).range(start, end)
             );
 
-            // Add bracket decoration for the closing }}
+            // Add bracket decorations
+            decorations.push(
+              Decoration.mark({
+                class: 'cm-bracket',
+              }).range(start, start + 2)
+            );
             decorations.push(
               Decoration.mark({
                 class: 'cm-bracket',
@@ -172,36 +321,40 @@ export const EmailSubject = () => {
     );
   };
 
-  const handleVariableClick = (e: MouseEvent, view: EditorView) => {
-    const target = e.target as HTMLElement;
-    if (target.classList.contains('cm-variable-pill')) {
-      const variable = target.getAttribute('data-variable');
-      const start = parseInt(target.getAttribute('data-start') || '0');
-      const end = parseInt(target.getAttribute('data-end') || '0');
-
-      if (variable) {
-        setSelectedVariable({ value: variable, from: start, to: end });
-      }
-    }
-  };
-
   const handleVariableUpdate = (newValue: string) => {
-    if (!selectedVariable) return;
+    if (!selectedVariable || !viewRef.current || !fieldRef.current) {
+      console.log('Missing required refs:', {
+        selectedVariable,
+        viewRef: !!viewRef.current,
+        fieldRef: !!fieldRef.current,
+      });
+      return;
+    }
 
     const { from, to } = selectedVariable;
-    const view = editorRef.current?.view;
-    if (!view) return;
+    const view = viewRef.current;
+    console.log('Updating variable:', { from, to, newValue });
+
+    // Create and dispatch the transaction
+    const changes = {
+      from,
+      to,
+      insert: `{{${newValue}}}`,
+    };
+    console.log('Applying changes:', changes);
 
     view.dispatch({
-      changes: {
-        from,
-        to,
-        insert: `{{${newValue}}}`,
-      },
+      changes,
+      selection: { anchor: from + `{{${newValue}}}`.length },
     });
-  };
 
-  const editorRef = useRef<any>(null);
+    // Get the updated content and trigger form update
+    const updatedContent = view.state.doc.toString();
+    console.log('Updated content:', updatedContent);
+    fieldRef.current.onChange(updatedContent);
+
+    setSelectedVariable(null);
+  };
 
   const extensions = useMemo(
     () => [
@@ -220,40 +373,51 @@ export const EmailSubject = () => {
     <FormField
       control={control}
       name={subjectKey}
-      render={({ field }) => (
-        <>
-          <FormItem className="w-full">
-            <FormControl>
-              <div className="relative">
-                <Editor
-                  ref={editorRef}
-                  size="lg"
-                  autoFocus={!field.value}
-                  fontFamily="inherit"
-                  placeholder={capitalize(field.name)}
-                  id={field.name}
-                  extensions={extensions}
-                  value={field.value}
-                  onChange={(val) => field.onChange(val)}
-                />
-                <Popover open={!!selectedVariable} onOpenChange={(open) => !open && setSelectedVariable(null)}>
-                  <PopoverTrigger asChild>
-                    <div />
-                  </PopoverTrigger>
-                  {selectedVariable && (
-                    <VariablePopover
-                      variable={selectedVariable.value}
-                      onClose={() => setSelectedVariable(null)}
-                      onUpdate={handleVariableUpdate}
-                    />
-                  )}
-                </Popover>
-              </div>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </>
-      )}
+      render={({ field }) => {
+        // Store the field reference
+        fieldRef.current = field;
+
+        return (
+          <>
+            <FormItem className="w-full">
+              <FormControl>
+                <div className="relative">
+                  <Editor
+                    size="lg"
+                    autoFocus={!field.value}
+                    fontFamily="inherit"
+                    placeholder={capitalize(field.name)}
+                    id={field.name}
+                    extensions={extensions}
+                    value={field.value}
+                    onChange={(val) => field.onChange(val)}
+                  />
+                  <Popover
+                    open={!!selectedVariable}
+                    onOpenChange={(open) => {
+                      if (!open) {
+                        setSelectedVariable(null);
+                      }
+                    }}
+                  >
+                    <PopoverTrigger asChild>
+                      <div />
+                    </PopoverTrigger>
+                    {selectedVariable && (
+                      <VariablePopover
+                        variable={selectedVariable.value}
+                        onClose={() => setSelectedVariable(null)}
+                        onUpdate={handleVariableUpdate}
+                      />
+                    )}
+                  </Popover>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </>
+        );
+      }}
     />
   );
 };
