@@ -83,15 +83,41 @@ export const Maily = (props: MailyProps) => {
                   ]}
                   variableTriggerCharacter="{{"
                   variables={({ query, editor, from }) => {
+                    const queryWithoutSuffix = query.replace(/}+$/, '');
+
+                    function addInlineVariable() {
+                      if (!query.endsWith('}}')) {
+                        return;
+                      }
+                      if (filteredVariables.every((variable) => variable.name !== queryWithoutSuffix)) {
+                        return;
+                      }
+                      const from = editor?.state.selection.from - queryWithoutSuffix.length - 4; /* for prefix */
+                      const to = editor?.state.selection.from;
+
+                      editor?.commands.deleteRange({ from, to });
+                      editor?.commands.insertContent({
+                        type: 'variable',
+                        attrs: {
+                          id: queryWithoutSuffix,
+                          label: null,
+                          fallback: null,
+                          showIfKey: null,
+                          required: false,
+                        },
+                      });
+                    }
+
                     const filteredVariables: { name: string; required: boolean }[] = [];
 
                     if (from === 'for') {
                       filteredVariables.push(...arrays, ...namespaces);
-                      if (namespaces.some((namespace) => query.includes(namespace.name))) {
-                        filteredVariables.push({ name: query, required: false });
+                      if (namespaces.some((namespace) => queryWithoutSuffix.includes(namespace.name))) {
+                        filteredVariables.push({ name: queryWithoutSuffix, required: false });
                       }
 
-                      return dedupAndSortVariables(filteredVariables, query);
+                      addInlineVariable();
+                      return dedupAndSortVariables(filteredVariables, queryWithoutSuffix);
                     }
 
                     const newNamespaces = [
@@ -99,11 +125,12 @@ export const Maily = (props: MailyProps) => {
                       ...(editor?.getAttributes('for')?.each ? [{ name: 'iterable', required: false }] : []),
                     ];
                     filteredVariables.push(...primitives, ...newNamespaces);
-                    if (newNamespaces.some((namespace) => query.includes(namespace.name))) {
-                      filteredVariables.push({ name: query, required: false });
+                    if (newNamespaces.some((namespace) => queryWithoutSuffix.includes(namespace.name))) {
+                      filteredVariables.push({ name: queryWithoutSuffix, required: false });
                     }
 
-                    return dedupAndSortVariables(filteredVariables, query);
+                    addInlineVariable();
+                    return dedupAndSortVariables(filteredVariables, queryWithoutSuffix);
                   }}
                   contentJson={field.value ? JSON.parse(field.value) : undefined}
                   onCreate={setEditor}

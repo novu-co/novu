@@ -47,7 +47,7 @@ export const BaseBody = () => {
               />
             </InputField>
           </FormControl>
-          <FormMessage>{`This supports markdown and variables, type { for more.`}</FormMessage>
+          <FormMessage>{`This supports markdown and variables, type {{ for more.`}</FormMessage>
         </FormItem>
       )}
     />

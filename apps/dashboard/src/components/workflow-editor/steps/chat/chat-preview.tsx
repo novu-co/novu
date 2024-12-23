@@ -16,6 +16,7 @@ export const ChatPreview = ({
 }) => {
   const isValidChatPreview =
     previewData?.result.type === ChannelTypeEnum.CHAT && previewData?.result.preview.body.length > 0;
+  const body = isValidChatPreview ? ((previewData?.result.preview as ChatRenderOutput)?.body ?? '') : '';
 
   return (
     <div className="relative w-full rounded-xl border border-dashed border-[#E1E4EA] p-3">
@@ -34,14 +35,14 @@ export const ChatPreview = ({
             </div>
             {isPreviewPending ? (
               <Skeleton className="h-4 w-1/2" />
-            ) : !isValidChatPreview ? (
-              <span className="text-destructive text-xs font-normal">Preview not available</span>
             ) : (
               <span
-                className={cn('text-foreground-950 text-xs font-normal', { 'line-clamp-3': variant === 'mini' })}
-                title={variant === 'mini' ? (previewData?.result.preview as ChatRenderOutput).body : undefined}
+                className={cn('text-foreground-950 min-h-4 text-xs font-normal', {
+                  'line-clamp-3': variant === 'mini',
+                })}
+                title={variant === 'mini' ? body : undefined}
               >
-                {(previewData?.result.preview as ChatRenderOutput).body}
+                {body}
               </span>
             )}
           </div>

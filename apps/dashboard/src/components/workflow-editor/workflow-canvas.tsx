@@ -99,8 +99,8 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
       id: crypto.randomUUID(),
       position: { x: 0, y: 0 },
       data: {
-        workflowSlug: currentWorkflow!.slug,
-        environment: currentEnvironment!.slug,
+        workflowSlug: currentWorkflow?.slug ?? '',
+        environment: currentEnvironment?.slug ?? '',
       },
       type: 'trigger',
     };

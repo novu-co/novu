@@ -2,29 +2,24 @@ import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
-import { skipControl } from './skip-control.schema';
+import { skipStepUiSchema, skipZodSchema } from './skip-control.schema';
 
-export const ChatStepControlZodSchema = z
+export const chatControlZodSchema = z
   .object({
-    skip: skipControl.schema,
+    skip: skipZodSchema,
     body: z.string(),
   })
   .strict();
 
-export type ChatStepControlType = z.infer<typeof ChatStepControlZodSchema>;
+export type ChatControlType = z.infer<typeof chatControlZodSchema>;
 
-export const chatStepControlSchema = zodToJsonSchema(ChatStepControlZodSchema) as JSONSchemaDto;
-export const chatStepUiSchema: UiSchema = {
+export const chatControlSchema = zodToJsonSchema(chatControlZodSchema) as JSONSchemaDto;
+export const chatUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.CHAT,
   properties: {
     body: {
       component: UiComponentEnum.CHAT_BODY,
     },
-    skip: skipControl.uiSchema.properties.skip,
+    skip: skipStepUiSchema.properties.skip,
   },
-};
-
-export const chatStepControl = {
-  uiSchema: chatStepUiSchema,
-  schema: chatStepControlSchema,
 };

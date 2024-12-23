@@ -11,8 +11,3 @@ export const skipStepUiSchema = {
     },
   },
 } satisfies UiSchema;
-
-export const skipControl = {
-  uiSchema: skipStepUiSchema,
-  schema: skipZodSchema,
-};

@@ -35,6 +35,7 @@ export const SideNavigation = () => {
   const { currentEnvironment, environments, switchEnvironment } = useEnvironment();
   const track = useTelemetry();
   const isNewActivityFeedEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ACTIVITY_FEED_ENABLED, false);
+  const isNewIntegrationStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_INTEGRATION_STORE_ENABLED, false);
   const environmentNames = useMemo(() => environments?.map((env) => env.name), [environments]);
   const onEnvironmentChange = (value: string) => {
     const environment = environments?.find((env) => env.name === value);
@@ -76,7 +77,14 @@ export const SideNavigation = () => {
               </NavigationLink>
             </NavigationGroup>
             <NavigationGroup label="Developer">
-              <NavigationLink to={LEGACY_ROUTES.INTEGRATIONS} isExternal>
+              <NavigationLink
+                to={
+                  isNewIntegrationStoreEnabled
+                    ? buildRoute(ROUTES.INTEGRATIONS, { environmentSlug: currentEnvironment?.slug ?? '' })
+                    : LEGACY_ROUTES.INTEGRATIONS
+                }
+                isExternal={!isNewIntegrationStoreEnabled}
+              >
                 <RiStore3Line className="size-4" />
                 <span>Integration Store</span>
               </NavigationLink>

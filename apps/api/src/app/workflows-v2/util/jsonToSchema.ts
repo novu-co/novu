@@ -1,15 +1,19 @@
 import { JSONSchemaDefinition, JSONSchemaDto } from '@novu/shared';
 
+export function emptyJsonSchema(): JSONSchemaDto {
+  return {
+    type: 'object',
+    properties: {},
+    additionalProperties: true,
+  };
+}
+
 export function convertJsonToSchemaWithDefaults(unknownObject?: Record<string, unknown>) {
   if (!unknownObject) {
     return {};
   }
 
   return generateJsonSchema(unknownObject) as unknown as JSONSchemaDto;
-}
-
-function isAJsonSchemaDto(schema: JSONSchemaDto | boolean): schema is JSONSchemaDto {
-  return typeof schema !== 'boolean';
 }
 
 function generateJsonSchema(jsonObject: Record<string, unknown>): JSONSchemaDto {

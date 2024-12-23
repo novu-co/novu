@@ -22,6 +22,10 @@ export const ROUTES = {
   EDIT_WORKFLOW_PREFERENCES: 'preferences',
   EDIT_STEP: 'steps/:stepSlug',
   EDIT_STEP_TEMPLATE: 'steps/:stepSlug/edit',
+  INTEGRATIONS: '/integrations',
+  INTEGRATIONS_CONNECT: '/integrations/connect',
+  INTEGRATIONS_CONNECT_PROVIDER: '/integrations/connect/:providerId',
+  INTEGRATIONS_UPDATE: '/integrations/:integrationId/update',
   API_KEYS: '/env/:environmentSlug/api-keys',
   ACTIVITY_FEED: '/env/:environmentSlug/activity-feed',
 } as const;

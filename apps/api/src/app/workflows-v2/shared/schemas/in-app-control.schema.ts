@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
-import { skipControl } from './skip-control.schema';
+import { skipStepUiSchema, skipZodSchema } from './skip-control.schema';
 
 const redirectZodSchema = z
   .object({
@@ -21,9 +21,9 @@ const actionZodSchema = z
   .optional()
   .nullable();
 
-export const InAppControlZodSchema = z
+export const inAppControlZodSchema = z
   .object({
-    skip: skipControl.schema,
+    skip: skipZodSchema,
     subject: z.string().optional(),
     body: z.string(),
     avatar: z.string().optional(),
@@ -36,11 +36,11 @@ export const InAppControlZodSchema = z
 
 export type InAppRedirectType = z.infer<typeof redirectZodSchema>;
 export type InAppActionType = z.infer<typeof actionZodSchema>;
-export type InAppControlType = z.infer<typeof InAppControlZodSchema>;
+export type InAppControlType = z.infer<typeof inAppControlZodSchema>;
 
-export const InAppRedirectSchema = zodToJsonSchema(redirectZodSchema) as JSONSchemaDto;
-export const InAppActionSchema = zodToJsonSchema(actionZodSchema) as JSONSchemaDto;
-export const inAppControlSchema = zodToJsonSchema(InAppControlZodSchema) as JSONSchemaDto;
+export const inAppRedirectSchema = zodToJsonSchema(redirectZodSchema) as JSONSchemaDto;
+export const inAppActionSchema = zodToJsonSchema(actionZodSchema) as JSONSchemaDto;
+export const inAppControlSchema = zodToJsonSchema(inAppControlZodSchema) as JSONSchemaDto;
 
 const redirectPlaceholder = {
   url: {
@@ -78,6 +78,6 @@ export const inAppUiSchema: UiSchema = {
       component: UiComponentEnum.URL_TEXT_BOX,
       placeholder: redirectPlaceholder,
     },
-    skip: skipControl.uiSchema.properties.skip,
+    skip: skipStepUiSchema.properties.skip,
   },
 };
