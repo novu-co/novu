@@ -53,7 +53,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
 
     return (
       <div className="size-9 space-y-2">
-        <Popover modal={true} open={isOpen} onOpenChange={setIsOpen}>
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" size="icon" className="text-foreground-600 relative size-full overflow-hidden">
               {value ? (
