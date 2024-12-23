@@ -1,25 +1,27 @@
 import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
 import { Notification5Fill } from '@/components/icons';
 import { InAppTabsSection } from '@/components/workflow-editor/steps/in-app/in-app-tabs-section';
-import { useEditorPreview } from '../use-editor-preview';
 import { InboxPreview } from './inbox-preview';
 import { ConfigurePreviewAccordion } from '../shared/configure-preview-accordion';
 
 type InAppEditorPreviewProps = {
-  workflow: WorkflowResponseDto;
-  step: StepDataDto;
-  formValues: Record<string, unknown>;
+  workflow?: WorkflowResponseDto;
+  step?: StepDataDto;
+  formValues?: Record<string, unknown>;
+  editorValue: string;
+  setEditorValue: (value: string) => void;
+  previewStep: () => void;
+  previewData?: any;
+  isPreviewPending?: boolean;
 };
 
-export const InAppEditorPreview = ({ workflow, step, formValues }: InAppEditorPreviewProps) => {
-  const workflowSlug = workflow.workflowId;
-  const stepSlug = step.stepId;
-  const { editorValue, setEditorValue, previewStep, previewData, isPreviewPending } = useEditorPreview({
-    workflowSlug,
-    stepSlug,
-    controlValues: formValues,
-  });
-
+export const InAppEditorPreview = ({
+  editorValue,
+  setEditorValue,
+  previewStep,
+  previewData,
+  isPreviewPending = false,
+}: InAppEditorPreviewProps) => {
   return (
     <InAppTabsSection>
       <div className="relative flex flex-col gap-3">

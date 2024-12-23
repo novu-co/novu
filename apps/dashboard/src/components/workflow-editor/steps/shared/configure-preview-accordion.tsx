@@ -26,7 +26,7 @@ export const ConfigurePreviewAccordion = ({
   setEditorValue,
   previewStep,
 }: ConfigurePreviewAccordionProps) => {
-  const [accordionValue, setAccordionValue] = useState<string | undefined>(getInitialAccordionValue(editorValue));
+  const [accordionValue, setAccordionValue] = useState<string | undefined>('payload');
   const [payloadError, setPayloadError] = useState('');
   const [height, setHeight] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);

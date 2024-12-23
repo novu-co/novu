@@ -13,25 +13,28 @@ import {
 import { EmailTabsSection } from '@/components/workflow-editor/steps/email/email-tabs-section';
 import { Tabs, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { TabsContent } from '@radix-ui/react-tabs';
-import { useEditorPreview } from '../use-editor-preview';
 import { Separator } from '@/components/primitives/separator';
 import { Skeleton } from '@/components/primitives/skeleton';
 import { ConfigurePreviewAccordion } from '../shared/configure-preview-accordion';
 
 type EmailEditorPreviewProps = {
-  workflow: WorkflowResponseDto;
-  step: StepDataDto;
-  formValues: Record<string, unknown>;
+  workflow?: WorkflowResponseDto;
+  step?: StepDataDto;
+  formValues?: Record<string, unknown>;
+  editorValue?: string;
+  setEditorValue?: (value: string) => void;
+  previewStep?: () => void;
+  previewData?: any;
+  isPreviewPending?: boolean;
 };
 
-export const EmailEditorPreview = ({ workflow, step, formValues }: EmailEditorPreviewProps) => {
-  const workflowSlug = workflow.workflowId;
-  const stepSlug = step.stepId;
-  const { editorValue, setEditorValue, isPreviewPending, previewData, previewStep } = useEditorPreview({
-    workflowSlug,
-    stepSlug,
-    controlValues: formValues,
-  });
+export const EmailEditorPreview = ({
+  editorValue = '{}',
+  setEditorValue = () => {},
+  previewStep = () => {},
+  previewData,
+  isPreviewPending = false,
+}: EmailEditorPreviewProps) => {
   const [activeTab, setActiveTab] = useState('desktop');
 
   return (

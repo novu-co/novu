@@ -1,26 +1,25 @@
-import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
 import { RiCellphoneFill } from 'react-icons/ri';
-import { useEditorPreview } from '@/components/workflow-editor/steps/use-editor-preview';
 import { PushPreview } from '@/components/workflow-editor/steps/push/push-preview';
 import { TabsSection } from '@/components/workflow-editor/steps/tabs-section';
 import { InlineToast } from '@/components/primitives/inline-toast';
 import { ConfigurePreviewAccordion } from '../shared/configure-preview-accordion';
+import { GeneratePreviewResponseDto } from '@novu/shared';
 
 type PushEditorPreviewProps = {
-  workflow: WorkflowResponseDto;
-  step: StepDataDto;
-  formValues: Record<string, unknown>;
+  editorValue: string;
+  setEditorValue: (value: string) => void;
+  previewStep: () => void;
+  previewData?: GeneratePreviewResponseDto;
+  isPreviewPending: boolean;
 };
 
-export const PushEditorPreview = ({ workflow, step, formValues }: PushEditorPreviewProps) => {
-  const workflowSlug = workflow.workflowId;
-  const stepSlug = step.stepId;
-  const { editorValue, setEditorValue, previewStep, previewData, isPreviewPending } = useEditorPreview({
-    workflowSlug,
-    stepSlug,
-    controlValues: formValues,
-  });
-
+export const PushEditorPreview = ({
+  editorValue,
+  setEditorValue,
+  previewStep,
+  previewData,
+  isPreviewPending,
+}: PushEditorPreviewProps) => {
   return (
     <TabsSection>
       <div className="relative flex flex-col gap-3">

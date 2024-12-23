@@ -1,27 +1,26 @@
 import { RiChat1Fill } from 'react-icons/ri';
-import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
+import { GeneratePreviewResponseDto } from '@novu/shared';
 
-import { useEditorPreview } from '@/components/workflow-editor/steps/use-editor-preview';
 import { ChatPreview } from '@/components/workflow-editor/steps/chat/chat-preview';
 import { TabsSection } from '@/components/workflow-editor/steps/tabs-section';
 import { InlineToast } from '@/components/primitives/inline-toast';
 import { ConfigurePreviewAccordion } from '../shared/configure-preview-accordion';
 
 type ChatEditorPreviewProps = {
-  workflow: WorkflowResponseDto;
-  step: StepDataDto;
-  formValues: Record<string, unknown>;
+  editorValue: string;
+  setEditorValue: (value: string) => void;
+  previewStep: () => void;
+  previewData?: GeneratePreviewResponseDto;
+  isPreviewPending: boolean;
 };
 
-export const ChatEditorPreview = ({ workflow, step, formValues }: ChatEditorPreviewProps) => {
-  const workflowSlug = workflow.workflowId;
-  const stepSlug = step.stepId;
-  const { editorValue, setEditorValue, previewStep, previewData, isPreviewPending } = useEditorPreview({
-    workflowSlug,
-    stepSlug,
-    controlValues: formValues,
-  });
-
+export const ChatEditorPreview = ({
+  editorValue,
+  setEditorValue,
+  previewStep,
+  previewData,
+  isPreviewPending = false,
+}: ChatEditorPreviewProps) => {
   return (
     <TabsSection>
       <div className="relative flex flex-col gap-3">

@@ -6,12 +6,19 @@ import { TemplateTabs } from '@/components/workflow-editor/steps/template-tabs';
 import { WorkflowOriginEnum } from '@novu/shared';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { useEditorPreview } from '../use-editor-preview';
 
 export const SmsTabs = (props: StepEditorProps) => {
   const { workflow, step } = props;
   const { dataSchema, uiSchema } = step.controls;
   const form = useFormContext();
   const [tabsValue, setTabsValue] = useState('editor');
+
+  const { editorValue, setEditorValue, previewStep, previewData, isPreviewPending } = useEditorPreview({
+    workflowSlug: workflow.workflowId,
+    stepSlug: step.stepId,
+    controlValues: form.getValues(),
+  });
 
   const isNovuCloud = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && uiSchema;
   const isExternal = workflow.origin === WorkflowOriginEnum.EXTERNAL;
@@ -23,7 +30,15 @@ export const SmsTabs = (props: StepEditorProps) => {
     </>
   );
 
-  const previewContent = <SmsEditorPreview workflow={workflow} step={step} formValues={form.getValues()} />;
+  const previewContent = (
+    <SmsEditorPreview
+      editorValue={editorValue}
+      setEditorValue={setEditorValue}
+      previewStep={previewStep}
+      previewData={previewData}
+      isPreviewPending={isPreviewPending}
+    />
+  );
 
   return (
     <TemplateTabs
@@ -31,6 +46,7 @@ export const SmsTabs = (props: StepEditorProps) => {
       previewContent={previewContent}
       tabsValue={tabsValue}
       onTabChange={setTabsValue}
+      previewStep={previewStep}
     />
   );
 };
