@@ -1,0 +1,46 @@
+import { EditorView } from '@uiw/react-codemirror';
+
+export const variablePillTheme = EditorView.baseTheme({
+  '.cm-variable-pill': {
+    backgroundColor: 'rgb(255 255 255 / 0.5)',
+    color: 'rgb(55, 65, 81)',
+    border: '1px solid #e5e7eb',
+    borderRadius: '9999px',
+    padding: '2px 6px 2px 24px',
+    margin: '0 2px',
+    fontFamily: 'inherit',
+    display: 'inline-flex',
+    alignItems: 'center',
+    height: '24px',
+    lineHeight: '24px',
+    fontSize: '14px',
+    cursor: 'pointer',
+    position: 'relative',
+  },
+  '.cm-variable-pill::before': {
+    content: '""',
+    position: 'absolute',
+    left: '6px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: '14px',
+    height: '14px',
+    backgroundColor: '#E11D48',
+    maskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1'%3E%3C/path%3E%3Cpath d='M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1'%3E%3C/path%3E%3C/svg%3E")`,
+    maskRepeat: 'no-repeat',
+    maskPosition: 'center',
+    maskSize: 'contain',
+    WebkitMaskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1'%3E%3C/path%3E%3Cpath d='M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1'%3E%3C/path%3E%3C/svg%3E")`,
+    WebkitMaskRepeat: 'no-repeat',
+    WebkitMaskPosition: 'center',
+    WebkitMaskSize: 'contain',
+  },
+  '.cm-variable-pill.cm-dark': {
+    backgroundColor: '#FFD6EE',
+    color: '#AD74FF',
+    border: '1px solid #3D3D4D',
+  },
+  '.cm-variable-pill .cm-bracket': {
+    display: 'none',
+  },
+});

@@ -1,14 +1,11 @@
-import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessagePure } from '@/components/primitives/form/form';
 import { Input, InputFieldProps, InputFieldPure, InputProps } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
-import { completions } from '@/utils/liquid-autocomplete';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
-import { autocompletion } from '@codemirror/autocomplete';
 import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
+import { FieldEditor } from '@/components/primitives/field-editor';
 
 type URLInputProps = Omit<InputProps, 'value' | 'onChange' | 'size'> & {
   options: string[];
@@ -34,7 +31,6 @@ export const URLInput = ({
   const url = getFieldState(`${urlKey}`);
   const target = getFieldState(`${targetKey}`);
   const error = url.error || target.error;
-  const extensions = useMemo(() => [autocompletion({ override: [completions(variables)] })], [variables]);
 
   return (
     <div className="flex flex-col gap-1">
@@ -48,13 +44,12 @@ export const URLInput = ({
                 <FormItem className="min-w-px max-w-full basis-full">
                   <FormControl>
                     {asEditor ? (
-                      <Editor
-                        asInput
+                      <FieldEditor
                         fontFamily="inherit"
                         placeholder={placeholder}
-                        extensions={extensions}
                         value={field.value}
                         onChange={field.onChange}
+                        variables={variables}
                       />
                     ) : (
                       <Input type="text" className="min-w-[20ch]" placeholder={placeholder} {...field} />
