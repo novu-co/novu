@@ -39,10 +39,16 @@ export function ActivityPanel({
   useEffect(() => {
     if (!activity) return;
 
-    const isPending = activity.jobs?.some((job) => job.status === JobStatusEnum.PENDING);
+    const isPending = activity.jobs?.some(
+      (job) =>
+        job.status === JobStatusEnum.PENDING ||
+        job.status === JobStatusEnum.QUEUED ||
+        job.status === JobStatusEnum.RUNNING ||
+        job.status === JobStatusEnum.DELAYED
+    );
 
     // Only stop refetching if we have an activity and it's not pending
-    setShouldRefetch(isPending);
+    setShouldRefetch(isPending || !activity?.jobs?.length);
 
     queryClient.invalidateQueries({
       queryKey: [QueryKeys.fetchActivity, currentEnvironment?._id, activityId],
