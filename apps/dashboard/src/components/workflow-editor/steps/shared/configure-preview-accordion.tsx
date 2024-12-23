@@ -32,10 +32,6 @@ export const ConfigurePreviewAccordion = ({
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setAccordionValue(getInitialAccordionValue(editorValue));
-  }, [editorValue]);
-
-  useEffect(() => {
     const timeout = setTimeout(() => {
       if (contentRef.current) {
         const rect = contentRef.current.getBoundingClientRect();
