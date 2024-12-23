@@ -52,7 +52,15 @@ export class GeneratePreviewUsecase {
         workflow,
       } = await this.initializePreviewContext(command);
       const commandVariablesExample = command.generatePreviewRequestDto.previewPayload;
-      const sanitizedValidatedControls = sanitizeControlValues(initialControlValues, stepData.type);
+
+      /**
+       * We don't want to sanitize control values for code workflows,
+       * as it's the responsibility of the custom code workflow creator
+       */
+      const sanitizedValidatedControls =
+        workflow.origin === WorkflowOriginEnum.NOVU_CLOUD
+          ? sanitizeControlValues(initialControlValues, stepData.type)
+          : initialControlValues;
 
       if (!sanitizedValidatedControls) {
         throw new Error(
