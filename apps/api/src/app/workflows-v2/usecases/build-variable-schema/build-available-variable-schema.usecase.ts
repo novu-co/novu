@@ -7,6 +7,7 @@ import { BuildAvailableVariableSchemaCommand } from './build-available-variable-
 import { parsePayloadSchema } from '../../shared/parse-payload-schema';
 import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
 import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
+import { emptyJsonSchema } from '../../util/jsonToSchema';
 
 @Injectable()
 export class BuildAvailableVariableSchemaUsecase {
@@ -62,13 +63,7 @@ export class BuildAvailableVariableSchemaUsecase {
     command: BuildAvailableVariableSchemaCommand
   ): Promise<JSONSchemaDto> {
     if (workflow.payloadSchema) {
-      return (
-        parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {
-          type: 'object',
-          properties: {},
-          additionalProperties: true,
-        }
-      );
+      return parsePayloadSchema(workflow.payloadSchema, { safe: true }) || emptyJsonSchema();
     }
 
     return this.buildPayloadSchema.execute(
