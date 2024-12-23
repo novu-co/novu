@@ -9,6 +9,7 @@ import {
   DigestTimedControlType,
   isDigestRegularControl,
   isDigestTimedControl,
+  LookBackWindowType,
 } from './schemas/digest-control.schema';
 import { PushControlType } from './schemas/push-control.schema';
 import { InAppActionType, InAppControlType, InAppRedirectType } from './schemas/in-app-control.schema';
@@ -24,22 +25,6 @@ const EMPTY_TIP_TAP_OBJECT = JSON.stringify({
     },
   ],
 });
-const WHITESPACE = ' ';
-
-type Redirect = {
-  url: string;
-  target: '_self' | '_blank' | '_parent' | '_top' | '_unfencedTop';
-};
-
-type Action = {
-  label?: string;
-  redirect?: Redirect;
-};
-
-type LookBackWindow = {
-  amount: number;
-  unit: string;
-};
 
 function sanitizeRedirect(redirect: InAppRedirectType | undefined, isOptional: boolean = false) {
   if (isOptional && (!redirect?.url || !redirect?.target)) {
@@ -66,7 +51,8 @@ function sanitizeAction(action: InAppActionType) {
 function sanitizeInApp(controlValues: InAppControlType) {
   const normalized: InAppControlType = {
     subject: controlValues.subject || undefined,
-    body: isEmpty(controlValues.body) ? WHITESPACE : controlValues.body,
+    // Cast to string to trigger Ajv validation errors
+    body: isEmpty(controlValues.body) ? (undefined as unknown as string) : controlValues.body,
     avatar: controlValues.avatar || undefined,
     primaryAction: undefined,
     secondaryAction: undefined,
@@ -147,8 +133,8 @@ function sanitizeDigest(controlValues: DigestControlSchemaType) {
       skip: controlValues.skip || undefined,
       lookBackWindow: controlValues.lookBackWindow
         ? {
-            amount: (controlValues.lookBackWindow as LookBackWindow).amount || 0,
-            unit: ((controlValues.lookBackWindow as LookBackWindow).unit as TimeUnitEnum) || TimeUnitEnum.SECONDS,
+            amount: (controlValues.lookBackWindow as LookBackWindowType).amount || 0,
+            unit: (controlValues.lookBackWindow as LookBackWindowType).unit || TimeUnitEnum.SECONDS,
           }
         : undefined,
     };
@@ -165,8 +151,8 @@ function sanitizeDigest(controlValues: DigestControlSchemaType) {
     skip: anyControlValues.skip || undefined,
     lookBackWindow: anyControlValues.lookBackWindow
       ? {
-          amount: (anyControlValues.lookBackWindow as LookBackWindow).amount || 0,
-          unit: ((anyControlValues.lookBackWindow as LookBackWindow).unit as TimeUnitEnum) || TimeUnitEnum.SECONDS,
+          amount: (anyControlValues.lookBackWindow as LookBackWindowType).amount || 0,
+          unit: (anyControlValues.lookBackWindow as LookBackWindowType).unit || TimeUnitEnum.SECONDS,
         }
       : undefined,
   });
@@ -211,7 +197,7 @@ function filterNullishValues<T extends Record<string, unknown>>(obj: T): T {
  * }
  *
  */
-export function sanitizeControlValues(
+export function dashboardSanitizeControlValues(
   controlValues: Record<string, unknown>,
   stepType: StepTypeEnum
 ): Record<string, unknown> | null {

@@ -10,19 +10,20 @@ import {
 } from '@novu/shared';
 import { defaultOptions, skipStepUiSchema, skipZodSchema } from './shared';
 
+const lookBackWindowZodSchema = z
+  .object({
+    amount: z.number().min(1),
+    unit: z.nativeEnum(TimeUnitEnum),
+  })
+  .strict();
+
 const digestRegularControlZodSchema = z
   .object({
     skip: skipZodSchema,
     amount: z.union([z.number().min(1), z.string().min(1)]),
     unit: z.nativeEnum(TimeUnitEnum),
     digestKey: z.string().optional(),
-    lookBackWindow: z
-      .object({
-        amount: z.number().min(1),
-        unit: z.nativeEnum(TimeUnitEnum),
-      })
-      .strict()
-      .optional(),
+    lookBackWindow: lookBackWindowZodSchema.optional(),
   })
   .strict();
 const digestTimedControlZodSchema = z
@@ -33,6 +34,7 @@ const digestTimedControlZodSchema = z
   })
   .strict();
 
+export type LookBackWindowType = z.infer<typeof lookBackWindowZodSchema>;
 export type DigestRegularControlType = z.infer<typeof digestRegularControlZodSchema>;
 export type DigestTimedControlType = z.infer<typeof digestTimedControlZodSchema>;
 export type DigestControlSchemaType = z.infer<typeof digestControlZodSchema>;

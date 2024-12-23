@@ -56,7 +56,7 @@ import { stepTypeToControlSchema } from '../../shared';
 import { GetWorkflowCommand, GetWorkflowUseCase } from '../get-workflow';
 import { buildVariables } from '../../util/build-variables';
 import { BuildAvailableVariableSchemaCommand, BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
-import { sanitizeControlValues } from '../../shared/sanitize-control-values';
+import { dashboardSanitizeControlValues } from '../../shared/sanitize-control-values';
 
 @Injectable()
 export class UpsertWorkflowUseCase {
@@ -312,7 +312,9 @@ export class UpsertWorkflowUseCase {
       )?.controls;
     }
 
-    const sanitizedControlValues = controlValueLocal ? sanitizeControlValues(controlValueLocal, step.type) : {};
+    const sanitizedControlValues = controlValueLocal
+      ? dashboardSanitizeControlValues(controlValueLocal, step.type)
+      : {};
     const controlIssues = processControlValuesBySchema(controlSchemas?.schema, sanitizedControlValues || {});
     const liquidTemplateIssues = processControlValuesByLiquid(variableSchema, controlValueLocal || {});
     const customIssues = await this.processCustomControlValues(user, step.type, controlValueLocal || {});
