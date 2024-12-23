@@ -44,6 +44,9 @@ export const buttonVariants = tv({
       ghost: {
         root: 'ring-1 ring-inset',
       },
+      gradient: {
+        root: '',
+      },
     },
     size: {
       md: {
@@ -122,6 +125,20 @@ export const buttonVariants = tv({
         ],
       },
     },
+    {
+      variant: 'primary',
+      mode: 'gradient',
+      class: {
+        root: [
+          // base
+          'bg-gradient-to-b from-primary/90 to-primary text-primary-foreground [clip-path:border-box] shadow-[inset_0_-4px_2px_-2px_hsl(var(--primary)),inset_0_0_0_1px_rgba(255,255,255,0.16),0_0_0_1px_hsl(var(--primary)),0px_1px_2px_0px_#0E121B3D] after:content-[""] after:absolute after:w-full after:h-full after:bg-gradient-to-b after:from-background/10 after:opacity-0  after:rounded-lg after:transition-opacity after:duration-300',
+          // hover
+          'hover:after:opacity-100',
+          // focus
+          'focus-visible:bg-bg-white focus-visible:shadow-button-primary-focus focus-visible:ring-primary-base',
+        ],
+      },
+    },
     //#endregion
 
     //#region variant=neutral
@@ -181,6 +198,20 @@ export const buttonVariants = tv({
         ],
       },
     },
+    {
+      variant: 'secondary',
+      mode: 'gradient',
+      class: {
+        root: [
+          // base
+          'bg-gradient-to-b from-neutral-alpha-900 to-neutral-900 text-neutral-foreground [clip-path:border-box] shadow-[inset_0_-4px_2px_-2px_hsl(var(--neutral-900)),inset_0_0_0_1px_rgba(255,255,255,0.16),0_0_0_1px_hsl(var(--neutral-900)),0px_1px_2px_0px_#0E121B3D] after:content-[""] after:absolute after:w-full after:h-full after:bg-gradient-to-b after:from-background/10 after:opacity-0  after:rounded-lg after:transition-opacity after:duration-300',
+          // hover
+          'hover:after:opacity-100',
+          // focus
+          'focus-visible:bg-bg-white focus-visible:text-text-strong focus-visible:shadow-button-important-focus focus-visible:ring-stroke-strong',
+        ],
+      },
+    },
     //#endregion
 
     //#region variant=error
@@ -235,6 +266,20 @@ export const buttonVariants = tv({
           'bg-transparent text-error-base ring-transparent',
           // hover
           'hover:bg-red-alpha-10',
+          // focus
+          'focus-visible:bg-bg-white focus-visible:shadow-button-error-focus focus-visible:ring-error-base',
+        ],
+      },
+    },
+    {
+      variant: 'error',
+      mode: 'gradient',
+      class: {
+        root: [
+          // base
+          'bg-error-base text-static-white',
+          // hover
+          'hover:bg-red-700',
           // focus
           'focus-visible:bg-bg-white focus-visible:shadow-button-error-focus focus-visible:ring-error-base',
         ],
