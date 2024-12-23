@@ -251,7 +251,7 @@ jobs:
     secrets: inherit
 
   test_e2e_web:
-    name: cE2E test Web app
+    name: E2E test Web app
     needs: [get-affected]
     if: ${{ contains(fromJson(needs.get-affected.outputs.test-e2e), '@novu/web') }}
     uses: ./.github/workflows/reusable-web-e2e.yml
