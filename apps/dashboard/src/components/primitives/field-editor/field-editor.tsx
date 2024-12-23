@@ -147,19 +147,17 @@ export const FieldEditor = ({
 
   return (
     <div className="relative">
-      <div className="flex min-h-[80px] flex-col">
-        <Editor
-          size={size}
-          className="flex-1"
-          autoFocus={autoFocus}
-          fontFamily={fontFamily}
-          placeholder={placeholder}
-          id={id}
-          extensions={extensions}
-          value={value}
-          onChange={onChange}
-        />
-      </div>
+      <Editor
+        size={size}
+        className="flex-1"
+        autoFocus={autoFocus}
+        fontFamily={fontFamily}
+        placeholder={placeholder}
+        id={id}
+        extensions={extensions}
+        value={value}
+        onChange={onChange}
+      />
       <Popover
         open={!!selectedVariable}
         onOpenChange={(open) => {
