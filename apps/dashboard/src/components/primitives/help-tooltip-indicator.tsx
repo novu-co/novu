@@ -16,9 +16,7 @@ export function HelpTooltipIndicator({ text, className, size = '5' }: HelpToolti
           <RiInformation2Line className={`size-${size}`} />
         </span>
       </TooltipTrigger>
-      <TooltipContent>
-        <p>{text}</p>
-      </TooltipContent>
+      <TooltipContent className="max-w-xs">{text}</TooltipContent>
     </Tooltip>
   );
 }

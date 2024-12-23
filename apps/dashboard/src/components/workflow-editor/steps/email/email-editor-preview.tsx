@@ -69,14 +69,16 @@ export const EmailEditorPreview = ({ workflow, step, formValues }: EmailEditorPr
     <Tabs value={activeTab} onValueChange={setActiveTab}>
       <EmailTabsSection className="flex w-full items-center justify-between">
         <EmailPreviewHeader />
-        <TabsList>
-          <TabsTrigger value="mobile">
-            <RiSmartphoneFill className="size-4" />
-          </TabsTrigger>
-          <TabsTrigger value="desktop">
-            <RiMacLine className="size-4" />
-          </TabsTrigger>
-        </TabsList>
+        <div>
+          <TabsList>
+            <TabsTrigger value="mobile">
+              <RiSmartphoneFill className="size-4" />
+            </TabsTrigger>
+            <TabsTrigger value="desktop">
+              <RiMacLine className="size-4" />
+            </TabsTrigger>
+          </TabsList>
+        </div>
       </EmailTabsSection>
       <div className="relative flex flex-col">
         {isPreviewPending ? (

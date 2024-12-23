@@ -21,7 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitives/tabs'
 import { buildDynamicFormSchema, TestWorkflowFormType } from '../schema';
 import { TestWorkflowForm } from './test-workflow-form';
 
-export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataResponseDto }) => {
+export const TestWorkflowTabs = ({ testData }: { testData?: WorkflowTestDataResponseDto }) => {
   const { environmentSlug = '', workflowSlug = '' } = useParams<{ environmentSlug: string; workflowSlug: string }>();
 
   const { workflow } = useFetchWorkflow({
@@ -29,8 +29,8 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
   });
   const [transactionId, setTransactionId] = useState<string>();
   const isNewActivityFeedEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ACTIVITY_FEED_ENABLED);
-  const to = useMemo(() => createMockObjectFromSchema(testData.to), [testData]);
-  const payload = useMemo(() => createMockObjectFromSchema(testData.payload), [testData]);
+  const to = useMemo(() => createMockObjectFromSchema(testData?.to ?? {}), [testData]);
+  const payload = useMemo(() => createMockObjectFromSchema(testData?.payload ?? {}), [testData]);
   const form = useForm<TestWorkflowFormType>({
     mode: 'onSubmit',
     resolver: zodResolver(buildDynamicFormSchema({ to: testData?.to ?? {} })),

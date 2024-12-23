@@ -5,7 +5,7 @@ import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { flattenObjectValues } from '../../util/utils';
 import { pathsToObject } from '../../util/path-to-object';
 import { extractLiquidTemplateVariables } from '../../util/template-parser/liquid-parser';
-import { convertJsonToSchemaWithDefaults } from '../../util/jsonToSchema';
+import { convertJsonToSchemaWithDefaults, emptyJsonSchema } from '../../util/jsonToSchema';
 import { BuildPayloadSchemaCommand } from './build-payload-schema.command';
 import { transformMailyContentToLiquid } from '../generate-preview/transform-maily-content-to-liquid';
 import { isStringTipTapNode } from '../../util/tip-tap.util';
@@ -19,20 +19,12 @@ export class BuildPayloadSchema {
     const controlValues = await this.buildControlValues(command);
 
     if (!controlValues.length) {
-      return {
-        type: 'object',
-        properties: {},
-        additionalProperties: true,
-      };
+      return emptyJsonSchema();
     }
 
     const templateVars = await this.processControlValues(controlValues);
     if (templateVars.length === 0) {
-      return {
-        type: 'object',
-        properties: {},
-        additionalProperties: true,
-      };
+      return emptyJsonSchema();
     }
 
     const variablesExample = pathsToObject(templateVars, {
