@@ -1,20 +1,17 @@
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { autocompletion } from '@codemirror/autocomplete';
 
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { InputFieldPure } from '@/components/primitives/input';
 import { Code2 } from '@/components/icons/code-2';
-import { Editor } from '@/components/primitives/editor';
+import { FieldEditor } from '@/components/primitives/field-editor';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
-import { completions } from '@/utils/liquid-autocomplete';
 
 export const DigestKey = () => {
   const { control } = useFormContext();
   const { step } = useWorkflow();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
-  const extensions = useMemo(() => [autocompletion({ override: [completions(variables)] })], [variables]);
 
   return (
     <FormField
@@ -32,15 +29,14 @@ export const DigestKey = () => {
                 <span className="text-foreground-600 text-xs font-normal">subscriberId</span>
               </FormLabel>
               <FormControl>
-                <Editor
+                <FieldEditor
                   fontFamily="inherit"
-                  ref={field.ref}
                   placeholder="Add additional digest..."
-                  className="overflow-x-auto [&_.cm-line]:mt-px"
                   id={field.name}
-                  extensions={extensions}
                   value={field.value}
                   onChange={field.onChange}
+                  variables={variables}
+                  size="default"
                 />
               </FormControl>
             </InputFieldPure>

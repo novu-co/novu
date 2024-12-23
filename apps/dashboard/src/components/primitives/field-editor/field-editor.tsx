@@ -51,7 +51,7 @@ export const FieldEditor = ({
       const start = parseInt(pill.getAttribute('data-start') || '0');
       const end = parseInt(pill.getAttribute('data-end') || '0');
 
-      if (variable && start && end) {
+      if (variable && end) {
         requestAnimationFrame(() => {
           setSelectedVariable({ value: variable, from: start, to: end });
         });
