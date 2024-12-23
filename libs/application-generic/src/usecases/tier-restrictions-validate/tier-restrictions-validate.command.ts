@@ -1,17 +1,12 @@
-import {
-  IsEnum,
-  IsNumber,
-  IsOptional,
-  isString,
-  IsString,
-} from 'class-validator';
-
-import { DigestUnitEnum, StepTypeEnum } from '@novu/shared';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { StepTypeEnum } from '@novu/shared';
+import { Transform } from 'class-transformer';
 import { OrganizationLevelCommand } from '../../commands';
 
 export class TierRestrictionsValidateCommand extends OrganizationLevelCommand {
-  @IsString()
   @IsOptional()
+  @Transform(({ value }) => (value ? String(value) : value))
+  @IsString()
   amount?: string;
 
   @IsString()

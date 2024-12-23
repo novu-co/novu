@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import * as Sentry from '@sentry/react';
+import isEqual from 'lodash.isequal';
 
 import { usePreviewStep } from '@/hooks/use-preview-step';
 import { useDataRef } from '@/hooks/use-data-ref';
@@ -20,7 +21,10 @@ export const useEditorPreview = ({
     isPending: isPreviewPending,
   } = usePreviewStep({
     onSuccess: (res) => {
-      setEditorValue(JSON.stringify(res.previewPayloadExample, null, 2));
+      const newValue = JSON.stringify(res.previewPayloadExample, null, 2);
+      if (!isEqual(editorValue, newValue)) {
+        setEditorValue(newValue);
+      }
     },
     onError: (error) => {
       Sentry.captureException(error);
