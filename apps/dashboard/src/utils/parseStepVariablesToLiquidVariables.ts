@@ -33,7 +33,6 @@ export function parseStepVariables(schema: JSONSchemaDefinition): ParsedVariable
           type: 'variable',
           label: path,
         });
-        return;
       }
 
       if (!obj.properties) return;

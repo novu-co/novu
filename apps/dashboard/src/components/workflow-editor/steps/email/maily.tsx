@@ -97,6 +97,7 @@ export const Maily = (props: MailyProps) => {
                   variableTriggerCharacter="{{"
                   variables={({ query, editor, from }) => {
                     const queryWithoutSuffix = query.replace(/}+$/, '');
+                    const filteredVariables: { name: string; required: boolean }[] = [];
 
                     function addInlineVariable() {
                       if (!query.endsWith('}}')) {
@@ -121,9 +122,7 @@ export const Maily = (props: MailyProps) => {
                       });
                     }
 
-                    const filteredVariables: { name: string; required: boolean }[] = [];
-
-                    if (from === 'for') {
+                    if (from === 'for-variable') {
                       filteredVariables.push(...arrays, ...namespaces);
                       if (namespaces.some((namespace) => queryWithoutSuffix.includes(namespace.name))) {
                         filteredVariables.push({ name: queryWithoutSuffix, required: false });
@@ -142,7 +141,9 @@ export const Maily = (props: MailyProps) => {
                       filteredVariables.push({ name: queryWithoutSuffix, required: false });
                     }
 
-                    addInlineVariable();
+                    if (from === 'content-variable') {
+                      addInlineVariable();
+                    }
                     return dedupAndSortVariables(filteredVariables, queryWithoutSuffix);
                   }}
                   contentJson={field.value ? JSON.parse(field.value) : undefined}
