@@ -53,12 +53,6 @@ export const Maily = (props: MailyProps) => {
   const isForBlockEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_EMAIL_FOR_BLOCK_ENABLED);
   const isShowEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_EMAIL_SHOW_ENABLED);
 
-  /* 
-button:has(.lucide-eye) {
-  display: none;
-}
-  */
-
   return (
     <FormField
       control={control}
