@@ -13,22 +13,6 @@ import {
 import { Period } from '@/components/workflow-editor/steps/digest/period';
 import { NumbersPicker } from '@/components/workflow-editor/steps/digest/numbers-picker';
 import { DaysOfWeek } from '@/components/workflow-editor/steps/digest/days-of-week';
-import { MultiSelect } from '@/components/primitives/multi-select';
-
-const MONTHS_OPTIONS = [
-  { value: 1, label: 'January' },
-  { value: 2, label: 'February' },
-  { value: 3, label: 'March' },
-  { value: 4, label: 'April' },
-  { value: 5, label: 'May' },
-  { value: 6, label: 'June' },
-  { value: 7, label: 'July' },
-  { value: 8, label: 'August' },
-  { value: 9, label: 'September' },
-  { value: 10, label: 'October' },
-  { value: 11, label: 'November' },
-  { value: 12, label: 'December' },
-];
 
 export const ScheduledDigest = ({
   value,
@@ -94,24 +78,7 @@ export const ScheduledDigest = ({
         <Period value={period} onPeriodChange={handlePeriodChange} isDisabled={isDisabled} />
       </div>
       {period !== PeriodValues.HOUR && period !== PeriodValues.MONTH && <span className="min-w-full" />}
-      {period === PeriodValues.YEAR && (
-        <div className="flex items-center gap-1">
-          <span className="text-foreground-600 text-xs font-medium">in</span>
-          <MultiSelect
-            className="w-[150px]"
-            values={month}
-            options={MONTHS_OPTIONS}
-            placeholder="Every month"
-            placeholderAll="Every month"
-            placeholderSelected="months"
-            isDisabled={isDisabled}
-            onValuesChange={(value) => {
-              handleValueChange({ month: value });
-            }}
-          />
-        </div>
-      )}
-      {(period === PeriodValues.YEAR || period === PeriodValues.MONTH) && (
+      {period === PeriodValues.MONTH && (
         <div className="ml-auto flex items-center gap-1">
           <span className="text-foreground-600 text-xs font-medium">on</span>
           <NumbersPicker
@@ -124,7 +91,7 @@ export const ScheduledDigest = ({
           />
         </div>
       )}
-      {(period === PeriodValues.YEAR || period === PeriodValues.MONTH || period === PeriodValues.WEEK) && (
+      {(period === PeriodValues.MONTH || period === PeriodValues.WEEK) && (
         <div className="col-span-2 flex min-w-full items-center gap-1">
           <span className="text-foreground-600 text-xs font-medium">and</span>
           <DaysOfWeek

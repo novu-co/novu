@@ -1,57 +1,43 @@
-import { ActivityPanel } from '@/components/activity/activity-panel';
 import { useEffect, useState } from 'react';
-import { JobStatusEnum } from '@novu/shared';
 import { Loader2 } from 'lucide-react';
+
+import { ActivityPanel } from '@/components/activity/activity-panel';
 import { WorkflowTriggerInboxIllustration } from '../../icons/workflow-trigger-inbox';
 import { useFetchActivities } from '../../../hooks/use-fetch-activities';
-import { QueryKeys } from '../../../utils/query-keys';
-import { useEnvironment } from '../../../context/environment/hooks';
-import { useQueryClient } from '@tanstack/react-query';
 
 type TestWorkflowLogsSidebarProps = {
   transactionId?: string;
 };
 
 export const TestWorkflowLogsSidebar = ({ transactionId }: TestWorkflowLogsSidebarProps) => {
-  const queryClient = useQueryClient();
-  const { currentEnvironment } = useEnvironment();
+  const [parentActivityId, setParentActivityId] = useState<string | undefined>(undefined);
   const [shouldRefetch, setShouldRefetch] = useState(true);
   const { activities } = useFetchActivities(
     {
       filters: transactionId ? { transactionId } : undefined,
     },
     {
-      enabled: transactionId !== undefined,
+      enabled: !!transactionId,
       refetchInterval: shouldRefetch ? 1000 : false,
     }
   );
+  const activityId: string | undefined = parentActivityId ?? activities?.[0]?._id;
 
   useEffect(() => {
-    if (!activities?.length) return;
-
-    const activity = activities[0];
-    const isPending = activity.jobs?.some(
-      (job) =>
-        job.status === JobStatusEnum.PENDING ||
-        job.status === JobStatusEnum.QUEUED ||
-        job.status === JobStatusEnum.RUNNING ||
-        job.status === JobStatusEnum.DELAYED
-    );
-
-    // Only stop refetching if we have an activity and it's not pending
-    setShouldRefetch(isPending || !activity?.jobs?.length);
-
-    queryClient.invalidateQueries({
-      queryKey: [QueryKeys.fetchActivity, currentEnvironment?._id, activity._id],
-    });
-  }, [activities]);
+    if (activityId) {
+      setShouldRefetch(false);
+    }
+  }, [activityId]);
 
   // Reset refetch when transaction ID changes
   useEffect(() => {
-    setShouldRefetch(true);
-  }, [transactionId]);
+    if (!transactionId) {
+      return;
+    }
 
-  const activityId = activities?.[0]?._id;
+    setShouldRefetch(true);
+    setParentActivityId(undefined);
+  }, [transactionId]);
 
   return (
     <aside className="flex h-full w-[500px] flex-col border-l">
@@ -65,7 +51,7 @@ export const TestWorkflowLogsSidebar = ({ transactionId }: TestWorkflowLogsSideb
       ) : activityId ? (
         <ActivityPanel
           activityId={activityId}
-          onActivitySelect={() => {}}
+          onActivitySelect={setParentActivityId}
           headerClassName="h-[49px]"
           overviewHeaderClassName="border-t-0"
         />

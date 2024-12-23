@@ -14,22 +14,15 @@ export class DigestOutputRendererUsecase {
   @InstrumentUsecase()
   execute(renderCommand: RenderCommand): DigestRenderOutput {
     const parse: DigestControlSchemaType = digestControlZodSchema.parse(renderCommand.controlValues);
-    if (
-      isDigestRegularControl(parse) &&
-      parse.amount &&
-      parse.unit &&
-      parse.lookBackWindow &&
-      parse.lookBackWindow.amount &&
-      parse.lookBackWindow.unit
-    ) {
+    if (isDigestRegularControl(parse) && parse.amount && parse.unit) {
       return {
         amount: parse.amount as number,
         unit: parse.unit,
         digestKey: parse.digestKey,
-        lookBackWindow: {
+        ...(parse.lookBackWindow && {
           amount: parse.lookBackWindow.amount,
           unit: parse.lookBackWindow.unit,
-        },
+        }),
       };
     }
     if (isDigestTimedControl(parse) && parse.cron) {
