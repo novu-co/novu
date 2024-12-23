@@ -1,6 +1,7 @@
 import { EditorView, ViewPlugin, Decoration, DecorationSet } from '@uiw/react-codemirror';
-import { useMemo, useState, useRef, useEffect, useCallback, ChangeEvent } from 'react';
+import { useMemo, useState, useRef, useEffect, useCallback, ChangeEvent, DragEvent } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { motion, AnimatePresence } from 'motion/react';
 
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
@@ -53,6 +54,8 @@ const VariablePopover = ({ variable, onClose, onUpdate }: VariablePopoverProps) 
   const [transformers, setTransformers] = useState<string[]>(initialTransformers);
   const updateTimeoutRef = useRef<NodeJS.Timeout>();
   const isUpdatingRef = useRef(false);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [draggingItem, setDraggingItem] = useState<number | null>(null);
 
   // Debounced update function
   const debouncedUpdate = useCallback(
@@ -154,38 +157,91 @@ const VariablePopover = ({ variable, onClose, onUpdate }: VariablePopoverProps) 
           {/* Selected transformers with drag handles */}
           {transformers.length > 0 && (
             <div className="flex flex-col gap-0.5 rounded-md border p-1">
-              {transformers.map((value, index) => {
-                const transformer = TRANSFORMERS.find((t) => t.value === value);
-                return (
-                  <div
-                    key={value}
-                    className="bg-secondary hover:bg-secondary/80 group flex cursor-move items-center gap-1.5 rounded px-1.5 py-0.5 text-sm"
-                    draggable
-                    onDragStart={(e) => {
-                      e.dataTransfer.setData('text/plain', index.toString());
-                    }}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                    }}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
-                      moveTransformer(fromIndex, index);
-                    }}
-                  >
-                    <GripVertical className="text-muted-foreground/50 group-hover:text-muted-foreground h-3 w-3" />
-                    <span className="flex-1">{transformer?.label}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="hover:bg-destructive/90 hover:text-destructive-foreground h-5 px-1.5"
-                      onClick={() => handleTransformerToggle(value)}
+              <AnimatePresence>
+                {transformers.map((value, index) => {
+                  const transformer = TRANSFORMERS.find((t) => t.value === value);
+                  return (
+                    <motion.div
+                      key={value}
+                      className="relative"
+                      layout
+                      transition={{
+                        layout: { duration: 0.2, ease: 'easeOut' },
+                      }}
                     >
-                      ×
-                    </Button>
-                  </div>
-                );
-              })}
+                      {dragOverIndex === index && (
+                        <motion.div
+                          className="bg-primary absolute -top-[2px] left-0 right-0 h-[2px]"
+                          layoutId="dropIndicator"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                          transition={{ duration: 0.15 }}
+                        />
+                      )}
+                      <motion.div
+                        className={`bg-secondary hover:bg-secondary/80 group flex cursor-move items-center gap-1.5 rounded px-1.5 py-0.5 text-sm ${
+                          draggingItem === index ? 'ring-primary opacity-50 ring-2 ring-offset-1' : ''
+                        }`}
+                        draggable
+                        onDragStart={(e: DragEvent<HTMLDivElement>) => {
+                          e.dataTransfer.setData('text/plain', index.toString());
+                          setDraggingItem(index);
+                        }}
+                        onDragEnd={() => {
+                          setDraggingItem(null);
+                          setDragOverIndex(null);
+                        }}
+                        onDragOver={(e: DragEvent<HTMLDivElement>) => {
+                          e.preventDefault();
+                          if (dragOverIndex !== index) {
+                            setDragOverIndex(index);
+                          }
+                        }}
+                        onDragLeave={(e: DragEvent<HTMLDivElement>) => {
+                          const relatedTarget = e.relatedTarget as HTMLElement;
+                          if (!e.currentTarget.contains(relatedTarget)) {
+                            setDragOverIndex(null);
+                          }
+                        }}
+                        onDrop={(e: DragEvent<HTMLDivElement>) => {
+                          e.preventDefault();
+                          const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                          if (fromIndex !== index) {
+                            moveTransformer(fromIndex, index);
+                          }
+                          setDragOverIndex(null);
+                          setDraggingItem(null);
+                        }}
+                        animate={draggingItem === index ? { scale: 1.02 } : { scale: 1 }}
+                        whileHover={{ scale: 1.01 }}
+                        transition={{ duration: 0.15 }}
+                      >
+                        <GripVertical className="text-muted-foreground/50 group-hover:text-muted-foreground h-3 w-3" />
+                        <span className="flex-1">{transformer?.label}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="hover:bg-destructive/90 hover:text-destructive-foreground h-5 px-1.5"
+                          onClick={() => handleTransformerToggle(value)}
+                        >
+                          ×
+                        </Button>
+                      </motion.div>
+                      {dragOverIndex === index + 1 && (
+                        <motion.div
+                          className="bg-primary absolute -bottom-[2px] left-0 right-0 h-[2px]"
+                          layoutId="dropIndicator"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.8 }}
+                          transition={{ duration: 0.15 }}
+                        />
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
             </div>
           )}
 
