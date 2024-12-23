@@ -34,11 +34,7 @@ export const PushEditorPreview = ({
             className="w-full px-3"
           />
         </div>
-        <ConfigurePreviewAccordion
-          editorValue={editorValue}
-          setEditorValue={setEditorValue}
-          previewStep={previewStep}
-        />
+        <ConfigurePreviewAccordion editorValue={editorValue} setEditorValue={setEditorValue} onUpdate={previewStep} />
       </div>
     </TabsSection>
   );

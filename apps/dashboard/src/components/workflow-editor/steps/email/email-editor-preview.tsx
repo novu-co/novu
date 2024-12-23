@@ -84,11 +84,7 @@ export const EmailEditorPreview = ({
           </>
         )}
         <EmailTabsSection>
-          <ConfigurePreviewAccordion
-            editorValue={editorValue}
-            setEditorValue={setEditorValue}
-            previewStep={previewStep}
-          />
+          <ConfigurePreviewAccordion editorValue={editorValue} setEditorValue={setEditorValue} onUpdate={previewStep} />
         </EmailTabsSection>
       </div>
     </Tabs>

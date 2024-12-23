@@ -27,11 +27,7 @@ export const InAppEditorPreview = ({
           In-App template editor
         </div>
         <InboxPreview isPreviewPending={isPreviewPending} previewData={previewData} />
-        <ConfigurePreviewAccordion
-          editorValue={editorValue}
-          setEditorValue={setEditorValue}
-          previewStep={previewStep}
-        />
+        <ConfigurePreviewAccordion editorValue={editorValue} setEditorValue={setEditorValue} onUpdate={previewStep} />
       </div>
     </InAppTabsSection>
   );

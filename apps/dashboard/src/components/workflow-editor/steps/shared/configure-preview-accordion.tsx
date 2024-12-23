@@ -7,16 +7,16 @@ import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 
 const extensions = [loadLanguage('json')?.extension ?? []];
 
-interface ConfigurePreviewAccordionProps {
+type ConfigurePreviewAccordionProps = {
   editorValue: string;
   setEditorValue: (value: string) => void;
-  previewStep: () => void;
-}
+  onUpdate: () => void;
+};
 
 export const ConfigurePreviewAccordion = ({
   editorValue,
   setEditorValue,
-  previewStep,
+  onUpdate,
 }: ConfigurePreviewAccordionProps) => {
   const [accordionValue, setAccordionValue] = useState<string | undefined>('payload');
   const [payloadError, setPayloadError] = useState('');
@@ -63,7 +63,7 @@ export const ConfigurePreviewAccordion = ({
             className="self-end"
             onClick={() => {
               try {
-                previewStep();
+                onUpdate();
                 setPayloadError('');
               } catch (e) {
                 setPayloadError(String(e));
