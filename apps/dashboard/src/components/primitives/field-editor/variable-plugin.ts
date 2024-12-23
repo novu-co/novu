@@ -1,34 +1,9 @@
-import { EditorView, ViewPlugin, Decoration, DecorationSet, WidgetType } from '@uiw/react-codemirror';
+import { EditorView, ViewPlugin, Decoration, DecorationSet } from '@uiw/react-codemirror';
 import { MutableRefObject } from 'react';
 
 interface PluginState {
   viewRef: MutableRefObject<EditorView | null>;
   lastCompletionRef: MutableRefObject<{ from: number; to: number } | null>;
-}
-
-class CursorWidget extends WidgetType {
-  toDOM() {
-    const dom = document.createElement('span');
-    dom.className = 'cm-cursor-target';
-    dom.style.display = 'inline-block';
-    dom.style.width = '4px';
-    dom.style.height = '1em';
-    dom.textContent = '\u200B'; // Zero-width space to ensure cursor visibility
-    return dom;
-  }
-
-  eq(other: CursorWidget) {
-    return true;
-  }
-  updateDOM(dom: HTMLElement) {
-    return true;
-  }
-  get estimatedHeight() {
-    return -1;
-  }
-  ignoreEvent() {
-    return false;
-  }
 }
 
 export function createVariablePlugin({ viewRef, lastCompletionRef }: PluginState) {
@@ -105,14 +80,6 @@ export function createVariablePlugin({ viewRef, lastCompletionRef }: PluginState
               Decoration.mark({
                 class: 'cm-bracket',
               }).range(end - 2, end)
-            );
-
-            // Add a widget after each variable pill
-            decorations.push(
-              Decoration.widget({
-                widget: new CursorWidget(),
-                side: 1,
-              }).range(end)
             );
           }
         }
