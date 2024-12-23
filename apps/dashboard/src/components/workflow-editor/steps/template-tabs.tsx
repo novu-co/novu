@@ -1,6 +1,7 @@
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { RiEdit2Line, RiPencilRuler2Line } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
 
 import { Notification5Fill } from '@/components/icons';
 import { Button } from '@/components/primitives/button';
@@ -12,10 +13,25 @@ interface TemplateTabsProps {
   previewContent?: React.ReactNode;
   tabsValue: string;
   onTabChange: (tab: string) => void;
+  previewStep?: () => void;
 }
 
-export const TemplateTabs = ({ editorContent, previewContent, tabsValue, onTabChange }: TemplateTabsProps) => {
+export const TemplateTabs = ({
+  editorContent,
+  previewContent,
+  tabsValue,
+  onTabChange,
+  previewStep,
+}: TemplateTabsProps) => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // We reload the preview when the tab changes to get the latest values
+    if (tabsValue === 'preview') {
+      previewStep?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tabsValue]);
 
   return (
     <Tabs defaultValue="editor" value={tabsValue} onValueChange={onTabChange} className="flex h-full flex-1 flex-col">

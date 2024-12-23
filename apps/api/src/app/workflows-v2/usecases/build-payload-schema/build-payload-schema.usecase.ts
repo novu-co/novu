@@ -5,7 +5,6 @@ import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { flattenObjectValues } from '../../util/utils';
 import { pathsToObject } from '../../util/path-to-object';
 import { extractLiquidTemplateVariables } from '../../util/template-parser/liquid-parser';
-import { convertJsonToSchemaWithDefaults } from '../../util/jsonToSchema';
 import { BuildPayloadSchemaCommand } from './build-payload-schema.command';
 import { transformMailyContentToLiquid } from '../generate-preview/transform-maily-content-to-liquid';
 import { isStringTipTapNode } from '../../util/tip-tap.util';
@@ -16,34 +15,13 @@ export class BuildPayloadSchema {
 
   @InstrumentUsecase()
   async execute(command: BuildPayloadSchemaCommand): Promise<JSONSchemaDto> {
-    const controlValues = await this.buildControlValues(command);
+    const controlValues = await this.getControlValues(command);
+    const extractedVariables = await this.extractAllVariables(controlValues);
 
-    if (!controlValues.length) {
-      return {
-        type: 'object',
-        properties: {},
-        additionalProperties: true,
-      };
-    }
-
-    const templateVars = await this.processControlValues(controlValues);
-    if (templateVars.length === 0) {
-      return {
-        type: 'object',
-        properties: {},
-        additionalProperties: true,
-      };
-    }
-
-    const variablesExample = pathsToObject(templateVars, {
-      valuePrefix: '{{',
-      valueSuffix: '}}',
-    }).payload;
-
-    return convertJsonToSchemaWithDefaults(variablesExample);
+    return this.buildVariablesSchema(extractedVariables);
   }
 
-  private async buildControlValues(command: BuildPayloadSchemaCommand) {
+  private async getControlValues(command: BuildPayloadSchemaCommand) {
     let controlValues = command.controlValues ? [command.controlValues] : [];
 
     if (!controlValues.length) {
@@ -64,15 +42,15 @@ export class BuildPayloadSchema {
       ).map((item) => item.controls);
     }
 
-    return controlValues;
+    return controlValues.flat();
   }
 
   @Instrument()
-  private async processControlValues(controlValues: Record<string, unknown>[]): Promise<string[]> {
+  private async extractAllVariables(controlValues: Record<string, unknown>[]): Promise<string[]> {
     const allVariables: string[] = [];
 
     for (const controlValue of controlValues) {
-      const processedControlValue = await this.processControlValue(controlValue);
+      const processedControlValue = await this.extractVariables(controlValue);
       const controlValuesString = flattenObjectValues(processedControlValue).join(' ');
       const templateVariables = extractLiquidTemplateVariables(controlValuesString);
       allVariables.push(...templateVariables.validVariables.map((variable) => variable.name));
@@ -82,7 +60,7 @@ export class BuildPayloadSchema {
   }
 
   @Instrument()
-  private async processControlValue(controlValue: Record<string, unknown>): Promise<Record<string, unknown>> {
+  private async extractVariables(controlValue: Record<string, unknown>): Promise<Record<string, unknown>> {
     const processedValue: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(controlValue)) {
@@ -94,5 +72,69 @@ export class BuildPayloadSchema {
     }
 
     return processedValue;
+  }
+
+  private async buildVariablesSchema(variables: string[]) {
+    // TODO: Update typings in this as .payload can be null or undefined
+    const variablesObject = pathsToObject(variables, {
+      valuePrefix: '{{',
+      valueSuffix: '}}',
+    }).payload;
+
+    const schema: JSONSchemaDto = {
+      type: 'object',
+      properties: {},
+      required: [],
+      additionalProperties: true,
+    };
+
+    if (variablesObject) {
+      for (const [key, value] of Object.entries(variablesObject)) {
+        if (schema.properties && schema.required) {
+          schema.properties[key] = determineSchemaType(value);
+          schema.required.push(key);
+        }
+      }
+    }
+
+    return schema;
+  }
+}
+
+function determineSchemaType(value: unknown): JSONSchemaDto {
+  if (value === null) {
+    return { type: 'null' };
+  }
+
+  if (Array.isArray(value)) {
+    return {
+      type: 'array',
+      items: value.length > 0 ? determineSchemaType(value[0]) : { type: 'null' },
+    };
+  }
+
+  switch (typeof value) {
+    case 'string':
+      return { type: 'string', default: value };
+    case 'number':
+      return { type: 'number', default: value };
+    case 'boolean':
+      return { type: 'boolean', default: value };
+    case 'object':
+      return {
+        type: 'object',
+        properties: Object.entries(value).reduce(
+          (acc, [key, val]) => {
+            acc[key] = determineSchemaType(val);
+
+            return acc;
+          },
+          {} as { [key: string]: JSONSchemaDto }
+        ),
+        required: Object.keys(value),
+      };
+
+    default:
+      return { type: 'null' };
   }
 }

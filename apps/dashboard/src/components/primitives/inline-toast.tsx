@@ -41,7 +41,7 @@ export interface InlineToastProps
   title?: string;
   description?: string | React.ReactNode;
   ctaLabel?: string;
-  onCtaClick?: () => void;
+  onCtaClick?: React.MouseEventHandler<HTMLButtonElement>;
   isCtaLoading?: boolean;
   ctaClassName?: string;
 }

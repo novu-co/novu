@@ -43,7 +43,7 @@ class DigestRegularOutput {
   amount: number;
   unit: TimeUnitEnum;
   digestKey?: string;
-  lookBackWindow: {
+  lookBackWindow?: {
     amount: number;
     unit: TimeUnitEnum;
   };

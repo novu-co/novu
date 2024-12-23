@@ -6,6 +6,7 @@ import { EmailEditorPreview } from '@/components/workflow-editor/steps/email/ema
 import { CustomStepControls } from '../controls/custom-step-controls';
 import { StepEditorProps } from '@/components/workflow-editor/steps/configure-step-template-form';
 import { TemplateTabs } from '@/components/workflow-editor/steps/template-tabs';
+import { useEditorPreview } from '../use-editor-preview';
 
 export const EmailTabs = (props: StepEditorProps) => {
   const { workflow, step } = props;
@@ -16,6 +17,12 @@ export const EmailTabs = (props: StepEditorProps) => {
   const isNovuCloud = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && uiSchema;
   const isExternal = workflow.origin === WorkflowOriginEnum.EXTERNAL;
 
+  const { editorValue, setEditorValue, previewStep, previewData, isPreviewPending } = useEditorPreview({
+    workflowSlug: workflow.workflowId,
+    stepSlug: step.stepId,
+    controlValues: form.getValues(),
+  });
+
   const editorContent = (
     <>
       {isNovuCloud && <EmailEditor uiSchema={uiSchema} />}
@@ -23,10 +30,19 @@ export const EmailTabs = (props: StepEditorProps) => {
     </>
   );
 
-  const previewContent = <EmailEditorPreview workflow={workflow} step={step} formValues={form.getValues()} />;
+  const previewContent = (
+    <EmailEditorPreview
+      editorValue={editorValue}
+      setEditorValue={setEditorValue}
+      previewStep={previewStep}
+      previewData={previewData}
+      isPreviewPending={isPreviewPending}
+    />
+  );
 
   return (
     <TemplateTabs
+      previewStep={previewStep}
       editorContent={editorContent}
       previewContent={previewContent}
       tabsValue={tabsValue}

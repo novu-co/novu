@@ -4,7 +4,7 @@ import { InstrumentUsecase } from '@novu/application-generic';
 import { RenderCommand } from './render-command';
 import {
   DigestControlSchemaType,
-  DigestControlZodSchema,
+  digestControlZodSchema,
   isDigestRegularControl,
   isDigestTimedControl,
 } from '../../../workflows-v2/shared/schemas/digest-control.schema';
@@ -13,23 +13,16 @@ import {
 export class DigestOutputRendererUsecase {
   @InstrumentUsecase()
   execute(renderCommand: RenderCommand): DigestRenderOutput {
-    const parse: DigestControlSchemaType = DigestControlZodSchema.parse(renderCommand.controlValues);
-    if (
-      isDigestRegularControl(parse) &&
-      parse.amount &&
-      parse.unit &&
-      parse.lookBackWindow &&
-      parse.lookBackWindow.amount &&
-      parse.lookBackWindow.unit
-    ) {
+    const parse: DigestControlSchemaType = digestControlZodSchema.parse(renderCommand.controlValues);
+    if (isDigestRegularControl(parse) && parse.amount && parse.unit) {
       return {
         amount: parse.amount as number,
         unit: parse.unit,
         digestKey: parse.digestKey,
-        lookBackWindow: {
+        ...(parse.lookBackWindow && {
           amount: parse.lookBackWindow.amount,
           unit: parse.lookBackWindow.unit,
-        },
+        }),
       };
     }
     if (isDigestTimedControl(parse) && parse.cron) {

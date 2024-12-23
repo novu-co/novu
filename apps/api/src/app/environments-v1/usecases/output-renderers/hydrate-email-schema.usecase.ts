@@ -15,7 +15,9 @@ export class HydrateEmailSchemaUseCase {
       nestedForPlaceholders: {},
       regularPlaceholdersToDefaultValue: {},
     };
-    const emailEditorSchema: TipTapNode = TipTapSchema.parse(JSON.parse(command.emailEditor));
+
+    // TODO: Aligned Zod inferred type and TipTapNode to remove the need of a type assertion
+    const emailEditorSchema: TipTapNode = TipTapSchema.parse(JSON.parse(command.emailEditor)) as TipTapNode;
     if (emailEditorSchema.content) {
       this.transformContentInPlace(emailEditorSchema.content, command.fullPayloadForRender, placeholderAggregation);
     }
@@ -117,10 +119,8 @@ export class HydrateEmailSchemaUseCase {
     node,
     placeholderAggregation: PlaceholderAggregation
   ) {
-    const { fallback } = node.attrs;
-    const variableName = node.attrs.id;
-    const buildLiquidJSDefault = (mailyFallback: string) => (mailyFallback ? ` | default: '${mailyFallback}'` : '');
-    const finalValue = `{{ ${variableName} ${buildLiquidJSDefault(fallback)} }}`;
+    const { fallback, id: variableName } = node.attrs;
+    const finalValue = buildLiquidJSDefault(variableName, fallback);
 
     placeholderAggregation.regularPlaceholdersToDefaultValue[`{{${node.attrs.id}}}`] = finalValue;
 
@@ -228,9 +228,24 @@ export class HydrateEmailSchemaUseCase {
   }
 }
 
-export const TipTapSchema = z.object({
-  type: z.string().optional(),
-  content: z.array(z.lazy(() => TipTapSchema)).optional(),
-  text: z.string().optional(),
-  attrs: z.record(z.unknown()).optional(),
-});
+export const TipTapSchema = z
+  .object({
+    type: z.string().optional(),
+    content: z.array(z.lazy(() => TipTapSchema)).optional(),
+    text: z.string().optional(),
+    marks: z
+      .array(
+        z
+          .object({
+            type: z.string(),
+            attrs: z.record(z.any()).optional(),
+          })
+          .passthrough()
+      )
+      .optional(),
+    attrs: z.record(z.unknown()).optional(),
+  })
+  .passthrough();
+
+const buildLiquidJSDefault = (variableName: string, fallback?: string) =>
+  `{{ ${variableName}${fallback ? ` | default: '${fallback}'` : ''} }}`;

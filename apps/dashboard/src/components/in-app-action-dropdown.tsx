@@ -51,7 +51,7 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <div className={cn('mt-3 flex items-center gap-1')}>
           <div className="border-neutral-alpha-200 relative flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
             {!primaryAction && !secondaryAction && (
@@ -168,7 +168,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
   );
 
   return (
-    <Popover modal={true}>
+    <Popover>
       <PopoverTrigger {...rest} />
       <PopoverContent className="max-w-72" side="bottom" align="end">
         <div className="flex flex-col gap-3">

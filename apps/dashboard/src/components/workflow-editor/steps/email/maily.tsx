@@ -1,6 +1,7 @@
 import { FormControl, FormField, FormMessage } from '@/components/primitives/form/form';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { parseStepVariables } from '@/utils/parseStepVariablesToLiquidVariables';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { cn } from '@/utils/ui';
 import { Editor } from '@maily-to/core';
 import {
@@ -20,6 +21,7 @@ import {
   spacer,
   text,
 } from '@maily-to/core/blocks';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 import type { Editor as TiptapEditor } from '@tiptap/core';
 import { HTMLAttributes, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -48,6 +50,9 @@ export const Maily = (props: MailyProps) => {
   const [_, setEditor] = useState<TiptapEditor>();
   const { control } = useFormContext();
 
+  const isForBlockEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_EMAIL_FOR_BLOCK_ENABLED);
+  const isShowEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_EMAIL_SHOW_ENABLED);
+
   return (
     <FormField
       control={control}
@@ -55,9 +60,17 @@ export const Maily = (props: MailyProps) => {
       render={({ field }) => {
         return (
           <>
+            {!isShowEnabled && (
+              <style>{`
+                  button:has(.lucide-eye) {
+                    display: none;
+                  }
+                `}</style>
+            )}
             <div className={cn('mx-auto flex h-full flex-col items-start', className)} {...rest}>
               <FormControl>
                 <Editor
+                  key={isForBlockEnabled ? 'for-block-enabled' : 'for-block-disabled'}
                   config={{
                     hasMenuBar: false,
                     wrapClassName: 'min-h-0 max-h-full flex flex-col w-full h-full overflow-y-auto',
@@ -74,7 +87,7 @@ export const Maily = (props: MailyProps) => {
                     image,
                     section,
                     columns,
-                    forLoop,
+                    ...(isForBlockEnabled ? [forLoop] : []),
                     divider,
                     spacer,
                     button,
@@ -84,8 +97,9 @@ export const Maily = (props: MailyProps) => {
                   variableTriggerCharacter="{{"
                   variables={({ query, editor, from }) => {
                     const queryWithoutSuffix = query.replace(/}+$/, '');
+                    const filteredVariables: { name: string; required: boolean }[] = [];
 
-                    const autoAddVariable = () => {
+                    function addInlineVariable() {
                       if (!query.endsWith('}}')) {
                         return;
                       }
@@ -98,19 +112,23 @@ export const Maily = (props: MailyProps) => {
                       editor?.commands.deleteRange({ from, to });
                       editor?.commands.insertContent({
                         type: 'variable',
-                        attrs: { id: queryWithoutSuffix, label: null, fallback: null, showIfKey: null },
+                        attrs: {
+                          id: queryWithoutSuffix,
+                          label: null,
+                          fallback: null,
+                          showIfKey: null,
+                          required: false,
+                        },
                       });
-                    };
+                    }
 
-                    const filteredVariables: { name: string; required: boolean }[] = [];
-
-                    if (from === 'for') {
+                    if (from === 'for-variable') {
                       filteredVariables.push(...arrays, ...namespaces);
                       if (namespaces.some((namespace) => queryWithoutSuffix.includes(namespace.name))) {
                         filteredVariables.push({ name: queryWithoutSuffix, required: false });
                       }
 
-                      autoAddVariable();
+                      addInlineVariable();
                       return dedupAndSortVariables(filteredVariables, queryWithoutSuffix);
                     }
 
@@ -123,7 +141,9 @@ export const Maily = (props: MailyProps) => {
                       filteredVariables.push({ name: queryWithoutSuffix, required: false });
                     }
 
-                    autoAddVariable();
+                    if (from === 'content-variable') {
+                      addInlineVariable();
+                    }
                     return dedupAndSortVariables(filteredVariables, queryWithoutSuffix);
                   }}
                   contentJson={field.value ? JSON.parse(field.value) : undefined}

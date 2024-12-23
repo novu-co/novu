@@ -21,6 +21,7 @@ export const CustomerSupportButton = () => {
         window?.Plain?.init({
           appId: PLAIN_SUPPORT_CHAT_APP_ID,
           hideLauncher: true,
+          hideBranding: true,
           title: 'Chat with us',
           links: [
             {
@@ -44,6 +45,7 @@ export const CustomerSupportButton = () => {
           customerDetails: {
             email: currentUser?.email,
             emailHash: currentUser?.servicesHashes?.plain,
+            externalId: currentUser?._id,
           },
           style: {
             brandColor: '#DD2450',
