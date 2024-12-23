@@ -1,5 +1,5 @@
 import { EditorView, ViewPlugin, Decoration, DecorationSet } from '@uiw/react-codemirror';
-import { useMemo, useState, useRef } from 'react';
+import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
@@ -45,13 +45,58 @@ const VariablePopover = ({ variable, onClose, onUpdate }: VariablePopoverProps) 
     // Get all transformers
     const transforms = rest.filter((part) => TRANSFORMERS.some((t) => t.value === part.trim()));
 
-    console.log('Parsed variable:', { name, defaultVal, transforms, parts });
     return [name, defaultVal, transforms];
   }, [variable]);
 
   const [name, setName] = useState(variableName);
   const [defaultVal, setDefaultVal] = useState(defaultValue);
   const [transformers, setTransformers] = useState<string[]>(initialTransformers);
+  const updateTimeoutRef = useRef<NodeJS.Timeout>();
+  const isUpdatingRef = useRef(false);
+
+  // Debounced update function
+  const debouncedUpdate = useCallback(
+    (newName: string, newDefaultVal: string, newTransformers: string[]) => {
+      if (isUpdatingRef.current) return;
+
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+
+      updateTimeoutRef.current = setTimeout(() => {
+        try {
+          isUpdatingRef.current = true;
+
+          // Build the variable parts
+          const parts = [newName.trim()];
+
+          if (newDefaultVal) {
+            parts.push(`default: ${newDefaultVal.trim()}`);
+          }
+
+          // Add transformers in order
+          parts.push(...newTransformers);
+
+          // Join with proper spacing
+          const finalValue = parts.join(' | ');
+          onUpdate(finalValue);
+        } finally {
+          isUpdatingRef.current = false;
+        }
+      }, 300);
+    },
+    [onUpdate]
+  );
+
+  // Update when values change
+  useEffect(() => {
+    debouncedUpdate(name, defaultVal, transformers);
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+    };
+  }, [name, defaultVal, transformers, debouncedUpdate]);
 
   const handleTransformerToggle = (value: string) => {
     setTransformers((current) => {
@@ -69,22 +114,6 @@ const VariablePopover = ({ variable, onClose, onUpdate }: VariablePopoverProps) 
       newTransformers.splice(to, 0, removed);
       return newTransformers;
     });
-  };
-
-  const handleUpdate = () => {
-    let finalValue = name.trim();
-
-    if (defaultVal) {
-      finalValue += ` | default: ${defaultVal.trim()}`;
-    }
-
-    // Add all active transformers in order
-    transformers.forEach((t) => {
-      finalValue += ` | ${t}`;
-    });
-
-    console.log('Updating with value:', finalValue);
-    onUpdate(finalValue);
   };
 
   return (
@@ -168,12 +197,9 @@ const VariablePopover = ({ variable, onClose, onUpdate }: VariablePopoverProps) 
             </div>
           </div>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end">
             <Button variant="ghost" size="sm" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button size="sm" onClick={handleUpdate}>
-              Update
+              Close
             </Button>
           </div>
         </div>
@@ -235,12 +261,18 @@ export const EmailSubject = () => {
   const [selectedVariable, setSelectedVariable] = useState<{ value: string; from: number; to: number } | null>(null);
   const viewRef = useRef<EditorView | null>(null);
   const fieldRef = useRef<any>(null);
+  const isUpdatingRef = useRef(false);
 
-  const handleVariableClick = (e: MouseEvent, view: EditorView) => {
+  const handleVariableClick = useCallback((e: MouseEvent, view: EditorView) => {
+    if (isUpdatingRef.current) return;
+
     const target = e.target as HTMLElement;
     const pill = target.closest('.cm-variable-pill');
 
     if (pill instanceof HTMLElement) {
+      e.preventDefault();
+      e.stopPropagation();
+
       const variable = pill.getAttribute('data-variable');
       const start = parseInt(pill.getAttribute('data-start') || '0');
       const end = parseInt(pill.getAttribute('data-end') || '0');
@@ -250,10 +282,60 @@ export const EmailSubject = () => {
         setSelectedVariable({ value: variable, from: start, to: end });
       }
     }
-  };
+  }, []);
+
+  const handleVariableUpdate = useCallback(
+    (newValue: string) => {
+      if (!selectedVariable || !viewRef.current || !fieldRef.current || isUpdatingRef.current) {
+        console.log('Skipping update:', {
+          selectedVariable,
+          viewRef: !!viewRef.current,
+          fieldRef: !!fieldRef.current,
+          isUpdating: isUpdatingRef.current,
+        });
+        return;
+      }
+
+      try {
+        isUpdatingRef.current = true;
+        const { from, to } = selectedVariable;
+        const view = viewRef.current;
+
+        // Get the current content and ensure we're not duplicating
+        const currentContent = view.state.doc.toString();
+        const beforeContent = currentContent.slice(0, from);
+        const afterContent = currentContent.slice(to);
+
+        // Create the new variable text
+        const newVariableText = `{{${newValue}}}`;
+
+        // Create and dispatch the transaction
+        const changes = {
+          from,
+          to,
+          insert: newVariableText,
+        };
+
+        view.dispatch({
+          changes,
+          selection: { anchor: from + newVariableText.length },
+        });
+
+        // Get the updated content and trigger form update
+        const updatedContent = view.state.doc.toString();
+        fieldRef.current.onChange(updatedContent);
+
+        // Update the selected variable with new bounds
+        setSelectedVariable((prev) => (prev ? { ...prev, value: newValue, to: from + newVariableText.length } : null));
+      } finally {
+        isUpdatingRef.current = false;
+      }
+    },
+    [selectedVariable]
+  );
 
   // Plugin to find and decorate variables
-  const createVariablePlugin = () => {
+  const createVariablePlugin = useCallback(() => {
     return ViewPlugin.fromClass(
       class {
         decorations: DecorationSet;
@@ -292,6 +374,7 @@ export const EmailSubject = () => {
                   'data-start': start.toString(),
                   'data-end': end.toString(),
                 },
+                inclusive: true,
               }).range(start, end)
             );
 
@@ -319,42 +402,7 @@ export const EmailSubject = () => {
           }),
       }
     );
-  };
-
-  const handleVariableUpdate = (newValue: string) => {
-    if (!selectedVariable || !viewRef.current || !fieldRef.current) {
-      console.log('Missing required refs:', {
-        selectedVariable,
-        viewRef: !!viewRef.current,
-        fieldRef: !!fieldRef.current,
-      });
-      return;
-    }
-
-    const { from, to } = selectedVariable;
-    const view = viewRef.current;
-    console.log('Updating variable:', { from, to, newValue });
-
-    // Create and dispatch the transaction
-    const changes = {
-      from,
-      to,
-      insert: `{{${newValue}}}`,
-    };
-    console.log('Applying changes:', changes);
-
-    view.dispatch({
-      changes,
-      selection: { anchor: from + `{{${newValue}}}`.length },
-    });
-
-    // Get the updated content and trigger form update
-    const updatedContent = view.state.doc.toString();
-    console.log('Updated content:', updatedContent);
-    fieldRef.current.onChange(updatedContent);
-
-    setSelectedVariable(null);
-  };
+  }, []);
 
   const extensions = useMemo(
     () => [
@@ -366,7 +414,7 @@ export const EmailSubject = () => {
         click: handleVariableClick,
       }),
     ],
-    [variables]
+    [variables, handleVariableClick, createVariablePlugin]
   );
 
   return (
