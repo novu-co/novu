@@ -1,18 +1,15 @@
-import { type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
+import { GeneratePreviewResponseDto } from '@novu/shared';
 import { Notification5Fill } from '@/components/icons';
 import { InAppTabsSection } from '@/components/workflow-editor/steps/in-app/in-app-tabs-section';
 import { InboxPreview } from './inbox-preview';
 import { ConfigurePreviewAccordion } from '../shared/configure-preview-accordion';
 
 type InAppEditorPreviewProps = {
-  workflow?: WorkflowResponseDto;
-  step?: StepDataDto;
-  formValues?: Record<string, unknown>;
   editorValue: string;
   setEditorValue: (value: string) => void;
   previewStep: () => void;
-  previewData?: any;
-  isPreviewPending?: boolean;
+  previewData?: GeneratePreviewResponseDto;
+  isPreviewPending: boolean;
 };
 
 export const InAppEditorPreview = ({

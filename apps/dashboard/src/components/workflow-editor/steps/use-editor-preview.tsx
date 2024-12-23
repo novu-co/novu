@@ -22,7 +22,7 @@ export const useEditorPreview = ({
   } = usePreviewStep({
     onSuccess: (res) => {
       const newValue = JSON.stringify(res.previewPayloadExample, null, 2);
-      if (!isEqual(JSON.parse(editorValue), res.previewPayloadExample)) {
+      if (!isEqual(editorValue, newValue)) {
         setEditorValue(newValue);
       }
     },
@@ -36,14 +36,6 @@ export const useEditorPreview = ({
     controlValues,
     editorValue,
   });
-
-  useEffect(() => {
-    console.log('MOUNTED', editorValue, dataRef.current.editorValue);
-
-    return () => {
-      console.log('UNMOUNTED', editorValue, dataRef.current.editorValue);
-    };
-  }, []);
 
   useEffect(() => {
     previewStep({

@@ -1,4 +1,4 @@
-import { ChannelTypeEnum, type StepDataDto, type WorkflowResponseDto } from '@novu/shared';
+import { ChannelTypeEnum, GeneratePreviewResponseDto } from '@novu/shared';
 import { useState } from 'react';
 import { RiMacLine, RiSmartphoneFill } from 'react-icons/ri';
 
@@ -18,20 +18,17 @@ import { Skeleton } from '@/components/primitives/skeleton';
 import { ConfigurePreviewAccordion } from '../shared/configure-preview-accordion';
 
 type EmailEditorPreviewProps = {
-  workflow?: WorkflowResponseDto;
-  step?: StepDataDto;
-  formValues?: Record<string, unknown>;
-  editorValue?: string;
-  setEditorValue?: (value: string) => void;
-  previewStep?: () => void;
-  previewData?: any;
-  isPreviewPending?: boolean;
+  editorValue: string;
+  setEditorValue: (value: string) => void;
+  previewStep: () => void;
+  previewData?: GeneratePreviewResponseDto;
+  isPreviewPending: boolean;
 };
 
 export const EmailEditorPreview = ({
-  editorValue = '{}',
-  setEditorValue = () => {},
-  previewStep = () => {},
+  editorValue,
+  setEditorValue,
+  previewStep,
   previewData,
   isPreviewPending = false,
 }: EmailEditorPreviewProps) => {
