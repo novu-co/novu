@@ -7,14 +7,6 @@ import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 
 const extensions = [loadLanguage('json')?.extension ?? []];
 
-const getInitialAccordionValue = (value: string) => {
-  try {
-    return Object.keys(JSON.parse(value)).length > 0 ? 'payload' : undefined;
-  } catch (e) {
-    return undefined;
-  }
-};
-
 interface ConfigurePreviewAccordionProps {
   editorValue: string;
   setEditorValue: (value: string) => void;
