@@ -11,7 +11,6 @@ import {
 } from '@novu/application-generic';
 import { PatchStepCommand } from './patch-step.command';
 import { BuildStepDataUsecase } from '../build-step-data';
-import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
 
 type ValidNotificationWorkflow = {
   currentStep: NonNullable<NotificationStepEntity>;
@@ -24,7 +23,6 @@ export class PatchStepUsecase {
     private buildStepDataUsecase: BuildStepDataUsecase,
     private notificationTemplateRepository: NotificationTemplateRepository,
     private upsertControlValuesUseCase: UpsertControlValuesUseCase,
-    private postProcessWorkflowUpdate: PostProcessWorkflowUpdate,
     @Inject(forwardRef(() => DeleteControlValuesUseCase))
     private deleteControlValuesUseCase: DeleteControlValuesUseCase
   ) {}
@@ -32,11 +30,7 @@ export class PatchStepUsecase {
   async execute(command: PatchStepCommand): Promise<StepDataDto> {
     const persistedItems = await this.loadPersistedItems(command);
     await this.patchFieldsOnPersistedItems(command, persistedItems);
-    const updatedWorkflow = await this.postProcessWorkflowUpdate.execute({
-      workflow: persistedItems.workflow,
-      user: command.user,
-    });
-    await this.persistWorkflow(updatedWorkflow, command.user);
+    await this.persistWorkflow(persistedItems.workflow, command.user);
 
     return await this.buildStepDataUsecase.execute(command);
   }
