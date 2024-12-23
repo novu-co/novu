@@ -85,7 +85,7 @@ export const Maily = (props: MailyProps) => {
                   variables={({ query, editor, from }) => {
                     const queryWithoutSuffix = query.replace(/}+$/, '');
 
-                    const autoAddVariable = () => {
+                    function addInlineVariable() {
                       if (!query.endsWith('}}')) {
                         return;
                       }
@@ -98,9 +98,15 @@ export const Maily = (props: MailyProps) => {
                       editor?.commands.deleteRange({ from, to });
                       editor?.commands.insertContent({
                         type: 'variable',
-                        attrs: { id: queryWithoutSuffix, label: null, fallback: null, showIfKey: null },
+                        attrs: {
+                          id: queryWithoutSuffix,
+                          label: null,
+                          fallback: null,
+                          showIfKey: null,
+                          required: false,
+                        },
                       });
-                    };
+                    }
 
                     const filteredVariables: { name: string; required: boolean }[] = [];
 
@@ -110,7 +116,7 @@ export const Maily = (props: MailyProps) => {
                         filteredVariables.push({ name: queryWithoutSuffix, required: false });
                       }
 
-                      autoAddVariable();
+                      addInlineVariable();
                       return dedupAndSortVariables(filteredVariables, queryWithoutSuffix);
                     }
 
@@ -123,7 +129,7 @@ export const Maily = (props: MailyProps) => {
                       filteredVariables.push({ name: queryWithoutSuffix, required: false });
                     }
 
-                    autoAddVariable();
+                    addInlineVariable();
                     return dedupAndSortVariables(filteredVariables, queryWithoutSuffix);
                   }}
                   contentJson={field.value ? JSON.parse(field.value) : undefined}
