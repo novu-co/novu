@@ -16,9 +16,9 @@ export class BuildPayloadSchema {
   @InstrumentUsecase()
   async execute(command: BuildPayloadSchemaCommand): Promise<JSONSchemaDto> {
     const controlValues = await this.getControlValues(command);
-    const sanitizedControlValues = await this.sanitizeControlValues(controlValues);
+    const extractedVariables = await this.extractAllVariables(controlValues);
 
-    return this.buildVariablesSchema(sanitizedControlValues);
+    return this.buildVariablesSchema(extractedVariables);
   }
 
   private async getControlValues(command: BuildPayloadSchemaCommand) {
@@ -46,11 +46,11 @@ export class BuildPayloadSchema {
   }
 
   @Instrument()
-  private async sanitizeControlValues(controlValues: Record<string, unknown>[]): Promise<string[]> {
+  private async extractAllVariables(controlValues: Record<string, unknown>[]): Promise<string[]> {
     const allVariables: string[] = [];
 
     for (const controlValue of controlValues) {
-      const processedControlValue = await this.sanitizeControlValue(controlValue);
+      const processedControlValue = await this.extractVariables(controlValue);
       const controlValuesString = flattenObjectValues(processedControlValue).join(' ');
       const templateVariables = extractLiquidTemplateVariables(controlValuesString);
       allVariables.push(...templateVariables.validVariables.map((variable) => variable.name));
@@ -60,7 +60,7 @@ export class BuildPayloadSchema {
   }
 
   @Instrument()
-  private async sanitizeControlValue(controlValue: Record<string, unknown>): Promise<Record<string, unknown>> {
+  private async extractVariables(controlValue: Record<string, unknown>): Promise<Record<string, unknown>> {
     const processedValue: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(controlValue)) {
@@ -91,12 +91,50 @@ export class BuildPayloadSchema {
     if (variablesObject) {
       for (const [key, value] of Object.entries(variablesObject)) {
         if (schema.properties && schema.required) {
-          schema.properties[key] = { type: 'string', default: value };
+          schema.properties[key] = determineSchemaType(value);
           schema.required.push(key);
         }
       }
     }
 
     return schema;
+  }
+}
+
+function determineSchemaType(value: unknown): JSONSchemaDto {
+  if (value === null) {
+    return { type: 'null' };
+  }
+
+  if (Array.isArray(value)) {
+    return {
+      type: 'array',
+      items: value.length > 0 ? determineSchemaType(value[0]) : { type: 'null' },
+    };
+  }
+
+  switch (typeof value) {
+    case 'string':
+      return { type: 'string', default: value };
+    case 'number':
+      return { type: 'number', default: value };
+    case 'boolean':
+      return { type: 'boolean', default: value };
+    case 'object':
+      return {
+        type: 'object',
+        properties: Object.entries(value).reduce(
+          (acc, [key, val]) => {
+            acc[key] = determineSchemaType(val);
+
+            return acc;
+          },
+          {} as { [key: string]: JSONSchemaDto }
+        ),
+        required: Object.keys(value),
+      };
+
+    default:
+      return { type: 'null' };
   }
 }
