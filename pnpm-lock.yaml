@@ -394,8 +394,8 @@ importers:
         specifier: 6.2.1
         version: 6.2.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(reflect-metadata@0.2.2)
       '@novu/api':
-        specifier: 0.0.1-alpha.109
-        version: 0.0.1-alpha.109(zod@3.23.8)
+        specifier: 0.0.1-alpha.149
+        version: 0.0.1-alpha.149(zod@3.23.8)
       '@novu/application-generic':
         specifier: workspace:*
         version: link:../../libs/application-generic
@@ -10610,8 +10610,8 @@ packages:
   '@nothing-but/utils@0.12.1':
     resolution: {integrity: sha512-1qZU1Q5El0IjE7JT/ucvJNzdr2hL3W8Rm27xNf1p6gb3Nw8pGnZmxp6/GEW9h+I1k1cICxXNq25hBwknTQ7yhg==}
 
-  '@novu/api@0.0.1-alpha.109':
-    resolution: {integrity: sha512-+fbdpvrhgzzRmdo6wh/gQG8whqSreTDGdkoW8N44sevTcMqg2LwQQs7E2hXkOcmBWUkyuZ7bbCPzMrf5uoKgfw==}
+  '@novu/api@0.0.1-alpha.149':
+    resolution: {integrity: sha512-HNLhe6+xsQGMnTD/EkaXumHuHcRyuu6c6yv987D7xjZa4CBXMyqi5rqQrCAUVs2go8+8WrqjoHEeTPHk5AmAoA==}
     peerDependencies:
       zod: '>= 3'
 
@@ -47017,7 +47017,7 @@ snapshots:
 
   '@nothing-but/utils@0.12.1': {}
 
-  '@novu/api@0.0.1-alpha.109(zod@3.23.8)':
+  '@novu/api@0.0.1-alpha.149(zod@3.23.8)':
     dependencies:
       zod: 3.23.8
 
