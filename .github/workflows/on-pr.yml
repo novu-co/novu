@@ -205,7 +205,7 @@ jobs:
       - uses: ./.github/actions/setup-project
         with:
           # Don't run redis and etc... for other unit tests
-          slim: ${{ !contains(matrix.projectName, '@novu/api') && !contains(matrix.projectName, '@novu/worker') && !contains(matrix.projectName, '@novu/ws') && !contains(matrix.projectName, '@novu/inbound-mail')}}
+          slim: ${{ !contains(matrix.projectName, '@novu/api-service') && !contains(matrix.projectName, '@novu/worker') && !contains(matrix.projectName, '@novu/ws') && !contains(matrix.projectName, '@novu/inbound-mail')}}
       - uses: ./.github/actions/setup-redis-cluster
       - uses: mansagroup/nrwl-nx-action@v3
         name: Lint and build and test
@@ -244,8 +244,8 @@ jobs:
     uses: ./.github/workflows/reusable-api-e2e.yml
     with:
       ee: ${{ contains (matrix.name,'-ee') }}
-      test-e2e-affected: ${{ contains(fromJson(needs.get-affected.outputs.test-e2e), '@novu/api') || contains(fromJson(needs.get-affected.outputs.test-e2e), '@novu/worker') }}
-      test-e2e-ee-affected: ${{ contains(fromJson(needs.get-affected.outputs.test-e2e-ee), '@novu/api') || contains(fromJson(needs.get-affected.outputs.test-e2e-ee), '@novu/worker') }}
+      test-e2e-affected: ${{ contains(fromJson(needs.get-affected.outputs.test-e2e), '@novu/api-service') || contains(fromJson(needs.get-affected.outputs.test-e2e), '@novu/worker') }}
+      test-e2e-ee-affected: ${{ contains(fromJson(needs.get-affected.outputs.test-e2e-ee), '@novu/api-service') || contains(fromJson(needs.get-affected.outputs.test-e2e-ee), '@novu/worker') }}
       job-name: ${{ matrix.name }}
       test-unit: false
     secrets: inherit

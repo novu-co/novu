@@ -1,12 +1,14 @@
-import { EmailRenderOutput, TipTapNode } from '@novu/shared';
-import { Injectable } from '@nestjs/common';
 import { render as mailyRender } from '@maily-to/render';
-import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import isEmpty from 'lodash/isEmpty';
+import { Injectable } from '@nestjs/common';
 import { Liquid } from 'liquidjs';
+
+import { EmailRenderOutput, TipTapNode } from '@novu/shared';
+import { Instrument, InstrumentUsecase } from '@novu/application-generic';
+
 import { FullPayloadForRender, RenderCommand } from './render-command';
 import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.usecase';
-import { emailStepControlZodSchema } from '../../../workflows-v2/shared';
+import { emailControlZodSchema } from '../../../workflows-v2/shared/schemas/email-control.schema';
 
 export class RenderEmailOutputCommand extends RenderCommand {}
 
@@ -16,13 +18,13 @@ export class RenderEmailOutputUsecase {
 
   @InstrumentUsecase()
   async execute(renderCommand: RenderEmailOutputCommand): Promise<EmailRenderOutput> {
-    const { body, subject } = emailStepControlZodSchema.parse(renderCommand.controlValues);
+    const { body, subject } = emailControlZodSchema.parse(renderCommand.controlValues);
 
     if (isEmpty(body)) {
       return { subject, body: '' };
     }
 
-    const expandedMailyContent = this.transformForAndShowLogic(body, renderCommand.fullPayloadForRender);
+    const expandedMailyContent = this.transformMailyDynamicBlocks(body, renderCommand.fullPayloadForRender);
     const parsedTipTap = await this.parseTipTapNodeByLiquid(expandedMailyContent, renderCommand);
     const renderedHtml = await this.renderEmail(parsedTipTap);
 
@@ -30,11 +32,15 @@ export class RenderEmailOutputUsecase {
   }
 
   private async parseTipTapNodeByLiquid(
-    value: TipTapNode,
+    tiptapNode: TipTapNode,
     renderCommand: RenderEmailOutputCommand
   ): Promise<TipTapNode> {
-    const client = new Liquid();
-    const templateString = client.parse(JSON.stringify(value));
+    const client = new Liquid({
+      outputEscape: (output) => {
+        return stringifyDataStructureWithSingleQuotes(output);
+      },
+    });
+    const templateString = client.parse(JSON.stringify(tiptapNode));
     const parsedTipTap = await client.render(templateString, {
       payload: renderCommand.fullPayloadForRender.payload,
       subscriber: renderCommand.fullPayloadForRender.subscriber,
@@ -50,7 +56,19 @@ export class RenderEmailOutputUsecase {
   }
 
   @Instrument()
-  private transformForAndShowLogic(body: string, fullPayloadForRender: FullPayloadForRender) {
+  private transformMailyDynamicBlocks(body: string, fullPayloadForRender: FullPayloadForRender) {
     return this.expandEmailEditorSchemaUseCase.execute({ emailEditorJson: body, fullPayloadForRender });
   }
 }
+
+export const stringifyDataStructureWithSingleQuotes = (value: unknown, spaces: number = 0): string => {
+  if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+    const valueStringified = JSON.stringify(value, null, spaces);
+    const valueSingleQuotes = valueStringified.replace(/"/g, "'");
+    const valueEscapedNewLines = valueSingleQuotes.replace(/\n/g, '\\n');
+
+    return valueEscapedNewLines;
+  } else {
+    return String(value);
+  }
+};

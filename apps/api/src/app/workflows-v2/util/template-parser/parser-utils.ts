@@ -14,7 +14,7 @@ export function isValidTemplate(template: unknown): template is string {
 export function extractLiquidExpressions(str: string): string[] {
   if (!str) return [];
 
-  const LIQUID_EXPRESSION_PATTERN = /{{\s*[^{}]+}}/g;
+  const LIQUID_EXPRESSION_PATTERN = /{{\s*[^{}]*}}/g;
 
   return str.match(LIQUID_EXPRESSION_PATTERN) || [];
 }

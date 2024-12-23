@@ -18,8 +18,8 @@ import {
 } from '@novu/shared';
 import { buildCreateWorkflowDto } from './workflow.controller.e2e';
 import { forSnippet, fullCodeSnippet } from './maily-test-data';
-import { InAppControlType } from './shared';
-import { EmailStepControlType } from './shared/schemas/email-control.schema';
+import { InAppControlType } from './shared/schemas/in-app-control.schema';
+import { EmailControlType } from './shared/schemas/email-control.schema';
 
 const SUBJECT_TEST_PAYLOAD = '{{payload.subject.test.payload}}';
 const PLACEHOLDER_SUBJECT_INAPP = '{{payload.subject}}';
@@ -421,7 +421,7 @@ describe('Generate Preview', () => {
 
       channelTypes.forEach(({ type, description }) => {
         // TODO: We need to get back to the drawing board on this one to make the preview action of the framework more forgiving
-        it(`[${type}] catches the 400 error returned by the Bridge Preview action`, async () => {
+        it(`[${type}] will generate gracefully the preview if the control values are missing`, async () => {
           const { stepDatabaseId, workflowId, stepId } = await createWorkflowAndReturnId(workflowsClient, type);
           const requestDto = buildDtoWithMissingControlValues(type, stepId);
 
@@ -433,7 +433,7 @@ describe('Generate Preview', () => {
             description
           );
 
-          expect(previewResponseDto.result).to.eql({ preview: {} });
+          expect(previewResponseDto.result).to.not.eql({ preview: {} });
         });
       });
     });
@@ -514,13 +514,13 @@ function buildDtoNoPayload(stepTypeEnum: StepTypeEnum, stepId?: string): Generat
   };
 }
 
-function buildEmailControlValuesPayload(stepId?: string): EmailStepControlType {
+function buildEmailControlValuesPayload(stepId?: string): EmailControlType {
   return {
     subject: `Hello, World! ${SUBJECT_TEST_PAYLOAD}`,
     body: JSON.stringify(fullCodeSnippet(stepId)),
   };
 }
-function buildSimpleForEmail(): EmailStepControlType {
+function buildSimpleForEmail(): EmailControlType {
   return {
     subject: `Hello, World! ${SUBJECT_TEST_PAYLOAD}`,
     body: JSON.stringify(forSnippet),
