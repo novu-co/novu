@@ -43,4 +43,23 @@ export const variablePillTheme = EditorView.baseTheme({
   '.cm-variable-pill .cm-bracket': {
     display: 'none',
   },
+  '.cm-cursor-target': {
+    display: 'inline-block',
+    width: '8px',
+    minWidth: '8px',
+    height: '24px',
+    cursor: 'text',
+    verticalAlign: 'middle',
+    margin: '0 1px',
+  },
+  '.cm-content': {
+    minHeight: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  '.cm-line': {
+    minHeight: '32px',
+    display: 'flex',
+    alignItems: 'center',
+  },
 });

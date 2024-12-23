@@ -114,11 +114,11 @@ export const FieldEditor = ({
 
           if (before !== '{{') {
             view.dispatch({
-              changes: { from, to, insert: `{{${text}}}` },
+              changes: { from, to, insert: `{{${text}}} ` },
             });
           } else {
             view.dispatch({
-              changes: { from, to, insert: `${text}}}` },
+              changes: { from, to, insert: `${text}}} ` },
             });
           }
         },
@@ -147,16 +147,19 @@ export const FieldEditor = ({
 
   return (
     <div className="relative">
-      <Editor
-        size={size}
-        autoFocus={autoFocus}
-        fontFamily={fontFamily}
-        placeholder={placeholder}
-        id={id}
-        extensions={extensions}
-        value={value}
-        onChange={onChange}
-      />
+      <div className="flex min-h-[80px] flex-col">
+        <Editor
+          size={size}
+          className="flex-1"
+          autoFocus={autoFocus}
+          fontFamily={fontFamily}
+          placeholder={placeholder}
+          id={id}
+          extensions={extensions}
+          value={value}
+          onChange={onChange}
+        />
+      </div>
       <Popover
         open={!!selectedVariable}
         onOpenChange={(open) => {

@@ -22,17 +22,19 @@ export const BaseBody = () => {
       render={({ field }) => (
         <FormItem className="w-full">
           <FormControl>
-            <InputField className="flex h-36 items-start px-1">
-              <FieldEditor
-                fontFamily="inherit"
-                placeholder={capitalize(field.name)}
-                id={field.name}
-                ref={field.ref}
-                value={field.value}
-                onChange={field.onChange}
-                variables={variables}
-                size="default"
-              />
+            <InputField className="flex h-36 w-full items-start px-1">
+              <div className="w-full">
+                <FieldEditor
+                  fontFamily="inherit"
+                  placeholder={capitalize(field.name)}
+                  id={field.name}
+                  ref={field.ref}
+                  value={field.value}
+                  onChange={field.onChange}
+                  variables={variables}
+                  size="default"
+                />
+              </div>
             </InputField>
           </FormControl>
           <FormMessage>{`This supports markdown and variables, type {{ for more.`}</FormMessage>
