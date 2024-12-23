@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Tabs } from '@radix-ui/react-tabs';
-import { RiCalendarScheduleFill } from 'react-icons/ri';
 import { FieldValues, useFormContext } from 'react-hook-form';
 import { TimeUnitEnum } from '@novu/shared';
 
@@ -67,12 +66,7 @@ export const DigestWindow = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <FormLabel>
-        <span className="flex items-center gap-1">
-          <RiCalendarScheduleFill className="size-4" />
-          <span>Digest window</span>
-        </span>
-      </FormLabel>
+      <FormLabel>Digest window</FormLabel>
       <Tabs
         value={digestType}
         className="flex h-full flex-1 flex-col"
