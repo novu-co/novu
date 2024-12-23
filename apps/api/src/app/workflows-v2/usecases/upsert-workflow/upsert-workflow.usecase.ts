@@ -470,23 +470,36 @@ function processControlValuesByLiquid(
 ): StepIssuesDto {
   const issues: StepIssuesDto = {};
 
-  for (const [controlKey, controlValue] of Object.entries(controlValues || {})) {
-    const liquidTemplateIssues = buildVariables(variableSchema, controlValue);
+  function processNestedControlValues(currentValue: unknown, currentPath: string[] = []) {
+    if (!currentValue || typeof currentValue !== 'object') {
+      const liquidTemplateIssues = buildVariables(variableSchema, currentValue);
 
-    if (liquidTemplateIssues.invalidVariables.length > 0) {
-      issues.controls = issues.controls || {};
+      if (liquidTemplateIssues.invalidVariables.length > 0) {
+        const controlKey = currentPath.join('.');
+        issues.controls = issues.controls || {};
 
-      issues.controls[controlKey] = liquidTemplateIssues.invalidVariables.map((error) => {
-        const message = error.message ? error.message[0].toUpperCase() + error.message.slice(1).split(' line:')[0] : '';
+        issues.controls[controlKey] = liquidTemplateIssues.invalidVariables.map((error) => {
+          const message = error.message
+            ? error.message[0].toUpperCase() + error.message.slice(1).split(' line:')[0]
+            : '';
 
-        return {
-          message: `${message} variable: ${error.output}`,
-          issueType: StepContentIssueEnum.ILLEGAL_VARIABLE_IN_CONTROL_VALUE,
-          variableName: error.output,
-        };
-      });
+          return {
+            message: `${message} variable: ${error.output}`,
+            issueType: StepContentIssueEnum.ILLEGAL_VARIABLE_IN_CONTROL_VALUE,
+            variableName: error.output,
+          };
+        });
+      }
+
+      return;
+    }
+
+    for (const [key, value] of Object.entries(currentValue)) {
+      processNestedControlValues(value, [...currentPath, key]);
     }
   }
+
+  processNestedControlValues(controlValues);
 
   return issues;
 }
