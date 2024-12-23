@@ -75,6 +75,7 @@ export class BuildPayloadSchema {
   }
 
   private async buildVariablesSchema(variables: string[]) {
+    // TODO: Update typings in this as .payload can be null or undefined
     const variablesObject = pathsToObject(variables, {
       valuePrefix: '{{',
       valueSuffix: '}}',
@@ -87,10 +88,12 @@ export class BuildPayloadSchema {
       additionalProperties: true,
     };
 
-    for (const [key, value] of Object.entries(variablesObject)) {
-      if (schema.properties && schema.required) {
-        schema.properties[key] = { type: 'string', default: value };
-        schema.required.push(key);
+    if (variablesObject) {
+      for (const [key, value] of Object.entries(variablesObject)) {
+        if (schema.properties && schema.required) {
+          schema.properties[key] = { type: 'string', default: value };
+          schema.required.push(key);
+        }
       }
     }
 
