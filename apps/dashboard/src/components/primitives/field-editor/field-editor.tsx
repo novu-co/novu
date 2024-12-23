@@ -28,7 +28,7 @@ export const FieldEditor = ({
   variables,
   placeholder,
   autoFocus,
-  size = 'lg',
+  size = 'default',
   fontFamily = 'inherit',
   id,
 }: FieldEditorProps) => {

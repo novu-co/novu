@@ -21,6 +21,7 @@ export const EmailSubject = () => {
         <FormItem className="w-full">
           <FormControl>
             <FieldEditor
+              size="lg"
               id={field.name}
               value={field.value}
               onChange={field.onChange}
