@@ -5,7 +5,6 @@ import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { flattenObjectValues } from '../../util/utils';
 import { pathsToObject } from '../../util/path-to-object';
 import { extractLiquidTemplateVariables } from '../../util/template-parser/liquid-parser';
-import { convertJsonToSchemaWithDefaults, emptyJsonSchema } from '../../util/jsonToSchema';
 import { BuildPayloadSchemaCommand } from './build-payload-schema.command';
 import { transformMailyContentToLiquid } from '../generate-preview/transform-maily-content-to-liquid';
 import { isStringTipTapNode } from '../../util/tip-tap.util';
@@ -16,26 +15,13 @@ export class BuildPayloadSchema {
 
   @InstrumentUsecase()
   async execute(command: BuildPayloadSchemaCommand): Promise<JSONSchemaDto> {
-    const controlValues = await this.buildControlValues(command);
+    const controlValues = await this.getControlValues(command);
+    const sanitizedControlValues = await this.sanitizeControlValues(controlValues);
 
-    if (!controlValues.length) {
-      return emptyJsonSchema();
-    }
-
-    const templateVars = await this.processControlValues(controlValues);
-    if (templateVars.length === 0) {
-      return emptyJsonSchema();
-    }
-
-    const variablesExample = pathsToObject(templateVars, {
-      valuePrefix: '{{',
-      valueSuffix: '}}',
-    }).payload;
-
-    return convertJsonToSchemaWithDefaults(variablesExample);
+    return this.buildVariablesSchema(sanitizedControlValues);
   }
 
-  private async buildControlValues(command: BuildPayloadSchemaCommand) {
+  private async getControlValues(command: BuildPayloadSchemaCommand) {
     let controlValues = command.controlValues ? [command.controlValues] : [];
 
     if (!controlValues.length) {
@@ -56,15 +42,15 @@ export class BuildPayloadSchema {
       ).map((item) => item.controls);
     }
 
-    return controlValues;
+    return controlValues.flat();
   }
 
   @Instrument()
-  private async processControlValues(controlValues: Record<string, unknown>[]): Promise<string[]> {
+  private async sanitizeControlValues(controlValues: Record<string, unknown>[]): Promise<string[]> {
     const allVariables: string[] = [];
 
     for (const controlValue of controlValues) {
-      const processedControlValue = await this.processControlValue(controlValue);
+      const processedControlValue = await this.sanitizeControlValue(controlValue);
       const controlValuesString = flattenObjectValues(processedControlValue).join(' ');
       const templateVariables = extractLiquidTemplateVariables(controlValuesString);
       allVariables.push(...templateVariables.validVariables.map((variable) => variable.name));
@@ -74,7 +60,7 @@ export class BuildPayloadSchema {
   }
 
   @Instrument()
-  private async processControlValue(controlValue: Record<string, unknown>): Promise<Record<string, unknown>> {
+  private async sanitizeControlValue(controlValue: Record<string, unknown>): Promise<Record<string, unknown>> {
     const processedValue: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(controlValue)) {
@@ -86,5 +72,28 @@ export class BuildPayloadSchema {
     }
 
     return processedValue;
+  }
+
+  private async buildVariablesSchema(variables: string[]) {
+    const variablesObject = pathsToObject(variables, {
+      valuePrefix: '{{',
+      valueSuffix: '}}',
+    }).payload;
+
+    const schema: JSONSchemaDto = {
+      type: 'object',
+      properties: {},
+      required: [],
+      additionalProperties: true,
+    };
+
+    for (const [key, value] of Object.entries(variablesObject)) {
+      if (schema.properties && schema.required) {
+        schema.properties[key] = { type: 'string', default: value };
+        schema.required.push(key);
+      }
+    }
+
+    return schema;
   }
 }
