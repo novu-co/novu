@@ -117,9 +117,8 @@ export class HydrateEmailSchemaUseCase {
     node,
     placeholderAggregation: PlaceholderAggregation
   ) {
-    const { fallback } = node.attrs;
-    const variableName = node.attrs.id;
-    const finalValue = `{{ ${variableName} ${buildLiquidJSDefault(fallback)} }}`;
+    const { fallback, id: variableName } = node.attrs;
+    const finalValue = buildLiquidJSDefault(variableName, fallback);
 
     placeholderAggregation.regularPlaceholdersToDefaultValue[`{{${node.attrs.id}}}`] = finalValue;
 
@@ -234,4 +233,5 @@ export const TipTapSchema = z.object({
   attrs: z.record(z.unknown()).optional(),
 });
 
-const buildLiquidJSDefault = (mailyFallback: string) => (mailyFallback ? ` | default: '${mailyFallback}'` : '');
+const buildLiquidJSDefault = (variableName: string, fallback?: string) =>
+  `{{ ${variableName}${fallback ? ` | default: '${fallback}'` : ''} }}`;

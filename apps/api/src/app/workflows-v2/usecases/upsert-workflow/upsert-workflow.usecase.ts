@@ -156,12 +156,11 @@ export class UpsertWorkflowUseCase {
   }
 
   private computeStatus(workflow: UpsertWorkflowDataCommand, steps: NotificationStep[]) {
-    const hasIssues = steps.filter((step) => this.hasControlIssues(step.issues)).length > 0;
-
     if (workflow.active === false) {
       return WorkflowStatusEnum.INACTIVE;
     }
 
+    const hasIssues = steps.filter((step) => this.hasControlIssues(step.issues)).length > 0;
     if (!hasIssues) {
       return WorkflowStatusEnum.ACTIVE;
     }
