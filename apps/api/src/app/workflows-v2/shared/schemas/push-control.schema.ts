@@ -2,11 +2,11 @@ import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
-import { skipZodSchema, skipStepUiSchema } from './skip-control.schema';
+import { skipStepUiSchema } from './skip-control.schema';
 
 export const pushControlZodSchema = z
   .object({
-    skip: skipZodSchema,
+    skip: z.object({}).catchall(z.unknown()).optional(),
     subject: z.string(),
     body: z.string(),
   })

@@ -8,11 +8,11 @@ import {
   UiSchema,
   UiSchemaGroupEnum,
 } from '@novu/shared';
-import { skipStepUiSchema, skipZodSchema } from './skip-control.schema';
+import { skipStepUiSchema } from './skip-control.schema';
 
 const digestRegularControlZodSchema = z
   .object({
-    skip: skipZodSchema,
+    skip: z.object({}).catchall(z.unknown()).optional(),
     amount: z.union([z.number().min(1), z.string().min(1)]),
     unit: z.nativeEnum(TimeUnitEnum).default(TimeUnitEnum.SECONDS),
     digestKey: z.string().optional(),
@@ -27,7 +27,7 @@ const digestRegularControlZodSchema = z
   .strict();
 const digestTimedControlZodSchema = z
   .object({
-    skip: skipZodSchema,
+    skip: z.object({}).catchall(z.unknown()).optional(),
     cron: z.string().min(1),
     digestKey: z.string().optional(),
   })
