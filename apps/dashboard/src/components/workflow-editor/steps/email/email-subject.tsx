@@ -1,7 +1,8 @@
 import { EditorView, ViewPlugin, Decoration, DecorationSet } from '@uiw/react-codemirror';
-import { useMemo, useState, useRef, useEffect, useCallback, ChangeEvent, DragEvent } from 'react';
+import { useMemo, useState, useRef, useEffect, useCallback, ChangeEvent } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { motion, AnimatePresence } from 'motion/react';
+import { Completion, CompletionContext } from '@codemirror/autocomplete';
 
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
@@ -183,32 +184,28 @@ const VariablePopover = ({ variable, onClose, onUpdate }: VariablePopoverProps) 
                         className={`bg-secondary hover:bg-secondary/80 group flex cursor-move items-center gap-1.5 rounded px-1.5 py-0.5 text-sm ${
                           draggingItem === index ? 'ring-primary opacity-50 ring-2 ring-offset-1' : ''
                         }`}
-                        draggable
-                        onDragStart={(e: DragEvent<HTMLDivElement>) => {
-                          e.dataTransfer.setData('text/plain', index.toString());
-                          setDraggingItem(index);
-                        }}
+                        drag
+                        dragConstraints={{ top: 0, right: 0, bottom: 0, left: 0 }}
+                        dragElastic={0}
+                        dragMomentum={false}
+                        onDragStart={() => setDraggingItem(index)}
                         onDragEnd={() => {
                           setDraggingItem(null);
                           setDragOverIndex(null);
                         }}
-                        onDragOver={(e: DragEvent<HTMLDivElement>) => {
-                          e.preventDefault();
+                        onDragOver={() => {
                           if (dragOverIndex !== index) {
                             setDragOverIndex(index);
                           }
                         }}
-                        onDragLeave={(e: DragEvent<HTMLDivElement>) => {
-                          const relatedTarget = e.relatedTarget as HTMLElement;
-                          if (!e.currentTarget.contains(relatedTarget)) {
+                        onDragLeave={(e) => {
+                          if (!e.currentTarget.contains(e.relatedTarget as Node)) {
                             setDragOverIndex(null);
                           }
                         }}
-                        onDrop={(e: DragEvent<HTMLDivElement>) => {
-                          e.preventDefault();
-                          const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
-                          if (fromIndex !== index) {
-                            moveTransformer(fromIndex, index);
+                        onDrop={() => {
+                          if (draggingItem !== null && draggingItem !== index) {
+                            moveTransformer(draggingItem, index);
                           }
                           setDragOverIndex(null);
                           setDraggingItem(null);
@@ -319,8 +316,9 @@ export const EmailSubject = () => {
   const viewRef = useRef<EditorView | null>(null);
   const fieldRef = useRef<any>(null);
   const isUpdatingRef = useRef(false);
+  const lastCompletionRef = useRef<{ from: number; to: number } | null>(null);
 
-  const handleVariableClick = useCallback((e: MouseEvent, view: EditorView) => {
+  const handleVariableClick = useCallback((e: MouseEvent) => {
     if (isUpdatingRef.current) return;
 
     const target = e.target as HTMLElement;
@@ -330,13 +328,17 @@ export const EmailSubject = () => {
       e.preventDefault();
       e.stopPropagation();
 
+      // Get the variable data
       const variable = pill.getAttribute('data-variable');
       const start = parseInt(pill.getAttribute('data-start') || '0');
       const end = parseInt(pill.getAttribute('data-end') || '0');
 
-      if (variable) {
-        console.log('Selected variable:', { variable, start, end });
-        setSelectedVariable({ value: variable, from: start, to: end });
+      // Only update if we have valid data
+      if (variable && start && end) {
+        // Use requestAnimationFrame to ensure the popover opens after the click event is fully processed
+        requestAnimationFrame(() => {
+          setSelectedVariable({ value: variable, from: start, to: end });
+        });
       }
     }
   }, []);
@@ -396,6 +398,7 @@ export const EmailSubject = () => {
     return ViewPlugin.fromClass(
       class {
         decorations: DecorationSet;
+        lastCursor: number = 0;
 
         constructor(view: EditorView) {
           this.decorations = this.createDecorations(view);
@@ -403,7 +406,23 @@ export const EmailSubject = () => {
         }
 
         update(update: any) {
-          if (update.docChanged || update.viewportChanged) {
+          if (update.docChanged || update.viewportChanged || update.selectionSet) {
+            this.lastCursor = update.state.selection.main.head;
+
+            // Check if we just completed a variable
+            const content = update.state.doc.toString();
+            const pos = update.state.selection.main.head;
+            if (update.docChanged && content.slice(pos - 2, pos) === '}}') {
+              const start = content.lastIndexOf('{{', pos);
+              if (start !== -1) {
+                const variableContent = content.slice(start + 2, pos - 2).trim();
+                if (variableContent) {
+                  // Force immediate decoration
+                  this.lastCursor = -1;
+                }
+              }
+            }
+
             this.decorations = this.createDecorations(update.view);
           }
           if (update.view) {
@@ -414,7 +433,7 @@ export const EmailSubject = () => {
         createDecorations(view: EditorView) {
           const decorations: any[] = [];
           const content = view.state.doc.toString();
-          const variableRegex = /{{(.*?)}}/g;
+          const variableRegex = /{{([^{}]+)}}/g;
           let match;
 
           while ((match = variableRegex.exec(content)) !== null) {
@@ -422,31 +441,45 @@ export const EmailSubject = () => {
             const end = start + match[0].length;
             const variableName = match[1].trim();
 
-            // Add the main variable decoration
-            decorations.push(
-              Decoration.mark({
-                class: `cm-variable-pill ${document.documentElement.classList.contains('dark') ? 'cm-dark' : ''}`,
-                attributes: {
-                  'data-variable': variableName,
-                  'data-start': start.toString(),
-                  'data-end': end.toString(),
-                },
-                inclusive: true,
-              }).range(start, end)
-            );
+            // Create pill if:
+            // 1. It's a complete variable with content
+            // 2. Cursor is not inside the variable
+            // 3. Or it was just completed via autocomplete
+            const isJustCompleted =
+              lastCompletionRef.current &&
+              start === lastCompletionRef.current.from - 2 &&
+              end === lastCompletionRef.current.to + 2;
 
-            // Add bracket decorations
-            decorations.push(
-              Decoration.mark({
-                class: 'cm-bracket',
-              }).range(start, start + 2)
-            );
-            decorations.push(
-              Decoration.mark({
-                class: 'cm-bracket',
-              }).range(end - 2, end)
-            );
+            if (variableName && (this.lastCursor < start || this.lastCursor > end || isJustCompleted)) {
+              // Add the main variable decoration
+              decorations.push(
+                Decoration.mark({
+                  class: `cm-variable-pill ${document.documentElement.classList.contains('dark') ? 'cm-dark' : ''}`,
+                  attributes: {
+                    'data-variable': variableName,
+                    'data-start': start.toString(),
+                    'data-end': end.toString(),
+                  },
+                  inclusive: true,
+                }).range(start, end)
+              );
+
+              // Add bracket decorations
+              decorations.push(
+                Decoration.mark({
+                  class: 'cm-bracket',
+                }).range(start, start + 2)
+              );
+              decorations.push(
+                Decoration.mark({
+                  class: 'cm-bracket',
+                }).range(end - 2, end)
+              );
+            }
           }
+
+          // Reset completion ref after processing
+          lastCompletionRef.current = null;
 
           return Decoration.set(decorations, true);
         }
@@ -461,17 +494,54 @@ export const EmailSubject = () => {
     );
   }, []);
 
+  const completionSource = useCallback(
+    (context: CompletionContext) => {
+      const word = context.matchBefore(/\{\{([^}]*)/);
+      if (!word) return null;
+
+      const options = completions(variables)(context);
+      if (!options) return null;
+
+      return {
+        ...options,
+        apply: (view: EditorView, completion: Completion, from: number, to: number) => {
+          const text = completion.label;
+          lastCompletionRef.current = { from, to };
+
+          const content = view.state.doc.toString();
+          const before = content.slice(Math.max(0, from - 2), from);
+
+          if (before !== '{{') {
+            view.dispatch({
+              changes: { from, to, insert: `{{${text}}}` },
+            });
+          } else {
+            view.dispatch({
+              changes: { from, to, insert: `${text}}}` },
+            });
+          }
+        },
+      };
+    },
+    [variables]
+  );
+
   const extensions = useMemo(
     () => [
-      autocompletion({ override: [completions(variables)] }),
+      autocompletion({
+        override: [completionSource],
+        closeOnBlur: false,
+        defaultKeymap: true,
+        activateOnTyping: true,
+      }),
       EditorView.lineWrapping,
       variablePillTheme,
       createVariablePlugin(),
       EditorView.domEventHandlers({
-        click: handleVariableClick,
+        mousedown: handleVariableClick,
       }),
     ],
-    [variables, handleVariableClick, createVariablePlugin]
+    [variables, handleVariableClick, createVariablePlugin, completionSource]
   );
 
   return (
@@ -501,7 +571,10 @@ export const EmailSubject = () => {
                     open={!!selectedVariable}
                     onOpenChange={(open) => {
                       if (!open) {
-                        setSelectedVariable(null);
+                        // Use setTimeout to prevent immediate closing
+                        setTimeout(() => {
+                          setSelectedVariable(null);
+                        }, 0);
                       }
                     }}
                   >
