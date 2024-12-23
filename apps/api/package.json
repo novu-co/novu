@@ -1,5 +1,5 @@
 {
-  "name": "@novu/api",
+  "name": "@novu/api-service",
   "version": "2.1.1",
   "description": "description",
   "author": "",
@@ -32,7 +32,7 @@
   "dependencies": {
     "@godaddy/terminus": "^4.12.1",
     "@google-cloud/storage": "^6.2.3",
-    "@maily-to/render": "^0.0.16",
+    "@maily-to/render": "^0.0.17",
     "@nestjs/axios": "3.0.3",
     "@nestjs/common": "10.4.1",
     "@nestjs/core": "10.4.1",
@@ -42,7 +42,7 @@
     "@nestjs/swagger": "7.4.0",
     "@nestjs/terminus": "10.2.3",
     "@nestjs/throttler": "6.2.1",
-    "@novu/api": "0.0.1-alpha.109",
+    "@novu/api": "0.0.1-alpha.149",
     "@novu/application-generic": "workspace:*",
     "@novu/dal": "workspace:*",
     "@novu/framework": "workspace:*",

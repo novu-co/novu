@@ -43,7 +43,6 @@ const noRestrictedImportsMultiLevelNovuPattern = {
   group: [
     '@novu/*/**/*',
     '!@novu/api/**/*', // This allows all imports from @novu/api
-    // '!@novu/api/funcs/triggerBulk',
     // These packages have legitimate exports 1 path part below the root level
     // This flatMap logic ignores the path 1 below the root level and prevents deeper imports.
     ...['framework', 'js', 'novui'].flatMap((pkg) => [`!@novu/${pkg}/**/*`, `@novu/${pkg}/*/**/*`]),
