@@ -9,6 +9,7 @@ import {
   UiSchemaGroupEnum,
 } from '@novu/shared';
 import { skipStepUiSchema, skipZodSchema } from './skip-control.schema';
+import { defaultOptions } from './shared';
 
 export const delayControlZodSchema = z
   .object({
@@ -21,7 +22,7 @@ export const delayControlZodSchema = z
 
 export type DelayControlType = z.infer<typeof delayControlZodSchema>;
 
-export const delayControlSchema = zodToJsonSchema(delayControlZodSchema) as JSONSchemaDto;
+export const delayControlSchema = zodToJsonSchema(delayControlZodSchema, defaultOptions) as JSONSchemaDto;
 export const delayUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.DELAY,
   properties: {

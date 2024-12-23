@@ -41,24 +41,24 @@ type LookBackWindow = {
   unit: string;
 };
 
-function sanitizeRedirect(redirect: Redirect | undefined) {
-  if (!redirect?.url || !redirect?.target) {
-    return undefined;
+function sanitizeRedirect(redirect: Redirect | undefined, isOptional: boolean = false) {
+  if (isOptional && (!redirect?.url || !redirect?.target)) {
+    return null;
   }
 
   return {
-    url: redirect.url || 'https://example.com',
-    target: redirect.target || '_self',
+    url: redirect?.url as string,
+    target: redirect?.target as '_self' | '_blank' | '_parent' | '_top' | '_unfencedTop',
   };
 }
 
 function sanitizeAction(action: Action) {
-  if (!action?.label) {
-    return undefined;
+  if (!action?.label && !action?.redirect?.url && !action?.redirect?.target) {
+    return null;
   }
 
   return {
-    label: action.label,
+    label: action.label as string,
     redirect: sanitizeRedirect(action.redirect),
   };
 }
@@ -84,7 +84,7 @@ function sanitizeInApp(controlValues: InAppControlType) {
   }
 
   if (controlValues.redirect) {
-    normalized.redirect = sanitizeRedirect(controlValues.redirect as Redirect);
+    normalized.redirect = sanitizeRedirect(controlValues.redirect as Redirect, true);
   }
 
   return filterNullishValues(normalized);

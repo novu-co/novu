@@ -2,45 +2,59 @@ import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 import { skipStepUiSchema, skipZodSchema } from './skip-control.schema';
+import { defaultOptions } from './shared';
+
+/**
+ * Regex pattern for validating URLs with template variables. Matches three cases:
+ *
+ * 1. ^(\{\{[^}]*\}\}.*)
+ *    - Matches URLs that start with template variables like {{variable}}
+ *    - Example: {{variable}}, {{variable}}/path
+ *
+ * 2. ^(?!mailto:)(?:(https?):\/\/[^\s/$.?#].[^\s]*(?:\{\{[^}]*\}\}[^\s]*)*)
+ *    - Matches full URLs that may contain template variables
+ *    - Excludes mailto: links
+ *    - Example: https://example.com, https://example.com/{{variable}}, https://{{variable}}.com
+ *
+ * 3. ^(\/[^\s]*(?:\{\{[^}]*\}\}[^\s]*)*)$
+ *    - Matches partial URLs (paths) that may contain template variables
+ *    - Example: /path/to/page, /path/{{variable}}/page
+ */
+const templateUrlPattern =
+  /^(\{\{[^}]*\}\}.*)|^(?!mailto:)(?:(https?):\/\/[^\s/$.?#].[^\s]*(?:\{\{[^}]*\}\}[^\s]*)*)|^(\/[^\s]*(?:\{\{[^}]*\}\}[^\s]*)*)$/;
 
 const redirectZodSchema = z
   .object({
-    url: z.string().optional(),
+    url: z.string().regex(templateUrlPattern),
     target: z.enum(['_self', '_blank', '_parent', '_top', '_unfencedTop']).default('_blank'),
   })
-  .strict()
-  .optional()
   .nullable();
 
 const actionZodSchema = z
   .object({
-    label: z.string().optional(),
-    redirect: redirectZodSchema.optional(),
-  })
-  .strict()
-  .optional()
-  .nullable();
-
-export const inAppControlZodSchema = z
-  .object({
-    skip: skipZodSchema,
-    subject: z.string().optional(),
-    body: z.string(),
-    avatar: z.string().optional(),
-    primaryAction: actionZodSchema,
-    secondaryAction: actionZodSchema,
-    data: z.object({}).catchall(z.unknown()).optional(),
+    label: z.string(),
     redirect: redirectZodSchema,
   })
-  .strict();
+  .nullable();
+
+export const inAppControlZodSchema = z.object({
+  skip: skipZodSchema,
+  subject: z.string().optional(),
+  body: z.string(),
+  avatar: z.string().regex(templateUrlPattern).optional(),
+  primaryAction: actionZodSchema,
+  secondaryAction: actionZodSchema,
+  data: z.object({}).catchall(z.unknown()).optional(),
+  redirect: redirectZodSchema.optional(),
+});
 
 export type InAppRedirectType = z.infer<typeof redirectZodSchema>;
 export type InAppActionType = z.infer<typeof actionZodSchema>;
 export type InAppControlType = z.infer<typeof inAppControlZodSchema>;
 
-export const inAppRedirectSchema = zodToJsonSchema(redirectZodSchema) as JSONSchemaDto;
-export const inAppActionSchema = zodToJsonSchema(actionZodSchema) as JSONSchemaDto;
-export const inAppControlSchema = zodToJsonSchema(inAppControlZodSchema) as JSONSchemaDto;
+export const inAppRedirectSchema = zodToJsonSchema(redirectZodSchema, defaultOptions) as JSONSchemaDto;
+export const inAppActionSchema = zodToJsonSchema(actionZodSchema, defaultOptions) as JSONSchemaDto;
+export const inAppControlSchema = zodToJsonSchema(inAppControlZodSchema, defaultOptions) as JSONSchemaDto;
 
 const redirectPlaceholder = {
   url: {

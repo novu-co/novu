@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { TipTapSchema } from '../../../environments-v1/usecases/output-renderers';
 import { skipZodSchema, skipStepUiSchema } from './skip-control.schema';
+import { defaultOptions } from './shared';
 
 export const emailControlZodSchema = z
   .object({
@@ -18,7 +19,7 @@ export const emailControlZodSchema = z
 
 export type EmailControlType = z.infer<typeof emailControlZodSchema>;
 
-export const emailControlSchema = zodToJsonSchema(emailControlZodSchema) as JSONSchemaDto;
+export const emailControlSchema = zodToJsonSchema(emailControlZodSchema, defaultOptions) as JSONSchemaDto;
 export const emailUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.EMAIL,
   properties: {

@@ -9,6 +9,7 @@ import {
   UiSchemaGroupEnum,
 } from '@novu/shared';
 import { skipStepUiSchema, skipZodSchema } from './skip-control.schema';
+import { defaultOptions } from './shared';
 
 const digestRegularControlZodSchema = z
   .object({
@@ -38,7 +39,7 @@ export type DigestTimedControlType = z.infer<typeof digestTimedControlZodSchema>
 export type DigestControlSchemaType = z.infer<typeof digestControlZodSchema>;
 
 export const digestControlZodSchema = z.union([digestRegularControlZodSchema, digestTimedControlZodSchema]);
-export const digestControlSchema = zodToJsonSchema(digestControlZodSchema) as JSONSchemaDto;
+export const digestControlSchema = zodToJsonSchema(digestControlZodSchema, defaultOptions) as JSONSchemaDto;
 
 export function isDigestRegularControl(data: unknown): data is DigestRegularControlType {
   const result = digestRegularControlZodSchema.safeParse(data);

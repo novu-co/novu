@@ -30,7 +30,6 @@ import {
   WorkflowStatusEnum,
   StepIssues,
   ControlSchemas,
-  DigestUnitEnum,
 } from '@novu/shared';
 import {
   CreateWorkflow as CreateWorkflowGeneric,
@@ -57,6 +56,7 @@ import { stepTypeToControlSchema } from '../../shared';
 import { GetWorkflowCommand, GetWorkflowUseCase } from '../get-workflow';
 import { buildVariables } from '../../util/build-variables';
 import { BuildAvailableVariableSchemaCommand, BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
+import { sanitizeControlValues } from '../../shared/sanitize-control-values';
 
 @Injectable()
 export class UpsertWorkflowUseCase {
@@ -312,7 +312,8 @@ export class UpsertWorkflowUseCase {
       )?.controls;
     }
 
-    const controlIssues = processControlValuesBySchema(controlSchemas?.schema, controlValueLocal || {});
+    const sanitizedControlValues = controlValueLocal ? sanitizeControlValues(controlValueLocal, step.type) : {};
+    const controlIssues = processControlValuesBySchema(controlSchemas?.schema, sanitizedControlValues || {});
     const liquidTemplateIssues = processControlValuesByLiquid(variableSchema, controlValueLocal || {});
     const customIssues = await this.processCustomControlValues(user, step.type, controlValueLocal || {});
     const customControlIssues = _.isEmpty(customIssues) ? {} : { controls: customIssues };
@@ -475,11 +476,15 @@ function processControlValuesByLiquid(
     if (liquidTemplateIssues.invalidVariables.length > 0) {
       issues.controls = issues.controls || {};
 
-      issues.controls[controlKey] = liquidTemplateIssues.invalidVariables.map((error) => ({
-        message: `${error.message}, variable: ${error.output}`,
-        issueType: StepContentIssueEnum.ILLEGAL_VARIABLE_IN_CONTROL_VALUE,
-        variableName: error.output,
-      }));
+      issues.controls[controlKey] = liquidTemplateIssues.invalidVariables.map((error) => {
+        const message = error.message ? error.message[0].toUpperCase() + error.message.slice(1).split(' line:')[0] : '';
+
+        return {
+          message: `${message} variable: ${error.output}`,
+          issueType: StepContentIssueEnum.ILLEGAL_VARIABLE_IN_CONTROL_VALUE,
+          variableName: error.output,
+        };
+      });
     }
   }
 
@@ -512,9 +517,8 @@ function processControlValuesBySchema(
           if (!acc[path]) {
             acc[path] = [];
           }
-
           acc[path].push({
-            message: error.message || 'Invalid value',
+            message: mapAjvErrorToMessage(error),
             issueType: mapAjvErrorToIssueType(error),
             variableName: path,
           });
@@ -538,7 +542,16 @@ function processControlValuesBySchema(
  * Example: "/foo/bar" becomes "foo.bar"
  */
 function getErrorPath(error: ErrorObject): string {
-  return (error.instancePath.substring(1) || error.params.missingProperty)?.replace(/\//g, '.');
+  const path = error.instancePath.substring(1);
+  const { missingProperty } = error.params;
+
+  if (!path || path.trim().length === 0) {
+    return missingProperty;
+  }
+
+  const fullPath = missingProperty ? `${path}/${missingProperty}` : path;
+
+  return fullPath?.replace(/\//g, '.');
 }
 
 function cleanObject(
@@ -563,4 +576,20 @@ function mapAjvErrorToIssueType(error: ErrorObject): StepContentIssueEnum {
     default:
       return StepContentIssueEnum.MISSING_VALUE;
   }
+}
+
+function mapAjvErrorToMessage(error: ErrorObject<string, Record<string, unknown>, unknown>): string {
+  if (error.keyword === 'required') {
+    return `${_.capitalize(error.params.missingProperty)} is required`;
+  }
+  if (
+    error.keyword === 'pattern' &&
+    error.message?.includes('must match pattern') &&
+    error.message?.includes('mailto') &&
+    error.message?.includes('https')
+  ) {
+    return 'Invalid URL format. Must be a valid absolute URL, path, or contain valid template variables';
+  }
+
+  return error.message || 'Invalid value';
 }

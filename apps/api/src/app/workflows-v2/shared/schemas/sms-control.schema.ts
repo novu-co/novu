@@ -3,6 +3,7 @@ import { zodToJsonSchema } from 'zod-to-json-schema';
 
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 import { skipZodSchema, skipStepUiSchema } from './skip-control.schema';
+import { defaultOptions } from './shared';
 
 export const smsControlZodSchema = z
   .object({
@@ -13,7 +14,7 @@ export const smsControlZodSchema = z
 
 export type SmsControlType = z.infer<typeof smsControlZodSchema>;
 
-export const smsControlSchema = zodToJsonSchema(smsControlZodSchema) as JSONSchemaDto;
+export const smsControlSchema = zodToJsonSchema(smsControlZodSchema, defaultOptions) as JSONSchemaDto;
 export const smsUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.SMS,
   properties: {

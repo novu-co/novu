@@ -3,6 +3,7 @@ import { zodToJsonSchema } from 'zod-to-json-schema';
 
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
 import { skipStepUiSchema, skipZodSchema } from './skip-control.schema';
+import { defaultOptions } from './shared';
 
 export const chatControlZodSchema = z
   .object({
@@ -13,7 +14,7 @@ export const chatControlZodSchema = z
 
 export type ChatControlType = z.infer<typeof chatControlZodSchema>;
 
-export const chatControlSchema = zodToJsonSchema(chatControlZodSchema) as JSONSchemaDto;
+export const chatControlSchema = zodToJsonSchema(chatControlZodSchema, defaultOptions) as JSONSchemaDto;
 export const chatUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.CHAT,
   properties: {
