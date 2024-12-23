@@ -70,10 +70,6 @@ export const FieldEditor = ({
         const { from, to } = selectedVariable;
         const view = viewRef.current;
 
-        const currentContent = view.state.doc.toString();
-        const beforeContent = currentContent.slice(0, from);
-        const afterContent = currentContent.slice(to);
-
         const newVariableText = `{{${newValue}}}`;
 
         const changes = {
@@ -88,6 +84,7 @@ export const FieldEditor = ({
         });
 
         const updatedContent = view.state.doc.toString();
+
         onChange(updatedContent);
 
         setSelectedVariable((prev) => (prev ? { ...prev, value: newValue, to: from + newVariableText.length } : null));

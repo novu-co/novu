@@ -51,11 +51,6 @@ export function createVariablePlugin({ viewRef, lastCompletionRef }: PluginState
           const end = start + match[0].length;
           const variableName = match[1].trim();
 
-          const isJustCompleted =
-            lastCompletionRef.current &&
-            start === lastCompletionRef.current.from - 2 &&
-            end === lastCompletionRef.current.to + 2;
-
           if (variableName) {
             decorations.push(
               Decoration.mark({
