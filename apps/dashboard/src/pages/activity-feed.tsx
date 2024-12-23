@@ -16,6 +16,7 @@ export function ActivityFeed() {
 
     // For arrays, check if they have any items
     if (Array.isArray(value)) return value.length > 0;
+
     // For other values, check if they exist
     return !!value;
   });

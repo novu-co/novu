@@ -8,6 +8,8 @@ import { mainCard, leftSection, textItem, stepsList, stepItem, logo } from './pr
 import { PointingArrow, NovuLogo } from './icons';
 import { useTelemetry } from '../../hooks/use-telemetry';
 import { TelemetryEvent } from '../../utils/telemetry';
+import { useFeatureFlag } from '../../hooks/use-feature-flag';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 
 interface StepItemProps {
   step: {
@@ -43,6 +45,7 @@ export function ProgressSection() {
 }
 
 function StepItem({ step, environmentSlug }: StepItemProps) {
+  const isNewIntegrationStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_INTEGRATION_STORE_ENABLED, false);
   const telemetry = useTelemetry();
 
   const handleStepClick = () => {
@@ -66,8 +69,8 @@ function StepItem({ step, environmentSlug }: StepItemProps) {
       </div>
 
       <Link
-        to={getStepRoute(step.id, environmentSlug).path}
-        reloadDocument={getStepRoute(step.id).isLegacy}
+        to={getStepRoute(step.id, environmentSlug, isNewIntegrationStoreEnabled).path}
+        reloadDocument={getStepRoute(step.id, environmentSlug, isNewIntegrationStoreEnabled).isLegacy}
         className="w-full"
         onClick={handleStepClick}
       >
@@ -118,7 +121,7 @@ function WelcomeHeader() {
   );
 }
 
-function getStepRoute(stepId: StepIdEnum, environmentSlug: string = '') {
+function getStepRoute(stepId: StepIdEnum, environmentSlug: string = '', isNewIntegrationStoreEnabled: boolean) {
   switch (stepId) {
     case StepIdEnum.CREATE_A_WORKFLOW:
       return {
@@ -130,8 +133,10 @@ function getStepRoute(stepId: StepIdEnum, environmentSlug: string = '') {
     case StepIdEnum.CONNECT_CHAT_PROVIDER:
     case StepIdEnum.CONNECT_SMS_PROVIDER:
       return {
-        path: LEGACY_ROUTES.INTEGRATIONS,
-        isLegacy: true,
+        path: isNewIntegrationStoreEnabled
+          ? buildRoute(ROUTES.INTEGRATIONS, { environmentSlug })
+          : LEGACY_ROUTES.INTEGRATIONS,
+        isLegacy: !isNewIntegrationStoreEnabled,
       };
     case StepIdEnum.CONNECT_IN_APP_PROVIDER:
       return {
