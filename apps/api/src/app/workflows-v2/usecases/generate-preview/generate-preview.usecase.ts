@@ -7,7 +7,6 @@ import {
   JobStatusEnum,
   PreviewPayload,
   StepDataDto,
-  TipTapNode,
   WorkflowOriginEnum,
 } from '@novu/shared';
 import {
@@ -17,7 +16,6 @@ import {
   Instrument,
   InstrumentUsecase,
   PinoLogger,
-  sanitizePreviewControlValues,
 } from '@novu/application-generic';
 import { captureException } from '@sentry/node';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
@@ -26,27 +24,13 @@ import { BuildStepDataUsecase } from '../build-step-data';
 import { GeneratePreviewCommand } from './generate-preview.command';
 import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
 import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
-import {
-  extractLiquidTemplateVariables,
-  TemplateParseResult,
-  Variable,
-} from '../../util/template-parser/liquid-parser';
+import { Variable } from '../../util/template-parser/liquid-parser';
 import { pathsToObject } from '../../util/path-to-object';
-import { transformMailyContentToLiquid } from './transform-maily-content-to-liquid';
-import { isObjectTipTapNode, isStringTipTapNode } from '../../util/tip-tap.util';
+import { isObjectTipTapNode } from '../../util/tip-tap.util';
+import { buildVariables } from '../../util/build-variables';
+import { sanitizeControlValues } from '../../shared/sanitize-control-values';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
-
-type DestructuredControlValues = {
-  tiptapControlValues: { emailEditor?: string | null; body?: string | null } | null;
-  // this is the remaining control values after the tiptap control is extracted
-  simpleControlValues: Record<string, unknown>;
-};
-
-type ProcessedControlResult = {
-  controlValues: Record<string, unknown>;
-  variablesExample: Record<string, unknown> | null;
-};
 
 @Injectable()
 export class GeneratePreviewUsecase {
@@ -54,8 +38,8 @@ export class GeneratePreviewUsecase {
     private previewStepUsecase: PreviewStep,
     private buildStepDataUsecase: BuildStepDataUsecase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private readonly logger: PinoLogger,
-    private buildPayloadSchema: BuildPayloadSchema
+    private buildPayloadSchema: BuildPayloadSchema,
+    private readonly logger: PinoLogger
   ) {}
 
   @InstrumentUsecase()
@@ -68,7 +52,7 @@ export class GeneratePreviewUsecase {
         workflow,
       } = await this.initializePreviewContext(command);
       const commandVariablesExample = command.generatePreviewRequestDto.previewPayload;
-      const sanitizedValidatedControls = sanitizePreviewControlValues(initialControlValues, stepData.type);
+      const sanitizedValidatedControls = sanitizeControlValues(initialControlValues, stepData.type);
 
       if (!sanitizedValidatedControls) {
         throw new Error(
@@ -77,37 +61,25 @@ export class GeneratePreviewUsecase {
         );
       }
 
-      let previewDataResult = {
+      let previewTemplateData = {
         variablesExample: {},
         controlValues: {},
       };
 
       for (const [controlKey, controlValue] of Object.entries(sanitizedValidatedControls)) {
-        // previewControlValue is the control value that will be used to render the preview
-        const previewControlValue = controlValue;
-        // variableControlValue is the control value that will be used to extract the variables example
-        let variableControlValue = controlValue;
-        if (isStringTipTapNode(variableControlValue)) {
-          try {
-            variableControlValue = transformMailyContentToLiquid(JSON.parse(variableControlValue));
-          } catch (error) {
-            console.log(error);
-          }
-        }
+        const variables = buildVariables(variableSchema, controlValue, this.logger);
+        const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalidVariables);
 
-        const variables = this.processControlValueVariables(variableControlValue, variableSchema);
-        const processedControlValues = this.fixControlValueInvalidVariables(previewControlValue, variables.invalid);
-
-        const validVariableNames = variables.valid.map((variable) => variable.name);
+        const validVariableNames = variables.validVariables.map((variable) => variable.name);
         const variablesExampleResult = pathsToObject(validVariableNames, {
           valuePrefix: '{{',
           valueSuffix: '}}',
         });
 
-        previewDataResult = {
-          variablesExample: _.merge(previewDataResult.variablesExample, variablesExampleResult),
+        previewTemplateData = {
+          variablesExample: _.merge(previewTemplateData.variablesExample, variablesExampleResult),
           controlValues: {
-            ...previewDataResult.controlValues,
+            ...previewTemplateData.controlValues,
             [controlKey]: isObjectTipTapNode(processedControlValues)
               ? JSON.stringify(processedControlValues)
               : processedControlValues,
@@ -115,12 +87,12 @@ export class GeneratePreviewUsecase {
         };
       }
 
-      const finalVariablesExample = this.buildVariable(workflow, previewDataResult, commandVariablesExample);
+      const mergedVariablesExample = this.mergeVariablesExample(workflow, previewTemplateData, commandVariablesExample);
       const executeOutput = await this.executePreviewUsecase(
         command,
         stepData,
-        finalVariablesExample,
-        previewDataResult.controlValues
+        mergedVariablesExample,
+        previewTemplateData.controlValues
       );
 
       return {
@@ -128,7 +100,7 @@ export class GeneratePreviewUsecase {
           preview: executeOutput.outputs as any,
           type: stepData.type as unknown as ChannelTypeEnum,
         },
-        previewPayloadExample: finalVariablesExample,
+        previewPayloadExample: mergedVariablesExample,
       };
     } catch (error) {
       this.logger.error(
@@ -154,9 +126,9 @@ export class GeneratePreviewUsecase {
     }
   }
 
-  private buildVariable(
+  private mergeVariablesExample(
     workflow: WorkflowInternalResponseDto,
-    previewDataResult: { variablesExample: {}; controlValues: {} },
+    previewTemplateData: { variablesExample: {}; controlValues: {} },
     commandVariablesExample: PreviewPayload | undefined
   ) {
     let finalVariablesExample = {};
@@ -166,9 +138,9 @@ export class GeneratePreviewUsecase {
         type: 'object',
         properties: { payload: workflow.payloadSchema },
       });
-      finalVariablesExample = { ...previewDataResult.variablesExample, ...tmp };
+      finalVariablesExample = { ...previewTemplateData.variablesExample, ...tmp };
     } else {
-      finalVariablesExample = previewDataResult.variablesExample;
+      finalVariablesExample = previewTemplateData.variablesExample;
     }
 
     finalVariablesExample = _.merge(finalVariablesExample, commandVariablesExample || {});
@@ -183,26 +155,6 @@ export class GeneratePreviewUsecase {
     const variableSchema = await this.buildVariablesSchema(stepData.variables, command, controlValues);
 
     return { stepData, controlValues, variableSchema, workflow };
-  }
-
-  private processControlValueVariables(
-    controlValue: unknown,
-    variableSchema: Record<string, unknown>
-  ): {
-    valid: Variable[];
-    invalid: Variable[];
-  } {
-    const { validVariables, invalidVariables } = extractLiquidTemplateVariables(JSON.stringify(controlValue));
-
-    const { validVariables: validSchemaVariables, invalidVariables: invalidSchemaVariables } = identifyUnknownVariables(
-      variableSchema,
-      validVariables
-    );
-
-    return {
-      valid: validSchemaVariables,
-      invalid: [...invalidVariables, ...invalidSchemaVariables],
-    };
   }
 
   @Instrument()
@@ -293,12 +245,12 @@ export class GeneratePreviewUsecase {
       let controlValuesString = JSON.stringify(controlValues);
 
       for (const invalidVariable of invalidVariables) {
-        if (!controlValuesString.includes(invalidVariable.template)) {
+        if (!controlValuesString.includes(invalidVariable.output)) {
           continue;
         }
 
         const EMPTY_STRING = '';
-        controlValuesString = replaceAll(controlValuesString, invalidVariable.template, EMPTY_STRING);
+        controlValuesString = replaceAll(controlValuesString, invalidVariable.output, EMPTY_STRING);
       }
 
       return JSON.parse(controlValuesString) as Record<string, unknown>;
@@ -323,6 +275,13 @@ function buildState(steps: Record<string, unknown> | undefined): FrameworkPrevio
   return outputArray;
 }
 
+/**
+ * Replaces all occurrences of a search string with a replacement string.
+ */
+export function replaceAll(text: string, searchValue: string, replaceValue: string): string {
+  return _.replace(text, new RegExp(_.escapeRegExp(searchValue), 'g'), replaceValue);
+}
+
 export class GeneratePreviewError extends InternalServerErrorException {
   constructor(error: FrameworkError) {
     super({
@@ -344,90 +303,4 @@ class FrameworkError {
   options: Record<string, unknown>;
   message: string;
   name: string;
-}
-
-/**
- * Validates liquid template variables against a schema, the result is an object with valid and invalid variables
- * @example
- * const variables = [
- *   { name: 'subscriber.firstName' },
- *   { name: 'subscriber.orderId' }
- * ];
- * const schema = {
- *   properties: {
- *     subscriber: {
- *       properties: {
- *         firstName: { type: 'string' }
- *       }
- *     }
- *   }
- * };
- * const invalid = [{ name: 'unknown.variable' }];
- *
- * validateVariablesAgainstSchema(variables, schema, invalid);
- * // Returns:
- * // {
- * //   validVariables: [{ name: 'subscriber.firstName' }],
- * //   invalidVariables: [{ name: 'unknown.variable' }, { name: 'subscriber.orderId' }]
- * // }
- */
-function identifyUnknownVariables(
-  variableSchema: Record<string, unknown>,
-  validVariables: Variable[]
-): TemplateParseResult {
-  const validVariablesCopy: Variable[] = _.cloneDeep(validVariables);
-
-  const result = validVariablesCopy.reduce<TemplateParseResult>(
-    (acc, variable: Variable) => {
-      const parts = variable.name.split('.');
-      let isValid = true;
-      let currentPath = 'properties';
-
-      for (const part of parts) {
-        currentPath += `.${part}`;
-        const valueSearch = _.get(variableSchema, currentPath);
-
-        currentPath += '.properties';
-        const propertiesSearch = _.get(variableSchema, currentPath);
-
-        if (valueSearch === undefined && propertiesSearch === undefined) {
-          isValid = false;
-          break;
-        }
-      }
-
-      if (isValid) {
-        acc.validVariables.push(variable);
-      } else {
-        acc.invalidVariables.push({
-          name: variable.template,
-          context: variable.context,
-          message: 'Variable is not supported',
-          template: variable.template,
-        });
-      }
-
-      return acc;
-    },
-    {
-      validVariables: [] as Variable[],
-      invalidVariables: [] as Variable[],
-    } as TemplateParseResult
-  );
-
-  return result;
-}
-
-/**
- * Fixes invalid Liquid template variables for preview by replacing them with error messages.
- *
- * @example
- * // Input controlValues:
- * { "message": "Hello {{invalid.var}}" }
- *
- * // Output:
- * { "message": "Hello [[Invalid Variable: invalid.var]]" }
- */
-function replaceAll(text: string, searchValue: string, replaceValue: string): string {
-  return _.replace(text, new RegExp(_.escapeRegExp(searchValue), 'g'), replaceValue);
 }

@@ -444,6 +444,12 @@ importers:
       '@upstash/ratelimit':
         specifier: ^0.4.4
         version: 0.4.4
+      ajv:
+        specifier: ^8.12.0
+        version: 8.13.0
+      ajv-formats:
+        specifier: ^2.1.1
+        version: 2.1.1(ajv@8.13.0)
       axios:
         specifier: ^1.6.8
         version: 1.6.8
@@ -2727,6 +2733,9 @@ importers:
       class-validator:
         specifier: 0.14.1
         version: 0.14.1
+      cron-parser:
+        specifier: ^4.9.0
+        version: 4.9.0
       date-fns:
         specifier: ^2.29.2
         version: 2.29.3

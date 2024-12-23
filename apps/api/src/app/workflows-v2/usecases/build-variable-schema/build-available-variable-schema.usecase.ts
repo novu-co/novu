@@ -14,9 +14,9 @@ export class BuildAvailableVariableSchemaUsecase {
 
   async execute(command: BuildAvailableVariableSchemaCommand): Promise<JSONSchemaDto> {
     const { workflow } = command;
-    const previousSteps = workflow.steps.slice(
+    const previousSteps = workflow?.steps.slice(
       0,
-      workflow.steps.findIndex((stepItem) => stepItem._id === command.stepInternalId)
+      workflow?.steps.findIndex((stepItem) => stepItem._id === command.stepInternalId)
     );
 
     return {
@@ -49,7 +49,7 @@ export class BuildAvailableVariableSchemaUsecase {
           required: ['firstName', 'lastName', 'email', 'subscriberId'],
           additionalProperties: false,
         },
-        steps: buildPreviousStepsSchema(previousSteps, workflow.payloadSchema),
+        steps: buildPreviousStepsSchema(previousSteps, workflow?.payloadSchema),
         payload: await this.resolvePayloadSchema(workflow, command),
       },
       additionalProperties: false,
@@ -58,9 +58,17 @@ export class BuildAvailableVariableSchemaUsecase {
 
   @Instrument()
   private async resolvePayloadSchema(
-    workflow: NotificationTemplateEntity,
+    workflow: NotificationTemplateEntity | undefined,
     command: BuildAvailableVariableSchemaCommand
   ): Promise<JSONSchemaDto> {
+    if (!workflow) {
+      return {
+        type: 'object',
+        properties: {},
+        additionalProperties: true,
+      };
+    }
+
     if (workflow.payloadSchema) {
       return (
         parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {
@@ -77,6 +85,7 @@ export class BuildAvailableVariableSchemaUsecase {
         organizationId: command.organizationId,
         userId: command.userId,
         workflowId: workflow._id,
+        ...(command.optimisticControlValues ? { controlValues: command.optimisticControlValues } : {}),
       })
     );
   }

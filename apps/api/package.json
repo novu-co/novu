@@ -101,6 +101,8 @@
     "twilio": "^4.14.1",
     "uuid": "^8.3.2",
     "zod": "^3.23.8",
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1",
     "zod-to-json-schema": "^3.23.3"
   },
   "devDependencies": {
