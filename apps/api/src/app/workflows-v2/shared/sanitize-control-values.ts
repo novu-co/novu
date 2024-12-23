@@ -11,7 +11,7 @@ import {
   isDigestTimedControl,
 } from './schemas/digest-control.schema';
 import { PushControlType } from './schemas/push-control.schema';
-import { InAppControlType } from './schemas/in-app-control.schema';
+import { InAppActionType, InAppControlType, InAppRedirectType } from './schemas/in-app-control.schema';
 import { EmailControlType } from './schemas/email-control.schema';
 
 const EMPTY_TIP_TAP_OBJECT = JSON.stringify({
@@ -41,9 +41,9 @@ type LookBackWindow = {
   unit: string;
 };
 
-function sanitizeRedirect(redirect: Redirect | undefined, isOptional: boolean = false) {
+function sanitizeRedirect(redirect: InAppRedirectType | undefined, isOptional: boolean = false) {
   if (isOptional && (!redirect?.url || !redirect?.target)) {
-    return null;
+    return undefined;
   }
 
   return {
@@ -52,14 +52,14 @@ function sanitizeRedirect(redirect: Redirect | undefined, isOptional: boolean = 
   };
 }
 
-function sanitizeAction(action: Action) {
-  if (!action?.label && !action?.redirect?.url && !action?.redirect?.target) {
-    return null;
+function sanitizeAction(action: InAppActionType) {
+  if (!action?.label && !action?.redirect?.url && !action?.redirect?.target && !action?.redirect) {
+    return undefined;
   }
 
   return {
     label: action.label as string,
-    redirect: sanitizeRedirect(action.redirect),
+    redirect: sanitizeRedirect(action.redirect) as InAppRedirectType,
   };
 }
 
@@ -68,23 +68,23 @@ function sanitizeInApp(controlValues: InAppControlType) {
     subject: controlValues.subject || undefined,
     body: isEmpty(controlValues.body) ? WHITESPACE : controlValues.body,
     avatar: controlValues.avatar || undefined,
-    primaryAction: null,
-    secondaryAction: null,
-    redirect: null,
+    primaryAction: undefined,
+    secondaryAction: undefined,
+    redirect: undefined,
     data: controlValues.data || undefined,
     skip: controlValues.skip || undefined,
   };
 
   if (controlValues.primaryAction) {
-    normalized.primaryAction = sanitizeAction(controlValues.primaryAction as Action);
+    normalized.primaryAction = sanitizeAction(controlValues.primaryAction as InAppActionType);
   }
 
   if (controlValues.secondaryAction) {
-    normalized.secondaryAction = sanitizeAction(controlValues.secondaryAction as Action);
+    normalized.secondaryAction = sanitizeAction(controlValues.secondaryAction as InAppActionType);
   }
 
   if (controlValues.redirect) {
-    normalized.redirect = sanitizeRedirect(controlValues.redirect as Redirect, true);
+    normalized.redirect = sanitizeRedirect(controlValues.redirect as InAppRedirectType, true);
   }
 
   return filterNullishValues(normalized);

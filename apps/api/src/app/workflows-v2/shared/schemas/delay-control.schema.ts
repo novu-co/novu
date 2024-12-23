@@ -8,8 +8,7 @@ import {
   UiSchema,
   UiSchemaGroupEnum,
 } from '@novu/shared';
-import { skipStepUiSchema, skipZodSchema } from './skip-control.schema';
-import { defaultOptions } from './shared';
+import { defaultOptions, skipStepUiSchema, skipZodSchema } from './shared';
 
 export const delayControlZodSchema = z
   .object({

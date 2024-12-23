@@ -2,8 +2,7 @@ import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@no
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { TipTapSchema } from '../../../environments-v1/usecases/output-renderers';
-import { skipZodSchema, skipStepUiSchema } from './skip-control.schema';
-import { defaultOptions } from './shared';
+import { defaultOptions, skipStepUiSchema, skipZodSchema } from './shared';
 
 export const emailControlZodSchema = z
   .object({

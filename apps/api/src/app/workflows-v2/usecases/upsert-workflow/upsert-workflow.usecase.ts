@@ -497,19 +497,17 @@ function processControlValuesBySchema(
 ): StepIssuesDto {
   let issues: StepIssuesDto = {};
 
-  const cleanedControlValues = controlValues ? cleanObject(controlValues) : {};
-
-  if (!controlSchema || !cleanedControlValues) {
+  if (!controlSchema || !controlValues) {
     return issues;
   }
 
   const ajv = new Ajv({ allErrors: true });
   addFormats(ajv);
   const validate = ajv.compile(controlSchema);
-  const isValid = validate(cleanedControlValues);
+  const isValid = validate(controlValues);
   const errors = validate.errors as null | ErrorObject[];
 
-  if (!isValid && errors && errors?.length !== 0 && cleanedControlValues) {
+  if (!isValid && errors && errors?.length !== 0 && controlValues) {
     issues = {
       controls: errors.reduce(
         (acc, error) => {
@@ -588,7 +586,7 @@ function mapAjvErrorToMessage(error: ErrorObject<string, Record<string, unknown>
     error.message?.includes('mailto') &&
     error.message?.includes('https')
   ) {
-    return 'Invalid URL format. Must be a valid absolute URL, path, or contain valid template variables';
+    return 'Invalid URL format. Must be a valid absolute URL, path, or valid variable';
   }
 
   return error.message || 'Invalid value';

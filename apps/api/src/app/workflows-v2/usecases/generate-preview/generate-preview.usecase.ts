@@ -218,7 +218,7 @@ export class GeneratePreviewUsecase {
     command: GeneratePreviewCommand,
     stepData: StepDataDto,
     hydratedPayload: PreviewPayload,
-    updatedControlValues: Record<string, unknown>
+    controlValues: Record<string, unknown>
   ) {
     const state = buildState(hydratedPayload.steps);
     try {
@@ -226,7 +226,7 @@ export class GeneratePreviewUsecase {
         PreviewStepCommand.create({
           payload: hydratedPayload.payload || {},
           subscriber: hydratedPayload.subscriber,
-          controls: updatedControlValues || {},
+          controls: controlValues || {},
           environmentId: command.user.environmentId,
           organizationId: command.user.organizationId,
           stepId: stepData.stepId,

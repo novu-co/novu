@@ -1,8 +1,7 @@
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
-import { skipStepUiSchema, skipZodSchema } from './skip-control.schema';
-import { defaultOptions } from './shared';
+import { defaultOptions, skipStepUiSchema, skipZodSchema } from './shared';
 
 /**
  * Regex pattern for validating URLs with template variables. Matches three cases:
@@ -23,19 +22,17 @@ import { defaultOptions } from './shared';
 const templateUrlPattern =
   /^(\{\{[^}]*\}\}.*)|^(?!mailto:)(?:(https?):\/\/[^\s/$.?#].[^\s]*(?:\{\{[^}]*\}\}[^\s]*)*)|^(\/[^\s]*(?:\{\{[^}]*\}\}[^\s]*)*)$/;
 
-const redirectZodSchema = z
-  .object({
-    url: z.string().regex(templateUrlPattern),
-    target: z.enum(['_self', '_blank', '_parent', '_top', '_unfencedTop']).default('_blank'),
-  })
-  .nullable();
+const redirectZodSchema = z.object({
+  url: z.string().regex(templateUrlPattern),
+  target: z.enum(['_self', '_blank', '_parent', '_top', '_unfencedTop']).default('_blank'),
+});
 
 const actionZodSchema = z
   .object({
     label: z.string(),
     redirect: redirectZodSchema,
   })
-  .nullable();
+  .optional();
 
 export const inAppControlZodSchema = z.object({
   skip: skipZodSchema,
