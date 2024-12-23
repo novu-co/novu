@@ -1,19 +1,20 @@
 import {
+  MutationObserverResult,
   QueryClient,
   QueryObserverOptions,
   QueryObserverResult,
-  MutationObserverResult,
 } from '@tanstack/query-core';
 import io from 'socket.io-client';
 import {
   ApiService,
-  IUserPreferenceSettings,
   IStoreQuery,
   IUserGlobalPreferenceSettings,
+  IUserPreferenceSettings,
 } from '@novu/client';
 import {
-  IOrganizationEntity,
   IMessage,
+  INotificationDto,
+  IOrganizationEntity,
   IPaginatedResponse,
   WebSocketEventEnum,
 } from '@novu/shared';
@@ -35,8 +36,8 @@ import {
   IHeadlessServiceOptions,
   IMessageId,
   IUpdateActionVariables,
-  IUpdateUserPreferencesVariables,
   IUpdateUserGlobalPreferencesVariables,
+  IUpdateUserPreferencesVariables,
   UpdateResult,
 } from './types';
 
@@ -877,17 +878,25 @@ export class HeadlessService {
       IUpdateActionVariables
     >({
       options: {
-        mutationFn: (variables) =>
-          this.api.updateAction(
+        mutationFn: async (variables) => {
+          const notificationDto: INotificationDto = await this.api.updateAction(
             variables.messageId,
             variables.actionButtonType,
             variables.status,
             variables.payload,
-          ),
+          );
+
+          // Transform INotificationDto to IMessage
+          return {
+            ...notificationDto,
+            payload: notificationDto.payload || {}, // Provide a default if optional
+          };
+        },
         onSuccess: (data) => {
           this.queryClient.refetchQueries(NOTIFICATIONS_QUERY_KEY, {
             exact: false,
           });
+          onSuccess?.(data); // Call onSuccess callback
         },
       },
       listener: (res) => this.callUpdateListener(res, listener),
@@ -1043,3 +1052,4 @@ export class HeadlessService {
       });
   }
 }
+// Function to transform INotificationDto to IMessage

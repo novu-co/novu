@@ -3,19 +3,19 @@ import { InAppRenderOutput, RedirectTargetEnum } from '@novu/shared';
 import { Injectable } from '@nestjs/common';
 import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { RenderCommand } from './render-command';
+import { isValidUrlForActionButton } from '../../../workflows-v2/util/url-utils';
 import {
   InAppActionType,
   InAppControlType,
-  InAppControlZodSchema,
+  inAppControlZodSchema,
   InAppRedirectType,
-} from '../../../workflows-v2/shared';
-import { isValidUrlForActionButton } from '../../../workflows-v2/util/url-utils';
+} from '../../../workflows-v2/shared/schemas/in-app-control.schema';
 
 @Injectable()
 export class InAppOutputRendererUsecase {
   @InstrumentUsecase()
   execute(renderCommand: RenderCommand): InAppRenderOutput {
-    const inApp: InAppControlType = InAppControlZodSchema.parse(renderCommand.controlValues);
+    const inApp: InAppControlType = inAppControlZodSchema.parse(renderCommand.controlValues);
     if (!inApp) {
       throw new Error('Invalid in-app control value data');
     }

@@ -13,7 +13,9 @@ import {
   UsecaseSelectPage,
   ApiKeysPage,
   WelcomePage,
+  IntegrationsListPage,
   SettingsPage,
+  ActivityFeed,
 } from '@/pages';
 import './index.css';
 import { ROUTES } from './utils/routes';
@@ -23,11 +25,15 @@ import { initializeSentry } from './utils/sentry';
 import { overrideZodErrorMap } from './utils/validation';
 import { InboxUsecasePage } from './pages/inbox-usecase-page';
 import { InboxEmbedPage } from './pages/inbox-embed-page';
-import { FeatureFlagsProvider } from '@/context/feature-flags-provider';
-import { EditStepTemplate } from '@/components/workflow-editor/steps/edit-step-template';
 import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workflow';
-import { EditStep } from '@/components/workflow-editor/steps/edit-step';
 import { InboxEmbedSuccessPage } from './pages/inbox-embed-success-page';
+import { ChannelPreferences } from './components/workflow-editor/channel-preferences';
+import { FeatureFlagsProvider } from './context/feature-flags-provider';
+import { ConfigureStep } from '@/components/workflow-editor/steps/configure-step';
+import { ConfigureStepTemplate } from '@/components/workflow-editor/steps/configure-step-template';
+import { RedirectToLegacyStudioAuth } from './pages/redirect-to-legacy-studio-auth';
+import { CreateIntegrationSidebar } from './components/integrations/components/create-integration-sidebar';
+import { UpdateIntegrationSidebar } from './components/integrations/components/update-integration-sidebar';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -100,6 +106,10 @@ const router = createBrowserRouter([
                 element: <ApiKeysPage />,
               },
               {
+                path: ROUTES.ACTIVITY_FEED,
+                element: <ActivityFeed />,
+              },
+              {
                 path: ROUTES.EDIT_WORKFLOW,
                 element: <EditWorkflowPage />,
                 children: [
@@ -108,12 +118,16 @@ const router = createBrowserRouter([
                     index: true,
                   },
                   {
-                    element: <EditStep />,
+                    element: <ConfigureStep />,
                     path: ROUTES.EDIT_STEP,
                   },
                   {
-                    element: <EditStepTemplate />,
+                    element: <ConfigureStepTemplate />,
                     path: ROUTES.EDIT_STEP_TEMPLATE,
+                  },
+                  {
+                    element: <ChannelPreferences />,
+                    path: ROUTES.EDIT_WORKFLOW_PREFERENCES,
                   },
                 ],
               },
@@ -121,11 +135,34 @@ const router = createBrowserRouter([
                 path: ROUTES.TEST_WORKFLOW,
                 element: <TestWorkflowPage />,
               },
+
               {
                 path: '*',
                 element: <CatchAllRoute />,
               },
             ],
+          },
+          {
+            path: ROUTES.INTEGRATIONS,
+            element: <IntegrationsListPage />,
+            children: [
+              {
+                path: ROUTES.INTEGRATIONS_CONNECT,
+                element: <CreateIntegrationSidebar isOpened />,
+              },
+              {
+                path: ROUTES.INTEGRATIONS_CONNECT_PROVIDER,
+                element: <CreateIntegrationSidebar isOpened />,
+              },
+              {
+                path: ROUTES.INTEGRATIONS_UPDATE,
+                element: <UpdateIntegrationSidebar isOpened />,
+              },
+            ],
+          },
+          {
+            path: ROUTES.INTEGRATIONS,
+            element: <IntegrationsListPage />,
           },
           {
             path: ROUTES.SETTINGS,
@@ -142,6 +179,14 @@ const router = createBrowserRouter([
           {
             path: ROUTES.SETTINGS_TEAM,
             element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.SETTINGS_BILLING,
+            element: <SettingsPage />,
+          },
+          {
+            path: ROUTES.LOCAL_STUDIO_AUTH,
+            element: <RedirectToLegacyStudioAuth />,
           },
           {
             path: '*',

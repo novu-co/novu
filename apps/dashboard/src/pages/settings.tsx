@@ -3,9 +3,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitive
 import { OrganizationProfile, UserProfile } from '@clerk/clerk-react';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ROUTES } from '@/utils/routes';
+import { LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { Appearance } from '@clerk/types';
 import { motion } from 'motion/react';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
+import { useFeatureFlag } from '../hooks/use-feature-flag';
+import { Plan } from '../components/billing/plan';
 
 const FADE_ANIMATION = {
   initial: { opacity: 0 },
@@ -52,6 +55,7 @@ const clerkComponentAppearance: Appearance = {
 export function SettingsPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const isV2BillingEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_DASHBOARD_BILLING_ENABLED);
 
   const currentTab =
     location.pathname === ROUTES.SETTINGS ? 'account' : location.pathname.split('/settings/')[1] || 'account';
@@ -67,37 +71,38 @@ export function SettingsPage() {
       case 'team':
         navigate(ROUTES.SETTINGS_TEAM);
         break;
+      case 'billing':
+        if (isV2BillingEnabled) {
+          navigate(ROUTES.SETTINGS_BILLING);
+        } else {
+          window.location.href = LEGACY_ROUTES.BILLING;
+        }
+        break;
     }
   };
 
   return (
     <DashboardLayout headerStartItems={<h1 className="text-foreground-950">Settings</h1>}>
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList
-          align="center"
-          className="border-border/20 relative mt-2.5 flex w-full items-end justify-start space-x-2 rounded-none border-b bg-transparent px-1.5 pb-0"
-        >
-          <TabsTrigger
-            value="account"
-            className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
-          >
+        <TabsList align="center" variant="regular" className="border-t-0 !py-0">
+          <TabsTrigger variant={'regular'} value="account">
             Account
           </TabsTrigger>
-          <TabsTrigger
-            value="organization"
-            className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
-          >
+          <TabsTrigger variant={'regular'} value="organization">
             Organization
           </TabsTrigger>
-          <TabsTrigger
-            value="team"
-            className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
-          >
+          <TabsTrigger variant={'regular'} value="team">
             Team
           </TabsTrigger>
+
+          {isV2BillingEnabled && (
+            <TabsTrigger variant={'regular'} value="billing">
+              Billing
+            </TabsTrigger>
+          )}
         </TabsList>
 
-        <div className="mx-auto mt-1 max-w-[700px] px-1.5">
+        <div className={`mx-auto mt-1 px-1.5 ${currentTab === 'billing' ? 'max-w-[1100px]' : 'max-w-[700px]'}`}>
           <TabsContent value="account" className="rounded-lg">
             <motion.div {...FADE_ANIMATION}>
               <Card className="mx-auto border-none shadow-none">
@@ -136,6 +141,16 @@ export function SettingsPage() {
               </Card>
             </motion.div>
           </TabsContent>
+
+          {isV2BillingEnabled && (
+            <TabsContent value="billing" className="rounded-lg">
+              <motion.div {...FADE_ANIMATION}>
+                <Card className="border-none shadow-none">
+                  <Plan />
+                </Card>
+              </motion.div>
+            </TabsContent>
+          )}
         </div>
       </Tabs>
     </DashboardLayout>

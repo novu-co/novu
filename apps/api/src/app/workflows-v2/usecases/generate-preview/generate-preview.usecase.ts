@@ -1,7 +1,8 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import _ from 'lodash';
 import {
   ChannelTypeEnum,
+  createMockObjectFromSchema,
   GeneratePreviewResponseDto,
   JobStatusEnum,
   PreviewPayload,
@@ -21,48 +22,85 @@ import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/previe
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
 import { BuildStepDataUsecase } from '../build-step-data';
 import { GeneratePreviewCommand } from './generate-preview.command';
-import { extractTemplateVars } from '../../util/template-variables/extract-template-variables';
+import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
+import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
+import { Variable } from '../../util/template-parser/liquid-parser';
 import { pathsToObject } from '../../util/path-to-object';
-import { createMockPayloadFromSchema, flattenObjectValues } from '../../util/utils';
-import { PrepareAndValidateContentUsecase } from '../validate-content/prepare-and-validate-content/prepare-and-validate-content.usecase';
+import { isObjectTipTapNode } from '../../util/tip-tap.util';
+import { buildVariables } from '../../util/build-variables';
+import { sanitizeControlValues } from '../../shared/sanitize-control-values';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
 @Injectable()
 export class GeneratePreviewUsecase {
   constructor(
-    private legacyPreviewStepUseCase: PreviewStep,
+    private previewStepUsecase: PreviewStep,
     private buildStepDataUsecase: BuildStepDataUsecase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private readonly logger: PinoLogger,
-    private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase
+    private buildPayloadSchema: BuildPayloadSchema,
+    private readonly logger: PinoLogger
   ) {}
 
   @InstrumentUsecase()
   async execute(command: GeneratePreviewCommand): Promise<GeneratePreviewResponseDto> {
     try {
-      const { previewPayload: commandVariablesExample, controlValues: commandControlValues } =
-        command.generatePreviewRequestDto;
-      const stepData = await this.getStepData(command);
-      const workflow = await this.findWorkflow(command);
-      const preparedAndValidatedContent = await this.prepareAndValidateContentUsecase.execute({
-        user: command.user,
-        previewPayloadFromDto: commandVariablesExample,
-        controlValues: commandControlValues || stepData.controls.values || {},
-        controlDataSchema: stepData.controls.dataSchema || {},
-        variableSchema: stepData.variables,
-      });
-      const variablesExample = this.buildVariablesExample(
+      const {
+        stepData,
+        controlValues: initialControlValues,
+        variableSchema,
         workflow,
-        preparedAndValidatedContent.finalPayload,
-        commandVariablesExample
-      );
+      } = await this.initializePreviewContext(command);
+      const commandVariablesExample = command.generatePreviewRequestDto.previewPayload;
 
+      /**
+       * We don't want to sanitize control values for code workflows,
+       * as it's the responsibility of the custom code workflow creator
+       */
+      const sanitizedValidatedControls =
+        workflow.origin === WorkflowOriginEnum.NOVU_CLOUD
+          ? sanitizeControlValues(initialControlValues, stepData.type)
+          : initialControlValues;
+
+      if (!sanitizedValidatedControls) {
+        throw new Error(
+          // eslint-disable-next-line max-len
+          'Control values normalization failed: The normalizeControlValues function requires maintenance to sanitize the provided type or data structure correctly'
+        );
+      }
+
+      let previewTemplateData = {
+        variablesExample: {},
+        controlValues: {},
+      };
+
+      for (const [controlKey, controlValue] of Object.entries(sanitizedValidatedControls)) {
+        const variables = buildVariables(variableSchema, controlValue, this.logger);
+        const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalidVariables);
+
+        const validVariableNames = variables.validVariables.map((variable) => variable.name);
+        const variablesExampleResult = pathsToObject(validVariableNames, {
+          valuePrefix: '{{',
+          valueSuffix: '}}',
+        });
+
+        previewTemplateData = {
+          variablesExample: _.merge(previewTemplateData.variablesExample, variablesExampleResult),
+          controlValues: {
+            ...previewTemplateData.controlValues,
+            [controlKey]: isObjectTipTapNode(processedControlValues)
+              ? JSON.stringify(processedControlValues)
+              : processedControlValues,
+          },
+        };
+      }
+
+      const mergedVariablesExample = this.mergeVariablesExample(workflow, previewTemplateData, commandVariablesExample);
       const executeOutput = await this.executePreviewUsecase(
         command,
         stepData,
-        variablesExample,
-        preparedAndValidatedContent.finalControlValues
+        mergedVariablesExample,
+        previewTemplateData.controlValues
       );
 
       return {
@@ -70,7 +108,7 @@ export class GeneratePreviewUsecase {
           preview: executeOutput.outputs as any,
           type: stepData.type as unknown as ChannelTypeEnum,
         },
-        previewPayloadExample: variablesExample,
+        previewPayloadExample: mergedVariablesExample,
       };
     } catch (error) {
       this.logger.error(
@@ -82,7 +120,6 @@ export class GeneratePreviewUsecase {
         `Unexpected error while generating preview`,
         LOG_CONTEXT
       );
-
       if (process.env.SENTRY_DSN) {
         captureException(error);
       }
@@ -97,39 +134,58 @@ export class GeneratePreviewUsecase {
     }
   }
 
-  @Instrument()
-  private buildVariablesExample(
+  private mergeVariablesExample(
     workflow: WorkflowInternalResponseDto,
-    finalPayload?: PreviewPayload,
-    commandVariablesExample?: PreviewPayload | undefined
+    previewTemplateData: { variablesExample: {}; controlValues: {} },
+    commandVariablesExample: PreviewPayload | undefined
   ) {
-    if (workflow.origin !== WorkflowOriginEnum.EXTERNAL) {
-      return finalPayload;
+    let finalVariablesExample = {};
+    if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
+      // if external workflow, we need to override with stored payload schema
+      const tmp = createMockObjectFromSchema({
+        type: 'object',
+        properties: { payload: workflow.payloadSchema },
+      });
+      finalVariablesExample = { ...previewTemplateData.variablesExample, ...tmp };
+    } else {
+      finalVariablesExample = previewTemplateData.variablesExample;
     }
 
-    const examplePayloadSchema = createMockPayloadFromSchema(workflow.payloadSchema);
+    finalVariablesExample = _.merge(finalVariablesExample, commandVariablesExample || {});
 
-    if (!examplePayloadSchema || Object.keys(examplePayloadSchema).length === 0) {
-      return finalPayload;
-    }
+    return finalVariablesExample;
+  }
 
-    return _.merge(
-      finalPayload as Record<string, unknown>,
-      { payload: examplePayloadSchema },
-      commandVariablesExample || {}
-    );
+  private async initializePreviewContext(command: GeneratePreviewCommand) {
+    const stepData = await this.getStepData(command);
+    const controlValues = command.generatePreviewRequestDto.controlValues || stepData.controls.values || {};
+    const workflow = await this.findWorkflow(command);
+    const variableSchema = await this.buildVariablesSchema(stepData.variables, command, controlValues);
+
+    return { stepData, controlValues, variableSchema, workflow };
   }
 
   @Instrument()
-  private generateVariablesExample(stepData: StepDataDto, commandControlValues?: Record<string, unknown>) {
-    const controlValues = flattenObjectValues(commandControlValues || stepData.controls.values).join(' ');
-    const templateVars = extractTemplateVars(controlValues);
-    const variablesExample = pathsToObject(templateVars, {
-      valuePrefix: '{{',
-      valueSuffix: '}}',
-    });
+  private async buildVariablesSchema(
+    variables: Record<string, unknown>,
+    command: GeneratePreviewCommand,
+    controlValues: Record<string, unknown>
+  ) {
+    const payloadSchema = await this.buildPayloadSchema.execute(
+      BuildPayloadSchemaCommand.create({
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
+        userId: command.user._id,
+        workflowId: command.workflowIdOrInternalId,
+        controlValues,
+      })
+    );
 
-    return variablesExample;
+    if (Object.keys(payloadSchema).length === 0) {
+      return variables;
+    }
+
+    return _.merge(variables, { properties: { payload: payloadSchema } });
   }
 
   @Instrument()
@@ -166,7 +222,7 @@ export class GeneratePreviewUsecase {
   ) {
     const state = buildState(hydratedPayload.steps);
     try {
-      return await this.legacyPreviewStepUseCase.execute(
+      return await this.previewStepUsecase.execute(
         PreviewStepCommand.create({
           payload: hydratedPayload.payload || {},
           subscriber: hydratedPayload.subscriber,
@@ -188,6 +244,28 @@ export class GeneratePreviewUsecase {
       }
     }
   }
+
+  private fixControlValueInvalidVariables(
+    controlValues: unknown,
+    invalidVariables: Variable[]
+  ): Record<string, unknown> {
+    try {
+      let controlValuesString = JSON.stringify(controlValues);
+
+      for (const invalidVariable of invalidVariables) {
+        if (!controlValuesString.includes(invalidVariable.output)) {
+          continue;
+        }
+
+        const EMPTY_STRING = '';
+        controlValuesString = replaceAll(controlValuesString, invalidVariable.output, EMPTY_STRING);
+      }
+
+      return JSON.parse(controlValuesString) as Record<string, unknown>;
+    } catch (error) {
+      return controlValues as Record<string, unknown>;
+    }
+  }
 }
 
 function buildState(steps: Record<string, unknown> | undefined): FrameworkPreviousStepsOutputState[] {
@@ -203,6 +281,13 @@ function buildState(steps: Record<string, unknown> | undefined): FrameworkPrevio
   }
 
   return outputArray;
+}
+
+/**
+ * Replaces all occurrences of a search string with a replacement string.
+ */
+export function replaceAll(text: string, searchValue: string, replaceValue: string): string {
+  return _.replace(text, new RegExp(_.escapeRegExp(searchValue), 'g'), replaceValue);
 }
 
 export class GeneratePreviewError extends InternalServerErrorException {

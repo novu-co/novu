@@ -132,12 +132,7 @@ export const CustomerSupportButton = () => {
     }
   };
   return (
-    <button
-      id="intercom-launcher"
-      tabIndex={-1}
-      className="flex items-center justify-center"
-      onClick={showPlainLiveChat}
-    >
+    <button tabIndex={-1} className="flex items-center justify-center" onClick={showPlainLiveChat}>
       <HeaderButton label="Help">
         <RiQuestionFill className="text-foreground-600 size-4" />{' '}
       </HeaderButton>

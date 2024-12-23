@@ -41,8 +41,9 @@ export interface InlineToastProps
   title?: string;
   description?: string | React.ReactNode;
   ctaLabel?: string;
-  onCtaClick?: () => void;
+  onCtaClick?: React.MouseEventHandler<HTMLButtonElement>;
   isCtaLoading?: boolean;
+  ctaClassName?: string;
 }
 
 export function InlineToast({
@@ -53,6 +54,7 @@ export function InlineToast({
   ctaLabel,
   onCtaClick,
   isCtaLoading,
+  ctaClassName,
   ...props
 }: InlineToastProps) {
   const barColorClass = VARIANT_COLORS[variant || 'tip'];
@@ -72,7 +74,8 @@ export function InlineToast({
         <Button
           variant="ghost"
           size="xs"
-          className={cn('shrink-0 p-0 text-xs font-medium hover:bg-transparent', buttonColorClass)}
+          type="button"
+          className={cn('shrink-0 p-0 text-xs font-medium hover:bg-transparent', buttonColorClass, ctaClassName)}
           onClick={onCtaClick}
           disabled={isCtaLoading}
         >

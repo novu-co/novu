@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ActorTypeEnum, ChannelTypeEnum } from '@novu/shared';
 import {
   AnalyticsService,

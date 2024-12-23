@@ -9,12 +9,12 @@ import { Label } from '@/components/primitives/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import TextSeparator from '@/components/primitives/text-separator';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { autocompletion } from '@codemirror/autocomplete';
 import { Editor } from '../editor';
 import { useFormField } from './form-context';
-import { useStep } from '@/components/workflow-editor/steps/step-provider';
 
 const predefinedAvatars = [
   `${window.location.origin}/images/avatar.svg`,
@@ -40,10 +40,11 @@ type AvatarPickerProps = {
 
 export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
   ({ name, value, onChange, onPick }, ref) => {
-    const { step } = useStep();
+    const { step } = useWorkflow();
     const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
     const [isOpen, setIsOpen] = useState(false);
     const { error } = useFormField();
+    const extensions = useMemo(() => [autocompletion({ override: [completions(variables)] })], [variables]);
 
     const handlePredefinedAvatarClick = (url: string) => {
       onPick?.(url);
@@ -52,7 +53,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
 
     return (
       <div className="size-9 space-y-2">
-        <Popover modal={true} open={isOpen} onOpenChange={setIsOpen}>
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" size="icon" className="text-foreground-600 relative size-full overflow-hidden">
               {value ? (
@@ -82,9 +83,9 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
                       ref={ref}
                       placeholder="Enter avatar URL"
                       id={name}
-                      extensions={[autocompletion({ override: [completions(variables)] })]}
+                      extensions={extensions}
                       value={`${value}`}
-                      onChange={(newValue) => onChange?.(newValue)}
+                      onChange={onChange}
                     />
                   </InputField>
                   <FormMessage />

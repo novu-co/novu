@@ -1,8 +1,8 @@
 /**
  * Release all packages in the monorepo.
- * 
+ *
  * Usage: pnpm release <version>
- * 
+ *
  * Known issues:
  * - nx release with independent versioning and updateDependents: "auto" increases patch by the amount of dependencies updated (https://github.com/nrwl/nx/issues/27823)
  */
@@ -13,8 +13,10 @@ import inquirer from 'inquirer';
 import yargs from 'yargs/yargs';
 import { execa } from 'execa';
 
+const projects = ['tag:type:package'];
+
 (async () => {
-  const { dryRun, verbose, ...rest } = yargs(hideBin(process.argv))
+  const { dryRun, verbose, from, ...rest } = yargs(hideBin(process.argv))
     .version(false)
     .option('dryRun', {
       alias: 'd',
@@ -27,6 +29,11 @@ import { execa } from 'execa';
       type: 'boolean',
       default: false,
     })
+    .option('from', {
+      description:
+        'The git reference to use as the start of the changelog. If not set it will attempt to resolve the latest tag and use that.',
+      type: 'string',
+    })
     .help()
     .parse();
 
@@ -38,7 +45,7 @@ import { execa } from 'execa';
   }
 
   const { workspaceVersion, projectsVersionData } = await releaseVersion({
-    projects: ['tag:type:package'],
+    projects,
     specifier,
     dryRun,
     verbose,
@@ -46,12 +53,13 @@ import { execa } from 'execa';
   });
 
   await releaseChangelog({
-    projects: ['tag:type:package'],
+    projects,
     specifier,
     versionData: projectsVersionData,
     version: workspaceVersion,
     dryRun,
     verbose,
+    from,
   });
 
   await execa({
@@ -68,7 +76,7 @@ import { execa } from 'execa';
   ]);
 
   await releasePublish({
-    projects: ['tag:type:package'],
+    projects,
     specifier: 'patch',
     dryRun,
     verbose,

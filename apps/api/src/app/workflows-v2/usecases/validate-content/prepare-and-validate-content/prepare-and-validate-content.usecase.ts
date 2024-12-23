@@ -3,13 +3,19 @@ import { merge } from 'lodash';
 import {
   ContentIssue,
   DigestUnitEnum,
+  JSONSchemaDefinition,
   JSONSchemaDto,
   PreviewPayload,
   StepContentIssueEnum,
   StepTypeEnum,
   UserSessionData,
 } from '@novu/shared';
-import { Instrument, InstrumentUsecase, TierRestrictionsValidateUsecase } from '@novu/application-generic';
+import {
+  Instrument,
+  InstrumentUsecase,
+  TierRestrictionsValidateCommand,
+  TierRestrictionsValidateUsecase,
+} from '@novu/application-generic';
 
 import { PrepareAndValidateContentCommand } from './prepare-and-validate-content.command';
 import { flattenJson, flattenToNested, mergeObjects } from '../../../util/jsonUtils';
@@ -21,6 +27,7 @@ import { ExtractDefaultValuesFromSchemaUsecase } from '../../extract-default-val
 import { ValidatedContentResponse } from './validated-content.response';
 import { toSentenceCase } from '../../../../shared/services/helper/helper.service';
 import { isValidUrlForActionButton } from '../../../util/url-utils';
+import { extractMinValuesFromSchema, isMatchingJsonSchema } from '../../../util/jsonToSchema';
 
 /**
  * Validates and prepares workflow step content by collecting placeholders,
@@ -101,18 +108,18 @@ export class PrepareAndValidateContentUsecase {
     controlValues: Record<string, unknown>,
     controlValueToValidPlaceholders: Record<string, ValidatedPlaceholderAggregation>
   ) {
-    const defaultControlValues = this.extractDefaultsFromSchemaUseCase.execute({ jsonSchemaDto });
+    const defaultControlValues = this.extractDefaultsFromSchemaUseCase.execute({ jsonSchemaDto, controlValues });
 
     let flatSanitizedControlValues: Record<string, unknown> = flattenJson(controlValues);
     const controlValueToContentIssues: Record<string, ContentIssue[]> = {};
 
+    flatSanitizedControlValues = this.removeEmptyValuesFromMap(flatSanitizedControlValues);
     this.overloadMissingRequiredValuesIssues(
       defaultControlValues,
       flatSanitizedControlValues,
       controlValueToContentIssues
     );
 
-    flatSanitizedControlValues = this.removeEmptyValuesFromMap(flatSanitizedControlValues);
     flatSanitizedControlValues = this.removeIllegalValuesAndOverloadIssues(
       flatSanitizedControlValues,
       controlValueToValidPlaceholders,
@@ -123,6 +130,9 @@ export class PrepareAndValidateContentUsecase {
       controlValueToValidPlaceholders,
       controlValueToContentIssues
     );
+
+    this.overloadMinValueIssues(jsonSchemaDto, flatSanitizedControlValues, controlValueToContentIssues);
+
     const finalControlValues = merge(defaultControlValues, flatSanitizedControlValues);
     const nestedJson = flattenToNested(finalControlValues);
 
@@ -292,8 +302,44 @@ export class PrepareAndValidateContentUsecase {
         controlValueToContentIssues,
         item,
         StepContentIssueEnum.MISSING_VALUE,
-        `${toSentenceCase(item)} is missing`,
+        `${toSentenceCase(item)} is required`,
         item
+      );
+    }
+  }
+
+  private overloadMinValueIssues(
+    jsonSchema: JSONSchemaDto,
+    controlValues: Record<string, unknown>,
+    controlValueIssues: Record<string, ContentIssue[]>
+  ) {
+    if (typeof jsonSchema !== 'object') {
+      return;
+    }
+
+    let schemaToExtractDefaults: JSONSchemaDefinition = jsonSchema;
+    if (jsonSchema.anyOf && jsonSchema.anyOf.length > 0) {
+      schemaToExtractDefaults =
+        jsonSchema.anyOf.find((item) => {
+          return isMatchingJsonSchema(item, controlValues);
+        }) ?? jsonSchema[0];
+    }
+    const minValuesFromSchema = extractMinValuesFromSchema(schemaToExtractDefaults);
+
+    for (const [key, minValue] of Object.entries(minValuesFromSchema)) {
+      if (typeof controlValues[key] !== 'number') {
+        continue;
+      }
+      if (controlValues[key] >= minValue) {
+        continue;
+      }
+
+      this.addToIssues(
+        controlValueIssues,
+        key,
+        StepContentIssueEnum.MIN_VALUE,
+        `${toSentenceCase(key)} must be at least ${minValue}`,
+        key
       );
     }
   }
@@ -346,16 +392,14 @@ export class PrepareAndValidateContentUsecase {
     user: UserSessionData,
     stepType?: StepTypeEnum
   ): Promise<Record<string, ContentIssue[]>> {
-    const deferDuration =
-      isValidDigestUnit(defaultControlValues.unit) && isNumber(defaultControlValues.amount)
-        ? calculateMilliseconds(defaultControlValues.amount, defaultControlValues.unit)
-        : 0;
-
-    const restrictionsErrors = await this.tierRestrictionsValidateUsecase.execute({
-      deferDurationMs: deferDuration,
-      organizationId: user.organizationId,
-      stepType,
-    });
+    const restrictionsErrors = await this.tierRestrictionsValidateUsecase.execute(
+      TierRestrictionsValidateCommand.create({
+        amount: defaultControlValues.amount as string | undefined,
+        unit: defaultControlValues.unit as string | undefined,
+        organizationId: user.organizationId,
+        stepType,
+      })
+    );
 
     if (!restrictionsErrors) {
       return {};
@@ -379,31 +423,4 @@ export class PrepareAndValidateContentUsecase {
 
     return result;
   }
-}
-
-function calculateMilliseconds(amount: number, unit: DigestUnitEnum): number {
-  switch (unit) {
-    case DigestUnitEnum.SECONDS:
-      return amount * 1000;
-    case DigestUnitEnum.MINUTES:
-      return amount * 1000 * 60;
-    case DigestUnitEnum.HOURS:
-      return amount * 1000 * 60 * 60;
-    case DigestUnitEnum.DAYS:
-      return amount * 1000 * 60 * 60 * 24;
-    case DigestUnitEnum.WEEKS:
-      return amount * 1000 * 60 * 60 * 24 * 7;
-    case DigestUnitEnum.MONTHS:
-      return amount * 1000 * 60 * 60 * 24 * 30; // Using 30 days as an approximation for a month
-    default:
-      return 0;
-  }
-}
-
-function isValidDigestUnit(unit: unknown): unit is DigestUnitEnum {
-  return Object.values(DigestUnitEnum).includes(unit as DigestUnitEnum);
-}
-
-function isNumber(value: unknown): value is number {
-  return !Number.isNaN(Number(value));
 }
