@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiExtension } from '@nestjs/swagger';
+import { ApiExtension, ApiParam } from '@nestjs/swagger';
+import { ApiParamOptions } from '@nestjs/swagger/dist/decorators/api-param.decorator';
 
 /**
  * Sets the method name for the SDK.
@@ -51,6 +52,29 @@ export function SdkUsageExample(title?: string, description?: string, position?:
 
 export function SdkMethodMaxParamsOverride(maxParamsBeforeCollapseToObject?: number) {
   return applyDecorators(ApiExtension('x-speakeasy-max-method-params', maxParamsBeforeCollapseToObject));
+}
+
+class SDKOverrideOptions {
+  // 'x-speakeasy-name-override': 'workflowId',
+  nameOverride?: string;
+}
+
+function overloadOptions(options: ApiParamOptions, sdkOverrideOptions: SDKOverrideOptions) {
+  let finalOptions = options;
+  if (sdkOverrideOptions.nameOverride) {
+    finalOptions = {
+      ...finalOptions,
+      'x-speakeasy-name-override': sdkOverrideOptions.nameOverride,
+    } as unknown as ApiParamOptions;
+  }
+
+  return finalOptions as ApiParamOptions;
+}
+
+export function SdkApiParam(options: ApiParamOptions, sdkOverrideOptions?: SDKOverrideOptions) {
+  const finalOptions = sdkOverrideOptions ? overloadOptions(options, sdkOverrideOptions) : options;
+
+  return applyDecorators(ApiParam(finalOptions));
 }
 
 /**

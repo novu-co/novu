@@ -1,18 +1,23 @@
-import { ChannelTypeEnum, StepTypeEnum } from '@novu/shared';
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
-
+import { Novu } from '@novu/api';
+import { ChannelTypeEnum,StepTypeEnum, UpdateSubscriberGlobalPreferencesRequestDto } from '@novu/api/models/components';
+import axios from 'axios';
 import { SubscriberRepository } from '@novu/dal';
-import { getPreference, updateGlobalPreferences } from './helpers';
+
+import { PreferenceChannels } from '@novu/api/src/models/components/preferencechannels';
+import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
 describe('Update Subscribers global preferences - /subscribers/:subscriberId/preferences (PATCH) #novu-v2', function () {
   let session: UserSession;
+  let novuClient: Novu;
   let subscriberRepository: SubscriberRepository;
 
   beforeEach(async () => {
     session = new UserSession();
     subscriberRepository = new SubscriberRepository();
     await session.initialize();
+    novuClient = initNovuClassSdk(session);
   });
 
   it('should validate the payload', async function () {
@@ -34,7 +39,7 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
 
     const yetAnotherBadPayload = {
       enabled: 'hello',
-      preferences: [{ type: ChannelTypeEnum.EMAIL, enabled: true }],
+      preferences: [{ type: ChannelTypeEnum.Email, enabled: true }],
     };
 
     try {
@@ -52,46 +57,56 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
   it('should update user global preferences', async function () {
     const payload = {
       enabled: true,
-      preferences: [{ type: ChannelTypeEnum.EMAIL, enabled: true }],
+      preferences: [{ type: ChannelTypeEnum.Email, enabled: true }],
     };
 
-    const response = await updateGlobalPreferences(payload, session);
+    const response = await novuClient.subscribers.preferences.updateGlobal(payload, session.subscriberId);
 
-    expect(response.data.data.preference.enabled).to.eql(true);
-    expect(response.data.data.preference.channels).to.not.eql({
-      [ChannelTypeEnum.IN_APP]: true,
+    expect(response.result.preference.enabled).to.eql(true);
+    expect(response.result.preference.channels).to.not.eql({
+      [ChannelTypeEnum.InApp]: true,
     });
-    expect(response.data.data.preference.channels).to.eql({
-      [ChannelTypeEnum.EMAIL]: true,
-      [ChannelTypeEnum.PUSH]: true,
-      [ChannelTypeEnum.CHAT]: true,
-      [ChannelTypeEnum.SMS]: true,
-      [ChannelTypeEnum.IN_APP]: true,
-    });
+    expect(response.result.preference.channels).to.eql({
+      email: true,
+      sms: true,
+      inApp: true,
+      chat: true,
+      push: true,
+    } as PreferenceChannels);
   });
 
   it('should update user global preferences for multiple channels', async function () {
     const payload = {
       enabled: true,
       preferences: [
-        { type: ChannelTypeEnum.PUSH, enabled: false },
-        { type: ChannelTypeEnum.IN_APP, enabled: false },
-        { type: ChannelTypeEnum.SMS, enabled: true },
+        { type: ChannelTypeEnum.Push, enabled: false },
+        { type: ChannelTypeEnum.InApp, enabled: false },
+        { type: ChannelTypeEnum.Sms, enabled: true },
       ],
     };
 
-    const response = await updateGlobalPreferences(payload, session);
+    const response = await novuClient.subscribers.preferences.updateGlobal(payload, session.subscriberId);
 
-    expect(response.data.data.preference.enabled).to.eql(true);
-    expect(response.data.data.preference.channels).to.eql({
-      [ChannelTypeEnum.EMAIL]: true,
-      [ChannelTypeEnum.PUSH]: false,
-      [ChannelTypeEnum.CHAT]: true,
-      [ChannelTypeEnum.SMS]: true,
-      [ChannelTypeEnum.IN_APP]: false,
-    });
+    expect(response.result.preference.enabled).to.eql(true);
+    expect(response.result.preference.channels).to.deep.eq({
+      email: true,
+      push: false,
+      chat: true,
+      sms: true,
+      inApp: false,
+    } as PreferenceChannels);
   });
+});
 
+// This is kept in order to validate the server controller behavior as the SDK will not allow problematic payloads in compilation
+export async function updateGlobalPreferences(data: UpdateSubscriberGlobalPreferencesRequestDto, session: UserSession) {
+  const axiosInstance = axios.create();
+
+  return await axiosInstance.patch(`${session.serverUrl}/v1/subscribers/${session.subscriberId}/preferences`, data, {
+    headers: {
+      authorization: `ApiKey ${session.apiKey}`,
+    },
+  });
   it('should update user global preferences only for the current environment', async function () {
     // create a template in dev environment
     await session.createTemplate({
@@ -155,22 +170,4 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
     expect(prodPreferences.every((item) => !!item.preference.channels.in_app)).to.be.true;
   });
 
-  // `enabled` flag is not used anymore. The presence of a preference object means that the subscriber has enabled notifications.
-  it.skip('should update user global preference and disable the flag for the future channels update', async function () {
-    const disablePreferenceData = {
-      enabled: false,
-    };
-
-    const response = await updateGlobalPreferences(disablePreferenceData, session);
-
-    expect(response.data.data.preference.enabled).to.eql(false);
-
-    const preferenceChannel = {
-      preferences: [{ type: ChannelTypeEnum.EMAIL, enabled: true }],
-    };
-
-    const res = await updateGlobalPreferences(preferenceChannel, session);
-
-    expect(res.data.data.preference.channels).to.eql({});
-  });
-});
+}

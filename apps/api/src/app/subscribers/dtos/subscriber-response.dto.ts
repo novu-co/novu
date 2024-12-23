@@ -67,8 +67,9 @@ export class SubscriberResponseDto {
   @ApiProperty({
     description: 'The email address of the subscriber.',
     type: String,
+    nullable: true,
   })
-  email?: string;
+  email?: string | null;
 
   @ApiPropertyOptional({
     description: 'The phone number of the subscriber.',
