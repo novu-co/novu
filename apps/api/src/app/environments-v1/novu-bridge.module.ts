@@ -8,12 +8,15 @@ import { ConstructFrameworkWorkflow } from './usecases/construct-framework-workf
 import { NovuBridgeController } from './novu-bridge.controller';
 import {
   ChatOutputRendererUsecase,
-  EmailOutputRendererUsecase,
   ExpandEmailEditorSchemaUsecase,
+  HydrateEmailSchemaUseCase,
   InAppOutputRendererUsecase,
   PushOutputRendererUsecase,
+  RenderEmailOutputUsecase,
   SmsOutputRendererUsecase,
 } from './usecases/output-renderers';
+import { DelayOutputRendererUsecase } from './usecases/output-renderers/delay-output-renderer.usecase';
+import { DigestOutputRendererUsecase } from './usecases/output-renderers/digest-output-renderer.usecase';
 
 @Module({
   controllers: [NovuBridgeController],
@@ -28,12 +31,15 @@ import {
     ConstructFrameworkWorkflow,
     GetDecryptedSecretKey,
     InAppOutputRendererUsecase,
-    EmailOutputRendererUsecase,
+    RenderEmailOutputUsecase,
     SmsOutputRendererUsecase,
     ChatOutputRendererUsecase,
     PushOutputRendererUsecase,
-    EmailOutputRendererUsecase,
+    RenderEmailOutputUsecase,
     ExpandEmailEditorSchemaUsecase,
+    HydrateEmailSchemaUseCase,
+    DelayOutputRendererUsecase,
+    DigestOutputRendererUsecase,
   ],
 })
 export class NovuBridgeModule {}

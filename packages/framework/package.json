@@ -1,13 +1,12 @@
 {
   "name": "@novu/framework",
-  "version": "2.3.0",
+  "version": "2.5.2",
   "description": "The Code-First Notifications Workflow SDK.",
   "main": "./dist/cjs/index.cjs",
   "types": "./dist/cjs/index.d.cts",
   "module": "./dist/esm/index.js",
   "type": "module",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org",
     "access": "public"
   },
   "private": false,
@@ -25,7 +24,7 @@
     "next",
     "nuxt",
     "remix",
-    "sveltekit",  
+    "sveltekit",
     "README.md"
   ],
   "scripts": {
@@ -37,9 +36,9 @@
     "format:fix": "prettier --write --ignore-path .gitignore .",
     "build": "NODE_ENV=production tsup",
     "build:watch": "tsup --watch",
-    "postbuild": "./scripts/copy-package-json.sh && pnpm run check:exports && pnpm check:circulars",
+    "postbuild": "pnpm run check:exports && pnpm check:circulars",
     "check:exports": "attw --pack .",
-    "check:circulars": "madge --circular --extensions ts --exclude ../../shared ./src",
+    "check:circulars": "madge --circular --extensions ts ./src",
     "$comment:bump:prerelease": "This is a workaround to support `npm version prerelease` with lerna",
     "bump:prerelease": "npm version prerelease --preid=alpha & PID=$!; (sleep 1 && kill -9 $PID) & wait $PID",
     "release:alpha": "pnpm bump:prerelease || pnpm build && npm publish",
@@ -229,23 +228,22 @@
     "tsx": "4.16.2",
     "typescript": "5.6.2",
     "vitest": "^1.2.1",
-    "zod": "^3.23.0",
-    "zod-to-json-schema": "^3.23.0"
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.23.3"
   },
   "dependencies": {
-    "@novu/shared": "workspace:*",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
     "better-ajv-errors": "^1.2.0",
     "chalk": "^4.1.2",
     "cross-fetch": "^4.0.0",
-    "json-schema-faker": "^0.5.6",
     "json-schema-to-ts": "^3.0.0",
     "liquidjs": "^10.13.1",
-    "ora": "^5.4.1",
     "sanitize-html": "^2.13.0"
   },
   "nx": {
-    "tags": ["package:public"]
+    "tags": [
+      "type:package"
+    ]
   }
 }

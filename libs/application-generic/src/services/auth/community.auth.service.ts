@@ -223,7 +223,8 @@ export class CommunityAuthService implements IAuthService {
         subscriberId: subscriber.subscriberId,
       },
       {
-        expiresIn: '15 day',
+        expiresIn:
+          process.env.SUBSCRIBER_WIDGET_JWT_EXPIRATION_TIME || '15 days',
         issuer: 'novu_api',
         audience: 'widget_user',
       },
@@ -350,12 +351,6 @@ export class CommunityAuthService implements IAuthService {
     );
   }
 
-  @CachedEntity({
-    builder: ({ apiKey }: { apiKey: string }) =>
-      buildAuthServiceKey({
-        apiKey,
-      }),
-  })
   private async getApiKeyUser({ apiKey }: { apiKey: string }): Promise<{
     environment?: EnvironmentEntity;
     user?: UserEntity;
@@ -364,7 +359,6 @@ export class CommunityAuthService implements IAuthService {
     const hashedApiKey = createHash('sha256').update(apiKey).digest('hex');
 
     const environment = await this.environmentRepository.findByApiKey({
-      key: apiKey,
       hash: hashedApiKey,
     });
 
@@ -373,16 +367,7 @@ export class CommunityAuthService implements IAuthService {
       return { error: 'API Key not found' };
     }
 
-    let key = environment.apiKeys.find((i) => i.hash === hashedApiKey);
-
-    if (!key) {
-      /*
-       * backward compatibility - delete after encrypt-api-keys-migration execution
-       * find by decrypted key if key not found, because of backward compatibility
-       * use-case: findByApiKey found by decrypted key, so we need to validate by decrypted key
-       */
-      key = environment.apiKeys.find((i) => i.key === apiKey);
-    }
+    const key = environment.apiKeys.find((i) => i.hash === hashedApiKey);
 
     if (!key) {
       return { error: 'API Key not found' };

@@ -9,7 +9,6 @@ describe('Events - Test email - /v1/events/test/email (POST)', function () {
   const requestDto: TestSendEmailRequestDto = {
     contentType: 'customHtml',
     payload: {},
-    inputs: {},
     controls: {},
     subject: 'subject',
     preheader: 'preheader',

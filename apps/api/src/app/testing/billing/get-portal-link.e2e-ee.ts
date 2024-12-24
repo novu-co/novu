@@ -35,7 +35,7 @@ describe('Get portal link', async () => {
     });
 
     expect(stub.lastCall.args.at(0)).to.deep.equal({
-      return_url: `${process.env.FRONT_BASE_URL}/settings/billing`,
+      return_url: `${process.env.FRONT_BASE_URL}/manage-account/billing`,
       customer: 'customer_id',
     });
 

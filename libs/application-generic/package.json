@@ -1,6 +1,6 @@
 {
   "name": "@novu/application-generic",
-  "version": "2.0.0",
+  "version": "2.0.6",
   "description": "Generic backend code used inside of Novu's different services",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -34,7 +34,7 @@
     "@nestjs/terminus": "10.2.3",
     "@nestjs/testing": "10.4.1",
     "jsonwebtoken": "9.0.0",
-    "newrelic": "^9",
+    "newrelic": "^12.8.1",
     "reflect-metadata": "0.2.2"
   },
   "dependencies": {
@@ -45,11 +45,11 @@
     "@google-cloud/storage": "^6.2.3",
     "@hokify/agenda": "^6.3.0",
     "@novu/dal": "workspace:*",
+    "@novu/framework": "workspace:*",
     "@novu/providers": "workspace:*",
     "@novu/shared": "workspace:*",
     "@novu/stateless": "workspace:*",
     "@novu/testing": "workspace:*",
-    "@novu/framework": "workspace:*",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/auto-instrumentations-node": "^0.40.2",
     "@opentelemetry/context-async-hooks": "~1.19.0",
@@ -69,6 +69,7 @@
     "@pyroscope/nodejs": "^0.2.9",
     "@segment/analytics-node": "^1.1.4",
     "@sentry/node": "^8.33.1",
+    "@team-plain/typescript-sdk": "5.4.3",
     "axios": "^1.6.8",
     "bullmq": "^3.10.2",
     "class-transformer": "0.5.1",
@@ -82,6 +83,8 @@
     "launchdarkly-node-server-sdk": "^7.0.1",
     "lodash": "^4.17.15",
     "mixpanel": "^0.17.0",
+    "cron-parser": "^4.9.0",
+    "nanoid": "^3.1.20",
     "nestjs-otel": "6.1.1",
     "nestjs-pino": "4.1.0",
     "node-fetch": "^3.2.10",
@@ -92,8 +95,7 @@
     "rrule": "^2.7.2",
     "rxjs": "7.8.1",
     "sanitize-html": "^2.4.0",
-    "shortid": "^2.2.16",
-    "slugify": "^1.4.6"
+    "shortid": "^2.2.16"
   },
   "optionalDependencies": {
     "@novu/ee-shared-services": "workspace:*",
@@ -101,10 +103,9 @@
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
-    "@nestjs/passport": "10.0.3",
     "@types/got": "^9.6.12",
     "@types/jest": "29.5.2",
-    "@types/newrelic": "^9",
+    "@types/newrelic": "^9.14.6",
     "@types/sanitize-html": "^2.11.0",
     "@types/sinon": "^9.0.0",
     "chai": "^4.2.0",
@@ -112,7 +113,6 @@
     "cpx": "^1.5.0",
     "dotenv": "^16.4.5",
     "jest": "^27.1.0",
-    "newrelic": "^9",
     "npm-run-all": "^4.1.5",
     "nyc": "^15.1.0",
     "prettier": "~2.8.0",
@@ -120,7 +120,8 @@
     "sinon": "^9.2.4",
     "ts-jest": "^27.0.5",
     "ts-node": "~10.9.1",
-    "typescript": "5.6.2"
+    "typescript": "5.6.2",
+    "vitest": "^2.0.5"
   },
   "files": [
     "build/main",

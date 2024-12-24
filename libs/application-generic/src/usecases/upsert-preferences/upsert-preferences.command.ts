@@ -1,17 +1,153 @@
-import { IsDefined, IsEnum } from 'class-validator';
-import { PreferencesTypeEnum, WorkflowPreferencesPartial } from '@novu/shared';
+import {
+  IsBoolean,
+  IsOptional,
+  IsObject,
+  ValidateNested,
+  ValidateIf,
+} from 'class-validator';
+import {
+  ChannelPreference as ChannelPreferenceType,
+  WorkflowPreferencesPartial,
+  WorkflowPreference as WorkflowPreferenceType,
+  ChannelTypeEnum,
+  WorkflowPreferences,
+} from '@novu/shared';
+import { Type } from 'class-transformer';
 import { EnvironmentCommand } from '../../commands';
 
-export class UpsertPreferencesCommand extends EnvironmentCommand {
-  @IsDefined()
-  readonly preferences: WorkflowPreferencesPartial;
+// PARTIAL PREFERENCES
+export class WorkflowPreferencePartial
+  implements Partial<WorkflowPreferenceType>
+{
+  @IsOptional()
+  @IsBoolean()
+  readonly enabled?: boolean;
 
-  _subscriberId?: string;
+  @IsOptional()
+  @IsBoolean()
+  readonly readOnly?: boolean;
+}
 
-  userId?: string;
+export class ChannelPreferencePartial
+  implements Partial<ChannelPreferenceType>
+{
+  @IsOptional()
+  @IsBoolean()
+  readonly enabled?: boolean;
+}
 
-  templateId?: string;
+export class ChannelPreferencesPartial
+  implements Partial<Record<ChannelTypeEnum, ChannelPreferencePartial>>
+{
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferencePartial)
+  readonly email?: ChannelPreferencePartial;
 
-  @IsEnum(PreferencesTypeEnum)
-  readonly type: PreferencesTypeEnum;
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferencePartial)
+  readonly sms?: ChannelPreferencePartial;
+
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferencePartial)
+  readonly in_app?: ChannelPreferencePartial;
+
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferencePartial)
+  readonly push?: ChannelPreferencePartial;
+
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferencePartial)
+  readonly chat?: ChannelPreferencePartial;
+}
+
+export class PreferencesPartial implements WorkflowPreferencesPartial {
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => WorkflowPreferencePartial)
+  readonly all?: WorkflowPreferencePartial;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferencesPartial)
+  readonly channels?: ChannelPreferencesPartial;
+}
+
+export class UpsertPreferencesPartialBaseCommand extends EnvironmentCommand {
+  @IsObject()
+  @ValidateNested()
+  @Type(() => PreferencesPartial)
+  readonly preferences: PreferencesPartial;
+}
+
+// FULL PREFERENCES
+export class WorkflowPreferenceRequired implements WorkflowPreferenceType {
+  @IsBoolean()
+  readonly enabled: boolean;
+
+  @IsBoolean()
+  readonly readOnly: boolean;
+}
+
+export class ChannelPreferenceRequired implements ChannelPreferenceType {
+  @IsBoolean()
+  readonly enabled: boolean;
+}
+
+export class ChannelPreferencesRequired
+  implements Record<ChannelTypeEnum, ChannelPreferenceRequired>
+{
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferenceRequired)
+  readonly email: ChannelPreferenceRequired;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferenceRequired)
+  readonly sms: ChannelPreferenceRequired;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferenceRequired)
+  readonly in_app: ChannelPreferenceRequired;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferenceRequired)
+  readonly push: ChannelPreferenceRequired;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferenceRequired)
+  readonly chat: ChannelPreferenceRequired;
+}
+
+export class PreferencesRequired implements WorkflowPreferences {
+  @IsObject()
+  @ValidateNested()
+  @Type(() => WorkflowPreferenceRequired)
+  readonly all: WorkflowPreferenceRequired;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => ChannelPreferencesRequired)
+  readonly channels: ChannelPreferencesRequired;
+}
+
+export class UpsertPreferencesRequiredBaseCommand extends EnvironmentCommand {
+  @IsObject()
+  @ValidateNested()
+  @Type(() => PreferencesRequired)
+  readonly preferences: PreferencesRequired;
 }

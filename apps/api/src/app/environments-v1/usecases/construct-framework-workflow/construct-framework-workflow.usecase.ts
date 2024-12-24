@@ -1,37 +1,42 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { workflow } from '@novu/framework/express';
-import {
-  ActionStep,
-  ChannelStep,
-  DelayOutput,
-  DigestOutput,
-  Step,
-  StepOptions,
-  StepOutput,
-  Workflow,
-} from '@novu/framework/internal';
+import { ActionStep, ChannelStep, JsonSchema, Step, StepOptions, StepOutput, Workflow } from '@novu/framework/internal';
 import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
-import { StepTypeEnum } from '@novu/shared';
+import { JSONSchemaDefinition, JSONSchemaDto, StepTypeEnum } from '@novu/shared';
+import { Instrument, InstrumentUsecase, PinoLogger } from '@novu/application-generic';
+import { AdditionalOperation, RulesLogic } from 'json-logic-js';
+import _ from 'lodash';
 import { ConstructFrameworkWorkflowCommand } from './construct-framework-workflow.command';
 import {
   ChatOutputRendererUsecase,
-  EmailOutputRendererUsecase,
+  FullPayloadForRender,
   InAppOutputRendererUsecase,
   PushOutputRendererUsecase,
+  RenderEmailOutputUsecase,
   SmsOutputRendererUsecase,
 } from '../output-renderers';
+import { DelayOutputRendererUsecase } from '../output-renderers/delay-output-renderer.usecase';
+import { DigestOutputRendererUsecase } from '../output-renderers/digest-output-renderer.usecase';
+import { evaluateRules } from '../../../shared/services/query-parser/query-parser.service';
+import { isMatchingJsonSchema } from '../../../workflows-v2/util/jsonToSchema';
+
+const LOG_CONTEXT = 'ConstructFrameworkWorkflow';
 
 @Injectable()
 export class ConstructFrameworkWorkflow {
   constructor(
+    private logger: PinoLogger,
     private workflowsRepository: NotificationTemplateRepository,
     private inAppOutputRendererUseCase: InAppOutputRendererUsecase,
-    private emailOutputRendererUseCase: EmailOutputRendererUsecase,
+    private emailOutputRendererUseCase: RenderEmailOutputUsecase,
     private smsOutputRendererUseCase: SmsOutputRendererUsecase,
     private chatOutputRendererUseCase: ChatOutputRendererUsecase,
-    private pushOutputRendererUseCase: PushOutputRendererUsecase
+    private pushOutputRendererUseCase: PushOutputRendererUsecase,
+    private delayOutputRendererUseCase: DelayOutputRendererUsecase,
+    private digestOutputRendererUseCase: DigestOutputRendererUsecase
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: ConstructFrameworkWorkflowCommand): Promise<Workflow> {
     const dbWorkflow = await this.getDbWorkflow(command.environmentId, command.workflowId);
     if (command.controlValues) {
@@ -43,12 +48,18 @@ export class ConstructFrameworkWorkflow {
     return this.constructFrameworkWorkflow(dbWorkflow);
   }
 
+  @Instrument()
   private constructFrameworkWorkflow(newWorkflow: NotificationTemplateEntity): Workflow {
     return workflow(
       newWorkflow.triggers[0].identifier,
-      async ({ step }) => {
+      async ({ step, payload, subscriber }) => {
+        const fullPayloadForRender: FullPayloadForRender = { payload, subscriber, steps: {} };
         for await (const staticStep of newWorkflow.steps) {
-          await this.constructStep(step, staticStep);
+          fullPayloadForRender.steps[staticStep.stepId || staticStep._templateId] = await this.constructStep(
+            step,
+            staticStep,
+            fullPayloadForRender
+          );
         }
       },
       {
@@ -66,7 +77,12 @@ export class ConstructFrameworkWorkflow {
     );
   }
 
-  private constructStep(step: Step, staticStep: NotificationStepEntity): StepOutput<Record<string, unknown>> {
+  @Instrument()
+  private constructStep(
+    step: Step,
+    staticStep: NotificationStepEntity,
+    fullPayloadForRender: FullPayloadForRender
+  ): StepOutput<Record<string, unknown>> {
     const stepTemplate = staticStep.template;
 
     if (!stepTemplate) {
@@ -91,67 +107,71 @@ export class ConstructFrameworkWorkflow {
           stepId,
           // The step callback function. Takes controls and returns the step outputs
           async (controlValues) => {
-            return this.inAppOutputRendererUseCase.execute({ controlValues });
+            return this.inAppOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           // Step options
-          this.constructChannelStepOptions(staticStep)
+          this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.EMAIL:
         return step.email(
           stepId,
           async (controlValues) => {
-            return this.emailOutputRendererUseCase.execute({ controlValues });
+            return this.emailOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
-          this.constructChannelStepOptions(staticStep)
+          this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.SMS:
         return step.inApp(
           stepId,
           async (controlValues) => {
-            return this.smsOutputRendererUseCase.execute({ controlValues });
+            return this.smsOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
-          this.constructChannelStepOptions(staticStep)
+          this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.CHAT:
         return step.inApp(
           stepId,
           async (controlValues) => {
-            return this.chatOutputRendererUseCase.execute({ controlValues });
+            return this.chatOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
-          this.constructChannelStepOptions(staticStep)
+          this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.PUSH:
         return step.inApp(
           stepId,
           async (controlValues) => {
-            return this.pushOutputRendererUseCase.execute({ controlValues });
+            return this.pushOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
-          this.constructChannelStepOptions(staticStep)
+          this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.DIGEST:
         return step.digest(
           stepId,
           async (controlValues) => {
-            return controlValues as DigestOutput;
+            return this.digestOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
-          this.constructActionStepOptions(staticStep)
+          this.constructActionStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.DELAY:
         return step.delay(
           stepId,
           async (controlValues) => {
-            return controlValues as DelayOutput;
+            return this.delayOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
-          this.constructActionStepOptions(staticStep)
+          this.constructActionStepOptions(staticStep, fullPayloadForRender)
         );
       default:
         throw new InternalServerErrorException(`Step type ${stepType} is not supported`);
     }
   }
 
-  private constructChannelStepOptions(staticStep: NotificationStepEntity): Required<Parameters<ChannelStep>[2]> {
+  @Instrument()
+  private constructChannelStepOptions(
+    staticStep: NotificationStepEntity,
+    fullPayloadForRender: FullPayloadForRender
+  ): Required<Parameters<ChannelStep>[2]> {
     return {
-      ...this.constructCommonStepOptions(staticStep),
+      ...this.constructCommonStepOptions(staticStep, fullPayloadForRender),
       // TODO: resolve this from the Step options
       disableOutputSanitization: false,
       // TODO: add providers
@@ -159,24 +179,46 @@ export class ConstructFrameworkWorkflow {
     };
   }
 
-  private constructActionStepOptions(staticStep: NotificationStepEntity): Required<Parameters<ActionStep>[2]> {
+  @Instrument()
+  private constructActionStepOptions(
+    staticStep: NotificationStepEntity,
+    fullPayloadForRender: FullPayloadForRender
+  ): Required<Parameters<ActionStep>[2]> {
+    const stepOptions = this.constructCommonStepOptions(staticStep, fullPayloadForRender);
+
+    let controlSchema = stepOptions.controlSchema as JSONSchemaDefinition;
+    const stepType = staticStep.template!.type;
+
+    /*
+     * because of the known AJV issue with anyOf, we need to find the first schema that matches the control values
+     * ref: https://ajv.js.org/guide/modifying-data.html#assigning-defaults
+     */
+    if (stepType === StepTypeEnum.DIGEST && typeof controlSchema === 'object' && controlSchema.anyOf) {
+      const fistSchemaMatch = controlSchema.anyOf.find((item) => {
+        return isMatchingJsonSchema(item, staticStep.controlVariables);
+      });
+      controlSchema = fistSchemaMatch ?? controlSchema.anyOf[0];
+    }
+
     return {
-      ...this.constructCommonStepOptions(staticStep),
+      ...stepOptions,
+      controlSchema: controlSchema as JsonSchema,
     };
   }
 
-  private constructCommonStepOptions(staticStep: NotificationStepEntity): Required<StepOptions> {
+  @Instrument()
+  private constructCommonStepOptions(
+    staticStep: NotificationStepEntity,
+    fullPayloadForRender: FullPayloadForRender
+  ): Required<StepOptions> {
     return {
-      /** @deprecated */
-      inputSchema: staticStep.template!.controls!.schema,
-      controlSchema: staticStep.template!.controls!.schema,
-      /*
-       * TODO: add conditions
-       * Used to construct conditions defined with https://react-querybuilder.js.org/ or similar
-       */
-      skip: (controlValues) => false,
+      // TODO: fix the `JSONSchemaDto` type to enforce a non-primitive schema type.
+      controlSchema: staticStep.template!.controls!.schema as JsonSchema,
+      skip: (controlValues: Record<string, unknown>) => this.processSkipOption(controlValues, fullPayloadForRender),
     };
   }
+
+  @Instrument()
   private async getDbWorkflow(environmentId: string, workflowId: string): Promise<NotificationTemplateEntity> {
     const foundWorkflow = await this.workflowsRepository.findByTriggerIdentifier(environmentId, workflowId);
 
@@ -186,7 +228,24 @@ export class ConstructFrameworkWorkflow {
 
     return foundWorkflow;
   }
+
+  private processSkipOption(controlValues: { [x: string]: unknown }, variables: FullPayloadForRender) {
+    const skipRules = controlValues.skip as RulesLogic<AdditionalOperation>;
+
+    if (_.isEmpty(skipRules)) {
+      return false;
+    }
+
+    const { result, error } = evaluateRules(skipRules, variables);
+
+    if (error) {
+      this.logger.error({ err: error }, 'Failed to evaluate skip rule', LOG_CONTEXT);
+    }
+
+    return result;
+  }
 }
+
 const PERMISSIVE_EMPTY_SCHEMA = {
   type: 'object',
   properties: {},

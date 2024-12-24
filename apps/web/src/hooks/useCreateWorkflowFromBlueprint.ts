@@ -1,6 +1,5 @@
-import slugify from 'slugify';
 import { useMutation, UseMutationOptions } from '@tanstack/react-query';
-import { WorkflowCreationSourceEnum, type INotificationTemplate } from '@novu/shared';
+import { WorkflowCreationSourceEnum, type INotificationTemplate, slugify } from '@novu/shared';
 
 import { useCreateTemplateFromBlueprint } from '../api/hooks';
 import { getBlueprintTemplateById, getTemplateById } from '../api/notification-templates';
@@ -17,10 +16,7 @@ export const useCreateWorkflowFromBlueprint = (
       const { name: blueprintName } = getWorkflowBlueprintDetails(blueprintData.name);
 
       try {
-        const workflowIdentifier = slugify(blueprintName, {
-          lower: true,
-          strict: true,
-        });
+        const workflowIdentifier = slugify(blueprintName);
 
         return await getTemplateById(workflowIdentifier);
       } catch (_error) {

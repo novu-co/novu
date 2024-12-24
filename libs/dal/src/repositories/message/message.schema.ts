@@ -1,9 +1,8 @@
-import mongoose, { Schema } from 'mongoose';
 import { ActorTypeEnum } from '@novu/shared';
+import mongoose, { Schema } from 'mongoose';
 
 import { schemaOptions } from '../schema-default.options';
 import { MessageDBModel } from './message.entity';
-import { getTTLOptions } from '../../shared';
 
 const mongooseDelete = require('mongoose-delete');
 
@@ -116,14 +115,11 @@ const messageSchema = new Schema<MessageDBModel>(
       type: Schema.Types.ObjectId,
       ref: 'Subscriber',
     },
-    expireAt: Schema.Types.Date,
     tags: [Schema.Types.String],
     avatar: Schema.Types.String,
   },
   schemaOptions
 );
-
-messageSchema.index({ expireAt: 1 }, getTTLOptions());
 
 messageSchema.virtual('subscriber', {
   ref: 'Subscriber',
@@ -290,6 +286,11 @@ messageSchema.index({
   providerId: 1,
   createdAt: 1,
 });
+
+/*
+ * This index was created to push entries to Online Archive
+ */
+messageSchema.index({ createdAt: 1 });
 
 export const Message =
   (mongoose.models.Message as mongoose.Model<MessageDBModel>) ||

@@ -1,4 +1,4 @@
-import { Injectable, UnprocessableEntityException, Logger } from '@nestjs/common';
+import { Injectable, Logger, UnprocessableEntityException } from '@nestjs/common';
 import { addBreadcrumb } from '@sentry/node';
 import { randomBytes } from 'crypto';
 import { merge } from 'lodash';
@@ -6,21 +6,21 @@ import { v4 as uuidv4 } from 'uuid';
 import { ModuleRef } from '@nestjs/core';
 
 import {
-  buildNotificationTemplateIdentifierKey,
-  buildHasNotificationKey,
-  CachedEntity,
-  Instrument,
-  InstrumentUsecase,
-  IWorkflowDataDto,
-  StorageHelperService,
-  WorkflowQueueService,
   AnalyticsService,
-  GetFeatureFlag,
-  GetFeatureFlagCommand,
-  InvalidateCacheService,
+  buildHasNotificationKey,
+  buildNotificationTemplateIdentifierKey,
+  CachedEntity,
   ExecuteBridgeRequest,
   ExecuteBridgeRequestCommand,
   ExecuteBridgeRequestDto,
+  GetFeatureFlag,
+  GetFeatureFlagCommand,
+  Instrument,
+  InstrumentUsecase,
+  InvalidateCacheService,
+  IWorkflowDataDto,
+  StorageHelperService,
+  WorkflowQueueService,
 } from '@novu/application-generic';
 import {
   FeatureFlagsKeysEnum,
@@ -31,21 +31,21 @@ import {
   WorkflowOriginEnum,
 } from '@novu/shared';
 import {
-  WorkflowOverrideRepository,
-  TenantEntity,
-  WorkflowOverrideEntity,
-  NotificationTemplateRepository,
-  NotificationTemplateEntity,
-  TenantRepository,
-  NotificationRepository,
-  UserRepository,
-  MemberRepository,
-  EnvironmentRepository,
   EnvironmentEntity,
+  EnvironmentRepository,
+  MemberRepository,
+  NotificationRepository,
+  NotificationTemplateEntity,
+  NotificationTemplateRepository,
+  TenantEntity,
+  TenantRepository,
+  UserRepository,
+  WorkflowOverrideEntity,
+  WorkflowOverrideRepository,
 } from '@novu/dal';
-import { Novu } from '@novu/node';
 import { DiscoverWorkflowOutput, GetActionEnum } from '@novu/framework/internal';
 
+import { Novu } from '@novu/api';
 import {
   ParseEventRequestBroadcastCommand,
   ParseEventRequestCommand,
@@ -375,13 +375,16 @@ export class ParseEventRequest {
 
       if (process.env.NOVU_API_KEY) {
         if (!command.payload[INVITE_TEAM_MEMBER_NUDGE_PAYLOAD_KEY]) {
-          const novu = new Novu(process.env.NOVU_API_KEY);
+          const novu = new Novu({ apiKey: process.env.NOVU_API_KEY });
 
-          await novu.trigger(process.env.NOVU_INVITE_TEAM_MEMBER_NUDGE_TRIGGER_IDENTIFIER, {
-            to: {
-              subscriberId: command.userId,
-              email: user?.email as string,
-            },
+          await novu.trigger({
+            name: process.env.NOVU_INVITE_TEAM_MEMBER_NUDGE_TRIGGER_IDENTIFIER,
+            to: [
+              {
+                subscriberId: command.userId,
+                email: user?.email as string,
+              },
+            ],
             payload: {
               [INVITE_TEAM_MEMBER_NUDGE_PAYLOAD_KEY]: true,
               webhookUrl: `${process.env.API_ROOT_URL}/v1/invites/webhook`,

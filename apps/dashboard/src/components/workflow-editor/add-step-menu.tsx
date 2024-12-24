@@ -1,13 +1,17 @@
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { STEP_TYPE_TO_COLOR } from '@/utils/color';
+import { StepTypeEnum } from '@/utils/enums';
+import { cn } from '@/utils/ui';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
+import { PopoverPortal } from '@radix-ui/react-popover';
 import React, { ReactNode, useState } from 'react';
 import { RiAddLine } from 'react-icons/ri';
-import { PopoverPortal } from '@radix-ui/react-popover';
-import { Node } from './base-node';
-import { Popover, PopoverContent, PopoverTrigger } from '../primitives/popover';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
-import { STEP_TYPE_TO_COLOR } from '@/utils/color';
-import { Badge, BadgeContent } from '../primitives/badge';
-import { cn } from '@/utils/ui';
-import { StepTypeEnum } from '@/utils/enums';
+import { Badge } from '../primitives/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '../primitives/popover';
+import { Node } from './base-node';
+
+const noop = () => {};
 
 const MenuGroup = ({ children }: { children: ReactNode }) => {
   return <div className="flex flex-col">{children}</div>;
@@ -41,7 +45,7 @@ const MenuItem = ({
 
   return (
     <span
-      onClick={onClick}
+      onClick={!disabled ? onClick : noop}
       className={cn(
         'shadow-xs text-foreground-600 hover:bg-accent flex cursor-pointer items-center gap-2 rounded-lg p-1.5',
         {
@@ -49,11 +53,16 @@ const MenuItem = ({
         }
       )}
     >
-      <Icon className={`text-${color} bg-neutral-alpha-50 h-6 w-6 rounded-md p-1 opacity-40`} />
+      <Icon
+        className={`bg-neutral-alpha-50 h-6 w-6 rounded-md p-1 opacity-40`}
+        style={{
+          color: `hsl(var(--${color}))`,
+        }}
+      />
       <span className="text-xs">{children}</span>
       {disabled && (
         <Badge kind="pill" variant="soft" className="ml-auto opacity-40">
-          <BadgeContent variant="neutral">soon</BadgeContent>
+          coming soon
         </Badge>
       )}
     </span>
@@ -68,6 +77,8 @@ export const AddStepMenu = ({
   onMenuItemClick: (stepType: StepTypeEnum) => void;
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const areNewStepsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
+  const arePushChatSMSEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_SMS_CHAT_PUSH_ENABLED);
 
   const handleMenuItemClick = (stepType: StepTypeEnum) => {
     onMenuItemClick(stepType);
@@ -99,7 +110,13 @@ export const AddStepMenu = ({
             <MenuGroup>
               <MenuTitle>Channels</MenuTitle>
               <MenuItemsGroup>
-                <MenuItem stepType={StepTypeEnum.EMAIL}>Email</MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.EMAIL}
+                  disabled={!areNewStepsEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.EMAIL)}
+                >
+                  Email
+                </MenuItem>
                 <MenuItem
                   stepType={StepTypeEnum.IN_APP}
                   disabled={false}
@@ -107,16 +124,46 @@ export const AddStepMenu = ({
                 >
                   In-App
                 </MenuItem>
-                <MenuItem stepType={StepTypeEnum.PUSH}>Push</MenuItem>
-                <MenuItem stepType={StepTypeEnum.CHAT}>Chat</MenuItem>
-                <MenuItem stepType={StepTypeEnum.SMS}>SMS</MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.PUSH}
+                  disabled={!arePushChatSMSEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.PUSH)}
+                >
+                  Push
+                </MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.CHAT}
+                  disabled={!arePushChatSMSEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.CHAT)}
+                >
+                  Chat
+                </MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.SMS}
+                  disabled={!arePushChatSMSEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.SMS)}
+                >
+                  SMS
+                </MenuItem>
               </MenuItemsGroup>
             </MenuGroup>
             <MenuGroup>
-              <MenuTitle>Action Steps</MenuTitle>
+              <MenuTitle>Actions</MenuTitle>
               <MenuItemsGroup>
-                <MenuItem stepType={StepTypeEnum.DIGEST}>Digest</MenuItem>
-                <MenuItem stepType={StepTypeEnum.DELAY}>Delay</MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.DELAY}
+                  disabled={!areNewStepsEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.DELAY)}
+                >
+                  Delay
+                </MenuItem>
+                <MenuItem
+                  stepType={StepTypeEnum.DIGEST}
+                  disabled={!areNewStepsEnabled}
+                  onClick={() => handleMenuItemClick(StepTypeEnum.DIGEST)}
+                >
+                  Digest
+                </MenuItem>
               </MenuItemsGroup>
             </MenuGroup>
           </div>

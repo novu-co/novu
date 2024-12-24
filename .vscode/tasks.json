@@ -20,12 +20,7 @@
           "beginsPattern": "Successfully compiled",
           "endsPattern": "Started application in NODE_ENV"
         }
-      },
-      "dependsOn": [
-        "SHARED",
-        "APPLICATION GENERIC",
-        "DAL"
-      ]
+      }
     },
     {
       "type": "npm",
@@ -42,18 +37,46 @@
           "endsPattern": "Started application in NODE_ENV"
         }
       },
+    },
+    {
+      "type": "npm",
+      "script": "start:test",
+      "isBackground": true,
+      "label": "WORKER TEST",
+      "path": "/apps/worker",
+      "problemMatcher": {
+        "base": "$tsc-watch",
+        "owner": "typescript",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Successfully compiled",
+          "endsPattern": "Started application in NODE_ENV"
+        }
+      },
       "icon": {
         "id": "server",
         "color": "terminal.ansiGreen"
+      }
+    },
+    {
+      "type": "npm",
+      "script": "start",
+      "isBackground": true,
+      "label": "DASHBOARD",
+      "path": "/apps/dashboard",
+      "icon": {
+        "id": "browser",
+        "color": "terminal.ansiGreen"
       },
-      "dependsOn": [
-        "SHARED",
-        "API",
-        "APPLICATION GENERIC",
-        "DAL",
-        "EE - TRANSLATION",
-        "EE - BILLING"
-      ]
+      "problemMatcher": {
+        "base": "$tsc-watch",
+        "owner": "typescript",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Compiling...",
+          "endsPattern": "webpack compiled successfully"
+        }
+      }
     },
     {
       "type": "npm",
@@ -74,12 +97,7 @@
           "endsPattern": "webpack compiled successfully"
         }
       },
-      "dependsOn": [
-        "SHARED",
-        "API",
-        "DESIGN SYSTEM",
-        "NOVUI"
-      ]
+      "dependsOn": ["SHARED", "API", "DESIGN SYSTEM", "NOVUI"]
     },
     {
       "type": "npm",
@@ -96,11 +114,7 @@
       "label": "APPLICATION GENERIC",
       "path": "/libs/application-generic",
       "problemMatcher": "$tsc-watch",
-      "dependsOn": [
-        "SHARED",
-        "TESTING",
-        "PROVIDERS"
-      ]
+      "dependsOn": ["SHARED", "TESTING", "PROVIDERS"]
     },
     {
       "type": "npm",
@@ -109,9 +123,7 @@
       "label": "DAL",
       "path": "/libs/dal",
       "problemMatcher": "$tsc-watch",
-      "dependsOn": [
-        "SHARED"
-      ]
+      "dependsOn": ["SHARED"]
     },
     {
       "type": "npm",
@@ -128,9 +140,7 @@
       "label": "PROVIDERS",
       "path": "/packages/providers",
       "problemMatcher": "$tsc-watch",
-      "dependsOn": [
-        "SHARED"
-      ]
+      "dependsOn": ["SHARED"]
     },
     {
       "type": "npm",
@@ -147,9 +157,7 @@
       "label": "TESTING",
       "path": "/libs/testing",
       "problemMatcher": "$tsc-watch",
-      "dependsOn": [
-        "SHARED"
-      ]
+      "dependsOn": ["SHARED"]
     },
     {
       "type": "npm",
@@ -207,10 +215,7 @@
       "label": "NOTIFICATION CENTER",
       "path": "/packages/notification-center",
       "problemMatcher": "$tsc",
-      "dependsOn": [
-        "NC CLIENT",
-        "SHARED"
-      ]
+      "dependsOn": ["NC CLIENT", "SHARED"]
     },
     {
       "type": "npm",
@@ -218,9 +223,7 @@
       "label": "NC CLIENT",
       "path": "/packages/client",
       "problemMatcher": "$tsc",
-      "dependsOn": [
-        "SHARED"
-      ]
+      "dependsOn": ["SHARED"]
     }
   ]
 }

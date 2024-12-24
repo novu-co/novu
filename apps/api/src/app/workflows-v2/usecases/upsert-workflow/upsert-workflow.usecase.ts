@@ -1,165 +1,119 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import Ajv, { ErrorObject } from 'ajv';
+import addFormats from 'ajv-formats';
+import _ from 'lodash';
 
 import {
-  ControlValuesEntity,
+  ControlValuesRepository,
   NotificationGroupRepository,
   NotificationStepEntity,
   NotificationTemplateEntity,
-  PreferencesEntity,
 } from '@novu/dal';
 import {
-  CreateWorkflow as CreateWorkflowGeneric,
-  CreateWorkflowCommand,
-  GetPreferences,
-  GetPreferencesCommand,
-  GetPreferencesResponseDto,
-  NotificationStep,
-  slugifyName,
-  UpdateWorkflow,
-  UpdateWorkflowCommand,
-  UpsertControlValuesCommand,
-  UpsertControlValuesUseCase,
-  UpsertPreferences,
-  UpsertUserWorkflowPreferencesCommand,
-} from '@novu/application-generic';
-import {
+  ContentIssue,
   CreateWorkflowDto,
+  JSONSchemaDto,
+  DEFAULT_WORKFLOW_PREFERENCES,
+  slugify,
+  StepContentIssueEnum,
   StepCreateDto,
-  StepDto,
+  StepIssuesDto,
   StepUpdateDto,
+  UpdateWorkflowDto,
+  UserSessionData,
+  StepTypeEnum,
   WorkflowCreationSourceEnum,
   WorkflowOriginEnum,
   WorkflowResponseDto,
   WorkflowTypeEnum,
+  ControlValuesLevelEnum,
+  WorkflowStatusEnum,
+  StepIssues,
+  ControlSchemas,
+  DigestUnitEnum,
 } from '@novu/shared';
-import { UpsertWorkflowCommand } from './upsert-workflow.command';
-import { StepUpsertMechanismFailedMissingIdException } from '../../exceptions/step-upsert-mechanism-failed-missing-id.exception';
-import { toResponseWorkflowDto } from '../../mappers/notification-template-mapper';
-import { GetWorkflowByIdsUseCase } from '../get-workflow-by-ids/get-workflow-by-ids.usecase';
-import { GetWorkflowByIdsCommand } from '../get-workflow-by-ids/get-workflow-by-ids.command';
-import { mapStepTypeToOutput } from '../../../step-schemas/shared';
+import {
+  CreateWorkflow as CreateWorkflowGeneric,
+  CreateWorkflowCommand,
+  GetWorkflowByIdsCommand,
+  GetWorkflowByIdsUseCase,
+  Instrument,
+  InstrumentUsecase,
+  NotificationStep,
+  shortId,
+  UpdateWorkflow as UpdateWorkflowGeneric,
+  UpdateWorkflowCommand,
+  WorkflowInternalResponseDto,
+  TierRestrictionsValidateUsecase,
+  UpsertControlValuesCommand,
+  DeleteControlValuesCommand,
+  UpsertControlValuesUseCase,
+  DeleteControlValuesUseCase,
+  TierRestrictionsValidateCommand,
+} from '@novu/application-generic';
 
-function buildUpsertControlValuesCommand(
-  command: UpsertWorkflowCommand,
-  persistedStep: NotificationStepEntity,
-  persistedWorkflow: NotificationTemplateEntity,
-  stepInDto: StepDto
-): UpsertControlValuesCommand {
-  return UpsertControlValuesCommand.create({
-    organizationId: command.user.organizationId,
-    environmentId: command.user.environmentId,
-    notificationStepEntity: persistedStep,
-    workflowId: persistedWorkflow._id,
-    newControlValues: stepInDto.controlValues || {},
-  });
-}
+import { UpsertWorkflowCommand, UpsertWorkflowDataCommand } from './upsert-workflow.command';
+import { stepTypeToControlSchema } from '../../shared';
+import { GetWorkflowCommand, GetWorkflowUseCase } from '../get-workflow';
+import { buildVariables } from '../../util/build-variables';
+import { BuildAvailableVariableSchemaCommand, BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
 
 @Injectable()
 export class UpsertWorkflowUseCase {
   constructor(
     private createWorkflowGenericUsecase: CreateWorkflowGeneric,
-    private updateWorkflowUsecase: UpdateWorkflow,
+    private updateWorkflowGenericUsecase: UpdateWorkflowGeneric,
     private notificationGroupRepository: NotificationGroupRepository,
-    private upsertPreferencesUsecase: UpsertPreferences,
-    private upsertControlValuesUseCase: UpsertControlValuesUseCase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private getPreferencesUseCase: GetPreferences
+    private getWorkflowUseCase: GetWorkflowUseCase,
+    private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase,
+    private controlValuesRepository: ControlValuesRepository,
+    private upsertControlValuesUseCase: UpsertControlValuesUseCase,
+    private deleteControlValuesUseCase: DeleteControlValuesUseCase,
+    private tierRestrictionsValidateUsecase: TierRestrictionsValidateUsecase
   ) {}
+
+  @InstrumentUsecase()
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
-    const workflowForUpdate: NotificationTemplateEntity | null = command.identifierOrInternalId
-      ? await this.getWorkflowByIdsUseCase.execute(
-          GetWorkflowByIdsCommand.create({
-            ...command,
-            identifierOrInternalId: command.identifierOrInternalId,
-          })
-        )
-      : null;
-    const workflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
-    const stepIdToControlValuesMap = await this.upsertControlValues(workflow, command);
-    const preferences = await this.upsertPreference(command, workflow);
-
-    return toResponseWorkflowDto(workflow, preferences, stepIdToControlValuesMap);
-  }
-
-  private async upsertControlValues(workflow: NotificationTemplateEntity, command: UpsertWorkflowCommand) {
-    const stepIdToControlValuesMap: { [p: string]: ControlValuesEntity } = {};
-    for (const persistedStep of workflow.steps) {
-      const controlValuesEntity = await this.upsertControlValuesForSingleStep(persistedStep, command, workflow);
-      if (controlValuesEntity) {
-        stepIdToControlValuesMap[persistedStep._templateId] = controlValuesEntity;
-      }
-    }
-
-    return stepIdToControlValuesMap;
-  }
-
-  private async upsertControlValuesForSingleStep(
-    persistedStep: NotificationStepEntity,
-    command: UpsertWorkflowCommand,
-    persistedWorkflow: NotificationTemplateEntity
-  ): Promise<ControlValuesEntity | undefined> {
-    const stepDatabaseId = persistedStep._templateId;
-    const stepExternalId = persistedStep.name;
-    if (!stepDatabaseId && !stepExternalId) {
-      throw new StepUpsertMechanismFailedMissingIdException(stepDatabaseId, stepExternalId, persistedStep);
-    }
-    const stepInDto = command.workflowDto?.steps.find((commandStepItem) => commandStepItem.name === persistedStep.name);
-    if (!stepInDto) {
-      // TODO: should delete the values from the database?  or just ignore?
-      return;
-    }
-
-    const upsertControlValuesCommand = buildUpsertControlValuesCommand(
-      command,
-      persistedStep,
-      persistedWorkflow,
-      stepInDto
-    );
-
-    return await this.upsertControlValuesUseCase.execute(upsertControlValuesCommand);
-  }
-
-  private async upsertPreference(
-    command: UpsertWorkflowCommand,
-    workflow: NotificationTemplateEntity
-  ): Promise<GetPreferencesResponseDto | undefined> {
-    if (!command.workflowDto.preferences?.user) {
-      return undefined;
-    }
-    await this.upsertPreferences(workflow, command);
-
-    return await this.getPersistedPreferences(workflow);
-  }
-
-  private async getPersistedPreferences(workflow) {
-    return await this.getPreferencesUseCase.safeExecute(
-      GetPreferencesCommand.create({
-        environmentId: workflow._environmentId,
-        organizationId: workflow._organizationId,
-        templateId: workflow._id,
+    const workflowForUpdate = await this.queryWorkflow(command);
+    const persistedWorkflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
+    await this.upsertControlValues(persistedWorkflow, command);
+    const workflow = await this.getWorkflowUseCase.execute(
+      GetWorkflowCommand.create({
+        workflowIdOrInternalId: persistedWorkflow._id,
+        user: command.user,
       })
     );
+
+    return workflow;
   }
 
-  private async upsertPreferences(workflow, command: UpsertWorkflowCommand): Promise<PreferencesEntity> {
-    return await this.upsertPreferencesUsecase.upsertUserWorkflowPreferences(
-      UpsertUserWorkflowPreferencesCommand.create({
-        environmentId: workflow._environmentId,
-        organizationId: workflow._organizationId,
+  @Instrument()
+  private async queryWorkflow(command: UpsertWorkflowCommand): Promise<WorkflowInternalResponseDto | null> {
+    if (!command.workflowIdOrInternalId) {
+      return null;
+    }
+
+    return await this.getWorkflowByIdsUseCase.execute(
+      GetWorkflowByIdsCommand.create({
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
         userId: command.user._id,
-        templateId: workflow._id,
-        preferences: command.workflowDto.preferences?.user,
+        workflowIdOrInternalId: command.workflowIdOrInternalId,
       })
     );
   }
 
+  @Instrument()
   private async createOrUpdateWorkflow(
-    existingWorkflow: NotificationTemplateEntity | null | undefined,
+    existingWorkflow: NotificationTemplateEntity | null,
     command: UpsertWorkflowCommand
-  ): Promise<NotificationTemplateEntity> {
-    if (existingWorkflow) {
-      return await this.updateWorkflowUsecase.execute(
-        UpdateWorkflowCommand.create(this.convertCreateToUpdateCommand(command, existingWorkflow))
+  ): Promise<WorkflowInternalResponseDto> {
+    if (existingWorkflow && isWorkflowUpdateDto(command.workflowDto, command.workflowIdOrInternalId)) {
+      return await this.updateWorkflowGenericUsecase.execute(
+        UpdateWorkflowCommand.create(
+          await this.convertCreateToUpdateCommand(command.workflowDto, command.user, existingWorkflow)
+        )
       );
     }
 
@@ -168,6 +122,7 @@ export class UpsertWorkflowUseCase {
     );
   }
 
+  @Instrument()
   private async buildCreateWorkflowGenericCommand(command: UpsertWorkflowCommand): Promise<CreateWorkflowCommand> {
     const { user } = command;
     // It's safe to assume we're dealing with CreateWorkflowDto on the creation path
@@ -178,6 +133,7 @@ export class UpsertWorkflowUseCase {
     if (!notificationGroupId) {
       throw new BadRequestException('Notification group not found');
     }
+    const steps = await this.mapSteps(command.user, workflowDto.steps);
 
     return {
       notificationGroupId,
@@ -188,71 +144,130 @@ export class UpsertWorkflowUseCase {
       __source: workflowDto.__source || WorkflowCreationSourceEnum.DASHBOARD,
       type: WorkflowTypeEnum.BRIDGE,
       origin: WorkflowOriginEnum.NOVU_CLOUD,
-      steps: this.mapSteps(workflowDto.steps),
-      payloadSchema: {},
+      steps,
       active: isWorkflowActive,
       description: workflowDto.description || '',
       tags: workflowDto.tags || [],
-      critical: false,
-      triggerIdentifier: slugifyName(workflowDto.name),
+      userPreferences: command.workflowDto.preferences?.user ?? null,
+      defaultPreferences: command.workflowDto.preferences?.workflow ?? DEFAULT_WORKFLOW_PREFERENCES,
+      triggerIdentifier: slugify(workflowDto.name),
+      status: this.computeStatus(command.workflowDto, steps),
     };
   }
 
-  private convertCreateToUpdateCommand(
-    command: UpsertWorkflowCommand,
+  private computeStatus(workflow: UpsertWorkflowDataCommand, steps: NotificationStep[]) {
+    if (workflow.active === false) {
+      return WorkflowStatusEnum.INACTIVE;
+    }
+
+    const hasIssues = steps.filter((step) => this.hasControlIssues(step.issues)).length > 0;
+    if (!hasIssues) {
+      return WorkflowStatusEnum.ACTIVE;
+    }
+
+    return WorkflowStatusEnum.ERROR;
+  }
+
+  private hasControlIssues(issue: StepIssues | undefined) {
+    return issue?.controls && Object.keys(issue.controls).length > 0;
+  }
+
+  private async convertCreateToUpdateCommand(
+    workflowDto: UpdateWorkflowDto,
+    user: UserSessionData,
     existingWorkflow: NotificationTemplateEntity
-  ): UpdateWorkflowCommand {
-    const { workflowDto } = command;
-    const { user } = command;
+  ): Promise<UpdateWorkflowCommand> {
+    const steps = await this.mapSteps(user, workflowDto.steps, existingWorkflow);
 
     return {
       id: existingWorkflow._id,
-      environmentId: user.environmentId,
+      environmentId: existingWorkflow._environmentId,
       organizationId: user.organizationId,
       userId: user._id,
-      name: command.workflowDto.name,
-      steps: this.mapSteps(workflowDto.steps, existingWorkflow),
+      name: workflowDto.name,
+      steps,
       rawData: workflowDto,
       type: WorkflowTypeEnum.BRIDGE,
       description: workflowDto.description,
+      userPreferences: workflowDto.preferences?.user ?? null,
+      defaultPreferences: workflowDto.preferences?.workflow ?? DEFAULT_WORKFLOW_PREFERENCES,
       tags: workflowDto.tags,
       active: workflowDto.active ?? true,
-      workflowId: workflowDto.workflowId,
+      status: this.computeStatus(workflowDto, steps),
     };
   }
-
-  private mapSteps(
+  private async mapSteps(
+    user: UserSessionData,
     commandWorkflowSteps: Array<StepCreateDto | StepUpdateDto>,
     persistedWorkflow?: NotificationTemplateEntity | undefined
-  ): NotificationStep[] {
-    const steps: NotificationStep[] = commandWorkflowSteps.map((step) => {
-      return this.mapSingleStep(persistedWorkflow, step);
-    });
+  ): Promise<NotificationStep[]> {
+    const steps: NotificationStep[] = [];
 
-    const seenStepIds = new Set();
-    const duplicateStepIds = new Set();
+    for (const step of commandWorkflowSteps) {
+      const mappedStep = await this.mapSingleStep(user, persistedWorkflow, step);
+      const baseStepId = mappedStep.stepId;
 
-    steps.forEach((step) => {
-      if (seenStepIds.has(step.stepId)) {
-        duplicateStepIds.add(step.stepId);
-      } else {
-        seenStepIds.add(step.stepId);
+      if (baseStepId) {
+        const previousStepIds = steps.map((stepX) => stepX.stepId).filter((id) => id != null);
+        mappedStep.stepId = this.generateUniqueStepId(baseStepId, previousStepIds);
       }
-    });
 
-    if (duplicateStepIds.size > 0) {
-      throw new BadRequestException(`Duplicate stepIds are not allowed: ${Array.from(duplicateStepIds).join(', ')}`);
+      steps.push(mappedStep);
     }
 
     return steps;
   }
 
-  private mapSingleStep(
+  private generateUniqueStepId(baseStepId: string, previousStepIds: string[]): string {
+    let currentStepId = baseStepId;
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    while (attempts < maxAttempts) {
+      if (isUniqueStepId(currentStepId, previousStepIds)) {
+        break;
+      }
+      currentStepId = `${baseStepId}-${shortId()}`;
+      attempts += 1;
+    }
+
+    if (attempts === maxAttempts && !isUniqueStepId(currentStepId, previousStepIds)) {
+      throw new BadRequestException({
+        message: 'Failed to generate unique stepId',
+        stepId: baseStepId,
+      });
+    }
+
+    return currentStepId;
+  }
+
+  private async mapSingleStep(
+    user: UserSessionData,
     persistedWorkflow: NotificationTemplateEntity | undefined,
-    step: StepDto | (StepDto & { stepUuid: string })
-  ): NotificationStep {
+    step: StepUpdateDto | StepCreateDto
+  ): Promise<NotificationStep> {
     const foundPersistedStep = this.getPersistedStepIfFound(persistedWorkflow, step);
-    const stepEntityToReturn = this.buildBaseStepEntity(step, foundPersistedStep);
+    const controlSchemas: ControlSchemas = foundPersistedStep?.template?.controls || stepTypeToControlSchema[step.type];
+    const issues: StepIssuesDto = await this.buildIssues(
+      user,
+      foundPersistedStep,
+      persistedWorkflow,
+      step,
+      controlSchemas
+    );
+
+    const stepEntityToReturn = {
+      template: {
+        type: step.type,
+        name: step.name,
+        controls: controlSchemas,
+        content: '',
+      },
+      stepId: foundPersistedStep?.stepId || slugify(step.name),
+      name: step.name,
+      issues,
+    };
+
     if (foundPersistedStep) {
       return {
         ...stepEntityToReturn,
@@ -265,20 +280,44 @@ export class UpsertWorkflowUseCase {
     return stepEntityToReturn;
   }
 
-  private buildBaseStepEntity(
-    step: StepDto | StepUpdateDto,
-    foundPersistedStep?: NotificationStepEntity
-  ): NotificationStep {
-    return {
-      template: {
-        type: step.type,
-        name: step.name,
-        controls: foundPersistedStep?.template?.controls || { schema: mapStepTypeToOutput[step.type] },
-        content: '',
-      },
-      stepId: slugifyName(step.name),
-      name: step.name,
-    };
+  private async buildIssues(
+    user: UserSessionData,
+    foundPersistedStep: NotificationStepEntity | undefined,
+    persistedWorkflow: NotificationTemplateEntity | undefined,
+    step: StepCreateDto | StepUpdateDto,
+    controlSchemas: ControlSchemas
+  ) {
+    const variableSchema = await this.buildAvailableVariableSchemaUsecase.execute(
+      BuildAvailableVariableSchemaCommand.create({
+        environmentId: user.environmentId,
+        organizationId: user.organizationId,
+        userId: user._id,
+        stepInternalId: foundPersistedStep?.stepId,
+        workflow: persistedWorkflow,
+        ...(step.controlValues ? { optimisticControlValues: step.controlValues } : {}),
+      })
+    );
+
+    let controlValueLocal = step.controlValues;
+
+    if (!controlValueLocal) {
+      controlValueLocal = (
+        await this.controlValuesRepository.findOne({
+          _environmentId: user.environmentId,
+          _organizationId: user.organizationId,
+          _workflowId: persistedWorkflow?._id,
+          _stepId: foundPersistedStep?._templateId,
+          level: ControlValuesLevelEnum.STEP_CONTROLS,
+        })
+      )?.controls;
+    }
+
+    const controlIssues = processControlValuesBySchema(controlSchemas?.schema, controlValueLocal || {});
+    const liquidTemplateIssues = processControlValuesByLiquid(variableSchema, controlValueLocal || {});
+    const customIssues = await this.processCustomControlValues(user, step.type, controlValueLocal || {});
+    const customControlIssues = _.isEmpty(customIssues) ? {} : { controls: customIssues };
+
+    return _.merge(controlIssues, liquidTemplateIssues, customControlIssues);
   }
 
   private getPersistedStepIfFound(
@@ -310,5 +349,218 @@ export class UpsertWorkflowUseCase {
         '_id'
       )
     )?._id;
+  }
+
+  @Instrument()
+  private async upsertControlValues(
+    workflow: NotificationTemplateEntity,
+    command: UpsertWorkflowCommand
+  ): Promise<void> {
+    const controlValuesUpdates = this.getControlValuesUpdates(workflow.steps, command);
+    if (controlValuesUpdates.length === 0) return;
+
+    await Promise.all(
+      controlValuesUpdates.map((update) => this.executeControlValuesUpdate(update, workflow._id, command))
+    );
+  }
+
+  private getControlValuesUpdates(steps: NotificationStepEntity[], command: UpsertWorkflowCommand) {
+    return steps
+      .map((step) => {
+        const controlValues = this.findControlValueInRequest(step, command.workflowDto.steps);
+        if (controlValues === undefined) return null;
+
+        return {
+          step,
+          controlValues,
+          shouldDelete: controlValues === null,
+        };
+      })
+      .filter((update): update is NonNullable<typeof update> => update !== null);
+  }
+
+  private executeControlValuesUpdate(
+    update: { step: NotificationStepEntity; controlValues: Record<string, unknown> | null; shouldDelete: boolean },
+    workflowId: string,
+    command: UpsertWorkflowCommand
+  ) {
+    if (update.shouldDelete) {
+      return this.deleteControlValuesUseCase.execute(
+        DeleteControlValuesCommand.create({
+          environmentId: command.user.environmentId,
+          organizationId: command.user.organizationId,
+          stepId: update.step._templateId,
+          workflowId,
+          userId: command.user._id,
+        })
+      );
+    }
+
+    return this.upsertControlValuesUseCase.execute(
+      UpsertControlValuesCommand.create({
+        organizationId: command.user.organizationId,
+        environmentId: command.user.environmentId,
+        notificationStepEntity: update.step,
+        workflowId,
+        newControlValues: update.controlValues || {},
+      })
+    );
+  }
+
+  private findControlValueInRequest(
+    step: NotificationStepEntity,
+    steps: (StepCreateDto | StepUpdateDto)[] | StepCreateDto[]
+  ): Record<string, unknown> | undefined | null {
+    return steps.find((stepRequest) => {
+      if (this.isStepUpdateDto(stepRequest)) {
+        return stepRequest._id === step._templateId;
+      }
+
+      return stepRequest.name === step.name;
+    })?.controlValues;
+  }
+
+  private async processCustomControlValues(
+    user: UserSessionData,
+    stepType: StepTypeEnum,
+    controlValues: Record<string, unknown> | null
+  ): Promise<StepIssuesDto> {
+    const cleanedControlValues = controlValues ? cleanObject(controlValues) : {};
+
+    const restrictionsErrors = await this.tierRestrictionsValidateUsecase.execute(
+      TierRestrictionsValidateCommand.create({
+        amount: cleanedControlValues.amount as string | undefined,
+        unit: cleanedControlValues.unit as string | undefined,
+        cron: cleanedControlValues.cron as string | undefined,
+        organizationId: user.organizationId,
+        stepType,
+      })
+    );
+
+    if (!restrictionsErrors) {
+      return {};
+    }
+
+    const result: Record<string, ContentIssue[]> = {};
+    for (const restrictionsError of restrictionsErrors) {
+      result[restrictionsError.controlKey] = [
+        {
+          issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
+          message: restrictionsError.message,
+        },
+      ];
+    }
+
+    return result;
+  }
+}
+
+function isWorkflowUpdateDto(workflowDto: UpsertWorkflowDataCommand, id?: string): workflowDto is UpdateWorkflowDto {
+  return !!id;
+}
+
+function isUniqueStepId(stepIdToValidate: string, otherStepsIds: string[]) {
+  return !otherStepsIds.some((stepId) => stepId === stepIdToValidate);
+}
+
+function processControlValuesByLiquid(
+  variableSchema: JSONSchemaDto | undefined,
+  controlValues: Record<string, unknown> | null
+): StepIssuesDto {
+  const issues: StepIssuesDto = {};
+
+  for (const [controlKey, controlValue] of Object.entries(controlValues || {})) {
+    const liquidTemplateIssues = buildVariables(variableSchema, controlValue);
+
+    if (liquidTemplateIssues.invalidVariables.length > 0) {
+      issues.controls = issues.controls || {};
+
+      issues.controls[controlKey] = liquidTemplateIssues.invalidVariables.map((error) => ({
+        message: `${error.message}, variable: ${error.output}`,
+        issueType: StepContentIssueEnum.ILLEGAL_VARIABLE_IN_CONTROL_VALUE,
+        variableName: error.output,
+      }));
+    }
+  }
+
+  return issues;
+}
+
+function processControlValuesBySchema(
+  controlSchema: JSONSchemaDto | undefined,
+  controlValues: Record<string, unknown> | null
+): StepIssuesDto {
+  let issues: StepIssuesDto = {};
+
+  const cleanedControlValues = controlValues ? cleanObject(controlValues) : {};
+
+  if (!controlSchema || !cleanedControlValues) {
+    return issues;
+  }
+
+  const ajv = new Ajv({ allErrors: true });
+  addFormats(ajv);
+  const validate = ajv.compile(controlSchema);
+  const isValid = validate(cleanedControlValues);
+  const errors = validate.errors as null | ErrorObject[];
+
+  if (!isValid && errors && errors?.length !== 0 && cleanedControlValues) {
+    issues = {
+      controls: errors.reduce(
+        (acc, error) => {
+          const path = getErrorPath(error);
+          if (!acc[path]) {
+            acc[path] = [];
+          }
+
+          acc[path].push({
+            message: error.message || 'Invalid value',
+            issueType: mapAjvErrorToIssueType(error),
+            variableName: path,
+          });
+
+          return acc;
+        },
+        {} as Record<string, ContentIssue[]>
+      ),
+    };
+
+    return issues;
+  }
+
+  return issues;
+}
+
+/*
+ * Extracts the path from the error object:
+ * 1. If instancePath exists, removes leading slash and converts remaining slashes to dots
+ * 2. If no instancePath, uses missingProperty from error params
+ * Example: "/foo/bar" becomes "foo.bar"
+ */
+function getErrorPath(error: ErrorObject): string {
+  return (error.instancePath.substring(1) || error.params.missingProperty)?.replace(/\//g, '.');
+}
+
+function cleanObject(
+  obj: Record<string, any>,
+  valuesToClean: Array<string | null | undefined> = ['', null, undefined]
+) {
+  if (typeof obj !== 'object' || obj === null) return obj;
+
+  return Object.fromEntries(
+    Object.entries(obj)
+      .filter(([unused, value]) => !valuesToClean.includes(value as string | null | undefined))
+      .map(([key, value]) => [key, cleanObject(value, valuesToClean)])
+  );
+}
+
+function mapAjvErrorToIssueType(error: ErrorObject): StepContentIssueEnum {
+  switch (error.keyword) {
+    case 'required':
+      return StepContentIssueEnum.MISSING_VALUE;
+    case 'type':
+      return StepContentIssueEnum.MISSING_VALUE;
+    default:
+      return StepContentIssueEnum.MISSING_VALUE;
   }
 }

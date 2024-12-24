@@ -17,9 +17,16 @@ import {
   UpdateWorkflow,
   UpdateWorkflowCommand,
 } from '@novu/application-generic';
-import { UserSessionData, WorkflowOriginEnum, WorkflowTypeEnum } from '@novu/shared';
+import {
+  buildWorkflowPreferencesFromPreferenceChannels,
+  DEFAULT_WORKFLOW_PREFERENCES,
+  UserSessionData,
+  WorkflowOriginEnum,
+  WorkflowTypeEnum,
+} from '@novu/shared';
 
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiExcludeController } from '@nestjs/swagger/dist/decorators/api-exclude-controller.decorator';
 import { UserSession } from '../shared/framework/user.decorator';
 import { GetNotificationTemplates } from './usecases/get-notification-templates/get-notification-templates.usecase';
 import { GetNotificationTemplatesCommand } from './usecases/get-notification-templates/get-notification-templates.command';
@@ -39,7 +46,7 @@ import { WorkflowResponse } from './dto/workflow-response.dto';
 import { WorkflowsResponseDto } from './dto/workflows.response.dto';
 import { ExternalApiAccessible } from '../auth/framework/external-api.decorator';
 import { WorkflowsRequestDto } from './dto/workflows-request.dto';
-import { ApiCommonResponses, ApiOkResponse, ApiResponse } from '../shared/framework/response.decorator';
+import { ApiOkResponse, ApiResponse } from '../shared/framework/response.decorator';
 import { DataBooleanDto } from '../shared/dtos/data-wrapper-dto';
 import { CreateWorkflowQuery } from './queries';
 import { DeleteNotificationTemplateCommand } from './usecases/delete-notification-template/delete-notification-template.command';
@@ -51,7 +58,7 @@ import { SdkGroupName } from '../shared/framework/swagger/sdk.decorators';
 /**
  * @deprecated use controllers in /workflows directory
  */
-@ApiCommonResponses()
+@ApiExcludeController()
 @Controller('/workflows')
 @UseInterceptors(ClassSerializerInterceptor)
 @UserAuthentication()
@@ -113,7 +120,10 @@ export class WorkflowControllerV1 {
         description: body.description,
         workflowId: body.identifier,
         critical: body.critical,
-        preferenceSettings: body.preferenceSettings,
+        defaultPreferences: DEFAULT_WORKFLOW_PREFERENCES,
+        userPreferences:
+          body.preferenceSettings &&
+          buildWorkflowPreferencesFromPreferenceChannels(body.critical, body.preferenceSettings),
         steps: body.steps,
         notificationGroupId: body.notificationGroupId,
         data: body.data,
@@ -210,12 +220,15 @@ export class WorkflowControllerV1 {
         active: body.active ?? false,
         draft: !body.active,
         critical: body.critical ?? false,
-        preferenceSettings: body.preferenceSettings,
+        defaultPreferences: DEFAULT_WORKFLOW_PREFERENCES,
+        userPreferences:
+          body.preferenceSettings &&
+          buildWorkflowPreferencesFromPreferenceChannels(body.critical, body.preferenceSettings),
         blueprintId: body.blueprintId,
         data: body.data,
         __source: query?.__source,
         type: WorkflowTypeEnum.REGULAR,
-        origin: WorkflowOriginEnum.NOVU_CLOUD,
+        origin: WorkflowOriginEnum.NOVU_CLOUD_V1,
       })
     );
   }

@@ -1,45 +1,20 @@
-import { useState } from 'react';
+import { HoverToCopy } from '@/components/primitives/hover-to-copy';
+import { cn } from '@/utils/ui';
 import { RiFileCopyLine } from 'react-icons/ri';
-import { Button } from './button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
+import { Button, ButtonProps } from './button';
 
-type CopyButtonProps = {
-  content: string;
-  className?: string;
+type CopyButtonProps = ButtonProps & {
+  valueToCopy: string;
 };
 
-export const CopyButton: React.FC<CopyButtonProps> = ({ content, className }) => {
-  const [isCopied, setIsCopied] = useState(false);
-
-  const copyToClipboard = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    try {
-      await navigator.clipboard.writeText(content);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 1500);
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
-    }
-  };
+export const CopyButton = (props: CopyButtonProps) => {
+  const { className, valueToCopy, children, ...rest } = props;
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            className={className}
-            onClick={copyToClipboard}
-            aria-label="Copy to clipboard"
-          >
-            <RiFileCopyLine className="h-4 w-4" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{isCopied ? 'Copied!' : 'Click to copy'}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <HoverToCopy asChild valueToCopy={valueToCopy}>
+      <Button variant="outline" className={cn('flex items-center gap-1', className)} {...rest}>
+        {children || <RiFileCopyLine className="size-4" />}
+      </Button>
+    </HoverToCopy>
   );
 };

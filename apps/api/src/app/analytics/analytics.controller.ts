@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Headers } from '@nestjs/common';
+import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { AnalyticsService, ExternalApiAccessible, UserSession } from '@novu/application-generic';
 import { UserSessionData } from '@novu/shared';
@@ -35,8 +35,9 @@ export class AnalyticsController {
   @Post('/identify')
   @ExternalApiAccessible()
   @UserAuthentication()
-  async identifyUser(@Body() body: any, @UserSession() user: UserSessionData): Promise<any> {
-    return this.hubspotIdentifyFormUsecase.execute(
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async identifyUser(@Body() body: any, @UserSession() user: UserSessionData) {
+    await this.hubspotIdentifyFormUsecase.execute(
       HubspotIdentifyFormCommand.create({
         email: user.email as string,
         lastName: user.lastName,

@@ -1,5 +1,3 @@
 {
-  "main": "../dist/cjs/servers/nest.cjs",
-  "module": "../dist/esm/servers/nest.js",
-  "types": "../dist/esm/servers/nest.d.ts"
+  "main": "../dist/cjs/servers/nest.cjs"
 }

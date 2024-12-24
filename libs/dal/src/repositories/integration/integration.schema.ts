@@ -94,6 +94,7 @@ const integrationSchema = new Schema<IntegrationDBModel>(
         ],
       },
     ],
+    connected: Schema.Types.Boolean,
   },
   schemaOptions
 );
@@ -101,6 +102,10 @@ const integrationSchema = new Schema<IntegrationDBModel>(
 integrationSchema.index({
   _organizationId: 1,
   active: 1,
+});
+
+integrationSchema.index({
+  _environmentId: 1,
 });
 
 integrationSchema.plugin(mongooseDelete, { deletedAt: true, deletedBy: true, overrideMethods: 'all' });

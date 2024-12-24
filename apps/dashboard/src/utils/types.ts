@@ -1,17 +1,4 @@
-import type { StepCreateDto } from '@novu/shared';
-
-export enum BaseEnvironmentEnum {
-  DEVELOPMENT = 'Development',
-  PRODUCTION = 'Production',
-}
-
-export type BridgeStatus = {
-  status: 'ok';
-  bridgeUrl?: string;
-  discovered: {
-    workflows: number;
-  };
-};
+import type { StepDataDto } from '@novu/shared';
 
 export enum ConnectionStatus {
   CONNECTED = 'connected',
@@ -19,5 +6,24 @@ export enum ConnectionStatus {
   LOADING = 'loading',
 }
 
-// TODO: update this when the API types are updated
-export type Step = Pick<StepCreateDto, 'name' | 'type'>;
+export enum WorkflowIssueTypeEnum {
+  MISSING_VARIABLE_IN_PAYLOAD = 'MISSING_VARIABLE_IN_PAYLOAD',
+  VARIABLE_TYPE_MISMATCH = 'VARIABLE_TYPE_MISMATCH',
+  MISSING_VALUE = 'MISSING_VALUE',
+  WORKFLOW_ID_ALREADY_EXIST = 'WORKFLOW_ID_ALREADY_EXIST',
+  STEP_ID_ALREADY_EXIST = 'STEP_ID_ALREADY_EXIST',
+}
+
+export type RuntimeIssue = {
+  issueType: WorkflowIssueTypeEnum;
+  variableName?: string;
+  message: string;
+};
+
+export type Step = Pick<StepDataDto, 'name' | 'type' | '_id' | 'stepId' | 'issues' | 'slug'>;
+
+/**
+ * Omit the `environment` field from the parameters of a function.
+ * This is useful to in data-fetching hooks invoking the api client functions.
+ */
+export type OmitEnvironmentFromParameters<T extends (...args: any) => any> = Omit<Parameters<T>[0], 'environment'>;

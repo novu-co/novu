@@ -1,13 +1,6 @@
 import axios from 'axios';
 
-import type { DiscoverWorkflowOutput } from '@novu/framework/internal';
-
-export type StepPreviewParams = {
-  workflowId: string;
-  stepId: string;
-  payload: Record<string, unknown>;
-  controls: Record<string, unknown>;
-};
+import type { DiscoverWorkflowOutput, Event, ExecuteOutput, HealthCheck } from '@novu/framework/internal';
 
 export type TriggerParams = {
   workflowId: string;
@@ -16,14 +9,6 @@ export type TriggerParams = {
   payload: Record<string, unknown>;
   controls?: {
     steps?: Record<string, unknown>;
-  };
-};
-
-export type BridgeStatus = {
-  status: 'ok';
-  bridgeUrl?: string;
-  discovered: {
-    workflows: number;
   };
 };
 
@@ -69,7 +54,7 @@ export function buildBridgeHTTPClient(baseURL: string) {
       });
     },
 
-    async healthCheck(): Promise<BridgeStatus> {
+    async healthCheck(): Promise<HealthCheck> {
       return get('', {
         action: 'health-check',
       });
@@ -78,7 +63,7 @@ export function buildBridgeHTTPClient(baseURL: string) {
     /**
      * TODO: Use framework shared types
      */
-    async getWorkflow(workflowId: string): Promise<any> {
+    async getWorkflow(workflowId: string): Promise<DiscoverWorkflowOutput | undefined> {
       const { workflows } = await this.discover();
 
       return workflows.find((workflow) => workflow.workflowId === workflowId);
@@ -87,10 +72,19 @@ export function buildBridgeHTTPClient(baseURL: string) {
     /**
      * TODO: Use framework shared types
      */
-    async getStepPreview({ workflowId, stepId, controls, payload }: StepPreviewParams): Promise<any> {
+    async getStepPreview({
+      workflowId,
+      stepId,
+      controls,
+      payload,
+      state,
+      subscriber,
+    }: Omit<Event, 'action'>): Promise<ExecuteOutput> {
       return post(`${baseURL}?action=preview&workflowId=${workflowId}&stepId=${stepId}`, {
         controls: controls || {},
         payload: payload || {},
+        state: state || [],
+        subscriber: subscriber || {},
       });
     },
 

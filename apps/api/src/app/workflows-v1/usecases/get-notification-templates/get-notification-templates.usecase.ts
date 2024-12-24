@@ -24,7 +24,8 @@ export class GetNotificationTemplates {
       command.environmentId,
       command.page * command.limit,
       command.limit,
-      command.query
+      command.query,
+      true
     );
 
     const workflows = await this.updateHasActiveIntegrationFlag(list, command);

@@ -1,6 +1,8 @@
 import { BaseEdge, Edge, EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xyflow/react';
 import { AddStepMenu } from './add-step-menu';
-import { useWorkflowEditorContext } from './hooks';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
+import { WorkflowOriginEnum } from '@novu/shared';
+import { createStep } from '@/components/workflow-editor/step-utils';
 
 export type AddNodeEdgeType = Edge<{ isLast: boolean; addStepIndex: number }>;
 
@@ -15,7 +17,8 @@ export function AddNodeEdge({
   data = { isLast: false, addStepIndex: 0 },
   markerEnd,
 }: EdgeProps<AddNodeEdgeType>) {
-  const { addStep } = useWorkflowEditorContext();
+  const { workflow, update } = useWorkflow();
+  const isReadOnly = workflow?.origin === WorkflowOriginEnum.EXTERNAL;
 
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -42,11 +45,28 @@ export function AddNodeEdge({
             }}
             className="nodrag nopan"
           >
-            <AddStepMenu
-              onMenuItemClick={(stepType) => {
-                addStep(stepType, data.addStepIndex);
-              }}
-            />
+            {!isReadOnly && (
+              <AddStepMenu
+                onMenuItemClick={(stepType) => {
+                  if (workflow) {
+                    const indexToAdd = data.addStepIndex;
+
+                    const newStep = createStep(stepType);
+
+                    const updatedSteps = [
+                      ...workflow.steps.slice(0, indexToAdd),
+                      newStep,
+                      ...workflow.steps.slice(indexToAdd),
+                    ];
+
+                    update({
+                      ...workflow,
+                      steps: updatedSteps,
+                    });
+                  }
+                }}
+              />
+            )}
           </div>
         </EdgeLabelRenderer>
       )}

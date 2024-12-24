@@ -2,7 +2,8 @@ import { Types } from 'mongoose';
 import {
   BuilderFieldType,
   BuilderGroupValues,
-  ControlsDto,
+  ControlSchemas,
+  CustomDataType,
   FilterParts,
   IMessageFilter,
   IMessageTemplate,
@@ -14,13 +15,13 @@ import {
   IStepVariant,
   ITriggerReservedVariable,
   IWorkflowStepMetadata,
-  NotificationTemplateCustomData,
+  StepIssues,
   TriggerTypeEnum,
+  WorkflowIssueTypeEnum,
   WorkflowOriginEnum,
+  WorkflowStatusEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
-
-import { JSONSchema } from 'json-schema-to-ts';
 import { NotificationGroupEntity } from '../notification-group';
 import type { OrganizationId } from '../organization';
 import type { EnvironmentId } from '../environment';
@@ -37,8 +38,10 @@ export class NotificationTemplateEntity implements INotificationTemplate {
 
   draft: boolean;
 
+  /** @deprecated - use `userPreferences` instead */
   preferenceSettings: IPreferenceChannels;
 
+  /** @deprecated - use `userPreferences` instead */
   critical: boolean;
 
   tags: string[];
@@ -73,7 +76,7 @@ export class NotificationTemplateEntity implements INotificationTemplate {
 
   blueprintId?: string;
 
-  data?: NotificationTemplateCustomData;
+  data?: CustomDataType;
 
   type?: WorkflowTypeEnum;
 
@@ -82,6 +85,15 @@ export class NotificationTemplateEntity implements INotificationTemplate {
   rawData?: any;
 
   payloadSchema?: any;
+
+  issues: Record<string, RuntimeIssue[]>;
+
+  status?: WorkflowStatusEnum;
+}
+export class RuntimeIssue {
+  issueType: WorkflowIssueTypeEnum;
+  variableName?: string;
+  message: string;
 }
 
 export type NotificationTemplateDBModel = ChangePropsValueType<
@@ -110,6 +122,8 @@ export class StepVariantEntity implements IStepVariant {
 
   stepId?: string;
 
+  issues?: StepIssues;
+
   name?: string;
 
   _templateId: string;
@@ -132,17 +146,17 @@ export class StepVariantEntity implements IStepVariant {
   shouldStopOnFail?: boolean;
 
   bridgeUrl?: string;
-  /**
-   * Control variables for the step
-   * Same as ControlValues
+  /*
+   * controlVariables exists
+   * only on none production environment in order to provide stateless control variables on fly
    */
-  controlVariables?: ControlsDto;
-
-  controls?: {
-    schema: JSONSchema;
-  };
+  controlVariables?: Record<string, unknown>;
+  /**
+   * @deprecated This property is deprecated and will be removed in future versions.
+   * Use IMessageTemplate.controls
+   */
+  controls?: ControlSchemas;
 }
-
 export class NotificationStepEntity extends StepVariantEntity implements INotificationTemplateStep {
   variants?: StepVariantEntity[];
 }

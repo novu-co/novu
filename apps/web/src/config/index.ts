@@ -52,6 +52,9 @@ export const WIDGET_EMBED_PATH =
 export const IS_SELF_HOSTED =
   window._env_.REACT_APP_IS_SELF_HOSTED === 'true' || process.env.REACT_APP_IS_SELF_HOSTED === 'true';
 
+// To test feature in prod and staging. Excluding self host and local
+export const IS_NOVU_PROD_STAGING = !IS_SELF_HOSTED && !API_ROOT.includes('localhost');
+
 export const REACT_APP_VERSION = process.env.NOVU_VERSION;
 
 export const INTERCOM_APP_ID = window._env_.REACT_APP_INTERCOM_APP_ID || process.env.REACT_APP_INTERCOM_APP_ID || '';
@@ -90,6 +93,11 @@ export const CLERK_PUBLISHABLE_KEY =
 
 export const IS_UNDER_DASHBOARD =
   window._env_.REACT_IS_UNDER_DASHBOARD || process.env.REACT_IS_UNDER_DASHBOARD || 'false';
+
+export const WEB_APP_URL =
+  window._env_.REACT_APP_WEB_APP_URL || process.env.REACT_APP_WEB_APP_URL || window.location.origin;
+
+export const NEW_DASHBOARD_URL = window._env_.REACT_APP_NEW_DASHBOARD_URL || process.env.REACT_APP_NEW_DASHBOARD_URL;
 
 if (IS_EE_AUTH_ENABLED && !CLERK_PUBLISHABLE_KEY) {
   throw new Error('Missing Clerk Publishable Key');

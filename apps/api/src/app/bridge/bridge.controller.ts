@@ -14,6 +14,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 
+import { HttpHeaderKeysEnum } from '@novu/framework/internal';
 import { ControlValuesLevelEnum, UserSessionData, WorkflowOriginEnum, WorkflowTypeEnum } from '@novu/shared';
 import { AnalyticsService, ExternalApiAccessible, UserAuthGuard, UserSession } from '@novu/application-generic';
 import { ControlValuesRepository, EnvironmentRepository, NotificationTemplateRepository } from '@novu/dal';
@@ -49,13 +50,11 @@ export class BridgeController {
   @Get('/status')
   @UseGuards(UserAuthGuard)
   async health(@UserSession() user: UserSessionData) {
-    const result = await this.getBridgeStatus.execute(
+    return this.getBridgeStatus.execute(
       GetBridgeStatusCommand.create({
         environmentId: user.environmentId,
       })
     );
-
-    return result;
   }
 
   @Post('/preview/:workflowId/:stepId')
@@ -70,7 +69,7 @@ export class BridgeController {
       PreviewStepCommand.create({
         workflowId,
         stepId,
-        controls: data.controls || data.inputs,
+        controls: data.controls,
         payload: data.payload,
         environmentId: user.environmentId,
         organizationId: user.organizationId,
@@ -84,14 +83,12 @@ export class BridgeController {
   @ExternalApiAccessible()
   @UseGuards(UserAuthGuard)
   async createBridgesByDiscovery(
-    @Headers('x-novu-anonymous') anonymousIdDeprecated: string,
-    @Headers('novu-anonymous') anonymousId: string,
+    @Headers(HttpHeaderKeysEnum.NOVU_ANONYMOUS) anonymousId: string,
     @UserSession() user: UserSessionData,
     @Body() body: CreateBridgeRequestDto,
     @Query('source') source?: string
   ): Promise<CreateBridgeResponseDto> {
-    const chosenAnonymousIdHeader = anonymousId ?? anonymousIdDeprecated;
-    if (chosenAnonymousIdHeader && chosenAnonymousIdHeader !== 'null') {
+    if (anonymousId) {
       this.analyticsService.alias(anonymousId, user._id);
     }
 
@@ -111,7 +108,7 @@ export class BridgeController {
   @ExternalApiAccessible()
   @UseGuards(UserAuthGuard)
   async createDiscoverySoft(
-    @Headers('x-novu-anonymous') anonymousId: string,
+    @Headers(HttpHeaderKeysEnum.NOVU_ANONYMOUS) anonymousId: string,
     @UserSession() user: UserSessionData,
     @Body() body: CreateBridgeRequestDto
   ): Promise<CreateBridgeResponseDto> {
@@ -121,7 +118,7 @@ export class BridgeController {
       throw new BadRequestException('Bridge URL not found');
     }
 
-    if (anonymousId && anonymousId !== 'null') {
+    if (anonymousId) {
       this.analyticsService.alias(anonymousId, user._id);
     }
 

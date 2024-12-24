@@ -2,10 +2,18 @@ import Ajv from 'ajv';
 import type { ErrorObject, ValidateFunction as AjvValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
 import type { ValidateResult, Validator } from '../types/validator.types';
-import type { FromSchema, FromSchemaUnvalidated, JsonSchema, Schema } from '../types/schema.types';
+import type { FromSchema, FromSchemaUnvalidated, Schema, JsonSchema } from '../types/schema.types';
 import { cloneData } from '../utils/clone.utils';
+import { checkDependencies } from '../utils/import.utils';
+import { ImportRequirement } from '../types/import.types';
 
 export class JsonSchemaValidator implements Validator<JsonSchema> {
+  /**
+   * Json schema validation has no required dependencies as they are included in
+   * the `@novu/framework` package dependencies.
+   */
+  readonly requiredImports: readonly ImportRequirement[] = [];
+
   private readonly ajv: Ajv;
 
   /**
@@ -27,15 +35,18 @@ export class JsonSchemaValidator implements Validator<JsonSchema> {
     this.compiledSchemas = new Map();
   }
 
-  canHandle(schema: Schema): schema is JsonSchema {
-    if (typeof schema === 'boolean') return false;
+  async canHandle(schema: Schema): Promise<boolean> {
+    const canHandle =
+      (schema as JsonSchema).type === 'object' ||
+      !!(schema as JsonSchema).anyOf ||
+      !!(schema as JsonSchema).allOf ||
+      !!(schema as JsonSchema).oneOf;
 
-    return (
-      (schema as Exclude<JsonSchema, boolean>).type === 'object' ||
-      !!(schema as Exclude<JsonSchema, boolean>).anyOf ||
-      !!(schema as Exclude<JsonSchema, boolean>).allOf ||
-      !!(schema as Exclude<JsonSchema, boolean>).oneOf
-    );
+    if (canHandle) {
+      await checkDependencies(this.requiredImports, 'JSON schema');
+    }
+
+    return canHandle;
   }
 
   async validate<
@@ -52,7 +63,6 @@ export class JsonSchemaValidator implements Validator<JsonSchema> {
     // ajv mutates the data, so we need to clone it to avoid side effects
     const clonedData = cloneData(data);
 
-    // const valid = validateFn(data);
     const valid = validateFn(clonedData);
 
     if (valid) {
@@ -68,7 +78,7 @@ export class JsonSchemaValidator implements Validator<JsonSchema> {
     }
   }
 
-  transformToJsonSchema(schema: JsonSchema): JsonSchema {
+  async transformToJsonSchema(schema: JsonSchema): Promise<JsonSchema> {
     return schema;
   }
 }

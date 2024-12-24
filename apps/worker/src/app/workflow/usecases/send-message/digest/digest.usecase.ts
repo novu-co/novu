@@ -19,7 +19,6 @@ import {
 import { GetDigestEventsRegular } from './get-digest-events-regular.usecase';
 import { GetDigestEventsBackoff } from './get-digest-events-backoff.usecase';
 
-import { CreateLog } from '../../../../shared/logs';
 import { PlatformException } from '../../../../shared/utils';
 
 import { SendMessageCommand } from '../send-message.command';
@@ -32,14 +31,13 @@ const LOG_CONTEXT = 'Digest';
 export class Digest extends SendMessageType {
   constructor(
     protected messageRepository: MessageRepository,
-    protected createLogUsecase: CreateLog,
     protected executionLogRoute: ExecutionLogRoute,
     protected jobRepository: JobRepository,
     private getDigestEventsRegular: GetDigestEventsRegular,
     private getDigestEventsBackoff: GetDigestEventsBackoff,
     private getFeatureFlag: GetFeatureFlag
   ) {
-    super(messageRepository, createLogUsecase, executionLogRoute);
+    super(messageRepository, executionLogRoute);
   }
 
   public async execute(command: SendMessageCommand) {

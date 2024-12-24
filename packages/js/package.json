@@ -1,6 +1,6 @@
 {
   "name": "@novu/js",
-  "version": "2.5.0",
+  "version": "2.6.3",
   "repository": "https://github.com/novuhq/novu",
   "description": "Novu's JavaScript SDK for building custom inbox notification experiences",
   "author": "",
@@ -126,7 +126,6 @@
   },
   "dependencies": {
     "@floating-ui/dom": "^1.6.7",
-    "@novu/client": "workspace:*",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "mitt": "^3.0.1",
@@ -137,6 +136,8 @@
     "tailwind-merge": "^2.4.0"
   },
   "nx": {
-    "tags": ["package:public"]
+    "tags": [
+      "type:package"
+    ]
   }
 }

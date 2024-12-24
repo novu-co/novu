@@ -1,16 +1,11 @@
-import type {
-  ITriggerPayload,
-  TriggerEventStatusEnum,
-  TriggerRecipientsPayload,
-  TriggerRecipientSubscriber,
-} from '@novu/shared';
+import type { ISubscriberPayload, ITriggerPayload, TriggerEventStatusEnum, TriggerRecipientsPayload } from '../shared';
 import { ConditionalPartial, PickRequiredKeys } from './util.types';
 
-type EventPayload = ITriggerPayload & {};
+type EventPayload = ITriggerPayload;
 
-type Actor = TriggerRecipientSubscriber & {};
+type Actor = string | ISubscriberPayload;
 
-type Recipients = TriggerRecipientsPayload & {};
+type Recipients = TriggerRecipientsPayload;
 
 export type EventTriggerResult = {
   /**
@@ -56,6 +51,14 @@ export type EventTriggerParams<T_Payload = EventPayload> = {
       [stepId: string]: Record<string, unknown>;
     };
   };
+  /**
+   * Use Novu Cloud US (https://api.novu.co) or EU deployment (https://eu.api.novu.co). Defaults to US.
+   */
+  apiUrl?: string;
+  /**
+   * Override secret key for the trigger
+   */
+  secretKey?: string;
 } & ConditionalPartial<
   {
     /**

@@ -1,4 +1,4 @@
-import { Schema } from '../../../types/schema.types';
+import type { JsonSchema } from '../../../types/schema.types';
 
 /**
  * Expo `POST /v2/push/send` schema
@@ -71,7 +71,7 @@ const expoOutputSchema = {
   },
   required: [],
   additionalProperties: true,
-} as const satisfies Schema;
+} as const satisfies JsonSchema;
 
 export const expoProviderSchemas = {
   output: expoOutputSchema,

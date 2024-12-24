@@ -1,3 +1,8 @@
+/*
+ * THIS FILE SHOULD NOT DEPEND ON ANY OTHER FILES.
+ * IT SHOULD ONLY CONTAIN UTILITY TYPES.
+ */
+
 /**
  * A type that represents either `A` or `B`. Shared properties retain their
  * types and unique properties are marked as optional.

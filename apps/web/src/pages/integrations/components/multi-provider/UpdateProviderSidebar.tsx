@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Group, Center, Box } from '@mantine/core';
 import styled from '@emotion/styled';
-import slugify from 'slugify';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useClipboard, useDisclosure } from '@mantine/hooks';
 import {
@@ -13,6 +12,7 @@ import {
   ICredentialsDto,
   InAppProviderIdEnum,
   SmsProviderIdEnum,
+  slugify,
 } from '@novu/shared';
 import { Button, colors, Input, Sidebar, Text, Check, Copy } from '@novu/design-system';
 import { useProviders } from '../../useProviders';
@@ -127,10 +127,7 @@ export function UpdateProviderSidebar({
 
   useEffect(() => {
     if (selectedProvider && !selectedProvider?.identifier) {
-      const newIdentifier = slugify(selectedProvider?.displayName, {
-        lower: true,
-        strict: true,
-      });
+      const newIdentifier = slugify(selectedProvider?.displayName);
 
       setValue('identifier', newIdentifier);
     }

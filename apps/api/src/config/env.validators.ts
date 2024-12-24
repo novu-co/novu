@@ -1,11 +1,5 @@
 import { bool, CleanedEnv, cleanEnv, json, num, port, str, url, ValidatorSpec } from 'envalid';
-import {
-  DEFAULT_MESSAGE_GENERIC_RETENTION_DAYS,
-  DEFAULT_MESSAGE_IN_APP_RETENTION_DAYS,
-  DEFAULT_NOTIFICATION_RETENTION_DAYS,
-  FeatureFlagsKeysEnum,
-  StringifyEnv,
-} from '@novu/shared';
+import { DEFAULT_NOTIFICATION_RETENTION_DAYS, FeatureFlagsKeysEnum, StringifyEnv } from '@novu/shared';
 
 export function validateEnv() {
   return cleanEnv(process.env, envValidators);
@@ -25,33 +19,45 @@ export const envValidators = {
   REDIS_TLS: json({ default: undefined }),
   JWT_SECRET: str(),
   SENDGRID_API_KEY: str({ default: '' }),
-  MONGO_URL: str(),
+  /** @deprecated - use `MONGO_AUTO_CREATE_INDEXES` instead */
+  AUTO_CREATE_INDEXES: bool({ default: false }),
+  MONGO_AUTO_CREATE_INDEXES: bool({ default: false }),
+  MONGO_MAX_IDLE_TIME_IN_MS: num({ default: 1000 * 30 }),
+  MONGO_MAX_POOL_SIZE: num({ default: 50 }),
   MONGO_MIN_POOL_SIZE: num({ default: 10 }),
-  MONGO_MAX_POOL_SIZE: num({ default: 500 }),
+  MONGO_URL: str(),
   NOVU_API_KEY: str({ default: '' }),
   STORE_ENCRYPTION_KEY: str(),
-  NEW_RELIC_APP_NAME: str({ default: '' }),
-  NEW_RELIC_LICENSE_KEY: str({ default: '' }),
   REDIS_CACHE_SERVICE_HOST: str({ default: '' }),
   REDIS_CACHE_SERVICE_PORT: str({ default: '' }),
   REDIS_CACHE_SERVICE_TLS: json({ default: undefined }),
   REDIS_CLUSTER_SERVICE_HOST: str({ default: '' }),
   REDIS_CLUSTER_SERVICE_PORTS: str({ default: '' }),
   STORE_NOTIFICATION_CONTENT: bool({ default: false }),
-  LAUNCH_DARKLY_SDK_KEY: str({ default: '' }),
   WORKER_DEFAULT_CONCURRENCY: num({ default: undefined }),
   WORKER_DEFAULT_LOCK_DURATION: num({ default: undefined }),
-  STRIPE_API_KEY: str({ default: undefined }),
-  STRIPE_CONNECT_SECRET: str({ default: undefined }),
   ENABLE_OTEL: bool({ default: false }),
   NOTIFICATION_RETENTION_DAYS: num({ default: DEFAULT_NOTIFICATION_RETENTION_DAYS }),
-  MESSAGE_GENERIC_RETENTION_DAYS: num({ default: DEFAULT_MESSAGE_GENERIC_RETENTION_DAYS }),
-  MESSAGE_IN_APP_RETENTION_DAYS: num({ default: DEFAULT_MESSAGE_IN_APP_RETENTION_DAYS }),
   LEGACY_STAGING_DASHBOARD_URL: url({ default: undefined }),
   API_ROOT_URL: url(),
   NOVU_INVITE_TEAM_MEMBER_NUDGE_TRIGGER_IDENTIFIER: str({ default: undefined }),
-  HUBSPOT_INVITE_NUDGE_EMAIL_USER_LIST_ID: str({ default: undefined }),
-  HUBSPOT_PRIVATE_APP_ACCESS_TOKEN: str({ default: undefined }),
+  SUBSCRIBER_WIDGET_JWT_EXPIRATION_TIME: str({ default: '15 days' }),
+
+  // Novu Cloud third party services
+  ...(processEnv.IS_SELF_HOSTED !== 'true' &&
+    processEnv.NOVU_ENTERPRISE === 'true' && {
+      HUBSPOT_INVITE_NUDGE_EMAIL_USER_LIST_ID: str({ default: undefined }),
+      HUBSPOT_PRIVATE_APP_ACCESS_TOKEN: str({ default: undefined }),
+      LAUNCH_DARKLY_SDK_KEY: str({ default: '' }),
+      NEW_RELIC_APP_NAME: str({ default: '' }),
+      NEW_RELIC_LICENSE_KEY: str({ default: '' }),
+      PLAIN_SUPPORT_KEY: str({ default: undefined }),
+      PLAIN_IDENTITY_VERIFICATION_SECRET_KEY: str({ default: undefined }),
+      PLAIN_CARDS_HMAC_SECRET_KEY: str({ default: undefined }),
+      STRIPE_API_KEY: str({ default: undefined }),
+      STRIPE_CONNECT_SECRET: str({ default: undefined }),
+    }),
+
   // Feature Flags
   ...Object.keys(FeatureFlagsKeysEnum).reduce(
     (acc, key) => {

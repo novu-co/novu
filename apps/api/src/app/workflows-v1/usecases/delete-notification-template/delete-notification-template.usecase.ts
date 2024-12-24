@@ -3,17 +3,16 @@ import { ChangeRepository, DalException, NotificationTemplateEntity, Notificatio
 import { ChangeEntityTypeEnum } from '@novu/shared';
 import {
   AnalyticsService,
-  buildNotificationTemplateIdentifierKey,
-  buildNotificationTemplateKey,
   CreateChange,
   CreateChangeCommand,
-  DeleteMessageTemplate,
-  DeleteMessageTemplateCommand,
-  InvalidateCacheService,
+  DeleteWorkflowUseCase,
+  DeleteWorkflowCommand,
+  GetWorkflowByIdsUseCase,
+  GetWorkflowByIdsCommand,
 } from '@novu/application-generic';
-import { ApiException } from '../../../shared/exceptions/api.exception';
 
 import { DeleteNotificationTemplateCommand } from './delete-notification-template.command';
+import { ApiException } from '../../../shared/exceptions/api.exception';
 
 /**
  * @deprecated
@@ -23,23 +22,23 @@ import { DeleteNotificationTemplateCommand } from './delete-notification-templat
 @Injectable()
 export class DeleteNotificationTemplate {
   constructor(
-    private notificationTemplateRepository: NotificationTemplateRepository,
     private createChange: CreateChange,
     private changeRepository: ChangeRepository,
-    private invalidateCache: InvalidateCacheService,
-    private deleteMessageTemplate: DeleteMessageTemplate,
-    private analyticsService: AnalyticsService
+    private analyticsService: AnalyticsService,
+    private deleteWorkflowUseCase: DeleteWorkflowUseCase,
+    private notificationTemplateRepository: NotificationTemplateRepository
   ) {}
 
   async execute(command: DeleteNotificationTemplateCommand) {
     try {
-      const notificationTemplate = await this.notificationTemplateRepository.findOne({
-        _environmentId: command.environmentId,
-        _id: command.templateId,
-      });
-      if (!notificationTemplate) {
-        throw new DalException(`Could not find workflow with id ${command.templateId}`);
-      }
+      await this.deleteWorkflowUseCase.execute(
+        DeleteWorkflowCommand.create({
+          workflowIdOrInternalId: command.templateId,
+          environmentId: command.environmentId,
+          organizationId: command.organizationId,
+          userId: command.userId,
+        })
+      );
 
       const parentChangeId: string = await this.changeRepository.getChangeId(
         command.environmentId,
@@ -47,44 +46,12 @@ export class DeleteNotificationTemplate {
         command.templateId
       );
 
-      for (const step of notificationTemplate.steps) {
-        await this.deleteMessageTemplate.execute(
-          DeleteMessageTemplateCommand.create({
-            organizationId: command.organizationId,
-            environmentId: command.environmentId,
-            userId: command.userId,
-            messageTemplateId: step._templateId,
-            parentChangeId,
-            workflowType: command.type,
-          })
-        );
-      }
-
-      await this.notificationTemplateRepository.delete({
-        _environmentId: command.environmentId,
-        _id: command.templateId,
-      });
-
       const item: NotificationTemplateEntity = (
         await this.notificationTemplateRepository.findDeleted({
           _environmentId: command.environmentId,
           _id: command.templateId,
         })
       )?.[0];
-
-      await this.invalidateCache.invalidateByKey({
-        key: buildNotificationTemplateKey({
-          _id: item._id,
-          _environmentId: command.environmentId,
-        }),
-      });
-
-      await this.invalidateCache.invalidateByKey({
-        key: buildNotificationTemplateIdentifierKey({
-          templateIdentifier: item.triggers[0].identifier,
-          _environmentId: command.environmentId,
-        }),
-      });
 
       await this.createChange.execute(
         CreateChangeCommand.create({

@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Deploy DEV DASHBOARD
 
 # Controls when the action will run. Triggers the workflow on push or pull request
@@ -13,6 +11,9 @@ on:
     paths:
       - 'apps/web/**'
       - 'apps/dashboard/**'
+
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -43,15 +44,3 @@ jobs:
       clerk_publishable_key: pk_live_Y2xlcmsubm92dS1zdGFnaW5nLmNvJA
       clerk_is_ee_auth_enabled: true
     secrets: inherit
-
-  # publish_docker_image_dashboard:
-  #   needs: test_dashboard
-  #   if: "!contains(github.event.head_commit.message, 'ci skip')"
-  #   uses: ./.github/workflows/reusable-docker.yml
-  #   with:
-  #     environment: Development
-  #     package_name: novu/dashboard
-  #     project_path: apps/dashboard
-  #     local_tag: novu-dashboard
-  #     env_tag: dev
-  #   secrets: inherit

@@ -1,7 +1,7 @@
 /* eslint-disable global-require */
 import { BadRequestException, Inject, Injectable, Logger, Scope } from '@nestjs/common';
 import { OrganizationEntity, OrganizationRepository, UserRepository } from '@novu/dal';
-import { ApiServiceLevelEnum, JobTitleEnum, MemberRoleEnum } from '@novu/shared';
+import { ApiServiceLevelEnum, JobTitleEnum, MemberRoleEnum, EnvironmentEnum } from '@novu/shared';
 import { AnalyticsService } from '@novu/application-generic';
 
 import { ModuleRef } from '@nestjs/core';
@@ -59,7 +59,7 @@ export class CreateOrganization {
     const devEnv = await this.createEnvironmentUsecase.execute(
       CreateEnvironmentCommand.create({
         userId: user._id,
-        name: 'Development',
+        name: EnvironmentEnum.DEVELOPMENT,
         organizationId: createdOrganization._id,
       })
     );
@@ -75,7 +75,7 @@ export class CreateOrganization {
     const prodEnv = await this.createEnvironmentUsecase.execute(
       CreateEnvironmentCommand.create({
         userId: user._id,
-        name: 'Production',
+        name: EnvironmentEnum.PRODUCTION,
         organizationId: createdOrganization._id,
         parentEnvironmentId: devEnv._id,
       })

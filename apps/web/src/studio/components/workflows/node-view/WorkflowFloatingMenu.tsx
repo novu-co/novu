@@ -47,7 +47,7 @@ export const WorkflowFloatingMenu: FC<IWorkflowFloatingMenuProps> = ({ className
           <WorkflowFloatingMenuButton
             Icon={IconOutlineNotifications}
             tooltipLabel="View the In-app step documentation"
-            onClick={handleClick('inbox')}
+            onClick={handleClick('inApp')}
           />
           <WorkflowFloatingMenuButton
             Icon={IconOutlineEmail}

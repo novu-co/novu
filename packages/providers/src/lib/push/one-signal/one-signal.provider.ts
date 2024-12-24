@@ -17,18 +17,26 @@ export class OneSignalPushProvider
   id = PushProviderIdEnum.OneSignal;
   channelType = ChannelTypeEnum.PUSH as ChannelTypeEnum.PUSH;
   private axiosInstance: AxiosInstance;
+  private apiVersion: string | null = null;
   protected casing: CasingEnum = CasingEnum.SNAKE_CASE;
-  public readonly BASE_URL = 'https://onesignal.com/api/v1';
+  public readonly BASE_URL_PLAYER_MODEL = 'https://onesignal.com/api/v1';
+  public readonly BASE_URL_USER_MODEL = 'https://api.onesignal.com';
 
   constructor(
     private config: {
       appId: string;
       apiKey: string;
+      apiVersion?: 'externalId' | 'playerModel' | null;
     },
   ) {
     super();
+    this.apiVersion = config.apiVersion;
+
     this.axiosInstance = axios.create({
-      baseURL: this.BASE_URL,
+      baseURL:
+        config.apiVersion === 'externalId'
+          ? this.BASE_URL_USER_MODEL
+          : this.BASE_URL_PLAYER_MODEL,
     });
   }
 
@@ -38,15 +46,25 @@ export class OneSignalPushProvider
   ): Promise<ISendMessageSuccessResponse> {
     const { sound, badge, ...overrides } = options.overrides ?? {};
 
+    const targetSegment =
+      this.apiVersion === 'externalId'
+        ? {
+            include_aliases: {
+              external_id: options.target,
+            },
+            target_channel: 'push',
+          }
+        : { include_player_ids: options.target };
+
     const notification = this.transform(bridgeProviderData, {
-      include_player_ids: options.target,
+      ...targetSegment,
       app_id: this.config.appId,
       headings: { en: options.title },
       contents: { en: options.content },
       subtitle: { en: overrides.subtitle },
       data: options.payload,
-      ios_badge_type: 'Increase',
-      ios_badge_count: 1,
+      ios_badgeType: 'Increase',
+      ios_badgeCount: 1,
       ios_sound: sound,
       android_sound: sound,
       mutable_content: overrides.mutableContent,

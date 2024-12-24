@@ -1,5 +1,3 @@
 {
-  "main": "../dist/cjs/servers/next.cjs",
-  "module": "../dist/esm/servers/next.js",
-  "types": "../dist/esm/servers/next.d.ts"
+  "main": "../dist/cjs/servers/next.cjs"
 }

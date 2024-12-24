@@ -25,6 +25,8 @@ export class SubscriberEntity {
 
   channels?: IChannelSettings[];
 
+  topics?: string[];
+
   _organizationId: OrganizationId;
 
   _environmentId: EnvironmentId;

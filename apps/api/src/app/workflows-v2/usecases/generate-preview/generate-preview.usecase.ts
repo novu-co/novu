@@ -1,287 +1,311 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import _ from 'lodash';
 import {
   ChannelTypeEnum,
-  ControlPreviewIssue,
-  ControlPreviewIssueTypeEnum,
-  ControlsSchema,
-  GeneratePreviewRequestDto,
+  createMockObjectFromSchema,
   GeneratePreviewResponseDto,
-  JSONSchemaDto,
-  StepTypeEnum,
+  JobStatusEnum,
+  PreviewPayload,
+  StepDataDto,
   WorkflowOriginEnum,
 } from '@novu/shared';
-import { merge } from 'lodash/fp';
-import { difference, isArray, isObject, reduce } from 'lodash';
-import { GeneratePreviewCommand } from './generate-preview-command';
+import {
+  GetWorkflowByIdsCommand,
+  GetWorkflowByIdsUseCase,
+  WorkflowInternalResponseDto,
+  Instrument,
+  InstrumentUsecase,
+  PinoLogger,
+} from '@novu/application-generic';
+import { captureException } from '@sentry/node';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
-import { GetWorkflowUseCase } from '../get-workflow/get-workflow.usecase';
-import { CreateMockPayloadUseCase } from '../placeholder-enrichment/payload-preview-value-generator.usecase';
-import { StepNotFoundException } from '../../exceptions/step-not-found-exception';
-import { ExtractDefaultsUsecase } from '../get-default-values-from-schema/extract-defaults.usecase';
+import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
+import { BuildStepDataUsecase } from '../build-step-data';
+import { GeneratePreviewCommand } from './generate-preview.command';
+import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
+import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
+import { Variable } from '../../util/template-parser/liquid-parser';
+import { keysToObject } from '../../util/utils';
+import { isObjectTipTapNode } from '../../util/tip-tap.util';
+import { buildVariables } from '../../util/build-variables';
+import { sanitizeControlValues } from '../../shared/sanitize-control-values';
+
+const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
 @Injectable()
 export class GeneratePreviewUsecase {
   constructor(
-    private legacyPreviewStepUseCase: PreviewStep,
-    private getWorkflowUseCase: GetWorkflowUseCase,
-    private createMockPayloadUseCase: CreateMockPayloadUseCase,
-    private extractDefaultsUseCase: ExtractDefaultsUsecase
+    private previewStepUsecase: PreviewStep,
+    private buildStepDataUsecase: BuildStepDataUsecase,
+    private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
+    private buildPayloadSchema: BuildPayloadSchema,
+    private readonly logger: PinoLogger
   ) {}
 
+  @InstrumentUsecase()
   async execute(command: GeneratePreviewCommand): Promise<GeneratePreviewResponseDto> {
-    const payloadHydrationInfo = this.payloadHydrationLogic(command);
-    const workflowInfo = await this.getWorkflowUserIdentifierFromWorkflowObject(command);
-    const controlValuesResult = this.addMissingValuesToControlValues(command, workflowInfo.stepControlSchema);
-    const executeOutput = await this.executePreviewUsecase(
-      workflowInfo.workflowId,
-      workflowInfo.stepId,
-      workflowInfo.origin,
-      payloadHydrationInfo.augmentedPayload,
-      controlValuesResult.augmentedControlValues,
-      command
-    );
+    try {
+      const {
+        stepData,
+        controlValues: initialControlValues,
+        variableSchema,
+        workflow,
+      } = await this.initializePreviewContext(command);
+      const commandVariablesExample = command.generatePreviewRequestDto.previewPayload;
 
-    return buildResponse(
-      controlValuesResult.issuesMissingValues,
-      payloadHydrationInfo.issues,
-      executeOutput,
-      workflowInfo.stepType
-    );
-  }
+      /**
+       * We don't want to sanitize control values for code workflows,
+       * as it's the responsibility of the custom code workflow creator
+       */
+      const sanitizedValidatedControls =
+        workflow.origin === WorkflowOriginEnum.NOVU_CLOUD
+          ? sanitizeControlValues(initialControlValues, stepData.type)
+          : initialControlValues;
 
-  private addMissingValuesToControlValues(command: GeneratePreviewCommand, stepControlSchema: ControlsSchema) {
-    const defaultValues = this.extractDefaultsUseCase.execute({
-      jsonSchemaDto: stepControlSchema.schema as JSONSchemaDto,
-    });
+      if (!sanitizedValidatedControls) {
+        throw new Error(
+          // eslint-disable-next-line max-len
+          'Control values normalization failed: The normalizeControlValues function requires maintenance to sanitize the provided type or data structure correctly'
+        );
+      }
 
-    return {
-      augmentedControlValues: merge(defaultValues, command.generatePreviewRequestDto.controlValues),
-      issuesMissingValues: this.buildMissingControlValuesIssuesList(defaultValues, command),
-    };
-  }
+      let previewTemplateData = {
+        variablesExample: {},
+        controlValues: {},
+      };
 
-  private buildMissingControlValuesIssuesList(defaultValues: Record<string, any>, command: GeneratePreviewCommand) {
-    const missingRequiredControlValues = this.findMissingKeys(
-      defaultValues,
-      command.generatePreviewRequestDto.controlValues || {}
-    );
+      for (const [controlKey, controlValue] of Object.entries(sanitizedValidatedControls)) {
+        const variables = buildVariables(variableSchema, controlValue, this.logger);
+        const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalidVariables);
 
-    return this.buildControlPreviewIssues(missingRequiredControlValues);
-  }
+        const validVariableNames = variables.validVariables.map((variable) => variable.name);
+        const variablesExampleResult = keysToObject(validVariableNames, { fn: (key) => `{{${key}}}` });
 
-  private buildControlPreviewIssues(keys: string[]): Record<string, ControlPreviewIssue[]> {
-    const record: Record<string, ControlPreviewIssue[]> = {};
+        previewTemplateData = {
+          variablesExample: _.merge(previewTemplateData.variablesExample, variablesExampleResult),
+          controlValues: {
+            ...previewTemplateData.controlValues,
+            [controlKey]: isObjectTipTapNode(processedControlValues)
+              ? JSON.stringify(processedControlValues)
+              : processedControlValues,
+          },
+        };
+      }
 
-    keys.forEach((key) => {
-      record[key] = [
-        {
-          issueType: ControlPreviewIssueTypeEnum.MISSING_VALUE,
-          message: `Value is missing on a required control`, // Custom message for the issue
+      const mergedVariablesExample = this.mergeVariablesExample(workflow, previewTemplateData, commandVariablesExample);
+      const executeOutput = await this.executePreviewUsecase(
+        command,
+        stepData,
+        mergedVariablesExample,
+        previewTemplateData.controlValues
+      );
+
+      return {
+        result: {
+          preview: executeOutput.outputs as any,
+          type: stepData.type as unknown as ChannelTypeEnum,
         },
-      ];
-    });
+        previewPayloadExample: mergedVariablesExample,
+      };
+    } catch (error) {
+      this.logger.error(
+        {
+          err: error,
+          workflowIdOrInternalId: command.workflowIdOrInternalId,
+          stepIdOrInternalId: command.stepIdOrInternalId,
+        },
+        `Unexpected error while generating preview`,
+        LOG_CONTEXT
+      );
+      if (process.env.SENTRY_DSN) {
+        captureException(error);
+      }
 
-    return record;
+      return {
+        result: {
+          preview: {},
+          type: undefined,
+        },
+        previewPayloadExample: {},
+      } as any;
+    }
   }
-  private findMissingKeys(requiredRecord: Record<string, unknown>, actualRecord: Record<string, unknown>) {
-    const requiredKeys = this.collectKeys(requiredRecord);
-    const actualKeys = this.collectKeys(actualRecord);
 
-    return difference(requiredKeys, actualKeys);
-  }
-  private collectKeys(obj, prefix = '') {
-    return reduce(
-      obj,
-      (result, value, key) => {
-        const newKey = prefix ? `${prefix}.${key}` : key;
-        if (isObject(value) && !isArray(value)) {
-          result.push(...this.collectKeys(value, newKey));
-        } else {
-          // Otherwise, just add the key
-          result.push(newKey);
-        }
-
-        return result;
-      },
-      []
-    );
-  }
-  private async executePreviewUsecase(
-    workflowId: string,
-    stepId: string,
-    origin: WorkflowOriginEnum,
-    hydratedPayload: Record<string, unknown>,
-    updatedControlValues: Record<string, unknown>,
-    command: GeneratePreviewCommand
+  private mergeVariablesExample(
+    workflow: WorkflowInternalResponseDto,
+    previewTemplateData: { variablesExample: {}; controlValues: {} },
+    commandVariablesExample: PreviewPayload | undefined
   ) {
-    return await this.legacyPreviewStepUseCase.execute(
-      PreviewStepCommand.create({
-        payload: hydratedPayload,
-        controls: updatedControlValues || {},
+    let finalVariablesExample = {};
+    if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
+      // if external workflow, we need to override with stored payload schema
+      const tmp = createMockObjectFromSchema({
+        type: 'object',
+        properties: { payload: workflow.payloadSchema },
+      });
+      finalVariablesExample = { ...previewTemplateData.variablesExample, ...tmp };
+    } else {
+      finalVariablesExample = previewTemplateData.variablesExample;
+    }
+
+    finalVariablesExample = _.merge(finalVariablesExample, commandVariablesExample || {});
+
+    return finalVariablesExample;
+  }
+
+  private async initializePreviewContext(command: GeneratePreviewCommand) {
+    const stepData = await this.getStepData(command);
+    const controlValues = command.generatePreviewRequestDto.controlValues || stepData.controls.values || {};
+    const workflow = await this.findWorkflow(command);
+    const variableSchema = await this.buildVariablesSchema(stepData.variables, command, controlValues);
+
+    return { stepData, controlValues, variableSchema, workflow };
+  }
+
+  @Instrument()
+  private async buildVariablesSchema(
+    variables: Record<string, unknown>,
+    command: GeneratePreviewCommand,
+    controlValues: Record<string, unknown>
+  ) {
+    const payloadSchema = await this.buildPayloadSchema.execute(
+      BuildPayloadSchemaCommand.create({
         environmentId: command.user.environmentId,
         organizationId: command.user.organizationId,
-        stepId,
         userId: command.user._id,
-        workflowId,
-        workflowOrigin: origin,
+        workflowId: command.workflowIdOrInternalId,
+        controlValues,
+      })
+    );
+
+    if (Object.keys(payloadSchema).length === 0) {
+      return variables;
+    }
+
+    return _.merge(variables, { properties: { payload: payloadSchema } });
+  }
+
+  @Instrument()
+  private async findWorkflow(command: GeneratePreviewCommand) {
+    return await this.getWorkflowByIdsUseCase.execute(
+      GetWorkflowByIdsCommand.create({
+        workflowIdOrInternalId: command.workflowIdOrInternalId,
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
+        userId: command.user._id,
       })
     );
   }
 
-  private async getWorkflowUserIdentifierFromWorkflowObject(command: GeneratePreviewCommand) {
-    const workflowResponseDto = await this.getWorkflowUseCase.execute({
-      identifierOrInternalId: command.workflowId,
+  @Instrument()
+  private async getStepData(command: GeneratePreviewCommand) {
+    return await this.buildStepDataUsecase.execute({
+      workflowIdOrInternalId: command.workflowIdOrInternalId,
+      stepIdOrInternalId: command.stepIdOrInternalId,
       user: command.user,
     });
-    const { workflowId, steps } = workflowResponseDto;
-    const step = steps.find((stepDto) => stepDto._id === command.stepUuid);
-    if (!step) {
-      throw new StepNotFoundException(command.stepUuid);
-    }
-
-    return {
-      workflowId,
-      stepId: step.stepId,
-      stepType: step.type,
-      stepControlSchema: step.controls,
-      origin: workflowResponseDto.origin,
-    };
   }
 
-  private payloadHydrationLogic(command: GeneratePreviewCommand) {
-    const dto = command.generatePreviewRequestDto;
-
-    let aggregatedDefaultValues = {};
-    const aggregatedDefaultValuesForControl: Record<string, Record<string, unknown>> = {};
-    const flattenedValues = flattenJson(dto.controlValues);
-    for (const controlValueKey in flattenedValues) {
-      if (flattenedValues.hasOwnProperty(controlValueKey)) {
-        const defaultValuesForSingleControlValue = this.createMockPayloadUseCase.execute({
-          controlValues: flattenedValues,
-          controlValueKey,
-        });
-
-        if (defaultValuesForSingleControlValue) {
-          aggregatedDefaultValuesForControl[controlValueKey] = defaultValuesForSingleControlValue;
-        }
-        aggregatedDefaultValues = merge(defaultValuesForSingleControlValue, aggregatedDefaultValues);
-      }
-    }
-
-    return {
-      augmentedPayload: merge(aggregatedDefaultValues, dto.payloadValues),
-      issues: this.buildVariableMissingIssueRecord(aggregatedDefaultValuesForControl, aggregatedDefaultValues, dto),
-    };
+  private isFrameworkError(obj: any): obj is FrameworkError {
+    return typeof obj === 'object' && obj.status === '400' && obj.name === 'BridgeRequestError';
   }
 
-  private buildVariableMissingIssueRecord(
-    valueKeyToDefaultsMap: Record<string, Record<string, unknown>>,
-    aggregatedDefaultValues: Record<string, unknown>,
-    dto: GeneratePreviewRequestDto
+  @Instrument()
+  private async executePreviewUsecase(
+    command: GeneratePreviewCommand,
+    stepData: StepDataDto,
+    hydratedPayload: PreviewPayload,
+    updatedControlValues: Record<string, unknown>
   ) {
-    const defaultVariableToValueKeyMap = flattenJsonWithArrayValues(valueKeyToDefaultsMap);
-    const missingRequiredPayloadIssues = this.findMissingKeys(aggregatedDefaultValues, dto.payloadValues || {});
-
-    return this.buildPayloadIssues(missingRequiredPayloadIssues, defaultVariableToValueKeyMap);
-  }
-  private buildPayloadIssues(
-    missingVariables: string[],
-    variableToControlValueKeys: Record<string, string[]>
-  ): Record<string, ControlPreviewIssue[]> {
-    const record: Record<string, ControlPreviewIssue[]> = {};
-
-    missingVariables.forEach((missingVariable) => {
-      variableToControlValueKeys[missingVariable].forEach((controlValueKey) => {
-        record[controlValueKey] = [
-          {
-            issueType: ControlPreviewIssueTypeEnum.MISSING_VARIABLE_IN_PAYLOAD, // Set issueType to MISSING_VALUE
-            message: `Variable payload.${missingVariable} is missing in payload`, // Custom message for the issue
-            variableName: `payload.${missingVariable}`,
-          },
-        ];
-      });
-    });
-
-    return record;
-  }
-}
-
-function buildResponse(
-  missingValuesIssue: Record<string, ControlPreviewIssue[]>,
-  missingPayloadVariablesIssue: Record<string, ControlPreviewIssue[]>,
-  executionOutput,
-  stepType: StepTypeEnum
-): GeneratePreviewResponseDto {
-  return {
-    issues: merge(missingValuesIssue, missingPayloadVariablesIssue),
-    result: {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      preview: executionOutput.outputs as any,
-      type: stepType as unknown as ChannelTypeEnum,
-    },
-  };
-}
-function flattenJsonWithArrayValues(valueKeyToDefaultsMap: Record<string, Record<string, unknown>>) {
-  const flattened = {};
-  Object.keys(valueKeyToDefaultsMap).forEach((controlValue) => {
-    const defaultPayloads = valueKeyToDefaultsMap[controlValue];
-    const defaultPlaceholders = getDotNotationKeys(defaultPayloads);
-    defaultPlaceholders.forEach((defaultPlaceholder) => {
-      if (!flattened[defaultPlaceholder]) {
-        flattened[defaultPlaceholder] = [];
-      }
-      flattened[defaultPlaceholder].push(controlValue);
-    });
-  });
-
-  return flattened;
-}
-type NestedRecord = Record<string, unknown>;
-
-function getDotNotationKeys(input: NestedRecord, parentKey: string = '', keys: string[] = []): string[] {
-  for (const key in input) {
-    if (input.hasOwnProperty(key)) {
-      const newKey = parentKey ? `${parentKey}.${key}` : key; // Construct dot notation key
-
-      if (typeof input[key] === 'object' && input[key] !== null && !Array.isArray(input[key])) {
-        // Recursively flatten the object and collect keys
-        getDotNotationKeys(input[key] as NestedRecord, newKey, keys);
+    const state = buildState(hydratedPayload.steps);
+    try {
+      return await this.previewStepUsecase.execute(
+        PreviewStepCommand.create({
+          payload: hydratedPayload.payload || {},
+          subscriber: hydratedPayload.subscriber,
+          controls: updatedControlValues || {},
+          environmentId: command.user.environmentId,
+          organizationId: command.user.organizationId,
+          stepId: stepData.stepId,
+          userId: command.user._id,
+          workflowId: stepData.workflowId,
+          workflowOrigin: stepData.origin,
+          state,
+        })
+      );
+    } catch (error) {
+      if (this.isFrameworkError(error)) {
+        throw new GeneratePreviewError(error);
       } else {
-        // Push the dot notation key to the keys array
-        keys.push(newKey);
+        throw error;
       }
     }
   }
 
-  return keys;
-}
-function flattenJson(obj, parentKey = '', result = {}) {
-  // eslint-disable-next-line guard-for-in
-  for (const key in obj) {
-    // Construct the new key using dot notation
-    const newKey = parentKey ? `${parentKey}.${key}` : key;
+  private fixControlValueInvalidVariables(
+    controlValues: unknown,
+    invalidVariables: Variable[]
+  ): Record<string, unknown> {
+    try {
+      let controlValuesString = JSON.stringify(controlValues);
 
-    // Check if the value is an object (and not null or an array)
-    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-      // Recursively flatten the object
-      flattenJson(obj[key], newKey, result);
-    } else if (Array.isArray(obj[key])) {
-      // Handle arrays by flattening each item
-      obj[key].forEach((item, index) => {
-        const arrayKey = `${newKey}[${index}]`;
-        if (typeof item === 'object' && item !== null) {
-          flattenJson(item, arrayKey, result);
-        } else {
-          // eslint-disable-next-line no-param-reassign
-          result[arrayKey] = item;
+      for (const invalidVariable of invalidVariables) {
+        if (!controlValuesString.includes(invalidVariable.output)) {
+          continue;
         }
-      });
-    } else {
-      // Assign the value to the result with the new key
-      // eslint-disable-next-line no-param-reassign
-      result[newKey] = obj[key];
+
+        const EMPTY_STRING = '';
+        controlValuesString = replaceAll(controlValuesString, invalidVariable.output, EMPTY_STRING);
+      }
+
+      return JSON.parse(controlValuesString) as Record<string, unknown>;
+    } catch (error) {
+      return controlValues as Record<string, unknown>;
     }
   }
+}
 
-  return result;
+function buildState(steps: Record<string, unknown> | undefined): FrameworkPreviousStepsOutputState[] {
+  const outputArray: FrameworkPreviousStepsOutputState[] = [];
+  for (const [stepId, value] of Object.entries(steps || {})) {
+    outputArray.push({
+      stepId,
+      outputs: value as Record<string, unknown>,
+      state: {
+        status: JobStatusEnum.COMPLETED,
+      },
+    });
+  }
+
+  return outputArray;
+}
+
+/**
+ * Replaces all occurrences of a search string with a replacement string.
+ */
+export function replaceAll(text: string, searchValue: string, replaceValue: string): string {
+  return _.replace(text, new RegExp(_.escapeRegExp(searchValue), 'g'), replaceValue);
+}
+
+export class GeneratePreviewError extends InternalServerErrorException {
+  constructor(error: FrameworkError) {
+    super({
+      message: `GeneratePreviewError: Original Message:`,
+      frameworkMessage: error.response.message,
+      code: error.response.code,
+      data: error.response.data,
+    });
+  }
+}
+
+class FrameworkError {
+  response: {
+    message: string;
+    code: string;
+    data: unknown;
+  };
+  status: number;
+  options: Record<string, unknown>;
+  message: string;
+  name: string;
 }

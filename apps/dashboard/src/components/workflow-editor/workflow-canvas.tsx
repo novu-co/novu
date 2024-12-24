@@ -10,6 +10,7 @@ import {
   ViewportHelperFunctionOptions,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+
 import {
   AddNode,
   ChatNode,
@@ -27,6 +28,12 @@ import { AddNodeEdge, AddNodeEdgeType } from './edges';
 import { NODE_HEIGHT, NODE_WIDTH } from './base-node';
 import { StepTypeEnum } from '@/utils/enums';
 import { Step } from '@/utils/types';
+import { getFirstControlsErrorMessage, getFirstBodyErrorMessage } from './step-utils';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
+import { useEnvironment } from '@/context/environment/hooks';
+import { buildRoute } from '@/utils/routes';
+import { ROUTES } from '@/utils/routes';
+import { useNavigate } from 'react-router-dom';
 
 const nodeTypes = {
   trigger: TriggerNode,
@@ -50,15 +57,21 @@ const panOnDrag = [1, 2];
 // y distance = node height + space between nodes
 const Y_DISTANCE = NODE_HEIGHT + 50;
 
-const mapStepToNode = (
-  step: Step,
-  previousPosition: { x: number; y: number },
-  addStepIndex: number
-): Node<NodeData, keyof typeof nodeTypes> => {
+const mapStepToNode = ({
+  addStepIndex,
+  previousPosition,
+  step,
+}: {
+  addStepIndex: number;
+  previousPosition: { x: number; y: number };
+  step: Step;
+}): Node<NodeData, keyof typeof nodeTypes> => {
   let content = '';
   if (step.type === StepTypeEnum.DELAY) {
-    content = `Wait to send ~ 30 minutes`;
+    content = `Delay action for a set time`;
   }
+
+  const error = getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues);
 
   return {
     id: crypto.randomUUID(),
@@ -67,6 +80,8 @@ const mapStepToNode = (
       name: step.name,
       content,
       addStepIndex,
+      stepSlug: step.slug,
+      error,
     },
     type: step.type,
   };
@@ -75,53 +90,65 @@ const mapStepToNode = (
 const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useReactFlow();
+  const { currentEnvironment } = useEnvironment();
+  const { workflow: currentWorkflow } = useWorkflow();
+  const navigate = useNavigate();
 
-  const nodes = useMemo(() => {
-    const triggerNode = { id: '0', position: { x: 0, y: 0 }, data: {}, type: 'trigger' };
+  const [nodes, edges] = useMemo(() => {
+    const triggerNode = {
+      id: crypto.randomUUID(),
+      position: { x: 0, y: 0 },
+      data: {
+        workflowSlug: currentWorkflow?.slug ?? '',
+        environment: currentEnvironment?.slug ?? '',
+      },
+      type: 'trigger',
+    };
     let previousPosition = triggerNode.position;
 
-    const createdNodes = steps.map((el, index) => {
-      const node = mapStepToNode(el, previousPosition, index);
+    const createdNodes = steps?.map((step, index) => {
+      const node = mapStepToNode({
+        step,
+        previousPosition,
+        addStepIndex: index,
+      });
       previousPosition = node.position;
       return node;
     });
 
     const addNode: Node<NodeData> = {
-      id: `${Number.MAX_SAFE_INTEGER}`,
+      id: crypto.randomUUID(),
       position: { ...previousPosition, y: previousPosition.y + Y_DISTANCE },
       data: {},
       type: 'add',
     };
 
-    return [triggerNode, ...createdNodes, addNode];
-  }, [steps]);
-
-  const edges = useMemo(
-    () =>
-      nodes.reduce<AddNodeEdgeType[]>((acc, node, index) => {
-        if (index === 0) {
-          return acc;
-        }
-
-        const parent = nodes[index - 1];
-        acc.push({
-          id: `edge-${parent.id}-${node.id}`,
-          source: parent.id,
-          sourceHandle: 'b',
-          targetHandle: 'a',
-          target: node.id,
-          type: 'addNode',
-          style: { stroke: 'hsl(var(--neutral-alpha-200))', strokeWidth: 2, strokeDasharray: 5 },
-          data: {
-            isLast: index === nodes.length - 1,
-            addStepIndex: index - 1,
-          },
-        });
-
+    const nodes = [triggerNode, ...createdNodes, addNode];
+    const edges = nodes.reduce<AddNodeEdgeType[]>((acc, node, index) => {
+      if (index === 0) {
         return acc;
-      }, []),
-    [nodes]
-  );
+      }
+
+      const parent = nodes[index - 1];
+      acc.push({
+        id: `edge-${parent.id}-${node.id}`,
+        source: parent.id,
+        sourceHandle: 'b',
+        targetHandle: 'a',
+        target: node.id,
+        type: 'addNode',
+        style: { stroke: 'hsl(var(--neutral-alpha-200))', strokeWidth: 2, strokeDasharray: 5 },
+        data: {
+          isLast: index === nodes.length - 1,
+          addStepIndex: index - 1,
+        },
+      });
+
+      return acc;
+    }, []);
+
+    return [nodes, edges];
+  }, [steps]);
 
   const positionCanvas = useCallback(
     (options?: ViewportHelperFunctionOptions) => {
@@ -160,8 +187,19 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
         panOnScroll
         selectionOnDrag
         panOnDrag={panOnDrag}
+        onPaneClick={() => {
+          // unselect node if clicked on background
+          if (currentEnvironment?.slug && currentWorkflow?.slug) {
+            navigate(
+              buildRoute(ROUTES.EDIT_WORKFLOW, {
+                environmentSlug: currentEnvironment.slug,
+                workflowSlug: currentWorkflow.slug,
+              })
+            );
+          }
+        }}
       >
-        <Controls showZoom={false} />
+        <Controls showZoom={false} showInteractive={false} />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>
     </div>
@@ -171,7 +209,7 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
 export const WorkflowCanvas = ({ steps }: { steps: Step[] }) => {
   return (
     <ReactFlowProvider>
-      <WorkflowCanvasChild steps={steps} />
+      <WorkflowCanvasChild steps={steps || []} />
     </ReactFlowProvider>
   );
 };

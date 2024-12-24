@@ -15,7 +15,6 @@ import {
   GetNovuLayout,
   GetNovuProviderCredentials,
   GetPreferences,
-  GetSubscriberGlobalPreference,
   GetSubscriberPreference,
   GetSubscriberTemplatePreference,
   GetTopicSubscribersUseCase,
@@ -26,6 +25,7 @@ import {
   TriggerBroadcast,
   TriggerEvent,
   TriggerMulticast,
+  TierRestrictionsValidateUsecase,
   WorkflowInMemoryProviderService,
 } from '@novu/application-generic';
 import { CommunityOrganizationRepository, JobRepository, PreferencesRepository } from '@novu/dal';
@@ -90,6 +90,7 @@ const USE_CASES = [
   AddDelayJob,
   MergeOrCreateDigest,
   AddJob,
+  TierRestrictionsValidateUsecase,
   CalculateLimitNovuIntegration,
   CompileEmailTemplate,
   CompileTemplate,
@@ -107,7 +108,6 @@ const USE_CASES = [
   SelectIntegration,
   SelectVariant,
   GetSubscriberPreference,
-  GetSubscriberGlobalPreference,
   GetSubscriberTemplatePreference,
   HandleLastFailedJob,
   ProcessTenant,

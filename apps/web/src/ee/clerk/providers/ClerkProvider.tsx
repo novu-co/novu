@@ -1,10 +1,9 @@
-import { PropsWithChildren, useEffect, useState } from 'react';
+import { PropsWithChildren } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClerkProp, ClerkProvider as _ClerkProvider } from '@clerk/clerk-react';
+import { ClerkProvider as _ClerkProvider } from '@clerk/clerk-react';
 import { useColorScheme } from '@novu/design-system';
 import { dark } from '@clerk/themes';
 import { Variables } from '@clerk/types';
-import { buildClerk } from './clerk-singleton';
 import { CLERK_PUBLISHABLE_KEY, IS_EE_AUTH_ENABLED } from '../../../config/index';
 
 const CLERK_LOCALIZATION = {
@@ -63,6 +62,13 @@ const CLERK_MODAL_ELEMENT = {
     borderWidth: '0 !important',
   },
   userButtonPopoverActionButton: {
+    fontWeight: 'var(--nv-font-weights-strong)',
+    lineHeight: 'var(--nv-line-heights-125)',
+    color: 'var(--nv-colors-typography-text-main)',
+    borderStyle: 'none',
+    borderWidth: '0 !important',
+  },
+  userButtonPopoverCustomItemButton: {
     fontWeight: 'var(--nv-font-weights-strong)',
     lineHeight: 'var(--nv-line-heights-125)',
     color: 'var(--nv-colors-typography-text-main)',
@@ -197,9 +203,6 @@ const CLERK_MODAL_ELEMENT = {
   pageScrollBox: {
     padding: '0',
   },
-  profileSectionItemList__organizationDomains: {
-    display: 'none',
-  },
   userButtonPopoverMain: {
     backgroundColor: 'var(--nv-colors-surface-panel-subsection)',
     boxShadow: 'unset !important',
@@ -274,29 +277,14 @@ const ALLOWED_REDIRECT_ORIGINS = ['http://localhost:*', window.location.origin];
 export const ClerkProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const { colorScheme } = useColorScheme();
 
-  const [clerkInstance, setClerkInstance] = useState<ClerkProp>();
-
   const navigate = useNavigate();
-
-  useEffect(() => {
-    (async () => {
-      if (IS_EE_AUTH_ENABLED) {
-        setClerkInstance(await buildClerk({ publishableKey: CLERK_PUBLISHABLE_KEY }));
-      }
-    })();
-  }, []);
 
   if (!IS_EE_AUTH_ENABLED) {
     return <>{children}</>;
   }
 
-  if (IS_EE_AUTH_ENABLED && !clerkInstance) {
-    return null;
-  }
-
   return (
     <_ClerkProvider
-      Clerk={clerkInstance}
       routerPush={(to) => navigate(to)}
       routerReplace={(to) => navigate(to, { replace: true })}
       publishableKey={CLERK_PUBLISHABLE_KEY}

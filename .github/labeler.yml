@@ -1,9 +1,11 @@
-'@novu/api':
+'@novu/api-service':
   - apps/api/**/*
 '@novu/worker':
   - apps/worker/**/*
 '@novu/web':
   - apps/web/**/*
+'@novu/dashboard':
+  - apps/dashboard/**/*
 '@novu/ws':
   - apps/ws/**/*
 '@novu/inbound-mail':
