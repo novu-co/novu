@@ -1,12 +1,32 @@
 import { JSONContent } from '@maily-to/render';
 import _ from 'lodash';
 
-const MailyContentTypeEnum = {
-  VARIABLE: 'variable',
-  FOR: 'for',
-  BUTTON: 'button',
-  IMAGE: 'image',
-} as const;
+enum MailyContentTypeEnum {
+  VARIABLE = 'variable',
+  FOR = 'for',
+  BUTTON = 'button',
+  IMAGE = 'image',
+}
+
+const variableAttributeConfig = (type: MailyContentTypeEnum) => {
+  if (type === MailyContentTypeEnum.BUTTON) {
+    return [
+      { attr: 'text', flag: 'isTextVariable' },
+      { attr: 'url', flag: 'isUrlVariable' },
+      { attr: 'showIfKey', flag: 'showIfKey' },
+    ];
+  }
+
+  if (type === MailyContentTypeEnum.IMAGE) {
+    return [
+      { attr: 'src', flag: 'isSrcVariable' },
+      { attr: 'externalLink', flag: 'isExternalLinkVariable' },
+      { attr: 'showIfKey', flag: 'showIfKey' },
+    ];
+  }
+
+  return [{ attr: 'showIfKey', flag: 'showIfKey' }];
+};
 
 /**
  * Processes raw Maily JSON editor state by converting variables to Liquid.js output syntax
@@ -104,33 +124,16 @@ function processForLoopNode(node: JSONContent): JSONContent {
   return { ...node, content };
 }
 
-function processButtonNode(node: JSONContent): JSONContent {
+function processNodeWithVariableAttrs(node: JSONContent): JSONContent {
   if (!node.attrs) return node;
 
   const attrs = { ...node.attrs };
+  const typeConfig = variableAttributeConfig(node.type as MailyContentTypeEnum);
 
-  if (attrs.isTextVariable && attrs.text) {
-    attrs.text = wrapInLiquidOutput(attrs.text);
-  }
-
-  if (attrs.isUrlVariable && attrs.url) {
-    attrs.url = wrapInLiquidOutput(attrs.url);
-  }
-
-  return { ...node, attrs };
-}
-
-function processImageNode(node: JSONContent): JSONContent {
-  if (!node.attrs) return node;
-
-  const attrs = { ...node.attrs };
-
-  if (attrs.isSrcVariable && attrs.src) {
-    attrs.src = wrapInLiquidOutput(attrs.src);
-  }
-
-  if (attrs.isExternalLinkVariable && attrs.externalLink) {
-    attrs.externalLink = wrapInLiquidOutput(attrs.externalLink);
+  for (const { attr, flag } of typeConfig) {
+    if (attrs[flag] && attrs[attr]) {
+      attrs[attr] = wrapInLiquidOutput(attrs[attr] as string);
+    }
   }
 
   return { ...node, attrs };
@@ -139,21 +142,13 @@ function processImageNode(node: JSONContent): JSONContent {
 function processNode(node: JSONContent): JSONContent {
   if (!node) return node;
 
-  const processedNode: JSONContent = { ...node };
-
-  if (processedNode.attrs) {
-    processedNode.attrs = processAttributes(processedNode.attrs);
-  }
+  const processedNode = processNodeWithVariableAttrs(node);
 
   switch (processedNode.type) {
     case MailyContentTypeEnum.VARIABLE:
       return processVariableNode(processedNode);
     case MailyContentTypeEnum.FOR:
       return processForLoopNode(processedNode);
-    case MailyContentTypeEnum.BUTTON:
-      return processButtonNode(processedNode);
-    case MailyContentTypeEnum.IMAGE:
-      return processImageNode(processedNode);
     default:
       if (Array.isArray(processedNode.content)) {
         processedNode.content = processedNode.content.map(processNode);
@@ -161,48 +156,6 @@ function processNode(node: JSONContent): JSONContent {
 
       return processedNode;
   }
-}
-
-const LIQUID_WRAPPED_KEYS = ['showIfKey'] as const;
-type LiquidWrappedKey = (typeof LIQUID_WRAPPED_KEYS)[number];
-
-/**
- * Processes node attributes by converting specific keys to Liquid.js syntax
- * * Please update LIQUID_WRAPPED_KEYS if you want to wrap more attributes
- * @example
- * // Input
- * {
- *   showIfKey: "user.isActive",
- *   title: "Hello",
- *   color: "blue"
- * }
- * // Output
- * {
- *   showIfKey: "{{user.isActive}}",
- *   title: "Hello",
- *   color: "blue"
- * }
- */
-export function processAttributes(content: JSONContent): Record<string, unknown> {
-  if (!content.attrs) {
-    return {};
-  }
-
-  return Object.entries(content.attrs).reduce(
-    (acc, [key, value]) => ({
-      ...acc,
-      [key]: shouldWrapInLiquid(key) && isString(value) ? wrapInLiquidOutput(value) : value,
-    }),
-    {} as Record<string, unknown>
-  );
-}
-
-function shouldWrapInLiquid(key: string): key is LiquidWrappedKey {
-  return LIQUID_WRAPPED_KEYS.includes(key as LiquidWrappedKey);
-}
-
-function isString(value: unknown): value is string {
-  return typeof value === 'string';
 }
 
 function wrapInLiquidOutput(value: string): string {
