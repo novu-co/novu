@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ComponentProps, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { RiExternalLinkLine } from 'react-icons/ri';
+import { RiExternalLinkLine, RiArrowRightSLine } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify } from '@novu/shared';
@@ -195,6 +195,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
         <SheetFooter>
           <Button isLoading={isPending} variant="default" type="submit" form="create-workflow">
             Create workflow
+            <RiArrowRightSLine className="size-4" />
           </Button>
         </SheetFooter>
       </SheetContent>
