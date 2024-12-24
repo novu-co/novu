@@ -36,6 +36,16 @@ export const ClerkProvider = (props: ClerkProviderProps) => {
             },
           },
         },
+        organizationList: {
+          elements: {
+            cardBox: {
+              borderRadius: '0',
+            },
+            card: {
+              borderRadius: '0',
+            },
+          },
+        },
         elements: {
           formButtonPrimary: cn(buttonVariants({ variant: 'primary' })),
         },
