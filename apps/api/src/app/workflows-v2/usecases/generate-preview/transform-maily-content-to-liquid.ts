@@ -1,32 +1,6 @@
 import { JSONContent } from '@maily-to/render';
 import _ from 'lodash';
-
-enum MailyContentTypeEnum {
-  VARIABLE = 'variable',
-  FOR = 'for',
-  BUTTON = 'button',
-  IMAGE = 'image',
-}
-
-const variableAttributeConfig = (type: MailyContentTypeEnum) => {
-  if (type === MailyContentTypeEnum.BUTTON) {
-    return [
-      { attr: 'text', flag: 'isTextVariable' },
-      { attr: 'url', flag: 'isUrlVariable' },
-      { attr: 'showIfKey', flag: 'showIfKey' },
-    ];
-  }
-
-  if (type === MailyContentTypeEnum.IMAGE) {
-    return [
-      { attr: 'src', flag: 'isSrcVariable' },
-      { attr: 'externalLink', flag: 'isExternalLinkVariable' },
-      { attr: 'showIfKey', flag: 'showIfKey' },
-    ];
-  }
-
-  return [{ attr: 'showIfKey', flag: 'showIfKey' }];
-};
+import { processNodeAttrs, MailyContentTypeEnum } from '@novu/application-generic';
 
 /**
  * Processes raw Maily JSON editor state by converting variables to Liquid.js output syntax
@@ -124,25 +98,10 @@ function processForLoopNode(node: JSONContent): JSONContent {
   return { ...node, content };
 }
 
-function processNodeWithVariableAttrs(node: JSONContent): JSONContent {
-  if (!node.attrs) return node;
-
-  const attrs = { ...node.attrs };
-  const typeConfig = variableAttributeConfig(node.type as MailyContentTypeEnum);
-
-  for (const { attr, flag } of typeConfig) {
-    if (attrs[flag] && attrs[attr]) {
-      attrs[attr] = wrapInLiquidOutput(attrs[attr] as string);
-    }
-  }
-
-  return { ...node, attrs };
-}
-
 function processNode(node: JSONContent): JSONContent {
   if (!node) return node;
 
-  const processedNode = processNodeWithVariableAttrs(node);
+  const processedNode = processNodeAttrs(node);
 
   switch (processedNode.type) {
     case MailyContentTypeEnum.VARIABLE:

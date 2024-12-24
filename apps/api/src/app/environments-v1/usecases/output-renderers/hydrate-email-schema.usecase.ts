@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { PreviewPayload, TipTapNode } from '@novu/shared';
 import { z } from 'zod';
-import { JSONContent } from '@maily-to/render';
+import { processNodeAttrs } from '@novu/application-generic';
 import { HydrateEmailSchemaCommand } from './hydrate-email-schema.command';
 import { PlaceholderAggregation } from '../../../workflows-v2/usecases';
 
@@ -88,7 +88,7 @@ export class HydrateEmailSchemaUseCase {
     placeholderAggregation: PlaceholderAggregation
   ) {
     content.forEach((node, index) => {
-      processNodeWithAttrs(node);
+      processNodeAttrs(node);
 
       if (this.isVariableNode(node)) {
         this.variableLogic(masterPayload, node, content, index, placeholderAggregation);
@@ -252,48 +252,3 @@ export const TipTapSchema = z
 
 const buildLiquidJSDefault = (variableName: string, fallback?: string) =>
   `{{ ${variableName}${fallback ? ` | default: '${fallback}'` : ''} }}`;
-
-enum MailyContentTypeEnum {
-  VARIABLE = 'variable',
-  FOR = 'for',
-  BUTTON = 'button',
-  IMAGE = 'image',
-}
-
-const variableAttributeConfig = (type: MailyContentTypeEnum) => {
-  if (type === MailyContentTypeEnum.BUTTON) {
-    return [
-      { attr: 'text', flag: 'isTextVariable' },
-      { attr: 'url', flag: 'isUrlVariable' },
-      { attr: 'showIfKey', flag: 'showIfKey' },
-    ];
-  }
-
-  if (type === MailyContentTypeEnum.IMAGE) {
-    return [
-      { attr: 'src', flag: 'isSrcVariable' },
-      { attr: 'externalLink', flag: 'isExternalLinkVariable' },
-      { attr: 'showIfKey', flag: 'showIfKey' },
-    ];
-  }
-
-  return [{ attr: 'showIfKey', flag: 'showIfKey' }];
-};
-
-function processNodeWithAttrs(node: JSONContent): JSONContent {
-  if (!node.attrs) return node;
-
-  const typeConfig = variableAttributeConfig(node.type as MailyContentTypeEnum);
-
-  for (const { attr, flag } of typeConfig) {
-    if (node.attrs[flag] && node.attrs[attr]) {
-      node.attrs[attr] = wrapInLiquidOutput(node.attrs[attr] as string);
-    }
-  }
-
-  return node;
-}
-
-function wrapInLiquidOutput(value: string): string {
-  return `{{${value}}}`;
-}
