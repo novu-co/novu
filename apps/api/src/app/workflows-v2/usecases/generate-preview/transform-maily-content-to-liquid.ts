@@ -1,6 +1,13 @@
 import { JSONContent } from '@maily-to/render';
 import _ from 'lodash';
 
+const MailyContentTypeEnum = {
+  VARIABLE: 'variable',
+  FOR: 'for',
+  BUTTON: 'button',
+  IMAGE: 'image',
+} as const;
+
 /**
  * Processes raw Maily JSON editor state by converting variables to Liquid.js output syntax
  *
@@ -97,6 +104,38 @@ function processForLoopNode(node: JSONContent): JSONContent {
   return { ...node, content };
 }
 
+function processButtonNode(node: JSONContent): JSONContent {
+  if (!node.attrs) return node;
+
+  const attrs = { ...node.attrs };
+
+  if (attrs.isTextVariable && attrs.text) {
+    attrs.text = wrapInLiquidOutput(attrs.text);
+  }
+
+  if (attrs.isUrlVariable && attrs.url) {
+    attrs.url = wrapInLiquidOutput(attrs.url);
+  }
+
+  return { ...node, attrs };
+}
+
+function processImageNode(node: JSONContent): JSONContent {
+  if (!node.attrs) return node;
+
+  const attrs = { ...node.attrs };
+
+  if (attrs.isSrcVariable && attrs.src) {
+    attrs.src = wrapInLiquidOutput(attrs.src);
+  }
+
+  if (attrs.isExternalLinkVariable && attrs.externalLink) {
+    attrs.externalLink = wrapInLiquidOutput(attrs.externalLink);
+  }
+
+  return { ...node, attrs };
+}
+
 function processNode(node: JSONContent): JSONContent {
   if (!node) return node;
 
@@ -107,10 +146,14 @@ function processNode(node: JSONContent): JSONContent {
   }
 
   switch (processedNode.type) {
-    case 'variable':
+    case MailyContentTypeEnum.VARIABLE:
       return processVariableNode(processedNode);
-    case 'for':
+    case MailyContentTypeEnum.FOR:
       return processForLoopNode(processedNode);
+    case MailyContentTypeEnum.BUTTON:
+      return processButtonNode(processedNode);
+    case MailyContentTypeEnum.IMAGE:
+      return processImageNode(processedNode);
     default:
       if (Array.isArray(processedNode.content)) {
         processedNode.content = processedNode.content.map(processNode);
@@ -140,8 +183,12 @@ type LiquidWrappedKey = (typeof LIQUID_WRAPPED_KEYS)[number];
  *   color: "blue"
  * }
  */
-export function processAttributes(attrs: Record<string, unknown>): Record<string, unknown> {
-  return Object.entries(attrs).reduce(
+export function processAttributes(content: JSONContent): Record<string, unknown> {
+  if (!content.attrs) {
+    return {};
+  }
+
+  return Object.entries(content.attrs).reduce(
     (acc, [key, value]) => ({
       ...acc,
       [key]: shouldWrapInLiquid(key) && isString(value) ? wrapInLiquidOutput(value) : value,
