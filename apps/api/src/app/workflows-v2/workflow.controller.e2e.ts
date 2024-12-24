@@ -276,7 +276,7 @@ describe('Workflow Controller E2E API Testing', () => {
       }
     });
 
-    it('should generate a payload schema if only control values are provided with a payload variable used', async () => {
+    it('should generate a payload schema if only control values are provided during workflow creation', async () => {
       const steps = [
         {
           ...buildEmailStep(),
