@@ -18,6 +18,9 @@ export const variablePillTheme = EditorView.baseTheme({
     position: 'relative',
     marginRight: '0px',
   },
+  '.cm-variable-pill.has-modifiers': {
+    paddingRight: '16px',
+  },
   '.cm-variable-pill::before': {
     content: '""',
     position: 'absolute',
@@ -36,10 +39,24 @@ export const variablePillTheme = EditorView.baseTheme({
     WebkitMaskPosition: 'center',
     WebkitMaskSize: 'contain',
   },
+  '.cm-variable-pill.has-modifiers::after': {
+    content: '""',
+    position: 'absolute',
+    right: '6px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: '4px',
+    height: '4px',
+    backgroundColor: '#E11D48',
+    borderRadius: '50%',
+  },
   '.cm-variable-pill.cm-dark': {
     backgroundColor: '#FFD6EE',
     color: '#AD74FF',
     border: '1px solid #3D3D4D',
+  },
+  '.cm-variable-pill.cm-dark.has-modifiers::after': {
+    backgroundColor: '#AD74FF',
   },
   '.cm-variable-pill .cm-bracket': {
     display: 'none',

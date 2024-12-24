@@ -37,26 +37,11 @@ export const FieldEditor = ({
   const isUpdatingRef = useRef(false);
   const lastCompletionRef = useRef<{ from: number; to: number } | null>(null);
 
-  const handleVariableClick = useCallback((e: MouseEvent) => {
+  const handleVariableSelect = useCallback((value: string, from: number, to: number) => {
     if (isUpdatingRef.current) return;
-
-    const target = e.target as HTMLElement;
-    const pill = target.closest('.cm-variable-pill');
-
-    if (pill instanceof HTMLElement) {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const variable = pill.getAttribute('data-variable');
-      const start = parseInt(pill.getAttribute('data-start') || '0');
-      const end = parseInt(pill.getAttribute('data-end') || '0');
-
-      if (variable && end) {
-        requestAnimationFrame(() => {
-          setSelectedVariable({ value: variable, from: start, to: end });
-        });
-      }
-    }
+    requestAnimationFrame(() => {
+      setSelectedVariable({ value, from, to });
+    });
   }, []);
 
   const handleVariableUpdate = useCallback(
@@ -137,12 +122,9 @@ export const FieldEditor = ({
       }),
       EditorView.lineWrapping,
       variablePillTheme,
-      createVariablePlugin({ viewRef, lastCompletionRef }),
-      EditorView.domEventHandlers({
-        mousedown: handleVariableClick,
-      }),
+      createVariablePlugin({ viewRef, lastCompletionRef, onSelect: handleVariableSelect }),
     ],
-    [variables, handleVariableClick, completionSource]
+    [variables, completionSource, handleVariableSelect]
   );
 
   return (
