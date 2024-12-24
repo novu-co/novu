@@ -133,8 +133,8 @@ describe('Generate Preview', () => {
           throw new Error('should be in app preview type');
         }
         const inApp = getTestControlValues().in_app;
-        const { primaryAction, ...previewRequestWithoutPrimaryAction } = inApp;
-        expect(previewResponseDto.result!.preview).to.deep.equal(previewRequestWithoutPrimaryAction);
+        const previewRequestWithoutTheRedirect = { ...inApp, primaryAction: { label: inApp.primaryAction.label } };
+        expect(previewResponseDto.result!.preview).to.deep.equal(previewRequestWithoutTheRedirect);
       });
 
       it('sms: should match the body in the preview response', async () => {
