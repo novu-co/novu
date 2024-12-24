@@ -9,6 +9,7 @@ import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.use
 export class RenderEmailOutputCommand extends RenderCommand {}
 
 @Injectable()
+// todo rename to EmailOutputRenderer
 export class RenderEmailOutputUsecase {
   constructor(private expandEmailEditorSchemaUseCase: ExpandEmailEditorSchemaUsecase) {}
 

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-
+import { RiRouteFill } from 'react-icons/ri';
 import { WorkflowList } from '@/components/workflow-list';
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { Button } from '@/components/primitives/button';
@@ -36,6 +36,7 @@ export const WorkflowsPage = () => {
 
           <CreateWorkflowButton asChild>
             <Button variant="primary" size="sm">
+              <RiRouteFill className="size-4" />
               Create workflow
             </Button>
           </CreateWorkflowButton>

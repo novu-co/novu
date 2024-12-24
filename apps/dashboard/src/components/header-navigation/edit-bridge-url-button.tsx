@@ -63,7 +63,7 @@ export const EditBridgeUrlButton = () => {
               className={cn(
                 'relative size-1.5 animate-[pulse-shadow_1s_ease-in-out_infinite] rounded-full',
                 status === ConnectionStatus.DISCONNECTED || status === ConnectionStatus.LOADING
-                  ? 'bg-destructive [--pulse-color:var(--destructive)]'
+                  ? 'bg-destructive'
                   : 'bg-success [--pulse-color:var(--success)]'
               )}
             />

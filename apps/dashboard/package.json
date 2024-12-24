@@ -25,7 +25,7 @@
     "@codemirror/autocomplete": "^6.18.3",
     "@hookform/resolvers": "^3.9.0",
     "@lezer/highlight": "^1.2.1",
-    "@maily-to/core": "^0.0.19",
+    "@maily-to/core": "^0.0.21",
     "@novu/framework": "workspace:*",
     "@novu/js": "workspace:*",
     "@novu/react": "workspace:*",

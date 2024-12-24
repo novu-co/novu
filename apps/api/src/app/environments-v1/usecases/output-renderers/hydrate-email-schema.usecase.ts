@@ -2,6 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { PreviewPayload, TipTapNode } from '@novu/shared';
 import { z } from 'zod';
+import { processNodeAttrs } from '@novu/application-generic';
 import { HydrateEmailSchemaCommand } from './hydrate-email-schema.command';
 import { PlaceholderAggregation } from '../../../workflows-v2/usecases';
 
@@ -87,6 +88,8 @@ export class HydrateEmailSchemaUseCase {
     placeholderAggregation: PlaceholderAggregation
   ) {
     content.forEach((node, index) => {
+      processNodeAttrs(node);
+
       if (this.isVariableNode(node)) {
         this.variableLogic(masterPayload, node, content, index, placeholderAggregation);
       }
