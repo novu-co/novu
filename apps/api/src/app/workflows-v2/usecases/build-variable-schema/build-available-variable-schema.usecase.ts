@@ -62,7 +62,7 @@ export class BuildAvailableVariableSchemaUsecase {
     workflow: NotificationTemplateEntity | undefined,
     command: BuildAvailableVariableSchemaCommand
   ): Promise<JSONSchemaDto> {
-    if (!workflow) {
+    if (workflow && workflow.steps.length === 0) {
       return {
         type: 'object',
         properties: {},
@@ -70,7 +70,7 @@ export class BuildAvailableVariableSchemaUsecase {
       };
     }
 
-    if (workflow.payloadSchema) {
+    if (workflow?.payloadSchema) {
       return parsePayloadSchema(workflow.payloadSchema, { safe: true }) || emptyJsonSchema();
     }
 
@@ -79,7 +79,7 @@ export class BuildAvailableVariableSchemaUsecase {
         environmentId: command.environmentId,
         organizationId: command.organizationId,
         userId: command.userId,
-        workflowId: workflow._id,
+        workflowId: workflow?._id,
         ...(command.optimisticControlValues ? { controlValues: command.optimisticControlValues } : {}),
       })
     );

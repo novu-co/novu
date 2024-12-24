@@ -1,3 +1,24 @@
+## 2.0.6 (2024-12-24)
+
+### 🩹 Fixes
+
+- **node:** Allow setting includeInactiveChannels to false ([129355e26](https://github.com/novuhq/novu/commit/129355e26))
+- **node:** add includeInactiveChannels option in sdk method" ([#7171](https://github.com/novuhq/novu/pull/7171))
+- **node:** add includeInactiveChannels option in sdk method ([#7115](https://github.com/novuhq/novu/pull/7115))
+
+### 🧱 Updated Dependencies
+
+- Updated @novu/shared to 2.1.5
+
+### ❤️ Thank You
+
+- GalTidhar @tatarco
+- George Desipris @desiprisg
+- George Djabarov @djabarovgeorge
+- Pawan Jain
+- Sokratis Vidros @SokratisVidros
+
+
 ## 2.0.5 (2024-12-02)
 
 ### 🩹 Fixes

@@ -23,7 +23,7 @@ export class BuildPayloadSchema {
   private async getControlValues(command: BuildPayloadSchemaCommand) {
     let controlValues = command.controlValues ? [command.controlValues] : [];
 
-    if (!controlValues.length) {
+    if (!controlValues.length && command.workflowId) {
       controlValues = (
         await this.controlValuesRepository.find(
           {

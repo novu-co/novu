@@ -2628,6 +2628,9 @@ importers:
       '@hokify/agenda':
         specifier: ^6.3.0
         version: 6.3.0
+      '@maily-to/render':
+        specifier: ^0.0.17
+        version: 0.0.17(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@nestjs/common':
         specifier: 10.4.1
         version: 10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)

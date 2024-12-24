@@ -1,5 +1,6 @@
 import { JSONContent } from '@maily-to/render';
 import _ from 'lodash';
+import { processNodeAttrs, MailyContentTypeEnum } from '@novu/application-generic';
 
 /**
  * Processes raw Maily JSON editor state by converting variables to Liquid.js output syntax
@@ -100,16 +101,12 @@ function processForLoopNode(node: JSONContent): JSONContent {
 function processNode(node: JSONContent): JSONContent {
   if (!node) return node;
 
-  const processedNode: JSONContent = { ...node };
-
-  if (processedNode.attrs) {
-    processedNode.attrs = processAttributes(processedNode.attrs);
-  }
+  const processedNode = processNodeAttrs(node);
 
   switch (processedNode.type) {
-    case 'variable':
+    case MailyContentTypeEnum.VARIABLE:
       return processVariableNode(processedNode);
-    case 'for':
+    case MailyContentTypeEnum.FOR:
       return processForLoopNode(processedNode);
     default:
       if (Array.isArray(processedNode.content)) {
@@ -118,44 +115,6 @@ function processNode(node: JSONContent): JSONContent {
 
       return processedNode;
   }
-}
-
-const LIQUID_WRAPPED_KEYS = ['showIfKey'] as const;
-type LiquidWrappedKey = (typeof LIQUID_WRAPPED_KEYS)[number];
-
-/**
- * Processes node attributes by converting specific keys to Liquid.js syntax
- * * Please update LIQUID_WRAPPED_KEYS if you want to wrap more attributes
- * @example
- * // Input
- * {
- *   showIfKey: "user.isActive",
- *   title: "Hello",
- *   color: "blue"
- * }
- * // Output
- * {
- *   showIfKey: "{{user.isActive}}",
- *   title: "Hello",
- *   color: "blue"
- * }
- */
-export function processAttributes(attrs: Record<string, unknown>): Record<string, unknown> {
-  return Object.entries(attrs).reduce(
-    (acc, [key, value]) => ({
-      ...acc,
-      [key]: shouldWrapInLiquid(key) && isString(value) ? wrapInLiquidOutput(value) : value,
-    }),
-    {} as Record<string, unknown>
-  );
-}
-
-function shouldWrapInLiquid(key: string): key is LiquidWrappedKey {
-  return LIQUID_WRAPPED_KEYS.includes(key as LiquidWrappedKey);
-}
-
-function isString(value: unknown): value is string {
-  return typeof value === 'string';
 }
 
 function wrapInLiquidOutput(value: string): string {

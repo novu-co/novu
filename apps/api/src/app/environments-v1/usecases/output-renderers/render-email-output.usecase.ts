@@ -13,6 +13,7 @@ import { emailControlZodSchema } from '../../../workflows-v2/shared/schemas/emai
 export class RenderEmailOutputCommand extends RenderCommand {}
 
 @Injectable()
+// todo rename to EmailOutputRenderer
 export class RenderEmailOutputUsecase {
   constructor(private expandEmailEditorSchemaUseCase: ExpandEmailEditorSchemaUsecase) {}
 
