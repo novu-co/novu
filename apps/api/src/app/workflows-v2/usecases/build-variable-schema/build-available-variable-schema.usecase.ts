@@ -62,7 +62,7 @@ export class BuildAvailableVariableSchemaUsecase {
     workflow: NotificationTemplateEntity | undefined,
     command: BuildAvailableVariableSchemaCommand
   ): Promise<JSONSchemaDto> {
-    if (workflow && !workflow?.steps.length) {
+    if (workflow && workflow.steps.length === 0) {
       return {
         type: 'object',
         properties: {},
