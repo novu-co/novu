@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ControlValuesRepository } from '@novu/dal';
 import { ControlValuesLevelEnum, JSONSchemaDto } from '@novu/shared';
 import { Instrument, InstrumentUsecase } from '@novu/application-generic';
-import { flattenObjectValues } from '../../util/utils';
-import { pathsToObject } from '../../util/path-to-object';
+import { flattenObjectValues, keysToObject } from '../../util/utils';
 import { extractLiquidTemplateVariables } from '../../util/template-parser/liquid-parser';
 import { BuildPayloadSchemaCommand } from './build-payload-schema.command';
 import { transformMailyContentToLiquid } from '../generate-preview/transform-maily-content-to-liquid';
@@ -75,11 +74,7 @@ export class BuildPayloadSchema {
   }
 
   private async buildVariablesSchema(variables: string[]) {
-    // TODO: Update typings in this as .payload can be null or undefined
-    const variablesObject = pathsToObject(variables, {
-      valuePrefix: '{{',
-      valueSuffix: '}}',
-    }).payload;
+    const { payload } = keysToObject(variables, { fn: (val) => `{{${val}}}` });
 
     const schema: JSONSchemaDto = {
       type: 'object',
@@ -88,8 +83,8 @@ export class BuildPayloadSchema {
       additionalProperties: true,
     };
 
-    if (variablesObject) {
-      for (const [key, value] of Object.entries(variablesObject)) {
+    if (payload) {
+      for (const [key, value] of Object.entries(payload)) {
         if (schema.properties && schema.required) {
           schema.properties[key] = determineSchemaType(value);
           schema.required.push(key);
