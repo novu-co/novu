@@ -40,9 +40,9 @@ function sanitizeRedirect(
 
 function sanitizeAction(action: InAppActionType) {
   if (
-    !action?.label &&
-    !action?.redirect?.url &&
-    !action?.redirect?.target &&
+    !action?.label ||
+    !action?.redirect?.url ||
+    !action?.redirect?.target ||
     !action?.redirect
   ) {
     return undefined;

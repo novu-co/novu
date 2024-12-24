@@ -115,7 +115,7 @@ describe('Generate Preview', () => {
         PLACEHOLDER_SUBJECT_INAPP_PAYLOAD_VALUE
       );
       if (previewResponseDto.result?.type !== 'in_app') {
-        throw new Error('should have a inapp redview ');
+        throw new Error('should have a in-app preview ');
       }
       expect(previewResponseDto.result.preview.subject).to.deep.equal(controlValues.subject);
     });
@@ -133,8 +133,8 @@ describe('Generate Preview', () => {
           throw new Error('should be in app preview type');
         }
         const inApp = getTestControlValues().in_app;
-        const previewRequestWithoutTheRedirect = { ...inApp, primaryAction: { label: inApp.primaryAction.label } };
-        expect(previewResponseDto.result!.preview).to.deep.equal(previewRequestWithoutTheRedirect);
+        const { primaryAction, ...previewRequestWithoutPrimaryAction } = inApp;
+        expect(previewResponseDto.result!.preview).to.deep.equal(previewRequestWithoutPrimaryAction);
       });
 
       it('sms: should match the body in the preview response', async () => {
