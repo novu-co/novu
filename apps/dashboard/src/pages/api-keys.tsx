@@ -119,6 +119,15 @@ export function ApiKeysPage() {
   );
 }
 
+interface SettingFieldProps {
+  label: string;
+  tooltip?: string;
+  value?: string;
+  secret?: boolean;
+  isLoading?: boolean;
+  readOnly?: boolean;
+}
+
 function SettingField({
   label,
   tooltip,
