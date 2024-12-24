@@ -55,7 +55,6 @@ const clerkComponentAppearance: Appearance = {
 export function SettingsPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const isV2BillingEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_DASHBOARD_BILLING_ENABLED);
 
   const currentTab =
     location.pathname === ROUTES.SETTINGS ? 'account' : location.pathname.split('/settings/')[1] || 'account';
@@ -72,11 +71,7 @@ export function SettingsPage() {
         navigate(ROUTES.SETTINGS_TEAM);
         break;
       case 'billing':
-        if (isV2BillingEnabled) {
-          navigate(ROUTES.SETTINGS_BILLING);
-        } else {
-          window.location.href = LEGACY_ROUTES.BILLING;
-        }
+        navigate(ROUTES.SETTINGS_BILLING);
         break;
     }
   };
