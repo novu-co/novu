@@ -1,7 +1,12 @@
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 
-import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
+import {
+  JSONSchemaDto,
+  UiComponentEnum,
+  UiSchema,
+  UiSchemaGroupEnum,
+} from '@novu/shared';
 import { defaultOptions, skipStepUiSchema, skipZodSchema } from './shared';
 
 export const pushControlZodSchema = z
@@ -14,7 +19,10 @@ export const pushControlZodSchema = z
 
 export type PushControlType = z.infer<typeof pushControlZodSchema>;
 
-export const pushControlSchema = zodToJsonSchema(pushControlZodSchema, defaultOptions) as JSONSchemaDto;
+export const pushControlSchema = zodToJsonSchema(
+  pushControlZodSchema,
+  defaultOptions,
+) as JSONSchemaDto;
 export const pushUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.PUSH,
   properties: {

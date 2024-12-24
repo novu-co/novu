@@ -49,6 +49,7 @@ import {
   UpsertControlValuesUseCase,
   DeleteControlValuesUseCase,
   TierRestrictionsValidateCommand,
+  dashboardSanitizeControlValues,
 } from '@novu/application-generic';
 
 import { UpsertWorkflowCommand, UpsertWorkflowDataCommand } from './upsert-workflow.command';
@@ -56,7 +57,6 @@ import { stepTypeToControlSchema } from '../../shared';
 import { GetWorkflowCommand, GetWorkflowUseCase } from '../get-workflow';
 import { buildVariables } from '../../util/build-variables';
 import { BuildAvailableVariableSchemaCommand, BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
-import { dashboardSanitizeControlValues } from '../../shared/sanitize-control-values';
 
 @Injectable()
 export class UpsertWorkflowUseCase {

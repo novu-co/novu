@@ -1,6 +1,11 @@
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
-import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
+import {
+  JSONSchemaDto,
+  UiComponentEnum,
+  UiSchema,
+  UiSchemaGroupEnum,
+} from '@novu/shared';
 import { defaultOptions, skipStepUiSchema, skipZodSchema } from './shared';
 
 /**
@@ -24,7 +29,9 @@ const templateUrlPattern =
 
 const redirectZodSchema = z.object({
   url: z.string().regex(templateUrlPattern),
-  target: z.enum(['_self', '_blank', '_parent', '_top', '_unfencedTop']).default('_blank'),
+  target: z
+    .enum(['_self', '_blank', '_parent', '_top', '_unfencedTop'])
+    .default('_blank'),
 });
 
 const actionZodSchema = z
@@ -49,9 +56,18 @@ export type InAppRedirectType = z.infer<typeof redirectZodSchema>;
 export type InAppActionType = z.infer<typeof actionZodSchema>;
 export type InAppControlType = z.infer<typeof inAppControlZodSchema>;
 
-export const inAppRedirectSchema = zodToJsonSchema(redirectZodSchema, defaultOptions) as JSONSchemaDto;
-export const inAppActionSchema = zodToJsonSchema(actionZodSchema, defaultOptions) as JSONSchemaDto;
-export const inAppControlSchema = zodToJsonSchema(inAppControlZodSchema, defaultOptions) as JSONSchemaDto;
+export const inAppRedirectSchema = zodToJsonSchema(
+  redirectZodSchema,
+  defaultOptions,
+) as JSONSchemaDto;
+export const inAppActionSchema = zodToJsonSchema(
+  actionZodSchema,
+  defaultOptions,
+) as JSONSchemaDto;
+export const inAppControlSchema = zodToJsonSchema(
+  inAppControlZodSchema,
+  defaultOptions,
+) as JSONSchemaDto;
 
 const redirectPlaceholder = {
   url: {

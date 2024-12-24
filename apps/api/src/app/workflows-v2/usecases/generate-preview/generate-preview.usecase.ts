@@ -20,6 +20,7 @@ import {
   Instrument,
   InstrumentUsecase,
   PinoLogger,
+  dashboardSanitizeControlValues,
 } from '@novu/application-generic';
 import { captureException } from '@sentry/node';
 import { getErrorPath as getErrorPathAjv } from 'ajv/dist/compile/util';
@@ -34,7 +35,6 @@ import { Variable } from '../../util/template-parser/liquid-parser';
 import { pathsToObject } from '../../util/path-to-object';
 import { isObjectTipTapNode } from '../../util/tip-tap.util';
 import { buildVariables } from '../../util/build-variables';
-import { dashboardSanitizeControlValues } from '../../shared/sanitize-control-values';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
@@ -368,11 +368,6 @@ function replaceInvalidControlValues(
 
   errors.forEach((error) => {
     const path = getErrorPath(error);
-    const getErrorPathAjvTEST = getErrorPathAjv(error.instancePath);
-
-    // eslint-disable-next-line no-console
-    console.log('getErrorPathAjvTEST', { path, getErrorPathAjvTEST });
-
     const defaultValue = _.get(previewControlValueDefault, path);
     _.set(fixedValues, path, defaultValue);
   });
@@ -420,7 +415,7 @@ const DEFAULT_TIP_TAP_EMPTY_PREVIEW: TipTapNode = {
 export const previewControlValueDefault = {
   subject: EMPTY_STRING,
   body: WHITESPACE,
-  avatar: EMPTY_STRING,
+  avatar: DEFAULT_URL_PATH,
   emailEditor: DEFAULT_TIP_TAP_EMPTY_PREVIEW,
   data: {},
   'primaryAction.label': EMPTY_STRING,

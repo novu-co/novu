@@ -21,7 +21,10 @@ export const delayControlZodSchema = z
 
 export type DelayControlType = z.infer<typeof delayControlZodSchema>;
 
-export const delayControlSchema = zodToJsonSchema(delayControlZodSchema, defaultOptions) as JSONSchemaDto;
+export const delayControlSchema = zodToJsonSchema(
+  delayControlZodSchema,
+  defaultOptions,
+) as JSONSchemaDto;
 export const delayUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.DELAY,
   properties: {

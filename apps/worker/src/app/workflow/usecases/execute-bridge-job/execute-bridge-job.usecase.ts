@@ -15,6 +15,7 @@ import {
   ExecutionDetailsStatusEnum,
   ITriggerPayload,
   JobStatusEnum,
+  StepTypeEnum,
   WorkflowOriginEnum,
   WorkflowTypeEnum,
 } from '@novu/shared';
@@ -23,6 +24,7 @@ import { Event, State, PostActionEnum, ExecuteOutput } from '@novu/framework/int
 import {
   CreateExecutionDetails,
   CreateExecutionDetailsCommand,
+  dashboardSanitizeControlValues,
   DetailEnum,
   ExecuteBridgeRequest,
   ExecuteBridgeRequestCommand,
@@ -147,6 +149,12 @@ export class ExecuteBridgeJob {
       _stepId: command.job.step._id,
       level: ControlValuesLevelEnum.STEP_CONTROLS,
     });
+
+    if (workflow?.origin === WorkflowOriginEnum.NOVU_CLOUD) {
+      return controls?.controls
+        ? dashboardSanitizeControlValues(controls.controls, command.job?.step?.template?.type)
+        : {};
+    }
 
     return controls?.controls;
   }

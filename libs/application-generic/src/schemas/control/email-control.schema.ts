@@ -1,7 +1,11 @@
-import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
+import {
+  JSONSchemaDto,
+  UiComponentEnum,
+  UiSchema,
+  UiSchemaGroupEnum,
+} from '@novu/shared';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
-import { TipTapSchema } from '../../../environments-v1/usecases/output-renderers';
 import { defaultOptions, skipStepUiSchema, skipZodSchema } from './shared';
 
 export const emailControlZodSchema = z
@@ -18,7 +22,10 @@ export const emailControlZodSchema = z
 
 export type EmailControlType = z.infer<typeof emailControlZodSchema>;
 
-export const emailControlSchema = zodToJsonSchema(emailControlZodSchema, defaultOptions) as JSONSchemaDto;
+export const emailControlSchema = zodToJsonSchema(
+  emailControlZodSchema,
+  defaultOptions,
+) as JSONSchemaDto;
 export const emailUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.EMAIL,
   properties: {
