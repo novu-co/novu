@@ -60,6 +60,7 @@ const projects = ['tag:type:package'];
     dryRun,
     verbose,
     from,
+    interactive: 'projects',
   });
 
   await execa({

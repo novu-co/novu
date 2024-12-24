@@ -25,7 +25,7 @@ import { GeneratePreviewCommand } from './generate-preview.command';
 import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
 import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
 import { Variable } from '../../util/template-parser/liquid-parser';
-import { pathsToObject } from '../../util/path-to-object';
+import { keysToObject } from '../../util/utils';
 import { isObjectTipTapNode } from '../../util/tip-tap.util';
 import { buildVariables } from '../../util/build-variables';
 import { sanitizeControlValues } from '../../shared/sanitize-control-values';
@@ -79,10 +79,7 @@ export class GeneratePreviewUsecase {
         const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalidVariables);
 
         const validVariableNames = variables.validVariables.map((variable) => variable.name);
-        const variablesExampleResult = pathsToObject(validVariableNames, {
-          valuePrefix: '{{',
-          valueSuffix: '}}',
-        });
+        const variablesExampleResult = keysToObject(validVariableNames, { fn: (key) => `{{${key}}}` });
 
         previewTemplateData = {
           variablesExample: _.merge(previewTemplateData.variablesExample, variablesExampleResult),
