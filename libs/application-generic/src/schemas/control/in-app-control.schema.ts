@@ -11,21 +11,20 @@ import { defaultOptions, skipStepUiSchema, skipZodSchema } from './shared';
 /**
  * Regex pattern for validating URLs with template variables. Matches three cases:
  *
- * 1. ^(\{\{[^}]*\}\}.*)
- *    - Matches URLs that start with template variables like {{variable}}
+ * 1. URLs that start with template variables like {{variable}}
  *    - Example: {{variable}}, {{variable}}/path
  *
- * 2. ^(?!mailto:)(?:(https?):\/\/[^\s/$.?#].[^\s]*(?:\{\{[^}]*\}\}[^\s]*)*)
- *    - Matches full URLs that may contain template variables
+ * 2. Full URLs that may contain template variables
  *    - Excludes mailto: links
  *    - Example: https://example.com, https://example.com/{{variable}}, https://{{variable}}.com
  *
- * 3. ^(\/[^\s]*(?:\{\{[^}]*\}\}[^\s]*)*)$
- *    - Matches partial URLs (paths) that may contain template variables
+ * 3. Paths starting with / that may contain template variables
  *    - Example: /path/to/page, /path/{{variable}}/page
+ *
+ * Pattern is optimized to prevent exponential backtracking while maintaining all functionality
  */
 const templateUrlPattern =
-  /^(\{\{[^}]*\}\}.*)|^(?!mailto:)(?:(https?):\/\/[^\s/$.?#].[^\s]*(?:\{\{[^}]*\}\}[^\s]*)*)|^(\/[^\s]*(?:\{\{[^}]*\}\}[^\s]*)*)$/;
+  /^(?:\{\{[^}]*\}\}.*|(?!mailto:)(?:https?:\/\/[^\s/$.?#][^\s]*(?:\{\{[^}]*\}\})*[^\s]*)|\/[^\s]*(?:\{\{[^}]*\}\})*[^\s]*)$/;
 
 const redirectZodSchema = z.object({
   url: z.string().regex(templateUrlPattern),
@@ -37,7 +36,7 @@ const redirectZodSchema = z.object({
 const actionZodSchema = z
   .object({
     label: z.string(),
-    redirect: redirectZodSchema,
+    redirect: redirectZodSchema.optional(),
   })
   .optional();
 

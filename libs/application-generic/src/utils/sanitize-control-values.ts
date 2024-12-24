@@ -19,17 +19,14 @@ import {
   ChatControlType,
 } from '../schemas/control';
 
-function sanitizeRedirect(
-  redirect: InAppRedirectType | undefined,
-  isOptional: boolean = false,
-) {
-  if (isOptional && (!redirect?.url || !redirect?.target)) {
+export function sanitizeRedirect(redirect: InAppRedirectType | undefined) {
+  if (!redirect?.url || redirect.url.length === 0 || !redirect?.target) {
     return undefined;
   }
 
   return {
-    url: redirect?.url as string,
-    target: redirect?.target as
+    url: redirect.url as string,
+    target: redirect.target as
       | '_self'
       | '_blank'
       | '_parent'
@@ -39,12 +36,7 @@ function sanitizeRedirect(
 }
 
 function sanitizeAction(action: InAppActionType) {
-  if (
-    !action?.label ||
-    !action?.redirect?.url ||
-    !action?.redirect?.target ||
-    !action?.redirect
-  ) {
+  if (!action?.label) {
     return undefined;
   }
 
@@ -84,7 +76,6 @@ function sanitizeInApp(controlValues: InAppControlType) {
   if (controlValues.redirect) {
     normalized.redirect = sanitizeRedirect(
       controlValues.redirect as InAppRedirectType,
-      true,
     );
   }
 
