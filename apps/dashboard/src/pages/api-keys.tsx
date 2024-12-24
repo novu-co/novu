@@ -44,75 +44,86 @@ export function ApiKeysPage() {
     <>
       <PageMeta title={`API Keys for ${currentEnvironment?.name} environment`} />
       <DashboardLayout headerStartItems={<h1 className="text-foreground-950">API Keys</h1>}>
-        <Container>
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[224px,1fr]">
-            <div className="column flex gap-2 pt-0">
-              <div className="flex flex-col gap-2">
-                <RiKey2Line className="h-8 w-8" />
-                <h2 className="text-foreground-950 text-md font-medium">Environment Keys</h2>
-                <p className="text-foreground-400 text-xs">Manage your public and private keys</p>
-
-                <ExternalLink variant="documentation" href="https://docs.novu.co/sdks/overview" className="text-sm">
-                  Read about our SDKs
-                </ExternalLink>
-              </div>
+        <Container className="flex w-full max-w-[800px] flex-col gap-6">
+          <Form {...form}>
+            <div>
+              <Card className="w-full overflow-hidden shadow-none">
+                <CardHeader>
+                  Inbox
+                  <p className="text-foreground-500 mt-1 text-xs font-normal">
+                    {'Use the public application identifier in Novu <Inbox />'}
+                    publicly.
+                  </p>
+                </CardHeader>
+                <CardContent className="rounded-b-xl border-t bg-neutral-50 bg-white p-3">
+                  <div className="space-y-4 p-3">
+                    <SettingField
+                      label="Application Identifier"
+                      tooltip="This is a unique identifier for the current environment, used to initialize the Inbox component"
+                      value={form.getValues('identifier')}
+                      isLoading={isLoading}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+              <ExternalLink
+                variant="tip"
+                iconClassName="text-neutral-400"
+                href="https://docs.novu.co/inbox/overview"
+                className="mt-2 text-xs text-neutral-600"
+              >
+                {'Learn more about <Inbox />'}
+              </ExternalLink>
             </div>
-            <div className="ml-auto flex w-full max-w-[700px] flex-col gap-6">
-              <Form {...form}>
-                <Card className="w-full overflow-hidden shadow-none">
-                  <CardHeader>Application</CardHeader>
+            <div>
+              <Card className="w-full overflow-hidden shadow-none">
+                <CardHeader>
+                  Secret Keys
+                  <p className="text-foreground-500 mt-1 text-xs font-normal">
+                    Use the secret key to authenticate your SDK requests. Keep it secure and never share it publicly.
+                  </p>
+                </CardHeader>
 
-                  <CardContent className="rounded-b-xl border-t bg-neutral-50 bg-white p-3">
-                    <div className="space-y-4 p-3">
-                      <SettingField
-                        label="API URL"
-                        tooltip="The base URL for making API requests to Novu"
-                        value={API_HOSTNAME}
-                      />
-
-                      <SettingField
-                        label="Application Identifier"
-                        tooltip="This is a unique identifier for the current environment, used to initialize the Inbox component"
-                        value={form.getValues('identifier')}
-                        isLoading={isLoading}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <div>
-                  <Card className="w-full overflow-hidden shadow-none">
-                    <CardHeader>
-                      Secret Keys
-                      <p className="text-foreground-600 mt-1 text-xs">
-                        Use this key to authenticate your API requests. Keep it secure and never share it publicly.
-                      </p>
-                    </CardHeader>
-
-                    <CardContent className="rounded-b-xl border-t bg-neutral-50 bg-white p-3">
-                      <div className="space-y-4 p-3">
-                        <SettingField
-                          label="Secret Key"
-                          tooltip="Use this key to authenticate your API requests. Keep it secure and never share it publicly."
-                          value={form.getValues('apiKey')}
-                          secret
-                          isLoading={isLoading}
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <ExternalLink
-                    variant="tip"
-                    iconClassName="text-neutral-400"
-                    href="https://docs.novu.co/api-reference/overview"
-                    className="mt-2 text-xs text-neutral-600"
-                  >
-                    Learn more about our APIs
-                  </ExternalLink>
-                </div>
-              </Form>
+                <CardContent className="rounded-b-xl border-t bg-neutral-50 bg-white p-3">
+                  <div className="space-y-4 p-3">
+                    <SettingField
+                      label="Secret Key"
+                      tooltip="Use this key to authenticate your API requests. Keep it secure and never share it publicly."
+                      value={form.getValues('apiKey')}
+                      secret
+                      isLoading={isLoading}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+              <ExternalLink
+                variant="tip"
+                iconClassName="text-neutral-400"
+                href="https://docs.novu.co/sdks/overview"
+                className="mt-2 text-xs text-neutral-600"
+              >
+                Learn more about Novu SDKs
+              </ExternalLink>
             </div>
-          </div>
+            <div>
+              <Card className="w-full overflow-hidden shadow-none">
+                <CardHeader>API URLs</CardHeader>
+                <CardContent className="rounded-b-xl border-t bg-neutral-50 bg-white p-3">
+                  <div className="space-y-4 p-3">
+                    <SettingField label="Novu API URL" tooltip="The base API URL for Novu Cloud" value={API_HOSTNAME} />
+                  </div>
+                </CardContent>
+              </Card>
+              <ExternalLink
+                variant="tip"
+                iconClassName="text-neutral-400"
+                href="https://docs.novu.co/api-reference/overview"
+                className="mt-2 text-xs text-neutral-600"
+              >
+                Learn more about Novu API
+              </ExternalLink>
+            </div>
+          </Form>
         </Container>
       </DashboardLayout>
     </>
@@ -173,6 +184,8 @@ function SettingField({
               <Button
                 variant="outline"
                 size="icon"
+                // TODO: Icon size variant is size-8 but doesn't align with the size of the input. We should fix this.
+                className="size-9"
                 onClick={toggleSecretVisibility}
                 disabled={isLoading}
                 aria-label={showSecret ? 'Hide Secret' : 'Show Secret'}
