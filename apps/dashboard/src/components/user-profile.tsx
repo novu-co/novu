@@ -17,7 +17,7 @@ export function UserProfile() {
         },
       }}
     >
-      {organization.createdAt < new Date('2024-12-24') && (
+      {organization && organization.createdAt < new Date('2024-12-24') && (
         <UserButton.MenuItems>
           <UserButton.Action
             label="Go back to the legacy Dashboard"
