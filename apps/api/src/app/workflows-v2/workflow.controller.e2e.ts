@@ -276,7 +276,7 @@ describe('Workflow Controller E2E API Testing', () => {
       }
     });
 
-    it('should allow creating a workflow with a payload schema if only control values are provided with a payload variable used', async () => {
+    it('should generate a payload schema if only control values are provided with a payload variable used', async () => {
       const steps = [
         {
           ...buildEmailStep(),
@@ -289,7 +289,7 @@ describe('Workflow Controller E2E API Testing', () => {
 
       const nameSuffix = `Test Workflow${new Date().toISOString()}`;
 
-      const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto(`payload-test-${nameSuffix}`, { steps });
+      const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto(`${nameSuffix}`, { steps });
       const res = await workflowsClient.createWorkflow(createWorkflowDto);
       expect(res.isSuccessResult()).to.be.true;
 
