@@ -1437,7 +1437,6 @@ describe('Novu-Hosted Bridge Trigger', () => {
       description: 'Test Workflow',
       __source: WorkflowCreationSourceEnum.DASHBOARD,
       workflowId: 'test-workflow',
-      origin: WorkflowOriginEnum.NOVU_CLOUD,
       steps: [
         {
           type: StepTypeEnum.IN_APP,

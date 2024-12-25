@@ -318,6 +318,7 @@ describe('Workflow Controller E2E API Testing', () => {
       const emailControlValue = `test-${generateUUID()}`;
       const updateRequest: UpdateWorkflowDto = {
         name: workflowCreated.name,
+        origin: WorkflowOriginEnum.NOVU_CLOUD,
         preferences: {
           user: null,
         },

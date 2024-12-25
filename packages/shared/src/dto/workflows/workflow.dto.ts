@@ -78,8 +78,6 @@ export type CreateWorkflowDto = WorkflowCommonsFields & {
   __source: WorkflowCreationSourceEnum;
 
   preferences?: PreferencesRequestDto;
-
-  origin: WorkflowOriginEnum;
 };
 
 export type UpdateWorkflowDto = WorkflowCommonsFields & {

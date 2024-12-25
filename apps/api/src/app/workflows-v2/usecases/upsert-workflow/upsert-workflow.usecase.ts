@@ -124,9 +124,7 @@ export class UpsertWorkflowUseCase {
 
   @Instrument()
   private async buildCreateWorkflowCommand(command: UpsertWorkflowCommand): Promise<CreateWorkflowCommand> {
-    const { user } = command;
-    // It's safe to assume we're dealing with CreateWorkflowDto on the creation path
-    const workflowDto = command.workflowDto as CreateWorkflowDto;
+    const { user, workflowDto } = command;
     const isWorkflowActive = workflowDto?.active ?? true;
     const notificationGroupId = await this.getNotificationGroup(command.user.environmentId);
 
