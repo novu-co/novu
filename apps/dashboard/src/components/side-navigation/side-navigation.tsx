@@ -120,7 +120,7 @@ export const SideNavigation = () => {
           </div>
 
           <div className="relative mt-auto gap-8 pt-4">
-            {!isFreeTrialActive && !isLoadingSubscription && <ChangelogStack />}
+            {isFreeTrialActive && !isLoadingSubscription && <ChangelogStack />}
             {isFreeTrialActive && !isLoadingSubscription && (
               <FreeTrialCard subscription={subscription} daysLeft={daysLeft} />
             )}

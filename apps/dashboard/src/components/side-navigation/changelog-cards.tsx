@@ -4,6 +4,7 @@ import { RiCloseLine } from 'react-icons/ri';
 import { useQuery } from '@tanstack/react-query';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
+import { useUser } from '@clerk/clerk-react';
 
 type Changelog = {
   id: string;
@@ -15,43 +16,56 @@ type Changelog = {
   published: boolean;
 };
 
-type CachedChangelogs = {
-  data: Changelog[];
-  timestamp: number;
-};
+declare global {
+  interface UserUnsafeMetadata {
+    dismissed_changelogs?: string[];
+  }
+}
 
 const CONSTANTS = {
   CHANGELOG_API_URL: 'https://productlane.com/api/v1/changelogs/f13f1996-c9b0-4fea-8ee7-2c3faf6a832d',
-  CACHE_KEY: 'cached_changelogs',
-  CACHE_EXPIRY: 4 * 60 * 60 * 1000, // 4 hours
   NUMBER_OF_CARDS: 3,
-  DISMISSED_STORAGE_KEY: 'dismissed_changelogs',
   CARD_OFFSET: 10,
   SCALE_FACTOR: 0.06,
+  MAX_DISMISSED_IDS: 15,
+  MONTHS_TO_SHOW: 2,
 } as const;
 
 export function ChangelogStack() {
   const [changelogs, setChangelogs] = useState<Changelog[]>([]);
   const track = useTelemetry();
+  const { user } = useUser();
+
+  const getDismissedChangelogs = (): string[] => {
+    return user?.unsafeMetadata?.dismissed_changelogs ?? [];
+  };
+
+  const updateDismissedChangelogs = async (changelogId: string) => {
+    if (!user) return;
+
+    const currentDismissed = getDismissedChangelogs();
+    const updatedDismissed = [...currentDismissed, changelogId].slice(-CONSTANTS.MAX_DISMISSED_IDS);
+
+    await user.update({
+      unsafeMetadata: {
+        ...user.unsafeMetadata,
+        dismissed_changelogs: updatedDismissed,
+      },
+    });
+  };
 
   const fetchChangelogs = async (): Promise<Changelog[]> => {
-    const cachedData = storage.getCachedData();
-    if (cachedData) {
-      return filterChangelogs(cachedData, storage.getDismissedChangelogs());
-    }
-
     const response = await fetch(CONSTANTS.CHANGELOG_API_URL);
-    const rawData = await response.json();
+    const rawData: Changelog[] = await response.json();
 
-    storage.cacheData(rawData);
-
-    return filterChangelogs(rawData, storage.getDismissedChangelogs());
+    return filterChangelogs(rawData, getDismissedChangelogs());
   };
 
   const { data: fetchedChangelogs } = useQuery({
     queryKey: ['changelogs'],
     queryFn: fetchChangelogs,
-    staleTime: CONSTANTS.CACHE_EXPIRY,
+    // Refetch every hour to ensure users see new changelogs
+    staleTime: 60 * 60 * 1000,
   });
 
   useEffect(() => {
@@ -60,18 +74,19 @@ export function ChangelogStack() {
     }
   }, [fetchedChangelogs]);
 
-  const handleChangelogClick = (changelog: Changelog) => {
+  const handleChangelogClick = async (changelog: Changelog) => {
     track(TelemetryEvent.CHANGELOG_ITEM_CLICKED, { title: changelog.title });
     window.open('https://roadmap.novu.co/changelog/' + changelog.id, '_blank');
 
-    storage.addToDismissed(changelog.id);
+    await updateDismissedChangelogs(changelog.id);
     setChangelogs((prev) => prev.filter((log) => log.id !== changelog.id));
   };
 
-  const handleDismiss = (e: React.MouseEvent, changelog: Changelog) => {
+  const handleDismiss = async (e: React.MouseEvent, changelog: Changelog) => {
     e.stopPropagation();
     track(TelemetryEvent.CHANGELOG_ITEM_DISMISSED, { title: changelog.title });
-    storage.addToDismissed(changelog.id);
+
+    await updateDismissedChangelogs(changelog.id);
     setChangelogs((prev) => prev.filter((log) => log.id !== changelog.id));
   };
 
@@ -93,57 +108,14 @@ export function ChangelogStack() {
   );
 }
 
-const storage = {
-  getDismissedChangelogs: (): string[] => {
-    const dismissed = localStorage.getItem(CONSTANTS.DISMISSED_STORAGE_KEY);
-    return dismissed ? JSON.parse(dismissed) : [];
-  },
-
-  addToDismissed: (changelogId: string): void => {
-    const dismissed = storage.getDismissedChangelogs();
-
-    localStorage.setItem(CONSTANTS.DISMISSED_STORAGE_KEY, JSON.stringify([...dismissed, changelogId]));
-  },
-
-  getCachedData: (): Changelog[] | null => {
-    const cachedData = localStorage.getItem(CONSTANTS.CACHE_KEY);
-    if (!cachedData) return null;
-
-    const { data, timestamp }: CachedChangelogs = JSON.parse(cachedData);
-    const isExpired = Date.now() - timestamp > CONSTANTS.CACHE_EXPIRY;
-
-    return isExpired ? null : data;
-  },
-
-  cacheData: (data: Changelog[]): void => {
-    // Remove unneeded fields and data from the changelog
-    const cleanedData = data
-      .map((changelog) => {
-        delete changelog.notes;
-
-        return changelog;
-      })
-      .filter((changelog) => changelog.published && changelog.imageUrl);
-
-    localStorage.setItem(
-      CONSTANTS.CACHE_KEY,
-      JSON.stringify({
-        data: cleanedData,
-        timestamp: Date.now(),
-      })
-    );
-  },
-};
-
 function filterChangelogs(changelogs: Changelog[], dismissedIds: string[]): Changelog[] {
-  const twoMonthsAgo = new Date();
-  twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+  const cutoffDate = new Date();
+  cutoffDate.setMonth(cutoffDate.getMonth() - CONSTANTS.MONTHS_TO_SHOW);
 
   return changelogs
     .filter((item) => {
       const changelogDate = new Date(item.date);
-
-      return item.published && item.imageUrl && changelogDate >= twoMonthsAgo;
+      return item.published && item.imageUrl && changelogDate >= cutoffDate;
     })
     .slice(0, CONSTANTS.NUMBER_OF_CARDS)
     .filter((item) => !dismissedIds.includes(item.id));
