@@ -113,7 +113,7 @@ export class WorkflowController {
   ): Promise<WorkflowResponseDto> {
     return await this.upsertWorkflowUseCase.execute(
       UpsertWorkflowCommand.create({
-        workflowDto: updateWorkflowDto,
+        workflowDto: { ...updateWorkflowDto, origin: WorkflowOriginEnum.NOVU_CLOUD },
         user,
         workflowIdOrInternalId,
       })

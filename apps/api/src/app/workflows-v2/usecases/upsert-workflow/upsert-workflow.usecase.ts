@@ -171,7 +171,7 @@ export class UpsertWorkflowUseCase {
   }
 
   private async buildUpdateWorkflowCommand(
-    workflowDto: UpdateWorkflowDto,
+    workflowDto: UpsertWorkflowDataCommand,
     user: UserSessionData,
     existingWorkflow: NotificationTemplateEntity
   ): Promise<UpdateWorkflowCommand> {
@@ -184,7 +184,7 @@ export class UpsertWorkflowUseCase {
       userId: user._id,
       name: workflowDto.name,
       steps,
-      rawData: workflowDto,
+      rawData: workflowDto as unknown as Record<string, unknown>,
       type: WorkflowTypeEnum.BRIDGE,
       description: workflowDto.description,
       userPreferences: workflowDto.preferences?.user ?? null,
@@ -462,7 +462,7 @@ export class UpsertWorkflowUseCase {
   }
 }
 
-function isWorkflowUpdateDto(workflowDto: UpsertWorkflowDataCommand, id?: string): workflowDto is UpdateWorkflowDto {
+function isWorkflowUpdateDto(workflowDto: UpsertWorkflowDataCommand, id?: string) {
   return !!id;
 }
 

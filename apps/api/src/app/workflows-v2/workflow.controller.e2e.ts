@@ -318,7 +318,6 @@ describe('Workflow Controller E2E API Testing', () => {
       const emailControlValue = `test-${generateUUID()}`;
       const updateRequest: UpdateWorkflowDto = {
         name: workflowCreated.name,
-        origin: WorkflowOriginEnum.NOVU_CLOUD,
         preferences: {
           user: null,
         },
@@ -570,7 +569,7 @@ describe('Workflow Controller E2E API Testing', () => {
       const prodWorkflowCreated = resPromoteCreate.body.data;
 
       // Update the workflow in the development environment
-      const updateDto = {
+      const updateDto: UpdateWorkflowDto = {
         ...convertResponseToUpdateDto(devWorkflow),
         name: 'Updated Name',
         description: 'Updated Description',
