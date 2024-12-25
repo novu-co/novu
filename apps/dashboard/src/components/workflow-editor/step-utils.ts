@@ -49,11 +49,11 @@ export const updateStepInWorkflow = (
 ): UpdateWorkflowDto => {
   return {
     ...workflow,
-    steps: workflow.steps.map((s) => {
-      if (s.stepId === stepId) {
-        return { ...s, ...updateStep };
+    steps: workflow.steps.map((step) => {
+      if (step.stepId === stepId) {
+        return { ...step, ...updateStep };
       }
-      return s;
+      return step;
     }),
   };
 };

@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
   FeatureFlagsKeysEnum,
   IEnvironment,
@@ -24,7 +23,6 @@ import { Input, InputField } from '@/components/primitives/input';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarContent, SidebarFooter, SidebarHeader } from '@/components/side-navigation/sidebar';
 import TruncatedText from '@/components/truncated-text';
-import { buildStepSchema } from '@/components/workflow-editor/schema';
 import {
   flattenIssues,
   getFirstBodyErrorMessage,
@@ -49,7 +47,6 @@ import {
 } from '@/utils/constants';
 import { getStepDefaultValues } from '@/components/workflow-editor/step-default-values';
 import { buildRoute, ROUTES } from '@/utils/routes';
-import { buildDynamicZodSchema } from '@/utils/schema';
 import { ConfigurePushStepPreview } from '@/components/workflow-editor/steps/push/configure-push-step-preview';
 import { ConfigureChatStepPreview } from '@/components/workflow-editor/steps/chat/configure-chat-step-preview';
 
@@ -128,11 +125,6 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     };
   }, [isInlineConfigurableStep]);
 
-  const controlsSchema = useMemo(
-    () => (isInlineConfigurableStep ? buildDynamicZodSchema(step.controls.dataSchema ?? {}) : undefined),
-    [step.controls.dataSchema, isInlineConfigurableStep]
-  );
-
   const defaultValues = useMemo(
     () => ({
       name: step.name,
@@ -144,7 +136,6 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
 
   const form = useForm({
     defaultValues,
-    resolver: zodResolver(buildStepSchema(controlsSchema)),
     shouldFocusError: false,
   });
 
@@ -170,6 +161,18 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
 
   const setControlValuesIssues = useCallback(() => {
     const stepIssues = flattenIssues(step.issues?.controls);
+    const currentErrors = form.formState.errors;
+
+    // Clear errors that are not in stepIssues
+    Object.values(currentErrors).forEach((controlValues) => {
+      Object.keys(controlValues).forEach((key) => {
+        if (!stepIssues[`${key}`]) {
+          form.clearErrors(`controlValues.${key}`);
+        }
+      });
+    });
+
+    // Set new errors from stepIssues
     Object.entries(stepIssues).forEach(([key, value]) => {
       form.setError(`controlValues.${key}`, { message: value });
     });
