@@ -112,18 +112,18 @@ export class UpsertWorkflowUseCase {
     if (existingWorkflow && isWorkflowUpdateDto(command.workflowDto, command.workflowIdOrInternalId)) {
       return await this.updateWorkflowGenericUsecase.execute(
         UpdateWorkflowCommand.create(
-          await this.convertCreateToUpdateCommand(command.workflowDto, command.user, existingWorkflow)
+          await this.buildUpdateWorkflowCommand(command.workflowDto, command.user, existingWorkflow)
         )
       );
     }
 
     return await this.createWorkflowGenericUsecase.execute(
-      CreateWorkflowCommand.create(await this.buildCreateWorkflowGenericCommand(command))
+      CreateWorkflowCommand.create(await this.buildCreateWorkflowCommand(command))
     );
   }
 
   @Instrument()
-  private async buildCreateWorkflowGenericCommand(command: UpsertWorkflowCommand): Promise<CreateWorkflowCommand> {
+  private async buildCreateWorkflowCommand(command: UpsertWorkflowCommand): Promise<CreateWorkflowCommand> {
     const { user } = command;
     // It's safe to assume we're dealing with CreateWorkflowDto on the creation path
     const workflowDto = command.workflowDto as CreateWorkflowDto;
@@ -133,7 +133,7 @@ export class UpsertWorkflowUseCase {
     if (!notificationGroupId) {
       throw new BadRequestException('Notification group not found');
     }
-    const steps = await this.mapSteps(command.user, workflowDto.steps);
+    const steps = await this.mapSteps(workflowDto.origin, command.user, workflowDto.steps);
 
     return {
       notificationGroupId,
@@ -172,12 +172,12 @@ export class UpsertWorkflowUseCase {
     return issue?.controls && Object.keys(issue.controls).length > 0;
   }
 
-  private async convertCreateToUpdateCommand(
+  private async buildUpdateWorkflowCommand(
     workflowDto: UpdateWorkflowDto,
     user: UserSessionData,
     existingWorkflow: NotificationTemplateEntity
   ): Promise<UpdateWorkflowCommand> {
-    const steps = await this.mapSteps(user, workflowDto.steps, existingWorkflow);
+    const steps = await this.mapSteps(workflowDto.origin, user, workflowDto.steps, existingWorkflow);
 
     return {
       id: existingWorkflow._id,
@@ -197,6 +197,7 @@ export class UpsertWorkflowUseCase {
     };
   }
   private async mapSteps(
+    workflowOrigin: WorkflowOriginEnum,
     user: UserSessionData,
     commandWorkflowSteps: Array<StepCreateDto | StepUpdateDto>,
     persistedWorkflow?: NotificationTemplateEntity | undefined
@@ -204,7 +205,7 @@ export class UpsertWorkflowUseCase {
     const steps: NotificationStep[] = [];
 
     for (const step of commandWorkflowSteps) {
-      const mappedStep = await this.mapSingleStep(user, persistedWorkflow, step);
+      const mappedStep = await this.mapSingleStep(workflowOrigin, user, persistedWorkflow, step);
       const baseStepId = mappedStep.stepId;
 
       if (baseStepId) {
@@ -242,6 +243,7 @@ export class UpsertWorkflowUseCase {
   }
 
   private async mapSingleStep(
+    workflowOrigin: WorkflowOriginEnum,
     user: UserSessionData,
     persistedWorkflow: NotificationTemplateEntity | undefined,
     step: StepUpdateDto | StepCreateDto
@@ -249,6 +251,7 @@ export class UpsertWorkflowUseCase {
     const foundPersistedStep = this.getPersistedStepIfFound(persistedWorkflow, step);
     const controlSchemas: ControlSchemas = foundPersistedStep?.template?.controls || stepTypeToControlSchema[step.type];
     const issues: StepIssuesDto = await this.buildIssues(
+      workflowOrigin,
       user,
       foundPersistedStep,
       persistedWorkflow,
@@ -281,6 +284,7 @@ export class UpsertWorkflowUseCase {
   }
 
   private async buildIssues(
+    workflowOrigin: WorkflowOriginEnum,
     user: UserSessionData,
     foundPersistedStep: NotificationStepEntity | undefined,
     persistedWorkflow: NotificationTemplateEntity | undefined,
@@ -312,10 +316,12 @@ export class UpsertWorkflowUseCase {
       )?.controls;
     }
 
-    const sanitizedControlValues = controlValueLocal
-      ? dashboardSanitizeControlValues(controlValueLocal, step.type)
-      : {};
+    const sanitizedControlValues =
+      controlValueLocal && workflowOrigin === WorkflowOriginEnum.NOVU_CLOUD
+        ? dashboardSanitizeControlValues(controlValueLocal, step.type) || {}
+        : controlValueLocal || {};
     const controlIssues = processControlValuesBySchema(controlSchemas?.schema, sanitizedControlValues || {});
+
     const liquidTemplateIssues = processControlValuesByLiquid(variableSchema, controlValueLocal || {});
     const customIssues = await this.processCustomControlValues(user, step.type, controlValueLocal || {});
     const customControlIssues = _.isEmpty(customIssues) ? {} : { controls: customIssues };

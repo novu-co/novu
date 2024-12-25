@@ -7,6 +7,7 @@ import {
   StepUpdateDto,
   UpdateWorkflowDto,
   WorkflowCreationSourceEnum,
+  WorkflowOriginEnum,
   WorkflowPreferences,
   WorkflowResponseDto,
 } from '@novu/shared';
@@ -100,6 +101,7 @@ export class SyncToEnvironmentUseCase {
     preferences: PreferencesEntity[]
   ): Promise<CreateWorkflowDto> {
     return {
+      origin: WorkflowOriginEnum.NOVU_CLOUD,
       workflowId: originWorkflow.workflowId,
       name: originWorkflow.name,
       active: originWorkflow.active,
@@ -118,6 +120,7 @@ export class SyncToEnvironmentUseCase {
     preferencesToClone: PreferencesEntity[]
   ): Promise<UpdateWorkflowDto> {
     return {
+      origin: WorkflowOriginEnum.NOVU_CLOUD,
       workflowId: originWorkflow.workflowId,
       name: originWorkflow.name,
       active: originWorkflow.active,
