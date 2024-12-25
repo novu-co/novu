@@ -77,7 +77,7 @@ const defaultFormValues: InboxPlaygroundFormData = {
     label: 'Add to your app',
     redirect: {
       target: '_self',
-      url: '/',
+      url: '/onboarding/inbox/embed',
     },
   },
   secondaryAction: null,
@@ -270,14 +270,14 @@ async function createDemoWorkflow({ environment }: { environment: IEnvironment }
               label: '{{payload.primaryActionLabel}}',
               redirect: {
                 target: '_self',
-                url: '',
+                url: '/onboarding/inbox/embed',
               },
             },
             secondaryAction: {
               label: '{{payload.secondaryActionLabel}}',
               redirect: {
                 target: '_self',
-                url: '',
+                url: '/onboarding/inbox/embed',
               },
             },
           },

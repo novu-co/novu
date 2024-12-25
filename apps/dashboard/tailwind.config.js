@@ -442,6 +442,13 @@ export default {
         soft: 'hsl(var(--stroke-soft))',
         white: 'hsl(var(--stroke-white))',
       },
+      text: {
+        strong: 'hsl(var(--text-strong))',
+        sub: 'hsl(var(--text-sub))',
+        soft: 'hsl(var(--text-soft))',
+        disabled: 'hsl(var(--text-disabled))',
+        white: 'hsl(var(--text-white))',
+      },
       faded: {
         dark: 'hsl(var(--faded-dark))',
         base: 'hsl(var(--faded-base))',

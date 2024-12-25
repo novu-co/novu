@@ -50,12 +50,10 @@ const WorkflowListEmptyDev = () => (
   <div className="flex h-full w-full flex-col items-center justify-center gap-6">
     <VersionControlDev />
     <div className="flex flex-col items-center gap-2 text-center">
-      <span className="text-foreground-900 block font-medium">
-        Create your first workflow to orchestrate notifications
-      </span>
+      <span className="text-foreground-900 block font-medium">Create your first workflow to send notifications</span>
       <p className="text-foreground-400 max-w-[60ch] text-sm">
-        Workflows in Novu handle event-driven notifications across multiple channels in a single, version-controlled
-        flow, with the ability to manage preference for each subscriber.
+        Workflows handle notifications across multiple channels in a single, version-controlled flow, with the ability
+        to manage preference for each subscriber.
       </p>
     </div>
 

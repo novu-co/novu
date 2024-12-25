@@ -14,12 +14,12 @@ const digestRegularControlZodSchema = z
   .object({
     skip: z.object({}).catchall(z.unknown()).optional(),
     amount: z.union([z.number().min(1), z.string().min(1)]),
-    unit: z.nativeEnum(TimeUnitEnum).default(TimeUnitEnum.SECONDS),
+    unit: z.nativeEnum(TimeUnitEnum),
     digestKey: z.string().optional(),
     lookBackWindow: z
       .object({
         amount: z.number().min(1),
-        unit: z.nativeEnum(TimeUnitEnum).default(TimeUnitEnum.SECONDS),
+        unit: z.nativeEnum(TimeUnitEnum),
       })
       .strict()
       .optional(),
