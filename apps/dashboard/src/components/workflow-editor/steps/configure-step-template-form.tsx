@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import isEqual from 'lodash.isequal';
 import { useForm } from 'react-hook-form';
 import {
   type StepDataDto,
@@ -19,7 +18,6 @@ import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-co
 import { SmsTabs } from '@/components/workflow-editor/steps/sms/sms-tabs';
 import { ChatTabs } from '@/components/workflow-editor/steps/chat/chat-tabs';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { buildDefaultValuesOfDataSchema } from '@/utils/schema';
 import { CommonCustomControlValues } from '@/components/workflow-editor/steps/common/common-custom-control-values';
 
 const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
@@ -57,12 +55,8 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
     previousData: defaultValues,
     form,
     save: (data) => {
-      const defaultValues = buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {});
-      const isDefaultValues = isEqual(data, defaultValues);
-      const updateData = isDefaultValues ? null : data;
-      // transform form fields to step update dto
       const updateStepData: Partial<StepUpdateDto> = {
-        controlValues: updateData,
+        controlValues: data,
       };
       update(updateStepInWorkflow(workflow, step.stepId, updateStepData));
     },

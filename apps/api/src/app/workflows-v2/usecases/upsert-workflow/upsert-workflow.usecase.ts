@@ -319,11 +319,11 @@ export class UpsertWorkflowUseCase {
     const sanitizedControlValues =
       controlValueLocal && workflowOrigin === WorkflowOriginEnum.NOVU_CLOUD
         ? dashboardSanitizeControlValues(controlValueLocal, step.type) || {}
-        : controlValueLocal || {};
-    const controlIssues = processControlValuesBySchema(controlSchemas?.schema, sanitizedControlValues || {});
+        : convertEmptyStringsToNull(controlValueLocal) || {};
 
+    const controlIssues = processControlValuesBySchema(controlSchemas?.schema, sanitizedControlValues || {});
     const liquidTemplateIssues = processControlValuesByLiquid(variableSchema, controlValueLocal || {});
-    const customIssues = await this.processCustomControlValues(user, step.type, controlValueLocal || {});
+    const customIssues = await this.processControlValuesByRules(user, step.type, controlValueLocal || {});
     const customControlIssues = _.isEmpty(customIssues) ? {} : { controls: customIssues };
 
     return _.merge(controlIssues, liquidTemplateIssues, customControlIssues);
@@ -429,7 +429,7 @@ export class UpsertWorkflowUseCase {
     })?.controlValues;
   }
 
-  private async processCustomControlValues(
+  private async processControlValuesByRules(
     user: UserSessionData,
     stepType: StepTypeEnum,
     controlValues: Record<string, unknown> | null
@@ -583,6 +583,23 @@ function cleanObject(
     Object.entries(obj)
       .filter(([unused, value]) => !valuesToClean.includes(value as string | null | undefined))
       .map(([key, value]) => [key, cleanObject(value, valuesToClean)])
+  );
+}
+
+function convertEmptyStringsToNull(obj: Record<string, unknown> | undefined): Record<string, unknown> | undefined {
+  if (typeof obj !== 'object' || obj === null || obj === undefined) return obj;
+
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => {
+      if (typeof value === 'string' && value.trim() === '') {
+        return [key, null];
+      }
+      if (typeof value === 'object') {
+        return [key, convertEmptyStringsToNull(value as Record<string, unknown>)];
+      }
+
+      return [key, value];
+    })
   );
 }
 
