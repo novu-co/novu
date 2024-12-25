@@ -993,6 +993,7 @@ describe('Workflow Controller E2E API Testing', () => {
 
     return res.value;
   }
+
   function stringify(workflowResponseDto: any) {
     return JSON.stringify(workflowResponseDto, null, 2);
   }
@@ -1457,7 +1458,7 @@ function generateUUID(): string {
 }
 
 function convertResponseToUpdateDto(workflowCreated: WorkflowResponseDto): UpsertWorkflowBody {
-  const workflowWithoutResponseFields = removeFields(workflowCreated, 'updatedAt', '_id', 'origin', 'status');
+  const workflowWithoutResponseFields = removeFields(workflowCreated, 'updatedAt', '_id', 'status');
   const steps: UpsertStepBody[] = workflowWithoutResponseFields.steps.map((step) => removeFields(step, 'stepId'));
 
   return { ...workflowWithoutResponseFields, steps };
@@ -1472,7 +1473,7 @@ function createStep(): StepCreateDto {
 
 function buildUpdateRequest(workflowCreated: WorkflowResponseDto): UpdateWorkflowDto {
   const steps = [createStep()];
-  const updateRequest = removeFields(workflowCreated, 'updatedAt', '_id', 'origin', 'status') as UpdateWorkflowDto;
+  const updateRequest = removeFields(workflowCreated, 'updatedAt', '_id', 'status') as UpdateWorkflowDto;
 
   return {
     ...updateRequest,
