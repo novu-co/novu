@@ -5,10 +5,10 @@ import { RiLoader3Line, RiLoader4Fill } from 'react-icons/ri';
 import { IconType } from 'react-icons/lib';
 
 export const STATUS_STYLES = {
-  completed: 'border-[1px] border-success/40 bg-success/10 text-success/40',
-  failed: 'border-[1px] border-destructive/40 bg-destructive/10 text-destructive/40',
-  delayed: 'border-[1px] border-warning/40 bg-warning/10 text-warning/40',
-  default: 'border-[1px] border-neutral-200 bg-neutral-50 text-neutral-200',
+  completed: 'border-[#99e3bb] bg-[#e9faf0] text-[#99e3bb]',
+  failed: 'border-[#ec98a0] bg-[#ffebed] text-[#ec98a0]',
+  delayed: 'border-[#F5A524] bg-[#FEF4E6] text-[#F8C16E]',
+  default: 'border-[#e0e4ea] bg-[#fbfbfb] text-[#e0e4ea]',
 } as const;
 
 export const JOB_STATUS_CONFIG: Record<

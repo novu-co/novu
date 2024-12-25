@@ -9,13 +9,23 @@ const LIQUID_CONFIG = {
 } as const;
 
 export type Variable = {
-  context?: string;
-  message?: string;
+  /**
+   * The variable name/path (e.g. for valid variables "user.name",
+   * for invalid variables will fallback to output "{{user.name | upcase}}")
+   */
   name: string;
-  template: string;
+
+  /** The surrounding context where the variable was found, useful for error messages */
+  context?: string;
+
+  /** Error message if the variable is invalid */
+  message?: string;
+
+  /** The full liquid output string (e.g. "{{user.name | upcase}}") */
+  output: string;
 };
 
-export type TemplateParseResult = {
+export type TemplateVariables = {
   validVariables: Variable[];
   invalidVariables: Variable[];
 };
@@ -62,7 +72,7 @@ function isLiquidErrors(error: unknown): error is LiquidErrors {
  * @param template - The Liquid template string to parse
  * @returns Object containing arrays of valid and invalid variables found in the template
  */
-export function extractLiquidTemplateVariables(template: string): TemplateParseResult {
+export function extractLiquidTemplateVariables(template: string): TemplateVariables {
   if (!isValidTemplate(template)) {
     return { validVariables: [], invalidVariables: [] };
   }
@@ -75,7 +85,7 @@ export function extractLiquidTemplateVariables(template: string): TemplateParseR
   return processLiquidRawOutput(liquidRawOutput);
 }
 
-function processLiquidRawOutput(rawOutputs: string[]): TemplateParseResult {
+function processLiquidRawOutput(rawOutputs: string[]): TemplateVariables {
   const validVariables: Variable[] = [];
   const invalidVariables: Variable[] = [];
   const processedVariables = new Set<string>();
@@ -100,7 +110,7 @@ function processLiquidRawOutput(rawOutputs: string[]): TemplateParseResult {
               name: rawOutput,
               message: e.message,
               context: e.context,
-              template: rawOutput,
+              output: rawOutput,
             },
             false
           );
@@ -112,7 +122,7 @@ function processLiquidRawOutput(rawOutputs: string[]): TemplateParseResult {
   return { validVariables, invalidVariables };
 }
 
-function parseByLiquid(rawOutput: string): TemplateParseResult {
+function parseByLiquid(rawOutput: string): TemplateVariables {
   const validVariables: Variable[] = [];
   const invalidVariables: Variable[] = [];
   const engine = new Liquid(LIQUID_CONFIG);
@@ -123,11 +133,11 @@ function parseByLiquid(rawOutput: string): TemplateParseResult {
       const result = extractProps(template);
 
       if (result.valid && result.props.length > 0) {
-        validVariables.push({ name: result.props.join('.'), template: rawOutput });
+        validVariables.push({ name: result.props.join('.'), output: rawOutput });
       }
 
       if (!result.valid) {
-        invalidVariables.push({ name: template?.token?.input, message: result.error, template: rawOutput });
+        invalidVariables.push({ name: template?.token?.input, message: result.error, output: rawOutput });
       }
     }
   });

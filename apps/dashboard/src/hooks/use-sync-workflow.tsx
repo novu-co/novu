@@ -11,11 +11,14 @@ import { WorkflowOriginEnum, WorkflowStatusEnum } from '@novu/shared';
 import { useMutation } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { buildRoute, ROUTES } from '@/utils/routes';
 
 export function useSyncWorkflow(workflow: WorkflowResponseDto | WorkflowListResponseDto) {
   const { currentEnvironment, oppositeEnvironment, switchEnvironment } = useEnvironment();
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const navigate = useNavigate();
 
   let loadingToast: string | number | undefined = undefined;
 
@@ -79,7 +82,10 @@ export function useSyncWorkflow(workflow: WorkflowResponseDto | WorkflowListResp
           actionLabel={`Switch to ${environment?.name}`}
           onAction={() => {
             close();
-            switchEnvironment(environment?.slug || '');
+            const targetSlug = environment?.slug || '';
+            switchEnvironment(targetSlug);
+
+            navigate(buildRoute(ROUTES.WORKFLOWS, { environmentSlug: targetSlug }));
           }}
           onClose={close}
         />

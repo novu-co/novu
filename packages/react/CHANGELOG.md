@@ -1,3 +1,17 @@
+## 2.6.3 (2024-12-24)
+
+### 🧱 Updated Dependencies
+
+- Updated @novu/js to 2.6.4
+
+### ❤️ Thank You
+
+- GalTidhar @tatarco
+- George Desipris @desiprisg
+- George Djabarov @djabarovgeorge
+- Pawan Jain
+
+
 ## 2.6.2 (2024-11-26)
 
 ### 🚀 Features

@@ -112,7 +112,7 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
         <div className="flex flex-col justify-center gap-1">
           <span className="block text-sm">Override code defined defaults</span>
           <span className="text-xs text-neutral-400">
-            Code-defined defaults are read-only by default, you can override them using this toggle.
+            Code-defined defaults are read-only by default, you can allow overrides using this toggle.
           </span>
         </div>
         <Switch

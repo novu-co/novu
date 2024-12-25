@@ -19,7 +19,7 @@ export function StepIndicators({ jobs }: StepIndicatorsProps) {
         <div
           key={job._id}
           className={cn(
-            '-ml-2 flex h-7 w-7 items-center justify-center rounded-full first:ml-0',
+            '-ml-2 flex h-7 w-7 items-center justify-center rounded-full border first:ml-0',
             STATUS_STYLES[job.status as keyof typeof STATUS_STYLES] ?? STATUS_STYLES.default
           )}
         >

@@ -1,3 +1,20 @@
+## 2.0.4 (2024-12-24)
+
+### 🧱 Updated Dependencies
+
+- Updated @novu/shared to 2.1.5
+- Updated @novu/stateless to 2.0.3
+
+### ❤️ Thank You
+
+- Dima Grossman @scopsy
+- GalTidhar @tatarco
+- George Desipris @desiprisg
+- George Djabarov @djabarovgeorge
+- Lucky @L-U-C-K-Y
+- Pawan Jain
+
+
 ## 2.0.3 (2024-11-26)
 
 ### 🚀 Features
