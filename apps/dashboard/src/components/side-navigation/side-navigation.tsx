@@ -1,6 +1,7 @@
 import { ReactNode, useMemo } from 'react';
 import {
   RiBarChartBoxLine,
+  RiChat1Line,
   RiGroup2Line,
   RiKey2Line,
   RiRouteFill,
@@ -21,6 +22,9 @@ import { SubscribersStayTunedModal } from './subscribers-stay-tuned-modal';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
 import { NavigationLink } from './navigation-link';
 import { GettingStartedMenuItem } from './getting-started-menu-item';
+import { ChangelogStack } from './changelog-cards';
+import { useFetchSubscription } from '../../hooks/use-fetch-subscription';
+import * as Sentry from '@sentry/react';
 
 const NavigationGroup = ({ children, label }: { children: ReactNode; label?: string }) => {
   return (
@@ -32,16 +36,30 @@ const NavigationGroup = ({ children, label }: { children: ReactNode; label?: str
 };
 
 export const SideNavigation = () => {
+  const { subscription, daysLeft, isLoading: isLoadingSubscription } = useFetchSubscription();
+  const isFreeTrialActive = subscription?.trial.isActive || subscription?.hasPaymentMethod;
+
   const { currentEnvironment, environments, switchEnvironment } = useEnvironment();
   const track = useTelemetry();
   const isNewActivityFeedEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ACTIVITY_FEED_ENABLED, false);
   const isNewIntegrationStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_INTEGRATION_STORE_ENABLED, false);
   const environmentNames = useMemo(() => environments?.map((env) => env.name), [environments]);
+
   const onEnvironmentChange = (value: string) => {
     const environment = environments?.find((env) => env.name === value);
     switchEnvironment(environment?.slug);
   };
 
+  const showPlainLiveChat = () => {
+    track(TelemetryEvent.SHARE_FEEDBACK_LINK_CLICKED);
+
+    try {
+      window?.Plain?.open();
+    } catch (error) {
+      Sentry.captureException(error);
+      console.error('Error opening plain chat:', error);
+    }
+  };
   return (
     <aside className="bg-neutral-alpha-50 relative flex h-full w-[275px] flex-shrink-0 flex-col">
       <SidebarContent className="h-full">
@@ -101,14 +119,23 @@ export const SideNavigation = () => {
             </NavigationGroup>
           </div>
 
-          <div className="mt-auto gap-8 pt-4">
-            <FreeTrialCard />
-
+          <div className="relative mt-auto gap-8 pt-4">
+            {!isFreeTrialActive && !isLoadingSubscription && <ChangelogStack />}{' '}
+            {isFreeTrialActive && !isLoadingSubscription && (
+              <FreeTrialCard subscription={subscription} daysLeft={daysLeft} />
+            )}
             <NavigationGroup>
+              <button onClick={showPlainLiveChat} className="w-full">
+                <NavigationLink>
+                  <RiChat1Line className="size-4" />
+                  <span>Share Feedback</span>
+                </NavigationLink>
+              </button>
               <NavigationLink to={ROUTES.SETTINGS_TEAM}>
                 <RiUserAddLine className="size-4" />
                 <span>Invite teammates</span>
               </NavigationLink>
+
               <GettingStartedMenuItem />
             </NavigationGroup>
           </div>

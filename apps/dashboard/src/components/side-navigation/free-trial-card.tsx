@@ -6,8 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger, TooltipArrow } from '../primit
 import { LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { Link } from 'react-router-dom';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
-import { FeatureFlagsKeysEnum } from '@novu/shared';
-import { useFetchSubscription } from '@/hooks/use-fetch-subscription';
+import { FeatureFlagsKeysEnum, GetSubscriptionDto } from '@novu/shared';
 
 const transition = 'transition-all duration-300 ease-out';
 
@@ -68,16 +67,11 @@ const CardContent = ({
   </>
 );
 
-export const FreeTrialCard = () => {
-  const { subscription, daysLeft, isLoading } = useFetchSubscription();
+export const FreeTrialCard = ({ subscription, daysLeft }: { subscription?: GetSubscriptionDto; daysLeft: number }) => {
   const daysTotal = subscription && subscription.trial.daysTotal > 0 ? subscription.trial.daysTotal : 100;
+  const pluralizedDays = pluralizeDaysLeft(daysLeft);
   const isV2BillingEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_DASHBOARD_BILLING_ENABLED);
 
-  if (isLoading || !subscription || !subscription.trial.isActive || subscription?.hasPaymentMethod) {
-    return null;
-  }
-
-  const pluralizedDays = pluralizeDaysLeft(daysLeft);
   const cardClassName =
     'bg-background group relative left-2 mb-2 flex w-[calc(100%-1rem)] cursor-pointer flex-col gap-2 rounded-lg p-3 shadow';
 
