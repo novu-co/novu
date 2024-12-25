@@ -16,6 +16,8 @@ import { ROUTES } from '../../utils/routes';
 import { useMutation } from '@tanstack/react-query';
 import { useOrganization, useUser } from '@clerk/clerk-react';
 import { useEnvironment, useFetchEnvironments } from '../../context/environment/hooks';
+import { useSegment } from '../../context/segment';
+import { useAuth } from '../../context/auth/hooks';
 
 interface QuestionnaireFormData {
   jobTitle: JobTitleEnum;
@@ -241,6 +243,8 @@ export function QuestionnaireForm() {
 }
 
 function useSubmitQuestionnaire() {
+  const { currentUser, currentOrganization } = useAuth();
+  const segment = useSegment();
   const track = useTelemetry();
   const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
@@ -271,6 +275,26 @@ function useSubmitQuestionnaire() {
         companySize: data.companySize,
         organizationType: data.organizationType,
       });
+
+      if (currentUser && currentOrganization) {
+        segment.identify(currentUser, {
+          organizationType: data.organizationType,
+          jobTitle: data.jobTitle,
+          companySize: data.companySize,
+        });
+
+        segment.group(
+          {
+            id: currentOrganization?._id,
+            name: currentOrganization?.name,
+            createdAt: currentOrganization?.createdAt,
+          },
+          {
+            organizationType: data.organizationType,
+            companySize: data.companySize,
+          }
+        );
+      }
     },
     onSuccess: () => {
       navigate(ROUTES.USECASE_SELECT);

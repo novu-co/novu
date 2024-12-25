@@ -59,7 +59,7 @@ export class SegmentService {
     }
   }
 
-  identify(user: IUserEntity) {
+  identify(user: IUserEntity, extraProperties?: Record<string, unknown>) {
     if (!this.isSegmentEnabled()) {
       return;
     }
@@ -70,6 +70,19 @@ export class SegmentService {
       firstName: user.firstName,
       lastName: user.lastName,
       avatar: user.profilePicture,
+      ...(extraProperties || {}),
+    });
+  }
+
+  group(organization: { id: string; name: string; createdAt: string }, extraProperties?: Record<string, unknown>) {
+    if (!this.isSegmentEnabled()) {
+      return;
+    }
+
+    this._segment?.group(organization.id, {
+      name: organization.name,
+      createdAt: organization.createdAt,
+      ...(extraProperties || {}),
     });
   }
 
