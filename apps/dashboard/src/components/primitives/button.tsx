@@ -5,7 +5,7 @@ import { cn } from '@/utils/ui';
 import { RiLoader4Line } from 'react-icons/ri';
 
 export const buttonVariants = cva(
-  `relative isolate inline-flex items-center justify-center whitespace-nowrap rounded-lg gap-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50`,
+  `relative isolate inline-flex items-center justify-center whitespace-nowrap rounded-lg gap-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50`,
   {
     variants: {
       variant: {
@@ -26,10 +26,10 @@ export const buttonVariants = cva(
       },
       size: {
         default: 'h-9 p-2.5',
-        xs: 'h-6 px-1.5 rounded-md text-xs',
-        sm: 'h-8 px-1.5 rounded-md text-xs',
+        xs: 'h-6 px-2 rounded-md',
+        sm: 'h-8 px-2 rounded-md',
         lg: 'h-10 rounded-md px-8',
-        'input-right': 'rounded-none border-b-0 h-full text-xs border-r-0 border-t-0 px-2 py-0',
+        'input-right': 'rounded-none border-b-0 h-full border-r-0 border-t-0 px-2 py-0',
         icon: 'size-8',
       },
     },

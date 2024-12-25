@@ -1,4 +1,4 @@
-import { RiBookMarkedLine, RiExternalLinkLine, RiQuestionLine } from 'react-icons/ri';
+import { RiBookMarkedLine, RiArrowRightUpLine, RiQuestionLine } from 'react-icons/ri';
 import { cn } from '@/utils/ui';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
@@ -26,19 +26,21 @@ export function ExternalLink({
     });
   };
 
+  const finalIconClassName = cn('inline size-3 mb-1', iconClassName);
+
   return (
     <a
       target="_blank"
       rel="noopener noreferrer"
-      className={cn('text-foreground-600 inline-flex items-center gap-1 hover:underline', className)}
+      className={cn('text-foreground-400 inline-flex items-center text-xs underline', className)}
       href={href}
       onClick={handleClick}
       {...props}
     >
-      {variant === 'documentation' && <RiBookMarkedLine className={cn('size-4', iconClassName)} aria-hidden="true" />}
-      {variant === 'default' && <RiExternalLinkLine className={cn('size-4', iconClassName)} aria-hidden="true" />}
-      {variant === 'tip' && <RiQuestionLine className={cn('size-4', iconClassName)} aria-hidden="true" />}
       {children}
+      {variant === 'documentation' && <RiBookMarkedLine className={finalIconClassName} aria-hidden="true" />}
+      {variant === 'default' && <RiArrowRightUpLine className={finalIconClassName} aria-hidden="true" />}
+      {variant === 'tip' && <RiQuestionLine className={finalIconClassName} aria-hidden="true" />}
     </a>
   );
 }

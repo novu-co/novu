@@ -30,7 +30,6 @@ import {
   WorkflowStatusEnum,
   StepIssues,
   ControlSchemas,
-  DigestUnitEnum,
 } from '@novu/shared';
 import {
   CreateWorkflow as CreateWorkflowGeneric,

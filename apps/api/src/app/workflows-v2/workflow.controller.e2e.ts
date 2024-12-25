@@ -275,6 +275,39 @@ describe('Workflow Controller E2E API Testing', () => {
         await assertValuesInSteps(workflowCreated);
       }
     });
+
+    it('should generate a payload schema if only control values are provided during workflow creation', async () => {
+      const steps = [
+        {
+          ...buildEmailStep(),
+          controlValues: {
+            body: 'Welcome {{payload.name}}',
+            subject: 'Hello {{payload.name}}',
+          },
+        },
+      ];
+
+      const nameSuffix = `Test Workflow${new Date().toISOString()}`;
+
+      const createWorkflowDto: CreateWorkflowDto = buildCreateWorkflowDto(`${nameSuffix}`, { steps });
+      const res = await workflowsClient.createWorkflow(createWorkflowDto);
+      expect(res.isSuccessResult()).to.be.true;
+
+      const workflow = res.value as WorkflowResponseDto;
+      expect(workflow).to.be.ok;
+
+      expect(workflow.steps[0].variables).to.be.ok;
+
+      const stepData = await getStepData(workflow._id, workflow.steps[0]._id);
+      expect(stepData.variables).to.be.ok;
+
+      const { properties } = stepData.variables as JSONSchemaDto;
+      expect(properties).to.be.ok;
+
+      const payloadProperties = properties?.payload as JSONSchemaDto;
+      expect(payloadProperties).to.be.ok;
+      expect(payloadProperties.properties?.name).to.be.ok;
+    });
   });
 
   describe('Update Workflow Permutations', () => {
