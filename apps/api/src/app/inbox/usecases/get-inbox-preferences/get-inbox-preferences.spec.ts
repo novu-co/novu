@@ -143,6 +143,7 @@ describe('GetInboxPreferences', () => {
         _organization: command.organizationId,
         subscriberId: command.subscriberId,
         workflowSize: 1,
+        tags: [],
       },
     ]);
 
@@ -248,6 +249,7 @@ describe('GetInboxPreferences', () => {
           tags: workflowsWithTags[0].template.tags,
         },
         ...mockedWorkflowPreference.preference,
+        tags: ['newsletter', 'security'],
       },
       {
         level: PreferenceLevelEnum.TEMPLATE,
