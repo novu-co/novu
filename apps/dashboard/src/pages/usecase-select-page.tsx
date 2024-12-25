@@ -87,7 +87,7 @@ export function UsecaseSelectPage() {
   function handleSkip() {
     track(TelemetryEvent.USE_CASE_SKIPPED);
 
-    navigate(ROUTES.WELCOME);
+    navigate(ROUTES.INBOX_USECASE);
   }
 
   function handleSelectUseCase(useCase: ChannelTypeEnum) {
@@ -140,7 +140,7 @@ export function UsecaseSelectPage() {
                       Continue
                     </Button>
                     <Button type="button" variant="link" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
-                      Skip to Homepage
+                      Skip this step
                     </Button>
                   </motion.div>
                 </div>
