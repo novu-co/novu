@@ -1,25 +1,11 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import {
-  SubscriberRepository,
-  SubscriberEntity,
-  ErrorCodesEnum,
-} from '@novu/dal';
+import { Injectable } from '@nestjs/common';
+import { SubscriberRepository, SubscriberEntity, ErrorCodesEnum } from '@novu/dal';
 
-import {
-  CachedEntity,
-  InvalidateCacheService,
-  buildSubscriberKey,
-} from '../../services/cache';
+import { CachedEntity, InvalidateCacheService, buildSubscriberKey } from '../../services/cache';
 import { CreateSubscriberCommand } from './create-subscriber.command';
-import {
-  UpdateSubscriber,
-  UpdateSubscriberCommand,
-} from '../update-subscriber';
-import {
-  OAuthHandlerEnum,
-  UpdateSubscriberChannel,
-  UpdateSubscriberChannelCommand,
-} from '../subscribers';
+import { UpdateSubscriber, UpdateSubscriberCommand } from '../update-subscriber';
+import { OAuthHandlerEnum, UpdateSubscriberChannel, UpdateSubscriberChannelCommand } from '../subscribers';
+import { AnalyticsService } from '../../services';
 
 @Injectable()
 export class CreateSubscriber {
@@ -28,6 +14,7 @@ export class CreateSubscriber {
     private subscriberRepository: SubscriberRepository,
     private updateSubscriber: UpdateSubscriber,
     private updateSubscriberChannel: UpdateSubscriberChannel,
+    private analyticsService: AnalyticsService
   ) {}
 
   async execute(command: CreateSubscriberCommand) {
@@ -64,7 +51,7 @@ export class CreateSubscriber {
           data: command.data,
           subscriber,
           channels: command.channels,
-        }),
+        })
       );
     }
 
@@ -83,7 +70,7 @@ export class CreateSubscriber {
           integrationIdentifier: channel.integrationIdentifier,
           oauthHandler: OAuthHandlerEnum.EXTERNAL,
           isIdempotentOperation: false,
-        }),
+        })
       );
     }
   }
@@ -110,7 +97,17 @@ export class CreateSubscriber {
         data: command.data,
       };
 
-      return await this.subscriberRepository.create(subscriberPayload);
+      const subscriber = await this.subscriberRepository.create(subscriberPayload);
+
+      this.analyticsService.mixpanelTrack('Create New Subscriber - [Platform]', '', {
+        _organization: command.organizationId,
+        _subscriber: subscriber?._id,
+        hasEmail: !!command.email,
+        hasPhone: !!command.phone,
+        environmentId: command.environmentId,
+      });
+
+      return subscriber;
     } catch (err: any) {
       /*
        * Possible race condition on subscriber creation, try fetch newly created the subscriber
@@ -140,10 +137,6 @@ export class CreateSubscriber {
     subscriberId: string;
     _environmentId: string;
   }): Promise<SubscriberEntity | null> {
-    return await this.subscriberRepository.findBySubscriberId(
-      _environmentId,
-      subscriberId,
-      true,
-    );
+    return await this.subscriberRepository.findBySubscriberId(_environmentId, subscriberId, true);
   }
 }
