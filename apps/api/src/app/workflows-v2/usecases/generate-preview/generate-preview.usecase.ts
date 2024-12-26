@@ -23,7 +23,6 @@ import {
   dashboardSanitizeControlValues,
 } from '@novu/application-generic';
 import { captureException } from '@sentry/node';
-import { getErrorPath as getErrorPathAjv } from 'ajv/dist/compile/util';
 import { channelStepSchemas, actionStepSchemas } from '@novu/framework/internal';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';

@@ -83,9 +83,14 @@ function sanitizeInApp(controlValues: InAppControlType) {
 }
 
 function sanitizeEmail(controlValues: EmailControlType) {
+  const EMPTY_TIP_TAP = JSON.stringify({
+    type: 'doc',
+    content: [{ type: 'paragraph' }],
+  });
+
   const emailControls: EmailControlType = {
     subject: controlValues.subject,
-    body: controlValues.body,
+    body: isEmpty(controlValues.body) ? EMPTY_TIP_TAP : controlValues.body,
     skip: controlValues.skip || undefined,
   };
 
