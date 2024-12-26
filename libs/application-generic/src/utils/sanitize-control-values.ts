@@ -57,7 +57,7 @@ function sanitizeInApp(controlValues: InAppControlType) {
   const normalized: InAppControlType = {
     subject: controlValues.subject,
     body: sanitizeEmptyInput<string>(controlValues.body),
-    avatar: controlValues.avatar,
+    avatar: sanitizeEmptyInput<string>(controlValues.avatar),
     primaryAction: undefined,
     secondaryAction: undefined,
     redirect: undefined,
