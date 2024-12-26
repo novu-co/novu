@@ -47,17 +47,17 @@ function sanitizeAction(action: InAppActionType) {
 
 function sanitizeInApp(controlValues: InAppControlType) {
   const normalized: InAppControlType = {
-    subject: controlValues.subject || undefined,
+    subject: controlValues.subject,
     // Cast to string to trigger Ajv validation errors - possible undefined
     body: isEmpty(controlValues.body)
       ? (undefined as unknown as string)
       : controlValues.body,
-    avatar: controlValues.avatar || undefined,
+    avatar: controlValues.avatar,
     primaryAction: undefined,
     secondaryAction: undefined,
     redirect: undefined,
-    data: controlValues.data || undefined,
-    skip: controlValues.skip || undefined,
+    data: controlValues.data,
+    skip: controlValues.skip,
   };
 
   if (controlValues.primaryAction) {
@@ -90,7 +90,7 @@ function sanitizeEmail(controlValues: EmailControlType) {
   const emailControls: EmailControlType = {
     subject: controlValues.subject,
     body: isEmpty(controlValues.body) ? EMPTY_TIP_TAP : controlValues.body,
-    skip: controlValues.skip || undefined,
+    skip: controlValues.skip,
   };
 
   return filterNullishValues(emailControls);
@@ -98,8 +98,8 @@ function sanitizeEmail(controlValues: EmailControlType) {
 
 function sanitizeSms(controlValues: SmsControlType) {
   const mappedValues: SmsControlType = {
-    body: controlValues.body || '',
-    skip: controlValues.skip || undefined,
+    body: controlValues.body,
+    skip: controlValues.skip,
   };
 
   return filterNullishValues(mappedValues);
@@ -107,9 +107,9 @@ function sanitizeSms(controlValues: SmsControlType) {
 
 function sanitizePush(controlValues: PushControlType) {
   const mappedValues: PushControlType = {
-    subject: controlValues.subject || '',
-    body: controlValues.body || '',
-    skip: controlValues.skip || undefined,
+    subject: controlValues.subject,
+    body: controlValues.body,
+    skip: controlValues.skip,
   };
 
   return filterNullishValues(mappedValues);
@@ -117,8 +117,8 @@ function sanitizePush(controlValues: PushControlType) {
 
 function sanitizeChat(controlValues: ChatControlType) {
   const mappedValues: ChatControlType = {
-    body: controlValues.body || '',
-    skip: controlValues.skip || undefined,
+    body: controlValues.body,
+    skip: controlValues.skip,
   };
 
   return filterNullishValues(mappedValues);
@@ -127,9 +127,9 @@ function sanitizeChat(controlValues: ChatControlType) {
 function sanitizeDigest(controlValues: DigestControlSchemaType) {
   if (isTimedDigestControl(controlValues)) {
     const mappedValues: DigestTimedControlType = {
-      cron: controlValues.cron || '',
-      digestKey: controlValues.digestKey || '',
-      skip: controlValues.skip || undefined,
+      cron: controlValues.cron,
+      digestKey: controlValues.digestKey,
+      skip: controlValues.skip,
     };
 
     return filterNullishValues(mappedValues);
@@ -143,7 +143,7 @@ function sanitizeDigest(controlValues: DigestControlSchemaType) {
       ...(parseAmount(controlValues.amount) as { amount?: number }),
       unit: controlValues.unit,
       digestKey: controlValues.digestKey,
-      skip: controlValues.skip || undefined,
+      skip: controlValues.skip,
       lookBackWindow: controlValues.lookBackWindow
         ? {
             // Cast to trigger Ajv validation errors - possible undefined
@@ -157,19 +157,20 @@ function sanitizeDigest(controlValues: DigestControlSchemaType) {
   }
 
   const anyControlValues = controlValues as Record<string, unknown>;
+  const lookBackWindow = (anyControlValues.lookBackWindow as LookBackWindowType)
+    ?.amount;
 
   return filterNullishValues({
-    amount: anyControlValues.amount || 0,
-    unit: anyControlValues.unit || TimeUnitEnum.SECONDS,
-    digestKey: anyControlValues.digestKey || '',
-    skip: anyControlValues.skip || undefined,
+    // Cast to trigger Ajv validation errors - possible undefined
+    ...(parseAmount(anyControlValues.amount) as { amount?: number }),
+    unit: anyControlValues.unit,
+    digestKey: anyControlValues.digestKey,
+    skip: anyControlValues.skip,
     lookBackWindow: anyControlValues.lookBackWindow
       ? {
-          amount:
-            (anyControlValues.lookBackWindow as LookBackWindowType).amount || 0,
-          unit:
-            (anyControlValues.lookBackWindow as LookBackWindowType).unit ||
-            TimeUnitEnum.SECONDS,
+          // Cast to trigger Ajv validation errors - possible undefined
+          ...(parseAmount(lookBackWindow) as { amount?: number }),
+          unit: (anyControlValues.lookBackWindow as LookBackWindowType).unit,
         }
       : undefined,
   });
@@ -181,7 +182,7 @@ function sanitizeDelay(controlValues: DelayControlType) {
     ...(parseAmount(controlValues.amount) as { amount?: number }),
     type: controlValues.type,
     unit: controlValues.unit,
-    skip: controlValues.skip || undefined,
+    skip: controlValues.skip,
   };
 
   return filterNullishValues(mappedValues);

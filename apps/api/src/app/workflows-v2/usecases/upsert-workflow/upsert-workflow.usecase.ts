@@ -569,22 +569,9 @@ function getErrorPath(error: ErrorObject): string {
   return fullPath?.replace(/\//g, '.');
 }
 
-function cleanObject(
-  obj: Record<string, any>,
-  valuesToClean: Array<string | null | undefined> = ['', null, undefined]
-) {
-  if (typeof obj !== 'object' || obj === null) return obj;
-
-  return Object.fromEntries(
-    Object.entries(obj)
-      .filter(([unused, value]) => !valuesToClean.includes(value as string | null | undefined))
-      .map(([key, value]) => [key, cleanObject(value, valuesToClean)])
-  );
-}
-
 function frameworkSanitizeEmptyStringsToNull(
-  obj: Record<string, unknown> | undefined
-): Record<string, unknown> | undefined {
+  obj: Record<string, unknown> | undefined | null
+): Record<string, unknown> | undefined | null {
   if (typeof obj !== 'object' || obj === null || obj === undefined) return obj;
 
   return Object.fromEntries(
