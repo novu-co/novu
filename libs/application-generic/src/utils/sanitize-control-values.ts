@@ -177,7 +177,7 @@ function sanitizeDigest(controlValues: DigestControlSchemaType) {
 function sanitizeDelay(controlValues: DelayControlType) {
   const mappedValues: DelayControlType = {
     // Cast to trigger Ajv validation errors - possible undefined
-    ...(parseAmount(controlValues) as { amount?: number }), // TODO FIX THIS - should be controlValues.amount
+    ...(parseAmount(controlValues.amount) as { amount?: number }),
     type: controlValues.type,
     unit: controlValues.unit,
     skip: controlValues.skip || undefined,
