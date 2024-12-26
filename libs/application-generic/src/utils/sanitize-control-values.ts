@@ -18,6 +18,14 @@ import {
 } from '../schemas/control';
 import { PinoLogger } from '../logging';
 
+// Cast input T_Type to trigger Ajv validation errors - possible undefined
+function sanitizeEmptyInput<T_Type>(
+  input: T_Type,
+  defaultValue: T_Type = undefined as unknown as T_Type,
+): T_Type {
+  return isEmpty(input) ? defaultValue : input;
+}
+
 export function sanitizeRedirect(redirect: InAppRedirectType | undefined) {
   if (!redirect?.url || redirect.url.length === 0 || !redirect?.target) {
     return undefined;
@@ -48,10 +56,7 @@ function sanitizeAction(action: InAppActionType) {
 function sanitizeInApp(controlValues: InAppControlType) {
   const normalized: InAppControlType = {
     subject: controlValues.subject,
-    // Cast to string to trigger Ajv validation errors - possible undefined
-    body: isEmpty(controlValues.body)
-      ? (undefined as unknown as string)
-      : controlValues.body,
+    body: sanitizeEmptyInput<string>(controlValues.body),
     avatar: controlValues.avatar,
     primaryAction: undefined,
     secondaryAction: undefined,
@@ -89,7 +94,7 @@ function sanitizeEmail(controlValues: EmailControlType) {
 
   const emailControls: EmailControlType = {
     subject: controlValues.subject,
-    body: isEmpty(controlValues.body) ? EMPTY_TIP_TAP : controlValues.body,
+    body: sanitizeEmptyInput(controlValues.body, EMPTY_TIP_TAP),
     skip: controlValues.skip,
   };
 
@@ -98,7 +103,7 @@ function sanitizeEmail(controlValues: EmailControlType) {
 
 function sanitizeSms(controlValues: SmsControlType) {
   const mappedValues: SmsControlType = {
-    body: controlValues.body,
+    body: sanitizeEmptyInput(controlValues.body),
     skip: controlValues.skip,
   };
 
@@ -107,8 +112,8 @@ function sanitizeSms(controlValues: SmsControlType) {
 
 function sanitizePush(controlValues: PushControlType) {
   const mappedValues: PushControlType = {
-    subject: controlValues.subject,
-    body: controlValues.body,
+    subject: sanitizeEmptyInput(controlValues.subject),
+    body: sanitizeEmptyInput(controlValues.body),
     skip: controlValues.skip,
   };
 
@@ -117,7 +122,7 @@ function sanitizePush(controlValues: PushControlType) {
 
 function sanitizeChat(controlValues: ChatControlType) {
   const mappedValues: ChatControlType = {
-    body: controlValues.body,
+    body: sanitizeEmptyInput(controlValues.body),
     skip: controlValues.skip,
   };
 
