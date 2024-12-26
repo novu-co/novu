@@ -100,10 +100,6 @@ export function InboxPlayground() {
   const telemetry = useTelemetry();
 
   useEffect(() => {
-    telemetry(TelemetryEvent.INBOX_USECASE_PAGE_VIEWED);
-  }, [telemetry]);
-
-  useEffect(() => {
     if (!data) return;
 
     /**
