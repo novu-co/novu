@@ -48,6 +48,7 @@ import {
   DeleteControlValuesUseCase,
   TierRestrictionsValidateCommand,
   dashboardSanitizeControlValues,
+  PinoLogger,
 } from '@novu/application-generic';
 
 import { UpsertWorkflowCommand, UpsertWorkflowDataCommand } from './upsert-workflow.command';
@@ -68,7 +69,8 @@ export class UpsertWorkflowUseCase {
     private controlValuesRepository: ControlValuesRepository,
     private upsertControlValuesUseCase: UpsertControlValuesUseCase,
     private deleteControlValuesUseCase: DeleteControlValuesUseCase,
-    private tierRestrictionsValidateUsecase: TierRestrictionsValidateUsecase
+    private tierRestrictionsValidateUsecase: TierRestrictionsValidateUsecase,
+    private logger: PinoLogger
   ) {}
 
   @InstrumentUsecase()
@@ -314,7 +316,7 @@ export class UpsertWorkflowUseCase {
 
     const sanitizedControlValues =
       controlValueLocal && workflowOrigin === WorkflowOriginEnum.NOVU_CLOUD
-        ? dashboardSanitizeControlValues(controlValueLocal, step.type) || {}
+        ? dashboardSanitizeControlValues(this.logger, controlValueLocal, step.type) || {}
         : frameworkSanitizeEmptyStringsToNull(controlValueLocal) || {};
 
     const controlIssues = processControlValuesBySchema(controlSchemas?.schema, sanitizedControlValues || {});

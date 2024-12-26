@@ -137,7 +137,7 @@ export class GeneratePreviewUsecase {
   }
 
   private sanitizeControlsForPreview(initialControlValues: Record<string, unknown>, stepData: StepDataDto) {
-    const sanitizedValues = dashboardSanitizeControlValues(initialControlValues, stepData.type);
+    const sanitizedValues = dashboardSanitizeControlValues(this.logger, initialControlValues, stepData.type);
 
     return sanitizeControlValuesByOutputSchema(sanitizedValues || {}, stepData.type);
   }

@@ -16,6 +16,7 @@ import {
   DelayControlType,
   ChatControlType,
 } from '../schemas/control';
+import { PinoLogger } from '../logging';
 
 export function sanitizeRedirect(redirect: InAppRedirectType | undefined) {
   if (!redirect?.url || redirect.url.length === 0 || !redirect?.target) {
@@ -234,6 +235,7 @@ function filterNullishValues<T extends Record<string, unknown>>(obj: T): T {
  *
  */
 export function dashboardSanitizeControlValues(
+  logger: PinoLogger,
   controlValues: Record<string, unknown>,
   stepType: StepTypeEnum | unknown,
 ): (Record<string, unknown> & { skip?: Record<string, unknown> }) | null {
@@ -242,7 +244,6 @@ export function dashboardSanitizeControlValues(
       return null;
     }
 
-    console.log('controlValues 333222 ', controlValues);
     let normalizedValues: Record<string, unknown>;
     switch (stepType) {
       case StepTypeEnum.IN_APP:
@@ -272,11 +273,9 @@ export function dashboardSanitizeControlValues(
         normalizedValues = filterNullishValues(controlValues);
     }
 
-    console.log('normalizedValues 333222 ', normalizedValues);
-
     return normalizedValues;
   } catch (error) {
-    console.error('Error sanitizing control values', error);
+    logger.error('Error sanitizing control values', error);
 
     return controlValues;
   }
