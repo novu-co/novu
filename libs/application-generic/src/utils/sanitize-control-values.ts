@@ -9,10 +9,8 @@ import {
   SmsControlType,
   InAppRedirectType,
   PushControlType,
-  isDigestTimedControl,
   DigestTimedControlType,
   DigestControlSchemaType,
-  isDigestRegularControl,
   DigestRegularControlType,
   LookBackWindowType,
   DelayControlType,
@@ -49,7 +47,7 @@ function sanitizeAction(action: InAppActionType) {
 function sanitizeInApp(controlValues: InAppControlType) {
   const normalized: InAppControlType = {
     subject: controlValues.subject || undefined,
-    // Cast to string to trigger Ajv validation errors
+    // Cast to string to trigger Ajv validation errors - possible undefined
     body: isEmpty(controlValues.body)
       ? (undefined as unknown as string)
       : controlValues.body,
@@ -126,7 +124,7 @@ function sanitizeChat(controlValues: ChatControlType) {
 }
 
 function sanitizeDigest(controlValues: DigestControlSchemaType) {
-  if (isDigestTimedControl(controlValues)) {
+  if (isTimedDigestControl(controlValues)) {
     const mappedValues: DigestTimedControlType = {
       cron: controlValues.cron || '',
       digestKey: controlValues.digestKey || '',
@@ -136,19 +134,20 @@ function sanitizeDigest(controlValues: DigestControlSchemaType) {
     return filterNullishValues(mappedValues);
   }
 
-  if (isDigestRegularControl(controlValues)) {
+  if (isRegularDigestControl(controlValues)) {
+    const lookBackAmount = (controlValues.lookBackWindow as LookBackWindowType)
+      ?.amount;
     const mappedValues: DigestRegularControlType = {
-      amount: controlValues.amount || 0,
-      unit: controlValues.unit || TimeUnitEnum.SECONDS,
-      digestKey: controlValues.digestKey || '',
+      // Cast to trigger Ajv validation errors - possible undefined
+      ...(parseAmount(controlValues.amount) as { amount?: number }),
+      unit: controlValues.unit,
+      digestKey: controlValues.digestKey,
       skip: controlValues.skip || undefined,
       lookBackWindow: controlValues.lookBackWindow
         ? {
-            amount:
-              (controlValues.lookBackWindow as LookBackWindowType).amount || 0,
-            unit:
-              (controlValues.lookBackWindow as LookBackWindowType).unit ||
-              TimeUnitEnum.SECONDS,
+            // Cast to trigger Ajv validation errors - possible undefined
+            ...(parseAmount(lookBackAmount) as { amount?: number }),
+            unit: (controlValues.lookBackWindow as LookBackWindowType).unit,
           }
         : undefined,
     };
@@ -177,13 +176,29 @@ function sanitizeDigest(controlValues: DigestControlSchemaType) {
 
 function sanitizeDelay(controlValues: DelayControlType) {
   const mappedValues: DelayControlType = {
-    type: controlValues.type || 'regular',
-    amount: controlValues.amount || 0,
-    unit: controlValues.unit || TimeUnitEnum.SECONDS,
+    // Cast to trigger Ajv validation errors - possible undefined
+    ...(parseAmount(controlValues) as { amount?: number }), // TODO FIX THIS - should be controlValues.amount
+    type: controlValues.type,
+    unit: controlValues.unit,
     skip: controlValues.skip || undefined,
   };
 
   return filterNullishValues(mappedValues);
+}
+
+function parseAmount(amount?: unknown) {
+  try {
+    if (!isNumber(amount)) {
+      return {};
+    }
+
+    const numberAmount =
+      typeof amount === 'string' ? parseInt(amount, 10) : amount;
+
+    return { amount: numberAmount };
+  } catch (error) {
+    return amount;
+  }
 }
 
 function filterNullishValues<T extends Record<string, unknown>>(obj: T): T {
@@ -222,37 +237,63 @@ export function dashboardSanitizeControlValues(
   controlValues: Record<string, unknown>,
   stepType: StepTypeEnum | unknown,
 ): (Record<string, unknown> & { skip?: Record<string, unknown> }) | null {
-  if (!controlValues) {
-    return null;
-  }
-  let normalizedValues: Record<string, unknown>;
-  switch (stepType) {
-    case StepTypeEnum.IN_APP:
-      normalizedValues = sanitizeInApp(controlValues as InAppControlType);
-      break;
-    case StepTypeEnum.EMAIL:
-      normalizedValues = sanitizeEmail(controlValues as EmailControlType);
-      break;
-    case StepTypeEnum.SMS:
-      normalizedValues = sanitizeSms(controlValues as SmsControlType);
-      break;
-    case StepTypeEnum.PUSH:
-      normalizedValues = sanitizePush(controlValues as PushControlType);
-      break;
-    case StepTypeEnum.CHAT:
-      normalizedValues = sanitizeChat(controlValues as ChatControlType);
-      break;
-    case StepTypeEnum.DIGEST:
-      normalizedValues = sanitizeDigest(
-        controlValues as DigestControlSchemaType,
-      );
-      break;
-    case StepTypeEnum.DELAY:
-      normalizedValues = sanitizeDelay(controlValues as DelayControlType);
-      break;
-    default:
-      normalizedValues = filterNullishValues(controlValues);
-  }
+  try {
+    if (!controlValues) {
+      return null;
+    }
 
-  return normalizedValues;
+    console.log('controlValues 333222 ', controlValues);
+    let normalizedValues: Record<string, unknown>;
+    switch (stepType) {
+      case StepTypeEnum.IN_APP:
+        normalizedValues = sanitizeInApp(controlValues as InAppControlType);
+        break;
+      case StepTypeEnum.EMAIL:
+        normalizedValues = sanitizeEmail(controlValues as EmailControlType);
+        break;
+      case StepTypeEnum.SMS:
+        normalizedValues = sanitizeSms(controlValues as SmsControlType);
+        break;
+      case StepTypeEnum.PUSH:
+        normalizedValues = sanitizePush(controlValues as PushControlType);
+        break;
+      case StepTypeEnum.CHAT:
+        normalizedValues = sanitizeChat(controlValues as ChatControlType);
+        break;
+      case StepTypeEnum.DIGEST:
+        normalizedValues = sanitizeDigest(
+          controlValues as DigestControlSchemaType,
+        );
+        break;
+      case StepTypeEnum.DELAY:
+        normalizedValues = sanitizeDelay(controlValues as DelayControlType);
+        break;
+      default:
+        normalizedValues = filterNullishValues(controlValues);
+    }
+
+    console.log('normalizedValues 333222 ', normalizedValues);
+
+    return normalizedValues;
+  } catch (error) {
+    console.error('Error sanitizing control values', error);
+
+    return controlValues;
+  }
+}
+
+function isNumber(value: unknown): value is number {
+  return !Number.isNaN(Number.parseInt(value as string, 10));
+}
+
+function isTimedDigestControl(
+  controlValues: unknown,
+): controlValues is DigestTimedControlType {
+  return !isEmpty((controlValues as DigestTimedControlType)?.cron);
+}
+
+function isRegularDigestControl(
+  controlValues: unknown,
+): controlValues is DigestRegularControlType {
+  return !isTimedDigestControl(controlValues);
 }

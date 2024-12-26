@@ -13,8 +13,8 @@ import { defaultOptions, skipStepUiSchema, skipZodSchema } from './shared';
 export const delayControlZodSchema = z
   .object({
     skip: skipZodSchema,
-    type: z.enum(['regular']).default('regular'),
-    amount: z.union([z.number().min(1), z.string()]),
+    type: z.enum(['regular']),
+    amount: z.number().min(1),
     unit: z.nativeEnum(TimeUnitEnum),
   })
   .strict();

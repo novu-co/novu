@@ -11,7 +11,6 @@ import {
 } from '@novu/dal';
 import {
   ContentIssue,
-  CreateWorkflowDto,
   JSONSchemaDto,
   DEFAULT_WORKFLOW_PREFERENCES,
   slugify,
@@ -19,7 +18,6 @@ import {
   StepCreateDto,
   StepIssuesDto,
   StepUpdateDto,
-  UpdateWorkflowDto,
   UserSessionData,
   StepTypeEnum,
   WorkflowCreationSourceEnum,
@@ -317,11 +315,11 @@ export class UpsertWorkflowUseCase {
     const sanitizedControlValues =
       controlValueLocal && workflowOrigin === WorkflowOriginEnum.NOVU_CLOUD
         ? dashboardSanitizeControlValues(controlValueLocal, step.type) || {}
-        : convertEmptyStringsToNull(controlValueLocal) || {};
+        : frameworkSanitizeEmptyStringsToNull(controlValueLocal) || {};
 
     const controlIssues = processControlValuesBySchema(controlSchemas?.schema, sanitizedControlValues || {});
     const liquidTemplateIssues = processControlValuesByLiquid(variableSchema, controlValueLocal || {});
-    const customIssues = await this.processControlValuesByRules(user, step.type, controlValueLocal || {});
+    const customIssues = await this.processControlValuesByRules(user, step.type, sanitizedControlValues || {});
     const customControlIssues = _.isEmpty(customIssues) ? {} : { controls: customIssues };
 
     return _.merge(controlIssues, liquidTemplateIssues, customControlIssues);
@@ -432,13 +430,11 @@ export class UpsertWorkflowUseCase {
     stepType: StepTypeEnum,
     controlValues: Record<string, unknown> | null
   ): Promise<StepIssuesDto> {
-    const cleanedControlValues = controlValues ? cleanObject(controlValues) : {};
-
     const restrictionsErrors = await this.tierRestrictionsValidateUsecase.execute(
       TierRestrictionsValidateCommand.create({
-        amount: cleanedControlValues.amount as string | undefined,
-        unit: cleanedControlValues.unit as string | undefined,
-        cron: cleanedControlValues.cron as string | undefined,
+        amount: controlValues?.amount as number | undefined,
+        unit: controlValues?.unit as string | undefined,
+        cron: controlValues?.cron as string | undefined,
         organizationId: user.organizationId,
         stepType,
       })
@@ -584,7 +580,9 @@ function cleanObject(
   );
 }
 
-function convertEmptyStringsToNull(obj: Record<string, unknown> | undefined): Record<string, unknown> | undefined {
+function frameworkSanitizeEmptyStringsToNull(
+  obj: Record<string, unknown> | undefined
+): Record<string, unknown> | undefined {
   if (typeof obj !== 'object' || obj === null || obj === undefined) return obj;
 
   return Object.fromEntries(
@@ -593,7 +591,7 @@ function convertEmptyStringsToNull(obj: Record<string, unknown> | undefined): Re
         return [key, null];
       }
       if (typeof value === 'object') {
-        return [key, convertEmptyStringsToNull(value as Record<string, unknown>)];
+        return [key, frameworkSanitizeEmptyStringsToNull(value as Record<string, unknown>)];
       }
 
       return [key, value];
