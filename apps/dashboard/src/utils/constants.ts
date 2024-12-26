@@ -28,11 +28,11 @@ export const STEP_TYPE_LABELS: Record<StepTypeEnum, string> = {
   [StepTypeEnum.CUSTOM]: 'Custom',
 };
 
-export const DEFAULT_CONTROL_DELAY_AMOUNT = 42;
+export const DEFAULT_CONTROL_DELAY_AMOUNT = 30;
 export const DEFAULT_CONTROL_DELAY_UNIT = TimeUnitEnum.SECONDS;
 export const DEFAULT_CONTROL_DELAY_TYPE = 'regular';
 
-export const DEFAULT_CONTROL_DIGEST_AMOUNT = 42;
+export const DEFAULT_CONTROL_DIGEST_AMOUNT = 30;
 export const DEFAULT_CONTROL_DIGEST_UNIT = TimeUnitEnum.SECONDS;
 export const DEFAULT_CONTROL_DIGEST_CRON = '';
 export const DEFAULT_CONTROL_DIGEST_DIGEST_KEY = '';
