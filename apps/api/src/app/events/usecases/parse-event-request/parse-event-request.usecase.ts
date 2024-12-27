@@ -28,7 +28,9 @@ import {
   ReservedVariablesMap,
   TriggerContextTypeEnum,
   TriggerEventStatusEnum,
+  TriggerSourceEnum,
   WorkflowOriginEnum,
+  WorkflowStatusEnum,
 } from '@novu/shared';
 import {
   EnvironmentEntity,
@@ -139,6 +141,20 @@ export class ParseEventRequest {
       const message = workflowOverride ? 'Workflow is not active by workflow override' : 'Workflow is not active';
       Logger.log(message, LOG_CONTEXT);
 
+      return {
+        acknowledged: true,
+        status: TriggerEventStatusEnum.NOT_ACTIVE,
+      };
+    }
+
+    if (template.status === WorkflowStatusEnum.INACTIVE && !this.isGracefulTriggerAllowed(command.payload.__source)) {
+      return {
+        acknowledged: true,
+        status: TriggerEventStatusEnum.NOT_ACTIVE,
+      };
+    }
+
+    if (template.status === WorkflowStatusEnum.ERROR && !this.isGracefulTriggerAllowed(command.payload.__source)) {
       return {
         acknowledged: true,
         status: TriggerEventStatusEnum.NOT_ACTIVE,
@@ -404,6 +420,10 @@ export class ParseEventRequest {
 
   private isBlockedEmail(email: string): boolean {
     return BLOCKED_DOMAINS.some((domain) => email.includes(domain));
+  }
+
+  private isGracefulTriggerAllowed(source?: string): boolean {
+    return source === TriggerSourceEnum.DASHBOARD;
   }
 }
 

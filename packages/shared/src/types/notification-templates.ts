@@ -13,6 +13,10 @@ export enum WorkflowCreationSourceEnum {
   DASHBOARD = 'dashboard',
 }
 
+export enum TriggerSourceEnum {
+  DASHBOARD = 'dashboard',
+}
+
 export type WorkflowIntegrationStatus = {
   hasActiveIntegrations: boolean;
   hasPrimaryIntegrations?: boolean;
