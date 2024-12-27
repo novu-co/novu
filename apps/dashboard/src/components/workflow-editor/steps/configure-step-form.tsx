@@ -1,6 +1,6 @@
 import {
   IEnvironment,
-  StepDataDto,
+  StepResponseDto,
   StepTypeEnum,
   StepUpdateDto,
   UpdateWorkflowDto,
@@ -75,7 +75,7 @@ const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, ((props: HTMLAttributes<HTMLDiv
 type ConfigureStepFormProps = {
   workflow: WorkflowResponseDto;
   environment: IEnvironment;
-  step: StepDataDto;
+  step: StepResponseDto;
   update: (data: UpdateWorkflowDto) => void;
 };
 
@@ -108,7 +108,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   };
 
   const registerInlineControlValues = useMemo(() => {
-    return (step: StepDataDto) => {
+    return (step: StepResponseDto) => {
       if (isInlineConfigurableStep) {
         return {
           controlValues: getStepDefaultValues(step),

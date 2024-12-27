@@ -7,6 +7,8 @@ const LIQUID_CONFIG = {
   greedy: false,
   catchAllErrors: true,
 } as const;
+const DOT_ANNOTATION_MARKDOWN_LINK =
+  '[dot notation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors#dot_notation)';
 
 export type Variable = {
   /**
@@ -162,7 +164,11 @@ function extractProps(template: any): { valid: boolean; props: string[]; error?:
    * Invalid: {{user.first name}} - postfix length would be 2 due to space
    */
   if (initial.postfix.length > 1) {
-    return { valid: false, props: [], error: 'Variables with spaces are not supported' };
+    return {
+      valid: false,
+      props: [],
+      error: `Invalid variable name containing whitespaces. Variables must follow the ${DOT_ANNOTATION_MARKDOWN_LINK}`,
+    };
   }
 
   const validProps: string[] = [];
@@ -184,7 +190,8 @@ function extractProps(template: any): { valid: boolean; props: string[]; error?:
     return {
       valid: false,
       props: [],
-      error: `Variables must include a namespace (e.g. payload.${validProps[0]})`,
+      // eslint-disable-next-line max-len
+      error: `Invalid variable name missing namespace. Variables must follow the ${DOT_ANNOTATION_MARKDOWN_LINK} (e.g. payload.${validProps[0]})`,
     };
   }
 

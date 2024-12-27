@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import {
-  type StepDataDto,
+  type StepResponseDto,
   StepTypeEnum,
   StepUpdateDto,
   UpdateWorkflowDto,
@@ -34,7 +34,7 @@ const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) =
 
 export type StepEditorProps = {
   workflow: WorkflowResponseDto;
-  step: StepDataDto;
+  step: StepResponseDto;
 };
 
 type ConfigureStepTemplateFormProps = StepEditorProps & {

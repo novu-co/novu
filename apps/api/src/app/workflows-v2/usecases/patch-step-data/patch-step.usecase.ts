@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
-import { StepDataDto, UserSessionData } from '@novu/shared';
+import { StepResponseDto, UserSessionData } from '@novu/shared';
 import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import {
   DeleteControlValuesCommand,
@@ -27,7 +27,7 @@ export class PatchStepUsecase {
     private deleteControlValuesUseCase: DeleteControlValuesUseCase
   ) {}
 
-  async execute(command: PatchStepCommand): Promise<StepDataDto> {
+  async execute(command: PatchStepCommand): Promise<StepResponseDto> {
     const persistedItems = await this.loadPersistedItems(command);
     await this.patchFieldsOnPersistedItems(command, persistedItems);
     await this.persistWorkflow(persistedItems.workflow, command.user);
