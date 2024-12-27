@@ -16,10 +16,9 @@ import {
   StepTypeEnum,
   WorkflowCreationSourceEnum,
 } from '@novu/shared';
+import { EmailControlType, InAppControlType } from '@novu/application-generic';
 import { buildCreateWorkflowDto } from './workflow.controller.e2e';
 import { forSnippet, fullCodeSnippet } from './maily-test-data';
-import { InAppControlType } from './shared/schemas/in-app-control.schema';
-import { EmailControlType } from './shared/schemas/email-control.schema';
 
 const SUBJECT_TEST_PAYLOAD = '{{payload.subject.test.payload}}';
 const PLACEHOLDER_SUBJECT_INAPP = '{{payload.subject}}';
@@ -116,7 +115,7 @@ describe('Generate Preview', () => {
         PLACEHOLDER_SUBJECT_INAPP_PAYLOAD_VALUE
       );
       if (previewResponseDto.result?.type !== 'in_app') {
-        throw new Error('should have a inapp redview ');
+        throw new Error('should have a in-app preview ');
       }
       expect(previewResponseDto.result.preview.subject).to.deep.equal(controlValues.subject);
     });

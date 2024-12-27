@@ -2814,6 +2814,12 @@ importers:
       shortid:
         specifier: ^2.2.16
         version: 2.2.16
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
+      zod-to-json-schema:
+        specifier: ^3.23.3
+        version: 3.23.3(zod@3.23.8)
     optionalDependencies:
       '@novu/ee-shared-services':
         specifier: workspace:*

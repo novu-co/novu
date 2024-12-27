@@ -90,9 +90,13 @@ export function ChangelogStack() {
     setChangelogs((prev) => prev.filter((log) => log.id !== changelog.id));
   };
 
+  if (!changelogs.length) {
+    return null;
+  }
+
   return (
-    <div className="absolute bottom-10 w-full">
-      <div className="m-full relative mb-4 h-[190px]">
+    <div className="mb-2 w-full">
+      <div className="m-full relative h-[175px]">
         {changelogs.map((changelog, index) => (
           <ChangelogCard
             key={changelog.id}

@@ -60,7 +60,7 @@ export function ActivityFilters({ onFiltersChange, initialValues, onReset }: Act
     );
   }, [watchedValues]);
 
-  const { data: workflowTemplates } = useFetchWorkflows({});
+  const { data: workflowTemplates } = useFetchWorkflows({ limit: 100 });
 
   useEffect(() => {
     const subscription = form.watch((value) => {

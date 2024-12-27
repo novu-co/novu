@@ -11,7 +11,6 @@ import {
 } from '@novu/dal';
 import {
   ContentIssue,
-  CreateWorkflowDto,
   JSONSchemaDto,
   DEFAULT_WORKFLOW_PREFERENCES,
   slugify,
@@ -19,7 +18,6 @@ import {
   StepCreateDto,
   StepIssuesDto,
   StepUpdateDto,
-  UpdateWorkflowDto,
   UserSessionData,
   StepTypeEnum,
   WorkflowCreationSourceEnum,
@@ -49,6 +47,8 @@ import {
   UpsertControlValuesUseCase,
   DeleteControlValuesUseCase,
   TierRestrictionsValidateCommand,
+  dashboardSanitizeControlValues,
+  PinoLogger,
 } from '@novu/application-generic';
 
 import { UpsertWorkflowCommand, UpsertWorkflowDataCommand } from './upsert-workflow.command';
@@ -69,7 +69,8 @@ export class UpsertWorkflowUseCase {
     private controlValuesRepository: ControlValuesRepository,
     private upsertControlValuesUseCase: UpsertControlValuesUseCase,
     private deleteControlValuesUseCase: DeleteControlValuesUseCase,
-    private tierRestrictionsValidateUsecase: TierRestrictionsValidateUsecase
+    private tierRestrictionsValidateUsecase: TierRestrictionsValidateUsecase,
+    private logger: PinoLogger
   ) {}
 
   @InstrumentUsecase()
@@ -111,28 +112,26 @@ export class UpsertWorkflowUseCase {
     if (existingWorkflow && isWorkflowUpdateDto(command.workflowDto, command.workflowIdOrInternalId)) {
       return await this.updateWorkflowGenericUsecase.execute(
         UpdateWorkflowCommand.create(
-          await this.convertCreateToUpdateCommand(command.workflowDto, command.user, existingWorkflow)
+          await this.buildUpdateWorkflowCommand(command.workflowDto, command.user, existingWorkflow)
         )
       );
     }
 
     return await this.createWorkflowGenericUsecase.execute(
-      CreateWorkflowCommand.create(await this.buildCreateWorkflowGenericCommand(command))
+      CreateWorkflowCommand.create(await this.buildCreateWorkflowCommand(command))
     );
   }
 
   @Instrument()
-  private async buildCreateWorkflowGenericCommand(command: UpsertWorkflowCommand): Promise<CreateWorkflowCommand> {
-    const { user } = command;
-    // It's safe to assume we're dealing with CreateWorkflowDto on the creation path
-    const workflowDto = command.workflowDto as CreateWorkflowDto;
+  private async buildCreateWorkflowCommand(command: UpsertWorkflowCommand): Promise<CreateWorkflowCommand> {
+    const { user, workflowDto } = command;
     const isWorkflowActive = workflowDto?.active ?? true;
     const notificationGroupId = await this.getNotificationGroup(command.user.environmentId);
 
     if (!notificationGroupId) {
       throw new BadRequestException('Notification group not found');
     }
-    const steps = await this.mapSteps(command.user, workflowDto.steps);
+    const steps = await this.mapSteps(workflowDto.origin, command.user, workflowDto.steps);
 
     return {
       notificationGroupId,
@@ -171,12 +170,12 @@ export class UpsertWorkflowUseCase {
     return issue?.controls && Object.keys(issue.controls).length > 0;
   }
 
-  private async convertCreateToUpdateCommand(
-    workflowDto: UpdateWorkflowDto,
+  private async buildUpdateWorkflowCommand(
+    workflowDto: UpsertWorkflowDataCommand,
     user: UserSessionData,
     existingWorkflow: NotificationTemplateEntity
   ): Promise<UpdateWorkflowCommand> {
-    const steps = await this.mapSteps(user, workflowDto.steps, existingWorkflow);
+    const steps = await this.mapSteps(workflowDto.origin, user, workflowDto.steps, existingWorkflow);
 
     return {
       id: existingWorkflow._id,
@@ -185,7 +184,7 @@ export class UpsertWorkflowUseCase {
       userId: user._id,
       name: workflowDto.name,
       steps,
-      rawData: workflowDto,
+      rawData: workflowDto as unknown as Record<string, unknown>,
       type: WorkflowTypeEnum.BRIDGE,
       description: workflowDto.description,
       userPreferences: workflowDto.preferences?.user ?? null,
@@ -196,6 +195,7 @@ export class UpsertWorkflowUseCase {
     };
   }
   private async mapSteps(
+    workflowOrigin: WorkflowOriginEnum,
     user: UserSessionData,
     commandWorkflowSteps: Array<StepCreateDto | StepUpdateDto>,
     persistedWorkflow?: NotificationTemplateEntity | undefined
@@ -203,7 +203,7 @@ export class UpsertWorkflowUseCase {
     const steps: NotificationStep[] = [];
 
     for (const step of commandWorkflowSteps) {
-      const mappedStep = await this.mapSingleStep(user, persistedWorkflow, step);
+      const mappedStep = await this.mapSingleStep(workflowOrigin, user, persistedWorkflow, step);
       const baseStepId = mappedStep.stepId;
 
       if (baseStepId) {
@@ -241,6 +241,7 @@ export class UpsertWorkflowUseCase {
   }
 
   private async mapSingleStep(
+    workflowOrigin: WorkflowOriginEnum,
     user: UserSessionData,
     persistedWorkflow: NotificationTemplateEntity | undefined,
     step: StepUpdateDto | StepCreateDto
@@ -248,6 +249,7 @@ export class UpsertWorkflowUseCase {
     const foundPersistedStep = this.getPersistedStepIfFound(persistedWorkflow, step);
     const controlSchemas: ControlSchemas = foundPersistedStep?.template?.controls || stepTypeToControlSchema[step.type];
     const issues: StepIssuesDto = await this.buildIssues(
+      workflowOrigin,
       user,
       foundPersistedStep,
       persistedWorkflow,
@@ -280,6 +282,7 @@ export class UpsertWorkflowUseCase {
   }
 
   private async buildIssues(
+    workflowOrigin: WorkflowOriginEnum,
     user: UserSessionData,
     foundPersistedStep: NotificationStepEntity | undefined,
     persistedWorkflow: NotificationTemplateEntity | undefined,
@@ -311,9 +314,14 @@ export class UpsertWorkflowUseCase {
       )?.controls;
     }
 
-    const controlIssues = processControlValuesBySchema(controlSchemas?.schema, controlValueLocal || {});
+    const sanitizedControlValues =
+      controlValueLocal && workflowOrigin === WorkflowOriginEnum.NOVU_CLOUD
+        ? dashboardSanitizeControlValues(this.logger, controlValueLocal, step.type) || {}
+        : frameworkSanitizeEmptyStringsToNull(controlValueLocal) || {};
+
+    const controlIssues = processControlValuesBySchema(controlSchemas?.schema, sanitizedControlValues || {});
     const liquidTemplateIssues = processControlValuesByLiquid(variableSchema, controlValueLocal || {});
-    const customIssues = await this.processCustomControlValues(user, step.type, controlValueLocal || {});
+    const customIssues = await this.processControlValuesByRules(user, step.type, sanitizedControlValues || {});
     const customControlIssues = _.isEmpty(customIssues) ? {} : { controls: customIssues };
 
     return _.merge(controlIssues, liquidTemplateIssues, customControlIssues);
@@ -419,18 +427,16 @@ export class UpsertWorkflowUseCase {
     })?.controlValues;
   }
 
-  private async processCustomControlValues(
+  private async processControlValuesByRules(
     user: UserSessionData,
     stepType: StepTypeEnum,
     controlValues: Record<string, unknown> | null
   ): Promise<StepIssuesDto> {
-    const cleanedControlValues = controlValues ? cleanObject(controlValues) : {};
-
     const restrictionsErrors = await this.tierRestrictionsValidateUsecase.execute(
       TierRestrictionsValidateCommand.create({
-        amount: cleanedControlValues.amount as string | undefined,
-        unit: cleanedControlValues.unit as string | undefined,
-        cron: cleanedControlValues.cron as string | undefined,
+        amount: controlValues?.amount as number | undefined,
+        unit: controlValues?.unit as string | undefined,
+        cron: controlValues?.cron as string | undefined,
         organizationId: user.organizationId,
         stepType,
       })
@@ -454,7 +460,7 @@ export class UpsertWorkflowUseCase {
   }
 }
 
-function isWorkflowUpdateDto(workflowDto: UpsertWorkflowDataCommand, id?: string): workflowDto is UpdateWorkflowDto {
+function isWorkflowUpdateDto(workflowDto: UpsertWorkflowDataCommand, id?: string) {
   return !!id;
 }
 
@@ -468,19 +474,36 @@ function processControlValuesByLiquid(
 ): StepIssuesDto {
   const issues: StepIssuesDto = {};
 
-  for (const [controlKey, controlValue] of Object.entries(controlValues || {})) {
-    const liquidTemplateIssues = buildVariables(variableSchema, controlValue);
+  function processNestedControlValues(currentValue: unknown, currentPath: string[] = []) {
+    if (!currentValue || typeof currentValue !== 'object') {
+      const liquidTemplateIssues = buildVariables(variableSchema, currentValue);
 
-    if (liquidTemplateIssues.invalidVariables.length > 0) {
-      issues.controls = issues.controls || {};
+      if (liquidTemplateIssues.invalidVariables.length > 0) {
+        const controlKey = currentPath.join('.');
+        issues.controls = issues.controls || {};
 
-      issues.controls[controlKey] = liquidTemplateIssues.invalidVariables.map((error) => ({
-        message: `${error.message}, variable: ${error.output}`,
-        issueType: StepContentIssueEnum.ILLEGAL_VARIABLE_IN_CONTROL_VALUE,
-        variableName: error.output,
-      }));
+        issues.controls[controlKey] = liquidTemplateIssues.invalidVariables.map((error) => {
+          const message = error.message
+            ? error.message[0].toUpperCase() + error.message.slice(1).split(' line:')[0]
+            : '';
+
+          return {
+            message: `${message} variable: ${error.output}`,
+            issueType: StepContentIssueEnum.ILLEGAL_VARIABLE_IN_CONTROL_VALUE,
+            variableName: error.output,
+          };
+        });
+      }
+
+      return;
+    }
+
+    for (const [key, value] of Object.entries(currentValue)) {
+      processNestedControlValues(value, [...currentPath, key]);
     }
   }
+
+  processNestedControlValues(controlValues);
 
   return issues;
 }
@@ -491,19 +514,17 @@ function processControlValuesBySchema(
 ): StepIssuesDto {
   let issues: StepIssuesDto = {};
 
-  const cleanedControlValues = controlValues ? cleanObject(controlValues) : {};
-
-  if (!controlSchema || !cleanedControlValues) {
+  if (!controlSchema || !controlValues) {
     return issues;
   }
 
   const ajv = new Ajv({ allErrors: true });
   addFormats(ajv);
   const validate = ajv.compile(controlSchema);
-  const isValid = validate(cleanedControlValues);
+  const isValid = validate(controlValues);
   const errors = validate.errors as null | ErrorObject[];
 
-  if (!isValid && errors && errors?.length !== 0 && cleanedControlValues) {
+  if (!isValid && errors && errors?.length !== 0 && controlValues) {
     issues = {
       controls: errors.reduce(
         (acc, error) => {
@@ -511,9 +532,8 @@ function processControlValuesBySchema(
           if (!acc[path]) {
             acc[path] = [];
           }
-
           acc[path].push({
-            message: error.message || 'Invalid value',
+            message: mapAjvErrorToMessage(error),
             issueType: mapAjvErrorToIssueType(error),
             variableName: path,
           });
@@ -537,19 +557,34 @@ function processControlValuesBySchema(
  * Example: "/foo/bar" becomes "foo.bar"
  */
 function getErrorPath(error: ErrorObject): string {
-  return (error.instancePath.substring(1) || error.params.missingProperty)?.replace(/\//g, '.');
+  const path = error.instancePath.substring(1);
+  const { missingProperty } = error.params;
+
+  if (!path || path.trim().length === 0) {
+    return missingProperty;
+  }
+
+  const fullPath = missingProperty ? `${path}/${missingProperty}` : path;
+
+  return fullPath?.replace(/\//g, '.');
 }
 
-function cleanObject(
-  obj: Record<string, any>,
-  valuesToClean: Array<string | null | undefined> = ['', null, undefined]
-) {
-  if (typeof obj !== 'object' || obj === null) return obj;
+function frameworkSanitizeEmptyStringsToNull(
+  obj: Record<string, unknown> | undefined | null
+): Record<string, unknown> | undefined | null {
+  if (typeof obj !== 'object' || obj === null || obj === undefined) return obj;
 
   return Object.fromEntries(
-    Object.entries(obj)
-      .filter(([unused, value]) => !valuesToClean.includes(value as string | null | undefined))
-      .map(([key, value]) => [key, cleanObject(value, valuesToClean)])
+    Object.entries(obj).map(([key, value]) => {
+      if (typeof value === 'string' && value.trim() === '') {
+        return [key, null];
+      }
+      if (typeof value === 'object') {
+        return [key, frameworkSanitizeEmptyStringsToNull(value as Record<string, unknown>)];
+      }
+
+      return [key, value];
+    })
   );
 }
 
@@ -562,4 +597,20 @@ function mapAjvErrorToIssueType(error: ErrorObject): StepContentIssueEnum {
     default:
       return StepContentIssueEnum.MISSING_VALUE;
   }
+}
+
+function mapAjvErrorToMessage(error: ErrorObject<string, Record<string, unknown>, unknown>): string {
+  if (error.keyword === 'required') {
+    return `${_.capitalize(error.params.missingProperty)} is required`;
+  }
+  if (
+    error.keyword === 'pattern' &&
+    error.message?.includes('must match pattern') &&
+    error.message?.includes('mailto') &&
+    error.message?.includes('https')
+  ) {
+    return 'Invalid URL format. Must be a valid absolute URL, path, or valid variable';
+  }
+
+  return error.message || 'Invalid value';
 }

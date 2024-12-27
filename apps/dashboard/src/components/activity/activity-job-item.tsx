@@ -1,4 +1,4 @@
-import { Route, ChevronDown } from 'lucide-react';
+import { Route, ChevronDown, Info } from 'lucide-react';
 import { IActivityJob, IDelayRegularMetadata, IDigestRegularMetadata, JobStatusEnum, StepTypeEnum } from '@novu/shared';
 import { Button } from '@/components/primitives/button';
 import { Badge } from '@/components/primitives/badge';
@@ -11,6 +11,8 @@ import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { STEP_TYPE_TO_COLOR } from '../../utils/color';
 import { JOB_STATUS_CONFIG } from './constants';
 import { TimeDisplayHoverCard } from '../time-display-hover-card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
+import { formatJSONString } from '../../utils/string';
 
 interface ActivityJobItemProps {
   job: IActivityJob;
@@ -86,13 +88,29 @@ function formatJobType(type?: StepTypeEnum): string {
   return type?.replace(/_/g, ' ') || '';
 }
 
-function getStatusMessage(job: IActivityJob): string {
+function getStatusMessage(job: IActivityJob): string | React.ReactNode {
   if (job.status === JobStatusEnum.MERGED) {
     return 'Step merged with another execution';
   }
 
+  if (job.status === JobStatusEnum.PENDING) {
+    return 'Job is pending';
+  }
+
   if (job.status === JobStatusEnum.FAILED && job.executionDetails?.length > 0) {
-    return job.executionDetails[job.executionDetails.length - 1].detail || 'Step execution failed';
+    const lastExecutionDetail = job.executionDetails[job.executionDetails.length - 1];
+
+    return lastExecutionDetail ? (
+      <div className="flex items-center gap-2">
+        {lastExecutionDetail.raw ? (
+          <ErrorTooltip message={lastExecutionDetail.detail} raw={lastExecutionDetail.raw} />
+        ) : (
+          <span className="text-destructive">{lastExecutionDetail.detail}</span>
+        )}
+      </div>
+    ) : (
+      'Step execution failed'
+    );
   }
 
   switch (job.type?.toLowerCase()) {
@@ -107,8 +125,8 @@ function getStatusMessage(job: IActivityJob): string {
           (job.digest as IDigestRegularMetadata)?.unit ?? ''
         }`;
       }
-      return 'Digest failed';
 
+      return '';
     case StepTypeEnum.DELAY:
       if (job.status === JobStatusEnum.COMPLETED) {
         return 'Delay completed';
@@ -123,18 +141,33 @@ function getStatusMessage(job: IActivityJob): string {
         );
       }
 
-      return 'Delay failed';
+      return '';
 
     default:
       if (job.status === JobStatusEnum.COMPLETED) {
         return 'Message sent successfully';
       }
-      if (job.status === JobStatusEnum.PENDING) {
-        return 'Sending message';
-      }
 
       return '';
   }
+}
+
+function ErrorTooltip({ message, raw }: { message: string; raw: any }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button type="button" className="flex items-center gap-1 text-left hover:cursor-default">
+          <span className="text-destructive">{message}</span>
+          <Info className="text-destructive h-3 w-3 shrink-0" />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="right" className="max-w-[400px] border border-neutral-200 bg-white p-3 shadow-lg">
+        <pre className="text-foreground-700 max-h-[300px] w-full overflow-auto rounded bg-neutral-50 p-2 font-mono text-xs">
+          {formatJSONString(raw)}
+        </pre>
+      </TooltipContent>
+    </Tooltip>
+  );
 }
 
 function getJobIcon(type?: StepTypeEnum) {

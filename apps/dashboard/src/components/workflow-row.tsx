@@ -243,7 +243,15 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
                 tooltipContent={tooltipContent}
                 onSync={safeSync}
               />
-              <Link to={LEGACY_ROUTES.ACTIVITY_FEED} reloadDocument>
+              <Link
+                to={
+                  buildRoute(ROUTES.ACTIVITY_FEED, {
+                    environmentSlug: currentEnvironment?.slug ?? '',
+                  }) +
+                  '?' +
+                  new URLSearchParams({ workflows: workflow._id }).toString()
+                }
+              >
                 <DropdownMenuItem className="cursor-pointer">
                   <RiPulseFill />
                   View activity
