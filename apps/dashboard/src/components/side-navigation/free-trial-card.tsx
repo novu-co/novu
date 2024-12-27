@@ -3,10 +3,9 @@ import { RiArrowRightDoubleLine, RiInformationFill } from 'react-icons/ri';
 import { Progress } from '../primitives/progress';
 import { Button } from '../primitives/button';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipArrow } from '../primitives/tooltip';
-import { LEGACY_ROUTES, ROUTES } from '@/utils/routes';
+import { ROUTES } from '@/utils/routes';
 import { Link } from 'react-router-dom';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
-import { FeatureFlagsKeysEnum, GetSubscriptionDto } from '@novu/shared';
+import { GetSubscriptionDto } from '@novu/shared';
 
 const transition = 'transition-all duration-300 ease-out';
 

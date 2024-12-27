@@ -1,5 +1,4 @@
 import {
-  FeatureFlagsKeysEnum,
   IEnvironment,
   StepDataDto,
   StepTypeEnum,
@@ -37,7 +36,6 @@ import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { ConfigureSmsStepPreview } from '@/components/workflow-editor/steps/sms/configure-sms-step-preview';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import {
   AUTOCOMPLETE_PASSWORD_MANAGERS_OFF,

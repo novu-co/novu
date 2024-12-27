@@ -3,11 +3,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitive
 import { OrganizationProfile, UserProfile } from '@clerk/clerk-react';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LEGACY_ROUTES, ROUTES } from '@/utils/routes';
+import { ROUTES } from '@/utils/routes';
 import { Appearance } from '@clerk/types';
 import { motion } from 'motion/react';
-import { FeatureFlagsKeysEnum } from '@novu/shared';
-import { useFeatureFlag } from '../hooks/use-feature-flag';
 import { Plan } from '../components/billing/plan';
 
 const FADE_ANIMATION = {
@@ -90,11 +88,9 @@ export function SettingsPage() {
             Team
           </TabsTrigger>
 
-          {isV2BillingEnabled && (
-            <TabsTrigger variant={'regular'} value="billing">
-              Billing
-            </TabsTrigger>
-          )}
+          <TabsTrigger variant={'regular'} value="billing">
+            Billing
+          </TabsTrigger>
         </TabsList>
 
         <div className={`mx-auto mt-1 px-1.5 ${currentTab === 'billing' ? 'max-w-[1100px]' : 'max-w-[700px]'}`}>
@@ -137,15 +133,13 @@ export function SettingsPage() {
             </motion.div>
           </TabsContent>
 
-          {isV2BillingEnabled && (
-            <TabsContent value="billing" className="rounded-lg">
-              <motion.div {...FADE_ANIMATION}>
-                <Card className="border-none shadow-none">
-                  <Plan />
-                </Card>
-              </motion.div>
-            </TabsContent>
-          )}
+          <TabsContent value="billing" className="rounded-lg">
+            <motion.div {...FADE_ANIMATION}>
+              <Card className="border-none shadow-none">
+                <Plan />
+              </Card>
+            </motion.div>
+          </TabsContent>
         </div>
       </Tabs>
     </DashboardLayout>
