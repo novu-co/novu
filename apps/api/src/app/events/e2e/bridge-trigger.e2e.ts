@@ -18,6 +18,7 @@ import {
   MessagesStatusEnum,
   StepTypeEnum,
   WorkflowCreationSourceEnum,
+  WorkflowOriginEnum,
   WorkflowResponseDto,
 } from '@novu/shared';
 import { workflow } from '@novu/framework';
@@ -626,7 +627,7 @@ contexts.forEach((context: Context) => {
       const expectedSubjects = ['prefix Hello default_name', 'prefix Hello payload_name'];
 
       expectedSubjects.forEach((expectedSubject) => {
-        const found = sentMessage.some((message) => message.subject.includes(expectedSubject));
+        const found = sentMessage.some((message) => message.subject?.includes(expectedSubject));
         expect(found).to.be.true;
       });
     });

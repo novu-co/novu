@@ -32,7 +32,7 @@
   <br />
   or
   <br />
-  <a href="https://dashboard.novu.co?utm_campaign=github-readme" rel="dofollow"><strong>create a free account »</strong></a>
+  <a href="https://dashboard-v2.novu.co?utm_campaign=github-readme" rel="dofollow"><strong>create a free account »</strong></a>
   <br />
 
 <br/>
@@ -76,7 +76,7 @@ There are two ways to get started:
 npx novu@latest dev
 ```
 
-2. [Create a free cloud account](https://dashboard.novu.co?utm_campaign=github-readme)
+2. [Create a free cloud account](https://dashboard-v2.novu.co?utm_campaign=github-readme)
 
 ## 📚 Table of contents
 

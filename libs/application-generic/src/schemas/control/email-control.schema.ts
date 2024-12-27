@@ -1,12 +1,16 @@
-import { JSONSchemaDto, UiComponentEnum, UiSchema, UiSchemaGroupEnum } from '@novu/shared';
+import {
+  JSONSchemaDto,
+  UiComponentEnum,
+  UiSchema,
+  UiSchemaGroupEnum,
+} from '@novu/shared';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
-import { TipTapSchema } from '../../../environments-v1/usecases/output-renderers';
-import { skipStepUiSchema } from './skip-control.schema';
+import { defaultOptions, skipStepUiSchema, skipZodSchema } from './shared';
 
 export const emailControlZodSchema = z
   .object({
-    skip: z.object({}).catchall(z.unknown()).optional(),
+    skip: skipZodSchema,
     /*
      * todo: we need to validate the email editor (body) by type and not string,
      * updating it to TipTapSchema will break the existing upsert issues generation
@@ -18,7 +22,10 @@ export const emailControlZodSchema = z
 
 export type EmailControlType = z.infer<typeof emailControlZodSchema>;
 
-export const emailControlSchema = zodToJsonSchema(emailControlZodSchema) as JSONSchemaDto;
+export const emailControlSchema = zodToJsonSchema(
+  emailControlZodSchema,
+  defaultOptions,
+) as JSONSchemaDto;
 export const emailUiSchema: UiSchema = {
   group: UiSchemaGroupEnum.EMAIL,
   properties: {

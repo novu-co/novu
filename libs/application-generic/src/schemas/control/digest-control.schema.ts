@@ -8,51 +8,69 @@ import {
   UiSchema,
   UiSchemaGroupEnum,
 } from '@novu/shared';
-import { skipStepUiSchema } from './skip-control.schema';
+import { defaultOptions, skipStepUiSchema, skipZodSchema } from './shared';
+
+const lookBackWindowZodSchema = z
+  .object({
+    amount: z.number().min(1),
+    unit: z.nativeEnum(TimeUnitEnum),
+  })
+  .strict();
 
 const digestRegularControlZodSchema = z
   .object({
-    skip: z.object({}).catchall(z.unknown()).optional(),
-    amount: z.union([z.number().min(1), z.string().min(1)]),
+    skip: skipZodSchema,
+    amount: z.number().min(1),
     unit: z.nativeEnum(TimeUnitEnum),
     digestKey: z.string().optional(),
-    lookBackWindow: z
-      .object({
-        amount: z.number().min(1),
-        unit: z.nativeEnum(TimeUnitEnum),
-      })
-      .strict()
-      .optional(),
+    lookBackWindow: lookBackWindowZodSchema.optional(),
   })
   .strict();
 const digestTimedControlZodSchema = z
   .object({
-    skip: z.object({}).catchall(z.unknown()).optional(),
+    skip: skipZodSchema,
     cron: z.string().min(1),
     digestKey: z.string().optional(),
   })
   .strict();
 
-export type DigestRegularControlType = z.infer<typeof digestRegularControlZodSchema>;
-export type DigestTimedControlType = z.infer<typeof digestTimedControlZodSchema>;
+export type LookBackWindowType = z.infer<typeof lookBackWindowZodSchema>;
+export type DigestRegularControlType = z.infer<
+  typeof digestRegularControlZodSchema
+>;
+export type DigestTimedControlType = z.infer<
+  typeof digestTimedControlZodSchema
+>;
 export type DigestControlSchemaType = z.infer<typeof digestControlZodSchema>;
 
-export const digestControlZodSchema = z.union([digestRegularControlZodSchema, digestTimedControlZodSchema]);
-export const digestControlSchema = zodToJsonSchema(digestControlZodSchema) as JSONSchemaDto;
+export const digestControlZodSchema = z.union([
+  digestRegularControlZodSchema,
+  digestTimedControlZodSchema,
+]);
+export const digestControlSchema = zodToJsonSchema(
+  digestControlZodSchema,
+  defaultOptions,
+) as JSONSchemaDto;
 
-export function isDigestRegularControl(data: unknown): data is DigestRegularControlType {
+export function isDigestRegularControl(
+  data: unknown,
+): data is DigestRegularControlType {
   const result = digestRegularControlZodSchema.safeParse(data);
 
   return result.success;
 }
 
-export function isDigestTimedControl(data: unknown): data is DigestTimedControlType {
+export function isDigestTimedControl(
+  data: unknown,
+): data is DigestTimedControlType {
   const result = digestTimedControlZodSchema.safeParse(data);
 
   return result.success;
 }
 
-export function isDigestControl(data: unknown): data is DigestControlSchemaType {
+export function isDigestControl(
+  data: unknown,
+): data is DigestControlSchemaType {
   const result = digestControlZodSchema.safeParse(data);
 
   return result.success;

@@ -1,14 +1,10 @@
 import { render as mailyRender } from '@maily-to/render';
-import isEmpty from 'lodash/isEmpty';
 import { Injectable } from '@nestjs/common';
 import { Liquid } from 'liquidjs';
-
 import { EmailRenderOutput, TipTapNode } from '@novu/shared';
 import { Instrument, InstrumentUsecase } from '@novu/application-generic';
-
 import { FullPayloadForRender, RenderCommand } from './render-command';
 import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.usecase';
-import { emailControlZodSchema } from '../../../workflows-v2/shared/schemas/email-control.schema';
 
 export class RenderEmailOutputCommand extends RenderCommand {}
 
@@ -19,17 +15,30 @@ export class RenderEmailOutputUsecase {
 
   @InstrumentUsecase()
   async execute(renderCommand: RenderEmailOutputCommand): Promise<EmailRenderOutput> {
-    const { body, subject } = emailControlZodSchema.parse(renderCommand.controlValues);
+    const { body, subject } = renderCommand.controlValues;
 
-    if (isEmpty(body)) {
-      return { subject, body: '' };
+    if (!body || typeof body !== 'string') {
+      /**
+       * Force type mapping in case undefined control.
+       * This passes responsibility to framework to throw type validation exceptions
+       * rather than handling invalid types here.
+       */
+      return {
+        subject: subject as string,
+        body: body as string,
+      };
     }
 
     const expandedMailyContent = this.transformMailyDynamicBlocks(body, renderCommand.fullPayloadForRender);
     const parsedTipTap = await this.parseTipTapNodeByLiquid(expandedMailyContent, renderCommand);
     const renderedHtml = await this.renderEmail(parsedTipTap);
 
-    return { subject, body: renderedHtml };
+    /**
+     * Force type mapping in case undefined control.
+     * This passes responsibility to framework to throw type validation exceptions
+     * rather than handling invalid types here.
+     */
+    return { subject: subject as string, body: renderedHtml };
   }
 
   private async parseTipTapNodeByLiquid(

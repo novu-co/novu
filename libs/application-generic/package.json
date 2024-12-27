@@ -96,7 +96,9 @@
     "rxjs": "7.8.1",
     "sanitize-html": "^2.4.0",
     "shortid": "^2.2.16",
-    "@maily-to/render": "^0.0.17"
+    "@maily-to/render": "^0.0.17",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.23.3"
   },
   "optionalDependencies": {
     "@novu/ee-shared-services": "workspace:*",

@@ -162,7 +162,7 @@ function extractProps(template: any): { valid: boolean; props: string[]; error?:
    * Invalid: {{user.first name}} - postfix length would be 2 due to space
    */
   if (initial.postfix.length > 1) {
-    return { valid: false, props: [], error: 'Novu does not support variables with spaces' };
+    return { valid: false, props: [], error: 'Variables with spaces are not supported' };
   }
 
   const validProps: string[] = [];
@@ -181,7 +181,11 @@ function extractProps(template: any): { valid: boolean; props: string[]; error?:
    * Invalid: {{firstName}} - No namespace
    */
   if (validProps.length === 1) {
-    return { valid: false, props: [], error: 'Novu variables must include a namespace (e.g. user.firstName)' };
+    return {
+      valid: false,
+      props: [],
+      error: `Variables must include a namespace (e.g. payload.${validProps[0]})`,
+    };
   }
 
   return { valid: true, props: validProps };

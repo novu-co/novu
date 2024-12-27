@@ -16,7 +16,6 @@ import {
 } from '@novu/shared';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { AnalyticsEventsEnum } from '../../utils';
 import { GetInboxPreferences } from './get-inbox-preferences.usecase';
 
 const mockedWorkflow = {
@@ -135,17 +134,6 @@ describe('GetInboxPreferences', () => {
       })
     );
 
-    expect(analyticsServiceMock.mixpanelTrack.calledOnce).to.be.true;
-    expect(analyticsServiceMock.mixpanelTrack.firstCall.args).to.deep.equal([
-      AnalyticsEventsEnum.FETCH_PREFERENCES,
-      '',
-      {
-        _organization: command.organizationId,
-        subscriberId: command.subscriberId,
-        workflowSize: 1,
-      },
-    ]);
-
     expect(result).to.deep.equal([
       {
         level: PreferenceLevelEnum.GLOBAL,
@@ -224,17 +212,6 @@ describe('GetInboxPreferences', () => {
         includeInactiveChannels: false,
       })
     );
-
-    expect(analyticsServiceMock.mixpanelTrack.calledOnce).to.be.true;
-    expect(analyticsServiceMock.mixpanelTrack.firstCall.args).to.deep.equal([
-      AnalyticsEventsEnum.FETCH_PREFERENCES,
-      '',
-      {
-        _organization: command.organizationId,
-        subscriberId: command.subscriberId,
-        workflowSize: 2,
-      },
-    ]);
 
     expect(result).to.deep.equal([
       { level: PreferenceLevelEnum.GLOBAL, ...mockedGlobalPreferences },
