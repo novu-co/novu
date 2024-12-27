@@ -10,12 +10,11 @@ import got, {
   CacheError,
   HTTPError,
   MaxRedirectsError,
-  OptionsOfTextResponseBody,
+  OptionsOfJSONResponseBody,
   ParseError,
   ReadError,
   RequestError,
   TimeoutError,
-  UnsupportedProtocolError,
   UploadError,
 } from 'got';
 import { createHmac } from 'node:crypto';
@@ -140,8 +139,10 @@ export class ExecuteBridgeRequest {
     });
 
     const url = bridgeActionUrl.toString();
-    const options: OptionsOfTextResponseBody = {
-      timeout: DEFAULT_TIMEOUT,
+    const options: OptionsOfJSONResponseBody = {
+      timeout: {
+        request: DEFAULT_TIMEOUT
+      },
       json: command.event,
       retry: {
         calculateDelay: ({ attemptCount, computedValue }) => {
@@ -181,12 +182,15 @@ export class ExecuteBridgeRequest {
 
     const headers = await this.buildRequestHeaders(command);
 
-    Logger.log(`Making bridge request to \`${url}\``, LOG_CONTEXT);
     try {
-      return await request(url, {
+      const res = await request(url, {
         ...options,
         headers,
-      }).json();
+      });
+
+      Logger.log(`Bridge request to \`${url}\``, {timings: res.timings},  LOG_CONTEXT);
+
+      return res.body as ExecuteBridgeRequestDto<T>;
     } catch (error) {
       await this.handleResponseError(error, bridgeUrl, command.processError);
     }
@@ -322,22 +326,21 @@ export class ExecuteBridgeRequest {
           statusCode: error.response.statusCode,
         };
       } else if (error instanceof TimeoutError) {
-        Logger.error(`Bridge request timeout for \`${url}\``, LOG_CONTEXT);
+        error.response?.timings;
+        Logger.error(
+          `Bridge request timeout for \`${url}\``, 
+          error.response.timings, 
+          LOG_CONTEXT
+        );
         bridgeErrorData = {
           code: BRIDGE_EXECUTION_ERROR.BRIDGE_REQUEST_TIMEOUT.code,
           message: BRIDGE_EXECUTION_ERROR.BRIDGE_REQUEST_TIMEOUT.message(url),
           statusCode: HttpStatus.REQUEST_TIMEOUT,
         };
-      } else if (error instanceof UnsupportedProtocolError) {
-        Logger.error(`Unsupported protocol for \`${url}\``, LOG_CONTEXT);
-        bridgeErrorData = {
-          code: BRIDGE_EXECUTION_ERROR.UNSUPPORTED_PROTOCOL.code,
-          message: BRIDGE_EXECUTION_ERROR.UNSUPPORTED_PROTOCOL.message(url),
-          statusCode: HttpStatus.BAD_REQUEST,
-        };
       } else if (error instanceof ReadError) {
         Logger.error(
           `Response body could not be read for \`${url}\``,
+          error.response.timings,
           LOG_CONTEXT,
         );
         bridgeErrorData = {

@@ -14,10 +14,7 @@
     "build": "run-p build:*",
     "build:main": "tsc -p tsconfig.json",
     "build:copy-template": "cpx \"src/**/*.handlebars\" build/main",
-    "fix": "run-s fix:*",
-    "fix:prettier": "prettier \"src/**/*.ts\" --write",
-    "lint:fix": "eslint src --fix",
-    "lint": "eslint src",
+
     "watch:build": "tsc -p tsconfig.json -w",
     "watch:test": "jest src --watch",
     "reset-hard": "git clean -dfx && git reset --hard && pnpm install"
@@ -75,7 +72,7 @@
     "class-transformer": "0.5.1",
     "class-validator": "0.14.1",
     "date-fns": "^2.29.2",
-    "got": "^11.8.6",
+    "got": "^14.4.5",
     "handlebars": "^4.7.7",
     "i18next": "^23.7.6",
     "ioredis": "^5.2.4",
@@ -106,7 +103,6 @@
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
-    "@types/got": "^9.6.12",
     "@types/jest": "29.5.2",
     "@types/newrelic": "^9.14.6",
     "@types/sanitize-html": "^2.11.0",
