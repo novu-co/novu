@@ -51,7 +51,7 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
                 {getJobIcon(job.type)}
               </div>
             </div>
-            <span className="text-foreground-950 text-xs capitalize">{formatJobType(job.type)}</span>
+            <span className="text-foreground-950 text-xs capitalize">{job?.step?.name || formatJobType(job.type)}</span>
           </div>
 
           <Button
