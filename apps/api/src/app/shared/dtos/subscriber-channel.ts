@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ChatProviderIdEnum, PushProviderIdEnum } from '@novu/shared';
 
 export class ChannelCredentials {
-  @ApiProperty({
+  @ApiPropertyOptional({
     description:
       'Webhook url used by chat app integrations. The webhook should be obtained from the chat app provider.',
   })
