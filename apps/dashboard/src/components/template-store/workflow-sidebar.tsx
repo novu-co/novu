@@ -1,28 +1,36 @@
 import { Calendar, Code2, ExternalLink, FileCode2, FileText, KeyRound, LayoutGrid, Users } from 'lucide-react';
 
+interface WorkflowSidebarProps {
+  selectedCategory: string;
+  onCategorySelect: (category: string) => void;
+}
+
 const useCases = [
   {
+    id: 'popular',
     icon: <LayoutGrid className="h-3 w-3 text-gray-700" />,
     label: 'Popular',
-    isHighlighted: true,
     bgColor: 'bg-blue-50',
   },
   {
+    id: 'events',
     icon: <Calendar className="h-3 w-3 text-gray-700" />,
     label: 'Events',
     bgColor: 'bg-blue-50',
   },
   {
+    id: 'authentication',
     icon: <KeyRound className="h-3 w-3 text-gray-700" />,
     label: 'Authentication',
     bgColor: 'bg-green-50',
   },
   {
+    id: 'social',
     icon: <Users className="h-3 w-3 text-gray-700" />,
     label: 'Social',
     bgColor: 'bg-purple-50',
   },
-];
+] as const;
 
 const createOptions = [
   {
@@ -38,7 +46,7 @@ const createOptions = [
   },
 ];
 
-export function WorkflowSidebar() {
+export function WorkflowSidebar({ selectedCategory, onCategorySelect }: WorkflowSidebarProps) {
   return (
     <div className="flex h-full flex-col bg-gray-50">
       <section className="p-2">
@@ -47,11 +55,12 @@ export function WorkflowSidebar() {
         </div>
 
         <div className="flex flex-col gap-2">
-          {useCases.map((item, index) => (
+          {useCases.map((item) => (
             <div
-              key={index}
-              className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:bg-gray-100 ${
-                item.isHighlighted ? 'border border-[#EEEFF1] bg-white' : ''
+              key={item.id}
+              onClick={() => onCategorySelect(item.id)}
+              className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100 ${
+                selectedCategory === item.id ? 'border border-[#EEEFF1] bg-white' : ''
               }`}
             >
               <div className={`rounded-lg p-[5px] ${item.bgColor}`}>{item.icon}</div>
@@ -67,19 +76,22 @@ export function WorkflowSidebar() {
         </div>
         <div className="flex flex-col gap-2">
           {createOptions.map((item, index) => (
-            <div key={index} className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:bg-gray-100`}>
+            <div
+              key={index}
+              className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100`}
+            >
               <div className="flex items-center gap-3">
                 <div className={`rounded-lg p-[5px] ${item.bgColor}`}>{item.icon}</div>
                 <span className="text-label-sm text-strong-950">{item.label}</span>
               </div>
-              {item.hasExternalLink && <ExternalLink className="h-4 w-4 text-gray-400" />}
+              {item.hasExternalLink && <ExternalLink className="text-foreground-600 ml-auto h-3 w-3" />}
             </div>
           ))}
         </div>
       </section>
 
       <div className="mt-auto p-3">
-        <div className="border-stroke-soft flex flex-col items-start rounded-xl border bg-white p-3">
+        <div className="border-stroke-soft flex flex-col items-start rounded-xl border bg-white p-3 hover:cursor-pointer">
           <div className="mb-1 flex items-center gap-1.5">
             <div className="rounded-lg bg-gray-50 p-1.5">
               <FileCode2 className="h-3 w-3 text-gray-700" />

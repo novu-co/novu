@@ -2,8 +2,9 @@ import React from 'react';
 import { Card, CardContent } from '../primitives/card';
 import { Bell, MessageSquare, MessageCircle, BellRing } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
+import { StepTypeEnum } from '@novu/shared';
 
-export type StepType = 'In-App' | 'Email' | 'SMS' | 'Push';
+export type StepType = StepTypeEnum;
 
 interface Step {
   icon: LucideIcon;
@@ -19,35 +20,60 @@ interface WorkflowCardProps {
 }
 
 const STEP_ICON_MAP: Record<StepType, LucideIcon> = {
-  'In-App': Bell,
-  Email: MessageSquare,
-  SMS: MessageCircle,
-  Push: BellRing,
+  [StepTypeEnum.IN_APP]: Bell,
+  [StepTypeEnum.EMAIL]: MessageSquare,
+  [StepTypeEnum.SMS]: MessageCircle,
+  [StepTypeEnum.PUSH]: BellRing,
+  [StepTypeEnum.CHAT]: MessageSquare,
+  [StepTypeEnum.DIGEST]: Bell,
+  [StepTypeEnum.TRIGGER]: Bell,
+  [StepTypeEnum.DELAY]: Bell,
+  [StepTypeEnum.CUSTOM]: Bell,
 };
 
 const STEP_COLORS: Record<StepType, { bg: string; border: string }> = {
-  'In-App': {
+  [StepTypeEnum.IN_APP]: {
     bg: 'bg-[#FFE5D3]',
     border: 'border-[#FF8D4E]',
   },
-  Email: {
+  [StepTypeEnum.EMAIL]: {
     bg: 'bg-[#E7F6F3]',
     border: 'border-[#4EC2AB]',
   },
-  SMS: {
+  [StepTypeEnum.SMS]: {
     bg: 'bg-[#FFE9F3]',
     border: 'border-[#FF4E9E]',
   },
-  Push: {
+  [StepTypeEnum.PUSH]: {
     bg: 'bg-[#E7EEFF]',
     border: 'border-[#4E77FF]',
+  },
+  [StepTypeEnum.CHAT]: {
+    bg: 'bg-[#E7F6F3]',
+    border: 'border-[#4EC2AB]',
+  },
+  [StepTypeEnum.DIGEST]: {
+    bg: 'bg-[#FFE5D3]',
+    border: 'border-[#FF8D4E]',
+  },
+  [StepTypeEnum.TRIGGER]: {
+    bg: 'bg-[#FFE5D3]',
+    border: 'border-[#FF8D4E]',
+  },
+  [StepTypeEnum.DELAY]: {
+    bg: 'bg-[#FFE5D3]',
+    border: 'border-[#FF8D4E]',
+  },
+  [StepTypeEnum.CUSTOM]: {
+    bg: 'bg-[#FFE5D3]',
+    border: 'border-[#FF8D4E]',
   },
 };
 
 export function WorkflowCard({
   name,
   description,
-  steps = ['In-App', 'Email', 'SMS', 'Push'],
+  steps = [StepTypeEnum.IN_APP, StepTypeEnum.EMAIL, StepTypeEnum.SMS, StepTypeEnum.PUSH],
   onClick,
 }: WorkflowCardProps) {
   const mappedSteps = steps.map((step) => ({
