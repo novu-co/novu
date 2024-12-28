@@ -8,12 +8,12 @@ import { HiOutlineUsers } from 'react-icons/hi';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/primitives/dialog';
 import { Button } from '@/components/primitives/button';
 import { CreateWorkflowButton } from '../create-workflow-button';
-import { WorkflowCard, StepType } from './workflow-card';
+import { WorkflowCard } from './workflow-card';
 import { WorkflowSidebar } from './workflow-sidebar';
 import { RouteFill } from '../icons';
 import { Form } from '../primitives/form/form';
 import { useForm } from 'react-hook-form';
-import { StepTypeEnum, WorkflowCreationSourceEnum } from '@novu/shared';
+import { StepTypeEnum, WorkflowCreationSourceEnum, UiComponentEnum } from '@novu/shared';
 
 const CATEGORIES = [
   {
@@ -69,6 +69,26 @@ interface WorkflowTemplate {
 
 type WorkflowTemplateModalProps = ComponentProps<typeof DialogTrigger>;
 
+// For email steps, we need to update the controlValues to match the email editor structure
+const EMAIL_TEMPLATE = {
+  subject: {
+    component: UiComponentEnum.TEXT_FULL_LINE,
+  },
+  body: {
+    component: UiComponentEnum.BLOCK_EDITOR,
+  },
+};
+
+// For push steps, we need to update the controlValues to match the push editor structure
+const PUSH_TEMPLATE = {
+  subject: {
+    component: UiComponentEnum.PUSH_SUBJECT,
+  },
+  body: {
+    component: UiComponentEnum.PUSH_BODY,
+  },
+};
+
 const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
   {
     id: 'mention-notification',
@@ -80,7 +100,7 @@ const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
         name: 'In-App Notification',
         type: StepTypeEnum.IN_APP,
         controlValues: {
-          content: 'You were mentioned in a comment by {{actorName}}',
+          content: 'You were mentioned in a comment by {{payload.actorName}}',
           title: 'New Mention',
           ctaLabel: 'View Comment',
         },
@@ -89,61 +109,67 @@ const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
         name: 'Email Notification',
         type: StepTypeEnum.EMAIL,
         controlValues: {
-          subject: 'You were mentioned in a comment',
-          content: {
-            type: 'doc',
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'Hi ',
-                  },
-                  {
-                    type: 'variable',
-                    attrs: { value: 'subscriberFirstName' },
-                  },
-                  {
-                    type: 'text',
-                    text: ',',
-                  },
-                ],
-              },
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'You were mentioned in a comment by ',
-                  },
-                  {
-                    type: 'variable',
-                    attrs: { value: 'actorName' },
-                  },
-                  {
-                    type: 'text',
-                    text: '.',
-                  },
-                ],
-              },
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'Click the button below to view the comment:',
-                  },
-                ],
-              },
-              {
-                type: 'button',
-                attrs: {
-                  url: '{{commentUrl}}',
-                  text: 'View Comment',
+          subject: {
+            component: UiComponentEnum.TEXT_FULL_LINE,
+            value: 'You were mentioned in a comment',
+          },
+          body: {
+            component: UiComponentEnum.BLOCK_EDITOR,
+            value: {
+              type: 'doc',
+              content: [
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'Hi ',
+                    },
+                    {
+                      type: 'variable',
+                      attrs: { value: 'subscriber.firstName' },
+                    },
+                    {
+                      type: 'text',
+                      text: ',',
+                    },
+                  ],
                 },
-              },
-            ],
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'You were mentioned in a comment by ',
+                    },
+                    {
+                      type: 'variable',
+                      attrs: { value: 'payload.actorName' },
+                    },
+                    {
+                      type: 'text',
+                      text: '.',
+                    },
+                  ],
+                },
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'Click the button below to view the comment:',
+                    },
+                  ],
+                },
+                {
+                  type: 'button',
+                  attrs: {
+                    url: '{{payload.commentUrl}}',
+                    text: 'View Comment',
+                  },
+                },
+              ],
+            },
           },
         },
       },
@@ -151,17 +177,23 @@ const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
         name: 'SMS Alert',
         type: StepTypeEnum.SMS,
         controlValues: {
-          content: 'You were mentioned in a comment by {{actorName}}. Click {{commentUrl}} to view.',
+          content: 'You were mentioned in a comment by {{payload.actorName}}. Click {{payload.commentUrl}} to view.',
         },
       },
       {
         name: 'Push Notification',
         type: StepTypeEnum.PUSH,
         controlValues: {
-          title: 'New Mention',
-          content: 'You were mentioned in a comment by {{actorName}}',
+          subject: {
+            component: UiComponentEnum.PUSH_SUBJECT,
+            value: 'New Mention',
+          },
+          body: {
+            component: UiComponentEnum.PUSH_BODY,
+            value: 'You were mentioned in a comment by {{payload.actorName}}',
+          },
           data: {
-            url: '{{commentUrl}}',
+            url: '{{payload.commentUrl}}',
           },
         },
       },
@@ -173,78 +205,92 @@ const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
   },
   {
     id: 'event-notification',
-    name: 'New Event Notification',
-    description: 'Notify users about new events',
+    name: 'Event Notification',
+    description: 'Notify users about upcoming events',
     workflowId: 'event-notification',
     steps: [
-      {
-        name: 'In-App Notification',
-        type: StepTypeEnum.IN_APP,
-        controlValues: {
-          content: 'New event: {{eventName}} on {{eventDate}}',
-          title: 'New Event',
-          ctaLabel: 'View Event',
-        },
-      },
       {
         name: 'Email Notification',
         type: StepTypeEnum.EMAIL,
         controlValues: {
-          subject: 'New Event: {{eventName}}',
-          content: {
-            type: 'doc',
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'Hello ',
-                  },
-                  {
-                    type: 'variable',
-                    attrs: { value: 'subscriberFirstName' },
-                  },
-                  {
-                    type: 'text',
-                    text: ',',
-                  },
-                ],
-              },
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'A new event has been scheduled: ',
-                  },
-                  {
-                    type: 'variable',
-                    attrs: { value: 'eventName' },
-                  },
-                ],
-              },
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'Date: ',
-                  },
-                  {
-                    type: 'variable',
-                    attrs: { value: 'eventDate' },
-                  },
-                ],
-              },
-              {
-                type: 'button',
-                attrs: {
-                  url: '{{eventUrl}}',
-                  text: 'View Event Details',
+          subject: {
+            component: UiComponentEnum.TEXT_FULL_LINE,
+            value: 'New Event: {{payload.eventName}}',
+          },
+          body: {
+            component: UiComponentEnum.BLOCK_EDITOR,
+            value: {
+              type: 'doc',
+              content: [
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'Hi ',
+                    },
+                    {
+                      type: 'variable',
+                      attrs: { value: 'subscriber.firstName' },
+                    },
+                    {
+                      type: 'text',
+                      text: ',',
+                    },
+                  ],
                 },
-              },
-            ],
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'A new event has been scheduled: ',
+                    },
+                    {
+                      type: 'variable',
+                      attrs: { value: 'payload.eventName' },
+                    },
+                  ],
+                },
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'Date: ',
+                    },
+                    {
+                      type: 'variable',
+                      attrs: { value: 'payload.eventDate' },
+                    },
+                  ],
+                },
+                {
+                  type: 'button',
+                  attrs: {
+                    url: '{{payload.eventUrl}}',
+                    text: 'View Event Details',
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+      {
+        name: 'Push Notification',
+        type: StepTypeEnum.PUSH,
+        controlValues: {
+          subject: {
+            component: UiComponentEnum.PUSH_SUBJECT,
+            value: 'New Event: {{payload.eventName}}',
+          },
+          body: {
+            component: UiComponentEnum.PUSH_BODY,
+            value: 'Event scheduled for {{payload.eventDate}}',
+          },
+          data: {
+            url: '{{payload.eventUrl}}',
           },
         },
       },
@@ -261,83 +307,82 @@ const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
     workflowId: 'password-reset',
     steps: [
       {
-        name: 'Email Instructions',
+        name: 'Email Notification',
         type: StepTypeEnum.EMAIL,
         controlValues: {
-          subject: 'Reset Your Password',
-          content: {
-            type: 'doc',
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'Hi ',
-                  },
-                  {
-                    type: 'variable',
-                    attrs: { value: 'subscriberFirstName' },
-                  },
-                  {
-                    type: 'text',
-                    text: ',',
-                  },
-                ],
-              },
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'We received a request to reset your password. Click the button below to reset it:',
-                  },
-                ],
-              },
-              {
-                type: 'button',
-                attrs: {
-                  url: '{{resetUrl}}',
-                  text: 'Reset Password',
-                },
-              },
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'If you did not request this change, please ignore this email.',
-                  },
-                ],
-              },
-            ],
+          subject: {
+            component: UiComponentEnum.TEXT_FULL_LINE,
+            value: 'Reset Your Password',
           },
-        },
-      },
-      {
-        name: 'SMS Code',
-        type: StepTypeEnum.SMS,
-        controlValues: {
-          content: 'Your password reset code is: {{resetCode}}. This code will expire in 10 minutes.',
+          body: {
+            component: UiComponentEnum.BLOCK_EDITOR,
+            value: {
+              type: 'doc',
+              content: [
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'Hi ',
+                    },
+                    {
+                      type: 'variable',
+                      attrs: { value: 'subscriber.firstName' },
+                    },
+                    {
+                      type: 'text',
+                      text: ',',
+                    },
+                  ],
+                },
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'We received a request to reset your password. Click the button below to reset it:',
+                    },
+                  ],
+                },
+                {
+                  type: 'button',
+                  attrs: {
+                    url: '{{payload.resetUrl}}',
+                    text: 'Reset Password',
+                  },
+                },
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'If you did not request a password reset, please ignore this email.',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
         },
       },
     ],
     category: 'authentication',
-    tags: ['auth', 'password', 'security'],
+    tags: ['password', 'security', 'authentication'],
     active: true,
     __source: WorkflowCreationSourceEnum.TEMPLATE_STORE,
   },
   {
     id: 'new-follower',
     name: 'New Follower',
-    description: 'Notify user when they get a new follower',
+    description: 'Notify users when they gain a new follower',
     workflowId: 'new-follower',
     steps: [
       {
-        name: 'In-App Alert',
+        name: 'In-App Notification',
         type: StepTypeEnum.IN_APP,
         controlValues: {
-          content: '{{followerName}} started following you',
+          content: '{{payload.followerName}} started following you',
           title: 'New Follower',
           ctaLabel: 'View Profile',
         },
@@ -346,232 +391,181 @@ const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
         name: 'Push Notification',
         type: StepTypeEnum.PUSH,
         controlValues: {
-          title: 'New Follower',
-          content: '{{followerName}} started following you',
+          subject: {
+            component: UiComponentEnum.PUSH_SUBJECT,
+            value: 'New Follower',
+          },
+          body: {
+            component: UiComponentEnum.PUSH_BODY,
+            value: '{{payload.followerName}} started following you',
+          },
           data: {
-            url: '{{followerProfileUrl}}',
+            url: '{{payload.followerProfileUrl}}',
           },
         },
       },
     ],
     category: 'social',
-    tags: ['social', 'follower', 'notification'],
+    tags: ['follower', 'social', 'notification'],
     active: true,
     __source: WorkflowCreationSourceEnum.TEMPLATE_STORE,
   },
   {
     id: 'welcome-message',
     name: 'Welcome Message',
-    description: 'Send welcome message to new users',
+    description: 'Send a welcome message to new users',
     workflowId: 'welcome-message',
     steps: [
       {
-        name: 'Welcome Email',
+        name: 'Email Notification',
         type: StepTypeEnum.EMAIL,
         controlValues: {
-          subject: 'Welcome to Our Platform!',
-          content: {
-            type: 'doc',
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'Welcome ',
-                  },
-                  {
-                    type: 'variable',
-                    attrs: { value: 'subscriberFirstName' },
-                  },
-                  {
-                    type: 'text',
-                    text: '!',
-                  },
-                ],
-              },
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'We are excited to have you on board. Here are some resources to help you get started:',
-                  },
-                ],
-              },
-              {
-                type: 'bulletList',
-                content: [
-                  {
-                    type: 'listItem',
-                    content: [
-                      {
-                        type: 'paragraph',
-                        content: [
-                          {
-                            type: 'text',
-                            text: 'Quick Start Guide',
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                  {
-                    type: 'listItem',
-                    content: [
-                      {
-                        type: 'paragraph',
-                        content: [
-                          {
-                            type: 'text',
-                            text: 'Documentation',
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              },
-              {
-                type: 'button',
-                attrs: {
-                  url: '{{dashboardUrl}}',
-                  text: 'Go to Dashboard',
+          subject: {
+            component: UiComponentEnum.TEXT_FULL_LINE,
+            value: 'Welcome to Our Platform!',
+          },
+          body: {
+            component: UiComponentEnum.BLOCK_EDITOR,
+            value: {
+              type: 'doc',
+              content: [
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'Hi ',
+                    },
+                    {
+                      type: 'variable',
+                      attrs: { value: 'subscriber.firstName' },
+                    },
+                    {
+                      type: 'text',
+                      text: ',',
+                    },
+                  ],
                 },
-              },
-            ],
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'We are excited to have you on board. Here are some resources to help you get started:',
+                    },
+                  ],
+                },
+                {
+                  type: 'button',
+                  attrs: {
+                    url: '{{payload.gettingStartedUrl}}',
+                    text: 'Getting Started Guide',
+                  },
+                },
+              ],
+            },
           },
         },
       },
-      {
-        name: 'Welcome Notification',
-        type: StepTypeEnum.IN_APP,
-        controlValues: {
-          content: 'Welcome to our platform! Click here to get started.',
-          title: 'Welcome!',
-          ctaLabel: 'Get Started',
-        },
-      },
     ],
-    category: 'popular',
-    tags: ['onboarding', 'welcome'],
+    category: 'authentication',
+    tags: ['welcome', 'onboarding'],
     active: true,
     __source: WorkflowCreationSourceEnum.TEMPLATE_STORE,
   },
   {
     id: 'event-reminder',
     name: 'Event Reminder',
-    description: 'Send event reminders to participants',
+    description: 'Send reminders for upcoming events',
     workflowId: 'event-reminder',
     steps: [
       {
-        name: 'Email Reminder',
+        name: 'Email Notification',
         type: StepTypeEnum.EMAIL,
         controlValues: {
-          subject: 'Reminder: {{eventName}} starts in 24 hours',
-          content: {
-            type: 'doc',
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'Hi ',
-                  },
-                  {
-                    type: 'variable',
-                    attrs: { value: 'subscriberFirstName' },
-                  },
-                  {
-                    type: 'text',
-                    text: ',',
-                  },
-                ],
-              },
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'This is a reminder that ',
-                  },
-                  {
-                    type: 'variable',
-                    attrs: { value: 'eventName' },
-                  },
-                  {
-                    type: 'text',
-                    text: ' starts in 24 hours.',
-                  },
-                ],
-              },
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'Event details:',
-                  },
-                ],
-              },
-              {
-                type: 'bulletList',
-                content: [
-                  {
-                    type: 'listItem',
-                    content: [
-                      {
-                        type: 'paragraph',
-                        content: [
-                          {
-                            type: 'text',
-                            text: 'Date: ',
-                          },
-                          {
-                            type: 'variable',
-                            attrs: { value: 'eventDate' },
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                  {
-                    type: 'listItem',
-                    content: [
-                      {
-                        type: 'paragraph',
-                        content: [
-                          {
-                            type: 'text',
-                            text: 'Location: ',
-                          },
-                          {
-                            type: 'variable',
-                            attrs: { value: 'eventLocation' },
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              },
-              {
-                type: 'button',
-                attrs: {
-                  url: '{{eventUrl}}',
-                  text: 'View Event Details',
+          subject: {
+            component: UiComponentEnum.TEXT_FULL_LINE,
+            value: 'Reminder: {{payload.eventName}} starts in 24 hours',
+          },
+          body: {
+            component: UiComponentEnum.BLOCK_EDITOR,
+            value: {
+              type: 'doc',
+              content: [
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'Hi ',
+                    },
+                    {
+                      type: 'variable',
+                      attrs: { value: 'subscriber.firstName' },
+                    },
+                    {
+                      type: 'text',
+                      text: ',',
+                    },
+                  ],
                 },
-              },
-            ],
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'This is a reminder that ',
+                    },
+                    {
+                      type: 'variable',
+                      attrs: { value: 'payload.eventName' },
+                    },
+                    {
+                      type: 'text',
+                      text: ' starts in 24 hours.',
+                    },
+                  ],
+                },
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'Date: ',
+                    },
+                    {
+                      type: 'variable',
+                      attrs: { value: 'payload.eventDate' },
+                    },
+                  ],
+                },
+                {
+                  type: 'button',
+                  attrs: {
+                    url: '{{payload.eventUrl}}',
+                    text: 'View Event Details',
+                  },
+                },
+              ],
+            },
           },
         },
       },
       {
-        name: 'SMS Reminder',
-        type: StepTypeEnum.SMS,
+        name: 'Push Notification',
+        type: StepTypeEnum.PUSH,
         controlValues: {
-          content: 'Reminder: {{eventName}} starts in 24 hours at {{eventLocation}}. Details: {{eventUrl}}',
+          subject: {
+            component: UiComponentEnum.PUSH_SUBJECT,
+            value: 'Event Reminder: {{payload.eventName}}',
+          },
+          body: {
+            component: UiComponentEnum.PUSH_BODY,
+            value: 'Your event starts in 24 hours',
+          },
+          data: {
+            url: '{{payload.eventUrl}}',
+          },
         },
       },
     ],
@@ -615,11 +609,22 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
 
                 <div className="grid grid-cols-3 gap-4 py-3 pt-3">
                   {filteredTemplates.map((template) => (
-                    <CreateWorkflowButton key={template.id} asChild>
+                    <CreateWorkflowButton
+                      key={template.id}
+                      asChild
+                      template={{
+                        name: template.name,
+                        description: template.description,
+                        workflowId: template.workflowId,
+                        tags: template.tags,
+                        steps: template.steps,
+                        __source: template.__source,
+                      }}
+                    >
                       <WorkflowCard
                         name={template.name}
                         description={template.description}
-                        steps={template.steps.map((step) => step.type as StepType)}
+                        steps={template.steps.map((step) => step.type)}
                       />
                     </CreateWorkflowButton>
                   ))}

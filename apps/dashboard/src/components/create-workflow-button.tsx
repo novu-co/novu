@@ -6,7 +6,7 @@ import { RiArrowRightSLine } from 'react-icons/ri';
 import { ExternalLink } from '@/components/shared/external-link';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify } from '@novu/shared';
+import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify, StepTypeEnum } from '@novu/shared';
 import { createWorkflow } from '@/api/workflows';
 import { Button } from '@/components/primitives/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
@@ -31,13 +31,26 @@ import { buildRoute, ROUTES } from '@/utils/routes';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowSchema } from './workflow-editor/schema';
 
-type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
-export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
+interface CreateWorkflowButtonProps extends ComponentProps<typeof SheetTrigger> {
+  template?: {
+    name: string;
+    description?: string;
+    workflowId: string;
+    tags: string[];
+    steps: {
+      name: string;
+      type: StepTypeEnum;
+      controlValues?: Record<string, unknown> | null;
+    }[];
+    __source: WorkflowCreationSourceEnum;
+  };
+}
+
+export const CreateWorkflowButton = ({ template, ...props }: CreateWorkflowButtonProps) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
   const [isOpen, setIsOpen] = useState(false);
-  // TODO: Move to a use-create-workflow.ts hook
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (workflow: CreateWorkflowDto) => createWorkflow({ environment: currentEnvironment!, workflow }),
     onSuccess: async (result) => {
@@ -62,7 +75,12 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
 
   const form = useForm<z.infer<typeof workflowSchema>>({
     resolver: zodResolver(workflowSchema),
-    defaultValues: { description: '', workflowId: '', name: '', tags: [] },
+    defaultValues: {
+      description: template?.description ?? '',
+      workflowId: template?.workflowId ?? '',
+      name: template?.name ?? '',
+      tags: template?.tags ?? [],
+    },
   });
 
   return (
@@ -88,8 +106,8 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
               onSubmit={form.handleSubmit((values) => {
                 mutateAsync({
                   name: values.name,
-                  steps: [],
-                  __source: WorkflowCreationSourceEnum.DASHBOARD,
+                  steps: template?.steps ?? [],
+                  __source: template?.__source ?? WorkflowCreationSourceEnum.DASHBOARD,
                   workflowId: values.workflowId,
                   description: values.description || undefined,
                   tags: values.tags,
@@ -111,7 +129,9 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                           {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
                           onChange={(e) => {
                             field.onChange(e);
-                            form.setValue('workflowId', slugify(e.target.value));
+                            if (!template) {
+                              form.setValue('workflowId', slugify(e.target.value));
+                            }
                           }}
                         />
                       </InputField>
@@ -129,7 +149,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     <FormLabel>Identifier</FormLabel>
                     <FormControl>
                       <InputField>
-                        <Input {...field} readOnly />
+                        <Input {...field} readOnly={!!template} />
                       </InputField>
                     </FormControl>
                     <FormMessage />
