@@ -3,12 +3,12 @@ import { RiRouteFill } from 'react-icons/ri';
 import { WorkflowList } from '@/components/workflow-list';
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { Button } from '@/components/primitives/button';
-import { CreateWorkflowButton } from '@/components/create-workflow-button';
 import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { Badge } from '@/components/primitives/badge';
+import { WorkflowTemplateModal } from '@/components/template-store/workflow-template-modal';
 
 export const WorkflowsPage = () => {
   const track = useTelemetry();
@@ -34,12 +34,12 @@ export const WorkflowsPage = () => {
         <div className="flex justify-between px-2.5 py-2.5">
           <div className="invisible flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2"></div>
 
-          <CreateWorkflowButton asChild>
+          <WorkflowTemplateModal asChild>
             <Button variant="primary" size="sm">
               <RiRouteFill className="size-4" />
               Create workflow
             </Button>
-          </CreateWorkflowButton>
+          </WorkflowTemplateModal>
         </div>
         <WorkflowList />
       </DashboardLayout>
