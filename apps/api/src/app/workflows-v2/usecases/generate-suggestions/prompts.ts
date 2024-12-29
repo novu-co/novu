@@ -165,7 +165,7 @@ const CHANNEL_RULES = {
   },
   push: {
     rules: ['Keep it under 140 characters', 'Be direct and clear'],
-    example: '{{subscriber.firstName}}, your order is out for delivery!',
+    example: 'Your order is out for delivery!',
   },
   sms: {
     rules: ['Keep it under 160 characters', 'Be direct and clear', 'Include call to action when needed'],
