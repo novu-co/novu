@@ -9,4 +9,3 @@ export * from './welcome-page';
 export * from './integrations-list-page';
 export * from './settings';
 export * from './activity-feed';
-export * from './suggested';

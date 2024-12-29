@@ -7,3 +7,5 @@ export interface WorkflowTemplate {
   category: 'popular' | 'events' | 'authentication' | 'social';
   workflowDefinition: CreateWorkflowDto;
 }
+
+export type IWorkflowSuggestion = WorkflowTemplate;
