@@ -1,4 +1,4 @@
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiExcludeEndpoint } from '@nestjs/swagger';
 import {
   Body,
   Controller,
@@ -91,6 +91,7 @@ export class WorkflowController {
 
   @Post('/suggestions')
   @UseGuards(UserAuthGuard)
+  @ApiExcludeEndpoint()
   async generateSuggestions(
     @UserSession() user: UserSessionData,
     @Body() body: GenerateWorkflowSuggestionsDto
