@@ -6,7 +6,7 @@ import { RiArrowRightSLine } from 'react-icons/ri';
 import { ExternalLink } from '@/components/shared/external-link';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify, StepTypeEnum } from '@novu/shared';
+import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify } from '@novu/shared';
 import { createWorkflow } from '@/api/workflows';
 import { Button } from '@/components/primitives/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
@@ -32,18 +32,7 @@ import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowSchema } from './workflow-editor/schema';
 
 interface CreateWorkflowButtonProps extends ComponentProps<typeof SheetTrigger> {
-  template?: {
-    name: string;
-    description?: string;
-    workflowId: string;
-    tags: string[];
-    steps: {
-      name: string;
-      type: StepTypeEnum;
-      controlValues?: Record<string, unknown> | null;
-    }[];
-    __source: WorkflowCreationSourceEnum;
-  };
+  template?: CreateWorkflowDto;
 }
 
 export const CreateWorkflowButton = ({ template, ...props }: CreateWorkflowButtonProps) => {
@@ -110,7 +99,7 @@ export const CreateWorkflowButton = ({ template, ...props }: CreateWorkflowButto
                   __source: template?.__source ?? WorkflowCreationSourceEnum.DASHBOARD,
                   workflowId: values.workflowId,
                   description: values.description || undefined,
-                  tags: values.tags,
+                  tags: values.tags || [],
                 });
               })}
               className="flex flex-col gap-4"

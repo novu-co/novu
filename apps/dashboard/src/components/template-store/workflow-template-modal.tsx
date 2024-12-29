@@ -9,141 +9,106 @@ import { WorkflowSidebar } from './workflow-sidebar';
 import { RouteFill } from '../icons';
 import { Form } from '../primitives/form/form';
 import { useForm } from 'react-hook-form';
-import {
-  StepTypeEnum,
-  WorkflowCreationSourceEnum,
-  CreateWorkflowDto,
-  StepCreateDto,
-  WorkflowOriginEnum,
-} from '@novu/shared';
-
-interface TipTapContent {
-  type: string;
-  content?: Array<{
-    type: string;
-    content?: Array<{
-      type: string;
-      text?: string;
-      attrs?: {
-        value?: string;
-        url?: string;
-        text?: string;
-      };
-    }>;
-    attrs?: {
-      url?: string;
-      text?: string;
-    };
-  }>;
-}
+import { StepTypeEnum, WorkflowCreationSourceEnum, CreateWorkflowDto } from '@novu/shared';
 
 type WorkflowTemplateModalProps = ComponentProps<typeof DialogTrigger>;
 
-type WorkflowTemplateWithExtras = Omit<CreateWorkflowDto, 'tags' | 'description'> & {
+interface WorkflowTemplate {
   id: string;
-  category: 'popular' | 'events' | 'authentication' | 'social';
-  active?: boolean;
-  tags: string[];
+  name: string;
   description: string;
-  steps: Array<
-    StepCreateDto & {
-      stepId: string;
-      slug: string;
-      origin: WorkflowOriginEnum;
-    }
-  >;
-};
+  category: 'popular' | 'events' | 'authentication' | 'social';
+  workflowDefinition: CreateWorkflowDto;
+}
 
-const WORKFLOW_TEMPLATES: WorkflowTemplateWithExtras[] = [
+const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
   {
     id: 'mention-notification',
     name: 'Mention in a comment',
     description: 'Triggered when an actor mentions someone',
-    workflowId: 'mention-notification',
-    steps: [
-      {
-        name: 'In-App Notification',
-        type: StepTypeEnum.IN_APP,
-        stepId: 'in-app-notification',
-        slug: 'in-app-notification',
-        origin: WorkflowOriginEnum.NOVU_CLOUD,
-        controlValues: {
-          body: 'You were mentioned in a comment by {{payload.actorName}}',
-          avatar: '',
-          subject: 'New Mention',
-          primaryAction: {
-            label: 'View Comment',
+    category: 'popular',
+    workflowDefinition: {
+      name: 'Mention in a comment',
+      description: 'Triggered when an actor mentions someone',
+      workflowId: 'mention-notification',
+      steps: [
+        {
+          name: 'In-App Notification',
+          type: StepTypeEnum.IN_APP,
+          controlValues: {
+            body: 'You were mentioned in a comment by {{payload.actorName}}',
+            avatar: '',
+            subject: 'New Mention',
+            primaryAction: {
+              label: 'View Comment',
+              redirect: {
+                url: '{{payload.commentUrl}}',
+                target: '_blank',
+              },
+            },
+            secondaryAction: null,
             redirect: {
-              url: '{{payload.commentUrl}}',
-              target: '_blank',
+              url: '',
+              target: '_self',
             },
           },
-          secondaryAction: null,
-          redirect: {
-            url: '',
-            target: '_self',
+        },
+        {
+          name: 'Email Notification',
+          type: StepTypeEnum.EMAIL,
+          controlValues: {
+            subject: 'You were mentioned in a comment',
+            body: JSON.stringify({
+              type: 'doc',
+              content: [
+                {
+                  type: 'paragraph',
+                  attrs: { textAlign: 'left' },
+                  content: [
+                    { type: 'text', text: 'Hi ' },
+                    {
+                      type: 'variable',
+                      attrs: { id: 'subscriber.firstName', label: null, fallback: null, required: false },
+                    },
+                    { type: 'text', text: ',' },
+                  ],
+                },
+                {
+                  type: 'paragraph',
+                  attrs: { textAlign: 'left' },
+                  content: [
+                    { type: 'text', text: 'You were mentioned in a comment by ' },
+                    {
+                      type: 'variable',
+                      attrs: { id: 'payload.actorName', label: null, fallback: null, required: false },
+                    },
+                    { type: 'text', text: '.' },
+                  ],
+                },
+                {
+                  type: 'button',
+                  attrs: {
+                    text: 'View Comment',
+                    isTextVariable: false,
+                    url: '',
+                    isUrlVariable: false,
+                    alignment: 'left',
+                    variant: 'filled',
+                    borderRadius: 'smooth',
+                    buttonColor: '#000000',
+                    textColor: '#ffffff',
+                    showIfKey: null,
+                  },
+                },
+              ],
+            }),
           },
         },
-      },
-      {
-        name: 'Email Notification',
-        type: StepTypeEnum.EMAIL,
-        stepId: 'email-notification',
-        slug: 'email-notification',
-        origin: WorkflowOriginEnum.NOVU_CLOUD,
-        controlValues: {
-          subject: 'You were mentioned in a comment',
-          body: JSON.stringify({
-            type: 'doc',
-            content: [
-              {
-                type: 'paragraph',
-                attrs: { textAlign: 'left' },
-                content: [
-                  { type: 'text', text: 'Hi ' },
-                  {
-                    type: 'variable',
-                    attrs: { id: 'subscriber.firstName', label: null, fallback: null, required: false },
-                  },
-                  { type: 'text', text: ',' },
-                ],
-              },
-              {
-                type: 'paragraph',
-                attrs: { textAlign: 'left' },
-                content: [
-                  { type: 'text', text: 'You were mentioned in a comment by ' },
-                  {
-                    type: 'variable',
-                    attrs: { id: 'payload.actorName', label: null, fallback: null, required: false },
-                  },
-                  { type: 'text', text: '.' },
-                ],
-              },
-              {
-                type: 'button',
-                attrs: {
-                  text: 'View Comment',
-                  isTextVariable: false,
-                  url: '',
-                  isUrlVariable: false,
-                  alignment: 'left',
-                  variant: 'filled',
-                  borderRadius: 'smooth',
-                  buttonColor: '#000000',
-                  textColor: '#ffffff',
-                  showIfKey: null,
-                },
-              },
-            ],
-          }),
-        },
-      },
-    ],
-    category: 'popular',
-    tags: ['mention', 'comment', 'notification'],
-    active: true,
-    __source: WorkflowCreationSourceEnum.TEMPLATE_STORE,
+      ],
+      tags: ['mention', 'comment', 'notification'],
+      active: true,
+      __source: WorkflowCreationSourceEnum.TEMPLATE_STORE,
+    },
   },
 ];
 
@@ -180,22 +145,11 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
 
                 <div className="grid grid-cols-3 gap-4 py-3 pt-3">
                   {filteredTemplates.map((template) => (
-                    <CreateWorkflowButton
-                      key={template.id}
-                      asChild
-                      template={{
-                        name: template.name,
-                        description: template.description,
-                        workflowId: template.workflowId,
-                        tags: template.tags,
-                        steps: template.steps,
-                        __source: template.__source,
-                      }}
-                    >
+                    <CreateWorkflowButton key={template.id} asChild template={template.workflowDefinition}>
                       <WorkflowCard
                         name={template.name}
                         description={template.description}
-                        steps={template.steps.map((step) => step.type)}
+                        steps={template.workflowDefinition.steps.map((step) => step.type)}
                       />
                     </CreateWorkflowButton>
                   ))}
