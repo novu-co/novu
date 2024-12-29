@@ -10,6 +10,8 @@ import {
   Sparkles,
   Wand2,
 } from 'lucide-react';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { WorkflowMode } from './workflow-template-modal';
 
 interface WorkflowSidebarProps {
@@ -68,6 +70,8 @@ export function WorkflowSidebar({
   onFromPromptClick,
   mode,
 }: WorkflowSidebarProps) {
+  const isAiTemplateStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_AI_TEMPLATE_STORE_ENABLED);
+
   return (
     <div className="flex h-full flex-col bg-gray-50">
       <section className="p-2">
@@ -76,18 +80,20 @@ export function WorkflowSidebar({
         </div>
 
         <div className="flex flex-col gap-2">
-          <button
-            type="button"
-            onClick={onGenerateClick}
-            className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100 ${
-              mode === WorkflowMode.GENERATE ? 'border border-[#EEEFF1] bg-white' : ''
-            }`}
-          >
-            <div className="rounded-lg bg-purple-50 p-[5px]">
-              <Sparkles className="h-3 w-3 text-gray-700" />
-            </div>
-            <span className="text-label-sm text-strong-950">AI Suggestions</span>
-          </button>
+          {isAiTemplateStoreEnabled && (
+            <button
+              type="button"
+              onClick={onGenerateClick}
+              className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100 ${
+                mode === WorkflowMode.GENERATE ? 'border border-[#EEEFF1] bg-white' : ''
+              }`}
+            >
+              <div className="rounded-lg bg-purple-50 p-[5px]">
+                <Sparkles className="h-3 w-3 text-gray-700" />
+              </div>
+              <span className="text-label-sm text-strong-950">AI Suggestions</span>
+            </button>
+          )}
           {useCases.map((item) => (
             <div
               key={item.id}
@@ -110,18 +116,20 @@ export function WorkflowSidebar({
           <span className="text-subheading-2xs text-gray-500">OR CREATE</span>
         </div>
         <div className="flex flex-col gap-2">
-          <button
-            type="button"
-            onClick={onFromPromptClick}
-            className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100 ${
-              mode === WorkflowMode.FROM_PROMPT ? 'border border-[#EEEFF1] bg-white' : ''
-            }`}
-          >
-            <div className="rounded-lg bg-blue-50 p-[5px]">
-              <Wand2 className="h-3 w-3 text-gray-700" />
-            </div>
-            <span className="text-label-sm text-strong-950">From prompt</span>
-          </button>
+          {isAiTemplateStoreEnabled && (
+            <button
+              type="button"
+              onClick={onFromPromptClick}
+              className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100 ${
+                mode === WorkflowMode.FROM_PROMPT ? 'border border-[#EEEFF1] bg-white' : ''
+              }`}
+            >
+              <div className="rounded-lg bg-blue-50 p-[5px]">
+                <Wand2 className="h-3 w-3 text-gray-700" />
+              </div>
+              <span className="text-label-sm text-strong-950">From prompt</span>
+            </button>
+          )}
           {createOptions.map((item, index) => (
             <div
               key={index}
