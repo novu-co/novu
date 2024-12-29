@@ -23,14 +23,14 @@ Delay Step Examples:
    }`;
 
 const COMMON_PROMPT_INSTRUCTIONS = `Variable Usage Rules:
-- For SMS, Push, In-App, and Chat channels: Use liquid syntax with either subscriber or payload prefix
+- For SMS, Push, In-App, and Chat channels: Use liquid syntax with either subscriber or payload prefix.
   Examples: 
   - {{subscriber.firstName}}
   - {{payload.orderNumber}}
   - {{subscriber.email}}
   - {{payload.amount}}
 
-For email steps, structure the body as a Tiptap JSON document with this format:
+For email steps, structure the body as a Tiptap JSON document and don't wrap the variables with {{ with this format:
 {
   "type": "doc",
   "content": [

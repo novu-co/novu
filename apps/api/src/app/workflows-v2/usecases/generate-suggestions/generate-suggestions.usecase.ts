@@ -18,8 +18,8 @@ export class GenerateSuggestionsUsecase {
   async execute(command: GenerateSuggestionsCommand): Promise<{ suggestions: IWorkflowSuggestion[] }> {
     const schema =
       command.mode === 'single'
-        ? z.object({ suggestions: z.array(workflowSchema).length(1) })
-        : z.object({ suggestions: z.array(workflowSchema).min(5).max(5) });
+        ? z.object({ suggestions: z.array(workflowSchema) })
+        : z.object({ suggestions: z.array(workflowSchema).max(5) });
 
     return withRetry(
       async () => {
@@ -38,6 +38,8 @@ User's request: ${command.prompt}`,
             },
           },
         });
+
+        console.log(JSON.stringify(result.object.suggestions, null, 2));
 
         return {
           suggestions: result.object.suggestions.map(mapSuggestionToDto),
