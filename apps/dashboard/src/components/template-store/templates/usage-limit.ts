@@ -5,7 +5,8 @@ export const usageLimitTemplate: WorkflowTemplate = {
   id: 'usage-limit',
   name: 'Usage limit alert',
   description: 'Alert users when they approach their usage limits',
-  category: 'popular',
+  category: 'events',
+  isPopular: true,
   workflowDefinition: {
     name: 'Usage limit alert',
     description: 'Alert users when they approach their usage limits',

@@ -5,7 +5,8 @@ export const mentionNotificationTemplate: WorkflowTemplate = {
   id: 'mention-notification',
   name: 'Mention in a comment',
   description: 'Triggered when an actor mentions someone',
-  category: 'popular',
+  category: 'social',
+  isPopular: true,
   workflowDefinition: {
     name: 'Mention in a comment',
     description: 'Triggered when an actor mentions someone',

@@ -4,7 +4,8 @@ export interface WorkflowTemplate {
   id: string;
   name: string;
   description: string;
-  category: 'popular' | 'events' | 'authentication' | 'social';
+  category: 'events' | 'authentication' | 'social';
+  isPopular?: boolean;
   workflowDefinition: CreateWorkflowDto;
 }
 

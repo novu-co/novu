@@ -104,7 +104,7 @@ function StepPreview({ type, stepContent }: { type: StepType; stepContent?: any 
       <div className="bg-background pointer-events-none p-3">
         <EmailPreviewHeader />
         <EmailPreviewSubject className="px-3 py-2" subject={subject} />
-        <div className="mx-auto min-h-96 w-full overflow-auto">
+        <div className="mx-auto w-full overflow-auto">
           <Editor
             config={{
               hasMenuBar: false,

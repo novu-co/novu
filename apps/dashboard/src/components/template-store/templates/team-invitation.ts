@@ -5,7 +5,8 @@ export const teamInvitationTemplate: WorkflowTemplate = {
   id: 'team-invitation',
   name: 'Team member invitation',
   description: 'Send invitations to new team members',
-  category: 'popular',
+  category: 'social',
+  isPopular: true,
   workflowDefinition: {
     name: 'Team member invitation',
     description: 'Send invitations to new team members',

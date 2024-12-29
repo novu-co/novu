@@ -5,7 +5,8 @@ export const trialExpirationTemplate: WorkflowTemplate = {
   id: 'trial-expiration',
   name: 'Trial expiration reminder',
   description: 'Notify users when their trial period is about to end',
-  category: 'popular',
+  category: 'events',
+  isPopular: true,
   workflowDefinition: {
     name: 'Trial expiration reminder',
     description: 'Notify users when their trial period is about to end',

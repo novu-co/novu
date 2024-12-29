@@ -5,7 +5,8 @@ export const loginAlertTemplate: WorkflowTemplate = {
   id: 'login-alert',
   name: 'New device login',
   description: 'Alert users when a new device signs into their account',
-  category: 'popular',
+  category: 'authentication',
+  isPopular: true,
   workflowDefinition: {
     name: 'New device login',
     description: 'Alert users when a new device signs into their account',

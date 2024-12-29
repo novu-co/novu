@@ -5,7 +5,8 @@ export const paymentFailedTemplate: WorkflowTemplate = {
   id: 'payment-failed',
   name: 'Payment failed alert',
   description: 'Notify users when their payment method fails to process',
-  category: 'popular',
+  category: 'events',
+  isPopular: true,
   workflowDefinition: {
     name: 'Payment failed alert',
     description: 'Notify users when their payment method fails to process',

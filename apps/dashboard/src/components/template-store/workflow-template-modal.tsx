@@ -22,7 +22,9 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   const [mode, setMode] = useState<WorkflowMode>(WorkflowMode.TEMPLATES);
   const { mutateAsync: generateSuggestions, isPending: isGenerating } = useGenerateWorkflowSuggestions();
 
-  const filteredTemplates = WORKFLOW_TEMPLATES.filter((template) => template.category === selectedCategory);
+  const filteredTemplates = WORKFLOW_TEMPLATES.filter((template) =>
+    selectedCategory === 'popular' ? template.isPopular : template.category === selectedCategory
+  );
   const templates = suggestions.length > 0 ? suggestions : filteredTemplates;
 
   const handleSubmit = async () => {
@@ -64,6 +66,7 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
     if (mode === WorkflowMode.TEMPLATES) {
       return `${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} workflows`;
     }
+
     return '';
   };
 
@@ -71,7 +74,7 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
     <Dialog>
       <DialogTrigger asChild {...props} />
 
-      <DialogContent className="w-full max-w-[1240px] overflow-hidden p-0">
+      <DialogContent className="w-full max-w-[1240px] p-0">
         <Form {...form}>
           <form>
             <DialogHeader className="border-stroke-soft flex flex-row gap-1 border-b p-3">
