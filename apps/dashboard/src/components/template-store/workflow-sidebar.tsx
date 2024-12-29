@@ -1,3 +1,4 @@
+import { motion } from 'motion/react';
 import {
   Calendar,
   Code2,
@@ -14,6 +15,7 @@ import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { WorkflowMode } from './types';
 import { CreateWorkflowButton } from '@/components/create-workflow-button';
+import { ReactNode } from 'react';
 
 interface WorkflowSidebarProps {
   selectedCategory: string;
@@ -21,6 +23,68 @@ interface WorkflowSidebarProps {
   onGenerateClick: () => void;
   onFromPromptClick: () => void;
   mode: WorkflowMode;
+}
+
+interface SidebarButtonProps {
+  icon: ReactNode;
+  label: string;
+  onClick?: () => void;
+  isActive?: boolean;
+  bgColor?: string;
+  asChild?: boolean;
+  hasExternalLink?: boolean;
+}
+
+const buttonVariants = {
+  initial: { scale: 1 },
+  hover: { scale: 1.01 },
+  tap: { scale: 0.99 },
+};
+
+const iconVariants = {
+  initial: { rotate: 0 },
+  hover: { rotate: 5 },
+};
+
+function SidebarButton({
+  icon,
+  label,
+  onClick,
+  isActive,
+  bgColor = 'bg-blue-50',
+  asChild,
+  hasExternalLink,
+}: SidebarButtonProps) {
+  const ButtonWrapper = asChild ? CreateWorkflowButton : motion.button;
+  const content = (
+    <div className="flex items-center gap-3">
+      <motion.div variants={iconVariants} className={`rounded-lg p-[5px] ${bgColor}`}>
+        {icon}
+      </motion.div>
+      <span className="text-label-sm text-strong-950">{label}</span>
+      {hasExternalLink && (
+        <motion.div whileHover={{ x: 2 }} transition={{ type: 'spring', stiffness: 300 }} className="ml-auto">
+          <ExternalLink className="text-foreground-600 h-3 w-3" />
+        </motion.div>
+      )}
+    </div>
+  );
+
+  return (
+    <ButtonWrapper
+      variants={buttonVariants}
+      initial="initial"
+      whileHover="hover"
+      whileTap="tap"
+      type="button"
+      onClick={onClick}
+      className={`flex w-full items-center gap-2 rounded-xl border border-transparent p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100 ${
+        isActive ? '!border-[#EEEFF1] bg-white' : ''
+      }`}
+    >
+      {asChild ? content : <div className="w-full">{content}</div>}
+    </ButtonWrapper>
+  );
 }
 
 const useCases = [
@@ -55,7 +119,7 @@ const createOptions = [
     icon: <FileText className="h-3 w-3 text-gray-700" />,
     label: 'Blank workflow',
     bgColor: 'bg-green-50',
-    component: CreateWorkflowButton,
+    asChild: true,
   },
   {
     icon: <Code2 className="h-3 w-3 text-gray-700" />,
@@ -83,40 +147,24 @@ export function WorkflowSidebar({
         </div>
         <div className="flex flex-col gap-2">
           {isAiTemplateStoreEnabled && (
-            <button
-              type="button"
+            <SidebarButton
+              icon={<Wand2 className="h-3 w-3 text-gray-700" />}
+              label="From prompt"
               onClick={onFromPromptClick}
-              className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100 ${
-                mode === WorkflowMode.FROM_PROMPT ? 'border border-[#EEEFF1] bg-white' : ''
-              }`}
-            >
-              <div className="rounded-lg bg-blue-50 p-[5px]">
-                <Wand2 className="h-3 w-3 text-gray-700" />
-              </div>
-              <span className="text-label-sm text-strong-950">From prompt</span>
-            </button>
+              isActive={mode === WorkflowMode.FROM_PROMPT}
+              bgColor="bg-blue-50"
+            />
           )}
           {createOptions.map((item, index) => (
-            <div
+            <SidebarButton
               key={index}
+              icon={item.icon}
+              label={item.label}
               onClick={item.onClick}
-              className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100`}
-            >
-              {item.component ? (
-                <item.component asChild>
-                  <div className="flex items-center gap-3">
-                    <div className={`rounded-lg p-[5px] ${item.bgColor}`}>{item.icon}</div>
-                    <span className="text-label-sm text-strong-950">{item.label}</span>
-                  </div>
-                </item.component>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <div className={`rounded-lg p-[5px] ${item.bgColor}`}>{item.icon}</div>
-                  <span className="text-label-sm text-strong-950">{item.label}</span>
-                </div>
-              )}
-              {item.hasExternalLink && <ExternalLink className="text-foreground-600 ml-auto h-3 w-3" />}
-            </div>
+              bgColor={item.bgColor}
+              asChild={item.asChild}
+              hasExternalLink={item.hasExternalLink}
+            />
           ))}
         </div>
       </section>
@@ -127,50 +175,45 @@ export function WorkflowSidebar({
 
         <div className="flex flex-col gap-2">
           {isAiTemplateStoreEnabled && (
-            <button
-              type="button"
+            <SidebarButton
+              icon={<Sparkles className="h-3 w-3 text-gray-700" />}
+              label="AI Suggestions"
               onClick={onGenerateClick}
-              className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100 ${
-                mode === WorkflowMode.GENERATE ? 'border border-[#EEEFF1] bg-white' : ''
-              }`}
-            >
-              <div className="rounded-lg bg-purple-50 p-[5px]">
-                <Sparkles className="h-3 w-3 text-gray-700" />
-              </div>
-              <span className="text-label-sm text-strong-950">AI Suggestions</span>
-            </button>
+              isActive={mode === WorkflowMode.GENERATE}
+              bgColor="bg-purple-50"
+            />
           )}
           {useCases.map((item) => (
-            <div
+            <SidebarButton
               key={item.id}
+              icon={item.icon}
+              label={item.label}
               onClick={() => onCategorySelect(item.id)}
-              className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100 ${
-                mode === WorkflowMode.TEMPLATES && selectedCategory === item.id
-                  ? 'border border-[#EEEFF1] bg-white'
-                  : ''
-              }`}
-            >
-              <div className={`rounded-lg p-[5px] ${item.bgColor}`}>{item.icon}</div>
-              <span className="text-label-sm text-strong-950">{item.label}</span>
-            </div>
+              isActive={mode === WorkflowMode.TEMPLATES && selectedCategory === item.id}
+              bgColor={item.bgColor}
+            />
           ))}
         </div>
       </section>
 
       <div className="mt-auto p-3">
-        <div
+        <motion.div
+          variants={buttonVariants}
+          initial="initial"
+          whileHover="hover"
+          whileTap="tap"
           className="border-stroke-soft flex flex-col items-start rounded-xl border bg-white p-3 hover:cursor-pointer"
           onClick={() => window.open('https://docs.novu.co/workflow/overview', '_blank')}
         >
           <div className="mb-1 flex items-center gap-1.5">
-            <div className="rounded-lg bg-gray-50 p-1.5">
+            <motion.div variants={iconVariants} className="rounded-lg bg-gray-50 p-1.5">
               <FileCode2 className="h-3 w-3 text-gray-700" />
-            </div>
+            </motion.div>
             <span className="text-label-sm text-strong-950">Documentation</span>
           </div>
 
           <p className="text-paragraph-xs text-neutral-400">Find out more about how to best setup workflows</p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
