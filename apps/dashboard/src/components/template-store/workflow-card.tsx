@@ -2,7 +2,13 @@ import React from 'react';
 import { Card, CardContent } from '../primitives/card';
 import { Bell, MessageSquare, MessageCircle, BellRing } from 'lucide-react';
 import { LucideIcon } from 'lucide-react';
-import { StepTypeEnum } from '@novu/shared';
+import {
+  StepTypeEnum,
+  ChannelTypeEnum,
+  ChatRenderOutput,
+  PushRenderOutput,
+  GeneratePreviewResponseDto,
+} from '@novu/shared';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '../primitives/hover-card';
 import {
   InAppPreview,
@@ -35,6 +41,9 @@ import {
 } from '@maily-to/core/blocks';
 import { CreateWorkflowDto } from '@novu/shared';
 import { WorkflowStep } from '../workflow-step';
+import { SmsPhone } from '../workflow-editor/steps/sms/sms-phone';
+import { ChatPreview } from '../workflow-editor/steps/chat/chat-preview';
+import { PushPreview } from '../workflow-editor/steps/push/push-preview';
 
 export type StepType = StepTypeEnum;
 
@@ -151,7 +160,7 @@ function StepPreview({ type, stepContent }: { type: StepType; stepContent?: any 
     }
 
     return (
-      <div className="bg-background p-3">
+      <div className="bg-background pointer-events-none p-3">
         <EmailPreviewHeader />
         <EmailPreviewSubject className="px-3 py-2" subject={subject} />
         <div className="mx-auto min-h-96 w-full overflow-auto">
@@ -182,6 +191,57 @@ function StepPreview({ type, stepContent }: { type: StepType; stepContent?: any 
             contentJson={parsedBody}
           />
         </div>
+      </div>
+    );
+  }
+
+  if (type === StepTypeEnum.SMS) {
+    const { body } = stepContent.controlValues;
+    return (
+      <div className="p-4">
+        <SmsPhone smsBody={body} />
+      </div>
+    );
+  }
+
+  if (type === StepTypeEnum.CHAT) {
+    const { body } = stepContent.controlValues;
+    const mockPreviewData: GeneratePreviewResponseDto = {
+      result: {
+        type: ChannelTypeEnum.CHAT as const,
+        preview: {
+          body,
+          content: body,
+        } as ChatRenderOutput,
+      },
+      previewPayloadExample: {},
+    };
+
+    return (
+      <div className="p-4">
+        <ChatPreview isPreviewPending={false} previewData={mockPreviewData} />
+      </div>
+    );
+  }
+
+  if (type === StepTypeEnum.PUSH) {
+    const { subject, body } = stepContent.controlValues;
+    const mockPreviewData: GeneratePreviewResponseDto = {
+      result: {
+        type: ChannelTypeEnum.PUSH as const,
+        preview: {
+          subject,
+          body,
+          title: subject,
+          content: body,
+        } as PushRenderOutput,
+      },
+      previewPayloadExample: {},
+    };
+
+    return (
+      <div className="p-4">
+        <PushPreview isPreviewPending={false} previewData={mockPreviewData} />
       </div>
     );
   }
