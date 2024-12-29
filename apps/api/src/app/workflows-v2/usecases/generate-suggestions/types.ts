@@ -56,9 +56,9 @@ export interface IWorkflowStep {
 }
 
 export interface IWorkflow {
-  id: string;
-  name: string;
-  description: string;
-  category: 'popular' | 'events' | 'authentication' | 'social';
-  steps: IWorkflowStep[];
+  id?: string;
+  name?: string;
+  description?: string;
+  category?: 'popular' | 'events' | 'authentication' | 'social';
+  steps?: IWorkflowStep[];
 }
