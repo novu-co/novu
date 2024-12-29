@@ -50,6 +50,7 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
                     <CreateWorkflowButton key={template.id} asChild template={template.workflowDefinition}>
                       <WorkflowCard
                         name={template.name}
+                        template={template.workflowDefinition}
                         description={template.description}
                         steps={template.workflowDefinition.steps.map((step) => step.type)}
                       />
