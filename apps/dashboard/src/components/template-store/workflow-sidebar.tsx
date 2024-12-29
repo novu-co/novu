@@ -13,6 +13,7 @@ import {
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { WorkflowMode } from './workflow-template-modal';
+import { CreateWorkflowButton } from '@/components/create-workflow-button';
 
 interface WorkflowSidebarProps {
   selectedCategory: string;
@@ -51,15 +52,17 @@ const useCases = [
 
 const createOptions = [
   {
+    icon: <FileText className="h-3 w-3 text-gray-700" />,
+    label: 'Blank workflow',
+    bgColor: 'bg-green-50',
+    component: CreateWorkflowButton,
+  },
+  {
     icon: <Code2 className="h-3 w-3 text-gray-700" />,
     label: 'Code-based workflow',
     hasExternalLink: true,
     bgColor: 'bg-blue-50',
-  },
-  {
-    icon: <FileText className="h-3 w-3 text-gray-700" />,
-    label: 'Blank workflow',
-    bgColor: 'bg-green-50',
+    onClick: () => window.open('https://docs.novu.co/framework/overview', '_blank'),
   },
 ];
 
@@ -74,6 +77,49 @@ export function WorkflowSidebar({
 
   return (
     <div className="flex h-full flex-col bg-gray-50">
+      <section className="p-2">
+        <div className="mb-2">
+          <span className="text-subheading-2xs text-gray-500">CREATE</span>
+        </div>
+        <div className="flex flex-col gap-2">
+          {isAiTemplateStoreEnabled && (
+            <button
+              type="button"
+              onClick={onFromPromptClick}
+              className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100 ${
+                mode === WorkflowMode.FROM_PROMPT ? 'border border-[#EEEFF1] bg-white' : ''
+              }`}
+            >
+              <div className="rounded-lg bg-blue-50 p-[5px]">
+                <Wand2 className="h-3 w-3 text-gray-700" />
+              </div>
+              <span className="text-label-sm text-strong-950">From prompt</span>
+            </button>
+          )}
+          {createOptions.map((item, index) => (
+            <div
+              key={index}
+              onClick={item.onClick}
+              className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100`}
+            >
+              {item.component ? (
+                <item.component asChild>
+                  <div className="flex items-center gap-3">
+                    <div className={`rounded-lg p-[5px] ${item.bgColor}`}>{item.icon}</div>
+                    <span className="text-label-sm text-strong-950">{item.label}</span>
+                  </div>
+                </item.component>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <div className={`rounded-lg p-[5px] ${item.bgColor}`}>{item.icon}</div>
+                  <span className="text-label-sm text-strong-950">{item.label}</span>
+                </div>
+              )}
+              {item.hasExternalLink && <ExternalLink className="text-foreground-600 ml-auto h-3 w-3" />}
+            </div>
+          ))}
+        </div>
+      </section>
       <section className="p-2">
         <div className="mb-2">
           <span className="text-subheading-2xs text-gray-500">EXPLORE</span>
@@ -106,40 +152,6 @@ export function WorkflowSidebar({
             >
               <div className={`rounded-lg p-[5px] ${item.bgColor}`}>{item.icon}</div>
               <span className="text-label-sm text-strong-950">{item.label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="p-2">
-        <div className="mb-2">
-          <span className="text-subheading-2xs text-gray-500">OR CREATE</span>
-        </div>
-        <div className="flex flex-col gap-2">
-          {isAiTemplateStoreEnabled && (
-            <button
-              type="button"
-              onClick={onFromPromptClick}
-              className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100 ${
-                mode === WorkflowMode.FROM_PROMPT ? 'border border-[#EEEFF1] bg-white' : ''
-              }`}
-            >
-              <div className="rounded-lg bg-blue-50 p-[5px]">
-                <Wand2 className="h-3 w-3 text-gray-700" />
-              </div>
-              <span className="text-label-sm text-strong-950">From prompt</span>
-            </button>
-          )}
-          {createOptions.map((item, index) => (
-            <div
-              key={index}
-              className={`flex items-center gap-2 rounded-xl p-1.5 transition-colors hover:cursor-pointer hover:bg-gray-100`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`rounded-lg p-[5px] ${item.bgColor}`}>{item.icon}</div>
-                <span className="text-label-sm text-strong-950">{item.label}</span>
-              </div>
-              {item.hasExternalLink && <ExternalLink className="text-foreground-600 ml-auto h-3 w-3" />}
             </div>
           ))}
         </div>

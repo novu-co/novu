@@ -417,14 +417,6 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
                 )}
               </div>
             </div>
-
-            <div className="flex w-full items-center justify-end gap-2 border-t border-neutral-200 p-2">
-              <CreateWorkflowButton asChild>
-                <Button variant="outline" size="sm">
-                  Create blank workflow
-                </Button>
-              </CreateWorkflowButton>
-            </div>
           </form>
         </Form>
       </DialogContent>

@@ -1,14 +1,17 @@
-import { UserSessionData } from '@novu/shared';
-import { IsString, IsDefined } from 'class-validator';
+import { EnvironmentWithUserCommand } from '@novu/application-generic';
+import { IsString, IsDefined, IsEnum } from 'class-validator';
 
-export class GenerateSuggestionsCommand {
+export enum WorkflowModeEnum {
+  SINGLE = 'single',
+  MULTIPLE = 'multiple',
+}
+
+export class GenerateSuggestionsCommand extends EnvironmentWithUserCommand {
   @IsDefined()
   @IsString()
   prompt: string;
 
-  @IsDefined()
-  user: UserSessionData;
-
   @IsString()
-  mode?: 'single' | 'multiple' = 'multiple';
+  @IsEnum(WorkflowModeEnum)
+  mode?: WorkflowModeEnum;
 }

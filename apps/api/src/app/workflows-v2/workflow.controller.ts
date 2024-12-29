@@ -55,14 +55,18 @@ import { GeneratePreviewCommand } from './usecases/generate-preview/generate-pre
 import { PatchStepCommand } from './usecases/patch-step-data';
 import { PatchWorkflowCommand, PatchWorkflowUsecase } from './usecases/patch-workflow';
 import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
-import { GenerateSuggestionsUsecase } from './usecases/generate-suggestions';
+import {
+  GenerateSuggestionsCommand,
+  GenerateSuggestionsUsecase,
+  WorkflowModeEnum,
+} from './usecases/generate-suggestions';
 
 class GenerateWorkflowSuggestionsDto {
   @IsString()
   prompt: string;
 
   @IsString()
-  mode?: 'single' | 'multiple' = 'multiple';
+  mode?: WorkflowModeEnum;
 }
 
 @ApiCommonResponses()
@@ -91,11 +95,15 @@ export class WorkflowController {
     @UserSession() user: UserSessionData,
     @Body() body: GenerateWorkflowSuggestionsDto
   ): Promise<any> {
-    return this.generateSuggestionsUsecase.execute({
-      prompt: body.prompt,
-      user,
-      mode: body.mode,
-    });
+    return this.generateSuggestionsUsecase.execute(
+      GenerateSuggestionsCommand.create({
+        prompt: body.prompt,
+        environmentId: user.environmentId,
+        organizationId: user.organizationId,
+        userId: user._id,
+        mode: body.mode || WorkflowModeEnum.MULTIPLE,
+      })
+    );
   }
 
   @Post('')
