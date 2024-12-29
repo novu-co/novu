@@ -56,17 +56,13 @@ import { PatchStepCommand } from './usecases/patch-step-data';
 import { PatchWorkflowCommand, PatchWorkflowUsecase } from './usecases/patch-workflow';
 import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
 import { GenerateSuggestionsUsecase } from './usecases/generate-suggestions';
-import { IWorkflowSuggestion } from './dtos/workflow-suggestion.interface';
 
-// DTO for the suggestions request
 class GenerateWorkflowSuggestionsDto {
   @IsString()
   prompt: string;
-}
 
-// Response type for workflow suggestions
-class WorkflowSuggestionsResponseDto {
-  suggestions: IWorkflowSuggestion[];
+  @IsString()
+  mode?: 'single' | 'multiple' = 'multiple';
 }
 
 @ApiCommonResponses()
@@ -98,6 +94,7 @@ export class WorkflowController {
     return this.generateSuggestionsUsecase.execute({
       prompt: body.prompt,
       user,
+      mode: body.mode,
     });
   }
 

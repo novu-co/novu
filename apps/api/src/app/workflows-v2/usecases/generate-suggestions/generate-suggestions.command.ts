@@ -1,18 +1,14 @@
 import { UserSessionData } from '@novu/shared';
-import { IsString } from 'class-validator';
+import { IsString, IsDefined } from 'class-validator';
 
 export class GenerateSuggestionsCommand {
+  @IsDefined()
   @IsString()
   prompt: string;
 
+  @IsDefined()
   user: UserSessionData;
 
-  static create(data: { prompt: string; user: UserSessionData }) {
-    const command = new GenerateSuggestionsCommand();
-
-    command.prompt = data.prompt;
-    command.user = data.user;
-
-    return command;
-  }
+  @IsString()
+  mode?: 'single' | 'multiple' = 'multiple';
 }
