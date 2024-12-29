@@ -1,5 +1,4 @@
 import { ComponentProps, useState } from 'react';
-import { RiArrowRightSLine } from 'react-icons/ri';
 
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/primitives/dialog';
 import { Button } from '@/components/primitives/button';
@@ -9,108 +8,11 @@ import { WorkflowSidebar } from './workflow-sidebar';
 import { RouteFill } from '../icons';
 import { Form } from '../primitives/form/form';
 import { useForm } from 'react-hook-form';
-import { StepTypeEnum, WorkflowCreationSourceEnum, CreateWorkflowDto } from '@novu/shared';
+import { getTemplates } from './templates';
 
 type WorkflowTemplateModalProps = ComponentProps<typeof DialogTrigger>;
 
-interface WorkflowTemplate {
-  id: string;
-  name: string;
-  description: string;
-  category: 'popular' | 'events' | 'authentication' | 'social';
-  workflowDefinition: CreateWorkflowDto;
-}
-
-const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
-  {
-    id: 'mention-notification',
-    name: 'Mention in a comment',
-    description: 'Triggered when an actor mentions someone',
-    category: 'popular',
-    workflowDefinition: {
-      name: 'Mention in a comment',
-      description: 'Triggered when an actor mentions someone',
-      workflowId: 'mention-notification',
-      steps: [
-        {
-          name: 'In-App Notification',
-          type: StepTypeEnum.IN_APP,
-          controlValues: {
-            body: 'You were mentioned in a comment by {{payload.actorName}}',
-            avatar: '',
-            subject: 'New Mention',
-            primaryAction: {
-              label: 'View Comment',
-              redirect: {
-                url: '{{payload.commentUrl}}',
-                target: '_blank',
-              },
-            },
-            secondaryAction: null,
-            redirect: {
-              url: '',
-              target: '_self',
-            },
-          },
-        },
-        {
-          name: 'Email Notification',
-          type: StepTypeEnum.EMAIL,
-          controlValues: {
-            subject: 'You were mentioned in a comment',
-            body: JSON.stringify({
-              type: 'doc',
-              content: [
-                {
-                  type: 'paragraph',
-                  attrs: { textAlign: 'left' },
-                  content: [
-                    { type: 'text', text: 'Hi ' },
-                    {
-                      type: 'variable',
-                      attrs: { id: 'subscriber.firstName', label: null, fallback: null, required: false },
-                    },
-                    { type: 'text', text: ',' },
-                  ],
-                },
-                {
-                  type: 'paragraph',
-                  attrs: { textAlign: 'left' },
-                  content: [
-                    { type: 'text', text: 'You were mentioned in a comment by ' },
-                    {
-                      type: 'variable',
-                      attrs: { id: 'payload.actorName', label: null, fallback: null, required: false },
-                    },
-                    { type: 'text', text: '.' },
-                  ],
-                },
-                {
-                  type: 'button',
-                  attrs: {
-                    text: 'View Comment',
-                    isTextVariable: false,
-                    url: '',
-                    isUrlVariable: false,
-                    alignment: 'left',
-                    variant: 'filled',
-                    borderRadius: 'smooth',
-                    buttonColor: '#000000',
-                    textColor: '#ffffff',
-                    showIfKey: null,
-                  },
-                },
-              ],
-            }),
-          },
-        },
-      ],
-      tags: ['mention', 'comment', 'notification'],
-      active: true,
-      __source: WorkflowCreationSourceEnum.TEMPLATE_STORE,
-    },
-  },
-];
+const WORKFLOW_TEMPLATES = getTemplates();
 
 export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   const form = useForm();
@@ -157,17 +59,12 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
               </div>
             </div>
 
-            {/* Footer */}
             <div className="flex w-full items-center justify-end gap-2 border-t border-neutral-200 p-2">
               <CreateWorkflowButton asChild>
                 <Button variant="outline" size="sm">
                   Create blank workflow
                 </Button>
               </CreateWorkflowButton>
-              <Button size="sm" variant="primary">
-                Import template
-                <RiArrowRightSLine className="size-4" />
-              </Button>
             </div>
           </form>
         </Form>
