@@ -31,6 +31,7 @@ import {
   WorkflowTestDataResponseDto,
 } from '@novu/shared';
 import { DeleteWorkflowCommand, DeleteWorkflowUseCase, UserAuthGuard, UserSession } from '@novu/application-generic';
+import { IsString } from 'class-validator';
 import { ApiCommonResponses } from '../shared/framework/response.decorator';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
 import { GetWorkflowCommand } from './usecases/get-workflow/get-workflow.command';
@@ -54,6 +55,19 @@ import { GeneratePreviewCommand } from './usecases/generate-preview/generate-pre
 import { PatchStepCommand } from './usecases/patch-step-data';
 import { PatchWorkflowCommand, PatchWorkflowUsecase } from './usecases/patch-workflow';
 import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
+import { GenerateSuggestionsUsecase } from './usecases/generate-suggestions';
+import { IWorkflowSuggestion } from './dtos/workflow-suggestion.interface';
+
+// DTO for the suggestions request
+class GenerateWorkflowSuggestionsDto {
+  @IsString()
+  prompt: string;
+}
+
+// Response type for workflow suggestions
+class WorkflowSuggestionsResponseDto {
+  suggestions: IWorkflowSuggestion[];
+}
 
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
@@ -71,8 +85,21 @@ export class WorkflowController {
     private buildWorkflowTestDataUseCase: BuildWorkflowTestDataUseCase,
     private buildStepDataUsecase: BuildStepDataUsecase,
     private patchStepDataUsecase: PatchStepUsecase,
-    private patchWorkflowUsecase: PatchWorkflowUsecase
+    private patchWorkflowUsecase: PatchWorkflowUsecase,
+    private generateSuggestionsUsecase: GenerateSuggestionsUsecase
   ) {}
+
+  @Post('/suggestions')
+  @UseGuards(UserAuthGuard)
+  async generateSuggestions(
+    @UserSession() user: UserSessionData,
+    @Body() body: GenerateWorkflowSuggestionsDto
+  ): Promise<any> {
+    return this.generateSuggestionsUsecase.execute({
+      prompt: body.prompt,
+      user,
+    });
+  }
 
   @Post('')
   @UseGuards(UserAuthGuard)
