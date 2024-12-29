@@ -104,7 +104,7 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
                 />
               </div>
 
-              <div className="w-full flex-1 p-3">
+              <div className="w-full flex-1 overflow-auto p-3">
                 <div className="mb-1.5 flex items-center justify-between">
                   <h2 className="text-label-md text-strong">{getHeaderText()}</h2>
                 </div>

@@ -4,6 +4,9 @@ import { paymentFailedTemplate } from './payment-failed';
 import { teamInvitationTemplate } from './team-invitation';
 import { trialExpirationTemplate } from './trial-expiration';
 import { usageLimitTemplate } from './usage-limit';
+import { passwordResetTemplate } from './password-reset';
+import { newCommentTemplate } from './new-comment';
+import { orderConfirmationTemplate } from './order-confirmation';
 import { WorkflowTemplate } from './types';
 
 export function getTemplates(): WorkflowTemplate[] {
@@ -14,6 +17,9 @@ export function getTemplates(): WorkflowTemplate[] {
     paymentFailedTemplate,
     teamInvitationTemplate,
     usageLimitTemplate,
+    passwordResetTemplate,
+    newCommentTemplate,
+    orderConfirmationTemplate,
   ];
 }
 
