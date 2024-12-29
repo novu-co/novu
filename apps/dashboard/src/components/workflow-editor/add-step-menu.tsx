@@ -30,7 +30,7 @@ const MenuItemsGroup = ({ children }: { children: ReactNode }) => {
 const MenuItem = ({
   children,
   stepType,
-  disabled = false,
+  disabled,
   onClick,
 }: {
   children: ReactNode;
