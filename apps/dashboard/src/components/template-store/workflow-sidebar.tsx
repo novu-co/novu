@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
-import { WorkflowMode } from './workflow-template-modal';
+import { WorkflowMode } from './types';
 import { CreateWorkflowButton } from '@/components/create-workflow-button';
 
 interface WorkflowSidebarProps {
@@ -158,7 +158,10 @@ export function WorkflowSidebar({
       </section>
 
       <div className="mt-auto p-3">
-        <div className="border-stroke-soft flex flex-col items-start rounded-xl border bg-white p-3 hover:cursor-pointer">
+        <div
+          className="border-stroke-soft flex flex-col items-start rounded-xl border bg-white p-3 hover:cursor-pointer"
+          onClick={() => window.open('https://docs.novu.co/workflow/overview', '_blank')}
+        >
           <div className="mb-1 flex items-center gap-1.5">
             <div className="rounded-lg bg-gray-50 p-1.5">
               <FileCode2 className="h-3 w-3 text-gray-700" />

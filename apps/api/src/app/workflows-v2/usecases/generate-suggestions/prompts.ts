@@ -1,3 +1,8 @@
+const VARIABLE_RULES = {
+  LIQUID:
+    'Use proper liquid syntax with {{ }}\nUse {{subscriber.firstName}} for personalization\nUse {{payload.*}} for dynamic data',
+};
+
 const DELAY_EXAMPLES = `
 Delay Step Examples:
 1. Regular delay:
@@ -22,13 +27,15 @@ Delay Step Examples:
      }
    }`;
 
-export const EMAIL_CONTENT_PROMPT = `Generate email content that follows Tiptap JSON structure with modern, visually appealing design elements.
+const EMAIL_CONTENT_PROMPT = `Generate email content that follows Tiptap JSON structure with modern, visually appealing design elements.
 
-Rules for document structure:
-- Content must be organized in a clear visual hierarchy
-- Use appropriate spacing between sections
-- Group related content elements together
-- Maximum content width should feel comfortable to read
+Rules for paragraphs:
+- Each paragraph must have attrs with textAlign property
+- textAlign must be exactly "left", "center", or "right"
+- Default textAlign should be "left"
+- Content array must contain only text or variable nodes
+- Use appropriate line height for readability
+- Maintain consistent spacing between paragraphs
 
 Rules for variables:
 - Use subscriber.firstName for user's name
@@ -41,14 +48,6 @@ Rules for variables:
   - label: must be null
   - fallback: must be null
   - required: boolean (usually false)
-
-Rules for paragraphs:
-- Each paragraph must have attrs with textAlign property
-- textAlign must be exactly "left", "center", or "right"
-- Default textAlign should be "left"
-- Content array must contain only text or variable nodes
-- Use appropriate line height for readability
-- Maintain consistent spacing between paragraphs
 
 Rules for buttons:
 - Must have attrs with all required properties:
@@ -153,61 +152,66 @@ Always include:
 - Only use allowed element types: paragraph, button, spacer, and divider
 - Ensure all attributes match their exact allowed values`;
 
-export const IN_APP_CONTENT_PROMPT = `Generate in-app notification content that is concise and actionable.
+const CHANNEL_RULES = {
+  inApp: {
+    rules: [
+      'Keep it short and clear',
+      'Include call to action when relevant',
+      'You can use ** to bold text',
+      "Don't wrap the result in ```liquid",
+      "Don't start with Hi, Hello, or anything like that. Focus on the content and the call to action",
+    ],
+    example: 'Your order #{{payload.orderNumber}} has been shipped!',
+  },
+  push: {
+    rules: ['Keep it under 140 characters', 'Be direct and clear'],
+    example: '{{subscriber.firstName}}, your order is out for delivery!',
+  },
+  sms: {
+    rules: ['Keep it under 160 characters', 'Be direct and clear', 'Include call to action when needed'],
+    example: 'Hi {{subscriber.firstName}}, your appointment is confirmed for {{payload.time}}. Reply YES to confirm.',
+  },
+  chat: {
+    rules: ['Keep it concise but friendly', 'Include relevant details'],
+    example:
+      'Hi {{subscriber.firstName}}! Just letting you know that your order #{{payload.orderNumber}} has been confirmed.',
+  },
+};
+
+const IN_APP_CONTENT_PROMPT = `Generate in-app notification content that is concise and actionable.
 
 Rules:
-- Keep it short and clear
-- Use {{subscriber.firstName}} for personalization
-- Use {{payload.*}} for dynamic data
-- Include call to action when relevant
-- Use proper liquid syntax with {{ }} for variables
-- You can use ** to bold text
-- Don't wrap the result in \`\`\`liquid
-- Don't start with Hi, Hello, or anything like that. Focus on the content and the call to action
+${CHANNEL_RULES.inApp.rules.map((rule) => `- ${rule}`).join('\n')}
+${VARIABLE_RULES.LIQUID}
 
-Example: Your order #{{payload.orderNumber}} has been shipped!`;
+Example: ${CHANNEL_RULES.inApp.example}`;
 
-export const PUSH_CONTENT_PROMPT = `Generate push notification content that is attention-grabbing but professional.
+const PUSH_CONTENT_PROMPT = `Generate push notification content that is attention-grabbing but professional.
 
 Rules:
-- Keep it under 140 characters
-- Use {{subscriber.firstName}} for personalization
-- Use {{payload.*}} for dynamic data
-- Be direct and clear
-- Use proper liquid syntax with {{ }}
+${CHANNEL_RULES.push.rules.map((rule) => `- ${rule}`).join('\n')}
+${VARIABLE_RULES.LIQUID}
 
-Example: {{subscriber.firstName}}, your order is out for delivery!`;
+Example: ${CHANNEL_RULES.push.example}`;
 
-export const SMS_CONTENT_PROMPT = `Generate SMS content that is concise and informative.
+const SMS_CONTENT_PROMPT = `Generate SMS content that is concise and informative.
 
 Rules:
-- Keep it under 160 characters
-- Use {{subscriber.firstName}} for personalization
-- Use {{payload.*}} for dynamic data
-- Be direct and clear
-- Include call to action when needed
-- Use proper liquid syntax with {{ }}
+${CHANNEL_RULES.sms.rules.map((rule) => `- ${rule}`).join('\n')}
+${VARIABLE_RULES.LIQUID}
 
-Example: Hi {{subscriber.firstName}}, your appointment is confirmed for {{payload.time}}. Reply YES to confirm.`;
+Example: ${CHANNEL_RULES.sms.example}`;
 
-export const CHAT_CONTENT_PROMPT = `Generate chat message content that is conversational yet professional.
+const CHAT_CONTENT_PROMPT = `Generate chat message content that is conversational yet professional.
 
 Rules:
-- Keep it concise but friendly
-- Use {{subscriber.firstName}} for personalization
-- Use {{payload.*}} for dynamic data
-- Include relevant details
-- Use proper liquid syntax with {{ }}
+${CHANNEL_RULES.chat.rules.map((rule) => `- ${rule}`).join('\n')}
+${VARIABLE_RULES.LIQUID}
 
-Example: Hi {{subscriber.firstName}}! Just letting you know that your order #{{payload.orderNumber}} has been confirmed.`;
+Example: ${CHANNEL_RULES.chat.example}`;
 
 const COMMON_PROMPT_INSTRUCTIONS = `Variable Usage Rules:
-- For SMS, Push, In-App, and Chat channels: Use liquid syntax with either subscriber or payload prefix.
-  Examples: 
-  - {{subscriber.firstName}}
-  - {{payload.orderNumber}}
-  - {{subscriber.email}}
-  - {{payload.amount}}
+- For SMS, Push, In-App, and Chat channels: ${VARIABLE_RULES.LIQUID}
 
 For email steps, structure the body as a Tiptap JSON document and don't wrap the variables with {{ with this format:
 {
@@ -236,9 +240,7 @@ Always include:
 - Proper liquid syntax for variables in non-email channels
 - Appropriate delays between notifications when needed`;
 
-export const MULTIPLE_WORKFLOWS_PROMPT = `You are an expert in generating workflow suggestions for a notification system. Based on the user's product description, generate 5 relevant workflow suggestions that would be useful for their product. Each workflow should be practical, specific, and follow best practices for user engagement and notification design.
-
-Consider common use cases for transactional notifications.
+const MULTIPLE_WORKFLOWS_PROMPT = `You are an expert in generating workflow suggestions for a notification system. Based on the user's product description, generate 5 relevant workflow suggestions that would be useful for their product. Each workflow should be practical, specific, and follow best practices for user engagement and notification design.
 
 For each workflow:
 - Create a unique ID
@@ -250,7 +252,7 @@ For each workflow:
 
 ${COMMON_PROMPT_INSTRUCTIONS}`;
 
-export const SINGLE_WORKFLOW_PROMPT = `You are an expert in creating notification workflows. Based on the user's workflow description, create a single, well-structured workflow that precisely matches their requirements. The workflow should follow best practices for user engagement and notification design.
+const SINGLE_WORKFLOW_PROMPT = `You are an expert in creating notification workflows. Based on the user's workflow description, create a single, well-structured workflow that precisely matches their requirements. The workflow should follow best practices for user engagement and notification design.
 
 For the workflow:
 - Create a unique ID
@@ -264,3 +266,24 @@ For the workflow:
 ${COMMON_PROMPT_INSTRUCTIONS}
 
 Focus on creating a precise, production-ready workflow that exactly matches the user's requirements, including any timing or delay specifications.`;
+
+export const prompts = {
+  email: EMAIL_CONTENT_PROMPT,
+  inApp: IN_APP_CONTENT_PROMPT,
+  push: PUSH_CONTENT_PROMPT,
+  sms: SMS_CONTENT_PROMPT,
+  chat: CHAT_CONTENT_PROMPT,
+  multipleWorkflows: MULTIPLE_WORKFLOWS_PROMPT,
+  singleWorkflow: SINGLE_WORKFLOW_PROMPT,
+} as const;
+
+// Re-export individual prompts for backward compatibility
+export {
+  EMAIL_CONTENT_PROMPT,
+  IN_APP_CONTENT_PROMPT,
+  PUSH_CONTENT_PROMPT,
+  SMS_CONTENT_PROMPT,
+  CHAT_CONTENT_PROMPT,
+  MULTIPLE_WORKFLOWS_PROMPT,
+  SINGLE_WORKFLOW_PROMPT,
+};

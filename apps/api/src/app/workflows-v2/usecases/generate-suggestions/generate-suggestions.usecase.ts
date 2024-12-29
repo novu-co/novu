@@ -7,18 +7,16 @@ import { StepTypeEnum } from '@novu/shared';
 import { IWorkflowSuggestion } from '../../dtos/workflow-suggestion.interface';
 import { GenerateSuggestionsCommand } from './generate-suggestions.command';
 import { workflowSchema, emailContentSchema } from './schemas';
-import {
-  MULTIPLE_WORKFLOWS_PROMPT,
-  SINGLE_WORKFLOW_PROMPT,
-  EMAIL_CONTENT_PROMPT,
-  IN_APP_CONTENT_PROMPT,
-  PUSH_CONTENT_PROMPT,
-  SMS_CONTENT_PROMPT,
-  CHAT_CONTENT_PROMPT,
-} from './prompts';
+import { prompts } from './prompts';
 import { mapSuggestionToDto } from './mappers';
 import { withRetry } from './retry.util';
 import { IWorkflow, IWorkflowStep } from './types';
+
+type ContentGenerator = {
+  prompt: string;
+  schema: z.ZodType<any>;
+  mapResult: (result: any) => string;
+} | null;
 
 @Injectable()
 export class GenerateSuggestionsUsecase {
@@ -26,10 +24,7 @@ export class GenerateSuggestionsUsecase {
 
   @InstrumentUsecase()
   async execute(command: GenerateSuggestionsCommand): Promise<{ suggestions: IWorkflowSuggestion[] }> {
-    // First, generate workflow structures
     const workflowsResult = await this.generateWorkflowStructures(command);
-
-    // Then, enrich each workflow's steps with content
     const enrichedWorkflows = await this.enrichWorkflowsWithContent(workflowsResult.suggestions, command);
 
     return {
@@ -37,14 +32,49 @@ export class GenerateSuggestionsUsecase {
     };
   }
 
+  private readonly contentGenerators: Record<StepTypeEnum, ContentGenerator> = {
+    [StepTypeEnum.EMAIL]: {
+      prompt: prompts.email,
+      schema: z.object({ content: z.array(emailContentSchema) }),
+      mapResult: (result) => JSON.stringify(result.content[0]),
+    },
+    [StepTypeEnum.IN_APP]: {
+      prompt: prompts.inApp,
+      schema: z.object({ text: z.string() }),
+      mapResult: (result) => result.text,
+    },
+    [StepTypeEnum.PUSH]: {
+      prompt: prompts.push,
+      schema: z.object({ text: z.string() }),
+      mapResult: (result) => result.text,
+    },
+    [StepTypeEnum.SMS]: {
+      prompt: prompts.sms,
+      schema: z.object({ text: z.string() }),
+      mapResult: (result) => result.text,
+    },
+    [StepTypeEnum.CHAT]: {
+      prompt: prompts.chat,
+      schema: z.object({ text: z.string() }),
+      mapResult: (result) => result.text,
+    },
+    // Non-content steps return null
+    [StepTypeEnum.DIGEST]: null,
+    [StepTypeEnum.TRIGGER]: null,
+    [StepTypeEnum.DELAY]: null,
+    [StepTypeEnum.CUSTOM]: null,
+  };
+
   private async generateWorkflowStructures(command: GenerateSuggestionsCommand) {
+    const workflowPrompt = command.mode === 'single' ? prompts.singleWorkflow : prompts.multipleWorkflows;
+
     return withRetry(
       async () => {
         const result = await generateObject({
           model: openai('gpt-4o', {
             structuredOutputs: true,
           }),
-          prompt: `${command.mode === 'single' ? SINGLE_WORKFLOW_PROMPT : MULTIPLE_WORKFLOWS_PROMPT}
+          prompt: `${workflowPrompt}
 
 User's request: ${command.prompt}`,
           schema: z.object({ suggestions: z.array(workflowSchema) }),
@@ -71,58 +101,31 @@ User's request: ${command.prompt}`,
   }
 
   private async enrichWorkflowsWithContent(workflows: IWorkflow[], command: GenerateSuggestionsCommand) {
-    const enrichedWorkflows: IWorkflow[] = [];
-
-    for (const workflow of workflows) {
-      const enrichedSteps: IWorkflowStep[] = [];
-
-      for (const step of workflow.steps) {
-        const enrichedStep: IWorkflowStep = { ...step };
-
-        if (step.type === StepTypeEnum.EMAIL) {
-          const email = await this.generateEmailContent(workflow, step, command);
-          enrichedStep.body = JSON.stringify(email[0]);
-        } else if (step.type === StepTypeEnum.IN_APP) {
-          enrichedStep.body = await this.generateInAppContent(workflow, step, command);
-        } else if (step.type === StepTypeEnum.PUSH) {
-          enrichedStep.body = await this.generatePushContent(workflow, step, command);
-        } else if (step.type === StepTypeEnum.SMS) {
-          enrichedStep.body = await this.generateSmsContent(workflow, step, command);
-        } else if (step.type === StepTypeEnum.CHAT) {
-          enrichedStep.body = await this.generateChatContent(workflow, step, command);
-        }
-
-        enrichedSteps.push(enrichedStep);
-      }
-
-      enrichedWorkflows.push({
+    return Promise.all(
+      workflows.map(async (workflow) => ({
         ...workflow,
-        steps: enrichedSteps,
-      });
-    }
-
-    return enrichedWorkflows;
+        steps: await Promise.all(
+          workflow.steps.map(async (step) => ({
+            ...step,
+            body: await this.generateStepContent(workflow, step, command),
+          }))
+        ),
+      }))
+    );
   }
 
-  private async generateEmailContent(workflow: IWorkflow, step: IWorkflowStep, command: GenerateSuggestionsCommand) {
+  private async generateStepContent(workflow: IWorkflow, step: IWorkflowStep, command: GenerateSuggestionsCommand) {
+    const generator = this.contentGenerators[step.type];
+    if (!generator) return step.body;
+
     const result = await withRetry(
       async () => {
         const response = await generateObject({
           model: openai('gpt-4o', {
             structuredOutputs: true,
           }),
-          prompt: `${EMAIL_CONTENT_PROMPT}
-
-Workflow Context:
-Name: ${workflow.name}
-Description: ${workflow.description}
-Step Name: ${step.name}
-Step Reasoning: ${step.context?.reasoning || ''}
-Step Focus Points:
-${step.context?.focus?.map((point) => `- ${point}`).join('\n') || ''}
-
-User's request: ${command.prompt}`,
-          schema: z.object({ content: z.array(emailContentSchema) }),
+          prompt: this.buildContentPrompt(generator.prompt, workflow, step, command),
+          schema: generator.schema,
           mode: 'json',
           experimental_providerMetadata: {
             config: {
@@ -131,12 +134,12 @@ User's request: ${command.prompt}`,
           },
         });
 
-        return response.object.content;
+        return generator.mapResult(response.object);
       },
       {
         isRetryable: this.isRetryableError,
         onRetry: (error, attempt, delay) => {
-          this.logger.warn(`Retrying email content generation after ${delay}ms (attempt ${attempt})`, {
+          this.logger.warn(`Retrying ${step.type} content generation after ${delay}ms (attempt ${attempt})`, {
             error,
             workflow,
             step,
@@ -148,19 +151,13 @@ User's request: ${command.prompt}`,
     return result;
   }
 
-  private async generateTextContent(
-    prompt: string,
+  private buildContentPrompt(
+    basePrompt: string,
     workflow: IWorkflow,
     step: IWorkflowStep,
     command: GenerateSuggestionsCommand
-  ) {
-    const result = await withRetry(
-      async () => {
-        const response = await generateObject({
-          model: openai('gpt-4o', {
-            structuredOutputs: true,
-          }),
-          prompt: `${prompt}
+  ): string {
+    return `${basePrompt}
 
 Workflow Context:
 Name: ${workflow.name}
@@ -170,49 +167,7 @@ Step Reasoning: ${step.context?.reasoning || ''}
 Step Focus Points:
 ${step.context?.focus?.map((point) => `- ${point}`).join('\n') || ''}
 
-User's request: ${command.prompt}`,
-          schema: z.object({
-            text: z.string(),
-          }),
-          mode: 'json',
-          experimental_providerMetadata: {
-            config: {
-              structuredOutputs: true,
-            },
-          },
-        });
-
-        return response.object.text;
-      },
-      {
-        isRetryable: this.isRetryableError,
-        onRetry: (error, attempt, delay) => {
-          this.logger.warn(`Retrying text content generation after ${delay}ms (attempt ${attempt})`, {
-            error,
-            workflow,
-            step,
-          });
-        },
-      }
-    );
-
-    return result;
-  }
-
-  private generateInAppContent(workflow: IWorkflow, step: IWorkflowStep, command: GenerateSuggestionsCommand) {
-    return this.generateTextContent(IN_APP_CONTENT_PROMPT, workflow, step, command);
-  }
-
-  private generatePushContent(workflow: IWorkflow, step: IWorkflowStep, command: GenerateSuggestionsCommand) {
-    return this.generateTextContent(PUSH_CONTENT_PROMPT, workflow, step, command);
-  }
-
-  private generateSmsContent(workflow: IWorkflow, step: IWorkflowStep, command: GenerateSuggestionsCommand) {
-    return this.generateTextContent(SMS_CONTENT_PROMPT, workflow, step, command);
-  }
-
-  private generateChatContent(workflow: IWorkflow, step: IWorkflowStep, command: GenerateSuggestionsCommand) {
-    return this.generateTextContent(CHAT_CONTENT_PROMPT, workflow, step, command);
+User's request: ${command.prompt}`;
   }
 
   private isRetryableError(error: any): boolean {
