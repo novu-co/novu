@@ -45,13 +45,13 @@ import { PushPreview } from '../workflow-editor/steps/push/push-preview';
 
 export type StepType = StepTypeEnum;
 
-interface WorkflowCardProps {
+type WorkflowCardProps = {
   name: string;
   description: string;
   steps?: StepType[];
   onClick?: () => void;
   template?: CreateWorkflowDto;
-}
+};
 
 function StepPreview({ type, stepContent }: { type: StepType; stepContent?: any }) {
   if (!stepContent) {

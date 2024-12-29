@@ -16,11 +16,11 @@ const PROMPT_EXAMPLES = [
   'We have a mobile app for food delivery services',
 ] as const;
 
-interface WorkflowGenerateModalProps {
+type WorkflowGenerateModalProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuggestionsGenerated?: (suggestions: IWorkflowSuggestion[]) => void;
-}
+};
 
 export function WorkflowGenerateModal({ open, onOpenChange, onSuggestionsGenerated }: WorkflowGenerateModalProps) {
   const [prompt, setPrompt] = useState('');

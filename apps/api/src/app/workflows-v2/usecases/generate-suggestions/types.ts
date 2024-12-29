@@ -10,9 +10,9 @@ export type ContentType =
   | 'columns'
   | 'column';
 
-interface IEmailContent {
+export interface IEmailContent {
   type: ContentType;
-  text: string;
+  text?: string;
   attrs?: {
     textAlign?: 'left' | 'center' | 'right';
     id?: string;

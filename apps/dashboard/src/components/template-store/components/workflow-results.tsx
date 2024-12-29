@@ -3,10 +3,10 @@ import { CreateWorkflowButton } from '../../create-workflow-button';
 import { WorkflowCard } from '../workflow-card';
 import { IWorkflowSuggestion } from '../templates/types';
 
-interface WorkflowResultsProps {
+type WorkflowResultsProps = {
   mode: WorkflowMode;
   suggestions: IWorkflowSuggestion[];
-}
+};
 
 export function WorkflowResults({ mode, suggestions }: WorkflowResultsProps) {
   return (

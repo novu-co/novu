@@ -5,22 +5,61 @@ import { z } from 'zod';
 import { InstrumentUsecase } from '@novu/application-generic';
 import { StepTypeEnum } from '@novu/shared';
 import { IWorkflowSuggestion } from '../../dtos/workflow-suggestion.interface';
-import { GenerateSuggestionsCommand } from './generate-suggestions.command';
+import { GenerateSuggestionsCommand, WorkflowModeEnum } from './generate-suggestions.command';
 import { workflowSchema, emailContentSchema } from './schemas';
 import { prompts } from './prompts';
 import { mapSuggestionToDto } from './mappers';
 import { withRetry } from './retry.util';
-import { IWorkflow, IWorkflowStep } from './types';
+import { IWorkflow, IWorkflowStep, IEmailContent } from './types';
+
+interface IGeneratedTextContent {
+  text: string;
+}
+
+type GeneratedContent = { type: 'doc'; content: IEmailContent[] } | IGeneratedTextContent;
 
 type ContentGenerator = {
   prompt: string;
-  schema: z.ZodType<any>;
-  mapResult: (result: any) => string;
+  schema: z.ZodType<GeneratedContent>;
+  mapResult: (result: GeneratedContent) => string;
 } | null;
 
 @Injectable()
 export class GenerateSuggestionsUsecase {
   private readonly logger = new Logger(GenerateSuggestionsUsecase.name);
+
+  private readonly contentGenerators: Record<StepTypeEnum, ContentGenerator> = {
+    [StepTypeEnum.EMAIL]: {
+      prompt: prompts.email,
+      schema: emailContentSchema as z.ZodType<{ type: 'doc'; content: IEmailContent[] }>,
+      mapResult: (result: { type: 'doc'; content: IEmailContent[] }) => JSON.stringify(result.content[0]),
+    },
+    [StepTypeEnum.IN_APP]: {
+      prompt: prompts.inApp,
+      schema: z.object({ text: z.string() }) as z.ZodType<IGeneratedTextContent>,
+      mapResult: (result: IGeneratedTextContent) => result.text,
+    },
+    [StepTypeEnum.PUSH]: {
+      prompt: prompts.push,
+      schema: z.object({ text: z.string() }) as z.ZodType<IGeneratedTextContent>,
+      mapResult: (result: IGeneratedTextContent) => result.text,
+    },
+    [StepTypeEnum.SMS]: {
+      prompt: prompts.sms,
+      schema: z.object({ text: z.string() }) as z.ZodType<IGeneratedTextContent>,
+      mapResult: (result: IGeneratedTextContent) => result.text,
+    },
+    [StepTypeEnum.CHAT]: {
+      prompt: prompts.chat,
+      schema: z.object({ text: z.string() }) as z.ZodType<IGeneratedTextContent>,
+      mapResult: (result: IGeneratedTextContent) => result.text,
+    },
+    // Non-content steps return null
+    [StepTypeEnum.DIGEST]: null,
+    [StepTypeEnum.TRIGGER]: null,
+    [StepTypeEnum.DELAY]: null,
+    [StepTypeEnum.CUSTOM]: null,
+  };
 
   @InstrumentUsecase()
   async execute(command: GenerateSuggestionsCommand): Promise<{ suggestions: IWorkflowSuggestion[] }> {
@@ -32,41 +71,9 @@ export class GenerateSuggestionsUsecase {
     };
   }
 
-  private readonly contentGenerators: Record<StepTypeEnum, ContentGenerator> = {
-    [StepTypeEnum.EMAIL]: {
-      prompt: prompts.email,
-      schema: z.object({ content: z.array(emailContentSchema) }),
-      mapResult: (result) => JSON.stringify(result.content[0]),
-    },
-    [StepTypeEnum.IN_APP]: {
-      prompt: prompts.inApp,
-      schema: z.object({ text: z.string() }),
-      mapResult: (result) => result.text,
-    },
-    [StepTypeEnum.PUSH]: {
-      prompt: prompts.push,
-      schema: z.object({ text: z.string() }),
-      mapResult: (result) => result.text,
-    },
-    [StepTypeEnum.SMS]: {
-      prompt: prompts.sms,
-      schema: z.object({ text: z.string() }),
-      mapResult: (result) => result.text,
-    },
-    [StepTypeEnum.CHAT]: {
-      prompt: prompts.chat,
-      schema: z.object({ text: z.string() }),
-      mapResult: (result) => result.text,
-    },
-    // Non-content steps return null
-    [StepTypeEnum.DIGEST]: null,
-    [StepTypeEnum.TRIGGER]: null,
-    [StepTypeEnum.DELAY]: null,
-    [StepTypeEnum.CUSTOM]: null,
-  };
-
   private async generateWorkflowStructures(command: GenerateSuggestionsCommand) {
-    const workflowPrompt = command.mode === 'single' ? prompts.singleWorkflow : prompts.multipleWorkflows;
+    const workflowPrompt =
+      command.mode === WorkflowModeEnum.SINGLE ? prompts.singleWorkflow : prompts.multipleWorkflows;
 
     return withRetry(
       async () => {
@@ -170,22 +177,33 @@ ${step.context?.focus?.map((point) => `- ${point}`).join('\n') || ''}
 User's request: ${command.prompt}`;
   }
 
-  private isRetryableError(error: any): boolean {
+  private isRetryableError(error: unknown): boolean {
     // Zod validation errors (can be transient due to AI output variations)
     if (error instanceof z.ZodError) return true;
 
     // Rate limits
-    if (error?.status === 429) return true;
-
-    // Server errors
-    if (error?.status >= 500 && error?.status < 600) return true;
+    if (error && typeof error === 'object' && 'status' in error) {
+      const { status } = error as { status: number };
+      if (status === 429) return true;
+      // Server errors
+      if (status >= 500 && status < 600) return true;
+    }
 
     // Network errors
-    if (error?.code === 'ECONNRESET' || error?.code === 'ETIMEDOUT') return true;
+    if (error && typeof error === 'object' && 'code' in error) {
+      const { code } = error as { code: string };
+      if (code === 'ECONNRESET' || code === 'ETIMEDOUT') return true;
+    }
 
     // Specific OpenAI errors that are retryable
     const retryableMessages = ['capacity', 'server_error', 'rate_limit_exceeded', 'model_overloaded'];
 
-    return retryableMessages.some((msg) => error?.message?.toLowerCase().includes(msg));
+    if (error && typeof error === 'object' && 'message' in error) {
+      const { message } = error as { message: string };
+
+      return retryableMessages.some((msg) => message.toLowerCase().includes(msg));
+    }
+
+    return false;
   }
 }

@@ -4,10 +4,20 @@ import { Textarea } from '@/components/primitives/textarea';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/primitives/hover-card';
 import { Sparkles, Wand2, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
-import { WorkflowGenerateProps } from '../types';
 import { GENERATE_EXAMPLES, FROM_PROMPT_EXAMPLES } from '../constants';
 import { LoadingSkeleton } from './loading-skeleton';
 import { WorkflowResults } from './workflow-results';
+import { IWorkflowSuggestion } from '../templates';
+import { WorkflowMode } from '../types';
+
+export type WorkflowGenerateProps = {
+  mode: WorkflowMode;
+  prompt: string;
+  setPrompt: (prompt: string) => void;
+  isGenerating: boolean;
+  handleSubmit: () => void;
+  suggestions: IWorkflowSuggestion[];
+};
 
 export function WorkflowGenerate({
   mode,

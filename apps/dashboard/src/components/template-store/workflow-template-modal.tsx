@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ComponentProps, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@/components/primitives/dialog';
 import { showToast } from '@/components/primitives/sonner-helpers';
 import { ToastIcon } from '@/components/primitives/sonner';
@@ -6,13 +6,15 @@ import { Form } from '../primitives/form/form';
 import { useForm } from 'react-hook-form';
 import { getTemplates, IWorkflowSuggestion } from './templates';
 import { RouteFill } from '../icons';
-import { WorkflowMode, WorkflowTemplateModalProps } from './types';
+import { WorkflowMode } from './types';
 import { WorkflowSidebar } from './workflow-sidebar';
 import { WorkflowGenerate } from './components/workflow-generate';
 import { WorkflowResults } from './components/workflow-results';
 import { useGenerateWorkflowSuggestions } from '@/hooks/workflows/use-generate-workflow-suggestions';
 
 const WORKFLOW_TEMPLATES = getTemplates();
+
+export type WorkflowTemplateModalProps = ComponentProps<typeof DialogTrigger>;
 
 export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   const form = useForm();
@@ -32,8 +34,6 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
 
     try {
       const suggestions = await generateSuggestions({ prompt, mode });
-
-      console.log(suggestions);
 
       setSuggestions(suggestions);
     } catch (error) {
