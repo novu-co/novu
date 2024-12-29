@@ -1,7 +1,5 @@
 import React from 'react';
 import { Card, CardContent } from '../primitives/card';
-import { Bell, MessageSquare, MessageCircle, BellRing } from 'lucide-react';
-import { LucideIcon } from 'lucide-react';
 import {
   StepTypeEnum,
   ChannelTypeEnum,
@@ -47,12 +45,6 @@ import { PushPreview } from '../workflow-editor/steps/push/push-preview';
 
 export type StepType = StepTypeEnum;
 
-interface Step {
-  icon: LucideIcon;
-  bgColor: string;
-  borderColor: string;
-}
-
 interface WorkflowCardProps {
   name: string;
   description: string;
@@ -60,57 +52,6 @@ interface WorkflowCardProps {
   onClick?: () => void;
   template?: CreateWorkflowDto;
 }
-
-const STEP_ICON_MAP: Record<StepType, LucideIcon> = {
-  [StepTypeEnum.IN_APP]: Bell,
-  [StepTypeEnum.EMAIL]: MessageSquare,
-  [StepTypeEnum.SMS]: MessageCircle,
-  [StepTypeEnum.PUSH]: BellRing,
-  [StepTypeEnum.CHAT]: MessageSquare,
-  [StepTypeEnum.DIGEST]: Bell,
-  [StepTypeEnum.TRIGGER]: Bell,
-  [StepTypeEnum.DELAY]: Bell,
-  [StepTypeEnum.CUSTOM]: Bell,
-};
-
-const STEP_COLORS: Record<StepType, { bg: string; border: string }> = {
-  [StepTypeEnum.IN_APP]: {
-    bg: 'bg-[#FFE5D3]',
-    border: 'border-[#FF8D4E]',
-  },
-  [StepTypeEnum.EMAIL]: {
-    bg: 'bg-[#E7F6F3]',
-    border: 'border-[#4EC2AB]',
-  },
-  [StepTypeEnum.SMS]: {
-    bg: 'bg-[#FFE9F3]',
-    border: 'border-[#FF4E9E]',
-  },
-  [StepTypeEnum.PUSH]: {
-    bg: 'bg-[#E7EEFF]',
-    border: 'border-[#4E77FF]',
-  },
-  [StepTypeEnum.CHAT]: {
-    bg: 'bg-[#E7F6F3]',
-    border: 'border-[#4EC2AB]',
-  },
-  [StepTypeEnum.DIGEST]: {
-    bg: 'bg-[#FFE5D3]',
-    border: 'border-[#FF8D4E]',
-  },
-  [StepTypeEnum.TRIGGER]: {
-    bg: 'bg-[#FFE5D3]',
-    border: 'border-[#FF8D4E]',
-  },
-  [StepTypeEnum.DELAY]: {
-    bg: 'bg-[#FFE5D3]',
-    border: 'border-[#FF8D4E]',
-  },
-  [StepTypeEnum.CUSTOM]: {
-    bg: 'bg-[#FFE5D3]',
-    border: 'border-[#FF8D4E]',
-  },
-};
 
 function StepPreview({ type, stepContent }: { type: StepType; stepContent?: any }) {
   if (!stepContent) {
