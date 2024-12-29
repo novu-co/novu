@@ -1,57 +1,145 @@
 import { z } from 'zod';
 import { StepTypeEnum } from '@novu/shared';
 
-export const emailStepSchema = z.object({
-  type: z.literal(StepTypeEnum.EMAIL),
-  name: z.string(),
-  subject: z.string(),
-  content: z.array(
-    z.object({
-      type: z.enum(['text', 'variable', 'paragraph', 'button']),
-      text: z.string(),
-    })
-  ),
-});
+// Define the base content types
+const textNodeSchema = z
+  .object({
+    type: z.literal('text'),
+    text: z.string(),
+  })
+  .strict();
 
-export const inAppStepSchema = z.object({
-  type: z.literal(StepTypeEnum.IN_APP),
-  name: z.string(),
-  subject: z.string(),
-  body: z.string(),
-});
+const variableNodeSchema = z
+  .object({
+    type: z.literal('variable'),
+    attrs: z
+      .object({
+        id: z.string(),
+        label: z.null(),
+        fallback: z.null(),
+        required: z.boolean(),
+      })
+      .strict(),
+  })
+  .strict();
 
-export const smsStepSchema = z.object({
-  type: z.literal(StepTypeEnum.SMS),
-  name: z.string(),
-  subject: z.string(),
-  body: z.string(),
-});
+const paragraphSchema = z
+  .object({
+    type: z.literal('paragraph'),
+    attrs: z
+      .object({
+        textAlign: z.enum(['left', 'center', 'right']),
+      })
+      .strict(),
+    content: z.array(z.union([textNodeSchema, variableNodeSchema])),
+  })
+  .strict();
 
-export const pushStepSchema = z.object({
-  type: z.literal(StepTypeEnum.PUSH),
-  name: z.string(),
-  subject: z.string(),
-  body: z.string(),
-});
+const buttonSchema = z
+  .object({
+    type: z.literal('button'),
+    attrs: z
+      .object({
+        text: z.string(),
+        url: z.string(),
+        alignment: z.enum(['left', 'center', 'right']),
+        variant: z.enum(['filled', 'outline', 'ghost']),
+        borderRadius: z.enum(['none', 'smooth', 'round']),
+        buttonColor: z.string(),
+        textColor: z.string(),
+        showIfKey: z.null(),
+      })
+      .strict(),
+  })
+  .strict();
 
-export const chatStepSchema = z.object({
-  type: z.literal(StepTypeEnum.CHAT),
-  name: z.string(),
-  subject: z.string(),
-  body: z.string(),
-});
+const spacerSchema = z
+  .object({
+    type: z.literal('spacer'),
+    attrs: z
+      .object({
+        height: z.enum(['sm', 'md', 'lg']),
+        showIfKey: z.null(),
+      })
+      .strict(),
+  })
+  .strict();
 
-export const delayStepSchema = z.object({
-  type: z.literal(StepTypeEnum.DELAY),
-  name: z.string(),
-  metadata: z.object({
-    amount: z.number(),
-    unit: z.enum(['seconds', 'minutes', 'hours', 'days']),
-    type: z.enum(['regular', 'scheduled']),
-  }),
-});
+export const emailContentSchema = z
+  .object({
+    type: z.literal('doc'),
+    content: z.array(z.union([paragraphSchema, buttonSchema, spacerSchema])),
+  })
+  .strict();
 
-export const stepSchema = z.discriminatedUnion('type', [
+// Step schemas
+const emailStepSchema = z
+  .object({
+    type: z.literal(StepTypeEnum.EMAIL),
+    name: z.string(),
+    subject: z.string(),
+    content: z.array(
+      z
+        .object({
+          type: z.enum(['text', 'variable', 'paragraph', 'button']),
+          text: z.string(),
+        })
+        .strict()
+    ),
+  })
+  .strict();
+
+const inAppStepSchema = z
+  .object({
+    type: z.literal(StepTypeEnum.IN_APP),
+    name: z.string(),
+    subject: z.string(),
+    body: z.string(),
+  })
+  .strict();
+
+const smsStepSchema = z
+  .object({
+    type: z.literal(StepTypeEnum.SMS),
+    name: z.string(),
+    subject: z.string(),
+    body: z.string(),
+  })
+  .strict();
+
+const pushStepSchema = z
+  .object({
+    type: z.literal(StepTypeEnum.PUSH),
+    name: z.string(),
+    subject: z.string(),
+    body: z.string(),
+  })
+  .strict();
+
+const chatStepSchema = z
+  .object({
+    type: z.literal(StepTypeEnum.CHAT),
+    name: z.string(),
+    subject: z.string(),
+    body: z.string(),
+  })
+  .strict();
+
+const delayStepSchema = z
+  .object({
+    type: z.literal(StepTypeEnum.DELAY),
+    name: z.string(),
+    metadata: z
+      .object({
+        amount: z.number(),
+        unit: z.enum(['seconds', 'minutes', 'hours', 'days']),
+        type: z.enum(['regular', 'scheduled']),
+      })
+      .strict(),
+  })
+  .strict();
+
+const stepSchema = z.discriminatedUnion('type', [
   emailStepSchema,
   inAppStepSchema,
   smsStepSchema,
@@ -60,10 +148,12 @@ export const stepSchema = z.discriminatedUnion('type', [
   delayStepSchema,
 ]);
 
-export const workflowSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
-  category: z.enum(['popular', 'events', 'authentication', 'social']),
-  steps: z.array(stepSchema),
-});
+export const workflowSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string(),
+    category: z.enum(['popular', 'events', 'authentication', 'social']),
+    steps: z.array(stepSchema),
+  })
+  .strict();
