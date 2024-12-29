@@ -22,7 +22,13 @@ Delay Step Examples:
      }
    }`;
 
-export const EMAIL_CONTENT_PROMPT = `Generate email content that follows Tiptap JSON structure. Each text or variable should be in its own paragraph block.
+export const EMAIL_CONTENT_PROMPT = `Generate email content that follows Tiptap JSON structure with modern, visually appealing design elements.
+
+Rules for document structure:
+- Content must be organized in a clear visual hierarchy
+- Use appropriate spacing between sections
+- Group related content elements together
+- Maximum content width should feel comfortable to read
 
 Rules for variables:
 - Use subscriber.firstName for user's name
@@ -41,22 +47,42 @@ Rules for paragraphs:
 - textAlign must be exactly "left", "center", or "right"
 - Default textAlign should be "left"
 - Content array must contain only text or variable nodes
+- Use appropriate line height for readability
+- Maintain consistent spacing between paragraphs
 
 Rules for buttons:
 - Must have attrs with all required properties:
-  - text: string
+  - text: string (clear call-to-action text)
   - url: string
   - alignment: exactly "left", "center", or "right"
   - variant: exactly "filled", "outline", or "ghost"
   - borderRadius: exactly "none", "smooth", or "round"
-  - buttonColor: string (hex color)
-  - textColor: string (hex color)
+  - buttonColor: string (hex color, use brand colors)
+  - textColor: string (hex color, ensure good contrast)
   - showIfKey: must be null
+- Buttons should stand out visually
+- Use action-oriented text
+- Maintain proper spacing around buttons
 
 Rules for spacers:
 - Must have attrs with:
-  - height: exactly "sm", "md", or "lg"
+  - height: exactly "sm" (16px), "md" (24px), or "lg" (32px)
   - showIfKey: must be null
+- Use consistently to create visual rhythm
+- Add extra spacing before and after important elements
+
+Rules for dividers:
+- Use to separate distinct content sections
+- Must have attrs with:
+  - color: string (hex color, usually light gray)
+  - showIfKey: must be null
+
+Visual Hierarchy Guidelines:
+1. Start with a prominent header or greeting
+2. Follow with clear, scannable content sections
+3. Use spacers to create breathing room
+4. End with a clear call-to-action button
+5. Add footer information if needed
 
 Example structure:
 {
@@ -79,6 +105,13 @@ Example structure:
       ]
     },
     {
+      "type": "spacer",
+      "attrs": {
+        "height": "md",
+        "showIfKey": null
+      }
+    },
+    {
       "type": "paragraph",
       "attrs": { "textAlign": "left" },
       "content": [
@@ -88,7 +121,7 @@ Example structure:
     {
       "type": "spacer",
       "attrs": {
-        "height": "md",
+        "height": "lg",
         "showIfKey": null
       }
     },
@@ -100,7 +133,7 @@ Example structure:
         "alignment": "center",
         "variant": "filled",
         "borderRadius": "smooth",
-        "buttonColor": "#000000",
+        "buttonColor": "#0042DA",
         "textColor": "#ffffff",
         "showIfKey": null
       }
@@ -109,13 +142,15 @@ Example structure:
 }
 
 Always include:
-- Personalized greeting with subscriber.firstName in a paragraph
-- Clear content structure with proper spacing using spacer elements
-- Professional tone
-- Call to action button with proper styling
-- Proper variable usage with complete attrs objects
+- Clear visual hierarchy with proper spacing
+- Personalized greeting with subscriber.firstName in a prominent position
+- Scannable content structure with appropriate spacers
+- Professional, on-brand design elements
+- Prominent call-to-action button with proper styling
+- Consistent spacing and alignment throughout
+- Mobile-responsive design considerations
 - All required attributes for each element type
-- Only use allowed element types: paragraph, button, and spacer
+- Only use allowed element types: paragraph, button, spacer, and divider
 - Ensure all attributes match their exact allowed values`;
 
 export const IN_APP_CONTENT_PROMPT = `Generate in-app notification content that is concise and actionable.
@@ -125,9 +160,12 @@ Rules:
 - Use {{subscriber.firstName}} for personalization
 - Use {{payload.*}} for dynamic data
 - Include call to action when relevant
-- Use proper liquid syntax with {{ }}
+- Use proper liquid syntax with {{ }} for variables
+- You can use ** to bold text
+- Don't wrap the result in \`\`\`liquid
+- Don't start with Hi, Hello, or anything like that. Focus on the content and the call to action
 
-Example: "Hi {{subscriber.firstName}}, your order #{{payload.orderNumber}} has been shipped!"`;
+Example: Your order #{{payload.orderNumber}} has been shipped!`;
 
 export const PUSH_CONTENT_PROMPT = `Generate push notification content that is attention-grabbing but professional.
 
@@ -138,7 +176,7 @@ Rules:
 - Be direct and clear
 - Use proper liquid syntax with {{ }}
 
-Example: "{{subscriber.firstName}}, your order is out for delivery!"`;
+Example: {{subscriber.firstName}}, your order is out for delivery!`;
 
 export const SMS_CONTENT_PROMPT = `Generate SMS content that is concise and informative.
 
