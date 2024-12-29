@@ -81,8 +81,6 @@ User's request: ${command.prompt}`,
 
         if (step.type === StepTypeEnum.EMAIL) {
           const email = await this.generateEmailContent(workflow, step, command);
-          console.log(JSON.stringify(email, null, 2));
-
           enrichedStep.body = JSON.stringify(email[0]);
         } else if (step.type === StepTypeEnum.IN_APP) {
           enrichedStep.body = await this.generateInAppContent(workflow, step, command);
@@ -168,6 +166,9 @@ Workflow Context:
 Name: ${workflow.name}
 Description: ${workflow.description}
 Step Name: ${step.name}
+Step Reasoning: ${step.context?.reasoning || ''}
+Step Focus Points:
+${step.context?.focus?.map((point) => `- ${point}`).join('\n') || ''}
 
 User's request: ${command.prompt}`,
           schema: z.object({
