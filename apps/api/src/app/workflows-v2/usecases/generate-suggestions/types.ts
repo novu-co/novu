@@ -49,6 +49,10 @@ export interface IWorkflowStep {
     unit: 'seconds' | 'minutes' | 'hours' | 'days';
     type: 'regular' | 'scheduled';
   };
+  context?: {
+    reasoning: string;
+    focus: string[];
+  };
 }
 
 export interface IWorkflow {

@@ -78,14 +78,12 @@ const emailStepSchema = z
     type: z.literal(StepTypeEnum.EMAIL),
     name: z.string(),
     subject: z.string(),
-    content: z.array(
-      z
-        .object({
-          type: z.enum(['text', 'variable', 'paragraph', 'button']),
-          text: z.string(),
-        })
-        .strict()
-    ),
+    context: z
+      .object({
+        reasoning: z.string(),
+        focus: z.array(z.string()),
+      })
+      .strict(),
   })
   .strict();
 
@@ -94,7 +92,12 @@ const inAppStepSchema = z
     type: z.literal(StepTypeEnum.IN_APP),
     name: z.string(),
     subject: z.string(),
-    body: z.string(),
+    context: z
+      .object({
+        reasoning: z.string(),
+        focus: z.array(z.string()),
+      })
+      .strict(),
   })
   .strict();
 
@@ -103,7 +106,12 @@ const smsStepSchema = z
     type: z.literal(StepTypeEnum.SMS),
     name: z.string(),
     subject: z.string(),
-    body: z.string(),
+    context: z
+      .object({
+        reasoning: z.string(),
+        focus: z.array(z.string()),
+      })
+      .strict(),
   })
   .strict();
 
@@ -112,7 +120,12 @@ const pushStepSchema = z
     type: z.literal(StepTypeEnum.PUSH),
     name: z.string(),
     subject: z.string(),
-    body: z.string(),
+    context: z
+      .object({
+        reasoning: z.string(),
+        focus: z.array(z.string()),
+      })
+      .strict(),
   })
   .strict();
 
@@ -121,7 +134,12 @@ const chatStepSchema = z
     type: z.literal(StepTypeEnum.CHAT),
     name: z.string(),
     subject: z.string(),
-    body: z.string(),
+    context: z
+      .object({
+        reasoning: z.string(),
+        focus: z.array(z.string()),
+      })
+      .strict(),
   })
   .strict();
 

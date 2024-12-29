@@ -119,6 +119,9 @@ Workflow Context:
 Name: ${workflow.name}
 Description: ${workflow.description}
 Step Name: ${step.name}
+Step Reasoning: ${step.context?.reasoning || ''}
+Step Focus Points:
+${step.context?.focus?.map((point) => `- ${point}`).join('\n') || ''}
 
 User's request: ${command.prompt}`,
           schema: z.object({ content: z.array(emailContentSchema) }),
