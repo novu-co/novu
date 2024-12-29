@@ -78,7 +78,7 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
               <RouteFill className="size-5" />
               <div className="text-label-sm !mt-0">Create a workflow</div>
             </DialogHeader>
-            <div className="flex h-[700px]">
+            <div className="flex h-[600px]">
               <div className="h-full w-[259px] border-r border-neutral-200">
                 <WorkflowSidebar
                   selectedCategory={selectedCategory}
