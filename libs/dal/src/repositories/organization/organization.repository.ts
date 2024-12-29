@@ -14,6 +14,10 @@ export class OrganizationRepository implements IOrganizationRepository {
     return this.organizationRepository.findUserActiveOrganizations(userId);
   }
 
+  findUseActiveSessions(userId: string): Promise<[]> {
+    return this.organizationRepository.findUseActiveSessions(userId);
+  }
+
   updateBrandingDetails(organizationId: string, branding: { color: string; logo: string }) {
     return this.organizationRepository.updateBrandingDetails(organizationId, branding);
   }

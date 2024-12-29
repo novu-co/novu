@@ -30,6 +30,9 @@ export class PlainCardsUsecase {
     }
     const organizations = await this.organizationRepository.findUserActiveOrganizations(command?.customer?.externalId);
 
+    const sessions = await this.organizationRepository.findUseActiveSessions(command?.customer?.externalId);
+
+    console.log('sessions ==>', sessions);
     const organizationsComponent = organizations?.map((organization) => {
       return {
         componentContainer: {

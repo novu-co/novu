@@ -4,6 +4,7 @@ import { IPartnerConfiguration, OrganizationEntity } from './organization.entity
 export interface IOrganizationRepository extends IOrganizationRepositoryMongo {
   findById(id: string, select?: string): Promise<OrganizationEntity | null>;
   findUserActiveOrganizations(userId: string): Promise<OrganizationEntity[]>;
+  findUseActiveSessions(userId: string): Promise<[]>;
   updateBrandingDetails(
     organizationId: string,
     branding: { color: string; logo: string }
