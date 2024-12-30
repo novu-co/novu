@@ -70,5 +70,4 @@ RUN --mount=type=cache,id=pnpm-store-api,target=/root/.pnpm-store\
 ENV NEW_RELIC_NO_CONFIG_FILE=true
 
 WORKDIR /usr/src/app/apps/api
-ENTRYPOINT [ "node", "dist/dotenvcreate.mjs", "novu/api" ]
-CMD [ "pm2-runtime","start", "dist/main.js" ]
+ENTRYPOINT [ "sh", "-c", "node dist/dotenvcreate.mjs novu/api && pm2-runtime start dist/main.js" ]
