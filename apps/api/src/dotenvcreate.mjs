@@ -1,6 +1,7 @@
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 console.time('dotenvcreate');
 
@@ -9,6 +10,10 @@ const secretsManagerClient = new SecretsManagerClient({
 });
 
 const secretName = process.argv[2];
+
+// Get the directory of the current script
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Function to retrieve secret value
 async function getSecretValue(secretName) {
@@ -45,7 +50,7 @@ function escapeValue(value) {
 async function updateEnvFile() {
   try {
     const secret = await getSecretValue(secretName);
-    const envPath = resolve('.env');
+    const envPath = resolve(__dirname, '.env'); // Ensure .env is created in the script's directory
 
     // Read the existing .env file if it exists
     let envContent = '';
