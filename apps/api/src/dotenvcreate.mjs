@@ -4,12 +4,10 @@ import { resolve } from 'path';
 
 console.time('dotenvcreate');
 
-// Initialize AWS Secrets Manager client
 const secretsManagerClient = new SecretsManagerClient({
   region: 'eu-west-2',
-}); // Replace 'your-region' with your AWS region
+});
 
-// take input from user
 const secretName = process.argv[2];
 
 // Function to retrieve secret value
