@@ -5,12 +5,19 @@ import { fileURLToPath } from 'url';
 
 console.time('dotenvcreate');
 
-const secretsManagerClient = new SecretsManagerClient({
-  region: 'eu-west-2',
-});
-
 const secretName = process.argv[2];
+const region = process.argv[3];
+const enterprise = process.argv[4];
+const env = process.argv[5];
 
+if (!enterprise || enterprise.toLowerCase() === 'false') {
+  console.log('Enterprise value is false or not provided. Exiting script.');
+  process.exit(0);
+}
+
+const secretsManagerClient = new SecretsManagerClient({
+  region,
+});
 // Get the directory of the current script
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -25,8 +32,8 @@ async function getSecretValue(secretName) {
     if (data.SecretString) {
       return JSON.parse(data.SecretString);
     } else {
-      // Handle binary secret value (optional)
-      let buff = Buffer.from(data.SecretBinary, 'base64');
+      // Handle binary secret value
+      const buff = Buffer.from(data.SecretBinary, 'base64');
 
       return JSON.parse(buff.toString('ascii'));
     }
@@ -50,7 +57,7 @@ function escapeValue(value) {
 async function updateEnvFile() {
   try {
     const secret = await getSecretValue(secretName);
-    const envPath = resolve(__dirname, '.env'); // Ensure .env is created in the script's directory
+    const envPath = resolve(__dirname, env === 'dev' ? '.env.development' : '.env.production');
 
     // Read the existing .env file if it exists
     let envContent = '';
