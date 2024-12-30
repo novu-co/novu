@@ -1,10 +1,4 @@
-import {
-  type StepResponseDto,
-  StepTypeEnum,
-  StepUpdateDto,
-  UpdateWorkflowDto,
-  type WorkflowResponseDto,
-} from '@novu/shared';
+import { type StepResponseDto, StepTypeEnum, StepUpdateDto, type WorkflowResponseDto } from '@novu/shared';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -18,6 +12,7 @@ import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs
 import { PushTabs } from '@/components/workflow-editor/steps/push/push-tabs';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { SmsTabs } from '@/components/workflow-editor/steps/sms/sms-tabs';
+import { UpdateWorkflowFn } from '@/components/workflow-editor/workflow-provider';
 import { useDataRef } from '@/hooks/use-data-ref';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 
@@ -39,7 +34,7 @@ export type StepEditorProps = {
 };
 
 type ConfigureStepTemplateFormProps = StepEditorProps & {
-  update: (data: UpdateWorkflowDto) => void;
+  update: UpdateWorkflowFn;
 };
 
 export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps) => {
