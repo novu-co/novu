@@ -1,15 +1,26 @@
 import { EditorView } from '@uiw/react-codemirror';
-import { useMemo, useState, useRef, useCallback } from 'react';
 import { Completion, CompletionContext } from '@codemirror/autocomplete';
+import { autocompletion } from '@codemirror/autocomplete';
 
 import { Editor } from '@/components/primitives/editor';
 import { completions } from '@/utils/liquid-autocomplete';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
-import { autocompletion } from '@codemirror/autocomplete';
 import { Popover, PopoverTrigger } from '@/components/primitives/popover';
 import { createVariablePlugin } from './variable-plugin';
 import { VariablePopover } from './variable-popover';
 import { variablePillTheme } from './variable-plugin/variable-theme';
+import { useCallback, useMemo, useRef, useState, Dispatch, SetStateAction } from 'react';
+
+type SelectedVariable = {
+  value: string;
+  from: number;
+  to: number;
+} | null;
+
+type CompletionRange = {
+  from: number;
+  to: number;
+} | null;
 
 type FieldEditorProps = {
   value: string;
@@ -22,7 +33,7 @@ type FieldEditorProps = {
   id?: string;
 };
 
-export const FieldEditor = ({
+export function FieldEditor({
   value,
   onChange,
   variables,
@@ -31,91 +42,21 @@ export const FieldEditor = ({
   size = 'default',
   fontFamily = 'inherit',
   id,
-}: FieldEditorProps) => {
-  const [selectedVariable, setSelectedVariable] = useState<{ value: string; from: number; to: number } | null>(null);
+}: FieldEditorProps) {
   const viewRef = useRef<EditorView | null>(null);
-  const isUpdatingRef = useRef(false);
-  const lastCompletionRef = useRef<{ from: number; to: number } | null>(null);
+  const lastCompletionRef = useRef<CompletionRange>(null);
 
-  const handleVariableSelect = useCallback((value: string, from: number, to: number) => {
-    if (isUpdatingRef.current) return;
-    requestAnimationFrame(() => {
-      setSelectedVariable({ value, from, to });
-    });
-  }, []);
+  const { selectedVariable, setSelectedVariable, handleVariableSelect, isUpdatingRef } = useVariableSelection();
 
-  const handleVariableUpdate = useCallback(
-    (newValue: string) => {
-      if (!selectedVariable || !viewRef.current || isUpdatingRef.current) {
-        return;
-      }
-
-      try {
-        isUpdatingRef.current = true;
-        const { from, to } = selectedVariable;
-        const view = viewRef.current;
-
-        const hasLiquidSyntax = newValue.match(/^\{\{.*\}\}$/);
-        const newVariableText = hasLiquidSyntax ? newValue : `{{${newValue}}}`;
-
-        const currentContent = view.state.doc.toString();
-        const afterCursor = currentContent.slice(to).trim();
-        const hasClosingBrackets = afterCursor.startsWith('}}');
-
-        const changes = {
-          from,
-          to: hasClosingBrackets ? to + 2 : to,
-          insert: newVariableText,
-        };
-
-        view.dispatch({
-          changes,
-          selection: { anchor: from + newVariableText.length },
-        });
-
-        const updatedContent = view.state.doc.toString();
-
-        onChange(updatedContent);
-
-        setSelectedVariable((prev) => (prev ? { ...prev, value: newValue, to: from + newVariableText.length } : null));
-      } finally {
-        isUpdatingRef.current = false;
-      }
-    },
-    [selectedVariable, onChange]
+  const handleVariableUpdate = useVariableUpdate(
+    selectedVariable,
+    viewRef,
+    isUpdatingRef,
+    onChange,
+    setSelectedVariable
   );
 
-  const completionSource = useCallback(
-    (context: CompletionContext) => {
-      const word = context.matchBefore(/\{\{([^}]*)/);
-      if (!word) return null;
-
-      const options = completions(variables)(context);
-      if (!options) return null;
-
-      return {
-        ...options,
-        apply: (view: EditorView, completion: Completion, from: number, to: number) => {
-          const text = completion.label;
-          lastCompletionRef.current = { from, to };
-
-          const content = view.state.doc.toString();
-          const before = content.slice(Math.max(0, from - 2), from);
-
-          if (before !== '{{') {
-            view.dispatch({
-              changes: { from, to, insert: `{{${text}}} ` },
-            });
-          } else {
-            view.dispatch({
-              changes: { from, to, insert: `${text}}} ` },
-            });
-          }
-        },
-      };
-    },
-    [variables]
-  );
+  const completionSource = useCompletionSource(variables, lastCompletionRef);
 
   const extensions = useMemo(
     () => [
@@ -149,9 +90,7 @@ export const FieldEditor = ({
         open={!!selectedVariable}
         onOpenChange={(open) => {
           if (!open) {
-            setTimeout(() => {
-              setSelectedVariable(null);
-            }, 0);
+            setTimeout(() => setSelectedVariable(null), 0);
           }
         }}
       >
@@ -168,4 +107,99 @@ export const FieldEditor = ({
       </Popover>
     </div>
   );
-};
+}
+
+function useVariableSelection() {
+  const [selectedVariable, setSelectedVariable] = useState<SelectedVariable>(null);
+  const isUpdatingRef = useRef(false);
+
+  const handleVariableSelect = useCallback((value: string, from: number, to: number) => {
+    if (isUpdatingRef.current) return;
+    requestAnimationFrame(() => {
+      setSelectedVariable({ value, from, to });
+    });
+  }, []);
+
+  return {
+    selectedVariable,
+    setSelectedVariable,
+    handleVariableSelect,
+    isUpdatingRef,
+  };
+}
+
+function useVariableUpdate(
+  selectedVariable: SelectedVariable,
+  viewRef: React.RefObject<EditorView>,
+  isUpdatingRef: React.MutableRefObject<boolean>,
+  onChange: (value: string) => void,
+  setSelectedVariable: Dispatch<SetStateAction<SelectedVariable>>
+) {
+  return useCallback(
+    (newValue: string) => {
+      if (!selectedVariable || !viewRef.current || isUpdatingRef.current) return;
+
+      try {
+        isUpdatingRef.current = true;
+        const { from, to } = selectedVariable;
+        const view = viewRef.current;
+
+        const hasLiquidSyntax = newValue.match(/^\{\{.*\}\}$/);
+        const newVariableText = hasLiquidSyntax ? newValue : `{{${newValue}}}`;
+
+        const currentContent = view.state.doc.toString();
+        const afterCursor = currentContent.slice(to).trim();
+        const hasClosingBrackets = afterCursor.startsWith('}}');
+
+        const changes = {
+          from,
+          to: hasClosingBrackets ? to + 2 : to,
+          insert: newVariableText,
+        };
+
+        view.dispatch({
+          changes,
+          selection: { anchor: from + newVariableText.length },
+        });
+
+        onChange(view.state.doc.toString());
+
+        setSelectedVariable((prev: SelectedVariable) =>
+          prev ? { ...prev, value: newValue, to: from + newVariableText.length } : null
+        );
+      } finally {
+        isUpdatingRef.current = false;
+      }
+    },
+    [selectedVariable, onChange, viewRef, isUpdatingRef, setSelectedVariable]
+  );
+}
+
+function useCompletionSource(variables: LiquidVariable[], lastCompletionRef: React.MutableRefObject<CompletionRange>) {
+  return useCallback(
+    (context: CompletionContext) => {
+      const word = context.matchBefore(/\{\{([^}]*)/);
+      if (!word) return null;
+
+      const options = completions(variables)(context);
+      if (!options) return null;
+
+      return {
+        ...options,
+        apply: (view: EditorView, completion: Completion, from: number, to: number) => {
+          const text = completion.label;
+          lastCompletionRef.current = { from, to };
+
+          const content = view.state.doc.toString();
+          const before = content.slice(Math.max(0, from - 2), from);
+          const insert = before !== '{{' ? `{{${text}}} ` : `${text}}} `;
+
+          view.dispatch({
+            changes: { from, to, insert },
+          });
+        },
+      };
+    },
+    [variables, lastCompletionRef]
+  );
+}
