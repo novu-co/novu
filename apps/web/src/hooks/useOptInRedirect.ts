@@ -11,11 +11,10 @@ const ROUTES_THAT_REDIRECT_TO_DASHBOARD = [ROUTES.WORKFLOWS];
 
 export const useOptInRedirect = () => {
   const { pathname } = useLocation();
-  const isNewDashboardEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_NEW_DASHBOARD_ENABLED);
   const { status, isLoaded, redirectToNewDashboard } = useNewDashboardOptIn();
 
   const checkAndRedirect = useCallback(() => {
-    if (!IS_EE_AUTH_ENABLED || !isNewDashboardEnabled) return false;
+    if (!IS_EE_AUTH_ENABLED) return false;
     if (!isLoaded || !status || status !== NewDashboardOptInStatusEnum.OPTED_IN) return false;
 
     const currentRoute = pathname.replace('/legacy', '');
@@ -26,7 +25,7 @@ export const useOptInRedirect = () => {
     redirectToNewDashboard();
 
     return true;
-  }, [isNewDashboardEnabled, isLoaded, status, pathname, redirectToNewDashboard]);
+  }, [isLoaded, status, pathname, redirectToNewDashboard]);
 
   // handling of updates to deps
   useLayoutEffect(() => {
