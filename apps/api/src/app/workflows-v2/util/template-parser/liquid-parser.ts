@@ -8,6 +8,12 @@ const LIQUID_CONFIG = {
   catchAllErrors: true,
 } as const;
 
+// Create a parser engine with digest filter for validation
+const parserEngine = new Liquid(LIQUID_CONFIG);
+
+// Register digest filter for validation
+parserEngine.registerFilter('digest', () => '');
+
 export type Variable = {
   /**
    * The variable name/path (e.g. for valid variables "user.name",
@@ -125,8 +131,7 @@ function processLiquidRawOutput(rawOutputs: string[]): TemplateVariables {
 function parseByLiquid(rawOutput: string): TemplateVariables {
   const validVariables: Variable[] = [];
   const invalidVariables: Variable[] = [];
-  const engine = new Liquid(LIQUID_CONFIG);
-  const parsed = engine.parse(rawOutput) as unknown as Template[];
+  const parsed = parserEngine.parse(rawOutput) as unknown as Template[];
 
   parsed.forEach((template: Template) => {
     if (isOutputToken(template)) {

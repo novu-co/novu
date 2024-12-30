@@ -1,4 +1,5 @@
 import { Liquid } from 'liquidjs';
+import { digest } from './filters/digest';
 
 import { ChannelStepEnum, PostActionEnum } from './constants';
 import {
@@ -76,9 +77,12 @@ export class Client {
     this.apiUrl = builtOpts.apiUrl;
     this.secretKey = builtOpts.secretKey;
     this.strictAuthentication = builtOpts.strictAuthentication;
+
+    // Register filters
     this.templateEngine.registerFilter('json', (value, spaces) =>
       stringifyDataStructureWithSingleQuotes(value, spaces)
     );
+    this.templateEngine.registerFilter('digest', digest);
   }
 
   private buildOptions(providedOptions?: ClientOptions) {

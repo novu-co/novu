@@ -8,10 +8,12 @@ import { Separator } from '../../separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { TransformerItem } from './components/transformer-item';
 import { TransformerList } from './components/transformer-list';
+import { DigestWidget } from './components/digest-widget';
 import { useVariableParser } from './hooks/use-variable-parser';
 import { useTransformerManager } from './hooks/use-transformer-manager';
 import { formatLiquidVariable } from './utils';
 import type { VariablePopoverProps } from './types';
+import type { TransformerWithParam } from './types';
 
 export function VariablePopover({ variable, onClose, onUpdate }: VariablePopoverProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -70,17 +72,52 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
     const newName = parts[0];
     setName(newName);
 
+    // Reset default value and transformers
+    let newDefaultVal = '';
+    const newTransformers: TransformerWithParam[] = [];
+
     // Process each part after the name
     parts.slice(1).forEach((part) => {
       if (part.startsWith('default:')) {
         // Extract default value, handling quotes
-        const newDefaultVal = part
+        newDefaultVal = part
           .replace('default:', '')
           .trim()
           .replace(/^["']|["']$/g, '');
-        setDefaultVal(newDefaultVal);
+      } else if (part.startsWith('digest:')) {
+        // Handle digest transformer
+        const digestMatch = part.match(/digest:\s*(\d+)(?:,\s*['"]([^'"]*)['"]\s*)?(?:,\s*['"]([^'"]*)['"]\s*)?/);
+        if (digestMatch) {
+          const [, maxNames = '2', keyPath = '', separator = ''] = digestMatch;
+          const params = [maxNames];
+          if (keyPath !== undefined) params.push(keyPath);
+          if (separator !== undefined) params.push(separator);
+          newTransformers.push({ value: 'digest', params });
+        } else {
+          // If no match but starts with digest, it's being edited
+          const digestParams = part.replace('digest:', '').trim();
+          newTransformers.push({
+            value: 'digest',
+            params: digestParams ? digestParams.split(',').map((p) => p.trim().replace(/^["']|["']$/g, '')) : ['2'],
+          });
+        }
+      } else {
+        // Handle other transformers
+        const [transformerName, ...params] = part.split(':').map((p) => p.trim());
+        if (transformerName) {
+          newTransformers.push({
+            value: transformerName,
+            params:
+              params.length > 0 ? params[0].split(',').map((p) => p.trim().replace(/^["']|["']$/g, '')) : undefined,
+          });
+        }
       }
     });
+
+    setDefaultVal(newDefaultVal);
+    transformers.length = 0;
+    transformers.push(...newTransformers);
+    onUpdate(`{{${content}}}`);
   };
 
   return (
@@ -120,6 +157,14 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
                 </div>
               </FormControl>
             </FormItem>
+
+            <DigestWidget
+              value={formatLiquidVariable(name, defaultVal, transformers)}
+              onChange={(newValue) => {
+                handleRawLiquidChange(newValue);
+              }}
+            />
+
             <FormItem>
               <FormControl>
                 <div className="flex items-center justify-between">
