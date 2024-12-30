@@ -35,5 +35,5 @@ export function formatLiquidVariable(
     })
   );
 
-  return parts.join(' | ');
+  return `{{${parts.join(' | ')}}}`;
 }
