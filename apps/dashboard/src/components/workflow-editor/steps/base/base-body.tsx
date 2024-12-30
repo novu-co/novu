@@ -28,7 +28,6 @@ export const BaseBody = () => {
                   fontFamily="inherit"
                   placeholder={capitalize(field.name)}
                   id={field.name}
-                  ref={field.ref}
                   value={field.value}
                   onChange={field.onChange}
                   variables={variables}

@@ -10,7 +10,7 @@ export class VariablePluginView {
   isTypingVariable: boolean = false;
 
   constructor(
-    private view: EditorView,
+    view: EditorView,
     private viewRef: MutableRefObject<EditorView | null>,
     private lastCompletionRef: MutableRefObject<{ from: number; to: number } | null>,
     private onSelect?: (value: string, from: number, to: number) => void

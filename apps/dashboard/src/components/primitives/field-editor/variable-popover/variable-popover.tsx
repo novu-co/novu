@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { PopoverContent } from '@/components/primitives/popover';
 import { Input, InputField } from '@/components/primitives/input';
 import { FormControl, FormItem } from '@/components/primitives/form/form';
@@ -20,6 +20,17 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
   const [defaultVal, setDefaultVal] = useState(parsedDefaultValue);
   const [showRawLiquid, setShowRawLiquid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
 
   const {
     transformers,
