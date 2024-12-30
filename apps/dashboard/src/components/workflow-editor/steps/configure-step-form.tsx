@@ -1,5 +1,4 @@
 import {
-  FeatureFlagsKeysEnum,
   IEnvironment,
   StepDataDto,
   StepTypeEnum,
@@ -37,7 +36,6 @@ import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { ConfigureSmsStepPreview } from '@/components/workflow-editor/steps/sms/configure-sms-step-preview';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import {
   AUTOCOMPLETE_PASSWORD_MANAGERS_OFF,
@@ -85,20 +83,16 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   const { step, workflow, update, environment } = props;
   const navigate = useNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const areNewStepsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ND_DELAY_DIGEST_EMAIL_ENABLED);
 
-  // we allow some form of configuration in the dashboard
-  let supportedStepTypes = [
+  const supportedStepTypes = [
     StepTypeEnum.IN_APP,
     StepTypeEnum.SMS,
     StepTypeEnum.CHAT,
     StepTypeEnum.PUSH,
     StepTypeEnum.EMAIL,
+    StepTypeEnum.DIGEST,
+    StepTypeEnum.DELAY,
   ];
-
-  if (areNewStepsEnabled) {
-    supportedStepTypes = [...supportedStepTypes, StepTypeEnum.DIGEST, StepTypeEnum.DELAY];
-  }
 
   const isSupportedStep = supportedStepTypes.includes(step.type);
   const isReadOnly = !isSupportedStep || workflow.origin === WorkflowOriginEnum.EXTERNAL;

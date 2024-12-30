@@ -91,6 +91,10 @@ export function useActivityUrlState(): ActivityUrlState & {
         newParams.set('dateRange', data.dateRange);
       }
 
+      if (searchParams.get('page')) {
+        newParams.set('page', searchParams.get('page') || '0');
+      }
+
       setSearchParams(newParams, { replace: true });
     },
     [activityItemId, setSearchParams]
