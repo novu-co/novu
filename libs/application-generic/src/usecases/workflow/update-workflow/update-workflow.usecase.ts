@@ -52,6 +52,8 @@ import {
   GetWorkflowByIdsUseCase,
   DeletePreferencesCommand,
   DeletePreferencesUseCase,
+  DeleteControlValuesUseCase,
+  DeleteControlValuesCommand,
 } from '../..';
 import {
   DeleteMessageTemplate,
@@ -87,6 +89,8 @@ export class UpdateWorkflow {
     private deletePreferencesUsecase: DeletePreferencesUseCase,
     @Inject(forwardRef(() => GetWorkflowByIdsUseCase))
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
+    @Inject(forwardRef(() => DeleteControlValuesUseCase))
+    private deleteControlValuesUseCase: DeleteControlValuesUseCase,
   ) {}
 
   async execute(
@@ -751,6 +755,16 @@ export class UpdateWorkflow {
           messageTemplateId: id,
           parentChangeId,
           workflowType: command.type,
+        }),
+      );
+
+      await this.deleteControlValuesUseCase.execute(
+        DeleteControlValuesCommand.create({
+          environmentId: command.environmentId,
+          organizationId: command.organizationId,
+          userId: command.userId,
+          stepId: id,
+          workflowId: command.id,
         }),
       );
     }

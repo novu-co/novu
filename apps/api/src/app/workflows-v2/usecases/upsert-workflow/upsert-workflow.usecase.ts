@@ -77,6 +77,7 @@ export class UpsertWorkflowUseCase {
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
     const workflowForUpdate = await this.queryWorkflow(command);
     const persistedWorkflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
+    // TODO: this upsertControlValues logic should be moved to the create/update workflow usecase
     await this.upsertControlValues(persistedWorkflow, command);
     const workflow = await this.getWorkflowUseCase.execute(
       GetWorkflowCommand.create({

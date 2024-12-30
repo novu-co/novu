@@ -3,6 +3,7 @@ import {
   DeleteWorkflowUseCase,
   GetWorkflowByIdsUseCase,
   UpdateWorkflow,
+  DeleteControlValuesUseCase,
 } from '@novu/application-generic';
 
 import { GetActiveIntegrationsStatus } from './get-active-integrations-status/get-active-integrations-status.usecase';
@@ -23,4 +24,5 @@ export const USE_CASES = [
   GetNotificationTemplate,
   DeleteNotificationTemplate,
   GetWorkflowVariables,
+  DeleteControlValuesUseCase,
 ];
