@@ -1,4 +1,5 @@
 import { Transformer } from '../types';
+import TruncatedText from '@/components/truncated-text';
 
 interface TransformerItemProps {
   transformer: Transformer;
@@ -14,9 +15,11 @@ export function TransformerItem({ transformer }: TransformerItemProps) {
         <p className="text-muted-foreground truncate text-[11px]">{transformer.description}</p>
 
         {transformer.example && (
-          <code className="text-muted-foreground max-w-[290px] shrink-0 truncate font-mono text-[10px]">
-            {transformer.example}
-          </code>
+          <TruncatedText asChild>
+            <span className="text-muted-foreground line-clamp-2 max-w-[290px] break-all font-mono text-[10px]">
+              {transformer.example}
+            </span>
+          </TruncatedText>
         )}
       </div>
     </div>
