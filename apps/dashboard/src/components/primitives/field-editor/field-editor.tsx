@@ -7,9 +7,9 @@ import { completions } from '@/utils/liquid-autocomplete';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 import { autocompletion } from '@codemirror/autocomplete';
 import { Popover, PopoverTrigger } from '@/components/primitives/popover';
-import { VariablePopover } from './variable-popover';
 import { createVariablePlugin } from './variable-plugin';
 import { variablePillTheme } from './variable-theme';
+import { VariablePopover } from './variable-popover';
 
 type FieldEditorProps = {
   value: string;
@@ -55,11 +55,16 @@ export const FieldEditor = ({
         const { from, to } = selectedVariable;
         const view = viewRef.current;
 
-        const newVariableText = `{{${newValue}}}`;
+        const hasLiquidSyntax = newValue.match(/^\{\{.*\}\}$/);
+        const newVariableText = hasLiquidSyntax ? newValue : `{{${newValue}}}`;
+
+        const currentContent = view.state.doc.toString();
+        const afterCursor = currentContent.slice(to).trim();
+        const hasClosingBrackets = afterCursor.startsWith('}}');
 
         const changes = {
           from,
-          to,
+          to: hasClosingBrackets ? to + 2 : to,
           insert: newVariableText,
         };
 

@@ -21,7 +21,9 @@ class VariablePillWidget extends WidgetType {
 
   toDOM() {
     const span = document.createElement('span');
-    const pillClass = `cm-variable-pill ${document.documentElement.classList.contains('dark') ? 'cm-dark' : ''} ${this.hasModifiers ? 'has-modifiers' : ''}`;
+    const pillClass = `cm-variable-pill ${document.documentElement.classList.contains('dark') ? 'cm-dark' : ''} ${
+      this.hasModifiers ? 'has-modifiers' : ''
+    }`;
     span.className = pillClass;
     span.setAttribute('data-variable', this.fullVariableName);
     span.setAttribute('data-start', this.start.toString());
@@ -71,6 +73,7 @@ export function createVariablePlugin({ viewRef, lastCompletionRef, onSelect }: P
     class {
       decorations: DecorationSet;
       lastCursor: number = 0;
+      isTypingVariable: boolean = false;
 
       constructor(view: EditorView) {
         this.decorations = this.createDecorations(view);
@@ -79,11 +82,41 @@ export function createVariablePlugin({ viewRef, lastCompletionRef, onSelect }: P
 
       update(update: any) {
         if (update.docChanged || update.viewportChanged || update.selectionSet) {
-          this.lastCursor = update.state.selection.main.head;
-
-          const content = update.state.doc.toString();
           const pos = update.state.selection.main.head;
+          const content = update.state.doc.toString();
 
+          // Check if we're currently typing a variable
+          const beforeCursor = content.slice(0, pos);
+          const afterCursor = content.slice(pos);
+          const lastOpenBrackets = beforeCursor.lastIndexOf('{{');
+          const nextCloseBrackets = afterCursor.indexOf('}}');
+
+          // We're typing a variable if we have {{ before the cursor but no }} after it
+          this.isTypingVariable =
+            lastOpenBrackets !== -1 &&
+            (nextCloseBrackets === -1 || beforeCursor.indexOf('}}', lastOpenBrackets) === -1);
+
+          // Handle backspace inside a variable
+          if (update.docChanged && update.changes.desc === 'input.delete.backward') {
+            if (lastOpenBrackets !== -1 && nextCloseBrackets !== -1) {
+              const variableContent = content.slice(lastOpenBrackets + 2, pos).trim();
+              // If we're deleting the last character of the variable name, remove the entire variable
+              if (!variableContent) {
+                requestAnimationFrame(() => {
+                  update.view.dispatch({
+                    changes: {
+                      from: lastOpenBrackets,
+                      to: pos + nextCloseBrackets + 2,
+                      insert: '',
+                    },
+                  });
+                });
+                return;
+              }
+            }
+          }
+
+          // Handle variable completion
           if (update.docChanged && content.slice(pos - 2, pos) === '}}') {
             const start = content.lastIndexOf('{{', pos);
             if (start !== -1) {
@@ -112,14 +145,20 @@ export function createVariablePlugin({ viewRef, lastCompletionRef, onSelect }: P
       createDecorations(view: EditorView) {
         const decorations: any[] = [];
         const content = view.state.doc.toString();
+        const pos = view.state.selection.main.head;
         const variableRegex = /{{([^{}]+)}}/g;
         let match;
 
         while ((match = variableRegex.exec(content)) !== null) {
           const start = match.index;
           const end = start + match[0].length;
-          const fullVariableName = match[1].trim();
 
+          // Don't create a pill if we're currently editing this variable
+          if (this.isTypingVariable && pos > start && pos < end) {
+            continue;
+          }
+
+          const fullVariableName = match[1].trim();
           const parts = fullVariableName.split('|').map((part) => part.trim());
           const variableName = parts[0];
           const hasModifiers = parts.length > 1;
@@ -128,8 +167,8 @@ export function createVariablePlugin({ viewRef, lastCompletionRef, onSelect }: P
             decorations.push(
               Decoration.replace({
                 widget: new VariablePillWidget(variableName, fullVariableName, start, end, hasModifiers, onSelect),
-                inclusive: true,
-                side: 1,
+                inclusive: false,
+                side: -1,
               }).range(start, end)
             );
           }
