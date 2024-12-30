@@ -777,7 +777,7 @@ export const VariablePopover = ({ variable, onClose, onUpdate }: VariablePopover
                           <GripVertical className="text-text-soft h-3.5 w-3.5" />
                           <div className="flex flex-1 items-center gap-1">
                             <div className="border-stroke-soft text-text-sub text-paragraph-xs bg-bg-weak rounded-8 flex w-full flex-row items-center border">
-                              <div className="px-2 py-1.5">{transformerDef?.label}</div>
+                              <div className="px-2 py-1.5 pr-0">{transformerDef?.label}</div>
                               {transformerDef?.hasParam && transformerDef.params && (
                                 <div className="flex flex-1 flex-col gap-1 py-1">
                                   {transformerDef.params.map((param, paramIndex) => (
