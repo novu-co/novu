@@ -5,6 +5,9 @@ import { Button } from '@/components/primitives/button';
 import { Input, InputField } from '@/components/primitives/input';
 import { GripVertical } from 'lucide-react';
 import { FormControl, FormItem } from '@/components/primitives/form/form';
+import { RiDeleteBin2Line } from 'react-icons/ri';
+import { Code2 } from '../../icons/code-2';
+import { Separator } from '../separator';
 
 const TRANSFORMERS = [
   { label: 'Uppercase', value: 'upcase' },
@@ -109,14 +112,27 @@ export const VariablePopover = ({ variable, onClose, onUpdate }: VariablePopover
   };
 
   return (
-    <PopoverContent className="w-72">
+    <PopoverContent className="w-72 p-0">
+      <div className="bg-bg-weak">
+        <div className="flex flex-row items-center justify-between space-y-0 p-1.5">
+          <div className="flex items-center gap-1">
+            <span className="font-subheading-2x-small text-subheading-2xs text-text-soft">CONFIGURE VARIABLE</span>
+          </div>
+
+          <Button variant="ghost" size="icon" className="rounded-6 h-5 w-5 p-0.5">
+            <RiDeleteBin2Line className="text-text-soft h-4 w-4" />
+          </Button>
+        </div>
+      </div>
       <div className="grid gap-1.5">
-        <div className="grid gap-1">
+        <div className="grid gap-2 p-2">
           <FormItem>
             <FormControl>
-              <div className="grid gap-0.5">
-                <label className="text-muted-foreground text-xs font-medium">Variable name</label>
-                <InputField size="fit">
+              <div className="grid gap-1">
+                <label className="text-text-sub text-label-xs">Variable name</label>
+                <InputField size="fit" className="min-h-0">
+                  <Code2 className="text-text-sub h-4 w-4" />
+
                   <Input
                     value={name}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
@@ -128,9 +144,9 @@ export const VariablePopover = ({ variable, onClose, onUpdate }: VariablePopover
           </FormItem>
           <FormItem>
             <FormControl>
-              <div className="grid gap-0.5">
-                <label className="text-muted-foreground text-xs font-medium">Default value</label>
-                <InputField size="fit">
+              <div className="grid gap-1">
+                <label className="text-text-sub text-label-xs">Default value</label>
+                <InputField size="fit" className="min-h-0">
                   <Input
                     value={defaultVal}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setDefaultVal(e.target.value)}
@@ -142,7 +158,9 @@ export const VariablePopover = ({ variable, onClose, onUpdate }: VariablePopover
           </FormItem>
         </div>
 
-        <div className="flex flex-col gap-1">
+        <Separator className="my-0" />
+
+        <div className="flex flex-col gap-1 p-2">
           {/* Selected transformers with drag handles */}
           {transformers.length > 0 && (
             <div className="flex flex-col gap-0.5 rounded-md border p-1">
