@@ -8,8 +8,8 @@ import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 import { autocompletion } from '@codemirror/autocomplete';
 import { Popover, PopoverTrigger } from '@/components/primitives/popover';
 import { createVariablePlugin } from './variable-plugin';
-import { variablePillTheme } from './variable-theme';
 import { VariablePopover } from './variable-popover';
+import { variablePillTheme } from './variable-plugin/variable-theme';
 
 type FieldEditorProps = {
   value: string;
