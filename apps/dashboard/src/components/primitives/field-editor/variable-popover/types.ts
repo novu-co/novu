@@ -1,4 +1,4 @@
-export interface Transformer {
+export type Transformer = {
   label: string;
   value: string;
   hasParam?: boolean;
@@ -9,15 +9,15 @@ export interface Transformer {
     description?: string;
     type?: 'string' | 'number';
   }[];
-}
+};
 
-export interface TransformerWithParam {
+export type TransformerWithParam = {
   value: string;
   params?: string[];
-}
+};
 
-export interface VariablePopoverProps {
+export type VariablePopoverProps = {
   variable: string;
   onClose: () => void;
   onUpdate: (newValue: string) => void;
-}
+};

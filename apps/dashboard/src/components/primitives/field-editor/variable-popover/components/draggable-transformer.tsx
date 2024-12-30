@@ -6,7 +6,7 @@ import { Input } from '@/components/primitives/input';
 import { TRANSFORMERS } from '../constants';
 import { TransformerWithParam } from '../types';
 
-interface DraggableTransformerProps {
+type DraggableTransformerProps = {
   transformer: TransformerWithParam;
   index: number;
   isLast: boolean;
@@ -17,7 +17,7 @@ interface DraggableTransformerProps {
   onDrag: (e: any, info: any) => void;
   onRemove: (value: string) => void;
   onParamChange: (index: number, params: string[]) => void;
-}
+};
 
 export function DraggableTransformer({
   transformer,

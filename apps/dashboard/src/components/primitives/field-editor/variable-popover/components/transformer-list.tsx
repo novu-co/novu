@@ -2,7 +2,7 @@ import { AnimatePresence } from 'motion/react';
 import { DraggableTransformer } from './draggable-transformer';
 import { TransformerWithParam } from '../types';
 
-interface TransformerListProps {
+type TransformerListProps = {
   transformers: TransformerWithParam[];
   dragOverIndex: number | null;
   draggingItem: number | null;
@@ -11,7 +11,7 @@ interface TransformerListProps {
   onDrag: (e: any, info: any) => void;
   onRemove: (value: string) => void;
   onParamChange: (index: number, params: string[]) => void;
-}
+};
 
 export function TransformerList({
   transformers,

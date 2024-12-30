@@ -1,9 +1,9 @@
 import { Transformer } from '../types';
 import TruncatedText from '@/components/truncated-text';
 
-interface TransformerItemProps {
+type TransformerItemProps = {
   transformer: Transformer;
-}
+};
 
 export function TransformerItem({ transformer }: TransformerItemProps) {
   return (
