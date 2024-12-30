@@ -23,15 +23,23 @@ export function handleVariableBackspace(view: EditorView, pos: number, content: 
   const nextCloseBrackets = content.indexOf('}}', pos);
 
   if (lastOpenBrackets !== -1 && nextCloseBrackets !== -1) {
-    const variableContent = content.slice(lastOpenBrackets + 2, pos).trim();
-    if (!variableContent) {
+    const isAtStartOrInside = pos >= lastOpenBrackets && pos <= lastOpenBrackets + 2;
+    const isBeforeVariable = pos === lastOpenBrackets;
+    const isAfterVariable = pos === nextCloseBrackets + 3 && content[nextCloseBrackets + 2] === ' ';
+
+    if (isAtStartOrInside || isBeforeVariable || isAfterVariable) {
       requestAnimationFrame(() => {
+        const deleteEnd = nextCloseBrackets + 2;
+        const hasSpaceAfter = content[deleteEnd] === ' ';
+        const hasSpaceBefore = isBeforeVariable && content[lastOpenBrackets - 1] === ' ';
+
         view.dispatch({
           changes: {
-            from: lastOpenBrackets,
-            to: pos + nextCloseBrackets + 2,
+            from: hasSpaceBefore ? lastOpenBrackets - 1 : lastOpenBrackets,
+            to: hasSpaceAfter ? deleteEnd + 1 : deleteEnd,
             insert: '',
           },
+          selection: { anchor: hasSpaceBefore ? lastOpenBrackets - 1 : lastOpenBrackets },
         });
       });
 
@@ -48,7 +56,8 @@ export function handleVariableCompletion(view: EditorView, pos: number, content:
     if (start !== -1) {
       const variableContent = content.slice(start + 2, pos - 2).trim();
       if (variableContent) {
-        if (pos === content.length || content[pos] !== ' ') {
+        const needsSpace = pos < content.length && content[pos] !== ' ' && content[pos] !== '\n';
+        if (needsSpace) {
           requestAnimationFrame(() => {
             view.dispatch({
               changes: { from: pos, insert: ' ' },
