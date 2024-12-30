@@ -50,14 +50,6 @@ export const variablePillTheme = EditorView.baseTheme({
     backgroundColor: 'hsl(var(--feature-base))',
     borderRadius: '50%',
   },
-  '.cm-variable-pill.cm-dark': {
-    backgroundColor: '#FFD6EE',
-    color: '#AD74FF',
-    border: '1px solid #3D3D4D',
-  },
-  '.cm-variable-pill.cm-dark.has-modifiers::after': {
-    backgroundColor: '#AD74FF',
-  },
   '.cm-variable-pill .cm-bracket': {
     display: 'none',
   },
@@ -67,5 +59,8 @@ export const variablePillTheme = EditorView.baseTheme({
     flexDirection: 'column',
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word',
+  },
+  '.cm-line': {
+    lineHeight: '19px !important',
   },
 });

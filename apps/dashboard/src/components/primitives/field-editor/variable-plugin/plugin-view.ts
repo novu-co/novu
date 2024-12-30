@@ -33,7 +33,6 @@ export class VariablePluginView {
         }
       }
 
-      // Handle variable completion
       if (update.docChanged) {
         handleVariableCompletion(update.view, pos, content);
       }
@@ -52,10 +51,12 @@ export class VariablePluginView {
     const pos = view.state.selection.main.head;
     let match;
 
+    // Iterate through all variable matches in the content and add the pills
     while ((match = VARIABLE_REGEX.exec(content)) !== null) {
       const { fullVariableName, variableName, start, end, hasModifiers } = parseVariable(match);
 
-      // Don't create a pill if we're currently editing this variable
+      // Skip creating pills for variables that are currently being edited
+      // This allows users to modify variables without the pill getting in the way
       if (this.isTypingVariable && pos > start && pos < end) {
         continue;
       }

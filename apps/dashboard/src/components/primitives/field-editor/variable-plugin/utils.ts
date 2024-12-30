@@ -1,6 +1,24 @@
 import { EditorView } from '@uiw/react-codemirror';
 import type { VariableMatch } from './types';
 
+/**
+ * Parses a variable match from the editor's content into structured data.
+ * This function is crucial for the variable pill system as it:
+ * 1. Extracts the position and content of variables like {{ subscriber.name | uppercase }}
+ * 2. Separates the base variable name from its modifiers (filters after |)
+ * 3. Provides the necessary information for rendering variable pills in the editor
+ *
+ * @example
+ * Input match for "{{ subscriber.name | uppercase }}"
+ * Returns:
+ * {
+ *   fullVariableName: "subscriber.name | uppercase",
+ *   variableName: "subscriber.name",
+ *   start: [match start index],
+ *   end: [match end index],
+ *   hasModifiers: true
+ * }
+ */
 export function parseVariable(match: RegExpExecArray): VariableMatch {
   const start = match.index;
   const end = start + match[0].length;
@@ -18,7 +36,12 @@ export function parseVariable(match: RegExpExecArray): VariableMatch {
   };
 }
 
+/**
+ * Handles backspace behavior for variables in the editor.
+ * When backspace is pressed near or within a variable, it removes the entire variable including its brackets.
+ */
 export function handleVariableBackspace(view: EditorView, pos: number, content: string): boolean {
+  // Find the boundaries of the potential variable surrounding the cursor
   const lastOpenBrackets = content.lastIndexOf('{{', pos);
   const nextCloseBrackets = content.indexOf('}}', pos);
 
@@ -33,21 +56,23 @@ export function handleVariableBackspace(view: EditorView, pos: number, content: 
         const hasSpaceAfter = content[deleteEnd] === ' ';
         const hasSpaceBefore = isBeforeVariable && content[lastOpenBrackets - 1] === ' ';
 
+        // Dispatch a change to remove the variable and any surrounding spaces
         view.dispatch({
           changes: {
             from: hasSpaceBefore ? lastOpenBrackets - 1 : lastOpenBrackets,
             to: hasSpaceAfter ? deleteEnd + 1 : deleteEnd,
             insert: '',
           },
+          // Place cursor where the variable started
           selection: { anchor: hasSpaceBefore ? lastOpenBrackets - 1 : lastOpenBrackets },
         });
       });
 
-      return true;
+      return true; // Indicate that we handled the backspace
     }
   }
 
-  return false;
+  return false; // Let CodeMirror handle the backspace normally
 }
 
 export function handleVariableCompletion(view: EditorView, pos: number, content: string): boolean {

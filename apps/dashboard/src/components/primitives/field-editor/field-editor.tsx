@@ -109,12 +109,20 @@ export function FieldEditor({
   );
 }
 
+/**
+ * Manages the state and selection of Liquid variables in the editor.
+ *
+ * This hook handles the complex state management needed when a user selects a variable in the editor:
+ * 1. Tracks which variable is currently selected
+ * 2. Prevents recursive updates when variables are being modified
+ */
 function useVariableSelection() {
   const [selectedVariable, setSelectedVariable] = useState<SelectedVariable>(null);
   const isUpdatingRef = useRef(false);
 
   const handleVariableSelect = useCallback((value: string, from: number, to: number) => {
     if (isUpdatingRef.current) return;
+
     requestAnimationFrame(() => {
       setSelectedVariable({ value, from, to });
     });
@@ -128,6 +136,21 @@ function useVariableSelection() {
   };
 }
 
+/**
+ * Handles the logic of updating Liquid variables in the editor while maintaining proper syntax.
+ *
+ * This hook manages several critical aspects of variable editing:
+ * 1. Ensures proper Liquid syntax ({{...}}) is maintained when updating variables
+ * 2. Handles edge cases like existing closing brackets
+ * 3. Maintains cursor position after updates
+ * 4. Prevents recursive updates during the edit process
+ *
+ * The update process:
+ * 1. Checks if the new value already has Liquid syntax
+ * 2. Detects if there are existing closing brackets after the cursor
+ * 3. Calculates the correct range to replace
+ * 4. Updates the editor state while maintaining proper cursor position
+ */
 function useVariableUpdate(
   selectedVariable: SelectedVariable,
   viewRef: React.RefObject<EditorView>,
@@ -178,6 +201,7 @@ function useVariableUpdate(
 function useCompletionSource(variables: LiquidVariable[], lastCompletionRef: React.MutableRefObject<CompletionRange>) {
   return useCallback(
     (context: CompletionContext) => {
+      // Match text that starts with {{ and capture everything after it until the cursor position
       const word = context.matchBefore(/\{\{([^}]*)/);
       if (!word) return null;
 
@@ -190,6 +214,9 @@ function useCompletionSource(variables: LiquidVariable[], lastCompletionRef: Rea
           const text = completion.label;
           lastCompletionRef.current = { from, to };
 
+          // Handle liquid variable syntax ({{variable}})
+          // If we're not already inside liquid brackets, wrap the completion with {{}}
+          // If we're inside liquid brackets (detected by checking previous chars), just insert the variable name
           const content = view.state.doc.toString();
           const before = content.slice(Math.max(0, from - 2), from);
           const insert = before !== '{{' ? `{{${text}}} ` : `${text}}} `;

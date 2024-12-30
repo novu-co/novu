@@ -231,7 +231,7 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
                 setDraggingItem(null);
                 setDragOverIndex(null);
               }}
-              onDrag={(e, info) => {
+              onDrag={(_, info) => {
                 const elements = document.elementsFromPoint(info.point.x, info.point.y);
                 const droppableElement = elements.find(
                   (el) => el.classList.contains('group') && !el.classList.contains('opacity-50')
