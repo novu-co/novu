@@ -65,10 +65,7 @@ export const variablePillTheme = EditorView.baseTheme({
     minHeight: '100%',
     display: 'flex',
     flexDirection: 'column',
-  },
-  '.cm-line': {
-    minHeight: '32px',
-    display: 'flex',
-    alignItems: 'center',
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word',
   },
 });

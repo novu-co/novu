@@ -1,6 +1,12 @@
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 import { CompletionContext, CompletionResult } from '@codemirror/autocomplete';
 
+interface CompletionOption {
+  label: string;
+  type: string;
+  boost?: number;
+}
+
 const filters = [
   // Math filters
   { label: 'plus', type: 'function' },
@@ -89,6 +95,13 @@ const filters = [
   { label: 'to_integer', type: 'function' },
 ];
 
+function createPayloadVariable(input: string): LiquidVariable {
+  return {
+    label: `payload.${input}`,
+    type: 'variable',
+  };
+}
+
 export const completions =
   (variables: LiquidVariable[]) =>
   (context: CompletionContext): CompletionResult | null => {
@@ -131,24 +144,56 @@ export const completions =
       }
     }
 
-    // If no pipe (|) is present, suggest variables
+    // Handle variable suggestions
     const word = context.matchBefore(/[\w.]+/); // Match variable names only
     if (!word && insideBraces.trim() === '') {
       return {
         from: pos,
-        options: variables.map((v) => ({
-          label: v.label,
-          type: 'variable',
-        })),
+        options: [
+          ...variables.map((v) => ({
+            label: v.label,
+            type: 'variable',
+          })),
+        ],
       };
     }
 
-    // Suggest variables if typing a valid variable name
-    if (word) {
+    // Special handling for payload namespace
+    if (word && word.text.startsWith('payload.')) {
+      const payloadPath = word.text.slice(8); // Remove 'payload.' prefix
+      const existingVariables = variables.filter((v) => v.label.startsWith('payload.'));
+
+      const suggestions: CompletionOption[] = existingVariables
+        .filter((v) => v.label.toLowerCase().includes(payloadPath.toLowerCase()))
+        .map((v) => ({
+          label: v.label,
+          type: 'variable',
+        }));
+
+      // Always add the current input as a suggestion for new variables
+      if (payloadPath && !existingVariables.some((v) => v.label === `payload.${payloadPath}`)) {
+        suggestions.unshift({
+          label: `payload.${payloadPath}`,
+          type: 'variable',
+          boost: 99, // Higher boost to show at top
+        });
+      }
+
       return {
         from: word.from,
         to: word.to ?? pos,
-        options: variables.map((v) => ({
+        options: suggestions,
+      };
+    }
+
+    // Regular variable suggestions
+    if (word) {
+      const matchingVariables = variables.filter((v) => v.label.toLowerCase().includes(word.text.toLowerCase()));
+
+      return {
+        from: word.from,
+        to: word.to ?? pos,
+        options: matchingVariables.map((v) => ({
           label: v.label,
           type: 'variable',
         })),

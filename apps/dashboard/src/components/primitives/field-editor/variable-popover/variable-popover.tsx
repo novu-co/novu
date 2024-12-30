@@ -1,17 +1,19 @@
 import { useState, useRef } from 'react';
-import { PopoverContent } from '@/components/primitives/popover';
+import { PopoverContent, Popover, PopoverTrigger } from '@/components/primitives/popover';
 import { Input, InputField } from '@/components/primitives/input';
 import { FormControl, FormItem } from '@/components/primitives/form/form';
 import { Code2 } from '@/components/icons/code-2';
 import { Separator } from '@/components/primitives/separator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { Switch } from '@/components/primitives/switch';
+import { Button } from '@/components/primitives/button';
 import { TransformerItem } from './components/transformer-item';
 import { TransformerList } from './components/transformer-list';
 import { useVariableParser } from './hooks/use-variable-parser';
 import { useTransformerManager } from './hooks/use-transformer-manager';
 import { formatLiquidVariable } from './utils';
 import type { VariablePopoverProps } from './types';
+import { Command, CommandInput, CommandList, CommandGroup, CommandItem } from '@/components/primitives/command';
+import { WandIcon } from 'lucide-react';
 
 export function VariablePopover({ variable, onClose, onUpdate }: VariablePopoverProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -20,6 +22,7 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
   const [defaultVal, setDefaultVal] = useState(parsedDefaultValue);
   const [showRawLiquid, setShowRawLiquid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isModifierPopoverOpen, setIsModifierPopoverOpen] = useState(false);
 
   const {
     transformers,
@@ -146,69 +149,52 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
               <FormControl>
                 <div className="grid gap-1">
                   <label className="text-text-sub text-label-xs">Modifiers</label>
-                  <Select
-                    value=""
-                    onValueChange={(value) => {
-                      if (value) {
-                        handleTransformerToggle(value);
-                        setSearchQuery('');
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="!text-paragraph-xs text-text-soft !h-7 min-h-0 !p-1.5">
-                      <SelectValue placeholder="Add a modifier..." />
-                    </SelectTrigger>
-                    <SelectContent
-                      onCloseAutoFocus={(e) => {
-                        e.preventDefault();
-                        searchInputRef.current?.focus();
-                      }}
-                      className="max-h-[400px]"
-                      align="start"
-                    >
-                      <div className="p-2">
-                        <InputField size="fit" className="min-h-0">
-                          <Input
-                            ref={searchInputRef}
+                  <Popover open={isModifierPopoverOpen} onOpenChange={setIsModifierPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" role="combobox" className="h-7 justify-between text-sm font-normal">
+                        Add a modifier
+                        <WandIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[300px] p-0" align="start">
+                      <Command>
+                        <div className="p-2 pb-0">
+                          <CommandInput
                             value={searchQuery}
-                            onChange={(e) => {
-                              e.stopPropagation();
-                              setSearchQuery(e.target.value);
-                            }}
-                            className="h-7 text-sm"
+                            onValueChange={setSearchQuery}
                             placeholder="Search modifiers..."
-                            autoFocus
-                            onKeyDown={(e) => {
-                              e.stopPropagation();
-                              if (e.key === 'Escape') {
-                                setSearchQuery('');
-                              }
-                            }}
+                            className="h-7 text-sm"
                           />
-                        </InputField>
-                      </div>
-                      <div className="max-h-[350px] overflow-y-auto px-1">
-                        {getFilteredTransformers(searchQuery).length === 0 ? (
-                          <div className="text-text-soft flex flex-col items-center justify-center gap-2 p-4 text-center">
-                            <span className="text-sm">
-                              {searchQuery ? 'No modifiers found' : 'All modifiers have been added'}
-                            </span>
-                            {searchQuery && <span className="text-xs">Try searching for different terms</span>}
-                          </div>
-                        ) : (
-                          getFilteredTransformers(searchQuery).map((transformer) => (
-                            <SelectItem
-                              key={transformer.value}
-                              value={transformer.value}
-                              className="relative [&>*:first-child]:p-0"
-                            >
-                              <TransformerItem transformer={transformer} />
-                            </SelectItem>
-                          ))
-                        )}
-                      </div>
-                    </SelectContent>
-                  </Select>
+                        </div>
+                        <CommandList className="max-h-[300px]">
+                          {getFilteredTransformers(searchQuery).length === 0 ? (
+                            <div className="text-text-soft flex flex-col items-center justify-center gap-2 p-4 text-center">
+                              <span className="text-sm">
+                                {searchQuery ? 'No modifiers found' : 'All modifiers have been added'}
+                              </span>
+                              {searchQuery && <span className="text-xs">Try searching for different terms</span>}
+                            </div>
+                          ) : (
+                            <CommandGroup>
+                              {getFilteredTransformers(searchQuery).map((transformer) => (
+                                <CommandItem
+                                  key={transformer.value}
+                                  value={transformer.value}
+                                  onSelect={() => {
+                                    handleTransformerToggle(transformer.value);
+                                    setSearchQuery('');
+                                    setIsModifierPopoverOpen(false);
+                                  }}
+                                >
+                                  <TransformerItem transformer={transformer} />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          )}
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </FormControl>
             </FormItem>
