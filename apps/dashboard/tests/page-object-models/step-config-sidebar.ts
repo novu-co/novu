@@ -1,28 +1,30 @@
-import { expect, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
 export class StepConfigSidebar {
   constructor(private page: Page) {}
 
-  async waitStepConfigSidebarNavigation(stepName: string): Promise<void> {
-    await expect(this.page).toHaveTitle(`Configure ${stepName} | Novu Cloud Dashboard`);
-  }
-
-  async verifyStepNameInput({ stepName, disabled = false }: { stepName: string; disabled?: boolean }): Promise<void> {
+  async getStepNameInputValue(): Promise<string> {
     const stepNameInput = await this.page.locator(`input[name="name"]`);
-    await expect(await stepNameInput.inputValue()).toEqual(stepName);
-    await expect(await stepNameInput.isDisabled()).toEqual(disabled);
+
+    return stepNameInput.inputValue();
   }
 
-  async verifyStepIdentifierInput({
-    stepId,
-    isReadOnly = false,
-  }: {
-    stepId: string;
-    isReadOnly?: boolean;
-  }): Promise<void> {
+  async isStepNameInputDisabled(): Promise<boolean> {
+    const stepNameInput = await this.page.locator(`input[name="name"]`);
+
+    return stepNameInput.isDisabled();
+  }
+
+  async getStepIdentifierInputValue(): Promise<string> {
     const stepIdentifierInput = await this.page.locator(`input[name="stepId"]`);
-    await expect(await stepIdentifierInput.inputValue()).toEqual(stepId);
-    await expect(await stepIdentifierInput.getAttribute('readonly')).toEqual(isReadOnly ? '' : null);
+
+    return stepIdentifierInput.inputValue();
+  }
+
+  async getStepIdentifierReadonlyAttribute(): Promise<string | null> {
+    const stepIdentifierInput = await this.page.locator(`input[name="stepId"]`);
+
+    return stepIdentifierInput.getAttribute('readonly');
   }
 
   async updateStepName({ oldStepName, newStepName }: { newStepName: string; oldStepName: string }): Promise<void> {

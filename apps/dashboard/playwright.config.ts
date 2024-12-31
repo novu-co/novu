@@ -57,6 +57,7 @@ export default defineConfig({
     },
     {
       name: 'chromium',
+      testMatch: /.*\.e2e\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.clerk/user.json',

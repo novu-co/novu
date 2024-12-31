@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 import os from 'node:os';
 
 const isMac = os.platform() === 'darwin';
@@ -7,13 +7,12 @@ const modifier = isMac ? 'Meta' : 'Control';
 export class InAppStepEditor {
   constructor(private page: Page) {}
 
-  async waitInAppStepEditorNavigation(stepName: string): Promise<void> {
-    await this.page.waitForResponse('**/v2/workflows/**/steps/**');
-    await expect(this.page).toHaveTitle(`Edit ${stepName} | Novu Cloud Dashboard`);
+  async getTitle(): Promise<string> {
+    return await this.page.title();
   }
 
-  async expectBodyValidationError(): Promise<void> {
-    await expect(await this.page.getByText('Body is missing')).toBeVisible();
+  async getBodyValidationError() {
+    return await this.page.getByText('Body is required');
   }
 
   async fillForm({
@@ -53,10 +52,15 @@ export class InAppStepEditor {
     }
   }
 
-  async checkSaved(): Promise<void> {
-    await this.page.locator('header', { hasText: 'Configure Template' }).evaluate((e) => e.blur());
+  async clickOnSidebar() {
+    const header = this.page.locator('header', { hasText: 'Configure Template' });
+    await header.click();
+  }
 
-    await expect(await this.page.locator('ol li:first-child', { hasText: 'Saved' })).toBeVisible();
+  async getSavedIndicator() {
+    await this.clickOnSidebar();
+
+    return await this.page.locator('ol li:first-child', { hasText: 'Saved' });
   }
 
   async previewTabClick(): Promise<void> {
@@ -64,9 +68,11 @@ export class InAppStepEditor {
     await preview.click();
   }
 
-  async checkPreview({ subject, body }: { subject: string; body: string }): Promise<void> {
-    await expect(await this.page.getByTestId('in-app-preview-subject')).toContainText(subject);
-    await expect(await this.page.getByTestId('in-app-preview-body')).toContainText(body);
+  async getPreviewElements() {
+    return {
+      subject: await this.page.getByTestId('in-app-preview-subject'),
+      body: await this.page.getByTestId('in-app-preview-body'),
+    };
   }
 
   async close(): Promise<void> {
@@ -74,20 +80,22 @@ export class InAppStepEditor {
     await closeSidebar.click();
   }
 
-  async verifyCustomControlsForm({
+  async getCustomControlElements({
     customControls,
   }: {
     customControls: Array<{ name: string; value?: string; defaultValue?: string }>;
-  }): Promise<void> {
+  }) {
+    const elements = [];
     for (const control of customControls) {
-      const label = await this.page.locator('label', { hasText: new RegExp(`^${control.name}$`) });
-      await expect(label).toBeVisible();
-
-      const input = await this.page.locator('div[contenteditable="true"]', {
-        hasText: control.defaultValue ?? control.value,
+      elements.push({
+        label: await this.page.locator('label', { hasText: new RegExp(`^${control.name}$`) }),
+        input: await this.page.locator('div[contenteditable="true"]', {
+          hasText: control.defaultValue ?? control.value,
+        }),
       });
-      await expect(input).toBeVisible();
     }
+
+    return elements;
   }
 
   async fillCustomControlField({ value, oldValue }: { value: string; oldValue: string }): Promise<void> {
@@ -97,5 +105,12 @@ export class InAppStepEditor {
     await input.click({ force: true });
     await input.press(`${modifier}+KeyX`);
     await this.page.keyboard.type(value);
+
+    await this.clickOnSidebar();
+  }
+
+  async toggleOverrideDefaults(): Promise<void> {
+    const overrideDefaults = await this.page.getByTestId('override-defaults-switch');
+    await overrideDefaults.click();
   }
 }

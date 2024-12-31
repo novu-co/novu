@@ -44,7 +44,6 @@ export async function initializeSession({ page }: { page: Page }): Promise<UserS
   await page.addInitScript((currentSession) => {
     window.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('nv_auth_token', currentSession.token);
-      localStorage.setItem('nv_last_environment_id', currentSession.environment._id);
     });
   }, sessionData);
 

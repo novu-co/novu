@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
 export class CreateWorkflowSidebar {
   constructor(private page: Page) {}
@@ -14,31 +14,25 @@ export class CreateWorkflowSidebar {
     }
   }
 
-  async expectNameValidationError(): Promise<void> {
-    await expect(await this.page.getByText('Name is required')).toBeVisible();
+  async getNameValidationError() {
+    return this.page.getByText('Name is required');
   }
 
-  async expectTagsValidationError(): Promise<void> {
-    await expect(await this.page.getByText('Tags must contain at most 16')).toBeVisible();
+  async getTagsValidationError() {
+    return this.page.getByText('Tags must contain at most 16');
   }
 
   async fillForm({
     workflowName,
-    workflowId,
     workflowDescription,
     tags,
   }: {
     workflowName: string;
-    workflowId: string;
     workflowDescription: string;
     tags: string[] | number;
   }): Promise<void> {
     // fill the workflow name
     await this.page.locator('input[name="name"]').fill(workflowName);
-    const workflowIdInput = await this.page.locator('input[name="workflowId"]');
-
-    // check the workflow id
-    await expect(await workflowIdInput.inputValue()).toEqual(workflowId);
 
     // fill the tags
     const tagsInput = await this.page.getByPlaceholder('Type a tag and press Enter');
