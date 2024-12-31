@@ -27,6 +27,8 @@ export const EmailSubject = () => {
             <FormControl>
               <Editor
                 size="lg"
+                singleLine
+                indentWithTab={false}
                 autoFocus={!field.value}
                 fontFamily="inherit"
                 placeholder={capitalize(field.name)}

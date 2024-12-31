@@ -79,6 +79,8 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
                   <Label>Avatar URL</Label>
                   <InputField size="fit">
                     <Editor
+                      singleLine
+                      indentWithTab={false}
                       fontFamily="inherit"
                       ref={ref}
                       placeholder="Enter avatar URL"
