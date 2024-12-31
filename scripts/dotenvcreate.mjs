@@ -2,13 +2,38 @@ import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-sec
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 
 console.time('dotenvcreate');
 
-const secretName = process.argv[2];
-const region = process.argv[3];
-const enterprise = process.argv[4];
-const env = process.argv[5];
+const { argv } = yargs(hideBin(process.argv))
+  .option('secretName', {
+    alias: 's',
+    type: 'string',
+    description: 'The name of the secret',
+    demandOption: true,
+  })
+  .option('region', {
+    alias: 'r',
+    type: 'string',
+    description: 'The region',
+    demandOption: true,
+  })
+  .option('enterprise', {
+    alias: 'e',
+    type: 'string',
+    description: 'The enterprise value',
+    demandOption: true,
+  })
+  .option('env', {
+    alias: 'v',
+    type: 'string',
+    description: 'The environment',
+    demandOption: true,
+  });
+
+const { secretName, region, enterprise, env } = argv;
 
 if (!enterprise || enterprise.toLowerCase() === 'false') {
   console.log('Enterprise value is false or not provided. Exiting script.');
@@ -47,9 +72,10 @@ async function getSecretValue(secretName) {
 function escapeValue(value) {
   // If the value contains special characters or spaces, quote it
   if (value && /[ \t"=$]/.test(value)) {
-    // Escape existing double quotes and wrap the value in quotes
-    return `"${value.replace(/"/g, '\\"')}"`;
+    // Escape backslashes and double quotes, then wrap the value in quotes
+    return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
   }
+
   return value;
 }
 
