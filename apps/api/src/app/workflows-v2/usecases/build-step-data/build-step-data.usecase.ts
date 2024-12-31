@@ -1,10 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ControlValuesLevelEnum, StepDataDto, WorkflowOriginEnum } from '@novu/shared';
+import { ControlValuesLevelEnum, ShortIsPrefixEnum, StepDataDto, WorkflowOriginEnum } from '@novu/shared';
 import { ControlValuesRepository, NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
-import { GetWorkflowByIdsUseCase, Instrument, InstrumentUsecase } from '@novu/application-generic';
+import {
+  GetWorkflowByIdsUseCase,
+  Instrument,
+  InstrumentUsecase,
+  WorkflowInternalResponseDto,
+} from '@novu/application-generic';
 import { BuildStepDataCommand } from './build-step-data.command';
 import { InvalidStepException } from '../../exceptions/invalid-step.exception';
 import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
+import { buildSlug } from '../../../shared/helpers/build-slug';
 
 @Injectable()
 export class BuildStepDataUsecase {
@@ -16,18 +22,17 @@ export class BuildStepDataUsecase {
 
   @InstrumentUsecase()
   async execute(command: BuildStepDataCommand): Promise<StepDataDto> {
-    const workflow = await this.fetchWorkflow(command);
+    const workflow: WorkflowInternalResponseDto = await this.fetchWorkflow(command);
 
     const { currentStep } = await this.loadStepsFromDb(command, workflow);
-    if (
-      currentStep.name === undefined ||
-      !currentStep._templateId ||
-      currentStep.stepId === undefined ||
-      !currentStep.template?.type
-    ) {
+    if (!currentStep._templateId || currentStep.stepId === undefined || !currentStep.template?.type) {
       throw new InvalidStepException(currentStep);
     }
-    const controlValues = await this.getValues(command, currentStep, workflow._id);
+    const controlValues = await this.getControlValues(command, currentStep, workflow._id);
+    const stepName = currentStep.name || 'MISSING STEP NAME - PLEASE UPDATE IMMEDIATELY';
+    const variables = await this.buildAvailableVariableSchema(command, currentStep, workflow);
+
+    const slug = buildSlug(stepName, ShortIsPrefixEnum.STEP, currentStep._templateId);
 
     return {
       controls: {
@@ -35,19 +40,31 @@ export class BuildStepDataUsecase {
         uiSchema: currentStep.template?.controls?.uiSchema,
         values: controlValues,
       },
-      variables: this.buildAvailableVariableSchemaUsecase.execute({
-        stepDatabaseId: currentStep._templateId,
-        workflow,
-      }),
-      name: currentStep.name,
+      variables,
+      name: stepName,
+      slug,
       _id: currentStep._templateId,
-      stepId: currentStep.stepId,
+      stepId: currentStep.stepId || 'Missing Step Id',
       type: currentStep.template?.type,
       origin: workflow.origin || WorkflowOriginEnum.EXTERNAL,
       workflowId: workflow.triggers[0].identifier,
       workflowDatabaseId: workflow._id,
       issues: currentStep.issues,
     };
+  }
+
+  private async buildAvailableVariableSchema(
+    command: BuildStepDataCommand,
+    currentStep: NotificationStepEntity,
+    workflow: WorkflowInternalResponseDto
+  ) {
+    return await this.buildAvailableVariableSchemaUsecase.execute({
+      environmentId: command.user.environmentId,
+      organizationId: command.user.organizationId,
+      userId: command.user._id,
+      stepInternalId: currentStep._templateId,
+      workflow,
+    });
   }
 
   @Instrument()
@@ -61,7 +78,11 @@ export class BuildStepDataUsecase {
   }
 
   @Instrument()
-  private async getValues(command: BuildStepDataCommand, currentStep: NotificationStepEntity, _workflowId: string) {
+  private async getControlValues(
+    command: BuildStepDataCommand,
+    currentStep: NotificationStepEntity,
+    _workflowId: string
+  ) {
     const controlValuesEntity = await this.controlValuesRepository.findOne({
       _environmentId: command.user.environmentId,
       _organizationId: command.user.organizationId,

@@ -29,7 +29,7 @@ export const InAppPreview = (props: InAppPreviewProps) => {
   return (
     <div
       className={cn(
-        'border-foreground-200 to-background/90 pointer-events-none relative mx-auto flex h-full w-full flex-col gap-4 rounded-xl px-2 py-3 shadow-sm',
+        'border-foreground-200 to-background/90 pointer-events-none relative mx-auto flex h-full w-full flex-col gap-4 rounded-xl px-4 py-3 shadow-sm',
         className
       )}
       {...rest}
@@ -42,7 +42,7 @@ export const InAppPreviewHeader = (props: InAppPreviewHeaderProps) => {
   const { className, ...rest } = props;
 
   return (
-    <div className={cn('z-20 flex items-center justify-between px-2 text-neutral-300', className)} {...rest}>
+    <div className={cn('z-20 flex items-center justify-between text-neutral-300', className)} {...rest}>
       <div className="flex items-center gap-2">
         <span className="text-xl font-medium">Inbox</span>
         <InboxArrowDown />
@@ -51,7 +51,7 @@ export const InAppPreviewHeader = (props: InAppPreviewHeaderProps) => {
         <span className="p-0.5">
           <InboxEllipsis />
         </span>
-        <span className="p-0.5">
+        <span>
           <InboxSettings />
         </span>
       </div>

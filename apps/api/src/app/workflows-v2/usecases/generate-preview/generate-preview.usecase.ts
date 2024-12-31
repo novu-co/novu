@@ -1,12 +1,17 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import _ from 'lodash';
+import Ajv, { ErrorObject } from 'ajv';
+import addFormats from 'ajv-formats';
 import {
   ChannelTypeEnum,
+  createMockObjectFromSchema,
   GeneratePreviewResponseDto,
   JobStatusEnum,
   PreviewPayload,
   StepDataDto,
   WorkflowOriginEnum,
+  TipTapNode,
+  StepTypeEnum,
 } from '@novu/shared';
 import {
   GetWorkflowByIdsCommand,
@@ -15,54 +20,89 @@ import {
   Instrument,
   InstrumentUsecase,
   PinoLogger,
+  dashboardSanitizeControlValues,
 } from '@novu/application-generic';
 import { captureException } from '@sentry/node';
+import { channelStepSchemas, actionStepSchemas } from '@novu/framework/internal';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
 import { BuildStepDataUsecase } from '../build-step-data';
 import { GeneratePreviewCommand } from './generate-preview.command';
-import { extractTemplateVars } from '../../util/template-variables/extract-template-variables';
-import { pathsToObject } from '../../util/path-to-object';
-import { createMockPayloadFromSchema, flattenObjectValues } from '../../util/utils';
-import { PrepareAndValidateContentUsecase } from '../validate-content/prepare-and-validate-content/prepare-and-validate-content.usecase';
+import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
+import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
+import { Variable } from '../../util/template-parser/liquid-parser';
+import { keysToObject } from '../../util/utils';
+import { isObjectTipTapNode } from '../../util/tip-tap.util';
+import { buildVariables } from '../../util/build-variables';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
 @Injectable()
 export class GeneratePreviewUsecase {
   constructor(
-    private legacyPreviewStepUseCase: PreviewStep,
+    private previewStepUsecase: PreviewStep,
     private buildStepDataUsecase: BuildStepDataUsecase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private readonly logger: PinoLogger,
-    private prepareAndValidateContentUsecase: PrepareAndValidateContentUsecase
+    private buildPayloadSchema: BuildPayloadSchema,
+    private readonly logger: PinoLogger
   ) {}
 
   @InstrumentUsecase()
   async execute(command: GeneratePreviewCommand): Promise<GeneratePreviewResponseDto> {
     try {
-      const { previewPayload: commandVariablesExample, controlValues: commandControlValues } =
-        command.generatePreviewRequestDto;
-      const stepData = await this.getStepData(command);
-      const workflow = await this.findWorkflow(command);
-      const preparedAndValidatedContent = await this.prepareAndValidateContentUsecase.execute({
-        user: command.user,
-        previewPayloadFromDto: commandVariablesExample,
-        controlValues: commandControlValues || stepData.controls.values || {},
-        controlDataSchema: stepData.controls.dataSchema || {},
-        variableSchema: stepData.variables,
-      });
-      const variablesExample = this.buildVariablesExample(
+      const {
+        stepData,
+        controlValues: initialControlValues,
+        variableSchema,
         workflow,
-        preparedAndValidatedContent.finalPayload,
-        commandVariablesExample
-      );
+      } = await this.initializePreviewContext(command);
+      const commandVariablesExample = command.generatePreviewRequestDto.previewPayload;
 
+      /**
+       * We don't want to sanitize control values for code workflows,
+       * as it's the responsibility of the custom code workflow creator
+       */
+      const sanitizedValidatedControls =
+        workflow.origin === WorkflowOriginEnum.NOVU_CLOUD
+          ? this.sanitizeControlsForPreview(initialControlValues, stepData)
+          : initialControlValues;
+
+      if (!sanitizedValidatedControls && workflow.origin === WorkflowOriginEnum.NOVU_CLOUD) {
+        throw new Error(
+          // eslint-disable-next-line max-len
+          'Control values normalization failed: The normalizeControlValues function requires maintenance to sanitize the provided type or data structure correctly'
+        );
+      }
+
+      let previewTemplateData = {
+        variablesExample: {},
+        controlValues: {},
+      };
+
+      for (const [controlKey, controlValue] of Object.entries(sanitizedValidatedControls || {})) {
+        const variables = buildVariables(variableSchema, controlValue, this.logger);
+        const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalidVariables);
+
+        const validVariableNames = variables.validVariables.map((variable) => variable.name);
+        const variablesExampleResult = keysToObject(validVariableNames, { fn: (key) => `{{${key}}}` });
+
+        previewTemplateData = {
+          variablesExample: _.merge(previewTemplateData.variablesExample, variablesExampleResult),
+          controlValues: {
+            ...previewTemplateData.controlValues,
+            [controlKey]: isObjectTipTapNode(processedControlValues)
+              ? JSON.stringify(processedControlValues)
+              : processedControlValues,
+          },
+        };
+      }
+
+      const mergedVariablesExample = this.mergeVariablesExample(workflow, previewTemplateData, commandVariablesExample);
       const executeOutput = await this.executePreviewUsecase(
         command,
         stepData,
-        variablesExample,
-        preparedAndValidatedContent.finalControlValues
+        mergedVariablesExample,
+        previewTemplateData.controlValues
       );
 
       return {
@@ -70,7 +110,7 @@ export class GeneratePreviewUsecase {
           preview: executeOutput.outputs as any,
           type: stepData.type as unknown as ChannelTypeEnum,
         },
-        previewPayloadExample: variablesExample,
+        previewPayloadExample: mergedVariablesExample,
       };
     } catch (error) {
       this.logger.error(
@@ -82,7 +122,6 @@ export class GeneratePreviewUsecase {
         `Unexpected error while generating preview`,
         LOG_CONTEXT
       );
-
       if (process.env.SENTRY_DSN) {
         captureException(error);
       }
@@ -97,39 +136,64 @@ export class GeneratePreviewUsecase {
     }
   }
 
-  @Instrument()
-  private buildVariablesExample(
+  private sanitizeControlsForPreview(initialControlValues: Record<string, unknown>, stepData: StepDataDto) {
+    const sanitizedValues = dashboardSanitizeControlValues(this.logger, initialControlValues, stepData.type);
+
+    return sanitizeControlValuesByOutputSchema(sanitizedValues || {}, stepData.type);
+  }
+
+  private mergeVariablesExample(
     workflow: WorkflowInternalResponseDto,
-    finalPayload?: PreviewPayload,
-    commandVariablesExample?: PreviewPayload | undefined
+    previewTemplateData: { variablesExample: {}; controlValues: {} },
+    commandVariablesExample: PreviewPayload | undefined
   ) {
-    if (workflow.origin !== WorkflowOriginEnum.EXTERNAL) {
-      return finalPayload;
+    let finalVariablesExample = {};
+    if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
+      // if external workflow, we need to override with stored payload schema
+      const tmp = createMockObjectFromSchema({
+        type: 'object',
+        properties: { payload: workflow.payloadSchema },
+      });
+      finalVariablesExample = { ...previewTemplateData.variablesExample, ...tmp };
+    } else {
+      finalVariablesExample = previewTemplateData.variablesExample;
     }
 
-    const examplePayloadSchema = createMockPayloadFromSchema(workflow.payloadSchema);
+    finalVariablesExample = _.merge(finalVariablesExample, commandVariablesExample || {});
 
-    if (!examplePayloadSchema || Object.keys(examplePayloadSchema).length === 0) {
-      return finalPayload;
-    }
+    return finalVariablesExample;
+  }
 
-    return _.merge(
-      finalPayload as Record<string, unknown>,
-      { payload: examplePayloadSchema },
-      commandVariablesExample || {}
-    );
+  private async initializePreviewContext(command: GeneratePreviewCommand) {
+    const stepData = await this.getStepData(command);
+    const controlValues = command.generatePreviewRequestDto.controlValues || stepData.controls.values || {};
+    const workflow = await this.findWorkflow(command);
+    const variableSchema = await this.buildVariablesSchema(stepData.variables, command, controlValues);
+
+    return { stepData, controlValues, variableSchema, workflow };
   }
 
   @Instrument()
-  private generateVariablesExample(stepData: StepDataDto, commandControlValues?: Record<string, unknown>) {
-    const controlValues = flattenObjectValues(commandControlValues || stepData.controls.values).join(' ');
-    const templateVars = extractTemplateVars(controlValues);
-    const variablesExample = pathsToObject(templateVars, {
-      valuePrefix: '{{',
-      valueSuffix: '}}',
-    });
+  private async buildVariablesSchema(
+    variables: Record<string, unknown>,
+    command: GeneratePreviewCommand,
+    controlValues: Record<string, unknown>
+  ) {
+    const payloadSchema = await this.buildPayloadSchema.execute(
+      BuildPayloadSchemaCommand.create({
+        environmentId: command.user.environmentId,
+        organizationId: command.user.organizationId,
+        userId: command.user._id,
+        workflowId: command.workflowIdOrInternalId,
+        controlValues,
+      })
+    );
 
-    return variablesExample;
+    if (Object.keys(payloadSchema).length === 0) {
+      return variables;
+    }
+
+    return _.merge(variables, { properties: { payload: payloadSchema } });
   }
 
   @Instrument()
@@ -162,15 +226,15 @@ export class GeneratePreviewUsecase {
     command: GeneratePreviewCommand,
     stepData: StepDataDto,
     hydratedPayload: PreviewPayload,
-    updatedControlValues: Record<string, unknown>
+    controlValues: Record<string, unknown>
   ) {
     const state = buildState(hydratedPayload.steps);
     try {
-      return await this.legacyPreviewStepUseCase.execute(
+      return await this.previewStepUsecase.execute(
         PreviewStepCommand.create({
           payload: hydratedPayload.payload || {},
           subscriber: hydratedPayload.subscriber,
-          controls: updatedControlValues || {},
+          controls: controlValues || {},
           environmentId: command.user.environmentId,
           organizationId: command.user.organizationId,
           stepId: stepData.stepId,
@@ -188,6 +252,28 @@ export class GeneratePreviewUsecase {
       }
     }
   }
+
+  private fixControlValueInvalidVariables(
+    controlValues: unknown,
+    invalidVariables: Variable[]
+  ): Record<string, unknown> {
+    try {
+      let controlValuesString = JSON.stringify(controlValues);
+
+      for (const invalidVariable of invalidVariables) {
+        if (!controlValuesString.includes(invalidVariable.output)) {
+          continue;
+        }
+
+        const EMPTY_STRING = '';
+        controlValuesString = replaceAll(controlValuesString, invalidVariable.output, EMPTY_STRING);
+      }
+
+      return JSON.parse(controlValuesString) as Record<string, unknown>;
+    } catch (error) {
+      return controlValues as Record<string, unknown>;
+    }
+  }
 }
 
 function buildState(steps: Record<string, unknown> | undefined): FrameworkPreviousStepsOutputState[] {
@@ -203,6 +289,13 @@ function buildState(steps: Record<string, unknown> | undefined): FrameworkPrevio
   }
 
   return outputArray;
+}
+
+/**
+ * Replaces all occurrences of a search string with a replacement string.
+ */
+export function replaceAll(text: string, searchValue: string, replaceValue: string): string {
+  return _.replace(text, new RegExp(_.escapeRegExp(searchValue), 'g'), replaceValue);
 }
 
 export class GeneratePreviewError extends InternalServerErrorException {
@@ -227,3 +320,106 @@ class FrameworkError {
   message: string;
   name: string;
 }
+
+function sanitizeControlValuesByOutputSchema(
+  controlValues: Record<string, unknown>,
+  type: StepTypeEnum
+): Record<string, unknown> {
+  const outputSchema = channelStepSchemas[type].output || actionStepSchemas[type].output;
+
+  if (!outputSchema || !controlValues) {
+    return controlValues;
+  }
+
+  const ajv = new Ajv({ allErrors: true });
+  addFormats(ajv);
+  const validate = ajv.compile(outputSchema);
+  const isValid = validate(controlValues);
+  const errors = validate.errors as null | ErrorObject[];
+
+  if (isValid || !errors || errors?.length === 0) {
+    return controlValues;
+  }
+
+  return replaceInvalidControlValues(controlValues, errors);
+}
+
+/**
+ * Fixes invalid control values by applying default values from the schema
+ *
+ * @example
+ * // Input:
+ * const values = { foo: 'invalid' };
+ * const errors = [{ instancePath: '/foo' }];
+ * const defaults = { foo: 'default' };
+ *
+ * // Output:
+ * const fixed = { foo: 'default' };
+ */
+function replaceInvalidControlValues(
+  normalizedControlValues: Record<string, unknown>,
+  errors: ErrorObject[]
+): Record<string, unknown> {
+  const fixedValues = _.cloneDeep(normalizedControlValues);
+
+  errors.forEach((error) => {
+    const path = getErrorPath(error);
+    const defaultValue = _.get(previewControlValueDefault, path);
+    _.set(fixedValues, path, defaultValue);
+  });
+
+  return fixedValues;
+}
+
+/*
+ * Extracts the path from the error object:
+ * 1. If instancePath exists, removes leading slash and converts remaining slashes to dots
+ * 2. If no instancePath, uses missingProperty from error params
+ * Example: "/foo/bar" becomes "foo.bar"
+ */
+function getErrorPath(error: ErrorObject): string {
+  return (error.instancePath.substring(1) || error.params.missingProperty).replace(/\//g, '.');
+}
+
+const EMPTY_STRING = '';
+const WHITESPACE = ' ';
+const DEFAULT_URL_TARGET = '_blank';
+const DEFAULT_URL_PATH = 'https://www.redirect-example.com';
+const DEFAULT_TIP_TAP_EMPTY_PREVIEW: TipTapNode = {
+  type: 'doc',
+  content: [
+    {
+      type: 'paragraph',
+      attrs: {
+        textAlign: 'left',
+      },
+      content: [
+        {
+          type: 'text',
+          text: EMPTY_STRING,
+        },
+      ],
+    },
+  ],
+};
+
+/**
+ * Default control values used specifically for preview purposes.
+ * These values are designed to be parsable by Liquid.js and provide
+ * safe fallback values when generating preview.
+ */
+export const previewControlValueDefault = {
+  subject: EMPTY_STRING,
+  body: WHITESPACE,
+  avatar: DEFAULT_URL_PATH,
+  emailEditor: DEFAULT_TIP_TAP_EMPTY_PREVIEW,
+  data: {},
+  'primaryAction.label': EMPTY_STRING,
+  'primaryAction.redirect.url': DEFAULT_URL_PATH,
+  'primaryAction.redirect.target': DEFAULT_URL_TARGET,
+  'secondaryAction.label': EMPTY_STRING,
+  'secondaryAction.redirect.url': DEFAULT_URL_PATH,
+  'secondaryAction.redirect.target': DEFAULT_URL_TARGET,
+  'redirect.url': DEFAULT_URL_PATH,
+  'redirect.target': DEFAULT_URL_TARGET,
+} as const;

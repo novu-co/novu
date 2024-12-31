@@ -2,13 +2,12 @@ import * as Sentry from '@sentry/react';
 import { HTMLAttributes, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { useStep } from '@/components/workflow-editor/steps/step-provider';
-import { usePreviewStep } from '@/hooks';
+import { usePreviewStep } from '@/hooks/use-preview-step';
 import { EmailPreviewHeader } from '@/components/workflow-editor/steps/email/email-preview';
 import { Separator } from '@/components/primitives/separator';
 import { Skeleton } from '@/components/primitives/skeleton';
-import { ChannelTypeEnum } from '@novu/shared';
 import { cn } from '@/utils/ui';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 type MiniEmailPreviewProps = HTMLAttributes<HTMLDivElement>;
 const MiniEmailPreview = (props: MiniEmailPreviewProps) => {
@@ -16,7 +15,7 @@ const MiniEmailPreview = (props: MiniEmailPreviewProps) => {
   return (
     <div
       className={cn(
-        'border-neutral-alpha-200 before:to-background relative isolate mb-4 rounded-lg border border-dashed before:pointer-events-none before:absolute before:inset-0 before:-m-px before:rounded-lg before:bg-gradient-to-b before:from-transparent before:bg-clip-padding',
+        'border-neutral-alpha-200 before:to-background relative isolate rounded-lg border border-dashed before:pointer-events-none before:absolute before:inset-0 before:-m-px before:rounded-lg before:bg-gradient-to-b before:from-transparent before:bg-clip-padding',
         className
       )}
       {...rest}
@@ -37,11 +36,9 @@ export function ConfigureEmailStepPreview(props: ConfigureEmailStepPreviewProps)
     data: previewData,
     isPending: isPreviewPending,
   } = usePreviewStep({
-    onError: (error) => {
-      Sentry.captureException(error);
-    },
+    onError: (error) => Sentry.captureException(error),
   });
-  const { step, isPending } = useStep();
+  const { step, isPending } = useWorkflow();
 
   const { workflowSlug, stepSlug } = useParams<{
     workflowSlug: string;
@@ -54,11 +51,11 @@ export function ConfigureEmailStepPreview(props: ConfigureEmailStepPreviewProps)
     previewStep({
       workflowSlug,
       stepSlug,
-      data: { controlValues: step.controls.values, previewPayload: {} },
+      previewData: { controlValues: step.controls.values, previewPayload: {} },
     });
   }, [workflowSlug, stepSlug, previewStep, step, isPending]);
 
-  if (isPreviewPending) {
+  if (isPreviewPending || !previewData) {
     return (
       <MiniEmailPreview>
         <Skeleton className="h-5 w-full max-w-[25ch]" />
@@ -67,13 +64,13 @@ export function ConfigureEmailStepPreview(props: ConfigureEmailStepPreviewProps)
     );
   }
 
-  if (previewData?.result?.type !== ChannelTypeEnum.EMAIL) {
-    return <MiniEmailPreview>No preview available</MiniEmailPreview>;
+  if (previewData.result.type === 'email') {
+    return (
+      <MiniEmailPreview {...props}>
+        <div className="text-foreground-400 line-clamp-2 text-xs">{previewData.result.preview.subject}</div>
+      </MiniEmailPreview>
+    );
   }
 
-  return (
-    <MiniEmailPreview {...props}>
-      <div className="text-foreground-400 line-clamp-2 text-xs">{previewData.result.preview.subject}</div>
-    </MiniEmailPreview>
-  );
+  return null;
 }

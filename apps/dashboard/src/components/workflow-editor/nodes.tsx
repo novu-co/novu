@@ -11,15 +11,15 @@ import { cn } from '@/utils/ui';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { WorkflowOriginEnum } from '@novu/shared';
-import { createStep } from '@/components/workflow-editor/steps/step-provider';
-import { getEncodedId, STEP_DIVIDER } from '@/utils/step';
+import { createStep } from '@/components/workflow-editor/step-utils';
+import { getWorkflowIdFromSlug, STEP_DIVIDER } from '@/utils/step';
 
 export type NodeData = {
-  name?: string;
-  content?: string;
   addStepIndex?: number;
-  stepSlug?: string;
+  content?: string;
   error?: string;
+  name?: string;
+  stepSlug?: string;
 };
 
 export type NodeType = FlowNode<NodeData>;
@@ -30,10 +30,15 @@ const bottomHandleClasses = `data-[handlepos=bottom]:w-2 data-[handlepos=bottom]
 
 const handleClassName = `${topHandleClasses} ${bottomHandleClasses}`;
 
-export const TriggerNode = (_props: NodeProps) => {
-  return (
-    <Node className="relative rounded-tl-none border-r">
-      <div className="border-neutral-alpha-200 text-foreground-600 absolute -left-[1px] top-0 flex -translate-y-full items-center gap-1 rounded-t-lg border bg-neutral-50 px-2 py-1 text-xs font-medium">
+export const TriggerNode = ({ data }: NodeProps<FlowNode<{ environmentSlug: string; workflowSlug: string }>>) => (
+  <Link
+    to={buildRoute(ROUTES.TEST_WORKFLOW, {
+      environmentSlug: data.environmentSlug,
+      workflowSlug: data.workflowSlug,
+    })}
+  >
+    <Node className="relative rounded-tl-none [&>span]:rounded-tl-none">
+      <div className="border-neutral-alpha-200 text-foreground-600 absolute left-0 top-0 flex -translate-y-full items-center gap-1 rounded-t-lg border border-b-0 bg-neutral-50 px-2 py-1 text-xs font-medium">
         <RiPlayCircleLine className="size-3" />
         <span>TRIGGER</span>
       </div>
@@ -43,8 +48,8 @@ export const TriggerNode = (_props: NodeProps) => {
       <NodeBody>This step triggers this workflow</NodeBody>
       <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
     </Node>
-  );
-};
+  </Link>
+);
 
 type StepNodeProps = ComponentProps<typeof Node> & { data: NodeData };
 const StepNode = (props: StepNodeProps) => {
@@ -54,8 +59,8 @@ const StepNode = (props: StepNodeProps) => {
   }>();
 
   const isSelected =
-    getEncodedId({ slug: stepSlug ?? '', divider: STEP_DIVIDER }) ===
-    getEncodedId({ slug: data.stepSlug ?? '', divider: STEP_DIVIDER });
+    getWorkflowIdFromSlug({ slug: stepSlug ?? '', divider: STEP_DIVIDER }) ===
+    getWorkflowIdFromSlug({ slug: data.stepSlug ?? '', divider: STEP_DIVIDER });
 
   return <Node aria-selected={isSelected} className={cn('group', className)} {...rest} />;
 };
@@ -119,7 +124,7 @@ export const InAppNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'In-App Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>Sends In-app notification to your subscribers</NodeBody>
+        <NodeBody>Sends In-App notification to your subscribers</NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -186,6 +191,7 @@ export const DelayNode = (props: NodeProps<NodeType>) => {
           <NodeName>{data.name || 'Delay Step'}</NodeName>
         </NodeHeader>
         <NodeBody>{data.content || 'You have been invited to the Novu party on "commentSnippet"'}</NodeBody>
+        {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>
@@ -209,6 +215,7 @@ export const DigestNode = (props: NodeProps<NodeType>) => {
         <NodeBody>
           {data.content || 'Batches events into one coherent message before delivery to the subscriber.'}
         </NodeBody>
+        {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>
@@ -230,6 +237,7 @@ export const CustomNode = (props: NodeProps<NodeType>) => {
           <NodeName>{data.name || 'Custom Step'}</NodeName>
         </NodeHeader>
         <NodeBody>Executes the business logic in your bridge application</NodeBody>
+        {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>

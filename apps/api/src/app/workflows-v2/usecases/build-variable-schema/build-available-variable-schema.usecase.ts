@@ -1,17 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { JSONSchemaDto } from '@novu/shared';
+import { Instrument } from '@novu/application-generic';
 import { computeResultSchema } from '../../shared';
 import { BuildAvailableVariableSchemaCommand } from './build-available-variable-schema.command';
 import { parsePayloadSchema } from '../../shared/parse-payload-schema';
+import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
+import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
+import { emptyJsonSchema } from '../../util/jsonToSchema';
 
 @Injectable()
 export class BuildAvailableVariableSchemaUsecase {
-  execute(command: BuildAvailableVariableSchemaCommand): JSONSchemaDto {
+  constructor(private readonly buildPayloadSchema: BuildPayloadSchema) {}
+
+  async execute(command: BuildAvailableVariableSchemaCommand): Promise<JSONSchemaDto> {
     const { workflow } = command;
-    const previousSteps = workflow.steps.slice(
+    const previousSteps = workflow?.steps.slice(
       0,
-      workflow.steps.findIndex((stepItem) => stepItem._id === command.stepDatabaseId)
+      workflow?.steps.findIndex((stepItem) => stepItem._id === command.stepInternalId)
     );
 
     return {
@@ -34,18 +40,49 @@ export class BuildAvailableVariableSchemaUsecase {
               format: 'date-time',
               description: 'The last time the subscriber was online (optional)',
             },
+            data: {
+              type: 'object',
+              properties: {},
+              description: 'Additional data about the subscriber',
+              additionalProperties: true,
+            },
           },
           required: ['firstName', 'lastName', 'email', 'subscriberId'],
           additionalProperties: false,
         },
-        steps: buildPreviousStepsSchema(previousSteps, workflow.payloadSchema),
-        payload: parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {
-          type: 'object',
-          description: 'Payload for the current step',
-        },
+        steps: buildPreviousStepsSchema(previousSteps, workflow?.payloadSchema),
+        payload: await this.resolvePayloadSchema(workflow, command),
       },
       additionalProperties: false,
     } as const satisfies JSONSchemaDto;
+  }
+
+  @Instrument()
+  private async resolvePayloadSchema(
+    workflow: NotificationTemplateEntity | undefined,
+    command: BuildAvailableVariableSchemaCommand
+  ): Promise<JSONSchemaDto> {
+    if (workflow && workflow.steps.length === 0) {
+      return {
+        type: 'object',
+        properties: {},
+        additionalProperties: true,
+      };
+    }
+
+    if (workflow?.payloadSchema) {
+      return parsePayloadSchema(workflow.payloadSchema, { safe: true }) || emptyJsonSchema();
+    }
+
+    return this.buildPayloadSchema.execute(
+      BuildPayloadSchemaCommand.create({
+        environmentId: command.environmentId,
+        organizationId: command.organizationId,
+        userId: command.userId,
+        workflowId: workflow?._id,
+        ...(command.optimisticControlValues ? { controlValues: command.optimisticControlValues } : {}),
+      })
+    );
   }
 }
 

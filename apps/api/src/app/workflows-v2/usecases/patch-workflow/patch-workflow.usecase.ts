@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { UserSessionData, WorkflowResponseDto } from '@novu/shared';
+import { UserSessionData, WorkflowResponseDto, WorkflowStatusEnum } from '@novu/shared';
 import { NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import { GetWorkflowByIdsUseCase, WorkflowInternalResponseDto } from '@novu/application-generic';
-import { PostProcessWorkflowUpdate } from '../post-process-workflow-update';
 import { PatchWorkflowCommand } from './patch-workflow.command';
 import { GetWorkflowUseCase } from '../get-workflow';
 
@@ -11,18 +10,12 @@ export class PatchWorkflowUsecase {
   constructor(
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private notificationTemplateRepository: NotificationTemplateRepository,
-    private postProcessWorkflowUpdate: PostProcessWorkflowUpdate,
     private getWorkflowUseCase: GetWorkflowUseCase
   ) {}
 
   async execute(command: PatchWorkflowCommand): Promise<WorkflowResponseDto> {
     const persistedWorkflow = await this.fetchWorkflow(command);
-    let transientWorkflow = this.patchWorkflowFields(persistedWorkflow, command);
-
-    transientWorkflow = await this.postProcessWorkflowUpdate.execute({
-      workflow: transientWorkflow,
-      user: command.user,
-    });
+    const transientWorkflow = this.patchWorkflowFields(persistedWorkflow, command);
     await this.persistWorkflow(transientWorkflow, command.user);
 
     return await this.getWorkflowUseCase.execute({
@@ -50,6 +43,10 @@ export class PatchWorkflowUsecase {
 
     if (command.tags !== undefined && command.tags !== null) {
       transientWorkflow.tags = command.tags;
+    }
+
+    if (command.active !== undefined && command.active !== null) {
+      transientWorkflow.status = command.active ? WorkflowStatusEnum.ACTIVE : WorkflowStatusEnum.INACTIVE;
     }
 
     return transientWorkflow;

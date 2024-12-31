@@ -26,6 +26,7 @@ import {
   SyncWorkflowDto,
   UpdateWorkflowDto,
   UserSessionData,
+  WorkflowOriginEnum,
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
 } from '@novu/shared';
@@ -81,7 +82,7 @@ export class WorkflowController {
   ): Promise<WorkflowResponseDto> {
     return this.upsertWorkflowUseCase.execute(
       UpsertWorkflowCommand.create({
-        workflowDto: createWorkflowDto,
+        workflowDto: { ...createWorkflowDto, origin: WorkflowOriginEnum.NOVU_CLOUD },
         user,
       })
     );
@@ -112,7 +113,7 @@ export class WorkflowController {
   ): Promise<WorkflowResponseDto> {
     return await this.upsertWorkflowUseCase.execute(
       UpsertWorkflowCommand.create({
-        workflowDto: updateWorkflowDto,
+        workflowDto: { ...updateWorkflowDto },
         user,
         workflowIdOrInternalId,
       })

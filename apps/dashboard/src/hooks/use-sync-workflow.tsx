@@ -11,11 +11,14 @@ import { WorkflowOriginEnum, WorkflowStatusEnum } from '@novu/shared';
 import { useMutation } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { buildRoute, ROUTES } from '@/utils/routes';
 
 export function useSyncWorkflow(workflow: WorkflowResponseDto | WorkflowListResponseDto) {
-  const { oppositeEnvironment, switchEnvironment } = useEnvironment();
+  const { currentEnvironment, oppositeEnvironment, switchEnvironment } = useEnvironment();
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const navigate = useNavigate();
 
   let loadingToast: string | number | undefined = undefined;
 
@@ -24,6 +27,7 @@ export function useSyncWorkflow(workflow: WorkflowResponseDto | WorkflowListResp
     [workflow.origin, workflow.status]
   );
 
+  // TODO: Move UI logic outside of a hook to the Sync related UI component
   const getTooltipContent = () => {
     if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
       return `Code-first workflows cannot be synced to ${oppositeEnvironment?.name} using dashboard.`;
@@ -62,6 +66,7 @@ export function useSyncWorkflow(workflow: WorkflowResponseDto | WorkflowListResp
     toast.dismiss(loadingToast);
     setIsLoading(false);
 
+    // TODO: Move UI logic outside of a hook to the Sync related UI component
     return showToast({
       variant: 'lg',
       className: 'gap-3',
@@ -77,7 +82,10 @@ export function useSyncWorkflow(workflow: WorkflowResponseDto | WorkflowListResp
           actionLabel={`Switch to ${environment?.name}`}
           onAction={() => {
             close();
-            switchEnvironment(environment?.slug || '');
+            const targetSlug = environment?.slug || '';
+            switchEnvironment(targetSlug);
+
+            navigate(buildRoute(ROUTES.WORKFLOWS, { environmentSlug: targetSlug }));
           }}
           onClose={close}
         />
@@ -99,8 +107,10 @@ export function useSyncWorkflow(workflow: WorkflowResponseDto | WorkflowListResp
 
   const { mutateAsync: syncWorkflowMutation, isPending } = useMutation({
     mutationFn: async () =>
-      syncWorkflow(workflow._id, {
-        targetEnvironmentId: oppositeEnvironment?._id || '',
+      syncWorkflow({
+        environment: currentEnvironment!,
+        workflowSlug: workflow.slug,
+        payload: { targetEnvironmentId: oppositeEnvironment?._id || '' },
       }).then((res) => ({ workflow: res.data, environment: oppositeEnvironment || undefined })),
     onMutate: async () => {
       setIsLoading(true);
@@ -120,7 +130,8 @@ export function useSyncWorkflow(workflow: WorkflowResponseDto | WorkflowListResp
   const { mutateAsync: isWorkflowInTargetEnvironment } = useMutation({
     mutationFn: async () => {
       const { data } = await getV2<{ data: WorkflowResponseDto }>(
-        `/workflows/${workflow.workflowId}?environmentId=${oppositeEnvironment?._id || ''}`
+        `/workflows/${workflow.workflowId}?environmentId=${oppositeEnvironment?._id || ''}`,
+        { environment: currentEnvironment! }
       );
       return data;
     },

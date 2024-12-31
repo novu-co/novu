@@ -24,6 +24,7 @@ export * from './entities/subscriber';
 export * from './entities/tenant';
 export * from './entities/user';
 export * from './entities/workflow-override';
+export * from './entities/activity-feed';
 export * from './services';
 export * from './types';
 export * from './ui';

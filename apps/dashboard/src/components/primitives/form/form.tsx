@@ -51,10 +51,17 @@ const FormLabel = React.forwardRef<
 
       {tooltip && (
         <Tooltip>
-          <TooltipTrigger className="ml-1">
+          <TooltipTrigger
+            className="ml-1"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
             <BsFillInfoCircleFill className="text-foreground-300 -mt-0.5 inline size-3" />
           </TooltipTrigger>
-          <TooltipContent>{tooltip}</TooltipContent>
+          <TooltipContent className="max-w-56">{tooltip}</TooltipContent>
         </Tooltip>
       )}
 
@@ -120,8 +127,8 @@ const FormMessagePure = React.forwardRef<
       className={formMessageVariants({ variant: error ? 'error' : 'default', className })}
       {...props}
     >
-      {error ? <RiErrorWarningFill className="size-4" /> : <RiInformationFill className="size-4" />}
-      <span className="mt-[1px] text-xs leading-3">{body}</span>
+      <span>{error ? <RiErrorWarningFill className="size-4" /> : <RiInformationFill className="size-4" />}</span>
+      <span className="mt-[1px] text-xs leading-4">{body}</span>
     </p>
   );
 });

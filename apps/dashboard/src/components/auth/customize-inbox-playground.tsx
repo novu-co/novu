@@ -1,11 +1,16 @@
 import { Info } from 'lucide-react';
 import { RiInputField, RiLayoutLine } from 'react-icons/ri';
-import { FormProvider, UseFormReturn } from 'react-hook-form';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../primitives/accordion';
-import { ColorPicker } from '../primitives/color-picker';
-import { getComponentByType } from '../workflow-editor/steps/component-utils';
-import { UiComponentEnum } from '@novu/shared';
+import { FormProvider, useFormContext, UseFormReturn } from 'react-hook-form';
+import { EditorView } from '@uiw/react-codemirror';
+
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
+import { ColorPicker } from '@/components/primitives/color-picker';
 import type { InboxPlaygroundFormData } from './inbox-playground';
+import { FormControl, FormField, FormItem } from '@/components/primitives/form/form';
+import { InputField } from '@/components/primitives/input';
+import { Editor } from '@/components/primitives/editor';
+import { capitalize } from '@/utils/string';
+import { InAppActionDropdown } from '@/components/in-app-action-dropdown';
 
 interface PreviewStyle {
   id: string;
@@ -149,12 +154,62 @@ function ColorPickerSection({ form }: { form: UseFormReturn<InboxPlaygroundFormD
   );
 }
 
+const extensions = [EditorView.lineWrapping];
+const basicSetup = {
+  defaultKeymap: true,
+};
+
 function NotificationConfigSection() {
+  const { control } = useFormContext();
+
   return (
     <div className="flex flex-col gap-1 p-1">
-      <div className="flex gap-1">{getComponentByType({ component: UiComponentEnum.IN_APP_SUBJECT })}</div>
-      {getComponentByType({ component: UiComponentEnum.IN_APP_BODY })}
-      {getComponentByType({ component: UiComponentEnum.IN_APP_BUTTON_DROPDOWN })}
+      <div className="flex gap-1">
+        <FormField
+          control={control}
+          name="subject"
+          render={({ field }) => (
+            <InputField size="fit">
+              <FormItem className="w-full">
+                <FormControl>
+                  <Editor
+                    fontFamily="inherit"
+                    placeholder={capitalize(field.name)}
+                    id={field.name}
+                    extensions={extensions}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            </InputField>
+          )}
+        />
+      </div>
+      <FormField
+        control={control}
+        name="body"
+        render={({ field }) => (
+          <FormItem className="w-full">
+            <FormControl>
+              <InputField className="h-36 px-1">
+                <Editor
+                  fontFamily="inherit"
+                  placeholder={capitalize(field.name)}
+                  id={field.name}
+                  extensions={extensions}
+                  basicSetup={basicSetup}
+                  ref={field.ref}
+                  value={field.value}
+                  onChange={field.onChange}
+                  height="100%"
+                />
+              </InputField>
+            </FormControl>
+          </FormItem>
+        )}
+      />
+      <InAppActionDropdown />
     </div>
   );
 }

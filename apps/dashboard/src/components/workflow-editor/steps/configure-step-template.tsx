@@ -1,21 +1,11 @@
-import { useMemo } from 'react';
 import { motion } from 'motion/react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-import {
-  Sheet,
-  SheetContentBase,
-  SheetDescription,
-  SheetOverlay,
-  SheetPortal,
-  SheetTitle,
-} from '@/components/primitives/sheet';
+import { Sheet, SheetContentBase, SheetDescription, SheetPortal, SheetTitle } from '@/components/primitives/sheet';
 import { ConfigureStepTemplateForm } from '@/components/workflow-editor/steps/configure-step-template-form';
 import { VisuallyHidden } from '@/components/primitives/visually-hidden';
 import { PageMeta } from '@/components/page-meta';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { useStep } from '@/components/workflow-editor/steps/step-provider';
-import { getEncodedId, STEP_DIVIDER } from '@/utils/step';
 import { StepTypeEnum } from '@novu/shared';
 import { cn } from '@/utils/ui';
 
@@ -26,25 +16,14 @@ const stepTypeToClassname: Record<string, string | undefined> = {
 };
 
 export const ConfigureStepTemplate = () => {
-  const { stepSlug = '' } = useParams<{
-    workflowSlug: string;
-    stepSlug: string;
-  }>();
   const navigate = useNavigate();
-  const { workflow, update } = useWorkflow();
-  const { step } = useStep();
+  const { workflow, update, step } = useWorkflow();
   const handleCloseSheet = () => {
-    navigate('..', { relative: 'path' });
+    if (step) {
+      // Do not use relative path here, calling twice will result in moving further back
+      navigate(`../steps/${step.slug}`);
+    }
   };
-  const issues = useMemo(() => {
-    const newIssues = workflow?.steps.find(
-      (s) =>
-        getEncodedId({ slug: s.slug, divider: STEP_DIVIDER }) ===
-        getEncodedId({ slug: stepSlug, divider: STEP_DIVIDER })
-    )?.issues;
-
-    return { ...newIssues };
-  }, [workflow, stepSlug]);
 
   if (!workflow || !step) {
     return null;
@@ -53,22 +32,21 @@ export const ConfigureStepTemplate = () => {
   return (
     <>
       <PageMeta title={`Edit ${step?.name}`} />
-      <Sheet open>
+      <Sheet modal={false} open>
+        <motion.div
+          initial={{
+            opacity: 0,
+          }}
+          animate={{
+            opacity: 1,
+          }}
+          exit={{
+            opacity: 0,
+          }}
+          className="fixed inset-0 z-50 h-screen w-screen bg-black/20"
+          transition={transitionSetting}
+        />
         <SheetPortal>
-          <SheetOverlay asChild>
-            <motion.div
-              initial={{
-                opacity: 0,
-              }}
-              animate={{
-                opacity: 1,
-              }}
-              exit={{
-                opacity: 0,
-              }}
-              transition={transitionSetting}
-            />
-          </SheetOverlay>
           <SheetContentBase asChild onInteractOutside={handleCloseSheet} onEscapeKeyDown={handleCloseSheet}>
             <motion.div
               initial={{
@@ -90,7 +68,7 @@ export const ConfigureStepTemplate = () => {
                 <SheetTitle />
                 <SheetDescription />
               </VisuallyHidden>
-              <ConfigureStepTemplateForm workflow={workflow} step={step} update={update} issues={issues} />
+              <ConfigureStepTemplateForm workflow={workflow} step={step} update={update} />
             </motion.div>
           </SheetContentBase>
         </SheetPortal>

@@ -6,6 +6,16 @@ import { PLAIN_SUPPORT_CHAT_APP_ID } from '@/config';
 import { useAuth } from '@/context/auth/hooks';
 import * as Sentry from '@sentry/react';
 
+// Add type declaration for Plain chat widget
+declare global {
+  interface Window {
+    Plain?: {
+      init: (config: any) => void;
+      open: () => void;
+    };
+  }
+}
+
 export const CustomerSupportButton = () => {
   const [isFirstRender, setIsFirstRender] = useState(true);
   const { currentUser } = useAuth();
@@ -17,11 +27,16 @@ export const CustomerSupportButton = () => {
   useEffect(() => {
     if (isFirstRender && isLiveChatVisible) {
       try {
-        // @ts-ignore
         window?.Plain?.init({
           appId: PLAIN_SUPPORT_CHAT_APP_ID,
           hideLauncher: true,
+          hideBranding: true,
           title: 'Chat with us',
+          customerDetails: {
+            email: currentUser?.email,
+            emailHash: currentUser?.servicesHashes?.plain,
+            externalId: currentUser?._id,
+          },
           links: [
             {
               icon: 'book',
@@ -29,22 +44,24 @@ export const CustomerSupportButton = () => {
               url: 'https://docs.novu.co?utm_campaign=in_app_live_chat',
             },
             {
-              icon: 'pencil',
+              icon: 'integration',
               text: 'Roadmap',
               url: 'https://roadmap.novu.co/roadmap?utm_campaign=in_app_live_chat',
             },
             {
-              icon: 'support',
+              icon: 'link',
+              text: 'Changelog',
+              url: 'https://roadmap.novu.co/changelog?utm_campaign=in_app_live_chat',
+            },
+            {
+              icon: 'email',
               text: 'Contact Sales',
               url: 'https://notify.novu.co/meetings/novuhq/novu-discovery-session-rr?utm_campaign=in_app_live_chat',
             },
           ],
           entryPoint: 'default',
           theme: 'light',
-          customerDetails: {
-            email: currentUser?.email,
-            emailHash: currentUser?.servicesHashes?.plain,
-          },
+
           style: {
             brandColor: '#DD2450',
             launcherBackgroundColor: '#FFFFFF',
@@ -70,6 +87,37 @@ export const CustomerSupportButton = () => {
               threadDetails: {
                 // "Insight"
                 labelTypeIds: ['lt_01JCKS50M6D1568DSJ1Q9CHFF2'],
+              },
+              form: {
+                fields: [
+                  {
+                    type: 'dropdown',
+                    placeholder: 'How important is this to you?',
+                    options: [
+                      {
+                        icon: 'error',
+                        text: 'Critical - Blocking my work',
+                        threadDetails: {
+                          labelTypeIds: ['lt_01JFYNG7N05VF956CABF23N3N8'],
+                        },
+                      },
+                      {
+                        icon: 'bulb',
+                        text: 'Important - Should be addressed soon',
+                        threadDetails: {
+                          labelTypeIds: ['lt_01JFYNGRPEJ4CNA3GMYSRCRCYB'],
+                        },
+                      },
+                      {
+                        icon: 'chat',
+                        text: 'Nice to have - Suggestion for improvement',
+                        threadDetails: {
+                          labelTypeIds: ['lt_01JFYNGE0EYWSE1GKAM3MTBDMC'],
+                        },
+                      },
+                    ],
+                  },
+                ],
               },
             },
             {
@@ -123,7 +171,6 @@ export const CustomerSupportButton = () => {
   const showPlainLiveChat = () => {
     if (isLiveChatVisible) {
       try {
-        // @ts-ignore
         window?.Plain?.open();
       } catch (error) {
         console.error('Error opening plain chat: ', error);
@@ -132,12 +179,7 @@ export const CustomerSupportButton = () => {
     }
   };
   return (
-    <button
-      id="intercom-launcher"
-      tabIndex={-1}
-      className="flex items-center justify-center"
-      onClick={showPlainLiveChat}
-    >
+    <button tabIndex={-1} className="flex items-center justify-center" onClick={showPlainLiveChat}>
       <HeaderButton label="Help">
         <RiQuestionFill className="text-foreground-600 size-4" />{' '}
       </HeaderButton>

@@ -34,7 +34,7 @@
     "@nestjs/terminus": "10.2.3",
     "@nestjs/testing": "10.4.1",
     "jsonwebtoken": "9.0.0",
-    "newrelic": "^9",
+    "newrelic": "^12.8.1",
     "reflect-metadata": "0.2.2"
   },
   "dependencies": {
@@ -83,6 +83,7 @@
     "launchdarkly-node-server-sdk": "^7.0.1",
     "lodash": "^4.17.15",
     "mixpanel": "^0.17.0",
+    "cron-parser": "^4.9.0",
     "nanoid": "^3.1.20",
     "nestjs-otel": "6.1.1",
     "nestjs-pino": "4.1.0",
@@ -94,7 +95,10 @@
     "rrule": "^2.7.2",
     "rxjs": "7.8.1",
     "sanitize-html": "^2.4.0",
-    "shortid": "^2.2.16"
+    "shortid": "^2.2.16",
+    "@maily-to/render": "^0.0.17",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.23.3"
   },
   "optionalDependencies": {
     "@novu/ee-shared-services": "workspace:*",
@@ -104,7 +108,7 @@
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/got": "^9.6.12",
     "@types/jest": "29.5.2",
-    "@types/newrelic": "^9",
+    "@types/newrelic": "^9.14.6",
     "@types/sanitize-html": "^2.11.0",
     "@types/sinon": "^9.0.0",
     "chai": "^4.2.0",

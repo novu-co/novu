@@ -1,3 +1,27 @@
+## 2.2.2 (2024-12-24)
+
+### 🚀 Features
+
+- **novu:** Add `--studio-host` option on dev server ([#7211](https://github.com/novuhq/novu/pull/7211))
+
+### 🩹 Fixes
+
+- **novu:** Respect .env values for API URL and SECRET_KEY ([#7279](https://github.com/novuhq/novu/pull/7279))
+
+### 🧱 Updated Dependencies
+
+- Updated @novu/shared to 2.1.5
+
+### ❤️ Thank You
+
+- Arthur M @4rthem
+- GalTidhar @tatarco
+- George Desipris @desiprisg
+- George Djabarov @djabarovgeorge
+- Pawan Jain
+- Sokratis Vidros @SokratisVidros
+
+
 ## 2.2.1 (2024-11-26)
 
 ### 🚀 Features

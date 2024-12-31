@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ROUTES } from '@/utils/routes';
 import { Appearance } from '@clerk/types';
 import { motion } from 'motion/react';
+import { Plan } from '../components/billing/plan';
 
 const FADE_ANIMATION = {
   initial: { opacity: 0 },
@@ -67,37 +68,32 @@ export function SettingsPage() {
       case 'team':
         navigate(ROUTES.SETTINGS_TEAM);
         break;
+      case 'billing':
+        navigate(ROUTES.SETTINGS_BILLING);
+        break;
     }
   };
 
   return (
     <DashboardLayout headerStartItems={<h1 className="text-foreground-950">Settings</h1>}>
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList
-          align="center"
-          className="border-border/20 relative mt-2.5 flex w-full items-end justify-start space-x-2 rounded-none border-b bg-transparent px-1.5 pb-0"
-        >
-          <TabsTrigger
-            value="account"
-            className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
-          >
+        <TabsList align="center" variant="regular" className="border-t-0 !py-0">
+          <TabsTrigger variant={'regular'} value="account">
             Account
           </TabsTrigger>
-          <TabsTrigger
-            value="organization"
-            className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
-          >
+          <TabsTrigger variant={'regular'} value="organization">
             Organization
           </TabsTrigger>
-          <TabsTrigger
-            value="team"
-            className="text-muted-foreground hover:text-foreground data-[state=active]:border-primary data-[state=active]:text-foreground flex items-center rounded-none border-b-2 border-transparent px-4 py-2.5 font-medium transition-all"
-          >
+          <TabsTrigger variant={'regular'} value="team">
             Team
+          </TabsTrigger>
+
+          <TabsTrigger variant={'regular'} value="billing">
+            Billing
           </TabsTrigger>
         </TabsList>
 
-        <div className="mx-auto mt-1 max-w-[700px] px-1.5">
+        <div className={`mx-auto mt-1 px-1.5 ${currentTab === 'billing' ? 'max-w-[1100px]' : 'max-w-[700px]'}`}>
           <TabsContent value="account" className="rounded-lg">
             <motion.div {...FADE_ANIMATION}>
               <Card className="mx-auto border-none shadow-none">
@@ -133,6 +129,14 @@ export function SettingsPage() {
                   <OrganizationProfile.Page label="members" />
                   <OrganizationProfile.Page label="general" />
                 </OrganizationProfile>
+              </Card>
+            </motion.div>
+          </TabsContent>
+
+          <TabsContent value="billing" className="rounded-lg">
+            <motion.div {...FADE_ANIMATION}>
+              <Card className="border-none shadow-none">
+                <Plan />
               </Card>
             </motion.div>
           </TabsContent>

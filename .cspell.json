@@ -4,12 +4,15 @@
   "language": "en",
   "words": [
     "ABNF",
+    "ORGANISATION",
+    "EQAs",
     "addrs",
     "subscriberpayloaddto",
     "adresses",
     "sdkerror",
     "africas",
     "africastalking",
+    "preferencechannels",
     "Aland",
     "alanturing",
     "alexjoverm",
@@ -30,6 +33,7 @@
     "atext",
     "attatchment",
     "Attatchment",
+    "someurl",
     "authres",
     "authserv",
     "autobuild",
@@ -710,9 +714,11 @@
     "truncatewords",
     "xmlschema",
     "jsonify",
+    "hsforms",
     "touchpoint",
     "Angularjs",
-    "navigatable"
+    "navigatable",
+    "facated"
   ],
   "flagWords": [],
   "patterns": [

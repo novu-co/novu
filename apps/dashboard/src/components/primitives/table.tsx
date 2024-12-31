@@ -1,25 +1,49 @@
 import * as React from 'react';
 
 import { cn } from '@/utils/ui';
+import { cva } from 'class-variance-authority';
 import { ClassNameValue } from 'tailwind-merge';
 
-const Table = React.forwardRef<
-  HTMLTableElement,
-  React.HTMLAttributes<HTMLDivElement> & { containerClassname?: ClassNameValue }
->(({ className, containerClassname, ...props }, ref) => (
-  <div
-    className={cn(
-      'border-neutral-alpha-200 relative w-full overflow-x-auto rounded-md border shadow-sm',
-      containerClassname
-    )}
-  >
-    <table
-      ref={ref}
-      className={cn('relative w-full caption-bottom border-separate border-spacing-0 text-sm', className)}
-      {...props}
-    />
-  </div>
-));
+interface TableProps extends React.HTMLAttributes<HTMLDivElement> {
+  containerClassname?: ClassNameValue;
+  isLoading?: boolean;
+  loadingRowsCount?: number;
+  loadingRow?: React.ReactNode;
+}
+
+const LoadingRow = () => (
+  <TableRow>
+    <TableCell className="animate-pulse" colSpan={100}>
+      <div className="h-8 w-full rounded-md bg-neutral-100" />
+    </TableCell>
+  </TableRow>
+);
+
+const Table = React.forwardRef<HTMLTableElement, TableProps>(
+  ({ className, containerClassname, isLoading, loadingRowsCount = 5, loadingRow, children, ...props }, ref) => (
+    <div
+      className={cn(
+        'border-neutral-alpha-200 relative w-full overflow-x-auto rounded-md border shadow-sm',
+        containerClassname
+      )}
+    >
+      <table
+        ref={ref}
+        className={cn('relative w-full caption-bottom border-separate border-spacing-0 text-sm', className)}
+        {...props}
+      >
+        {children}
+        {isLoading && (
+          <TableBody>
+            {Array.from({ length: loadingRowsCount }).map((_, index) => (
+              <React.Fragment key={index}>{loadingRow || <LoadingRow />}</React.Fragment>
+            ))}
+          </TableBody>
+        )}
+      </table>
+    </div>
+  )
+);
 Table.displayName = 'Table';
 
 const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
@@ -74,9 +98,10 @@ const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<
 );
 TableHead.displayName = 'TableHead';
 
+export const tableCellVariants = cva(`px-6 py-2 align-middle`);
 const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(
-  ({ className, ...props }, ref) => <td ref={ref} className={cn('px-6 py-2 align-middle', className)} {...props} />
+  ({ className, ...props }, ref) => <td ref={ref} className={cn(tableCellVariants(), className)} {...props} />
 );
 TableCell.displayName = 'TableCell';
 
-export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell };
+export { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow };

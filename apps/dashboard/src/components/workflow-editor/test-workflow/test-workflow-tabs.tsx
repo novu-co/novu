@@ -1,53 +1,49 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { RiPlayCircleLine } from 'react-icons/ri';
 import { useForm } from 'react-hook-form';
+import { RiPlayCircleLine } from 'react-icons/ri';
 // eslint-disable-next-line
 // @ts-ignore
-import { zodResolver } from '@hookform/resolvers/zod';
-import type { WorkflowTestDataResponseDto } from '@novu/shared';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitives/tabs';
-import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
-import { useFetchWorkflow } from '@/hooks';
-import { Form } from '../../primitives/form/form';
-import { Button } from '../../primitives/button';
-import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
-import { showToast } from '../../primitives/sonner-helpers';
-import { buildDynamicFormSchema, makeObjectFromSchema, TestWorkflowFormType } from '../schema';
-import { TestWorkflowForm } from './test-workflow-form';
-import { toast } from 'sonner';
+import { TestWorkflowLogsSidebar } from './test-workflow-logs-sidebar';
+import { createMockObjectFromSchema } from '@novu/shared';
 import { ToastClose, ToastIcon } from '@/components/primitives/sonner';
+import { useFetchWorkflow } from '@/hooks/use-fetch-workflow';
+import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { type WorkflowTestDataResponseDto } from '@novu/shared';
+import { toast } from 'sonner';
+import { Button } from '../../primitives/button';
+import { Form } from '../../primitives/form/form';
+import { showToast } from '../../primitives/sonner-helpers';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitives/tabs';
+import { buildDynamicFormSchema, TestWorkflowFormType } from '../schema';
+import { TestWorkflowForm } from './test-workflow-form';
 
-export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataResponseDto }) => {
+export const TestWorkflowTabs = ({ testData }: { testData?: WorkflowTestDataResponseDto }) => {
   const { environmentSlug = '', workflowSlug = '' } = useParams<{ environmentSlug: string; workflowSlug: string }>();
+
   const { workflow } = useFetchWorkflow({
     workflowSlug,
   });
-  const to = useMemo(
-    () => (typeof testData.to === 'object' ? makeObjectFromSchema({ properties: testData.to.properties ?? {} }) : {}),
-    [testData]
-  );
-  const payload = useMemo(
-    () =>
-      typeof testData.payload === 'object'
-        ? makeObjectFromSchema({ properties: testData.payload.properties ?? {} })
-        : {},
-    [testData]
-  );
+  const [transactionId, setTransactionId] = useState<string>();
+  const to = useMemo(() => createMockObjectFromSchema(testData?.to ?? {}), [testData]);
+  const payload = useMemo(() => createMockObjectFromSchema(testData?.payload ?? {}), [testData]);
   const form = useForm<TestWorkflowFormType>({
     mode: 'onSubmit',
     resolver: zodResolver(buildDynamicFormSchema({ to: testData?.to ?? {} })),
-    defaultValues: { to, payload: JSON.stringify(payload, null, 2) },
+    values: { to, payload: JSON.stringify(payload, null, 2) },
   });
+
   const { handleSubmit } = form;
   const { triggerWorkflow, isPending } = useTriggerWorkflow();
 
   const onSubmit = async (data: TestWorkflowFormType) => {
     try {
       const {
-        data: { transactionId },
+        data: { transactionId: newTransactionId },
       } = await triggerWorkflow({ name: workflow?.workflowId ?? '', to: data.to, payload: data.payload });
-      if (!transactionId) {
+      if (!newTransactionId) {
         return showToast({
           variant: 'lg',
           children: ({ close }) => (
@@ -68,31 +64,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
           },
         });
       }
-      return showToast({
-        variant: 'lg',
-        children: ({ close }) => (
-          <>
-            <ToastIcon variant="success" />
-            <div className="flex flex-col gap-2">
-              <span className="font-medium">Test workflow succeeded</span>
-              <span className="text-foreground-600 inline">
-                Workflow <span className="font-bold">{workflow?.name}</span> was triggered successfully.
-              </span>
-              <Link
-                to={`${LEGACY_ROUTES.ACTIVITY_FEED}?transactionId=${transactionId}`}
-                reloadDocument
-                className="text-primary text-sm font-medium"
-              >
-                View activity feed
-              </Link>
-            </div>
-            <ToastClose onClick={close} />
-          </>
-        ),
-        options: {
-          position: 'bottom-right',
-        },
-      });
+      setTransactionId(newTransactionId);
     } catch (e) {
       toast.error('Failed to trigger workflow', {
         description: e instanceof Error ? e.message : 'There was an error triggering the workflow.',
@@ -105,7 +77,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="roun flex h-full flex-1 flex-nowrap">
           <Tabs defaultValue="workflow" className="-mt-[1px] flex flex-1 flex-col" value="trigger">
-            <TabsList variant="regular">
+            <TabsList variant="regular" className="items-center">
               <TabsTrigger value="workflow" asChild variant="regular">
                 <Link
                   to={buildRoute(ROUTES.EDIT_WORKFLOW, {
@@ -126,7 +98,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
                   Trigger
                 </Link>
               </TabsTrigger>
-              <div className="ml-auto">
+              <div className="my-auto ml-auto flex items-center gap-2">
                 <Button type="submit" variant="primary" size="sm" className="flex gap-1" isLoading={isPending}>
                   <RiPlayCircleLine className="size-5" />
                   <span>Test workflow</span>
@@ -137,7 +109,7 @@ export const TestWorkflowTabs = ({ testData }: { testData: WorkflowTestDataRespo
               <TestWorkflowForm workflow={workflow} />
             </TabsContent>
           </Tabs>
-          {/* <TestWorkflowLogsSidebar /> */}
+          <TestWorkflowLogsSidebar transactionId={transactionId} />
         </form>
       </Form>
     </div>

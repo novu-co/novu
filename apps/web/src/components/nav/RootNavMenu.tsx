@@ -159,21 +159,17 @@ export const RootNavMenu: React.FC = () => {
           ></NavMenuLinkButton>
         </When>
       </NavMenuSection>
-      {isV2Enabled ? (
-        <>
-          <SidebarFooter>
-            {!IS_SELF_HOSTED && IS_EE_AUTH_ENABLED && <NewDashboardOptInWidget />}
-            <FreeTrialSidebarWidget />
-            <OutlineButton fullWidth onClick={navigateToLocalStudio} Icon={IconLaptop}>
-              Open Local Studio
-            </OutlineButton>
-          </SidebarFooter>
-          {/** TODO: refactor when modal manager is available */}
-          {isLocalStudioModalOpen && <OpenLocalStudioModal isOpen toggleOpen={toggleLocalStudioModalOpen} />}
-        </>
-      ) : (
-        <RootNavMenuFooter />
-      )}
+      <>
+        <SidebarFooter>
+          {!IS_SELF_HOSTED && IS_EE_AUTH_ENABLED && <NewDashboardOptInWidget />}
+          <FreeTrialSidebarWidget />
+          <OutlineButton fullWidth onClick={navigateToLocalStudio} Icon={IconLaptop}>
+            Open Local Studio
+          </OutlineButton>
+        </SidebarFooter>
+        {/** TODO: refactor when modal manager is available */}
+        {isLocalStudioModalOpen && <OpenLocalStudioModal isOpen toggleOpen={toggleLocalStudioModalOpen} />}
+      </>
     </NavMenu>
   );
 };

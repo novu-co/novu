@@ -4,8 +4,6 @@ import { Notification5Fill } from '@/components/icons';
 import { Separator } from '@/components/primitives/separator';
 import { getComponentByType } from '@/components/workflow-editor/steps/component-utils';
 import { InAppTabsSection } from '@/components/workflow-editor/steps/in-app/in-app-tabs-section';
-import { FormMessagePure } from '../../../primitives/form/form';
-import { useFormContext } from 'react-hook-form';
 
 const avatarKey = 'avatar';
 const subjectKey = 'subject';
@@ -14,11 +12,8 @@ const redirectKey = 'redirect';
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
 
-export const InAppEditor = ({ uiSchema }: { uiSchema?: UiSchema }) => {
-  const { getFieldState } = useFormContext();
-  const bodyError = getFieldState(bodyKey).error;
-
-  if (!uiSchema || uiSchema?.group !== UiSchemaGroupEnum.IN_APP) {
+export const InAppEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
+  if (uiSchema.group !== UiSchemaGroupEnum.IN_APP) {
     return null;
   }
 
@@ -36,7 +31,7 @@ export const InAppEditor = ({ uiSchema }: { uiSchema?: UiSchema }) => {
       <InAppTabsSection className="flex flex-col gap-3">
         <div className={'flex items-center gap-2.5 text-sm font-medium'}>
           <Notification5Fill className="size-3" />
-          <span>In-app template editor</span>
+          <span>In-App template editor</span>
         </div>
         <div className="flex flex-col gap-1 rounded-xl border border-neutral-100 p-1">
           {(avatar || subject) && (
@@ -45,14 +40,7 @@ export const InAppEditor = ({ uiSchema }: { uiSchema?: UiSchema }) => {
               {subject && getComponentByType({ component: subject.component })}
             </div>
           )}
-          {body && (
-            <>
-              {getComponentByType({ component: body.component })}
-              <FormMessagePure
-                error={bodyError ? String(bodyError.message) : undefined}
-              >{`Type {{ for variables, or wrap text in ** for bold.`}</FormMessagePure>
-            </>
-          )}
+          {body && getComponentByType({ component: body.component })}
           {(primaryAction || secondaryAction) &&
             getComponentByType({
               component: primaryAction.component || secondaryAction.component,

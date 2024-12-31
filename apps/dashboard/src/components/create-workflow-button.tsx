@@ -2,8 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ComponentProps, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { RiExternalLinkLine } from 'react-icons/ri';
-import { Link, useNavigate } from 'react-router-dom';
+import { RiArrowRightSLine } from 'react-icons/ri';
+import { ExternalLink } from '@/components/shared/external-link';
+import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify } from '@novu/shared';
 import { createWorkflow } from '@/api/workflows';
@@ -36,8 +37,9 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
   const [isOpen, setIsOpen] = useState(false);
+  // TODO: Move to a use-create-workflow.ts hook
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (data: CreateWorkflowDto) => createWorkflow(data),
+    mutationFn: async (workflow: CreateWorkflowDto) => createWorkflow({ environment: currentEnvironment!, workflow }),
     onSuccess: async (result) => {
       await queryClient.invalidateQueries({ queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id] });
       await queryClient.invalidateQueries({
@@ -56,7 +58,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
       );
     },
   });
-  const tagsQuery = useTags();
+  const { tags } = useTags();
 
   const form = useForm<z.infer<typeof workflowSchema>>({
     resolver: zodResolver(workflowSchema),
@@ -71,14 +73,8 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
           <SheetTitle>Create workflow</SheetTitle>
           <div>
             <SheetDescription>
-              Workflows manage event-driven notifications across channels.{' '}
-              <Link
-                target="_blank"
-                to="https://docs.novu.co/concepts/workflows"
-                className="text-foreground-400 inline-flex items-center text-xs underline"
-              >
-                Learn more <RiExternalLinkLine className="inline size-4" />
-              </Link>
+              Define the steps to notify subscribers using channels like in-app, email, and more.{' '}
+              <ExternalLink href="https://docs.novu.co/concepts/workflows">Learn more</ExternalLink>
             </SheetDescription>
           </div>
         </SheetHeader>
@@ -153,9 +149,13 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     </div>
                     <FormControl>
                       <TagInput
-                        suggestions={tagsQuery.data?.data.map((tag) => tag.name) || []}
+                        suggestions={tags.map((tag) => tag.name)}
                         {...field}
                         value={field.value ?? []}
+                        onChange={(tags) => {
+                          field.onChange(tags);
+                          form.setValue('tags', tags, { shouldValidate: true });
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -190,6 +190,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
         <SheetFooter>
           <Button isLoading={isPending} variant="default" type="submit" form="create-workflow">
             Create workflow
+            <RiArrowRightSLine className="size-4" />
           </Button>
         </SheetFooter>
       </SheetContent>

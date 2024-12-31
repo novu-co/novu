@@ -2,7 +2,7 @@ import { Card, CardContent } from '../primitives/card';
 import { RiArrowRightDoubleFill, RiCheckLine, RiLoader3Line } from 'react-icons/ri';
 import { useOnboardingSteps, StepIdEnum } from '../../hooks/use-onboarding-steps';
 import { Link, useParams } from 'react-router-dom';
-import { buildRoute, LEGACY_ROUTES, ROUTES } from '../../utils/routes';
+import { buildRoute, ROUTES } from '../../utils/routes';
 import { motion } from 'motion/react';
 import { mainCard, leftSection, textItem, stepsList, stepItem, logo } from './progress-section.animations';
 import { PointingArrow, NovuLogo } from './icons';
@@ -67,7 +67,7 @@ function StepItem({ step, environmentSlug }: StepItemProps) {
 
       <Link
         to={getStepRoute(step.id, environmentSlug).path}
-        reloadDocument={getStepRoute(step.id).isLegacy}
+        reloadDocument={getStepRoute(step.id, environmentSlug).isLegacy}
         className="w-full"
         onClick={handleStepClick}
       >
@@ -130,8 +130,8 @@ function getStepRoute(stepId: StepIdEnum, environmentSlug: string = '') {
     case StepIdEnum.CONNECT_CHAT_PROVIDER:
     case StepIdEnum.CONNECT_SMS_PROVIDER:
       return {
-        path: LEGACY_ROUTES.INTEGRATIONS,
-        isLegacy: true,
+        path: buildRoute(ROUTES.INTEGRATIONS, { environmentSlug }),
+        isLegacy: false,
       };
     case StepIdEnum.CONNECT_IN_APP_PROVIDER:
       return {
@@ -140,8 +140,8 @@ function getStepRoute(stepId: StepIdEnum, environmentSlug: string = '') {
       };
     case StepIdEnum.INVITE_TEAM_MEMBER:
       return {
-        path: LEGACY_ROUTES.INVITE_TEAM_MEMBERS,
-        isLegacy: true,
+        path: ROUTES.SETTINGS_TEAM,
+        isLegacy: false,
       };
     default:
       return {

@@ -31,6 +31,8 @@ export class NotificationRepository extends BaseRepository<
       templates?: string[] | null;
       subscriberIds?: string[];
       transactionId?: string;
+      after?: string;
+      before?: string;
     } = {},
     skip = 0,
     limit = 10
@@ -41,6 +43,14 @@ export class NotificationRepository extends BaseRepository<
 
     if (query.transactionId) {
       requestQuery.transactionId = query.transactionId;
+    }
+
+    if (query.after) {
+      requestQuery.createdAt = { $gte: query.after };
+    }
+
+    if (query.before) {
+      requestQuery.createdAt = { $lte: query.before };
     }
 
     if (query?.templates) {
@@ -101,7 +111,7 @@ export class NotificationRepository extends BaseRepository<
       .populate({
         options: {
           readPreference: 'secondaryPreferred',
-          sort: { createdAt: 1 },
+          sort: { createdAt: 1, _parentId: 1 },
         },
         path: 'jobs',
         match: {
@@ -110,7 +120,7 @@ export class NotificationRepository extends BaseRepository<
             $nin: [StepTypeEnum.TRIGGER],
           },
         },
-        select: 'createdAt digest payload overrides to tenant actorId providerId step status type updatedAt',
+        select: 'createdAt digest payload overrides to tenant actorId providerId step status type updatedAt _parentId',
         populate: [
           {
             path: 'executionDetails',
