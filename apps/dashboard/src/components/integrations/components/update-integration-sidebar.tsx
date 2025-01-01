@@ -3,7 +3,7 @@ import { useFetchIntegrations } from '@/hooks/use-fetch-integrations';
 import { useUpdateIntegration } from '@/hooks/use-update-integration';
 import { useSetPrimaryIntegration } from '@/hooks/use-set-primary-integration';
 import { IntegrationConfiguration } from './integration-configuration';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button-deprecated';
 import { DeleteIntegrationModal } from './modals/delete-integration-modal';
 import { SelectPrimaryIntegrationModal } from './modals/select-primary-integration-modal';
 import { IntegrationSheet } from './integration-sheet';

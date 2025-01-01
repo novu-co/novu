@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify } from '@novu/shared';
 import { createWorkflow } from '@/api/workflows';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button-deprecated';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';
 import { Separator } from '@/components/primitives/separator';

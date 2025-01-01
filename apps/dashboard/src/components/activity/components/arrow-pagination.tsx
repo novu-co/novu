@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button-deprecated';
 
 interface ArrowPaginationProps {
   page: number;

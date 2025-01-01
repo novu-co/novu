@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button-deprecated';
 import { SheetHeader, SheetTitle } from '@/components/primitives/sheet';
 import { RiArrowLeftSLine } from 'react-icons/ri';
 import { IProviderConfig } from '@novu/shared';

@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button-deprecated';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
 import TruncatedText from '@/components/truncated-text';
 import { StepDataDto } from '@novu/shared';

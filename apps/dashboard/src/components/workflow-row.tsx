@@ -1,6 +1,6 @@
 import { PAUSE_MODAL_TITLE, PauseModalDescription } from '@/components/pause-workflow-dialog';
 import { Badge } from '@/components/primitives/badge';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button-deprecated';
 import {
   DropdownMenu,
   DropdownMenuContent,

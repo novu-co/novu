@@ -15,7 +15,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { PageMeta } from '@/components/page-meta';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button-deprecated';
 import { CopyButton } from '@/components/primitives/copy-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';

@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button-deprecated';
 import { cn } from '@/utils/ui';
 import { PlayCircleIcon } from 'lucide-react';
 import { RiCloseCircleLine } from 'react-icons/ri';

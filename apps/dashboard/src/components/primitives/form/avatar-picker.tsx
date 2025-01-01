@@ -2,7 +2,7 @@ import { forwardRef, useMemo, useState } from 'react';
 import { RiEdit2Line, RiErrorWarningFill, RiImageEditFill } from 'react-icons/ri';
 
 import { Avatar, AvatarImage } from '@/components/primitives/avatar';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button-deprecated';
 import { FormMessage } from '@/components/primitives/form/form';
 import { InputField } from '@/components/primitives/input';
 import { Label } from '@/components/primitives/label';

@@ -1,6 +1,6 @@
 import { RiAddLine, RiSubtractFill } from 'react-icons/ri';
 import { IconButtonProps } from '@rjsf/utils';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button-deprecated';
 
 export const AddButton = (props: IconButtonProps) => {
   return (

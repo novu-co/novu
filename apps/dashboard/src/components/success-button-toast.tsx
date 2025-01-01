@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button-deprecated';
 import { ToastClose, ToastIcon } from '@/components/primitives/sonner';
 import { ReactNode } from 'react';
 import { RiArrowRightSLine } from 'react-icons/ri';

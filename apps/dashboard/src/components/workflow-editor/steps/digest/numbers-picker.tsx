@@ -2,7 +2,7 @@ import { KeyboardEventHandler, useMemo, useRef, useState } from 'react';
 import { RiCornerDownLeftLine } from 'react-icons/ri';
 import type { PopoverContentProps } from '@radix-ui/react-popover';
 
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button-deprecated';
 import { InputFieldPure } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from '@/components/primitives/popover';
 import TruncatedText from '@/components/truncated-text';

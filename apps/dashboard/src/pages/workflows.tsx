@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { RiRouteFill } from 'react-icons/ri';
 import { WorkflowList } from '@/components/workflow-list';
 import { DashboardLayout } from '@/components/dashboard-layout';
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button-deprecated';
 import { CreateWorkflowButton } from '@/components/create-workflow-button';
 import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';

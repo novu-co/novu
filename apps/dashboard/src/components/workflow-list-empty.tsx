@@ -1,6 +1,6 @@
 import { RiBookMarkedLine, RiRouteFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-import { Button, buttonVariants } from '@/components/primitives/button';
+import { Button, buttonDeprecatedVariants } from '@/components/primitives/button-deprecated';
 import { VersionControlProd } from '@/components/icons/version-control-prod';
 import { VersionControlDev } from '@/components/icons/version-control-dev';
 import { CreateWorkflowButton } from '@/components/create-workflow-button';
@@ -33,7 +33,7 @@ const WorkflowListEmptyProd = ({ switchToDev }: { switchToDev: () => void }) => 
       <Link
         to={'https://docs.novu.co/concepts/workflows'}
         target="_blank"
-        className={buttonVariants({ variant: 'link', className: 'text-foreground-600 gap-1' })}
+        className={buttonDeprecatedVariants({ variant: 'link', className: 'text-foreground-600 gap-1' })}
       >
         <RiBookMarkedLine className="size-4" />
         View docs
@@ -61,7 +61,7 @@ const WorkflowListEmptyDev = () => (
       <Link
         to={'https://docs.novu.co/concepts/workflows'}
         target="_blank"
-        className={buttonVariants({ variant: 'link', className: 'text-foreground-600 gap-1' })}
+        className={buttonDeprecatedVariants({ variant: 'link', className: 'text-foreground-600 gap-1' })}
       >
         <RiBookMarkedLine className="size-4" />
         View docs

@@ -76,4 +76,4 @@ const ButtonDeprecated = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 ButtonDeprecated.displayName = 'ButtonDeprecated';
 
-export { ButtonDeprecated as ButtonDeprecated };
+export { ButtonDeprecated as ButtonDeprecated, ButtonDeprecated as Button };

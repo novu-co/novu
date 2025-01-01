@@ -1,4 +1,4 @@
-import { Button } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button-deprecated';
 import { Plus, Settings } from 'lucide-react';
 
 type IntegrationsEmptyStateProps = {

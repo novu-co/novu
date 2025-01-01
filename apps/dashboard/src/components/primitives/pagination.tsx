@@ -8,7 +8,7 @@ import {
 } from '@radix-ui/react-icons';
 
 import { cn } from '@/utils/ui';
-import { ButtonProps, buttonVariants } from '@/components/primitives/button';
+import { ButtonProps, buttonDeprecatedVariants } from '@/components/primitives/button-deprecated';
 import { Link, LinkProps } from 'react-router-dom';
 
 const Pagination = ({ className, ...props }: React.ComponentProps<'nav'>) => (
@@ -43,7 +43,7 @@ const PaginationLink = ({ className, isActive, isDisabled, size = 'icon', ...pro
   <Link
     aria-current={isActive ? 'page' : undefined}
     className={cn(
-      buttonVariants({
+      buttonDeprecatedVariants({
         variant: 'ghost',
         size,
       }),
@@ -88,7 +88,11 @@ PaginationEnd.displayName = 'PaginationEnd';
 const PaginationEllipsis = ({ className, ...props }: React.ComponentProps<'span'>) => (
   <span
     aria-hidden
-    className={cn(buttonVariants({ size: 'icon', variant: 'ghost' }), 'bg-transparent hover:bg-transparent', className)}
+    className={cn(
+      buttonDeprecatedVariants({ size: 'icon', variant: 'ghost' }),
+      'bg-transparent hover:bg-transparent',
+      className
+    )}
     {...props}
   >
     <DotsHorizontalIcon className="size-3" />
