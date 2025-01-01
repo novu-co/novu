@@ -31,6 +31,8 @@ type FieldEditorProps = {
   size?: 'default' | 'lg';
   fontFamily?: 'inherit';
   id?: string;
+  singleLine?: boolean;
+  indentWithTab?: boolean;
 };
 
 export function FieldEditor({
@@ -42,6 +44,8 @@ export function FieldEditor({
   size = 'default',
   fontFamily = 'inherit',
   id,
+  singleLine,
+  indentWithTab,
 }: FieldEditorProps) {
   const viewRef = useRef<EditorView | null>(null);
   const lastCompletionRef = useRef<CompletionRange>(null);
@@ -76,6 +80,8 @@ export function FieldEditor({
   return (
     <div className="relative">
       <Editor
+        singleLine={singleLine}
+        indentWithTab={indentWithTab}
         size={size}
         className="flex-1"
         autoFocus={autoFocus}
