@@ -8,6 +8,7 @@ import {
 } from './metrics.service';
 import { metricsServiceList } from './index';
 import { IMetricsService } from './metrics.interface';
+import { vi } from 'vitest';
 
 describe('MetricsService', () => {
   let service: MetricsService;
@@ -55,16 +56,13 @@ describe('MetricsService', () => {
       const metricName = 'testMetric';
       const metricValue = 123;
 
-      const spyNewRelic = jest.spyOn(
+      const spyNewRelic = vi.spyOn(
         NewRelicMetricsService.prototype,
         'recordMetric',
       );
-      const spyAws = jest.spyOn(AwsMetricsService.prototype, 'recordMetric');
-      const spyGcs = jest.spyOn(GCPMetricsService.prototype, 'recordMetric');
-      const spyAzure = jest.spyOn(
-        AzureMetricsService.prototype,
-        'recordMetric',
-      );
+      const spyAws = vi.spyOn(AwsMetricsService.prototype, 'recordMetric');
+      const spyGcs = vi.spyOn(GCPMetricsService.prototype, 'recordMetric');
+      const spyAzure = vi.spyOn(AzureMetricsService.prototype, 'recordMetric');
 
       service.recordMetric(metricName, metricValue);
 

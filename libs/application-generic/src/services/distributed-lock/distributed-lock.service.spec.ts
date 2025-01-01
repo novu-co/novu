@@ -2,12 +2,8 @@ import Redlock from 'redlock';
 import { setTimeout } from 'timers/promises';
 
 import { DistributedLockService } from './distributed-lock.service';
-import { FeatureFlagsService } from '../feature-flags.service';
-import {
-  InMemoryProviderClient,
-  InMemoryProviderEnum,
-  CacheInMemoryProviderService,
-} from '../in-memory-provider';
+import { CacheInMemoryProviderService } from '../in-memory-provider';
+import { vi } from 'vitest';
 
 // eslint-disable-next-line no-multi-assign
 const originalRedisCacheServiceHost = (process.env.REDIS_CACHE_SERVICE_HOST =
@@ -19,16 +15,16 @@ const originalRedisClusterServiceHost = process.env.REDIS_CLUSTER_SERVICE_HOST;
 const originalRedisClusterServicePorts =
   process.env.REDIS_CLUSTER_SERVICE_PORTS;
 
-const spyDecreaseLockCounter = jest.spyOn(
+const spyDecreaseLockCounter = vi.spyOn(
   DistributedLockService.prototype,
   <any>'decreaseLockCounter',
 );
-const spyIncreaseLockCounter = jest.spyOn(
+const spyIncreaseLockCounter = vi.spyOn(
   DistributedLockService.prototype,
   <any>'increaseLockCounter',
 );
-const spyLock = jest.spyOn(Redlock.prototype, 'acquire');
-const spyUnlock = jest.spyOn(Redlock.prototype, 'release');
+const spyLock = vi.spyOn(Redlock.prototype, 'acquire');
+const spyUnlock = vi.spyOn(Redlock.prototype, 'release');
 
 describe('Distributed Lock Service', () => {
   afterEach(() => {

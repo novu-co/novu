@@ -24,6 +24,7 @@ import {
   ChangeEntity,
   SubscriberRepository,
   LayoutRepository,
+  DalService,
 } from '@novu/dal';
 
 import { NotificationTemplateService } from './notification-template.service';
@@ -103,6 +104,8 @@ export class UserSession {
   }
 
   private async initializeCommunity(options: UserSessionOptions = {}) {
+    new DalService().connect(process.env.MONGO_URL || '');
+
     const card = {
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
@@ -120,17 +123,22 @@ export class UserSession {
       showOnBoardingTour: options.showOnBoardingTour ? 0 : 2,
     };
 
+    console.log('>>>>> USER CREATED');
     this.user = await userService.createUser(userEntity);
 
     if (!options.noOrganization) {
       await this.addOrganizationCommunity();
+      console.log('>>>>> ORGANIZATION CREATED');
     }
 
     if (!options.noOrganization && !options?.noEnvironment) {
       await this.createEnvironmentsAndFeeds();
+      console.log('>>>>> ENVIRONMENT CREATED');
     }
 
     await this.fetchJwtCommunity();
+
+    console.log('>>>>> JWT');
 
     if (!options.noOrganization) {
       if (!options?.noEnvironment) {
@@ -231,9 +239,12 @@ export class UserSession {
   }
 
   private async fetchJwtCommunity() {
+    console.log('>>>>> JWT REQUEST', this.requestEndpoint);
     const response = await request(this.requestEndpoint).get(
       `/v1/auth/test/token/${this.user._id}?organizationId=${this.organization ? this.organization._id : ''}`
     );
+
+    console.log('>>>>> JWT RESPONSE', response.body.data);
 
     this.token = `Bearer ${response.body.data}`;
     this.testAgent = superAgentDefaults(request(this.requestEndpoint))

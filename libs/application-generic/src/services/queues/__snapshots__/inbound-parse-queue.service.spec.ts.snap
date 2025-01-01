@@ -1,0 +1,35 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Inbound Parse Queue service > General > should add a minimal job in the queue 1`] = `
+{
+  "attemptsMade": 0,
+  "data": {
+    "html": "<>Hello World</>",
+    "messageId": "123",
+    "subject": "subject",
+    "text": "text",
+  },
+  "delay": 0,
+  "failedReason": undefined,
+  "id": "2",
+  "name": "inbound-parse-mail-job-id-2",
+  "opts": {
+    "attempts": 5,
+    "backoff": {
+      "delay": 4000,
+      "type": "exponential",
+    },
+    "delay": 0,
+    "removeOnComplete": true,
+    "removeOnFail": true,
+  },
+  "parent": undefined,
+  "parentKey": undefined,
+  "progress": 0,
+  "repeatJobKey": undefined,
+  "returnvalue": null,
+  "stacktrace": [],
+  "timestamp": 1735772120475,
+  "toKey": [Function],
+}
+`;

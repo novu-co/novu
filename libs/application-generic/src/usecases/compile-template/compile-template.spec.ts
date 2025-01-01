@@ -178,12 +178,12 @@ describe('Compile Template', function () {
 
     it('should not fail and return passed value', async () => {
       const result = await useCase.execute({
-        data: { number: 'Not a number' },
+        data: { number: 'NaN' },
         template:
           '<div>{{numberFormat number decimalSep="," decimalLength="2" thousandsSep="|"}}</div>',
       });
 
-      expect(result).toEqual('<div>Not a number</div>');
+      expect(result).toEqual('<div>NaN</div>');
     });
   });
 

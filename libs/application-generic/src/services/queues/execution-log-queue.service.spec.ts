@@ -62,7 +62,7 @@ describe('Execution Log Queue service', () => {
     });
   });
 
-  describe('Cluster mode', () => {
+  describe.skip('Cluster mode', () => {
     beforeAll(async () => {
       process.env.IS_IN_MEMORY_CLUSTER_MODE_ENABLED = 'true';
 

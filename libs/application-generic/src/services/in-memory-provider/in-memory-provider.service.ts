@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { setTimeout } from 'timers/promises';
 
 import {
@@ -21,26 +21,54 @@ const LOG_CONTEXT = 'InMemoryProviderService';
 export class InMemoryProviderService {
   public inMemoryProviderClient: InMemoryProviderClient;
   public inMemoryProviderConfig: InMemoryProviderConfig;
+  public provider: InMemoryProviderEnum;
+  public inCluster: boolean;
+  public hasAutoPipelining: boolean;
 
   public isProviderClientReady: (string) => boolean;
 
   constructor(
-    private provider: InMemoryProviderEnum,
-    private isCluster: boolean,
-    private enableAutoPipelining?: boolean,
+    private options: { logContext?: string; inCluster?: boolean } = {
+      logContext: LOG_CONTEXT,
+      inCluster:
+        process.env.IS_IN_MEMORY_CLUSTER_MODE_ENABLED === 'true' ||
+        process.env.IN_MEMORY_CLUSTER_MODE_ENABLED === 'true' ||
+        false,
+    },
   ) {
+    /**
+     * Rules for the provider selection:
+     * - For our self hosted users we assume all of them have a single node Redis
+     * instance.
+     * - For Novu we will use Elasticache. We fallback to a Redis Cluster configuration
+     * if Elasticache not configured properly. That's happening in the provider
+     * mapping in the /in-memory-provider/providers/index.ts
+     */
+    this.provider = process.env.IS_SELF_HOSTED
+      ? InMemoryProviderEnum.REDIS
+      : InMemoryProviderEnum.ELASTICACHE;
+
+    this.inCluster =
+      process.env.IS_IN_MEMORY_CLUSTER_MODE_ENABLED === 'true' ||
+      process.env.IN_MEMORY_CLUSTER_MODE_ENABLED === 'true' ||
+      false;
+
+    this.hasAutoPipelining =
+      process.env.REDIS_CACHE_ENABLE_AUTOPIPELINING === 'true';
+
     Logger.log(
-      this.descriptiveLogMessage('In-memory provider service initialized'),
-      LOG_CONTEXT,
+      `[${this.options.logContext}] Provider: ${this.provider}, Cluster: ${this.inCluster ? 'enabled' : 'disabled'}, Autopipelining: ${this.hasAutoPipelining ? 'enabled' : 'disabled'}`,
+      this.options.logContext,
     );
-    this.inMemoryProviderClient = this.buildClient(provider);
+
+    this.inMemoryProviderClient = this.buildClient(this.provider);
   }
 
   public get getProvider(): {
     selected: InMemoryProviderEnum;
     configured: InMemoryProviderEnum;
   } {
-    const config = this.isCluster
+    const config = this.inCluster
       ? getClientAndConfigForCluster(this.provider)
       : getClientAndConfig();
 
@@ -50,12 +78,15 @@ export class InMemoryProviderService {
     };
   }
 
-  protected descriptiveLogMessage(message) {
-    return `[Provider: ${this.provider}] ${message}`;
+  protected log(message) {
+    return Logger.log(
+      `[${this.options.logContext}] ${message}`,
+      this.options.logContext,
+    );
   }
 
   private buildClient(provider: InMemoryProviderEnum): InMemoryProviderClient {
-    return this.isCluster
+    return this.inCluster
       ? this.inMemoryClusterProviderSetup(provider)
       : this.inMemoryProviderSetup();
   }
@@ -76,17 +107,13 @@ export class InMemoryProviderService {
     }
 
     Logger.warn(
-      this.descriptiveLogMessage(
-        `Is being delayed ${times} times up to a total of ${retries}.`,
-      ),
+      this.log(`Is being delayed ${times} times up to a total of ${retries}.`),
       LOG_CONTEXT,
     );
 
     if (times === retries) {
       Logger.error(
-        this.descriptiveLogMessage(
-          'It reached the limit of retries waiting for readiness.',
-        ),
+        this.log('It reached the limit of retries waiting for readiness.'),
         LOG_CONTEXT,
       );
     }
@@ -103,14 +130,14 @@ export class InMemoryProviderService {
   }
 
   public getClusterOptions(): ClusterOptions | undefined {
-    if (this.inMemoryProviderClient && this.isCluster) {
+    if (this.inMemoryProviderClient && this.inCluster) {
       return this.inMemoryProviderClient.options;
     }
   }
 
   public getOptions(): RedisOptions | undefined {
     if (this.inMemoryProviderClient) {
-      if (!this.isCluster) {
+      if (!this.inCluster) {
         const { options } = this.inMemoryProviderClient;
 
         return options;
@@ -124,71 +151,50 @@ export class InMemoryProviderService {
   }
 
   private inMemoryClusterProviderSetup(provider): Cluster | undefined {
-    Logger.verbose(
-      this.descriptiveLogMessage(`In-memory cluster service set up`),
-      LOG_CONTEXT,
-    );
+    Logger.verbose(this.log(`In-memory cluster service set up`), LOG_CONTEXT);
 
     const { getConfig, getClient, isClientReady } =
       getClientAndConfigForCluster(provider);
 
     this.isProviderClientReady = isClientReady;
     this.inMemoryProviderConfig = getConfig();
-    const { host, ttl } = getConfig();
+    const { host } = getConfig();
 
     if (!host) {
       Logger.warn(
-        this.descriptiveLogMessage(`Missing host for in-memory cluster for`),
+        this.log(`Missing host for in-memory cluster for`),
         LOG_CONTEXT,
       );
     }
 
-    const inMemoryProviderClient = getClient(this.enableAutoPipelining);
+    const inMemoryProviderClient = getClient(this.hasAutoPipelining);
     if (host && inMemoryProviderClient) {
-      Logger.log(
-        this.descriptiveLogMessage(`Connecting to cluster at ${host}`),
-        LOG_CONTEXT,
-      );
+      Logger.log(this.log(`Connecting to cluster at ${host}`), LOG_CONTEXT);
 
       inMemoryProviderClient.on('connect', () => {
-        Logger.verbose(
-          this.descriptiveLogMessage(`In-memory cluster connected`),
-          LOG_CONTEXT,
-        );
+        Logger.verbose(this.log(`In-memory cluster connected`), LOG_CONTEXT);
       });
 
       inMemoryProviderClient.on('connecting', () => {
-        Logger.verbose(
-          this.descriptiveLogMessage(`In-memory cluster connecting`),
-          LOG_CONTEXT,
-        );
+        Logger.verbose(this.log(`In-memory cluster connecting`), LOG_CONTEXT);
       });
 
       inMemoryProviderClient.on('reconnecting', () => {
-        Logger.verbose(
-          this.descriptiveLogMessage(`In-memory cluster reconnecting`),
-          LOG_CONTEXT,
-        );
+        Logger.verbose(this.log(`In-memory cluster reconnecting`), LOG_CONTEXT);
       });
 
       inMemoryProviderClient.on('close', () => {
-        Logger.verbose(
-          this.descriptiveLogMessage(`In-memory cluster closing`),
-          LOG_CONTEXT,
-        );
+        Logger.verbose(this.log(`In-memory cluster closing`), LOG_CONTEXT);
       });
 
       inMemoryProviderClient.on('end', () => {
-        Logger.verbose(
-          this.descriptiveLogMessage(`In-memory cluster end`),
-          LOG_CONTEXT,
-        );
+        Logger.verbose(this.log(`In-memory cluster end`), LOG_CONTEXT);
       });
 
       inMemoryProviderClient.on('error', (error) => {
         Logger.error(
           error,
-          this.descriptiveLogMessage(
+          this.log(
             `There has been an error in the In-memory Cluster provider client`,
           ),
           LOG_CONTEXT,
@@ -196,17 +202,11 @@ export class InMemoryProviderService {
       });
 
       inMemoryProviderClient.on('ready', () => {
-        Logger.log(
-          this.descriptiveLogMessage(`In-memory cluster ready`),
-          LOG_CONTEXT,
-        );
+        Logger.log(this.log(`In-memory cluster ready`), LOG_CONTEXT);
       });
 
       inMemoryProviderClient.on('wait', () => {
-        Logger.verbose(
-          this.descriptiveLogMessage(`In-memory cluster waiting`),
-          LOG_CONTEXT,
-        );
+        Logger.verbose(this.log(`In-memory cluster waiting`), LOG_CONTEXT);
       });
 
       return inMemoryProviderClient;
@@ -214,10 +214,7 @@ export class InMemoryProviderService {
   }
 
   private inMemoryProviderSetup(): Redis | undefined {
-    Logger.verbose(
-      this.descriptiveLogMessage('In-memory service set up'),
-      LOG_CONTEXT,
-    );
+    Logger.verbose(this.log('In-memory service set up'), LOG_CONTEXT);
 
     const { getClient, getConfig, isClientReady } = getClientAndConfig();
 
@@ -226,57 +223,43 @@ export class InMemoryProviderService {
     const { host, port, ttl } = getConfig();
 
     if (!host) {
-      Logger.warn(
-        this.descriptiveLogMessage('Missing host for in-memory provider'),
-        LOG_CONTEXT,
-      );
+      Logger.warn(this.log('Missing host for in-memory provider'), LOG_CONTEXT);
     }
 
     const inMemoryProviderClient = getClient();
     if (host && inMemoryProviderClient) {
-      Logger.log(
-        this.descriptiveLogMessage(`Connecting to ${host}:${port}`),
-        LOG_CONTEXT,
-      );
+      Logger.log(this.log(`Connecting to ${host}:${port}`), LOG_CONTEXT);
 
       inMemoryProviderClient.on('connect', () => {
-        Logger.verbose(
-          this.descriptiveLogMessage('REDIS CONNECTED'),
-          LOG_CONTEXT,
-        );
+        Logger.verbose(this.log('REDIS CONNECTED'), LOG_CONTEXT);
       });
 
       inMemoryProviderClient.on('reconnecting', () => {
-        Logger.verbose(
-          this.descriptiveLogMessage('Redis reconnecting'),
-          LOG_CONTEXT,
-        );
+        Logger.verbose(this.log('Redis reconnecting'), LOG_CONTEXT);
       });
 
       inMemoryProviderClient.on('close', () => {
-        Logger.verbose(this.descriptiveLogMessage('Redis close'), LOG_CONTEXT);
+        Logger.verbose(this.log('Redis close'), LOG_CONTEXT);
       });
 
       inMemoryProviderClient.on('end', () => {
-        Logger.verbose(this.descriptiveLogMessage('Redis end'), LOG_CONTEXT);
+        Logger.verbose(this.log('Redis end'), LOG_CONTEXT);
       });
 
       inMemoryProviderClient.on('error', (error) => {
         Logger.error(
           error,
-          this.descriptiveLogMessage(
-            'There has been an error in the InMemory provider client',
-          ),
+          this.log('There has been an error in the InMemory provider client'),
           LOG_CONTEXT,
         );
       });
 
       inMemoryProviderClient.on('ready', () => {
-        Logger.log(this.descriptiveLogMessage('Redis ready'), LOG_CONTEXT);
+        Logger.log(this.log('Redis ready'), LOG_CONTEXT);
       });
 
       inMemoryProviderClient.on('wait', () => {
-        Logger.verbose(this.descriptiveLogMessage('Redis wait'), LOG_CONTEXT);
+        Logger.verbose(this.log('Redis wait'), LOG_CONTEXT);
       });
 
       return inMemoryProviderClient;
@@ -284,7 +267,7 @@ export class InMemoryProviderService {
   }
 
   public inMemoryScan(pattern: string): ScanStream {
-    if (this.isCluster) {
+    if (this.inCluster) {
       const client = this.inMemoryProviderClient as Cluster;
 
       return client.sscanStream(pattern);
@@ -300,15 +283,13 @@ export class InMemoryProviderService {
       try {
         await this.inMemoryProviderClient.quit();
         Logger.verbose(
-          this.descriptiveLogMessage(`In-memory provider service shutdown`),
+          this.log(`In-memory provider service shutdown`),
           LOG_CONTEXT,
         );
       } catch (error) {
         Logger.warn(
           error,
-          this.descriptiveLogMessage(
-            `In-memory provider service shutdown has failed`,
-          ),
+          this.log(`In-memory provider service shutdown has failed`),
           LOG_CONTEXT,
         );
       }

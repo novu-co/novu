@@ -10,13 +10,12 @@
   "keywords": [],
   "scripts": {
     "start": "npm run watch:build",
+    "test": "vitest",
     "prebuild": "rimraf build",
     "build": "run-p build:*",
     "build:main": "tsc -p tsconfig.json",
     "build:copy-template": "cpx \"src/**/*.handlebars\" build/main",
-
     "watch:build": "tsc -p tsconfig.json -w",
-    "watch:test": "jest src --watch",
     "reset-hard": "git clean -dfx && git reset --hard && pnpm install"
   },
   "engines": {

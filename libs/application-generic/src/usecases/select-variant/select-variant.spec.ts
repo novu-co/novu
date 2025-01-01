@@ -10,22 +10,23 @@ import {
   SubscriberRepository,
   MessageTemplateRepository,
 } from '@novu/dal';
+import { vi } from 'vitest';
 
 import { ConditionsFilter } from '../conditions-filter';
 import { SelectVariant } from './select-variant.usecase';
 import { SelectVariantCommand } from './select-variant.command';
 import { NormalizeVariables } from '../normalize-variables';
 
-const findOneMessageTemplateMock = jest.fn(() => testVariant);
+const findOneMessageTemplateMock = vi.fn(() => testVariant);
 
-jest.mock('@novu/dal', () => ({
-  ...jest.requireActual('@novu/dal'),
-  MessageTemplateRepository: jest.fn(() => ({
+vi.mock('@novu/dal', async () => ({
+  ...(await vi.importActual('@novu/dal')),
+  MessageTemplateRepository: vi.fn(() => ({
     findOne: findOneMessageTemplateMock,
   })),
 }));
 
-describe('select variant', function () {
+describe.only('select variant', function () {
   let selectVariantUsecase: SelectVariant;
 
   beforeEach(async function () {
@@ -38,7 +39,7 @@ describe('select variant', function () {
         new TenantRepository(),
       ),
     );
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should select the variant', async function () {

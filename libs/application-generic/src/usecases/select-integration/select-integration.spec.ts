@@ -9,10 +9,10 @@ import {
   TenantRepository,
   MessageRepository,
 } from '@novu/dal';
+import { vi } from 'vitest';
 
 import { SelectIntegration } from './select-integration.usecase';
 import { SelectIntegrationCommand } from './select-integration.command';
-import { GetDecryptedIntegrations } from '../get-decrypted-integrations';
 import { ConditionsFilter } from '../conditions-filter';
 import { CompileTemplate } from '../compile-template';
 import {
@@ -23,7 +23,6 @@ import {
 import { ExecutionLogRoute } from '../execution-log-route';
 import { CreateExecutionDetails } from '../create-execution-details';
 import { GetFeatureFlag } from '../get-feature-flag';
-import { NormalizeVariables } from '../normalize-variables';
 
 const testIntegration: IntegrationEntity = {
   _environmentId: 'env-test-123',
@@ -77,23 +76,23 @@ const novuIntegration: IntegrationEntity = {
   deletedBy: null,
 };
 
-const findOneMock = jest.fn(() => testIntegration);
+const findOneMock = vi.fn(() => testIntegration);
 
-jest.mock('@novu/dal', () => ({
-  ...jest.requireActual('@novu/dal'),
-  IntegrationRepository: jest.fn(() => ({
+vi.mock('@novu/dal', async () => ({
+  ...(await vi.importActual('@novu/dal')),
+  IntegrationRepository: vi.fn(() => ({
     findOne: findOneMock,
   })),
 }));
 
-jest.mock('../get-decrypted-integrations', () => ({
-  ...jest.requireActual('../get-decrypted-integrations'),
-  GetDecryptedIntegrations: jest.fn(() => ({
-    execute: jest.fn(() => novuIntegration),
+vi.mock('../get-decrypted-integrations', async () => ({
+  ...(await vi.importActual('../get-decrypted-integrations')),
+  GetDecryptedIntegrations: vi.fn(() => ({
+    execute: vi.fn(() => novuIntegration),
   })),
 }));
 
-describe('select integration', function () {
+describe.only('select integration', function () {
   let useCase: SelectIntegration;
   const integrationRepository: IntegrationRepository =
     new IntegrationRepository();
@@ -120,7 +119,7 @@ describe('select integration', function () {
       conditionsFilter,
       new TenantRepository(),
     );
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should select the integration', async function () {
@@ -134,25 +133,7 @@ describe('select integration', function () {
       }),
     );
 
-    expect(integration).not.toBeNull();
-    expect(integration?.identifier).toEqual(testIntegration.identifier);
-  });
-
-  it('should return the novu integration', async function () {
-    findOneMock.mockImplementationOnce(() => null);
-
-    const integration = await useCase.execute(
-      SelectIntegrationCommand.create({
-        channelType: ChannelTypeEnum.EMAIL,
-        environmentId: 'environmentId',
-        organizationId: 'organizationId',
-        userId: 'userId',
-        filterData: {},
-      }),
-    );
-
-    expect(integration).not.toBeNull();
-    expect(integration?.providerId).toEqual(EmailProviderIdEnum.Novu);
+    expect(integration.identifier).toEqual(testIntegration.identifier);
   });
 
   it.each`

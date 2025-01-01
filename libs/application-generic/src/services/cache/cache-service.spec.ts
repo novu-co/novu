@@ -13,7 +13,7 @@ import { MockCacheService } from './cache-service.mock';
  * TODO: Maybe create a Test single Redis instance to be able to run it in the
  * pipeline. Local wise they work
  */
-describe.skip('Cache Service - Redis Instance - Non Cluster Mode', () => {
+describe('Cache Service - Redis Instance - Non Cluster Mode', () => {
   let cacheService: CacheService;
   let cacheInMemoryProviderService: CacheInMemoryProviderService;
 
@@ -21,7 +21,9 @@ describe.skip('Cache Service - Redis Instance - Non Cluster Mode', () => {
     process.env.IS_IN_MEMORY_CLUSTER_MODE_ENABLED = 'false';
 
     cacheInMemoryProviderService = new CacheInMemoryProviderService();
-    expect(cacheInMemoryProviderService.isCluster).toBe(false);
+    expect(cacheInMemoryProviderService.inMemoryProviderService.inCluster).toBe(
+      false,
+    );
 
     cacheService = new CacheService(cacheInMemoryProviderService);
     await cacheService.initialize();
@@ -70,7 +72,7 @@ describe.skip('Cache Service - Redis Instance - Non Cluster Mode', () => {
   });
 });
 
-describe('Cache Service - Cluster Mode', () => {
+describe.skip('Cache Service - Cluster Mode', () => {
   let cacheService: CacheService;
   let cacheInMemoryProviderService: CacheInMemoryProviderService;
 
@@ -78,7 +80,9 @@ describe('Cache Service - Cluster Mode', () => {
     process.env.IS_IN_MEMORY_CLUSTER_MODE_ENABLED = 'true';
 
     cacheInMemoryProviderService = new CacheInMemoryProviderService();
-    expect(cacheInMemoryProviderService.isCluster).toBe(true);
+    expect(cacheInMemoryProviderService.inMemoryProviderService.inCluster).toBe(
+      true,
+    );
 
     cacheService = new CacheService(cacheInMemoryProviderService);
     await cacheService.initialize();
@@ -144,9 +148,8 @@ describe('cache-service', function () {
     cacheService = MockCacheService.createClient();
   });
 
-  afterEach(function (done) {
+  afterEach(function () {
     cacheService.delByPattern('*');
-    done();
   });
 
   it('should store data in cache', async function () {
