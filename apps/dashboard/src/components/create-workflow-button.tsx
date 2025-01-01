@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify } from '@novu/shared';
 import { createWorkflow } from '@/api/workflows';
-import { Button } from '@/components/primitives/button-deprecated';
+import { Button } from '@/components/primitives/button';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';
 import { Separator } from '@/components/primitives/separator';
@@ -188,9 +188,15 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
         </SheetMain>
         <Separator />
         <SheetFooter>
-          <Button isLoading={isPending} variant="default" type="submit" form="create-workflow">
+          <Button
+            isLoading={isPending}
+            trailingIcon={RiArrowRightSLine}
+            variant="secondary"
+            mode="gradient"
+            type="submit"
+            form="create-workflow"
+          >
             Create workflow
-            <RiArrowRightSLine className="size-4" />
           </Button>
         </SheetFooter>
       </SheetContent>

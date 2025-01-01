@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { RiRouteFill } from 'react-icons/ri';
 import { WorkflowList } from '@/components/workflow-list';
 import { DashboardLayout } from '@/components/dashboard-layout';
-import { Button } from '@/components/primitives/button-deprecated';
+import { Button } from '@/components/primitives/button';
 import { CreateWorkflowButton } from '@/components/create-workflow-button';
 import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';
@@ -35,8 +35,7 @@ export const WorkflowsPage = () => {
           <div className="invisible flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2"></div>
 
           <CreateWorkflowButton asChild>
-            <Button variant="primary" size="sm">
-              <RiRouteFill className="size-4" />
+            <Button mode="gradient" variant="primary" size="xs" leadingIcon={RiRouteFill}>
               Create workflow
             </Button>
           </CreateWorkflowButton>
