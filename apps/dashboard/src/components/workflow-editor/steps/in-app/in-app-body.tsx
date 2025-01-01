@@ -25,6 +25,7 @@ export const InAppBody = () => {
             <InputField className="flex h-36 items-start">
               <FieldEditor
                 fontFamily="inherit"
+                indentWithTab={false}
                 placeholder={capitalize(field.name)}
                 id={field.name}
                 value={field.value}

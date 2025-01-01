@@ -48,6 +48,7 @@ export function TextWidget(props: WidgetProps) {
                 />
               ) : (
                 <FieldEditor
+                  indentWithTab={false}
                   fontFamily="inherit"
                   placeholder={capitalize(label)}
                   id={label}

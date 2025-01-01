@@ -25,6 +25,8 @@ export const InAppSubject = () => {
             <FormControl>
               <FieldEditor
                 fontFamily="inherit"
+                singleLine
+                indentWithTab={false}
                 placeholder={capitalize(field.name)}
                 id={field.name}
                 value={field.value}

@@ -22,18 +22,15 @@ export const BaseBody = () => {
       render={({ field }) => (
         <FormItem className="w-full">
           <FormControl>
-            <InputField className="flex h-36 w-full items-start px-1">
-              <div className="w-full">
-                <FieldEditor
-                  fontFamily="inherit"
-                  placeholder={capitalize(field.name)}
-                  id={field.name}
-                  value={field.value}
-                  onChange={field.onChange}
-                  variables={variables}
-                  size="default"
-                />
-              </div>
+            <InputField className="h-36 px-1">
+              <FieldEditor
+                fontFamily="inherit"
+                placeholder={capitalize(field.name)}
+                id={field.name}
+                variables={variables}
+                value={field.value}
+                onChange={field.onChange}
+              />
             </InputField>
           </FormControl>
           <FormMessage>{`You can use variables by typing {{ select from the list or create a new one.`}</FormMessage>
