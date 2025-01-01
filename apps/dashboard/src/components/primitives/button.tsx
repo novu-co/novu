@@ -348,21 +348,22 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
 );
 ButtonRoot.displayName = BUTTON_ROOT_NAME;
 
-const Button = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentPropsWithoutRef<typeof ButtonRoot> & {
-    leadingIcon?: IconType;
-    trailingIcon?: IconType;
+export type ButtonProps = React.ComponentPropsWithoutRef<typeof ButtonRoot> & {
+  leadingIcon?: IconType;
+  trailingIcon?: IconType;
+};
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ children, leadingIcon: LeadingIcon, trailingIcon: TrailingIcon, ...rest }, forwardedRef) => {
+    return (
+      <ButtonRoot ref={forwardedRef} {...rest}>
+        {LeadingIcon && <ButtonIcon as={LeadingIcon} />}
+        <Slottable>{children}</Slottable>
+        {TrailingIcon && <ButtonIcon as={TrailingIcon} />}
+      </ButtonRoot>
+    );
   }
->(({ children, leadingIcon: LeadingIcon, trailingIcon: TrailingIcon, ...rest }, forwardedRef) => {
-  return (
-    <ButtonRoot ref={forwardedRef} {...rest}>
-      {LeadingIcon && <ButtonIcon as={LeadingIcon} />}
-      <Slottable>{children}</Slottable>
-      {TrailingIcon && <ButtonIcon as={TrailingIcon} />}
-    </ButtonRoot>
-  );
-});
+);
 Button.displayName = 'Button';
 
 function ButtonIcon<T extends React.ElementType>({

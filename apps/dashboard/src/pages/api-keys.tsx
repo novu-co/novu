@@ -166,7 +166,11 @@ function SettingField({
                 value={secret ? (showSecret ? value : maskSecret(value ?? '')) : value}
                 readOnly={readOnly}
               />
-              <CopyButton size="input-right" valueToCopy={value ?? ''} />
+              <CopyButton
+                size="xs"
+                valueToCopy={value ?? ''}
+                className="h-[34px] rounded-none border-l border-neutral-200"
+              />
             </InputField>
 
             {secret && (

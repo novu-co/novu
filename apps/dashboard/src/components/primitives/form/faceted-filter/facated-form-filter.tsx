@@ -1,7 +1,6 @@
 import { PlusCircle } from 'lucide-react';
 import * as React from 'react';
 import { cn } from '../../../../utils/ui';
-import { ButtonDeprecated } from '../../button-deprecated';
 import { Popover, PopoverContent, PopoverTrigger } from '../../popover';
 import { FilterBadge } from './components/filter-badge';
 import { MultiFilterContent } from './components/multi-filter-content';
@@ -9,6 +8,7 @@ import { SingleFilterContent } from './components/single-filter-content';
 import { TextFilterContent } from './components/text-filter-content';
 import { STYLES } from './styles';
 import { FacetedFilterProps } from './types';
+import { Button } from '../../button';
 
 export function FacetedFormFilter({
   title,
@@ -142,16 +142,17 @@ export function FacetedFormFilter({
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
-        <ButtonDeprecated
-          variant="outline"
+        <Button
+          variant="secondary"
+          mode="outline"
           size="sm"
           className={cn(
             'h-10 border-neutral-300 bg-white px-3 text-neutral-600',
             'hover:border-neutral-300 hover:bg-neutral-50/30 hover:text-neutral-700',
-            'rounded-lg transition-colors duration-200 ease-out',
+            'rounded-lg border-neutral-200 ring-0 ring-offset-0 transition-colors duration-200 ease-out',
             sizes.trigger,
-            isEmpty && 'border-dashed border-neutral-200 px-1.5 hover:border-neutral-300',
-            !isEmpty && 'border-solid bg-white'
+            isEmpty && 'border-[1px] border-dashed px-1.5 hover:border-neutral-300',
+            !isEmpty && 'border-[1px] bg-white'
           )}
         >
           <div className="flex items-center gap-1">
@@ -164,7 +165,7 @@ export function FacetedFormFilter({
             )}
             {!isEmpty && renderTriggerContent()}
           </div>
-        </ButtonDeprecated>
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="min-w-[245px] p-0" align="start">
         {renderContent()}

@@ -6,7 +6,6 @@ import * as z from 'zod';
 
 import { cn } from '@/utils/ui';
 import { Popover, PopoverContent, PopoverTrigger, PopoverPortal } from '../primitives/popover';
-import { ButtonDeprecated } from '../primitives/button-deprecated';
 import { Input, InputField } from '../primitives/input';
 import { ConnectionStatus } from '@/utils/types';
 import { useEnvironment } from '@/context/environment/hooks';
@@ -14,6 +13,7 @@ import { useFetchBridgeHealthCheck } from '@/hooks/use-fetch-bridge-health-check
 import { useValidateBridgeUrl } from '@/hooks/use-validate-bridge-url';
 import { useUpdateBridgeUrl } from '@/hooks/use-update-bridge-url';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
+import { Button } from '../primitives/button';
 
 const formSchema = z.object({ bridgeUrl: z.string().url() });
 
@@ -105,15 +105,16 @@ export const EditBridgeUrlButton = () => {
                 >
                   Learn more
                 </a>
-                <ButtonDeprecated
+                <Button
                   type="submit"
                   variant="primary"
+                  mode="filled"
                   size="xs"
                   isLoading={isUpdatingBridgeUrl}
                   disabled={!isDirty || isValidatingBridgeUrl || isUpdatingBridgeUrl}
                 >
                   Update endpoint
-                </ButtonDeprecated>
+                </Button>
               </div>
             </form>
           </Form>
