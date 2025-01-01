@@ -51,6 +51,7 @@ import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
 import { Tooltip, TooltipContent, TooltipPortal, TooltipTrigger } from '../primitives/tooltip';
 import { usePromotionalBanner } from '../promotional/coming-soon-banner';
+import { Button } from '../primitives/button';
 
 type ConfigureWorkflowFormProps = {
   workflow: WorkflowResponseDto;
@@ -188,9 +189,13 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
            */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <ButtonDeprecated variant="ghost" size="icon" className="ml-auto h-[20px] w-[22px]">
-                <RiMore2Fill />
-              </ButtonDeprecated>
+              <Button
+                mode="ghost"
+                leadingIcon={RiMore2Fill}
+                variant="secondary"
+                size="sm"
+                className="ml-auto h-5 w-5 p-0.5 px-1"
+              ></Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuGroup>
@@ -356,14 +361,15 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
         <Separator />
         <SidebarContent size="lg">
           <Link to={ROUTES.EDIT_WORKFLOW_PREFERENCES}>
-            <ButtonDeprecated
-              variant="outline"
+            <Button
+              variant="secondary"
+              mode="outline"
+              leadingIcon={RiSettingsLine}
               className="flex w-full justify-start gap-1.5 p-1.5 text-xs font-medium"
               type="button"
             >
-              <RiSettingsLine className="h-4 w-4 text-neutral-600" />
               Configure channel preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
-            </ButtonDeprecated>
+            </Button>
           </Link>
         </SidebarContent>
         <Separator />
