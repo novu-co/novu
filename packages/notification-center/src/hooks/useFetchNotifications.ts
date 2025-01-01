@@ -1,6 +1,6 @@
 import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query';
 import type { IStoreQuery } from '@novu/client';
-import type { IMessage, IPaginatedResponse } from '@novu/shared';
+import type { IMessage, INotificationDto, IPaginatedResponse } from '@novu/shared';
 import { INotificationsContext } from '../shared/interfaces';
 
 import { useNovuContext } from './useNovuContext';
@@ -16,7 +16,7 @@ export const useFetchNotifications = (
 
   const result = useInfiniteQuery<IPaginatedResponse<IMessage>, Error, IPaginatedResponse<IMessage>>(
     fetchNotificationsQueryKey,
-    ({ pageParam = 0 }) => apiService.getNotificationsList(pageParam, query),
+    async ({ pageParam = 0 }) => await getNotificationList(apiService, pageParam, query),
     {
       ...options,
       enabled: isSessionInitialized && fetchingStrategy.fetchNotifications,
@@ -37,3 +37,17 @@ export const useFetchNotifications = (
     refetch,
   };
 };
+async function getNotificationList(apiService, pageParam: number, query) {
+  const response: IPaginatedResponse<INotificationDto> = await apiService.getNotificationsList(pageParam, query);
+  const messages: IMessage[] = response.data.map((notification: INotificationDto): IMessage => {
+    return {
+      ...notification,
+      payload: notification.payload ?? {},
+    };
+  });
+
+  return {
+    ...response,
+    data: messages,
+  };
+}

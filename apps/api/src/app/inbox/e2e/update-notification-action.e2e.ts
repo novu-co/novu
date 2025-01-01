@@ -117,9 +117,9 @@ describe('Update Notification Action - /inbox/notifications/:id/{complete/revert
       actionType: ButtonTypeEnum.PRIMARY,
     });
 
-    expect(status).to.equal(400);
-    expect(body.statusCode).to.equal(400);
-    expect(body.cause.notificationId.messages[0]).to.equal(`notificationId must be a mongodb id`);
+    expect(status).to.equal(422);
+    expect(body.statusCode).to.equal(422);
+    expect(body.errors.notificationId.messages[0]).to.equal(`notificationId must be a mongodb id`);
   });
 
   it("should throw not found error when the message doesn't exist", async function () {

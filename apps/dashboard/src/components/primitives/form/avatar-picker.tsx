@@ -9,12 +9,12 @@ import { Label } from '@/components/primitives/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import TextSeparator from '@/components/primitives/text-separator';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { autocompletion } from '@codemirror/autocomplete';
 import { Editor } from '../editor';
 import { useFormField } from './form-context';
-import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 const predefinedAvatars = [
   `${window.location.origin}/images/avatar.svg`,
@@ -53,7 +53,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
 
     return (
       <div className="size-9 space-y-2">
-        <Popover modal={true} open={isOpen} onOpenChange={setIsOpen}>
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" size="icon" className="text-foreground-600 relative size-full overflow-hidden">
               {value ? (
@@ -79,6 +79,8 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
                   <Label>Avatar URL</Label>
                   <InputField size="fit">
                     <Editor
+                      singleLine
+                      indentWithTab={false}
                       fontFamily="inherit"
                       ref={ref}
                       placeholder="Enter avatar URL"

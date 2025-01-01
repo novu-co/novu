@@ -1,3 +1,22 @@
+## 2.6.4 (2024-12-24)
+
+### 🩹 Fixes
+
+- **js:** add missing on click event for dropdown tabs ([#7342](https://github.com/novuhq/novu/pull/7342))
+- **js:** Remove @novu/shared dependency" ([#7206](https://github.com/novuhq/novu/pull/7206))
+- **js:** Remove @novu/shared dependency ([#6906](https://github.com/novuhq/novu/pull/6906))
+
+### ❤️ Thank You
+
+- Dima Grossman @scopsy
+- GalTidhar @tatarco
+- George Desipris @desiprisg
+- George Djabarov @djabarovgeorge
+- Pasha
+- Pawan Jain
+- Sokratis Vidros @SokratisVidros
+
+
 ## 2.6.3 (2024-11-26)
 
 ### 🚀 Features

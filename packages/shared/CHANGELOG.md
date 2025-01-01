@@ -1,3 +1,52 @@
+## 2.1.5 (2024-12-24)
+
+### 🚀 Features
+
+- **dashboard:** new integrations page view ([#7310](https://github.com/novuhq/novu/pull/7310))
+- **dashboard:** Nv 4885 push step editor ([#7306](https://github.com/novuhq/novu/pull/7306))
+- **api:** Nv 5045 update the api to have same behavior as preference ([#7302](https://github.com/novuhq/novu/pull/7302))
+- **api:** add query parser ([#7267](https://github.com/novuhq/novu/pull/7267))
+- **api:** Nv 5033 additional removal cycle found unneeded elements ([#7283](https://github.com/novuhq/novu/pull/7283))
+- **dashboard:** Activity Feed Page - Stacked PR ([#7249](https://github.com/novuhq/novu/pull/7249))
+- **dashboard:** digest fixed duration ([#7234](https://github.com/novuhq/novu/pull/7234))
+- **api:** Nv 4966 e2e testing happy path - messages ([#7248](https://github.com/novuhq/novu/pull/7248))
+- **api:** add external id api to onesignal Based on #6976 ([#7270](https://github.com/novuhq/novu/pull/7270), [#6976](https://github.com/novuhq/novu/issues/6976))
+- **api:** add push control schema ([#7252](https://github.com/novuhq/novu/pull/7252))
+- **api:** add chat control schema ([#7251](https://github.com/novuhq/novu/pull/7251))
+- **api:** add sms control schema ([#7250](https://github.com/novuhq/novu/pull/7250))
+- **api:** add full step data to workflow dto; refactor ([#7235](https://github.com/novuhq/novu/pull/7235))
+- **dashboard:** Billing settings page in dashboard v2 ([#7203](https://github.com/novuhq/novu/pull/7203))
+- **dashboard:** Implement email step editor & mini preview ([#7129](https://github.com/novuhq/novu/pull/7129))
+- **api:** Nv 4939 e2e testing happy path events ([#7208](https://github.com/novuhq/novu/pull/7208))
+- **dashboard:** Getting started page ([#7132](https://github.com/novuhq/novu/pull/7132))
+- **api:** converted bulk trigger to use SDK ([#7166](https://github.com/novuhq/novu/pull/7166))
+- **api:** wip fix framework workflow issues ([#7147](https://github.com/novuhq/novu/pull/7147))
+- **api:** fix framework workflow payload preview ([#7137](https://github.com/novuhq/novu/pull/7137))
+- **application-generic:** add SUBSCRIBER_WIDGET_JWT_EXPIRATION_TIME env variable ([#7105](https://github.com/novuhq/novu/pull/7105))
+- **dashboard:** Sign up Questionnaire ([#7114](https://github.com/novuhq/novu/pull/7114))
+
+### 🩹 Fixes
+
+- **api-service:** digest schema - remove the schema defaults as it doesn't work with the framework ajv validation ([#7334](https://github.com/novuhq/novu/pull/7334))
+- **api:** @novu/api -> @novu/api-service ([#7348](https://github.com/novuhq/novu/pull/7348))
+- **api:** Crate of fixes part 2 ([#7292](https://github.com/novuhq/novu/pull/7292))
+- **api:** centralize upsert validation  + improve nested error handling ([#7173](https://github.com/novuhq/novu/pull/7173))
+- **dashboard:** nested payload gen ([#7240](https://github.com/novuhq/novu/pull/7240))
+- **dashboard:** Always trust the URL for the environment selection ([#7223](https://github.com/novuhq/novu/pull/7223))
+
+### ❤️ Thank You
+
+- Adam Chmara @ChmaraX
+- Biswajeet Das @BiswaViraj
+- Dima Grossman @scopsy
+- GalTidhar @tatarco
+- George Desipris @desiprisg
+- George Djabarov @djabarovgeorge
+- Pawan Jain
+- Paweł Tymczuk @LetItRock
+- Sokratis Vidros @SokratisVidros
+
+
 ## 2.1.4 (2024-11-26)
 
 ### 🚀 Features

@@ -15,6 +15,7 @@ export enum TelemetryEvent {
   INBOX_CUSTOMIZATION_CHANGED = 'Inbox customization changed - [Onboarding]',
   INBOX_IMPLEMENTATION_CLICKED = 'Inbox implementation clicked - [Onboarding]',
   INBOX_PREVIEW_STYLE_CHANGED = 'Inbox preview style changed - [Onboarding]',
+  INBOX_FRAMEWORK_SELECTED = 'Inbox framework selected - [Onboarding]',
   SKIP_ONBOARDING_CLICKED = 'Skip onboarding clicked - [Onboarding]',
   USECASE_SELECT_PAGE_VIEWED = 'Use case select page viewed - [Onboarding]',
   INBOX_USECASE_PAGE_VIEWED = 'Inbox use case page viewed - [Onboarding]',
@@ -33,4 +34,7 @@ export enum TelemetryEvent {
   WORKFLOW_PREFERENCES_OVERRIDE_USED = 'Workflow preferences override used',
   EXPORT_TO_CODE_BANNER_REACTION = 'Export to Code banner reaction - [Promotional]',
   EXTERNAL_LINK_CLICKED = 'External link clicked',
+  CHANGELOG_ITEM_CLICKED = 'Changelog item clicked',
+  CHANGELOG_ITEM_DISMISSED = 'Changelog item dismissed',
+  SHARE_FEEDBACK_LINK_CLICKED = 'Share feedback link clicked',
 }

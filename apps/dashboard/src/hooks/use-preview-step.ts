@@ -11,11 +11,13 @@ export const usePreviewStep = ({
   onError,
 }: { onSuccess?: (data: GeneratePreviewResponseDto) => void; onError?: (error: Error) => void } = {}) => {
   const { currentEnvironment } = useEnvironment();
-  const { mutateAsync, isPending, error, data } = useMutation({
-    mutationFn: (args: PreviewStepParameters) => previewStep({ environment: currentEnvironment!, ...args }),
-    onSuccess,
-    onError,
-  });
+  const { mutateAsync, isPending, error, data } = useMutation<GeneratePreviewResponseDto, Error, PreviewStepParameters>(
+    {
+      mutationFn: (args: PreviewStepParameters) => previewStep({ environment: currentEnvironment!, ...args }),
+      onSuccess,
+      onError,
+    }
+  );
 
   return {
     previewStep: mutateAsync,

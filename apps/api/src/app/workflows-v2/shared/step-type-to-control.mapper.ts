@@ -1,11 +1,21 @@
-import { ActionStepEnum, ChannelStepEnum, channelStepSchemas } from '@novu/framework/internal';
+import {
+  chatControlSchema,
+  chatUiSchema,
+  delayControlSchema,
+  delayUiSchema,
+  digestControlSchema,
+  digestUiSchema,
+  emailControlSchema,
+  emailUiSchema,
+  inAppControlSchema,
+  inAppUiSchema,
+  pushControlSchema,
+  pushUiSchema,
+  smsControlSchema,
+  smsUiSchema,
+} from '@novu/application-generic';
+import { ActionStepEnum, ChannelStepEnum } from '@novu/framework/internal';
 import { ControlSchemas, JSONSchemaDto } from '@novu/shared';
-import { emailStepControlSchema, emailStepUiSchema, inAppControlSchema, inAppUiSchema } from './schemas';
-import { DelayTimeControlSchema, delayUiSchema } from './schemas/delay-control.schema';
-import { DigestOutputJsonSchema, digestUiSchema } from './schemas/digest-control.schema';
-import { smsStepControl } from './schemas/sms-control.schema';
-import { chatStepControl } from './schemas/chat-control.schema';
-import { pushStepControl } from './schemas/push-control.schema';
 
 export const PERMISSIVE_EMPTY_SCHEMA = {
   type: 'object',
@@ -20,27 +30,27 @@ export const stepTypeToControlSchema: Record<ChannelStepEnum | ActionStepEnum, C
     uiSchema: inAppUiSchema,
   },
   [ChannelStepEnum.EMAIL]: {
-    schema: emailStepControlSchema,
-    uiSchema: emailStepUiSchema,
+    schema: emailControlSchema,
+    uiSchema: emailUiSchema,
   },
   [ChannelStepEnum.SMS]: {
-    schema: smsStepControl.schema,
-    uiSchema: smsStepControl.uiSchema,
+    schema: smsControlSchema,
+    uiSchema: smsUiSchema,
   },
   [ChannelStepEnum.PUSH]: {
-    schema: pushStepControl.schema,
-    uiSchema: pushStepControl.uiSchema,
+    schema: pushControlSchema,
+    uiSchema: pushUiSchema,
   },
   [ChannelStepEnum.CHAT]: {
-    schema: chatStepControl.schema,
-    uiSchema: chatStepControl.uiSchema,
+    schema: chatControlSchema,
+    uiSchema: chatUiSchema,
   },
   [ActionStepEnum.DELAY]: {
-    schema: DelayTimeControlSchema,
+    schema: delayControlSchema,
     uiSchema: delayUiSchema,
   },
   [ActionStepEnum.DIGEST]: {
-    schema: DigestOutputJsonSchema,
+    schema: digestControlSchema,
     uiSchema: digestUiSchema,
   },
   [ActionStepEnum.CUSTOM]: {

@@ -86,7 +86,9 @@ export class SubscriberJobBound {
     /**
      * Due to Mixpanel HotSharding, we don't want to pass userId for production volume
      */
-    const segmentUserId = ['test-workflow', 'digest-playground'].includes(command.payload.__source) ? userId : '';
+    const segmentUserId = ['test-workflow', 'digest-playground', 'dashboard'].includes(command.payload.__source)
+      ? userId
+      : '';
 
     this.analyticsService.mixpanelTrack('Notification event trigger - [Triggers]', segmentUserId, {
       name: template.name,

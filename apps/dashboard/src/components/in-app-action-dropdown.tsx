@@ -1,8 +1,8 @@
 import { EditorView } from '@uiw/react-codemirror';
+import merge from 'lodash.merge';
 import { ComponentProps, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
-import merge from 'lodash.merge';
 
 import { Button, buttonVariants } from '@/components/primitives/button';
 import {
@@ -24,12 +24,12 @@ import { InputField } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import { URLInput } from '@/components/workflow-editor/url-input';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
 import { autocompletion } from '@codemirror/autocomplete';
-import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
@@ -51,7 +51,7 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <div className={cn('mt-3 flex items-center gap-1')}>
           <div className="border-neutral-alpha-200 relative flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
             {!primaryAction && !secondaryAction && (
@@ -168,7 +168,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
   );
 
   return (
-    <Popover modal={true}>
+    <Popover>
       <PopoverTrigger {...rest} />
       <PopoverContent className="max-w-72" side="bottom" align="end">
         <div className="flex flex-col gap-3">
@@ -188,6 +188,8 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                 <FormControl>
                   <InputField size="fit">
                     <Editor
+                      singleLine
+                      indentWithTab={false}
                       fontFamily="inherit"
                       placeholder="Button text"
                       value={field.value}

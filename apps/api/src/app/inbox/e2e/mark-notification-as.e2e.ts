@@ -111,8 +111,8 @@ describe('Mark Notification As - /inbox/notifications/:id/{read,unread,archive,u
   it('should throw bad request error when the notification id is not mongo id', async function () {
     const id = 'fake';
     const { body, status } = await updateNotification({ id, status: 'read' });
-    expect(body.statusCode).to.equal(400);
-    expect(body.cause.notificationId.messages[0]).to.equal(`notificationId must be a mongodb id`);
+    expect(body.statusCode).to.equal(422);
+    expect(body.errors.notificationId.messages[0]).to.equal(`notificationId must be a mongodb id`);
   });
 
   it("should throw not found error when the message doesn't exist", async function () {

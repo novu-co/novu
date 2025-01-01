@@ -5,10 +5,10 @@ import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessagePure } from '@/components/primitives/form/form';
 import { Input, InputFieldProps, InputFieldPure, InputProps } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
+import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
 import { completions } from '@/utils/liquid-autocomplete';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 import { autocompletion } from '@codemirror/autocomplete';
-import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
 
 type URLInputProps = Omit<InputProps, 'value' | 'onChange' | 'size'> & {
   options: string[];
@@ -49,7 +49,11 @@ export const URLInput = ({
                   <FormControl>
                     {asEditor ? (
                       <Editor
-                        asInput
+                        singleLine
+                        indentWithTab={false}
+                        basicSetup={{
+                          defaultKeymap: false,
+                        }}
                         fontFamily="inherit"
                         placeholder={placeholder}
                         extensions={extensions}

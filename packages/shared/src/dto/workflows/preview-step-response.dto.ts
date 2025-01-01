@@ -43,7 +43,7 @@ class DigestRegularOutput {
   amount: number;
   unit: TimeUnitEnum;
   digestKey?: string;
-  lookBackWindow: {
+  lookBackWindow?: {
     amount: number;
     unit: TimeUnitEnum;
   };
@@ -113,7 +113,7 @@ export class PreviewPayload {
 
 export class GeneratePreviewResponseDto {
   previewPayloadExample: PreviewPayload;
-  result?:
+  result:
     | {
         type: ChannelTypeEnum.EMAIL;
         preview: EmailRenderOutput;

@@ -77,7 +77,7 @@ const defaultFormValues: InboxPlaygroundFormData = {
     label: 'Add to your app',
     redirect: {
       target: '_self',
-      url: '/',
+      url: '/onboarding/inbox/embed',
     },
   },
   secondaryAction: null,
@@ -98,10 +98,6 @@ export function InboxPlayground() {
   const [hasNotificationBeenSent, setHasNotificationBeenSent] = useState(false);
   const navigate = useNavigate();
   const telemetry = useTelemetry();
-
-  useEffect(() => {
-    telemetry(TelemetryEvent.INBOX_USECASE_PAGE_VIEWED);
-  }, [telemetry]);
 
   useEffect(() => {
     if (!data) return;
@@ -270,14 +266,14 @@ async function createDemoWorkflow({ environment }: { environment: IEnvironment }
               label: '{{payload.primaryActionLabel}}',
               redirect: {
                 target: '_self',
-                url: '',
+                url: '/onboarding/inbox/embed',
               },
             },
             secondaryAction: {
               label: '{{payload.secondaryActionLabel}}',
               redirect: {
                 target: '_self',
-                url: '',
+                url: '/onboarding/inbox/embed',
               },
             },
           },

@@ -5,11 +5,11 @@ import { useFormContext } from 'react-hook-form';
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
 import { InputField } from '@/components/primitives/input';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
 import { autocompletion } from '@codemirror/autocomplete';
-import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 
 const bodyKey = 'body';
 
@@ -36,6 +36,7 @@ export const InAppBody = () => {
             <InputField className="h-36 px-1">
               <Editor
                 fontFamily="inherit"
+                indentWithTab={false}
                 placeholder={capitalize(field.name)}
                 id={field.name}
                 extensions={extensions}
