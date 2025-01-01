@@ -1,7 +1,7 @@
 import { cn } from '@/utils/ui';
 import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
-import { Button } from './button';
+import { ButtonDeprecated } from './button-deprecated';
 import { Loader2 } from 'lucide-react';
 
 const inlineToastVariants = cva('flex items-center justify-between gap-3 rounded-lg border px-2 py-1.5', {
@@ -71,7 +71,7 @@ export function InlineToast({
         </div>
       </div>
       {ctaLabel && (
-        <Button
+        <ButtonDeprecated
           variant="ghost"
           size="xs"
           type="button"
@@ -81,7 +81,7 @@ export function InlineToast({
         >
           {ctaLabel}
           {isCtaLoading && <Loader2 className="ml-1 h-3 w-3 animate-spin" />}
-        </Button>
+        </ButtonDeprecated>
       )}
     </div>
   );

@@ -2,7 +2,7 @@ import { UsecaseSelectOnboarding } from '../components/auth/usecase-selector';
 import { AuthCard } from '../components/auth/auth-card';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Button } from '../components/primitives/button';
+import { ButtonDeprecated } from '../components/primitives/button-deprecated';
 import { ROUTES } from '../utils/routes';
 import { useNavigate } from 'react-router-dom';
 import { OnboardingArrowLeft } from '../components/icons/onboarding-arrow-left';
@@ -131,17 +131,22 @@ export function UsecaseSelectPage() {
                   />
 
                   <motion.div className="flex w-full flex-col items-center gap-3" variants={itemVariants}>
-                    <Button
+                    <ButtonDeprecated
                       disabled={selectedUseCases.length === 0}
                       isLoading={isPending}
                       className="w-full"
                       type="submit"
                     >
                       Continue
-                    </Button>
-                    <Button type="button" variant="link" className="pt-0 text-xs text-[#717784]" onClick={handleSkip}>
+                    </ButtonDeprecated>
+                    <ButtonDeprecated
+                      type="button"
+                      variant="link"
+                      className="pt-0 text-xs text-[#717784]"
+                      onClick={handleSkip}
+                    >
                       Skip this step
-                    </Button>
+                    </ButtonDeprecated>
                   </motion.div>
                 </div>
               </form>

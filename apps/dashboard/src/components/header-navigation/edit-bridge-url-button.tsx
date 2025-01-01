@@ -6,7 +6,7 @@ import * as z from 'zod';
 
 import { cn } from '@/utils/ui';
 import { Popover, PopoverContent, PopoverTrigger, PopoverPortal } from '../primitives/popover';
-import { Button } from '../primitives/button';
+import { ButtonDeprecated } from '../primitives/button-deprecated';
 import { Input, InputField } from '../primitives/input';
 import { ConnectionStatus } from '@/utils/types';
 import { useEnvironment } from '@/context/environment/hooks';
@@ -105,7 +105,7 @@ export const EditBridgeUrlButton = () => {
                 >
                   Learn more
                 </a>
-                <Button
+                <ButtonDeprecated
                   type="submit"
                   variant="primary"
                   size="xs"
@@ -113,7 +113,7 @@ export const EditBridgeUrlButton = () => {
                   disabled={!isDirty || isValidatingBridgeUrl || isUpdatingBridgeUrl}
                 >
                   Update endpoint
-                </Button>
+                </ButtonDeprecated>
               </div>
             </form>
           </Form>

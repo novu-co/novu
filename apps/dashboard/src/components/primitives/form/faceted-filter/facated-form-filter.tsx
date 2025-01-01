@@ -1,7 +1,7 @@
 import { PlusCircle } from 'lucide-react';
 import * as React from 'react';
 import { cn } from '../../../../utils/ui';
-import { Button } from '../../button';
+import { ButtonDeprecated } from '../../button-deprecated';
 import { Popover, PopoverContent, PopoverTrigger } from '../../popover';
 import { FilterBadge } from './components/filter-badge';
 import { MultiFilterContent } from './components/multi-filter-content';
@@ -142,7 +142,7 @@ export function FacetedFormFilter({
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
-        <Button
+        <ButtonDeprecated
           variant="outline"
           size="sm"
           className={cn(
@@ -164,7 +164,7 @@ export function FacetedFormFilter({
             )}
             {!isEmpty && renderTriggerContent()}
           </div>
-        </Button>
+        </ButtonDeprecated>
       </PopoverTrigger>
       <PopoverContent className="min-w-[245px] p-0" align="start">
         {renderContent()}

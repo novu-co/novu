@@ -1,4 +1,4 @@
-import { Button } from '../primitives/button';
+import { ButtonDeprecated } from '../primitives/button-deprecated';
 import { createWorkflow } from '../../api/workflows';
 import { CustomizeInbox } from './customize-inbox-playground';
 import { InboxPreviewContent } from './inbox-preview-content';
@@ -212,22 +212,22 @@ export function InboxPlayground() {
           <div className="bg-muted mt-auto border-t">
             <div className="flex justify-end gap-3 p-2">
               {!hasNotificationBeenSent ? (
-                <Button size="sm" onClick={handleSendNotification} disabled={isPending} className="px-2">
+                <ButtonDeprecated size="sm" onClick={handleSendNotification} disabled={isPending} className="px-2">
                   Send notification
                   {isPending ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
                   ) : (
                     <RiNotification2Fill className="h-3 w-3" />
                   )}
-                </Button>
+                </ButtonDeprecated>
               ) : (
                 <>
-                  <Button size="sm" variant="ghost" className="px-2" onClick={handleSkipToDashboard}>
+                  <ButtonDeprecated size="sm" variant="ghost" className="px-2" onClick={handleSkipToDashboard}>
                     Skip to Dashboard
-                  </Button>
-                  <Button size="sm" className="px-2" onClick={handleImplementClick}>
+                  </ButtonDeprecated>
+                  <ButtonDeprecated size="sm" className="px-2" onClick={handleImplementClick}>
                     Implement &lt;Inbox /&gt;
-                  </Button>
+                  </ButtonDeprecated>
                 </>
               )}
             </div>

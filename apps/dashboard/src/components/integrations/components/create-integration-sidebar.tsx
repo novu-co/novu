@@ -6,7 +6,7 @@ import { useSidebarNavigationManager } from './hooks/use-sidebar-navigation-mana
 import { IntegrationSheet } from './integration-sheet';
 import { ChannelTabs } from './channel-tabs';
 import { IntegrationConfiguration } from './integration-configuration';
-import { Button } from '../../../components/primitives/button';
+import { ButtonDeprecated } from '../../primitives/button-deprecated';
 import { handleIntegrationError } from './utils/handle-integration-error';
 import { useSetPrimaryIntegration } from '../../../hooks/use-set-primary-integration';
 import { SelectPrimaryIntegrationModal } from './modals/select-primary-integration-modal';
@@ -120,14 +120,14 @@ export function CreateIntegrationSidebar({ isOpened }: CreateIntegrationSidebarP
               />
             </div>
             <div className="bg-background flex justify-end gap-2 border-t p-3">
-              <Button
+              <ButtonDeprecated
                 type="submit"
                 form="integration-configuration-form"
                 isLoading={isPending || isSettingPrimary}
                 size="sm"
               >
                 Create Integration
-              </Button>
+              </ButtonDeprecated>
             </div>
           </>
         ) : null}

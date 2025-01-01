@@ -8,7 +8,7 @@ import { useOnboardingSteps } from '../../hooks/use-onboarding-steps';
 import { NavigationLink } from './navigation-link';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
-import { Button } from '../primitives/button';
+import { ButtonDeprecated } from '../primitives/button-deprecated';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 
 export function GettingStartedMenuItem() {
@@ -85,7 +85,7 @@ export function GettingStartedMenuItem() {
           >
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
+                <ButtonDeprecated
                   size="icon"
                   variant="ghost"
                   onClick={handleClose}
@@ -93,7 +93,7 @@ export function GettingStartedMenuItem() {
                   aria-label="Close getting started menu"
                 >
                   <RiCloseLine className="size-4" />
-                </Button>
+                </ButtonDeprecated>
               </TooltipTrigger>
               <TooltipContent>This will hide the Getting Started page</TooltipContent>
             </Tooltip>
