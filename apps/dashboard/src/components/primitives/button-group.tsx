@@ -32,7 +32,7 @@ export const buttonGroupVariants = tv({
   },
   variants: {
     size: {
-      small: {
+      sm: {
         item: [
           // base
           'h-9 gap-4 px-4 text-label-sm',
@@ -44,7 +44,7 @@ export const buttonGroupVariants = tv({
           '-mx-2 size-5',
         ],
       },
-      xsmall: {
+      xs: {
         item: [
           // base
           'h-8 gap-3.5 px-3.5 text-label-sm',
@@ -56,7 +56,7 @@ export const buttonGroupVariants = tv({
           '-mx-2 size-5',
         ],
       },
-      xxsmall: {
+      '2xs': {
         item: [
           // base
           'h-6 gap-3 px-3 text-label-xs',
@@ -71,7 +71,7 @@ export const buttonGroupVariants = tv({
     },
   },
   defaultVariants: {
-    size: 'small',
+    size: 'sm',
   },
 });
 
