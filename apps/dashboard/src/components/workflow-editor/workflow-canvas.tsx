@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import {
   Background,
   BackgroundVariant,
@@ -10,7 +9,16 @@ import {
   ViewportHelperFunctionOptions,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
+import { useEnvironment } from '@/context/environment/hooks';
+import { StepTypeEnum } from '@/utils/enums';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { Step } from '@/utils/types';
+import { useNavigate } from 'react-router-dom';
+import { NODE_HEIGHT, NODE_WIDTH } from './base-node';
+import { AddNodeEdge, AddNodeEdgeType } from './edges';
 import {
   AddNode,
   ChatNode,
@@ -24,16 +32,7 @@ import {
   SmsNode,
   TriggerNode,
 } from './nodes';
-import { AddNodeEdge, AddNodeEdgeType } from './edges';
-import { NODE_HEIGHT, NODE_WIDTH } from './base-node';
-import { StepTypeEnum } from '@/utils/enums';
-import { Step } from '@/utils/types';
-import { getFirstControlsErrorMessage, getFirstBodyErrorMessage } from './step-utils';
-import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { useEnvironment } from '@/context/environment/hooks';
-import { buildRoute } from '@/utils/routes';
-import { ROUTES } from '@/utils/routes';
-import { useNavigate } from 'react-router-dom';
+import { getFirstBodyErrorMessage, getFirstControlsErrorMessage } from './step-utils';
 
 const nodeTypes = {
   trigger: TriggerNode,
@@ -57,6 +56,17 @@ const panOnDrag = [1, 2];
 // y distance = node height + space between nodes
 const Y_DISTANCE = NODE_HEIGHT + 50;
 
+const mapStepToNodeContent = (step: Step): string => {
+  const controlValues = step.controls.values;
+
+  switch (step.type) {
+    case StepTypeEnum.DELAY:
+      return `Delay for ${controlValues.amount} ${controlValues.unit}`;
+    default:
+      return 'Unknown step type';
+  }
+};
+
 const mapStepToNode = ({
   addStepIndex,
   previousPosition,
@@ -67,8 +77,9 @@ const mapStepToNode = ({
   step: Step;
 }): Node<NodeData, keyof typeof nodeTypes> => {
   let content = '';
+
   if (step.type === StepTypeEnum.DELAY) {
-    content = `Delay action for a set time`;
+    content = mapStepToNodeContent(step);
   }
 
   const error = getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues);
