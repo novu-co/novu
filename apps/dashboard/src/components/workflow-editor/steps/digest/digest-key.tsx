@@ -31,11 +31,7 @@ export const DigestKey = () => {
             </FormLabel>
             <InputRoot>
               <InputWrapper className="flex h-[28px] items-center gap-1 border-r border-neutral-100 pr-1">
-                <FormLabel
-                  optional
-                  hideOptional
-                  className="flex h-full items-center gap-1 border-r border-neutral-100 pr-1"
-                >
+                <FormLabel className="flex h-full items-center gap-1 border-r border-neutral-100 pr-1">
                   <Code2 className="-ml-1.5 size-5" />
                   <span className="text-foreground-600 text-xs font-normal">subscriberId</span>
                 </FormLabel>
