@@ -4,9 +4,10 @@ import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../utils/constants';
 import { CopyButton } from './copy-button';
 import { Input, InputProps } from './input';
 
-interface SecretInputProps extends Omit<InputProps, 'size' | 'onChange'> {
+interface SecretInputProps extends Omit<InputProps, 'onChange'> {
   value: string;
   onChange: (value: string) => void;
+  copyButton?: boolean;
 }
 
 export function SecretInput({ className, value, onChange, copyButton = false, ...props }: SecretInputProps) {

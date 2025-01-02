@@ -62,7 +62,7 @@ export function CredentialsSection({ provider, control }: CredentialsSectionProp
               ) : (
                 <FormControl>
                   <Input
-                    size="sm"
+                    size={'md'}
                     id={credential.key}
                     type="text"
                     {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}

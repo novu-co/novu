@@ -221,6 +221,7 @@ const InputEl = React.forwardRef<
   React.InputHTMLAttributes<HTMLInputElement> &
     InputSharedProps & {
       asChild?: boolean;
+      onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     }
 >(({ className, type = 'text', size, hasError, asChild, ...rest }, forwardedRef) => {
   const Component = asChild ? Slot : 'input';
@@ -242,16 +243,16 @@ const InputEl = React.forwardRef<
 });
 InputEl.displayName = INPUT_EL_NAME;
 
-type InputProps = Omit<React.ComponentPropsWithoutRef<typeof InputRoot>, 'size'> &
-  React.ComponentPropsWithoutRef<typeof InputEl> & {
+type InputProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> &
+  InputSharedProps &
+  Omit<React.ComponentPropsWithoutRef<typeof InputEl>, 'size'> & {
     leadingIcon?: IconType;
     trailingIcon?: IconType;
     leadingNode?: React.ReactNode;
     trailingNode?: React.ReactNode;
     inlineLeadingNode?: React.ReactNode;
     inlineTrailingNode?: React.ReactNode;
-    size?: 'md' | 'sm' | 'xs';
-    hasError?: boolean;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   };
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -265,17 +266,22 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       trailingNode,
       inlineLeadingNode,
       inlineTrailingNode,
+      onChange,
       ...rest
     },
     forwardedRef
   ) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChange?.(e);
+    };
+
     return (
       <InputRoot size={size} hasError={hasError}>
         {leadingNode}
         <InputWrapper>
           {inlineLeadingNode}
           {LeadingIcon && <InputIcon as={LeadingIcon} />}
-          <InputEl ref={forwardedRef} type="text" {...rest} />
+          <InputEl ref={forwardedRef} type="text" onChange={handleChange} {...rest} />
           {TrailingIcon && <InputIcon as={TrailingIcon} />}
           {inlineTrailingNode}
         </InputWrapper>
@@ -349,4 +355,5 @@ export {
   InputEl as InputPure,
   InputRoot as InputRoot,
   InputWrapper as InputWrapper,
+  type InputProps,
 };
