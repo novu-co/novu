@@ -27,7 +27,7 @@ export const WorkflowTags = (props: WorkflowTagsProps) => {
           </Badge>
         ))}
         {restTags.length > 0 && (
-          <Badge color="purple" size="md" variant="lighter">
+          <Badge color="gray" size="md" variant="lighter">
             +{restTags.length}
           </Badge>
         )}
