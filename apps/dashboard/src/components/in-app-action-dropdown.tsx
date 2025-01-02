@@ -188,6 +188,8 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                 <FormControl>
                   <InputField size="fit">
                     <Editor
+                      singleLine
+                      indentWithTab={false}
                       fontFamily="inherit"
                       placeholder="Button text"
                       value={field.value}

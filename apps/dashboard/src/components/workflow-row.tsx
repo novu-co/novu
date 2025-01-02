@@ -1,18 +1,4 @@
-import { useState } from 'react';
-import { FaCode } from 'react-icons/fa6';
-import {
-  RiDeleteBin2Line,
-  RiFileCopyLine,
-  RiFlashlightLine,
-  RiGitPullRequestFill,
-  RiMore2Fill,
-  RiPauseCircleLine,
-  RiPlayCircleLine,
-  RiPulseFill,
-} from 'react-icons/ri';
-import { Link } from 'react-router-dom';
-import { type ExternalToast } from 'sonner';
-import { IEnvironment, WorkflowListResponseDto } from '@novu/shared';
+import { PAUSE_MODAL_TITLE, PauseModalDescription } from '@/components/pause-workflow-dialog';
 import { Badge } from '@/components/primitives/badge';
 import { Button } from '@/components/primitives/button';
 import {
@@ -32,15 +18,30 @@ import { WorkflowSteps } from '@/components/workflow-steps';
 import { WorkflowTags } from '@/components/workflow-tags';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
+import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
 import { WorkflowOriginEnum, WorkflowStatusEnum } from '@/utils/enums';
 import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
+import { cn } from '@/utils/ui';
+import { IEnvironment, WorkflowListResponseDto } from '@novu/shared';
+import { ComponentProps, useState } from 'react';
+import { FaCode } from 'react-icons/fa6';
+import {
+  RiDeleteBin2Line,
+  RiFileCopyLine,
+  RiFlashlightLine,
+  RiGitPullRequestFill,
+  RiMore2Fill,
+  RiPauseCircleLine,
+  RiPlayCircleLine,
+  RiPulseFill,
+} from 'react-icons/ri';
+import { Link } from 'react-router-dom';
+import { type ExternalToast } from 'sonner';
 import { ConfirmationModal } from './confirmation-modal';
-import { showToast } from './primitives/sonner-helpers';
-import { ToastIcon } from './primitives/sonner';
-import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
-import { PauseModalDescription, PAUSE_MODAL_TITLE } from '@/components/pause-workflow-dialog';
 import { DeleteWorkflowDialog } from './delete-workflow-dialog';
+import { ToastIcon } from './primitives/sonner';
+import { showToast } from './primitives/sonner-helpers';
 import { TimeDisplayHoverCard } from './time-display-hover-card';
 
 type WorkflowRowProps = {
@@ -54,13 +55,15 @@ const toastOptions: ExternalToast = {
   },
 };
 
-export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
-  const { currentEnvironment } = useEnvironment();
-  const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
+type WorkflowLinkTableCellProps = ComponentProps<typeof TableCell> & {
+  workflow: WorkflowListResponseDto;
+};
 
+const WorkflowLinkTableCell = (props: WorkflowLinkTableCellProps) => {
+  const { workflow, children, className, ...rest } = props;
+  const { currentEnvironment } = useEnvironment();
   const isV1Workflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1;
+
   const workflowLink = isV1Workflow
     ? buildRoute(LEGACY_ROUTES.EDIT_WORKFLOW, {
         workflowId: workflow._id,
@@ -70,6 +73,23 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         workflowSlug: workflow.slug,
       });
 
+  return (
+    <TableCell className={cn('group-hover:bg-neutral-alpha-50 relative', className)} {...rest}>
+      {children}
+      <Link to={workflowLink} className={cn('absolute inset-0')} reloadDocument={isV1Workflow}>
+        <span className="sr-only">Edit workflow</span>
+      </Link>
+    </TableCell>
+  );
+};
+
+export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
+  const { currentEnvironment } = useEnvironment();
+  const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
+
+  const isV1Workflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1;
   const triggerWorkflowLink = isV1Workflow
     ? buildRoute(LEGACY_ROUTES.TEST_WORKFLOW, { workflowId: workflow._id })
     : buildRoute(ROUTES.TEST_WORKFLOW, {
@@ -160,37 +180,33 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
   };
 
   return (
-    <TableRow key={workflow._id} className="relative">
+    <TableRow key={workflow._id} className="group relative isolate">
       <PromoteConfirmModal />
-      <TableCell className="font-medium">
+      <WorkflowLinkTableCell workflow={workflow} className="font-medium">
         <div className="flex items-center gap-1">
           {workflow.origin === WorkflowOriginEnum.EXTERNAL && (
             <Badge variant="warning" kind="pill">
               <FaCode className="size-3" />
             </Badge>
           )}
-          <TruncatedText className="max-w-[32ch]" asChild>
-            <Link to={workflowLink} reloadDocument={isV1Workflow}>
-              {workflow.name}
-            </Link>
-          </TruncatedText>
+          <TruncatedText className="max-w-[32ch]">{workflow.name}</TruncatedText>
         </div>
-        <HoverToCopy className="group flex items-center gap-1" valueToCopy={workflow.workflowId}>
+        <HoverToCopy className="group relative z-10 flex items-center gap-1" valueToCopy={workflow.workflowId}>
           <TruncatedText className="text-foreground-400 font-code block text-xs">{workflow.workflowId}</TruncatedText>
           <RiFileCopyLine className="text-foreground-400 invisible size-3 group-hover:visible" />
         </HoverToCopy>
-      </TableCell>
-      <TableCell className="min-w-[200px]">
+      </WorkflowLinkTableCell>
+      <WorkflowLinkTableCell workflow={workflow} className="min-w-[200px]">
         <WorkflowStatus status={workflow.status} />
-      </TableCell>
-      <TableCell>
+      </WorkflowLinkTableCell>
+      <WorkflowLinkTableCell workflow={workflow}>
         <WorkflowSteps steps={workflow.stepTypeOverviews} />
-      </TableCell>
-      <TableCell>
+      </WorkflowLinkTableCell>
+      <WorkflowLinkTableCell workflow={workflow}>
         <WorkflowTags tags={workflow.tags || []} />
-      </TableCell>
+      </WorkflowLinkTableCell>
 
-      <TableCell className="text-foreground-600 min-w-[180px] text-sm font-medium">
+      <WorkflowLinkTableCell workflow={workflow} className="text-foreground-600 min-w-[180px] text-sm font-medium">
         <TimeDisplayHoverCard date={new Date(workflow.updatedAt)}>
           {new Date(workflow.updatedAt).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -198,9 +214,9 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             day: 'numeric',
           })}
         </TimeDisplayHoverCard>
-      </TableCell>
+      </WorkflowLinkTableCell>
 
-      <TableCell className="w-1">
+      <WorkflowLinkTableCell workflow={workflow} className="w-1">
         <DeleteWorkflowDialog
           workflow={workflow}
           open={isDeleteModalOpen}
@@ -225,7 +241,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
          */}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button variant="ghost" className="z-10 h-8 w-8 p-0">
               <RiMore2Fill className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -286,7 +302,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-      </TableCell>
+      </WorkflowLinkTableCell>
     </TableRow>
   );
 };

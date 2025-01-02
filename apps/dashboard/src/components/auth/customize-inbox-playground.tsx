@@ -1,16 +1,16 @@
-import { Info } from 'lucide-react';
-import { RiInputField, RiLayoutLine } from 'react-icons/ri';
-import { FormProvider, useFormContext, UseFormReturn } from 'react-hook-form';
 import { EditorView } from '@uiw/react-codemirror';
+import { Info } from 'lucide-react';
+import { FormProvider, useFormContext, UseFormReturn } from 'react-hook-form';
+import { RiInputField, RiLayoutLine } from 'react-icons/ri';
 
+import { InAppActionDropdown } from '@/components/in-app-action-dropdown';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
 import { ColorPicker } from '@/components/primitives/color-picker';
-import type { InboxPlaygroundFormData } from './inbox-playground';
+import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem } from '@/components/primitives/form/form';
 import { InputField } from '@/components/primitives/input';
-import { Editor } from '@/components/primitives/editor';
 import { capitalize } from '@/utils/string';
-import { InAppActionDropdown } from '@/components/in-app-action-dropdown';
+import type { InboxPlaygroundFormData } from './inbox-playground';
 
 interface PreviewStyle {
   id: string;
@@ -173,6 +173,8 @@ function NotificationConfigSection() {
               <FormItem className="w-full">
                 <FormControl>
                   <Editor
+                    singleLine
+                    indentWithTab={false}
                     fontFamily="inherit"
                     placeholder={capitalize(field.name)}
                     id={field.name}
@@ -195,6 +197,7 @@ function NotificationConfigSection() {
               <InputField className="h-36 px-1">
                 <Editor
                   fontFamily="inherit"
+                  indentWithTab={false}
                   placeholder={capitalize(field.name)}
                   id={field.name}
                   extensions={extensions}
