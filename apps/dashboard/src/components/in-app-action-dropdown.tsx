@@ -197,7 +197,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                   <FormLabel>Button text</FormLabel>
                 </div>
                 <FormControl>
-                  <InputRoot>
+                  <InputRoot className="overflow-visible">
                     <InputWrapper className="flex h-9 items-center justify-center px-1">
                       <Editor
                         singleLine
