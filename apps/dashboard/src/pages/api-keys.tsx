@@ -1,20 +1,20 @@
-import { useState } from 'react';
-import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
-import { useEnvironment } from '@/context/environment/hooks';
-import { CopyButton } from '@/components/primitives/copy-button';
-import { Card, CardContent, CardHeader } from '@/components/primitives/card';
-import { Button } from '@/components/primitives/button';
-import { Input, InputField } from '@/components/primitives/input';
-import { Form } from '@/components/primitives/form/form';
-import { useForm } from 'react-hook-form';
-import { DashboardLayout } from '../components/dashboard-layout';
 import { PageMeta } from '@/components/page-meta';
-import { useFetchApiKeys } from '../hooks/use-fetch-api-keys';
+import { Button } from '@/components/primitives/button';
+import { Card, CardContent, CardHeader } from '@/components/primitives/card';
+import { CopyButton } from '@/components/primitives/copy-button';
+import { Form } from '@/components/primitives/form/form';
+import { Input, InputField } from '@/components/primitives/input';
+import { Skeleton } from '@/components/primitives/skeleton';
 import { ExternalLink } from '@/components/shared/external-link';
+import { useEnvironment } from '@/context/environment/hooks';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
+import { DashboardLayout } from '../components/dashboard-layout';
 import { Container } from '../components/primitives/container';
 import { HelpTooltipIndicator } from '../components/primitives/help-tooltip-indicator';
 import { API_HOSTNAME } from '../config';
-import { Skeleton } from '@/components/primitives/skeleton';
+import { useFetchApiKeys } from '../hooks/use-fetch-api-keys';
 
 interface ApiKeysFormData {
   apiKey: string;
@@ -166,21 +166,24 @@ function SettingField({
                 value={secret ? (showSecret ? value : maskSecret(value ?? '')) : value}
                 readOnly={readOnly}
               />
-              <CopyButton size="input-right" valueToCopy={value ?? ''} />
+              <CopyButton
+                size="xs"
+                valueToCopy={value ?? ''}
+                className="h-[34px] rounded-none border-l border-neutral-200 shadow-none ring-0"
+              />
             </InputField>
 
             {secret && (
               <Button
-                variant="outline"
-                size="icon"
-                // TODO: Icon size variant is size-8 but doesn't align with the size of the input. We should fix this.
-                className="size-9"
+                variant="secondary"
+                mode="outline"
+                size="xs"
                 onClick={toggleSecretVisibility}
                 disabled={isLoading}
+                className="size-9"
                 aria-label={showSecret ? 'Hide Secret' : 'Show Secret'}
-              >
-                {showSecret ? <RiEyeOffLine className="size-4" /> : <RiEyeLine className="size-4" />}
-              </Button>
+                trailingIcon={showSecret ? RiEyeOffLine : RiEyeLine}
+              />
             )}
           </>
         )}

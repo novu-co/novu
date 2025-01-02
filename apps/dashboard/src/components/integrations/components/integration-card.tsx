@@ -1,13 +1,13 @@
 import { Badge } from '@/components/primitives/badge';
 import { Button } from '@/components/primitives/button';
-import { RiCheckboxCircleFill, RiGitBranchFill, RiSettings4Line, RiStarSmileLine } from 'react-icons/ri';
-import { TableIntegration } from '../types';
-import { ChannelTypeEnum, type IEnvironment, type IIntegration, type IProviderConfig } from '@novu/shared';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '@/utils/routes';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
-import { ProviderIcon } from './provider-icon';
+import { ROUTES } from '@/utils/routes';
+import { ChannelTypeEnum, type IEnvironment, type IIntegration, type IProviderConfig } from '@novu/shared';
+import { RiCheckboxCircleFill, RiGitBranchFill, RiSettings4Line, RiStarSmileLine } from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '../../../utils/ui';
+import { TableIntegration } from '../types';
+import { ProviderIcon } from './provider-icon';
 import { isDemoIntegration } from './utils/helpers';
 
 type IntegrationCardProps = {
@@ -91,8 +91,14 @@ export function IntegrationCard({ integration, provider, environment, onClick }:
 
       <div className="mt-auto flex items-center gap-2">
         {integration.channel === ChannelTypeEnum.IN_APP && !integration.connected ? (
-          <Button size="xs" className="h-[26px]" variant="outline" onClick={handleConfigureClick}>
-            <RiSettings4Line className="h-4 w-4" />
+          <Button
+            size="xs"
+            leadingIcon={RiSettings4Line}
+            className="h-[26px]"
+            variant="secondary"
+            mode="outline"
+            onClick={handleConfigureClick}
+          >
             Connect
           </Button>
         ) : (

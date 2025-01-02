@@ -188,9 +188,15 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
         </SheetMain>
         <Separator />
         <SheetFooter>
-          <Button isLoading={isPending} variant="default" type="submit" form="create-workflow">
+          <Button
+            isLoading={isPending}
+            trailingIcon={RiArrowRightSLine}
+            variant="secondary"
+            mode="gradient"
+            type="submit"
+            form="create-workflow"
+          >
             Create workflow
-            <RiArrowRightSLine className="size-4" />
           </Button>
         </SheetFooter>
       </SheetContent>
