@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
-import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../utils/constants';
 import { CopyButton } from './copy-button';
 import { Input, InputProps } from './input';
 
@@ -16,7 +15,6 @@ export function SecretInput({ className, value, onChange, copyButton = false, ..
   return (
     <Input
       type={revealed ? 'text' : 'password'}
-      {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       {...props}

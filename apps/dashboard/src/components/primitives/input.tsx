@@ -268,17 +268,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     },
     forwardedRef
   ) => {
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange?.(e);
-    };
-
     return (
       <InputRoot size={size} hasError={hasError}>
         {leadingNode}
         <InputWrapper>
           {inlineLeadingNode}
           {LeadingIcon && <InputIcon as={LeadingIcon} />}
-          <InputEl ref={forwardedRef} type="text" onChange={handleChange} {...rest} />
+          <InputEl ref={forwardedRef} type="text" onChange={onChange} {...rest} />
           {TrailingIcon && <InputIcon as={TrailingIcon} />}
           {inlineTrailingNode}
         </InputWrapper>
