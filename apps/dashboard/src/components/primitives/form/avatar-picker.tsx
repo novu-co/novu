@@ -2,7 +2,7 @@ import { forwardRef, useMemo, useState } from 'react';
 import { RiEdit2Line, RiErrorWarningFill, RiImageEditFill } from 'react-icons/ri';
 
 import { Avatar, AvatarImage } from '@/components/primitives/avatar';
-import { Button } from '@/components/primitives/button-deprecated';
+import { Button } from '@/components/primitives/button';
 import { FormMessage } from '@/components/primitives/form/form';
 import { InputField } from '@/components/primitives/input';
 import { Label } from '@/components/primitives/label';
@@ -55,7 +55,11 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
       <div className="size-9 space-y-2">
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="text-foreground-600 relative size-full overflow-hidden">
+            <Button
+              mode="outline"
+              variant="secondary"
+              className="text-foreground-600 relative size-full overflow-hidden"
+            >
               {value ? (
                 <Avatar className="bg-transparent p-1">
                   <AvatarImage src={value as string} />

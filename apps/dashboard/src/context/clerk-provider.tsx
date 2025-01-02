@@ -1,5 +1,4 @@
-import { buttonDeprecatedVariants } from '@/components/primitives/button-deprecated';
-import { cn } from '@/utils/ui';
+import { buttonVariants } from '@/components/primitives/button';
 import { CLERK_PUBLISHABLE_KEY } from '@/config';
 import { ClerkProvider as _ClerkProvider } from '@clerk/clerk-react';
 import { PropsWithChildren } from 'react';
@@ -47,7 +46,7 @@ export const ClerkProvider = (props: ClerkProviderProps) => {
           },
         },
         elements: {
-          formButtonPrimary: cn(buttonDeprecatedVariants({ variant: 'primary' })),
+          formButtonPrimary: buttonVariants({ variant: 'primary', mode: 'gradient' }).root({}),
         },
         variables: {
           fontSize: '14px !important',

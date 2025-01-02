@@ -1,5 +1,5 @@
-import * as React from 'react';
 import { Slot, Slottable } from '@radix-ui/react-slot';
+import * as React from 'react';
 import { IconType } from 'react-icons';
 import { RiLoader4Line } from 'react-icons/ri';
 
@@ -11,7 +11,7 @@ import { cn } from '@/utils/ui';
 const BUTTON_ROOT_NAME = 'ButtonRoot';
 const BUTTON_ICON_NAME = 'ButtonIcon';
 
-export const buttonDeprecatedVariants = tv({
+export const buttonVariants = tv({
   slots: {
     root: [
       // base
@@ -294,9 +294,9 @@ export const buttonDeprecatedVariants = tv({
   },
 });
 
-type ButtonSharedProps = VariantProps<typeof buttonDeprecatedVariants>;
+type ButtonSharedProps = VariantProps<typeof buttonVariants>;
 
-export type ButtonRootProps = VariantProps<typeof buttonDeprecatedVariants> &
+export type ButtonRootProps = VariantProps<typeof buttonVariants> &
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
     asChild?: boolean;
     isLoading?: boolean;
@@ -306,7 +306,7 @@ const ButtonRoot = React.forwardRef<HTMLButtonElement, ButtonRootProps>(
   ({ children, variant, mode, size, asChild, isLoading, className, disabled, ...rest }, forwardedRef) => {
     const uniqueId = React.useId();
     const Component = asChild ? Slot : 'button';
-    const { root } = buttonDeprecatedVariants({ variant, mode, size });
+    const { root } = buttonVariants({ variant, mode, size });
 
     const sharedProps: ButtonSharedProps = {
       variant,
@@ -375,10 +375,10 @@ function ButtonIcon<T extends React.ElementType>({
   ...rest
 }: PolymorphicComponentProps<T, ButtonSharedProps>) {
   const Component = as || 'div';
-  const { icon } = buttonDeprecatedVariants({ mode, variant, size });
+  const { icon } = buttonVariants({ mode, variant, size });
 
   return <Component className={icon({ class: className })} {...rest} />;
 }
 ButtonIcon.displayName = BUTTON_ICON_NAME;
 
-export { ButtonRoot as Root, ButtonIcon as ButtonIcon, Button };
+export { Button, ButtonIcon as ButtonIcon, ButtonRoot as Root };
