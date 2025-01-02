@@ -60,10 +60,25 @@ const mapStepToNodeContent = (step: Step): string | undefined => {
   const controlValues = step.controls.values;
 
   switch (step.type) {
+    case StepTypeEnum.TRIGGER:
+      return 'This step triggers this workflow';
+    case StepTypeEnum.EMAIL:
+      return 'Sends Email to your subscribers';
+    case StepTypeEnum.SMS:
+      return 'Sends SMS to your subscribers';
+    case StepTypeEnum.IN_APP:
+      return 'Sends In-App notification to your subscribers';
+    case StepTypeEnum.PUSH:
+      return 'Sends Push notification to your subscribers';
+    case StepTypeEnum.CHAT:
+      return 'Sends Chat message to your subscribers';
     case StepTypeEnum.DELAY:
       return `Delay for ${controlValues.amount} ${controlValues.unit}`;
+    case StepTypeEnum.DIGEST:
+      return 'Batches events into one coherent message before delivery to the subscriber.';
+    case StepTypeEnum.CUSTOM:
+      return 'Executes the business logic in your bridge application';
     default:
-      // will be overridden by the node default content (nodes.tsx)
       return undefined;
   }
 };
