@@ -31,7 +31,11 @@ export const WorkflowTags = (props: WorkflowTagsProps) => {
             <TruncatedText>{tag}</TruncatedText>
           </Badge>
         ))}
-        {restTags.length > 0 && <Badge>+{restTags.length}</Badge>}
+        {restTags.length > 0 && (
+          <Badge variant={'soft'} className="text-feature bg-feature/10 max-w-[130px] font-[600]" kind="pill">
+            +{restTags.length}
+          </Badge>
+        )}
       </>
     </div>
   );
