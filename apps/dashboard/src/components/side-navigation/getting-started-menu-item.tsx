@@ -1,15 +1,15 @@
+import { useEnvironment } from '@/context/environment/hooks';
+import { useTelemetry } from '@/hooks/use-telemetry';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { TelemetryEvent } from '@/utils/telemetry';
 import { useUser } from '@clerk/clerk-react';
 import { motion } from 'motion/react';
-import { RiQuestionLine, RiSparkling2Fill, RiCloseLine } from 'react-icons/ri';
-import { Badge } from '../primitives/badge';
-import { buildRoute, ROUTES } from '@/utils/routes';
-import { useEnvironment } from '@/context/environment/hooks';
+import { RiCloseFill, RiQuestionLine, RiSparkling2Fill } from 'react-icons/ri';
 import { useOnboardingSteps } from '../../hooks/use-onboarding-steps';
-import { NavigationLink } from './navigation-link';
-import { useTelemetry } from '@/hooks/use-telemetry';
-import { TelemetryEvent } from '@/utils/telemetry';
-import { Button } from '../primitives/button';
+import { Badge } from '../primitives/badge';
+import { CompactButton } from '../primitives/button-compact';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
+import { NavigationLink } from './navigation-link';
 
 export function GettingStartedMenuItem() {
   const { totalSteps, completedSteps, steps } = useOnboardingSteps();
@@ -85,15 +85,16 @@ export function GettingStartedMenuItem() {
           >
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  size="icon"
+                <CompactButton
+                  size="md"
+                  icon={RiCloseFill}
                   variant="ghost"
                   onClick={handleClose}
                   className="h-4 w-4 hover:bg-neutral-300"
                   aria-label="Close getting started menu"
                 >
-                  <RiCloseLine className="size-4" />
-                </Button>
+                  <span className="sr-only">Close</span>
+                </CompactButton>
               </TooltipTrigger>
               <TooltipContent>This will hide the Getting Started page</TooltipContent>
             </Tooltip>

@@ -9,7 +9,6 @@ import {
   UpsertControlValuesUseCase,
   UpsertPreferences,
   TierRestrictionsValidateUsecase,
-  DeleteControlValuesUseCase,
 } from '@novu/application-generic';
 
 import { CommunityOrganizationRepository } from '@novu/dal';
@@ -78,7 +77,6 @@ const DAL_REPOSITORIES = [CommunityOrganizationRepository];
     PatchWorkflowUsecase,
     TierRestrictionsValidateUsecase,
     BuildPayloadSchema,
-    DeleteControlValuesUseCase,
   ],
 })
 export class WorkflowModule implements NestModule {
