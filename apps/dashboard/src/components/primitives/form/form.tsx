@@ -1,15 +1,15 @@
-import * as React from 'react';
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
+import * as React from 'react';
 import { Controller, ControllerProps, FieldPath, FieldValues, FormProvider } from 'react-hook-form';
 
-import { cn } from '@/utils/ui';
-import { Label } from '@/components/primitives/label';
-import { cva } from 'class-variance-authority';
-import { FormFieldContext, FormItemContext, useFormField } from './form-context';
-import { RiErrorWarningFill, RiInformationFill } from 'react-icons/ri';
-import { BsFillInfoCircleFill } from 'react-icons/bs';
+import { Label, LabelAsterisk, LabelSub } from '@/components/primitives/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
+import { cn } from '@/utils/ui';
+import { BsFillInfoCircleFill } from 'react-icons/bs';
+import { RiErrorWarningFill, RiInformationFill } from 'react-icons/ri';
+import { Hint, HintIcon } from '../hint';
+import { FormFieldContext, FormItemContext, useFormField } from './form-context';
 
 const Form = FormProvider;
 
@@ -49,10 +49,13 @@ const FormLabel = React.forwardRef<
     <Label ref={ref} className={cn('text-foreground-950 flex items-center', className)} htmlFor={formItemId} {...props}>
       {children}
 
+      {!optional && <LabelAsterisk />}
+      {hint && <LabelSub>{hint}</LabelSub>}
+
+      {optional && <LabelSub>(optional)</LabelSub>}
       {tooltip && (
         <Tooltip>
           <TooltipTrigger
-            className="ml-1"
             type="button"
             onClick={(e) => {
               e.preventDefault();
@@ -64,10 +67,6 @@ const FormLabel = React.forwardRef<
           <TooltipContent className="max-w-56">{tooltip}</TooltipContent>
         </Tooltip>
       )}
-
-      {hint && <span className="text-foreground-400 ml-0.5 inline-flex items-center gap-1">{hint}</span>}
-
-      {optional && <span className="text-foreground-400 ml-0.5 inline-flex items-center gap-1">(optional)</span>}
     </Label>
   );
 });
@@ -90,30 +89,10 @@ const FormControl = React.forwardRef<React.ElementRef<typeof Slot>, React.Compon
 );
 FormControl.displayName = 'FormControl';
 
-const FormDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
-  ({ className, ...props }, ref) => {
-    const { formDescriptionId } = useFormField();
-
-    return (
-      <p ref={ref} id={formDescriptionId} className={cn('text-muted-foreground text-[0.8rem]', className)} {...props} />
-    );
-  }
-);
-FormDescription.displayName = 'FormDescription';
-
-const formMessageVariants = cva('flex items-center gap-1', {
-  variants: {
-    variant: {
-      default: '[&>svg]:text-foreground-400 text-foreground-500',
-      error: '[&>svg]:text-destructive [&>span]:text-destructive',
-    },
-  },
-});
-
 const FormMessagePure = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement> & { error?: string }
->(({ className, children, error, id, ...props }, ref) => {
+>(({ className, children, error, id, ...props }) => {
   const body = error ? error : children;
 
   if (!body) {
@@ -121,15 +100,10 @@ const FormMessagePure = React.forwardRef<
   }
 
   return (
-    <p
-      ref={ref}
-      id={id}
-      className={formMessageVariants({ variant: error ? 'error' : 'default', className })}
-      {...props}
-    >
-      <span>{error ? <RiErrorWarningFill className="size-4" /> : <RiInformationFill className="size-4" />}</span>
-      <span className="mt-[1px] text-xs leading-4">{body}</span>
-    </p>
+    <Hint hasError={!!error} {...props}>
+      <HintIcon as={error ? RiErrorWarningFill : RiInformationFill} />
+      {body}
+    </Hint>
   );
 });
 FormMessagePure.displayName = 'FormMessagePure';
@@ -141,4 +115,4 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<
 });
 FormMessage.displayName = 'FormMessage';
 
-export { Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage, FormMessagePure, FormField };
+export { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormMessagePure };

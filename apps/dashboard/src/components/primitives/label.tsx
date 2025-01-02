@@ -12,7 +12,7 @@ const LabelRoot = React.forwardRef<
     <LabelPrimitives.Root
       ref={forwardedRef}
       className={cn(
-        'text-label-sm text-text-strong group cursor-pointer',
+        'text-label-xs text-text-strong group cursor-pointer',
         'flex items-center gap-px',
         // disabled
         'aria-disabled:text-text-disabled',
@@ -45,7 +45,7 @@ function LabelSub({ children, className, ...rest }: React.HTMLAttributes<HTMLSpa
   return (
     <span
       className={cn(
-        'text-paragraph-sm text-text-sub',
+        'text-paragraph-xs text-text-sub',
         // disabled
         'group-aria-disabled:text-text-disabled',
         className
@@ -57,4 +57,4 @@ function LabelSub({ children, className, ...rest }: React.HTMLAttributes<HTMLSpa
   );
 }
 
-export { LabelAsterisk as Asterisk, LabelRoot as Label, LabelRoot as Root, LabelSub as Sub };
+export { LabelRoot as Label, LabelAsterisk as LabelAsterisk, LabelSub as LabelSub, LabelRoot as Root };

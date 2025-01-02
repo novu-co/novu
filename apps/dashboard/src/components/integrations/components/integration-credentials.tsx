@@ -4,15 +4,9 @@ import { Switch } from '@/components/primitives/switch';
 import { CredentialsKeyEnum, IProviderConfig } from '@novu/shared';
 import { Info } from 'lucide-react';
 import { Control } from 'react-hook-form';
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '../../../components/primitives/form/form';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../../../components/primitives/form/form';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../../utils/constants';
+import { Hint, HintIcon } from '../../primitives/hint';
 
 type IntegrationFormData = {
   name: string;
@@ -82,10 +76,10 @@ export function CredentialsSection({ provider, control }: CredentialsSectionProp
                 </FormControl>
               )}
               {credential.description && (
-                <FormDescription className="text-foreground-400 flex gap-1 text-xs">
-                  <Info className="relative top-[2px] h-3 w-3" />
-                  <span>{credential.description}</span>
-                </FormDescription>
+                <Hint className="text-foreground-400 flex gap-1 text-xs">
+                  <HintIcon as={Info} className="relative top-0 h-3 w-3" />
+                  {credential.description}
+                </Hint>
               )}
               <FormMessage />
             </FormItem>
