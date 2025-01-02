@@ -1,3 +1,4 @@
+import { Registry, RJSFSchema } from '@rjsf/utils';
 import { RiAddLine, RiSubtractFill } from 'react-icons/ri';
 import { CompactButton } from '../../../primitives/button-compact';
 
@@ -14,7 +15,9 @@ export const AddButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) 
   );
 };
 
-export const RemoveButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+export const RemoveButton = (
+  props: React.ButtonHTMLAttributes<HTMLButtonElement> & { registry?: Registry<any, RJSFSchema, any> }
+) => {
   return (
     <CompactButton
       icon={RiSubtractFill}
