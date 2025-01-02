@@ -101,7 +101,7 @@ const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>
           className
         )}
         value={value || calculatedValue}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+        onChange={(e) => {
           e.preventDefault();
           onChange?.(e);
         }}

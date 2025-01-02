@@ -16,7 +16,7 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
         type="text"
         className="text-foreground-600 w-[60px] py-1 text-xs"
         value={value}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
       />
       <Popover>
         <PopoverTrigger asChild>
