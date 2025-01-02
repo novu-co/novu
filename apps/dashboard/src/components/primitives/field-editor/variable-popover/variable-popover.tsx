@@ -1,21 +1,21 @@
-import { useState, useRef, useEffect } from 'react';
-import { PopoverContent } from '@/components/primitives/popover';
-import { Input, InputField } from '@/components/primitives/input';
 import { FormControl, FormItem } from '@/components/primitives/form/form';
+import { Input, InputField } from '@/components/primitives/input';
+import { PopoverContent } from '@/components/primitives/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { Switch } from '@/components/primitives/switch';
+import { useEffect, useRef, useState } from 'react';
 import { Code2 } from '../../../icons/code-2';
 import { Separator } from '../../separator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { TransformerItem } from './components/transformer-item';
 import { TransformerList } from './components/transformer-list';
-import { useVariableParser } from './hooks/use-variable-parser';
 import { useTransformerManager } from './hooks/use-transformer-manager';
-import { formatLiquidVariable } from './utils';
+import { useVariableParser } from './hooks/use-variable-parser';
 import type { VariablePopoverProps } from './types';
+import { formatLiquidVariable } from './utils';
 
 export function VariablePopover({ variable, onClose, onUpdate }: VariablePopoverProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const { parsedName, parsedDefaultValue, parsedTransformers } = useVariableParser(variable);
+  const { parsedName, parsedDefaultValue, parsedTransformers } = useVariableParser(variable || '');
   const [name, setName] = useState(parsedName);
   const [defaultVal, setDefaultVal] = useState(parsedDefaultValue);
   const [showRawLiquid, setShowRawLiquid] = useState(false);

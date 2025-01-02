@@ -1,15 +1,14 @@
+import { autocompletion, Completion, CompletionContext } from '@codemirror/autocomplete';
 import { EditorView } from '@uiw/react-codemirror';
-import { Completion, CompletionContext } from '@codemirror/autocomplete';
-import { autocompletion } from '@codemirror/autocomplete';
 
 import { Editor } from '@/components/primitives/editor';
+import { Popover, PopoverTrigger } from '@/components/primitives/popover';
 import { completions } from '@/utils/liquid-autocomplete';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
-import { Popover, PopoverTrigger } from '@/components/primitives/popover';
+import { Dispatch, SetStateAction, useCallback, useMemo, useRef, useState } from 'react';
 import { createVariablePlugin } from './variable-plugin';
-import { VariablePopover } from './variable-popover';
 import { variablePillTheme } from './variable-plugin/variable-theme';
-import { useCallback, useMemo, useRef, useState, Dispatch, SetStateAction } from 'react';
+import { VariablePopover } from './variable-popover';
 
 type SelectedVariable = {
   value: string;
@@ -66,7 +65,7 @@ export function FieldEditor({
     () => [
       autocompletion({
         override: [completionSource],
-        closeOnBlur: false,
+        closeOnBlur: true,
         defaultKeymap: true,
         activateOnTyping: true,
       }),
