@@ -160,7 +160,8 @@ function SettingField({
         ) : (
           <>
             <Input
-              className="cursor-default"
+              className="cursor-default !text-neutral-500"
+              disabled
               value={secret ? (showSecret ? value : maskSecret(value ?? '')) : value}
               readOnly={readOnly}
               trailingNode={
