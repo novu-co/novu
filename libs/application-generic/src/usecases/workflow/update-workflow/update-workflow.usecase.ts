@@ -12,6 +12,7 @@ import { ModuleRef } from '@nestjs/core';
 
 import {
   ChangeRepository,
+  ControlValuesRepository,
   MessageTemplateRepository,
   NotificationGroupRepository,
   NotificationStepEntity,
@@ -22,6 +23,7 @@ import {
 import {
   buildWorkflowPreferences,
   ChangeEntityTypeEnum,
+  ControlValuesLevelEnum,
   isBridgeWorkflow,
   PreferencesTypeEnum,
 } from '@novu/shared';
@@ -87,6 +89,7 @@ export class UpdateWorkflow {
     private deletePreferencesUsecase: DeletePreferencesUseCase,
     @Inject(forwardRef(() => GetWorkflowByIdsUseCase))
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
+    private controlValuesRepository: ControlValuesRepository,
   ) {}
 
   async execute(
@@ -753,6 +756,14 @@ export class UpdateWorkflow {
           workflowType: command.type,
         }),
       );
+
+      await this.controlValuesRepository.delete({
+        _environmentId: command.environmentId,
+        _organizationId: command.organizationId,
+        _workflowId: command.id,
+        _stepId: id,
+        level: ControlValuesLevelEnum.STEP_CONTROLS,
+      });
     }
   }
 }
