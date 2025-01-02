@@ -2,10 +2,10 @@ import { FocusEventHandler } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { FormControl, FormField, FormItem, FormMessagePure } from '@/components/primitives/form/form';
-import { Input, InputFieldPure } from '@/components/primitives/input-deprecated';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 import { cn } from '@/utils/ui';
+import { InputPure } from './primitives/input';
 
 const HEIGHT = {
   sm: {
@@ -47,12 +47,7 @@ const AmountInputContainer = ({
   hasError?: boolean;
 }) => {
   return (
-    <InputFieldPure
-      className={cn(HEIGHT[size].base, 'rounded-lg border pr-0', className)}
-      state={hasError ? 'error' : 'default'}
-    >
-      {children}
-    </InputFieldPure>
+    <div className={cn(HEIGHT[size].base, 'relative flex w-full rounded-lg border pr-0', className)}>{children}</div>
   );
 };
 
@@ -72,9 +67,9 @@ const AmountInputField = ({
   onBlur?: FocusEventHandler<HTMLInputElement>;
 }) => {
   return (
-    <Input
+    <InputPure
       type="number"
-      className="font-code min-w-[20ch] [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+      className="font-code h-[28px] min-w-[40px] border-0 border-r-0 pl-2 shadow-none ring-0 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       placeholder={placeholder}
       disabled={disabled}
       value={value}
@@ -119,7 +114,7 @@ const AmountUnitSelect = ({
       <SelectTrigger
         className={cn(
           HEIGHT[size].trigger,
-          'w-auto gap-1 rounded-l-none border-x-0 border-y-0 border-l bg-neutral-50 p-2 text-xs'
+          'gap-1 rounded-l-none border-x-0 border-y-0 border-l bg-neutral-50 p-2 text-xs'
         )}
       >
         <SelectValue />

@@ -4,7 +4,6 @@ import { RiEdit2Line, RiErrorWarningFill, RiImageEditFill } from 'react-icons/ri
 import { Avatar, AvatarImage } from '@/components/primitives/avatar';
 import { Button } from '@/components/primitives/button';
 import { FormMessage } from '@/components/primitives/form/form';
-import { InputField } from '@/components/primitives/input-deprecated';
 import { Label } from '@/components/primitives/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
@@ -14,6 +13,7 @@ import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { autocompletion } from '@codemirror/autocomplete';
 import { Editor } from '../editor';
+import { InputRoot, InputWrapper } from '../input';
 import { useFormField } from './form-context';
 
 const predefinedAvatars = [
@@ -81,19 +81,22 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
                 <Separator />
                 <div className="space-y-1">
                   <Label className="text-xs font-medium">Avatar URL</Label>
-                  <InputField size="fit">
-                    <Editor
-                      singleLine
-                      indentWithTab={false}
-                      fontFamily="inherit"
-                      ref={ref}
-                      placeholder="Enter avatar URL"
-                      id={name}
-                      extensions={extensions}
-                      value={`${value}`}
-                      onChange={onChange}
-                    />
-                  </InputField>
+                  <InputRoot>
+                    <InputWrapper className="flex h-9 items-center justify-center px-1">
+                      <Editor
+                        singleLine
+                        indentWithTab={false}
+                        fontFamily="inherit"
+                        ref={ref}
+                        placeholder="Enter avatar URL"
+                        id={name}
+                        extensions={extensions}
+                        value={`${value}`}
+                        onChange={onChange}
+                        className="flex h-full items-center"
+                      />
+                    </InputWrapper>
+                  </InputRoot>
                   <FormMessage />
                 </div>
               </div>

@@ -2,7 +2,6 @@
 
 import { Badge } from '@/components/primitives/badge';
 import { CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/primitives/command';
-import { inputVariants } from '@/components/primitives/input-deprecated';
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/primitives/popover';
 import { cn } from '@/utils/ui';
 import { Command } from 'cmdk';
@@ -13,6 +12,7 @@ type TagInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange
   value: string[];
   suggestions: string[];
   onChange: (tags: string[]) => void;
+  size?: 'sm' | 'md' | 'xs';
 };
 
 const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
@@ -64,7 +64,7 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
               ref={ref}
               autoComplete="off"
               value={inputValue}
-              className={cn(inputVariants(), 'flex-grow', className)}
+              className={cn('flex-grow', className)}
               placeholder="Type a tag and press Enter"
               onValueChange={(value) => {
                 setInputValue(value);

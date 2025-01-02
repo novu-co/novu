@@ -4,12 +4,12 @@ import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
-import { InputField } from '@/components/primitives/input-deprecated';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
 import { autocompletion } from '@codemirror/autocomplete';
+import { InputRoot, InputWrapper } from '../../../primitives/input';
 
 const subjectKey = 'subject';
 
@@ -29,18 +29,21 @@ export const BaseSubject = () => {
       render={({ field }) => (
         <FormItem className="w-full">
           <FormControl>
-            <InputField size="fit" className="px-1">
-              <Editor
-                singleLine
-                indentWithTab={false}
-                fontFamily="inherit"
-                placeholder={capitalize(field.name)}
-                id={field.name}
-                extensions={extensions}
-                value={field.value}
-                onChange={field.onChange}
-              />
-            </InputField>
+            <InputRoot>
+              <InputWrapper className="flex h-9 items-center justify-center px-1">
+                <Editor
+                  singleLine
+                  indentWithTab={false}
+                  fontFamily="inherit"
+                  placeholder={capitalize(field.name)}
+                  id={field.name}
+                  extensions={extensions}
+                  value={field.value}
+                  onChange={field.onChange}
+                  className="flex h-full items-center"
+                />
+              </InputWrapper>
+            </InputRoot>
           </FormControl>
           <FormMessage />
         </FormItem>

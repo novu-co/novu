@@ -1,12 +1,10 @@
-import { Input, InputField } from '@/components/primitives/input-deprecated';
+import { Input } from '@/components/primitives/input';
 import { SecretInput } from '@/components/primitives/secret-input';
 import { Switch } from '@/components/primitives/switch';
 import { CredentialsKeyEnum, IProviderConfig } from '@novu/shared';
-import { Info } from 'lucide-react';
 import { Control } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../../../components/primitives/form/form';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../../utils/constants';
-import { Hint, HintIcon } from '../../primitives/hint';
 
 type IntegrationFormData = {
   name: string;
@@ -43,9 +41,8 @@ export function CredentialsSection({ provider, control }: CredentialsSectionProp
           rules={{ required: credential.required ? `${credential.displayName} is required` : false }}
           render={({ field }) => (
             <FormItem className="mb-2">
-              <FormLabel htmlFor={credential.key}>
+              <FormLabel htmlFor={credential.key} optional={!credential.required}>
                 {credential.displayName}
-                {credential.required && <span className="text-destructive ml-1">*</span>}
               </FormLabel>
               {credential.type === 'switch' ? (
                 <div className="flex items-center justify-between gap-2">
@@ -64,24 +61,18 @@ export function CredentialsSection({ provider, control }: CredentialsSectionProp
                 </FormControl>
               ) : (
                 <FormControl>
-                  <InputField>
-                    <Input
-                      id={credential.key}
-                      type="text"
-                      {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
-                      placeholder={`Enter ${credential.displayName.toLowerCase()}`}
-                      {...field}
-                    />
-                  </InputField>
+                  <Input
+                    size="sm"
+                    id={credential.key}
+                    type="text"
+                    {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
+                    placeholder={`Enter ${credential.displayName.toLowerCase()}`}
+                    {...field}
+                  />
                 </FormControl>
               )}
-              {credential.description && (
-                <Hint className="text-foreground-400 flex gap-1 text-xs">
-                  <HintIcon as={Info} className="relative top-0 h-3 w-3" />
-                  {credential.description}
-                </Hint>
-              )}
-              <FormMessage />
+
+              <FormMessage>{credential.description}</FormMessage>
             </FormItem>
           )}
         />

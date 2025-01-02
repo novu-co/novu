@@ -45,7 +45,7 @@ import { Button } from '../primitives/button';
 import { CompactButton } from '../primitives/button-compact';
 import { CopyButton } from '../primitives/copy-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
-import { Input, InputField } from '../primitives/input-deprecated';
+import { Input } from '../primitives/input';
 import { Separator } from '../primitives/separator';
 import { Switch } from '../primitives/switch';
 import { TagInput } from '../primitives/tag-input';
@@ -280,9 +280,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <InputField>
-                        <Input placeholder="New workflow" {...field} disabled={isReadOnly} />
-                      </InputField>
+                      <Input placeholder="New workflow" {...field} disabled={isReadOnly} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -296,13 +294,14 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                   <FormItem>
                     <FormLabel>Identifier</FormLabel>
                     <FormControl>
-                      <InputField className="flex overflow-hidden pr-0">
-                        <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
-                        <CopyButton
-                          valueToCopy={field.value}
-                          className="h-[34px] rounded-none border-l border-neutral-200"
-                        />
-                      </InputField>
+                      <Input
+                        size="xs"
+                        trailingNode={<CopyButton valueToCopy={field.value} />}
+                        placeholder="Untitled"
+                        className="cursor-default"
+                        {...field}
+                        readOnly
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -12,7 +12,7 @@ import { useValidateBridgeUrl } from '@/hooks/use-validate-bridge-url';
 import { ConnectionStatus } from '@/utils/types';
 import { cn } from '@/utils/ui';
 import { Button } from '../primitives/button';
-import { Input, InputField } from '../primitives/input-deprecated';
+import { Input } from '../primitives/input';
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from '../primitives/popover';
 
 const formSchema = z.object({ bridgeUrl: z.string().url() });
@@ -86,10 +86,7 @@ export const EditBridgeUrlButton = () => {
                     <FormItem>
                       <FormLabel>Bridge Endpoint URL</FormLabel>
                       <FormControl>
-                        <InputField>
-                          <RiLinkM className="size-5 min-w-5" />
-                          <Input id="bridgeUrl" {...field} />
-                        </InputField>
+                        <Input leadingIcon={RiLinkM} id="bridgeUrl" {...field} />
                       </FormControl>
                       <FormMessage>URL (e.g., https://your.api.com/api/novu)</FormMessage>
                     </FormItem>

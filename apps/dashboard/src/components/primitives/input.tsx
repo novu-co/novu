@@ -1,5 +1,3 @@
-// AlignUI Input v0.0.0
-
 import { Slot } from '@radix-ui/react-slot';
 import * as React from 'react';
 
@@ -7,6 +5,7 @@ import type { PolymorphicComponentProps } from '@/utils/polymorphic';
 import { recursiveCloneChildren } from '@/utils/recursive-clone-children';
 import { tv, type VariantProps } from '@/utils/tv';
 import { IconType } from 'react-icons';
+import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../utils/constants';
 
 const INPUT_ROOT_NAME = 'InputRoot';
 const INPUT_WRAPPER_NAME = 'InputWrapper';
@@ -231,18 +230,28 @@ const InputEl = React.forwardRef<
     hasError,
   });
 
-  return <Component type={type} className={input({ class: className })} ref={forwardedRef} {...rest} />;
+  return (
+    <Component
+      type={type}
+      className={input({ class: className })}
+      ref={forwardedRef}
+      {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
+      {...rest}
+    />
+  );
 });
 InputEl.displayName = INPUT_EL_NAME;
 
-type InputProps = React.ComponentPropsWithoutRef<typeof InputEl> &
-  Pick<React.ComponentPropsWithoutRef<typeof InputRoot>, 'hasError' | 'size'> & {
+type InputProps = Omit<React.ComponentPropsWithoutRef<typeof InputRoot>, 'size'> &
+  React.ComponentPropsWithoutRef<typeof InputEl> & {
     leadingIcon?: IconType;
     trailingIcon?: IconType;
     leadingNode?: React.ReactNode;
     trailingNode?: React.ReactNode;
     inlineLeadingNode?: React.ReactNode;
     inlineTrailingNode?: React.ReactNode;
+    size?: 'md' | 'sm' | 'xs';
+    hasError?: boolean;
   };
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -275,6 +284,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     );
   }
 );
+
 Input.displayName = 'Input';
 
 function InputIcon<T extends React.ElementType = 'div'>({
@@ -283,7 +293,7 @@ function InputIcon<T extends React.ElementType = 'div'>({
   as,
   className,
   ...rest
-}: PolymorphicComponentProps<T, InputSharedProps>) {
+}: PolymorphicComponentProps<T, { size?: 'md' | 'sm' | 'xs' } & Omit<InputSharedProps, 'size'>>) {
   const Component = as || 'div';
   const { icon } = inputVariants({ size, hasError });
 
@@ -336,6 +346,7 @@ export {
   InputIcon as Icon,
   InputInlineAffix as InlineAffix,
   Input,
-  InputRoot as Root,
-  InputWrapper as Wrapper,
+  InputEl as InputPure,
+  InputRoot as InputRoot,
+  InputWrapper as InputWrapper,
 };

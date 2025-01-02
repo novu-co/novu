@@ -18,7 +18,7 @@ import { PageMeta } from '@/components/page-meta';
 import { Button } from '@/components/primitives/button';
 import { CopyButton } from '@/components/primitives/copy-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { Input, InputField } from '@/components/primitives/input-deprecated';
+import { Input } from '@/components/primitives/input';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarContent, SidebarFooter, SidebarHeader } from '@/components/side-navigation/sidebar';
 import TruncatedText from '@/components/truncated-text';
@@ -40,12 +40,7 @@ import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-co
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { ConfigureSmsStepPreview } from '@/components/workflow-editor/steps/sms/configure-sms-step-preview';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
-import {
-  AUTOCOMPLETE_PASSWORD_MANAGERS_OFF,
-  INLINE_CONFIGURABLE_STEP_TYPES,
-  STEP_TYPE_LABELS,
-  TEMPLATE_CONFIGURABLE_STEP_TYPES,
-} from '@/utils/constants';
+import { INLINE_CONFIGURABLE_STEP_TYPES, STEP_TYPE_LABELS, TEMPLATE_CONFIGURABLE_STEP_TYPES } from '@/utils/constants';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { CompactButton } from '../../primitives/button-compact';
 
@@ -231,16 +226,9 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Name</FormLabel>
-                        <InputField>
-                          <FormControl>
-                            <Input
-                              placeholder="Untitled"
-                              {...field}
-                              disabled={isReadOnly}
-                              {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
-                            />
-                          </FormControl>
-                        </InputField>
+                        <FormControl>
+                          <Input placeholder="Untitled" {...field} disabled={isReadOnly} />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -251,16 +239,16 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Identifier</FormLabel>
-                        <InputField className="flex overflow-hidden pr-0">
-                          <FormControl>
-                            <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
-                          </FormControl>
-                          <CopyButton
-                            valueToCopy={field.value}
-                            size="xs"
-                            className="h-[34px] rounded-none border-l border-neutral-200"
+                        <FormControl>
+                          <Input
+                            trailingNode={<CopyButton valueToCopy={field.value} />}
+                            placeholder="Untitled"
+                            className="cursor-default"
+                            {...field}
+                            readOnly
                           />
-                        </InputField>
+                        </FormControl>
+
                         <FormMessage />
                       </FormItem>
                     )}

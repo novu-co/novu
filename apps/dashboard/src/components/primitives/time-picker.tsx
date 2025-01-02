@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Input, InputFieldPure } from '@/components/primitives/input-deprecated';
+import { Input, InputPure } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { display12HourValue, getArrowByType, getDateByType, setDateByType, TimePickerType } from '@/utils/time';
 import { cn } from '@/utils/ui';
@@ -30,6 +30,7 @@ const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>
       period,
       onLeftFocus,
       onRightFocus,
+      size: _size,
       ...props
     },
     ref
@@ -100,13 +101,13 @@ const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>
           className
         )}
         value={value || calculatedValue}
-        onChange={(e) => {
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
           e.preventDefault();
           onChange?.(e);
         }}
         type={type}
         inputMode="decimal"
-        onKeyDown={(e) => {
+        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
           onKeyDown?.(e);
           handleKeyDown(e);
         }}
@@ -189,7 +190,7 @@ export const TimePicker = ({ value, onChange, hoursType = '12hours' }: TimePicke
   const periodRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <InputFieldPure className="h-7 w-max gap-0.5 rounded-lg border p-0">
+    <InputPure className="h-7 w-max gap-0.5 rounded-lg border p-0">
       <div className="flex h-full items-center gap-0.5 pl-1">
         <TimePickerInput
           picker={hoursType}
@@ -218,6 +219,6 @@ export const TimePicker = ({ value, onChange, hoursType = '12hours' }: TimePicke
         ref={periodRef}
         onLeftFocus={() => hourRef.current?.focus()}
       />
-    </InputFieldPure>
+    </InputPure>
   );
 };

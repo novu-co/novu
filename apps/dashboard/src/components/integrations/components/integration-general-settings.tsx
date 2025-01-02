@@ -1,5 +1,5 @@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { Input, InputField } from '@/components/primitives/input-deprecated';
+import { Input } from '@/components/primitives/input';
 import { Separator } from '@/components/primitives/separator';
 import { Switch } from '@/components/primitives/switch';
 import { Control } from 'react-hook-form';
@@ -81,9 +81,7 @@ export function GeneralSettings({ control, mode, hidePrimarySelector, disabledPr
               Name
             </FormLabel>
             <FormControl>
-              <InputField>
-                <Input id="name" {...field} />
-              </InputField>
+              <Input id="name" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -106,9 +104,7 @@ export function GeneralSettings({ control, mode, hidePrimarySelector, disabledPr
               Identifier
             </FormLabel>
             <FormControl>
-              <InputField>
-                <Input id="identifier" {...field} readOnly={mode === 'update'} />
-              </InputField>
+              <Input id="identifier" {...field} readOnly={mode === 'update'} />
             </FormControl>
             <FormMessage />
           </FormItem>
