@@ -3,6 +3,7 @@ import { Slot } from '@radix-ui/react-slot';
 import * as React from 'react';
 import { Controller, ControllerProps, FieldPath, FieldValues, FormProvider } from 'react-hook-form';
 
+import { Input } from '@/components/primitives/input';
 import { Label, LabelAsterisk, LabelSub } from '@/components/primitives/label';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { cn } from '@/utils/ui';
@@ -120,4 +121,11 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<
 });
 FormMessage.displayName = 'FormMessage';
 
-export { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormMessagePure };
+const FormTextInput = React.forwardRef<HTMLInputElement, React.ComponentPropsWithoutRef<typeof Input>>((props, ref) => {
+  const { error } = useFormField();
+
+  return <Input ref={ref} hasError={!!error} {...props} />;
+});
+FormTextInput.displayName = 'FormTextInput';
+
+export { Form, FormControl, FormField, FormTextInput as FormInput, FormItem, FormLabel, FormMessage, FormMessagePure };

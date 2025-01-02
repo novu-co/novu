@@ -1,6 +1,14 @@
 import { createWorkflow } from '@/api/workflows';
 import { Button } from '@/components/primitives/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormInput,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/primitives/form/form';
 import { Separator } from '@/components/primitives/separator';
 import {
   Sheet,
@@ -27,10 +35,10 @@ import { useForm } from 'react-hook-form';
 import { RiArrowRightSLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { Input } from './primitives/input';
 import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowSchema } from './workflow-editor/schema';
 
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
+
 export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -99,14 +107,13 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field, fieldState }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input
+                      <FormInput
                         {...field}
                         autoFocus
-                        hasError={!!fieldState.error}
                         onChange={(e) => {
                           field.onChange(e);
                           form.setValue('workflowId', slugify(e.target.value));
@@ -121,11 +128,11 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
               <FormField
                 control={form.control}
                 name="workflowId"
-                render={({ field, fieldState }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Identifier</FormLabel>
                     <FormControl>
-                      <Input {...field} disabled hasError={!!fieldState.error} />
+                      <FormInput {...field} disabled />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
