@@ -159,7 +159,11 @@ export class GeneratePreviewUsecase {
       finalVariablesExample = previewTemplateData.variablesExample;
     }
 
-    finalVariablesExample = _.merge(finalVariablesExample, commandVariablesExample || {});
+    if (commandVariablesExample) {
+      // merge only values of common keys between finalVariablesExample and commandVariablesExample
+      const commonKeys = _.pick(commandVariablesExample, Object.keys(finalVariablesExample));
+      finalVariablesExample = _.merge(finalVariablesExample, commonKeys);
+    }
 
     return finalVariablesExample;
   }
