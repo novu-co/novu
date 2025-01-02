@@ -41,7 +41,7 @@ import { ConfirmationModal } from '../confirmation-modal';
 import { DeleteWorkflowDialog } from '../delete-workflow-dialog';
 import { RouteFill } from '../icons';
 import { PageMeta } from '../page-meta';
-import { ButtonDeprecated } from '../primitives/button-deprecated';
+import { Button } from '../primitives/button';
 import { CopyButton } from '../primitives/copy-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
 import { Input, InputField } from '../primitives/input';
@@ -51,7 +51,6 @@ import { TagInput } from '../primitives/tag-input';
 import { Textarea } from '../primitives/textarea';
 import { Tooltip, TooltipContent, TooltipPortal, TooltipTrigger } from '../primitives/tooltip';
 import { usePromotionalBanner } from '../promotional/coming-soon-banner';
-import { Button } from '../primitives/button';
 
 type ConfigureWorkflowFormProps = {
   workflow: WorkflowResponseDto;
