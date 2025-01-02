@@ -49,7 +49,8 @@
     "newrelic": "^12.8.1",
     "reflect-metadata": "0.2.2",
     "rimraf": "^3.0.2",
-    "rxjs": "7.8.1"
+    "rxjs": "7.8.1",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@nestjs/cli": "10.4.5",

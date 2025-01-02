@@ -1670,6 +1670,9 @@ importers:
       rxjs:
         specifier: 7.8.1
         version: 7.8.1
+      yargs:
+        specifier: ^17.7.2
+        version: 17.7.2
     devDependencies:
       '@nestjs/cli':
         specifier: 10.4.5
