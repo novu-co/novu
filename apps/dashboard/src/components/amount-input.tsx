@@ -39,12 +39,10 @@ const AmountInputContainer = ({
   children,
   className,
   size = 'sm',
-  hasError,
 }: {
   children?: React.ReactNode | React.ReactNode[];
   className?: string;
   size?: 'sm' | 'md';
-  hasError?: boolean;
 }) => {
   return (
     <div className={cn(HEIGHT[size].base, 'relative flex w-full rounded-lg border pr-0', className)}>{children}</div>
@@ -156,7 +154,7 @@ const AmountInput = ({
 
   return (
     <>
-      <AmountInputContainer className={className} hasError={!!input.error}>
+      <AmountInputContainer className={className}>
         <FormField
           control={control}
           name={fields.inputKey}
