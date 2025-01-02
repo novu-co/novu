@@ -1,9 +1,10 @@
-import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { FaCode } from 'react-icons/fa6';
 import { WorkflowOriginEnum } from '@novu/shared';
+import React from 'react';
+import { FaCode } from 'react-icons/fa6';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { ArrowRight, RouteFill } from '@/components/icons';
+import { RouteFill } from '@/components/icons';
+import { Badge } from '@/components/primitives/badge';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,12 +13,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/primitives/breadcrumb';
-import { Button } from '@/components/primitives/button';
-import { useEnvironment } from '@/context/environment/hooks';
-import { buildRoute, ROUTES } from '@/utils/routes';
-import { useFetchWorkflow } from '@/hooks/use-fetch-workflow';
 import TruncatedText from '@/components/truncated-text';
-import { Badge } from '@/components/primitives/badge';
+import { useEnvironment } from '@/context/environment/hooks';
+import { useFetchWorkflow } from '@/hooks/use-fetch-workflow';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { RiArrowLeftSLine } from 'react-icons/ri';
+import { CompactButton } from '../primitives/button-compact';
 
 export const EditorBreadcrumbs = () => {
   const { workflowSlug = '' } = useParams<{ workflowSlug: string }>();
@@ -47,9 +48,13 @@ export const EditorBreadcrumbs = () => {
 
   return (
     <div className="flex items-center overflow-hidden">
-      <Button variant="link" onClick={handleBackNav}>
-        <ArrowRight className="text-neutral-950" />
-      </Button>
+      <CompactButton
+        size="lg"
+        className="mr-1"
+        variant="ghost"
+        icon={RiArrowLeftSLine}
+        onClick={handleBackNav}
+      ></CompactButton>
       <Breadcrumb>
         <BreadcrumbList>
           {breadcrumbs.map(({ label, href, node }) => (

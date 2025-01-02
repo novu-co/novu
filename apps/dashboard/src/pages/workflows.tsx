@@ -35,8 +35,7 @@ export const WorkflowsPage = () => {
           <div className="invisible flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2"></div>
 
           <CreateWorkflowButton asChild>
-            <Button variant="primary" size="sm">
-              <RiRouteFill className="size-4" />
+            <Button mode="gradient" variant="primary" size="xs" leadingIcon={RiRouteFill}>
               Create workflow
             </Button>
           </CreateWorkflowButton>

@@ -1,10 +1,4 @@
-import { EditorView } from '@uiw/react-codemirror';
-import merge from 'lodash.merge';
-import { ComponentProps, useMemo } from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
-import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
-
-import { Button, buttonVariants } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +24,12 @@ import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesT
 import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
 import { autocompletion } from '@codemirror/autocomplete';
+import { EditorView } from '@uiw/react-codemirror';
+import merge from 'lodash.merge';
+import { ComponentProps, useMemo } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
+import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
+import { CompactButton } from './primitives/button-compact';
 
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
@@ -55,21 +55,25 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
         <div className={cn('mt-3 flex items-center gap-1')}>
           <div className="border-neutral-alpha-200 relative flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
             {!primaryAction && !secondaryAction && (
-              <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'z-10 cursor-not-allowed')}>
-                <RiForbid2Line className="size-4" />
-                <span>No action</span>
-              </div>
+              <Button
+                mode="outline"
+                size="2xs"
+                className="h-6 border-[1px] border-dashed shadow-none ring-0"
+                trailingIcon={RiForbid2Line}
+              >
+                No action
+              </Button>
             )}
             {primaryAction && (
               <ConfigureActionPopover asChild fields={{ actionKey: primaryActionKey }}>
-                <Button variant="primary" size="xs" className="z-10">
+                <Button variant="primary" size="2xs" className="z-10 h-6">
                   {primaryAction.label}
                 </Button>
               </ConfigureActionPopover>
             )}
             {secondaryAction && (
               <ConfigureActionPopover asChild fields={{ actionKey: secondaryActionKey }}>
-                <Button variant="outline" size="xs" className="z-10">
+                <Button variant="secondary" mode="outline" size="2xs" className="z-10 h-6">
                   {secondaryAction.label}
                 </Button>
               </ConfigureActionPopover>
@@ -77,9 +81,9 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
             <DropdownMenuTrigger className="absolute size-full" />
           </div>
           <DropdownMenuTrigger asChild>
-            <Button size={'icon'} variant={'ghost'}>
-              <RiExpandUpDownLine className="size-4" />
-            </Button>
+            <CompactButton icon={RiExpandUpDownLine} size="lg" variant="ghost">
+              <span className="sr-only">Actions</span>
+            </CompactButton>
           </DropdownMenuTrigger>
         </div>
         <DropdownMenuContent
@@ -99,10 +103,15 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
               onMenuItemClick?.();
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'pointer-events-none gap-2')}>
-              <RiForbid2Line className="size-4" />
-              <span className="cursor-default">No action</span>
-            </div>
+            <Button
+              mode="outline"
+              variant="secondary"
+              size="2xs"
+              className="h-6 border-[1px] border-dashed shadow-none ring-0"
+              trailingIcon={RiForbid2Line}
+            >
+              No action
+            </Button>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
@@ -118,9 +127,9 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
               onMenuItemClick?.();
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
+            <Button variant="primary" size="2xs" className="pointer-events-none h-6">
               Primary action
-            </div>
+            </Button>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
@@ -140,12 +149,13 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
               onMenuItemClick?.();
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
+            <Button variant="primary" size="2xs" className="pointer-events-none h-6">
               Primary action
-            </div>
-            <div className={cn(buttonVariants({ variant: 'outline', size: 'xs' }), 'pointer-events-none')}>
+            </Button>
+
+            <Button variant="secondary" mode="outline" size="2xs" className="pointer-events-none h-6">
               Secondary action
-            </div>
+            </Button>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

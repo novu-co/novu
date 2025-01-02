@@ -42,6 +42,7 @@ import { DeleteWorkflowDialog } from '../delete-workflow-dialog';
 import { RouteFill } from '../icons';
 import { PageMeta } from '../page-meta';
 import { Button } from '../primitives/button';
+import { CompactButton } from '../primitives/button-compact';
 import { CopyButton } from '../primitives/copy-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
 import { Input, InputField } from '../primitives/input';
@@ -188,9 +189,9 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
            */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="ml-auto h-[20px] w-[22px]">
-                <RiMore2Fill />
-              </Button>
+              <CompactButton size="md" icon={RiMore2Fill} variant="ghost" className="ml-auto">
+                <span className="sr-only">More</span>
+              </CompactButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuGroup>
@@ -297,7 +298,10 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                     <FormControl>
                       <InputField className="flex overflow-hidden pr-0">
                         <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
-                        <CopyButton size="input-right" valueToCopy={field.value} />
+                        <CopyButton
+                          valueToCopy={field.value}
+                          className="h-[34px] rounded-none border-l border-neutral-200"
+                        />
                       </InputField>
                     </FormControl>
                     <FormMessage />
@@ -354,11 +358,12 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
         <SidebarContent size="lg">
           <Link to={ROUTES.EDIT_WORKFLOW_PREFERENCES}>
             <Button
-              variant="outline"
+              variant="secondary"
+              mode="outline"
+              leadingIcon={RiSettingsLine}
               className="flex w-full justify-start gap-1.5 p-1.5 text-xs font-medium"
               type="button"
             >
-              <RiSettingsLine className="h-4 w-4 text-neutral-600" />
               Configure channel preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
             </Button>
           </Link>

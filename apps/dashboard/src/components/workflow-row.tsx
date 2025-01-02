@@ -1,6 +1,5 @@
 import { PAUSE_MODAL_TITLE, PauseModalDescription } from '@/components/pause-workflow-dialog';
 import { Badge } from '@/components/primitives/badge';
-import { Button } from '@/components/primitives/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,6 +39,7 @@ import { Link } from 'react-router-dom';
 import { type ExternalToast } from 'sonner';
 import { ConfirmationModal } from './confirmation-modal';
 import { DeleteWorkflowDialog } from './delete-workflow-dialog';
+import { CompactButton } from './primitives/button-compact';
 import { ToastIcon } from './primitives/sonner';
 import { showToast } from './primitives/sonner-helpers';
 import { TimeDisplayHoverCard } from './time-display-hover-card';
@@ -241,9 +241,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
          */}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="z-10 h-8 w-8 p-0">
-              <RiMore2Fill className="h-4 w-4" />
-            </Button>
+            <CompactButton icon={RiMore2Fill} variant="ghost" className="z-10 h-8 w-8 p-0"></CompactButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
             <DropdownMenuGroup>

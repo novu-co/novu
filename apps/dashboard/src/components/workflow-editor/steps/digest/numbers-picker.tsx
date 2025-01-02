@@ -1,6 +1,6 @@
+import type { PopoverContentProps } from '@radix-ui/react-popover';
 import { KeyboardEventHandler, useMemo, useRef, useState } from 'react';
 import { RiCornerDownLeftLine } from 'react-icons/ri';
-import type { PopoverContentProps } from '@radix-ui/react-popover';
 
 import { Button } from '@/components/primitives/button';
 import { InputFieldPure } from '@/components/primitives/input';
@@ -97,7 +97,8 @@ export const NumbersPicker = <T extends string | number>({
                 <Button
                   key={day}
                   size="sm"
-                  variant={internalSelectedNumbers.includes(day as T) ? 'primary' : 'ghost'}
+                  variant="secondary"
+                  mode={internalSelectedNumbers.includes(day as T) ? 'filled' : 'ghost'}
                   className="size-8 [&_span]:transition-none"
                   onClick={() => onNumberClick(day as T)}
                 >
@@ -107,8 +108,9 @@ export const NumbersPicker = <T extends string | number>({
             </div>
             <div className="flex items-center justify-end gap-2 border-t border-t-neutral-100 p-3">
               <Button
-                size="sm"
-                variant="outline"
+                size="2xs"
+                variant="secondary"
+                mode="outline"
                 onClick={() => {
                   setInternalSelectedNumbers(numbers);
                   onClose();
@@ -117,7 +119,7 @@ export const NumbersPicker = <T extends string | number>({
                 Cancel
               </Button>
               <Button
-                size="sm"
+                size="2xs"
                 variant="primary"
                 onClick={() => {
                   onNumbersChange(internalSelectedNumbers);
