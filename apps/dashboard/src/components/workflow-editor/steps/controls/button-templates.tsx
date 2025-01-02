@@ -1,19 +1,28 @@
 import { RiAddLine, RiSubtractFill } from 'react-icons/ri';
-import { IconButtonProps } from '@rjsf/utils';
-import { Button } from '@/components/primitives/button-deprecated';
+import { CompactButton } from '../../../primitives/button-compact';
 
-export const AddButton = (props: IconButtonProps) => {
+export const AddButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   return (
-    <Button variant="ghost" className="size-4 rounded-sm p-0.5" type="button" {...props} title="Add item">
-      <RiAddLine className="text-foreground-600 size-3" />
-    </Button>
+    <CompactButton
+      icon={RiAddLine}
+      variant="ghost"
+      className="size-4 rounded-sm p-0.5"
+      type="button"
+      {...props}
+      title="Add item"
+    ></CompactButton>
   );
 };
 
-export const RemoveButton = (props: IconButtonProps) => {
+export const RemoveButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => {
   return (
-    <Button variant="ghost" className="size-4 rounded-sm p-0.5" type="button" {...props} title="Remove item">
-      <RiSubtractFill className="text-foreground-600 size-3" />
-    </Button>
+    <CompactButton
+      icon={RiSubtractFill}
+      variant="ghost"
+      className="size-4 rounded-sm p-0.5"
+      type="button"
+      {...props}
+      title="Remove item"
+    ></CompactButton>
   );
 };
