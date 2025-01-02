@@ -68,10 +68,16 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
               placeholder="Type a tag and press Enter"
               onValueChange={(value) => {
                 setInputValue(value);
-                setIsOpen(true);
+                if (value) {
+                  setIsOpen(true);
+                }
               }}
-              onFocusCapture={() => setIsOpen(true)}
-              onBlurCapture={() => setIsOpen(false)}
+              onClick={() => setIsOpen(true)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  setIsOpen(false);
+                }
+              }}
               {...rest}
             />
           </PopoverAnchor>
@@ -95,8 +101,15 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
               onOpenAutoFocus={(e) => {
                 e.preventDefault();
               }}
-              onFocusOutside={(e) => e.preventDefault()}
-              onInteractOutside={(e) => e.preventDefault()}
+              align="start"
+              sideOffset={4}
+              onPointerDownOutside={(e) => {
+                const target = e.target as HTMLElement;
+
+                if (!target.closest('[cmdk-input-wrapper]')) {
+                  setIsOpen(false);
+                }
+              }}
             >
               <CommandGroup>
                 {inputValue !== '' && !validSuggestions.includes(inputValue) && (
