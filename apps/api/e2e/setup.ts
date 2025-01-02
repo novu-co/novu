@@ -12,6 +12,8 @@ async function seedClerkMongo() {
   if (isClerkEnabled()) {
     const clerkClientMock = require('@novu/ee-auth')?.ClerkClientMock;
 
+    console.log('process.env.MONGO_URL', process.env.MONGO_URL);
+
     if (clerkClientMock) {
       const clerkClient = new clerkClientMock();
       await clerkClient.seedDatabase();
