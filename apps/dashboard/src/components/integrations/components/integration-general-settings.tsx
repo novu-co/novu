@@ -1,8 +1,8 @@
-import { Control } from 'react-hook-form';
-import { Input, InputField } from '@/components/primitives/input';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
+import { Input, InputField } from '@/components/primitives/input-deprecated';
 import { Separator } from '@/components/primitives/separator';
 import { Switch } from '@/components/primitives/switch';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
+import { Control } from 'react-hook-form';
 
 type IntegrationFormData = {
   name: string;

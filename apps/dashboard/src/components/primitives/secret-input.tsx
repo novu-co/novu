@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../utils/constants';
 import { CompactButton } from './button-compact';
-import { Input, InputField } from './input';
+import { Input, InputField } from './input-deprecated';
 
 interface SecretInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   value: string;

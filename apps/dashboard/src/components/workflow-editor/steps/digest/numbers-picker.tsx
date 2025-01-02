@@ -3,7 +3,7 @@ import { KeyboardEventHandler, useMemo, useRef, useState } from 'react';
 import { RiCornerDownLeftLine } from 'react-icons/ri';
 
 import { Button } from '@/components/primitives/button';
-import { InputFieldPure } from '@/components/primitives/input';
+import { InputFieldPure } from '@/components/primitives/input-deprecated';
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from '@/components/primitives/popover';
 import TruncatedText from '@/components/truncated-text';
 import { cn } from '@/utils/ui';

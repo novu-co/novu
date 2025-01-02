@@ -3,7 +3,7 @@ import { Button } from '@/components/primitives/button';
 import { Card, CardContent, CardHeader } from '@/components/primitives/card';
 import { CopyButton } from '@/components/primitives/copy-button';
 import { Form } from '@/components/primitives/form/form';
-import { Input, InputField } from '@/components/primitives/input';
+import { Input, InputField } from '@/components/primitives/input-deprecated';
 import { Skeleton } from '@/components/primitives/skeleton';
 import { ExternalLink } from '@/components/shared/external-link';
 import { useEnvironment } from '@/context/environment/hooks';

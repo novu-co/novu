@@ -8,7 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { ColorPicker } from '@/components/primitives/color-picker';
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem } from '@/components/primitives/form/form';
-import { InputField } from '@/components/primitives/input';
+import { InputField } from '@/components/primitives/input-deprecated';
 import { capitalize } from '@/utils/string';
 import type { InboxPlaygroundFormData } from './inbox-playground';
 

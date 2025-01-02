@@ -4,7 +4,7 @@ import { RiEdit2Line, RiErrorWarningFill, RiImageEditFill } from 'react-icons/ri
 import { Avatar, AvatarImage } from '@/components/primitives/avatar';
 import { Button } from '@/components/primitives/button';
 import { FormMessage } from '@/components/primitives/form/form';
-import { InputField } from '@/components/primitives/input';
+import { InputField } from '@/components/primitives/input-deprecated';
 import { Label } from '@/components/primitives/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
@@ -80,7 +80,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
                 </div>
                 <Separator />
                 <div className="space-y-1">
-                  <Label>Avatar URL</Label>
+                  <Label className="text-xs font-medium">Avatar URL</Label>
                   <InputField size="fit">
                     <Editor
                       singleLine

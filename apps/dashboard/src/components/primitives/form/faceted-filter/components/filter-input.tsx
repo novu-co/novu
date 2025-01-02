@@ -1,8 +1,8 @@
-import { Input } from '../../../input';
 import { cn } from '../../../../../utils/ui';
-import { SizeType } from '../types';
-import { STYLES } from '../styles';
 import { EnterLineIcon } from '../../../../icons/enter-line';
+import { Input } from '../../../input-deprecated';
+import { STYLES } from '../styles';
+import { SizeType } from '../types';
 
 interface FilterInputProps {
   inputRef: React.RefObject<HTMLInputElement>;

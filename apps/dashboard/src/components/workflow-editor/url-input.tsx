@@ -3,7 +3,7 @@ import { useFormContext } from 'react-hook-form';
 
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormMessagePure } from '@/components/primitives/form/form';
-import { Input, InputFieldProps, InputFieldPure, InputProps } from '@/components/primitives/input';
+import { Input, InputFieldProps, InputFieldPure, InputProps } from '@/components/primitives/input-deprecated';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
 import { completions } from '@/utils/liquid-autocomplete';

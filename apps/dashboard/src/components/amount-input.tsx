@@ -1,12 +1,11 @@
 import { FocusEventHandler } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { cn } from '@/utils/ui';
 import { FormControl, FormField, FormItem, FormMessagePure } from '@/components/primitives/form/form';
-import { Input } from '@/components/primitives/input';
-import { InputFieldPure } from '@/components/primitives/input';
+import { Input, InputFieldPure } from '@/components/primitives/input-deprecated';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
+import { cn } from '@/utils/ui';
 
 const HEIGHT = {
   sm: {

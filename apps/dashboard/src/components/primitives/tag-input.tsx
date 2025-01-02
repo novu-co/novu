@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/primitives/badge';
 import { CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/primitives/command';
-import { inputVariants } from '@/components/primitives/input';
+import { inputVariants } from '@/components/primitives/input-deprecated';
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/primitives/popover';
 import { cn } from '@/utils/ui';
 import { Command } from 'cmdk';

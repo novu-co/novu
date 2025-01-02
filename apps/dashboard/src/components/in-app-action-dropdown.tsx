@@ -14,7 +14,7 @@ import {
   FormMessage,
   FormMessagePure,
 } from '@/components/primitives/form/form';
-import { InputField } from '@/components/primitives/input';
+import { InputField } from '@/components/primitives/input-deprecated';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import { URLInput } from '@/components/workflow-editor/url-input';

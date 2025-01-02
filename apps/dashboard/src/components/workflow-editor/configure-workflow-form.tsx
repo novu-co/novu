@@ -45,7 +45,7 @@ import { Button } from '../primitives/button';
 import { CompactButton } from '../primitives/button-compact';
 import { CopyButton } from '../primitives/copy-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
-import { Input, InputField } from '../primitives/input';
+import { Input, InputField } from '../primitives/input-deprecated';
 import { Separator } from '../primitives/separator';
 import { Switch } from '../primitives/switch';
 import { TagInput } from '../primitives/tag-input';

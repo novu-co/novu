@@ -5,7 +5,7 @@ import { useFormContext } from 'react-hook-form';
 import { Code2 } from '@/components/icons/code-2';
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { InputFieldPure } from '@/components/primitives/input';
+import { InputFieldPure } from '@/components/primitives/input-deprecated';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';

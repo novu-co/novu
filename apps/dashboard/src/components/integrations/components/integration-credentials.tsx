@@ -1,9 +1,9 @@
-import { Control } from 'react-hook-form';
-import { Input, InputField } from '@/components/primitives/input';
-import { Switch } from '@/components/primitives/switch';
+import { Input, InputField } from '@/components/primitives/input-deprecated';
 import { SecretInput } from '@/components/primitives/secret-input';
-import { Info } from 'lucide-react';
+import { Switch } from '@/components/primitives/switch';
 import { CredentialsKeyEnum, IProviderConfig } from '@novu/shared';
+import { Info } from 'lucide-react';
+import { Control } from 'react-hook-form';
 import {
   FormControl,
   FormDescription,

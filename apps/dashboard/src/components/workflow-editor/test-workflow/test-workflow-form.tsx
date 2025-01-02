@@ -18,7 +18,7 @@ import { RiFileCopyLine, RiSendPlaneFill } from 'react-icons/ri';
 import { Code2 } from '../../icons/code-2';
 import { CopyButton } from '../../primitives/copy-button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../../primitives/form/form';
-import { Input, InputField } from '../../primitives/input';
+import { Input, InputField } from '../../primitives/input-deprecated';
 import { Panel, PanelContent, PanelHeader } from '../../primitives/panel';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitives/tabs';
 import { TestWorkflowFormType } from '../schema';

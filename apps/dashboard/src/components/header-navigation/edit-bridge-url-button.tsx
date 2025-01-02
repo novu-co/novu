@@ -1,19 +1,19 @@
-import { useLayoutEffect, useState } from 'react';
-import { RiLinkM, RiPencilFill } from 'react-icons/ri';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useLayoutEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { RiLinkM, RiPencilFill } from 'react-icons/ri';
 import * as z from 'zod';
 
-import { cn } from '@/utils/ui';
-import { Popover, PopoverContent, PopoverTrigger, PopoverPortal } from '../primitives/popover';
-import { Input, InputField } from '../primitives/input';
-import { ConnectionStatus } from '@/utils/types';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useFetchBridgeHealthCheck } from '@/hooks/use-fetch-bridge-health-check';
-import { useValidateBridgeUrl } from '@/hooks/use-validate-bridge-url';
 import { useUpdateBridgeUrl } from '@/hooks/use-update-bridge-url';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
+import { useValidateBridgeUrl } from '@/hooks/use-validate-bridge-url';
+import { ConnectionStatus } from '@/utils/types';
+import { cn } from '@/utils/ui';
 import { Button } from '../primitives/button';
+import { Input, InputField } from '../primitives/input-deprecated';
+import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from '../primitives/popover';
 
 const formSchema = z.object({ bridgeUrl: z.string().url() });
 

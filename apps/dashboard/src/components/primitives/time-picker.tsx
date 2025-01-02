@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Input, InputFieldPure } from '@/components/primitives/input';
+import { Input, InputFieldPure } from '@/components/primitives/input-deprecated';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
-import { cn } from '@/utils/ui';
 import { display12HourValue, getArrowByType, getDateByType, setDateByType, TimePickerType } from '@/utils/time';
+import { cn } from '@/utils/ui';
 
 interface TimePickerInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   picker: TimePickerType;
