@@ -1,7 +1,7 @@
 // AlignUI LinkButton v0.0.0
 
-import * as React from 'react';
 import { Slot, Slottable } from '@radix-ui/react-slot';
+import * as React from 'react';
 
 import { PolymorphicComponentProps } from '@/utils/polymorphic';
 import { recursiveCloneChildren } from '@/utils/recursive-clone-children';
@@ -23,7 +23,7 @@ export const linkButtonVariants = tv({
       // focus
       'focus:outline-none focus-visible:underline',
       // disabled
-      'disabled:pointer-events-none disabled:text-text-disabled-300 disabled:no-underline',
+      'disabled:pointer-events-none disabled:text-text-disabled disabled:no-underline',
     ],
     icon: 'shrink-0',
   },
@@ -32,13 +32,13 @@ export const linkButtonVariants = tv({
       gray: {
         root: [
           // base
-          'text-text-sub-600',
+          'text-text-sub',
           // focus
-          'focus-visible:text-text-strong-950',
+          'focus-visible:text-text-strong',
         ],
       },
       black: {
-        root: 'text-text-strong-950',
+        root: 'text-text-strong',
       },
       primary: {
         root: [
@@ -53,7 +53,7 @@ export const linkButtonVariants = tv({
           // base
           'text-error-base',
           // hover
-          'hover:text-red-700',
+          'hover:text-red',
         ],
       },
       modifiable: {},
@@ -146,4 +146,4 @@ const LinkButton = React.forwardRef<
 });
 LinkButton.displayName = 'LinkButton';
 
-export { LinkButtonRoot as Root, LinkButtonIcon as Icon, LinkButton };
+export { LinkButtonIcon as Icon, LinkButton, LinkButtonRoot as Root };

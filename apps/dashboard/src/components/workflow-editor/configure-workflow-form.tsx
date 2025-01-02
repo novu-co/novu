@@ -42,6 +42,7 @@ import { DeleteWorkflowDialog } from '../delete-workflow-dialog';
 import { RouteFill } from '../icons';
 import { PageMeta } from '../page-meta';
 import { Button } from '../primitives/button';
+import { CompactButton } from '../primitives/button-compact';
 import { CopyButton } from '../primitives/copy-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
 import { Input, InputField } from '../primitives/input';
@@ -188,13 +189,9 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
            */}
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <Button
-                mode="ghost"
-                leadingIcon={RiMore2Fill}
-                variant="secondary"
-                size="sm"
-                className="ml-auto h-5 w-5 p-0.5 px-1"
-              ></Button>
+              <CompactButton size="md" icon={RiMore2Fill} variant="ghost" className="ml-auto">
+                <span className="sr-only">More</span>
+              </CompactButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuGroup>
