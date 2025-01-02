@@ -12,6 +12,7 @@ import { ModuleRef } from '@nestjs/core';
 
 import {
   ChangeRepository,
+  ControlValuesRepository,
   MessageTemplateRepository,
   NotificationGroupRepository,
   NotificationStepEntity,
@@ -22,6 +23,7 @@ import {
 import {
   buildWorkflowPreferences,
   ChangeEntityTypeEnum,
+  ControlValuesLevelEnum,
   isBridgeWorkflow,
   PreferencesTypeEnum,
 } from '@novu/shared';
@@ -52,8 +54,6 @@ import {
   GetWorkflowByIdsUseCase,
   DeletePreferencesCommand,
   DeletePreferencesUseCase,
-  DeleteControlValuesUseCase,
-  DeleteControlValuesCommand,
 } from '../..';
 import {
   DeleteMessageTemplate,
@@ -89,8 +89,7 @@ export class UpdateWorkflow {
     private deletePreferencesUsecase: DeletePreferencesUseCase,
     @Inject(forwardRef(() => GetWorkflowByIdsUseCase))
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    @Inject(forwardRef(() => DeleteControlValuesUseCase))
-    private deleteControlValuesUseCase: DeleteControlValuesUseCase,
+    private controlValuesRepository: ControlValuesRepository,
   ) {}
 
   async execute(
@@ -758,15 +757,13 @@ export class UpdateWorkflow {
         }),
       );
 
-      await this.deleteControlValuesUseCase.execute(
-        DeleteControlValuesCommand.create({
-          environmentId: command.environmentId,
-          organizationId: command.organizationId,
-          userId: command.userId,
-          stepId: id,
-          workflowId: command.id,
-        }),
-      );
+      await this.controlValuesRepository.delete({
+        _environmentId: command.environmentId,
+        _organizationId: command.organizationId,
+        _workflowId: command.id,
+        _stepId: id,
+        level: ControlValuesLevelEnum.STEP_CONTROLS,
+      });
     }
   }
 }

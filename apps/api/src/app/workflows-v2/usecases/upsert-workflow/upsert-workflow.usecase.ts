@@ -43,9 +43,7 @@ import {
   WorkflowInternalResponseDto,
   TierRestrictionsValidateUsecase,
   UpsertControlValuesCommand,
-  DeleteControlValuesCommand,
   UpsertControlValuesUseCase,
-  DeleteControlValuesUseCase,
   TierRestrictionsValidateCommand,
   dashboardSanitizeControlValues,
   PinoLogger,
@@ -68,7 +66,6 @@ export class UpsertWorkflowUseCase {
     private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase,
     private controlValuesRepository: ControlValuesRepository,
     private upsertControlValuesUseCase: UpsertControlValuesUseCase,
-    private deleteControlValuesUseCase: DeleteControlValuesUseCase,
     private tierRestrictionsValidateUsecase: TierRestrictionsValidateUsecase,
     private logger: PinoLogger
   ) {}
@@ -393,15 +390,13 @@ export class UpsertWorkflowUseCase {
     command: UpsertWorkflowCommand
   ) {
     if (update.shouldDelete) {
-      return this.deleteControlValuesUseCase.execute(
-        DeleteControlValuesCommand.create({
-          environmentId: command.user.environmentId,
-          organizationId: command.user.organizationId,
-          stepId: update.step._templateId,
-          workflowId,
-          userId: command.user._id,
-        })
-      );
+      return this.controlValuesRepository.delete({
+        _environmentId: command.user.environmentId,
+        _organizationId: command.user.organizationId,
+        _workflowId: workflowId,
+        _stepId: update.step._templateId,
+        level: ControlValuesLevelEnum.STEP_CONTROLS,
+      });
     }
 
     return this.upsertControlValuesUseCase.execute(
