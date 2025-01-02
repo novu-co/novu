@@ -120,7 +120,7 @@ async function updateEnvFile() {
 
     // Write the updated .env file
     writeFileSync(envPath, updatedEnvContent);
-    console.log('.env file updated successfully');
+    console.log(`${envPath} file updated successfully`);
   } catch (err) {
     console.error('Error updating .env file:', err);
   }
