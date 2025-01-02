@@ -56,14 +56,15 @@ const panOnDrag = [1, 2];
 // y distance = node height + space between nodes
 const Y_DISTANCE = NODE_HEIGHT + 50;
 
-const mapStepToNodeContent = (step: Step): string => {
+const mapStepToNodeContent = (step: Step): string | undefined => {
   const controlValues = step.controls.values;
 
   switch (step.type) {
     case StepTypeEnum.DELAY:
       return `Delay for ${controlValues.amount} ${controlValues.unit}`;
     default:
-      return 'Unknown step type';
+      // will be overridden by the node default content (nodes.tsx)
+      return undefined;
   }
 };
 
@@ -76,11 +77,7 @@ const mapStepToNode = ({
   previousPosition: { x: number; y: number };
   step: Step;
 }): Node<NodeData, keyof typeof nodeTypes> => {
-  let content = '';
-
-  if (step.type === StepTypeEnum.DELAY) {
-    content = mapStepToNodeContent(step);
-  }
+  const content = mapStepToNodeContent(step);
 
   const error = getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues);
 
