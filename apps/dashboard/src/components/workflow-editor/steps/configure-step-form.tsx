@@ -225,7 +225,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                     name="name"
                     render={({ field, fieldState }) => (
                       <FormItem>
-                        <FormLabel>Name</FormLabel>
+                        <FormLabel required>Name</FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Untitled"
@@ -243,7 +243,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                     name={'stepId'}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Identifier</FormLabel>
+                        <FormLabel required>Identifier</FormLabel>
                         <FormControl>
                           <Input
                             trailingNode={<CopyButton valueToCopy={field.value} />}

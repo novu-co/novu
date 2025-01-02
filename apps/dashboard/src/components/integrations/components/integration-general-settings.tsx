@@ -77,7 +77,7 @@ export function GeneralSettings({ control, mode, hidePrimarySelector, disabledPr
         rules={{ required: 'Name is required' }}
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-xs" htmlFor="name">
+            <FormLabel className="text-xs" htmlFor="name" required>
               Name
             </FormLabel>
             <FormControl>
@@ -100,7 +100,7 @@ export function GeneralSettings({ control, mode, hidePrimarySelector, disabledPr
         }}
         render={({ field, fieldState }) => (
           <FormItem>
-            <FormLabel className="text-xs" htmlFor="identifier">
+            <FormLabel className="text-xs" htmlFor="identifier" required>
               Identifier
             </FormLabel>
             <FormControl>

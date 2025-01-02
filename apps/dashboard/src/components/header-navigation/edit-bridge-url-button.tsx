@@ -84,7 +84,7 @@ export const EditBridgeUrlButton = () => {
                   name="bridgeUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bridge Endpoint URL</FormLabel>
+                      <FormLabel required>Bridge Endpoint URL</FormLabel>
                       <FormControl>
                         <Input leadingIcon={RiLinkM} id="bridgeUrl" {...field} />
                       </FormControl>

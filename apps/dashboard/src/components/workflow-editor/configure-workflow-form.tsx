@@ -278,7 +278,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                 defaultValue=""
                 render={({ field, fieldState }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel required>Name</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="New workflow"
@@ -297,7 +297,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                 defaultValue=""
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Identifier</FormLabel>
+                    <FormLabel required>Identifier</FormLabel>
                     <FormControl>
                       <Input
                         size="xs"
@@ -317,7 +317,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel optional>Description</FormLabel>
                     <FormControl>
                       <Textarea
                         className="min-h-36"
@@ -337,7 +337,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                 render={({ field }) => (
                   <FormItem className="group" tabIndex={-1}>
                     <div className="flex items-center gap-1">
-                      <FormLabel>Tags</FormLabel>
+                      <FormLabel optional>Tags</FormLabel>
                     </div>
                     <FormControl className="text-xs text-neutral-600">
                       <TagInput

@@ -44,21 +44,21 @@ const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & {
     optional?: boolean;
+    required?: boolean;
     hint?: string;
     tooltip?: string;
-    hideOptional?: boolean;
   }
->(({ className, optional, tooltip, hideOptional, hint, children, ...props }, ref) => {
+>(({ className, optional, required, tooltip, hint, children, ...props }, ref) => {
   const { formItemId } = useFormField();
 
   return (
     <Label ref={ref} className={cn('text-foreground-950 flex items-center', className)} htmlFor={formItemId} {...props}>
       {children}
 
-      {!optional && <LabelAsterisk />}
+      {required && <LabelAsterisk />}
       {hint && <LabelSub>{hint}</LabelSub>}
 
-      {optional && !hideOptional && <LabelSub>(optional)</LabelSub>}
+      {optional && <LabelSub>(optional)</LabelSub>}
       {tooltip && (
         <Tooltip>
           <TooltipTrigger

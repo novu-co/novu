@@ -109,7 +109,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel required>Name</FormLabel>
                     <FormControl>
                       <FormInput
                         {...field}
@@ -130,7 +130,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 name="workflowId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Identifier</FormLabel>
+                    <FormLabel required>Identifier</FormLabel>
                     <FormControl>
                       <FormInput {...field} disabled />
                     </FormControl>
@@ -147,7 +147,9 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-1">
-                      <FormLabel hint={`(max. ${MAX_TAG_ELEMENTS})`}>Add tags</FormLabel>
+                      <FormLabel optional hint={`(max. ${MAX_TAG_ELEMENTS})`}>
+                        Add tags
+                      </FormLabel>
                     </div>
                     <FormControl>
                       <TagInput
