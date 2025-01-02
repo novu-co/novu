@@ -168,10 +168,10 @@ function NotificationConfigSection() {
         <FormField
           control={control}
           name="subject"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem className="w-full">
               <FormControl>
-                <InputRoot>
+                <InputRoot hasError={!!fieldState.error}>
                   <InputWrapper className="flex h-9 items-center justify-center px-1">
                     <Editor
                       singleLine

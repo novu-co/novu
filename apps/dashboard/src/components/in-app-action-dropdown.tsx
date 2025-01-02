@@ -191,13 +191,13 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
             control={control}
             name={`${actionKey}.label`}
             defaultValue=""
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
                 <div className="flex items-center gap-1">
                   <FormLabel>Button text</FormLabel>
                 </div>
                 <FormControl>
-                  <InputRoot className="overflow-visible">
+                  <InputRoot className="overflow-visible" hasError={!!fieldState.error}>
                     <InputWrapper className="flex h-9 items-center justify-center px-1">
                       <Editor
                         singleLine

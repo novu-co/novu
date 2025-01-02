@@ -223,11 +223,16 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                   <FormField
                     control={form.control}
                     name="name"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItem>
                         <FormLabel>Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Untitled" {...field} disabled={isReadOnly} />
+                          <Input
+                            placeholder="Untitled"
+                            {...field}
+                            disabled={isReadOnly}
+                            hasError={!!fieldState.error}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

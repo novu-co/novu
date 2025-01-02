@@ -30,10 +30,10 @@ export const InAppBody = () => {
     <FormField
       control={control}
       name={bodyKey}
-      render={({ field }) => (
+      render={({ field, fieldState }) => (
         <FormItem className="w-full">
           <FormControl>
-            <InputRoot>
+            <InputRoot hasError={!!fieldState.error}>
               <InputWrapper className="h-36 px-1">
                 <Editor
                   fontFamily="inherit"

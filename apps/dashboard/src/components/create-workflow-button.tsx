@@ -17,7 +17,6 @@ import { Textarea } from '@/components/primitives/textarea';
 import { ExternalLink } from '@/components/shared/external-link';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useTags } from '@/hooks/use-tags';
-import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -100,14 +99,14 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         autoFocus
-                        {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
+                        hasError={!!fieldState.error}
                         onChange={(e) => {
                           field.onChange(e);
                           form.setValue('workflowId', slugify(e.target.value));
@@ -122,11 +121,11 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
               <FormField
                 control={form.control}
                 name="workflowId"
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel>Identifier</FormLabel>
                     <FormControl>
-                      <Input {...field} disabled />
+                      <Input {...field} disabled hasError={!!fieldState.error} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

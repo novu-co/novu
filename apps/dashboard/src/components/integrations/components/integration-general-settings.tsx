@@ -98,13 +98,13 @@ export function GeneralSettings({ control, mode, hidePrimarySelector, disabledPr
             message: 'Identifier cannot contain spaces',
           },
         }}
-        render={({ field }) => (
+        render={({ field, fieldState }) => (
           <FormItem>
             <FormLabel className="text-xs" htmlFor="identifier">
               Identifier
             </FormLabel>
             <FormControl>
-              <Input id="identifier" {...field} readOnly={mode === 'update'} />
+              <Input id="identifier" {...field} readOnly={mode === 'update'} hasError={!!fieldState.error} />
             </FormControl>
             <FormMessage />
           </FormItem>

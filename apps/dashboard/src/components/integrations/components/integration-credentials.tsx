@@ -4,7 +4,6 @@ import { Switch } from '@/components/primitives/switch';
 import { CredentialsKeyEnum, IProviderConfig } from '@novu/shared';
 import { Control } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../../../components/primitives/form/form';
-import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../../utils/constants';
 
 type IntegrationFormData = {
   name: string;
@@ -39,7 +38,7 @@ export function CredentialsSection({ provider, control }: CredentialsSectionProp
           control={control}
           name={`credentials.${credential.key}`}
           rules={{ required: credential.required ? `${credential.displayName} is required` : false }}
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem className="mb-2">
               <FormLabel htmlFor={credential.key} optional={!credential.required}>
                 {credential.displayName}
@@ -65,9 +64,9 @@ export function CredentialsSection({ provider, control }: CredentialsSectionProp
                     size={'md'}
                     id={credential.key}
                     type="text"
-                    {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
                     placeholder={`Enter ${credential.displayName.toLowerCase()}`}
                     {...field}
+                    hasError={!!fieldState.error}
                   />
                 </FormControl>
               )}

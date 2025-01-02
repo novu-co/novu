@@ -276,11 +276,16 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                 control={form.control}
                 name="name"
                 defaultValue=""
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="New workflow" {...field} disabled={isReadOnly} />
+                      <Input
+                        placeholder="New workflow"
+                        {...field}
+                        disabled={isReadOnly}
+                        hasError={!!fieldState.error}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

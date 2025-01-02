@@ -29,7 +29,7 @@ export function TextWidget(props: WidgetProps) {
     <FormField
       control={control}
       name={extractedName}
-      render={({ field }) => (
+      render={({ field, fieldState }) => (
         <FormItem className="w-full py-1">
           <FormLabel className="text-xs">{capitalize(label)}</FormLabel>
           <FormControl>
@@ -37,6 +37,7 @@ export function TextWidget(props: WidgetProps) {
               <Input
                 type="number"
                 {...field}
+                hasError={!!fieldState.error}
                 onChange={(e) => {
                   if (e.target.value === '') {
                     field.onChange(undefined);

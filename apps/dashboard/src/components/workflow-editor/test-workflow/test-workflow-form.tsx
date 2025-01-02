@@ -67,11 +67,11 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
                 key={key}
                 control={control}
                 name={`to.${key}`}
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel htmlFor={key}>{capitalize(key)}</FormLabel>
                     <FormControl>
-                      <Input size="xs" id={key} {...(field as any)} />
+                      <Input size="xs" id={key} {...(field as any)} hasError={!!fieldState.error} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
