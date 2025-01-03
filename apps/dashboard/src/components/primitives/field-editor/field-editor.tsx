@@ -5,7 +5,7 @@ import { Editor } from '@/components/primitives/editor';
 import { Popover, PopoverTrigger } from '@/components/primitives/popover';
 import { createAutocompleteSource } from '@/utils/liquid-autocomplete';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
-import { useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { useVariables } from './hooks/use-variables';
 import { createVariablePlugin } from './variable-plugin';
 import { variablePillTheme } from './variable-plugin/variable-theme';
@@ -28,6 +28,8 @@ type FieldEditorProps = {
   indentWithTab?: boolean;
 };
 
+const baseExtensions = [EditorView.lineWrapping, variablePillTheme];
+
 export function FieldEditor({
   value,
   onChange,
@@ -49,20 +51,42 @@ export function FieldEditor({
 
   const completionSource = useMemo(() => createAutocompleteSource(variables), [variables]);
 
-  const extensions = useMemo(
-    () => [
+  const autocompletionExtension = useMemo(
+    () =>
       autocompletion({
         override: [completionSource],
         closeOnBlur: true,
         defaultKeymap: true,
         activateOnTyping: true,
       }),
-      EditorView.lineWrapping,
-      variablePillTheme,
-      createVariablePlugin({ viewRef, lastCompletionRef, onSelect: handleVariableSelect }),
-    ],
-    [variables, completionSource, handleVariableSelect]
+    [completionSource]
   );
+
+  const variablePlugin = useMemo(
+    () =>
+      createVariablePlugin({
+        viewRef,
+        lastCompletionRef,
+        onSelect: handleVariableSelect,
+      }),
+    [handleVariableSelect]
+  );
+
+  const extensions = useMemo(
+    () => [...baseExtensions, autocompletionExtension, variablePlugin],
+    [autocompletionExtension, variablePlugin]
+  );
+
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        setTimeout(() => setSelectedVariable(null), 0);
+      }
+    },
+    [setSelectedVariable]
+  );
+
+  const handleClose = useCallback(() => setSelectedVariable(null), [setSelectedVariable]);
 
   return (
     <div className="relative">
@@ -79,23 +103,12 @@ export function FieldEditor({
         value={value}
         onChange={onChange}
       />
-      <Popover
-        open={!!selectedVariable}
-        onOpenChange={(open) => {
-          if (!open) {
-            setTimeout(() => setSelectedVariable(null), 0);
-          }
-        }}
-      >
+      <Popover open={!!selectedVariable} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <div />
         </PopoverTrigger>
         {selectedVariable && (
-          <VariablePopover
-            variable={selectedVariable.value}
-            onClose={() => setSelectedVariable(null)}
-            onUpdate={handleVariableUpdate}
-          />
+          <VariablePopover variable={selectedVariable.value} onClose={handleClose} onUpdate={handleVariableUpdate} />
         )}
       </Popover>
     </div>
