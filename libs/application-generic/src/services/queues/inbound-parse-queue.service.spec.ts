@@ -82,9 +82,7 @@ describe('Inbound Parse Queue service', () => {
 
     it('should add a minimal job in the queue', async () => {
       const jobId = 'inbound-parse-mail-job-id-2';
-      const _environmentId = 'inbound-parse-mail-environment-id';
       const _organizationId = 'inbound-parse-mail-organization-id';
-      const _userId = 'inbound-parse-mail-user-id';
       const jobData = {
         html: '<>Hello World</>',
         text: 'text',

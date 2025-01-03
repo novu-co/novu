@@ -61,11 +61,7 @@ describe('Storage-Helper service', function () {
     vi.clearAllMocks();
   });
 
-  // mocking the S3 Storage service with vi
   describe('S3', function () {
-    const s3StorageHelperService = new StorageHelperService(
-      new S3StorageService(),
-    );
     const attachments: IAttachmentOptionsExtended[] = [
       {
         name: 'test.png',
@@ -82,9 +78,12 @@ describe('Storage-Helper service', function () {
     });
 
     it('should upload file', async function () {
-      // resolve PutObjectCommand
       vi.spyOn(S3Client.prototype, 'send').mockImplementation(() =>
         Promise.resolve({}),
+      );
+
+      const s3StorageHelperService = new StorageHelperService(
+        new S3StorageService(),
       );
 
       await s3StorageHelperService.uploadAttachments(attachments);
@@ -107,6 +106,10 @@ describe('Storage-Helper service', function () {
         }),
       );
 
+      const s3StorageHelperService = new StorageHelperService(
+        new S3StorageService(),
+      );
+
       await s3StorageHelperService.getAttachments(attachments);
     });
 
@@ -114,6 +117,10 @@ describe('Storage-Helper service', function () {
       // resolve DeleteObjectCommand
       vi.spyOn(S3Client.prototype, 'send').mockImplementation(() =>
         Promise.resolve({}),
+      );
+
+      const s3StorageHelperService = new StorageHelperService(
+        new S3StorageService(),
       );
 
       await s3StorageHelperService.deleteAttachments(resultAttachments);
@@ -128,9 +135,12 @@ describe('Storage-Helper service', function () {
           mime: 'image/png',
         },
       ];
-      vi.spyOn(S3Client.prototype, 'send').mockImplementation(() =>
-        // eslint-disable-next-line prefer-promise-reject-errors
-        Promise.reject({ message: 'The specified key does not exist.' }),
+      vi.spyOn(S3Client.prototype, 'send').mockImplementation(() => {
+        throw new Error('The specified key does not exist.');
+      });
+
+      const s3StorageHelperService = new StorageHelperService(
+        new S3StorageService(),
       );
 
       await s3StorageHelperService.getAttachments(attachments2);

@@ -5,11 +5,24 @@ import {
   StepTypeEnum,
 } from '@novu/shared';
 import {
+  EnvironmentRepository,
+  ExecutionDetailsRepository,
+  JobRepository,
+  MessageRepository,
   MessageTemplateEntity,
-  TenantRepository,
-  SubscriberRepository,
   MessageTemplateRepository,
+  SubscriberRepository,
+  TenantRepository,
 } from '@novu/dal';
+import {
+  ExecutionLogQueueService,
+  FeatureFlagsService,
+  WorkflowInMemoryProviderService,
+} from '../../services';
+import { ExecutionLogRoute } from '../execution-log-route';
+import { CreateExecutionDetails } from '../create-execution-details';
+import { CompileTemplate } from '../compile-template';
+import { GetFeatureFlag } from '../get-feature-flag';
 import { vi } from 'vitest';
 
 import { ConditionsFilter } from '../conditions-filter';
@@ -26,13 +39,24 @@ vi.mock('@novu/dal', async () => ({
   })),
 }));
 
-describe.only('select variant', function () {
+describe('select variant', function () {
   let selectVariantUsecase: SelectVariant;
 
   beforeEach(async function () {
     selectVariantUsecase = new SelectVariant(
-      // @ts-ignore
-      new ConditionsFilter(),
+      new ConditionsFilter(
+        new SubscriberRepository(),
+        new MessageRepository(),
+        new ExecutionDetailsRepository(),
+        new JobRepository(),
+        new EnvironmentRepository(),
+        new ExecutionLogRoute(
+          new CreateExecutionDetails(new ExecutionDetailsRepository()),
+          new ExecutionLogQueueService(new WorkflowInMemoryProviderService()),
+          new GetFeatureFlag(new FeatureFlagsService()),
+        ),
+        new CompileTemplate(),
+      ),
       new MessageTemplateRepository(),
       new NormalizeVariables(
         new SubscriberRepository(),
