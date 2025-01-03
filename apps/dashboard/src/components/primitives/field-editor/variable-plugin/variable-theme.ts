@@ -28,6 +28,7 @@ export const variablePillTheme = EditorView.baseTheme({
     top: '50%',
     transform: 'translateY(-50%)',
     width: '12px',
+    minWidth: '12px',
     height: '12px',
     backgroundColor: 'hsl(var(--feature-base))',
     maskImage: `url("/images/code.svg")`,

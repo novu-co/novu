@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
-import { TransformerWithParam } from '../types';
+import { useCallback, useState } from 'react';
 import { TRANSFORMERS } from '../constants';
+import { TransformerWithParam } from '../types';
 
 interface UseTransformerManagerProps {
   initialTransformers: TransformerWithParam[];
@@ -42,20 +42,25 @@ export function useTransformerManager({ initialTransformers, onUpdate }: UseTran
     (index: number, params: string[]) => {
       setTransformers((current) => {
         const newTransformers = [...current];
+
         const transformerDef = TRANSFORMERS.find((def) => def.value === newTransformers[index].value);
 
         // Format params based on their types
         const formattedParams = params.map((param, paramIndex) => {
           const paramType = transformerDef?.params?.[paramIndex]?.type;
+
           if (paramType === 'number') {
-            const numericValue = param.replace(/[^\d.-]/g, '');
+            const numericValue = String(param).replace(/[^\d.-]/g, '');
+
             return isNaN(Number(numericValue)) ? '' : numericValue;
           }
           return param;
         });
 
         newTransformers[index] = { ...newTransformers[index], params: formattedParams };
+
         onUpdate(newTransformers);
+
         return newTransformers;
       });
     },

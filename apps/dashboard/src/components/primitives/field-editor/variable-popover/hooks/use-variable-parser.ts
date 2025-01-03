@@ -1,14 +1,7 @@
-import { Tokenizer, TokenKind, TopLevelToken } from 'liquidjs';
+import { Tokenizer, TokenKind } from 'liquidjs';
 import { useMemo } from 'react';
 import { TRANSFORMERS } from '../constants';
 import { TransformerWithParam } from '../types';
-
-function isLiquidOutputToken(token: TopLevelToken): token is TopLevelToken & {
-  content: string;
-} {
-  const t = token as any;
-  return token.kind === TokenKind.Output && typeof t.content === 'string';
-}
 
 export function useVariableParser(variable: string) {
   return useMemo(() => {

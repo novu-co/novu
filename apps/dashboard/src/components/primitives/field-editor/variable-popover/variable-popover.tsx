@@ -3,7 +3,7 @@ import { Input, InputField } from '@/components/primitives/input';
 import { PopoverContent } from '@/components/primitives/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { Switch } from '@/components/primitives/switch';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Code2 } from '../../../icons/code-2';
 import { Separator } from '../../separator';
 import { TransformerItem } from './components/transformer-item';
@@ -13,6 +13,23 @@ import { useVariableParser } from './hooks/use-variable-parser';
 import type { VariablePopoverProps } from './types';
 import { formatLiquidVariable } from './utils';
 
+function useDebounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
+  const timeoutRef = useRef<NodeJS.Timeout>();
+
+  return useCallback(
+    (...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        callback(...args);
+      }, delay);
+    },
+    [callback, delay]
+  );
+}
+
 export function VariablePopover({ variable, onClose, onUpdate }: VariablePopoverProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { parsedName, parsedDefaultValue, parsedTransformers, originalVariable } = useVariableParser(variable || '');
@@ -20,6 +37,15 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
   const [defaultVal, setDefaultVal] = useState(parsedDefaultValue);
   const [showRawLiquid, setShowRawLiquid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const updateVariable = useCallback(
+    (newName: string, newDefaultVal: string, newTransformers: any[]) => {
+      onUpdate(formatLiquidVariable(newName, newDefaultVal, newTransformers));
+    },
+    [onUpdate]
+  );
+
+  const debouncedUpdate = useDebounce(updateVariable, 300);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -45,21 +71,27 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
   } = useTransformerManager({
     initialTransformers: parsedTransformers,
     onUpdate: (newTransformers) => {
-      onUpdate(formatLiquidVariable(name, defaultVal, newTransformers));
+      debouncedUpdate(name, defaultVal, newTransformers);
     },
   });
 
-  const handleNameChange = (newName: string) => {
-    setName(newName);
-    onUpdate(formatLiquidVariable(newName, defaultVal, transformers));
-  };
+  const handleNameChange = useCallback(
+    (newName: string) => {
+      setName(newName);
+      debouncedUpdate(newName, defaultVal, transformers);
+    },
+    [defaultVal, transformers, debouncedUpdate]
+  );
 
-  const handleDefaultValueChange = (newDefaultVal: string) => {
-    setDefaultVal(newDefaultVal);
-    onUpdate(formatLiquidVariable(name, newDefaultVal, transformers));
-  };
+  const handleDefaultValueChange = useCallback(
+    (newDefaultVal: string) => {
+      setDefaultVal(newDefaultVal);
+      debouncedUpdate(name, newDefaultVal, transformers);
+    },
+    [name, transformers, debouncedUpdate]
+  );
 
-  const handleRawLiquidChange = (value: string) => {
+  const handleRawLiquidChange = useCallback((value: string) => {
     // Remove {{ and }} and trim
     const content = value.replace(/^\{\{\s*|\s*\}\}$/g, '').trim();
 
@@ -81,10 +113,20 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
         setDefaultVal(newDefaultVal);
       }
     });
-  };
+  }, []);
+
+  const filteredTransformers = useMemo(
+    () => getFilteredTransformers(searchQuery),
+    [getFilteredTransformers, searchQuery]
+  );
+
+  const currentLiquidValue = useMemo(
+    () => originalVariable || formatLiquidVariable(name, defaultVal, transformers),
+    [originalVariable, name, defaultVal, transformers]
+  );
 
   return (
-    <PopoverContent className="w-72 p-0">
+    <PopoverContent className="w-72 p-0 pb-1">
       <div>
         <div className="bg-bg-weak">
           <div className="flex flex-row items-center justify-between space-y-0 p-1.5">
@@ -100,12 +142,13 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
                 <div className="grid gap-1">
                   <label className="text-text-sub text-label-xs">Variable name</label>
                   <InputField size="fit" className="min-h-0">
-                    <Code2 className="text-text-sub h-4 w-4" />
+                    <Code2 className="text-text-sub h-4 w-4 min-w-4" />
                     <Input value={name} onChange={(e) => handleNameChange(e.target.value)} className="h-7 text-sm" />
                   </InputField>
                 </div>
               </FormControl>
             </FormItem>
+
             <FormItem>
               <FormControl>
                 <div className="grid gap-1">
@@ -134,7 +177,7 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
                   <div className="grid gap-1">
                     <InputField size="fit" className="min-h-0">
                       <Input
-                        value={originalVariable || formatLiquidVariable(name, defaultVal, transformers)}
+                        value={currentLiquidValue}
                         onChange={(e) => handleRawLiquidChange(e.target.value)}
                         className="h-7 text-sm"
                       />
@@ -161,7 +204,7 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
                       }
                     }}
                   >
-                    <SelectTrigger className="!text-paragraph-xs text-text-soft !h-7 min-h-0 !p-1.5">
+                    <SelectTrigger className="!text-paragraph-xs text-text-soft !h-[30px] min-h-7">
                       <SelectValue placeholder="Add a modifier..." />
                     </SelectTrigger>
                     <SelectContent
@@ -169,7 +212,7 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
                         e.preventDefault();
                         searchInputRef.current?.focus();
                       }}
-                      className="max-h-[400px]"
+                      className="max-h-[400px] w-[340px]"
                       align="start"
                     >
                       <div className="p-2">
@@ -194,7 +237,7 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
                         </InputField>
                       </div>
                       <div className="max-h-[350px] overflow-y-auto px-1">
-                        {getFilteredTransformers(searchQuery).length === 0 ? (
+                        {filteredTransformers.length === 0 ? (
                           <div className="text-text-soft flex flex-col items-center justify-center gap-2 p-4 text-center">
                             <span className="text-sm">
                               {searchQuery ? 'No modifiers found' : 'All modifiers have been added'}
@@ -202,7 +245,7 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
                             {searchQuery && <span className="text-xs">Try searching for different terms</span>}
                           </div>
                         ) : (
-                          getFilteredTransformers(searchQuery).map((transformer) => (
+                          filteredTransformers.map((transformer) => (
                             <SelectItem
                               key={transformer.value}
                               value={transformer.value}
