@@ -2,6 +2,8 @@ import { WidgetType } from '@uiw/react-codemirror';
 import { MODIFIERS_CLASS, VARIABLE_PILL_CLASS } from './constants';
 
 export class VariablePillWidget extends WidgetType {
+  private clickHandler: (e: MouseEvent) => void;
+
   constructor(
     private variableName: string,
     private fullVariableName: string,
@@ -11,6 +13,16 @@ export class VariablePillWidget extends WidgetType {
     private onSelect?: (value: string, from: number, to: number) => void
   ) {
     super();
+    this.clickHandler = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // setTimeout is used to defer the selection until after CodeMirror's own click handling
+      // This prevents race conditions where our selection might be immediately cleared by the editor
+      setTimeout(() => {
+        this.onSelect?.(this.fullVariableName, this.start, this.end);
+      }, 0);
+    };
   }
 
   toDOM() {
@@ -30,19 +42,7 @@ export class VariablePillWidget extends WidgetType {
 
     span.textContent = this.variableName;
 
-    const handleClick = (e: MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      // setTimeout is used to defer the selection until after CodeMirror's own click handling
-      // This prevents race conditions where our selection might be immediately cleared by the editor
-      setTimeout(() => {
-        this.onSelect?.(this.fullVariableName, this.start, this.end);
-      }, 0);
-    };
-
-    span.addEventListener('mousedown', handleClick);
-    (span as any)._variableClickHandler = handleClick;
+    span.addEventListener('mousedown', this.clickHandler);
 
     return span;
   }
@@ -66,10 +66,7 @@ export class VariablePillWidget extends WidgetType {
    * Removes event listeners to prevent memory leaks.
    */
   destroy(dom: HTMLElement) {
-    if ((dom as any)._variableClickHandler) {
-      dom.removeEventListener('mousedown', (dom as any)._variableClickHandler);
-      delete (dom as any)._variableClickHandler;
-    }
+    dom.removeEventListener('mousedown', this.clickHandler);
   }
 
   /**
