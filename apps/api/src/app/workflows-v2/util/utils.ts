@@ -5,7 +5,6 @@ import set from 'lodash/set';
 import values from 'lodash/values';
 import isObject from 'lodash/isObject';
 import isArray from 'lodash/isArray';
-
 import { BadRequestException } from '@nestjs/common';
 
 import { JSONSchemaDto } from '@novu/shared';
@@ -164,4 +163,38 @@ export function keysToObject(keys: string[], { fn } = { fn: (key: string) => key
   keys.filter((key) => key.includes('.')).forEach((key) => set(result, key, fn(key)));
 
   return result;
+}
+
+/**
+ * Merges common/overlapping object keys from source into target.
+ *
+ * @example
+ * Target: { subscriber: { phone: '{{subscriber.phone}}', name: '{{subscriber.name}}' } }
+ * Source: { subscriber: { phone: '123' }, payload: { someone: '{{payload.someone}}' }}
+ * Result: { subscriber: { phone: '123', name: '{{subscriber.name}}' } }
+ */
+export function mergeCommonObjectKeys(
+  source: Record<string, unknown>,
+  target: Record<string, unknown>
+): Record<string, unknown> {
+  /* eslint-disable no-param-reassign */
+  return Object.entries(source).reduce(
+    (merged, [key, sourceValue]) => {
+      const targetValue = target[key];
+
+      // If both source and target values are objects, recursively merge them
+      if (isObject(sourceValue) && isObject(targetValue)) {
+        merged[key] = mergeCommonObjectKeys(
+          sourceValue as Record<string, unknown>,
+          targetValue as Record<string, unknown>
+        );
+      } else {
+        // Otherwise, use the target value if it exists, otherwise use the source value
+        merged[key] = sourceValue ?? targetValue;
+      }
+
+      return merged;
+    },
+    {} as Record<string, unknown>
+  );
 }
