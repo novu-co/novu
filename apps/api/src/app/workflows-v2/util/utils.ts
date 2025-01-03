@@ -178,12 +178,12 @@ export function mergeCommonObjectKeys(
   target: Record<string, unknown>
 ): Record<string, unknown> {
   /* eslint-disable no-param-reassign */
-  return Object.entries(source).reduce(
-    (merged, [key, sourceValue]) => {
-      const targetValue = target[key];
+  return Object.entries(target).reduce(
+    (merged, [key, targetValue]) => {
+      const sourceValue = source[key];
 
       // If both source and target values are objects, recursively merge them
-      if (isObject(sourceValue) && isObject(targetValue)) {
+      if (isObject(targetValue) && isObject(sourceValue)) {
         merged[key] = mergeCommonObjectKeys(
           sourceValue as Record<string, unknown>,
           targetValue as Record<string, unknown>
