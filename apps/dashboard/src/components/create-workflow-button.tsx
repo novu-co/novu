@@ -1,15 +1,6 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ComponentProps, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { RiArrowRightSLine } from 'react-icons/ri';
-import { ExternalLink } from '@/components/shared/external-link';
-import { useNavigate } from 'react-router-dom';
-import { z } from 'zod';
-import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify } from '@novu/shared';
 import { createWorkflow } from '@/api/workflows';
 import { Button } from '@/components/primitives/button';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';
 import { Separator } from '@/components/primitives/separator';
 import {
@@ -24,11 +15,20 @@ import {
 } from '@/components/primitives/sheet';
 import { TagInput } from '@/components/primitives/tag-input';
 import { Textarea } from '@/components/primitives/textarea';
+import { ExternalLink } from '@/components/shared/external-link';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useTags } from '@/hooks/use-tags';
+import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
-import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { type CreateWorkflowDto, slugify, WorkflowCreationSourceEnum } from '@novu/shared';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ComponentProps, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { RiArrowRightSLine } from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowSchema } from './workflow-editor/schema';
 
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
@@ -137,7 +137,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 )}
               />
 
-              <Separator className="bg-neutral-alpha-100" />
+              <Separator />
 
               <FormField
                 control={form.control}

@@ -185,7 +185,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
           <div className="flex items-center gap-2 text-sm font-medium leading-none">
             <RiEdit2Line className="size-4" /> Customize button
           </div>
-          <Separator decorative />
+          <Separator />
           <FormField
             control={control}
             name={`${actionKey}.label`}
