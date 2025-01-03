@@ -93,6 +93,9 @@ export function FieldEditor({
         singleLine={singleLine}
         indentWithTab={indentWithTab}
         size={size}
+        basicSetup={{
+          defaultKeymap: true,
+        }}
         className="flex-1"
         autoFocus={autoFocus}
         placeholder={placeholder}

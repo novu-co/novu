@@ -22,7 +22,6 @@ export function useVariables(viewRef: React.RefObject<EditorView>, onChange: (va
 
   const handleVariableSelect = useCallback((value: string, from: number, to: number) => {
     if (isUpdatingRef.current) return;
-
     setSelectedVariable({ value, from, to });
   }, []);
 
@@ -35,16 +34,19 @@ export function useVariables(viewRef: React.RefObject<EditorView>, onChange: (va
         const { from, to } = selectedVariable;
         const view = viewRef.current;
 
+        // Ensure the new value has proper liquid syntax
         const hasLiquidSyntax = newValue.match(/^\{\{.*\}\}$/);
         const newVariableText = hasLiquidSyntax ? newValue : `{{${newValue}}}`;
 
+        // Calculate the actual end position including closing brackets
         const currentContent = view.state.doc.toString();
-        const afterCursor = currentContent.slice(to).trim();
-        const hasClosingBrackets = afterCursor.startsWith('}}');
+        const afterCursor = currentContent.slice(to);
+        const closingBracketPos = afterCursor.indexOf('}}');
+        const actualEnd = closingBracketPos >= 0 ? to + closingBracketPos + 2 : to;
 
         const changes = {
           from,
-          to: hasClosingBrackets ? to + 2 : to,
+          to: actualEnd,
           insert: newVariableText,
         };
 
@@ -55,6 +57,7 @@ export function useVariables(viewRef: React.RefObject<EditorView>, onChange: (va
 
         onChange(view.state.doc.toString());
 
+        // Update the selected variable with new bounds
         setSelectedVariable((prev: SelectedVariable) =>
           prev ? { ...prev, value: newValue, to: from + newVariableText.length } : null
         );

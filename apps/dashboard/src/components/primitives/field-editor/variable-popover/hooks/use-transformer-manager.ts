@@ -1,29 +1,39 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { TRANSFORMERS } from '../constants';
-import { TransformerWithParam } from '../types';
+import type { TransformerWithParam } from '../types';
 
-interface UseTransformerManagerProps {
+type UseTransformerManagerProps = {
   initialTransformers: TransformerWithParam[];
   onUpdate: (transformers: TransformerWithParam[]) => void;
-}
+};
 
 export function useTransformerManager({ initialTransformers, onUpdate }: UseTransformerManagerProps) {
-  const [transformers, setTransformers] = useState<TransformerWithParam[]>(initialTransformers);
+  const [transformers, setTransformers] = useState<TransformerWithParam[]>(
+    initialTransformers.filter((t) => t.value !== 'default')
+  );
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [draggingItem, setDraggingItem] = useState<number | null>(null);
-
-  // Update transformers when initialTransformers changes
-  useEffect(() => {
-    setTransformers(initialTransformers);
-  }, [initialTransformers]);
 
   const handleTransformerToggle = useCallback(
     (value: string) => {
       setTransformers((current) => {
-        const newTransformers = current.some((t) => t.value === value)
-          ? current.filter((t) => t.value !== value)
-          : [...current, { value }];
+        const index = current.findIndex((t) => t.value === value);
+        let newTransformers: TransformerWithParam[];
+
+        if (index === -1) {
+          const transformerDef = TRANSFORMERS.find((t) => t.value === value);
+          const newTransformer: TransformerWithParam = {
+            value,
+            ...(transformerDef?.hasParam ? { params: transformerDef.params?.map(() => '') } : {}),
+          };
+
+          newTransformers = [...current, newTransformer];
+        } else {
+          newTransformers = current.filter((_, i) => i !== index);
+        }
+
         onUpdate(newTransformers);
+
         return newTransformers;
       });
     },
@@ -31,12 +41,14 @@ export function useTransformerManager({ initialTransformers, onUpdate }: UseTran
   );
 
   const moveTransformer = useCallback(
-    (from: number, to: number) => {
+    (fromIndex: number, toIndex: number) => {
       setTransformers((current) => {
         const newTransformers = [...current];
-        const [removed] = newTransformers.splice(from, 1);
-        newTransformers.splice(to, 0, removed);
+        const [movedItem] = newTransformers.splice(fromIndex, 1);
+        newTransformers.splice(toIndex, 0, movedItem);
+
         onUpdate(newTransformers);
+
         return newTransformers;
       });
     },
@@ -47,7 +59,6 @@ export function useTransformerManager({ initialTransformers, onUpdate }: UseTran
     (index: number, params: string[]) => {
       setTransformers((current) => {
         const newTransformers = [...current];
-
         const transformerDef = TRANSFORMERS.find((def) => def.value === newTransformers[index].value);
 
         // Format params based on their types
@@ -56,14 +67,12 @@ export function useTransformerManager({ initialTransformers, onUpdate }: UseTran
 
           if (paramType === 'number') {
             const numericValue = String(param).replace(/[^\d.-]/g, '');
-
             return isNaN(Number(numericValue)) ? '' : numericValue;
           }
           return param;
         });
 
         newTransformers[index] = { ...newTransformers[index], params: formattedParams };
-
         onUpdate(newTransformers);
 
         return newTransformers;
@@ -76,6 +85,8 @@ export function useTransformerManager({ initialTransformers, onUpdate }: UseTran
     (query: string) => {
       const normalizedQuery = query.toLowerCase();
       return TRANSFORMERS.filter((transformer) => {
+        // Never show default in the transformer list as it's handled separately
+        if (transformer.value === 'default') return false;
         if (transformers.some((t) => t.value === transformer.value)) return false;
 
         return (

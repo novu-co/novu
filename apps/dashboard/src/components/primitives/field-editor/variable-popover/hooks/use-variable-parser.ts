@@ -10,8 +10,11 @@ export function useVariableParser(variable: string) {
     }
 
     try {
+      // Remove {{ and }} and trim
+      const cleanVariable = variable.replace(/^\{\{|\}\}$/g, '').trim();
+
       // The content before any filters is the variable name
-      const [variableName, ...filterParts] = variable.split('|');
+      const [variableName, ...filterParts] = cleanVariable.split('|');
       const parsedName = variableName.trim();
 
       // Extract default value and transformers from the filters
@@ -22,12 +25,21 @@ export function useVariableParser(variable: string) {
         const filterTokenizer = new Tokenizer('|' + filterParts.join('|'));
         const filters = filterTokenizer.readFilters();
 
-        filters.forEach((filter) => {
+        // First pass: find default value
+        for (const filter of filters) {
           if (filter.kind === TokenKind.Filter && filter.name === 'default' && filter.args.length > 0) {
-            const arg = filter.args[0];
+            parsedDefaultValue = (filter.args[0] as any).content;
+            break;
+          }
+        }
 
-            parsedDefaultValue = (arg as any).content;
-          } else if (TRANSFORMERS.some((t) => t.value === filter.name)) {
+        // Second pass: collect other transformers
+        for (const filter of filters) {
+          if (
+            filter.kind === TokenKind.Filter &&
+            filter.name !== 'default' &&
+            TRANSFORMERS.some((t) => t.value === filter.name)
+          ) {
             parsedTransformers.push({
               value: filter.name,
               ...(filter.args.length > 0
@@ -39,7 +51,7 @@ export function useVariableParser(variable: string) {
                 : {}),
             });
           }
-        });
+        }
       }
 
       return {

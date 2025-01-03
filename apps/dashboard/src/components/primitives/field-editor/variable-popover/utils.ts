@@ -22,18 +22,20 @@ export function formatLiquidVariable(
     parts.push(`default: '${escapeString(defaultValue.trim())}'`);
   }
 
-  parts.push(
-    ...transformers.map((t) => {
-      if (!t.params?.length) return t.value;
+  transformers.forEach((t) => {
+    if (t.value === 'default') return;
 
+    if (!t.params?.length) {
+      parts.push(t.value);
+    } else {
       const transformerDef = TRANSFORMERS.find((def) => def.value === t.value);
       const formattedParams = t.params.map((param, index) =>
         formatParamValue(param, transformerDef?.params?.[index]?.type)
       );
 
-      return `${t.value}: ${formattedParams.join(', ')}`;
-    })
-  );
+      parts.push(`${t.value}: ${formattedParams.join(', ')}`);
+    }
+  });
 
-  return parts.join(' | ');
+  return `{{${parts.join(' | ')}}}`;
 }
