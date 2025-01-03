@@ -24,7 +24,6 @@ export const BaseBody = () => {
           <FormControl>
             <InputField className="h-36 items-start justify-start px-1">
               <FieldEditor
-                fontFamily="inherit"
                 placeholder={capitalize(field.name)}
                 id={field.name}
                 variables={variables}

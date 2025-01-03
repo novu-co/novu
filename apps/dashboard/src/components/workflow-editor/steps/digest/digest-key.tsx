@@ -32,7 +32,6 @@ export const DigestKey = () => {
                 <FieldEditor
                   singleLine
                   indentWithTab={false}
-                  fontFamily="inherit"
                   placeholder="Add additional digest..."
                   id={field.name}
                   value={field.value}

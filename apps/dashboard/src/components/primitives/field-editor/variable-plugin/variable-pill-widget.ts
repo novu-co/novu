@@ -1,5 +1,5 @@
 import { WidgetType } from '@uiw/react-codemirror';
-import { VARIABLE_PILL_CLASS, MODIFIERS_CLASS } from './constants';
+import { MODIFIERS_CLASS, VARIABLE_PILL_CLASS } from './constants';
 
 export class VariablePillWidget extends WidgetType {
   constructor(

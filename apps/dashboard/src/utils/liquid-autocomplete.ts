@@ -1,6 +1,6 @@
+import { TRANSFORMERS } from '@/components/primitives/field-editor/variable-popover/constants';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 import { CompletionContext, CompletionResult } from '@codemirror/autocomplete';
-import { TRANSFORMERS } from '@/components/primitives/field-editor/variable-popover/constants';
 
 interface CompletionOption {
   label: string;
@@ -29,6 +29,85 @@ function getFilterCompletions(afterPipe: string): CompletionOption[] {
   }));
 }
 
+interface PathConfig {
+  prefix: string;
+  getPath: (text: string) => string | null;
+  getPrefix: (text: string) => string;
+}
+
+const VARIABLE_PATHS: PathConfig[] = [
+  {
+    prefix: 'payload.',
+    getPath: (text) => text.slice(8),
+    getPrefix: () => 'payload.',
+  },
+  {
+    prefix: 'subscriber.data.',
+    getPath: (text) => text.slice(15),
+    getPrefix: () => 'subscriber.data.',
+  },
+  {
+    prefix: 'steps.',
+    getPath: (text) => {
+      const fullMatch = text.match(/^steps\.[^.]+\.events\[\d+\]\.payload\.(.*?)$/);
+      if (fullMatch) return fullMatch[1];
+
+      // Handle partial paths
+      if (text === 'steps.' || text.startsWith('steps.')) return '';
+      return null;
+    },
+    getPrefix: (text) => {
+      const match = text.match(/^(steps\.[^.]+\.events\[\d+\]\.payload)\./);
+      if (match) return `${match[1]}.`;
+
+      // For partial paths, return what we have so far
+      return text;
+    },
+  },
+];
+
+function getVariableSuggestions(
+  word: { text: string; from: number; to?: number },
+  variables: LiquidVariable[],
+  pathConfig: PathConfig
+): CompletionOption[] {
+  const path = pathConfig.getPath(word.text);
+  if (path === null) return [];
+
+  const prefix = pathConfig.getPrefix(word.text);
+  const existingVariables = variables.filter((v) => {
+    if (pathConfig.prefix === 'steps.') {
+      // For partial paths, show all step variables
+      if (word.text === 'steps.' || (word.text.startsWith('steps.') && !word.text.includes('events'))) {
+        return v.label.startsWith('steps.');
+      }
+
+      const stepMatch = word.text.match(/^steps\.([^.]+)\.events\[(\d+)\]/);
+      if (!stepMatch) return false;
+      const [, stepId, eventIndex] = stepMatch;
+      return v.label.startsWith(`steps.${stepId}.events[${eventIndex}].payload.`);
+    }
+    return v.label.startsWith(pathConfig.prefix);
+  });
+
+  const suggestions: CompletionOption[] = existingVariables
+    .filter((v) => path === '' || v.label.toLowerCase().includes(path.toLowerCase()))
+    .map((v) => ({
+      label: v.label,
+      type: 'variable',
+    }));
+
+  if (path && !existingVariables.some((v) => v.label === `${prefix}${path}`)) {
+    suggestions.unshift({
+      label: `${prefix}${path}`,
+      type: 'variable',
+      boost: 99,
+    });
+  }
+
+  return suggestions;
+}
+
 function getVariableCompletions(
   word: { text: string; from: number; to?: number } | null,
   pos: number,
@@ -36,30 +115,16 @@ function getVariableCompletions(
 ): CompletionResult | null {
   if (!word && !variables.length) return null;
 
-  if (word?.text.startsWith('payload.')) {
-    const payloadPath = word.text.slice(8);
-    const existingVariables = variables.filter((v) => v.label.startsWith('payload.'));
+  for (const pathConfig of VARIABLE_PATHS) {
+    if (word?.text.startsWith(pathConfig.prefix)) {
+      const suggestions = getVariableSuggestions(word, variables, pathConfig);
 
-    const suggestions: CompletionOption[] = existingVariables
-      .filter((v) => v.label.toLowerCase().includes(payloadPath.toLowerCase()))
-      .map((v) => ({
-        label: v.label,
-        type: 'variable',
-      }));
-
-    if (payloadPath && !existingVariables.some((v) => v.label === `payload.${payloadPath}`)) {
-      suggestions.unshift({
-        label: `payload.${payloadPath}`,
-        type: 'variable',
-        boost: 99,
-      });
+      return {
+        from: word.from,
+        to: word.to ?? pos,
+        options: suggestions,
+      };
     }
-
-    return {
-      from: word.from,
-      to: word.to ?? pos,
-      options: suggestions,
-    };
   }
 
   if (word) {

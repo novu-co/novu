@@ -1,12 +1,10 @@
 import difference from 'lodash/difference';
 import flatMap from 'lodash/flatMap';
+import isArray from 'lodash/isArray';
+import isObject from 'lodash/isObject';
 import reduce from 'lodash/reduce';
 import set from 'lodash/set';
 import values from 'lodash/values';
-import isObject from 'lodash/isObject';
-import isArray from 'lodash/isArray';
-
-import { BadRequestException } from '@nestjs/common';
 
 import { JSONSchemaDto } from '@novu/shared';
 

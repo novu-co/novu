@@ -1,11 +1,10 @@
-import { useMemo } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { FieldEditor } from '@/components/primitives/field-editor';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
-import { FieldEditor } from '@/components/primitives/field-editor';
-import { autocompletion } from '@codemirror/autocomplete';
+import { useMemo } from 'react';
+import { useFormContext } from 'react-hook-form';
 
 const subjectKey = 'subject';
 
@@ -27,7 +26,6 @@ export const EmailSubject = () => {
                 singleLine
                 indentWithTab={false}
                 autoFocus={!field.value}
-                fontFamily="inherit"
                 placeholder={capitalize(field.name)}
                 id={field.name}
                 value={field.value}

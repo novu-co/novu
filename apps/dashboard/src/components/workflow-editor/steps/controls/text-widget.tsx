@@ -1,3 +1,4 @@
+import { FieldEditor } from '@/components/primitives/field-editor';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
@@ -7,7 +8,6 @@ import { type WidgetProps } from '@rjsf/utils';
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { getFieldName } from './template-utils';
-import { FieldEditor } from '@/components/primitives/field-editor';
 
 export function TextWidget(props: WidgetProps) {
   const { label, readonly, disabled, id, required } = props;
@@ -49,7 +49,6 @@ export function TextWidget(props: WidgetProps) {
               ) : (
                 <FieldEditor
                   indentWithTab={false}
-                  fontFamily="inherit"
                   placeholder={capitalize(label)}
                   id={label}
                   value={field.value}

@@ -28,7 +28,6 @@ type FieldEditorProps = {
   placeholder?: string;
   autoFocus?: boolean;
   size?: 'default' | 'lg';
-  fontFamily?: 'inherit';
   id?: string;
   singleLine?: boolean;
   indentWithTab?: boolean;
@@ -41,7 +40,6 @@ export function FieldEditor({
   placeholder,
   autoFocus,
   size = 'default',
-  fontFamily = 'inherit',
   id,
   singleLine,
   indentWithTab,
@@ -79,12 +77,12 @@ export function FieldEditor({
   return (
     <div className="relative">
       <Editor
+        fontFamily="inherit"
         singleLine={singleLine}
         indentWithTab={indentWithTab}
         size={size}
         className="flex-1"
         autoFocus={autoFocus}
-        fontFamily={fontFamily}
         placeholder={placeholder}
         id={id}
         extensions={extensions}
