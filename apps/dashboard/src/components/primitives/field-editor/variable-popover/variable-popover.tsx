@@ -38,6 +38,11 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
   const [showRawLiquid, setShowRawLiquid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  useEffect(() => {
+    setName(parsedName);
+    setDefaultVal(parsedDefaultValue);
+  }, [parsedName, parsedDefaultValue]);
+
   const updateVariable = useCallback(
     (newName: string, newDefaultVal: string, newTransformers: any[]) => {
       onUpdate(formatLiquidVariable(newName, newDefaultVal, newTransformers));

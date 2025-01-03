@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TRANSFORMERS } from '../constants';
 import { TransformerWithParam } from '../types';
 
@@ -11,6 +11,11 @@ export function useTransformerManager({ initialTransformers, onUpdate }: UseTran
   const [transformers, setTransformers] = useState<TransformerWithParam[]>(initialTransformers);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [draggingItem, setDraggingItem] = useState<number | null>(null);
+
+  // Update transformers when initialTransformers changes
+  useEffect(() => {
+    setTransformers(initialTransformers);
+  }, [initialTransformers]);
 
   const handleTransformerToggle = useCallback(
     (value: string) => {
