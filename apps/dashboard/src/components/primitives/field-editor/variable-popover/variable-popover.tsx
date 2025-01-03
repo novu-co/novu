@@ -1,9 +1,17 @@
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/primitives/command';
 import { FormControl, FormItem } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';
-import { PopoverContent } from '@/components/primitives/popover';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Switch } from '@/components/primitives/switch';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { RiAddFill } from 'react-icons/ri';
 import { Code2 } from '../../../icons/code-2';
 import { Separator } from '../../separator';
 import { TransformerItem } from './components/transformer-item';
@@ -37,6 +45,7 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
   const [defaultVal, setDefaultVal] = useState(parsedDefaultValue);
   const [showRawLiquid, setShowRawLiquid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isCommandOpen, setIsCommandOpen] = useState(false);
 
   useEffect(() => {
     setName(parsedName);
@@ -189,69 +198,46 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
               <FormControl>
                 <div className="grid gap-1">
                   <label className="text-text-sub text-label-xs">Modifiers</label>
-                  <Select
-                    value=""
-                    onValueChange={(value) => {
-                      if (value) {
-                        handleTransformerToggle(value);
-                        setSearchQuery('');
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="!text-paragraph-xs text-text-soft !h-[30px] min-h-7">
-                      <SelectValue placeholder="Add a modifier..." />
-                    </SelectTrigger>
-                    <SelectContent
-                      onCloseAutoFocus={(e) => {
-                        e.preventDefault();
-                        searchInputRef.current?.focus();
-                      }}
-                      className="max-h-[400px] w-[340px]"
-                      align="start"
-                    >
-                      <div className="p-2">
-                        <InputField size="fit" className="min-h-0">
-                          <Input
-                            ref={searchInputRef}
+                  <Popover open={isCommandOpen} onOpenChange={setIsCommandOpen}>
+                    <PopoverTrigger asChild>
+                      <button className="text-text-soft bg-background flex h-[30px] w-full items-center justify-between rounded-md border px-2 text-sm">
+                        <span>Add a modifier...</span>
+                        <RiAddFill className="h-4 w-4" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[280px] p-0" align="start">
+                      <Command>
+                        <div className="p-1">
+                          <CommandInput
                             value={searchQuery}
-                            onChange={(e) => {
-                              e.stopPropagation();
-                              setSearchQuery(e.target.value);
-                            }}
-                            className="h-7 text-sm"
+                            onValueChange={setSearchQuery}
                             placeholder="Search modifiers..."
-                            autoFocus
-                            onKeyDown={(e) => {
-                              e.stopPropagation();
-                              if (e.key === 'Escape') {
-                                setSearchQuery('');
-                              }
-                            }}
+                            inputFieldClassName="h-7"
                           />
-                        </InputField>
-                      </div>
-                      <div className="max-h-[350px] overflow-y-auto px-1">
-                        {filteredTransformers.length === 0 ? (
-                          <div className="text-text-soft flex flex-col items-center justify-center gap-2 p-4 text-center">
-                            <span className="text-sm">
-                              {searchQuery ? 'No modifiers found' : 'All modifiers have been added'}
-                            </span>
-                            {searchQuery && <span className="text-xs">Try searching for different terms</span>}
-                          </div>
-                        ) : (
-                          filteredTransformers.map((transformer) => (
-                            <SelectItem
-                              key={transformer.value}
-                              value={transformer.value}
-                              className="relative [&>*:first-child]:p-0"
-                            >
-                              <TransformerItem transformer={transformer} />
-                            </SelectItem>
-                          ))
-                        )}
-                      </div>
-                    </SelectContent>
-                  </Select>
+                        </div>
+
+                        <CommandList className="max-h-[300px]">
+                          <CommandEmpty>No modifiers found</CommandEmpty>
+                          {filteredTransformers.length > 0 && (
+                            <CommandGroup>
+                              {filteredTransformers.map((transformer) => (
+                                <CommandItem
+                                  key={transformer.value}
+                                  onSelect={() => {
+                                    handleTransformerToggle(transformer.value);
+                                    setSearchQuery('');
+                                    setIsCommandOpen(false);
+                                  }}
+                                >
+                                  <TransformerItem transformer={transformer} />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          )}
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </FormControl>
             </FormItem>
