@@ -204,3 +204,18 @@ function getMatchingVariables(searchText: string, variables: LiquidVariable[]): 
   // Default case: show any variables containing the search text
   return variables.filter((v) => v.label.toLowerCase().includes(searchLower));
 }
+
+export function createAutocompleteSource(variables: LiquidVariable[]) {
+  return (context: CompletionContext) => {
+    // Match text that starts with {{ and capture everything after it until the cursor position
+    const word = context.matchBefore(/\{\{([^}]*)/);
+    if (!word) return null;
+
+    const options = completions(variables)(context);
+    if (!options) return null;
+
+    return {
+      ...options,
+    };
+  };
+}

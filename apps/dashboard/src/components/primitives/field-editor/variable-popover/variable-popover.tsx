@@ -15,7 +15,7 @@ import { formatLiquidVariable } from './utils';
 
 export function VariablePopover({ variable, onClose, onUpdate }: VariablePopoverProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const { parsedName, parsedDefaultValue, parsedTransformers } = useVariableParser(variable || '');
+  const { parsedName, parsedDefaultValue, parsedTransformers, originalVariable } = useVariableParser(variable || '');
   const [name, setName] = useState(parsedName);
   const [defaultVal, setDefaultVal] = useState(parsedDefaultValue);
   const [showRawLiquid, setShowRawLiquid] = useState(false);
@@ -134,7 +134,7 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
                   <div className="grid gap-1">
                     <InputField size="fit" className="min-h-0">
                       <Input
-                        value={formatLiquidVariable(name, defaultVal, transformers)}
+                        value={originalVariable || formatLiquidVariable(name, defaultVal, transformers)}
                         onChange={(e) => handleRawLiquidChange(e.target.value)}
                         className="h-7 text-sm"
                       />

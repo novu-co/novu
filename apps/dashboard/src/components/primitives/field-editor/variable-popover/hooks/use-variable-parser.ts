@@ -1,72 +1,63 @@
+import { Tokenizer, TokenKind, TopLevelToken } from 'liquidjs';
 import { useMemo } from 'react';
-import { TransformerWithParam } from '../types';
 import { TRANSFORMERS } from '../constants';
+import { TransformerWithParam } from '../types';
+
+function isLiquidOutputToken(token: TopLevelToken): token is TopLevelToken & {
+  content: string;
+} {
+  const t = token as any;
+  return token.kind === TokenKind.Output && typeof t.content === 'string';
+}
 
 export function useVariableParser(variable: string) {
   return useMemo(() => {
     if (!variable) {
-      return { parsedName: '', parsedDefaultValue: '', parsedTransformers: [] };
+      return { parsedName: '', parsedDefaultValue: '', parsedTransformers: [], originalVariable: '' };
     }
 
-    const parts = variable.split('|').map((part) => part.trim());
-    const [nameWithDefault, ...restParts] = parts;
+    try {
+      // The content before any filters is the variable name
+      const [variableName, ...filterParts] = variable.split('|');
+      const parsedName = variableName.trim();
 
-    // Handle default value - check both in nameWithDefault and rest parts
-    let name = nameWithDefault || '';
-    let defaultVal = '';
+      // Extract default value and transformers from the filters
+      let parsedDefaultValue = '';
+      const parsedTransformers: TransformerWithParam[] = [];
 
-    // Function to extract default value from a part
-    const extractDefault = (part: string) => {
-      const defaultMatch =
-        part.match(/default:\s*'((?:[^'\\]|\\.)*)'/) ||
-        part.match(/default:\s*"((?:[^"\\]|\\.)*)"/) ||
-        part.match(/default:\s*([^}\s]+)/);
+      if (filterParts.length > 0) {
+        const filterTokenizer = new Tokenizer('|' + filterParts.join('|'));
+        const filters = filterTokenizer.readFilters();
 
-      if (defaultMatch) {
-        defaultVal = defaultMatch[1].replace(/\\\\'/g, "\\'").replace(/\\'/g, "'");
-        return true;
+        filters.forEach((filter) => {
+          if (filter.kind === TokenKind.Filter && filter.name === 'default' && filter.args.length > 0) {
+            const arg = filter.args[0];
+
+            parsedDefaultValue = (arg as any).content;
+          } else if (TRANSFORMERS.some((t) => t.value === filter.name)) {
+            parsedTransformers.push({
+              value: filter.name,
+              ...(filter.args.length > 0
+                ? {
+                    params: filter.args.map((arg) => {
+                      return (arg as any).content;
+                    }),
+                  }
+                : {}),
+            });
+          }
+        });
       }
-      return false;
-    };
 
-    // First check if default is in the nameWithDefault part
-    if (nameWithDefault?.includes('default:')) {
-      name = nameWithDefault.replace(/\s*\|\s*default:[^}]+/, '').trim();
-      extractDefault(nameWithDefault);
+      return {
+        parsedName,
+        parsedDefaultValue,
+        parsedTransformers,
+        originalVariable: variable,
+      };
+    } catch (error) {
+      console.error('Error parsing variable:', error);
+      return { parsedName: '', parsedDefaultValue: '', parsedTransformers: [], originalVariable: variable };
     }
-
-    // Also check rest parts for default value and filter out default parts
-    const transformerParts = restParts.filter((part) => {
-      if (part.startsWith('default:')) {
-        extractDefault(part);
-        return false;
-      }
-      return true;
-    });
-
-    // Get all transformers with their parameters
-    const transforms =
-      transformerParts.reduce<TransformerWithParam[]>((acc, part) => {
-        const [transformerValue, ...paramValues] = part.split(':').map((p) => p.trim());
-        if (TRANSFORMERS.some((t) => t.value === transformerValue)) {
-          // Parse parameters, handling quoted values and commas
-          const params =
-            paramValues.length > 0
-              ? paramValues
-                  .join(':')
-                  .split(',')
-                  .map((param) => param.trim().replace(/^['"]|["']$/g, ''))
-              : undefined;
-
-          acc.push({ value: transformerValue, ...(params ? { params } : {}) });
-        }
-        return acc;
-      }, []) || [];
-
-    return {
-      parsedName: name,
-      parsedDefaultValue: defaultVal,
-      parsedTransformers: transforms,
-    };
   }, [variable]);
 }
