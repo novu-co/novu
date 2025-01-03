@@ -2,12 +2,8 @@ import Redlock from 'redlock';
 import { setTimeout } from 'timers/promises';
 
 import { DistributedLockService } from './distributed-lock.service';
-import { FeatureFlagsService } from '../feature-flags.service';
-import {
-  InMemoryProviderClient,
-  InMemoryProviderEnum,
-  CacheInMemoryProviderService,
-} from '../in-memory-provider';
+import { CacheInMemoryProviderService } from '../in-memory-provider';
+import { vi } from 'vitest';
 
 // eslint-disable-next-line no-multi-assign
 const originalRedisCacheServiceHost = (process.env.REDIS_CACHE_SERVICE_HOST =
@@ -19,16 +15,16 @@ const originalRedisClusterServiceHost = process.env.REDIS_CLUSTER_SERVICE_HOST;
 const originalRedisClusterServicePorts =
   process.env.REDIS_CLUSTER_SERVICE_PORTS;
 
-const spyDecreaseLockCounter = jest.spyOn(
+const spyDecreaseLockCounter = vi.spyOn(
   DistributedLockService.prototype,
   <any>'decreaseLockCounter',
 );
-const spyIncreaseLockCounter = jest.spyOn(
+const spyIncreaseLockCounter = vi.spyOn(
   DistributedLockService.prototype,
   <any>'increaseLockCounter',
 );
-const spyLock = jest.spyOn(Redlock.prototype, 'acquire');
-const spyUnlock = jest.spyOn(Redlock.prototype, 'release');
+const spyLock = vi.spyOn(Redlock.prototype, 'acquire');
+const spyUnlock = vi.spyOn(Redlock.prototype, 'release');
 
 describe('Distributed Lock Service', () => {
   afterEach(() => {
@@ -135,6 +131,7 @@ describe('Distributed Lock Service', () => {
       });
     });
 
+    // TODO: Revise the following tests as they are too slow to run at the moment without fake timers
     describe('Functionalities', () => {
       it('should create lock and it should expire after the TTL set', async () => {
         const resource = 'lock-created';
@@ -153,7 +150,13 @@ describe('Distributed Lock Service', () => {
         resourceExists = await client!.exists(resource);
         expect(resourceExists).toEqual(0);
 
-        expect(spyLock).toHaveBeenNthCalledWith(1, [resource], TTL);
+        expect(spyLock).toHaveBeenNthCalledWith(1, [resource], TTL, {
+          automaticExtensionThreshold: 500,
+          driftFactor: 0.01,
+          retryCount: 50,
+          retryDelay: 100,
+          retryJitter: 200,
+        });
         expect(spyIncreaseLockCounter).toHaveBeenCalledTimes(1);
         // Unlock is still called even when the lock expires by going over TTL but errors
         expect(spyUnlock).toHaveBeenCalledTimes(1);
@@ -182,7 +185,13 @@ describe('Distributed Lock Service', () => {
           expect(resourceExists).toEqual(0);
         }
 
-        expect(spyLock).toHaveBeenNthCalledWith(1, [resource], TTL);
+        expect(spyLock).toHaveBeenNthCalledWith(1, [resource], TTL, {
+          automaticExtensionThreshold: 500,
+          driftFactor: 0.01,
+          retryCount: 50,
+          retryDelay: 100,
+          retryJitter: 200,
+        });
         expect(spyIncreaseLockCounter).toHaveBeenCalledTimes(1);
         expect(spyDecreaseLockCounter).toHaveBeenCalledTimes(1);
         expect(spyUnlock).toHaveBeenCalledTimes(1);
@@ -217,7 +226,13 @@ describe('Distributed Lock Service', () => {
           secondCall: true,
         });
         expect(spyLock).toHaveBeenCalledTimes(2);
-        expect(spyLock).toHaveBeenCalledWith([resource], TTL);
+        expect(spyLock).toHaveBeenCalledWith([resource], TTL, {
+          automaticExtensionThreshold: 500,
+          driftFactor: 0.01,
+          retryCount: 50,
+          retryDelay: 100,
+          retryJitter: 200,
+        });
         expect(spyIncreaseLockCounter).toHaveBeenCalledTimes(2);
         expect(spyIncreaseLockCounter).toHaveBeenCalledWith(resource);
         expect(spyDecreaseLockCounter).toHaveBeenCalledTimes(2);
@@ -251,7 +266,13 @@ describe('Distributed Lock Service', () => {
 
         expect(executed).toEqual(1);
         expect(spyLock).toHaveBeenCalledTimes(5);
-        expect(spyLock).toHaveBeenCalledWith([resource], TTL);
+        expect(spyLock).toHaveBeenCalledWith([resource], TTL, {
+          automaticExtensionThreshold: 500,
+          driftFactor: 0.01,
+          retryCount: 50,
+          retryDelay: 100,
+          retryJitter: 200,
+        });
         expect(spyIncreaseLockCounter).toHaveBeenCalledTimes(5);
         expect(spyIncreaseLockCounter).toHaveBeenCalledWith(resource);
         expect(spyUnlock.mock.calls.length).toBeGreaterThanOrEqual(5);
@@ -286,11 +307,17 @@ describe('Distributed Lock Service', () => {
 
         expect(executed).toEqual(5);
         expect(spyLock).toHaveBeenCalledTimes(5);
-        expect(spyLock).toHaveBeenCalledWith([resource], TTL);
+        expect(spyLock).toHaveBeenCalledWith([resource], TTL, {
+          automaticExtensionThreshold: 500,
+          driftFactor: 0.01,
+          retryCount: 50,
+          retryDelay: 100,
+          retryJitter: 200,
+        });
         expect(spyIncreaseLockCounter).toHaveBeenCalledTimes(5);
         expect(spyIncreaseLockCounter).toHaveBeenCalledWith(resource);
         expect(spyUnlock.mock.calls.length).toBeGreaterThanOrEqual(5);
-      });
+      }, 10000);
     });
   });
 

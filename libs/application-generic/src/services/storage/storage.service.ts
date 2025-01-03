@@ -79,6 +79,8 @@ export class S3StorageService implements StorageService {
         Key: key,
       });
       const data = await this.s3.send(command);
+
+      console.log('>Data', data);
       const bodyContents = await streamToBuffer(data.Body as Readable);
 
       return bodyContents as unknown as Buffer;

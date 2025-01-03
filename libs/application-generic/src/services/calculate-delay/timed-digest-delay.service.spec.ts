@@ -6,16 +6,17 @@ import {
   OrdinalEnum,
   OrdinalValueEnum,
 } from '@novu/shared';
+import { vi } from 'vitest';
 
 import { TimedDigestDelayService } from './timed-digest-delay.service';
 
 describe('TimedDigestDelayService', () => {
   describe('calculate', () => {
-    let clock: typeof jest;
+    let clock;
 
     beforeEach(() => {
       const date = new Date('2023-05-04T12:00:00Z');
-      clock = jest.useFakeTimers('modern' as FakeTimersConfig);
+      clock = vi.useFakeTimers('modern' as FakeTimersConfig);
       clock.setSystemTime(date.getTime());
     });
 

@@ -13,8 +13,7 @@
     "precommit": "lint-staged",
     "lint": "eslint src",
     "lint:fix": "pnpm lint -- --fix",
-    "test": "echo \"no tests yet\"",
-    "test:watch": ""
+    "test": "echo \"no tests yet\""
   },
   "author": "",
   "license": "ISC",

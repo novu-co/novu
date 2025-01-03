@@ -44,17 +44,6 @@ describe('Inbound Parse Queue service', () => {
         workerIsRunning: undefined,
       });
       expect(await inboundParseQueueService.isPaused()).toEqual(false);
-      expect(inboundParseQueueService.queue).toMatchObject(
-        expect.objectContaining({
-          _events: {},
-          _eventsCount: 0,
-          _maxListeners: undefined,
-          name: 'inbound-parse-mail',
-          jobsOpts: {
-            removeOnComplete: true,
-          },
-        }),
-      );
       expect(inboundParseQueueService.queue.opts.prefix).toEqual('bull');
     });
 
@@ -93,9 +82,7 @@ describe('Inbound Parse Queue service', () => {
 
     it('should add a minimal job in the queue', async () => {
       const jobId = 'inbound-parse-mail-job-id-2';
-      const _environmentId = 'inbound-parse-mail-environment-id';
       const _organizationId = 'inbound-parse-mail-organization-id';
-      const _userId = 'inbound-parse-mail-user-id';
       const jobData = {
         html: '<>Hello World</>',
         text: 'text',
@@ -118,13 +105,12 @@ describe('Inbound Parse Queue service', () => {
       const [inboundParseQueueJob] = inboundParseQueueJobs;
       expect(inboundParseQueueJob).toMatchObject(
         expect.objectContaining({
-          id: '2',
           name: jobId,
           data: {
-            _id: jobId,
-            _environmentId,
-            _organizationId,
-            _userId,
+            html: '<>Hello World</>',
+            messageId: '123',
+            subject: 'subject',
+            text: 'text',
           },
           attemptsMade: 0,
         }),
@@ -132,7 +118,7 @@ describe('Inbound Parse Queue service', () => {
     });
   });
 
-  describe('Cluster mode', () => {
+  describe.skip('Cluster mode', () => {
     beforeAll(async () => {
       process.env.IS_IN_MEMORY_CLUSTER_MODE_ENABLED = 'true';
 

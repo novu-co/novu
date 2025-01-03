@@ -1,7 +1,6 @@
-import { File } from '@google-cloud/storage';
 import { S3Client } from '@aws-sdk/client-s3';
-import { BlockBlobClient } from '@azure/storage-blob';
 import { IAttachmentOptionsExtended } from '@novu/stateless';
+import { vi } from 'vitest';
 
 import { StorageHelperService } from './storage-helper.service';
 import {
@@ -11,25 +10,24 @@ import {
 } from './storage.service';
 
 const file = Buffer.from('test');
-const gcpFileSave = jest.fn(() => Promise.resolve({}));
-const gcpDownload = jest.fn(() => Promise.resolve([file]));
-const gcpDelete = jest.fn(() => Promise.resolve({}));
+const gcpFileSave = vi.fn(() => Promise.resolve({}));
+const gcpDownload = vi.fn(() => Promise.resolve([file]));
+const gcpDelete = vi.fn(() => Promise.resolve({}));
 
-const azureUpload = jest.fn(() =>
+const azureUpload = vi.fn(() =>
   Promise.resolve({ _response: { status: 201 } }),
 );
-const azureDownloadToBuffer = jest.fn(() => Promise.resolve(file));
-const azureDelete = jest.fn(() =>
+const azureDownloadToBuffer = vi.fn(() => Promise.resolve(file));
+const azureDelete = vi.fn(() =>
   Promise.resolve({ _response: { status: 202 } }),
 );
 
-jest.mock('@aws-sdk/client-s3');
-jest.mock('@azure/storage-blob', () => ({
-  ...jest.requireActual('@azure/storage-blob'),
-  StorageSharedKeyCredential: jest.fn(() => ({})),
-  BlobServiceClient: jest.fn(() => ({
-    getContainerClient: jest.fn(() => ({
-      getBlockBlobClient: jest.fn(() => ({
+vi.mock('@aws-sdk/client-s3');
+vi.mock('@azure/storage-blob', () => ({
+  StorageSharedKeyCredential: vi.fn(() => ({})),
+  BlobServiceClient: vi.fn(() => ({
+    getContainerClient: vi.fn(() => ({
+      getBlockBlobClient: vi.fn(() => ({
         upload: azureUpload,
         downloadToBuffer: azureDownloadToBuffer,
         delete: azureDelete,
@@ -37,11 +35,10 @@ jest.mock('@azure/storage-blob', () => ({
     })),
   })),
 }));
-jest.mock('@google-cloud/storage', () => ({
-  ...jest.requireActual('@google-cloud/storage'),
-  Storage: jest.fn(() => ({
+vi.mock('@google-cloud/storage', () => ({
+  Storage: vi.fn(() => ({
     bucket: () => ({
-      file: jest.fn(() => ({
+      file: vi.fn(() => ({
         save: gcpFileSave,
         delete: gcpDelete,
         download: gcpDownload,
@@ -52,7 +49,7 @@ jest.mock('@google-cloud/storage', () => ({
 
 describe('Storage-Helper service', function () {
   beforeAll(() => {
-    jest.resetModules();
+    vi.resetModules();
     process.env = {
       ...process.env,
       GCS_BUCKET_NAME: 'test_bucket',
@@ -61,14 +58,10 @@ describe('Storage-Helper service', function () {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
-  // mocking the S3 Storage service with jest
   describe('S3', function () {
-    const s3StorageHelperService = new StorageHelperService(
-      new S3StorageService(),
-    );
     const attachments: IAttachmentOptionsExtended[] = [
       {
         name: 'test.png',
@@ -85,17 +78,20 @@ describe('Storage-Helper service', function () {
     });
 
     it('should upload file', async function () {
-      // resolve PutObjectCommand
-      jest
-        .spyOn(S3Client.prototype, 'send')
-        .mockImplementation(() => Promise.resolve({}));
+      vi.spyOn(S3Client.prototype, 'send').mockImplementation(() =>
+        Promise.resolve({}),
+      );
+
+      const s3StorageHelperService = new StorageHelperService(
+        new S3StorageService(),
+      );
 
       await s3StorageHelperService.uploadAttachments(attachments);
     });
 
     it('should get file', async function () {
       // resolve GetObjectCommand with the file
-      jest.spyOn(S3Client.prototype, 'send').mockImplementation(() =>
+      vi.spyOn(S3Client.prototype, 'send').mockImplementation(() =>
         Promise.resolve({
           Body: {
             on: (event, callback) => {
@@ -110,14 +106,22 @@ describe('Storage-Helper service', function () {
         }),
       );
 
+      const s3StorageHelperService = new StorageHelperService(
+        new S3StorageService(),
+      );
+
       await s3StorageHelperService.getAttachments(attachments);
     });
 
     it('should delete file', async function () {
       // resolve DeleteObjectCommand
-      jest
-        .spyOn(S3Client.prototype, 'send')
-        .mockImplementation(() => Promise.resolve({}));
+      vi.spyOn(S3Client.prototype, 'send').mockImplementation(() =>
+        Promise.resolve({}),
+      );
+
+      const s3StorageHelperService = new StorageHelperService(
+        new S3StorageService(),
+      );
 
       await s3StorageHelperService.deleteAttachments(resultAttachments);
     });
@@ -131,9 +135,12 @@ describe('Storage-Helper service', function () {
           mime: 'image/png',
         },
       ];
-      jest.spyOn(S3Client.prototype, 'send').mockImplementation(() =>
-        // eslint-disable-next-line prefer-promise-reject-errors
-        Promise.reject({ message: 'The specified key does not exist.' }),
+      vi.spyOn(S3Client.prototype, 'send').mockImplementation(() => {
+        throw new Error('The specified key does not exist.');
+      });
+
+      const s3StorageHelperService = new StorageHelperService(
+        new S3StorageService(),
       );
 
       await s3StorageHelperService.getAttachments(attachments2);
@@ -141,7 +148,7 @@ describe('Storage-Helper service', function () {
     });
   });
 
-  // mocking the google cloud storage service with jest
+  // mocking the google cloud storage service with vi
   describe('Google Cloud', function () {
     const gCSStorageHelperService = new StorageHelperService(
       new GCSStorageService(),
@@ -193,7 +200,7 @@ describe('Storage-Helper service', function () {
     });
   });
 
-  // mocking the azure storage service with jest
+  // mocking the azure storage service with vi
   describe('Azure', function () {
     const azureStorageHelperService = new StorageHelperService(
       new AzureBlobStorageService(),

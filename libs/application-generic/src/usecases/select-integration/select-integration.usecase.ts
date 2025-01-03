@@ -14,11 +14,11 @@ import {
 } from '../conditions-filter';
 import { CachedQuery } from '../../services/cache/interceptors/cached-query.interceptor';
 import { buildIntegrationKey } from '../../services/cache/key-builders/queries';
-import { GetDecryptedIntegrations } from '../get-decrypted-integrations';
 import {
   NormalizeVariables,
   NormalizeVariablesCommand,
 } from '../normalize-variables';
+import { decryptCredentials } from '../../encryption';
 
 const LOG_CONTEXT = 'SelectIntegration';
 
@@ -103,7 +103,9 @@ export class SelectIntegration {
       return;
     }
 
-    return GetDecryptedIntegrations.getDecryptedCredentials(integration);
+    integration.credentials = await decryptCredentials(integration.credentials);
+
+    return integration;
   }
 
   private async getPrimaryIntegration(

@@ -7,10 +7,7 @@ export abstract class BaseCommand {
     this: new (...args: unknown[]) => T,
     data: T,
   ): T {
-    const convertedObject = plainToInstance<T, unknown>(this, {
-      ...data,
-    });
-
+    const convertedObject = plainToInstance<T, unknown>(this, data);
     const errors = validateSync(convertedObject);
     const flattenedErrors = flattenErrors(errors);
     if (Object.keys(flattenedErrors).length > 0) {

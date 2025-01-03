@@ -5,22 +5,36 @@ import {
   StepTypeEnum,
 } from '@novu/shared';
 import {
+  EnvironmentRepository,
+  ExecutionDetailsRepository,
+  JobRepository,
+  MessageRepository,
   MessageTemplateEntity,
-  TenantRepository,
-  SubscriberRepository,
   MessageTemplateRepository,
+  SubscriberRepository,
+  TenantRepository,
 } from '@novu/dal';
+import {
+  ExecutionLogQueueService,
+  FeatureFlagsService,
+  WorkflowInMemoryProviderService,
+} from '../../services';
+import { ExecutionLogRoute } from '../execution-log-route';
+import { CreateExecutionDetails } from '../create-execution-details';
+import { CompileTemplate } from '../compile-template';
+import { GetFeatureFlag } from '../get-feature-flag';
+import { vi } from 'vitest';
 
 import { ConditionsFilter } from '../conditions-filter';
 import { SelectVariant } from './select-variant.usecase';
 import { SelectVariantCommand } from './select-variant.command';
 import { NormalizeVariables } from '../normalize-variables';
 
-const findOneMessageTemplateMock = jest.fn(() => testVariant);
+const findOneMessageTemplateMock = vi.fn(() => testVariant);
 
-jest.mock('@novu/dal', () => ({
-  ...jest.requireActual('@novu/dal'),
-  MessageTemplateRepository: jest.fn(() => ({
+vi.mock('@novu/dal', async () => ({
+  ...(await vi.importActual('@novu/dal')),
+  MessageTemplateRepository: vi.fn(() => ({
     findOne: findOneMessageTemplateMock,
   })),
 }));
@@ -30,15 +44,26 @@ describe('select variant', function () {
 
   beforeEach(async function () {
     selectVariantUsecase = new SelectVariant(
-      // @ts-ignore
-      new ConditionsFilter(),
+      new ConditionsFilter(
+        new SubscriberRepository(),
+        new MessageRepository(),
+        new ExecutionDetailsRepository(),
+        new JobRepository(),
+        new EnvironmentRepository(),
+        new ExecutionLogRoute(
+          new CreateExecutionDetails(new ExecutionDetailsRepository()),
+          new ExecutionLogQueueService(new WorkflowInMemoryProviderService()),
+          new GetFeatureFlag(new FeatureFlagsService()),
+        ),
+        new CompileTemplate(),
+      ),
       new MessageTemplateRepository(),
       new NormalizeVariables(
         new SubscriberRepository(),
         new TenantRepository(),
       ),
     );
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should select the variant', async function () {

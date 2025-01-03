@@ -33,15 +33,9 @@ export class GetDecryptedIntegrations {
 
     return foundIntegrations
       .filter((integration) => integration)
-      .map((integration: IntegrationEntity) =>
-        GetDecryptedIntegrations.getDecryptedCredentials(integration),
-      );
-  }
-
-  public static getDecryptedCredentials(integration: IntegrationEntity) {
-    // eslint-disable-next-line no-param-reassign
-    integration.credentials = decryptCredentials(integration.credentials);
-
-    return integration;
+      .map((integration: IntegrationEntity) => {
+        integration.credentials = decryptCredentials(integration.credentials);
+        return integration;
+      });
   }
 }

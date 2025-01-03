@@ -65,9 +65,10 @@ describe('Readiness Service', () => {
     it('should be able to instantiate it correctly', async () => {
       expect(Object.keys(readinessService)).toEqual(
         expect.arrayContaining([
-          'standardQueueServiceHealthIndicator',
-          'workflowQueueServiceHealthIndicator',
-          'subscriberProcessQueueHealthIndicator',
+          // 'standardQueueServiceHealthIndicator',
+          // 'workflowQueueServiceHealthIndicator',
+          // 'subscriberProcessQueueHealthIndicator',
+          'healthIndicators',
         ]),
       );
 

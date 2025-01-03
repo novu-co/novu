@@ -33,6 +33,8 @@ export class UserService {
     const password = userEntity?.password ?? faker.internet.password();
     const passwordHash = await hash(password, 10);
 
+    console.log('>>> DB', await this.userRepository._model.db.readyState);
+
     const user = await this.userRepository.create({
       email: normalizeEmail(userEntity?.email ?? faker.internet.email()),
       firstName: userEntity?.firstName ?? faker.name.firstName(),
