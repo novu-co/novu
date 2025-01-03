@@ -47,9 +47,6 @@ export const URLInput = ({
                       <FieldEditor
                         singleLine
                         indentWithTab={false}
-                        basicSetup={{
-                          defaultKeymap: false,
-                        }}
                         placeholder={placeholder}
                         value={field.value}
                         onChange={field.onChange}

@@ -10,8 +10,9 @@ import { FormControl, FormItem } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Switch } from '@/components/primitives/switch';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { RiAddFill } from 'react-icons/ri';
+import { useDebounce } from '../../../../hooks/use-debounce';
 import { Code2 } from '../../../icons/code-2';
 import { Separator } from '../../separator';
 import { TransformerItem } from './components/transformer-item';
@@ -21,25 +22,7 @@ import { useVariableParser } from './hooks/use-variable-parser';
 import type { VariablePopoverProps } from './types';
 import { formatLiquidVariable } from './utils';
 
-function useDebounce<T extends (...args: any[]) => void>(callback: T, delay: number) {
-  const timeoutRef = useRef<NodeJS.Timeout>();
-
-  return useCallback(
-    (...args: Parameters<T>) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        callback(...args);
-      }, delay);
-    },
-    [callback, delay]
-  );
-}
-
-export function VariablePopover({ variable, onClose, onUpdate }: VariablePopoverProps) {
-  const searchInputRef = useRef<HTMLInputElement>(null);
+export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
   const { parsedName, parsedDefaultValue, parsedTransformers, originalVariable } = useVariableParser(variable || '');
   const [name, setName] = useState(parsedName);
   const [defaultVal, setDefaultVal] = useState(parsedDefaultValue);

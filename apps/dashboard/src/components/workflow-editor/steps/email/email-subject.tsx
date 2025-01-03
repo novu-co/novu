@@ -28,6 +28,7 @@ export const EmailSubject = () => {
                 autoFocus={!field.value}
                 placeholder={capitalize(field.name)}
                 id={field.name}
+                variables={variables}
                 value={field.value}
                 onChange={(val) => field.onChange(val)}
               />

@@ -86,8 +86,6 @@ export function FieldEditor({
     [setSelectedVariable]
   );
 
-  const handleClose = useCallback(() => setSelectedVariable(null), [setSelectedVariable]);
-
   return (
     <div className="relative">
       <Editor
@@ -107,9 +105,7 @@ export function FieldEditor({
         <PopoverTrigger asChild>
           <div />
         </PopoverTrigger>
-        {selectedVariable && (
-          <VariablePopover variable={selectedVariable.value} onClose={handleClose} onUpdate={handleVariableUpdate} />
-        )}
+        {selectedVariable && <VariablePopover variable={selectedVariable.value} onUpdate={handleVariableUpdate} />}
       </Popover>
     </div>
   );
