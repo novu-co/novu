@@ -7,8 +7,9 @@ const LIQUID_CONFIG = {
   greedy: false,
   catchAllErrors: true,
 } as const;
-const DOT_ANNOTATION_MARKDOWN_LINK =
-  '[dot notation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors#dot_notation)';
+const DOT_ANNOTATION_MARKDOWN_HREF =
+  // eslint-disable-next-line max-len
+  '<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Property_accessors#dot_notation" target="_blank" rel="noopener noreferrer" style="text-decoration: underline">dot notation</a>';
 
 export type Variable = {
   /**
@@ -167,7 +168,7 @@ function extractProps(template: any): { valid: boolean; props: string[]; error?:
     return {
       valid: false,
       props: [],
-      error: `Invalid variable name containing whitespaces. Variables must follow the ${DOT_ANNOTATION_MARKDOWN_LINK}`,
+      error: `<span>Invalid variable name containing whitespaces. Variables must follow the ${DOT_ANNOTATION_MARKDOWN_HREF}</span>`,
     };
   }
 
@@ -191,7 +192,7 @@ function extractProps(template: any): { valid: boolean; props: string[]; error?:
       valid: false,
       props: [],
       // eslint-disable-next-line max-len
-      error: `Invalid variable name missing namespace. Variables must follow the ${DOT_ANNOTATION_MARKDOWN_LINK} (e.g. payload.${validProps[0]})`,
+      error: `<span>Invalid variable name missing namespace. Variables must follow the ${DOT_ANNOTATION_MARKDOWN_HREF} (e.g. payload.${validProps[0]})</span>`,
     };
   }
 

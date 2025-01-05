@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
 import { Controller, ControllerProps, FieldPath, FieldValues, FormProvider } from 'react-hook-form';
-import DOMPurify from 'dompurify';
 
 import { cn } from '@/utils/ui';
 import { Label } from '@/components/primitives/label';
@@ -121,27 +120,6 @@ const FormMessagePure = React.forwardRef<
     return null;
   }
 
-  const parseMarkdownLinks = (text: string) => {
-    if (!text.includes('[') || !text.includes(']')) return text;
-
-    const markdownLinkRegex = /\[([^\]]+)\]\(([^)"']+)(?:\s+"[^"]*")?\)/g;
-
-    const htmlContent = text.replace(markdownLinkRegex, (_, text, url) => {
-      const isValidUrl = /^(https?:\/\/|\/)[^\s<>{}\\^~[\]`]+$/i.test(url);
-      if (!isValidUrl) return text;
-
-      return `<a href="${url}" class="underline text-primary hover:text-primary/80" target="_blank" rel="noopener noreferrer nofollow">${text}</a>`;
-    });
-
-    return DOMPurify.sanitize(htmlContent, {
-      ALLOWED_TAGS: ['a'],
-      ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
-      ALLOW_UNKNOWN_PROTOCOLS: false,
-      ALLOWED_URI_REGEXP: /^(https?:|\/)/i,
-      ADD_ATTR: ['target', 'rel'],
-    });
-  };
-
   return (
     <p
       ref={ref}
@@ -151,7 +129,7 @@ const FormMessagePure = React.forwardRef<
     >
       <span>{error ? <RiErrorWarningFill className="size-4" /> : <RiInformationFill className="size-4" />}</span>
       <span className="mt-[1px] text-xs leading-4">
-        {typeof body === 'string' ? <span dangerouslySetInnerHTML={{ __html: parseMarkdownLinks(body) }} /> : body}
+        {typeof body === 'string' ? <span dangerouslySetInnerHTML={{ __html: body }} /> : body}
       </span>
     </p>
   );
