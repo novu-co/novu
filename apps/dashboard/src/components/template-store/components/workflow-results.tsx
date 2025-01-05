@@ -23,7 +23,6 @@ export function WorkflowResults({ mode, suggestions, onClick }: WorkflowResultsP
             }}
             key={template.id}
             name={template.name}
-            template={template.workflowDefinition}
             description={template.description || ''}
             steps={template.workflowDefinition.steps.map((step) => step.type)}
           />

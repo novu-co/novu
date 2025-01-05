@@ -13,24 +13,19 @@ import {
 import { ExternalLink } from '@/components/shared/external-link';
 import { CreateWorkflowForm } from '@/components/workflow-editor/create-workflow-form';
 import { useCreateWorkflow } from '@/hooks/use-create-workflow';
-import { type CreateWorkflowDto } from '@novu/shared';
 import { ComponentProps, useState } from 'react';
 import { RiArrowRightSLine } from 'react-icons/ri';
 import { z } from 'zod';
 import { workflowSchema } from './workflow-editor/schema';
 
-interface CreateWorkflowButtonProps extends ComponentProps<typeof SheetTrigger> {
-  template?: CreateWorkflowDto;
-}
-
-export const CreateWorkflowButton = ({ template, ...props }: CreateWorkflowButtonProps) => {
+export const CreateWorkflowButton = ({ ...props }: ComponentProps<typeof SheetTrigger>) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { createWorkflow: createFromTemplate, isLoading: isCreating } = useCreateWorkflow({
+  const { submit, isLoading: isCreating } = useCreateWorkflow({
     onSuccess: () => setIsOpen(false),
   });
 
   const handleSubmit = (values: z.infer<typeof workflowSchema>) => {
-    createFromTemplate(values, template);
+    submit(values);
   };
 
   return (
@@ -48,7 +43,7 @@ export const CreateWorkflowButton = ({ template, ...props }: CreateWorkflowButto
         </SheetHeader>
         <Separator />
         <SheetMain>
-          <CreateWorkflowForm onSubmit={handleSubmit} template={template} />
+          <CreateWorkflowForm onSubmit={handleSubmit} />
         </SheetMain>
         <Separator />
         <SheetFooter>

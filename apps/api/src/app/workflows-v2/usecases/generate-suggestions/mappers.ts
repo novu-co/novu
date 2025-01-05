@@ -6,16 +6,16 @@ export function mapSuggestionToDto(suggestion: IWorkflow): IWorkflowSuggestion {
   const { id, name, description, category, steps } = suggestion;
 
   return {
-    id,
-    name,
-    description,
-    category,
+    id: id ?? '',
+    name: name ?? '',
+    description: description ?? '',
+    category: category ?? 'popular',
     workflowDefinition: {
-      name,
-      description,
-      workflowId: id,
+      name: name ?? '',
+      description: description ?? '',
+      workflowId: id ?? '',
       __source: WorkflowCreationSourceEnum.TEMPLATE_STORE,
-      steps: steps.map(mapStepToDto),
+      steps: steps?.map(mapStepToDto) ?? [],
     },
   };
 }

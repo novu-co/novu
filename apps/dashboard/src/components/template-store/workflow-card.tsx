@@ -1,8 +1,7 @@
-import { CreateWorkflowDto, StepTypeEnum } from '@novu/shared';
+import { StepTypeEnum } from '@novu/shared';
 import React from 'react';
 import { Card, CardContent } from '../primitives/card';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '../primitives/hover-card';
-import { StepPreview, StepType } from '../step-preview-hover-card';
+import { StepType } from '../step-preview-hover-card';
 import { WorkflowStep } from '../workflow-step';
 
 type WorkflowCardProps = {
@@ -10,7 +9,6 @@ type WorkflowCardProps = {
   description: string;
   steps?: StepType[];
   onClick?: () => void;
-  template?: CreateWorkflowDto;
 };
 
 export function WorkflowCard({
@@ -18,7 +16,6 @@ export function WorkflowCard({
   description,
   steps = [StepTypeEnum.IN_APP, StepTypeEnum.EMAIL, StepTypeEnum.SMS, StepTypeEnum.PUSH],
   onClick,
-  template,
 }: WorkflowCardProps) {
   return (
     <Card
@@ -31,17 +28,7 @@ export function WorkflowCard({
             <div className="flex h-full w-full items-center justify-center">
               {steps.map((step, index) => (
                 <React.Fragment key={index}>
-                  <HoverCard openDelay={100}>
-                    <HoverCardTrigger>
-                      <WorkflowStep step={step} />
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-[350px] p-0" sideOffset={5}>
-                      <StepPreview
-                        type={steps[index]}
-                        stepContent={template?.steps?.find((s) => s.type === steps[index])}
-                      />
-                    </HoverCardContent>
-                  </HoverCard>
+                  <WorkflowStep step={step} />
                   {index < steps.length - 1 && <div className="h-px w-6 bg-gray-200" />}
                 </React.Fragment>
               ))}

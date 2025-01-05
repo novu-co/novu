@@ -1,16 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
 import { openai } from '@ai-sdk/openai';
-import { generateObject } from 'ai';
-import { z } from 'zod';
+import { Injectable, Logger } from '@nestjs/common';
 import { InstrumentUsecase } from '@novu/application-generic';
 import { StepTypeEnum } from '@novu/shared';
+import { generateObject } from 'ai';
+import { z } from 'zod';
 import { IWorkflowSuggestion } from '../../dtos/workflow-suggestion.interface';
 import { GenerateSuggestionsCommand, WorkflowModeEnum } from './generate-suggestions.command';
-import { workflowSchema, emailContentSchema } from './schemas';
-import { prompts } from './prompts';
 import { mapSuggestionToDto } from './mappers';
+import { prompts } from './prompts';
 import { withRetry } from './retry.util';
-import { IWorkflow, IWorkflowStep, IEmailContent } from './types';
+import { emailContentSchema, workflowSchema } from './schemas';
+import { IEmailContent, IWorkflow, IWorkflowStep } from './types';
 
 interface IGeneratedTextContent {
   text: string;
@@ -112,10 +112,10 @@ User's request: ${command.prompt}`,
       workflows.map(async (workflow) => ({
         ...workflow,
         steps: await Promise.all(
-          workflow.steps.map(async (step) => ({
+          workflow.steps?.map(async (step) => ({
             ...step,
             body: await this.generateStepContent(workflow, step, command),
-          }))
+          })) ?? []
         ),
       }))
     );
