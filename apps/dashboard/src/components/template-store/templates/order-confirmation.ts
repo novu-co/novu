@@ -132,7 +132,7 @@ export const orderConfirmationTemplate: WorkflowTemplate = {
         },
       },
     ],
-    tags: ['ecommerce', 'orders', 'tracking'],
+    tags: ['orders', 'tracking'],
     active: true,
     __source: WorkflowCreationSourceEnum.TEMPLATE_STORE,
   },
