@@ -1,4 +1,6 @@
-import { motion } from 'motion/react';
+import { CreateWorkflowButton } from '@/components/create-workflow-button';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 import {
   Calendar,
   Code2,
@@ -7,15 +9,14 @@ import {
   FileText,
   KeyRound,
   LayoutGrid,
-  Users,
   Sparkles,
+  Users,
   Wand2,
 } from 'lucide-react';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
-import { FeatureFlagsKeysEnum } from '@novu/shared';
-import { WorkflowMode } from './types';
-import { CreateWorkflowButton } from '@/components/create-workflow-button';
+import { motion } from 'motion/react';
 import { ReactNode } from 'react';
+import { Badge } from '../primitives/badge';
+import { WorkflowMode } from './types';
 
 interface WorkflowSidebarProps {
   selectedCategory: string;
@@ -33,6 +34,7 @@ interface SidebarButtonProps {
   bgColor?: string;
   asChild?: boolean;
   hasExternalLink?: boolean;
+  beta?: boolean;
 }
 
 const buttonVariants = {
@@ -53,6 +55,7 @@ function SidebarButton({
   isActive,
   bgColor = 'bg-blue-50',
   asChild,
+  beta,
   hasExternalLink,
 }: SidebarButtonProps) {
   const ButtonWrapper = asChild ? CreateWorkflowButton : motion.button;
@@ -82,7 +85,18 @@ function SidebarButton({
         isActive ? '!border-[#EEEFF1] bg-white' : ''
       }`}
     >
-      {asChild ? content : <div className="w-full">{content}</div>}
+      {asChild ? (
+        content
+      ) : (
+        <div className="flex w-full items-center gap-2">
+          {content}{' '}
+          {beta && (
+            <Badge kind="pill" size="2xs">
+              BETA
+            </Badge>
+          )}
+        </div>
+      )}
     </ButtonWrapper>
   );
 }
@@ -150,6 +164,7 @@ export function WorkflowSidebar({
             <SidebarButton
               icon={<Wand2 className="h-3 w-3 text-gray-700" />}
               label="From prompt"
+              beta
               onClick={onFromPromptClick}
               isActive={mode === WorkflowMode.FROM_PROMPT}
               bgColor="bg-blue-50"
@@ -178,6 +193,7 @@ export function WorkflowSidebar({
             <SidebarButton
               icon={<Sparkles className="h-3 w-3 text-gray-700" />}
               label="AI Suggestions"
+              beta
               onClick={onGenerateClick}
               isActive={mode === WorkflowMode.GENERATE}
               bgColor="bg-purple-50"
