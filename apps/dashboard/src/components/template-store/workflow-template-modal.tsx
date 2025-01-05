@@ -30,7 +30,10 @@ import { WorkflowSidebar } from './workflow-sidebar';
 
 const WORKFLOW_TEMPLATES = getTemplates();
 
-export type WorkflowTemplateModalProps = ComponentProps<typeof DialogTrigger>;
+export type WorkflowTemplateModalProps = ComponentProps<typeof DialogTrigger> & {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+};
 
 export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   const form = useForm();
@@ -109,9 +112,8 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
     setMode(WorkflowMode.TEMPLATES);
   };
 
-  console.log(selectedTemplate?.workflowDefinition);
   return (
-    <Dialog>
+    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogTrigger asChild {...props} />
 
       <DialogContent className="w-full max-w-[1240px] gap-0 p-0" id="workflow-templates-modal">
