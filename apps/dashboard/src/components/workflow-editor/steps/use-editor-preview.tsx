@@ -4,6 +4,7 @@ import isEqual from 'lodash.isequal';
 
 import { usePreviewStep } from '@/hooks/use-preview-step';
 import { useDataRef } from '@/hooks/use-data-ref';
+export type PreviewStepOverrides = { previewData: { previewPayload: Record<string, unknown> } };
 
 export const useEditorPreview = ({
   workflowSlug,
@@ -48,13 +49,17 @@ export const useEditorPreview = ({
     });
   }, [dataRef, previewStep]);
 
-  const previewStepCallback = useCallback(() => {
-    return previewStep({
-      workflowSlug,
-      stepSlug,
-      previewData: { controlValues, previewPayload: JSON.parse(editorValue) },
-    });
-  }, [workflowSlug, stepSlug, controlValues, editorValue, previewStep]);
+  const previewStepCallback = useCallback(
+    (overrides: PreviewStepOverrides) => {
+      const previewPayload = overrides?.previewData?.previewPayload || JSON.parse(editorValue);
+      return previewStep({
+        workflowSlug,
+        stepSlug,
+        previewData: { controlValues, previewPayload },
+      });
+    },
+    [workflowSlug, stepSlug, controlValues, editorValue, previewStep]
+  );
 
   return {
     editorValue,

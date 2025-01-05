@@ -6,13 +6,14 @@ import { Notification5Fill } from '@/components/icons';
 import { Separator } from '@/components/primitives/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { CompactButton } from '../../primitives/button-compact';
+import { PreviewStepOverrides } from './use-editor-preview';
 
 interface TemplateTabsProps {
   editorContent: React.ReactNode;
   previewContent?: React.ReactNode;
   tabsValue: string;
   onTabChange: (tab: string) => void;
-  previewStep?: () => void;
+  previewStep?: (previewData: PreviewStepOverrides) => void;
 }
 
 export const TemplateTabs = ({
@@ -27,7 +28,7 @@ export const TemplateTabs = ({
   useEffect(() => {
     // We reload the preview when the tab changes to get the latest values
     if (tabsValue === 'preview') {
-      previewStep?.();
+      previewStep?.({ previewData: { previewPayload: {} } });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabsValue]);
