@@ -35,6 +35,7 @@ export const BaseBody = () => {
           <FormControl>
             <InputField className="h-36 px-1">
               <Editor
+                indentWithTab={false}
                 fontFamily="inherit"
                 placeholder={capitalize(field.name)}
                 id={field.name}

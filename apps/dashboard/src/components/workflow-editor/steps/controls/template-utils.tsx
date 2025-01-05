@@ -1,4 +1,5 @@
 import { RegistryWidgetsType, UiSchema } from '@rjsf/utils';
+import { ComponentProps } from 'react';
 import { SelectWidget } from './select-widget';
 import { SwitchWidget } from './switch-widget';
 import { TextWidget } from './text-widget';
@@ -22,7 +23,7 @@ export const UI_SCHEMA: UiSchema = {
 
 export const WIDGETS: RegistryWidgetsType = {
   TextWidget: TextWidget,
-  URLWidget: TextWidget,
+  URLWidget: (props: ComponentProps<typeof TextWidget>) => <TextWidget {...props} singleLine />,
   EmailWidget: TextWidget,
   CheckboxWidget: SwitchWidget,
   SelectWidget: SelectWidget,

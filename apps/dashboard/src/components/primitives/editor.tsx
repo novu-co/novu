@@ -1,10 +1,10 @@
+import { autocompleteFooter, autocompleteHeader, functionIcon } from '@/components/primitives/constants';
+import { tags as t } from '@lezer/highlight';
+import createTheme from '@uiw/codemirror-themes';
+import { EditorView, ReactCodeMirrorProps, useCodeMirror } from '@uiw/react-codemirror';
+import { cva, VariantProps } from 'class-variance-authority';
 import React, { useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { useCodeMirror, ReactCodeMirrorProps, EditorView } from '@uiw/react-codemirror';
-import createTheme from '@uiw/codemirror-themes';
-import { tags as t } from '@lezer/highlight';
-import { cva, VariantProps } from 'class-variance-authority';
-import { autocompleteFooter, autocompleteHeader, functionIcon } from '@/components/primitives/constants';
 
 const editorVariants = cva('h-full w-full flex-1 [&_.cm-focused]:outline-none', {
   variants: {
@@ -18,12 +18,12 @@ const editorVariants = cva('h-full w-full flex-1 [&_.cm-focused]:outline-none', 
   },
 });
 
-const baseTheme = (options: { asInput?: boolean }) =>
+const baseTheme = (options: { singleLine?: boolean }) =>
   EditorView.baseTheme({
     '&light': {
       backgroundColor: 'transparent',
     },
-    ...(options.asInput
+    ...(options.singleLine
       ? {
           '.cm-scroller': {
             overflow: 'hidden',
@@ -114,9 +114,10 @@ const baseTheme = (options: { asInput?: boolean }) =>
 
 type EditorProps = {
   value: string;
-  asInput?: boolean;
+  singleLine?: boolean;
   placeholder?: string;
   className?: string;
+  indentWithTab?: boolean;
   height?: string;
   onChange?: (value: string) => void;
   fontFamily?: 'inherit';
@@ -131,9 +132,10 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
       className,
       height,
       size,
-      asInput,
+      singleLine,
       fontFamily,
       onChange,
+      indentWithTab,
       extensions: extensionsProp,
       basicSetup: basicSetupProp,
       ...restCodeMirrorProps
@@ -142,15 +144,19 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
   ) => {
     const editorRef = useRef<HTMLDivElement>(null);
     const [shouldFocus, setShouldFocus] = useState(false);
-    const extensions = useMemo(() => [...(extensionsProp ?? []), baseTheme({ asInput })], [extensionsProp, asInput]);
+    const extensions = useMemo(
+      () => [...(extensionsProp ?? []), baseTheme({ singleLine })],
+      [extensionsProp, singleLine]
+    );
     const basicSetup = useMemo(
       () => ({
         lineNumbers: false,
         foldGutter: false,
         highlightActiveLine: false,
+        defaultKeymap: !singleLine,
         ...((typeof basicSetupProp === 'object' ? basicSetupProp : {}) ?? {}),
       }),
-      [basicSetupProp]
+      [basicSetupProp, singleLine]
     );
 
     const theme = useMemo(
@@ -189,6 +195,7 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
       placeholder,
       basicSetup,
       container: editorRef.current,
+      indentWithTab,
       value,
       onChange: onChangeCallback,
       theme,

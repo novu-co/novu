@@ -1,17 +1,17 @@
-import { useEffect } from 'react';
-import { RiRouteFill } from 'react-icons/ri';
-import { WorkflowList } from '@/components/workflow-list';
+import { CreateWorkflowButton } from '@/components/create-workflow-button';
 import { DashboardLayout } from '@/components/dashboard-layout';
-import { Button } from '@/components/primitives/button';
 import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';
+import { Badge } from '@/components/primitives/badge';
+import { Button } from '@/components/primitives/button';
+import { WorkflowTemplateModal } from '@/components/template-store/workflow-template-modal';
+import { WorkflowList } from '@/components/workflow-list';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
-import { Badge } from '@/components/primitives/badge';
-import { WorkflowTemplateModal } from '@/components/template-store/workflow-template-modal';
-import { CreateWorkflowButton } from '@/components/create-workflow-button';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
+import { useEffect } from 'react';
+import { RiRouteFill } from 'react-icons/ri';
 
 export const WorkflowsPage = () => {
   const track = useTelemetry();
@@ -40,15 +40,13 @@ export const WorkflowsPage = () => {
 
           {isTemplateStoreEnabled ? (
             <WorkflowTemplateModal asChild>
-              <Button variant="primary" size="sm">
-                <RiRouteFill className="size-4" />
+              <Button mode="gradient" variant="primary" size="xs" leadingIcon={RiRouteFill}>
                 Create workflow
               </Button>
             </WorkflowTemplateModal>
           ) : (
             <CreateWorkflowButton asChild>
-              <Button variant="primary" size="sm">
-                <RiRouteFill className="size-4" />
+              <Button mode="gradient" variant="primary" size="xs" leadingIcon={RiRouteFill}>
                 Create workflow
               </Button>
             </CreateWorkflowButton>

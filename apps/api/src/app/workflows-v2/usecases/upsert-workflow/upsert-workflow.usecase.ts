@@ -43,9 +43,7 @@ import {
   WorkflowInternalResponseDto,
   TierRestrictionsValidateUsecase,
   UpsertControlValuesCommand,
-  DeleteControlValuesCommand,
   UpsertControlValuesUseCase,
-  DeleteControlValuesUseCase,
   TierRestrictionsValidateCommand,
   dashboardSanitizeControlValues,
   PinoLogger,
@@ -68,7 +66,6 @@ export class UpsertWorkflowUseCase {
     private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase,
     private controlValuesRepository: ControlValuesRepository,
     private upsertControlValuesUseCase: UpsertControlValuesUseCase,
-    private deleteControlValuesUseCase: DeleteControlValuesUseCase,
     private tierRestrictionsValidateUsecase: TierRestrictionsValidateUsecase,
     private logger: PinoLogger
   ) {}
@@ -77,6 +74,7 @@ export class UpsertWorkflowUseCase {
   async execute(command: UpsertWorkflowCommand): Promise<WorkflowResponseDto> {
     const workflowForUpdate = await this.queryWorkflow(command);
     const persistedWorkflow = await this.createOrUpdateWorkflow(workflowForUpdate, command);
+    // TODO: this upsertControlValues logic should be moved to the create/update workflow usecase
     await this.upsertControlValues(persistedWorkflow, command);
     const workflow = await this.getWorkflowUseCase.execute(
       GetWorkflowCommand.create({
@@ -392,15 +390,13 @@ export class UpsertWorkflowUseCase {
     command: UpsertWorkflowCommand
   ) {
     if (update.shouldDelete) {
-      return this.deleteControlValuesUseCase.execute(
-        DeleteControlValuesCommand.create({
-          environmentId: command.user.environmentId,
-          organizationId: command.user.organizationId,
-          stepId: update.step._templateId,
-          workflowId,
-          userId: command.user._id,
-        })
-      );
+      return this.controlValuesRepository.delete({
+        _environmentId: command.user.environmentId,
+        _organizationId: command.user.organizationId,
+        _workflowId: workflowId,
+        _stepId: update.step._templateId,
+        level: ControlValuesLevelEnum.STEP_CONTROLS,
+      });
     }
 
     return this.upsertControlValuesUseCase.execute(

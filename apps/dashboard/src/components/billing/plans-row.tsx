@@ -97,7 +97,7 @@ export function PlansRow({ selectedBillingInterval, currentPlan, trial }: PlansR
           </div>
           <div className="mt-6">
             {effectiveCurrentPlan !== 'enterprise' && (
-              <PlanActionButton selectedBillingInterval={selectedBillingInterval} className="w-full" />
+              <PlanActionButton selectedBillingInterval={selectedBillingInterval} mode="filled" className="w-full" />
             )}
           </div>
         </div>
@@ -134,9 +134,9 @@ export function PlansRow({ selectedBillingInterval, currentPlan, trial }: PlansR
               </li>
             </ul>
           </div>
-          <div className="mt-6">
+          <div className="mt-auto">
             {effectiveCurrentPlan === 'enterprise' ? (
-              <PlanActionButton selectedBillingInterval={selectedBillingInterval} className="w-full" />
+              <PlanActionButton selectedBillingInterval={selectedBillingInterval} mode="outline" className="w-full" />
             ) : (
               <ContactSalesButton variant="outline" className="w-full" />
             )}

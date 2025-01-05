@@ -1,14 +1,14 @@
+import { autocompletion } from '@codemirror/autocomplete';
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { autocompletion } from '@codemirror/autocomplete';
 
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { InputFieldPure } from '@/components/primitives/input';
 import { Code2 } from '@/components/icons/code-2';
 import { Editor } from '@/components/primitives/editor';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
+import { InputFieldPure } from '@/components/primitives/input';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { completions } from '@/utils/liquid-autocomplete';
+import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 
 export const DigestKey = () => {
   const { control } = useFormContext();
@@ -33,6 +33,8 @@ export const DigestKey = () => {
               </FormLabel>
               <FormControl>
                 <Editor
+                  singleLine
+                  indentWithTab={false}
                   fontFamily="inherit"
                   ref={field.ref}
                   placeholder="Add additional digest..."
