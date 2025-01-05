@@ -20,6 +20,7 @@ export type NodeData = {
   error?: string;
   name?: string;
   stepSlug?: string;
+  controlValues?: Record<string, any>;
 };
 
 export type NodeType = FlowNode<NodeData>;
@@ -45,7 +46,9 @@ export const TriggerNode = ({ data }: NodeProps<FlowNode<{ environmentSlug: stri
       <NodeHeader type={StepTypeEnum.TRIGGER}>
         <NodeName>Workflow trigger</NodeName>
       </NodeHeader>
-      <NodeBody>This step triggers this workflow</NodeBody>
+      <NodeBody type={StepTypeEnum.TRIGGER} controlValues={{}}>
+        This step triggers this workflow
+      </NodeBody>
       <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
     </Node>
   </Link>
@@ -75,9 +78,13 @@ export const EmailNode = ({ data }: NodeProps<NodeType>) => {
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.EMAIL]}>
             <Icon />
           </NodeIcon>
+
           <NodeName>{data.name || 'Email Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>{data.content}</NodeBody>
+
+        <NodeBody type={StepTypeEnum.EMAIL} controlValues={data.controlValues ?? {}}>
+          {data.content}
+        </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -99,7 +106,9 @@ export const SmsNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'SMS Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>{data.content}</NodeBody>
+        <NodeBody type={StepTypeEnum.SMS} controlValues={data.controlValues ?? {}}>
+          {data.content}
+        </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -121,7 +130,9 @@ export const InAppNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'In-App Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>{data.content}</NodeBody>
+        <NodeBody type={StepTypeEnum.IN_APP} controlValues={data.controlValues ?? {}}>
+          {data.content}
+        </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -143,7 +154,9 @@ export const PushNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Push Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>{data.content}</NodeBody>
+        <NodeBody type={StepTypeEnum.PUSH} controlValues={data.controlValues ?? {}}>
+          {data.content}
+        </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -165,7 +178,9 @@ export const ChatNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Chat Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>{data.content}</NodeBody>
+        <NodeBody type={StepTypeEnum.CHAT} controlValues={data.controlValues ?? {}}>
+          {data.content}
+        </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -187,7 +202,9 @@ export const DelayNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Delay Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>{data.content}</NodeBody>
+        <NodeBody type={StepTypeEnum.DELAY} controlValues={data.controlValues ?? {}}>
+          {data.content}
+        </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -209,7 +226,9 @@ export const DigestNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Digest Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>{data.content}</NodeBody>
+        <NodeBody type={StepTypeEnum.DIGEST} controlValues={data.controlValues ?? {}}>
+          {data.content}
+        </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -231,7 +250,9 @@ export const CustomNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Custom Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>{data.content}</NodeBody>
+        <NodeBody type={StepTypeEnum.CUSTOM} controlValues={data.controlValues ?? {}}>
+          {data.content}
+        </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />

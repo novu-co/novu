@@ -105,12 +105,13 @@ const mapStepToNode = ({
       addStepIndex,
       stepSlug: step.slug,
       error,
+      controlValues: step.controls.values,
     },
     type: step.type,
   };
 };
 
-const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
+const WorkflowCanvasChild = ({ steps, readOnly }: { steps: Step[]; readOnly?: boolean }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const reactFlowInstance = useReactFlow();
   const { currentEnvironment } = useEnvironment();
@@ -153,19 +154,26 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
       }
 
       const parent = nodes[index - 1];
-      acc.push({
-        id: `edge-${parent.id}-${node.id}`,
-        source: parent.id,
-        sourceHandle: 'b',
-        targetHandle: 'a',
-        target: node.id,
-        type: 'addNode',
-        style: { stroke: 'hsl(var(--neutral-alpha-200))', strokeWidth: 2, strokeDasharray: 5 },
-        data: {
-          isLast: index === nodes.length - 1,
-          addStepIndex: index - 1,
-        },
-      });
+
+      if (!readOnly) {
+        acc.push({
+          id: `edge-${parent.id}-${node.id}`,
+          source: parent.id,
+          sourceHandle: 'b',
+          targetHandle: 'a',
+          target: node.id,
+          type: 'addNode',
+          style: {
+            stroke: 'hsl(var(--neutral-alpha-200))',
+            strokeWidth: 2,
+            strokeDasharray: 5,
+          },
+          data: {
+            isLast: index === nodes.length - 1,
+            addStepIndex: index - 1,
+          },
+        });
+      }
 
       return acc;
     }, []);
@@ -198,7 +206,7 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
   }, [positionCanvas]);
 
   return (
-    <div ref={reactFlowWrapper} className="h-full w-full">
+    <div ref={reactFlowWrapper} className="h-full w-full" id="workflow-canvas-container">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -211,6 +219,10 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
         selectionOnDrag
         panOnDrag={panOnDrag}
         onPaneClick={() => {
+          if (readOnly) {
+            return;
+          }
+
           // unselect node if clicked on background
           if (currentEnvironment?.slug && currentWorkflow?.slug) {
             navigate(
@@ -229,10 +241,10 @@ const WorkflowCanvasChild = ({ steps }: { steps: Step[] }) => {
   );
 };
 
-export const WorkflowCanvas = ({ steps }: { steps: Step[] }) => {
+export const WorkflowCanvas = ({ steps, readOnly }: { steps: Step[]; readOnly?: boolean }) => {
   return (
     <ReactFlowProvider>
-      <WorkflowCanvasChild steps={steps || []} />
+      <WorkflowCanvasChild steps={steps || []} readOnly={readOnly} />
     </ReactFlowProvider>
   );
 };

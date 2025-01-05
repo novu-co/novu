@@ -1,14 +1,14 @@
 import { Button } from '@/components/primitives/button';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/primitives/hover-card';
 import { Input, InputField } from '@/components/primitives/input';
 import { Textarea } from '@/components/primitives/textarea';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/primitives/hover-card';
-import { Sparkles, Wand2, ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles, Wand2 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { GENERATE_EXAMPLES, FROM_PROMPT_EXAMPLES } from '../constants';
-import { LoadingSkeleton } from './loading-skeleton';
-import { WorkflowResults } from './workflow-results';
+import { FROM_PROMPT_EXAMPLES, GENERATE_EXAMPLES } from '../constants';
 import { IWorkflowSuggestion } from '../templates';
 import { WorkflowMode } from '../types';
+import { LoadingSkeleton } from './loading-skeleton';
+import { WorkflowResults } from './workflow-results';
 
 export type WorkflowGenerateProps = {
   mode: WorkflowMode;
@@ -17,6 +17,7 @@ export type WorkflowGenerateProps = {
   isGenerating: boolean;
   handleSubmit: () => void;
   suggestions: IWorkflowSuggestion[];
+  onClick: (template: IWorkflowSuggestion) => void;
 };
 
 export function WorkflowGenerate({
@@ -26,6 +27,7 @@ export function WorkflowGenerate({
   isGenerating,
   handleSubmit,
   suggestions,
+  onClick,
 }: WorkflowGenerateProps) {
   const examples = mode === 'from_prompt' ? FROM_PROMPT_EXAMPLES : GENERATE_EXAMPLES;
 
@@ -50,7 +52,7 @@ export function WorkflowGenerate({
             Regenerate
           </Button>
         </div>
-        <WorkflowResults mode={mode} suggestions={suggestions} />
+        <WorkflowResults mode={mode} suggestions={suggestions} onClick={onClick} />
       </>
     );
   }
@@ -134,7 +136,7 @@ export function WorkflowGenerate({
         </div>
       </div>
 
-      <Button onClick={handleSubmit} size="lg" className="w-full max-w-xl" type="button" isLoading={isGenerating}>
+      <Button onClick={handleSubmit} size="sm" className="w-full max-w-xl" type="button" isLoading={isGenerating}>
         {mode === 'from_prompt' ? 'Generate Workflow' : 'Generate Suggestions'}
       </Button>
     </div>

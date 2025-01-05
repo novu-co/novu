@@ -1,10 +1,18 @@
-import { ReactNode, useState } from 'react';
-import { cva, VariantProps } from 'class-variance-authority';
-import { StepTypeEnum } from '@/utils/enums';
-import { RiErrorWarningFill } from 'react-icons/ri';
-import { Popover, PopoverArrow, PopoverContent, PopoverPortal, PopoverTrigger } from '../primitives/popover';
-import { cn } from '@/utils/ui';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
+import { StepTypeEnum } from '@/utils/enums';
+import { cn } from '@/utils/ui';
+import { cva, VariantProps } from 'class-variance-authority';
+import { ReactNode, useState } from 'react';
+import { RiErrorWarningFill } from 'react-icons/ri';
+import {
+  HoverCard,
+  HoverCardArrow,
+  HoverCardContent,
+  HoverCardPortal,
+  HoverCardTrigger,
+} from '../primitives/hover-card';
+import { Popover, PopoverArrow, PopoverContent, PopoverPortal, PopoverTrigger } from '../primitives/popover';
+import { StepPreview } from '../step-preview-hover-card';
 
 const nodeBadgeVariants = cva(
   'min-w-5 text-xs h-5 border rounded-full opacity-40 flex items-center justify-center p-1',
@@ -60,14 +68,35 @@ export const NodeHeader = ({ children, type }: { children: ReactNode; type: Step
   );
 };
 
-export const NodeBody = ({ children }: { children: ReactNode }) => {
+export const NodeBody = ({
+  children,
+  type,
+  controlValues,
+}: {
+  children: ReactNode;
+  type: StepTypeEnum;
+  controlValues: Record<string, any>;
+}) => {
   return (
-    <div className="bg-neutral-alpha-50 relative flex items-center rounded-lg px-1 py-2">
-      <span className="text-foreground-400 overflow-hidden text-ellipsis text-nowrap text-sm font-medium">
-        {children}
-      </span>
-      <span className="to-background/90 absolute left-0 top-0 h-full w-full rounded-b-[calc(var(--radius)-1px)] bg-gradient-to-r from-[rgba(255,255,255,0.00)] from-70% to-95%" />
-    </div>
+    <HoverCard openDelay={300}>
+      <HoverCardTrigger>
+        <div className="bg-neutral-alpha-50 relative flex items-center rounded-lg px-1 py-2">
+          <span className="text-foreground-400 overflow-hidden text-ellipsis text-nowrap text-sm font-medium">
+            {children}
+          </span>
+          <span className="to-background/90 absolute left-0 top-0 h-full w-full rounded-b-[calc(var(--radius)-1px)] bg-gradient-to-r from-[rgba(255,255,255,0.00)] from-70% to-95%" />
+        </div>
+      </HoverCardTrigger>
+      <HoverCardPortal container={document.getElementById('workflow-canvas-container')}>
+        {type !== StepTypeEnum.TRIGGER && (
+          <HoverCardContent side="left" className="w-[350px] border-none p-0" sideOffset={15}>
+            <StepPreview type={type} controlValues={controlValues} />
+
+            <HoverCardArrow className="fill-white stroke-white text-white" />
+          </HoverCardContent>
+        )}
+      </HoverCardPortal>
+    </HoverCard>
   );
 };
 

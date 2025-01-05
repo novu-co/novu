@@ -1,14 +1,14 @@
-import { WorkflowMode } from '../types';
-import { CreateWorkflowButton } from '../../create-workflow-button';
-import { WorkflowCard } from '../workflow-card';
 import { IWorkflowSuggestion } from '../templates/types';
+import { WorkflowMode } from '../types';
+import { WorkflowCard } from '../workflow-card';
 
 type WorkflowResultsProps = {
   mode: WorkflowMode;
   suggestions: IWorkflowSuggestion[];
+  onClick: (template: IWorkflowSuggestion) => void;
 };
 
-export function WorkflowResults({ mode, suggestions }: WorkflowResultsProps) {
+export function WorkflowResults({ mode, suggestions, onClick }: WorkflowResultsProps) {
   return (
     <div
       className={`grid ${
@@ -17,14 +17,16 @@ export function WorkflowResults({ mode, suggestions }: WorkflowResultsProps) {
     >
       {suggestions.map((template) => {
         return (
-          <CreateWorkflowButton key={template.name} asChild template={template.workflowDefinition}>
-            <WorkflowCard
-              name={template.name}
-              template={template.workflowDefinition}
-              description={template.description || ''}
-              steps={template.workflowDefinition.steps.map((step) => step.type)}
-            />
-          </CreateWorkflowButton>
+          <WorkflowCard
+            onClick={() => {
+              onClick(template);
+            }}
+            key={template.id}
+            name={template.name}
+            template={template.workflowDefinition}
+            description={template.description || ''}
+            steps={template.workflowDefinition.steps.map((step) => step.type)}
+          />
         );
       })}
     </div>
