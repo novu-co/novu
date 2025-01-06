@@ -1,11 +1,11 @@
 import { useFormContext } from 'react-hook-form';
 
+import { FieldEditor } from '@/components/primitives/field-editor';
 import { FormControl, FormField, FormItem, FormMessagePure } from '@/components/primitives/form/form';
 import { Input, InputFieldProps, InputFieldPure, InputProps } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
-import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
-import { FieldEditor } from '@/components/primitives/field-editor';
+import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 
 type URLInputProps = Omit<InputProps, 'value' | 'onChange' | 'size'> & {
   options: string[];
@@ -45,7 +45,8 @@ export const URLInput = ({
                   <FormControl>
                     {asEditor ? (
                       <FieldEditor
-                        fontFamily="inherit"
+                        singleLine
+                        indentWithTab={false}
                         placeholder={placeholder}
                         value={field.value}
                         onChange={field.onChange}

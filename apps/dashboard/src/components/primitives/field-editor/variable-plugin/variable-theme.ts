@@ -1,13 +1,13 @@
 import { EditorView } from '@uiw/react-codemirror';
+import { VARIABLE_PILL_CLASS } from './constants';
 
 export const variablePillTheme = EditorView.baseTheme({
-  '.cm-variable-pill': {
+  [`.${VARIABLE_PILL_CLASS}`]: {
     backgroundColor: 'hsl(var(--bg-weak))',
     color: 'hsl(var(--text-sub))',
     border: '1px solid hsl(var(--stroke-soft))',
-    borderRadius: '9999px',
-    padding: '2px 6px 2px 18px',
-    margin: '0 4px',
+    borderRadius: '10px',
+    padding: '2px 6px 2px 6px',
     fontFamily: 'inherit',
     display: 'inline-flex',
     alignItems: 'center',
@@ -17,18 +17,15 @@ export const variablePillTheme = EditorView.baseTheme({
     cursor: 'pointer',
     position: 'relative',
     marginRight: '0px',
-  },
-  '.cm-variable-pill.has-modifiers': {
-    paddingRight: '12px',
+    top: '2px',
   },
   '.cm-variable-pill::before': {
     content: '""',
-    position: 'absolute',
     left: '4px',
-    top: '50%',
-    transform: 'translateY(-50%)',
     width: '12px',
+    minWidth: '12px',
     height: '12px',
+    marginRight: '3px',
     backgroundColor: 'hsl(var(--feature-base))',
     maskImage: `url("/images/code.svg")`,
     maskRepeat: 'no-repeat',
@@ -41,14 +38,11 @@ export const variablePillTheme = EditorView.baseTheme({
   },
   '.cm-variable-pill.has-modifiers::after': {
     content: '""',
-    position: 'absolute',
-    right: '5px',
-    top: '50%',
-    transform: 'translateY(-50%)',
     width: '4px',
     height: '4px',
     backgroundColor: 'hsl(var(--feature-base))',
     borderRadius: '50%',
+    marginLeft: '3px',
   },
   '.cm-variable-pill .cm-bracket': {
     display: 'none',

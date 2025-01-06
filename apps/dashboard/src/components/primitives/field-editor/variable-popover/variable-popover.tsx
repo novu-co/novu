@@ -1,38 +1,49 @@
-import { useState, useRef, useEffect } from 'react';
-import { PopoverContent } from '@/components/primitives/popover';
-import { Input, InputField } from '@/components/primitives/input';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/primitives/command';
 import { FormControl, FormItem } from '@/components/primitives/form/form';
+import { Input, InputField } from '@/components/primitives/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Switch } from '@/components/primitives/switch';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { RiAddFill } from 'react-icons/ri';
+import { useDebounce } from '../../../../hooks/use-debounce';
 import { Code2 } from '../../../icons/code-2';
 import { Separator } from '../../separator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
+import { DigestWidget } from './components/digest-widget';
 import { TransformerItem } from './components/transformer-item';
 import { TransformerList } from './components/transformer-list';
-import { DigestWidget } from './components/digest-widget';
-import { useVariableParser } from './hooks/use-variable-parser';
 import { useTransformerManager } from './hooks/use-transformer-manager';
+import { useVariableParser } from './hooks/use-variable-parser';
+import type { TransformerWithParam, VariablePopoverProps } from './types';
 import { formatLiquidVariable } from './utils';
-import type { VariablePopoverProps } from './types';
-import type { TransformerWithParam } from './types';
 
-export function VariablePopover({ variable, onClose, onUpdate }: VariablePopoverProps) {
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const { parsedName, parsedDefaultValue, parsedTransformers } = useVariableParser(variable);
+export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
+  const { parsedName, parsedDefaultValue, parsedTransformers, originalVariable } = useVariableParser(variable || '');
   const [name, setName] = useState(parsedName);
   const [defaultVal, setDefaultVal] = useState(parsedDefaultValue);
   const [showRawLiquid, setShowRawLiquid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isCommandOpen, setIsCommandOpen] = useState(false);
 
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
+    setName(parsedName);
+    setDefaultVal(parsedDefaultValue);
+  }, [parsedName, parsedDefaultValue]);
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [onClose]);
+  const updateVariable = useCallback(
+    (newName: string, newDefaultVal: string, newTransformers: any[]) => {
+      onUpdate(formatLiquidVariable(newName, newDefaultVal, newTransformers));
+    },
+    [onUpdate]
+  );
+
+  const debouncedUpdate = useDebounce(updateVariable, 300);
 
   const {
     transformers,
@@ -47,21 +58,27 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
   } = useTransformerManager({
     initialTransformers: parsedTransformers,
     onUpdate: (newTransformers) => {
-      onUpdate(formatLiquidVariable(name, defaultVal, newTransformers));
+      debouncedUpdate(name, defaultVal, newTransformers);
     },
   });
 
-  const handleNameChange = (newName: string) => {
-    setName(newName);
-    onUpdate(formatLiquidVariable(newName, defaultVal, transformers));
-  };
+  const handleNameChange = useCallback(
+    (newName: string) => {
+      setName(newName);
+      debouncedUpdate(newName, defaultVal, transformers);
+    },
+    [defaultVal, transformers, debouncedUpdate]
+  );
 
-  const handleDefaultValueChange = (newDefaultVal: string) => {
-    setDefaultVal(newDefaultVal);
-    onUpdate(formatLiquidVariable(name, newDefaultVal, transformers));
-  };
+  const handleDefaultValueChange = useCallback(
+    (newDefaultVal: string) => {
+      setDefaultVal(newDefaultVal);
+      debouncedUpdate(name, newDefaultVal, transformers);
+    },
+    [name, transformers, debouncedUpdate]
+  );
 
-  const handleRawLiquidChange = (value: string) => {
+  const handleRawLiquidChange = useCallback((value: string) => {
     // Remove {{ and }} and trim
     const content = value.replace(/^\{\{\s*|\s*\}\}$/g, '').trim();
 
@@ -113,15 +130,20 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
         }
       }
     });
+  }, []);
 
-    setDefaultVal(newDefaultVal);
-    transformers.length = 0;
-    transformers.push(...newTransformers);
-    onUpdate(`{{${content}}}`);
-  };
+  const filteredTransformers = useMemo(
+    () => getFilteredTransformers(searchQuery),
+    [getFilteredTransformers, searchQuery]
+  );
+
+  const currentLiquidValue = useMemo(
+    () => originalVariable || formatLiquidVariable(name, defaultVal, transformers),
+    [originalVariable, name, defaultVal, transformers]
+  );
 
   return (
-    <PopoverContent className="w-72 p-0">
+    <PopoverContent className="w-72 p-0 pb-1">
       <div>
         <div className="bg-bg-weak">
           <div className="flex flex-row items-center justify-between space-y-0 p-1.5">
@@ -137,12 +159,13 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
                 <div className="grid gap-1">
                   <label className="text-text-sub text-label-xs">Variable name</label>
                   <InputField size="fit" className="min-h-0">
-                    <Code2 className="text-text-sub h-4 w-4" />
+                    <Code2 className="text-text-sub h-4 w-4 min-w-4" />
                     <Input value={name} onChange={(e) => handleNameChange(e.target.value)} className="h-7 text-sm" />
                   </InputField>
                 </div>
               </FormControl>
             </FormItem>
+
             <FormItem>
               <FormControl>
                 <div className="grid gap-1">
@@ -179,7 +202,7 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
                   <div className="grid gap-1">
                     <InputField size="fit" className="min-h-0">
                       <Input
-                        value={formatLiquidVariable(name, defaultVal, transformers)}
+                        value={currentLiquidValue}
                         onChange={(e) => handleRawLiquidChange(e.target.value)}
                         className="h-7 text-sm"
                       />
@@ -197,69 +220,46 @@ export function VariablePopover({ variable, onClose, onUpdate }: VariablePopover
               <FormControl>
                 <div className="grid gap-1">
                   <label className="text-text-sub text-label-xs">Modifiers</label>
-                  <Select
-                    value=""
-                    onValueChange={(value) => {
-                      if (value) {
-                        handleTransformerToggle(value);
-                        setSearchQuery('');
-                      }
-                    }}
-                  >
-                    <SelectTrigger className="!text-paragraph-xs text-text-soft !h-7 min-h-0 !p-1.5">
-                      <SelectValue placeholder="Add a modifier..." />
-                    </SelectTrigger>
-                    <SelectContent
-                      onCloseAutoFocus={(e) => {
-                        e.preventDefault();
-                        searchInputRef.current?.focus();
-                      }}
-                      className="max-h-[400px]"
-                      align="start"
-                    >
-                      <div className="p-2">
-                        <InputField size="fit" className="min-h-0">
-                          <Input
-                            ref={searchInputRef}
+                  <Popover open={isCommandOpen} onOpenChange={setIsCommandOpen}>
+                    <PopoverTrigger asChild>
+                      <button className="text-text-soft bg-background flex h-[30px] w-full items-center justify-between rounded-md border px-2 text-sm">
+                        <span>Add a modifier...</span>
+                        <RiAddFill className="h-4 w-4" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[280px] p-0" align="start">
+                      <Command>
+                        <div className="p-1">
+                          <CommandInput
                             value={searchQuery}
-                            onChange={(e) => {
-                              e.stopPropagation();
-                              setSearchQuery(e.target.value);
-                            }}
-                            className="h-7 text-sm"
+                            onValueChange={setSearchQuery}
                             placeholder="Search modifiers..."
-                            autoFocus
-                            onKeyDown={(e) => {
-                              e.stopPropagation();
-                              if (e.key === 'Escape') {
-                                setSearchQuery('');
-                              }
-                            }}
+                            inputFieldClassName="h-7"
                           />
-                        </InputField>
-                      </div>
-                      <div className="max-h-[350px] overflow-y-auto px-1">
-                        {getFilteredTransformers(searchQuery).length === 0 ? (
-                          <div className="text-text-soft flex flex-col items-center justify-center gap-2 p-4 text-center">
-                            <span className="text-sm">
-                              {searchQuery ? 'No modifiers found' : 'All modifiers have been added'}
-                            </span>
-                            {searchQuery && <span className="text-xs">Try searching for different terms</span>}
-                          </div>
-                        ) : (
-                          getFilteredTransformers(searchQuery).map((transformer) => (
-                            <SelectItem
-                              key={transformer.value}
-                              value={transformer.value}
-                              className="relative [&>*:first-child]:p-0"
-                            >
-                              <TransformerItem transformer={transformer} />
-                            </SelectItem>
-                          ))
-                        )}
-                      </div>
-                    </SelectContent>
-                  </Select>
+                        </div>
+
+                        <CommandList className="max-h-[300px]">
+                          <CommandEmpty>No modifiers found</CommandEmpty>
+                          {filteredTransformers.length > 0 && (
+                            <CommandGroup>
+                              {filteredTransformers.map((transformer) => (
+                                <CommandItem
+                                  key={transformer.value}
+                                  onSelect={() => {
+                                    handleTransformerToggle(transformer.value);
+                                    setSearchQuery('');
+                                    setIsCommandOpen(false);
+                                  }}
+                                >
+                                  <TransformerItem transformer={transformer} />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          )}
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </FormControl>
             </FormItem>

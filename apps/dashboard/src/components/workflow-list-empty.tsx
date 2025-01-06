@@ -1,10 +1,11 @@
+import { CreateWorkflowButton } from '@/components/create-workflow-button';
+import { VersionControlDev } from '@/components/icons/version-control-dev';
+import { VersionControlProd } from '@/components/icons/version-control-prod';
+import { Button } from '@/components/primitives/button';
+import { useEnvironment } from '@/context/environment/hooks';
 import { RiBookMarkedLine, RiRouteFill } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-import { Button, buttonVariants } from '@/components/primitives/button';
-import { VersionControlProd } from '@/components/icons/version-control-prod';
-import { VersionControlDev } from '@/components/icons/version-control-dev';
-import { CreateWorkflowButton } from '@/components/create-workflow-button';
-import { useEnvironment } from '@/context/environment/hooks';
+import { LinkButton } from './primitives/button-link';
 
 export const WorkflowListEmpty = () => {
   const { currentEnvironment, switchEnvironment, oppositeEnvironment } = useEnvironment();
@@ -30,16 +31,11 @@ const WorkflowListEmptyProd = ({ switchToDev }: { switchToDev: () => void }) => 
     </div>
 
     <div className="flex items-center justify-center gap-6">
-      <Link
-        to={'https://docs.novu.co/concepts/workflows'}
-        target="_blank"
-        className={buttonVariants({ variant: 'link', className: 'text-foreground-600 gap-1' })}
-      >
-        <RiBookMarkedLine className="size-4" />
-        View docs
+      <Link to={'https://docs.novu.co/concepts/workflows'} target="_blank">
+        <LinkButton trailingIcon={RiBookMarkedLine}>View docs</LinkButton>
       </Link>
-      <Button variant="primary" className="gap-2" onClick={switchToDev}>
-        <RiRouteFill className="size-5" />
+
+      <Button variant="secondary" className="gap-2" onClick={switchToDev}>
         Switch to Development
       </Button>
     </div>
@@ -58,17 +54,14 @@ const WorkflowListEmptyDev = () => (
     </div>
 
     <div className="flex items-center justify-center gap-6">
-      <Link
-        to={'https://docs.novu.co/concepts/workflows'}
-        target="_blank"
-        className={buttonVariants({ variant: 'link', className: 'text-foreground-600 gap-1' })}
-      >
-        <RiBookMarkedLine className="size-4" />
-        View docs
+      <Link to={'https://docs.novu.co/concepts/workflows'} target="_blank">
+        <LinkButton variant="gray" trailingIcon={RiBookMarkedLine}>
+          View docs
+        </LinkButton>
       </Link>
+
       <CreateWorkflowButton asChild>
-        <Button variant="primary" className="gap-2">
-          <RiRouteFill className="size-5" />
+        <Button variant="primary" leadingIcon={RiRouteFill} className="gap-2">
           Create workflow
         </Button>
       </CreateWorkflowButton>

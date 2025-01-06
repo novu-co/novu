@@ -17,7 +17,6 @@ export type TransformerWithParam = {
 };
 
 export type VariablePopoverProps = {
-  variable: string;
-  onClose: () => void;
+  variable?: string;
   onUpdate: (newValue: string) => void;
 };

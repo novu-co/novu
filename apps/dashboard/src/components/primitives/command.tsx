@@ -1,10 +1,10 @@
-import * as React from 'react';
 import { type DialogProps } from '@radix-ui/react-dialog';
 import { Command as CommandPrimitive } from 'cmdk';
+import * as React from 'react';
 
-import { cn } from '@/utils/ui';
 import { Dialog, DialogContent } from '@/components/primitives/dialog';
 import { InputField, inputVariants } from '@/components/primitives/input';
+import { cn } from '@/utils/ui';
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -37,9 +37,9 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
 
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => (
-  <InputField>
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & { inputFieldClassName?: string }
+>(({ className, inputFieldClassName, ...props }, ref) => (
+  <InputField className={inputFieldClassName}>
     <CommandPrimitive.Input ref={ref} className={cn(inputVariants(), className)} {...props} />
   </InputField>
 ));
@@ -115,11 +115,11 @@ CommandShortcut.displayName = 'CommandShortcut';
 export {
   Command,
   CommandDialog,
-  CommandInput,
-  CommandList,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
-  CommandShortcut,
+  CommandList,
   CommandSeparator,
+  CommandShortcut,
 };

@@ -1,8 +1,8 @@
-import { EditorView, Decoration, DecorationSet } from '@uiw/react-codemirror';
+import { Decoration, DecorationSet, EditorView } from '@uiw/react-codemirror';
 import { MutableRefObject } from 'react';
 import { VARIABLE_REGEX } from './constants';
-import { VariablePillWidget } from './variable-pill-widget';
 import { handleVariableBackspace, handleVariableCompletion, isTypingVariable, parseVariable } from './utils';
+import { VariablePillWidget } from './variable-pill-widget';
 
 export class VariablePluginView {
   decorations: DecorationSet;

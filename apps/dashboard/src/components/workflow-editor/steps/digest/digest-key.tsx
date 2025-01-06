@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { InputFieldPure } from '@/components/primitives/input';
 import { Code2 } from '@/components/icons/code-2';
 import { FieldEditor } from '@/components/primitives/field-editor';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
+import { InputFieldPure } from '@/components/primitives/input';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 
@@ -30,7 +30,8 @@ export const DigestKey = () => {
               </FormLabel>
               <FormControl>
                 <FieldEditor
-                  fontFamily="inherit"
+                  singleLine
+                  indentWithTab={false}
                   placeholder="Add additional digest..."
                   id={field.name}
                   value={field.value}

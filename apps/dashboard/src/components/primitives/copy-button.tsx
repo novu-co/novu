@@ -12,7 +12,7 @@ export const CopyButton = (props: CopyButtonProps) => {
 
   return (
     <HoverToCopy asChild valueToCopy={valueToCopy}>
-      <Button variant="outline" className={cn('flex items-center gap-1', className)} {...rest}>
+      <Button mode="outline" variant="secondary" className={cn('flex items-center gap-1', className)} {...rest}>
         {children || <RiFileCopyLine className="size-4" />}
       </Button>
     </HoverToCopy>
