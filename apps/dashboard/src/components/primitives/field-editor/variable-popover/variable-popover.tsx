@@ -15,7 +15,6 @@ import { RiAddFill } from 'react-icons/ri';
 import { useDebounce } from '../../../../hooks/use-debounce';
 import { Code2 } from '../../../icons/code-2';
 import { Separator } from '../../separator';
-import { DigestWidget } from './components/digest-widget';
 import { TransformerItem } from './components/transformer-item';
 import { TransformerList } from './components/transformer-list';
 import { useTransformerManager } from './hooks/use-transformer-manager';
@@ -146,13 +145,6 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
                 </div>
               </FormControl>
             </FormItem>
-
-            <DigestWidget
-              value={formatLiquidVariable(name, defaultVal, transformers)}
-              onChange={(newValue) => {
-                handleRawLiquidChange(newValue);
-              }}
-            />
 
             <FormItem>
               <FormControl>
