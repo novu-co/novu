@@ -5,6 +5,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from '@/components/primitives/command';
 import { FormControl, FormItem } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';
@@ -17,6 +18,7 @@ import { Code2 } from '../../../icons/code-2';
 import { Separator } from '../../separator';
 import { TransformerItem } from './components/transformer-item';
 import { TransformerList } from './components/transformer-list';
+import { useSuggestedTransformers } from './hooks/use-suggested-transformers';
 import { useTransformerManager } from './hooks/use-transformer-manager';
 import { useVariableParser } from './hooks/use-variable-parser';
 import type { VariablePopoverProps } from './types';
@@ -96,6 +98,8 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
       }
     });
   }, []);
+
+  const suggestedTransformers = useSuggestedTransformers(name, transformers);
 
   const filteredTransformers = useMemo(
     () => getFilteredTransformers(searchQuery),
@@ -198,8 +202,27 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
 
                         <CommandList className="max-h-[300px]">
                           <CommandEmpty>No modifiers found</CommandEmpty>
+                          {suggestedTransformers.length > 0 && !searchQuery && (
+                            <>
+                              <CommandGroup heading="Suggested">
+                                {suggestedTransformers[0].transformers.map((transformer) => (
+                                  <CommandItem
+                                    key={transformer.value}
+                                    onSelect={() => {
+                                      handleTransformerToggle(transformer.value);
+                                      setSearchQuery('');
+                                      setIsCommandOpen(false);
+                                    }}
+                                  >
+                                    <TransformerItem transformer={transformer} />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                              {filteredTransformers.length > 0 && <CommandSeparator />}
+                            </>
+                          )}
                           {filteredTransformers.length > 0 && (
-                            <CommandGroup>
+                            <CommandGroup heading={searchQuery ? 'Search Results' : 'All Modifiers'}>
                               {filteredTransformers.map((transformer) => (
                                 <CommandItem
                                   key={transformer.value}

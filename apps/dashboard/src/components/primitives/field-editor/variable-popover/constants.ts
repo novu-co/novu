@@ -188,14 +188,6 @@ export const TRANSFORMERS: Transformer[] = [
     params: [{ placeholder: 'Format (e.g. "%Y-%m-%d")', description: 'strftime format', type: 'string' }],
   },
   {
-    label: 'Default',
-    value: 'default',
-    hasParam: true,
-    description: 'Use default value if input is empty',
-    example: '"" | default: "¯\\_(ツ)_/¯" → ¯\\_(ツ)_/¯',
-    params: [{ placeholder: 'Default value', type: 'string' }],
-  },
-  {
     label: 'JSON',
     value: 'json',
     description: 'Convert object to JSON string',
