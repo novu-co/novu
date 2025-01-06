@@ -6,15 +6,14 @@ import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { FullPayloadForRender, RenderCommand } from './render-command';
 import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.usecase';
 
-export class RenderEmailOutputCommand extends RenderCommand {}
+export class EmailOutputRendererCommand extends RenderCommand {}
 
 @Injectable()
-// todo rename to EmailOutputRenderer
-export class RenderEmailOutputUsecase {
+export class EmailOutputRendererUsecase {
   constructor(private expandEmailEditorSchemaUseCase: ExpandEmailEditorSchemaUsecase) {}
 
   @InstrumentUsecase()
-  async execute(renderCommand: RenderEmailOutputCommand): Promise<EmailRenderOutput> {
+  async execute(renderCommand: EmailOutputRendererCommand): Promise<EmailRenderOutput> {
     const { body, subject } = renderCommand.controlValues;
 
     if (!body || typeof body !== 'string') {
@@ -31,7 +30,11 @@ export class RenderEmailOutputUsecase {
 
     const expandedMailyContent = this.transformMailyDynamicBlocks(body, renderCommand.fullPayloadForRender);
     const parsedTipTap = await this.parseTipTapNodeByLiquid(expandedMailyContent, renderCommand);
+    // eslint-disable-next-line no-console
+    console.log('parsedTipTap 555 ', JSON.stringify(parsedTipTap, null, 2));
     const renderedHtml = await this.renderEmail(parsedTipTap);
+    // eslint-disable-next-line no-console
+    console.log('renderedHtml 666 ', JSON.stringify(renderedHtml, null, 2));
 
     /**
      * Force type mapping in case undefined control.
@@ -43,7 +46,7 @@ export class RenderEmailOutputUsecase {
 
   private async parseTipTapNodeByLiquid(
     tiptapNode: TipTapNode,
-    renderCommand: RenderEmailOutputCommand
+    renderCommand: EmailOutputRendererCommand
   ): Promise<TipTapNode> {
     const client = new Liquid({
       outputEscape: (output) => {

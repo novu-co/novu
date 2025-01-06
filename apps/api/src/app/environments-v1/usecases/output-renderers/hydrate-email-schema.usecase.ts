@@ -1,8 +1,10 @@
 /* eslint-disable no-param-reassign */
 import { Injectable } from '@nestjs/common';
-import { PreviewPayload, TipTapNode } from '@novu/shared';
 import { z } from 'zod';
-import { processNodeAttrs } from '@novu/application-generic';
+
+import { PreviewPayload, TipTapNode } from '@novu/shared';
+import { processNodeAttrs, processNodeMarks } from '@novu/application-generic';
+
 import { HydrateEmailSchemaCommand } from './hydrate-email-schema.command';
 import { PlaceholderAggregation } from '../../../workflows-v2/usecases';
 
@@ -18,13 +20,13 @@ export class HydrateEmailSchemaUseCase {
     };
 
     // TODO: Aligned Zod inferred type and TipTapNode to remove the need of a type assertion
-    const emailEditorSchema: TipTapNode = TipTapSchema.parse(JSON.parse(command.emailEditor)) as TipTapNode;
-    if (emailEditorSchema.content) {
-      this.transformContentInPlace(emailEditorSchema.content, command.fullPayloadForRender, placeholderAggregation);
+    const emailBody: TipTapNode = TipTapSchema.parse(JSON.parse(command.emailEditor)) as TipTapNode;
+    if (emailBody) {
+      this.transformContentInPlace([emailBody], command.fullPayloadForRender, placeholderAggregation);
     }
 
     return {
-      hydratedEmailSchema: emailEditorSchema,
+      hydratedEmailSchema: emailBody,
       placeholderAggregation,
     };
   }
@@ -89,6 +91,7 @@ export class HydrateEmailSchemaUseCase {
   ) {
     content.forEach((node, index) => {
       processNodeAttrs(node);
+      processNodeMarks(node);
 
       if (this.isVariableNode(node)) {
         this.variableLogic(masterPayload, node, content, index, placeholderAggregation);
