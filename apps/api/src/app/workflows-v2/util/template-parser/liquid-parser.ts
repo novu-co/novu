@@ -1,5 +1,5 @@
-import { Template, Liquid, RenderError, LiquidError } from 'liquidjs';
-import { isValidTemplate, extractLiquidExpressions } from './parser-utils';
+import { Liquid, LiquidError, RenderError, Template } from 'liquidjs';
+import { extractLiquidExpressions, isValidTemplate } from './parser-utils';
 
 const LIQUID_CONFIG = {
   strictVariables: true,
@@ -7,12 +7,6 @@ const LIQUID_CONFIG = {
   greedy: false,
   catchAllErrors: true,
 } as const;
-
-// Create a parser engine with digest filter for validation
-const parserEngine = new Liquid(LIQUID_CONFIG);
-
-// Register digest filter for validation
-parserEngine.registerFilter('digest', () => '');
 
 export type Variable = {
   /**
@@ -129,6 +123,11 @@ function processLiquidRawOutput(rawOutputs: string[]): TemplateVariables {
 }
 
 function parseByLiquid(rawOutput: string): TemplateVariables {
+  const parserEngine = new Liquid(LIQUID_CONFIG);
+
+  // Register digest filter for validation of digest transformers
+  parserEngine.registerFilter('digest', () => '');
+
   const validVariables: Variable[] = [];
   const invalidVariables: Variable[] = [];
   const parsed = parserEngine.parse(rawOutput) as unknown as Template[];
