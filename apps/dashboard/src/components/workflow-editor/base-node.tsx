@@ -80,7 +80,7 @@ export const NodeBody = ({
   return (
     <HoverCard openDelay={300}>
       <HoverCardTrigger>
-        <div className="bg-neutral-alpha-50 relative flex items-center rounded-lg px-1 py-2">
+        <div className="bg-neutral-alpha-50 hover-trigger pointer-events-auto relative flex items-center rounded-lg px-1 py-2">
           <span className="text-foreground-400 overflow-hidden text-ellipsis text-nowrap text-sm font-medium">
             {children}
           </span>
@@ -106,7 +106,7 @@ export const NodeError = ({ children }: { children: ReactNode }) => {
     <Popover open={isPopoverOpen}>
       <PopoverTrigger asChild>
         <span
-          className="absolute right-0 top-0 size-4 -translate-y-[5px] translate-x-[5px]"
+          className="error-trigger pointer-events-auto absolute right-0 top-0 size-4 -translate-y-[5px] translate-x-[5px]"
           onMouseEnter={() => setIsPopoverOpen(true)}
           onMouseLeave={() => setIsPopoverOpen(false)}
         >
@@ -127,12 +127,12 @@ export const NODE_WIDTH = 300;
 export const NODE_HEIGHT = 86;
 
 const nodeVariants = cva(
-  `relative bg-neutral-alpha-200 transition-colors aria-selected:bg-gradient-to-tr aria-selected:to-warning/50 aria-selected:from-destructive/60 [&>span]:bg-foreground-0 flex w-[300px] flex-col p-px shadow-xs flex [&>span]:flex-1 [&>span]:rounded-[calc(var(--radius)-1px)] [&>span]:p-1 [&>span]:flex [&>span]:flex-col [&>span]:gap-1`,
+  `relative bg-neutral-alpha-200 transition-colors aria-selected:bg-gradient-to-bl aria-selected:from-[#FFB84D] aria-selected:to-[#E300BD] [&>span]:bg-foreground-0 flex w-[300px] flex-col p-px shadow-xs flex [&>span]:flex-1 [&>span]:rounded-[calc(var(--radius)-1px)] [&>span]:p-1 [&>span]:flex [&>span]:flex-col [&>span]:gap-1`,
   {
     variants: {
       variant: {
-        default: 'rounded-lg',
-        sm: 'text-neutral-400 w-min rounded-lg',
+        default: 'rounded-lg pointer-events-auto [&_span:not(.hover-trigger,.error-trigger)]:pointer-events-none',
+        sm: 'text-neutral-400 w-min rounded-lg pointer-events-auto [&_span:not(.hover-trigger,.error-trigger)]:pointer-events-none',
       },
     },
     defaultVariants: {

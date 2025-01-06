@@ -1,7 +1,9 @@
 import {
   Background,
   BackgroundVariant,
+  BaseEdge,
   Controls,
+  EdgeProps,
   Node,
   ReactFlow,
   ReactFlowProvider,
@@ -47,8 +49,13 @@ const nodeTypes = {
   add: AddNode,
 };
 
+const DefaultEdge = ({ id, sourceX, sourceY, targetX, targetY, style }: EdgeProps) => {
+  return <BaseEdge id={id} path={`M ${sourceX} ${sourceY} L ${targetX} ${targetY}`} style={style} />;
+};
+
 const edgeTypes = {
   addNode: AddNodeEdge,
+  default: DefaultEdge,
 };
 
 const panOnDrag = [1, 2];
@@ -87,10 +94,12 @@ const mapStepToNode = ({
   addStepIndex,
   previousPosition,
   step,
+  readOnly,
 }: {
   addStepIndex: number;
   previousPosition: { x: number; y: number };
   step: Step;
+  readOnly?: boolean;
 }): Node<NodeData, keyof typeof nodeTypes> => {
   const content = mapStepToNodeContent(step);
 
@@ -106,6 +115,7 @@ const mapStepToNode = ({
       stepSlug: step.slug,
       error,
       controlValues: step.controls.values,
+      readOnly,
     },
     type: step.type,
   };
@@ -119,12 +129,13 @@ const WorkflowCanvasChild = ({ steps, readOnly }: { steps: Step[]; readOnly?: bo
   const navigate = useNavigate();
 
   const [nodes, edges] = useMemo(() => {
-    const triggerNode = {
+    const triggerNode: Node<NodeData, 'trigger'> = {
       id: crypto.randomUUID(),
       position: { x: 0, y: 0 },
       data: {
         workflowSlug: currentWorkflow?.slug ?? '',
         environment: currentEnvironment?.slug ?? '',
+        readOnly,
       },
       type: 'trigger',
     };
@@ -135,51 +146,56 @@ const WorkflowCanvasChild = ({ steps, readOnly }: { steps: Step[]; readOnly?: bo
         step,
         previousPosition,
         addStepIndex: index,
+        readOnly,
       });
       previousPosition = node.position;
       return node;
     });
 
-    const addNode: Node<NodeData> = {
-      id: crypto.randomUUID(),
-      position: { ...previousPosition, y: previousPosition.y + Y_DISTANCE },
-      data: {},
-      type: 'add',
-    };
+    let allNodes: Node<NodeData, keyof typeof nodeTypes>[] = [triggerNode, ...createdNodes];
 
-    const nodes = [triggerNode, ...createdNodes, addNode];
-    const edges = nodes.reduce<AddNodeEdgeType[]>((acc, node, index) => {
+    if (!readOnly) {
+      const addNode: Node<NodeData, 'add'> = {
+        id: crypto.randomUUID(),
+        position: { ...previousPosition, y: previousPosition.y + Y_DISTANCE },
+        data: {},
+        type: 'add',
+      };
+      allNodes = [...allNodes, addNode];
+    }
+
+    const edges = allNodes.reduce<AddNodeEdgeType[]>((acc, node, index) => {
       if (index === 0) {
         return acc;
       }
 
-      const parent = nodes[index - 1];
+      const parent = allNodes[index - 1];
 
-      if (!readOnly) {
-        acc.push({
-          id: `edge-${parent.id}-${node.id}`,
-          source: parent.id,
-          sourceHandle: 'b',
-          targetHandle: 'a',
-          target: node.id,
-          type: 'addNode',
-          style: {
-            stroke: 'hsl(var(--neutral-alpha-200))',
-            strokeWidth: 2,
-            strokeDasharray: 5,
-          },
-          data: {
-            isLast: index === nodes.length - 1,
-            addStepIndex: index - 1,
-          },
-        });
-      }
+      acc.push({
+        id: `edge-${parent.id}-${node.id}`,
+        source: parent.id,
+        sourceHandle: 'b',
+        targetHandle: 'a',
+        target: node.id,
+        type: readOnly ? 'default' : 'addNode',
+        style: {
+          stroke: 'hsl(var(--neutral-alpha-200))',
+          strokeWidth: 2,
+          strokeDasharray: 5,
+        },
+        data: readOnly
+          ? undefined
+          : {
+              isLast: index === allNodes.length - 1,
+              addStepIndex: index - 1,
+            },
+      });
 
       return acc;
     }, []);
 
-    return [nodes, edges];
-  }, [steps]);
+    return [allNodes, edges];
+  }, [steps, readOnly, currentWorkflow?.slug, currentEnvironment?.slug]);
 
   const positionCanvas = useCallback(
     (options?: ViewportHelperFunctionOptions) => {
