@@ -10,7 +10,7 @@ import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { useEffect, useState } from 'react';
-import { RiArrowDownSLine, RiFileMarkedLine, RiRouteFill } from 'react-icons/ri';
+import { RiArrowDownSLine, RiFileAddLine, RiFileMarkedLine, RiRouteFill } from 'react-icons/ri';
 import { ButtonGroupItem, ButtonGroupRoot } from '../components/primitives/button-group';
 import {
   DropdownMenu,
@@ -73,6 +73,14 @@ export const WorkflowsPage = () => {
                     ></Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56">
+                    <DropdownMenuItem className="cursor-pointer" asChild>
+                      <CreateWorkflowButton className="w-full">
+                        <div className="flex items-center gap-2">
+                          <RiFileAddLine />
+                          Blank Workflow
+                        </div>
+                      </CreateWorkflowButton>
+                    </DropdownMenuItem>
                     <DropdownMenuItem className="cursor-pointer" onSelect={() => setShouldOpenTemplateModal(true)}>
                       <RiFileMarkedLine />
                       View Template Gallery
