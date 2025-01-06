@@ -78,7 +78,6 @@ export class Client {
     this.secretKey = builtOpts.secretKey;
     this.strictAuthentication = builtOpts.strictAuthentication;
 
-    // Register filters
     this.templateEngine.registerFilter('json', (value, spaces) =>
       stringifyDataStructureWithSingleQuotes(value, spaces)
     );

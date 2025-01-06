@@ -44,7 +44,6 @@ function getNestedValue(obj: NestedObject, path: string): string {
 export function digest(array: unknown, maxNames = 2, keyPath?: string, separator = ', '): string {
   if (!Array.isArray(array) || array.length === 0) return '';
 
-  // Extract values if key is provided
   const values = keyPath
     ? array.map((item) => {
         if (typeof item !== 'object' || !item) return '';
@@ -53,13 +52,9 @@ export function digest(array: unknown, maxNames = 2, keyPath?: string, separator
       })
     : array;
 
-  // Single item
   if (values.length === 1) return values[0];
-
-  // Two items - always use "and"
   if (values.length === 2) return `${values[0]} and ${values[1]}`;
 
-  // Three items - use natural format
   if (values.length === 3 && maxNames >= 3) {
     return `${values[0]}, ${separator}${values[1]} and ${values[2]}`;
   }
