@@ -56,5 +56,6 @@ export const variablePillTheme = EditorView.baseTheme({
   },
   '.cm-line': {
     lineHeight: '19px !important',
+    paddingLeft: 0,
   },
 });
