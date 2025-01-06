@@ -46,7 +46,7 @@ interface StepPreviewProps {
 }
 
 export function StepPreview({ type, controlValues }: StepPreviewProps) {
-  if (type === StepTypeEnum.TRIGGER) {
+  if (type === StepTypeEnum.TRIGGER || type === StepTypeEnum.DELAY || type === StepTypeEnum.DIGEST) {
     return null;
   }
 
@@ -174,10 +174,4 @@ export function StepPreview({ type, controlValues }: StepPreviewProps) {
       </div>
     );
   }
-
-  return (
-    <div className="p-4">
-      <div className="text-foreground-600 text-sm">Preview coming soon</div>
-    </div>
-  );
 }
