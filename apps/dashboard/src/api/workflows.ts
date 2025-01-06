@@ -9,7 +9,6 @@ import type {
   WorkflowTestDataResponseDto,
 } from '@novu/shared';
 import { delV2, getV2, patchV2, post, postV2, putV2 } from './api.client';
-import { IWorkflowSuggestion } from '../components/template-store/templates';
 
 export const getWorkflow = async ({
   environment,
@@ -140,21 +139,4 @@ export const patchWorkflow = async ({
   });
 
   return res.data;
-};
-
-export const generateWorkflowSuggestions = async ({
-  environment,
-  prompt,
-  mode,
-}: {
-  environment: IEnvironment;
-  prompt: string;
-  mode: 'single' | 'multiple';
-}) => {
-  const { data } = await postV2<{ data: { suggestions: IWorkflowSuggestion[] } }>('/workflows/suggestions', {
-    environment,
-    body: { prompt, mode },
-  });
-
-  return data.suggestions;
 };

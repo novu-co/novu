@@ -1,7 +1,4 @@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from '@/components/primitives/dialog';
-import { ToastIcon } from '@/components/primitives/sonner';
-import { showToast } from '@/components/primitives/sonner-helpers';
-import { useGenerateWorkflowSuggestions } from '@/hooks/workflows/use-generate-workflow-suggestions';
 import { ComponentProps, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine } from 'react-icons/ri';
@@ -22,7 +19,6 @@ import TruncatedText from '../truncated-text';
 import { CreateWorkflowForm } from '../workflow-editor/create-workflow-form';
 import { workflowSchema } from '../workflow-editor/schema';
 import { WorkflowCanvas } from '../workflow-editor/workflow-canvas';
-import { WorkflowGenerate } from './components/workflow-generate';
 import { WorkflowResults } from './components/workflow-results';
 import { getTemplates, IWorkflowSuggestion } from './templates';
 import { WorkflowMode } from './types';
@@ -40,10 +36,8 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   const { submit: createFromTemplate, isLoading: isCreating } = useCreateWorkflow();
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
   const [suggestions, setSuggestions] = useState<IWorkflowSuggestion[]>([]);
-  const [prompt, setPrompt] = useState('');
   const [mode, setMode] = useState<WorkflowMode>(WorkflowMode.TEMPLATES);
   const [selectedTemplate, setSelectedTemplate] = useState<IWorkflowSuggestion | null>(null);
-  const { mutateAsync: generateSuggestions, isPending: isGenerating } = useGenerateWorkflowSuggestions();
 
   const filteredTemplates = WORKFLOW_TEMPLATES.filter((template) =>
     selectedCategory === 'popular' ? template.isPopular : template.category === selectedCategory
@@ -56,31 +50,6 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
     const workflow = await createFromTemplate(values, selectedTemplate.workflowDefinition);
 
     console.log('workflow', workflow);
-  };
-
-  const handleSubmit = async () => {
-    if (!prompt) return;
-
-    try {
-      const suggestions = await generateSuggestions({ prompt, mode });
-
-      setSuggestions(suggestions);
-    } catch (error) {
-      showToast({
-        children: () => (
-          <>
-            <ToastIcon variant="error" />
-            <span className="text-sm">
-              Failed to generate suggestions:{' '}
-              {error instanceof Error ? error.message : 'There was an error generating workflow suggestions.'}
-            </span>
-          </>
-        ),
-        options: {
-          position: 'bottom-right',
-        },
-      });
-    }
   };
 
   const getHeaderText = () => {
@@ -150,16 +119,6 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
                   setSuggestions([]);
                   setMode(WorkflowMode.TEMPLATES);
                 }}
-                onGenerateClick={() => {
-                  setSuggestions([]);
-                  setPrompt('');
-                  setMode(WorkflowMode.GENERATE);
-                }}
-                onFromPromptClick={() => {
-                  setSuggestions([]);
-                  setPrompt('');
-                  setMode(WorkflowMode.FROM_PROMPT);
-                }}
                 mode={mode}
               />
             </div>
@@ -174,19 +133,7 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
                       <h2 className="text-label-md text-strong">{getHeaderText()}</h2>
                     </div>
 
-                    {mode !== WorkflowMode.TEMPLATES ? (
-                      <WorkflowGenerate
-                        mode={mode}
-                        prompt={prompt}
-                        setPrompt={setPrompt}
-                        isGenerating={isGenerating}
-                        handleSubmit={handleSubmit}
-                        suggestions={suggestions}
-                        onClick={handleTemplateClick}
-                      />
-                    ) : (
-                      <WorkflowResults mode={mode} suggestions={templates} onClick={handleTemplateClick} />
-                    )}
+                    <WorkflowResults mode={mode} suggestions={templates} onClick={handleTemplateClick} />
                   </form>
                 </Form>
               </div>
