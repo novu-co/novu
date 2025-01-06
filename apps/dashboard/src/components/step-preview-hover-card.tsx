@@ -1,40 +1,16 @@
 import { Editor } from '@maily-to/core';
 import {
-  blockquote,
-  bulletList,
-  button,
-  columns,
-  divider,
-  hardBreak,
-  heading1,
-  heading2,
-  heading3,
-  image,
-  orderedList,
-  section,
-  spacer,
-  text,
-} from '@maily-to/core/blocks';
-import {
   ChannelTypeEnum,
   ChatRenderOutput,
   GeneratePreviewResponseDto,
+  InAppRenderOutput,
   PushRenderOutput,
   StepTypeEnum,
 } from '@novu/shared';
-import {
-  InAppPreview,
-  InAppPreviewActions,
-  InAppPreviewBell,
-  InAppPreviewBody,
-  InAppPreviewHeader,
-  InAppPreviewNotification,
-  InAppPreviewNotificationContent,
-  InAppPreviewPrimaryAction,
-  InAppPreviewSubject,
-} from './workflow-editor/in-app-preview';
 import { ChatPreview } from './workflow-editor/steps/chat/chat-preview';
 import { EmailPreviewHeader, EmailPreviewSubject } from './workflow-editor/steps/email/email-preview';
+import { DEFAULT_EDITOR_BLOCKS, DEFAULT_EDITOR_CONFIG } from './workflow-editor/steps/email/maily-config';
+import { InboxPreview } from './workflow-editor/steps/in-app/inbox-preview';
 import { PushPreview } from './workflow-editor/steps/push/push-preview';
 import { SmsPhone } from './workflow-editor/steps/sms/sms-phone';
 
@@ -51,26 +27,22 @@ export function StepPreview({ type, controlValues }: StepPreviewProps) {
   }
 
   if (type === StepTypeEnum.IN_APP) {
-    const { subject, body, action } = controlValues;
+    const { subject, body } = controlValues;
 
     return (
-      <InAppPreview>
-        <InAppPreviewBell />
-        <InAppPreviewHeader />
-        <InAppPreviewNotification>
-          <InAppPreviewNotificationContent>
-            <InAppPreviewSubject>{subject}</InAppPreviewSubject>
-            <InAppPreviewBody>{body}</InAppPreviewBody>
-            {action?.buttons?.length > 0 && (
-              <InAppPreviewActions>
-                {action.buttons.map((button: any, index: number) => (
-                  <InAppPreviewPrimaryAction key={index}>{button.content}</InAppPreviewPrimaryAction>
-                ))}
-              </InAppPreviewActions>
-            )}
-          </InAppPreviewNotificationContent>
-        </InAppPreviewNotification>
-      </InAppPreview>
+      <InboxPreview
+        isPreviewPending={false}
+        previewData={{
+          result: {
+            type: ChannelTypeEnum.IN_APP as const,
+            preview: {
+              subject,
+              body,
+            } as InAppRenderOutput,
+          },
+          previewPayloadExample: {},
+        }}
+      />
     );
   }
 
@@ -93,32 +65,7 @@ export function StepPreview({ type, controlValues }: StepPreviewProps) {
         <EmailPreviewHeader />
         <EmailPreviewSubject className="px-3 py-2" subject={subject} />
         <div className="mx-auto w-full overflow-auto">
-          <Editor
-            config={{
-              hasMenuBar: false,
-              autofocus: false,
-              wrapClassName: 'min-h-0 max-h-full flex flex-col w-full h-full overflow-y-auto',
-              bodyClassName:
-                '!bg-transparent flex flex-col basis-full !border-none !mt-0 [&>div]:basis-full [&_.tiptap]:h-full',
-            }}
-            blocks={[
-              text,
-              heading1,
-              heading2,
-              heading3,
-              bulletList,
-              orderedList,
-              image,
-              section,
-              columns,
-              divider,
-              spacer,
-              button,
-              hardBreak,
-              blockquote,
-            ]}
-            contentJson={parsedBody}
-          />
+          <Editor config={DEFAULT_EDITOR_CONFIG} blocks={DEFAULT_EDITOR_BLOCKS} contentJson={parsedBody} />
         </div>
       </div>
     );

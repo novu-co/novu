@@ -1,30 +1,14 @@
 import { FormControl, FormField, FormMessage } from '@/components/primitives/form/form';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { parseStepVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { parseStepVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { cn } from '@/utils/ui';
 import { Editor } from '@maily-to/core';
-import {
-  blockquote,
-  bulletList,
-  button,
-  columns,
-  divider,
-  forLoop,
-  hardBreak,
-  heading1,
-  heading2,
-  heading3,
-  image,
-  orderedList,
-  section,
-  spacer,
-  text,
-} from '@maily-to/core/blocks';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 import type { Editor as TiptapEditor } from '@tiptap/core';
 import { HTMLAttributes, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { DEFAULT_EDITOR_CONFIG, getEditorBlocks } from './maily-config';
 
 type MailyProps = HTMLAttributes<HTMLDivElement>;
 export const Maily = (props: MailyProps) => {
@@ -71,29 +55,8 @@ export const Maily = (props: MailyProps) => {
               <FormControl>
                 <Editor
                   key={isForBlockEnabled ? 'for-block-enabled' : 'for-block-disabled'}
-                  config={{
-                    hasMenuBar: false,
-                    wrapClassName: 'min-h-0 max-h-full flex flex-col w-full h-full overflow-y-auto',
-                    bodyClassName:
-                      '!bg-transparent flex flex-col basis-full !border-none !mt-0 [&>div]:basis-full [&_.tiptap]:h-full',
-                  }}
-                  blocks={[
-                    text,
-                    heading1,
-                    heading2,
-                    heading3,
-                    bulletList,
-                    orderedList,
-                    image,
-                    section,
-                    columns,
-                    ...(isForBlockEnabled ? [forLoop] : []),
-                    divider,
-                    spacer,
-                    button,
-                    hardBreak,
-                    blockquote,
-                  ]}
+                  config={DEFAULT_EDITOR_CONFIG}
+                  blocks={getEditorBlocks(isForBlockEnabled)}
                   variableTriggerCharacter="{{"
                   variables={({ query, editor, from }) => {
                     const queryWithoutSuffix = query.replace(/}+$/, '');
