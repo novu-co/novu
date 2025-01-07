@@ -5,10 +5,11 @@ export enum MailyContentTypeEnum {
   FOR = 'for',
   BUTTON = 'button',
   IMAGE = 'image',
+  LINK = 'link',
 }
 
 export const variableAttributeConfig = (type: MailyContentTypeEnum) => {
-  //todo add variable type
+  // todo add variable type
   if (type === MailyContentTypeEnum.BUTTON) {
     return [
       { attr: 'text', flag: 'isTextVariable' },
@@ -25,18 +26,43 @@ export const variableAttributeConfig = (type: MailyContentTypeEnum) => {
     ];
   }
 
+  if (type === MailyContentTypeEnum.LINK) {
+    return [{ attr: 'href', flag: 'isUrlVariable' }];
+  }
+
   return [{ attr: 'showIfKey', flag: 'showIfKey' }];
 };
+
+function processAttributes(
+  attrs: Record<string, unknown>,
+  type: MailyContentTypeEnum,
+): void {
+  if (!attrs) return;
+
+  const typeConfig = variableAttributeConfig(type);
+
+  for (const { attr, flag } of typeConfig) {
+    if (attrs[flag] && attrs[attr]) {
+      // eslint-disable-next-line no-param-reassign
+      attrs[attr] = wrapInLiquidOutput(attrs[attr] as string);
+    }
+  }
+}
 
 export function processNodeAttrs(node: JSONContent): JSONContent {
   if (!node.attrs) return node;
 
-  const typeConfig = variableAttributeConfig(node.type as MailyContentTypeEnum);
+  processAttributes(node.attrs, node.type as MailyContentTypeEnum);
 
-  for (const { attr, flag } of typeConfig) {
-    if (node.attrs[flag] && node.attrs[attr]) {
-      // eslint-disable-next-line no-param-reassign
-      node.attrs[attr] = wrapInLiquidOutput(node.attrs[attr] as string);
+  return node;
+}
+
+export function processNodeMarks(node: JSONContent): JSONContent {
+  if (!node.marks) return node;
+
+  for (const mark of node.marks) {
+    if (mark.attrs) {
+      processAttributes(mark.attrs, mark.type as MailyContentTypeEnum);
     }
   }
 
