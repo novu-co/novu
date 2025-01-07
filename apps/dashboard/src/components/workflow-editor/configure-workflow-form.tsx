@@ -298,10 +298,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                     <FormControl>
                       <InputField className="flex overflow-hidden pr-0">
                         <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
-                        <CopyButton
-                          valueToCopy={field.value}
-                          className="h-[34px] rounded-none border-l border-neutral-200"
-                        />
+                        <CopyButton valueToCopy={field.value} inputGroup />
                       </InputField>
                     </FormControl>
                     <FormMessage />
