@@ -1,5 +1,3 @@
-import { useCallback, useEffect, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
 import {
   type StepDataDto,
   StepTypeEnum,
@@ -7,18 +5,21 @@ import {
   UpdateWorkflowDto,
   type WorkflowResponseDto,
 } from '@novu/shared';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
 
-import { flattenIssues, updateStepInWorkflow } from '@/components/workflow-editor/step-utils';
 import { Form } from '@/components/primitives/form/form';
-import { EmailTabs } from '@/components/workflow-editor/steps/email/email-tabs';
 import { getStepDefaultValues } from '@/components/workflow-editor/step-default-values';
+import { flattenIssues, updateStepInWorkflow } from '@/components/workflow-editor/step-utils';
+import { ChatTabs } from '@/components/workflow-editor/steps/chat/chat-tabs';
+import { CommonCustomControlValues } from '@/components/workflow-editor/steps/common/common-custom-control-values';
+import { EmailTabs } from '@/components/workflow-editor/steps/email/email-tabs';
 import { InAppTabs } from '@/components/workflow-editor/steps/in-app/in-app-tabs';
 import { PushTabs } from '@/components/workflow-editor/steps/push/push-tabs';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { SmsTabs } from '@/components/workflow-editor/steps/sms/sms-tabs';
-import { ChatTabs } from '@/components/workflow-editor/steps/chat/chat-tabs';
+import { useDataRef } from '@/hooks/use-data-ref';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { CommonCustomControlValues } from '@/components/workflow-editor/steps/common/common-custom-control-values';
 
 const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
   [StepTypeEnum.EMAIL]: EmailTabs,
@@ -61,6 +62,15 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
       update(updateStepInWorkflow(workflow, step.stepId, updateStepData));
     },
   });
+
+  // Run saveForm on unmount
+  const saveFormRef = useDataRef(saveForm);
+  useEffect(() => {
+    return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      saveFormRef.current();
+    };
+  }, [saveFormRef]);
 
   const setIssuesFromStep = useCallback(() => {
     const stepIssues = flattenIssues(step.issues?.controls);
