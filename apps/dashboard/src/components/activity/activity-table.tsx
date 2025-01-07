@@ -1,19 +1,19 @@
-import { ActivityFilters } from '@/api/activity';
-import { Skeleton } from '@/components/primitives/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/primitives/table';
-import { TimeDisplayHoverCard } from '@/components/time-display-hover-card';
+import { format } from 'date-fns';
 import { cn } from '@/utils/ui';
 import { ISubscriber } from '@novu/shared';
-import { format } from 'date-fns';
-import { AnimatePresence, motion } from 'motion/react';
-import { useEffect } from 'react';
-import { createSearchParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { toast } from 'sonner';
-import { useFetchActivities } from '../../hooks/use-fetch-activities';
-import { ActivityEmptyState } from './activity-empty-state';
-import { ArrowPagination } from './components/arrow-pagination';
-import { ActivityStatusBadge } from './components/status-badge';
+import { TimeDisplayHoverCard } from '@/components/time-display-hover-card';
+import { createSearchParams, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
+import { StatusBadge } from './components/status-badge';
 import { StepIndicators } from './components/step-indicators';
+import { ActivityEmptyState } from './activity-empty-state';
+import { AnimatePresence, motion } from 'motion/react';
+import { ArrowPagination } from './components/arrow-pagination';
+import { useEffect } from 'react';
+import { ActivityFilters } from '@/api/activity';
+import { useFetchActivities } from '../../hooks/use-fetch-activities';
+import { toast } from 'sonner';
+import { Skeleton } from '@/components/primitives/skeleton';
 
 export interface ActivityTableProps {
   selectedActivityId: string | null;
@@ -120,7 +120,7 @@ export function ActivityTable({
                     </div>
                   </TableCell>
                   <TableCell className="px-3">
-                    <ActivityStatusBadge jobs={activity.jobs} />
+                    <StatusBadge jobs={activity.jobs} />
                   </TableCell>
                   <TableCell className="px-3">
                     <StepIndicators jobs={activity.jobs} />

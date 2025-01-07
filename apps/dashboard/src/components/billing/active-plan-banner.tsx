@@ -51,7 +51,7 @@ export function ActivePlanBanner({ selectedBillingInterval }: ActivePlanBannerPr
                   <h3 className="text-lg font-semibold capitalize">{subscription.apiServiceLevel?.toLowerCase()}</h3>
                 )}
                 {subscription?.trial.isActive && (
-                  <Badge variant="light" color="gray" size="sm">
+                  <Badge variant="outline" className="font-medium">
                     Trial
                   </Badge>
                 )}

@@ -1,11 +1,12 @@
 'use client';
 
+import { Badge } from '@/components/primitives/badge';
 import { CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/primitives/command';
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/primitives/popover';
 import { cn } from '@/utils/ui';
 import { Command } from 'cmdk';
 import { forwardRef, useEffect, useMemo, useState } from 'react';
-import { Tag } from './tag';
+import { RiCloseFill } from 'react-icons/ri';
 
 type TagInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> & {
   value: string[];
@@ -82,9 +83,13 @@ const TagInput = forwardRef<HTMLInputElement, TagInputProps>((props, ref) => {
           </PopoverAnchor>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, index) => (
-              <Tag key={index} variant="stroke" onDismiss={() => removeTag(tag)}>
+              <Badge key={index} variant="outline" kind="tag" className="gap-1">
                 <span style={{ wordBreak: 'break-all' }}>{tag}</span>
-              </Tag>
+                <button type="button" onClick={() => removeTag(tag)}>
+                  <RiCloseFill className="-mr-0.5 size-3" />
+                  <span className="sr-only">Remove tag</span>
+                </button>
+              </Badge>
             ))}
           </div>
         </div>
