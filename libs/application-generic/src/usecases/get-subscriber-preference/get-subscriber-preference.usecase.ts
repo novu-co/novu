@@ -221,7 +221,7 @@ export class GetSubscriberPreference {
       _templateId: { $in: workflowIds },
       _environmentId: environmentId,
       type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
-    }) as Promise<PreferenceSet['workflowResourcePreference'][] | null>;
+    });
   }
 
   @Instrument()
@@ -236,7 +236,7 @@ export class GetSubscriberPreference {
       _templateId: { $in: workflowIds },
       _environmentId: environmentId,
       type: PreferencesTypeEnum.USER_WORKFLOW,
-    }) as Promise<PreferenceSet['workflowUserPreference'][] | null>;
+    });
   }
 
   @Instrument()
@@ -254,7 +254,7 @@ export class GetSubscriberPreference {
       _subscriberId: subscriberId,
       _environmentId: environmentId,
       type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
-    }) as Promise<PreferenceSet['subscriberWorkflowPreference'][] | null>;
+    });
   }
 
   @Instrument()
@@ -264,7 +264,7 @@ export class GetSubscriberPreference {
   }: {
     environmentId: string;
     subscriberId: string;
-  }): Promise<PreferenceSet['subscriberGlobalPreference'] | null> {
+  }) {
     return this.preferencesRepository.findOne({
       _subscriberId: subscriberId,
       _environmentId: environmentId,
