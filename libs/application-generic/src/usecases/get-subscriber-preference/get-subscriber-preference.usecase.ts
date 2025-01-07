@@ -55,12 +55,6 @@ export class GetSubscriberPreference {
 
     const workflowIds = workflowList.map((wf) => wf._id);
 
-    console.log(
-      '>>>> SKATA >>>>>>>',
-      workflowIds,
-      '>>>>>>>>>>>>>>>>>>>>>>>>>>>',
-    );
-
     const [
       workflowResourcePreferences,
       workflowUserPreferences,
