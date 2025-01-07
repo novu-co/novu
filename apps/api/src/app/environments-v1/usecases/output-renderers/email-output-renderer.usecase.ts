@@ -28,9 +28,13 @@ export class EmailOutputRendererUsecase {
       };
     }
 
-    const expandedMailyContent = this.transformMailyDynamicBlocks(body, renderCommand.fullPayloadForRender);
+    const expandedMailyContent = await this.expandEmailEditorSchemaUseCase.execute({
+      emailEditorJson: body,
+      fullPayloadForRender: renderCommand.fullPayloadForRender,
+    });
     const parsedTipTap = await this.parseTipTapNodeByLiquid(expandedMailyContent, renderCommand);
-    const renderedHtml = await this.renderEmail(parsedTipTap);
+
+    const renderedHtml = await mailyRender(parsedTipTap);
 
     /**
      * Force type mapping in case undefined control.
@@ -44,33 +48,28 @@ export class EmailOutputRendererUsecase {
     tiptapNode: TipTapNode,
     renderCommand: EmailOutputRendererCommand
   ): Promise<TipTapNode> {
-    const client = new Liquid({
-      outputEscape: (output) => {
-        return stringifyDataStructureWithSingleQuotes(output);
-      },
-    });
-    const templateString = client.parse(JSON.stringify(tiptapNode));
-    const parsedTipTap = await client.render(templateString, {
-      payload: renderCommand.fullPayloadForRender.payload,
-      subscriber: renderCommand.fullPayloadForRender.subscriber,
-      steps: renderCommand.fullPayloadForRender.steps,
-    });
+    const parsedString = await parseLiquid(
+      JSON.stringify(tiptapNode),
+      renderCommand.fullPayloadForRender as unknown as Record<string, unknown>
+    );
 
-    return JSON.parse(parsedTipTap);
-  }
-
-  @Instrument()
-  private renderEmail(content: TipTapNode): Promise<string> {
-    return mailyRender(content);
-  }
-
-  @Instrument()
-  private transformMailyDynamicBlocks(body: string, fullPayloadForRender: FullPayloadForRender) {
-    return this.expandEmailEditorSchemaUseCase.execute({ emailEditorJson: body, fullPayloadForRender });
+    return JSON.parse(parsedString);
   }
 }
 
-export const stringifyDataStructureWithSingleQuotes = (value: unknown, spaces: number = 0): string => {
+export const parseLiquid = async (value: string, variables: Record<string, unknown>): Promise<string> => {
+  const client = new Liquid({
+    outputEscape: (output) => {
+      return stringifyDataStructureWithSingleQuotes(output);
+    },
+  });
+
+  const template = client.parse(value);
+
+  return await client.render(template, variables);
+};
+
+const stringifyDataStructureWithSingleQuotes = (value: unknown, spaces: number = 0): string => {
   if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
     const valueStringified = JSON.stringify(value, null, spaces);
     const valueSingleQuotes = valueStringified.replace(/"/g, "'");
