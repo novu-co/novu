@@ -29,11 +29,11 @@ import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/prev
 import { BuildStepDataUsecase } from '../build-step-data';
 import { GeneratePreviewCommand } from './generate-preview.command';
 import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
-import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
+import { BuildSchemasByControlValues } from '../build-payload-schema/build-payload-schema.usecase';
 import { Variable } from '../../util/template-parser/liquid-parser';
 import { keysToObject } from '../../util/utils';
 import { isObjectTipTapNode } from '../../util/tip-tap.util';
-import { buildVariables } from '../../util/build-variables';
+import { buildVariables, isPropertyAllowed } from '../../util/build-variables';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
@@ -43,7 +43,7 @@ export class GeneratePreviewUsecase {
     private previewStepUsecase: PreviewStep,
     private buildStepDataUsecase: BuildStepDataUsecase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private buildPayloadSchema: BuildPayloadSchema,
+    private buildSchemasByControlValues: BuildSchemasByControlValues,
     private readonly logger: PinoLogger
   ) {}
 
@@ -97,11 +97,16 @@ export class GeneratePreviewUsecase {
         };
       }
 
-      const mergedVariablesExample = this.mergeVariablesExample(workflow, previewTemplateData, commandVariablesExample);
+      const variablesExample = this.buildVariablesExample(
+        workflow,
+        previewTemplateData,
+        commandVariablesExample,
+        variableSchema
+      );
       const executeOutput = await this.executePreviewUsecase(
         command,
         stepData,
-        mergedVariablesExample,
+        variablesExample,
         previewTemplateData.controlValues
       );
 
@@ -110,7 +115,7 @@ export class GeneratePreviewUsecase {
           preview: executeOutput.outputs as any,
           type: stepData.type as unknown as ChannelTypeEnum,
         },
-        previewPayloadExample: mergedVariablesExample,
+        previewPayloadExample: variablesExample,
       };
     } catch (error) {
       this.logger.error(
@@ -142,14 +147,18 @@ export class GeneratePreviewUsecase {
     return sanitizeControlValuesByOutputSchema(sanitizedValues || {}, stepData.type);
   }
 
-  private mergeVariablesExample(
+  private buildVariablesExample(
     workflow: WorkflowInternalResponseDto,
     previewTemplateData: { variablesExample: {}; controlValues: {} },
-    commandVariablesExample: PreviewPayload | undefined
+    commandVariablesExample: PreviewPayload | undefined,
+    variableSchema: Record<string, unknown>
   ) {
     let finalVariablesExample = {};
     if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
-      // if external workflow, we need to override with stored payload schema
+      /*
+       * if external workflow, we need to override with stored payload schema
+       * ** this is place is to late and wrong, id the variableSchema is properly build this wont be needed
+       */
       const tmp = createMockObjectFromSchema({
         type: 'object',
         properties: { payload: workflow.payloadSchema },
@@ -159,9 +168,10 @@ export class GeneratePreviewUsecase {
       finalVariablesExample = previewTemplateData.variablesExample;
     }
 
-    finalVariablesExample = _.merge(finalVariablesExample, commandVariablesExample || {});
+    finalVariablesExample = _.merge(finalVariablesExample, commandVariablesExample);
+    const variablesExample = this.removeStaleVariables(finalVariablesExample, variableSchema);
 
-    return finalVariablesExample;
+    return variablesExample;
   }
 
   private async initializePreviewContext(command: GeneratePreviewCommand) {
@@ -175,11 +185,11 @@ export class GeneratePreviewUsecase {
 
   @Instrument()
   private async buildVariablesSchema(
-    variables: Record<string, unknown>,
+    variableSchema: Record<string, unknown>,
     command: GeneratePreviewCommand,
     controlValues: Record<string, unknown>
   ) {
-    const payloadSchema = await this.buildPayloadSchema.execute(
+    const { payloadSchema, subscriberSchema: buildSubscriberSchema } = await this.buildSchemasByControlValues.execute(
       BuildPayloadSchemaCommand.create({
         environmentId: command.user.environmentId,
         organizationId: command.user.organizationId,
@@ -189,11 +199,13 @@ export class GeneratePreviewUsecase {
       })
     );
 
-    if (Object.keys(payloadSchema).length === 0) {
-      return variables;
-    }
+    const subscriberDataSchema = {
+      properties: {
+        data: buildSubscriberSchema?.properties?.data || {},
+      },
+    };
 
-    return _.merge(variables, { properties: { payload: payloadSchema } });
+    return _.merge(variableSchema, { properties: { payload: payloadSchema, subscriber: subscriberDataSchema } });
   }
 
   @Instrument()
@@ -273,6 +285,27 @@ export class GeneratePreviewUsecase {
     } catch (error) {
       return controlValues as Record<string, unknown>;
     }
+  }
+
+  private removeStaleVariables(
+    commandVariables: PreviewPayload | undefined,
+    variableSchema: Record<string, unknown>
+  ): PreviewPayload | {} {
+    if (!commandVariables) {
+      return {};
+    }
+
+    const normalizedVariables = _.cloneDeep(commandVariables);
+    const flattenedObject = flat(normalizedVariables);
+
+    const invalidKeys = Object.keys(flattenedObject).filter(
+      (key) => !isPropertyAllowed(variableSchema as Record<string, unknown>, key, { strict: false })
+    );
+    invalidKeys.forEach((key) => {
+      _.unset(normalizedVariables, key);
+    });
+
+    return normalizedVariables;
   }
 }
 
@@ -423,3 +456,20 @@ export const previewControlValueDefault = {
   'redirect.url': DEFAULT_URL_PATH,
   'redirect.target': DEFAULT_URL_TARGET,
 } as const;
+
+function flat(obj: Record<string, unknown>): Record<string, unknown> {
+  const flattenedObject = {};
+  const flattenObject = (innerObject: Record<string, unknown>, prefix = '') => {
+    for (const [key, value] of Object.entries(innerObject)) {
+      const newKey = prefix ? `${prefix}.${key}` : key;
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        flattenObject(value as Record<string, unknown>, newKey);
+      } else {
+        flattenedObject[newKey] = value;
+      }
+    }
+  };
+  flattenObject(obj);
+
+  return flattenedObject;
+}
