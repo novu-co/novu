@@ -92,7 +92,7 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
     });
   });
 
-  it('should update user global preferences and override the workflow preferences for the dev environment', async function () {
+  it('should update user global preferences only for the current environment', async function () {
     // create a template in dev environment
     await session.createTemplate({
       steps: [
