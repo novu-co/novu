@@ -1,15 +1,20 @@
+import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'motion/react';
 import { RiPlayCircleLine, RiRouteFill } from 'react-icons/ri';
+import { IActivityJob, JobStatusEnum } from '@novu/shared';
+
 import { ActivityJobItem } from './activity-job-item';
 import { InlineToast } from '../primitives/inline-toast';
 import { useFetchActivity } from '@/hooks/use-fetch-activity';
 import { ActivityOverview } from './components/activity-overview';
 import { cn } from '../../utils/ui';
-import { IActivityJob } from '@novu/shared';
 import { Skeleton } from '../primitives/skeleton';
+import { QueryKeys } from '@/utils/query-keys';
+import { useEnvironment } from '@/context/environment/hooks';
 
 export interface ActivityPanelProps {
-  activityId: string;
+  activityId?: string;
   onActivitySelect: (activityId: string) => void;
   headerClassName?: string;
   overviewHeaderClassName?: string;
@@ -21,7 +26,34 @@ export function ActivityPanel({
   headerClassName,
   overviewHeaderClassName,
 }: ActivityPanelProps) {
-  const { activity, isPending, error } = useFetchActivity({ activityId });
+  const queryClient = useQueryClient();
+  const [shouldRefetch, setShouldRefetch] = useState(true);
+  const { currentEnvironment } = useEnvironment();
+  const { activity, isPending, error } = useFetchActivity(
+    { activityId },
+    {
+      refetchInterval: shouldRefetch ? 1000 : false,
+    }
+  );
+
+  useEffect(() => {
+    if (!activity) return;
+
+    const isPending = activity.jobs?.some(
+      (job) =>
+        job.status === JobStatusEnum.PENDING ||
+        job.status === JobStatusEnum.QUEUED ||
+        job.status === JobStatusEnum.RUNNING ||
+        job.status === JobStatusEnum.DELAYED
+    );
+
+    // Only stop refetching if we have an activity and it's not pending
+    setShouldRefetch(isPending || !activity?.jobs?.length);
+
+    queryClient.invalidateQueries({
+      queryKey: [QueryKeys.fetchActivity, currentEnvironment?._id, activityId],
+    });
+  }, [activity, queryClient, currentEnvironment, activityId]);
 
   if (isPending) {
     return (
@@ -77,7 +109,10 @@ export function ActivityPanel({
               ctaClassName="text-foreground-950"
               variant={'tip'}
               ctaLabel="View Execution"
-              onCtaClick={() => {
+              onCtaClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+
                 if (activity._digestedNotificationId) {
                   onActivitySelect(activity._digestedNotificationId);
                 }

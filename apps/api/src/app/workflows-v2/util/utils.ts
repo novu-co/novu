@@ -1,4 +1,10 @@
-import _, { flatMap, values } from 'lodash';
+import difference from 'lodash/difference';
+import flatMap from 'lodash/flatMap';
+import reduce from 'lodash/reduce';
+import set from 'lodash/set';
+import values from 'lodash/values';
+import isObject from 'lodash/isObject';
+import isArray from 'lodash/isArray';
 
 import { BadRequestException } from '@nestjs/common';
 
@@ -8,15 +14,15 @@ export function findMissingKeys(requiredRecord: object, actualRecord: object) {
   const requiredKeys = collectKeys(requiredRecord);
   const actualKeys = collectKeys(actualRecord);
 
-  return _.difference(requiredKeys, actualKeys);
+  return difference(requiredKeys, actualKeys);
 }
 
 export function collectKeys(obj, prefix = '') {
-  return _.reduce(
+  return reduce(
     obj,
     (result, value, key) => {
       const newKey = prefix ? `${prefix}.${key}` : key;
-      if (_.isObject(value) && !_.isArray(value)) {
+      if (isObject(value) && !isArray(value)) {
         result.push(...collectKeys(value, newKey));
       } else {
         result.push(newKey);
@@ -136,4 +142,26 @@ export function mockSchemaDefaults(schema: JSONSchemaDto, parentPath = 'payload'
   }
 
   return schema;
+}
+
+/**
+ *
+ * Converts an array of dot-notation paths into a nested object structure,
+ * setting each path's value to the path itself.
+ *
+ * @param keys - Array of dot-notation paths
+ * @param options - Optional configuration object
+ *  - fn: Callback function to transform each path's value (default: identity function)
+ * @returns Nested object with paths as values
+ * @warning Entries without a namespace (no dots) will be ignored.
+ * @example
+ * keysToObject(['payload.old', 'payload.new', 'payload'])
+ * // Returns: { payload: { old: 'payload.old', new: 'payload.new' } }
+ * // Note: 'payload' entry is ignored as it has no namespace
+ */
+export function keysToObject(keys: string[], { fn } = { fn: (key: string) => key }) {
+  const result: Record<string, Record<string, unknown> | undefined> = {};
+  keys.filter((key) => key.includes('.')).forEach((key) => set(result, key, fn(key)));
+
+  return result;
 }

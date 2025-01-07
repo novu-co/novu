@@ -1,37 +1,39 @@
-import { StrictMode } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { createRoot } from 'react-dom/client';
 import ErrorPage from '@/components/error-page';
-import { RootRoute, AuthRoute, DashboardRoute, CatchAllRoute } from './routes';
-import { OnboardingParentRoute } from './routes/onboarding';
-import {
-  WorkflowsPage,
-  SignInPage,
-  SignUpPage,
-  OrganizationListPage,
-  QuestionnairePage,
-  UsecaseSelectPage,
-  ApiKeysPage,
-  WelcomePage,
-  SettingsPage,
-  ActivityFeed,
-} from '@/pages';
-import './index.css';
-import { ROUTES } from './utils/routes';
-import { EditWorkflowPage } from './pages/edit-workflow';
-import { TestWorkflowPage } from './pages/test-workflow';
-import { initializeSentry } from './utils/sentry';
-import { overrideZodErrorMap } from './utils/validation';
-import { InboxUsecasePage } from './pages/inbox-usecase-page';
-import { InboxEmbedPage } from './pages/inbox-embed-page';
 import { ConfigureWorkflow } from '@/components/workflow-editor/configure-workflow';
-import { InboxEmbedSuccessPage } from './pages/inbox-embed-success-page';
-import { ChannelPreferences } from './components/workflow-editor/channel-preferences';
-import { FeatureFlagsProvider } from './context/feature-flags-provider';
 import { ConfigureStep } from '@/components/workflow-editor/steps/configure-step';
 import { ConfigureStepTemplate } from '@/components/workflow-editor/steps/configure-step-template';
+import {
+  ActivityFeed,
+  ApiKeysPage,
+  IntegrationsListPage,
+  OrganizationListPage,
+  QuestionnairePage,
+  SettingsPage,
+  SignInPage,
+  SignUpPage,
+  UsecaseSelectPage,
+  WelcomePage,
+  WorkflowsPage,
+} from '@/pages';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { CreateIntegrationSidebar } from './components/integrations/components/create-integration-sidebar';
+import { UpdateIntegrationSidebar } from './components/integrations/components/update-integration-sidebar';
+import { ChannelPreferences } from './components/workflow-editor/channel-preferences';
+import { FeatureFlagsProvider } from './context/feature-flags-provider';
+import './index.css';
+import { EditWorkflowPage } from './pages/edit-workflow';
+import { InboxEmbedPage } from './pages/inbox-embed-page';
+import { InboxEmbedSuccessPage } from './pages/inbox-embed-success-page';
+import { InboxUsecasePage } from './pages/inbox-usecase-page';
 import { RedirectToLegacyStudioAuth } from './pages/redirect-to-legacy-studio-auth';
-import { ProviderControl } from './components/workflow-editor/steps/controls/provider-controls';
+import { TestWorkflowPage } from './pages/test-workflow';
+import { AuthRoute, CatchAllRoute, DashboardRoute, RootRoute } from './routes';
+import { OnboardingParentRoute } from './routes/onboarding';
+import { ROUTES } from './utils/routes';
+import { initializeSentry } from './utils/sentry';
+import { overrideZodErrorMap } from './utils/validation';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -133,11 +135,34 @@ const router = createBrowserRouter([
                 path: ROUTES.TEST_WORKFLOW,
                 element: <TestWorkflowPage />,
               },
+
               {
                 path: '*',
                 element: <CatchAllRoute />,
               },
             ],
+          },
+          {
+            path: ROUTES.INTEGRATIONS,
+            element: <IntegrationsListPage />,
+            children: [
+              {
+                path: ROUTES.INTEGRATIONS_CONNECT,
+                element: <CreateIntegrationSidebar isOpened />,
+              },
+              {
+                path: ROUTES.INTEGRATIONS_CONNECT_PROVIDER,
+                element: <CreateIntegrationSidebar isOpened />,
+              },
+              {
+                path: ROUTES.INTEGRATIONS_UPDATE,
+                element: <UpdateIntegrationSidebar isOpened />,
+              },
+            ],
+          },
+          {
+            path: ROUTES.INTEGRATIONS,
+            element: <IntegrationsListPage />,
           },
           {
             path: ROUTES.SETTINGS,
@@ -170,10 +195,6 @@ const router = createBrowserRouter([
         ],
       },
     ],
-  },
-  {
-    path: '/dima',
-    element: <ProviderControl />,
   },
 ]);
 

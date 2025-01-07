@@ -44,7 +44,7 @@ describe('test onesignal notification api', () => {
     const spy = vi.spyOn(provider, 'sendMessage');
 
     const res = await provider.sendMessage(mockNotificationOptions, {
-      iosBadgeCount: 2,
+      iosBadgeCount: 1,
       includeExternalUserIds: ['test'],
     });
     expect(mockedAxios.request).toHaveBeenCalled();
@@ -59,14 +59,13 @@ describe('test onesignal notification api', () => {
       contents: { en: 'Test push' },
       subtitle: {},
       data: { sound: 'test_sound' },
-      ios_badge_type: 'Increase',
-      ios_badgeCount: 2,
-      ios_badge_count: 1,
+      ios_badgeType: 'Increase',
+      ios_badgeCount: 1,
       include_external_user_ids: ['test'],
     });
 
     expect(spy).toHaveBeenCalledWith(mockNotificationOptions, {
-      iosBadgeCount: 2,
+      iosBadgeCount: 1,
       includeExternalUserIds: ['test'],
     });
     expect(res.id).toEqual(response.data.id);
@@ -89,7 +88,7 @@ describe('test onesignal notification api', () => {
     const spy = vi.spyOn(provider, 'sendMessage');
 
     const res = await provider.sendMessage(mockNotificationOptions, {
-      iosBadgeCount: 2,
+      iosBadgeCount: 1,
       includeExternalUserIds: ['test'],
       _passthrough: {
         body: {
@@ -109,14 +108,13 @@ describe('test onesignal notification api', () => {
       contents: { en: 'Test push' },
       subtitle: {},
       data: { sound: 'test_sound' },
-      ios_badge_type: 'Increase',
-      ios_badgeCount: 2,
-      ios_badge_count: 1,
+      ios_badgeType: 'Increase',
+      ios_badgeCount: 1,
       include_external_user_ids: ['test', 'test1'],
     });
 
     expect(spy).toHaveBeenCalledWith(mockNotificationOptions, {
-      iosBadgeCount: 2,
+      iosBadgeCount: 1,
       includeExternalUserIds: ['test'],
       _passthrough: {
         body: {

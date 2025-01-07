@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import isEqual from 'lodash.isequal';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
   type StepDataDto,
   StepTypeEnum,
@@ -20,7 +18,6 @@ import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-co
 import { SmsTabs } from '@/components/workflow-editor/steps/sms/sms-tabs';
 import { ChatTabs } from '@/components/workflow-editor/steps/chat/chat-tabs';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
-import { buildDefaultValuesOfDataSchema, buildDynamicZodSchema } from '@/utils/schema';
 import { CommonCustomControlValues } from '@/components/workflow-editor/steps/common/common-custom-control-values';
 
 const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) => React.JSX.Element | null> = {
@@ -46,12 +43,10 @@ type ConfigureStepTemplateFormProps = StepEditorProps & {
 
 export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps) => {
   const { workflow, step, update } = props;
-  const schema = useMemo(() => buildDynamicZodSchema(step.controls.dataSchema ?? {}), [step.controls.dataSchema]);
 
   const defaultValues = useMemo(() => getStepDefaultValues(step), [step]);
 
   const form = useForm({
-    resolver: zodResolver(schema),
     defaultValues,
     shouldFocusError: false,
   });
@@ -60,12 +55,8 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
     previousData: defaultValues,
     form,
     save: (data) => {
-      const defaultValues = buildDefaultValuesOfDataSchema(step.controls.dataSchema ?? {});
-      const isDefaultValues = isEqual(data, defaultValues);
-      const updateData = isDefaultValues ? null : data;
-      // transform form fields to step update dto
       const updateStepData: Partial<StepUpdateDto> = {
-        controlValues: updateData,
+        controlValues: data,
       };
       update(updateStepInWorkflow(workflow, step.stepId, updateStepData));
     },
@@ -73,10 +64,20 @@ export const ConfigureStepTemplateForm = (props: ConfigureStepTemplateFormProps)
 
   const setIssuesFromStep = useCallback(() => {
     const stepIssues = flattenIssues(step.issues?.controls);
+    const currentErrors = form.formState.errors;
+
+    // Clear errors that are not in stepIssues
+    Object.keys(currentErrors).forEach((key) => {
+      if (!stepIssues[key]) {
+        form.clearErrors(key);
+      }
+    });
+
+    // Set new errors from stepIssues
     Object.entries(stepIssues).forEach(([key, value]) => {
       form.setError(key as string, { message: value });
     });
-  }, [form, step.issues]);
+  }, [form, step]);
 
   useEffect(() => {
     setIssuesFromStep();

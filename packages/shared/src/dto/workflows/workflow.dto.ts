@@ -89,6 +89,8 @@ export type UpdateWorkflowDto = WorkflowCommonsFields & {
   steps: (StepCreateDto | StepUpdateDto)[];
 
   preferences: PreferencesRequestDto;
+
+  origin: WorkflowOriginEnum;
 };
 
 export type UpsertWorkflowBody = Omit<UpdateWorkflowDto, 'steps'> & {

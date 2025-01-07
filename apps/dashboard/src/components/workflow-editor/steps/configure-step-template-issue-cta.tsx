@@ -4,6 +4,7 @@ import TruncatedText from '@/components/truncated-text';
 import { StepDataDto } from '@novu/shared';
 import { RiArrowRightUpLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
+import { ExternalLink } from '../../shared/external-link';
 
 type ConfigureStepTemplateIssueCtaProps = {
   step: StepDataDto;
@@ -16,18 +17,23 @@ export const ConfigureStepTemplateIssueCta = (props: ConfigureStepTemplateIssueC
     <SidebarContent>
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium">Action required</span>
-        <Link
-          to="https://docs.novu.co/sdks/framework/typescript/steps/inApp"
-          reloadDocument
+        <ExternalLink
+          variant="text"
+          underline={false}
+          href="https://docs.novu.co/sdks/framework/typescript/steps/inApp"
           className="text-xs"
-          target="_blank"
-          rel="noopener noreferrer"
         >
           <span>Help?</span>
-        </Link>
+        </ExternalLink>
       </div>
       <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
-        <Button variant="outline" className="flex w-full justify-start gap-1.5 text-xs font-medium" type="button">
+        <Button
+          size="sm"
+          variant="secondary"
+          mode="outline"
+          className="flex w-full justify-start gap-1.5 text-xs font-medium"
+          type="button"
+        >
           <span className="bg-destructive h-4 min-w-1 rounded-full" />
           <TruncatedText>{issue}</TruncatedText>
           <RiArrowRightUpLine className="text-destructive ml-auto h-4 w-4" />

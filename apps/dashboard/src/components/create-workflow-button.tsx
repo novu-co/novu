@@ -1,14 +1,6 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ComponentProps, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { RiExternalLinkLine } from 'react-icons/ri';
-import { Link, useNavigate } from 'react-router-dom';
-import { z } from 'zod';
-import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify } from '@novu/shared';
 import { createWorkflow } from '@/api/workflows';
 import { Button } from '@/components/primitives/button';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Input, InputField } from '@/components/primitives/input';
 import { Separator } from '@/components/primitives/separator';
 import {
@@ -23,11 +15,20 @@ import {
 } from '@/components/primitives/sheet';
 import { TagInput } from '@/components/primitives/tag-input';
 import { Textarea } from '@/components/primitives/textarea';
+import { ExternalLink } from '@/components/shared/external-link';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useTags } from '@/hooks/use-tags';
+import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
-import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { type CreateWorkflowDto, slugify, WorkflowCreationSourceEnum } from '@novu/shared';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ComponentProps, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { RiArrowRightSLine } from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowSchema } from './workflow-editor/schema';
 
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
@@ -73,13 +74,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
           <div>
             <SheetDescription>
               Define the steps to notify subscribers using channels like in-app, email, and more.{' '}
-              <Link
-                target="_blank"
-                to="https://docs.novu.co/concepts/workflows"
-                className="text-foreground-400 inline-flex items-center text-xs underline"
-              >
-                Learn more <RiExternalLinkLine className="inline size-4" />
-              </Link>
+              <ExternalLink href="https://docs.novu.co/concepts/workflows">Learn more</ExternalLink>
             </SheetDescription>
           </div>
         </SheetHeader>
@@ -142,7 +137,7 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 )}
               />
 
-              <Separator className="bg-neutral-alpha-100" />
+              <Separator />
 
               <FormField
                 control={form.control}
@@ -178,9 +173,9 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     </div>
                     <FormControl>
                       <Textarea
-                        className="min-h-36"
                         placeholder="Describe what this workflow does"
                         {...field}
+                        showCounter
                         maxLength={MAX_DESCRIPTION_LENGTH}
                       />
                     </FormControl>
@@ -193,7 +188,14 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
         </SheetMain>
         <Separator />
         <SheetFooter>
-          <Button isLoading={isPending} variant="default" type="submit" form="create-workflow">
+          <Button
+            isLoading={isPending}
+            trailingIcon={RiArrowRightSLine}
+            variant="secondary"
+            mode="gradient"
+            type="submit"
+            form="create-workflow"
+          >
             Create workflow
           </Button>
         </SheetFooter>

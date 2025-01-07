@@ -1,26 +1,25 @@
-import { useState } from 'react';
-import { useFormContext } from 'react-hook-form';
-import { RiBookMarkedLine, RiInputField, RiQuestionLine } from 'react-icons/ri';
-import { motion } from 'motion/react';
-import { Link } from 'react-router-dom';
-import { RJSFSchema } from '@rjsf/utils';
-import { type ControlsMetadata } from '@novu/shared';
-import { Separator } from '@/components/primitives/separator';
-import { Switch } from '@/components/primitives/switch';
-import { WorkflowOriginEnum } from '@/utils/enums';
-import { cn } from '@/utils/ui';
-import { JsonForm } from './json-form';
-import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
-import { useWorkflow } from '../../workflow-provider';
-import { buildDefaultValuesOfDataSchema } from '@/utils/schema';
-import { SidebarContent } from '@/components/side-navigation/sidebar';
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
 import { InlineToast } from '@/components/primitives/inline-toast';
-import { JsonSchema } from '@novu/framework/internal';
+import { Separator } from '@/components/primitives/separator';
+import { Switch } from '@/components/primitives/switch';
+import { SidebarContent } from '@/components/side-navigation/sidebar';
+import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
+import { WorkflowOriginEnum } from '@/utils/enums';
+import { buildDefaultValuesOfDataSchema } from '@/utils/schema';
+import { cn } from '@/utils/ui';
+import { type ControlsMetadata } from '@novu/shared';
+import { RJSFSchema } from '@rjsf/utils';
+import { motion } from 'motion/react';
+import { useState } from 'react';
+import { useFormContext } from 'react-hook-form';
+import { RiBookMarkedLine, RiInputField, RiQuestionLine } from 'react-icons/ri';
+import { Link } from 'react-router-dom';
+import { useWorkflow } from '../../workflow-provider';
+import { JsonForm } from './json-form';
 
 type CustomStepControlsProps = {
-  dataSchema: ControlsMetadata['dataSchema'] | JsonSchema;
+  dataSchema: ControlsMetadata['dataSchema'];
   origin: WorkflowOriginEnum;
   className?: string;
 };
@@ -113,7 +112,7 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
         <div className="flex flex-col justify-center gap-1">
           <span className="block text-sm">Override code defined defaults</span>
           <span className="text-xs text-neutral-400">
-            Code-defined defaults are read-only by default, you can override them using this toggle.
+            Code-defined defaults are read-only by default, you can allow overrides using this toggle.
           </span>
         </div>
         <Switch

@@ -63,6 +63,7 @@ export class GetInboxPreferences {
       _organization: command.organizationId,
       subscriberId: command.subscriberId,
       workflowSize: workflowPreferences.length,
+      tags: command.tags || [],
     });
 
     return [updatedGlobalPreference, ...workflowPreferences];

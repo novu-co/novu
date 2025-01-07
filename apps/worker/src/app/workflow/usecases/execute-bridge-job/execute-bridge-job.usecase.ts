@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import {
   ControlValuesRepository,
@@ -23,11 +23,13 @@ import { Event, State, PostActionEnum, ExecuteOutput } from '@novu/framework/int
 import {
   CreateExecutionDetails,
   CreateExecutionDetailsCommand,
+  dashboardSanitizeControlValues,
   DetailEnum,
   ExecuteBridgeRequest,
   ExecuteBridgeRequestCommand,
   Instrument,
   InstrumentUsecase,
+  PinoLogger,
 } from '@novu/application-generic';
 import { ExecuteBridgeJobCommand } from './execute-bridge-job.command';
 
@@ -42,7 +44,8 @@ export class ExecuteBridgeJob {
     private environmentRepository: EnvironmentRepository,
     private controlValuesRepository: ControlValuesRepository,
     private createExecutionDetails: CreateExecutionDetails,
-    private executeBridgeRequest: ExecuteBridgeRequest
+    private executeBridgeRequest: ExecuteBridgeRequest,
+    private logger: PinoLogger
   ) {}
 
   @InstrumentUsecase()
@@ -147,6 +150,12 @@ export class ExecuteBridgeJob {
       _stepId: command.job.step._id,
       level: ControlValuesLevelEnum.STEP_CONTROLS,
     });
+
+    if (workflow?.origin === WorkflowOriginEnum.NOVU_CLOUD) {
+      return controls?.controls
+        ? dashboardSanitizeControlValues(this.logger, controls.controls, command.job?.step?.template?.type)
+        : {};
+    }
 
     return controls?.controls;
   }

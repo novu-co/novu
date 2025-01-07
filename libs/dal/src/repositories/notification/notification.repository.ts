@@ -111,7 +111,7 @@ export class NotificationRepository extends BaseRepository<
       .populate({
         options: {
           readPreference: 'secondaryPreferred',
-          sort: { createdAt: 1 },
+          sort: { createdAt: 1, _parentId: 1 },
         },
         path: 'jobs',
         match: {
@@ -120,7 +120,7 @@ export class NotificationRepository extends BaseRepository<
             $nin: [StepTypeEnum.TRIGGER],
           },
         },
-        select: 'createdAt digest payload overrides to tenant actorId providerId step status type updatedAt',
+        select: 'createdAt digest payload overrides to tenant actorId providerId step status type updatedAt _parentId',
         populate: [
           {
             path: 'executionDetails',

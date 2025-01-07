@@ -8,7 +8,6 @@ import {
   Param,
   Post,
   Put,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ChannelTypeEnum, UserSessionData } from '@novu/shared';
@@ -16,7 +15,6 @@ import {
   CalculateLimitNovuIntegration,
   CalculateLimitNovuIntegrationCommand,
   OtelSpan,
-  Roles,
 } from '@novu/application-generic';
 import { ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserSession } from '../shared/framework/user.decorator';

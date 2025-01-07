@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { workflow } from '@novu/framework/express';
 import { ActionStep, ChannelStep, JsonSchema, Step, StepOptions, StepOutput, Workflow } from '@novu/framework/internal';
 import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
-import { StepTypeEnum } from '@novu/shared';
+import { JSONSchemaDefinition, JSONSchemaDto, StepTypeEnum } from '@novu/shared';
 import { Instrument, InstrumentUsecase, PinoLogger } from '@novu/application-generic';
 import { AdditionalOperation, RulesLogic } from 'json-logic-js';
 import _ from 'lodash';
@@ -18,6 +18,7 @@ import {
 import { DelayOutputRendererUsecase } from '../output-renderers/delay-output-renderer.usecase';
 import { DigestOutputRendererUsecase } from '../output-renderers/digest-output-renderer.usecase';
 import { evaluateRules } from '../../../shared/services/query-parser/query-parser.service';
+import { isMatchingJsonSchema } from '../../../workflows-v2/util/jsonToSchema';
 
 const LOG_CONTEXT = 'ConstructFrameworkWorkflow';
 
@@ -183,8 +184,25 @@ export class ConstructFrameworkWorkflow {
     staticStep: NotificationStepEntity,
     fullPayloadForRender: FullPayloadForRender
   ): Required<Parameters<ActionStep>[2]> {
+    const stepOptions = this.constructCommonStepOptions(staticStep, fullPayloadForRender);
+
+    let controlSchema = stepOptions.controlSchema as JSONSchemaDefinition;
+    const stepType = staticStep.template!.type;
+
+    /*
+     * because of the known AJV issue with anyOf, we need to find the first schema that matches the control values
+     * ref: https://ajv.js.org/guide/modifying-data.html#assigning-defaults
+     */
+    if (stepType === StepTypeEnum.DIGEST && typeof controlSchema === 'object' && controlSchema.anyOf) {
+      const fistSchemaMatch = controlSchema.anyOf.find((item) => {
+        return isMatchingJsonSchema(item, staticStep.controlVariables);
+      });
+      controlSchema = fistSchemaMatch ?? controlSchema.anyOf[0];
+    }
+
     return {
-      ...this.constructCommonStepOptions(staticStep, fullPayloadForRender),
+      ...stepOptions,
+      controlSchema: controlSchema as JsonSchema,
     };
   }
 

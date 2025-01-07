@@ -45,7 +45,7 @@ describe('test onesignal notification user api', () => {
     const spy = vi.spyOn(provider, 'sendMessage');
 
     const res = await provider.sendMessage(mockNotificationOptions, {
-      iosBadgeCount: 2,
+      iosBadgeCount: 1,
     });
     expect(mockedAxios.request).toHaveBeenCalled();
     const data = JSON.parse(
@@ -62,9 +62,8 @@ describe('test onesignal notification user api', () => {
       contents: { en: 'Test push' },
       subtitle: {},
       data: { sound: 'test_sound' },
-      ios_badge_type: 'Increase',
-      ios_badgeCount: 2,
-      ios_badge_count: 1,
+      ios_badgeType: 'Increase',
+      ios_badgeCount: 1,
     });
 
     expect(res.id).toEqual(response.data.id);

@@ -1,127 +1,24 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, Request, Response, RawBodyRequest } from '@nestjs/common';
 import { UserAuthGuard, UserSession } from '@novu/application-generic';
-import { UserRepository } from '@novu/dal';
 import { UserSessionData } from '@novu/shared';
 import { CreateSupportThreadDto } from './dto/create-thread.dto';
-import { CreateSupportThreadUsecase } from './usecases/create-thread.usecase';
 import { CreateSupportThreadCommand } from './usecases/create-thread.command';
+import { PlainCardRequestDto } from './dto/plain-card.dto';
+import { PlainCardsCommand } from './usecases/plain-cards.command';
+import { CreateSupportThreadUsecase, PlainCardsUsecase } from './usecases';
+import { PlainCardsGuard } from './guards/plain-cards.guard';
 
 @Controller('/support')
 export class SupportController {
   constructor(
-    private readonly userRepository: UserRepository,
-    private createSupportThreadUsecase: CreateSupportThreadUsecase
+    private createSupportThreadUsecase: CreateSupportThreadUsecase,
+    private plainCardsUsecase: PlainCardsUsecase
   ) {}
 
-  @Post('plain/cards')
-  async getPlainCards() {
-    return {
-      data: {},
-
-      cards: [
-        {
-          key: 'plain-customer-details',
-          components: [
-            {
-              componentSpacer: {
-                spacerSize: 'S',
-              },
-            },
-            {
-              componentRow: {
-                rowMainContent: [
-                  {
-                    componentText: {
-                      text: 'Registered at',
-                      textColor: 'MUTED',
-                    },
-                  },
-                ],
-                rowAsideContent: [
-                  {
-                    componentText: {
-                      text: '7/18/2024, 1:00 PM',
-                    },
-                  },
-                ],
-              },
-            },
-            {
-              componentSpacer: {
-                spacerSize: 'M',
-              },
-            },
-            {
-              componentRow: {
-                rowMainContent: [
-                  {
-                    componentText: {
-                      text: 'Last signed in',
-                      textColor: 'MUTED',
-                    },
-                  },
-                ],
-                rowAsideContent: [
-                  {
-                    componentText: {
-                      text: '10/20/2024, 12:57 PM',
-                    },
-                  },
-                ],
-              },
-            },
-            {
-              componentSpacer: {
-                spacerSize: 'M',
-              },
-            },
-            {
-              componentRow: {
-                rowMainContent: [
-                  {
-                    componentText: {
-                      text: 'Last device used',
-                      textColor: 'MUTED',
-                    },
-                  },
-                ],
-                rowAsideContent: [
-                  {
-                    componentText: {
-                      text: 'iPhone 13 🍎',
-                    },
-                  },
-                ],
-              },
-            },
-            {
-              componentSpacer: {
-                spacerSize: 'M',
-              },
-            },
-            {
-              componentRow: {
-                rowMainContent: [
-                  {
-                    componentText: {
-                      text: 'Marketing preferences',
-                      textColor: 'MUTED',
-                    },
-                  },
-                ],
-                rowAsideContent: [
-                  {
-                    componentText: {
-                      text: 'Opted out 🙅',
-                    },
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      ],
-    };
+  @UseGuards(PlainCardsGuard)
+  @Post('user-organizations')
+  async fetchUserOrganizations(@Body() body: PlainCardRequestDto) {
+    return this.plainCardsUsecase.fetchUserOrganizations(PlainCardsCommand.create({ ...body }));
   }
 
   @UseGuards(UserAuthGuard)

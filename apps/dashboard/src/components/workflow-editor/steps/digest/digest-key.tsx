@@ -1,15 +1,14 @@
+import { autocompletion } from '@codemirror/autocomplete';
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { RiAccountPinBoxFill } from 'react-icons/ri';
-import { autocompletion } from '@codemirror/autocomplete';
 
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { InputFieldPure } from '@/components/primitives/input';
 import { Code2 } from '@/components/icons/code-2';
 import { Editor } from '@/components/primitives/editor';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
+import { InputFieldPure } from '@/components/primitives/input';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { completions } from '@/utils/liquid-autocomplete';
+import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 
 export const DigestKey = () => {
   const { control } = useFormContext();
@@ -25,10 +24,7 @@ export const DigestKey = () => {
         <FormItem className="flex w-full flex-col overflow-hidden">
           <>
             <FormLabel tooltip="Digest is aggregated by the subscriberId by default. You can add one more aggregation key to group events further.">
-              <span className="flex items-center gap-1">
-                <RiAccountPinBoxFill className="size-4" />
-                <span>Aggregated by</span>
-              </span>
+              Aggregated by
             </FormLabel>
             <InputFieldPure className="h-7 items-center gap-0 rounded-lg border">
               <FormLabel className="flex h-full items-center gap-1 border-r border-neutral-100 pr-1">
@@ -37,6 +33,8 @@ export const DigestKey = () => {
               </FormLabel>
               <FormControl>
                 <Editor
+                  singleLine
+                  indentWithTab={false}
                   fontFamily="inherit"
                   ref={field.ref}
                   placeholder="Add additional digest..."

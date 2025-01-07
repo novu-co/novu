@@ -36,6 +36,7 @@ export const InAppBody = () => {
             <InputField className="h-36 px-1">
               <Editor
                 fontFamily="inherit"
+                indentWithTab={false}
                 placeholder={capitalize(field.name)}
                 id={field.name}
                 extensions={extensions}

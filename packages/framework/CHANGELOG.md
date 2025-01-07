@@ -1,3 +1,18 @@
+## 2.5.3 (2024-12-24)
+
+### 🩹 Fixes
+
+- **framework:** Remove @novu/shared dependency temporarily ([#7337](https://github.com/novuhq/novu/pull/7337))
+
+### ❤️ Thank You
+
+- GalTidhar @tatarco
+- George Desipris @desiprisg
+- George Djabarov @djabarovgeorge
+- Pawan Jain
+- Sokratis Vidros @SokratisVidros
+
+
 ## 2.5.2 (2024-11-26)
 
 ### 🚀 Features

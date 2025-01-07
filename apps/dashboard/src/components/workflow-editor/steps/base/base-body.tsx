@@ -35,6 +35,7 @@ export const BaseBody = () => {
           <FormControl>
             <InputField className="h-36 px-1">
               <Editor
+                indentWithTab={false}
                 fontFamily="inherit"
                 placeholder={capitalize(field.name)}
                 id={field.name}
@@ -47,7 +48,7 @@ export const BaseBody = () => {
               />
             </InputField>
           </FormControl>
-          <FormMessage>{`This supports markdown and variables, type { for more.`}</FormMessage>
+          <FormMessage>{`You can use variables by typing {{ select from the list or create a new one.`}</FormMessage>
         </FormItem>
       )}
     />
