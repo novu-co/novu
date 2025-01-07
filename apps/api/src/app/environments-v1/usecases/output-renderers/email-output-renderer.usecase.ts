@@ -30,11 +30,7 @@ export class EmailOutputRendererUsecase {
 
     const expandedMailyContent = this.transformMailyDynamicBlocks(body, renderCommand.fullPayloadForRender);
     const parsedTipTap = await this.parseTipTapNodeByLiquid(expandedMailyContent, renderCommand);
-    // eslint-disable-next-line no-console
-    console.log('parsedTipTap 555 ', JSON.stringify(parsedTipTap, null, 2));
     const renderedHtml = await this.renderEmail(parsedTipTap);
-    // eslint-disable-next-line no-console
-    console.log('renderedHtml 666 ', JSON.stringify(renderedHtml, null, 2));
 
     /**
      * Force type mapping in case undefined control.
