@@ -147,13 +147,7 @@ export const CustomStepControls = (props: CustomStepControlsProps) => {
 
           <AccordionContent>
             <div className="bg-background rounded-md border border-dashed p-3">
-              <JsonForm
-                schema={(dataSchema as RJSFSchema) || {}}
-                disabled={!isOverridden}
-                onChange={() => {
-                  saveForm();
-                }}
-              />
+              <JsonForm schema={(dataSchema as RJSFSchema) || {}} disabled={!isOverridden} />
             </div>
           </AccordionContent>
         </AccordionItem>

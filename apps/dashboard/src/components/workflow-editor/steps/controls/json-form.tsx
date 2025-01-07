@@ -6,7 +6,6 @@ import { ArrayFieldTitleTemplate } from './array-field-title-template';
 import { AddButton, RemoveButton } from './button-templates';
 import { ObjectFieldTemplate } from './object-field-template';
 import { JSON_SCHEMA_FORM_ID_DELIMITER, UI_SCHEMA, WIDGETS } from './template-utils';
-import { DescriptionField } from '../description-field';
 
 type JsonFormProps<TFormData = unknown> = Pick<
   FormProps<TFormData>,
@@ -26,7 +25,6 @@ export function JsonForm(props: JsonFormProps) {
       autoComplete="false"
       idSeparator={JSON_SCHEMA_FORM_ID_DELIMITER}
       templates={{
-        DescriptionFieldTemplate: DescriptionField as any,
         ButtonTemplates: {
           AddButton,
           RemoveButton,
