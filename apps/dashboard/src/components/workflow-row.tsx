@@ -190,7 +190,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           )}
           <TruncatedText className="max-w-[32ch]">{workflow.name}</TruncatedText>
         </div>
-        <div className="gap-1transition-opacity flex items-center duration-200">
+        <div className="flex items-center gap-1 transition-opacity duration-200">
           <TruncatedText className="text-foreground-400 font-code block text-xs">{workflow.workflowId}</TruncatedText>
 
           <CopyButton
