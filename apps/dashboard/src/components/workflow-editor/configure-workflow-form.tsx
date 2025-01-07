@@ -320,6 +320,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                         placeholder="Describe what this workflow does"
                         {...field}
                         maxLength={MAX_DESCRIPTION_LENGTH}
+                        showCounter
                         disabled={isReadOnly}
                       />
                     </FormControl>
