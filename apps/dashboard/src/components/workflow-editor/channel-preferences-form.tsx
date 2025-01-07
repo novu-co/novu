@@ -1,29 +1,29 @@
-import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { useForm, useWatch } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { RiArrowLeftSLine, RiCloseFill, RiInformationFill } from 'react-icons/ri';
 import { ChannelTypeEnum, UpdateWorkflowDto, WorkflowPreferences, WorkflowResponseDto } from '@novu/shared';
+import { motion } from 'motion/react';
+import { useMemo } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import { RiArrowLeftSLine, RiCloseFill, RiInformationFill } from 'react-icons/ri';
+import { Link } from 'react-router-dom';
+import { z } from 'zod';
 
 import { SidebarContent, SidebarHeader } from '@/components/side-navigation/sidebar';
 import { UserPreferencesFormSchema } from '@/components/workflow-editor/schema';
+import { useTelemetry } from '@/hooks/use-telemetry';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { StepTypeEnum, WorkflowOriginEnum } from '@/utils/enums';
 import { capitalize } from '@/utils/string';
+import { TelemetryEvent } from '@/utils/telemetry';
 import { cn } from '@/utils/ui';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { PageMeta } from '../page-meta';
-import { Button } from '../primitives/button';
+import { CompactButton } from '../primitives/button-compact';
 import { Card, CardContent } from '../primitives/card';
 import { Checkbox } from '../primitives/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '../primitives/form/form';
 import { Separator } from '../primitives/separator';
 import { Step } from '../primitives/step';
 import { Switch } from '../primitives/switch';
-import { useTelemetry } from '@/hooks/use-telemetry';
-import { TelemetryEvent } from '@/utils/telemetry';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 
 type ConfigureWorkflowFormProps = {
@@ -176,16 +176,16 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
       >
         <SidebarHeader className="items-center text-sm font-medium">
           <Link to="../" className="flex items-center">
-            <Button variant="link" size="icon" className="size-4" type="button">
-              <RiArrowLeftSLine />
-            </Button>
+            <CompactButton icon={RiArrowLeftSLine} variant="ghost" size="md" type="button">
+              <span className="sr-only">Back</span>
+            </CompactButton>
           </Link>
           <span>Channel Preferences</span>
 
           <Link to="../" className="ml-auto flex items-center">
-            <Button variant="link" size="icon" className="size-4" type="button">
-              <RiCloseFill />
-            </Button>
+            <CompactButton icon={RiCloseFill} variant="ghost" type="button">
+              <span className="sr-only">Close</span>
+            </CompactButton>
           </Link>
         </SidebarHeader>
         <Separator />
