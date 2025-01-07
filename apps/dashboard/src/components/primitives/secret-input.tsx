@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
-import { Input, InputField } from './input';
-import { Button } from './button';
+import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '../../utils/constants';
+import { CompactButton } from './button-compact';
+import { Input, InputField } from './input';
 
 interface SecretInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   value: string;
@@ -21,20 +21,15 @@ export function SecretInput({ className, value, onChange, ...props }: SecretInpu
         onChange={(e) => onChange(e.target.value)}
         {...props}
       />
-      <Button
+      <CompactButton
         type="button"
         variant="ghost"
-        size="sm"
-        className="h-9 w-9 px-0 hover:bg-transparent"
+        icon={revealed ? RiEyeOffLine : RiEyeLine}
+        className="text-foreground-400 h-9 w-9 px-0 hover:bg-transparent"
         onClick={() => setRevealed(!revealed)}
       >
-        {revealed ? (
-          <EyeOff className="text-muted-foreground/70 h-4 w-4" />
-        ) : (
-          <Eye className="text-muted-foreground/70 h-4 w-4" />
-        )}
         <span className="sr-only">{revealed ? 'Hide' : 'Show'} password</span>
-      </Button>
+      </CompactButton>
     </InputField>
   );
 }

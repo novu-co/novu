@@ -1,4 +1,17 @@
-/** @type {import('tailwindcss').Config} */
+export const borderRadii = {
+  4: '.25rem',
+  6: '.375rem',
+  8: '.5rem',
+  10: '.625rem',
+  12: '.75rem',
+  16: '1rem',
+  20: '1.25rem',
+  24: '1.5rem',
+  full: '999px',
+  lg: 'var(--radius)', // DEPRECATED
+  md: 'calc(var(--radius) - 2px)', // DEPRECATED
+  sm: 'calc(var(--radius) - 4px)', // DEPRECATED
+};
 
 export const texts = {
   'title-h1': [
@@ -568,18 +581,7 @@ export default {
         2.5: 0.025,
       },
       borderRadius: {
-        4: '.25rem',
-        6: '.375rem',
-        8: '.5rem',
-        10: '.625rem',
-        12: '.75rem',
-        16: '1rem',
-        20: '1.25rem',
-        24: '1.5rem',
-        full: '999px',
-        lg: 'var(--radius)', // DEPRECATED
-        md: 'calc(var(--radius) - 2px)', // DEPRECATED
-        sm: 'calc(var(--radius) - 4px)', // DEPRECATED
+        ...borderRadii,
       },
       keyframes: {
         'pulse-shadow': {
@@ -661,5 +663,5 @@ export default {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [import('tailwindcss-animate')],
 };

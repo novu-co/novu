@@ -27,8 +27,8 @@ export function OverviewItem({
         {isCopyable && value && (
           <CopyButton
             valueToCopy={value}
-            variant="ghost"
-            size="icon"
+            mode="ghost"
+            size="xs"
             className="text-foreground-600 mr-0 size-3 gap-0 p-0 opacity-0 transition-opacity group-hover:opacity-100"
           >
             <Copy className="h-3 w-3" />

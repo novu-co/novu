@@ -50,7 +50,7 @@ export const InAppEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
 
       {redirect && (
         <>
-          <Separator className="bg-neutral-100" />
+          <Separator className="before:bg-neutral-100" />
           <InAppTabsSection>
             {getComponentByType({
               component: redirect.component,
