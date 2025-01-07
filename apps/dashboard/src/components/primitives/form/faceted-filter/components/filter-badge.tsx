@@ -1,7 +1,7 @@
-import { cn } from '../../../../../utils/ui';
 import { Badge } from '../../../badge';
-import { STYLES } from '../styles';
+import { cn } from '../../../../../utils/ui';
 import { SizeType } from '../types';
+import { STYLES } from '../styles';
 
 interface FilterBadgeProps {
   content: React.ReactNode;
@@ -12,8 +12,7 @@ interface FilterBadgeProps {
 export function FilterBadge({ content, size, className }: FilterBadgeProps) {
   return (
     <Badge
-      variant="lighter"
-      color="gray"
+      variant="outline"
       className={cn(
         'rounded-md border-neutral-100 bg-neutral-50 font-normal text-neutral-600 shadow-none',
         'transition-colors duration-200 ease-out',

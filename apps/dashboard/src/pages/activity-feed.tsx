@@ -1,11 +1,11 @@
-import { ActivityFilters, defaultActivityFilters } from '@/components/activity/activity-filters';
-import { ActivityPanel } from '@/components/activity/activity-panel';
-import { ActivityTable } from '@/components/activity/activity-table';
 import { DashboardLayout } from '@/components/dashboard-layout';
-import { useActivityUrlState } from '@/hooks/use-activity-url-state';
-import { AnimatePresence, motion } from 'motion/react';
-import { PageMeta } from '../components/page-meta';
+import { ActivityTable } from '@/components/activity/activity-table';
+import { ActivityFilters, defaultActivityFilters } from '@/components/activity/activity-filters';
+import { motion, AnimatePresence } from 'motion/react';
+import { ActivityPanel } from '@/components/activity/activity-panel';
 import { Badge } from '../components/primitives/badge';
+import { PageMeta } from '../components/page-meta';
+import { useActivityUrlState } from '@/hooks/use-activity-url-state';
 
 export function ActivityFeed() {
   const { activityItemId, filters, filterValues, handleActivitySelect, handleFiltersChange } = useActivityUrlState();
@@ -32,7 +32,7 @@ export function ActivityFeed() {
         headerStartItems={
           <h1 className="text-foreground-950 flex items-center gap-1">
             <span>Activity Feed</span>
-            <Badge color="gray" size="sm" variant="lighter">
+            <Badge kind="pill" size="2xs">
               BETA
             </Badge>
           </h1>

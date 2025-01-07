@@ -35,7 +35,7 @@ export const EditorBreadcrumbs = () => {
       label: 'Workflows',
       href: workflowsRoute,
       node: (
-        <Badge color="gray" size="sm" variant="lighter">
+        <Badge kind="pill" size="2xs" className="no-underline">
           BETA
         </Badge>
       ),
@@ -70,7 +70,7 @@ export const EditorBreadcrumbs = () => {
             {workflow && (
               <BreadcrumbPage className="flex items-center gap-1">
                 {workflow.origin === WorkflowOriginEnum.EXTERNAL ? (
-                  <Badge color="yellow" size="sm" variant="lighter">
+                  <Badge variant="warning" kind="pill" size="2xs">
                     <FaCode className="size-3.5" />
                   </Badge>
                 ) : (

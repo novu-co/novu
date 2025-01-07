@@ -1,7 +1,8 @@
 import { JobStatusEnum } from '@novu/shared';
+import { RiCheckboxCircleFill, RiErrorWarningFill, RiForbidFill } from 'react-icons/ri';
+import { BadgeVariant } from '../primitives/badge';
+import { RiLoader3Line, RiLoader4Fill } from 'react-icons/ri';
 import { IconType } from 'react-icons/lib';
-import { RiCheckboxCircleFill, RiErrorWarningFill, RiForbidFill, RiLoader3Line, RiLoader4Fill } from 'react-icons/ri';
-import { StatusBadgeProps } from '../primitives/status-badge';
 
 export const STATUS_STYLES = {
   completed: 'border-[#99e3bb] bg-[#e9faf0] text-[#99e3bb]',
@@ -13,7 +14,7 @@ export const STATUS_STYLES = {
 export const JOB_STATUS_CONFIG: Record<
   JobStatusEnum,
   {
-    variant: StatusBadgeProps['status'];
+    variant: BadgeVariant;
     color: string;
     icon: IconType;
     label: string;
@@ -21,56 +22,56 @@ export const JOB_STATUS_CONFIG: Record<
   }
 > = {
   [JobStatusEnum.COMPLETED]: {
-    variant: 'completed' as const,
+    variant: 'success' as const,
     color: 'success',
     icon: RiCheckboxCircleFill,
     label: 'SUCCESS',
   },
   [JobStatusEnum.FAILED]: {
-    variant: 'failed' as const,
+    variant: 'destructive' as const,
     color: 'destructive',
     icon: RiErrorWarningFill,
     label: `ERROR`,
   },
   [JobStatusEnum.MERGED]: {
-    variant: 'disabled' as const,
+    variant: 'success' as const,
     color: 'success',
     icon: RiForbidFill,
     label: 'MERGED',
   },
   [JobStatusEnum.PENDING]: {
-    variant: 'pending' as const,
+    variant: 'warning' as const,
     icon: RiLoader3Line,
     color: 'neutral-300',
     label: 'PENDING',
   },
   [JobStatusEnum.CANCELED]: {
-    variant: 'disabled' as const,
+    variant: 'warning' as const,
     icon: RiLoader3Line,
     color: 'neutral-300',
     label: 'CANCELED',
   },
   [JobStatusEnum.SKIPPED]: {
-    variant: 'disabled' as const,
+    variant: 'warning' as const,
     icon: RiLoader3Line,
     color: 'neutral-300',
     label: 'SKIPPED',
   },
   [JobStatusEnum.RUNNING]: {
-    variant: 'pending' as const,
+    variant: 'warning' as const,
     icon: RiLoader3Line,
     color: 'warning',
     label: 'RUNNING',
   },
   [JobStatusEnum.DELAYED]: {
-    variant: 'pending' as const,
+    variant: 'warning' as const,
     icon: RiLoader4Fill,
     label: 'DELAYED',
     color: 'warning',
     animationClass: 'animate-spin-slow',
   },
   [JobStatusEnum.QUEUED]: {
-    variant: 'pending' as const,
+    variant: 'warning' as const,
     icon: RiLoader3Line,
     color: 'warning',
     label: 'QUEUED',

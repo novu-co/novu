@@ -185,7 +185,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
       <WorkflowLinkTableCell workflow={workflow} className="font-medium">
         <div className="flex items-center gap-1">
           {workflow.origin === WorkflowOriginEnum.EXTERNAL && (
-            <Badge color="yellow" size="sm" variant="lighter">
+            <Badge variant="warning" kind="pill">
               <FaCode className="size-3" />
             </Badge>
           )}

@@ -16,15 +16,15 @@ const TAG_DISMISS_ICON_NAME = 'TagDismissIcon';
 export const tagVariants = tv({
   slots: {
     root: [
-      'group/tag inline-flex h-6 items-center gap-2 rounded-md px-2 text-label-xs text-text-sub',
+      'group/tag inline-flex h-6 items-center gap-2 rounded-md px-2 text-label-xs text-text-sub-600',
       'transition duration-200 ease-out',
       'ring-1 ring-inset',
     ],
     icon: [
       // base
-      '-mx-1 size-4 shrink-0 text-text-soft transition duration-200 ease-out',
+      '-mx-1 size-4 shrink-0 text-text-soft-400 transition duration-200 ease-out',
       // hover
-      'group-hover/tag:text-text-sub',
+      'group-hover/tag:text-text-sub-600',
     ],
     dismissButton: [
       // base
@@ -32,24 +32,24 @@ export const tagVariants = tv({
       // focus
       'focus:outline-none',
     ],
-    dismissIcon: 'size-4 text-text-soft transition duration-200 ease-out',
+    dismissIcon: 'size-4 text-text-soft-400 transition duration-200 ease-out',
   },
   variants: {
     variant: {
       stroke: {
         root: [
           // base
-          'bg-bg-white-0 ring-stroke-soft',
+          'bg-bg-white-0 ring-stroke-soft-200',
           // hover
-          'hover:bg-bg-weak',
+          'hover:bg-bg-weak-50 hover:ring-transparent',
           // focus-within
-          'focus-within:bg-bg-weak focus-within:ring-transparent',
+          'focus-within:bg-bg-weak-50 focus-within:ring-transparent',
         ],
         dismissIcon: [
           // hover
-          'group-hover/dismiss-button:text-text-sub',
+          'group-hover/dismiss-button:text-text-sub-600',
           // focus
-          'group-focus/dismiss-button:text-text-sub',
+          'group-focus/dismiss-button:text-text-sub-600',
         ],
       },
       gray: {
@@ -57,15 +57,15 @@ export const tagVariants = tv({
           // base
           'bg-bg-weak-50 ring-transparent',
           // hover
-          'hover:bg-bg-white-0 hover:ring-stroke-soft',
+          'hover:bg-bg-white-0 hover:ring-stroke-soft-200',
         ],
       },
     },
     disabled: {
       true: {
-        root: 'pointer-events-none bg-bg-weak text-text-disabled ring-transparent',
-        icon: 'text-text-disabled [&:not(.remixicon)]:opacity-[.48]',
-        dismissIcon: 'text-text-disabled',
+        root: 'pointer-events-none bg-bg-weak-50 text-text-disabled-300 ring-transparent',
+        icon: 'text-text-disabled-300 [&:not(.remixicon)]:opacity-[.48]',
+        dismissIcon: 'text-text-disabled-300',
       },
     },
   },
