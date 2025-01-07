@@ -1,12 +1,11 @@
 import { Button } from '@/components/primitives/button';
-import { cn } from '@/utils/ui';
-import { PlayCircleIcon } from 'lucide-react';
-import { RiCloseCircleLine } from 'react-icons/ri';
-import { motion, AnimatePresence } from 'motion/react';
-import { ExternalLink } from '../shared/external-link';
-import { useNavigate } from 'react-router-dom';
-import { buildRoute, ROUTES } from '@/utils/routes';
 import { useEnvironment } from '@/context/environment/hooks';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { cn } from '@/utils/ui';
+import { AnimatePresence, motion } from 'motion/react';
+import { RiCloseCircleLine, RiPlayCircleLine } from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
+import { ExternalLink } from '../shared/external-link';
 
 interface ActivityEmptyStateProps {
   className?: string;
@@ -87,7 +86,7 @@ export function ActivityEmptyState({ className, emptySearchResults, onClearFilte
               }}
               className="flex gap-6"
             >
-              <Button variant="outline" className="gap-2" onClick={onClearFilters}>
+              <Button variant="secondary" mode="outline" className="gap-2" onClick={onClearFilters}>
                 <RiCloseCircleLine className="h-4 w-4" />
                 Clear Filters
               </Button>
@@ -102,13 +101,23 @@ export function ActivityEmptyState({ className, emptySearchResults, onClearFilte
                 duration: 0.2,
                 delay: 0.3,
               }}
-              className="flex gap-6"
+              className="flex items-center gap-6"
             >
-              <ExternalLink href="https://docs.novu.co" variant="documentation" target="_blank">
+              <ExternalLink
+                size="md"
+                underline={false}
+                variant="documentation"
+                href="https://docs.novu.co"
+                target="_blank"
+              >
                 View Docs
               </ExternalLink>
-              <Button variant="primary" className="gap-2" onClick={handleNavigateToWorkflows}>
-                <PlayCircleIcon className="h-4 w-4" />
+              <Button
+                leadingIcon={RiPlayCircleLine}
+                variant="primary"
+                className="gap-2"
+                onClick={handleNavigateToWorkflows}
+              >
                 Trigger Workflow
               </Button>
             </motion.div>

@@ -22,17 +22,20 @@ import { Input, InputField } from '@/components/primitives/input';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarContent, SidebarFooter, SidebarHeader } from '@/components/side-navigation/sidebar';
 import TruncatedText from '@/components/truncated-text';
+import { getStepDefaultValues } from '@/components/workflow-editor/step-default-values';
 import {
   flattenIssues,
   getFirstBodyErrorMessage,
   getFirstControlsErrorMessage,
   updateStepInWorkflow,
 } from '@/components/workflow-editor/step-utils';
+import { ConfigureChatStepPreview } from '@/components/workflow-editor/steps/chat/configure-chat-step-preview';
 import { ConfigureStepTemplateIssueCta } from '@/components/workflow-editor/steps/configure-step-template-issue-cta';
 import { DelayControlValues } from '@/components/workflow-editor/steps/delay/delay-control-values';
 import { DigestControlValues } from '@/components/workflow-editor/steps/digest/digest-control-values';
 import { ConfigureEmailStepPreview } from '@/components/workflow-editor/steps/email/configure-email-step-preview';
 import { ConfigureInAppStepPreview } from '@/components/workflow-editor/steps/in-app/configure-in-app-step-preview';
+import { ConfigurePushStepPreview } from '@/components/workflow-editor/steps/push/configure-push-step-preview';
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { ConfigureSmsStepPreview } from '@/components/workflow-editor/steps/sms/configure-sms-step-preview';
@@ -43,10 +46,8 @@ import {
   STEP_TYPE_LABELS,
   TEMPLATE_CONFIGURABLE_STEP_TYPES,
 } from '@/utils/constants';
-import { getStepDefaultValues } from '@/components/workflow-editor/step-default-values';
 import { buildRoute, ROUTES } from '@/utils/routes';
-import { ConfigurePushStepPreview } from '@/components/workflow-editor/steps/push/configure-push-step-preview';
-import { ConfigureChatStepPreview } from '@/components/workflow-editor/steps/chat/configure-chat-step-preview';
+import { CompactButton } from '../../primitives/button-compact';
 
 const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
@@ -200,9 +201,9 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               })}
               className="flex items-center"
             >
-              <Button variant="link" size="icon" className="size-4" type="button">
-                <RiArrowLeftSLine />
-              </Button>
+              <CompactButton size="lg" variant="ghost" icon={RiArrowLeftSLine} className="size-4" type="button">
+                <span className="sr-only">Back</span>
+              </CompactButton>
             </Link>
             <span>Configure Step</span>
             <Link
@@ -212,9 +213,9 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               })}
               className="ml-auto flex items-center"
             >
-              <Button variant="link" size="icon" className="size-4" type="button">
-                <RiCloseFill />
-              </Button>
+              <CompactButton size="lg" variant="ghost" icon={RiCloseFill} className="size-4" type="button">
+                <span className="sr-only">Close</span>
+              </CompactButton>
             </Link>
           </SidebarHeader>
 
@@ -254,7 +255,11 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                           <FormControl>
                             <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
                           </FormControl>
-                          <CopyButton valueToCopy={field.value} size="input-right" />
+                          <CopyButton
+                            valueToCopy={field.value}
+                            size="xs"
+                            className="h-[34px] rounded-none border-l border-neutral-200"
+                          />
                         </InputField>
                         <FormMessage />
                       </FormItem>
@@ -273,9 +278,9 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               <SidebarContent>
                 <Link to={'./edit'} relative="path" state={{ stepType: step.type }}>
                   <Button
-                    variant="outline"
+                    variant="secondary"
+                    mode="outline"
                     className="flex w-full justify-start gap-1.5 text-xs font-medium"
-                    type="button"
                   >
                     <RiPencilRuler2Fill className="h-4 w-4 text-neutral-600" />
                     Configure {STEP_TYPE_LABELS[step.type]} Step template{' '}
@@ -327,12 +332,13 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                 confirmButtonText="Delete"
               />
               <Button
-                variant="ghostDestructive"
-                className="gap-1.5 text-xs"
+                variant="error"
+                mode="ghost"
+                className="gap-1.5"
                 type="button"
                 onClick={() => setIsDeleteModalOpen(true)}
+                leadingIcon={RiDeleteBin2Line}
               >
-                <RiDeleteBin2Line className="size-4" />
                 Delete step
               </Button>
             </SidebarFooter>

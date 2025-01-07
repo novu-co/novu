@@ -3,12 +3,12 @@ import { Button } from '@/components/primitives/button';
 import {
   Dialog,
   DialogClose,
-  DialogDescription,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogOverlay,
   DialogPortal,
   DialogTitle,
-  DialogFooter,
 } from '@/components/primitives/dialog';
 import { ReactNode } from 'react';
 import { RiAlertFill } from 'react-icons/ri';
@@ -50,7 +50,7 @@ export const ConfirmationModal = ({
           </div>
           <DialogFooter>
             <DialogClose asChild aria-label="Close">
-              <Button type="button" size="sm" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button type="button" size="sm" mode="outline" variant="secondary" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
             </DialogClose>
