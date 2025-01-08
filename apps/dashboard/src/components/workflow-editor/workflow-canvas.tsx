@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import {
   Background,
   BackgroundVariant,
@@ -10,7 +9,16 @@ import {
   ViewportHelperFunctionOptions,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
+import { useEnvironment } from '@/context/environment/hooks';
+import { StepTypeEnum } from '@/utils/enums';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { Step } from '@/utils/types';
+import { useNavigate } from 'react-router-dom';
+import { NODE_HEIGHT, NODE_WIDTH } from './base-node';
+import { AddNodeEdge, AddNodeEdgeType } from './edges';
 import {
   AddNode,
   ChatNode,
@@ -24,16 +32,7 @@ import {
   SmsNode,
   TriggerNode,
 } from './nodes';
-import { AddNodeEdge, AddNodeEdgeType } from './edges';
-import { NODE_HEIGHT, NODE_WIDTH } from './base-node';
-import { StepTypeEnum } from '@/utils/enums';
-import { Step } from '@/utils/types';
-import { getFirstControlsErrorMessage, getFirstBodyErrorMessage } from './step-utils';
-import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { useEnvironment } from '@/context/environment/hooks';
-import { buildRoute } from '@/utils/routes';
-import { ROUTES } from '@/utils/routes';
-import { useNavigate } from 'react-router-dom';
+import { getFirstBodyErrorMessage, getFirstControlsErrorMessage } from './step-utils';
 
 const nodeTypes = {
   trigger: TriggerNode,
@@ -57,6 +56,33 @@ const panOnDrag = [1, 2];
 // y distance = node height + space between nodes
 const Y_DISTANCE = NODE_HEIGHT + 50;
 
+const mapStepToNodeContent = (step: Step): string | undefined => {
+  const controlValues = step.controls.values;
+
+  switch (step.type) {
+    case StepTypeEnum.TRIGGER:
+      return 'This step triggers this workflow';
+    case StepTypeEnum.EMAIL:
+      return 'Sends Email to your subscribers';
+    case StepTypeEnum.SMS:
+      return 'Sends SMS to your subscribers';
+    case StepTypeEnum.IN_APP:
+      return 'Sends In-App notification to your subscribers';
+    case StepTypeEnum.PUSH:
+      return 'Sends Push notification to your subscribers';
+    case StepTypeEnum.CHAT:
+      return 'Sends Chat message to your subscribers';
+    case StepTypeEnum.DELAY:
+      return `Delay for ${controlValues.amount} ${controlValues.unit}`;
+    case StepTypeEnum.DIGEST:
+      return 'Batches events into one coherent message before delivery to the subscriber.';
+    case StepTypeEnum.CUSTOM:
+      return 'Executes the business logic in your bridge application';
+    default:
+      return undefined;
+  }
+};
+
 const mapStepToNode = ({
   addStepIndex,
   previousPosition,
@@ -66,10 +92,7 @@ const mapStepToNode = ({
   previousPosition: { x: number; y: number };
   step: Step;
 }): Node<NodeData, keyof typeof nodeTypes> => {
-  let content = '';
-  if (step.type === StepTypeEnum.DELAY) {
-    content = `Delay action for a set time`;
-  }
+  const content = mapStepToNodeContent(step);
 
   const error = getFirstBodyErrorMessage(step.issues) || getFirstControlsErrorMessage(step.issues);
 
