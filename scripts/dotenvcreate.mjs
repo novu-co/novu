@@ -83,7 +83,10 @@ function escapeValue(value) {
 async function updateEnvFile() {
   try {
     const secret = await getSecretValue(secretName);
-    const envPath = resolve(__dirname, env === 'dev' ? '.env.development' : '.env.production');
+    const envPath = resolve(
+      __dirname,
+      env === 'dev' ? '.env.development' : env === 'test' ? '.env.test' : '.env.production'
+    );
 
     // Read the existing .env file if it exists
     let envContent = '';
