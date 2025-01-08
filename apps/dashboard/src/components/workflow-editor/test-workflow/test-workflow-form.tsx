@@ -14,7 +14,7 @@ import type { WorkflowResponseDto } from '@novu/shared';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { RiFileCopyLine, RiSendPlaneFill } from 'react-icons/ri';
+import { RiSendPlaneFill } from 'react-icons/ri';
 import { Code2 } from '../../icons/code-2';
 import { CopyButton } from '../../primitives/copy-button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../../primitives/form/form';
@@ -133,13 +133,7 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
               <TabsTrigger className={tabsTriggerClassName} value="python" variant="regular">
                 Python
               </TabsTrigger>
-              <CopyButton
-                mode="ghost"
-                leadingIcon={RiFileCopyLine}
-                className="text-foreground-400 ml-auto"
-                size="xs"
-                valueToCopy={snippetValue}
-              >
+              <CopyButton mode="ghost" className="text-foreground-400 ml-auto" size="xs" valueToCopy={snippetValue}>
                 Copy code
               </CopyButton>
             </TabsList>
