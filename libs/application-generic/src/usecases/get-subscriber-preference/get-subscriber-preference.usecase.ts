@@ -3,7 +3,6 @@ import {
   NotificationTemplateRepository,
   SubscriberRepository,
   PreferencesRepository,
-  PreferencesEntity,
   NotificationTemplateEntity,
 } from '@novu/dal';
 import {
@@ -13,9 +12,8 @@ import {
   StepTypeEnum,
 } from '@novu/shared';
 
-import { AnalyticsService } from '../../services/analytics.service';
 import { GetSubscriberPreferenceCommand } from './get-subscriber-preference.command';
-import { InstrumentUsecase } from '../../instrumentation';
+import { Instrument, InstrumentUsecase } from '../../instrumentation';
 import { MergePreferences } from '../merge-preferences/merge-preferences.usecase';
 import { GetPreferences, PreferenceSet } from '../get-preferences';
 import {
@@ -30,7 +28,6 @@ export class GetSubscriberPreference {
   constructor(
     private subscriberRepository: SubscriberRepository,
     private notificationTemplateRepository: NotificationTemplateRepository,
-    private analyticsService: AnalyticsService,
     private preferencesRepository: PreferencesRepository,
   ) {}
 
@@ -56,14 +53,6 @@ export class GetSubscriberPreference {
       },
     );
 
-    this.analyticsService.mixpanelTrack(
-      'Fetch User Preferences - [Notification Center]',
-      '',
-      {
-        _organization: command.organizationId,
-        templatesSize: workflowList.length,
-      },
-    );
     const workflowIds = workflowList.map((wf) => wf._id);
 
     const [
@@ -72,26 +61,22 @@ export class GetSubscriberPreference {
       subscriberWorkflowPreferences,
       subscriberGlobalPreference,
     ] = await Promise.all([
-      this.preferencesRepository.find({
-        _templateId: { $in: workflowIds },
-        _environmentId: command.environmentId,
-        type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
-      }) as Promise<PreferenceSet['workflowResourcePreference'][] | null>,
-      this.preferencesRepository.find({
-        _templateId: { $in: workflowIds },
-        _environmentId: command.environmentId,
-        type: PreferencesTypeEnum.USER_WORKFLOW,
-      }) as Promise<PreferenceSet['workflowUserPreference'][] | null>,
-      this.preferencesRepository.find({
-        _templateId: { $in: workflowIds },
-        _subscriberId: subscriber._id,
-        _environmentId: command.environmentId,
-        type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+      this.findWorkflowPreferences({
+        environmentId: command.environmentId,
+        workflowIds,
       }),
-      this.preferencesRepository.findOne({
-        _subscriberId: subscriber._id,
-        _environmentId: command.environmentId,
-        type: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
+      this.findUserWorkflowPreferences({
+        environmentId: command.environmentId,
+        workflowIds,
+      }),
+      this.findSubscriberWorkflowPreferences({
+        environmentId: command.environmentId,
+        subscriberId: subscriber._id,
+        workflowIds,
+      }),
+      this.findSubscriberGlobalPreferences({
+        environmentId: command.environmentId,
+        subscriberId: subscriber._id,
       }),
     ]);
 
@@ -222,5 +207,68 @@ export class GetSubscriberPreference {
       }, []);
 
     return channels as unknown as ChannelTypeEnum[];
+  }
+
+  @Instrument()
+  private async findWorkflowPreferences({
+    environmentId,
+    workflowIds,
+  }: {
+    environmentId: string;
+    workflowIds: string[];
+  }) {
+    return this.preferencesRepository.find({
+      _templateId: { $in: workflowIds },
+      _environmentId: environmentId,
+      type: PreferencesTypeEnum.WORKFLOW_RESOURCE,
+    });
+  }
+
+  @Instrument()
+  private async findUserWorkflowPreferences({
+    environmentId,
+    workflowIds,
+  }: {
+    environmentId: string;
+    workflowIds: string[];
+  }) {
+    return this.preferencesRepository.find({
+      _templateId: { $in: workflowIds },
+      _environmentId: environmentId,
+      type: PreferencesTypeEnum.USER_WORKFLOW,
+    });
+  }
+
+  @Instrument()
+  private async findSubscriberWorkflowPreferences({
+    environmentId,
+    subscriberId,
+    workflowIds,
+  }: {
+    environmentId: string;
+    subscriberId: string;
+    workflowIds: string[];
+  }) {
+    return this.preferencesRepository.find({
+      _templateId: { $in: workflowIds },
+      _subscriberId: subscriberId,
+      _environmentId: environmentId,
+      type: PreferencesTypeEnum.SUBSCRIBER_WORKFLOW,
+    });
+  }
+
+  @Instrument()
+  private async findSubscriberGlobalPreferences({
+    environmentId,
+    subscriberId,
+  }: {
+    environmentId: string;
+    subscriberId: string;
+  }) {
+    return this.preferencesRepository.findOne({
+      _subscriberId: subscriberId,
+      _environmentId: environmentId,
+      type: PreferencesTypeEnum.SUBSCRIBER_GLOBAL,
+    });
   }
 }
