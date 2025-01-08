@@ -42,6 +42,7 @@ const actionZodSchema = z
 
 export const inAppControlZodSchema = z.object({
   skip: skipZodSchema,
+  disableOutputSanitization: z.boolean().optional(),
   subject: z.string().optional(),
   body: z.string(),
   avatar: z.string().regex(redirectUrlRegex).optional(),
@@ -105,5 +106,9 @@ export const inAppUiSchema: UiSchema = {
       placeholder: redirectPlaceholder,
     },
     skip: skipStepUiSchema.properties.skip,
+    disableOutputSanitization: {
+      component: UiComponentEnum.IN_APP_DISABLE_SANITIZATION_SWITCH,
+      placeholder: false,
+    },
   },
 };
