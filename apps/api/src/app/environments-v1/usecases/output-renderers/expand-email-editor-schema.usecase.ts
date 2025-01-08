@@ -36,7 +36,7 @@ export class ExpandEmailEditorSchemaUsecase {
     if (node.content) {
       const processedContent: TipTapNode[] = [];
       for (const innerNode of node.content) {
-        const processed = await this.processShowAndForControls(variables, innerNode, node);
+        const processed = await this.processShowAndForControls(variables, innerNode, parentNode);
         if (processed) {
           processedContent.push(processed);
         }
@@ -69,7 +69,7 @@ export class ExpandEmailEditorSchemaUsecase {
   }
 
   private hasShow(node: TipTapNode): node is TipTapNode & { attrs: { [MailyAttrsEnum.SHOW_IF_KEY]: string } } {
-    return !!node.attrs?.[MailyAttrsEnum.SHOW_IF_KEY];
+    return node.attrs?.[MailyAttrsEnum.SHOW_IF_KEY] !== undefined;
   }
 
   private regularExpansion(eachObject: any, templateContent: TipTapNode[]): TipTapNode[] {
@@ -133,9 +133,7 @@ export class ExpandEmailEditorSchemaUsecase {
   ): Promise<void> {
     const { [MailyAttrsEnum.SHOW_IF_KEY]: showIfKey } = node.attrs;
 
-    if (!showIfKey) {
-      this.removeNodeFromParent(node, parentNode);
-
+    if (showIfKey === undefined) {
       return;
     }
 
