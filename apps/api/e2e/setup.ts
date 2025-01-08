@@ -28,6 +28,10 @@ before(async () => {
   chai.config.truncateThreshold = 0;
   await testServer.create(await bootstrap());
 
+  // console all environment variables
+  console.log('Environment variables:');
+  console.table(process.env);
+
   console.log(`Connecting to MongoDB at ${process.env.MONGO_URL}`);
 
   await dalService.connect(process.env.MONGO_URL);
