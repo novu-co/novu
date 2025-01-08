@@ -8,7 +8,9 @@ interface TimeDisplayHoverCardProps {
 }
 
 export function TimeDisplayHoverCard({ date, children, className }: TimeDisplayHoverCardProps) {
-  const utcTime = format(new Date(date.toUTCString()), 'MMM d yyyy, HH:mm:ss');
+  // For UTC, we adjust the date by the local timezone offset
+  const utcDate = new Date(date?.getTime() + date?.getTimezoneOffset() * 60000);
+  const utcTime = format(utcDate, 'MMM d yyyy, HH:mm:ss');
   const localTime = format(date, 'MMM d yyyy, HH:mm:ss');
   const timeAgo = formatDistanceToNow(date, { addSuffix: true });
 
