@@ -2,8 +2,8 @@ import { render as mailyRender } from '@maily-to/render';
 import { Injectable } from '@nestjs/common';
 import { Liquid } from 'liquidjs';
 import { EmailRenderOutput, TipTapNode } from '@novu/shared';
-import { Instrument, InstrumentUsecase } from '@novu/application-generic';
-import { FullPayloadForRender, RenderCommand } from './render-command';
+import { InstrumentUsecase } from '@novu/application-generic';
+import { RenderCommand } from './render-command';
 import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.usecase';
 
 export class EmailOutputRendererCommand extends RenderCommand {}
@@ -33,7 +33,6 @@ export class EmailOutputRendererUsecase {
       fullPayloadForRender: renderCommand.fullPayloadForRender,
     });
     const parsedTipTap = await this.parseTipTapNodeByLiquid(expandedMailyContent, renderCommand);
-
     const renderedHtml = await mailyRender(parsedTipTap);
 
     /**
