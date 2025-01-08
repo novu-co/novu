@@ -59,7 +59,7 @@ export const CopyButton = (props: CopyButtonProps) => {
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.5, opacity: 0 }}
-                  transition={{ type: 'spring', duration: 0.1, bounce: 0.5 }}
+                  transition={{ type: 'spring', duration: 0.15, bounce: 0.5 }}
                   className="absolute inset-0"
                 >
                   <RiFileCopyLine className={`${sizeClass}`} />
