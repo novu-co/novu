@@ -30,7 +30,7 @@ before(async () => {
 
   // console all environment variables
   console.log('Environment variables:');
-  console.table(process.env);
+  console.log(JSON.stringify(process.env, null, 2));
 
   console.log(`Connecting to MongoDB at ${process.env.MONGO_URL}`);
 
