@@ -255,11 +255,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                           <FormControl>
                             <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
                           </FormControl>
-                          <CopyButton
-                            valueToCopy={field.value}
-                            size="xs"
-                            className="h-[34px] rounded-none border-l border-neutral-200"
-                          />
+                          <CopyButton valueToCopy={field.value} size="xs" inputGroup />
                         </InputField>
                         <FormMessage />
                       </FormItem>
