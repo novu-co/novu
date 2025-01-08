@@ -5,6 +5,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 
 import { useEnvironment } from '@/context/environment/hooks';
 import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
+import { useTelemetry } from '../../hooks/use-telemetry';
+import { TelemetryEvent } from '../../utils/telemetry';
 import { cn } from '../../utils/ui';
 import { CompactButton } from '../primitives/button-compact';
 import { InlineToast } from '../primitives/inline-toast';
@@ -29,6 +31,7 @@ export function ActivityPanel({
   headerClassName,
   overviewHeaderClassName,
 }: ActivityPanelProps) {
+  const track = useTelemetry();
   const { isLoadingTransaction, setTransactionId } = useActivityByTransaction({
     transactionId: initialTransactionId,
     onActivityFound: onActivitySelect,
@@ -45,6 +48,10 @@ export function ActivityPanel({
     if (!activity || !currentEnvironment) return;
 
     try {
+      track(TelemetryEvent.RE_RUN_WORKFLOW, {
+        name: activity.template?.name,
+      });
+
       const { data } = await triggerWorkflow({
         name: activity.template?.triggers[0].identifier || '',
         payload: activity.payload || {},
