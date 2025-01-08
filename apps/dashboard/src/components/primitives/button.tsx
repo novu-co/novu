@@ -1,7 +1,7 @@
 import { Slot, Slottable } from '@radix-ui/react-slot';
 import * as React from 'react';
 import { IconType } from 'react-icons';
-import { RiLoader4Line } from 'react-icons/ri';
+import { RiArrowRightSLine, RiLoader4Line } from 'react-icons/ri';
 
 import type { PolymorphicComponentProps } from '@/utils/polymorphic';
 import { recursiveCloneChildren } from '@/utils/recursive-clone-children';
@@ -24,7 +24,8 @@ export const buttonVariants = tv({
     ],
     icon: [
       // base
-      'flex size-5 shrink-0 items-center justify-center',
+      'flex size-5 shrink-0 items-center justify-center transition-transform duration-200',
+      '[&.arrow-right-hover-animation]:group-hover:translate-x-0.5',
     ],
   },
   variants: {
@@ -353,17 +354,20 @@ export type ButtonProps = React.ComponentPropsWithoutRef<typeof ButtonRoot> & {
   trailingIcon?: IconType;
 };
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ children, leadingIcon: LeadingIcon, trailingIcon: TrailingIcon, ...rest }, forwardedRef) => {
-    return (
-      <ButtonRoot ref={forwardedRef} {...rest}>
-        {LeadingIcon && <ButtonIcon as={LeadingIcon} />}
-        <Slottable>{children}</Slottable>
-        {TrailingIcon && <ButtonIcon as={TrailingIcon} />}
-      </ButtonRoot>
-    );
-  }
-);
+const Button = ({ leadingIcon: LeadingIcon, trailingIcon: TrailingIcon, children, ...rest }: ButtonProps) => {
+  const isArrowRight = TrailingIcon === RiArrowRightSLine;
+
+  return (
+    <ButtonRoot {...rest}>
+      {LeadingIcon && <ButtonIcon as={LeadingIcon} />}
+      <Slottable>{children}</Slottable>
+      {TrailingIcon && (
+        <ButtonIcon className={isArrowRight ? 'arrow-right-hover-animation' : undefined} as={TrailingIcon} />
+      )}
+    </ButtonRoot>
+  );
+};
+
 Button.displayName = 'Button';
 
 function ButtonIcon<T extends React.ElementType>({
@@ -381,4 +385,4 @@ function ButtonIcon<T extends React.ElementType>({
 }
 ButtonIcon.displayName = BUTTON_ICON_NAME;
 
-export { Button, ButtonIcon as ButtonIcon, ButtonRoot as Root };
+export { Button, ButtonIcon, ButtonRoot };

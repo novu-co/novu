@@ -1,6 +1,6 @@
 import { JSONContent } from '@maily-to/render';
 import _ from 'lodash';
-import { processNodeAttrs, MailyContentTypeEnum } from '@novu/application-generic';
+import { processNodeAttrs, MailyContentTypeEnum, processNodeMarks } from '@novu/application-generic';
 
 /**
  * Processes raw Maily JSON editor state by converting variables to Liquid.js output syntax
@@ -101,7 +101,8 @@ function processForLoopNode(node: JSONContent): JSONContent {
 function processNode(node: JSONContent): JSONContent {
   if (!node) return node;
 
-  const processedNode = processNodeAttrs(node);
+  let processedNode = processNodeAttrs(node);
+  processedNode = processNodeMarks(processedNode);
 
   switch (processedNode.type) {
     case MailyContentTypeEnum.VARIABLE:

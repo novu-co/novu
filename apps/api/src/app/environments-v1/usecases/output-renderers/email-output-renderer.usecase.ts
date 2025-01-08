@@ -6,15 +6,14 @@ import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { FullPayloadForRender, RenderCommand } from './render-command';
 import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.usecase';
 
-export class RenderEmailOutputCommand extends RenderCommand {}
+export class EmailOutputRendererCommand extends RenderCommand {}
 
 @Injectable()
-// todo rename to EmailOutputRenderer
-export class RenderEmailOutputUsecase {
+export class EmailOutputRendererUsecase {
   constructor(private expandEmailEditorSchemaUseCase: ExpandEmailEditorSchemaUsecase) {}
 
   @InstrumentUsecase()
-  async execute(renderCommand: RenderEmailOutputCommand): Promise<EmailRenderOutput> {
+  async execute(renderCommand: EmailOutputRendererCommand): Promise<EmailRenderOutput> {
     const { body, subject } = renderCommand.controlValues;
 
     if (!body || typeof body !== 'string') {
@@ -43,7 +42,7 @@ export class RenderEmailOutputUsecase {
 
   private async parseTipTapNodeByLiquid(
     tiptapNode: TipTapNode,
-    renderCommand: RenderEmailOutputCommand
+    renderCommand: EmailOutputRendererCommand
   ): Promise<TipTapNode> {
     const client = new Liquid({
       outputEscape: (output) => {
