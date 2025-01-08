@@ -8,6 +8,8 @@ import { isClerkEnabled } from '@novu/shared';
 
 const dalService = new DalService();
 
+console.log('Dummy change');
+
 async function seedClerkMongo() {
   if (isClerkEnabled()) {
     const clerkClientMock = require('@novu/ee-auth')?.ClerkClientMock;

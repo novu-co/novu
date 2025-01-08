@@ -80,21 +80,22 @@ jobs:
         with:
           submodules: ${{ inputs.ee && needs.check_submodule_token.outputs.has_token == 'true' }}
 
-      - uses: ./.github/actions/setup-redis-cluster
-        name: Setup redis cluster
-
       - uses: ./.github/actions/start-localstack
         name: Start localstack
 
-      - uses: ./.github/actions/run-worker
-        name: Run worker
-        with:
-          launch_darkly_sdk_key: ${{ secrets.LAUNCH_DARKLY_SDK_KEY }}
-          ee: ${{ needs.check_submodule_token.outputs.has_token == 'true' && inputs.ee }}
+      - name: Build API & Worker
+        run: pnpm run build:api_and_worker --skip-nx-cache
 
-        # Runs a single command using the runners shell
-      - name: Build API
-        run: CI='' pnpm build:api --skip-nx-cache
+      - name: Start Worker
+        shell: bash
+        env:
+          LAUNCH_DARKLY_SDK_KEY: ${{ secrets.LAUNCH_DARKLY_SDK_KEY }}
+          NOVU_ENTERPRISE: ${{ inputs.ee }}
+        run: cd apps/worker && pnpm start:test &
+
+      - name: Wait on worker
+        shell: bash
+        run: wait-on --timeout=180000 http://127.0.0.1:1342/v1/health-check
 
       - name: Run E2E tests
         if: ${{ !inputs.ee }}
