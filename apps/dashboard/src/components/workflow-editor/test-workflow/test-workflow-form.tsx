@@ -14,11 +14,11 @@ import type { WorkflowResponseDto } from '@novu/shared';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
 import { useMemo, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { RiFileCopyLine, RiSendPlaneFill } from 'react-icons/ri';
+import { RiSendPlaneFill } from 'react-icons/ri';
 import { Code2 } from '../../icons/code-2';
 import { CopyButton } from '../../primitives/copy-button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../../primitives/form/form';
-import { Input, InputField } from '../../primitives/input';
+import { Input } from '../../primitives/input';
 import { Panel, PanelContent, PanelHeader } from '../../primitives/panel';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitives/tabs';
 import { TestWorkflowFormType } from '../schema';
@@ -67,13 +67,11 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
                 key={key}
                 control={control}
                 name={`to.${key}`}
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel htmlFor={key}>{capitalize(key)}</FormLabel>
                     <FormControl>
-                      <InputField>
-                        <Input id={key} {...(field as any)} />
-                      </InputField>
+                      <Input size="xs" id={key} {...(field as any)} hasError={!!fieldState.error} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -133,13 +131,7 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
               <TabsTrigger className={tabsTriggerClassName} value="python" variant="regular">
                 Python
               </TabsTrigger>
-              <CopyButton
-                mode="ghost"
-                leadingIcon={RiFileCopyLine}
-                className="text-foreground-400 ml-auto"
-                size="xs"
-                valueToCopy={snippetValue}
-              >
+              <CopyButton mode="ghost" className="text-foreground-400 ml-auto" size="xs" valueToCopy={snippetValue}>
                 Copy code
               </CopyButton>
             </TabsList>

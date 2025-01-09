@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   PreferencesTypeEnum,
   StepCreateDto,
-  StepDataDto,
+  StepResponseDto,
   StepUpdateDto,
   WorkflowCreationSourceEnum,
   WorkflowOriginEnum,
@@ -131,8 +131,8 @@ export class SyncToEnvironmentUseCase {
 
   @Instrument()
   private async mapStepsToCreateOrUpdateDto(
-    originSteps: StepDataDto[],
-    targetEnvSteps?: StepDataDto[]
+    originSteps: StepResponseDto[],
+    targetEnvSteps?: StepResponseDto[]
   ): Promise<(StepUpdateDto | StepCreateDto)[]> {
     return originSteps.map((sourceStep) => {
       // if we find matching step in target environment, we are updating
@@ -144,7 +144,10 @@ export class SyncToEnvironmentUseCase {
     });
   }
 
-  private buildStepCreateOrUpdateDto(step: StepDataDto, existingInternalId?: string): StepUpdateDto | StepCreateDto {
+  private buildStepCreateOrUpdateDto(
+    step: StepResponseDto,
+    existingInternalId?: string
+  ): StepUpdateDto | StepCreateDto {
     return {
       ...(existingInternalId && { _id: existingInternalId }),
       name: step.name ?? '',

@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ControlValuesLevelEnum, StepDataDto, UserSessionData } from '@novu/shared';
+import { StepResponseDto, UserSessionData, ControlValuesLevelEnum } from '@novu/shared';
 import {
   ControlValuesRepository,
   NotificationStepEntity,
@@ -29,7 +29,7 @@ export class PatchStepUsecase {
     private controlValuesRepository: ControlValuesRepository
   ) {}
 
-  async execute(command: PatchStepCommand): Promise<StepDataDto> {
+  async execute(command: PatchStepCommand): Promise<StepResponseDto> {
     const persistedItems = await this.loadPersistedItems(command);
     await this.patchFieldsOnPersistedItems(command, persistedItems);
     await this.persistWorkflow(persistedItems.workflow, command.user);

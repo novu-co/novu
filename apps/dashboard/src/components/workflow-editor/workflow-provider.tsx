@@ -1,4 +1,4 @@
-import { PatchWorkflowDto, StepDataDto, UpdateWorkflowDto, WorkflowResponseDto } from '@novu/shared';
+import { PatchWorkflowDto, StepResponseDto, UpdateWorkflowDto, WorkflowResponseDto } from '@novu/shared';
 import { createContext, ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useBlocker, useNavigate, useParams } from 'react-router-dom';
 
@@ -23,11 +23,12 @@ import { useInvocationQueue } from '@/hooks/use-invocation-queue';
 import { showErrorToast, showSavingToast, showSuccessToast } from './toasts';
 import { STEP_DIVIDER } from '@/utils/step';
 import { getWorkflowIdFromSlug } from '@/utils/step';
+import { useBeforeUnload } from '@/hooks/use-before-unload';
 
 export type WorkflowContextType = {
   isPending: boolean;
   workflow?: WorkflowResponseDto;
-  step?: StepDataDto;
+  step?: StepResponseDto;
   update: (data: UpdateWorkflowDto) => void;
   patch: (data: PatchWorkflowDto) => void;
 };
@@ -103,6 +104,11 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const isUpdatePatchPending = isPatchPending || isUpdatePending || hasPendingItems;
+  /**
+   * Prevents the user from accidentally closing the tab or window
+   * while an update is in progress.
+   */
+  useBeforeUnload(isUpdatePatchPending);
 
   const update = useCallback(
     (data: UpdateWorkflowDto) => {
