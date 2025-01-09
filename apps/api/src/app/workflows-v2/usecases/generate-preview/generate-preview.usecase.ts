@@ -10,7 +10,7 @@ import {
   GeneratePreviewResponseDto,
   JobStatusEnum,
   PreviewPayload,
-  StepDataDto,
+  StepResponseDto,
   WorkflowOriginEnum,
   TipTapNode,
   StepTypeEnum,
@@ -138,7 +138,7 @@ export class GeneratePreviewUsecase {
     }
   }
 
-  private sanitizeControlsForPreview(initialControlValues: Record<string, unknown>, stepData: StepDataDto) {
+  private sanitizeControlsForPreview(initialControlValues: Record<string, unknown>, stepData: StepResponseDto) {
     const sanitizedValues = dashboardSanitizeControlValues(this.logger, initialControlValues, stepData.type);
 
     return sanitizeControlValuesByOutputSchema(sanitizedValues || {}, stepData.type);
@@ -226,7 +226,7 @@ export class GeneratePreviewUsecase {
   @Instrument()
   private async executePreviewUsecase(
     command: GeneratePreviewCommand,
-    stepData: StepDataDto,
+    stepData: StepResponseDto,
     hydratedPayload: PreviewPayload,
     controlValues: Record<string, unknown>
   ) {

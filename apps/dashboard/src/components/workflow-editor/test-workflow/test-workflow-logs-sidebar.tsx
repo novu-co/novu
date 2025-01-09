@@ -40,7 +40,7 @@ export const TestWorkflowLogsSidebar = ({ transactionId }: TestWorkflowLogsSideb
   }, [transactionId]);
 
   return (
-    <aside className="flex h-full w-[500px] flex-col border-l">
+    <aside className="flex max-h-full w-[500px] flex-1 flex-col overflow-auto border-l">
       {transactionId && !activityId ? (
         <div className="flex h-full items-center justify-center">
           <div className="flex flex-col items-center gap-4">
