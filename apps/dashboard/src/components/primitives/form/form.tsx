@@ -128,9 +128,7 @@ const FormMessagePure = React.forwardRef<
       {...props}
     >
       <span>{error ? <RiErrorWarningFill className="size-4" /> : <RiInformationFill className="size-4" />}</span>
-      <span className="mt-[1px] text-xs leading-4">
-        {typeof body === 'string' ? <span dangerouslySetInnerHTML={{ __html: body }} /> : body}
-      </span>
+      <span className="mt-[1px] text-xs leading-4">{body}</span>
     </p>
   );
 });
