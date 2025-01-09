@@ -1504,7 +1504,7 @@ importers:
         version: 0.42.0(@types/node@20.16.5)(@types/react-dom@18.3.0)(@types/react@18.3.3)(jsdom@25.0.0)(less@4.1.3)(lightningcss@1.26.0)(sass@1.77.8)(sugarss@4.0.1(postcss@8.4.47))(terser@5.31.6)(typescript@5.6.2)
       '@playwright/test':
         specifier: ^1.44.0
-        version: 1.44.0
+        version: 1.46.1
       '@storybook/addon-actions':
         specifier: ^7.4.2
         version: 7.4.2(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -12066,11 +12066,6 @@ packages:
   '@pkgr/utils@2.3.1':
     resolution: {integrity: sha512-wfzX8kc1PMyUILA+1Z/EqoE4UCXGy0iRGMhPwdfae1+f0OXlLqCk+By+aMzgJBzR9AzS4CDizioG6Ss1gvAFJw==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
-
-  '@playwright/test@1.44.0':
-    resolution: {integrity: sha512-rNX5lbNidamSUorBhB4XZ9SQTjAqfe5M+p37Z8ic0jPFBMo5iCtQz1kRWkEMg+rYOKSlVycpQmpqjSFq7LXOfg==}
-    engines: {node: '>=16'}
-    hasBin: true
 
   '@playwright/test@1.46.1':
     resolution: {integrity: sha512-Fq6SwLujA/DOIvNC2EL/SojJnkKf/rAwJ//APpJJHRyMi1PdKrY3Az+4XNQ51N4RTbItbIByQ0jgd1tayq1aeA==}
@@ -29041,19 +29036,9 @@ packages:
     resolution: {integrity: sha512-8xCNE/aT/EXKenuMDZ+xTVwkT8gsoHN2z/Q29l80u0ppGEXVvsKRzNMbtKhg8LS8k1tJLAHHylf6p4VFmP6XUQ==}
     engines: {node: '>= 0.4.0'}
 
-  playwright-core@1.44.0:
-    resolution: {integrity: sha512-ZTbkNpFfYcGWohvTTl+xewITm7EOuqIqex0c7dNZ+aXsbrLj0qI8XlGKfPpipjm0Wny/4Lt4CJsWJk1stVS5qQ==}
-    engines: {node: '>=16'}
-    hasBin: true
-
   playwright-core@1.46.1:
     resolution: {integrity: sha512-h9LqIQaAv+CYvWzsZ+h3RsrqCStkBHlgo6/TJlFst3cOTlLghBQlJwPOZKQJTKNaD3QIB7aAVQ+gfWbN3NXB7A==}
     engines: {node: '>=18'}
-    hasBin: true
-
-  playwright@1.44.0:
-    resolution: {integrity: sha512-F9b3GUCLQ3Nffrfb6dunPOkE5Mh68tR7zN32L4jCk4FjQamgesGay7/dAAe1WaMEGV04DkdJfcJzjoCKygUaRQ==}
-    engines: {node: '>=16'}
     hasBin: true
 
   playwright@1.46.1:
@@ -49541,10 +49526,6 @@ snapshots:
       tiny-glob: 0.2.9
       tslib: 2.7.0
 
-  '@playwright/test@1.44.0':
-    dependencies:
-      playwright: 1.44.0
-
   '@playwright/test@1.46.1':
     dependencies:
       playwright: 1.46.1
@@ -64925,7 +64906,7 @@ snapshots:
 
   eslint-import-resolver-node@0.3.9:
     dependencies:
-      debug: 3.2.7(supports-color@8.1.1)
+      debug: 3.2.7(supports-color@5.5.0)
       is-core-module: 2.15.1
       resolve: 1.22.8
     transitivePeerDependencies:
@@ -64934,7 +64915,7 @@ snapshots:
   eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))):
     dependencies:
       array.prototype.find: 2.2.3
-      debug: 3.2.7(supports-color@8.1.1)
+      debug: 3.2.7(supports-color@5.5.0)
       enhanced-resolve: 0.9.1
       eslint-plugin-import: 2.29.1(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8)(eslint@8.57.1)
       find-root: 1.1.0
@@ -64951,7 +64932,7 @@ snapshots:
 
   eslint-module-utils@2.8.2(@typescript-eslint/parser@5.62.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6)):
     dependencies:
-      debug: 3.2.7(supports-color@8.1.1)
+      debug: 3.2.7(supports-color@5.5.0)
     optionalDependencies:
       '@typescript-eslint/parser': 5.62.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2)
       eslint: 9.9.1(jiti@1.21.6)
@@ -64962,7 +64943,7 @@ snapshots:
 
   eslint-module-utils@2.8.2(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.8)(eslint@8.57.1):
     dependencies:
-      debug: 3.2.7(supports-color@8.1.1)
+      debug: 3.2.7(supports-color@5.5.0)
     optionalDependencies:
       '@typescript-eslint/parser': 8.18.2(eslint@8.57.1)(typescript@5.6.2)
       eslint: 8.57.1
@@ -65044,7 +65025,7 @@ snapshots:
       array.prototype.findlastindex: 1.2.5
       array.prototype.flat: 1.3.2
       array.prototype.flatmap: 1.3.2
-      debug: 3.2.7(supports-color@8.1.1)
+      debug: 3.2.7(supports-color@5.5.0)
       doctrine: 2.1.0
       eslint: 9.9.1(jiti@1.21.6)
       eslint-import-resolver-node: 0.3.9
@@ -65071,7 +65052,7 @@ snapshots:
       array.prototype.findlastindex: 1.2.5
       array.prototype.flat: 1.3.2
       array.prototype.flatmap: 1.3.2
-      debug: 3.2.7(supports-color@8.1.1)
+      debug: 3.2.7(supports-color@5.5.0)
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
@@ -73019,7 +73000,7 @@ snapshots:
 
   needle@2.4.0:
     dependencies:
-      debug: 3.2.7(supports-color@8.1.1)
+      debug: 3.2.7(supports-color@5.5.0)
       iconv-lite: 0.4.24
       sax: 1.4.1
     transitivePeerDependencies:
@@ -73027,7 +73008,7 @@ snapshots:
 
   needle@3.2.0:
     dependencies:
-      debug: 3.2.7(supports-color@8.1.1)
+      debug: 3.2.7(supports-color@5.5.0)
       iconv-lite: 0.6.3
       sax: 1.2.4
     transitivePeerDependencies:
@@ -74599,15 +74580,7 @@ snapshots:
 
   pkginfo@0.4.1: {}
 
-  playwright-core@1.44.0: {}
-
   playwright-core@1.46.1: {}
-
-  playwright@1.44.0:
-    dependencies:
-      playwright-core: 1.44.0
-    optionalDependencies:
-      fsevents: 2.3.2
 
   playwright@1.46.1:
     dependencies:
@@ -74733,7 +74706,7 @@ snapshots:
   portfinder@1.0.32:
     dependencies:
       async: 2.6.4
-      debug: 3.2.7(supports-color@8.1.1)
+      debug: 3.2.7(supports-color@5.5.0)
       mkdirp: 0.5.6
     transitivePeerDependencies:
       - supports-color
