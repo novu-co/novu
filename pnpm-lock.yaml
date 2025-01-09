@@ -972,6 +972,9 @@ importers:
       http-proxy-middleware:
         specifier: ^3.0.2
         version: 3.0.2
+      http-server:
+        specifier: ^0.13.0
+        version: 0.13.0
       pm2:
         specifier: ^5.4.2
         version: 5.4.2
