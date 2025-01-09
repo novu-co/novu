@@ -26,9 +26,6 @@ export function IntegrationsListPage() {
       headerStartItems={
         <h1 className="text-foreground-950 flex items-center gap-1">
           <span>Integration Store</span>
-          <Badge kind="pill" size="2xs">
-            BETA
-          </Badge>
         </h1>
       }
     >

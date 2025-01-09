@@ -324,6 +324,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                         placeholder="Describe what this workflow does"
                         {...field}
                         maxLength={MAX_DESCRIPTION_LENGTH}
+                        showCounter
                         disabled={isReadOnly}
                       />
                     </FormControl>
@@ -367,8 +368,10 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
               leadingIcon={RiSettingsLine}
               className="flex w-full justify-start gap-1.5 p-1.5 text-xs font-medium"
               type="button"
+              trailingIcon={RiArrowRightSLine}
             >
-              Configure channel preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
+              Configure channel preferences
+              <span className="ml-auto" />
             </Button>
           </Link>
         </SidebarContent>
