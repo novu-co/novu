@@ -91,11 +91,9 @@ jobs:
         env:
           LAUNCH_DARKLY_SDK_KEY: ${{ secrets.LAUNCH_DARKLY_SDK_KEY }}
           NOVU_ENTERPRISE: ${{ inputs.ee }}
-        run: cd apps/worker && pnpm start:test &
-
-      - name: Wait on worker
-        shell: bash
-        run: wait-on --timeout=180000 http://127.0.0.1:1342/v1/health-check
+        run: |
+          cd apps/worker && pnpm start:test &
+          wait-on --timeout=180000 http://127.0.0.1:1342/v1/health-check
 
       - name: Run E2E tests
         if: ${{ !inputs.ee }}
@@ -112,18 +110,15 @@ jobs:
           CLERK_ENABLED: true
           CLERK_ISSUER_URL: ${{ vars.CLERK_ISSUER_URL }}
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          CLERK_PRIVATE_KEY_BASE64: ${{ secrets.CLERK_PRIVATE_KEY_BASE64 }}
-          CLERK_PEM_PUBLIC_KEY_BASE64: ${{ secrets.CLERK_PEM_PUBLIC_KEY_BASE64 }}
           CLERK_WEBHOOK_SECRET: ${{ secrets.CLERK_WEBHOOK_SECRET }}
           CLERK_LONG_LIVED_TOKEN: ${{ secrets.CLERK_LONG_LIVED_TOKEN }}
         run: |
-          export CLERK_PEM_PUBLIC_KEY=$(echo $CLERK_PEM_PUBLIC_KEY_BASE64 | base64 -d)
-          export CLERK_PRIVATE_KEY=$(echo $CLERK_PRIVATE_KEY_BASE64 | base64 -d)
           cd apps/api && pnpm test:e2e:ee
 
       - name: Kill port for worker 1342 for unit tests
         run: sudo kill -9 $(sudo lsof -t -i:1342)
 
+      # TODO: Run unit tests before e2e
       - name: Run unit tests
         if: inputs.test-unit
         run: |
