@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import { ActivityPanel } from '@/components/activity/activity-panel';
-import { WorkflowTriggerInboxIllustration } from '../../icons/workflow-trigger-inbox';
 import { useFetchActivities } from '../../../hooks/use-fetch-activities';
+import { WorkflowTriggerInboxIllustration } from '../../icons/workflow-trigger-inbox';
 
 type TestWorkflowLogsSidebarProps = {
   transactionId?: string;
@@ -40,7 +40,7 @@ export const TestWorkflowLogsSidebar = ({ transactionId }: TestWorkflowLogsSideb
   }, [transactionId]);
 
   return (
-    <aside className="flex max-h-full w-[500px] flex-1 flex-col overflow-auto border-l">
+    <aside className="flex h-full flex-col">
       {transactionId && !activityId ? (
         <div className="flex h-full items-center justify-center">
           <div className="flex flex-col items-center gap-4">
