@@ -32,22 +32,15 @@ export class HydrateEmailSchemaUseCase {
   }
 
   private variableLogic(
-    masterPayload: PreviewPayload,
     node: TipTapNode & {
       attrs: { id: string };
     },
     content: TipTapNode[],
-    index: number,
-    placeholderAggregation: PlaceholderAggregation
+    index: number
   ) {
-    const resolvedValueRegularPlaceholder = this.getResolvedValueRegularPlaceholder(
-      masterPayload,
-      node,
-      placeholderAggregation
-    );
     content[index] = {
       type: 'text',
-      text: resolvedValueRegularPlaceholder,
+      text: node.attrs.id,
     };
   }
 
@@ -74,16 +67,6 @@ export class HydrateEmailSchemaUseCase {
     };
   }
 
-  private showLogic(
-    masterPayload: PreviewPayload,
-    node: TipTapNode & {
-      attrs: { show: string };
-    },
-    placeholderAggregation: PlaceholderAggregation
-  ) {
-    node.attrs.show = this.getResolvedValueShowPlaceholder(masterPayload, node, placeholderAggregation);
-  }
-
   private transformContentInPlace(
     content: TipTapNode[],
     masterPayload: PreviewPayload,
@@ -94,13 +77,10 @@ export class HydrateEmailSchemaUseCase {
       processNodeMarks(node);
 
       if (this.isVariableNode(node)) {
-        this.variableLogic(masterPayload, node, content, index, placeholderAggregation);
+        this.variableLogic(node, content, index);
       }
       if (this.isForNode(node)) {
         this.forNodeLogic(node, masterPayload, content, index, placeholderAggregation);
-      }
-      if (this.isShowNode(node)) {
-        this.showLogic(masterPayload, node, placeholderAggregation);
       }
       if (node.content) {
         this.transformContentInPlace(node.content, masterPayload, placeholderAggregation);
@@ -112,39 +92,8 @@ export class HydrateEmailSchemaUseCase {
     return !!(node.type === 'for' && node.attrs && 'each' in node.attrs && typeof node.attrs.each === 'string');
   }
 
-  private isShowNode(node: TipTapNode): node is TipTapNode & { attrs: { show: string } } {
-    return !!(node.attrs && 'show' in node.attrs && typeof node.attrs.show === 'string');
-  }
-
   private isVariableNode(node: TipTapNode): node is TipTapNode & { attrs: { id: string } } {
     return !!(node.type === 'variable' && node.attrs && 'id' in node.attrs && typeof node.attrs.id === 'string');
-  }
-
-  private getResolvedValueRegularPlaceholder(
-    masterPayload: PreviewPayload,
-    node,
-    placeholderAggregation: PlaceholderAggregation
-  ) {
-    const { fallback, id: variableName } = node.attrs;
-    const finalValue = buildLiquidJSDefault(variableName, fallback);
-
-    placeholderAggregation.regularPlaceholdersToDefaultValue[`{{${node.attrs.id}}}`] = finalValue;
-
-    return finalValue;
-  }
-
-  private getResolvedValueShowPlaceholder(
-    masterPayload: PreviewPayload,
-    node,
-    placeholderAggregation: PlaceholderAggregation
-  ) {
-    const resolvedValue = this.getValueByPath(masterPayload, node.attrs.show);
-    const { fallback } = node.attrs;
-
-    const finalValue = resolvedValue || fallback || `true`;
-    placeholderAggregation.regularPlaceholdersToDefaultValue[`{{${node.attrs.show}}}`] = finalValue;
-
-    return finalValue;
   }
 
   private getResolvedValueForPlaceholder(
@@ -252,6 +201,3 @@ export const TipTapSchema = z
     attrs: z.record(z.unknown()).optional(),
   })
   .passthrough();
-
-const buildLiquidJSDefault = (variableName: string, fallback?: string) =>
-  `{{ ${variableName}${fallback ? ` | default: '${fallback}'` : ''} }}`;

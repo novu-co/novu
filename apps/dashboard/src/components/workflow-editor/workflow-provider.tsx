@@ -23,6 +23,7 @@ import { useInvocationQueue } from '@/hooks/use-invocation-queue';
 import { showErrorToast, showSavingToast, showSuccessToast } from './toasts';
 import { STEP_DIVIDER } from '@/utils/step';
 import { getWorkflowIdFromSlug } from '@/utils/step';
+import { useBeforeUnload } from '@/hooks/use-before-unload';
 
 export type WorkflowContextType = {
   isPending: boolean;
@@ -103,6 +104,11 @@ export const WorkflowProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const isUpdatePatchPending = isPatchPending || isUpdatePending || hasPendingItems;
+  /**
+   * Prevents the user from accidentally closing the tab or window
+   * while an update is in progress.
+   */
+  useBeforeUnload(isUpdatePatchPending);
 
   const update = useCallback(
     (data: UpdateWorkflowDto) => {
