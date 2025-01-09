@@ -24,7 +24,7 @@ describe('Novu Client', () => {
       }));
     });
 
-    client = new Client({ secretKey: 'some-secret-key' });
+    client = new Client({ secretKey: 'some-secret-key', logging: true });
     await client.addWorkflows([newWorkflow]);
   });
 

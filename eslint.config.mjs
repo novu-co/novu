@@ -262,6 +262,7 @@ export default tsEslint.config(
       'unused-imports': fixupPluginRules(unusedImports),
     },
     rules: {
+      'id-length': 'off',
       'max-len': 'off',
       '@typescript-eslint/no-explicit-any': 'error',
       'import/prefer-default-export': 0,

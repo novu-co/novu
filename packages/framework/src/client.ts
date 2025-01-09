@@ -39,6 +39,7 @@ import {
   EMOJI,
   log,
   resolveApiUrl,
+  resolveLogging,
   resolveSecretKey,
   sanitizeHtmlInObject,
   stringifyDataStructureWithSingleQuotes,
@@ -71,19 +72,29 @@ export class Client {
 
   public strictAuthentication: boolean;
 
+  public logging: boolean = true;
+
   constructor(options?: ClientOptions) {
     const builtOpts = this.buildOptions(options);
     this.apiUrl = builtOpts.apiUrl;
+    this.logging = builtOpts.logging;
     this.secretKey = builtOpts.secretKey;
     this.strictAuthentication = builtOpts.strictAuthentication;
     this.templateEngine.registerFilter('json', (value, spaces) =>
       stringifyDataStructureWithSingleQuotes(value, spaces)
     );
+
+    if (this.logging) {
+      log.enable();
+    } else {
+      log.disable();
+    }
   }
 
   private buildOptions(providedOptions?: ClientOptions) {
     const builtConfiguration: Required<ClientOptions> = {
       apiUrl: resolveApiUrl(providedOptions?.apiUrl),
+      logging: resolveLogging(providedOptions?.logging),
       secretKey: resolveSecretKey(providedOptions?.secretKey),
       strictAuthentication: !isRuntimeInDevelopment(),
     };
@@ -400,8 +411,7 @@ export class Client {
     const actionMessage = actionMessages[event.action];
 
     const actionMessageFormatted = `${actionMessage} workflowId:`;
-    // eslint-disable-next-line no-console
-    console.log(`\n${log.bold(log.underline(actionMessageFormatted))} '${event.workflowId}'`);
+    log((l) => `\n${l.bold(l.underline(actionMessageFormatted))} '${event.workflowId}'`);
     const workflow = this.getWorkflow(event.workflowId);
 
     const startTime = process.hrtime();
@@ -483,15 +493,14 @@ export class Client {
     const elapsedNanoseconds = endTime[1];
     const elapsedTimeInMilliseconds = elapsedSeconds * 1_000 + elapsedNanoseconds / 1_000_000;
 
-    const emoji = executionError ? EMOJI.ERROR : EMOJI.SUCCESS;
     const resultMessages = {
       [PostActionEnum.EXECUTE]: 'Executed',
       [PostActionEnum.PREVIEW]: 'Previewed',
     } as const;
     const resultMessage = resultMessages[event.action];
 
-    // eslint-disable-next-line no-console
-    console.log(`${emoji} ${resultMessage} workflowId: \`${event.workflowId}\``);
+    const emoji = executionError ? EMOJI.ERROR : EMOJI.SUCCESS;
+    log(`${emoji} ${resultMessage} workflowId: \`${event.workflowId}\``);
 
     this.prettyPrintExecute(event, elapsedTimeInMilliseconds, executionError);
 
@@ -541,16 +550,11 @@ export class Client {
     } as const;
     const actionMessage = actionMessages[event.action];
     const message = error ? 'Failed to execute' : actionMessage;
-    const executionLog = error ? log.error : log.success;
     const logMessage = `${successPrefix} ${message} workflowId: '${event.workflowId}`;
-    // eslint-disable-next-line no-console
-    console.log(`\n  ${log.bold(executionLog(logMessage))}'`);
-    // eslint-disable-next-line no-console
-    console.log(`  ├ ${EMOJI.STEP} stepId: '${event.stepId}'`);
-    // eslint-disable-next-line no-console
-    console.log(`  ├ ${EMOJI.ACTION} action: '${event.action}'`);
-    // eslint-disable-next-line no-console
-    console.log(`  └ ${EMOJI.DURATION} duration: '${duration.toFixed(2)}ms'\n`);
+    log((l) => `\n  ${l.bold(error ? l.error(logMessage) : l.success(logMessage))}`);
+    log((l) => `  ├ ${l.emoji.STEP} stepId: '${event.stepId}'`);
+    log((l) => `  ├ ${l.emoji.ACTION} action: '${event.action}'`);
+    log((l) => `  └ ${l.emoji.DURATION} duration: '${duration.toFixed(2)}ms'\n`);
   }
 
   private async executeProviders(
@@ -583,8 +587,7 @@ export class Client {
 
     outputs: Record<string, unknown>
   ): Record<string, unknown> {
-    // eslint-disable-next-line no-console
-    console.log(`  ${EMOJI.MOCK} Mocked provider: \`${provider.type}\``);
+    log((l) => `  ${l.emoji.MOCK} Mocked provider: \`${provider.type}\``);
     const mockOutput = this.mock(provider.outputs.schema);
 
     return mockOutput;
@@ -612,7 +615,7 @@ export class Client {
           step.stepId,
           provider.type
         );
-        console.log(`  ${EMOJI.SUCCESS} Executed provider: \`${provider.type}\``);
+        log((l) => `  ${l.emoji.SUCCESS} Executed provider: \`${provider.type}\``);
 
         return {
           ...validatedOutput,
@@ -620,12 +623,12 @@ export class Client {
         };
       } else {
         // No-op. We don't execute providers for hydrated steps
-        console.log(`  ${EMOJI.HYDRATED} Hydrated provider: \`${provider.type}\``);
+        log((l) => `  ${l.emoji.HYDRATED} Hydrated provider: \`${provider.type}\``);
 
         return {};
       }
     } catch (error) {
-      console.log(`  ${EMOJI.ERROR} Failed to execute provider: \`${provider.type}\``);
+      log((l) => `  ${l.emoji.ERROR} Failed to execute provider: \`${provider.type}\``);
 
       throw new ProviderExecutionFailedError(provider.type, event.action, error);
     }
@@ -651,14 +654,14 @@ export class Client {
 
         const providers = await this.executeProviders(event, step, validatedOutput);
 
-        console.log(`  ${EMOJI.SUCCESS} Executed stepId: \`${step.stepId}\``);
+        log(`  ${EMOJI.SUCCESS} Executed stepId: \`${step.stepId}\``);
 
         return {
           outputs: validatedOutput,
           providers,
         };
       } catch (error) {
-        console.log(`  ${EMOJI.ERROR} Failed to execute stepId: \`${step.stepId}\``);
+        log(`  ${EMOJI.ERROR} Failed to execute stepId: \`${step.stepId}\``);
         if (isFrameworkError(error)) {
           throw error;
         } else {
@@ -678,7 +681,7 @@ export class Client {
             event.workflowId,
             step.stepId
           );
-          console.log(`  ${EMOJI.HYDRATED} Hydrated stepId: \`${step.stepId}\``);
+          log(`  ${EMOJI.HYDRATED} Hydrated stepId: \`${step.stepId}\``);
 
           return {
             outputs: validatedOutput,
@@ -688,7 +691,7 @@ export class Client {
           throw new ExecutionStateCorruptError(event.workflowId, step.stepId);
         }
       } catch (error) {
-        console.log(`  ${EMOJI.ERROR} Failed to hydrate stepId: \`${step.stepId}\``);
+        log(`  ${EMOJI.ERROR} Failed to hydrate stepId: \`${step.stepId}\``);
 
         throw error;
       }
@@ -738,7 +741,7 @@ export class Client {
     try {
       return await this.constructStepForPreview(event, step);
     } catch (error) {
-      console.log(`  ${EMOJI.ERROR} Failed to preview stepId: \`${step.stepId}\``);
+      log(`  ${EMOJI.ERROR} Failed to preview stepId: \`${step.stepId}\``);
 
       if (isFrameworkError(error)) {
         throw error;
@@ -783,7 +786,7 @@ export class Client {
       step.stepId
     );
 
-    console.log(`  ${EMOJI.MOCK} Mocked stepId: \`${step.stepId}\``);
+    log(`  ${EMOJI.MOCK} Mocked stepId: \`${step.stepId}\``);
 
     return {
       outputs: validatedOutput,

@@ -21,7 +21,7 @@ import {
   SigningKeyNotFoundError,
 } from './errors';
 import type { Awaitable, EventTriggerParams, Workflow } from './types';
-import { initApiClient, createHmacSubtle } from './utils';
+import { initApiClient, createHmacSubtle, log } from './utils';
 import { isPlatformError } from './errors/guard.errors';
 
 export type ServeHandlerOptions = {
@@ -275,8 +275,8 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
          * Log bridge server errors to assist the Developer in debugging errors with their integration.
          * This path is reached when the Bridge application throws an error, ensuring they can see the error in their logs.
          */
-        // eslint-disable-next-line no-console
-        console.error(error);
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
+        log((l) => l.error(error.message || error.toString()));
       }
 
       return this.createError(error);
@@ -284,8 +284,8 @@ export class NovuRequestHandler<Input extends any[] = any[], Output = any> {
       return this.createError(error);
     } else {
       const bridgeError = new BridgeError(error);
-      // eslint-disable-next-line no-console
-      console.error(bridgeError);
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+      log((l) => l.error(bridgeError.message || bridgeError.toString()));
 
       return this.createError(bridgeError);
     }
