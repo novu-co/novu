@@ -1,7 +1,7 @@
 import {
   FeatureFlagsKeysEnum,
   IEnvironment,
-  StepDataDto,
+  StepResponseDto,
   StepTypeEnum,
   StepUpdateDto,
   UpdateWorkflowDto,
@@ -26,7 +26,7 @@ import { PageMeta } from '@/components/page-meta';
 import { Button } from '@/components/primitives/button';
 import { CopyButton } from '@/components/primitives/copy-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { Input, InputField } from '@/components/primitives/input';
+import { Input } from '@/components/primitives/input';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarContent, SidebarFooter, SidebarHeader } from '@/components/side-navigation/sidebar';
 import TruncatedText from '@/components/truncated-text';
@@ -48,12 +48,7 @@ import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-co
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { ConfigureSmsStepPreview } from '@/components/workflow-editor/steps/sms/configure-sms-step-preview';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
-import {
-  AUTOCOMPLETE_PASSWORD_MANAGERS_OFF,
-  INLINE_CONFIGURABLE_STEP_TYPES,
-  STEP_TYPE_LABELS,
-  TEMPLATE_CONFIGURABLE_STEP_TYPES,
-} from '@/utils/constants';
+import { INLINE_CONFIGURABLE_STEP_TYPES, STEP_TYPE_LABELS, TEMPLATE_CONFIGURABLE_STEP_TYPES } from '@/utils/constants';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { CompactButton } from '../../primitives/button-compact';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
@@ -85,7 +80,7 @@ const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, ((props: HTMLAttributes<HTMLDiv
 type ConfigureStepFormProps = {
   workflow: WorkflowResponseDto;
   environment: IEnvironment;
-  step: StepDataDto;
+  step: StepResponseDto;
   update: (data: UpdateWorkflowDto) => void;
 };
 
@@ -118,7 +113,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   };
 
   const registerInlineControlValues = useMemo(() => {
-    return (step: StepDataDto) => {
+    return (step: StepResponseDto) => {
       if (isInlineConfigurableStep) {
         return {
           controlValues: getStepDefaultValues(step),
@@ -237,19 +232,17 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                   <FormField
                     control={form.control}
                     name="name"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <InputField>
-                          <FormControl>
-                            <Input
-                              placeholder="Untitled"
-                              {...field}
-                              disabled={isReadOnly}
-                              {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
-                            />
-                          </FormControl>
-                        </InputField>
+                        <FormLabel required>Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Untitled"
+                            {...field}
+                            disabled={isReadOnly}
+                            hasError={!!fieldState.error}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -259,13 +252,17 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                     name={'stepId'}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Identifier</FormLabel>
-                        <InputField className="flex overflow-hidden pr-0">
-                          <FormControl>
-                            <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
-                          </FormControl>
-                          <CopyButton valueToCopy={field.value} size="xs" inputGroup />
-                        </InputField>
+                        <FormLabel required>Identifier</FormLabel>
+                        <FormControl>
+                          <Input
+                            trailingNode={<CopyButton valueToCopy={field.value} />}
+                            placeholder="Untitled"
+                            className="cursor-default"
+                            {...field}
+                            readOnly
+                          />
+                        </FormControl>
+
                         <FormMessage />
                       </FormItem>
                     )}

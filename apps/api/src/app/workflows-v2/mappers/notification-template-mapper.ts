@@ -2,7 +2,7 @@ import {
   PreferencesResponseDto,
   RuntimeIssueDto,
   ShortIsPrefixEnum,
-  StepDataDto,
+  StepResponseDto,
   StepTypeEnum,
   WorkflowCreateAndUpdateKeys,
   WorkflowListResponseDto,
@@ -17,7 +17,7 @@ import { buildSlug } from '../../shared/helpers/build-slug';
 
 export function toResponseWorkflowDto(
   workflow: WorkflowInternalResponseDto,
-  steps: StepDataDto[]
+  steps: StepResponseDto[]
 ): WorkflowResponseDto {
   const preferencesDto: PreferencesResponseDto = {
     user: workflow.userPreferences,

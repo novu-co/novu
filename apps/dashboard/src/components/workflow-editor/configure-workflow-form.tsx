@@ -45,7 +45,7 @@ import { Button } from '../primitives/button';
 import { CompactButton } from '../primitives/button-compact';
 import { CopyButton } from '../primitives/copy-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../primitives/form/form';
-import { Input, InputField } from '../primitives/input';
+import { Input } from '../primitives/input';
 import { Separator } from '../primitives/separator';
 import { Switch } from '../primitives/switch';
 import { TagInput } from '../primitives/tag-input';
@@ -276,13 +276,16 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                 control={form.control}
                 name="name"
                 defaultValue=""
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel required>Name</FormLabel>
                     <FormControl>
-                      <InputField>
-                        <Input placeholder="New workflow" {...field} disabled={isReadOnly} />
-                      </InputField>
+                      <Input
+                        placeholder="New workflow"
+                        {...field}
+                        disabled={isReadOnly}
+                        hasError={!!fieldState.error}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -294,12 +297,16 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                 defaultValue=""
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Identifier</FormLabel>
+                    <FormLabel required>Identifier</FormLabel>
                     <FormControl>
-                      <InputField className="flex overflow-hidden pr-0">
-                        <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
-                        <CopyButton valueToCopy={field.value} inputGroup />
-                      </InputField>
+                      <Input
+                        size="xs"
+                        trailingNode={<CopyButton valueToCopy={field.value} />}
+                        placeholder="Untitled"
+                        className="cursor-default"
+                        {...field}
+                        readOnly
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -310,7 +317,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel optional>Description</FormLabel>
                     <FormControl>
                       <Textarea
                         className="min-h-36"
@@ -331,7 +338,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                 render={({ field }) => (
                   <FormItem className="group" tabIndex={-1}>
                     <div className="flex items-center gap-1">
-                      <FormLabel>Tags</FormLabel>
+                      <FormLabel optional>Tags</FormLabel>
                     </div>
                     <FormControl className="text-xs text-neutral-600">
                       <TagInput
