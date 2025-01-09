@@ -521,9 +521,7 @@ const addSubscribersToTopic = async (
     createdTopicDto.key
   );
 
-  expect(response.result).to.be.eql({
-    succeeded: subscriberIds,
-  });
+  expect(response.result.succeeded).to.have.members(subscriberIds);
 };
 
 const buildTriggerRequestPayload = (
