@@ -1,4 +1,4 @@
-import { PatchWorkflowDto, StepDataDto, UpdateWorkflowDto, WorkflowResponseDto } from '@novu/shared';
+import { PatchWorkflowDto, StepResponseDto, UpdateWorkflowDto, WorkflowResponseDto } from '@novu/shared';
 import { createContext, ReactNode, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useBlocker, useNavigate, useParams } from 'react-router-dom';
 
@@ -28,7 +28,7 @@ import { useBeforeUnload } from '@/hooks/use-before-unload';
 export type WorkflowContextType = {
   isPending: boolean;
   workflow?: WorkflowResponseDto;
-  step?: StepDataDto;
+  step?: StepResponseDto;
   update: (data: UpdateWorkflowDto) => void;
   patch: (data: PatchWorkflowDto) => void;
 };

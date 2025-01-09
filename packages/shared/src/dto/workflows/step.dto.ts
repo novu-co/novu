@@ -2,7 +2,7 @@ import type { JSONSchemaDto } from './json-schema-dto';
 import { Slug, StepTypeEnum, WorkflowOriginEnum } from '../../types';
 import { StepContentIssueEnum, StepIssueEnum } from './step-content-issue.enum';
 
-export type StepDataDto = {
+export type StepResponseDto = {
   controls: ControlsMetadata;
   variables: JSONSchemaDto;
   stepId: string;

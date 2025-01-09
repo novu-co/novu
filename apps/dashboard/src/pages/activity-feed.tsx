@@ -2,6 +2,7 @@ import { ActivityFilters, defaultActivityFilters } from '@/components/activity/a
 import { ActivityPanel } from '@/components/activity/activity-panel';
 import { ActivityTable } from '@/components/activity/activity-table';
 import { DashboardLayout } from '@/components/dashboard-layout';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/primitives/resizable';
 import { useActivityUrlState } from '@/hooks/use-activity-url-state';
 import { AnimatePresence, motion } from 'motion/react';
 import { PageMeta } from '../components/page-meta';
@@ -40,39 +41,37 @@ export function ActivityFeed() {
           onReset={handleClearFilters}
         />
         <div className="relative flex h-[calc(100vh-88px)]">
-          <motion.div
-            transition={{
-              duration: 0.2,
-              ease: [0.32, 0.72, 0, 1],
-            }}
-            className="h-full flex-1"
-            style={{
-              width: activityItemId ? '65%' : '100%',
-            }}
-          >
-            <ActivityTable
-              selectedActivityId={activityItemId}
-              onActivitySelect={handleActivitySelect}
-              filters={filters}
-              hasActiveFilters={hasActiveFilters}
-              onClearFilters={handleClearFilters}
-            />
-          </motion.div>
+          <ResizablePanelGroup direction="horizontal">
+            <ResizablePanel defaultSize={70} minSize={40}>
+              <ActivityTable
+                selectedActivityId={activityItemId}
+                onActivitySelect={handleActivitySelect}
+                filters={filters}
+                hasActiveFilters={hasActiveFilters}
+                onClearFilters={handleClearFilters}
+              />
+            </ResizablePanel>
 
-          <AnimatePresence mode="wait">
-            {activityItemId && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{
-                  duration: 0.2,
-                }}
-                className="bg-background h-full w-[35%] overflow-auto border-l"
-              >
-                <ActivityPanel activityId={activityItemId} onActivitySelect={handleActivitySelect} />
-              </motion.div>
-            )}
-          </AnimatePresence>
+            <AnimatePresence mode="wait">
+              {activityItemId && (
+                <>
+                  <ResizableHandle />
+                  <ResizablePanel defaultSize={30} minSize={30} maxSize={50}>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{
+                        duration: 0.2,
+                      }}
+                      className="bg-background h-full overflow-auto"
+                    >
+                      <ActivityPanel activityId={activityItemId} onActivitySelect={handleActivitySelect} />
+                    </motion.div>
+                  </ResizablePanel>
+                </>
+              )}
+            </AnimatePresence>
+          </ResizablePanelGroup>
         </div>
       </DashboardLayout>
     </>
