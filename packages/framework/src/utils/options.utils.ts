@@ -15,5 +15,5 @@ export function resolveLogging(providedLogging?: boolean): boolean {
   }
 
   // Disable verbose logging in test and production environments
-  return ['test', 'production'].includes(process.env.NODE_ENV);
+  return !['test', 'production'].includes(process.env.NODE_ENV);
 }

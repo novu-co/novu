@@ -62,11 +62,17 @@ export function log(message: string | ((formatter: typeof f) => string)): void {
   }
 
   if (typeof message === 'string') {
+    // eslint-disable-next-line no-console
     console.log(message);
   } else if (typeof message === 'function') {
+    // eslint-disable-next-line no-console
     console.log(message(f));
   }
 }
 
-log.enable = () => (enabled = true);
-log.disable = () => (enabled = false);
+log.enable = () => {
+  enabled = true;
+};
+log.disable = () => {
+  enabled = false;
+};

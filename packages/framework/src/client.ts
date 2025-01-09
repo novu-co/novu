@@ -49,7 +49,6 @@ import { validateData } from './validators';
 import { mockSchema } from './jsonSchemaFaker';
 import { prettyPrintDiscovery } from './resources/workflow/pretty-print-discovery';
 import { deepMerge } from './utils/object.utils';
-import build from 'next/dist/build';
 
 function isRuntimeInDevelopment() {
   return ['development', undefined].includes(process.env.NODE_ENV);
