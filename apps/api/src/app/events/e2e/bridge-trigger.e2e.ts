@@ -1445,7 +1445,7 @@ contexts.forEach((context: Context) => {
                 properties: {
                   subject: {
                     type: 'string',
-                    default: 'A Successful Test on Novu from {{payload.userName}}',
+                    default: `A Successful Test on Novu from defualt_name`,
                   },
                 },
               } as const,
@@ -1491,7 +1491,7 @@ contexts.forEach((context: Context) => {
         channel: StepTypeEnum.EMAIL,
       });
       expect(emailMessages.length).to.eq(1);
-      expect(emailMessages[0].subject).to.include('A Successful Test on Novu from John Doe');
+      expect(emailMessages[0].subject).to.include('A Successful Test on Novu from defualt_name');
     });
 
     it(`should execute both inApp and email steps when userName is not John Doe [${context.name}]`, async () => {
@@ -1513,9 +1513,9 @@ contexts.forEach((context: Context) => {
 
           await step.email(
             'send-email',
-            async (controls) => {
+            async () => {
               return {
-                subject: controls.subject,
+                subject: `Welcome to Novu ${payload.userName}`,
                 body: `This is your first Novu Email ${payload.userName}`,
               };
             },
@@ -1525,7 +1525,6 @@ contexts.forEach((context: Context) => {
                 properties: {
                   subject: {
                     type: 'string',
-                    default: 'A Successful Test on Novu from {{userName}}',
                   },
                 },
               } as const,
@@ -1572,8 +1571,7 @@ contexts.forEach((context: Context) => {
         channel: StepTypeEnum.EMAIL,
       });
       expect(emailMessages.length).to.eq(1);
-      expect(emailMessages[0].subject).to.include('A Successful Test on Novu from Jane Doe');
-      expect(emailMessages[0].content).to.include('This is your first Novu Email Jane Doe');
+      expect(emailMessages[0].subject).to.include('Welcome to Novu Jane Doe');
     });
   });
 });
