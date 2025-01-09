@@ -3289,6 +3289,69 @@ describe(`Trigger event - /v1/events/trigger (POST)`, function () {
       });
       expect(notSkippedMessages.length).to.equal(1);
     });
+
+    it('should successfully trigger a workflow with SMS followed by in-app notification', async function () {
+      const workflowBody: CreateWorkflowDto = {
+        name: 'Test SMS -> In-App Workflow',
+        workflowId: 'test-sms-inapp-workflow',
+        __source: WorkflowCreationSourceEnum.DASHBOARD,
+        steps: [
+          {
+            type: StepTypeEnum.SMS,
+            name: 'SMS Message',
+            controlValues: {
+              body: 'Hello {{subscriber.firstName}}, this is a test SMS',
+            },
+          },
+          {
+            type: StepTypeEnum.IN_APP,
+            name: 'In-App Message',
+            controlValues: {
+              body: 'Welcome {{subscriber.firstName}}! This is an in-app notification',
+            },
+          },
+        ],
+      };
+
+      const response = await session.testAgent.post('/v2/workflows').send(workflowBody);
+      expect(response.status).to.equal(201);
+      const workflow: WorkflowResponseDto = response.body.data;
+
+      subscriber = await subscriberService.createSubscriber({
+        firstName: 'John',
+        lastName: 'Doe',
+        phone: '+1234567890',
+      });
+
+      const triggerResponse = await novuClient.trigger({
+        name: workflow.workflowId,
+        to: [subscriber.subscriberId],
+        payload: {
+          firstName: subscriber.firstName,
+        },
+      });
+
+      expect(triggerResponse.result.status).to.equal('processed');
+      expect(triggerResponse.result.acknowledged).to.equal(true);
+
+      await session.awaitRunningJobs(workflow._id);
+
+      const messages = await messageRepository.find({
+        _environmentId: session.environment._id,
+        _subscriberId: subscriber._id,
+      });
+
+      expect(messages.length).to.equal(2);
+
+      const smsMessage = messages.find((message) => message.channel === ChannelTypeEnum.SMS);
+      const inAppMessage = messages.find((message) => message.channel === ChannelTypeEnum.IN_APP);
+
+      expect(smsMessage).to.exist;
+      expect(inAppMessage).to.exist;
+
+      expect(smsMessage?.content).to.equal('Hello John, this is a test SMS');
+      expect(inAppMessage?.content).to.equal('Welcome John! This is an in-app notification');
+    });
   });
 
   it('should handle complex skip logic with subscriber data', async function () {

@@ -18,7 +18,7 @@ import { RiSendPlaneFill } from 'react-icons/ri';
 import { Code2 } from '../../icons/code-2';
 import { CopyButton } from '../../primitives/copy-button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../../primitives/form/form';
-import { Input, InputField } from '../../primitives/input';
+import { Input } from '../../primitives/input';
 import { Panel, PanelContent, PanelHeader } from '../../primitives/panel';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitives/tabs';
 import { TestWorkflowFormType } from '../schema';
@@ -67,13 +67,11 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
                 key={key}
                 control={control}
                 name={`to.${key}`}
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel htmlFor={key}>{capitalize(key)}</FormLabel>
                     <FormControl>
-                      <InputField>
-                        <Input id={key} {...(field as any)} />
-                      </InputField>
+                      <Input size="xs" id={key} {...(field as any)} hasError={!!fieldState.error} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

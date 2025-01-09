@@ -1,19 +1,24 @@
 /* eslint-disable no-param-reassign */
 import { TipTapNode } from '@novu/shared';
 import { Injectable } from '@nestjs/common';
+import { MailyAttrsEnum } from '@novu/application-generic';
 import { ExpandEmailEditorSchemaCommand } from './expand-email-editor-schema-command';
 import { HydrateEmailSchemaUseCase } from './hydrate-email-schema.usecase';
+import { parseLiquid } from './email-output-renderer.usecase';
 
 @Injectable()
 export class ExpandEmailEditorSchemaUsecase {
   constructor(private hydrateEmailSchemaUseCase: HydrateEmailSchemaUseCase) {}
 
-  execute(command: ExpandEmailEditorSchemaCommand): TipTapNode {
+  async execute(command: ExpandEmailEditorSchemaCommand): Promise<TipTapNode> {
     const emailSchemaHydrated = this.hydrate(command);
-    this.processShowAndForControls(emailSchemaHydrated, undefined);
 
-    return emailSchemaHydrated;
+    return await this.processShowAndForControls(
+      command.fullPayloadForRender as unknown as Record<string, unknown>,
+      emailSchemaHydrated
+    );
   }
+
   private hydrate(command: ExpandEmailEditorSchemaCommand) {
     const { hydratedEmailSchema } = this.hydrateEmailSchemaUseCase.execute({
       emailEditor: command.emailEditorJson,
@@ -23,14 +28,24 @@ export class ExpandEmailEditorSchemaUsecase {
     return hydratedEmailSchema;
   }
 
-  private processShowAndForControls(node: TipTapNode, parentNode?: TipTapNode) {
+  private async processShowAndForControls(
+    variables: Record<string, unknown>,
+    node: TipTapNode,
+    parentNode?: TipTapNode
+  ): Promise<TipTapNode> {
     if (node.content) {
-      node.content.forEach((innerNode) => {
-        this.processShowAndForControls(innerNode, node);
-      });
+      const processedContent: TipTapNode[] = [];
+      for (const innerNode of node.content) {
+        const processed = await this.processShowAndForControls(variables, innerNode, parentNode);
+        if (processed) {
+          processedContent.push(processed);
+        }
+      }
+      node.content = processedContent;
     }
+
     if (this.hasShow(node)) {
-      this.hideShowIfNeeded(node, parentNode);
+      await this.hideShowIfNeeded(variables, node, parentNode);
     } else if (this.hasEach(node)) {
       const newContent = this.expendedForEach(node);
       node.content = newContent;
@@ -39,6 +54,8 @@ export class ExpandEmailEditorSchemaUsecase {
         parentNode.content.splice(parentNode.content.indexOf(node), 1);
       }
     }
+
+    return node;
   }
   private insertArrayAt(array: any[], index: number, newArray: any[]) {
     if (index < 0 || index > array.length) {
@@ -51,8 +68,8 @@ export class ExpandEmailEditorSchemaUsecase {
     return !!(node.attrs && 'each' in node.attrs);
   }
 
-  private hasShow(node: TipTapNode): node is TipTapNode & { attrs: { show: string } } {
-    return !!(node.attrs && 'show' in node.attrs);
+  private hasShow(node: TipTapNode): node is TipTapNode & { attrs: { [MailyAttrsEnum.SHOW_IF_KEY]: string } } {
+    return node.attrs?.[MailyAttrsEnum.SHOW_IF_KEY] !== undefined;
   }
 
   private regularExpansion(eachObject: any, templateContent: TipTapNode[]): TipTapNode[] {
@@ -109,14 +126,25 @@ export class ExpandEmailEditorSchemaUsecase {
     }
   }
 
-  private hideShowIfNeeded(node: TipTapNode & { attrs: { show: unknown } }, parentNode?: TipTapNode): void {
-    const { show } = node.attrs;
-    const shouldShow = typeof show === 'boolean' ? show : this.stringToBoolean(show);
+  private async hideShowIfNeeded(
+    variables: Record<string, unknown>,
+    node: TipTapNode & { attrs: { [MailyAttrsEnum.SHOW_IF_KEY]: unknown } },
+    parentNode?: TipTapNode
+  ): Promise<void> {
+    const { [MailyAttrsEnum.SHOW_IF_KEY]: showIfKey } = node.attrs;
 
-    if (!shouldShow) {
+    if (showIfKey === undefined) {
+      return;
+    }
+
+    const parsedShowIfValue = await parseLiquid(showIfKey as string, variables);
+    const showIfValueBoolean =
+      typeof parsedShowIfValue === 'boolean' ? parsedShowIfValue : this.stringToBoolean(parsedShowIfValue);
+
+    if (!showIfValueBoolean) {
       this.removeNodeFromParent(node, parentNode);
     } else {
-      delete node.attrs.show;
+      delete node.attrs[MailyAttrsEnum.SHOW_IF_KEY];
     }
   }
 

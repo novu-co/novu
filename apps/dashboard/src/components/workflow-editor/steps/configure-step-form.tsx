@@ -1,4 +1,5 @@
 import {
+  FeatureFlagsKeysEnum,
   IEnvironment,
   StepDataDto,
   StepTypeEnum,
@@ -10,7 +11,14 @@ import {
 import { AnimatePresence, motion } from 'motion/react';
 import { HTMLAttributes, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { RiArrowLeftSLine, RiArrowRightSLine, RiCloseFill, RiDeleteBin2Line, RiPencilRuler2Fill } from 'react-icons/ri';
+import {
+  RiArrowLeftSLine,
+  RiArrowRightSLine,
+  RiCloseFill,
+  RiDeleteBin2Line,
+  RiGuideFill,
+  RiPencilRuler2Fill,
+} from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { ConfirmationModal } from '@/components/confirmation-modal';
@@ -18,7 +26,7 @@ import { PageMeta } from '@/components/page-meta';
 import { Button } from '@/components/primitives/button';
 import { CopyButton } from '@/components/primitives/copy-button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { Input, InputField } from '@/components/primitives/input';
+import { Input } from '@/components/primitives/input';
 import { Separator } from '@/components/primitives/separator';
 import { SidebarContent, SidebarFooter, SidebarHeader } from '@/components/side-navigation/sidebar';
 import TruncatedText from '@/components/truncated-text';
@@ -40,14 +48,10 @@ import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-co
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { ConfigureSmsStepPreview } from '@/components/workflow-editor/steps/sms/configure-sms-step-preview';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
-import {
-  AUTOCOMPLETE_PASSWORD_MANAGERS_OFF,
-  INLINE_CONFIGURABLE_STEP_TYPES,
-  STEP_TYPE_LABELS,
-  TEMPLATE_CONFIGURABLE_STEP_TYPES,
-} from '@/utils/constants';
+import { INLINE_CONFIGURABLE_STEP_TYPES, STEP_TYPE_LABELS, TEMPLATE_CONFIGURABLE_STEP_TYPES } from '@/utils/constants';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { CompactButton } from '../../primitives/button-compact';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
 
 const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
@@ -84,7 +88,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   const { step, workflow, update, environment } = props;
   const navigate = useNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
+  const isStepConditionsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_STEP_CONDITIONS_ENABLED);
   const supportedStepTypes = [
     StepTypeEnum.IN_APP,
     StepTypeEnum.SMS,
@@ -228,19 +232,17 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                   <FormField
                     control={form.control}
                     name="name"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <InputField>
-                          <FormControl>
-                            <Input
-                              placeholder="Untitled"
-                              {...field}
-                              disabled={isReadOnly}
-                              {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
-                            />
-                          </FormControl>
-                        </InputField>
+                        <FormLabel required>Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Untitled"
+                            {...field}
+                            disabled={isReadOnly}
+                            hasError={!!fieldState.error}
+                          />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -250,13 +252,17 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                     name={'stepId'}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Identifier</FormLabel>
-                        <InputField className="flex overflow-hidden pr-0">
-                          <FormControl>
-                            <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
-                          </FormControl>
-                          <CopyButton valueToCopy={field.value} size="xs" inputGroup />
-                        </InputField>
+                        <FormLabel required>Identifier</FormLabel>
+                        <FormControl>
+                          <Input
+                            trailingNode={<CopyButton valueToCopy={field.value} />}
+                            placeholder="Untitled"
+                            className="cursor-default"
+                            {...field}
+                            readOnly
+                          />
+                        </FormControl>
+
                         <FormMessage />
                       </FormItem>
                     )}
@@ -301,6 +307,28 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                   </>
                 )
               )}
+            </>
+          )}
+
+          {isStepConditionsEnabled && (
+            <>
+              <SidebarContent>
+                <Link to={'./conditions'} relative="path" state={{ stepType: step.type }}>
+                  <Button
+                    variant="secondary"
+                    mode="outline"
+                    className="flex w-full justify-start gap-1.5 text-xs font-medium"
+                  >
+                    <RiGuideFill className="h-4 w-4 text-neutral-600" />
+                    Step Conditions
+                    <span className="ml-auto flex items-center gap-0.5">
+                      <span>0</span>
+                      <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
+                    </span>
+                  </Button>
+                </Link>
+              </SidebarContent>
+              <Separator />
             </>
           )}
 

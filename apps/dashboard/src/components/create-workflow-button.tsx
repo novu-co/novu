@@ -1,7 +1,14 @@
 import { createWorkflow } from '@/api/workflows';
 import { Button } from '@/components/primitives/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { Input, InputField } from '@/components/primitives/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormInput,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/primitives/form/form';
 import { Separator } from '@/components/primitives/separator';
 import {
   Sheet,
@@ -18,7 +25,6 @@ import { Textarea } from '@/components/primitives/textarea';
 import { ExternalLink } from '@/components/shared/external-link';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useTags } from '@/hooks/use-tags';
-import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -32,6 +38,7 @@ import { z } from 'zod';
 import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowSchema } from './workflow-editor/schema';
 
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
+
 export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -102,19 +109,16 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel required>Name</FormLabel>
                     <FormControl>
-                      <InputField>
-                        <Input
-                          {...field}
-                          autoFocus
-                          {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            form.setValue('workflowId', slugify(e.target.value));
-                          }}
-                        />
-                      </InputField>
+                      <FormInput
+                        {...field}
+                        autoFocus
+                        onChange={(e) => {
+                          field.onChange(e);
+                          form.setValue('workflowId', slugify(e.target.value));
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -126,11 +130,9 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 name="workflowId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Identifier</FormLabel>
+                    <FormLabel required>Identifier</FormLabel>
                     <FormControl>
-                      <InputField>
-                        <Input {...field} readOnly />
-                      </InputField>
+                      <FormInput {...field} disabled />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -145,7 +147,9 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-1">
-                      <FormLabel hint={`(max. ${MAX_TAG_ELEMENTS})`}>Add tags</FormLabel>
+                      <FormLabel optional hint={`(max. ${MAX_TAG_ELEMENTS})`}>
+                        Add tags
+                      </FormLabel>
                     </div>
                     <FormControl>
                       <TagInput
