@@ -22,7 +22,7 @@ import {
 } from '@novu/api/models/components';
 import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-describe('Topic Trigger Event', () => {
+describe('Topic Trigger Event #novu-v2', () => {
   describe('Trigger event for a topic - /v1/events/trigger (POST)', () => {
     let session: UserSession;
     let template: NotificationTemplateEntity;

@@ -8,7 +8,7 @@ import { createHash } from '@novu/application-generic';
 
 const axiosInstance = axios.create();
 
-describe('ChatOauth - /:subscriberId/credentials/:providerId/:environmentId (GET)', function () {
+describe('ChatOauth - /:subscriberId/credentials/:providerId/:environmentId (GET) #novu-v2', function () {
   let session: UserSession;
   const ACTION = '<script>window.close();</script>';
 

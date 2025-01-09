@@ -11,7 +11,7 @@ import {
   InvalidateCacheService,
 } from '@novu/application-generic';
 
-describe('Count - GET /widget/notifications/count', function () {
+describe('Count - GET /widget/notifications/count #novu-v1', function () {
   const messageRepository = new MessageRepository();
   let session: UserSession;
   let template: NotificationTemplateEntity;

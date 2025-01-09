@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { UserSession } from '@novu/testing';
 
-describe('Get Subscriber - /subscribers/:id (GET)', function () {
+describe('Get Subscriber - /subscribers/:id (GET) #novu-v2', function () {
   let session: UserSession;
 
   beforeEach(async () => {

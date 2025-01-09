@@ -5,7 +5,7 @@ import { expect } from 'chai';
 import { Novu } from '@novu/api';
 import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-describe('Delete Messages By TransactionId - /messages/?transactionId= (DELETE)', function () {
+describe('Delete Messages By TransactionId - /messages/?transactionId= (DELETE) #novu-v2', function () {
   let session: UserSession;
   const messageRepository = new MessageRepository();
   let template: NotificationTemplateEntity;

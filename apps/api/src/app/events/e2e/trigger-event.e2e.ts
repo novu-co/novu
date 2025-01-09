@@ -51,7 +51,7 @@ const promiseTimeout = (ms: number): Promise<void> =>
     setTimeout(resolve, ms);
   });
 
-describe(`Trigger event - /v1/events/trigger (POST)`, function () {
+describe('Trigger event - /v1/events/trigger (POST) #novu-v2', function () {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let subscriber: SubscriberEntity;

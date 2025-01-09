@@ -5,7 +5,7 @@ import { UserSession, SubscribersService } from '@novu/testing';
 
 const axiosInstance = axios.create();
 
-describe('Bulk create subscribers - /v1/subscribers/bulk (POST)', function () {
+describe('Bulk create subscribers - /v1/subscribers/bulk (POST) #novu-v2', function () {
   const BULK_API_ENDPOINT = '/v1/subscribers/bulk';
   let session: UserSession;
   let subscriber: SubscriberEntity;
