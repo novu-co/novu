@@ -41,53 +41,59 @@ export function buildVariables(
   };
 }
 
-/**
- * Validates variables against a schema to identify which ones are valid/invalid.
- * Returns an object containing arrays of valid and invalid variables.
- */
+function isPropertyAllowed(schema: Record<string, unknown>, propertyPath: string) {
+  let currentSchema = { ...schema };
+  if (!currentSchema || typeof currentSchema !== 'object') {
+    return false;
+  }
+
+  const pathParts = propertyPath.split('.');
+
+  for (const part of pathParts) {
+    const { properties, additionalProperties } = currentSchema;
+
+    if (properties?.[part]) {
+      currentSchema = properties[part];
+      continue;
+    }
+
+    if (additionalProperties === true) {
+      return true;
+    }
+
+    return false;
+  }
+
+  return true;
+}
+
+function createInvalidVariable(variable: Variable): Variable {
+  return {
+    name: variable.output,
+    context: variable.context,
+    message: 'Variable is not supported',
+    output: variable.output,
+  };
+}
+
 function identifyUnknownVariables(
   variableSchema: Record<string, unknown>,
   validVariables: Variable[]
 ): TemplateVariables {
-  const validVariablesCopy: Variable[] = _.cloneDeep(validVariables);
+  const variables = _.cloneDeep(validVariables);
 
-  const result = validVariablesCopy.reduce<TemplateVariables>(
-    (acc, variable: Variable) => {
-      const parts = variable.name.split('.');
-      let isValid = true;
-      let currentPath = 'properties';
-
-      for (const part of parts) {
-        currentPath += `.${part}`;
-        const valueSearch = _.get(variableSchema, currentPath);
-
-        currentPath += '.properties';
-        const propertiesSearch = _.get(variableSchema, currentPath);
-
-        if (valueSearch === undefined && propertiesSearch === undefined) {
-          isValid = false;
-          break;
-        }
-      }
+  return variables.reduce<TemplateVariables>(
+    (acc, variable) => {
+      const isValid = isPropertyAllowed(variableSchema, variable.name);
 
       if (isValid) {
         acc.validVariables.push(variable);
       } else {
-        acc.invalidVariables.push({
-          name: variable.output,
-          context: variable.context,
-          message: 'Variable is not supported',
-          output: variable.output,
-        });
+        acc.invalidVariables.push(createInvalidVariable(variable));
       }
 
       return acc;
     },
-    {
-      validVariables: [] as Variable[],
-      invalidVariables: [] as Variable[],
-    } as TemplateVariables
+    { validVariables: [], invalidVariables: [] }
   );
-
-  return result;
 }

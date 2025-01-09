@@ -70,6 +70,10 @@ function buildStepTypeOverview(step: NotificationStepEntity): StepTypeEnum | und
 
 function computeOrigin(template: NotificationTemplateEntity): WorkflowOriginEnum {
   // Required to differentiate between old V1 and new workflows in an attempt to eliminate the need for type field
+  if (typeof template.type === 'undefined' && typeof template.origin === 'undefined') {
+    return WorkflowOriginEnum.NOVU_CLOUD_V1;
+  }
+
   return template?.type === WorkflowTypeEnum.REGULAR
     ? WorkflowOriginEnum.NOVU_CLOUD_V1
     : template.origin || WorkflowOriginEnum.EXTERNAL;

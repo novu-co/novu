@@ -12,7 +12,7 @@ import {
   FullPayloadForRender,
   InAppOutputRendererUsecase,
   PushOutputRendererUsecase,
-  RenderEmailOutputUsecase,
+  EmailOutputRendererUsecase,
   SmsOutputRendererUsecase,
 } from '../output-renderers';
 import { DelayOutputRendererUsecase } from '../output-renderers/delay-output-renderer.usecase';
@@ -28,7 +28,7 @@ export class ConstructFrameworkWorkflow {
     private logger: PinoLogger,
     private workflowsRepository: NotificationTemplateRepository,
     private inAppOutputRendererUseCase: InAppOutputRendererUsecase,
-    private emailOutputRendererUseCase: RenderEmailOutputUsecase,
+    private emailOutputRendererUseCase: EmailOutputRendererUsecase,
     private smsOutputRendererUseCase: SmsOutputRendererUsecase,
     private chatOutputRendererUseCase: ChatOutputRendererUsecase,
     private pushOutputRendererUseCase: PushOutputRendererUsecase,
