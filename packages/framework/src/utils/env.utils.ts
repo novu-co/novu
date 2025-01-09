@@ -1,4 +1,5 @@
 import { Response as CrossFetchResponse } from 'cross-fetch';
+import { log } from './log.utils';
 
 export const getResponse = (): typeof Response => {
   if (typeof Response !== 'undefined') {
@@ -31,8 +32,7 @@ export const getBridgeUrl = async (): Promise<string> => {
       return `${data.tunnelOrigin}${data.route}`;
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
+    log((l) => l.error((error as Error).message));
   }
 
   return '';

@@ -23,4 +23,9 @@ export type ClientOptions = {
    * Defaults to true.
    */
   strictAuthentication?: boolean;
+
+  /**
+   * Enable/disable logging of workflows and execution details
+   */
+  logging?: boolean;
 };
