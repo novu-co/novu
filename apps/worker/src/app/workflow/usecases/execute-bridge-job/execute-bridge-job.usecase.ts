@@ -95,7 +95,7 @@ export class ExecuteBridgeJob {
     const { subscriber, payload: originalPayload } = command.variables || {};
     const payload = this.normalizePayload(originalPayload);
 
-    const state = await this.generateState(payload, command);
+    const state = await this.generateState(command);
 
     const variablesStores = isStateful
       ? await this.findControlValues(command, workflow as NotificationTemplateEntity)
@@ -168,7 +168,7 @@ export class ExecuteBridgeJob {
     return payload;
   }
 
-  private async generateState(payload, command: ExecuteBridgeJobCommand): Promise<State[]> {
+  private async generateState(command: ExecuteBridgeJobCommand): Promise<State[]> {
     const previousJobs: State[] = [];
     let theJob = (await this.jobRepository.findOne({
       _id: command.job._parentId,
@@ -176,7 +176,7 @@ export class ExecuteBridgeJob {
     })) as JobEntity;
 
     if (theJob) {
-      const jobState = await this.mapState(theJob, payload);
+      const jobState = await this.mapState(theJob);
       previousJobs.push(jobState);
     }
 
@@ -187,7 +187,7 @@ export class ExecuteBridgeJob {
       })) as JobEntity;
 
       if (theJob) {
-        const jobState = await this.mapState(theJob, payload);
+        const jobState = await this.mapState(theJob);
         previousJobs.push(jobState);
       }
     }
@@ -236,7 +236,7 @@ export class ExecuteBridgeJob {
   }
 
   @Instrument()
-  private async mapState(job: JobEntity, payload: Record<string, unknown>) {
+  private async mapState(job: JobEntity) {
     let output = {};
 
     switch (job.type) {
@@ -287,6 +287,17 @@ export class ExecuteBridgeJob {
             read: message.read,
             lastSeenDate: message.lastSeenDate || null,
             lastReadDate: message.lastReadDate || null,
+          };
+        } else {
+          /*
+           * Provide fallback state for in-app messages to satisfy framework inAppResultSchema validation
+           * when message is not found (e.g., cancelled jobs, nv-5120)
+           */
+          output = {
+            seen: false,
+            read: false,
+            lastSeenDate: null,
+            lastReadDate: null,
           };
         }
         break;
