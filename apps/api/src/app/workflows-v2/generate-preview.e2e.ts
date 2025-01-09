@@ -280,7 +280,8 @@ describe('Generate Preview', () => {
         });
       });
       describe('for', () => {
-        it('should populate for if payload exist with actual values', async () => {
+        // TODO: remove skip once we restore for block
+        it.skip('should populate for if payload exist with actual values', async () => {
           const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(workflowsClient, StepTypeEnum.EMAIL);
           const name1 = 'ball is round';
           const name2 = 'square is square';

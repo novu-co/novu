@@ -298,10 +298,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                     <FormControl>
                       <InputField className="flex overflow-hidden pr-0">
                         <Input placeholder="Untitled" className="cursor-default" {...field} readOnly />
-                        <CopyButton
-                          valueToCopy={field.value}
-                          className="h-[34px] rounded-none border-l border-neutral-200"
-                        />
+                        <CopyButton valueToCopy={field.value} inputGroup />
                       </InputField>
                     </FormControl>
                     <FormMessage />
@@ -364,8 +361,10 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
               leadingIcon={RiSettingsLine}
               className="flex w-full justify-start gap-1.5 p-1.5 text-xs font-medium"
               type="button"
+              trailingIcon={RiArrowRightSLine}
             >
-              Configure channel preferences <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
+              Configure channel preferences
+              <span className="ml-auto" />
             </Button>
           </Link>
         </SidebarContent>

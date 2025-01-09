@@ -26,6 +26,7 @@ import {
   ControlValuesLevelEnum,
   isBridgeWorkflow,
   PreferencesTypeEnum,
+  WorkflowOriginEnum,
 } from '@novu/shared';
 
 import {
@@ -61,6 +62,7 @@ import {
   UpdateMessageTemplate,
   UpdateMessageTemplateCommand,
 } from '../../message-template';
+import { Instrument, InstrumentUsecase } from '../../../instrumentation';
 
 /**
  * @deprecated - use `UpsertWorkflow` instead
@@ -92,6 +94,7 @@ export class UpdateWorkflow {
     private controlValuesRepository: ControlValuesRepository,
   ) {}
 
+  @InstrumentUsecase()
   async execute(
     command: UpdateWorkflowCommand,
   ): Promise<WorkflowInternalResponseDto> {
@@ -370,8 +373,10 @@ export class UpdateWorkflow {
 
     try {
       if (
-        process.env.NOVU_ENTERPRISE === 'true' ||
-        process.env.CI_EE_TEST === 'true'
+        (process.env.NOVU_ENTERPRISE === 'true' ||
+          process.env.CI_EE_TEST === 'true') &&
+        notificationTemplateWithStepTemplate.origin ===
+          WorkflowOriginEnum.NOVU_CLOUD_V1
       ) {
         if (!require('@novu/ee-shared-services')?.TranslationsService) {
           throw new PlatformException('Translation module is not loaded');
@@ -420,6 +425,7 @@ export class UpdateWorkflow {
     }
   }
 
+  @Instrument()
   private async updateMessageTemplates(
     steps: NotificationStep[],
     command: UpdateWorkflowCommand,
@@ -518,6 +524,7 @@ export class UpdateWorkflow {
     return templateMessages;
   }
 
+  @Instrument()
   private updateTriggers(
     updatePayload: Partial<WorkflowInternalResponseDto>,
     steps: NotificationStep[],
@@ -735,6 +742,7 @@ export class UpdateWorkflow {
     return variantsList;
   }
 
+  @Instrument()
   private async deleteRemovedSteps(
     existingSteps: NotificationStepEntity[] | StepVariantEntity[] | undefined,
     command: UpdateWorkflowCommand,
