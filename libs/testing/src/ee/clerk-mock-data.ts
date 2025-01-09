@@ -3,7 +3,7 @@ import type { User, Organization, OrganizationMembership } from '@clerk/backend'
 
 export const CLERK_USER_1: User = {
   id: 'clerk_user_1',
-  externalId: null, // state before linking
+  externalId: null,
   firstName: 'firstName',
   lastName: 'lastName',
   emailAddresses: [],
@@ -51,7 +51,7 @@ export const CLERK_USER_1: User = {
 export const CLERK_USER_2: User = {
   ...CLERK_USER_1,
   id: 'clerk_user_2',
-  externalId: null, // state before linking
+  externalId: null,
   firstName: 'firstName2',
   lastName: 'lastName2',
   emailAddresses: [],

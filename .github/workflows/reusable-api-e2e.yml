@@ -113,7 +113,7 @@ jobs:
           CLERK_WEBHOOK_SECRET: ${{ secrets.CLERK_WEBHOOK_SECRET }}
           CLERK_LONG_LIVED_TOKEN: ${{ secrets.CLERK_LONG_LIVED_TOKEN }}
         run: |
-          cd apps/api && pnpm test:e2e:ee
+          pnpm --filter @novu/api-services test:e2e:novu-v2
 
       - name: Kill port for worker 1342 for unit tests
         run: sudo kill -9 $(sudo lsof -t -i:1342)

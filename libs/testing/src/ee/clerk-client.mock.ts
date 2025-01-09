@@ -59,9 +59,9 @@ export class ClerkClientMock {
       return this.getUserById(userId);
     };
 
-    const getUserList: UserAPI['getUserList'] = async (params) => {
+    const getUserList: UserAPI['getUserList'] = async (params = {}) => {
       const users = Array.from(this.clerkUsers.values()).filter((user) => {
-        if (params.emailAddress?.length > 0) {
+        if (params.emailAddress && params.emailAddress.length > 0) {
           return user.emailAddresses.some((emailAddress) => emailAddress.emailAddress === params.emailAddress[0]);
         }
         return true;
@@ -73,12 +73,6 @@ export class ClerkClientMock {
       };
     };
 
-    const deleteUser: UserAPI['deleteUser'] = async (userId) => {
-      const user = this.getUserById(userId);
-      this.clerkUsers.delete(userId);
-      return user;
-    };
-
     const getOrganizationMembershipList: UserAPI['getOrganizationMembershipList'] = async (params) => {
       const users = Array.from(this.clerkOrganizationMemberships.values()).filter(
         (membership) => membership.organization.id === params.userId
@@ -88,6 +82,12 @@ export class ClerkClientMock {
         data: users,
         totalCount: users.length,
       });
+    };
+
+    const deleteUser: UserAPI['deleteUser'] = async (userId) => {
+      const user = this.getUserById(userId);
+      this.clerkUsers.delete(userId);
+      return user;
     };
 
     return {
