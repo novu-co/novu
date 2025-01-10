@@ -84,16 +84,18 @@ jobs:
         name: Start localstack
 
       - name: Build API & Worker
-        run: pnpm run build:api_and_worker --skip-nx-cache
+        run: CI='' pnpm run build:api_and_worker --skip-nx-cache
 
       - name: Start Worker
         shell: bash
         env:
           LAUNCH_DARKLY_SDK_KEY: ${{ secrets.LAUNCH_DARKLY_SDK_KEY }}
           NOVU_ENTERPRISE: ${{ inputs.ee }}
-        run: |
-          cd apps/worker && pnpm start:test &
-          wait-on --timeout=180000 http://127.0.0.1:1342/v1/health-check
+        run: cd apps/worker && pnpm start:test &
+
+      - name: Wait on worker
+        shell: bash
+        run: wait-on --timeout=180000 http://127.0.0.1:1342/v1/health-check
 
       - name: Run E2E tests
         if: ${{ !inputs.ee }}
