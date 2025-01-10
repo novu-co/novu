@@ -8,7 +8,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/primitives/dropdown-menu';
-import { HoverToCopy } from '@/components/primitives/hover-to-copy';
 import { TableCell, TableRow } from '@/components/primitives/table';
 import { Tooltip, TooltipContent, TooltipPortal, TooltipTrigger } from '@/components/primitives/tooltip';
 import TruncatedText from '@/components/truncated-text';
@@ -27,7 +26,6 @@ import { ComponentProps, useState } from 'react';
 import { FaCode } from 'react-icons/fa6';
 import {
   RiDeleteBin2Line,
-  RiFileCopyLine,
   RiFlashlightLine,
   RiGitPullRequestFill,
   RiMore2Fill,
@@ -40,6 +38,7 @@ import { type ExternalToast } from 'sonner';
 import { ConfirmationModal } from './confirmation-modal';
 import { DeleteWorkflowDialog } from './delete-workflow-dialog';
 import { CompactButton } from './primitives/button-compact';
+import { CopyButton } from './primitives/copy-button';
 import { ToastIcon } from './primitives/sonner';
 import { showToast } from './primitives/sonner-helpers';
 import { TimeDisplayHoverCard } from './time-display-hover-card';
@@ -191,10 +190,16 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           )}
           <TruncatedText className="max-w-[32ch]">{workflow.name}</TruncatedText>
         </div>
-        <HoverToCopy className="group relative z-10 flex items-center gap-1" valueToCopy={workflow.workflowId}>
+        <div className="flex items-center gap-1 transition-opacity duration-200">
           <TruncatedText className="text-foreground-400 font-code block text-xs">{workflow.workflowId}</TruncatedText>
-          <RiFileCopyLine className="text-foreground-400 invisible size-3 group-hover:visible" />
-        </HoverToCopy>
+
+          <CopyButton
+            className="z-10 flex size-2 p-0 px-1 opacity-0 group-hover:opacity-100"
+            valueToCopy={workflow.workflowId}
+            size="2xs"
+            mode="ghost"
+          ></CopyButton>
+        </div>
       </WorkflowLinkTableCell>
       <WorkflowLinkTableCell workflow={workflow} className="min-w-[200px]">
         <WorkflowStatus status={workflow.status} />

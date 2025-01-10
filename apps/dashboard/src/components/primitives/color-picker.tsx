@@ -1,7 +1,7 @@
 import { HexColorPicker } from 'react-colorful';
-import { Popover, PopoverContent, PopoverTrigger } from './popover';
-import { Input } from './input';
 import { cn } from '../../utils/ui';
+import { Input } from './input';
+import { Popover, PopoverContent, PopoverTrigger } from './popover';
 
 interface ColorPickerProps {
   value: string;

@@ -3,10 +3,10 @@ import { useFormContext } from 'react-hook-form';
 
 import { FieldEditor } from '@/components/primitives/field-editor';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
-import { InputField } from '@/components/primitives/input';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
+import { InputRoot, InputWrapper } from '../../../primitives/input';
 
 const subjectKey = 'subject';
 
@@ -19,23 +19,25 @@ export const InAppSubject = () => {
     <FormField
       control={control}
       name={subjectKey}
-      render={({ field }) => (
-        <InputField size="fit">
-          <FormItem className="w-full">
-            <FormControl>
-              <FieldEditor
-                singleLine
-                indentWithTab={false}
-                placeholder={capitalize(field.name)}
-                id={field.name}
-                value={field.value}
-                onChange={field.onChange}
-                variables={variables}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        </InputField>
+      render={({ field, fieldState }) => (
+        <FormItem className="w-full">
+          <FormControl>
+            <InputRoot hasError={!!fieldState.error}>
+              <InputWrapper className="flex h-9 items-center justify-center px-1">
+                <FieldEditor
+                  singleLine
+                  indentWithTab={false}
+                  placeholder={capitalize(field.name)}
+                  id={field.name}
+                  value={field.value}
+                  onChange={field.onChange}
+                  variables={variables}
+                />
+              </InputWrapper>
+            </InputRoot>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
       )}
     />
   );

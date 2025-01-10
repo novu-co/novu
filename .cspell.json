@@ -718,7 +718,8 @@
     "touchpoint",
     "Angularjs",
     "navigatable",
-    "facated"
+    "facated",
+    "dotenvcreate"
   ],
   "flagWords": [],
   "patterns": [

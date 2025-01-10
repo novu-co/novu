@@ -1,9 +1,8 @@
 import { PageMeta } from '@/components/page-meta';
-import { Button } from '@/components/primitives/button';
 import { Card, CardContent, CardHeader } from '@/components/primitives/card';
 import { CopyButton } from '@/components/primitives/copy-button';
 import { Form } from '@/components/primitives/form/form';
-import { Input, InputField } from '@/components/primitives/input';
+import { Input } from '@/components/primitives/input';
 import { Skeleton } from '@/components/primitives/skeleton';
 import { ExternalLink } from '@/components/shared/external-link';
 import { useEnvironment } from '@/context/environment/hooks';
@@ -160,31 +159,29 @@ function SettingField({
           </>
         ) : (
           <>
-            <InputField className="flex overflow-hidden pr-0">
-              <Input
-                className="cursor-default"
-                value={secret ? (showSecret ? value : maskSecret(value ?? '')) : value}
-                readOnly={readOnly}
-              />
-              <CopyButton
-                size="xs"
-                valueToCopy={value ?? ''}
-                className="h-[34px] rounded-none border-l border-neutral-200 shadow-none ring-0"
-              />
-            </InputField>
-
-            {secret && (
-              <Button
-                variant="secondary"
-                mode="outline"
-                size="xs"
-                onClick={toggleSecretVisibility}
-                disabled={isLoading}
-                className="size-9"
-                aria-label={showSecret ? 'Hide Secret' : 'Show Secret'}
-                trailingIcon={showSecret ? RiEyeOffLine : RiEyeLine}
-              />
-            )}
+            <Input
+              className="cursor-default !text-neutral-500"
+              disabled
+              value={secret ? (showSecret ? value : maskSecret(value ?? '')) : value}
+              readOnly={readOnly}
+              trailingNode={
+                <CopyButton
+                  valueToCopy={value ?? ''}
+                  className="rounded-none border-l border-neutral-200 shadow-none ring-0"
+                />
+              }
+              inlineTrailingNode={
+                secret && (
+                  <button type="button" onClick={toggleSecretVisibility}>
+                    {showSecret ? (
+                      <RiEyeOffLine className="text-text-soft group-has-[disabled]:text-text-disabled size-5" />
+                    ) : (
+                      <RiEyeLine className="text-text-soft group-has-[disabled]:text-text-disabled size-5" />
+                    )}
+                  </button>
+                )
+              }
+            />
           </>
         )}
       </div>
