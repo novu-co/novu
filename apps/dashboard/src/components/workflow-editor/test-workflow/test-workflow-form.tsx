@@ -55,7 +55,7 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
 
   return (
     <div className="flex w-full flex-1 flex-col gap-3 overflow-hidden p-3">
-      <div className="grid flex-grow grid-cols-1 gap-3 xl:grid-cols-[1fr_2fr]">
+      <div className="grid h-1/2 flex-1 shrink-0 grid-cols-1 gap-3 xl:grid-cols-[1fr_2fr]">
         <Panel className="h-full">
           <PanelHeader>
             <RiSendPlaneFill className="size-4" />
@@ -93,7 +93,13 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
               <FormItem className="h-full">
                 <FormControl>
                   <PanelContent>
-                    <Editor lang="json" basicSetup={basicSetup} extensions={extensions} {...restField} />
+                    <Editor
+                      lang="json"
+                      basicSetup={basicSetup}
+                      extensions={extensions}
+                      className="overflow-auto"
+                      {...restField}
+                    />
                     <FormMessage />
                   </PanelContent>
                 </FormControl>
@@ -103,7 +109,7 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
         </Panel>
       </div>
 
-      <div className="flex h-1/3 flex-1 flex-col">
+      <div className="flex h-1/2 flex-1 flex-col">
         <Panel className="flex flex-1 flex-col overflow-hidden">
           <Tabs
             className="flex max-h-full flex-1 flex-col border-none"

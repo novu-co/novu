@@ -112,7 +112,7 @@ const AmountUnitSelect = ({
       <SelectTrigger
         className={cn(
           HEIGHT[size].trigger,
-          'gap-1 rounded-l-none border-x-0 border-y-0 border-l bg-neutral-50 p-2 text-xs'
+          'gap-1 rounded-l-none border-x-0 border-y-0 border-l bg-neutral-50 p-2 text-xs ring-0 focus:ring-0'
         )}
       >
         <SelectValue />
