@@ -154,7 +154,7 @@
     "@novu/testing": "workspace:*",
     "@pandacss/dev": "^0.42.0",
     "@pandacss/studio": "^0.42.0",
-    "@playwright/test": "^1.44.0",
+    "@playwright/test": "^1.46.1",
     "@storybook/addon-actions": "^7.4.2",
     "@storybook/addon-essentials": "^7.4.2",
     "@storybook/addon-links": "^7.4.2",
