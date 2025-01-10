@@ -59,7 +59,7 @@ contexts.forEach((context: Context) => {
       await bridgeServer.stop();
     });
 
-    it.only(`should trigger the bridge workflow with sync [${context.name}]`, async () => {
+    it(`should trigger the bridge workflow with sync [${context.name}]`, async () => {
       const workflowId = `hello-world-${`${context.name}`}`;
       const newWorkflow = workflow(
         workflowId,
