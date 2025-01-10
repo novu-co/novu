@@ -97,14 +97,14 @@ jobs:
         shell: bash
         run: wait-on --timeout=180000 http://127.0.0.1:1342/v1/health-check
 
-      - name: Run E2E tests
+      - name: Run Novu V1 E2E tests
         if: ${{ !inputs.ee }}
         env:
           LAUNCH_DARKLY_SDK_KEY: ${{ secrets.LAUNCH_DARKLY_SDK_KEY }}
         run: |
           pnpm --filter @novu/api-service test:e2e:novu-v1
 
-      - name: Run E2E EE tests
+      - name: Run Novu V2 E2E tests
         if: ${{ needs.check_submodule_token.outputs.has_token == 'true' && inputs.ee }}
         env:
           LAUNCH_DARKLY_SDK_KEY: ${{ secrets.LAUNCH_DARKLY_SDK_KEY }}
