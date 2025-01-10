@@ -87,8 +87,8 @@ export class GeneratePreviewUsecase {
         const validVariableNames = variables.validVariables.map((variable) => variable.name);
 
         const tipTapNode = isStringTipTapNode(controlValue) ? JSON.parse(controlValue) : controlValue;
-        const eachValues = this.extractEachKeyValues(tipTapNode);
-        const variablesExampleResult = this.buildVariablesExample(eachValues, validVariableNames);
+        const iterableArrayPaths = this.extractIterableArrayPaths(tipTapNode);
+        const variablesExampleResult = this.buildVariablesExample(iterableArrayPaths, validVariableNames);
 
         previewTemplateData = {
           variablesExample: _.merge(previewTemplateData.variablesExample, variablesExampleResult),
@@ -149,7 +149,7 @@ export class GeneratePreviewUsecase {
    * @returns variables example object, iterable values will be tripled
    *
    * @example
-   * eachValues = ["payload.comments"]
+   * iterableArrayPaths = ["payload.comments"]
    * validVariableNames = [ "payload.title", "payload.comments.author" ]
    *
    * result = {
@@ -169,30 +169,72 @@ export class GeneratePreviewUsecase {
    *   }
    * }
    */
-  private buildVariablesExample(eachValues: string[], validVariableNames: string[]) {
+  private buildVariablesExample(iterableArrayPaths: string[], allVariableNames: string[]) {
     const result = {};
 
-    // handle regular variables
-    validVariableNames
-      .filter((varName) => !eachValues.some((each) => varName.startsWith(each)))
-      .forEach((varName) => _.set(result, varName, `{{${varName}}}`));
-
-    // handle array variables
-    eachValues.forEach((arrayPath) => {
-      const arrayVars = validVariableNames.filter((varName) => varName.startsWith(`${arrayPath}.`));
-      if (arrayVars.length) {
-        const arrayItem = {};
-        arrayVars.forEach((varName) => {
-          const propertyPath = varName.replace(`${arrayPath}.`, '');
-          _.set(arrayItem, propertyPath, `{{${varName}}}`);
-        });
-
-        // create an array with three copies of the arrayItem for example purposes
-        _.set(result, arrayPath, [arrayItem, arrayItem, arrayItem]);
-      }
-    });
+    this.processRegularVariables(result, allVariableNames, iterableArrayPaths);
+    this.processIterableArrays(result, allVariableNames, iterableArrayPaths);
 
     return result;
+  }
+
+  private processRegularVariables(
+    result: Record<string, unknown>,
+    allVariableNames: string[],
+    iterableArrayPaths: string[]
+  ): void {
+    const isNotPartOfArray = (varName: string) =>
+      !iterableArrayPaths.some((arrayPath) => varName.startsWith(arrayPath));
+
+    const regularVariables = allVariableNames.filter(isNotPartOfArray);
+
+    for (const varName of regularVariables) {
+      _.set(result, varName, `{{${varName}}}`);
+    }
+  }
+
+  private processIterableArrays(
+    result: Record<string, unknown>,
+    allVariableNames: string[],
+    iterableArrayPaths: string[]
+  ): void {
+    const EXAMPLE_ARRAY_SIZE = 3;
+
+    for (const arrayPath of iterableArrayPaths) {
+      const arrayVariables = allVariableNames.filter((varName) => varName.startsWith(`${arrayPath}.`));
+
+      if (arrayVariables.length === 0) {
+        const simpleArray = Array(EXAMPLE_ARRAY_SIZE).fill(`{{${arrayPath}}}`);
+        _.set(result, arrayPath, simpleArray);
+        continue;
+      }
+
+      const arrayItemTemplate = this.buildArrayItemTemplate(arrayPath, arrayVariables);
+      const exampleArray = Array(EXAMPLE_ARRAY_SIZE).fill(arrayItemTemplate);
+
+      _.set(result, arrayPath, exampleArray);
+    }
+  }
+
+  /**
+   * @example
+   * arrayPath = "payload.comments"
+   * arrayVariables = ["payload.comments.author", "payload.comments.text"]
+   *
+   * result = {
+   *   author: "{{payload.comments.author}}",
+   *   text: "{{payload.comments.text}}"
+   * }
+   */
+  private buildArrayItemTemplate(arrayPath: string, arrayVariables: string[]): Record<string, string> {
+    const template = {};
+
+    for (const varName of arrayVariables) {
+      const propertyPath = varName.replace(`${arrayPath}.`, '');
+      _.set(template, propertyPath, `{{${varName}}}`);
+    }
+
+    return template;
   }
 
   /**
@@ -207,7 +249,7 @@ export class GeneratePreviewUsecase {
    *
    * result = ["payload.comments"]
    */
-  private extractEachKeyValues(node: TipTapNode): string[] {
+  private extractIterableArrayPaths(node: TipTapNode): string[] {
     const eachValues: string[] = [];
 
     if (node.attrs?.each) {
@@ -216,7 +258,7 @@ export class GeneratePreviewUsecase {
 
     if (node.content) {
       for (const childNode of node.content) {
-        eachValues.push(...this.extractEachKeyValues(childNode));
+        eachValues.push(...this.extractIterableArrayPaths(childNode));
       }
     }
 
