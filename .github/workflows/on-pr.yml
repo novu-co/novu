@@ -244,37 +244,6 @@ jobs:
       job-name: 'novu/api-ee'
       test-unit: false
     secrets: inherit
-  
-  test_e2e_web:
-    name: E2E test Web app
-    needs: [get-affected]
-    if: ${{ contains(fromJson(needs.get-affected.outputs.test-e2e), '@novu/web') }}
-    uses: ./.github/workflows/reusable-web-e2e.yml
-    secrets: inherit
-    with:
-      ee: true
-
-  test_e2e_dashboard:
-    name: E2E test Dashboard app
-    needs: [get-affected]
-    if: ${{ contains(fromJson(needs.get-affected.outputs.test-e2e), '@novu/dashboard') }}
-    uses: ./.github/workflows/reusable-dashboard-e2e.yml
-    secrets: inherit
-    with:
-      ee: true
-
-  test_e2e_widget:
-    name: E2E test Widget
-    needs: [get-affected]
-    uses: ./.github/workflows/reusable-widget-e2e.yml
-    if: ${{ contains(fromJson(needs.get-affected.outputs.test-cypress), '@novu/widget') || contains(fromJson(needs.get-affected.outputs.test-unit), '@novu/notification-center') || contains(fromJson(needs.get-affected.outputs.test-unit), '@novu/ws') }}
-    with:
-      ee: true
-      test-e2e-affected: true
-      test-e2e-ee-affected: true
-      job-name: 'novu/api-ee'
-      test-unit: false
-    secrets: inherit
 
   test_e2e_web:
     name: E2E test Web app
@@ -301,3 +270,4 @@ jobs:
     with:
       ee: true
     if: ${{ contains(fromJson(needs.get-affected.outputs.test-cypress), '@novu/widget') || contains(fromJson(needs.get-affected.outputs.test-unit), '@novu/notification-center') || contains(fromJson(needs.get-affected.outputs.test-unit), '@novu/ws') }}
+    secrets: inherit
