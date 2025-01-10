@@ -105,8 +105,6 @@ export class JobsService {
       runDelayedImmediately: async () => {
         const delayedJobs = await this.standardQueue.getDelayed();
 
-        console.log('Delayed jobs', delayedJobs);
-
         await delayedJobs.forEach(async (job) => {
           job.changeDelay(1);
         });

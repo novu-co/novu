@@ -40,18 +40,21 @@ const clerkClientMock = new ClerkClientMock();
 
 function getEEUserRepository() {
   // nx-ignore-next-line
-  const EnterpriseUserRepository = require('@novu/ee-auth').EEUserRepository;
+  const { EnterpriseUserRepository } = require('@novu/ee-auth');
+
   return new EnterpriseUserRepository(new CommunityUserRepository(), clerkClientMock);
 }
 
 function getEEOrganizationRepository() {
   // nx-ignore-next-line
-  const EEOrganizationRepository = require('@novu/ee-auth').EEOrganizationRepository;
+  const { EEOrganizationRepository } = require('@novu/ee-auth');
+
   return new EEOrganizationRepository(new CommunityOrganizationRepository(), clerkClientMock);
 }
 
 function getEEMemberRepository() {
   // nx-ignore-next-line
-  const EEMemberRepository = require('@novu/ee-auth').EEMemberRepository;
+  const { EEMemberRepository } = require('@novu/ee-auth');
+
   return new EEMemberRepository(new CommunityOrganizationRepository(), clerkClientMock);
 }

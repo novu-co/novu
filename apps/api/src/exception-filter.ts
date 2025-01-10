@@ -6,7 +6,6 @@ import { captureException } from '@sentry/node';
 import { ZodError } from 'zod';
 import { InternalServerErrorException } from '@nestjs/common/exceptions/internal-server-error.exception';
 import { ErrorDto, ValidationErrorDto } from './error-dto';
-import { error } from 'node:console';
 
 const ERROR_MSG_500 = `Internal server error, contact support and provide them with the errorId`;
 export class AllExceptionsFilter implements ExceptionFilter {

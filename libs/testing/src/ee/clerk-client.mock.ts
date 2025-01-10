@@ -1,3 +1,5 @@
+import type { User } from '@clerk/backend';
+import type { UserAPI, OrganizationAPI } from '@clerk/backend/dist/api/endpoints';
 import {
   CLERK_USER_1,
   CLERK_USER_2,
@@ -5,8 +7,6 @@ import {
   CLERK_ORGANIZATION_2,
   CLERK_ORGANIZATION_1_MEMBERSHIP_1,
 } from './clerk-mock-data';
-import type { UserAPI, OrganizationAPI } from '@clerk/backend/dist/api/endpoints';
-import type { ClerkClient, User } from '@clerk/backend';
 
 type MakeWritable<T, K extends keyof T> = {
   -readonly [P in K]: T[P];
@@ -64,6 +64,7 @@ export class ClerkClientMock {
         if (params.emailAddress && params.emailAddress.length > 0) {
           return user.emailAddresses.some((emailAddress) => emailAddress.emailAddress === params.emailAddress[0]);
         }
+
         return true;
       });
 
@@ -87,6 +88,7 @@ export class ClerkClientMock {
     const deleteUser: UserAPI['deleteUser'] = async (userId) => {
       const user = this.getUserById(userId);
       this.clerkUsers.delete(userId);
+
       return user;
     };
 
@@ -135,6 +137,7 @@ export class ClerkClientMock {
         organization: CLERK_ORGANIZATION_1,
       };
       this.clerkOrganizationMemberships.push(newMembership);
+
       return newMembership;
     };
 
@@ -160,6 +163,7 @@ export class ClerkClientMock {
     const deleteOrganization: OrganizationAPI['deleteOrganization'] = async (organizationId) => {
       const organization = this.clerkOrganizations.get(organizationId);
       this.clerkOrganizations.delete(organizationId);
+
       return organization;
     };
 
