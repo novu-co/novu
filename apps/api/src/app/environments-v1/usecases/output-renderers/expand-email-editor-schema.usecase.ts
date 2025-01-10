@@ -13,10 +13,15 @@ export class ExpandEmailEditorSchemaUsecase {
   async execute(command: ExpandEmailEditorSchemaCommand): Promise<TipTapNode> {
     const emailSchemaHydrated = this.hydrate(command);
 
-    return await this.processShowAndForControls(
+    const processed = await this.processSpecialNodeTypes(
       command.fullPayloadForRender as unknown as Record<string, unknown>,
       emailSchemaHydrated
     );
+
+    // needs to be done after the special node types are processed
+    this.processVariableNodeTypes(processed, command.fullPayloadForRender as unknown as Record<string, unknown>);
+
+    return processed;
   }
 
   private hydrate(command: ExpandEmailEditorSchemaCommand) {
@@ -28,40 +33,90 @@ export class ExpandEmailEditorSchemaUsecase {
     return hydratedEmailSchema;
   }
 
-  private async processShowAndForControls(
-    variables: Record<string, unknown>,
+  private async processSpecialNodeTypes(variables: Record<string, unknown>, rootNode: TipTapNode): Promise<TipTapNode> {
+    const processedNode = structuredClone(rootNode);
+    await this.traverseAndProcessNodes(processedNode, variables);
+
+    return processedNode;
+  }
+
+  private async traverseAndProcessNodes(
     node: TipTapNode,
-    parentNode?: TipTapNode
-  ): Promise<TipTapNode> {
-    if (node.content) {
-      const processedContent: TipTapNode[] = [];
-      for (const innerNode of node.content) {
-        const processed = await this.processShowAndForControls(variables, innerNode, parentNode);
-        if (processed) {
-          processedContent.push(processed);
+    variables: Record<string, unknown>,
+    parent?: TipTapNode
+  ): Promise<void> {
+    const queue: Array<{ node: TipTapNode; parent?: TipTapNode }> = [{ node, parent }];
+
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      await this.processNode(current.node, variables, current.parent);
+
+      if (current.node.content) {
+        for (const childNode of current.node.content) {
+          queue.push({ node: childNode, parent: current.node });
         }
       }
-      node.content = processedContent;
     }
-
-    if (this.hasShow(node)) {
-      await this.hideShowIfNeeded(variables, node, parentNode);
-    } else if (this.hasEach(node)) {
-      const newContent = this.expendedForEach(node);
-      node.content = newContent;
-      if (parentNode && parentNode.content) {
-        this.insertArrayAt(parentNode.content, parentNode.content.indexOf(node), newContent);
-        parentNode.content.splice(parentNode.content.indexOf(node), 1);
-      }
-    }
-
-    return node;
   }
-  private insertArrayAt(array: any[], index: number, newArray: any[]) {
-    if (index < 0 || index > array.length) {
-      throw new Error('Index out of bounds');
+
+  private async processNode(node: TipTapNode, variables: Record<string, unknown>, parent?: TipTapNode): Promise<void> {
+    if (this.hasShow(node)) {
+      await this.handleShowNode(node, variables, parent);
     }
-    array.splice(index, 0, ...newArray);
+
+    if (this.hasEach(node)) {
+      await this.handleEachNode(node, variables, parent);
+    }
+  }
+
+  private async handleShowNode(
+    node: TipTapNode & { attrs: { showIfKey: unknown } },
+    variables: Record<string, unknown>,
+    parent?: TipTapNode
+  ): Promise<void> {
+    const shouldShow = await this.evaluateShowCondition(variables, node);
+    if (!shouldShow && parent?.content) {
+      parent.content = parent.content.filter((pNode) => pNode !== node);
+
+      return;
+    }
+    if (node.attrs) {
+      delete node.attrs[MailyAttrsEnum.SHOW_IF_KEY];
+    }
+  }
+
+  private async handleEachNode(
+    node: TipTapNode & { attrs: { each: unknown } },
+    variables: Record<string, unknown>,
+    parent?: TipTapNode
+  ): Promise<void> {
+    const newContent = this.multiplyForEachNode(node, variables);
+    if (parent?.content) {
+      const nodeIndex = parent.content.indexOf(node);
+      parent.content = [...parent.content.slice(0, nodeIndex), ...newContent, ...parent.content.slice(nodeIndex + 1)];
+    } else {
+      node.content = newContent;
+    }
+  }
+
+  private async evaluateShowCondition(
+    variables: Record<string, unknown>,
+    node: TipTapNode & { attrs: { [MailyAttrsEnum.SHOW_IF_KEY]: unknown } }
+  ): Promise<boolean> {
+    const { [MailyAttrsEnum.SHOW_IF_KEY]: showIfKey } = node.attrs;
+    if (showIfKey === undefined) return true;
+
+    const parsedShowIfValue = await parseLiquid(showIfKey as string, variables);
+
+    return typeof parsedShowIfValue === 'boolean' ? parsedShowIfValue : this.stringToBoolean(parsedShowIfValue);
+  }
+
+  private processVariableNodeTypes(node: TipTapNode, variables: Record<string, unknown>) {
+    if (this.isAVariableNode(node)) {
+      node.type = 'text'; // set 'variable' to 'text' to for Liquid to recognize it
+    }
+
+    node.content?.forEach((innerNode) => this.processVariableNodeTypes(innerNode, variables));
   }
 
   private hasEach(node: TipTapNode): node is TipTapNode & { attrs: { each: unknown } } {
@@ -69,19 +124,7 @@ export class ExpandEmailEditorSchemaUsecase {
   }
 
   private hasShow(node: TipTapNode): node is TipTapNode & { attrs: { [MailyAttrsEnum.SHOW_IF_KEY]: string } } {
-    return node.attrs?.[MailyAttrsEnum.SHOW_IF_KEY] !== undefined;
-  }
-
-  private regularExpansion(eachObject: any, templateContent: TipTapNode[]): TipTapNode[] {
-    const expandedContent: TipTapNode[] = [];
-    const jsonArrOfValues = eachObject as unknown as [{ [key: string]: string }];
-
-    for (const value of jsonArrOfValues) {
-      const hydratedContent = this.replacePlaceholders(templateContent, value);
-      expandedContent.push(...hydratedContent);
-    }
-
-    return expandedContent;
+    return node.attrs?.[MailyAttrsEnum.SHOW_IF_KEY] !== undefined && node.attrs?.[MailyAttrsEnum.SHOW_IF_KEY] !== null;
   }
 
   private isOrderedList(templateContent: TipTapNode[]) {
@@ -92,60 +135,74 @@ export class ExpandEmailEditorSchemaUsecase {
     return templateContent.length === 1 && templateContent[0].type === 'bulletList';
   }
 
-  private expendedForEach(node: TipTapNode & { attrs: { each: unknown } }): TipTapNode[] {
-    const eachObject = node.attrs.each;
-    const templateContent = node.content || [];
+  /**
+   * For 'each' node, multiply the content by the number of items in the iterable array
+   * and add indexes to the placeholders.
+   *
+   * @example
+   * node:
+   * {
+   *   type: 'each',
+   *   attrs: { each: 'payload.comments' },
+   *   content: [
+   *     { type: 'variable', text: '{{ payload.comments.author }}' }
+   *   ]
+   * }
+   *
+   * variables:
+   * { payload: { comments: [{ author: 'John Doe' }, { author: 'Jane Doe' }] } }
+   *
+   * result:
+   * [
+   *   { type: 'text', text: '{{ payload.comments[0].author }}' },
+   *   { type: 'text', text: '{{ payload.comments[1].author }}' }
+   * ]
+   *
+   */
+  private multiplyForEachNode(
+    node: TipTapNode & { attrs: { each: unknown } },
+    variables: Record<string, unknown>
+  ): TipTapNode[] {
+    const iterablePath = node.attrs.each as string;
+    const nodeContent = node.content || [];
+    const expandedContent: TipTapNode[] = [];
 
-    /*
-     * Due to maily limitations in the current implementation, the location of the for
-     * element is situated on the container of the list making the list a
-     *  child of the for element, if we iterate it we will get the
-     *  wrong behavior of multiple lists instead of list with multiple items.
-     * due to that when we choose the content to iterate in case we find a list we drill down additional level
-     * and iterate on the list items
-     * this prevents us from
-     * 1. item1
-     * 1. item2
-     *
-     * and turns it into
-     * 1.item1
-     * 2.item2
-     * which is the correct behavior
-     *
-     */
-    if ((this.isOrderedList(templateContent) || this.isBulletList(templateContent)) && templateContent[0].content) {
-      return [{ ...templateContent[0], content: this.regularExpansion(eachObject, templateContent[0].content) }];
+    const iterableArray = this.getValueByPath(variables, iterablePath) as [{ [key: string]: unknown }];
+
+    for (const [index] of iterableArray.entries()) {
+      const contentToExpand =
+        (this.isOrderedList(nodeContent) || this.isBulletList(nodeContent)) && nodeContent[0].content
+          ? nodeContent[0].content
+          : nodeContent;
+
+      const hydratedContent = this.addIndexesToPlaceholders(contentToExpand, iterablePath, index);
+      expandedContent.push(...hydratedContent);
     }
 
-    return this.regularExpansion(eachObject, templateContent);
+    return expandedContent;
   }
 
-  private removeNodeFromParent(node: TipTapNode, parentNode?: TipTapNode) {
-    if (parentNode && parentNode.content) {
-      parentNode.content.splice(parentNode.content.indexOf(node), 1);
-    }
-  }
+  private addIndexesToPlaceholders(nodes: TipTapNode[], iterablePath: string, index: number): TipTapNode[] {
+    return nodes.map((node) => {
+      const newNode: TipTapNode = { ...node };
 
-  private async hideShowIfNeeded(
-    variables: Record<string, unknown>,
-    node: TipTapNode & { attrs: { [MailyAttrsEnum.SHOW_IF_KEY]: unknown } },
-    parentNode?: TipTapNode
-  ): Promise<void> {
-    const { [MailyAttrsEnum.SHOW_IF_KEY]: showIfKey } = node.attrs;
+      if (this.isAVariableNode(newNode)) {
+        const nodePlaceholder = newNode.text as string;
 
-    if (showIfKey === undefined) {
-      return;
-    }
+        /**
+         * example:
+         * iterablePath = payload.comments
+         * nodePlaceholder = {{ payload.comments.author }}
+         * text = {{ payload.comments[0].author }}
+         */
+        newNode.text = nodePlaceholder.replace(iterablePath, `${iterablePath}[${index}]`);
+        newNode.type = 'text'; // set 'variable' to 'text' to for Liquid to recognize it
+      } else if (newNode.content) {
+        newNode.content = this.addIndexesToPlaceholders(newNode.content, iterablePath, index);
+      }
 
-    const parsedShowIfValue = await parseLiquid(showIfKey as string, variables);
-    const showIfValueBoolean =
-      typeof parsedShowIfValue === 'boolean' ? parsedShowIfValue : this.stringToBoolean(parsedShowIfValue);
-
-    if (!showIfValueBoolean) {
-      this.removeNodeFromParent(node, parentNode);
-    } else {
-      delete node.attrs[MailyAttrsEnum.SHOW_IF_KEY];
-    }
+      return newNode;
+    });
   }
 
   private stringToBoolean(value: unknown): boolean {
@@ -157,27 +214,7 @@ export class ExpandEmailEditorSchemaUsecase {
   }
 
   private isAVariableNode(newNode: TipTapNode): newNode is TipTapNode & { attrs: { id: string } } {
-    return newNode.type === 'payloadValue' && newNode.attrs?.id !== undefined;
-  }
-
-  private replacePlaceholders(nodes: TipTapNode[], payload: Record<string, any>): TipTapNode[] {
-    return nodes.map((node) => {
-      const newNode: TipTapNode = { ...node };
-
-      if (this.isAVariableNode(newNode)) {
-        const valueByPath = this.getValueByPath(payload, newNode.attrs.id);
-        if (valueByPath) {
-          newNode.text = valueByPath;
-          newNode.type = 'text';
-          // @ts-ignore
-          delete newNode.attrs;
-        }
-      } else if (newNode.content) {
-        newNode.content = this.replacePlaceholders(newNode.content, payload);
-      }
-
-      return newNode;
-    });
+    return newNode.type === 'variable';
   }
 
   private getValueByPath(obj: Record<string, any>, path: string): any {

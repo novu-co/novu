@@ -33,8 +33,7 @@ import { GeneratePreviewCommand } from './generate-preview.command';
 import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
 import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
 import { Variable } from '../../util/template-parser/liquid-parser';
-import { keysToObject } from '../../util/utils';
-import { isObjectTipTapNode } from '../../util/tip-tap.util';
+import { isObjectTipTapNode, isStringTipTapNode } from '../../util/tip-tap.util';
 import { buildVariables } from '../../util/build-variables';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
@@ -86,7 +85,10 @@ export class GeneratePreviewUsecase {
         const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalidVariables);
 
         const validVariableNames = variables.validVariables.map((variable) => variable.name);
-        const variablesExampleResult = keysToObject(validVariableNames, { fn: (key) => `{{${key}}}` });
+
+        const tipTapNode = isStringTipTapNode(controlValue) ? JSON.parse(controlValue) : controlValue;
+        const eachValues = this.extractEachKeyValues(tipTapNode);
+        const variablesExampleResult = this.buildVariablesExample(eachValues, validVariableNames);
 
         previewTemplateData = {
           variablesExample: _.merge(previewTemplateData.variablesExample, variablesExampleResult),
@@ -100,6 +102,7 @@ export class GeneratePreviewUsecase {
       }
 
       const mergedVariablesExample = this.mergeVariablesExample(workflow, previewTemplateData, commandVariablesExample);
+
       const executeOutput = await this.executePreviewUsecase(
         command,
         stepData,
@@ -136,6 +139,88 @@ export class GeneratePreviewUsecase {
         previewPayloadExample: {},
       } as any;
     }
+  }
+
+  /**
+   * Builds the variables example object for the preview
+   *
+   * @param eachValues - name of the iterable arrays (e.g. "payload.comments")
+   * @param validVariableNames - name of all the variables (e.g. "payload.comments.author")
+   * @returns variables example object, iterable values will be tripled
+   *
+   * @example
+   * eachValues = ["payload.comments"]
+   * validVariableNames = [ "payload.title", "payload.comments.author" ]
+   *
+   * result = {
+   *   payload: {
+   *     title: "{{payload.title}}",
+   *     comments: [
+   *       {
+   *         author: "{{payload.comments.author}}"
+   *       },
+   *      {
+   *         author: "{{payload.comments.author}}"
+   *       },
+   *    {
+   *         author: "{{payload.comments.author}}"
+   *       }
+   *     ]
+   *   }
+   * }
+   */
+  private buildVariablesExample(eachValues: string[], validVariableNames: string[]) {
+    const result = {};
+
+    // handle regular variables
+    validVariableNames
+      .filter((varName) => !eachValues.some((each) => varName.startsWith(each)))
+      .forEach((varName) => _.set(result, varName, `{{${varName}}}`));
+
+    // handle array variables
+    eachValues.forEach((arrayPath) => {
+      const arrayVars = validVariableNames.filter((varName) => varName.startsWith(`${arrayPath}.`));
+      if (arrayVars.length) {
+        const arrayItem = {};
+        arrayVars.forEach((varName) => {
+          const propertyPath = varName.replace(`${arrayPath}.`, '');
+          _.set(arrayItem, propertyPath, `{{${varName}}}`);
+        });
+
+        // create an array with three copies of the arrayItem for example purposes
+        _.set(result, arrayPath, [arrayItem, arrayItem, arrayItem]);
+      }
+    });
+
+    return result;
+  }
+
+  /**
+   * Extracts the each key values from all "for" nodes in the TipTap json
+   *
+   * @example
+   * node = {
+   *   type: "for",
+   *   attrs: { each: "payload.comments" },
+   *   content: [ ... ]
+   * }
+   *
+   * result = ["payload.comments"]
+   */
+  private extractEachKeyValues(node: TipTapNode): string[] {
+    const eachValues: string[] = [];
+
+    if (node.attrs?.each) {
+      eachValues.push(node.attrs.each);
+    }
+
+    if (node.content) {
+      for (const childNode of node.content) {
+        eachValues.push(...this.extractEachKeyValues(childNode));
+      }
+    }
+
+    return eachValues;
   }
 
   private sanitizeControlsForPreview(initialControlValues: Record<string, unknown>, stepData: StepResponseDto) {

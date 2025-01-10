@@ -19,9 +19,9 @@ export const forSnippet = {
               text: 'this is a food item with name  ',
             },
             {
-              type: 'payloadValue',
+              type: 'variable',
               attrs: {
-                id: 'name',
+                id: 'payload.food.items.name',
                 label: null,
               },
             },
@@ -54,9 +54,9 @@ export const forSnippet = {
                       },
                       content: [
                         {
-                          type: 'payloadValue',
+                          type: 'variable',
                           attrs: {
-                            id: 'header',
+                            id: 'payload.food.warnings.header',
                             label: null,
                           },
                         },
@@ -308,7 +308,7 @@ export function fullCodeSnippet(stepId?: string) {
               {
                 type: 'for',
                 attrs: {
-                  each: stepId ? `steps.${stepId}.events` : 'payload.origins',
+                  each: 'payload.origins',
                   isUpdatingKey: false,
                 },
                 content: [
@@ -335,23 +335,23 @@ export function fullCodeSnippet(stepId?: string) {
                                 text: 'a list item: ',
                               },
                               {
-                                type: 'payloadValue',
+                                type: 'variable',
                                 attrs: {
-                                  id: stepId ? 'payload.country' : 'origin.country',
+                                  id: 'payload.origins.country',
                                   label: null,
                                 },
                               },
                               {
-                                type: 'payloadValue',
+                                type: 'variable',
                                 attrs: {
-                                  id: 'id',
+                                  id: 'payload.origins.id',
                                   label: null,
                                 },
                               },
                               {
-                                type: 'payloadValue',
+                                type: 'variable',
                                 attrs: {
-                                  id: 'time',
+                                  id: 'payload.origins.time',
                                   label: null,
                                 },
                               },
@@ -412,9 +412,9 @@ export function fullCodeSnippet(stepId?: string) {
                                 text: 'bulleted list item: ',
                               },
                               {
-                                type: 'payloadValue',
+                                type: 'variable',
                                 attrs: {
-                                  id: 'id',
+                                  id: 'payload.students.id',
                                   label: null,
                                 },
                               },
@@ -423,9 +423,9 @@ export function fullCodeSnippet(stepId?: string) {
                                 text: '  and name: ',
                               },
                               {
-                                type: 'payloadValue',
+                                type: 'variable',
                                 attrs: {
-                                  id: 'name',
+                                  id: 'payload.students.name',
                                   label: null,
                                 },
                               },
@@ -501,9 +501,9 @@ export function fullCodeSnippet(stepId?: string) {
                 text: 'this is a food item with name  ',
               },
               {
-                type: 'payloadValue',
+                type: 'variable',
                 attrs: {
-                  id: 'name',
+                  id: 'payload.food.items.name',
                   label: null,
                 },
               },
@@ -536,9 +536,9 @@ export function fullCodeSnippet(stepId?: string) {
                         },
                         content: [
                           {
-                            type: 'payloadValue',
+                            type: 'variable',
                             attrs: {
-                              id: 'header',
+                              id: 'payload.food.warnings.header',
                               label: null,
                             },
                           },

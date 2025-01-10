@@ -39,12 +39,12 @@ export class HydrateEmailSchemaUseCase {
     index: number
   ) {
     content[index] = {
-      type: 'text',
+      type: 'variable',
       text: node.attrs.id,
     };
   }
 
-  private forNodeLogic(
+  private async forNodeLogic(
     node: TipTapNode & {
       attrs: { each: string };
     },
@@ -54,15 +54,11 @@ export class HydrateEmailSchemaUseCase {
     placeholderAggregation: PlaceholderAggregation
   ) {
     const itemPointerToDefaultRecord = this.collectAllItemPlaceholders(node);
-    const resolvedValueForPlaceholder = this.getResolvedValueForPlaceholder(
-      masterPayload,
-      node,
-      itemPointerToDefaultRecord,
-      placeholderAggregation
-    );
+    await this.getResolvedValueForPlaceholder(masterPayload, node, itemPointerToDefaultRecord, placeholderAggregation);
+
     content[index] = {
-      type: 'for',
-      attrs: { each: resolvedValueForPlaceholder },
+      type: 'paragraph',
+      attrs: { each: node.attrs.each },
       content: node.content,
     };
   }
@@ -133,7 +129,7 @@ export class HydrateEmailSchemaUseCase {
       if (node.type === 'for') {
         return;
       }
-      if (this.isPayloadValue(node)) {
+      if (this.isVariableNode(node)) {
         const { id } = node.attrs;
         payloadValues[`${node.attrs.id}`] = node.attrs.fallback || `{{item.${id}}}`;
       }
@@ -176,10 +172,6 @@ export class HydrateEmailSchemaUseCase {
     });
 
     return mockPayload;
-  }
-
-  private isPayloadValue(node: TipTapNode): node is { type: 'payloadValue'; attrs: { id: string; fallback?: string } } {
-    return !!(node.type === 'payloadValue' && node.attrs && typeof node.attrs.id === 'string');
   }
 }
 
