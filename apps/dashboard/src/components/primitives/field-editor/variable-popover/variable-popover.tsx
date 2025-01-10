@@ -7,13 +7,12 @@ import {
   CommandList,
 } from '@/components/primitives/command';
 import { FormControl, FormItem } from '@/components/primitives/form/form';
-import { Input, InputField } from '@/components/primitives/input';
+import { Input } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Switch } from '@/components/primitives/switch';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { RiAddFill } from 'react-icons/ri';
 import { useDebounce } from '../../../../hooks/use-debounce';
-import { Code2 } from '../../../icons/code-2';
 import { Separator } from '../../separator';
 import { TransformerItem } from './components/transformer-item';
 import { TransformerList } from './components/transformer-list';
@@ -127,10 +126,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
               <FormControl>
                 <div className="grid gap-1">
                   <label className="text-text-sub text-label-xs">Variable name</label>
-                  <InputField size="fit" className="min-h-0">
-                    <Code2 className="text-text-sub h-4 w-4 min-w-4" />
-                    <Input value={name} onChange={(e) => handleNameChange(e.target.value)} className="h-7 text-sm" />
-                  </InputField>
+                  <Input value={name} onChange={(e) => handleNameChange(e.target.value)} className="h-7 text-sm" />
                 </div>
               </FormControl>
             </FormItem>
@@ -139,13 +135,11 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
               <FormControl>
                 <div className="grid gap-1">
                   <label className="text-text-sub text-label-xs">Default value</label>
-                  <InputField size="fit" className="min-h-0">
-                    <Input
-                      value={defaultVal}
-                      onChange={(e) => handleDefaultValueChange(e.target.value)}
-                      className="h-7 text-sm"
-                    />
-                  </InputField>
+                  <Input
+                    value={defaultVal}
+                    onChange={(e) => handleDefaultValueChange(e.target.value)}
+                    className="h-7 text-sm"
+                  />
                 </div>
               </FormControl>
             </FormItem>
@@ -161,13 +155,11 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
               <FormItem>
                 <FormControl>
                   <div className="grid gap-1">
-                    <InputField size="fit" className="min-h-0">
-                      <Input
-                        value={currentLiquidValue}
-                        onChange={(e) => handleRawLiquidChange(e.target.value)}
-                        className="h-7 text-sm"
-                      />
-                    </InputField>
+                    <Input
+                      value={currentLiquidValue}
+                      onChange={(e) => handleRawLiquidChange(e.target.value)}
+                      className="h-7 text-sm"
+                    />
                   </div>
                 </FormControl>
               </FormItem>
@@ -195,7 +187,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
                             value={searchQuery}
                             onValueChange={setSearchQuery}
                             placeholder="Search modifiers..."
-                            inputFieldClassName="h-7"
+                            className="h-7"
                           />
                         </div>
 

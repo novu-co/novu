@@ -23,7 +23,7 @@ export const BaseBody = () => {
         <FormItem className="w-full">
           <FormControl>
             <InputRoot hasError={!!fieldState.error}>
-              <InputWrapper className="h-36 px-1">
+              <InputWrapper className="h-36 items-start p-3 py-2">
                 <FieldEditor
                   placeholder={capitalize(field.name)}
                   id={field.name}

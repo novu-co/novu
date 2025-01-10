@@ -23,7 +23,7 @@ export const BaseSubject = () => {
         <FormItem className="w-full">
           <FormControl>
             <InputRoot hasError={!!fieldState.error}>
-              <InputWrapper className="px-1">
+              <InputWrapper className="h-9 p-2.5">
                 <FieldEditor
                   singleLine
                   indentWithTab={false}
