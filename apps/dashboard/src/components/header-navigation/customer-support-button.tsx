@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useBootIntercom } from '@/hooks/use-boot-intercom';
-import { RiQuestionFill } from 'react-icons/ri';
-import { HeaderButton } from './header-button';
 import { PLAIN_SUPPORT_CHAT_APP_ID } from '@/config';
 import { useAuth } from '@/context/auth/hooks';
+import { useBootIntercom } from '@/hooks/use-boot-intercom';
 import * as Sentry from '@sentry/react';
+import { useEffect, useState } from 'react';
+import { RiQuestionFill } from 'react-icons/ri';
+import { HeaderButton } from './header-button';
 
 // Add type declaration for Plain chat widget
 declare global {
@@ -59,7 +59,6 @@ export const CustomerSupportButton = () => {
               url: 'https://notify.novu.co/meetings/novuhq/novu-discovery-session-rr?utm_campaign=in_app_live_chat',
             },
           ],
-          entryPoint: 'default',
           theme: 'light',
 
           style: {
