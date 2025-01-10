@@ -33,7 +33,7 @@ type SelectTriggerProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.
 
 const SelectTrigger = React.forwardRef<React.ElementRef<typeof SelectPrimitive.Trigger>, SelectTriggerProps>(
   ({ className, children, size, ...props }, ref) => (
-    <SelectPrimitive.Trigger ref={ref} className={selectTriggerVariants({ size, className })} {...props}>
+    <SelectPrimitive.Trigger ref={ref} className={cn(selectTriggerVariants({ size, className }))} {...props}>
       {children}
       <SelectPrimitive.Icon asChild>
         <CaretSortIcon className="h-4 w-4 opacity-50" />
