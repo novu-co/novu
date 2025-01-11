@@ -20,6 +20,7 @@ export enum MailyAttrsEnum {
   URL = 'url',
   SRC = 'src',
   EXTERNAL_LINK = 'externalLink',
+  HREF = 'href',
 }
 
 const MAILY_FIRST_CITIZEN_VARIABLE_KEY = [
@@ -62,7 +63,7 @@ export const variableAttributeConfig = (type: MailyContentTypeEnum) => {
 
   if (type === MailyContentTypeEnum.LINK) {
     return [
-      { attr: MailyAttrsEnum.URL, flag: MailyAttrsEnum.IS_URL_VARIABLE },
+      { attr: MailyAttrsEnum.HREF, flag: MailyAttrsEnum.IS_URL_VARIABLE },
       ...commonConfig,
     ];
   }
