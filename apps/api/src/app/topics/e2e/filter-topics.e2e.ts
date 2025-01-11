@@ -9,7 +9,7 @@ import { TopicsControllerAssignResponse } from '@novu/api/models/operations';
 import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
 const BASE_PATH = '/v1/topics';
-describe('Filter topics - /topics (GET)', async () => {
+describe('Filter topics - /topics (GET) #novu-v2', async () => {
   let firstSubscriber: SubscriberEntity;
   let secondSubscriber: SubscriberEntity;
   let session: UserSession;

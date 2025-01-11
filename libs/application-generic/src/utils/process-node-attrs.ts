@@ -5,15 +5,33 @@ export enum MailyContentTypeEnum {
   FOR = 'for',
   BUTTON = 'button',
   IMAGE = 'image',
+  LINK = 'link',
+}
+
+export enum MailyAttrsEnum {
+  ID = 'id',
+  SHOW_IF_KEY = 'showIfKey',
 }
 
 export const variableAttributeConfig = (type: MailyContentTypeEnum) => {
-  //todo add variable type
+  const commonConfig = [
+    /*
+     * Maily Variable Map
+     * * maily_id equals to maily_variable
+     * * https://github.com/arikchakma/maily.to/blob/ebcf233eb1d4b16fb568fb702bf0756678db38d0/packages/render/src/maily.tsx#L787
+     */
+    { attr: 'id', flag: 'id' },
+    /*
+     * showIfKey is always a maily_variable
+     */
+    { attr: 'showIfKey', flag: 'showIfKey' },
+  ];
+
   if (type === MailyContentTypeEnum.BUTTON) {
     return [
       { attr: 'text', flag: 'isTextVariable' },
       { attr: 'url', flag: 'isUrlVariable' },
-      { attr: 'showIfKey', flag: 'showIfKey' },
+      ...commonConfig,
     ];
   }
 
@@ -21,28 +39,55 @@ export const variableAttributeConfig = (type: MailyContentTypeEnum) => {
     return [
       { attr: 'src', flag: 'isSrcVariable' },
       { attr: 'externalLink', flag: 'isExternalLinkVariable' },
-      { attr: 'showIfKey', flag: 'showIfKey' },
+      ...commonConfig,
     ];
   }
 
-  return [{ attr: 'showIfKey', flag: 'showIfKey' }];
+  if (type === MailyContentTypeEnum.LINK) {
+    return [{ attr: 'href', flag: 'isUrlVariable' }, ...commonConfig];
+  }
+
+  return commonConfig;
 };
+
+function processAttributes(
+  attrs: Record<string, unknown>,
+  type: MailyContentTypeEnum,
+): void {
+  if (!attrs) return;
+
+  const typeConfig = variableAttributeConfig(type);
+
+  for (const { attr, flag } of typeConfig) {
+    if (attrs[flag] && attrs[attr]) {
+      // eslint-disable-next-line no-param-reassign
+      attrs[attr] = wrapInLiquidOutput(
+        attrs[attr] as string,
+        attrs.fallback as string,
+      );
+    }
+  }
+}
 
 export function processNodeAttrs(node: JSONContent): JSONContent {
   if (!node.attrs) return node;
 
-  const typeConfig = variableAttributeConfig(node.type as MailyContentTypeEnum);
+  processAttributes(node.attrs, node.type as MailyContentTypeEnum);
 
-  for (const { attr, flag } of typeConfig) {
-    if (node.attrs[flag] && node.attrs[attr]) {
-      // eslint-disable-next-line no-param-reassign
-      node.attrs[attr] = wrapInLiquidOutput(node.attrs[attr] as string);
+  return node;
+}
+
+export function processNodeMarks(node: JSONContent): JSONContent {
+  if (!node.marks) return node;
+
+  for (const mark of node.marks) {
+    if (mark.attrs) {
+      processAttributes(mark.attrs, mark.type as MailyContentTypeEnum);
     }
   }
 
   return node;
 }
 
-export function wrapInLiquidOutput(value: string): string {
-  return `{{${value}}}`;
-}
+const wrapInLiquidOutput = (variableName: string, fallback?: string) =>
+  `{{ ${variableName}${fallback ? ` | default: '${fallback}'` : ''} }}`;

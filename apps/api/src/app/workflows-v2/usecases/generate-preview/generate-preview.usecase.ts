@@ -2,13 +2,15 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import _ from 'lodash';
 import Ajv, { ErrorObject } from 'ajv';
 import addFormats from 'ajv-formats';
+import { captureException } from '@sentry/node';
+
 import {
   ChannelTypeEnum,
   createMockObjectFromSchema,
   GeneratePreviewResponseDto,
   JobStatusEnum,
   PreviewPayload,
-  StepDataDto,
+  StepResponseDto,
   WorkflowOriginEnum,
   TipTapNode,
   StepTypeEnum,
@@ -22,8 +24,8 @@ import {
   PinoLogger,
   dashboardSanitizeControlValues,
 } from '@novu/application-generic';
-import { captureException } from '@sentry/node';
 import { channelStepSchemas, actionStepSchemas } from '@novu/framework/internal';
+
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
 import { BuildStepDataUsecase } from '../build-step-data';
@@ -70,7 +72,7 @@ export class GeneratePreviewUsecase {
       if (!sanitizedValidatedControls && workflow.origin === WorkflowOriginEnum.NOVU_CLOUD) {
         throw new Error(
           // eslint-disable-next-line max-len
-          'Control values normalization failed: The normalizeControlValues function requires maintenance to sanitize the provided type or data structure correctly'
+          'Control values normalization failed, normalizeControlValues function requires maintenance to sanitize the provided type or data structure correctly'
         );
       }
 
@@ -136,7 +138,7 @@ export class GeneratePreviewUsecase {
     }
   }
 
-  private sanitizeControlsForPreview(initialControlValues: Record<string, unknown>, stepData: StepDataDto) {
+  private sanitizeControlsForPreview(initialControlValues: Record<string, unknown>, stepData: StepResponseDto) {
     const sanitizedValues = dashboardSanitizeControlValues(this.logger, initialControlValues, stepData.type);
 
     return sanitizeControlValuesByOutputSchema(sanitizedValues || {}, stepData.type);
@@ -224,7 +226,7 @@ export class GeneratePreviewUsecase {
   @Instrument()
   private async executePreviewUsecase(
     command: GeneratePreviewCommand,
-    stepData: StepDataDto,
+    stepData: StepResponseDto,
     hydratedPayload: PreviewPayload,
     controlValues: Record<string, unknown>
   ) {

@@ -3,9 +3,9 @@ import { ChannelTypeEnum } from '@novu/shared';
 import { useFetchWorkflows } from '../../hooks/use-fetch-workflows';
 import { useForm } from 'react-hook-form';
 import { Form, FormItem, FormField } from '../primitives/form/form';
-import { Button } from '../primitives/button';
 import { FacetedFormFilter } from '../primitives/form/faceted-filter/facated-form-filter';
 import { CalendarIcon } from 'lucide-react';
+import { Button } from '../primitives/button';
 
 export type ActivityFilters = {
   onFiltersChange: (filters: ActivityFiltersData) => void;
@@ -178,7 +178,7 @@ export function ActivityFilters({ onFiltersChange, initialValues, onReset }: Act
         />
 
         {hasChanges && (
-          <Button variant="ghost" size="sm" className="h-[28px]" onClick={handleReset}>
+          <Button variant="secondary" mode="ghost" size="2xs" onClick={handleReset}>
             Reset
           </Button>
         )}

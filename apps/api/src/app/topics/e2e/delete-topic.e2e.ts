@@ -7,7 +7,7 @@ import { addSubscribers, createTopic, getTopic } from './helpers/topic-e2e-helpe
 
 const BASE_PATH = '/v1/topics';
 
-describe('Delete a topic - /topics/:topicKey (DELETE)', async () => {
+describe('Delete a topic - /topics/:topicKey (DELETE) #novu-v2', async () => {
   let session: UserSession;
   let novuClient: Novu;
 

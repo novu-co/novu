@@ -5,7 +5,7 @@ import { UserSession } from '@novu/testing';
 import { MessageRepository, NotificationTemplateEntity, SubscriberRepository } from '@novu/dal';
 import { ChannelTypeEnum } from '@novu/shared';
 
-describe('Remove messages by bulk - /widgets/messages/bulk/delete (POST)', function () {
+describe('Remove messages by bulk - /widgets/messages/bulk/delete (POST) #novu-v1', function () {
   const messageRepository = new MessageRepository();
   let session: UserSession;
   let template: NotificationTemplateEntity;

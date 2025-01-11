@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { Novu } from '@novu/api';
 import { expectSdkExceptionGeneric, initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-describe('Topic creation - /topics (POST)', async () => {
+describe('Topic creation - /topics (POST) #novu-v2', async () => {
   let session: UserSession;
   let novuClient: Novu;
 

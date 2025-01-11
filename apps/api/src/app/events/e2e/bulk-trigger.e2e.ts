@@ -13,7 +13,7 @@ import {
   initNovuFunctionSdk,
 } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-describe('Trigger bulk events - /v1/events/trigger/bulk (POST)', function () {
+describe('Trigger bulk events - /v1/events/trigger/bulk (POST) #novu-v2', function () {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let secondTemplate: NotificationTemplateEntity;

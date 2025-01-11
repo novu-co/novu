@@ -18,7 +18,7 @@ import {
 
 import { mapToDto } from '../utils/notification-mapper';
 
-describe('Mark Notification As - /inbox/notifications/:id/{read,unread,archive,unarchive} (PATCH)', async () => {
+describe('Mark Notification As - /inbox/notifications/:id/{read,unread,archive,unarchive} (PATCH) #novu-v2', async () => {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let subscriber: SubscriberEntity | null;

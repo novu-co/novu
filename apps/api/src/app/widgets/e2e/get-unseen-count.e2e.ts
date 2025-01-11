@@ -11,7 +11,7 @@ import {
   InvalidateCacheService,
 } from '@novu/application-generic';
 
-describe('Unseen Count - GET /widget/notifications/unseen', function () {
+describe('Unseen Count - GET /widget/notifications/unseen #novu-v1', function () {
   const messageRepository = new MessageRepository();
   let session: UserSession;
   let template: NotificationTemplateEntity;

@@ -12,6 +12,7 @@ import { ModuleRef } from '@nestjs/core';
 
 import {
   ChangeRepository,
+  ControlValuesRepository,
   MessageTemplateRepository,
   NotificationGroupRepository,
   NotificationStepEntity,
@@ -22,8 +23,10 @@ import {
 import {
   buildWorkflowPreferences,
   ChangeEntityTypeEnum,
+  ControlValuesLevelEnum,
   isBridgeWorkflow,
   PreferencesTypeEnum,
+  WorkflowOriginEnum,
 } from '@novu/shared';
 
 import {
@@ -59,6 +62,7 @@ import {
   UpdateMessageTemplate,
   UpdateMessageTemplateCommand,
 } from '../../message-template';
+import { Instrument, InstrumentUsecase } from '../../../instrumentation';
 
 /**
  * @deprecated - use `UpsertWorkflow` instead
@@ -87,8 +91,10 @@ export class UpdateWorkflow {
     private deletePreferencesUsecase: DeletePreferencesUseCase,
     @Inject(forwardRef(() => GetWorkflowByIdsUseCase))
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
+    private controlValuesRepository: ControlValuesRepository,
   ) {}
 
+  @InstrumentUsecase()
   async execute(
     command: UpdateWorkflowCommand,
   ): Promise<WorkflowInternalResponseDto> {
@@ -367,8 +373,10 @@ export class UpdateWorkflow {
 
     try {
       if (
-        process.env.NOVU_ENTERPRISE === 'true' ||
-        process.env.CI_EE_TEST === 'true'
+        (process.env.NOVU_ENTERPRISE === 'true' ||
+          process.env.CI_EE_TEST === 'true') &&
+        notificationTemplateWithStepTemplate.origin ===
+          WorkflowOriginEnum.NOVU_CLOUD_V1
       ) {
         if (!require('@novu/ee-shared-services')?.TranslationsService) {
           throw new PlatformException('Translation module is not loaded');
@@ -417,6 +425,7 @@ export class UpdateWorkflow {
     }
   }
 
+  @Instrument()
   private async updateMessageTemplates(
     steps: NotificationStep[],
     command: UpdateWorkflowCommand,
@@ -515,6 +524,7 @@ export class UpdateWorkflow {
     return templateMessages;
   }
 
+  @Instrument()
   private updateTriggers(
     updatePayload: Partial<WorkflowInternalResponseDto>,
     steps: NotificationStep[],
@@ -732,6 +742,7 @@ export class UpdateWorkflow {
     return variantsList;
   }
 
+  @Instrument()
   private async deleteRemovedSteps(
     existingSteps: NotificationStepEntity[] | StepVariantEntity[] | undefined,
     command: UpdateWorkflowCommand,
@@ -753,6 +764,14 @@ export class UpdateWorkflow {
           workflowType: command.type,
         }),
       );
+
+      await this.controlValuesRepository.delete({
+        _environmentId: command.environmentId,
+        _organizationId: command.organizationId,
+        _workflowId: command.id,
+        _stepId: id,
+        level: ControlValuesLevelEnum.STEP_CONTROLS,
+      });
     }
   }
 }

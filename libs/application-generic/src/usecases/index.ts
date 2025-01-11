@@ -48,4 +48,3 @@ export * from './get-preferences';
 export * from './delete-preferences';
 export * from './get-decrypted-secret-key';
 export * from './tier-restrictions-validate';
-export * from './delete-control-values';

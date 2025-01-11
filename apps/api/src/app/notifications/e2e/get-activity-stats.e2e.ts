@@ -12,7 +12,7 @@ import { expect } from 'chai';
 import { formatISO, subDays, subWeeks, subMonths } from 'date-fns';
 import { v4 as uuid } from 'uuid';
 
-describe('Get activity stats - /notifications/stats (GET)', async () => {
+describe('Get activity stats - /notifications/stats (GET) #novu-v2', async () => {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   const messageRepository = new MessageRepository();

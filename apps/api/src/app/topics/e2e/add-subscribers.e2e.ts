@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { Novu } from '@novu/api';
 import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-describe('Add subscribers to topic - /topics/:topicKey/subscribers (POST)', async () => {
+describe('Add subscribers to topic - /topics/:topicKey/subscribers (POST) #novu-v2', async () => {
   const topicKey = 'topic-key-add-subscribers';
   const topicName = 'topic-name';
   const URL = '/v1/topics';

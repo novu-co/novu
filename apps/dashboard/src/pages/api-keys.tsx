@@ -1,20 +1,19 @@
-import { useState } from 'react';
-import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
-import { useEnvironment } from '@/context/environment/hooks';
-import { CopyButton } from '@/components/primitives/copy-button';
-import { Card, CardContent, CardHeader } from '@/components/primitives/card';
-import { Button } from '@/components/primitives/button';
-import { Input, InputField } from '@/components/primitives/input';
-import { Form } from '@/components/primitives/form/form';
-import { useForm } from 'react-hook-form';
-import { DashboardLayout } from '../components/dashboard-layout';
 import { PageMeta } from '@/components/page-meta';
-import { useFetchApiKeys } from '../hooks/use-fetch-api-keys';
+import { Card, CardContent, CardHeader } from '@/components/primitives/card';
+import { CopyButton } from '@/components/primitives/copy-button';
+import { Form } from '@/components/primitives/form/form';
+import { Input } from '@/components/primitives/input';
+import { Skeleton } from '@/components/primitives/skeleton';
 import { ExternalLink } from '@/components/shared/external-link';
+import { useEnvironment } from '@/context/environment/hooks';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
+import { DashboardLayout } from '../components/dashboard-layout';
 import { Container } from '../components/primitives/container';
 import { HelpTooltipIndicator } from '../components/primitives/help-tooltip-indicator';
 import { API_HOSTNAME } from '../config';
-import { Skeleton } from '@/components/primitives/skeleton';
+import { useFetchApiKeys } from '../hooks/use-fetch-api-keys';
 
 interface ApiKeysFormData {
   apiKey: string;
@@ -160,28 +159,29 @@ function SettingField({
           </>
         ) : (
           <>
-            <InputField className="flex overflow-hidden pr-0">
-              <Input
-                className="cursor-default"
-                value={secret ? (showSecret ? value : maskSecret(value ?? '')) : value}
-                readOnly={readOnly}
-              />
-              <CopyButton size="input-right" valueToCopy={value ?? ''} />
-            </InputField>
-
-            {secret && (
-              <Button
-                variant="outline"
-                size="icon"
-                // TODO: Icon size variant is size-8 but doesn't align with the size of the input. We should fix this.
-                className="size-9"
-                onClick={toggleSecretVisibility}
-                disabled={isLoading}
-                aria-label={showSecret ? 'Hide Secret' : 'Show Secret'}
-              >
-                {showSecret ? <RiEyeOffLine className="size-4" /> : <RiEyeLine className="size-4" />}
-              </Button>
-            )}
+            <Input
+              className="cursor-default !text-neutral-500"
+              disabled
+              value={secret ? (showSecret ? value : maskSecret(value ?? '')) : value}
+              readOnly={readOnly}
+              trailingNode={
+                <CopyButton
+                  valueToCopy={value ?? ''}
+                  className="rounded-none border-l border-neutral-200 shadow-none ring-0"
+                />
+              }
+              inlineTrailingNode={
+                secret && (
+                  <button type="button" onClick={toggleSecretVisibility}>
+                    {showSecret ? (
+                      <RiEyeOffLine className="text-text-soft group-has-[disabled]:text-text-disabled size-5" />
+                    ) : (
+                      <RiEyeLine className="text-text-soft group-has-[disabled]:text-text-disabled size-5" />
+                    )}
+                  </button>
+                )
+              }
+            />
           </>
         )}
       </div>
