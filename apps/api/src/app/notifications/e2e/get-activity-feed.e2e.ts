@@ -3,7 +3,7 @@ import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
 import { ChannelTypeEnum, StepTypeEnum, IMessage } from '@novu/shared';
 
-describe('Get activity feed - /notifications (GET)', async () => {
+describe('Get activity feed - /notifications (GET) #novu-v2', async () => {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let smsOnlyTemplate: NotificationTemplateEntity;

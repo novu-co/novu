@@ -10,7 +10,7 @@ import {
   ChannelTypeEnum,
 } from '@novu/shared';
 
-describe('Get Notifications Count - /inbox/notifications/count (GET)', async () => {
+describe('Get Notifications Count - /inbox/notifications/count (GET) #novu-v2', async () => {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let subscriber: SubscriberEntity | null;

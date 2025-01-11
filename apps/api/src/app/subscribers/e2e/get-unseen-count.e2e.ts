@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import axios from 'axios';
 import { NotificationTemplateEntity, SubscriberRepository } from '@novu/dal';
 
-describe('Get Unseen Count - /:subscriberId/notifications/unseen (GET)', function () {
+describe('Get Unseen Count - /:subscriberId/notifications/unseen (GET) #novu-v2', function () {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let subscriberId: string;

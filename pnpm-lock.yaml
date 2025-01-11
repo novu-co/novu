@@ -3455,6 +3455,9 @@ importers:
 
   libs/testing:
     dependencies:
+      '@clerk/backend':
+        specifier: ^1.6.2
+        version: 1.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@clerk/clerk-sdk-node':
         specifier: ^5.0.19
         version: 5.0.19(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3503,9 +3506,6 @@ importers:
       jsonwebtoken:
         specifier: 9.0.0
         version: 9.0.0
-      mongoose:
-        specifier: ^7.5.0
-        version: 7.5.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.716.0(@aws-sdk/client-sts@3.716.0)))
       ng-intercom:
         specifier: ^8.0.2
         version: 8.0.2

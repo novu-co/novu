@@ -4,7 +4,7 @@ import { MessageRepository, NotificationTemplateEntity, SubscriberRepository } f
 import { UserSession } from '@novu/testing';
 import { ChannelTypeEnum } from '@novu/shared';
 
-describe('Unread Count - GET /widget/notifications/unread', function () {
+describe('Unread Count - GET /widget/notifications/unread #novu-v1', function () {
   const messageRepository = new MessageRepository();
   let session: UserSession;
   let template: NotificationTemplateEntity;

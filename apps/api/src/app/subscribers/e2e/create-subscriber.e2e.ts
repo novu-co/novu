@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const axiosInstance = axios.create();
 
-describe('Create Subscriber - /subscribers (POST)', function () {
+describe('Create Subscriber - /subscribers (POST) #novu-v2', function () {
   let session: UserSession;
   const subscriberRepository = new SubscriberRepository();
 

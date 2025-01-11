@@ -7,7 +7,7 @@ import { ExternalSubscriberId, TopicId, TopicKey, TopicName } from '@novu/shared
 const axiosInstance = axios.create();
 const TOPIC_PATH = '/v1/topics';
 
-describe('Delete Subscriber - /subscribers/:subscriberId (DELETE)', function () {
+describe('Delete Subscriber - /subscribers/:subscriberId (DELETE) #novu-v2', function () {
   let session: UserSession;
   let subscriberService: SubscribersService;
   const subscriberRepository = new SubscriberRepository();

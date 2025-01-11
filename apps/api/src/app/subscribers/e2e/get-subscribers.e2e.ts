@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const axiosInstance = axios.create();
 
-describe('Get Subscribers - /subscribers (GET)', function () {
+describe('Get Subscribers - /subscribers (GET) #novu-v2', function () {
   let session: UserSession;
 
   beforeEach(async () => {

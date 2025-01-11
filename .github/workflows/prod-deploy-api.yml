@@ -125,17 +125,6 @@ jobs:
           # Required.
           bridge-url: https://api.novu.co/v1/bridge/novu
 
-  deploy_docs:
-    needs: deploy_prod_api_us
-    runs-on: ubuntu-latest
-    environment: Production
-    steps:
-      - name: Deploy API Documentation
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: ${{ secrets.API_DOCS_BUILD_WEBHOOK }}
-          method: 'POST'
-
   newrelic:
     runs-on: ubuntu-latest
     name: New Relic Deploy

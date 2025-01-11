@@ -11,7 +11,7 @@ import { UserSession } from '@novu/testing';
 import { Novu } from '@novu/api';
 import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-describe('Trigger event - Send Push Notification - /v1/events/trigger (POST)', () => {
+describe('Trigger event - Send Push Notification - /v1/events/trigger (POST) #novu-v2', () => {
   let session: UserSession;
   let template: NotificationTemplateEntity;
 

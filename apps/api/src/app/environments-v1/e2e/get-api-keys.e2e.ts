@@ -2,7 +2,7 @@ import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
 import { NOVU_ENCRYPTION_SUB_MASK } from '@novu/shared';
 
-describe('Get Environment API Keys - /environments/api-keys (GET)', async () => {
+describe('Get Environment API Keys - /environments/api-keys (GET) #novu-v2', async () => {
   let session: UserSession;
   before(async () => {
     session = new UserSession();

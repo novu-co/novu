@@ -13,7 +13,7 @@ import { ChannelTypeEnum, MessagesStatusEnum } from '@novu/shared';
 
 const axiosInstance = axios.create();
 
-describe('Mark as Seen - /widgets/messages/mark-as (POST)', async () => {
+describe('Mark as Seen - /widgets/messages/mark-as (POST) #novu-v2', async () => {
   const messageRepository = new MessageRepository();
   const subscriberRepository = new SubscriberRepository();
   let session: UserSession;

@@ -9,6 +9,7 @@
     "build:dashboard": "nx build @novu/dashboard",
     "build:embed": "nx build @novu/embed",
     "build:inbound-mail": "nx build @novu/inbound-mail",
+    "build:api_and_worker": "nx run-many --target=build --all --projects=@novu/api-service,@novu/worker",
     "build:packages": "nx run-many --target=build --all --projects=tag:type:package",
     "build:storybook": "nx run @novu/design-system:build-storybook",
     "build:web": "nx build @novu/web",
@@ -31,7 +32,7 @@
     "install:with-ee": "pnpm install && pnpm symlink:submodules",
     "jarvis": "node scripts/jarvis.js",
     "lint-staged": "lint-staged",
-    "lint": "nx run-many  --target=lint --all",
+    "lint": "nx run-many --target=lint --all",
     "nx": "nx",
     "packages:set-latest": "node scripts/set-package-dependencies.mjs latest",
     "packages:set-workspace-protocol": "node scripts/set-package-dependencies.mjs workspace:*",
@@ -203,9 +204,6 @@
     }
   },
   "lint-staged": {
-    "*.{e2e,e2e-ee,spec}.{js,ts}": [
-      "stop-only --file"
-    ],
     "apps/**/*.{ts,tsx,json}": [
       "prettier --ignore-path ./.prettierignore --write"
     ],
