@@ -62,7 +62,7 @@ export const variableAttributeConfig = (type: MailyContentTypeEnum) => {
 
   if (type === MailyContentTypeEnum.LINK) {
     return [
-      { attr: 'href', flag: MailyAttrsEnum.IS_URL_VARIABLE },
+      { attr: MailyAttrsEnum.URL, flag: MailyAttrsEnum.IS_URL_VARIABLE },
       ...commonConfig,
     ];
   }
