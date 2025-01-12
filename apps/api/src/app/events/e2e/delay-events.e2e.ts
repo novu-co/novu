@@ -13,7 +13,7 @@ import { StepTypeEnum, DelayTypeEnum, DigestUnitEnum, DigestTypeEnum, JobTopicNa
 
 const axiosInstance = axios.create();
 
-describe('Trigger event - Delay triggered events - /v1/events/trigger (POST)', function () {
+describe('Trigger event - Delay triggered events - /v1/events/trigger (POST) #novu-v2', function () {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let subscriber: SubscriberEntity;

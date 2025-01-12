@@ -5,7 +5,7 @@ import { NotificationTemplateEntity } from '@novu/dal';
 import { PreferenceLevelEnum } from '@novu/shared';
 import { getPreference, getPreferenceByLevel } from './helpers';
 
-describe('Get Subscribers workflow preferences - /subscribers/:subscriberId/preferences (GET)', function () {
+describe('Get Subscribers workflow preferences - /subscribers/:subscriberId/preferences (GET) #novu-v2', function () {
   let session: UserSession;
   let template: NotificationTemplateEntity;
 

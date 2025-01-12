@@ -17,7 +17,7 @@ import {
   updatePreferences,
 } from './helpers';
 
-describe('Update Subscribers preferences - /subscribers/:subscriberId/preferences/:templateId (PATCH)', function () {
+describe('Update Subscribers preferences - /subscribers/:subscriberId/preferences/:templateId (PATCH) #novu-v2', function () {
   let session: UserSession;
   let template: NotificationTemplateEntity;
 

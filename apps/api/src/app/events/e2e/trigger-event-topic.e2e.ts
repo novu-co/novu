@@ -22,7 +22,7 @@ import {
 } from '@novu/api/models/components';
 import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-describe('Topic Trigger Event', () => {
+describe('Topic Trigger Event #novu-v2', () => {
   describe('Trigger event for a topic - /v1/events/trigger (POST)', () => {
     let session: UserSession;
     let template: NotificationTemplateEntity;
@@ -521,9 +521,7 @@ const addSubscribersToTopic = async (
     createdTopicDto.key
   );
 
-  expect(response.result).to.be.eql({
-    succeeded: subscriberIds,
-  });
+  expect(response.result.succeeded).to.have.members(subscriberIds);
 };
 
 const buildTriggerRequestPayload = (

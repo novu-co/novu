@@ -36,15 +36,3 @@ export const buildRoute = (route: string, params: Record<string, string>) => {
     return acc.replace(`:${key}`, value);
   }, route);
 };
-
-export const LEGACY_ROUTES = {
-  ACTIVITY_FEED: '/legacy/activities',
-  INTEGRATIONS: '/legacy/integrations',
-  API_KEYS: '/legacy/api-keys',
-  BILLING: '/legacy/manage-account/billing',
-  INVITE_TEAM_MEMBERS: '/legacy/manage-account/team-members',
-  SETTINGS: '/legacy/manage-account/user-profile',
-  EDIT_WORKFLOW: '/legacy/workflows/edit/:workflowId',
-  TEST_WORKFLOW: '/legacy/workflows/edit/:workflowId/test-workflow',
-  LOCAL_STUDIO_AUTH: '/legacy/local-studio/auth',
-};

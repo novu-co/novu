@@ -5,7 +5,7 @@ import axios from 'axios';
 
 const axiosInstance = axios.create();
 
-describe('Update Subscriber - /subscribers/:subscriberId (PUT)', function () {
+describe('Update Subscriber - /subscribers/:subscriberId (PUT) #novu-v2', function () {
   let session: UserSession;
   const subscriberRepository = new SubscriberRepository();
 

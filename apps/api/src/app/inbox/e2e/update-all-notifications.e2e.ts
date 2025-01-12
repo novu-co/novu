@@ -10,7 +10,7 @@ import {
   ButtonTypeEnum,
 } from '@novu/shared';
 
-describe('Update All Notifications - /inbox/notifications/{read,archive,read-archive} (POST)', async () => {
+describe('Update All Notifications - /inbox/notifications/{read,archive,read-archive} (POST) #novu-v2', async () => {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let subscriber: SubscriberEntity | null;

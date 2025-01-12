@@ -5,7 +5,7 @@ import { expect } from 'chai';
 import { SubscriberRepository } from '@novu/dal';
 import { getPreference, updateGlobalPreferences } from './helpers';
 
-describe('Update Subscribers global preferences - /subscribers/:subscriberId/preferences (PATCH)', function () {
+describe('Update Subscribers global preferences - /subscribers/:subscriberId/preferences (PATCH) #novu-v2', function () {
   let session: UserSession;
   let subscriberRepository: SubscriberRepository;
 

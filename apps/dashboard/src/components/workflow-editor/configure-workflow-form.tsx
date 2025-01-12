@@ -18,6 +18,7 @@ import { ToastIcon } from '@/components/primitives/sonner';
 import { showToast } from '@/components/primitives/sonner-helpers';
 import { SidebarContent, SidebarHeader } from '@/components/side-navigation/sidebar';
 import { MAX_DESCRIPTION_LENGTH, workflowSchema } from '@/components/workflow-editor/schema';
+import { UpdateWorkflowFn } from '@/components/workflow-editor/workflow-provider';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
@@ -26,7 +27,7 @@ import { useTags } from '@/hooks/use-tags';
 import { ROUTES } from '@/utils/routes';
 import { cn } from '@/utils/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { UpdateWorkflowDto, WorkflowOriginEnum, WorkflowResponseDto } from '@novu/shared';
+import { WorkflowOriginEnum, WorkflowResponseDto } from '@novu/shared';
 import {
   RiArrowRightSLine,
   RiCodeSSlashLine,
@@ -55,7 +56,7 @@ import { usePromotionalBanner } from '../promotional/coming-soon-banner';
 
 type ConfigureWorkflowFormProps = {
   workflow: WorkflowResponseDto;
-  update: (data: UpdateWorkflowDto) => void;
+  update: UpdateWorkflowFn;
 };
 
 const toastOptions: ExternalToast = {

@@ -11,7 +11,7 @@ import {
 } from '@novu/dal';
 import { ChannelTypeEnum, MessagesStatusEnum } from '@novu/shared';
 
-describe('Mark as Seen - /widgets/messages/mark-as (POST)', async () => {
+describe('Mark as Seen - /widgets/messages/mark-as (POST) #novu-v1', async () => {
   const messageRepository = new MessageRepository();
   const subscriberRepository = new SubscriberRepository();
   let session: UserSession;
