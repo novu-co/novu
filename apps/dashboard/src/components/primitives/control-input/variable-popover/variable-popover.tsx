@@ -49,10 +49,10 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
     filters,
     dragOverIndex,
     draggingItem,
-    setDragOverIndex,
-    setDraggingItem,
+    handleDragStart,
+    handleDragEnd,
+    handleDrag,
     handleFilterToggle,
-    moveFilter,
     handleParamChange,
     getFilteredFilters,
   } = useFilterManager({
@@ -205,29 +205,9 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
               filters={filters}
               dragOverIndex={dragOverIndex}
               draggingItem={draggingItem}
-              onDragStart={setDraggingItem}
-              onDragEnd={() => {
-                if (dragOverIndex !== null && draggingItem !== null && draggingItem !== dragOverIndex) {
-                  moveFilter(draggingItem, dragOverIndex);
-                }
-                setDraggingItem(null);
-                setDragOverIndex(null);
-              }}
-              onDrag={(_, info) => {
-                const elements = document.elementsFromPoint(info.point.x, info.point.y);
-                const droppableElement = elements.find(
-                  (el) => el.classList.contains('group') && !el.classList.contains('opacity-50')
-                );
-
-                if (droppableElement) {
-                  const index = parseInt(droppableElement.getAttribute('data-index') || '-1');
-                  if (index !== -1 && dragOverIndex !== index) {
-                    setDragOverIndex(index);
-                  }
-                } else {
-                  setDragOverIndex(null);
-                }
-              }}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+              onDrag={handleDrag}
               onRemove={handleFilterToggle}
               onParamChange={handleParamChange}
             />

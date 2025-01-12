@@ -33,7 +33,7 @@ export function useSortable<T>({ items, onUpdate }: UseSortableProps<T>) {
   }, [dragOverIndex, draggingItem, moveItem]);
 
   const handleDrag = useCallback(
-    (e: any, info: any) => {
+    (_: any, info: any) => {
       const elements = document.elementsFromPoint(info.point.x, info.point.y);
       const droppableElement = elements.find(
         (el) => el.classList.contains('group') && !el.classList.contains('opacity-50')
