@@ -17,7 +17,7 @@ import {
 } from '@novu/shared';
 import { mapToDto } from '../utils/notification-mapper';
 
-describe('Update Notification Action - /inbox/notifications/:id/{complete/revert} (PATCH)', async () => {
+describe('Update Notification Action - /inbox/notifications/:id/{complete/revert} (PATCH) #novu-v2', async () => {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let subscriber: SubscriberEntity | null;

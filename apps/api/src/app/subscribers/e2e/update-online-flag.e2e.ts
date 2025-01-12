@@ -5,7 +5,7 @@ import { SubscriberEntity } from '@novu/dal';
 
 import { updateSubscriberOnlineFlag } from './helpers';
 
-describe('Update Subscriber online flag - /subscribers/:subscriberId/online-status (PATCH)', function () {
+describe('Update Subscriber online flag - /subscribers/:subscriberId/online-status (PATCH) #novu-v2', function () {
   let session: UserSession;
   let onlineSubscriber: SubscriberEntity;
   let offlineSubscriber: SubscriberEntity;

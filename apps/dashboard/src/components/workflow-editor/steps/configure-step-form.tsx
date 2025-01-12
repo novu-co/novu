@@ -1,16 +1,23 @@
 import {
+  FeatureFlagsKeysEnum,
   IEnvironment,
-  StepDataDto,
+  StepResponseDto,
   StepTypeEnum,
   StepUpdateDto,
-  UpdateWorkflowDto,
   WorkflowOriginEnum,
   WorkflowResponseDto,
 } from '@novu/shared';
 import { AnimatePresence, motion } from 'motion/react';
 import { HTMLAttributes, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { RiArrowLeftSLine, RiArrowRightSLine, RiCloseFill, RiDeleteBin2Line, RiPencilRuler2Fill } from 'react-icons/ri';
+import {
+  RiArrowLeftSLine,
+  RiArrowRightSLine,
+  RiCloseFill,
+  RiDeleteBin2Line,
+  RiGuideFill,
+  RiPencilRuler2Fill,
+} from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { ConfirmationModal } from '@/components/confirmation-modal';
@@ -39,6 +46,8 @@ import { ConfigurePushStepPreview } from '@/components/workflow-editor/steps/pus
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { ConfigureSmsStepPreview } from '@/components/workflow-editor/steps/sms/configure-sms-step-preview';
+import { UpdateWorkflowFn } from '@/components/workflow-editor/workflow-provider';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { INLINE_CONFIGURABLE_STEP_TYPES, STEP_TYPE_LABELS, TEMPLATE_CONFIGURABLE_STEP_TYPES } from '@/utils/constants';
 import { buildRoute, ROUTES } from '@/utils/routes';
@@ -71,15 +80,15 @@ const STEP_TYPE_TO_PREVIEW: Record<StepTypeEnum, ((props: HTMLAttributes<HTMLDiv
 type ConfigureStepFormProps = {
   workflow: WorkflowResponseDto;
   environment: IEnvironment;
-  step: StepDataDto;
-  update: (data: UpdateWorkflowDto) => void;
+  step: StepResponseDto;
+  update: UpdateWorkflowFn;
 };
 
 export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   const { step, workflow, update, environment } = props;
   const navigate = useNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
+  const isStepConditionsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_STEP_CONDITIONS_ENABLED);
   const supportedStepTypes = [
     StepTypeEnum.IN_APP,
     StepTypeEnum.SMS,
@@ -99,12 +108,23 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   const isInlineConfigurableStepWithCustomControls = isInlineConfigurableStep && hasCustomControls;
 
   const onDeleteStep = () => {
-    update({ ...workflow, steps: workflow.steps.filter((s) => s._id !== step._id) });
-    navigate(buildRoute(ROUTES.EDIT_WORKFLOW, { environmentSlug: environment.slug!, workflowSlug: workflow.slug }));
+    update(
+      {
+        ...workflow,
+        steps: workflow.steps.filter((s) => s._id !== step._id),
+      },
+      {
+        onSuccess: () => {
+          navigate(
+            buildRoute(ROUTES.EDIT_WORKFLOW, { environmentSlug: environment.slug!, workflowSlug: workflow.slug })
+          );
+        },
+      }
+    );
   };
 
   const registerInlineControlValues = useMemo(() => {
-    return (step: StepDataDto) => {
+    return (step: StepResponseDto) => {
       if (isInlineConfigurableStep) {
         return {
           controlValues: getStepDefaultValues(step),
@@ -298,6 +318,28 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                   </>
                 )
               )}
+            </>
+          )}
+
+          {isStepConditionsEnabled && (
+            <>
+              <SidebarContent>
+                <Link to={'./conditions'} relative="path" state={{ stepType: step.type }}>
+                  <Button
+                    variant="secondary"
+                    mode="outline"
+                    className="flex w-full justify-start gap-1.5 text-xs font-medium"
+                  >
+                    <RiGuideFill className="h-4 w-4 text-neutral-600" />
+                    Step Conditions
+                    <span className="ml-auto flex items-center gap-0.5">
+                      <span>0</span>
+                      <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
+                    </span>
+                  </Button>
+                </Link>
+              </SidebarContent>
+              <Separator />
             </>
           )}
 

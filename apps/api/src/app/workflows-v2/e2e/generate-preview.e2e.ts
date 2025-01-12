@@ -14,7 +14,7 @@ import { EnvironmentRepository, NotificationTemplateEntity, NotificationTemplate
 
 const TEST_WORKFLOW_NAME = 'Test Workflow Name';
 
-describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () => {
+describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview #novu-v2', () => {
   let session: UserSession;
   let workflowsClient: ReturnType<typeof createWorkflowClient>;
   const notificationTemplateRepository = new NotificationTemplateRepository();

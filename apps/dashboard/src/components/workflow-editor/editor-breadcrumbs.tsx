@@ -34,11 +34,6 @@ export const EditorBreadcrumbs = () => {
     {
       label: 'Workflows',
       href: workflowsRoute,
-      node: (
-        <Badge color="gray" size="sm" variant="lighter">
-          BETA
-        </Badge>
-      ),
     },
   ];
 
@@ -57,11 +52,10 @@ export const EditorBreadcrumbs = () => {
       ></CompactButton>
       <Breadcrumb>
         <BreadcrumbList>
-          {breadcrumbs.map(({ label, href, node }) => (
+          {breadcrumbs.map(({ label, href }) => (
             <React.Fragment key={`${href}_${label}`}>
               <BreadcrumbItem className="flex items-center gap-1">
                 <BreadcrumbLink to={href}>{label}</BreadcrumbLink>
-                {node}
               </BreadcrumbItem>
               <BreadcrumbSeparator />
             </React.Fragment>

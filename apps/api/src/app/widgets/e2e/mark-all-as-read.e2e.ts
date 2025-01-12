@@ -4,7 +4,7 @@ import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
 import { ChannelTypeEnum } from '@novu/shared';
 
-describe('Mark all as read - /widgets/messages/seen (POST)', function () {
+describe('Mark all as read - /widgets/messages/seen (POST) #novu-v1', function () {
   const messageRepository = new MessageRepository();
   let session: UserSession;
   let template: NotificationTemplateEntity;

@@ -22,7 +22,7 @@ import {
   ListWorkflowResponse,
   PatchStepDataDto,
   PatchWorkflowDto,
-  StepDataDto,
+  StepResponseDto,
   SyncWorkflowDto,
   UpdateWorkflowDto,
   UserSessionData,
@@ -113,7 +113,7 @@ export class WorkflowController {
   ): Promise<WorkflowResponseDto> {
     return await this.upsertWorkflowUseCase.execute(
       UpsertWorkflowCommand.create({
-        workflowDto: { ...updateWorkflowDto },
+        workflowDto: updateWorkflowDto,
         user,
         workflowIdOrInternalId,
       })
@@ -196,7 +196,7 @@ export class WorkflowController {
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
     @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string,
     @Param('stepId', ParseSlugIdPipe) stepIdOrInternalId: string
-  ): Promise<StepDataDto> {
+  ): Promise<StepResponseDto> {
     return await this.buildStepDataUsecase.execute(
       BuildStepDataCommand.create({ user, workflowIdOrInternalId, stepIdOrInternalId })
     );
@@ -209,7 +209,7 @@ export class WorkflowController {
     @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string,
     @Param('stepId', ParseSlugIdPipe) stepIdOrInternalId: string,
     @Body() patchStepDataDto: PatchStepDataDto
-  ): Promise<StepDataDto> {
+  ): Promise<StepResponseDto> {
     return await this.patchStepDataUsecase.execute(
       PatchStepCommand.create({
         user,

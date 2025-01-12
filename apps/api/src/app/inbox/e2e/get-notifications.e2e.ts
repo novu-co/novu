@@ -11,7 +11,7 @@ import {
 } from '@novu/shared';
 import { mapToDto } from '../utils/notification-mapper';
 
-describe('Get Notifications - /inbox/notifications (GET)', async () => {
+describe('Get Notifications - /inbox/notifications (GET) #novu-v2', async () => {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let subscriber: SubscriberEntity | null;

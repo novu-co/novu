@@ -12,7 +12,7 @@ import {
   HydrateEmailSchemaUseCase,
   InAppOutputRendererUsecase,
   PushOutputRendererUsecase,
-  RenderEmailOutputUsecase,
+  EmailOutputRendererUsecase,
   SmsOutputRendererUsecase,
 } from './usecases/output-renderers';
 import { DelayOutputRendererUsecase } from './usecases/output-renderers/delay-output-renderer.usecase';
@@ -31,11 +31,11 @@ import { DigestOutputRendererUsecase } from './usecases/output-renderers/digest-
     ConstructFrameworkWorkflow,
     GetDecryptedSecretKey,
     InAppOutputRendererUsecase,
-    RenderEmailOutputUsecase,
+    EmailOutputRendererUsecase,
     SmsOutputRendererUsecase,
     ChatOutputRendererUsecase,
     PushOutputRendererUsecase,
-    RenderEmailOutputUsecase,
+    EmailOutputRendererUsecase,
     ExpandEmailEditorSchemaUsecase,
     HydrateEmailSchemaUseCase,
     DelayOutputRendererUsecase,
