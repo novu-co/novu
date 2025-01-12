@@ -41,13 +41,13 @@ import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.us
 import { ListWorkflowsCommand } from './usecases/list-workflows/list-workflows.command';
 import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
 import { SyncToEnvironmentCommand } from './usecases/sync-to-environment/sync-to-environment.command';
-import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
 import { ParseSlugIdPipe } from './pipes/parse-slug-id.pipe';
 import { ParseSlugEnvironmentIdPipe } from './pipes/parse-slug-env-id.pipe';
 import {
   BuildStepDataCommand,
   BuildStepDataUsecase,
   BuildWorkflowTestDataUseCase,
+  GeneratePreviewUsecase,
   WorkflowTestDataCommand,
 } from './usecases';
 import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview.command';
