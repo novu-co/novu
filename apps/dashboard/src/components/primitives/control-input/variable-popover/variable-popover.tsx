@@ -14,15 +14,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { RiAddFill } from 'react-icons/ri';
 import { useDebounce } from '../../../../hooks/use-debounce';
 import { Separator } from '../../separator';
-import { TransformerItem } from './components/transformer-item';
-import { TransformerList } from './components/transformer-list';
-import { useTransformerManager } from './hooks/use-transformer-manager';
+import { FilterItem } from './components/filter-item';
+import { FiltersList } from './components/filters-list';
+import { useFilterManager } from './hooks/use-filter-manager';
 import { useVariableParser } from './hooks/use-variable-parser';
-import type { VariablePopoverProps } from './types';
+import type { FilterWithParam, VariablePopoverProps } from './types';
 import { formatLiquidVariable } from './utils';
 
 export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
-  const { parsedName, parsedDefaultValue, parsedTransformers, originalVariable } = useVariableParser(variable || '');
+  const { parsedName, parsedDefaultValue, parsedFilters, originalVariable } = useVariableParser(variable || '');
   const [name, setName] = useState(parsedName);
   const [defaultVal, setDefaultVal] = useState(parsedDefaultValue);
   const [showRawLiquid, setShowRawLiquid] = useState(false);
@@ -35,8 +35,8 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
   }, [parsedName, parsedDefaultValue]);
 
   const updateVariable = useCallback(
-    (newName: string, newDefaultVal: string, newTransformers: any[]) => {
-      onUpdate(formatLiquidVariable(newName, newDefaultVal, newTransformers));
+    (newName: string, newDefaultVal: string, newFilters: FilterWithParam[]) => {
+      onUpdate(formatLiquidVariable(newName, newDefaultVal, newFilters));
     },
     [onUpdate]
   );
@@ -44,36 +44,36 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
   const debouncedUpdate = useDebounce(updateVariable, 300);
 
   const {
-    transformers,
+    filters,
     dragOverIndex,
     draggingItem,
     setDragOverIndex,
     setDraggingItem,
-    handleTransformerToggle,
-    moveTransformer,
+    handleFilterToggle,
+    moveFilter,
     handleParamChange,
-    getFilteredTransformers,
-  } = useTransformerManager({
-    initialTransformers: parsedTransformers,
-    onUpdate: (newTransformers) => {
-      debouncedUpdate(name, defaultVal, newTransformers);
+    getFilteredFilters,
+  } = useFilterManager({
+    initialFilters: parsedFilters || [],
+    onUpdate: (newFilters) => {
+      debouncedUpdate(name, defaultVal, newFilters);
     },
   });
 
   const handleNameChange = useCallback(
     (newName: string) => {
       setName(newName);
-      debouncedUpdate(newName, defaultVal, transformers);
+      debouncedUpdate(newName, defaultVal, filters);
     },
-    [defaultVal, transformers, debouncedUpdate]
+    [defaultVal, filters, debouncedUpdate]
   );
 
   const handleDefaultValueChange = useCallback(
     (newDefaultVal: string) => {
       setDefaultVal(newDefaultVal);
-      debouncedUpdate(name, newDefaultVal, transformers);
+      debouncedUpdate(name, newDefaultVal, filters);
     },
-    [name, transformers, debouncedUpdate]
+    [name, filters, debouncedUpdate]
   );
 
   const handleRawLiquidChange = useCallback((value: string) => {
@@ -100,14 +100,11 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
     });
   }, []);
 
-  const filteredTransformers = useMemo(
-    () => getFilteredTransformers(searchQuery),
-    [getFilteredTransformers, searchQuery]
-  );
+  const filteredFilters = useMemo(() => getFilteredFilters(searchQuery), [getFilteredFilters, searchQuery]);
 
   const currentLiquidValue = useMemo(
-    () => originalVariable || formatLiquidVariable(name, defaultVal, transformers),
-    [originalVariable, name, defaultVal, transformers]
+    () => originalVariable || formatLiquidVariable(name, defaultVal, filters),
+    [originalVariable, name, defaultVal, filters]
   );
 
   return (
@@ -172,11 +169,11 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
             <FormItem>
               <FormControl>
                 <div className="grid gap-1">
-                  <label className="text-text-sub text-label-xs">Modifiers</label>
+                  <label className="text-text-sub text-label-xs">Filters</label>
                   <Popover open={isCommandOpen} onOpenChange={setIsCommandOpen}>
                     <PopoverTrigger asChild>
                       <button className="text-text-soft bg-background flex h-[30px] w-full items-center justify-between rounded-md border px-2 text-sm">
-                        <span>Add a modifier...</span>
+                        <span>Add a filter...</span>
                         <RiAddFill className="h-4 w-4" />
                       </button>
                     </PopoverTrigger>
@@ -186,25 +183,25 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
                           <CommandInput
                             value={searchQuery}
                             onValueChange={setSearchQuery}
-                            placeholder="Search modifiers..."
+                            placeholder="Search filters..."
                             className="h-7"
                           />
                         </div>
 
                         <CommandList className="max-h-[300px]">
-                          <CommandEmpty>No modifiers found</CommandEmpty>
-                          {filteredTransformers.length > 0 && (
+                          <CommandEmpty>No filters found</CommandEmpty>
+                          {filteredFilters.length > 0 && (
                             <CommandGroup>
-                              {filteredTransformers.map((transformer) => (
+                              {filteredFilters.map((filter) => (
                                 <CommandItem
-                                  key={transformer.value}
+                                  key={filter.value}
                                   onSelect={() => {
-                                    handleTransformerToggle(transformer.value);
+                                    handleFilterToggle(filter.value);
                                     setSearchQuery('');
                                     setIsCommandOpen(false);
                                   }}
                                 >
-                                  <TransformerItem transformer={transformer} />
+                                  <FilterItem filter={filter} />
                                 </CommandItem>
                               ))}
                             </CommandGroup>
@@ -217,14 +214,14 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
               </FormControl>
             </FormItem>
 
-            <TransformerList
-              transformers={transformers}
+            <FiltersList
+              filters={filters}
               dragOverIndex={dragOverIndex}
               draggingItem={draggingItem}
               onDragStart={setDraggingItem}
               onDragEnd={() => {
                 if (dragOverIndex !== null && draggingItem !== null && draggingItem !== dragOverIndex) {
-                  moveTransformer(draggingItem, dragOverIndex);
+                  moveFilter(draggingItem, dragOverIndex);
                 }
                 setDraggingItem(null);
                 setDragOverIndex(null);
@@ -244,7 +241,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
                   setDragOverIndex(null);
                 }
               }}
-              onRemove={handleTransformerToggle}
+              onRemove={handleFilterToggle}
               onParamChange={handleParamChange}
             />
           </div>

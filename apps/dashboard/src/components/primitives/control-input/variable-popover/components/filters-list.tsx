@@ -1,9 +1,9 @@
 import { AnimatePresence } from 'motion/react';
-import { DraggableTransformer } from './draggable-transformer';
-import { TransformerWithParam } from '../types';
+import { FilterWithParam } from '../types';
+import { DraggableFilter } from './draggable-filter';
 
-type TransformerListProps = {
-  transformers: TransformerWithParam[];
+type FiltersListProps = {
+  filters: FilterWithParam[];
   dragOverIndex: number | null;
   draggingItem: number | null;
   onDragStart: (index: number) => void;
@@ -13,8 +13,8 @@ type TransformerListProps = {
   onParamChange: (index: number, params: string[]) => void;
 };
 
-export function TransformerList({
-  transformers,
+export function FiltersList({
+  filters,
   dragOverIndex,
   draggingItem,
   onDragStart,
@@ -22,18 +22,18 @@ export function TransformerList({
   onDrag,
   onRemove,
   onParamChange,
-}: TransformerListProps) {
-  if (transformers.length === 0) return null;
+}: FiltersListProps) {
+  if (filters.length === 0) return null;
 
   return (
     <div className="rounded-8 border-stroke-soft flex flex-col gap-0.5 border px-1 py-1.5">
       <AnimatePresence mode="popLayout">
-        {transformers.map((transformer, index) => (
-          <DraggableTransformer
+        {filters.map((transformer, index) => (
+          <DraggableFilter
             key={transformer.value + index}
             transformer={transformer}
             index={index}
-            isLast={index === transformers.length - 1}
+            isLast={index === filters.length - 1}
             dragOverIndex={dragOverIndex}
             draggingItem={draggingItem}
             onDragStart={onDragStart}

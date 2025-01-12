@@ -4,11 +4,11 @@ import { GripVertical } from 'lucide-react';
 import { motion } from 'motion/react';
 import { forwardRef } from 'react';
 import { RiCloseLine } from 'react-icons/ri';
-import { TRANSFORMERS } from '../constants';
-import { TransformerWithParam } from '../types';
+import { FILTERS } from '../constants';
+import { FilterWithParam } from '../types';
 
-type DraggableTransformerProps = {
-  transformer: TransformerWithParam;
+type DraggableFilterProps = {
+  filter: FilterWithParam;
   index: number;
   isLast: boolean;
   draggingItem: number | null;
@@ -20,31 +20,20 @@ type DraggableTransformerProps = {
   onParamChange: (index: number, params: string[]) => void;
 };
 
-export const DraggableTransformer = forwardRef<HTMLDivElement, DraggableTransformerProps>(
+export const DraggableFilter = forwardRef<HTMLDivElement, DraggableFilterProps>(
   (
-    {
-      transformer,
-      index,
-      isLast,
-      draggingItem,
-      dragOverIndex,
-      onDragStart,
-      onDragEnd,
-      onDrag,
-      onRemove,
-      onParamChange,
-    },
+    { filter, index, isLast, draggingItem, dragOverIndex, onDragStart, onDragEnd, onDrag, onRemove, onParamChange },
     ref
   ) => {
-    const transformerDef = TRANSFORMERS.find((t) => t.value === transformer.value);
+    const filterDef = FILTERS.find((t) => t.value === filter.value);
 
     return (
       <motion.div
         ref={ref}
-        key={transformer.value + index}
+        key={filter.value + index}
         className={`relative ${!isLast ? 'mb-1' : ''}`}
         layout
-        layoutId={transformer.value + index}
+        layoutId={filter.value + index}
         transition={{
           layout: { duration: 0.2, ease: 'easeOut' },
           type: 'spring',
@@ -84,15 +73,15 @@ export const DraggableTransformer = forwardRef<HTMLDivElement, DraggableTransfor
           <GripVertical className="text-text-soft h-3.5 w-3.5" />
           <div className="flex flex-1 items-center gap-1">
             <div className="border-stroke-soft text-text-sub text-paragraph-xs bg-bg-weak rounded-8 flex w-full flex-row items-center border">
-              <div className="px-2 py-1.5 pr-0">{transformerDef?.label}</div>
-              {transformerDef?.hasParam && transformerDef.params && (
+              <div className="px-2 py-1.5 pr-0">{filterDef?.label}</div>
+              {filterDef?.hasParam && filterDef.params && (
                 <div className="flex flex-1 flex-col gap-1 py-1">
-                  {transformerDef.params.map((param, paramIndex) => (
+                  {filterDef.params.map((param, paramIndex) => (
                     <Input
                       key={paramIndex}
-                      value={transformer.params?.[paramIndex] || ''}
+                      value={filter.params?.[paramIndex] || ''}
                       onChange={(e) => {
-                        const newParams = [...(transformer.params || [])];
+                        const newParams = [...(filter.params || [])];
                         newParams[paramIndex] = e.target.value;
                         onParamChange(index, newParams);
                       }}
@@ -110,7 +99,7 @@ export const DraggableTransformer = forwardRef<HTMLDivElement, DraggableTransfor
             mode="ghost"
             size="sm"
             className="text-text-soft hover:text-destructive h-4 w-4 p-0"
-            onClick={() => onRemove(transformer.value)}
+            onClick={() => onRemove(filter.value)}
           >
             <RiCloseLine className="h-3.5 w-3.5" />
           </Button>

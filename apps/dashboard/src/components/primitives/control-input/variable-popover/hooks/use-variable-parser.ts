@@ -1,12 +1,17 @@
 import { Tokenizer, TokenKind } from 'liquidjs';
 import { useMemo } from 'react';
-import { TRANSFORMERS } from '../constants';
-import { TransformerWithParam } from '../types';
+import { FILTERS } from '../constants';
+import { FilterWithParam } from '../types';
 
-export function useVariableParser(variable: string) {
+export function useVariableParser(variable: string): {
+  parsedName: string;
+  parsedDefaultValue: string;
+  parsedFilters: FilterWithParam[];
+  originalVariable: string;
+} {
   return useMemo(() => {
     if (!variable) {
-      return { parsedName: '', parsedDefaultValue: '', parsedTransformers: [], originalVariable: '' };
+      return { parsedName: '', parsedDefaultValue: '', parsedFilters: [], originalVariable: '' };
     }
 
     try {
@@ -17,9 +22,8 @@ export function useVariableParser(variable: string) {
       const [variableName, ...filterParts] = cleanVariable.split('|');
       const parsedName = variableName.trim();
 
-      // Extract default value and transformers from the filters
       let parsedDefaultValue = '';
-      const parsedTransformers: TransformerWithParam[] = [];
+      const parsedFilters: FilterWithParam[] = [];
 
       if (filterParts.length > 0) {
         const filterTokenizer = new Tokenizer('|' + filterParts.join('|'));
@@ -33,14 +37,14 @@ export function useVariableParser(variable: string) {
           }
         }
 
-        // Second pass: collect other transformers
+        // Second pass: collect other filters
         for (const filter of filters) {
           if (
             filter.kind === TokenKind.Filter &&
             filter.name !== 'default' &&
-            TRANSFORMERS.some((t) => t.value === filter.name)
+            FILTERS.some((t) => t.value === filter.name)
           ) {
-            parsedTransformers.push({
+            parsedFilters.push({
               value: filter.name,
               ...(filter.args.length > 0
                 ? {
@@ -57,12 +61,12 @@ export function useVariableParser(variable: string) {
       return {
         parsedName,
         parsedDefaultValue,
-        parsedTransformers,
+        parsedFilters,
         originalVariable: variable,
       };
     } catch (error) {
       console.error('Error parsing variable:', error);
-      return { parsedName: '', parsedDefaultValue: '', parsedTransformers: [], originalVariable: variable };
+      return { parsedName: '', parsedDefaultValue: '', parsedFilters: [], originalVariable: variable };
     }
   }, [variable]);
 }

@@ -1,4 +1,5 @@
-import { TRANSFORMERS } from './constants';
+import { FILTERS } from './constants';
+import { FilterWithParam } from './types';
 
 function escapeString(str: string): string {
   return str.replace(/'/g, "\\'");
@@ -11,27 +12,21 @@ export function formatParamValue(param: string, type?: 'string' | 'number') {
   return `'${escapeString(param)}'`;
 }
 
-export function formatLiquidVariable(
-  name: string,
-  defaultValue: string,
-  transformers: { value: string; params?: string[] }[]
-) {
+export function formatLiquidVariable(name: string, defaultValue: string, filters: FilterWithParam[]) {
   const parts = [name.trim()];
 
   if (defaultValue) {
     parts.push(`default: '${escapeString(defaultValue.trim())}'`);
   }
 
-  transformers.forEach((t) => {
+  filters.forEach((t) => {
     if (t.value === 'default') return;
 
     if (!t.params?.length) {
       parts.push(t.value);
     } else {
-      const transformerDef = TRANSFORMERS.find((def) => def.value === t.value);
-      const formattedParams = t.params.map((param, index) =>
-        formatParamValue(param, transformerDef?.params?.[index]?.type)
-      );
+      const filterDef = FILTERS.find((def) => def.value === t.value);
+      const formattedParams = t.params.map((param, index) => formatParamValue(param, filterDef?.params?.[index]?.type));
 
       parts.push(`${t.value}: ${formattedParams.join(', ')}`);
     }

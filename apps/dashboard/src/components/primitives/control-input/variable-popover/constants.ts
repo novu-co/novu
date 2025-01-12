@@ -1,6 +1,6 @@
-import { Transformer } from './types';
+import { Filters } from './types';
 
-export const TRANSFORMERS: Transformer[] = [
+export const FILTERS: Filters[] = [
   // Text Transformations
   {
     label: 'Uppercase',

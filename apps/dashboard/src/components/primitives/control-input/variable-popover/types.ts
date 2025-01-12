@@ -1,4 +1,4 @@
-export type Transformer = {
+export type Filters = {
   label: string;
   value: string;
   hasParam?: boolean;
@@ -11,7 +11,7 @@ export type Transformer = {
   }[];
 };
 
-export type TransformerWithParam = {
+export type FilterWithParam = {
   value: string;
   params?: string[];
 };

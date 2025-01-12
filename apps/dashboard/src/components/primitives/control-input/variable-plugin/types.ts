@@ -12,5 +12,5 @@ export type VariableMatch = {
   name: string;
   start: number;
   end: number;
-  modifiers: string[];
+  filters: string[];
 };

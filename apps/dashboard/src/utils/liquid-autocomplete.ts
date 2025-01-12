@@ -1,4 +1,4 @@
-import { TRANSFORMERS } from '@/components/primitives/control-input/variable-popover/constants';
+import { FILTERS } from '@/components/primitives/control-input/variable-popover/constants';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 import { CompletionContext, CompletionResult } from '@codemirror/autocomplete';
 
@@ -132,7 +132,7 @@ function createCompletionOption(label: string, type: string, boost?: number): Co
 }
 
 function getFilterCompletions(afterPipe: string): CompletionOption[] {
-  return TRANSFORMERS.filter((f) => f.label.toLowerCase().startsWith(afterPipe.toLowerCase())).map((f) =>
+  return FILTERS.filter((f) => f.label.toLowerCase().startsWith(afterPipe.toLowerCase())).map((f) =>
     createCompletionOption(f.value, 'function')
   );
 }

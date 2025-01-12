@@ -36,7 +36,7 @@ export const variablePillTheme = EditorView.baseTheme({
     WebkitMaskPosition: 'center',
     WebkitMaskSize: 'contain',
   },
-  '.cm-variable-pill.has-modifiers::after': {
+  '.cm-variable-pill.has-filters::after': {
     content: '""',
     width: '4px',
     height: '4px',

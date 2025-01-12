@@ -1,5 +1,5 @@
 import { WidgetType } from '@uiw/react-codemirror';
-import { MODIFIERS_CLASS, VARIABLE_PILL_CLASS } from './';
+import { FILTERS_CLASS, VARIABLE_PILL_CLASS } from './';
 
 export class VariablePillWidget extends WidgetType {
   private clickHandler: (e: MouseEvent) => void;
@@ -9,7 +9,7 @@ export class VariablePillWidget extends WidgetType {
     private fullVariableName: string,
     private start: number,
     private end: number,
-    private hasModifiers: boolean,
+    private hasFilters: boolean,
     private onSelect?: (value: string, from: number, to: number) => void
   ) {
     super();
@@ -27,11 +27,11 @@ export class VariablePillWidget extends WidgetType {
 
   toDOM() {
     const span = document.createElement('span');
-    const pillClass = `${VARIABLE_PILL_CLASS} ${this.hasModifiers ? MODIFIERS_CLASS : ''}`;
+    const pillClass = `${VARIABLE_PILL_CLASS} ${this.hasFilters ? FILTERS_CLASS : ''}`;
 
     span.className = pillClass;
 
-    // Stores the complete variable expression including any filters/transformers
+    // Stores the complete variable expression including any filters
     span.setAttribute('data-variable', this.fullVariableName);
 
     span.setAttribute('data-start', this.start.toString());
@@ -57,7 +57,7 @@ export class VariablePillWidget extends WidgetType {
       other.fullVariableName === this.fullVariableName &&
       other.start === this.start &&
       other.end === this.end &&
-      other.hasModifiers === this.hasModifiers
+      other.hasFilters === this.hasFilters
     );
   }
 

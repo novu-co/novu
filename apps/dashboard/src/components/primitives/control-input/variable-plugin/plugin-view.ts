@@ -1,7 +1,7 @@
 import { Decoration, DecorationSet, EditorView, Range } from '@uiw/react-codemirror';
 import { MutableRefObject } from 'react';
 import { VARIABLE_REGEX } from './';
-import { handleVariableBackspace, handleVariableCompletion, isTypingVariable, parseVariable } from './utils';
+import { handleVariableCompletion, isTypingVariable, parseVariable } from './utils';
 import { VariablePillWidget } from './variable-pill-widget';
 
 export class VariablePluginView {
@@ -26,13 +26,6 @@ export class VariablePluginView {
 
       this.isTypingVariable = isTypingVariable(content, pos);
 
-      // Handle backspace inside a variable
-      if (update.docChanged && update.changes.desc === 'input.delete.backward') {
-        if (handleVariableBackspace(update.view, pos, content)) {
-          return;
-        }
-      }
-
       if (update.docChanged) {
         handleVariableCompletion(update.view, pos, content);
       }
@@ -53,7 +46,7 @@ export class VariablePluginView {
 
     // Iterate through all variable matches in the content and add the pills
     while ((match = VARIABLE_REGEX.exec(content)) !== null) {
-      const { fullLiquidExpression, name, start, end, modifiers } = parseVariable(match);
+      const { fullLiquidExpression, name, start, end, filters } = parseVariable(match);
 
       // Skip creating pills for variables that are currently being edited
       // This allows users to modify variables without the pill getting in the way
@@ -64,14 +57,7 @@ export class VariablePluginView {
       if (name) {
         decorations.push(
           Decoration.replace({
-            widget: new VariablePillWidget(
-              name,
-              fullLiquidExpression,
-              start,
-              end,
-              modifiers?.length > 0,
-              this.onSelect
-            ),
+            widget: new VariablePillWidget(name, fullLiquidExpression, start, end, filters?.length > 0, this.onSelect),
             inclusive: false,
             side: -1,
           }).range(start, end)
