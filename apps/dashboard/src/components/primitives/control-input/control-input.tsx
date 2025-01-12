@@ -16,7 +16,7 @@ type CompletionRange = {
   to: number;
 } | null;
 
-type FieldEditorProps = {
+type ControlInputProps = {
   value: string;
   onChange: (value: string) => void;
   variables: LiquidVariable[];
@@ -40,7 +40,7 @@ export function ControlInput({
   id,
   singleLine,
   indentWithTab,
-}: FieldEditorProps) {
+}: ControlInputProps) {
   const viewRef = useRef<EditorView | null>(null);
   const lastCompletionRef = useRef<CompletionRange>(null);
 
