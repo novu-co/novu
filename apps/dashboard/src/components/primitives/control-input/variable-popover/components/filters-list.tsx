@@ -28,10 +28,10 @@ export function FiltersList({
   return (
     <div className="rounded-8 border-stroke-soft flex flex-col gap-0.5 border px-1 py-1.5">
       <AnimatePresence mode="popLayout">
-        {filters.map((transformer, index) => (
+        {filters.map((filter, index) => (
           <DraggableFilter
-            key={transformer.value + index}
-            transformer={transformer}
+            key={filter.value + index}
+            filter={filter}
             index={index}
             isLast={index === filters.length - 1}
             dragOverIndex={dragOverIndex}
