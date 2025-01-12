@@ -1,6 +1,6 @@
-import { Decoration, DecorationSet, EditorView } from '@uiw/react-codemirror';
+import { Decoration, DecorationSet, EditorView, Range } from '@uiw/react-codemirror';
 import { MutableRefObject } from 'react';
-import { VARIABLE_REGEX } from './constants';
+import { VARIABLE_REGEX } from './';
 import { handleVariableBackspace, handleVariableCompletion, isTypingVariable, parseVariable } from './utils';
 import { VariablePillWidget } from './variable-pill-widget';
 
@@ -46,10 +46,10 @@ export class VariablePluginView {
   }
 
   createDecorations(view: EditorView) {
-    const decorations: any[] = [];
+    const decorations: Range<Decoration>[] = [];
     const content = view.state.doc.toString();
     const pos = view.state.selection.main.head;
-    let match;
+    let match: RegExpExecArray | null = null;
 
     // Iterate through all variable matches in the content and add the pills
     while ((match = VARIABLE_REGEX.exec(content)) !== null) {

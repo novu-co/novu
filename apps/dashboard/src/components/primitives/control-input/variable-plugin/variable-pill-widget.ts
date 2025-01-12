@@ -1,5 +1,5 @@
 import { WidgetType } from '@uiw/react-codemirror';
-import { MODIFIERS_CLASS, VARIABLE_PILL_CLASS } from './constants';
+import { MODIFIERS_CLASS, VARIABLE_PILL_CLASS } from './';
 
 export class VariablePillWidget extends WidgetType {
   private clickHandler: (e: MouseEvent) => void;

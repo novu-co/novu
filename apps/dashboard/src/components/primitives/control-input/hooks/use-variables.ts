@@ -45,9 +45,11 @@ export function useVariables(viewRef: React.RefObject<EditorView>, onChange: (va
 
         // Calculate the actual end position including closing brackets
         const currentContent = view.state.doc.toString();
-        const afterCursor = currentContent.slice(to);
-        const closingBracketPos = afterCursor.indexOf('}}');
-        const actualEnd = closingBracketPos >= 0 ? to + closingBracketPos + 2 : to;
+        const contentAfterFrom = currentContent.slice(from);
+
+        // If there are no next opening brackets, or they come after our closing brackets
+        const closingBracketsPos = contentAfterFrom.indexOf('}}');
+        const actualEnd = closingBracketsPos > -1 ? from + closingBracketsPos + 2 : to;
 
         const changes = {
           from,

@@ -1,5 +1,5 @@
 import { EditorView } from '@uiw/react-codemirror';
-import { VARIABLE_PILL_CLASS } from './constants';
+import { VARIABLE_PILL_CLASS } from './';
 
 export const variablePillTheme = EditorView.baseTheme({
   [`.${VARIABLE_PILL_CLASS}`]: {
