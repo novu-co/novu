@@ -22,17 +22,12 @@ export const WorkflowTags = (props: WorkflowTagsProps) => {
     <div className="flex items-center gap-1">
       <>
         {firstTags.map((tag) => (
-          <Badge
-            key={tag}
-            variant={'soft'}
-            className="text-feature bg-feature/10 max-w-[130px] font-[600]"
-            kind={'pill'}
-          >
+          <Badge key={tag} color="purple" size="md" variant="lighter">
             <TruncatedText>{tag}</TruncatedText>
           </Badge>
         ))}
         {restTags.length > 0 && (
-          <Badge variant={'soft'} className="text-feature bg-feature/10 max-w-[130px] font-[600]" kind="pill">
+          <Badge color="gray" size="md" variant="lighter">
             +{restTags.length}
           </Badge>
         )}

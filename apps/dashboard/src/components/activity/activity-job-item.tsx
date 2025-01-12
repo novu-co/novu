@@ -69,7 +69,7 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
           <CardContent className="rounded-lg bg-neutral-50 p-2">
             <div className="flex items-center justify-between">
               <span className="text-foreground-400 max-w-[300px] truncate pr-2 text-xs">{getStatusMessage(job)}</span>
-              <Badge variant="soft" className="bg-foreground-50 shrink-0 px-2 py-0.5 text-[11px] leading-3">
+              <Badge variant="lighter" color="gray" size="sm">
                 <TimeDisplayHoverCard date={new Date(job.updatedAt)}>
                   {format(new Date(job.updatedAt), 'MMM d yyyy, HH:mm:ss')}
                 </TimeDisplayHoverCard>
