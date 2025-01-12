@@ -33,7 +33,7 @@ export const DigestKey = () => {
                   <span className="text-foreground-600 text-xs font-normal">subscriberId</span>
                 </FormLabel>
                 <ControlInput
-                  singleLine
+                  multiline={false}
                   indentWithTab={false}
                   placeholder="Add additional digest..."
                   id={field.name}

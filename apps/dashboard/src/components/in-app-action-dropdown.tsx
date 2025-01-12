@@ -194,7 +194,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                     <InputWrapper className="flex h-9 items-center px-2.5">
                       <ControlInput
                         variables={variables}
-                        singleLine
+                        multiline={false}
                         indentWithTab={false}
                         placeholder="Button text"
                         value={field.value}

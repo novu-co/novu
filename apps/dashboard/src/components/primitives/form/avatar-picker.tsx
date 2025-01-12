@@ -84,7 +84,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
                   <InputRoot className="overflow-visible">
                     <InputWrapper className="flex h-9 items-center justify-center p-2.5">
                       <Editor
-                        singleLine
+                        multiline={false}
                         indentWithTab={false}
                         fontFamily="inherit"
                         ref={ref}

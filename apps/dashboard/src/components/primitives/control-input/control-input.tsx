@@ -14,7 +14,7 @@ import { VariablePopover } from './variable-popover';
 type CompletionRange = {
   from: number;
   to: number;
-} | null;
+};
 
 type ControlInputProps = {
   value: string;
@@ -24,7 +24,7 @@ type ControlInputProps = {
   autoFocus?: boolean;
   size?: 'default' | 'lg';
   id?: string;
-  singleLine?: boolean;
+  multiline?: boolean;
   indentWithTab?: boolean;
 };
 
@@ -38,11 +38,11 @@ export function ControlInput({
   autoFocus,
   size = 'default',
   id,
-  singleLine,
+  multiline = false,
   indentWithTab,
 }: ControlInputProps) {
   const viewRef = useRef<EditorView | null>(null);
-  const lastCompletionRef = useRef<CompletionRange>(null);
+  const lastCompletionRef = useRef<CompletionRange | null>(null);
 
   const { selectedVariable, setSelectedVariable, handleVariableSelect, handleVariableUpdate } = useVariables(
     viewRef,
@@ -62,7 +62,7 @@ export function ControlInput({
     [completionSource]
   );
 
-  const variablePlugin = useMemo(
+  const variablePluginExtension = useMemo(
     () =>
       createVariablePlugin({
         viewRef,
@@ -73,8 +73,8 @@ export function ControlInput({
   );
 
   const extensions = useMemo(
-    () => [...baseExtensions, autocompletionExtension, variablePlugin],
-    [autocompletionExtension, variablePlugin]
+    () => [...baseExtensions, autocompletionExtension, variablePluginExtension],
+    [autocompletionExtension, variablePluginExtension]
   );
 
   const handleOpenChange = useCallback(
@@ -90,7 +90,7 @@ export function ControlInput({
     <div className="relative">
       <Editor
         fontFamily="inherit"
-        singleLine={singleLine}
+        multiline={multiline}
         indentWithTab={indentWithTab}
         size={size}
         basicSetup={{
