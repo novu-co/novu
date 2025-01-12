@@ -45,4 +45,6 @@ export enum DetailEnum {
   NOTIFICATION_ERROR = 'There was one or more errors when trying to execute the notification',
   DELAY_MISCONFIGURATION = 'Invalid delay configuration',
   DEFER_DURATION_LIMIT_EXCEEDED = 'Defer duration limit exceeded',
+  THROTTLED = 'Step was throttled due to rate limit',
+  THROTTLE_PROCESSED = 'Throttle step processed successfully',
 }

@@ -1,6 +1,5 @@
-import { ChannelTypeEnum, StepTypeEnum } from '@novu/shared';
-import React from 'react';
 import {
+  Bolt,
   ChatFilled,
   DelayAction,
   DigestAction,
@@ -8,8 +7,9 @@ import {
   InAppFilled,
   PushFilled,
   SmsFilled,
-  Bolt,
 } from '@novu/design-system';
+import { ChannelTypeEnum, StepTypeEnum } from '@novu/shared';
+import React from 'react';
 
 export enum NodeTypeEnum {
   CHANNEL = 'channel',
@@ -78,6 +78,15 @@ export const channels: IChannelDefinition[] = [
     Icon: DelayAction,
     testId: 'delaySelector',
     channelType: StepTypeEnum.DELAY,
+    type: NodeTypeEnum.ACTION,
+  },
+  {
+    tabKey: StepTypeEnum.THROTTLE,
+    label: 'Throttle',
+    description: 'Limit the number of notifications sent in a time period',
+    Icon: DigestAction,
+    testId: 'throttleSelector',
+    channelType: StepTypeEnum.THROTTLE,
     type: NodeTypeEnum.ACTION,
   },
   {

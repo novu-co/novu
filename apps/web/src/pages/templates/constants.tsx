@@ -1,5 +1,5 @@
-import { ChannelTypeEnum, StepTypeEnum } from '@novu/shared';
 import { Bell, Bolt, Chat, DigestGradient, Mail, Mobile, Sms, TimerGradient } from '@novu/design-system';
+import { ChannelTypeEnum, StepTypeEnum } from '@novu/shared';
 
 export enum TemplateAnalyticsEnum {
   CREATE_TEMPLATE_CLICK = 'Create Template Click - [Templates]',
@@ -57,6 +57,7 @@ export const stepNames: Record<StepTypeEnum, string> = {
   delay: 'Delay',
   trigger: 'Trigger',
   custom: 'Custom',
+  throttle: 'Throttle',
 };
 
 export const stepIcon: Record<StepTypeEnum | ChannelTypeEnum, (...args: any[]) => JSX.Element> = {
@@ -68,7 +69,8 @@ export const stepIcon: Record<StepTypeEnum | ChannelTypeEnum, (...args: any[]) =
   digest: DigestGradient,
   delay: TimerGradient,
   custom: Bolt,
-  trigger: () => <></>,
+  trigger: Bolt,
+  throttle: TimerGradient,
 };
 
 export enum StartFromScratchTourAnalyticsEnum {

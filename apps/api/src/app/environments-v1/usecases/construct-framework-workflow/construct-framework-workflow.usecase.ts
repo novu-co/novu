@@ -1,24 +1,25 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Instrument, InstrumentUsecase, PinoLogger } from '@novu/application-generic';
+import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import { workflow } from '@novu/framework/express';
 import { ActionStep, ChannelStep, JsonSchema, Step, StepOptions, StepOutput, Workflow } from '@novu/framework/internal';
-import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import { JSONSchemaDefinition, StepTypeEnum } from '@novu/shared';
-import { Instrument, InstrumentUsecase, PinoLogger } from '@novu/application-generic';
 import { AdditionalOperation, RulesLogic } from 'json-logic-js';
 import _ from 'lodash';
-import { ConstructFrameworkWorkflowCommand } from './construct-framework-workflow.command';
+import { evaluateRules } from '../../../shared/services/query-parser/query-parser.service';
+import { isMatchingJsonSchema } from '../../../workflows-v2/util/jsonToSchema';
 import {
   ChatOutputRendererUsecase,
+  EmailOutputRendererUsecase,
   FullPayloadForRender,
   InAppOutputRendererUsecase,
   PushOutputRendererUsecase,
-  EmailOutputRendererUsecase,
   SmsOutputRendererUsecase,
 } from '../output-renderers';
 import { DelayOutputRendererUsecase } from '../output-renderers/delay-output-renderer.usecase';
 import { DigestOutputRendererUsecase } from '../output-renderers/digest-output-renderer.usecase';
-import { evaluateRules } from '../../../shared/services/query-parser/query-parser.service';
-import { isMatchingJsonSchema } from '../../../workflows-v2/util/jsonToSchema';
+import { ThrottleOutputRendererUsecase } from '../output-renderers/throttle-output-renderer.usecase';
+import { ConstructFrameworkWorkflowCommand } from './construct-framework-workflow.command';
 
 const LOG_CONTEXT = 'ConstructFrameworkWorkflow';
 
@@ -33,12 +34,15 @@ export class ConstructFrameworkWorkflow {
     private chatOutputRendererUseCase: ChatOutputRendererUsecase,
     private pushOutputRendererUseCase: PushOutputRendererUsecase,
     private delayOutputRendererUseCase: DelayOutputRendererUsecase,
-    private digestOutputRendererUseCase: DigestOutputRendererUsecase
+    private digestOutputRendererUseCase: DigestOutputRendererUsecase,
+    private throttleOutputRendererUseCase: ThrottleOutputRendererUsecase
   ) {}
 
   @InstrumentUsecase()
   async execute(command: ConstructFrameworkWorkflowCommand): Promise<Workflow> {
     const dbWorkflow = await this.getDbWorkflow(command.environmentId, command.workflowId);
+    console.log('dbWorkflow', dbWorkflow, command.controlValues);
+
     if (command.controlValues) {
       for (const step of dbWorkflow.steps) {
         step.controlVariables = command.controlValues;
@@ -89,6 +93,7 @@ export class ConstructFrameworkWorkflow {
       throw new InternalServerErrorException(`Step template not found for step ${staticStep.stepId}`);
     }
 
+    console.log('stepTemplate', stepTemplate);
     const stepType = stepTemplate.type;
     const { stepId } = staticStep;
     if (!stepId) {
@@ -157,6 +162,14 @@ export class ConstructFrameworkWorkflow {
           stepId,
           async (controlValues) => {
             return this.delayOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
+          },
+          this.constructActionStepOptions(staticStep, fullPayloadForRender)
+        );
+      case StepTypeEnum.THROTTLE:
+        return step.throttle(
+          stepId,
+          async (controlValues) => {
+            return this.throttleOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
           },
           this.constructActionStepOptions(staticStep, fullPayloadForRender)
         );

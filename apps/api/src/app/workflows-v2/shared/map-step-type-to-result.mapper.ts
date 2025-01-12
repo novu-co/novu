@@ -1,6 +1,6 @@
 import { ActionStepEnum, actionStepSchemas, ChannelStepEnum, channelStepSchemas } from '@novu/framework/internal';
-import { JSONSchema } from 'json-schema-to-ts';
 import { StepTypeEnum } from '@novu/shared';
+import { JSONSchema } from 'json-schema-to-ts';
 
 export function computeResultSchema(stepType: StepTypeEnum, payloadSchema?: JSONSchema) {
   const mapStepTypeToResult: Record<ChannelStepEnum & ActionStepEnum, JSONSchema> = {
@@ -9,6 +9,7 @@ export function computeResultSchema(stepType: StepTypeEnum, payloadSchema?: JSON
     [ChannelStepEnum.PUSH]: channelStepSchemas[ChannelStepEnum.PUSH].result,
     [ChannelStepEnum.CHAT]: channelStepSchemas[ChannelStepEnum.CHAT].result,
     [ChannelStepEnum.IN_APP]: channelStepSchemas[ChannelStepEnum.IN_APP].result,
+    [ActionStepEnum.THROTTLE]: actionStepSchemas[ActionStepEnum.THROTTLE].result,
     [ActionStepEnum.DELAY]: actionStepSchemas[ActionStepEnum.DELAY].result,
     [ActionStepEnum.DIGEST]: buildDigestResult(payloadSchema),
   };

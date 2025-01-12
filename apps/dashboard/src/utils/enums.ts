@@ -8,6 +8,7 @@ export enum StepTypeEnum {
   TRIGGER = 'trigger',
   DELAY = 'delay',
   CUSTOM = 'custom',
+  THROTTLE = 'throttle',
 }
 
 export enum WorkflowTypeEnum {

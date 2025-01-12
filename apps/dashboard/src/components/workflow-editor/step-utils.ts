@@ -1,4 +1,16 @@
-import { flatten } from 'flat';
+import {
+  DEFAULT_CONTROL_DELAY_AMOUNT,
+  DEFAULT_CONTROL_DELAY_TYPE,
+  DEFAULT_CONTROL_DELAY_UNIT,
+  DEFAULT_CONTROL_DIGEST_AMOUNT,
+  DEFAULT_CONTROL_DIGEST_CRON,
+  DEFAULT_CONTROL_DIGEST_DIGEST_KEY,
+  DEFAULT_CONTROL_DIGEST_UNIT,
+  DEFAULT_CONTROL_THROTTLE_AMOUNT,
+  DEFAULT_CONTROL_THROTTLE_TIME_UNIT,
+  DEFAULT_CONTROL_THROTTLE_TIME_VALUE,
+  STEP_TYPE_LABELS,
+} from '@/utils/constants';
 import type {
   ContentIssue,
   StepCreateDto,
@@ -8,16 +20,7 @@ import type {
   WorkflowResponseDto,
 } from '@novu/shared';
 import { StepTypeEnum } from '@novu/shared';
-import {
-  DEFAULT_CONTROL_DELAY_AMOUNT,
-  DEFAULT_CONTROL_DELAY_TYPE,
-  DEFAULT_CONTROL_DELAY_UNIT,
-  DEFAULT_CONTROL_DIGEST_AMOUNT,
-  DEFAULT_CONTROL_DIGEST_CRON,
-  DEFAULT_CONTROL_DIGEST_DIGEST_KEY,
-  DEFAULT_CONTROL_DIGEST_UNIT,
-  STEP_TYPE_LABELS,
-} from '@/utils/constants';
+import { flatten } from 'flat';
 
 export const getFirstBodyErrorMessage = (issues?: StepIssuesDto) => {
   const stepIssuesArray = Object.entries({ ...issues?.body });
@@ -81,6 +84,12 @@ export const createStep = (type: StepTypeEnum): StepCreateDto => {
     controlValue.amount = DEFAULT_CONTROL_DELAY_AMOUNT;
     controlValue.unit = DEFAULT_CONTROL_DELAY_UNIT;
     controlValue.type = DEFAULT_CONTROL_DELAY_TYPE;
+  }
+
+  if (type === StepTypeEnum.THROTTLE) {
+    controlValue.amount = DEFAULT_CONTROL_THROTTLE_AMOUNT;
+    controlValue.timeValue = DEFAULT_CONTROL_THROTTLE_TIME_VALUE;
+    controlValue.timeUnit = DEFAULT_CONTROL_THROTTLE_TIME_UNIT;
   }
 
   return {

@@ -48,6 +48,7 @@ const STEP_TYPE_TO_SKELETON_CONTENT: Record<StepTypeEnum | string, () => React.J
   },
   [StepTypeEnum.SMS]: SingleLineSkeleton,
   [StepTypeEnum.PUSH]: SingleLineSkeleton,
+  [StepTypeEnum.THROTTLE]: SingleLineSkeleton,
   [StepTypeEnum.DIGEST]: () => null,
   [StepTypeEnum.DELAY]: () => null,
   [StepTypeEnum.TRIGGER]: () => null,

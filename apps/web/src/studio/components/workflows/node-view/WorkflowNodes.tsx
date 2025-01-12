@@ -1,4 +1,4 @@
-import { VStack } from '@novu/novui/jsx';
+import { ActionStepEnum, ChannelStepEnum, type DiscoverStepOutput } from '@novu/framework/internal';
 import {
   IconOutlineAutoAwesomeMotion,
   IconOutlineAvTimer,
@@ -11,7 +11,7 @@ import {
   IconSize,
   IconType,
 } from '@novu/novui/icons';
-import { ActionStepEnum, ChannelStepEnum, type DiscoverStepOutput } from '@novu/framework/internal';
+import { VStack } from '@novu/novui/jsx';
 import { StepNode } from './StepNode';
 import { WorkflowBackgroundWrapper } from './WorkflowBackgroundWrapper';
 
@@ -29,6 +29,7 @@ export const WORKFLOW_NODE_STEP_ICON_DICTIONARY: Record<`${ChannelStepEnum | Act
   push: IconOutlineMobileFriendly,
   digest: IconOutlineAutoAwesomeMotion,
   delay: IconOutlineAvTimer,
+  throttle: IconOutlineAutoAwesomeMotion,
   custom: IconOutlineBolt,
 };
 

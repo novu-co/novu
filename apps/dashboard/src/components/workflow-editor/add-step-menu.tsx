@@ -136,6 +136,9 @@ export const AddStepMenu = ({
                 <MenuItem stepType={StepTypeEnum.DIGEST} onClick={() => handleMenuItemClick(StepTypeEnum.DIGEST)}>
                   Digest
                 </MenuItem>
+                <MenuItem stepType={StepTypeEnum.THROTTLE} onClick={() => handleMenuItemClick(StepTypeEnum.THROTTLE)}>
+                  Throttle
+                </MenuItem>
               </MenuItemsGroup>
             </MenuGroup>
           </div>

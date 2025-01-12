@@ -471,6 +471,7 @@ export class Client {
             push: this.executeStepFactory(validatedEvent, setResult, hasResult),
             chat: this.executeStepFactory(validatedEvent, setResult, hasResult),
             custom: this.executeStepFactory(validatedEvent, setResult, hasResult),
+            throttle: this.executeStepFactory(validatedEvent, setResult, hasResult),
           },
         }),
       ]);

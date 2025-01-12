@@ -219,6 +219,28 @@ export const DigestNode = (props: NodeProps<NodeType>) => {
   );
 };
 
+export const ThrottleNode = (props: NodeProps<NodeType>) => {
+  const { data } = props;
+  const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.THROTTLE];
+
+  return (
+    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
+      <StepNode data={data}>
+        <NodeHeader type={StepTypeEnum.THROTTLE}>
+          <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.THROTTLE]}>
+            <Icon />
+          </NodeIcon>
+          <NodeName>{data.name || 'Throttle Step'}</NodeName>
+        </NodeHeader>
+        <NodeBody>{data.content}</NodeBody>
+        {data.error && <NodeError>{data.error}</NodeError>}
+        <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
+        <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
+      </StepNode>
+    </Link>
+  );
+};
+
 export const CustomNode = (props: NodeProps<NodeType>) => {
   const { data } = props;
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.CUSTOM];
@@ -281,4 +303,18 @@ export const AddNode = (_props: NodeProps<NodeType>) => {
       />
     </div>
   );
+};
+
+const nodeTypes = {
+  trigger: TriggerNode,
+  email: EmailNode,
+  sms: SmsNode,
+  in_app: InAppNode,
+  push: PushNode,
+  chat: ChatNode,
+  delay: DelayNode,
+  digest: DigestNode,
+  throttle: ThrottleNode,
+  custom: CustomNode,
+  add: AddNode,
 };

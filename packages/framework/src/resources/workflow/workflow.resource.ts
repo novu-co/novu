@@ -1,16 +1,22 @@
 import { ActionStepEnum, ChannelStepEnum } from '../../constants';
 import { WorkflowPayloadInvalidError } from '../../errors';
-import { channelStepSchemas, delayActionSchemas, digestActionSchemas, emptySchema } from '../../schemas';
+import {
+  channelStepSchemas,
+  delayActionSchemas,
+  digestActionSchemas,
+  emptySchema,
+  throttleActionSchemas,
+} from '../../schemas';
 import type {
   CancelEventTriggerResponse,
   DiscoverWorkflowOutput,
+  EventTriggerResponse,
   Execute,
   FromSchema,
+  FromSchemaUnvalidated,
   Schema,
-  EventTriggerResponse,
   Workflow,
   WorkflowOptions,
-  FromSchemaUnvalidated,
 } from '../../types';
 import { getBridgeUrl, initApiClient, resolveApiUrl, resolveSecretKey } from '../../utils';
 import { transformSchema, validateData } from '../../validators';
@@ -145,6 +151,12 @@ export function workflow<
           delayActionSchemas.result
         ),
         custom: await discoverCustomStepFactory(newWorkflow, ActionStepEnum.CUSTOM),
+        throttle: await discoverActionStepFactory(
+          newWorkflow,
+          ActionStepEnum.THROTTLE,
+          throttleActionSchemas.output,
+          throttleActionSchemas.result
+        ),
       } as never,
     });
 

@@ -6,7 +6,11 @@ export const AUTOCOMPLETE_PASSWORD_MANAGERS_OFF = {
   'data-form-type': 'other',
 };
 
-export const INLINE_CONFIGURABLE_STEP_TYPES: readonly StepTypeEnum[] = [StepTypeEnum.DELAY, StepTypeEnum.DIGEST];
+export const INLINE_CONFIGURABLE_STEP_TYPES: readonly StepTypeEnum[] = [
+  StepTypeEnum.DELAY,
+  StepTypeEnum.DIGEST,
+  StepTypeEnum.THROTTLE,
+];
 
 export const TEMPLATE_CONFIGURABLE_STEP_TYPES: readonly StepTypeEnum[] = [
   StepTypeEnum.IN_APP,
@@ -26,6 +30,7 @@ export const STEP_TYPE_LABELS: Record<StepTypeEnum, string> = {
   [StepTypeEnum.DELAY]: 'Delay',
   [StepTypeEnum.TRIGGER]: 'Trigger',
   [StepTypeEnum.CUSTOM]: 'Custom',
+  [StepTypeEnum.THROTTLE]: 'Throttle',
 };
 
 export const DEFAULT_CONTROL_DELAY_AMOUNT = 30;
@@ -36,3 +41,7 @@ export const DEFAULT_CONTROL_DIGEST_AMOUNT = 30;
 export const DEFAULT_CONTROL_DIGEST_UNIT = TimeUnitEnum.SECONDS;
 export const DEFAULT_CONTROL_DIGEST_CRON = '';
 export const DEFAULT_CONTROL_DIGEST_DIGEST_KEY = '';
+
+export const DEFAULT_CONTROL_THROTTLE_AMOUNT = 5;
+export const DEFAULT_CONTROL_THROTTLE_TIME_VALUE = 1;
+export const DEFAULT_CONTROL_THROTTLE_TIME_UNIT = TimeUnitEnum.HOURS;

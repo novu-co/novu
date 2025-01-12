@@ -59,6 +59,12 @@ const variantSchemePart = {
     amount: {
       type: Schema.Types.Number,
     },
+    timeValue: {
+      type: Schema.Types.Number,
+    },
+    timeUnit: {
+      type: Schema.Types.String,
+    },
     unit: {
       type: Schema.Types.String,
     },

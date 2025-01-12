@@ -11,6 +11,7 @@ export enum ActionTypeEnum {
   DIGEST = 'digest',
   DELAY = 'delay',
   CUSTOM = 'custom',
+  THROTTLE = 'throttle',
 }
 
 export type StepType = ChannelTypeEnum | ActionTypeEnum;
@@ -25,6 +26,7 @@ export enum StepTypeEnum {
   TRIGGER = 'trigger',
   DELAY = 'delay',
   CUSTOM = 'custom',
+  THROTTLE = 'throttle',
 }
 
 export const STEP_TYPE_TO_CHANNEL_TYPE = new Map<StepTypeEnum | string, ChannelTypeEnum>([

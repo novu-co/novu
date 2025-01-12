@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { Instrument } from '@novu/application-generic';
 import { NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
 import { JSONSchemaDto } from '@novu/shared';
-import { Instrument } from '@novu/application-generic';
 import { computeResultSchema } from '../../shared';
-import { BuildAvailableVariableSchemaCommand } from './build-available-variable-schema.command';
 import { parsePayloadSchema } from '../../shared/parse-payload-schema';
+import { emptyJsonSchema } from '../../util/jsonToSchema';
 import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
 import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
-import { emptyJsonSchema } from '../../util/jsonToSchema';
+import { BuildAvailableVariableSchemaCommand } from './build-available-variable-schema.command';
 
 @Injectable()
 export class BuildAvailableVariableSchemaUsecase {
@@ -93,7 +93,7 @@ function buildPreviousStepsProperties(
   return (previousSteps || []).reduce(
     (acc, step) => {
       if (step.stepId && step.template?.type) {
-        acc[step.stepId] = computeResultSchema(step.template.type, payloadSchema);
+        acc[step.stepId] = computeResultSchema(step.template.type, payloadSchema) as JSONSchemaDto;
       }
 
       return acc;

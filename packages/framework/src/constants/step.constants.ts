@@ -10,4 +10,5 @@ export enum ActionStepEnum {
   DIGEST = 'digest',
   DELAY = 'delay',
   CUSTOM = 'custom',
+  THROTTLE = 'throttle',
 }

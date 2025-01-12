@@ -1,16 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
 import {
-  DigestTypeEnum,
-  ExecutionDetailsSourceEnum,
-  ExecutionDetailsStatusEnum,
-  IDigestRegularMetadata,
-  IPreferenceChannels,
-  PreferencesTypeEnum,
-  StepTypeEnum,
-  WorkflowTypeEnum,
-} from '@novu/shared';
-import {
   AnalyticsService,
   buildNotificationTemplateKey,
   buildSubscriberKey,
@@ -40,18 +30,29 @@ import {
   TenantRepository,
 } from '@novu/dal';
 import { ExecuteOutput } from '@novu/framework/internal';
+import {
+  DigestTypeEnum,
+  ExecutionDetailsSourceEnum,
+  ExecutionDetailsStatusEnum,
+  IDigestRegularMetadata,
+  IPreferenceChannels,
+  PreferencesTypeEnum,
+  StepTypeEnum,
+  WorkflowTypeEnum,
+} from '@novu/shared';
 
-import { SendMessageCommand } from './send-message.command';
+import { PlatformException } from '../../../shared/utils';
+import { ExecuteBridgeJob } from '../execute-bridge-job';
+import { Digest } from './digest';
+import { ExecuteStepCustom } from './execute-step-custom.usecase';
+import { SendMessageChat } from './send-message-chat.usecase';
 import { SendMessageDelay } from './send-message-delay.usecase';
 import { SendMessageEmail } from './send-message-email.usecase';
-import { SendMessageSms } from './send-message-sms.usecase';
 import { SendMessageInApp } from './send-message-in-app.usecase';
-import { SendMessageChat } from './send-message-chat.usecase';
 import { SendMessagePush } from './send-message-push.usecase';
-import { Digest } from './digest';
-import { PlatformException } from '../../../shared/utils';
-import { ExecuteStepCustom } from './execute-step-custom.usecase';
-import { ExecuteBridgeJob } from '../execute-bridge-job';
+import { SendMessageSms } from './send-message-sms.usecase';
+import { SendMessageCommand } from './send-message.command';
+import { Throttle } from './throttle/throttle.usecase';
 
 @Injectable()
 export class SendMessage {
@@ -73,7 +74,8 @@ export class SendMessage {
     private tenantRepository: TenantRepository,
     private analyticsService: AnalyticsService,
     private normalizeVariablesUsecase: NormalizeVariables,
-    private executeBridgeJob: ExecuteBridgeJob
+    private executeBridgeJob: ExecuteBridgeJob,
+    private throttle: Throttle
   ) {}
 
   @InstrumentUsecase()
@@ -187,6 +189,10 @@ export class SendMessage {
       }
       case StepTypeEnum.CUSTOM: {
         await this.executeStepCustom.execute(sendMessageCommand);
+        break;
+      }
+      case StepTypeEnum.THROTTLE: {
+        await this.throttle.execute(command);
         break;
       }
       default: {

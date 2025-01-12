@@ -1,22 +1,22 @@
-import { MouseEventHandler } from 'react';
 import styled from '@emotion/styled';
-import { Group, Container } from '@mantine/core';
+import { Container, Group } from '@mantine/core';
 import {
   ActionButton,
+  Condition,
+  ConditionPlus,
+  DotsHorizontal,
   Dropdown,
   IDropdownProps,
-  ConditionPlus,
-  Condition,
-  DotsHorizontal,
   NoConditions,
   PencilOutlined,
   Trash,
   VariantPlus,
 } from '@novu/design-system';
 import { DELAYED_STEPS, StepTypeEnum } from '@novu/shared';
+import { MouseEventHandler } from 'react';
 
-import { NodeType } from './WorkflowNode';
 import { When } from '../../../../../components/utils/When';
+import { NodeType } from './WorkflowNode';
 
 const ButtonsContainer = styled(Container)`
   padding: 0;
@@ -57,6 +57,7 @@ const VARIANT_TYPE_TO_DELETE: Record<NodeType, string> = {
   stepRoot: 'Delete step',
   variant: 'Delete variant',
   variantRoot: 'Delete step',
+  throttle: 'Delete throttle step',
 };
 
 interface IWorkflowNodeActionsProps {

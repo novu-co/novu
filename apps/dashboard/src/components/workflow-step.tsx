@@ -1,8 +1,8 @@
 import { Step, StepProps } from '@/components/primitives/step';
-import { IconType } from 'react-icons/lib';
-import { STEP_TYPE_TO_ICON } from './icons/utils';
 import { StepTypeEnum } from '@/utils/enums';
 import { ComponentProps } from 'react';
+import { IconType } from 'react-icons/lib';
+import { STEP_TYPE_TO_ICON } from './icons/utils';
 
 type WorkflowStepProps = StepProps & {
   step: StepTypeEnum;
@@ -18,6 +18,7 @@ const stepRenderData: Record<StepTypeEnum, { variant: ComponentProps<typeof Step
   [StepTypeEnum.PUSH]: { variant: 'verified', icon: STEP_TYPE_TO_ICON[StepTypeEnum.PUSH] },
   [StepTypeEnum.SMS]: { variant: 'destructive', icon: STEP_TYPE_TO_ICON[StepTypeEnum.SMS] },
   [StepTypeEnum.TRIGGER]: { variant: 'neutral', icon: STEP_TYPE_TO_ICON[StepTypeEnum.TRIGGER] },
+  [StepTypeEnum.THROTTLE]: { variant: 'warning', icon: STEP_TYPE_TO_ICON[StepTypeEnum.THROTTLE] },
 };
 
 export const WorkflowStep = (props: WorkflowStepProps) => {

@@ -24,6 +24,7 @@ const STEP_TYPE_TO_TEMPLATE_FORM: Record<StepTypeEnum, (args: StepEditorProps) =
   [StepTypeEnum.PUSH]: PushTabs,
   [StepTypeEnum.DIGEST]: CommonCustomControlValues,
   [StepTypeEnum.DELAY]: CommonCustomControlValues,
+  [StepTypeEnum.THROTTLE]: CommonCustomControlValues,
   [StepTypeEnum.TRIGGER]: () => null,
   [StepTypeEnum.CUSTOM]: () => null,
 };

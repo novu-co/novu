@@ -30,6 +30,7 @@ import {
   NodeData,
   PushNode,
   SmsNode,
+  ThrottleNode,
   TriggerNode,
 } from './nodes';
 import { getFirstBodyErrorMessage, getFirstControlsErrorMessage } from './step-utils';
@@ -43,6 +44,7 @@ const nodeTypes = {
   chat: ChatNode,
   delay: DelayNode,
   digest: DigestNode,
+  throttle: ThrottleNode,
   custom: CustomNode,
   add: AddNode,
 };
