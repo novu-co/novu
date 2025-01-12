@@ -5,7 +5,7 @@ type SelectedVariable = {
   value: string;
   from: number;
   to: number;
-} | null;
+};
 
 /**
  * Manages variable selection and updates in the editor.
@@ -17,7 +17,7 @@ type SelectedVariable = {
  * 4. Manages cursor position and editor state updates
  */
 export function useVariables(viewRef: React.RefObject<EditorView>, onChange: (value: string) => void) {
-  const [selectedVariable, setSelectedVariable] = useState<SelectedVariable>(null);
+  const [selectedVariable, setSelectedVariable] = useState<SelectedVariable | null>(null);
   const isUpdatingRef = useRef(false);
 
   const handleVariableSelect = useCallback((value: string, from: number, to: number) => {
@@ -34,9 +34,14 @@ export function useVariables(viewRef: React.RefObject<EditorView>, onChange: (va
         const { from, to } = selectedVariable;
         const view = viewRef.current;
 
-        // Ensure the new value has proper liquid syntax
-        const hasLiquidSyntax = newValue.match(/^\{\{.*\}\}$/);
-        const newVariableText = hasLiquidSyntax ? newValue : `{{${newValue}}}`;
+        // Function to normalize variable syntax by reducing multiple brackets to two
+        const normalizeVariableSyntax = (value: string): string => {
+          const strippedValue = value.replace(/[{}]/g, '').trim();
+
+          return `{{${strippedValue}}}`;
+        };
+
+        const newVariableText = newValue.match(/^\{+.*\}+$/) ? normalizeVariableSyntax(newValue) : `{{${newValue}}}`;
 
         // Calculate the actual end position including closing brackets
         const currentContent = view.state.doc.toString();
@@ -58,7 +63,7 @@ export function useVariables(viewRef: React.RefObject<EditorView>, onChange: (va
         onChange(view.state.doc.toString());
 
         // Update the selected variable with new bounds
-        setSelectedVariable((prev: SelectedVariable) =>
+        setSelectedVariable((prev: SelectedVariable | null) =>
           prev ? { ...prev, value: newValue, to: from + newVariableText.length } : null
         );
       } finally {
