@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { FieldEditor } from '@/components/primitives/field-editor';
+import { ControlInput } from 'src/components/primitives/control-input';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
@@ -24,7 +24,7 @@ export const BaseBody = () => {
           <FormControl>
             <InputRoot hasError={!!fieldState.error}>
               <InputWrapper className="h-36 items-start p-3 py-2">
-                <FieldEditor
+                <ControlInput
                   placeholder={capitalize(field.name)}
                   id={field.name}
                   variables={variables}

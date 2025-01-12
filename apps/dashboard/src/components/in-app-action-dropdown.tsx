@@ -25,7 +25,7 @@ import { ComponentProps, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
 import { CompactButton } from './primitives/button-compact';
-import { FieldEditor } from './primitives/field-editor';
+import { ControlInput } from './primitives/control-input';
 import { InputRoot, InputWrapper } from './primitives/input';
 
 const primaryActionKey = 'primaryAction';
@@ -192,7 +192,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                 <FormControl>
                   <InputRoot className="overflow-visible" hasError={!!fieldState.error}>
                     <InputWrapper className="flex h-9 items-center px-2.5">
-                      <FieldEditor
+                      <ControlInput
                         variables={variables}
                         singleLine
                         indentWithTab={false}

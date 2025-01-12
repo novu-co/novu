@@ -1,6 +1,6 @@
 import { useFormContext } from 'react-hook-form';
 
-import { FieldEditor } from '@/components/primitives/field-editor';
+import { ControlInput } from 'src/components/primitives/control-input';
 import { FormControl, FormField, FormItem, FormMessagePure } from '@/components/primitives/form/form';
 import { Input, InputProps, InputRoot, InputWrapper } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
@@ -44,7 +44,7 @@ export const URLInput = ({
                 {asEditor ? (
                   <InputRoot className="overflow-visible rounded-r-none">
                     <InputWrapper className="flex h-9 items-center border-r-0 p-2.5">
-                      <FieldEditor
+                      <ControlInput
                         singleLine
                         indentWithTab={false}
                         placeholder={placeholder}

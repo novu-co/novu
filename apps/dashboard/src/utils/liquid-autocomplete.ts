@@ -1,4 +1,4 @@
-import { TRANSFORMERS } from '@/components/primitives/field-editor/variable-popover/constants';
+import { TRANSFORMERS } from '@/components/primitives/control-input/variable-popover/constants';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 import { CompletionContext, CompletionResult } from '@codemirror/autocomplete';
 

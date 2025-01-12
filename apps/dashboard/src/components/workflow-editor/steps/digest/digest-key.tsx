@@ -5,7 +5,7 @@ import { Code2 } from '@/components/icons/code-2';
 import { FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
-import { FieldEditor } from '../../../primitives/field-editor';
+import { ControlInput } from '../../../primitives/control-input';
 import { InputRoot, InputWrapper } from '../../../primitives/input';
 
 export const DigestKey = () => {
@@ -32,7 +32,7 @@ export const DigestKey = () => {
                   <Code2 className="-ml-1.5 size-5" />
                   <span className="text-foreground-600 text-xs font-normal">subscriberId</span>
                 </FormLabel>
-                <FieldEditor
+                <ControlInput
                   singleLine
                   indentWithTab={false}
                   placeholder="Add additional digest..."

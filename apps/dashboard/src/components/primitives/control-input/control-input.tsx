@@ -30,7 +30,7 @@ type FieldEditorProps = {
 
 const baseExtensions = [EditorView.lineWrapping, variablePillTheme];
 
-export function FieldEditor({
+export function ControlInput({
   value,
   onChange,
   variables,

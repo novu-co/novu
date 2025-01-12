@@ -1,4 +1,4 @@
-import { FieldEditor } from '@/components/primitives/field-editor';
+import { ControlInput } from 'src/components/primitives/control-input';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { Input } from '@/components/primitives/input';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
@@ -47,7 +47,7 @@ export function TextWidget(props: WidgetProps) {
                 placeholder={capitalize(label)}
               />
             ) : (
-              <FieldEditor
+              <ControlInput
                 indentWithTab={false}
                 placeholder={capitalize(label)}
                 id={label}
