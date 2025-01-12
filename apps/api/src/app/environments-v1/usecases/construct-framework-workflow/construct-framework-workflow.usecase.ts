@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { workflow } from '@novu/framework/express';
 import { ActionStep, ChannelStep, JsonSchema, Step, StepOptions, StepOutput, Workflow } from '@novu/framework/internal';
 import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
-import { JSONSchemaDefinition, JSONSchemaDto, StepTypeEnum } from '@novu/shared';
+import { JSONSchemaDefinition, StepTypeEnum } from '@novu/shared';
 import { Instrument, InstrumentUsecase, PinoLogger } from '@novu/application-generic';
 import { AdditionalOperation, RulesLogic } from 'json-logic-js';
 import _ from 'lodash';
@@ -121,7 +121,7 @@ export class ConstructFrameworkWorkflow {
           this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.SMS:
-        return step.inApp(
+        return step.sms(
           stepId,
           async (controlValues) => {
             return this.smsOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
@@ -129,7 +129,7 @@ export class ConstructFrameworkWorkflow {
           this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.CHAT:
-        return step.inApp(
+        return step.chat(
           stepId,
           async (controlValues) => {
             return this.chatOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
@@ -137,7 +137,7 @@ export class ConstructFrameworkWorkflow {
           this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.PUSH:
-        return step.inApp(
+        return step.push(
           stepId,
           async (controlValues) => {
             return this.pushOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });

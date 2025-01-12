@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { WorkflowTriggerInboxIllustration } from '../../icons/workflow-trigger-inbox';
 
 import { ActivityPanel } from '@/components/activity/activity-panel';
+import { WorkflowTriggerInboxIllustration } from '../../icons/workflow-trigger-inbox';
 
 type TestWorkflowLogsSidebarProps = {
   transactionId?: string;
@@ -10,9 +10,10 @@ type TestWorkflowLogsSidebarProps = {
 export const TestWorkflowLogsSidebar = ({ transactionId }: TestWorkflowLogsSidebarProps) => {
   const [activityId, setActivityId] = useState<string>();
 
+  console.log(transactionId, activityId);
   return (
-    <aside className="flex h-full w-[500px] flex-col border-l">
-      {transactionId || activityId ? (
+    <aside className="flex h-full flex-col">
+      {transactionId ? (
         <ActivityPanel
           activityId={activityId}
           transactionId={transactionId}

@@ -605,7 +605,7 @@ function mapAjvErrorToMessage(error: ErrorObject<string, Record<string, unknown>
     error.message?.includes('mailto') &&
     error.message?.includes('https')
   ) {
-    return 'Invalid URL format. Must be a valid absolute URL, path, or valid variable';
+    return `Invalid URL format. Must be a valid absolute URL, path starting with /, or {{variable}}`;
   }
 
   return error.message || 'Invalid value';

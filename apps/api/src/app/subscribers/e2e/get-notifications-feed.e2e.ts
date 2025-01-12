@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import axios from 'axios';
 import { NotificationTemplateEntity, SubscriberRepository } from '@novu/dal';
 
-describe('Get Notifications feed - /:subscriberId/notifications/feed (GET)', function () {
+describe('Get Notifications feed - /:subscriberId/notifications/feed (GET) #novu-v2', function () {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let subscriberId: string;

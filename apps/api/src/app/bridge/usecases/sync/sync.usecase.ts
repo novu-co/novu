@@ -299,6 +299,7 @@ export class Sync {
     commandWorkflowSteps: DiscoverStepOutput[],
     workflow?: NotificationTemplateEntity | undefined
   ): NotificationStep[] {
+    // TODO: reuse the issue logic from workflows-v2
     return commandWorkflowSteps.map((step) => {
       const foundStep = workflow?.steps?.find((workflowStep) => workflowStep.stepId === step.stepId);
 

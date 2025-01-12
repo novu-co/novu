@@ -14,7 +14,6 @@ import {
   FormMessage,
   FormMessagePure,
 } from '@/components/primitives/form/form';
-import { InputField } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import { URLInput } from '@/components/workflow-editor/url-input';
@@ -30,6 +29,7 @@ import { ComponentProps, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
 import { CompactButton } from './primitives/button-compact';
+import { InputRoot, InputWrapper } from './primitives/input';
 
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
@@ -56,6 +56,7 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
           <div className="border-neutral-alpha-200 relative flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
             {!primaryAction && !secondaryAction && (
               <Button
+                variant="secondary"
                 mode="outline"
                 size="2xs"
                 className="h-6 border-[1px] border-dashed shadow-none ring-0"
@@ -190,23 +191,26 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
             control={control}
             name={`${actionKey}.label`}
             defaultValue=""
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
                 <div className="flex items-center gap-1">
                   <FormLabel>Button text</FormLabel>
                 </div>
                 <FormControl>
-                  <InputField size="fit">
-                    <Editor
-                      singleLine
-                      indentWithTab={false}
-                      fontFamily="inherit"
-                      placeholder="Button text"
-                      value={field.value}
-                      onChange={field.onChange}
-                      extensions={extensions}
-                    />
-                  </InputField>
+                  <InputRoot className="overflow-visible" hasError={!!fieldState.error}>
+                    <InputWrapper className="flex h-9 items-center justify-center px-1">
+                      <Editor
+                        singleLine
+                        indentWithTab={false}
+                        fontFamily="inherit"
+                        placeholder="Button text"
+                        value={field.value}
+                        onChange={field.onChange}
+                        extensions={extensions}
+                        className="flex h-full items-center"
+                      />
+                    </InputWrapper>
+                  </InputRoot>
                 </FormControl>
                 <FormMessage />
               </FormItem>

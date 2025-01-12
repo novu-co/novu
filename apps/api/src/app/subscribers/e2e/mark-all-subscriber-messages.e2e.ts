@@ -5,7 +5,7 @@ import { MessageRepository, NotificationTemplateEntity, SubscriberRepository } f
 import { Novu } from '@novu/api';
 import { expectSdkExceptionGeneric, initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-describe('Mark All Subscriber Messages - /subscribers/:subscriberId/messages/mark-all (POST)', function () {
+describe('Mark All Subscriber Messages - /subscribers/:subscriberId/messages/mark-all (POST) #novu-v2', function () {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   const messageRepository = new MessageRepository();

@@ -1,6 +1,7 @@
 import { createStep } from '@/components/workflow-editor/step-utils';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
+import { TEMPLATE_CONFIGURABLE_STEP_TYPES } from '@/utils/constants';
 import { StepTypeEnum } from '@/utils/enums';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { getWorkflowIdFromSlug, STEP_DIVIDER } from '@/utils/step';
@@ -9,7 +10,7 @@ import { WorkflowOriginEnum } from '@novu/shared';
 import { Node as FlowNode, Handle, NodeProps, Position } from '@xyflow/react';
 import { ComponentProps } from 'react';
 import { RiPlayCircleLine } from 'react-icons/ri';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { AddStepMenu } from './add-step-menu';
 import { Node, NodeBody, NodeError, NodeHeader, NodeIcon, NodeName } from './base-node';
@@ -242,6 +243,7 @@ export const CustomNode = (props: NodeProps<NodeType>) => {
 
 export const AddNode = (_props: NodeProps<NodeType>) => {
   const { workflow, update } = useWorkflow();
+  const navigate = useNavigate();
   if (!workflow) {
     return null;
   }
@@ -257,7 +259,24 @@ export const AddNode = (_props: NodeProps<NodeType>) => {
       <AddStepMenu
         visible
         onMenuItemClick={(stepType) => {
-          update({ ...workflow, steps: [...workflow.steps, createStep(stepType)] });
+          update(
+            {
+              ...workflow,
+              steps: [...workflow.steps, createStep(stepType)],
+            },
+            {
+              onSuccess: (data) => {
+                if (TEMPLATE_CONFIGURABLE_STEP_TYPES.includes(stepType)) {
+                  navigate(
+                    buildRoute(ROUTES.EDIT_STEP_TEMPLATE, {
+                      workflowSlug: workflow.slug,
+                      stepSlug: data.steps[data.steps.length - 1].slug,
+                    })
+                  );
+                }
+              },
+            }
+          );
         }}
       />
     </div>
