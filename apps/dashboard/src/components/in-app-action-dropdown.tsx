@@ -5,7 +5,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/primitives/dropdown-menu';
-import { Editor } from '@/components/primitives/editor';
 import {
   FormControl,
   FormField,
@@ -29,6 +28,7 @@ import { ComponentProps, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
 import { CompactButton } from './primitives/button-compact';
+import { FieldEditor } from './primitives/field-editor';
 import { InputRoot, InputWrapper } from './primitives/input';
 
 const primaryActionKey = 'primaryAction';
@@ -66,14 +66,14 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
               </Button>
             )}
             {primaryAction && (
-              <ConfigureActionPopover asChild fields={{ actionKey: primaryActionKey }}>
+              <ConfigureActionPopover fields={{ actionKey: primaryActionKey }}>
                 <Button variant="primary" size="2xs" className="z-10 h-6">
                   {primaryAction.label}
                 </Button>
               </ConfigureActionPopover>
             )}
             {secondaryAction && (
-              <ConfigureActionPopover asChild fields={{ actionKey: secondaryActionKey }}>
+              <ConfigureActionPopover fields={{ actionKey: secondaryActionKey }}>
                 <Button variant="secondary" mode="outline" size="2xs" className="z-10 h-6">
                   {secondaryAction.label}
                 </Button>
@@ -81,7 +81,7 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
             )}
             <DropdownMenuTrigger className="absolute size-full" />
           </div>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger>
             <CompactButton icon={RiExpandUpDownLine} size="lg" variant="ghost">
               <span className="sr-only">Actions</span>
             </CompactButton>
@@ -181,7 +181,7 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
   return (
     <Popover>
       <PopoverTrigger {...rest} />
-      <PopoverContent className="max-w-72" side="bottom" align="end">
+      <PopoverContent className="max-w-72 overflow-visible" side="bottom" align="end">
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 text-sm font-medium leading-none">
             <RiEdit2Line className="size-4" /> Customize button
@@ -198,16 +198,14 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                 </div>
                 <FormControl>
                   <InputRoot className="overflow-visible" hasError={!!fieldState.error}>
-                    <InputWrapper className="flex h-9 items-center justify-center px-1">
-                      <Editor
+                    <InputWrapper className="flex h-9 items-center px-2.5">
+                      <FieldEditor
+                        variables={variables}
                         singleLine
                         indentWithTab={false}
-                        fontFamily="inherit"
                         placeholder="Button text"
                         value={field.value}
                         onChange={field.onChange}
-                        extensions={extensions}
-                        className="flex h-full items-center"
                       />
                     </InputWrapper>
                   </InputRoot>

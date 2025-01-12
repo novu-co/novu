@@ -35,15 +35,15 @@ export const URLInput = ({
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between space-x-2">
-        <div className="relative flex w-full">
+        <div className="flex w-full">
           <FormField
             control={control}
             name={urlKey}
             render={({ field }) => (
               <FormItem className="min-w-px max-w-full basis-full">
                 {asEditor ? (
-                  <InputRoot className="rounded-r-none">
-                    <InputWrapper className="flex h-9 items-center justify-center border-r-0 px-1">
+                  <InputRoot className="overflow-visible rounded-r-none">
+                    <InputWrapper className="flex h-9 items-center border-r-0 p-2.5">
                       <FieldEditor
                         singleLine
                         indentWithTab={false}
