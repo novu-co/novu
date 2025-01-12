@@ -22,7 +22,9 @@ import type { FilterWithParam, VariablePopoverProps } from './types';
 import { formatLiquidVariable } from './utils';
 
 export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
-  const { parsedName, parsedDefaultValue, parsedFilters, originalVariable } = useVariableParser(variable || '');
+  const { parsedName, parsedDefaultValue, parsedFilters, originalVariable, parseRawInput } = useVariableParser(
+    variable || ''
+  );
   const [name, setName] = useState(parsedName);
   const [defaultVal, setDefaultVal] = useState(parsedDefaultValue);
   const [showRawLiquid, setShowRawLiquid] = useState(false);
@@ -76,29 +78,14 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
     [name, filters, debouncedUpdate]
   );
 
-  const handleRawLiquidChange = useCallback((value: string) => {
-    // Remove {{ and }} and trim
-    const content = value.replace(/^\{\{\s*|\s*\}\}$/g, '').trim();
-
-    // Split by pipe and trim each part
-    const parts = content.split('|').map((part) => part.trim());
-
-    // First part is the name
-    const newName = parts[0];
-    setName(newName);
-
-    // Process each part after the name
-    parts.slice(1).forEach((part) => {
-      if (part.startsWith('default:')) {
-        // Extract default value, handling quotes
-        const newDefaultVal = part
-          .replace('default:', '')
-          .trim()
-          .replace(/^["']|["']$/g, '');
-        setDefaultVal(newDefaultVal);
-      }
-    });
-  }, []);
+  const handleRawLiquidChange = useCallback(
+    (value: string) => {
+      const { parsedName, parsedDefaultValue } = parseRawInput(value);
+      setName(parsedName);
+      setDefaultVal(parsedDefaultValue);
+    },
+    [parseRawInput]
+  );
 
   const filteredFilters = useMemo(() => getFilteredFilters(searchQuery), [getFilteredFilters, searchQuery]);
 
