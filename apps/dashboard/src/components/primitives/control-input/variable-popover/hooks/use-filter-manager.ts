@@ -1,3 +1,4 @@
+import { useSortable } from '@/components/primitives/hooks/use-sortable';
 import { useCallback, useState } from 'react';
 import { FILTERS } from '../constants';
 import type { FilterWithParam } from '../types';
@@ -9,8 +10,14 @@ type UseFilterManagerProps = {
 
 export function useFilterManager({ initialFilters, onUpdate }: UseFilterManagerProps) {
   const [filters, setFilters] = useState<FilterWithParam[]>(initialFilters.filter((t) => t.value !== 'default'));
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [draggingItem, setDraggingItem] = useState<number | null>(null);
+
+  const { dragOverIndex, draggingItem, handleDragStart, handleDragEnd, handleDrag } = useSortable({
+    items: filters,
+    onUpdate: (newFilters) => {
+      setFilters(newFilters);
+      onUpdate(newFilters);
+    },
+  });
 
   const handleFilterToggle = useCallback(
     (value: string) => {
@@ -29,21 +36,6 @@ export function useFilterManager({ initialFilters, onUpdate }: UseFilterManagerP
         } else {
           newFilters = current.filter((_, i) => i !== index);
         }
-
-        onUpdate(newFilters);
-
-        return newFilters;
-      });
-    },
-    [onUpdate]
-  );
-
-  const moveFilter = useCallback(
-    (fromIndex: number, toIndex: number) => {
-      setFilters((current) => {
-        const newFilters = [...current];
-        const [movedItem] = newFilters.splice(fromIndex, 1);
-        newFilters.splice(toIndex, 0, movedItem);
 
         onUpdate(newFilters);
 
@@ -101,10 +93,10 @@ export function useFilterManager({ initialFilters, onUpdate }: UseFilterManagerP
     filters,
     dragOverIndex,
     draggingItem,
-    setDragOverIndex,
-    setDraggingItem,
+    handleDragStart,
+    handleDragEnd,
+    handleDrag,
     handleFilterToggle,
-    moveFilter,
     handleParamChange,
     getFilteredFilters,
   };
