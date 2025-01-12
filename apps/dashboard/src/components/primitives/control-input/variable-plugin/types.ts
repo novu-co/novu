@@ -8,9 +8,9 @@ export type PluginState = {
 };
 
 export type VariableMatch = {
-  fullVariableName: string;
-  variableName: string;
+  fullLiquidExpression: string;
+  name: string;
   start: number;
   end: number;
-  hasModifiers: boolean;
+  modifiers: string[];
 };

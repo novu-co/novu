@@ -7,7 +7,7 @@ import { createAutocompleteSource } from '@/utils/liquid-autocomplete';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 import { useCallback, useMemo, useRef } from 'react';
 import { useVariables } from './hooks/use-variables';
-import { createVariablePlugin } from './variable-plugin';
+import { createVariableExtension } from './variable-plugin';
 import { variablePillTheme } from './variable-plugin/variable-theme';
 import { VariablePopover } from './variable-popover';
 
@@ -64,7 +64,7 @@ export function ControlInput({
 
   const variablePluginExtension = useMemo(
     () =>
-      createVariablePlugin({
+      createVariableExtension({
         viewRef,
         lastCompletionRef,
         onSelect: handleVariableSelect,

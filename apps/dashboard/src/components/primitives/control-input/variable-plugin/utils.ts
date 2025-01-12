@@ -12,27 +12,27 @@ import type { VariableMatch } from './types';
  * Input match for "{{ subscriber.name | uppercase }}"
  * Returns:
  * {
- *   fullVariableName: "subscriber.name | uppercase",
- *   variableName: "subscriber.name",
+ *   fullLiquidExpression: "subscriber.name | uppercase",
+ *   name: "subscriber.name",
  *   start: [match start index],
  *   end: [match end index],
- *   hasModifiers: true
+ *   modifiers: ["uppercase"]
  * }
  */
 export function parseVariable(match: RegExpExecArray): VariableMatch {
   const start = match.index;
   const end = start + match[0].length;
-  const fullVariableName = match[1].trim();
-  const parts = fullVariableName.split('|').map((part) => part.trim());
-  const variableName = parts[0];
+  const fullLiquidExpression = match[1].trim();
+  const parts = fullLiquidExpression.split('|').map((part) => part.trim());
+  const name = parts[0];
   const hasModifiers = parts.length > 1;
 
   return {
-    fullVariableName,
-    variableName,
+    fullLiquidExpression,
+    name,
     start,
     end,
-    hasModifiers,
+    modifiers: hasModifiers ? parts.slice(1) : [],
   };
 }
 

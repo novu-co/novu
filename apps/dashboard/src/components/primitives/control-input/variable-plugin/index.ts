@@ -1,8 +1,8 @@
-import { EditorView, ViewPlugin, Decoration } from '@uiw/react-codemirror';
-import type { PluginState } from './types';
+import { Decoration, EditorView, ViewPlugin } from '@uiw/react-codemirror';
 import { VariablePluginView } from './plugin-view';
+import type { PluginState } from './types';
 
-export function createVariablePlugin({ viewRef, lastCompletionRef, onSelect }: PluginState) {
+export function createVariableExtension({ viewRef, lastCompletionRef, onSelect }: PluginState) {
   return ViewPlugin.fromClass(
     class {
       private view: VariablePluginView;
@@ -29,5 +29,8 @@ export function createVariablePlugin({ viewRef, lastCompletionRef, onSelect }: P
   );
 }
 
+export const VARIABLE_REGEX = /{{([^{}]+)}}/g;
+export const VARIABLE_PILL_CLASS = 'cm-variable-pill';
+export const MODIFIERS_CLASS = 'has-modifiers';
+
 export * from './types';
-export * from './constants';

@@ -53,7 +53,7 @@ export class VariablePluginView {
 
     // Iterate through all variable matches in the content and add the pills
     while ((match = VARIABLE_REGEX.exec(content)) !== null) {
-      const { fullVariableName, variableName, start, end, hasModifiers } = parseVariable(match);
+      const { fullLiquidExpression, name, start, end, modifiers } = parseVariable(match);
 
       // Skip creating pills for variables that are currently being edited
       // This allows users to modify variables without the pill getting in the way
@@ -61,10 +61,17 @@ export class VariablePluginView {
         continue;
       }
 
-      if (variableName) {
+      if (name) {
         decorations.push(
           Decoration.replace({
-            widget: new VariablePillWidget(variableName, fullVariableName, start, end, hasModifiers, this.onSelect),
+            widget: new VariablePillWidget(
+              name,
+              fullLiquidExpression,
+              start,
+              end,
+              modifiers?.length > 0,
+              this.onSelect
+            ),
             inclusive: false,
             side: -1,
           }).range(start, end)
