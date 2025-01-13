@@ -63,6 +63,7 @@ function sanitizeInApp(controlValues: InAppControlType) {
     redirect: undefined,
     data: controlValues.data,
     skip: controlValues.skip,
+    disableOutputSanitization: controlValues.disableOutputSanitization,
   };
 
   if (controlValues.primaryAction) {

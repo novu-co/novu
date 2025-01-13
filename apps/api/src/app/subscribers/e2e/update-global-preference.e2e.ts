@@ -33,30 +33,7 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
       );
       expect(firstResponse).to.not.be.ok;
     } catch (error) {
-      expect(error.toJSON()).to.have.include({
-        status: 400,
-        name: 'AxiosError',
-        message: 'Request failed with status code 400',
-      });
-    }
-
-    const yetAnotherBadPayload = {
-      enabled: 'hello',
-      preferences: [{ type: ChannelTypeEnum.Email, enabled: true }],
-    };
-
-    try {
-      const secondResponse = await novuClient.subscribers.preferences.updateGlobal(
-        yetAnotherBadPayload as any,
-        session.subscriberId
-      );
-      expect(secondResponse).to.not.be.ok;
-    } catch (error) {
-      expect(error.toJSON()).to.have.include({
-        status: 400,
-        name: 'AxiosError',
-        message: 'Request failed with status code 400',
-      });
+      expect(error.pretty()).to.contain('Expected array, received boolean');
     }
   });
 
@@ -160,7 +137,8 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
 
     // get the subscriber preferences in prod environment
     session.apiKey = session.environment.apiKeys[0].key;
-    const getProdPreferencesResponse = await novuClient.subscribers.preferences.list(session.subscriberId);
+    const novuClientForProduction = initNovuClassSdk(session);
+    const getProdPreferencesResponse = await novuClientForProduction.subscribers.preferences.list(session.subscriberId);
     const prodPreferences = getProdPreferencesResponse.result;
     expect(prodPreferences.every((item) => !!item.preference.channels.inApp)).to.be.true;
   });

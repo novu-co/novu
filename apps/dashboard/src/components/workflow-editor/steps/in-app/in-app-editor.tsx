@@ -11,6 +11,7 @@ const bodyKey = 'body';
 const redirectKey = 'redirect';
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
+const disableOutputSanitizationKey = 'disableOutputSanitization';
 
 export const InAppEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
   if (uiSchema.group !== UiSchemaGroupEnum.IN_APP) {
@@ -24,6 +25,7 @@ export const InAppEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
     [redirectKey]: redirect,
     [primaryActionKey]: primaryAction,
     [secondaryActionKey]: secondaryAction,
+    [disableOutputSanitizationKey]: disableOutputSanitization,
   } = uiSchema.properties ?? {};
 
   return (
@@ -57,6 +59,14 @@ export const InAppEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
             })}
           </InAppTabsSection>
         </>
+      )}
+
+      {disableOutputSanitization && (
+        <InAppTabsSection>
+          {getComponentByType({
+            component: disableOutputSanitization.component,
+          })}
+        </InAppTabsSection>
       )}
     </div>
   );
