@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { JobEntity, JobRepository, JobStatusEnum, NotificationRepository } from '@novu/dal';
 import { StepTypeEnum } from '@novu/shared';
 import { setUser } from '@sentry/node';
@@ -11,9 +11,11 @@ import {
 } from '@novu/application-generic';
 
 import { RunJobCommand } from './run-job.command';
-import { QueueNextJob, QueueNextJobCommand } from '../queue-next-job';
 import { SendMessage, SendMessageCommand } from '../send-message';
 import { PlatformException, EXCEPTION_MESSAGE_ON_WEBHOOK_FILTER } from '../../../shared/utils';
+import { SetJobAsFailed } from '../update-job-status/set-job-as-failed.usecase';
+import { AddJob } from '../add-job';
+import { SetJobAsFailedCommand } from '../update-job-status/set-job-as.command';
 
 const nr = require('newrelic');
 
@@ -24,7 +26,8 @@ export class RunJob {
   constructor(
     private jobRepository: JobRepository,
     private sendMessage: SendMessage,
-    private queueNextJob: QueueNextJob,
+    @Inject(forwardRef(() => AddJob)) private addJobUsecase: AddJob,
+    @Inject(forwardRef(() => SetJobAsFailed)) private setJobAsFailed: SetJobAsFailed,
     private storageHelperService: StorageHelperService,
     private notificationRepository: NotificationRepository,
     private logger?: PinoLogger
@@ -128,49 +131,60 @@ export class RunJob {
    * Otherwise, we continue trying to queue the next job in the chain.
    */
   private async tryQueueNextJobs(job: JobEntity): Promise<void> {
-    let currentJob = job;
+    let currentJob: JobEntity | null = job;
+    if (!currentJob) {
+      return;
+    }
+
     let shouldContinue = true;
 
     while (shouldContinue) {
       try {
-        const nextJobResult = await this.queueNextJob.execute(
-          QueueNextJobCommand.create({
-            parentId: currentJob._id,
-            environmentId: currentJob._environmentId,
-            organizationId: currentJob._organizationId,
-            userId: currentJob._userId,
-          })
-        );
-
-        if (!nextJobResult) {
-          shouldContinue = false;
-          await this.storageHelperService.deleteAttachments(job.payload?.attachments);
-          break;
+        if (!currentJob) {
+          return;
         }
 
-        currentJob = nextJobResult;
+        currentJob = await this.jobRepository.findOne({
+          _environmentId: currentJob._environmentId,
+          _parentId: currentJob._id,
+        });
+
+        if (!currentJob) {
+          return;
+        }
+
+        await this.addJobUsecase.execute({
+          userId: currentJob._userId,
+          environmentId: currentJob._environmentId,
+          organizationId: currentJob._organizationId,
+          jobId: currentJob._id,
+          job: currentJob,
+        });
       } catch (error: any) {
+        if (!currentJob) {
+          return;
+        }
+
+        await this.setJobAsFailed.execute(
+          SetJobAsFailedCommand.create({
+            environmentId: currentJob._environmentId,
+            jobId: currentJob._id,
+            organizationId: currentJob._organizationId,
+            userId: currentJob._userId,
+          }),
+          error
+        );
+
         if (currentJob.step.shouldStopOnFail || this.shouldBackoff(error)) {
           shouldContinue = false;
           await this.storageHelperService.deleteAttachments(job.payload?.attachments);
           throw error;
         }
-        // If we shouldn't stop on fail, continue with the next job
-        const nextJob = await this.jobRepository.findOne({
-          _environmentId: currentJob._environmentId,
-          _organizationId: currentJob._organizationId,
-          _userId: currentJob._userId,
-          _parentId: currentJob._id,
-        });
-
-        if (!nextJob) {
+      } finally {
+        if (!currentJob) {
           shouldContinue = false;
-          // Only remove the attachments if that is the last job
           await this.storageHelperService.deleteAttachments(job.payload?.attachments);
-          break;
         }
-
-        currentJob = nextJob;
       }
     }
   }
