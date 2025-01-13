@@ -52,6 +52,22 @@ type VariableNodeContent = JSONContent & {
   };
 };
 
+type IterableVariable = JSONContent & {
+  type: 'variable';
+  attrs: {
+    id: string;
+    [key: string]: unknown;
+  };
+};
+
+function isVariableNode(node: JSONContent): node is VariableNodeContent {
+  return node.type === 'variable';
+}
+
+function isIterableVariable(node: JSONContent, eachVariable: string): node is IterableVariable {
+  return isVariableNode(node) && Boolean(node.attrs?.id?.startsWith(eachVariable));
+}
+
 function processForLoopNode(node: JSONContent): JSONContent {
   const eachVariable = node?.attrs?.each;
   if (!eachVariable) {
@@ -62,9 +78,38 @@ function processForLoopNode(node: JSONContent): JSONContent {
     return node;
   }
 
-  const content = node.content.map((contentNodeChild) => processNode(contentNodeChild));
+  const processContentArray = (contentArray: JSONContent[]): JSONContent[] => {
+    return contentArray.map((contentNode) => {
+      // If this node has nested content, process it first
+      if (contentNode.content && Array.isArray(contentNode.content)) {
+        return {
+          ...contentNode,
+          content: processContentArray(contentNode.content),
+        };
+      }
 
-  return { ...node, content };
+      // Check if this is an iterable variable node
+      if (isIterableVariable(contentNode, eachVariable)) {
+        const idWithoutIterablePrefix = contentNode.attrs.id.replace(`${eachVariable}.`, '');
+        const liquidId = `{{${eachVariable}[0].${idWithoutIterablePrefix}}}`;
+
+        return {
+          ...contentNode,
+          attrs: {
+            ...contentNode.attrs,
+            id: liquidId,
+          },
+        };
+      } else {
+        return processNode(contentNode);
+      }
+    });
+  };
+
+  return {
+    ...node,
+    content: processContentArray(node.content),
+  };
 }
 
 function processNode(node: JSONContent): JSONContent {

@@ -22,12 +22,12 @@ export class HydrateEmailSchemaUseCase {
     // TODO: Aligned Zod inferred type and TipTapNode to remove the need of a type assertion
     const emailBody: TipTapNode = TipTapSchema.parse(JSON.parse(command.emailEditor)) as TipTapNode;
     if (emailBody) {
-      this.transformContentInPlace([emailBody], command.fullPayloadForRender, placeholderAggregation);
+      this.transformContentInPlace([emailBody], command.fullPayloadForRender);
     }
 
     return {
       hydratedEmailSchema: emailBody,
-      placeholderAggregation,
+      placeholderAggregation, // TODO: remove this
     };
   }
 
@@ -48,14 +48,9 @@ export class HydrateEmailSchemaUseCase {
     node: TipTapNode & {
       attrs: { each: string };
     },
-    masterPayload: PreviewPayload,
     content: TipTapNode[],
-    index: number,
-    placeholderAggregation: PlaceholderAggregation
+    index: number
   ) {
-    const itemPointerToDefaultRecord = this.collectAllItemPlaceholders(node);
-    await this.getResolvedValueForPlaceholder(masterPayload, node, itemPointerToDefaultRecord, placeholderAggregation);
-
     content[index] = {
       type: 'paragraph',
       attrs: { each: node.attrs.each },
@@ -63,11 +58,7 @@ export class HydrateEmailSchemaUseCase {
     };
   }
 
-  private transformContentInPlace(
-    content: TipTapNode[],
-    masterPayload: PreviewPayload,
-    placeholderAggregation: PlaceholderAggregation
-  ) {
+  private transformContentInPlace(content: TipTapNode[], masterPayload: PreviewPayload) {
     content.forEach((node, index) => {
       processNodeAttrs(node);
       processNodeMarks(node);
@@ -76,10 +67,10 @@ export class HydrateEmailSchemaUseCase {
         this.variableLogic(node, content, index);
       }
       if (this.isForNode(node)) {
-        this.forNodeLogic(node, masterPayload, content, index, placeholderAggregation);
+        this.forNodeLogic(node, content, index);
       }
       if (node.content) {
-        this.transformContentInPlace(node.content, masterPayload, placeholderAggregation);
+        this.transformContentInPlace(node.content, masterPayload);
       }
     });
   }
@@ -90,88 +81,6 @@ export class HydrateEmailSchemaUseCase {
 
   private isVariableNode(node: TipTapNode): node is TipTapNode & { attrs: { id: string } } {
     return !!(node.type === 'variable' && node.attrs && 'id' in node.attrs && typeof node.attrs.id === 'string');
-  }
-
-  private getResolvedValueForPlaceholder(
-    masterPayload: PreviewPayload,
-    node: TipTapNode & {
-      attrs: { each: string };
-    },
-    itemPointerToDefaultRecord: Record<string, string>,
-    placeholderAggregation: PlaceholderAggregation
-  ) {
-    let resolvedValueIfFound = this.getValueByPath(masterPayload, node.attrs.each);
-
-    if (!resolvedValueIfFound) {
-      resolvedValueIfFound = [
-        this.buildElement(itemPointerToDefaultRecord, '1'),
-        this.buildElement(itemPointerToDefaultRecord, '2'),
-      ];
-    }
-    placeholderAggregation.nestedForPlaceholders[`{{${node.attrs.each}}}`] =
-      this.buildNestedVariableRecord(itemPointerToDefaultRecord);
-
-    return resolvedValueIfFound;
-  }
-
-  private buildNestedVariableRecord(itemPointerToDefaultRecord: Record<string, string>) {
-    const transformedObj: Record<string, string> = {};
-
-    Object.entries(itemPointerToDefaultRecord).forEach(([key, value]) => {
-      transformedObj[value] = value;
-    });
-
-    return transformedObj;
-  }
-  private collectAllItemPlaceholders(nodeExt: TipTapNode) {
-    const payloadValues = {};
-    const traverse = (node: TipTapNode) => {
-      if (node.type === 'for') {
-        return;
-      }
-      if (this.isVariableNode(node)) {
-        const { id } = node.attrs;
-        payloadValues[`${node.attrs.id}`] = node.attrs.fallback || `{{item.${id}}}`;
-      }
-      if (node.content && Array.isArray(node.content)) {
-        node.content.forEach(traverse);
-      }
-    };
-    nodeExt.content?.forEach(traverse);
-
-    return payloadValues;
-  }
-
-  private getValueByPath(masterPayload: Record<string, any>, placeholderRef: string): any {
-    const keys = placeholderRef.split('.');
-
-    return keys.reduce((currentObj, key) => {
-      if (currentObj && typeof currentObj === 'object' && key in currentObj) {
-        return currentObj[key];
-      }
-
-      return undefined;
-    }, masterPayload);
-  }
-
-  private buildElement(itemPointerToDefaultRecord: Record<string, string>, suffix: string) {
-    const mockPayload: Record<string, any> = {};
-    Object.keys(itemPointerToDefaultRecord).forEach((key) => {
-      const keys = key.split('.');
-      let current = mockPayload;
-      keys.forEach((innerKey, index) => {
-        if (!current[innerKey]) {
-          current[innerKey] = {};
-        }
-        if (index === keys.length - 1) {
-          current[innerKey] = itemPointerToDefaultRecord[key] + suffix;
-        } else {
-          current = current[innerKey];
-        }
-      });
-    });
-
-    return mockPayload;
   }
 }
 

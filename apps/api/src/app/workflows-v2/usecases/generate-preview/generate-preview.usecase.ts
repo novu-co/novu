@@ -33,8 +33,9 @@ import { GeneratePreviewCommand } from './generate-preview.command';
 import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
 import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
 import { Variable } from '../../util/template-parser/liquid-parser';
-import { isObjectTipTapNode, isStringTipTapNode } from '../../util/tip-tap.util';
+import { isObjectTipTapNode } from '../../util/tip-tap.util';
 import { buildVariables } from '../../util/build-variables';
+import { keysToObject } from '../../util/utils';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
@@ -85,10 +86,7 @@ export class GeneratePreviewUsecase {
         const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalidVariables);
 
         const validVariableNames = variables.validVariables.map((variable) => variable.name);
-
-        const tipTapNode = isStringTipTapNode(controlValue) ? JSON.parse(controlValue) : controlValue;
-        const iterableArrayPaths = this.extractIterableArrayPaths(tipTapNode);
-        const variablesExampleResult = this.buildVariablesExample(iterableArrayPaths, validVariableNames);
+        const variablesExampleResult = keysToObject(validVariableNames);
 
         previewTemplateData = {
           variablesExample: _.merge(previewTemplateData.variablesExample, variablesExampleResult),
@@ -139,130 +137,6 @@ export class GeneratePreviewUsecase {
         previewPayloadExample: {},
       } as any;
     }
-  }
-
-  /**
-   * Builds the variables example object for the preview
-   *
-   * @param eachValues - name of the iterable arrays (e.g. "payload.comments")
-   * @param validVariableNames - name of all the variables (e.g. "payload.comments.author")
-   * @returns variables example object, iterable values will be tripled
-   *
-   * @example
-   * iterableArrayPaths = ["payload.comments"]
-   * validVariableNames = [ "payload.title", "payload.comments.author" ]
-   *
-   * result = {
-   *   payload: {
-   *     title: "{{payload.title}}",
-   *     comments: [
-   *       {
-   *         author: "{{payload.comments.author}}"
-   *       },
-   *      {
-   *         author: "{{payload.comments.author}}"
-   *       },
-   *    {
-   *         author: "{{payload.comments.author}}"
-   *       }
-   *     ]
-   *   }
-   * }
-   */
-  private buildVariablesExample(iterableArrayPaths: string[], allVariableNames: string[]) {
-    const result = {};
-
-    this.processRegularVariables(result, allVariableNames, iterableArrayPaths);
-    this.processIterableArrays(result, allVariableNames, iterableArrayPaths);
-
-    return result;
-  }
-
-  private processRegularVariables(
-    result: Record<string, unknown>,
-    allVariableNames: string[],
-    iterableArrayPaths: string[]
-  ): void {
-    const isNotPartOfArray = (varName: string) =>
-      !iterableArrayPaths.some((arrayPath) => varName.startsWith(arrayPath));
-
-    const regularVariables = allVariableNames.filter(isNotPartOfArray);
-
-    for (const varName of regularVariables) {
-      _.set(result, varName, `{{${varName}}}`);
-    }
-  }
-
-  private processIterableArrays(
-    result: Record<string, unknown>,
-    allVariableNames: string[],
-    iterableArrayPaths: string[]
-  ): void {
-    const EXAMPLE_ARRAY_SIZE = 3;
-
-    for (const arrayPath of iterableArrayPaths) {
-      const arrayVariables = allVariableNames.filter((varName) => varName.startsWith(`${arrayPath}.`));
-
-      if (arrayVariables.length === 0) {
-        const simpleArray = Array(EXAMPLE_ARRAY_SIZE).fill(`{{${arrayPath}}}`);
-        _.set(result, arrayPath, simpleArray);
-        continue;
-      }
-
-      const arrayItemTemplate = this.buildArrayItemTemplate(arrayPath, arrayVariables);
-      const exampleArray = Array(EXAMPLE_ARRAY_SIZE).fill(arrayItemTemplate);
-
-      _.set(result, arrayPath, exampleArray);
-    }
-  }
-
-  /**
-   * @example
-   * arrayPath = "payload.comments"
-   * arrayVariables = ["payload.comments.author", "payload.comments.text"]
-   *
-   * result = {
-   *   author: "{{payload.comments.author}}",
-   *   text: "{{payload.comments.text}}"
-   * }
-   */
-  private buildArrayItemTemplate(arrayPath: string, arrayVariables: string[]): Record<string, string> {
-    const template = {};
-
-    for (const varName of arrayVariables) {
-      const propertyPath = varName.replace(`${arrayPath}.`, '');
-      _.set(template, propertyPath, `{{${varName}}}`);
-    }
-
-    return template;
-  }
-
-  /**
-   * Extracts the each key values from all "for" nodes in the TipTap json
-   *
-   * @example
-   * node = {
-   *   type: "for",
-   *   attrs: { each: "payload.comments" },
-   *   content: [ ... ]
-   * }
-   *
-   * result = ["payload.comments"]
-   */
-  private extractIterableArrayPaths(node: TipTapNode): string[] {
-    const eachValues: string[] = [];
-
-    if (node.attrs?.each) {
-      eachValues.push(node.attrs.each);
-    }
-
-    if (node.content) {
-      for (const childNode of node.content) {
-        eachValues.push(...this.extractIterableArrayPaths(childNode));
-      }
-    }
-
-    return eachValues;
   }
 
   private sanitizeControlsForPreview(initialControlValues: Record<string, unknown>, stepData: StepResponseDto) {
