@@ -3354,7 +3354,6 @@ describe('Trigger event - /v1/events/trigger (POST) #novu-v2', function () {
     });
 
     it('should throw error when delay step exceeds tier limit', async function () {
-      console.log('test 333');
       const workflowBody: CreateWorkflowDto = {
         name: 'Test Tier Validation',
         workflowId: 'test-tier-validation',
@@ -3390,16 +3389,13 @@ describe('Trigger event - /v1/events/trigger (POST) #novu-v2', function () {
         lastName: 'Doe',
       });
 
-      console.log('trigger 333');
       await novuClient.trigger({
         name: workflow.workflowId,
         to: [subscriber.subscriberId],
         payload: {},
       });
 
-      console.log('before trigger 333');
       await session.awaitRunningJobs(workflow._id);
-      console.log('after trigger 333');
 
       const executionDetails = await executionDetailsRepository.findOne({
         _environmentId: session.environment._id,
