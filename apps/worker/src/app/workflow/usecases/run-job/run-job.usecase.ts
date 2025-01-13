@@ -114,22 +114,63 @@ export class RunJob {
       throw error;
     } finally {
       if (shouldQueueNextJob) {
-        const newJob = await this.queueNextJob.execute(
-          QueueNextJobCommand.create({
-            parentId: job._id,
-            environmentId: job._environmentId,
-            organizationId: job._organizationId,
-            userId: job._userId,
-          })
-        );
-
-        // Only remove the attachments if that is the last job
-        if (!newJob) {
-          await this.storageHelperService.deleteAttachments(job.payload?.attachments);
-        }
+        await this.tryQueueNextJobs(job);
       } else {
         // Remove the attachments if the job should not be queued
         await this.storageHelperService.deleteAttachments(job.payload?.attachments);
+      }
+    }
+  }
+
+  /**
+   * Attempts to queue subsequent jobs in the workflow chain.
+   * If queueNextJob.execute returns undefined, we stop the workflow.
+   * Otherwise, we continue trying to queue the next job in the chain.
+   */
+  private async tryQueueNextJobs(job: JobEntity): Promise<void> {
+    let currentJob = job;
+    let shouldContinue = true;
+
+    while (shouldContinue) {
+      try {
+        const nextJobResult = await this.queueNextJob.execute(
+          QueueNextJobCommand.create({
+            parentId: currentJob._id,
+            environmentId: currentJob._environmentId,
+            organizationId: currentJob._organizationId,
+            userId: currentJob._userId,
+          })
+        );
+
+        if (!nextJobResult) {
+          shouldContinue = false;
+          await this.storageHelperService.deleteAttachments(job.payload?.attachments);
+          break;
+        }
+
+        currentJob = nextJobResult;
+      } catch (error: any) {
+        if (currentJob.step.shouldStopOnFail || this.shouldBackoff(error)) {
+          shouldContinue = false;
+          await this.storageHelperService.deleteAttachments(job.payload?.attachments);
+          throw error;
+        }
+        // If we shouldn't stop on fail, continue with the next job
+        const nextJob = await this.jobRepository.findOne({
+          _environmentId: currentJob._environmentId,
+          _organizationId: currentJob._organizationId,
+          _userId: currentJob._userId,
+          _parentId: currentJob._id,
+        });
+
+        if (!nextJob) {
+          shouldContinue = false;
+          // Only remove the attachments if that is the last job
+          await this.storageHelperService.deleteAttachments(job.payload?.attachments);
+          break;
+        }
+
+        currentJob = nextJob;
       }
     }
   }

@@ -142,6 +142,10 @@ const isCronExpression = (cron: string) => {
 };
 
 const isRegularDeferAction = (command: TierRestrictionsValidateCommand) => {
+  if (command.deferDurationMs) {
+    return true;
+  }
+
   return (
     !!command.amount &&
     isNumber(command.amount) &&
