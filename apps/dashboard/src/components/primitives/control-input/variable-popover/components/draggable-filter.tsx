@@ -26,34 +26,23 @@ export const DraggableFilter = forwardRef<HTMLDivElement, DraggableFilterProps>(
     ref
   ) => {
     const filterDef = FILTERS.find((t) => t.value === filter.value);
+    const isDragging = draggingItem === index;
 
     return (
-      <motion.div
-        ref={ref}
-        key={filter.value + index}
-        className={`relative ${!isLast ? 'mb-1' : ''}`}
-        layout
-        layoutId={filter.value + index}
-        transition={{
-          layout: { duration: 0.2, ease: 'easeOut' },
-          type: 'spring',
-          stiffness: 500,
-          damping: 30,
-        }}
-      >
+      <motion.div ref={ref} key={filter.value + index} className="relative" initial={false}>
         {dragOverIndex === index && (
           <motion.div
-            className="bg-primary absolute -top-[2px] left-0 right-0 h-[2px]"
             layoutId="dropIndicator"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.15 }}
+            className="absolute -top-0.5 left-0 right-0 h-0.5 bg-neutral-200"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
           />
         )}
         <motion.div
-          className={`group flex cursor-move items-center gap-1.5 ${
-            draggingItem === index ? 'ring-primary opacity-50 ring-2 ring-offset-1' : ''
+          className={`group mb-0 flex cursor-move items-center gap-1.5 rounded-md p-0.5 ${
+            isDragging ? 'opacity-50' : ''
           }`}
           drag="y"
           dragDirectionLock
@@ -64,7 +53,7 @@ export const DraggableFilter = forwardRef<HTMLDivElement, DraggableFilterProps>(
           onDragEnd={onDragEnd}
           onDrag={onDrag}
           data-index={index}
-          animate={draggingItem === index ? { scale: 1.02, zIndex: 50 } : { scale: 1, zIndex: 1 }}
+          animate={isDragging ? { scale: 1.02, zIndex: 50 } : { scale: 1, zIndex: 1 }}
           transition={{
             duration: 0.15,
             ease: [0.32, 0.72, 0, 1],
@@ -104,14 +93,14 @@ export const DraggableFilter = forwardRef<HTMLDivElement, DraggableFilterProps>(
             <RiCloseLine className="h-3.5 w-3.5" />
           </Button>
         </motion.div>
-        {dragOverIndex === index + 1 && (
+        {isLast && dragOverIndex === index + 1 && (
           <motion.div
-            className="bg-primary absolute -bottom-[2px] left-0 right-0 h-[2px]"
             layoutId="dropIndicator"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.15 }}
+            className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-neutral-200"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
           />
         )}
       </motion.div>
