@@ -2,7 +2,6 @@ import { CreateWorkflowButton } from '@/components/create-workflow-button';
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';
-import { Badge } from '@/components/primitives/badge';
 import { Button } from '@/components/primitives/button';
 import { WorkflowList } from '@/components/workflow-list';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';

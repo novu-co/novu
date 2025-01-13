@@ -47,7 +47,7 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   const handleCreateWorkflow = async (values: z.infer<typeof workflowSchema>) => {
     if (!selectedTemplate) return;
 
-    const workflow = await createFromTemplate(values, selectedTemplate.workflowDefinition);
+    await createFromTemplate(values, selectedTemplate.workflowDefinition);
   };
 
   const getHeaderText = () => {
