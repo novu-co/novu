@@ -11,6 +11,8 @@ import { FormControl, FormItem } from '@/components/primitives/form/form';
 import { Input } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Switch } from '@/components/primitives/switch';
+import { useTelemetry } from '@/hooks/use-telemetry';
+import { TelemetryEvent } from '@/utils/telemetry';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { RiAddFill } from 'react-icons/ri';
 import { Separator } from '../../separator';
@@ -31,6 +33,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [filters, setFilters] = useState<FilterWithParam[]>(parsedFilters || []);
+  const track = useTelemetry();
 
   useEffect(() => {
     setName(parsedName);
@@ -77,11 +80,17 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
   );
 
   const handleSave = useCallback(() => {
+    track(TelemetryEvent.VARIABLE_POPOVER_APPLIED, {
+      variableName: name,
+      hasDefaultValue: !!defaultVal,
+      filtersCount: filters.length,
+      filters: filters.map((filter) => filter.value),
+    });
     onUpdate(formatLiquidVariable(name, defaultVal, filters));
-  }, [name, defaultVal, filters, onUpdate]);
+  }, [name, defaultVal, filters, onUpdate, track]);
 
   return (
-    <PopoverContent className="w-72 p-0">
+    <PopoverContent className="w-72 p-0" onOpenAutoFocus={() => track(TelemetryEvent.VARIABLE_POPOVER_OPENED)}>
       <div>
         <div className="bg-bg-weak">
           <div className="flex flex-row items-center justify-between space-y-0 p-1.5">
@@ -203,7 +212,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
           <Separator className="my-0" />
 
           <div className="flex justify-end p-2">
-            <Button variant="secondary" mode="filled" size="2xs" onClick={handleSave}>
+            <Button variant="secondary" mode="filled" size="2xs" onClick={handleSave} className="h-6">
               Apply
             </Button>
           </div>
