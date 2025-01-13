@@ -1,3 +1,4 @@
+import { Button } from '@/components/primitives/button';
 import {
   Command,
   CommandEmpty,
@@ -12,7 +13,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives
 import { Switch } from '@/components/primitives/switch';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { RiAddFill } from 'react-icons/ri';
-import { useDebounce } from '../../../../hooks/use-debounce';
 import { Separator } from '../../separator';
 import { FilterItem } from './components/filter-item';
 import { FiltersList } from './components/filters-list';
@@ -30,53 +30,21 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
   const [showRawLiquid, setShowRawLiquid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCommandOpen, setIsCommandOpen] = useState(false);
+  const [filters, setFilters] = useState<FilterWithParam[]>(parsedFilters || []);
 
   useEffect(() => {
     setName(parsedName);
     setDefaultVal(parsedDefaultValue);
-  }, [parsedName, parsedDefaultValue]);
+    setFilters(parsedFilters || []);
+  }, [parsedName, parsedDefaultValue, parsedFilters]);
 
-  const updateVariable = useCallback(
-    (newName: string, newDefaultVal: string, newFilters: FilterWithParam[]) => {
-      onUpdate(formatLiquidVariable(newName, newDefaultVal, newFilters));
-    },
-    [onUpdate]
-  );
+  const handleNameChange = useCallback((newName: string) => {
+    setName(newName);
+  }, []);
 
-  const debouncedUpdate = useDebounce(updateVariable, 300);
-
-  const {
-    filters,
-    dragOverIndex,
-    draggingItem,
-    handleDragStart,
-    handleDragEnd,
-    handleDrag,
-    handleFilterToggle,
-    handleParamChange,
-    getFilteredFilters,
-  } = useFilterManager({
-    initialFilters: parsedFilters || [],
-    onUpdate: (newFilters) => {
-      debouncedUpdate(name, defaultVal, newFilters);
-    },
-  });
-
-  const handleNameChange = useCallback(
-    (newName: string) => {
-      setName(newName);
-      debouncedUpdate(newName, defaultVal, filters);
-    },
-    [defaultVal, filters, debouncedUpdate]
-  );
-
-  const handleDefaultValueChange = useCallback(
-    (newDefaultVal: string) => {
-      setDefaultVal(newDefaultVal);
-      debouncedUpdate(name, newDefaultVal, filters);
-    },
-    [name, filters, debouncedUpdate]
-  );
+  const handleDefaultValueChange = useCallback((newDefaultVal: string) => {
+    setDefaultVal(newDefaultVal);
+  }, []);
 
   const handleRawLiquidChange = useCallback(
     (value: string) => {
@@ -87,12 +55,30 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
     [parseRawInput]
   );
 
+  const {
+    dragOverIndex,
+    draggingItem,
+    handleDragStart,
+    handleDragEnd,
+    handleDrag,
+    handleFilterToggle,
+    handleParamChange,
+    getFilteredFilters,
+  } = useFilterManager({
+    initialFilters: filters,
+    onUpdate: setFilters,
+  });
+
   const filteredFilters = useMemo(() => getFilteredFilters(searchQuery), [getFilteredFilters, searchQuery]);
 
   const currentLiquidValue = useMemo(
     () => originalVariable || formatLiquidVariable(name, defaultVal, filters),
     [originalVariable, name, defaultVal, filters]
   );
+
+  const handleSave = useCallback(() => {
+    onUpdate(formatLiquidVariable(name, defaultVal, filters));
+  }, [name, defaultVal, filters, onUpdate]);
 
   return (
     <PopoverContent className="w-72 p-0">
@@ -127,10 +113,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
                 </div>
               </FormControl>
             </FormItem>
-          </div>
-          <Separator className="my-0" />
 
-          <div className="flex flex-col gap-1.5 p-2">
             <FormItem>
               <FormControl>
                 <div className="grid gap-1">
@@ -216,6 +199,13 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
                 </FormControl>
               </FormItem>
             )}
+          </div>
+          <Separator className="my-0" />
+
+          <div className="flex justify-end p-2">
+            <Button variant="secondary" mode="filled" size="2xs" onClick={handleSave}>
+              Update
+            </Button>
           </div>
         </div>
       </div>

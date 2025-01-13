@@ -65,9 +65,7 @@ export function useVariables(viewRef: React.RefObject<EditorView>, onChange: (va
         onChange(view.state.doc.toString());
 
         // Update the selected variable with new bounds
-        setSelectedVariable((prev: SelectedVariable | null) =>
-          prev ? { ...prev, value: newValue, to: from + newVariableText.length } : null
-        );
+        setSelectedVariable(null);
       } finally {
         isUpdatingRef.current = false;
       }

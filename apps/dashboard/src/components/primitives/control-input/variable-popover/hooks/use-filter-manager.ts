@@ -13,10 +13,7 @@ export function useFilterManager({ initialFilters, onUpdate }: UseFilterManagerP
 
   const { dragOverIndex, draggingItem, handleDragStart, handleDragEnd, handleDrag } = useSortable({
     items: filters,
-    onUpdate: (newFilters) => {
-      setFilters(newFilters);
-      onUpdate(newFilters);
-    },
+    onUpdate: setFilters,
   });
 
   const handleFilterToggle = useCallback(
@@ -38,53 +35,42 @@ export function useFilterManager({ initialFilters, onUpdate }: UseFilterManagerP
         }
 
         onUpdate(newFilters);
-
         return newFilters;
       });
     },
     [onUpdate]
   );
 
-  const handleParamChange = useCallback(
-    (index: number, params: string[]) => {
-      setFilters((current) => {
-        const newFilters = [...current];
-        const filterDef = FILTERS.find((def) => def.value === newFilters[index].value);
+  const handleParamChange = useCallback((index: number, params: string[]) => {
+    setFilters((current) => {
+      const newFilters = [...current];
+      const filterDef = FILTERS.find((def) => def.value === newFilters[index].value);
 
-        // Format params based on their types
-        const formattedParams = params.map((param, paramIndex) => {
-          const paramType = filterDef?.params?.[paramIndex]?.type;
+      // Format params based on their types
+      const formattedParams = params.map((param, paramIndex) => {
+        const paramType = filterDef?.params?.[paramIndex]?.type;
 
-          if (paramType === 'number') {
-            const numericValue = String(param).replace(/[^\d.-]/g, '');
-            return isNaN(Number(numericValue)) ? '' : numericValue;
-          }
-          return param;
-        });
-
-        newFilters[index] = { ...newFilters[index], params: formattedParams };
-        onUpdate(newFilters);
-
-        return newFilters;
+        if (paramType === 'number') {
+          const numericValue = String(param).replace(/[^\d.-]/g, '');
+          return isNaN(Number(numericValue)) ? '' : numericValue;
+        }
+        return param;
       });
-    },
-    [onUpdate]
-  );
+
+      newFilters[index] = { ...newFilters[index], params: formattedParams };
+      return newFilters;
+    });
+  }, []);
 
   const getFilteredFilters = useCallback(
     (query: string) => {
-      const normalizedQuery = query.toLowerCase();
-      return FILTERS.filter((filter) => {
-        // Never show default in the transformer list as it's handled separately
-        if (filter.value === 'default') return false;
-        if (filters.some((t) => t.value === filter.value)) return false;
-
-        return (
-          filter.label.toLowerCase().includes(normalizedQuery) ||
-          filter.description?.toLowerCase().includes(normalizedQuery) ||
-          filter.value.toLowerCase().includes(normalizedQuery)
-        );
-      });
+      const currentFilterValues = filters.map((t) => t.value);
+      return FILTERS.filter(
+        (t) =>
+          !currentFilterValues.includes(t.value) &&
+          (t.label.toLowerCase().includes(query.toLowerCase()) ||
+            t.description?.toLowerCase().includes(query.toLowerCase()))
+      );
     },
     [filters]
   );
