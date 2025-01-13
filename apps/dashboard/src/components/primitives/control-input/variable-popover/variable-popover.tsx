@@ -127,7 +127,10 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
                 </div>
               </FormControl>
             </FormItem>
+          </div>
+          <Separator className="my-0" />
 
+          <div className="flex flex-col gap-1.5 p-2">
             <FormItem>
               <FormControl>
                 <div className="grid gap-1">
@@ -145,8 +148,9 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
                           <CommandInput
                             value={searchQuery}
                             onValueChange={setSearchQuery}
-                            placeholder="Search filters..."
+                            placeholder="Search..."
                             className="h-7"
+                            inputWrapperClassName="h-7 text-2xs"
                           />
                         </div>
 
