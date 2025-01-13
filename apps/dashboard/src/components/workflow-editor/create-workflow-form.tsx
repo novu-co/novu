@@ -30,7 +30,6 @@ export function CreateWorkflowForm({ onSubmit, template }: CreateWorkflowFormPro
       workflowId: template?.workflowId ?? '',
       name: template?.name ?? '',
       tags: template?.tags ?? [],
-      steps: template?.steps ?? [],
     },
   });
 

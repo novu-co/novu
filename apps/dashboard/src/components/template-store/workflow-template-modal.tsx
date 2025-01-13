@@ -48,8 +48,6 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
     if (!selectedTemplate) return;
 
     const workflow = await createFromTemplate(values, selectedTemplate.workflowDefinition);
-
-    console.log('workflow', workflow);
   };
 
   const getHeaderText = () => {
