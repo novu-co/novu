@@ -49,7 +49,7 @@ function getHeaders(overrideEnv?: string): HeadersInit {
   };
 }
 
-describe('Workflow Controller E2E API Testing', () => {
+describe('Workflow Controller E2E API Testing #novu-v2', () => {
   let workflowsClient: ReturnType<typeof createWorkflowClient>;
 
   beforeEach(async () => {

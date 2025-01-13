@@ -46,7 +46,6 @@ export class NotificationsController {
     @Query() query: ActivitiesRequestDto
   ): Promise<ActivitiesResponseDto> {
     let channelsQuery: ChannelTypeEnum[] | null = null;
-
     if (query.channels) {
       channelsQuery = Array.isArray(query.channels) ? query.channels : [query.channels];
     }

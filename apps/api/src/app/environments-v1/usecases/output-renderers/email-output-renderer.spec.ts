@@ -227,7 +227,7 @@ describe('EmailOutputRendererUsecase', () => {
 
       const result = await emailOutputRendererUsecase.execute(renderCommand);
 
-      expect(result).to.have.property('subject', 'Order Status');
+      expect(result.subject).to.equal('Order Status');
       expect(result.body).to.include('Welcome');
       expect(result.body).to.include('John');
       expect(result.body).to.include('Your order');
@@ -595,8 +595,7 @@ describe('EmailOutputRendererUsecase', () => {
       };
 
       const result = await emailOutputRendererUsecase.execute(renderCommand);
-      // todo check if this is correct or a bug as this should be 'href="https://example.com"'
-      expect(result.body).to.include('href="example.com"');
+      expect(result.body).to.include('href="https://example.com"');
       expect(result.body).to.include('target="_blank"');
       expect(result.body).to.include('>here</a>');
     });
@@ -676,8 +675,7 @@ describe('EmailOutputRendererUsecase', () => {
       };
 
       const result = await emailOutputRendererUsecase.execute(renderCommand);
-      // todo check if this is correct or a bug as this should be 'href="https://example.com"'
-      expect(result.body).to.include('href="example.com"');
+      expect(result.body).to.include('href="https://example.com"');
     });
   });
 });

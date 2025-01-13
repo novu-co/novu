@@ -99,7 +99,7 @@ describe('Trigger bulk events - /v1/events/trigger/bulk (POST) #novu-v2', functi
     expect(thirdEvent.transactionId).to.equal('3333');
   });
 
-  it('should gene?rate message and notification based on a bulk event', async function () {
+  it('should generate message and notification based on a bulk event', async function () {
     await novuClient.triggerBulk({
       events: [
         {
