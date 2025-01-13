@@ -1,4 +1,3 @@
-import { EditorView } from '@uiw/react-codemirror';
 import type { VariableMatch } from './types';
 
 /**
@@ -34,30 +33,6 @@ export function parseVariable(match: RegExpExecArray): VariableMatch {
     end,
     filters: hasFilters ? parts.slice(1) : [],
   };
-}
-
-export function handleVariableCompletion(view: EditorView, pos: number, content: string): boolean {
-  if (content.slice(pos - 2, pos) === '}}') {
-    const start = content.lastIndexOf('{{', pos);
-    if (start !== -1) {
-      const variableContent = content.slice(start + 2, pos - 2).trim();
-      if (variableContent) {
-        const needsSpace = pos < content.length && content[pos] !== ' ' && content[pos] !== '\n';
-        if (needsSpace) {
-          requestAnimationFrame(() => {
-            view.dispatch({
-              changes: { from: pos, insert: ' ' },
-              selection: { anchor: pos + 1 },
-            });
-          });
-        }
-
-        return true;
-      }
-    }
-  }
-
-  return false;
 }
 
 export function isTypingVariable(content: string, pos: number): boolean {

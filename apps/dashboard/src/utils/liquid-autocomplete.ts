@@ -1,6 +1,7 @@
 import { FILTERS } from '@/components/primitives/control-input/variable-popover/constants';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
-import { CompletionContext, CompletionResult } from '@codemirror/autocomplete';
+import { Completion, CompletionContext, CompletionResult } from '@codemirror/autocomplete';
+import { EditorView } from '@uiw/react-codemirror';
 
 interface CompletionOption {
   label: string;
@@ -214,8 +215,37 @@ export function createAutocompleteSource(variables: LiquidVariable[]) {
     const options = completions(variables)(context);
     if (!options) return null;
 
+    const { from, to } = options;
+
     return {
-      ...options,
+      from,
+      to,
+      options: options.options.map((option) => ({
+        ...option,
+        apply: (view: EditorView, completion: Completion, from: number, to: number) => {
+          const selectedValue = completion.label;
+          const content = view.state.doc.toString();
+          const beforeCursor = content.slice(0, from);
+          const afterCursor = content.slice(to);
+
+          // Ensure proper {{ }} wrapping
+          const needsOpening = !beforeCursor.endsWith('{{');
+          const needsClosing = !afterCursor.startsWith('}}');
+
+          const wrappedValue = `${needsOpening ? '{{' : ''}${selectedValue}${needsClosing ? '}}' : ''}`;
+
+          // Calculate the final cursor position
+          // Add 2 if we need to account for closing brackets
+          const finalCursorPos = from + wrappedValue.length + (needsClosing ? 0 : 2);
+
+          view.dispatch({
+            changes: { from, to, insert: wrappedValue },
+            selection: { anchor: finalCursorPos },
+          });
+
+          return true;
+        },
+      })),
     };
   };
 }

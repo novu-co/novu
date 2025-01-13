@@ -1,7 +1,7 @@
 import { Decoration, DecorationSet, EditorView, Range } from '@uiw/react-codemirror';
 import { MutableRefObject } from 'react';
 import { VARIABLE_REGEX } from './';
-import { handleVariableCompletion, isTypingVariable, parseVariable } from './utils';
+import { isTypingVariable, parseVariable } from './utils';
 import { VariablePillWidget } from './variable-pill-widget';
 
 export class VariablePluginView {
@@ -25,11 +25,6 @@ export class VariablePluginView {
       const content = update.state.doc.toString();
 
       this.isTypingVariable = isTypingVariable(content, pos);
-
-      if (update.docChanged) {
-        handleVariableCompletion(update.view, pos, content);
-      }
-
       this.decorations = this.createDecorations(update.view);
     }
 
