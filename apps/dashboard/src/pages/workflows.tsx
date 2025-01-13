@@ -3,6 +3,7 @@ import { DashboardLayout } from '@/components/dashboard-layout';
 import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';
 import { Button } from '@/components/primitives/button';
+import { ServerErrorPage } from '@/components/shared/server-error-page';
 import { WorkflowList } from '@/components/workflow-list';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
@@ -21,7 +22,8 @@ export const WorkflowsPage = () => {
       <PageMeta title="Workflows" />
       <DashboardLayout headerStartItems={<h1 className="text-foreground-950 flex items-center gap-1">Workflows</h1>}>
         <OptInModal />
-        <div className="flex justify-between px-2.5 py-2.5">
+        <ServerErrorPage />
+        {/* <div className="flex justify-between px-2.5 py-2.5">
           <div className="invisible flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2"></div>
 
           <CreateWorkflowButton asChild>
@@ -30,7 +32,7 @@ export const WorkflowsPage = () => {
             </Button>
           </CreateWorkflowButton>
         </div>
-        <WorkflowList />
+        <WorkflowList /> */}
       </DashboardLayout>
     </>
   );
