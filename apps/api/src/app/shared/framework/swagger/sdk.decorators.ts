@@ -55,7 +55,6 @@ export function SdkMethodMaxParamsOverride(maxParamsBeforeCollapseToObject?: num
 }
 
 class SDKOverrideOptions {
-  // 'x-speakeasy-name-override': 'workflowId',
   nameOverride?: string;
 }
 

@@ -141,13 +141,13 @@ export class ActivityNotificationSubscriberResponseDto {
   @ApiPropertyOptional({ description: 'First name of the subscriber', type: String })
   firstName?: string;
 
-  @ApiProperty({ description: 'Unique identifier of the subscriber', type: String })
+  @ApiProperty({ description: 'External unique identifier of the subscriber', type: String })
   _id: string;
 
   @ApiPropertyOptional({ description: 'Last name of the subscriber', type: String })
   lastName?: string;
 
-  @ApiPropertyOptional({ description: 'Email of the subscriber', type: String })
+  @ApiPropertyOptional({ description: 'Email address of the subscriber', type: String })
   email?: string;
 
   @ApiPropertyOptional({ description: 'Phone number of the subscriber', type: String })
@@ -247,7 +247,7 @@ export class ActivityNotificationResponseDto {
 
 // Activities Response DTO
 export class ActivitiesResponseDto {
-  @ApiProperty({ description: 'Whether there are more activities', type: Boolean })
+  @ApiProperty({ description: 'Indicates if there are more activities in the result set', type: Boolean })
   hasMore: boolean;
 
   @ApiProperty({
