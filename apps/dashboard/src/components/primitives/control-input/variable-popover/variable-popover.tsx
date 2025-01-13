@@ -104,7 +104,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
             </div>
           </div>
         </div>
-        <div className="grid gap-1.5">
+        <div className="grid">
           <div className="grid gap-2 p-2">
             <FormItem>
               <FormControl>
@@ -127,32 +127,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
                 </div>
               </FormControl>
             </FormItem>
-            <FormItem>
-              <FormControl>
-                <div className="flex items-center justify-between">
-                  <label className="text-text-sub text-label-xs">Show raw liquid</label>
-                  <Switch checked={showRawLiquid} onCheckedChange={setShowRawLiquid} className="scale-75" />
-                </div>
-              </FormControl>
-            </FormItem>
-            {showRawLiquid && (
-              <FormItem>
-                <FormControl>
-                  <div className="grid gap-1">
-                    <Input
-                      value={currentLiquidValue}
-                      onChange={(e) => handleRawLiquidChange(e.target.value)}
-                      className="h-7 text-sm"
-                    />
-                  </div>
-                </FormControl>
-              </FormItem>
-            )}
-          </div>
 
-          <Separator className="my-0" />
-
-          <div className="flex flex-col gap-1 p-2">
             <FormItem>
               <FormControl>
                 <div className="grid gap-1">
@@ -211,6 +186,32 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
               onRemove={handleFilterToggle}
               onParamChange={handleParamChange}
             />
+          </div>
+
+          <Separator className="my-0" />
+
+          <div className="p-2">
+            <FormItem>
+              <FormControl>
+                <div className="flex items-center justify-between">
+                  <label className="text-text-sub text-label-xs">Show raw liquid</label>
+                  <Switch checked={showRawLiquid} onCheckedChange={setShowRawLiquid} className="scale-75" />
+                </div>
+              </FormControl>
+            </FormItem>
+            {showRawLiquid && (
+              <FormItem>
+                <FormControl>
+                  <div className="grid gap-1">
+                    <Input
+                      value={currentLiquidValue}
+                      onChange={(e) => handleRawLiquidChange(e.target.value)}
+                      className="h-7 text-sm"
+                    />
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
           </div>
         </div>
       </div>

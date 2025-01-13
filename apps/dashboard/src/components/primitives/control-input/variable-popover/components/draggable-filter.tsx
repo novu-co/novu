@@ -1,5 +1,5 @@
 import { Button } from '@/components/primitives/button';
-import { Input } from '@/components/primitives/input';
+import { InputPure } from '@/components/primitives/input';
 import { GripVertical } from 'lucide-react';
 import { motion } from 'motion/react';
 import { forwardRef } from 'react';
@@ -77,7 +77,7 @@ export const DraggableFilter = forwardRef<HTMLDivElement, DraggableFilterProps>(
               {filterDef?.hasParam && filterDef.params && (
                 <div className="flex flex-1 flex-col gap-1 py-1">
                   {filterDef.params.map((param, paramIndex) => (
-                    <Input
+                    <InputPure
                       key={paramIndex}
                       value={filter.params?.[paramIndex] || ''}
                       onChange={(e) => {
