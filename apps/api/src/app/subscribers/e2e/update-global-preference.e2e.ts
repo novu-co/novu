@@ -1,11 +1,11 @@
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
 import { Novu } from '@novu/api';
-import { ChannelTypeEnum,StepTypeEnum, UpdateSubscriberGlobalPreferencesRequestDto } from '@novu/api/models/components';
-import axios from 'axios';
+import { ChannelTypeEnum } from '@novu/api/models/components';
 import { SubscriberRepository } from '@novu/dal';
 
 import { PreferenceChannels } from '@novu/api/src/models/components/preferencechannels';
+import { ChannelTypeEnum as ChannelTypeEnumInShared, StepTypeEnum } from '@novu/shared';
 import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
 describe('Update Subscribers global preferences - /subscribers/:subscriberId/preferences (PATCH) #novu-v2', function () {
@@ -27,7 +27,10 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
     };
 
     try {
-      const firstResponse = await updateGlobalPreferences(badPayload as any, session);
+      const firstResponse = await novuClient.subscribers.preferences.updateGlobal(
+        badPayload as any,
+        session.subscriberId
+      );
       expect(firstResponse).to.not.be.ok;
     } catch (error) {
       expect(error.toJSON()).to.have.include({
@@ -43,7 +46,10 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
     };
 
     try {
-      const secondResponse = await updateGlobalPreferences(yetAnotherBadPayload as any, session);
+      const secondResponse = await novuClient.subscribers.preferences.updateGlobal(
+        yetAnotherBadPayload as any,
+        session.subscriberId
+      );
       expect(secondResponse).to.not.be.ok;
     } catch (error) {
       expect(error.toJSON()).to.have.include({
@@ -96,17 +102,6 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
       inApp: false,
     } as PreferenceChannels);
   });
-});
-
-// This is kept in order to validate the server controller behavior as the SDK will not allow problematic payloads in compilation
-export async function updateGlobalPreferences(data: UpdateSubscriberGlobalPreferencesRequestDto, session: UserSession) {
-  const axiosInstance = axios.create();
-
-  return await axiosInstance.patch(`${session.serverUrl}/v1/subscribers/${session.subscriberId}/preferences`, data, {
-    headers: {
-      authorization: `ApiKey ${session.apiKey}`,
-    },
-  });
   it('should update user global preferences only for the current environment', async function () {
     // create a template in dev environment
     await session.createTemplate({
@@ -139,35 +134,36 @@ export async function updateGlobalPreferences(data: UpdateSubscriberGlobalPrefer
 
     await session.switchToDevEnvironment();
     // update the subscriber global preferences in dev environment
-    const response = await updateGlobalPreferences(
+    const response = await novuClient.subscribers.preferences.updateGlobal(
       {
         enabled: true,
-        preferences: [{ type: ChannelTypeEnum.IN_APP, enabled: false }],
+        preferences: [{ type: ChannelTypeEnumInShared.IN_APP, enabled: false }],
       },
-      session
+      session.subscriberId
     );
 
-    expect(response.data.data.preference.enabled).to.eql(true);
-    expect(response.data.data.preference.channels).to.eql({
-      [ChannelTypeEnum.EMAIL]: true,
-      [ChannelTypeEnum.PUSH]: true,
-      [ChannelTypeEnum.CHAT]: true,
-      [ChannelTypeEnum.SMS]: true,
-      [ChannelTypeEnum.IN_APP]: false,
-    });
+    expect(response.result.preference.enabled).to.eql(true);
+    expect(response.result.preference.channels).to.eql({
+      email: true,
+      push: true,
+      chat: true,
+      sms: true,
+      inApp: false,
+    } as PreferenceChannels);
 
     // get the subscriber preferences in dev environment
-    const getDevPreferencesResponse = await getPreference(session);
-    const devPreferences = getDevPreferencesResponse.data.data;
-    expect(devPreferences.every((item) => !!item.preference.channels.in_app)).to.be.false;
+    const getDevPreferencesResponse = await novuClient.subscribers.preferences.list(session.subscriberId);
+    const devPreferences = getDevPreferencesResponse.result;
+    expect(devPreferences.every((item) => !!item.preference.channels.inApp)).to.be.false;
 
     await session.switchToProdEnvironment();
 
     // get the subscriber preferences in prod environment
     session.apiKey = session.environment.apiKeys[0].key;
-    const getProdPreferencesResponse = await getPreference(session);
-    const prodPreferences = getProdPreferencesResponse.data.data;
-    expect(prodPreferences.every((item) => !!item.preference.channels.in_app)).to.be.true;
+    const getProdPreferencesResponse = await novuClient.subscribers.preferences.list(session.subscriberId);
+    const prodPreferences = getProdPreferencesResponse.result;
+    expect(prodPreferences.every((item) => !!item.preference.channels.inApp)).to.be.true;
   });
+});
 
-}
+// This is kept in order to validate the server controller behavior as the SDK will not allow problematic payloads in compilation
