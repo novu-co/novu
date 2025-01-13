@@ -58,6 +58,9 @@ export class ActivityNotificationExecutionDetailResponseDto {
   @ApiProperty({ description: 'Unique identifier of the execution detail', type: String })
   _id: string;
 
+  @ApiPropertyOptional({ description: 'Creation time of the execution detail', type: String })
+  createdAt?: string;
+
   @ApiProperty({
     enum: ExecutionDetailsStatusEnum,
     description: 'Status of the execution detail',

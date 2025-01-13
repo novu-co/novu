@@ -136,5 +136,6 @@ function convertExecutionDetail(detail: ExecutionDetailFeedItem): ActivityNotifi
     providerId: detail.providerId as unknown as ProvidersIdEnum,
     source: detail.source,
     status: detail.status,
+    createdAt: detail.createdAt,
   };
 }
