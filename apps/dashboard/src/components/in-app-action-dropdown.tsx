@@ -66,14 +66,14 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
               </Button>
             )}
             {primaryAction && (
-              <ConfigureActionPopover asChild fields={{ actionKey: primaryActionKey }}>
+              <ConfigureActionPopover fields={{ actionKey: primaryActionKey }}>
                 <Button variant="primary" size="2xs" className="z-10 h-6">
                   {primaryAction.label}
                 </Button>
               </ConfigureActionPopover>
             )}
             {secondaryAction && (
-              <ConfigureActionPopover asChild fields={{ actionKey: secondaryActionKey }}>
+              <ConfigureActionPopover fields={{ actionKey: secondaryActionKey }}>
                 <Button variant="secondary" mode="outline" size="2xs" className="z-10 h-6">
                   {secondaryAction.label}
                 </Button>
