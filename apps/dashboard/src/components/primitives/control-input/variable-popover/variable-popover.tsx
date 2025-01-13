@@ -204,7 +204,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
 
           <div className="flex justify-end p-2">
             <Button variant="secondary" mode="filled" size="2xs" onClick={handleSave}>
-              Update
+              Apply
             </Button>
           </div>
         </div>
