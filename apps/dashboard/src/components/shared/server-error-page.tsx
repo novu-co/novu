@@ -1,8 +1,11 @@
 import { RiQuestionAnswerLine } from 'react-icons/ri';
 import { Button } from '../primitives/button';
 import { Plug } from '../icons/plug';
+import { usePlainChat } from '@/hooks/use-plain-chat';
 
 export function ServerErrorPage() {
+  const { showPlainLiveChat } = usePlainChat();
+
   return (
     <div className="peer flex h-full w-full flex-col items-center justify-center" data-error="true">
       <div className="relative flex w-3/4 flex-col items-center justify-center gap-3">
@@ -24,7 +27,14 @@ export function ServerErrorPage() {
             <p className="text-text-soft text-center text-xs font-medium">we're still human… mostly.</p>
           </div>
 
-          <Button leadingIcon={RiQuestionAnswerLine} size="sm" variant="secondary" mode="outline" className="mt-3">
+          <Button
+            leadingIcon={RiQuestionAnswerLine}
+            size="sm"
+            variant="secondary"
+            mode="outline"
+            className="mt-3"
+            onClick={showPlainLiveChat}
+          >
             Get in Touch
           </Button>
         </div>
