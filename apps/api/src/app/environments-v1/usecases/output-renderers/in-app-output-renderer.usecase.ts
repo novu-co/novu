@@ -7,7 +7,7 @@ import { RenderCommand } from './render-command';
 export class InAppOutputRendererUsecase {
   @InstrumentUsecase()
   execute(renderCommand: RenderCommand): InAppRenderOutput {
-    const { skip, ...outputControls } = renderCommand.controlValues ?? {};
+    const { skip, disableOutputSanitization, ...outputControls } = renderCommand.controlValues ?? {};
 
     return outputControls as any;
   }
