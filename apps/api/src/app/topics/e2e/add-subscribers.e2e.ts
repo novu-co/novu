@@ -39,8 +39,8 @@ describe('Add subscribers to topic - /topics/:topicKey/subscribers (POST) #novu-
     topicUrl = `${URL}/${topicKey}`;
     addSubscribersUrl = `${topicUrl}/subscribers`;
   });
-
   it('should throw validation error for missing request payload information', async () => {
+    // Not changing to use SDK since the SDK would block wrong usage
     const { body } = await session.testAgent.post(addSubscribersUrl).send({});
 
     expect(body.statusCode).to.eql(400);

@@ -40,9 +40,9 @@ const clerkClientMock = new ClerkClientMock();
 
 function getEEUserRepository() {
   // nx-ignore-next-line
-  const { EnterpriseUserRepository } = require('@novu/ee-auth');
+  const { EEUserRepository } = require('@novu/ee-auth');
 
-  return new EnterpriseUserRepository(new CommunityUserRepository(), clerkClientMock);
+  return new EEUserRepository(new CommunityUserRepository(), clerkClientMock);
 }
 
 function getEEOrganizationRepository() {

@@ -8,22 +8,21 @@ import {
   EmailBlockTypeEnum,
   IApiRateLimitMaximum,
   IEmailBlock,
+  isClerkEnabled,
   JobTopicNameEnum,
   StepTypeEnum,
-  TriggerRecipientsPayload,
-  isClerkEnabled,
 } from '@novu/shared';
 import {
-  UserEntity,
+  ChangeEntity,
+  ChangeRepository,
   EnvironmentEntity,
-  OrganizationEntity,
+  FeedRepository,
+  LayoutRepository,
   NotificationGroupEntity,
   NotificationGroupRepository,
-  FeedRepository,
-  ChangeRepository,
-  ChangeEntity,
+  OrganizationEntity,
   SubscriberRepository,
-  LayoutRepository,
+  UserEntity,
 } from '@novu/dal';
 
 import { NotificationTemplateService } from './notification-template.service';
@@ -423,14 +422,6 @@ export class UserSession {
     });
 
     return feed;
-  }
-
-  async triggerEvent(triggerName: string, to: TriggerRecipientsPayload, payload = {}) {
-    await this.testAgent.post('/v1/events/trigger').send({
-      name: triggerName,
-      to,
-      payload,
-    });
   }
 
   public async awaitRunningJobs(
