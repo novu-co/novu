@@ -5,7 +5,7 @@ import { Novu } from '@novu/api';
 import { ChannelTypeEnum } from '@novu/api/models/components';
 import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-describe('Get Message - /messages (GET)', function () {
+describe('Get Message - /messages (GET) #novu-v2', function () {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let subscriber: SubscriberEntity;

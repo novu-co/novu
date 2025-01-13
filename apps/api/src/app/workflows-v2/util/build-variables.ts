@@ -6,9 +6,6 @@ import { Variable, extractLiquidTemplateVariables, TemplateVariables } from './t
 import { transformMailyContentToLiquid } from '../usecases/generate-preview/transform-maily-content-to-liquid';
 import { isStringTipTapNode } from './tip-tap.util';
 
-const DOT_PROPERTIES = '.properties';
-const DOT_ADDITIONAL_PROPERTIES = '.additionalProperties';
-
 export function buildVariables(
   variableSchema: Record<string, unknown> | undefined,
   controlValue: unknown | Record<string, unknown>,
@@ -44,57 +41,30 @@ export function buildVariables(
   };
 }
 
-type PathValidationResult = {
-  isValid: boolean;
-  additionalPropertiesFound?: boolean;
-};
-
-function validateVariablePath(variableSchema: Record<string, unknown>, variableName: string): PathValidationResult {
-  const parts = variableName.split('.');
-  let currentPath = 'properties';
-
-  for (const part of parts) {
-    currentPath += `.${part}`;
-    const valueExists = _.get(variableSchema, currentPath) !== undefined;
-    const propertiesPath = `${currentPath}${DOT_PROPERTIES}`;
-    const propertiesExist = _.get(variableSchema, propertiesPath) !== undefined;
-
-    if (!valueExists && !propertiesExist) {
-      const additionalPropertiesResult = checkAdditionalProperties(variableSchema, propertiesPath);
-      if (additionalPropertiesResult.isValid) {
-        return { isValid: true, additionalPropertiesFound: true };
-      }
-
-      return { isValid: false };
-    }
-
-    currentPath = propertiesPath;
+function isPropertyAllowed(schema: Record<string, unknown>, propertyPath: string) {
+  let currentSchema = { ...schema };
+  if (!currentSchema || typeof currentSchema !== 'object') {
+    return false;
   }
 
-  return { isValid: true };
-}
+  const pathParts = propertyPath.split('.');
 
-function checkAdditionalProperties(
-  variableSchema: Record<string, unknown>,
-  propertiesPath: string
-): PathValidationResult {
-  let currentPath = propertiesPath;
+  for (const part of pathParts) {
+    const { properties, additionalProperties } = currentSchema;
 
-  while (currentPath.length > 0) {
-    const additionalPropertiesPath = `${currentPath.slice(0, -DOT_PROPERTIES.length)}${DOT_ADDITIONAL_PROPERTIES}`;
-    const additionalPropertiesValue = _.get(variableSchema, additionalPropertiesPath);
-
-    if (additionalPropertiesValue !== undefined) {
-      return { isValid: additionalPropertiesValue === true };
+    if (properties?.[part]) {
+      currentSchema = properties[part];
+      continue;
     }
 
-    const pathParts = currentPath.split('.');
-    if (pathParts.length <= 2) break;
+    if (additionalProperties === true) {
+      return true;
+    }
 
-    currentPath = pathParts.slice(0, -2).join('.');
+    return false;
   }
 
-  return { isValid: false };
+  return true;
 }
 
 function createInvalidVariable(variable: Variable): Variable {
@@ -114,7 +84,7 @@ function identifyUnknownVariables(
 
   return variables.reduce<TemplateVariables>(
     (acc, variable) => {
-      const { isValid } = validateVariablePath(variableSchema, variable.name);
+      const isValid = isPropertyAllowed(variableSchema, variable.name);
 
       if (isValid) {
         acc.validVariables.push(variable);

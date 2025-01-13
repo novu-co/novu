@@ -1,4 +1,4 @@
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './primitives/hover-card';
 
 interface TimeDisplayHoverCardProps {
@@ -8,8 +8,24 @@ interface TimeDisplayHoverCardProps {
 }
 
 export function TimeDisplayHoverCard({ date, children, className }: TimeDisplayHoverCardProps) {
-  const utcTime = format(new Date(date.toUTCString()), 'MMM d yyyy, HH:mm:ss');
-  const localTime = format(date, 'MMM d yyyy, HH:mm:ss');
+  const dateConfig: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  };
+
+  const dateTimeFormat = new Intl.DateTimeFormat('default', dateConfig);
+
+  const utcFormat = new Intl.DateTimeFormat('default', {
+    ...dateConfig,
+    timeZone: 'UTC',
+  });
+
+  const utcTime = utcFormat.format(date);
+  const localTime = dateTimeFormat.format(date);
   const timeAgo = formatDistanceToNow(date, { addSuffix: true });
 
   return (

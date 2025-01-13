@@ -32,16 +32,7 @@ export const WorkflowsPage = () => {
   return (
     <>
       <PageMeta title="Workflows" />
-      <DashboardLayout
-        headerStartItems={
-          <h1 className="text-foreground-950 flex items-center gap-1">
-            <span>Workflows</span>
-            <Badge kind="pill" size="2xs">
-              BETA
-            </Badge>
-          </h1>
-        }
-      >
+      <DashboardLayout headerStartItems={<h1 className="text-foreground-950 flex items-center gap-1">Workflows</h1>}>
         <OptInModal />
         <div className="flex justify-between px-2.5 py-2.5">
           <div className="invisible flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2"></div>

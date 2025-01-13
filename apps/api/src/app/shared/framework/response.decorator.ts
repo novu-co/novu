@@ -17,6 +17,9 @@ export const { ApiNoContentResponse }: { ApiNoContentResponse: (options?: ApiRes
 export const {
   ApiMovedPermanentlyResponse,
 }: { ApiMovedPermanentlyResponse: (options?: ApiResponseOptions) => MethodDecorator } = customResponseDecorators;
+export const {
+  ApiTemporaryRedirectResponse,
+}: { ApiTemporaryRedirectResponse: (options?: ApiResponseOptions) => MethodDecorator } = customResponseDecorators;
 export const { ApiFoundResponse }: { ApiFoundResponse: (options?: ApiResponseOptions) => MethodDecorator } =
   customResponseDecorators;
 export const { ApiBadRequestResponse }: { ApiBadRequestResponse: (options?: ApiResponseOptions) => MethodDecorator } =
@@ -99,12 +102,12 @@ function buildSchema<DataDto extends Type<unknown>>(
 
   return { $ref: getSchemaPath(dataDto) };
 }
-
 export const ApiResponse = <DataDto extends Type<unknown>>(
   dataDto: DataDto,
   statusCode: number = 200,
   isResponseArray = false,
-  shouldEnvelope = true
+  shouldEnvelope = true,
+  options?: ApiResponseOptions
 ) => {
   let responseDecoratorFunction;
   let description = 'Ok'; // Default description
@@ -155,10 +158,12 @@ export const ApiResponse = <DataDto extends Type<unknown>>(
 
   return applyDecorators(
     ApiExtraModels(DataWrapperDto, dataDto),
-    responseDecoratorFunction({
-      description,
-      schema: buildSchema(shouldEnvelope, isResponseArray, dataDto),
-    })
+    responseDecoratorFunction(
+      options || {
+        description,
+        schema: buildSchema(shouldEnvelope, isResponseArray, dataDto),
+      }
+    )
   );
 };
 export const ApiCommonResponses = () => {

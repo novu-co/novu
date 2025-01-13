@@ -6,7 +6,7 @@ import { Novu } from '@novu/api';
 import { ExternalSubscriberId, TopicId } from '../types';
 import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-describe('Check if a subscriber belongs to a topic - /topics/:topicKey/subscribers/:externalSubscriberId (GET)', () => {
+describe('Check if a subscriber belongs to a topic - /topics/:topicKey/subscribers/:externalSubscriberId (GET) #novu-v2', () => {
   const topicKey = 'topic-key-get-topic-subscriber';
   const topicName = 'topic-name';
 

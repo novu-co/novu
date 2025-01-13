@@ -7,7 +7,7 @@ import {
   ListWorkflowResponse,
   PatchStepDataDto,
   PatchWorkflowDto,
-  StepDataDto,
+  StepResponseDto,
   SyncWorkflowDto,
   UpdateWorkflowDto,
   WorkflowResponseDto,
@@ -44,16 +44,16 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
   const getWorkflowStepData = async (
     workflowId: string,
     stepId: string
-  ): Promise<NovuRestResult<StepDataDto, HttpError>> => {
-    return await baseClient.safeGet<StepDataDto>(`/v2/workflows/${workflowId}/steps/${stepId}`);
+  ): Promise<NovuRestResult<StepResponseDto, HttpError>> => {
+    return await baseClient.safeGet<StepResponseDto>(`/v2/workflows/${workflowId}/steps/${stepId}`);
   };
 
   const patchWorkflowStepData = async (
     workflowId: string,
     stepId: string,
     patchStepDataDto: PatchStepDataDto
-  ): Promise<NovuRestResult<StepDataDto, HttpError>> => {
-    return await baseClient.safePatch<StepDataDto>(`/v2/workflows/${workflowId}/steps/${stepId}`, patchStepDataDto);
+  ): Promise<NovuRestResult<StepResponseDto, HttpError>> => {
+    return await baseClient.safePatch<StepResponseDto>(`/v2/workflows/${workflowId}/steps/${stepId}`, patchStepDataDto);
   };
 
   const patchWorkflow = async (

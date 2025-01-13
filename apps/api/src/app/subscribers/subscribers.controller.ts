@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Body,
   Controller,
-  DefaultValuePipe,
   Delete,
   Get,
   HttpCode,
@@ -36,7 +35,6 @@ import {
   UserSessionData,
 } from '@novu/shared';
 import { MessageEntity } from '@novu/dal';
-
 import { RemoveSubscriber, RemoveSubscriberCommand } from './usecases/remove-subscriber';
 import { ExternalApiAccessible } from '../auth/framework/external-api.decorator';
 import { UserSession } from '../shared/framework/user.decorator';
@@ -54,7 +52,10 @@ import { GetSubscribers, GetSubscribersCommand } from './usecases/get-subscriber
 import { GetSubscriber, GetSubscriberCommand } from './usecases/get-subscriber';
 import { GetPreferencesByLevelCommand } from './usecases/get-preferences-by-level/get-preferences-by-level.command';
 import { GetPreferencesByLevel } from './usecases/get-preferences-by-level/get-preferences-by-level.usecase';
-import { UpdateSubscriberPreferenceResponseDto } from '../widgets/dtos/update-subscriber-preference-response.dto';
+import {
+  UpdateSubscriberPreferenceGlobalResponseDto,
+  UpdateSubscriberPreferenceResponseDto,
+} from '../widgets/dtos/update-subscriber-preference-response.dto';
 import { UpdateSubscriberPreferenceRequestDto } from '../widgets/dtos/update-subscriber-preference-request.dto';
 import { MessageResponseDto } from '../widgets/dtos/message-response.dto';
 import { UnseenCountResponse } from '../widgets/dtos/unseen-count-response.dto';
@@ -80,6 +81,7 @@ import { GetInAppNotificationsFeedForSubscriberDto } from './dtos/get-in-app-not
 import {
   ApiCommonResponses,
   ApiCreatedResponse,
+  ApiFoundResponse,
   ApiNoContentResponse,
   ApiResponse,
 } from '../shared/framework/response.decorator';
@@ -104,9 +106,12 @@ import { MarkMessageAsByMarkCommand } from '../widgets/usecases/mark-message-as-
 import { MarkMessageAsByMark } from '../widgets/usecases/mark-message-as-by-mark/mark-message-as-by-mark.usecase';
 import { FeedResponseDto } from '../widgets/dtos/feeds-response.dto';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
-import { SdkGroupName, SdkMethodName, SdkUsePagination } from '../shared/framework/swagger/sdk.decorators';
+import { SdkApiParam, SdkGroupName, SdkMethodName, SdkUsePagination } from '../shared/framework/swagger/sdk.decorators';
 import { UpdatePreferences } from '../inbox/usecases/update-preferences/update-preferences.usecase';
 import { UpdatePreferencesCommand } from '../inbox/usecases/update-preferences/update-preferences.command';
+import { UnseenCountQueryDto } from './query-objects/unseen-count.query';
+import { ResponseTypeEnum } from './usecases/chat-oauth-callback/chat-oauth-callback.result';
+import { BulkCreateSubscriberResponseDto } from './dtos/bulk-create-subscriber-response.dto';
 
 @ThrottlerCategory(ApiRateLimitCategoryEnum.CONFIGURATION)
 @ApiCommonResponses()
@@ -230,8 +235,12 @@ export class SubscribersController {
       The bulk API is limited to 500 subscribers per request.
     `,
   })
+  @ApiResponse(BulkCreateSubscriberResponseDto, 201)
   @SdkMethodName('createBulk')
-  async bulkCreateSubscribers(@UserSession() user: UserSessionData, @Body() body: BulkSubscriberCreateDto) {
+  async bulkCreateSubscribers(
+    @UserSession() user: UserSessionData,
+    @Body() body: BulkSubscriberCreateDto
+  ): Promise<BulkCreateSubscriberResponseDto> {
     return await this.bulkCreateSubscribersUsecase.execute(
       BulkCreateSubscribersCommand.create({
         environmentId: user.environmentId,
@@ -415,6 +424,7 @@ export class SubscribersController {
       'A flag which specifies if the inactive workflow channels should be included in the retrieved preferences. Default is true',
   })
   @SdkGroupName('Subscribers.Preferences')
+  @SdkMethodName('list')
   async listSubscriberPreferences(
     @UserSession() user: UserSessionData,
     @Param('subscriberId') subscriberId: string,
@@ -439,13 +449,16 @@ export class SubscribersController {
     summary: 'Get subscriber preferences by level',
   })
   @ApiParam({ name: 'subscriberId', type: String, required: true })
-  @ApiParam({
-    name: 'parameter',
-    type: String,
-    enum: PreferenceLevelEnum,
-    required: true,
-    description: 'Fetch global or per workflow channel preferences',
-  })
+  @SdkApiParam(
+    {
+      name: 'parameter',
+      type: String,
+      enum: PreferenceLevelEnum,
+      required: true,
+      description: 'the preferences level to be retrieved (template / global) ',
+    },
+    { nameOverride: 'preferenceLevel' }
+  )
   @ApiQuery({
     name: 'includeInactiveChannels',
     type: Boolean,
@@ -471,12 +484,20 @@ export class SubscribersController {
     return await this.getPreferenceUsecase.execute(command);
   }
 
+  // @ts-ignore
   @Patch('/:subscriberId/preferences/:parameter')
   @ExternalApiAccessible()
   @UserAuthentication()
   @ApiResponse(UpdateSubscriberPreferenceResponseDto)
   @ApiParam({ name: 'subscriberId', type: String, required: true })
-  @ApiParam({ name: 'parameter', type: String, required: true })
+  @SdkApiParam(
+    {
+      name: 'parameter',
+      type: String,
+      required: true,
+    },
+    { nameOverride: 'workflowId' }
+  )
   @ApiOperation({
     summary: 'Update subscriber preference',
   })
@@ -484,7 +505,7 @@ export class SubscribersController {
   async updateSubscriberPreference(
     @UserSession() user: UserSessionData,
     @Param('subscriberId') subscriberId: string,
-    @Param('parameter') templateId: string,
+    @Param('parameter') workflowId: string,
     @Body() body: UpdateSubscriberPreferenceRequestDto
   ): Promise<UpdateSubscriberPreferenceResponseDto> {
     const result = await this.updatePreferencesUsecase.execute(
@@ -492,7 +513,7 @@ export class SubscribersController {
         environmentId: user.environmentId,
         organizationId: user.organizationId,
         subscriberId,
-        workflowId: templateId,
+        workflowId,
         level: PreferenceLevelEnum.TEMPLATE,
         includeInactiveChannels: true,
         ...(body.channel && { [body.channel.type]: body.channel.enabled }),
@@ -524,7 +545,7 @@ export class SubscribersController {
   @Patch('/:subscriberId/preferences')
   @ExternalApiAccessible()
   @UserAuthentication()
-  @ApiResponse(UpdateSubscriberPreferenceResponseDto)
+  @ApiResponse(UpdateSubscriberPreferenceGlobalResponseDto)
   @ApiOperation({
     summary: 'Update subscriber global preferences',
   })
@@ -534,7 +555,7 @@ export class SubscribersController {
     @UserSession() user: UserSessionData,
     @Param('subscriberId') subscriberId: string,
     @Body() body: UpdateSubscriberGlobalPreferencesRequestDto
-  ): Promise<Omit<UpdateSubscriberPreferenceResponseDto, 'template'>> {
+  ): Promise<UpdateSubscriberPreferenceGlobalResponseDto> {
     const channels = body.preferences?.reduce((acc, curr) => {
       acc[curr.type] = curr.enabled;
 
@@ -604,20 +625,18 @@ export class SubscribersController {
   @SdkMethodName('unseenCount')
   async getUnseenCount(
     @UserSession() user: UserSessionData,
-    @Query('feedIdentifier') feedId: string[] | string,
-    @Query('seen') seen: boolean,
     @Param('subscriberId') subscriberId: string,
-    @Query('limit', new DefaultValuePipe(100)) limit: number
+    @Query() query: UnseenCountQueryDto
   ): Promise<UnseenCountResponse> {
     let feedsQuery: string[] | undefined;
 
-    if (feedId) {
-      feedsQuery = Array.isArray(feedId) ? feedId : [feedId];
+    if (query.feedId) {
+      feedsQuery = Array.isArray(query.feedId) ? query.feedId : [query.feedId];
     }
 
-    if (seen === undefined) {
+    if (query.seen === undefined) {
       // eslint-disable-next-line no-param-reassign
-      seen = false;
+      query.seen = false;
     }
 
     const command = GetFeedCountCommand.create({
@@ -625,8 +644,8 @@ export class SubscribersController {
       subscriberId,
       environmentId: user.environmentId,
       feedId: feedsQuery,
-      seen,
-      limit,
+      seen: query.seen,
+      limit: query.limit || 100,
     });
 
     return await this.getFeedCountUsecase.execute(command);
@@ -673,11 +692,12 @@ export class SubscribersController {
   @Post('/:subscriberId/messages/mark-as')
   @SdkGroupName('Subscribers.Messages')
   @SdkMethodName('markAllAs')
+  @ApiResponse(MessageResponseDto, 201, true)
   async markMessagesAs(
     @UserSession() user: UserSessionData,
     @Param('subscriberId') subscriberId: string,
     @Body() body: MessageMarkAsRequestDto
-  ): Promise<MessageEntity[]> {
+  ): Promise<MessageResponseDto[]> {
     const messageIds = this.toArray(body.messageId);
     if (!messageIds || messageIds.length === 0) throw new BadRequestException('messageId is required');
 
@@ -757,15 +777,34 @@ export class SubscribersController {
   @ApiOperation({
     summary: 'Handle providers oauth redirect',
   })
+  @ApiResponse(String, 200, false, false, {
+    status: 200,
+    description: 'Returns plain text response.',
+    content: {
+      'text/html': {
+        schema: {
+          type: 'string',
+        },
+      },
+    },
+  })
+  @ApiFoundResponse({
+    type: String,
+    status: 302,
+    description: 'Redirects to the specified URL.',
+    headers: {
+      Location: { description: 'The URL to redirect to.', schema: { type: 'string', example: 'https://www.novu.co' } },
+    },
+  }) // Link to the interface
   @SdkGroupName('Subscribers.Authentication')
   @SdkMethodName('chatAccessOauthCallBack')
   async chatOauthCallback(
     @Param('subscriberId') subscriberId: string,
     @Param('providerId') providerId: ChatProviderIdEnum,
     @Query() query: ChatOauthCallbackRequestDto,
-    @Res() res
-  ): Promise<any> {
-    const data = await this.chatOauthCallbackUsecase.execute(
+    @Res() res: any
+  ): Promise<void> {
+    const callbackResult = await this.chatOauthCallbackUsecase.execute(
       ChatOauthCallbackCommand.create({
         providerCode: query?.code,
         hmacHash: query?.hmacHash,
@@ -775,14 +814,14 @@ export class SubscribersController {
         providerId,
       })
     );
-
-    if (data.redirect) {
-      res.redirect(data.action);
-    } else {
+    if (callbackResult.typeOfResponse !== ResponseTypeEnum.URL) {
       res.setHeader('Content-Type', 'text/html');
       res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'");
-      res.send(data.action);
+      res.send(callbackResult.resultString);
+
+      return;
     }
+    res.redirect(callbackResult.resultString); // Return the URL to redirect to
   }
 
   @ExternalApiAccessible()

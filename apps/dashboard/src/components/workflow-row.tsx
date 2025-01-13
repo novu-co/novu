@@ -8,7 +8,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/primitives/dropdown-menu';
-import { HoverToCopy } from '@/components/primitives/hover-to-copy';
 import { TableCell, TableRow } from '@/components/primitives/table';
 import { Tooltip, TooltipContent, TooltipPortal, TooltipTrigger } from '@/components/primitives/tooltip';
 import TruncatedText from '@/components/truncated-text';
@@ -20,14 +19,13 @@ import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
 import { WorkflowOriginEnum, WorkflowStatusEnum } from '@/utils/enums';
-import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
+import { buildRoute, ROUTES } from '@/utils/routes';
 import { cn } from '@/utils/ui';
 import { IEnvironment, WorkflowListResponseDto } from '@novu/shared';
 import { ComponentProps, useState } from 'react';
 import { FaCode } from 'react-icons/fa6';
 import {
   RiDeleteBin2Line,
-  RiFileCopyLine,
   RiFlashlightLine,
   RiGitPullRequestFill,
   RiMore2Fill,
@@ -40,9 +38,11 @@ import { type ExternalToast } from 'sonner';
 import { ConfirmationModal } from './confirmation-modal';
 import { DeleteWorkflowDialog } from './delete-workflow-dialog';
 import { CompactButton } from './primitives/button-compact';
+import { CopyButton } from './primitives/copy-button';
 import { ToastIcon } from './primitives/sonner';
 import { showToast } from './primitives/sonner-helpers';
 import { TimeDisplayHoverCard } from './time-display-hover-card';
+import { LEGACY_DASHBOARD_URL } from '@/config';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -65,7 +65,7 @@ const WorkflowLinkTableCell = (props: WorkflowLinkTableCellProps) => {
   const isV1Workflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1;
 
   const workflowLink = isV1Workflow
-    ? buildRoute(LEGACY_ROUTES.EDIT_WORKFLOW, {
+    ? buildRoute(`${LEGACY_DASHBOARD_URL}/workflows/edit/:workflowId`, {
         workflowId: workflow._id,
       })
     : buildRoute(ROUTES.EDIT_WORKFLOW, {
@@ -91,7 +91,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
 
   const isV1Workflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1;
   const triggerWorkflowLink = isV1Workflow
-    ? buildRoute(LEGACY_ROUTES.TEST_WORKFLOW, { workflowId: workflow._id })
+    ? buildRoute(`${LEGACY_DASHBOARD_URL}/workflows/edit/:workflowId/test-workflow`, { workflowId: workflow._id })
     : buildRoute(ROUTES.TEST_WORKFLOW, {
         environmentSlug: currentEnvironment?.slug ?? '',
         workflowSlug: workflow.slug,
@@ -185,16 +185,22 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
       <WorkflowLinkTableCell workflow={workflow} className="font-medium">
         <div className="flex items-center gap-1">
           {workflow.origin === WorkflowOriginEnum.EXTERNAL && (
-            <Badge variant="warning" kind="pill">
+            <Badge color="yellow" size="sm" variant="lighter">
               <FaCode className="size-3" />
             </Badge>
           )}
           <TruncatedText className="max-w-[32ch]">{workflow.name}</TruncatedText>
         </div>
-        <HoverToCopy className="group relative z-10 flex items-center gap-1" valueToCopy={workflow.workflowId}>
+        <div className="flex items-center gap-1 transition-opacity duration-200">
           <TruncatedText className="text-foreground-400 font-code block text-xs">{workflow.workflowId}</TruncatedText>
-          <RiFileCopyLine className="text-foreground-400 invisible size-3 group-hover:visible" />
-        </HoverToCopy>
+
+          <CopyButton
+            className="z-10 flex size-2 p-0 px-1 opacity-0 group-hover:opacity-100"
+            valueToCopy={workflow.workflowId}
+            size="2xs"
+            mode="ghost"
+          ></CopyButton>
+        </div>
       </WorkflowLinkTableCell>
       <WorkflowLinkTableCell workflow={workflow} className="min-w-[200px]">
         <WorkflowStatus status={workflow.status} />

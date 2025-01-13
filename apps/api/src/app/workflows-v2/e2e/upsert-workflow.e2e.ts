@@ -16,7 +16,7 @@ interface ITestStepConfig {
   controlValues: Record<string, string>;
 }
 
-describe('Upsert Workflow', function () {
+describe('Upsert Workflow #novu-v2', function () {
   let session: UserSession;
 
   beforeEach(async () => {

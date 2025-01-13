@@ -8,8 +8,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { ColorPicker } from '@/components/primitives/color-picker';
 import { Editor } from '@/components/primitives/editor';
 import { FormControl, FormField, FormItem } from '@/components/primitives/form/form';
-import { InputField } from '@/components/primitives/input';
 import { capitalize } from '@/utils/string';
+import { InputRoot, InputWrapper } from '../primitives/input';
 import type { InboxPlaygroundFormData } from './inbox-playground';
 
 interface PreviewStyle {
@@ -168,23 +168,26 @@ function NotificationConfigSection() {
         <FormField
           control={control}
           name="subject"
-          render={({ field }) => (
-            <InputField size="fit">
-              <FormItem className="w-full">
-                <FormControl>
-                  <Editor
-                    singleLine
-                    indentWithTab={false}
-                    fontFamily="inherit"
-                    placeholder={capitalize(field.name)}
-                    id={field.name}
-                    extensions={extensions}
-                    value={field.value}
-                    onChange={field.onChange}
-                  />
-                </FormControl>
-              </FormItem>
-            </InputField>
+          render={({ field, fieldState }) => (
+            <FormItem className="w-full">
+              <FormControl>
+                <InputRoot hasError={!!fieldState.error}>
+                  <InputWrapper className="flex h-9 items-center justify-center px-1">
+                    <Editor
+                      singleLine
+                      indentWithTab={false}
+                      fontFamily="inherit"
+                      placeholder={capitalize(field.name)}
+                      id={field.name}
+                      extensions={extensions}
+                      value={field.value}
+                      onChange={field.onChange}
+                      className="flex h-full items-center"
+                    />
+                  </InputWrapper>
+                </InputRoot>
+              </FormControl>
+            </FormItem>
           )}
         />
       </div>
@@ -194,20 +197,22 @@ function NotificationConfigSection() {
         render={({ field }) => (
           <FormItem className="w-full">
             <FormControl>
-              <InputField className="h-36 px-1">
-                <Editor
-                  fontFamily="inherit"
-                  indentWithTab={false}
-                  placeholder={capitalize(field.name)}
-                  id={field.name}
-                  extensions={extensions}
-                  basicSetup={basicSetup}
-                  ref={field.ref}
-                  value={field.value}
-                  onChange={field.onChange}
-                  height="100%"
-                />
-              </InputField>
+              <InputRoot>
+                <InputWrapper className="flex h-36 items-center justify-center px-1">
+                  <Editor
+                    fontFamily="inherit"
+                    indentWithTab={false}
+                    placeholder={capitalize(field.name)}
+                    id={field.name}
+                    extensions={extensions}
+                    basicSetup={basicSetup}
+                    ref={field.ref}
+                    value={field.value}
+                    onChange={field.onChange}
+                    height="100%"
+                  />
+                </InputWrapper>
+              </InputRoot>
             </FormControl>
           </FormItem>
         )}

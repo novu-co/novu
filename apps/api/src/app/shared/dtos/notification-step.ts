@@ -1,16 +1,16 @@
 import { ApiExtraModels, ApiProperty, ApiPropertyOptional, getSchemaPath } from '@nestjs/swagger';
 import {
-  DigestUnitEnum,
-  DigestTypeEnum,
+  DaysEnum,
   DelayTypeEnum,
-  IWorkflowStepMetadata,
+  DigestTypeEnum,
+  DigestUnitEnum,
+  IDelayRegularMetadata,
+  IDelayScheduledMetadata,
   IDigestBaseMetadata,
   IDigestRegularMetadata,
   IDigestTimedMetadata,
-  IDelayRegularMetadata,
-  IDelayScheduledMetadata,
   ITimedConfig,
-  DaysEnum,
+  IWorkflowStepMetadata,
   MonthlyTypeEnum,
   OrdinalEnum,
   OrdinalValueEnum,
@@ -19,7 +19,7 @@ import {
 import { IsBoolean, ValidateNested } from 'class-validator';
 
 import { MessageTemplate } from './message-template';
-import { StepFilter } from './step-filter';
+import { StepFilterDto } from './step-filter-dto';
 
 class TimedConfig implements ITimedConfig {
   @ApiPropertyOptional()
@@ -133,10 +133,10 @@ export class NotificationStepVariant implements StepVariantDto {
   template?: MessageTemplate;
 
   @ApiPropertyOptional({
-    type: [StepFilter],
+    type: [StepFilterDto],
   })
   @ValidateNested({ each: true })
-  filters?: StepFilter[];
+  filters?: StepFilterDto[];
 
   @ApiPropertyOptional()
   _parentId?: string | null;
