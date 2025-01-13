@@ -95,7 +95,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
   );
 
   return (
-    <PopoverContent className="w-72 p-0 pb-1">
+    <PopoverContent className="w-72 p-0">
       <div>
         <div className="bg-bg-weak">
           <div className="flex flex-row items-center justify-between space-y-0 p-1.5">
