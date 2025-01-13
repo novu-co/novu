@@ -4,10 +4,12 @@ export type Filters = {
   hasParam?: boolean;
   description?: string;
   example?: string;
+  sampleValue?: string;
   params?: {
     placeholder: string;
     description?: string;
     type?: 'string' | 'number';
+    defaultValue?: string;
   }[];
 };
 

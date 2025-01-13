@@ -35,31 +35,61 @@ export function useSortable<T>({ items, onUpdate }: UseSortableProps<T>) {
 
   const findDropPosition = useCallback(
     (point: Point): DragPosition | null => {
-      const elements = document.elementsFromPoint(point.x, point.y);
-      const droppableElement = elements.find(
-        (el) => el.classList.contains('group') && !el.classList.contains('opacity-50')
-      );
-
-      if (droppableElement) {
-        const index = parseInt(droppableElement.getAttribute('data-index') || '-1');
-        return index !== -1 ? { index, isAfter: false } : null;
-      }
-
-      const container = document.querySelector('.rounded-8.border-stroke-soft');
+      const container = document.querySelector('[data-filters-container]');
       if (!container) return null;
 
-      const rect = container.getBoundingClientRect();
-      const isInBounds = point.x >= rect.left && point.x <= rect.right && point.y >= rect.top;
+      const containerRect = container.getBoundingClientRect();
+      if (point.y < containerRect.top || point.y > containerRect.bottom) return null;
 
-      const isBelow = point.y > rect.bottom - 20; // 20px threshold
+      const draggableElements = Array.from(container.querySelectorAll('[data-index]')) as HTMLElement[];
+      if (draggableElements.length === 0) return null;
 
-      if (isInBounds && isBelow) {
+      // Constants for smoother detection
+      const EDGE_THRESHOLD = 10; // px from top/bottom of element
+      const TRANSITION_ZONE = 0.35; // percentage of element height for transition
+
+      for (const element of draggableElements) {
+        const rect = element.getBoundingClientRect();
+        const index = parseInt(element.getAttribute('data-index') || '-1');
+        if (index === -1) continue;
+
+        // Skip if we're not within this element's vertical bounds
+        if (point.y < rect.top - EDGE_THRESHOLD || point.y > rect.bottom + EDGE_THRESHOLD) continue;
+
+        const elementHeight = rect.height;
+        const transitionZoneSize = elementHeight * TRANSITION_ZONE;
+
+        // Top zone
+        if (point.y < rect.top + transitionZoneSize) {
+          return { index, isAfter: false };
+        }
+
+        // Bottom zone
+        if (point.y > rect.bottom - transitionZoneSize) {
+          return { index, isAfter: true };
+        }
+
+        // Middle zone - maintain previous position to reduce flickering
+        if (dragOverIndex !== null) {
+          const currentIsAfter = dragOverIndex > index;
+          return { index, isAfter: currentIsAfter };
+        }
+
+        // Default to after if we're in the middle and no previous position
+        return { index, isAfter: true };
+      }
+
+      // Handle dropping at the end of the list
+      const lastElement = draggableElements[draggableElements.length - 1];
+      const lastRect = lastElement.getBoundingClientRect();
+
+      if (point.y > lastRect.bottom - EDGE_THRESHOLD) {
         return { index: items.length - 1, isAfter: true };
       }
 
       return null;
     },
-    [items.length]
+    [items.length, dragOverIndex]
   );
 
   const handleDragStart = useCallback((index: number) => {

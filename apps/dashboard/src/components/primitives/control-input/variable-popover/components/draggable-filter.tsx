@@ -1,5 +1,6 @@
 import { Button } from '@/components/primitives/button';
 import { InputPure } from '@/components/primitives/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { GripVertical } from 'lucide-react';
 import { motion } from 'motion/react';
 import { forwardRef } from 'react';
@@ -49,6 +50,7 @@ export const DraggableFilter = forwardRef<HTMLDivElement, DraggableFilterProps>(
           dragConstraints={{ top: 0, bottom: 0 }}
           dragElastic={0.1}
           dragMomentum={false}
+          dragSnapToOrigin={false}
           onDragStart={() => onDragStart(index)}
           onDragEnd={onDragEnd}
           onDrag={onDrag}
@@ -62,7 +64,14 @@ export const DraggableFilter = forwardRef<HTMLDivElement, DraggableFilterProps>(
           <GripVertical className="text-text-soft h-3.5 w-3.5" />
           <div className="flex flex-1 items-center gap-1">
             <div className="border-stroke-soft text-text-sub text-paragraph-xs bg-bg-weak rounded-8 flex w-full flex-row items-center border">
-              <div className="px-2 py-1.5 pr-0">{filterDef?.label}</div>
+              <Tooltip delayDuration={700}>
+                <TooltipTrigger asChild>
+                  <div className="cursor-help px-2 py-1.5 pr-0">{filterDef?.label}</div>
+                </TooltipTrigger>
+                <TooltipContent side="left" align="center" className="font-mono text-[10px]">
+                  {filterDef?.example}
+                </TooltipContent>
+              </Tooltip>
               {filterDef?.hasParam && filterDef.params && (
                 <div className="flex flex-1 flex-col gap-1 py-1">
                   {filterDef.params.map((param, paramIndex) => (

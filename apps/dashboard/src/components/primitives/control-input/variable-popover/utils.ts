@@ -12,6 +12,10 @@ export function formatParamValue(param: string, type?: 'string' | 'number') {
   return `'${escapeString(param)}'`;
 }
 
+export function getDefaultSampleValue(filterValue: string): string {
+  return FILTERS.find((filter) => filter.value === filterValue)?.sampleValue ?? '';
+}
+
 export function formatLiquidVariable(name: string, defaultValue: string, filters: FilterWithParam[]) {
   const parts = [name.trim()];
 

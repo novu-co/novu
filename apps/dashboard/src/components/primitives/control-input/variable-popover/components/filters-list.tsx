@@ -26,7 +26,7 @@ export function FiltersList({
   if (filters.length === 0) return null;
 
   return (
-    <div className="rounded-8 border-stroke-soft flex flex-col gap-0.5 border px-1 py-1.5">
+    <div className="rounded-8 border-stroke-soft flex flex-col gap-0.5 border px-1 py-1.5" data-filters-container>
       <AnimatePresence mode="popLayout">
         {filters.map((filter, index) => (
           <DraggableFilter

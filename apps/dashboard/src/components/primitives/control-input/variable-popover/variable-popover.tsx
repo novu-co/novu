@@ -17,11 +17,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { RiAddFill } from 'react-icons/ri';
 import { Separator } from '../../separator';
 import { FilterItem } from './components/filter-item';
+import { FilterPreview } from './components/filter-preview';
 import { FiltersList } from './components/filters-list';
 import { useFilterManager } from './hooks/use-filter-manager';
 import { useVariableParser } from './hooks/use-variable-parser';
 import type { FilterWithParam, VariablePopoverProps } from './types';
-import { formatLiquidVariable } from './utils';
+import { formatLiquidVariable, getDefaultSampleValue } from './utils';
 
 export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
   const { parsedName, parsedDefaultValue, parsedFilters, originalVariable, parseRawInput } = useVariableParser(
@@ -29,6 +30,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
   );
   const [name, setName] = useState(parsedName);
   const [defaultVal, setDefaultVal] = useState(parsedDefaultValue);
+  const [previewValue, setPreviewValue] = useState('');
   const [showRawLiquid, setShowRawLiquid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCommandOpen, setIsCommandOpen] = useState(false);
@@ -40,6 +42,23 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
     setDefaultVal(parsedDefaultValue);
     setFilters(parsedFilters || []);
   }, [parsedName, parsedDefaultValue, parsedFilters]);
+
+  // Set initial test value when popover opens
+  const handlePopoverOpen = useCallback(() => {
+    track(TelemetryEvent.VARIABLE_POPOVER_OPENED);
+
+    // Set a default test value based on the first filter, if any
+    if (filters.length > 0) {
+      const firstFilter = filters[0];
+      const sampleValue = getDefaultSampleValue(firstFilter.value);
+      if (sampleValue) {
+        setPreviewValue(sampleValue);
+      }
+    } else {
+      // Default to a simple string if no filters
+      setPreviewValue('Hello World');
+    }
+  }, [filters, track]);
 
   const handleNameChange = useCallback((newName: string) => {
     setName(newName);
@@ -90,7 +109,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
   }, [name, defaultVal, filters, onUpdate, track]);
 
   return (
-    <PopoverContent className="w-72 p-0" onOpenAutoFocus={() => track(TelemetryEvent.VARIABLE_POPOVER_OPENED)}>
+    <PopoverContent className="w-72 p-0" onOpenAutoFocus={handlePopoverOpen}>
       <div>
         <div className="bg-bg-weak">
           <div className="flex flex-row items-center justify-between space-y-0 p-1.5">
@@ -157,6 +176,10 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
                                     handleFilterToggle(filter.value);
                                     setSearchQuery('');
                                     setIsCommandOpen(false);
+                                    const sampleValue = getDefaultSampleValue(filter.value);
+                                    if (sampleValue) {
+                                      setPreviewValue(sampleValue);
+                                    }
                                   }}
                                 >
                                   <FilterItem filter={filter} />
@@ -182,6 +205,27 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
               onRemove={handleFilterToggle}
               onParamChange={handleParamChange}
             />
+
+            {filters.length > 0 && (
+              <FormItem>
+                <FormControl>
+                  <div className="grid gap-1">
+                    <label className="text-text-sub text-label-xs">Test value</label>
+                    <Input
+                      value={previewValue}
+                      onChange={(e) => setPreviewValue(e.target.value)}
+                      placeholder='Enter value (e.g. "text" or [1,2,3] or {"key":"value"})'
+                      className="h-7 text-sm"
+                    />
+                  </div>
+                </FormControl>
+                {previewValue && (
+                  <div className="mt-1">
+                    <FilterPreview value={previewValue} filters={filters} />
+                  </div>
+                )}
+              </FormItem>
+            )}
           </div>
 
           <Separator className="my-0" />

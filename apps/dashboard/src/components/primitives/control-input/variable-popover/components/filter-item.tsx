@@ -1,4 +1,4 @@
-import TruncatedText from '@/components/truncated-text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { Filters } from '../types';
 
 type FilterItemProps = {
@@ -10,17 +10,16 @@ export function FilterItem({ filter }: FilterItemProps) {
     <div className="flex items-start gap-3 py-1">
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-baseline justify-between gap-2">
-          <span className="text-xs font-medium">{filter.label}</span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="cursor-help text-xs font-medium">{filter.label}</span>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="font-mono text-[10px]">
+              {filter.example}
+            </TooltipContent>
+          </Tooltip>
         </div>
         <p className="text-text-sub truncate text-[11px]">{filter.description}</p>
-
-        {filter.example && (
-          <TruncatedText asChild>
-            <span className="text-text-sub line-clamp-2 max-w-[290px] break-all font-mono text-[10px]">
-              {filter.example}
-            </span>
-          </TruncatedText>
-        )}
       </div>
     </div>
   );
