@@ -3353,6 +3353,63 @@ describe('Trigger event - /v1/events/trigger (POST) #novu-v2', function () {
       expect(smsMessage?.content).to.equal('Hello John, this is a test SMS');
       expect(inAppMessage?.content).to.equal('Welcome John! This is an in-app notification');
     });
+
+    it('should throw error when delay step exceeds tier limit', async function () {
+      console.log('test 333');
+      const workflowBody: CreateWorkflowDto = {
+        name: 'Test Tier Validation',
+        workflowId: 'test-tier-validation',
+        __source: WorkflowCreationSourceEnum.DASHBOARD,
+        steps: [
+          {
+            type: StepTypeEnum.DELAY,
+            name: 'Delay Step',
+            controlValues: {
+              metadata: {
+                unit: DigestUnitEnum.DAYS,
+                type: DelayTypeEnum.REGULAR,
+                amount: 100, // Setting a high value that should exceed tier limits
+              },
+            },
+          },
+          {
+            type: StepTypeEnum.IN_APP,
+            name: 'In-App Step',
+            controlValues: {
+              body: 'Hello after delay',
+            },
+          },
+        ],
+      };
+
+      const response = await session.testAgent.post('/v2/workflows').send(workflowBody);
+      expect(response.status).to.equal(201);
+      const workflow: WorkflowResponseDto = response.body.data;
+
+      subscriber = await subscriberService.createSubscriber({
+        firstName: 'John',
+        lastName: 'Doe',
+      });
+
+      console.log('trigger 333');
+      await novuClient.trigger({
+        name: workflow.workflowId,
+        to: [subscriber.subscriberId],
+        payload: {},
+      });
+
+      console.log('before trigger 333');
+      await session.awaitRunningJobs(workflow._id);
+      console.log('after trigger 333');
+
+      const executionDetails = await executionDetailsRepository.findOne({
+        _environmentId: session.environment._id,
+        _templateId: workflow._id,
+        status: ExecutionDetailsStatusEnum.FAILED,
+      });
+
+      expect(executionDetails?.raw).to.contain('Delay duration exceeded tier limit');
+    });
   });
 
   it('should handle complex skip logic with subscriber data', async function () {
