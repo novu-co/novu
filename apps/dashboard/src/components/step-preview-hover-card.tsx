@@ -47,17 +47,6 @@ export function StepPreview({ type, controlValues }: StepPreviewProps) {
 
   if (type === StepTypeEnum.EMAIL) {
     const { subject, body } = controlValues;
-    let parsedBody;
-    try {
-      parsedBody = JSON.parse(body);
-    } catch (e) {
-      console.error('Failed to parse email body:', e);
-      return (
-        <div className="p-4">
-          <div className="text-foreground-600 text-sm">Error parsing email content</div>
-        </div>
-      );
-    }
 
     return (
       <div className="bg-background p-3">
@@ -72,6 +61,7 @@ export function StepPreview({ type, controlValues }: StepPreviewProps) {
 
   if (type === StepTypeEnum.SMS) {
     const { body } = controlValues;
+
     return (
       <div className="p-4">
         <SmsPhone smsBody={body} />
