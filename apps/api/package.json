@@ -44,7 +44,7 @@
     "@nestjs/swagger": "7.4.0",
     "@nestjs/terminus": "10.2.3",
     "@nestjs/throttler": "6.2.1",
-    "@novu/api": "0.0.1-alpha.150",
+    "@novu/api": "0.0.1-alpha.191",
     "@novu/application-generic": "workspace:*",
     "@novu/dal": "workspace:*",
     "@novu/framework": "workspace:*",
