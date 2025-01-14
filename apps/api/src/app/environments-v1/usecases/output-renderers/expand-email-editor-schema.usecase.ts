@@ -12,23 +12,17 @@ export class ExpandEmailEditorSchemaUsecase {
   constructor(private hydrateEmailSchemaUseCase: HydrateEmailSchemaUseCase) {}
 
   async execute(command: ExpandEmailEditorSchemaCommand): Promise<TipTapNode> {
-    const emailSchemaHydrated = this.hydrate(command);
+    const hydratedEmailSchema = this.hydrateEmailSchemaUseCase.execute({
+      emailEditor: command.emailEditorJson,
+      fullPayloadForRender: command.fullPayloadForRender,
+    });
 
-    const processed = await this.processSpecialNodeTypes(command.fullPayloadForRender, emailSchemaHydrated);
+    const processed = await this.processSpecialNodeTypes(command.fullPayloadForRender, hydratedEmailSchema);
 
     // needs to be done after the special node types are processed
     this.processVariableNodeTypes(processed, command.fullPayloadForRender);
 
     return processed;
-  }
-
-  private hydrate(command: ExpandEmailEditorSchemaCommand) {
-    const { hydratedEmailSchema } = this.hydrateEmailSchemaUseCase.execute({
-      emailEditor: command.emailEditorJson,
-      fullPayloadForRender: command.fullPayloadForRender,
-    });
-
-    return hydratedEmailSchema;
   }
 
   private async processSpecialNodeTypes(variables: FullPayloadForRender, rootNode: TipTapNode): Promise<TipTapNode> {

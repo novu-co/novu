@@ -7,32 +7,16 @@ import { MailyAttrsEnum, processNodeAttrs, processNodeMarks } from '@novu/applic
 
 import { HydrateEmailSchemaCommand } from './hydrate-email-schema.command';
 
-export type PlaceholderAggregation = {
-  nestedForPlaceholders: Record<string, Record<string, string>>;
-  regularPlaceholdersToDefaultValue: Record<string, string>;
-};
-
 @Injectable()
 export class HydrateEmailSchemaUseCase {
-  execute(command: HydrateEmailSchemaCommand): {
-    hydratedEmailSchema: TipTapNode;
-    placeholderAggregation: PlaceholderAggregation;
-  } {
-    const placeholderAggregation: PlaceholderAggregation = {
-      nestedForPlaceholders: {},
-      regularPlaceholdersToDefaultValue: {},
-    };
-
+  execute(command: HydrateEmailSchemaCommand): TipTapNode {
     // TODO: Aligned Zod inferred type and TipTapNode to remove the need of a type assertion
-    const emailBody: TipTapNode = TipTapSchema.parse(JSON.parse(command.emailEditor)) as TipTapNode;
+    const emailBody: TipTapNode = TipTapSchema.parse(JSON.parse(command.emailEditor));
     if (emailBody) {
       this.transformContentInPlace([emailBody], command.fullPayloadForRender);
     }
 
-    return {
-      hydratedEmailSchema: emailBody,
-      placeholderAggregation, // TODO: remove this
-    };
+    return emailBody;
   }
 
   private variableLogic(
