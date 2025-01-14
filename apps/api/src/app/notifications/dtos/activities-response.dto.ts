@@ -17,6 +17,57 @@ import {
 import { IsArray, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { StepFilterDto } from '../../shared/dtos/step-filter-dto';
 
+export class DigestTimedConfigDto {
+  @ApiPropertyOptional({ description: 'Time at which the digest is triggered' })
+  @IsOptional()
+  @IsString()
+  atTime?: string;
+
+  @ApiPropertyOptional({ description: 'Days of the week for the digest', type: [String], enum: DaysEnum })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(DaysEnum, { each: true })
+  weekDays?: DaysEnum[];
+
+  @ApiPropertyOptional({ description: 'Specific days of the month for the digest', type: [Number] })
+  @IsOptional()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  monthDays?: number[];
+
+  @ApiPropertyOptional({
+    description: 'Ordinal position for the digest',
+    enum: [...Object.values(OrdinalEnum)],
+    enumName: 'OrdinalEnum',
+  })
+  @IsOptional()
+  @IsEnum(OrdinalEnum)
+  ordinal?: OrdinalEnum;
+
+  @ApiPropertyOptional({
+    description: 'Value of the ordinal',
+    enum: [...Object.values(OrdinalValueEnum)],
+    enumName: 'OrdinalValueEnum',
+  })
+  @IsOptional()
+  @IsEnum(OrdinalValueEnum)
+  ordinalValue?: OrdinalValueEnum;
+
+  @ApiPropertyOptional({
+    description: 'Type of monthly schedule',
+    enum: [...Object.values(MonthlyTypeEnum)],
+    enumName: 'MonthlyTypeEnum',
+  })
+  @IsOptional()
+  @IsEnum(MonthlyTypeEnum)
+  monthlyType?: MonthlyTypeEnum;
+
+  @ApiPropertyOptional({ description: 'Cron expression for scheduling' })
+  @IsOptional()
+  @IsString()
+  cronExpression?: string;
+}
+
 export class DigestMetadataDto {
   @ApiPropertyOptional({ description: 'Optional key for the digest' })
   digestKey?: string;
@@ -362,54 +413,4 @@ export class ActivitiesResponseDto {
 
   @ApiProperty({ description: 'Current page of the activities', type: Number })
   page: number;
-}
-export class DigestTimedConfigDto {
-  @ApiPropertyOptional({ description: 'Time at which the digest is triggered' })
-  @IsOptional()
-  @IsString()
-  atTime?: string;
-
-  @ApiPropertyOptional({ description: 'Days of the week for the digest', type: [String], enum: DaysEnum })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(DaysEnum, { each: true })
-  weekDays?: DaysEnum[];
-
-  @ApiPropertyOptional({ description: 'Specific days of the month for the digest', type: [Number] })
-  @IsOptional()
-  @IsArray()
-  @IsNumber({}, { each: true })
-  monthDays?: number[];
-
-  @ApiPropertyOptional({
-    description: 'Ordinal position for the digest',
-    enum: [...Object.values(OrdinalEnum)],
-    enumName: 'OrdinalEnum',
-  })
-  @IsOptional()
-  @IsEnum(OrdinalEnum)
-  ordinal?: OrdinalEnum;
-
-  @ApiPropertyOptional({
-    description: 'Value of the ordinal',
-    enum: [...Object.values(OrdinalValueEnum)],
-    enumName: 'OrdinalValueEnum',
-  })
-  @IsOptional()
-  @IsEnum(OrdinalValueEnum)
-  ordinalValue?: OrdinalValueEnum;
-
-  @ApiPropertyOptional({
-    description: 'Type of monthly schedule',
-    enum: [...Object.values(MonthlyTypeEnum)],
-    enumName: 'MonthlyTypeEnum',
-  })
-  @IsOptional()
-  @IsEnum(MonthlyTypeEnum)
-  monthlyType?: MonthlyTypeEnum;
-
-  @ApiPropertyOptional({ description: 'Cron expression for scheduling' })
-  @IsOptional()
-  @IsString()
-  cronExpression?: string;
 }
