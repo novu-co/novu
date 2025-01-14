@@ -20,6 +20,7 @@ import {
   ActivityNotificationJobResponseDto,
   ActivityNotificationResponseDto,
   ActivityNotificationStepResponseDto,
+  DigestMetadataDto,
 } from '../../dtos/activities-response.dto';
 import {
   FieldFilterPartDto,
@@ -32,7 +33,6 @@ import {
   WebhookFilterPartDto,
 } from '../../../shared/dtos/step-filter-dto';
 import { MessageTemplateDto } from '../../../shared/dtos/message.template.dto';
-import { DigestMetadataDto } from '../../dtos/digest-metadata.dto';
 
 export function mapFeedItemToDto(entity: NotificationFeedItemEntity): ActivityNotificationResponseDto {
   const dto = new ActivityNotificationResponseDto();
