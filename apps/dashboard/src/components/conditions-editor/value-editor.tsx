@@ -31,7 +31,6 @@ export const ValueEditor = React.memo((props: ValueEditorProps) => {
           <InputWrapper className="h-7">
             <Editor
               fontFamily="inherit"
-              singleLine
               indentWithTab={false}
               placeholder={'value'}
               className="mt-[4px] overflow-hidden [&_.cm-line]:pl-px"
@@ -58,7 +57,6 @@ export const ValueEditor = React.memo((props: ValueEditorProps) => {
       <InputWrapper className="h-7">
         <Editor
           fontFamily="inherit"
-          singleLine
           indentWithTab={false}
           placeholder={'value'}
           className="mt-[4px] overflow-hidden [&_.cm-line]:pl-px"
