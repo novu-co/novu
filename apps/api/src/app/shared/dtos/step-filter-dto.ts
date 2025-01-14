@@ -40,14 +40,14 @@ class BaseFieldFilterPart extends BaseFilterPart {
   operator: BuilderFieldOperator;
 }
 
-class FieldFilterPart extends BaseFieldFilterPart {
+export class FieldFilterPartDto extends BaseFieldFilterPart {
   @ApiProperty({
     enum: [FilterPartTypeEnum.SUBSCRIBER, FilterPartTypeEnum.PAYLOAD],
   })
   on: FilterPartTypeEnum.SUBSCRIBER | FilterPartTypeEnum.PAYLOAD;
 }
 
-class WebhookFilterPart extends BaseFieldFilterPart {
+export class WebhookFilterPartDto extends BaseFieldFilterPart {
   @ApiProperty({
     enum: [FilterPartTypeEnum.WEBHOOK],
   })
@@ -57,7 +57,7 @@ class WebhookFilterPart extends BaseFieldFilterPart {
   webhookUrl: string;
 }
 
-class RealtimeOnlineFilterPart extends BaseFilterPart {
+export class RealtimeOnlineFilterPartDto extends BaseFilterPart {
   @ApiProperty({
     enum: [FilterPartTypeEnum.IS_ONLINE],
   })
@@ -67,7 +67,7 @@ class RealtimeOnlineFilterPart extends BaseFilterPart {
   value: boolean;
 }
 
-class OnlineInLastFilterPart extends BaseFilterPart {
+export class OnlineInLastFilterPartDto extends BaseFilterPart {
   @ApiProperty({
     enum: [FilterPartTypeEnum.IS_ONLINE_IN_LAST],
   })
@@ -82,7 +82,7 @@ class OnlineInLastFilterPart extends BaseFilterPart {
   value: number;
 }
 
-class PreviousStepFilterPart extends BaseFilterPart {
+export class PreviousStepFilterPartDto extends BaseFilterPart {
   @ApiProperty({
     enum: [FilterPartTypeEnum.PREVIOUS_STEP],
   })
@@ -97,7 +97,7 @@ class PreviousStepFilterPart extends BaseFilterPart {
   stepType: PreviousStepTypeEnum;
 }
 
-class TenantFilterPart extends BaseFieldFilterPart {
+export class TenantFilterPartDto extends BaseFieldFilterPart {
   @ApiProperty({
     enum: [FilterPartTypeEnum.TENANT],
     description: 'Only on integrations right now',
@@ -105,15 +105,15 @@ class TenantFilterPart extends BaseFieldFilterPart {
   on: FilterPartTypeEnum.TENANT;
 }
 
-type FilterParts =
-  | FieldFilterPart
-  | WebhookFilterPart
-  | RealtimeOnlineFilterPart
-  | OnlineInLastFilterPart
-  | PreviousStepFilterPart
-  | TenantFilterPart;
+export type FilterPartsDto =
+  | FieldFilterPartDto
+  | WebhookFilterPartDto
+  | RealtimeOnlineFilterPartDto
+  | OnlineInLastFilterPartDto
+  | PreviousStepFilterPartDto
+  | TenantFilterPartDto;
 
-export class StepFilter {
+export class StepFilterDto {
   @ApiProperty()
   isNegated?: boolean;
 
@@ -130,13 +130,13 @@ export class StepFilter {
 
   @ApiProperty({
     type: [
-      FieldFilterPart,
-      WebhookFilterPart,
-      RealtimeOnlineFilterPart,
-      OnlineInLastFilterPart,
-      PreviousStepFilterPart,
-      TenantFilterPart,
+      FieldFilterPartDto,
+      WebhookFilterPartDto,
+      RealtimeOnlineFilterPartDto,
+      OnlineInLastFilterPartDto,
+      PreviousStepFilterPartDto,
+      TenantFilterPartDto,
     ],
   })
-  children: FilterParts[];
+  children: FilterPartsDto[];
 }

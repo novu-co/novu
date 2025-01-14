@@ -10,6 +10,8 @@ import {
   SubscriberRepository,
 } from '@novu/dal';
 import { ChannelTypeEnum, MessagesStatusEnum } from '@novu/shared';
+import { Novu } from '@novu/api';
+import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
 describe('Mark as Seen - /widgets/messages/mark-as (POST) #novu-v1', async () => {
   const messageRepository = new MessageRepository();
@@ -20,12 +22,13 @@ describe('Mark as Seen - /widgets/messages/mark-as (POST) #novu-v1', async () =>
   let subscriberToken: string;
   let subscriber: SubscriberEntity;
   let message: MessageEntity;
-
+  let novuClient: Novu;
   before(async () => {
     session = new UserSession();
     await session.initialize();
     subscriberId = SubscriberRepository.createObjectId();
     template = await session.createTemplate();
+    novuClient = initNovuClassSdk(session);
 
     const { body } = await session.testAgent
       .post('/v1/widgets/session/initialize')
@@ -42,7 +45,7 @@ describe('Mark as Seen - /widgets/messages/mark-as (POST) #novu-v1', async () =>
   });
 
   beforeEach(async () => {
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
     await session.awaitRunningJobs(template._id);
 
     message = await getMessage(session, messageRepository, subscriber);
