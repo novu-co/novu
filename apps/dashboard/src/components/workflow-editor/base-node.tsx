@@ -1,6 +1,8 @@
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { StepTypeEnum } from '@/utils/enums';
 import { cn } from '@/utils/ui';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { cva, VariantProps } from 'class-variance-authority';
 import { ReactNode, useState } from 'react';
 import { RiErrorWarningFill } from 'react-icons/ri';
@@ -77,6 +79,8 @@ export const NodeBody = ({
   type: StepTypeEnum;
   controlValues: Record<string, any>;
 }) => {
+  const isPreviewEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_WORKFLOW_NODE_PREVIEW_ENABLED);
+
   return (
     <HoverCard openDelay={300}>
       <HoverCardTrigger>
@@ -87,15 +91,17 @@ export const NodeBody = ({
           <span className="to-background/90 absolute left-0 top-0 h-full w-full rounded-b-[calc(var(--radius)-1px)] bg-gradient-to-r from-[rgba(255,255,255,0.00)] from-70% to-95%" />
         </div>
       </HoverCardTrigger>
-      <HoverCardPortal container={document.getElementById('workflow-canvas-container')}>
-        {type !== StepTypeEnum.TRIGGER && (
-          <HoverCardContent side="left" className="w-[350px] border-none p-0" sideOffset={15}>
-            <StepPreview type={type} controlValues={controlValues} />
+      {isPreviewEnabled && (
+        <HoverCardPortal container={document.getElementById('workflow-canvas-container')}>
+          {type !== StepTypeEnum.TRIGGER && (
+            <HoverCardContent side="left" className="w-[350px] border-none p-0" sideOffset={15}>
+              <StepPreview type={type} controlValues={controlValues} />
 
-            <HoverCardArrow className="fill-white stroke-white text-white" />
-          </HoverCardContent>
-        )}
-      </HoverCardPortal>
+              <HoverCardArrow className="fill-white stroke-white text-white" />
+            </HoverCardContent>
+          )}
+        </HoverCardPortal>
+      )}
     </HoverCard>
   );
 };

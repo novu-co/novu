@@ -21,9 +21,6 @@ export function useCreateWorkflow({ onSuccess }: UseCreateWorkflowOptions = {}) 
     mutationFn: async (workflow: CreateWorkflowDto) => createWorkflow({ environment: currentEnvironment!, workflow }),
     onSuccess: async (result) => {
       await queryClient.invalidateQueries({ queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id] });
-      await queryClient.invalidateQueries({
-        queryKey: [QueryKeys.fetchWorkflow, currentEnvironment?._id, result.data.workflowId],
-      });
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.fetchTags, currentEnvironment?._id],
       });

@@ -1,4 +1,3 @@
-import { Editor } from '@maily-to/core';
 import {
   ChannelTypeEnum,
   ChatRenderOutput,
@@ -9,7 +8,7 @@ import {
 } from '@novu/shared';
 import { ChatPreview } from './workflow-editor/steps/chat/chat-preview';
 import { EmailPreviewHeader, EmailPreviewSubject } from './workflow-editor/steps/email/email-preview';
-import { DEFAULT_EDITOR_BLOCKS, DEFAULT_EDITOR_CONFIG } from './workflow-editor/steps/email/maily-config';
+import { Maily } from './workflow-editor/steps/email/maily';
 import { InboxPreview } from './workflow-editor/steps/in-app/inbox-preview';
 import { PushPreview } from './workflow-editor/steps/push/push-preview';
 import { SmsPhone } from './workflow-editor/steps/sms/sms-phone';
@@ -61,11 +60,11 @@ export function StepPreview({ type, controlValues }: StepPreviewProps) {
     }
 
     return (
-      <div className="bg-background pointer-events-none p-3">
+      <div className="bg-background p-3">
         <EmailPreviewHeader />
         <EmailPreviewSubject className="px-3 py-2" subject={subject} />
         <div className="mx-auto w-full overflow-auto">
-          <Editor config={DEFAULT_EDITOR_CONFIG} blocks={DEFAULT_EDITOR_BLOCKS} contentJson={parsedBody} />
+          <Maily value={body} />
         </div>
       </div>
     );
