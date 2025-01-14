@@ -1,9 +1,9 @@
 import difference from 'lodash/difference';
 import flatMap from 'lodash/flatMap';
+import isArray from 'lodash/isArray';
+import isObject from 'lodash/isObject';
 import reduce from 'lodash/reduce';
 import values from 'lodash/values';
-import isObject from 'lodash/isObject';
-import isArray from 'lodash/isArray';
 
 import { JSONSchemaDto } from '@novu/shared';
 

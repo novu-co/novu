@@ -98,7 +98,7 @@ FormControl.displayName = 'FormControl';
 const FormMessagePure = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement> & { error?: string }
->(({ className, children, error, id, ...props }) => {
+>(({ className, children, error, id, ...props }, _ref) => {
   const body = error ? error : children;
 
   if (!body) {

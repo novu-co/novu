@@ -9,7 +9,7 @@ import {
 } from '@novu/application-generic';
 import { BuildStepDataCommand } from './build-step-data.command';
 import { InvalidStepException } from '../../exceptions/invalid-step.exception';
-import { BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
+import { BuildVariableSchemaUsecase } from '../build-variable-schema';
 import { buildSlug } from '../../../shared/helpers/build-slug';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class BuildStepDataUsecase {
   constructor(
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private controlValuesRepository: ControlValuesRepository,
-    private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase
+    private buildAvailableVariableSchemaUsecase: BuildVariableSchemaUsecase
   ) {}
 
   @InstrumentUsecase()
