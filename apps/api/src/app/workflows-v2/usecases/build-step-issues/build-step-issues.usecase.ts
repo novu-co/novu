@@ -18,17 +18,19 @@ import {
   PinoLogger,
 } from '@novu/application-generic';
 
-import _ from 'lodash';
+import merge from 'lodash/merge';
+import capitalize from 'lodash/capitalize';
+import isEmpty from 'lodash/isEmpty';
 import Ajv, { ErrorObject } from 'ajv';
 import addFormats from 'ajv-formats';
 import { buildVariables } from '../../util/build-variables';
-import { BuildAvailableVariableSchemaCommand, BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
+import { BuildVariableSchemaCommand, BuildVariableSchemaUsecase } from '../build-variable-schema';
 import { BuildStepIssuesCommand } from './build-step-issues.command';
 
 @Injectable()
 export class BuildStepIssuesUsecase {
   constructor(
-    private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase,
+    private buildAvailableVariableSchemaUsecase: BuildVariableSchemaUsecase,
     private controlValuesRepository: ControlValuesRepository,
     private tierRestrictionsValidateUsecase: TierRestrictionsValidateUsecase,
     private logger: PinoLogger
@@ -39,48 +41,48 @@ export class BuildStepIssuesUsecase {
     const {
       workflowOrigin,
       user,
-      step: foundPersistedStep,
+      stepInternalId,
       workflow: persistedWorkflow,
-      stepDto: step,
       controlSchema,
+      controlsDto: controlValuesDto,
+      stepType: stepTypeDto,
     } = command;
 
     const variableSchema = await this.buildAvailableVariableSchemaUsecase.execute(
-      BuildAvailableVariableSchemaCommand.create({
+      BuildVariableSchemaCommand.create({
         environmentId: user.environmentId,
         organizationId: user.organizationId,
         userId: user._id,
-        stepInternalId: foundPersistedStep?.stepId,
+        stepInternalId,
         workflow: persistedWorkflow,
-        ...(step.controlValues ? { optimisticControlValues: step.controlValues } : {}),
+        ...(controlValuesDto ? { optimisticControlValues: controlValuesDto } : {}),
       })
     );
 
-    let controlValueLocal = step.controlValues;
+    let newControlValues = controlValuesDto;
 
-    if (!controlValueLocal) {
-      controlValueLocal = (
+    if (!newControlValues) {
+      newControlValues = (
         await this.controlValuesRepository.findOne({
           _environmentId: user.environmentId,
           _organizationId: user.organizationId,
           _workflowId: persistedWorkflow?._id,
-          _stepId: foundPersistedStep?._templateId,
+          _stepId: stepInternalId,
           level: ControlValuesLevelEnum.STEP_CONTROLS,
         })
       )?.controls;
     }
 
     const sanitizedControlValues =
-      controlValueLocal && workflowOrigin === WorkflowOriginEnum.NOVU_CLOUD
-        ? dashboardSanitizeControlValues(this.logger, controlValueLocal, step.type) || {}
-        : this.frameworkSanitizeEmptyStringsToNull(controlValueLocal) || {};
+      newControlValues && workflowOrigin === WorkflowOriginEnum.NOVU_CLOUD
+        ? dashboardSanitizeControlValues(this.logger, newControlValues, stepTypeDto) || {}
+        : this.frameworkSanitizeEmptyStringsToNull(newControlValues) || {};
 
-    const controlIssues = this.processControlValuesBySchema(controlSchema, sanitizedControlValues || {});
-    const liquidTemplateIssues = this.processControlValuesByLiquid(variableSchema, controlValueLocal || {});
-    const customIssues = await this.processControlValuesByRules(user, step.type, sanitizedControlValues || {});
-    const customControlIssues = _.isEmpty(customIssues) ? {} : { controls: customIssues };
+    const schemaIssues = this.processControlValuesBySchema(controlSchema, sanitizedControlValues || {});
+    const liquidIssues = this.processControlValuesByLiquid(variableSchema, newControlValues || {});
+    const customIssues = await this.processControlValuesByCustomeRules(user, stepTypeDto, sanitizedControlValues || {});
 
-    return _.merge(controlIssues, liquidTemplateIssues, customControlIssues);
+    return merge(schemaIssues, liquidIssues, customIssues);
   }
 
   private processControlValuesByLiquid(
@@ -165,7 +167,7 @@ export class BuildStepIssuesUsecase {
     return issues;
   }
 
-  private async processControlValuesByRules(
+  private async processControlValuesByCustomeRules(
     user: UserSessionData,
     stepType: StepTypeEnum,
     controlValues: Record<string, unknown> | null
@@ -194,7 +196,7 @@ export class BuildStepIssuesUsecase {
       ];
     }
 
-    return result;
+    return isEmpty(result) ? {} : { controls: result };
   }
 
   private getErrorPath(error: ErrorObject): string {
@@ -242,7 +244,7 @@ export class BuildStepIssuesUsecase {
 
   private mapAjvErrorToMessage(error: ErrorObject<string, Record<string, unknown>, unknown>): string {
     if (error.keyword === 'required') {
-      return `${_.capitalize(error.params.missingProperty)} is required`;
+      return `${capitalize(error.params.missingProperty)} is required`;
     }
     if (
       error.keyword === 'pattern' &&

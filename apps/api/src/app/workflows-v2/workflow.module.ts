@@ -19,7 +19,7 @@ import { AuthModule } from '../auth/auth.module';
 import { IntegrationModule } from '../integrations/integrations.module';
 import { WorkflowController } from './workflow.controller';
 import {
-  BuildAvailableVariableSchemaUsecase,
+  BuildVariableSchemaUsecase,
   BuildStepDataUsecase,
   BuildWorkflowTestDataUseCase,
   GeneratePreviewUsecase,
@@ -58,7 +58,7 @@ const DAL_REPOSITORIES = [CommunityOrganizationRepository];
     BuildWorkflowTestDataUseCase,
     GetWorkflowUseCase,
     HydrateEmailSchemaUseCase,
-    BuildAvailableVariableSchemaUsecase,
+    BuildVariableSchemaUsecase,
     PatchStepUsecase,
     PatchWorkflowUsecase,
     TierRestrictionsValidateUsecase,

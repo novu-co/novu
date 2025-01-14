@@ -296,9 +296,9 @@ export class Sync {
             environmentId: command.environmentId,
             organizationId: command.organizationId,
           } as UserSessionData,
-          step: foundStep,
+          stepInternalId: foundStep?._id,
           workflow,
-          stepDto: { ...step, name: step.stepId, type: step.type as StepTypeEnum },
+          stepType: step.type as StepTypeEnum,
           controlSchema: step.controls?.schema as JSONSchemaDto,
         });
 

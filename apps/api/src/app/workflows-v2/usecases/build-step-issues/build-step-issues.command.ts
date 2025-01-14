@@ -1,22 +1,31 @@
-import { WorkflowOriginEnum, StepCreateDto, StepUpdateDto, JSONSchemaDto } from '@novu/shared';
-import { NotificationStepEntity, NotificationTemplateEntity } from '@novu/dal';
+import { WorkflowOriginEnum, JSONSchemaDto, StepTypeEnum } from '@novu/shared';
+import { NotificationTemplateEntity } from '@novu/dal';
 import { EnvironmentWithUserObjectCommand } from '@novu/application-generic';
-import { IsEnum, IsObject, IsDefined } from 'class-validator';
+import { IsEnum, IsObject, IsDefined, IsString, IsOptional } from 'class-validator';
 
 export class BuildStepIssuesCommand extends EnvironmentWithUserObjectCommand {
+  /**
+   * Workflow origin is needed separately to handle origin-specific logic
+   * before workflow creation
+   */
   @IsDefined()
   @IsEnum(WorkflowOriginEnum)
   workflowOrigin: WorkflowOriginEnum;
 
-  @IsDefined()
-  step: NotificationStepEntity | undefined;
+  @IsOptional()
+  workflow?: NotificationTemplateEntity;
+
+  @IsString()
+  @IsOptional()
+  stepInternalId?: string;
 
   @IsObject()
-  @IsDefined()
-  stepDto: StepCreateDto | StepUpdateDto;
+  @IsOptional()
+  controlsDto?: Record<string, unknown> | null;
 
   @IsDefined()
-  workflow: NotificationTemplateEntity | undefined;
+  @IsEnum(StepTypeEnum)
+  stepType: StepTypeEnum;
 
   @IsObject()
   @IsDefined()

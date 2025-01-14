@@ -219,10 +219,11 @@ export class UpsertWorkflowUseCase {
     const issues: StepIssuesDto = await this.buildStepIssuesUsecase.execute({
       workflowOrigin,
       user,
-      step: foundPersistedStep,
+      stepInternalId: foundPersistedStep?._id,
       workflow: persistedWorkflow,
-      stepDto: step,
+      stepType: step.type,
       controlSchema: controlSchemas.schema,
+      controlsDto: step.controlValues,
     });
 
     const stepEntityToReturn = {
