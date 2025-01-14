@@ -50,7 +50,7 @@ export const variablePillTheme = EditorView.baseTheme({
     wordBreak: 'break-word',
   },
   '.cm-line': {
-    lineHeight: '19px !important',
+    lineHeight: '21px !important',
     paddingLeft: 0,
   },
 });
