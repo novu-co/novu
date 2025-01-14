@@ -47,7 +47,7 @@ export const TriggerNode = ({
       <NodeHeader type={StepTypeEnum.TRIGGER}>
         <NodeName>Workflow trigger</NodeName>
       </NodeHeader>
-      <NodeBody type={StepTypeEnum.TRIGGER} controlValues={{}}>
+      <NodeBody type={StepTypeEnum.TRIGGER} controlValues={{}} showPreview={data.readOnly}>
         This step triggers this workflow
       </NodeBody>
       <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -119,7 +119,7 @@ export const EmailNode = ({ data }: NodeProps<NodeType>) => {
           <NodeName>{data.name || 'Email Step'}</NodeName>
         </NodeHeader>
 
-        <NodeBody type={StepTypeEnum.EMAIL} controlValues={data.controlValues ?? {}}>
+        <NodeBody type={StepTypeEnum.EMAIL} showPreview={data.readOnly} controlValues={data.controlValues ?? {}}>
           {data.content}
         </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
@@ -143,7 +143,7 @@ export const SmsNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'SMS Step'}</NodeName>
         </NodeHeader>
-        <NodeBody type={StepTypeEnum.SMS} controlValues={data.controlValues ?? {}}>
+        <NodeBody showPreview={data.readOnly} type={StepTypeEnum.SMS} controlValues={data.controlValues ?? {}}>
           {data.content}
         </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
@@ -167,7 +167,7 @@ export const InAppNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'In-App Step'}</NodeName>
         </NodeHeader>
-        <NodeBody type={StepTypeEnum.IN_APP} controlValues={data.controlValues ?? {}}>
+        <NodeBody showPreview={data.readOnly} type={StepTypeEnum.IN_APP} controlValues={data.controlValues ?? {}}>
           {data.content}
         </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
@@ -191,7 +191,7 @@ export const PushNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Push Step'}</NodeName>
         </NodeHeader>
-        <NodeBody type={StepTypeEnum.PUSH} controlValues={data.controlValues ?? {}}>
+        <NodeBody showPreview={data.readOnly} type={StepTypeEnum.PUSH} controlValues={data.controlValues ?? {}}>
           {data.content}
         </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
@@ -215,7 +215,7 @@ export const ChatNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Chat Step'}</NodeName>
         </NodeHeader>
-        <NodeBody type={StepTypeEnum.CHAT} controlValues={data.controlValues ?? {}}>
+        <NodeBody showPreview={data.readOnly} type={StepTypeEnum.CHAT} controlValues={data.controlValues ?? {}}>
           {data.content}
         </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}

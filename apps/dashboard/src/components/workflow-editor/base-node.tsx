@@ -74,10 +74,12 @@ export const NodeBody = ({
   children,
   type,
   controlValues,
+  showPreview,
 }: {
   children: ReactNode;
   type: StepTypeEnum;
   controlValues: Record<string, any>;
+  showPreview?: boolean;
 }) => {
   const isPreviewEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_WORKFLOW_NODE_PREVIEW_ENABLED);
 
@@ -91,7 +93,7 @@ export const NodeBody = ({
           <span className="to-background/90 absolute left-0 top-0 h-full w-full rounded-b-[calc(var(--radius)-1px)] bg-gradient-to-r from-[rgba(255,255,255,0.00)] from-70% to-95%" />
         </div>
       </HoverCardTrigger>
-      {isPreviewEnabled && (
+      {(isPreviewEnabled || showPreview) && (
         <HoverCardPortal container={document.getElementById('workflow-canvas-container')}>
           {type !== StepTypeEnum.TRIGGER && (
             <HoverCardContent side="left" className="w-[350px] border-none p-0" sideOffset={15}>
