@@ -131,8 +131,9 @@ export class RunJob {
    * Otherwise, we continue trying to queue the next job in the chain.
    */
   private async tryQueueNextJobs(job: JobEntity): Promise<void> {
-    let currentJob: JobEntity | null = job;
-    if (!currentJob) {
+    let currentFailedJob: JobEntity | null = job;
+    let nextJob: JobEntity | null = null;
+    if (!currentFailedJob) {
       return;
     }
 
@@ -140,50 +141,52 @@ export class RunJob {
 
     while (shouldContinue) {
       try {
-        if (!currentJob) {
+        if (!currentFailedJob) {
           return;
         }
 
-        currentJob = await this.jobRepository.findOne({
-          _environmentId: currentJob._environmentId,
-          _parentId: currentJob._id,
+        nextJob = await this.jobRepository.findOne({
+          _environmentId: currentFailedJob._environmentId,
+          _parentId: currentFailedJob._id,
         });
 
-        if (!currentJob) {
+        if (!nextJob) {
           return;
         }
 
         await this.addJobUsecase.execute({
-          userId: currentJob._userId,
-          environmentId: currentJob._environmentId,
-          organizationId: currentJob._organizationId,
-          jobId: currentJob._id,
-          job: currentJob,
+          userId: nextJob._userId,
+          environmentId: nextJob._environmentId,
+          organizationId: nextJob._organizationId,
+          jobId: nextJob._id,
+          job: nextJob,
         });
+
+        shouldContinue = false;
       } catch (error: any) {
-        if (!currentJob) {
+        if (!nextJob) {
           return;
         }
 
         await this.setJobAsFailed.execute(
           SetJobAsFailedCommand.create({
-            environmentId: currentJob._environmentId,
-            jobId: currentJob._id,
-            organizationId: currentJob._organizationId,
-            userId: currentJob._userId,
+            environmentId: nextJob._environmentId,
+            jobId: nextJob._id,
+            organizationId: nextJob._organizationId,
+            userId: nextJob._userId,
           }),
           error
         );
 
-        if (currentJob.step.shouldStopOnFail || this.shouldBackoff(error)) {
+        if (nextJob.step.shouldStopOnFail || this.shouldBackoff(error)) {
           shouldContinue = false;
-          await this.storageHelperService.deleteAttachments(job.payload?.attachments);
           throw error;
         }
+
+        currentFailedJob = nextJob;
       } finally {
-        if (!currentJob) {
-          shouldContinue = false;
-          await this.storageHelperService.deleteAttachments(job.payload?.attachments);
+        if (nextJob) {
+          await this.storageHelperService.deleteAttachments(nextJob.payload?.attachments);
         }
       }
     }
