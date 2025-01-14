@@ -11,7 +11,7 @@ import { HydrateEmailSchemaCommand } from './hydrate-email-schema.command';
 export class HydrateEmailSchemaUseCase {
   execute(command: HydrateEmailSchemaCommand): TipTapNode {
     // TODO: Aligned Zod inferred type and TipTapNode to remove the need of a type assertion
-    const emailBody: TipTapNode = TipTapSchema.parse(JSON.parse(command.emailEditor));
+    const emailBody: TipTapNode = TipTapSchema.parse(JSON.parse(command.emailEditor)) as TipTapNode;
     if (emailBody) {
       this.transformContentInPlace([emailBody], command.fullPayloadForRender);
     }
