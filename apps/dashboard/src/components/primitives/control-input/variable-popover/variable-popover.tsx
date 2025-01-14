@@ -32,6 +32,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
   const [defaultVal, setDefaultVal] = useState(parsedDefaultValue);
   const [previewValue, setPreviewValue] = useState('');
   const [showRawLiquid, setShowRawLiquid] = useState(false);
+  const [showTestValue, setShowTestValue] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [filters, setFilters] = useState<FilterWithParam[]>(parsedFilters || []);
@@ -209,8 +210,18 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
             {filters.length > 0 && (
               <FormItem>
                 <FormControl>
+                  <div className="flex items-center justify-between">
+                    <label className="text-text-sub text-label-xs">Show test value</label>
+                    <Switch checked={showTestValue} onCheckedChange={setShowTestValue} className="scale-75" />
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+
+            {filters.length > 0 && showTestValue && (
+              <FormItem>
+                <FormControl>
                   <div className="grid gap-1">
-                    <label className="text-text-sub text-label-xs">Test value</label>
                     <Input
                       value={previewValue}
                       onChange={(e) => setPreviewValue(e.target.value)}
@@ -226,11 +237,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
                 )}
               </FormItem>
             )}
-          </div>
 
-          <Separator className="my-0" />
-
-          <div className="p-2">
             <FormItem>
               <FormControl>
                 <div className="flex items-center justify-between">
