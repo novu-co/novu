@@ -58,6 +58,9 @@ export class ActivityNotificationExecutionDetailResponseDto {
   @ApiProperty({ description: 'Unique identifier of the execution detail', type: String })
   _id: string;
 
+  @ApiPropertyOptional({ description: 'Creation time of the execution detail', type: String })
+  createdAt?: string;
+
   @ApiProperty({
     enum: ExecutionDetailsStatusEnum,
     description: 'Status of the execution detail',
@@ -134,6 +137,9 @@ export class ActivityNotificationJobResponseDto {
 
   @ApiProperty({ description: 'Status of the job', type: String })
   status: string;
+
+  @ApiPropertyOptional({ description: 'Updated time of the notification', type: String })
+  updatedAt?: string;
 }
 
 // Activity Notification Subscriber Response DTO

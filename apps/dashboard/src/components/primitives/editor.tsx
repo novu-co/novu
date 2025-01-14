@@ -18,12 +18,12 @@ const editorVariants = cva('h-full w-full flex-1 [&_.cm-focused]:outline-none', 
   },
 });
 
-const baseTheme = (options: { singleLine?: boolean }) =>
+const baseTheme = (options: { multiline?: boolean }) =>
   EditorView.baseTheme({
     '&light': {
       backgroundColor: 'transparent',
     },
-    ...(options.singleLine
+    ...(!options.multiline
       ? {
           '.cm-scroller': {
             overflow: 'hidden',
@@ -114,7 +114,7 @@ const baseTheme = (options: { singleLine?: boolean }) =>
 
 type EditorProps = {
   value: string;
-  singleLine?: boolean;
+  multiline?: boolean;
   placeholder?: string;
   className?: string;
   indentWithTab?: boolean;
@@ -132,7 +132,7 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
       className,
       height,
       size,
-      singleLine,
+      multiline = false,
       fontFamily,
       onChange,
       indentWithTab,
@@ -145,18 +145,18 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
     const editorRef = useRef<HTMLDivElement>(null);
     const [shouldFocus, setShouldFocus] = useState(false);
     const extensions = useMemo(
-      () => [...(extensionsProp ?? []), baseTheme({ singleLine })],
-      [extensionsProp, singleLine]
+      () => [...(extensionsProp ?? []), baseTheme({ multiline })],
+      [extensionsProp, multiline]
     );
     const basicSetup = useMemo(
       () => ({
         lineNumbers: false,
         foldGutter: false,
         highlightActiveLine: false,
-        defaultKeymap: !singleLine,
+        defaultKeymap: !multiline,
         ...((typeof basicSetupProp === 'object' ? basicSetupProp : {}) ?? {}),
       }),
-      [basicSetupProp, singleLine]
+      [basicSetupProp, multiline]
     );
 
     const theme = useMemo(
