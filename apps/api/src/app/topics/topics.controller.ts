@@ -178,8 +178,6 @@ export class TopicsController {
     @UserSession() user: UserSessionData,
     @Query() query?: FilterTopicsRequestDto
   ): Promise<FilterTopicsResponseDto> {
-    console.log(JSON.stringify(query));
-
     return await this.filterTopicsUseCase.execute(
       FilterTopicsCommand.create({
         environmentId: user.environmentId,
