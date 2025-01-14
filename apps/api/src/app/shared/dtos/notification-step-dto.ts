@@ -75,7 +75,6 @@ class DigestRegularMetadata extends DigestBaseMetadata implements IDigestRegular
   updateMode?: boolean;
 }
 
-@ApiExtraModels(TimedConfig)
 class DigestTimedMetadata extends DigestBaseMetadata implements IDigestTimedMetadata {
   @ApiProperty({
     enum: [DigestTypeEnum.TIMED],
@@ -158,8 +157,7 @@ export class NotificationStepVariant implements StepVariantDto {
   };
 }
 
-@ApiExtraModels(DigestRegularMetadata, DigestTimedMetadata, DelayRegularMetadata, DelayScheduledMetadata)
-export class NotificationStep extends NotificationStepVariant {
+export class NotificationStepDto {
   @ApiPropertyOptional({
     type: NotificationStepVariant,
   })
