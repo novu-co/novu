@@ -21,7 +21,7 @@ import { UpdateSubscriberPreferenceRequestDto } from '../../widgets/dtos/update-
 
 const axiosInstance = axios.create();
 
-describe('Trigger event - process subscriber /v1/events/trigger (POST)', function () {
+describe('Trigger event - process subscriber /v1/events/trigger (POST) #novu-v2', function () {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let subscriber: SubscriberEntity;

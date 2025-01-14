@@ -1,20 +1,17 @@
-import { autocompletion } from '@codemirror/autocomplete';
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { Code2 } from '@/components/icons/code-2';
-import { Editor } from '@/components/primitives/editor';
 import { FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
+import { ControlInput } from '../../../primitives/control-input';
 import { InputRoot, InputWrapper } from '../../../primitives/input';
 
 export const DigestKey = () => {
   const { control } = useFormContext();
   const { step } = useWorkflow();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
-  const extensions = useMemo(() => [autocompletion({ override: [completions(variables)] })], [variables]);
 
   return (
     <FormField
@@ -35,17 +32,15 @@ export const DigestKey = () => {
                   <Code2 className="-ml-1.5 size-5" />
                   <span className="text-foreground-600 text-xs font-normal">subscriberId</span>
                 </FormLabel>
-                <Editor
-                  className="overflow-x-auto font-medium [&_.cm-line]:mt-px"
-                  singleLine
+                <ControlInput
+                  multiline={false}
                   indentWithTab={false}
-                  fontFamily="inherit"
-                  ref={field.ref}
                   placeholder="Add additional digest..."
                   id={field.name}
-                  extensions={extensions}
                   value={field.value}
                   onChange={field.onChange}
+                  variables={variables}
+                  size="default"
                 />
               </InputWrapper>
             </InputRoot>

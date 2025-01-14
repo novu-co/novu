@@ -1,37 +1,29 @@
 import { UserSession } from '@novu/testing';
 import { SubscriberRepository } from '@novu/dal';
 import { expect } from 'chai';
-import axios from 'axios';
+import { Novu } from '@novu/api';
+import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-const axiosInstance = axios.create();
-
-describe('Update Subscriber - /subscribers/:subscriberId (PUT)', function () {
+const subscriberId = '123';
+describe('Update Subscriber - /subscribers/:subscriberId (PUT) #novu-v2', function () {
   let session: UserSession;
   const subscriberRepository = new SubscriberRepository();
-
+  let novuClient: Novu;
   beforeEach(async () => {
     session = new UserSession();
     await session.initialize();
+    novuClient = initNovuClassSdk(session);
   });
 
   it('should update an existing subscriber', async function () {
-    await axiosInstance.post(
-      `${session.serverUrl}/v1/subscribers`,
-      {
-        subscriberId: '123',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john@doe.com',
-      },
-      {
-        headers: {
-          authorization: `ApiKey ${session.apiKey}`,
-        },
-      }
-    );
+    await novuClient.subscribers.create({
+      subscriberId,
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@doe.com',
+    });
 
-    const response = await axiosInstance.put(
-      `${session.serverUrl}/v1/subscribers/123`,
+    const response = await novuClient.subscribers.update(
       {
         lastName: 'Test Changed',
         email: 'changed@mail.com',
@@ -39,17 +31,13 @@ describe('Update Subscriber - /subscribers/:subscriberId (PUT)', function () {
         locale: 'sv',
         data: { test: 'test value' },
       },
-      {
-        headers: {
-          authorization: `ApiKey ${session.apiKey}`,
-        },
-      }
+      subscriberId
     );
 
-    const { data: body } = response;
+    const { result: body } = response;
 
-    expect(body.data).to.be.ok;
-    const createdSubscriber = await subscriberRepository.findBySubscriberId(session.environment._id, '123');
+    expect(body).to.be.ok;
+    const createdSubscriber = await subscriberRepository.findBySubscriberId(session.environment._id, subscriberId);
 
     expect(createdSubscriber?.firstName).to.equal('John');
     expect(createdSubscriber?.lastName).to.equal('Test Changed');
@@ -60,41 +48,28 @@ describe('Update Subscriber - /subscribers/:subscriberId (PUT)', function () {
   });
 
   it('should allow unsetting the email', async function () {
-    await axiosInstance.post(
-      `${session.serverUrl}/v1/subscribers`,
-      {
-        subscriberId: '123',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john@doe.com',
-      },
-      {
-        headers: {
-          authorization: `ApiKey ${session.apiKey}`,
-        },
-      }
-    );
+    await novuClient.subscribers.create({
+      subscriberId,
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@doe.com',
+    });
 
-    const response = await axiosInstance.put(
-      `${session.serverUrl}/v1/subscribers/123`,
+    const response = await novuClient.subscribers.update(
       {
         lastName: 'Test Changed',
-        email: null,
         phone: '+972523333333',
         locale: 'sv',
         data: { test: 'test value' },
+        email: '',
       },
-      {
-        headers: {
-          authorization: `ApiKey ${session.apiKey}`,
-        },
-      }
+      subscriberId
     );
 
-    const { data: body } = response;
+    const { result: body } = response;
 
-    expect(body.data).to.be.ok;
-    const createdSubscriber = await subscriberRepository.findBySubscriberId(session.environment._id, '123');
+    expect(body).to.be.ok;
+    const createdSubscriber = await subscriberRepository.findBySubscriberId(session.environment._id, subscriberId);
 
     expect(createdSubscriber?.firstName).to.equal('John');
     expect(createdSubscriber?.lastName).to.equal('Test Changed');
@@ -105,39 +80,24 @@ describe('Update Subscriber - /subscribers/:subscriberId (PUT)', function () {
   });
 
   it('should update an existing subscriber credentials', async function () {
-    await axiosInstance.post(
-      `${session.serverUrl}/v1/subscribers`,
+    await novuClient.subscribers.create({
+      subscriberId,
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@doe.com',
+    });
+    const response = await novuClient.subscribers.credentials.update(
       {
-        subscriberId: '123',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john@doe.com',
-      },
-      {
-        headers: {
-          authorization: `ApiKey ${session.apiKey}`,
-        },
-      }
-    );
-
-    const response = await axiosInstance.put(
-      `${session.serverUrl}/v1/subscribers/123/credentials`,
-      {
-        subscriberId: '123',
         providerId: 'slack',
         credentials: { webhookUrl: 'webhookUrlNew' },
       },
-      {
-        headers: {
-          authorization: `ApiKey ${session.apiKey}`,
-        },
-      }
+      subscriberId
     );
 
-    const { data: body } = response;
+    const { result: body } = response;
 
-    expect(body.data).to.be.ok;
-    const createdSubscriber = await subscriberRepository.findBySubscriberId(session.environment._id, '123');
+    expect(body).to.be.ok;
+    const createdSubscriber = await subscriberRepository.findBySubscriberId(session.environment._id, subscriberId);
 
     const subscriberChannel = createdSubscriber?.channels?.find((channel) => channel.providerId === 'slack');
 

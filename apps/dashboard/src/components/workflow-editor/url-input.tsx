@@ -1,14 +1,11 @@
-import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
-import { Editor } from '@/components/primitives/editor';
+import { ControlInput } from '@/components/primitives/control-input';
 import { FormControl, FormField, FormItem, FormMessagePure } from '@/components/primitives/form/form';
 import { Input, InputProps, InputRoot, InputWrapper } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
-import { completions } from '@/utils/liquid-autocomplete';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
-import { autocompletion } from '@codemirror/autocomplete';
 
 type URLInputProps = Omit<InputProps, 'value' | 'onChange'> & {
   options: string[];
@@ -34,32 +31,26 @@ export const URLInput = ({
   const url = getFieldState(`${urlKey}`);
   const target = getFieldState(`${targetKey}`);
   const error = url.error || target.error;
-  const extensions = useMemo(() => [autocompletion({ override: [completions(variables)] })], [variables]);
 
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between space-x-2">
-        <div className="relative flex w-full">
+        <div className="flex w-full">
           <FormField
             control={control}
             name={urlKey}
             render={({ field }) => (
               <FormItem className="min-w-px max-w-full basis-full">
                 {asEditor ? (
-                  <InputRoot className="rounded-r-none">
-                    <InputWrapper className="flex h-9 items-center justify-center border-r-0 px-1">
-                      <Editor
-                        singleLine
+                  <InputRoot className="overflow-visible rounded-r-none">
+                    <InputWrapper className="flex h-9 items-center border-r-0 p-2.5">
+                      <ControlInput
+                        multiline={false}
                         indentWithTab={false}
-                        basicSetup={{
-                          defaultKeymap: false,
-                        }}
-                        fontFamily="inherit"
                         placeholder={placeholder}
-                        extensions={extensions}
                         value={field.value}
                         onChange={field.onChange}
-                        className="flex h-full items-center"
+                        variables={variables}
                       />
                     </InputWrapper>
                   </InputRoot>

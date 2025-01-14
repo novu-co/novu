@@ -54,7 +54,7 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
     return (
       <div className="size-9 space-y-2">
         <Popover open={isOpen} onOpenChange={setIsOpen}>
-          <PopoverTrigger asChild>
+          <PopoverTrigger className="relative size-full overflow-hidden">
             <Button
               mode="outline"
               variant="secondary"
@@ -82,9 +82,9 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
                 <div className="space-y-1">
                   <Label className="text-xs font-medium">Avatar URL</Label>
                   <InputRoot className="overflow-visible">
-                    <InputWrapper className="flex h-9 items-center justify-center px-1">
+                    <InputWrapper className="flex h-9 items-center justify-center p-2.5">
                       <Editor
-                        singleLine
+                        multiline={false}
                         indentWithTab={false}
                         fontFamily="inherit"
                         ref={ref}
