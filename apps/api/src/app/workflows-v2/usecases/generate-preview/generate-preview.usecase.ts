@@ -364,11 +364,19 @@ function replaceInvalidControlValues(
 ): Record<string, unknown> {
   const fixedValues = _.cloneDeep(normalizedControlValues);
 
-  errors.forEach((error) => {
+  for (const error of errors) {
+    /*
+     *  we allow additional properties in control values compare to output
+     *  such as skip and disableOutputSanitization
+     */
+    if (error.keyword === 'additionalProperties') {
+      continue;
+    }
+
     const path = getErrorPath(error);
     const defaultValue = _.get(previewControlValueDefault, path);
     _.set(fixedValues, path, defaultValue);
-  });
+  }
 
   return fixedValues;
 }

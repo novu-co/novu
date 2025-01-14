@@ -37,10 +37,13 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
 
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & { size?: 'sm' | 'md' | 'xs' }
->(({ className, size = 'md', ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & {
+    size?: 'sm' | 'md' | 'xs';
+    inputWrapperClassName?: string;
+  }
+>(({ className, size = 'md', inputWrapperClassName, ...props }, ref) => (
   <InputRoot>
-    <InputWrapper className={cn('h-9', size === 'sm' && 'h-8', size === 'xs' && 'h-7')}>
+    <InputWrapper className={cn('h-9', size === 'sm' && 'h-8', size === 'xs' && 'h-7', inputWrapperClassName)}>
       <CommandPrimitive.Input
         ref={ref}
         className={cn('text-paragraph-sm placeholder:text-text-soft h-9 w-full bg-transparent outline-none', className)}

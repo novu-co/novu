@@ -124,6 +124,7 @@ function mapJobToDto(item: JobFeedItem): ActivityNotificationJobResponseDto {
     payload: item.payload,
     providerId: item.providerId as ProvidersIdEnum,
     status: item.status,
+    updatedAt: item.updatedAt,
   };
 }
 function convertExecutionDetail(detail: ExecutionDetailFeedItem): ActivityNotificationExecutionDetailResponseDto {
@@ -135,5 +136,6 @@ function convertExecutionDetail(detail: ExecutionDetailFeedItem): ActivityNotifi
     providerId: detail.providerId as unknown as ProvidersIdEnum,
     source: detail.source,
     status: detail.status,
+    createdAt: detail.createdAt,
   };
 }

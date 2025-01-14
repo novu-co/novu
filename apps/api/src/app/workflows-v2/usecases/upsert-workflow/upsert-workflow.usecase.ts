@@ -1,7 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import Ajv, { ErrorObject } from 'ajv';
-import addFormats from 'ajv-formats';
-import _ from 'lodash';
 
 import {
   ControlValuesRepository,
@@ -10,23 +7,17 @@ import {
   NotificationTemplateEntity,
 } from '@novu/dal';
 import {
-  ContentIssue,
-  JSONSchemaDto,
   DEFAULT_WORKFLOW_PREFERENCES,
   slugify,
-  StepContentIssueEnum,
   StepCreateDto,
   StepIssuesDto,
   StepUpdateDto,
   UserSessionData,
-  StepTypeEnum,
   WorkflowCreationSourceEnum,
   WorkflowOriginEnum,
   WorkflowResponseDto,
   WorkflowTypeEnum,
   ControlValuesLevelEnum,
-  WorkflowStatusEnum,
-  StepIssues,
   ControlSchemas,
 } from '@novu/shared';
 import {
@@ -41,19 +32,15 @@ import {
   UpdateWorkflow as UpdateWorkflowGeneric,
   UpdateWorkflowCommand,
   WorkflowInternalResponseDto,
-  TierRestrictionsValidateUsecase,
   UpsertControlValuesCommand,
   UpsertControlValuesUseCase,
-  TierRestrictionsValidateCommand,
-  dashboardSanitizeControlValues,
-  PinoLogger,
 } from '@novu/application-generic';
 
 import { UpsertWorkflowCommand, UpsertWorkflowDataCommand } from './upsert-workflow.command';
 import { stepTypeToControlSchema } from '../../shared';
 import { GetWorkflowCommand, GetWorkflowUseCase } from '../get-workflow';
-import { buildVariables } from '../../util/build-variables';
-import { BuildAvailableVariableSchemaCommand, BuildAvailableVariableSchemaUsecase } from '../build-variable-schema';
+import { BuildStepIssuesUsecase } from '../build-step-issues/build-step-issues.usecase';
+import { computeWorkflowStatus } from '../../shared/compute-workflow-status';
 
 @Injectable()
 export class UpsertWorkflowUseCase {
@@ -63,11 +50,9 @@ export class UpsertWorkflowUseCase {
     private notificationGroupRepository: NotificationGroupRepository,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
     private getWorkflowUseCase: GetWorkflowUseCase,
-    private buildAvailableVariableSchemaUsecase: BuildAvailableVariableSchemaUsecase,
+    private buildStepIssuesUsecase: BuildStepIssuesUsecase,
     private controlValuesRepository: ControlValuesRepository,
-    private upsertControlValuesUseCase: UpsertControlValuesUseCase,
-    private tierRestrictionsValidateUsecase: TierRestrictionsValidateUsecase,
-    private logger: PinoLogger
+    private upsertControlValuesUseCase: UpsertControlValuesUseCase
   ) {}
 
   @InstrumentUsecase()
@@ -147,25 +132,8 @@ export class UpsertWorkflowUseCase {
       userPreferences: command.workflowDto.preferences?.user ?? null,
       defaultPreferences: command.workflowDto.preferences?.workflow ?? DEFAULT_WORKFLOW_PREFERENCES,
       triggerIdentifier: slugify(workflowDto.name),
-      status: this.computeStatus(command.workflowDto, steps),
+      status: computeWorkflowStatus(isWorkflowActive, steps),
     };
-  }
-
-  private computeStatus(workflow: UpsertWorkflowDataCommand, steps: NotificationStep[]) {
-    if (workflow.active === false) {
-      return WorkflowStatusEnum.INACTIVE;
-    }
-
-    const hasIssues = steps.filter((step) => this.hasControlIssues(step.issues)).length > 0;
-    if (!hasIssues) {
-      return WorkflowStatusEnum.ACTIVE;
-    }
-
-    return WorkflowStatusEnum.ERROR;
-  }
-
-  private hasControlIssues(issue: StepIssues | undefined) {
-    return issue?.controls && Object.keys(issue.controls).length > 0;
   }
 
   private async buildUpdateWorkflowCommand(
@@ -174,6 +142,7 @@ export class UpsertWorkflowUseCase {
     existingWorkflow: NotificationTemplateEntity
   ): Promise<UpdateWorkflowCommand> {
     const steps = await this.mapSteps(workflowDto.origin, user, workflowDto.steps, existingWorkflow);
+    const workflowActive = workflowDto.active ?? true;
 
     return {
       id: existingWorkflow._id,
@@ -188,10 +157,11 @@ export class UpsertWorkflowUseCase {
       userPreferences: workflowDto.preferences?.user ?? null,
       defaultPreferences: workflowDto.preferences?.workflow ?? DEFAULT_WORKFLOW_PREFERENCES,
       tags: workflowDto.tags,
-      active: workflowDto.active ?? true,
-      status: this.computeStatus(workflowDto, steps),
+      active: workflowActive,
+      status: computeWorkflowStatus(workflowActive, steps),
     };
   }
+
   private async mapSteps(
     workflowOrigin: WorkflowOriginEnum,
     user: UserSessionData,
@@ -246,14 +216,15 @@ export class UpsertWorkflowUseCase {
   ): Promise<NotificationStep> {
     const foundPersistedStep = this.getPersistedStepIfFound(persistedWorkflow, step);
     const controlSchemas: ControlSchemas = foundPersistedStep?.template?.controls || stepTypeToControlSchema[step.type];
-    const issues: StepIssuesDto = await this.buildIssues(
+    const issues: StepIssuesDto = await this.buildStepIssuesUsecase.execute({
       workflowOrigin,
       user,
-      foundPersistedStep,
-      persistedWorkflow,
-      step,
-      controlSchemas
-    );
+      stepInternalId: foundPersistedStep?._id,
+      workflow: persistedWorkflow,
+      stepType: step.type,
+      controlSchema: controlSchemas.schema,
+      controlsDto: step.controlValues,
+    });
 
     const stepEntityToReturn = {
       template: {
@@ -277,52 +248,6 @@ export class UpsertWorkflowUseCase {
     }
 
     return stepEntityToReturn;
-  }
-
-  private async buildIssues(
-    workflowOrigin: WorkflowOriginEnum,
-    user: UserSessionData,
-    foundPersistedStep: NotificationStepEntity | undefined,
-    persistedWorkflow: NotificationTemplateEntity | undefined,
-    step: StepCreateDto | StepUpdateDto,
-    controlSchemas: ControlSchemas
-  ) {
-    const variableSchema = await this.buildAvailableVariableSchemaUsecase.execute(
-      BuildAvailableVariableSchemaCommand.create({
-        environmentId: user.environmentId,
-        organizationId: user.organizationId,
-        userId: user._id,
-        stepInternalId: foundPersistedStep?.stepId,
-        workflow: persistedWorkflow,
-        ...(step.controlValues ? { optimisticControlValues: step.controlValues } : {}),
-      })
-    );
-
-    let controlValueLocal = step.controlValues;
-
-    if (!controlValueLocal) {
-      controlValueLocal = (
-        await this.controlValuesRepository.findOne({
-          _environmentId: user.environmentId,
-          _organizationId: user.organizationId,
-          _workflowId: persistedWorkflow?._id,
-          _stepId: foundPersistedStep?._templateId,
-          level: ControlValuesLevelEnum.STEP_CONTROLS,
-        })
-      )?.controls;
-    }
-
-    const sanitizedControlValues =
-      controlValueLocal && workflowOrigin === WorkflowOriginEnum.NOVU_CLOUD
-        ? dashboardSanitizeControlValues(this.logger, controlValueLocal, step.type) || {}
-        : frameworkSanitizeEmptyStringsToNull(controlValueLocal) || {};
-
-    const controlIssues = processControlValuesBySchema(controlSchemas?.schema, sanitizedControlValues || {});
-    const liquidTemplateIssues = processControlValuesByLiquid(variableSchema, controlValueLocal || {});
-    const customIssues = await this.processControlValuesByRules(user, step.type, sanitizedControlValues || {});
-    const customControlIssues = _.isEmpty(customIssues) ? {} : { controls: customIssues };
-
-    return _.merge(controlIssues, liquidTemplateIssues, customControlIssues);
   }
 
   private getPersistedStepIfFound(
@@ -422,38 +347,6 @@ export class UpsertWorkflowUseCase {
       return stepRequest.name === step.name;
     })?.controlValues;
   }
-
-  private async processControlValuesByRules(
-    user: UserSessionData,
-    stepType: StepTypeEnum,
-    controlValues: Record<string, unknown> | null
-  ): Promise<StepIssuesDto> {
-    const restrictionsErrors = await this.tierRestrictionsValidateUsecase.execute(
-      TierRestrictionsValidateCommand.create({
-        amount: controlValues?.amount as number | undefined,
-        unit: controlValues?.unit as string | undefined,
-        cron: controlValues?.cron as string | undefined,
-        organizationId: user.organizationId,
-        stepType,
-      })
-    );
-
-    if (!restrictionsErrors) {
-      return {};
-    }
-
-    const result: Record<string, ContentIssue[]> = {};
-    for (const restrictionsError of restrictionsErrors) {
-      result[restrictionsError.controlKey] = [
-        {
-          issueType: StepContentIssueEnum.TIER_LIMIT_EXCEEDED,
-          message: restrictionsError.message,
-        },
-      ];
-    }
-
-    return result;
-  }
 }
 
 function isWorkflowUpdateDto(workflowDto: UpsertWorkflowDataCommand, id?: string) {
@@ -462,151 +355,4 @@ function isWorkflowUpdateDto(workflowDto: UpsertWorkflowDataCommand, id?: string
 
 function isUniqueStepId(stepIdToValidate: string, otherStepsIds: string[]) {
   return !otherStepsIds.some((stepId) => stepId === stepIdToValidate);
-}
-
-function processControlValuesByLiquid(
-  variableSchema: JSONSchemaDto | undefined,
-  controlValues: Record<string, unknown> | null
-): StepIssuesDto {
-  const issues: StepIssuesDto = {};
-
-  function processNestedControlValues(currentValue: unknown, currentPath: string[] = []) {
-    if (!currentValue || typeof currentValue !== 'object') {
-      const liquidTemplateIssues = buildVariables(variableSchema, currentValue);
-
-      if (liquidTemplateIssues.invalidVariables.length > 0) {
-        const controlKey = currentPath.join('.');
-        issues.controls = issues.controls || {};
-
-        issues.controls[controlKey] = liquidTemplateIssues.invalidVariables.map((error) => {
-          const message = error.message
-            ? error.message[0].toUpperCase() + error.message.slice(1).split(' line:')[0]
-            : '';
-
-          return {
-            message: `${message} variable: ${error.output}`,
-            issueType: StepContentIssueEnum.ILLEGAL_VARIABLE_IN_CONTROL_VALUE,
-            variableName: error.output,
-          };
-        });
-      }
-
-      return;
-    }
-
-    for (const [key, value] of Object.entries(currentValue)) {
-      processNestedControlValues(value, [...currentPath, key]);
-    }
-  }
-
-  processNestedControlValues(controlValues);
-
-  return issues;
-}
-
-function processControlValuesBySchema(
-  controlSchema: JSONSchemaDto | undefined,
-  controlValues: Record<string, unknown> | null
-): StepIssuesDto {
-  let issues: StepIssuesDto = {};
-
-  if (!controlSchema || !controlValues) {
-    return issues;
-  }
-
-  const ajv = new Ajv({ allErrors: true });
-  addFormats(ajv);
-  const validate = ajv.compile(controlSchema);
-  const isValid = validate(controlValues);
-  const errors = validate.errors as null | ErrorObject[];
-
-  if (!isValid && errors && errors?.length !== 0 && controlValues) {
-    issues = {
-      controls: errors.reduce(
-        (acc, error) => {
-          const path = getErrorPath(error);
-          if (!acc[path]) {
-            acc[path] = [];
-          }
-          acc[path].push({
-            message: mapAjvErrorToMessage(error),
-            issueType: mapAjvErrorToIssueType(error),
-            variableName: path,
-          });
-
-          return acc;
-        },
-        {} as Record<string, ContentIssue[]>
-      ),
-    };
-
-    return issues;
-  }
-
-  return issues;
-}
-
-/*
- * Extracts the path from the error object:
- * 1. If instancePath exists, removes leading slash and converts remaining slashes to dots
- * 2. If no instancePath, uses missingProperty from error params
- * Example: "/foo/bar" becomes "foo.bar"
- */
-function getErrorPath(error: ErrorObject): string {
-  const path = error.instancePath.substring(1);
-  const { missingProperty } = error.params;
-
-  if (!path || path.trim().length === 0) {
-    return missingProperty;
-  }
-
-  const fullPath = missingProperty ? `${path}/${missingProperty}` : path;
-
-  return fullPath?.replace(/\//g, '.');
-}
-
-function frameworkSanitizeEmptyStringsToNull(
-  obj: Record<string, unknown> | undefined | null
-): Record<string, unknown> | undefined | null {
-  if (typeof obj !== 'object' || obj === null || obj === undefined) return obj;
-
-  return Object.fromEntries(
-    Object.entries(obj).map(([key, value]) => {
-      if (typeof value === 'string' && value.trim() === '') {
-        return [key, null];
-      }
-      if (typeof value === 'object') {
-        return [key, frameworkSanitizeEmptyStringsToNull(value as Record<string, unknown>)];
-      }
-
-      return [key, value];
-    })
-  );
-}
-
-function mapAjvErrorToIssueType(error: ErrorObject): StepContentIssueEnum {
-  switch (error.keyword) {
-    case 'required':
-      return StepContentIssueEnum.MISSING_VALUE;
-    case 'type':
-      return StepContentIssueEnum.MISSING_VALUE;
-    default:
-      return StepContentIssueEnum.MISSING_VALUE;
-  }
-}
-
-function mapAjvErrorToMessage(error: ErrorObject<string, Record<string, unknown>, unknown>): string {
-  if (error.keyword === 'required') {
-    return `${_.capitalize(error.params.missingProperty)} is required`;
-  }
-  if (
-    error.keyword === 'pattern' &&
-    error.message?.includes('must match pattern') &&
-    error.message?.includes('mailto') &&
-    error.message?.includes('https')
-  ) {
-    return `Invalid URL format. Must be a valid absolute URL, path starting with /, or {{variable}}`;
-  }
-
-  return error.message || 'Invalid value';
 }

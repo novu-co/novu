@@ -4,12 +4,11 @@ import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
 import { ErrorDto, ValidationErrorDto } from '@novu/api/models/errors';
 
-export function initNovuClassSdk(session: UserSession, overrideApiKey?: string): Novu {
-  return new Novu({ apiKey: session.apiKey, serverURL: session.serverUrl, debugLogger: console });
-  // return new Novu({ apiKey: overrideApiKey || session.apiKey, serverURL: session.serverUrl });
+export function initNovuClassSdk(session: UserSession): Novu {
+  return new Novu({ apiKey: session.apiKey, serverURL: session.serverUrl });
 }
 export function initNovuFunctionSdk(session: UserSession): NovuCore {
-  return new NovuCore({ apiKey: session.apiKey, serverURL: session.serverUrl, debugLogger: console });
+  return new NovuCore({ apiKey: session.apiKey, serverURL: session.serverUrl });
 }
 
 function isErrorDto(error: unknown): error is ErrorDto {
