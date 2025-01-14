@@ -69,46 +69,68 @@ function isIterableVariable(node: JSONContent, eachVariable: string): node is It
 }
 
 function processForLoopNode(node: JSONContent): JSONContent {
-  const eachVariable = node?.attrs?.each;
-  if (!eachVariable) {
+  // early returns for invalid inputs
+  if (!node?.attrs?.each || !Array.isArray(node.content)) {
     return node;
   }
 
-  if (!Array.isArray(node.content)) {
-    return node;
-  }
-
-  const processContentArray = (contentArray: JSONContent[]): JSONContent[] => {
-    return contentArray.map((contentNode) => {
-      // If this node has nested content, process it first
-      if (contentNode.content && Array.isArray(contentNode.content)) {
-        return {
-          ...contentNode,
-          content: processContentArray(contentNode.content),
-        };
-      }
-
-      // Check if this is an iterable variable node
-      if (isIterableVariable(contentNode, eachVariable)) {
-        const idWithoutIterablePrefix = contentNode.attrs.id.replace(`${eachVariable}.`, '');
-        const liquidId = `{{${eachVariable}[0].${idWithoutIterablePrefix}}}`;
-
-        return {
-          ...contentNode,
-          attrs: {
-            ...contentNode.attrs,
-            id: liquidId,
-          },
-        };
-      } else {
-        return processNode(contentNode);
-      }
-    });
-  };
+  const loopVariable = node.attrs.each;
 
   return {
     ...node,
-    content: processContentArray(node.content),
+    content: processLoopContent(node.content, loopVariable),
+  };
+}
+
+function processLoopContent(content: JSONContent[], loopVariable: string, parentLoops: string[] = []): JSONContent[] {
+  return content.map((node) => {
+    // handle nested for loops
+    if (node.type === MailyContentTypeEnum.FOR) {
+      return processForLoopNode({
+        ...node,
+        content: Array.isArray(node.content) ? node.content : [],
+      });
+    }
+
+    // process nested content recursively until leaf nodes
+    if (node.content && Array.isArray(node.content)) {
+      return {
+        ...node,
+        content: processLoopContent(node.content, loopVariable, parentLoops),
+      };
+    }
+
+    // transform variable / leaf nodes within the loop
+    if (isIterableVariable(node, loopVariable)) {
+      return transformLoopVariable(node, loopVariable, parentLoops);
+    }
+
+    // return unchanged node
+    return node;
+  });
+}
+
+function transformLoopVariable(node: IterableVariable, currentLoop: string, parentLoops: string[]): JSONContent {
+  const variableId = node.attrs.id;
+  const allLoopContexts = [...parentLoops, currentLoop];
+
+  // find which loop context this variable belongs to
+  const matchingLoop = allLoopContexts.find((loop) => variableId.startsWith(loop));
+
+  if (!matchingLoop) {
+    return node;
+  }
+
+  // transform the variable to use array index notation
+  const variablePath = variableId.replace(`${matchingLoop}.`, '');
+  const liquidVariable = `{{${matchingLoop}[0].${variablePath}}}`;
+
+  return {
+    ...node,
+    attrs: {
+      ...node.attrs,
+      id: liquidVariable,
+    },
   };
 }
 

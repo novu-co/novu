@@ -79,7 +79,7 @@ export class ExpandEmailEditorSchemaUsecase {
       return;
     }
 
-    // @ts-expect-error
+    // @ts-ignore
     delete node.attrs[MailyAttrsEnum.SHOW_IF_KEY];
   }
 
@@ -164,6 +164,10 @@ export class ExpandEmailEditorSchemaUsecase {
     const expandedContent: TipTapNode[] = [];
 
     const iterableArray = this.getValueByPath(variables, iterablePath);
+
+    if (!Array.isArray(iterableArray)) {
+      throw new Error(`Iterable "${iterablePath}" is not an array`);
+    }
 
     for (const [index] of iterableArray.entries()) {
       const contentToExpand =
