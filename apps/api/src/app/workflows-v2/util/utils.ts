@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import difference from 'lodash/difference';
 import flatMap from 'lodash/flatMap';
 import isArray from 'lodash/isArray';
