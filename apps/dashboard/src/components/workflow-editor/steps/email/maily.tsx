@@ -90,10 +90,10 @@ export const Maily = ({ value, onChange, className, ...rest }: MailyProps) => {
               return dedupAndSortVariables(filteredVariables, queryWithoutSuffix);
             }
 
-            const newNamespaces = [
-              ...namespaces,
-              ...(editor?.getAttributes('for')?.each ? [{ name: 'iterable', required: false }] : []),
-            ];
+            const iterableName = editor?.getAttributes('for')?.each;
+
+            const newNamespaces = [...namespaces, ...(iterableName ? [{ name: iterableName, required: false }] : [])];
+
             filteredVariables.push(...primitives, ...newNamespaces);
             if (newNamespaces.some((namespace) => queryWithoutSuffix.includes(namespace.name))) {
               filteredVariables.push({ name: queryWithoutSuffix, required: false });
