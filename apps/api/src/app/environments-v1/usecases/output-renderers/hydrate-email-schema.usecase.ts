@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
 
 import { PreviewPayload, TipTapNode } from '@novu/shared';
-import { processNodeAttrs, processNodeMarks } from '@novu/application-generic';
+import { MailyAttrsEnum, processNodeAttrs, processNodeMarks } from '@novu/application-generic';
 
 import { HydrateEmailSchemaCommand } from './hydrate-email-schema.command';
 import { PlaceholderAggregation } from '../../../workflows-v2/usecases';
@@ -76,11 +76,21 @@ export class HydrateEmailSchemaUseCase {
   }
 
   private isForNode(node: TipTapNode): node is TipTapNode & { attrs: { each: string } } {
-    return !!(node.type === 'for' && node.attrs && 'each' in node.attrs && typeof node.attrs.each === 'string');
+    return !!(
+      node.type === 'for' &&
+      node.attrs &&
+      node.attrs[MailyAttrsEnum.EACH_KEY] !== undefined &&
+      typeof node.attrs.each === 'string'
+    );
   }
 
   private isVariableNode(node: TipTapNode): node is TipTapNode & { attrs: { id: string } } {
-    return !!(node.type === 'variable' && node.attrs && 'id' in node.attrs && typeof node.attrs.id === 'string');
+    return !!(
+      node.type === 'variable' &&
+      node.attrs &&
+      node.attrs[MailyAttrsEnum.ID] !== undefined &&
+      typeof node.attrs.id === 'string'
+    );
   }
 }
 

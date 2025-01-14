@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Liquid } from 'liquidjs';
 import { EmailRenderOutput, TipTapNode } from '@novu/shared';
 import { InstrumentUsecase } from '@novu/application-generic';
-import { RenderCommand } from './render-command';
+import { FullPayloadForRender, RenderCommand } from './render-command';
 import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.usecase';
 
 export class EmailOutputRendererCommand extends RenderCommand {}
@@ -47,16 +47,13 @@ export class EmailOutputRendererUsecase {
     tiptapNode: TipTapNode,
     renderCommand: EmailOutputRendererCommand
   ): Promise<TipTapNode> {
-    const parsedString = await parseLiquid(
-      JSON.stringify(tiptapNode),
-      renderCommand.fullPayloadForRender as unknown as Record<string, unknown>
-    );
+    const parsedString = await parseLiquid(JSON.stringify(tiptapNode), renderCommand.fullPayloadForRender);
 
     return JSON.parse(parsedString);
   }
 }
 
-export const parseLiquid = async (value: string, variables: Record<string, unknown>): Promise<string> => {
+export const parseLiquid = async (value: string, variables: FullPayloadForRender): Promise<string> => {
   const client = new Liquid({
     outputEscape: (output) => {
       return stringifyDataStructureWithSingleQuotes(output);

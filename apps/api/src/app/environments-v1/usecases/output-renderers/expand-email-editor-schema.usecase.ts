@@ -5,6 +5,7 @@ import { MailyAttrsEnum } from '@novu/application-generic';
 import { ExpandEmailEditorSchemaCommand } from './expand-email-editor-schema-command';
 import { HydrateEmailSchemaUseCase } from './hydrate-email-schema.usecase';
 import { parseLiquid } from './email-output-renderer.usecase';
+import { FullPayloadForRender } from './render-command';
 
 @Injectable()
 export class ExpandEmailEditorSchemaUsecase {
@@ -13,13 +14,10 @@ export class ExpandEmailEditorSchemaUsecase {
   async execute(command: ExpandEmailEditorSchemaCommand): Promise<TipTapNode> {
     const emailSchemaHydrated = this.hydrate(command);
 
-    const processed = await this.processSpecialNodeTypes(
-      command.fullPayloadForRender as unknown as Record<string, unknown>,
-      emailSchemaHydrated
-    );
+    const processed = await this.processSpecialNodeTypes(command.fullPayloadForRender, emailSchemaHydrated);
 
     // needs to be done after the special node types are processed
-    this.processVariableNodeTypes(processed, command.fullPayloadForRender as unknown as Record<string, unknown>);
+    this.processVariableNodeTypes(processed, command.fullPayloadForRender);
 
     return processed;
   }
@@ -33,7 +31,7 @@ export class ExpandEmailEditorSchemaUsecase {
     return hydratedEmailSchema;
   }
 
-  private async processSpecialNodeTypes(variables: Record<string, unknown>, rootNode: TipTapNode): Promise<TipTapNode> {
+  private async processSpecialNodeTypes(variables: FullPayloadForRender, rootNode: TipTapNode): Promise<TipTapNode> {
     const processedNode = structuredClone(rootNode);
     await this.traverseAndProcessNodes(processedNode, variables);
 
@@ -42,7 +40,7 @@ export class ExpandEmailEditorSchemaUsecase {
 
   private async traverseAndProcessNodes(
     node: TipTapNode,
-    variables: Record<string, unknown>,
+    variables: FullPayloadForRender,
     parent?: TipTapNode
   ): Promise<void> {
     const queue: Array<{ node: TipTapNode; parent?: TipTapNode }> = [{ node, parent }];
@@ -59,7 +57,7 @@ export class ExpandEmailEditorSchemaUsecase {
     }
   }
 
-  private async processNode(node: TipTapNode, variables: Record<string, unknown>, parent?: TipTapNode): Promise<void> {
+  private async processNode(node: TipTapNode, variables: FullPayloadForRender, parent?: TipTapNode): Promise<void> {
     if (this.hasShow(node)) {
       await this.handleShowNode(node, variables, parent);
     }
@@ -70,8 +68,8 @@ export class ExpandEmailEditorSchemaUsecase {
   }
 
   private async handleShowNode(
-    node: TipTapNode & { attrs: { showIfKey: unknown } },
-    variables: Record<string, unknown>,
+    node: TipTapNode & { attrs: { [MailyAttrsEnum.SHOW_IF_KEY]: string } },
+    variables: FullPayloadForRender,
     parent?: TipTapNode
   ): Promise<void> {
     const shouldShow = await this.evaluateShowCondition(variables, node);
@@ -80,14 +78,14 @@ export class ExpandEmailEditorSchemaUsecase {
 
       return;
     }
-    if (node.attrs) {
-      delete node.attrs[MailyAttrsEnum.SHOW_IF_KEY];
-    }
+
+    // @ts-expect-error
+    delete node.attrs[MailyAttrsEnum.SHOW_IF_KEY];
   }
 
   private async handleEachNode(
-    node: TipTapNode & { attrs: { each: unknown } },
-    variables: Record<string, unknown>,
+    node: TipTapNode & { attrs: { [MailyAttrsEnum.EACH_KEY]: string } },
+    variables: FullPayloadForRender,
     parent?: TipTapNode
   ): Promise<void> {
     const newContent = this.multiplyForEachNode(node, variables);
@@ -100,18 +98,16 @@ export class ExpandEmailEditorSchemaUsecase {
   }
 
   private async evaluateShowCondition(
-    variables: Record<string, unknown>,
-    node: TipTapNode & { attrs: { [MailyAttrsEnum.SHOW_IF_KEY]: unknown } }
+    variables: FullPayloadForRender,
+    node: TipTapNode & { attrs: { [MailyAttrsEnum.SHOW_IF_KEY]: string } }
   ): Promise<boolean> {
     const { [MailyAttrsEnum.SHOW_IF_KEY]: showIfKey } = node.attrs;
-    if (showIfKey === undefined) return true;
+    const parsedShowIfValue = await parseLiquid(showIfKey, variables);
 
-    const parsedShowIfValue = await parseLiquid(showIfKey as string, variables);
-
-    return typeof parsedShowIfValue === 'boolean' ? parsedShowIfValue : this.stringToBoolean(parsedShowIfValue);
+    return this.stringToBoolean(parsedShowIfValue);
   }
 
-  private processVariableNodeTypes(node: TipTapNode, variables: Record<string, unknown>) {
+  private processVariableNodeTypes(node: TipTapNode, variables: FullPayloadForRender) {
     if (this.isAVariableNode(node)) {
       node.type = 'text'; // set 'variable' to 'text' to for Liquid to recognize it
     }
@@ -119,8 +115,8 @@ export class ExpandEmailEditorSchemaUsecase {
     node.content?.forEach((innerNode) => this.processVariableNodeTypes(innerNode, variables));
   }
 
-  private hasEach(node: TipTapNode): node is TipTapNode & { attrs: { each: unknown } } {
-    return !!(node.attrs && 'each' in node.attrs);
+  private hasEach(node: TipTapNode): node is TipTapNode & { attrs: { [MailyAttrsEnum.EACH_KEY]: string } } {
+    return node.attrs?.[MailyAttrsEnum.EACH_KEY] !== undefined && node.attrs?.[MailyAttrsEnum.EACH_KEY] !== null;
   }
 
   private hasShow(node: TipTapNode): node is TipTapNode & { attrs: { [MailyAttrsEnum.SHOW_IF_KEY]: string } } {
@@ -160,14 +156,14 @@ export class ExpandEmailEditorSchemaUsecase {
    *
    */
   private multiplyForEachNode(
-    node: TipTapNode & { attrs: { each: unknown } },
-    variables: Record<string, unknown>
+    node: TipTapNode & { attrs: { [MailyAttrsEnum.EACH_KEY]: string } },
+    variables: FullPayloadForRender
   ): TipTapNode[] {
-    const iterablePath = node.attrs.each as string;
+    const iterablePath = node.attrs[MailyAttrsEnum.EACH_KEY];
     const nodeContent = node.content || [];
     const expandedContent: TipTapNode[] = [];
 
-    const iterableArray = this.getValueByPath(variables, iterablePath) as [{ [key: string]: unknown }];
+    const iterableArray = this.getValueByPath(variables, iterablePath);
 
     for (const [index] of iterableArray.entries()) {
       const contentToExpand =
@@ -213,7 +209,7 @@ export class ExpandEmailEditorSchemaUsecase {
     return false;
   }
 
-  private isAVariableNode(newNode: TipTapNode): newNode is TipTapNode & { attrs: { id: string } } {
+  private isAVariableNode(newNode: TipTapNode): newNode is TipTapNode & { attrs: { [MailyAttrsEnum.ID]: string } } {
     return newNode.type === 'variable';
   }
 

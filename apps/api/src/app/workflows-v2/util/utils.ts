@@ -153,8 +153,6 @@ export function mockSchemaDefaults(schema: JSONSchemaDto, parentPath = 'payload'
  *     name: '{{user.name}}',
  *     addresses: [
  *       { street: '{{user.addresses.street}}' },
- *       { street: '{{user.addresses.street}}' },
- *       { street: '{{user.addresses.street}}' }
  *     ]
  *   }
  * }
@@ -163,8 +161,6 @@ export function keysToObject(paths: string[]): Record<string, unknown> {
   const result = {};
 
   paths.filter(hasNamespace).forEach((path) => buildPathInObject(path, result));
-
-  duplicateArrayItems(result);
 
   return result;
 }
@@ -214,14 +210,40 @@ function setFinalLeafValue(current: Record<string, any>, lastPart: string, fullP
   }
 }
 
-function duplicateArrayItems(obj: Record<string, any>, size = 3): void {
-  Object.entries(obj).forEach(([key, value]) => {
+/**
+ * Duplicates array items within an object structure to create sample data.
+ * Recursively processes nested objects and arrays, creating multiple copies of array items.
+ *
+ * @example
+ * const input = {
+ *   users: [{
+ *     name: "John",
+ *     addresses: [{ city: "NYC" }]
+ *   }]
+ * };
+ *
+ * duplicateArrayItems(input);
+ *  Returns:
+ *  {
+ *    users: [
+ *      { name: "John", addresses: [{ city: "NYC" }] },
+ *      { name: "John", addresses: [{ city: "NYC" }] },
+ *      { name: "John", addresses: [{ city: "NYC" }] }
+ *    ]
+ *  }
+ */
+export function multiplyArrayItems(obj: Record<string, unknown>, multiplyBy = 3): Record<string, unknown> {
+  const result = { ...obj };
+
+  Object.entries(result).forEach(([key, value]) => {
     if (Array.isArray(value)) {
-      obj[key] = Array(size)
+      result[key] = Array(multiplyBy)
         .fill(null)
         .map(() => ({ ...value[0] }));
-    } else if (typeof value === 'object') {
-      duplicateArrayItems(value);
+    } else if (typeof value === 'object' && value !== null) {
+      result[key] = multiplyArrayItems(value as Record<string, unknown>, multiplyBy);
     }
   });
+
+  return result;
 }
