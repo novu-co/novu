@@ -6,7 +6,11 @@ import { PreviewPayload, TipTapNode } from '@novu/shared';
 import { processNodeAttrs, processNodeMarks } from '@novu/application-generic';
 
 import { HydrateEmailSchemaCommand } from './hydrate-email-schema.command';
-import { PlaceholderAggregation } from '../../../workflows-v2/usecases';
+
+export type PlaceholderAggregation = {
+  nestedForPlaceholders: Record<string, Record<string, string>>;
+  regularPlaceholdersToDefaultValue: Record<string, string>;
+};
 
 @Injectable()
 export class HydrateEmailSchemaUseCase {

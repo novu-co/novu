@@ -27,23 +27,6 @@ export function transformMailyContentToLiquid(mailyContent: JSONContent): JSONCo
   return processNode(processedState);
 }
 
-function processVariableNode(node: JSONContent): JSONContent {
-  if (!node.attrs) {
-    return node;
-  }
-
-  const attrs = node.attrs as VariableNodeContent['attrs'];
-  const processedId = attrs?.id ? wrapInLiquidOutput(attrs.id) : undefined;
-
-  return {
-    ...node,
-    attrs: {
-      ...attrs,
-      ...(processedId && { id: processedId }),
-    },
-  };
-}
-
 type VariableNodeContent = JSONContent & {
   type: 'variable';
   attrs?: {
@@ -106,7 +89,7 @@ function processNode(node: JSONContent): JSONContent {
 
   switch (processedNode.type) {
     case MailyContentTypeEnum.VARIABLE:
-      return processVariableNode(processedNode);
+      return processedNode;
     case MailyContentTypeEnum.FOR:
       return processForLoopNode(processedNode);
     default:
@@ -116,8 +99,4 @@ function processNode(node: JSONContent): JSONContent {
 
       return processedNode;
   }
-}
-
-function wrapInLiquidOutput(value: string): string {
-  return `{{${value}}}`;
 }
