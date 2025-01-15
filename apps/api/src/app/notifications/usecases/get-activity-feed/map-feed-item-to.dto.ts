@@ -250,7 +250,7 @@ function convertExecutionDetail(entity: ExecutionDetailFeedItem): ActivityNotifi
     providerId: entity.providerId as unknown as ProvidersIdEnum,
     source: entity.source,
     status: entity.status,
-    raw: entity.raw,
+    raw: entity.raw || undefined,
     createdAt: entity.createdAt,
   };
 }

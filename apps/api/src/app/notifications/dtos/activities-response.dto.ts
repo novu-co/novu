@@ -197,7 +197,7 @@ export class ActivityNotificationExecutionDetailResponseDto {
   providerId: ProvidersIdEnum;
 
   @ApiPropertyOptional({ description: 'Raw data of the execution', type: String })
-  raw?: string;
+  raw?: string | null;
 
   @ApiProperty({
     enum: [...Object.values(ExecutionDetailsSourceEnum)],
