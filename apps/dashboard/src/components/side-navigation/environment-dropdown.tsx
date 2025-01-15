@@ -1,5 +1,6 @@
 import { IEnvironment } from '@novu/shared';
 import { RiExpandUpDownLine } from 'react-icons/ri';
+import { cn } from '../../utils/ui';
 import { EnvironmentBranchIcon } from '../primitives/environment-branch-icon';
 import { Select, SelectContent, SelectIcon, SelectItem, SelectTrigger, SelectValue } from '../primitives/select';
 
@@ -7,12 +8,20 @@ type EnvironmentDropdownProps = {
   currentEnvironment?: IEnvironment;
   data?: IEnvironment[];
   onChange?: (value: string) => void;
+  className?: string;
+  disabled?: boolean;
 };
 
-export const EnvironmentDropdown = ({ currentEnvironment, data, onChange }: EnvironmentDropdownProps) => {
+export const EnvironmentDropdown = ({
+  currentEnvironment,
+  data,
+  onChange,
+  className,
+  disabled,
+}: EnvironmentDropdownProps) => {
   return (
-    <Select value={currentEnvironment?.name} onValueChange={onChange}>
-      <SelectTrigger className="group p-1.5 shadow-sm last:[&>svg]:hidden">
+    <Select value={currentEnvironment?.name} onValueChange={onChange} disabled={disabled}>
+      <SelectTrigger className={cn('group p-1.5 shadow-sm last:[&>svg]:hidden', className)}>
         <SelectValue asChild>
           <div className="flex items-center gap-2">
             <EnvironmentBranchIcon environment={currentEnvironment} />

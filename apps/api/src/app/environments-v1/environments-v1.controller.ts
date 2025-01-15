@@ -116,7 +116,6 @@ export class EnvironmentsControllerV1 {
   })
   @ApiExcludeEndpoint()
   @ApiResponse(EnvironmentResponseDto)
-  @ProductFeature(ProductFeatureKeyEnum.MANAGE_ENVIRONMENTS)
   async updateMyEnvironment(
     @UserSession() user: UserSessionData,
     @Param('environmentId') environmentId: string,
