@@ -19,7 +19,7 @@ import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
 import { WorkflowOriginEnum, WorkflowStatusEnum } from '@/utils/enums';
-import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
+import { buildRoute, ROUTES } from '@/utils/routes';
 import { cn } from '@/utils/ui';
 import { IEnvironment, WorkflowListResponseDto } from '@novu/shared';
 import { ComponentProps, useState } from 'react';
@@ -42,6 +42,7 @@ import { CopyButton } from './primitives/copy-button';
 import { ToastIcon } from './primitives/sonner';
 import { showToast } from './primitives/sonner-helpers';
 import { TimeDisplayHoverCard } from './time-display-hover-card';
+import { LEGACY_DASHBOARD_URL } from '@/config';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -64,7 +65,7 @@ const WorkflowLinkTableCell = (props: WorkflowLinkTableCellProps) => {
   const isV1Workflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1;
 
   const workflowLink = isV1Workflow
-    ? buildRoute(LEGACY_ROUTES.EDIT_WORKFLOW, {
+    ? buildRoute(`${LEGACY_DASHBOARD_URL}/workflows/edit/:workflowId`, {
         workflowId: workflow._id,
       })
     : buildRoute(ROUTES.EDIT_WORKFLOW, {
@@ -90,7 +91,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
 
   const isV1Workflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1;
   const triggerWorkflowLink = isV1Workflow
-    ? buildRoute(LEGACY_ROUTES.TEST_WORKFLOW, { workflowId: workflow._id })
+    ? buildRoute(`${LEGACY_DASHBOARD_URL}/workflows/edit/:workflowId/test-workflow`, { workflowId: workflow._id })
     : buildRoute(ROUTES.TEST_WORKFLOW, {
         environmentSlug: currentEnvironment?.slug ?? '',
         workflowSlug: workflow.slug,
@@ -184,7 +185,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
       <WorkflowLinkTableCell workflow={workflow} className="font-medium">
         <div className="flex items-center gap-1">
           {workflow.origin === WorkflowOriginEnum.EXTERNAL && (
-            <Badge variant="warning" kind="pill">
+            <Badge color="yellow" size="sm" variant="lighter">
               <FaCode className="size-3" />
             </Badge>
           )}

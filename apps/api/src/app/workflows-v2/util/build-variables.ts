@@ -57,6 +57,11 @@ function isPropertyAllowed(schema: Record<string, unknown>, propertyPath: string
       continue;
     }
 
+    if (part === '0' && currentSchema.type === 'array') {
+      currentSchema = currentSchema.items as Record<string, unknown>;
+      continue;
+    }
+
     if (additionalProperties === true) {
       return true;
     }

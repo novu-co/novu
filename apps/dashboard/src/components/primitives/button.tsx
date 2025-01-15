@@ -163,7 +163,7 @@ export const buttonVariants = tv({
       class: {
         root: [
           // base
-          'bg-bg-white text-text-sub shadow-regular-xs ring-stroke-soft',
+          'bg-bg-white text-text-sub shadow-xs ring-stroke-soft',
           // hover
           'hover:bg-bg-weak hover:text-text-strong hover:shadow-none ',
           // focus
@@ -179,7 +179,7 @@ export const buttonVariants = tv({
           // base
           'bg-bg-weak text-text-sub ring-transparent',
           // hover
-          'hover:bg-bg-white hover:text-text-strong hover:shadow-regular-xs hover:ring-stroke-soft',
+          'hover:bg-bg-white hover:text-text-strong hover:shadow-xs hover:ring-stroke-soft',
           // focus
           'focus-visible:bg-bg-white focus-visible:text-text-strong focus-visible:shadow-button-important-focus focus-visible:ring-stroke-strong',
         ],
@@ -352,21 +352,24 @@ ButtonRoot.displayName = BUTTON_ROOT_NAME;
 export type ButtonProps = React.ComponentPropsWithoutRef<typeof ButtonRoot> & {
   leadingIcon?: IconType;
   trailingIcon?: IconType;
+  asChild?: boolean;
 };
 
-const Button = ({ leadingIcon: LeadingIcon, trailingIcon: TrailingIcon, children, ...rest }: ButtonProps) => {
-  const isArrowRight = TrailingIcon === RiArrowRightSLine;
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ leadingIcon: LeadingIcon, trailingIcon: TrailingIcon, children, asChild, ...rest }, ref) => {
+    const isArrowRight = TrailingIcon === RiArrowRightSLine;
 
-  return (
-    <ButtonRoot {...rest}>
-      {LeadingIcon && <ButtonIcon as={LeadingIcon} />}
-      <Slottable>{children}</Slottable>
-      {TrailingIcon && (
-        <ButtonIcon className={isArrowRight ? 'arrow-right-hover-animation' : undefined} as={TrailingIcon} />
-      )}
-    </ButtonRoot>
-  );
-};
+    return (
+      <ButtonRoot ref={ref} asChild={asChild} {...rest}>
+        {LeadingIcon && <ButtonIcon as={LeadingIcon} />}
+        <Slottable>{children}</Slottable>
+        {TrailingIcon && (
+          <ButtonIcon className={isArrowRight ? 'arrow-right-hover-animation' : undefined} as={TrailingIcon} />
+        )}
+      </ButtonRoot>
+    );
+  }
+);
 
 Button.displayName = 'Button';
 

@@ -34,6 +34,7 @@ import { ConfigureStepTemplate } from '@/components/workflow-editor/steps/config
 import { RedirectToLegacyStudioAuth } from './pages/redirect-to-legacy-studio-auth';
 import { CreateIntegrationSidebar } from './components/integrations/components/create-integration-sidebar';
 import { UpdateIntegrationSidebar } from './components/integrations/components/update-integration-sidebar';
+import { EditStepConditions } from '@/components/workflow-editor/steps/conditions/edit-step-conditions';
 
 initializeSentry();
 overrideZodErrorMap();
@@ -124,6 +125,10 @@ const router = createBrowserRouter([
                   {
                     element: <ConfigureStepTemplate />,
                     path: ROUTES.EDIT_STEP_TEMPLATE,
+                  },
+                  {
+                    element: <EditStepConditions />,
+                    path: ROUTES.EDIT_STEP_CONDITIONS,
                   },
                   {
                     element: <ChannelPreferences />,

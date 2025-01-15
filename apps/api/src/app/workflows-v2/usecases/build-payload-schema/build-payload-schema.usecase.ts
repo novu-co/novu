@@ -74,7 +74,7 @@ export class BuildPayloadSchema {
   }
 
   private async buildVariablesSchema(variables: string[]) {
-    const { payload } = keysToObject(variables, { fn: (val) => `{{${val}}}` });
+    const { payload } = keysToObject(variables);
 
     const schema: JSONSchemaDto = {
       type: 'object',

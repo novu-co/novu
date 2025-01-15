@@ -1,13 +1,13 @@
 import { Button } from '@/components/primitives/button';
 import { SidebarContent } from '@/components/side-navigation/sidebar';
 import TruncatedText from '@/components/truncated-text';
-import { StepDataDto } from '@novu/shared';
+import { StepResponseDto } from '@novu/shared';
 import { RiArrowRightUpLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { ExternalLink } from '../../shared/external-link';
 
 type ConfigureStepTemplateIssueCtaProps = {
-  step: StepDataDto;
+  step: StepResponseDto;
   issue: string;
 };
 export const ConfigureStepTemplateIssueCta = (props: ConfigureStepTemplateIssueCtaProps) => {

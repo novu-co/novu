@@ -10,7 +10,7 @@ import {
   GeneratePreviewResponseDto,
   JobStatusEnum,
   PreviewPayload,
-  StepDataDto,
+  StepResponseDto,
   WorkflowOriginEnum,
   TipTapNode,
   StepTypeEnum,
@@ -33,9 +33,9 @@ import { GeneratePreviewCommand } from './generate-preview.command';
 import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
 import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
 import { Variable } from '../../util/template-parser/liquid-parser';
-import { keysToObject } from '../../util/utils';
 import { isObjectTipTapNode } from '../../util/tip-tap.util';
 import { buildVariables } from '../../util/build-variables';
+import { keysToObject, multiplyArrayItems } from '../../util/utils';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
@@ -86,10 +86,12 @@ export class GeneratePreviewUsecase {
         const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalidVariables);
 
         const validVariableNames = variables.validVariables.map((variable) => variable.name);
-        const variablesExampleResult = keysToObject(validVariableNames, { fn: (key) => `{{${key}}}` });
+        const variablesExampleResult = keysToObject(validVariableNames);
+        // multiply array items by 3 for preview example purposes
+        const multipliedVariablesExampleResult = multiplyArrayItems(variablesExampleResult, 3);
 
         previewTemplateData = {
-          variablesExample: _.merge(previewTemplateData.variablesExample, variablesExampleResult),
+          variablesExample: _.merge(previewTemplateData.variablesExample, multipliedVariablesExampleResult),
           controlValues: {
             ...previewTemplateData.controlValues,
             [controlKey]: isObjectTipTapNode(processedControlValues)
@@ -100,6 +102,7 @@ export class GeneratePreviewUsecase {
       }
 
       const mergedVariablesExample = this.mergeVariablesExample(workflow, previewTemplateData, commandVariablesExample);
+
       const executeOutput = await this.executePreviewUsecase(
         command,
         stepData,
@@ -138,7 +141,7 @@ export class GeneratePreviewUsecase {
     }
   }
 
-  private sanitizeControlsForPreview(initialControlValues: Record<string, unknown>, stepData: StepDataDto) {
+  private sanitizeControlsForPreview(initialControlValues: Record<string, unknown>, stepData: StepResponseDto) {
     const sanitizedValues = dashboardSanitizeControlValues(this.logger, initialControlValues, stepData.type);
 
     return sanitizeControlValuesByOutputSchema(sanitizedValues || {}, stepData.type);
@@ -226,7 +229,7 @@ export class GeneratePreviewUsecase {
   @Instrument()
   private async executePreviewUsecase(
     command: GeneratePreviewCommand,
-    stepData: StepDataDto,
+    stepData: StepResponseDto,
     hydratedPayload: PreviewPayload,
     controlValues: Record<string, unknown>
   ) {
@@ -364,11 +367,19 @@ function replaceInvalidControlValues(
 ): Record<string, unknown> {
   const fixedValues = _.cloneDeep(normalizedControlValues);
 
-  errors.forEach((error) => {
+  for (const error of errors) {
+    /*
+     *  we allow additional properties in control values compare to output
+     *  such as skip and disableOutputSanitization
+     */
+    if (error.keyword === 'additionalProperties') {
+      continue;
+    }
+
     const path = getErrorPath(error);
     const defaultValue = _.get(previewControlValueDefault, path);
     _.set(fixedValues, path, defaultValue);
-  });
+  }
 
   return fixedValues;
 }

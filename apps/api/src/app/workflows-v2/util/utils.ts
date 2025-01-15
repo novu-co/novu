@@ -1,12 +1,10 @@
+/* eslint-disable no-param-reassign */
 import difference from 'lodash/difference';
 import flatMap from 'lodash/flatMap';
-import reduce from 'lodash/reduce';
-import set from 'lodash/set';
-import values from 'lodash/values';
-import isObject from 'lodash/isObject';
 import isArray from 'lodash/isArray';
-
-import { BadRequestException } from '@nestjs/common';
+import isObject from 'lodash/isObject';
+import reduce from 'lodash/reduce';
+import values from 'lodash/values';
 
 import { JSONSchemaDto } from '@novu/shared';
 
@@ -145,23 +143,108 @@ export function mockSchemaDefaults(schema: JSONSchemaDto, parentPath = 'payload'
 }
 
 /**
+ * Converts an array of dot-notation paths into a nested object structure.
+ * Each leaf node value will be the original path wrapped in handlebars syntax {{path}}.
+ * Handles both object and array paths (using .0. notation for arrays).
  *
- * Converts an array of dot-notation paths into a nested object structure,
- * setting each path's value to the path itself.
- *
- * @param keys - Array of dot-notation paths
- * @param options - Optional configuration object
- *  - fn: Callback function to transform each path's value (default: identity function)
- * @returns Nested object with paths as values
- * @warning Entries without a namespace (no dots) will be ignored.
  * @example
- * keysToObject(['payload.old', 'payload.new', 'payload'])
- * // Returns: { payload: { old: 'payload.old', new: 'payload.new' } }
- * // Note: 'payload' entry is ignored as it has no namespace
+ * Input: ['user.name', 'user.addresses.0.street']
+ * Output: {
+ *   user: {
+ *     name: '{{user.name}}',
+ *     addresses: [
+ *       { street: '{{user.addresses.street}}' },
+ *     ]
+ *   }
+ * }
  */
-export function keysToObject(keys: string[], { fn } = { fn: (key: string) => key }) {
-  const result: Record<string, Record<string, unknown> | undefined> = {};
-  keys.filter((key) => key.includes('.')).forEach((key) => set(result, key, fn(key)));
+export function keysToObject(paths: string[]): Record<string, unknown> {
+  const result = {};
+
+  paths.filter(hasNamespace).forEach((path) => buildPathInObject(path, result));
+
+  return result;
+}
+
+function hasNamespace(path: string): boolean {
+  return path.includes('.');
+}
+
+function buildPathInObject(path: string, result: Record<string, any>): void {
+  const parts = path.split('.');
+  let current = result;
+
+  for (let i = 0; i < parts.length - 1; i += 1) {
+    const key = parts[i];
+
+    if (isArrayNotation(parts[i + 1])) {
+      current = handleArrayPath(current, key);
+      i += 1; // Skip the "0"
+      continue;
+    }
+
+    current = handleObjectPath(current, key);
+  }
+
+  setFinalLeafValue(current, parts[parts.length - 1], path);
+}
+
+function isArrayNotation(part: string): boolean {
+  return part === '0';
+}
+
+function handleArrayPath(current: Record<string, any>, key: string): Record<string, any> {
+  current[key] = current[key] || [{}];
+
+  return current[key][0];
+}
+
+function handleObjectPath(current: Record<string, any>, key: string): Record<string, any> {
+  current[key] = current[key] || {};
+
+  return current[key];
+}
+
+function setFinalLeafValue(current: Record<string, any>, lastPart: string, fullPath: string): void {
+  if (lastPart !== '0') {
+    current[lastPart] = `{{${fullPath.replace('.0.', '.')}}}`;
+  }
+}
+
+/**
+ * Duplicates array items within an object structure to create sample data.
+ * Recursively processes nested objects and arrays, creating multiple copies of array items.
+ *
+ * @example
+ * const input = {
+ *   users: [{
+ *     name: "John",
+ *     addresses: [{ city: "NYC" }]
+ *   }]
+ * };
+ *
+ * duplicateArrayItems(input);
+ *  Returns:
+ *  {
+ *    users: [
+ *      { name: "John", addresses: [{ city: "NYC" }] },
+ *      { name: "John", addresses: [{ city: "NYC" }] },
+ *      { name: "John", addresses: [{ city: "NYC" }] }
+ *    ]
+ *  }
+ */
+export function multiplyArrayItems(obj: Record<string, unknown>, multiplyBy = 3): Record<string, unknown> {
+  const result = { ...obj };
+
+  Object.entries(result).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      result[key] = Array(multiplyBy)
+        .fill(null)
+        .map(() => ({ ...value[0] }));
+    } else if (typeof value === 'object' && value !== null) {
+      result[key] = multiplyArrayItems(value as Record<string, unknown>, multiplyBy);
+    }
+  });
 
   return result;
 }

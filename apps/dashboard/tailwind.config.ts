@@ -197,6 +197,9 @@ export const shadows = {
   sm: '0px 1px 2px 0px #1018280F,0px 1px 3px 0px #1018281A',
   md: '0px 16px 32px -12px rgba(14, 18, 27, 0.10)',
   DEFAULT: '0px 16px 32px -12px #0E121B1A',
+  'button-primary-focus': ['0 0 0 2px theme(colors.bg[white])', '0 0 0 4px hsl(var(--primary-alpha-10))'],
+  'button-important-focus': ['0 0 0 2px theme(colors.bg[white])', '0 0 0 4px hsl(var(--neutral-alpha-16))'],
+  'button-error-focus': ['0 0 0 2px theme(colors.bg[white])', '0 0 0 4px hsl(var(--red-alpha-10))'],
 };
 
 export default {
