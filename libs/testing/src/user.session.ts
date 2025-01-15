@@ -8,22 +8,21 @@ import {
   EmailBlockTypeEnum,
   IApiRateLimitMaximum,
   IEmailBlock,
+  isClerkEnabled,
   JobTopicNameEnum,
   StepTypeEnum,
-  TriggerRecipientsPayload,
-  isClerkEnabled,
 } from '@novu/shared';
 import {
-  UserEntity,
+  ChangeEntity,
+  ChangeRepository,
   EnvironmentEntity,
-  OrganizationEntity,
+  FeedRepository,
+  LayoutRepository,
   NotificationGroupEntity,
   NotificationGroupRepository,
-  FeedRepository,
-  ChangeRepository,
-  ChangeEntity,
+  OrganizationEntity,
   SubscriberRepository,
-  LayoutRepository,
+  UserEntity,
 } from '@novu/dal';
 
 import { NotificationTemplateService } from './notification-template.service';
@@ -252,14 +251,14 @@ export class UserSession {
   }
 
   async updateEETokenClaims(claims: Partial<ClerkJwtPayload>) {
-    const decoded = await this.decodeClerkJWT(process.env.CLERK_LONG_LIVED_TOKEN as string);
+    const decoded = await jwt.decode(process.env.CLERK_LONG_LIVED_TOKEN as string);
 
     const newToken = {
       ...decoded,
       ...claims,
     };
 
-    const encoded = jwt.sign(newToken, process.env.CLERK_PRIVATE_KEY as string, {
+    const encoded = jwt.sign(newToken, process.env.CLERK_MOCK_JWT_PRIVATE_KEY, {
       algorithm: 'RS256',
     });
 
@@ -268,12 +267,6 @@ export class UserSession {
     this.testAgent = superAgentDefaults(request(this.requestEndpoint))
       .set('Authorization', this.token)
       .set('Novu-Environment-Id', this.environment ? this.environment._id : '');
-  }
-
-  private async decodeClerkJWT(token: string) {
-    const publicKey = process.env.CLERK_PEM_PUBLIC_KEY;
-
-    return jwt.verify(token, publicKey);
   }
 
   async createEnvironmentsAndFeeds(): Promise<void> {
@@ -429,14 +422,6 @@ export class UserSession {
     });
 
     return feed;
-  }
-
-  async triggerEvent(triggerName: string, to: TriggerRecipientsPayload, payload = {}) {
-    await this.testAgent.post('/v1/events/trigger').send({
-      name: triggerName,
-      to,
-      payload,
-    });
   }
 
   public async awaitRunningJobs(

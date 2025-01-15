@@ -19,27 +19,21 @@ import { AuthModule } from '../auth/auth.module';
 import { IntegrationModule } from '../integrations/integrations.module';
 import { WorkflowController } from './workflow.controller';
 import {
-  BuildAvailableVariableSchemaUsecase,
-  BuildDefaultPayloadUsecase,
+  BuildVariableSchemaUsecase,
   BuildStepDataUsecase,
   BuildWorkflowTestDataUseCase,
-  CollectPlaceholderWithDefaultsUsecase,
-  ExtractDefaultValuesFromSchemaUsecase,
   GeneratePreviewUsecase,
   GetWorkflowUseCase,
   ListWorkflowsUseCase,
-  PostProcessWorkflowUpdate,
-  PrepareAndValidateContentUsecase,
   SyncToEnvironmentUseCase,
   UpsertWorkflowUseCase,
-  ValidatePlaceholderUsecase,
 } from './usecases';
 import { BridgeModule } from '../bridge';
 import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-renderers';
-import { OverloadContentDataOnWorkflowUseCase } from './usecases/overload-content-data';
 import { PatchWorkflowUsecase } from './usecases/patch-workflow';
 import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
 import { BuildPayloadSchema } from './usecases/build-payload-schema/build-payload-schema.usecase';
+import { BuildStepIssuesUsecase } from './usecases/build-step-issues/build-step-issues.usecase';
 
 const DAL_REPOSITORIES = [CommunityOrganizationRepository];
 
@@ -64,19 +58,12 @@ const DAL_REPOSITORIES = [CommunityOrganizationRepository];
     BuildWorkflowTestDataUseCase,
     GetWorkflowUseCase,
     HydrateEmailSchemaUseCase,
-    PostProcessWorkflowUpdate,
-    BuildDefaultPayloadUsecase,
-    BuildAvailableVariableSchemaUsecase,
-    CollectPlaceholderWithDefaultsUsecase,
-    PrepareAndValidateContentUsecase,
-    ValidatePlaceholderUsecase,
-    ExtractDefaultValuesFromSchemaUsecase,
+    BuildVariableSchemaUsecase,
     PatchStepUsecase,
-    PostProcessWorkflowUpdate,
-    OverloadContentDataOnWorkflowUseCase,
     PatchWorkflowUsecase,
     TierRestrictionsValidateUsecase,
     BuildPayloadSchema,
+    BuildStepIssuesUsecase,
   ],
 })
 export class WorkflowModule implements NestModule {

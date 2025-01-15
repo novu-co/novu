@@ -5,7 +5,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/primitives/dropdown-menu';
-import { Editor } from '@/components/primitives/editor';
 import {
   FormControl,
   FormField,
@@ -18,17 +17,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives
 import { Separator } from '@/components/primitives/separator';
 import { URLInput } from '@/components/workflow-editor/url-input';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
-import { autocompletion } from '@codemirror/autocomplete';
-import { EditorView } from '@uiw/react-codemirror';
 import merge from 'lodash.merge';
 import { ComponentProps, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
 import { CompactButton } from './primitives/button-compact';
+import { ControlInput } from './primitives/control-input';
 import { InputRoot, InputWrapper } from './primitives/input';
 
 const primaryActionKey = 'primaryAction';
@@ -66,14 +63,14 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
               </Button>
             )}
             {primaryAction && (
-              <ConfigureActionPopover asChild fields={{ actionKey: primaryActionKey }}>
+              <ConfigureActionPopover fields={{ actionKey: primaryActionKey }}>
                 <Button variant="primary" size="2xs" className="z-10 h-6">
                   {primaryAction.label}
                 </Button>
               </ConfigureActionPopover>
             )}
             {secondaryAction && (
-              <ConfigureActionPopover asChild fields={{ actionKey: secondaryActionKey }}>
+              <ConfigureActionPopover fields={{ actionKey: secondaryActionKey }}>
                 <Button variant="secondary" mode="outline" size="2xs" className="z-10 h-6">
                   {secondaryAction.label}
                 </Button>
@@ -81,7 +78,7 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
             )}
             <DropdownMenuTrigger className="absolute size-full" />
           </div>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger>
             <CompactButton icon={RiExpandUpDownLine} size="lg" variant="ghost">
               <span className="sr-only">Actions</span>
             </CompactButton>
@@ -173,15 +170,11 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
   const { control } = useFormContext();
   const { step } = useWorkflow();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
-  const extensions = useMemo(
-    () => [autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping],
-    [variables]
-  );
 
   return (
     <Popover>
       <PopoverTrigger {...rest} />
-      <PopoverContent className="max-w-72" side="bottom" align="end">
+      <PopoverContent className="max-w-72 overflow-visible" side="bottom" align="end">
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 text-sm font-medium leading-none">
             <RiEdit2Line className="size-4" /> Customize button
@@ -198,16 +191,14 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
                 </div>
                 <FormControl>
                   <InputRoot className="overflow-visible" hasError={!!fieldState.error}>
-                    <InputWrapper className="flex h-9 items-center justify-center px-1">
-                      <Editor
-                        singleLine
+                    <InputWrapper className="flex h-9 items-center px-2.5">
+                      <ControlInput
+                        variables={variables}
+                        multiline={false}
                         indentWithTab={false}
-                        fontFamily="inherit"
                         placeholder="Button text"
                         value={field.value}
                         onChange={field.onChange}
-                        extensions={extensions}
-                        className="flex h-full items-center"
                       />
                     </InputWrapper>
                   </InputRoot>

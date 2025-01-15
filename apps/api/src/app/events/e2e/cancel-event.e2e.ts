@@ -14,7 +14,7 @@ import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
 const axiosInstance = axios.create();
 
-describe('Cancel event - /v1/events/trigger/:transactionId (DELETE)', function () {
+describe('Cancel event - /v1/events/trigger/:transactionId (DELETE) #novu-v2', function () {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let subscriber: SubscriberEntity;

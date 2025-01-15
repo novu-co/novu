@@ -5,7 +5,7 @@ import { DOCS_LINK } from './idempotency.interceptor';
 
 process.env.LAUNCH_DARKLY_SDK_KEY = ''; // disable Launch Darkly to allow test to define FF state
 
-describe('Idempotency Test', async () => {
+describe('Idempotency Test #novu-v2', async () => {
   let session: UserSession;
   const path = '/v1/testing/idempotency';
   let cacheService: CacheService | null = null;

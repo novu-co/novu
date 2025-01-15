@@ -3,9 +3,16 @@ import { Button } from '@/components/primitives/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { ROUTES } from '@/utils/routes';
 import { ChannelTypeEnum, type IEnvironment, type IIntegration, type IProviderConfig } from '@novu/shared';
-import { RiCheckboxCircleFill, RiGitBranchFill, RiSettings4Line, RiStarSmileLine } from 'react-icons/ri';
+import {
+  RiCheckboxCircleFill,
+  RiCloseCircleFill,
+  RiGitBranchFill,
+  RiSettings4Line,
+  RiStarSmileLine,
+} from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../../utils/ui';
+import { StatusBadge, StatusBadgeIcon } from '../../primitives/status-badge';
 import { TableIntegration } from '../types';
 import { ProviderIcon } from './provider-icon';
 import { isDemoIntegration } from './utils/helpers';
@@ -74,7 +81,7 @@ export function IntegrationCard({ integration, provider, environment, onClick }:
           <Tooltip>
             <TooltipTrigger className="flex h-[16px] items-center gap-1">
               <span className="flex h-[16px] items-center gap-1">
-                <Badge variant="warning" className="text-2xs h-[16px] rounded-sm text-[#F6B51E]">
+                <Badge variant="lighter" color="yellow" size="sm">
                   DEMO
                 </Badge>
               </span>
@@ -102,17 +109,17 @@ export function IntegrationCard({ integration, provider, environment, onClick }:
             Connect
           </Button>
         ) : (
-          <Badge variant={integration.active ? 'success' : 'neutral'} className="capitalize">
-            <RiCheckboxCircleFill className="text-success h-4 w-4" />
+          <StatusBadge variant="light" status={integration.active ? 'completed' : 'disabled'}>
+            <StatusBadgeIcon as={integration.active ? RiCheckboxCircleFill : RiCloseCircleFill} />
             {integration.active ? 'Active' : 'Inactive'}
-          </Badge>
+          </StatusBadge>
         )}
-        <Badge variant="outline" className="shadow-none">
+        <StatusBadge variant="stroke" status="pending" className="gap-1 shadow-none">
           <RiGitBranchFill
             className={cn('h-4 w-4', environment.name.toLowerCase() === 'production' ? 'text-feature' : 'text-warning')}
           />
           {environment.name}
-        </Badge>
+        </StatusBadge>
       </div>
     </div>
   );

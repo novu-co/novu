@@ -1,7 +1,7 @@
 import { FormControl, FormField, FormMessage } from '@/components/primitives/form/form';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { parseStepVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { parseStepVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { cn } from '@/utils/ui';
 import { Editor } from '@maily-to/core';
 import {
@@ -132,10 +132,13 @@ export const Maily = (props: MailyProps) => {
                       return dedupAndSortVariables(filteredVariables, queryWithoutSuffix);
                     }
 
+                    const iterableName = editor?.getAttributes('for')?.each;
+
                     const newNamespaces = [
                       ...namespaces,
-                      ...(editor?.getAttributes('for')?.each ? [{ name: 'iterable', required: false }] : []),
+                      ...(iterableName ? [{ name: iterableName, required: false }] : []),
                     ];
+
                     filteredVariables.push(...primitives, ...newNamespaces);
                     if (newNamespaces.some((namespace) => queryWithoutSuffix.includes(namespace.name))) {
                       filteredVariables.push({ name: queryWithoutSuffix, required: false });

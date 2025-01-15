@@ -4,7 +4,6 @@ import {
   StepResponseDto,
   StepTypeEnum,
   StepUpdateDto,
-  UpdateWorkflowDto,
   WorkflowOriginEnum,
   WorkflowResponseDto,
 } from '@novu/shared';
@@ -47,11 +46,12 @@ import { ConfigurePushStepPreview } from '@/components/workflow-editor/steps/pus
 import { SaveFormContext } from '@/components/workflow-editor/steps/save-form-context';
 import { SdkBanner } from '@/components/workflow-editor/steps/sdk-banner';
 import { ConfigureSmsStepPreview } from '@/components/workflow-editor/steps/sms/configure-sms-step-preview';
+import { UpdateWorkflowFn } from '@/components/workflow-editor/workflow-provider';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { INLINE_CONFIGURABLE_STEP_TYPES, STEP_TYPE_LABELS, TEMPLATE_CONFIGURABLE_STEP_TYPES } from '@/utils/constants';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { CompactButton } from '../../primitives/button-compact';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
 
 const STEP_TYPE_TO_INLINE_CONTROL_VALUES: Record<StepTypeEnum, () => React.JSX.Element | null> = {
   [StepTypeEnum.DELAY]: DelayControlValues,
@@ -81,7 +81,7 @@ type ConfigureStepFormProps = {
   workflow: WorkflowResponseDto;
   environment: IEnvironment;
   step: StepResponseDto;
-  update: (data: UpdateWorkflowDto) => void;
+  update: UpdateWorkflowFn;
 };
 
 export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
@@ -108,8 +108,19 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   const isInlineConfigurableStepWithCustomControls = isInlineConfigurableStep && hasCustomControls;
 
   const onDeleteStep = () => {
-    update({ ...workflow, steps: workflow.steps.filter((s) => s._id !== step._id) });
-    navigate(buildRoute(ROUTES.EDIT_WORKFLOW, { environmentSlug: environment.slug!, workflowSlug: workflow.slug }));
+    update(
+      {
+        ...workflow,
+        steps: workflow.steps.filter((s) => s._id !== step._id),
+      },
+      {
+        onSuccess: () => {
+          navigate(
+            buildRoute(ROUTES.EDIT_WORKFLOW, { environmentSlug: environment.slug!, workflowSlug: workflow.slug })
+          );
+        },
+      }
+    );
   };
 
   const registerInlineControlValues = useMemo(() => {
