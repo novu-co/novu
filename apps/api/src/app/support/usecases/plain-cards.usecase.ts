@@ -2,6 +2,32 @@ import { Injectable } from '@nestjs/common';
 import { OrganizationRepository } from '@novu/dal';
 import { PlainCardsCommand } from './plain-cards.command';
 
+const divider = [
+  {
+    componentDivider: {
+      dividerSpacingSize: 'M',
+    },
+  },
+];
+
+const organizationDetailsHeading = [
+  {
+    componentText: {
+      text: `User's active orgaganizations`,
+      textSize: 'L',
+    },
+  },
+];
+
+const sessionsDetailsHeading = [
+  {
+    componentText: {
+      text: `User's active sessions`,
+      textSize: 'L',
+    },
+  },
+];
+
 @Injectable()
 export class PlainCardsUsecase {
   constructor(private organizationRepository: OrganizationRepository) {}
@@ -32,8 +58,27 @@ export class PlainCardsUsecase {
 
     const sessions = await this.organizationRepository.findUseActiveSessions(command?.customer?.externalId);
 
-    console.log('sessions ==>', sessions);
-    const organizationsComponent = organizations?.map((organization) => {
+    return {
+      data: {},
+      cards: [
+        {
+          // key: process.env.NOVU_REGION === 'eu-west-2' ? 'customer-details-eu' : 'customer-details-us',
+          key: 'customer-details-local',
+          components: [
+            ...organizationDetailsHeading,
+            ...divider,
+            ...this.organizationsComponent(organizations),
+            ...divider,
+            ...sessionsDetailsHeading,
+            ...this.sessionsComponent(sessions),
+          ],
+        },
+      ],
+    };
+  }
+
+  private organizationsComponent = (organizations) => {
+    const activeOrganizations = organizations?.map((organization) => {
       return {
         componentContainer: {
           containerContent: [
@@ -202,14 +247,133 @@ export class PlainCardsUsecase {
       };
     });
 
-    return {
-      data: {},
-      cards: [
-        {
-          key: 'plain-customer-details',
-          components: organizationsComponent,
+    return activeOrganizations;
+  };
+
+  private sessionsComponent = (sessions) => {
+    const allSessions = sessions.map((session) => {
+      return {
+        componentContainer: {
+          containerContent: [
+            {
+              componentRow: {
+                rowMainContent: [
+                  {
+                    componentText: {
+                      text: 'Status',
+                      textSize: 'S',
+                    },
+                  },
+                ],
+                rowAsideContent: [
+                  {
+                    componentText: {
+                      text: session?.status || 'NA',
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              componentRow: {
+                rowMainContent: [
+                  {
+                    componentText: {
+                      text: 'City',
+                      textSize: 'S',
+                    },
+                  },
+                ],
+                rowAsideContent: [
+                  {
+                    componentText: {
+                      text: session?.latestActivity?.city || 'NA',
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              componentRow: {
+                rowMainContent: [
+                  {
+                    componentText: {
+                      text: 'Country',
+                      textSize: 'S',
+                    },
+                  },
+                ],
+                rowAsideContent: [
+                  {
+                    componentText: {
+                      text: session?.latestActivity?.country || 'NA',
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              componentRow: {
+                rowMainContent: [
+                  {
+                    componentText: {
+                      text: 'Device Type',
+                      textSize: 'S',
+                    },
+                  },
+                ],
+                rowAsideContent: [
+                  {
+                    componentText: {
+                      text: session?.latestActivity?.deviceType || 'NA',
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              componentRow: {
+                rowMainContent: [
+                  {
+                    componentText: {
+                      text: 'Browser Name',
+                      textSize: 'S',
+                    },
+                  },
+                ],
+                rowAsideContent: [
+                  {
+                    componentText: {
+                      text: session?.latestActivity?.browserName || 'NA',
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              componentRow: {
+                rowMainContent: [
+                  {
+                    componentText: {
+                      text: 'Browser Version',
+                      textSize: 'S',
+                    },
+                  },
+                ],
+                rowAsideContent: [
+                  {
+                    componentText: {
+                      text: session?.latestActivity?.browserVersion || 'NA',
+                    },
+                  },
+                ],
+              },
+            },
+          ],
         },
-      ],
-    };
-  }
+      };
+    });
+
+    return allSessions;
+  };
 }
