@@ -45,6 +45,7 @@ export function mapFeedItemToDto(entity: NotificationFeedItemEntity): ActivityNo
   dto._digestedNotificationId = entity._digestedNotificationId; // Optional field
   dto.createdAt = entity.createdAt;
   dto.updatedAt = entity.updatedAt;
+  dto.channels = entity.channels;
 
   if (entity.template) {
     dto.template = {

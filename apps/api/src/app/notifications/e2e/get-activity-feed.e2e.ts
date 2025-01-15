@@ -58,6 +58,7 @@ describe('Get activity feed - /notifications (GET) #novu-v2', async () => {
     expect(activity.template.name).to.equal(template.name);
     expect(activity.template.id).to.equal(template._id);
     expect(activity.subscriber.firstName).to.equal('Test');
+    expect(activity.channels).to.be.ok;
     expect(activity.channels).to.include.oneOf(Object.keys(ChannelTypeEnum).map((i) => ChannelTypeEnum[i]));
   });
 
