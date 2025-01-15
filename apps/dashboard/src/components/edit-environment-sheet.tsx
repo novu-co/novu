@@ -26,9 +26,11 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowRightSLine } from 'react-icons/ri';
 import { z } from 'zod';
+import { ColorPicker } from './primitives/color-picker';
 
 const editEnvironmentSchema = z.object({
   name: z.string().min(1, 'Name is required'),
+  color: z.string().min(1, 'Color is required'),
 });
 
 type EditEnvironmentFormData = z.infer<typeof editEnvironmentSchema>;
@@ -46,6 +48,7 @@ export const EditEnvironmentSheet = ({ environment, isOpen, onOpenChange }: Edit
     resolver: zodResolver(editEnvironmentSchema),
     defaultValues: {
       name: environment?.name || '',
+      color: environment?.color,
     },
   });
 
@@ -53,6 +56,7 @@ export const EditEnvironmentSheet = ({ environment, isOpen, onOpenChange }: Edit
     if (environment) {
       form.reset({
         name: environment.name,
+        color: environment.color,
       });
     }
   }, [environment, form]);
@@ -63,6 +67,7 @@ export const EditEnvironmentSheet = ({ environment, isOpen, onOpenChange }: Edit
     await updateEnvironment({
       environment,
       name: values.name,
+      color: values.color,
     });
     onOpenChange(false);
     form.reset();
@@ -104,6 +109,19 @@ export const EditEnvironmentSheet = ({ environment, isOpen, onOpenChange }: Edit
                           field.onChange(e);
                         }}
                       />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="color"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel required>Color</FormLabel>
+                    <FormControl>
+                      <ColorPicker value={field.value} onChange={field.onChange} pureInput={false} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

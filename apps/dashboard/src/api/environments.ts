@@ -1,5 +1,5 @@
 import { IApiKey, IEnvironment, ITagsResponse } from '@novu/shared';
-import { get, getV2, post, put } from './api.client';
+import { del, get, getV2, post, put } from './api.client';
 
 export async function getEnvironments() {
   const { data } = await get<{ data: IEnvironment[] }>('/environments');
@@ -25,8 +25,12 @@ export async function getTags({ environment }: { environment: IEnvironment }): P
   return data;
 }
 
-export async function createEnvironment(payload: { name: string }): Promise<IEnvironment> {
+export async function createEnvironment(payload: { name: string; color: string }): Promise<IEnvironment> {
   const response = await post<{ data: IEnvironment }>('/environments', { body: payload });
 
   return response.data;
+}
+
+export async function deleteEnvironment({ environment }: { environment: IEnvironment }): Promise<void> {
+  return del(`/environments/${environment._id}`);
 }

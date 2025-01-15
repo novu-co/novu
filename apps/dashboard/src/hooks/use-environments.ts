@@ -1,5 +1,6 @@
-import { createEnvironment, getEnvironments, updateEnvironment } from '@/api/environments';
+import { createEnvironment, deleteEnvironment, getEnvironments, updateEnvironment } from '@/api/environments';
 import { QueryKeys } from '@/utils/query-keys';
+import { IEnvironment } from '@novu/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export function useEnvironments() {
@@ -25,6 +26,17 @@ export function useUpdateEnvironment() {
 
   return useMutation({
     mutationFn: updateEnvironment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.myEnvironments] });
+    },
+  });
+}
+
+export function useDeleteEnvironment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ environment }: { environment: IEnvironment }) => deleteEnvironment({ environment }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QueryKeys.myEnvironments] });
     },

@@ -20,15 +20,42 @@ import {
   SheetTrigger,
 } from '@/components/primitives/sheet';
 import { ExternalLink } from '@/components/shared/external-link';
-import { useCreateEnvironment } from '@/hooks/use-environments';
+import { useCreateEnvironment, useEnvironments } from '@/hooks/use-environments';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { IEnvironment } from '@novu/shared';
 import { ComponentProps, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiAddLine, RiArrowRightSLine } from 'react-icons/ri';
 import { z } from 'zod';
+import { ColorPicker } from './primitives/color-picker';
+import { showErrorToast, showSuccessToast } from './primitives/sonner-helpers';
+
+const ENVIRONMENT_COLORS = [
+  '#FF6B6B', // Vibrant Coral
+  '#4ECDC4', // Bright Turquoise
+  '#45B7D1', // Azure Blue
+  '#96C93D', // Lime Green
+  '#A66CFF', // Bright Purple
+  '#FF9F43', // Bright Orange
+  '#FF78C4', // Hot Pink
+  '#20C997', // Emerald
+  '#845EC2', // Royal Purple
+  '#FF5E78', // Bright Red
+] as const;
+
+function getRandomColor(existingEnvironments: IEnvironment[] = []) {
+  const usedColors = new Set(existingEnvironments.map((env) => (env as any).color).filter(Boolean));
+  const availableColors = ENVIRONMENT_COLORS.filter((color) => !usedColors.has(color));
+
+  // If all colors are used, fall back to the original list
+  const colorPool = availableColors.length > 0 ? availableColors : ENVIRONMENT_COLORS;
+
+  return colorPool[Math.floor(Math.random() * colorPool.length)];
+}
 
 const createEnvironmentSchema = z.object({
   name: z.string().min(1, 'Name is required'),
+  color: z.string(),
 });
 
 type CreateEnvironmentFormData = z.infer<typeof createEnvironmentSchema>;
@@ -36,6 +63,7 @@ type CreateEnvironmentFormData = z.infer<typeof createEnvironmentSchema>;
 type CreateEnvironmentButtonProps = ComponentProps<typeof Button>;
 
 export const CreateEnvironmentButton = (props: CreateEnvironmentButtonProps) => {
+  const { data: environments = [] } = useEnvironments();
   const [isOpen, setIsOpen] = useState(false);
   const { mutateAsync, isPending } = useCreateEnvironment();
 
@@ -43,15 +71,28 @@ export const CreateEnvironmentButton = (props: CreateEnvironmentButtonProps) => 
     resolver: zodResolver(createEnvironmentSchema),
     defaultValues: {
       name: '',
+      color: getRandomColor(environments),
     },
   });
 
   const onSubmit = async (values: CreateEnvironmentFormData) => {
-    await mutateAsync({
-      name: values.name,
-    });
-    setIsOpen(false);
-    form.reset();
+    try {
+      await mutateAsync({
+        name: values.name,
+        color: values.color,
+      });
+
+      setIsOpen(false);
+      form.reset({
+        name: '',
+        color: getRandomColor(environments),
+      });
+
+      showSuccessToast('Environment created successfully');
+    } catch (e: any) {
+      const message = e?.response?.data?.message || e?.message || 'Failed to create environment';
+      showErrorToast(Array.isArray(message) ? message[0] : message);
+    }
   };
 
   return (
@@ -97,6 +138,19 @@ export const CreateEnvironmentButton = (props: CreateEnvironmentButtonProps) => 
                       />
                     </FormControl>
                     <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="color"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel required>Color</FormLabel>
+                    <FormControl>
+                      <ColorPicker pureInput={false} value={field.value} onChange={field.onChange} />
+                    </FormControl>
+                    <FormMessage>Will be used to identify the environment in the UI.</FormMessage>
                   </FormItem>
                 )}
               />

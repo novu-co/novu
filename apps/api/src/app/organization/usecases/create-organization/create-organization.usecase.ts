@@ -1,8 +1,8 @@
 /* eslint-disable global-require */
-import { BadRequestException, Inject, Injectable, Logger, Scope } from '@nestjs/common';
-import { OrganizationEntity, OrganizationRepository, UserRepository } from '@novu/dal';
-import { ApiServiceLevelEnum, JobTitleEnum, MemberRoleEnum, EnvironmentEnum } from '@novu/shared';
+import { BadRequestException, Injectable, Logger, Scope } from '@nestjs/common';
 import { AnalyticsService } from '@novu/application-generic';
+import { OrganizationEntity, OrganizationRepository, UserRepository } from '@novu/dal';
+import { ApiServiceLevelEnum, EnvironmentEnum, JobTitleEnum, MemberRoleEnum } from '@novu/shared';
 
 import { ModuleRef } from '@nestjs/core';
 import { CreateEnvironmentCommand } from '../../../environments-v1/usecases/create-environment/create-environment.command';
@@ -13,9 +13,9 @@ import { AddMemberCommand } from '../membership/add-member/add-member.command';
 import { AddMember } from '../membership/add-member/add-member.usecase';
 import { CreateOrganizationCommand } from './create-organization.command';
 
-import { ApiException } from '../../../shared/exceptions/api.exception';
-import { CreateNovuIntegrations } from '../../../integrations/usecases/create-novu-integrations/create-novu-integrations.usecase';
 import { CreateNovuIntegrationsCommand } from '../../../integrations/usecases/create-novu-integrations/create-novu-integrations.command';
+import { CreateNovuIntegrations } from '../../../integrations/usecases/create-novu-integrations/create-novu-integrations.usecase';
+import { ApiException } from '../../../shared/exceptions/api.exception';
 
 @Injectable({
   scope: Scope.REQUEST,
@@ -61,6 +61,7 @@ export class CreateOrganization {
         userId: user._id,
         name: EnvironmentEnum.DEVELOPMENT,
         organizationId: createdOrganization._id,
+        system: true,
       })
     );
 
@@ -78,6 +79,7 @@ export class CreateOrganization {
         name: EnvironmentEnum.PRODUCTION,
         organizationId: createdOrganization._id,
         parentEnvironmentId: devEnv._id,
+        system: true,
       })
     );
 

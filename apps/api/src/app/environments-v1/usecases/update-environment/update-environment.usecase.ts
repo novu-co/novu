@@ -20,6 +20,10 @@ export class UpdateEnvironment {
       updatePayload.identifier = command.identifier;
     }
 
+    if (command.color) {
+      updatePayload.color = command.color;
+    }
+
     if (command.dns && command.dns.inboundParseDomain && command.dns.inboundParseDomain !== '') {
       updatePayload[`dns.inboundParseDomain`] = command.dns.inboundParseDomain;
     }

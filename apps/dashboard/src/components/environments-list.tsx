@@ -1,28 +1,54 @@
 import { useEnvironment } from '@/context/environment/hooks';
-import { useEnvironments } from '@/hooks/use-environments';
+import { useDeleteEnvironment, useEnvironments } from '@/hooks/use-environments';
 import { cn } from '@/utils/ui';
 import { IEnvironment } from '@novu/shared';
 import { useState } from 'react';
-import { RiMore2Fill } from 'react-icons/ri';
+import { RiDeleteBin2Line, RiMore2Fill } from 'react-icons/ri';
+import { DeleteEnvironmentDialog } from './delete-environment-dialog';
 import { EditEnvironmentSheet } from './edit-environment-sheet';
 import { Badge } from './primitives/badge';
-import { Button } from './primitives/button';
+import { CompactButton } from './primitives/button-compact';
 import { CopyButton } from './primitives/copy-button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './primitives/dropdown-menu';
+import { EnvironmentBranchIcon } from './primitives/environment-branch-icon';
+import { showErrorToast, showSuccessToast } from './primitives/sonner-helpers';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './primitives/table';
 import { TimeDisplayHoverCard } from './time-display-hover-card';
 import TruncatedText from './truncated-text';
+
+const PROTECTED_ENVIRONMENTS = ['Development', 'Production'];
 
 export function EnvironmentsList() {
   const { data: environments = [], isLoading } = useEnvironments();
   const { currentEnvironment } = useEnvironment();
   const [editEnvironment, setEditEnvironment] = useState<IEnvironment>();
+  const [deleteEnvironment, setDeleteEnvironment] = useState<IEnvironment>();
+  const { mutateAsync: deleteEnvironmentAction, isPending: isDeletePending } = useDeleteEnvironment();
+
+  const onDeleteEnvironment = async () => {
+    if (!deleteEnvironment) return;
+
+    try {
+      await deleteEnvironmentAction({ environment: deleteEnvironment });
+      showSuccessToast('Environment deleted successfully');
+
+      setDeleteEnvironment(undefined);
+    } catch (e: any) {
+      const message = e?.response?.data?.message || e?.message || 'Failed to delete environment';
+      showErrorToast(Array.isArray(message) ? message[0] : message);
+    }
+  };
+
+  const handleDeleteClick = (environment: IEnvironment) => {
+    setDeleteEnvironment(environment);
+  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -43,13 +69,16 @@ export function EnvironmentsList() {
           {environments.map((environment) => (
             <TableRow key={environment._id} className="group relative isolate">
               <TableCell className="font-medium">
-                <div className="flex items-center gap-1">
-                  <TruncatedText className="max-w-[32ch]">{environment.name}</TruncatedText>
-                  {environment._id === currentEnvironment?._id && (
-                    <Badge color="blue" size="sm" variant="lighter">
-                      Current
-                    </Badge>
-                  )}
+                <div className="flex items-center gap-2">
+                  <EnvironmentBranchIcon size="sm" environment={environment} />
+                  <div className="flex items-center gap-1">
+                    <TruncatedText className="max-w-[32ch]">{environment.name}</TruncatedText>
+                    {environment._id === currentEnvironment?._id && (
+                      <Badge color="blue" size="sm" variant="lighter">
+                        Current
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </TableCell>
               <TableCell>
@@ -74,21 +103,35 @@ export function EnvironmentsList() {
                   })}
                 </TimeDisplayHoverCard>
               </TableCell>
-              <TableCell className="w-1">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="secondary" mode="ghost" size="xs">
-                      <RiMore2Fill className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem onSelect={() => setEditEnvironment(environment)}>
-                        Edit environment
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              <TableCell className="h-[49px] w-1">
+                {!PROTECTED_ENVIRONMENTS.includes(environment.name) && (
+                  <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger asChild>
+                      <CompactButton icon={RiMore2Fill} variant="ghost" className="z-10 h-8 w-8 p-0"></CompactButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem onSelect={() => setEditEnvironment(environment)}>
+                          Edit environment
+                        </DropdownMenuItem>
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onSelect={() => handleDeleteClick(environment)}
+                            disabled={
+                              environment._id === currentEnvironment?._id ||
+                              PROTECTED_ENVIRONMENTS.includes(environment.name)
+                            }
+                          >
+                            <RiDeleteBin2Line />
+                            Delete environment
+                          </DropdownMenuItem>
+                        </>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </TableCell>
             </TableRow>
           ))}
@@ -98,6 +141,13 @@ export function EnvironmentsList() {
         environment={editEnvironment}
         isOpen={!!editEnvironment}
         onOpenChange={(open) => !open && setEditEnvironment(undefined)}
+      />
+      <DeleteEnvironmentDialog
+        environment={deleteEnvironment}
+        open={!!deleteEnvironment}
+        onOpenChange={(open) => !open && setDeleteEnvironment(undefined)}
+        onConfirm={onDeleteEnvironment}
+        isLoading={isDeletePending}
       />
     </>
   );

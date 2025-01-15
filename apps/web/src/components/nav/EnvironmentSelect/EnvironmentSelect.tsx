@@ -1,5 +1,4 @@
 import { Select, IconConstruction, IconRocketLaunch } from '@novu/design-system';
-
 import { css } from '@novu/novui/css';
 import { navSelectStyles } from '../NavSelect.styles';
 import { useEnvironment } from '../../providers/EnvironmentProvider';
@@ -24,7 +23,6 @@ export function EnvironmentSelect() {
           <span
             className={css({
               p: '50',
-              // TODO: use design system values when available
               borderRadius: '8px',
               bg: 'surface.page',
               '& svg': {

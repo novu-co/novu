@@ -4,7 +4,7 @@ import { useTelemetry } from '@/hooks/use-telemetry';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { TelemetryEvent } from '@/utils/telemetry';
 import * as Sentry from '@sentry/react';
-import { ReactNode, useMemo } from 'react';
+import { ReactNode } from 'react';
 import {
   RiBarChartBoxLine,
   RiChat1Line,
@@ -40,7 +40,6 @@ export const SideNavigation = () => {
 
   const { currentEnvironment, environments, switchEnvironment } = useEnvironment();
   const track = useTelemetry();
-  const environmentNames = useMemo(() => environments?.map((env) => env.name), [environments]);
 
   const onEnvironmentChange = (value: string) => {
     const environment = environments?.find((env) => env.name === value);
@@ -61,7 +60,11 @@ export const SideNavigation = () => {
     <aside className="bg-neutral-alpha-50 relative flex h-full w-[275px] flex-shrink-0 flex-col">
       <SidebarContent className="h-full">
         <OrganizationDropdown />
-        <EnvironmentDropdown value={currentEnvironment?.name} data={environmentNames} onChange={onEnvironmentChange} />
+        <EnvironmentDropdown
+          currentEnvironment={currentEnvironment}
+          data={environments}
+          onChange={onEnvironmentChange}
+        />
         <nav className="flex h-full flex-1 flex-col">
           <div className="flex flex-col gap-4">
             <NavigationGroup>
