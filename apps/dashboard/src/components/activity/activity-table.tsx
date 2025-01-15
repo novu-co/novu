@@ -2,9 +2,10 @@ import { ActivityFilters } from '@/api/activity';
 import { Skeleton } from '@/components/primitives/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/primitives/table';
 import { TimeDisplayHoverCard } from '@/components/time-display-hover-card';
+import { formatDate } from '@/utils/format-date';
+import { parsePageParam } from '@/utils/parse-page-param';
 import { cn } from '@/utils/ui';
 import { ISubscriber } from '@novu/shared';
-import { format } from 'date-fns';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect } from 'react';
 import { createSearchParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -142,10 +143,6 @@ export function ActivityTable({
   );
 }
 
-function formatDate(date: string) {
-  return format(new Date(date), 'MMM d yyyy, HH:mm:ss');
-}
-
 function SkeletonRow() {
   return (
     <TableRow>
@@ -185,11 +182,4 @@ function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriber
   }
 
   return '';
-}
-function parsePageParam(param: string | null): number {
-  if (!param) return 0;
-
-  const parsed = Number.parseInt(param, 10);
-
-  return Math.max(0, parsed || 0);
 }

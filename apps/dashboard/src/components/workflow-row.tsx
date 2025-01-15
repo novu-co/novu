@@ -25,6 +25,7 @@ import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
 import { WorkflowOriginEnum, WorkflowStatusEnum } from '@/utils/enums';
+import { formatDateSimple } from '@/utils/format-date';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { cn } from '@/utils/ui';
 import { IEnvironment, WorkflowListResponseDto } from '@novu/shared';
@@ -219,11 +220,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
 
       <WorkflowLinkTableCell workflow={workflow} className="text-foreground-600 min-w-[180px] text-sm font-medium">
         <TimeDisplayHoverCard date={new Date(workflow.updatedAt)}>
-          {new Date(workflow.updatedAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          })}
+          {formatDateSimple(workflow.updatedAt)}
         </TimeDisplayHoverCard>
       </WorkflowLinkTableCell>
 
