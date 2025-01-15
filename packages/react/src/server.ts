@@ -13,4 +13,3 @@ export function Bell() {}
 
 // Hooks
 export { NovuProvider } from './index';
-export * from './hooks';
