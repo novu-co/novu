@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OrganizationRepository } from '@novu/dal';
+import { OrganizationRepository, UserRepository } from '@novu/dal';
 import { PlainCardsCommand } from './plain-cards.command';
 
 const divider = [
@@ -13,7 +13,7 @@ const divider = [
 const organizationDetailsHeading = [
   {
     componentText: {
-      text: `User's active orgaganizations`,
+      text: `User's Organizations`,
       textSize: 'L',
     },
   },
@@ -22,7 +22,7 @@ const organizationDetailsHeading = [
 const sessionsDetailsHeading = [
   {
     componentText: {
-      text: `User's active sessions`,
+      text: `User's Sessions`,
       textSize: 'L',
     },
   },
@@ -30,14 +30,19 @@ const sessionsDetailsHeading = [
 
 @Injectable()
 export class PlainCardsUsecase {
-  constructor(private organizationRepository: OrganizationRepository) {}
-  async fetchUserOrganizations(command: PlainCardsCommand) {
+  constructor(
+    private organizationRepository: OrganizationRepository,
+    private userRepository: UserRepository
+  ) {}
+  async fetchCustomerDetails(command: PlainCardsCommand) {
+    const key = process.env.NOVU_REGION === 'eu-west-2' ? 'customer-details-eu' : 'customer-details-us';
+
     if (!command?.customer?.externalId) {
       return {
         data: {},
         cards: [
           {
-            key: 'plain-customer-details',
+            key,
             components: [
               {
                 componentSpacer: {
@@ -54,16 +59,15 @@ export class PlainCardsUsecase {
         ],
       };
     }
-    const organizations = await this.organizationRepository.findUserActiveOrganizations(command?.customer?.externalId);
 
-    const sessions = await this.organizationRepository.findUseActiveSessions(command?.customer?.externalId);
+    const organizations = await this.organizationRepository.findUserActiveOrganizations(command?.customer?.externalId);
+    const sessions = await this.userRepository.findUserSessions(command?.customer?.externalId);
 
     return {
       data: {},
       cards: [
         {
-          // key: process.env.NOVU_REGION === 'eu-west-2' ? 'customer-details-eu' : 'customer-details-us',
-          key: 'customer-details-local',
+          key,
           components: [
             ...organizationDetailsHeading,
             ...divider,

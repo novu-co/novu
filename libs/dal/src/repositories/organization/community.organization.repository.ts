@@ -29,10 +29,6 @@ export class CommunityOrganizationRepository
     });
   }
 
-  async findUseActiveSessions(userId: string): Promise<[]> {
-    throw new Error('Not implemented');
-  }
-
   private async getUsersMembersOrganizationIds(userId: string): Promise<string[]> {
     const members = await this.memberRepository.findUserActiveMembers(userId);
 
