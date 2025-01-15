@@ -567,9 +567,8 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview #novu-v
     expect(status).to.equal(201);
     expect(body.data.result.type).to.equal('email');
     expect(body.data.result.preview.subject).to.equal('Hello {{subscriber.firstName}} World!');
-    expect(body.data.result.preview.body).to.include('{{subscriber.lastName}}');
+    expect(body.data.result.preview.body).to.not.include('{{subscriber.lastName}}');
     expect(body.data.result.preview.body).to.include('{{payload.foo}}');
-    // expect(body.data.result.preview.body).to.include('{{payload.show}}');
     expect(body.data.result.preview.body).to.include('{{payload.extraData}}');
     expect(body.data.previewPayloadExample).to.deep.equal({
       subscriber: {
@@ -640,7 +639,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview #novu-v
         },
         payload: {
           foo: 'foo from client',
-          show: false,
+          show: true,
           extraData: '',
         },
       },
@@ -659,7 +658,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview #novu-v
       },
       payload: {
         foo: 'foo from client',
-        show: false,
+        show: true,
         extraData: '',
       },
     });

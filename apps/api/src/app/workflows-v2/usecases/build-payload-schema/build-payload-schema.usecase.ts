@@ -5,12 +5,15 @@ import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { flattenObjectValues, keysToObject } from '../../util/utils';
 import { extractLiquidTemplateVariables } from '../../util/template-parser/liquid-parser';
 import { BuildPayloadSchemaCommand } from './build-payload-schema.command';
-import { transformMailyContentToLiquid } from '../generate-preview/transform-maily-content-to-liquid';
 import { isStringTipTapNode } from '../../util/tip-tap.util';
+import { HydrateEmailSchemaUseCase } from '../../../environments-v1/usecases/output-renderers/hydrate-email-schema.usecase';
 
 @Injectable()
 export class BuildPayloadSchema {
-  constructor(private readonly controlValuesRepository: ControlValuesRepository) {}
+  constructor(
+    private readonly controlValuesRepository: ControlValuesRepository,
+    private readonly hydrateEmailSchemaUseCase: HydrateEmailSchemaUseCase
+  ) {}
 
   @InstrumentUsecase()
   async execute(command: BuildPayloadSchemaCommand): Promise<JSONSchemaDto> {
@@ -64,7 +67,7 @@ export class BuildPayloadSchema {
 
     for (const [key, value] of Object.entries(controlValue)) {
       if (isStringTipTapNode(value)) {
-        processedValue[key] = transformMailyContentToLiquid(JSON.parse(value));
+        processedValue[key] = this.hydrateEmailSchemaUseCase.execute({ emailEditor: value });
       } else {
         processedValue[key] = value;
       }
