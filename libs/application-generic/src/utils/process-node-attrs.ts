@@ -11,6 +11,7 @@ export enum MailyContentTypeEnum {
 export enum MailyAttrsEnum {
   ID = 'id',
   SHOW_IF_KEY = 'showIfKey',
+  EACH_KEY = 'each',
   FALLBACK = 'fallback',
   IS_SRC_VARIABLE = 'isSrcVariable',
   IS_EXTERNAL_LINK_VARIABLE = 'isExternalLinkVariable',
