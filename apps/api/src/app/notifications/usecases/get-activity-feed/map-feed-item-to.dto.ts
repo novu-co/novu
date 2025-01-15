@@ -20,6 +20,8 @@ import {
   ActivityNotificationJobResponseDto,
   ActivityNotificationResponseDto,
   ActivityNotificationStepResponseDto,
+  ActivityNotificationSubscriberResponseDto,
+  ActivityNotificationTemplateResponseDto,
   DigestMetadataDto,
 } from '../../dtos/activities-response.dto';
 import {
@@ -34,36 +36,44 @@ import {
 } from '../../../shared/dtos/step-filter-dto';
 import { MessageTemplateDto } from '../../../shared/dtos/message.template.dto';
 
-export function mapFeedItemToDto(entity: NotificationFeedItemEntity): ActivityNotificationResponseDto {
-  const dto = new ActivityNotificationResponseDto();
-  dto._id = entity._id;
-  dto._environmentId = entity._environmentId;
-  dto._organizationId = entity._organizationId;
-  dto._subscriberId = entity._subscriberId;
-  dto.transactionId = entity.transactionId;
-  dto._templateId = entity._templateId; // Mapping template ID
-  dto._digestedNotificationId = entity._digestedNotificationId; // Optional field
-  dto.createdAt = entity.createdAt;
-  dto.updatedAt = entity.updatedAt;
-  dto.channels = entity.channels;
-
-  if (entity.template) {
-    dto.template = {
-      _id: entity.template._id,
-      name: entity.template.name,
-      triggers: entity.template.triggers,
-    };
-  }
-  dto.subscriber = {
+function buildSubscriberDto(entity: NotificationFeedItemEntity): ActivityNotificationSubscriberResponseDto {
+  return {
     _id: entity.subscriber._id,
     email: entity.subscriber.email,
     firstName: entity.subscriber.firstName,
     lastName: entity.subscriber.lastName,
     phone: entity.subscriber.phone,
   };
-  dto.jobs = entity.jobs.map(mapJobToDto);
+}
 
-  return dto;
+function buildTemplate(entity: NotificationFeedItemEntity): ActivityNotificationTemplateResponseDto {
+  return {
+    _id: entity.template._id,
+    name: entity.template.name,
+    triggers: entity.template.triggers,
+  };
+}
+
+export function mapFeedItemToDto(entity: NotificationFeedItemEntity): ActivityNotificationResponseDto {
+  return {
+    _digestedNotificationId: entity._digestedNotificationId,
+    _environmentId: entity._environmentId,
+    _id: entity._id,
+    _organizationId: entity._organizationId,
+    _subscriberId: entity._subscriberId,
+    _templateId: entity._templateId,
+    channels: entity.channels,
+    createdAt: entity.createdAt,
+    jobs: entity.jobs.map(mapJobToDto),
+    tags: entity.tags,
+    transactionId: entity.transactionId,
+    updatedAt: entity.updatedAt,
+    controls: entity.controls,
+    payload: entity.payload,
+    to: entity.to,
+    subscriber: buildSubscriberDto(entity),
+    template: buildTemplate(entity),
+  };
 }
 
 function mapChildFilterToDto(filterPart: FilterParts): FilterPartsDto {
@@ -230,15 +240,15 @@ function mapJobToDto(item: JobFeedItem): ActivityNotificationJobResponseDto {
   };
 }
 
-function convertExecutionDetail(detail: ExecutionDetailFeedItem): ActivityNotificationExecutionDetailResponseDto {
+function convertExecutionDetail(entity: ExecutionDetailFeedItem): ActivityNotificationExecutionDetailResponseDto {
   return {
-    _id: detail._id,
-    detail: detail.detail,
-    isRetry: detail.isRetry,
-    isTest: detail.isTest,
-    providerId: detail.providerId as unknown as ProvidersIdEnum,
-    source: detail.source,
-    status: detail.status,
-    createdAt: detail.createdAt,
+    _id: entity._id,
+    detail: entity.detail,
+    isRetry: entity.isRetry,
+    isTest: entity.isTest,
+    providerId: entity.providerId as unknown as ProvidersIdEnum,
+    source: entity.source,
+    status: entity.status,
+    createdAt: entity.createdAt,
   };
 }
