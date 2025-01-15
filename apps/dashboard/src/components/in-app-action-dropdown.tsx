@@ -1,17 +1,10 @@
-import { EditorView } from '@uiw/react-codemirror';
-import merge from 'lodash.merge';
-import { ComponentProps, useMemo } from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
-import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
-
-import { Button, buttonVariants } from '@/components/primitives/button';
+import { Button } from '@/components/primitives/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/primitives/dropdown-menu';
-import { Editor } from '@/components/primitives/editor';
 import {
   FormControl,
   FormField,
@@ -20,16 +13,20 @@ import {
   FormMessage,
   FormMessagePure,
 } from '@/components/primitives/form/form';
-import { InputField } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import { URLInput } from '@/components/workflow-editor/url-input';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
-import { autocompletion } from '@codemirror/autocomplete';
+import merge from 'lodash.merge';
+import { ComponentProps, useMemo } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
+import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
+import { CompactButton } from './primitives/button-compact';
+import { ControlInput } from './primitives/control-input';
+import { InputRoot, InputWrapper } from './primitives/input';
 
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
@@ -55,31 +52,36 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
         <div className={cn('mt-3 flex items-center gap-1')}>
           <div className="border-neutral-alpha-200 relative flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
             {!primaryAction && !secondaryAction && (
-              <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'z-10 cursor-not-allowed')}>
-                <RiForbid2Line className="size-4" />
-                <span>No action</span>
-              </div>
+              <Button
+                variant="secondary"
+                mode="outline"
+                size="2xs"
+                className="h-6 border-[1px] border-dashed shadow-none ring-0"
+                trailingIcon={RiForbid2Line}
+              >
+                No action
+              </Button>
             )}
             {primaryAction && (
-              <ConfigureActionPopover asChild fields={{ actionKey: primaryActionKey }}>
-                <Button variant="primary" size="xs" className="z-10">
+              <ConfigureActionPopover fields={{ actionKey: primaryActionKey }}>
+                <Button variant="primary" size="2xs" className="z-10 h-6">
                   {primaryAction.label}
                 </Button>
               </ConfigureActionPopover>
             )}
             {secondaryAction && (
-              <ConfigureActionPopover asChild fields={{ actionKey: secondaryActionKey }}>
-                <Button variant="outline" size="xs" className="z-10">
+              <ConfigureActionPopover fields={{ actionKey: secondaryActionKey }}>
+                <Button variant="secondary" mode="outline" size="2xs" className="z-10 h-6">
                   {secondaryAction.label}
                 </Button>
               </ConfigureActionPopover>
             )}
             <DropdownMenuTrigger className="absolute size-full" />
           </div>
-          <DropdownMenuTrigger asChild>
-            <Button size={'icon'} variant={'ghost'}>
-              <RiExpandUpDownLine className="size-4" />
-            </Button>
+          <DropdownMenuTrigger>
+            <CompactButton icon={RiExpandUpDownLine} size="lg" variant="ghost">
+              <span className="sr-only">Actions</span>
+            </CompactButton>
           </DropdownMenuTrigger>
         </div>
         <DropdownMenuContent
@@ -99,10 +101,15 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
               onMenuItemClick?.();
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'dashed', size: 'xs' }), 'pointer-events-none gap-2')}>
-              <RiForbid2Line className="size-4" />
-              <span className="cursor-default">No action</span>
-            </div>
+            <Button
+              mode="outline"
+              variant="secondary"
+              size="2xs"
+              className="h-6 border-[1px] border-dashed shadow-none ring-0"
+              trailingIcon={RiForbid2Line}
+            >
+              No action
+            </Button>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
@@ -118,9 +125,9 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
               onMenuItemClick?.();
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
+            <Button variant="primary" size="2xs" className="pointer-events-none h-6">
               Primary action
-            </div>
+            </Button>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
@@ -140,12 +147,13 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
               onMenuItemClick?.();
             }}
           >
-            <div className={cn(buttonVariants({ variant: 'primary', size: 'xs' }), 'pointer-events-none')}>
+            <Button variant="primary" size="2xs" className="pointer-events-none h-6">
               Primary action
-            </div>
-            <div className={cn(buttonVariants({ variant: 'outline', size: 'xs' }), 'pointer-events-none')}>
+            </Button>
+
+            <Button variant="secondary" mode="outline" size="2xs" className="pointer-events-none h-6">
               Secondary action
-            </div>
+            </Button>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -162,39 +170,38 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
   const { control } = useFormContext();
   const { step } = useWorkflow();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
-  const extensions = useMemo(
-    () => [autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping],
-    [variables]
-  );
 
   return (
     <Popover>
       <PopoverTrigger {...rest} />
-      <PopoverContent className="max-w-72" side="bottom" align="end">
+      <PopoverContent className="max-w-72 overflow-visible" side="bottom" align="end">
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 text-sm font-medium leading-none">
             <RiEdit2Line className="size-4" /> Customize button
           </div>
-          <Separator decorative />
+          <Separator />
           <FormField
             control={control}
             name={`${actionKey}.label`}
             defaultValue=""
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
                 <div className="flex items-center gap-1">
                   <FormLabel>Button text</FormLabel>
                 </div>
                 <FormControl>
-                  <InputField size="fit">
-                    <Editor
-                      fontFamily="inherit"
-                      placeholder="Button text"
-                      value={field.value}
-                      onChange={field.onChange}
-                      extensions={extensions}
-                    />
-                  </InputField>
+                  <InputRoot className="overflow-visible" hasError={!!fieldState.error}>
+                    <InputWrapper className="flex h-9 items-center px-2.5">
+                      <ControlInput
+                        variables={variables}
+                        multiline={false}
+                        indentWithTab={false}
+                        placeholder="Button text"
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </InputWrapper>
+                  </InputRoot>
                 </FormControl>
                 <FormMessage />
               </FormItem>

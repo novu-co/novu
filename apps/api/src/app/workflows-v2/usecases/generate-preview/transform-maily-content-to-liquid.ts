@@ -1,6 +1,6 @@
 import { JSONContent } from '@maily-to/render';
 import _ from 'lodash';
-import { processNodeAttrs, MailyContentTypeEnum } from '@novu/application-generic';
+import { processNodeAttrs, MailyContentTypeEnum, processNodeMarks } from '@novu/application-generic';
 
 /**
  * Processes raw Maily JSON editor state by converting variables to Liquid.js output syntax
@@ -27,23 +27,6 @@ export function transformMailyContentToLiquid(mailyContent: JSONContent): JSONCo
   return processNode(processedState);
 }
 
-function processVariableNode(node: JSONContent): JSONContent {
-  if (!node.attrs) {
-    return node;
-  }
-
-  const attrs = node.attrs as VariableNodeContent['attrs'];
-  const processedId = attrs?.id ? wrapInLiquidOutput(attrs.id) : undefined;
-
-  return {
-    ...node,
-    attrs: {
-      ...attrs,
-      ...(processedId && { id: processedId }),
-    },
-  };
-}
-
 type VariableNodeContent = JSONContent & {
   type: 'variable';
   attrs?: {
@@ -64,48 +47,85 @@ function isVariableNode(node: JSONContent): node is VariableNodeContent {
   return node.type === 'variable';
 }
 
-function isIterableVariable(node: JSONContent): node is IterableVariable {
-  return isVariableNode(node) && Boolean(node.attrs?.id?.startsWith('iterable.'));
+function isIterableVariable(node: JSONContent, eachVariable: string): node is IterableVariable {
+  return isVariableNode(node) && Boolean(node.attrs?.id?.startsWith(eachVariable));
 }
 
 function processForLoopNode(node: JSONContent): JSONContent {
-  const eachVariable = node?.attrs?.each;
-  if (!eachVariable) {
+  // early returns for invalid inputs
+  if (!node?.attrs?.each || !Array.isArray(node.content)) {
     return node;
   }
 
-  if (!Array.isArray(node.content)) {
-    return node;
-  }
+  const loopVariable = node.attrs.each;
 
-  const content = node.content.map((contentNodeChild) => {
-    if (!isIterableVariable(contentNodeChild)) {
-      return processNode(contentNodeChild);
+  return {
+    ...node,
+    content: processLoopContent(node.content, loopVariable),
+  };
+}
+
+function processLoopContent(content: JSONContent[], loopVariable: string, parentLoops: string[] = []): JSONContent[] {
+  return content.map((node) => {
+    // handle nested for loops
+    if (node.type === MailyContentTypeEnum.FOR) {
+      return processForLoopNode({
+        ...node,
+        content: Array.isArray(node.content) ? node.content : [],
+      });
     }
 
-    const idWithoutIterablePrefix = contentNodeChild.attrs.id.replace('iterable.', '');
-    const liquidId = `{{${eachVariable}[0].${idWithoutIterablePrefix}}}`;
+    // process nested content recursively until leaf nodes
+    if (node.content && Array.isArray(node.content)) {
+      return {
+        ...node,
+        content: processLoopContent(node.content, loopVariable, parentLoops),
+      };
+    }
 
-    return {
-      ...contentNodeChild,
-      attrs: {
-        ...contentNodeChild.attrs,
-        id: liquidId,
-      },
-    };
+    // transform variable / leaf nodes within the loop
+    if (isIterableVariable(node, loopVariable)) {
+      return transformLoopVariable(node, loopVariable, parentLoops);
+    }
+
+    // return unchanged node
+    return node;
   });
+}
 
-  return { ...node, content };
+function transformLoopVariable(node: IterableVariable, currentLoop: string, parentLoops: string[]): JSONContent {
+  const variableId = node.attrs.id;
+  const allLoopContexts = [...parentLoops, currentLoop];
+
+  // find which loop context this variable belongs to
+  const matchingLoop = allLoopContexts.find((loop) => variableId.startsWith(loop));
+
+  if (!matchingLoop) {
+    return node;
+  }
+
+  // transform the variable to use array index notation
+  const variablePath = variableId.replace(`${matchingLoop}.`, '');
+  const liquidVariable = `{{${matchingLoop}[0].${variablePath}}}`;
+
+  return {
+    ...node,
+    attrs: {
+      ...node.attrs,
+      id: liquidVariable,
+    },
+  };
 }
 
 function processNode(node: JSONContent): JSONContent {
   if (!node) return node;
 
-  const processedNode = processNodeAttrs(node);
+  let processedNode = processNodeAttrs(node);
+  processedNode = processNodeMarks(processedNode);
 
   switch (processedNode.type) {
     case MailyContentTypeEnum.VARIABLE:
-      return processVariableNode(processedNode);
+      return processedNode;
     case MailyContentTypeEnum.FOR:
       return processForLoopNode(processedNode);
     default:
@@ -115,8 +135,4 @@ function processNode(node: JSONContent): JSONContent {
 
       return processedNode;
   }
-}
-
-function wrapInLiquidOutput(value: string): string {
-  return `{{${value}}}`;
 }

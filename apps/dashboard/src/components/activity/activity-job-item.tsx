@@ -1,18 +1,18 @@
-import { Route, ChevronDown, Info } from 'lucide-react';
-import { IActivityJob, IDelayRegularMetadata, IDigestRegularMetadata, JobStatusEnum, StepTypeEnum } from '@novu/shared';
-import { Button } from '@/components/primitives/button';
 import { Badge } from '@/components/primitives/badge';
-import { Card, CardContent, CardHeader } from '../primitives/card';
-import { format } from 'date-fns';
-import { useState } from 'react';
+import { Button } from '@/components/primitives/button';
 import { cn } from '@/utils/ui';
-import { ExecutionDetailItem } from './execution-detail-item';
-import { STEP_TYPE_TO_ICON } from '../icons/utils';
+import { IActivityJob, IDelayRegularMetadata, IDigestRegularMetadata, JobStatusEnum, StepTypeEnum } from '@novu/shared';
+import { format } from 'date-fns';
+import { ChevronDown, Info, Route } from 'lucide-react';
+import { useState } from 'react';
 import { STEP_TYPE_TO_COLOR } from '../../utils/color';
-import { JOB_STATUS_CONFIG } from './constants';
-import { TimeDisplayHoverCard } from '../time-display-hover-card';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 import { formatJSONString } from '../../utils/string';
+import { STEP_TYPE_TO_ICON } from '../icons/utils';
+import { Card, CardContent, CardHeader } from '../primitives/card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
+import { TimeDisplayHoverCard } from '../time-display-hover-card';
+import { JOB_STATUS_CONFIG } from './constants';
+import { ExecutionDetailItem } from './execution-detail-item';
 
 interface ActivityJobItemProps {
   job: IActivityJob;
@@ -55,13 +55,13 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
           </div>
 
           <Button
-            variant="ghost"
-            type="button"
-            size="sm"
+            variant="secondary"
+            mode="ghost"
+            size="xs"
             className="text-foreground-600 !mt-0 h-5 gap-0 p-0 leading-[12px] hover:bg-transparent"
           >
             Show more
-            <ChevronDown className={cn('h-4 w-4 transition-transform', isExpanded && 'rotate-180')} />
+            <ChevronDown className={cn('ml-1 h-4 w-4 transition-transform', isExpanded && 'rotate-180')} />
           </Button>
         </CardHeader>
 
@@ -69,7 +69,7 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
           <CardContent className="rounded-lg bg-neutral-50 p-2">
             <div className="flex items-center justify-between">
               <span className="text-foreground-400 max-w-[300px] truncate pr-2 text-xs">{getStatusMessage(job)}</span>
-              <Badge variant="soft" className="bg-foreground-50 shrink-0 px-2 py-0.5 text-[11px] leading-3">
+              <Badge variant="lighter" color="gray" size="sm">
                 <TimeDisplayHoverCard date={new Date(job.updatedAt)}>
                   {format(new Date(job.updatedAt), 'MMM d yyyy, HH:mm:ss')}
                 </TimeDisplayHoverCard>

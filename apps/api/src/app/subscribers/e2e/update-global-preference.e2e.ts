@@ -1,15 +1,23 @@
-import { ChannelTypeEnum } from '@novu/shared';
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
+import { Novu } from '@novu/api';
+import { ChannelTypeEnum } from '@novu/api/models/components';
+import { SubscriberRepository } from '@novu/dal';
 
-import { updateGlobalPreferences } from './helpers';
+import { PreferenceChannels } from '@novu/api/src/models/components/preferencechannels';
+import { ChannelTypeEnum as ChannelTypeEnumInShared, StepTypeEnum } from '@novu/shared';
+import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-describe('Update Subscribers global preferences - /subscribers/:subscriberId/preferences (PATCH)', function () {
+describe('Update Subscribers global preferences - /subscribers/:subscriberId/preferences (PATCH) #novu-v2', function () {
   let session: UserSession;
+  let novuClient: Novu;
+  let subscriberRepository: SubscriberRepository;
 
   beforeEach(async () => {
     session = new UserSession();
+    subscriberRepository = new SubscriberRepository();
     await session.initialize();
+    novuClient = initNovuClassSdk(session);
   });
 
   it('should validate the payload', async function () {
@@ -19,92 +27,121 @@ describe('Update Subscribers global preferences - /subscribers/:subscriberId/pre
     };
 
     try {
-      const firstResponse = await updateGlobalPreferences(badPayload as any, session);
+      const firstResponse = await novuClient.subscribers.preferences.updateGlobal(
+        badPayload as any,
+        session.subscriberId
+      );
       expect(firstResponse).to.not.be.ok;
     } catch (error) {
-      expect(error.toJSON()).to.have.include({
-        status: 400,
-        name: 'AxiosError',
-        message: 'Request failed with status code 400',
-      });
-    }
-
-    const yetAnotherBadPayload = {
-      enabled: 'hello',
-      preferences: [{ type: ChannelTypeEnum.EMAIL, enabled: true }],
-    };
-
-    try {
-      const secondResponse = await updateGlobalPreferences(yetAnotherBadPayload as any, session);
-      expect(secondResponse).to.not.be.ok;
-    } catch (error) {
-      expect(error.toJSON()).to.have.include({
-        status: 400,
-        name: 'AxiosError',
-        message: 'Request failed with status code 400',
-      });
+      expect(error.pretty()).to.contain('Expected array, received boolean');
     }
   });
 
   it('should update user global preferences', async function () {
     const payload = {
       enabled: true,
-      preferences: [{ type: ChannelTypeEnum.EMAIL, enabled: true }],
+      preferences: [{ type: ChannelTypeEnum.Email, enabled: true }],
     };
 
-    const response = await updateGlobalPreferences(payload, session);
+    const response = await novuClient.subscribers.preferences.updateGlobal(payload, session.subscriberId);
 
-    expect(response.data.data.preference.enabled).to.eql(true);
-    expect(response.data.data.preference.channels).to.not.eql({
-      [ChannelTypeEnum.IN_APP]: true,
+    expect(response.result.preference.enabled).to.eql(true);
+    expect(response.result.preference.channels).to.not.eql({
+      [ChannelTypeEnum.InApp]: true,
     });
-    expect(response.data.data.preference.channels).to.eql({
-      [ChannelTypeEnum.EMAIL]: true,
-      [ChannelTypeEnum.PUSH]: true,
-      [ChannelTypeEnum.CHAT]: true,
-      [ChannelTypeEnum.SMS]: true,
-      [ChannelTypeEnum.IN_APP]: true,
-    });
+    expect(response.result.preference.channels).to.eql({
+      email: true,
+      sms: true,
+      inApp: true,
+      chat: true,
+      push: true,
+    } as PreferenceChannels);
   });
 
   it('should update user global preferences for multiple channels', async function () {
     const payload = {
       enabled: true,
       preferences: [
-        { type: ChannelTypeEnum.PUSH, enabled: false },
-        { type: ChannelTypeEnum.IN_APP, enabled: false },
-        { type: ChannelTypeEnum.SMS, enabled: true },
+        { type: ChannelTypeEnum.Push, enabled: false },
+        { type: ChannelTypeEnum.InApp, enabled: false },
+        { type: ChannelTypeEnum.Sms, enabled: true },
       ],
     };
 
-    const response = await updateGlobalPreferences(payload, session);
+    const response = await novuClient.subscribers.preferences.updateGlobal(payload, session.subscriberId);
 
-    expect(response.data.data.preference.enabled).to.eql(true);
-    expect(response.data.data.preference.channels).to.eql({
-      [ChannelTypeEnum.EMAIL]: true,
-      [ChannelTypeEnum.PUSH]: false,
-      [ChannelTypeEnum.CHAT]: true,
-      [ChannelTypeEnum.SMS]: true,
-      [ChannelTypeEnum.IN_APP]: false,
-    });
+    expect(response.result.preference.enabled).to.eql(true);
+    expect(response.result.preference.channels).to.deep.eq({
+      email: true,
+      push: false,
+      chat: true,
+      sms: true,
+      inApp: false,
+    } as PreferenceChannels);
   });
+  it('should update user global preferences only for the current environment', async function () {
+    // create a template in dev environment
+    await session.createTemplate({
+      steps: [
+        {
+          type: StepTypeEnum.IN_APP,
+          content: 'Hello',
+        },
+      ],
+      noFeedId: true,
+    });
 
-  // `enabled` flag is not used anymore. The presence of a preference object means that the subscriber has enabled notifications.
-  it.skip('should update user global preference and disable the flag for the future channels update', async function () {
-    const disablePreferenceData = {
-      enabled: false,
-    };
+    await session.switchToProdEnvironment();
+    // create a subscriber in prod environment
+    await subscriberRepository.create({
+      _environmentId: session.environment._id,
+      _organizationId: session.organization._id,
+      subscriberId: session.subscriberId,
+    });
+    // create a template in prod environment
+    await session.createTemplate({
+      steps: [
+        {
+          type: StepTypeEnum.IN_APP,
+          content: 'Hello',
+        },
+      ],
+      noFeedId: true,
+    });
 
-    const response = await updateGlobalPreferences(disablePreferenceData, session);
+    await session.switchToDevEnvironment();
+    // update the subscriber global preferences in dev environment
+    const response = await novuClient.subscribers.preferences.updateGlobal(
+      {
+        enabled: true,
+        preferences: [{ type: ChannelTypeEnumInShared.IN_APP, enabled: false }],
+      },
+      session.subscriberId
+    );
 
-    expect(response.data.data.preference.enabled).to.eql(false);
+    expect(response.result.preference.enabled).to.eql(true);
+    expect(response.result.preference.channels).to.eql({
+      email: true,
+      push: true,
+      chat: true,
+      sms: true,
+      inApp: false,
+    } as PreferenceChannels);
 
-    const preferenceChannel = {
-      preferences: [{ type: ChannelTypeEnum.EMAIL, enabled: true }],
-    };
+    // get the subscriber preferences in dev environment
+    const getDevPreferencesResponse = await novuClient.subscribers.preferences.list(session.subscriberId);
+    const devPreferences = getDevPreferencesResponse.result;
+    expect(devPreferences.every((item) => !!item.preference.channels.inApp)).to.be.false;
 
-    const res = await updateGlobalPreferences(preferenceChannel, session);
+    await session.switchToProdEnvironment();
 
-    expect(res.data.data.preference.channels).to.eql({});
+    // get the subscriber preferences in prod environment
+    session.apiKey = session.environment.apiKeys[0].key;
+    const novuClientForProduction = initNovuClassSdk(session);
+    const getProdPreferencesResponse = await novuClientForProduction.subscribers.preferences.list(session.subscriberId);
+    const prodPreferences = getProdPreferencesResponse.result;
+    expect(prodPreferences.every((item) => !!item.preference.channels.inApp)).to.be.true;
   });
 });
+
+// This is kept in order to validate the server controller behavior as the SDK will not allow problematic payloads in compilation

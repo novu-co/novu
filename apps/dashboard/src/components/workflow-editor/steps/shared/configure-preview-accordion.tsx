@@ -1,9 +1,9 @@
-import { CSSProperties, useEffect, useRef, useState } from 'react';
 import { Code2 } from '@/components/icons/code-2';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/primitives/accordion';
 import { Button } from '@/components/primitives/button';
 import { Editor } from '@/components/primitives/editor';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
+import { CSSProperties, useEffect, useRef, useState } from 'react';
 
 const extensions = [loadLanguage('json')?.extension ?? []];
 
@@ -57,9 +57,10 @@ export const ConfigurePreviewAccordion = ({
           />
           {payloadError && <p className="text-destructive text-xs">{payloadError}</p>}
           <Button
-            size="xs"
+            size="2xs"
             type="button"
-            variant="outline"
+            variant="secondary"
+            mode="outline"
             className="self-end"
             onClick={() => {
               try {

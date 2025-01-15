@@ -1,5 +1,3 @@
-import { RiMore2Fill } from 'react-icons/ri';
-import { createSearchParams, useLocation, useSearchParams } from 'react-router-dom';
 import { DefaultPagination } from '@/components/default-pagination';
 import { Skeleton } from '@/components/primitives/skeleton';
 import {
@@ -11,9 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/primitives/table';
-import { WorkflowRow } from '@/components/workflow-row';
 import { WorkflowListEmpty } from '@/components/workflow-list-empty';
+import { WorkflowRow } from '@/components/workflow-row';
 import { useFetchWorkflows } from '@/hooks/use-fetch-workflows';
+import { RiMore2Fill } from 'react-icons/ri';
+import { createSearchParams, useLocation, useSearchParams } from 'react-router-dom';
 
 export function WorkflowList() {
   const [searchParams] = useSearchParams();

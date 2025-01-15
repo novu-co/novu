@@ -13,18 +13,12 @@ import { UserSession, SubscribersService } from '@novu/testing';
 
 const axiosInstance = axios.create();
 
-const promiseTimeout = (ms: number): Promise<void> =>
-  new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-
-describe('Trigger event - Scheduled Digest Mode - /v1/events/trigger (POST)', function () {
+describe('Trigger event - Scheduled Digest Mode - /v1/events/trigger (POST) #novu-v2', function () {
   let session: UserSession;
   let template: NotificationTemplateEntity;
   let subscriber: SubscriberEntity;
   let subscriberService: SubscribersService;
   const jobRepository = new JobRepository();
-  const messageRepository = new MessageRepository();
 
   const triggerEvent = async (payload, transactionId?: string): Promise<void> => {
     await axiosInstance.post(

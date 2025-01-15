@@ -1,18 +1,19 @@
-import { Handle, Node as FlowNode, NodeProps, Position } from '@xyflow/react';
+import { createStep } from '@/components/workflow-editor/step-utils';
+import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
+import { STEP_TYPE_TO_COLOR } from '@/utils/color';
+import { TEMPLATE_CONFIGURABLE_STEP_TYPES } from '@/utils/constants';
+import { StepTypeEnum } from '@/utils/enums';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { getWorkflowIdFromSlug, STEP_DIVIDER } from '@/utils/step';
+import { cn } from '@/utils/ui';
+import { WorkflowOriginEnum } from '@novu/shared';
+import { Node as FlowNode, Handle, NodeProps, Position } from '@xyflow/react';
+import { ComponentProps } from 'react';
 import { RiPlayCircleLine } from 'react-icons/ri';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { AddStepMenu } from './add-step-menu';
 import { Node, NodeBody, NodeError, NodeHeader, NodeIcon, NodeName } from './base-node';
-import { StepTypeEnum } from '@/utils/enums';
-import { buildRoute, ROUTES } from '@/utils/routes';
-import { ComponentProps } from 'react';
-import { cn } from '@/utils/ui';
-import { STEP_TYPE_TO_COLOR } from '@/utils/color';
-import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { WorkflowOriginEnum } from '@novu/shared';
-import { createStep } from '@/components/workflow-editor/step-utils';
-import { getWorkflowIdFromSlug, STEP_DIVIDER } from '@/utils/step';
 
 export type NodeData = {
   addStepIndex?: number;
@@ -77,7 +78,7 @@ export const EmailNode = ({ data }: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Email Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>Sends Email to your subscribers</NodeBody>
+        <NodeBody>{data.content}</NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -99,7 +100,7 @@ export const SmsNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'SMS Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>Sends SMS notification to your subscribers</NodeBody>
+        <NodeBody>{data.content}</NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -121,7 +122,7 @@ export const InAppNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'In-App Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>Sends In-App notification to your subscribers</NodeBody>
+        <NodeBody>{data.content}</NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -143,7 +144,7 @@ export const PushNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Push Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>Sends push notification to your subscribers</NodeBody>
+        <NodeBody>{data.content}</NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -165,7 +166,7 @@ export const ChatNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Chat Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>Sends chat notification to your subscribers</NodeBody>
+        <NodeBody>{data.content}</NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -187,7 +188,7 @@ export const DelayNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Delay Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>{data.content || 'You have been invited to the Novu party on "commentSnippet"'}</NodeBody>
+        <NodeBody>{data.content}</NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -209,9 +210,7 @@ export const DigestNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Digest Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>
-          {data.content || 'Batches events into one coherent message before delivery to the subscriber.'}
-        </NodeBody>
+        <NodeBody>{data.content}</NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -233,7 +232,7 @@ export const CustomNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Custom Step'}</NodeName>
         </NodeHeader>
-        <NodeBody>Executes the business logic in your bridge application</NodeBody>
+        <NodeBody>{data.content}</NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
@@ -244,6 +243,7 @@ export const CustomNode = (props: NodeProps<NodeType>) => {
 
 export const AddNode = (_props: NodeProps<NodeType>) => {
   const { workflow, update } = useWorkflow();
+  const navigate = useNavigate();
   if (!workflow) {
     return null;
   }
@@ -259,7 +259,24 @@ export const AddNode = (_props: NodeProps<NodeType>) => {
       <AddStepMenu
         visible
         onMenuItemClick={(stepType) => {
-          update({ ...workflow, steps: [...workflow.steps, createStep(stepType)] });
+          update(
+            {
+              ...workflow,
+              steps: [...workflow.steps, createStep(stepType)],
+            },
+            {
+              onSuccess: (data) => {
+                if (TEMPLATE_CONFIGURABLE_STEP_TYPES.includes(stepType)) {
+                  navigate(
+                    buildRoute(ROUTES.EDIT_STEP_TEMPLATE, {
+                      workflowSlug: workflow.slug,
+                      stepSlug: data.steps[data.steps.length - 1].slug,
+                    })
+                  );
+                }
+              },
+            }
+          );
         }}
       />
     </div>

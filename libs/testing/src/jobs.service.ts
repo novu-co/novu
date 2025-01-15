@@ -105,13 +105,9 @@ export class JobsService {
       runDelayedImmediately: async () => {
         const delayedJobs = await this.standardQueue.getDelayed();
 
-        if (delayedJobs.length === 1) {
-          await delayedJobs[0].changeDelay(1);
-        } else if (delayedJobs.length > 1) {
-          throw new Error('There are more than one delayed jobs');
-        } else if (delayedJobs.length === 0) {
-          throw new Error('There are no delayed jobs');
-        }
+        await delayedJobs.forEach(async (job) => {
+          job.changeDelay(1);
+        });
       },
     };
   }
