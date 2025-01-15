@@ -12,8 +12,9 @@ import {
 } from '@nestjs/common';
 import { ApiExcludeController, ApiExcludeEndpoint, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Roles, RolesGuard } from '@novu/application-generic';
-import { ApiAuthSchemeEnum, MemberRoleEnum, UserSessionData } from '@novu/shared';
+import { ApiAuthSchemeEnum, MemberRoleEnum, ProductFeatureKeyEnum, UserSessionData } from '@novu/shared';
 import { ExternalApiAccessible } from '../auth/framework/external-api.decorator';
+import { ProductFeature } from '../shared/decorators/product-feature.decorator';
 import { ApiKey } from '../shared/dtos/api-key';
 import { ApiCommonResponses, ApiResponse } from '../shared/framework/response.decorator';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
@@ -77,6 +78,7 @@ export class EnvironmentsControllerV1 {
   })
   @ApiExcludeEndpoint()
   @ApiResponse(EnvironmentResponseDto, 201)
+  @ProductFeature(ProductFeatureKeyEnum.MANAGE_ENVIRONMENTS)
   async createEnvironment(
     @UserSession() user: UserSessionData,
     @Body() body: CreateEnvironmentRequestDto
@@ -114,6 +116,7 @@ export class EnvironmentsControllerV1 {
   })
   @ApiExcludeEndpoint()
   @ApiResponse(EnvironmentResponseDto)
+  @ProductFeature(ProductFeatureKeyEnum.MANAGE_ENVIRONMENTS)
   async updateMyEnvironment(
     @UserSession() user: UserSessionData,
     @Param('environmentId') environmentId: string,
@@ -170,6 +173,7 @@ export class EnvironmentsControllerV1 {
     summary: 'Delete environment',
   })
   @ApiParam({ name: 'environmentId', type: String, required: true })
+  @ProductFeature(ProductFeatureKeyEnum.MANAGE_ENVIRONMENTS)
   async deleteEnvironment(@UserSession() user: UserSessionData, @Param('environmentId') environmentId: string) {
     return await this.deleteEnvironmentUsecase.execute(
       DeleteEnvironmentCommand.create({

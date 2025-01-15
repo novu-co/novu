@@ -17,18 +17,21 @@ import {
   SheetHeader,
   SheetMain,
   SheetTitle,
-  SheetTrigger,
 } from '@/components/primitives/sheet';
 import { ExternalLink } from '@/components/shared/external-link';
 import { useCreateEnvironment, useEnvironments } from '@/hooks/use-environments';
+import { useFetchSubscription } from '@/hooks/use-fetch-subscription';
+import { ROUTES } from '@/utils/routes';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { IEnvironment } from '@novu/shared';
+import { ApiServiceLevelEnum, IEnvironment } from '@novu/shared';
 import { ComponentProps, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiAddLine, RiArrowRightSLine } from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { ColorPicker } from './primitives/color-picker';
 import { showErrorToast, showSuccessToast } from './primitives/sonner-helpers';
+import { Tooltip, TooltipContent, TooltipTrigger } from './primitives/tooltip';
 
 const ENVIRONMENT_COLORS = [
   '#FF6B6B', // Vibrant Coral
@@ -66,6 +69,12 @@ export const CreateEnvironmentButton = (props: CreateEnvironmentButtonProps) => 
   const { data: environments = [] } = useEnvironments();
   const [isOpen, setIsOpen] = useState(false);
   const { mutateAsync, isPending } = useCreateEnvironment();
+  const { subscription } = useFetchSubscription();
+  const navigate = useNavigate();
+
+  const isBusinessTier = subscription?.apiServiceLevel === ApiServiceLevelEnum.BUSINESS;
+  const isTrialActive = subscription?.trial?.isActive;
+  const canCreateEnvironment = isBusinessTier && !isTrialActive;
 
   const form = useForm<CreateEnvironmentFormData>({
     resolver: zodResolver(createEnvironmentSchema),
@@ -95,82 +104,110 @@ export const CreateEnvironmentButton = (props: CreateEnvironmentButtonProps) => 
     }
   };
 
+  const handleClick = () => {
+    if (!canCreateEnvironment) {
+      navigate(ROUTES.MANAGE_ACCOUNT_BILLING);
+      return;
+    }
+    setIsOpen(true);
+  };
+
+  const getTooltipContent = () => {
+    if (!canCreateEnvironment) {
+      return 'Upgrade to Business plan to create custom environments';
+    }
+
+    return '';
+  };
+
+  const button = (
+    <Button mode="gradient" variant="primary" size="xs" leadingIcon={RiAddLine} onClick={handleClick} {...props}>
+      Create environment
+    </Button>
+  );
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>
-        <Button mode="gradient" variant="primary" size="xs" leadingIcon={RiAddLine} {...props}>
-          Create environment
-        </Button>
-      </SheetTrigger>
-      <SheetContent onOpenAutoFocus={(e) => e.preventDefault()}>
-        <SheetHeader>
-          <SheetTitle>Create environment</SheetTitle>
-          <div>
-            <SheetDescription>
-              Create a new environment to manage your notifications.{' '}
-              <ExternalLink href="https://docs.novu.co/concepts/environments">Learn more</ExternalLink>
-            </SheetDescription>
-          </div>
-        </SheetHeader>
-        <Separator />
-        <SheetMain>
-          <Form {...form}>
-            <form
-              id="create-environment"
-              autoComplete="off"
-              noValidate
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="flex flex-col gap-4"
+      {canCreateEnvironment ? (
+        button
+      ) : (
+        <Tooltip>
+          <TooltipTrigger>{button}</TooltipTrigger>
+          <TooltipContent>{getTooltipContent()}</TooltipContent>
+        </Tooltip>
+      )}
+
+      {canCreateEnvironment && (
+        <SheetContent onOpenAutoFocus={(e) => e.preventDefault()}>
+          <SheetHeader>
+            <SheetTitle>Create environment</SheetTitle>
+            <div>
+              <SheetDescription>
+                Create a new environment to manage your notifications.{' '}
+                <ExternalLink href="https://docs.novu.co/concepts/environments">Learn more</ExternalLink>
+              </SheetDescription>
+            </div>
+          </SheetHeader>
+          <Separator />
+          <SheetMain>
+            <Form {...form}>
+              <form
+                id="create-environment"
+                autoComplete="off"
+                noValidate
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="flex flex-col gap-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel required>Name</FormLabel>
+                      <FormControl>
+                        <FormInput
+                          {...field}
+                          autoFocus
+                          onChange={(e) => {
+                            field.onChange(e);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="color"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel required>Color</FormLabel>
+                      <FormControl>
+                        <ColorPicker pureInput={false} value={field.value} onChange={field.onChange} />
+                      </FormControl>
+                      <FormMessage>Will be used to identify the environment in the UI.</FormMessage>
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          </SheetMain>
+          <Separator />
+          <SheetFooter>
+            <Button
+              isLoading={isPending}
+              trailingIcon={RiArrowRightSLine}
+              variant="secondary"
+              mode="gradient"
+              type="submit"
+              form="create-environment"
             >
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel required>Name</FormLabel>
-                    <FormControl>
-                      <FormInput
-                        {...field}
-                        autoFocus
-                        onChange={(e) => {
-                          field.onChange(e);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="color"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel required>Color</FormLabel>
-                    <FormControl>
-                      <ColorPicker pureInput={false} value={field.value} onChange={field.onChange} />
-                    </FormControl>
-                    <FormMessage>Will be used to identify the environment in the UI.</FormMessage>
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
-        </SheetMain>
-        <Separator />
-        <SheetFooter>
-          <Button
-            isLoading={isPending}
-            trailingIcon={RiArrowRightSLine}
-            variant="secondary"
-            mode="gradient"
-            type="submit"
-            form="create-environment"
-          >
-            Create environment
-          </Button>
-        </SheetFooter>
-      </SheetContent>
+              Create environment
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      )}
     </Sheet>
   );
 };
