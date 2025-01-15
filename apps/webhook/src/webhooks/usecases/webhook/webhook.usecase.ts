@@ -116,7 +116,7 @@ export class Webhook {
     });
 
     if (!message) {
-      Logger.error(`Message with ${messageIdentifier} as identifier was not found`);
+      Logger.log(`Message with ${messageIdentifier} as identifier was not found`);
 
       return;
     }

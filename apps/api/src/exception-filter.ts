@@ -1,6 +1,6 @@
-import { ArgumentsHost, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
+import { ArgumentsHost, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { Response } from 'express';
-import { CommandValidationException, PinoLogger } from '@novu/application-generic';
+import { CommandValidationException } from '@novu/application-generic';
 import { randomUUID } from 'node:crypto';
 import { captureException } from '@sentry/node';
 import { ZodError } from 'zod';
@@ -9,7 +9,7 @@ import { ErrorDto, ValidationErrorDto } from './error-dto';
 
 const ERROR_MSG_500 = `Internal server error, contact support and provide them with the errorId`;
 export class AllExceptionsFilter implements ExceptionFilter {
-  constructor(private readonly logger: PinoLogger) {}
+  constructor(private readonly logger: Logger) {}
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();

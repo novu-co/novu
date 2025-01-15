@@ -314,7 +314,7 @@ export class UpsertWorkflowUseCase {
 
     const sanitizedControlValues =
       controlValueLocal && workflowOrigin === WorkflowOriginEnum.NOVU_CLOUD
-        ? dashboardSanitizeControlValues(this.logger, controlValueLocal, step.type) || {}
+        ? dashboardSanitizeControlValues(controlValueLocal, step.type) || {}
         : frameworkSanitizeEmptyStringsToNull(controlValueLocal) || {};
 
     const controlIssues = processControlValuesBySchema(controlSchemas?.schema, sanitizedControlValues || {});

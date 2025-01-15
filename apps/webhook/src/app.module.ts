@@ -1,11 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import {
-  createNestLoggingModuleOptions,
-  LoggerModule,
-  ProfilingModule,
-  TracingModule,
-} from '@novu/application-generic';
+import { buildLoggerModuleOptions, LoggerModule, TracingModule } from '@novu/application-generic';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -19,11 +14,10 @@ const modules = [
   HealthModule,
   WebhooksModule,
   TracingModule.register(packageJson.name, packageJson.version),
-  ProfilingModule.register(packageJson.name),
   LoggerModule.forRoot(
-    createNestLoggingModuleOptions({
+    buildLoggerModuleOptions({
       serviceName: packageJson.name,
-      version: packageJson.version,
+      serviceVersion: packageJson.version,
     })
   ),
 ];

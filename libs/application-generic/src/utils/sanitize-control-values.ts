@@ -1,5 +1,5 @@
-import { StepTypeEnum, TimeUnitEnum } from '@novu/shared';
-import { isEmpty } from 'lodash';
+import { StepTypeEnum } from '@novu/shared';
+import isEmpty from 'lodash/isEmpty';
 import {
   InAppActionType,
   InAppControlType,
@@ -16,7 +16,6 @@ import {
   DelayControlType,
   ChatControlType,
 } from '../schemas/control';
-import { PinoLogger } from '../logging';
 
 // Cast input T_Type to trigger Ajv validation errors - possible undefined
 function sanitizeEmptyInput<T_Type>(
@@ -242,50 +241,43 @@ function filterNullishValues<T extends Record<string, unknown>>(obj: T): T {
  *
  */
 export function dashboardSanitizeControlValues(
-  logger: PinoLogger,
   controlValues: Record<string, unknown>,
   stepType: StepTypeEnum | unknown,
 ): (Record<string, unknown> & { skip?: Record<string, unknown> }) | null {
-  try {
-    if (!controlValues) {
-      return null;
-    }
-
-    let normalizedValues: Record<string, unknown>;
-    switch (stepType) {
-      case StepTypeEnum.IN_APP:
-        normalizedValues = sanitizeInApp(controlValues as InAppControlType);
-        break;
-      case StepTypeEnum.EMAIL:
-        normalizedValues = sanitizeEmail(controlValues as EmailControlType);
-        break;
-      case StepTypeEnum.SMS:
-        normalizedValues = sanitizeSms(controlValues as SmsControlType);
-        break;
-      case StepTypeEnum.PUSH:
-        normalizedValues = sanitizePush(controlValues as PushControlType);
-        break;
-      case StepTypeEnum.CHAT:
-        normalizedValues = sanitizeChat(controlValues as ChatControlType);
-        break;
-      case StepTypeEnum.DIGEST:
-        normalizedValues = sanitizeDigest(
-          controlValues as DigestControlSchemaType,
-        );
-        break;
-      case StepTypeEnum.DELAY:
-        normalizedValues = sanitizeDelay(controlValues as DelayControlType);
-        break;
-      default:
-        normalizedValues = filterNullishValues(controlValues);
-    }
-
-    return normalizedValues;
-  } catch (error) {
-    logger.error('Error sanitizing control values', error);
-
-    return controlValues;
+  if (!controlValues) {
+    return null;
   }
+
+  let normalizedValues: Record<string, unknown>;
+  switch (stepType) {
+    case StepTypeEnum.IN_APP:
+      normalizedValues = sanitizeInApp(controlValues as InAppControlType);
+      break;
+    case StepTypeEnum.EMAIL:
+      normalizedValues = sanitizeEmail(controlValues as EmailControlType);
+      break;
+    case StepTypeEnum.SMS:
+      normalizedValues = sanitizeSms(controlValues as SmsControlType);
+      break;
+    case StepTypeEnum.PUSH:
+      normalizedValues = sanitizePush(controlValues as PushControlType);
+      break;
+    case StepTypeEnum.CHAT:
+      normalizedValues = sanitizeChat(controlValues as ChatControlType);
+      break;
+    case StepTypeEnum.DIGEST:
+      normalizedValues = sanitizeDigest(
+        controlValues as DigestControlSchemaType,
+      );
+      break;
+    case StepTypeEnum.DELAY:
+      normalizedValues = sanitizeDelay(controlValues as DelayControlType);
+      break;
+    default:
+      normalizedValues = filterNullishValues(controlValues);
+  }
+
+  return normalizedValues;
 }
 
 function isNumber(value: unknown): value is number {

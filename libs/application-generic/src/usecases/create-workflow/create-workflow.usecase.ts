@@ -26,7 +26,6 @@ import {
   DEFAULT_WORKFLOW_PREFERENCES,
 } from '@novu/shared';
 
-import { PinoLogger } from 'nestjs-pino';
 import {
   CreateWorkflowCommand,
   NotificationStep,
@@ -72,7 +71,7 @@ export class CreateWorkflow {
     private createChange: CreateChange,
     @Inject(forwardRef(() => AnalyticsService))
     private analyticsService: AnalyticsService,
-    private logger: PinoLogger,
+    private logger: Logger,
     @Inject(forwardRef(() => InvalidateCacheService))
     private invalidateCache: InvalidateCacheService,
     protected moduleRef: ModuleRef,
@@ -327,8 +326,6 @@ export class CreateWorkflow {
     trigger: INotificationTrigger,
     triggerIdentifier: string,
   ): Promise<WorkflowInternalResponseDto> {
-    this.logger.info(`Creating workflow ${JSON.stringify(command)}`);
-
     const savedWorkflow = await this.notificationTemplateRepository.create({
       _organizationId: command.organizationId,
       _creatorId: command.userId,

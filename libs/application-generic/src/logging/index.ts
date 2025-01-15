@@ -8,79 +8,76 @@ import {
   PinoLogger,
 } from 'nestjs-pino';
 import { storage, Store } from 'nestjs-pino/storage';
-import { sensitiveFields } from './masking';
 
+const cardFields = ['credit', 'debit', 'creditCard', 'debitCard'];
+
+const emailFields = ['primaryEmail', 'secondaryEmail', 'email'];
+
+const passwordFields = [
+  'password',
+  'token',
+  'apiKey',
+  'apiKeys',
+  'secretKey',
+  'firstName',
+  'lastName',
+  'organizationName',
+  'senderName',
+  'username',
+];
+
+const phoneFields = ['homePhone', 'workPhone', 'phone'];
+
+const addressFields = [
+  'addressLine1',
+  'addressLine2',
+  'address',
+  'cardAddress',
+];
+
+const httpFields = ['webhookUrl', 'avatar', 'avatar_url'];
+
+const uuidFields = [];
+
+export const sensitiveFields = cardFields.concat(
+  emailFields,
+  passwordFields,
+  phoneFields,
+  addressFields,
+  uuidFields,
+  httpFields,
+);
 export * from './LogDecorator';
 
 export function getErrorInterceptor(): NestInterceptor {
   return new LoggerErrorInterceptor();
 }
+
 export { Logger, LoggerModule, PinoLogger, storage, Store, getLoggerToken };
 
-const loggingLevelArr = ['error', 'warn', 'info', 'verbose', 'debug'];
+const AVAILABLE_LOG_LEVELS = Object.freeze([
+  'error',
+  'warn',
+  'info',
+  'verbose',
+  'debug',
+]);
 
-const loggingLevelSet = {
-  error: 50,
-  warn: 40,
-  info: 30,
-  verbose: 20,
-  debug: 10,
-};
-
-interface ILoggingVariables {
-  env: string;
-  level: string;
-
-  hostingPlatform: string;
-  tenant: string;
-}
-
-export function getLogLevel() {
-  let logLevel = process.env.LOGGING_LEVEL ?? 'info';
-
-  if (loggingLevelArr.indexOf(logLevel) === -1) {
-    // eslint-disable-next-line no-console
-    console.log(
-      `${logLevel}is not a valid log level of ${loggingLevelArr}. Reverting to info.`,
-    );
-
-    logLevel = 'info';
-  }
-  // eslint-disable-next-line no-console
-  console.log(`Log Level Chosen: ${logLevel}`);
-
-  return logLevel;
-}
-
-// TODO: should be moved into a config framework
-function getLoggingVariables(): ILoggingVariables {
+export function buildLoggerModuleOptions({
+  serviceName,
+  serviceVersion,
+}: {
+  serviceName: string;
+  serviceVersion: string;
+}): Params {
   const env = process.env.NODE_ENV ?? 'local';
-
-  // eslint-disable-next-line no-console
-  console.log(`Environment: ${env}`);
-
-  const hostingPlatform = process.env.HOSTING_PLATFORM ?? 'Docker';
-
-  // eslint-disable-next-line no-console
-  console.log(`Platform: ${hostingPlatform}`);
-
+  const platform = process.env.HOSTING_PLATFORM ?? 'Docker';
   const tenant = process.env.TENANT ?? 'OS';
 
-  // eslint-disable-next-line no-console
-  console.log(`Tenant: ${tenant}`);
-
-  return {
-    env,
-    level: getLogLevel(),
-    hostingPlatform,
-    tenant,
-  };
-}
-
-export function createNestLoggingModuleOptions(
-  settings: ILoggerSettings,
-): Params {
-  const values: ILoggingVariables = getLoggingVariables();
+  let level = process.env.LOGGING_LEVEL ?? 'info';
+  if (!AVAILABLE_LOG_LEVELS.includes(level)) {
+    level = 'info';
+  }
 
   let redactFields: string[] = sensitiveFields.map((val) => val);
 
@@ -102,33 +99,23 @@ export function createNestLoggingModuleOptions(
     ? { target: 'pino-pretty' }
     : undefined;
 
-  // eslint-disable-next-line no-console
-  console.log(loggingLevelSet);
-
-  // eslint-disable-next-line no-console
-  console.log(
-    `Selected Log Transport ${!transport ? 'None' : 'pino-pretty'}`,
-    loggingLevelSet,
-  );
-
   return {
     exclude: [{ path: '*/health-check', method: RequestMethod.GET }],
     pinoHttp: {
-      customLevels: loggingLevelSet,
-      level: values.level,
+      level,
       redact: {
         paths: redactFields,
-        censor: customRedaction,
       },
       base: {
+        env,
         pid: process.pid,
-        serviceName: settings.serviceName,
-        serviceVersion: settings.version,
-        platform: values.hostingPlatform,
-        tenant: values.tenant,
+        serviceName,
+        serviceVersion,
+        platform,
+        tenant,
       },
       transport,
-      autoLogging: !['test', 'local'].includes(process.env.NODE_ENV),
+      autoLogging: !['test', 'local'].includes(env),
       /**
        * These custom props are only added to 'request completed' and 'request errored' logs.
        * Logs generated during request processing won't have these props by default.
@@ -146,20 +133,4 @@ export function createNestLoggingModuleOptions(
       }),
     },
   };
-}
-
-const customRedaction = (value: any, path: string[]) => {
-  /*
-   * Logger.
-   * if (obj.email && typeof obj.email === 'string') {
-   *   obj.email = '[REDACTED]';
-   * }
-   *
-   * return JSON.parse(JSON.stringify(obj));
-   */
-};
-
-interface ILoggerSettings {
-  serviceName: string;
-  version: string;
 }

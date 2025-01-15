@@ -5,7 +5,7 @@ import {
   cacheService,
   ComputeJobWaitDurationService,
   CreateExecutionDetails,
-  createNestLoggingModuleOptions,
+  buildLoggerModuleOptions,
   CreateNotificationJobs,
   CreateSubscriber,
   CreateTenant,
@@ -123,9 +123,9 @@ const PROVIDERS = [
         : undefined
     ),
     LoggerModule.forRoot(
-      createNestLoggingModuleOptions({
+      buildLoggerModuleOptions({
         serviceName: packageJson.name,
-        version: packageJson.version,
+        serviceVersion: packageJson.version,
       })
     ),
   ],

@@ -82,7 +82,7 @@ export class GeneratePreviewUsecase {
       };
 
       for (const [controlKey, controlValue] of Object.entries(sanitizedValidatedControls || {})) {
-        const variables = buildVariables(variableSchema, controlValue, this.logger);
+        const variables = buildVariables(variableSchema, controlValue);
         const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalidVariables);
 
         const validVariableNames = variables.validVariables.map((variable) => variable.name);
@@ -139,7 +139,7 @@ export class GeneratePreviewUsecase {
   }
 
   private sanitizeControlsForPreview(initialControlValues: Record<string, unknown>, stepData: StepResponseDto) {
-    const sanitizedValues = dashboardSanitizeControlValues(this.logger, initialControlValues, stepData.type);
+    const sanitizedValues = dashboardSanitizeControlValues(initialControlValues, stepData.type);
 
     return sanitizeControlValuesByOutputSchema(sanitizedValues || {}, stepData.type);
   }

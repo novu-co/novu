@@ -1,31 +1,17 @@
 import _ from 'lodash';
 
-import { PinoLogger } from '@novu/application-generic';
-
 import { Variable, extractLiquidTemplateVariables, TemplateVariables } from './template-parser/liquid-parser';
 import { transformMailyContentToLiquid } from '../usecases/generate-preview/transform-maily-content-to-liquid';
 import { isStringTipTapNode } from './tip-tap.util';
 
 export function buildVariables(
   variableSchema: Record<string, unknown> | undefined,
-  controlValue: unknown | Record<string, unknown>,
-  logger?: PinoLogger
+  controlValue: unknown | Record<string, unknown>
 ): TemplateVariables {
   let variableControlValue = controlValue;
 
   if (isStringTipTapNode(variableControlValue)) {
-    try {
-      variableControlValue = transformMailyContentToLiquid(JSON.parse(variableControlValue));
-    } catch (error) {
-      logger?.error(
-        {
-          err: error as Error,
-          controlKey: 'unknown',
-          message: 'Failed to transform maily content to liquid syntax',
-        },
-        'BuildVariables'
-      );
-    }
+    variableControlValue = transformMailyContentToLiquid(JSON.parse(variableControlValue));
   }
 
   const { validVariables, invalidVariables } = extractLiquidTemplateVariables(JSON.stringify(variableControlValue));

@@ -1,6 +1,5 @@
 import { DynamicModule, ForwardReference, Logger, Module, Provider, Type } from '@nestjs/common';
 
-import { ProfilingModule } from '@novu/application-generic';
 import { APP_FILTER } from '@nestjs/core';
 import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import { SharedModule } from './app/shared/shared.module';
@@ -14,7 +13,6 @@ const modules: Array<Type | DynamicModule | Promise<DynamicModule> | ForwardRefe
   HealthModule,
   WorkflowModule,
   TelemetryModule,
-  ProfilingModule.register(packageJson.name),
 ];
 
 const providers: Provider[] = [];

@@ -14,7 +14,6 @@ import {
   TriggerRecipientSubscriber,
 } from '@novu/shared';
 
-import { PinoLogger } from '../../logging';
 import { InstrumentUsecase } from '../../instrumentation';
 import { ApiException } from '../../utils/exceptions';
 import { SubscriberProcessQueueService } from '../../services/queues/subscriber-process-queue.service';

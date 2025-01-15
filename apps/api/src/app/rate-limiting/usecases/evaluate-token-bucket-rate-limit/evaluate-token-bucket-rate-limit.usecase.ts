@@ -20,9 +20,7 @@ export class EvaluateTokenBucketRateLimit {
   @InstrumentUsecase()
   async execute(command: EvaluateTokenBucketRateLimitCommand): Promise<EvaluateTokenBucketRateLimitResponseDto> {
     if (!this.cacheService.cacheEnabled()) {
-      const message = 'Rate limiting cache service is not available';
-      Logger.error(message, LOG_CONTEXT);
-      throw new ServiceUnavailableException(message);
+      throw new ServiceUnavailableException('Rate limiting cache service is not available');
     }
 
     const cacheClient = EvaluateTokenBucketRateLimit.getCacheClient(this.cacheService);

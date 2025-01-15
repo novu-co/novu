@@ -3,6 +3,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { PinoLogger } from '../../logging';
 import { AuthGuard, IAuthModuleOptions } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 import {
@@ -12,7 +13,6 @@ import {
   HandledUser,
   NONE_AUTH_SCHEME,
 } from '@novu/shared';
-import { PinoLogger } from '../../logging';
 
 @Injectable()
 export class CommunityUserAuthGuard extends AuthGuard([
@@ -33,7 +33,10 @@ export class CommunityUserAuthGuard extends AuthGuard([
     const authScheme = authorizationHeader?.split(' ')[0] || NONE_AUTH_SCHEME;
     request.authScheme = authScheme;
 
-    this.logger.assign({ authScheme });
+    // Assign is only available in NestJS PinoLogger, not in the default Nest.js Logger used for local development
+    if (this.logger instanceof PinoLogger) {
+      this.logger.assign({ authScheme });
+    }
 
     switch (authScheme) {
       case ApiAuthSchemeEnum.BEARER:
@@ -85,7 +88,10 @@ export class CommunityUserAuthGuard extends AuthGuard([
       handledUser = user;
     }
 
-    this.logger.assign({ user: handledUser });
+    // Assign is only available in NestJS PinoLogger, not in the default Nest.js Logger used for local development
+    if (this.logger instanceof PinoLogger) {
+      this.logger.assign({ user: handledUser });
+    }
 
     return super.handleRequest(err, handledUser, info, context, status);
   }

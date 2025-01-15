@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { addBreadcrumb } from '@sentry/node';
 
 import {
@@ -26,7 +26,6 @@ import {
   ProcessSubscriber,
   ProcessSubscriberCommand,
 } from '../process-subscriber';
-import { PinoLogger } from '../../logging';
 import { Instrument, InstrumentUsecase } from '../../instrumentation';
 import {
   buildNotificationTemplateIdentifierKey,
@@ -40,6 +39,7 @@ import {
   TriggerMulticast,
   TriggerMulticastCommand,
 } from '../trigger-multicast';
+import { PinoLogger } from '../../logging';
 
 const LOG_CONTEXT = 'TriggerEventUseCase';
 
@@ -66,8 +66,6 @@ export class TriggerEvent {
         actor: this.mapActor(command.actor),
       };
 
-      Logger.debug(mappedCommand.actor);
-
       const { environmentId, identifier, organizationId, userId } =
         mappedCommand;
 
@@ -83,11 +81,14 @@ export class TriggerEvent {
         },
       });
 
-      this.logger.assign({
-        transactionId: mappedCommand.transactionId,
-        environmentId: mappedCommand.environmentId,
-        organizationId: mappedCommand.organizationId,
-      });
+      // Assign is only available in NestJS PinoLogger, not in the default Nest.js Logger used for local development
+      if (this.logger instanceof PinoLogger) {
+        this.logger.assign({
+          transactionId: mappedCommand.transactionId,
+          environmentId: mappedCommand.environmentId,
+          organizationId: mappedCommand.organizationId,
+        });
+      }
 
       let storedWorkflow: NotificationTemplateEntity | null = null;
       if (!command.bridgeWorkflow) {
@@ -112,7 +113,7 @@ export class TriggerEvent {
         );
 
         if (!tenantProcessed) {
-          Logger.warn(
+          this.logger.warn(
             `Tenant with identifier ${JSON.stringify(
               mappedCommand.tenant.identifier,
             )} of organization ${mappedCommand.organizationId} in transaction ${
@@ -187,7 +188,7 @@ export class TriggerEvent {
         }
       }
     } catch (e) {
-      Logger.error(
+      this.logger.error(
         {
           transactionId: command.transactionId,
           organization: command.organizationId,

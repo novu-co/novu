@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import {
@@ -10,13 +11,13 @@ import {
   MemberRepository,
   OrganizationRepository,
 } from '@novu/dal';
-import { PinoLogger } from '../logging';
 import {
   AnalyticsService,
   CommunityAuthService,
   CommunityUserAuthGuard,
 } from '../services';
 import { CreateUser, SwitchOrganization } from '../usecases';
+import { PinoLogger } from '../logging';
 
 /**
  * Injects community auth providers, or providers handling user management (services, repositories, guards ...) into the application.

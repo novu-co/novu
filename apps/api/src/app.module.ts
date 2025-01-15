@@ -1,7 +1,7 @@
 /* eslint-disable global-require */
 import { DynamicModule, Logger, Module, Provider } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { ProfilingModule, TracingModule } from '@novu/application-generic';
+import { TracingModule } from '@novu/application-generic';
 import { Client, NovuModule } from '@novu/framework/nest';
 
 import { Type } from '@nestjs/common/interfaces/type.interface';
@@ -108,7 +108,6 @@ const baseModules: Array<Type | DynamicModule | Promise<DynamicModule> | Forward
   WorkflowOverridesModule,
   RateLimitingModule,
   WidgetsModule,
-  ProfilingModule.register(packageJson.name),
   TracingModule.register(packageJson.name, packageJson.version),
   BridgeModule,
   PreferencesModule,

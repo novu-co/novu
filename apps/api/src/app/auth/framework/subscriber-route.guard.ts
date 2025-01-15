@@ -1,8 +1,8 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ISubscriberJwt } from '@novu/shared';
-import jwt from 'jsonwebtoken';
 import { PinoLogger } from '@novu/application-generic';
+import jwt from 'jsonwebtoken';
 
 @Injectable()
 export class SubscriberRouteGuard implements CanActivate {
@@ -28,7 +28,9 @@ export class SubscriberRouteGuard implements CanActivate {
     if (tokenContent.aud !== 'widget_user') return false;
     if (!tokenContent.environmentId) return false;
 
-    this.logger.assign({ user: tokenContent });
+    if (this.logger instanceof PinoLogger) {
+      this.logger.assign({ user: tokenContent });
+    }
 
     return true;
   }

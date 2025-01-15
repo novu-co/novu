@@ -31,7 +31,7 @@ import {
   CacheServiceHealthIndicator,
   ComputeJobWaitDurationService,
   CreateExecutionDetails,
-  createNestLoggingModuleOptions,
+  buildLoggerModuleOptions,
   DalServiceHealthIndicator,
   distributedLockService,
   ExecuteBridgeRequest,
@@ -122,9 +122,9 @@ const IMPORTS = [
     JobTopicNameEnum.INBOUND_PARSE_MAIL,
   ]),
   LoggerModule.forRoot(
-    createNestLoggingModuleOptions({
+    buildLoggerModuleOptions({
       serviceName: packageJson.name,
-      version: packageJson.version,
+      serviceVersion: packageJson.version,
     })
   ),
 ];

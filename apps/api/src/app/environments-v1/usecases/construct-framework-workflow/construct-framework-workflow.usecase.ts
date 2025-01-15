@@ -1,9 +1,9 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { workflow } from '@novu/framework/express';
 import { ActionStep, ChannelStep, JsonSchema, Step, StepOptions, StepOutput, Workflow } from '@novu/framework/internal';
 import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
 import { JSONSchemaDefinition, StepTypeEnum } from '@novu/shared';
-import { Instrument, InstrumentUsecase, PinoLogger } from '@novu/application-generic';
+import { Instrument, InstrumentUsecase } from '@novu/application-generic';
 import { AdditionalOperation, RulesLogic } from 'json-logic-js';
 import _ from 'lodash';
 import { ConstructFrameworkWorkflowCommand } from './construct-framework-workflow.command';
@@ -25,7 +25,6 @@ const LOG_CONTEXT = 'ConstructFrameworkWorkflow';
 @Injectable()
 export class ConstructFrameworkWorkflow {
   constructor(
-    private logger: PinoLogger,
     private workflowsRepository: NotificationTemplateRepository,
     private inAppOutputRendererUseCase: InAppOutputRendererUsecase,
     private emailOutputRendererUseCase: EmailOutputRendererUsecase,
@@ -240,7 +239,7 @@ export class ConstructFrameworkWorkflow {
     const { result, error } = evaluateRules(skipRules, variables);
 
     if (error) {
-      this.logger.error({ err: error }, 'Failed to evaluate skip rule', LOG_CONTEXT);
+      Logger.error({ err: error }, 'Failed to evaluate skip rule', LOG_CONTEXT);
     }
 
     return result;

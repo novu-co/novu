@@ -136,6 +136,7 @@ export class RunJob {
 
   private assignLogger(job) {
     try {
+      // TODO:
       this.logger?.assign({
         transactionId: job.transactionId,
         environmentId: job._environmentId,
