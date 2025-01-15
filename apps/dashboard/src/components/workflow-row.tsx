@@ -5,7 +5,11 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/primitives/dropdown-menu';
 import { TableCell, TableRow } from '@/components/primitives/table';
@@ -14,8 +18,10 @@ import TruncatedText from '@/components/truncated-text';
 import { WorkflowStatus } from '@/components/workflow-status';
 import { WorkflowSteps } from '@/components/workflow-steps';
 import { WorkflowTags } from '@/components/workflow-tags';
+import { LEGACY_DASHBOARD_URL } from '@/config';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
+import { useEnvironments } from '@/hooks/use-environments';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
 import { WorkflowOriginEnum, WorkflowStatusEnum } from '@/utils/enums';
@@ -42,7 +48,6 @@ import { CopyButton } from './primitives/copy-button';
 import { ToastIcon } from './primitives/sonner';
 import { showToast } from './primitives/sonner-helpers';
 import { TimeDisplayHoverCard } from './time-display-hover-card';
-import { LEGACY_DASHBOARD_URL } from '@/config';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -126,13 +131,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
     },
   });
 
-  const onDeleteWorkflow = async () => {
-    await deleteWorkflow({
-      workflowSlug: workflow.slug,
-    });
-  };
-
-  const { patchWorkflow, isPending: isPauseWorkflowPending } = usePatchWorkflow({
+  const { patchWorkflow, isPending: isPatchWorkflowPending } = usePatchWorkflow({
     onSuccess: (data) => {
       showToast({
         children: () => (
@@ -161,6 +160,12 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
       });
     },
   });
+
+  const onDeleteWorkflow = async () => {
+    await deleteWorkflow({
+      workflowSlug: workflow.slug,
+    });
+  };
 
   const onPauseWorkflow = async () => {
     await patchWorkflow({
@@ -240,7 +245,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           title={PAUSE_MODAL_TITLE}
           description={<PauseModalDescription workflowName={workflow.name} />}
           confirmButtonText="Proceed"
-          isLoading={isPauseWorkflowPending}
+          isLoading={isPatchWorkflowPending}
         />
         {/**
          * Needs modal={false} to prevent the click freeze after the modal is closed
@@ -320,30 +325,51 @@ const SyncWorkflowMenuItem = ({
   currentEnvironment: IEnvironment | undefined;
   isSyncable: boolean;
   tooltipContent: string | undefined;
-  onSync: () => void;
+  onSync: (targetEnvironmentId: string) => void;
 }) => {
-  const syncToLabel = `Sync to ${currentEnvironment?.name === 'Production' ? 'Development' : 'Production'}`;
+  const { data: environments = [] } = useEnvironments();
+  const otherEnvironments = environments.filter((env) => env._id !== currentEnvironment?._id);
 
-  if (isSyncable) {
+  if (!isSyncable) {
     return (
-      <DropdownMenuItem onClick={onSync}>
+      <Tooltip>
+        <TooltipTrigger>
+          <DropdownMenuItem disabled>
+            <RiGitPullRequestFill />
+            Sync workflow
+          </DropdownMenuItem>
+        </TooltipTrigger>
+        <TooltipPortal>
+          <TooltipContent>{tooltipContent}</TooltipContent>
+        </TooltipPortal>
+      </Tooltip>
+    );
+  }
+
+  if (otherEnvironments.length === 1) {
+    return (
+      <DropdownMenuItem onClick={() => onSync(otherEnvironments[0]._id)}>
         <RiGitPullRequestFill />
-        {syncToLabel}
+        {`Sync to ${otherEnvironments[0].name}`}
       </DropdownMenuItem>
     );
   }
 
   return (
-    <Tooltip>
-      <TooltipTrigger>
-        <DropdownMenuItem disabled>
-          <RiGitPullRequestFill />
-          {syncToLabel}
-        </DropdownMenuItem>
-      </TooltipTrigger>
-      <TooltipPortal>
-        <TooltipContent>{tooltipContent}</TooltipContent>
-      </TooltipPortal>
-    </Tooltip>
+    <DropdownMenuSub>
+      <DropdownMenuSubTrigger className="gap-2">
+        <RiGitPullRequestFill />
+        Sync workflow
+      </DropdownMenuSubTrigger>
+      <DropdownMenuPortal>
+        <DropdownMenuSubContent>
+          {otherEnvironments.map((env) => (
+            <DropdownMenuItem key={env._id} onClick={() => onSync(env._id)}>
+              {env.name}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuSubContent>
+      </DropdownMenuPortal>
+    </DropdownMenuSub>
   );
 };
