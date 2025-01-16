@@ -10,9 +10,9 @@
   "types": "dist/client/index.d.ts",
   "browser": {
     "./dist/server/server.js": "./dist/client/index.js",
-    "./dist/server/server.mjs": "./dist/client/index.js",
-    "./dist/hooks/index.mjs": "./dist/hooks/index.js",
-    "./dist/themes/index.mjs": "./dist/themes/index.js",
+    "./dist/server/server.mjs": "./dist/client/index.mjs",
+    "./dist/hooks/index.mjs": "./dist/hooks/index.mjs",
+    "./dist/themes/index.mjs": "./dist/themes/index.mjs",
     "./dist/hooks/index.js": "./dist/hooks/index.js",
     "./dist/themes/index.js": "./dist/themes/index.js"
   },
@@ -20,7 +20,7 @@
     ".": {
       "import": {
         "types": "./dist/client/index.d.mts",
-        "default": "./dist/server/server.js"
+        "default": "./dist/server/server.mjs"
       },
       "require": {
         "types": "./dist/server/server.d.ts",
