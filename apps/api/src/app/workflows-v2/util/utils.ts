@@ -256,3 +256,37 @@ export function multiplyArrayItems(obj: Record<string, unknown>, multiplyBy = 3)
 
   return result;
 }
+
+/**
+ * Recursively merges common/overlapping object keys from source into target.
+ *
+ * @example
+ * Target: { subscriber: { phone: '{{subscriber.phone}}', name: '{{subscriber.name}}' } }
+ * Source: { subscriber: { phone: '123' }, payload: { someone: '{{payload.someone}}' }}
+ * Result: { subscriber: { phone: '123', name: '{{subscriber.name}}' } }
+ */
+export function mergeCommonObjectKeys(
+  target: Record<string, unknown>,
+  source: Record<string, unknown>
+): Record<string, unknown> {
+  /* eslint-disable no-param-reassign */
+  return Object.entries(target).reduce(
+    (merged, [key, targetValue]) => {
+      const sourceValue = source[key];
+
+      // If both source and target values are objects, recursively merge them
+      if (isObject(targetValue) && isObject(sourceValue)) {
+        merged[key] = mergeCommonObjectKeys(
+          targetValue as Record<string, unknown>,
+          sourceValue as Record<string, unknown>
+        );
+      } else {
+        // Otherwise, use the target value if it exists, otherwise use the source value
+        merged[key] = targetValue ?? sourceValue;
+      }
+
+      return merged;
+    },
+    {} as Record<string, unknown>
+  );
+}
