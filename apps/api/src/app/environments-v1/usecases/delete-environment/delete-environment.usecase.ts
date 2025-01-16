@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { EnvironmentRepository } from '@novu/dal';
+import { EnvironmentEnum, PROTECTED_ENVIRONMENTS } from '@novu/shared';
 import { DeleteEnvironmentCommand } from './delete-environment.command';
 
 @Injectable()
@@ -16,8 +17,7 @@ export class DeleteEnvironment {
       throw new NotFoundException(`Environment ${command.environmentId} not found`);
     }
 
-    const protectedEnvironments = ['Development', 'Production'];
-    if (protectedEnvironments.includes(environment.name)) {
+    if (PROTECTED_ENVIRONMENTS.includes(environment.name as EnvironmentEnum)) {
       throw new BadRequestException(
         `The ${environment.name} environment is protected and cannot be deleted. Only custom environments can be deleted.`
       );

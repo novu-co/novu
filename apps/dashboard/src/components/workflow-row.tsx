@@ -19,9 +19,9 @@ import { WorkflowStatus } from '@/components/workflow-status';
 import { WorkflowSteps } from '@/components/workflow-steps';
 import { WorkflowTags } from '@/components/workflow-tags';
 import { LEGACY_DASHBOARD_URL } from '@/config';
-import { useEnvironment } from '@/context/environment/hooks';
+import { useAuth } from '@/context/auth/hooks';
+import { useEnvironment, useFetchEnvironments } from '@/context/environment/hooks';
 import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
-import { useEnvironments } from '@/hooks/use-environments';
 import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
 import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
 import { WorkflowOriginEnum, WorkflowStatusEnum } from '@/utils/enums';
@@ -131,7 +131,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
     },
   });
 
-  const { patchWorkflow, isPending: isPatchWorkflowPending } = usePatchWorkflow({
+  const { patchWorkflow, isPending: isPauseWorkflowPending } = usePatchWorkflow({
     onSuccess: (data) => {
       showToast({
         children: () => (
@@ -245,7 +245,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
           title={PAUSE_MODAL_TITLE}
           description={<PauseModalDescription workflowName={workflow.name} />}
           confirmButtonText="Proceed"
-          isLoading={isPatchWorkflowPending}
+          isLoading={isPauseWorkflowPending}
         />
         {/**
          * Needs modal={false} to prevent the click freeze after the modal is closed
@@ -327,8 +327,9 @@ const SyncWorkflowMenuItem = ({
   tooltipContent: string | undefined;
   onSync: (targetEnvironmentId: string) => void;
 }) => {
-  const { data: environments = [] } = useEnvironments();
-  const otherEnvironments = environments.filter((env) => env._id !== currentEnvironment?._id);
+  const { currentOrganization } = useAuth();
+  const { environments = [] } = useFetchEnvironments({ organizationId: currentOrganization?._id });
+  const otherEnvironments = environments.filter((env: IEnvironment) => env._id !== currentEnvironment?._id);
 
   if (!isSyncable) {
     return (

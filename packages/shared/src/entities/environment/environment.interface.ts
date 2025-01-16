@@ -26,6 +26,9 @@ export interface IEnvironment {
   bridge?: {
     url?: string;
   };
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface IWidgetSettings {

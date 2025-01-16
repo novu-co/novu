@@ -5,6 +5,7 @@ import { nanoid } from 'nanoid';
 import { encryptApiKey } from '@novu/application-generic';
 import { EnvironmentRepository, NotificationGroupRepository } from '@novu/dal';
 
+import { EnvironmentEnum, PROTECTED_ENVIRONMENTS } from '@novu/shared';
 import { CreateDefaultLayout, CreateDefaultLayoutCommand } from '../../../layouts/usecases';
 import { GenerateUniqueApiKey } from '../generate-unique-api-key/generate-unique-api-key.usecase';
 import { CreateEnvironmentCommand } from './create-environment.command';
@@ -18,13 +19,6 @@ export class CreateEnvironment {
     private createDefaultLayoutUsecase: CreateDefaultLayout
   ) {}
 
-  private getEnvironmentColor(name: string, commandColor?: string): string | undefined {
-    if (name === 'Development') return '#ff8547';
-    if (name === 'Production') return '#7e52f4';
-
-    return commandColor;
-  }
-
   async execute(command: CreateEnvironmentCommand) {
     const environmentCount = await this.environmentRepository.count({
       _organizationId: command.organizationId,
@@ -37,7 +31,7 @@ export class CreateEnvironment {
     if (!command.system) {
       const { name } = command;
 
-      if (name === 'Development' || name === 'Production') {
+      if (PROTECTED_ENVIRONMENTS.includes(name as EnvironmentEnum)) {
         throw new UnprocessableEntityException('Environment name cannot be Development or Production');
       }
 
@@ -101,5 +95,12 @@ export class CreateEnvironment {
     }
 
     return environment;
+  }
+
+  private getEnvironmentColor(name: string, commandColor?: string): string | undefined {
+    if (name === EnvironmentEnum.DEVELOPMENT) return '#ff8547';
+    if (name === EnvironmentEnum.PRODUCTION) return '#7e52f4';
+
+    return commandColor;
   }
 }

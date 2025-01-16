@@ -5,8 +5,8 @@ import { ToastIcon } from '@/components/primitives/sonner';
 import { showToast } from '@/components/primitives/sonner-helpers';
 import { SuccessButtonToast } from '@/components/success-button-toast';
 import TruncatedText from '@/components/truncated-text';
-import { useEnvironment } from '@/context/environment/hooks';
-import { useEnvironments } from '@/hooks/use-environments';
+import { useAuth } from '@/context/auth/hooks';
+import { useEnvironment, useFetchEnvironments } from '@/context/environment/hooks';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import type { IEnvironment, WorkflowListResponseDto, WorkflowResponseDto } from '@novu/shared';
 import { WorkflowOriginEnum, WorkflowStatusEnum } from '@novu/shared';
@@ -17,7 +17,8 @@ import { toast } from 'sonner';
 
 export function useSyncWorkflow(workflow: WorkflowResponseDto | WorkflowListResponseDto) {
   const { currentEnvironment } = useEnvironment();
-  const { data: environments = [] } = useEnvironments();
+  const { currentOrganization } = useAuth();
+  const { environments = [] } = useFetchEnvironments({ organizationId: currentOrganization?._id });
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [targetEnvironmentId, setTargetEnvironmentId] = useState<string>();

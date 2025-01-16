@@ -23,9 +23,9 @@ import { showToast } from '@/components/primitives/sonner-helpers';
 import { SidebarContent, SidebarHeader } from '@/components/side-navigation/sidebar';
 import { MAX_DESCRIPTION_LENGTH, workflowSchema } from '@/components/workflow-editor/schema';
 import { UpdateWorkflowFn } from '@/components/workflow-editor/workflow-provider';
-import { useEnvironment } from '@/context/environment/hooks';
+import { useAuth } from '@/context/auth/hooks';
+import { useEnvironment, useFetchEnvironments } from '@/context/environment/hooks';
 import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
-import { useEnvironments } from '@/hooks/use-environments';
 import { useFormAutosave } from '@/hooks/use-form-autosave';
 import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
 import { useTags } from '@/hooks/use-tags';
@@ -79,6 +79,8 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { tags } = useTags();
   const { currentEnvironment } = useEnvironment();
+  const { currentOrganization } = useAuth();
+  const { environments = [] } = useFetchEnvironments({ organizationId: currentOrganization?._id });
   const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
   const { show: showComingSoonBanner } = usePromotionalBanner({
     content: {
@@ -155,12 +157,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
     showComingSoonBanner();
   }
 
-  const { data: environments = [] } = useEnvironments();
   const otherEnvironments = environments.filter((env) => env._id !== currentEnvironment?._id);
-
-  const handleSync = (envId: string) => () => {
-    safeSync(envId);
-  };
 
   return (
     <>
@@ -214,7 +211,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                 )}
                 {isSyncable ? (
                   otherEnvironments.length === 1 ? (
-                    <DropdownMenuItem onClick={handleSync(otherEnvironments[0]._id)}>
+                    <DropdownMenuItem onClick={() => safeSync(otherEnvironments[0]._id)}>
                       <RiGitPullRequestFill />
                       {`Sync to ${otherEnvironments[0].name}`}
                     </DropdownMenuItem>
@@ -227,7 +224,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
                       <DropdownMenuPortal>
                         <DropdownMenuSubContent>
                           {otherEnvironments.map((env) => (
-                            <DropdownMenuItem key={env._id} onClick={handleSync(env._id)}>
+                            <DropdownMenuItem key={env._id} onClick={() => safeSync(env._id)}>
                               {env.name}
                             </DropdownMenuItem>
                           ))}

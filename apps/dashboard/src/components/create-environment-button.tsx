@@ -19,7 +19,9 @@ import {
   SheetTitle,
 } from '@/components/primitives/sheet';
 import { ExternalLink } from '@/components/shared/external-link';
-import { useCreateEnvironment, useEnvironments } from '@/hooks/use-environments';
+import { useAuth } from '@/context/auth/hooks';
+import { useFetchEnvironments } from '@/context/environment/hooks';
+import { useCreateEnvironment } from '@/hooks/use-environments';
 import { useFetchSubscription } from '@/hooks/use-fetch-subscription';
 import { ROUTES } from '@/utils/routes';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -66,7 +68,8 @@ type CreateEnvironmentFormData = z.infer<typeof createEnvironmentSchema>;
 type CreateEnvironmentButtonProps = ComponentProps<typeof Button>;
 
 export const CreateEnvironmentButton = (props: CreateEnvironmentButtonProps) => {
-  const { data: environments = [] } = useEnvironments();
+  const { currentOrganization } = useAuth();
+  const { environments = [] } = useFetchEnvironments({ organizationId: currentOrganization?._id });
   const [isOpen, setIsOpen] = useState(false);
   const { mutateAsync, isPending } = useCreateEnvironment();
   const { subscription } = useFetchSubscription();

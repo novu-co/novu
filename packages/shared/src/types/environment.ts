@@ -1,10 +1,10 @@
 export type EnvironmentId = string;
 
-export enum SystemEnvironmentsEnum {
+export enum EnvironmentEnum {
   DEVELOPMENT = 'Development',
   PRODUCTION = 'Production',
 }
 
-export const PROTECTED_ENVIRONMENTS = [SystemEnvironmentsEnum.DEVELOPMENT, SystemEnvironmentsEnum.PRODUCTION] as const;
+export const PROTECTED_ENVIRONMENTS = [EnvironmentEnum.DEVELOPMENT, EnvironmentEnum.PRODUCTION] as const;
 
-export type EnvironmentName = SystemEnvironmentsEnum | string;
+export type EnvironmentName = EnvironmentEnum | string;
