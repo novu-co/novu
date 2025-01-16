@@ -1,5 +1,5 @@
 import { For, onCleanup, onMount, Show } from 'solid-js';
-import { MountableElement, Portal } from 'solid-js/web';
+import { isServer, MountableElement, Portal } from 'solid-js/web';
 import { NovuUI } from '..';
 import { Novu } from '../../novu';
 import type { NovuOptions } from '../../types';
@@ -73,6 +73,8 @@ export const Renderer = (props: RendererProps) => {
       element?.remove();
     });
   });
+
+  if (isServer) return null;
 
   return (
     <Show when={typeof window !== 'undefined'}>
