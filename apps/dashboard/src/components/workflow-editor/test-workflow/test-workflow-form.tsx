@@ -99,6 +99,7 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
                       extensions={extensions}
                       className="overflow-auto"
                       {...restField}
+                      multiline
                     />
                     <FormMessage />
                   </PanelContent>
@@ -117,11 +118,11 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
             onValueChange={(value) => setActiveSnippetTab(value as SnippetLanguage)}
           >
             <TabsList className="border-t-0" variant="regular">
-              {workflow?.origin === WorkflowOriginEnum.EXTERNAL && (
+              {/* {workflow?.origin === WorkflowOriginEnum.EXTERNAL && (
                 <TabsTrigger className={tabsTriggerClassName} value="framework" variant="regular">
                   Framework
                 </TabsTrigger>
-              )}
+              )} */}
               <TabsTrigger className={tabsTriggerClassName} value="typescript" variant="regular">
                 NodeJS
               </TabsTrigger>

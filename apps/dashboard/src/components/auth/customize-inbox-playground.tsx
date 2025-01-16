@@ -174,7 +174,6 @@ function NotificationConfigSection() {
                 <InputRoot hasError={!!fieldState.error}>
                   <InputWrapper className="flex h-9 items-center justify-center px-1">
                     <Editor
-                      multiline={false}
                       indentWithTab={false}
                       fontFamily="inherit"
                       placeholder={capitalize(field.name)}

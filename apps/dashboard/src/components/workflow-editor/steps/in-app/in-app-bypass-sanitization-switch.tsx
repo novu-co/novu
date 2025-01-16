@@ -6,7 +6,7 @@ import { useFormContext } from 'react-hook-form';
 
 const fieldKey = 'disableOutputSanitization';
 
-export const InAppDisableSanitizationSwitch = () => {
+export const InAppBypassSanitizationSwitch = () => {
   const { control } = useFormContext();
   const { saveForm } = useSaveForm();
 
@@ -30,8 +30,11 @@ export const InAppDisableSanitizationSwitch = () => {
           </FormItem>
         )}
       />
-      <FormLabel className="text-foreground-600 text-sm">Bypass sanitization</FormLabel>
-      <HelpTooltipIndicator text="Return unescaped HTML content in inbox. This enables the possibility of XSS attacks from unsanitized user input." />
+      <FormLabel className="text-foreground-600 text-xs">Bypass sanitization</FormLabel>
+      <HelpTooltipIndicator
+        size="4"
+        text="Bypassing HTML sanitization in <Inbox /> may expose your app to XSS attacks from untrusted input. Enable this option only if you are sure that the notification input is safe."
+      />
     </div>
   );
 };
