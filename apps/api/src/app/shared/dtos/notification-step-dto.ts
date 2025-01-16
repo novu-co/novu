@@ -16,8 +16,9 @@ import {
   OrdinalValueEnum,
   StepVariantDto,
 } from '@novu/shared';
-import { IsBoolean, ValidateNested } from 'class-validator';
+import { IsBoolean, IsString, ValidateNested } from 'class-validator';
 
+import { Type } from 'class-transformer';
 import { MessageTemplate } from './message-template';
 import { StepFilterDto } from './step-filter-dto';
 
@@ -75,7 +76,6 @@ class DigestRegularMetadata extends DigestBaseMetadata implements IDigestRegular
   updateMode?: boolean;
 }
 
-@ApiExtraModels(TimedConfig)
 class DigestTimedMetadata extends DigestBaseMetadata implements IDigestTimedMetadata {
   @ApiProperty({
     enum: [DigestTypeEnum.TIMED],
@@ -104,44 +104,84 @@ class DelayScheduledMetadata implements IDelayScheduledMetadata {
   delayPath: string;
 }
 
+// Define the ReplyCallback type with OpenAPI annotations
+export class ReplyCallback {
+  @ApiPropertyOptional({
+    description: 'Indicates whether the reply callback is active.',
+    type: Boolean,
+  })
+  @IsBoolean()
+  active: boolean;
+
+  @ApiPropertyOptional({
+    description: 'The URL to which replies should be sent.',
+    type: String,
+  })
+  @IsString()
+  url: string;
+}
+
 @ApiExtraModels(DigestRegularMetadata, DigestTimedMetadata, DelayRegularMetadata, DelayScheduledMetadata)
-export class NotificationStepVariant implements StepVariantDto {
-  @ApiPropertyOptional()
+export class NotificationStepData implements StepVariantDto {
+  @ApiPropertyOptional({
+    description: 'Unique identifier for the notification step.',
+    type: String,
+  })
   _id?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Universally unique identifier for the notification step.',
+    type: String,
+  })
   uuid?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Name of the notification step.',
+    type: String,
+  })
   name?: string;
 
-  @ApiPropertyOptional()
-  @ApiProperty()
+  @ApiPropertyOptional({
+    description: 'ID of the template associated with this notification step.',
+    type: String,
+  })
   _templateId?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Indicates whether the notification step is active.',
+    type: Boolean,
+  })
   @IsBoolean()
   active?: boolean;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'Determines if the process should stop on failure.',
+    type: Boolean,
+  })
   shouldStopOnFail?: boolean;
 
   @ApiPropertyOptional({
-    type: MessageTemplate,
+    description: 'Message template used in this notification step.',
+    type: () => MessageTemplate, // Assuming MessageTemplate is a class
   })
   @ValidateNested()
   template?: MessageTemplate;
 
   @ApiPropertyOptional({
+    description: 'Filters applied to this notification step.',
     type: [StepFilterDto],
   })
   @ValidateNested({ each: true })
   filters?: StepFilterDto[];
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    description: 'ID of the parent notification step, if applicable.',
+    type: String,
+  })
   _parentId?: string | null;
 
   @ApiPropertyOptional({
+    description: 'Metadata associated with the workflow step. Can vary based on the type of step.',
     oneOf: [
       { $ref: getSchemaPath(DigestRegularMetadata) },
       { $ref: getSchemaPath(DigestTimedMetadata) },
@@ -151,18 +191,18 @@ export class NotificationStepVariant implements StepVariantDto {
   })
   metadata?: IWorkflowStepMetadata;
 
-  @ApiPropertyOptional()
-  replyCallback?: {
-    active: boolean;
-    url: string;
-  };
+  @ApiPropertyOptional({
+    description: 'Callback information for replies, including whether it is active and the callback URL.',
+    type: () => ReplyCallback,
+  })
+  replyCallback?: ReplyCallback;
 }
 
-@ApiExtraModels(DigestRegularMetadata, DigestTimedMetadata, DelayRegularMetadata, DelayScheduledMetadata)
-export class NotificationStep extends NotificationStepVariant {
+export class NotificationStepDto extends NotificationStepData {
   @ApiPropertyOptional({
-    type: NotificationStepVariant,
+    type: () => [NotificationStepData], // Specify that this is an array of NotificationStepData
   })
-  @ValidateNested()
-  variants?: NotificationStepVariant[];
+  @ValidateNested({ each: true }) // Validate each nested variant
+  @Type(() => NotificationStepData) // Transform to NotificationStepData instances
+  variants?: NotificationStepData[];
 }

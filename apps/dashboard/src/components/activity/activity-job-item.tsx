@@ -11,6 +11,7 @@ import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { Card, CardContent, CardHeader } from '../primitives/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 import { TimeDisplayHoverCard } from '../time-display-hover-card';
+import TruncatedText from '../truncated-text';
 import { JOB_STATUS_CONFIG } from './constants';
 import { ExecutionDetailItem } from './execution-detail-item';
 
@@ -105,7 +106,9 @@ function getStatusMessage(job: IActivityJob): string | React.ReactNode {
         {lastExecutionDetail.raw ? (
           <ErrorTooltip message={lastExecutionDetail.detail} raw={lastExecutionDetail.raw} />
         ) : (
-          <span className="text-destructive">{lastExecutionDetail.detail}</span>
+          <span className="text-destructive">
+            <TruncatedText>{lastExecutionDetail.detail}</TruncatedText>
+          </span>
         )}
       </div>
     ) : (
