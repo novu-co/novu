@@ -143,5 +143,8 @@
     "tags": [
       "type:package"
     ]
+  },
+  "overrides": {
+    "vite": "5.4.10"
   }
 }
