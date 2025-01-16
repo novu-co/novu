@@ -145,23 +145,23 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
             </TabsList>
             {workflow?.origin === WorkflowOriginEnum.EXTERNAL && (
               <TabsContent value="framework" className={codePanelClassName} variant="regular">
-                <SnippetEditor language="framework" value={snippetValue} />
+                <SnippetEditor language="framework" value={snippetValue} readOnly />
               </TabsContent>
             )}
             <TabsContent value="shell" className={codePanelClassName} variant="regular">
-              <SnippetEditor language="shell" value={snippetValue} />
+              <SnippetEditor language="shell" value={snippetValue} readOnly />
             </TabsContent>
             <TabsContent value="typescript" className={codePanelClassName} variant="regular">
-              <SnippetEditor language="typescript" value={snippetValue} />
+              <SnippetEditor language="typescript" value={snippetValue} readOnly />
             </TabsContent>
             <TabsContent value="php" className={codePanelClassName} variant="regular">
-              <SnippetEditor language="php" value={snippetValue} />
+              <SnippetEditor language="php" value={snippetValue} readOnly />
             </TabsContent>
             <TabsContent value="go" className={codePanelClassName} variant="regular">
-              <SnippetEditor language="go" value={snippetValue} />
+              <SnippetEditor language="go" value={snippetValue} readOnly />
             </TabsContent>
             <TabsContent value="python" className={codePanelClassName} variant="regular">
-              <SnippetEditor language="python" value={snippetValue} />
+              <SnippetEditor language="python" value={snippetValue} readOnly />
             </TabsContent>
           </Tabs>
         </Panel>
