@@ -6,8 +6,8 @@ import { SubscriberEntity } from '../subscriber';
 import { NotificationEntity } from './notification.entity';
 
 export type NotificationFeedItemEntity = Omit<NotificationEntity, 'template'> & {
-  template: TemplateFeedItem;
-  subscriber: SubscriberFeedItem;
+  template?: TemplateFeedItem;
+  subscriber?: SubscriberFeedItem;
   jobs: JobFeedItem[];
 };
 export type TemplateFeedItem = Pick<NotificationTemplateEntity, '_id' | 'name' | 'triggers'>;
