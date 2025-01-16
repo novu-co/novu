@@ -7,6 +7,7 @@ import reduce from 'lodash/reduce';
 import values from 'lodash/values';
 
 import { JSONSchemaDto } from '@novu/shared';
+import { MAILY_ITERABLE_MARK } from '@novu/application-generic';
 
 export function findMissingKeys(requiredRecord: object, actualRecord: object) {
   const requiredKeys = collectKeys(requiredRecord);
@@ -161,7 +162,12 @@ export function mockSchemaDefaults(schema: JSONSchemaDto, parentPath = 'payload'
 export function keysToObject(paths: string[]): Record<string, unknown> {
   const result = {};
 
-  paths.filter(hasNamespace).forEach((path) => buildPathInObject(path, result));
+  const validPaths = paths
+    .filter(hasNamespace)
+    // remove paths that are a prefix of another path
+    .filter((path) => !paths.some((otherPath) => otherPath !== path && otherPath.startsWith(`${path}.`)));
+
+  validPaths.filter(hasNamespace).forEach((path) => buildPathInObject(path, result));
 
   return result;
 }
@@ -179,7 +185,7 @@ function buildPathInObject(path: string, result: Record<string, any>): void {
 
     if (isArrayNotation(parts[i + 1])) {
       current = handleArrayPath(current, key);
-      i += 1; // Skip the "0"
+      i += 1; // Skip the index path part ("0")
       continue;
     }
 
@@ -190,11 +196,13 @@ function buildPathInObject(path: string, result: Record<string, any>): void {
 }
 
 function isArrayNotation(part: string): boolean {
-  return part === '0';
+  return part === MAILY_ITERABLE_MARK;
 }
 
 function handleArrayPath(current: Record<string, any>, key: string): Record<string, any> {
-  current[key] = current[key] || [{}];
+  if (!Array.isArray(current[key])) {
+    current[key] = [{}];
+  }
 
   return current[key][0];
 }

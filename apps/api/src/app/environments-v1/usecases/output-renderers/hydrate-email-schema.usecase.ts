@@ -2,18 +2,51 @@
 import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
 
-import { PreviewPayload, TipTapNode } from '@novu/shared';
+import { TipTapNode } from '@novu/shared';
 import { MailyAttrsEnum, processNodeAttrs, processNodeMarks } from '@novu/application-generic';
 
 import { HydrateEmailSchemaCommand } from './hydrate-email-schema.command';
 
+/**
+ * Transforms the content in place by processing nodes and replacing variables with Liquid.js syntax.
+ * Handles both array iterations and simple variables.
+ *
+ * @example
+ * Input:
+ * {
+ *   type: "for",
+ *   attrs: { each: "payload.comments" },
+ *   content: [{
+ *     type: "variable",
+ *     attrs: { id: "payload.comments.name" }
+ *   }]
+ * },
+ * {
+ *   type: "variable",
+ *   attrs: { id: "payload.test" }
+ * }
+ *
+ * Output:
+ * {
+ *   type: "paragraph",
+ *   attrs: { each: "{{ payload.comments }}" },
+ *   content: [{
+ *     type: "variable",
+ *     text: "{{ payload.comments[0].name }}"
+ *   }]
+ * },
+ * {
+ *   type: "variable",
+ *   text: "{{ payload.test }}"
+ * }
+ */
 @Injectable()
 export class HydrateEmailSchemaUseCase {
   execute(command: HydrateEmailSchemaCommand): TipTapNode {
     // TODO: Aligned Zod inferred type and TipTapNode to remove the need of a type assertion
     const emailBody: TipTapNode = TipTapSchema.parse(JSON.parse(command.emailEditor)) as TipTapNode;
     if (emailBody) {
-      this.transformContentInPlace([emailBody], command.fullPayloadForRender);
+      this.prepareForLiquidParsing([emailBody]);
     }
 
     return emailBody;
@@ -29,6 +62,9 @@ export class HydrateEmailSchemaUseCase {
     content[index] = {
       type: 'variable',
       text: node.attrs.id,
+      attrs: {
+        ...node.attrs,
+      },
     };
   }
 
@@ -41,24 +77,28 @@ export class HydrateEmailSchemaUseCase {
   ) {
     content[index] = {
       type: 'paragraph',
-      attrs: { each: node.attrs.each },
       content: node.content,
+      attrs: {
+        ...node.attrs,
+      },
     };
   }
 
-  private transformContentInPlace(content: TipTapNode[], masterPayload: PreviewPayload) {
+  private prepareForLiquidParsing(content: TipTapNode[], forLoopVariable?: string) {
     content.forEach((node, index) => {
-      processNodeAttrs(node);
+      processNodeAttrs(node, forLoopVariable);
       processNodeMarks(node);
 
-      if (this.isVariableNode(node)) {
-        this.variableLogic(node, content, index);
-      }
       if (this.isForNode(node)) {
         this.forNodeLogic(node, content, index);
-      }
-      if (node.content) {
-        this.transformContentInPlace(node.content, masterPayload);
+
+        if (node.content) {
+          this.prepareForLiquidParsing(node.content, node.attrs.each);
+        }
+      } else if (this.isVariableNode(node)) {
+        this.variableLogic(node, content, index);
+      } else if (node.content) {
+        this.prepareForLiquidParsing(node.content, forLoopVariable);
       }
     });
   }

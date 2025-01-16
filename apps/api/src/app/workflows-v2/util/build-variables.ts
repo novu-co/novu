@@ -1,10 +1,10 @@
 import _ from 'lodash';
 
-import { PinoLogger } from '@novu/application-generic';
+import { MAILY_ITERABLE_MARK, PinoLogger } from '@novu/application-generic';
 
 import { Variable, extractLiquidTemplateVariables, TemplateVariables } from './template-parser/liquid-parser';
-import { transformMailyContentToLiquid } from '../usecases/generate-preview/transform-maily-content-to-liquid';
 import { isStringTipTapNode } from './tip-tap.util';
+import { HydrateEmailSchemaUseCase } from '../../environments-v1/usecases/output-renderers/hydrate-email-schema.usecase';
 
 export function buildVariables(
   variableSchema: Record<string, unknown> | undefined,
@@ -15,7 +15,7 @@ export function buildVariables(
 
   if (isStringTipTapNode(variableControlValue)) {
     try {
-      variableControlValue = transformMailyContentToLiquid(JSON.parse(variableControlValue));
+      variableControlValue = new HydrateEmailSchemaUseCase().execute({ emailEditor: variableControlValue });
     } catch (error) {
       logger?.error(
         {
@@ -57,7 +57,7 @@ function isPropertyAllowed(schema: Record<string, unknown>, propertyPath: string
       continue;
     }
 
-    if (part === '0' && currentSchema.type === 'array') {
+    if (part === MAILY_ITERABLE_MARK && currentSchema.type === 'array') {
       currentSchema = currentSchema.items as Record<string, unknown>;
       continue;
     }

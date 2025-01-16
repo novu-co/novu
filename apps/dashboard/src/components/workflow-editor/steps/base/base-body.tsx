@@ -29,6 +29,7 @@ export const BaseBody = () => {
                   id={field.name}
                   variables={variables}
                   value={field.value}
+                  multiline
                   onChange={field.onChange}
                 />
               </InputWrapper>

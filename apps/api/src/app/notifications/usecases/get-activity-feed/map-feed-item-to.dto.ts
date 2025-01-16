@@ -15,15 +15,7 @@ import {
   ProvidersIdEnum,
   StepTypeEnum,
 } from '@novu/shared';
-import {
-  ActivityNotificationExecutionDetailResponseDto,
-  ActivityNotificationJobResponseDto,
-  ActivityNotificationResponseDto,
-  ActivityNotificationStepResponseDto,
-  ActivityNotificationSubscriberResponseDto,
-  ActivityNotificationTemplateResponseDto,
-  DigestMetadataDto,
-} from '../../dtos/activities-response.dto';
+import { MessageTemplateDto } from '../../../shared/dtos/message.template.dto';
 import {
   FieldFilterPartDto,
   FilterPartsDto,
@@ -34,11 +26,20 @@ import {
   TenantFilterPartDto,
   WebhookFilterPartDto,
 } from '../../../shared/dtos/step-filter-dto';
-import { MessageTemplateDto } from '../../../shared/dtos/message.template.dto';
+import {
+  ActivityNotificationExecutionDetailResponseDto,
+  ActivityNotificationJobResponseDto,
+  ActivityNotificationResponseDto,
+  ActivityNotificationStepResponseDto,
+  ActivityNotificationSubscriberResponseDto,
+  ActivityNotificationTemplateResponseDto,
+  DigestMetadataDto,
+} from '../../dtos/activities-response.dto';
 
 function buildSubscriberDto(entity: NotificationFeedItemEntity): ActivityNotificationSubscriberResponseDto {
   return {
     _id: entity.subscriber._id,
+    subscriberId: entity.subscriber.subscriberId,
     email: entity.subscriber.email,
     firstName: entity.subscriber.firstName,
     lastName: entity.subscriber.lastName,
@@ -249,6 +250,7 @@ function convertExecutionDetail(entity: ExecutionDetailFeedItem): ActivityNotifi
     providerId: entity.providerId as unknown as ProvidersIdEnum,
     source: entity.source,
     status: entity.status,
+    raw: entity.raw || undefined,
     createdAt: entity.createdAt,
   };
 }
