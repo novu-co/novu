@@ -33,6 +33,7 @@ export const CustomerSupportButton = () => {
           hideBranding: true,
           title: 'Chat with us',
           customerDetails: {
+            fullName: `${currentUser.firstName} ${currentUser.lastName}`,
             email: currentUser?.email,
             emailHash: currentUser?.servicesHashes?.plain,
             externalId: currentUser?._id,
