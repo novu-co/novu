@@ -1,8 +1,10 @@
 import { SidebarContent } from '@/components/side-navigation/sidebar';
 import { useEnvironment } from '@/context/environment/hooks';
+import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { TelemetryEvent } from '@/utils/telemetry';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 import * as Sentry from '@sentry/react';
 import { ReactNode } from 'react';
 import {
@@ -37,6 +39,7 @@ const NavigationGroup = ({ children, label }: { children: ReactNode; label?: str
 export const SideNavigation = () => {
   const { subscription, daysLeft, isLoading: isLoadingSubscription } = useFetchSubscription();
   const isFreeTrialActive = subscription?.trial.isActive || subscription?.hasPaymentMethod;
+  const isEnvironmentManagementEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_ENVIRONMENT_MANAGEMENT_ENABLED);
 
   const { currentEnvironment, environments, switchEnvironment } = useEnvironment();
   const track = useTelemetry();
@@ -98,10 +101,14 @@ export const SideNavigation = () => {
                 <RiKey2Line className="size-4" />
                 <span>API Keys</span>
               </NavigationLink>
-              <NavigationLink to={buildRoute(ROUTES.ENVIRONMENTS, { environmentSlug: currentEnvironment?.slug ?? '' })}>
-                <RiDatabase2Line className="size-4" />
-                <span>Environments</span>
-              </NavigationLink>
+              {isEnvironmentManagementEnabled && (
+                <NavigationLink
+                  to={buildRoute(ROUTES.ENVIRONMENTS, { environmentSlug: currentEnvironment?.slug ?? '' })}
+                >
+                  <RiDatabase2Line className="size-4" />
+                  <span>Environments</span>
+                </NavigationLink>
+              )}
             </NavigationGroup>
             <NavigationGroup label="Application">
               <NavigationLink to={ROUTES.SETTINGS}>

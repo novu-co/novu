@@ -1,11 +1,17 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { EnvironmentRepository } from '@novu/dal';
+import { EnvironmentRepository, IntegrationRepository } from '@novu/dal';
 import { EnvironmentEnum, PROTECTED_ENVIRONMENTS } from '@novu/shared';
+import { RemoveIntegrationCommand } from '../../../integrations/usecases/remove-integration/remove-integration.command';
+import { RemoveIntegration } from '../../../integrations/usecases/remove-integration/remove-integration.usecase';
 import { DeleteEnvironmentCommand } from './delete-environment.command';
 
 @Injectable()
 export class DeleteEnvironment {
-  constructor(private environmentRepository: EnvironmentRepository) {}
+  constructor(
+    private environmentRepository: EnvironmentRepository,
+    private removeIntegration: RemoveIntegration,
+    private integrationRepository: IntegrationRepository
+  ) {}
 
   async execute(command: DeleteEnvironmentCommand): Promise<void> {
     const environment = await this.environmentRepository.findOne({
@@ -27,5 +33,21 @@ export class DeleteEnvironment {
       _id: command.environmentId,
       _organizationId: command.organizationId,
     });
+
+    const integrations = await this.integrationRepository.find({
+      _organizationId: command.organizationId,
+      _environmentId: command.environmentId,
+    });
+
+    for (const integration of integrations) {
+      await this.removeIntegration.execute(
+        RemoveIntegrationCommand.create({
+          organizationId: command.organizationId,
+          integrationId: integration._id,
+          userId: command.userId,
+          environmentId: command.environmentId,
+        })
+      );
+    }
   }
 }

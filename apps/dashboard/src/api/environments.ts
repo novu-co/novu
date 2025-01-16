@@ -6,8 +6,16 @@ export async function getEnvironments() {
   return data;
 }
 
-export async function updateEnvironment({ environment, name }: { environment: IEnvironment; name: string }) {
-  return put<{ data: IEnvironment }>(`/environments/${environment._id}`, { body: { name } });
+export async function updateEnvironment({
+  environment,
+  name,
+  color,
+}: {
+  environment: IEnvironment;
+  name: string;
+  color?: string;
+}) {
+  return put<{ data: IEnvironment }>(`/environments/${environment._id}`, { body: { name, color } });
 }
 
 export async function updateBridgeUrl({ environment, url }: { environment: IEnvironment; url?: string }) {

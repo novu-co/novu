@@ -15,37 +15,65 @@ const logoVariants = cva('', {
   },
 });
 
+const sizeConfig = {
+  xs: {
+    container: 'size-4',
+    padding: 'p-0',
+    icon: 'size-3',
+  },
+  sm: {
+    container: 'size-5',
+    padding: 'p-1',
+    icon: 'size-3',
+  },
+  md: {
+    container: 'size-6',
+    padding: 'p-1',
+    icon: 'size-4',
+  },
+} as const;
+
 interface EnvironmentBranchIconProps {
   environment?: IEnvironment;
   className?: string;
-  size?: 'sm' | 'md';
+  size?: keyof typeof sizeConfig;
+  mode?: 'default' | 'ghost';
 }
 
-export function EnvironmentBranchIcon({ environment, className, size = 'md' }: EnvironmentBranchIconProps) {
+export function EnvironmentBranchIcon({
+  environment,
+  className,
+  size = 'md',
+  mode = 'default',
+}: EnvironmentBranchIconProps) {
   const hasCustomColor = !!environment?.color;
   const isProduction = environment?.name?.toLowerCase() === 'production';
+  const { container, padding, icon } = sizeConfig[size];
 
   return (
     <div
       style={
         hasCustomColor
           ? {
-              backgroundColor: `${environment.color}1A`,
+              backgroundColor: mode === 'default' ? `${environment.color}1A` : 'transparent',
               borderColor: environment.color,
               color: environment.color,
             }
           : undefined
       }
       className={cn(
-        size === 'sm' ? 'size-5' : 'size-6',
-        'rounded-[6px] border-[1px] border-solid p-1',
+        container,
+        'flex items-center justify-center rounded-[6px] border-[1px] border-solid',
+        size === 'xs' ? 'border-none' : 'border',
+        padding,
         hasCustomColor
           ? 'border-opacity-100 bg-opacity-10'
           : logoVariants({ variant: isProduction ? 'production' : 'default' }),
-        className
+        className,
+        mode === 'ghost' ? 'bg-transparent' : ''
       )}
     >
-      <RiGitBranchLine className={size === 'sm' ? 'size-3' : 'size-4'} />
+      <RiGitBranchLine className={icon} />
     </div>
   );
 }

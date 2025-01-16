@@ -34,8 +34,8 @@ export const DeleteEnvironmentDialog = ({
         <DialogHeader>
           <DialogTitle>Delete Environment</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete the environment <span className="font-bold">{environment.name}</span>? This
-            action cannot be undone and it will break all the integrations that are using this environment.
+            Are you sure you want to delete the environment <span className="font-bold">{environment.name}</span>?{' '}
+            <br /> This action cannot be undone and it will break all the integrations that are using this environment.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
