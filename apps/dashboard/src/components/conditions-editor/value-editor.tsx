@@ -1,12 +1,10 @@
-import React, { useMemo } from 'react';
-import { autocompletion } from '@codemirror/autocomplete';
+import React from 'react';
 import { useValueEditor, ValueEditorProps } from 'react-querybuilder';
 import { useFormContext } from 'react-hook-form';
 
-import { completions } from '@/utils/liquid-autocomplete';
 import { InputRoot, InputWrapper } from '@/components/primitives/input';
-import { Editor } from '@/components/primitives/editor';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
+import { ControlInput } from '../primitives/control-input/control-input';
 
 export const ValueEditor = React.memo((props: ValueEditorProps) => {
   const form = useFormContext();
@@ -15,15 +13,6 @@ export const ValueEditor = React.memo((props: ValueEditorProps) => {
   const { variables } = props.context as { variables: LiquidVariable[] };
   const { value, handleOnChange, operator, type } = props;
   const { valueAsArray, multiValueHandler } = useValueEditor(props);
-
-  const extensions = useMemo(
-    () => [
-      autocompletion({
-        override: [completions(variables)],
-      }),
-    ],
-    [variables]
-  );
 
   if (operator === 'null' || operator === 'notNull') {
     return null;
@@ -34,14 +23,13 @@ export const ValueEditor = React.memo((props: ValueEditorProps) => {
       return (
         <InputRoot key={key} size="2xs" className="w-28" hasError={!!error && !valueAsArray[i]}>
           <InputWrapper className="h-7">
-            <Editor
-              fontFamily="inherit"
+            <ControlInput
+              multiline={false}
               indentWithTab={false}
-              placeholder={'value'}
-              className="mt-[4px] overflow-hidden [&_.cm-line]:pl-px"
-              extensions={extensions}
+              placeholder="value"
               value={valueAsArray[i] ?? ''}
               onChange={(newValue) => multiValueHandler(newValue, i)}
+              variables={variables}
             />
           </InputWrapper>
         </InputRoot>
@@ -64,14 +52,13 @@ export const ValueEditor = React.memo((props: ValueEditorProps) => {
     <div className="flex flex-col gap-1">
       <InputRoot size="2xs" className="w-40" hasError={!!error}>
         <InputWrapper className="h-7">
-          <Editor
-            fontFamily="inherit"
+          <ControlInput
+            multiline={false}
             indentWithTab={false}
-            placeholder={'value'}
-            className="mt-[4px] overflow-hidden [&_.cm-line]:pl-px"
-            extensions={extensions}
+            placeholder="value"
             value={value ?? ''}
             onChange={handleOnChange}
+            variables={variables}
           />
         </InputWrapper>
       </InputRoot>

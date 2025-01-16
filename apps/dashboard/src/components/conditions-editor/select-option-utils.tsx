@@ -10,7 +10,7 @@ export const toSelectOptions = (arr: OptionList, capitalizeLabel: boolean = true
         <SelectLabel>{group.label}</SelectLabel>
         {group.options.map((option) => (
           <SelectItem key={option.value} value={option.value ?? ''} className="h-6">
-            <span className="text-foreground-600 text-xs font-medium">
+            <span className="text-foreground-600 text-label-xs font-medium">
               {capitalizeLabel ? capitalize(option.label.toLocaleLowerCase()) : option.label}
             </span>
           </SelectItem>
@@ -21,7 +21,7 @@ export const toSelectOptions = (arr: OptionList, capitalizeLabel: boolean = true
 
   return (arr as BaseOption<string>[]).map((option) => (
     <SelectItem key={option.value} value={option.value ?? ''} className="h-6">
-      <span className="text-foreground-600 text-xs font-medium">
+      <span className="text-foreground-600 text-label-xs font-medium">
         {capitalizeLabel ? capitalize(option.label.toLocaleLowerCase()) : option.label}
       </span>
     </SelectItem>

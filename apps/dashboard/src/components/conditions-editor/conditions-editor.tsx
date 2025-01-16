@@ -14,8 +14,11 @@ import { ValueEditor } from '@/components/conditions-editor/value-editor';
 import { FieldSelector } from '@/components/conditions-editor/field-selector';
 import { RuleActions } from '@/components/conditions-editor/rule-actions';
 
+const ruleActionsClassName = `[&>[data-actions="true"]]:opacity-0 [&:hover>[data-actions="true"]]:opacity-100 [&>[data-actions="true"]:has(~[data-radix-popper-content-wrapper])]:opacity-100`;
+const groupActionsClassName = `[&_.ruleGroup-header>[data-actions="true"]]:opacity-0 [&_.ruleGroup-header:hover>[data-actions="true"]]:opacity-100 [&_.ruleGroup-header>[data-actions="true"]:has(~[data-radix-popper-content-wrapper])]:opacity-100`;
 const nestedGroupClassName = `[&.ruleGroup_.ruleGroup]:p-3 [&.ruleGroup_.ruleGroup]:bg-neutral-50 [&.ruleGroup_.ruleGroup]:rounded-md [&.ruleGroup_.ruleGroup]:border [&.ruleGroup_.ruleGroup]:border-solid [&.ruleGroup_.ruleGroup]:border-neutral-100`;
-const ruleGroupClassName = `[&.ruleGroup]:[background:transparent] [&.ruleGroup]:[border:none] [&.ruleGroup]:p-0 ${nestedGroupClassName} [&_.ruleGroup-body_.rule]:items-start`;
+const ruleGroupClassName = `[&.ruleGroup]:[background:transparent] [&.ruleGroup]:[border:none] [&.ruleGroup]:p-0 ${nestedGroupClassName} [&_.ruleGroup-body_.rule]:items-start ${groupActionsClassName}`;
+const ruleClassName = `${ruleActionsClassName}`;
 
 function InternalConditionsEditor({ fields, variables }: { fields: Field[]; variables: LiquidVariable[] }) {
   const { query, setQuery } = useConditionsEditorContext();
@@ -42,6 +45,7 @@ function InternalConditionsEditor({ fields, variables }: { fields: Field[]; vari
       onQueryChange={setQuery}
       controlClassnames={{
         ruleGroup: ruleGroupClassName,
+        rule: ruleClassName,
       }}
       translations={{
         addRule: {

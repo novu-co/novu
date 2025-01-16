@@ -85,6 +85,7 @@ const baseTheme = (options: { multiline?: boolean }) =>
       alignItems: 'center',
       gap: '8px',
       padding: '4px',
+      fontFamily: 'JetBrains Mono, monospace',
       fontSize: '12px',
       fontWeight: '500',
       lineHeight: '16px',
@@ -102,6 +103,10 @@ const baseTheme = (options: { multiline?: boolean }) =>
     },
     '.cm-line span.cm-matchingBracket': {
       backgroundColor: 'hsl(var(--highlighted) / 0.1)',
+    },
+    // important to show the cursor at the beginning of the line
+    '.cm-line': {
+      marginLeft: '1px',
     },
     'div.cm-content': {
       padding: 0,
@@ -155,7 +160,7 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
         lineNumbers: false,
         foldGutter: false,
         highlightActiveLine: false,
-        defaultKeymap: !multiline,
+        defaultKeymap: multiline,
         ...((typeof basicSetupProp === 'object' ? basicSetupProp : {}) ?? {}),
       }),
       [basicSetupProp, multiline]

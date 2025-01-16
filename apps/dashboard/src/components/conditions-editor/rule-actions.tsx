@@ -28,20 +28,21 @@ export const RuleActions = ({ path, ruleOrGroup }: ActionWithRulesProps) => {
           variant="ghost"
           size="lg"
           className="ml-auto size-7 [&_svg]:size-4"
+          data-actions
         ></CompactButton>
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end">
+      <DropdownMenuContent side="bottom" align="end" withPortal={false}>
         <DropdownMenuGroup className="*:cursor-pointer">
           <DropdownMenuItem
             onClick={() => {
               cloneRuleOrGroup(ruleOrGroup, getParentPath(path));
             }}
-            className="text-foreground-600 h-7 text-xs"
+            className="text-foreground-600 text-label-xs h-7"
             disabled={isDuplicateDisabled}
           >
             <SquareTwoStack className="[&&]:size-3.5" /> Duplicate {isGroup ? `group` : `condition`}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => removeRuleOrGroup(path)} className="text-error-base h-7 text-xs">
+          <DropdownMenuItem onClick={() => removeRuleOrGroup(path)} className="text-error-base text-label-xs h-7">
             <Delete className="[&&]:size-3.5" />
             Delete {isGroup ? `group` : `condition`}
           </DropdownMenuItem>
