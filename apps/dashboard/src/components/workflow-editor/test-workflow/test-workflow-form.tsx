@@ -99,6 +99,7 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
                       extensions={extensions}
                       className="overflow-auto"
                       {...restField}
+                      multiline
                     />
                     <FormMessage />
                   </PanelContent>

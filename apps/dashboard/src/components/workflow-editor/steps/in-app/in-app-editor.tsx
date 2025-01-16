@@ -31,9 +31,15 @@ export const InAppEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
   return (
     <div className="flex flex-col">
       <InAppTabsSection className="flex flex-col gap-3">
-        <div className={'flex items-center gap-2.5 text-sm font-medium'}>
-          <Notification5Fill className="size-3" />
-          <span>In-App template editor</span>
+        <div className={'flex items-center justify-between gap-2.5 text-sm font-medium'}>
+          <div className="flex items-center gap-2.5">
+            <Notification5Fill className="size-3" />
+            <span>In-App template editor</span>
+          </div>
+          {disableOutputSanitization &&
+            getComponentByType({
+              component: disableOutputSanitization.component,
+            })}
         </div>
         <div className="flex flex-col gap-1 rounded-xl border border-neutral-100 p-1">
           {(avatar || subject) && (
@@ -59,14 +65,6 @@ export const InAppEditor = ({ uiSchema }: { uiSchema: UiSchema }) => {
             })}
           </InAppTabsSection>
         </>
-      )}
-
-      {disableOutputSanitization && (
-        <InAppTabsSection>
-          {getComponentByType({
-            component: disableOutputSanitization.component,
-          })}
-        </InAppTabsSection>
       )}
     </div>
   );

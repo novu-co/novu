@@ -192,16 +192,13 @@ describe('Generate Preview #novu-v2', () => {
     describe('email specific features', () => {
       describe('show', () => {
         it('show -> should hide element based on payload', async () => {
-          const { stepDatabaseId, workflowId, stepId } = await createWorkflowAndReturnId(
-            workflowsClient,
-            StepTypeEnum.EMAIL
-          );
+          const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(workflowsClient, StepTypeEnum.EMAIL);
           const previewResponseDto = await generatePreview(
             workflowsClient,
             workflowId,
             stepDatabaseId,
             {
-              controlValues: getTestControlValues(stepId)[StepTypeEnum.EMAIL],
+              controlValues: getTestControlValues()[StepTypeEnum.EMAIL],
               previewPayload: { payload: { params: { isPayedUser: 'false' } } },
             },
             'email'
@@ -214,16 +211,13 @@ describe('Generate Preview #novu-v2', () => {
           expect(preview).to.not.contain('should be the fallback value');
         });
         it('show -> should show element based on payload - string', async () => {
-          const { stepDatabaseId, workflowId, stepId } = await createWorkflowAndReturnId(
-            workflowsClient,
-            StepTypeEnum.EMAIL
-          );
+          const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(workflowsClient, StepTypeEnum.EMAIL);
           const previewResponseDto = await generatePreview(
             workflowsClient,
             workflowId,
             stepDatabaseId,
             {
-              controlValues: getTestControlValues(stepId)[StepTypeEnum.EMAIL],
+              controlValues: getTestControlValues()[StepTypeEnum.EMAIL],
               previewPayload: { payload: { params: { isPayedUser: 'true' } } },
             },
             'email'
@@ -280,8 +274,7 @@ describe('Generate Preview #novu-v2', () => {
         });
       });
       describe('for', () => {
-        // TODO: remove skip once we restore for block
-        it.skip('should populate for if payload exist with actual values', async () => {
+        it('should populate for if payload exist with actual values', async () => {
           const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(workflowsClient, StepTypeEnum.EMAIL);
           const name1 = 'ball is round';
           const name2 = 'square is square';

@@ -1,3 +1,5 @@
+import animate from 'tailwindcss-animate';
+
 export const borderRadii = {
   4: '.25rem',
   6: '.375rem',
@@ -670,7 +672,7 @@ export default {
     },
   },
   plugins: [
-    import('tailwindcss-animate'),
+    animate,
     function ({ addUtilities }: { addUtilities: (utilities: Record<string, any>) => void }) {
       addUtilities({
         '.overflow-initial': { overflow: 'initial' },

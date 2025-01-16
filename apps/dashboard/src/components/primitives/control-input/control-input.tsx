@@ -92,9 +92,6 @@ export function ControlInput({
         multiline={multiline}
         indentWithTab={indentWithTab}
         size={size}
-        basicSetup={{
-          defaultKeymap: true,
-        }}
         className={cn('flex-1', { 'overflow-hidden': !multiline })}
         autoFocus={autoFocus}
         placeholder={placeholder}
