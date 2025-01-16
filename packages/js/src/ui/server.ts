@@ -1,7 +1,7 @@
 import { Accessor, ComponentProps, Setter } from 'solid-js';
+import { MountableElement } from 'solid-js/web';
 import { Appearance, Localization, NovuProviderProps, PreferencesFilter, RouterPush, Tab } from './types';
 import { NovuComponentName, novuComponents } from './components/Renderer';
-import { MountableElement } from 'solid-js/web';
 import { NovuOptions } from '../types';
 
 export type { Notification } from '../notifications';
@@ -19,7 +19,9 @@ export class NovuUI {
   #setPreferencesFilter: Setter<PreferencesFilter | undefined>;
   id: string;
 
-  constructor(props: NovuProviderProps) {}
+  constructor(props: NovuProviderProps) {
+    return;
+  }
 
   mountComponent<T extends NovuComponentName>({
     name,
