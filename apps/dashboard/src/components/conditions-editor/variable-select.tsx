@@ -24,98 +24,28 @@ type VariablesListProps = {
   options: Array<{ label: string; value: string }>;
   onSelect: (value: string) => void;
   selectedValue?: string;
+  title: string;
+  hoveredOptionIndex: number;
 };
 
-const VariablesList = React.forwardRef<HTMLInputElement, VariablesListProps>(
-  ({ options, onSelect, selectedValue }, ref) => {
-    const [hoveredOptionIndex, setHoveredOptionIndex] = useState(-1);
-    const listRef = useRef<HTMLUListElement>(null);
-
-    const scrollToOption = (index: number) => {
-      if (!listRef.current) return;
-
-      const listElement = listRef.current;
-      const optionElement = listElement.children[index] as HTMLLIElement;
-
-      if (optionElement) {
-        const containerHeight = listElement.clientHeight;
-        const optionTop = optionElement.offsetTop;
-        const optionHeight = optionElement.clientHeight;
-
-        if (optionTop < listElement.scrollTop) {
-          // Scroll up if option is above visible area
-          listElement.scrollTop = optionTop;
-        } else if (optionTop + optionHeight > listElement.scrollTop + containerHeight) {
-          // Scroll down if option is below visible area
-          listElement.scrollTop = optionTop + optionHeight - containerHeight;
-        }
-      }
-    };
-
-    const next = () => {
-      if (hoveredOptionIndex === -1) {
-        setHoveredOptionIndex(0);
-        scrollToOption(0);
-      } else {
-        setHoveredOptionIndex((oldIndex) => {
-          const newIndex = oldIndex === options.length - 1 ? 0 : oldIndex + 1;
-          scrollToOption(newIndex);
-          return newIndex;
-        });
-      }
-    };
-
-    const prev = () => {
-      if (hoveredOptionIndex === -1) {
-        setHoveredOptionIndex(options.length - 1);
-        scrollToOption(options.length - 1);
-      } else {
-        setHoveredOptionIndex((oldIndex) => {
-          const newIndex = oldIndex === 0 ? options.length - 1 : oldIndex - 1;
-          scrollToOption(newIndex);
-          return newIndex;
-        });
-      }
-    };
-
+const VariablesList = React.forwardRef<HTMLUListElement, VariablesListProps>(
+  ({ options, onSelect, selectedValue, title, hoveredOptionIndex }, ref) => {
     return (
       <div className="flex flex-col">
-        <input
-          className="sr-only"
-          ref={ref}
-          onFocusCapture={() => {
-            setHoveredOptionIndex(0);
-            scrollToOption(0);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'ArrowDown') {
-              next();
-              e.preventDefault();
-            } else if (e.key === 'ArrowUp') {
-              prev();
-              e.preventDefault();
-            } else if (e.key === 'Enter') {
-              if (hoveredOptionIndex !== -1) {
-                onSelect(options[hoveredOptionIndex].value ?? '');
-                setHoveredOptionIndex(-1);
-              }
-            }
-          }}
-        />
         <header className="flex items-center justify-between gap-1 border-b border-neutral-100 bg-neutral-50 p-1">
-          <span className="text-foreground-400 text-paragraph-2xs uppercase">Variables</span>
+          <span className="text-foreground-400 text-paragraph-2xs uppercase">{title}</span>
           <KeyboardItem>{`{`}</KeyboardItem>
         </header>
         <ul
-          ref={listRef}
+          ref={ref}
           // relative is to set offset parent and is important to make the scroll and navigation work
           className="relative flex max-h-[200px] flex-col gap-0.5 overflow-y-auto overflow-x-hidden p-1"
         >
           {options.map((option, index) => (
             <li
               className={cn(
-                'hover:bg-accent text-paragraph-xs flex cursor-pointer items-center gap-1 rounded-sm p-1',
-                hoveredOptionIndex === index ? 'bg-accent' : ''
+                'hover:bg-accent text-paragraph-xs font-code text-foreground-950 flex cursor-pointer items-center gap-1 rounded-sm p-1',
+                hoveredOptionIndex === index ? 'bg-neutral-100' : ''
               )}
               key={option.value}
               value={option.value}
@@ -150,6 +80,7 @@ type VariableSelectProps = {
   options: Array<{ label: string; value: string }>;
   onChange: (value: string) => void;
   leftIcon?: React.ReactNode;
+  title?: string;
 };
 
 /**
@@ -162,11 +93,21 @@ type VariableSelectProps = {
  * - Visual feedback for selected items
  * - Support for custom left icon
  */
-export const VariableSelect = ({ disabled, value, options: optionsProp, onChange, leftIcon }: VariableSelectProps) => {
+export const VariableSelect = ({
+  disabled,
+  value,
+  options: optionsProp,
+  onChange,
+  leftIcon,
+  title = 'Variables',
+}: VariableSelectProps) => {
   const [inputValue, setInputValue] = useState(value ?? '');
   const [filterValue, setFilterValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [options, setOptions] = useState(optionsProp);
+  const [hoveredOptionIndex, setHoveredOptionIndex] = useState(0);
+  const variablesListRef = useRef<HTMLUListElement>(null);
+
   const hasNoInputOption = useMemo(
     () =>
       inputValue !== '' &&
@@ -180,7 +121,6 @@ export const VariableSelect = ({ disabled, value, options: optionsProp, onChange
     return options.filter((option) => option.value?.toLocaleLowerCase().includes(filterValue.toLocaleLowerCase()));
   }, [options, filterValue]);
   const inputRef = useRef<HTMLInputElement>(null);
-  const variablesListRef = useRef<HTMLInputElement>(null);
 
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value.trim();
@@ -190,11 +130,66 @@ export const VariableSelect = ({ disabled, value, options: optionsProp, onChange
     }
   };
 
+  const scrollToOption = (index: number) => {
+    if (!variablesListRef.current) return;
+
+    const listElement = variablesListRef.current;
+    const optionElement = listElement.children[index] as HTMLLIElement;
+
+    if (optionElement) {
+      const containerHeight = listElement.clientHeight;
+      const optionTop = optionElement.offsetTop;
+      const optionHeight = optionElement.clientHeight;
+
+      if (optionTop < listElement.scrollTop) {
+        // Scroll up if option is above visible area
+        listElement.scrollTop = optionTop;
+      } else if (optionTop + optionHeight > listElement.scrollTop + containerHeight) {
+        // Scroll down if option is below visible area
+        listElement.scrollTop = optionTop + optionHeight - containerHeight;
+      }
+    }
+  };
+
+  const next = () => {
+    if (hoveredOptionIndex === -1) {
+      setHoveredOptionIndex(0);
+      scrollToOption(0);
+    } else {
+      setHoveredOptionIndex((oldIndex) => {
+        const newIndex = oldIndex === options.length - 1 ? 0 : oldIndex + 1;
+        scrollToOption(newIndex);
+        return newIndex;
+      });
+    }
+  };
+
+  const prev = () => {
+    if (hoveredOptionIndex === -1) {
+      setHoveredOptionIndex(options.length - 1);
+      scrollToOption(options.length - 1);
+    } else {
+      setHoveredOptionIndex((oldIndex) => {
+        const newIndex = oldIndex === 0 ? options.length - 1 : oldIndex - 1;
+        scrollToOption(newIndex);
+        return newIndex;
+      });
+    }
+  };
+
   const onInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     setIsOpen(true);
-    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    if (e.key === 'ArrowDown') {
+      next();
       e.preventDefault();
-      variablesListRef.current?.focus();
+    } else if (e.key === 'ArrowUp') {
+      prev();
+      e.preventDefault();
+    } else if (e.key === 'Enter') {
+      if (hoveredOptionIndex !== -1) {
+        onSelect(options[hoveredOptionIndex].value ?? '');
+        setHoveredOptionIndex(-1);
+      }
     }
   };
 
@@ -236,6 +231,10 @@ export const VariableSelect = ({ disabled, value, options: optionsProp, onChange
               value={inputValue}
               onClick={onOpen}
               onChange={onInputChange}
+              onFocusCapture={() => {
+                setHoveredOptionIndex(0);
+                scrollToOption(0);
+              }}
               // use blur only when there are no filtered options, otherwise it closes the popover on keyboard navigation
               onBlurCapture={filteredOptions.length === 0 ? onClose : undefined}
               placeholder="Field"
@@ -257,7 +256,14 @@ export const VariableSelect = ({ disabled, value, options: optionsProp, onChange
           }}
           onFocusOutside={onClose}
         >
-          <VariablesList ref={variablesListRef} options={filteredOptions} onSelect={onSelect} selectedValue={value} />
+          <VariablesList
+            ref={variablesListRef}
+            hoveredOptionIndex={hoveredOptionIndex}
+            options={filteredOptions}
+            onSelect={onSelect}
+            selectedValue={value}
+            title={title}
+          />
         </PopoverContent>
       )}
     </Popover>

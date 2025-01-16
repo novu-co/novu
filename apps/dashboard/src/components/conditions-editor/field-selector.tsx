@@ -19,6 +19,7 @@ export const FieldSelector = ({ handleOnChange, options, ...restFieldSelectorPro
       leftIcon={<Code2 className="text-feature size-3 min-w-3" />}
       onChange={handleOnChange}
       options={optionsArray}
+      title="Fields"
       {...restFieldSelectorProps}
     />
   );

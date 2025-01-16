@@ -1,6 +1,5 @@
 import { type CombinatorSelectorProps } from 'react-querybuilder';
 
-import { RepeatRoundLine } from '@/components/icons/repeat-round-line';
 import { Select, SelectContent, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { cn } from '@/utils/ui';
 import { toSelectOptions } from '@/components/conditions-editor/select-option-utils';
@@ -8,14 +7,10 @@ import { toSelectOptions } from '@/components/conditions-editor/select-option-ut
 export const CombinatorSelector = ({ disabled, value, options, handleOnChange }: CombinatorSelectorProps) => {
   return (
     <Select onValueChange={handleOnChange} disabled={disabled} value={value}>
-      <SelectTrigger
-        size="2xs"
-        className={cn('w-18 hover:bg-bg-weak hover:text-text-strong gap-1 text-xs')}
-        rightIcon={<RepeatRoundLine className="text-foreground-600 size-4" />}
-      >
+      <SelectTrigger size="2xs" className={cn('w-18 hover:bg-bg-weak hover:text-text-strong text-label-xs gap-1')}>
         <SelectValue />
       </SelectTrigger>
-      <SelectContent className={cn('min-w-18 gap-1 text-xs')}>{toSelectOptions(options)}</SelectContent>
+      <SelectContent className={cn('min-w-18 text-label-xs gap-1')}>{toSelectOptions(options)}</SelectContent>
     </Select>
   );
 };

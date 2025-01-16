@@ -1,24 +1,13 @@
-import React, { useMemo } from 'react';
-import { autocompletion } from '@codemirror/autocomplete';
+import React from 'react';
 import { useValueEditor, ValueEditorProps } from 'react-querybuilder';
 
-import { completions } from '@/utils/liquid-autocomplete';
 import { InputRoot, InputWrapper } from '@/components/primitives/input';
-import { Editor } from '@/components/primitives/editor';
 import { variables } from '@/components/conditions-editor/conditions-editor';
+import { ControlInput } from '../primitives/control-input/control-input';
 
 export const ValueEditor = React.memo((props: ValueEditorProps) => {
   const { value, handleOnChange, operator, type } = props;
   const { valueAsArray, multiValueHandler } = useValueEditor(props);
-
-  const extensions = useMemo(
-    () => [
-      autocompletion({
-        override: [completions(variables)],
-      }),
-    ],
-    []
-  );
 
   if (operator === 'null' || operator === 'notNull') {
     return null;
@@ -29,14 +18,13 @@ export const ValueEditor = React.memo((props: ValueEditorProps) => {
       return (
         <InputRoot key={key} size="2xs" className="w-28">
           <InputWrapper className="h-7">
-            <Editor
-              fontFamily="inherit"
+            <ControlInput
+              multiline={false}
               indentWithTab={false}
-              placeholder={'value'}
-              className="mt-[4px] overflow-hidden [&_.cm-line]:pl-px"
-              extensions={extensions}
+              placeholder="value"
               value={valueAsArray[i] ?? ''}
               onChange={(newValue) => multiValueHandler(newValue, i)}
+              variables={variables}
             />
           </InputWrapper>
         </InputRoot>
@@ -55,14 +43,13 @@ export const ValueEditor = React.memo((props: ValueEditorProps) => {
   return (
     <InputRoot size="2xs" className="w-40">
       <InputWrapper className="h-7">
-        <Editor
-          fontFamily="inherit"
+        <ControlInput
+          multiline={false}
           indentWithTab={false}
-          placeholder={'value'}
-          className="mt-[4px] overflow-hidden [&_.cm-line]:pl-px"
-          extensions={extensions}
+          placeholder="value"
           value={value ?? ''}
           onChange={handleOnChange}
+          variables={variables}
         />
       </InputWrapper>
     </InputRoot>
