@@ -3,13 +3,13 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Button } from '@/components/primitives/button';
 import { Editor } from '@/components/primitives/editor';
 import { loadLanguage } from '@uiw/codemirror-extensions-langs';
-import { CSSProperties, useEffect, useRef, useState } from 'react';
+import { CSSProperties, useCallback, useEffect, useRef, useState } from 'react';
 
 const extensions = [loadLanguage('json')?.extension ?? []];
 
 type ConfigurePreviewAccordionProps = {
   editorValue: string;
-  setEditorValue: (value: string) => void;
+  setEditorValue: (value: string) => Error | null;
   onUpdate: () => void;
 };
 
@@ -19,7 +19,7 @@ export const ConfigurePreviewAccordion = ({
   onUpdate,
 }: ConfigurePreviewAccordionProps) => {
   const [accordionValue, setAccordionValue] = useState<string | undefined>('payload');
-  const [payloadError, setPayloadError] = useState('');
+  const [payloadError, setPayloadError] = useState<string | null>(null);
   const [height, setHeight] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -33,6 +33,18 @@ export const ConfigurePreviewAccordion = ({
 
     return () => clearTimeout(timeout);
   }, [editorValue]);
+
+  const setEditorValueCallback = useCallback(
+    (value: string) => {
+      const error = setEditorValue(value);
+      if (error) {
+        setPayloadError(error.message);
+      } else {
+        setPayloadError(null);
+      }
+    },
+    [setEditorValue]
+  );
 
   return (
     <Accordion type="single" collapsible value={accordionValue} onValueChange={setAccordionValue}>
@@ -50,7 +62,7 @@ export const ConfigurePreviewAccordion = ({
         >
           <Editor
             value={editorValue}
-            onChange={setEditorValue}
+            onChange={setEditorValueCallback}
             lang="json"
             extensions={extensions}
             className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 rounded-lg border border-dashed p-3"
@@ -62,14 +74,8 @@ export const ConfigurePreviewAccordion = ({
             variant="secondary"
             mode="outline"
             className="self-end"
-            onClick={() => {
-              try {
-                onUpdate();
-                setPayloadError('');
-              } catch (e) {
-                setPayloadError(String(e));
-              }
-            }}
+            disabled={payloadError !== null}
+            onClick={onUpdate}
           >
             Apply
           </Button>
