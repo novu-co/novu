@@ -197,7 +197,7 @@ export class ActivityNotificationExecutionDetailResponseDto {
   providerId: ProvidersIdEnum;
 
   @ApiPropertyOptional({ description: 'Raw data of the execution', type: String })
-  raw?: string;
+  raw?: string | null;
 
   @ApiProperty({
     enum: [...Object.values(ExecutionDetailsSourceEnum)],
@@ -260,6 +260,9 @@ export class ActivityNotificationSubscriberResponseDto {
   firstName?: string;
 
   @ApiProperty({ description: 'External unique identifier of the subscriber', type: String })
+  subscriberId: string;
+
+  @ApiProperty({ description: 'Internal to Novu unique identifier of the subscriber', type: String })
   _id: string;
 
   @ApiPropertyOptional({ description: 'Last name of the subscriber', type: String })

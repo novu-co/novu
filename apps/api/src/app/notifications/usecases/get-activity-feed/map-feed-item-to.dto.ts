@@ -4,6 +4,8 @@ import {
   NotificationFeedItemEntity,
   NotificationStepEntity,
   StepFilter,
+  SubscriberFeedItem,
+  TemplateFeedItem,
 } from '@novu/dal';
 import {
   DigestTypeEnum,
@@ -15,15 +17,7 @@ import {
   ProvidersIdEnum,
   StepTypeEnum,
 } from '@novu/shared';
-import {
-  ActivityNotificationExecutionDetailResponseDto,
-  ActivityNotificationJobResponseDto,
-  ActivityNotificationResponseDto,
-  ActivityNotificationStepResponseDto,
-  ActivityNotificationSubscriberResponseDto,
-  ActivityNotificationTemplateResponseDto,
-  DigestMetadataDto,
-} from '../../dtos/activities-response.dto';
+import { MessageTemplateDto } from '../../../shared/dtos/message.template.dto';
 import {
   FieldFilterPartDto,
   FilterPartsDto,
@@ -34,23 +28,32 @@ import {
   TenantFilterPartDto,
   WebhookFilterPartDto,
 } from '../../../shared/dtos/step-filter-dto';
-import { MessageTemplateDto } from '../../../shared/dtos/message.template.dto';
+import {
+  ActivityNotificationExecutionDetailResponseDto,
+  ActivityNotificationJobResponseDto,
+  ActivityNotificationResponseDto,
+  ActivityNotificationStepResponseDto,
+  ActivityNotificationSubscriberResponseDto,
+  ActivityNotificationTemplateResponseDto,
+  DigestMetadataDto,
+} from '../../dtos/activities-response.dto';
 
-function buildSubscriberDto(entity: NotificationFeedItemEntity): ActivityNotificationSubscriberResponseDto {
+function buildSubscriberDto(subscriber: SubscriberFeedItem): ActivityNotificationSubscriberResponseDto {
   return {
-    _id: entity.subscriber._id,
-    email: entity.subscriber.email,
-    firstName: entity.subscriber.firstName,
-    lastName: entity.subscriber.lastName,
-    phone: entity.subscriber.phone,
+    _id: subscriber._id,
+    subscriberId: subscriber.subscriberId,
+    email: subscriber.email,
+    firstName: subscriber.firstName,
+    lastName: subscriber.lastName,
+    phone: subscriber.phone,
   };
 }
 
-function buildTemplate(entity: NotificationFeedItemEntity): ActivityNotificationTemplateResponseDto {
+function buildTemplate(template: TemplateFeedItem): ActivityNotificationTemplateResponseDto {
   return {
-    _id: entity.template._id,
-    name: entity.template.name,
-    triggers: entity.template.triggers,
+    _id: template._id,
+    name: template.name,
+    triggers: template.triggers,
   };
 }
 
@@ -71,8 +74,8 @@ export function mapFeedItemToDto(entity: NotificationFeedItemEntity): ActivityNo
     controls: entity.controls,
     payload: entity.payload,
     to: entity.to,
-    subscriber: buildSubscriberDto(entity),
-    template: buildTemplate(entity),
+    subscriber: entity.subscriber ? buildSubscriberDto(entity.subscriber) : undefined,
+    template: entity.template ? buildTemplate(entity.template) : undefined,
   };
 }
 
@@ -249,6 +252,7 @@ function convertExecutionDetail(entity: ExecutionDetailFeedItem): ActivityNotifi
     providerId: entity.providerId as unknown as ProvidersIdEnum,
     source: entity.source,
     status: entity.status,
+    raw: entity.raw || undefined,
     createdAt: entity.createdAt,
   };
 }

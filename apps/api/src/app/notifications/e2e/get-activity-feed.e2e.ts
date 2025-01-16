@@ -1,4 +1,4 @@
-import { NotificationTemplateEntity, SubscriberRepository } from '@novu/dal';
+import { NotificationTemplateEntity, NotificationTemplateRepository, SubscriberRepository } from '@novu/dal';
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
 import { StepTypeEnum } from '@novu/shared';
@@ -238,5 +238,39 @@ describe('Get activity feed - /notifications (GET) #novu-v2', async () => {
 
     expect(activities.length).to.equal(1);
     expect(activities[0].template?.id, JSON.stringify(template)).to.equal(template._id);
+  });
+
+  it('should return with deleted workflow and subscriber data', async function () {
+    const notificationTemplateRepository = new NotificationTemplateRepository();
+    const subscriberRepository = new SubscriberRepository();
+    const templateToDelete = await session.createTemplate();
+    const subscriberIdToDelete = `${SubscriberRepository.createObjectId()}`;
+
+    await novuClient.trigger({
+      name: templateToDelete.triggers[0].identifier,
+      to: subscriberIdToDelete,
+      payload: { firstName: 'Test' },
+    });
+
+    await session.awaitRunningJobs(templateToDelete._id);
+
+    await notificationTemplateRepository.delete({ _id: templateToDelete._id, _environmentId: session.environment._id });
+    const subscriberToDelete = await subscriberRepository.findOne({
+      subscriberId: subscriberIdToDelete,
+      _environmentId: session.environment._id,
+    });
+    await subscriberRepository.delete({ _id: subscriberToDelete?._id, _environmentId: session.environment._id });
+
+    const body = await novuClient.notifications.list({ page: 0 });
+    const activities = body.result;
+
+    expect(activities.hasMore).to.equal(false);
+    expect(activities.data.length, JSON.stringify(body.result)).to.equal(1);
+    const activity = activities.data[0];
+
+    expect(activity.template).to.be.undefined;
+    expect(activity.subscriber).to.be.undefined;
+    expect(activity.channels).to.be.ok;
+    expect(activity.channels).to.include.oneOf(Object.keys(ChannelTypeEnum).map((i) => ChannelTypeEnum[i]));
   });
 });

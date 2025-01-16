@@ -35,7 +35,7 @@ import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema
 import { Variable } from '../../util/template-parser/liquid-parser';
 import { isObjectTipTapNode } from '../../util/tip-tap.util';
 import { buildVariables } from '../../util/build-variables';
-import { keysToObject, multiplyArrayItems } from '../../util/utils';
+import { keysToObject, mergeCommonObjectKeys, multiplyArrayItems } from '../../util/utils';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
@@ -152,21 +152,26 @@ export class GeneratePreviewUsecase {
     previewTemplateData: { variablesExample: {}; controlValues: {} },
     commandVariablesExample: PreviewPayload | undefined
   ) {
-    let finalVariablesExample = {};
+    let { variablesExample } = previewTemplateData;
+
     if (workflow.origin === WorkflowOriginEnum.EXTERNAL) {
       // if external workflow, we need to override with stored payload schema
-      const tmp = createMockObjectFromSchema({
+      const schemaBasedVariables = createMockObjectFromSchema({
         type: 'object',
         properties: { payload: workflow.payloadSchema },
       });
-      finalVariablesExample = { ...previewTemplateData.variablesExample, ...tmp };
-    } else {
-      finalVariablesExample = previewTemplateData.variablesExample;
+      variablesExample = _.merge(variablesExample, schemaBasedVariables);
     }
 
-    finalVariablesExample = _.merge(finalVariablesExample, commandVariablesExample || {});
+    if (commandVariablesExample && Object.keys(commandVariablesExample).length > 0) {
+      // merge only values of common keys between variablesExample and commandVariablesExample
+      variablesExample = mergeCommonObjectKeys(
+        variablesExample as Record<string, unknown>,
+        commandVariablesExample as Record<string, unknown>
+      );
+    }
 
-    return finalVariablesExample;
+    return variablesExample;
   }
 
   private async initializePreviewContext(command: GeneratePreviewCommand) {

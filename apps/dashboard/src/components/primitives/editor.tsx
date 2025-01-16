@@ -153,7 +153,7 @@ export const Editor = React.forwardRef<{ focus: () => void; blur: () => void }, 
         lineNumbers: false,
         foldGutter: false,
         highlightActiveLine: false,
-        defaultKeymap: !multiline,
+        defaultKeymap: multiline,
         ...((typeof basicSetupProp === 'object' ? basicSetupProp : {}) ?? {}),
       }),
       [basicSetupProp, multiline]
