@@ -32,10 +32,10 @@ export const DeleteEnvironmentDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete environment</DialogTitle>
+          <DialogTitle>Delete Environment</DialogTitle>
           <DialogDescription>
             Are you sure you want to delete the environment <span className="font-bold">{environment.name}</span>? This
-            action cannot be undone.
+            action cannot be undone and it will break all the integrations that are using this environment.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -43,7 +43,7 @@ export const DeleteEnvironmentDialog = ({
             Cancel
           </Button>
           <Button variant="error" mode="gradient" onClick={onConfirm} isLoading={isLoading}>
-            Delete environment
+            Delete {environment.name}
           </Button>
         </DialogFooter>
       </DialogContent>

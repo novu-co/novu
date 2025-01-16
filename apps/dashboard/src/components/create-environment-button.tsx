@@ -95,6 +95,7 @@ export const CreateEnvironmentButton = (props: CreateEnvironmentButtonProps) => 
       });
 
       setIsOpen(false);
+
       form.reset({
         name: '',
         color: getRandomColor(environments),
@@ -109,9 +110,10 @@ export const CreateEnvironmentButton = (props: CreateEnvironmentButtonProps) => 
 
   const handleClick = () => {
     if (!canCreateEnvironment) {
-      navigate(ROUTES.MANAGE_ACCOUNT_BILLING);
+      navigate(ROUTES.SETTINGS_BILLING);
       return;
     }
+
     setIsOpen(true);
   };
 

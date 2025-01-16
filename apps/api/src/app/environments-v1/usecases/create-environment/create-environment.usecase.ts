@@ -6,6 +6,8 @@ import { encryptApiKey } from '@novu/application-generic';
 import { EnvironmentRepository, NotificationGroupRepository } from '@novu/dal';
 
 import { EnvironmentEnum, PROTECTED_ENVIRONMENTS } from '@novu/shared';
+import { CreateNovuIntegrationsCommand } from '../../../integrations/usecases/create-novu-integrations/create-novu-integrations.command';
+import { CreateNovuIntegrations } from '../../../integrations/usecases/create-novu-integrations/create-novu-integrations.usecase';
 import { CreateDefaultLayout, CreateDefaultLayoutCommand } from '../../../layouts/usecases';
 import { GenerateUniqueApiKey } from '../generate-unique-api-key/generate-unique-api-key.usecase';
 import { CreateEnvironmentCommand } from './create-environment.command';
@@ -16,7 +18,8 @@ export class CreateEnvironment {
     private environmentRepository: EnvironmentRepository,
     private notificationGroupRepository: NotificationGroupRepository,
     private generateUniqueApiKey: GenerateUniqueApiKey,
-    private createDefaultLayoutUsecase: CreateDefaultLayout
+    private createDefaultLayoutUsecase: CreateDefaultLayout,
+    private createNovuIntegrationsUsecase: CreateNovuIntegrations
   ) {}
 
   async execute(command: CreateEnvironmentCommand) {
@@ -93,6 +96,14 @@ export class CreateEnvironment {
         _parentId: group?._id,
       });
     }
+
+    await this.createNovuIntegrationsUsecase.execute(
+      CreateNovuIntegrationsCommand.create({
+        environmentId: environment._id,
+        organizationId: environment._organizationId,
+        userId: command.userId,
+      })
+    );
 
     return environment;
   }

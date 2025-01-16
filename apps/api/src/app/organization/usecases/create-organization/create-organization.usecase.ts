@@ -13,7 +13,6 @@ import { AddMemberCommand } from '../membership/add-member/add-member.command';
 import { AddMember } from '../membership/add-member/add-member.usecase';
 import { CreateOrganizationCommand } from './create-organization.command';
 
-import { CreateNovuIntegrationsCommand } from '../../../integrations/usecases/create-novu-integrations/create-novu-integrations.command';
 import { CreateNovuIntegrations } from '../../../integrations/usecases/create-novu-integrations/create-novu-integrations.usecase';
 import { ApiException } from '../../../shared/exceptions/api.exception';
 
@@ -65,29 +64,13 @@ export class CreateOrganization {
       })
     );
 
-    await this.createNovuIntegrations.execute(
-      CreateNovuIntegrationsCommand.create({
-        environmentId: devEnv._id,
-        organizationId: devEnv._organizationId,
-        userId: user._id,
-      })
-    );
-
-    const prodEnv = await this.createEnvironmentUsecase.execute(
+    await this.createEnvironmentUsecase.execute(
       CreateEnvironmentCommand.create({
         userId: user._id,
         name: EnvironmentEnum.PRODUCTION,
         organizationId: createdOrganization._id,
         parentEnvironmentId: devEnv._id,
         system: true,
-      })
-    );
-
-    await this.createNovuIntegrations.execute(
-      CreateNovuIntegrationsCommand.create({
-        environmentId: prodEnv._id,
-        organizationId: prodEnv._organizationId,
-        userId: user._id,
       })
     );
 
@@ -134,9 +117,11 @@ export class CreateOrganization {
         if (!require('@novu/ee-billing')?.StartReverseFreeTrial) {
           throw new BadRequestException('Billing module is not loaded');
         }
+
         const usecase = this.moduleRef.get(require('@novu/ee-billing')?.StartReverseFreeTrial, {
           strict: false,
         });
+
         await usecase.execute({
           userId,
           organizationId,
