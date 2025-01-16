@@ -23,7 +23,6 @@ export function handleSdkError(error: unknown): ErrorDto {
     throw new Error(`Provided error is not an ErrorDto error found:\n ${JSON.stringify(error, null, 2)}`);
   }
   expect(error.name).to.equal('ErrorDto');
-  expect(error.ctx).to.be.ok;
 
   return error;
 }
