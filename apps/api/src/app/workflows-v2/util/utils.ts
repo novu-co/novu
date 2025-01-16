@@ -282,7 +282,7 @@ export function mergeCommonObjectKeys(
         );
       } else {
         // Otherwise, use the target value if it exists, otherwise use the source value
-        merged[key] = targetValue ?? sourceValue;
+        merged[key] = sourceValue ?? targetValue;
       }
 
       return merged;
