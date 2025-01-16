@@ -199,7 +199,6 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview #novu-v
           body: 'This is a body',
         },
         primaryUrlLabel: 'https://example.com',
-        organizationName: 'Novu',
       },
     };
     const { status, body } = await session.testAgent.post(`/v2/workflows/${workflow._id}/step/${stepId}/preview`).send({
@@ -247,7 +246,6 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview #novu-v
             body: 'This is a body',
           },
           primaryUrlLabel: 'https://example.com',
-          organizationName: 'Novu',
         },
       },
     });
@@ -409,7 +407,8 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview #novu-v
       result: {
         preview: {
           subject: 'Welcome John',
-          body: 'Hello John, your order #undefined is ready!', // orderId is not defined in the payload schema or clientVariablesExample
+          // missing orderId will be replaced with placeholder "{{payload.orderId}}"
+          body: 'Hello John, your order #{{payload.orderId}} is ready!',
         },
         type: 'in_app',
       },
@@ -418,6 +417,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview #novu-v
           lastName: '{{payload.lastName}}',
           organizationName: '{{payload.organizationName}}',
           firstName: 'John',
+          orderId: '{{payload.orderId}}',
         },
       },
     });
