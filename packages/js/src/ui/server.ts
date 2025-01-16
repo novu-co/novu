@@ -19,9 +19,9 @@ export class NovuUI {
   #setPreferencesFilter: Setter<PreferencesFilter | undefined>;
   id: string;
 
-  constructor(props: NovuProviderProps) {
-    return;
-  }
+  /* eslint-disable  @typescript-eslint/no-useless-constructor */
+  /* eslint-disable    @typescript-eslint/no-empty-function */
+  constructor(props: NovuProviderProps) {}
 
   mountComponent<T extends NovuComponentName>({
     name,
