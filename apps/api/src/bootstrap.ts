@@ -99,7 +99,7 @@ export async function bootstrap(expressApp?): Promise<INestApplication> {
   await setupSwagger(app);
 
   app.useGlobalFilters(new AllExceptionsFilter(app.get(PinoLogger)));
-  Logger.log('BOOTSTRAPPED SUCCESSFULLY');
+
   if (expressApp) {
     await app.init();
   } else {

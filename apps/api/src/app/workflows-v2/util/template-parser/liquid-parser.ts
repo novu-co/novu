@@ -166,13 +166,16 @@ function extractProps(template: any): { valid: boolean; props: string[]; error?:
    * Invalid: {{user.first name}} - postfix length would be 2 due to space
    */
   if (initial.postfix.length > 1) {
-    return { valid: false, props: [], error: 'Variables with spaces are not supported' };
+    return {
+      valid: false,
+      props: [],
+      error: 'Invalid variable name containing whitespaces. Variables must follow the dot notation',
+    };
   }
 
   const validProps: string[] = [];
 
   for (const prop of initial.postfix[0].props) {
-    if (prop.constructor.name !== 'IdentifierToken') break;
     validProps.push(prop.content);
   }
 
@@ -188,7 +191,7 @@ function extractProps(template: any): { valid: boolean; props: string[]; error?:
     return {
       valid: false,
       props: [],
-      error: `Variables must include a namespace (e.g. payload.${validProps[0]})`,
+      error: `Invalid variable name missing namespace. Variables must follow the dot notation (e.g. payload.${validProps[0]})`,
     };
   }
 

@@ -1,4 +1,4 @@
-import { FieldEditor } from '@/components/primitives/field-editor';
+import { ControlInput } from '@/components/primitives/control-input';
 import { FormControl, FormField, FormItem, FormMessage } from '@/components/primitives/form/form';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
@@ -21,9 +21,8 @@ export const EmailSubject = () => {
         <>
           <FormItem className="w-full">
             <FormControl>
-              <FieldEditor
+              <ControlInput
                 size="lg"
-                singleLine
                 indentWithTab={false}
                 autoFocus={!field.value}
                 placeholder={capitalize(field.name)}

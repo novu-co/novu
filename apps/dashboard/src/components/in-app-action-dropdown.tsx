@@ -5,7 +5,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/primitives/dropdown-menu';
-import { Editor } from '@/components/primitives/editor';
 import {
   FormControl,
   FormField,
@@ -14,22 +13,20 @@ import {
   FormMessage,
   FormMessagePure,
 } from '@/components/primitives/form/form';
-import { InputField } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
 import { URLInput } from '@/components/workflow-editor/url-input';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { cn } from '@/utils/ui';
 import { urlTargetTypes } from '@/utils/url';
-import { autocompletion } from '@codemirror/autocomplete';
-import { EditorView } from '@uiw/react-codemirror';
 import merge from 'lodash.merge';
 import { ComponentProps, useMemo } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { RiEdit2Line, RiExpandUpDownLine, RiForbid2Line } from 'react-icons/ri';
 import { CompactButton } from './primitives/button-compact';
+import { ControlInput } from './primitives/control-input';
+import { InputRoot, InputWrapper } from './primitives/input';
 
 const primaryActionKey = 'primaryAction';
 const secondaryActionKey = 'secondaryAction';
@@ -56,6 +53,7 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
           <div className="border-neutral-alpha-200 relative flex min-h-10 w-full flex-wrap items-center justify-end gap-1 rounded-md border p-1 shadow-sm">
             {!primaryAction && !secondaryAction && (
               <Button
+                variant="secondary"
                 mode="outline"
                 size="2xs"
                 className="h-6 border-[1px] border-dashed shadow-none ring-0"
@@ -65,14 +63,14 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
               </Button>
             )}
             {primaryAction && (
-              <ConfigureActionPopover asChild fields={{ actionKey: primaryActionKey }}>
+              <ConfigureActionPopover fields={{ actionKey: primaryActionKey }}>
                 <Button variant="primary" size="2xs" className="z-10 h-6">
                   {primaryAction.label}
                 </Button>
               </ConfigureActionPopover>
             )}
             {secondaryAction && (
-              <ConfigureActionPopover asChild fields={{ actionKey: secondaryActionKey }}>
+              <ConfigureActionPopover fields={{ actionKey: secondaryActionKey }}>
                 <Button variant="secondary" mode="outline" size="2xs" className="z-10 h-6">
                   {secondaryAction.label}
                 </Button>
@@ -80,7 +78,7 @@ export const InAppActionDropdown = ({ onMenuItemClick }: { onMenuItemClick?: () 
             )}
             <DropdownMenuTrigger className="absolute size-full" />
           </div>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger>
             <CompactButton icon={RiExpandUpDownLine} size="lg" variant="ghost">
               <span className="sr-only">Actions</span>
             </CompactButton>
@@ -172,41 +170,38 @@ const ConfigureActionPopover = (props: ComponentProps<typeof PopoverTrigger> & {
   const { control } = useFormContext();
   const { step } = useWorkflow();
   const variables = useMemo(() => (step ? parseStepVariablesToLiquidVariables(step.variables) : []), [step]);
-  const extensions = useMemo(
-    () => [autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping],
-    [variables]
-  );
 
   return (
     <Popover>
       <PopoverTrigger {...rest} />
-      <PopoverContent className="max-w-72" side="bottom" align="end">
+      <PopoverContent className="max-w-72 overflow-visible" side="bottom" align="end">
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 text-sm font-medium leading-none">
             <RiEdit2Line className="size-4" /> Customize button
           </div>
-          <Separator decorative />
+          <Separator />
           <FormField
             control={control}
             name={`${actionKey}.label`}
             defaultValue=""
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem>
                 <div className="flex items-center gap-1">
                   <FormLabel>Button text</FormLabel>
                 </div>
                 <FormControl>
-                  <InputField size="fit">
-                    <Editor
-                      singleLine
-                      indentWithTab={false}
-                      fontFamily="inherit"
-                      placeholder="Button text"
-                      value={field.value}
-                      onChange={field.onChange}
-                      extensions={extensions}
-                    />
-                  </InputField>
+                  <InputRoot className="overflow-visible" hasError={!!fieldState.error}>
+                    <InputWrapper className="flex h-9 items-center px-2.5">
+                      <ControlInput
+                        variables={variables}
+                        multiline={false}
+                        indentWithTab={false}
+                        placeholder="Button text"
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </InputWrapper>
+                  </InputRoot>
                 </FormControl>
                 <FormMessage />
               </FormItem>

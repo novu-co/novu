@@ -1,16 +1,14 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ComponentProps, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { RiArrowRightSLine } from 'react-icons/ri';
-import { ExternalLink } from '@/components/shared/external-link';
-import { useNavigate } from 'react-router-dom';
-import { z } from 'zod';
-import { type CreateWorkflowDto, WorkflowCreationSourceEnum, slugify } from '@novu/shared';
 import { createWorkflow } from '@/api/workflows';
 import { Button } from '@/components/primitives/button';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/primitives/form/form';
-import { Input, InputField } from '@/components/primitives/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormInput,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/primitives/form/form';
 import { Separator } from '@/components/primitives/separator';
 import {
   Sheet,
@@ -24,14 +22,23 @@ import {
 } from '@/components/primitives/sheet';
 import { TagInput } from '@/components/primitives/tag-input';
 import { Textarea } from '@/components/primitives/textarea';
+import { ExternalLink } from '@/components/shared/external-link';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useTags } from '@/hooks/use-tags';
 import { QueryKeys } from '@/utils/query-keys';
 import { buildRoute, ROUTES } from '@/utils/routes';
-import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { type CreateWorkflowDto, slugify, WorkflowCreationSourceEnum } from '@novu/shared';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { ComponentProps, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { RiArrowRightSLine } from 'react-icons/ri';
+import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 import { MAX_DESCRIPTION_LENGTH, MAX_TAG_ELEMENTS, workflowSchema } from './workflow-editor/schema';
 
 type CreateWorkflowButtonProps = ComponentProps<typeof SheetTrigger>;
+
 export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -102,19 +109,16 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel required>Name</FormLabel>
                     <FormControl>
-                      <InputField>
-                        <Input
-                          {...field}
-                          autoFocus
-                          {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
-                          onChange={(e) => {
-                            field.onChange(e);
-                            form.setValue('workflowId', slugify(e.target.value));
-                          }}
-                        />
-                      </InputField>
+                      <FormInput
+                        {...field}
+                        autoFocus
+                        onChange={(e) => {
+                          field.onChange(e);
+                          form.setValue('workflowId', slugify(e.target.value));
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -126,18 +130,16 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 name="workflowId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Identifier</FormLabel>
+                    <FormLabel required>Identifier</FormLabel>
                     <FormControl>
-                      <InputField>
-                        <Input {...field} readOnly />
-                      </InputField>
+                      <FormInput {...field} disabled />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <Separator className="bg-neutral-alpha-100" />
+              <Separator />
 
               <FormField
                 control={form.control}
@@ -145,7 +147,9 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-1">
-                      <FormLabel hint={`(max. ${MAX_TAG_ELEMENTS})`}>Add tags</FormLabel>
+                      <FormLabel optional hint={`(max. ${MAX_TAG_ELEMENTS})`}>
+                        Add tags
+                      </FormLabel>
                     </div>
                     <FormControl>
                       <TagInput
@@ -173,9 +177,9 @@ export const CreateWorkflowButton = (props: CreateWorkflowButtonProps) => {
                     </div>
                     <FormControl>
                       <Textarea
-                        className="min-h-36"
                         placeholder="Describe what this workflow does"
                         {...field}
+                        showCounter
                         maxLength={MAX_DESCRIPTION_LENGTH}
                       />
                     </FormControl>

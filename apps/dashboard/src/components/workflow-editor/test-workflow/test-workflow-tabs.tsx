@@ -1,24 +1,22 @@
-import { useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { RiPlayCircleLine } from 'react-icons/ri';
-// eslint-disable-next-line
-// @ts-ignore
-import { TestWorkflowLogsSidebar } from './test-workflow-logs-sidebar';
-import { createMockObjectFromSchema } from '@novu/shared';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/primitives/resizable';
 import { ToastClose, ToastIcon } from '@/components/primitives/sonner';
 import { useFetchWorkflow } from '@/hooks/use-fetch-workflow';
 import { useTriggerWorkflow } from '@/hooks/use-trigger-workflow';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type WorkflowTestDataResponseDto } from '@novu/shared';
+import { createMockObjectFromSchema, type WorkflowTestDataResponseDto } from '@novu/shared';
+import { useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { RiPlayCircleLine } from 'react-icons/ri';
+import { Link, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Button } from '../../primitives/button';
 import { Form } from '../../primitives/form/form';
 import { showToast } from '../../primitives/sonner-helpers';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../primitives/tabs';
 import { buildDynamicFormSchema, TestWorkflowFormType } from '../schema';
 import { TestWorkflowForm } from './test-workflow-form';
-import { Button } from '../../primitives/button';
+import { TestWorkflowLogsSidebar } from './test-workflow-logs-sidebar';
 
 export const TestWorkflowTabs = ({ testData }: { testData?: WorkflowTestDataResponseDto }) => {
   const { environmentSlug = '', workflowSlug = '' } = useParams<{ environmentSlug: string; workflowSlug: string }>();
@@ -75,47 +73,58 @@ export const TestWorkflowTabs = ({ testData }: { testData?: WorkflowTestDataResp
   return (
     <div className="h-full w-full">
       <Form {...form}>
-        <form onSubmit={handleSubmit(onSubmit)} className="roun flex h-full flex-1 flex-nowrap">
-          <Tabs defaultValue="workflow" className="-mt-[1px] flex flex-1 flex-col" value="trigger">
-            <TabsList variant="regular" className="items-center">
-              <TabsTrigger value="workflow" asChild variant="regular">
-                <Link
-                  to={buildRoute(ROUTES.EDIT_WORKFLOW, {
-                    environmentSlug,
-                    workflowSlug,
-                  })}
+        <form onSubmit={handleSubmit(onSubmit)} className="flex h-full flex-1">
+          <ResizablePanelGroup direction="horizontal">
+            <ResizablePanel defaultSize={70} minSize={40} className="h-full">
+              <Tabs defaultValue="workflow" className="-mt-[1px] flex h-full flex-1 flex-col" value="trigger">
+                <TabsList variant="regular" className="items-center">
+                  <TabsTrigger value="workflow" asChild variant="regular">
+                    <Link
+                      to={buildRoute(ROUTES.EDIT_WORKFLOW, {
+                        environmentSlug,
+                        workflowSlug,
+                      })}
+                    >
+                      Workflow
+                    </Link>
+                  </TabsTrigger>
+                  <TabsTrigger value="trigger" asChild variant="regular">
+                    <Link
+                      to={buildRoute(ROUTES.TEST_WORKFLOW, {
+                        environmentSlug,
+                        workflowSlug,
+                      })}
+                    >
+                      Trigger
+                    </Link>
+                  </TabsTrigger>
+                  <div className="my-auto ml-auto flex items-center gap-2">
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      size="xs"
+                      mode="gradient"
+                      isLoading={isPending}
+                      leadingIcon={RiPlayCircleLine}
+                    >
+                      Test workflow
+                    </Button>
+                  </div>
+                </TabsList>
+                <TabsContent
+                  value="trigger"
+                  className="mt-0 flex w-full flex-1 flex-col overflow-hidden"
+                  variant="regular"
                 >
-                  Workflow
-                </Link>
-              </TabsTrigger>
-              <TabsTrigger value="trigger" asChild variant="regular">
-                <Link
-                  to={buildRoute(ROUTES.TEST_WORKFLOW, {
-                    environmentSlug,
-                    workflowSlug,
-                  })}
-                >
-                  Trigger
-                </Link>
-              </TabsTrigger>
-              <div className="my-auto ml-auto flex items-center gap-2">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="xs"
-                  mode="gradient"
-                  isLoading={isPending}
-                  leadingIcon={RiPlayCircleLine}
-                >
-                  Test workflow
-                </Button>
-              </div>
-            </TabsList>
-            <TabsContent value="trigger" className="mt-0 flex w-full flex-1 flex-col overflow-hidden" variant="regular">
-              <TestWorkflowForm workflow={workflow} />
-            </TabsContent>
-          </Tabs>
-          <TestWorkflowLogsSidebar transactionId={transactionId} />
+                  <TestWorkflowForm workflow={workflow} />
+                </TabsContent>
+              </Tabs>
+            </ResizablePanel>
+            <ResizableHandle />
+            <ResizablePanel defaultSize={30} minSize={30} maxSize={50}>
+              <TestWorkflowLogsSidebar transactionId={transactionId} />
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </form>
       </Form>
     </div>

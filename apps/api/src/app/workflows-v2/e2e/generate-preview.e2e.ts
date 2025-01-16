@@ -14,7 +14,7 @@ import { EnvironmentRepository, NotificationTemplateEntity, NotificationTemplate
 
 const TEST_WORKFLOW_NAME = 'Test Workflow Name';
 
-describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () => {
+describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview #novu-v2', () => {
   let session: UserSession;
   let workflowsClient: ReturnType<typeof createWorkflowClient>;
   const notificationTemplateRepository = new NotificationTemplateRepository();
@@ -199,7 +199,6 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
           body: 'This is a body',
         },
         primaryUrlLabel: 'https://example.com',
-        organizationName: 'Novu',
       },
     };
     const { status, body } = await session.testAgent.post(`/v2/workflows/${workflow._id}/step/${stepId}/preview`).send({
@@ -247,7 +246,6 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
             body: 'This is a body',
           },
           primaryUrlLabel: 'https://example.com',
-          organizationName: 'Novu',
         },
       },
     });
@@ -409,7 +407,8 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
       result: {
         preview: {
           subject: 'Welcome John',
-          body: 'Hello John, your order #undefined is ready!', // orderId is not defined in the payload schema or clientVariablesExample
+          // missing orderId will be replaced with placeholder "{{payload.orderId}}"
+          body: 'Hello John, your order #{{payload.orderId}} is ready!',
         },
         type: 'in_app',
       },
@@ -418,6 +417,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
           lastName: '{{payload.lastName}}',
           organizationName: '{{payload.organizationName}}',
           firstName: 'John',
+          orderId: '{{payload.orderId}}',
         },
       },
     });
@@ -567,9 +567,8 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
     expect(status).to.equal(201);
     expect(body.data.result.type).to.equal('email');
     expect(body.data.result.preview.subject).to.equal('Hello {{subscriber.firstName}} World!');
-    expect(body.data.result.preview.body).to.include('{{subscriber.lastName}}');
+    expect(body.data.result.preview.body).to.not.include('{{subscriber.lastName}}');
     expect(body.data.result.preview.body).to.include('{{payload.foo}}');
-    // expect(body.data.result.preview.body).to.include('{{payload.show}}');
     expect(body.data.result.preview.body).to.include('{{payload.extraData}}');
     expect(body.data.previewPayloadExample).to.deep.equal({
       subscriber: {
@@ -640,7 +639,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
         },
         payload: {
           foo: 'foo from client',
-          show: false,
+          show: true,
           extraData: '',
         },
       },
@@ -659,7 +658,7 @@ describe('Workflow Step Preview - POST /:workflowId/step/:stepId/preview', () =>
       },
       payload: {
         foo: 'foo from client',
-        show: false,
+        show: true,
         extraData: '',
       },
     });
