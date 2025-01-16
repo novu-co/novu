@@ -20,7 +20,7 @@
     ".": {
       "import": {
         "types": "./dist/client/index.d.mts",
-        "default": "./dist/server/server.mjs"
+        "default": "./dist/server/server.js"
       },
       "require": {
         "types": "./dist/server/server.d.ts",
