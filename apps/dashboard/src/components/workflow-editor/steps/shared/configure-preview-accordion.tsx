@@ -53,6 +53,7 @@ export const ConfigurePreviewAccordion = ({
             onChange={setEditorValue}
             lang="json"
             extensions={extensions}
+            multiline
             className="border-neutral-alpha-200 bg-background text-foreground-600 mx-0 mt-0 rounded-lg border border-dashed p-3"
           />
           {payloadError && <p className="text-destructive text-xs">{payloadError}</p>}

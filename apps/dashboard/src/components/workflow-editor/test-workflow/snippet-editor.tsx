@@ -34,6 +34,7 @@ export const SnippetEditor = ({
       value={value}
       extensions={extensions}
       basicSetup={basicSetup}
+      multiline
     />
   );
 };
