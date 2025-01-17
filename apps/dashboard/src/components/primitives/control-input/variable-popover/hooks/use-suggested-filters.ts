@@ -1,26 +1,21 @@
 import { useMemo } from 'react';
-import { TRANSFORMERS } from '../constants';
-import type { Transformer, TransformerWithParam } from '../types';
+import { FILTERS } from '../constants';
+import { Filters, FilterWithParam } from '../types';
 
 type SuggestionGroup = {
   label: string;
-  transformers: Transformer[];
+  filters: Filters[];
 };
 
-export function useSuggestedTransformers(
-  variableName: string,
-  currentTransformers: TransformerWithParam[]
-): SuggestionGroup[] {
+export function useSuggestedFilters(variableName: string, currentFilters: FilterWithParam[]): SuggestionGroup[] {
   return useMemo(() => {
-    const currentTransformerValues = new Set(currentTransformers.map((t) => t.value));
-    const suggestedTransformers: Transformer[] = [];
+    const currentFilterValues = new Set(currentFilters.map((f) => f.value));
+    const suggestedFilters: Filters[] = [];
 
-    const addSuggestions = (transformerValues: string[]) => {
-      const newTransformers = TRANSFORMERS.filter(
-        (t) => transformerValues.includes(t.value) && !currentTransformerValues.has(t.value)
-      );
+    const addSuggestions = (filterValues: string[]) => {
+      const newFilters = FILTERS.filter((f) => filterValues.includes(f.value) && !currentFilterValues.has(f.value));
 
-      suggestedTransformers.push(...newTransformers);
+      suggestedFilters.push(...newFilters);
     };
 
     if (isStepsEventsPattern(variableName)) {
@@ -43,8 +38,8 @@ export function useSuggestedTransformers(
       addSuggestions(['upcase', 'downcase', 'capitalize', 'truncate', 'truncatewords']);
     }
 
-    return suggestedTransformers.length > 0 ? [{ label: 'Suggested', transformers: suggestedTransformers }] : [];
-  }, [variableName, currentTransformers]);
+    return suggestedFilters.length > 0 ? [{ label: 'Suggested', filters: suggestedFilters }] : [];
+  }, [variableName, currentFilters]);
 }
 
 function isDateVariable(name: string): boolean {
