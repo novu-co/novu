@@ -25,7 +25,7 @@ type ControlInputProps = {
   variables: LiquidVariable[];
   placeholder?: string;
   autoFocus?: boolean;
-  size?: 'base' | 'small';
+  size?: 'md' | 'sm';
   id?: string;
   multiline?: boolean;
   indentWithTab?: boolean;
