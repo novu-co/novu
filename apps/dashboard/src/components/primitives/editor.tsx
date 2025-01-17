@@ -15,8 +15,8 @@ import {
 const variants = cva('h-full w-full flex-1 [&_.cm-focused]:outline-none', {
   variants: {
     size: {
-      base: 'text-base',
-      small: 'text-xs',
+      md: 'text-base',
+      sm: 'text-xs',
     },
   },
   defaultVariants: {
