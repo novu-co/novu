@@ -35,12 +35,24 @@ export class EmailOutputRendererUsecase {
     const parsedTipTap = await this.parseTipTapNodeByLiquid(expandedMailyContent, renderCommand);
     const renderedHtml = await mailyRender(parsedTipTap);
 
+    console.log({
+      expandedMailyContent: parsedTipTap?.content?.[2],
+      first: parsedTipTap?.content?.[1],
+      parsedTipTap,
+      body,
+    });
+
     /**
      * Force type mapping in case undefined control.
      * This passes responsibility to framework to throw type validation exceptions
      * rather than handling invalid types here.
      */
     return { subject: subject as string, body: renderedHtml };
+  }
+
+  private stripEmptyNodes(tiptapNode: TipTapNode[]): TipTapNode {
+    // recursively check if content missing and strip it
+    return tiptapNode;
   }
 
   private async parseTipTapNodeByLiquid(
