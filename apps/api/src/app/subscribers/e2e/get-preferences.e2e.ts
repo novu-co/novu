@@ -34,12 +34,7 @@ describe('Get Subscribers workflow preferences - /subscribers/:subscriberId/pref
   });
 
   it('should get subscriber workflow preferences with inactive channels when includeInactiveChannels is true', async function () {
-    const response = await novuClient.subscribers.preferences.list(
-      session.subscriberId,
-      {
-        includeInactiveChannels: true,
-      }.includeInactiveChannels
-    );
+    const response = await novuClient.subscribers.preferences.list(session.subscriberId, true);
     const data = response.result[0];
 
     expect(data.preference.channels).to.deep.equal({
@@ -52,12 +47,7 @@ describe('Get Subscribers workflow preferences - /subscribers/:subscriberId/pref
   });
 
   it('should get subscriber workflow preferences with active channels when includeInactiveChannels is false', async function () {
-    const response = await novuClient.subscribers.preferences.list(
-      session.subscriberId,
-      {
-        includeInactiveChannels: false,
-      }.includeInactiveChannels
-    );
+    const response = await novuClient.subscribers.preferences.list(session.subscriberId, false);
     const data = response.result[0];
 
     expect(data.preference.channels).to.deep.equal({

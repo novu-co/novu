@@ -15,10 +15,10 @@ import {
   ControlValuesRepository,
   MessageTemplateRepository,
   NotificationGroupRepository,
+  NotificationStepData,
   NotificationStepEntity,
   NotificationTemplateEntity,
   NotificationTemplateRepository,
-  StepVariantEntity,
 } from '@novu/dal';
 import {
   buildWorkflowPreferences,
@@ -44,17 +44,17 @@ import {
   CreateChangeCommand,
   CreateMessageTemplate,
   CreateMessageTemplateCommand,
+  DeletePreferencesCommand,
+  DeletePreferencesUseCase,
+  GetPreferences,
+  GetWorkflowByIdsCommand,
+  GetWorkflowByIdsUseCase,
   NotificationStep,
   NotificationStepVariantCommand,
   UpsertPreferences,
   UpsertUserWorkflowPreferencesCommand,
-  GetPreferences,
-  WorkflowInternalResponseDto,
   UpsertWorkflowPreferencesCommand,
-  GetWorkflowByIdsCommand,
-  GetWorkflowByIdsUseCase,
-  DeletePreferencesCommand,
-  DeletePreferencesUseCase,
+  WorkflowInternalResponseDto,
 } from '../..';
 import {
   DeleteMessageTemplate,
@@ -575,7 +575,7 @@ export class UpdateWorkflow {
     stepId: string | undefined,
     parentStepId: string | null,
     message: NotificationStep,
-    updatedVariants: StepVariantEntity[],
+    updatedVariants: NotificationStepData[],
   ) {
     const partialNotificationStep: Partial<NotificationStepEntity> = {
       _id: stepId,
@@ -669,10 +669,10 @@ export class UpdateWorkflow {
     variants: NotificationStepVariantCommand[] | undefined,
     command: UpdateWorkflowCommand,
     parentChangeId: string,
-  ): Promise<StepVariantEntity[]> {
+  ): Promise<NotificationStepData[]> {
     if (!variants?.length) return [];
 
-    const variantsList: StepVariantEntity[] = [];
+    const variantsList: NotificationStepData[] = [];
     let parentVariantId: string | null = null;
 
     for (const variant of variants) {
@@ -744,7 +744,10 @@ export class UpdateWorkflow {
 
   @Instrument()
   private async deleteRemovedSteps(
-    existingSteps: NotificationStepEntity[] | StepVariantEntity[] | undefined,
+    existingSteps:
+      | NotificationStepEntity[]
+      | NotificationStepData[]
+      | undefined,
     command: UpdateWorkflowCommand,
     parentChangeId: string,
   ) {

@@ -36,7 +36,7 @@ export function TimeDisplayHoverCard({ date, children, className }: TimeDisplayH
       <HoverCardContent className="w-fit" align="end" sideOffset={4}>
         <div className="flex flex-col gap-2">
           <div className="text-muted-foreground text-2xs font-medium uppercase">Time Details</div>
-          <div className="flex flex-col gap-2 text-xs">
+          <div className="flex flex-col gap-2 text-xs capitalize">
             <div className="bg-muted/40 hover:bg-muted flex items-center justify-between gap-4 rounded-sm transition-colors">
               <span className="text-muted-foreground">UTC</span>
               <span className="font-medium">{utcTime}</span>
@@ -47,7 +47,7 @@ export function TimeDisplayHoverCard({ date, children, className }: TimeDisplayH
             </div>
             <div className="bg-muted/40 hover:bg-muted flex items-center justify-between gap-4 rounded-sm transition-colors">
               <span className="text-muted-foreground">Relative</span>
-              <span className="font-medium">{timeAgo}</span>
+              <span className="font-medium normal-case">{timeAgo}</span>
             </div>
           </div>
         </div>
