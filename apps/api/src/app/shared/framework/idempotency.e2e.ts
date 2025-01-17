@@ -1,8 +1,7 @@
 import { UserSession } from '@novu/testing';
 import { CacheService, HttpResponseHeaderKeysEnum } from '@novu/application-generic';
 import { expect } from 'chai';
-import { Novu } from '@novu/api';
-import { expectSdkExceptionGeneric, initNovuClassSdk } from '../helpers/e2e/sdk/e2e-sdk.helper';
+import { expectSdkExceptionGeneric } from '../helpers/e2e/sdk/e2e-sdk.helper';
 import {
   IdempotenceTestingResponse,
   IdempotencyBehaviorEnum,
@@ -30,7 +29,6 @@ describe('Idempotency Test', async () => {
   let session: UserSession;
   const path = '/v1/health-check/test-idempotency';
   let cacheService: CacheService | null = null;
-  let novu: Novu;
 
   async function testIdempotencyPost(
     idempotencyTestingDto: IdempotencyTestingDto,
@@ -60,8 +58,6 @@ describe('Idempotency Test', async () => {
     session = new UserSession();
     await session.initialize();
     cacheService = session.testServer?.getService(CacheService);
-    novu = initNovuClassSdk(session, true);
-    // @ts-ignore
     process.env.IS_API_IDEMPOTENCY_ENABLED = 'true';
   });
 
