@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef } from 'react';
 import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@uiw/react-codemirror';
+import clsx from 'clsx';
 
 import { Editor } from '@/components/primitives/editor';
 import { Popover, PopoverTrigger } from '@/components/primitives/popover';
@@ -18,12 +19,13 @@ type CompletionRange = {
 };
 
 type ControlInputProps = {
+  className?: string;
   value: string;
   onChange: (value: string) => void;
   variables: LiquidVariable[];
   placeholder?: string;
   autoFocus?: boolean;
-  size?: 'default' | 'lg';
+  size?: 'base' | 'small';
   id?: string;
   multiline?: boolean;
   indentWithTab?: boolean;
@@ -33,11 +35,12 @@ export function ControlInput({
   value,
   onChange,
   variables,
+  className,
   placeholder,
   autoFocus,
-  size = 'default',
   id,
   multiline = false,
+  size = 'small',
   indentWithTab,
 }: ControlInputProps) {
   const viewRef = useRef<EditorView | null>(null);
@@ -86,12 +89,15 @@ export function ControlInput({
   );
 
   return (
-    <div className="relative">
+    <div className={clsx('relative h-full w-full p-2.5', className)}>
       <Editor
+        size={size}
         fontFamily="inherit"
         multiline={multiline}
         indentWithTab={indentWithTab}
+        // TODO for Sokratis
         size={size}
+        // TODO for Sokratis
         className={cn('flex-1', { 'overflow-hidden': !multiline })}
         autoFocus={autoFocus}
         placeholder={placeholder}
@@ -99,6 +105,7 @@ export function ControlInput({
         extensions={extensions}
         value={value}
         onChange={onChange}
+        className="flex-1"
       />
       <Popover open={!!selectedVariable} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
