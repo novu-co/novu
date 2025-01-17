@@ -4,9 +4,9 @@ import { WorkflowTemplate } from './types';
 export const usageLimitTemplate: WorkflowTemplate = {
   id: 'usage-threshold',
   name: 'Usage Threshold',
-  description: '',
+  description: 'Notify users when they reach a usage limit',
   category: 'operational',
-  isPopular: false,
+  isPopular: true,
   workflowDefinition: {
     name: 'Usage Threshold',
     description: '',

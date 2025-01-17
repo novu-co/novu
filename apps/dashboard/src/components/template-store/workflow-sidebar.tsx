@@ -94,9 +94,9 @@ const useCases = [
     bgColor: 'bg-blue-50',
   },
   {
-    id: 'events',
+    id: 'billing',
     icon: <Calendar className="h-3 w-3 text-gray-700" />,
-    label: 'Events',
+    label: 'Billing',
     bgColor: 'bg-blue-50',
   },
   {
@@ -106,9 +106,9 @@ const useCases = [
     bgColor: 'bg-green-50',
   },
   {
-    id: 'social',
+    id: 'operational',
     icon: <Users className="h-3 w-3 text-gray-700" />,
-    label: 'Social',
+    label: 'Operational',
     bgColor: 'bg-purple-50',
   },
 ] as const;
