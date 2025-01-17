@@ -7,10 +7,10 @@ import {
   WorkflowQueueServiceHealthIndicator,
 } from '@novu/application-generic';
 
-import { ApiTags } from '@nestjs/swagger';
 import { Body, Post } from '@nestjs/common/decorators';
+import { ApiExcludeController } from '@nestjs/swagger';
 import { version } from '../../../package.json';
-import { DocumentationIgnore, SdkGroupName, SdkMethodName } from '../shared/framework/swagger/sdk.decorators';
+import { DocumentationIgnore, SdkMethodName } from '../shared/framework/swagger/sdk.decorators';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
 import {
   IdempotenceTestingResponse,
@@ -20,8 +20,7 @@ import {
 import { ApiCommonResponses, ApiCreatedResponse } from '../shared/framework/response.decorator';
 
 @Controller('health-check')
-@ApiTags('Admin')
-@SdkGroupName('admin')
+@ApiExcludeController()
 export class HealthController {
   constructor(
     private healthCheckService: HealthCheckService,
@@ -31,7 +30,6 @@ export class HealthController {
   ) {}
 
   @Get()
-  @DocumentationIgnore()
   @HealthCheck()
   healthCheck(): Promise<HealthCheckResult> {
     const checks: HealthIndicatorFunction[] = [
