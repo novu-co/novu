@@ -20,7 +20,7 @@ const variants = cva('h-full w-full flex-1 [&_.cm-focused]:outline-none', {
     },
   },
   defaultVariants: {
-    size: 'small',
+    size: 'sm',
   },
 });
 
