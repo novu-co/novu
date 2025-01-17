@@ -31,7 +31,7 @@ describe('Idempotency Test', async () => {
     session = new UserSession();
     await session.initialize();
     cacheService = session.testServer?.getService(CacheService);
-    novu = initNovuClassSdk(session);
+    novu = initNovuClassSdk(session, true);
     // @ts-ignore
     process.env.IS_API_IDEMPOTENCY_ENABLED = 'true';
   });

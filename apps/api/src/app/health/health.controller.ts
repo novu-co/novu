@@ -10,7 +10,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { Body, Post } from '@nestjs/common/decorators';
 import { version } from '../../../package.json';
-import { SdkGroupName, SdkMethodName } from '../shared/framework/swagger/sdk.decorators';
+import { DocumentationIgnore, SdkGroupName, SdkMethodName } from '../shared/framework/swagger/sdk.decorators';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
 import {
   IdempotenceTestingResponse,
@@ -31,6 +31,7 @@ export class HealthController {
   ) {}
 
   @Get()
+  @DocumentationIgnore()
   @HealthCheck()
   healthCheck(): Promise<HealthCheckResult> {
     const checks: HealthIndicatorFunction[] = [
@@ -55,6 +56,7 @@ export class HealthController {
   @UserAuthentication()
   @ApiCommonResponses()
   @ApiCreatedResponse({ type: IdempotenceTestingResponse })
+  @DocumentationIgnore()
   @SdkMethodName('testIdempotency')
   @Post('/test-idempotency')
   async testIdempotency(@Body() body: IdempotencyTestingDto): Promise<IdempotenceTestingResponse> {
@@ -76,6 +78,7 @@ export class HealthController {
 
     return { number: randomNumber };
   }
+  @DocumentationIgnore()
   @ExternalApiAccessible()
   @UserAuthentication()
   @ApiCommonResponses()

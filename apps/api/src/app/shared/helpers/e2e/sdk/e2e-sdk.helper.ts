@@ -3,9 +3,15 @@ import { NovuCore } from '@novu/api/core';
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
 import { ErrorDto, ValidationErrorDto } from '@novu/api/models/errors';
+import { SDKOptions } from '@novu/api/lib/config';
 
-export function initNovuClassSdk(session: UserSession): Novu {
-  return new Novu({ apiKey: session.apiKey, serverURL: session.serverUrl });
+export function initNovuClassSdk(session: UserSession, shouldRetry: boolean = false): Novu {
+  const options: SDKOptions = { apiKey: session.apiKey, serverURL: session.serverUrl };
+  if (!shouldRetry) {
+    options.retryConfig = { strategy: 'none' };
+  }
+
+  return new Novu(options);
 }
 export function initNovuFunctionSdk(session: UserSession): NovuCore {
   return new NovuCore({ apiKey: session.apiKey, serverURL: session.serverUrl });
