@@ -21,16 +21,18 @@ export const WorkflowsPage = () => {
       <PageMeta title="Workflows" />
       <DashboardLayout headerStartItems={<h1 className="text-foreground-950 flex items-center gap-1">Workflows</h1>}>
         <OptInModal />
-        <div className="flex justify-between px-2.5 py-2.5">
-          <div className="invisible flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2"></div>
+        <div className="group h-full w-full">
+          <div className="flex justify-between px-2.5 py-2.5 group-has-[[data-error=true]]:hidden">
+            <div className="invisible flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2"></div>
 
-          <CreateWorkflowButton asChild>
-            <Button mode="gradient" variant="primary" size="xs" leadingIcon={RiRouteFill}>
-              Create workflow
-            </Button>
-          </CreateWorkflowButton>
+            <CreateWorkflowButton asChild>
+              <Button mode="gradient" variant="primary" size="xs" leadingIcon={RiRouteFill}>
+                Create workflow
+              </Button>
+            </CreateWorkflowButton>
+          </div>
+          <WorkflowList />
         </div>
-        <WorkflowList />
       </DashboardLayout>
     </>
   );
