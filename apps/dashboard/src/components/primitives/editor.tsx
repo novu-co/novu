@@ -133,7 +133,7 @@ export type EditorProps = {
   height?: string;
   onChange?: (value: string) => void;
   fontFamily?: 'inherit';
-  size?: 'small' | 'base';
+  size?: 'sm' | 'md';
 } & ReactCodeMirrorProps;
 
 export const Editor = React.forwardRef<ReactCodeMirrorRef, EditorProps>(
@@ -146,7 +146,7 @@ export const Editor = React.forwardRef<ReactCodeMirrorRef, EditorProps>(
       multiline = false,
       fontFamily,
       onChange,
-      size = 'small',
+      size = 'sm',
       extensions: extensionsProp,
       basicSetup: basicSetupProp,
       ...restCodeMirrorProps
