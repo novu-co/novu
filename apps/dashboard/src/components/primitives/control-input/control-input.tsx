@@ -40,7 +40,7 @@ export function ControlInput({
   autoFocus,
   id,
   multiline = false,
-  size = 'small',
+  size = 'sm',
   indentWithTab,
 }: ControlInputProps) {
   const viewRef = useRef<EditorView | null>(null);
