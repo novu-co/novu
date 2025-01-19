@@ -1,7 +1,9 @@
-import { CreateWorkflowButton } from '@/components/create-workflow-button';
+import { useTelemetry } from '@/hooks/use-telemetry';
+import { TelemetryEvent } from '@/utils/telemetry';
 import { Calendar, Code2, ExternalLink, FileCode2, FileText, KeyRound, LayoutGrid, Users } from 'lucide-react';
 import { motion } from 'motion/react';
 import { ReactNode } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Badge } from '../primitives/badge';
 import { WorkflowMode } from './types';
 
@@ -20,7 +22,6 @@ interface SidebarButtonProps {
   asChild?: boolean;
   hasExternalLink?: boolean;
   beta?: boolean;
-  createWorkflowButton?: React.ComponentType<any>;
 }
 
 const buttonVariants = {
@@ -43,9 +44,8 @@ function SidebarButton({
   asChild,
   beta,
   hasExternalLink,
-  createWorkflowButton: CustomCreateWorkflowButton,
 }: SidebarButtonProps) {
-  const ButtonWrapper = asChild && CustomCreateWorkflowButton ? CustomCreateWorkflowButton : motion.button;
+  const ButtonWrapper = motion.button;
   const content = (
     <div className="flex items-center gap-3">
       <motion.div variants={iconVariants} className={`rounded-lg p-[5px] ${bgColor}`}>
@@ -132,27 +132,26 @@ const createOptions = [
 ];
 
 export function WorkflowSidebar({ selectedCategory, onCategorySelect, mode }: WorkflowSidebarProps) {
+  const navigate = useNavigate();
+  const { environmentSlug } = useParams();
+  const track = useTelemetry();
+
+  const handleCreateWorkflow = () => {
+    track(TelemetryEvent.CREATE_WORKFLOW_CLICK);
+
+    navigate('/env/' + environmentSlug + '/workflows/create');
+  };
+
   return (
-    <div className="flex h-full flex-col bg-gray-50">
-      <section className="p-2">
-        <div className="mb-2">
-          <span className="text-subheading-2xs text-gray-500">CREATE</span>
-        </div>
-        <div className="flex flex-col gap-2">
-          {createOptions.map((item, index) => (
-            <SidebarButton
-              key={index}
-              icon={item.icon}
-              label={item.label}
-              onClick={item.onClick}
-              bgColor={item.bgColor}
-              asChild={item.asChild}
-              hasExternalLink={item.hasExternalLink}
-              createWorkflowButton={CreateWorkflowButton}
-            />
-          ))}
-        </div>
-      </section>
+    <div className="flex h-full w-[240px] flex-col gap-4 border-r p-4">
+      <div className="flex flex-col gap-1">
+        <SidebarButton
+          icon={<FileText className="text-foreground-950 h-4 w-4" />}
+          label="Blank workflow"
+          onClick={handleCreateWorkflow}
+          bgColor="bg-neutral-50"
+        />
+      </div>
       <section className="p-2">
         <div className="mb-2">
           <span className="text-subheading-2xs text-gray-500">EXPLORE</span>
@@ -167,7 +166,6 @@ export function WorkflowSidebar({ selectedCategory, onCategorySelect, mode }: Wo
               onClick={() => onCategorySelect(item.id)}
               isActive={mode === WorkflowMode.TEMPLATES && selectedCategory === item.id}
               bgColor={item.bgColor}
-              createWorkflowButton={CreateWorkflowButton}
             />
           ))}
         </div>
