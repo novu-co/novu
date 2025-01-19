@@ -18,11 +18,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 export function CreateWorkflowPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { submit, isLoading: isCreating } = useCreateWorkflow({
-    onSuccess: () => {
-      navigate(`..${location.search}`);
-    },
-  });
+
+  const { submit, isLoading: isCreating } = useCreateWorkflow();
 
   return (
     <Sheet

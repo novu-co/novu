@@ -146,13 +146,7 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
         </DialogHeader>
         <div className={`flex h-[${selectedTemplate ? '600px' : '640px'}]`}>
           {!selectedTemplate && (
-            <div className="h-full w-[259px] border-r border-neutral-200">
-              <WorkflowSidebar
-                selectedCategory={selectedCategory}
-                onCategorySelect={handleCategorySelect}
-                mode={mode}
-              />
-            </div>
+            <WorkflowSidebar selectedCategory={selectedCategory} onCategorySelect={handleCategorySelect} mode={mode} />
           )}
 
           <div className="w-full flex-1 overflow-auto">

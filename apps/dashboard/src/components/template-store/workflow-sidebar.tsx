@@ -143,7 +143,7 @@ export function WorkflowSidebar({ selectedCategory, onCategorySelect, mode }: Wo
   };
 
   return (
-    <div className="flex h-full w-[240px] flex-col gap-4 border-r p-4">
+    <div className="flex h-full w-[240px] flex-col gap-4 border-r p-2">
       <div className="flex flex-col gap-1">
         <SidebarButton
           icon={<FileText className="text-foreground-950 h-4 w-4" />}
