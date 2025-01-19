@@ -34,59 +34,62 @@ export const WorkflowsPage = () => {
       <DashboardLayout headerStartItems={<h1 className="text-foreground-950 flex items-center gap-1">Workflows</h1>}>
         <OptInModal />
         <div className="group h-full w-full">
-          {isTemplateStoreEnabled ? (
-            <ButtonGroupRoot size="xs">
-              <ButtonGroupItem asChild className="gap-1">
-                <CreateWorkflowButton asChild>
-                  <Button
-                    mode="gradient"
-                    className="rounded-l-lg rounded-r-none border-none p-2 text-white"
-                    variant="primary"
-                    size="xs"
-                    leadingIcon={RiRouteFill}
-                  >
-                    Create workflow
-                  </Button>
-                </CreateWorkflowButton>
-              </ButtonGroupItem>
-              <ButtonGroupItem asChild>
-                <DropdownMenu modal={false}>
-                  <DropdownMenuTrigger asChild>
+          <div className="flex justify-between px-2.5 py-2.5 group-has-[[data-error=true]]:hidden">
+            <div className="invisible flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2"></div>
+            {isTemplateStoreEnabled ? (
+              <ButtonGroupRoot size="xs">
+                <ButtonGroupItem asChild className="gap-1">
+                  <CreateWorkflowButton asChild>
                     <Button
                       mode="gradient"
-                      className="rounded-l-none rounded-r-lg border-none text-white"
+                      className="rounded-l-lg rounded-r-none border-none p-2 text-white"
                       variant="primary"
                       size="xs"
-                      leadingIcon={RiArrowDownSLine}
-                    ></Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56">
-                    <DropdownMenuItem className="cursor-pointer" asChild>
-                      <CreateWorkflowButton className="w-full">
-                        <div className="flex items-center gap-2">
-                          <RiFileAddLine />
-                          Blank Workflow
-                        </div>
-                      </CreateWorkflowButton>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer" onSelect={() => setShouldOpenTemplateModal(true)}>
-                      <RiFileMarkedLine />
-                      View Template Gallery
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </ButtonGroupItem>
-            </ButtonGroupRoot>
-          ) : (
-            <CreateWorkflowButton asChild>
-              <Button mode="gradient" variant="primary" size="xs" leadingIcon={RiRouteFill}>
-                Create workflow
-              </Button>
-            </CreateWorkflowButton>
-          )}
-          {shouldOpenTemplateModal && <WorkflowTemplateModal open={true} onOpenChange={setShouldOpenTemplateModal} />}
+                      leadingIcon={RiRouteFill}
+                    >
+                      Create workflow
+                    </Button>
+                  </CreateWorkflowButton>
+                </ButtonGroupItem>
+                <ButtonGroupItem asChild>
+                  <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        mode="gradient"
+                        className="rounded-l-none rounded-r-lg border-none text-white"
+                        variant="primary"
+                        size="xs"
+                        leadingIcon={RiArrowDownSLine}
+                      ></Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                      <DropdownMenuItem className="cursor-pointer" asChild>
+                        <CreateWorkflowButton className="w-full">
+                          <div className="flex items-center gap-2">
+                            <RiFileAddLine />
+                            Blank Workflow
+                          </div>
+                        </CreateWorkflowButton>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer" onSelect={() => setShouldOpenTemplateModal(true)}>
+                        <RiFileMarkedLine />
+                        View Template Gallery
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </ButtonGroupItem>
+              </ButtonGroupRoot>
+            ) : (
+              <CreateWorkflowButton asChild>
+                <Button mode="gradient" variant="primary" size="xs" leadingIcon={RiRouteFill}>
+                  Create workflow
+                </Button>
+              </CreateWorkflowButton>
+            )}
+            {shouldOpenTemplateModal && <WorkflowTemplateModal open={true} onOpenChange={setShouldOpenTemplateModal} />}
+          </div>
+          <WorkflowList />
         </div>
-        <WorkflowList />
       </DashboardLayout>
     </>
   );
