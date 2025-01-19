@@ -1,5 +1,7 @@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from '@/components/primitives/dialog';
-import { ComponentProps, useState } from 'react';
+import { useTelemetry } from '@/hooks/use-telemetry';
+import { TelemetryEvent } from '@/utils/telemetry';
+import { ComponentProps, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine } from 'react-icons/ri';
 import { z } from 'zod';
@@ -29,10 +31,12 @@ const WORKFLOW_TEMPLATES = getTemplates();
 export type WorkflowTemplateModalProps = ComponentProps<typeof DialogTrigger> & {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  source?: string;
 };
 
 export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   const form = useForm();
+  const track = useTelemetry();
   const { submit: createFromTemplate, isLoading: isCreating } = useCreateWorkflow();
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
   const [suggestions, setSuggestions] = useState<IWorkflowSuggestion[]>([]);
@@ -44,10 +48,23 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   );
   const templates = suggestions.length > 0 ? suggestions : filteredTemplates;
 
+  useEffect(() => {
+    if (props.open) {
+      track(TelemetryEvent.TEMPLATE_MODAL_OPENED, {
+        source: props.source || 'unknown',
+      });
+    }
+  }, [props.open, props.source, track]);
+
   const handleCreateWorkflow = async (values: z.infer<typeof workflowSchema>) => {
     if (!selectedTemplate) return;
 
     await createFromTemplate(values, selectedTemplate.workflowDefinition);
+    track(TelemetryEvent.CREATE_WORKFLOW_FROM_TEMPLATE, {
+      templateId: selectedTemplate.id,
+      templateName: selectedTemplate.name,
+      category: selectedCategory,
+    });
   };
 
   const getHeaderText = () => {
@@ -77,6 +94,15 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   const handleBackClick = () => {
     setSelectedTemplate(null);
     setMode(WorkflowMode.TEMPLATES);
+  };
+
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    setSuggestions([]);
+    setMode(WorkflowMode.TEMPLATES);
+    track(TelemetryEvent.TEMPLATE_CATEGORY_SELECTED, {
+      category,
+    });
   };
 
   return (
@@ -114,11 +140,7 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
             <div className="h-full w-[259px] border-r border-neutral-200">
               <WorkflowSidebar
                 selectedCategory={selectedCategory}
-                onCategorySelect={(category) => {
-                  setSelectedCategory(category);
-                  setSuggestions([]);
-                  setMode(WorkflowMode.TEMPLATES);
-                }}
+                onCategorySelect={handleCategorySelect}
                 mode={mode}
               />
             </div>

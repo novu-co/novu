@@ -73,7 +73,7 @@ export const WorkflowsPage = () => {
                       </DropdownMenuItem>
                       <DropdownMenuItem className="cursor-pointer" onSelect={() => setShouldOpenTemplateModal(true)}>
                         <RiFileMarkedLine />
-                        View Template Gallery
+                        View Workflow Gallery
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
