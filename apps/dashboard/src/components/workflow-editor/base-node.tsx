@@ -6,13 +6,7 @@ import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { cva, VariantProps } from 'class-variance-authority';
 import { ReactNode, useState } from 'react';
 import { RiErrorWarningFill } from 'react-icons/ri';
-import {
-  HoverCard,
-  HoverCardArrow,
-  HoverCardContent,
-  HoverCardPortal,
-  HoverCardTrigger,
-} from '../primitives/hover-card';
+import { HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger } from '../primitives/hover-card';
 import { Popover, PopoverArrow, PopoverContent, PopoverPortal, PopoverTrigger } from '../primitives/popover';
 import { StepPreview } from '../step-preview-hover-card';
 
@@ -96,10 +90,10 @@ export const NodeBody = ({
       {(isPreviewEnabled || showPreview) && (
         <HoverCardPortal container={document.getElementById('workflow-canvas-container')}>
           {type !== StepTypeEnum.TRIGGER && (
-            <HoverCardContent side="left" className="w-[350px] border-none p-0" sideOffset={15}>
-              <StepPreview type={type} controlValues={controlValues} />
-
-              <HoverCardArrow className="fill-white stroke-white text-white" />
+            <HoverCardContent side="left" className="border-stroke-soft bg-bg-weak w-[450px] p-1" sideOffset={15}>
+              <div className="bg-bg-white flex w-full items-center justify-center rounded-lg border border-[#F2F5F8] p-1">
+                <StepPreview type={type} controlValues={controlValues} />
+              </div>
             </HoverCardContent>
           )}
         </HoverCardPortal>
