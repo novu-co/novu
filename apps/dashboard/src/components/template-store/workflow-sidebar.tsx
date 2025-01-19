@@ -4,6 +4,7 @@ import { Calendar, Code2, ExternalLink, FileCode2, FileText, KeyRound, LayoutGri
 import { motion } from 'motion/react';
 import { ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { buildRoute, ROUTES } from '../../utils/routes';
 import { Badge } from '../primitives/badge';
 import { WorkflowMode } from './types';
 
@@ -19,7 +20,6 @@ interface SidebarButtonProps {
   onClick?: () => void;
   isActive?: boolean;
   bgColor?: string;
-  asChild?: boolean;
   hasExternalLink?: boolean;
   beta?: boolean;
 }
@@ -41,7 +41,6 @@ function SidebarButton({
   onClick,
   isActive,
   bgColor = 'bg-blue-50',
-  asChild,
   beta,
   hasExternalLink,
 }: SidebarButtonProps) {
@@ -71,18 +70,14 @@ function SidebarButton({
         isActive ? '!border-[#EEEFF1] bg-white' : ''
       }`}
     >
-      {asChild ? (
-        content
-      ) : (
-        <div className="flex w-full items-center gap-2">
-          {content}{' '}
-          {beta && (
-            <Badge color="gray" size="sm">
-              BETA
-            </Badge>
-          )}
-        </div>
-      )}
+      <div className="flex w-full items-center gap-2">
+        {content}{' '}
+        {beta && (
+          <Badge color="gray" size="sm">
+            BETA
+          </Badge>
+        )}
+      </div>
     </motion.button>
   );
 }
@@ -114,22 +109,6 @@ const useCases = [
   },
 ] as const;
 
-const createOptions = [
-  {
-    icon: <FileText className="h-3 w-3 text-gray-700" />,
-    label: 'Blank workflow',
-    bgColor: 'bg-green-50',
-    asChild: true,
-  },
-  {
-    icon: <Code2 className="h-3 w-3 text-gray-700" />,
-    label: 'Code-based workflow',
-    hasExternalLink: true,
-    bgColor: 'bg-blue-50',
-    onClick: () => window.open('https://docs.novu.co/framework/overview', '_blank'),
-  },
-];
-
 export function WorkflowSidebar({ selectedCategory, onCategorySelect, mode }: WorkflowSidebarProps) {
   const navigate = useNavigate();
   const { environmentSlug } = useParams();
@@ -137,19 +116,38 @@ export function WorkflowSidebar({ selectedCategory, onCategorySelect, mode }: Wo
 
   const handleCreateWorkflow = () => {
     track(TelemetryEvent.CREATE_WORKFLOW_CLICK);
-
-    navigate('/env/' + environmentSlug + '/workflows/create');
+    navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }));
   };
+
+  const createOptions = [
+    {
+      icon: <FileText className="h-3 w-3 text-gray-700" />,
+      label: 'Blank workflow',
+      bgColor: 'bg-green-50',
+      onClick: handleCreateWorkflow,
+    },
+    {
+      icon: <Code2 className="h-3 w-3 text-gray-700" />,
+      label: 'Code-based workflow',
+      hasExternalLink: true,
+      bgColor: 'bg-blue-50',
+      onClick: () => window.open('https://docs.novu.co/framework/overview', '_blank'),
+    },
+  ];
 
   return (
     <div className="flex h-full w-[240px] flex-col gap-4 border-r p-2">
       <div className="flex flex-col gap-1">
-        <SidebarButton
-          icon={<FileText className="text-foreground-950 h-4 w-4" />}
-          label="Blank workflow"
-          onClick={handleCreateWorkflow}
-          bgColor="bg-neutral-50"
-        />
+        {createOptions.map((item, index) => (
+          <SidebarButton
+            key={index}
+            icon={item.icon}
+            label={item.label}
+            onClick={item.onClick}
+            bgColor={item.bgColor}
+            hasExternalLink={item.hasExternalLink}
+          />
+        ))}
       </div>
       <section className="p-2">
         <div className="mb-2">
