@@ -4,7 +4,7 @@ import { WorkflowTemplate } from './types';
 export const otpTemplate: WorkflowTemplate = {
   id: 'one-time-password',
   name: 'One Time Password',
-  description: 'Notify users when they need to verify their identity',
+  description: 'Send verification codes via email and SMS',
   category: 'authentication',
   isPopular: true,
   workflowDefinition: {

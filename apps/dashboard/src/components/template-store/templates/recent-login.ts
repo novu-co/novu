@@ -4,7 +4,7 @@ import { WorkflowTemplate } from './types';
 export const recentLoginTemplate: WorkflowTemplate = {
   id: 'recent-login',
   name: 'Recent Login',
-  description: 'Notify users when a new device logs into their account',
+  description: 'Alert users about new device logins',
   category: 'authentication',
   isPopular: true,
   workflowDefinition: {

@@ -4,7 +4,7 @@ import { WorkflowTemplate } from './types';
 export const paymentConfirmedTemplate: WorkflowTemplate = {
   id: 'payment-confirmed',
   name: 'Payment Confirmed',
-  description: 'Notify users when their payment is confirmed',
+  description: 'Send payment confirmations with receipts',
   category: 'billing',
   isPopular: false,
   workflowDefinition: {

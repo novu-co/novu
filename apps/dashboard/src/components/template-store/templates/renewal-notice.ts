@@ -4,7 +4,7 @@ import { WorkflowTemplate } from './types';
 export const renewalNoticeTemplate: WorkflowTemplate = {
   id: 'subscription-renewal-approaching',
   name: 'Upcoming Renewal Notice',
-  description: 'Notify users when their subscription is about to renew',
+  description: 'Remind users about subscription renewals',
   category: 'billing',
   isPopular: false,
   workflowDefinition: {

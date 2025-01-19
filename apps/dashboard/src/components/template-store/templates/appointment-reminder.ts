@@ -4,8 +4,7 @@ import { WorkflowTemplate } from './types';
 export const appointmentReminderTemplate: WorkflowTemplate = {
   id: 'clinic-appointment-reminder',
   name: 'Clinic Appointment Reminder',
-  description:
-    'The workflow reminds the patient about the upcoming appointment and also prompt for feedback after the appointment.',
+  description: 'Streamline healthcare appointments with timely reminders and post-visit feedback collection',
   category: 'operational',
   isPopular: false,
   workflowDefinition: {
