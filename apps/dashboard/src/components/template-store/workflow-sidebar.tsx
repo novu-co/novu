@@ -20,6 +20,7 @@ interface SidebarButtonProps {
   asChild?: boolean;
   hasExternalLink?: boolean;
   beta?: boolean;
+  createWorkflowButton?: React.ComponentType<any>;
 }
 
 const buttonVariants = {
@@ -42,8 +43,9 @@ function SidebarButton({
   asChild,
   beta,
   hasExternalLink,
+  createWorkflowButton: CustomCreateWorkflowButton,
 }: SidebarButtonProps) {
-  const ButtonWrapper = asChild ? CreateWorkflowButton : motion.button;
+  const ButtonWrapper = asChild && CustomCreateWorkflowButton ? CustomCreateWorkflowButton : motion.button;
   const content = (
     <div className="flex items-center gap-3">
       <motion.div variants={iconVariants} className={`rounded-lg p-[5px] ${bgColor}`}>
@@ -146,6 +148,7 @@ export function WorkflowSidebar({ selectedCategory, onCategorySelect, mode }: Wo
               bgColor={item.bgColor}
               asChild={item.asChild}
               hasExternalLink={item.hasExternalLink}
+              createWorkflowButton={CreateWorkflowButton}
             />
           ))}
         </div>
@@ -164,6 +167,7 @@ export function WorkflowSidebar({ selectedCategory, onCategorySelect, mode }: Wo
               onClick={() => onCategorySelect(item.id)}
               isActive={mode === WorkflowMode.TEMPLATES && selectedCategory === item.id}
               bgColor={item.bgColor}
+              createWorkflowButton={CreateWorkflowButton}
             />
           ))}
         </div>

@@ -71,7 +71,7 @@ export function StepPreview({ type, controlValues }: StepPreviewProps) {
 
   if (type === StepTypeEnum.CHAT) {
     const { body } = controlValues;
-    const mockPreviewData: GeneratePreviewResponseDto = {
+    const previewData: GeneratePreviewResponseDto = {
       result: {
         type: ChannelTypeEnum.CHAT as const,
         preview: {
@@ -84,14 +84,14 @@ export function StepPreview({ type, controlValues }: StepPreviewProps) {
 
     return (
       <div className="p-4">
-        <ChatPreview isPreviewPending={false} previewData={mockPreviewData} />
+        <ChatPreview isPreviewPending={false} previewData={previewData} />
       </div>
     );
   }
 
   if (type === StepTypeEnum.PUSH) {
     const { subject, body } = controlValues;
-    const mockPreviewData: GeneratePreviewResponseDto = {
+    const previewData: GeneratePreviewResponseDto = {
       result: {
         type: ChannelTypeEnum.PUSH as const,
         preview: {
@@ -106,7 +106,7 @@ export function StepPreview({ type, controlValues }: StepPreviewProps) {
 
     return (
       <div className="p-4">
-        <PushPreview isPreviewPending={false} previewData={mockPreviewData} />
+        <PushPreview isPreviewPending={false} previewData={previewData} />
       </div>
     );
   }

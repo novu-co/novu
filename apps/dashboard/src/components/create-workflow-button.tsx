@@ -15,18 +15,12 @@ import { CreateWorkflowForm } from '@/components/workflow-editor/create-workflow
 import { useCreateWorkflow } from '@/hooks/use-create-workflow';
 import { ComponentProps, forwardRef, useState } from 'react';
 import { RiArrowRightSLine } from 'react-icons/ri';
-import { z } from 'zod';
-import { workflowSchema } from './workflow-editor/schema';
 
 export const CreateWorkflowButton = forwardRef<HTMLButtonElement, ComponentProps<typeof SheetTrigger>>((props, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const { submit, isLoading: isCreating } = useCreateWorkflow({
     onSuccess: () => setIsOpen(false),
   });
-
-  const handleSubmit = (values: z.infer<typeof workflowSchema>) => {
-    submit(values);
-  };
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -43,7 +37,7 @@ export const CreateWorkflowButton = forwardRef<HTMLButtonElement, ComponentProps
         </SheetHeader>
         <Separator />
         <SheetMain>
-          <CreateWorkflowForm onSubmit={handleSubmit} />
+          <CreateWorkflowForm onSubmit={submit} />
         </SheetMain>
         <Separator />
         <SheetFooter>

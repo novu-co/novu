@@ -92,7 +92,9 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
             <BreadcrumbList>
               {selectedTemplate && (
                 <>
-                  <BreadcrumbItem className="flex items-center gap-1">Templates</BreadcrumbItem>
+                  <BreadcrumbItem onClick={handleBackClick} className="flex items-center gap-1 hover:cursor-pointer">
+                    Templates
+                  </BreadcrumbItem>
                   <BreadcrumbSeparator />
                 </>
               )}
@@ -107,7 +109,7 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
             </BreadcrumbList>
           </Breadcrumb>
         </DialogHeader>
-        <div className="flex h-[600px]">
+        <div className={`flex h-[${selectedTemplate ? '600px' : '640px'}]`}>
           {!selectedTemplate && (
             <div className="h-full w-[259px] border-r border-neutral-200">
               <WorkflowSidebar
