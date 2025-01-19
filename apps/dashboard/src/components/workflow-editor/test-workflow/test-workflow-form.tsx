@@ -55,7 +55,7 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
 
   return (
     <div className="flex w-full flex-1 flex-col gap-3 overflow-hidden p-3">
-      <div className="grid h-1/2 flex-1 shrink-0 grid-cols-1 gap-3 xl:grid-cols-[1fr_2fr]">
+      <div className="grid max-h-[50%] min-h-[50%] flex-1 grid-cols-1 gap-3 xl:grid-cols-[1fr_2fr]">
         <Panel className="h-full">
           <PanelHeader>
             <RiSendPlaneFill className="size-4" />
@@ -86,31 +86,33 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
             <Code2 className="size-5" />
             <span className="text-neutral-950">Payload</span>
           </PanelHeader>
-          <FormField
-            control={control}
-            name="payload"
-            render={({ field: { ref: _ref, ...restField } }) => (
-              <FormItem className="h-full">
-                <FormControl>
-                  <PanelContent>
-                    <Editor
-                      lang="json"
-                      basicSetup={basicSetup}
-                      extensions={extensions}
-                      className="overflow-auto"
-                      {...restField}
-                      multiline
-                    />
-                    <FormMessage />
-                  </PanelContent>
-                </FormControl>
-              </FormItem>
-            )}
-          />
+          <PanelContent className="flex flex-col overflow-hidden">
+            <FormField
+              control={control}
+              name="payload"
+              render={({ field: { ref: _ref, ...restField } }) => (
+                <FormItem className="flex flex-1 flex-col gap-2 overflow-auto">
+                  <FormControl>
+                    <>
+                      <Editor
+                        lang="json"
+                        basicSetup={basicSetup}
+                        extensions={extensions}
+                        className="overflow-auto"
+                        {...restField}
+                        multiline
+                      />
+                      <FormMessage />
+                    </>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </PanelContent>
         </Panel>
       </div>
 
-      <div className="flex h-1/2 flex-1 flex-col">
+      <div className="flex max-h-[50%] min-h-[50%] flex-1 flex-col">
         <Panel className="flex flex-1 flex-col overflow-hidden">
           <Tabs
             className="flex max-h-full flex-1 flex-col border-none"
@@ -144,23 +146,23 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
             </TabsList>
             {workflow?.origin === WorkflowOriginEnum.EXTERNAL && (
               <TabsContent value="framework" className={codePanelClassName} variant="regular">
-                <SnippetEditor language="framework" value={snippetValue} />
+                <SnippetEditor language="framework" value={snippetValue} readOnly />
               </TabsContent>
             )}
             <TabsContent value="shell" className={codePanelClassName} variant="regular">
-              <SnippetEditor language="shell" value={snippetValue} />
+              <SnippetEditor language="shell" value={snippetValue} readOnly />
             </TabsContent>
             <TabsContent value="typescript" className={codePanelClassName} variant="regular">
-              <SnippetEditor language="typescript" value={snippetValue} />
+              <SnippetEditor language="typescript" value={snippetValue} readOnly />
             </TabsContent>
             <TabsContent value="php" className={codePanelClassName} variant="regular">
-              <SnippetEditor language="php" value={snippetValue} />
+              <SnippetEditor language="php" value={snippetValue} readOnly />
             </TabsContent>
             <TabsContent value="go" className={codePanelClassName} variant="regular">
-              <SnippetEditor language="go" value={snippetValue} />
+              <SnippetEditor language="go" value={snippetValue} readOnly />
             </TabsContent>
             <TabsContent value="python" className={codePanelClassName} variant="regular">
-              <SnippetEditor language="python" value={snippetValue} />
+              <SnippetEditor language="python" value={snippetValue} readOnly />
             </TabsContent>
           </Tabs>
         </Panel>
