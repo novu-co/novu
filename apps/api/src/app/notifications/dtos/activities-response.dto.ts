@@ -187,7 +187,7 @@ export class ActivityNotificationExecutionDetailResponseDto {
   isTest: boolean;
 
   @ApiProperty({
-    enum: [...Object.values(ProvidersIdEnumConst).flatMap((enumObj) => Object.values(enumObj))],
+    enum: [...new Set([...Object.values(ProvidersIdEnumConst).flatMap((enumObj) => Object.values(enumObj))])],
     enumName: 'ProvidersIdEnum',
     description: 'Provider ID of the execution',
     type: String,
@@ -240,7 +240,7 @@ export class ActivityNotificationJobResponseDto {
   payload?: Record<string, unknown>;
 
   @ApiProperty({
-    enum: [...Object.values(ProvidersIdEnumConst).flatMap((enumObj) => Object.values(enumObj))],
+    enum: [...new Set([...Object.values(ProvidersIdEnumConst).flatMap((enumObj) => Object.values(enumObj))])],
     enumName: 'ProvidersIdEnum',
     description: 'Provider ID of the job',
     type: String, // Explicit type reference for enum

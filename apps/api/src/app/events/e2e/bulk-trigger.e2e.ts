@@ -8,7 +8,7 @@ import { TriggerEventRequestDto } from '@novu/api/models/components';
 import { z } from 'zod';
 import { NovuCore } from '@novu/api/core';
 import {
-  handleValidationErrorDto,
+  expectSdkValidationExceptionGeneric,
   initNovuClassSdk,
   initNovuFunctionSdk,
 } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
@@ -210,18 +210,14 @@ describe('Trigger bulk events - /v1/events/trigger/bulk (POST) #novu-v2', functi
       },
     };
 
-    let error;
-    try {
-      await novuClient.triggerBulk({
+    const { error: errorDto } = await expectSdkValidationExceptionGeneric(() =>
+      novuClient.triggerBulk({
         events: Array.from({ length: 101 }, () => event),
-      });
-    } catch (e) {
-      error = e;
-    }
-    const errorDto = handleValidationErrorDto(error);
+      })
+    );
 
-    expect(errorDto.statusCode).to.equal(422);
-    expect(errorDto.errors.events.messages[0]).to.equal('events must contain no more than 100 elements');
+    expect(errorDto?.statusCode).to.equal(422);
+    expect(errorDto?.errors.events.messages[0]).to.equal('events must contain no more than 100 elements');
   });
 
   it('should handle bulk if one of the events returns errors', async function () {

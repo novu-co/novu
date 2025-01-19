@@ -46,7 +46,7 @@ const CommandInput = React.forwardRef<
     <InputWrapper className={cn('h-9', size === 'sm' && 'h-8', size === 'xs' && 'h-7', inputWrapperClassName)}>
       <CommandPrimitive.Input
         ref={ref}
-        className={cn('text-paragraph-sm placeholder:text-text-soft h-9 w-full bg-transparent outline-none', className)}
+        className={cn('text-paragraph-xs placeholder:text-text-soft h-9 w-full bg-transparent outline-none', className)}
         {...props}
       />
     </InputWrapper>

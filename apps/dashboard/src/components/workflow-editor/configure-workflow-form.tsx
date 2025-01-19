@@ -187,7 +187,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
         exit={{ opacity: 0.1 }}
         transition={{ duration: 0.1 }}
       >
-        <SidebarHeader className="items-center text-sm font-medium">
+        <SidebarHeader className="items-center border-b text-sm font-medium">
           <div className="flex items-center gap-1">
             <RouteFill />
             <span>Configure workflow</span>
@@ -263,7 +263,6 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
           </DropdownMenu>
           <PromoteConfirmModal />
         </SidebarHeader>
-        <Separator />
         <Form {...form}>
           <form onBlur={onBlur}>
             <SidebarContent size="md">

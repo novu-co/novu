@@ -14,6 +14,7 @@ import { WorkflowRow } from '@/components/workflow-row';
 import { useFetchWorkflows } from '@/hooks/use-fetch-workflows';
 import { RiMore2Fill } from 'react-icons/ri';
 import { createSearchParams, useLocation, useSearchParams } from 'react-router-dom';
+import { ServerErrorPage } from './shared/server-error-page';
 
 export function WorkflowList() {
   const [searchParams] = useSearchParams();
@@ -34,7 +35,7 @@ export function WorkflowList() {
     offset,
   });
 
-  if (isError) return null;
+  if (isError) return <ServerErrorPage />;
 
   if (!isPending && data.totalCount === 0) {
     return <WorkflowListEmpty />;
