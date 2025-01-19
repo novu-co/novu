@@ -18,10 +18,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../components/primitives/dropdown-menu';
-import { getTemplates } from '../components/template-store/templates';
+import { getTemplates, WorkflowTemplate } from '../components/template-store/templates';
 import { WorkflowCard } from '../components/template-store/workflow-card';
 import { WorkflowTemplateModal } from '../components/template-store/workflow-template-modal';
 import { WorkflowList } from '../components/workflow-list';
+import { buildRoute, ROUTES } from '../utils/routes';
 
 export const TemplateModal = () => {
   const navigate = useNavigate();
@@ -40,9 +41,9 @@ export const TemplateModal = () => {
 };
 
 export const WorkflowsPage = () => {
+  const { environmentSlug } = useParams();
   const track = useTelemetry();
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams] = useSearchParams();
   const isTemplateStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_TEMPLATE_STORE_ENABLED);
   const templates = getTemplates();
@@ -66,9 +67,15 @@ export const WorkflowsPage = () => {
     track(TelemetryEvent.WORKFLOWS_PAGE_VISIT);
   }, [track]);
 
-  const handleTemplateClick = (template: (typeof templates)[0]) => {
+  const handleTemplateClick = (template: WorkflowTemplate) => {
     track(TelemetryEvent.TEMPLATE_WORKFLOW_CLICK);
-    navigate(`templates/${template.id}${location.search}`);
+
+    navigate(
+      buildRoute(ROUTES.TEMPLATE_STORE_CREATE_WORKFLOW, {
+        environmentSlug: environmentSlug || '',
+        templateId: template.id,
+      })
+    );
   };
 
   return (
@@ -88,7 +95,9 @@ export const WorkflowsPage = () => {
                     variant="primary"
                     size="xs"
                     leadingIcon={RiRouteFill}
-                    onClick={() => navigate(`create${location.search}`)}
+                    onClick={() =>
+                      navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }))
+                    }
                   >
                     Create workflow
                   </Button>
@@ -110,7 +119,7 @@ export const WorkflowsPage = () => {
                           className="w-full"
                           onClick={() => {
                             track(TelemetryEvent.CREATE_WORKFLOW_CLICK);
-                            navigate(`create${location.search}`);
+                            navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }));
                           }}
                         >
                           <div className="flex items-center gap-2">
@@ -121,7 +130,9 @@ export const WorkflowsPage = () => {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="cursor-pointer"
-                        onSelect={() => navigate(`templates${location.search}`)}
+                        onSelect={() =>
+                          navigate(buildRoute(ROUTES.TEMPLATE_STORE, { environmentSlug: environmentSlug || '' }))
+                        }
                       >
                         <RiFileMarkedLine />
                         View Workflow Gallery
@@ -136,7 +147,9 @@ export const WorkflowsPage = () => {
                 variant="primary"
                 size="xs"
                 leadingIcon={RiRouteFill}
-                onClick={() => navigate(`create${location.search}`)}
+                onClick={() =>
+                  navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }))
+                }
               >
                 Create workflow
               </Button>
@@ -151,7 +164,8 @@ export const WorkflowsPage = () => {
                     className="cursor-pointer"
                     onClick={() => {
                       track(TelemetryEvent.CREATE_WORKFLOW_CLICK);
-                      navigate(`create${location.search}`);
+
+                      navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }));
                     }}
                   >
                     <WorkflowCard name="Blank workflow" description="Create a blank workflow" steps={[]} />

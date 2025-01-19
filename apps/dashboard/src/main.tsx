@@ -105,15 +105,15 @@ const router = createBrowserRouter([
                 element: <WorkflowsPage />,
                 children: [
                   {
-                    path: 'templates',
+                    path: ROUTES.TEMPLATE_STORE,
                     element: <TemplateModal />,
                   },
                   {
-                    path: 'templates/:templateId',
+                    path: ROUTES.TEMPLATE_STORE_CREATE_WORKFLOW,
                     element: <TemplateModal />,
                   },
                   {
-                    path: 'create',
+                    path: ROUTES.WORKFLOWS_CREATE,
                     element: <CreateWorkflowPage />,
                   },
                 ],
