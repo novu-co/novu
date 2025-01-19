@@ -4,12 +4,13 @@ import { PageMeta } from '@/components/page-meta';
 import { Button } from '@/components/primitives/button';
 import { ScrollArea, ScrollBar } from '@/components/primitives/scroll-area';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { useFetchWorkflows } from '@/hooks/use-fetch-workflows';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { FeatureFlagsKeysEnum, StepTypeEnum } from '@novu/shared';
 import { useEffect } from 'react';
 import { RiArrowDownSLine, RiFileAddLine, RiFileMarkedLine, RiRouteFill } from 'react-icons/ri';
-import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ButtonGroupItem, ButtonGroupRoot } from '../components/primitives/button-group';
 import {
   DropdownMenu,
@@ -42,9 +43,24 @@ export const WorkflowsPage = () => {
   const track = useTelemetry();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const isTemplateStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_TEMPLATE_STORE_ENABLED);
   const templates = getTemplates();
   const popularTemplates = templates.filter((template) => template.isPopular).slice(0, 4);
+
+  const offset = parseInt(searchParams.get('offset') || '0');
+  const limit = parseInt(searchParams.get('limit') || '12');
+
+  const {
+    data: workflowsData,
+    isPending,
+    isError,
+  } = useFetchWorkflows({
+    limit,
+    offset,
+  });
+
+  const shouldShowStartWith = isTemplateStoreEnabled && (!workflowsData || workflowsData.totalCount < 5);
 
   useEffect(() => {
     track(TelemetryEvent.WORKFLOWS_PAGE_VISIT);
@@ -126,7 +142,7 @@ export const WorkflowsPage = () => {
               </Button>
             )}
           </div>
-          {isTemplateStoreEnabled && (
+          {shouldShowStartWith && (
             <div className="px-2.5 py-2">
               <div className="text-label-xs text-text-soft mb-2">Start with</div>
               <ScrollArea className="w-full">
@@ -156,8 +172,8 @@ export const WorkflowsPage = () => {
           )}
 
           <div className="px-2.5 py-2">
-            {isTemplateStoreEnabled && <div className="text-label-xs text-text-soft mb-2">Your Workflows</div>}
-            <WorkflowList />
+            {shouldShowStartWith && <div className="text-label-xs text-text-soft mb-2">Your Workflows</div>}
+            <WorkflowList data={workflowsData} isPending={isPending} isError={isError} limit={limit} />
           </div>
         </div>
         <Outlet />
