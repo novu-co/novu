@@ -45,7 +45,6 @@ function SidebarButton({
   beta,
   hasExternalLink,
 }: SidebarButtonProps) {
-  const ButtonWrapper = motion.button;
   const content = (
     <div className="flex items-center gap-3">
       <motion.div variants={iconVariants} className={`rounded-lg p-[5px] ${bgColor}`}>
@@ -61,7 +60,7 @@ function SidebarButton({
   );
 
   return (
-    <ButtonWrapper
+    <motion.button
       variants={buttonVariants}
       initial="initial"
       whileHover="hover"
@@ -84,7 +83,7 @@ function SidebarButton({
           )}
         </div>
       )}
-    </ButtonWrapper>
+    </motion.button>
   );
 }
 
