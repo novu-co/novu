@@ -126,35 +126,37 @@ export const WorkflowsPage = () => {
               </Button>
             )}
           </div>
-          <div className="px-2.5 py-2">
-            <div className="text-label-xs text-text-soft mb-2">Start with</div>
-            <ScrollArea className="w-full">
-              <div className="flex gap-4 pb-4">
-                <div
-                  className="cursor-pointer"
-                  onClick={() => {
-                    track(TelemetryEvent.CREATE_WORKFLOW_CLICK);
-                    navigate(`create${location.search}`);
-                  }}
-                >
-                  <WorkflowCard name="Blank workflow" description="Create a blank workflow" steps={[]} />
+          {isTemplateStoreEnabled && (
+            <div className="px-2.5 py-2">
+              <div className="text-label-xs text-text-soft mb-2">Start with</div>
+              <ScrollArea className="w-full">
+                <div className="flex gap-4 pb-4">
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => {
+                      track(TelemetryEvent.CREATE_WORKFLOW_CLICK);
+                      navigate(`create${location.search}`);
+                    }}
+                  >
+                    <WorkflowCard name="Blank workflow" description="Create a blank workflow" steps={[]} />
+                  </div>
+                  {popularTemplates.map((template) => (
+                    <WorkflowCard
+                      key={template.id}
+                      name={template.name}
+                      description={template.description}
+                      steps={template.workflowDefinition.steps.map((step) => step.type as StepTypeEnum)}
+                      onClick={() => handleTemplateClick(template)}
+                    />
+                  ))}
                 </div>
-                {popularTemplates.map((template) => (
-                  <WorkflowCard
-                    key={template.id}
-                    name={template.name}
-                    description={template.description}
-                    steps={template.workflowDefinition.steps.map((step) => step.type as StepTypeEnum)}
-                    onClick={() => handleTemplateClick(template)}
-                  />
-                ))}
-              </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-          </div>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            </div>
+          )}
 
           <div className="px-2.5 py-2">
-            <div className="text-label-xs text-text-soft mb-2">Your Workflows</div>
+            {isTemplateStoreEnabled && <div className="text-label-xs text-text-soft mb-2">Your Workflows</div>}
             <WorkflowList />
           </div>
         </div>
