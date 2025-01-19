@@ -88,7 +88,10 @@ export const WorkflowsPage = () => {
             )}
             {shouldOpenTemplateModal && <WorkflowTemplateModal open={true} onOpenChange={setShouldOpenTemplateModal} />}
           </div>
-          <WorkflowList />
+          <div className="px-2.5 py-2">
+            <div className="text-label-xs text-text-soft mb-2">Your Workflows</div>
+            <WorkflowList />
+          </div>
         </div>
       </DashboardLayout>
     </>
