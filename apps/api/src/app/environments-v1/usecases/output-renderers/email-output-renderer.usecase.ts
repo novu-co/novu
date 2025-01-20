@@ -45,34 +45,26 @@ export class EmailOutputRendererUsecase {
   }
 
   private removeTrailingEmptyLines(node: TipTapNode): TipTapNode {
-    if (!node.content) return node;
+    if (!node.content || node.content.length === 0) return node;
 
-    let shouldKeepFiltering = true;
+    // Iterate from the end of the content and find the first non-empty node
+    let lastIndex = node.content.length;
+    // eslint-disable-next-line no-plusplus
+    for (let i = node.content.length - 1; i >= 0; i--) {
+      const childNode = node.content[i];
 
-    // Filter and remove trailing empty nodes
-    const filteredContent = [...node.content]
-      .reverse()
-      .filter((childNode) => {
-        if (shouldKeepFiltering) {
-          const isEmptyParagraph =
-            childNode.type === 'paragraph' &&
-            !childNode.text && // No text
-            (!childNode.content || childNode.content.length === 0);
+      const isEmptyParagraph =
+        childNode.type === 'paragraph' && !childNode.text && (!childNode.content || childNode.content.length === 0);
 
-          // If the paragraph is empty, remove it
-          if (isEmptyParagraph) {
-            return false;
-          }
+      if (!isEmptyParagraph) {
+        lastIndex = i + 1; // Include this node in the result
+        break;
+      }
+    }
 
-          // Stop filtering once a non-empty node is encountered
-          shouldKeepFiltering = false;
-        }
+    // Slice the content to remove trailing empty nodes
+    const filteredContent = node.content.slice(0, lastIndex);
 
-        return true;
-      })
-      .reverse(); // Reverse back to the original order
-
-    // Return the updated node
     return { ...node, content: filteredContent };
   }
 
