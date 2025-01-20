@@ -8,8 +8,6 @@ import { ConstructFrameworkWorkflow } from './usecases/construct-framework-workf
 import { NovuBridgeController } from './novu-bridge.controller';
 import {
   ChatOutputRendererUsecase,
-  ExpandEmailEditorSchemaUsecase,
-  HydrateEmailSchemaUseCase,
   InAppOutputRendererUsecase,
   PushOutputRendererUsecase,
   EmailOutputRendererUsecase,
@@ -17,6 +15,7 @@ import {
 } from './usecases/output-renderers';
 import { DelayOutputRendererUsecase } from './usecases/output-renderers/delay-output-renderer.usecase';
 import { DigestOutputRendererUsecase } from './usecases/output-renderers/digest-output-renderer.usecase';
+import { WrapMailyInLiquidUseCase } from './usecases/output-renderers/maily-to-liquid/wrap-maily-in-liquid.usecase';
 
 @Module({
   controllers: [NovuBridgeController],
@@ -36,8 +35,7 @@ import { DigestOutputRendererUsecase } from './usecases/output-renderers/digest-
     ChatOutputRendererUsecase,
     PushOutputRendererUsecase,
     EmailOutputRendererUsecase,
-    ExpandEmailEditorSchemaUsecase,
-    HydrateEmailSchemaUseCase,
+    WrapMailyInLiquidUseCase,
     DelayOutputRendererUsecase,
     DigestOutputRendererUsecase,
   ],
