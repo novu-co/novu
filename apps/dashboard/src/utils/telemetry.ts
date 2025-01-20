@@ -37,6 +37,7 @@ export enum TelemetryEvent {
   CHANGELOG_ITEM_CLICKED = 'Changelog item clicked',
   CHANGELOG_ITEM_DISMISSED = 'Changelog item dismissed',
   SHARE_FEEDBACK_LINK_CLICKED = 'Share feedback link clicked',
+  RE_RUN_WORKFLOW = 'Re-run workflow',
   VARIABLE_POPOVER_OPENED = 'Variable popover opened - [Variable Editor]',
   VARIABLE_POPOVER_APPLIED = 'Variable popover applied - [Variable Editor]',
   TEMPLATE_MODAL_OPENED = 'Template Modal Opened - [Template Store]',
