@@ -21,6 +21,17 @@ export function SdkMethodName(methodName: string) {
 export function SdkGroupName(methodName: string) {
   return applyDecorators(ApiExtension('x-speakeasy-group', methodName));
 }
+/**
+ * A decorator function that marks a path or operation to be ignored in OpenAPI documentation.
+ *
+ * This function applies the `x-ignore` extension to the OpenAPI specification,
+ * indicating that the decorated path or operation should not be included in the generated documentation.
+ *
+ * @returns {Function} A decorator function that applies the `x-ignore` extension.
+ */
+export function DocumentationIgnore() {
+  return applyDecorators(ApiExtension('x-ignore', true));
+}
 
 /**
  * Ignores the path for the SDK.

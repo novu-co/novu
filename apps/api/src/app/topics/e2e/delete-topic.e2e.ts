@@ -58,7 +58,7 @@ describe('Delete a topic - /topics/:topicKey (DELETE) #novu-v2', async () => {
     await addSubscribers(session, topicKey, [subscriber.subscriberId]);
 
     const { error } = await expectSdkExceptionGeneric(() =>
-      novuClient.topics.delete(topicKey, { retries: { strategy: 'none' } })
+      novuClient.topics.delete(topicKey, undefined, { retries: { strategy: 'none' } })
     );
     expect(error?.statusCode).to.equal(409);
     expect(error?.message).to.eql(
