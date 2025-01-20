@@ -111,12 +111,6 @@ export class StandardWorker extends StandardWorkerService {
                 .execute(RunJobCommand.create(minimalJobData))
                 .then(resolve)
                 .catch((error) => {
-                  Logger.error(
-                    error,
-                    `Failed to run the job ${minimalJobData.jobId} during worker processing`,
-                    LOG_CONTEXT
-                  );
-
                   return reject(error);
                 })
                 .finally(() => {
