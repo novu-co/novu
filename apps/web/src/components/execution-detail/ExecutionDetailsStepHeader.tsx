@@ -122,9 +122,9 @@ const getDetailsStyledComponentByStepStatus = (status) => {
   return StepDetails;
 };
 
-const StepOutcome = ({ createdAt, name, detail, status }) => {
+const StepOutcome = ({ updatedAt, name, detail, status }) => {
   const Details = getDetailsStyledComponentByStepStatus(status);
-  const date = format(parseISO(createdAt), 'dd/MM/yyyy');
+  const date = format(parseISO(updatedAt), 'dd/MM/yyyy');
 
   return (
     <>
@@ -145,7 +145,7 @@ export const ExecutionDetailsStepHeader = ({ step }) => {
         <StepLogo status={status} type={step.type} />
       </Grid.Col>
       <Grid.Col span={7}>
-        <StepOutcome createdAt={step?.createdAt} name={step?.type} detail={generatedDetail} status={status} />
+        <StepOutcome updatedAt={step?.updatedAt} name={step?.type} detail={generatedDetail} status={status} />
       </Grid.Col>
       <Grid.Col span={4}>
         <ExecutionDetailsWebhookFeedback executionDetails={step.executionDetails} />

@@ -19,7 +19,7 @@ import { ConfigurePreviewAccordion } from '../shared/configure-preview-accordion
 
 type EmailEditorPreviewProps = {
   editorValue: string;
-  setEditorValue: (value: string) => void;
+  setEditorValue: (value: string) => Error | null;
   previewStep: () => void;
   previewData?: GeneratePreviewResponseDto;
   isPreviewPending: boolean;

@@ -73,6 +73,7 @@
     "flat": "^6.0.1",
     "js-cookie": "^3.0.5",
     "launchdarkly-react-client-sdk": "^3.3.2",
+    "liquidjs": "^10.20.0",
     "lodash.debounce": "^4.0.8",
     "lodash.isequal": "^4.5.0",
     "lodash.merge": "^4.6.2",

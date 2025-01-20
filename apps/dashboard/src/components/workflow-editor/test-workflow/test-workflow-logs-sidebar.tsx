@@ -10,7 +10,6 @@ type TestWorkflowLogsSidebarProps = {
 export const TestWorkflowLogsSidebar = ({ transactionId }: TestWorkflowLogsSidebarProps) => {
   const [activityId, setActivityId] = useState<string>();
 
-  console.log(transactionId, activityId);
   return (
     <aside className="flex h-full flex-col">
       {transactionId ? (
