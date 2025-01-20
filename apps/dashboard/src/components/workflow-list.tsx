@@ -11,15 +11,13 @@ import {
 } from '@/components/primitives/table';
 import { WorkflowListEmpty } from '@/components/workflow-list-empty';
 import { WorkflowRow } from '@/components/workflow-row';
+import { ListWorkflowResponse } from '@novu/shared';
 import { RiMore2Fill } from 'react-icons/ri';
 import { createSearchParams, useLocation, useSearchParams } from 'react-router-dom';
 import { ServerErrorPage } from './shared/server-error-page';
 
 interface WorkflowListProps {
-  data?: {
-    workflows: any[];
-    totalCount: number;
-  };
+  data?: ListWorkflowResponse;
   isPending?: boolean;
   isError?: boolean;
   limit?: number;

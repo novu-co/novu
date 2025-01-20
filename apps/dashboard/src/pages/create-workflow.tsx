@@ -26,7 +26,7 @@ export function CreateWorkflowPage() {
       open={true}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
-          navigate(`..${location.search}`);
+          navigate(-1);
         }
       }}
     >

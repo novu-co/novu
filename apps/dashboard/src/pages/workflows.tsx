@@ -10,7 +10,7 @@ import { TelemetryEvent } from '@/utils/telemetry';
 import { FeatureFlagsKeysEnum, StepTypeEnum } from '@novu/shared';
 import { useEffect } from 'react';
 import { RiArrowDownSLine, RiFileAddLine, RiFileMarkedLine, RiRouteFill } from 'react-icons/ri';
-import { Outlet, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Outlet, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ButtonGroupItem, ButtonGroupRoot } from '../components/primitives/button-group';
 import {
   DropdownMenu,
@@ -26,13 +26,12 @@ import { buildRoute, ROUTES } from '../utils/routes';
 
 export const TemplateModal = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { templateId } = useParams();
   const templates = getTemplates();
   const selectedTemplate = templateId ? templates.find((template) => template.id === templateId) : undefined;
 
   const handleCloseTemplateModal = () => {
-    navigate(`..${location.search}`);
+    navigate(-1);
   };
 
   return (
