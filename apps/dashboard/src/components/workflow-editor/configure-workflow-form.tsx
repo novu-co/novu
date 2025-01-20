@@ -174,7 +174,7 @@ export const ConfigureWorkflowForm = (props: ConfigureWorkflowFormProps) => {
       />
       <PageMeta title={workflow.name} />
       <motion.div
-        className={cn('relative flex h-full w-full flex-col')}
+        className={cn('relative flex w-full flex-col')}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0.1 }}

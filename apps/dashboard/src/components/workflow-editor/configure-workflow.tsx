@@ -1,5 +1,6 @@
 import { ConfigureWorkflowForm } from '@/components/workflow-editor/configure-workflow-form';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
+import { WorkflowActions } from './workflow-actions';
 
 export function ConfigureWorkflow() {
   const { workflow, update } = useWorkflow();
@@ -8,5 +9,10 @@ export function ConfigureWorkflow() {
     return null;
   }
 
-  return <ConfigureWorkflowForm workflow={workflow} update={update} />;
+  return (
+    <>
+      <ConfigureWorkflowForm workflow={workflow} update={update} />
+      <WorkflowActions workflow={workflow} />
+    </>
+  );
 }
