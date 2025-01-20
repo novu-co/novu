@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
 import * as Sentry from '@sentry/react';
+import isEqual from 'lodash.isequal';
+import { useCallback, useEffect, useState } from 'react';
 
-import { usePreviewStep } from '@/hooks/use-preview-step';
 import { useDataRef } from '@/hooks/use-data-ref';
+import { usePreviewStep } from '@/hooks/use-preview-step';
 
 export const useEditorPreview = ({
   workflowSlug,
@@ -20,7 +21,10 @@ export const useEditorPreview = ({
     isPending: isPreviewPending,
   } = usePreviewStep({
     onSuccess: (res) => {
-      setEditorValue(JSON.stringify(res.previewPayloadExample, null, 2));
+      const newValue = JSON.stringify(res.previewPayloadExample, null, 2);
+      if (!isEqual(editorValue, newValue)) {
+        setEditorValueSafe(newValue);
+      }
     },
     onError: (error) => {
       Sentry.captureException(error);
@@ -44,6 +48,16 @@ export const useEditorPreview = ({
     });
   }, [dataRef, previewStep]);
 
+  const setEditorValueSafe = (value: string): Error | null => {
+    try {
+      JSON.parse(value);
+      setEditorValue(value);
+      return null;
+    } catch (e) {
+      return e as Error;
+    }
+  };
+
   const previewStepCallback = useCallback(() => {
     return previewStep({
       workflowSlug,
@@ -54,7 +68,7 @@ export const useEditorPreview = ({
 
   return {
     editorValue,
-    setEditorValue,
+    setEditorValue: setEditorValueSafe,
     previewStep: previewStepCallback,
     previewData,
     isPreviewPending,

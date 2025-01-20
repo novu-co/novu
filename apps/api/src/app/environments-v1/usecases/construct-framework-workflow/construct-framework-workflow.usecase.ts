@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { workflow } from '@novu/framework/express';
 import { ActionStep, ChannelStep, JsonSchema, Step, StepOptions, StepOutput, Workflow } from '@novu/framework/internal';
 import { NotificationStepEntity, NotificationTemplateEntity, NotificationTemplateRepository } from '@novu/dal';
-import { StepTypeEnum } from '@novu/shared';
+import { JSONSchemaDefinition, StepTypeEnum } from '@novu/shared';
 import { Instrument, InstrumentUsecase, PinoLogger } from '@novu/application-generic';
 import { AdditionalOperation, RulesLogic } from 'json-logic-js';
 import _ from 'lodash';
@@ -12,12 +12,13 @@ import {
   FullPayloadForRender,
   InAppOutputRendererUsecase,
   PushOutputRendererUsecase,
-  RenderEmailOutputUsecase,
+  EmailOutputRendererUsecase,
   SmsOutputRendererUsecase,
 } from '../output-renderers';
 import { DelayOutputRendererUsecase } from '../output-renderers/delay-output-renderer.usecase';
 import { DigestOutputRendererUsecase } from '../output-renderers/digest-output-renderer.usecase';
 import { evaluateRules } from '../../../shared/services/query-parser/query-parser.service';
+import { isMatchingJsonSchema } from '../../../workflows-v2/util/jsonToSchema';
 
 const LOG_CONTEXT = 'ConstructFrameworkWorkflow';
 
@@ -27,7 +28,7 @@ export class ConstructFrameworkWorkflow {
     private logger: PinoLogger,
     private workflowsRepository: NotificationTemplateRepository,
     private inAppOutputRendererUseCase: InAppOutputRendererUsecase,
-    private emailOutputRendererUseCase: RenderEmailOutputUsecase,
+    private emailOutputRendererUseCase: EmailOutputRendererUsecase,
     private smsOutputRendererUseCase: SmsOutputRendererUsecase,
     private chatOutputRendererUseCase: ChatOutputRendererUsecase,
     private pushOutputRendererUseCase: PushOutputRendererUsecase,
@@ -120,7 +121,7 @@ export class ConstructFrameworkWorkflow {
           this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.SMS:
-        return step.inApp(
+        return step.sms(
           stepId,
           async (controlValues) => {
             return this.smsOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
@@ -128,7 +129,7 @@ export class ConstructFrameworkWorkflow {
           this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.CHAT:
-        return step.inApp(
+        return step.chat(
           stepId,
           async (controlValues) => {
             return this.chatOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
@@ -136,7 +137,7 @@ export class ConstructFrameworkWorkflow {
           this.constructChannelStepOptions(staticStep, fullPayloadForRender)
         );
       case StepTypeEnum.PUSH:
-        return step.inApp(
+        return step.push(
           stepId,
           async (controlValues) => {
             return this.pushOutputRendererUseCase.execute({ controlValues, fullPayloadForRender });
@@ -172,7 +173,8 @@ export class ConstructFrameworkWorkflow {
     return {
       ...this.constructCommonStepOptions(staticStep, fullPayloadForRender),
       // TODO: resolve this from the Step options
-      disableOutputSanitization: false,
+      disableOutputSanitization:
+        (staticStep.controlVariables?.disableOutputSanitization as boolean | undefined) ?? false,
       // TODO: add providers
       providers: {},
     };
@@ -183,8 +185,25 @@ export class ConstructFrameworkWorkflow {
     staticStep: NotificationStepEntity,
     fullPayloadForRender: FullPayloadForRender
   ): Required<Parameters<ActionStep>[2]> {
+    const stepOptions = this.constructCommonStepOptions(staticStep, fullPayloadForRender);
+
+    let controlSchema = stepOptions.controlSchema as JSONSchemaDefinition;
+    const stepType = staticStep.template!.type;
+
+    /*
+     * because of the known AJV issue with anyOf, we need to find the first schema that matches the control values
+     * ref: https://ajv.js.org/guide/modifying-data.html#assigning-defaults
+     */
+    if (stepType === StepTypeEnum.DIGEST && typeof controlSchema === 'object' && controlSchema.anyOf) {
+      const fistSchemaMatch = controlSchema.anyOf.find((item) => {
+        return isMatchingJsonSchema(item, staticStep.controlVariables);
+      });
+      controlSchema = fistSchemaMatch ?? controlSchema.anyOf[0];
+    }
+
     return {
-      ...this.constructCommonStepOptions(staticStep, fullPayloadForRender),
+      ...stepOptions,
+      controlSchema: controlSchema as JsonSchema,
     };
   }
 

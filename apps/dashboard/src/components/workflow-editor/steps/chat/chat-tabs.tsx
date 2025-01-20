@@ -7,6 +7,7 @@ import { CustomStepControls } from '@/components/workflow-editor/steps/controls/
 import { TemplateTabs } from '@/components/workflow-editor/steps/template-tabs';
 import { ChatEditor } from '@/components/workflow-editor/steps/chat/chat-editor';
 import { ChatEditorPreview } from '@/components/workflow-editor/steps/chat/chat-editor-preview';
+import { useEditorPreview } from '../use-editor-preview';
 
 export const ChatTabs = (props: StepEditorProps) => {
   const { workflow, step } = props;
@@ -16,6 +17,12 @@ export const ChatTabs = (props: StepEditorProps) => {
   const isNovuCloud = !!(workflow.origin === WorkflowOriginEnum.NOVU_CLOUD && uiSchema);
   const isExternal = workflow.origin === WorkflowOriginEnum.EXTERNAL;
 
+  const { editorValue, setEditorValue, previewStep, previewData, isPreviewPending } = useEditorPreview({
+    workflowSlug: workflow.workflowId,
+    stepSlug: step.stepId,
+    controlValues: form.getValues(),
+  });
+
   const editorContent = (
     <>
       {isNovuCloud && <ChatEditor uiSchema={uiSchema} />}
@@ -23,7 +30,15 @@ export const ChatTabs = (props: StepEditorProps) => {
     </>
   );
 
-  const previewContent = <ChatEditorPreview workflow={workflow} step={step} formValues={form.getValues()} />;
+  const previewContent = (
+    <ChatEditorPreview
+      editorValue={editorValue}
+      setEditorValue={setEditorValue}
+      previewStep={previewStep}
+      previewData={previewData}
+      isPreviewPending={isPreviewPending}
+    />
+  );
 
   return (
     <TemplateTabs
@@ -31,6 +46,7 @@ export const ChatTabs = (props: StepEditorProps) => {
       previewContent={previewContent}
       tabsValue={tabsValue}
       onTabChange={setTabsValue}
+      previewStep={previewStep}
     />
   );
 };

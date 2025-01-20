@@ -115,7 +115,7 @@ export class NotificationTriggerEntity implements INotificationTrigger {
   reservedVariables?: ITriggerReservedVariable[];
 }
 
-export class StepVariantEntity implements IStepVariant {
+export class NotificationStepData implements IStepVariant {
   _id?: string;
 
   uuid?: string;
@@ -157,8 +157,8 @@ export class StepVariantEntity implements IStepVariant {
    */
   controls?: ControlSchemas;
 }
-export class NotificationStepEntity extends StepVariantEntity implements INotificationTemplateStep {
-  variants?: StepVariantEntity[];
+export class NotificationStepEntity extends NotificationStepData implements INotificationTemplateStep {
+  variants?: NotificationStepData[];
 }
 
 export class StepFilter implements IMessageFilter {

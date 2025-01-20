@@ -2,7 +2,7 @@ import { AnalyticsBrowser } from '@segment/analytics-next';
 import type { IUserEntity } from '@novu/shared';
 import * as mixpanel from 'mixpanel-browser';
 import { MIXPANEL_KEY, SEGMENT_KEY } from '@/config';
-
+import * as Sentry from '@sentry/react';
 export class SegmentService {
   private _segment: AnalyticsBrowser | null = null;
   private _segmentEnabled: boolean;
@@ -17,6 +17,14 @@ export class SegmentService {
         //@ts-expect-error missing from types
         record_sessions_percent: 100,
       });
+
+      try {
+        //@ts-expect-error missing from types
+        mixpanel.start_session_recording();
+      } catch (e) {
+        Sentry.captureException(e);
+        console.error(e);
+      }
     }
 
     if (this._segmentEnabled) {
@@ -51,7 +59,7 @@ export class SegmentService {
     }
   }
 
-  identify(user: IUserEntity) {
+  identify(user: IUserEntity, extraProperties?: Record<string, unknown>) {
     if (!this.isSegmentEnabled()) {
       return;
     }
@@ -62,6 +70,19 @@ export class SegmentService {
       firstName: user.firstName,
       lastName: user.lastName,
       avatar: user.profilePicture,
+      ...(extraProperties || {}),
+    });
+  }
+
+  group(organization: { id: string; name: string; createdAt: string }, extraProperties?: Record<string, unknown>) {
+    if (!this.isSegmentEnabled()) {
+      return;
+    }
+
+    this._segment?.group(organization.id, {
+      name: organization.name,
+      createdAt: organization.createdAt,
+      ...(extraProperties || {}),
     });
   }
 

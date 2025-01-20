@@ -52,6 +52,8 @@ export const envValidators = {
       NEW_RELIC_APP_NAME: str({ default: '' }),
       NEW_RELIC_LICENSE_KEY: str({ default: '' }),
       PLAIN_SUPPORT_KEY: str({ default: undefined }),
+      PLAIN_IDENTITY_VERIFICATION_SECRET_KEY: str({ default: undefined }),
+      PLAIN_CARDS_HMAC_SECRET_KEY: str({ default: undefined }),
       STRIPE_API_KEY: str({ default: undefined }),
       STRIPE_CONNECT_SECRET: str({ default: undefined }),
     }),

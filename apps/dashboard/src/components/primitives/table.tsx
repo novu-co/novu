@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { cn } from '@/utils/ui';
+import { cva } from 'class-variance-authority';
 import { ClassNameValue } from 'tailwind-merge';
 
 interface TableProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -97,9 +98,10 @@ const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<
 );
 TableHead.displayName = 'TableHead';
 
+export const tableCellVariants = cva(`px-6 py-2 align-middle`);
 const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(
-  ({ className, ...props }, ref) => <td ref={ref} className={cn('px-6 py-2 align-middle', className)} {...props} />
+  ({ className, ...props }, ref) => <td ref={ref} className={cn(tableCellVariants(), className)} {...props} />
 );
 TableCell.displayName = 'TableCell';
 
-export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell };
+export { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow };

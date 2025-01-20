@@ -1,8 +1,31 @@
-import { useState } from 'react';
+import { PAUSE_MODAL_TITLE, PauseModalDescription } from '@/components/pause-workflow-dialog';
+import { Badge } from '@/components/primitives/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/primitives/dropdown-menu';
+import { TableCell, TableRow } from '@/components/primitives/table';
+import { Tooltip, TooltipContent, TooltipPortal, TooltipTrigger } from '@/components/primitives/tooltip';
+import TruncatedText from '@/components/truncated-text';
+import { WorkflowStatus } from '@/components/workflow-status';
+import { WorkflowSteps } from '@/components/workflow-steps';
+import { WorkflowTags } from '@/components/workflow-tags';
+import { useEnvironment } from '@/context/environment/hooks';
+import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
+import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
+import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
+import { WorkflowOriginEnum, WorkflowStatusEnum } from '@/utils/enums';
+import { buildRoute, ROUTES } from '@/utils/routes';
+import { cn } from '@/utils/ui';
+import { IEnvironment, WorkflowListResponseDto } from '@novu/shared';
+import { ComponentProps, useState } from 'react';
 import { FaCode } from 'react-icons/fa6';
 import {
   RiDeleteBin2Line,
-  RiFileCopyLine,
   RiFlashlightLine,
   RiGitPullRequestFill,
   RiMore2Fill,
@@ -12,36 +35,14 @@ import {
 } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import { type ExternalToast } from 'sonner';
-import { IEnvironment, WorkflowListResponseDto } from '@novu/shared';
-import { Badge } from '@/components/primitives/badge';
-import { Button } from '@/components/primitives/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/primitives/dropdown-menu';
-import { HoverToCopy } from '@/components/primitives/hover-to-copy';
-import { TableCell, TableRow } from '@/components/primitives/table';
-import { Tooltip, TooltipContent, TooltipPortal, TooltipTrigger } from '@/components/primitives/tooltip';
-import TruncatedText from '@/components/truncated-text';
-import { WorkflowStatus } from '@/components/workflow-status';
-import { WorkflowSteps } from '@/components/workflow-steps';
-import { WorkflowTags } from '@/components/workflow-tags';
-import { useEnvironment } from '@/context/environment/hooks';
-import { useDeleteWorkflow } from '@/hooks/use-delete-workflow';
-import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
-import { WorkflowOriginEnum, WorkflowStatusEnum } from '@/utils/enums';
-import { buildRoute, LEGACY_ROUTES, ROUTES } from '@/utils/routes';
 import { ConfirmationModal } from './confirmation-modal';
-import { showToast } from './primitives/sonner-helpers';
-import { ToastIcon } from './primitives/sonner';
-import { usePatchWorkflow } from '@/hooks/use-patch-workflow';
-import { PauseModalDescription, PAUSE_MODAL_TITLE } from '@/components/pause-workflow-dialog';
 import { DeleteWorkflowDialog } from './delete-workflow-dialog';
+import { CompactButton } from './primitives/button-compact';
+import { CopyButton } from './primitives/copy-button';
+import { ToastIcon } from './primitives/sonner';
+import { showToast } from './primitives/sonner-helpers';
 import { TimeDisplayHoverCard } from './time-display-hover-card';
+import { LEGACY_DASHBOARD_URL } from '@/config';
 
 type WorkflowRowProps = {
   workflow: WorkflowListResponseDto;
@@ -54,15 +55,17 @@ const toastOptions: ExternalToast = {
   },
 };
 
-export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
-  const { currentEnvironment } = useEnvironment();
-  const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
+type WorkflowLinkTableCellProps = ComponentProps<typeof TableCell> & {
+  workflow: WorkflowListResponseDto;
+};
 
+const WorkflowLinkTableCell = (props: WorkflowLinkTableCellProps) => {
+  const { workflow, children, className, ...rest } = props;
+  const { currentEnvironment } = useEnvironment();
   const isV1Workflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1;
+
   const workflowLink = isV1Workflow
-    ? buildRoute(LEGACY_ROUTES.EDIT_WORKFLOW, {
+    ? buildRoute(`${LEGACY_DASHBOARD_URL}/workflows/edit/:workflowId`, {
         workflowId: workflow._id,
       })
     : buildRoute(ROUTES.EDIT_WORKFLOW, {
@@ -70,8 +73,25 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
         workflowSlug: workflow.slug,
       });
 
+  return (
+    <TableCell className={cn('group-hover:bg-neutral-alpha-50 relative', className)} {...rest}>
+      {children}
+      <Link to={workflowLink} className={cn('absolute inset-0')} reloadDocument={isV1Workflow}>
+        <span className="sr-only">Edit workflow</span>
+      </Link>
+    </TableCell>
+  );
+};
+
+export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
+  const { currentEnvironment } = useEnvironment();
+  const { safeSync, isSyncable, tooltipContent, PromoteConfirmModal } = useSyncWorkflow(workflow);
+
+  const isV1Workflow = workflow.origin === WorkflowOriginEnum.NOVU_CLOUD_V1;
   const triggerWorkflowLink = isV1Workflow
-    ? buildRoute(LEGACY_ROUTES.TEST_WORKFLOW, { workflowId: workflow._id })
+    ? buildRoute(`${LEGACY_DASHBOARD_URL}/workflows/edit/:workflowId/test-workflow`, { workflowId: workflow._id })
     : buildRoute(ROUTES.TEST_WORKFLOW, {
         environmentSlug: currentEnvironment?.slug ?? '',
         workflowSlug: workflow.slug,
@@ -160,37 +180,39 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
   };
 
   return (
-    <TableRow key={workflow._id} className="relative">
+    <TableRow key={workflow._id} className="group relative isolate">
       <PromoteConfirmModal />
-      <TableCell className="font-medium">
+      <WorkflowLinkTableCell workflow={workflow} className="font-medium">
         <div className="flex items-center gap-1">
           {workflow.origin === WorkflowOriginEnum.EXTERNAL && (
-            <Badge variant="warning" kind="pill">
+            <Badge color="yellow" size="sm" variant="lighter">
               <FaCode className="size-3" />
             </Badge>
           )}
-          <TruncatedText className="max-w-[32ch]" asChild>
-            <Link to={workflowLink} reloadDocument={isV1Workflow}>
-              {workflow.name}
-            </Link>
-          </TruncatedText>
+          <TruncatedText className="max-w-[32ch]">{workflow.name}</TruncatedText>
         </div>
-        <HoverToCopy className="group flex items-center gap-1" valueToCopy={workflow.workflowId}>
+        <div className="flex items-center gap-1 transition-opacity duration-200">
           <TruncatedText className="text-foreground-400 font-code block text-xs">{workflow.workflowId}</TruncatedText>
-          <RiFileCopyLine className="text-foreground-400 invisible size-3 group-hover:visible" />
-        </HoverToCopy>
-      </TableCell>
-      <TableCell className="min-w-[200px]">
-        <WorkflowStatus status={workflow.status} />
-      </TableCell>
-      <TableCell>
-        <WorkflowSteps steps={workflow.stepTypeOverviews} />
-      </TableCell>
-      <TableCell>
-        <WorkflowTags tags={workflow.tags || []} />
-      </TableCell>
 
-      <TableCell className="text-foreground-600 min-w-[180px] text-sm font-medium">
+          <CopyButton
+            className="z-10 flex size-2 p-0 px-1 opacity-0 group-hover:opacity-100"
+            valueToCopy={workflow.workflowId}
+            size="2xs"
+            mode="ghost"
+          ></CopyButton>
+        </div>
+      </WorkflowLinkTableCell>
+      <WorkflowLinkTableCell workflow={workflow} className="min-w-[200px]">
+        <WorkflowStatus status={workflow.status} />
+      </WorkflowLinkTableCell>
+      <WorkflowLinkTableCell workflow={workflow}>
+        <WorkflowSteps steps={workflow.stepTypeOverviews} />
+      </WorkflowLinkTableCell>
+      <WorkflowLinkTableCell workflow={workflow}>
+        <WorkflowTags tags={workflow.tags || []} />
+      </WorkflowLinkTableCell>
+
+      <WorkflowLinkTableCell workflow={workflow} className="text-foreground-600 min-w-[180px] text-sm font-medium">
         <TimeDisplayHoverCard date={new Date(workflow.updatedAt)}>
           {new Date(workflow.updatedAt).toLocaleDateString('en-US', {
             year: 'numeric',
@@ -198,9 +220,9 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             day: 'numeric',
           })}
         </TimeDisplayHoverCard>
-      </TableCell>
+      </WorkflowLinkTableCell>
 
-      <TableCell className="w-1">
+      <WorkflowLinkTableCell workflow={workflow} className="w-1">
         <DeleteWorkflowDialog
           workflow={workflow}
           open={isDeleteModalOpen}
@@ -225,9 +247,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
          */}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <RiMore2Fill className="h-4 w-4" />
-            </Button>
+            <CompactButton icon={RiMore2Fill} variant="ghost" className="z-10 h-8 w-8 p-0"></CompactButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
             <DropdownMenuGroup>
@@ -243,7 +263,15 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
                 tooltipContent={tooltipContent}
                 onSync={safeSync}
               />
-              <Link to={LEGACY_ROUTES.ACTIVITY_FEED} reloadDocument>
+              <Link
+                to={
+                  buildRoute(ROUTES.ACTIVITY_FEED, {
+                    environmentSlug: currentEnvironment?.slug ?? '',
+                  }) +
+                  '?' +
+                  new URLSearchParams({ workflows: workflow._id }).toString()
+                }
+              >
                 <DropdownMenuItem className="cursor-pointer">
                   <RiPulseFill />
                   View activity
@@ -278,7 +306,7 @@ export const WorkflowRow = ({ workflow }: WorkflowRowProps) => {
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-      </TableCell>
+      </WorkflowLinkTableCell>
     </TableRow>
   );
 };

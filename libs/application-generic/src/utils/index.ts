@@ -12,4 +12,4 @@ export * from './subscriber';
 export * from './variants';
 export * from './deepmerge';
 export * from './generate-id';
-export * from './sanitize-preview-control-values';
+export * from './sanitize-control-values';

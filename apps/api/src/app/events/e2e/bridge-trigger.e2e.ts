@@ -18,6 +18,7 @@ import {
   MessagesStatusEnum,
   StepTypeEnum,
   WorkflowCreationSourceEnum,
+  WorkflowOriginEnum,
   WorkflowResponseDto,
 } from '@novu/shared';
 import { workflow } from '@novu/framework';
@@ -34,7 +35,7 @@ const contexts: Context[] = [
 ];
 
 contexts.forEach((context: Context) => {
-  describe('Self-Hosted Bridge Trigger', async () => {
+  describe('Self-Hosted Bridge Trigger #novu-v2', async () => {
     let session: UserSession;
     let bridgeServer: BridgeServer;
     const messageRepository = new MessageRepository();
@@ -626,7 +627,7 @@ contexts.forEach((context: Context) => {
       const expectedSubjects = ['prefix Hello default_name', 'prefix Hello payload_name'];
 
       expectedSubjects.forEach((expectedSubject) => {
-        const found = sentMessage.some((message) => message.subject.includes(expectedSubject));
+        const found = sentMessage.some((message) => message.subject?.includes(expectedSubject));
         expect(found).to.be.true;
       });
     });
@@ -1412,10 +1413,170 @@ contexts.forEach((context: Context) => {
         expect(executionDetailsSubscriberWorkflowFiltered.length).to.be.eq(1);
       }
     });
+
+    it(`should skip inApp step and execute email step when userName is John Doe [${context.name}]`, async () => {
+      const workflowId = `bug-5120-${context.name}`;
+      const newWorkflow = workflow(
+        workflowId,
+        async ({ step, payload }) => {
+          await step.inApp(
+            'inapp',
+            async () => {
+              return {
+                body: 'This is a log message',
+              };
+            },
+            {
+              skip: () => payload.userName === 'John Doe',
+            }
+          );
+
+          await step.email(
+            'send-email',
+            async (controls) => {
+              return {
+                subject: controls.subject,
+                body: `This is your first Novu Email ${payload.userName}`,
+              };
+            },
+            {
+              controlSchema: {
+                type: 'object',
+                properties: {
+                  subject: {
+                    type: 'string',
+                    default: `A Successful Test on Novu from defualt_name`,
+                  },
+                },
+              } as const,
+            }
+          );
+        },
+        {
+          payloadSchema: {
+            type: 'object',
+            properties: {
+              userName: {
+                type: 'string',
+                default: 'John Doe',
+              },
+            },
+            required: [],
+            additionalProperties: false,
+          } as const,
+        }
+      );
+
+      await bridgeServer.start({ workflows: [newWorkflow] });
+
+      if (context.isStateful) {
+        await discoverAndSyncBridge(session, workflowsRepository, workflowId, bridgeServer);
+      }
+
+      await triggerEvent(session, workflowId, subscriber.subscriberId, { userName: 'John Doe' }, bridge);
+      await session.awaitRunningJobs();
+
+      // Verify inApp message was skipped
+      const inAppMessages = await messageRepository.find({
+        _environmentId: session.environment._id,
+        _subscriberId: subscriber._id,
+        channel: StepTypeEnum.IN_APP,
+      });
+      expect(inAppMessages.length).to.eq(0);
+
+      // Verify email was sent
+      const emailMessages = await messageRepository.find({
+        _environmentId: session.environment._id,
+        _subscriberId: subscriber._id,
+        channel: StepTypeEnum.EMAIL,
+      });
+      expect(emailMessages.length).to.eq(1);
+      expect(emailMessages[0].subject).to.include('A Successful Test on Novu from defualt_name');
+    });
+
+    it(`should execute both inApp and email steps when userName is not John Doe [${context.name}]`, async () => {
+      const workflowId = `bug-5120-not-skipped-${context.name}`;
+      const newWorkflow = workflow(
+        workflowId,
+        async ({ step, payload }) => {
+          await step.inApp(
+            'inapp',
+            async () => {
+              return {
+                body: 'This is a log message',
+              };
+            },
+            {
+              skip: () => payload.userName === 'John Doe',
+            }
+          );
+
+          await step.email(
+            'send-email',
+            async () => {
+              return {
+                subject: `Welcome to Novu ${payload.userName}`,
+                body: `This is your first Novu Email ${payload.userName}`,
+              };
+            },
+            {
+              controlSchema: {
+                type: 'object',
+                properties: {
+                  subject: {
+                    type: 'string',
+                  },
+                },
+              } as const,
+            }
+          );
+        },
+        {
+          payloadSchema: {
+            type: 'object',
+            properties: {
+              userName: {
+                type: 'string',
+                default: 'John Doe',
+              },
+            },
+            required: [],
+            additionalProperties: false,
+          } as const,
+        }
+      );
+
+      await bridgeServer.start({ workflows: [newWorkflow] });
+
+      if (context.isStateful) {
+        await discoverAndSyncBridge(session, workflowsRepository, workflowId, bridgeServer);
+      }
+
+      await triggerEvent(session, workflowId, subscriber.subscriberId, { userName: 'Jane Doe' }, bridge);
+      await session.awaitRunningJobs();
+
+      // Verify inApp message was not skipped
+      const inAppMessages = await messageRepository.find({
+        _environmentId: session.environment._id,
+        _subscriberId: subscriber._id,
+        channel: StepTypeEnum.IN_APP,
+      });
+      expect(inAppMessages.length).to.eq(1);
+      expect(inAppMessages[0].content).to.include('This is a log message');
+
+      // Verify email was sent
+      const emailMessages = await messageRepository.find({
+        _environmentId: session.environment._id,
+        _subscriberId: subscriber._id,
+        channel: StepTypeEnum.EMAIL,
+      });
+      expect(emailMessages.length).to.eq(1);
+      expect(emailMessages[0].subject).to.include('Welcome to Novu Jane Doe');
+    });
   });
 });
 
-describe('Novu-Hosted Bridge Trigger', () => {
+describe('Novu-Hosted Bridge Trigger #novu-v2', () => {
   let session: UserSession;
   const messageRepository = new MessageRepository();
   let subscriber: SubscriberEntity;

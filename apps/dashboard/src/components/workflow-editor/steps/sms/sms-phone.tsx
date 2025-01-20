@@ -46,7 +46,7 @@ export const SmsPhone = ({
   isLoading?: boolean;
   error?: boolean;
 }) => (
-  <div className="shadow-xs relative h-[200px] max-w-fit overflow-hidden">
+  <div className="shadow-xs relative h-60 w-full max-w-72 overflow-hidden">
     <div className="absolute left-[25px] right-[15px] top-[110px]">
       {isLoading ? (
         <TypingIndicator />

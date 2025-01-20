@@ -4,7 +4,6 @@ import { RiEdit2Line, RiErrorWarningFill, RiImageEditFill } from 'react-icons/ri
 import { Avatar, AvatarImage } from '@/components/primitives/avatar';
 import { Button } from '@/components/primitives/button';
 import { FormMessage } from '@/components/primitives/form/form';
-import { InputField } from '@/components/primitives/input';
 import { Label } from '@/components/primitives/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Separator } from '@/components/primitives/separator';
@@ -14,6 +13,7 @@ import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { autocompletion } from '@codemirror/autocomplete';
 import { Editor } from '../editor';
+import { InputRoot, InputWrapper } from '../input';
 import { useFormField } from './form-context';
 
 const predefinedAvatars = [
@@ -53,9 +53,13 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
 
     return (
       <div className="size-9 space-y-2">
-        <Popover modal={true} open={isOpen} onOpenChange={setIsOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="text-foreground-600 relative size-full overflow-hidden">
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <PopoverTrigger className="relative size-full overflow-hidden">
+            <Button
+              mode="outline"
+              variant="secondary"
+              className="text-foreground-600 relative size-full overflow-hidden"
+            >
               {value ? (
                 <Avatar className="bg-transparent p-1">
                   <AvatarImage src={value as string} />
@@ -76,18 +80,22 @@ export const AvatarPicker = forwardRef<HTMLInputElement, AvatarPickerProps>(
                 </div>
                 <Separator />
                 <div className="space-y-1">
-                  <Label>Avatar URL</Label>
-                  <InputField size="fit">
-                    <Editor
-                      fontFamily="inherit"
-                      ref={ref}
-                      placeholder="Enter avatar URL"
-                      id={name}
-                      extensions={extensions}
-                      value={`${value}`}
-                      onChange={onChange}
-                    />
-                  </InputField>
+                  <Label className="text-xs font-medium">Avatar URL</Label>
+                  <InputRoot className="overflow-visible">
+                    <InputWrapper className="flex h-9 items-center justify-center p-2.5">
+                      <Editor
+                        indentWithTab={false}
+                        fontFamily="inherit"
+                        ref={ref}
+                        placeholder="Enter avatar URL"
+                        id={name}
+                        extensions={extensions}
+                        value={`${value}`}
+                        onChange={onChange}
+                        className="flex h-full items-center"
+                      />
+                    </InputWrapper>
+                  </InputRoot>
                   <FormMessage />
                 </div>
               </div>

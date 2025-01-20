@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
-import { EditorView } from '@uiw/react-codemirror';
-import { loadLanguage, LanguageName } from '@uiw/codemirror-extensions-langs';
 import { Editor } from '@/components/primitives/editor';
+import { LanguageName, loadLanguage } from '@uiw/codemirror-extensions-langs';
+import { EditorView } from '@uiw/react-codemirror';
+import { useMemo } from 'react';
 import type { SnippetLanguage } from './types';
 
 const basicSetup = { lineNumbers: true };
@@ -34,6 +34,7 @@ export const SnippetEditor = ({
       value={value}
       extensions={extensions}
       basicSetup={basicSetup}
+      multiline
     />
   );
 };

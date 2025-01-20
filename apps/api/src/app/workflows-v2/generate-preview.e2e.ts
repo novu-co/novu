@@ -16,16 +16,15 @@ import {
   StepTypeEnum,
   WorkflowCreationSourceEnum,
 } from '@novu/shared';
+import { EmailControlType, InAppControlType } from '@novu/application-generic';
 import { buildCreateWorkflowDto } from './workflow.controller.e2e';
 import { forSnippet, fullCodeSnippet } from './maily-test-data';
-import { InAppControlType } from './shared';
-import { EmailStepControlType } from './shared/schemas/email-control.schema';
 
 const SUBJECT_TEST_PAYLOAD = '{{payload.subject.test.payload}}';
 const PLACEHOLDER_SUBJECT_INAPP = '{{payload.subject}}';
 const PLACEHOLDER_SUBJECT_INAPP_PAYLOAD_VALUE = 'this is the replacement text for the placeholder';
 
-describe('Generate Preview', () => {
+describe('Generate Preview #novu-v2', () => {
   let session: UserSession;
   let workflowsClient: ReturnType<typeof createWorkflowClient>;
 
@@ -116,7 +115,7 @@ describe('Generate Preview', () => {
         PLACEHOLDER_SUBJECT_INAPP_PAYLOAD_VALUE
       );
       if (previewResponseDto.result?.type !== 'in_app') {
-        throw new Error('should have a inapp redview ');
+        throw new Error('should have a in-app preview ');
       }
       expect(previewResponseDto.result.preview.subject).to.deep.equal(controlValues.subject);
     });
@@ -193,16 +192,13 @@ describe('Generate Preview', () => {
     describe('email specific features', () => {
       describe('show', () => {
         it('show -> should hide element based on payload', async () => {
-          const { stepDatabaseId, workflowId, stepId } = await createWorkflowAndReturnId(
-            workflowsClient,
-            StepTypeEnum.EMAIL
-          );
+          const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(workflowsClient, StepTypeEnum.EMAIL);
           const previewResponseDto = await generatePreview(
             workflowsClient,
             workflowId,
             stepDatabaseId,
             {
-              controlValues: getTestControlValues(stepId)[StepTypeEnum.EMAIL],
+              controlValues: getTestControlValues()[StepTypeEnum.EMAIL],
               previewPayload: { payload: { params: { isPayedUser: 'false' } } },
             },
             'email'
@@ -215,16 +211,13 @@ describe('Generate Preview', () => {
           expect(preview).to.not.contain('should be the fallback value');
         });
         it('show -> should show element based on payload - string', async () => {
-          const { stepDatabaseId, workflowId, stepId } = await createWorkflowAndReturnId(
-            workflowsClient,
-            StepTypeEnum.EMAIL
-          );
+          const { stepDatabaseId, workflowId } = await createWorkflowAndReturnId(workflowsClient, StepTypeEnum.EMAIL);
           const previewResponseDto = await generatePreview(
             workflowsClient,
             workflowId,
             stepDatabaseId,
             {
-              controlValues: getTestControlValues(stepId)[StepTypeEnum.EMAIL],
+              controlValues: getTestControlValues()[StepTypeEnum.EMAIL],
               previewPayload: { payload: { params: { isPayedUser: 'true' } } },
             },
             'email'
@@ -421,7 +414,7 @@ describe('Generate Preview', () => {
 
       channelTypes.forEach(({ type, description }) => {
         // TODO: We need to get back to the drawing board on this one to make the preview action of the framework more forgiving
-        it(`[${type}] catches the 400 error returned by the Bridge Preview action`, async () => {
+        it(`[${type}] will generate gracefully the preview if the control values are missing`, async () => {
           const { stepDatabaseId, workflowId, stepId } = await createWorkflowAndReturnId(workflowsClient, type);
           const requestDto = buildDtoWithMissingControlValues(type, stepId);
 
@@ -433,7 +426,7 @@ describe('Generate Preview', () => {
             description
           );
 
-          expect(previewResponseDto.result).to.eql({ preview: {} });
+          expect(previewResponseDto.result).to.not.eql({ preview: {} });
         });
       });
     });
@@ -514,13 +507,13 @@ function buildDtoNoPayload(stepTypeEnum: StepTypeEnum, stepId?: string): Generat
   };
 }
 
-function buildEmailControlValuesPayload(stepId?: string): EmailStepControlType {
+function buildEmailControlValuesPayload(stepId?: string): EmailControlType {
   return {
     subject: `Hello, World! ${SUBJECT_TEST_PAYLOAD}`,
     body: JSON.stringify(fullCodeSnippet(stepId)),
   };
 }
-function buildSimpleForEmail(): EmailStepControlType {
+function buildSimpleForEmail(): EmailControlType {
   return {
     subject: `Hello, World! ${SUBJECT_TEST_PAYLOAD}`,
     body: JSON.stringify(forSnippet),

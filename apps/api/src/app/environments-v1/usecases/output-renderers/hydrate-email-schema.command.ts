@@ -1,8 +1,7 @@
-// New HydrateEmailSchemaUseCase class
+import { BaseCommand } from '@novu/application-generic';
+import { IsNotEmpty, IsString } from 'class-validator';
 
-import { FullPayloadForRender } from './render-command';
-
-export class HydrateEmailSchemaCommand {
+export class HydrateEmailSchemaCommand extends BaseCommand {
+  @IsString()
   emailEditor: string;
-  fullPayloadForRender: FullPayloadForRender;
 }

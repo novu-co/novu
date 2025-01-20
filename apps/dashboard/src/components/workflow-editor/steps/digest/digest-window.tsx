@@ -1,18 +1,17 @@
-import { useState } from 'react';
-import { Tabs } from '@radix-ui/react-tabs';
-import { RiCalendarScheduleFill } from 'react-icons/ri';
-import { FieldValues, useFormContext } from 'react-hook-form';
 import { TimeUnitEnum } from '@novu/shared';
+import { Tabs } from '@radix-ui/react-tabs';
+import { useState } from 'react';
+import { FieldValues, useFormContext } from 'react-hook-form';
 
 import { FormField, FormLabel, FormMessagePure } from '@/components/primitives/form/form';
 import { Separator } from '@/components/primitives/separator';
 import { TabsContent, TabsList, TabsTrigger } from '@/components/primitives/tabs';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
+import { AMOUNT_KEY, CRON_KEY, UNIT_KEY } from '@/components/workflow-editor/steps/digest/keys';
 import { RegularDigest } from '@/components/workflow-editor/steps/digest/regular-digest';
 import { ScheduledDigest } from '@/components/workflow-editor/steps/digest/scheduled-digest';
-import { AMOUNT_KEY, CRON_KEY, UNIT_KEY } from '@/components/workflow-editor/steps/digest/keys';
-import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
 import { EVERY_MINUTE_CRON } from '@/components/workflow-editor/steps/digest/utils';
+import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
 
 const REGULAR_DIGEST_TYPE = 'regular';
 const SCHEDULED_DIGEST_TYPE = 'scheduled';
@@ -67,12 +66,7 @@ export const DigestWindow = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <FormLabel>
-        <span className="flex items-center gap-1">
-          <RiCalendarScheduleFill className="size-4" />
-          <span>Digest window</span>
-        </span>
-      </FormLabel>
+      <FormLabel>Digest window</FormLabel>
       <Tabs
         value={digestType}
         className="flex h-full flex-1 flex-col"
@@ -117,7 +111,7 @@ export const DigestWindow = () => {
               </Tooltip>
             </TabsList>
           </div>
-          <Separator className="bg-neutral-100" />
+          <Separator className="before:bg-neutral-100" />
           <div className="bg-background rounded-b-lg p-2">
             <TabsContent value={REGULAR_DIGEST_TYPE}>
               <RegularDigest />
