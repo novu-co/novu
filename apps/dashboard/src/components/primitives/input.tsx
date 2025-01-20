@@ -100,12 +100,16 @@ export const inputVariants = tv({
       sm: {
         root: 'rounded-lg',
         wrapper: 'gap-2 px-2.5',
-        input: 'h-9',
+        input: 'h-9 text-paragraph-xs',
+        affix: 'text-paragraph-xs',
+        inlineAffix: 'text-paragraph-xs',
       },
       xs: {
         root: 'rounded-lg',
         wrapper: 'gap-1.5 px-2',
-        input: 'h-8',
+        input: 'h-8 text-paragraph-xs',
+        affix: 'text-paragraph-xs',
+        inlineAffix: 'text-paragraph-xs',
       },
     },
     hasError: {

@@ -24,9 +24,12 @@ export enum MailyAttrsEnum {
   HREF = 'href',
 }
 
+export const MAILY_ITERABLE_MARK = '0';
+
 const MAILY_FIRST_CITIZEN_VARIABLE_KEY = [
   MailyAttrsEnum.ID,
   MailyAttrsEnum.SHOW_IF_KEY,
+  MailyAttrsEnum.EACH_KEY,
 ];
 
 export const variableAttributeConfig = (type: MailyContentTypeEnum) => {
@@ -41,6 +44,7 @@ export const variableAttributeConfig = (type: MailyContentTypeEnum) => {
      * showIfKey is always a maily_variable
      */
     { attr: MailyAttrsEnum.SHOW_IF_KEY, flag: MailyAttrsEnum.SHOW_IF_KEY },
+    { attr: MailyAttrsEnum.EACH_KEY, flag: MailyAttrsEnum.EACH_KEY },
   ];
 
   if (type === MailyContentTypeEnum.BUTTON) {
@@ -75,6 +79,7 @@ export const variableAttributeConfig = (type: MailyContentTypeEnum) => {
 function processAttributes(
   attrs: Record<string, unknown>,
   type: MailyContentTypeEnum,
+  forLoopVariable?: string,
 ): void {
   if (!attrs) return;
 
@@ -82,10 +87,10 @@ function processAttributes(
 
   for (const { attr, flag } of typeConfig) {
     if (attrs[flag] && attrs[attr]) {
-      // eslint-disable-next-line no-param-reassign
       attrs[attr] = wrapInLiquidOutput(
         attrs[attr] as string,
         attrs.fallback as string,
+        forLoopVariable,
       );
       if (!MAILY_FIRST_CITIZEN_VARIABLE_KEY.includes(flag)) {
         // eslint-disable-next-line no-param-reassign
@@ -95,10 +100,17 @@ function processAttributes(
   }
 }
 
-export function processNodeAttrs(node: JSONContent): JSONContent {
+export function processNodeAttrs(
+  node: JSONContent,
+  forLoopVariable?: string,
+): JSONContent {
   if (!node.attrs) return node;
 
-  processAttributes(node.attrs, node.type as MailyContentTypeEnum);
+  processAttributes(
+    node.attrs,
+    node.type as MailyContentTypeEnum,
+    forLoopVariable,
+  );
 
   return node;
 }
@@ -115,5 +127,34 @@ export function processNodeMarks(node: JSONContent): JSONContent {
   return node;
 }
 
-const wrapInLiquidOutput = (variableName: string, fallback?: string) =>
-  `{{ ${variableName}${fallback ? ` | default: '${fallback}'` : ''} }}`;
+function wrapInLiquidOutput(
+  variableName: string,
+  fallback?: string,
+  forLoopVariable?: string,
+): string {
+  const sanitizedVariableName = sanitizeVariableName(variableName);
+  const sanitizedForLoopVariable =
+    forLoopVariable && sanitizeVariableName(forLoopVariable);
+
+  /*
+   * Handle loop variable replacement
+   * payload.comments.name => payload.comments[0].name
+   */
+  const processedName =
+    sanitizedForLoopVariable &&
+    sanitizedVariableName.startsWith(sanitizedForLoopVariable)
+      ? sanitizedVariableName.replace(
+          sanitizedForLoopVariable,
+          `${sanitizedForLoopVariable}[${MAILY_ITERABLE_MARK}]`,
+        )
+      : sanitizedVariableName;
+
+  // Build liquid output syntax
+  const fallbackSuffix = fallback ? ` | default: '${fallback}'` : '';
+
+  return `{{ ${processedName}${fallbackSuffix} }}`;
+}
+
+function sanitizeVariableName(variableName: string): string {
+  return variableName.replace(/{{|}}/g, '').trim();
+}

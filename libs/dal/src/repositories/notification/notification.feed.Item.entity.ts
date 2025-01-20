@@ -1,13 +1,13 @@
 import { StepTypeEnum } from '@novu/shared';
-import { NotificationTemplateEntity } from '../notification-template';
-import { NotificationEntity } from './notification.entity';
-import { SubscriberEntity } from '../subscriber';
-import { JobEntity } from '../job';
 import { ExecutionDetailsEntity } from '../execution-details';
+import { JobEntity } from '../job';
+import { NotificationTemplateEntity } from '../notification-template';
+import { SubscriberEntity } from '../subscriber';
+import { NotificationEntity } from './notification.entity';
 
 export type NotificationFeedItemEntity = Omit<NotificationEntity, 'template'> & {
-  template: TemplateFeedItem;
-  subscriber: SubscriberFeedItem;
+  template?: TemplateFeedItem;
+  subscriber?: SubscriberFeedItem;
   jobs: JobFeedItem[];
 };
 export type TemplateFeedItem = Pick<NotificationTemplateEntity, '_id' | 'name' | 'triggers'>;
@@ -27,5 +27,5 @@ export type JobFeedItem = Pick<
 
 export type ExecutionDetailFeedItem = Pick<
   ExecutionDetailsEntity,
-  '_id' | 'providerId' | 'detail' | 'source' | '_jobId' | 'status' | 'isTest' | 'isRetry' | 'createdAt'
+  '_id' | 'providerId' | 'detail' | 'source' | '_jobId' | 'status' | 'isTest' | 'isRetry' | 'createdAt' | 'raw'
 >;

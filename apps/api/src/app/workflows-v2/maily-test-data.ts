@@ -31,47 +31,6 @@ export const forSnippet = {
             },
           ],
         },
-        {
-          type: 'for',
-          attrs: {
-            each: 'payload.food.warnings',
-            isUpdatingKey: false,
-          },
-          content: [
-            {
-              type: 'bulletList',
-              content: [
-                {
-                  type: 'listItem',
-                  attrs: {
-                    color: null,
-                  },
-                  content: [
-                    {
-                      type: 'paragraph',
-                      attrs: {
-                        textAlign: 'left',
-                      },
-                      content: [
-                        {
-                          type: 'variable',
-                          attrs: {
-                            id: 'payload.food.warnings.header',
-                            label: null,
-                          },
-                        },
-                        {
-                          type: 'text',
-                          text: ' ',
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
       ],
     },
   ],
@@ -510,47 +469,6 @@ export function fullCodeSnippet(stepId?: string) {
               {
                 type: 'text',
                 text: ' ',
-              },
-            ],
-          },
-          {
-            type: 'for',
-            attrs: {
-              each: 'payload.food.warnings',
-              isUpdatingKey: false,
-            },
-            content: [
-              {
-                type: 'bulletList',
-                content: [
-                  {
-                    type: 'listItem',
-                    attrs: {
-                      color: null,
-                    },
-                    content: [
-                      {
-                        type: 'paragraph',
-                        attrs: {
-                          textAlign: 'left',
-                        },
-                        content: [
-                          {
-                            type: 'variable',
-                            attrs: {
-                              id: 'payload.food.warnings.header',
-                              label: null,
-                            },
-                          },
-                          {
-                            type: 'text',
-                            text: ' ',
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
               },
             ],
           },

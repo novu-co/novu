@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { TipTapNode } from '@novu/shared';
 import { Injectable } from '@nestjs/common';
-import { MailyAttrsEnum } from '@novu/application-generic';
+import { MAILY_ITERABLE_MARK, MailyAttrsEnum } from '@novu/application-generic';
 import { ExpandEmailEditorSchemaCommand } from './expand-email-editor-schema-command';
 import { HydrateEmailSchemaUseCase } from './hydrate-email-schema.usecase';
 import { parseLiquid } from './email-output-renderer.usecase';
@@ -14,7 +14,6 @@ export class ExpandEmailEditorSchemaUsecase {
   async execute(command: ExpandEmailEditorSchemaCommand): Promise<TipTapNode> {
     const hydratedEmailSchema = this.hydrateEmailSchemaUseCase.execute({
       emailEditor: command.emailEditorJson,
-      fullPayloadForRender: command.fullPayloadForRender,
     });
 
     const processed = await this.processSpecialNodeTypes(command.fullPayloadForRender, hydratedEmailSchema);
@@ -82,7 +81,7 @@ export class ExpandEmailEditorSchemaUsecase {
     variables: FullPayloadForRender,
     parent?: TipTapNode
   ): Promise<void> {
-    const newContent = this.multiplyForEachNode(node, variables);
+    const newContent = await this.multiplyForEachNode(node, variables);
     if (parent?.content) {
       const nodeIndex = parent.content.indexOf(node);
       parent.content = [...parent.content.slice(0, nodeIndex), ...newContent, ...parent.content.slice(nodeIndex + 1)];
@@ -133,9 +132,9 @@ export class ExpandEmailEditorSchemaUsecase {
    * node:
    * {
    *   type: 'each',
-   *   attrs: { each: 'payload.comments' },
+   *   attrs: { each: '{{ payload.comments }}' },
    *   content: [
-   *     { type: 'variable', text: '{{ payload.comments.author }}' }
+   *     { type: 'variable', text: '{{ payload.comments[0].author }}' }
    *   ]
    * }
    *
@@ -149,15 +148,22 @@ export class ExpandEmailEditorSchemaUsecase {
    * ]
    *
    */
-  private multiplyForEachNode(
+  private async multiplyForEachNode(
     node: TipTapNode & { attrs: { [MailyAttrsEnum.EACH_KEY]: string } },
     variables: FullPayloadForRender
-  ): TipTapNode[] {
+  ): Promise<TipTapNode[]> {
     const iterablePath = node.attrs[MailyAttrsEnum.EACH_KEY];
     const nodeContent = node.content || [];
     const expandedContent: TipTapNode[] = [];
 
-    const iterableArray = this.getValueByPath(variables, iterablePath);
+    const iterableArrayString = await parseLiquid(iterablePath, variables);
+
+    let iterableArray: unknown;
+    try {
+      iterableArray = JSON.parse(iterableArrayString.replace(/'/g, '"'));
+    } catch (error) {
+      throw new Error(`Failed to parse iterable value for "${iterablePath}": ${error.message}`);
+    }
 
     if (!Array.isArray(iterableArray)) {
       throw new Error(`Iterable "${iterablePath}" is not an array`);
@@ -183,13 +189,7 @@ export class ExpandEmailEditorSchemaUsecase {
       if (this.isAVariableNode(newNode)) {
         const nodePlaceholder = newNode.text as string;
 
-        /**
-         * example:
-         * iterablePath = payload.comments
-         * nodePlaceholder = {{ payload.comments.author }}
-         * text = {{ payload.comments[0].author }}
-         */
-        newNode.text = nodePlaceholder.replace(iterablePath, `${iterablePath}[${index}]`);
+        newNode.text = nodePlaceholder.replace(MAILY_ITERABLE_MARK, index.toString());
         newNode.type = 'text'; // set 'variable' to 'text' to for Liquid to recognize it
       } else if (newNode.content) {
         newNode.content = this.addIndexesToPlaceholders(newNode.content, iterablePath, index);
@@ -209,21 +209,5 @@ export class ExpandEmailEditorSchemaUsecase {
 
   private isAVariableNode(newNode: TipTapNode): newNode is TipTapNode & { attrs: { [MailyAttrsEnum.ID]: string } } {
     return newNode.type === 'variable';
-  }
-
-  private getValueByPath(obj: Record<string, any>, path: string): any {
-    if (path in obj) {
-      return obj[path];
-    }
-
-    const keys = path.split('.');
-
-    return keys.reduce((currentObj, key) => {
-      if (currentObj && typeof currentObj === 'object' && key in currentObj) {
-        return currentObj[key];
-      }
-
-      return undefined;
-    }, obj);
   }
 }

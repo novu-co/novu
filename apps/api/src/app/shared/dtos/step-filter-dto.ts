@@ -1,6 +1,7 @@
 import {
   BuilderFieldOperator,
   BuilderFieldType,
+  BuilderFieldTypeEnum,
   BuilderGroupValues,
   FilterPartTypeEnum,
   PreviousStepTypeEnum,
@@ -119,7 +120,7 @@ export class StepFilterDto {
 
   @ApiProperty({
     enum: ['BOOLEAN', 'TEXT', 'DATE', 'NUMBER', 'STATEMENT', 'LIST', 'MULTI_LIST', 'GROUP'],
-    enumName: 'BuilderFieldType',
+    enumName: 'BuilderFieldTypeEnum',
   })
   type?: BuilderFieldType;
 

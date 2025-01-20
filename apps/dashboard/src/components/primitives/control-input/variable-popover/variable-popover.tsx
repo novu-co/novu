@@ -146,7 +146,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
             <FormItem>
               <FormControl>
                 <div className="grid gap-1">
-                  <label className="text-text-sub text-label-xs">Filters</label>
+                  <label className="text-text-sub text-label-xs">LiquidJS Filters</label>
                   <Popover open={isCommandOpen} onOpenChange={setIsCommandOpen}>
                     <PopoverTrigger asChild>
                       <button className="text-text-soft bg-background flex h-[30px] w-full items-center justify-between rounded-md border px-2 text-sm">
@@ -241,7 +241,7 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
             <FormItem>
               <FormControl>
                 <div className="flex items-center justify-between">
-                  <label className="text-text-sub text-label-xs">Show raw liquid</label>
+                  <label className="text-text-sub text-label-xs">Show raw LiquidJS</label>
                   <Switch checked={showRawLiquid} onCheckedChange={setShowRawLiquid} className="scale-75" />
                 </div>
               </FormControl>
