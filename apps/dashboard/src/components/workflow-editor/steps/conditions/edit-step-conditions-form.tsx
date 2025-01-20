@@ -126,7 +126,7 @@ export const EditStepConditionsForm = () => {
   return (
     <>
       <Form {...form}>
-        <form className="flex h-full flex-col" onSubmit={form.handleSubmit(onSubmit)}>
+        <form className="flex h-full flex-col overflow-hidden" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-3 overflow-y-auto overflow-x-hidden px-3 py-5">
             <Panel className="overflow-initial">
               <PanelHeader>
