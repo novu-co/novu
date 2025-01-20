@@ -218,7 +218,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
           exit={{ opacity: 0.1 }}
           transition={{ duration: 0.1 }}
         >
-          <SidebarHeader className="flex items-center gap-2.5 text-sm font-medium">
+          <SidebarHeader className="flex items-center gap-2.5 border-b text-sm font-medium">
             <Link
               to={buildRoute(ROUTES.EDIT_WORKFLOW, {
                 environmentSlug: environment.slug!,
@@ -243,9 +243,6 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               </CompactButton>
             </Link>
           </SidebarHeader>
-
-          <Separator />
-
           <Form {...form}>
             <form onBlur={onBlur}>
               <SaveFormContext.Provider value={value}>

@@ -59,6 +59,7 @@ describe('Topic creation - /topics (POST) #novu-v2', async () => {
           key: topicKey,
           name: topicName,
         },
+        undefined,
         { retryCodes: ['404'] }
       )
     );
