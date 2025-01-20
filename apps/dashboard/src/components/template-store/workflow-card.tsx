@@ -1,5 +1,6 @@
 import { StepTypeEnum } from '@novu/shared';
 import React from 'react';
+import { RiAddFill } from 'react-icons/ri';
 import { Card, CardContent } from '../primitives/card';
 import { StepType } from '../step-preview-hover-card';
 import { WorkflowStep } from '../workflow-step';
@@ -26,12 +27,16 @@ export function WorkflowCard({
         <div className="overflow-hidden rounded-lg border border-neutral-100">
           <div className="bg-bg-weak relative h-[100px] bg-[url(/images/dots.svg)] bg-cover">
             <div className="flex h-full w-full items-center justify-center">
-              {steps.map((step, index) => (
-                <React.Fragment key={index}>
-                  <WorkflowStep step={step} />
-                  {index < steps.length - 1 && <div className="h-px w-6 bg-gray-200" />}
-                </React.Fragment>
-              ))}
+              {!steps?.length ? (
+                <RiAddFill className="text-[#D6D6D6]" />
+              ) : (
+                steps.map((step, index) => (
+                  <React.Fragment key={index}>
+                    <WorkflowStep step={step} />
+                    {index < steps.length - 1 && <div className="h-px w-6 bg-gray-200" />}
+                  </React.Fragment>
+                ))
+              )}
             </div>
           </div>
         </div>
