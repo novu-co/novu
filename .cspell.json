@@ -724,7 +724,8 @@
     "navigatable",
     "facated",
     "dotenvcreate",
-    "querybuilder"
+    "querybuilder",
+    "liquified"
   ],
   "flagWords": [],
   "patterns": [
