@@ -1,6 +1,7 @@
 import { createStep } from '@/components/workflow-editor/step-utils';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
+import { TEMPLATE_CONFIGURABLE_STEP_TYPES } from '@/utils/constants';
 import { StepTypeEnum } from '@/utils/enums';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { getWorkflowIdFromSlug, STEP_DIVIDER } from '@/utils/step';
@@ -9,7 +10,7 @@ import { WorkflowOriginEnum } from '@novu/shared';
 import { Node as FlowNode, Handle, NodeProps, Position } from '@xyflow/react';
 import { ComponentProps } from 'react';
 import { RiPlayCircleLine } from 'react-icons/ri';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { AddStepMenu } from './add-step-menu';
 import { Node, NodeBody, NodeError, NodeHeader, NodeIcon, NodeName } from './base-node';
@@ -21,6 +22,9 @@ export type NodeData = {
   name?: string;
   stepSlug?: string;
   controlValues?: Record<string, any>;
+  workflowSlug?: string;
+  environment?: string;
+  readOnly?: boolean;
 };
 
 export type NodeType = FlowNode<NodeData>;
@@ -31,13 +35,10 @@ const bottomHandleClasses = `data-[handlepos=bottom]:w-2 data-[handlepos=bottom]
 
 const handleClassName = `${topHandleClasses} ${bottomHandleClasses}`;
 
-export const TriggerNode = ({ data }: NodeProps<FlowNode<{ environmentSlug: string; workflowSlug: string }>>) => (
-  <Link
-    to={buildRoute(ROUTES.TEST_WORKFLOW, {
-      environmentSlug: data.environmentSlug,
-      workflowSlug: data.workflowSlug,
-    })}
-  >
+export const TriggerNode = ({
+  data,
+}: NodeProps<FlowNode<{ environmentSlug: string; workflowSlug: string; readOnly?: boolean }>>) => {
+  const content = (
     <Node className="relative rounded-tl-none [&>span]:rounded-tl-none">
       <div className="border-neutral-alpha-200 text-foreground-600 absolute left-0 top-0 flex -translate-y-full items-center gap-1 rounded-t-lg border border-b-0 bg-neutral-50 px-2 py-1 text-xs font-medium">
         <RiPlayCircleLine className="size-3" />
@@ -46,13 +47,28 @@ export const TriggerNode = ({ data }: NodeProps<FlowNode<{ environmentSlug: stri
       <NodeHeader type={StepTypeEnum.TRIGGER}>
         <NodeName>Workflow trigger</NodeName>
       </NodeHeader>
-      <NodeBody type={StepTypeEnum.TRIGGER} controlValues={{}}>
+      <NodeBody type={StepTypeEnum.TRIGGER} controlValues={{}} showPreview={data.readOnly}>
         This step triggers this workflow
       </NodeBody>
       <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
     </Node>
-  </Link>
-);
+  );
+
+  if (data.readOnly) {
+    return content;
+  }
+
+  return (
+    <Link
+      to={buildRoute(ROUTES.TEST_WORKFLOW, {
+        environmentSlug: data.environmentSlug,
+        workflowSlug: data.workflowSlug,
+      })}
+    >
+      {content}
+    </Link>
+  );
+};
 
 type StepNodeProps = ComponentProps<typeof Node> & { data: NodeData };
 const StepNode = (props: StepNodeProps) => {
@@ -63,16 +79,37 @@ const StepNode = (props: StepNodeProps) => {
 
   const isSelected =
     getWorkflowIdFromSlug({ slug: stepSlug ?? '', divider: STEP_DIVIDER }) ===
-    getWorkflowIdFromSlug({ slug: data.stepSlug ?? '', divider: STEP_DIVIDER });
+      getWorkflowIdFromSlug({ slug: data.stepSlug ?? '', divider: STEP_DIVIDER }) &&
+    !!stepSlug &&
+    !!data.stepSlug;
 
   return <Node aria-selected={isSelected} className={cn('group', className)} {...rest} />;
+};
+
+const NodeWrapper = ({ children, data }: { children: React.ReactNode; data: NodeData }) => {
+  if (data.readOnly) {
+    return children;
+  }
+
+  return (
+    <Link
+      to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}
+      onClick={(e) => {
+        // Prevent any bubbling that might interfere with the navigation
+        e.stopPropagation();
+      }}
+      className="contents"
+    >
+      {children}
+    </Link>
+  );
 };
 
 export const EmailNode = ({ data }: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.EMAIL];
 
   return (
-    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <NodeWrapper data={data}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.EMAIL}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.EMAIL]}>
@@ -82,14 +119,14 @@ export const EmailNode = ({ data }: NodeProps<NodeType>) => {
           <NodeName>{data.name || 'Email Step'}</NodeName>
         </NodeHeader>
 
-        <NodeBody type={StepTypeEnum.EMAIL} controlValues={data.controlValues ?? {}}>
+        <NodeBody type={StepTypeEnum.EMAIL} showPreview={data.readOnly} controlValues={data.controlValues ?? {}}>
           {data.content}
         </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>
-    </Link>
+    </NodeWrapper>
   );
 };
 
@@ -98,7 +135,7 @@ export const SmsNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.SMS];
 
   return (
-    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <NodeWrapper data={data}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.SMS}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.SMS]}>
@@ -106,14 +143,14 @@ export const SmsNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'SMS Step'}</NodeName>
         </NodeHeader>
-        <NodeBody type={StepTypeEnum.SMS} controlValues={data.controlValues ?? {}}>
+        <NodeBody showPreview={data.readOnly} type={StepTypeEnum.SMS} controlValues={data.controlValues ?? {}}>
           {data.content}
         </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>
-    </Link>
+    </NodeWrapper>
   );
 };
 
@@ -122,7 +159,7 @@ export const InAppNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.IN_APP];
 
   return (
-    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <NodeWrapper data={data}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.IN_APP}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.IN_APP]}>
@@ -130,14 +167,14 @@ export const InAppNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'In-App Step'}</NodeName>
         </NodeHeader>
-        <NodeBody type={StepTypeEnum.IN_APP} controlValues={data.controlValues ?? {}}>
+        <NodeBody showPreview={data.readOnly} type={StepTypeEnum.IN_APP} controlValues={data.controlValues ?? {}}>
           {data.content}
         </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>
-    </Link>
+    </NodeWrapper>
   );
 };
 
@@ -146,7 +183,7 @@ export const PushNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.PUSH];
 
   return (
-    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <NodeWrapper data={data}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.PUSH}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.PUSH]}>
@@ -154,14 +191,14 @@ export const PushNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Push Step'}</NodeName>
         </NodeHeader>
-        <NodeBody type={StepTypeEnum.PUSH} controlValues={data.controlValues ?? {}}>
+        <NodeBody showPreview={data.readOnly} type={StepTypeEnum.PUSH} controlValues={data.controlValues ?? {}}>
           {data.content}
         </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>
-    </Link>
+    </NodeWrapper>
   );
 };
 
@@ -170,7 +207,7 @@ export const ChatNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.CHAT];
 
   return (
-    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <NodeWrapper data={data}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.CHAT}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.CHAT]}>
@@ -178,14 +215,14 @@ export const ChatNode = (props: NodeProps<NodeType>) => {
           </NodeIcon>
           <NodeName>{data.name || 'Chat Step'}</NodeName>
         </NodeHeader>
-        <NodeBody type={StepTypeEnum.CHAT} controlValues={data.controlValues ?? {}}>
+        <NodeBody showPreview={data.readOnly} type={StepTypeEnum.CHAT} controlValues={data.controlValues ?? {}}>
           {data.content}
         </NodeBody>
         {data.error && <NodeError>{data.error}</NodeError>}
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>
-    </Link>
+    </NodeWrapper>
   );
 };
 
@@ -194,7 +231,7 @@ export const DelayNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.DELAY];
 
   return (
-    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <NodeWrapper data={data}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.DELAY}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.DELAY]}>
@@ -209,7 +246,7 @@ export const DelayNode = (props: NodeProps<NodeType>) => {
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>
-    </Link>
+    </NodeWrapper>
   );
 };
 
@@ -218,7 +255,7 @@ export const DigestNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.DIGEST];
 
   return (
-    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <NodeWrapper data={data}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.DIGEST}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.DIGEST]}>
@@ -233,7 +270,7 @@ export const DigestNode = (props: NodeProps<NodeType>) => {
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>
-    </Link>
+    </NodeWrapper>
   );
 };
 
@@ -242,7 +279,7 @@ export const CustomNode = (props: NodeProps<NodeType>) => {
   const Icon = STEP_TYPE_TO_ICON[StepTypeEnum.CUSTOM];
 
   return (
-    <Link to={buildRoute(ROUTES.EDIT_STEP, { stepSlug: data.stepSlug ?? '' })}>
+    <NodeWrapper data={data}>
       <StepNode data={data}>
         <NodeHeader type={StepTypeEnum.CUSTOM}>
           <NodeIcon variant={STEP_TYPE_TO_COLOR[StepTypeEnum.CUSTOM]}>
@@ -257,12 +294,13 @@ export const CustomNode = (props: NodeProps<NodeType>) => {
         <Handle isConnectable={false} className={handleClassName} type="target" position={Position.Top} id="a" />
         <Handle isConnectable={false} className={handleClassName} type="source" position={Position.Bottom} id="b" />
       </StepNode>
-    </Link>
+    </NodeWrapper>
   );
 };
 
 export const AddNode = (_props: NodeProps<NodeType>) => {
   const { workflow, update } = useWorkflow();
+  const navigate = useNavigate();
   if (!workflow) {
     return null;
   }
@@ -278,7 +316,24 @@ export const AddNode = (_props: NodeProps<NodeType>) => {
       <AddStepMenu
         visible
         onMenuItemClick={(stepType) => {
-          update({ ...workflow, steps: [...workflow.steps, createStep(stepType)] });
+          update(
+            {
+              ...workflow,
+              steps: [...workflow.steps, createStep(stepType)],
+            },
+            {
+              onSuccess: (data) => {
+                if (TEMPLATE_CONFIGURABLE_STEP_TYPES.includes(stepType)) {
+                  navigate(
+                    buildRoute(ROUTES.EDIT_STEP_TEMPLATE, {
+                      workflowSlug: workflow.slug,
+                      stepSlug: data.steps[data.steps.length - 1].slug,
+                    })
+                  );
+                }
+              },
+            }
+          );
         }}
       />
     </div>

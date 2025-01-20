@@ -1,25 +1,22 @@
-import { loginAlertTemplate } from './login-alert';
-import { mentionNotificationTemplate } from './mention-notification';
-import { paymentFailedTemplate } from './payment-failed';
-import { teamInvitationTemplate } from './team-invitation';
-import { trialExpirationTemplate } from './trial-expiration';
+import { accessTokenTemplate } from './access-token';
 import { usageLimitTemplate } from './usage-limit';
-import { passwordResetTemplate } from './password-reset';
-import { newCommentTemplate } from './new-comment';
-import { orderConfirmationTemplate } from './order-confirmation';
+
+import { appointmentReminderTemplate } from './appointment-reminder';
+import { otpTemplate } from './otp';
+import { paymentConfirmedTemplate } from './payment-confirmed';
+import { recentLoginTemplate } from './recent-login';
+import { renewalNoticeTemplate } from './renewal-notice';
 import { WorkflowTemplate } from './types';
 
 export function getTemplates(): WorkflowTemplate[] {
   return [
-    mentionNotificationTemplate,
-    loginAlertTemplate,
-    trialExpirationTemplate,
-    paymentFailedTemplate,
-    teamInvitationTemplate,
+    accessTokenTemplate,
     usageLimitTemplate,
-    passwordResetTemplate,
-    newCommentTemplate,
-    orderConfirmationTemplate,
+    otpTemplate,
+    renewalNoticeTemplate,
+    appointmentReminderTemplate,
+    recentLoginTemplate,
+    paymentConfirmedTemplate,
   ];
 }
 

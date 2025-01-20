@@ -10,7 +10,11 @@
     "subscriberpayloaddto",
     "adresses",
     "sdkerror",
+    "idempotancy",
+    "errordto",
+    "filtertopicsresponsedto",
     "africas",
+    "idemp",
     "africastalking",
     "preferencechannels",
     "Aland",
@@ -718,7 +722,9 @@
     "touchpoint",
     "Angularjs",
     "navigatable",
-    "facated"
+    "facated",
+    "dotenvcreate",
+    "querybuilder"
   ],
   "flagWords": [],
   "patterns": [
@@ -821,6 +827,7 @@
     "tsconfig.json",
     "unreadRead",
     "websockets",
-    "apps/dashboard/src/components/header-navigation/customer-support-button.tsx"
+    "apps/dashboard/src/components/header-navigation/customer-support-button.tsx",
+    "apps/dashboard/src/components/primitives/control-input/variable-popover/constants.ts"
   ]
 }

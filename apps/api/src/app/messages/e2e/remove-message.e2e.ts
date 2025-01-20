@@ -8,7 +8,7 @@ import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
 const axiosInstance = axios.create();
 
-describe('Delete Message - /messages/:messageId (DELETE)', function () {
+describe('Delete Message - /messages/:messageId (DELETE) #novu-v2', function () {
   let session: UserSession;
   const messageRepository = new MessageRepository();
   let template: NotificationTemplateEntity;

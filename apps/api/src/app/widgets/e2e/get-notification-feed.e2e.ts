@@ -3,8 +3,10 @@ import { MessageRepository, NotificationTemplateEntity, SubscriberRepository } f
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
 import { ChannelTypeEnum } from '@novu/shared';
+import { Novu } from '@novu/api';
+import { initNovuClassSdk } from '../../shared/helpers/e2e/sdk/e2e-sdk.helper';
 
-describe('GET /widget/notifications/feed', function () {
+describe('GET /widget/notifications/feed #novu-v1', function () {
   const messageRepository = new MessageRepository();
   let session: UserSession;
   let template: NotificationTemplateEntity;
@@ -13,7 +15,7 @@ describe('GET /widget/notifications/feed', function () {
   let subscriberProfile: {
     _id: string;
   } | null = null;
-
+  let novuClient: Novu;
   beforeEach(async () => {
     session = new UserSession();
     await session.initialize();
@@ -38,6 +40,7 @@ describe('GET /widget/notifications/feed', function () {
 
     subscriberToken = token;
     subscriberProfile = profile;
+    novuClient = initNovuClassSdk(session);
   });
 
   it('should fetch a feed without filters and with feed id', async function () {
@@ -50,8 +53,8 @@ describe('GET /widget/notifications/feed', function () {
      */
     template = await session.createTemplate();
 
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
 
     await session.awaitRunningJobs(template._id);
 
@@ -60,8 +63,8 @@ describe('GET /widget/notifications/feed', function () {
   });
 
   it('should fetch a feed without filters', async function () {
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
 
     await session.awaitRunningJobs(template._id);
 
@@ -70,8 +73,8 @@ describe('GET /widget/notifications/feed', function () {
   });
 
   it('should filter only unseen messages', async function () {
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
 
     await session.awaitRunningJobs(template._id);
 
@@ -95,8 +98,8 @@ describe('GET /widget/notifications/feed', function () {
   });
 
   it('should return seen and unseen', async function () {
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
 
     await session.awaitRunningJobs(template._id);
 
@@ -123,8 +126,8 @@ describe('GET /widget/notifications/feed', function () {
   });
 
   it('should include subscriber object', async function () {
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
 
     await session.awaitRunningJobs(template._id);
 
@@ -134,7 +137,7 @@ describe('GET /widget/notifications/feed', function () {
   });
 
   it('should include hasMore when there is more notification', async function () {
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
 
     await session.awaitRunningJobs(template._id);
 
@@ -145,7 +148,7 @@ describe('GET /widget/notifications/feed', function () {
     expect(feed.hasMore).to.be.equal(false);
 
     for (let i = 0; i < 10; i += 1) {
-      await session.triggerEvent(template.triggers[0].identifier, subscriberId);
+      await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
     }
 
     await session.awaitRunningJobs(template._id);
@@ -158,7 +161,7 @@ describe('GET /widget/notifications/feed', function () {
   });
 
   it('should throw exception when invalid payload query param is passed', async function () {
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
 
     await session.awaitRunningJobs(template._id);
 
@@ -178,10 +181,10 @@ describe('GET /widget/notifications/feed', function () {
     const partialPayload = { foo: 123 };
     const payload = { ...partialPayload, bar: 'bar' };
 
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
     await session.awaitRunningJobs(template._id);
 
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId, payload);
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId, payload });
     await session.awaitRunningJobs(template._id);
 
     const payloadQueryValue = Buffer.from(JSON.stringify(partialPayload)).toString('base64');
@@ -195,10 +198,10 @@ describe('GET /widget/notifications/feed', function () {
     const partialPayload = { foo: { bar: 123 } };
     const payload = { ...partialPayload, baz: 'baz' };
 
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId);
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId });
     await session.awaitRunningJobs(template._id);
 
-    await session.triggerEvent(template.triggers[0].identifier, subscriberId, payload);
+    await novuClient.trigger({ name: template.triggers[0].identifier, to: subscriberId, payload });
     await session.awaitRunningJobs(template._id);
 
     const payloadQueryValue = Buffer.from(JSON.stringify(partialPayload)).toString('base64');

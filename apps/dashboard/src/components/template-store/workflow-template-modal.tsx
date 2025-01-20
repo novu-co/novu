@@ -1,12 +1,12 @@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from '@/components/primitives/dialog';
-import { ToastIcon } from '@/components/primitives/sonner';
-import { showToast } from '@/components/primitives/sonner-helpers';
-import { useGenerateWorkflowSuggestions } from '@/hooks/workflows/use-generate-workflow-suggestions';
-import { ComponentProps, useState } from 'react';
+import { useTelemetry } from '@/hooks/use-telemetry';
+import { TelemetryEvent } from '@/utils/telemetry';
+import { ComponentProps, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine } from 'react-icons/ri';
 import { z } from 'zod';
 import { useCreateWorkflow } from '../../hooks/use-create-workflow';
+import { useGenerateWorkflowSuggestions } from '../../hooks/workflows/use-generate-workflow-suggestions';
 import { RouteFill } from '../icons';
 import {
   Breadcrumb,
@@ -18,6 +18,8 @@ import {
 import { Button } from '../primitives/button';
 import { CompactButton } from '../primitives/button-compact';
 import { Form } from '../primitives/form/form';
+import { ToastIcon } from '../primitives/sonner';
+import { showToast } from '../primitives/sonner-helpers';
 import TruncatedText from '../truncated-text';
 import { CreateWorkflowForm } from '../workflow-editor/create-workflow-form';
 import { workflowSchema } from '../workflow-editor/schema';
@@ -33,14 +35,16 @@ const WORKFLOW_TEMPLATES = getTemplates();
 export type WorkflowTemplateModalProps = ComponentProps<typeof DialogTrigger> & {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  source?: string;
 };
 
 export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   const form = useForm();
+  const track = useTelemetry();
+  const [prompt, setPrompt] = useState('');
   const { submit: createFromTemplate, isLoading: isCreating } = useCreateWorkflow();
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
   const [suggestions, setSuggestions] = useState<IWorkflowSuggestion[]>([]);
-  const [prompt, setPrompt] = useState('');
   const [mode, setMode] = useState<WorkflowMode>(WorkflowMode.TEMPLATES);
   const [selectedTemplate, setSelectedTemplate] = useState<IWorkflowSuggestion | null>(null);
   const { mutateAsync: generateSuggestions, isPending: isGenerating } = useGenerateWorkflowSuggestions();
@@ -49,14 +53,6 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
     selectedCategory === 'popular' ? template.isPopular : template.category === selectedCategory
   );
   const templates = suggestions.length > 0 ? suggestions : filteredTemplates;
-
-  const handleCreateWorkflow = async (values: z.infer<typeof workflowSchema>) => {
-    if (!selectedTemplate) return;
-
-    const workflow = await createFromTemplate(values, selectedTemplate.workflowDefinition);
-
-    console.log('workflow', workflow);
-  };
 
   const handleSubmit = async () => {
     if (!prompt) return;
@@ -81,6 +77,25 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
         },
       });
     }
+  };
+
+  useEffect(() => {
+    if (props.open) {
+      track(TelemetryEvent.TEMPLATE_MODAL_OPENED, {
+        source: props.source || 'unknown',
+      });
+    }
+  }, [props.open, props.source, track]);
+
+  const handleCreateWorkflow = async (values: z.infer<typeof workflowSchema>) => {
+    if (!selectedTemplate) return;
+
+    await createFromTemplate(values, selectedTemplate.workflowDefinition);
+    track(TelemetryEvent.CREATE_WORKFLOW_FROM_TEMPLATE, {
+      templateId: selectedTemplate.id,
+      templateName: selectedTemplate.name,
+      category: selectedCategory,
+    });
   };
 
   const getHeaderText = () => {
@@ -112,6 +127,15 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
     setMode(WorkflowMode.TEMPLATES);
   };
 
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+    setSuggestions([]);
+    setMode(WorkflowMode.TEMPLATES);
+    track(TelemetryEvent.TEMPLATE_CATEGORY_SELECTED, {
+      category,
+    });
+  };
+
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
       <DialogTrigger asChild {...props} />
@@ -125,7 +149,9 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
             <BreadcrumbList>
               {selectedTemplate && (
                 <>
-                  <BreadcrumbItem className="flex items-center gap-1">Templates</BreadcrumbItem>
+                  <BreadcrumbItem onClick={handleBackClick} className="flex items-center gap-1 hover:cursor-pointer">
+                    Templates
+                  </BreadcrumbItem>
                   <BreadcrumbSeparator />
                 </>
               )}
@@ -140,16 +166,13 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
             </BreadcrumbList>
           </Breadcrumb>
         </DialogHeader>
-        <div className="flex h-[600px]">
+        <div className={`flex h-[${selectedTemplate ? '600px' : '640px'}]`}>
           {!selectedTemplate && (
             <div className="h-full w-[259px] border-r border-neutral-200">
               <WorkflowSidebar
                 selectedCategory={selectedCategory}
-                onCategorySelect={(category) => {
-                  setSelectedCategory(category);
-                  setSuggestions([]);
-                  setMode(WorkflowMode.TEMPLATES);
-                }}
+                onCategorySelect={handleCategorySelect}
+                mode={mode}
                 onGenerateClick={() => {
                   setSuggestions([]);
                   setPrompt('');
@@ -160,7 +183,6 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
                   setPrompt('');
                   setMode(WorkflowMode.FROM_PROMPT);
                 }}
-                mode={mode}
               />
             </div>
           )}

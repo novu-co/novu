@@ -13,24 +13,18 @@ import {
 import { ExternalLink } from '@/components/shared/external-link';
 import { CreateWorkflowForm } from '@/components/workflow-editor/create-workflow-form';
 import { useCreateWorkflow } from '@/hooks/use-create-workflow';
-import { ComponentProps, useState } from 'react';
+import { ComponentProps, forwardRef, useState } from 'react';
 import { RiArrowRightSLine } from 'react-icons/ri';
-import { z } from 'zod';
-import { workflowSchema } from './workflow-editor/schema';
 
-export const CreateWorkflowButton = ({ ...props }: ComponentProps<typeof SheetTrigger>) => {
+export const CreateWorkflowButton = forwardRef<HTMLButtonElement, ComponentProps<typeof SheetTrigger>>((props, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const { submit, isLoading: isCreating } = useCreateWorkflow({
     onSuccess: () => setIsOpen(false),
   });
 
-  const handleSubmit = (values: z.infer<typeof workflowSchema>) => {
-    submit(values);
-  };
-
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger {...props} />
+      <SheetTrigger ref={ref} {...props} />
       <SheetContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <SheetHeader>
           <SheetTitle>Create workflow</SheetTitle>
@@ -43,7 +37,7 @@ export const CreateWorkflowButton = ({ ...props }: ComponentProps<typeof SheetTr
         </SheetHeader>
         <Separator />
         <SheetMain>
-          <CreateWorkflowForm onSubmit={handleSubmit} />
+          <CreateWorkflowForm onSubmit={submit} />
         </SheetMain>
         <Separator />
         <SheetFooter>
@@ -61,4 +55,6 @@ export const CreateWorkflowButton = ({ ...props }: ComponentProps<typeof SheetTr
       </SheetContent>
     </Sheet>
   );
-};
+});
+
+CreateWorkflowButton.displayName = 'CreateWorkflowButton';

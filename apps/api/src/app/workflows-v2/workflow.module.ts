@@ -20,24 +20,18 @@ import { IntegrationModule } from '../integrations/integrations.module';
 import { MessageTemplateModule } from '../message-template/message-template.module';
 import { SharedModule } from '../shared/shared.module';
 import {
-  BuildAvailableVariableSchemaUsecase,
-  BuildDefaultPayloadUsecase,
   BuildStepDataUsecase,
+  BuildVariableSchemaUsecase,
   BuildWorkflowTestDataUseCase,
-  CollectPlaceholderWithDefaultsUsecase,
-  ExtractDefaultValuesFromSchemaUsecase,
   GeneratePreviewUsecase,
   GetWorkflowUseCase,
   ListWorkflowsUseCase,
-  PostProcessWorkflowUpdate,
-  PrepareAndValidateContentUsecase,
   SyncToEnvironmentUseCase,
   UpsertWorkflowUseCase,
-  ValidatePlaceholderUsecase,
 } from './usecases';
 import { BuildPayloadSchema } from './usecases/build-payload-schema/build-payload-schema.usecase';
+import { BuildStepIssuesUsecase } from './usecases/build-step-issues/build-step-issues.usecase';
 import { GenerateSuggestionsUsecase } from './usecases/generate-suggestions';
-import { OverloadContentDataOnWorkflowUseCase } from './usecases/overload-content-data';
 import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
 import { PatchWorkflowUsecase } from './usecases/patch-workflow';
 import { WorkflowController } from './workflow.controller';
@@ -65,19 +59,12 @@ const DAL_REPOSITORIES = [CommunityOrganizationRepository];
     BuildWorkflowTestDataUseCase,
     GetWorkflowUseCase,
     HydrateEmailSchemaUseCase,
-    PostProcessWorkflowUpdate,
-    BuildDefaultPayloadUsecase,
-    BuildAvailableVariableSchemaUsecase,
-    CollectPlaceholderWithDefaultsUsecase,
-    PrepareAndValidateContentUsecase,
-    ValidatePlaceholderUsecase,
-    ExtractDefaultValuesFromSchemaUsecase,
+    BuildVariableSchemaUsecase,
     PatchStepUsecase,
-    PostProcessWorkflowUpdate,
-    OverloadContentDataOnWorkflowUseCase,
     PatchWorkflowUsecase,
     TierRestrictionsValidateUsecase,
     BuildPayloadSchema,
+    BuildStepIssuesUsecase,
     GenerateSuggestionsUsecase,
   ],
 })

@@ -1,5 +1,3 @@
-import { CreateWorkflowButton } from '@/components/create-workflow-button';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 import {
   Calendar,
@@ -15,6 +13,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { ReactNode } from 'react';
+import { useFeatureFlag } from '../../hooks/use-feature-flag';
 import { Badge } from '../primitives/badge';
 import { WorkflowMode } from './types';
 
@@ -35,6 +34,7 @@ interface SidebarButtonProps {
   asChild?: boolean;
   hasExternalLink?: boolean;
   beta?: boolean;
+  createWorkflowButton?: React.ComponentType<any>;
 }
 
 const buttonVariants = {
@@ -57,8 +57,9 @@ function SidebarButton({
   asChild,
   beta,
   hasExternalLink,
+  createWorkflowButton: CustomCreateWorkflowButton,
 }: SidebarButtonProps) {
-  const ButtonWrapper = asChild ? CreateWorkflowButton : motion.button;
+  const ButtonWrapper = asChild && CustomCreateWorkflowButton ? CustomCreateWorkflowButton : motion.button;
   const content = (
     <div className="flex items-center gap-3">
       <motion.div variants={iconVariants} className={`rounded-lg p-[5px] ${bgColor}`}>
@@ -91,7 +92,7 @@ function SidebarButton({
         <div className="flex w-full items-center gap-2">
           {content}{' '}
           {beta && (
-            <Badge kind="pill" size="2xs">
+            <Badge color="gray" size="2xs">
               BETA
             </Badge>
           )}
@@ -109,9 +110,9 @@ const useCases = [
     bgColor: 'bg-blue-50',
   },
   {
-    id: 'events',
+    id: 'billing',
     icon: <Calendar className="h-3 w-3 text-gray-700" />,
-    label: 'Events',
+    label: 'Billing',
     bgColor: 'bg-blue-50',
   },
   {
@@ -121,9 +122,9 @@ const useCases = [
     bgColor: 'bg-green-50',
   },
   {
-    id: 'social',
+    id: 'operational',
     icon: <Users className="h-3 w-3 text-gray-700" />,
-    label: 'Social',
+    label: 'Operational',
     bgColor: 'bg-purple-50',
   },
 ] as const;
@@ -147,9 +148,9 @@ const createOptions = [
 export function WorkflowSidebar({
   selectedCategory,
   onCategorySelect,
-  onGenerateClick,
-  onFromPromptClick,
   mode,
+  onFromPromptClick,
+  onGenerateClick,
 }: WorkflowSidebarProps) {
   const isAiTemplateStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_AI_TEMPLATE_STORE_ENABLED);
 

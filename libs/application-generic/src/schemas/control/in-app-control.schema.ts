@@ -23,11 +23,11 @@ import { defaultOptions, skipStepUiSchema, skipZodSchema } from './shared';
  *
  * Pattern is optimized to prevent exponential backtracking while maintaining all functionality
  */
-const templateUrlPattern =
+const redirectUrlRegex =
   /^(?:\{\{[^}]*\}\}.*|(?!mailto:)(?:https?:\/\/[^\s/$.?#][^\s]*(?:\{\{[^}]*\}\})*[^\s]*)|\/[^\s]*(?:\{\{[^}]*\}\})*[^\s]*)$/;
 
 const redirectZodSchema = z.object({
-  url: z.string().regex(templateUrlPattern),
+  url: z.string().regex(redirectUrlRegex),
   target: z
     .enum(['_self', '_blank', '_parent', '_top', '_unfencedTop'])
     .default('_blank'),
@@ -42,9 +42,10 @@ const actionZodSchema = z
 
 export const inAppControlZodSchema = z.object({
   skip: skipZodSchema,
+  disableOutputSanitization: z.boolean().optional(),
   subject: z.string().optional(),
   body: z.string(),
-  avatar: z.string().regex(templateUrlPattern).optional(),
+  avatar: z.string().regex(redirectUrlRegex).optional(),
   primaryAction: actionZodSchema,
   secondaryAction: actionZodSchema,
   data: z.object({}).catchall(z.unknown()).optional(),
@@ -105,5 +106,9 @@ export const inAppUiSchema: UiSchema = {
       placeholder: redirectPlaceholder,
     },
     skip: skipStepUiSchema.properties.skip,
+    disableOutputSanitization: {
+      component: UiComponentEnum.IN_APP_DISABLE_SANITIZATION_SWITCH,
+      placeholder: false,
+    },
   },
 };

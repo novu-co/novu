@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiExtension } from '@nestjs/swagger';
+import { ApiExtension, ApiParam } from '@nestjs/swagger';
+import { ApiParamOptions } from '@nestjs/swagger/dist/decorators/api-param.decorator';
 
 /**
  * Sets the method name for the SDK.
@@ -19,6 +20,17 @@ export function SdkMethodName(methodName: string) {
 
 export function SdkGroupName(methodName: string) {
   return applyDecorators(ApiExtension('x-speakeasy-group', methodName));
+}
+/**
+ * A decorator function that marks a path or operation to be ignored in OpenAPI documentation.
+ *
+ * This function applies the `x-ignore` extension to the OpenAPI specification,
+ * indicating that the decorated path or operation should not be included in the generated documentation.
+ *
+ * @returns {Function} A decorator function that applies the `x-ignore` extension.
+ */
+export function DocumentationIgnore() {
+  return applyDecorators(ApiExtension('x-ignore', true));
 }
 
 /**
@@ -51,6 +63,28 @@ export function SdkUsageExample(title?: string, description?: string, position?:
 
 export function SdkMethodMaxParamsOverride(maxParamsBeforeCollapseToObject?: number) {
   return applyDecorators(ApiExtension('x-speakeasy-max-method-params', maxParamsBeforeCollapseToObject));
+}
+
+class SDKOverrideOptions {
+  nameOverride?: string;
+}
+
+function overloadOptions(options: ApiParamOptions, sdkOverrideOptions: SDKOverrideOptions) {
+  let finalOptions = options;
+  if (sdkOverrideOptions.nameOverride) {
+    finalOptions = {
+      ...finalOptions,
+      'x-speakeasy-name-override': sdkOverrideOptions.nameOverride,
+    } as unknown as ApiParamOptions;
+  }
+
+  return finalOptions as ApiParamOptions;
+}
+
+export function SdkApiParam(options: ApiParamOptions, sdkOverrideOptions?: SDKOverrideOptions) {
+  const finalOptions = sdkOverrideOptions ? overloadOptions(options, sdkOverrideOptions) : options;
+
+  return applyDecorators(ApiParam(finalOptions));
 }
 
 /**

@@ -1,10 +1,16 @@
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { Input, InputField } from '@/components/primitives/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormInput,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/primitives/form/form';
 import { Separator } from '@/components/primitives/separator';
 import { TagInput } from '@/components/primitives/tag-input';
 import { Textarea } from '@/components/primitives/textarea';
 import { useTags } from '@/hooks/use-tags';
-import { AUTOCOMPLETE_PASSWORD_MANAGERS_OFF } from '@/utils/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type CreateWorkflowDto, slugify } from '@novu/shared';
 import { useForm } from 'react-hook-form';
@@ -44,21 +50,16 @@ export function CreateWorkflowForm({ onSubmit, template }: CreateWorkflowFormPro
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel required>Name</FormLabel>
               <FormControl>
-                <InputField>
-                  <Input
-                    {...field}
-                    autoFocus
-                    {...AUTOCOMPLETE_PASSWORD_MANAGERS_OFF}
-                    onChange={(e) => {
-                      field.onChange(e);
-                      if (!template) {
-                        form.setValue('workflowId', slugify(e.target.value));
-                      }
-                    }}
-                  />
-                </InputField>
+                <FormInput
+                  {...field}
+                  autoFocus
+                  onChange={(e) => {
+                    field.onChange(e);
+                    form.setValue('workflowId', slugify(e.target.value));
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -70,11 +71,9 @@ export function CreateWorkflowForm({ onSubmit, template }: CreateWorkflowFormPro
           name="workflowId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Identifier</FormLabel>
+              <FormLabel required>Identifier</FormLabel>
               <FormControl>
-                <InputField>
-                  <Input {...field} readOnly={!!template} />
-                </InputField>
+                <FormInput {...field} disabled />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,7 +88,9 @@ export function CreateWorkflowForm({ onSubmit, template }: CreateWorkflowFormPro
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center gap-1">
-                <FormLabel hint={`(max. ${MAX_TAG_ELEMENTS})`}>Add tags</FormLabel>
+                <FormLabel optional hint={`(max. ${MAX_TAG_ELEMENTS})`}>
+                  Add tags
+                </FormLabel>
               </div>
               <FormControl>
                 <TagInput
@@ -117,9 +118,9 @@ export function CreateWorkflowForm({ onSubmit, template }: CreateWorkflowFormPro
               </div>
               <FormControl>
                 <Textarea
-                  className="min-h-36"
                   placeholder="Describe what this workflow does"
                   {...field}
+                  showCounter
                   maxLength={MAX_DESCRIPTION_LENGTH}
                 />
               </FormControl>

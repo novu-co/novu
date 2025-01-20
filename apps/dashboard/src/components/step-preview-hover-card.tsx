@@ -1,40 +1,15 @@
-import { Editor } from '@maily-to/core';
-import {
-  blockquote,
-  bulletList,
-  button,
-  columns,
-  divider,
-  hardBreak,
-  heading1,
-  heading2,
-  heading3,
-  image,
-  orderedList,
-  section,
-  spacer,
-  text,
-} from '@maily-to/core/blocks';
 import {
   ChannelTypeEnum,
   ChatRenderOutput,
   GeneratePreviewResponseDto,
+  InAppRenderOutput,
   PushRenderOutput,
   StepTypeEnum,
 } from '@novu/shared';
-import {
-  InAppPreview,
-  InAppPreviewActions,
-  InAppPreviewBell,
-  InAppPreviewBody,
-  InAppPreviewHeader,
-  InAppPreviewNotification,
-  InAppPreviewNotificationContent,
-  InAppPreviewPrimaryAction,
-  InAppPreviewSubject,
-} from './workflow-editor/in-app-preview';
 import { ChatPreview } from './workflow-editor/steps/chat/chat-preview';
 import { EmailPreviewHeader, EmailPreviewSubject } from './workflow-editor/steps/email/email-preview';
+import { Maily } from './workflow-editor/steps/email/maily';
+import { InboxPreview } from './workflow-editor/steps/in-app/inbox-preview';
 import { PushPreview } from './workflow-editor/steps/push/push-preview';
 import { SmsPhone } from './workflow-editor/steps/sms/sms-phone';
 
@@ -46,79 +21,39 @@ interface StepPreviewProps {
 }
 
 export function StepPreview({ type, controlValues }: StepPreviewProps) {
-  if (type === StepTypeEnum.TRIGGER) {
+  if (type === StepTypeEnum.TRIGGER || type === StepTypeEnum.DELAY || type === StepTypeEnum.DIGEST) {
     return null;
   }
 
   if (type === StepTypeEnum.IN_APP) {
-    const { subject, body, action } = controlValues;
+    const { subject, body } = controlValues;
 
     return (
-      <InAppPreview>
-        <InAppPreviewBell />
-        <InAppPreviewHeader />
-        <InAppPreviewNotification>
-          <InAppPreviewNotificationContent>
-            <InAppPreviewSubject>{subject}</InAppPreviewSubject>
-            <InAppPreviewBody>{body}</InAppPreviewBody>
-            {action?.buttons?.length > 0 && (
-              <InAppPreviewActions>
-                {action.buttons.map((button: any, index: number) => (
-                  <InAppPreviewPrimaryAction key={index}>{button.content}</InAppPreviewPrimaryAction>
-                ))}
-              </InAppPreviewActions>
-            )}
-          </InAppPreviewNotificationContent>
-        </InAppPreviewNotification>
-      </InAppPreview>
+      <InboxPreview
+        isPreviewPending={false}
+        previewData={{
+          result: {
+            type: ChannelTypeEnum.IN_APP as const,
+            preview: {
+              subject,
+              body,
+            } as InAppRenderOutput,
+          },
+          previewPayloadExample: {},
+        }}
+      />
     );
   }
 
   if (type === StepTypeEnum.EMAIL) {
     const { subject, body } = controlValues;
-    let parsedBody;
-    try {
-      parsedBody = JSON.parse(body);
-    } catch (e) {
-      console.error('Failed to parse email body:', e);
-      return (
-        <div className="p-4">
-          <div className="text-foreground-600 text-sm">Error parsing email content</div>
-        </div>
-      );
-    }
 
     return (
-      <div className="bg-background pointer-events-none p-3">
+      <div className="bg-background p-3">
         <EmailPreviewHeader />
         <EmailPreviewSubject className="px-3 py-2" subject={subject} />
         <div className="mx-auto w-full overflow-auto">
-          <Editor
-            config={{
-              hasMenuBar: false,
-              autofocus: false,
-              wrapClassName: 'min-h-0 max-h-full flex flex-col w-full h-full overflow-y-auto',
-              bodyClassName:
-                '!bg-transparent flex flex-col basis-full !border-none !mt-0 [&>div]:basis-full [&_.tiptap]:h-full',
-            }}
-            blocks={[
-              text,
-              heading1,
-              heading2,
-              heading3,
-              bulletList,
-              orderedList,
-              image,
-              section,
-              columns,
-              divider,
-              spacer,
-              button,
-              hardBreak,
-              blockquote,
-            ]}
-            contentJson={parsedBody}
-          />
+          <Maily value={body} />
         </div>
       </div>
     );
@@ -135,7 +70,7 @@ export function StepPreview({ type, controlValues }: StepPreviewProps) {
 
   if (type === StepTypeEnum.CHAT) {
     const { body } = controlValues;
-    const mockPreviewData: GeneratePreviewResponseDto = {
+    const previewData: GeneratePreviewResponseDto = {
       result: {
         type: ChannelTypeEnum.CHAT as const,
         preview: {
@@ -148,14 +83,14 @@ export function StepPreview({ type, controlValues }: StepPreviewProps) {
 
     return (
       <div className="p-4">
-        <ChatPreview isPreviewPending={false} previewData={mockPreviewData} />
+        <ChatPreview isPreviewPending={false} previewData={previewData} />
       </div>
     );
   }
 
   if (type === StepTypeEnum.PUSH) {
     const { subject, body } = controlValues;
-    const mockPreviewData: GeneratePreviewResponseDto = {
+    const previewData: GeneratePreviewResponseDto = {
       result: {
         type: ChannelTypeEnum.PUSH as const,
         preview: {
@@ -170,14 +105,8 @@ export function StepPreview({ type, controlValues }: StepPreviewProps) {
 
     return (
       <div className="p-4">
-        <PushPreview isPreviewPending={false} previewData={mockPreviewData} />
+        <PushPreview isPreviewPending={false} previewData={previewData} />
       </div>
     );
   }
-
-  return (
-    <div className="p-4">
-      <div className="text-foreground-600 text-sm">Preview coming soon</div>
-    </div>
-  );
 }
