@@ -84,7 +84,7 @@ export class BuildStepIssuesUsecase {
     const liquidIssues = this.processControlValuesByLiquid(variableSchema, newControlValues || {});
     const customIssues = await this.processControlValuesByCustomeRules(user, stepTypeDto, sanitizedControlValues || {});
     const skipLogicIssues = sanitizedControlValues?.skip
-      ? this.validateSkipLogicFields(sanitizedControlValues.skip as RulesLogic<AdditionalOperation>)
+      ? this.validateSkipField(sanitizedControlValues.skip as RulesLogic<AdditionalOperation>)
       : {};
 
     return merge(schemaIssues, liquidIssues, customIssues, skipLogicIssues);
@@ -278,7 +278,7 @@ export class BuildStepIssuesUsecase {
   }
 
   @Instrument()
-  private validateSkipLogicFields(skipLogic: RulesLogic<AdditionalOperation>): StepIssuesDto {
+  private validateSkipField(skipLogic: RulesLogic<AdditionalOperation>): StepIssuesDto {
     const issues: StepIssuesDto = {};
 
     const queryValidatorService = new QueryValidatorService();
