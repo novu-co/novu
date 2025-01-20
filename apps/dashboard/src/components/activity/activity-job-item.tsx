@@ -37,7 +37,7 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
 
       <JobStatusIndicator status={job.status} />
 
-      <Card className="border-1 flex-1 border border-neutral-200 p-1 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
+      <Card className="border-1 min-w-0 flex-1 border border-neutral-200 p-1 shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
         <CardHeader
           className="flex flex-row items-center justify-between bg-white p-2 px-1 hover:cursor-pointer"
           onClick={() => setIsExpanded(!isExpanded)}
@@ -67,10 +67,12 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
         </CardHeader>
 
         {!isExpanded && (
-          <CardContent className="rounded-lg bg-neutral-50 p-2">
-            <div className="flex items-center justify-between">
-              <span className="text-foreground-400 max-w-[300px] truncate pr-2 text-xs">{getStatusMessage(job)}</span>
-              <Badge variant="lighter" color="gray" size="sm">
+          <CardContent className="overflow-hidden rounded-lg bg-neutral-50 p-2">
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="min-w-0 flex-1 overflow-hidden">
+                <span className="text-foreground-400 block truncate text-xs">{getStatusMessage(job)}</span>
+              </div>
+              <Badge variant="lighter" color="gray" size="sm" className="shrink-0 whitespace-nowrap">
                 <TimeDisplayHoverCard date={new Date(job.updatedAt)}>
                   {format(new Date(job.updatedAt), 'MMM d yyyy, HH:mm:ss')}
                 </TimeDisplayHoverCard>
