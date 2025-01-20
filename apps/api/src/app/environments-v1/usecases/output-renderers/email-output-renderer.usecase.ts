@@ -33,14 +33,8 @@ export class EmailOutputRendererUsecase {
       fullPayloadForRender: renderCommand.fullPayloadForRender,
     });
     const parsedTipTap = await this.parseTipTapNodeByLiquid(expandedMailyContent, renderCommand);
-    const renderedHtml = await mailyRender(parsedTipTap);
-
-    console.log({
-      expandedMailyContent: parsedTipTap?.content?.[2],
-      first: parsedTipTap?.content?.[1],
-      parsedTipTap,
-      body,
-    });
+    const strippedTipTap = this.removeTrailingEmptyLines(parsedTipTap);
+    const renderedHtml = await mailyRender(strippedTipTap);
 
     /**
      * Force type mapping in case undefined control.
@@ -50,9 +44,36 @@ export class EmailOutputRendererUsecase {
     return { subject: subject as string, body: renderedHtml };
   }
 
-  private stripEmptyNodes(tiptapNode: TipTapNode[]): TipTapNode {
-    // recursively check if content missing and strip it
-    return tiptapNode;
+  private removeTrailingEmptyLines(node: TipTapNode): TipTapNode {
+    if (!node.content) return node;
+
+    let shouldKeepFiltering = true;
+
+    // Filter and remove trailing empty nodes
+    const filteredContent = [...node.content]
+      .reverse()
+      .filter((childNode) => {
+        if (shouldKeepFiltering) {
+          const isEmptyParagraph =
+            childNode.type === 'paragraph' &&
+            !childNode.text && // No text
+            (!childNode.content || childNode.content.length === 0);
+
+          // If the paragraph is empty, remove it
+          if (isEmptyParagraph) {
+            return false;
+          }
+
+          // Stop filtering once a non-empty node is encountered
+          shouldKeepFiltering = false;
+        }
+
+        return true;
+      })
+      .reverse(); // Reverse back to the original order
+
+    // Return the updated node
+    return { ...node, content: filteredContent };
   }
 
   private async parseTipTapNodeByLiquid(
