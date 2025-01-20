@@ -39,4 +39,7 @@ export enum TelemetryEvent {
   SHARE_FEEDBACK_LINK_CLICKED = 'Share feedback link clicked',
   VARIABLE_POPOVER_OPENED = 'Variable popover opened - [Variable Editor]',
   VARIABLE_POPOVER_APPLIED = 'Variable popover applied - [Variable Editor]',
+  TEMPLATE_MODAL_OPENED = 'Template Modal Opened - [Template Store]',
+  TEMPLATE_CATEGORY_SELECTED = 'Template Category Selected - [Template Store]',
+  CREATE_WORKFLOW_FROM_TEMPLATE = 'Create Workflow From Template - [Template Store]',
 }
