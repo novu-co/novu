@@ -1,10 +1,10 @@
 import { render as mailyRender } from '@maily-to/render';
 import { Injectable } from '@nestjs/common';
-import { Liquid } from 'liquidjs';
 import { EmailRenderOutput, TipTapNode } from '@novu/shared';
 import { InstrumentUsecase } from '@novu/application-generic';
-import { FullPayloadForRender, RenderCommand } from './render-command';
+import { RenderCommand } from './render-command';
 import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.usecase';
+import { parseLiquid } from '../../../shared/helpers/liquid';
 
 export class EmailOutputRendererCommand extends RenderCommand {}
 
@@ -52,27 +52,3 @@ export class EmailOutputRendererUsecase {
     return JSON.parse(parsedString);
   }
 }
-
-export const parseLiquid = async (value: string, variables: FullPayloadForRender): Promise<string> => {
-  const client = new Liquid({
-    outputEscape: (output) => {
-      return stringifyDataStructureWithSingleQuotes(output);
-    },
-  });
-
-  const template = client.parse(value);
-
-  return await client.render(template, variables);
-};
-
-const stringifyDataStructureWithSingleQuotes = (value: unknown, spaces: number = 0): string => {
-  if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
-    const valueStringified = JSON.stringify(value, null, spaces);
-    const valueSingleQuotes = valueStringified.replace(/"/g, "'");
-    const valueEscapedNewLines = valueSingleQuotes.replace(/\n/g, '\\n');
-
-    return valueEscapedNewLines;
-  } else {
-    return String(value);
-  }
-};

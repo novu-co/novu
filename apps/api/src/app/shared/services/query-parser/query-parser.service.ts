@@ -144,3 +144,39 @@ export function isValidRule(rule: RulesLogic<AdditionalOperation>): boolean {
     return false;
   }
 }
+
+export function extractFieldsFromRules(rules: RulesLogic<AdditionalOperation>): string[] {
+  const variables = new Set<string>();
+
+  const collectVariables = (node: RulesLogic<AdditionalOperation>) => {
+    if (!node || typeof node !== 'object') {
+      return;
+    }
+
+    const entries = Object.entries(node);
+
+    for (const [key, value] of entries) {
+      if (key === 'var' && typeof value === 'string') {
+        variables.add(value);
+        continue;
+      }
+
+      if (Array.isArray(value)) {
+        value.forEach((item) => {
+          if (typeof item === 'object') {
+            collectVariables(item);
+          }
+        });
+        continue;
+      }
+
+      if (typeof value === 'object') {
+        collectVariables(value as RulesLogic<AdditionalOperation>);
+      }
+    }
+  };
+
+  collectVariables(rules);
+
+  return Array.from(variables);
+}

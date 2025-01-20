@@ -19,6 +19,7 @@ import { DelayOutputRendererUsecase } from '../output-renderers/delay-output-ren
 import { DigestOutputRendererUsecase } from '../output-renderers/digest-output-renderer.usecase';
 import { evaluateRules } from '../../../shared/services/query-parser/query-parser.service';
 import { isMatchingJsonSchema } from '../../../workflows-v2/util/jsonToSchema';
+import { parseLiquid } from '../../../shared/helpers/liquid';
 
 const LOG_CONTEXT = 'ConstructFrameworkWorkflow';
 
@@ -230,14 +231,24 @@ export class ConstructFrameworkWorkflow {
     return foundWorkflow;
   }
 
-  private processSkipOption(controlValues: { [x: string]: unknown }, variables: FullPayloadForRender) {
+  private async parseLiquidInSkipRules(skipRules: RulesLogic<AdditionalOperation>, variables: object) {
+    const parsedString = await parseLiquid(JSON.stringify(skipRules), variables);
+
+    return JSON.parse(parsedString);
+  }
+
+  private async processSkipOption(
+    controlValues: { [x: string]: unknown },
+    variables: FullPayloadForRender
+  ): Promise<boolean> {
     const skipRules = controlValues.skip as RulesLogic<AdditionalOperation>;
 
     if (_.isEmpty(skipRules)) {
       return false;
     }
 
-    const { result, error } = evaluateRules(skipRules, variables);
+    const parsedSkipRules = await this.parseLiquidInSkipRules(skipRules, variables);
+    const { result, error } = evaluateRules(parsedSkipRules, variables);
 
     if (error) {
       this.logger.error({ err: error }, 'Failed to evaluate skip rule', LOG_CONTEXT);

@@ -21,7 +21,7 @@ import { BridgeController } from './bridge.controller';
 import { USECASES } from './usecases';
 import { BuildVariableSchemaUsecase } from '../workflows-v2/usecases/build-variable-schema';
 import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-renderers/hydrate-email-schema.usecase';
-import { BuildPayloadSchema } from '../workflows-v2/usecases/build-payload-schema/build-payload-schema.usecase';
+import { ExtractVariables } from '../workflows-v2/usecases/extract-variables/extract-variables.usecase';
 import { BuildStepIssuesUsecase } from '../workflows-v2/usecases/build-step-issues/build-step-issues.usecase';
 
 const PROVIDERS = [
@@ -44,7 +44,7 @@ const PROVIDERS = [
   TierRestrictionsValidateUsecase,
   HydrateEmailSchemaUseCase,
   CommunityOrganizationRepository,
-  BuildPayloadSchema,
+  ExtractVariables,
   BuildStepIssuesUsecase,
 ];
 

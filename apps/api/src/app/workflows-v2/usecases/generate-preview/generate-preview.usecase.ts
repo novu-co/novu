@@ -30,8 +30,8 @@ import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/previe
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
 import { BuildStepDataUsecase } from '../build-step-data';
 import { GeneratePreviewCommand } from './generate-preview.command';
-import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
-import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
+import { ExtractVariablesCommand } from '../extract-variables/extract-variables.command';
+import { ExtractVariables } from '../extract-variables/extract-variables.usecase';
 import { Variable } from '../../util/template-parser/liquid-parser';
 import { isObjectTipTapNode } from '../../util/tip-tap.util';
 import { buildVariables } from '../../util/build-variables';
@@ -45,7 +45,7 @@ export class GeneratePreviewUsecase {
     private previewStepUsecase: PreviewStep,
     private buildStepDataUsecase: BuildStepDataUsecase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private buildPayloadSchema: BuildPayloadSchema,
+    private buildPayloadSchema: ExtractVariables,
     private readonly logger: PinoLogger
   ) {}
 
@@ -190,7 +190,7 @@ export class GeneratePreviewUsecase {
     controlValues: Record<string, unknown>
   ) {
     const payloadSchema = await this.buildPayloadSchema.execute(
-      BuildPayloadSchemaCommand.create({
+      ExtractVariablesCommand.create({
         environmentId: command.user.environmentId,
         organizationId: command.user.organizationId,
         userId: command.user._id,

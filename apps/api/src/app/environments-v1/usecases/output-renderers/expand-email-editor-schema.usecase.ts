@@ -4,8 +4,8 @@ import { Injectable } from '@nestjs/common';
 import { MAILY_ITERABLE_MARK, MailyAttrsEnum } from '@novu/application-generic';
 import { ExpandEmailEditorSchemaCommand } from './expand-email-editor-schema-command';
 import { HydrateEmailSchemaUseCase } from './hydrate-email-schema.usecase';
-import { parseLiquid } from './email-output-renderer.usecase';
 import { FullPayloadForRender } from './render-command';
+import { parseLiquid } from '../../../shared/helpers/liquid';
 
 @Injectable()
 export class ExpandEmailEditorSchemaUsecase {
