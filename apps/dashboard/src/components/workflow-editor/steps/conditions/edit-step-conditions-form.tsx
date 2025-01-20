@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
-import { RiInputField, RiQuestionLine } from 'react-icons/ri';
-import { Link, useBlocker } from 'react-router-dom';
+import { useBlocker } from 'react-router-dom';
 import { formatQuery, RQBJsonLogic, RuleGroupType, RuleType } from 'react-querybuilder';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -9,8 +8,6 @@ import { prepareRuleGroup } from 'react-querybuilder';
 import { parseJsonLogic } from 'react-querybuilder/parseJsonLogic';
 import type { StepUpdateDto } from '@novu/shared';
 
-import { Button } from '@/components/primitives/button';
-import { Panel, PanelContent, PanelHeader } from '@/components/primitives/panel';
 import { ConditionsEditor } from '@/components/conditions-editor/conditions-editor';
 import { Form, FormField } from '@/components/primitives/form/form';
 import { parseStepVariables } from '@/utils/parseStepVariablesToLiquidVariables';
@@ -18,6 +15,7 @@ import { updateStepInWorkflow } from '@/components/workflow-editor/step-utils';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { UnsavedChangesAlertDialog } from '@/components/unsaved-changes-alert-dialog';
 import { useBeforeUnload } from '@/hooks/use-before-unload';
+import { EditStepConditionsLayout } from './edit-step-conditions-layout';
 
 const rulesSchema: z.ZodType<RuleType | RuleGroupType> = z.union([
   z
@@ -112,42 +110,24 @@ export const EditStepConditionsForm = () => {
   return (
     <>
       <Form {...form}>
-        <form className="flex h-full flex-col" onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="flex flex-col gap-3 overflow-y-auto overflow-x-hidden px-3 py-5">
-            <Panel className="overflow-initial">
-              <PanelHeader>
-                <RiInputField className="text-feature size-4" />
-                <span className="text-neutral-950">Step conditions for — {step?.name}</span>
-              </PanelHeader>
-              <PanelContent className="flex flex-col gap-2 border-solid">
-                <FormField
-                  control={form.control}
-                  name="query"
-                  render={({ field }) => (
-                    <ConditionsEditor
-                      query={field.value}
-                      onQueryChange={field.onChange}
-                      fields={fields}
-                      variables={variables}
-                    />
-                  )}
-                />
-              </PanelContent>
-            </Panel>
-            <Link
-              target="_blank"
-              to={'https://docs.novu.co/workflow/step-conditions'}
-              className="mt-2 flex w-max items-center gap-1 text-xs text-neutral-600 hover:underline"
-            >
-              <RiQuestionLine className="size-4" /> Learn more about conditional step execution
-            </Link>
-          </div>
-          <div className="mt-auto flex justify-end border-t border-neutral-200 p-3">
-            <Button type="submit" variant="secondary" disabled={!formState.isDirty}>
-              Save Conditions
-            </Button>
-          </div>
-        </form>
+        <EditStepConditionsLayout
+          onSubmit={form.handleSubmit(onSubmit)}
+          stepName={step?.name}
+          disabled={!formState.isDirty}
+        >
+          <FormField
+            control={form.control}
+            name="query"
+            render={({ field }) => (
+              <ConditionsEditor
+                query={field.value}
+                onQueryChange={field.onChange}
+                fields={fields}
+                variables={variables}
+              />
+            )}
+          />
+        </EditStepConditionsLayout>
       </Form>
       <UnsavedChangesAlertDialog blocker={blocker} />
     </>
