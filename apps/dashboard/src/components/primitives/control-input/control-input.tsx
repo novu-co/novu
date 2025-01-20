@@ -104,7 +104,16 @@ export function ControlInput({
         <PopoverTrigger asChild>
           <div />
         </PopoverTrigger>
-        {selectedVariable && <VariablePopover variable={selectedVariable.value} onUpdate={handleVariableUpdate} />}
+        {selectedVariable && (
+          <VariablePopover
+            variable={selectedVariable.value}
+            onUpdate={(newValue) => {
+              handleVariableUpdate(newValue);
+              // Focus back to the editor after updating the variable
+              viewRef.current?.focus();
+            }}
+          />
+        )}
       </Popover>
     </div>
   );

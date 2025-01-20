@@ -120,11 +120,6 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
             onValueChange={(value) => setActiveSnippetTab(value as SnippetLanguage)}
           >
             <TabsList className="border-t-0" variant="regular">
-              {/* {workflow?.origin === WorkflowOriginEnum.EXTERNAL && (
-                <TabsTrigger className={tabsTriggerClassName} value="framework" variant="regular">
-                  Framework
-                </TabsTrigger>
-              )} */}
               <TabsTrigger className={tabsTriggerClassName} value="typescript" variant="regular">
                 NodeJS
               </TabsTrigger>
@@ -144,11 +139,6 @@ export const TestWorkflowForm = ({ workflow }: { workflow?: WorkflowResponseDto 
                 Copy code
               </CopyButton>
             </TabsList>
-            {workflow?.origin === WorkflowOriginEnum.EXTERNAL && (
-              <TabsContent value="framework" className={codePanelClassName} variant="regular">
-                <SnippetEditor language="framework" value={snippetValue} readOnly />
-              </TabsContent>
-            )}
             <TabsContent value="shell" className={codePanelClassName} variant="regular">
               <SnippetEditor language="shell" value={snippetValue} readOnly />
             </TabsContent>
