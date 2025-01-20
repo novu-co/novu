@@ -3,9 +3,9 @@ import { ROUTES } from '@/utils/routes';
 import { ChannelTypeEnum, StepTypeEnum, WorkflowResponseDto } from '@novu/shared';
 import { RiArrowRightUpLine, RiTimeLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
+import { Badge, BadgeIcon } from '../primitives/badge';
 import { Button } from '../primitives/button';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '../primitives/hover-card';
-import { StatusBadge, StatusBadgeIcon } from '../primitives/status-badge';
 import { SidebarContent } from '../side-navigation/sidebar';
 import TruncatedText from '../truncated-text';
 
@@ -54,17 +54,17 @@ export function WorkflowActions({ workflow }: WorkflowActionsProps) {
             </div>
           </Button>
         </HoverCardTrigger>
-        <HoverCardContent side="left" align="center" className="w-80">
-          <div className="flex flex-col gap-3">
-            <div className="text-subheading-xs flex items-center gap-2">Inbox Integration Required</div>
-            <p className="text-foreground-500 text-xs">
+        <HoverCardContent side="left" align="center" className="w-[270px]">
+          <div className="flex flex-col gap-1">
+            <div className="text-label-xs flex items-center gap-2">Inbox Integration Required</div>
+            <p className="text-text-soft text-paragraph-2xs">
               You haven't yet integrated the Inbox component with your application
             </p>
-            <div className="flex items-center gap-2">
-              <StatusBadge variant="stroke" status="pending">
-                <StatusBadgeIcon as={RiTimeLine} />
+            <div className="mt-2 flex items-center">
+              <Badge variant="lighter" color="orange" size="sm" className="h-5 capitalize">
+                <BadgeIcon as={RiTimeLine} />
                 Less than 4 minutes setup
-              </StatusBadge>
+              </Badge>
             </div>
           </div>
         </HoverCardContent>
