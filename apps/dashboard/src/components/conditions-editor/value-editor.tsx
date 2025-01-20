@@ -1,4 +1,3 @@
-import React from 'react';
 import { useValueEditor, ValueEditorProps } from 'react-querybuilder';
 import { useFormContext } from 'react-hook-form';
 
@@ -6,11 +5,11 @@ import { InputRoot, InputWrapper } from '@/components/primitives/input';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 import { ControlInput } from '../primitives/control-input/control-input';
 
-export const ValueEditor = React.memo((props: ValueEditorProps) => {
+export const ValueEditor = (props: ValueEditorProps) => {
   const form = useFormContext();
   const queryPath = 'query.rules.' + props.path.join('.rules.') + '.value';
   const { error } = form.getFieldState(queryPath, form.formState);
-  const { variables } = props.context as { variables: LiquidVariable[] };
+  const { variables = [] } = (props.context as { variables: LiquidVariable[] }) ?? {};
   const { value, handleOnChange, operator, type } = props;
   const { valueAsArray, multiValueHandler } = useValueEditor(props);
 
@@ -65,4 +64,4 @@ export const ValueEditor = React.memo((props: ValueEditorProps) => {
       {error && <span className="text-destructive text-xs">{error?.message}</span>}
     </div>
   );
-});
+};
