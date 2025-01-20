@@ -82,12 +82,10 @@ export class GeneratePreviewUsecase {
 
       for (const [controlKey, controlValue] of Object.entries(sanitizedValidatedControls || {})) {
         const variables = buildVariables(variableSchema, controlValue, this.logger);
-        console.log('variables', variables);
         const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalidVariables);
 
         const validVariableNames = variables.validVariables.map((variable) => variable.name);
         const variablesExampleResult = keysToObject(validVariableNames);
-        console.log('variablesExampleResult', variablesExampleResult);
         // multiply array items by 3 for preview example purposes
         const multipliedVariablesExampleResult = multiplyArrayItems(variablesExampleResult, 3);
 
