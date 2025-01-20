@@ -109,19 +109,21 @@ export function ActivityPanel({
             {activity.template?.name || 'Deleted workflow'}
           </span>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <CompactButton
-                icon={RiMemoriesFill}
-                size="md"
-                variant="ghost"
-                className="ml-auto"
-                onClick={handleRerun}
-                isLoading={isRerunning}
-              />
-            </TooltipTrigger>
-            <TooltipContent>Rerun this workflow again with the same payload and recipients</TooltipContent>
-          </Tooltip>
+          {activity.template?.name && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <CompactButton
+                  icon={RiMemoriesFill}
+                  size="md"
+                  variant="ghost"
+                  className="ml-auto"
+                  onClick={handleRerun}
+                  isLoading={isRerunning}
+                />
+              </TooltipTrigger>
+              <TooltipContent>Rerun this workflow again with the same payload and recipients</TooltipContent>
+            </Tooltip>
+          )}
         </div>
         <ActivityOverview activity={activity} />
 
