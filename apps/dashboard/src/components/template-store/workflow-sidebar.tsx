@@ -92,7 +92,7 @@ function SidebarButton({
         <div className="flex w-full items-center gap-2">
           {content}{' '}
           {beta && (
-            <Badge color="gray" size="2xs">
+            <Badge color="gray" size="sm">
               BETA
             </Badge>
           )}

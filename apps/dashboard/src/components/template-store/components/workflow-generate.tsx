@@ -1,6 +1,6 @@
 import { Button } from '@/components/primitives/button';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/primitives/hover-card';
-import { Input, InputField } from '@/components/primitives/input';
+import { Input } from '@/components/primitives/input';
 import { Textarea } from '@/components/primitives/textarea';
 import { ArrowRight, Sparkles, Wand2 } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -39,15 +39,13 @@ export function WorkflowGenerate({
     return (
       <>
         <div className="mb-3 flex items-center gap-3">
-          <InputField>
-            <Input
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              className="text-xs"
-              placeholder="Describe your workflow..."
-              disabled={isGenerating}
-            />
-          </InputField>
+          <Input
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            className="text-xs"
+            placeholder="Describe your workflow..."
+            disabled={isGenerating}
+          />
           <Button onClick={handleSubmit} size="sm" type="button" isLoading={isGenerating}>
             Regenerate
           </Button>
