@@ -9,9 +9,10 @@ import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { FeatureFlagsKeysEnum, StepTypeEnum } from '@novu/shared';
 import { useEffect } from 'react';
-import { RiArrowDownSLine, RiFileAddLine, RiFileMarkedLine, RiRouteFill } from 'react-icons/ri';
+import { RiArrowDownSLine, RiArrowRightSLine, RiFileAddLine, RiFileMarkedLine, RiRouteFill } from 'react-icons/ri';
 import { Outlet, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ButtonGroupItem, ButtonGroupRoot } from '../components/primitives/button-group';
+import { LinkButton } from '../components/primitives/button-link';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -156,9 +157,21 @@ export const WorkflowsPage = () => {
           </div>
           {shouldShowStartWith && (
             <div className="px-2.5 py-2">
-              <div className="text-label-xs text-text-soft mb-2">Start with</div>
+              <div className="mb-2 flex items-center justify-between">
+                <div className="text-label-xs text-text-soft">Start with</div>
+                <LinkButton
+                  size="sm"
+                  variant="gray"
+                  onClick={() =>
+                    navigate(buildRoute(ROUTES.TEMPLATE_STORE, { environmentSlug: environmentSlug || '' }))
+                  }
+                  trailingIcon={RiArrowRightSLine}
+                >
+                  Explore templates
+                </LinkButton>
+              </div>
               <ScrollArea className="w-full">
-                <div className="flex gap-4 pb-4">
+                <div className="bg-bg-weak rounded-12 flex gap-4 p-3">
                   <div
                     className="cursor-pointer"
                     onClick={() => {
