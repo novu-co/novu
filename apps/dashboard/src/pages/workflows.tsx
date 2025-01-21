@@ -3,13 +3,15 @@ import { DashboardLayout } from '@/components/dashboard-layout';
 import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';
 import { Button } from '@/components/primitives/button';
+import { Input } from '@/components/primitives/input';
+import { useDebounce } from '@/hooks/use-debounce';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { RiArrowDownSLine, RiFileAddLine, RiFileMarkedLine, RiRouteFill } from 'react-icons/ri';
+import { RiArrowDownSLine, RiFileAddLine, RiFileMarkedLine, RiRouteFill, RiSearchLine } from 'react-icons/ri';
 import { useSearchParams } from 'react-router-dom';
 import { ButtonGroupItem, ButtonGroupRoot } from '../components/primitives/button-group';
 import {
@@ -18,7 +20,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../components/primitives/dropdown-menu';
-import { FacetedFormFilter } from '../components/primitives/form/faceted-filter/facated-form-filter';
 import { Form, FormField, FormItem } from '../components/primitives/form/form';
 import { WorkflowTemplateModal } from '../components/template-store/workflow-template-modal';
 import { WorkflowList } from '../components/workflow-list';
@@ -31,29 +32,48 @@ export const WorkflowsPage = () => {
   const track = useTelemetry();
   const isTemplateStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_TEMPLATE_STORE_ENABLED);
   const [shouldOpenTemplateModal, setShouldOpenTemplateModal] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams({
+    orderDirection: 'desc',
+    orderByField: 'updatedAt',
+    query: '',
+  });
   const form = useForm<WorkflowFilters>({
     defaultValues: {
       query: searchParams.get('query') || '',
     },
   });
 
+  const updateSearchParam = (value: string) => {
+    if (value) {
+      searchParams.set('query', value);
+    } else {
+      searchParams.delete('query');
+    }
+    setSearchParams(searchParams);
+  };
+
+  const debouncedSearch = useDebounce((value: string) => updateSearchParam(value), 500);
+
+  const clearFilters = () => {
+    form.reset({ query: '' });
+  };
+
   useEffect(() => {
-    const subscription = form.watch((value) => {
-      if (value.query) {
-        searchParams.set('query', value.query);
-      } else {
-        searchParams.delete('query');
-      }
-      setSearchParams(searchParams);
+    const subscription = form.watch((value: { query?: string }) => {
+      debouncedSearch(value.query || '');
     });
 
-    return () => subscription.unsubscribe();
-  }, [form, searchParams, setSearchParams]);
+    return () => {
+      subscription.unsubscribe();
+      debouncedSearch.cancel();
+    };
+  }, [form, debouncedSearch]);
 
   useEffect(() => {
     track(TelemetryEvent.WORKFLOWS_PAGE_VISIT);
   }, [track]);
+
+  const hasActiveFilters = searchParams.get('query') !== null;
 
   return (
     <>
@@ -69,14 +89,7 @@ export const WorkflowsPage = () => {
                   name="query"
                   render={({ field }) => (
                     <FormItem className="relative">
-                      <FacetedFormFilter
-                        type="text"
-                        size="small"
-                        title="Search"
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="Search workflows"
-                      />
+                      <Input size="xs" {...field} placeholder="Search workflows..." leadingIcon={RiSearchLine} />
                     </FormItem>
                   )}
                 />
@@ -134,7 +147,7 @@ export const WorkflowsPage = () => {
             )}
             {shouldOpenTemplateModal && <WorkflowTemplateModal open={true} onOpenChange={setShouldOpenTemplateModal} />}
           </div>
-          <WorkflowList />
+          <WorkflowList hasActiveFilters={hasActiveFilters} onClearFilters={clearFilters} />
         </div>
       </DashboardLayout>
     </>

@@ -18,7 +18,12 @@ import { ServerErrorPage } from './shared/server-error-page';
 
 type SortableColumn = 'name' | 'updatedAt';
 
-export function WorkflowList() {
+interface WorkflowListProps {
+  hasActiveFilters?: boolean;
+  onClearFilters?: () => void;
+}
+
+export function WorkflowList({ hasActiveFilters, onClearFilters }: WorkflowListProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
 
@@ -35,7 +40,7 @@ export function WorkflowList() {
   const orderDirection = (searchParams.get('orderDirection') || 'desc') as 'asc' | 'desc';
   const orderByField = (searchParams.get('orderByField') || 'updatedAt') as SortableColumn;
 
-  const { data, isPending, isError, currentPage, totalPages } = useFetchWorkflows({
+  const { data, isLoading, isError, currentPage, totalPages } = useFetchWorkflows({
     limit,
     offset,
     query,
@@ -70,8 +75,8 @@ export function WorkflowList() {
 
   if (isError) return <ServerErrorPage />;
 
-  if (!isPending && data.totalCount === 0) {
-    return <WorkflowListEmpty />;
+  if (!isLoading && data?.totalCount === 0) {
+    return <WorkflowListEmpty emptySearchResults={hasActiveFilters} onClearFilters={onClearFilters} />;
   }
 
   return (
@@ -92,7 +97,7 @@ export function WorkflowList() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {isPending ? (
+          {isLoading ? (
             <>
               {new Array(limit).fill(0).map((_, index) => (
                 <TableRow key={index}>
@@ -119,11 +124,7 @@ export function WorkflowList() {
               ))}
             </>
           ) : (
-            <>
-              {data.workflows.map((workflow) => (
-                <WorkflowRow key={workflow._id} workflow={workflow} />
-              ))}
-            </>
+            <>{data?.workflows.map((workflow) => <WorkflowRow key={workflow._id} workflow={workflow} />)}</>
           )}
         </TableBody>
         {data && limit < data.totalCount && (

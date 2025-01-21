@@ -110,11 +110,13 @@ export const inputVariants = tv({
         input: 'h-8 text-paragraph-xs',
         affix: 'text-paragraph-xs',
         inlineAffix: 'text-paragraph-xs',
+        icon: 'size-4',
       },
       '2xs': {
         root: 'rounded-lg',
         wrapper: 'gap-1.5 px-2',
         input: 'h-7 text-paragraph-xs',
+        icon: 'size-4',
       },
     },
     hasError: {
