@@ -11,29 +11,11 @@ interface TableProps extends React.HTMLAttributes<HTMLDivElement> {
   loadingRow?: React.ReactNode;
 }
 
-interface TableHeaderProps extends React.HTMLAttributes<HTMLTableSectionElement> {}
-
 interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
   sortable?: boolean;
   sortDirection?: 'asc' | 'desc' | false;
   onSort?: () => void;
 }
-
-interface TableBodyProps extends React.HTMLAttributes<HTMLTableSectionElement> {}
-
-interface TableFooterProps extends React.HTMLAttributes<HTMLTableSectionElement> {}
-
-interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {}
-
-interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {}
-
-const LoadingRow = () => (
-  <TableRow>
-    <TableCell className="animate-pulse" colSpan={100}>
-      <div className="h-8 w-full rounded-md bg-neutral-100" />
-    </TableCell>
-  </TableRow>
-);
 
 const Table = React.forwardRef<HTMLTableElement, TableProps>(
   ({ className, containerClassname, isLoading, loadingRowsCount = 5, loadingRow, children, ...props }, ref) => {
@@ -58,9 +40,9 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
 );
 Table.displayName = 'Table';
 
-const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn('[&_tr]:border-b', className)} {...props} />
-));
+const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
+  ({ className, ...props }, ref) => <thead ref={ref} className={cn('[&_tr]:border-b', className)} {...props} />
+);
 TableHeader.displayName = 'TableHeader';
 
 const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
@@ -100,28 +82,39 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
 );
 TableHead.displayName = 'TableHead';
 
-const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(({ className, ...props }, ref) => (
-  <tbody ref={ref} className={cn('[&_tr:last-child]:border-0', className)} {...props} />
-));
+const TableBody = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
+  ({ className, ...props }, ref) => (
+    <tbody ref={ref} className={cn('[&_tr:last-child]:border-0', className)} {...props} />
+  )
+);
 TableBody.displayName = 'TableBody';
 
-const TableFooter = React.forwardRef<HTMLTableSectionElement, TableFooterProps>(({ className, ...props }, ref) => (
-  <tfoot ref={ref} className={cn('bg-neutral-900 font-medium text-neutral-50', className)} {...props} />
-));
+const TableFooter = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
+  ({ className, ...props }, ref) => (
+    <tfoot ref={ref} className={cn('bg-neutral-900 font-medium text-neutral-50', className)} {...props} />
+  )
+);
 TableFooter.displayName = 'TableFooter';
 
-const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(({ className, ...props }, ref) => (
-  <tr
-    ref={ref}
-    className={cn('border-b transition-colors hover:bg-neutral-100/50 data-[state=selected]:bg-neutral-100', className)}
-    {...props}
-  />
-));
+const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
+  ({ className, ...props }, ref) => (
+    <tr
+      ref={ref}
+      className={cn(
+        'border-b transition-colors hover:bg-neutral-100/50 data-[state=selected]:bg-neutral-100',
+        className
+      )}
+      {...props}
+    />
+  )
+);
 TableRow.displayName = 'TableRow';
 
-const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(({ className, ...props }, ref) => (
-  <td ref={ref} className={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)} {...props} />
-));
+const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(
+  ({ className, ...props }, ref) => (
+    <td ref={ref} className={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)} {...props} />
+  )
+);
 TableCell.displayName = 'TableCell';
 
 export { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow };
