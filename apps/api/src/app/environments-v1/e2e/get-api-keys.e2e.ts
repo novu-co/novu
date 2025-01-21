@@ -1,6 +1,6 @@
-import { NOVU_ENCRYPTION_SUB_MASK } from '@novu/shared';
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
+import { NOVU_ENCRYPTION_SUB_MASK } from '@novu/shared';
 
 describe('Get Environment API Keys - /environments/api-keys (GET) #novu-v2', async () => {
   let session: UserSession;
@@ -12,7 +12,6 @@ describe('Get Environment API Keys - /environments/api-keys (GET) #novu-v2', asy
   it('should get environment api keys correctly', async () => {
     const demoEnvironment = {
       name: 'Hello App',
-      color: '#000000',
     };
     await session.testAgent.post('/v1/environments').send(demoEnvironment).expect(201);
 
