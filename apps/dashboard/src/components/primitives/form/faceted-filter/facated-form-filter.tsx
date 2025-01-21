@@ -133,7 +133,7 @@ export function FacetedFormFilter({
       selectedValues,
       onSelect: handleSelect,
       searchQuery,
-      placeholder: placeholder,
+      placeholder,
       onSearchChange: (value: string) => setSearchQuery(value),
     };
 
