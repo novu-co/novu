@@ -79,6 +79,8 @@ export class EnvironmentsControllerV1 {
   @ApiExcludeEndpoint()
   @ApiResponse(EnvironmentResponseDto, 201)
   @ProductFeature(ProductFeatureKeyEnum.MANAGE_ENVIRONMENTS)
+  @UseGuards(RolesGuard)
+  @Roles(MemberRoleEnum.ADMIN)
   async createEnvironment(
     @UserSession() user: UserSessionData,
     @Body() body: CreateEnvironmentRequestDto
@@ -173,6 +175,8 @@ export class EnvironmentsControllerV1 {
   })
   @ApiParam({ name: 'environmentId', type: String, required: true })
   @ProductFeature(ProductFeatureKeyEnum.MANAGE_ENVIRONMENTS)
+  @UseGuards(RolesGuard)
+  @Roles(MemberRoleEnum.ADMIN)
   async deleteEnvironment(@UserSession() user: UserSessionData, @Param('environmentId') environmentId: string) {
     return await this.deleteEnvironmentUsecase.execute(
       DeleteEnvironmentCommand.create({
