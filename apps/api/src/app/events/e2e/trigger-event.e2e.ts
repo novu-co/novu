@@ -891,7 +891,6 @@ describe('Trigger event - /v1/events/trigger (POST) #novu-v2', function () {
 
       await session.awaitRunningJobs();
       const envId = session.environment._id;
-      console.log(`created sub envId:${envId} subscriberId: ${subscriberId}`);
       const createdSubscriber = await subscriberRepository.findBySubscriberId(envId, subscriberId);
 
       expect(createdSubscriber?.subscriberId).to.equal(subscriberId);
