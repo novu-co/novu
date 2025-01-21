@@ -12,7 +12,7 @@ import {
 import { WorkflowListEmpty } from '@/components/workflow-list-empty';
 import { WorkflowRow } from '@/components/workflow-row';
 import { useFetchWorkflows } from '@/hooks/use-fetch-workflows';
-import { RiArrowDownSFill, RiArrowUpSFill, RiExpandUpDownFill, RiMore2Fill } from 'react-icons/ri';
+import { RiMore2Fill } from 'react-icons/ri';
 import { createSearchParams, useLocation, useSearchParams } from 'react-router-dom';
 import { ServerErrorPage } from './shared/server-error-page';
 
@@ -55,24 +55,6 @@ export function WorkflowList({ hasActiveFilters, onClearFilters }: WorkflowListP
     setSearchParams(searchParams);
   };
 
-  const getSortingIcon = (state: 'asc' | 'desc' | false) => {
-    if (state === 'asc') return <RiArrowUpSFill className="text-text-sub-600 size-4" />;
-    if (state === 'desc') return <RiArrowDownSFill className="text-text-sub-600 size-4" />;
-
-    return <RiExpandUpDownFill className="text-text-sub-600 size-4" />;
-  };
-
-  const SortButton = ({ column, children }: { column: SortableColumn; children: React.ReactNode }) => (
-    <div
-      role="button"
-      className="hover:text-foreground-900 flex cursor-pointer items-center gap-1"
-      onClick={() => toggleSort(column)}
-    >
-      {children}
-      {getSortingIcon(orderByField === column ? orderDirection : false)}
-    </div>
-  );
-
   if (isError) return <ServerErrorPage />;
 
   if (!isLoading && data?.totalCount === 0) {
@@ -84,14 +66,22 @@ export function WorkflowList({ hasActiveFilters, onClearFilters }: WorkflowListP
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>
-              <SortButton column="name">Workflows</SortButton>
+            <TableHead
+              sortable
+              sortDirection={orderByField === 'name' ? orderDirection : false}
+              onSort={() => toggleSort('name')}
+            >
+              Workflows
             </TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Steps</TableHead>
             <TableHead>Tags</TableHead>
-            <TableHead>
-              <SortButton column="updatedAt">Last updated</SortButton>
+            <TableHead
+              sortable
+              sortDirection={orderByField === 'updatedAt' ? orderDirection : false}
+              onSort={() => toggleSort('updatedAt')}
+            >
+              Last updated
             </TableHead>
             <TableHead />
           </TableRow>
