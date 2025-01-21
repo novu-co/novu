@@ -135,8 +135,14 @@ export class AddJob {
     const filterVariables = shouldRun.variables;
     const filtered = !shouldRun.passed;
 
+    let digestResult: {
+      digestAmount: number;
+      digestCreationResult: DigestCreationResultEnum;
+      cronExpression?: string;
+    } | null = null;
+
     if (job.type === StepTypeEnum.DIGEST) {
-      const digestResult = await this.handleDigest(command, filterVariables, job, digestAmount, filtered);
+      digestResult = await this.handleDigest(command, filterVariables, job, digestAmount, filtered);
 
       if (isShouldHaltJobExecution(digestResult.digestCreationResult)) {
         return;
@@ -161,17 +167,18 @@ export class AddJob {
 
     const delay = this.getExecutionDelayAmount(filtered, digestAmount, delayAmount);
 
-    await this.validateDeferDuration(delay, job, command);
+    await this.validateDeferDuration(delay, job, command, digestResult?.cronExpression);
 
     await this.queueJob(job, delay);
   }
 
-  private async validateDeferDuration(delay: number, job: JobEntity, command: AddJobCommand) {
+  private async validateDeferDuration(delay: number, job: JobEntity, command: AddJobCommand, cronExpression?: string) {
     const errors = await this.tierRestrictionsValidateUsecase.execute(
       TierRestrictionsValidateCommand.create({
         deferDurationMs: delay,
         stepType: job.type,
         organizationId: command.organizationId,
+        cron: cronExpression,
       })
     );
 
@@ -387,7 +394,7 @@ export class AddJob {
       await this.handleDigestSkip(command, job);
     }
 
-    return { digestAmount, digestCreationResult };
+    return { digestAmount, digestCreationResult, cronExpression: bridgeResponse?.outputs?.cron as string | undefined };
   }
 
   private mapBridgeTimedDigestAmount(bridgeResponse: ExecuteOutput | null): number | null {
