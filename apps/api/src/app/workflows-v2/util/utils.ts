@@ -159,7 +159,7 @@ export function mockSchemaDefaults(schema: JSONSchemaDto, parentPath = 'payload'
  *   }
  * }
  */
-export function keysToObject(paths: string[]): Record<string, unknown> {
+export function keysToObject(paths: string[], showIfVariablesPath?: string[]): Record<string, unknown> {
   const result = {};
 
   const validPaths = paths
@@ -167,17 +167,7 @@ export function keysToObject(paths: string[]): Record<string, unknown> {
     // remove paths that are a prefix of another path
     .filter((path) => !paths.some((otherPath) => otherPath !== path && otherPath.startsWith(`${path}.`)));
 
-  validPaths.filter(hasNamespace).forEach((path) => buildPathInObject(path, result));
-
-  return result;
-}
-
-export function keysToObject(
-  keys: string[],
-  { fn }: { fn: (key: string) => string | boolean } = { fn: (key: string) => key }
-) {
-  const result: Record<string, Record<string, unknown> | undefined> = {};
-  keys.filter((key) => key.includes('.')).forEach((key) => set(result, key, fn(key)));
+  validPaths.filter(hasNamespace).forEach((path) => buildPathInObject(path, result, showIfVariablesPath));
 
   return result;
 }
@@ -186,7 +176,7 @@ function hasNamespace(path: string): boolean {
   return path.includes('.');
 }
 
-function buildPathInObject(path: string, result: Record<string, any>): void {
+function buildPathInObject(path: string, result: Record<string, any>, showIfVariablesPath?: string[]): void {
   const parts = path.split('.');
   let current = result;
 
@@ -202,7 +192,7 @@ function buildPathInObject(path: string, result: Record<string, any>): void {
     current = handleObjectPath(current, key);
   }
 
-  setFinalLeafValue(current, parts[parts.length - 1], path);
+  setFinalLeafValue(current, parts[parts.length - 1], path, showIfVariablesPath);
 }
 
 function isArrayNotation(part: string): boolean {
@@ -223,9 +213,16 @@ function handleObjectPath(current: Record<string, any>, key: string): Record<str
   return current[key];
 }
 
-function setFinalLeafValue(current: Record<string, any>, lastPart: string, fullPath: string): void {
+function setFinalLeafValue(
+  current: Record<string, any>,
+  lastPart: string,
+  fullPath: string,
+  showIfVariablesPath?: string[]
+): void {
   if (lastPart !== '0') {
-    current[lastPart] = `{{${fullPath.replace('.0.', '.')}}}`;
+    const currentPath = fullPath.replace('.0.', '.');
+    const showIfPath = showIfVariablesPath?.find((path) => path.includes(currentPath));
+    current[lastPart] = showIfPath ? true : `{{${currentPath}}}`;
   }
 }
 

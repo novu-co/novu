@@ -86,11 +86,8 @@ export class GeneratePreviewUsecase {
         const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalidVariables);
         const showIfVariables: string[] = this.findShowIfVariables(processedControlValues);
         const validVariableNames = variables.validVariables.map((variable) => variable.name);
-        const variablesExampleResult = keysToObject(validVariableNames, {
-          fn: (key) => (showIfVariables.includes(key) ? true : `{{${key}}}`),
-        });
+        const variablesExampleResult = keysToObject(validVariableNames, showIfVariables);
 
-        const variablesExampleResult = keysToObject(validVariableNames);
         // multiply array items by 3 for preview example purposes
         const multipliedVariablesExampleResult = multiplyArrayItems(variablesExampleResult, 3);
 
@@ -145,6 +142,10 @@ export class GeneratePreviewUsecase {
     }
   }
 
+  /**
+   * Extracts showIf variables from TipTap nodes to transform template variables
+   * (e.g. {{payload.foo}}) into true - for preview purposes
+   */
   private findShowIfVariables(processedControlValues: Record<string, unknown>) {
     const showIfVariables: string[] = [];
     if (typeof processedControlValues === 'string') {
