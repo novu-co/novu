@@ -133,7 +133,6 @@ export function FacetedFormFilter({
       selectedValues,
       onSelect: handleSelect,
       searchQuery,
-      placeholder,
       onSearchChange: (value: string) => setSearchQuery(value),
     };
 
@@ -161,7 +160,7 @@ export function FacetedFormFilter({
             {isEmpty && <PlusCircle className="h-4 w-4 text-neutral-300" />}
             {(isEmpty || !hideTitle) && (
               <span className={cn('text-xs font-normal', isEmpty ? 'text-neutral-400' : 'text-neutral-600')}>
-                {placeholder || title}
+                {title}
               </span>
             )}
             {!isEmpty && renderTriggerContent()}
