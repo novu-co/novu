@@ -2,7 +2,7 @@ import { useAuth } from '@/context/auth/hooks';
 import { useEnvironment, useFetchEnvironments } from '@/context/environment/hooks';
 import { useDeleteEnvironment } from '@/hooks/use-environments';
 import { cn } from '@/utils/ui';
-import { IEnvironment, PROTECTED_ENVIRONMENTS } from '@novu/shared';
+import { EnvironmentEnum, IEnvironment, PROTECTED_ENVIRONMENTS } from '@novu/shared';
 import { useState } from 'react';
 import { RiDeleteBin2Line, RiMore2Fill } from 'react-icons/ri';
 import { DeleteEnvironmentDialog } from './delete-environment-dialog';
@@ -125,7 +125,7 @@ export function EnvironmentsList() {
                     </TimeDisplayHoverCard>
                   </TableCell>
                   <TableCell className="h-[49px] w-1">
-                    {!PROTECTED_ENVIRONMENTS.includes(environment.name) && (
+                    {!PROTECTED_ENVIRONMENTS.includes(environment.name as EnvironmentEnum) && (
                       <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
                           <CompactButton
@@ -146,7 +146,7 @@ export function EnvironmentsList() {
                                 onSelect={() => handleDeleteClick(environment)}
                                 disabled={
                                   environment._id === currentEnvironment?._id ||
-                                  PROTECTED_ENVIRONMENTS.includes(environment.name)
+                                  PROTECTED_ENVIRONMENTS.includes(environment.name as EnvironmentEnum)
                                 }
                               >
                                 <RiDeleteBin2Line />

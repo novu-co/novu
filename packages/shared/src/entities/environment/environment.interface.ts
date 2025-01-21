@@ -10,7 +10,7 @@ export interface IEnvironment {
   widget: IWidgetSettings;
   dns?: IDnsSettings;
   apiRateLimits?: IApiRateLimitMaximum;
-  color?: string;
+  color: string;
   branding?: {
     color: string;
     logo: string;
