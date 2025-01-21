@@ -61,7 +61,6 @@ export function StepPreview({ type, controlValues }: StepPreviewProps) {
 
   if (type === StepTypeEnum.SMS) {
     const { body } = controlValues;
-
     return (
       <div className="p-4">
         <SmsPhone smsBody={body} />

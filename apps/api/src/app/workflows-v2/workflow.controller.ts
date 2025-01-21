@@ -12,7 +12,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common/decorators';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 import { DeleteWorkflowCommand, DeleteWorkflowUseCase, UserAuthGuard, UserSession } from '@novu/application-generic';
 import {
   CreateWorkflowDto,
@@ -31,6 +31,7 @@ import {
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
 } from '@novu/shared';
+import { IsString } from 'class-validator';
 import { ApiCommonResponses } from '../shared/framework/response.decorator';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
 import { ParseSlugEnvironmentIdPipe } from './pipes/parse-slug-env-id.pipe';
@@ -55,6 +56,20 @@ import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to
 import { UpsertWorkflowCommand } from './usecases/upsert-workflow/upsert-workflow.command';
 import { UpsertWorkflowUseCase } from './usecases/upsert-workflow/upsert-workflow.usecase';
 
+import {
+  GenerateSuggestionsCommand,
+  GenerateSuggestionsUsecase,
+  WorkflowModeEnum,
+} from './usecases/generate-suggestions';
+
+class GenerateWorkflowSuggestionsDto {
+  @IsString()
+  prompt: string;
+
+  @IsString()
+  mode?: WorkflowModeEnum;
+}
+
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
 @UseInterceptors(ClassSerializerInterceptor)
@@ -71,8 +86,27 @@ export class WorkflowController {
     private buildWorkflowTestDataUseCase: BuildWorkflowTestDataUseCase,
     private buildStepDataUsecase: BuildStepDataUsecase,
     private patchStepDataUsecase: PatchStepUsecase,
-    private patchWorkflowUsecase: PatchWorkflowUsecase
+    private patchWorkflowUsecase: PatchWorkflowUsecase,
+    private generateSuggestionsUsecase: GenerateSuggestionsUsecase
   ) {}
+
+  @Post('/suggestions')
+  @UseGuards(UserAuthGuard)
+  @ApiExcludeEndpoint()
+  async generateSuggestions(
+    @UserSession() user: UserSessionData,
+    @Body() body: GenerateWorkflowSuggestionsDto
+  ): Promise<any> {
+    return this.generateSuggestionsUsecase.execute(
+      GenerateSuggestionsCommand.create({
+        prompt: body.prompt,
+        environmentId: user.environmentId,
+        organizationId: user.organizationId,
+        userId: user._id,
+        mode: body.mode || WorkflowModeEnum.MULTIPLE,
+      })
+    );
+  }
 
   @Post('')
   @UseGuards(UserAuthGuard)

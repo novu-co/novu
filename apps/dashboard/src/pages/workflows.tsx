@@ -4,10 +4,8 @@ import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';
 import { Button } from '@/components/primitives/button';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
-import { useTelemetry } from '@/hooks/use-telemetry';
-import { TelemetryEvent } from '@/utils/telemetry';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { RiArrowDownSLine, RiFileAddLine, RiFileMarkedLine, RiRouteFill } from 'react-icons/ri';
 import { ButtonGroupItem, ButtonGroupRoot } from '../components/primitives/button-group';
 import {
@@ -20,13 +18,8 @@ import { WorkflowTemplateModal } from '../components/template-store/workflow-tem
 import { WorkflowList } from '../components/workflow-list';
 
 export const WorkflowsPage = () => {
-  const track = useTelemetry();
   const isTemplateStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_TEMPLATE_STORE_ENABLED);
   const [shouldOpenTemplateModal, setShouldOpenTemplateModal] = useState(false);
-
-  useEffect(() => {
-    track(TelemetryEvent.WORKFLOWS_PAGE_VISIT);
-  }, [track]);
 
   return (
     <>

@@ -1,13 +1,27 @@
-import { CreateWorkflowButton } from '@/components/create-workflow-button';
-import { Calendar, Code2, ExternalLink, FileCode2, FileText, KeyRound, LayoutGrid, Users } from 'lucide-react';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
+import {
+  Calendar,
+  Code2,
+  ExternalLink,
+  FileCode2,
+  FileText,
+  KeyRound,
+  LayoutGrid,
+  Sparkles,
+  Users,
+  Wand2,
+} from 'lucide-react';
 import { motion } from 'motion/react';
 import { ReactNode } from 'react';
+import { useFeatureFlag } from '../../hooks/use-feature-flag';
 import { Badge } from '../primitives/badge';
 import { WorkflowMode } from './types';
 
 interface WorkflowSidebarProps {
   selectedCategory: string;
   onCategorySelect: (category: string) => void;
+  onGenerateClick: () => void;
+  onFromPromptClick: () => void;
   mode: WorkflowMode;
 }
 
@@ -131,7 +145,15 @@ const createOptions = [
   },
 ];
 
-export function WorkflowSidebar({ selectedCategory, onCategorySelect, mode }: WorkflowSidebarProps) {
+export function WorkflowSidebar({
+  selectedCategory,
+  onCategorySelect,
+  mode,
+  onFromPromptClick,
+  onGenerateClick,
+}: WorkflowSidebarProps) {
+  const isAiTemplateStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_AI_TEMPLATE_STORE_ENABLED);
+
   return (
     <div className="flex h-full flex-col bg-gray-50">
       <section className="p-2">
@@ -139,6 +161,16 @@ export function WorkflowSidebar({ selectedCategory, onCategorySelect, mode }: Wo
           <span className="text-subheading-2xs text-gray-500">CREATE</span>
         </div>
         <div className="flex flex-col gap-2">
+          {isAiTemplateStoreEnabled && (
+            <SidebarButton
+              icon={<Wand2 className="h-3 w-3 text-gray-700" />}
+              label="From prompt"
+              beta
+              onClick={onFromPromptClick}
+              isActive={mode === WorkflowMode.FROM_PROMPT}
+              bgColor="bg-blue-50"
+            />
+          )}
           {createOptions.map((item, index) => (
             <SidebarButton
               key={index}
@@ -148,7 +180,6 @@ export function WorkflowSidebar({ selectedCategory, onCategorySelect, mode }: Wo
               bgColor={item.bgColor}
               asChild={item.asChild}
               hasExternalLink={item.hasExternalLink}
-              createWorkflowButton={CreateWorkflowButton}
             />
           ))}
         </div>
@@ -159,6 +190,16 @@ export function WorkflowSidebar({ selectedCategory, onCategorySelect, mode }: Wo
         </div>
 
         <div className="flex flex-col gap-2">
+          {isAiTemplateStoreEnabled && (
+            <SidebarButton
+              icon={<Sparkles className="h-3 w-3 text-gray-700" />}
+              label="AI Suggestions"
+              beta
+              onClick={onGenerateClick}
+              isActive={mode === WorkflowMode.GENERATE}
+              bgColor="bg-purple-50"
+            />
+          )}
           {useCases.map((item) => (
             <SidebarButton
               key={item.id}
@@ -167,7 +208,6 @@ export function WorkflowSidebar({ selectedCategory, onCategorySelect, mode }: Wo
               onClick={() => onCategorySelect(item.id)}
               isActive={mode === WorkflowMode.TEMPLATES && selectedCategory === item.id}
               bgColor={item.bgColor}
-              createWorkflowButton={CreateWorkflowButton}
             />
           ))}
         </div>
