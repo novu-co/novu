@@ -51,13 +51,18 @@ export class CreateEnvironment {
     const key = await this.generateUniqueApiKey.execute();
     const encryptedApiKey = encryptApiKey(key);
     const hashedApiKey = createHash('sha256').update(key).digest('hex');
+    const color = this.getEnvironmentColor(command.name, command.color);
+
+    if (!color) {
+      throw new BadRequestException('Color property is required');
+    }
 
     const environment = await this.environmentRepository.create({
       _organizationId: command.organizationId,
       name: command.name,
       identifier: nanoid(12),
       _parentId: command.parentEnvironmentId,
-      color: this.getEnvironmentColor(command.name, command.color),
+      color,
       apiKeys: [
         {
           key: encryptedApiKey,

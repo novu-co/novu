@@ -12,8 +12,8 @@ export class CreateEnvironmentRequestDto {
   @IsMongoId()
   parentId?: string;
 
-  @ApiPropertyOptional()
-  @IsOptional()
+  @ApiProperty()
+  @IsDefined()
   @IsHexColor()
-  color?: string;
+  color: string;
 }

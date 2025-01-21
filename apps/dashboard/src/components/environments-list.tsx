@@ -2,7 +2,7 @@ import { useAuth } from '@/context/auth/hooks';
 import { useEnvironment, useFetchEnvironments } from '@/context/environment/hooks';
 import { useDeleteEnvironment } from '@/hooks/use-environments';
 import { cn } from '@/utils/ui';
-import { IEnvironment } from '@novu/shared';
+import { IEnvironment, PROTECTED_ENVIRONMENTS } from '@novu/shared';
 import { useState } from 'react';
 import { RiDeleteBin2Line, RiMore2Fill } from 'react-icons/ri';
 import { DeleteEnvironmentDialog } from './delete-environment-dialog';
@@ -24,8 +24,6 @@ import { showErrorToast, showSuccessToast } from './primitives/sonner-helpers';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './primitives/table';
 import { TimeDisplayHoverCard } from './time-display-hover-card';
 import TruncatedText from './truncated-text';
-
-const PROTECTED_ENVIRONMENTS = ['Development', 'Production'];
 
 const EnvironmentRowSkeleton = () => (
   <TableRow>

@@ -15,5 +15,6 @@ export class CreateEnvironmentCommand extends OrganizationCommand {
   color?: string;
 
   @IsBoolean()
+  @IsDefined()
   system: boolean;
 }
