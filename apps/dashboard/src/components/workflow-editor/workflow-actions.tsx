@@ -3,6 +3,7 @@ import { ROUTES } from '@/utils/routes';
 import { ChannelTypeEnum, StepTypeEnum, WorkflowResponseDto } from '@novu/shared';
 import { RiArrowRightUpLine, RiTimeLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
+import { useEnvironment } from '../../context/environment/hooks';
 import { Badge, BadgeIcon } from '../primitives/badge';
 import { Button } from '../primitives/button';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '../primitives/hover-card';
@@ -14,18 +15,22 @@ interface WorkflowActionsProps {
 }
 
 export function WorkflowActions({ workflow }: WorkflowActionsProps) {
+  const { currentEnvironment } = useEnvironment();
   const { integrations } = useFetchIntegrations();
   const navigate = useNavigate();
 
   const hasInAppStep = workflow.steps.some((step) => step.type === StepTypeEnum.IN_APP);
   const hasConnectedInAppIntegration = integrations?.some(
-    (integration) => integration.channel === ChannelTypeEnum.IN_APP && integration.connected
+    (integration) =>
+      integration.channel === ChannelTypeEnum.IN_APP &&
+      integration.connected &&
+      integration._environmentId === currentEnvironment?._id
   );
 
   const showInAppActionRequired = hasInAppStep && !hasConnectedInAppIntegration;
 
   const handleInboxSetup = () => {
-    navigate(ROUTES.INBOX_EMBED);
+    navigate(ROUTES.INBOX_EMBED + `?environmentId=${currentEnvironment?._id}&source=workflow-editor`);
   };
 
   if (!showInAppActionRequired) {

@@ -1,18 +1,22 @@
-import { AuthCard } from '../components/auth/auth-card';
-import { ROUTES } from '../utils/routes';
-import { InboxEmbed } from '../components/welcome/inbox-embed';
-import { UsecasePlaygroundHeader } from '../components/usecase-playground-header';
-import { useTelemetry } from '../hooks/use-telemetry';
-import { TelemetryEvent } from '../utils/telemetry';
-import { useEffect } from 'react';
 import { AnimatedPage } from '@/components/onboarding/animated-page';
+import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { AuthCard } from '../components/auth/auth-card';
+import { UsecasePlaygroundHeader } from '../components/usecase-playground-header';
+import { InboxEmbed } from '../components/welcome/inbox-embed';
+import { useTelemetry } from '../hooks/use-telemetry';
+import { ROUTES } from '../utils/routes';
+import { TelemetryEvent } from '../utils/telemetry';
 
 export function InboxEmbedPage() {
+  const [searchParams] = useSearchParams();
   const telemetry = useTelemetry();
 
   useEffect(() => {
-    telemetry(TelemetryEvent.INBOX_EMBED_PAGE_VIEWED);
-  }, [telemetry]);
+    telemetry(TelemetryEvent.INBOX_EMBED_PAGE_VIEWED, {
+      referralSource: searchParams.get('source'),
+    });
+  }, [telemetry, searchParams]);
 
   return (
     <AnimatedPage>

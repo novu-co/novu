@@ -31,7 +31,7 @@ export function IntegrationCard({ integration, provider, environment, onClick }:
     if (integration.channel === ChannelTypeEnum.IN_APP && !integration.connected) {
       e.stopPropagation();
 
-      navigate(ROUTES.INBOX_EMBED + `?environmentId=${environment._id}`);
+      navigate(ROUTES.INBOX_EMBED + `?environmentId=${environment._id}&source=integrations-page`);
     } else {
       onClick({
         integrationId: integration._id ?? '',
