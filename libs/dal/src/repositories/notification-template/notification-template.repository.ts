@@ -217,15 +217,6 @@ export class NotificationTemplateRepository extends BaseRepository<
       ...searchQuery,
     });
 
-    console.log(
-      { [orderByField]: orderDirection === DirectionEnum.ASC ? 1 : -1 },
-      {
-        _environmentId: environmentId,
-        _organizationId: organizationId,
-        ...searchQuery,
-      }
-    );
-
     const items = await this.MongooseModel.find({
       _environmentId: environmentId,
       _organizationId: organizationId,
