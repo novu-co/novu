@@ -15,7 +15,7 @@ import { useSaveForm } from '@/components/workflow-editor/steps/save-form-contex
 
 const REGULAR_DIGEST_TYPE = 'regular';
 const SCHEDULED_DIGEST_TYPE = 'scheduled';
-const TWO_SECONDS = 2000;
+const POPOVER_DURATION_MS = 600;
 
 type PreservedFormValuesByType = { [key: string]: FieldValues | undefined };
 
@@ -79,7 +79,7 @@ export const DigestWindow = () => {
         <div className="bg-neutral-alpha-50 flex flex-col rounded-lg border border-solid border-neutral-100">
           <div className="rounded-t-lg p-2">
             <TabsList className="w-full">
-              <Tooltip delayDuration={TWO_SECONDS}>
+              <Tooltip delayDuration={POPOVER_DURATION_MS}>
                 <TooltipTrigger className="ml-1" asChild>
                   <span className="flex-1">
                     <TabsTrigger value={REGULAR_DIGEST_TYPE} className="w-full text-xs">
@@ -94,7 +94,7 @@ export const DigestWindow = () => {
                   </span>
                 </TooltipContent>
               </Tooltip>
-              <Tooltip delayDuration={TWO_SECONDS}>
+              <Tooltip delayDuration={POPOVER_DURATION_MS}>
                 <TooltipTrigger className="ml-1" asChild>
                   <span className="flex-1">
                     <TabsTrigger value={SCHEDULED_DIGEST_TYPE} className="w-full text-xs">

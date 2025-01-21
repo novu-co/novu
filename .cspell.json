@@ -723,7 +723,9 @@
     "Angularjs",
     "navigatable",
     "facated",
-    "dotenvcreate"
+    "dotenvcreate",
+    "querybuilder",
+    "liquified"
   ],
   "flagWords": [],
   "patterns": [

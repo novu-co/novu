@@ -15,7 +15,6 @@ import { CommunityOrganizationRepository } from '@novu/dal';
 import { AuthModule } from '../auth/auth.module';
 import { BridgeModule } from '../bridge';
 import { ChangeModule } from '../change/change.module';
-import { HydrateEmailSchemaUseCase } from '../environments-v1/usecases/output-renderers';
 import { IntegrationModule } from '../integrations/integrations.module';
 import { MessageTemplateModule } from '../message-template/message-template.module';
 import { SharedModule } from '../shared/shared.module';
@@ -57,7 +56,6 @@ const DAL_REPOSITORIES = [CommunityOrganizationRepository];
     GeneratePreviewUsecase,
     BuildWorkflowTestDataUseCase,
     GetWorkflowUseCase,
-    HydrateEmailSchemaUseCase,
     BuildVariableSchemaUsecase,
     PatchStepUsecase,
     PatchWorkflowUsecase,
