@@ -3,8 +3,9 @@ import _ from 'lodash';
 import { PinoLogger } from '@novu/application-generic';
 
 import { Variable, extractLiquidTemplateVariables, TemplateVariables } from './template-parser/liquid-parser';
-import { transformMailyContentToLiquid } from '../usecases/generate-preview/transform-maily-content-to-liquid';
-import { isStringTipTapNode } from './tip-tap.util';
+import { WrapMailyInLiquidUseCase } from '../../environments-v1/usecases/output-renderers/maily-to-liquid/wrap-maily-in-liquid.usecase';
+import { MAILY_ITERABLE_MARK } from '../../environments-v1/usecases/output-renderers/maily-to-liquid/maily.types';
+import { isStringifiedMailyJSONContent } from '../../environments-v1/usecases/output-renderers/maily-to-liquid/wrap-maily-in-liquid.command';
 
 export function buildVariables(
   variableSchema: Record<string, unknown> | undefined,
@@ -13,9 +14,11 @@ export function buildVariables(
 ): TemplateVariables {
   let variableControlValue = controlValue;
 
-  if (isStringTipTapNode(variableControlValue)) {
+  if (isStringifiedMailyJSONContent(variableControlValue)) {
     try {
-      variableControlValue = transformMailyContentToLiquid(JSON.parse(variableControlValue));
+      variableControlValue = new WrapMailyInLiquidUseCase().execute({
+        emailEditor: variableControlValue,
+      });
     } catch (error) {
       logger?.error(
         {
@@ -29,6 +32,11 @@ export function buildVariables(
   }
 
   const { validVariables, invalidVariables } = extractLiquidTemplateVariables(JSON.stringify(variableControlValue));
+
+  // don't compare against schema if it's not provided
+  if (!variableSchema) {
+    return { validVariables, invalidVariables };
+  }
 
   const { validVariables: validSchemaVariables, invalidVariables: invalidSchemaVariables } = identifyUnknownVariables(
     variableSchema || {},
@@ -57,7 +65,7 @@ function isPropertyAllowed(schema: Record<string, unknown>, propertyPath: string
       continue;
     }
 
-    if (part === '0' && currentSchema.type === 'array') {
+    if (part === MAILY_ITERABLE_MARK && currentSchema.type === 'array') {
       currentSchema = currentSchema.items as Record<string, unknown>;
       continue;
     }

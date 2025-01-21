@@ -1,12 +1,10 @@
 /* eslint-disable no-param-reassign */
 import difference from 'lodash/difference';
-import flatMap from 'lodash/flatMap';
 import isArray from 'lodash/isArray';
 import isObject from 'lodash/isObject';
 import reduce from 'lodash/reduce';
-import values from 'lodash/values';
-
 import { JSONSchemaDto } from '@novu/shared';
+import { MAILY_ITERABLE_MARK } from '../../environments-v1/usecases/output-renderers/maily-to-liquid/maily.types';
 
 export function findMissingKeys(requiredRecord: object, actualRecord: object) {
   const requiredKeys = collectKeys(requiredRecord);
@@ -30,51 +28,6 @@ export function collectKeys(obj, prefix = '') {
     },
     []
   );
-}
-
-/**
- * Recursively flattens an object's values into an array of strings.
- * Handles nested objects, arrays, and converts primitive values to strings.
- *
- * @param obj - The object to flatten
- * @returns An array of strings containing all primitive values found in the object
- *
- * @example
- * ```typescript
- * const input = {
- *   subject: "Hello {{name}}",
- *   body: "Welcome!",
- *   actions: {
- *     primary: {
- *       label: "Click {{here}}",
- *       url: "https://example.com"
- *     }
- *   },
- *   data: { count: 42 }
- * };
- *
- * flattenObjectValues(input);
- *  Returns:
- *  [
- *    "Hello {{name}}",
- *    "Welcome!",
- *    "Click {{here}}",
- *    "https://example.com",
- *    "42"
- *  ]
- * ```
- */
-export function flattenObjectValues(obj: Record<string, unknown>): string[] {
-  return flatMap(values(obj), (value) => {
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      return String(value);
-    }
-    if (value && typeof value === 'object') {
-      return flattenObjectValues(value as Record<string, unknown>);
-    }
-
-    return [];
-  });
 }
 
 /**
@@ -161,7 +114,12 @@ export function mockSchemaDefaults(schema: JSONSchemaDto, parentPath = 'payload'
 export function keysToObject(paths: string[]): Record<string, unknown> {
   const result = {};
 
-  paths.filter(hasNamespace).forEach((path) => buildPathInObject(path, result));
+  const validPaths = paths
+    .filter(hasNamespace)
+    // remove paths that are a prefix of another path
+    .filter((path) => !paths.some((otherPath) => otherPath !== path && otherPath.startsWith(`${path}.`)));
+
+  validPaths.filter(hasNamespace).forEach((path) => buildPathInObject(path, result));
 
   return result;
 }
@@ -179,7 +137,7 @@ function buildPathInObject(path: string, result: Record<string, any>): void {
 
     if (isArrayNotation(parts[i + 1])) {
       current = handleArrayPath(current, key);
-      i += 1; // Skip the "0"
+      i += 1; // Skip the index path part ("0")
       continue;
     }
 
@@ -190,11 +148,13 @@ function buildPathInObject(path: string, result: Record<string, any>): void {
 }
 
 function isArrayNotation(part: string): boolean {
-  return part === '0';
+  return part === MAILY_ITERABLE_MARK;
 }
 
 function handleArrayPath(current: Record<string, any>, key: string): Record<string, any> {
-  current[key] = current[key] || [{}];
+  if (!Array.isArray(current[key])) {
+    current[key] = [{}];
+  }
 
   return current[key][0];
 }
@@ -247,4 +207,45 @@ export function multiplyArrayItems(obj: Record<string, unknown>, multiplyBy = 3)
   });
 
   return result;
+}
+
+/**
+ * Recursively merges common/overlapping object keys from source into target.
+ *
+ * @example
+ * Target: { subscriber: { phone: '{{subscriber.phone}}', name: '{{subscriber.name}}' } }
+ * Source: { subscriber: { phone: '123' }, payload: { someone: '{{payload.someone}}' }}
+ * Result: { subscriber: { phone: '123', name: '{{subscriber.name}}' } }
+ */
+export function mergeCommonObjectKeys(
+  target: Record<string, unknown>,
+  source: Record<string, unknown>
+): Record<string, unknown> {
+  return Object.entries(target).reduce(
+    (merged, [key, targetValue]) => {
+      const sourceValue = source[key];
+
+      if (Array.isArray(targetValue) && Array.isArray(sourceValue)) {
+        merged[key] = targetValue.map((_, index) => {
+          if (index < sourceValue.length) {
+            // if we have a corresponding source item, use it
+            return sourceValue[index];
+          }
+
+          // otherwise keep the target item
+          return targetValue[index];
+        });
+      } else if (isObject(targetValue) && isObject(sourceValue)) {
+        merged[key] = mergeCommonObjectKeys(
+          targetValue as Record<string, unknown>,
+          sourceValue as Record<string, unknown>
+        );
+      } else {
+        merged[key] = sourceValue ?? targetValue;
+      }
+
+      return merged;
+    },
+    {} as Record<string, unknown>
+  );
 }

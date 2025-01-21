@@ -137,10 +137,10 @@ importers:
         version: 4.13.0(typescript@5.6.2)
       eslint-config-airbnb-base:
         specifier: ^15.0.0
-        version: 15.0.0(eslint-plugin-import@2.29.1)(eslint@8.57.1)
+        version: 15.0.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8)(eslint@8.57.1))(eslint@8.57.1)
       eslint-config-airbnb-typescript:
         specifier: ^18.0.0
-        version: 18.0.0(@typescript-eslint/eslint-plugin@8.18.2(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-plugin-import@2.29.1)(eslint@8.57.1)
+        version: 18.0.0(@typescript-eslint/eslint-plugin@8.18.2(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-plugin-import@2.29.1(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8)(eslint@8.57.1))(eslint@8.57.1)
       eslint-config-auto:
         specifier: ^0.9.0
         version: 0.9.0(typescript@5.6.2)
@@ -242,7 +242,7 @@ importers:
         version: 12.1.1(eslint@8.57.1)
       eslint-plugin-sonarjs:
         specifier: ^2.0.1
-        version: 2.0.1(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8)(eslint@8.57.1)
+        version: 2.0.1(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@8.57.1)
       eslint-plugin-spellcheck:
         specifier: 0.0.20
         version: 0.0.20(eslint@8.57.1)
@@ -395,16 +395,16 @@ importers:
         version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)
       '@nestjs/swagger':
         specifier: 7.4.0
-        version: 7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
+        version: 7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
       '@nestjs/terminus':
         specifier: 10.2.3
-        version: 10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.726.0(@aws-sdk/client-sts@3.726.0)))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)
+        version: 10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.726.0(@aws-sdk/client-sts@3.726.0)))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/throttler':
         specifier: 6.2.1
-        version: 6.2.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(reflect-metadata@0.2.2)
+        version: 6.2.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(reflect-metadata@0.2.2)
       '@novu/api':
-        specifier: 0.0.1-alpha.150
-        version: 0.0.1-alpha.150(zod@3.23.8)
+        specifier: 0.1.0
+        version: 0.1.0(zod@3.23.8)
       '@novu/application-generic':
         specifier: workspace:*
         version: link:../../libs/application-generic
@@ -437,7 +437,7 @@ importers:
         version: 7.114.0
       '@sentry/nestjs':
         specifier: ^8.33.1
-        version: 8.33.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)
+        version: 8.33.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))
       '@sentry/node':
         specifier: ^8.33.1
         version: 8.33.1
@@ -524,7 +524,7 @@ importers:
         version: 3.3.6
       nest-raven:
         specifier: 10.1.0
-        version: 10.1.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(@sentry/node@8.33.1)(class-transformer@0.5.1)(class-validator@0.14.1)(graphql@16.9.0)(reflect-metadata@0.2.2)(rxjs@7.8.1)
+        version: 10.1.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@sentry/node@8.33.1)(class-transformer@0.5.1)(class-validator@0.14.1)(graphql@16.9.0)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       newrelic:
         specifier: ^12.8.1
         version: 12.8.2
@@ -613,7 +613,7 @@ importers:
         version: 10.1.4(chokidar@3.6.0)(typescript@5.6.2)
       '@nestjs/testing':
         specifier: 10.4.1
-        version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(@nestjs/platform-express@10.4.1)
+        version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1))
       '@stoplight/spectral-cli':
         specifier: ^6.11.0
         version: 6.11.0(encoding@0.1.13)
@@ -820,7 +820,7 @@ importers:
         version: 4.23.6(@babel/runtime@7.25.6)(@codemirror/autocomplete@6.18.3(@codemirror/language@6.10.3)(@codemirror/state@6.4.1)(@codemirror/view@6.34.3)(@lezer/common@1.2.3))(@codemirror/language@6.10.3)(@codemirror/lint@6.8.2)(@codemirror/search@6.5.6)(@codemirror/state@6.4.1)(@codemirror/theme-one-dark@6.1.2)(@codemirror/view@6.34.3)(codemirror@6.0.1(@lezer/common@1.2.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@xyflow/react':
         specifier: ^12.3.2
-        version: 12.3.2(@types/react@18.3.3)(immer@9.0.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 12.3.2(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0
@@ -893,6 +893,9 @@ importers:
       react-icons:
         specifier: ^5.3.0
         version: 5.3.0(react@18.3.1)
+      react-querybuilder:
+        specifier: ^8.0.0
+        version: 8.1.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1)
       react-resizable-panels:
         specifier: ^2.1.7
         version: 2.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1034,7 +1037,7 @@ importers:
         version: 7.114.0
       '@sentry/nestjs':
         specifier: ^8.33.1
-        version: 8.33.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)
+        version: 8.33.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))
       '@sentry/node':
         specifier: ^8.33.1
         version: 8.33.1
@@ -1531,7 +1534,7 @@ importers:
         version: 7.4.2
       '@storybook/preset-create-react-app':
         specifier: ^7.4.2
-        version: 7.4.2(@babel/core@7.22.11)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(react-refresh@0.11.0)(react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(esbuild@0.18.20)(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1))(type-fest@2.19.0)(typescript@5.6.2)(webpack-dev-server@4.11.1(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20)))(webpack-hot-middleware@2.26.1)(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))
+        version: 7.4.2(ucmnrhmq4kewpo24xrp57f5r6y)
       '@storybook/react':
         specifier: ^7.4.2
         version: 7.4.2(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
@@ -1567,13 +1570,13 @@ importers:
         version: 4.1.0(less@4.1.3)(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))
       react-app-rewired:
         specifier: ^2.2.1
-        version: 2.2.1(react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(esbuild@0.18.20)(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1))
+        version: 2.2.1(react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(esbuild@0.18.20)(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1))
       react-error-overlay:
         specifier: 6.0.11
         version: 6.0.11
       react-scripts:
         specifier: ^5.0.1
-        version: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(esbuild@0.18.20)(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1)
+        version: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(esbuild@0.18.20)(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1)
       sinon:
         specifier: 9.2.4
         version: 9.2.4
@@ -1612,7 +1615,7 @@ importers:
         version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)
       '@nestjs/terminus':
         specifier: 10.2.3
-        version: 10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.726.0(@aws-sdk/client-sts@3.726.0)))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)
+        version: 10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.726.0(@aws-sdk/client-sts@3.726.0)))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@novu/application-generic':
         specifier: workspace:*
         version: link:../../libs/application-generic
@@ -1636,7 +1639,7 @@ importers:
         version: 7.114.0
       '@sentry/nestjs':
         specifier: ^8.33.1
-        version: 8.33.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)
+        version: 8.33.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))
       '@sentry/node':
         specifier: ^8.33.1
         version: 8.33.1
@@ -1669,7 +1672,7 @@ importers:
         version: 4.17.21
       nest-raven:
         specifier: 10.1.0
-        version: 10.1.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(@sentry/node@8.33.1)(class-transformer@0.5.1)(class-validator@0.14.1)(graphql@16.9.0)(reflect-metadata@0.2.2)(rxjs@7.8.1)
+        version: 10.1.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@sentry/node@8.33.1)(class-transformer@0.5.1)(class-validator@0.14.1)(graphql@16.9.0)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       newrelic:
         specifier: ^12.8.1
         version: 12.8.2
@@ -1694,7 +1697,7 @@ importers:
         version: 10.1.4(chokidar@3.6.0)(typescript@5.6.2)
       '@nestjs/testing':
         specifier: 10.4.1
-        version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(@nestjs/platform-express@10.4.1)
+        version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1))
       '@types/chai':
         specifier: ^4.3.4
         version: 4.3.4
@@ -1911,10 +1914,10 @@ importers:
         version: 4.1.0(less@4.1.3)(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12)))
       react-app-rewired:
         specifier: ^2.2.1
-        version: 2.2.1(react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12)))(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1))
+        version: 2.2.1(react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12)))(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1))
       react-scripts:
         specifier: ^5.0.1
-        version: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12)))(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1)
+        version: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12)))(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1)
       typescript:
         specifier: 5.6.2
         version: 5.6.2
@@ -1944,13 +1947,13 @@ importers:
         version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)
       '@nestjs/schedule':
         specifier: ^4.1.1
-        version: 4.1.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)
+        version: 4.1.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))
       '@nestjs/swagger':
         specifier: 7.4.0
-        version: 7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
+        version: 7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
       '@nestjs/terminus':
         specifier: 10.2.3
-        version: 10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.726.0(@aws-sdk/client-sts@3.726.0)))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)
+        version: 10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.726.0(@aws-sdk/client-sts@3.726.0)))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@novu/application-generic':
         specifier: workspace:*
         version: link:../../libs/application-generic
@@ -1977,7 +1980,7 @@ importers:
         version: 7.114.0
       '@sentry/nestjs':
         specifier: ^8.33.1
-        version: 8.33.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)
+        version: 8.33.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))
       '@sentry/node':
         specifier: ^8.33.1
         version: 8.33.1
@@ -2034,7 +2037,7 @@ importers:
         version: 4.17.21
       nest-raven:
         specifier: 10.1.0
-        version: 10.1.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(@sentry/node@8.33.1)(class-transformer@0.5.1)(class-validator@0.14.1)(graphql@16.9.0)(reflect-metadata@0.2.2)(rxjs@7.8.1)
+        version: 10.1.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@sentry/node@8.33.1)(class-transformer@0.5.1)(class-validator@0.14.1)(graphql@16.9.0)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       newrelic:
         specifier: ^12.8.1
         version: 12.8.2
@@ -2078,7 +2081,7 @@ importers:
         version: 10.1.4(chokidar@3.6.0)(typescript@5.6.2)
       '@nestjs/testing':
         specifier: 10.4.1
-        version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(@nestjs/platform-express@10.4.1)
+        version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1))
       '@types/bcrypt':
         specifier: ^3.0.0
         version: 3.0.1
@@ -2156,13 +2159,13 @@ importers:
         version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/websockets@10.4.1)(rxjs@7.8.1)
       '@nestjs/serve-static':
         specifier: 4.0.2
-        version: 4.0.2(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(express@4.21.0)
+        version: 4.0.2(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(express@4.21.0)
       '@nestjs/swagger':
         specifier: 7.4.0
-        version: 7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
+        version: 7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
       '@nestjs/terminus':
         specifier: 10.2.3
-        version: 10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.7.7)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.726.0(@aws-sdk/client-sts@3.726.0)))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)
+        version: 10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.7.7)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.726.0(@aws-sdk/client-sts@3.726.0)))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/websockets':
         specifier: 10.4.1
         version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(@nestjs/platform-socket.io@10.4.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -2186,7 +2189,7 @@ importers:
         version: 7.114.0
       '@sentry/nestjs':
         specifier: ^8.33.1
-        version: 8.33.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)
+        version: 8.33.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))
       '@sentry/node':
         specifier: ^8.33.1
         version: 8.33.1
@@ -2228,7 +2231,7 @@ importers:
         version: 4.17.21
       nest-raven:
         specifier: 10.1.0
-        version: 10.1.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(@sentry/node@8.33.1)(class-transformer@0.5.1)(class-validator@0.14.1)(graphql@16.9.0)(reflect-metadata@0.2.2)(rxjs@7.8.1)
+        version: 10.1.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@sentry/node@8.33.1)(class-transformer@0.5.1)(class-validator@0.14.1)(graphql@16.9.0)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       newrelic:
         specifier: ^12.8.1
         version: 12.8.2
@@ -2256,7 +2259,7 @@ importers:
         version: 10.1.4(chokidar@3.6.0)(typescript@5.6.2)
       '@nestjs/testing':
         specifier: 10.4.1
-        version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(@nestjs/platform-express@10.4.1)
+        version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1))
       '@types/chai':
         specifier: ^4.2.11
         version: 4.3.4
@@ -2328,7 +2331,7 @@ importers:
         version: 10.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(passport@0.7.0)
       '@nestjs/swagger':
         specifier: 7.4.0
-        version: 7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
+        version: 7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
       '@novu/application-generic':
         specifier: workspace:*
         version: link:../../../libs/application-generic
@@ -2410,10 +2413,10 @@ importers:
         version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)
       '@nestjs/swagger':
         specifier: 7.4.0
-        version: 7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
+        version: 7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
       '@nestjs/throttler':
         specifier: 6.2.1
-        version: 6.2.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(reflect-metadata@0.2.2)
+        version: 6.2.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(reflect-metadata@0.2.2)
       '@novu/application-generic':
         specifier: workspace:*
         version: link:../../../libs/application-generic
@@ -2572,7 +2575,7 @@ importers:
         version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)
       '@nestjs/swagger':
         specifier: 7.4.0
-        version: 7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
+        version: 7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
       '@novu/application-generic':
         specifier: workspace:*
         version: link:../../../libs/application-generic
@@ -2672,13 +2675,13 @@ importers:
         version: 10.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(passport@0.7.0)
       '@nestjs/swagger':
         specifier: 7.4.0
-        version: 7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
+        version: 7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)
       '@nestjs/terminus':
         specifier: 10.2.3
-        version: 10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.575.0))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)
+        version: 10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.575.0))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/testing':
         specifier: 10.4.1
-        version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(@nestjs/platform-express@10.4.1)
+        version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1))
       '@novu/dal':
         specifier: workspace:*
         version: link:../dal
@@ -2804,7 +2807,7 @@ importers:
         version: 3.3.7
       nestjs-otel:
         specifier: 6.1.1
-        version: 6.1.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)
+        version: 6.1.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))
       nestjs-pino:
         specifier: 4.1.0
         version: 4.1.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(pino-http@8.3.3)
@@ -3777,7 +3780,7 @@ importers:
         version: 5.3.0
       compression-webpack-plugin:
         specifier: ^10.0.0
-        version: 10.0.0(webpack@5.78.0)
+        version: 10.0.0(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4))
       concurrently:
         specifier: ^5.3.0
         version: 5.3.0
@@ -3825,7 +3828,7 @@ importers:
         version: 1.0.7(tailwindcss@3.4.4(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@20.16.5)(typescript@5.6.2)))
       terser-webpack-plugin:
         specifier: ^5.3.9
-        version: 5.3.9(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack@5.78.0)
+        version: 5.3.9(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4))
       tiny-glob:
         specifier: ^0.2.9
         version: 0.2.9
@@ -3834,7 +3837,7 @@ importers:
         version: 29.1.2(@babel/core@7.25.2)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2))(esbuild@0.23.1)(jest@29.7.0(@types/node@20.16.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@20.16.5)(typescript@5.6.2)))(typescript@5.6.2)
       ts-loader:
         specifier: ~9.4.0
-        version: 9.4.4(typescript@5.6.2)(webpack@5.78.0)
+        version: 9.4.4(typescript@5.6.2)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4))
       tsup:
         specifier: ^8.1.0
         version: 8.1.0(@microsoft/api-extractor@7.47.7(@types/node@20.16.5))(@swc/core@1.7.26(@swc/helpers@0.5.12))(postcss@8.4.38)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)
@@ -4096,7 +4099,7 @@ importers:
         version: 7.4.2(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@storybook/react-webpack5':
         specifier: ^7.4.2
-        version: 7.4.2(@babel/core@7.25.2)(@swc/core@1.7.26(@swc/helpers@0.5.12))(@swc/helpers@0.5.12)(@types/react-dom@18.3.0)(@types/react@18.3.3)(@types/webpack@5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(type-fest@2.19.0)(typescript@5.6.2)(webpack-cli@5.1.4)(webpack-hot-middleware@2.26.1)
+        version: 7.4.2(@babel/core@7.25.2)(@swc/core@1.7.26(@swc/helpers@0.5.12))(@swc/helpers@0.5.12)(@types/react-dom@18.3.0)(@types/react@18.3.3)(@types/webpack@5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0)))(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(type-fest@2.19.0)(typescript@5.6.2)(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))(webpack-hot-middleware@2.26.1)
       '@testing-library/dom':
         specifier: ^9.3.0
         version: 9.3.0
@@ -4129,10 +4132,10 @@ importers:
         version: 8.8.2
       babel-loader:
         specifier: ^8.2.4
-        version: 8.3.0(@babel/core@7.25.2)(webpack@5.78.0)
+        version: 8.3.0(@babel/core@7.25.2)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       compression-webpack-plugin:
         specifier: ^10.0.0
-        version: 10.0.0(webpack@5.78.0)
+        version: 10.0.0(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       jest:
         specifier: ^29.3.1
         version: 29.5.0(@types/node@20.16.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@20.16.5)(typescript@5.6.2))
@@ -4156,19 +4159,19 @@ importers:
         version: 7.4.2(encoding@0.1.13)
       terser-webpack-plugin:
         specifier: ^5.3.9
-        version: 5.3.10(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack@5.78.0)
+        version: 5.3.10(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       ts-jest:
         specifier: ^29.0.3
         version: 29.1.0(@babel/core@7.25.2)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2))(jest@29.5.0(@types/node@20.16.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@20.16.5)(typescript@5.6.2)))(typescript@5.6.2)
       ts-loader:
         specifier: ~9.4.0
-        version: 9.4.4(typescript@5.6.2)(webpack@5.78.0)
+        version: 9.4.4(typescript@5.6.2)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       typescript:
         specifier: 5.6.2
         version: 5.6.2
       url-loader:
         specifier: ^4.1.1
-        version: 4.1.1(file-loader@6.2.0(webpack@5.78.0))(webpack@5.78.0)
+        version: 4.1.1(file-loader@6.2.0(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       webpack:
         specifier: ^5.74.0
         version: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
@@ -4639,7 +4642,7 @@ importers:
         version: 10.1.4(chokidar@3.6.0)(typescript@5.6.2)
       '@nestjs/testing':
         specifier: 10.4.1
-        version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(@nestjs/platform-express@10.4.1)
+        version: 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1))
       '@swc/core':
         specifier: ^1.7.26
         version: 1.7.26(@swc/helpers@0.5.12)
@@ -10761,8 +10764,8 @@ packages:
   '@nothing-but/utils@0.12.1':
     resolution: {integrity: sha512-1qZU1Q5El0IjE7JT/ucvJNzdr2hL3W8Rm27xNf1p6gb3Nw8pGnZmxp6/GEW9h+I1k1cICxXNq25hBwknTQ7yhg==}
 
-  '@novu/api@0.0.1-alpha.150':
-    resolution: {integrity: sha512-ICjMDpzHMBoysntqz8km/45kc5+Huyq5TdCRlyMDDV3PW6qL7JbFTKrnl+ris/XWVM7hGGyA4iVNATDMx407Ew==}
+  '@novu/api@0.1.0':
+    resolution: {integrity: sha512-vCdc1UsJvNXSVc5XuCeCy0qVIai9oQcV2SK4TFSU9/WxJlTYh2RJ/zEBV7uN7pxnbfcn8LEcKWYlfhSmtLugzw==}
     peerDependencies:
       zod: '>= 3'
 
@@ -13810,6 +13813,17 @@ packages:
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: 18.2.0
+
+  '@reduxjs/toolkit@2.5.0':
+    resolution: {integrity: sha512-awNe2oTodsZ6LmRqmkFhtb/KH03hUhxOamEQy411m3Njj3BbFvoBovxo4Q1cBWnV1ErprVj9MlF0UPXkng0eyg==}
+    peerDependencies:
+      react: ^16.9.0 || ^17.0.0 || ^18 || ^19
+      react-redux: ^7.2.1 || ^8.1.3 || ^9.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-redux:
+        optional: true
 
   '@remirror/core-constants@2.0.2':
     resolution: {integrity: sha512-dyHY+sMF0ihPus3O27ODd4+agdHMEmuRdyiZJ2CCWjPV5UFmn17ZbElvk6WOGVE4rdCJKZQCrPV2BcikOMLUGQ==}
@@ -19119,7 +19133,7 @@ packages:
     hasBin: true
 
   add-px-to-style@1.0.0:
-    resolution: {integrity: sha512-YMyxSlXpPjD8uWekCQGuN40lV4bnZagUwqa2m/uFv1z/tNImSk9fnXVMUI5qwME/zzI3MMQRvjZ+69zyfSSyew==}
+    resolution: {integrity: sha1-0ME1RB+oAUqBN5BFMQlvZ/KPJjo=}
 
   add-stream@1.0.0:
     resolution: {integrity: sha512-qQLMr+8o0WC4FZGQTcJiKBVC59JylcPSrTtk6usvmIDFUOCKegapy1VHQwRbFMOFyb/inzUVqHs+eMYKDM1YeQ==}
@@ -19426,7 +19440,7 @@ packages:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
 
   argv@0.0.2:
-    resolution: {integrity: sha512-dEamhpPEwRUBpLNHeuCm/v+g0anFByHahxodVO/BbAarHVBBg2MccCwf9K+o1Pof+2btdnkJelYVUWjW/VrATw==}
+    resolution: {integrity: sha1-7L0W+JSbFXGDcRsb2jNPN4QBhas=}
     engines: {node: '>=0.6.10'}
     deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
@@ -20194,7 +20208,7 @@ packages:
     resolution: {integrity: sha512-VO9Ht/+p3SN7SKWqcrgEzjGbRSJYTx+Q1pTQC0wrWqHx0vpJraQ6GtHx8tvcg1rlK1byhU5gccxgOgj7B0TDkQ==}
 
   buffer-equal-constant-time@1.0.1:
-    resolution: {integrity: sha512-zRpUiDwd/xk6ADqPMATG8vc9VPrkck7T07OIx0gnjmJAnHnTVXNQG3vfvWNuiZIkwu9KrKdA1iJKfsfTVxE6NA==}
+    resolution: {integrity: sha1-+OcRMvf/5uAaXJaXpMbz5I1cyBk=}
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
@@ -20264,7 +20278,7 @@ packages:
     engines: {node: '>= 0.8'}
 
   bytes@3.0.0:
-    resolution: {integrity: sha512-pMhOfFDPiv9t5jjIXkHosWmkSyQbvsgEVNkz0ERHbuLh2T/7j4Mqqpz523Fe8MVY89KC6Sh/QfS2sM+SjgFDcw==}
+    resolution: {integrity: sha1-0ygVQE1olpn4Wk6k+odV3ROpYEg=}
     engines: {node: '>= 0.8'}
 
   bytes@3.1.2:
@@ -20963,7 +20977,7 @@ packages:
     resolution: {integrity: sha512-7CEBgcMjVmitjYo5q8JTJVra6X5mQ20uTThdK+0kR7UEaDrAWEQcRiBtWJzga4eRpP6afNwwLsX2SET2JhVB1Q==}
 
   concat-map@0.0.1:
-    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
 
   concat-stream@1.6.2:
     resolution: {integrity: sha512-27HBghJxjiZtIk3Ycvn/4kbJk/1uZuJFfuPEns6LaEvpvG1f0hTea8lilrouyo9mVc2GWdcEZ8OLoGmSADlrCw==}
@@ -21068,7 +21082,7 @@ packages:
     resolution: {integrity: sha512-L2rLOcK0wzWSfSDA33YR+PUHDG10a8px7rUHKWbGLP4YfbsMed2KFUw5fczvDPbT98DDe3LEzviswl810apTEw==}
 
   cookie-signature@1.0.6:
-    resolution: {integrity: sha512-QADzlaHc8icV8I7vbaJXJwod9HWYp8uCqf1xa4OfNu1T7JVxQIrUgOWtHdNDtPiywmFbiS12VjotIXLrKM3orQ==}
+    resolution: {integrity: sha1-4wOogrNCzD7oylE6eZmXNNqzriw=}
 
   cookie@0.4.2:
     resolution: {integrity: sha512-aSWTXFzaKWkvHO1Ny/s+ePFpvKsPnjc551iI41v3ny/ow6tBG5Vd+FuqGNhh1LxOmVzOlGUriIlOaokOvhaStA==}
@@ -22256,7 +22270,7 @@ packages:
     hasBin: true
 
   ee-first@1.1.1:
-    resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
+    resolution: {integrity: sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=}
 
   ejs@3.1.10:
     resolution: {integrity: sha512-UeJmFfOrAQS8OJWPZ4qtgHyWExa088/MtK5UEyoJGFH67cDEXkZSviOiKRCZ4Xij0zxI3JECgYs3oKx+AizQBA==}
@@ -24889,6 +24903,9 @@ packages:
   immediate@3.0.6:
     resolution: {integrity: sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==}
 
+  immer@10.1.1:
+    resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
+
   immer@9.0.21:
     resolution: {integrity: sha512-bc4NBHqOqSfRW7POMkHd51LvClaeMXpm8dx0e8oE2GORbq5aRK7Bxl4FyzVLdGtLmvLKL7BTDBG5ACQm4HWjTA==}
 
@@ -24946,7 +24963,7 @@ packages:
     engines: {node: '>=12'}
 
   indexof@0.0.1:
-    resolution: {integrity: sha512-i0G7hLJ1z0DE8dsqJa2rycj9dBmNKgXBvotXtZYXakU9oivfB9Uj2ZBC27qqef2U58/ZLwalxa1X/RDCdkHtVg==}
+    resolution: {integrity: sha1-gtwzbSMrkGIXnQWrMpOmYFn9Q10=}
 
   individual@3.0.0:
     resolution: {integrity: sha512-rUY5vtT748NMRbEMrTNiFfy29BgGZwGXUi2NFUVMWQrogSLzlJvQV9eeMWi+g1aVaQ53tpyLAQtd5x/JH0Nh1g==}
@@ -27133,7 +27150,7 @@ packages:
     resolution: {integrity: sha512-0aF7ZmVon1igznGI4VS30yugpduQW3y3GkcgGJOp7d8x8QrizhigUxjI/m2UojsXXto+jLAH3KSz+xOJTiORjg==}
 
   map-stream@0.0.7:
-    resolution: {integrity: sha512-C0X0KQmGm3N2ftbTGBhSyuydQ+vV1LC3f3zPvT3RXHXNZrvfPZcoXp/N5DOa8vedX/rTMm2CjTtivFg2STJMRQ==}
+    resolution: {integrity: sha1-ih8HiW2CsQkmvTdEokIACfiJdKg=}
 
   map-visit@1.0.0:
     resolution: {integrity: sha512-4y7uGv8bd2WdM9vpQsiQNo41Ln1NvhvDRuVt0k2JZQ+ezN2uaQes7lZeZ+QQUHOLQAtDaBJ+7wCbi+ab/KFs+w==}
@@ -27353,7 +27370,7 @@ packages:
     resolution: {integrity: sha512-88ZRGcNxAq4EH38cQ4D85PM57pikCwS8Z99EWHODxN7KBY+UuPiqzRTtZzS8KTXO/ywSWbdjjJST2Hly/EQxLw==}
 
   media-typer@0.3.0:
-    resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
+    resolution: {integrity: sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=}
     engines: {node: '>= 0.6'}
 
   mediaquery-text@1.2.0:
@@ -28078,6 +28095,11 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
+  nanoid@3.3.8:
+    resolution: {integrity: sha512-WNLf5Sd8oZxOm+TzppcYk8gVOgP+l58xNy58D0nbUnOxOWRWvlcCV4kUF7ltmI6PsrLl/BgKEyS4mqsGChFN0w==}
+    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
   nanomatch@1.2.13:
     resolution: {integrity: sha512-fpoe2T0RbHwBTBUOftAfBPaDEi06ufaUai0mE6Yn1kacc3SnTErfb/h+X94VXzI64rKFHYImXSvdwGGCmwOqCA==}
     engines: {node: '>=0.10.0'}
@@ -28533,6 +28555,10 @@ packages:
 
   numbered@1.1.0:
     resolution: {integrity: sha512-pv/ue2Odr7IfYOO0byC1KgBI10wo5YDauLhxY6/saNzAdAs0r1SotGCPzzCLNPL0xtrAwWRialLu23AAu9xO1g==}
+
+  numeric-quantity@2.0.1:
+    resolution: {integrity: sha512-+Bt2X6YxM5bg8XIBl76NVeG2eL0Y5VQRoyz6GLYrZXW/TDh7We+tGeX4/WZWhaVGOg5ZjNBEOZt9a86slMhOJA==}
+    engines: {node: '>=16'}
 
   nwsapi@2.2.12:
     resolution: {integrity: sha512-qXDmcVlZV4XRtKFzddidpfVP4oMSGhga+xdMc25mv8kaLUHtgzCDhUxkrN8exkGdTlLNaXj7CV3GtON7zuGZ+w==}
@@ -29146,7 +29172,7 @@ packages:
     resolution: {integrity: sha512-e3FBlXLmN/D1S+zHzanP4E/4Z60oFAa3O051qt1pxa7DEJWKAyil6upYVXCWadEnuoqa4Pkc9oUx9zsxYeRv8A==}
 
   pause@0.0.1:
-    resolution: {integrity: sha512-KG8UEiEVkR3wGEb4m5yZkVCzigAD+cVEJck2CzYZO37ZGJfctvVptVO192MwrtPhzONn6go8ylnOdMhKqi4nfg==}
+    resolution: {integrity: sha1-HUCLP9t2kjuVQ9lvtMnf1TXZy10=}
 
   peberminta@0.9.0:
     resolution: {integrity: sha512-XIxfHpEuSJbITd1H3EeQwpcZbTLHc+VVr8ANI9t5sit565tsI4/xK3KWTUFE2e6QiangUkh3B0jihzmGnNrRsQ==}
@@ -30248,7 +30274,7 @@ packages:
     engines: {node: '>=10'}
 
   prefix-style@2.0.1:
-    resolution: {integrity: sha512-gdr1MBNVT0drzTq95CbSNdsrBDoHGlb2aDJP/FoY+1e+jSDPOb1Cv554gH2MGiSr2WTcXi/zu+NaFzfcHQkfBQ==}
+    resolution: {integrity: sha1-ZrupqHDP2jCKXcIOhekSCTLJWgY=}
 
   prelude-ls@1.1.2:
     resolution: {integrity: sha512-ESF23V4SKG6lVSGZgYNpbsiaAkdab6ZgOxe52p7+Kid3W3u3bxR4Vfd/o21dmN7jSt0IwgZ4v5MUd26FEtXE9w==}
@@ -31231,6 +31257,23 @@ packages:
   react-proptype-conditional-require@1.0.4:
     resolution: {integrity: sha512-nopsRn7KnGgazBe2c3H2+Kf+Csp6PGDRLiBkYEDMKY8o/EIgft/WnIm/OnAKTawZiLnJXHAqhpFBddvs6NiXlw==}
 
+  react-querybuilder@8.1.0:
+    resolution: {integrity: sha512-CNNLJSatSNCATBZA7MNipXq559n4IHVqWMfI4//XsqhnZarhZ2uCcuPLgO/dcu0WOEWegnqZywAIKVMz30zo3g==}
+    peerDependencies:
+      react: '>=18'
+
+  react-redux@9.2.0:
+    resolution: {integrity: sha512-ROY9fvHhwOD9ySfrF0wmvu//bKCQ6AeZZq1nJNtbDC+kk5DuSuNX/n6YWYF/SYy7bSba4D4FSz8DJeKY/S/r+g==}
+    peerDependencies:
+      '@types/react': ^18.2.25 || ^19
+      react: ^18.0 || ^19
+      redux: ^5.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      redux:
+        optional: true
+
   react-refresh@0.11.0:
     resolution: {integrity: sha512-F27qZr8uUqwhWZboondsPx8tnC3Ct3SxZA3V5WyEvujRyyNv0VYPhoBg1gZ8/MV5tubQp76Trw8lTv9hzRBa+A==}
     engines: {node: '>=0.10.0'}
@@ -31563,6 +31606,14 @@ packages:
     resolution: {integrity: sha512-EJ4UNY/U1t2P/2k6oqotuX2Cc3T6nxJwsM0N0asT7dhrtH1ltUxDn4NalSYmPE2rCkVpcf/X6R0wDwcFpzhd4w==}
     engines: {node: '>=6'}
 
+  redux-thunk@3.1.0:
+    resolution: {integrity: sha512-NW2r5T6ksUKXCabzhL9z+h206HQw/NJkcLm1GPImRQ8IzfXwRGqjVhKJGauHirT0DAuyy6hjdnMZaRoAcy0Klw==}
+    peerDependencies:
+      redux: ^5.0.0
+
+  redux@5.0.1:
+    resolution: {integrity: sha512-M9/ELqF6fy8FwmkpnF0S3YKOqMyoWJ4+CS5Efg2ct3oY9daQvd/Pc71FpGZsVsbl3Cpb+IIcjBDUnnyBdQbq4w==}
+
   refa@0.12.1:
     resolution: {integrity: sha512-J8rn6v4DBb2nnFqkqwy6/NnTYMcgLA+sLr0iIO41qpv0n+ngb7ksag2tMRl0inb1bbO/esUwzW1vbJi7K0sI0g==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
@@ -31777,6 +31828,9 @@ packages:
 
   requizzle@0.2.4:
     resolution: {integrity: sha512-JRrFk1D4OQ4SqovXOgdav+K8EAhSB/LJZqCz8tbX0KObcdeM15Ss59ozWMBWmmINMagCwmqn4ZNryUGpBsl6Jw==}
+
+  reselect@5.1.1:
+    resolution: {integrity: sha512-K/BG6eIky/SBpzfHZv/dd+9JBFiS4SWV7FIujVyJRux6e45+73RaUHXLmIR1f7WOMaQ0U1km6qwklRQxpJJY0w==}
 
   resend@2.1.0:
     resolution: {integrity: sha512-s6LlaEReTUvlbo6w3Eg1M1TMuwK9OKJ1GVgyptIV8smLPHhFZVqnwBTFPZHID9rcsih72t3iuyrtkQ3IIGwnow==}
@@ -32048,7 +32102,7 @@ packages:
     hasBin: true
 
   run-p@0.0.0:
-    resolution: {integrity: sha512-ZLiUUVOXJcM/S1hMnm6Ooc1zAgAx98Mmn1qyA+y3WNeK7hOTGAusVR5r3uOQJ0NuUxZt7J9vNusYNNVgKPSbww==}
+    resolution: {integrity: sha1-cWpVvRICd6nZDaX4IzO3C5GAiPI=}
 
   run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
@@ -32199,7 +32253,7 @@ packages:
     engines: {node: '>=4'}
 
   secure-compare@3.0.1:
-    resolution: {integrity: sha512-AckIIV90rPDcBcglUwXPF3kg0P0qmPsPXAj6BBEENQE1p5yA1xfmDJzfi1Tappj37Pv2mVbKpL3Z1T+Nn7k1Qw==}
+    resolution: {integrity: sha1-8aAymzCLIh+uN7mXTz1XjQypmeM=}
 
   secure-json-parse@2.7.0:
     resolution: {integrity: sha512-6aU+Rwsezw7VR8/nyvKTx8QpWH9FrcYiXXlqC4z5d5XQBDRqtbfsRjnwGyqbi3gddNtWHuEk9OANUotL26qKUw==}
@@ -33667,7 +33721,7 @@ packages:
     resolution: {integrity: sha512-3f0uOEAQwIqGuWW2MVzYg8fV/QNnc/IpuJNG837rLuczAaLVHslWHZQj4IGiEl5Hs3kkbhwL9Ab7Hrsmuj+Smw==}
 
   to-camel-case@1.0.0:
-    resolution: {integrity: sha512-nD8pQi5H34kyu1QDMFjzEIYqk0xa9Alt6ZfrdEMuHCFOfTLhDG5pgTu/aAM9Wt9lXILwlXmWP43b8sav0GNE8Q==}
+    resolution: {integrity: sha1-GlYFSy+daWKYzmamCJcyK29CPkY=}
 
   to-fast-properties@2.0.0:
     resolution: {integrity: sha512-/OaKK0xYrs3DmxRYqL/yDc+FxFUVYhDlXMhRmv3z915w2HF1tnN1omB354j8VUGO/hbRzyD6Y3sA7v7GS/ceog==}
@@ -34676,6 +34730,11 @@ packages:
     resolution: {integrity: sha512-PElTlVMwpblvbNqQ82d2n6RjStvdSoNe9FG28kNfz3WiXilJm4DdNkEzRhCZuIDwY8U08WVihhGR5iRqAwfDiw==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
+
+  use-sync-external-store@1.4.0:
+    resolution: {integrity: sha512-9WXSPC5fMv61vaupRkCKCxsPxBocVnwakBEkMIHHpkTTg6icbJtg6jzgtLDm4bl3cSHAca52rYWih0k4K3PfHw==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   use@3.1.1:
     resolution: {integrity: sha512-cwESVXlO3url9YWlFW/TA9cshCEhtu7IKJ/p5soJ/gGpj7vbvFrAY/eIioQ6Dw23KjZhYgiIo8HOs1nQ2vr/oQ==}
@@ -36311,8 +36370,8 @@ snapshots:
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sso-oidc': 3.575.0(@aws-sdk/client-sts@3.575.0)
-      '@aws-sdk/client-sts': 3.575.0
+      '@aws-sdk/client-sso-oidc': 3.575.0
+      '@aws-sdk/client-sts': 3.575.0(@aws-sdk/client-sso-oidc@3.575.0)
       '@aws-sdk/core': 3.575.0
       '@aws-sdk/credential-provider-node': 3.575.0(@aws-sdk/client-sso-oidc@3.575.0)(@aws-sdk/client-sts@3.575.0)
       '@aws-sdk/middleware-host-header': 3.575.0
@@ -36513,8 +36572,8 @@ snapshots:
       '@aws-crypto/sha1-browser': 3.0.0
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sso-oidc': 3.575.0(@aws-sdk/client-sts@3.575.0)
-      '@aws-sdk/client-sts': 3.575.0
+      '@aws-sdk/client-sso-oidc': 3.575.0
+      '@aws-sdk/client-sts': 3.575.0(@aws-sdk/client-sso-oidc@3.575.0)
       '@aws-sdk/core': 3.575.0
       '@aws-sdk/credential-provider-node': 3.575.0(@aws-sdk/client-sso-oidc@3.575.0)(@aws-sdk/client-sts@3.575.0)
       '@aws-sdk/middleware-bucket-endpoint': 3.575.0
@@ -36788,11 +36847,11 @@ snapshots:
       - aws-crt
     optional: true
 
-  '@aws-sdk/client-sso-oidc@3.575.0(@aws-sdk/client-sts@3.575.0)':
+  '@aws-sdk/client-sso-oidc@3.575.0':
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sts': 3.575.0
+      '@aws-sdk/client-sts': 3.575.0(@aws-sdk/client-sso-oidc@3.575.0)
       '@aws-sdk/core': 3.575.0
       '@aws-sdk/credential-provider-node': 3.575.0(@aws-sdk/client-sso-oidc@3.575.0)(@aws-sdk/client-sts@3.575.0)
       '@aws-sdk/middleware-host-header': 3.575.0
@@ -36831,7 +36890,6 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.7.0
     transitivePeerDependencies:
-      - '@aws-sdk/client-sts'
       - aws-crt
 
   '@aws-sdk/client-sso-oidc@3.637.0(@aws-sdk/client-sts@3.637.0)':
@@ -37350,11 +37408,11 @@ snapshots:
       - aws-crt
     optional: true
 
-  '@aws-sdk/client-sts@3.575.0':
+  '@aws-sdk/client-sts@3.575.0(@aws-sdk/client-sso-oidc@3.575.0)':
     dependencies:
       '@aws-crypto/sha256-browser': 3.0.0
       '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sso-oidc': 3.575.0(@aws-sdk/client-sts@3.575.0)
+      '@aws-sdk/client-sso-oidc': 3.575.0
       '@aws-sdk/core': 3.575.0
       '@aws-sdk/credential-provider-node': 3.575.0(@aws-sdk/client-sso-oidc@3.575.0)(@aws-sdk/client-sts@3.575.0)
       '@aws-sdk/middleware-host-header': 3.575.0
@@ -37393,6 +37451,7 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.7.0
     transitivePeerDependencies:
+      - '@aws-sdk/client-sso-oidc'
       - aws-crt
 
   '@aws-sdk/client-sts@3.637.0':
@@ -37702,7 +37761,7 @@ snapshots:
 
   '@aws-sdk/credential-provider-ini@3.575.0(@aws-sdk/client-sso-oidc@3.575.0)(@aws-sdk/client-sts@3.575.0)':
     dependencies:
-      '@aws-sdk/client-sts': 3.575.0
+      '@aws-sdk/client-sts': 3.575.0(@aws-sdk/client-sso-oidc@3.575.0)
       '@aws-sdk/credential-provider-env': 3.575.0
       '@aws-sdk/credential-provider-process': 3.575.0
       '@aws-sdk/credential-provider-sso': 3.575.0(@aws-sdk/client-sso-oidc@3.575.0)
@@ -38235,7 +38294,7 @@ snapshots:
 
   '@aws-sdk/credential-provider-web-identity@3.575.0(@aws-sdk/client-sts@3.575.0)':
     dependencies:
-      '@aws-sdk/client-sts': 3.575.0
+      '@aws-sdk/client-sts': 3.575.0(@aws-sdk/client-sso-oidc@3.575.0)
       '@aws-sdk/types': 3.575.0
       '@smithy/property-provider': 3.1.3
       '@smithy/types': 3.3.0
@@ -38837,7 +38896,7 @@ snapshots:
 
   '@aws-sdk/token-providers@3.575.0(@aws-sdk/client-sso-oidc@3.575.0)':
     dependencies:
-      '@aws-sdk/client-sso-oidc': 3.575.0(@aws-sdk/client-sts@3.575.0)
+      '@aws-sdk/client-sso-oidc': 3.575.0
       '@aws-sdk/types': 3.575.0
       '@smithy/property-provider': 3.1.3
       '@smithy/shared-ini-file-loader': 3.1.4
@@ -38846,7 +38905,7 @@ snapshots:
 
   '@aws-sdk/token-providers@3.614.0(@aws-sdk/client-sso-oidc@3.575.0)':
     dependencies:
-      '@aws-sdk/client-sso-oidc': 3.575.0(@aws-sdk/client-sts@3.575.0)
+      '@aws-sdk/client-sso-oidc': 3.575.0
       '@aws-sdk/types': 3.609.0
       '@smithy/property-provider': 3.1.3
       '@smithy/shared-ini-file-loader': 3.1.4
@@ -47746,7 +47805,7 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  '@nestjs/graphql@12.0.9(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(class-transformer@0.5.1)(class-validator@0.14.1)(graphql@16.9.0)(reflect-metadata@0.2.2)':
+  '@nestjs/graphql@12.0.9(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(class-transformer@0.5.1)(class-validator@0.14.1)(graphql@16.9.0)(reflect-metadata@0.2.2)':
     dependencies:
       '@graphql-tools/merge': 9.0.0(graphql@16.9.0)
       '@graphql-tools/schema': 10.0.0(graphql@16.9.0)
@@ -47826,7 +47885,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@nestjs/schedule@4.1.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)':
+  '@nestjs/schedule@4.1.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))':
     dependencies:
       '@nestjs/common': 10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/core': 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -47855,7 +47914,7 @@ snapshots:
     transitivePeerDependencies:
       - chokidar
 
-  '@nestjs/serve-static@4.0.2(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(express@4.21.0)':
+  '@nestjs/serve-static@4.0.2(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(express@4.21.0)':
     dependencies:
       '@nestjs/common': 10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/core': 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -47863,7 +47922,7 @@ snapshots:
     optionalDependencies:
       express: 4.21.0
 
-  '@nestjs/swagger@7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)':
+  '@nestjs/swagger@7.4.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)':
     dependencies:
       '@microsoft/tsdoc': 0.15.0
       '@nestjs/common': 10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -47878,7 +47937,7 @@ snapshots:
       class-transformer: 0.5.1
       class-validator: 0.14.1
 
-  '@nestjs/terminus@10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.575.0))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)':
+  '@nestjs/terminus@10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.575.0))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)':
     dependencies:
       '@nestjs/common': 10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/core': 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -47892,7 +47951,7 @@ snapshots:
       '@nestjs/axios': 3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1)
       mongoose: 8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.575.0))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1)
 
-  '@nestjs/terminus@10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.726.0(@aws-sdk/client-sts@3.726.0)))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)':
+  '@nestjs/terminus@10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.726.0(@aws-sdk/client-sts@3.726.0)))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)':
     dependencies:
       '@nestjs/common': 10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/core': 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -47906,7 +47965,7 @@ snapshots:
       '@nestjs/axios': 3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1)
       mongoose: 8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.726.0(@aws-sdk/client-sts@3.726.0)))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1)
 
-  '@nestjs/terminus@10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.7.7)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.726.0(@aws-sdk/client-sts@3.726.0)))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)':
+  '@nestjs/terminus@10.2.3(@grpc/grpc-js@1.12.4)(@grpc/proto-loader@0.7.13)(@nestjs/axios@3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.7.7)(rxjs@7.8.1))(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(mongoose@8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.726.0(@aws-sdk/client-sts@3.726.0)))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1))(reflect-metadata@0.2.2)(rxjs@7.8.1)':
     dependencies:
       '@nestjs/common': 10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/core': 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -47920,7 +47979,7 @@ snapshots:
       '@nestjs/axios': 3.0.3(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.7.7)(rxjs@7.8.1)
       mongoose: 8.6.0(@aws-sdk/credential-providers@3.637.0(@aws-sdk/client-sso-oidc@3.726.0(@aws-sdk/client-sts@3.726.0)))(gcp-metadata@5.3.0(encoding@0.1.13))(socks@2.7.1)
 
-  '@nestjs/testing@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(@nestjs/platform-express@10.4.1)':
+  '@nestjs/testing@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1))':
     dependencies:
       '@nestjs/common': 10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/core': 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -47928,7 +47987,7 @@ snapshots:
     optionalDependencies:
       '@nestjs/platform-express': 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)
 
-  '@nestjs/throttler@6.2.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(reflect-metadata@0.2.2)':
+  '@nestjs/throttler@6.2.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(reflect-metadata@0.2.2)':
     dependencies:
       '@nestjs/common': 10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/core': 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -48110,7 +48169,7 @@ snapshots:
 
   '@nothing-but/utils@0.12.1': {}
 
-  '@novu/api@0.0.1-alpha.150(zod@3.23.8)':
+  '@novu/api@0.1.0(zod@3.23.8)':
     dependencies:
       zod: 3.23.8
 
@@ -50533,7 +50592,7 @@ snapshots:
       webpack-dev-server: 4.11.1(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12)))
       webpack-hot-middleware: 2.26.1
 
-  '@pmmmwh/react-refresh-webpack-plugin@0.5.10(@types/webpack@5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-hot-middleware@2.26.1)(webpack@5.78.0)':
+  '@pmmmwh/react-refresh-webpack-plugin@0.5.10(@types/webpack@5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0)))(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-hot-middleware@2.26.1)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))':
     dependencies:
       ansi-html-community: 0.0.8
       common-path-prefix: 3.0.0
@@ -50547,7 +50606,7 @@ snapshots:
       source-map: 0.7.4
       webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
     optionalDependencies:
-      '@types/webpack': 5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
+      '@types/webpack': 5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))
       type-fest: 2.19.0
       webpack-hot-middleware: 2.26.1
 
@@ -52312,6 +52371,16 @@ snapshots:
     dependencies:
       react: 18.3.1
 
+  '@reduxjs/toolkit@2.5.0(react-redux@9.2.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)':
+    dependencies:
+      immer: 10.1.1
+      redux: 5.0.1
+      redux-thunk: 3.1.0(redux@5.0.1)
+      reselect: 5.1.1
+    optionalDependencies:
+      react: 18.3.1
+      react-redux: 9.2.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1)
+
   '@remirror/core-constants@2.0.2': {}
 
   '@remirror/core-constants@3.0.0': {}
@@ -53012,7 +53081,7 @@ snapshots:
       '@sentry/types': 7.114.0
       '@sentry/utils': 7.114.0
 
-  '@sentry/nestjs@8.33.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)':
+  '@sentry/nestjs@8.33.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))':
     dependencies:
       '@nestjs/common': 10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/core': 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -56141,7 +56210,7 @@ snapshots:
       - uglify-js
       - webpack-cli
 
-  '@storybook/builder-webpack5@7.4.2(@swc/helpers@0.5.12)(@types/react-dom@18.3.0)(@types/react@18.3.3)(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)(webpack-cli@5.1.4)':
+  '@storybook/builder-webpack5@7.4.2(@swc/helpers@0.5.12)(@types/react-dom@18.3.0)(@types/react@18.3.3)(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))':
     dependencies:
       '@babel/core': 7.23.2
       '@storybook/addons': 7.4.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -56163,30 +56232,30 @@ snapshots:
       '@swc/core': 1.3.107(@swc/helpers@0.5.12)
       '@types/node': 16.11.7
       '@types/semver': 7.3.13
-      babel-loader: 9.1.2(@babel/core@7.23.2)(webpack@5.78.0)
+      babel-loader: 9.1.2(@babel/core@7.23.2)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       babel-plugin-named-exports-order: 0.0.2
       browser-assert: 1.2.1
       case-sensitive-paths-webpack-plugin: 2.4.0
       constants-browserify: 1.0.0
-      css-loader: 6.7.3(webpack@5.78.0)
+      css-loader: 6.7.3(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       express: 4.21.0
-      fork-ts-checker-webpack-plugin: 8.0.0(typescript@5.6.2)(webpack@5.78.0)
+      fork-ts-checker-webpack-plugin: 8.0.0(typescript@5.6.2)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       fs-extra: 11.2.0
-      html-webpack-plugin: 5.5.3(webpack@5.78.0)
+      html-webpack-plugin: 5.5.3(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       path-browserify: 1.0.1
       process: 0.11.10
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       semver: 7.6.3
-      style-loader: 3.3.2(webpack@5.78.0)
-      swc-loader: 0.2.3(@swc/core@1.3.107(@swc/helpers@0.5.12))(webpack@5.78.0)
-      terser-webpack-plugin: 5.3.10(@swc/core@1.3.107(@swc/helpers@0.5.12))(webpack@5.78.0)
+      style-loader: 3.3.2(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
+      swc-loader: 0.2.3(@swc/core@1.3.107(@swc/helpers@0.5.12))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
+      terser-webpack-plugin: 5.3.10(@swc/core@1.3.107(@swc/helpers@0.5.12))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       ts-dedent: 2.2.0
       url: 0.11.4
       util: 0.12.5
       util-deprecate: 1.0.2
-      webpack: 5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
-      webpack-dev-middleware: 6.1.1(webpack@5.78.0)
+      webpack: 5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))
+      webpack-dev-middleware: 6.1.1(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       webpack-hot-middleware: 2.25.3
       webpack-virtual-modules: 0.5.0
     optionalDependencies:
@@ -56837,7 +56906,7 @@ snapshots:
 
   '@storybook/postinstall@7.4.2': {}
 
-  '@storybook/preset-create-react-app@7.4.2(@babel/core@7.22.11)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(react-refresh@0.11.0)(react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(esbuild@0.18.20)(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1))(type-fest@2.19.0)(typescript@5.6.2)(webpack-dev-server@4.11.1(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20)))(webpack-hot-middleware@2.26.1)(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))':
+  '@storybook/preset-create-react-app@7.4.2(ucmnrhmq4kewpo24xrp57f5r6y)':
     dependencies:
       '@babel/core': 7.22.11
       '@pmmmwh/react-refresh-webpack-plugin': 0.5.10(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-dev-server@4.11.1(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20)))(webpack-hot-middleware@2.26.1)(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))
@@ -56846,7 +56915,7 @@ snapshots:
       '@types/babel__core': 7.20.0
       babel-plugin-react-docgen: 4.2.1
       pnp-webpack-plugin: 1.7.0(typescript@5.6.2)
-      react-scripts: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(esbuild@0.18.20)(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1)
+      react-scripts: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(esbuild@0.18.20)(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1)
       semver: 7.5.4
     transitivePeerDependencies:
       - '@types/webpack'
@@ -56934,16 +57003,16 @@ snapshots:
       - webpack-hot-middleware
       - webpack-plugin-serve
 
-  '@storybook/preset-react-webpack@7.4.2(@babel/core@7.25.2)(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/webpack@5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(type-fest@2.19.0)(typescript@5.6.2)(webpack-cli@5.1.4)(webpack-hot-middleware@2.26.1)':
+  '@storybook/preset-react-webpack@7.4.2(@babel/core@7.25.2)(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/webpack@5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0)))(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(type-fest@2.19.0)(typescript@5.6.2)(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))(webpack-hot-middleware@2.26.1)':
     dependencies:
       '@babel/preset-flow': 7.22.15(@babel/core@7.25.2)
       '@babel/preset-react': 7.22.15(@babel/core@7.25.2)
-      '@pmmmwh/react-refresh-webpack-plugin': 0.5.10(@types/webpack@5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-hot-middleware@2.26.1)(webpack@5.78.0)
+      '@pmmmwh/react-refresh-webpack-plugin': 0.5.10(@types/webpack@5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0)))(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-hot-middleware@2.26.1)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       '@storybook/core-webpack': 7.4.2(encoding@0.1.13)
       '@storybook/docs-tools': 7.4.2(encoding@0.1.13)
       '@storybook/node-logger': 7.4.2
       '@storybook/react': 7.4.2(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
-      '@storybook/react-docgen-typescript-plugin': 1.0.6--canary.9.0c3f3b7.0(typescript@5.6.2)(webpack@5.78.0)
+      '@storybook/react-docgen-typescript-plugin': 1.0.6--canary.9.0c3f3b7.0(typescript@5.6.2)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       '@types/node': 16.11.7
       '@types/semver': 7.5.8
       babel-plugin-add-react-displayname: 0.0.5
@@ -57057,6 +57126,20 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@storybook/react-docgen-typescript-plugin@1.0.6--canary.9.0c3f3b7.0(typescript@5.6.2)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))':
+    dependencies:
+      debug: 4.3.6(supports-color@8.1.1)
+      endent: 2.1.0
+      find-cache-dir: 3.3.2
+      flat-cache: 3.1.0
+      micromatch: 4.0.8
+      react-docgen-typescript: 2.2.2(typescript@5.6.2)
+      tslib: 2.7.0
+      typescript: 5.6.2
+      webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
+    transitivePeerDependencies:
+      - supports-color
+
   '@storybook/react-docgen-typescript-plugin@1.0.6--canary.9.0c3f3b7.0(typescript@5.6.2)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12)))':
     dependencies:
       debug: 4.3.6(supports-color@8.1.1)
@@ -57068,20 +57151,6 @@ snapshots:
       tslib: 2.7.0
       typescript: 5.6.2
       webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))
-    transitivePeerDependencies:
-      - supports-color
-
-  '@storybook/react-docgen-typescript-plugin@1.0.6--canary.9.0c3f3b7.0(typescript@5.6.2)(webpack@5.78.0)':
-    dependencies:
-      debug: 4.3.6(supports-color@8.1.1)
-      endent: 2.1.0
-      find-cache-dir: 3.3.2
-      flat-cache: 3.1.0
-      micromatch: 4.0.8
-      react-docgen-typescript: 2.2.2(typescript@5.6.2)
-      tslib: 2.7.0
-      typescript: 5.6.2
-      webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
     transitivePeerDependencies:
       - supports-color
 
@@ -57177,10 +57246,10 @@ snapshots:
       - webpack-hot-middleware
       - webpack-plugin-serve
 
-  '@storybook/react-webpack5@7.4.2(@babel/core@7.25.2)(@swc/core@1.7.26(@swc/helpers@0.5.12))(@swc/helpers@0.5.12)(@types/react-dom@18.3.0)(@types/react@18.3.3)(@types/webpack@5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(type-fest@2.19.0)(typescript@5.6.2)(webpack-cli@5.1.4)(webpack-hot-middleware@2.26.1)':
+  '@storybook/react-webpack5@7.4.2(@babel/core@7.25.2)(@swc/core@1.7.26(@swc/helpers@0.5.12))(@swc/helpers@0.5.12)(@types/react-dom@18.3.0)(@types/react@18.3.3)(@types/webpack@5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0)))(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(type-fest@2.19.0)(typescript@5.6.2)(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))(webpack-hot-middleware@2.26.1)':
     dependencies:
-      '@storybook/builder-webpack5': 7.4.2(@swc/helpers@0.5.12)(@types/react-dom@18.3.0)(@types/react@18.3.3)(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)(webpack-cli@5.1.4)
-      '@storybook/preset-react-webpack': 7.4.2(@babel/core@7.25.2)(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/webpack@5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(type-fest@2.19.0)(typescript@5.6.2)(webpack-cli@5.1.4)(webpack-hot-middleware@2.26.1)
+      '@storybook/builder-webpack5': 7.4.2(@swc/helpers@0.5.12)(@types/react-dom@18.3.0)(@types/react@18.3.3)(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))
+      '@storybook/preset-react-webpack': 7.4.2(@babel/core@7.25.2)(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/webpack@5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0)))(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(type-fest@2.19.0)(typescript@5.6.2)(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))(webpack-hot-middleware@2.26.1)
       '@storybook/react': 7.4.2(encoding@0.1.13)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.2)
       '@types/node': 16.11.7
       react: 18.3.1
@@ -59250,7 +59319,7 @@ snapshots:
       - webpack-cli
     optional: true
 
-  '@types/webpack@5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)':
+  '@types/webpack@5.28.5(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))':
     dependencies:
       '@types/node': 20.16.5
       tapable: 2.2.1
@@ -60889,20 +60958,35 @@ snapshots:
 
   '@webcontainer/api@1.2.0': {}
 
-  '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4)(webpack@5.78.0)':
+  '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.1)(webpack@5.78.0))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4))':
     dependencies:
       webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.1)(webpack@5.78.0)
 
-  '@webpack-cli/info@2.0.2(webpack-cli@5.1.4)(webpack@5.78.0)':
+  '@webpack-cli/configtest@2.1.1(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))':
+    dependencies:
+      webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
+      webpack-cli: 5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0)
+
+  '@webpack-cli/info@2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.1)(webpack@5.78.0))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4))':
     dependencies:
       webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.1)(webpack@5.78.0)
 
-  '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4)(webpack@5.78.0)':
+  '@webpack-cli/info@2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))':
+    dependencies:
+      webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
+      webpack-cli: 5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0)
+
+  '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.1)(webpack@5.78.0))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4))':
     dependencies:
       webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4)
       webpack-cli: 5.1.4(webpack-bundle-analyzer@4.10.1)(webpack@5.78.0)
+
+  '@webpack-cli/serve@2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))':
+    dependencies:
+      webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
+      webpack-cli: 5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0)
 
   '@wry/context@0.4.4':
     dependencies:
@@ -60921,13 +61005,13 @@ snapshots:
 
   '@xtuc/long@4.2.2': {}
 
-  '@xyflow/react@12.3.2(@types/react@18.3.3)(immer@9.0.21)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@xyflow/react@12.3.2(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@xyflow/system': 0.0.43
       classcat: 5.0.4
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      zustand: 4.5.5(@types/react@18.3.3)(immer@9.0.21)(react@18.3.1)
+      zustand: 4.5.5(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
     transitivePeerDependencies:
       - '@types/react'
       - immer
@@ -62072,7 +62156,7 @@ snapshots:
       schema-utils: 2.7.1
       webpack: 5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))
 
-  babel-loader@8.3.0(@babel/core@7.25.2)(webpack@5.78.0):
+  babel-loader@8.3.0(@babel/core@7.25.2)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)):
     dependencies:
       '@babel/core': 7.25.2
       find-cache-dir: 3.3.2
@@ -62095,7 +62179,7 @@ snapshots:
       schema-utils: 4.0.0
       webpack: 5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))
 
-  babel-loader@9.1.2(@babel/core@7.23.2)(webpack@5.78.0):
+  babel-loader@9.1.2(@babel/core@7.23.2)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)):
     dependencies:
       '@babel/core': 7.23.2
       find-cache-dir: 3.3.2
@@ -63674,11 +63758,17 @@ snapshots:
     dependencies:
       mime-db: 1.52.0
 
-  compression-webpack-plugin@10.0.0(webpack@5.78.0):
+  compression-webpack-plugin@10.0.0(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4)):
     dependencies:
       schema-utils: 4.0.0
       serialize-javascript: 6.0.1
       webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4)
+
+  compression-webpack-plugin@10.0.0(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)):
+    dependencies:
+      schema-utils: 4.0.0
+      serialize-javascript: 6.0.1
+      webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
 
   compression@1.7.4:
     dependencies:
@@ -64384,7 +64474,7 @@ snapshots:
       semver: 7.6.3
       webpack: 5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))
 
-  css-loader@6.7.3(webpack@5.78.0):
+  css-loader@6.7.3(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)):
     dependencies:
       icss-utils: 5.1.0(postcss@8.4.47)
       postcss: 8.4.47
@@ -65974,7 +66064,7 @@ snapshots:
       - supports-color
       - typescript
 
-  eslint-config-airbnb-base@15.0.0(eslint-plugin-import@2.29.1)(eslint@8.57.1):
+  eslint-config-airbnb-base@15.0.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8)(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       confusing-browser-globals: 1.0.11
       eslint: 8.57.1
@@ -65983,12 +66073,12 @@ snapshots:
       object.entries: 1.1.8
       semver: 6.3.1
 
-  eslint-config-airbnb-typescript@18.0.0(@typescript-eslint/eslint-plugin@8.18.2(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-plugin-import@2.29.1)(eslint@8.57.1):
+  eslint-config-airbnb-typescript@18.0.0(@typescript-eslint/eslint-plugin@8.18.2(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2))(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-plugin-import@2.29.1(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8)(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       '@typescript-eslint/eslint-plugin': 8.18.2(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2)
       '@typescript-eslint/parser': 8.18.2(eslint@8.57.1)(typescript@5.6.2)
       eslint: 8.57.1
-      eslint-config-airbnb-base: 15.0.0(eslint-plugin-import@2.29.1)(eslint@8.57.1)
+      eslint-config-airbnb-base: 15.0.0(eslint-plugin-import@2.29.1(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8)(eslint@8.57.1))(eslint@8.57.1)
     transitivePeerDependencies:
       - eslint-plugin-import
 
@@ -66011,7 +66101,7 @@ snapshots:
     dependencies:
       eslint: 8.57.1
 
-  eslint-config-react-app@7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(jest@27.5.1(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2)))(typescript@5.6.2):
+  eslint-config-react-app@7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(jest@27.5.1(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2)))(typescript@5.6.2):
     dependencies:
       '@babel/core': 7.21.4
       '@babel/eslint-parser': 7.25.1(@babel/core@7.21.4)(eslint@9.9.1(jiti@1.21.6))
@@ -66022,7 +66112,7 @@ snapshots:
       confusing-browser-globals: 1.0.11
       eslint: 9.9.1(jiti@1.21.6)
       eslint-plugin-flowtype: 8.0.3(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(eslint@9.9.1(jiti@1.21.6))
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))
       eslint-plugin-jest: 25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint@9.9.1(jiti@1.21.6))(jest@27.5.1(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2)))(typescript@5.6.2)
       eslint-plugin-jsx-a11y: 6.9.0(eslint@9.9.1(jiti@1.21.6))
       eslint-plugin-react: 7.35.0(eslint@9.9.1(jiti@1.21.6))
@@ -66038,7 +66128,7 @@ snapshots:
       - jest
       - supports-color
 
-  eslint-config-react-app@7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(jest@27.5.1(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2)))(typescript@5.6.2):
+  eslint-config-react-app@7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(jest@27.5.1(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2)))(typescript@5.6.2):
     dependencies:
       '@babel/core': 7.21.4
       '@babel/eslint-parser': 7.25.1(@babel/core@7.21.4)(eslint@9.9.1(jiti@1.21.6))
@@ -66049,7 +66139,7 @@ snapshots:
       confusing-browser-globals: 1.0.11
       eslint: 9.9.1(jiti@1.21.6)
       eslint-plugin-flowtype: 8.0.3(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(eslint@9.9.1(jiti@1.21.6))
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))
       eslint-plugin-jest: 25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint@9.9.1(jiti@1.21.6))(jest@27.5.1(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2)))(typescript@5.6.2)
       eslint-plugin-jsx-a11y: 6.9.0(eslint@9.9.1(jiti@1.21.6))
       eslint-plugin-react: 7.35.0(eslint@9.9.1(jiti@1.21.6))
@@ -66091,7 +66181,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.8.2(@typescript-eslint/parser@5.62.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6)):
+  eslint-module-utils@2.8.2(@typescript-eslint/parser@5.62.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6)):
     dependencies:
       debug: 3.2.7(supports-color@8.1.1)
     optionalDependencies:
@@ -66102,7 +66192,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.8.2(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.8)(eslint@8.57.1):
+  eslint-module-utils@2.8.2(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@8.57.1):
     dependencies:
       debug: 3.2.7(supports-color@8.1.1)
     optionalDependencies:
@@ -66180,7 +66270,7 @@ snapshots:
     dependencies:
       htmlparser2: 9.1.0
 
-  eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6)):
+  eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6)):
     dependencies:
       array-includes: 3.1.8
       array.prototype.findlastindex: 1.2.5
@@ -66190,7 +66280,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.9.1(jiti@1.21.6)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.2(@typescript-eslint/parser@5.62.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))
+      eslint-module-utils: 2.8.2(@typescript-eslint/parser@5.62.0(eslint@9.9.1(jiti@1.21.6))(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -66217,7 +66307,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.2(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.8)(eslint@8.57.1)
+      eslint-module-utils: 2.8.2(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -66451,7 +66541,7 @@ snapshots:
     dependencies:
       eslint: 8.57.1
 
-  eslint-plugin-sonarjs@2.0.1(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8)(eslint@8.57.1):
+  eslint-plugin-sonarjs@2.0.1(@typescript-eslint/parser@8.18.2(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@8.57.1):
     dependencies:
       '@babel/core': 7.24.3
       '@babel/eslint-parser': 7.24.1(@babel/core@7.24.3)(eslint@8.57.1)
@@ -67296,7 +67386,7 @@ snapshots:
       schema-utils: 3.3.0
       webpack: 5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))
 
-  file-loader@6.2.0(webpack@5.78.0):
+  file-loader@6.2.0(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)):
     dependencies:
       loader-utils: 2.0.4
       schema-utils: 3.3.0
@@ -67622,7 +67712,7 @@ snapshots:
       typescript: 5.6.2
       webpack: 5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))
 
-  fork-ts-checker-webpack-plugin@8.0.0(typescript@5.6.2)(webpack@5.78.0):
+  fork-ts-checker-webpack-plugin@8.0.0(typescript@5.6.2)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)):
     dependencies:
       '@babel/code-frame': 7.24.7
       chalk: 4.1.2
@@ -68870,7 +68960,7 @@ snapshots:
       tapable: 2.2.1
       webpack: 5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))
 
-  html-webpack-plugin@5.5.3(webpack@5.78.0):
+  html-webpack-plugin@5.5.3(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)):
     dependencies:
       '@types/html-minifier-terser': 6.1.0
       html-minifier-terser: 6.1.0
@@ -69178,6 +69268,8 @@ snapshots:
     optional: true
 
   immediate@3.0.6: {}
+
+  immer@10.1.1: {}
 
   immer@9.0.21: {}
 
@@ -74151,6 +74243,8 @@ snapshots:
 
   nanoid@3.3.7: {}
 
+  nanoid@3.3.8: {}
+
   nanomatch@1.2.13:
     dependencies:
       arr-diff: 4.0.0
@@ -74215,13 +74309,13 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  nest-raven@10.1.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(@sentry/node@8.33.1)(class-transformer@0.5.1)(class-validator@0.14.1)(graphql@16.9.0)(reflect-metadata@0.2.2)(rxjs@7.8.1):
+  nest-raven@10.1.0(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@sentry/node@8.33.1)(class-transformer@0.5.1)(class-validator@0.14.1)(graphql@16.9.0)(reflect-metadata@0.2.2)(rxjs@7.8.1):
     dependencies:
       '@nestjs/common': 10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@sentry/node': 8.33.1
       rxjs: 7.8.1
     optionalDependencies:
-      '@nestjs/graphql': 12.0.9(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1)(class-transformer@0.5.1)(class-validator@0.14.1)(graphql@16.9.0)(reflect-metadata@0.2.2)
+      '@nestjs/graphql': 12.0.9(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1))(class-transformer@0.5.1)(class-validator@0.14.1)(graphql@16.9.0)(reflect-metadata@0.2.2)
     transitivePeerDependencies:
       - '@apollo/subgraph'
       - '@nestjs/core'
@@ -74235,7 +74329,7 @@ snapshots:
 
   nested-error-stacks@2.0.1: {}
 
-  nestjs-otel@6.1.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1):
+  nestjs-otel@6.1.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/core@10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1)):
     dependencies:
       '@nestjs/common': 10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@nestjs/core': 10.4.1(@nestjs/common@10.4.1(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.1)(@nestjs/websockets@10.4.1)(encoding@0.1.13)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -74739,6 +74833,8 @@ snapshots:
   number-is-nan@1.0.1: {}
 
   numbered@1.1.0: {}
+
+  numeric-quantity@2.0.1: {}
 
   nwsapi@2.2.12: {}
 
@@ -76886,13 +76982,13 @@ snapshots:
 
   postcss@8.4.39:
     dependencies:
-      nanoid: 3.3.7
+      nanoid: 3.3.8
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
   postcss@8.4.41:
     dependencies:
-      nanoid: 3.3.7
+      nanoid: 3.3.8
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -77904,14 +78000,14 @@ snapshots:
       regenerator-runtime: 0.13.11
       whatwg-fetch: 3.6.2
 
-  react-app-rewired@2.2.1(react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(esbuild@0.18.20)(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1)):
+  react-app-rewired@2.2.1(react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(esbuild@0.18.20)(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1)):
     dependencies:
-      react-scripts: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(esbuild@0.18.20)(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1)
+      react-scripts: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(esbuild@0.18.20)(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1)
       semver: 5.7.2
 
-  react-app-rewired@2.2.1(react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12)))(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1)):
+  react-app-rewired@2.2.1(react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12)))(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1)):
     dependencies:
-      react-scripts: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12)))(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1)
+      react-scripts: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12)))(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1)
       semver: 5.7.2
 
   react-chartjs-2@4.3.1(chart.js@3.9.1)(react@18.3.1):
@@ -78247,6 +78343,26 @@ snapshots:
 
   react-proptype-conditional-require@1.0.4: {}
 
+  react-querybuilder@8.1.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1):
+    dependencies:
+      '@reduxjs/toolkit': 2.5.0(react-redux@9.2.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
+      immer: 10.1.1
+      numeric-quantity: 2.0.1
+      react: 18.3.1
+      react-redux: 9.2.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1)
+    transitivePeerDependencies:
+      - '@types/react'
+      - redux
+
+  react-redux@9.2.0(@types/react@18.3.3)(react@18.3.1)(redux@5.0.1):
+    dependencies:
+      '@types/use-sync-external-store': 0.0.6
+      react: 18.3.1
+      use-sync-external-store: 1.4.0(react@18.3.1)
+    optionalDependencies:
+      '@types/react': 18.3.3
+      redux: 5.0.1
+
   react-refresh@0.11.0: {}
 
   react-refresh@0.14.2: {}
@@ -78346,7 +78462,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(esbuild@0.18.20)(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1):
+  react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(esbuild@0.18.20)(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1):
     dependencies:
       '@babel/core': 7.21.4
       '@pmmmwh/react-refresh-webpack-plugin': 0.5.10(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-dev-server@4.11.1(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20)))(webpack-hot-middleware@2.26.1)(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))
@@ -78364,7 +78480,7 @@ snapshots:
       dotenv: 10.0.0
       dotenv-expand: 5.1.0
       eslint: 9.9.1(jiti@1.21.6)
-      eslint-config-react-app: 7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(jest@27.5.1(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2)))(typescript@5.6.2)
+      eslint-config-react-app: 7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.22.11))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.22.11))(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(jest@27.5.1(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2)))(typescript@5.6.2)
       eslint-webpack-plugin: 3.2.0(eslint@9.9.1(jiti@1.21.6))(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))
       file-loader: 6.2.0(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(esbuild@0.18.20))
       fs-extra: 10.1.0
@@ -78432,7 +78548,7 @@ snapshots:
       - webpack-hot-middleware
       - webpack-plugin-serve
 
-  react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12)))(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1):
+  react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/babel__core@7.20.5)(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12)))(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(react@18.3.1)(sass@1.77.8)(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2))(type-fest@2.19.0)(typescript@5.6.2)(vue-template-compiler@2.7.16)(webpack-hot-middleware@2.26.1):
     dependencies:
       '@babel/core': 7.21.4
       '@pmmmwh/react-refresh-webpack-plugin': 0.5.10(@types/webpack@5.28.5(@swc/core@1.3.107(@swc/helpers@0.5.12)))(react-refresh@0.11.0)(type-fest@2.19.0)(webpack-dev-server@4.11.1(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(webpack-hot-middleware@2.26.1)(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12)))
@@ -78450,7 +78566,7 @@ snapshots:
       dotenv: 10.0.0
       dotenv-expand: 5.1.0
       eslint: 9.9.1(jiti@1.21.6)
-      eslint-config-react-app: 7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(eslint-import-resolver-webpack@0.13.8)(eslint@9.9.1(jiti@1.21.6))(jest@27.5.1(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2)))(typescript@5.6.2)
+      eslint-config-react-app: 7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.94.0(@swc/core@1.3.107(@swc/helpers@0.5.12))))(eslint@9.9.1(jiti@1.21.6))(jest@27.5.1(ts-node@10.9.1(@swc/core@1.3.107(@swc/helpers@0.5.12))(@types/node@18.16.9)(typescript@5.6.2)))(typescript@5.6.2)
       eslint-webpack-plugin: 3.2.0(eslint@9.9.1(jiti@1.21.6))(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12)))
       file-loader: 6.2.0(webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12)))
       fs-extra: 10.1.0
@@ -78795,6 +78911,12 @@ snapshots:
 
   reduce-flatten@2.0.0: {}
 
+  redux-thunk@3.1.0(redux@5.0.1):
+    dependencies:
+      redux: 5.0.1
+
+  redux@5.0.1: {}
+
   refa@0.12.1:
     dependencies:
       '@eslint-community/regexpp': 4.11.0
@@ -79106,6 +79228,8 @@ snapshots:
     dependencies:
       lodash: 4.17.21
     optional: true
+
+  reselect@5.1.1: {}
 
   resend@2.1.0:
     dependencies:
@@ -80677,7 +80801,7 @@ snapshots:
     dependencies:
       webpack: 5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))
 
-  style-loader@3.3.2(webpack@5.78.0):
+  style-loader@3.3.2(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)):
     dependencies:
       webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
 
@@ -80979,7 +81103,7 @@ snapshots:
       '@swc/core': 1.3.107(@swc/helpers@0.5.12)
       webpack: 5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))
 
-  swc-loader@0.2.3(@swc/core@1.3.107(@swc/helpers@0.5.12))(webpack@5.78.0):
+  swc-loader@0.2.3(@swc/core@1.3.107(@swc/helpers@0.5.12))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)):
     dependencies:
       '@swc/core': 1.3.107(@swc/helpers@0.5.12)
       webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
@@ -81324,7 +81448,7 @@ snapshots:
     optionalDependencies:
       '@swc/core': 1.3.107(@swc/helpers@0.5.12)
 
-  terser-webpack-plugin@5.3.10(@swc/core@1.3.107(@swc/helpers@0.5.12))(webpack@5.78.0):
+  terser-webpack-plugin@5.3.10(@swc/core@1.3.107(@swc/helpers@0.5.12))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       jest-worker: 27.5.1
@@ -81346,7 +81470,7 @@ snapshots:
     optionalDependencies:
       '@swc/core': 1.3.107(@swc/helpers@0.5.12)
 
-  terser-webpack-plugin@5.3.10(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack@5.78.0):
+  terser-webpack-plugin@5.3.10(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       jest-worker: 27.5.1
@@ -81358,6 +81482,17 @@ snapshots:
       '@swc/core': 1.7.26(@swc/helpers@0.5.12)
       esbuild: 0.23.1
 
+  terser-webpack-plugin@5.3.10(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)):
+    dependencies:
+      '@jridgewell/trace-mapping': 0.3.25
+      jest-worker: 27.5.1
+      schema-utils: 3.3.0
+      serialize-javascript: 6.0.2
+      terser: 5.31.6
+      webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
+    optionalDependencies:
+      '@swc/core': 1.7.26(@swc/helpers@0.5.12)
+
   terser-webpack-plugin@5.3.10(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
@@ -81366,17 +81501,6 @@ snapshots:
       serialize-javascript: 6.0.2
       terser: 5.31.6
       webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))
-    optionalDependencies:
-      '@swc/core': 1.7.26(@swc/helpers@0.5.12)
-
-  terser-webpack-plugin@5.3.10(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack@5.78.0):
-    dependencies:
-      '@jridgewell/trace-mapping': 0.3.25
-      jest-worker: 27.5.1
-      schema-utils: 3.3.0
-      serialize-javascript: 6.0.2
-      terser: 5.31.6
-      webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
     optionalDependencies:
       '@swc/core': 1.7.26(@swc/helpers@0.5.12)
 
@@ -81414,7 +81538,7 @@ snapshots:
     optionalDependencies:
       '@swc/core': 1.3.107(@swc/helpers@0.5.12)
 
-  terser-webpack-plugin@5.3.9(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack@5.78.0):
+  terser-webpack-plugin@5.3.9(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       jest-worker: 27.5.1
@@ -81951,7 +82075,7 @@ snapshots:
       typescript: 5.6.2
       webpack: 5.94.0(@swc/core@1.7.26(@swc/helpers@0.5.12))
 
-  ts-loader@9.4.4(typescript@5.6.2)(webpack@5.78.0):
+  ts-loader@9.4.4(typescript@5.6.2)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4)):
     dependencies:
       chalk: 4.1.2
       enhanced-resolve: 5.17.1
@@ -81959,6 +82083,15 @@ snapshots:
       semver: 7.6.3
       typescript: 5.6.2
       webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4)
+
+  ts-loader@9.4.4(typescript@5.6.2)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)):
+    dependencies:
+      chalk: 4.1.2
+      enhanced-resolve: 5.17.1
+      micromatch: 4.0.8
+      semver: 7.6.3
+      typescript: 5.6.2
+      webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
 
   ts-loader@9.4.4(typescript@5.6.2)(webpack@5.94.0(@swc/core@1.7.26(@swc/helpers@0.5.12))):
     dependencies:
@@ -82896,14 +83029,14 @@ snapshots:
 
   url-join@5.0.0: {}
 
-  url-loader@4.1.1(file-loader@6.2.0(webpack@5.78.0))(webpack@5.78.0):
+  url-loader@4.1.1(file-loader@6.2.0(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)):
     dependencies:
       loader-utils: 2.0.4
       mime-types: 2.1.35
       schema-utils: 3.3.0
       webpack: 5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)
     optionalDependencies:
-      file-loader: 6.2.0(webpack@5.78.0)
+      file-loader: 6.2.0(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
 
   url-loader@4.1.1(file-loader@6.2.0(webpack@5.94.0(@swc/core@1.7.26(@swc/helpers@0.5.12))))(webpack@5.94.0(@swc/core@1.7.26(@swc/helpers@0.5.12))):
     dependencies:
@@ -82984,6 +83117,10 @@ snapshots:
       react: 18.3.1
 
   use-sync-external-store@1.2.2(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+
+  use-sync-external-store@1.4.0(react@18.3.1):
     dependencies:
       react: 18.3.1
 
@@ -83995,9 +84132,9 @@ snapshots:
   webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.1)(webpack@5.78.0):
     dependencies:
       '@discoveryjs/json-ext': 0.5.7
-      '@webpack-cli/configtest': 2.1.1(webpack-cli@5.1.4)(webpack@5.78.0)
-      '@webpack-cli/info': 2.0.2(webpack-cli@5.1.4)(webpack@5.78.0)
-      '@webpack-cli/serve': 2.0.5(webpack-cli@5.1.4)(webpack@5.78.0)
+      '@webpack-cli/configtest': 2.1.1(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.1)(webpack@5.78.0))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4))
+      '@webpack-cli/info': 2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.1)(webpack@5.78.0))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4))
+      '@webpack-cli/serve': 2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@4.10.1)(webpack@5.78.0))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4))
       colorette: 2.0.20
       commander: 10.0.1
       cross-spawn: 7.0.3
@@ -84014,9 +84151,9 @@ snapshots:
   webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0):
     dependencies:
       '@discoveryjs/json-ext': 0.5.7
-      '@webpack-cli/configtest': 2.1.1(webpack-cli@5.1.4)(webpack@5.78.0)
-      '@webpack-cli/info': 2.0.2(webpack-cli@5.1.4)(webpack@5.78.0)
-      '@webpack-cli/serve': 2.0.5(webpack-cli@5.1.4)(webpack@5.78.0)
+      '@webpack-cli/configtest': 2.1.1(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
+      '@webpack-cli/info': 2.0.2(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
+      '@webpack-cli/serve': 2.0.5(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       colorette: 2.0.20
       commander: 10.0.1
       cross-spawn: 7.0.3
@@ -84068,7 +84205,7 @@ snapshots:
     optionalDependencies:
       webpack: 5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))
 
-  webpack-dev-middleware@6.1.1(webpack@5.78.0):
+  webpack-dev-middleware@6.1.1(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4)):
     dependencies:
       colorette: 2.0.19
       memfs: 3.5.0
@@ -84264,7 +84401,7 @@ snapshots:
       - esbuild
       - uglify-js
 
-  webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(webpack-cli@5.1.4):
+  webpack@5.78.0(@swc/core@1.3.107(@swc/helpers@0.5.12))(webpack-cli@5.1.4(webpack-bundle-analyzer@4.9.0)(webpack@5.78.0)):
     dependencies:
       '@types/eslint-scope': 3.7.4
       '@types/estree': 0.0.51
@@ -84287,7 +84424,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(@swc/core@1.3.107(@swc/helpers@0.5.12))(webpack@5.78.0)
+      terser-webpack-plugin: 5.3.10(@swc/core@1.3.107(@swc/helpers@0.5.12))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       watchpack: 2.4.2
       webpack-sources: 3.2.3
     optionalDependencies:
@@ -84351,7 +84488,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack@5.78.0)
+      terser-webpack-plugin: 5.3.10(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(esbuild@0.23.1)(webpack-cli@5.1.4))
       watchpack: 2.4.2
       webpack-sources: 3.2.3
     optionalDependencies:
@@ -84384,7 +84521,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack@5.78.0)
+      terser-webpack-plugin: 5.3.10(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack@5.78.0(@swc/core@1.7.26(@swc/helpers@0.5.12))(webpack-cli@5.1.4))
       watchpack: 2.4.2
       webpack-sources: 3.2.3
     optionalDependencies:
@@ -85114,12 +85251,12 @@ snapshots:
     optionalDependencies:
       react: 18.3.1
 
-  zustand@4.5.5(@types/react@18.3.3)(immer@9.0.21)(react@18.3.1):
+  zustand@4.5.5(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1):
     dependencies:
       use-sync-external-store: 1.2.2(react@18.3.1)
     optionalDependencies:
       '@types/react': 18.3.3
-      immer: 9.0.21
+      immer: 10.1.1
       react: 18.3.1
 
   zwitch@2.0.4: {}

@@ -32,6 +32,7 @@ export const InAppBody = () => {
                   onChange={field.onChange}
                   variables={variables}
                   autoFocus
+                  multiline
                 />
               </InputWrapper>
             </InputRoot>

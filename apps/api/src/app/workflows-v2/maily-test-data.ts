@@ -1,83 +1,4 @@
-export const forSnippet = {
-  type: 'doc',
-  content: [
-    {
-      type: 'for',
-      attrs: {
-        each: 'payload.food.items',
-        isUpdatingKey: false,
-      },
-      content: [
-        {
-          type: 'paragraph',
-          attrs: {
-            textAlign: 'left',
-          },
-          content: [
-            {
-              type: 'text',
-              text: 'this is a food item with name  ',
-            },
-            {
-              type: 'variable',
-              attrs: {
-                id: 'payload.food.items.name',
-                label: null,
-              },
-            },
-            {
-              type: 'text',
-              text: ' ',
-            },
-          ],
-        },
-        {
-          type: 'for',
-          attrs: {
-            each: 'payload.food.warnings',
-            isUpdatingKey: false,
-          },
-          content: [
-            {
-              type: 'bulletList',
-              content: [
-                {
-                  type: 'listItem',
-                  attrs: {
-                    color: null,
-                  },
-                  content: [
-                    {
-                      type: 'paragraph',
-                      attrs: {
-                        textAlign: 'left',
-                      },
-                      content: [
-                        {
-                          type: 'variable',
-                          attrs: {
-                            id: 'payload.food.warnings.header',
-                            label: null,
-                          },
-                        },
-                        {
-                          type: 'text',
-                          text: ' ',
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  ],
-};
-
-export function fullCodeSnippet(stepId?: string) {
+export function fullCodeSnippet() {
   return {
     type: 'doc',
     content: [
@@ -513,47 +434,6 @@ export function fullCodeSnippet(stepId?: string) {
               },
             ],
           },
-          {
-            type: 'for',
-            attrs: {
-              each: 'payload.food.warnings',
-              isUpdatingKey: false,
-            },
-            content: [
-              {
-                type: 'bulletList',
-                content: [
-                  {
-                    type: 'listItem',
-                    attrs: {
-                      color: null,
-                    },
-                    content: [
-                      {
-                        type: 'paragraph',
-                        attrs: {
-                          textAlign: 'left',
-                        },
-                        content: [
-                          {
-                            type: 'variable',
-                            attrs: {
-                              id: 'payload.food.warnings.header',
-                              label: null,
-                            },
-                          },
-                          {
-                            type: 'text',
-                            text: ' ',
-                          },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
         ],
       },
       {
@@ -582,5 +462,68 @@ export function fullCodeSnippet(stepId?: string) {
         ],
       },
     ],
+  };
+}
+
+export function previewPayloadExample() {
+  return {
+    payload: {
+      subject: {
+        test: {
+          payload: '{{payload.subject.test.payload}}',
+        },
+      },
+      params: {
+        isPayedUser: '{{payload.params.isPayedUser}}',
+      },
+      hidden: {
+        section: '{{payload.hidden.section}}',
+      },
+      body: '{{payload.body}}',
+      origins: [
+        {
+          country: '{{payload.origins.country}}',
+          id: '{{payload.origins.id}}',
+          time: '{{payload.origins.time}}',
+        },
+        {
+          country: '{{payload.origins.country}}',
+          id: '{{payload.origins.id}}',
+          time: '{{payload.origins.time}}',
+        },
+        {
+          country: '{{payload.origins.country}}',
+          id: '{{payload.origins.id}}',
+          time: '{{payload.origins.time}}',
+        },
+      ],
+      students: [
+        {
+          id: '{{payload.students.id}}',
+          name: '{{payload.students.name}}',
+        },
+        {
+          id: '{{payload.students.id}}',
+          name: '{{payload.students.name}}',
+        },
+        {
+          id: '{{payload.students.id}}',
+          name: '{{payload.students.name}}',
+        },
+      ],
+      food: {
+        items: [
+          {
+            name: '{{payload.food.items.name}}',
+          },
+          {
+            name: '{{payload.food.items.name}}',
+          },
+          {
+            name: '{{payload.food.items.name}}',
+          },
+        ],
+      },
+    },
   };
 }

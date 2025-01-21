@@ -153,12 +153,12 @@ function sdkSetup(app: INestApplication, document: OpenAPIObject) {
   document['x-speakeasy-retries'] = {
     strategy: 'backoff',
     backoff: {
-      initialInterval: 500,
+      initialInterval: 1000,
       maxInterval: 30000,
       maxElapsedTime: 3600000,
       exponent: 1.5,
     },
-    statusCodes: ['408', '409', '429', '5XX'],
+    statusCodes: [408, 409, 429, '5XX'],
     retryConnectionErrors: true,
   };
 
