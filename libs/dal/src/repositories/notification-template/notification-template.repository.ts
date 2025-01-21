@@ -1,12 +1,13 @@
 import { FilterQuery } from 'mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
 
-import { BaseRepository } from '../base-repository';
-import { NotificationTemplate } from './notification-template.schema';
-import { NotificationTemplateDBModel, NotificationTemplateEntity } from './notification-template.entity';
+import { DirectionEnum } from '@novu/shared';
 import { DalException } from '../../shared';
 import type { EnforceEnvOrOrgIds } from '../../types/enforce';
+import { BaseRepository } from '../base-repository';
 import { EnvironmentRepository } from '../environment';
+import { NotificationTemplateDBModel, NotificationTemplateEntity } from './notification-template.entity';
+import { NotificationTemplate } from './notification-template.schema';
 
 type NotificationTemplateQuery = FilterQuery<NotificationTemplateDBModel> & EnforceEnvOrOrgIds;
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -194,7 +195,9 @@ export class NotificationTemplateRepository extends BaseRepository<
     skip: number = 0,
     limit: number = 10,
     query?: string,
-    excludeNewDashboardWorkflows: boolean = false
+    excludeNewDashboardWorkflows: boolean = false,
+    orderByField: string = 'createdAt',
+    orderDirection: DirectionEnum = DirectionEnum.DESC
   ): Promise<{ totalCount: number; data: NotificationTemplateEntity[] }> {
     const searchQuery: FilterQuery<NotificationTemplateDBModel> = {};
 
@@ -214,12 +217,21 @@ export class NotificationTemplateRepository extends BaseRepository<
       ...searchQuery,
     });
 
+    console.log(
+      { [orderByField]: orderDirection === DirectionEnum.ASC ? 1 : -1 },
+      {
+        _environmentId: environmentId,
+        _organizationId: organizationId,
+        ...searchQuery,
+      }
+    );
+
     const items = await this.MongooseModel.find({
       _environmentId: environmentId,
       _organizationId: organizationId,
       ...searchQuery,
     })
-      .sort({ createdAt: -1 })
+      .sort({ [orderByField]: orderDirection === DirectionEnum.ASC ? 1 : -1 })
       .skip(skip)
       .limit(limit)
       .populate({ path: 'notificationGroup' })

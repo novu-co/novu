@@ -8,7 +8,9 @@ import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { RiArrowDownSLine, RiFileAddLine, RiFileMarkedLine, RiRouteFill } from 'react-icons/ri';
+import { useSearchParams } from 'react-router-dom';
 import { ButtonGroupItem, ButtonGroupRoot } from '../components/primitives/button-group';
 import {
   DropdownMenu,
@@ -16,13 +18,38 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../components/primitives/dropdown-menu';
+import { FacetedFormFilter } from '../components/primitives/form/faceted-filter/facated-form-filter';
+import { Form, FormField, FormItem } from '../components/primitives/form/form';
 import { WorkflowTemplateModal } from '../components/template-store/workflow-template-modal';
 import { WorkflowList } from '../components/workflow-list';
+
+interface WorkflowFilters {
+  query: string;
+}
 
 export const WorkflowsPage = () => {
   const track = useTelemetry();
   const isTemplateStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_TEMPLATE_STORE_ENABLED);
   const [shouldOpenTemplateModal, setShouldOpenTemplateModal] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const form = useForm<WorkflowFilters>({
+    defaultValues: {
+      query: searchParams.get('query') || '',
+    },
+  });
+
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      if (value.query) {
+        searchParams.set('query', value.query);
+      } else {
+        searchParams.delete('query');
+      }
+      setSearchParams(searchParams);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form, searchParams, setSearchParams]);
 
   useEffect(() => {
     track(TelemetryEvent.WORKFLOWS_PAGE_VISIT);
@@ -35,7 +62,26 @@ export const WorkflowsPage = () => {
         <OptInModal />
         <div className="h-full w-full">
           <div className="flex justify-between px-2.5 py-2.5">
-            <div className="invisible flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2"></div>
+            <Form {...form}>
+              <form>
+                <FormField
+                  control={form.control}
+                  name="query"
+                  render={({ field }) => (
+                    <FormItem className="relative">
+                      <FacetedFormFilter
+                        type="text"
+                        size="small"
+                        title="Search"
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Search workflows"
+                      />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
             {isTemplateStoreEnabled ? (
               <ButtonGroupRoot size="xs">
                 <ButtonGroupItem asChild className="gap-1">

@@ -12,12 +12,14 @@ import {
 import { WorkflowListEmpty } from '@/components/workflow-list-empty';
 import { WorkflowRow } from '@/components/workflow-row';
 import { useFetchWorkflows } from '@/hooks/use-fetch-workflows';
-import { RiMore2Fill } from 'react-icons/ri';
+import { RiArrowDownSFill, RiArrowUpSFill, RiExpandUpDownFill, RiMore2Fill } from 'react-icons/ri';
 import { createSearchParams, useLocation, useSearchParams } from 'react-router-dom';
 import { ServerErrorPage } from './shared/server-error-page';
 
+type SortableColumn = 'name' | 'updatedAt';
+
 export function WorkflowList() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
 
   const hrefFromOffset = (offset: number) => {
@@ -29,11 +31,42 @@ export function WorkflowList() {
 
   const offset = parseInt(searchParams.get('offset') || '0');
   const limit = parseInt(searchParams.get('limit') || '12');
+  const query = searchParams.get('query') || '';
+  const orderDirection = (searchParams.get('orderDirection') || 'desc') as 'asc' | 'desc';
+  const orderByField = (searchParams.get('orderByField') || 'updatedAt') as SortableColumn;
 
   const { data, isPending, isError, currentPage, totalPages } = useFetchWorkflows({
     limit,
     offset,
+    query,
+    orderByField,
+    orderDirection,
   });
+
+  const toggleSort = (column: SortableColumn) => {
+    const newDirection = column === orderByField ? (orderDirection === 'desc' ? 'asc' : 'desc') : 'desc';
+    searchParams.set('orderDirection', newDirection);
+    searchParams.set('orderByField', column);
+    setSearchParams(searchParams);
+  };
+
+  const getSortingIcon = (state: 'asc' | 'desc' | false) => {
+    if (state === 'asc') return <RiArrowUpSFill className="text-text-sub-600 size-4" />;
+    if (state === 'desc') return <RiArrowDownSFill className="text-text-sub-600 size-4" />;
+
+    return <RiExpandUpDownFill className="text-text-sub-600 size-4" />;
+  };
+
+  const SortButton = ({ column, children }: { column: SortableColumn; children: React.ReactNode }) => (
+    <div
+      role="button"
+      className="hover:text-foreground-900 flex cursor-pointer items-center gap-1"
+      onClick={() => toggleSort(column)}
+    >
+      {children}
+      {getSortingIcon(orderByField === column ? orderDirection : false)}
+    </div>
+  );
 
   if (isError) return <ServerErrorPage />;
 
@@ -46,11 +79,15 @@ export function WorkflowList() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Workflows</TableHead>
+            <TableHead>
+              <SortButton column="name">Workflows</SortButton>
+            </TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Steps</TableHead>
             <TableHead>Tags</TableHead>
-            <TableHead>Last updated</TableHead>
+            <TableHead>
+              <SortButton column="updatedAt">Last updated</SortButton>
+            </TableHead>
             <TableHead />
           </TableRow>
         </TableHeader>

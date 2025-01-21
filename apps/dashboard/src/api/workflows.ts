@@ -27,16 +27,31 @@ export const getWorkflows = async ({
   limit,
   query,
   offset,
+  orderByField,
+  orderDirection,
 }: {
   environment: IEnvironment;
   limit: number;
   offset: number;
   query: string;
+  orderByField?: string;
+  orderDirection?: string;
 }): Promise<ListWorkflowResponse> => {
-  const { data } = await getV2<{ data: ListWorkflowResponse }>(
-    `/workflows?limit=${limit}&offset=${offset}&query=${query}`,
-    { environment }
-  );
+  const params = new URLSearchParams({
+    limit: limit.toString(),
+    offset: offset.toString(),
+    query,
+  });
+
+  if (orderByField) {
+    params.append('orderByField', orderByField);
+  }
+  if (orderDirection) {
+    params.append('orderDirection', orderDirection.toUpperCase());
+  }
+
+  const { data } = await getV2<{ data: ListWorkflowResponse }>(`/workflows?${params.toString()}`, { environment });
+
   return data;
 };
 
