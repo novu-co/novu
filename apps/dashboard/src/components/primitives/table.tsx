@@ -1,11 +1,10 @@
-import * as React from 'react';
-
 import { cn } from '@/utils/ui';
+import { cva } from 'class-variance-authority';
+import * as React from 'react';
 import { RiArrowDownSFill, RiArrowUpSFill, RiExpandUpDownFill } from 'react-icons/ri';
-import { ClassNameValue } from 'tailwind-merge';
 
-interface TableProps extends React.HTMLAttributes<HTMLDivElement> {
-  containerClassname?: ClassNameValue;
+interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
+  containerClassname?: string;
   isLoading?: boolean;
   loadingRowsCount?: number;
   loadingRow?: React.ReactNode;
@@ -17,32 +16,54 @@ interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
   onSort?: () => void;
 }
 
-const Table = React.forwardRef<HTMLTableElement, TableProps>(
-  ({ className, containerClassname, isLoading, loadingRowsCount = 5, loadingRow, children, ...props }, ref) => {
-    const loadingRows = Array.from({ length: loadingRowsCount }).map(
-      (_, i) => loadingRow && <React.Fragment key={i}>{loadingRow}</React.Fragment>
-    );
+type TableHeaderProps = React.HTMLAttributes<HTMLTableSectionElement>;
+type TableBodyProps = React.HTMLAttributes<HTMLTableSectionElement>;
+type TableFooterProps = React.HTMLAttributes<HTMLTableSectionElement>;
+type TableRowProps = React.HTMLAttributes<HTMLTableRowElement>;
+type TableCellProps = React.TdHTMLAttributes<HTMLTableCellElement>;
 
-    return (
-      <div
-        className={cn(
-          'relative w-full overflow-auto rounded-lg border border-neutral-200 shadow-sm',
-          containerClassname
-        )}
+const LoadingRow = () => (
+  <TableRow>
+    <TableCell className="animate-pulse" colSpan={100}>
+      <div className="h-8 w-full rounded-md bg-neutral-100" />
+    </TableCell>
+  </TableRow>
+);
+
+const Table = React.forwardRef<HTMLTableElement, TableProps>(
+  ({ className, containerClassname, isLoading, loadingRowsCount = 5, loadingRow, children, ...props }, ref) => (
+    <div
+      className={cn(
+        'border-neutral-alpha-200 relative w-full overflow-x-auto rounded-md border shadow-sm',
+        containerClassname
+      )}
+    >
+      <table
+        ref={ref}
+        className={cn('relative w-full caption-bottom border-separate border-spacing-0 text-sm', className)}
+        {...props}
       >
-        <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props}>
-          {children}
-          {isLoading && loadingRow && loadingRows}
-        </table>
-      </div>
-    );
-  }
+        {children}
+        {isLoading && (
+          <TableBody>
+            {Array.from({ length: loadingRowsCount }).map((_, index) => (
+              <React.Fragment key={index}>{loadingRow || <LoadingRow />}</React.Fragment>
+            ))}
+          </TableBody>
+        )}
+      </table>
+    </div>
+  )
 );
 Table.displayName = 'Table';
 
-const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
-  ({ className, ...props }, ref) => <thead ref={ref} className={cn('[&_tr]:border-b', className)} {...props} />
-);
+const TableHeader = React.forwardRef<HTMLTableSectionElement, TableHeaderProps>(({ className, ...props }, ref) => (
+  <thead
+    ref={ref}
+    className={cn('sticky top-0 bg-neutral-50 shadow-[0_0_0_1px_hsl(var(--neutral-alpha-200))]', className)}
+    {...props}
+  />
+));
 TableHeader.displayName = 'TableHeader';
 
 const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
@@ -64,7 +85,7 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
       <th
         ref={ref}
         className={cn(
-          'text-muted-foreground h-12 px-4 text-left align-middle font-medium [&:has([role=checkbox])]:pr-0',
+          'text-foreground-600 h-10 px-6 py-2 text-left align-middle font-medium [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]',
           className
         )}
         {...props}
@@ -82,39 +103,34 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
 );
 TableHead.displayName = 'TableHead';
 
-const TableBody = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
-  ({ className, ...props }, ref) => (
-    <tbody ref={ref} className={cn('[&_tr:last-child]:border-0', className)} {...props} />
-  )
-);
+const TableBody = React.forwardRef<HTMLTableSectionElement, TableBodyProps>(({ className, ...props }, ref) => (
+  <tbody ref={ref} className={cn('', className)} {...props} />
+));
 TableBody.displayName = 'TableBody';
 
-const TableFooter = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
-  ({ className, ...props }, ref) => (
-    <tfoot ref={ref} className={cn('bg-neutral-900 font-medium text-neutral-50', className)} {...props} />
-  )
-);
+const TableFooter = React.forwardRef<HTMLTableSectionElement, TableFooterProps>(({ className, ...props }, ref) => (
+  <tfoot
+    ref={ref}
+    className={cn('bg-background sticky bottom-0 shadow-[0_0_0_1px_hsl(var(--neutral-alpha-200))]', className)}
+    {...props}
+  />
+));
 TableFooter.displayName = 'TableFooter';
 
-const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
-  ({ className, ...props }, ref) => (
-    <tr
-      ref={ref}
-      className={cn(
-        'border-b transition-colors hover:bg-neutral-100/50 data-[state=selected]:bg-neutral-100',
-        className
-      )}
-      {...props}
-    />
-  )
-);
+const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(({ className, ...props }, ref) => (
+  <tr
+    ref={ref}
+    className={cn('[&>td]:border-neutral-alpha-100 [&>td]:border-b [&>td]:last-of-type:border-0', className)}
+    {...props}
+  />
+));
 TableRow.displayName = 'TableRow';
 
-const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(
-  ({ className, ...props }, ref) => (
-    <td ref={ref} className={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)} {...props} />
-  )
-);
+export const tableCellVariants = cva(`px-6 py-2 align-middle`);
+
+const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(({ className, ...props }, ref) => (
+  <td ref={ref} className={cn(tableCellVariants(), className)} {...props} />
+));
 TableCell.displayName = 'TableCell';
 
 export { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow };
