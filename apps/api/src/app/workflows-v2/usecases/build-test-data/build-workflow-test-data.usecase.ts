@@ -18,12 +18,13 @@ import { parsePayloadSchema } from '../../shared/parse-payload-schema';
 import { mockSchemaDefaults } from '../../util/utils';
 import { ExtractVariables } from '../extract-variables/extract-variables.usecase';
 import { ExtractVariablesCommand } from '../extract-variables/extract-variables.command';
+import { buildVariablesSchema } from '../../util/create-schema';
 
 @Injectable()
 export class BuildWorkflowTestDataUseCase {
   constructor(
     private readonly getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private readonly buildPayloadSchema: ExtractVariables
+    private readonly extractVariables: ExtractVariables
   ) {}
 
   @InstrumentUsecase()
@@ -48,7 +49,7 @@ export class BuildWorkflowTestDataUseCase {
       return parsePayloadSchema(workflow.payloadSchema, { safe: true }) || {};
     }
 
-    return this.buildPayloadSchema.execute(
+    const { payload } = await this.extractVariables.execute(
       ExtractVariablesCommand.create({
         environmentId: command.user.environmentId,
         organizationId: command.user.organizationId,
@@ -56,6 +57,8 @@ export class BuildWorkflowTestDataUseCase {
         workflowId: workflow._id,
       })
     );
+
+    return buildVariablesSchema(payload);
   }
 
   private generatePayloadMock(schema: JSONSchemaDto): Record<string, unknown> {

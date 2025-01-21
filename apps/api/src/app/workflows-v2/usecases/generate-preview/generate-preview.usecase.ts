@@ -36,6 +36,7 @@ import { Variable } from '../../util/template-parser/liquid-parser';
 import { isObjectTipTapNode } from '../../util/tip-tap.util';
 import { buildVariables } from '../../util/build-variables';
 import { keysToObject, mergeCommonObjectKeys, multiplyArrayItems } from '../../util/utils';
+import { buildVariablesSchema } from '../../util/create-schema';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
@@ -45,7 +46,7 @@ export class GeneratePreviewUsecase {
     private previewStepUsecase: PreviewStep,
     private buildStepDataUsecase: BuildStepDataUsecase,
     private getWorkflowByIdsUseCase: GetWorkflowByIdsUseCase,
-    private buildPayloadSchema: ExtractVariables,
+    private extractVariables: ExtractVariables,
     private readonly logger: PinoLogger
   ) {}
 
@@ -189,7 +190,7 @@ export class GeneratePreviewUsecase {
     command: GeneratePreviewCommand,
     controlValues: Record<string, unknown>
   ) {
-    const payloadSchema = await this.buildPayloadSchema.execute(
+    const { payload } = await this.extractVariables.execute(
       ExtractVariablesCommand.create({
         environmentId: command.user.environmentId,
         organizationId: command.user.organizationId,
@@ -198,6 +199,7 @@ export class GeneratePreviewUsecase {
         controlValues,
       })
     );
+    const payloadSchema = buildVariablesSchema(payload);
 
     if (Object.keys(payloadSchema).length === 0) {
       return variables;
