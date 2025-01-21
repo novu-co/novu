@@ -30,12 +30,13 @@ export const DeleteEnvironmentDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Delete Environment</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete the environment <span className="font-bold">{environment.name}</span>?{' '}
-            <br /> This action cannot be undone and it will break all the integrations that are using this environment.
+            Deleting <span className="font-bold">{environment.name}</span> will permanently remove this environment and
+            all the data associated with it. Including integrations, workflows, and notifications. This action cannot be
+            undone. Are you sure you want to proceed?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
