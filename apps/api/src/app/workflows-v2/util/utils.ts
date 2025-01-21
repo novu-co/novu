@@ -1,13 +1,10 @@
 /* eslint-disable no-param-reassign */
 import difference from 'lodash/difference';
-import flatMap from 'lodash/flatMap';
 import isArray from 'lodash/isArray';
 import isObject from 'lodash/isObject';
 import reduce from 'lodash/reduce';
-import values from 'lodash/values';
-
 import { JSONSchemaDto } from '@novu/shared';
-import { MAILY_ITERABLE_MARK } from '@novu/application-generic';
+import { MAILY_ITERABLE_MARK } from '../../environments-v1/usecases/output-renderers/maily-to-liquid/maily.types';
 
 export function findMissingKeys(requiredRecord: object, actualRecord: object) {
   const requiredKeys = collectKeys(requiredRecord);
@@ -31,51 +28,6 @@ export function collectKeys(obj, prefix = '') {
     },
     []
   );
-}
-
-/**
- * Recursively flattens an object's values into an array of strings.
- * Handles nested objects, arrays, and converts primitive values to strings.
- *
- * @param obj - The object to flatten
- * @returns An array of strings containing all primitive values found in the object
- *
- * @example
- * ```typescript
- * const input = {
- *   subject: "Hello {{name}}",
- *   body: "Welcome!",
- *   actions: {
- *     primary: {
- *       label: "Click {{here}}",
- *       url: "https://example.com"
- *     }
- *   },
- *   data: { count: 42 }
- * };
- *
- * flattenObjectValues(input);
- *  Returns:
- *  [
- *    "Hello {{name}}",
- *    "Welcome!",
- *    "Click {{here}}",
- *    "https://example.com",
- *    "42"
- *  ]
- * ```
- */
-export function flattenObjectValues(obj: Record<string, unknown>): string[] {
-  return flatMap(values(obj), (value) => {
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      return String(value);
-    }
-    if (value && typeof value === 'object') {
-      return flattenObjectValues(value as Record<string, unknown>);
-    }
-
-    return [];
-  });
 }
 
 /**
