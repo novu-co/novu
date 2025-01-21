@@ -135,7 +135,7 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
             </BreadcrumbList>
           </Breadcrumb>
         </DialogHeader>
-        <div className={`flex h-[${selectedTemplate ? '600px' : '640px'}]`}>
+        <div className={`flex ${selectedTemplate ? 'min-h-[600px]' : 'min-h-[640px]'}`}>
           {!selectedTemplate && (
             <div className="h-full w-[259px] border-r border-neutral-200">
               <WorkflowSidebar
