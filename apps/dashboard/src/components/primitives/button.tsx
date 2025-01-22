@@ -59,11 +59,11 @@ export const buttonVariants = tv({
         icon: '',
       },
       xs: {
-        root: 'h-8 gap-2.5 rounded-lg px-2 text-label-xs',
+        root: 'h-8 gap-2.5 rounded-lg px-1.5 text-label-xs',
         icon: 'size-4',
       },
       '2xs': {
-        root: 'h-7 gap-2.5 rounded-lg px-2 text-label-xs',
+        root: 'h-7 gap-2.5 rounded-lg px-1.5 text-label-xs',
         icon: 'size-4',
       },
     },
@@ -362,7 +362,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <ButtonRoot ref={ref} asChild={asChild} {...rest}>
         {LeadingIcon && <ButtonIcon as={LeadingIcon} />}
-        <Slottable>{children}</Slottable>
+        <div className="px-1">
+          <Slottable>{children}</Slottable>
+        </div>
         {TrailingIcon && (
           <ButtonIcon className={isArrowRight ? 'arrow-right-hover-animation' : undefined} as={TrailingIcon} />
         )}
