@@ -23,31 +23,31 @@ export function TextWidget(props: WidgetProps) {
       control={control}
       name={extractedName}
       render={({ field, fieldState }) => (
-        <FormItem className="w-full py-1">
+        <FormItem className="w-full py-1 has-[input:focus]:[&>:before]:shadow-none has-[input:focus]:[&>:before]:ring-0">
           <FormLabel className="text-xs">{capitalize(label)}</FormLabel>
           <FormControl>
-            <InputRoot hasError={!!fieldState.error}>
-              {isNumberType ? (
-                <Input
-                  type="number"
-                  {...field}
-                  hasError={!!fieldState.error}
-                  onChange={(e) => {
-                    if (e.target.value === '') {
-                      field.onChange('');
-                      return;
-                    }
-                    const val = Number(e.target.value);
-                    const isNaN = Number.isNaN(val);
-                    const finalValue = isNaN ? '' : val;
-                    field.onChange(finalValue);
-                  }}
-                  required={required}
-                  readOnly={readonly}
-                  disabled={disabled}
-                  placeholder={capitalize(label)}
-                />
-              ) : (
+            {isNumberType ? (
+              <Input
+                type="number"
+                {...field}
+                hasError={!!fieldState.error}
+                onChange={(e) => {
+                  if (e.target.value === '') {
+                    field.onChange('');
+                    return;
+                  }
+                  const val = Number(e.target.value);
+                  const isNaN = Number.isNaN(val);
+                  const finalValue = isNaN ? '' : val;
+                  field.onChange(finalValue);
+                }}
+                required={required}
+                readOnly={readonly}
+                disabled={disabled}
+                placeholder={capitalize(label)}
+              />
+            ) : (
+              <InputRoot hasError={!!fieldState.error}>
                 <InputWrapper className="flex h-full items-center p-2 py-1">
                   <ControlInput
                     indentWithTab={false}
@@ -59,8 +59,8 @@ export function TextWidget(props: WidgetProps) {
                     size="default"
                   />
                 </InputWrapper>
-              )}
-            </InputRoot>
+              </InputRoot>
+            )}
           </FormControl>
           <FormMessage />
         </FormItem>
