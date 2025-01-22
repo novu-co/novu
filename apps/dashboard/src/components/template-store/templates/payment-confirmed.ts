@@ -6,7 +6,7 @@ export const paymentConfirmedTemplate: WorkflowTemplate = {
   name: 'Payment Confirmed',
   description: 'Send payment confirmations with receipts',
   category: 'billing',
-  isPopular: false,
+  isPopular: true,
   workflowDefinition: {
     name: 'Payment Confirmed',
     description: '',
