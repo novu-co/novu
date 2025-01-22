@@ -28,7 +28,7 @@ export const EditStepConditions = () => {
       <header className="flex flex-row items-center gap-3 border-b border-neutral-200 px-3 py-1.5">
         <div className="mr-auto flex items-center gap-2.5 py-2 text-sm font-medium">
           <RiGuideFill className="size-4" />
-          <span>Step Skip Conditions</span>
+          <span>Skip Conditions</span>
         </div>
 
         <CompactButton
