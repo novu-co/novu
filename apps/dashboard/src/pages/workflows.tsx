@@ -99,7 +99,7 @@ export const WorkflowsPage = () => {
     query: searchParams.get('query') || '',
   });
 
-  const hasActiveFilters = searchParams.get('query') !== null;
+  const hasActiveFilters = searchParams.get('query') && searchParams.get('query') !== null;
 
   const shouldShowStartWith =
     isTemplateStoreEnabled && workflowsData && workflowsData.totalCount < 5 && !hasActiveFilters;
