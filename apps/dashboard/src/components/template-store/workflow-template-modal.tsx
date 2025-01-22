@@ -4,9 +4,10 @@ import { TelemetryEvent } from '@/utils/telemetry';
 import { ComponentProps, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine } from 'react-icons/ri';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { useCreateWorkflow } from '../../hooks/use-create-workflow';
+import { buildRoute, ROUTES } from '../../utils/routes';
 import { RouteFill } from '../icons';
 import {
   Breadcrumb,
@@ -39,6 +40,8 @@ export type WorkflowTemplateModalProps = ComponentProps<typeof DialogTrigger> & 
 export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   const form = useForm();
   const track = useTelemetry();
+  const navigate = useNavigate();
+  const { environmentSlug } = useParams();
   const [searchParams] = useSearchParams();
   const { submit: createFromTemplate, isLoading: isCreating } = useCreateWorkflow();
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
@@ -103,6 +106,7 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   };
 
   const handleBackClick = () => {
+    navigate(buildRoute(ROUTES.TEMPLATE_STORE, { environmentSlug: environmentSlug || '' }));
     setInternalSelectedTemplate(null);
     setMode(WorkflowMode.TEMPLATES);
   };

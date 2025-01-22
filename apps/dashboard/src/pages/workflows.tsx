@@ -205,12 +205,12 @@ export const WorkflowsPage = () => {
 
 export const TemplateModal = () => {
   const navigate = useNavigate();
-  const { templateId } = useParams();
+  const { templateId, environmentSlug } = useParams();
   const templates = getTemplates();
   const selectedTemplate = templateId ? templates.find((template) => template.id === templateId) : undefined;
 
   const handleCloseTemplateModal = () => {
-    navigate(-1);
+    navigate(buildRoute(ROUTES.WORKFLOWS, { environmentSlug: environmentSlug || '' }));
   };
 
   return (
