@@ -4,8 +4,10 @@ import { TelemetryEvent } from '@/utils/telemetry';
 import { ComponentProps, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine } from 'react-icons/ri';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { useCreateWorkflow } from '../../hooks/use-create-workflow';
+import { buildRoute, ROUTES } from '../../utils/routes';
 import { RouteFill } from '../icons';
 import {
   Breadcrumb,
@@ -32,16 +34,22 @@ export type WorkflowTemplateModalProps = ComponentProps<typeof DialogTrigger> & 
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   source?: string;
+  selectedTemplate?: IWorkflowSuggestion;
 };
 
 export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   const form = useForm();
   const track = useTelemetry();
+  const navigate = useNavigate();
+  const { environmentSlug } = useParams();
+  const [searchParams] = useSearchParams();
   const { submit: createFromTemplate, isLoading: isCreating } = useCreateWorkflow();
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
   const [suggestions, setSuggestions] = useState<IWorkflowSuggestion[]>([]);
   const [mode, setMode] = useState<WorkflowMode>(WorkflowMode.TEMPLATES);
-  const [selectedTemplate, setSelectedTemplate] = useState<IWorkflowSuggestion | null>(null);
+  const [internalSelectedTemplate, setInternalSelectedTemplate] = useState<IWorkflowSuggestion | null>(null);
+
+  const selectedTemplate = props.selectedTemplate ?? internalSelectedTemplate;
 
   const filteredTemplates = WORKFLOW_TEMPLATES.filter((template) =>
     selectedCategory === 'popular' ? template.isPopular : template.category === selectedCategory
@@ -51,10 +59,16 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   useEffect(() => {
     if (props.open) {
       track(TelemetryEvent.TEMPLATE_MODAL_OPENED, {
-        source: props.source || 'unknown',
+        source: searchParams.get('source') || 'unknown',
       });
     }
-  }, [props.open, props.source, track]);
+  }, [props.open, track, searchParams]);
+
+  useEffect(() => {
+    if (props.selectedTemplate) {
+      setInternalSelectedTemplate(props.selectedTemplate);
+    }
+  }, [props.selectedTemplate]);
 
   const handleCreateWorkflow = async (values: z.infer<typeof workflowSchema>) => {
     if (!selectedTemplate) return;
@@ -88,11 +102,12 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   };
 
   const handleTemplateClick = (template: IWorkflowSuggestion) => {
-    setSelectedTemplate(template);
+    setInternalSelectedTemplate(template);
   };
 
   const handleBackClick = () => {
-    setSelectedTemplate(null);
+    navigate(buildRoute(ROUTES.TEMPLATE_STORE, { environmentSlug: environmentSlug || '' }));
+    setInternalSelectedTemplate(null);
     setMode(WorkflowMode.TEMPLATES);
   };
 
@@ -137,13 +152,7 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
         </DialogHeader>
         <div className={`flex ${selectedTemplate ? 'min-h-[600px]' : 'min-h-[640px]'}`}>
           {!selectedTemplate && (
-            <div className="h-full w-[259px] border-r border-neutral-200">
-              <WorkflowSidebar
-                selectedCategory={selectedCategory}
-                onCategorySelect={handleCategorySelect}
-                mode={mode}
-              />
-            </div>
+            <WorkflowSidebar selectedCategory={selectedCategory} onCategorySelect={handleCategorySelect} mode={mode} />
           )}
 
           <div className="w-full flex-1 overflow-auto">
