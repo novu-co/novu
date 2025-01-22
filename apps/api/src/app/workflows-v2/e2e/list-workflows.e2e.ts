@@ -78,7 +78,7 @@ describe('List Workflows - /workflows (GET) #novu-v2', function () {
 
       const { body } = await session.testAgent.get('/v2/workflows').query({
         orderDirection: DirectionEnum.ASC,
-        orderByField: 'createdAt',
+        orderBy: 'createdAt',
       });
 
       expect(body.data.workflows[0].name).to.equal('First Workflow');

@@ -19,7 +19,7 @@ export class ListWorkflowsUseCase {
       command.limit,
       command.searchQuery,
       false,
-      command.orderByField,
+      command.orderBy,
       command.orderDirection
     );
     if (res.data === null || res.data === undefined) {

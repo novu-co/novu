@@ -34,7 +34,7 @@ export const WorkflowsPage = () => {
   const [shouldOpenTemplateModal, setShouldOpenTemplateModal] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams({
     orderDirection: 'desc',
-    orderByField: 'updatedAt',
+    orderBy: 'updatedAt',
     query: '',
   });
   const form = useForm<WorkflowFilters>({

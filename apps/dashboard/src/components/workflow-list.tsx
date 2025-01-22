@@ -38,20 +38,20 @@ export function WorkflowList({ hasActiveFilters, onClearFilters }: WorkflowListP
   const limit = parseInt(searchParams.get('limit') || '12');
   const query = searchParams.get('query') || '';
   const orderDirection = (searchParams.get('orderDirection') || 'desc') as 'asc' | 'desc';
-  const orderByField = (searchParams.get('orderByField') || 'updatedAt') as SortableColumn;
+  const orderBy = (searchParams.get('orderBy') || 'updatedAt') as SortableColumn;
 
   const { data, isLoading, isError, currentPage, totalPages } = useFetchWorkflows({
     limit,
     offset,
     query,
-    orderByField,
+    orderBy,
     orderDirection,
   });
 
   const toggleSort = (column: SortableColumn) => {
-    const newDirection = column === orderByField ? (orderDirection === 'desc' ? 'asc' : 'desc') : 'desc';
+    const newDirection = column === orderBy ? (orderDirection === 'desc' ? 'asc' : 'desc') : 'desc';
     searchParams.set('orderDirection', newDirection);
-    searchParams.set('orderByField', column);
+    searchParams.set('orderBy', column);
     setSearchParams(searchParams);
   };
 
@@ -68,7 +68,7 @@ export function WorkflowList({ hasActiveFilters, onClearFilters }: WorkflowListP
           <TableRow>
             <TableHead
               sortable
-              sortDirection={orderByField === 'name' ? orderDirection : false}
+              sortDirection={orderBy === 'name' ? orderDirection : false}
               onSort={() => toggleSort('name')}
             >
               Workflows
@@ -78,7 +78,7 @@ export function WorkflowList({ hasActiveFilters, onClearFilters }: WorkflowListP
             <TableHead>Tags</TableHead>
             <TableHead
               sortable
-              sortDirection={orderByField === 'updatedAt' ? orderDirection : false}
+              sortDirection={orderBy === 'updatedAt' ? orderDirection : false}
               onSort={() => toggleSort('updatedAt')}
             >
               Last updated

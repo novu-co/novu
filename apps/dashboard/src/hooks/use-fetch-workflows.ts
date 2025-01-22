@@ -7,7 +7,7 @@ interface UseWorkflowsParams {
   limit?: number;
   offset?: number;
   query?: string;
-  orderByField?: string;
+  orderBy?: string;
   orderDirection?: 'asc' | 'desc';
 }
 
@@ -15,19 +15,14 @@ export function useFetchWorkflows({
   limit = 12,
   offset = 0,
   query = '',
-  orderByField = '',
+  orderBy = '',
   orderDirection = 'desc',
 }: UseWorkflowsParams = {}) {
   const { currentEnvironment } = useEnvironment();
 
   const workflowsQuery = useQuery({
-    queryKey: [
-      QueryKeys.fetchWorkflows,
-      currentEnvironment?._id,
-      { limit, offset, query, orderByField, orderDirection },
-    ],
-    queryFn: () =>
-      getWorkflows({ environment: currentEnvironment!, limit, offset, query, orderByField, orderDirection }),
+    queryKey: [QueryKeys.fetchWorkflows, currentEnvironment?._id, { limit, offset, query, orderBy, orderDirection }],
+    queryFn: () => getWorkflows({ environment: currentEnvironment!, limit, offset, query, orderBy, orderDirection }),
     placeholderData: keepPreviousData,
     enabled: !!currentEnvironment?._id,
     refetchOnWindowFocus: true,

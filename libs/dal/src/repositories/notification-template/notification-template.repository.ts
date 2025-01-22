@@ -196,7 +196,7 @@ export class NotificationTemplateRepository extends BaseRepository<
     limit: number = 10,
     query?: string,
     excludeNewDashboardWorkflows: boolean = false,
-    orderByField: string = 'createdAt',
+    orderBy: string = 'createdAt',
     orderDirection: DirectionEnum = DirectionEnum.DESC
   ): Promise<{ totalCount: number; data: NotificationTemplateEntity[] }> {
     const searchQuery: FilterQuery<NotificationTemplateDBModel> = {};
@@ -222,7 +222,7 @@ export class NotificationTemplateRepository extends BaseRepository<
       _organizationId: organizationId,
       ...searchQuery,
     })
-      .sort({ [orderByField]: orderDirection === DirectionEnum.ASC ? 1 : -1 })
+      .sort({ [orderBy]: orderDirection === DirectionEnum.ASC ? 1 : -1 })
       .skip(skip)
       .limit(limit)
       .populate({ path: 'notificationGroup' })

@@ -27,14 +27,14 @@ export const getWorkflows = async ({
   limit,
   query,
   offset,
-  orderByField,
+  orderBy,
   orderDirection,
 }: {
   environment: IEnvironment;
   limit: number;
   offset: number;
   query: string;
-  orderByField?: string;
+  orderBy?: string;
   orderDirection?: string;
 }): Promise<ListWorkflowResponse> => {
   const params = new URLSearchParams({
@@ -43,8 +43,8 @@ export const getWorkflows = async ({
     query,
   });
 
-  if (orderByField) {
-    params.append('orderByField', orderByField);
+  if (orderBy) {
+    params.append('orderBy', orderBy);
   }
   if (orderDirection) {
     params.append('orderDirection', orderDirection.toUpperCase());
