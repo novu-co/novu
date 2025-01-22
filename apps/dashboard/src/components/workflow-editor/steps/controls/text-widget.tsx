@@ -1,6 +1,6 @@
 import { ControlInput } from '@/components/primitives/control-input';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { Input } from '@/components/primitives/input';
+import { Input, InputRoot, InputWrapper } from '@/components/primitives/input';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
@@ -26,37 +26,41 @@ export function TextWidget(props: WidgetProps) {
         <FormItem className="w-full py-1">
           <FormLabel className="text-xs">{capitalize(label)}</FormLabel>
           <FormControl>
-            {isNumberType ? (
-              <Input
-                type="number"
-                {...field}
-                hasError={!!fieldState.error}
-                onChange={(e) => {
-                  if (e.target.value === '') {
-                    field.onChange(undefined);
-                    return;
-                  }
-                  const val = Number(e.target.value);
-                  const isNaN = Number.isNaN(val);
-                  const finalValue = isNaN ? undefined : val;
-                  field.onChange(finalValue);
-                }}
-                required={required}
-                readOnly={readonly}
-                disabled={disabled}
-                placeholder={capitalize(label)}
-              />
-            ) : (
-              <ControlInput
-                indentWithTab={false}
-                placeholder={capitalize(label)}
-                id={label}
-                value={field.value}
-                onChange={field.onChange}
-                variables={variables}
-                size="default"
-              />
-            )}
+            <InputRoot hasError={!!fieldState.error}>
+              {isNumberType ? (
+                <Input
+                  type="number"
+                  {...field}
+                  hasError={!!fieldState.error}
+                  onChange={(e) => {
+                    if (e.target.value === '') {
+                      field.onChange('');
+                      return;
+                    }
+                    const val = Number(e.target.value);
+                    const isNaN = Number.isNaN(val);
+                    const finalValue = isNaN ? '' : val;
+                    field.onChange(finalValue);
+                  }}
+                  required={required}
+                  readOnly={readonly}
+                  disabled={disabled}
+                  placeholder={capitalize(label)}
+                />
+              ) : (
+                <InputWrapper className="flex h-full items-center p-2 py-1">
+                  <ControlInput
+                    indentWithTab={false}
+                    placeholder={capitalize(label)}
+                    id={label}
+                    value={field.value}
+                    onChange={field.onChange}
+                    variables={variables}
+                    size="default"
+                  />
+                </InputWrapper>
+              )}
+            </InputRoot>
           </FormControl>
           <FormMessage />
         </FormItem>
