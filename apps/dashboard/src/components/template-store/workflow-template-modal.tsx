@@ -4,6 +4,7 @@ import { TelemetryEvent } from '@/utils/telemetry';
 import { ComponentProps, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiArrowLeftSLine } from 'react-icons/ri';
+import { useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { useCreateWorkflow } from '../../hooks/use-create-workflow';
 import { RouteFill } from '../icons';
@@ -38,6 +39,7 @@ export type WorkflowTemplateModalProps = ComponentProps<typeof DialogTrigger> & 
 export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   const form = useForm();
   const track = useTelemetry();
+  const [searchParams] = useSearchParams();
   const { submit: createFromTemplate, isLoading: isCreating } = useCreateWorkflow();
   const [selectedCategory, setSelectedCategory] = useState<string>('popular');
   const [suggestions, setSuggestions] = useState<IWorkflowSuggestion[]>([]);
@@ -54,10 +56,10 @@ export function WorkflowTemplateModal(props: WorkflowTemplateModalProps) {
   useEffect(() => {
     if (props.open) {
       track(TelemetryEvent.TEMPLATE_MODAL_OPENED, {
-        source: props.source || 'unknown',
+        source: searchParams.get('source') || 'unknown',
       });
     }
-  }, [props.open, props.source, track]);
+  }, [props.open, track, searchParams]);
 
   useEffect(() => {
     if (props.selectedTemplate) {

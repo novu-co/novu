@@ -25,21 +25,6 @@ import { WorkflowTemplateModal } from '../components/template-store/workflow-tem
 import { WorkflowList } from '../components/workflow-list';
 import { buildRoute, ROUTES } from '../utils/routes';
 
-export const TemplateModal = () => {
-  const navigate = useNavigate();
-  const { templateId } = useParams();
-  const templates = getTemplates();
-  const selectedTemplate = templateId ? templates.find((template) => template.id === templateId) : undefined;
-
-  const handleCloseTemplateModal = () => {
-    navigate(-1);
-  };
-
-  return (
-    <WorkflowTemplateModal open={true} onOpenChange={handleCloseTemplateModal} selectedTemplate={selectedTemplate} />
-  );
-};
-
 export const WorkflowsPage = () => {
   const { environmentSlug } = useParams();
   const track = useTelemetry();
@@ -61,7 +46,7 @@ export const WorkflowsPage = () => {
     offset,
   });
 
-  const shouldShowStartWith = isTemplateStoreEnabled && (!workflowsData || workflowsData.totalCount < 5);
+  const shouldShowStartWith = isTemplateStoreEnabled && workflowsData && workflowsData.totalCount < 5;
 
   useEffect(() => {
     track(TelemetryEvent.WORKFLOWS_PAGE_VISIT);
@@ -131,7 +116,12 @@ export const WorkflowsPage = () => {
                       <DropdownMenuItem
                         className="cursor-pointer"
                         onSelect={() =>
-                          navigate(buildRoute(ROUTES.TEMPLATE_STORE, { environmentSlug: environmentSlug || '' }))
+                          navigate(
+                            buildRoute(ROUTES.TEMPLATE_STORE, {
+                              environmentSlug: environmentSlug || '',
+                              source: 'create-workflow-dropdown',
+                            })
+                          )
                         }
                       >
                         <RiFileMarkedLine />
@@ -163,7 +153,12 @@ export const WorkflowsPage = () => {
                   size="sm"
                   variant="gray"
                   onClick={() =>
-                    navigate(buildRoute(ROUTES.TEMPLATE_STORE, { environmentSlug: environmentSlug || '' }))
+                    navigate(
+                      buildRoute(ROUTES.TEMPLATE_STORE, {
+                        environmentSlug: environmentSlug || '',
+                        source: 'start-with',
+                      })
+                    )
                   }
                   trailingIcon={RiArrowRightSLine}
                 >
@@ -205,5 +200,28 @@ export const WorkflowsPage = () => {
         <Outlet />
       </DashboardLayout>
     </>
+  );
+};
+
+export const TemplateModal = () => {
+  const navigate = useNavigate();
+  const { templateId } = useParams();
+  const templates = getTemplates();
+  const selectedTemplate = templateId ? templates.find((template) => template.id === templateId) : undefined;
+
+  const handleCloseTemplateModal = () => {
+    navigate(-1);
+  };
+
+  return (
+    <WorkflowTemplateModal
+      open={true}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          handleCloseTemplateModal();
+        }
+      }}
+      selectedTemplate={selectedTemplate}
+    />
   );
 };
