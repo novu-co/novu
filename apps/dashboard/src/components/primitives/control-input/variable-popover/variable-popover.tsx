@@ -11,10 +11,11 @@ import { FormControl, FormItem } from '@/components/primitives/form/form';
 import { Input } from '@/components/primitives/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/primitives/popover';
 import { Switch } from '@/components/primitives/switch';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/primitives/tooltip';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { RiAddFill } from 'react-icons/ri';
+import { RiAddFill, RiQuestionLine } from 'react-icons/ri';
 import { Separator } from '../../separator';
 import { FilterItem } from './components/filter-item';
 import { FilterPreview } from './components/filter-preview';
@@ -146,7 +147,21 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
             <FormItem>
               <FormControl>
                 <div className="grid gap-1">
-                  <label className="text-text-sub text-label-xs">LiquidJS Filters</label>
+                  <div className="flex items-center gap-1">
+                    <label className="text-text-sub text-label-xs">LiquidJS Filters</label>
+                    <Tooltip>
+                      <TooltipTrigger className="relative top-0 cursor-pointer">
+                        <RiQuestionLine className="text-text-soft h-3 w-3" />
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="max-w-sm">
+                        <p>
+                          LiquidJS filters are functions that modify the output of your variables. They are applied in
+                          sequence from top to bottom, where each filter takes the output of the previous filter as its
+                          input. You can re-order them by dragging and dropping.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                   <Popover open={isCommandOpen} onOpenChange={setIsCommandOpen}>
                     <PopoverTrigger asChild>
                       <button className="text-text-soft bg-background flex h-[30px] w-full items-center justify-between rounded-md border px-2 text-sm">
