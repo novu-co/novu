@@ -23,7 +23,7 @@ export function TextWidget(props: WidgetProps) {
       control={control}
       name={extractedName}
       render={({ field, fieldState }) => (
-        <FormItem className="w-full py-1 has-[input:focus]:[&>:before]:shadow-none has-[input:focus]:[&>:before]:ring-0">
+        <FormItem className="w-full py-1">
           <FormLabel className="text-xs">{capitalize(label)}</FormLabel>
           <FormControl>
             {isNumberType ? (
