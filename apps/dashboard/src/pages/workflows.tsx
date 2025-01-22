@@ -10,7 +10,7 @@ import { useFetchWorkflows } from '@/hooks/use-fetch-workflows';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { FeatureFlagsKeysEnum, StepTypeEnum } from '@novu/shared';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   RiArrowDownSLine,
@@ -45,7 +45,6 @@ export const WorkflowsPage = () => {
   const track = useTelemetry();
   const navigate = useNavigate();
   const isTemplateStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_TEMPLATE_STORE_ENABLED);
-  const [shouldOpenTemplateModal, setShouldOpenTemplateModal] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams({
     orderDirection: 'desc',
     orderBy: 'updatedAt',
@@ -95,6 +94,9 @@ export const WorkflowsPage = () => {
   } = useFetchWorkflows({
     limit,
     offset,
+    orderBy: searchParams.get('orderBy') as SortableColumn,
+    orderDirection: searchParams.get('orderDirection') as 'asc' | 'desc',
+    query: searchParams.get('query') || '',
   });
 
   const shouldShowStartWith = isTemplateStoreEnabled && workflowsData && workflowsData.totalCount < 5;
