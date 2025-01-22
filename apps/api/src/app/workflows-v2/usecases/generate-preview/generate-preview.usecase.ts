@@ -83,9 +83,10 @@ export class GeneratePreviewUsecase {
       for (const [controlKey, controlValue] of Object.entries(sanitizedValidatedControls || {})) {
         const variables = buildVariables(variableSchema, controlValue, this.logger);
         const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalidVariables);
-
+        const showIfVariables: string[] = this.findShowIfVariables(processedControlValues);
         const validVariableNames = variables.validVariables.map((variable) => variable.name);
-        const variablesExampleResult = keysToObject(validVariableNames);
+        const variablesExampleResult = keysToObject(validVariableNames, showIfVariables);
+
         // multiply array items by 3 for preview example purposes
         const multipliedVariablesExampleResult = multiplyArrayItems(variablesExampleResult, 3);
 
@@ -138,6 +139,33 @@ export class GeneratePreviewUsecase {
         previewPayloadExample: {},
       } as any;
     }
+  }
+
+  /**
+   * Extracts showIf variables from TipTap nodes to transform template variables
+   * (e.g. {{payload.foo}}) into true - for preview purposes
+   */
+  private findShowIfVariables(processedControlValues: Record<string, unknown>) {
+    const showIfVariables: string[] = [];
+    if (typeof processedControlValues === 'string') {
+      try {
+        const parsed = JSON.parse(processedControlValues);
+        const extractShowIfKeys = (node: any) => {
+          if (node?.attrs?.showIfKey) {
+            const key = node.attrs.showIfKey;
+            showIfVariables.push(key);
+          }
+          if (node.content) {
+            node.content.forEach((child: any) => extractShowIfKeys(child));
+          }
+        };
+        extractShowIfKeys(parsed);
+      } catch (e) {
+        // If parsing fails, continue with empty showIfVariables
+      }
+    }
+
+    return showIfVariables;
   }
 
   private sanitizeControlsForPreview(initialControlValues: Record<string, unknown>, stepData: StepResponseDto) {

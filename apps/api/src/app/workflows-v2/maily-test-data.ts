@@ -474,7 +474,7 @@ export function previewPayloadExample() {
         },
       },
       params: {
-        isPayedUser: '{{payload.params.isPayedUser}}',
+        isPayedUser: true,
       },
       hidden: {
         section: '{{payload.hidden.section}}',
