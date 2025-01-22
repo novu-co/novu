@@ -1,3 +1,4 @@
+import { useDataRef } from '@/hooks/use-data-ref';
 import { EditorView } from '@uiw/react-codemirror';
 import { useCallback, useRef, useState } from 'react';
 
@@ -19,6 +20,7 @@ type SelectedVariable = {
 export function useVariables(viewRef: React.RefObject<EditorView>, onChange: (value: string) => void) {
   const [selectedVariable, setSelectedVariable] = useState<SelectedVariable | null>(null);
   const isUpdatingRef = useRef(false);
+  const onChangeRef = useDataRef(onChange);
 
   const handleVariableSelect = useCallback((value: string, from: number, to: number) => {
     if (isUpdatingRef.current) return;
@@ -62,7 +64,7 @@ export function useVariables(viewRef: React.RefObject<EditorView>, onChange: (va
           selection: { anchor: from + newVariableText.length },
         });
 
-        onChange(view.state.doc.toString());
+        onChangeRef.current(view.state.doc.toString());
 
         // Update the selected variable with new bounds
         setSelectedVariable(null);
@@ -70,7 +72,7 @@ export function useVariables(viewRef: React.RefObject<EditorView>, onChange: (va
         isUpdatingRef.current = false;
       }
     },
-    [selectedVariable, onChange, viewRef]
+    [selectedVariable, onChangeRef, viewRef]
   );
 
   return {

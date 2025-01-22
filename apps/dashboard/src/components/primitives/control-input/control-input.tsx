@@ -1,3 +1,4 @@
+import { useCallback, useMemo, useRef } from 'react';
 import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@uiw/react-codemirror';
 
@@ -5,7 +6,6 @@ import { Editor } from '@/components/primitives/editor';
 import { Popover, PopoverTrigger } from '@/components/primitives/popover';
 import { createAutocompleteSource } from '@/utils/liquid-autocomplete';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
-import { useCallback, useMemo, useRef } from 'react';
 import { useVariables } from './hooks/use-variables';
 import { createVariableExtension } from './variable-plugin';
 import { variablePillTheme } from './variable-plugin/variable-theme';
