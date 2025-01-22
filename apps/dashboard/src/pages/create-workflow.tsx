@@ -13,11 +13,10 @@ import { ExternalLink } from '@/components/shared/external-link';
 import { CreateWorkflowForm } from '@/components/workflow-editor/create-workflow-form';
 import { useCreateWorkflow } from '@/hooks/use-create-workflow';
 import { RiArrowRightSLine } from 'react-icons/ri';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export function CreateWorkflowPage() {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const { submit, isLoading: isCreating } = useCreateWorkflow();
 
