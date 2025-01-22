@@ -1,22 +1,23 @@
-import { StepTypeEnum, TimeUnitEnum } from '@novu/shared';
+import { StepTypeEnum } from '@novu/shared';
 import { isEmpty } from 'lodash';
+import { PinoLogger } from '../logging';
+import {
+  ChatControlType,
+  DelayControlType,
+  DigestControlSchemaType,
+  DigestRegularControlType,
+  DigestTimedControlType,
+  EmailControlType,
+  InAppRedirectType,
+  LookBackWindowType,
+  PushControlType,
+  SmsControlType,
+  ThrottleControlType,
+} from '../schemas/control';
 import {
   InAppActionType,
   InAppControlType,
 } from '../schemas/control/in-app-control.schema';
-import {
-  EmailControlType,
-  SmsControlType,
-  InAppRedirectType,
-  PushControlType,
-  DigestTimedControlType,
-  DigestControlSchemaType,
-  DigestRegularControlType,
-  LookBackWindowType,
-  DelayControlType,
-  ChatControlType,
-} from '../schemas/control';
-import { PinoLogger } from '../logging';
 
 // Cast input T_Type to trigger Ajv validation errors - possible undefined
 function sanitizeEmptyInput<T_Type>(
@@ -182,6 +183,18 @@ function sanitizeDigest(controlValues: DigestControlSchemaType) {
   });
 }
 
+function sanitizeThrottle(controlValues: ThrottleControlType) {
+  const mappedValues: ThrottleControlType = {
+    // Cast to trigger Ajv validation errors - possible undefined
+    ...(parseAmount(controlValues.amount) as { amount?: number }),
+    ...(parseAmount(controlValues.timeValue) as { timeValue?: number }),
+    timeUnit: controlValues.timeUnit,
+    skip: controlValues.skip,
+  };
+
+  return filterNullishValues(mappedValues);
+}
+
 function sanitizeDelay(controlValues: DelayControlType) {
   const mappedValues: DelayControlType = {
     // Cast to trigger Ajv validation errors - possible undefined
@@ -275,6 +288,11 @@ export function dashboardSanitizeControlValues(
         break;
       case StepTypeEnum.DELAY:
         normalizedValues = sanitizeDelay(controlValues as DelayControlType);
+        break;
+      case StepTypeEnum.THROTTLE:
+        normalizedValues = sanitizeThrottle(
+          controlValues as ThrottleControlType,
+        );
         break;
       default:
         normalizedValues = filterNullishValues(controlValues);

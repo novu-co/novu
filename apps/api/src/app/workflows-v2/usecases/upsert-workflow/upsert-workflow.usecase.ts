@@ -234,6 +234,7 @@ export class UpsertWorkflowUseCase {
   ): Promise<NotificationStep> {
     const foundPersistedStep = this.getPersistedStepIfFound(persistedWorkflow, step);
     const controlSchemas: ControlSchemas = foundPersistedStep?.template?.controls || stepTypeToControlSchema[step.type];
+    console.log(`controlSchemas!`, controlSchemas, foundPersistedStep);
     const issues: StepIssuesDto = await this.buildStepIssuesUsecase.execute({
       workflowOrigin,
       user,

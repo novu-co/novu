@@ -1,11 +1,9 @@
-import type { BuilderFieldType, BuilderGroupValues, CustomDataType, FilterParts, WorkflowTypeEnum } from '../../types';
-import { JSONSchemaDto } from '../../dto/workflows';
 import type { ContentIssue, StepIssue } from '../../dto/workflows/step.dto';
-import { ControlSchemas, IMessageTemplate } from '../message-template';
+import type { BuilderFieldType, BuilderGroupValues, CustomDataType, FilterParts, WorkflowTypeEnum } from '../../types';
+import { IStepVariant } from '../../types/step';
 import { INotificationGroup } from '../notification-group';
 import { INotificationBridgeTrigger, INotificationTrigger } from '../notification-trigger';
 import { IPreferenceChannels } from '../subscriber-preference';
-import { IWorkflowStepMetadata } from '../step';
 
 export interface INotificationTemplate {
   _id?: string;
@@ -45,39 +43,6 @@ export interface IBlueprint extends INotificationTemplate {
 export class StepIssues {
   body?: Record<string, StepIssue>;
   controls?: Record<string, ContentIssue[]>;
-}
-
-export interface IStepVariant {
-  _id?: string;
-  uuid?: string;
-  stepId?: string;
-  issues?: StepIssues;
-  name?: string;
-  filters?: IMessageFilter[];
-  _templateId?: string;
-  _parentId?: string | null;
-  template?: IMessageTemplate;
-  active?: boolean;
-  shouldStopOnFail?: boolean;
-  replyCallback?: {
-    active: boolean;
-    url: string;
-  };
-  metadata?: IWorkflowStepMetadata;
-  inputs?: {
-    schema: JSONSchemaDto;
-  };
-  /**
-   * @deprecated This property is deprecated and will be removed in future versions.
-   * Use IMessageTemplate.controls
-   */
-  controls?: ControlSchemas;
-  /*
-   * controlVariables exists
-   * only on none production environment in order to provide stateless control variables on fly
-   */
-  controlVariables?: Record<string, unknown>;
-  bridgeUrl?: string;
 }
 
 export interface INotificationTemplateStep extends IStepVariant {

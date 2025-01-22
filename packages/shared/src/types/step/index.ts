@@ -1,3 +1,6 @@
+import { StepIssuesDto } from '../../dto/workflows/step.dto';
+import { IMessageTemplate } from '../../entities/message-template';
+import { IWorkflowStepMetadata } from '../../entities/step';
 import { BuilderFieldType, BuilderGroupValues, FilterParts } from '../builder';
 
 export interface IStepFilter {
@@ -44,14 +47,26 @@ export interface IThrottleMetadata {
 
 export interface IStepVariant {
   _id?: string;
-  uuid: string;
-  name: string;
+  uuid?: string;
+  name?: string;
   active?: boolean;
   filters?: IStepFilter[];
-  metadata?: IEmailMetadata | IPushMetadata | ISmsMetadata | IChatMetadata | IInAppMetadata | IThrottleMetadata;
+  metadata?:
+    | IEmailMetadata
+    | IPushMetadata
+    | ISmsMetadata
+    | IChatMetadata
+    | IInAppMetadata
+    | IThrottleMetadata
+    | IWorkflowStepMetadata;
   shouldStopOnFail?: boolean;
   replyCallback?: {
     active: boolean;
     url: string;
   };
+  _templateId?: string;
+  _parentId?: string | null;
+  stepId?: string;
+  issues?: StepIssuesDto;
+  template?: IMessageTemplate;
 }

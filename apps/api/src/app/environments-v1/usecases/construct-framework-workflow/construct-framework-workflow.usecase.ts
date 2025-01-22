@@ -45,6 +45,8 @@ export class ConstructFrameworkWorkflow {
 
     if (command.controlValues) {
       for (const step of dbWorkflow.steps) {
+        console.log(`step!!${step?.name}`, step);
+
         step.controlVariables = command.controlValues;
       }
     }
