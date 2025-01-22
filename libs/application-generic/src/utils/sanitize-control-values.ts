@@ -187,7 +187,7 @@ function sanitizeThrottle(controlValues: ThrottleControlType) {
   const mappedValues: ThrottleControlType = {
     // Cast to trigger Ajv validation errors - possible undefined
     ...(parseAmount(controlValues.amount) as { amount?: number }),
-    ...(parseAmount(controlValues.timeValue) as { timeValue?: number }),
+    timeValue: Number(controlValues.timeValue),
     timeUnit: controlValues.timeUnit,
     skip: controlValues.skip,
   };
@@ -293,6 +293,7 @@ export function dashboardSanitizeControlValues(
         normalizedValues = sanitizeThrottle(
           controlValues as ThrottleControlType,
         );
+        console.log('normalizedValues', normalizedValues, controlValues);
         break;
       default:
         normalizedValues = filterNullishValues(controlValues);
