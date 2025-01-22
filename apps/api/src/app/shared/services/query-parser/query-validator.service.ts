@@ -138,7 +138,9 @@ export class QueryValidatorService {
       issues.push(this.getFieldReferenceIssue(path));
     }
 
-    if (lowerBound === undefined || lowerBound === null || upperBound === undefined || upperBound === null) {
+    const lowerBoundIsUndefined = lowerBound === undefined || lowerBound === null;
+    const upperBoundIsUndefined = upperBound === undefined || upperBound === null;
+    if (lowerBoundIsUndefined || upperBoundIsUndefined) {
       issues.push(this.getValueIssue(path));
     }
   }
@@ -189,7 +191,8 @@ export class QueryValidatorService {
     }
 
     // Validate array for 'in' operations
-    if (operator === 'in' && !Array.isArray(comparisonValue)) {
+    const invalidComparisonValue = operator === 'in' && !Array.isArray(comparisonValue);
+    if (invalidComparisonValue) {
       issues.push(this.getOperationIssue(operator, path));
     }
   }
@@ -210,26 +213,29 @@ export class QueryValidatorService {
 
     if (isContains) {
       // Validate search value exists
-      if (firstOperand === undefined || firstOperand === '') {
+      const searchValueExists = firstOperand === undefined || firstOperand === '';
+      if (searchValueExists) {
         issues.push(this.getValueIssue(path));
       }
 
       // Validate field reference
-      if (!secondOperand || typeof secondOperand !== 'object' || !('var' in secondOperand)) {
+      const secondOperandInvalid = !secondOperand || typeof secondOperand !== 'object' || !('var' in secondOperand);
+      if (secondOperandInvalid) {
         issues.push(this.getFieldReferenceIssue(path));
       }
     } else {
       // Validate field reference
-      if (!firstOperand || typeof firstOperand !== 'object' || !('var' in firstOperand)) {
+      const firstOperandInvalid = !firstOperand || typeof firstOperand !== 'object' || !('var' in firstOperand);
+      if (firstOperandInvalid) {
         issues.push(this.getFieldReferenceIssue(path));
       }
 
       // Validate the in array is not empty
-      if (
+      const secondOperandEmpty =
         secondOperand === undefined ||
         secondOperand === null ||
-        (Array.isArray(secondOperand) && secondOperand.length === 0)
-      ) {
+        (Array.isArray(secondOperand) && secondOperand.length === 0);
+      if (secondOperandEmpty) {
         issues.push(this.getValueIssue(path));
       }
     }
