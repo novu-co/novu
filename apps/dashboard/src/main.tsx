@@ -6,16 +6,19 @@ import { ConfigureStepTemplate } from '@/components/workflow-editor/steps/config
 import {
   ActivityFeed,
   ApiKeysPage,
+  CreateWorkflowPage,
   IntegrationsListPage,
   OrganizationListPage,
   QuestionnairePage,
   SettingsPage,
   SignInPage,
   SignUpPage,
+  TemplateModal,
   UsecaseSelectPage,
   WelcomePage,
   WorkflowsPage,
 } from '@/pages';
+
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -102,6 +105,20 @@ const router = createBrowserRouter([
               {
                 path: ROUTES.WORKFLOWS,
                 element: <WorkflowsPage />,
+                children: [
+                  {
+                    path: ROUTES.TEMPLATE_STORE,
+                    element: <TemplateModal />,
+                  },
+                  {
+                    path: ROUTES.TEMPLATE_STORE_CREATE_WORKFLOW,
+                    element: <TemplateModal />,
+                  },
+                  {
+                    path: ROUTES.WORKFLOWS_CREATE,
+                    element: <CreateWorkflowPage />,
+                  },
+                ],
               },
               {
                 path: ROUTES.API_KEYS,

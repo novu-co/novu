@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useBlocker } from 'react-router-dom';
 import { formatQuery, RQBJsonLogic, RuleGroupType, RuleType } from 'react-querybuilder';
 import { useForm } from 'react-hook-form';
@@ -106,6 +106,20 @@ export const EditStepConditionsForm = () => {
     update(updateStepInWorkflow(workflow, step.stepId, updateStepData));
     form.reset(values);
   };
+
+  useEffect(() => {
+    if (!step) return;
+
+    const stepConditionIssues = step.issues?.controls?.skip;
+    if (stepConditionIssues && stepConditionIssues.length > 0) {
+      stepConditionIssues.forEach((issue) => {
+        const queryPath = 'query.rules.' + issue.variableName?.split('.').join('.rules.') + '.value';
+        form.setError(queryPath as keyof typeof form.formState.errors, {
+          message: issue.message,
+        });
+      });
+    }
+  }, [form, step]);
 
   return (
     <>

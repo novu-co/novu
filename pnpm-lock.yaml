@@ -2640,9 +2640,6 @@ importers:
 
   libs/application-generic:
     dependencies:
-      '@aws-sdk/client-cloudwatch':
-        specifier: ^3.567.0
-        version: 3.575.0
       '@aws-sdk/client-s3':
         specifier: ^3.567.0
         version: 3.575.0
@@ -4923,10 +4920,6 @@ packages:
 
   '@aws-crypto/util@5.2.0':
     resolution: {integrity: sha512-4RkU9EsI6ZpBve5fseQlGNUWKMa1RLPQ1dnjnQoe07ldfIzcsGb5hC5W0Dm7u423KWzawlrpbjXBrXCEv9zazQ==}
-
-  '@aws-sdk/client-cloudwatch@3.575.0':
-    resolution: {integrity: sha512-BGwMHWm6hQiGPoIBcPJRcfAjiU1D5qx+tkwf9bhnFTEkKNaPupfDTwz9aUmKDHQTOLyPRKuhGNOuuLNhzipPqA==}
-    engines: {node: '>=16.0.0'}
 
   '@aws-sdk/client-cognito-identity@3.504.0':
     resolution: {integrity: sha512-WsQY6CRDC9Y1rKjpsk187EHKES6nLmM9sD6iHAKZFLhi/DiYsy8SIafPFPEvluubYlheeLzgUB8Oxpj6Z69hlA==}
@@ -14679,10 +14672,6 @@ packages:
   '@smithy/md5-js@3.0.0':
     resolution: {integrity: sha512-Tm0vrrVzjlD+6RCQTx7D3Ls58S3FUH1ZCtU1MIh/qQmaOo1H9lMN2as6CikcEwgattnA9SURSdoJJ27xMcEfMA==}
 
-  '@smithy/middleware-compression@3.0.0':
-    resolution: {integrity: sha512-ZOIYISXy3cNyy/yddpmVrpo/MR7wPqPgzwwuR9ZpQrTx0PnzLOzESFTj+Vg0Ev6uh/7XhoCbOnJukrq5y48TAw==}
-    engines: {node: '>=16.0.0'}
-
   '@smithy/middleware-content-length@2.0.3':
     resolution: {integrity: sha512-2FiZ5vu2+iMRL8XWNaREUqqNHjtBubaY9Jb2b3huZ9EbgrXsJfCszK6PPidHTLe+B4T7AISqdF4ZSp9VPXuelg==}
     engines: {node: '>=14.0.0'}
@@ -23519,9 +23508,6 @@ packages:
 
   fflate@0.4.8:
     resolution: {integrity: sha512-FJqqoDBR00Mdj9ppamLa/Y7vxm+PRmNWA67N846RvsoYVMKB4q3y/de5PA7gUmRMYK/8CMz2GDZQmCRN1wBcWA==}
-
-  fflate@0.8.1:
-    resolution: {integrity: sha512-/exOvEuc+/iaUm105QIiOt4LpBdMTWsXxqR0HDF35vx3fmaKzw7354gTilCh5rkzEt8WYyG//ku3h3nRmd7CHQ==}
 
   fflate@0.8.2:
     resolution: {integrity: sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A==}
@@ -36373,54 +36359,6 @@ snapshots:
       '@aws-sdk/types': 3.723.0
       '@smithy/util-utf8': 2.3.0
       tslib: 2.7.0
-
-  '@aws-sdk/client-cloudwatch@3.575.0':
-    dependencies:
-      '@aws-crypto/sha256-browser': 3.0.0
-      '@aws-crypto/sha256-js': 3.0.0
-      '@aws-sdk/client-sso-oidc': 3.575.0
-      '@aws-sdk/client-sts': 3.575.0(@aws-sdk/client-sso-oidc@3.575.0)
-      '@aws-sdk/core': 3.575.0
-      '@aws-sdk/credential-provider-node': 3.575.0(@aws-sdk/client-sso-oidc@3.575.0)(@aws-sdk/client-sts@3.575.0)
-      '@aws-sdk/middleware-host-header': 3.575.0
-      '@aws-sdk/middleware-logger': 3.575.0
-      '@aws-sdk/middleware-recursion-detection': 3.575.0
-      '@aws-sdk/middleware-user-agent': 3.575.0
-      '@aws-sdk/region-config-resolver': 3.575.0
-      '@aws-sdk/types': 3.575.0
-      '@aws-sdk/util-endpoints': 3.575.0
-      '@aws-sdk/util-user-agent-browser': 3.575.0
-      '@aws-sdk/util-user-agent-node': 3.575.0
-      '@smithy/config-resolver': 3.0.0
-      '@smithy/core': 2.0.0
-      '@smithy/fetch-http-handler': 3.0.0
-      '@smithy/hash-node': 3.0.0
-      '@smithy/invalid-dependency': 3.0.0
-      '@smithy/middleware-compression': 3.0.0
-      '@smithy/middleware-content-length': 3.0.0
-      '@smithy/middleware-endpoint': 3.0.0
-      '@smithy/middleware-retry': 3.0.0
-      '@smithy/middleware-serde': 3.0.0
-      '@smithy/middleware-stack': 3.0.0
-      '@smithy/node-config-provider': 3.0.0
-      '@smithy/node-http-handler': 3.0.0
-      '@smithy/protocol-http': 4.0.0
-      '@smithy/smithy-client': 3.0.0
-      '@smithy/types': 3.0.0
-      '@smithy/url-parser': 3.0.0
-      '@smithy/util-base64': 3.0.0
-      '@smithy/util-body-length-browser': 3.0.0
-      '@smithy/util-body-length-node': 3.0.0
-      '@smithy/util-defaults-mode-browser': 3.0.0
-      '@smithy/util-defaults-mode-node': 3.0.0
-      '@smithy/util-endpoints': 2.0.0
-      '@smithy/util-middleware': 3.0.0
-      '@smithy/util-retry': 3.0.0
-      '@smithy/util-utf8': 3.0.0
-      '@smithy/util-waiter': 3.0.0
-      tslib: 2.6.2
-    transitivePeerDependencies:
-      - aws-crt
 
   '@aws-sdk/client-cognito-identity@3.504.0':
     dependencies:
@@ -53654,18 +53592,6 @@ snapshots:
       '@smithy/util-utf8': 3.0.0
       tslib: 2.7.0
 
-  '@smithy/middleware-compression@3.0.0':
-    dependencies:
-      '@smithy/is-array-buffer': 3.0.0
-      '@smithy/node-config-provider': 3.0.0
-      '@smithy/protocol-http': 4.0.0
-      '@smithy/types': 3.0.0
-      '@smithy/util-config-provider': 3.0.0
-      '@smithy/util-middleware': 3.0.0
-      '@smithy/util-utf8': 3.0.0
-      fflate: 0.8.1
-      tslib: 2.7.0
-
   '@smithy/middleware-content-length@2.0.3':
     dependencies:
       '@smithy/protocol-http': 2.0.3
@@ -67334,8 +67260,6 @@ snapshots:
   fetch-retry@5.0.6: {}
 
   fflate@0.4.8: {}
-
-  fflate@0.8.1: {}
 
   fflate@0.8.2: {}
 
