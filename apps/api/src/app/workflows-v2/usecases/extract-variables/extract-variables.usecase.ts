@@ -55,7 +55,7 @@ export class ExtractVariables {
     const allVariables: string[] = [];
 
     for (const controlValue of controlValues) {
-      const processedControlValue = await this.extractVariables(controlValue);
+      const processedControlValue = await this.processControlValuesToLiquid(controlValue);
       const controlValuesString = flattenObjectValues(processedControlValue).join(' ');
       const templateVariables = extractLiquidTemplateVariables(controlValuesString);
       allVariables.push(...templateVariables.validVariables.map((variable) => variable.name));
@@ -65,7 +65,7 @@ export class ExtractVariables {
   }
 
   @Instrument()
-  private async extractVariables(controlValue: Record<string, unknown>): Promise<Record<string, unknown>> {
+  private async processControlValuesToLiquid(controlValue: Record<string, unknown>): Promise<Record<string, unknown>> {
     const processedValue: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(controlValue)) {
