@@ -8,7 +8,7 @@ import { buildVariables } from '../../util/build-variables';
 import { ExtractVariablesCommand } from './extract-variables.command';
 
 @Injectable()
-export class BuildPayloadSchema {
+export class ExtractVariables {
   constructor(private readonly controlValuesRepository: ControlValuesRepository) {}
 
   @InstrumentUsecase()
