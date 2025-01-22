@@ -279,7 +279,7 @@ export class SendMessagePush extends SendMessageBase {
         })
       );
     } catch (error) {
-      Logger.error(error, 'Error creating execution details error');
+      Logger.log(error, 'Error creating execution details error');
     }
   }
 
