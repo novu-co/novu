@@ -172,7 +172,6 @@ function extractProps(template: any): { valid: boolean; props: string[]; error?:
   const validProps: string[] = [];
 
   for (const prop of initial.postfix[0].props) {
-    if (prop.constructor.name !== 'IdentifierToken') break;
     validProps.push(prop.content);
   }
 

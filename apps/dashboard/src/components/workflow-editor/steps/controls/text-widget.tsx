@@ -1,13 +1,10 @@
-import { Editor } from '@/components/primitives/editor';
+import { ControlInput } from '@/components/primitives/control-input';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
-import { Input } from '@/components/primitives/input';
+import { Input, InputRoot, InputWrapper } from '@/components/primitives/input';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
-import { completions } from '@/utils/liquid-autocomplete';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
-import { autocompletion } from '@codemirror/autocomplete';
 import { type WidgetProps } from '@rjsf/utils';
-import { EditorView } from '@uiw/react-codemirror';
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { getFieldName } from './template-utils';
@@ -20,10 +17,6 @@ export function TextWidget(props: WidgetProps) {
 
   const extractedName = useMemo(() => getFieldName(id), [id]);
   const isNumberType = useMemo(() => props.schema.type === 'number', [props.schema.type]);
-  const extensions = useMemo(
-    () => [autocompletion({ override: [completions(variables)] }), EditorView.lineWrapping],
-    [variables]
-  );
 
   return (
     <FormField
@@ -40,12 +33,12 @@ export function TextWidget(props: WidgetProps) {
                 hasError={!!fieldState.error}
                 onChange={(e) => {
                   if (e.target.value === '') {
-                    field.onChange(undefined);
+                    field.onChange('');
                     return;
                   }
                   const val = Number(e.target.value);
                   const isNaN = Number.isNaN(val);
-                  const finalValue = isNaN ? undefined : val;
+                  const finalValue = isNaN ? '' : val;
                   field.onChange(finalValue);
                 }}
                 required={required}
@@ -54,15 +47,19 @@ export function TextWidget(props: WidgetProps) {
                 placeholder={capitalize(label)}
               />
             ) : (
-              <Editor
-                indentWithTab={false}
-                fontFamily="inherit"
-                placeholder={capitalize(label)}
-                id={label}
-                extensions={extensions}
-                readOnly={readonly || disabled}
-                {...field}
-              />
+              <InputRoot hasError={!!fieldState.error}>
+                <InputWrapper className="flex h-full items-center p-2 py-1">
+                  <ControlInput
+                    indentWithTab={false}
+                    placeholder={capitalize(label)}
+                    id={label}
+                    value={field.value}
+                    onChange={field.onChange}
+                    variables={variables}
+                    size="default"
+                  />
+                </InputWrapper>
+              </InputRoot>
             )}
           </FormControl>
           <FormMessage />

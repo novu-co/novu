@@ -19,6 +19,8 @@ import {
   RiPencilRuler2Fill,
 } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
+import { parseJsonLogic } from 'react-querybuilder/parseJsonLogic';
+import { RQBJsonLogic } from 'react-querybuilder';
 
 import { ConfirmationModal } from '@/components/confirmation-modal';
 import { PageMeta } from '@/components/page-meta';
@@ -201,6 +203,14 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
 
   const value = useMemo(() => ({ saveForm }), [saveForm]);
 
+  const conditionsCount = useMemo(() => {
+    if (!step.controls.values.skip) return 0;
+
+    const query = parseJsonLogic(step.controls.values.skip as RQBJsonLogic);
+
+    return query.rules.length;
+  }, [step]);
+
   return (
     <>
       <PageMeta title={`Configure ${step.name}`} />
@@ -212,7 +222,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
           exit={{ opacity: 0.1 }}
           transition={{ duration: 0.1 }}
         >
-          <SidebarHeader className="flex items-center gap-2.5 text-sm font-medium">
+          <SidebarHeader className="flex items-center gap-2.5 border-b text-sm font-medium">
             <Link
               to={buildRoute(ROUTES.EDIT_WORKFLOW, {
                 environmentSlug: environment.slug!,
@@ -237,9 +247,6 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
               </CompactButton>
             </Link>
           </SidebarHeader>
-
-          <Separator />
-
           <Form {...form}>
             <form onBlur={onBlur}>
               <SaveFormContext.Provider value={value}>
@@ -335,9 +342,9 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                     className="flex w-full justify-start gap-1.5 text-xs font-medium"
                   >
                     <RiGuideFill className="h-4 w-4 text-neutral-600" />
-                    Step Conditions
+                    Skip Conditions
                     <span className="ml-auto flex items-center gap-0.5">
-                      <span>0</span>
+                      <span>{conditionsCount}</span>
                       <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
                     </span>
                   </Button>

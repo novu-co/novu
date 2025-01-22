@@ -175,7 +175,7 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
         exit={{ opacity: 0.1 }}
         transition={{ duration: 0.1 }}
       >
-        <SidebarHeader className="items-center text-sm font-medium">
+        <SidebarHeader className="items-center border-b text-sm font-medium">
           <Link to="../" className="flex items-center">
             <CompactButton icon={RiArrowLeftSLine} variant="ghost" size="md" type="button">
               <span className="sr-only">Back</span>
@@ -189,7 +189,6 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
             </CompactButton>
           </Link>
         </SidebarHeader>
-        <Separator />
         <SidebarContent size="md">
           <p className="text-xs text-neutral-400">
             Set default channel preferences for subscribers and specify which channels they can customize.

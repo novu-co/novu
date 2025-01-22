@@ -7,17 +7,17 @@ import { parsePayloadSchema } from '../../shared/parse-payload-schema';
 import { emptyJsonSchema } from '../../util/jsonToSchema';
 import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
 import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
-import { BuildAvailableVariableSchemaCommand } from './build-available-variable-schema.command';
+import { BuildVariableSchemaCommand } from './build-available-variable-schema.command';
 
 @Injectable()
-export class BuildAvailableVariableSchemaUsecase {
+export class BuildVariableSchemaUsecase {
   constructor(private readonly buildPayloadSchema: BuildPayloadSchema) {}
 
-  async execute(command: BuildAvailableVariableSchemaCommand): Promise<JSONSchemaDto> {
-    const { workflow } = command;
+  async execute(command: BuildVariableSchemaCommand): Promise<JSONSchemaDto> {
+    const { workflow, stepInternalId } = command;
     const previousSteps = workflow?.steps.slice(
       0,
-      workflow?.steps.findIndex((stepItem) => stepItem._id === command.stepInternalId)
+      workflow?.steps.findIndex((stepItem) => stepItem._id === stepInternalId)
     );
 
     return {
@@ -60,7 +60,7 @@ export class BuildAvailableVariableSchemaUsecase {
   @Instrument()
   private async resolvePayloadSchema(
     workflow: NotificationTemplateEntity | undefined,
-    command: BuildAvailableVariableSchemaCommand
+    command: BuildVariableSchemaCommand
   ): Promise<JSONSchemaDto> {
     if (workflow && workflow.steps.length === 0) {
       return {

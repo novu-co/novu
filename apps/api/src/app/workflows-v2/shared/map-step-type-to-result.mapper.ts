@@ -32,9 +32,13 @@ function buildDigestResult(payloadSchema?: JSONSchema) {
             time: {
               type: 'string',
             },
-            payload: payloadSchema || {
-              type: 'object',
-            },
+            payload:
+              payloadSchema && typeof payloadSchema === 'object'
+                ? { ...payloadSchema, additionalProperties: true }
+                : {
+                    type: 'object',
+                    additionalProperties: true,
+                  },
           },
           required: ['id', 'time', 'payload'],
           additionalProperties: false,

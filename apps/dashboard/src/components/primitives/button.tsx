@@ -59,11 +59,11 @@ export const buttonVariants = tv({
         icon: '',
       },
       xs: {
-        root: 'h-8 gap-2.5 rounded-lg px-2 text-label-xs',
+        root: 'h-8 gap-2.5 rounded-lg px-1.5 text-label-xs',
         icon: 'size-4',
       },
       '2xs': {
-        root: 'h-7 gap-2.5 rounded-lg px-2 text-label-xs',
+        root: 'h-7 gap-2.5 rounded-lg px-1.5 text-label-xs',
         icon: 'size-4',
       },
     },
@@ -352,21 +352,24 @@ ButtonRoot.displayName = BUTTON_ROOT_NAME;
 export type ButtonProps = React.ComponentPropsWithoutRef<typeof ButtonRoot> & {
   leadingIcon?: IconType;
   trailingIcon?: IconType;
+  asChild?: boolean;
 };
 
-const Button = ({ leadingIcon: LeadingIcon, trailingIcon: TrailingIcon, children, ...rest }: ButtonProps) => {
-  const isArrowRight = TrailingIcon === RiArrowRightSLine;
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ leadingIcon: LeadingIcon, trailingIcon: TrailingIcon, children, asChild, ...rest }, ref) => {
+    const isArrowRight = TrailingIcon === RiArrowRightSLine;
 
-  return (
-    <ButtonRoot {...rest}>
-      {LeadingIcon && <ButtonIcon as={LeadingIcon} />}
-      <Slottable>{children}</Slottable>
-      {TrailingIcon && (
-        <ButtonIcon className={isArrowRight ? 'arrow-right-hover-animation' : undefined} as={TrailingIcon} />
-      )}
-    </ButtonRoot>
-  );
-};
+    return (
+      <ButtonRoot ref={ref} asChild={asChild} {...rest}>
+        {LeadingIcon && <ButtonIcon as={LeadingIcon} />}
+        <Slottable>{children}</Slottable>
+        {TrailingIcon && (
+          <ButtonIcon className={isArrowRight ? 'arrow-right-hover-animation' : undefined} as={TrailingIcon} />
+        )}
+      </ButtonRoot>
+    );
+  }
+);
 
 Button.displayName = 'Button';
 

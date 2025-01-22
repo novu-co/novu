@@ -2,11 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { ControlValuesRepository } from '@novu/dal';
 import { ControlValuesLevelEnum, JSONSchemaDto } from '@novu/shared';
 import { Instrument, InstrumentUsecase } from '@novu/application-generic';
-import { flattenObjectValues, keysToObject } from '../../util/utils';
-import { extractLiquidTemplateVariables } from '../../util/template-parser/liquid-parser';
+import { keysToObject } from '../../util/utils';
 import { BuildPayloadSchemaCommand } from './build-payload-schema.command';
-import { transformMailyContentToLiquid } from '../generate-preview/transform-maily-content-to-liquid';
-import { isStringTipTapNode } from '../../util/tip-tap.util';
+import { buildVariables } from '../../util/build-variables';
 
 @Injectable()
 export class BuildPayloadSchema {
@@ -41,40 +39,29 @@ export class BuildPayloadSchema {
       ).map((item) => item.controls);
     }
 
-    return controlValues.flat();
+    // get just the actual control "values", not entire objects
+    return controlValues.flat().flatMap((obj) => Object.values(obj));
   }
 
+  /**
+   * @example
+   * controlValues = [ "John {{name}}", "Address {{address}} {{address}}", "nothing", 123, true ]
+   * returns = [ "name", "address" ]
+   */
   @Instrument()
-  private async extractAllVariables(controlValues: Record<string, unknown>[]): Promise<string[]> {
+  private async extractAllVariables(controlValues: unknown[]): Promise<string[]> {
     const allVariables: string[] = [];
 
     for (const controlValue of controlValues) {
-      const processedControlValue = await this.extractVariables(controlValue);
-      const controlValuesString = flattenObjectValues(processedControlValue).join(' ');
-      const templateVariables = extractLiquidTemplateVariables(controlValuesString);
+      const templateVariables = buildVariables(undefined, controlValue);
       allVariables.push(...templateVariables.validVariables.map((variable) => variable.name));
     }
 
     return [...new Set(allVariables)];
   }
 
-  @Instrument()
-  private async extractVariables(controlValue: Record<string, unknown>): Promise<Record<string, unknown>> {
-    const processedValue: Record<string, unknown> = {};
-
-    for (const [key, value] of Object.entries(controlValue)) {
-      if (isStringTipTapNode(value)) {
-        processedValue[key] = transformMailyContentToLiquid(JSON.parse(value));
-      } else {
-        processedValue[key] = value;
-      }
-    }
-
-    return processedValue;
-  }
-
   private async buildVariablesSchema(variables: string[]) {
-    const { payload } = keysToObject(variables, { fn: (val) => `{{${val}}}` });
+    const { payload } = keysToObject(variables);
 
     const schema: JSONSchemaDto = {
       type: 'object',

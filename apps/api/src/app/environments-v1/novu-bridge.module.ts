@@ -9,14 +9,13 @@ import { ConstructFrameworkWorkflow } from './usecases/construct-framework-workf
 import {
   ChatOutputRendererUsecase,
   EmailOutputRendererUsecase,
-  ExpandEmailEditorSchemaUsecase,
-  HydrateEmailSchemaUseCase,
   InAppOutputRendererUsecase,
   PushOutputRendererUsecase,
   SmsOutputRendererUsecase,
 } from './usecases/output-renderers';
 import { DelayOutputRendererUsecase } from './usecases/output-renderers/delay-output-renderer.usecase';
 import { DigestOutputRendererUsecase } from './usecases/output-renderers/digest-output-renderer.usecase';
+import { WrapMailyInLiquidUseCase } from './usecases/output-renderers/maily-to-liquid/wrap-maily-in-liquid.usecase';
 import { ThrottleOutputRendererUsecase } from './usecases/output-renderers/throttle-output-renderer.usecase';
 
 @Module({
@@ -37,8 +36,7 @@ import { ThrottleOutputRendererUsecase } from './usecases/output-renderers/throt
     ChatOutputRendererUsecase,
     PushOutputRendererUsecase,
     EmailOutputRendererUsecase,
-    ExpandEmailEditorSchemaUsecase,
-    HydrateEmailSchemaUseCase,
+    WrapMailyInLiquidUseCase,
     DelayOutputRendererUsecase,
     DigestOutputRendererUsecase,
     ThrottleOutputRendererUsecase,
