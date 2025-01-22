@@ -99,13 +99,15 @@ export const WorkflowsPage = () => {
     query: searchParams.get('query') || '',
   });
 
-  const shouldShowStartWith = isTemplateStoreEnabled && workflowsData && workflowsData.totalCount < 5;
+  const hasActiveFilters = searchParams.get('query') !== null;
+
+  const shouldShowStartWith =
+    isTemplateStoreEnabled && workflowsData && workflowsData.totalCount < 5 && !hasActiveFilters;
 
   useEffect(() => {
     track(TelemetryEvent.WORKFLOWS_PAGE_VISIT);
   }, [track]);
 
-  const hasActiveFilters = searchParams.get('query') !== null;
   const handleTemplateClick = (template: WorkflowTemplate) => {
     track(TelemetryEvent.TEMPLATE_WORKFLOW_CLICK);
 
