@@ -362,9 +362,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <ButtonRoot ref={ref} asChild={asChild} {...rest}>
         {LeadingIcon && <ButtonIcon as={LeadingIcon} />}
-        <div className="px-1">
-          <Slottable>{children}</Slottable>
-        </div>
+        <Slottable>{children}</Slottable>
         {TrailingIcon && (
           <ButtonIcon className={isArrowRight ? 'arrow-right-hover-animation' : undefined} as={TrailingIcon} />
         )}
