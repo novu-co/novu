@@ -1,4 +1,10 @@
-import { CreateWorkflowDto, DirectionEnum, WorkflowCreationSourceEnum, WorkflowResponseDto } from '@novu/shared';
+import {
+  CreateWorkflowDto,
+  DirectionEnum,
+  WorkflowCreationSourceEnum,
+  WorkflowResponseDto,
+  WorkflowStatusEnum,
+} from '@novu/shared';
 import { UserSession } from '@novu/testing';
 import { expect } from 'chai';
 
@@ -98,7 +104,7 @@ describe('List Workflows - /workflows (GET) #novu-v2', function () {
         _id: createdWorkflow._id,
         name: workflowName,
         workflowId: createdWorkflow.workflowId,
-        active: true,
+        status: WorkflowStatusEnum.ACTIVE,
       });
       expect(returnedWorkflow.steps).to.be.an('array');
       expect(returnedWorkflow.createdAt).to.be.a('string');
