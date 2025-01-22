@@ -35,11 +35,7 @@ export class CreateEnvironment {
     if (!command.system) {
       const { name } = command;
 
-      if (
-        PROTECTED_ENVIRONMENTS.includes(
-          (normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1).toLowerCase()) as EnvironmentEnum
-        )
-      ) {
+      if (PROTECTED_ENVIRONMENTS?.map((env) => env.toLowerCase()).includes(normalizedName.toLowerCase())) {
         throw new UnprocessableEntityException('Environment name cannot be Development or Production');
       }
 
