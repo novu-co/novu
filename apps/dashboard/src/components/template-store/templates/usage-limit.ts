@@ -48,7 +48,7 @@ export const usageLimitTemplate: WorkflowTemplate = {
         },
       },
     ],
-    tags: ['Operational'],
+    tags: [],
     active: true,
     __source: WorkflowCreationSourceEnum.TEMPLATE_STORE,
   },
