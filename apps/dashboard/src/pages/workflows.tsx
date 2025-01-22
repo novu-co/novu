@@ -263,7 +263,7 @@ export const WorkflowsPage = () => {
           <div className="px-2.5 py-2">
             {shouldShowStartWith && <div className="text-label-xs text-text-soft mb-2">Your Workflows</div>}
             <WorkflowList
-              hasActiveFilters={hasActiveFilters}
+              hasActiveFilters={!!hasActiveFilters}
               onClearFilters={clearFilters}
               orderBy={searchParams.get('orderBy') as SortableColumn}
               orderDirection={searchParams.get('orderDirection') as 'asc' | 'desc'}
