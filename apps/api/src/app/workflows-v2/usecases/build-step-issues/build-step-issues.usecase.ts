@@ -1,3 +1,9 @@
+import merge from 'lodash/merge';
+import capitalize from 'lodash/capitalize';
+import isEmpty from 'lodash/isEmpty';
+import Ajv, { ErrorObject } from 'ajv';
+import addFormats from 'ajv-formats';
+import { AdditionalOperation, RulesLogic } from 'json-logic-js';
 import { Injectable } from '@nestjs/common';
 import { ControlValuesRepository } from '@novu/dal';
 import {
@@ -16,16 +22,16 @@ import {
   TierRestrictionsValidateCommand,
   dashboardSanitizeControlValues,
   PinoLogger,
+  Instrument,
 } from '@novu/application-generic';
 
-import merge from 'lodash/merge';
-import capitalize from 'lodash/capitalize';
-import isEmpty from 'lodash/isEmpty';
-import Ajv, { ErrorObject } from 'ajv';
-import addFormats from 'ajv-formats';
 import { buildVariables } from '../../util/build-variables';
 import { BuildVariableSchemaCommand, BuildVariableSchemaUsecase } from '../build-variable-schema';
 import { BuildStepIssuesCommand } from './build-step-issues.command';
+import {
+  QueryIssueTypeEnum,
+  QueryValidatorService,
+} from '../../../shared/services/query-parser/query-validator.service';
 
 @Injectable()
 export class BuildStepIssuesUsecase {
@@ -73,18 +79,29 @@ export class BuildStepIssuesUsecase {
       )?.controls;
     }
 
-    const sanitizedControlValues =
-      newControlValues && workflowOrigin === WorkflowOriginEnum.NOVU_CLOUD
-        ? dashboardSanitizeControlValues(this.logger, newControlValues, stepTypeDto) || {}
-        : this.frameworkSanitizeEmptyStringsToNull(newControlValues) || {};
-
+    const sanitizedControlValues = this.sanitizeControlValues(newControlValues, workflowOrigin, stepTypeDto);
     const schemaIssues = this.processControlValuesBySchema(controlSchema, sanitizedControlValues || {});
     const liquidIssues = this.processControlValuesByLiquid(variableSchema, newControlValues || {});
     const customIssues = await this.processControlValuesByCustomeRules(user, stepTypeDto, sanitizedControlValues || {});
+    const skipLogicIssues = sanitizedControlValues?.skip
+      ? this.validateSkipField(sanitizedControlValues.skip as RulesLogic<AdditionalOperation>)
+      : {};
 
-    return merge(schemaIssues, liquidIssues, customIssues);
+    return merge(schemaIssues, liquidIssues, customIssues, skipLogicIssues);
   }
 
+  @Instrument()
+  private sanitizeControlValues(
+    newControlValues: Record<string, unknown> | undefined,
+    workflowOrigin: WorkflowOriginEnum,
+    stepTypeDto: StepTypeEnum
+  ) {
+    return newControlValues && workflowOrigin === WorkflowOriginEnum.NOVU_CLOUD
+      ? dashboardSanitizeControlValues(this.logger, newControlValues, stepTypeDto) || {}
+      : this.frameworkSanitizeEmptyStringsToNull(newControlValues) || {};
+  }
+
+  @Instrument()
   private processControlValuesByLiquid(
     variableSchema: JSONSchemaDto | undefined,
     controlValues: Record<string, unknown> | null
@@ -125,6 +142,7 @@ export class BuildStepIssuesUsecase {
     return issues;
   }
 
+  @Instrument()
   private processControlValuesBySchema(
     controlSchema: JSONSchemaDto | undefined,
     controlValues: Record<string, unknown> | null
@@ -167,6 +185,7 @@ export class BuildStepIssuesUsecase {
     return issues;
   }
 
+  @Instrument()
   private async processControlValuesByCustomeRules(
     user: UserSessionData,
     stepType: StepTypeEnum,
@@ -256,5 +275,28 @@ export class BuildStepIssuesUsecase {
     }
 
     return error.message || 'Invalid value';
+  }
+
+  @Instrument()
+  private validateSkipField(skipLogic: RulesLogic<AdditionalOperation>): StepIssuesDto {
+    const issues: StepIssuesDto = {};
+
+    const queryValidatorService = new QueryValidatorService();
+    const skipRulesIssues = queryValidatorService.validateQueryRules(skipLogic);
+
+    if (skipRulesIssues.length > 0) {
+      issues.controls = {
+        skip: skipRulesIssues.map((issue) => ({
+          issueType:
+            issue.type === QueryIssueTypeEnum.MISSING_VALUE
+              ? StepContentIssueEnum.MISSING_VALUE
+              : StepContentIssueEnum.ILLEGAL_VARIABLE_IN_CONTROL_VALUE,
+          message: issue.message,
+          variableName: issue.path.join('.'),
+        })),
+      };
+    }
+
+    return issues.controls?.skip.length ? issues : {};
   }
 }
