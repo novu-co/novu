@@ -12,7 +12,6 @@ import {
   PreviewPayload,
   StepResponseDto,
   WorkflowOriginEnum,
-  TipTapNode,
   StepTypeEnum,
 } from '@novu/shared';
 import {
@@ -25,7 +24,7 @@ import {
   dashboardSanitizeControlValues,
 } from '@novu/application-generic';
 import { channelStepSchemas, actionStepSchemas } from '@novu/framework/internal';
-
+import { JSONContent as MailyJSONContent } from '@maily-to/render';
 import { PreviewStep, PreviewStepCommand } from '../../../bridge/usecases/preview-step';
 import { FrameworkPreviousStepsOutputState } from '../../../bridge/usecases/preview-step/preview-step.command';
 import { BuildStepDataUsecase } from '../build-step-data';
@@ -33,9 +32,9 @@ import { GeneratePreviewCommand } from './generate-preview.command';
 import { BuildPayloadSchemaCommand } from '../build-payload-schema/build-payload-schema.command';
 import { BuildPayloadSchema } from '../build-payload-schema/build-payload-schema.usecase';
 import { Variable } from '../../util/template-parser/liquid-parser';
-import { isObjectTipTapNode } from '../../util/tip-tap.util';
 import { buildVariables } from '../../util/build-variables';
 import { keysToObject, mergeCommonObjectKeys, multiplyArrayItems } from '../../util/utils';
+import { isObjectMailyJSONContent } from '../../../environments-v1/usecases/output-renderers/maily-to-liquid/wrap-maily-in-liquid.command';
 
 const LOG_CONTEXT = 'GeneratePreviewUsecase';
 
@@ -84,9 +83,10 @@ export class GeneratePreviewUsecase {
       for (const [controlKey, controlValue] of Object.entries(sanitizedValidatedControls || {})) {
         const variables = buildVariables(variableSchema, controlValue, this.logger);
         const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalidVariables);
-
+        const showIfVariables: string[] = this.findShowIfVariables(processedControlValues);
         const validVariableNames = variables.validVariables.map((variable) => variable.name);
-        const variablesExampleResult = keysToObject(validVariableNames);
+        const variablesExampleResult = keysToObject(validVariableNames, showIfVariables);
+
         // multiply array items by 3 for preview example purposes
         const multipliedVariablesExampleResult = multiplyArrayItems(variablesExampleResult, 3);
 
@@ -94,7 +94,7 @@ export class GeneratePreviewUsecase {
           variablesExample: _.merge(previewTemplateData.variablesExample, multipliedVariablesExampleResult),
           controlValues: {
             ...previewTemplateData.controlValues,
-            [controlKey]: isObjectTipTapNode(processedControlValues)
+            [controlKey]: isObjectMailyJSONContent(processedControlValues)
               ? JSON.stringify(processedControlValues)
               : processedControlValues,
           },
@@ -139,6 +139,33 @@ export class GeneratePreviewUsecase {
         previewPayloadExample: {},
       } as any;
     }
+  }
+
+  /**
+   * Extracts showIf variables from TipTap nodes to transform template variables
+   * (e.g. {{payload.foo}}) into true - for preview purposes
+   */
+  private findShowIfVariables(processedControlValues: Record<string, unknown>) {
+    const showIfVariables: string[] = [];
+    if (typeof processedControlValues === 'string') {
+      try {
+        const parsed = JSON.parse(processedControlValues);
+        const extractShowIfKeys = (node: any) => {
+          if (node?.attrs?.showIfKey) {
+            const key = node.attrs.showIfKey;
+            showIfVariables.push(key);
+          }
+          if (node.content) {
+            node.content.forEach((child: any) => extractShowIfKeys(child));
+          }
+        };
+        extractShowIfKeys(parsed);
+      } catch (e) {
+        // If parsing fails, continue with empty showIfVariables
+      }
+    }
+
+    return showIfVariables;
   }
 
   private sanitizeControlsForPreview(initialControlValues: Record<string, unknown>, stepData: StepResponseDto) {
@@ -403,7 +430,7 @@ const EMPTY_STRING = '';
 const WHITESPACE = ' ';
 const DEFAULT_URL_TARGET = '_blank';
 const DEFAULT_URL_PATH = 'https://www.redirect-example.com';
-const DEFAULT_TIP_TAP_EMPTY_PREVIEW: TipTapNode = {
+const DEFAULT_TIP_TAP_EMPTY_PREVIEW: MailyJSONContent = {
   type: 'doc',
   content: [
     {

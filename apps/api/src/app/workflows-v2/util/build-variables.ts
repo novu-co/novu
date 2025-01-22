@@ -1,10 +1,11 @@
 import _ from 'lodash';
 
-import { MAILY_ITERABLE_MARK, PinoLogger } from '@novu/application-generic';
+import { PinoLogger } from '@novu/application-generic';
 
 import { Variable, extractLiquidTemplateVariables, TemplateVariables } from './template-parser/liquid-parser';
-import { isStringTipTapNode } from './tip-tap.util';
-import { HydrateEmailSchemaUseCase } from '../../environments-v1/usecases/output-renderers/hydrate-email-schema.usecase';
+import { WrapMailyInLiquidUseCase } from '../../environments-v1/usecases/output-renderers/maily-to-liquid/wrap-maily-in-liquid.usecase';
+import { MAILY_ITERABLE_MARK } from '../../environments-v1/usecases/output-renderers/maily-to-liquid/maily.types';
+import { isStringifiedMailyJSONContent } from '../../environments-v1/usecases/output-renderers/maily-to-liquid/wrap-maily-in-liquid.command';
 
 export function buildVariables(
   variableSchema: Record<string, unknown> | undefined,
@@ -13,9 +14,11 @@ export function buildVariables(
 ): TemplateVariables {
   let variableControlValue = controlValue;
 
-  if (isStringTipTapNode(variableControlValue)) {
+  if (isStringifiedMailyJSONContent(variableControlValue)) {
     try {
-      variableControlValue = new HydrateEmailSchemaUseCase().execute({ emailEditor: variableControlValue });
+      variableControlValue = new WrapMailyInLiquidUseCase().execute({
+        emailEditor: variableControlValue,
+      });
     } catch (error) {
       logger?.error(
         {
@@ -29,6 +32,11 @@ export function buildVariables(
   }
 
   const { validVariables, invalidVariables } = extractLiquidTemplateVariables(JSON.stringify(variableControlValue));
+
+  // don't compare against schema if it's not provided
+  if (!variableSchema) {
+    return { validVariables, invalidVariables };
+  }
 
   const { validVariables: validSchemaVariables, invalidVariables: invalidSchemaVariables } = identifyUnknownVariables(
     variableSchema || {},

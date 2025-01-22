@@ -18,6 +18,7 @@ import {
   WelcomePage,
   WorkflowsPage,
 } from '@/pages';
+
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -27,6 +28,7 @@ import { ChannelPreferences } from './components/workflow-editor/channel-prefere
 import { FeatureFlagsProvider } from './context/feature-flags-provider';
 import './index.css';
 import { EditWorkflowPage } from './pages/edit-workflow';
+import { EnvironmentsPage } from './pages/environments';
 import { InboxEmbedPage } from './pages/inbox-embed-page';
 import { InboxEmbedSuccessPage } from './pages/inbox-embed-success-page';
 import { InboxUsecasePage } from './pages/inbox-usecase-page';
@@ -121,6 +123,10 @@ const router = createBrowserRouter([
               {
                 path: ROUTES.API_KEYS,
                 element: <ApiKeysPage />,
+              },
+              {
+                path: ROUTES.ENVIRONMENTS,
+                element: <EnvironmentsPage />,
               },
               {
                 path: ROUTES.ACTIVITY_FEED,
