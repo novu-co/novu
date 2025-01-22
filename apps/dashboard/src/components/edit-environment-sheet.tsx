@@ -27,6 +27,7 @@ import { useForm } from 'react-hook-form';
 import { RiArrowRightSLine } from 'react-icons/ri';
 import { z } from 'zod';
 import { ColorPicker } from './primitives/color-picker';
+import { showErrorToast, showSuccessToast } from './primitives/sonner-helpers';
 
 const editEnvironmentSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -64,13 +65,19 @@ export const EditEnvironmentSheet = ({ environment, isOpen, onOpenChange }: Edit
   const onSubmit = async (values: EditEnvironmentFormData) => {
     if (!environment) return;
 
-    await updateEnvironment({
-      environment,
-      name: values.name,
-      color: values.color,
-    });
-    onOpenChange(false);
-    form.reset();
+    try {
+      await updateEnvironment({
+        environment,
+        name: values.name,
+        color: values.color,
+      });
+      onOpenChange(false);
+      form.reset();
+      showSuccessToast('Environment updated successfully');
+    } catch (e: any) {
+      const message = e?.response?.data?.message || e?.message || 'Failed to update environment';
+      showErrorToast(Array.isArray(message) ? message[0] : message);
+    }
   };
 
   return (
