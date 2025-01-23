@@ -44,7 +44,7 @@ const VariablesList = React.forwardRef<HTMLUListElement, VariablesListProps>(
           {options.map((option, index) => (
             <li
               className={cn(
-                'hover:bg-accent text-paragraph-xs font-code text-foreground-950 flex cursor-pointer items-center gap-1 rounded-sm p-1',
+                'text-paragraph-xs font-code text-foreground-950 flex cursor-pointer items-center gap-1 rounded-sm p-1 hover:bg-neutral-100',
                 hoveredOptionIndex === index ? 'bg-neutral-100' : ''
               )}
               key={option.value}
@@ -187,7 +187,8 @@ export const VariableSelect = ({
       e.preventDefault();
     } else if (e.key === 'Enter') {
       if (hoveredOptionIndex !== -1) {
-        onSelect(options[hoveredOptionIndex].value ?? '');
+        e.preventDefault();
+        onSelect(filteredOptions[hoveredOptionIndex].value ?? '');
         setHoveredOptionIndex(-1);
       }
     }

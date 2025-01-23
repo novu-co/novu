@@ -7,6 +7,7 @@ import { InstrumentUsecase } from '@novu/application-generic';
 import { FullPayloadForRender, RenderCommand } from './render-command';
 import { WrapMailyInLiquidUseCase } from './maily-to-liquid/wrap-maily-in-liquid.usecase';
 import { MAILY_ITERABLE_MARK, MailyAttrsEnum, MailyContentTypeEnum } from './maily-to-liquid/maily.types';
+import { parseLiquid } from '../../../shared/helpers/liquid';
 
 export class EmailOutputRendererCommand extends RenderCommand {}
 
@@ -72,7 +73,7 @@ export class EmailOutputRendererUsecase {
     mailyContent: MailyJSONContent,
     variables: FullPayloadForRender
   ): Promise<MailyJSONContent> {
-    const parsedString = await this.parseLiquid(JSON.stringify(mailyContent), variables);
+    const parsedString = await parseLiquid(JSON.stringify(mailyContent), variables);
 
     return JSON.parse(parsedString);
   }
@@ -145,7 +146,7 @@ export class EmailOutputRendererUsecase {
     node: MailyJSONContent & { attrs: { [MailyAttrsEnum.SHOW_IF_KEY]: string } }
   ): Promise<boolean> {
     const { [MailyAttrsEnum.SHOW_IF_KEY]: showIfKey } = node.attrs;
-    const parsedShowIfValue = await this.parseLiquid(showIfKey, variables);
+    const parsedShowIfValue = await parseLiquid(showIfKey, variables);
 
     return this.stringToBoolean(parsedShowIfValue);
   }
@@ -208,7 +209,7 @@ export class EmailOutputRendererUsecase {
   }
 
   private async getIterableArray(iterablePath: string, variables: FullPayloadForRender): Promise<unknown[]> {
-    const iterableArrayString = await this.parseLiquid(iterablePath, variables);
+    const iterableArrayString = await parseLiquid(iterablePath, variables);
 
     try {
       const parsedArray = JSON.parse(iterableArrayString.replace(/'/g, '"'));
@@ -262,29 +263,5 @@ export class EmailOutputRendererUsecase {
       node.attrs[MailyAttrsEnum.ID] !== undefined &&
       typeof node.attrs[MailyAttrsEnum.ID] === 'string'
     );
-  }
-
-  private parseLiquid(value: string, variables: FullPayloadForRender): Promise<string> {
-    const client = new Liquid({
-      outputEscape: (output) => {
-        return this.stringifyDataStructureWithSingleQuotes(output);
-      },
-    });
-
-    const template = client.parse(value);
-
-    return client.render(template, variables);
-  }
-
-  private stringifyDataStructureWithSingleQuotes(value: unknown, spaces: number = 0): string {
-    if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
-      const valueStringified = JSON.stringify(value, null, spaces);
-      const valueSingleQuotes = valueStringified.replace(/"/g, "'");
-      const valueEscapedNewLines = valueSingleQuotes.replace(/\n/g, '\\n');
-
-      return valueEscapedNewLines;
-    } else {
-      return String(value);
-    }
   }
 }

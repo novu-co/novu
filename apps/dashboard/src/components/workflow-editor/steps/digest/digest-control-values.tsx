@@ -12,11 +12,11 @@ export const DigestControlValues = () => {
     return null;
   }
 
-  const { ['amount']: amount, ['digestKey']: digestKey, ['unit']: unit, ['cron']: cron } = uiSchema.properties ?? {};
+  const { ['amount']: amount, ['unit']: unit, ['cron']: cron } = uiSchema.properties ?? {};
 
   return (
     <div className="flex flex-col">
-      {digestKey && (
+      {/* {digestKey && (
         <>
           <SidebarContent size="lg">
             {getComponentByType({
@@ -25,7 +25,7 @@ export const DigestControlValues = () => {
           </SidebarContent>
           <Separator />
         </>
-      )}
+      )} */}
       {((amount && unit) || cron) && (
         <>
           <SidebarContent size="lg">

@@ -1,7 +1,7 @@
 import { EnvironmentWithUserCommand } from '@novu/application-generic';
 import { IsString, IsObject, IsOptional } from 'class-validator';
 
-export class BuildPayloadSchemaCommand extends EnvironmentWithUserCommand {
+export class ExtractVariablesCommand extends EnvironmentWithUserCommand {
   @IsString()
   @IsOptional()
   workflowId?: string;

@@ -11,13 +11,35 @@ import {
 } from '@/components/primitives/table';
 import { WorkflowListEmpty } from '@/components/workflow-list-empty';
 import { WorkflowRow } from '@/components/workflow-row';
-import { useFetchWorkflows } from '@/hooks/use-fetch-workflows';
+import { ListWorkflowResponse } from '@novu/shared';
 import { RiMore2Fill } from 'react-icons/ri';
 import { createSearchParams, useLocation, useSearchParams } from 'react-router-dom';
 import { ServerErrorPage } from './shared/server-error-page';
 
-export function WorkflowList() {
-  const [searchParams] = useSearchParams();
+export type SortableColumn = 'name' | 'updatedAt';
+
+interface WorkflowListProps {
+  data?: ListWorkflowResponse;
+  isLoading?: boolean;
+  isError?: boolean;
+  limit?: number;
+  orderBy?: SortableColumn;
+  orderDirection?: 'asc' | 'desc';
+  hasActiveFilters?: boolean;
+  onClearFilters?: () => void;
+}
+
+export function WorkflowList({
+  data,
+  isLoading,
+  isError,
+  limit = 12,
+  orderBy,
+  orderDirection,
+  hasActiveFilters,
+  onClearFilters,
+}: WorkflowListProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
 
   const hrefFromOffset = (offset: number) => {
@@ -28,34 +50,50 @@ export function WorkflowList() {
   };
 
   const offset = parseInt(searchParams.get('offset') || '0');
-  const limit = parseInt(searchParams.get('limit') || '12');
 
-  const { data, isPending, isError, currentPage, totalPages } = useFetchWorkflows({
-    limit,
-    offset,
-  });
+  const toggleSort = (column: SortableColumn) => {
+    const newDirection = column === orderBy ? (orderDirection === 'desc' ? 'asc' : 'desc') : 'desc';
+    searchParams.set('orderDirection', newDirection);
+    searchParams.set('orderBy', column);
+    setSearchParams(searchParams);
+  };
 
   if (isError) return <ServerErrorPage />;
 
-  if (!isPending && data.totalCount === 0) {
-    return <WorkflowListEmpty />;
+  if (!isLoading && data?.totalCount === 0) {
+    return <WorkflowListEmpty emptySearchResults={hasActiveFilters} onClearFilters={onClearFilters} />;
   }
 
+  const currentPage = Math.floor(offset / limit) + 1;
+  const totalPages = Math.ceil((data?.totalCount || 0) / limit);
+
   return (
-    <div className="flex h-full flex-col px-2.5 py-2">
+    <div className="flex h-full flex-col">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Workflows</TableHead>
+            <TableHead
+              sortable
+              sortDirection={orderBy === 'name' ? orderDirection : false}
+              onSort={() => toggleSort('name')}
+            >
+              Workflows
+            </TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Steps</TableHead>
             <TableHead>Tags</TableHead>
-            <TableHead>Last updated</TableHead>
+            <TableHead
+              sortable
+              sortDirection={orderBy === 'updatedAt' ? orderDirection : false}
+              onSort={() => toggleSort('updatedAt')}
+            >
+              Last updated
+            </TableHead>
             <TableHead />
           </TableRow>
         </TableHeader>
         <TableBody>
-          {isPending ? (
+          {isLoading ? (
             <>
               {new Array(limit).fill(0).map((_, index) => (
                 <TableRow key={index}>
@@ -82,11 +120,7 @@ export function WorkflowList() {
               ))}
             </>
           ) : (
-            <>
-              {data.workflows.map((workflow) => (
-                <WorkflowRow key={workflow._id} workflow={workflow} />
-              ))}
-            </>
+            <>{data?.workflows.map((workflow) => <WorkflowRow key={workflow._id} workflow={workflow} />)}</>
           )}
         </TableBody>
         {data && limit < data.totalCount && (

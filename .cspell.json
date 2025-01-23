@@ -828,7 +828,7 @@
     "tsconfig.json",
     "unreadRead",
     "websockets",
-    "apps/dashboard/src/components/header-navigation/customer-support-button.tsx",
+    "apps/dashboard/src/hooks/use-plain-chat.ts",
     "apps/dashboard/src/components/primitives/control-input/variable-popover/constants.ts"
   ]
 }
