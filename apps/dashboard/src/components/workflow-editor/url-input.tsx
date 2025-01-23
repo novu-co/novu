@@ -2,7 +2,7 @@ import { useFormContext } from 'react-hook-form';
 
 import { ControlInput } from '@/components/primitives/control-input';
 import { FormControl, FormField, FormItem, FormMessagePure } from '@/components/primitives/form/form';
-import { Input, InputProps, InputRoot, InputWrapper } from '@/components/primitives/input';
+import { InputProps, InputRoot } from '@/components/primitives/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/primitives/select';
 import { useSaveForm } from '@/components/workflow-editor/steps/save-form-context';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';

@@ -1,6 +1,5 @@
 import * as z from 'zod';
 import { type JSONSchemaDefinition, ChannelTypeEnum } from '@novu/shared';
-import type { ZodValue } from '@/utils/schema';
 
 export const MAX_TAG_ELEMENTS = 16;
 export const MAX_TAG_LENGTH = 32;

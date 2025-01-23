@@ -11,7 +11,6 @@ import { useVariables } from './hooks/use-variables';
 import { createVariableExtension } from './variable-plugin';
 import { variablePillTheme } from './variable-plugin/variable-theme';
 import { VariablePopover } from './variable-popover';
-import { cn } from '@/utils/ui';
 
 type CompletionRange = {
   from: number;
@@ -91,11 +90,9 @@ export function ControlInput({
   return (
     <div className={cn('relative h-full w-full p-2.5', className)}>
       <Editor
-        size={size}
         fontFamily="inherit"
         multiline={multiline}
         indentWithTab={indentWithTab}
-        // TODO for Sokratis
         size={size}
         // TODO for Sokratis
         className={cn('flex-1', { 'overflow-hidden': !multiline })}

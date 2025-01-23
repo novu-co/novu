@@ -6,7 +6,7 @@ import { FormControl, FormField, FormItem, FormMessage } from '@/components/prim
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
-import { InputRoot, InputWrapper } from '../../../primitives/input';
+import { InputRoot } from '../../../primitives/input';
 
 const subjectKey = 'subject';
 

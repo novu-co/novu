@@ -56,7 +56,7 @@ export function TextWidget(props: WidgetProps) {
                     value={field.value}
                     onChange={field.onChange}
                     variables={variables}
-                    size="default"
+                    size="sm"
                   />
                 </InputWrapper>
               </InputRoot>
