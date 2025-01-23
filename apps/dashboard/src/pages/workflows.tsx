@@ -2,14 +2,24 @@ import { DashboardLayout } from '@/components/dashboard-layout';
 import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';
 import { Button } from '@/components/primitives/button';
+import { Input } from '@/components/primitives/input';
 import { ScrollArea, ScrollBar } from '@/components/primitives/scroll-area';
+import { useDebounce } from '@/hooks/use-debounce';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { useFetchWorkflows } from '@/hooks/use-fetch-workflows';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { FeatureFlagsKeysEnum, StepTypeEnum } from '@novu/shared';
 import { useEffect } from 'react';
-import { RiArrowDownSLine, RiArrowRightSLine, RiFileAddLine, RiFileMarkedLine, RiRouteFill } from 'react-icons/ri';
+import { useForm } from 'react-hook-form';
+import {
+  RiArrowDownSLine,
+  RiArrowRightSLine,
+  RiFileAddLine,
+  RiFileMarkedLine,
+  RiRouteFill,
+  RiSearchLine,
+} from 'react-icons/ri';
 import { Outlet, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ButtonGroupItem, ButtonGroupRoot } from '../components/primitives/button-group';
 import { LinkButton } from '../components/primitives/button-link';
@@ -19,18 +29,58 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../components/primitives/dropdown-menu';
+import { Form, FormField, FormItem } from '../components/primitives/form/form';
 import { getTemplates, WorkflowTemplate } from '../components/template-store/templates';
 import { WorkflowCard } from '../components/template-store/workflow-card';
 import { WorkflowTemplateModal } from '../components/template-store/workflow-template-modal';
-import { WorkflowList } from '../components/workflow-list';
+import { SortableColumn, WorkflowList } from '../components/workflow-list';
 import { buildRoute, ROUTES } from '../utils/routes';
+
+interface WorkflowFilters {
+  query: string;
+}
 
 export const WorkflowsPage = () => {
   const { environmentSlug } = useParams();
   const track = useTelemetry();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const isTemplateStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_TEMPLATE_STORE_ENABLED);
+  const [searchParams, setSearchParams] = useSearchParams({
+    orderDirection: 'desc',
+    orderBy: 'updatedAt',
+    query: '',
+  });
+  const form = useForm<WorkflowFilters>({
+    defaultValues: {
+      query: searchParams.get('query') || '',
+    },
+  });
+
+  const updateSearchParam = (value: string) => {
+    if (value) {
+      searchParams.set('query', value);
+    } else {
+      searchParams.delete('query');
+    }
+    setSearchParams(searchParams);
+  };
+
+  const debouncedSearch = useDebounce((value: string) => updateSearchParam(value), 500);
+
+  const clearFilters = () => {
+    form.reset({ query: '' });
+  };
+
+  useEffect(() => {
+    const subscription = form.watch((value: { query?: string }) => {
+      debouncedSearch(value.query || '');
+    });
+
+    return () => {
+      subscription.unsubscribe();
+      debouncedSearch.cancel();
+    };
+  }, [form, debouncedSearch]);
   const templates = getTemplates();
   const popularTemplates = templates.filter((template) => template.isPopular).slice(0, 4);
 
@@ -44,9 +94,15 @@ export const WorkflowsPage = () => {
   } = useFetchWorkflows({
     limit,
     offset,
+    orderBy: searchParams.get('orderBy') as SortableColumn,
+    orderDirection: searchParams.get('orderDirection') as 'asc' | 'desc',
+    query: searchParams.get('query') || '',
   });
 
-  const shouldShowStartWith = isTemplateStoreEnabled && workflowsData && workflowsData.totalCount < 5;
+  const hasActiveFilters = searchParams.get('query') && searchParams.get('query') !== null;
+
+  const shouldShowStartWith =
+    isTemplateStoreEnabled && workflowsData && workflowsData.totalCount < 5 && !hasActiveFilters;
 
   useEffect(() => {
     track(TelemetryEvent.WORKFLOWS_PAGE_VISIT);
@@ -70,7 +126,19 @@ export const WorkflowsPage = () => {
         <OptInModal />
         <div className="h-full w-full">
           <div className="flex justify-between px-2.5 py-2.5">
-            <div className="invisible flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2"></div>
+            <Form {...form}>
+              <form>
+                <FormField
+                  control={form.control}
+                  name="query"
+                  render={({ field }) => (
+                    <FormItem className="relative">
+                      <Input size="xs" {...field} placeholder="Search workflows..." leadingIcon={RiSearchLine} />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
             {isTemplateStoreEnabled ? (
               <ButtonGroupRoot size="xs">
                 <ButtonGroupItem asChild className="gap-1">
@@ -194,7 +262,16 @@ export const WorkflowsPage = () => {
 
           <div className="px-2.5 py-2">
             {shouldShowStartWith && <div className="text-label-xs text-text-soft mb-2">Your Workflows</div>}
-            <WorkflowList data={workflowsData} isPending={isPending} isError={isError} limit={limit} />
+            <WorkflowList
+              hasActiveFilters={!!hasActiveFilters}
+              onClearFilters={clearFilters}
+              orderBy={searchParams.get('orderBy') as SortableColumn}
+              orderDirection={searchParams.get('orderDirection') as 'asc' | 'desc'}
+              data={workflowsData}
+              isLoading={isPending}
+              isError={isError}
+              limit={limit}
+            />
           </div>
         </div>
         <Outlet />

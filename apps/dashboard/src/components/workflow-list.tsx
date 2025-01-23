@@ -16,15 +16,30 @@ import { RiMore2Fill } from 'react-icons/ri';
 import { createSearchParams, useLocation, useSearchParams } from 'react-router-dom';
 import { ServerErrorPage } from './shared/server-error-page';
 
+export type SortableColumn = 'name' | 'updatedAt';
+
 interface WorkflowListProps {
   data?: ListWorkflowResponse;
-  isPending?: boolean;
+  isLoading?: boolean;
   isError?: boolean;
   limit?: number;
+  orderBy?: SortableColumn;
+  orderDirection?: 'asc' | 'desc';
+  hasActiveFilters?: boolean;
+  onClearFilters?: () => void;
 }
 
-export function WorkflowList({ data, isPending, isError, limit = 12 }: WorkflowListProps) {
-  const [searchParams] = useSearchParams();
+export function WorkflowList({
+  data,
+  isLoading,
+  isError,
+  limit = 12,
+  orderBy,
+  orderDirection,
+  hasActiveFilters,
+  onClearFilters,
+}: WorkflowListProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
 
   const hrefFromOffset = (offset: number) => {
@@ -36,10 +51,17 @@ export function WorkflowList({ data, isPending, isError, limit = 12 }: WorkflowL
 
   const offset = parseInt(searchParams.get('offset') || '0');
 
+  const toggleSort = (column: SortableColumn) => {
+    const newDirection = column === orderBy ? (orderDirection === 'desc' ? 'asc' : 'desc') : 'desc';
+    searchParams.set('orderDirection', newDirection);
+    searchParams.set('orderBy', column);
+    setSearchParams(searchParams);
+  };
+
   if (isError) return <ServerErrorPage />;
 
-  if (!isPending && data?.totalCount === 0) {
-    return <WorkflowListEmpty />;
+  if (!isLoading && data?.totalCount === 0) {
+    return <WorkflowListEmpty emptySearchResults={hasActiveFilters} onClearFilters={onClearFilters} />;
   }
 
   const currentPage = Math.floor(offset / limit) + 1;
@@ -50,16 +72,28 @@ export function WorkflowList({ data, isPending, isError, limit = 12 }: WorkflowL
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Workflows</TableHead>
+            <TableHead
+              sortable
+              sortDirection={orderBy === 'name' ? orderDirection : false}
+              onSort={() => toggleSort('name')}
+            >
+              Workflows
+            </TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Steps</TableHead>
             <TableHead>Tags</TableHead>
-            <TableHead>Last updated</TableHead>
+            <TableHead
+              sortable
+              sortDirection={orderBy === 'updatedAt' ? orderDirection : false}
+              onSort={() => toggleSort('updatedAt')}
+            >
+              Last updated
+            </TableHead>
             <TableHead />
           </TableRow>
         </TableHeader>
         <TableBody>
-          {isPending ? (
+          {isLoading ? (
             <>
               {new Array(limit).fill(0).map((_, index) => (
                 <TableRow key={index}>
