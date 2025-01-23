@@ -30,11 +30,12 @@ export class CreateEnvironment {
     if (environmentCount >= 10) {
       throw new BadRequestException('Organization cannot have more than 10 environments');
     }
+    const normalizedName = command.name.trim();
 
     if (!command.system) {
       const { name } = command;
 
-      if (PROTECTED_ENVIRONMENTS.includes(name as EnvironmentEnum)) {
+      if (PROTECTED_ENVIRONMENTS?.map((env) => env.toLowerCase()).includes(normalizedName.toLowerCase())) {
         throw new UnprocessableEntityException('Environment name cannot be Development or Production');
       }
 
@@ -59,7 +60,7 @@ export class CreateEnvironment {
 
     const environment = await this.environmentRepository.create({
       _organizationId: command.organizationId,
-      name: command.name,
+      name: normalizedName,
       identifier: nanoid(12),
       _parentId: command.parentEnvironmentId,
       color,

@@ -201,6 +201,7 @@ export const CreateEnvironmentButton = (props: CreateEnvironmentButtonProps) => 
           <Separator />
           <SheetFooter>
             <Button
+              size="xs"
               isLoading={isPending}
               trailingIcon={RiArrowRightSLine}
               variant="secondary"
