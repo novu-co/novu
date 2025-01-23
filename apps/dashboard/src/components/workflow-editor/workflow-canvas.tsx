@@ -2,7 +2,6 @@ import {
   Background,
   BackgroundVariant,
   BaseEdge,
-  Controls,
   EdgeProps,
   Node,
   ReactFlow,
@@ -35,6 +34,7 @@ import {
   TriggerNode,
 } from './nodes';
 import { getFirstBodyErrorMessage, getFirstControlsErrorMessage } from './step-utils';
+import { WorkflowChecklist } from './workflow-checklist';
 
 const nodeTypes = {
   trigger: TriggerNode,
@@ -250,9 +250,9 @@ const WorkflowCanvasChild = ({ steps, readOnly }: { steps: Step[]; readOnly?: bo
           }
         }}
       >
-        <Controls showZoom={false} showInteractive={false} />
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>
+      <WorkflowChecklist steps={steps} />
     </div>
   );
 };

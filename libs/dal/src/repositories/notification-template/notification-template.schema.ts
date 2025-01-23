@@ -55,6 +55,10 @@ const variantSchemePart = {
   _parentId: {
     type: Schema.Types.ObjectId,
   },
+  connected: {
+    type: Schema.Types.Boolean,
+    default: false,
+  },
   metadata: {
     amount: {
       type: Schema.Types.Number,
