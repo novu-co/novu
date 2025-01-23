@@ -115,7 +115,7 @@ export const WorkflowsPage = () => {
       buildRoute(ROUTES.TEMPLATE_STORE_CREATE_WORKFLOW, {
         environmentSlug: environmentSlug || '',
         templateId: template.id,
-      })
+      }) + '?source=template-store-card-row'
     );
   };
 
@@ -183,14 +183,13 @@ export const WorkflowsPage = () => {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="cursor-pointer"
-                        onSelect={() =>
+                        onSelect={() => {
                           navigate(
                             buildRoute(ROUTES.TEMPLATE_STORE, {
                               environmentSlug: environmentSlug || '',
-                              source: 'create-workflow-dropdown',
-                            })
-                          )
-                        }
+                            }) + '?source=create-workflow-dropdown'
+                          );
+                        }}
                       >
                         <RiFileMarkedLine />
                         View Workflow Gallery
@@ -224,8 +223,7 @@ export const WorkflowsPage = () => {
                     navigate(
                       buildRoute(ROUTES.TEMPLATE_STORE, {
                         environmentSlug: environmentSlug || '',
-                        source: 'start-with',
-                      })
+                      }) + '?source=start-with'
                     )
                   }
                   trailingIcon={RiArrowRightSLine}

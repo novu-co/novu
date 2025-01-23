@@ -261,12 +261,14 @@ export class AddJob {
   private async updateMetadata(response: ExecuteOutput, command: AddJobCommand) {
     let metadata = {} as IWorkflowStepMetadata;
     const outputs = response.outputs as DigestOutput;
+    // digest value is pre-computed by framework and passed as digestKey
+    const outputDigestValue = outputs?.digestKey;
     const digestType = getDigestType(outputs);
 
     if (isTimedDigestOutput(outputs)) {
       metadata = {
         type: DigestTypeEnum.TIMED,
-        digestKey: outputs?.digestKey,
+        digestValue: outputDigestValue,
         timed: { cronExpression: outputs?.cron },
       } as IDigestTimedMetadata;
 
@@ -278,7 +280,7 @@ export class AddJob {
         {
           $set: {
             'digest.type': metadata.type,
-            'digest.digestKey': metadata.digestKey,
+            'digest.digestValue': metadata.digestValue,
             'digest.amount': metadata.amount,
             'digest.unit': metadata.unit,
             'digest.timed.cronExpression': metadata.timed?.cronExpression,
@@ -291,7 +293,7 @@ export class AddJob {
       metadata = {
         type: digestType,
         amount: outputs?.amount,
-        digestKey: outputs?.digestKey,
+        digestValue: outputDigestValue,
         unit: outputs.unit ? castUnitToDigestUnitEnum(outputs?.unit) : undefined,
         backoff: digestType === DigestTypeEnum.BACKOFF,
         backoffAmount: outputs.lookBackWindow?.amount,
@@ -306,7 +308,7 @@ export class AddJob {
         {
           $set: {
             'digest.type': metadata.type,
-            'digest.digestKey': metadata.digestKey,
+            'digest.digestValue': metadata.digestValue,
             'digest.amount': metadata.amount,
             'digest.unit': metadata.unit,
             'digest.backoff': metadata.backoff,
@@ -321,7 +323,7 @@ export class AddJob {
       metadata = {
         type: digestType,
         amount: outputs?.amount,
-        digestKey: outputs?.digestKey,
+        digestValue: outputDigestValue,
         unit: outputs.unit ? castUnitToDigestUnitEnum(outputs?.unit) : undefined,
       } as IDigestRegularMetadata;
 
@@ -333,7 +335,7 @@ export class AddJob {
         {
           $set: {
             'digest.type': metadata.type,
-            'digest.digestKey': metadata.digestKey,
+            'digest.digestValue': metadata.digestValue,
             'digest.amount': metadata.amount,
             'digest.unit': metadata.unit,
           },
