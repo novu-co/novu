@@ -1,13 +1,10 @@
 /* eslint-disable no-param-reassign */
 import difference from 'lodash/difference';
-import flatMap from 'lodash/flatMap';
 import isArray from 'lodash/isArray';
 import isObject from 'lodash/isObject';
 import reduce from 'lodash/reduce';
-import values from 'lodash/values';
-
 import { JSONSchemaDto } from '@novu/shared';
-import { MAILY_ITERABLE_MARK } from '@novu/application-generic';
+import { MAILY_ITERABLE_MARK } from '../../environments-v1/usecases/output-renderers/maily-to-liquid/maily.types';
 
 export function findMissingKeys(requiredRecord: object, actualRecord: object) {
   const requiredKeys = collectKeys(requiredRecord);
@@ -31,51 +28,6 @@ export function collectKeys(obj, prefix = '') {
     },
     []
   );
-}
-
-/**
- * Recursively flattens an object's values into an array of strings.
- * Handles nested objects, arrays, and converts primitive values to strings.
- *
- * @param obj - The object to flatten
- * @returns An array of strings containing all primitive values found in the object
- *
- * @example
- * ```typescript
- * const input = {
- *   subject: "Hello {{name}}",
- *   body: "Welcome!",
- *   actions: {
- *     primary: {
- *       label: "Click {{here}}",
- *       url: "https://example.com"
- *     }
- *   },
- *   data: { count: 42 }
- * };
- *
- * flattenObjectValues(input);
- *  Returns:
- *  [
- *    "Hello {{name}}",
- *    "Welcome!",
- *    "Click {{here}}",
- *    "https://example.com",
- *    "42"
- *  ]
- * ```
- */
-export function flattenObjectValues(obj: Record<string, unknown>): string[] {
-  return flatMap(values(obj), (value) => {
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      return String(value);
-    }
-    if (value && typeof value === 'object') {
-      return flattenObjectValues(value as Record<string, unknown>);
-    }
-
-    return [];
-  });
 }
 
 /**
@@ -159,7 +111,7 @@ export function mockSchemaDefaults(schema: JSONSchemaDto, parentPath = 'payload'
  *   }
  * }
  */
-export function keysToObject(paths: string[]): Record<string, unknown> {
+export function keysToObject(paths: string[], showIfVariablesPath?: string[]): Record<string, unknown> {
   const result = {};
 
   const validPaths = paths
@@ -167,7 +119,7 @@ export function keysToObject(paths: string[]): Record<string, unknown> {
     // remove paths that are a prefix of another path
     .filter((path) => !paths.some((otherPath) => otherPath !== path && otherPath.startsWith(`${path}.`)));
 
-  validPaths.filter(hasNamespace).forEach((path) => buildPathInObject(path, result));
+  validPaths.filter(hasNamespace).forEach((path) => buildPathInObject(path, result, showIfVariablesPath));
 
   return result;
 }
@@ -176,7 +128,7 @@ function hasNamespace(path: string): boolean {
   return path.includes('.');
 }
 
-function buildPathInObject(path: string, result: Record<string, any>): void {
+function buildPathInObject(path: string, result: Record<string, any>, showIfVariablesPath?: string[]): void {
   const parts = path.split('.');
   let current = result;
 
@@ -192,7 +144,7 @@ function buildPathInObject(path: string, result: Record<string, any>): void {
     current = handleObjectPath(current, key);
   }
 
-  setFinalLeafValue(current, parts[parts.length - 1], path);
+  setFinalLeafValue(current, parts[parts.length - 1], path, showIfVariablesPath);
 }
 
 function isArrayNotation(part: string): boolean {
@@ -213,9 +165,16 @@ function handleObjectPath(current: Record<string, any>, key: string): Record<str
   return current[key];
 }
 
-function setFinalLeafValue(current: Record<string, any>, lastPart: string, fullPath: string): void {
+function setFinalLeafValue(
+  current: Record<string, any>,
+  lastPart: string,
+  fullPath: string,
+  showIfVariablesPath?: string[]
+): void {
   if (lastPart !== '0') {
-    current[lastPart] = `{{${fullPath.replace('.0.', '.')}}}`;
+    const currentPath = fullPath.replace('.0.', '.');
+    const showIfPath = showIfVariablesPath?.find((path) => path.includes(currentPath));
+    current[lastPart] = showIfPath ? true : `{{${currentPath}}}`;
   }
 }
 

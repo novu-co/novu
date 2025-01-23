@@ -22,7 +22,7 @@ export class LimitOffsetPaginationDto<T, K extends KeysOfT<T>> {
   limit: string;
   offset: string;
   orderDirection?: DirectionEnum;
-  orderByField?: K;
+  orderBy?: K;
 }
 
 export interface IPaginationParams {
