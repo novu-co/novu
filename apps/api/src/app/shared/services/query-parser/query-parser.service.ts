@@ -64,21 +64,21 @@ function validateComparison(
   a: unknown,
   b: unknown
 ): { isValid: true; a: number | string | boolean; b: number | string | boolean } | { isValid: false } {
-  // Handle boolean values and string representations of booleans
+  // handle boolean values and string representations of booleans
   const booleanA = validateBooleanInput(a);
   const booleanB = validateBooleanInput(b);
   if (booleanA.isValid && booleanB.isValid) {
     return { isValid: true, a: booleanA.input, b: booleanB.input };
   }
 
-  // Try to convert to numbers if possible
+  // try to convert to numbers if possible
   const numA = Number(a);
   const numB = Number(b);
   if (!Number.isNaN(numA) && !Number.isNaN(numB)) {
     return { isValid: true, a: numA, b: numB };
   }
 
-  // Handle dates first
+  // handle dates
   if (typeof a === 'string' && typeof b === 'string') {
     const dateA = new Date(a);
     const dateB = new Date(b);
@@ -184,7 +184,7 @@ const initializeCustomOperators = (): void => {
 
   jsonLogic.rm_operation('<=');
   jsonLogic.add_operation('<=', (first: unknown, second: unknown, third?: unknown) => {
-    // Handle three argument case (typically used in between operations)
+    // handle three argument case (typically used in between operations)
     if (third !== undefined) {
       const validation1 = validateComparison(first, second);
       const validation2 = validateComparison(second, third);
@@ -193,7 +193,6 @@ const initializeCustomOperators = (): void => {
       return validation1.a <= validation1.b && validation1.b <= validation2.b;
     }
 
-    // Handle regular two argument case
     const validation = validateComparison(first, second);
     if (!validation.isValid) return false;
 
@@ -212,7 +211,7 @@ const initializeCustomOperators = (): void => {
   jsonLogic.add_operation('==', (a: unknown, b: unknown) => {
     const validation = validateComparison(a, b);
     if (!validation.isValid) {
-      // Fall back to strict equality for other types
+      // fall back to strict equality for other types
       return a === b;
     }
 
@@ -223,7 +222,7 @@ const initializeCustomOperators = (): void => {
   jsonLogic.add_operation('!=', (a: unknown, b: unknown) => {
     const validation = validateComparison(a, b);
     if (!validation.isValid) {
-      // Fall back to strict inequality for other types
+      // fall back to strict inequality for other types
       return a !== b;
     }
 
