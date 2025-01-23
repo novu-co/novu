@@ -31,6 +31,8 @@ import { useForm } from 'react-hook-form';
 import { RiAddLine, RiArrowRightSLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+import { useTelemetry } from '../hooks/use-telemetry';
+import { TelemetryEvent } from '../utils/telemetry';
 import { ColorPicker } from './primitives/color-picker';
 import { showErrorToast, showSuccessToast } from './primitives/sonner-helpers';
 import { Tooltip, TooltipContent, TooltipTrigger } from './primitives/tooltip';
@@ -74,6 +76,7 @@ export const CreateEnvironmentButton = (props: CreateEnvironmentButtonProps) => 
   const { mutateAsync, isPending } = useCreateEnvironment();
   const { subscription } = useFetchSubscription();
   const navigate = useNavigate();
+  const track = useTelemetry();
 
   const isBusinessTier = subscription?.apiServiceLevel === ApiServiceLevelEnum.BUSINESS;
   const isTrialActive = subscription?.trial?.isActive;
@@ -109,6 +112,10 @@ export const CreateEnvironmentButton = (props: CreateEnvironmentButtonProps) => 
   };
 
   const handleClick = () => {
+    track(TelemetryEvent.CREATE_ENVIRONMENT_CLICK, {
+      createAllowed: !!canCreateEnvironment,
+    });
+
     if (!canCreateEnvironment) {
       navigate(ROUTES.SETTINGS_BILLING);
       return;

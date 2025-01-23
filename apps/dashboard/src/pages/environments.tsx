@@ -1,9 +1,18 @@
 import { PageMeta } from '@/components/page-meta';
+import { useEffect } from 'react';
 import { CreateEnvironmentButton } from '../components/create-environment-button';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { EnvironmentsList } from '../components/environments-list';
+import { useTelemetry } from '../hooks/use-telemetry';
+import { TelemetryEvent } from '../utils/telemetry';
 
 export function EnvironmentsPage() {
+  const track = useTelemetry();
+
+  useEffect(() => {
+    track(TelemetryEvent.ENVIRONMENTS_PAGE_VIEWED);
+  }, [track]);
+
   return (
     <>
       <PageMeta title={`Environments`} />
