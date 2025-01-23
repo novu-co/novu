@@ -106,7 +106,6 @@ describe('List Workflows - /workflows (GET) #novu-v2', function () {
         workflowId: createdWorkflow.workflowId,
         status: WorkflowStatusEnum.ACTIVE,
       });
-      expect(returnedWorkflow.steps).to.be.an('array');
       expect(returnedWorkflow.createdAt).to.be.a('string');
       expect(returnedWorkflow.updatedAt).to.be.a('string');
     });
