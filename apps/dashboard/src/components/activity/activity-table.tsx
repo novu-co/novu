@@ -181,7 +181,7 @@ function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriber
   if (!subscriber) return '';
 
   if (subscriber.firstName || subscriber.lastName) {
-    return `• ${subscriber.firstName || ''} ${subscriber.lastName || ''}`;
+    return `• ${subscriber.firstName || ''} ${subscriber.lastName || ''}`.trim();
   }
 
   return '';
