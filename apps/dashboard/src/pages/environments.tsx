@@ -3,13 +3,19 @@ import { ApiServiceLevelEnum } from '@novu/shared';
 import { useEffect } from 'react';
 import { CreateEnvironmentButton } from '../components/create-environment-button';
 import { DashboardLayout } from '../components/dashboard-layout';
+import { FreeTierState } from '../components/environments-free-state';
 import { EnvironmentsList } from '../components/environments-list';
-import { FreeTierEmptyState } from '../components/free-tier-empty-state';
+import { useAuth } from '../context/auth/hooks';
+import { useFetchEnvironments } from '../context/environment/hooks';
 import { useFetchSubscription } from '../hooks/use-fetch-subscription';
 import { useTelemetry } from '../hooks/use-telemetry';
 import { TelemetryEvent } from '../utils/telemetry';
 
 export function EnvironmentsPage() {
+  const { currentOrganization } = useAuth();
+  const { environments = [], areEnvironmentsInitialLoading } = useFetchEnvironments({
+    organizationId: currentOrganization?._id,
+  });
   const track = useTelemetry();
   const { subscription } = useFetchSubscription();
 
@@ -17,7 +23,7 @@ export function EnvironmentsPage() {
     subscription?.apiServiceLevel === ApiServiceLevelEnum.BUSINESS ||
     subscription?.apiServiceLevel === ApiServiceLevelEnum.ENTERPRISE;
   const isTrialActive = subscription?.trial?.isActive;
-  const canAccessEnvironments = !isPaidTier && !isTrialActive;
+  const canAccessEnvironments = areEnvironmentsInitialLoading || !subscription || (isPaidTier && !isTrialActive);
 
   useEffect(() => {
     track(TelemetryEvent.ENVIRONMENTS_PAGE_VIEWED);
@@ -32,10 +38,10 @@ export function EnvironmentsPage() {
             <div className="flex justify-end">
               <CreateEnvironmentButton />
             </div>
-            <EnvironmentsList />
+            <EnvironmentsList environments={environments} isLoading={areEnvironmentsInitialLoading} />
           </div>
         ) : (
-          <FreeTierEmptyState />
+          <FreeTierState />
         )}
       </DashboardLayout>
     </>
