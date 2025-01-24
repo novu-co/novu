@@ -11,6 +11,7 @@ import { STEP_TYPE_TO_ICON } from '../icons/utils';
 import { Card, CardContent, CardHeader } from '../primitives/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 import { TimeDisplayHoverCard } from '../time-display-hover-card';
+import TruncatedText from '../truncated-text';
 import { JOB_STATUS_CONFIG } from './constants';
 import { ExecutionDetailItem } from './execution-detail-item';
 
@@ -69,7 +70,7 @@ export function ActivityJobItem({ job, isFirst, isLast }: ActivityJobItemProps) 
           <CardContent className="rounded-lg bg-neutral-50 p-2">
             <div className="flex items-center justify-between">
               <span className="text-foreground-400 max-w-[300px] truncate pr-2 text-xs">{getStatusMessage(job)}</span>
-              <Badge variant="soft" className="bg-foreground-50 shrink-0 px-2 py-0.5 text-[11px] leading-3">
+              <Badge variant="lighter" color="gray" size="sm">
                 <TimeDisplayHoverCard date={new Date(job.updatedAt)}>
                   {format(new Date(job.updatedAt), 'MMM d yyyy, HH:mm:ss')}
                 </TimeDisplayHoverCard>
@@ -105,7 +106,9 @@ function getStatusMessage(job: IActivityJob): string | React.ReactNode {
         {lastExecutionDetail.raw ? (
           <ErrorTooltip message={lastExecutionDetail.detail} raw={lastExecutionDetail.raw} />
         ) : (
-          <span className="text-destructive">{lastExecutionDetail.detail}</span>
+          <span className="text-destructive">
+            <TruncatedText>{lastExecutionDetail.detail}</TruncatedText>
+          </span>
         )}
       </div>
     ) : (

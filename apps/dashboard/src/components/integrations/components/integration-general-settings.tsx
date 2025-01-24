@@ -1,8 +1,8 @@
-import { Control } from 'react-hook-form';
-import { Input, InputField } from '@/components/primitives/input';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
+import { Input } from '@/components/primitives/input';
 import { Separator } from '@/components/primitives/separator';
 import { Switch } from '@/components/primitives/switch';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/primitives/form/form';
+import { Control } from 'react-hook-form';
 
 type IntegrationFormData = {
   name: string;
@@ -77,13 +77,11 @@ export function GeneralSettings({ control, mode, hidePrimarySelector, disabledPr
         rules={{ required: 'Name is required' }}
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-xs" htmlFor="name">
+            <FormLabel className="text-xs" htmlFor="name" required>
               Name
             </FormLabel>
             <FormControl>
-              <InputField>
-                <Input id="name" {...field} />
-              </InputField>
+              <Input id="name" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -100,15 +98,13 @@ export function GeneralSettings({ control, mode, hidePrimarySelector, disabledPr
             message: 'Identifier cannot contain spaces',
           },
         }}
-        render={({ field }) => (
+        render={({ field, fieldState }) => (
           <FormItem>
-            <FormLabel className="text-xs" htmlFor="identifier">
+            <FormLabel className="text-xs" htmlFor="identifier" required>
               Identifier
             </FormLabel>
             <FormControl>
-              <InputField>
-                <Input id="identifier" {...field} readOnly={mode === 'update'} />
-              </InputField>
+              <Input id="identifier" {...field} readOnly={mode === 'update'} hasError={!!fieldState.error} />
             </FormControl>
             <FormMessage />
           </FormItem>

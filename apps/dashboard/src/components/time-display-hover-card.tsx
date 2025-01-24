@@ -1,4 +1,4 @@
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './primitives/hover-card';
 
 interface TimeDisplayHoverCardProps {
@@ -8,8 +8,24 @@ interface TimeDisplayHoverCardProps {
 }
 
 export function TimeDisplayHoverCard({ date, children, className }: TimeDisplayHoverCardProps) {
-  const utcTime = format(new Date(date.toUTCString()), 'MMM d yyyy, HH:mm:ss');
-  const localTime = format(date, 'MMM d yyyy, HH:mm:ss');
+  const dateConfig: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  };
+
+  const dateTimeFormat = new Intl.DateTimeFormat('default', dateConfig);
+
+  const utcFormat = new Intl.DateTimeFormat('default', {
+    ...dateConfig,
+    timeZone: 'UTC',
+  });
+
+  const utcTime = utcFormat.format(date);
+  const localTime = dateTimeFormat.format(date);
   const timeAgo = formatDistanceToNow(date, { addSuffix: true });
 
   return (
@@ -20,7 +36,7 @@ export function TimeDisplayHoverCard({ date, children, className }: TimeDisplayH
       <HoverCardContent className="w-fit" align="end" sideOffset={4}>
         <div className="flex flex-col gap-2">
           <div className="text-muted-foreground text-2xs font-medium uppercase">Time Details</div>
-          <div className="flex flex-col gap-2 text-xs">
+          <div className="flex flex-col gap-2 text-xs capitalize">
             <div className="bg-muted/40 hover:bg-muted flex items-center justify-between gap-4 rounded-sm transition-colors">
               <span className="text-muted-foreground">UTC</span>
               <span className="font-medium">{utcTime}</span>
@@ -31,7 +47,7 @@ export function TimeDisplayHoverCard({ date, children, className }: TimeDisplayH
             </div>
             <div className="bg-muted/40 hover:bg-muted flex items-center justify-between gap-4 rounded-sm transition-colors">
               <span className="text-muted-foreground">Relative</span>
-              <span className="font-medium">{timeAgo}</span>
+              <span className="font-medium normal-case">{timeAgo}</span>
             </div>
           </div>
         </div>

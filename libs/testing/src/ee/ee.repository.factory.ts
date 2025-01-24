@@ -1,6 +1,7 @@
 /* eslint-disable global-require */
 import { CommunityOrganizationRepository, CommunityUserRepository, CommunityMemberRepository } from '@novu/dal';
 import { isClerkEnabled } from '@novu/shared';
+import { ClerkClientMock } from './clerk-client.mock';
 
 /**
  * We are using nx-ignore-next-line as a workaround here to avoid following circular dependency error:
@@ -35,43 +36,25 @@ export function getEERepository<T>(className: 'OrganizationRepository' | 'Member
   }
 }
 
-export function getEEUserRepository({ mockClerkClient = true }: { mockClerkClient?: boolean } = {}) {
+const clerkClientMock = new ClerkClientMock();
+
+function getEEUserRepository() {
   // nx-ignore-next-line
-  const enterpriseModule = require('@novu/ee-auth');
-  const EnterpriseUserRepository = enterpriseModule?.EEUserRepository;
+  const { EEUserRepository } = require('@novu/ee-auth');
 
-  if (mockClerkClient) {
-    const ClerkClientMock = enterpriseModule?.ClerkClientMock;
-
-    return new EnterpriseUserRepository(new CommunityUserRepository(), new ClerkClientMock());
-  }
-
-  return new EnterpriseUserRepository(new CommunityUserRepository());
+  return new EEUserRepository(new CommunityUserRepository(), clerkClientMock);
 }
 
 export function getEEOrganizationRepository({ mockClerkClient = true }: { mockClerkClient?: boolean } = {}) {
   // nx-ignore-next-line
-  const enterpriseModule = require('@novu/ee-auth');
-  const EEOrganizationRepository = enterpriseModule?.EEOrganizationRepository;
-  if (mockClerkClient) {
-    const ClerkClientMock = enterpriseModule?.ClerkClientMock;
+  const { EEOrganizationRepository } = require('@novu/ee-auth');
 
-    return new EEOrganizationRepository(new CommunityOrganizationRepository(), new ClerkClientMock());
-  }
-
-  return new EEOrganizationRepository(new CommunityOrganizationRepository());
+  return new EEOrganizationRepository(new CommunityOrganizationRepository(), clerkClientMock);
 }
 
 export function getEEMemberRepository({ mockClerkClient = true }: { mockClerkClient?: boolean } = {}) {
   // nx-ignore-next-line
-  const enterpriseModule = require('@novu/ee-auth');
-  const EEMemberRepository = enterpriseModule?.EEMemberRepository;
+  const { EEMemberRepository } = require('@novu/ee-auth');
 
-  if (mockClerkClient) {
-    const ClerkClientMock = enterpriseModule?.ClerkClientMock;
-
-    return new EEMemberRepository(new CommunityOrganizationRepository(), new ClerkClientMock());
-  }
-
-  return new EEMemberRepository(new CommunityOrganizationRepository());
+  return new EEMemberRepository(new CommunityOrganizationRepository(), clerkClientMock);
 }

@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ChannelTypeEnum, UpdateWorkflowDto, WorkflowPreferences, WorkflowResponseDto } from '@novu/shared';
+import { ChannelTypeEnum, WorkflowPreferences, WorkflowResponseDto } from '@novu/shared';
 import { motion } from 'motion/react';
 import { useMemo } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 import { SidebarContent, SidebarHeader } from '@/components/side-navigation/sidebar';
 import { UserPreferencesFormSchema } from '@/components/workflow-editor/schema';
+import { UpdateWorkflowFn } from '@/components/workflow-editor/workflow-provider';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { STEP_TYPE_TO_COLOR } from '@/utils/color';
 import { StepTypeEnum, WorkflowOriginEnum } from '@/utils/enums';
@@ -28,7 +29,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../primitives/tooltip';
 
 type ConfigureWorkflowFormProps = {
   workflow: WorkflowResponseDto;
-  update: (data: UpdateWorkflowDto) => void;
+  update: UpdateWorkflowFn;
 };
 
 const CHANNEL_LABELS_LOOKUP: Record<`${ChannelTypeEnum}` | 'all', string> = {
@@ -174,7 +175,7 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
         exit={{ opacity: 0.1 }}
         transition={{ duration: 0.1 }}
       >
-        <SidebarHeader className="items-center text-sm font-medium">
+        <SidebarHeader className="items-center border-b text-sm font-medium">
           <Link to="../" className="flex items-center">
             <CompactButton icon={RiArrowLeftSLine} variant="ghost" size="md" type="button">
               <span className="sr-only">Back</span>
@@ -188,7 +189,6 @@ export const ChannelPreferencesForm = (props: ConfigureWorkflowFormProps) => {
             </CompactButton>
           </Link>
         </SidebarHeader>
-        <Separator />
         <SidebarContent size="md">
           <p className="text-xs text-neutral-400">
             Set default channel preferences for subscribers and specify which channels they can customize.

@@ -1,19 +1,19 @@
+import { ActivityFilters } from '@/api/activity';
+import { Skeleton } from '@/components/primitives/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/primitives/table';
-import { format } from 'date-fns';
+import { TimeDisplayHoverCard } from '@/components/time-display-hover-card';
 import { cn } from '@/utils/ui';
 import { ISubscriber } from '@novu/shared';
-import { TimeDisplayHoverCard } from '@/components/time-display-hover-card';
-import { createSearchParams, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
-import { StatusBadge } from './components/status-badge';
-import { StepIndicators } from './components/step-indicators';
-import { ActivityEmptyState } from './activity-empty-state';
+import { format } from 'date-fns';
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowPagination } from './components/arrow-pagination';
 import { useEffect } from 'react';
-import { ActivityFilters } from '@/api/activity';
-import { useFetchActivities } from '../../hooks/use-fetch-activities';
+import { createSearchParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Skeleton } from '@/components/primitives/skeleton';
+import { useFetchActivities } from '../../hooks/use-fetch-activities';
+import { ActivityEmptyState } from './activity-empty-state';
+import { ArrowPagination } from './components/arrow-pagination';
+import { ActivityStatusBadge } from './components/status-badge';
+import { StepIndicators } from './components/step-indicators';
 
 export interface ActivityTableProps {
   selectedActivityId: string | null;
@@ -92,7 +92,7 @@ export function ActivityTable({
                 <TableHead className="h-9 px-3 py-0">Event</TableHead>
                 <TableHead className="h-9 px-3 py-0">Status</TableHead>
                 <TableHead className="h-9 px-3 py-0">Steps</TableHead>
-                <TableHead className="h-9 px-3 py-0">Triggered Date</TableHead>
+                <TableHead className="h-9 px-3 py-0">Triggered At</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -120,7 +120,7 @@ export function ActivityTable({
                     </div>
                   </TableCell>
                   <TableCell className="px-3">
-                    <StatusBadge jobs={activity.jobs} />
+                    <ActivityStatusBadge jobs={activity.jobs} />
                   </TableCell>
                   <TableCell className="px-3">
                     <StepIndicators jobs={activity.jobs} />

@@ -26,9 +26,6 @@ export function IntegrationsListPage() {
       headerStartItems={
         <h1 className="text-foreground-950 flex items-center gap-1">
           <span>Integration Store</span>
-          <Badge kind="pill" size="2xs">
-            BETA
-          </Badge>
         </h1>
       }
     >
@@ -42,7 +39,7 @@ export function IntegrationsListPage() {
               <TooltipTrigger>
                 <TabsTrigger value="data-warehouse" variant="regular" disabled>
                   Data{' '}
-                  <Badge kind="pill" size="2xs">
+                  <Badge color="gray" size="sm" variant="lighter">
                     SOON
                   </Badge>
                 </TabsTrigger>

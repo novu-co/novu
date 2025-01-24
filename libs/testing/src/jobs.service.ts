@@ -4,20 +4,16 @@ import { JobTopicNameEnum, StepTypeEnum } from '@novu/shared';
 
 import { TestingQueueService } from './testing-queue.service';
 
-const LOG_CONTEXT = 'TestingJobsService';
-
 export class JobsService {
   private jobRepository = new JobRepository();
 
   public standardQueue: Queue;
   public workflowQueue: Queue;
   public subscriberProcessQueue: Queue;
-  public executionLogQueue: Queue;
   constructor(private isClusterMode?: boolean) {
     this.workflowQueue = new TestingQueueService(JobTopicNameEnum.WORKFLOW).queue;
     this.standardQueue = new TestingQueueService(JobTopicNameEnum.STANDARD).queue;
     this.subscriberProcessQueue = new TestingQueueService(JobTopicNameEnum.PROCESS_SUBSCRIBER).queue;
-    this.executionLogQueue = new TestingQueueService(JobTopicNameEnum.EXECUTION_LOG).queue;
   }
 
   public async queueGet(jobTopicName: JobTopicNameEnum, getter: 'getDelayed') {
@@ -105,13 +101,9 @@ export class JobsService {
       runDelayedImmediately: async () => {
         const delayedJobs = await this.standardQueue.getDelayed();
 
-        if (delayedJobs.length === 1) {
-          await delayedJobs[0].changeDelay(1);
-        } else if (delayedJobs.length > 1) {
-          throw new Error('There are more than one delayed jobs');
-        } else if (delayedJobs.length === 0) {
-          throw new Error('There are no delayed jobs');
-        }
+        await delayedJobs.forEach(async (job) => {
+          job.changeDelay(1);
+        });
       },
     };
   }
@@ -124,8 +116,6 @@ export class JobsService {
       activeStandardJobsCount,
       subscriberProcessQueueWaitingCount,
       subscriberProcessQueueActiveCount,
-      executionLogQueueWaitingCount,
-      executionLogQueueActiveCount,
     ] = await Promise.all([
       this.workflowQueue.getActiveCount(),
       this.workflowQueue.getWaitingCount(),
@@ -135,9 +125,6 @@ export class JobsService {
 
       this.subscriberProcessQueue.getWaitingCount(),
       this.subscriberProcessQueue.getActiveCount(),
-
-      this.executionLogQueue.getWaitingCount(),
-      this.executionLogQueue.getActiveCount(),
     ]);
 
     const totalCount =
@@ -146,9 +133,7 @@ export class JobsService {
       waitingStandardJobsCount +
       activeStandardJobsCount +
       subscriberProcessQueueWaitingCount +
-      subscriberProcessQueueActiveCount +
-      executionLogQueueWaitingCount +
-      executionLogQueueActiveCount;
+      subscriberProcessQueueActiveCount;
 
     return {
       totalCount,
@@ -158,8 +143,6 @@ export class JobsService {
       activeStandardJobsCount,
       subscriberProcessQueueWaitingCount,
       subscriberProcessQueueActiveCount,
-      executionLogQueueWaitingCount,
-      executionLogQueueActiveCount,
     };
   }
 }

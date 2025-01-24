@@ -1,4 +1,4 @@
-import { ApiTags } from '@nestjs/swagger';
+import { ClassSerializerInterceptor, HttpStatus, Patch } from '@nestjs/common';
 import {
   Body,
   Controller,
@@ -12,7 +12,8 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common/decorators';
-import { ClassSerializerInterceptor, HttpStatus, Patch } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { DeleteWorkflowCommand, DeleteWorkflowUseCase, UserAuthGuard, UserSession } from '@novu/application-generic';
 import {
   CreateWorkflowDto,
   DirectionEnum,
@@ -22,7 +23,7 @@ import {
   ListWorkflowResponse,
   PatchStepDataDto,
   PatchWorkflowDto,
-  StepDataDto,
+  StepResponseDto,
   SyncWorkflowDto,
   UpdateWorkflowDto,
   UserSessionData,
@@ -30,20 +31,10 @@ import {
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
 } from '@novu/shared';
-import { DeleteWorkflowCommand, DeleteWorkflowUseCase, UserAuthGuard, UserSession } from '@novu/application-generic';
 import { ApiCommonResponses } from '../shared/framework/response.decorator';
 import { UserAuthentication } from '../shared/framework/swagger/api.key.security';
-import { GetWorkflowCommand } from './usecases/get-workflow/get-workflow.command';
-import { UpsertWorkflowUseCase } from './usecases/upsert-workflow/upsert-workflow.usecase';
-import { UpsertWorkflowCommand } from './usecases/upsert-workflow/upsert-workflow.command';
-import { GetWorkflowUseCase } from './usecases/get-workflow/get-workflow.usecase';
-import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.usecase';
-import { ListWorkflowsCommand } from './usecases/list-workflows/list-workflows.command';
-import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
-import { SyncToEnvironmentCommand } from './usecases/sync-to-environment/sync-to-environment.command';
-import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
-import { ParseSlugIdPipe } from './pipes/parse-slug-id.pipe';
 import { ParseSlugEnvironmentIdPipe } from './pipes/parse-slug-env-id.pipe';
+import { ParseSlugIdPipe } from './pipes/parse-slug-id.pipe';
 import {
   BuildStepDataCommand,
   BuildStepDataUsecase,
@@ -51,9 +42,18 @@ import {
   WorkflowTestDataCommand,
 } from './usecases';
 import { GeneratePreviewCommand } from './usecases/generate-preview/generate-preview.command';
+import { GeneratePreviewUsecase } from './usecases/generate-preview/generate-preview.usecase';
+import { GetWorkflowCommand } from './usecases/get-workflow/get-workflow.command';
+import { GetWorkflowUseCase } from './usecases/get-workflow/get-workflow.usecase';
+import { ListWorkflowsUseCase } from './usecases/list-workflows/list-workflow.usecase';
+import { ListWorkflowsCommand } from './usecases/list-workflows/list-workflows.command';
 import { PatchStepCommand } from './usecases/patch-step-data';
-import { PatchWorkflowCommand, PatchWorkflowUsecase } from './usecases/patch-workflow';
 import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
+import { PatchWorkflowCommand, PatchWorkflowUsecase } from './usecases/patch-workflow';
+import { SyncToEnvironmentCommand } from './usecases/sync-to-environment/sync-to-environment.command';
+import { SyncToEnvironmentUseCase } from './usecases/sync-to-environment/sync-to-environment.usecase';
+import { UpsertWorkflowCommand } from './usecases/upsert-workflow/upsert-workflow.command';
+import { UpsertWorkflowUseCase } from './usecases/upsert-workflow/upsert-workflow.usecase';
 
 @ApiCommonResponses()
 @Controller({ path: `/workflows`, version: '2' })
@@ -113,7 +113,7 @@ export class WorkflowController {
   ): Promise<WorkflowResponseDto> {
     return await this.upsertWorkflowUseCase.execute(
       UpsertWorkflowCommand.create({
-        workflowDto: { ...updateWorkflowDto },
+        workflowDto: updateWorkflowDto,
         user,
         workflowIdOrInternalId,
       })
@@ -165,7 +165,7 @@ export class WorkflowController {
         offset: Number(query.offset || '0'),
         limit: Number(query.limit || '50'),
         orderDirection: query.orderDirection ?? DirectionEnum.DESC,
-        orderByField: query.orderByField ?? 'createdAt',
+        orderBy: query.orderBy ?? 'createdAt',
         searchQuery: query.query,
         user,
       })
@@ -196,7 +196,7 @@ export class WorkflowController {
     @UserSession(ParseSlugEnvironmentIdPipe) user: UserSessionData,
     @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string,
     @Param('stepId', ParseSlugIdPipe) stepIdOrInternalId: string
-  ): Promise<StepDataDto> {
+  ): Promise<StepResponseDto> {
     return await this.buildStepDataUsecase.execute(
       BuildStepDataCommand.create({ user, workflowIdOrInternalId, stepIdOrInternalId })
     );
@@ -209,7 +209,7 @@ export class WorkflowController {
     @Param('workflowId', ParseSlugIdPipe) workflowIdOrInternalId: string,
     @Param('stepId', ParseSlugIdPipe) stepIdOrInternalId: string,
     @Body() patchStepDataDto: PatchStepDataDto
-  ): Promise<StepDataDto> {
+  ): Promise<StepResponseDto> {
     return await this.patchStepDataUsecase.execute(
       PatchStepCommand.create({
         user,
