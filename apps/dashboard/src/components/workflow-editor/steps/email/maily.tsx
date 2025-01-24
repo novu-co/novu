@@ -6,6 +6,7 @@ import { Editor } from '@maily-to/core';
 import { FeatureFlagsKeysEnum } from '@novu/shared';
 import type { Editor as TiptapEditor } from '@tiptap/core';
 import { HTMLAttributes, useMemo, useState } from 'react';
+import { ForExtension } from './extensions/for';
 import { DEFAULT_EDITOR_CONFIG, getEditorBlocks } from './maily-config';
 
 type MailyProps = HTMLAttributes<HTMLDivElement> & {
@@ -52,6 +53,7 @@ export const Maily = ({ value, onChange, className, ...rest }: MailyProps) => {
           key={isForBlockEnabled ? 'for-block-enabled' : 'for-block-disabled'}
           config={DEFAULT_EDITOR_CONFIG}
           blocks={getEditorBlocks(isForBlockEnabled)}
+          extensions={[ForExtension]}
           variableTriggerCharacter="{{"
           variables={({ query, editor, from }) => {
             const queryWithoutSuffix = query.replace(/}+$/, '');
