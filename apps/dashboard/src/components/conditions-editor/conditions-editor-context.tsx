@@ -5,8 +5,6 @@ import { ConditionsEditorContextType } from './types';
 import { useDataRef } from '@/hooks/use-data-ref';
 
 export const ConditionsEditorContext = createContext<ConditionsEditorContextType>({
-  query: { combinator: 'and', rules: [] },
-  setQuery: () => {},
   removeRuleOrGroup: () => {},
   cloneRuleOrGroup: () => {},
   getParentGroup: () => null,
@@ -23,6 +21,7 @@ export function ConditionsEditorProvider({
 }) {
   const queryRef = useDataRef(query);
   const queryChangeRef = useDataRef(onQueryChange);
+
   const removeRuleOrGroup = useCallback(
     (path: Path) => {
       queryChangeRef.current(remove(queryRef.current, path));
@@ -37,11 +36,9 @@ export function ConditionsEditorProvider({
     [queryChangeRef, queryRef]
   );
 
-  const setQuery = useCallback((query: RuleGroupType) => queryChangeRef.current(query), [queryChangeRef]);
-
   const getParentGroup = useCallback(
     (id?: string) => {
-      if (!id) return query;
+      if (!id) return queryRef.current;
 
       const findParent = (group: RuleGroupTypeAny): RuleGroupTypeAny | null => {
         for (const rule of group.rules) {
@@ -60,14 +57,14 @@ export function ConditionsEditorProvider({
         return null;
       };
 
-      return findParent(query);
+      return findParent(queryRef.current);
     },
-    [query]
+    [queryRef]
   );
 
   const contextValue = useMemo(
-    () => ({ query, setQuery, removeRuleOrGroup, cloneRuleOrGroup, getParentGroup }),
-    [query, setQuery, removeRuleOrGroup, cloneRuleOrGroup, getParentGroup]
+    () => ({ removeRuleOrGroup, cloneRuleOrGroup, getParentGroup }),
+    [removeRuleOrGroup, cloneRuleOrGroup, getParentGroup]
   );
 
   return <ConditionsEditorContext.Provider value={contextValue}>{children}</ConditionsEditorContext.Provider>;

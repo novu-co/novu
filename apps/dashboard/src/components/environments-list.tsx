@@ -134,7 +134,7 @@ export function EnvironmentsList() {
                             className="z-10 h-8 w-8 p-0"
                           ></CompactButton>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent>
+                        <DropdownMenuContent alignOffset={5} align="end">
                           <DropdownMenuGroup>
                             <DropdownMenuItem onSelect={() => setEditEnvironment(environment)}>
                               Edit environment

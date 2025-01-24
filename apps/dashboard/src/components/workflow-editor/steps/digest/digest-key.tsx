@@ -40,7 +40,7 @@ export const DigestKey = () => {
                   value={field.value}
                   onChange={field.onChange}
                   variables={variables}
-                  size="default"
+                  size="md"
                 />
               </InputWrapper>
             </InputRoot>

@@ -30,6 +30,9 @@ export const ROUTES = {
   API_KEYS: '/env/:environmentSlug/api-keys',
   ENVIRONMENTS: '/env/:environmentSlug/environments',
   ACTIVITY_FEED: '/env/:environmentSlug/activity-feed',
+  TEMPLATE_STORE: '/env/:environmentSlug/workflows/templates',
+  WORKFLOWS_CREATE: '/env/:environmentSlug/workflows/create',
+  TEMPLATE_STORE_CREATE_WORKFLOW: '/env/:environmentSlug/workflows/templates/:templateId',
 } as const;
 
 export const buildRoute = (route: string, params: Record<string, string>) => {

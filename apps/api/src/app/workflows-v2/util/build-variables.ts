@@ -1,11 +1,12 @@
 import _ from 'lodash';
-
+import { AdditionalOperation, RulesLogic } from 'json-logic-js';
 import { PinoLogger } from '@novu/application-generic';
 
 import { Variable, extractLiquidTemplateVariables, TemplateVariables } from './template-parser/liquid-parser';
 import { WrapMailyInLiquidUseCase } from '../../environments-v1/usecases/output-renderers/maily-to-liquid/wrap-maily-in-liquid.usecase';
 import { MAILY_ITERABLE_MARK } from '../../environments-v1/usecases/output-renderers/maily-to-liquid/maily.types';
 import { isStringifiedMailyJSONContent } from '../../environments-v1/usecases/output-renderers/maily-to-liquid/wrap-maily-in-liquid.command';
+import { extractFieldsFromRules, isValidRule } from '../../shared/services/query-parser/query-parser.service';
 
 export function buildVariables(
   variableSchema: Record<string, unknown> | undefined,
@@ -29,6 +30,15 @@ export function buildVariables(
         'BuildVariables'
       );
     }
+  } else if (isValidRule(variableControlValue as RulesLogic<AdditionalOperation>)) {
+    const fields = extractFieldsFromRules(variableControlValue as RulesLogic<AdditionalOperation>)
+      .filter((field) => field.startsWith('payload.') || field.startsWith('subscriber.data.'))
+      .map((field) => `{{${field}}}`);
+
+    variableControlValue = {
+      rules: variableControlValue,
+      fields,
+    };
   }
 
   const { validVariables, invalidVariables } = extractLiquidTemplateVariables(JSON.stringify(variableControlValue));
