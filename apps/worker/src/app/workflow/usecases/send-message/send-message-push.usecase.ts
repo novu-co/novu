@@ -263,24 +263,19 @@ export class SendMessagePush extends SendMessageBase {
       raw?: string;
     }
   ): Promise<void> {
-    // We avoid to throw the errors to be able to execute all actions in the loop
-    try {
-      await this.executionLogRoute.execute(
-        ExecutionLogRouteCommand.create({
-          ...ExecutionLogRouteCommand.getDetailsFromJob(job),
-          detail,
-          source: ExecutionDetailsSourceEnum.INTERNAL,
-          status: ExecutionDetailsStatusEnum.FAILED,
-          isTest: false,
-          isRetry: false,
-          ...(contextData?.providerId && { providerId: contextData.providerId }),
-          ...(contextData?.messageId && { messageId: contextData.messageId }),
-          ...(contextData?.raw && { raw: contextData.raw }),
-        })
-      );
-    } catch (error) {
-      Logger.log(error, 'Error creating execution details error');
-    }
+    await this.executionLogRoute.execute(
+      ExecutionLogRouteCommand.create({
+        ...ExecutionLogRouteCommand.getDetailsFromJob(job),
+        detail,
+        source: ExecutionDetailsSourceEnum.INTERNAL,
+        status: ExecutionDetailsStatusEnum.FAILED,
+        isTest: false,
+        isRetry: false,
+        ...(contextData?.providerId && { providerId: contextData.providerId }),
+        ...(contextData?.messageId && { messageId: contextData.messageId }),
+        ...(contextData?.raw && { raw: contextData.raw }),
+      })
+    );
   }
 
   private async sendMessage(
