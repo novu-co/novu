@@ -250,9 +250,9 @@ export class EmailOutputRendererUsecase {
     if (normalized === 'false' || normalized === 'null' || normalized === 'undefined') return false;
 
     try {
-      return Boolean(JSON.parse(value));
+      return Boolean(JSON.parse(normalized));
     } catch {
-      return Boolean(value);
+      return Boolean(normalized);
     }
   }
 

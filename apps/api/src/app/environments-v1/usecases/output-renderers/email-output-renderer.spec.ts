@@ -339,6 +339,7 @@ describe('EmailOutputRendererUsecase', () => {
         { value: true, desc: 'boolean true' },
         { value: 1, desc: 'number 1' },
         { value: 'true', desc: 'string "true"' },
+        { value: 'TRUE', desc: 'string "TRUE"' },
         { value: 'yes', desc: 'string "yes"' },
         { value: {}, desc: 'empty object' },
         { value: [], desc: 'empty array' },
@@ -411,6 +412,7 @@ describe('EmailOutputRendererUsecase', () => {
         { value: '', desc: 'empty string' },
         { value: null, desc: 'null' },
         { value: undefined, desc: 'undefined' },
+        { value: 'UNDEFINED', desc: 'string "UNDEFINED"' },
       ];
 
       const mockTipTapNode: MailyJSONContent = {
