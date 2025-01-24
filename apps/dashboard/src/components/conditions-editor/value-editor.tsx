@@ -1,7 +1,7 @@
 import { useValueEditor, ValueEditorProps } from 'react-querybuilder';
 import { useFormContext } from 'react-hook-form';
 
-import { InputRoot, InputWrapper } from '@/components/primitives/input';
+import { InputRoot } from '@/components/primitives/input';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
 import { ControlInput } from '../primitives/control-input/control-input';
 
