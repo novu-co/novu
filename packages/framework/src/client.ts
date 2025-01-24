@@ -312,7 +312,8 @@ export class Client {
 
       // Only evaluate a skip condition when the step is the current step and not in preview mode.
       if (!isPreview && stepId === event.stepId) {
-        const controls = await this.createStepControls(step, event);
+        const templateControls = await this.createStepControls(step, event);
+        const controls = await this.compileControls(templateControls, event);
         const shouldSkip = await this.shouldSkip(options?.skip as typeof step.options.skip, controls);
 
         if (shouldSkip) {

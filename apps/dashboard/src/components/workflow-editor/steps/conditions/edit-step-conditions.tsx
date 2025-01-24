@@ -1,16 +1,17 @@
 import { RiCloseLine, RiGuideFill } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 
 import { CompactButton } from '@/components/primitives/button-compact';
 import { StepDrawer } from '@/components/workflow-editor/steps/step-drawer';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
-import { FeatureFlagsKeysEnum } from '@novu/shared';
-import { Button } from '@/components/primitives/button';
+import { EditStepConditionsForm } from '@/components/workflow-editor/steps/conditions/edit-step-conditions-form';
+import { EditStepConditionsFormSkeleton } from '@/components/workflow-editor/steps/conditions/edit-step-conditions-skeleton';
 
 export const EditStepConditions = () => {
   const navigate = useNavigate();
-  const { workflow, step } = useWorkflow();
+  const { isPending, workflow, step } = useWorkflow();
   const isStepConditionsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_STEP_CONDITIONS_ENABLED);
 
   if (!workflow || !step) {
@@ -23,11 +24,11 @@ export const EditStepConditions = () => {
   }
 
   return (
-    <StepDrawer title={`Edit ${step?.name} Conditions`}>
-      <header className="flex flex-row items-center gap-3 px-3 py-1.5">
+    <StepDrawer title={`Edit ${step?.name} Skip Conditions`}>
+      <header className="flex flex-row items-center gap-3 border-b border-neutral-200 px-3 py-1.5">
         <div className="mr-auto flex items-center gap-2.5 py-2 text-sm font-medium">
           <RiGuideFill className="size-4" />
-          <span>Step Conditions</span>
+          <span>Skip Conditions</span>
         </div>
 
         <CompactButton
@@ -43,11 +44,7 @@ export const EditStepConditions = () => {
           <span className="sr-only">Close</span>
         </CompactButton>
       </header>
-      <div className="mt-auto flex justify-end border-t border-neutral-200 p-3">
-        <Button type="submit" variant="secondary">
-          Save Conditions
-        </Button>
-      </div>
+      {isPending ? <EditStepConditionsFormSkeleton /> : <EditStepConditionsForm />}
     </StepDrawer>
   );
 };
