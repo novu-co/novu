@@ -56,7 +56,7 @@ export class PreviewUsecase {
 
       for (const [controlKey, controlValue] of Object.entries(sanitizedValidatedControls || {})) {
         const variables = buildVariables(variableSchema, controlValue, this.logger);
-        const processedControlValues = this.fixControlValueInvalidVariables(controlValue, variables.invalidVariables);
+        const processedControlValues = this.replaceInvalidLiquidOutput(controlValue, variables.invalidVariables);
         const showIfVariables: string[] = this.findShowIfVariables(processedControlValues);
         const validVariableNames = variables.validVariables.map((variable) => variable.name);
         const variablesExampleResult = keysToObject(validVariableNames, showIfVariables);
@@ -198,10 +198,9 @@ export class PreviewUsecase {
     return _.merge(variables, { properties: { payload: payloadSchema } });
   }
 
-  private fixControlValueInvalidVariables(
-    controlValues: unknown,
-    invalidVariables: Variable[]
-  ): Record<string, unknown> {
+  private replaceInvalidLiquidOutput(controlValues: unknown, invalidVariables: Variable[]): Record<string, unknown> {
+    const INVALID_VARIABLE_REPLACEMENT = '';
+
     try {
       let controlValuesString = JSON.stringify(controlValues);
 
@@ -210,8 +209,7 @@ export class PreviewUsecase {
           continue;
         }
 
-        const EMPTY_STRING = '';
-        controlValuesString = replaceAll(controlValuesString, invalidVariable.output, EMPTY_STRING);
+        controlValuesString = replaceAll(controlValuesString, invalidVariable.output, INVALID_VARIABLE_REPLACEMENT);
       }
 
       return JSON.parse(controlValuesString) as Record<string, unknown>;
