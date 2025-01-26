@@ -1,5 +1,5 @@
-import { SidebarContent } from '@/components/side-navigation/sidebar';
 import { Badge } from '@/components/primitives/badge';
+import { SidebarContent } from '@/components/side-navigation/sidebar';
 import { useEnvironment } from '@/context/environment/hooks';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { buildRoute, ROUTES } from '@/utils/routes';
@@ -37,7 +37,7 @@ const NavigationGroup = ({ children, label }: { children: ReactNode; label?: str
 
 export const SideNavigation = () => {
   const { subscription, daysLeft, isLoading: isLoadingSubscription } = useFetchSubscription();
-  const isFreeTrialActive = subscription?.trial.isActive || subscription?.hasPaymentMethod;
+  const isFreeTrialActive = subscription?.trial.isActive;
 
   const { currentEnvironment, environments, switchEnvironment } = useEnvironment();
   const track = useTelemetry();
