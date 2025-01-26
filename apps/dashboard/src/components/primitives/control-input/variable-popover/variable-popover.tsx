@@ -14,8 +14,9 @@ import { Switch } from '@/components/primitives/switch';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { RiAddFill } from 'react-icons/ri';
+import { RiAddFill, RiQuestionLine } from 'react-icons/ri';
 import { Separator } from '../../separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../tooltip';
 import { FilterItem } from './components/filter-item';
 import { FilterPreview } from './components/filter-preview';
 import { FiltersList } from './components/filters-list';
@@ -145,7 +146,21 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
           <FormItem>
             <FormControl>
               <div className="grid gap-1">
-                <label className="text-text-sub text-label-xs">LiquidJS Filters</label>
+                <label className="text-text-sub text-label-xs">
+                  LiquidJS Filters
+                  <Tooltip>
+                    <TooltipTrigger className="relative top-0.5 ml-1 cursor-pointer">
+                      <RiQuestionLine className="text-text-soft h-3 w-3" />
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-sm">
+                      <p>
+                        LiquidJS filters modify the variable output in sequence, with each filter using the previous
+                        one’s result. Reorder them by dragging and dropping.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </label>
+
                 <Popover open={isCommandOpen} onOpenChange={setIsCommandOpen}>
                   <PopoverTrigger asChild>
                     <button className="text-text-soft bg-background flex h-[30px] w-full items-center justify-between rounded-md border px-2 text-sm">
