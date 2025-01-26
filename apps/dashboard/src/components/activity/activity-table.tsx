@@ -80,7 +80,7 @@ export function ActivityTable({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="flex min-h-full min-w-[800px] flex-1 flex-col"
+          className="flex min-h-full flex-1 flex-col"
         >
           <Table
             isLoading={isLoading}
@@ -181,7 +181,7 @@ function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriber
   if (!subscriber) return '';
 
   if (subscriber.firstName || subscriber.lastName) {
-    return `• ${subscriber.firstName || ''} ${subscriber.lastName || ''}`;
+    return `• ${subscriber.firstName || ''} ${subscriber.lastName || ''}`.trim();
   }
 
   return '';

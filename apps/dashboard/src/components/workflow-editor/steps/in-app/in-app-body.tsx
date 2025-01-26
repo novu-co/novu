@@ -6,7 +6,7 @@ import { FormControl, FormField, FormItem, FormMessage } from '@/components/prim
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { parseStepVariablesToLiquidVariables } from '@/utils/parseStepVariablesToLiquidVariables';
 import { capitalize } from '@/utils/string';
-import { InputRoot, InputWrapper } from '../../../primitives/input';
+import { InputRoot } from '../../../primitives/input';
 
 const bodyKey = 'body';
 
@@ -23,18 +23,17 @@ export const InAppBody = () => {
         <FormItem className="w-full">
           <FormControl>
             <InputRoot hasError={!!fieldState.error}>
-              <InputWrapper className="h-36 items-start p-3 py-2">
-                <ControlInput
-                  indentWithTab={false}
-                  placeholder={capitalize(field.name)}
-                  id={field.name}
-                  value={field.value}
-                  onChange={field.onChange}
-                  variables={variables}
-                  autoFocus
-                  multiline
-                />
-              </InputWrapper>
+              <ControlInput
+                className="h-[7.75rem]"
+                indentWithTab={false}
+                placeholder={capitalize(field.name)}
+                id={field.name}
+                value={field.value}
+                onChange={field.onChange}
+                variables={variables}
+                autoFocus
+                multiline
+              />
             </InputRoot>
           </FormControl>
           <FormMessage>{`Type {{ for variables, or wrap text in ** for bold.`}</FormMessage>

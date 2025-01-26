@@ -21,8 +21,11 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { parseJsonLogic } from 'react-querybuilder/parseJsonLogic';
 import { RQBJsonLogic } from 'react-querybuilder';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import { ConfirmationModal } from '@/components/confirmation-modal';
+import { stepSchema } from '@/components/workflow-editor/schema';
 import { PageMeta } from '@/components/page-meta';
 import { Button } from '@/components/primitives/button';
 import { CopyButton } from '@/components/primitives/copy-button';
@@ -146,15 +149,17 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     [step, registerInlineControlValues]
   );
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof stepSchema>>({
     defaultValues,
     shouldFocusError: false,
+    resolver: zodResolver(stepSchema),
   });
 
   const { onBlur, saveForm } = useFormAutosave({
     previousData: defaultValues,
     form,
     isReadOnly,
+    shouldClientValidate: true,
     save: (data) => {
       // transform form fields to step update dto
       const updateStepData: Partial<StepUpdateDto> = {
@@ -179,6 +184,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     Object.values(currentErrors).forEach((controlValues) => {
       Object.keys(controlValues).forEach((key) => {
         if (!stepIssues[`${key}`]) {
+          // @ts-expect-error
           form.clearErrors(`controlValues.${key}`);
         }
       });
@@ -186,6 +192,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
 
     // Set new errors from stepIssues
     Object.entries(stepIssues).forEach(([key, value]) => {
+      // @ts-expect-error
       form.setError(`controlValues.${key}`, { message: value });
     });
   }, [form, step]);
