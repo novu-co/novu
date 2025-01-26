@@ -1,4 +1,3 @@
-import { createNovuBaseClient, HttpError, NovuRestResult } from './novu-base-client';
 import {
   CreateWorkflowDto,
   GeneratePreviewRequestDto,
@@ -13,6 +12,7 @@ import {
   WorkflowResponseDto,
   WorkflowTestDataResponseDto,
 } from '../dto';
+import { createNovuBaseClient, HttpError, NovuRestResult } from './novu-base-client';
 
 export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {}) => {
   const baseClient = createNovuBaseClient(baseUrl, headers);
@@ -76,8 +76,8 @@ export const createWorkflowClient = (baseUrl: string, headers: HeadersInit = {})
     if (queryParams.orderDirection) {
       query.append('orderDirection', queryParams.orderDirection);
     }
-    if (queryParams.orderByField) {
-      query.append('orderByField', queryParams.orderByField);
+    if (queryParams.orderBy) {
+      query.append('orderBy', queryParams.orderBy);
     }
     if (queryParams.query) {
       query.append('query', queryParams.query);

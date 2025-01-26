@@ -187,7 +187,8 @@ export const VariableSelect = ({
       e.preventDefault();
     } else if (e.key === 'Enter') {
       if (hoveredOptionIndex !== -1) {
-        onSelect(options[hoveredOptionIndex].value ?? '');
+        e.preventDefault();
+        onSelect(filteredOptions[hoveredOptionIndex].value ?? '');
         setHoveredOptionIndex(-1);
       }
     }

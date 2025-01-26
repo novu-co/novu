@@ -30,7 +30,7 @@ import {
 } from './usecases';
 import { PatchWorkflowUsecase } from './usecases/patch-workflow';
 import { PatchStepUsecase } from './usecases/patch-step-data/patch-step.usecase';
-import { BuildPayloadSchema } from './usecases/build-payload-schema/build-payload-schema.usecase';
+import { ExtractVariables } from './usecases/extract-variables/extract-variables.usecase';
 import { BuildStepIssuesUsecase } from './usecases/build-step-issues/build-step-issues.usecase';
 import { WorkflowController } from './workflow.controller';
 
@@ -60,7 +60,7 @@ const DAL_REPOSITORIES = [CommunityOrganizationRepository];
     PatchStepUsecase,
     PatchWorkflowUsecase,
     TierRestrictionsValidateUsecase,
-    BuildPayloadSchema,
+    ExtractVariables,
     BuildStepIssuesUsecase,
   ],
 })

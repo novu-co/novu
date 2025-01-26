@@ -230,7 +230,10 @@ export class ConstructFrameworkWorkflow {
     return foundWorkflow;
   }
 
-  private processSkipOption(controlValues: { [x: string]: unknown }, variables: FullPayloadForRender) {
+  private async processSkipOption(
+    controlValues: { [x: string]: unknown },
+    variables: FullPayloadForRender
+  ): Promise<boolean> {
     const skipRules = controlValues.skip as RulesLogic<AdditionalOperation>;
 
     if (_.isEmpty(skipRules)) {

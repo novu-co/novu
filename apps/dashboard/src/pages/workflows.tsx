@@ -2,14 +2,23 @@ import { DashboardLayout } from '@/components/dashboard-layout';
 import { OptInModal } from '@/components/opt-in-modal';
 import { PageMeta } from '@/components/page-meta';
 import { Button } from '@/components/primitives/button';
+import { Input } from '@/components/primitives/input';
 import { ScrollArea, ScrollBar } from '@/components/primitives/scroll-area';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
+import { useDebounce } from '@/hooks/use-debounce';
 import { useFetchWorkflows } from '@/hooks/use-fetch-workflows';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
-import { FeatureFlagsKeysEnum, StepTypeEnum } from '@novu/shared';
+import { StepTypeEnum } from '@novu/shared';
 import { useEffect } from 'react';
-import { RiArrowDownSLine, RiArrowRightSLine, RiFileAddLine, RiFileMarkedLine, RiRouteFill } from 'react-icons/ri';
+import { useForm } from 'react-hook-form';
+import {
+  RiArrowDownSLine,
+  RiArrowRightSLine,
+  RiFileAddLine,
+  RiFileMarkedLine,
+  RiRouteFill,
+  RiSearchLine,
+} from 'react-icons/ri';
 import { Outlet, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ButtonGroupItem, ButtonGroupRoot } from '../components/primitives/button-group';
 import { LinkButton } from '../components/primitives/button-link';
@@ -19,18 +28,57 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../components/primitives/dropdown-menu';
+import { Form, FormField, FormItem } from '../components/primitives/form/form';
 import { getTemplates, WorkflowTemplate } from '../components/template-store/templates';
 import { WorkflowCard } from '../components/template-store/workflow-card';
 import { WorkflowTemplateModal } from '../components/template-store/workflow-template-modal';
-import { WorkflowList } from '../components/workflow-list';
+import { SortableColumn, WorkflowList } from '../components/workflow-list';
 import { buildRoute, ROUTES } from '../utils/routes';
+
+interface WorkflowFilters {
+  query: string;
+}
 
 export const WorkflowsPage = () => {
   const { environmentSlug } = useParams();
   const track = useTelemetry();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const isTemplateStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_TEMPLATE_STORE_ENABLED);
+  const [searchParams, setSearchParams] = useSearchParams({
+    orderDirection: 'desc',
+    orderBy: 'updatedAt',
+    query: '',
+  });
+  const form = useForm<WorkflowFilters>({
+    defaultValues: {
+      query: searchParams.get('query') || '',
+    },
+  });
+
+  const updateSearchParam = (value: string) => {
+    if (value) {
+      searchParams.set('query', value);
+    } else {
+      searchParams.delete('query');
+    }
+    setSearchParams(searchParams);
+  };
+
+  const debouncedSearch = useDebounce((value: string) => updateSearchParam(value), 500);
+
+  const clearFilters = () => {
+    form.reset({ query: '' });
+  };
+
+  useEffect(() => {
+    const subscription = form.watch((value: { query?: string }) => {
+      debouncedSearch(value.query || '');
+    });
+
+    return () => {
+      subscription.unsubscribe();
+      debouncedSearch.cancel();
+    };
+  }, [form, debouncedSearch]);
   const templates = getTemplates();
   const popularTemplates = templates.filter((template) => template.isPopular).slice(0, 4);
 
@@ -44,9 +92,14 @@ export const WorkflowsPage = () => {
   } = useFetchWorkflows({
     limit,
     offset,
+    orderBy: searchParams.get('orderBy') as SortableColumn,
+    orderDirection: searchParams.get('orderDirection') as 'asc' | 'desc',
+    query: searchParams.get('query') || '',
   });
 
-  const shouldShowStartWith = isTemplateStoreEnabled && workflowsData && workflowsData.totalCount < 5;
+  const hasActiveFilters = searchParams.get('query') && searchParams.get('query') !== null;
+
+  const shouldShowStartWith = workflowsData && workflowsData.totalCount < 5 && !hasActiveFilters;
 
   useEffect(() => {
     track(TelemetryEvent.WORKFLOWS_PAGE_VISIT);
@@ -59,7 +112,7 @@ export const WorkflowsPage = () => {
       buildRoute(ROUTES.TEMPLATE_STORE_CREATE_WORKFLOW, {
         environmentSlug: environmentSlug || '',
         templateId: template.id,
-      })
+      }) + '?source=template-store-card-row'
     );
   };
 
@@ -70,80 +123,83 @@ export const WorkflowsPage = () => {
         <OptInModal />
         <div className="h-full w-full">
           <div className="flex justify-between px-2.5 py-2.5">
-            <div className="invisible flex w-[20ch] items-center gap-2 rounded-lg bg-neutral-50 p-2"></div>
-            {isTemplateStoreEnabled ? (
-              <ButtonGroupRoot size="xs">
-                <ButtonGroupItem asChild className="gap-1">
-                  <Button
-                    mode="gradient"
-                    className="rounded-l-lg rounded-r-none border-none p-2 text-white"
-                    variant="primary"
-                    size="xs"
-                    leadingIcon={RiRouteFill}
-                    onClick={() =>
-                      navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }))
-                    }
-                  >
-                    Create workflow
-                  </Button>
-                </ButtonGroupItem>
-                <ButtonGroupItem asChild>
-                  <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        mode="gradient"
-                        className="rounded-l-none rounded-r-lg border-none text-white"
-                        variant="primary"
+            <Form {...form}>
+              <form>
+                <FormField
+                  control={form.control}
+                  name="query"
+                  render={({ field }) => (
+                    <FormItem className="relative">
+                      <Input
                         size="xs"
-                        leadingIcon={RiArrowDownSLine}
-                      ></Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
-                      <DropdownMenuItem className="cursor-pointer" asChild>
-                        <div
-                          className="w-full"
-                          onClick={() => {
-                            track(TelemetryEvent.CREATE_WORKFLOW_CLICK);
-                            navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }));
-                          }}
-                        >
-                          <div className="flex items-center gap-2">
-                            <RiFileAddLine />
-                            Blank Workflow
-                          </div>
-                        </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onSelect={() =>
-                          navigate(
-                            buildRoute(ROUTES.TEMPLATE_STORE, {
-                              environmentSlug: environmentSlug || '',
-                              source: 'create-workflow-dropdown',
-                            })
-                          )
-                        }
+                        className="w-64"
+                        {...field}
+                        placeholder="Search workflows..."
+                        leadingIcon={RiSearchLine}
+                      />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+            <ButtonGroupRoot size="xs">
+              <ButtonGroupItem asChild className="gap-1">
+                <Button
+                  mode="gradient"
+                  className="rounded-l-lg rounded-r-none border-none p-2 text-white"
+                  variant="primary"
+                  size="xs"
+                  leadingIcon={RiRouteFill}
+                  onClick={() =>
+                    navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }))
+                  }
+                >
+                  Create workflow
+                </Button>
+              </ButtonGroupItem>
+              <ButtonGroupItem asChild>
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      mode="gradient"
+                      className="rounded-l-none rounded-r-lg border-none text-white"
+                      variant="primary"
+                      size="xs"
+                      leadingIcon={RiArrowDownSLine}
+                    ></Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    <DropdownMenuItem className="cursor-pointer" asChild>
+                      <div
+                        className="w-full"
+                        onClick={() => {
+                          track(TelemetryEvent.CREATE_WORKFLOW_CLICK);
+                          navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }));
+                        }}
                       >
-                        <RiFileMarkedLine />
-                        View Workflow Gallery
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </ButtonGroupItem>
-              </ButtonGroupRoot>
-            ) : (
-              <Button
-                mode="gradient"
-                variant="primary"
-                size="xs"
-                leadingIcon={RiRouteFill}
-                onClick={() =>
-                  navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }))
-                }
-              >
-                Create workflow
-              </Button>
-            )}
+                        <div className="flex items-center gap-2">
+                          <RiFileAddLine />
+                          Blank Workflow
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onSelect={() => {
+                        navigate(
+                          buildRoute(ROUTES.TEMPLATE_STORE, {
+                            environmentSlug: environmentSlug || '',
+                          }) + '?source=create-workflow-dropdown'
+                        );
+                      }}
+                    >
+                      <RiFileMarkedLine />
+                      View Workflow Gallery
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </ButtonGroupItem>
+            </ButtonGroupRoot>
           </div>
           {shouldShowStartWith && (
             <div className="px-2.5 py-2">
@@ -156,8 +212,7 @@ export const WorkflowsPage = () => {
                     navigate(
                       buildRoute(ROUTES.TEMPLATE_STORE, {
                         environmentSlug: environmentSlug || '',
-                        source: 'start-with',
-                      })
+                      }) + '?source=start-with'
                     )
                   }
                   trailingIcon={RiArrowRightSLine}
@@ -194,7 +249,16 @@ export const WorkflowsPage = () => {
 
           <div className="px-2.5 py-2">
             {shouldShowStartWith && <div className="text-label-xs text-text-soft mb-2">Your Workflows</div>}
-            <WorkflowList data={workflowsData} isPending={isPending} isError={isError} limit={limit} />
+            <WorkflowList
+              hasActiveFilters={!!hasActiveFilters}
+              onClearFilters={clearFilters}
+              orderBy={searchParams.get('orderBy') as SortableColumn}
+              orderDirection={searchParams.get('orderDirection') as 'asc' | 'desc'}
+              data={workflowsData}
+              isLoading={isPending}
+              isError={isError}
+              limit={limit}
+            />
           </div>
         </div>
         <Outlet />

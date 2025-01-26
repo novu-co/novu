@@ -18,6 +18,7 @@ export const inputVariants = tv({
   slots: {
     root: [
       // base
+      'ring-stroke-soft',
       'group relative flex w-full overflow-hidden bg-bg-white-0 text-text-strong shadow-xs',
       'transition duration-200 ease-out',
       'divide-x divide-stroke-soft',
@@ -29,6 +30,7 @@ export const inputVariants = tv({
       'hover:shadow-none',
       // focus
       'has-[input:focus]:shadow-button-important-focus has-[input:focus]:before:ring-stroke-strong',
+      'focus-within:shadow-button-important-focus focus-within:before:ring-stroke-strong',
       // disabled
       'has-[input:disabled]:shadow-none',
     ],
@@ -110,11 +112,13 @@ export const inputVariants = tv({
         input: 'h-8 text-paragraph-xs',
         affix: 'text-paragraph-xs',
         inlineAffix: 'text-paragraph-xs',
+        icon: 'size-4',
       },
       '2xs': {
         root: 'rounded-lg',
         wrapper: 'gap-1.5 px-2',
         input: 'h-7 text-paragraph-xs',
+        icon: 'size-4',
       },
     },
     hasError: {
@@ -126,6 +130,7 @@ export const inputVariants = tv({
           'hover:before:ring-error-base hover:[&:not(&:has(input:focus)):has(>:only-child)]:before:ring-error-base',
           // focus
           'has-[input:focus]:shadow-button-error-focus has-[input:focus]:before:ring-error-base',
+          'focus-within:shadow-button-error-focus focus-within:before:ring-error-base',
         ],
       },
       false: {
