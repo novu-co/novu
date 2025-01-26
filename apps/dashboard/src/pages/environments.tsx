@@ -19,9 +19,7 @@ export function EnvironmentsPage() {
   const track = useTelemetry();
   const { subscription } = useFetchSubscription();
 
-  const isPaidTier =
-    subscription?.apiServiceLevel === ApiServiceLevelEnum.BUSINESS ||
-    subscription?.apiServiceLevel === ApiServiceLevelEnum.ENTERPRISE;
+  const isPaidTier = subscription?.apiServiceLevel !== ApiServiceLevelEnum.FREE;
   const isTrialActive = subscription?.trial?.isActive;
   const canAccessEnvironments = areEnvironmentsInitialLoading || !subscription || (isPaidTier && !isTrialActive);
 
