@@ -13,15 +13,72 @@ import { EnvironmentBranchIcon } from './primitives/environment-branch-icon';
 import { Separator } from './primitives/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './primitives/table';
 import TruncatedText from './truncated-text';
+import { Skeleton } from './primitives/skeleton';
 
+function EnvironmentRowSkeleton() {
+  return (
+    <TableRow>
+      <TableCell>
+        <div className="flex items-center gap-2">
+          <Skeleton className="size-4 rounded-full" />
+          <Skeleton className="h-4 w-24" />
+        </div>
+      </TableCell>
+      <TableCell>
+        <Skeleton className="h-4 w-32" />
+      </TableCell>
+    </TableRow>
+  );
+}
+
+function FreeTierStateSkeleton() {
+  return (
+    <div className="flex h-full w-full flex-col items-center justify-center gap-6 px-4">
+      <div className="flex w-full max-w-[480px] flex-col items-center gap-6 text-center">
+        <div className="flex w-full flex-col gap-3">
+          <div className="flex flex-col items-center gap-2">
+            <div className="mb-[50px]">
+              <Skeleton className="h-28 w-80" />
+            </div>
+            <Skeleton className="h-6 w-40" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <Skeleton className="mx-auto h-px w-full max-w-[300px]" />
+          <div className="flex w-full items-center justify-center px-5">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Identifier</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <EnvironmentRowSkeleton />
+                <EnvironmentRowSkeleton />
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+        <div className="flex flex-col items-center gap-2">
+          <Skeleton className="h-8 w-40" />
+          <Skeleton className="h-6 w-32" />
+        </div>
+      </div>
+    </div>
+  );
+}
 export function FreeTierState() {
   const track = useTelemetry();
   const navigate = useNavigate();
   const { currentOrganization } = useAuth();
-  const { environments = [] } = useFetchEnvironments({
+  const { environments = [], areEnvironmentsInitialLoading } = useFetchEnvironments({
     organizationId: currentOrganization?._id,
   });
   const { currentEnvironment } = useEnvironment();
+
+  if (areEnvironmentsInitialLoading) {
+    return <FreeTierStateSkeleton />;
+  }
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-6 px-4">

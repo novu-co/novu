@@ -44,8 +44,8 @@ const EnvironmentRowSkeleton = () => (
   </TableRow>
 );
 
-export function EnvironmentsList({ environments, isLoading }: { environments: IEnvironment[]; isLoading: boolean }) {
-  const { currentEnvironment } = useEnvironment();
+export function EnvironmentsList({ environments }: { environments: IEnvironment[] }) {
+  const { currentEnvironment, areEnvironmentsInitialLoading } = useEnvironment();
   const [editEnvironment, setEditEnvironment] = useState<IEnvironment>();
   const [deleteEnvironment, setDeleteEnvironment] = useState<IEnvironment>();
   const { mutateAsync: deleteEnvironmentAction, isPending: isDeletePending } = useDeleteEnvironment();
@@ -80,7 +80,7 @@ export function EnvironmentsList({ environments, isLoading }: { environments: IE
           </TableRow>
         </TableHeader>
         <TableBody>
-          {isLoading
+          {areEnvironmentsInitialLoading
             ? Array.from({ length: 3 }).map((_, i) => <EnvironmentRowSkeleton key={i} />)
             : environments.map((environment) => (
                 <TableRow key={environment._id} className="group relative isolate">

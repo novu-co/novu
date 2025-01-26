@@ -11,6 +11,20 @@ import { useFetchSubscription } from '../hooks/use-fetch-subscription';
 import { useTelemetry } from '../hooks/use-telemetry';
 import { TelemetryEvent } from '../utils/telemetry';
 
+export function EnvironmentsPageSkeleton() {
+  return (
+    <>
+      <div className="flex flex-col justify-between gap-2 px-2.5 py-2.5">
+        <div className="flex justify-end">
+          <CreateEnvironmentButton />
+        </div>
+        <EnvironmentsList environments={[]} />
+      </div>
+      <FreeTierState />
+    </>
+  );
+}
+
 export function EnvironmentsPage() {
   const { currentOrganization } = useAuth();
   const { environments = [], areEnvironmentsInitialLoading } = useFetchEnvironments({
@@ -18,10 +32,7 @@ export function EnvironmentsPage() {
   });
   const track = useTelemetry();
   const { subscription } = useFetchSubscription();
-
-  const isPaidTier = subscription?.apiServiceLevel !== ApiServiceLevelEnum.FREE;
-  const isTrialActive = subscription?.trial?.isActive;
-  const canAccessEnvironments = areEnvironmentsInitialLoading || !subscription || (isPaidTier && !isTrialActive);
+  const isPaidTier = subscription?.apiServiceLevel !== ApiServiceLevelEnum.FREE && subscription?.trial?.isActive;
 
   useEffect(() => {
     track(TelemetryEvent.ENVIRONMENTS_PAGE_VIEWED);
@@ -31,12 +42,14 @@ export function EnvironmentsPage() {
     <>
       <PageMeta title={`Environments`} />
       <DashboardLayout headerStartItems={<h1 className="text-foreground-950">Environments</h1>}>
-        {canAccessEnvironments ? (
+        {areEnvironmentsInitialLoading ? (
+          <EnvironmentsPageSkeleton />
+        ) : isPaidTier ? (
           <div className="flex flex-col justify-between gap-2 px-2.5 py-2.5">
             <div className="flex justify-end">
               <CreateEnvironmentButton />
             </div>
-            <EnvironmentsList environments={environments} isLoading={areEnvironmentsInitialLoading} />
+            <EnvironmentsList environments={environments} />
           </div>
         ) : (
           <FreeTierState />
