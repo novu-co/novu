@@ -5,11 +5,10 @@ import { Button } from '@/components/primitives/button';
 import { Input } from '@/components/primitives/input';
 import { ScrollArea, ScrollBar } from '@/components/primitives/scroll-area';
 import { useDebounce } from '@/hooks/use-debounce';
-import { useFeatureFlag } from '@/hooks/use-feature-flag';
 import { useFetchWorkflows } from '@/hooks/use-fetch-workflows';
 import { useTelemetry } from '@/hooks/use-telemetry';
 import { TelemetryEvent } from '@/utils/telemetry';
-import { FeatureFlagsKeysEnum, StepTypeEnum } from '@novu/shared';
+import { StepTypeEnum } from '@novu/shared';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import {
@@ -44,7 +43,6 @@ export const WorkflowsPage = () => {
   const { environmentSlug } = useParams();
   const track = useTelemetry();
   const navigate = useNavigate();
-  const isTemplateStoreEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_V2_TEMPLATE_STORE_ENABLED);
   const [searchParams, setSearchParams] = useSearchParams({
     orderDirection: 'desc',
     orderBy: 'updatedAt',
@@ -101,8 +99,7 @@ export const WorkflowsPage = () => {
 
   const hasActiveFilters = searchParams.get('query') && searchParams.get('query') !== null;
 
-  const shouldShowStartWith =
-    isTemplateStoreEnabled && workflowsData && workflowsData.totalCount < 5 && !hasActiveFilters;
+  const shouldShowStartWith = workflowsData && workflowsData.totalCount < 5 && !hasActiveFilters;
 
   useEffect(() => {
     track(TelemetryEvent.WORKFLOWS_PAGE_VISIT);
@@ -133,84 +130,76 @@ export const WorkflowsPage = () => {
                   name="query"
                   render={({ field }) => (
                     <FormItem className="relative">
-                      <Input size="xs" {...field} placeholder="Search workflows..." leadingIcon={RiSearchLine} />
+                      <Input
+                        size="xs"
+                        className="w-64"
+                        {...field}
+                        placeholder="Search workflows..."
+                        leadingIcon={RiSearchLine}
+                      />
                     </FormItem>
                   )}
                 />
               </form>
             </Form>
-            {isTemplateStoreEnabled ? (
-              <ButtonGroupRoot size="xs">
-                <ButtonGroupItem asChild className="gap-1">
-                  <Button
-                    mode="gradient"
-                    className="rounded-l-lg rounded-r-none border-none p-2 text-white"
-                    variant="primary"
-                    size="xs"
-                    leadingIcon={RiRouteFill}
-                    onClick={() =>
-                      navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }))
-                    }
-                  >
-                    Create workflow
-                  </Button>
-                </ButtonGroupItem>
-                <ButtonGroupItem asChild>
-                  <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        mode="gradient"
-                        className="rounded-l-none rounded-r-lg border-none text-white"
-                        variant="primary"
-                        size="xs"
-                        leadingIcon={RiArrowDownSLine}
-                      ></Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56">
-                      <DropdownMenuItem className="cursor-pointer" asChild>
-                        <div
-                          className="w-full"
-                          onClick={() => {
-                            track(TelemetryEvent.CREATE_WORKFLOW_CLICK);
-                            navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }));
-                          }}
-                        >
-                          <div className="flex items-center gap-2">
-                            <RiFileAddLine />
-                            Blank Workflow
-                          </div>
-                        </div>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onSelect={() => {
-                          navigate(
-                            buildRoute(ROUTES.TEMPLATE_STORE, {
-                              environmentSlug: environmentSlug || '',
-                            }) + '?source=create-workflow-dropdown'
-                          );
+            <ButtonGroupRoot size="xs">
+              <ButtonGroupItem asChild className="gap-1">
+                <Button
+                  mode="gradient"
+                  className="rounded-l-lg rounded-r-none border-none p-2 text-white"
+                  variant="primary"
+                  size="xs"
+                  leadingIcon={RiRouteFill}
+                  onClick={() =>
+                    navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }))
+                  }
+                >
+                  Create workflow
+                </Button>
+              </ButtonGroupItem>
+              <ButtonGroupItem asChild>
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      mode="gradient"
+                      className="rounded-l-none rounded-r-lg border-none text-white"
+                      variant="primary"
+                      size="xs"
+                      leadingIcon={RiArrowDownSLine}
+                    ></Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    <DropdownMenuItem className="cursor-pointer" asChild>
+                      <div
+                        className="w-full"
+                        onClick={() => {
+                          track(TelemetryEvent.CREATE_WORKFLOW_CLICK);
+                          navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }));
                         }}
                       >
-                        <RiFileMarkedLine />
-                        View Workflow Gallery
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </ButtonGroupItem>
-              </ButtonGroupRoot>
-            ) : (
-              <Button
-                mode="gradient"
-                variant="primary"
-                size="xs"
-                leadingIcon={RiRouteFill}
-                onClick={() =>
-                  navigate(buildRoute(ROUTES.WORKFLOWS_CREATE, { environmentSlug: environmentSlug || '' }))
-                }
-              >
-                Create workflow
-              </Button>
-            )}
+                        <div className="flex items-center gap-2">
+                          <RiFileAddLine />
+                          Blank Workflow
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onSelect={() => {
+                        navigate(
+                          buildRoute(ROUTES.TEMPLATE_STORE, {
+                            environmentSlug: environmentSlug || '',
+                          }) + '?source=create-workflow-dropdown'
+                        );
+                      }}
+                    >
+                      <RiFileMarkedLine />
+                      View Workflow Gallery
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </ButtonGroupItem>
+            </ButtonGroupRoot>
           </div>
           {shouldShowStartWith && (
             <div className="px-2.5 py-2">

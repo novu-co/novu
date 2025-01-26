@@ -1,5 +1,4 @@
-import { useAuth } from '@/context/auth/hooks';
-import { useEnvironment, useFetchEnvironments } from '@/context/environment/hooks';
+import { useEnvironment } from '@/context/environment/hooks';
 import { useDeleteEnvironment } from '@/hooks/use-environments';
 import { cn } from '@/utils/ui';
 import { EnvironmentEnum, IEnvironment, PROTECTED_ENVIRONMENTS } from '@novu/shared';
@@ -45,11 +44,7 @@ const EnvironmentRowSkeleton = () => (
   </TableRow>
 );
 
-export function EnvironmentsList() {
-  const { currentOrganization } = useAuth();
-  const { environments = [], areEnvironmentsInitialLoading } = useFetchEnvironments({
-    organizationId: currentOrganization?._id,
-  });
+export function EnvironmentsList({ environments, isLoading }: { environments: IEnvironment[]; isLoading: boolean }) {
   const { currentEnvironment } = useEnvironment();
   const [editEnvironment, setEditEnvironment] = useState<IEnvironment>();
   const [deleteEnvironment, setDeleteEnvironment] = useState<IEnvironment>();
@@ -85,7 +80,7 @@ export function EnvironmentsList() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {areEnvironmentsInitialLoading
+          {isLoading
             ? Array.from({ length: 3 }).map((_, i) => <EnvironmentRowSkeleton key={i} />)
             : environments.map((environment) => (
                 <TableRow key={environment._id} className="group relative isolate">

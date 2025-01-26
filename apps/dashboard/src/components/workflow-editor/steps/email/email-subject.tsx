@@ -22,7 +22,7 @@ export const EmailSubject = () => {
           <FormItem className="w-full">
             <FormControl>
               <ControlInput
-                size="lg"
+                size="md"
                 indentWithTab={false}
                 autoFocus={!field.value}
                 placeholder={capitalize(field.name)}
