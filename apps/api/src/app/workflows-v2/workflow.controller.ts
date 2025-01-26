@@ -165,7 +165,7 @@ export class WorkflowController {
         offset: Number(query.offset || '0'),
         limit: Number(query.limit || '50'),
         orderDirection: query.orderDirection ?? DirectionEnum.DESC,
-        orderByField: query.orderByField ?? 'createdAt',
+        orderBy: query.orderBy ?? 'createdAt',
         searchQuery: query.query,
         user,
       })

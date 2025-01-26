@@ -19,8 +19,13 @@ import {
   RiPencilRuler2Fill,
 } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
+import { parseJsonLogic } from 'react-querybuilder/parseJsonLogic';
+import { RQBJsonLogic } from 'react-querybuilder';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import { ConfirmationModal } from '@/components/confirmation-modal';
+import { stepSchema } from '@/components/workflow-editor/schema';
 import { PageMeta } from '@/components/page-meta';
 import { Button } from '@/components/primitives/button';
 import { CopyButton } from '@/components/primitives/copy-button';
@@ -144,15 +149,17 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     [step, registerInlineControlValues]
   );
 
-  const form = useForm({
+  const form = useForm<z.infer<typeof stepSchema>>({
     defaultValues,
     shouldFocusError: false,
+    resolver: zodResolver(stepSchema),
   });
 
   const { onBlur, saveForm } = useFormAutosave({
     previousData: defaultValues,
     form,
     isReadOnly,
+    shouldClientValidate: true,
     save: (data) => {
       // transform form fields to step update dto
       const updateStepData: Partial<StepUpdateDto> = {
@@ -177,6 +184,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
     Object.values(currentErrors).forEach((controlValues) => {
       Object.keys(controlValues).forEach((key) => {
         if (!stepIssues[`${key}`]) {
+          // @ts-expect-error
           form.clearErrors(`controlValues.${key}`);
         }
       });
@@ -184,6 +192,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
 
     // Set new errors from stepIssues
     Object.entries(stepIssues).forEach(([key, value]) => {
+      // @ts-expect-error
       form.setError(`controlValues.${key}`, { message: value });
     });
   }, [form, step]);
@@ -196,6 +205,14 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   const InlineControlValues = STEP_TYPE_TO_INLINE_CONTROL_VALUES[step.type];
 
   const value = useMemo(() => ({ saveForm }), [saveForm]);
+
+  const conditionsCount = useMemo(() => {
+    if (!step.controls.values.skip) return 0;
+
+    const query = parseJsonLogic(step.controls.values.skip as RQBJsonLogic);
+
+    return query.rules.length;
+  }, [step]);
 
   return (
     <>
@@ -328,9 +345,9 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                     className="flex w-full justify-start gap-1.5 text-xs font-medium"
                   >
                     <RiGuideFill className="h-4 w-4 text-neutral-600" />
-                    Step Conditions
+                    Skip Conditions
                     <span className="ml-auto flex items-center gap-0.5">
-                      <span>0</span>
+                      <span>{conditionsCount}</span>
                       <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
                     </span>
                   </Button>

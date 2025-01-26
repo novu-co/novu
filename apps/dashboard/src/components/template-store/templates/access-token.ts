@@ -6,7 +6,7 @@ export const accessTokenTemplate: WorkflowTemplate = {
   name: 'Access Token',
   description: 'Alert users about new access token creation',
   category: 'authentication',
-  isPopular: false,
+  isPopular: true,
   workflowDefinition: {
     name: 'Access Token',
     description: 'Notify a user about a creation of a personal access token in their GitHub account',

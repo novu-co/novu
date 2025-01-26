@@ -80,7 +80,7 @@ export function ActivityTable({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="flex min-h-full min-w-[800px] flex-1 flex-col"
+          className="flex min-h-full flex-1 flex-col"
         >
           <Table
             isLoading={isLoading}
@@ -92,7 +92,7 @@ export function ActivityTable({
                 <TableHead className="h-9 px-3 py-0">Event</TableHead>
                 <TableHead className="h-9 px-3 py-0">Status</TableHead>
                 <TableHead className="h-9 px-3 py-0">Steps</TableHead>
-                <TableHead className="h-9 px-3 py-0">Triggered Date</TableHead>
+                <TableHead className="h-9 px-3 py-0">Triggered At</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -181,7 +181,7 @@ function getSubscriberDisplay(subscriber?: Pick<ISubscriber, '_id' | 'subscriber
   if (!subscriber) return '';
 
   if (subscriber.firstName || subscriber.lastName) {
-    return `• ${subscriber.firstName || ''} ${subscriber.lastName || ''}`;
+    return `• ${subscriber.firstName || ''} ${subscriber.lastName || ''}`.trim();
   }
 
   return '';

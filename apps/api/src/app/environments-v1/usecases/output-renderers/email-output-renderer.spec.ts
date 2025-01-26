@@ -1,24 +1,19 @@
 import { Test } from '@nestjs/testing';
 import { expect } from 'chai';
-import { TipTapNode } from '@novu/shared';
+import { JSONContent as MailyJSONContent } from '@maily-to/render';
 import { EmailOutputRendererUsecase } from './email-output-renderer.usecase';
-import { ExpandEmailEditorSchemaUsecase } from './expand-email-editor-schema.usecase';
-import { HydrateEmailSchemaUseCase } from './hydrate-email-schema.usecase';
 import { FullPayloadForRender } from './render-command';
+import { WrapMailyInLiquidUseCase } from './maily-to-liquid/wrap-maily-in-liquid.usecase';
 
 describe('EmailOutputRendererUsecase', () => {
   let emailOutputRendererUsecase: EmailOutputRendererUsecase;
-  let expandEmailEditorSchemaUseCase: ExpandEmailEditorSchemaUsecase;
-  let hydrateEmailSchemaUseCase: HydrateEmailSchemaUseCase;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
-      providers: [EmailOutputRendererUsecase, ExpandEmailEditorSchemaUsecase, HydrateEmailSchemaUseCase],
+      providers: [EmailOutputRendererUsecase, WrapMailyInLiquidUseCase],
     }).compile();
 
     emailOutputRendererUsecase = moduleRef.get<EmailOutputRendererUsecase>(EmailOutputRendererUsecase);
-    expandEmailEditorSchemaUseCase = moduleRef.get<ExpandEmailEditorSchemaUsecase>(ExpandEmailEditorSchemaUsecase);
-    hydrateEmailSchemaUseCase = moduleRef.get<HydrateEmailSchemaUseCase>(HydrateEmailSchemaUseCase);
   });
 
   const mockFullPayload: FullPayloadForRender = {
@@ -61,7 +56,7 @@ describe('EmailOutputRendererUsecase', () => {
     });
 
     it('should process simple text with liquid variables', async () => {
-      const mockTipTapNode: TipTapNode = {
+      const mockTipTapNode: MailyJSONContent = {
         type: 'doc',
         content: [
           {
@@ -94,7 +89,7 @@ describe('EmailOutputRendererUsecase', () => {
     });
 
     it('should handle nested object variables with liquid syntax', async () => {
-      const mockTipTapNode: TipTapNode = {
+      const mockTipTapNode: MailyJSONContent = {
         type: 'doc',
         content: [
           {
@@ -132,7 +127,7 @@ describe('EmailOutputRendererUsecase', () => {
     });
 
     it('should handle liquid variables with default values', async () => {
-      const mockTipTapNode: TipTapNode = {
+      const mockTipTapNode: MailyJSONContent = {
         type: 'doc',
         content: [
           {
@@ -167,7 +162,7 @@ describe('EmailOutputRendererUsecase', () => {
 
   describe('variable node transformation to text', () => {
     it('should handle maily variables', async () => {
-      const mockTipTapNode: TipTapNode = {
+      const mockTipTapNode: MailyJSONContent = {
         type: 'doc',
         content: [
           {
@@ -237,7 +232,7 @@ describe('EmailOutputRendererUsecase', () => {
     });
 
     it('should handle maily variables with fallback values', async () => {
-      const mockTipTapNode: TipTapNode = {
+      const mockTipTapNode: MailyJSONContent = {
         type: 'doc',
         content: [
           {
@@ -339,8 +334,18 @@ describe('EmailOutputRendererUsecase', () => {
   });
 
   describe('conditional block transformation (showIfKey)', () => {
-    it('should render content when showIfKey condition is true', async () => {
-      const mockTipTapNode: TipTapNode = {
+    describe('truthy conditions', () => {
+      const truthyValues = [
+        { value: true, desc: 'boolean true' },
+        { value: 1, desc: 'number 1' },
+        { value: 'true', desc: 'string "true"' },
+        { value: 'TRUE', desc: 'string "TRUE"' },
+        { value: 'yes', desc: 'string "yes"' },
+        { value: {}, desc: 'empty object' },
+        { value: [], desc: 'empty array' },
+      ];
+
+      const mockTipTapNode: MailyJSONContent = {
         type: 'doc',
         content: [
           {
@@ -376,28 +381,41 @@ describe('EmailOutputRendererUsecase', () => {
         ],
       };
 
-      const renderCommand = {
-        controlValues: {
-          subject: 'Conditional Test',
-          body: JSON.stringify(mockTipTapNode),
-        },
-        fullPayloadForRender: {
-          ...mockFullPayload,
-          payload: {
-            isPremium: true,
-          },
-        },
-      };
+      truthyValues.forEach(({ value, desc }) => {
+        it(`should render content when showIfKey is ${desc}`, async () => {
+          const renderCommand = {
+            controlValues: {
+              subject: 'Conditional Test',
+              body: JSON.stringify(mockTipTapNode),
+            },
+            fullPayloadForRender: {
+              ...mockFullPayload,
+              payload: {
+                isPremium: value,
+              },
+            },
+          };
 
-      const result = await emailOutputRendererUsecase.execute(renderCommand);
+          const result = await emailOutputRendererUsecase.execute(renderCommand);
 
-      expect(result.body).to.include('Before condition');
-      expect(result.body).to.include('Premium content');
-      expect(result.body).to.include('After condition');
+          expect(result.body).to.include('Before condition');
+          expect(result.body).to.include('Premium content');
+          expect(result.body).to.include('After condition');
+        });
+      });
     });
 
-    it('should not render content when showIfKey condition is false', async () => {
-      const mockTipTapNode: TipTapNode = {
+    describe('falsy conditions', () => {
+      const falsyValues = [
+        { value: false, desc: 'boolean false' },
+        { value: 0, desc: 'number 0' },
+        { value: '', desc: 'empty string' },
+        { value: null, desc: 'null' },
+        { value: undefined, desc: 'undefined' },
+        { value: 'UNDEFINED', desc: 'string "UNDEFINED"' },
+      ];
+
+      const mockTipTapNode: MailyJSONContent = {
         type: 'doc',
         content: [
           {
@@ -428,38 +446,37 @@ describe('EmailOutputRendererUsecase', () => {
                 type: 'text',
                 text: 'After condition',
               },
-              {
-                type: 'text',
-                text: 'After condition 2',
-              },
             ],
           },
         ],
       };
 
-      const renderCommand = {
-        controlValues: {
-          subject: 'Conditional Test',
-          body: JSON.stringify(mockTipTapNode),
-        },
-        fullPayloadForRender: {
-          ...mockFullPayload,
-          payload: {
-            isPremium: false,
-          },
-        },
-      };
+      falsyValues.forEach(({ value, desc }) => {
+        it(`should not render content when showIfKey is ${desc}`, async () => {
+          const renderCommand = {
+            controlValues: {
+              subject: 'Conditional Test',
+              body: JSON.stringify(mockTipTapNode),
+            },
+            fullPayloadForRender: {
+              ...mockFullPayload,
+              payload: {
+                isPremium: value,
+              },
+            },
+          };
 
-      const result = await emailOutputRendererUsecase.execute(renderCommand);
+          const result = await emailOutputRendererUsecase.execute(renderCommand);
 
-      expect(result.body).to.include('Before condition');
-      expect(result.body).to.not.include('Premium content');
-      expect(result.body).to.include('After condition');
-      expect(result.body).to.include('After condition 2');
+          expect(result.body).to.include('Before condition');
+          expect(result.body).to.not.include('Premium content');
+          expect(result.body).to.include('After condition');
+        });
+      });
     });
 
     it('should handle nested conditional blocks correctly', async () => {
-      const mockTipTapNode: TipTapNode = {
+      const mockTipTapNode: MailyJSONContent = {
         type: 'doc',
         content: [
           {
@@ -543,12 +560,127 @@ describe('EmailOutputRendererUsecase', () => {
   });
 
   describe('for block transformation and expansion', () => {
-    // Tests for for loop block transformation will be added here
+    it('should handle for loop block transformation with array of objects', async () => {
+      const mockTipTapNode: MailyJSONContent = {
+        type: 'doc',
+        content: [
+          {
+            type: 'for',
+            attrs: {
+              each: 'payload.comments',
+              isUpdatingKey: false,
+              showIfKey: null,
+            },
+            content: [
+              {
+                type: 'paragraph',
+                attrs: {
+                  textAlign: 'left',
+                },
+                content: [
+                  {
+                    type: 'text',
+                    text: 'This is an author: ',
+                  },
+                  {
+                    type: 'variable',
+                    attrs: {
+                      id: 'payload.comments.author',
+                      label: null,
+                      fallback: null,
+                      required: false,
+                    },
+                  },
+                  {
+                    type: 'variable',
+                    attrs: {
+                      // variable not belonging to the loop
+                      id: 'payload.postTitle',
+                      label: null,
+                      fallback: null,
+                      required: false,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+
+      const renderCommand = {
+        controlValues: {
+          subject: 'For Loop Test',
+          body: JSON.stringify(mockTipTapNode),
+        },
+        fullPayloadForRender: {
+          ...mockFullPayload,
+          payload: {
+            postTitle: 'Post Title',
+            comments: [{ author: 'John' }, { author: 'Jane' }],
+          },
+        },
+      };
+      const result = await emailOutputRendererUsecase.execute(renderCommand);
+      expect(result.body).to.include('This is an author: <!-- -->John<!-- -->Post Title');
+      expect(result.body).to.include('This is an author: <!-- -->Jane<!-- -->Post Title');
+    });
+
+    it('should handle for loop block transformation with array of primitives', async () => {
+      const mockTipTapNode: MailyJSONContent = {
+        type: 'doc',
+        content: [
+          {
+            type: 'for',
+            attrs: {
+              each: 'payload.names',
+              isUpdatingKey: false,
+              showIfKey: null,
+            },
+            content: [
+              {
+                type: 'paragraph',
+                attrs: {
+                  textAlign: 'left',
+                },
+                content: [
+                  {
+                    type: 'variable',
+                    attrs: {
+                      id: 'payload.names',
+                      label: null,
+                      fallback: null,
+                      required: false,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+
+      const renderCommand = {
+        controlValues: {
+          subject: 'For Loop Test',
+          body: JSON.stringify(mockTipTapNode),
+        },
+        fullPayloadForRender: {
+          ...mockFullPayload,
+          payload: {
+            names: ['John', 'Jane'],
+          },
+        },
+      };
+      const result = await emailOutputRendererUsecase.execute(renderCommand);
+      expect(result.body).to.include('John');
+      expect(result.body).to.include('Jane');
+    });
   });
 
   describe('node attrs and marks attrs hydration', () => {
     it('should handle links with href attributes', async () => {
-      const mockTipTapNode: TipTapNode = {
+      const mockTipTapNode: MailyJSONContent = {
         type: 'doc',
         content: [
           {
@@ -601,7 +733,7 @@ describe('EmailOutputRendererUsecase', () => {
     });
 
     it('should handle image nodes with variable attributes', async () => {
-      const mockTipTapNode: TipTapNode = {
+      const mockTipTapNode: MailyJSONContent = {
         type: 'doc',
         content: [
           {
@@ -637,7 +769,7 @@ describe('EmailOutputRendererUsecase', () => {
     });
 
     it('should handle marks attrs href', async () => {
-      const mockTipTapNode: TipTapNode = {
+      const mockTipTapNode: MailyJSONContent = {
         type: 'doc',
         content: [
           {

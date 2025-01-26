@@ -1,11 +1,12 @@
+import { useCallback, useMemo, useRef } from 'react';
 import { autocompletion } from '@codemirror/autocomplete';
 import { EditorView } from '@uiw/react-codemirror';
+import { cn } from '@/utils/ui';
 
 import { Editor } from '@/components/primitives/editor';
 import { Popover, PopoverTrigger } from '@/components/primitives/popover';
 import { createAutocompleteSource } from '@/utils/liquid-autocomplete';
 import { LiquidVariable } from '@/utils/parseStepVariablesToLiquidVariables';
-import { useCallback, useMemo, useRef } from 'react';
 import { useVariables } from './hooks/use-variables';
 import { createVariableExtension } from './variable-plugin';
 import { variablePillTheme } from './variable-plugin/variable-theme';
@@ -17,28 +18,28 @@ type CompletionRange = {
 };
 
 type ControlInputProps = {
+  className?: string;
   value: string;
   onChange: (value: string) => void;
   variables: LiquidVariable[];
   placeholder?: string;
   autoFocus?: boolean;
-  size?: 'default' | 'lg';
+  size?: 'md' | 'sm';
   id?: string;
   multiline?: boolean;
   indentWithTab?: boolean;
 };
 
-const baseExtensions = [EditorView.lineWrapping, variablePillTheme];
-
 export function ControlInput({
   value,
   onChange,
   variables,
+  className,
   placeholder,
   autoFocus,
-  size = 'default',
   id,
   multiline = false,
+  size = 'sm',
   indentWithTab,
 }: ControlInputProps) {
   const viewRef = useRef<EditorView | null>(null);
@@ -72,10 +73,10 @@ export function ControlInput({
     [handleVariableSelect]
   );
 
-  const extensions = useMemo(
-    () => [...baseExtensions, autocompletionExtension, variablePluginExtension],
-    [autocompletionExtension, variablePluginExtension]
-  );
+  const extensions = useMemo(() => {
+    const baseExtensions = [...(multiline ? [EditorView.lineWrapping] : []), variablePillTheme];
+    return [...baseExtensions, autocompletionExtension, variablePluginExtension];
+  }, [autocompletionExtension, variablePluginExtension, multiline]);
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
@@ -87,13 +88,14 @@ export function ControlInput({
   );
 
   return (
-    <div className="relative">
+    <div className={cn('relative h-full w-full p-2.5', className)}>
       <Editor
         fontFamily="inherit"
         multiline={multiline}
         indentWithTab={indentWithTab}
         size={size}
-        className="flex-1"
+        // TODO for Sokratis
+        className={cn('flex-1', { 'overflow-hidden': !multiline })}
         autoFocus={autoFocus}
         placeholder={placeholder}
         id={id}
@@ -105,7 +107,16 @@ export function ControlInput({
         <PopoverTrigger asChild>
           <div />
         </PopoverTrigger>
-        {selectedVariable && <VariablePopover variable={selectedVariable.value} onUpdate={handleVariableUpdate} />}
+        {selectedVariable && (
+          <VariablePopover
+            variable={selectedVariable.value}
+            onUpdate={(newValue) => {
+              handleVariableUpdate(newValue);
+              // Focus back to the editor after updating the variable
+              viewRef.current?.focus();
+            }}
+          />
+        )}
       </Popover>
     </div>
   );

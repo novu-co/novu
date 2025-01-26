@@ -75,7 +75,7 @@ export abstract class PaginatedListCommand extends EnvironmentWithUserObjectComm
 
   @IsDefined()
   @IsString()
-  orderByField: string;
+  orderBy: string;
 }
 
 export abstract class EnvironmentWithSubscriber extends BaseCommand {
