@@ -86,7 +86,7 @@ export function FreeTierState() {
             variant="primary"
             mode="gradient"
             size="xs"
-            className="mb-2"
+            className="mb-3.5"
             onClick={() => {
               track(TelemetryEvent.UPGRADE_TO_BUSINESS_TIER_CLICK, {
                 source: 'environments-page',
