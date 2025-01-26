@@ -155,9 +155,8 @@ export function VariablePopover({ variable, onUpdate }: VariablePopoverProps) {
                       </TooltipTrigger>
                       <TooltipContent side="right" className="max-w-sm">
                         <p>
-                          LiquidJS filters are functions that modify the output of your variables. They are applied in
-                          sequence from top to bottom, where each filter takes the output of the previous filter as its
-                          input. You can re-order them by dragging and dropping.
+                          LiquidJS filters modify the variable output in sequence, with each filter using the previous
+                          one’s result. Reorder them by dragging and dropping.
                         </p>
                       </TooltipContent>
                     </Tooltip>
