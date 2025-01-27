@@ -27,49 +27,160 @@ interface WorkflowChecklistProps {
   steps: Step[];
 }
 
-export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
-  const navigate = useNavigate();
-  const { currentEnvironment } = useEnvironment();
-  const { workflow } = useWorkflow();
-  const { integrations } = useFetchIntegrations();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isWorkflowInProd, setIsWorkflowInProd] = useState(false);
-  const { currentOrganization } = useAuth();
-  const { user } = useUser();
-  const { environments = [] } = useFetchEnvironments({ organizationId: currentOrganization?._id });
-  const syncWorkflowResult = useSyncWorkflow(workflow ?? ({} as any));
-  const { safeSync, PromoteConfirmModal } = workflow
-    ? syncWorkflowResult
-    : { safeSync: undefined, PromoteConfirmModal: undefined };
+type ChecklistItem = {
+  title: string;
+  isCompleted: (steps: Step[]) => boolean;
+  onClick: () => void;
+};
 
-  async function checkWorkflowInProd() {
+export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const { user } = useUser();
+  const { workflow } = useWorkflow();
+  const { currentEnvironment } = useEnvironment();
+  const { integrations } = useFetchIntegrations();
+  const { environments = [] } = useFetchEnvironments({ organizationId: currentEnvironment?._id });
+  const checklistItems = useChecklistItems(steps);
+  const syncWorkflowResult = useSyncWorkflow(workflow ?? ({} as any));
+  const { PromoteConfirmModal } = syncWorkflowResult;
+
+  useEffect(() => {
+    const allItemsCompleted = checklistItems.every((item) => item.isCompleted(steps));
+    const isFinishedLoading = currentEnvironment && workflow && integrations && environments;
+
+    if (isFinishedLoading) {
+      if (allItemsCompleted) {
+        setIsOpen(false);
+
+        if (user) {
+          user.update({
+            unsafeMetadata: {
+              ...user.unsafeMetadata,
+              workflowChecklistCompleted: true,
+            },
+          });
+        }
+      } else {
+        setIsOpen(true);
+      }
+    }
+  }, [steps, checklistItems, currentEnvironment, workflow, integrations, environments, user]);
+
+  return (
+    <>
+      <Popover
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (open === false) return;
+          setIsOpen(open);
+        }}
+      >
+        <PopoverTrigger asChild>
+          <button type="button" className="absolute bottom-[18px] left-[18px]">
+            <Badge color="red" size="md" variant="lighter" className="cursor-pointer">
+              <motion.div
+                variants={{
+                  initial: { scale: 1, rotate: 0, opacity: 1 },
+                  hover: {
+                    scale: [1, 1.1, 1],
+                    rotate: [0, 4, -4, 0],
+                    opacity: [0, 1, 1],
+                    transition: {
+                      duration: 1.4,
+                      repeat: 0,
+                      ease: 'easeInOut',
+                    },
+                  },
+                }}
+              >
+                <BadgeIcon as={RiSparkling2Fill} />
+              </motion.div>
+              <span className="text-xs">
+                {checklistItems.filter((item) => item.isCompleted(steps)).length}/{checklistItems.length}
+              </span>
+            </Badge>
+          </button>
+        </PopoverTrigger>
+        <PopoverContent side="top" alignOffset={0} align="start" className="w-[325px] p-3">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-foreground-900 text-label-sm mb-1 font-medium">Actions Recommended</h3>
+              <p className="text-text-soft text-paragraph-xs mb-3">
+                Let's make sure you have everything you need to send notifications to your users
+              </p>
+            </div>
+            <PopoverClose asChild>
+              <button
+                type="button"
+                className="text-text-soft hover:text-text-sub -mr-1 -mt-1 rounded-sm p-1 transition-colors"
+                onClick={() => setIsOpen(false)}
+              >
+                <RiCloseLine className="h-4 w-4" />
+              </button>
+            </PopoverClose>
+          </div>
+          <div className="bg-bg-weak rounded-8 flex flex-col gap-3 p-1.5">
+            {checklistItems.map((item, index) => (
+              <ChecklistItemButton key={index} item={item} steps={steps} />
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+      {PromoteConfirmModal && <PromoteConfirmModal />}
+    </>
+  );
+}
+
+function useWorkflowInProd() {
+  const [isWorkflowInProd, setIsWorkflowInProd] = useState(false);
+  const { workflow } = useWorkflow();
+  const { currentEnvironment } = useEnvironment();
+  const { currentOrganization } = useAuth();
+  const { environments = [] } = useFetchEnvironments({ organizationId: currentOrganization?._id });
+
+  const checkWorkflowInProd = async () => {
     if (!workflow?.workflowId) return;
 
     try {
       const prodEnv = environments.find((env) => env.name === 'Production');
+      if (!prodEnv) return;
 
       await getWorkflow({
-        environment: prodEnv!,
-        workflowSlug: workflow?.workflowId,
-        targetEnvironmentId: prodEnv?._id,
+        environment: prodEnv,
+        workflowSlug: workflow.workflowId,
+        targetEnvironmentId: prodEnv._id,
       });
 
       setIsWorkflowInProd(true);
     } catch (error) {
       setIsWorkflowInProd(false);
     }
-  }
+  };
 
   useEffect(() => {
     checkWorkflowInProd();
   }, [workflow?.workflowId, currentEnvironment]);
+
+  return { isWorkflowInProd, setIsWorkflowInProd };
+}
+
+function useChecklistItems(steps: Step[]) {
+  const navigate = useNavigate();
+  const { currentEnvironment } = useEnvironment();
+  const { workflow } = useWorkflow();
+  const { integrations } = useFetchIntegrations();
+  const { currentOrganization } = useAuth();
+  const { environments = [] } = useFetchEnvironments({ organizationId: currentOrganization?._id });
+  const syncWorkflowResult = useSyncWorkflow(workflow ?? ({} as any));
+  const { safeSync } = workflow ? syncWorkflowResult : { safeSync: undefined };
+  const { isWorkflowInProd, setIsWorkflowInProd } = useWorkflowInProd();
 
   const foundInAppIntegration = integrations?.find(
     (integration) =>
       integration._environmentId === currentEnvironment?._id && integration.channel === ChannelTypeEnum.IN_APP
   );
 
-  const CHECKLIST_ITEMS = useMemo(
+  return useMemo(
     () => [
       {
         title: 'Add a step',
@@ -139,115 +250,29 @@ export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
     ],
     [currentEnvironment, workflow, foundInAppIntegration, navigate, steps, isWorkflowInProd, environments, safeSync]
   );
+}
 
-  useEffect(() => {
-    const allItemsCompleted = CHECKLIST_ITEMS.every((item) => item.isCompleted(steps));
-    const isFinishedLoading = currentEnvironment && workflow && integrations && environments;
-
-    if (isFinishedLoading) {
-      if (allItemsCompleted) {
-        setIsOpen(false);
-        // Update user metadata to hide checklist
-        if (user) {
-          user.update({
-            unsafeMetadata: {
-              ...user.unsafeMetadata,
-              workflowChecklistCompleted: true,
-            },
-          });
-        }
-      } else {
-        setIsOpen(true);
-      }
-    }
-  }, [steps, CHECKLIST_ITEMS, currentEnvironment, workflow, integrations, environments, user]);
-
+function ChecklistItemButton({ item, steps }: { item: ChecklistItem; steps: Step[] }) {
   return (
-    <>
-      <Popover
-        open={isOpen}
-        onOpenChange={(open) => {
-          // Only allow closing through the close button
-          if (open === false) return;
-          setIsOpen(open);
-        }}
-      >
-        <PopoverTrigger asChild>
-          <button type="button" className="absolute bottom-[18px] left-[18px]">
-            <Badge color="red" size="md" variant="lighter" className="cursor-pointer">
-              <motion.div
-                variants={{
-                  initial: { scale: 1, rotate: 0, opacity: 1 },
-                  hover: {
-                    scale: [1, 1.1, 1],
-                    rotate: [0, 4, -4, 0],
-                    opacity: [0, 1, 1],
-                    transition: {
-                      duration: 1.4,
-                      repeat: 0,
-                      ease: 'easeInOut',
-                    },
-                  },
-                }}
-              >
-                <BadgeIcon as={RiSparkling2Fill} />
-              </motion.div>
-              <span className="text-xs">
-                {CHECKLIST_ITEMS.filter((item) => item.isCompleted(steps)).length}/{CHECKLIST_ITEMS.length}
-              </span>
-            </Badge>
-          </button>
-        </PopoverTrigger>
-        <PopoverContent side="top" alignOffset={0} align="start" className="w-[325px] p-3">
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="text-foreground-900 text-label-sm mb-1 font-medium">Actions Recommended</h3>
-              <p className="text-text-soft text-paragraph-xs mb-3">
-                Let's make sure you have everything you need to send notifications to your users
-              </p>
-            </div>
-            <PopoverClose asChild>
-              <button
-                type="button"
-                className="text-text-soft hover:text-text-sub -mr-1 -mt-1 rounded-sm p-1 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <RiCloseLine className="h-4 w-4" />
-              </button>
-            </PopoverClose>
-          </div>
-          <div className="bg-bg-weak rounded-8 flex flex-col gap-3 p-1.5">
-            {CHECKLIST_ITEMS.map((item, index) => (
-              <button
-                key={index}
-                type="button"
-                className="hover:bg-background group flex w-full items-center gap-1 rounded-md transition-colors duration-200"
-                onClick={item.onClick}
-              >
-                <div
-                  className={cn(
-                    'flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]'
-                  )}
-                >
-                  <div className={`text- flex items-center justify-center`}>
-                    {item.isCompleted(steps) ? (
-                      <RiCheckboxCircleFill className="text-success h-4 w-4" />
-                    ) : (
-                      <RiLoader3Line className="text-text-soft h-4 w-4" />
-                    )}
-                  </div>
-                </div>
-                <div className="text-label-xs text-text-sub">
-                  <span className={cn(item.isCompleted(steps) && 'line-through')}>{item.title}</span>
-                </div>
+    <button
+      type="button"
+      className="hover:bg-background group flex w-full items-center gap-1 rounded-md transition-colors duration-200"
+      onClick={item.onClick}
+    >
+      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-[0px_1px_2px_0px_rgba(10,13,20,0.03)]">
+        <div className="flex items-center justify-center">
+          {item.isCompleted(steps) ? (
+            <RiCheckboxCircleFill className="text-success h-4 w-4" />
+          ) : (
+            <RiLoader3Line className="text-text-soft h-4 w-4" />
+          )}
+        </div>
+      </div>
+      <div className="text-label-xs text-text-sub">
+        <span className={cn(item.isCompleted(steps) && 'line-through')}>{item.title}</span>
+      </div>
 
-                <RiArrowRightDoubleFill className="text-text-soft ml-auto h-4 w-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-              </button>
-            ))}
-          </div>
-        </PopoverContent>
-      </Popover>
-      {PromoteConfirmModal && <PromoteConfirmModal />}
-    </>
+      <RiArrowRightDoubleFill className="text-text-soft ml-auto h-4 w-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+    </button>
   );
 }
