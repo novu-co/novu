@@ -5,6 +5,7 @@ import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
 import { StepTypeEnum } from '@/utils/enums';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { Step } from '@/utils/types';
+import { useUser } from '@clerk/clerk-react';
 import { ChannelTypeEnum } from '@novu/shared';
 import { motion } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
@@ -34,36 +35,32 @@ export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isWorkflowInProd, setIsWorkflowInProd] = useState(false);
   const { currentOrganization } = useAuth();
+  const { user } = useUser();
   const { environments = [] } = useFetchEnvironments({ organizationId: currentOrganization?._id });
   const syncWorkflowResult = useSyncWorkflow(workflow ?? ({} as any));
   const { safeSync, PromoteConfirmModal } = workflow
     ? syncWorkflowResult
     : { safeSync: undefined, PromoteConfirmModal: undefined };
 
-  useEffect(() => {
-    if (currentEnvironment && workflow && integrations) {
-      setIsOpen(true);
+  async function checkWorkflowInProd() {
+    if (!workflow?.workflowId) return;
+
+    try {
+      const prodEnv = environments.find((env) => env.name === 'Production');
+
+      await getWorkflow({
+        environment: prodEnv!,
+        workflowSlug: workflow?.workflowId,
+        targetEnvironmentId: prodEnv?._id,
+      });
+
+      setIsWorkflowInProd(true);
+    } catch (error) {
+      setIsWorkflowInProd(false);
     }
-  }, [currentEnvironment, workflow, integrations]);
+  }
 
   useEffect(() => {
-    async function checkWorkflowInProd() {
-      if (!workflow?.workflowId) return;
-
-      try {
-        const prodEnv = environments.find((env) => env.name === 'Production');
-        await getWorkflow({
-          environment: prodEnv!,
-          workflowSlug: workflow?.workflowId,
-          targetEnvironmentId: prodEnv?._id,
-        });
-
-        setIsWorkflowInProd(true);
-      } catch (error) {
-        setIsWorkflowInProd(false);
-      }
-    }
-
     checkWorkflowInProd();
   }, [workflow?.workflowId, currentEnvironment]);
 
@@ -133,7 +130,9 @@ export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
         onClick: () => {
           const prodEnv = environments.find((env) => env.name === 'Production');
           if (prodEnv && safeSync) {
-            safeSync(prodEnv._id);
+            safeSync(prodEnv._id).then(() => {
+              setIsWorkflowInProd(true);
+            });
           }
         },
       },
@@ -143,10 +142,25 @@ export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
 
   useEffect(() => {
     const allItemsCompleted = CHECKLIST_ITEMS.every((item) => item.isCompleted(steps));
-    if (allItemsCompleted) {
-      setIsOpen(false);
+    const isFinishedLoading = currentEnvironment && workflow && integrations && environments;
+
+    if (isFinishedLoading) {
+      if (allItemsCompleted) {
+        setIsOpen(false);
+        // Update user metadata to hide checklist
+        if (user) {
+          user.update({
+            unsafeMetadata: {
+              ...user.unsafeMetadata,
+              workflowChecklistCompleted: true,
+            },
+          });
+        }
+      } else {
+        setIsOpen(true);
+      }
     }
-  }, [steps, CHECKLIST_ITEMS]);
+  }, [steps, CHECKLIST_ITEMS, currentEnvironment, workflow, integrations, environments, user]);
 
   return (
     <>

@@ -1,3 +1,4 @@
+import { EnvironmentEnum } from '@novu/shared';
 import {
   Background,
   BackgroundVariant,
@@ -35,6 +36,7 @@ import {
 } from './nodes';
 import { getFirstBodyErrorMessage, getFirstControlsErrorMessage } from './step-utils';
 import { WorkflowChecklist } from './workflow-checklist';
+import { useUser } from '@clerk/clerk-react';
 
 const nodeTypes = {
   trigger: TriggerNode,
@@ -127,6 +129,7 @@ const WorkflowCanvasChild = ({ steps, readOnly }: { steps: Step[]; readOnly?: bo
   const { currentEnvironment } = useEnvironment();
   const { workflow: currentWorkflow } = useWorkflow();
   const navigate = useNavigate();
+  const { user } = useUser();
 
   const [nodes, edges] = useMemo(() => {
     const triggerNode: Node<NodeData, 'trigger'> = {
@@ -252,7 +255,8 @@ const WorkflowCanvasChild = ({ steps, readOnly }: { steps: Step[]; readOnly?: bo
       >
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>
-      <WorkflowChecklist steps={steps} />
+      {currentEnvironment?.name === EnvironmentEnum.DEVELOPMENT &&
+        !user?.unsafeMetadata?.workflowChecklistCompleted && <WorkflowChecklist steps={steps} />}
     </div>
   );
 };
