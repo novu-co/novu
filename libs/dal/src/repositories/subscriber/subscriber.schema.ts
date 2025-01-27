@@ -30,6 +30,7 @@ const subscriberSchema = new Schema<SubscriberDBModel>(
     },
     lastOnlineAt: Schema.Types.Date,
     data: Schema.Types.Mixed,
+    timezone: Schema.Types.String,
   },
   schemaOptions
 );
