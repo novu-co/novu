@@ -55,10 +55,6 @@ const variantSchemePart = {
   _parentId: {
     type: Schema.Types.ObjectId,
   },
-  connected: {
-    type: Schema.Types.Boolean,
-    default: false,
-  },
   metadata: {
     amount: {
       type: Schema.Types.Number,
@@ -207,6 +203,10 @@ const notificationTemplateSchema = new Schema<NotificationTemplateDBModel>(
     },
     status: {
       type: Schema.Types.String,
+    },
+    connected: {
+      type: Schema.Types.Boolean,
+      default: false,
     },
     _environmentId: {
       type: Schema.Types.ObjectId,

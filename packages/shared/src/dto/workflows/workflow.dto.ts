@@ -1,8 +1,8 @@
-import type { JSONSchemaDto } from './json-schema-dto';
-import { Slug } from '../../types/utils';
 import { StepTypeEnum, WorkflowCreationSourceEnum, WorkflowOriginEnum, WorkflowPreferences } from '../../types';
-import { WorkflowStatusEnum } from './workflow-status-enum';
+import { Slug } from '../../types/utils';
+import type { JSONSchemaDto } from './json-schema-dto';
 import { StepCreateDto, StepResponseDto, StepUpdateDto } from './step.dto';
+import { WorkflowStatusEnum } from './workflow-status-enum';
 
 export class ControlsSchema {
   schema: JSONSchemaDto;
@@ -55,6 +55,7 @@ export type WorkflowResponseDto = WorkflowCommonsFields & {
   preferences: PreferencesResponseDto;
   status: WorkflowStatusEnum;
   issues?: Record<WorkflowCreateAndUpdateKeys, RuntimeIssueDto>;
+  connected?: boolean;
 };
 export type WorkflowCreateAndUpdateKeys = keyof CreateWorkflowDto | keyof UpdateWorkflowDto;
 export class RuntimeIssueDto {

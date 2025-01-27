@@ -1,13 +1,22 @@
 import { useEnvironment } from '@/context/environment/hooks';
+import { useFetchIntegrations } from '@/hooks/use-fetch-integrations';
 import { StepTypeEnum } from '@/utils/enums';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { Step } from '@/utils/types';
+import { ChannelTypeEnum } from '@novu/shared';
 import { motion } from 'motion/react';
-import { RiArrowRightDoubleFill, RiCheckboxCircleFill, RiLoader3Line, RiSparkling2Fill } from 'react-icons/ri';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  RiArrowRightDoubleFill,
+  RiCheckboxCircleFill,
+  RiCloseLine,
+  RiLoader3Line,
+  RiSparkling2Fill,
+} from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../utils/ui';
 import { Badge, BadgeIcon } from '../primitives/badge';
-import { Popover, PopoverContent, PopoverTrigger } from '../primitives/popover';
+import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from '../primitives/popover';
 import { useWorkflow } from './workflow-provider';
 
 interface WorkflowChecklistProps {
@@ -24,50 +33,92 @@ export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
   const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
   const { workflow } = useWorkflow();
+  const { integrations } = useFetchIntegrations();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const CHECKLIST_ITEMS: ChecklistItem[] = [
-    {
-      title: 'Add a Step',
-      isCompleted: (steps) => steps.length > 0,
-      onClick: () => {
-        if (steps.length === 0) {
-          return;
-        }
+  useEffect(() => {
+    if (currentEnvironment && workflow && integrations) {
+      setIsOpen(true);
+    }
+  }, [currentEnvironment, workflow, integrations]);
+
+  const foundInAppIntegration = integrations?.find(
+    (integration) =>
+      integration._environmentId === currentEnvironment?._id && integration.channel === ChannelTypeEnum.IN_APP
+  );
+
+  const CHECKLIST_ITEMS = useMemo(
+    () => [
+      {
+        title: 'Add a Step',
+        isCompleted: (steps: Step[]) => steps.length > 0,
+        onClick: () => {
+          if (steps.length === 0) {
+            return;
+          }
+        },
       },
-    },
-    {
-      title: 'Configure notification template',
-      isCompleted: (steps) => steps.some((step) => step.type !== StepTypeEnum.TRIGGER && step.controls?.values),
-      onClick: () => {
-        const stepToConfig = steps.find((step) => step.type !== StepTypeEnum.TRIGGER);
+      {
+        title: 'Configure notification template',
+        isCompleted: (steps: Step[]) =>
+          steps.some((step: Step) => step.type !== StepTypeEnum.TRIGGER && step.controls?.values),
+        onClick: () => {
+          const stepToConfig = steps.find((step) => step.type !== StepTypeEnum.TRIGGER);
 
-        if (stepToConfig) {
+          if (stepToConfig) {
+            navigate(
+              buildRoute(ROUTES.EDIT_STEP_TEMPLATE, {
+                environmentSlug: currentEnvironment?.slug ?? '',
+                workflowSlug: workflow?.slug ?? '',
+                stepSlug: stepToConfig.slug,
+              })
+            );
+          }
+        },
+      },
+      ...(steps.some((step) => step.type === StepTypeEnum.IN_APP)
+        ? [
+            {
+              title: 'Connect Inbox to your app',
+              isCompleted: () => foundInAppIntegration?.connected ?? false,
+              onClick: () => {
+                navigate(`${ROUTES.INBOX_EMBED}?environmentId=${currentEnvironment?._id}`);
+              },
+            },
+          ]
+        : []),
+      {
+        title: 'Trigger from your application',
+        isCompleted: () => workflow?.connected ?? false,
+        onClick: () => {
           navigate(
-            buildRoute(ROUTES.EDIT_STEP_TEMPLATE, {
+            buildRoute(ROUTES.TEST_WORKFLOW, {
               environmentSlug: currentEnvironment?.slug ?? '',
               workflowSlug: workflow?.slug ?? '',
-              stepSlug: stepToConfig.slug,
             })
           );
-        }
+        },
       },
-    },
-    {
-      title: 'Trigger from your application',
-      isCompleted: (steps) => false,
-      onClick: () => {
-        navigate(
-          buildRoute(ROUTES.TEST_WORKFLOW, {
-            environmentSlug: currentEnvironment?.slug ?? '',
-            workflowSlug: workflow?.slug ?? '',
-          })
-        );
-      },
-    },
-  ];
+    ],
+    [currentEnvironment, workflow, foundInAppIntegration, navigate, steps]
+  );
+
+  useEffect(() => {
+    const allItemsCompleted = CHECKLIST_ITEMS.every((item) => item.isCompleted(steps));
+    if (allItemsCompleted) {
+      setIsOpen(false);
+    }
+  }, [steps, CHECKLIST_ITEMS]);
 
   return (
-    <Popover>
+    <Popover
+      open={isOpen}
+      onOpenChange={(open) => {
+        // Only allow closing through the close button
+        if (open === false) return;
+        setIsOpen(open);
+      }}
+    >
       <PopoverTrigger asChild>
         <button type="button" className="absolute bottom-[18px] left-[18px]">
           <Badge color="red" size="md" variant="lighter" className="cursor-pointer">
@@ -95,11 +146,22 @@ export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
         </button>
       </PopoverTrigger>
       <PopoverContent side="top" alignOffset={0} align="start" className="w-[325px] p-4">
-        <div>
-          <h3 className="text-foreground-900 text-label-sm mb-1 font-medium">Workflow Checklist</h3>
-          <p className="text-text-soft text-paragraph-xs mb-3">
-            Let's make sure you have everything you need to send notifications to your users
-          </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="text-foreground-900 text-label-sm mb-1 font-medium">Workflow Checklist</h3>
+            <p className="text-text-soft text-paragraph-xs mb-3">
+              Let's make sure you have everything you need to send notifications to your users
+            </p>
+          </div>
+          <PopoverClose asChild>
+            <button
+              type="button"
+              className="text-text-soft hover:text-text-sub -mr-1 -mt-1 rounded-sm p-1 transition-colors"
+              onClick={() => setIsOpen(false)}
+            >
+              <RiCloseLine className="h-4 w-4" />
+            </button>
+          </PopoverClose>
         </div>
         <div className="bg-bg-weak rounded-8 flex flex-col p-1.5">
           {CHECKLIST_ITEMS.map((item, index) => (
