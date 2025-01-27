@@ -93,7 +93,8 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
   const { step, workflow, update, environment } = props;
   const navigate = useNavigate();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const isStepConditionsEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_STEP_CONDITIONS_ENABLED);
+  const isStepConditionsFeatureEnabled = useFeatureFlag(FeatureFlagsKeysEnum.IS_STEP_CONDITIONS_ENABLED);
+  const canEditStepConditions = isStepConditionsFeatureEnabled && workflow.origin === WorkflowOriginEnum.NOVU_CLOUD;
   const supportedStepTypes = [
     StepTypeEnum.IN_APP,
     StepTypeEnum.SMS,
@@ -335,7 +336,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
             </>
           )}
 
-          {isStepConditionsEnabled && (
+          {canEditStepConditions && (
             <>
               <SidebarContent>
                 <Link to={'./conditions'} relative="path" state={{ stepType: step.type }}>
@@ -345,7 +346,7 @@ export const ConfigureStepForm = (props: ConfigureStepFormProps) => {
                     className="flex w-full justify-start gap-1.5 text-xs font-medium"
                   >
                     <RiGuideFill className="h-4 w-4 text-neutral-600" />
-                    Skip Conditions
+                    Step Conditions
                     <span className="ml-auto flex items-center gap-0.5">
                       <span>{conditionsCount}</span>
                       <RiArrowRightSLine className="ml-auto h-4 w-4 text-neutral-600" />
