@@ -47,7 +47,7 @@ export class SubscriberController {
     );
   }
 
-  @Get(':/subscriberId')
+  @Get('/:subscriberId')
   @UserAuthentication()
   @ExternalApiAccessible()
   @ApiOperation({
