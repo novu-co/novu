@@ -2,8 +2,10 @@ import { useAuth } from '@/context/auth/hooks';
 import { useEnvironment, useFetchEnvironments } from '@/context/environment/hooks';
 import { useFetchIntegrations } from '@/hooks/use-fetch-integrations';
 import { useSyncWorkflow } from '@/hooks/use-sync-workflow';
+import { useTelemetry } from '@/hooks/use-telemetry';
 import { StepTypeEnum } from '@/utils/enums';
 import { buildRoute, ROUTES } from '@/utils/routes';
+import { TelemetryEvent } from '@/utils/telemetry';
 import { Step } from '@/utils/types';
 import { useUser } from '@clerk/clerk-react';
 import { ChannelTypeEnum } from '@novu/shared';
@@ -43,6 +45,7 @@ export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
   const checklistItems = useChecklistItems(steps);
   const syncWorkflowResult = useSyncWorkflow(workflow ?? ({} as any));
   const { PromoteConfirmModal } = syncWorkflowResult;
+  const telemetry = useTelemetry();
 
   useEffect(() => {
     const allItemsCompleted = checklistItems.every((item) => item.isCompleted(steps));
@@ -51,7 +54,10 @@ export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
     if (isFinishedLoading) {
       if (allItemsCompleted) {
         setIsOpen(false);
-
+        telemetry(TelemetryEvent.WORKFLOW_CHECKLIST_COMPLETED, {
+          workflowId: workflow?.workflowId,
+          environmentId: currentEnvironment?._id,
+        });
         if (user) {
           user.update({
             unsafeMetadata: {
@@ -64,17 +70,20 @@ export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
         setIsOpen(true);
       }
     }
-  }, [steps, checklistItems, currentEnvironment, workflow, integrations, environments, user]);
+  }, [steps, checklistItems, currentEnvironment, workflow, integrations, environments, user, telemetry]);
+
+  const handleOpenChange = (open: boolean) => {
+    if (open === false) return;
+    setIsOpen(open);
+    telemetry(TelemetryEvent.WORKFLOW_CHECKLIST_OPENED, {
+      workflowId: workflow?.workflowId,
+      environmentId: currentEnvironment?._id,
+    });
+  };
 
   return (
     <>
-      <Popover
-        open={isOpen}
-        onOpenChange={(open) => {
-          if (open === false) return;
-          setIsOpen(open);
-        }}
-      >
+      <Popover open={isOpen} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <button type="button" className="absolute bottom-[18px] left-[18px]">
             <Badge color="red" size="md" variant="lighter" className="cursor-pointer">
@@ -174,6 +183,7 @@ function useChecklistItems(steps: Step[]) {
   const syncWorkflowResult = useSyncWorkflow(workflow ?? ({} as any));
   const { safeSync } = workflow ? syncWorkflowResult : { safeSync: undefined };
   const { isWorkflowInProd, setIsWorkflowInProd } = useWorkflowInProd();
+  const telemetry = useTelemetry();
 
   const foundInAppIntegration = integrations?.find(
     (integration) =>
@@ -186,6 +196,7 @@ function useChecklistItems(steps: Step[]) {
         title: 'Add a step',
         isCompleted: (steps: Step[]) => steps.length > 0,
         onClick: () => {
+          telemetry(TelemetryEvent.WORKFLOW_CHECKLIST_STEP_CLICKED, { stepTitle: 'Add a step' });
           if (steps.length === 0) {
             const addStepButton = document.querySelector('[data-test-id="add-step-button"]');
             if (addStepButton instanceof HTMLElement) {
@@ -199,6 +210,7 @@ function useChecklistItems(steps: Step[]) {
         isCompleted: (steps: Step[]) =>
           steps.some((step: Step) => step.type !== StepTypeEnum.TRIGGER && step.controls?.values),
         onClick: () => {
+          telemetry(TelemetryEvent.WORKFLOW_CHECKLIST_STEP_CLICKED, { stepTitle: 'Add notification content' });
           const stepToConfig = steps.find((step) => step.type !== StepTypeEnum.TRIGGER);
 
           if (stepToConfig) {
@@ -218,6 +230,9 @@ function useChecklistItems(steps: Step[]) {
               title: 'Integrate Inbox into your app',
               isCompleted: () => foundInAppIntegration?.connected ?? false,
               onClick: () => {
+                telemetry(TelemetryEvent.WORKFLOW_CHECKLIST_STEP_CLICKED, {
+                  stepTitle: 'Integrate Inbox into your app',
+                });
                 navigate(`${ROUTES.INBOX_EMBED}?environmentId=${currentEnvironment?._id}`);
               },
             },
@@ -227,6 +242,7 @@ function useChecklistItems(steps: Step[]) {
         title: 'Trigger from your application',
         isCompleted: () => workflow?.connected ?? false,
         onClick: () => {
+          telemetry(TelemetryEvent.WORKFLOW_CHECKLIST_STEP_CLICKED, { stepTitle: 'Trigger from your application' });
           navigate(
             buildRoute(ROUTES.TEST_WORKFLOW, {
               environmentSlug: currentEnvironment?.slug ?? '',
@@ -239,6 +255,7 @@ function useChecklistItems(steps: Step[]) {
         title: 'Sync to Production',
         isCompleted: () => isWorkflowInProd,
         onClick: () => {
+          telemetry(TelemetryEvent.WORKFLOW_CHECKLIST_STEP_CLICKED, { stepTitle: 'Sync to Production' });
           const prodEnv = environments.find((env) => env.name === 'Production');
           if (prodEnv && safeSync) {
             safeSync(prodEnv._id).then(() => {
@@ -248,7 +265,17 @@ function useChecklistItems(steps: Step[]) {
         },
       },
     ],
-    [currentEnvironment, workflow, foundInAppIntegration, navigate, steps, isWorkflowInProd, environments, safeSync]
+    [
+      currentEnvironment,
+      workflow,
+      foundInAppIntegration,
+      navigate,
+      steps,
+      isWorkflowInProd,
+      environments,
+      safeSync,
+      telemetry,
+    ]
   );
 }
 
