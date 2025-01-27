@@ -45,14 +45,14 @@ function getEEUserRepository() {
   return new EEUserRepository(new CommunityUserRepository(), clerkClientMock);
 }
 
-function getEEOrganizationRepository() {
+export function getEEOrganizationRepository({ mockClerkClient = true }: { mockClerkClient?: boolean } = {}) {
   // nx-ignore-next-line
   const { EEOrganizationRepository } = require('@novu/ee-auth');
 
   return new EEOrganizationRepository(new CommunityOrganizationRepository(), clerkClientMock);
 }
 
-function getEEMemberRepository() {
+export function getEEMemberRepository({ mockClerkClient = true }: { mockClerkClient?: boolean } = {}) {
   // nx-ignore-next-line
   const { EEMemberRepository } = require('@novu/ee-auth');
 
