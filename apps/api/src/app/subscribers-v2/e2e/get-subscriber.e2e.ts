@@ -21,7 +21,7 @@ describe('Get Subscriber - /subscribers/:subscriberId (GET) #novu-v2', () => {
 
     expect(res.statusCode).to.equal(200);
 
-    validateSubscriber(res.body, subscriber);
+    validateSubscriber(res.body.data, subscriber);
   });
 
   it('should return 404 if subscriberId does not exist', async () => {
