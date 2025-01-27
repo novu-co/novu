@@ -714,24 +714,6 @@ export class Client {
 
   private async renderTemplateControls(templateControls: Record<string, unknown>, event: Event) {
     try {
-      // eslint-disable-next-line no-console
-      console.log(
-        'compileControls 555 ',
-        JSON.stringify(
-          {
-            templateControls,
-            templateControlsString: JSON.stringify(templateControls),
-            variables: {
-              payload: event.payload,
-              subscriber: event.subscriber,
-              steps: buildSteps(event.state),
-            },
-          },
-          null,
-          2
-        )
-      );
-
       const templateString = this.templateEngine.parse(JSON.stringify(templateControls));
 
       const compiledString = await this.templateEngine.render(templateString, {
@@ -742,9 +724,6 @@ export class Client {
 
       return JSON.parse(compiledString);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log('error 666', error);
-
       throw new StepControlCompilationFailedError(event.workflowId, event.stepId, error);
     }
   }
