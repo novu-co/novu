@@ -24,7 +24,7 @@ describe('Update Subscriber - /subscribers/:subscriberId (PATCH) #novu-v2', () =
 
     const res = await session.testAgent.patch(`${v2Prefix}/subscribers/${subscriber.subscriberId}`).send(payload);
 
-    expect(res.statusCode).to.equal(201);
+    expect(res.statusCode).to.equal(200);
     const updatedSubscriber = res.body.data;
 
     expect(subscriber.firstName).to.not.equal(updatedSubscriber.firstName);
@@ -53,7 +53,7 @@ describe('Update Subscriber - /subscribers/:subscriberId (PATCH) #novu-v2', () =
   it('should return the original subscriber if no fields are updated', async () => {
     const res = await session.testAgent.patch(`${v2Prefix}/subscribers/${subscriber.subscriberId}`).send({});
 
-    expect(res.statusCode).to.equal(201);
+    expect(res.statusCode).to.equal(200);
     const updatedSubscriber = res.body.data;
 
     expect(subscriber.firstName).to.equal(updatedSubscriber.firstName);
