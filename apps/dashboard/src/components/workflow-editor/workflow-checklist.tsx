@@ -75,7 +75,7 @@ export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
   const CHECKLIST_ITEMS = useMemo(
     () => [
       {
-        title: 'Add a Step',
+        title: 'Add a step',
         isCompleted: (steps: Step[]) => steps.length > 0,
         onClick: () => {
           if (steps.length === 0) {
@@ -87,7 +87,7 @@ export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
         },
       },
       {
-        title: 'Configure notification template',
+        title: 'Add notification content',
         isCompleted: (steps: Step[]) =>
           steps.some((step: Step) => step.type !== StepTypeEnum.TRIGGER && step.controls?.values),
         onClick: () => {
@@ -107,7 +107,7 @@ export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
       ...(steps.some((step) => step.type === StepTypeEnum.IN_APP)
         ? [
             {
-              title: 'Connect Inbox to your app',
+              title: 'Integrate Inbox into your app',
               isCompleted: () => foundInAppIntegration?.connected ?? false,
               onClick: () => {
                 navigate(`${ROUTES.INBOX_EMBED}?environmentId=${currentEnvironment?._id}`);
