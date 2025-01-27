@@ -33,7 +33,6 @@ describe('Update Subscriber - /subscribers/:subscriberId (PATCH) #novu-v2', () =
     expect(updatedSubscriber.lastName).to.equal(payload.lastName);
 
     expect(subscriber.subscriberId).to.equal(updatedSubscriber.subscriberId);
-    expect(subscriber.lastName).to.equal(updatedSubscriber.lastName);
     expect(subscriber.email).to.equal(updatedSubscriber.email);
     expect(subscriber.phone).to.equal(updatedSubscriber.phone);
   });
