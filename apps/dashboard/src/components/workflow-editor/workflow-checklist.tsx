@@ -8,7 +8,7 @@ import { buildRoute, ROUTES } from '@/utils/routes';
 import { TelemetryEvent } from '@/utils/telemetry';
 import { Step } from '@/utils/types';
 import { useUser } from '@clerk/clerk-react';
-import { ChannelTypeEnum } from '@novu/shared';
+import { ChannelTypeEnum, WorkflowResponseDto } from '@novu/shared';
 import { motion } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -27,6 +27,7 @@ import { useWorkflow } from './workflow-provider';
 
 interface WorkflowChecklistProps {
   steps: Step[];
+  workflow: WorkflowResponseDto;
 }
 
 type ChecklistItem = {
@@ -35,16 +36,14 @@ type ChecklistItem = {
   onClick: () => void;
 };
 
-export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
+export function WorkflowChecklist({ steps, workflow }: WorkflowChecklistProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useUser();
-  const { workflow } = useWorkflow();
   const { currentEnvironment } = useEnvironment();
   const { integrations } = useFetchIntegrations();
   const { environments = [] } = useFetchEnvironments({ organizationId: currentEnvironment?._id });
-  const checklistItems = useChecklistItems(steps);
-  const syncWorkflowResult = useSyncWorkflow(workflow ?? ({} as any));
-  const { PromoteConfirmModal } = syncWorkflowResult;
+  const { PromoteConfirmModal, safeSync } = useSyncWorkflow(workflow);
+  const checklistItems = useChecklistItems(steps, safeSync);
   const telemetry = useTelemetry();
 
   useEffect(() => {
@@ -54,10 +53,11 @@ export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
     if (isFinishedLoading) {
       if (allItemsCompleted) {
         setIsOpen(false);
+
         telemetry(TelemetryEvent.WORKFLOW_CHECKLIST_COMPLETED, {
           workflowId: workflow?.workflowId,
-          environmentId: currentEnvironment?._id,
         });
+
         if (user) {
           user.update({
             unsafeMetadata: {
@@ -75,9 +75,9 @@ export function WorkflowChecklist({ steps }: WorkflowChecklistProps) {
   const handleOpenChange = (open: boolean) => {
     if (open === false) return;
     setIsOpen(open);
+
     telemetry(TelemetryEvent.WORKFLOW_CHECKLIST_OPENED, {
       workflowId: workflow?.workflowId,
-      environmentId: currentEnvironment?._id,
     });
   };
 
@@ -173,15 +173,13 @@ function useWorkflowInProd() {
   return { isWorkflowInProd, setIsWorkflowInProd };
 }
 
-function useChecklistItems(steps: Step[]) {
+function useChecklistItems(steps: Step[], safeSync: (targetEnvironmentId: string) => Promise<any>) {
   const navigate = useNavigate();
   const { currentEnvironment } = useEnvironment();
   const { workflow } = useWorkflow();
   const { integrations } = useFetchIntegrations();
   const { currentOrganization } = useAuth();
   const { environments = [] } = useFetchEnvironments({ organizationId: currentOrganization?._id });
-  const syncWorkflowResult = useSyncWorkflow(workflow ?? ({} as any));
-  const { safeSync } = workflow ? syncWorkflowResult : { safeSync: undefined };
   const { isWorkflowInProd, setIsWorkflowInProd } = useWorkflowInProd();
   const telemetry = useTelemetry();
 

@@ -18,6 +18,7 @@ import { useEnvironment } from '@/context/environment/hooks';
 import { StepTypeEnum } from '@/utils/enums';
 import { buildRoute, ROUTES } from '@/utils/routes';
 import { Step } from '@/utils/types';
+import { useUser } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import { NODE_HEIGHT, NODE_WIDTH } from './base-node';
 import { AddNodeEdge, AddNodeEdgeType } from './edges';
@@ -36,7 +37,6 @@ import {
 } from './nodes';
 import { getFirstBodyErrorMessage, getFirstControlsErrorMessage } from './step-utils';
 import { WorkflowChecklist } from './workflow-checklist';
-import { useUser } from '@clerk/clerk-react';
 
 const nodeTypes = {
   trigger: TriggerNode,
@@ -255,8 +255,11 @@ const WorkflowCanvasChild = ({ steps, readOnly }: { steps: Step[]; readOnly?: bo
       >
         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
       </ReactFlow>
-      {currentEnvironment?.name === EnvironmentEnum.DEVELOPMENT &&
-        !user?.unsafeMetadata?.workflowChecklistCompleted && <WorkflowChecklist steps={steps} />}
+      {currentWorkflow &&
+        currentEnvironment?.name === EnvironmentEnum.DEVELOPMENT &&
+        !user?.unsafeMetadata?.workflowChecklistCompleted && (
+          <WorkflowChecklist steps={steps} workflow={currentWorkflow} />
+        )}
     </div>
   );
 };
