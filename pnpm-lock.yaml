@@ -3746,13 +3746,13 @@ importers:
         version: 4.7.2
       solid-floating-ui:
         specifier: ^0.3.1
-        version: 0.3.1(@floating-ui/dom@1.6.7)(solid-js@1.8.17)
+        version: 0.3.1(@floating-ui/dom@1.6.7)(solid-js@1.9.4)
       solid-js:
-        specifier: ^1.8.11
-        version: 1.8.17
+        specifier: ^1.9.4
+        version: 1.9.4
       solid-motionone:
         specifier: ^1.0.1
-        version: 1.0.1(solid-js@1.8.17)
+        version: 1.0.1(solid-js@1.9.4)
       tailwind-merge:
         specifier: ^2.4.0
         version: 2.4.0
@@ -3792,7 +3792,7 @@ importers:
         version: 1.0.4
       esbuild-plugin-solid:
         specifier: ^0.6.0
-        version: 0.6.0(esbuild@0.23.1)(solid-js@1.8.17)
+        version: 0.6.0(esbuild@0.23.1)(solid-js@1.9.4)
       http-server:
         specifier: ^0.13.0
         version: 0.13.0
@@ -3816,7 +3816,7 @@ importers:
         version: 0.6.5(prettier@3.3.3)
       solid-devtools:
         specifier: ^0.29.2
-        version: 0.29.3(solid-js@1.8.17)(vite@5.4.2(@types/node@20.16.5)(less@4.2.0)(lightningcss@1.26.0)(sass@1.77.8)(sugarss@4.0.1(postcss@8.4.38))(terser@5.31.6))
+        version: 0.29.3(solid-js@1.9.4)(vite@5.4.2(@types/node@20.16.5)(less@4.2.0)(lightningcss@1.26.0)(sass@1.77.8)(sugarss@4.0.1(postcss@8.4.38))(terser@5.31.6))
       tailwindcss:
         specifier: ^3.4.4
         version: 3.4.4(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@20.16.5)(typescript@5.6.2))
@@ -3840,7 +3840,7 @@ importers:
         version: 8.1.0(@microsoft/api-extractor@7.47.7(@types/node@20.16.5))(@swc/core@1.7.26(@swc/helpers@0.5.12))(postcss@8.4.38)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)
       tsup-preset-solid:
         specifier: ^2.2.0
-        version: 2.2.0(esbuild@0.23.1)(solid-js@1.8.17)(tsup@8.1.0(@microsoft/api-extractor@7.47.7(@types/node@20.16.5))(@swc/core@1.7.26(@swc/helpers@0.5.12))(postcss@8.4.38)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2))
+        version: 2.2.0(esbuild@0.23.1)(solid-js@1.9.4)(tsup@8.1.0(@microsoft/api-extractor@7.47.7(@types/node@20.16.5))(@swc/core@1.7.26(@swc/helpers@0.5.12))(postcss@8.4.38)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2))
       typescript:
         specifier: 5.6.2
         version: 5.6.2
@@ -32328,14 +32328,14 @@ packages:
   serialize-javascript@6.0.2:
     resolution: {integrity: sha512-Saa1xPByTTq2gdeFZYLLo+RFE35NHZkAbqZeWNd3BpzppeVisAqpDjcp8dyf6uIvEqJRd46jemmyA4iFIeVk8g==}
 
-  seroval-plugins@1.0.7:
-    resolution: {integrity: sha512-GO7TkWvodGp6buMEX9p7tNyIkbwlyuAWbI6G9Ec5bhcm7mQdu3JOK1IXbEUwb3FVzSc363GraG/wLW23NSavIw==}
+  seroval-plugins@1.2.0:
+    resolution: {integrity: sha512-hULTbfzSe81jGWLH8TAJjkEvw6JWMqOo9Uq+4V4vg+HNq53hyHldM9ZOfjdzokcFysiTp9aFdV2vJpZFqKeDjQ==}
     engines: {node: '>=10'}
     peerDependencies:
       seroval: ^1.0
 
-  seroval@1.0.7:
-    resolution: {integrity: sha512-n6ZMQX5q0Vn19Zq7CIKNIo7E75gPkGCFUEqDpa8jgwpYr/vScjqnQ6H09t1uIiZ0ZSK0ypEGvrYK2bhBGWsGdw==}
+  seroval@1.2.0:
+    resolution: {integrity: sha512-GURoU99ko2UiAgUC3qDCk59Jb3Ss4Po8VIMGkG8j5PFo2Q7y0YSMP8QG9NuL/fJCoTz9V1XZUbpNIMXPOfaGpA==}
     engines: {node: '>=10'}
 
   serve-favicon@2.5.0:
@@ -32646,8 +32646,8 @@ packages:
       '@floating-ui/dom': ^1.5
       solid-js: ^1.8
 
-  solid-js@1.8.17:
-    resolution: {integrity: sha512-E0FkUgv9sG/gEBWkHr/2XkBluHb1fkrHywUgA6o6XolPDCJ4g1HaLmQufcBBhiF36ee40q+HpG/vCZu7fLpI3Q==}
+  solid-js@1.9.4:
+    resolution: {integrity: sha512-ipQl8FJ31bFUoBNScDQTG3BjN6+9Rg+Q+f10bUbnO6EOTTf5NGerJeHc7wyu5I4RMHEl/WwZwUmy/PTRgxxZ8g==}
 
   solid-motionone@1.0.1:
     resolution: {integrity: sha512-gkbrSikDMXFyYgqmAwVi80URtsv3YTcrGIEJdwLajlneMrW58V4qQCzTMSPlmirYU48wG7hWgwW6idJoPQ9Fwg==}
@@ -34886,6 +34886,7 @@ packages:
   verdaccio@5.32.1:
     resolution: {integrity: sha512-GU8a+van7cQzzv6/pXWW8jMlQ7OoWNYPqRpvCW7F2QmxzpKp9hWb3yX9iLY3CJNrODuQYnUDjJ/hmBa8rUq+Aw==}
     engines: {node: '>=14'}
+    deprecated: this version is deprecated, please migrate to 6.x versions
     hasBin: true
 
   verror@1.10.0:
@@ -54565,127 +54566,127 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@solid-devtools/debugger@0.23.4(solid-js@1.8.17)':
+  '@solid-devtools/debugger@0.23.4(solid-js@1.9.4)':
     dependencies:
       '@nothing-but/utils': 0.12.1
-      '@solid-devtools/shared': 0.13.2(solid-js@1.8.17)
-      '@solid-primitives/bounds': 0.0.118(solid-js@1.8.17)
-      '@solid-primitives/cursor': 0.0.112(solid-js@1.8.17)
-      '@solid-primitives/event-bus': 1.0.11(solid-js@1.8.17)
-      '@solid-primitives/event-listener': 2.3.3(solid-js@1.8.17)
-      '@solid-primitives/keyboard': 1.2.8(solid-js@1.8.17)
-      '@solid-primitives/platform': 0.1.2(solid-js@1.8.17)
-      '@solid-primitives/rootless': 1.4.5(solid-js@1.8.17)
-      '@solid-primitives/scheduled': 1.4.3(solid-js@1.8.17)
-      '@solid-primitives/static-store': 0.0.5(solid-js@1.8.17)
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-devtools/shared': 0.13.2(solid-js@1.9.4)
+      '@solid-primitives/bounds': 0.0.118(solid-js@1.9.4)
+      '@solid-primitives/cursor': 0.0.112(solid-js@1.9.4)
+      '@solid-primitives/event-bus': 1.0.11(solid-js@1.9.4)
+      '@solid-primitives/event-listener': 2.3.3(solid-js@1.9.4)
+      '@solid-primitives/keyboard': 1.2.8(solid-js@1.9.4)
+      '@solid-primitives/platform': 0.1.2(solid-js@1.9.4)
+      '@solid-primitives/rootless': 1.4.5(solid-js@1.9.4)
+      '@solid-primitives/scheduled': 1.4.3(solid-js@1.9.4)
+      '@solid-primitives/static-store': 0.0.5(solid-js@1.9.4)
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-devtools/shared@0.13.2(solid-js@1.8.17)':
+  '@solid-devtools/shared@0.13.2(solid-js@1.9.4)':
     dependencies:
-      '@solid-primitives/event-bus': 1.0.11(solid-js@1.8.17)
-      '@solid-primitives/event-listener': 2.3.3(solid-js@1.8.17)
-      '@solid-primitives/media': 2.2.9(solid-js@1.8.17)
-      '@solid-primitives/refs': 1.0.8(solid-js@1.8.17)
-      '@solid-primitives/rootless': 1.4.5(solid-js@1.8.17)
-      '@solid-primitives/scheduled': 1.4.3(solid-js@1.8.17)
-      '@solid-primitives/static-store': 0.0.5(solid-js@1.8.17)
-      '@solid-primitives/styles': 0.0.111(solid-js@1.8.17)
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-primitives/event-bus': 1.0.11(solid-js@1.9.4)
+      '@solid-primitives/event-listener': 2.3.3(solid-js@1.9.4)
+      '@solid-primitives/media': 2.2.9(solid-js@1.9.4)
+      '@solid-primitives/refs': 1.0.8(solid-js@1.9.4)
+      '@solid-primitives/rootless': 1.4.5(solid-js@1.9.4)
+      '@solid-primitives/scheduled': 1.4.3(solid-js@1.9.4)
+      '@solid-primitives/static-store': 0.0.5(solid-js@1.9.4)
+      '@solid-primitives/styles': 0.0.111(solid-js@1.9.4)
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-primitives/bounds@0.0.118(solid-js@1.8.17)':
+  '@solid-primitives/bounds@0.0.118(solid-js@1.9.4)':
     dependencies:
-      '@solid-primitives/event-listener': 2.3.3(solid-js@1.8.17)
-      '@solid-primitives/resize-observer': 2.0.25(solid-js@1.8.17)
-      '@solid-primitives/static-store': 0.0.5(solid-js@1.8.17)
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-primitives/event-listener': 2.3.3(solid-js@1.9.4)
+      '@solid-primitives/resize-observer': 2.0.25(solid-js@1.9.4)
+      '@solid-primitives/static-store': 0.0.5(solid-js@1.9.4)
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-primitives/cursor@0.0.112(solid-js@1.8.17)':
+  '@solid-primitives/cursor@0.0.112(solid-js@1.9.4)':
     dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-primitives/event-bus@1.0.11(solid-js@1.8.17)':
+  '@solid-primitives/event-bus@1.0.11(solid-js@1.9.4)':
     dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-primitives/event-listener@2.3.3(solid-js@1.8.17)':
+  '@solid-primitives/event-listener@2.3.3(solid-js@1.9.4)':
     dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-primitives/keyboard@1.2.8(solid-js@1.8.17)':
+  '@solid-primitives/keyboard@1.2.8(solid-js@1.9.4)':
     dependencies:
-      '@solid-primitives/event-listener': 2.3.3(solid-js@1.8.17)
-      '@solid-primitives/rootless': 1.4.5(solid-js@1.8.17)
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-primitives/event-listener': 2.3.3(solid-js@1.9.4)
+      '@solid-primitives/rootless': 1.4.5(solid-js@1.9.4)
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-primitives/media@2.2.9(solid-js@1.8.17)':
+  '@solid-primitives/media@2.2.9(solid-js@1.9.4)':
     dependencies:
-      '@solid-primitives/event-listener': 2.3.3(solid-js@1.8.17)
-      '@solid-primitives/rootless': 1.4.5(solid-js@1.8.17)
-      '@solid-primitives/static-store': 0.0.8(solid-js@1.8.17)
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-primitives/event-listener': 2.3.3(solid-js@1.9.4)
+      '@solid-primitives/rootless': 1.4.5(solid-js@1.9.4)
+      '@solid-primitives/static-store': 0.0.8(solid-js@1.9.4)
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-primitives/platform@0.1.2(solid-js@1.8.17)':
+  '@solid-primitives/platform@0.1.2(solid-js@1.9.4)':
     dependencies:
-      solid-js: 1.8.17
+      solid-js: 1.9.4
 
-  '@solid-primitives/props@3.1.11(solid-js@1.8.17)':
+  '@solid-primitives/props@3.1.11(solid-js@1.9.4)':
     dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-primitives/refs@1.0.8(solid-js@1.8.17)':
+  '@solid-primitives/refs@1.0.8(solid-js@1.9.4)':
     dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-primitives/resize-observer@2.0.25(solid-js@1.8.17)':
+  '@solid-primitives/resize-observer@2.0.25(solid-js@1.9.4)':
     dependencies:
-      '@solid-primitives/event-listener': 2.3.3(solid-js@1.8.17)
-      '@solid-primitives/rootless': 1.4.5(solid-js@1.8.17)
-      '@solid-primitives/static-store': 0.0.8(solid-js@1.8.17)
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-primitives/event-listener': 2.3.3(solid-js@1.9.4)
+      '@solid-primitives/rootless': 1.4.5(solid-js@1.9.4)
+      '@solid-primitives/static-store': 0.0.8(solid-js@1.9.4)
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-primitives/rootless@1.4.5(solid-js@1.8.17)':
+  '@solid-primitives/rootless@1.4.5(solid-js@1.9.4)':
     dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-primitives/scheduled@1.4.3(solid-js@1.8.17)':
+  '@solid-primitives/scheduled@1.4.3(solid-js@1.9.4)':
     dependencies:
-      solid-js: 1.8.17
+      solid-js: 1.9.4
 
-  '@solid-primitives/static-store@0.0.5(solid-js@1.8.17)':
+  '@solid-primitives/static-store@0.0.5(solid-js@1.9.4)':
     dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-primitives/static-store@0.0.8(solid-js@1.8.17)':
+  '@solid-primitives/static-store@0.0.8(solid-js@1.9.4)':
     dependencies:
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-primitives/styles@0.0.111(solid-js@1.8.17)':
+  '@solid-primitives/styles@0.0.111(solid-js@1.9.4)':
     dependencies:
-      '@solid-primitives/rootless': 1.4.5(solid-js@1.8.17)
-      '@solid-primitives/utils': 6.2.3(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-primitives/rootless': 1.4.5(solid-js@1.9.4)
+      '@solid-primitives/utils': 6.2.3(solid-js@1.9.4)
+      solid-js: 1.9.4
 
-  '@solid-primitives/transition-group@1.0.5(solid-js@1.8.17)':
+  '@solid-primitives/transition-group@1.0.5(solid-js@1.9.4)':
     dependencies:
-      solid-js: 1.8.17
+      solid-js: 1.9.4
 
-  '@solid-primitives/utils@6.2.3(solid-js@1.8.17)':
+  '@solid-primitives/utils@6.2.3(solid-js@1.9.4)':
     dependencies:
-      solid-js: 1.8.17
+      solid-js: 1.9.4
 
   '@stablelib/base64@1.0.1': {}
 
@@ -65709,23 +65710,23 @@ snapshots:
 
   esbuild-plugin-inline-import@1.0.4: {}
 
-  esbuild-plugin-solid@0.5.0(esbuild@0.23.1)(solid-js@1.8.17):
+  esbuild-plugin-solid@0.5.0(esbuild@0.23.1)(solid-js@1.9.4):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/preset-typescript': 7.23.2(@babel/core@7.25.2)
       babel-preset-solid: 1.8.17(@babel/core@7.25.2)
       esbuild: 0.23.1
-      solid-js: 1.8.17
+      solid-js: 1.9.4
     transitivePeerDependencies:
       - supports-color
 
-  esbuild-plugin-solid@0.6.0(esbuild@0.23.1)(solid-js@1.8.17):
+  esbuild-plugin-solid@0.6.0(esbuild@0.23.1)(solid-js@1.9.4):
     dependencies:
       '@babel/core': 7.24.4
       '@babel/preset-typescript': 7.23.2(@babel/core@7.24.4)
       babel-preset-solid: 1.8.17(@babel/core@7.24.4)
       esbuild: 0.23.1
-      solid-js: 1.8.17
+      solid-js: 1.9.4
     transitivePeerDependencies:
       - supports-color
 
@@ -79709,11 +79710,11 @@ snapshots:
     dependencies:
       randombytes: 2.1.0
 
-  seroval-plugins@1.0.7(seroval@1.0.7):
+  seroval-plugins@1.2.0(seroval@1.2.0):
     dependencies:
-      seroval: 1.0.7
+      seroval: 1.2.0
 
-  seroval@1.0.7: {}
+  seroval@1.2.0: {}
 
   serve-favicon@2.5.0:
     dependencies:
@@ -80107,39 +80108,39 @@ snapshots:
       ip: 2.0.0
       smart-buffer: 4.2.0
 
-  solid-devtools@0.29.3(solid-js@1.8.17)(vite@5.4.2(@types/node@20.16.5)(less@4.2.0)(lightningcss@1.26.0)(sass@1.77.8)(sugarss@4.0.1(postcss@8.4.38))(terser@5.31.6)):
+  solid-devtools@0.29.3(solid-js@1.9.4)(vite@5.4.2(@types/node@20.16.5)(less@4.2.0)(lightningcss@1.26.0)(sass@1.77.8)(sugarss@4.0.1(postcss@8.4.38))(terser@5.31.6)):
     dependencies:
       '@babel/core': 7.24.4
       '@babel/plugin-syntax-typescript': 7.24.7(@babel/core@7.24.4)
       '@babel/types': 7.24.5
-      '@solid-devtools/debugger': 0.23.4(solid-js@1.8.17)
-      '@solid-devtools/shared': 0.13.2(solid-js@1.8.17)
-      solid-js: 1.8.17
+      '@solid-devtools/debugger': 0.23.4(solid-js@1.9.4)
+      '@solid-devtools/shared': 0.13.2(solid-js@1.9.4)
+      solid-js: 1.9.4
     optionalDependencies:
       vite: 5.4.2(@types/node@20.16.5)(less@4.2.0)(lightningcss@1.26.0)(sass@1.77.8)(sugarss@4.0.1(postcss@8.4.38))(terser@5.31.6)
     transitivePeerDependencies:
       - supports-color
 
-  solid-floating-ui@0.3.1(@floating-ui/dom@1.6.7)(solid-js@1.8.17):
+  solid-floating-ui@0.3.1(@floating-ui/dom@1.6.7)(solid-js@1.9.4):
     dependencies:
       '@floating-ui/dom': 1.6.7
-      solid-js: 1.8.17
+      solid-js: 1.9.4
 
-  solid-js@1.8.17:
+  solid-js@1.9.4:
     dependencies:
       csstype: 3.1.3
-      seroval: 1.0.7
-      seroval-plugins: 1.0.7(seroval@1.0.7)
+      seroval: 1.2.0
+      seroval-plugins: 1.2.0(seroval@1.2.0)
 
-  solid-motionone@1.0.1(solid-js@1.8.17):
+  solid-motionone@1.0.1(solid-js@1.9.4):
     dependencies:
       '@motionone/dom': 10.18.0
       '@motionone/utils': 10.18.0
-      '@solid-primitives/props': 3.1.11(solid-js@1.8.17)
-      '@solid-primitives/refs': 1.0.8(solid-js@1.8.17)
-      '@solid-primitives/transition-group': 1.0.5(solid-js@1.8.17)
+      '@solid-primitives/props': 3.1.11(solid-js@1.9.4)
+      '@solid-primitives/refs': 1.0.8(solid-js@1.9.4)
+      '@solid-primitives/transition-group': 1.0.5(solid-js@1.9.4)
       csstype: 3.1.3
-      solid-js: 1.8.17
+      solid-js: 1.9.4
 
   sonic-boom@2.8.0:
     dependencies:
@@ -82300,9 +82301,9 @@ snapshots:
 
   tslib@2.7.0: {}
 
-  tsup-preset-solid@2.2.0(esbuild@0.23.1)(solid-js@1.8.17)(tsup@8.1.0(@microsoft/api-extractor@7.47.7(@types/node@20.16.5))(@swc/core@1.7.26(@swc/helpers@0.5.12))(postcss@8.4.38)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)):
+  tsup-preset-solid@2.2.0(esbuild@0.23.1)(solid-js@1.9.4)(tsup@8.1.0(@microsoft/api-extractor@7.47.7(@types/node@20.16.5))(@swc/core@1.7.26(@swc/helpers@0.5.12))(postcss@8.4.38)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)):
     dependencies:
-      esbuild-plugin-solid: 0.5.0(esbuild@0.23.1)(solid-js@1.8.17)
+      esbuild-plugin-solid: 0.5.0(esbuild@0.23.1)(solid-js@1.9.4)
       tsup: 8.1.0(@microsoft/api-extractor@7.47.7(@types/node@20.16.5))(@swc/core@1.7.26(@swc/helpers@0.5.12))(postcss@8.4.38)(ts-node@10.9.2(@swc/core@1.7.26(@swc/helpers@0.5.12))(@types/node@20.16.5)(typescript@5.6.2))(typescript@5.6.2)
     transitivePeerDependencies:
       - esbuild
