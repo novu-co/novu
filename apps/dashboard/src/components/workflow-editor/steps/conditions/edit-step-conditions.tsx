@@ -1,13 +1,13 @@
+import { FeatureFlagsKeysEnum } from '@novu/shared';
 import { RiCloseLine, RiGuideFill } from 'react-icons/ri';
 import { useNavigate } from 'react-router-dom';
-import { FeatureFlagsKeysEnum } from '@novu/shared';
 
 import { CompactButton } from '@/components/primitives/button-compact';
+import { EditStepConditionsForm } from '@/components/workflow-editor/steps/conditions/edit-step-conditions-form';
+import { EditStepConditionsFormSkeleton } from '@/components/workflow-editor/steps/conditions/edit-step-conditions-skeleton';
 import { StepDrawer } from '@/components/workflow-editor/steps/step-drawer';
 import { useWorkflow } from '@/components/workflow-editor/workflow-provider';
 import { useFeatureFlag } from '@/hooks/use-feature-flag';
-import { EditStepConditionsForm } from '@/components/workflow-editor/steps/conditions/edit-step-conditions-form';
-import { EditStepConditionsFormSkeleton } from '@/components/workflow-editor/steps/conditions/edit-step-conditions-skeleton';
 
 export const EditStepConditions = () => {
   const navigate = useNavigate();
@@ -18,7 +18,10 @@ export const EditStepConditions = () => {
     return null;
   }
 
-  if (!isStepConditionsEnabled) {
+  const { uiSchema } = step.controls ?? {};
+  const { skip } = uiSchema?.properties ?? {};
+
+  if (!isStepConditionsEnabled || !skip) {
     navigate('..', { relative: 'path' });
     return null;
   }
