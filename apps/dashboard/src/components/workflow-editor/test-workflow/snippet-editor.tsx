@@ -26,12 +26,15 @@ export const SnippetEditor = ({
     return res;
   }, [editorLanguage]);
 
+  console.log('value 1111', JSON.stringify(value));
+  console.log('value 2222', value);
+
   return (
     <Editor
       readOnly={readOnly}
       lang={editorLanguage}
       className="h-full"
-      value={value}
+      value={JSON.stringify(value)}
       extensions={extensions}
       basicSetup={basicSetup}
       multiline

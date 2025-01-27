@@ -7,7 +7,7 @@ import { InstrumentUsecase } from '@novu/application-generic';
 import { FullPayloadForRender, RenderCommand } from './render-command';
 import { WrapMailyInLiquidUseCase } from './maily-to-liquid/wrap-maily-in-liquid.usecase';
 import { MAILY_ITERABLE_MARK, MailyAttrsEnum, MailyContentTypeEnum } from './maily-to-liquid/maily.types';
-import { parseLiquid } from '../../../shared/helpers/liquid';
+import { parseLiquid, parseLiquidString } from '../../../shared/helpers/liquid';
 
 export class EmailOutputRendererCommand extends RenderCommand {}
 
@@ -17,7 +17,8 @@ export class EmailOutputRendererUsecase {
 
   @InstrumentUsecase()
   async execute(renderCommand: EmailOutputRendererCommand): Promise<EmailRenderOutput> {
-    const { body, subject } = renderCommand.controlValues;
+    const { body, subject: controlSubject } = renderCommand.controlValues;
+    const subject = await parseLiquidString(controlSubject as string, renderCommand.fullPayloadForRender);
 
     if (!body || typeof body !== 'string') {
       /**
@@ -33,7 +34,7 @@ export class EmailOutputRendererUsecase {
 
     const liquifiedMaily = this.wrapMailyInLiquidUsecase.execute({ emailEditor: body });
     const transformedMaily = await this.transformMailyContent(liquifiedMaily, renderCommand.fullPayloadForRender);
-    const parsedMaily = await this.parseMailyContentByLiquid(transformedMaily, renderCommand.fullPayloadForRender);
+    const parsedMaily = await parseLiquid(transformedMaily, renderCommand.fullPayloadForRender);
     const strippedMaily = this.removeTrailingEmptyLines(parsedMaily);
     const renderedHtml = await mailyRender(strippedMaily);
 
@@ -42,7 +43,7 @@ export class EmailOutputRendererUsecase {
      * This passes responsibility to framework to throw type validation exceptions
      * rather than handling invalid types here.
      */
-    return { subject: subject as string, body: renderedHtml };
+    return { subject, body: renderedHtml };
   }
 
   private removeTrailingEmptyLines(node: MailyJSONContent): MailyJSONContent {
@@ -67,15 +68,6 @@ export class EmailOutputRendererUsecase {
     const filteredContent = node.content.slice(0, lastIndex);
 
     return { ...node, content: filteredContent };
-  }
-
-  private async parseMailyContentByLiquid(
-    mailyContent: MailyJSONContent,
-    variables: FullPayloadForRender
-  ): Promise<MailyJSONContent> {
-    const parsedString = await parseLiquid(JSON.stringify(mailyContent), variables);
-
-    return JSON.parse(parsedString);
   }
 
   private async transformMailyContent(
@@ -146,7 +138,7 @@ export class EmailOutputRendererUsecase {
     node: MailyJSONContent & { attrs: { [MailyAttrsEnum.SHOW_IF_KEY]: string } }
   ): Promise<boolean> {
     const { [MailyAttrsEnum.SHOW_IF_KEY]: showIfKey } = node.attrs;
-    const parsedShowIfValue = await parseLiquid(showIfKey, variables);
+    const parsedShowIfValue = await parseLiquidString(showIfKey, variables);
 
     return this.stringToBoolean(parsedShowIfValue);
   }
@@ -209,7 +201,7 @@ export class EmailOutputRendererUsecase {
   }
 
   private async getIterableArray(iterablePath: string, variables: FullPayloadForRender): Promise<unknown[]> {
-    const iterableArrayString = await parseLiquid(iterablePath, variables);
+    const iterableArrayString = await parseLiquidString(iterablePath, variables);
 
     try {
       const parsedArray = JSON.parse(iterableArrayString.replace(/'/g, '"'));
