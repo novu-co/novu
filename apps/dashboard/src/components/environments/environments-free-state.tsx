@@ -3,16 +3,16 @@ import { useEnvironment, useFetchEnvironments } from '@/context/environment/hook
 import { ROUTES } from '@/utils/routes';
 import { RiBookMarkedLine, RiSparkling2Line } from 'react-icons/ri';
 import { Link, useNavigate } from 'react-router-dom';
-import { useTelemetry } from '../hooks/use-telemetry';
-import { TelemetryEvent } from '../utils/telemetry';
-import { Badge } from './primitives/badge';
-import { Button } from './primitives/button';
-import { LinkButton } from './primitives/button-link';
-import { CopyButton } from './primitives/copy-button';
-import { EnvironmentBranchIcon } from './primitives/environment-branch-icon';
-import { Separator } from './primitives/separator';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './primitives/table';
-import TruncatedText from './truncated-text';
+import { useTelemetry } from '../../hooks/use-telemetry';
+import { TelemetryEvent } from '../../utils/telemetry';
+import { Badge } from '../primitives/badge';
+import { Button } from '../primitives/button';
+import { LinkButton } from '../primitives/button-link';
+import { CopyButton } from '../primitives/copy-button';
+import { EnvironmentBranchIcon } from '../primitives/environment-branch-icon';
+import { Separator } from '../primitives/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../primitives/table';
+import TruncatedText from '../truncated-text';
 
 export function FreeTierState() {
   const track = useTelemetry();

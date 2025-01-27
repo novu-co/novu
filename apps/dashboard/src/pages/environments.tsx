@@ -1,10 +1,10 @@
 import { PageMeta } from '@/components/page-meta';
 import { ApiServiceLevelEnum } from '@novu/shared';
 import { useEffect } from 'react';
-import { CreateEnvironmentButton } from '../components/create-environment-button';
+import { CreateEnvironmentButton } from '../components/environments/create-environment-button';
 import { DashboardLayout } from '../components/dashboard-layout';
-import { FreeTierState } from '../components/environments-free-state';
-import { EnvironmentsList } from '../components/environments-list';
+import { FreeTierState } from '../components/environments/environments-free-state';
+import { EnvironmentsList } from '../components/environments/environments-list';
 import { useAuth } from '../context/auth/hooks';
 import { useFetchEnvironments } from '../context/environment/hooks';
 import { useFetchSubscription } from '../hooks/use-fetch-subscription';

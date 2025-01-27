@@ -28,10 +28,10 @@ import { ComponentProps, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiAddLine, RiArrowRightSLine } from 'react-icons/ri';
 import { z } from 'zod';
-import { useTelemetry } from '../hooks/use-telemetry';
-import { TelemetryEvent } from '../utils/telemetry';
-import { ColorPicker } from './primitives/color-picker';
-import { showErrorToast, showSuccessToast } from './primitives/sonner-helpers';
+import { useTelemetry } from '../../hooks/use-telemetry';
+import { TelemetryEvent } from '../../utils/telemetry';
+import { ColorPicker } from '../primitives/color-picker';
+import { showErrorToast, showSuccessToast } from '../primitives/sonner-helpers';
 
 const ENVIRONMENT_COLORS = [
   '#FF6B6B', // Vibrant Coral
@@ -58,7 +58,7 @@ function getRandomColor(existingEnvironments: IEnvironment[] = []) {
 
 const createEnvironmentSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  color: z.string(),
+  color: z.string().regex(/^\#[0-9a-fA-F]{6}$/, 'Enter a valid hex color, like #123456.'),
 });
 
 type CreateEnvironmentFormData = z.infer<typeof createEnvironmentSchema>;
