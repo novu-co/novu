@@ -1,4 +1,13 @@
-import { ClassSerializerInterceptor, Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Query,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ExternalApiAccessible, UserSession } from '@novu/application-generic';
 import {
@@ -6,6 +15,7 @@ import {
   IGetSubscriberResponseDto,
   IListSubscribersRequestDto,
   IListSubscribersResponseDto,
+  IPatchSubscriberRequestDto,
   UserSessionData,
 } from '@novu/shared';
 import { ApiCommonResponses } from '../shared/framework/response.decorator';
@@ -14,6 +24,8 @@ import { ListSubscribersCommand } from './usecases/list-subscribers/list-subscri
 import { ListSubscribersUseCase } from './usecases/list-subscribers/list-subscribers.usecase';
 import { GetSubscriber } from './usecases/get-subscriber/get-subscriber.usecase';
 import { GetSubscriberCommand } from './usecases/get-subscriber/get-subscriber.command';
+import { PatchSubscriber } from './usecases/patch-subscriber/patch-subscriber.usecase';
+import { PatchSubscriberCommand } from './usecases/patch-subscriber/patch-subscriber.command';
 
 @Controller({ path: '/subscribers', version: '2' })
 @UseInterceptors(ClassSerializerInterceptor)
@@ -22,7 +34,8 @@ import { GetSubscriberCommand } from './usecases/get-subscriber/get-subscriber.c
 export class SubscriberController {
   constructor(
     private listSubscribersUsecase: ListSubscribersUseCase,
-    private getSubscriberUsecase: GetSubscriber
+    private getSubscriberUsecase: GetSubscriber,
+    private patchSubscriberUsecase: PatchSubscriber
   ) {}
 
   @Get('')
@@ -63,6 +76,28 @@ export class SubscriberController {
         environmentId: user.environmentId,
         organizationId: user.organizationId,
         subscriberId,
+      })
+    );
+  }
+
+  @Patch('/:subscriberId')
+  @UserAuthentication()
+  @ExternalApiAccessible()
+  @ApiOperation({
+    summary: 'Patch subscriber',
+    description: 'Patch subscriber by your internal id used to identify the subscriber',
+  })
+  async patchSubscriber(
+    @UserSession() user: UserSessionData,
+    @Param('subscriberId') subscriberId: string,
+    @Body() body: IPatchSubscriberRequestDto
+  ): Promise<IGetSubscriberResponseDto> {
+    return await this.patchSubscriberUsecase.execute(
+      PatchSubscriberCommand.create({
+        environmentId: user.environmentId,
+        organizationId: user.organizationId,
+        subscriberId,
+        ...body,
       })
     );
   }
