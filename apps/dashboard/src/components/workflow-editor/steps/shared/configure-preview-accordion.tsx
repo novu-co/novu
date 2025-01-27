@@ -46,8 +46,6 @@ export const ConfigurePreviewAccordion = ({
     [setEditorValue]
   );
 
-  console.log('editorValue 6666', editorValue);
-
   return (
     <Accordion type="single" collapsible value={accordionValue} onValueChange={setAccordionValue}>
       <AccordionItem value="payload">
@@ -63,7 +61,7 @@ export const ConfigurePreviewAccordion = ({
           style={{ '--radix-collapsible-content-height': `${height}px` } as CSSProperties}
         >
           <Editor
-            value={''}
+            value={editorValue}
             onChange={setEditorValueCallback}
             lang="json"
             extensions={extensions}

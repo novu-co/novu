@@ -194,14 +194,11 @@ export const Editor = React.forwardRef<ReactCodeMirrorRef, EditorProps>(
         // which results in value not being updated and "jumping" effect in the editor
         // to prevent this we need to flush the state updates synchronously
         flushSync(() => {
-          console.log('value 4444', value);
           onChangeRef.current?.(value);
         });
       },
       [onChangeRef]
     );
-
-    console.log('value 3333', JSON.stringify(value));
 
     return (
       <CodeMirror
@@ -211,7 +208,7 @@ export const Editor = React.forwardRef<ReactCodeMirrorRef, EditorProps>(
         height={height}
         placeholder={placeholder}
         basicSetup={basicSetup}
-        value={JSON.stringify(value)}
+        value={value}
         onChange={onChangeCallback}
         theme={theme}
         onBlur={() => {
