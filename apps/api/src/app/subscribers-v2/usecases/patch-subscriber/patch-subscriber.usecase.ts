@@ -84,7 +84,7 @@ export class PatchSubscriber {
   }): Promise<IGetSubscriberResponseDto> {
     return await this.getSubscriberUsecase.execute(
       GetSubscriberCommand.create({
-        subscriberId: subscriberId,
+        subscriberId,
         environmentId: _environmentId,
         organizationId: _organizationId,
       })
