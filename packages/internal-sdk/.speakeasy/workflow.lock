@@ -1,0 +1,37 @@
+speakeasyVersion: 1.476.2
+sources:
+    internal-sdk-OAS:
+        sourceNamespace: json-development-internal
+        sourceRevisionDigest: sha256:64dd2fbd3eed651976ea14b35f30f479ae5571ae9fd086baa839f138037ac792
+        sourceBlobDigest: sha256:68bac272e542ed83cb9c867ed90e4e682d4c03c54c0b12ddfe8ebb6a0ba9b103
+        tags:
+            - latest
+            - "1.0"
+targets:
+    internal-sdk:
+        source: internal-sdk-OAS
+        sourceNamespace: json-development-internal
+        sourceRevisionDigest: sha256:64dd2fbd3eed651976ea14b35f30f479ae5571ae9fd086baa839f138037ac792
+        sourceBlobDigest: sha256:68bac272e542ed83cb9c867ed90e4e682d4c03c54c0b12ddfe8ebb6a0ba9b103
+        codeSamplesNamespace: json-development-internal-code-samples
+        codeSamplesRevisionDigest: sha256:a56eb0939eca60850fa1c2a90ccb6ecbe55f127cdc13ad4ee7d7721bf458db2b
+workflow:
+    workflowVersion: 1.0.0
+    speakeasyVersion: latest
+    sources:
+        internal-sdk-OAS:
+            inputs:
+                - location: ../../apps/api/swagger-spec.json
+            overlays:
+                - location: .speakeasy/speakeasy-modifications-overlay.yaml
+            output: sources/json-development.json
+            registry:
+                location: registry.speakeasyapi.dev/novu/novu/json-development-internal
+    targets:
+        internal-sdk:
+            target: typescript
+            source: internal-sdk-OAS
+            codeSamples:
+                registry:
+                    location: registry.speakeasyapi.dev/novu/novu/json-development-internal-code-samples
+                blocking: false

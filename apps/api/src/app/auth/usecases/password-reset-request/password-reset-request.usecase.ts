@@ -39,7 +39,7 @@ export class PasswordResetRequest {
       await this.userRepository.updatePasswordResetToken(foundUser._id, token, resetTokenCount);
 
       if ((process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'production') && process.env.NOVU_API_KEY) {
-        const novu = new Novu({ apiKey: process.env.NOVU_API_KEY });
+        const novu = new Novu({ security: { apiKey: process.env.NOVU_API_KEY } });
         const resetPasswordLink = PasswordResetRequest.getResetRedirectLink(token, foundUser, command.src);
 
         await novu.trigger({

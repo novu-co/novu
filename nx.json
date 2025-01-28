@@ -54,6 +54,7 @@
           "@novu/nextjs",
           "@novu/node",
           "@novu/providers",
+          "@novu/api",
           "@novu/shared",
           "@novu/stateless"
         ],
